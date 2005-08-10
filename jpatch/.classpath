@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/Buoy.jar">
+		<attributes>
+			<attribute value="http://buoy.sourceforge.net/docs/" name="javadoc_location"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/vecmath.jar">
+		<attributes>
+			<attribute value="http://java.sun.com/products/java-media/3D/forDevelopers/J3D_1_3_API/j3dapi/" name="javadoc_location"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/bsh-core-2.0b4.jar">
+		<attributes>
+			<attribute value="http://www.beanshell.org/javadoc/" name="javadoc_location"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/jogl.jar">
+		<attributes>
+			<attribute value="http://www.jpatch.com/jogl/javadoc_public/" name="javadoc_location"/>
+			<attribute value="jpatch/lib/native/linux_x86" name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
