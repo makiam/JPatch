@@ -17,9 +17,9 @@ public final class AlwaysUseZBufferAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		viewDefinition.alwaysUseZBuffer(!viewDefinition.alwaysUseZBuffer());
+//		viewDefinition.alwaysUseZBuffer(!viewDefinition.alwaysUseZBuffer());
 		//((JPatchCanvas)viewDefinition.getViewport()).updateImage();
-		viewDefinition.reset();
+//		viewDefinition.reset();
 	}
 }
 

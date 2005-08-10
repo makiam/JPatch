@@ -19,7 +19,7 @@ implements ComponentListener {
 	public static final String[] aViewName = { "","front view","rear view","top view","bottom view","left view","right view","bird's eye view" };
 	public static final int[] aiGridPlane = { 0, Grid.XY, Grid.XY, Grid.XZ, Grid.XZ, Grid.YZ, Grid.YZ, Grid.NONE };
 
-	private Viewport viewport;
+	private JPatchDrawable2 drawable;
 	private int iView;
 	private float fRotateX = 0f;
 	private float fRotateY = 0f;
@@ -51,12 +51,12 @@ implements ComponentListener {
 		//setGridPlane();
 	}
 	
-	private final void setGridPlane() {
-		//if (iView != BIRDS_EYE) {
-			//iGridPlane = aiGridPlane[iView];
-			viewport.getGrid().setPlane(aiGridPlane[iView]);
-		//}
-	}
+//	private final void setGridPlane() {
+//		//if (iView != BIRDS_EYE) {
+//			//iGridPlane = aiGridPlane[iView];
+//			viewport.getGrid().setPlane(aiGridPlane[iView]);
+//		//}
+//	}
 	/*
 	public final int getGridPlane() {
 		return iGridPlane;
@@ -81,11 +81,17 @@ implements ComponentListener {
 		;
 	}
 	
-	public void setViewport(Viewport viewport) {
-		this.viewport = viewport;
-		viewport.addComponentListener(this);
+//	public void setViewport(Viewport viewport) {
+//		this.viewport = viewport;
+//		viewport.addComponentListener(this);
+//		setView(iView);
+//		setGridPlane();
+//	}
+	
+	public void setDrawable(JPatchDrawable2 drawable) {
+		this.drawable = drawable;
+		drawable.getComponent().addComponentListener(this);
 		setView(iView);
-		setGridPlane();
 	}
 	
 	public final Matrix4f getMatrix() {
@@ -155,17 +161,17 @@ implements ComponentListener {
 			float dimY = getHeight() /2f;
 			moveView(-p3.x / dimX + 1, (dimY - p3.y) / dimX, false);
 		}
-		viewport.render();
+		drawable.display();
 	}
 	
 	public float getWidth() {
 		//return fWidth;
-		return viewport.getWidth();
+		return drawable.getComponent().getWidth();
 	}
 	
 	public float getHeight() {
 		//return fHeight;
-		return viewport.getHeight();
+		return drawable.getComponent().getHeight();
 	}
 	
 	public final int getView() {
@@ -303,8 +309,8 @@ implements ComponentListener {
 		//m.setTranslation(new Vector3f(fTranslateX*fScale,-fTranslateY*fScale,0));
 		//m4View.mul(m);
 		//m4View.setScale(fScale);
-		float width = viewport.getWidth();
-		float height = viewport.getHeight();
+		float width = getWidth();
+		float height = getHeight();
 		//if (viewport != null) {
 			//float fWidth = viewport.getWidth();
 			//float fHeight = viewport.getHeight();
@@ -360,7 +366,7 @@ implements ComponentListener {
 		}
 		p3Lock = null;
 		computeMatrix();
-		setGridPlane();
+//		setGridPlane();
 	}
 	
 	public final void moveView(float x, float y) {
@@ -371,8 +377,8 @@ implements ComponentListener {
 		fTranslateX += x/fScale;
 		fTranslateY += y/fScale;
 		computeMatrix();
-		((JPatchCanvas)viewport).clearBackground();
-		if (repaint) viewport.render();
+//		((JPatchCanvas)viewport).clearBackground();
+		if (repaint) drawable.display();
 	}
 	
 	public final void rotateView(float x, float y) {
@@ -385,7 +391,7 @@ implements ComponentListener {
 		if (fRotateX > Math.PI/2) {
 			fRotateX = (float)Math.PI/2;
 		}
-		viewport.getGrid().setPlane(Grid.NONE);
+//		viewport.getGrid().setPlane(Grid.NONE);
 		if (p3Lock != null) {
 			computeMatrix();
 			Point3f p3 = new Point3f(p3Lock);
@@ -395,24 +401,24 @@ implements ComponentListener {
 			moveView(-p3.x / dimX + 1, (dimY - p3.y) / dimX, false);
 		}
 		computeMatrix();
-		((JPatchCanvas)viewport).clearBackground();
-		viewport.render();
+//		((JPatchCanvas)viewport).clearBackground();
+		drawable.display();
 	}
 	
 	public final void scaleView(float scale) {
 		fScale *= scale;
 		computeMatrix();
-		((JPatchCanvas)viewport).clearBackground();
-		viewport.render();
+//		((JPatchCanvas)viewport).clearBackground();
+		drawable.display();
 	}
 	
 	public final void repaint() {
-		viewport.render();
+		drawable.display();
 	}
 	
-	public final void reset() {
-		((JPatchCanvas)viewport).updateImage();
-	}
+//	public final void reset() {
+//		((JPatchCanvas)viewport).updateImage();
+//	}
 	
 	public final Point get2DPosition(Point3f point) {
 		Point3f p3 = new Point3f(point);
@@ -458,17 +464,17 @@ implements ComponentListener {
 		
 	public final ControlPoint getClosestControlPoint(Point2D.Float t, ControlPoint except, float[] hookPos, boolean selectHooks, boolean grid, ControlPoint selected) {
 		Point2D.Float target;
-		if (grid && viewport.getGrid().snap()) {
-			Point3f p3Target = new Point3f(t.x,t.y,0);
-			Matrix4f m4InvScreen = new Matrix4f(getScreenMatrix());
-			m4InvScreen.invert();
-			m4InvScreen.transform(p3Target);
-			viewport.getGrid().correctVector(p3Target);
-			getScreenMatrix().transform(p3Target);
-			target = new Point2D.Float(p3Target.x,p3Target.y);
-		} else {
+//		if (grid && viewport.getGrid().snap()) {
+//			Point3f p3Target = new Point3f(t.x,t.y,0);
+//			Matrix4f m4InvScreen = new Matrix4f(getScreenMatrix());
+//			m4InvScreen.invert();
+//			m4InvScreen.transform(p3Target);
+//			viewport.getGrid().correctVector(p3Target);
+//			getScreenMatrix().transform(p3Target);
+//			target = new Point2D.Float(p3Target.x,p3Target.y);
+//		} else {
 			target = t;
-		}
+//		}
 		ControlPoint cp;
 		float fHookPos = -1;
 		ControlPoint cpExcept = (except != null) ? except.getHead() : null;

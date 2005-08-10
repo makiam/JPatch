@@ -51,7 +51,7 @@ implements Viewport {
 	public JPatchCanvas(Model model, ViewDefinition viewDefinition) {
 		//this.model = model;
 		this.viewDefinition = viewDefinition;
-		viewDefinition.setViewport(this);
+//		viewDefinition.setViewport(this);
 		m4View = viewDefinition.getMatrix();
 		//drawable = new JPatchDrawableJava2D(createVolatileImage(getWidth(), getHeight()), lighting);
 	}
@@ -828,7 +828,7 @@ implements Viewport {
 				
 				//paintTest();
 				if (tool != null) tool.paint(this, drawable);
-				drawActiveViewportMarker(MainFrame.getInstance().getJPatchScreen().getActiveViewport() == this);
+//				drawActiveViewportMarker(MainFrame.getInstance().getJPatchScreen().getActiveViewport() == this);
 				paintAxis();
 				drawOrigin();
 				drawDisplayName();
