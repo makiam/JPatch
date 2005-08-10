@@ -31,7 +31,7 @@ import jpatch.entity.MaterialProperties;
  *
  */
 public class HashPatchRenderer {
-	private Viewport2 viewport;
+	private JPatchDrawable2 viewport;
 	private float fNearClip;
 	private float fW;
 	private boolean bPerspective;

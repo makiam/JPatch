@@ -11,7 +11,7 @@ import buoy.widget.*;
 import jpatch.entity.*;
 import jpatch.renderer.PatchTesselator3;
 
-public class CameraViewport implements Viewport2EventListener {
+public class CameraViewport implements JPatchDrawableEventListener {
 	public static final int ZOOM = 1;
 	public static final int WALK = 2;
 	public static final int MOVE = 3;
@@ -86,7 +86,7 @@ public class CameraViewport implements Viewport2EventListener {
 //		}
 //	};
 	
-	private Viewport2 viewport = new ViewportGL(this, false);
+	private JPatchDrawable2 viewport = new JPatchDrawableGL(this, false);
 	private Component component = viewport.getComponent();
 	private JPanel panel = new JPanel();
 	private AWTWidget widget = new AWTWidget(panel);
@@ -131,7 +131,7 @@ public class CameraViewport implements Viewport2EventListener {
 		camera = cam;
 		listObjects = objects;
 		//viewport.getComponent().setPreferredSize(new Dimension(640, 480));
-		viewport.setProjection(Viewport2.PERSPECTIVE);
+		viewport.setProjection(JPatchDrawable2.PERSPECTIVE);
 		panel.setPreferredSize(new Dimension(640, 480));
 		panel.setLayout(new BorderLayout());
 		JPanel panelButtons = new JPanel();
@@ -399,8 +399,8 @@ public class CameraViewport implements Viewport2EventListener {
 //		else render();
 //	}
 	
-	public void display(Viewport2 viewport) {
-		viewport.clear(Viewport2.COLOR_BUFFER | Viewport2.DEPTH_BUFFER);
+	public void display(JPatchDrawable2 viewport) {
+		viewport.clear(JPatchDrawable2.COLOR_BUFFER | JPatchDrawable2.DEPTH_BUFFER, new Color3f(0,0,0)); // FIXME
 		viewport.setFocalLength(camera.getFocalLength());
 		int W = viewport.getComponent().getWidth();
 		int H = viewport.getComponent().getHeight();
@@ -700,7 +700,7 @@ public class CameraViewport implements Viewport2EventListener {
 //		}
 //	}
 //	
-	private void drawCurve3D(Viewport2 viewport, Point3f p0, Point3f p1, Point3f p2, Point3f p3) {
+	private void drawCurve3D(JPatchDrawable2 viewport, Point3f p0, Point3f p1, Point3f p2, Point3f p3) {
 		Point3f pa = new Point3f(p0);
 		Point3f pb = new Point3f();
 		for (int t = 0; t < iCurveSubdiv - 1; t++) {

@@ -17,10 +17,9 @@ public class PopupMouseListener extends MouseAdapter {
 			if (popupMenu != null && popupMenu.isShowing()) {
 				popupMenu.setVisible(false);
 			} else {
-				//Viewport viewport = (Viewport)mouseEvent.getSource();
+				ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 				Component source = (Component)mouseEvent.getSource();
-				Viewport viewport = (Viewport)mouseEvent.getSource();
-				popupMenu = new JPatchPopupMenu(viewport.getViewDefinition());
+				popupMenu = new JPatchPopupMenu(viewDef);
 				popupMenu.show(source,mouseEvent.getX(),mouseEvent.getY());
 			}
 		}

@@ -9,9 +9,9 @@ import javax.vecmath.*;
 
 import jpatch.entity.*;
 
-public class Viewport2D implements Viewport2 {
+public class JPatchDrawable2D implements JPatchDrawable2 {
 	
-	private Viewport2EventListener listener;
+	private JPatchDrawableEventListener listener;
 	private Component component;
 	private Graphics2D g;
 	//private Matrix4f m4Transform = new Matrix4f();
@@ -24,7 +24,7 @@ public class Viewport2D implements Viewport2 {
 	private int iYoff = 0;
 	private VolatileImage image;
 	
-	public Viewport2D(final Viewport2EventListener listener, boolean lightweight) {
+	public JPatchDrawable2D(final JPatchDrawableEventListener listener, boolean lightweight) {
 		this.listener = listener;
 		if (lightweight) {
 			component = new JPanel() {
@@ -92,13 +92,14 @@ public class Viewport2D implements Viewport2 {
 	
 	public void display() {
 		if (g == null) updateImage();
-		listener.display(Viewport2D.this);
+		listener.display(JPatchDrawable2D.this);
 		Graphics cg = component.getGraphics();
 		if (cg != null) component.paint(cg);
 	}
 	
-	public void clear(int mode) {
+	public void clear(int mode, Color3f color) {
 		if ((mode & COLOR_BUFFER) != 0) {
+			g.setColor(color.get());
 			g.fillRect(0, 0, component.getWidth(), component.getHeight());
 		}
 	}
@@ -134,9 +135,17 @@ public class Viewport2D implements Viewport2 {
 		g.setColor(color.get());
 	}
 	
-	public void setMaterial(MaterialProperties mp) { }
+	public void setMaterial(MaterialProperties mp) {
+		throw new UnsupportedOperationException(this.getClass().getName() + " does not support lighting.");
+	}
 	
-	public void setLighting() { }
+	public void setLighting() {
+		throw new UnsupportedOperationException(this.getClass().getName() + " does not support lighting.");
+	}
+	
+	public void setTransform(Matrix4f transform) {
+		throw new UnsupportedOperationException(this.getClass().getName() + " does not support transform.");
+	}
 	
 	public void setPointSize(int size) {
 		iPointSize = size;
@@ -188,15 +197,15 @@ public class Viewport2D implements Viewport2 {
 	}
 	
 	public void drawTriangle(Point3f p0, Color3f c0, Point3f p1, Color3f c1, Point3f p2, Color3f c2) {
-		throw new UnsupportedOperationException("Viewport2D does not support shaded triangles");
+		throw new UnsupportedOperationException(this.getClass().getName() + " does not support shading");
 	}
 	
 	public void drawTriangle(Point3f p0, Color4f c0, Point3f p1, Color4f c1, Point3f p2, Color4f c2) {
-		throw new UnsupportedOperationException("Viewport2D does not support shaded triangles");
+		throw new UnsupportedOperationException(this.getClass().getName() + " does not support shading");
 	}
 	
 	public void drawTriangle(Point3f p0, Vector3f n0, Point3f p1, Vector3f n1, Point3f p2, Vector3f n2) {
-		throw new UnsupportedOperationException("Viewport2D does not support shaded triangles");
+		throw new UnsupportedOperationException(this.getClass().getName() + " does not support shading");
 	}
 	
 	public void drawCurve(Curve curve) { }
@@ -210,6 +219,10 @@ public class Viewport2D implements Viewport2 {
 	}
 	
 	public boolean isLightingSupported() {
+		return false;
+	}
+	
+	public boolean isTransformSupported() {
 		return false;
 	}
 	

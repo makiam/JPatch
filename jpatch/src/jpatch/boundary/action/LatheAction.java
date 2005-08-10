@@ -24,9 +24,9 @@ public final class LatheAction extends AbstractAction {
 			} else {
 				//PointSelection newPs = MainFrame.getInstance().getModel().clone(ps.getControlPointArray());
 				//MainFrame.getInstance().setSelection(newPs);
-				float epsilon = 3f / MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().getMatrix().getScale();
+//				float epsilon = 3f / MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().getMatrix().getScale();
 				//System.out.println(epsilon);
-				new LatheOptions(MainFrame.getInstance(), epsilon);
+				new LatheOptions(MainFrame.getInstance(), 0.0f);
 			}
 		}
 	}
