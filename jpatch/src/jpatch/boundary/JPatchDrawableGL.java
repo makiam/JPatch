@@ -684,6 +684,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			iGlMode = GL.GL_POINTS;
 			gl.glBegin(iGlMode);
 		}
+		System.out.println("point " + p);
 		gl.glVertex3f(p.x, p.y, p.z);
 	}
 	

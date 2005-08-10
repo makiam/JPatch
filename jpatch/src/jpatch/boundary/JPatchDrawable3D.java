@@ -184,6 +184,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	}
 	
 	public void drawPoint(Point3f p) {
+//		System.out.println("drawpoint " + p);
 		int x, y, z;
 		if (bPerspective) {
 			if (p.z > fNearClip) {
@@ -191,34 +192,36 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 				y = iYoff - (int) ((p.y / p.z) * fW);
 				z = (int) (-Integer.MAX_VALUE / p.z);
 			} else {
-				x = iXoff + (int) p.x;
-				y = iYoff - (int) p.y;
-				z = (int) (p.z * 65536);
-			}
-			int x1 = x - (iPointSize >> 1);
-			int y1 = y - (iPointSize >> 1);
-			int x2 = x1 + iPointSize;
-			int y2 = y1 + iPointSize;
-			if ((x1 < 0 && x2 < 0 )|| (y1 < 0 && y2 < 0) || (x1 >= iWidth && x2 >= iWidth) || (y1 >= iHeight && y2 >= iHeight)) {
 				return;
 			}
-			
-			if (x1 < 0) x1 = 0;
-			if (y1 < 0) y1 = 0;
-			if (x2 >= iWidth) x2 = iWidth - 1;
-			if (y2 >= iHeight) y2 = iHeight - 1;
-			int index = y1 * iWidth + x1;
-			for (y = y1; y < y2; y++) {
-				for (x = x1; x < x2; x++) {
-					if (z < aiDepthBuffer[index]) {
-						aiDepthBuffer[index] = iColor;
-						aiColorBuffer[index] = z;
-					}
-					index++;
+		} else {
+			x = iXoff + (int) p.x;
+			y = iYoff - (int) p.y;
+			z = (int) (p.z * 65536);
+		}
+//		System.out.println(x + " " + y);
+		int x1 = x - (iPointSize >> 1);
+		int y1 = y - (iPointSize >> 1);
+		int x2 = x1 + iPointSize;
+		int y2 = y1 + iPointSize;
+		if ((x1 < 0 && x2 < 0 )|| (y1 < 0 && y2 < 0) || (x1 >= iWidth && x2 >= iWidth) || (y1 >= iHeight && y2 >= iHeight)) {
+			return;
+		}
+		
+		if (x1 < 0) x1 = 0;
+		if (y1 < 0) y1 = 0;
+		if (x2 >= iWidth) x2 = iWidth - 1;
+		if (y2 >= iHeight) y2 = iHeight - 1;
+		int index = y1 * iWidth + x1;
+		for (y = y1; y < y2; y++) {
+			for (x = x1; x < x2; x++) {
+				if (z < aiDepthBuffer[index]) {
+					aiDepthBuffer[index] = iColor;
+					aiColorBuffer[index] = z;
 				}
-				index += iWidth - iPointSize;
+				index++;
 			}
-			
+			index += iWidth - iPointSize;
 		}	
 	}
 	

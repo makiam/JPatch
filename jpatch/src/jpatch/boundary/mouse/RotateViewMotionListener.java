@@ -17,6 +17,7 @@ public class RotateViewMotionListener extends MouseMotionAdapter {
 	}
 	
 	public void mouseDragged(MouseEvent mouseEvent) {
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 		int deltaX = mouseEvent.getX() - iMouseX;
 		int deltaY = mouseEvent.getY() - iMouseY;
 		iMouseX = mouseEvent.getX();
@@ -25,6 +26,6 @@ public class RotateViewMotionListener extends MouseMotionAdapter {
 		iHeight = ((Component)(mouseEvent.getSource())).getHeight();
 		//fMin = (iWidth < iHeight) ? iWidth : iHeight;
 		fMin = iWidth;
-		((Viewport)(mouseEvent.getSource())).getViewDefinition().rotateView((float)deltaX/200,(float)deltaY/200);
+		viewDef.rotateView((float)deltaX/200,(float)deltaY/200);
 	}
 }
