@@ -17,6 +17,7 @@ public class MoveViewMotionListener extends MouseMotionAdapter {
 	}
 	
 	public void mouseDragged(MouseEvent mouseEvent) {
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 		int deltaX = mouseEvent.getX() - iMouseX;
 		int deltaY = mouseEvent.getY() - iMouseY;
 		iMouseX = mouseEvent.getX();
@@ -25,8 +26,8 @@ public class MoveViewMotionListener extends MouseMotionAdapter {
 		iHeight = ((Component)(mouseEvent.getSource())).getHeight();
 		//fMin = (iWidth < iHeight) ? iWidth : iHeight;
 		fMin = iWidth/2;
-		((Viewport)(mouseEvent.getSource())).getViewDefinition().setLock(null);
-		((Viewport)(mouseEvent.getSource())).getViewDefinition().moveView((float)deltaX/fMin,(float)deltaY/fMin);
+		viewDef.setLock(null);
+		viewDef.moveView((float)deltaX/fMin,(float)deltaY/fMin);
 		//((Viewport)(mouseEvent.getSource())).getViewDefinition().moveView(deltaX,deltaY);
 	}
 }

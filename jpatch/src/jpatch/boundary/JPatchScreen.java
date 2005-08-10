@@ -223,7 +223,7 @@ public final class JPatchScreen extends JPanel {
 		if (bSynchronized) {
 			update_all();
 		} else {
-			((JPatchCanvas) component).render();
+			component.repaint();
 		}
 	}
 	
@@ -317,8 +317,8 @@ public final class JPatchScreen extends JPanel {
 	}
 	
 	public void setTool(JPatchTool tool) {
-//		this.tool = tool;
-//		removeAllMouseListeners();
+		this.tool = tool;
+		removeAllMouseListeners();
 //		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 //			((JPatchCanvas)aComponent[i]).setTool(tool);
 //		}
