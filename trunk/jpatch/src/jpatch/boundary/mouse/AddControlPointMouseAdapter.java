@@ -25,7 +25,6 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 	private boolean bMulti = false;
 	
 	private Component compSource;
-	private Viewport viewport;
 	
 	public AddControlPointMouseAdapter(boolean multi) {
 		this();
@@ -37,27 +36,27 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 	}
 	
 	public void mousePressed(MouseEvent mouseEvent) {
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 		if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
 			/**
 			* left mouse button pressed
 			**/
 			compSource = (Component) mouseEvent.getSource();
-			viewport = (Viewport) compSource;
-			viewport.getViewDefinition().setZ(0);
+			viewDef.setZ(0);
 			iMouseX = mouseEvent.getX();
 			iMouseY = mouseEvent.getY();
 			compoundEdit = new JPatchCompoundEdit("add");
-			ControlPoint cp = viewport.getViewDefinition().getClosestControlPoint(new Point2D.Float(iMouseX,iMouseY),null,null,false,true);
+			ControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(iMouseX,iMouseY),null,null,false,true);
 			if (cp == null || cp.getLooseEnd() != null) {
 				/**
 				* start a entirely new curve
 				**/
-				//viewport.getViewDefinition().setZ(MainFrame.getInstance().getJPatchScreen().get3DCursor().getPosition());
+				//viewDef.setZ(MainFrame.getInstance().getJPatchScreen().get3DCursor().getPosition());
 				if (cp != null) {
-					viewport.getViewDefinition().setZ(cp.getPosition());
+					viewDef.setZ(cp.getPosition());
 				}
-				Point3f pos = viewport.getViewDefinition().get3DPosition((float)iMouseX,(float)iMouseY);
-				viewport.getGrid().correctVector(pos);
+				Point3f pos = viewDef.get3DPosition((float)iMouseX,(float)iMouseY);
+//				viewport.getGrid().correctVector(pos);
 				ControlPoint cpA = new ControlPoint(pos);
 				ControlPoint cpB = new ControlPoint(pos);
 				cpA.setNext(cpB);
@@ -93,7 +92,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 				/**
 				* start a new curve, attached to the selected controlpoint
 				**/
-				viewport.getViewDefinition().setZ(cp.getPosition());
+				viewDef.setZ(cp.getPosition());
 				ControlPoint cpA = new ControlPoint(cp);
 				ControlPoint cpB = new ControlPoint(cp);
 				cpA.setNext(cpB);
@@ -118,11 +117,10 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 			* right mouse button pressed (in active state)
 			**/
 			compSource = (Component)mouseEvent.getSource();
-			Viewport viewport = (Viewport)mouseEvent.getSource();
 			int iMouseX = mouseEvent.getX();
 			int iMouseY = mouseEvent.getY();
 			float[] hookPos = new float[1];
-			ControlPoint cp = viewport.getViewDefinition().getClosestControlPoint(new Point2D.Float(iMouseX,iMouseY),cpHot,hookPos,false,true);
+			ControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(iMouseX,iMouseY),cpHot,hookPos,false,true);
 			if (cp != null && cp != cpHot.getPrev()) {
 				if (hookPos[0] == -1) {
 					if (!mouseEvent.isControlDown())
@@ -169,12 +167,13 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 	}
 	
 	public void mouseDragged(MouseEvent mouseEvent) {
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 		iMouseX = mouseEvent.getX();
 		iMouseY = mouseEvent.getY();
-		ViewDefinition viewDefinition = viewport.getViewDefinition();
+//		ViewDefinition viewDefinition = viewDef;
 		//viewDefinition.setZ(cpHot.getPosition());
-		Point3f pos = viewDefinition.get3DPosition((float)iMouseX,(float)iMouseY);
-		viewport.getGrid().correctVector(pos);
+		Point3f pos = viewDef.get3DPosition((float)iMouseX,(float)iMouseY);
+//		viewport.getGrid().correctVector(pos);
 		cpHot.setPosition(pos);
 		MainFrame.getInstance().getJPatchScreen().single_update(compSource);
 		//MainFrame.getInstance().getJPatchScreen().repaint();

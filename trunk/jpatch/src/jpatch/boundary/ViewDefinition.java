@@ -99,24 +99,28 @@ implements ComponentListener {
 	}
 	
 	public final Matrix4f getScreenMatrix() {
-		/*
-		float fWidth = viewport.getWidth();
-		float fHeight = viewport.getHeight();
-		//fMin = (fWidth < fHeight) ? fWidth : fHeight;
-		float fMin = fWidth;
-		m4Screen = new Matrix4f(m4View);
-		Matrix4f m4 = new Matrix4f();
 		
-		m4Screen.mul(fMin/2);
-		m4Screen.setRow(3,0,0,0,1);
+//		float fWidth = drawable.getComponent().getWidth();
+//		float fHeight = drawable.getComponent().getHeight();
+//		//fMin = (fWidth < fHeight) ? fWidth : fHeight;
+//		float fMin = fWidth;
+//		Matrix4f m4Screen = new Matrix4f(m4View);
+////		Matrix4f m4 = new Matrix4f();
+//		
+//		m4Screen.mul(fMin/2);
+//		m4Screen.setRow(3,0,0,0,1);
+//		
+//		m4Screen.getColumn(3,v4Screen);
+//		v4ScreenOffset = new Vector4f(fWidth/2,fHeight/2,0,0);
+//		v4Screen.add(v4ScreenOffset);
+//		m4Screen.setColumn(3,v4Screen);
+//		return m4Screen;
 		
-		m4Screen.getColumn(3,v4Screen);
-		v4ScreenOffset = new Vector4f(fWidth/2,fHeight/2,0,0);
-		v4Screen.add(v4ScreenOffset);
-		m4Screen.setColumn(3,v4Screen);
+		Matrix4f m4Screen = new Matrix4f(m4View);
+		m4Screen.m03 += drawable.getComponent().getWidth() / 2;
+		m4Screen.m13 -= drawable.getComponent().getHeight() / 2;
 		return m4Screen;
-		*/
-		return m4View;
+		//return m4View;
 	}
 		
 	public final float getRotateX() {
@@ -156,10 +160,13 @@ implements ComponentListener {
 		p3Lock = lock;
 		if (p3Lock != null) {
 			Point3f p3 = new Point3f(p3Lock);
-			m4View.transform(p3);
+			Matrix4f m = new Matrix4f(m4View);
+			m.invert();
+			m.transform(p3);
 			float dimX = getWidth() / 2f;
 			float dimY = getHeight() /2f;
-			moveView(-p3.x / dimX + 1, (dimY - p3.y) / dimX, false);
+			//moveView(-p3.x / dimX + 1, (dimY - p3.y) / dimX, false);
+			moveView(p3.x, p3.y, false);
 		}
 		drawable.display();
 	}
@@ -248,46 +255,53 @@ implements ComponentListener {
 	public final void computeMatrix() {
 		switch (iView) {
 			case FRONT:
-				m4View.set(new Matrix4f(1, 0, 0, 0,
-						       0,-1, 0, 0,
-						       0, 0, 1, 0,
-						       0, 0, 0, 1));
+				m4View.set(new Matrix4f(
+						1, 0, 0, 0,
+						0, 1, 0, 0,
+						0, 0, 1, 0,
+						0, 0, 0, 1));
 			break;
 			case REAR:
-				m4View.set(new Matrix4f(-1, 0, 0, 0,
-						       0,-1, 0, 0,
-						       0, 0,-1, 0,
-						       0, 0, 0, 1));
+				m4View.set(new Matrix4f(
+						-1, 0, 0, 0,
+						 0,-1, 0, 0,
+						 0, 0,-1, 0,
+						 0, 0, 0, 1));
 			break;
 			case RIGHT:
-				m4View.set(new Matrix4f( 0, 0, 1, 0,
-						       0,-1, 0, 0,
-						       -1, 0, 0, 0,
-						       0, 0, 0, 1));
+				m4View.set(new Matrix4f(
+						0, 0, 1, 0,
+						0,-1, 0, 0,
+						-1, 0, 0, 0,
+						0, 0, 0, 1));
 			break;
 			case LEFT:
-				m4View.set(new Matrix4f( 0, 0,-1, 0,
-			 			       0,-1, 0, 0,
-						       1, 0, 0, 0,
-						       0, 0, 0, 1));
+				m4View.set(new Matrix4f(
+						0, 0,-1, 0,
+			 			0,-1, 0, 0,
+						1, 0, 0, 0,
+						0, 0, 0, 1));
 			break;
 			case BOTTOM:
-				m4View.set(new Matrix4f( 1, 0, 0, 0,
-						       0, 0, 1, 0,
-						       0, 1, 0, 0,
-						       0, 0, 0, 1));
+				m4View.set(new Matrix4f(
+						1, 0, 0, 0,
+						0, 0, 1, 0,
+						0, 1, 0, 0,
+						0, 0, 0, 1));
 			break;
 			case TOP:
-				m4View.set(new Matrix4f( 1, 0, 0, 0,
-						       0, 0,-1, 0,
-						       0,-1, 0, 0,
-						       0, 0, 0, 1));
+				m4View.set(new Matrix4f(
+						1, 0, 0, 0,
+						0, 0,-1, 0,
+						0,-1, 0, 0,
+						0, 0, 0, 1));
 			break;
 			case BIRDS_EYE:
-				m4View.set(new Matrix4f(1, 0, 0, 0,
-						       0,-1, 0, 0,
-						       0, 0, 1, 0,
-						       0, 0, 0, 1));
+				m4View.set(new Matrix4f(
+						1, 0, 0, 0,
+						0, 1, 0, 0,
+						0, 0, 1, 0,
+						0, 0, 0, 1));
 				Matrix4f m4Transform = new Matrix4f();
 				//m4Transform.setIdentity();
 				//m4Transform.set(new Vector3f(-v3Pivot.x, -v3Pivot.y, -v3Pivot.z));
@@ -323,9 +337,9 @@ implements ComponentListener {
 			m4View.setRow(3,0,0,0,1);
 			
 			m4View.getColumn(3,v4Screen);
-			v4ScreenOffset = new Vector4f(width/2,height/2,0,0);
-			v4Screen.add(v4ScreenOffset);
-			m4View.setColumn(3,v4Screen);
+			//v4ScreenOffset = new Vector4f(width/2,height/2,0,0);
+			//v4Screen.add(v4ScreenOffset);
+			//m4View.setColumn(3,v4Screen);
 			
 		//}
 		//return m4Screen;
@@ -375,7 +389,7 @@ implements ComponentListener {
 		
 	public final void moveView(float x, float y, boolean repaint) {
 		fTranslateX += x/fScale;
-		fTranslateY += y/fScale;
+		fTranslateY -= y/fScale;
 		computeMatrix();
 //		((JPatchCanvas)viewport).clearBackground();
 		if (repaint) drawable.display();
@@ -438,11 +452,12 @@ implements ComponentListener {
 	
 	public final Point3f get3DPosition(float x, float y)
 	{
-		Point3f p3 = new Point3f(x,y,fZ);
+		Point3f p3 = new Point3f(x,-y,fZ);
 		Matrix4f m4Screen = getScreenMatrix();
 		Matrix4f m4Inverse = new Matrix4f();
 		m4Inverse.invert(m4Screen);
 		m4Inverse.transform(p3);
+		p3.y = p3.y;
 		return p3;
 	}
 	
@@ -507,7 +522,7 @@ implements ComponentListener {
 						if (cp.isHead()) {
 							p3.set(cp.getPosition());
 							m4Screen.transform(p3);
-							p2.setLocation(p3.x,p3.y);
+							p2.setLocation(p3.x,-p3.y);
 							fDistance = (float)p2.distanceSq(target);
 							if (fDistance <= fMinDistance && cp != cpExcept) {
 								fMinDistance = fDistance;
