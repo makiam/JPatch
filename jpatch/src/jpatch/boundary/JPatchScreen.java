@@ -25,10 +25,12 @@ public final class JPatchScreen extends JPanel {
 	
 	public static final int NUMBER_OF_VIEWPORTS = 4;
 	
-	private Viewport activeViewport;
+	//private Viewport activeViewport;
 	
-	private JPatchCanvas[] aComponent = new JPatchCanvas[NUMBER_OF_VIEWPORTS];
+	//private JPatchCanvas[] aComponent = new JPatchCanvas[NUMBER_OF_VIEWPORTS];
+	private JPatchDrawable2[] aDrawable = new JPatchDrawable2[NUMBER_OF_VIEWPORTS];
 	private ViewDefinition[] aViewDef;
+	private Viewport2[] aViewport = new Viewport2[NUMBER_OF_VIEWPORTS];
 	
 	private boolean bSnapToGrid = JPatchSettings.getInstance().bGridSnap;
 	private float fGridSpacing = JPatchSettings.getInstance().fGridSpacing;
@@ -51,23 +53,39 @@ public final class JPatchScreen extends JPanel {
 	private boolean bShowTangents = false;
 	private TangentTool tangentTool = new TangentTool();
 	
-	public JPatchScreen(Model model,int mode,ViewDefinition[] viewDefinitions) {
+	public JPatchScreen(final Model model,int mode,ViewDefinition[] viewDefinitions) {
 		aViewDef = viewDefinitions;
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			aComponent[i] = new JPatchCanvas(model, aViewDef[i]);
+			final int I = i;
+			JPatchDrawableEventListener listener = new JPatchDrawableEventListener() {
+				public void display(JPatchDrawable2 drawable) {
+					aViewport[I].prepare();
+					aViewport[I].drawModel(MainFrame.getInstance().getModel());
+				}
+			};
+			aDrawable[i] = new JPatchDrawableGL(listener, false);
+			aDrawable[i].setProjection(JPatchDrawable2.ORTHOGONAL);
+			aViewport[i] = new Viewport2(aDrawable[i], aViewDef[i]);
+			aViewDef[i].setDrawable(aDrawable[i]);
 			//aComponent[i] = new JPatchCanvas(model,aViewDef[i]);
-			add(aComponent[i]);
-			aComponent[i].setFocusable(false);
+			add(aDrawable[i].getComponent());
+			aDrawable[i].getComponent().setFocusable(false);
 		}
 		setFocusable(false);
 		setMode(mode);
 		setLightingMode(iLightMode);
 		enablePopupMenu(true);
-		activeViewport = aComponent[0];
+//		activeViewport = aDrawable[0];
 		snapToGrid(bSnapToGrid);
 	}
 	
-	
+	public ViewDefinition getViewDefinition(Component component) {
+		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+			if (aDrawable[i].getComponent() == component)
+				return aViewDef[i];
+		}
+		throw new IllegalArgumentException("component not found");
+	}
 				
 	public boolean isSynchronized() {
 		return bSynchronized;
@@ -82,20 +100,20 @@ public final class JPatchScreen extends JPanel {
 	}
 	
 	public void flipBackfacingNormals(boolean flip) {
-		bBackfaceNormalFlip = flip;
-		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			JPatchDrawable drawable = aComponent[i].getDrawable();
-			if (drawable != null) drawable.getLighting().setBackfaceNormalFlip(flip);
-			//if (drawable instanceof ZBufferRenderer) ((ZBufferRenderer) drawable).setBackfaceNormalFlip(flip);
-		}
+//		bBackfaceNormalFlip = flip;
+//		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+//			JPatchDrawable drawable = aComponent[i].getDrawable();
+//			if (drawable != null) drawable.getLighting().setBackfaceNormalFlip(flip);
+//			//if (drawable instanceof ZBufferRenderer) ((ZBufferRenderer) drawable).setBackfaceNormalFlip(flip);
+//		}
 	}
 	
 	public void cullBackfacingPolys(int mode) {
-		iBackfaceCulling = mode;
-		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			JPatchDrawable drawable = aComponent[i].getDrawable();
-			if (drawable instanceof ZBufferRenderer) ((ZBufferRenderer) drawable).setCulling(mode);
-		}
+//		iBackfaceCulling = mode;
+//		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+//			JPatchDrawable drawable = aComponent[i].getDrawable();
+//			if (drawable instanceof ZBufferRenderer) ((ZBufferRenderer) drawable).setCulling(mode);
+//		}
 	}
 	
 	public void synchronize(boolean sync) {
@@ -110,9 +128,9 @@ public final class JPatchScreen extends JPanel {
 		bShowTangents = enable;
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 			if (enable && !bShowTangents) {
-				aComponent[i].addMouseListener(tangentTool);
+//				aComponent[i].addMouseListener(tangentTool);
 			} else {
-				aComponent[i].removeMouseListener(tangentTool);
+//				aComponent[i].removeMouseListener(tangentTool);
 			}
 		}
 	}
@@ -122,54 +140,54 @@ public final class JPatchScreen extends JPanel {
 	}
 	
 	public void setLightingMode(int mode) {
-		iLightMode = mode;
-		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			switch(iLightMode) {
-				case LIGHT_OFF:
-					aComponent[i].flatShade(true);
-					aComponent[i].setLighting(Lighting.createSimpleLight());
-					break;
-				case LIGHT_SIMPLE:
-					aComponent[i].flatShade(false);
-					aComponent[i].setLighting(Lighting.createSimpleLight());
-					break;
-				case LIGHT_HEAD:
-					aComponent[i].flatShade(false);
-					aComponent[i].setLighting(Lighting.createHeadLight());
-					break;
-				case LIGHT_THREE_POINT:
-					aComponent[i].flatShade(false);
-					aComponent[i].setLighting(Lighting.createThreePointLight());
-					break;
-			}
-		}
-		update_all();
+//		iLightMode = mode;
+//		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+//			switch(iLightMode) {
+//				case LIGHT_OFF:
+//					aComponent[i].flatShade(true);
+//					aComponent[i].setLighting(Lighting.createSimpleLight());
+//					break;
+//				case LIGHT_SIMPLE:
+//					aComponent[i].flatShade(false);
+//					aComponent[i].setLighting(Lighting.createSimpleLight());
+//					break;
+//				case LIGHT_HEAD:
+//					aComponent[i].flatShade(false);
+//					aComponent[i].setLighting(Lighting.createHeadLight());
+//					break;
+//				case LIGHT_THREE_POINT:
+//					aComponent[i].flatShade(false);
+//					aComponent[i].setLighting(Lighting.createThreePointLight());
+//					break;
+//			}
+//		}
+//		update_all();
 	}
 	
 	public int getLightingMode() {
 		return iLightMode;
 	}
 	
-	public void setActiveViewport(Viewport viewport) {
-		if (viewport != activeViewport) {
-			activeViewport = viewport;
-			//for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			//	aComponent[i].drawActiveViewportMarker(aComponent[i] == viewport);
-			//}
-			update_all();
-		}
-	}
+//	public void setActiveViewport(Viewport viewport) {
+//		if (viewport != activeViewport) {
+//			activeViewport = viewport;
+//			//for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+//			//	aComponent[i].drawActiveViewportMarker(aComponent[i] == viewport);
+//			//}
+//			update_all();
+//		}
+//	}
 	
-	public Viewport getActiveViewport() {
-		return activeViewport;
-	}
+//	public Viewport getActiveViewport() {
+//		return activeViewport;
+//	}
 	
 	public void setStickyLight(boolean sticky) {
-		bStickyLight = sticky;
-		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			aComponent[i].getLighting().setStickyLight(sticky);
-		}
-		update_all();
+//		bStickyLight = sticky;
+//		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+//			aComponent[i].getLighting().setStickyLight(sticky);
+//		}
+//		update_all();
 	}
 	
 	public boolean snapToGrid() {
@@ -179,7 +197,7 @@ public final class JPatchScreen extends JPanel {
 	public void snapToGrid(boolean enable) {
 		bSnapToGrid = enable;
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			aComponent[i].getGrid().snap(enable);
+//			aComponent[i].getGrid().snap(enable);
 		}
 		update_all();
 		JPatchSettings.getInstance().bGridSnap = enable;
@@ -192,7 +210,7 @@ public final class JPatchScreen extends JPanel {
 	public void setGridSpacing(float gridSpacing) {
 		fGridSpacing = gridSpacing;
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			aComponent[i].getGrid().setSpacing(gridSpacing);
+//			aComponent[i].getGrid().setSpacing(gridSpacing);
 		}
 		update_all();
 	}
@@ -219,68 +237,68 @@ public final class JPatchScreen extends JPanel {
 	public void update_all() {
 		switch(iMode) {
 			case SINGLE:
-				aComponent[0].render();
+				aDrawable[0].display();
 				break;
 			case HORIZONTAL_SPLIT:
-				aComponent[0].render();
-				aComponent[1].render();
+				aDrawable[0].display();
+				aDrawable[1].display();
 				break;
 			case VERTICAL_SPLIT:
-				aComponent[0].render();
-				aComponent[2].render();
+				aDrawable[0].display();
+				aDrawable[2].display();
 				break;
 			case QUAD:
-				aComponent[0].render();
-				aComponent[1].render();
-				aComponent[2].render();
-				aComponent[3].render();
+				aDrawable[0].display();
+				aDrawable[1].display();
+				aDrawable[2].display();
+				aDrawable[3].display();
 				break;
 		}
 	}
 	
 	public void zoomToFit_all() {
-		switch(iMode) {
-			case SINGLE:
-				ZoomToFitAction.zoomToFit((Viewport) aComponent[0]);
-				break;
-			case HORIZONTAL_SPLIT:
-				ZoomToFitAction.zoomToFit((Viewport) aComponent[0]);
-				ZoomToFitAction.zoomToFit((Viewport) aComponent[1]);
-				break;
-			case VERTICAL_SPLIT:
-				ZoomToFitAction.zoomToFit((Viewport) aComponent[0]);
-				ZoomToFitAction.zoomToFit((Viewport) aComponent[2]);
-				break;
-			case QUAD:
-				ZoomToFitAction.zoomToFit((Viewport) aComponent[0]);
-				ZoomToFitAction.zoomToFit((Viewport) aComponent[1]);
-				ZoomToFitAction.zoomToFit((Viewport) aComponent[2]);
-				ZoomToFitAction.zoomToFit((Viewport) aComponent[3]);
-				break;
-		}
+//		switch(iMode) {
+//			case SINGLE:
+//				ZoomToFitAction.zoomToFit((Viewport) aComponent[0]);
+//				break;
+//			case HORIZONTAL_SPLIT:
+//				ZoomToFitAction.zoomToFit((Viewport) aComponent[0]);
+//				ZoomToFitAction.zoomToFit((Viewport) aComponent[1]);
+//				break;
+//			case VERTICAL_SPLIT:
+//				ZoomToFitAction.zoomToFit((Viewport) aComponent[0]);
+//				ZoomToFitAction.zoomToFit((Viewport) aComponent[2]);
+//				break;
+//			case QUAD:
+//				ZoomToFitAction.zoomToFit((Viewport) aComponent[0]);
+//				ZoomToFitAction.zoomToFit((Viewport) aComponent[1]);
+//				ZoomToFitAction.zoomToFit((Viewport) aComponent[2]);
+//				ZoomToFitAction.zoomToFit((Viewport) aComponent[3]);
+//				break;
+//		}
 	}
 	
-	public void prepareBackground(Component component) {
-		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		if (bSynchronized) {
-			for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-				if (aComponent[i].isVisible()) {
-					((JPatchCanvas)aComponent[i]).prepareBackground();
-				}
-			}
-		} else {
-			((JPatchCanvas)component).prepareBackground();
-		}
-		setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-	}
-	
-	public void clearBackground() {
-		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			//if (aComponent[i].isVisible()) {
-				((JPatchCanvas)aComponent[i]).clearBackground();
-			//}
-		}
-	}
+//	public void prepareBackground(Component component) {
+//		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+//		if (bSynchronized) {
+//			for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+//				if (aComponent[i].isVisible()) {
+//					((JPatchCanvas)aComponent[i]).prepareBackground();
+//				}
+//			}
+//		} else {
+//			((JPatchCanvas)component).prepareBackground();
+//		}
+//		setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+//	}
+//	
+//	public void clearBackground() {
+//		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+//			//if (aComponent[i].isVisible()) {
+//				((JPatchCanvas)aComponent[i]).clearBackground();
+//			//}
+//		}
+//	}
 	
 	//public void set3DCursor(Point3f cursor) {
 	//	cpCursor.setPosition(cursor);
@@ -294,17 +312,17 @@ public final class JPatchScreen extends JPanel {
 	
 	public void addMouseListeners(MouseListener mouseAdapter) {
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			aComponent[i].addMouseListener(mouseAdapter);
+			aDrawable[i].getComponent().addMouseListener(mouseAdapter);
 		}
 	}
 	
 	public void setTool(JPatchTool tool) {
-		this.tool = tool;
-		removeAllMouseListeners();
-		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			((JPatchCanvas)aComponent[i]).setTool(tool);
-		}
-		update_all();
+//		this.tool = tool;
+//		removeAllMouseListeners();
+//		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+//			((JPatchCanvas)aComponent[i]).setTool(tool);
+//		}
+//		update_all();
 	}
 	
 	public JPatchTool getTool() {
@@ -313,17 +331,17 @@ public final class JPatchScreen extends JPanel {
 	
 	public void removeAllMouseListeners() {
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			MouseListener[] aMouseListener = aComponent[i].getMouseListeners();
-			MouseMotionListener[] aMouseMotionListener = aComponent[i].getMouseMotionListeners();
-			MouseWheelListener[] aMouseWheelListener = aComponent[i].getMouseWheelListeners();
+			MouseListener[] aMouseListener = aDrawable[i].getComponent().getMouseListeners();
+			MouseMotionListener[] aMouseMotionListener = aDrawable[i].getComponent().getMouseMotionListeners();
+			MouseWheelListener[] aMouseWheelListener = aDrawable[i].getComponent().getMouseWheelListeners();
 			for (int m = 0; m < aMouseListener.length; m++) {
-				aComponent[i].removeMouseListener(aMouseListener[m]);
+				aDrawable[i].getComponent().removeMouseListener(aMouseListener[m]);
 			}
 			for (int m = 0; m < aMouseMotionListener.length; m++) {
-				aComponent[i].removeMouseMotionListener(aMouseMotionListener[m]);
+				aDrawable[i].getComponent().removeMouseMotionListener(aMouseMotionListener[m]);
 			}
 			for (int m = 0; m < aMouseWheelListener.length; m++) {
-				aComponent[i].removeMouseWheelListener(aMouseWheelListener[m]);
+				aDrawable[i].getComponent().removeMouseWheelListener(aMouseWheelListener[m]);
 			}
 		}
 		enablePopupMenu(false);
@@ -358,9 +376,9 @@ public final class JPatchScreen extends JPanel {
 		if (enable != bPopupEnabled) {
 			for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 				if (enable) {
-					aComponent[i].addMouseListener(popupMouseListener);
+					aDrawable[i].getComponent().addMouseListener(popupMouseListener);
 				} else {
-					aComponent[i].removeMouseListener(popupMouseListener);
+					aDrawable[i].getComponent().removeMouseListener(popupMouseListener);
 				}
 			}
 			bPopupEnabled = enable;
@@ -369,12 +387,12 @@ public final class JPatchScreen extends JPanel {
 	
 	public void addMMBListener() {
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			aComponent[i].addMouseListener(moveZoomRotateMouseAdapter);
-			aComponent[i].addMouseWheelListener(moveZoomRotateMouseAdapter);
-			aComponent[i].addMouseListener(activeViewportMouseAdapter);
-			aComponent[i].addMouseWheelListener(activeViewportMouseAdapter);
+			aDrawable[i].getComponent().addMouseListener(moveZoomRotateMouseAdapter);
+			aDrawable[i].getComponent().addMouseWheelListener(moveZoomRotateMouseAdapter);
+			aDrawable[i].getComponent().addMouseListener(activeViewportMouseAdapter);
+			aDrawable[i].getComponent().addMouseWheelListener(activeViewportMouseAdapter);
 			if (bShowTangents) {
-				aComponent[i].addMouseListener(tangentTool);
+				aDrawable[i].getComponent().addMouseListener(tangentTool);
 			}
 		}
 	}
@@ -389,57 +407,56 @@ public final class JPatchScreen extends JPanel {
 		int w = getWidth();
 		int h2 = h/2;
 		int w2 = w/2;
-		aComponent[0].setVisible(false);
-		aComponent[1].setVisible(false);
-		aComponent[2].setVisible(false);
-		aComponent[3].setVisible(false);
-		aComponent[0].clearImage();
-		aComponent[1].clearImage();
-		aComponent[2].clearImage();
-		aComponent[3].clearImage();
+//		aComponent[0].setVisible(false);
+//		aComponent[1].setVisible(false);
+//		aComponent[2].setVisible(false);
+//		aComponent[3].setVisible(false);
+//		aComponent[0].clearImage();
+//		aComponent[1].clearImage();
+//		aComponent[2].clearImage();
+//		aComponent[3].clearImage();
 		//update_all();
 		if (h > 0 && w > 0) {
 			switch(mode) {
 				case SINGLE:
-					activeViewport = aComponent[0];
-					aComponent[0].setBounds(0,0,w,h);
-					aComponent[0].setVisible(true);
-					//aComponent[1].setVisible(false);
-					//aComponent[2].setVisible(false);
-					//aComponent[3].setVisible(false);
+//					activeViewport = aComponent[0];
+					aDrawable[0].getComponent().setBounds(0,0,w,h);
+					aDrawable[0].getComponent().setVisible(true);
+					aDrawable[1].getComponent().setVisible(false);
+					aDrawable[2].getComponent().setVisible(false);
+					aDrawable[3].getComponent().setVisible(false);
 				break;
 				case HORIZONTAL_SPLIT:
-					if (activeViewport != aComponent[0] && activeViewport != aComponent[1]) {
-						activeViewport = aComponent[0];
-					}
-					aComponent[0].setBounds(0,0,w2 - 1,h);
-					aComponent[0].setVisible(true);
-					aComponent[1].setBounds(w2 + 1,0,w2 - 1,h);
-					aComponent[1].setVisible(true);
-					//aComponent[2].setVisible(false);
-					//aComponent[3].setVisible(false);
+//					if (activeViewport != aComponent[0] && activeViewport != aComponent[1]) {
+//						activeViewport = aComponent[0];
+//					}
+					aDrawable[0].getComponent().setBounds(0,0,w2 - 1,h);
+					aDrawable[0].getComponent().setVisible(true);
+					aDrawable[1].getComponent().setBounds(w2 + 1,0,w2 - 1,h);
+					aDrawable[1].getComponent().setVisible(true);
+					aDrawable[2].getComponent().setVisible(false);
+					aDrawable[3].getComponent().setVisible(false);
 				break;
 				case VERTICAL_SPLIT:
-					if (activeViewport != aComponent[0] && activeViewport != aComponent[2]) {
-						activeViewport = aComponent[0];
-					}
-					aComponent[0].setBounds(0,0,w,h2 - 1);
-					aComponent[0].setVisible(true);
-					//aComponent[1].setVisible(false);
-					aComponent[2].setBounds(0,h2 + 1,w,h2 - 1);
-										aComponent[2].setVisible(true);
-
-					//aComponent[3].setVisible(false);
+//					if (activeViewport != aComponent[0] && activeViewport != aComponent[2]) {
+//						activeViewport = aComponent[0];
+//					}
+					aDrawable[0].getComponent().setBounds(0,0,w,h2 - 1);
+					aDrawable[0].getComponent().setVisible(true);
+					aDrawable[1].getComponent().setVisible(false);
+					aDrawable[2].getComponent().setBounds(0,h2 + 1,w,h2 - 1);
+					aDrawable[2].getComponent().setVisible(true);
+					aDrawable[3].getComponent().setVisible(false);
 				break;
 				case QUAD:
-					aComponent[0].setBounds(0,0,w2 - 1,h2 - 1);
-					aComponent[0].setVisible(true);
-					aComponent[1].setBounds(w2 + 1,0,w2 - 1,h2 - 1);
-					aComponent[1].setVisible(true);
-					aComponent[2].setBounds(0,h2 + 1,w2 - 1,h2 - 1);
-					aComponent[2].setVisible(true);
-					aComponent[3].setBounds(w2 + 1,h2 + 1,w2 - 1,h2 - 1);
-					aComponent[3].setVisible(true);
+					aDrawable[0].getComponent().setBounds(0,0,w2 - 1,h2 - 1);
+					aDrawable[0].getComponent().setVisible(true);
+					aDrawable[1].getComponent().setBounds(w2 + 1,0,w2 - 1,h2 - 1);
+					aDrawable[1].getComponent().setVisible(true);
+					aDrawable[2].getComponent().setBounds(0,h2 + 1,w2 - 1,h2 - 1);
+					aDrawable[2].getComponent().setVisible(true);
+					aDrawable[3].getComponent().setBounds(w2 + 1,h2 + 1,w2 - 1,h2 - 1);
+					aDrawable[3].getComponent().setVisible(true);
 
 				break;
 			}

@@ -9,7 +9,7 @@ import net.java.games.jogl.*;
 //import jpatch.*;
 import jpatch.entity.*;
 
-public class ViewportGL implements Viewport2 {
+public class JPatchDrawableGL implements JPatchDrawable2 {
 	
 	private GLDrawable glDrawable;
 	private volatile GL gl;
@@ -17,6 +17,7 @@ public class ViewportGL implements Viewport2 {
 	
 	private boolean bPerspective = false;
 	private float fFocalLength = 50;
+	private Matrix4f m4Transform = new Matrix4f();
 	
 	/** used to check if the last drawn image is stored in a display list */
 	private BufferedImage image;
@@ -305,7 +306,8 @@ public class ViewportGL implements Viewport2 {
 	private int iImageOffset;
 	
 	
-	public ViewportGL(final Viewport2EventListener listener, boolean leightweight) {
+	public JPatchDrawableGL(final JPatchDrawableEventListener listener, boolean leightweight) {
+		m4Transform.setIdentity();
 		if (leightweight) {
 			glDrawable = GLDrawableFactory.getFactory().createGLJPanel(new GLCapabilities());
 		} else {
@@ -381,7 +383,7 @@ public class ViewportGL implements Viewport2 {
 			public void display(GLDrawable glDrawable) {
 				gl = glDrawable.getGL();
 				enableRasterMode(false);
-				listener.display(ViewportGL.this);
+				listener.display(JPatchDrawableGL.this);
 				gl.glEnd();
 				gl.glFlush();
 				iGlMode = -1;
@@ -400,12 +402,12 @@ public class ViewportGL implements Viewport2 {
 			float h = dim.height / 2;
 			gl.glMatrixMode(GL.GL_PROJECTION);
 			gl.glLoadIdentity();
-			gl.glLoadMatrixf(new float[] {
-					1, 0, 0, 0,
-					0, 1, 0, 0,
-					0, 0, 1, 0,
-					0, 0, 0, 1
-			});
+//			gl.glLoadMatrixf(new float[] {
+//					m4Transform.m00, m4Transform.m10, m4Transform.m20, m4Transform.m30,
+//					m4Transform.m01, m4Transform.m11, m4Transform.m21, m4Transform.m31,
+//					m4Transform.m02, m4Transform.m12, m4Transform.m22, m4Transform.m32,
+//					m4Transform.m03, m4Transform.m13, m4Transform.m23, m4Transform.m33,
+//			});
 			if (bPerspective) {
 				float a = 35f / fFocalLength;
 				float b = a * h / w;
@@ -415,13 +417,7 @@ public class ViewportGL implements Viewport2 {
 			}
 			gl.glMatrixMode(GL.GL_MODELVIEW);
 			gl.glLoadIdentity();
-			gl.glLoadMatrixf(new float[] {
-					1, 0, 0, 0,
-					0, 1, 0, 0,
-					0, 0,-1, 0,
-					0, 0, 0, 1
-			});
-			gl.glEnable(GL.GL_LIGHTING);
+			gl.glDisable(GL.GL_LIGHTING);
 			gl.glEnable(GL.GL_DEPTH_TEST);
 			gl.glShadeModel(GL.GL_SMOOTH);
 		} else {
@@ -489,11 +485,11 @@ public class ViewportGL implements Viewport2 {
 		glDrawable.display();
 	}
 	
-	public void clear(int mode) {
+	public void clear(int mode, Color3f color) {
 		int bits = 0;
 		if ((mode & COLOR_BUFFER) > 0) bits |= GL.GL_COLOR_BUFFER_BIT;
 		if ((mode & DEPTH_BUFFER) > 0) bits |= GL.GL_DEPTH_BUFFER_BIT;
-		gl.glClearColor(0,0,0,0);
+		gl.glClearColor(color.x, color.y, color.z, 0);
 		gl.glClearDepth(32000);
 		gl.glClear(bits);
 		gl.glFlush();
@@ -532,6 +528,10 @@ public class ViewportGL implements Viewport2 {
 		gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[] { mp.red * mp.diffuse, mp.green * mp.diffuse, mp.blue * mp.diffuse, 1.0f } );
 		gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[] { mp.specular, mp.specular, mp.specular, 1.0f } );
 		gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[] { 1f / mp.roughness } );
+	}
+	
+	public void setTransform(Matrix4f transform) {
+		m4Transform = transform;
 	}
 	
 	public void setLighting(RealtimeLighting lighting) {
@@ -762,6 +762,10 @@ public class ViewportGL implements Viewport2 {
 	
 	public boolean isLightingSupported() {
 		return true;
+	}
+	
+	public boolean isTransformSupported() {
+		return false; // FIXME
 	}
 	
 	public Graphics getGraphics() {

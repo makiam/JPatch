@@ -67,8 +67,8 @@ public final class MainFrame extends JFrame {
 			helpLabel = new JLabel("press right mousebutton (RMB) for popup-menu, click and drag with middle mousebutton (MMB) to move view, use mousewheel to zoom");
 			helpLabel.setFont(new Font("SansSerif",Font.PLAIN,10));
 			
-			//ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
-			//JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+			ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
+			JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 			
 			bgAction = new ButtonGroup();
 			

@@ -1,5 +1,5 @@
 /*
- * $Id: HashPatchRenderer.java,v 1.1 2005/08/10 12:57:20 sascha_l Exp $
+ * $Id: HashPatchRenderer.java,v 1.2 2005/08/10 15:13:41 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -31,7 +31,7 @@ import jpatch.entity.MaterialProperties;
  *
  */
 public class HashPatchRenderer {
-	private Viewport2 viewport;
+	private JPatchDrawable2 viewport;
 	private float fNearClip;
 	private float fW;
 	private boolean bPerspective;

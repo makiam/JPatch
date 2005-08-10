@@ -10,14 +10,14 @@ import javax.vecmath.*;
 
 import jpatch.entity.*;
 
-public final class Viewport3D implements Viewport2 {
+public final class JPatchDrawable3D implements JPatchDrawable2 {
 	
 	private static final byte SUB_PIXEL_BITS = 16;
 	private static final int SUB_PIXEL_MULTIPLIER = 65536;
 	private static final int SUB_PIXEL_MASK_1 = 0xffff;
 	private static final float POLYGON_OFFSET = 1;
 	
-	private Viewport2EventListener listener;
+	private JPatchDrawableEventListener listener;
 	private Component component;
 	private Graphics2D g;
 	//private Matrix4f m4Transform = new Matrix4f();
@@ -46,7 +46,7 @@ public final class Viewport3D implements Viewport2 {
 	private Color3f Cbc = new Color3f();
 	private Color3f Cca = new Color3f();
 	
-	public Viewport3D(final Viewport2EventListener listener, boolean lightweight) {
+	public JPatchDrawable3D(final JPatchDrawableEventListener listener, boolean lightweight) {
 		this.listener = listener;
 		if (lightweight) {
 			component = new JPanel() {
@@ -117,15 +117,18 @@ public final class Viewport3D implements Viewport2 {
 	}
 	
 	public void display() {
+		if (component.getWidth() <= 0 || component.getHeight() <= 0)
+			return;
 		if (g == null || image == null) updateImage();
-		listener.display(Viewport3D.this);
+		listener.display(JPatchDrawable3D.this);
 		Graphics cg = component.getGraphics();
 		if (cg != null) component.paint(cg);
 	}
 	
-	public void clear(int mode) {
+	public void clear(int mode, Color3f color) {
+		int col = color.get().getRGB();
 		for (int i = 0, n = aiColorBuffer.length; i < n; i++) {
-			aiColorBuffer[i] = 0;
+			aiColorBuffer[i] = col;
 			aiDepthBuffer[i] = Integer.MAX_VALUE;
 		}
 //		if ((mode & COLOR_BUFFER) != 0) {
@@ -164,9 +167,17 @@ public final class Viewport3D implements Viewport2 {
 		//g.setColor(color.get());
 	}
 	
-	public void setMaterial(MaterialProperties mp) { }
+	public void setMaterial(MaterialProperties mp) {
+		throw new UnsupportedOperationException(this.getClass().getName() + " does not support lighting.");
+	}
 	
-	public void setLighting(RealtimeLighting lighting) { }
+	public void setLighting(RealtimeLighting lighting) {
+		throw new UnsupportedOperationException(this.getClass().getName() + " does not support lighting.");
+	}
+	
+	public void setTransform(Matrix4f transform) {
+		throw new UnsupportedOperationException(this.getClass().getName() + " does not support transform.");
+	}
 	
 	public void setPointSize(int size) {
 		iPointSize = size;
@@ -350,6 +361,10 @@ public final class Viewport3D implements Viewport2 {
 	}
 	
 	public boolean isLightingSupported() {
+		return false;
+	}
+	
+	public boolean isTransformSupported() {
 		return false;
 	}
 	

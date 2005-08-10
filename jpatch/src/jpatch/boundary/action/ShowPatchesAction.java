@@ -19,7 +19,7 @@ public final class ShowPatchesAction extends AbstractAction {
 	public void actionPerformed(ActionEvent actionEvent) {
 		viewDefinition.renderPatches(!viewDefinition.renderPatches());
 		//((JPatchCanvas)viewDefinition.getViewport()).updateImage();
-		viewDefinition.reset();
+//		viewDefinition.reset();
 	}
 }
 

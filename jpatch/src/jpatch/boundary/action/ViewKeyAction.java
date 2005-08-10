@@ -17,9 +17,9 @@ public final class ViewKeyAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		ViewDefinition viewDefinition = MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition();
-		viewDefinition.setView(iDirection);
-		viewDefinition.repaint();
+//		ViewDefinition viewDefinition = MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition();
+//		viewDefinition.setView(iDirection);
+//		viewDefinition.repaint();
 	}
 }
 

@@ -20,7 +20,7 @@ public final class ZoomToFitAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		zoomToFit(MainFrame.getInstance().getJPatchScreen().getActiveViewport());
+//		zoomToFit(MainFrame.getInstance().getJPatchScreen().getActiveViewport());
 	}
 	
 	public static void zoomToFit(Viewport viewport) {

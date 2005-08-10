@@ -10,7 +10,7 @@ import jpatch.entity.*;
 import javax.vecmath.*;
 import javax.imageio.*;
 
-public class Viewport2Test implements Viewport2EventListener {
+public class Viewport2Test implements JPatchDrawableEventListener {
 	
 	private AliasWavefrontObj obj;
 	private BufferedImage image;
@@ -28,7 +28,7 @@ public class Viewport2Test implements Viewport2EventListener {
 	private float[] phase = new float[] { 0, 1, 2, 3 };
 	private int iMode = 0;
 	private int iDisplay = 0;
-	private Viewport2[] avp = new Viewport2[4];
+	private JPatchDrawable2[] avp = new JPatchDrawable2[4];
 	private JFrame frame;
 	private JPanel panel = new JPanel();
 	private JPanel buttons = new JPanel();
@@ -174,22 +174,22 @@ public class Viewport2Test implements Viewport2EventListener {
 		switch(display) {
 			case 0: {
 				for (int i = 0; i < avp.length; i++) {
-					avp[i] = new ViewportGL(this, bLightweight);
-					avp[i].setProjection(Viewport2.PERSPECTIVE);
+					avp[i] = new JPatchDrawableGL(this, bLightweight);
+					avp[i].setProjection(JPatchDrawable2.PERSPECTIVE);
 				}
 			}
 			break;
 			case 1: {
 				for (int i = 0; i < avp.length; i++) {
-					avp[i] = new Viewport2D(this, bLightweight);
-					avp[i].setProjection(Viewport2.PERSPECTIVE);
+					avp[i] = new JPatchDrawable2D(this, bLightweight);
+					avp[i].setProjection(JPatchDrawable2.PERSPECTIVE);
 				}
 			}
 			break;
 			case 2: {
 				for (int i = 0; i < avp.length; i++) {
-					avp[i] = new Viewport3D(this, bLightweight);
-					avp[i].setProjection(Viewport2.PERSPECTIVE);
+					avp[i] = new JPatchDrawable3D(this, bLightweight);
+					avp[i].setProjection(JPatchDrawable2.PERSPECTIVE);
 				}
 			}
 		}
@@ -245,10 +245,10 @@ public class Viewport2Test implements Viewport2EventListener {
 		//panel.
 	}
 	
-	public void display(Viewport2 vp) {
+	public void display(JPatchDrawable2 vp) {
 		vp.setLighting(rtl);
 		vp.setColor(new Color3f(0,0,0));
-		vp.clear(Viewport2.COLOR_BUFFER | Viewport2.DEPTH_BUFFER);
+		vp.clear(JPatchDrawable2.COLOR_BUFFER | JPatchDrawable2.DEPTH_BUFFER, new Color3f(0,0,0));
 		vp.setColor(new Color3f(1,1,1));
 		vp.setPointSize(3);
 		
