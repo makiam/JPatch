@@ -51,7 +51,7 @@ public class DefaultTool extends JPatchTool {
 	//private Point3f p3Pivot = new Point3f();
 	//private boolean bChange;
 	private SelectMouseMotionListener selectMouseMotionListener;
-	private Viewport viewport;
+	//private Viewport viewport;
 	private boolean bMoveZ;
 	private TangentTool tangentTool = MainFrame.getInstance().getJPatchScreen().getTangentTool();
 	private TangentHandle tangentHandle;
@@ -69,16 +69,17 @@ public class DefaultTool extends JPatchTool {
 		//m3Rot = ps.getRotation();
 		//p3CornerA = ps.getCornerA();
 		//p3CornerB = ps.getCornerB();
-		pivotHandle = new PivotHandle2(settings.cSelection);
+		Color3f color = new Color3f(settings.cSelection);
+		pivotHandle = new PivotHandle2(color);
 		aHandle = new Handle[] {
-			new DefaultHandle(this, new Point3f(), settings.cSelection),
-			new DefaultHandle(this, new Point3f(), settings.cSelection),
-			new DefaultHandle(this, new Point3f(), settings.cSelection),
-			new DefaultHandle(this, new Point3f(), settings.cSelection),
-			new DefaultHandle(this, new Point3f(), settings.cSelection),
-			new DefaultHandle(this, new Point3f(), settings.cSelection),
-			new DefaultHandle(this, new Point3f(), settings.cSelection),
-			new DefaultHandle(this, new Point3f(), settings.cSelection),
+			new DefaultHandle(this, new Point3f(), color),
+			new DefaultHandle(this, new Point3f(), color),
+			new DefaultHandle(this, new Point3f(), color),
+			new DefaultHandle(this, new Point3f(), color),
+			new DefaultHandle(this, new Point3f(), color),
+			new DefaultHandle(this, new Point3f(), color),
+			new DefaultHandle(this, new Point3f(), color),
+			new DefaultHandle(this, new Point3f(), color),
 			pivotHandle
 		};
 		if (MainFrame.getInstance().getPointSelection() == null) {
@@ -209,14 +210,15 @@ public class DefaultTool extends JPatchTool {
 		return false;
 	}
 	
-	public void paint(Viewport viewport, JPatchDrawable drawable) {
+	public void paint(ViewDefinition viewDef) {
 		//drawable.clearZBuffer();
+		JPatchDrawable2 drawable = viewDef.getDrawable();
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
 		
-		if (MainFrame.getInstance().getJPatchScreen().showTangents() && tangentTool != null) tangentTool.paint(viewport, drawable);
+//		if (MainFrame.getInstance().getJPatchScreen().showTangents() && tangentTool != null) tangentTool.paint(viewport, drawable); // FIXME
 				
 		if (ps != null && ps.getSize() > 1) {
-			Matrix4f m4View = viewport.getViewDefinition().getMatrix();
+			Matrix4f m4View = viewDef.getMatrix();
 			Point3f p3A = new Point3f(ps.getCornerA());
 			Point3f p3B = new Point3f(ps.getCornerB());
 			float scale = 12f / m4View.getScale();
@@ -240,19 +242,31 @@ public class DefaultTool extends JPatchTool {
 				m4View.transform(ap3[p]);
 			}
 			
-			drawable.setColor(settings.cSelection);
-			drawable.drawGhostLine3D(ap3[0],ap3[1],GHOST_FACTOR);
-			drawable.drawGhostLine3D(ap3[1],ap3[2],GHOST_FACTOR);
-			drawable.drawGhostLine3D(ap3[2],ap3[3],GHOST_FACTOR);
-			drawable.drawGhostLine3D(ap3[3],ap3[0],GHOST_FACTOR);
-			drawable.drawGhostLine3D(ap3[4],ap3[5],GHOST_FACTOR);
-			drawable.drawGhostLine3D(ap3[5],ap3[6],GHOST_FACTOR);
-			drawable.drawGhostLine3D(ap3[6],ap3[7],GHOST_FACTOR);
-			drawable.drawGhostLine3D(ap3[7],ap3[4],GHOST_FACTOR);
-			drawable.drawGhostLine3D(ap3[0],ap3[4],GHOST_FACTOR);
-			drawable.drawGhostLine3D(ap3[1],ap3[5],GHOST_FACTOR);
-			drawable.drawGhostLine3D(ap3[2],ap3[6],GHOST_FACTOR);
-			drawable.drawGhostLine3D(ap3[3],ap3[7],GHOST_FACTOR);
+			drawable.setColor(new Color3f(settings.cSelection)); // FIXME
+//			drawable.drawGhostLine3D(ap3[0],ap3[1],GHOST_FACTOR);
+//			drawable.drawGhostLine3D(ap3[1],ap3[2],GHOST_FACTOR);
+//			drawable.drawGhostLine3D(ap3[2],ap3[3],GHOST_FACTOR);
+//			drawable.drawGhostLine3D(ap3[3],ap3[0],GHOST_FACTOR);
+//			drawable.drawGhostLine3D(ap3[4],ap3[5],GHOST_FACTOR);
+//			drawable.drawGhostLine3D(ap3[5],ap3[6],GHOST_FACTOR);
+//			drawable.drawGhostLine3D(ap3[6],ap3[7],GHOST_FACTOR);
+//			drawable.drawGhostLine3D(ap3[7],ap3[4],GHOST_FACTOR);
+//			drawable.drawGhostLine3D(ap3[0],ap3[4],GHOST_FACTOR);
+//			drawable.drawGhostLine3D(ap3[1],ap3[5],GHOST_FACTOR);
+//			drawable.drawGhostLine3D(ap3[2],ap3[6],GHOST_FACTOR);
+//			drawable.drawGhostLine3D(ap3[3],ap3[7],GHOST_FACTOR);
+			drawable.drawLine(ap3[0],ap3[1]);
+			drawable.drawLine(ap3[1],ap3[2]);
+			drawable.drawLine(ap3[2],ap3[3]);
+			drawable.drawLine(ap3[3],ap3[0]);
+			drawable.drawLine(ap3[4],ap3[5]);
+			drawable.drawLine(ap3[5],ap3[6]);
+			drawable.drawLine(ap3[6],ap3[7]);
+			drawable.drawLine(ap3[7],ap3[4]);
+			drawable.drawLine(ap3[0],ap3[4]);
+			drawable.drawLine(ap3[1],ap3[5]);
+			drawable.drawLine(ap3[2],ap3[6]);
+			drawable.drawLine(ap3[3],ap3[7]);
 			
 			comparator.setMatrix(m4View);
 			
@@ -260,7 +274,8 @@ public class DefaultTool extends JPatchTool {
 			Arrays.sort(aHandleCopy,comparator);
 			
 			for (int h = aHandleCopy.length - 1; h >= 0; h--) {
-				aHandleCopy[h].paint(viewport, drawable);
+				aHandleCopy[h].paint(viewDef);
+//				aHandleCopy[h].paint(viewport, drawable); // FIXME
 			}
 		}
 	}
@@ -272,7 +287,7 @@ public class DefaultTool extends JPatchTool {
 	}
 	
 	public void mousePressed(MouseEvent mouseEvent) {
-		
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 		m4Transform.setIdentity();
 		
 		/* LEFT MOUSE BUTTON */
@@ -288,29 +303,30 @@ public class DefaultTool extends JPatchTool {
 			
 			
 			//System.out.println ("ps = " + ps);
-			viewport = (Viewport)mouseEvent.getSource();
+			//viewport = (Viewport)mouseEvent.getSource();
 			
-			if (MainFrame.getInstance().getJPatchScreen().showTangents()) {
-				tangentHandle = tangentTool.isHit(viewport, x, y);
-				if (tangentHandle != null) {
-					if (mouseEvent.getClickCount() == 2) {
-						fMagnitude = tangentHandle.getMagnitude();
-						tangentHandle.getCp().setMagnitude(1);
-						tangentHandle.getCp().invalidateTangents();
-						MainFrame.getInstance().getUndoManager().addEdit(new ChangeControlPointMagnitudeEdit(tangentHandle.getCp(),fMagnitude));
-						MainFrame.getInstance().getJPatchScreen().update_all();
-						return;
-					}
-					
-					fMagnitude = tangentHandle.getMagnitude();
-					tangentHandle.setFactor(mouseEvent);
-					((Component)mouseEvent.getSource()).addMouseMotionListener(tangentHandle);
-					iState = TANGENT;
-					return;
-				}
-			}
+			// FIXME
+//			if (MainFrame.getInstance().getJPatchScreen().showTangents()) {
+//				tangentHandle = tangentTool.isHit(viewport, x, y); // FIXME
+//				if (tangentHandle != null) {
+//					if (mouseEvent.getClickCount() == 2) {
+//						fMagnitude = tangentHandle.getMagnitude();
+//						tangentHandle.getCp().setMagnitude(1);
+//						tangentHandle.getCp().invalidateTangents();
+//						MainFrame.getInstance().getUndoManager().addEdit(new ChangeControlPointMagnitudeEdit(tangentHandle.getCp(),fMagnitude));
+//						MainFrame.getInstance().getJPatchScreen().update_all();
+//						return;
+//					}
+//					
+//					fMagnitude = tangentHandle.getMagnitude();
+//					tangentHandle.setFactor(mouseEvent);
+//					((Component)mouseEvent.getSource()).addMouseMotionListener(tangentHandle);
+//					iState = TANGENT;
+//					return;
+//				}
+//			}
 			
-			paint(viewport,((JPatchCanvas) mouseEvent.getSource()).getDrawable());
+			paint(viewDef);
 			compoundEdit = new JPatchCompoundEdit();
 			
 			boolean repaint = false;
@@ -331,7 +347,7 @@ public class DefaultTool extends JPatchTool {
 				Point3f p3Hit = new Point3f();
 				
 				for (int h = 0; h < aHandle.length; h++) {
-					if (aHandle[h].isHit(viewport, x, y, p3Hit) && (activeHandle == null || p3Hit.z < z)) {
+					if (aHandle[h].isHit(viewDef, x, y, p3Hit) && (activeHandle == null || p3Hit.z < z)) {
 						//System.out.println("hit");
 						z = p3Hit.z;
 						activeHandle = aHandle[h];
@@ -375,10 +391,10 @@ public class DefaultTool extends JPatchTool {
 				}	
 			} else {
 				/* no handle was clicked... */
-				Matrix4f m4View = viewport.getViewDefinition().getMatrix();
+				Matrix4f m4View = viewDef.getMatrix();
 				
 				/* check if a controlpoint was clicked... */
-				cpHot = viewport.getViewDefinition().getClosestControlPoint(new Point2D.Float(x,y),null,null,true,false,cpHot);
+				cpHot = viewDef.getClosestControlPoint(new Point2D.Float(x,y),null,null,true,false,cpHot);
 				
 				/* if a point was hit... */
 				if (cpHot != null) {
@@ -387,7 +403,7 @@ public class DefaultTool extends JPatchTool {
 					if ((!mouseEvent.isControlDown() && !mouseEvent.isShiftDown()) || ps == null) {
 						
 						/* is the point inside the selection box? */
-						if (ps != null && ps.getSize() > 1 && isHit(x,y,m4View)) {
+						if (ps != null && ps.getSize() > 1 && isHit(x,y,viewDef.getScreenMatrix())) {
 							
 							/* change the hot cp */
 							if (ps.contains(cpHot)) {
@@ -495,7 +511,7 @@ public class DefaultTool extends JPatchTool {
 						/* neither shift nor control are down */
 						
 						/* check if selection box was hit and set state*/
-						if (ps != null && ps.getSize() > 1 && isHit(x,y,m4View)) {
+						if (ps != null && ps.getSize() > 1 && isHit(x,y,viewDef.getScreenMatrix())) {
 							
 							/* selection box was hit, set state*/
 							iState = MOVE_GROUP;
@@ -673,6 +689,7 @@ public class DefaultTool extends JPatchTool {
 	}
 	
 	public void mouseReleased(MouseEvent mouseEvent) {
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 		//Viewport viewport = (Viewport)mouseEvent.getSource();
 		if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
 			PointSelection ps = MainFrame.getInstance().getPointSelection();
@@ -704,7 +721,7 @@ public class DefaultTool extends JPatchTool {
 					((Component)mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
 					break;
 				case DRAW_SELECTION:
-					Selection selection = selectMouseMotionListener.getSelection(viewport.getViewDefinition());
+					Selection selection = selectMouseMotionListener.getSelection(viewDef);
 					if (selection != null || ps != null) {
 						edit = new ChangeSelectionEdit(selection);
 						MainFrame.getInstance().getUndoManager().addEdit(edit);
@@ -713,7 +730,7 @@ public class DefaultTool extends JPatchTool {
 					selectionChanged(selection);
 					break;
 				case ADD_MODIFY_SELECTION:
-					PointSelection psNew = (PointSelection)selectMouseMotionListener.getSelection(viewport.getViewDefinition());
+					PointSelection psNew = (PointSelection)selectMouseMotionListener.getSelection(viewDef);
 					if (psNew != null) {
 						Collection colPointsToAdd = psNew.getSelectedControlPoints();
 						if (ps != null) colPointsToAdd.removeAll(ps.getSelectedControlPoints());
@@ -725,7 +742,7 @@ public class DefaultTool extends JPatchTool {
 					selectionChanged(ps);
 					break;
 				case XOR_MODIFY_SELECTION:
-					psNew = (PointSelection)selectMouseMotionListener.getSelection(viewport.getViewDefinition());
+					psNew = (PointSelection)selectMouseMotionListener.getSelection(viewDef);
 					if (psNew != null) {
 						Collection colNewSelection = psNew.getSelectedControlPoints();
 						Collection colPointsToAdd = new ArrayList();
@@ -794,11 +811,11 @@ public class DefaultTool extends JPatchTool {
 	}
 	
 	public void mouseDragged(MouseEvent mouseEvent) {
-		Viewport viewport = (Viewport)mouseEvent.getSource();
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 		//System.out.println("mouseDragged");
 		int iDeltaX = mouseEvent.getX() - iMouseX;
 		int iDeltaY = mouseEvent.getY() - iMouseY;
-		Matrix4f m4InvScreenMatrix = new Matrix4f(viewport.getViewDefinition().getMatrix());
+		Matrix4f m4InvScreenMatrix = new Matrix4f(viewDef.getScreenMatrix());
 		m4InvScreenMatrix.invert();
 		switch(iState) {
 			case MOVE_GROUP: {
@@ -818,7 +835,7 @@ public class DefaultTool extends JPatchTool {
 				//if (Math.abs(v3Ortho.y) > 0.01f);
 				//	float f = v3Move.y / v3Ortho.y;
 				//	v3Move.addScaled(v3Ortho, -f);
-					translate(v3Move, viewport);
+					translate(v3Move, viewDef);
 				//}
 			}
 			break;
@@ -832,7 +849,7 @@ public class DefaultTool extends JPatchTool {
 				if (bMoveZ) {
 					MainFrame.getInstance().getJPatchScreen().update_all();
 				} else {
-					MainFrame.getInstance().getJPatchScreen().single_update((Component)viewport);
+					MainFrame.getInstance().getJPatchScreen().single_update(viewDef.getDrawable().getComponent());
 				}
 				//Point3f p3Old = cpHot.getPosition();
 				//viewport.getViewDefinition().setZ(p3Old);
@@ -893,7 +910,7 @@ public class DefaultTool extends JPatchTool {
 		}
 	}
 	
-	protected void translate(Vector3f v, Viewport viewport) {
+	protected void translate(Vector3f v, ViewDefinition viewDef) {
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
 		Point3f point = new Point3f();
 		ControlPoint[] acp = ps.getControlPointArray();
@@ -906,16 +923,16 @@ public class DefaultTool extends JPatchTool {
 		
 		Vector3f vector = new Vector3f(v);
 		if (bMoveZ) {
-			viewport.getGrid().correctZVector(vector);
+//			viewport.getGrid().correctZVector(vector);
 		} else {
-			viewport.getGrid().correctVector(vector);
+//			viewport.getGrid().correctVector(vector);
 		}
 		if (cpHot != null) {
 			//System.out.println("*  " + vector);
 			if (bMoveZ) {
-				vector.add(viewport.getGrid().getZCorrectionVector(cpHot.getPosition()));
+//				vector.add(viewport.getGrid().getZCorrectionVector(cpHot.getPosition()));
 			} else {
-				vector.add(viewport.getGrid().getCorrectionVector(cpHot.getPosition()));
+//				vector.add(viewport.getGrid().getCorrectionVector(cpHot.getPosition()));
 			}
 			//cv.set(-1,0,0);
 			//System.out.println("** " + vector);
@@ -934,12 +951,12 @@ public class DefaultTool extends JPatchTool {
 			if (bMoveZ) {
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			} else {
-				MainFrame.getInstance().getJPatchScreen().single_update((Component)viewport);
+				MainFrame.getInstance().getJPatchScreen().single_update(viewDef.getDrawable().getComponent());
 			}
 		}
 	}
 	
-	protected void scale(float scale, Viewport viewport) {
+	protected void scale(float scale, ViewDefinition viewDef) {
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
 		Point3f point = new Point3f();
 		ControlPoint[] acp = ps.getControlPointArray();
@@ -949,7 +966,7 @@ public class DefaultTool extends JPatchTool {
 			point.add(ps.getPivot());
 			MainFrame.getInstance().getConstraints().setControlPointPosition(acp[p],point);
 		}
-		MainFrame.getInstance().getJPatchScreen().single_update((Component)viewport);
+		MainFrame.getInstance().getJPatchScreen().single_update(viewDef.getDrawable().getComponent());
 	}
 	
 	private void selectionChanged(Selection selection) {

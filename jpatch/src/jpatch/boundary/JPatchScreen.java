@@ -319,10 +319,11 @@ public final class JPatchScreen extends JPanel {
 	public void setTool(JPatchTool tool) {
 		this.tool = tool;
 		removeAllMouseListeners();
-//		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 //			((JPatchCanvas)aComponent[i]).setTool(tool);
-//		}
-//		update_all();
+			aViewport[i].setTool(tool);
+		}
+		update_all();
 	}
 	
 	public JPatchTool getTool() {

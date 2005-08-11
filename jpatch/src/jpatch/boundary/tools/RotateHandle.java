@@ -16,7 +16,7 @@ public class RotateHandle extends Handle {
 	protected float angle = 0;
 	protected float fScale = 1;
 	
-	public RotateHandle(Point3f position, RotateTool rotateTool, Color color, Vector3f axis, Matrix3f m) {
+	public RotateHandle(Point3f position, RotateTool rotateTool, Color3f color, Vector3f axis, Matrix3f m) {
 		super(position, color);
 		this.rotateTool = rotateTool;
 		m3Cube = m;

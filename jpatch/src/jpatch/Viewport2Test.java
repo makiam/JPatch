@@ -246,9 +246,10 @@ public class Viewport2Test implements JPatchDrawableEventListener {
 	}
 	
 	public void display(JPatchDrawable2 vp) {
-		vp.setLighting(rtl);
-		vp.setColor(new Color3f(0,0,0));
-		vp.clear(JPatchDrawable2.COLOR_BUFFER | JPatchDrawable2.DEPTH_BUFFER, new Color3f(0,0,0));
+		vp.setProjection(JPatchDrawable2.PERSPECTIVE);
+		if (vp.isLightingSupported())
+			vp.setLighting(rtl);
+		vp.clear(JPatchDrawable2.COLOR_BUFFER | JPatchDrawable2.DEPTH_BUFFER, new Color3f(0,0,1));
 		vp.setColor(new Color3f(1,1,1));
 		vp.setPointSize(3);
 		
@@ -292,7 +293,7 @@ public class Viewport2Test implements JPatchDrawableEventListener {
 		matrix.setIdentity();
 		matrix.setRotation(new AxisAngle4f(vector[v], angle[v]));
 		matrix.setScale(1.0f);
-		matrix.setTranslation(new Vector3f(0, -4, 40 + 50 * (float) Math.sin(phase[v])));
+		matrix.setTranslation(new Vector3f(0, -4, 50 + 40 * (float) Math.sin(phase[v])));
 		//for (int i = 0; i < obj.v.length; i++) {
 		//	
 		//	vp.drawPoint(obj.v[i]);
@@ -318,7 +319,8 @@ public class Viewport2Test implements JPatchDrawableEventListener {
 //			mp.diffuse = 1;
 //			mp.specular = 1;
 //			mp.roughness = 0.05f;
-			vp.setMaterial(mp);
+			if (vp.isLightingSupported())
+				vp.setMaterial(mp);
 			for (int j = 0; j < obj.fv[i].length; j++) {
 				p0.set(obj.v[obj.fv[i][j][0]]);
 				p1.set(obj.v[obj.fv[i][j][1]]);
@@ -343,9 +345,12 @@ public class Viewport2Test implements JPatchDrawableEventListener {
 				//c2.clamp(0, 1);
 				//vp.drawTriangle(p0, c0, p1, c1, p2, c2);
 				//vp.drawPoint(p0);
-				if (vp.isShadingSupported()) {
+				if (false && vp.isShadingSupported()) {
 					if (vp.isLightingSupported()) {
 						vp.drawTriangle(p0, n0, p1, n1, p2, n2);
+						vp.drawPoint(p0);
+						vp.drawPoint(p1);
+						vp.drawPoint(p2);
 					} else {
 						rtl.shade(p0, n0, mp, c0);
 						rtl.shade(p1, n1, mp, c1);
@@ -354,6 +359,9 @@ public class Viewport2Test implements JPatchDrawableEventListener {
 						c1.clamp(0, 1);
 						c2.clamp(0, 1);
 						vp.drawTriangle(p0, c0, p1, c1, p2, c2);
+						vp.drawPoint(p0);
+						vp.drawPoint(p1);
+						vp.drawPoint(p2);
 					}
 				} else {
 					float z = -p0.z / 10 - 5;
@@ -367,6 +375,9 @@ public class Viewport2Test implements JPatchDrawableEventListener {
 					vp.drawLine(p0, p1);
 					vp.drawLine(p1, p2);
 					vp.drawLine(p2, p0);
+					vp.drawPoint(p0);
+					vp.drawPoint(p1);
+					vp.drawPoint(p2);
 				}
 			}
 		}
