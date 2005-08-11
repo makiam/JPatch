@@ -5,10 +5,12 @@ import jpatch.entity.*;
 
 public class SimpleShape {
 	Point3f[] ap3Points;
+	Point3f[] ap3TransformedPoints;
 	Vector3f[] av3Normals;
+	Vector3f[] av3TransformedNormals;
 	int[] aiTriangles;
 	int[] aiNormalIndices;
-	MaterialProperties mp;
+	MaterialProperties mp = new MaterialProperties();;
 	
 	public Point3f[] getPoints() {
 		Point3f[] ap3 = new Point3f[ap3Points.length];
@@ -40,10 +42,12 @@ public class SimpleShape {
 	
 	public void setPoints(Point3f[] ap3) {
 		ap3Points = ap3;
+		transformedPoints();
 	}
 	
 	public void setNormals(Vector3f[] av3) {
 		av3Normals = av3;
+		transformedNormals();
 	}
 	
 	public void setTriangles(int[] ai) {
@@ -58,25 +62,38 @@ public class SimpleShape {
 		this.mp = mp;
 	}
 	
-	public void transform(Matrix4f matrix) {
-		for (int i = 0; i < ap3Points.length; i++) {
-			matrix.transform(ap3Points[i]);
-		}
+	public void initTransform() {
+		for (int i = 0; i < ap3Points.length; ap3TransformedPoints[i].set(ap3Points[i++]));
+		for (int i = 0; i < av3Normals.length; av3TransformedNormals[i].set(av3Normals[i++]));
+	}
+	
+	public void doTransform(Matrix4f matrix) {
+		for (int i = 0; i < ap3Points.length; matrix.transform(ap3TransformedPoints[i++]));
 		for (int i = 0; i < av3Normals.length; i++) {
-			matrix.transform(av3Normals[i]);
-			av3Normals[i].normalize();
+			matrix.transform(av3TransformedNormals[i]);
+			av3TransformedNormals[i].normalize();
 		}
 	}
 	
-	public void transform(Matrix3f matrix) {
-		for (int i = 0; i < ap3Points.length; i++) {
-			matrix.transform(ap3Points[i]);
-		}
-		for (int i = 0; i < av3Normals.length; i++) {
-			matrix.transform(av3Normals[i]);
-			av3Normals[i].normalize();
-		}
-	}
+//	public void transform(Matrix4f matrix) {
+//		for (int i = 0; i < ap3Points.length; i++) {
+//			matrix.transform(ap3Points[i]);
+//		}
+//		for (int i = 0; i < av3Normals.length; i++) {
+//			matrix.transform(av3Normals[i]);
+//			av3Normals[i].normalize();
+//		}
+//	}
+//	
+//	public void transform(Matrix3f matrix) {
+//		for (int i = 0; i < ap3Points.length; i++) {
+//			matrix.transform(ap3Points[i]);
+//		}
+//		for (int i = 0; i < av3Normals.length; i++) {
+//			matrix.transform(av3Normals[i]);
+//			av3Normals[i].normalize();
+//		}
+//	}
 	
 	public void translate(Vector3f vector) {
 		for (int i = 0; i < ap3Points.length; i++) {
@@ -84,27 +101,24 @@ public class SimpleShape {
 		}
 	}
 	
-	public void setColor(float r, float g, float b) {
-		mp = new MaterialProperties();
-		mp.red = r;
-		mp.green = g;
-		mp.blue = b;
+	public void setColor(Color3f color) {
+		mp.red = color.x;
+		mp.green = color.y;
+		mp.blue = color.z;
 		mp.ambient = 0.4f;
 		mp.diffuse = 0.9f;
 		mp.specular = 0.3f;
 		mp.roughness = 0.01f;
 	}
 	
-	public static SimpleShape createCube(float size, float r, float g, float b) {
+	public static SimpleShape createCube(float size) {
 		SimpleShape s = new SimpleShape();
-		s.setColor(r, g, b);
 		s.setCube(size);
 		return s;
 	}
 	
-	public static SimpleShape createArrow(float length, float size, float r, float g, float b) {
+	public static SimpleShape createArrow(float length, float size) {
 		SimpleShape s = new SimpleShape();
-		s.setColor(r, g, b);
 		s.setArrow(length, size);
 		return s;
 	}
@@ -153,6 +167,8 @@ public class SimpleShape {
 			4,
 			4
 		};
+		transformedPoints();
+		transformedNormals();
 	}
 	
 	public void setCube(float size) {
@@ -196,5 +212,48 @@ public class SimpleShape {
 			4,4,
 			5,5
 		};
+		transformedPoints();
+		transformedNormals();
+	}
+	
+	private void transformedPoints() {
+		ap3TransformedPoints = new Point3f[ap3Points.length];
+		for (int i = 0; i < ap3Points.length; ap3TransformedPoints[i++] = new Point3f());
+	}
+	private void transformedNormals() {
+		av3TransformedNormals = new Vector3f[av3Normals.length];
+		for (int i = 0; i < av3Normals.length; av3TransformedNormals[i++] = new Vector3f());
+	}
+	
+	public void paint(ViewDefinition viewDef, Matrix4f transform, Matrix4f view) {
+		JPatchDrawable2 drawable = viewDef.getDrawable();
+		initTransform();
+		doTransform(transform);
+		if (drawable.isTransformSupported())
+//			drawable.setTransform(view);
+			;
+		else
+			doTransform(view);
+		if (drawable.isLightingSupported())
+			drawable.setMaterial(mp);
+		int t = 0;
+		for (int i = 0; i < aiNormalIndices.length; i++) {
+			if (drawable.isLightingSupported()) {
+				drawable.drawTriangle(
+						ap3TransformedPoints[aiTriangles[t++]], av3TransformedNormals[aiNormalIndices[i]],
+						ap3TransformedPoints[aiTriangles[t++]], av3TransformedNormals[aiNormalIndices[i]],
+						ap3TransformedPoints[aiTriangles[t++]], av3TransformedNormals[aiNormalIndices[i]]
+				);
+			} else {
+				Color3f c0 = new Color3f();
+				viewDef.getLighting().shade(ap3TransformedPoints[aiTriangles[t]], av3TransformedNormals[aiNormalIndices[i]], mp, c0);
+				drawable.setColor(c0);
+				drawable.drawTriangle(
+						ap3TransformedPoints[aiTriangles[t++]],
+						ap3TransformedPoints[aiTriangles[t++]],
+						ap3TransformedPoints[aiTriangles[t++]]
+				);
+			}
+		}
 	}
 }

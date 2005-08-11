@@ -15,7 +15,7 @@ public class TangentHandle extends Handle {
 	private ControlPoint cp;
 	private float fFactor = 1;
 	
-	public TangentHandle(Color color, ControlPoint cp, int direction) {
+	public TangentHandle(Color3f color, ControlPoint cp, int direction) {
 		super(null, color);
 		iDirection = direction;
 		this.cp = cp;

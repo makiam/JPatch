@@ -216,8 +216,8 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 		for (y = y1; y < y2; y++) {
 			for (x = x1; x < x2; x++) {
 				if (z < aiDepthBuffer[index]) {
-					aiDepthBuffer[index] = iColor;
-					aiColorBuffer[index] = z;
+					aiDepthBuffer[index] = z;
+					aiColorBuffer[index] = iColor;
 				}
 				index++;
 			}
