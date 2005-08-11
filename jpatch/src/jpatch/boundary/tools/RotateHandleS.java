@@ -6,7 +6,7 @@ import javax.vecmath.*;
 import jpatch.boundary.*;
 
 public class RotateHandleS extends RotateHandle {	
-	public RotateHandleS(Point3f position, RotateTool rotateTool, Color color) {
+	public RotateHandleS(Point3f position, RotateTool rotateTool, Color3f color) {
 		super(position, rotateTool, color, null, null);
 		v3Axis = new Vector3f(0,0,1);
 		//iHitSize = 6;

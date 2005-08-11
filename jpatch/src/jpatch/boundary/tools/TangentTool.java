@@ -7,8 +7,8 @@ import jpatch.entity.*;
 
 public class TangentTool extends JPatchTool {
 	
-	private TangentHandle handleIn = new TangentHandle(JPatchSettings.getInstance().cTangent, null, TangentHandle.IN);
-	private TangentHandle handleOut = new TangentHandle(JPatchSettings.getInstance().cTangent, null, TangentHandle.OUT);
+	private TangentHandle handleIn = new TangentHandle(new Color3f(JPatchSettings.getInstance().cTangent), null, TangentHandle.IN);
+	private TangentHandle handleOut = new TangentHandle(new Color3f(JPatchSettings.getInstance().cTangent), null, TangentHandle.OUT);
 	
 	private static final int GHOST_FACTOR = JPatchSettings.getInstance().iGhost;
 	

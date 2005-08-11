@@ -1,30 +1,29 @@
 package jpatch.boundary.tools;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.vecmath.*;
+
 import jpatch.boundary.*;
 
 public class Handle 
 implements MouseMotionListener {
 	protected Point3f p3Position;
-	protected int iSize = 3;
+	protected Matrix4f m4Transform = new Matrix4f();
+	private SimpleShape shape = SimpleShape.createCube(1);
+	protected float fSize = 3;
 	protected int iHitSize = 4;
-	protected Color cPassive;
-	protected Color cActive = new Color(0xFF,0xFF,0xFF);
+	protected Color3f c3Passive;
+	protected Color3f c3Active = new Color3f(1, 1, 1);
 	protected int iPassive;
-	protected int iActive = cActive.getRGB();
 	protected boolean bActive = false;
 	protected int iMouseX;
 	protected int iMouseY;
 	
 	protected JPatchSettings settings = JPatchSettings.getInstance();
-
 		
-	public Handle(Point3f position, Color color) {
+	public Handle(Point3f position, Color3f color) {
 		p3Position = position;
-		cPassive = color;
-		iPassive = color.getRGB();
+		c3Passive = color;
 	}
 	
 	public Point3f getPosition() {
@@ -43,39 +42,30 @@ implements MouseMotionListener {
 	}
 	
 	public void setActive(boolean active) {
-		//if (active) System.out.println("active " + this + " pos = " + p3Position);
 		bActive = active;
 	}
 	
-	public void paint(Viewport viewport, JPatchDrawable drawable) {
-		Point3f p3 = getTransformedPosition(viewport.getViewDefinition().getMatrix());
-		if (bActive) {
-			drawable.setColor(cActive);
-		} else {
-			drawable.setColor(cPassive);
-		}
-		int x = (int)p3.x;
-		int y = (int)p3.y;
-		drawable.drawPoint3D(p3, iSize);
-		drawable.drawLine(x - iSize, y - iSize, x + iSize, y - iSize);
-		drawable.drawLine(x - iSize, y + iSize, x + iSize, y + iSize);
-		drawable.drawLine(x - iSize, y - iSize, x - iSize, y + iSize);
-		drawable.drawLine(x + iSize, y - iSize, x + iSize, y + iSize);
-		/*
-		SimpleShape shape = SimpleShape.createCube(5f, 0.0f, 1.0f, 1.0f);
-		//drawable.drawSimpleShape(shape, m4View);
-		//shape.setColor(1.0f,0.0f,0.0f);
-		Matrix4f m4 = new Matrix4f();
-		m4.set(new Vector3f(p3));
-		shape.transform(m4);
-		m4.setIdentity();
-		drawable.drawSimpleShape(shape, m4);
-		*/
+	public void paint(ViewDefinition viewDef) {
+		paint(viewDef, null);
 	}
 	
-	public boolean isHit(Viewport viewport, int x, int y, Point3f hit) {
-		Point3f p3 = getTransformedPosition(viewport.getViewDefinition().getMatrix());
-		//System.out.println("handle " + this + " " + p3 + " " + x + " " + y);
+	protected void paint(ViewDefinition viewDef, Matrix3f orientation) {
+		if (bActive)
+			shape.setColor(c3Active);
+		else
+			shape.setColor(c3Passive);
+		m4Transform.setIdentity();
+		if (orientation != null)
+			m4Transform.setRotationScale(orientation);
+		m4Transform.setScale(fSize / viewDef.getMatrix().getScale());
+		m4Transform.m03 += p3Position.x;
+		m4Transform.m13 += p3Position.y;
+		m4Transform.m23 += p3Position.z;
+		shape.paint(viewDef, m4Transform, viewDef.getMatrix());
+	}
+	
+	public boolean isHit(ViewDefinition viewDef, int x, int y, Point3f hit) {
+		Point3f p3 = getTransformedPosition(viewDef.getScreenMatrix());
 		if (x >= p3.x - iHitSize && x <= p3.x + iHitSize && y >= p3.y - iHitSize && y <= p3.y + iHitSize) {
 			hit.set(p3);
 			return true;

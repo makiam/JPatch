@@ -38,6 +38,7 @@ implements ComponentListener {
 	private Vector4f v4Screen = new Vector4f();
 	private Vector4f v4ScreenOffset = new Vector4f();
 	private Matrix4f m4View = new Matrix4f();
+	private RealtimeLighting lighting;
 	
 //	private float fWidth;
 //	private float fHeight;
@@ -94,6 +95,18 @@ implements ComponentListener {
 		setView(iView);
 	}
 	
+	public JPatchDrawable2 getDrawable() {
+		return drawable;
+	}
+	
+	public void setLighting(RealtimeLighting lighting) {
+		this.lighting = lighting;
+	}
+	
+	public RealtimeLighting getLighting() {
+		return lighting;
+	}
+	
 	public final Matrix4f getMatrix() {
 		return m4View;
 	}
@@ -118,7 +131,10 @@ implements ComponentListener {
 		
 		Matrix4f m4Screen = new Matrix4f(m4View);
 		m4Screen.m03 += drawable.getComponent().getWidth() / 2;
-		m4Screen.m13 -= drawable.getComponent().getHeight() / 2;
+		m4Screen.m10 = -m4Screen.m10;
+		m4Screen.m11 = -m4Screen.m11;
+		m4Screen.m12 = -m4Screen.m12;
+		m4Screen.m13 = -m4Screen.m13 + drawable.getComponent().getHeight() / 2;
 		return m4Screen;
 		//return m4View;
 	}
@@ -452,7 +468,7 @@ implements ComponentListener {
 	
 	public final Point3f get3DPosition(float x, float y)
 	{
-		Point3f p3 = new Point3f(x,-y,fZ);
+		Point3f p3 = new Point3f(x, y, fZ);
 		Matrix4f m4Screen = getScreenMatrix();
 		Matrix4f m4Inverse = new Matrix4f();
 		m4Inverse.invert(m4Screen);
@@ -522,7 +538,7 @@ implements ComponentListener {
 						if (cp.isHead()) {
 							p3.set(cp.getPosition());
 							m4Screen.transform(p3);
-							p2.setLocation(p3.x,-p3.y);
+							p2.setLocation(p3.x,p3.y);
 							fDistance = (float)p2.distanceSq(target);
 							if (fDistance <= fMinDistance && cp != cpExcept) {
 								fMinDistance = fDistance;

@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.3 2005/08/10 19:06:22 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.4 2005/08/11 15:17:11 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -24,6 +24,7 @@ package jpatch.boundary;
 import javax.vecmath.*;
 
 import jpatch.boundary.selection.*;
+import jpatch.boundary.tools.*;
 import jpatch.entity.*;
 
 /**
@@ -46,10 +47,11 @@ public class Viewport2 {
 	private static Point3f p3 = new Point3f();
 	
 	private JPatchDrawable2 drawable;
-	private ViewDefinition viewDefinition;
+	private ViewDefinition viewDef;
 	private JPatchSettings settings = JPatchSettings.getInstance();
 	
 	private Matrix4f m4View = new Matrix4f();
+	private JPatchTool tool;
 	
 	static {
 		init();
@@ -71,28 +73,35 @@ public class Viewport2 {
 	
 	public Viewport2(JPatchDrawable2 drawable, ViewDefinition viewDefinition) {
 		this.drawable = drawable;
-		this.viewDefinition = viewDefinition;
+		this.viewDef = viewDefinition;
 	}
 	
 	public void prepare() {
 		if (drawable.isTransformSupported())
-			drawable.setTransform(viewDefinition.getScreenMatrix());
+			drawable.setTransform(viewDef.getScreenMatrix());
 		else
-			m4View.set(viewDefinition.getMatrix());
+			m4View.set(viewDef.getMatrix());
 		drawable.clear(JPatchDrawable2.COLOR_BUFFER | JPatchDrawable2.DEPTH_BUFFER, new Color3f(settings.cBackground)); // FIXME
+	}
+	
+	public void setTool(JPatchTool tool) {
+		this.tool = tool;
+		if (tool != null)
+			drawable.getComponent().addMouseListener(tool);
 	}
 	
 	public void drawModel(Model model) {
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		System.out.println("drawModel");
-		if (viewDefinition.renderCurves()) {
+		if (tool != null)
+			tool.paint(viewDef);
+		if (viewDef.renderCurves()) {
 			drawable.setColor(new Color3f(settings.cCurve)); // FIXME
 			for (Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
 				if (!curve.getStart().isStartHook())
 					drawCurve(curve);
 			}
 		}
-		if (viewDefinition.renderPoints()) {
+		if (viewDef.renderPoints()) {
 			drawable.setPointSize(3);
 			for(Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
 				for(ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
@@ -101,17 +110,17 @@ public class Viewport2 {
 						if (!drawable.isTransformSupported()) 
 							m4View.transform(p0);
 						if (ps != null && ps.contains(cp)) {
-//							drawable.setColor(new Color3f(settings.cSelected)); //FIXME
+							drawable.setColor(new Color3f(settings.cSelected)); //FIXME
 							drawable.drawPoint(p0);
 						} else if (!cp.isHook() && ! cp.isHidden()){
 							if (cp.isSingle()) {
-//								drawable.setColor(new Color3f(settings.cPoint)); //FIXME
+								drawable.setColor(new Color3f(settings.cPoint)); //FIXME
 								drawable.drawPoint(p0);
 							} else if (!cp.isMulti()) {
-//								drawable.setColor(new Color3f(settings.cHeadPoint)); //FIXME
+								drawable.setColor(new Color3f(settings.cHeadPoint)); //FIXME
 								drawable.drawPoint(p0);
 							} else {
-//								drawable.setColor(new Color3f(settings.cMultiPoint)); //FIXME
+								drawable.setColor(new Color3f(settings.cMultiPoint)); //FIXME
 								drawable.drawPoint(p0);
 							}
 							//if (cp.isHidden()) drawable.setColor(Color.BLUE);

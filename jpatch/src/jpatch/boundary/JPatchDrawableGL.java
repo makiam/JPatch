@@ -371,9 +371,9 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 //				gl.glEnable(GL.GL_LIGHT2);
 				
 //				gl.glDisable(GL.GL_CULL_FACE);
-//				//gl.glCullFace(GL.GL_BACK);
-//				gl.glDepthFunc(GL.GL_LEQUAL);
-//				gl.glEnable(GL.GL_DEPTH_TEST);
+//				gl.glCullFace(GL.GL_FRONT);
+				gl.glDepthFunc(GL.GL_LEQUAL);
+				gl.glEnable(GL.GL_DEPTH_TEST);
 
 			}
 			public void reshape(GLDrawable glDrawable, int x, int y, int width, int height) {
@@ -417,7 +417,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			}
 			gl.glMatrixMode(GL.GL_MODELVIEW);
 			gl.glLoadIdentity();
-			gl.glDisable(GL.GL_LIGHTING);
+			gl.glDisable(GL.GL_LIGHTING); // FIXME
 			gl.glEnable(GL.GL_DEPTH_TEST);
 			gl.glShadeModel(GL.GL_SMOOTH);
 		} else {
@@ -684,7 +684,6 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			iGlMode = GL.GL_POINTS;
 			gl.glBegin(iGlMode);
 		}
-		System.out.println("point " + p);
 		gl.glVertex3f(p.x, p.y, p.z);
 	}
 	
@@ -762,7 +761,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public boolean isLightingSupported() {
-		return true;
+		return true; // FIXME
 	}
 	
 	public boolean isTransformSupported() {
