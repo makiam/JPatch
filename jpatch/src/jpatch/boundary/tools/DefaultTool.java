@@ -238,7 +238,7 @@ public class DefaultTool extends JPatchTool {
 			
 			for (int p = 0; p < 8; p++) {
 				ps.getRotation().transform(ap3[p]);
-				aHandle[p].getPosition().set(ap3[p]);
+				aHandle[p].getPosition(viewDef).set(ap3[p]);
 				m4View.transform(ap3[p]);
 			}
 			
@@ -268,7 +268,7 @@ public class DefaultTool extends JPatchTool {
 			drawable.drawLine(ap3[2],ap3[6]);
 			drawable.drawLine(ap3[3],ap3[7]);
 			
-			comparator.setMatrix(m4View);
+			comparator.setViewDefinition(viewDef);
 			
 			Handle[] aHandleCopy = (Handle[])aHandle.clone();
 			Arrays.sort(aHandleCopy,comparator);
@@ -351,6 +351,9 @@ public class DefaultTool extends JPatchTool {
 						//System.out.println("hit");
 						z = p3Hit.z;
 						activeHandle = aHandle[h];
+						aHandle[h].setActive(true);
+					} else {
+						aHandle[h].setActive(false);
 					}
 				}
 				
@@ -385,7 +388,7 @@ public class DefaultTool extends JPatchTool {
 				/* check if a scale or the pivot handle is active and set state */
 				iState = PIVOT;
 				if (activeHandle != pivotHandle) {
-					((DefaultHandle)activeHandle).setOldPosition();
+					((DefaultHandle)activeHandle).setOldPosition(viewDef);
 					iState = SCALE_GROUP;
 					compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
 				}	
@@ -605,9 +608,9 @@ public class DefaultTool extends JPatchTool {
 			
 			/* check state */
 			if (iState == MOVE_SINGLE_POINT || (cpHot != null && iState == MOVE_GROUP)) {
-				Viewport viewport = (Viewport)mouseEvent.getSource();
+//				Viewport viewport = (Viewport)mouseEvent.getSource();
 				float[] hookPos = new float[1];
-				ControlPoint cp = viewport.getViewDefinition().getClosestControlPoint(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()),cpHot,hookPos,false,true);
+				ControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()),cpHot,hookPos,false,true);
 				PointSelection ps = MainFrame.getInstance().getPointSelection();
 				if (cp != null && cp != cpHot.getPrev() && cp != cpHot.getNext()) {
 					if (hookPos[0] == -1) {
@@ -781,6 +784,7 @@ public class DefaultTool extends JPatchTool {
 					break;
 			}
 			((Component)mouseEvent.getSource()).removeMouseMotionListener(this);
+			for (int i = 0; i < aHandle.length; aHandle[i++].setActive(false));
 			MainFrame.getInstance().getJPatchScreen().update_all();
 			iState = IDLE;
 			if (MainFrame.getInstance().getPointSelection() == null) {

@@ -4,6 +4,7 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.vecmath.*;
+
 import jpatch.boundary.*;
 import jpatch.boundary.selection.*;
 import jpatch.control.edit.*;
@@ -13,7 +14,7 @@ public class RotateTool extends JPatchTool {
 	private static final int GHOST_FACTOR = JPatchSettings.getInstance().iGhost;
 	
 	private static final int SUBDIV = 64;
-	private static final float S = 1f/(float)Math.sqrt(2);
+	private static final float S = 1f / (float) Math.sqrt(2);
 	private static final float[] COS = new float[SUBDIV];
 	private static final float[] SIN = new float[SUBDIV];
 	
@@ -69,34 +70,35 @@ public class RotateTool extends JPatchTool {
 		m3RotA.set(m3Rot);
 		
 		setRadius();
-		pivotHandle = new PivotHandle(this, settings.cSelection);
+		
 		Matrix3f m3X = new Matrix3f();
 		Matrix3f m3Y = new Matrix3f();
 		Matrix3f m3Z = new Matrix3f();
 		m3X.rotX((float)Math.PI/4);
 		m3Y.rotY((float)Math.PI/4);
 		m3Z.rotZ((float)Math.PI/4);
+		Color3f cSelect = new Color3f(settings.cSelection);
+		Color3f colorX = new Color3f(settings.cX);
+		Color3f colorY = new Color3f(settings.cY);
+		Color3f colorZ = new Color3f(settings.cZ);
+		pivotHandle = new PivotHandle(this, cSelect);
 		aHandle = new Handle[] {
-			new RotateHandle(new Point3f( 0, S, S), this, settings.cX, v3AxisX, m3X),
-			new RotateHandle(new Point3f( 0,-S, S), this, settings.cX, v3AxisX, m3X),
-			new RotateHandle(new Point3f( 0,-S,-S), this, settings.cX, v3AxisX, m3X),
-			new RotateHandle(new Point3f( 0, S,-S), this, settings.cX, v3AxisX, m3X),
-			new RotateHandle(new Point3f( S, 0, S), this, settings.cY, v3AxisY, m3Y),
-			new RotateHandle(new Point3f(-S, 0, S), this, settings.cY, v3AxisY, m3Y),
-			new RotateHandle(new Point3f(-S, 0,-S), this, settings.cY, v3AxisY, m3Y),
-			new RotateHandle(new Point3f( S, 0,-S), this, settings.cY, v3AxisY, m3Y),
-			new RotateHandle(new Point3f( S, S, 0), this, settings.cZ, v3AxisZ, m3Z),
-			new RotateHandle(new Point3f(-S, S, 0), this, settings.cZ, v3AxisZ, m3Z),
-			new RotateHandle(new Point3f(-S,-S, 0), this, settings.cZ, v3AxisZ, m3Z),
-			new RotateHandle(new Point3f( S,-S, 0), this, settings.cZ, v3AxisZ, m3Z),
-			//new RotateHandleS(new Point3f( S * 1.1f, S * 1.1f, 0), this, settings.cSelection),
-			//new RotateHandleS(new Point3f(-S * 1.1f, S * 1.1f, 0), this, settings.cSelection),
-			//new RotateHandleS(new Point3f(-S * 1.1f,-S * 1.1f, 0), this, settings.cSelection),
-			//new RotateHandleS(new Point3f( S * 1.1f,-S * 1.1f, 0), this, settings.cSelection),
-			new RotateHandleS(new Point3f( 0, 1, 0), this, settings.cSelection),
-			new RotateHandleS(new Point3f( 1, 0, 0), this, settings.cSelection),
-			new RotateHandleS(new Point3f( 0,-1, 0), this, settings.cSelection),
-			new RotateHandleS(new Point3f(-1, 0, 0), this, settings.cSelection),
+			new RotateHandle(new Point3f( 0, S, S), this, colorX, v3AxisX, m3X),
+			new RotateHandle(new Point3f( 0,-S, S), this, colorX, v3AxisX, m3X),
+			new RotateHandle(new Point3f( 0,-S,-S), this, colorX, v3AxisX, m3X),
+			new RotateHandle(new Point3f( 0, S,-S), this, colorX, v3AxisX, m3X),
+			new RotateHandle(new Point3f( S, 0, S), this, colorY, v3AxisY, m3Y),
+			new RotateHandle(new Point3f(-S, 0, S), this, colorY, v3AxisY, m3Y),
+			new RotateHandle(new Point3f(-S, 0,-S), this, colorY, v3AxisY, m3Y),
+			new RotateHandle(new Point3f( S, 0,-S), this, colorY, v3AxisY, m3Y),
+			new RotateHandle(new Point3f( S, S, 0), this, colorZ, v3AxisZ, m3Z),
+			new RotateHandle(new Point3f(-S, S, 0), this, colorZ, v3AxisZ, m3Z),
+			new RotateHandle(new Point3f(-S,-S, 0), this, colorZ, v3AxisZ, m3Z),
+			new RotateHandle(new Point3f( S,-S, 0), this, colorZ, v3AxisZ, m3Z),
+			new RotateHandleS(new Point3f( 0, 1, 0), this, cSelect),
+			new RotateHandleS(new Point3f( 1, 0, 0), this, cSelect),
+			new RotateHandleS(new Point3f( 0,-1, 0), this, cSelect),
+			new RotateHandleS(new Point3f(-1, 0, 0), this, cSelect),
 			pivotHandle
 		};
 		MainFrame.getInstance().setHelpText("Click and drag handles to rotate or move pivot. Click and drag inside sphere to rotate freely. Doubleclick to reset coordinate system or pivot.");
@@ -120,7 +122,7 @@ public class RotateTool extends JPatchTool {
 	}
 
 	public float getRadius(float scale) {
-		return (fRadius * scale < 24f) ? 24f / scale : fRadius;
+		return (1.1f * fRadius * scale < 24f) ? 24f / scale : 1.1f * fRadius;
 	}
 	
 	public float getAlpha() {
@@ -147,7 +149,8 @@ public class RotateTool extends JPatchTool {
 		return p3Pivot;
 	}
 	
-	public void paint(Viewport viewport, JPatchDrawable drawable) {
+	public void paint(ViewDefinition viewDef) {
+		JPatchDrawable2 drawable = viewDef.getDrawable();
 		//drawable.clearZBuffer();
 		//System.out.println("fAlpha = " + fAlpha);
 		Point3f p3a = new Point3f();
@@ -160,7 +163,7 @@ public class RotateTool extends JPatchTool {
 		Point3f p3la = new Point3f();
 		Point3f p3lb = new Point3f();
 		//int s2;
-		Matrix4f m4View = viewport.getViewDefinition().getMatrix();
+		Matrix4f m4View = viewDef.getMatrix();
 		
 		
 		float scale = m4View.getScale();
@@ -174,7 +177,7 @@ public class RotateTool extends JPatchTool {
 		
 		Point3f p3TransformedPivot = new Point3f(p3Pivot);
 		m4View.transform(p3TransformedPivot);
-		float fInvRadius = 1 / (fRadius * viewport.getViewDefinition().getScale() * viewport.getViewDefinition().getWidth());// * 0.5f;
+		float fInvRadius = 1 / (fRadius * viewDef.getScale() * viewDef.getWidth());// * 0.5f;
 		//System.out.println("fradius = " + fTransformedRadius);
 		p3a.set(0,fRadius * COS[SUBDIV - 1],fRadius * SIN[SUBDIV - 1]);
 		m3RotA.transform(p3a);
@@ -190,13 +193,13 @@ public class RotateTool extends JPatchTool {
 			f = (p3a.z - p3TransformedPivot.z) * fInvRadius + 0.3f;
 			c3.interpolate(c3a,c3b,f);
 			c3.clamp(0.1f,1);
-			drawable.setColor(c3.get());
+			drawable.setColor(c3);
 			//if (p3a.z < p3TransformedPivot.z) {
 			//	drawable.setColor(settings.cX);
 			//} else {
 			//	drawable.setColor(settings.cGrey);
 			//}
-			drawable.drawGhostLine3D(p3a, p3b, GHOST_FACTOR);
+			drawable.drawLine(p3a, p3b);
 			//if (g2 != null) g2.drawLine((int)p3a.x, (int)p3a.y, (int)p3b.x, (int)p3b.y);
 			//else zBufferRenderer.draw3DLine(p3a, p3b, settings.iX);
 			p3a.set(p3b);
@@ -222,9 +225,9 @@ public class RotateTool extends JPatchTool {
 		for (int i = 1; i < 11; i++) {
 			float s = ((float) i) / 10;
 			c3.interpolate(c3la,c3lb,s);
-			drawable.setColor(c3.get());
+			drawable.setColor(c3);
 			p3lb.interpolate(p3a,p3b,s);
-			drawable.drawGhostLine3D(p3la,p3lb, GHOST_FACTOR);
+			drawable.drawLine(p3la,p3lb);
 			p3la.set(p3lb);
 		}
 			
@@ -249,8 +252,8 @@ public class RotateTool extends JPatchTool {
 			f = (p3a.z - p3TransformedPivot.z) * fInvRadius + 0.3f;
 			c3.interpolate(c3a,c3b,f);
 			c3.clamp(0.1f,1);
-			drawable.setColor(c3.get());
-			drawable.drawGhostLine3D(p3a, p3b, GHOST_FACTOR);
+			drawable.setColor(c3);
+			drawable.drawLine(p3a, p3b);
 			//else zBufferRenderer.draw3DLine(p3a, p3b, settings.iY);
 			p3a.set(p3b);
 		}
@@ -278,9 +281,9 @@ public class RotateTool extends JPatchTool {
 		for (int i = 1; i < 11; i++) {
 			float s = ((float) i) / 10;
 			c3.interpolate(c3la,c3lb,s);
-			drawable.setColor(c3.get());
+			drawable.setColor(c3);
 			p3lb.interpolate(p3a,p3b,s);
-			drawable.drawGhostLine3D(p3la,p3lb, GHOST_FACTOR);
+			drawable.drawLine(p3la,p3lb);
 			p3la.set(p3lb);
 		}
 		
@@ -303,8 +306,8 @@ public class RotateTool extends JPatchTool {
 			f = (p3a.z - p3TransformedPivot.z) * fInvRadius + 0.3f;
 			c3.interpolate(c3a,c3b,f);
 			c3.clamp(0.1f,1);
-			drawable.setColor(c3.get());
-			drawable.drawGhostLine3D(p3a, p3b, GHOST_FACTOR);
+			drawable.setColor(c3);
+			drawable.drawLine(p3a, p3b);
 			//else zBufferRenderer.draw3DLine(p3a, p3b, settings.iZ);
 			p3a.set(p3b);
 		}
@@ -332,13 +335,13 @@ public class RotateTool extends JPatchTool {
 		for (int i = 1; i < 11; i++) {
 			float s = ((float) i) / 10;
 			c3.interpolate(c3la,c3lb,s);
-			drawable.setColor(c3.get());
+			drawable.setColor(c3);
 			p3lb.interpolate(p3a,p3b,s);
-			drawable.drawGhostLine3D(p3la,p3lb, GHOST_FACTOR);
+			drawable.drawLine(p3la,p3lb);
 			p3la.set(p3lb);
 		}
 		
-		drawable.setColor(settings.cSelection);
+		drawable.setColor(new Color3f(settings.cSelection)); // FIXME
 		p3a.set(fRadius * COS[SUBDIV - 1] * 1.0f, fRadius * SIN[SUBDIV - 1] * 1.0f, 0);
 		//m3RotA.transform(p3a);
 		Matrix3f m3 = new Matrix3f();
@@ -353,19 +356,22 @@ public class RotateTool extends JPatchTool {
 			m3.transform(p3b);
 			p3b.add(p3Pivot);
 			m4View.transform(p3b);
-			drawable.drawGhostLine3D(p3a, p3b, GHOST_FACTOR);
+			drawable.drawLine(p3a, p3b);
 			//else zBufferRenderer.draw3DLine(p3a, p3b, settings.iSelection);
 			p3a.set(p3b);
 		}
 		
-		comparator.setMatrix(m4View);
-		Arrays.sort(aHandle,comparator);
+		comparator.setViewDefinition(viewDef);
+		//Arrays.sort(aHandle,comparator);
 		for (int h = aHandle.length - 1; h >= 0; h--) {
-			aHandle[h].paint(viewport, drawable);
+			aHandle[h].paint(viewDef);
 		}
 	}
 	
 	public void mousePressed(MouseEvent mouseEvent) {
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
+		Matrix4f m4View = viewDef.getScreenMatrix();
+		
 		if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
 			//System.out.println("mousePressed() state = " + iState);
 			fBeta = fAlpha;
@@ -375,17 +381,17 @@ public class RotateTool extends JPatchTool {
 			ap3 = ps.getPointArray();
 			acp = ps.getControlPointArray();
 			boolean repaint = false;
-			Viewport viewport = (Viewport)mouseEvent.getSource();
-			paint(viewport,((JPatchCanvas) mouseEvent.getSource()).getDrawable());
+//			Viewport viewport = (Viewport)mouseEvent.getSource();
+			paint(viewDef);
 			float z = Float.MAX_VALUE;
 			Point3f p3Hit = new Point3f();
 			if (activeHandle != null) {
-				((Component)mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
+				((Component) mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
 				activeHandle = null;
 				repaint = true;
 			}
 			for (int h = 0; h < aHandle.length; h++) {
-				if (aHandle[h].isHit(viewport, x, y, p3Hit) && (activeHandle == null || p3Hit.z < z)) {
+				if (aHandle[h].isHit(viewDef, x, y, p3Hit) && (activeHandle == null || p3Hit.z < z)) {
 					z = p3Hit.z;
 					activeHandle = aHandle[h];
 				}
@@ -424,7 +430,6 @@ public class RotateTool extends JPatchTool {
 				}
 			} else {
 				Point3f p3 = new Point3f(p3Pivot);
-				Matrix4f m4View = viewport.getViewDefinition().getMatrix();
 				m4View.transform(p3);
 				float r = m4View.getScale() * getRadius(m4View.getScale());
 				//System.out.println(p3 + " " + x + " " + y + " " + r);
@@ -490,14 +495,16 @@ public class RotateTool extends JPatchTool {
 				iState = IDLE;
 				bChange = false;
 			}
-			((Component)mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
-			((Component)mouseEvent.getSource()).removeMouseMotionListener(this);
+			((Component) mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
+			((Component) mouseEvent.getSource()).removeMouseMotionListener(this);
 			MainFrame.getInstance().setHelpText("Click and drag handles to rotate or move pivot. Click and drag inside sphere to rotate freely. Doubleclick to reset coordinate system or pivot.");
 		}
 	}
 	
 	public void mouseDragged(MouseEvent mouseEvent) {
-		//System.out.println("mouseDragged() state = " + iState);
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
+		Matrix4f m4 = viewDef.getScreenMatrix();
+		
 		bChange = true;
 		if (iState == ROTATE_FREE) {
 			Matrix3f m3 = new Matrix3f();
@@ -506,9 +513,6 @@ public class RotateTool extends JPatchTool {
 			Vector3f v3AxisY = new Vector3f(0,1,0);
 			//RotateTool rotateTool = this;
 			//float angle = 0;
-			
-			Matrix4f m4 = ((Viewport)mouseEvent.getSource()).getViewDefinition().getMatrix();
-			
 				
 			float scale = m4.getScale();
 			//setRadius();

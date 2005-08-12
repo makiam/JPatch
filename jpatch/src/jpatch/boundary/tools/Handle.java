@@ -9,7 +9,7 @@ public class Handle
 implements MouseMotionListener {
 	protected Point3f p3Position;
 	protected Matrix4f m4Transform = new Matrix4f();
-	private SimpleShape shape = SimpleShape.createCube(1);
+	protected SimpleShape shape = SimpleShape.createCube(1);
 	protected float fSize = 3;
 	protected int iHitSize = 4;
 	protected Color3f c3Passive;
@@ -26,15 +26,15 @@ implements MouseMotionListener {
 		c3Passive = color;
 	}
 	
-	public Point3f getPosition() {
+	public Point3f getPosition(ViewDefinition viewDef) {
 		return p3Position;
 	}
 	
-	public Point3f getTransformedPosition(Matrix4f matrix) {
-		Point3f p = new Point3f(getPosition());
-		matrix.transform(p);
-		return p;
-	}
+//	public Point3f getTransformedPosition(ViewDefinition viewDef, Matrix4f matrix) {
+//		Point3f p = new Point3f(getPosition(viewDef));
+//		matrix.transform(matrix);
+//		return p;
+//	}
 	
 	public void setMouse(int x, int y) {
 		iMouseX = x;
@@ -58,14 +58,16 @@ implements MouseMotionListener {
 		if (orientation != null)
 			m4Transform.setRotationScale(orientation);
 		m4Transform.setScale(fSize / viewDef.getMatrix().getScale());
-		m4Transform.m03 += p3Position.x;
-		m4Transform.m13 += p3Position.y;
-		m4Transform.m23 += p3Position.z;
+		m4Transform.m03 += getPosition(viewDef).x;
+		m4Transform.m13 += getPosition(viewDef).y;
+		m4Transform.m23 += getPosition(viewDef).z;
 		shape.paint(viewDef, m4Transform, viewDef.getMatrix());
 	}
 	
 	public boolean isHit(ViewDefinition viewDef, int x, int y, Point3f hit) {
-		Point3f p3 = getTransformedPosition(viewDef.getScreenMatrix());
+//		Point3f p3 = getTransformedPosition(viewDef.getScreenMatrix());
+		Point3f p3 = new Point3f(getPosition(viewDef));
+		viewDef.getScreenMatrix().transform(p3);
 		if (x >= p3.x - iHitSize && x <= p3.x + iHitSize && y >= p3.y - iHitSize && y <= p3.y + iHitSize) {
 			hit.set(p3);
 			return true;

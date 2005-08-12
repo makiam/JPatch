@@ -69,6 +69,10 @@ public class JPatchDrawable2D implements JPatchDrawable2 {
 		});
 	}
 	
+	public String getInfo() {
+		return "Java2D renderer";
+	}
+	
 	public void setLighting(RealtimeLighting lighting) { }
 	
 	

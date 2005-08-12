@@ -40,4 +40,5 @@ public interface JPatchDrawable2 {
 	public boolean isShadingSupported();
 	public boolean isLightingSupported();
 	public boolean isTransformSupported();
+	public String getInfo();
 }
