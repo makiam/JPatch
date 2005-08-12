@@ -13,7 +13,7 @@ public class PivotHandle2 extends Handle {
 		//iHitSize = 6;
 	}
 	
-	public Point3f getPosition() {
+	public Point3f getPosition(ViewDefinition viewDef) {
 		return MainFrame.getInstance().getPointSelection().getPivot();
 	}
 	
@@ -24,8 +24,8 @@ public class PivotHandle2 extends Handle {
 	
 	public void mouseDragged(MouseEvent mouseEvent) {
 		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
-		viewDef.setZ(getPosition());
-		MainFrame.getInstance().getConstraints().setPointPosition(getPosition(),viewDef.get3DPosition(mouseEvent.getX(), mouseEvent.getY()));
+		viewDef.setZ(getPosition(viewDef));
+		MainFrame.getInstance().getConstraints().setPointPosition(getPosition(viewDef),viewDef.get3DPosition(mouseEvent.getX(), mouseEvent.getY()));
 		//getPosition().set(viewDefinition.get3DPosition(mouseEvent.getX(), mouseEvent.getY()));
 		//rotateTool.setRadius();
 		MainFrame.getInstance().getJPatchScreen().single_update((Component)mouseEvent.getSource());

@@ -374,9 +374,8 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 				
 //				gl.glDisable(GL.GL_CULL_FACE);
 //				gl.glCullFace(GL.GL_FRONT);
-				gl.glDepthFunc(GL.GL_LEQUAL);
+				gl.glDepthFunc(GL.GL_GREATER);
 				gl.glEnable(GL.GL_DEPTH_TEST);
-
 			}
 			public void reshape(GLDrawable glDrawable, int x, int y, int width, int height) {
 			}
@@ -391,6 +390,10 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 				iGlMode = -1;
 			}
 		});
+	}
+	
+	public String getInfo() {
+		return "JOGL OpenGL Renderer\nGL Vendor: " + gl.glGetString(GL.GL_VENDOR) + "\nGL Renderer: " + gl.glGetString(GL.GL_RENDERER) + "\nGL Version: " + gl.glGetString(GL.GL_VERSION) + "\n";
 	}
 	
 	private void enableRasterMode(boolean enable) {
@@ -422,6 +425,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			gl.glDisable(GL.GL_LIGHTING); // FIXME
 			gl.glEnable(GL.GL_DEPTH_TEST);
 			gl.glShadeModel(GL.GL_SMOOTH);
+			//gl.glPolygonOffsetEXT(1.0f, 1.0f);
 		} else {
 			//Dimension dim = glDrawable.getSize();
 			float w = dim.width;
@@ -492,7 +496,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		if ((mode & COLOR_BUFFER) > 0) bits |= GL.GL_COLOR_BUFFER_BIT;
 		if ((mode & DEPTH_BUFFER) > 0) bits |= GL.GL_DEPTH_BUFFER_BIT;
 		gl.glClearColor(color.x, color.y, color.z, 0);
-		gl.glClearDepth(32000);
+		gl.glClearDepth(-32000);
 		gl.glClear(bits);
 		gl.glFlush();
 	}
@@ -515,7 +519,17 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	
 	public void setTransparentRenderingEnabled(boolean enable) { }
 	
-	public void setLightingEnable(boolean enable) { }
+	public void setLightingEnable(boolean enable) {
+		if (enable) {
+			gl.glEnd();
+			iGlMode = -1;
+			gl.glEnable(GL.GL_LIGHTING);
+		} else {
+			gl.glEnd();
+			iGlMode = -1;
+			gl.glDisable(GL.GL_LIGHTING);
+		}
+	}
 	
 	public void setColor(Color3f color) {
 		gl.glColor3f(color.x, color.y, color.z);
@@ -759,11 +773,11 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			gl.glBegin(iGlMode);
 		}
 		gl.glNormal3f(n0.x, n0.y, n0.z);
-		gl.glVertex3f(p0.x, p0.y, p0.z);
+		gl.glVertex3f(p0.x, p0.y, p0.z + 1);
 		gl.glNormal3f(n1.x, n1.y, n1.z);
-		gl.glVertex3f(p1.x, p1.y, p1.z);
+		gl.glVertex3f(p1.x, p1.y, p1.z + 1);
 		gl.glNormal3f(n2.x, n2.y, n2.z);
-		gl.glVertex3f(p2.x, p2.y, p2.z);
+		gl.glVertex3f(p2.x, p2.y, p2.z + 1);
 	}
 	
 	public void drawCurve(Curve curve) { }
