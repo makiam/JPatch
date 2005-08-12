@@ -91,6 +91,10 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 //		});
 	}
 	
+	public String getInfo() {
+		return "Java software renderer";
+	}
+	
 	private void updateImage() {
 		image = new BufferedImage(component.getWidth(), component.getHeight(), BufferedImage.TYPE_INT_RGB);
 		aiColorBuffer = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();

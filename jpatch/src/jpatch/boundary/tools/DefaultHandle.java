@@ -16,8 +16,8 @@ public class DefaultHandle extends Handle {
 		iHitSize = 4;
 	}
 	
-	public void setOldPosition() {
-		p3OldPosition.set(getPosition());
+	public void setOldPosition(ViewDefinition viewDef) {
+		p3OldPosition.set(getPosition(viewDef));
 	}
 	
 	public void mouseDragged(MouseEvent mouseEvent) {
@@ -73,7 +73,6 @@ public class DefaultHandle extends Handle {
 		v3Mouse.normalize();
 		
 		float sc = v3Handle.dot(v3Mouse) / lh * lm * sign;
-		
 		defaultTool.scale(sc, viewDef);
 	}
 	

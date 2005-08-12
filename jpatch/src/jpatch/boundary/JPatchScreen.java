@@ -61,6 +61,7 @@ public final class JPatchScreen extends JPanel {
 				public void display(JPatchDrawable2 drawable) {
 					aViewport[I].prepare();
 					aViewport[I].drawModel(MainFrame.getInstance().getModel());
+					aViewport[I].drawInfo();
 				}
 			};
 			aDrawable[i] = new JPatchDrawableGL(listener, false);
@@ -70,6 +71,7 @@ public final class JPatchScreen extends JPanel {
 			//aComponent[i] = new JPatchCanvas(model,aViewDef[i]);
 			add(aDrawable[i].getComponent());
 			aDrawable[i].getComponent().setFocusable(false);
+			aViewDef[i].setLighting(RealtimeLighting.createThreepointLight()); // FIXME
 		}
 		setFocusable(false);
 		setMode(mode);

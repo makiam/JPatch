@@ -62,12 +62,28 @@ public class SimpleShape {
 		this.mp = mp;
 	}
 	
+	public void transform(Matrix3f matrix) {
+		for (int i = 0; i < ap3Points.length; matrix.transform(ap3Points[i++]));
+		for (int i = 0; i < av3Normals.length; i++) {
+			matrix.transform(av3Normals[i]);
+			av3Normals[i].normalize();
+		}
+	}
+	
 	public void initTransform() {
 		for (int i = 0; i < ap3Points.length; ap3TransformedPoints[i].set(ap3Points[i++]));
 		for (int i = 0; i < av3Normals.length; av3TransformedNormals[i].set(av3Normals[i++]));
 	}
 	
 	public void doTransform(Matrix4f matrix) {
+		for (int i = 0; i < ap3Points.length; matrix.transform(ap3TransformedPoints[i++]));
+		for (int i = 0; i < av3Normals.length; i++) {
+			matrix.transform(av3TransformedNormals[i]);
+			av3TransformedNormals[i].normalize();
+		}
+	}
+	
+	public void doTransform(Matrix3f matrix) {
 		for (int i = 0; i < ap3Points.length; matrix.transform(ap3TransformedPoints[i++]));
 		for (int i = 0; i < av3Normals.length; i++) {
 			matrix.transform(av3TransformedNormals[i]);
@@ -234,8 +250,10 @@ public class SimpleShape {
 			;
 		else
 			doTransform(view);
-		if (drawable.isLightingSupported())
+		if (drawable.isLightingSupported()) {
+			drawable.setLightingEnable(true);
 			drawable.setMaterial(mp);
+		}
 		int t = 0;
 		for (int i = 0; i < aiNormalIndices.length; i++) {
 			if (drawable.isLightingSupported()) {
@@ -247,6 +265,7 @@ public class SimpleShape {
 			} else {
 				Color3f c0 = new Color3f();
 				viewDef.getLighting().shade(ap3TransformedPoints[aiTriangles[t]], av3TransformedNormals[aiNormalIndices[i]], mp, c0);
+				c0.clamp(0, 1);
 				drawable.setColor(c0);
 				drawable.drawTriangle(
 						ap3TransformedPoints[aiTriangles[t++]],
@@ -255,5 +274,7 @@ public class SimpleShape {
 				);
 			}
 		}
+		if (drawable.isLightingSupported())
+			drawable.setLightingEnable(false);
 	}
 }
