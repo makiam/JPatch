@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.6 2005/08/14 08:14:55 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.7 2005/08/14 09:04:16 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -117,6 +117,29 @@ public class Viewport2 {
 	}
 	
 	public void drawModel(Model model) {
+//		Point3f pc = new Point3f(0,0,0);
+//		Point3f px = new Point3f(1,0,0);
+//		Point3f py = new Point3f(0,1,0);
+//		Point3f pz = new Point3f(0,0,1);
+//		Color3f cc = new Color3f(0, 0, 0);
+//		Color3f cx = new Color3f(1, 0, 0);
+//		Color3f cy = new Color3f(0, 1, 0);
+//		Color3f cz = new Color3f(0, 0, 1);
+//		
+//		m4View.transform(pc);
+//		m4View.transform(px);
+//		m4View.transform(py);
+//		m4View.transform(pz);
+//		drawable.setLightingEnable(false);
+//		drawable.drawTriangle(pc, cc, pz, cz, px, cz);
+//		drawable.drawTriangle(pc, cc, py, cy, pz, cz);
+//		drawable.drawTriangle(pc, cc, px, cx, py, cy);
+//		System.out.println("c = " + pc);
+//		System.out.println("x = " + px);
+//		System.out.println("y = " + py);
+//		System.out.println("z = " + pz);
+//		System.out.println();
+		
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
 		if (tool != null)
 			tool.paint(viewDef);
