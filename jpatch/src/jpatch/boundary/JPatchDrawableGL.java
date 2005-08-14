@@ -376,7 +376,9 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 //				gl.glCullFace(GL.GL_FRONT);
 				gl.glDepthFunc(GL.GL_GREATER);
 				gl.glEnable(GL.GL_DEPTH_TEST);
+				gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1);
 			}
+			
 			public void reshape(GLDrawable glDrawable, int x, int y, int width, int height) {
 			}
 			public void displayChanged(GLDrawable glDrawable, boolean modeChanged, boolean deviceChanged) {
@@ -425,7 +427,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			gl.glDisable(GL.GL_LIGHTING); // FIXME
 			gl.glEnable(GL.GL_DEPTH_TEST);
 			gl.glShadeModel(GL.GL_SMOOTH);
-			//gl.glPolygonOffsetEXT(1.0f, 1.0f);
+			
 		} else {
 			//Dimension dim = glDrawable.getSize();
 			float w = dim.width;
@@ -742,14 +744,16 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		if (iGlMode != GL.GL_TRIANGLES) {
 			gl.glEnd();
 			iGlMode = GL.GL_TRIANGLES;
+			
 			gl.glBegin(iGlMode);
 		}
+		
 		gl.glColor3f(c0.x, c0.y, c0.z);
-		gl.glVertex3f(p0.x, p0.y, p0.z);
+		gl.glVertex3f(p0.x, p0.y, p0.z + 1);
 		gl.glColor3f(c1.x, c1.y, c1.z);
-		gl.glVertex3f(p1.x, p1.y, p1.z);
+		gl.glVertex3f(p1.x, p1.y, p1.z + 1);
 		gl.glColor3f(c2.x, c2.y, c2.z);
-		gl.glVertex3f(p2.x, p2.y, p2.z);
+		gl.glVertex3f(p2.x, p2.y, p2.z + 1);
 	}
 	
 	public void drawTriangle(Point3f p0, Color4f c0, Point3f p1, Color4f c1, Point3f p2, Color4f c2) {
@@ -772,12 +776,26 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			iGlMode = GL.GL_TRIANGLES;
 			gl.glBegin(iGlMode);
 		}
+//		gl.glEnable(GL.GL_LIGHTING);
+//		gl.glBegin(GL.GL_TRIANGLES);
 		gl.glNormal3f(n0.x, n0.y, n0.z);
 		gl.glVertex3f(p0.x, p0.y, p0.z + 1);
 		gl.glNormal3f(n1.x, n1.y, n1.z);
 		gl.glVertex3f(p1.x, p1.y, p1.z + 1);
 		gl.glNormal3f(n2.x, n2.y, n2.z);
 		gl.glVertex3f(p2.x, p2.y, p2.z + 1);
+//		gl.glEnd();
+//		gl.glDisable(GL.GL_LIGHTING);
+//		gl.glBegin(GL.GL_LINES);
+//		int l = 10;
+//		gl.glVertex3f(p0.x, p0.y, p0.z);
+//		gl.glVertex3f(p0.x + n0.x * l, p0.y + n0.y * l, p0.z + n0.z * l);
+//		gl.glVertex3f(p1.x, p1.y, p1.z);
+//		gl.glVertex3f(p1.x + n1.x * l, p1.y + n1.y * l, p1.z + n1.z * l);
+//		gl.glVertex3f(p2.x, p2.y, p2.z);
+//		gl.glVertex3f(p2.x + n2.x * l, p2.y + n2.y * l, p2.z + n2.z * l);
+//		gl.glEnd();
+//		iGlMode = -1;
 	}
 	
 	public void drawCurve(Curve curve) { }

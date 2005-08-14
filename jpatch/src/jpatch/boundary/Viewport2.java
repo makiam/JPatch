@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.5 2005/08/12 14:53:04 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.6 2005/08/14 08:14:55 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -219,7 +219,7 @@ public class Viewport2 {
 								} else {
 									v3_b.sub(hashPatch[(p + pl - 1) % pl], hashPatch[p]);
 								}
-								normals[i].cross(v3_b, v3_a);
+								normals[i].cross(v3_a, v3_b);
 								normals[i].normalize();
 								//levels[i] = 1;
 							}
@@ -694,11 +694,16 @@ public class Viewport2 {
 				Vector3f zc = Functions.vector(Z, Center);
 				
 				Vector3f[] nc = newNormals(5);
-				nc[0].cross(wc, vc);
-				nc[1].cross(xc, wc);
-				nc[2].cross(yc, xc);
-				nc[3].cross(zc, yc);
-				nc[4].cross(vc, zc);
+//				nc[0].cross(wc, vc);
+//				nc[1].cross(xc, wc);
+//				nc[2].cross(yc, xc);
+//				nc[3].cross(zc, yc);
+//				nc[4].cross(vc, zc);
+				nc[0].cross(vc, wc);
+				nc[1].cross(wc, xc);
+				nc[2].cross(xc, yc);
+				nc[3].cross(yc, zc);
+				nc[4].cross(zc, vc);
 				nc[0].normalize();
 				nc[1].normalize();
 				nc[2].normalize();
