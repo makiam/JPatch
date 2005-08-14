@@ -280,35 +280,35 @@ implements ComponentListener {
 			case REAR:
 				m4View.set(new Matrix4f(
 						-1, 0, 0, 0,
-						 0,-1, 0, 0,
+						 0, 1, 0, 0,
 						 0, 0,-1, 0,
 						 0, 0, 0, 1));
 			break;
 			case RIGHT:
 				m4View.set(new Matrix4f(
 						0, 0, 1, 0,
-						0,-1, 0, 0,
+						0, 1, 0, 0,
 						-1, 0, 0, 0,
 						0, 0, 0, 1));
 			break;
 			case LEFT:
 				m4View.set(new Matrix4f(
 						0, 0,-1, 0,
-			 			0,-1, 0, 0,
+			 			0, 1, 0, 0,
 						1, 0, 0, 0,
 						0, 0, 0, 1));
 			break;
 			case BOTTOM:
 				m4View.set(new Matrix4f(
 						1, 0, 0, 0,
-						0, 0, 1, 0,
+						0, 0,-1, 0,
 						0, 1, 0, 0,
 						0, 0, 0, 1));
 			break;
 			case TOP:
 				m4View.set(new Matrix4f(
 						1, 0, 0, 0,
-						0, 0,-1, 0,
+						0, 0, 1, 0,
 						0,-1, 0, 0,
 						0, 0, 0, 1));
 			break;
