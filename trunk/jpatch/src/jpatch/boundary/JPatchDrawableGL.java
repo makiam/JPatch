@@ -372,11 +372,16 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 //				gl.glEnable(GL.GL_LIGHT1);
 //				gl.glEnable(GL.GL_LIGHT2);
 				
-//				gl.glDisable(GL.GL_CULL_FACE);
-//				gl.glCullFace(GL.GL_FRONT);
-				gl.glDepthFunc(GL.GL_GREATER);
+				gl.glEnable(GL.GL_CULL_FACE);
+				gl.glCullFace(GL.GL_BACK);
+				gl.glDepthFunc(GL.GL_LESS);
 				gl.glEnable(GL.GL_DEPTH_TEST);
 				gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1);
+				
+				gl.glMaterialfv(GL.GL_BACK, GL.GL_AMBIENT, new float[] { 1.0f, 0.0f, 0.0f } );
+				gl.glMaterialfv(GL.GL_BACK, GL.GL_DIFFUSE, new float[] { 0.0f, 0.0f, 0.0f } );
+				gl.glMaterialfv(GL.GL_BACK, GL.GL_SPECULAR, new float[] { 0.0f, 0.0f, 0.0f } );
+				gl.glMaterialfv(GL.GL_BACK, GL.GL_SHININESS, new float[] { 0.0f } );
 			}
 			
 			public void reshape(GLDrawable glDrawable, int x, int y, int width, int height) {
@@ -408,22 +413,34 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			float w = dim.width / 2;
 			float h = dim.height / 2;
 			gl.glMatrixMode(GL.GL_PROJECTION);
-			gl.glLoadIdentity();
+//			gl.glLoadIdentity();
 //			gl.glLoadMatrixf(new float[] {
 //					m4Transform.m00, m4Transform.m10, m4Transform.m20, m4Transform.m30,
 //					m4Transform.m01, m4Transform.m11, m4Transform.m21, m4Transform.m31,
 //					m4Transform.m02, m4Transform.m12, m4Transform.m22, m4Transform.m32,
 //					m4Transform.m03, m4Transform.m13, m4Transform.m23, m4Transform.m33,
 //			});
+			gl.glLoadMatrixf(new float[] {
+					1, 0, 0, 0,
+					0, 1, 0, 0,
+					0, 0, 1, 0,
+					0, 0, 0, 1
+			});
 			if (bPerspective) {
 				float a = 35f / fFocalLength;
 				float b = a * h / w;
-				gl.glFrustum(-a, a, -b, b, 1, 32000);
+				gl.glFrustum(-a, a, -b, b, 1, Short.MAX_VALUE);
 			} else {
-				gl.glOrtho(-w, w, -h, h, -32000, 32000);
+				gl.glOrtho(-w, w, -h, h, Short.MAX_VALUE, -Short.MAX_VALUE);
 			}
 			gl.glMatrixMode(GL.GL_MODELVIEW);
-			gl.glLoadIdentity();
+//			gl.glLoadIdentity();
+			gl.glLoadMatrixf(new float[] {
+					1, 0, 0, 0,
+					0, 1, 0, 0,
+					0, 0, 1, 0,
+					0, 0, 0, 1
+			});
 			gl.glDisable(GL.GL_LIGHTING); // FIXME
 			gl.glEnable(GL.GL_DEPTH_TEST);
 			gl.glShadeModel(GL.GL_SMOOTH);
@@ -435,7 +452,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			gl.glViewport(0, 0, (int) w, (int) h);
 		    gl.glMatrixMode(GL.GL_PROJECTION);
 		    gl.glLoadIdentity();
-		    gl.glOrtho (0.0, w, 0.0, h, -1.0, 1.0);
+		    gl.glOrtho (0.0, w, 0.0, h, 1.0, -1.0);
 		    gl.glMatrixMode(GL.GL_MODELVIEW);
 		    gl.glDisable(GL.GL_LIGHTING);
 			gl.glDisable(GL.GL_DEPTH_TEST);
@@ -498,7 +515,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		if ((mode & COLOR_BUFFER) > 0) bits |= GL.GL_COLOR_BUFFER_BIT;
 		if ((mode & DEPTH_BUFFER) > 0) bits |= GL.GL_DEPTH_BUFFER_BIT;
 		gl.glClearColor(color.x, color.y, color.z, 0);
-		gl.glClearDepth(-32000);
+		gl.glClearDepth(Short.MAX_VALUE);
 		gl.glClear(bits);
 		gl.glFlush();
 	}
@@ -577,7 +594,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 					/*
 					 * set GL light directions (w = 0 for directional light)
 					 */
-					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_POSITION, new float[] { direction.x, direction.y, direction.z, 0 });
+					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_POSITION, new float[] { -direction.x, -direction.y, -direction.z, 0 });
 					
 					/*
 					 * set GL spot cutoff (180 = no spot)
