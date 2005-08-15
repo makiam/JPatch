@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.7 2005/08/14 09:04:16 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.8 2005/08/15 17:52:04 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -55,7 +55,7 @@ public class Viewport2 {
 	private Matrix4f m4View = new Matrix4f();
 	private JPatchTool tool;
 	
-	private static float fFlatness = 3f;
+	private static float fFlatness = 10f;
 	//private static float fFlatnessSquared = fFlatness * fFlatness;
 	private static int iMaxSubdiv = 10;
 	
