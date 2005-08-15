@@ -55,7 +55,7 @@ public class Viewport2 {
 	private Matrix4f m4View = new Matrix4f();
 	private JPatchTool tool;
 	
-	private static float fFlatness = 3f;
+	private static float fFlatness = 10f;
 	//private static float fFlatnessSquared = fFlatness * fFlatness;
 	private static int iMaxSubdiv = 10;
 	
