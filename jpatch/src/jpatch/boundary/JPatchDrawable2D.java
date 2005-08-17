@@ -78,7 +78,8 @@ public class JPatchDrawable2D implements JPatchDrawable2 {
 	
 	private void updateImage() {
 		image = component.createVolatileImage(component.getWidth(), component.getHeight());
-		g = image.createGraphics();
+		if (image != null)
+			g = image.createGraphics();
 	}
 	
 	public Component getComponent() {
@@ -96,9 +97,11 @@ public class JPatchDrawable2D implements JPatchDrawable2 {
 	
 	public void display() {
 		if (g == null) updateImage();
-		listener.display(JPatchDrawable2D.this);
-		Graphics cg = component.getGraphics();
-		if (cg != null) component.paint(cg);
+		if (g != null) {
+			listener.display(JPatchDrawable2D.this);
+			Graphics cg = component.getGraphics();
+			if (cg != null) component.paint(cg);
+		}
 	}
 	
 	public void clear(int mode, Color3f color) {
