@@ -35,6 +35,7 @@ public final class MeshToolBar extends JPanel {
 	private AbstractAction cloneAction = new CloneAction();
 	private AbstractAction extrudeAction = new ExtrudeAction();
 	private AbstractAction latheAction = new LatheAction();
+	private AbstractAction latheEditorAction = new LatheEditorAction();
 	
 	private AbstractButton buttonSelectMove = new JPatchToggleButton(selectMoveAction);
 	private AbstractButton buttonMagnet = new JPatchToggleButton(magnetAction);
@@ -46,6 +47,7 @@ public final class MeshToolBar extends JPanel {
 	private AbstractButton buttonClone = new JPatchButton(cloneAction);
 	private AbstractButton buttonExtrude = new JPatchButton(extrudeAction);
 	private AbstractButton buttonLathe = new JPatchButton(latheAction);
+	private AbstractButton buttonLatheEditor = new JPatchButton(latheEditorAction);
 	private AbstractButton buttonPeak = new JPatchToggleButton(new PeakAction());
 	private AbstractButton buttonRound = new JPatchToggleButton(new RoundAction());
 	private AbstractButton buttonFivePoint = new JPatchButton(new MakeFivePointPatchAction());
@@ -99,6 +101,7 @@ public final class MeshToolBar extends JPanel {
 		add(buttonClone);
 		add(buttonExtrude);
 		add(buttonLathe);
+		add(buttonLatheEditor);
 		add(JPatchSeparator.createVerticalSeparator());
 		add(buttonFivePoint);
 		add(buttonComputePatches);
