@@ -92,7 +92,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	}
 	
 	public String getInfo() {
-		return "Java software renderer";
+		return "JPatch software renderer";
 	}
 	
 	private void updateImage() {
@@ -105,6 +105,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 		iXoff = iWidth >> 1;
 		iYoff = iHeight >> 1;
 		fW = fFocalLength * iXoff / 12.5f;
+		listener.display(this);
 	}
 	
 	public Component getComponent() {
@@ -117,6 +118,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	}
 	
 	public void drawString(String string, int x, int y) {
+		g.setColor(new Color(iColor));
 		g.drawString(string, x, y);
 	}
 	
@@ -205,7 +207,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 		}
 //		System.out.println(x + " " + y);
 		int x1 = x - (iPointSize >> 1);
-		int y1 = y - (iPointSize >> 1);
+		int y1 = y - (iPointSize >> 1) - 1;
 		int x2 = x1 + iPointSize;
 		int y2 = y1 + iPointSize;
 		if ((x1 < 0 && x2 < 0 )|| (y1 < 0 && y2 < 0) || (x1 >= iWidth && x2 >= iWidth) || (y1 >= iHeight && y2 >= iHeight)) {
@@ -254,7 +256,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 				drawLine(iXoff + x, iYoff - y, (int) (-Integer.MAX_VALUE / p0.z), iXoff + xx, iYoff - yy, (int) (-Integer.MAX_VALUE / p1.z));
 			}
 		} else 
-			drawLine((int) (iXoff + p0.x), (int) (iYoff - p0.y), (int) (p0.z * 65536), (int) (iXoff + p1.x), (int) (iYoff - p1.y), (int) (p1.z * 65536));
+			drawLine((int) (iXoff + p0.x + 0.5f), (int) (iYoff - p0.y), (int) (p0.z * 65536), (int) (iXoff + p1.x + 0.5f), (int) (iYoff - p1.y), (int) (p1.z * 65536));
 	}
 	
 	

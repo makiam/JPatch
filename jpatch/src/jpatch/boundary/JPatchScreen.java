@@ -25,6 +25,10 @@ public final class JPatchScreen extends JPanel {
 	
 	public static final int NUMBER_OF_VIEWPORTS = 4;
 	
+	public static final int JAVA2D = 0;
+	public static final int SOFTWARE = 1;
+	public static final int OPENGL = 2;
+	
 	//private Viewport activeViewport;
 	
 	//private JPatchCanvas[] aComponent = new JPatchCanvas[NUMBER_OF_VIEWPORTS];
@@ -53,8 +57,20 @@ public final class JPatchScreen extends JPanel {
 	private boolean bShowTangents = false;
 	private TangentTool tangentTool = new TangentTool();
 	
-	public JPatchScreen(final Model model,int mode,ViewDefinition[] viewDefinitions) {
+	public JPatchScreen(Model model,int mode,ViewDefinition[] viewDefinitions) {
 		aViewDef = viewDefinitions;
+		initScreen();
+		setFocusable(false);
+		setMode(mode);
+		setLightingMode(iLightMode);
+		enablePopupMenu(true);
+//		activeViewport = aDrawable[0];
+		snapToGrid(bSnapToGrid);
+	}
+	
+	public void initScreen() {
+		int mode = iMode;
+		setMode(0);
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 			final int I = i;
 			JPatchDrawableEventListener listener = new JPatchDrawableEventListener() {
@@ -64,7 +80,11 @@ public final class JPatchScreen extends JPanel {
 					aViewport[I].drawInfo();
 				}
 			};
-			aDrawable[i] = new JPatchDrawableGL(listener, false);
+			switch (JPatchSettings.getInstance().iRealtimeRenderer) {
+				case JAVA2D: aDrawable[i] = new JPatchDrawable2D(listener, false); break;
+				case SOFTWARE: aDrawable[i] = new JPatchDrawable3D(listener, false); break;
+				case OPENGL: aDrawable[i] = new JPatchDrawableGL(listener, false); break;
+			}
 			aDrawable[i].setProjection(JPatchDrawable2.ORTHOGONAL);
 			aViewport[i] = new Viewport2(aDrawable[i], aViewDef[i]);
 			aViewDef[i].setDrawable(aDrawable[i]);
@@ -73,12 +93,13 @@ public final class JPatchScreen extends JPanel {
 			aDrawable[i].getComponent().setFocusable(false);
 			aViewDef[i].setLighting(RealtimeLighting.createThreepointLight()); // FIXME
 		}
-		setFocusable(false);
 		setMode(mode);
-		setLightingMode(iLightMode);
-		enablePopupMenu(true);
-//		activeViewport = aDrawable[0];
-		snapToGrid(bSnapToGrid);
+	}
+	
+	public void switchRenderer(int renderer) {
+		JPatchSettings.getInstance().iRealtimeRenderer = renderer;
+		initScreen();
+		update_all();
 	}
 	
 	public ViewDefinition getViewDefinition(Component component) {
@@ -225,7 +246,7 @@ public final class JPatchScreen extends JPanel {
 		if (bSynchronized) {
 			update_all();
 		} else {
-			component.repaint();
+			getViewDefinition(component).getDrawable().display();
 		}
 	}
 	
@@ -421,6 +442,12 @@ public final class JPatchScreen extends JPanel {
 		//update_all();
 		if (h > 0 && w > 0) {
 			switch(mode) {
+				case 0:
+					aDrawable[0].getComponent().setVisible(false);
+					aDrawable[1].getComponent().setVisible(false);
+					aDrawable[2].getComponent().setVisible(false);
+					aDrawable[3].getComponent().setVisible(false);
+				break;
 				case SINGLE:
 //					activeViewport = aComponent[0];
 					aDrawable[0].getComponent().setBounds(0,0,w,h);

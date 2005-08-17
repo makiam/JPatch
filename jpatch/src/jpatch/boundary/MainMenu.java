@@ -131,6 +131,30 @@ public final class MainMenu extends JMenuBar {
 		
 		menuHelp.add(new AboutAction());
 		
+		JMenu menuRenderer = new JMenu("Renderer");
+		JRadioButtonMenuItem miJava2D = new JRadioButtonMenuItem(new SwitchRendererAction(0, "Java2D"));
+		JRadioButtonMenuItem miSoftware = new JRadioButtonMenuItem(new SwitchRendererAction(1, "Software"));
+		JRadioButtonMenuItem miOpenGl = new JRadioButtonMenuItem(new SwitchRendererAction(2, "OpenGL"));
+		ButtonGroup bgRenderer = new ButtonGroup();
+		bgRenderer.add(miJava2D);
+		bgRenderer.add(miSoftware);
+		bgRenderer.add(miOpenGl);
+		menuRenderer.add(miJava2D);
+		menuRenderer.add(miSoftware);
+		menuRenderer.add(miOpenGl);
+		switch (JPatchSettings.getInstance().iRealtimeRenderer) {
+		case JPatchScreen.JAVA2D:
+			miJava2D.setSelected(true);
+		break;
+		case JPatchScreen.SOFTWARE:
+			miSoftware.setSelected(true);
+		break;
+		case JPatchScreen.OPENGL:
+			miOpenGl.setSelected(true);
+		break;
+		}
+		menuOptions.add(menuRenderer);
+		
 		menuOptions.add(miSync);
 		//menuOptions.add(miFlip);
 		//menuOptions.add(miCull);
