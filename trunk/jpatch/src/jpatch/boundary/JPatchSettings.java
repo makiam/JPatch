@@ -64,6 +64,8 @@ public class JPatchSettings {
 	public Color cGrey;
 	public Color cBackface;
 	
+	public int iRealtimeRenderer;
+	
 	public int iGhost = 0xA0;
 	
 	public int iBackground;
@@ -286,6 +288,8 @@ public class JPatchSettings {
 		
 		mapDefaults.put("modelDir", "");
 		mapDefaults.put("deleteSources", new Boolean(true));
+		
+		mapDefaults.put("realtimeRenderer", new Integer(JPatchScreen.SOFTWARE));
 		
 		//mapDefaults.put("povrayLauncher", "");
 		//mapDefaults.put("inyoLauncher", "");
@@ -510,6 +514,8 @@ public class JPatchSettings {
 		strModelDir = getString("modelDir");
 		bDeleteSources = getBoolean("deleteSources");
 		
+		iRealtimeRenderer= getInt("realtimeRenderer");
+		
 		//strPovrayLauncher = getString("povrayLauncher");
 		//strInyoLauncher = getString("inyoLauncher");
 		//strAqsisLauncher = getString("aqsisLauncher");
@@ -641,6 +647,8 @@ public class JPatchSettings {
 		
 		strModelDir = getStringDefault("modelDir");
 		bDeleteSources = getBooleanDefault("deleteSources");
+		
+		iRealtimeRenderer= getIntDefault("realtimeRenderer");
 	}
 	
 	/**
@@ -765,6 +773,8 @@ public class JPatchSettings {
 		
 		putString("modelDir", strModelDir);
 		putBoolean("deleteSources", bDeleteSources);
+		
+		putInt("realtimeRenderer", iRealtimeRenderer);
 		
 		try {
 			userPrefs.flush();
