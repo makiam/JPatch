@@ -6,7 +6,7 @@ import java.awt.image.*;
 import java.io.*;
 import javax.swing.*;
 import javax.imageio.*;
-
+import javax.vecmath.*;
 import jpatch.auxilary.*;
 
 public final class Rotoscope {
@@ -17,10 +17,9 @@ public final class Rotoscope {
 	private float fXPosition;
 	private float fYPosition;
 	private float fScale;
-	private AffineTransform affineTransform = new AffineTransform();
 	private String strFilename;
 	private boolean bValid;
-	
+	private BufferedImage image;
 	public Rotoscope() {
 		bValid = false;
 	}
@@ -65,7 +64,7 @@ public final class Rotoscope {
 	public void loadImageFromFile(String filename) {
 		//System.out.println("loadImageFromFile(" + filename + ") called...");
 		strFilename = filename;
-		BufferedImage image;
+		//BufferedImage image;
 		//ImageIcon imageIcon = new ImageIcon(filename);
 		//image = imageIcon.getImage();
 		//if (image.getWidth(null) == -1) {
@@ -84,27 +83,31 @@ public final class Rotoscope {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(),"Unable to load rotoscope image \"" + filename + "\"\nInvalid file format", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		originalRGBImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
-		int[] aiRGB = ((DataBufferInt) originalRGBImage.getRaster().getDataBuffer()).getData();
-		int i = 0;
-		int width = image.getWidth();
-		int height = image.getHeight();
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				aiRGB[i++] = image.getRGB(x,y);
-			}
-		}
+//		originalRGBImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+//		byte[] abBGR = ((DataBufferByte) originalRGBImage.getRaster().getDataBuffer()).getData();
+//		int i = 0;
+//		int width = image.getWidth();
+//		int height = image.getHeight();
+//		for (int y = 0; y < height; y++) {
+//			for (int x = 0; x < width; x++) {
+//				int rgb = image.getRGB(x,y);
+//				abBGR[i++] = (byte) ((rgb >> 16) & 0xff);
+//				abBGR[i++] = (byte) ((rgb >> 8) & 0xff);
+//				abBGR[i++] = (byte) (rgb & 0xff);
+//			}
+//		}
+		originalRGBImage = image;
 		
 		//System.out.println("done. Size=" + image.getWidth(null) + "x" + image.getHeight(null));
 		fScale = 0.05f;
 		fXPosition = 0; //-fScale * 0.5f * image.getWidth(null);
 		fYPosition = 0; //-fScale * 0.5f * image.getHeight(null);
 		//System.out.print("Creating BufferedImage...");
-		filteredRGBImage = new BufferedImage(originalRGBImage.getWidth(null),originalRGBImage.getHeight(null),BufferedImage.TYPE_INT_RGB);
+//		filteredRGBImage = new BufferedImage(originalRGBImage.getWidth(null),originalRGBImage.getHeight(null),BufferedImage.TYPE_INT_RGB);
 		bValid = true;
 		//System.out.println("done. Size = " + filteredRGBImage.getWidth(null) + "x" + filteredRGBImage.getHeight(null));
 		//System.out.print("Filtering image...");
-		setOpacity(128);
+//		setOpacity(128);
 		//int rgb = filteredRGBImage.getRGB(0,0);
 		//int r = (rgb & 0xFF0000) >> 16;
 		//int g = (rgb & 0xFF00) >> 8;
@@ -149,33 +152,37 @@ public final class Rotoscope {
 	/**
 	 * paint the background image on canvas
 	 */
-	public void paint(JPatchCanvas canvas) {
-		
-		/* get Graphics2D, scale, translateX and translateY from Canvas */
-		Graphics2D g2 = (Graphics2D)canvas.getDrawable().getGraphics();
-		ViewDefinition viewDefinition = canvas.getViewDefinition();
-		float viewTranslateX = viewDefinition.getTranslateX();
-		float viewTranslateY = viewDefinition.getTranslateY();
-		float viewWidth = viewDefinition.getWidth();
-		float viewHeight = viewDefinition.getHeight();
-		float viewScale = viewDefinition.getScale() * viewWidth * 0.5f;
+	public void paint(ViewDefinition viewDef) {
+		JPatchDrawable2 drawable = viewDef.getDrawable();
+		float viewTranslateX = viewDef.getTranslateX();
+		float viewTranslateY = viewDef.getTranslateY();
+		float viewWidth = viewDef.getWidth();
+		float viewHeight = viewDef.getHeight();
+		float viewScale = viewDef.getScale() * viewWidth * 0.5f;
 		float scale = fScale * viewScale;
 		
-		float xPos = fXPosition - fScale * 0.5f * filteredRGBImage.getWidth();
-		float yPos = fYPosition - fScale * 0.5f * filteredRGBImage.getHeight();
+		float xPos = fXPosition - fScale * 0.5f * originalRGBImage.getWidth();
+		float yPos = fYPosition - fScale * 0.5f * originalRGBImage.getHeight();
 		/* set up affine transform */
-		affineTransform = new AffineTransform(scale,0,0,scale,viewWidth * 0.5f + (viewTranslateX + xPos) * viewScale,viewHeight * 0.5f + (viewTranslateY + yPos) * viewScale);
+		//affineTransform = new AffineTransform(scale,0,0,scale,viewWidth * 0.5f + (viewTranslateX + xPos) * viewScale,viewHeight * 0.5f + (viewTranslateY + yPos) * viewScale);
 		
 		/* paint image */
-		g2.drawImage(filteredRGBImage,affineTransform,null);
+		//g2.drawImage(filteredRGBImage,affineTransform,null);
 		
 		int iLeftX = (int) (viewWidth * 0.5f + (viewTranslateX + xPos) * viewScale);
 		int iRightX = (int) (iLeftX + scale * getPixelWidth());
-		int iTopY = (int) (viewHeight * 0.5f + (viewTranslateY + yPos) * viewScale);
+		int iTopY = (int) (viewHeight * 0.5f - (viewTranslateY + yPos) * viewScale);
 		int iBottomY = (int) (iTopY + scale * getPixelHeight());
 		
-		g2.setColor(JPatchSettings.getInstance().cGrey);
-		g2.drawRect(iLeftX,iTopY,iRightX - iLeftX,iBottomY - iTopY);
+		System.out.println("roto:" + iLeftX + " " + iTopY + " " + scale);
+		drawable.drawImage(image, iLeftX, iTopY, scale, scale);
+		drawable.setColor(new Color3f(JPatchSettings.getInstance().cGrey));
+		drawable.drawLine(iLeftX, iTopY, iRightX, iTopY);
+		drawable.drawLine(iLeftX, iBottomY, iRightX, iBottomY);
+		drawable.drawLine(iLeftX, iTopY, iLeftX, iBottomY);
+		drawable.drawLine(iRightX, iTopY, iRightX, iBottomY);
+		
+		//g2.drawRect(iLeftX,iTopY,iRightX - iLeftX,iBottomY - iTopY);
 	}
 	
 	/**

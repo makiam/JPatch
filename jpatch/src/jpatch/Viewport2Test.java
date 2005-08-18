@@ -284,7 +284,7 @@ public class Viewport2Test implements JPatchDrawableEventListener {
 		float scaleY = 1.5f + 1.4f * (float) Math.sin(phase[v]);
 		phase[v] += 0.01f;
 		
-//		vp.drawImage(image, 50 + (int) (50 * scaleY), (int) (50 * scaleX), scaleX, scaleY);
+		vp.drawImage(image, -50 + (int) (300 * scaleY), -50 + (int) (300 * scaleX), scaleX, scaleY);
 //		vp.drawImage(150, 50, scaleX, scaleY);
 //		vp.drawImage(50, 150, scaleX, scaleY);
 //		vp.drawImage(150, 150, scaleX, scaleY);

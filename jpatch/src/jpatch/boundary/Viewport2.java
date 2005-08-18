@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.10 2005/08/18 15:05:30 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.11 2005/08/18 20:33:46 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -146,7 +146,10 @@ public class Viewport2 {
 //		Matrix4f m4 = new Matrix4f();
 //		m4.setIdentity();
 //		cube.paint(viewDef, m4, viewDef.getMatrix());
-		
+		Rotoscope rotoscope = MainFrame.getInstance().getModel().getRotoscope(viewDef.getView());
+		if (rotoscope != null) {
+			rotoscope.paint(viewDef);
+		}
 		grid.paint(viewDef);
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
 		if (tool != null)

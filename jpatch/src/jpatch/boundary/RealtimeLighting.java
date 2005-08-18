@@ -1,5 +1,5 @@
 /*
- * $Id: RealtimeLighting.java,v 1.2 2005/08/18 15:05:30 sascha_l Exp $
+ * $Id: RealtimeLighting.java,v 1.3 2005/08/18 20:33:46 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -28,7 +28,7 @@ import jpatch.entity.*;
 /**
  * This class holds information needed for realtime lighing (a list of lightsources and some global settings)
  * @author sascha
- * @version $$Revision: 1.2 $$
+ * @version $$Revision: 1.3 $$
  */
 public class RealtimeLighting {
 	
@@ -62,6 +62,16 @@ public class RealtimeLighting {
 		rtl.add(rtl.new PointLight(new Color3f (1.00f, 0.00f, 0.00f), true, true, new Point3f(-70,0,0), 2, 70));
 //		rtl.add(rtl.new SpotLight(new Color3f (0.00f, 1.00f, 0.00f), true, true, new Point3f(-60,0,0), 0, 1, new Vector3f(1,0,1),30,30));
 //		rtl.add(rtl.new SpotLight(new Color3f (0.00f, 0.00f, 1.00f), true, true, new Point3f(-50,0,0), 0, 1, new Vector3f(1,0,1),30,30));
+		return rtl;
+	}
+	
+	/**
+	 * A factory method that returns a headlight
+	 * @return
+	 */
+	public static RealtimeLighting createHeadLight() {
+		RealtimeLighting rtl = new RealtimeLighting(1);
+		rtl.add(rtl.new DirectionalLight(new Color3f (1.00f, 1.00f, 1.00f), true, true, new Vector3f( 0, 0,-1)));
 		return rtl;
 	}
 	
