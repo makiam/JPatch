@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.9 2005/08/18 10:29:37 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.10 2005/08/18 15:05:30 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -71,6 +71,8 @@ public class Viewport2 {
 	private static Vector3f v3b = new Vector3f();
 	private static Vector3f v3c = new Vector3f();
 	
+	private Grid grid = new Grid();
+	
 	static {
 		init();
 	}
@@ -140,6 +142,12 @@ public class Viewport2 {
 //		System.out.println("z = " + pz);
 //		System.out.println();
 		
+//		SimpleShape cube = SimpleShape.createCube(10);
+//		Matrix4f m4 = new Matrix4f();
+//		m4.setIdentity();
+//		cube.paint(viewDef, m4, viewDef.getMatrix());
+		
+		grid.paint(viewDef);
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
 		if (tool != null)
 			tool.paint(viewDef);
@@ -339,6 +347,7 @@ public class Viewport2 {
 						if (drawable.isLightingSupported())
 							drawLitHashPatch(hashPatch, normals, levels);
 						else
+							//drawLitHashPatch(hashPatch, normals, levels);
 							drawShadedHashPatch(hashPatch, normals, levels, patch.getMaterial().getMaterialProperties());
 						//}
 //					} else {
@@ -1226,11 +1235,16 @@ public class Viewport2 {
 				Vector3f zc = Functions.vector(Z, Center);
 				
 				Vector3f[] nc = newNormals(5);
-				nc[0].cross(wc, vc);
-				nc[1].cross(xc, wc);
-				nc[2].cross(yc, xc);
-				nc[3].cross(zc, yc);
-				nc[4].cross(vc, zc);
+//				nc[0].cross(wc, vc);
+//				nc[1].cross(xc, wc);
+//				nc[2].cross(yc, xc);
+//				nc[3].cross(zc, yc);
+//				nc[4].cross(vc, zc);
+				nc[0].cross(vc, wc);
+				nc[1].cross(wc, xc);
+				nc[2].cross(xc, yc);
+				nc[3].cross(yc, zc);
+				nc[4].cross(zc, vc);
 				nc[0].normalize();
 				nc[1].normalize();
 				nc[2].normalize();

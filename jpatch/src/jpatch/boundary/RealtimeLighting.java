@@ -1,5 +1,5 @@
 /*
- * $Id: RealtimeLighting.java,v 1.1 2005/08/10 12:57:20 sascha_l Exp $
+ * $Id: RealtimeLighting.java,v 1.2 2005/08/18 15:05:30 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -28,7 +28,7 @@ import jpatch.entity.*;
 /**
  * This class holds information needed for realtime lighing (a list of lightsources and some global settings)
  * @author sascha
- * @version $$Revision: 1.1 $$
+ * @version $$Revision: 1.2 $$
  */
 public class RealtimeLighting {
 	
@@ -71,9 +71,9 @@ public class RealtimeLighting {
 	 */
 	public static RealtimeLighting createThreepointLight() {
 		RealtimeLighting rtl = new RealtimeLighting(3);
-		rtl.add(rtl.new DirectionalLight(new Color3f (0.66f, 0.66f, 0.66f), true, true, new Vector3f(  1, -1,  1)));	// key
-		rtl.add(rtl.new DirectionalLight(new Color3f (0.33f, 0.33f, 0.33f), true, true, new Vector3f( -1,  0,  1)));	// fill
-		rtl.add(rtl.new DirectionalLight(new Color3f (1.00f, 1.00f, 1.00f), true, true, new Vector3f(  0, -1, -1)));	// back
+		rtl.add(rtl.new DirectionalLight(new Color3f (0.66f, 0.66f, 0.66f), true, true, new Vector3f( -1,  1, -1)));	// key
+		rtl.add(rtl.new DirectionalLight(new Color3f (0.33f, 0.33f, 0.33f), true, true, new Vector3f(  1,  0, -1)));	// fill
+		rtl.add(rtl.new DirectionalLight(new Color3f (1.00f, 1.00f, 1.00f), true, true, new Vector3f(  0,  1,  1)));	// back
 		return rtl;
 	}
 	
@@ -152,6 +152,7 @@ public class RealtimeLighting {
 		for (int i = 0; i < aLightSources.length; i++) {
 			aLightSources[i].shade(point, normal, mp, color);
 		}
+		color.clamp(0, 1);
 	}
 	
 	/**

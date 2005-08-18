@@ -261,20 +261,30 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	
 	
 	private void drawScreenTriangle(Point3f p1, Point3f p2, Point3f p3) {
-		if ((p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x) > 0) {
-//			if (bCulling) return;
-//			if (bMark) color ^= 0xffffff;
-		}
 		int x1, y1, z1, x2, y2, z2, x3, y3, z3;
-		x1 = (int) (p1.x * SUB_PIXEL_MULTIPLIER);
-		y1 = (int) (p1.y * SUB_PIXEL_MULTIPLIER);
-		z1 = (int) ((p1.z + POLYGON_OFFSET) * SUB_PIXEL_MULTIPLIER);
-		x2 = (int) (p2.x * SUB_PIXEL_MULTIPLIER);
-		y2 = (int) (p2.y * SUB_PIXEL_MULTIPLIER);
-		z2 = (int) ((p2.z + POLYGON_OFFSET) * SUB_PIXEL_MULTIPLIER);
-		x3 = (int) (p3.x * SUB_PIXEL_MULTIPLIER);
-		y3 = (int) (p3.y * SUB_PIXEL_MULTIPLIER);
-		z3 = (int) ((p3.z + POLYGON_OFFSET) * SUB_PIXEL_MULTIPLIER);
+		
+		if (bPerspective) {
+			x1 = (int) ((iXoff + p1.x / p1.z * fW) * SUB_PIXEL_MULTIPLIER);
+			y1 = (int) ((iYoff - p1.y / p1.z * fW) * SUB_PIXEL_MULTIPLIER);
+			z1 = (int) (-Integer.MAX_VALUE / (p1.z + POLYGON_OFFSET));
+			x2 = (int) ((iXoff + p2.x / p2.z * fW) * SUB_PIXEL_MULTIPLIER);
+			y2 = (int) ((iYoff - p2.y / p2.z * fW) * SUB_PIXEL_MULTIPLIER);
+			z2 = (int) (-Integer.MAX_VALUE / (p2.z + POLYGON_OFFSET));
+			x3 = (int) ((iXoff + p3.x / p3.z * fW) * SUB_PIXEL_MULTIPLIER);
+			y3 = (int) ((iYoff - p3.y / p3.z * fW) * SUB_PIXEL_MULTIPLIER);
+			z3 = (int) (-Integer.MAX_VALUE / (p3.z + POLYGON_OFFSET));
+		} else {
+			x1 = (int) ((iXoff + p1.x) * SUB_PIXEL_MULTIPLIER);
+			y1 = (int) ((iYoff - p1.y) * SUB_PIXEL_MULTIPLIER);
+			z1 = (int) ((p1.z + POLYGON_OFFSET) * SUB_PIXEL_MULTIPLIER);
+			x2 = (int) ((iXoff + p2.x) * SUB_PIXEL_MULTIPLIER);
+			y2 = (int) ((iYoff - p2.y) * SUB_PIXEL_MULTIPLIER);
+			z2 = (int) ((p2.z + POLYGON_OFFSET) * SUB_PIXEL_MULTIPLIER);
+			x3 = (int) ((iXoff + p3.x) * SUB_PIXEL_MULTIPLIER);
+			y3 = (int) ((iYoff - p3.y) * SUB_PIXEL_MULTIPLIER);
+			z3 = (int) ((p3.z + POLYGON_OFFSET) * SUB_PIXEL_MULTIPLIER);
+		}
+		
 		if (y1 < y2) {
 			if (y2 < y3) drawTriangle(x1, y1, z1, x2, y2, z2, x3, y3, z3);
 			else if (y1 < y3) drawTriangle(x1, y1, z1, x3, y3, z3, x2, y2, z2);
@@ -301,14 +311,14 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 			y3 = (int) ((iYoff - p3.y / p3.z * fW) * SUB_PIXEL_MULTIPLIER);
 			z3 = (int) (-Integer.MAX_VALUE / (p3.z + POLYGON_OFFSET));
 		} else {
-			x1 = (int) (p1.x * SUB_PIXEL_MULTIPLIER);
-			y1 = (int) (p1.y * SUB_PIXEL_MULTIPLIER);
+			x1 = (int) ((iXoff + p1.x) * SUB_PIXEL_MULTIPLIER);
+			y1 = (int) ((iYoff - p1.y) * SUB_PIXEL_MULTIPLIER);
 			z1 = (int) ((p1.z + POLYGON_OFFSET) * SUB_PIXEL_MULTIPLIER);
-			x2 = (int) (p2.x * SUB_PIXEL_MULTIPLIER);
-			y2 = (int) (p2.y * SUB_PIXEL_MULTIPLIER);
+			x2 = (int) ((iXoff + p2.x) * SUB_PIXEL_MULTIPLIER);
+			y2 = (int) ((iYoff - p2.y) * SUB_PIXEL_MULTIPLIER);
 			z2 = (int) ((p2.z + POLYGON_OFFSET) * SUB_PIXEL_MULTIPLIER);
-			x3 = (int) (p3.x * SUB_PIXEL_MULTIPLIER);
-			y3 = (int) (p3.y * SUB_PIXEL_MULTIPLIER);
+			x3 = (int) ((iXoff + p3.x) * SUB_PIXEL_MULTIPLIER);
+			y3 = (int) ((iYoff - p3.y) * SUB_PIXEL_MULTIPLIER);
 			z3 = (int) ((p3.z + POLYGON_OFFSET) * SUB_PIXEL_MULTIPLIER);
 		}
 		
@@ -356,7 +366,10 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	}
 	
 	public void drawTriangle(Point3f p0, Vector3f n0, Point3f p1, Vector3f n1, Point3f p2, Vector3f n2) {
-		drawTriangle(p0, p1, p2);
+		Color3f c0 = new Color3f(n0.x * 0.5f + 0.5f, n0.y * 0.5f + 0.5f, n0.z * 0.5f + 0.5f);
+		Color3f c1 = new Color3f(n0.x * 0.5f + 0.5f, n0.y * 0.5f + 0.5f, n0.z * 0.5f + 0.5f);
+		Color3f c2 = new Color3f(n0.x * 0.5f + 0.5f, n0.y * 0.5f + 0.5f, n0.z * 0.5f + 0.5f);
+		drawTriangle(p0, c0, p1, c1, p2, c2);
 	}
 	
 	public void drawCurve(Curve curve) { }
@@ -379,6 +392,74 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	
 	public Graphics getGraphics() {
 		return g;
+	}
+	
+	public void drawLine(int x1, int y1, int x2, int y2) {
+		int x;
+		int y;
+		int end;
+		int edge;
+		int index;
+		if ((x1 < 0 && x2 < 0 )|| (y1 < 0 && y2 < 0) || (x1 >= iWidth && x2 >= iWidth) || (y1 >= iHeight && y2 >= iHeight)) {
+			return;
+		}
+		
+		int dx = x2 - x1;
+		int dy = y2 - y1;
+		if (dx == 0 && dy == 0) {
+			return;
+		}
+		if (Math.abs(dx) > Math.abs(dy)) {
+			if (dx > 0) {
+				x = x1;
+				y = y1 << 16 + 32768;
+				dy = (dy << 16) / dx;
+				end = (x2 < iWidth) ? x2 : iWidth;
+			} else {
+				x = x2;
+				y = y2 << 16 + 32768;
+				dy = (dy << 16) / dx;
+				end = (x1 < iWidth) ? x1 : iWidth;
+			}
+			if (x < 0) {
+				y -= dy * x;
+				x = 0;
+			}
+			edge = iHeight<<16;
+			while (x < end) {
+				if (y >= 0 && y < edge) {
+					index = iWidth * (y >> 16) + x;
+					aiColorBuffer[index] = iColor;
+				}
+				x++;
+				y += dy;
+			}
+		} else {
+			if (dy > 0) {
+				y = y1;
+				x = x1 << 16 + 32768;
+				dx = (dx << 16) / dy;
+				end = (y2 < iHeight) ? y2 : iHeight;
+			} else {
+				y = y2;
+				x = x2 << 16 + 32768;
+				dx = (dx << 16) / dy;
+				end = (y1 < iHeight) ? y1 : iHeight;
+			}
+			if (y < 0) {
+				x -= dx * y;
+				y = 0;
+			}
+			edge = iWidth<<16;
+			while (y < end) {
+				if (x >= 0 && x < edge) {
+					index = iWidth * y + (x >> 16);
+					aiColorBuffer[index] = iColor;
+				}
+				y++;
+				x += dx;
+			}
+		}
 	}
 	
 	private final void drawLine(int x1, int y1, int z1, int x2, int y2, int z2) {
@@ -950,118 +1031,71 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	}
 	
 	public final void drawTriangle(Point3f pa, Point3f pb, Point3f pc) { //, Vector3d na, Vector3d nb, Vector3d nc) {
-//		A.x = -pa.x / pa.z * fW + iXoff;
-//		A.y = pa.y / pa.z * fW + iYoff;
-//		B.x = -pb.x / pb.z * fW + iXoff;
-//		B.y = pb.y / pb.z * fW + iYoff;
-//		C.x = -pc.x / pc.z * fW + iXoff;
-//		C.y = pc.y / pc.z * fW + iYoff;
-//		if (A.x >= 0 && A.x < iWidth && A.y >= 0 && A.y < iHeight || B.x >= 0 && B.x < iWidth && B.y >= 0 && B.y < iHeight || C.x >= 0 && C.x < iWidth && C.y >= 0 && C.y < iHeight) {
-//			if (A.y < B.y && A.y < C.y) {
-//				if (B.y < C.y) {
-//					float f = (B.y - A.y) / (C.y - A.y);
-//					pd.interpolate(pa,pc,f);
-//					//nd.interpolate(na,nc,f);
-//					D.x = -pd.x / pd.z * fW + iXoff;
-//					D.y = pd.y / pd.z * fW + iYoff;
-//					if (B.x < D.x) {
-//						drawScreenTriangle(A, B, D);
-//						drawScreenTriangle(C, B, D);
-//					} else {
-//						drawScreenTriangle(A, D, B);
-//						drawScreenTriangle(C, D, B);
-//					}
-//				} else if (B.y > C.y) {
-//					float f = (C.y - A.y) / (B.y - A.y);
-//					pd.interpolate(pa,pb,f);
-//					//nd.interpolate(na,nb,f);
-//					D.x = -pd.x / pd.z * fW + iXoff;
-//					D.y = pd.y / pd.z * fW + iYoff;
-//					if (C.x < D.x) {
-//						drawScreenTriangle(A, C, D);
-//						drawScreenTriangle(B, C, D);
-//					} else {
-//						drawScreenTriangle(A, D, C);
-//						drawScreenTriangle(B, D, C);
-//					}
-//				} else {
-//					if (B.x < C.x) {
-//						drawScreenTriangle(A, B, C);
-//					} else {
-//						drawScreenTriangle(A, C, B);
-//					}
-//				}
-//			} else if (B.y < A.y && B.y < C.y) {
-//				if (A.y < C.y) {
-//					float f = (A.y - B.y) / (C.y - B.y);
-//					pd.interpolate(pb,pc,f);
-//					//nd.interpolate(nb,nc,f);
-//					D.x = -pd.x / pd.z * fW + iXoff;
-//					D.y = pd.y / pd.z * fW + iYoff;
-//					if (A.x < D.x) {
-//						drawScreenTriangle(B, A, D);
-//						drawScreenTriangle(C, A, D);
-//					} else {
-//						drawScreenTriangle(B, D, A);
-//						drawScreenTriangle(C, D, A);
-//					}
-//				} else if (A.y > C.y) {
-//					float f = (C.y - B.y) / (A.y - B.y);
-//					pd.interpolate(pb,pa,f);
-//					//nd.interpolate(nb,na,f);
-//					D.x = -pd.x / pd.z * fW + iXoff;
-//					D.y = pd.y / pd.z * fW + iYoff;
-//					if (C.x < D.x) {
-//						drawScreenTriangle(B, C, D);
-//						drawScreenTriangle(A, C, D);
-//					} else {
-//						drawScreenTriangle(B, D, C);
-//						drawScreenTriangle(A, D, C);
-//					}
-//				} else {
-//					if (A.x < C.x) {
-//						drawScreenTriangle(B, A, C);
-//					} else {
-//						drawScreenTriangle(B, C, A);
-//					}
-//				}
-//			} else {
-//				if (A.y < B.y) {
-//					float f = (A.y - C.y) / (B.y - C.y);
-//					pd.interpolate(pc,pb,f);
-//					//nd.interpolate(nc,nb,f);
-//					D.x = -pd.x / pd.z * fW + iXoff;
-//					D.y = pd.y / pd.z * fW + iYoff;
-//					if (A.x < D.x) {
-//						drawScreenTriangle(C, A, D);
-//						drawScreenTriangle(B, A, D);
-//					} else {
-//						drawScreenTriangle(C, D, A);
-//						drawScreenTriangle(B, D, A);
-//					}
-//				} else if (A.y > B.y) {
-//					float f = (B.y - C.y) / (A.y - C.y);
-//					pd.interpolate(pc,pa,f);
-//					//nd.interpolate(nc,na,f);
-//					D.x = -pd.x / pd.z * fW + iXoff;
-//					D.y = pd.y / pd.z * fW + iYoff;
-//					if (B.x < D.x) {
-//						drawScreenTriangle(C, B, D);
-//						drawScreenTriangle(A, B, D);
-//					} else {
-//						drawScreenTriangle(C, D, B);
-//						drawScreenTriangle(A, D, B);
-//					}
-//				} else {
-//					if (A.x < B.x) {
-//						drawScreenTriangle(C, A, B);
-//					} else {
-//						drawScreenTriangle(C, B, A);
-//					}
-//				}
-//			}
-//		}
+		if (bPerspective) {
+			/*
+			 * Check if triangle intersects near clipping plane and split if necessary
+			 */
+			if (pa.z > fNearClip) {
+				if (pb.z > fNearClip) {
+					if (pc.z > fNearClip) {									// triangle is entirely behind near clipping plane, draw it
+						drawScreenTriangle(pa, pb, pc);			
+					} else {												// only c is on front of near clipping plane, split triangle
+						float tca = (fNearClip - pc.z) / (pa.z - pc.z);		
+						float tbc = (fNearClip - pb.z) / (pc.z - pb.z);
+						Pca.interpolate(pc, pa, tca);
+						Pbc.interpolate(pb, pc, tbc);
+						drawScreenTriangle(pa, pb, Pbc);
+						drawScreenTriangle(Pbc, Pca, pa);
+					}
+				} else {
+					if (pc.z > fNearClip) {									// only b is in front of near clipping plane, split triangle
+						float tab = (fNearClip - pa.z) / (pb.z - pa.z);		
+						float tbc = (fNearClip - pb.z) / (pc.z - pb.z);
+						Pab.interpolate(pa, pb, tab);
+						Pbc.interpolate(pb, pc, tbc);
+						drawScreenTriangle(pc, pa, Pab);
+						drawScreenTriangle(Pab, Pbc, pc);
+					} else {												// b and c are in front of near clipping plane, split triange
+						float tca = (fNearClip - pc.z) / (pa.z - pc.z);		
+						float tab = (fNearClip - pa.z) / (pb.z - pa.z);
+						Pca.interpolate(pc, pa, tca);
+						Pab.interpolate(pa, pb, tab);
+						drawScreenTriangle(pa, Pab, Pca);
+					}
+				}
+			} else {														
+				if (pb.z > fNearClip) {
+					if (pc.z > fNearClip) {									// only a is in front of near clipping plane, split triangle
+						float tab = (fNearClip - pa.z) / (pb.z - pa.z);		
+						float tca = (fNearClip - pc.z) / (pa.z - pc.z);
+						Pab.interpolate(pa, pb, tab);
+						Pca.interpolate(pc, pa, tca);
+						drawScreenTriangle(pb, pc, Pca);
+						drawScreenTriangle(Pca, Pab, pb);
+					} else {												// a and c are in front of near clipping plane, split triange
+						float tca = (fNearClip - pc.z) / (pa.z - pc.z);		
+						float tbc = (fNearClip - pb.z) / (pc.z - pb.z);
+						Pca.interpolate(pc, pa, tca);
+						Pbc.interpolate(pb, pc, tbc);
+						drawScreenTriangle(pb, Pbc, Pab);
+					}
+				} else {
+					if (pc.z > fNearClip) {									// a and b are in front of near clipping plane, split triangle
+						float tca = (fNearClip - pc.z) / (pa.z - pc.z);		
+						float tbc = (fNearClip - pb.z) / (pc.z - pb.z);
+						Pca.interpolate(pc, pa, tca);
+						Pbc.interpolate(pb, pc, tbc);
+						drawScreenTriangle(pc, Pca, Pbc);
+					}														// triangle is entirely in fron of near clipping plane, skip it
+				}
+			}
+		}
+		else {
+//			System.out.println("Draw shaded triangle, orthogonal: " + pa + " " + pb + " " + pc);
+			drawScreenTriangle(pa, pb, pc);
+		}
 	}
+
 
 	public final void drawTriangle(Point3f pa, Color3f ca, Point3f pb, Color3f cb, Point3f pc, Color3f cc) { //, Vector3d na, Vector3d nb, Vector3d nc) {
 		if (bPerspective) {
@@ -1134,6 +1168,10 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 					}														// triangle is entirely in fron of near clipping plane, skip it
 				}
 			}
+		}
+		else {
+//			System.out.println("Draw shaded triangle, orthogonal: " + pa + " " + pb + " " + pc);
+			drawScreenTriangle(pa, ca, pb, cb, pc, cc);
 		}
 	}
 }
