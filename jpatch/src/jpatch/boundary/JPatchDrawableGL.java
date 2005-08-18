@@ -452,7 +452,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			gl.glViewport(0, 0, (int) w, (int) h);
 		    gl.glMatrixMode(GL.GL_PROJECTION);
 		    gl.glLoadIdentity();
-		    gl.glOrtho (0.0, w, 0.0, h, 1.0, -1.0);
+		    gl.glOrtho (0.0, w, h, 0.0, 1.0, -1.0);
 		    gl.glMatrixMode(GL.GL_MODELVIEW);
 		    gl.glDisable(GL.GL_LIGHTING);
 			gl.glDisable(GL.GL_DEPTH_TEST);
@@ -492,13 +492,25 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		enableRasterMode(true);							// switch to "raster mode"
 		Dimension dim = glDrawable.getSize();
 		float h = dim.height;						
-		gl.glRasterPos2i(x, (int) h - y - 2);			// set raster position
+		gl.glRasterPos2i(x, y - 2);			// set raster position
 		char[] c = string.toCharArray();
 	    for (int i = 0, n = c.length; i < n; i++) {		// loop over characters
 	    	int off = (int) c[i];
 	    	if (off >= 0 && off < 256)
 	    		gl.glCallList(off + iFontOffset);		// call display list that draws a character
 	    }
+	    enableRasterMode(false);						// switch back to "3d mode"
+	}
+	
+	public void drawLine(int x1, int y1, int x2, int y2) {
+		enableRasterMode(true);							// switch to "raster mode"
+		if (iGlMode != GL.GL_LINES) {
+			gl.glEnd();
+			iGlMode = GL.GL_LINES;
+			gl.glBegin(iGlMode);
+		}
+		gl.glVertex2i(x1, y1);
+		gl.glVertex2i(x2, y2);
 	    enableRasterMode(false);						// switch back to "3d mode"
 	}
 	
@@ -594,7 +606,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 					/*
 					 * set GL light directions (w = 0 for directional light)
 					 */
-					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_POSITION, new float[] { -direction.x, -direction.y, -direction.z, 0 });
+					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_POSITION, new float[] { direction.x, direction.y, direction.z, 0 });
 					
 					/*
 					 * set GL spot cutoff (180 = no spot)

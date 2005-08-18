@@ -207,18 +207,13 @@ public class SimpleShape {
 			new Vector3f(  0, -1,  0)
 		};
 		aiTriangles = new int[] {
-			0,1,5,
-			5,4,0,
-			1,2,6,
-			6,5,1,
-			2,3,7,
-			7,6,2,
-			3,0,4,
-			7,4,3,
-			4,5,6,
-			6,7,4,
-			0,3,2,
-			2,1,0
+			0, 4, 1, 1, 4, 5,
+			1, 5, 2, 2, 5, 6,
+			2, 6, 3, 3, 6, 7,
+			3, 7, 0, 0, 7, 4,
+			4, 7, 5, 5, 7, 6,
+			0, 1, 3, 3, 1, 2
+			
 		};
 		aiNormalIndices = new int[] {
 			0,0,
@@ -255,6 +250,7 @@ public class SimpleShape {
 			drawable.setMaterial(mp);
 		}
 		int t = 0;
+		System.out.println();
 		for (int i = 0; i < aiNormalIndices.length; i++) {
 			if (drawable.isLightingSupported()) {
 				drawable.drawTriangle(
@@ -263,15 +259,19 @@ public class SimpleShape {
 						ap3TransformedPoints[aiTriangles[t++]], av3TransformedNormals[aiNormalIndices[i]]
 				);
 			} else {
-				Color3f c0 = new Color3f();
-				viewDef.getLighting().shade(ap3TransformedPoints[aiTriangles[t]], av3TransformedNormals[aiNormalIndices[i]], mp, c0);
-				c0.clamp(0, 1);
-				drawable.setColor(c0);
-				drawable.drawTriangle(
-						ap3TransformedPoints[aiTriangles[t++]],
-						ap3TransformedPoints[aiTriangles[t++]],
-						ap3TransformedPoints[aiTriangles[t++]]
-				);
+				if (av3TransformedNormals[aiNormalIndices[i]].z < 0) {
+					Color3f c0 = new Color3f();
+					viewDef.getLighting().shade(ap3TransformedPoints[aiTriangles[t]], av3TransformedNormals[aiNormalIndices[i]], mp, c0);
+					drawable.setColor(c0);
+					drawable.drawTriangle(
+							ap3TransformedPoints[aiTriangles[t++]],
+							ap3TransformedPoints[aiTriangles[t++]],
+							ap3TransformedPoints[aiTriangles[t++]]
+					);
+				}
+				else {
+					t += 3;
+				}
 			}
 		}
 		if (drawable.isLightingSupported())
