@@ -66,6 +66,16 @@ public class RealtimeLighting {
 	}
 	
 	/**
+	 * A factory method that returns a headlight
+	 * @return
+	 */
+	public static RealtimeLighting createHeadLight() {
+		RealtimeLighting rtl = new RealtimeLighting(1);
+		rtl.add(rtl.new DirectionalLight(new Color3f (1.00f, 1.00f, 1.00f), true, true, new Vector3f( 0, 0,-1)));
+		return rtl;
+	}
+	
+	/**
 	 * A factory method that returns a three point light
 	 * @return
 	 */

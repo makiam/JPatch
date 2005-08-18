@@ -372,7 +372,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 //				gl.glEnable(GL.GL_LIGHT1);
 //				gl.glEnable(GL.GL_LIGHT2);
 				
-				gl.glEnable(GL.GL_CULL_FACE);
+				gl.glDisable(GL.GL_CULL_FACE);
 				gl.glCullFace(GL.GL_BACK);
 				gl.glDepthFunc(GL.GL_LESS);
 				gl.glEnable(GL.GL_DEPTH_TEST);
@@ -454,6 +454,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		    gl.glLoadIdentity();
 		    gl.glOrtho (0.0, w, h, 0.0, 1.0, -1.0);
 		    gl.glMatrixMode(GL.GL_MODELVIEW);
+		    gl.glLoadIdentity();
 		    gl.glDisable(GL.GL_LIGHTING);
 			gl.glDisable(GL.GL_DEPTH_TEST);
 			gl.glShadeModel(GL.GL_FLAT);		
@@ -475,6 +476,10 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		/*
 		 * Check if we know this image
 		 */
+		if (iGlMode != -1) {
+			gl.glEnd();
+			iGlMode = -1;
+		}
 		if (this.image != image) {
 			this.image = image;							// remember this image
 			makeImageList();							// generate a display list that draws the image
@@ -482,8 +487,15 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		enableRasterMode(true);							// switch to "raster mode"
 		Dimension dim = glDrawable.getSize();
 		float h = dim.height;
-		gl.glPixelZoom(scaleX, -scaleY);				// set raster position
-		gl.glRasterPos2i(x, (int) h - y - 2);			// set image zoom
+		gl.glPixelZoom(scaleX, scaleY);				// set raster position
+		gl.glRasterPos2i(x, y);			// set image zoom
+		gl.glMatrixMode(GL.GL_PROJECTION);
+		gl.glLoadMatrixf(new float[] {
+				scaleX, 0, 0, 0,
+				0, scaleY, 0, 0,
+				0, 0, 1, 0,
+				0, 0, 0, 1
+		});
 		gl.glCallList(iImageOffset);					// call displaylist that draws the image
 		enableRasterMode(false);						// switch to "3d mode"
 	}
@@ -573,8 +585,16 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	public void setMaterial(MaterialProperties mp) {
 		gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, new float[] { mp.red * mp.ambient, mp.green * mp.ambient, mp.blue * mp.ambient, 1.0f } );
 		gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[] { mp.red * mp.diffuse, mp.green * mp.diffuse, mp.blue * mp.diffuse, 1.0f } );
-		gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[] { mp.specular, mp.specular, mp.specular, 1.0f } );
+		gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[] {
+				mp.specular * (1 - mp.metallic + mp.metallic * mp.red),
+				mp.specular * (1 - mp.metallic + mp.metallic * mp.green),
+				mp.specular * (1 - mp.metallic + mp.metallic * mp.blue),
+				1.0f });
 		gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[] { 1f / mp.roughness } );
+//		gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, new float[] { 0.0f, 0.0f, 0.0f, 1.0f } );
+//		gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[] { 1.0f, 0.0f, 0.0f, 1.0f } );
+//		gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[] { 1.0f, 1.0f, 1.0f, 1.0f } );
+//		gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[] { 50.0f } );
 	}
 	
 	public void setTransform(Matrix4f transform) {
@@ -597,16 +617,18 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 					 */
 					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_AMBIENT, new float[] { 0, 0, 0, 1 });
 					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_DIFFUSE, new float[] { color.x, color.y, color.z, 1 });
-					if (directionalLight.castsHighlight())
+					if (directionalLight.castsHighlight()) {
+						System.out.println("yes");
+					
 						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { color.x, color.y, color.z, 1 });
-					else
+					}else
 						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
 					Vector3f direction = directionalLight.getDirection();
 					
 					/*
 					 * set GL light directions (w = 0 for directional light)
 					 */
-					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_POSITION, new float[] { direction.x, direction.y, direction.z, 0 });
+					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_POSITION, new float[] { -direction.x, -direction.y, -direction.z, 0 });
 					
 					/*
 					 * set GL spot cutoff (180 = no spot)
@@ -807,11 +829,11 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		}
 //		gl.glEnable(GL.GL_LIGHTING);
 //		gl.glBegin(GL.GL_TRIANGLES);
-		gl.glNormal3f(n0.x, n0.y, n0.z);
+		gl.glNormal3f(-n0.x, -n0.y, -n0.z);
 		gl.glVertex3f(p0.x, p0.y, p0.z + 1);
-		gl.glNormal3f(n1.x, n1.y, n1.z);
+		gl.glNormal3f(-n1.x, -n1.y, -n1.z);
 		gl.glVertex3f(p1.x, p1.y, p1.z + 1);
-		gl.glNormal3f(n2.x, n2.y, n2.z);
+		gl.glNormal3f(-n2.x, -n2.y, -n2.z);
 		gl.glVertex3f(p2.x, p2.y, p2.z + 1);
 //		gl.glEnd();
 //		gl.glDisable(GL.GL_LIGHTING);

@@ -146,7 +146,10 @@ public class Viewport2 {
 //		Matrix4f m4 = new Matrix4f();
 //		m4.setIdentity();
 //		cube.paint(viewDef, m4, viewDef.getMatrix());
-		
+		Rotoscope rotoscope = MainFrame.getInstance().getModel().getRotoscope(viewDef.getView());
+		if (rotoscope != null) {
+			rotoscope.paint(viewDef);
+		}
 		grid.paint(viewDef);
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
 		if (tool != null)
