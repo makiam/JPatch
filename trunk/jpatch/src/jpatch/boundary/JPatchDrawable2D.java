@@ -24,6 +24,10 @@ public class JPatchDrawable2D implements JPatchDrawable2 {
 	private int iYoff = 0;
 	private VolatileImage image;
 	
+	private Point3f Pab = new Point3f();
+	private Point3f Pbc = new Point3f();
+	private Point3f Pca = new Point3f();
+	
 	public JPatchDrawable2D(final JPatchDrawableEventListener listener, boolean lightweight) {
 		this.listener = listener;
 		if (lightweight) {
@@ -168,6 +172,10 @@ public class JPatchDrawable2D implements JPatchDrawable2 {
 		}
 	}
 	
+	public void drawLine(int x1, int y1, int x2, int y2) {
+		g.drawLine(x1, y1, x2, y2);
+	}
+	
 	public void drawLine(Point3f p0, Point3f p1) {
 		if (bPerspective) {
 			if (p0.z < fNearClip) {
@@ -197,10 +205,92 @@ public class JPatchDrawable2D implements JPatchDrawable2 {
 		}
 	}
 	
-	public void drawTriangle(Point3f p0, Point3f p1, Point3f p2) {
-		drawLine(p0, p1);
-		drawLine(p1, p2);
-		drawLine(p2, p0);
+	public final void drawTriangle(Point3f pa, Point3f pb, Point3f pc) { //, Vector3d na, Vector3d nb, Vector3d nc) {
+		if (bPerspective) {
+			/*
+			 * Check if triangle intersects near clipping plane and split if necessary
+			 */
+			if (pa.z > fNearClip) {
+				if (pb.z > fNearClip) {
+					if (pc.z > fNearClip) {									// triangle is entirely behind near clipping plane, draw it
+						drawScreenTriangle(pa, pb, pc);			
+					} else {												// only c is on front of near clipping plane, split triangle
+						float tca = (fNearClip - pc.z) / (pa.z - pc.z);		
+						float tbc = (fNearClip - pb.z) / (pc.z - pb.z);
+						Pca.interpolate(pc, pa, tca);
+						Pbc.interpolate(pb, pc, tbc);
+						drawScreenTriangle(pa, pb, Pbc);
+						drawScreenTriangle(Pbc, Pca, pa);
+					}
+				} else {
+					if (pc.z > fNearClip) {									// only b is in front of near clipping plane, split triangle
+						float tab = (fNearClip - pa.z) / (pb.z - pa.z);		
+						float tbc = (fNearClip - pb.z) / (pc.z - pb.z);
+						Pab.interpolate(pa, pb, tab);
+						Pbc.interpolate(pb, pc, tbc);
+						drawScreenTriangle(pc, pa, Pab);
+						drawScreenTriangle(Pab, Pbc, pc);
+					} else {												// b and c are in front of near clipping plane, split triange
+						float tca = (fNearClip - pc.z) / (pa.z - pc.z);		
+						float tab = (fNearClip - pa.z) / (pb.z - pa.z);
+						Pca.interpolate(pc, pa, tca);
+						Pab.interpolate(pa, pb, tab);
+						drawScreenTriangle(pa, Pab, Pca);
+					}
+				}
+			} else {														
+				if (pb.z > fNearClip) {
+					if (pc.z > fNearClip) {									// only a is in front of near clipping plane, split triangle
+						float tab = (fNearClip - pa.z) / (pb.z - pa.z);		
+						float tca = (fNearClip - pc.z) / (pa.z - pc.z);
+						Pab.interpolate(pa, pb, tab);
+						Pca.interpolate(pc, pa, tca);
+						drawScreenTriangle(pb, pc, Pca);
+						drawScreenTriangle(Pca, Pab, pb);
+					} else {												// a and c are in front of near clipping plane, split triange
+						float tca = (fNearClip - pc.z) / (pa.z - pc.z);		
+						float tbc = (fNearClip - pb.z) / (pc.z - pb.z);
+						Pca.interpolate(pc, pa, tca);
+						Pbc.interpolate(pb, pc, tbc);
+						drawScreenTriangle(pb, Pbc, Pab);
+					}
+				} else {
+					if (pc.z > fNearClip) {									// a and b are in front of near clipping plane, split triangle
+						float tca = (fNearClip - pc.z) / (pa.z - pc.z);		
+						float tbc = (fNearClip - pb.z) / (pc.z - pb.z);
+						Pca.interpolate(pc, pa, tca);
+						Pbc.interpolate(pb, pc, tbc);
+						drawScreenTriangle(pc, Pca, Pbc);
+					}														// triangle is entirely in fron of near clipping plane, skip it
+				}
+			}
+		}
+		else {
+//			System.out.println("Draw shaded triangle, orthogonal: " + pa + " " + pb + " " + pc);
+			drawScreenTriangle(pa, pb, pc);
+		}
+	}
+	
+	private void drawScreenTriangle(Point3f p1, Point3f p2, Point3f p3) {
+		int x[] = new int[3];
+		int y[] = new int[3];
+		
+		if (bPerspective) {
+			x[0] = (int) (iXoff + p1.x / p1.z * fW);
+			y[0] = (int) (iYoff - p1.y / p1.z * fW);
+			x[1] = (int) (iXoff + p2.x / p2.z * fW);
+			y[1] = (int) (iYoff - p2.y / p2.z * fW);
+			x[2] = (int) (iXoff + p3.x / p3.z * fW);
+			y[2] = (int) (iYoff - p3.y / p3.z * fW);
+		} else {
+			x[0] = (int) (iXoff + p1.x);
+			y[0] = (int) (iYoff - p1.y);
+			x[1] = (int) (iXoff + p2.x);
+			y[1] = (int) (iYoff - p2.y);
+			x[2] = (int) (iXoff + p3.x);
+			y[2] = (int) (iYoff - p3.y);
+		}
+		g.fillPolygon(x, y, 3);
 	}
 	
 	public void drawTriangle(Point3f p0, Color3f c0, Point3f p1, Color3f c1, Point3f p2, Color3f c2) {

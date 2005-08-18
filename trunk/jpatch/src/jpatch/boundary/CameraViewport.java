@@ -86,7 +86,7 @@ public class CameraViewport implements JPatchDrawableEventListener {
 //		}
 //	};
 	
-	private JPatchDrawable2 viewport = new JPatchDrawableGL(this, false);
+	private JPatchDrawable2 viewport = new JPatchDrawable3D(this, false);
 	private Component component = viewport.getComponent();
 	private JPanel panel = new JPanel();
 	private AWTWidget widget = new AWTWidget(panel);
@@ -473,7 +473,7 @@ public class CameraViewport implements JPatchDrawableEventListener {
 				
 				if (Animator.getInstance().getActiveObject() == character) viewport.setColor(new Color3f(1,1,0));
 				else viewport.setColor(new Color3f(1,1,1));
-				if (false) { // draw curves
+				if (true) { // draw curves
 					for (Curve curve = character.getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
 						if (!curve.getStart().isStartHook()) {
 							for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
@@ -492,7 +492,7 @@ public class CameraViewport implements JPatchDrawableEventListener {
 						}
 					}
 				}
-				if (true) { // draw shaded, lit patches (GL only)
+				if (false) { // draw shaded, lit patches (GL only)
 					patchTesselator.tesselate(character.getModel(), 1, m4d, true);
 					PatchTesselator3.Vertex[] vertex = patchTesselator.getVertexArray();
 					java.util.List quads = patchTesselator.getQuadList();

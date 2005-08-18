@@ -29,6 +29,7 @@ public interface JPatchDrawable2 {
 	public void setPointSize(int size);
 	public void drawPoint(Point3f p);
 	public void drawLine(Point3f p0, Point3f p1);
+	public void drawLine(int x1, int y1, int x2, int y2);
 	public void drawImage(BufferedImage image, int x, int y, float scaleX, float scaleY);
 	public void drawTriangle(Point3f p0, Point3f p1, Point3f p2);
 	public void drawTriangle(Point3f p0, Color3f c0, Point3f p1, Color3f c1, Point3f p2, Color3f c2);

@@ -362,7 +362,7 @@ public class RotateTool extends JPatchTool {
 		}
 		
 		comparator.setViewDefinition(viewDef);
-		//Arrays.sort(aHandle,comparator);
+		Arrays.sort(aHandle,comparator);
 		for (int h = aHandle.length - 1; h >= 0; h--) {
 			aHandle[h].paint(viewDef);
 		}
