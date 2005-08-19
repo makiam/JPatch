@@ -219,6 +219,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 		if (x2 >= iWidth) x2 = iWidth - 1;
 		if (y2 >= iHeight) y2 = iHeight - 1;
 		int index = y1 * iWidth + x1;
+		int offset = iWidth - x2 + x1;
 		for (y = y1; y < y2; y++) {
 			for (x = x1; x < x2; x++) {
 				if (z < aiDepthBuffer[index]) {
@@ -227,7 +228,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 				}
 				index++;
 			}
-			index += iWidth - iPointSize;
+			index += offset;
 		}	
 	}
 	
@@ -393,6 +394,31 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	public Graphics getGraphics() {
 		return g;
 	}
+	
+	public void drawRect(int x, int y, int width, int height) {
+		drawLine(x, y, x + width, y);
+		drawLine(x, y + height, x + width, y + height);
+		drawLine(x, y, x, y + height);
+		drawLine(x + width, y, x + width, y + height);
+	}
+	
+	public void fillRect(int x1, int y1, int width, int height) {
+		int x2 = x1 + width;
+		int y2 = y1 + height;
+		if (x1 < 0) x1 = 0;
+		if (y1 < 0) y1 = 0;
+		if (x2 >= iWidth) x2 = iWidth - 1;
+		if (y2 >= iHeight) y2 = iHeight - 1;
+		int index = y1 * iWidth + x1;
+		int offset = iWidth - x2 + x1;
+		for (int y = y1; y < y2; y++) {
+			for (int x = x1; x < x2; x++) {
+				aiColorBuffer[index] = iColor;
+				index++;
+			}
+			index += offset;
+		}
+	}	
 	
 	public void drawLine(int x1, int y1, int x2, int y2) {
 		int x;
