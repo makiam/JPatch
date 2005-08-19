@@ -1,5 +1,5 @@
 /**
- * $Id: NewLatheEditorEdit.java,v 1.2 2005/08/19 19:00:21 sascha_l Exp $
+ * $Id: NewLatheEditorEdit.java,v 1.3 2005/08/19 19:16:39 sascha_l Exp $
  */
 package jpatch.control.edit;
 
@@ -28,7 +28,7 @@ import jpatch.entity.Curve;
 /**
  * 
  * @author lois
- * @Revision $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * 
  */
 public class NewLatheEditorEdit extends JPatchCompoundEdit {
@@ -56,17 +56,17 @@ public class NewLatheEditorEdit extends JPatchCompoundEdit {
 		float epsilon = 0.1f; // FIXME
 		
 		// calculate control points
-		ControlPoint[] cpts = new ControlPoint[iSegments + (bCloseTop ? 1 : 0) + (bCloseBottom ? 1: 0) + 1];
+		ControlPoint[] cpts = new ControlPoint[iSegments/2 + (bCloseTop ? 1 : 0) + (bCloseBottom ? 1: 0) + 1];
 
 		double dyr = 0;
 		boolean first = true;
 		int cpidx = 0; // controlpoint index
 		
 		// curve
-		for (int i = 0; i <= iSegments; i++) {
+		for (int i = 0; i <= iSegments/2; i++) {
 			// fill, size
-			double dx = Math.sin(Math.PI*i*(100f-iFill)/50f/(float)iSegments)*iSize/10f;
-			double dy = Math.cos(Math.PI*i*(100f-iFill)/50f/(float)iSegments)*iSize/10f;
+			double dx = Math.sin(Math.PI*i*(100f-iFill)/25f/(float)iSegments)*iSize/10f;
+			double dy = Math.cos(Math.PI*i*(100f-iFill)/25f/(float)iSegments)*iSize/10f;
 			// form			
 			if (iForm >= 0) 
 				dx = dx * (90-iForm)/90;
