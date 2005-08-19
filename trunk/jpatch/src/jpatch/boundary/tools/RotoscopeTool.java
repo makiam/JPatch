@@ -1,8 +1,11 @@
 package jpatch.boundary.tools;
 
 import jpatch.boundary.*;
+
 import java.awt.*;
 import java.awt.event.*;
+
+import javax.vecmath.*;
 
 public final class RotoscopeTool extends JPatchTool {
 	private static final int IDLE = 0;
@@ -49,27 +52,25 @@ public final class RotoscopeTool extends JPatchTool {
 		float scale = rotoscope.getScale() * viewScale;
 		
 		float xPos = rotoscope.getXPosition() - rotoscope.getScale() * 0.5f * rotoscope.getPixelWidth();
-		float yPos = rotoscope.getYPosition() - rotoscope.getScale() * 0.5f * rotoscope.getPixelHeight();
+		float yPos = rotoscope.getYPosition() + rotoscope.getScale() * 0.5f * rotoscope.getPixelHeight();
 		
 		iWidth = (int) (scale * rotoscope.getPixelWidth());
 		iHeight = (int) (scale * rotoscope.getPixelHeight());
 		iLeftX = (int) (viewWidth * 0.5f + (viewTranslateX + xPos) * viewScale);
 		iRightX = (int) (iLeftX + iWidth);
-		iTopY = (int) (viewHeight * 0.5f + (viewTranslateY + yPos) * viewScale);
+		iTopY = (int) (viewHeight * 0.5f - (viewTranslateY + yPos) * viewScale);
 		iBottomY = (int) (iTopY + iHeight);
 		iCenterX = (iLeftX + iRightX) / 2;
 		iCenterY = (iTopY + iBottomY) / 2;
 	}
 	
-	public void paint(Viewport viewport, JPatchDrawable drawable) {
+	public void paint(ViewDefinition viewDef) {
 		JPatchSettings settings = JPatchSettings.getInstance();
-		Graphics2D g2 = (Graphics2D) drawable.getGraphics();
-		ViewDefinition viewDefinition = viewport.getViewDefinition();
-		
-		init(viewDefinition);
+		JPatchDrawable2 drawable = viewDef.getDrawable();
+		init(viewDef);
 		if (rotoscope == null) {
-			g2.setColor(settings.cSelection);
-			g2.drawString("No rotoscope set!", viewDefinition.getWidth() / 2 - 50, viewDefinition.getHeight() / 2 - 20);
+			drawable.setColor(new Color3f(settings.cSelection)); // FIXME
+			drawable.drawString("No rotoscope set!", (int) (viewDef.getWidth() / 2 - 50), (int) (viewDef.getHeight() / 2 - 20));
 			return;
 		}
 		
@@ -82,39 +83,40 @@ public final class RotoscopeTool extends JPatchTool {
 		
 		
 		
-		Color white = new Color(255,255,255);
-		
+		Color3f white = new Color3f(1,1,1);
+		Color3f cSelection = new Color3f(settings.cSelection);
 		if (iState == MOVE) {
-			g2.setColor(white);
-			g2.drawRect(iLeftX,iTopY,iWidth,iHeight);
+			drawable.setColor(white);
+			drawable.drawRect(iLeftX,iTopY,iWidth,iHeight);
 		} else {
-			g2.setColor(settings.cSelection);
-			g2.drawRect(iLeftX,iTopY,iWidth,iHeight);
-			if (iState == SCALE_TOP_LEFT) g2.setColor(white); else g2.setColor(settings.cSelection);
-			g2.fillRect(iLeftX - 3,iTopY - 3,7,7);
-			if (iState == SCALE_TOP_RIGHT) g2.setColor(white); else g2.setColor(settings.cSelection);
-			g2.fillRect(iRightX - 3,iTopY - 3,7,7);
-			if (iState == SCALE_BOTTOM_LEFT) g2.setColor(white); else g2.setColor(settings.cSelection);
-			g2.fillRect(iLeftX - 3,iBottomY - 3,7,7);
-			if (iState == SCALE_BOTTOM_RIGHT) g2.setColor(white); else g2.setColor(settings.cSelection);
-			g2.fillRect(iRightX - 3,iBottomY - 3,7,7);
+			drawable.setColor(cSelection);
+			drawable.drawRect(iLeftX,iTopY,iWidth,iHeight);
+			if (iState == SCALE_TOP_LEFT) drawable.setColor(white); else drawable.setColor(cSelection);
+			drawable.fillRect(iLeftX - 3,iTopY - 3,7,7);
+			if (iState == SCALE_TOP_RIGHT) drawable.setColor(white); else drawable.setColor(cSelection);
+			drawable.fillRect(iRightX - 3,iTopY - 3,7,7);
+			if (iState == SCALE_BOTTOM_LEFT) drawable.setColor(white); else drawable.setColor(cSelection);
+			drawable.fillRect(iLeftX - 3,iBottomY - 3,7,7);
+			if (iState == SCALE_BOTTOM_RIGHT) drawable.setColor(white); else drawable.setColor(cSelection);
+			drawable.fillRect(iRightX - 3,iBottomY - 3,7,7);
 		}
-		g2.setColor(settings.cSelection);
-		g2.drawString("Opacity:",iCenterX - 90, iBottomY + 17);
-		g2.drawRect(iCenterX - 40,iBottomY + 9,127,7);
+		drawable.setColor(cSelection);
+		drawable.drawString("Opacity:",iCenterX - 90, iBottomY + 17);
+		drawable.drawRect(iCenterX - 40,iBottomY + 9,127,7);
 		if (iState == SLIDER) {
-			g2.setColor(new Color(255,255,255));
+			drawable.setColor(white);
 		}
 		//g2.fillRect(iCenterX - 128, iBottomY + 10,rotoscope.getOpacity(), 6);
 		//g2.drawLine(iCenterX - 128 + rotoscope.getOpacity(),iBottomY + 5,iCenterX - 128 + rotoscope.getOpacity(),iBottomY + 20);
-		g2.fillRect(iCenterX - 40, iBottomY + 10,rotoscope.getOpacity() / 2, 6);
-		g2.drawLine(iCenterX - 41 + rotoscope.getOpacity() / 2,iBottomY + 5,iCenterX - 41 + rotoscope.getOpacity() / 2,iBottomY + 20);
-		g2.drawLine(iCenterX - 40 + rotoscope.getOpacity() / 2,iBottomY + 5,iCenterX - 40 + rotoscope.getOpacity() / 2,iBottomY + 20);
-		g2.drawLine(iCenterX - 39 + rotoscope.getOpacity() / 2,iBottomY + 5,iCenterX - 39 + rotoscope.getOpacity() / 2,iBottomY + 20);
+		drawable.fillRect(iCenterX - 40, iBottomY + 9,rotoscope.getOpacity() / 2, 7);
+		drawable.drawLine(iCenterX - 41 + rotoscope.getOpacity() / 2,iBottomY + 5,iCenterX - 41 + rotoscope.getOpacity() / 2,iBottomY + 20);
+		drawable.drawLine(iCenterX - 40 + rotoscope.getOpacity() / 2,iBottomY + 5,iCenterX - 40 + rotoscope.getOpacity() / 2,iBottomY + 20);
+		drawable.drawLine(iCenterX - 39 + rotoscope.getOpacity() / 2,iBottomY + 5,iCenterX - 39 + rotoscope.getOpacity() / 2,iBottomY + 20);
 	}
 	
 	public void mousePressed(MouseEvent mouseEvent) {
-		init(((Viewport) mouseEvent.getSource()).getViewDefinition());
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
+		init(viewDef);
 		if (rotoscope == null) return;
 		
 		if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
@@ -162,7 +164,8 @@ public final class RotoscopeTool extends JPatchTool {
 	}
 	
 	public void mouseDragged(MouseEvent mouseEvent) {
-		init(((Viewport) mouseEvent.getSource()).getViewDefinition());
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
+		init(viewDef);
 		if (rotoscope == null) return;
 		
 		int deltaX = mouseEvent.getX() - iMouseX;
@@ -178,10 +181,9 @@ public final class RotoscopeTool extends JPatchTool {
 				MainFrame.getInstance().getJPatchScreen().single_update((Component) mouseEvent.getSource());
 			break;
 			case MOVE:
-				ViewDefinition viewDefinition = ((Viewport) mouseEvent.getSource()).getViewDefinition();
-				float scale = viewDefinition.getScale() * viewDefinition.getWidth() * 0.5f;
+				float scale = viewDef.getScale() * viewDef.getWidth() * 0.5f;
 				float x = rotoscope.getXPosition() + 1f / scale * deltaX;
-				float y = rotoscope.getYPosition() + 1f / scale * deltaY;
+				float y = rotoscope.getYPosition() - 1f / scale * deltaY;
 				rotoscope.setPosition(x,y);
 				MainFrame.getInstance().getJPatchScreen().single_update((Component) mouseEvent.getSource());
 			break;
