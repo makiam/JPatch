@@ -1,5 +1,5 @@
 /**
- * $Id: NewLatheEditorEdit.java,v 1.1 2005/08/17 13:58:35 lois Exp $
+ * $Id: NewLatheEditorEdit.java,v 1.2 2005/08/19 19:00:21 sascha_l Exp $
  */
 package jpatch.control.edit;
 
@@ -28,7 +28,7 @@ import jpatch.entity.Curve;
 /**
  * 
  * @author lois
- * @Revision $Revision: 1.1 $
+ * @Revision $Revision: 1.2 $
  * 
  */
 public class NewLatheEditorEdit extends JPatchCompoundEdit {
@@ -52,7 +52,8 @@ public class NewLatheEditorEdit extends JPatchCompoundEdit {
 		// get the dialog data (iSegments, iFill, iForm...)
 		if (!new SegmentsDialog(MainFrame.getInstance()).okPressed) return;
 
-		float epsilon = 3f / MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().getMatrix().getScale();
+//		float epsilon = 3f / MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().getMatrix().getScale();
+		float epsilon = 0.1f; // FIXME
 		
 		// calculate control points
 		ControlPoint[] cpts = new ControlPoint[iSegments + (bCloseTop ? 1 : 0) + (bCloseBottom ? 1: 0) + 1];
