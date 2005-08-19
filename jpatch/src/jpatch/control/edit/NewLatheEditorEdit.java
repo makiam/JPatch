@@ -52,7 +52,8 @@ public class NewLatheEditorEdit extends JPatchCompoundEdit {
 		// get the dialog data (iSegments, iFill, iForm...)
 		if (!new SegmentsDialog(MainFrame.getInstance()).okPressed) return;
 
-		float epsilon = 3f / MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().getMatrix().getScale();
+//		float epsilon = 3f / MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().getMatrix().getScale();
+		float epsilon = 0.1f; // FIXME
 		
 		// calculate control points
 		ControlPoint[] cpts = new ControlPoint[iSegments + (bCloseTop ? 1 : 0) + (bCloseBottom ? 1: 0) + 1];
