@@ -391,11 +391,6 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 				iMaxLights = i[0];
 				gl.glGetIntegerv(GL.GL_MAX_TEXTURE_SIZE, i);
 				iMaxTextureSize = i[0];
-				System.out.println("0:" + getTextureSize(0));
-				System.out.println("511:" + getTextureSize(511));
-				System.out.println("512:" + getTextureSize(512));
-				System.out.println("513:" + getTextureSize(513));
-				System.out.println("2049:" + getTextureSize(2049));
 			}
 			
 			public void reshape(GLDrawable glDrawable, int x, int y, int width, int height) {
@@ -709,11 +704,9 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 					 */
 					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_AMBIENT, new float[] { 0, 0, 0, 1 });
 					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_DIFFUSE, new float[] { color.x, color.y, color.z, 1 });
-					if (directionalLight.castsHighlight()) {
-						System.out.println("yes");
-					
+					if (directionalLight.castsHighlight())
 						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { color.x, color.y, color.z, 1 });
-					}else
+					else
 						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
 					Vector3f direction = directionalLight.getDirection();
 					
