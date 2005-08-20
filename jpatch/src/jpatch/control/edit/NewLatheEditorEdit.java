@@ -1,5 +1,5 @@
 /**
- * $Id: NewLatheEditorEdit.java,v 1.3 2005/08/19 19:16:39 sascha_l Exp $
+ * $Id: NewLatheEditorEdit.java,v 1.4 2005/08/20 16:06:17 lois Exp $
  */
 package jpatch.control.edit;
 
@@ -21,6 +21,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import jpatch.auxilary.Functions;
 import jpatch.boundary.MainFrame;
 import jpatch.entity.ControlPoint;
 import jpatch.entity.Curve;
@@ -28,7 +29,7 @@ import jpatch.entity.Curve;
 /**
  * 
  * @author lois
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  */
 public class NewLatheEditorEdit extends JPatchCompoundEdit {
@@ -87,8 +88,16 @@ public class NewLatheEditorEdit extends JPatchCompoundEdit {
 			
 			// add controlpoint
 			cpts[cpidx] = new ControlPoint(0f, (float)dyr, (float)dxr);
+			if (iFill == 50 || iFill == 0) // correct spere & torus curvature
+				cpts[cpidx].setMagnitude(Functions.optimumCurvature(iFill == 0 ? iSegments/2 : iSegments));
 			if (cpidx > 0) 
-				cpts[cpidx].appendTo(cpts[cpidx-1]);
+				if (iFill == 0 && cpidx == iSegments/2) { // close torus loop
+					cpts[cpidx-1].setNext(cpts[0]);
+					cpts[0].setPrev(cpts[cpidx-1]);
+					cpts[0].setLoop(true);
+				} else 
+					cpts[cpidx].appendTo(cpts[cpidx-1]);
+			
 			if (bCloseTop && cpidx == 1)
 				cpts[1].setMode(ControlPoint.PEAK);
 			
