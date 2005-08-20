@@ -21,6 +21,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import jpatch.auxilary.Functions;
 import jpatch.boundary.MainFrame;
 import jpatch.entity.ControlPoint;
 import jpatch.entity.Curve;
@@ -87,8 +88,16 @@ public class NewLatheEditorEdit extends JPatchCompoundEdit {
 			
 			// add controlpoint
 			cpts[cpidx] = new ControlPoint(0f, (float)dyr, (float)dxr);
+			if (iFill == 50 || iFill == 0) // correct spere & torus curvature
+				cpts[cpidx].setMagnitude(Functions.optimumCurvature(iFill == 0 ? iSegments/2 : iSegments));
 			if (cpidx > 0) 
-				cpts[cpidx].appendTo(cpts[cpidx-1]);
+				if (iFill == 0 && cpidx == iSegments/2) { // close torus loop
+					cpts[cpidx-1].setNext(cpts[0]);
+					cpts[0].setPrev(cpts[cpidx-1]);
+					cpts[0].setLoop(true);
+				} else 
+					cpts[cpidx].appendTo(cpts[cpidx-1]);
+			
 			if (bCloseTop && cpidx == 1)
 				cpts[1].setMode(ControlPoint.PEAK);
 			
