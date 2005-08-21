@@ -161,7 +161,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	
 	public void setGhostRenderingEnabled(boolean enable) { }
 	
-	public void setTransparentRenderingEnabled(boolean enable) { }
+	public void setTransparentRenderingMode(int mode) { }
 	
 	public void setLightingEnable(boolean enable) { }
 	

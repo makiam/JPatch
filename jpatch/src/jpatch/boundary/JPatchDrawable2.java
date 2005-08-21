@@ -11,6 +11,9 @@ public interface JPatchDrawable2 {
 	public static final int DEPTH_BUFFER = 2;
 	public static final int ORTHOGONAL = 1;
 	public static final int PERSPECTIVE = 2;
+	public static final int OFF = 0;
+	public static final int TRANSPARENT = 1;
+	public static final int HIGHLIGHTS = 2;
 	
 	public Component getComponent();
 	public void display();
@@ -20,7 +23,7 @@ public interface JPatchDrawable2 {
 	public void setClipping(float near, float far);
 	public void setFocalLength(float focalLength);
 	public void setGhostRenderingEnabled(boolean enable);
-	public void setTransparentRenderingEnabled(boolean enable);
+	public void setTransparentRenderingMode(int mode);
 	public void setLightingEnable(boolean enable);
 	public void setColor(Color3f color);
 	public void setColor(Color4f color);

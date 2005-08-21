@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.12 2005/08/21 10:31:31 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.13 2005/08/21 14:39:10 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -194,183 +194,199 @@ public class Viewport2 {
 			Vector3f[] normals = new Vector3f[] {new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f()};
 			if (drawable.isLightingSupported())
 				drawable.setLightingEnable(true);
-			for (Patch patch = model.getFirstPatch(); patch != null; patch = patch.getNext()) {
-				if (!patch.isHidden() && patch.getMaterial() != null) {
-					if (drawable.isLightingSupported())
-						drawable.setMaterial(patch.getMaterial().getMaterialProperties());
-//					MaterialProperties materialProperties = patch.getMaterial().getMaterialProperties();
-//					if ((pass == 0 && !materialProperties.isOpaque()) || pass == 1 && materialProperties.isOpaque()) continue;
-					Point3f[] hashPatch = patch.coonsPatch();
-					ControlPoint[] acp = patch.getControlPoints();
-					for (int i = 0; i < hashPatch.length; i++) {
-						m4View.transform(hashPatch[i]);
-					}
-					
-					//if (hashPatch.length == 9) {
-					//	int apex = -1;
-					//	for (int i = 0; i < 6; i += 2) {
-					//		if (apex == -1 && acp[i].getHead().getStack().length > 2) apex = i;
-					//	}
-					//	if (apex != -1) {
-					//		//System.out.print("apex " + apex + "   " + "cp = " + acpPoint[apex] + "   ");
-					//		apex = apex / 2;
-					//		Patch.shift(hashPatch,apex * 3 + 3);
-					//	}
-					//}
-					
-//					if (!bFlat) {
-						
-						
-						
-						/* set up corner normals */
-						
-						int[] levels = new int[patch.getType()];
-						for (int i = 0; i < patch.getType(); levels[i++] = 0);
-						for (int i = 0, n = patch.getType(), pl = hashPatch.length, cn = n * 2; i < n; i++) {
-							ControlPoint targetHook = null;
-							boolean reversePatch = false;
-							int i2 = i * 2;
-							if (acp[i2].isTargetHook()) {
-								targetHook = acp[i2];
-								levels[(i + n - 1) % n] = 1;
-								//levels[i] = 1;
-								//System.out.println("1");
-							}
-							if (acp[(i2 + cn - 1) % cn].isTargetHook()) {
-								targetHook = acp[(i2 + cn - 1) % cn];
-								levels[i] = 1;
-								//System.out.println("2");
-							}
-							if (targetHook == null) {
-								int p = i * 3;
-								if (hashPatch[p].equals(hashPatch[(p + 3) % pl])) {
-									v3_a.sub(hashPatch[(p + 4) % pl], hashPatch[p]);
-								} else  {
-									v3_a.sub(hashPatch[(p + 1) % pl], hashPatch[p]);
-								}
-								if (hashPatch[p].equals(hashPatch[(p + pl - 3) % pl])) {
-									v3_b.sub(hashPatch[(p + pl - 4) % pl], hashPatch[p]);
-								} else {
-									v3_b.sub(hashPatch[(p + pl - 1) % pl], hashPatch[p]);
-								}
-								normals[i].cross(v3_a, v3_b);
-								normals[i].normalize();
-								//levels[i] = 1;
-							}
-							else {
-								ControlPoint hook = targetHook.getHead();
-								loop:
-								for (int ii = 0; ii < acp.length; ii++) {
-									if (acp[ii] == hook) {
-										int ip = (ii + 1) % acp.length;
-										int im = (ii + acp.length - 1) % acp.length;
-										reversePatch = (acp[ii].getNext() == acp[ip] || acp[ii].getPrev() == acp[im]);
-										break loop;
-									}
-								}
-								
-								Vector3f v3Dir = new Vector3f();
-								Point3f p = targetHook.getPosition();
-								if (targetHook.getNext() != null) v3Dir.sub(targetHook.getNext().getPosition(), p);
-								else v3Dir.sub(targetHook.getPrev().getPosition(), p);
-								Vector3f v3Start = new Vector3f(v3Dir);
-								Vector3f v3End = new Vector3f(v3Dir);
-								targetHook.computeTargetHookBorderTangents(v3Dir, v3Start, v3End);
-								ControlPoint cpStart = targetHook.getHead().getStart().getParentHook();
-								ControlPoint cpEnd = cpStart.getNext();
-								Point3f p0 = cpStart.getPosition();
-								Point3f p1 = cpStart.getOutTangent();
-								Point3f p2 = cpEnd.getInTangent();
-								Point3f p3 = cpEnd.getPosition();
-								Vector3f v = new Vector3f();
-								Vector3f n1 = new Vector3f();
-								Vector3f n2 = new Vector3f();
-								//System.out.println(cpStart + " " + cpEnd);
-								//System.out.println(p0 + " " + p1 + " " + p2 + " " + p3);
-								//System.out.println(v3Start + " " + v3End);
-								v.sub(p1, p0);
-								n1.cross(v3Start, v);
-								n1.normalize();
-								v.sub(p3, p2);
-								n2.cross(v3End, v);
-								n2.normalize();
-								//System.out.println(n1 + " " + n2);
-								Vector3f ncenter = JPatchDrawableZBuffer.interpolateNormal(n1, n2, p0, p1, p2, p3);
-								
-								//System.out.println(ncenter);
-								//System.out.println();
-								float hookpos = targetHook.getHead().getHookPos();
-								
-								//System.out.println(reversePatch + " " + hookpos);
-								
-								if (hookpos == 0.5f) v.set(ncenter);
-								else if (hookpos == 0.25f) v = JPatchDrawableZBuffer.interpolateNormal(n1, ncenter);
-								else v = JPatchDrawableZBuffer.interpolateNormal(ncenter, n2);
-								//else if (hookpos == 0.25f ^ !reversePatch) {
-								//	v = JPatchDrawableZBuffer.interpolateNormal(n1, ncenter);
-								//	System.out.println("n1");
-								//}
-								//else {
-								//	v = JPatchDrawableZBuffer.interpolateNormal(ncenter, n2);
-								//	System.out.println("n2");
-								//}
-								m4View.transform(v);
-								v.normalize();
-								if (reversePatch) v.scale(-1f);
-								normals[i].set(v);
-							}
-								
-								//System.out.println(i);
-								//normals[i].set(1,0,0);
-								//Point3f P = targethook.getPosition();
-								//m4View.transform(P);
-								//drawable.drawPoint3D(P,5);
-								//drawable.drawPoint3D(hashPatch[i * 3],7);
-							
-							//drawable.drawPoint3D(hashPatch[i], 2+i);
+			for (int pass = 0; pass < 3; pass++) {
+				drawable.setTransparentRenderingMode(pass);
+				pass:
+				for (Patch patch = model.getFirstPatch(); patch != null; patch = patch.getNext()) {
+					if (!patch.isHidden() && patch.getMaterial() != null) {
+						MaterialProperties mp = patch.getMaterial().getMaterialProperties();
+						if (pass == 0) {
+							if (mp.transmit > 0 || mp.filter > 0)
+								continue pass;
+						} else if (pass == 1) {
+							if (mp.transmit == 0 && mp.filter == 0)
+								continue pass;
+						} else if (pass == 2) {
+							if ((mp.transmit == 0 && mp.filter == 0) || mp.specular == 0)
+								continue pass;
 						}
-							///* set up corner normals */
-							//Vector3f[] cn = newNormals(4);
-							//v3_a.sub(ap3[1], ap3[0]);
-							//v3_b.sub(ap3[8], ap3[0]);
-							//cn[0].cross(v3_b, v3_a);
-							//v3_a.sub(ap3[4], ap3[3]);
-							//v3_b.sub(ap3[2], ap3[3]);
-							//cn[1].cross(v3_b, v3_a);
-							//v3_a.sub(ap3[7], ap3[6]);
-							//v3_b.sub(ap3[5], ap3[6]);
-							//cn[2].cross(v3_b, v3_a);
-							//cn[0].normalize();
-							//cn[1].normalize();
-							//cn[2].normalize();
-							//cn[3].set(cn[0]);
-						
-						//System.out.println(patch + " " + hashPatch.length);
-						//if (hashPatch.length == 12) {
 						if (drawable.isLightingSupported())
-							drawLitHashPatch(hashPatch, normals, levels);
-						else
-							//drawLitHashPatch(hashPatch, normals, levels);
-							drawShadedHashPatch(hashPatch, normals, levels, patch.getMaterial().getMaterialProperties());
+							drawable.setMaterial(patch.getMaterial().getMaterialProperties());
+	//					MaterialProperties materialProperties = patch.getMaterial().getMaterialProperties();
+	//					if ((pass == 0 && !materialProperties.isOpaque()) || pass == 1 && materialProperties.isOpaque()) continue;
+						Point3f[] hashPatch = patch.coonsPatch();
+						ControlPoint[] acp = patch.getControlPoints();
+						for (int i = 0; i < hashPatch.length; i++) {
+							m4View.transform(hashPatch[i]);
+						}
+						
+						//if (hashPatch.length == 9) {
+						//	int apex = -1;
+						//	for (int i = 0; i < 6; i += 2) {
+						//		if (apex == -1 && acp[i].getHead().getStack().length > 2) apex = i;
+						//	}
+						//	if (apex != -1) {
+						//		//System.out.print("apex " + apex + "   " + "cp = " + acpPoint[apex] + "   ");
+						//		apex = apex / 2;
+						//		Patch.shift(hashPatch,apex * 3 + 3);
+						//	}
 						//}
-//					} else {
-//						int[] levels = new int[patch.getType()];
-//						for (int i = 0; i < patch.getType(); levels[i++] = 0);
-//						for (int i = 0, n = patch.getType(), cn = n * 2; i < n; i++) {
-//							int i2 = i * 2;
-//							if (acp[i2].isTargetHook()) {
-//								levels[(i + n - 1) % n] = 1;
-//								//levels[i] = 1;
-//								//System.out.println("1");
-//							}
-//							if (acp[(i2 + cn - 1) % cn].isTargetHook()) {
-//								levels[i] = 1;
-//								//System.out.println("2");
-//							}
-//						}
-//						drawable.drawHashPatchFlat(hashPatch, levels, materialProperties);
-//					}
+						
+	//					if (!bFlat) {
+							
+							
+							
+							/* set up corner normals */
+							
+							int[] levels = new int[patch.getType()];
+							for (int i = 0; i < patch.getType(); levels[i++] = 0);
+							for (int i = 0, n = patch.getType(), pl = hashPatch.length, cn = n * 2; i < n; i++) {
+								ControlPoint targetHook = null;
+								boolean reversePatch = false;
+								int i2 = i * 2;
+								if (acp[i2].isTargetHook()) {
+									targetHook = acp[i2];
+									levels[(i + n - 1) % n] = 1;
+									//levels[i] = 1;
+									//System.out.println("1");
+								}
+								if (acp[(i2 + cn - 1) % cn].isTargetHook()) {
+									targetHook = acp[(i2 + cn - 1) % cn];
+									levels[i] = 1;
+									//System.out.println("2");
+								}
+								if (targetHook == null) {
+									int p = i * 3;
+									if (hashPatch[p].equals(hashPatch[(p + 3) % pl])) {
+										v3_a.sub(hashPatch[(p + 4) % pl], hashPatch[p]);
+									} else  {
+										v3_a.sub(hashPatch[(p + 1) % pl], hashPatch[p]);
+									}
+									if (hashPatch[p].equals(hashPatch[(p + pl - 3) % pl])) {
+										v3_b.sub(hashPatch[(p + pl - 4) % pl], hashPatch[p]);
+									} else {
+										v3_b.sub(hashPatch[(p + pl - 1) % pl], hashPatch[p]);
+									}
+									normals[i].cross(v3_a, v3_b);
+									normals[i].normalize();
+									//levels[i] = 1;
+								}
+								else {
+									ControlPoint hook = targetHook.getHead();
+									loop:
+									for (int ii = 0; ii < acp.length; ii++) {
+										if (acp[ii] == hook) {
+											int ip = (ii + 1) % acp.length;
+											int im = (ii + acp.length - 1) % acp.length;
+											reversePatch = (acp[ii].getNext() == acp[ip] || acp[ii].getPrev() == acp[im]);
+											break loop;
+										}
+									}
+									
+									Vector3f v3Dir = new Vector3f();
+									Point3f p = targetHook.getPosition();
+									if (targetHook.getNext() != null) v3Dir.sub(targetHook.getNext().getPosition(), p);
+									else v3Dir.sub(targetHook.getPrev().getPosition(), p);
+									Vector3f v3Start = new Vector3f(v3Dir);
+									Vector3f v3End = new Vector3f(v3Dir);
+									targetHook.computeTargetHookBorderTangents(v3Dir, v3Start, v3End);
+									ControlPoint cpStart = targetHook.getHead().getStart().getParentHook();
+									ControlPoint cpEnd = cpStart.getNext();
+									Point3f p0 = cpStart.getPosition();
+									Point3f p1 = cpStart.getOutTangent();
+									Point3f p2 = cpEnd.getInTangent();
+									Point3f p3 = cpEnd.getPosition();
+									Vector3f v = new Vector3f();
+									Vector3f n1 = new Vector3f();
+									Vector3f n2 = new Vector3f();
+									//System.out.println(cpStart + " " + cpEnd);
+									//System.out.println(p0 + " " + p1 + " " + p2 + " " + p3);
+									//System.out.println(v3Start + " " + v3End);
+									v.sub(p1, p0);
+									n1.cross(v3Start, v);
+									n1.normalize();
+									v.sub(p3, p2);
+									n2.cross(v3End, v);
+									n2.normalize();
+									//System.out.println(n1 + " " + n2);
+									Vector3f ncenter = JPatchDrawableZBuffer.interpolateNormal(n1, n2, p0, p1, p2, p3);
+									
+									//System.out.println(ncenter);
+									//System.out.println();
+									float hookpos = targetHook.getHead().getHookPos();
+									
+									//System.out.println(reversePatch + " " + hookpos);
+									
+									if (hookpos == 0.5f) v.set(ncenter);
+									else if (hookpos == 0.25f) v = JPatchDrawableZBuffer.interpolateNormal(n1, ncenter);
+									else v = JPatchDrawableZBuffer.interpolateNormal(ncenter, n2);
+									//else if (hookpos == 0.25f ^ !reversePatch) {
+									//	v = JPatchDrawableZBuffer.interpolateNormal(n1, ncenter);
+									//	System.out.println("n1");
+									//}
+									//else {
+									//	v = JPatchDrawableZBuffer.interpolateNormal(ncenter, n2);
+									//	System.out.println("n2");
+									//}
+									m4View.transform(v);
+									v.normalize();
+									if (reversePatch) v.scale(-1f);
+									normals[i].set(v);
+								}
+									
+									//System.out.println(i);
+									//normals[i].set(1,0,0);
+									//Point3f P = targethook.getPosition();
+									//m4View.transform(P);
+									//drawable.drawPoint3D(P,5);
+									//drawable.drawPoint3D(hashPatch[i * 3],7);
+								
+								//drawable.drawPoint3D(hashPatch[i], 2+i);
+							}
+								///* set up corner normals */
+								//Vector3f[] cn = newNormals(4);
+								//v3_a.sub(ap3[1], ap3[0]);
+								//v3_b.sub(ap3[8], ap3[0]);
+								//cn[0].cross(v3_b, v3_a);
+								//v3_a.sub(ap3[4], ap3[3]);
+								//v3_b.sub(ap3[2], ap3[3]);
+								//cn[1].cross(v3_b, v3_a);
+								//v3_a.sub(ap3[7], ap3[6]);
+								//v3_b.sub(ap3[5], ap3[6]);
+								//cn[2].cross(v3_b, v3_a);
+								//cn[0].normalize();
+								//cn[1].normalize();
+								//cn[2].normalize();
+								//cn[3].set(cn[0]);
+							
+							//System.out.println(patch + " " + hashPatch.length);
+							//if (hashPatch.length == 12) {
+							if (drawable.isLightingSupported())
+								drawLitHashPatch(hashPatch, normals, levels);
+							else
+								//drawLitHashPatch(hashPatch, normals, levels);
+								drawShadedHashPatch(hashPatch, normals, levels, patch.getMaterial().getMaterialProperties());
+							//}
+	//					} else {
+	//						int[] levels = new int[patch.getType()];
+	//						for (int i = 0; i < patch.getType(); levels[i++] = 0);
+	//						for (int i = 0, n = patch.getType(), cn = n * 2; i < n; i++) {
+	//							int i2 = i * 2;
+	//							if (acp[i2].isTargetHook()) {
+	//								levels[(i + n - 1) % n] = 1;
+	//								//levels[i] = 1;
+	//								//System.out.println("1");
+	//							}
+	//							if (acp[(i2 + cn - 1) % cn].isTargetHook()) {
+	//								levels[i] = 1;
+	//								//System.out.println("2");
+	//							}
+	//						}
+	//						drawable.drawHashPatchFlat(hashPatch, levels, materialProperties);
+	//					}
+					}
 				}
+				drawable.setTransparentRenderingMode(0);
 			}
 		}
 		if (drawable.isLightingSupported())
