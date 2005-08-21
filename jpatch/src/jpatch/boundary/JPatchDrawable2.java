@@ -24,7 +24,7 @@ public interface JPatchDrawable2 {
 	public void setFocalLength(float focalLength);
 	public void setGhostRenderingEnabled(boolean enable);
 	public void setTransparentRenderingMode(int mode);
-	public void setLightingEnable(boolean enable);
+	public void setLightingEnabled(boolean enable);
 	public void setColor(Color3f color);
 	public void setColor(Color4f color);
 	public void setMaterial(MaterialProperties mp);

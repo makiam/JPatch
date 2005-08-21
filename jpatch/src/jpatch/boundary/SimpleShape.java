@@ -246,7 +246,7 @@ public class SimpleShape {
 		else
 			doTransform(view);
 		if (drawable.isLightingSupported()) {
-			drawable.setLightingEnable(true);
+			drawable.setLightingEnabled(true);
 			drawable.setMaterial(mp);
 		}
 		int t = 0;
@@ -274,6 +274,6 @@ public class SimpleShape {
 			}
 		}
 		if (drawable.isLightingSupported())
-			drawable.setLightingEnable(false);
+			drawable.setLightingEnabled(false);
 	}
 }

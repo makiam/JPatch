@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.13 2005/08/21 14:39:10 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.14 2005/08/21 18:02:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -55,7 +55,7 @@ public class Viewport2 {
 	private Matrix4f m4View = new Matrix4f();
 	private JPatchTool tool;
 	
-	private static float fFlatness = 3f;
+	private static float fFlatness = 5f;
 	//private static float fFlatnessSquared = fFlatness * fFlatness;
 	private static int iMaxSubdiv = 10;
 	
@@ -193,7 +193,7 @@ public class Viewport2 {
 		if (viewDef.renderPatches() && (drawable.isShadingSupported() || drawable.isLightingSupported())) {
 			Vector3f[] normals = new Vector3f[] {new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f()};
 			if (drawable.isLightingSupported())
-				drawable.setLightingEnable(true);
+				drawable.setLightingEnabled(true);
 			for (int pass = 0; pass < 3; pass++) {
 				drawable.setTransparentRenderingMode(pass);
 				pass:
@@ -362,6 +362,8 @@ public class Viewport2 {
 							//System.out.println(patch + " " + hashPatch.length);
 							//if (hashPatch.length == 12) {
 							if (drawable.isLightingSupported())
+								//((JPatchDrawableGL) drawable).setReflectionsEnabled(true);
+								//((JPatchDrawableGL) drawable).setLightingEnabled(false);
 								drawLitHashPatch(hashPatch, normals, levels);
 							else
 								//drawLitHashPatch(hashPatch, normals, levels);
@@ -390,7 +392,7 @@ public class Viewport2 {
 			}
 		}
 		if (drawable.isLightingSupported())
-			drawable.setLightingEnable(false);
+			drawable.setLightingEnabled(false);
 	}
 	
 	private void drawCurve(Curve curve) {
@@ -405,9 +407,9 @@ public class Viewport2 {
 					m4View.transform(p1);
 					m4View.transform(p2);
 					m4View.transform(p3);
-					drawCurveSegment(p0, p1, p2, p3, false);
+					drawCurveSegment(p0, p1, p2, p3, false, 0);
 				} else {
-					drawCurveSegment(cp.getPosition(), cp.getOutTangent(), cp.getNext().getInTangent(), cp.getNext().getPosition(), false);
+					drawCurveSegment(cp.getPosition(), cp.getOutTangent(), cp.getNext().getInTangent(), cp.getNext().getPosition(), false, 0);
 				}
 			}
 		}
@@ -427,8 +429,8 @@ public class Viewport2 {
 //		drawable.drawLine(pa, p3);
 //	}
 	
-	private void drawCurveSegment(Point3f p3A, Point3f p3B, Point3f p3C, Point3f p3D, boolean simple) {
-		if (subdiv(p3A, p3B, p3C, p3D, simple) >= fFlatness) {
+	private void drawCurveSegment(Point3f p3A, Point3f p3B, Point3f p3C, Point3f p3D, boolean simple, int level) {
+		if (level < iMaxSubdiv && subdiv(p3A, p3B, p3C, p3D, simple) >= fFlatness) {
 			Point3f p0 = new Point3f(p3A);
 			Point3f p1 = new Point3f(p3B);
 			Point3f p2 = new Point3f(p3C);
@@ -439,8 +441,8 @@ public class Viewport2 {
 			Point3f p7 = new Point3f();
 			deCasteljauSplit(p0, p1, p2, p3, p4, p5, p6, p7);
 			
-			drawCurveSegment(p0, p1, p2, p3, true);
-			drawCurveSegment(p4, p5, p6, p7, true);
+			drawCurveSegment(p0, p1, p2, p3, true, ++level);
+			drawCurveSegment(p4, p5, p6, p7, true, level);
 		} else {
 			drawable.drawLine(p3A, p3D);
 		}
