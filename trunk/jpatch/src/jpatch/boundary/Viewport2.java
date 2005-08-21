@@ -190,7 +190,7 @@ public class Viewport2 {
 				}
 			}
 		}
-		if (viewDef.renderPatches()) {
+		if (viewDef.renderPatches() && (drawable.isShadingSupported() || drawable.isLightingSupported())) {
 			Vector3f[] normals = new Vector3f[] {new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f()};
 			if (drawable.isLightingSupported())
 				drawable.setLightingEnable(true);
