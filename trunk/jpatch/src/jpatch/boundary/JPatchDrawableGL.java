@@ -14,6 +14,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	private GLDrawable glDrawable;
 	private volatile GL gl;
 	private int iGlMode = -1;
+	private int iTransparentMode = OFF;
 	
 	private boolean bPointAsQuad = true;
 	private boolean bPerspective = false;
@@ -636,7 +637,35 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	
 	public void setGhostRenderingEnabled(boolean enable) { }
 	
-	public void setTransparentRenderingEnabled(boolean enable) { }
+	public void setTransparentRenderingMode(int mode) {
+		iTransparentMode = mode;
+		if (iGlMode != -1) {
+			iGlMode = -1;
+			gl.glEnd();
+		}
+		switch (mode) {
+			case OFF: {
+				gl.glDisable(GL.GL_BLEND);
+				gl.glDepthMask(true);		// make depth-buffer readwrite
+				gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1);
+			}
+			break;
+			case TRANSPARENT: {
+				gl.glEnable(GL.GL_BLEND);
+				gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+				gl.glDepthMask(false);		// make depth-buffer readonly
+				gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 0);
+			}
+			break;
+			case HIGHLIGHTS: {
+				gl.glEnable(GL.GL_BLEND);
+				gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE);
+				gl.glDepthMask(false);		// make depth-buffer readonly
+				gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 0);
+			}
+			break;
+		}
+	}
 	
 	public void setLightingEnable(boolean enable) {
 		if (enable) {
@@ -659,18 +688,37 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void setMaterial(MaterialProperties mp) {
-		gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, new float[] { mp.red * mp.ambient, mp.green * mp.ambient, mp.blue * mp.ambient, 1.0f } );
-		gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[] { mp.red * mp.diffuse, mp.green * mp.diffuse, mp.blue * mp.diffuse, 1.0f } );
-		gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[] {
-				mp.specular * (1 - mp.metallic + mp.metallic * mp.red),
-				mp.specular * (1 - mp.metallic + mp.metallic * mp.green),
-				mp.specular * (1 - mp.metallic + mp.metallic * mp.blue),
-				1.0f });
-		gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[] { 1f / mp.roughness } );
-//		gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, new float[] { 0.0f, 0.0f, 0.0f, 1.0f } );
-//		gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[] { 1.0f, 0.0f, 0.0f, 1.0f } );
-//		gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[] { 1.0f, 1.0f, 1.0f, 1.0f } );
-//		gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[] { 50.0f } );
+		switch (iTransparentMode) {
+			case OFF: {
+				gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, new float[] { mp.red * mp.ambient, mp.green * mp.ambient, mp.blue * mp.ambient, 1 } );
+				gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[] { mp.red * mp.diffuse, mp.green * mp.diffuse, mp.blue * mp.diffuse, 1 } );
+				gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[] {
+						mp.specular * (1 - mp.metallic + mp.metallic * mp.red),
+						mp.specular * (1 - mp.metallic + mp.metallic * mp.green),
+						mp.specular * (1 - mp.metallic + mp.metallic * mp.blue),
+						1.0f });
+				gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[] { 1f / mp.roughness } );
+			}
+			break;
+			case TRANSPARENT: {
+				gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, new float[] { mp.red * mp.ambient, mp.green * mp.ambient, mp.blue * mp.ambient, 1 - mp.transmit - mp.filter } );
+				gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[] { mp.red * mp.diffuse, mp.green * mp.diffuse, mp.blue * mp.diffuse, 1 - mp.transmit - mp.filter } );
+				gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
+				gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[] { 1f / mp.roughness } );
+			}
+			break;
+			case HIGHLIGHTS: {
+				gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, new float[] { 0, 0, 0, 1 } );
+				gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[] { 0, 0, 0, 1 } );
+				gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[] {
+						mp.specular * (1 - mp.metallic + mp.metallic * mp.red),
+						mp.specular * (1 - mp.metallic + mp.metallic * mp.green),
+						mp.specular * (1 - mp.metallic + mp.metallic * mp.blue),
+						1.0f });
+				gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[] { 1f / mp.roughness } );
+			}
+			break;
+		}
 	}
 	
 	public void setTransform(Matrix4f transform) {
