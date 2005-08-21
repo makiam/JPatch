@@ -163,7 +163,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	
 	public void setTransparentRenderingMode(int mode) { }
 	
-	public void setLightingEnable(boolean enable) { }
+	public void setLightingEnabled(boolean enable) { }
 	
 	public void setColor(Color3f color) {
 		iColor = color.get().getRGB();
