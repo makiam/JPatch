@@ -1,3 +1,6 @@
+/*
+ * $Id: LatheEditorAction.java,v 1.2 2005/08/21 15:32:08 lois Exp $
+ */
 package jpatch.boundary.action;
 
 import java.awt.event.ActionEvent;
@@ -8,9 +11,14 @@ import javax.swing.ImageIcon;
 
 import jpatch.boundary.KeyMapping;
 import jpatch.boundary.MainFrame;
-import jpatch.control.edit.JPatchCompoundEdit;
-import jpatch.control.edit.NewLatheEditorEdit;
+import jpatch.boundary.dialog.LatheEditorDialog;
 
+/**
+ * 
+ * @author lois
+ * @version $Revision: 1.2 $
+ *
+ */
 public final class LatheEditorAction extends AbstractAction {
 	/**
 	 * 
@@ -21,7 +29,7 @@ public final class LatheEditorAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("add sphere"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		MainFrame.getInstance().getUndoManager().addEdit(new NewLatheEditorEdit());
+		MainFrame.getInstance().getUndoManager().addEdit((new LatheEditorDialog(MainFrame.getInstance())).getEdit());
 		MainFrame.getInstance().getJPatchScreen().update_all();
 	}
 }
