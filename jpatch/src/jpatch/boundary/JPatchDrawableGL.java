@@ -835,16 +835,16 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	
 	public void drawPoint(Point3f p) {
 		enableRasterMode(false);
-		if (bPointAsQuad) {
+		if (bPointAsQuad) {				// FIXME
 			if (iGlMode != -1) {
 				gl.glEnd();
 				iGlMode = -1;
 			}
 			gl.glBegin(GL.GL_QUADS);
-			gl.glVertex3f(p.x - fPointSize, p.y - fPointSize, p.z);
-			gl.glVertex3f(p.x + fPointSize, p.y - fPointSize, p.z);
-			gl.glVertex3f(p.x + fPointSize, p.y + fPointSize, p.z);
-			gl.glVertex3f(p.x - fPointSize, p.y + fPointSize, p.z);
+			gl.glVertex3f(p.x - fPointSize, p.y - fPointSize, p.z - 1);
+			gl.glVertex3f(p.x + fPointSize, p.y - fPointSize, p.z - 1);
+			gl.glVertex3f(p.x + fPointSize, p.y + fPointSize, p.z - 1);
+			gl.glVertex3f(p.x - fPointSize, p.y + fPointSize, p.z - 1);
 			gl.glEnd();
 		} else {
 			if (iGlMode != GL.GL_POINTS) {
@@ -852,7 +852,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 				iGlMode = GL.GL_POINTS;
 				gl.glBegin(iGlMode);
 			}
-			gl.glVertex3f(p.x, p.y, p.z);
+			gl.glVertex3f(p.x, p.y, p.z - 1);
 		}
 	}
 	

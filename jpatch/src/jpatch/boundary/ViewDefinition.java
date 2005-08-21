@@ -176,13 +176,13 @@ implements ComponentListener {
 		p3Lock = lock;
 		if (p3Lock != null) {
 			Point3f p3 = new Point3f(p3Lock);
-			Matrix4f m = new Matrix4f(m4View);
-			m.invert();
+			Matrix3f m = new Matrix3f();
+			m4View.getRotationScale(m);
+			m.setScale(1);
 			m.transform(p3);
-			float dimX = getWidth() / 2f;
-			float dimY = getHeight() /2f;
-			//moveView(-p3.x / dimX + 1, (dimY - p3.y) / dimX, false);
-			moveView(p3.x, p3.y, false);
+			fTranslateX = -p3.x;
+			fTranslateY = -p3.y;
+			computeMatrix();
 		}
 		drawable.display();
 	}
@@ -425,10 +425,12 @@ implements ComponentListener {
 		if (p3Lock != null) {
 			computeMatrix();
 			Point3f p3 = new Point3f(p3Lock);
-			m4View.transform(p3);
-			float dimX = getWidth() / 2f;
-			float dimY = getHeight() /2f;
-			moveView(-p3.x / dimX + 1, (dimY - p3.y) / dimX, false);
+			Matrix3f m = new Matrix3f();
+			m4View.getRotationScale(m);
+			m.setScale(1);
+			m.transform(p3);
+			fTranslateX = -p3.x;
+			fTranslateY = -p3.y;
 		}
 		computeMatrix();
 //		((JPatchCanvas)viewport).clearBackground();
