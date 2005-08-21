@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.11 2005/08/18 20:33:46 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.12 2005/08/21 10:31:31 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -190,7 +190,7 @@ public class Viewport2 {
 				}
 			}
 		}
-		if (viewDef.renderPatches()) {
+		if (viewDef.renderPatches() && (drawable.isShadingSupported() || drawable.isLightingSupported())) {
 			Vector3f[] normals = new Vector3f[] {new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f()};
 			if (drawable.isLightingSupported())
 				drawable.setLightingEnable(true);

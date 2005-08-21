@@ -250,7 +250,6 @@ public class SimpleShape {
 			drawable.setMaterial(mp);
 		}
 		int t = 0;
-		System.out.println();
 		for (int i = 0; i < aiNormalIndices.length; i++) {
 			if (drawable.isLightingSupported()) {
 				drawable.drawTriangle(
