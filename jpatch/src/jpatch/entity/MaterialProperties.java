@@ -157,6 +157,10 @@ public class MaterialProperties {
 		conserveEnergy = m.conserveEnergy;
 	}
 	
+	public float getAlpha() {
+		return 1 - Math.max(transmit, filter);
+	}
+	
 	public boolean isOpaque() {
 		return (transmit == 0 && filter == 0);
 	}
