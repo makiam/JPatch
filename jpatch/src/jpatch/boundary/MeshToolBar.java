@@ -60,7 +60,8 @@ public final class MeshToolBar extends JToolBar {
 	public MeshToolBar(ButtonGroup action) {
 		//super("Mesh Panel",SwingConstants.VERTICAL);
 		setFloatable(false);
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		setOrientation(JToolBar.VERTICAL);
+		//setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		
 		/* Buttons */
 		

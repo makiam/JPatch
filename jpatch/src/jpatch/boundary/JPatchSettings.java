@@ -229,7 +229,7 @@ public class JPatchSettings {
 		mapDefaults.put("rendermanPath", "");
 		mapDefaults.put("rotoscopePath", "");
 		
-		mapDefaults.put("lookAndFeel", UIManager.getCrossPlatformLookAndFeelClassName());
+		mapDefaults.put("lookAndFeel", "jpatch.boundary.laf.SmoothLookAndFeel");
 		
 		mapDefaults.put("renderer", new Integer(RENDERER_POVRAY));
 		mapDefaults.put("rendererBackgroundColor",new Color(0x7f,0x7f,0x7f));
@@ -526,7 +526,7 @@ public class JPatchSettings {
 	
 	public void loadDefaults() {
 		//>>>>> test-add
-		astrKeyMap = getStringDefault("keyMap").split("\\|\\|");
+//		astrKeyMap = getStringDefault("keyMap").split("\\|\\|");
 		//<<<<< test-add
 		bFirstStart = getBooleanDefault("firstStart");
 		

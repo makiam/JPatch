@@ -1,12 +1,8 @@
 package jpatch.boundary;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 //import java.beans.*;
 import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
 import javax.swing.tree.*;
 
 import jpatch.*;
@@ -15,6 +11,7 @@ import jpatch.boundary.tools.*;
 //	import jpatch.boundary.mouse.*;		//remove
 import jpatch.control.*;
 import jpatch.control.edit.*;
+import jpatch.boundary.laf.SmoothLookAndFeel;
 import jpatch.boundary.selection.*;
 
 public final class MainFrame extends JFrame {
@@ -62,26 +59,18 @@ public final class MainFrame extends JFrame {
 			INSTANCE = this;
 			
 			try {
-				//UIManager.setLookAndFeel(JPatchSettings.getInstance().strPlafClassName);
-				UIManager.setLookAndFeel("jpatch.boundary.laf.SmoothLookAndFeel");
+				String plaf = JPatchSettings.getInstance().strPlafClassName;
+				if (plaf.equals("jpatch.boundary.laf.SmoothLookAndFeel"))
+					UIManager.setLookAndFeel(new SmoothLookAndFeel());
+				else
+					UIManager.setLookAndFeel(plaf);
+				//UIManager.setLookAndFeel("jpatch.boundary.laf.SmoothLookAndFeel");
 				//PlafOptions.setAntialiasingEnabled(true);
 				//PlafOptions.setCurrentTheme(ThemeFactory.GOLD);
 				//PlafOptions.setDefaultMenuItemIconSize(new Dimension(15, 15));
 				//SwingUtilities.updateComponentTreeUI(this);
 				//UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-				UIDefaults def = UIManager.getLookAndFeelDefaults();
-				ArrayList list = Collections.list(def.keys());
-				Collections.sort(list);
-				for(Iterator it = list.iterator(); it.hasNext(); ) {
-					String key = (String) it.next();
-					if (key.endsWith(".font")) {
-						FontUIResource f = (FontUIResource) def.get(key);
-						def.put(key, new FontUIResource("Sans-Serif", Font.PLAIN, f.getSize()));
-						//fontUIResource.setStyle(FontUIResource.PLAIN);
-						//System.out.println(key +" " + def.get(key));
-					}
-					def.put("ToggleButton.rollover", new Boolean(true));
-				}
+				
 				
 			} catch (Exception e) {
 				e.printStackTrace();
