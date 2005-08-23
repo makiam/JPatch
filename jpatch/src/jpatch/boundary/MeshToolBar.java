@@ -5,7 +5,7 @@ import javax.swing.*;
 import jpatch.boundary.action.*;
 import jpatch.boundary.tools.*;
 
-public final class MeshToolBar extends JPanel {
+public final class MeshToolBar extends JToolBar {
 	
 	/**
 	 * 
@@ -59,7 +59,7 @@ public final class MeshToolBar extends JPanel {
 	
 	public MeshToolBar(ButtonGroup action) {
 		//super("Mesh Panel",SwingConstants.VERTICAL);
-		
+		setFloatable(false);
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		
 		/* Buttons */
