@@ -21,7 +21,7 @@ import java.util.*;
  * @author Marcel Offermans
  */
 public class SmoothLookAndFeel extends MetalLookAndFeel {
-
+	
     protected static final String PACKAGE = "jpatch.boundary.laf.";
 
 //    SmoothLookAndFeel(boolean antiAlias) {
@@ -46,8 +46,7 @@ public class SmoothLookAndFeel extends MetalLookAndFeel {
         // first line doesn't work, second does, third is a workaround
 //		Object buttonBorder = new UIDefaults.ProxyLazyValue("smooth.metal.SmoothBorders", "getButtonBorder");
 //		Object buttonBorder = new UIDefaults.ProxyLazyValue("javax.swing.plaf.metal.MetalBorders", "getButtonBorder");
-        Object buttonBorder = SmoothBorders.getButtonBorder();
-
+        
 //        Object buttonBorder = new BorderUIResource.CompoundBorderUIResource(new EtchedBorder(), new BasicBorders.MarginBorder());
         
         // see above, don't use the ProxyLazyValue construction for now, because it
@@ -57,12 +56,13 @@ public class SmoothLookAndFeel extends MetalLookAndFeel {
         // create a map of all the features we want to modify and install them
         Object classMap[] =
                 {
-                    "Button.border", buttonBorder,
-                    "ToggleButton.border", buttonBorder,
-                    "ToolBar.rolloverBorder", buttonBorder,
-                    "ToolBar.nonrolloverBorder", buttonBorder,
+                    "Button.border", SmoothBorders.buttonBorder,
+                    "ToggleButton.border", SmoothBorders.buttonBorder,
+                    "ToolBar.rolloverBorder", SmoothBorders.buttonBorder,
+                    "ToolBar.nonrolloverBorder", SmoothBorders.buttonBorder,
                     "RadioButton.icon", radioButtonIcon,
-
+                    "TextField.border", SmoothBorders.textFieldBorder,
+                    
 // add in dialog icons
                     "OptionPane.errorIcon", LookAndFeel.makeIcon(MetalLookAndFeel.class, "icons/Error.gif"),
                     "OptionPane.informationIcon", LookAndFeel.makeIcon(MetalLookAndFeel.class, "icons/Inform.gif"),
@@ -87,6 +87,7 @@ public class SmoothLookAndFeel extends MetalLookAndFeel {
 				//System.out.println(key +" " + def.get(key));
 			}
 		}
+		uidefaults.put("ToggleButton.rollover", new Boolean(true));
     }
 
     protected void initClassDefaults(UIDefaults uidefaults) {

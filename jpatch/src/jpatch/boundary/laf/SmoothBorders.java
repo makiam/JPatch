@@ -16,8 +16,9 @@ import java.awt.geom.*;
  * similar to what's done in UI delegates.
  */
 public class SmoothBorders extends MetalBorders {
-    private static Border buttonBorder;
-
+    public final static Border buttonBorder = createBorder(new ButtonBorder());
+    public final static Border textFieldBorder = createBorder(new TextFieldBorder());
+    
 //    public static class ButtonBorder extends MetalBorders.ButtonBorder {
 //        public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
 //            SmoothUtilities.configureGraphics(g);
@@ -26,38 +27,47 @@ public class SmoothBorders extends MetalBorders {
 //    }
 
     public static class ButtonBorder extends MetalBorders.ButtonBorder {
-    	
+    	protected static Insets borderInsets = new Insets( 2, 2, 2, 2 );
     	public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
     		SmoothUtilities.configureGraphics(g);
     		AbstractButton button = (AbstractButton) c;
     		ButtonModel model = button.getModel();
-    		Graphics2D g2 = (Graphics2D) g;
     		if (model.isRollover()) {
-    			g2.setColor(Theme.rolloverBorderColor);
-    			g2.draw(new RoundRectangle2D.Float(x + 2, y + 2, w - 5, h - 5, 5, 5));
-    			g2.setColor(new Color(0, 0, 0, 0.5f));
-    			g2.draw(new RoundRectangle2D.Float(x + 1, y + 1, w - 3, h - 3, 7, 7));
-//    			Area area = new Area();
-//    			area.add(new Area(new RoundRectangle2D.Float(x, y, w, h, 9, 9)));
-//    			area.subtract(new Area(new RoundRectangle2D.Float(x + 3, y + 3, w - 6, h - 6, 6, 6)));
-//    			g2.fill(area);
-//    			g2.setColor(c.getBackground().darker().darker());
-//    			g2.draw(new RoundRectangle2D.Float(x + 1, y + 1, w - 3, h - 3, 7, 7));
-    			
+    			g.setColor(Theme.rolloverBorderColor);
+    			g.drawRoundRect(x + 1, y + 1, w - 3, h - 3, 7, 7);
+    			g.setColor(new Color(0, 0, 0, 0.5f));
+    			g.drawRoundRect(x, y, w - 1, h - 1, 9, 9);
     		} else if (model.isSelected() || model.isPressed()){
-    			g2.setColor(new Color(0, 0, 0, 0.5f));
-    			g2.draw(new RoundRectangle2D.Float(x + 1, y + 1, w - 3, h - 3, 7, 7));
+    			g.setColor(new Color(0, 0, 0, 0.5f));
+    			g.drawRoundRect(x, y, w - 1, h - 1, 9, 9);
     		} else if (!(c.getParent() instanceof JToolBar)) {
-    			g2.setColor(new Color(0, 0, 0, 0.25f));
-    			g2.draw(new RoundRectangle2D.Float(x + 1, y + 1, w - 3, h - 3, 7, 7));
+    			g.setColor(new Color(0, 0, 0, 0.25f));
+    			g.drawRoundRect(x, y, w - 1, h - 1, 9, 9);
     		}
+    	}
+    	
+    	public Insets getBorderInsets( Component c ) {
+            return borderInsets;
+        }
+    	
+        public Insets getBorderInsets(Component c, Insets newInsets) {
+        	newInsets.top = borderInsets.top;
+        	newInsets.left = borderInsets.left;
+        	newInsets.bottom = borderInsets.bottom;
+        	newInsets.right = borderInsets.right;
+        	return newInsets;
+        }
+    }
+    
+    public static class TextFieldBorder extends MetalBorders.TextFieldBorder {
+    	public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
+    		SmoothUtilities.configureGraphics(g);
+    		g.setColor(new Color(0, 0, 0, 0.5f));
+    		g.drawRoundRect(x, y, w - 1, h - 1, 7, 7);
     	}	
     }
     
-    public static Border getButtonBorder() {
-        if (buttonBorder == null) {
-            buttonBorder = new BorderUIResource.CompoundBorderUIResource(new ButtonBorder(), new BasicBorders.MarginBorder());
-        }
-        return buttonBorder;
+    private static Border createBorder(Border border) {
+    	return new BorderUIResource.CompoundBorderUIResource(border, new BasicBorders.MarginBorder());
     }
 }

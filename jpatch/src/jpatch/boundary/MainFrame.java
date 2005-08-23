@@ -3,6 +3,8 @@ package jpatch.boundary;
 import java.awt.*;
 //import java.beans.*;
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.metal.OceanTheme;
 import javax.swing.tree.*;
 
 import jpatch.*;
@@ -12,6 +14,7 @@ import jpatch.boundary.tools.*;
 import jpatch.control.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.laf.SmoothLookAndFeel;
+import jpatch.boundary.laf.SmoothTheme;
 import jpatch.boundary.selection.*;
 
 public final class MainFrame extends JFrame {
@@ -60,16 +63,14 @@ public final class MainFrame extends JFrame {
 			
 			try {
 				String plaf = JPatchSettings.getInstance().strPlafClassName;
+				if (plaf.endsWith("MetalLookAndFeel"))
+					MetalLookAndFeel.setCurrentTheme(new OceanTheme());
+				else if (plaf.endsWith("SmoothLookAndFeel"))
+					SmoothLookAndFeel.setCurrentTheme(new SmoothTheme());
 				if (plaf.equals("jpatch.boundary.laf.SmoothLookAndFeel"))
 					UIManager.setLookAndFeel(new SmoothLookAndFeel());
 				else
 					UIManager.setLookAndFeel(plaf);
-				//UIManager.setLookAndFeel("jpatch.boundary.laf.SmoothLookAndFeel");
-				//PlafOptions.setAntialiasingEnabled(true);
-				//PlafOptions.setCurrentTheme(ThemeFactory.GOLD);
-				//PlafOptions.setDefaultMenuItemIconSize(new Dimension(15, 15));
-				//SwingUtilities.updateComponentTreeUI(this);
-				//UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 				
 				
 			} catch (Exception e) {
