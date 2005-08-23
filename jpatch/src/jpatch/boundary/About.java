@@ -62,6 +62,8 @@ public class About extends JDialog implements ActionListener {
 			"RenderMan&reg; is a registered trademark of Pixar.</font></div><br>" +
 			"<hr><p>JPatch now includes <b>Inyo</b>, a renderer written by <i>David Cuny</i>. " +
 			"See <a href='http://inyo.sourceforge.net'>http://inyo.sourceforge.net</a></p><br>" +
+			"The JPatch Look And Feel is based on <b>SmoothMetal</b> by <i>James Shiell</i></b>. " +
+			"See <a href='http://smoothmetal.sourceforge.net/'>http://smoothmetal.sourceforge.net/</a>" +
 			"<hr><p>JPatch uses and contains binary distributions of:" +
 			"<ul>" +
 			"<li>An <b>'unofficial' Java3D vecmath package</b> by <i>Kenji Hirabane</i>. " +
@@ -73,13 +75,10 @@ public class About extends JDialog implements ActionListener {
 			"<li><b>Buoy</b> by <i>Peter Eastman</i>. " +
 //			"See <a href='http://buoy.sourceforge.net'>http://buoy.sourceforge.net</a></li>" +
 //			"<li><b>Inyo</b> by <i>David Cuny</i>. "+
-			"See <a href='http://inyo.sourceforge.net'>http://inyo.sourceforge.net</a></li>" +
+			"See <a href='http://bouy.sourceforge.net'>http://bouy.sourceforge.net</a></li>" +
 			"<li><b>The JOGL Java bindings for OpenGL</b>. "+
 			"See <a href='https://jogl.dev.java.net/'>https://jogl.dev.java.net/</a></li>" +
-			"<li>The JPatch Look And Feel is based on <b>SmoothMetal</b> by <i>James Shiell</i></b>. "+
-			"See <a href='http://smoothmetal.sourceforge.net/'>http://smoothmetal.sourceforge.net/</a></li>" +
-			"</ul>" + 
-			"The packages listed above have not been modified. For source code " +
+			"</ul>The packages listed above have not been modified. For source code " +
 			"or detailed licensing information please follow the links above. " +
 			"I'd like to thank the authors of these great packages for making them freely available!</p>" +
 			"</html>";
