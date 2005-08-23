@@ -5,6 +5,8 @@ import javax.swing.plaf.basic.*;
 import javax.swing.plaf.*;
 import javax.swing.*;
 import javax.swing.border.*;
+import java.awt.*;
+import java.util.*;
 
 /**
  * Smooth Metal Look And Feel. An enhanced version of the standard
@@ -22,6 +24,22 @@ public class SmoothLookAndFeel extends MetalLookAndFeel {
 
     protected static final String PACKAGE = "jpatch.boundary.laf.";
 
+//    SmoothLookAndFeel(boolean antiAlias) {
+//    	//SmoothUtilities.setAntialias(antiAlias);
+//    }
+//    
+//    public static class AntiAlias extends SmoothLookAndFeel {
+//    	public AntiAlias() {
+//    		super(true);
+//    	}
+//    }
+//    
+//    public static class Standard extends SmoothLookAndFeel {
+//    	public Standard() {
+//    		super(false);
+//    	}
+//    }
+    
     protected void initComponentDefaults(UIDefaults uidefaults) {
         super.initComponentDefaults(uidefaults);
 
@@ -50,8 +68,25 @@ public class SmoothLookAndFeel extends MetalLookAndFeel {
                     "OptionPane.informationIcon", LookAndFeel.makeIcon(MetalLookAndFeel.class, "icons/Inform.gif"),
                     "OptionPane.warningIcon", LookAndFeel.makeIcon(MetalLookAndFeel.class, "icons/Warn.gif"),
                     "OptionPane.questionIcon", LookAndFeel.makeIcon(MetalLookAndFeel.class, "icons/Question.gif"),
+                    
+                    "ToolTip.background", new ColorUIResource(new Color(1.0f, 1.0f, 0.75f)),
+                    "ToolTip.foreground", new ColorUIResource(Color.BLACK),
+                    "ToolTip.border", new BorderUIResource(new LineBorder(Color.BLACK)),
+                    "ToolTip.backgroundInactive", new ColorUIResource(new Color(0.7f, 0.7f, 0.7f)),
+                    "ToolTip.foregroundInactive", new ColorUIResource(new Color(0.3f, 0.3f, 0.3f)),
+                    "ToolTip.borderInactive", new BorderUIResource(new LineBorder(new Color(0.3f, 0.3f, 0.3f))),
                 };
         uidefaults.putDefaults(classMap);
+        ArrayList list = Collections.list(uidefaults.keys());
+		for(Iterator it = list.iterator(); it.hasNext(); ) {
+			String key = (String) it.next();
+			if (key.endsWith(".font")) {
+				FontUIResource f = (FontUIResource) uidefaults.get(key);
+				uidefaults.put(key, new FontUIResource("Sans-Serif", Font.PLAIN, f.getSize()));
+				//fontUIResource.setStyle(FontUIResource.PLAIN);
+				//System.out.println(key +" " + def.get(key));
+			}
+		}
     }
 
     protected void initClassDefaults(UIDefaults uidefaults) {

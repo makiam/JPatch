@@ -2,6 +2,7 @@ package jpatch.boundary;
 
 import javax.swing.*;
 import jpatch.boundary.action.*;
+import jpatch.boundary.laf.SmoothLookAndFeel;
 
 public final class MainMenu extends JMenuBar {
 	/**
@@ -166,18 +167,42 @@ public final class MainMenu extends JMenuBar {
 		
 		menuPlaf = new JMenu("Look And Feel");
 		ButtonGroup bgPlaf = new ButtonGroup();
-		UIManager.LookAndFeelInfo[] aLookAndFeelInfo = UIManager.getInstalledLookAndFeels();
-		for (int i = 0; i < aLookAndFeelInfo.length; i++) {
-			String plafName = aLookAndFeelInfo[i].getName();
-			String plafClassName = aLookAndFeelInfo[i].getClassName();
-			JRadioButtonMenuItem rmi = new JRadioButtonMenuItem(new SwitchLookAndFeelAction(plafName, plafClassName));
-			if (plafClassName.equals(JPatchSettings.getInstance().strPlafClassName)) {
-				rmi.setSelected(true);
-			} else {
-				rmi.setSelected(false);
-			}
+//		UIManager.LookAndFeelInfo[] aLookAndFeelInfo = UIManager.getInstalledLookAndFeels();
+//		for (int i = 0; i < aLookAndFeelInfo.length; i++) {
+//			String plafName = aLookAndFeelInfo[i].getName();
+//			String plafClassName = aLookAndFeelInfo[i].getClassName();
+//			JRadioButtonMenuItem rmi = new JRadioButtonMenuItem(new SwitchLookAndFeelAction(plafName, plafClassName));
+//			if (plafClassName.equals(JPatchSettings.getInstance().strPlafClassName)) {
+//				rmi.setSelected(true);
+//			} else {
+//				rmi.setSelected(false);
+//			}
+//			bgPlaf.add(rmi);
+//			menuPlaf.add(rmi);
+//		}
+		JRadioButtonMenuItem rmi;
+		String plaf;
+		try {
+			plaf = "jpatch.boundary.laf.SmoothLookAndFeel";
+			rmi = new JRadioButtonMenuItem(new SwitchLookAndFeelAction("JPatch", new SmoothLookAndFeel()));
+			rmi.setSelected (plaf.equals(JPatchSettings.getInstance().strPlafClassName));
 			bgPlaf.add(rmi);
 			menuPlaf.add(rmi);
+			
+			plaf = UIManager.getCrossPlatformLookAndFeelClassName();
+			rmi = new JRadioButtonMenuItem(new SwitchLookAndFeelAction("Metal", Class.forName(plaf).newInstance()));
+			rmi.setSelected (plaf.equals(JPatchSettings.getInstance().strPlafClassName));
+			bgPlaf.add(rmi);
+			menuPlaf.add(rmi);
+			
+			plaf = UIManager.getSystemLookAndFeelClassName();
+			rmi = new JRadioButtonMenuItem(new SwitchLookAndFeelAction("System", Class.forName(plaf).newInstance()));
+			rmi.setSelected (plaf.equals(JPatchSettings.getInstance().strPlafClassName));
+			bgPlaf.add(rmi);
+			menuPlaf.add(rmi);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		menuOptions.add(menuPlaf);
 		//>>>>> test-add
