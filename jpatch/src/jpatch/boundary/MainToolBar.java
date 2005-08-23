@@ -3,7 +3,7 @@ package jpatch.boundary;
 import javax.swing.*;
 import jpatch.boundary.action.*;
 
-public final class MainToolBar extends JPanel {
+public final class MainToolBar extends JToolBar {
 	/**
 	 * 
 	 */
@@ -55,6 +55,7 @@ public final class MainToolBar extends JPanel {
 	//private AbstractButton buttonBone;
 	
 	public MainToolBar(ButtonGroup action) {
+		setFloatable(false);
 		setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
 		
 		/* Buttons */

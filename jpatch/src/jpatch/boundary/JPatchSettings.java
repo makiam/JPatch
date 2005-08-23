@@ -128,9 +128,9 @@ public class JPatchSettings {
 	public float fRenderAspectHeight;
 	
 	//>>>>> test-replace
-	public String[] astrKeyMap;
-	//public String[] astrKeyMap = new String[] {
-	public String[] astrKeyMapDefault = new String[] {
+//	public String[] astrKeyMap;
+	public String[] astrKeyMap = new String[] {
+//	public String[] astrKeyMapDefault = new String[] {
 		"Single View				Single view					1",
 		"Horizontal Split View		Horizontal split view		2",
 		"Vertical Split View		Vertical split view			3",
@@ -178,7 +178,7 @@ public class JPatchSettings {
 	 */
 	public JPatchSettings() {
 		//>>>>> test-add
-		mapDefaults.put("keyMap", join("||", astrKeyMapDefault));
+//		mapDefaults.put("keyMap", join("||", astrKeyMapDefault));
 		//<<<<< test-add
 		mapDefaults.put("firstStart", new Boolean(true));
 		
@@ -389,7 +389,7 @@ public class JPatchSettings {
 	 */
 	public void loadSettings() {
 		//>>>>> test-add
-		astrKeyMap = getString("keyMap").split("\\|\\|");
+//		astrKeyMap = getString("keyMap").split("\\|\\|");
 		//<<<<< test-add
 		
 		bFirstStart = getBoolean("firstStart");

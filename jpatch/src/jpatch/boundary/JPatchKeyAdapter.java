@@ -9,9 +9,12 @@ public class JPatchKeyAdapter extends KeyAdapter {
 	//private Map mapKeys = new HashMap();
 	
 	public void addKey(JPatchKey key, Object object) {
-		if (listKeys.indexOf(key) != -1) throw new IllegalArgumentException(key + " already assigned");
-		listKeys.add(key);
-		listKeys.add(object);
+		if (listKeys.indexOf(key) != -1) {
+			//throw new IllegalArgumentException(key + " already assigned");
+		} else {
+			listKeys.add(key);
+			listKeys.add(object);
+		}
 		//System.out.println("add key " + key + " " + listKeys.size());
 		//mapKeys.put(key, object);
 		//System.out.println(key);
@@ -45,7 +48,7 @@ public class JPatchKeyAdapter extends KeyAdapter {
 	public void keyPressed(KeyEvent keyEvent) {
 		for (int i = 0; i < listKeys.size(); i += 2) {
 			JPatchKey key = (JPatchKey)listKeys.get(i);
-			if (key.test(keyEvent)) {
+			if (key != null && key.test(keyEvent)) {
 				Object object = listKeys.get(i + 1);
 				
 				//try {
