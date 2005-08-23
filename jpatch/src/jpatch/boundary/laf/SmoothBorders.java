@@ -35,7 +35,7 @@ public class SmoothBorders extends MetalBorders {
     		if (model.isRollover()) {
     			g2.setColor(Theme.rolloverBorderColor);
     			g2.draw(new RoundRectangle2D.Float(x + 2, y + 2, w - 5, h - 5, 5, 5));
-    			g2.setColor(c.getBackground().darker().darker());
+    			g2.setColor(new Color(0, 0, 0, 0.5f));
     			g2.draw(new RoundRectangle2D.Float(x + 1, y + 1, w - 3, h - 3, 7, 7));
 //    			Area area = new Area();
 //    			area.add(new Area(new RoundRectangle2D.Float(x, y, w, h, 9, 9)));
@@ -44,8 +44,11 @@ public class SmoothBorders extends MetalBorders {
 //    			g2.setColor(c.getBackground().darker().darker());
 //    			g2.draw(new RoundRectangle2D.Float(x + 1, y + 1, w - 3, h - 3, 7, 7));
     			
-    		} else if (model.isSelected() || model.isPressed() || !(c.getParent() instanceof JToolBar)){
-    			g2.setColor(c.getBackground().darker().darker());
+    		} else if (model.isSelected() || model.isPressed()){
+    			g2.setColor(new Color(0, 0, 0, 0.5f));
+    			g2.draw(new RoundRectangle2D.Float(x + 1, y + 1, w - 3, h - 3, 7, 7));
+    		} else if (!(c.getParent() instanceof JToolBar)) {
+    			g2.setColor(new Color(0, 0, 0, 0.25f));
     			g2.draw(new RoundRectangle2D.Float(x + 1, y + 1, w - 3, h - 3, 7, 7));
     		}
     	}	

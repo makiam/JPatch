@@ -10,20 +10,20 @@ public class SwitchLookAndFeelAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = -8098202792221617869L;
-	String strPlafClassName;
+	LookAndFeel lookAndFeel;
 	
-	public SwitchLookAndFeelAction(String name, String className) {
+	public SwitchLookAndFeelAction(String name, Object lookAndFeel) {
 		super(name);
-		strPlafClassName = className;
+		this.lookAndFeel = (LookAndFeel) lookAndFeel;
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
 		try {
-			UIManager.setLookAndFeel(strPlafClassName);
+			UIManager.setLookAndFeel(lookAndFeel);
 			SwingUtilities.updateComponentTreeUI(MainFrame.getInstance());
-			JPatchSettings.getInstance().strPlafClassName = strPlafClassName;
+			JPatchSettings.getInstance().strPlafClassName = lookAndFeel.getClass().getName();
 		} catch (Exception e) {
-			System.err.println(e);
+			e.printStackTrace();
 		}
 	}
 }

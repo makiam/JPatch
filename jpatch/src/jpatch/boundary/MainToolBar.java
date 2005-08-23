@@ -1,6 +1,7 @@
 package jpatch.boundary;
 
 import javax.swing.*;
+
 import jpatch.boundary.action.*;
 
 public final class MainToolBar extends JToolBar {
@@ -56,7 +57,7 @@ public final class MainToolBar extends JToolBar {
 	
 	public MainToolBar(ButtonGroup action) {
 		setFloatable(false);
-		setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
+		setOrientation(JToolBar.HORIZONTAL);
 		
 		/* Buttons */
 		buttonXLock.setSelectedIcon(new ImageIcon(getClass().getClassLoader().getResource("jpatch/images/xlocked.png")));
@@ -65,6 +66,7 @@ public final class MainToolBar extends JToolBar {
 		buttonGridSnap.setSelectedIcon(new ImageIcon(getClass().getClassLoader().getResource("jpatch/images/grid_snap.png")));
 		buttonHide.setSelectedIcon(new ImageIcon(getClass().getClassLoader().getResource("jpatch/images/hide2.png")));
 		
+		buttonGridSnap.setEnabled(false);
 		//buttonSingle.setSelected(true);
 		
 		/* ButtonGroups */

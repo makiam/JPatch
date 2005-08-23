@@ -26,25 +26,10 @@ public class SmoothButtonUI extends BasicButtonUI {
 		AbstractButton button = (AbstractButton) c;
 		ButtonModel model = button.getModel();
 		Graphics2D g2 = (Graphics2D) g;
+		Theme.paintButtonBackground(button, g2);
 		//g.setColor(c.getBackground());
 		//g.fillRect(0, 0, c.getWidth(), c.getHeight());
-		if (c.getParent() instanceof JToolBar) {
-			if (model.isRollover()) {
-				GradientPaint gp = new GradientPaint(0, 0, c.getBackground().brighter(), 0, c.getHeight(), c.getBackground().darker());
-				g2.setPaint(gp);
-				g2.fill(new RoundRectangle2D.Float(1, 1, c.getWidth() - 2, c.getHeight() - 2, 7, 7));
-			} 
-		} else {
-			if (model.isRollover()) {
-				GradientPaint gp = new GradientPaint(0, 0, c.getBackground().brighter().brighter(), 0, c.getHeight(), c.getBackground());
-				g2.setPaint(gp);
-				g2.fill(new RoundRectangle2D.Float(1, 1, c.getWidth() - 2, c.getHeight() - 2, 7, 7));
-			} else {
-				GradientPaint gp = new GradientPaint(0, 0, c.getBackground().brighter(), 0, c.getHeight(), c.getBackground().darker());
-				g2.setPaint(gp);
-				g2.fill(new RoundRectangle2D.Float(1, 1, c.getWidth() - 2, c.getHeight() - 2, 7, 7));
-			}
-		}
+		
 //		if (model.isSelected()) {
 //			g.setColor(c.getBackground().darker());
 //			g2.fill(new RoundRectangle2D.Float(1, 1, c.getWidth() - 2, c.getHeight() - 2, 7, 7));
