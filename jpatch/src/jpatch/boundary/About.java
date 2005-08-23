@@ -76,6 +76,8 @@ public class About extends JDialog implements ActionListener {
 			"See <a href='http://inyo.sourceforge.net'>http://inyo.sourceforge.net</a></li>" +
 			"<li><b>The JOGL Java bindings for OpenGL</b>. "+
 			"See <a href='https://jogl.dev.java.net/'>https://jogl.dev.java.net/</a></li>" +
+			"<li>The JPatch Look And Feel is based on <b>SmoothMetal</b> by <i>James Shiell</i></b>. "+
+			"See <a href='http://smoothmetal.sourceforge.net/'>http://smoothmetal.sourceforge.net/</a></li>" +
 			"</ul>" + 
 			"The packages listed above have not been modified. For source code " +
 			"or detailed licensing information please follow the links above. " +
