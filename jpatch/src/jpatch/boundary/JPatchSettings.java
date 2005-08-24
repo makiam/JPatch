@@ -5,6 +5,8 @@ import java.util.*;
 import java.util.prefs.*;
 import java.awt.*;
 
+import jpatch.auxilary.JPatchUtils;
+
 public class JPatchSettings {
 	
 	public static final int OUTPUT_TRIANGULIZED_HASHPATCHES = 0;
@@ -177,6 +179,7 @@ public class JPatchSettings {
 	 * constructor
 	 */
 	public JPatchSettings() {
+		
 		//>>>>> test-add
 //		mapDefaults.put("keyMap", join("||", astrKeyMapDefault));
 		//<<<<< test-add

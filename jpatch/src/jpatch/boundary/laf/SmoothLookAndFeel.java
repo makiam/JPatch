@@ -88,6 +88,8 @@ public class SmoothLookAndFeel extends MetalLookAndFeel {
 			}
 		}
 		uidefaults.put("ToggleButton.rollover", new Boolean(true));
+		uidefaults.put("Button.rollover", new Boolean(true));
+		uidefaults.put("ToolBarButton.rollover", new Boolean(true));
     }
 
     protected void initClassDefaults(UIDefaults uidefaults) {

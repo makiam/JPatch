@@ -5,6 +5,7 @@ import javax.swing.*;
 import jpatch.boundary.*;
 
 public final class JPatchUtils {
+	
 	public static boolean arrayContains(Object[] array, Object element) {
 		for (int i = 0; i < array.length; i++) {
 			if (array[i] == element) return true;
@@ -22,5 +23,17 @@ public final class JPatchUtils {
 	
 	public static int showSaveDialog() {
 		return JOptionPane.showConfirmDialog(MainFrame.getInstance(),"The model has been changed, and all changes will be lost. Do you like to save?", "Save changes?", JOptionPane.YES_NO_CANCEL_OPTION);
+	}
+	
+	public static int[] getJvmVersion() {
+		String version = (String) System.getProperty("java.version");
+		String[] s = version.split("\\.");
+		int[] V = new int[] { Integer.parseInt(s[0]), Integer.parseInt(s[1]) };
+		return V;
+	}
+	
+	public boolean isJvmVersion(int major, int minor) {
+		int[] jvm = getJvmVersion();
+		return major <= jvm[0] && minor <= jvm[1];
 	}
 }
