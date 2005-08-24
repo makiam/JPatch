@@ -3,8 +3,7 @@ package jpatch.boundary;
 import java.awt.*;
 //import java.beans.*;
 import javax.swing.*;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.plaf.metal.OceanTheme;
+import javax.swing.plaf.metal.*;
 import javax.swing.tree.*;
 
 import jpatch.*;
@@ -13,8 +12,7 @@ import jpatch.boundary.tools.*;
 //	import jpatch.boundary.mouse.*;		//remove
 import jpatch.control.*;
 import jpatch.control.edit.*;
-import jpatch.boundary.laf.SmoothLookAndFeel;
-import jpatch.boundary.laf.SmoothTheme;
+import jpatch.boundary.laf.*;
 import jpatch.boundary.selection.*;
 
 public final class MainFrame extends JFrame {
@@ -63,10 +61,10 @@ public final class MainFrame extends JFrame {
 			
 			try {
 				String plaf = JPatchSettings.getInstance().strPlafClassName;
-				if (plaf.endsWith("MetalLookAndFeel"))
-					MetalLookAndFeel.setCurrentTheme(new OceanTheme());
-				else if (plaf.endsWith("SmoothLookAndFeel"))
-					SmoothLookAndFeel.setCurrentTheme(new SmoothTheme());
+//				if (plaf.endsWith("MetalLookAndFeel"))
+//					MetalLookAndFeel.setCurrentTheme(SmoothTheme.getDefaultMetalTheme());
+//				else if (plaf.endsWith("SmoothLookAndFeel"))
+//					SmoothLookAndFeel.setCurrentTheme(new SmoothTheme());
 				if (plaf.equals("jpatch.boundary.laf.SmoothLookAndFeel"))
 					UIManager.setLookAndFeel(new SmoothLookAndFeel());
 				else
