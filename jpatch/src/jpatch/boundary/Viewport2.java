@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.15 2005/08/28 12:59:13 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.16 2005/08/28 19:05:39 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -113,8 +113,11 @@ public class Viewport2 {
 		else
 			m4View.set(viewDef.getMatrix());
 		drawable.clear(JPatchDrawable2.COLOR_BUFFER | JPatchDrawable2.DEPTH_BUFFER, new Color3f(settings.cBackground)); // FIXME
-		if (drawable.isLightingSupported())
+		if (drawable.isLightingSupported()) {
+			if (!MainFrame.getInstance().getJPatchScreen().isStickyLight())
+				viewDef.getLighting().transform(viewDef.getMatrix());
 			drawable.setLighting(viewDef.getLighting());
+		}
 	}
 	
 	public void drawInfo() {
@@ -132,8 +135,12 @@ public class Viewport2 {
 	}
 	
 	private void setFogColor(float z, Color3f colorIn, Color3f colorOut) {
-		colorOut.interpolate(colorIn, c3Background, (z - fMinZ) / fDeltaZ * 0.75f);
-		colorOut.clamp(0, 1);
+		if (settings.bFog) {
+			colorOut.interpolate(colorIn, c3Background, (z - fMinZ) / fDeltaZ * 0.75f);
+			colorOut.clamp(0, 1);
+		} else {
+			colorOut.set(colorIn);
+		}
 	}
 	
 	public void drawRotoscope() {
@@ -164,7 +171,7 @@ public class Viewport2 {
 		Point3f pz = new Point3f();
 		for (Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
 			for(ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
-				if (cp.isHead()){
+				if (cp.isHead() && !cp.isHidden()){
 					pz.set(cp.getPosition());
 					m4View.transform(pz);
 					if (pz.z > fDeltaZ)

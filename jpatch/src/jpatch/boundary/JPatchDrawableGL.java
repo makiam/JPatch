@@ -476,7 +476,8 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 				case 2: {
 					gl.glDisable(GL.GL_CULL_FACE);
 					gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1);
-					gl.glMaterialfv(GL.GL_BACK, GL.GL_AMBIENT, new float[] { 1.0f, 0.0f, 0.0f } );
+					Color3f backfaceColor = new Color3f(JPatchSettings.getInstance().cBackface);
+					gl.glMaterialfv(GL.GL_BACK, GL.GL_AMBIENT, new float[] { backfaceColor.x, backfaceColor.y, backfaceColor.z } );
 					gl.glMaterialfv(GL.GL_BACK, GL.GL_DIFFUSE, new float[] { 0.0f, 0.0f, 0.0f } );
 					gl.glMaterialfv(GL.GL_BACK, GL.GL_SPECULAR, new float[] { 0.0f, 0.0f, 0.0f } );
 					gl.glMaterialfv(GL.GL_BACK, GL.GL_SHININESS, new float[] { 0.0f } );
@@ -822,7 +823,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { color.x, color.y, color.z, 1 });
 					else
 						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
-					Vector3f direction = directionalLight.getDirection();
+					Vector3f direction = directionalLight.getTransformedDirection();
 					
 					/*
 					 * set GL light directions (w = 0 for directional light)
@@ -846,7 +847,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { color.x, color.y, color.z, 1 });
 					else
 						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
-					Point3f position = pointLight.getPosition();
+					Point3f position = pointLight.getTransformedPosition();
 					
 					/*
 					 * set GL light position (w = 1 for point light)
@@ -891,7 +892,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { color.x, color.y, color.z, 1 });
 					else
 						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
-					Point3f position = spotLight.getPosition();
+					Point3f position = spotLight.getTransformedPosition();
 					
 					/*
 					 * set GL light position (w = 1 for point light)
@@ -919,7 +920,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 						} break;
 					}
 					
-					Vector3f direction = spotLight.getDirection();
+					Vector3f direction = spotLight.getTransformedDirection();
 					
 					/*
 					 * set GL spot direction

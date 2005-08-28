@@ -21,7 +21,7 @@ public final class ApplyMaterialAction extends AbstractAction {
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}
 	public ApplyMaterialAction() {
-		super("clear patches");
+		super("Clear patch material");
 		this.material = null;
 		//putValue(Action.SHORT_DESCRIPTION,"Add Controlpoint [A]");
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);

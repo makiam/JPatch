@@ -11,7 +11,7 @@ public class ZBufferSettings extends BDialog {
 	private String[] rendererName = new String[] { "Java2D", "Software Z-Buffer", "OpenGL" };
 	
 	private ColumnContainer content = new ColumnContainer();
-	private FormContainer form = new FormContainer(2, 3);
+	private FormContainer form = new FormContainer(2, 4);
 	
 	private RowContainer buttons = new RowContainer();
 	private BButton buttonOk = new BButton("OK");
@@ -19,6 +19,8 @@ public class ZBufferSettings extends BDialog {
 	private BSlider sliderTesselationQuality = new BSlider(settings.iTesselationQuality,0,4,BSlider.HORIZONTAL);
 	private BuoyUtils.RadioSelector rsBackface = new BuoyUtils.RadioSelector(new String[] { "ignore", "cull", "highlight" }, settings.iBackfaceMode);
 	private BuoyUtils.RadioSelector rsRenderer = new BuoyUtils.RadioSelector(rendererName, settings.iRealtimeRenderer);
+	private BuoyUtils.RadioSelector rsFog = new BuoyUtils.RadioSelector(new String[] { "enabled", "disabled" }, settings.bFog ? 0 : 1);
+	
 	
 	public ZBufferSettings() {
 		super("Realtime renderer settings");
@@ -51,6 +53,8 @@ public class ZBufferSettings extends BDialog {
 		form.add(rsRenderer, 1, i++, west);
 		form.add(new BLabel("Backfacing polygons:    "), 0, i, east);
 		form.add(rsBackface, 1, i++, west);
+		form.add(new BLabel("Wireframe fog effect:    "), 0, i, east);
+		form.add(rsFog, 1, i++, west);
 		form.add(new BLabel("Tesselation quality:    "), 0, i, east);
 		form.add(sliderTesselationQuality, 1, i++, west);
 		
@@ -74,6 +78,7 @@ public class ZBufferSettings extends BDialog {
 			);
 			settings.iRealtimeRenderer = rsRenderer.getSelectedIndex();
 		}
+		settings.bFog = (rsFog.getSelectedIndex() == 0);
 		settings.iTesselationQuality = sliderTesselationQuality.getValue();
 		settings.iBackfaceMode = rsBackface.getSelectedIndex();
 		Viewport2.setQuality(settings.iTesselationQuality);

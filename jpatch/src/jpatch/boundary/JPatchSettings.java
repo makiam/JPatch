@@ -95,6 +95,7 @@ public class JPatchSettings {
 	
 	public int iLightingMode;
 	public boolean bStickyLight;
+	public boolean bFog;
 	
 	public boolean bGridSnap;
 	public float fGridSpacing;
@@ -218,6 +219,7 @@ public class JPatchSettings {
 		
 		mapDefaults.put("lightingMode", new Integer(JPatchScreen.LIGHT_THREE_POINT));
 		mapDefaults.put("stickyLight", new Boolean(true));
+		mapDefaults.put("fogEffect", new Boolean(true));
 		
 		mapDefaults.put("gridSnap", new Boolean(false));
 		mapDefaults.put("gridSpacing", new Float(1));
@@ -443,6 +445,7 @@ public class JPatchSettings {
 		
 		iLightingMode = getInt("lightingMode");
 		bStickyLight = getBoolean("stickyLight");
+		bFog = getBoolean("fogEffect");
 		
 		iBackfaceMode = getInt("backfaceMode");
 		
@@ -579,6 +582,7 @@ public class JPatchSettings {
 		
 		iLightingMode = getIntDefault("lightingMode");
 		bStickyLight = getBooleanDefault("stickyLight");
+		bFog = getBooleanDefault("fogEffect");
 		
 		iBackfaceMode = getIntDefault("backfaceMode");
 		
@@ -696,6 +700,8 @@ public class JPatchSettings {
 		
 		putInt("lightingMode", iLightingMode);
 		putBoolean("stickyLight", bStickyLight);
+		putBoolean("fogEffect", bFog);
+		
 		putBoolean("gridSnap", bGridSnap);
 		putFloat("gridSpacing", fGridSpacing);
 		putInt("backfaceMode", iBackfaceMode);

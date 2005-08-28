@@ -67,6 +67,7 @@ public final class MainMenu extends JMenuBar {
 		miLightSticky.setState(MainFrame.getInstance().getJPatchScreen().isStickyLight());
 		miSync.setState(MainFrame.getInstance().getJPatchScreen().isSynchronized());
 		miFlip.setState(MainFrame.getInstance().getJPatchScreen().flipBackfacingNormals());
+		miLightOff.setEnabled(false); // FIXME
 		
 		menuLight.add(miLightOff);
 		menuLight.add(miLightSimple);
