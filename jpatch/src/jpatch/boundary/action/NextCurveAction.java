@@ -11,7 +11,7 @@ public final class NextCurveAction extends AbstractAction {
 	 */
 	private static final long serialVersionUID = 1L;
 	public NextCurveAction() {
-		super("next curve");
+		super(KeyMapping.getDescription("next curve"));
 		//putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("add point"));
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}

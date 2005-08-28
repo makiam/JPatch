@@ -12,7 +12,7 @@ public final class ZBufferQualityAction extends AbstractAction {
 	private static final long serialVersionUID = 2278339099081500769L;
 
 	public ZBufferQualityAction() {
-		super("Renderer settings...");
+		super("Realtime renderer settings...");
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {

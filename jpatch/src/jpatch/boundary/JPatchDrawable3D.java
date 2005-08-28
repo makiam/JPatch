@@ -232,6 +232,11 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 		}	
 	}
 	
+	public void drawLine(Point3f p0, Color3f c0, Point3f p1, Color3f c1) {
+		setColor(c0);
+		drawLine(p0, p1);
+	}
+	
 	public void drawLine(Point3f p0, Point3f p1) {
 		if (bPerspective) {
 			if (p0.z < fNearClip) {
@@ -1191,7 +1196,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 						Pbc.interpolate(pb, pc, tbc);
 						Cbc.interpolate(cb, cc, tbc);
 						drawScreenTriangle(pc, cc, Pca, Cca, Pbc, Cbc);
-					}														// triangle is entirely in fron of near clipping plane, skip it
+					}														// triangle is entirely in front of near clipping plane, skip it
 				}
 			}
 		}

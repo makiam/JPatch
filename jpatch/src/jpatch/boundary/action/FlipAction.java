@@ -20,7 +20,7 @@ public final class FlipAction extends AbstractAction {
 	private int iAxis;
 	
 	public FlipAction(int axis) {
-		super("flip " + astrAxis[axis]);
+		super(astrAxis[axis]);
 		iAxis = axis;
 		//putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("lathe"));
 	}
