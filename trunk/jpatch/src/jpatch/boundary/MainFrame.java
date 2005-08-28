@@ -61,12 +61,11 @@ public final class MainFrame extends JFrame {
 			
 			try {
 				String plaf = JPatchSettings.getInstance().strPlafClassName;
-//				if (plaf.endsWith("MetalLookAndFeel"))
-//					MetalLookAndFeel.setCurrentTheme(SmoothTheme.getDefaultMetalTheme());
-//				else if (plaf.endsWith("SmoothLookAndFeel"))
-//					SmoothLookAndFeel.setCurrentTheme(new SmoothTheme());
 				if (plaf.equals("jpatch.boundary.laf.SmoothLookAndFeel"))
-					UIManager.setLookAndFeel(new SmoothLookAndFeel());
+					if (jpatch.auxilary.JPatchUtils.isJvmVersionGreaterOrEqual(1, 5))
+						UIManager.setLookAndFeel(new SmoothLookAndFeel());
+					else
+						UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 				else
 					UIManager.setLookAndFeel(plaf);
 				

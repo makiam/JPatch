@@ -32,8 +32,13 @@ public final class JPatchUtils {
 		return V;
 	}
 	
-	public boolean isJvmVersion(int major, int minor) {
+	public static boolean isJvmVersionGreaterOrEqual(int major, int minor) {
 		int[] jvm = getJvmVersion();
-		return major <= jvm[0] && minor <= jvm[1];
+		if (major > jvm[0])
+			return true;
+		if (major == jvm[0] && minor >= jvm[1])
+			return true;
+		else
+			return false;
 	}
 }

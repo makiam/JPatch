@@ -32,6 +32,7 @@ public interface JPatchDrawable2 {
 	public void setPointSize(int size);
 	public void drawPoint(Point3f p);
 	public void drawLine(Point3f p0, Point3f p1);
+	public void drawLine(Point3f p0, Color3f c0, Point3f p1, Color3f c1);
 	public void drawLine(int x1, int y1, int x2, int y2);
 	public void drawRect(int x, int y, int width, int height);
 	public void fillRect(int x, int y, int width, int height);
