@@ -69,6 +69,16 @@ public class RealtimeLighting {
 	 * A factory method that returns a headlight
 	 * @return
 	 */
+	public static RealtimeLighting createSimpleLight() {
+		RealtimeLighting rtl = new RealtimeLighting(1);
+		rtl.add(rtl.new DirectionalLight(new Color3f (1.00f, 1.00f, 1.00f), true, false, new Vector3f( -1, 1,-1)));
+		return rtl;
+	}
+	
+	/**
+	 * A factory method that returns a headlight
+	 * @return
+	 */
 	public static RealtimeLighting createHeadLight() {
 		RealtimeLighting rtl = new RealtimeLighting(1);
 		rtl.add(rtl.new DirectionalLight(new Color3f (1.00f, 1.00f, 1.00f), true, true, new Vector3f( 0, 0,-1)));
@@ -81,9 +91,9 @@ public class RealtimeLighting {
 	 */
 	public static RealtimeLighting createThreepointLight() {
 		RealtimeLighting rtl = new RealtimeLighting(3);
-		rtl.add(rtl.new DirectionalLight(new Color3f (0.66f, 0.66f, 0.66f), true, true, new Vector3f( -1,  1, -1)));	// key
-		rtl.add(rtl.new DirectionalLight(new Color3f (0.33f, 0.33f, 0.33f), true, true, new Vector3f(  1,  0, -1)));	// fill
-		rtl.add(rtl.new DirectionalLight(new Color3f (1.00f, 1.00f, 1.00f), true, true, new Vector3f(  0,  1,  1)));	// back
+		rtl.add(rtl.new DirectionalLight(new Color3f (0.80f, 0.80f, 0.80f), true, true, new Vector3f( -1,  1, -1)));	// key
+		rtl.add(rtl.new DirectionalLight(new Color3f (0.40f, 0.40f, 0.40f), true, true, new Vector3f(  1,  0, -1)));	// fill
+		rtl.add(rtl.new DirectionalLight(new Color3f (1.20f, 1.20f, 1.20f), true, true, new Vector3f(  0,  1,  1)));	// back
 		return rtl;
 	}
 	
@@ -262,6 +272,13 @@ public class RealtimeLighting {
 			return v3Direction;
 		}
 		
+		/**
+		 * @return transformeddirection vector to lightsource
+		 */
+		public Vector3f getTransformedDirection() {
+			return v3TransformedDirection;
+		}
+		
 		public void transform(Matrix4f matrix) {
 			v3TransformedDirection.set(v3Direction);
 			matrix.transform(v3TransformedDirection);
@@ -349,6 +366,13 @@ public class RealtimeLighting {
 		 */
 		public Point3f getPosition() {
 			return p3Position;
+		}
+		
+		/**
+		 * @return transformed position of the lightsource
+		 */
+		public Point3f getTransformedPosition() {
+			return p3TransformedPosition;
 		}
 		
 		/**
@@ -491,6 +515,13 @@ public class RealtimeLighting {
 		}
 		
 		/**
+		 * @return transformed position of the lightsource
+		 */
+		public Point3f getTransformedPosition() {
+			return p3TransformedPosition;
+		}
+		
+		/**
 		 * @return The attenuation (0 = no attenuation, 1 = linear (1/x) attenuation, 2 = quadratic (1/x²) attenuation)
 		 */
 		public int getAttenuation() {
@@ -509,6 +540,13 @@ public class RealtimeLighting {
 		 */
 		public Vector3f getDirection() {
 			return v3Direction;
+		}
+		
+		/**
+		 * @return transformed direction of the spot
+		 */
+		public Vector3f getTransformedDirection() {
+			return v3TransformedDirection;
 		}
 		
 		/**

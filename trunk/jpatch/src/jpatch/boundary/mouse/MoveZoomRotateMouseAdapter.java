@@ -26,7 +26,7 @@ public class MoveZoomRotateMouseAdapter extends JPatchMouseAdapter {
 //			} else {
 //				iState = ROTATE;
 //			}
-			iState = (mouseEvent.isControlDown()) ? ROTATE : MOVE;
+			iState = (mouseEvent.isControlDown() || viewDef.isLocked()) ? ROTATE : MOVE;
 		}
 	}
 	

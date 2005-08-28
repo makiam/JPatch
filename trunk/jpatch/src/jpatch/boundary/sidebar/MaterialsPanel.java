@@ -12,6 +12,7 @@ public class MaterialsPanel extends SidePanel {
 
 	public MaterialsPanel(Model model) {
 		add(new JPatchButton(new NewMaterialAction(model)));
+		add(new JPatchButton(new ApplyMaterialAction()));
 		MainFrame.getInstance().getSideBar().clearDetailPanel();
 		//add(new JButton("test2"));
 		//add(new JButton("test3"));
