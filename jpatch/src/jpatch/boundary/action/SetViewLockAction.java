@@ -14,7 +14,7 @@ public final class SetViewLockAction extends AbstractAction {
 	private ViewDefinition viewDefinition;
 	
 	public SetViewLockAction(ViewDefinition viewDefinition) {
-		super("lock to selection");
+		super("lock view to selection");
 		this.viewDefinition = viewDefinition;
 	}
 	

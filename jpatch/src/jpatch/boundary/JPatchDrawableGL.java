@@ -10,6 +10,7 @@ import net.java.games.jogl.*;
 import jpatch.entity.*;
 
 public class JPatchDrawableGL implements JPatchDrawable2 {
+	private static final float GHOST_ALPHA = 0.5f;
 	
 	private GLDrawable glDrawable;
 	private volatile GL gl;
@@ -26,6 +27,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	
 	private int iMaxLights, iMaxTextureSize;
 	private boolean bRasterMode = false;
+	private boolean bRenderGhost = false;
 	
 	private byte[] envMap = new byte[256 * 3];
 	/**
@@ -376,16 +378,11 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 //				gl.glEnable(GL.GL_LIGHT1);
 //				gl.glEnable(GL.GL_LIGHT2);
 				
-				gl.glDisable(GL.GL_CULL_FACE);
 				gl.glCullFace(GL.GL_BACK);
-				gl.glDepthFunc(GL.GL_LESS);
+				gl.glDepthFunc(GL.GL_LEQUAL);
 				gl.glEnable(GL.GL_DEPTH_TEST);
-				gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1);
 				
-				gl.glMaterialfv(GL.GL_BACK, GL.GL_AMBIENT, new float[] { 1.0f, 0.0f, 0.0f } );
-				gl.glMaterialfv(GL.GL_BACK, GL.GL_DIFFUSE, new float[] { 0.0f, 0.0f, 0.0f } );
-				gl.glMaterialfv(GL.GL_BACK, GL.GL_SPECULAR, new float[] { 0.0f, 0.0f, 0.0f } );
-				gl.glMaterialfv(GL.GL_BACK, GL.GL_SHININESS, new float[] { 0.0f } );
+				
 				
 				int[] I = new int[1];
 				gl.glGetIntegerv(GL.GL_MAX_LIGHTS, I);
@@ -420,7 +417,8 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public String getInfo() {
-		return "JOGL OpenGL Renderer\nGL Vendor: " + gl.glGetString(GL.GL_VENDOR) + "\nGL Renderer: " + gl.glGetString(GL.GL_RENDERER) + "\nGL Version: " + gl.glGetString(GL.GL_VERSION) + "\n";
+		//return "JOGL OpenGL Renderer\nGL Vendor: " + gl.glGetString(GL.GL_VENDOR) + "\nGL Renderer: " + gl.glGetString(GL.GL_RENDERER) + "\nGL Version: " + gl.glGetString(GL.GL_VERSION) + "\n";
+		return "OpenGL (JOGL)";
 	}
 	
 	private void enableRasterMode(boolean enable) {
@@ -467,6 +465,23 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			gl.glDisable(GL.GL_LIGHTING); // FIXME
 			gl.glEnable(GL.GL_DEPTH_TEST);
 			gl.glShadeModel(GL.GL_SMOOTH);
+			switch(JPatchSettings.getInstance().iBackfaceMode) {
+				case 0: {
+					gl.glDisable(GL.GL_CULL_FACE);
+					gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1);
+					} break;
+				case 1: {
+					gl.glEnable(GL.GL_CULL_FACE);
+					} break;
+				case 2: {
+					gl.glDisable(GL.GL_CULL_FACE);
+					gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1);
+					gl.glMaterialfv(GL.GL_BACK, GL.GL_AMBIENT, new float[] { 1.0f, 0.0f, 0.0f } );
+					gl.glMaterialfv(GL.GL_BACK, GL.GL_DIFFUSE, new float[] { 0.0f, 0.0f, 0.0f } );
+					gl.glMaterialfv(GL.GL_BACK, GL.GL_SPECULAR, new float[] { 0.0f, 0.0f, 0.0f } );
+					gl.glMaterialfv(GL.GL_BACK, GL.GL_SHININESS, new float[] { 0.0f } );
+					} break;
+			}
 			
 		} else {
 			//Dimension dim = glDrawable.getSize();
@@ -656,7 +671,21 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		fFocalLength = focalLength;
 	}
 	
-	public void setGhostRenderingEnabled(boolean enable) { }
+	public void setGhostRenderingEnabled(boolean enable) {
+		bRenderGhost = enable;
+		if (iGlMode != -1) {
+			iGlMode = -1;
+			gl.glEnd();
+		}
+		if (enable) {
+			gl.glDisable(GL.GL_DEPTH_TEST);
+			gl.glEnable(GL.GL_BLEND);
+			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+		} else {
+			gl.glEnable(GL.GL_DEPTH_TEST);
+			gl.glDisable(GL.GL_BLEND);
+		}
+	}
 	
 	public void setTransparentRenderingMode(int mode) {
 		iTransparentMode = mode;
@@ -701,7 +730,11 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void setColor(Color3f color) {
-		gl.glColor3f(color.x, color.y, color.z);
+		if (bRenderGhost)
+			gl.glColor4f(color.x, color.y, color.z, GHOST_ALPHA);
+		else
+			gl.glColor3f(color.x, color.y, color.z);
+		//this.color.set(color);
 	}
 	
 	public void setColor(Color4f color) {
@@ -709,34 +742,46 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void setMaterial(MaterialProperties mp) {
+		int side = (JPatchSettings.getInstance().iBackfaceMode == 0) ? GL.GL_FRONT_AND_BACK : GL.GL_FRONT;
 		switch (iTransparentMode) {
 			case OFF: {
-				gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, new float[] { mp.red * mp.ambient, mp.green * mp.ambient, mp.blue * mp.ambient, 1 } );
-				gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[] { mp.red * mp.diffuse, mp.green * mp.diffuse, mp.blue * mp.diffuse, 1 } );
-				gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[] {
-						mp.specular * (1 - mp.metallic + mp.metallic * mp.red),
-						mp.specular * (1 - mp.metallic + mp.metallic * mp.green),
-						mp.specular * (1 - mp.metallic + mp.metallic * mp.blue),
-						1.0f });
-				gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[] { 1f / mp.roughness } );
+				if (bRenderGhost) {
+					gl.glMaterialfv(side, GL.GL_AMBIENT, new float[] { mp.red * mp.ambient, mp.green * mp.ambient, mp.blue * mp.ambient, GHOST_ALPHA } );
+					gl.glMaterialfv(side, GL.GL_DIFFUSE, new float[] { mp.red * mp.diffuse, mp.green * mp.diffuse, mp.blue * mp.diffuse, GHOST_ALPHA } );
+					gl.glMaterialfv(side, GL.GL_SPECULAR, new float[] {
+							mp.specular * (1 - mp.metallic + mp.metallic * mp.red),
+							mp.specular * (1 - mp.metallic + mp.metallic * mp.green),
+							mp.specular * (1 - mp.metallic + mp.metallic * mp.blue),
+							GHOST_ALPHA });
+					gl.glMaterialfv(side, GL.GL_SHININESS, new float[] { 1f / mp.roughness } );
+				} else {
+					gl.glMaterialfv(side, GL.GL_AMBIENT, new float[] { mp.red * mp.ambient, mp.green * mp.ambient, mp.blue * mp.ambient, 1 } );
+					gl.glMaterialfv(side, GL.GL_DIFFUSE, new float[] { mp.red * mp.diffuse, mp.green * mp.diffuse, mp.blue * mp.diffuse, 1 } );
+					gl.glMaterialfv(side, GL.GL_SPECULAR, new float[] {
+							mp.specular * (1 - mp.metallic + mp.metallic * mp.red),
+							mp.specular * (1 - mp.metallic + mp.metallic * mp.green),
+							mp.specular * (1 - mp.metallic + mp.metallic * mp.blue),
+							1.0f });
+					gl.glMaterialfv(side, GL.GL_SHININESS, new float[] { 1f / mp.roughness } );
+				}
 			}
 			break;
 			case TRANSPARENT: {
-				gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, new float[] { mp.red * mp.ambient, mp.green * mp.ambient, mp.blue * mp.ambient, 1 - mp.transmit - mp.filter } );
-				gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[] { mp.red * mp.diffuse, mp.green * mp.diffuse, mp.blue * mp.diffuse, 1 - mp.transmit - mp.filter } );
-				gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
-				gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[] { 1f / mp.roughness } );
+				gl.glMaterialfv(side, GL.GL_AMBIENT, new float[] { mp.red * mp.ambient, mp.green * mp.ambient, mp.blue * mp.ambient, 1 - mp.transmit - mp.filter } );
+				gl.glMaterialfv(side, GL.GL_DIFFUSE, new float[] { mp.red * mp.diffuse, mp.green * mp.diffuse, mp.blue * mp.diffuse, 1 - mp.transmit - mp.filter } );
+				gl.glMaterialfv(side, GL.GL_SPECULAR, new float[] { 0, 0, 0, 1 });
+				gl.glMaterialfv(side, GL.GL_SHININESS, new float[] { 1f / mp.roughness } );
 			}
 			break;
 			case HIGHLIGHTS: {
-				gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, new float[] { 0, 0, 0, 1 } );
-				gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[] { 0, 0, 0, 1 } );
-				gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[] {
+				gl.glMaterialfv(side, GL.GL_AMBIENT, new float[] { 0, 0, 0, 1 } );
+				gl.glMaterialfv(side, GL.GL_DIFFUSE, new float[] { 0, 0, 0, 1 } );
+				gl.glMaterialfv(side, GL.GL_SPECULAR, new float[] {
 						mp.specular * (1 - mp.metallic + mp.metallic * mp.red),
 						mp.specular * (1 - mp.metallic + mp.metallic * mp.green),
 						mp.specular * (1 - mp.metallic + mp.metallic * mp.blue),
 						1.0f });
-				gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[] { 1f / mp.roughness } );
+				gl.glMaterialfv(side, GL.GL_SHININESS, new float[] { 1f / mp.roughness } );
 			}
 			break;
 		}
@@ -936,6 +981,19 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		gl.glVertex3f(p1.x, p1.y, p1.z);
 	}
 	
+	public void drawLine(Point3f p0, Color3f c0, Point3f p1, Color3f c1) {
+		enableRasterMode(false);
+		if (iGlMode != GL.GL_LINES) {
+			gl.glEnd();
+			iGlMode = GL.GL_LINES;
+			gl.glBegin(iGlMode);
+		}
+		gl.glColor3f(c0.x, c0.y, c0.z);
+		gl.glVertex3f(p0.x, p0.y, p0.z);
+		gl.glColor3f(c1.x, c1.y, c1.z);
+		gl.glVertex3f(p1.x, p1.y, p1.z);
+	}
+	
 	public void drawTriangle(Point3f p0, Point3f p1, Point3f p2) {
 		enableRasterMode(false);
 		if (iGlMode != GL.GL_TRIANGLES) {
@@ -987,26 +1045,12 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			iGlMode = GL.GL_TRIANGLES;
 			gl.glBegin(iGlMode);
 		}
-//		gl.glEnable(GL.GL_LIGHTING);
-//		gl.glBegin(GL.GL_TRIANGLES);
 		gl.glNormal3f(-n0.x, -n0.y, -n0.z);
 		gl.glVertex3f(p0.x, p0.y, p0.z + 1);
 		gl.glNormal3f(-n1.x, -n1.y, -n1.z);
 		gl.glVertex3f(p1.x, p1.y, p1.z + 1);
 		gl.glNormal3f(-n2.x, -n2.y, -n2.z);
 		gl.glVertex3f(p2.x, p2.y, p2.z + 1);
-//		gl.glEnd();
-//		gl.glDisable(GL.GL_LIGHTING);
-//		gl.glBegin(GL.GL_LINES);
-//		int l = 10;
-//		gl.glVertex3f(p0.x, p0.y, p0.z);
-//		gl.glVertex3f(p0.x + n0.x * l, p0.y + n0.y * l, p0.z + n0.z * l);
-//		gl.glVertex3f(p1.x, p1.y, p1.z);
-//		gl.glVertex3f(p1.x + n1.x * l, p1.y + n1.y * l, p1.z + n1.z * l);
-//		gl.glVertex3f(p2.x, p2.y, p2.z);
-//		gl.glVertex3f(p2.x + n2.x * l, p2.y + n2.y * l, p2.z + n2.z * l);
-//		gl.glEnd();
-//		iGlMode = -1;
 	}
 	
 	public void drawCurve(Curve curve) { }
@@ -1020,9 +1064,13 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public boolean isLightingSupported() {
-		return true; // FIXME
+		return true;
 	}
 	
+	/*
+	 * Matrix transformation is fast enough in software. Using OpenGL to perform the transformations
+	 * would make rendering with GL too different from other renderers, so it's currently disabled.
+	 */
 	public boolean isTransformSupported() {
 		return false; // FIXME
 	}

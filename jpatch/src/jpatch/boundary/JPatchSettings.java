@@ -157,7 +157,7 @@ public class JPatchSettings {
 		"Extrude					Extrude						E",
 		"Lathe						Lathe						L",
 		"Extend Selection			Extend selection			ENTER",
-		"Next Curve					Next curve					TAB",
+		"Next Curve					cycle through curves		TAB",
 		"Insert Point				Insert point				INS",
 		"Bottom View				Bottom view					NUM0",
 		"Front View					Front view					NUM2",

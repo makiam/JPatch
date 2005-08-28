@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.14 2005/08/21 18:02:20 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.15 2005/08/28 12:59:13 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -55,7 +55,7 @@ public class Viewport2 {
 	private Matrix4f m4View = new Matrix4f();
 	private JPatchTool tool;
 	
-	private static float fFlatness = 5f;
+	private static float fFlatness;
 	//private static float fFlatnessSquared = fFlatness * fFlatness;
 	private static int iMaxSubdiv = 10;
 	
@@ -73,22 +73,33 @@ public class Viewport2 {
 	
 	private Grid grid = new Grid();
 	
+	private float fMinZ, fDeltaZ;
+	private Color3f c3Background = new Color3f(settings.cBackground);
+	
 	static {
-		init();
+		setQuality(JPatchSettings.getInstance().iTesselationQuality);
 	}
 	
-	private static void init() {
-		cB0 = new float[iCurveSubdiv];
-		cB1 = new float[iCurveSubdiv];
-		cB2 = new float[iCurveSubdiv];
-		cB3 = new float[iCurveSubdiv];
-		for (int i = 0; i < iCurveSubdiv; i++) {
-			float s = (float) i / (float) (iCurveSubdiv - 1);
-			cB0[i] = (1 - s) * (1 - s) * (1 - s);
-			cB1[i] = 3 * s * (1 - s) * (1 - s);
-			cB2[i] = 3 * s * s * (1 - s);
-			cB3[i] = s * s * s;
-		}
+//	private static void init() {
+//		cB0 = new float[iCurveSubdiv];
+//		cB1 = new float[iCurveSubdiv];
+//		cB2 = new float[iCurveSubdiv];
+//		cB3 = new float[iCurveSubdiv];
+//		for (int i = 0; i < iCurveSubdiv; i++) {
+//			float s = (float) i / (float) (iCurveSubdiv - 1);
+//			cB0[i] = (1 - s) * (1 - s) * (1 - s);
+//			cB1[i] = 3 * s * (1 - s) * (1 - s);
+//			cB2[i] = 3 * s * s * (1 - s);
+//			cB3[i] = s * s * s;
+//		}
+//	}
+	
+	public static void setQuality(int q) {
+		if (q == 0) fFlatness = 16;
+		if (q == 1) fFlatness = 8;
+		if (q == 2) fFlatness = 4;
+		if (q == 3) fFlatness = 2;
+		if (q == 4) fFlatness = 1;
 	}
 	
 	public Viewport2(JPatchDrawable2 drawable, ViewDefinition viewDefinition) {
@@ -109,8 +120,10 @@ public class Viewport2 {
 	public void drawInfo() {
 		String[] info = drawable.getInfo().split("\n");
 		drawable.setColor(new Color3f(settings.cText));
-		for (int i = 0, y = 0; i < info.length; drawable.drawString(info[i++], 4, y += 16));
+		drawable.drawString(viewDef.getViewName(), 4, 16);
+		for (int i = 0, y = 16; i < info.length; drawable.drawString(info[i++], 4, y += 16));
 	}
+	
 	
 	public void setTool(JPatchTool tool) {
 		this.tool = tool;
@@ -118,42 +131,55 @@ public class Viewport2 {
 			drawable.getComponent().addMouseListener(tool);
 	}
 	
-	public void drawModel(Model model) {
-//		Point3f pc = new Point3f(0,0,0);
-//		Point3f px = new Point3f(1,0,0);
-//		Point3f py = new Point3f(0,1,0);
-//		Point3f pz = new Point3f(0,0,1);
-//		Color3f cc = new Color3f(0, 0, 0);
-//		Color3f cx = new Color3f(1, 0, 0);
-//		Color3f cy = new Color3f(0, 1, 0);
-//		Color3f cz = new Color3f(0, 0, 1);
-//		
-//		m4View.transform(pc);
-//		m4View.transform(px);
-//		m4View.transform(py);
-//		m4View.transform(pz);
-//		drawable.setLightingEnable(false);
-//		drawable.drawTriangle(pc, cc, pz, cz, px, cz);
-//		drawable.drawTriangle(pc, cc, py, cy, pz, cz);
-//		drawable.drawTriangle(pc, cc, px, cx, py, cy);
-//		System.out.println("c = " + pc);
-//		System.out.println("x = " + px);
-//		System.out.println("y = " + py);
-//		System.out.println("z = " + pz);
-//		System.out.println();
-		
-//		SimpleShape cube = SimpleShape.createCube(10);
-//		Matrix4f m4 = new Matrix4f();
-//		m4.setIdentity();
-//		cube.paint(viewDef, m4, viewDef.getMatrix());
+	private void setFogColor(float z, Color3f colorIn, Color3f colorOut) {
+		colorOut.interpolate(colorIn, c3Background, (z - fMinZ) / fDeltaZ * 0.75f);
+		colorOut.clamp(0, 1);
+	}
+	
+	public void drawRotoscope() {
 		Rotoscope rotoscope = MainFrame.getInstance().getModel().getRotoscope(viewDef.getView());
 		if (rotoscope != null) {
 			rotoscope.paint(viewDef);
 		}
+	}
+	
+	public void drawGrid() {
 		grid.paint(viewDef);
+	}
+	
+	public void drawTool(JPatchTool tool) {
+		drawable.setGhostRenderingEnabled(true);
+		tool.paint(viewDef);
+		drawable.setGhostRenderingEnabled(false);
+		tool.paint(viewDef);
+	}
+	
+	public void drawModel(Model model) {
+		
+		/*
+		 * get max and min z-values (for fog effect)
+		 */
+		fMinZ = Short.MAX_VALUE;
+		fDeltaZ = Short.MIN_VALUE;
+		Point3f pz = new Point3f();
+		for (Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
+			for(ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				if (cp.isHead()){
+					pz.set(cp.getPosition());
+					m4View.transform(pz);
+					if (pz.z > fDeltaZ)
+						fDeltaZ = pz.z;
+					if (pz.z < fMinZ)
+						fMinZ = pz.z;
+				}
+			}
+		}
+		fDeltaZ -= fMinZ;
+		fDeltaZ += 1;
+		//fMinZ -= 1;
+		
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (tool != null)
-			tool.paint(viewDef);
+		
 		if (viewDef.renderCurves()) {
 			drawable.setColor(new Color3f(settings.cCurve)); // FIXME
 			for (Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
@@ -161,6 +187,11 @@ public class Viewport2 {
 					drawCurve(curve);
 			}
 		}
+		Color3f cSelected = new Color3f(settings.cSelected);
+		Color3f cPoint = new Color3f(settings.cPoint);
+		Color3f cHeadPoint = new Color3f(settings.cHeadPoint);
+		Color3f cMultiPoint = new Color3f(settings.cMultiPoint);
+		Color3f color = new Color3f();
 		if (viewDef.renderPoints()) {
 			drawable.setPointSize(3);
 			for(Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
@@ -170,17 +201,21 @@ public class Viewport2 {
 						if (!drawable.isTransformSupported()) 
 							m4View.transform(p0);
 						if (ps != null && ps.contains(cp)) {
-							drawable.setColor(new Color3f(settings.cSelected)); //FIXME
+							setFogColor(p0.z, cSelected, color);
+							drawable.setColor(color);
 							drawable.drawPoint(p0);
 						} else if (!cp.isHook() && ! cp.isHidden()){
 							if (cp.isSingle()) {
-								drawable.setColor(new Color3f(settings.cPoint)); //FIXME
+								setFogColor(p0.z, cPoint, color);
+								drawable.setColor(color);
 								drawable.drawPoint(p0);
 							} else if (!cp.isMulti()) {
-								drawable.setColor(new Color3f(settings.cHeadPoint)); //FIXME
+								setFogColor(p0.z, cHeadPoint, color);
+								drawable.setColor(color);
 								drawable.drawPoint(p0);
 							} else {
-								drawable.setColor(new Color3f(settings.cMultiPoint)); //FIXME
+								setFogColor(p0.z, cMultiPoint, color);
+								drawable.setColor(color);
 								drawable.drawPoint(p0);
 							}
 							//if (cp.isHidden()) drawable.setColor(Color.BLUE);
@@ -391,13 +426,78 @@ public class Viewport2 {
 				drawable.setTransparentRenderingMode(0);
 			}
 		}
+		if (ps != null)
+			drawSelection(ps);
 		if (drawable.isLightingSupported())
 			drawable.setLightingEnabled(false);
 	}
 	
+	public void drawOrigin() {
+		for (int i = 0; i < 2; i++) {
+			drawable.setGhostRenderingEnabled(i == 0);
+			float len = 24f/m4View.getScale();;
+			Point3f p1 = new Point3f();
+			Point3f p2 = new Point3f();
+			p2.set(len,0,0);
+			m4View.transform(p1);
+			m4View.transform(p2);
+			drawable.setColor(new Color3f(settings.cX)); // FIXME
+			drawable.drawLine(p1,p2);
+			p2.set(0,len,0);
+			m4View.transform(p2);
+			drawable.setColor(new Color3f(settings.cY)); // FIXME
+			drawable.drawLine(p1,p2);
+			p2.set(0,0,len);
+			m4View.transform(p2);
+			drawable.setColor(new Color3f(settings.cZ)); // FIXME
+			drawable.drawLine(p1,p2);
+		}
+	}
+	
+	private void drawSelection(PointSelection ps) {
+		if (ps != null && ps.getHotCp() != null) {
+			if (ps.getHotCp().getCurve() != null && ps.getHotCp().getCurve().getModel() != null) {
+				Point3f p = new Point3f(ps.getHotCp().getPosition());
+				m4View.transform(p);
+				drawable.setColor(new Color3f(settings.cHot)); // FIXME
+				drawable.setPointSize(5);
+				drawable.drawPoint(p);
+			}
+		}
+		if (ps != null && ps.isCurve()) {
+			ControlPoint cp = ps.getControlPoint();
+			if (ps.getDirection() && cp.getNext() != null) {
+				Point3f p3A = new Point3f(cp.getPosition());
+				Point3f p3B = new Point3f(cp.getOutTangent());
+				Point3f p3C = new Point3f(cp.getNext().getInTangent());
+				Point3f p3D = new Point3f(cp.getNext().getPosition());
+				m4View.transform(p3A);
+				m4View.transform(p3B);
+				m4View.transform(p3C);
+				m4View.transform(p3D);
+//				drawable.setColor(new Color3f(settings.cSelected)); // FIXME
+				drawCurveSegment(p3A,p3B,p3C,p3D, false, 0, new Color3f(settings.cSelected)); // FIXME
+			} else if (!ps.getDirection() && cp.getPrev() != null) {
+				Point3f p3A = new Point3f(cp.getPrev().getPosition());
+				Point3f p3B = new Point3f(cp.getPrev().getOutTangent());
+				Point3f p3C = new Point3f(cp.getInTangent());
+				Point3f p3D = new Point3f(cp.getPosition());
+				m4View.transform(p3A);
+				m4View.transform(p3B);
+				m4View.transform(p3C);
+				m4View.transform(p3D);
+//				drawable.setColor(new Color3f(settings.cSelected)); // FIXME
+				drawCurveSegment(p3A,p3B,p3C,p3D, false, 0, new Color3f(settings.cSelected)); // FIXME
+			}
+		}
+	}
+	
+	private Color3f c3Curve = new Color3f(settings.cCurve);
 	private void drawCurve(Curve curve) {
+		ControlPoint cpNext;
 		for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
-			if (cp.getNext() != null) {
+			cpNext = cp.getNext();
+			if (cpNext != null && !cp.isHidden() && !cpNext.isHidden()) {
 				if (!drawable.isTransformSupported()) {
 					p0.set(cp.getPosition());
 					p1.set(cp.getOutTangent());
@@ -407,29 +507,17 @@ public class Viewport2 {
 					m4View.transform(p1);
 					m4View.transform(p2);
 					m4View.transform(p3);
-					drawCurveSegment(p0, p1, p2, p3, false, 0);
+					drawCurveSegment(p0, p1, p2, p3, false, 0, c3Curve);
 				} else {
-					drawCurveSegment(cp.getPosition(), cp.getOutTangent(), cp.getNext().getInTangent(), cp.getNext().getPosition(), false, 0);
+//					drawCurveSegment(cp.getPosition(), cp.getOutTangent(), cp.getNext().getInTangent(), cp.getNext().getPosition(), false, 0);
 				}
 			}
 		}
 	}
 	
-//	private void drawCurveSegment(Point3f p0, Point3f p1, Point3f p2, Point3f p3) {
-//		pa.set(p0);
-//		for (int t = 0; t < iCurveSubdiv - 1; t++) {
-//			pb.set(
-//				cB0[t] * p0.x + cB1[t] * p1.x + cB2[t] * p2.x + cB3[t] * p3.x,
-//				cB0[t] * p0.y + cB1[t] * p1.y + cB2[t] * p2.y + cB3[t] * p3.y,
-//				cB0[t] * p0.z + cB1[t] * p1.z + cB2[t] * p2.z + cB3[t] * p3.z
-//			);
-//			drawable.drawLine(pa, pb);
-//			pa.set(pb);
-//		}
-//		drawable.drawLine(pa, p3);
-//	}
-	
-	private void drawCurveSegment(Point3f p3A, Point3f p3B, Point3f p3C, Point3f p3D, boolean simple, int level) {
+	private Color3f c3SegmentA = new Color3f();
+	private Color3f c3SegmentB = new Color3f();
+	private void drawCurveSegment(Point3f p3A, Point3f p3B, Point3f p3C, Point3f p3D, boolean simple, int level, Color3f color) {
 		if (level < iMaxSubdiv && subdiv(p3A, p3B, p3C, p3D, simple) >= fFlatness) {
 			Point3f p0 = new Point3f(p3A);
 			Point3f p1 = new Point3f(p3B);
@@ -441,10 +529,12 @@ public class Viewport2 {
 			Point3f p7 = new Point3f();
 			deCasteljauSplit(p0, p1, p2, p3, p4, p5, p6, p7);
 			
-			drawCurveSegment(p0, p1, p2, p3, true, ++level);
-			drawCurveSegment(p4, p5, p6, p7, true, level);
+			drawCurveSegment(p0, p1, p2, p3, true, ++level, color);
+			drawCurveSegment(p4, p5, p6, p7, true, level, color);
 		} else {
-			drawable.drawLine(p3A, p3D);
+			setFogColor(p3A.z, color, c3SegmentA);
+			setFogColor(p3D.z, color, c3SegmentB);
+			drawable.drawLine(p3A, c3SegmentA, p3D, c3SegmentB);
 		}
 	}
 	

@@ -19,13 +19,14 @@ public class MoveZoomRotateMouseAdapter extends JPatchMouseAdapter {
 			((Component)mouseEvent.getSource()).addMouseMotionListener(this);
 			iMouseX = mouseEvent.getX();
 			iMouseY = mouseEvent.getY();
-			int dx = iMouseX - 40;
-			int dy = iMouseY - ((Component)mouseEvent.getSource()).getHeight() + 40;
-			if ((dx * dx + dy * dy) > 2500 && !viewDef.isLocked()) {
-				iState = MOVE;
-			} else {
-				iState = ROTATE;
-			}
+//			int dx = iMouseX - 40;
+//			int dy = iMouseY - ((Component)mouseEvent.getSource()).getHeight() + 40;
+//			if ((dx * dx + dy * dy) > 2500 && !viewDef.isLocked()) {
+//				iState = MOVE;
+//			} else {
+//				iState = ROTATE;
+//			}
+			iState = (mouseEvent.isControlDown()) ? ROTATE : MOVE;
 		}
 	}
 	

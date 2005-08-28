@@ -1,5 +1,5 @@
 /*
- * $Id: Theme.java,v 1.3 2005/08/23 22:14:42 sascha_l Exp $
+ * $Id: Theme.java,v 1.4 2005/08/28 12:59:13 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -31,23 +31,29 @@ import javax.swing.*;
  *
  */
 public class Theme {
-	public static final Color rolloverBorderColor = Color.ORANGE;
+	public static final Color rolloverBorderColor = new Color(0.6f, 0.6f, 1.0f);
 	
 	public static void paintButtonBackground(AbstractButton button, Graphics2D g2) {
+		
+		float buttonRed = (float) button.getBackground().getRed() / 255 * 0.9f;
+		float buttonGreen = (float) button.getBackground().getRed() / 255 * 0.9f;
+		float buttonBlue = (float) button.getBackground().getRed() / 255 * 1.0f;
+		Color buttonBackground = new Color(buttonRed, buttonGreen, buttonBlue);
+		
 		ButtonModel model = button.getModel();
 		float width = button.getWidth();
 		float height = button.getHeight();
 		
 		if (model.isRollover()) {
 			if (model.isPressed()) {
-				g2.setPaint(new GradientPaint(0, 0, button.getBackground(), 0, height, Color.WHITE));
+				g2.setPaint(new GradientPaint(0, 0, buttonBackground, 0, height, Color.WHITE));
 				g2.fill(new RoundRectangle2D.Float(0, 0, width, height, 9, 9));
 			} else {
-				g2.setPaint(new GradientPaint(0, 0, Color.WHITE, 0, height, button.getBackground()));
+				g2.setPaint(new GradientPaint(0, 0, Color.WHITE, 0, height, buttonBackground));
 				g2.fill(new RoundRectangle2D.Float(0, 0, width, height, 9, 9));
 			}
 		} else if (model.isSelected()) {
-			g2.setPaint(new GradientPaint(0, 0, new Color(0,0,0,0.3f), 0, height * 0.75f, new Color(0,0,0,0.0f)));
+			g2.setPaint(new GradientPaint(0, 0, new Color(0,0,0.2f,0.3f), 0, height * 0.75f, new Color(0,0,0.2f,0.0f)));
 			g2.setClip(0, 0, (int) width, (int) (height * 0.75f));
 			g2.fill(new RoundRectangle2D.Float(0, 0, width, height, 9, 9));
 			g2.setPaint(new GradientPaint(0, height * 0.75f - 1, new Color(1,1,1,0.0f), 0, height - 2, new Color(1,1,1,1f)));
@@ -58,7 +64,7 @@ public class Theme {
 			g2.setPaint(new GradientPaint(0, 0, new Color(1,1,1,1f), 0, height/2, new Color(1,1,1,0.0f)));
 			g2.setClip(0, 0, (int) width, (int) (height /2));
 			g2.fill(new RoundRectangle2D.Float(0, 0, width, height, 9, 9));
-			g2.setPaint(new GradientPaint(0, height/2 - 1, new Color(0,0,0,0.0f), 0, height - 2, new Color(0,0,0,0.1f)));
+			g2.setPaint(new GradientPaint(0, height/2 - 1, new Color(0,0,0.3f,0.0f), 0, height - 2, new Color(0,0,0.3f,0.1f)));
 			g2.setClip(0, (int) (height /2), (int) width, (int) (height /2));
 			g2.fill(new RoundRectangle2D.Float(0, 0, width, height, 9, 9));
 			g2.setClip(0, 0, (int) width, (int) height);

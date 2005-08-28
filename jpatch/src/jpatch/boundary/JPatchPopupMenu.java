@@ -69,7 +69,7 @@ public class JPatchPopupMenu extends JPopupMenu {
 		menuShow.add(miCurves);
 		menuShow.add(miPatches);
 		menuShow.add(miRotoscope);
-		menuShow.add(miBezier);
+//		menuShow.add(miBezier);
 		
 		menuView = new JMenu("view");
 		for (int i = ViewDefinition.FRONT; i <= ViewDefinition.BIRDS_EYE; i++) {
@@ -124,7 +124,7 @@ public class JPatchPopupMenu extends JPopupMenu {
 		JMenuItem miUnlock = new JMenuItem(new ClearViewLockAction(viewDefinition));
 		miUnlock.setEnabled(viewDefinition.isLocked());
 		JMenuItem miLock = new JMenuItem(new SetViewLockAction(viewDefinition));
-		JMenuItem miApplyMaterial = new JMenuItem(new ApplyMaterialAction());
+		JMenuItem miNextCurve = new JMenuItem(new NextCurveAction());
 		JMenuItem miAddStubs = new JMenuItem(new AddStubsAction());
 		JMenuItem miRemoveStubs = new JMenuItem(new RemoveStubsAction());
 		JMenuItem miConvertToCp = new JMenuItem(new ConvertHookToCpAction());
@@ -136,36 +136,41 @@ public class JPatchPopupMenu extends JPopupMenu {
 			menuTools.setEnabled(false);
 			menuTangents.setEnabled(false);
 			miLock.setEnabled(false);
-			miApplyMaterial.setEnabled(false);
+			miNextCurve.setEnabled(false);
 			miAddStubs.setEnabled(false);
 			miRemoveStubs.setEnabled(false);
 			miConvertToCp.setEnabled(false);
 		} else {
 			PointSelection ps = MainFrame.getInstance().getPointSelection();
 			miConvertToCp.setEnabled(ps.isSingle() && ps.getControlPoint().isHook());
+			if (!MainFrame.getInstance().getPointSelection().isCurve() && !MainFrame.getInstance().getPointSelection().isSingle())
+				miNextCurve.setEnabled(false);
 		}
-		
+
 		menuSelection.add(miSelectNone);
 		menuSelection.add(new SelectAllAction());
 		menuSelection.add(miInvertSelection);
 		menuSelection.add(miExtendSelection);
-		menuSelection.add(miApplyMaterial);
+		menuSelection.add(miNextCurve);
 		
 		menuTangents.add(new ChangeTangentModeAction(ChangeTangentModeAction.PEAK));
 		menuTangents.add(new ChangeTangentModeAction(ChangeTangentModeAction.JPATCH));
 		menuTangents.add(new ChangeTangentModeAction(ChangeTangentModeAction.SPATCH));
 		
-		menuTools.add(new FlipAction(FlipAction.X));
-		menuTools.add(new FlipAction(FlipAction.Y));
-		menuTools.add(new FlipAction(FlipAction.Z));
-		menuTools.add(new AlignAction());
-		menuTools.add(new AutoMirrorAction());
+		JMenu menuFlip = new JMenu("flip");
+		menuFlip.add(new FlipAction(FlipAction.X));
+		menuFlip.add(new FlipAction(FlipAction.Y));
+		menuFlip.add(new FlipAction(FlipAction.Z));
+		
+		menuTools.add(menuFlip);
 		menuTools.add(new FlipPatchesAction());
 		menuTools.add(new AlignPatchesAction());
-		menuTools.add(menuTangents);
+		menuTools.add(new AlignAction());
+		menuTools.add(new AutoMirrorAction());
 		menuTools.add(miAddStubs);
 		menuTools.add(miRemoveStubs);
-		menuTools.add(miConvertToCp);
+		menuTools.add(menuTangents);
+//		menuTools.add(miConvertToCp);
 		
 		
 		add(menuShow);
@@ -175,9 +180,11 @@ public class JPatchPopupMenu extends JPopupMenu {
 		//add(menuLight);
 		//add(menuZBuffer);
 		add(menuRotoscope);
-		add(miLock);
-		add(miUnlock);
-		add(miZBuffer);
+		if (miUnlock.isEnabled())
+			add(miUnlock);
+		else
+			add(miLock);
+//		add(miZBuffer);
 		addSeparator();
 		add(menuSelection);
 		add(menuTools);

@@ -76,7 +76,11 @@ public final class JPatchScreen extends JPanel {
 			JPatchDrawableEventListener listener = new JPatchDrawableEventListener() {
 				public void display(JPatchDrawable2 drawable) {
 					aViewport[I].prepare();
+					aViewport[I].drawGrid();
 					aViewport[I].drawModel(MainFrame.getInstance().getModel());
+					aViewport[I].drawOrigin();
+					if (tool != null)
+						aViewport[I].drawTool(tool);
 					aViewport[I].drawInfo();
 				}
 			};

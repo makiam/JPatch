@@ -184,6 +184,11 @@ public class JPatchDrawable2D implements JPatchDrawable2 {
 		g.fillRect(x, y, width, height);
 	}
 	
+	public void drawLine(Point3f p0, Color3f c0, Point3f p1, Color3f c1) {
+		g.setColor(c0.get());
+		drawLine(p0, p1);
+	}
+	
 	public void drawLine(Point3f p0, Point3f p1) {
 		if (bPerspective) {
 			if (p0.z < fNearClip) {
