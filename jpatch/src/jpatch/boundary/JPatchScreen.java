@@ -59,10 +59,11 @@ public final class JPatchScreen extends JPanel {
 	
 	public JPatchScreen(Model model,int mode,ViewDefinition[] viewDefinitions) {
 		aViewDef = viewDefinitions;
+		setLightingMode(iLightMode);
 		initScreen();
 		setFocusable(false);
 		setMode(mode);
-		setLightingMode(iLightMode);
+		
 		enablePopupMenu(true);
 //		activeViewport = aDrawable[0];
 		snapToGrid(bSnapToGrid);
@@ -95,7 +96,7 @@ public final class JPatchScreen extends JPanel {
 			//aComponent[i] = new JPatchCanvas(model,aViewDef[i]);
 			add(aDrawable[i].getComponent());
 			aDrawable[i].getComponent().setFocusable(false);
-			aViewDef[i].setLighting(RealtimeLighting.createThreepointLight()); // FIXME
+			//aViewDef[i].setLighting(RealtimeLighting.createThreepointLight()); // FIXME
 		}
 		setMode(mode);
 	}
@@ -167,28 +168,32 @@ public final class JPatchScreen extends JPanel {
 	}
 	
 	public void setLightingMode(int mode) {
-//		iLightMode = mode;
-//		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-//			switch(iLightMode) {
-//				case LIGHT_OFF:
+		iLightMode = mode;
+		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+			switch(iLightMode) {
+				case LIGHT_OFF:
 //					aComponent[i].flatShade(true);
 //					aComponent[i].setLighting(Lighting.createSimpleLight());
-//					break;
-//				case LIGHT_SIMPLE:
+					aViewDef[i].setLighting(RealtimeLighting.createThreepointLight());
+					break;
+				case LIGHT_SIMPLE:
 //					aComponent[i].flatShade(false);
 //					aComponent[i].setLighting(Lighting.createSimpleLight());
-//					break;
-//				case LIGHT_HEAD:
+					aViewDef[i].setLighting(RealtimeLighting.createSimpleLight());
+					break;
+				case LIGHT_HEAD:
 //					aComponent[i].flatShade(false);
 //					aComponent[i].setLighting(Lighting.createHeadLight());
-//					break;
-//				case LIGHT_THREE_POINT:
+					aViewDef[i].setLighting(RealtimeLighting.createHeadLight());
+					break;
+				case LIGHT_THREE_POINT:
 //					aComponent[i].flatShade(false);
 //					aComponent[i].setLighting(Lighting.createThreePointLight());
-//					break;
-//			}
-//		}
-//		update_all();
+					aViewDef[i].setLighting(RealtimeLighting.createThreepointLight());
+					break;
+			}
+		}
+		update_all();
 	}
 	
 	public int getLightingMode() {
@@ -210,7 +215,7 @@ public final class JPatchScreen extends JPanel {
 //	}
 	
 	public void setStickyLight(boolean sticky) {
-//		bStickyLight = sticky;
+		bStickyLight = sticky;
 //		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 //			aComponent[i].getLighting().setStickyLight(sticky);
 //		}

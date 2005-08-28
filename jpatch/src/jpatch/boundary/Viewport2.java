@@ -113,8 +113,11 @@ public class Viewport2 {
 		else
 			m4View.set(viewDef.getMatrix());
 		drawable.clear(JPatchDrawable2.COLOR_BUFFER | JPatchDrawable2.DEPTH_BUFFER, new Color3f(settings.cBackground)); // FIXME
-		if (drawable.isLightingSupported())
+		if (drawable.isLightingSupported()) {
+			if (!MainFrame.getInstance().getJPatchScreen().isStickyLight())
+				viewDef.getLighting().transform(viewDef.getMatrix());
 			drawable.setLighting(viewDef.getLighting());
+		}
 	}
 	
 	public void drawInfo() {
@@ -132,8 +135,12 @@ public class Viewport2 {
 	}
 	
 	private void setFogColor(float z, Color3f colorIn, Color3f colorOut) {
-		colorOut.interpolate(colorIn, c3Background, (z - fMinZ) / fDeltaZ * 0.75f);
-		colorOut.clamp(0, 1);
+		if (settings.bFog) {
+			colorOut.interpolate(colorIn, c3Background, (z - fMinZ) / fDeltaZ * 0.75f);
+			colorOut.clamp(0, 1);
+		} else {
+			colorOut.set(colorIn);
+		}
 	}
 	
 	public void drawRotoscope() {
@@ -164,7 +171,7 @@ public class Viewport2 {
 		Point3f pz = new Point3f();
 		for (Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
 			for(ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
-				if (cp.isHead()){
+				if (cp.isHead() && !cp.isHidden()){
 					pz.set(cp.getPosition());
 					m4View.transform(pz);
 					if (pz.z > fDeltaZ)

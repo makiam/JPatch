@@ -22,6 +22,7 @@ implements ChangeListener {
 		add(new JPatchButton(new DeleteMaterialAction(material)));
 		add(new JPatchButton(new ApplyMaterialAction(material)));
 		add(new JPatchButton(new SelectMaterialAction(material)));
+		add(new JPatchButton(new ApplyMaterialAction()));
 		JPatchInput.setDimensions(50,150,20);
 		inputName = new JPatchInput("Name:",material.getName());
 		JPanel detailPanel = MainFrame.getInstance().getSideBar().getDetailPanel();
