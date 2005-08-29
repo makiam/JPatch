@@ -174,7 +174,7 @@ public final class JPatchScreen extends JPanel {
 				case LIGHT_OFF:
 //					aComponent[i].flatShade(true);
 //					aComponent[i].setLighting(Lighting.createSimpleLight());
-					aViewDef[i].setLighting(RealtimeLighting.createThreepointLight());
+					aViewDef[i].setLighting(null);
 					break;
 				case LIGHT_SIMPLE:
 //					aComponent[i].flatShade(false);

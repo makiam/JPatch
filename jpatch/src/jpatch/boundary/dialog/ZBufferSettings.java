@@ -11,7 +11,7 @@ public class ZBufferSettings extends BDialog {
 	private String[] rendererName = new String[] { "Java2D", "Software Z-Buffer", "OpenGL" };
 	
 	private ColumnContainer content = new ColumnContainer();
-	private FormContainer form = new FormContainer(2, 4);
+	private FormContainer form = new FormContainer(2, 6);
 	
 	private RowContainer buttons = new RowContainer();
 	private BButton buttonOk = new BButton("OK");
@@ -20,7 +20,8 @@ public class ZBufferSettings extends BDialog {
 	private BuoyUtils.RadioSelector rsBackface = new BuoyUtils.RadioSelector(new String[] { "ignore", "cull", "highlight" }, settings.iBackfaceMode);
 	private BuoyUtils.RadioSelector rsRenderer = new BuoyUtils.RadioSelector(rendererName, settings.iRealtimeRenderer);
 	private BuoyUtils.RadioSelector rsFog = new BuoyUtils.RadioSelector(new String[] { "enabled", "disabled" }, settings.bFog ? 0 : 1);
-	
+	private BuoyUtils.RadioSelector rsLight = new BuoyUtils.RadioSelector(new String[] { "off", "simple", "headlight", "threepoint light" }, settings.iLightingMode );
+	private BuoyUtils.RadioSelector rsLightSticky = new BuoyUtils.RadioSelector(new String[] { "relative to viewer", "relative to model" }, settings.bStickyLight ? 0 : 1 );
 	
 	public ZBufferSettings() {
 		super("Realtime renderer settings");
@@ -45,8 +46,9 @@ public class ZBufferSettings extends BDialog {
 		((JSlider) sliderTesselationQuality.getComponent()).setLabelTable(dict);
 				
 		//LayoutInfo northeast = new LayoutInfo(LayoutInfo.NORTHEAST, LayoutInfo.NONE);
-		LayoutInfo east = new LayoutInfo(LayoutInfo.NORTHEAST, LayoutInfo.NONE);
-		LayoutInfo west = new LayoutInfo(LayoutInfo.NORTHWEST, LayoutInfo.NONE);
+		LayoutInfo northeast = new LayoutInfo(LayoutInfo.NORTHEAST, LayoutInfo.NONE);
+		LayoutInfo east = new LayoutInfo(LayoutInfo.EAST, LayoutInfo.NONE);
+		LayoutInfo west = new LayoutInfo(LayoutInfo.NORTHWEST, LayoutInfo.HORIZONTAL);
 		
 		int i = 0;
 		form.add(new BLabel("Renderer:    "), 0, i, east);
@@ -55,7 +57,11 @@ public class ZBufferSettings extends BDialog {
 		form.add(rsBackface, 1, i++, west);
 		form.add(new BLabel("Wireframe fog effect:    "), 0, i, east);
 		form.add(rsFog, 1, i++, west);
-		form.add(new BLabel("Tesselation quality:    "), 0, i, east);
+		form.add(new BLabel("Lighting:    "), 0, i, east);
+		form.add(rsLight, 1, i++, west);
+		form.add(new BLabel("Light position:    "), 0, i, east);
+		form.add(rsLightSticky, 1, i++, west);
+		form.add(new BLabel("Tesselation quality:    "), 0, i, northeast);
 		form.add(sliderTesselationQuality, 1, i++, west);
 		
 		
@@ -81,6 +87,10 @@ public class ZBufferSettings extends BDialog {
 		settings.bFog = (rsFog.getSelectedIndex() == 0);
 		settings.iTesselationQuality = sliderTesselationQuality.getValue();
 		settings.iBackfaceMode = rsBackface.getSelectedIndex();
+		settings.iLightingMode = rsLight.getSelectedIndex();
+		MainFrame.getInstance().getJPatchScreen().setLightingMode(settings.iLightingMode);
+		settings.bStickyLight = (rsLightSticky.getSelectedIndex() == 0);
+		MainFrame.getInstance().getJPatchScreen().setStickyLight(settings.bStickyLight);
 		Viewport2.setQuality(settings.iTesselationQuality);
 		dispose();
 		MainFrame.getInstance().getJPatchScreen().update_all();
