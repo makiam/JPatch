@@ -46,21 +46,25 @@ public class BuoyUtils {
 		}
 	}
 	
-	public static class RadioSelector extends RowContainer {
-		RadioButtonGroup bg = new RadioButtonGroup();
-		private HashMap map = new HashMap();
-		
+	public static class RadioSelector extends BComboBox {
 		public RadioSelector(String[] selections, int selectedIndex) {
-			for (int i = 0; i < selections.length; i++) {
-				BRadioButton button = new BRadioButton(selections[i], i == selectedIndex, bg);
-				add(button, new LayoutInfo(LayoutInfo.WEST, LayoutInfo.NONE));
-				map.put(button, new Integer(i));
-			}
+			super(selections);
+			setSelectedIndex(selectedIndex);
 		}
-		
-		public int getSelectedIndex() {
-			return ((Integer) map.get((BRadioButton) bg.getSelection())).intValue();
-		}
+//		RadioButtonGroup bg = new RadioButtonGroup();
+//		private HashMap map = new HashMap();
+//		
+//		public RadioSelector(String[] selections, int selectedIndex) {
+//			for (int i = 0; i < selections.length; i++) {
+//				BRadioButton button = new BRadioButton(selections[i], i == selectedIndex, bg);
+//				add(button, new LayoutInfo(LayoutInfo.WEST, LayoutInfo.NONE));
+//				map.put(button, new Integer(i));
+//			}
+//		}
+//		
+//		public int getSelectedIndex() {
+//			return ((Integer) map.get((BRadioButton) bg.getSelection())).intValue();
+//		}
 	}
 	
 	public static class ColorSelector extends BButton {

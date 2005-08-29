@@ -11,11 +11,15 @@ import jpatch.entity.*;
 
 public class JPatchDrawableGL implements JPatchDrawable2 {
 	private static final float GHOST_ALPHA = 0.5f;
+	private static final JPatchSettings settings = JPatchSettings.getInstance();
 	
 	private GLDrawable glDrawable;
 	private volatile GL gl;
 	private int iGlMode = -1;
 	private int iTransparentMode = OFF;
+	
+	private Color4f color = new Color4f();
+	private Color3f backfaceColor;
 	
 	private boolean bPointAsQuad = true;
 	private boolean bPerspective = false;
@@ -418,7 +422,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	
 	public String getInfo() {
 		//return "JOGL OpenGL Renderer\nGL Vendor: " + gl.glGetString(GL.GL_VENDOR) + "\nGL Renderer: " + gl.glGetString(GL.GL_RENDERER) + "\nGL Version: " + gl.glGetString(GL.GL_VERSION) + "\n";
-		return "OpenGL (JOGL)";
+		return "JOGL OpenGL renderer";
 	}
 	
 	private void enableRasterMode(boolean enable) {
@@ -462,9 +466,10 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 					0, 0, 1, 0,
 					0, 0, 0, 1
 			});
-			gl.glDisable(GL.GL_LIGHTING); // FIXME
+			gl.glDisable(GL.GL_LIGHTING);
 			gl.glEnable(GL.GL_DEPTH_TEST);
 			gl.glShadeModel(GL.GL_SMOOTH);
+			backfaceColor = new Color3f(JPatchSettings.getInstance().cBackface); // FIXME
 			switch(JPatchSettings.getInstance().iBackfaceMode) {
 				case 0: {
 					gl.glDisable(GL.GL_CULL_FACE);
@@ -476,7 +481,6 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 				case 2: {
 					gl.glDisable(GL.GL_CULL_FACE);
 					gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1);
-					Color3f backfaceColor = new Color3f(JPatchSettings.getInstance().cBackface);
 					gl.glMaterialfv(GL.GL_BACK, GL.GL_AMBIENT, new float[] { backfaceColor.x, backfaceColor.y, backfaceColor.z } );
 					gl.glMaterialfv(GL.GL_BACK, GL.GL_DIFFUSE, new float[] { 0.0f, 0.0f, 0.0f } );
 					gl.glMaterialfv(GL.GL_BACK, GL.GL_SPECULAR, new float[] { 0.0f, 0.0f, 0.0f } );
@@ -731,15 +735,18 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void setColor(Color3f color) {
-		if (bRenderGhost)
+		if (bRenderGhost) {
 			gl.glColor4f(color.x, color.y, color.z, GHOST_ALPHA);
-		else
+			this.color.set(color.x, color.y, color.z, GHOST_ALPHA);
+		} else {
 			gl.glColor3f(color.x, color.y, color.z);
-		//this.color.set(color);
+			this.color.set(color.x, color.y, color.z, 1);
+		}
 	}
 	
 	public void setColor(Color4f color) {
 		gl.glColor4f(color.x, color.y, color.z, color.w);
+		this.color.set(color);
 	}
 	
 	public void setMaterial(MaterialProperties mp) {
@@ -804,6 +811,11 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void setLighting(RealtimeLighting lighting) {
+		if (lighting == null) {
+			gl.glDisable(GL.GL_LIGHTING);
+			return;
+		}
+		gl.glEnable(GL.GL_LIGHTING);
 		Color3f ambient = lighting.getAmbientColor();
 		gl.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, new float[] { ambient.x, ambient.y, ambient.z, 1 });
 		for (int i = 0; i < iMaxLights; i++) {
@@ -996,15 +1008,20 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void drawTriangle(Point3f p0, Point3f p1, Point3f p2) {
+		boolean backface = (settings.iBackfaceMode == 2 && (p1.x - p0.x) * (p2.y - p0.y) - (p1.y - p0.y) * (p2.x - p0.x) < 0);
+		if (backface)
+			gl.glColor3f(backfaceColor.x, backfaceColor.y, backfaceColor.z);
 		enableRasterMode(false);
 		if (iGlMode != GL.GL_TRIANGLES) {
 			gl.glEnd();
 			iGlMode = GL.GL_TRIANGLES;
 			gl.glBegin(iGlMode);
 		}
-		gl.glVertex3f(p0.x, p0.y, p0.z);
-		gl.glVertex3f(p1.x, p1.y, p1.z);
-		gl.glVertex3f(p2.x, p2.y, p2.z);
+		gl.glVertex3f(p0.x, p0.y, p0.z + 1);
+		gl.glVertex3f(p1.x, p1.y, p1.z + 1);
+		gl.glVertex3f(p2.x, p2.y, p2.z + 1);
+		if (backface)
+			gl.glColor4f(color.x, color.y, color.z, color.w);
 	}
 	
 	public void drawTriangle(Point3f p0, Color3f c0, Point3f p1, Color3f c1, Point3f p2, Color3f c2) {
@@ -1032,11 +1049,11 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			gl.glBegin(iGlMode);
 		}
 		gl.glColor4f(c0.x, c0.y, c0.z, c0.w);
-		gl.glVertex3f(p0.x, p0.y, p0.z);
+		gl.glVertex3f(p0.x, p0.y, p0.z + 1);
 		gl.glColor4f(c1.x, c1.y, c1.z, c1.w);
-		gl.glVertex3f(p1.x, p1.y, p1.z);
+		gl.glVertex3f(p1.x, p1.y, p1.z + 1);
 		gl.glColor4f(c2.x, c2.y, c2.z, c2.w);
-		gl.glVertex3f(p2.x, p2.y, p2.z);
+		gl.glVertex3f(p2.x, p2.y, p2.z + 1);
 	}
 	
 	public void drawTriangle(Point3f p0, Vector3f n0, Point3f p1, Vector3f n1, Point3f p2, Vector3f n2) {
