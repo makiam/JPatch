@@ -812,10 +812,10 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	
 	public void setLighting(RealtimeLighting lighting) {
 		if (lighting == null) {
-			gl.glDisable(GL.GL_LIGHTING);
+			//gl.glDisable(GL.GL_LIGHTING);
 			return;
 		}
-		gl.glEnable(GL.GL_LIGHTING);
+		//gl.glEnable(GL.GL_LIGHTING);
 		Color3f ambient = lighting.getAmbientColor();
 		gl.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, new float[] { ambient.x, ambient.y, ambient.z, 1 });
 		for (int i = 0; i < iMaxLights; i++) {
