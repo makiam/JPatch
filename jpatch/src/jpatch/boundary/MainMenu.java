@@ -164,7 +164,7 @@ public final class MainMenu extends JMenuBar {
 		menuOptions.add(new ColorPreferencesAction());
 		menuOptions.add(new SetGridSpacingAction());
 		menuOptions.add(new ZBufferQualityAction());
-		menuOptions.add(menuLight);
+//		menuOptions.add(menuLight);
 		
 		
 		menuPlaf = new JMenu("Look And Feel");

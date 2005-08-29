@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.16 2005/08/28 19:05:39 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.17 2005/08/29 14:00:27 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -114,9 +114,16 @@ public class Viewport2 {
 			m4View.set(viewDef.getMatrix());
 		drawable.clear(JPatchDrawable2.COLOR_BUFFER | JPatchDrawable2.DEPTH_BUFFER, new Color3f(settings.cBackground)); // FIXME
 		if (drawable.isLightingSupported()) {
-			if (!MainFrame.getInstance().getJPatchScreen().isStickyLight())
-				viewDef.getLighting().transform(viewDef.getMatrix());
-			drawable.setLighting(viewDef.getLighting());
+			RealtimeLighting rtl = viewDef.getLighting();
+			if (rtl != null) {
+				Matrix4f identity = new Matrix4f();
+				identity.setIdentity();
+				if (!MainFrame.getInstance().getJPatchScreen().isStickyLight())
+					rtl.transform(viewDef.getMatrix());
+				else
+					rtl.transform(identity);
+			}
+			drawable.setLighting(rtl);
 		}
 	}
 	
@@ -158,9 +165,12 @@ public class Viewport2 {
 		drawable.setGhostRenderingEnabled(true);
 		tool.paint(viewDef);
 		drawable.setGhostRenderingEnabled(false);
-		tool.paint(viewDef);
+		if (drawable instanceof JPatchDrawableGL)
+			tool.paint(viewDef);
 	}
 	
+	private Color3f solidColor = new Color3f();
+	private Color4f solidColor4 = new Color4f();
 	public void drawModel(Model model) {
 		
 		/*
@@ -233,10 +243,12 @@ public class Viewport2 {
 			}
 		}
 		if (viewDef.renderPatches() && (drawable.isShadingSupported() || drawable.isLightingSupported())) {
+			drawable.setColor(new Color3f(new java.awt.Color(JPatchSettings.getInstance().iBackfaceColor))); // FIXME
+			int passes = (drawable instanceof JPatchDrawableGL) ? 3 : 2;
 			Vector3f[] normals = new Vector3f[] {new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f()};
 			if (drawable.isLightingSupported())
-				drawable.setLightingEnabled(true);
-			for (int pass = 0; pass < 3; pass++) {
+				drawable.setLightingEnabled(viewDef.getLighting() != null);
+			for (int pass = 0; pass < passes; pass++) {
 				drawable.setTransparentRenderingMode(pass);
 				pass:
 				for (Patch patch = model.getFirstPatch(); patch != null; patch = patch.getNext()) {
@@ -403,13 +415,33 @@ public class Viewport2 {
 							
 							//System.out.println(patch + " " + hashPatch.length);
 							//if (hashPatch.length == 12) {
-							if (drawable.isLightingSupported())
-								//((JPatchDrawableGL) drawable).setReflectionsEnabled(true);
-								//((JPatchDrawableGL) drawable).setLightingEnabled(false);
-								drawLitHashPatch(hashPatch, normals, levels);
-							else
-								//drawLitHashPatch(hashPatch, normals, levels);
-								drawShadedHashPatch(hashPatch, normals, levels, patch.getMaterial().getMaterialProperties());
+							//MaterialProperties mp = patch.getMaterial().getMaterialProperties();
+							if (viewDef.getLighting() == null) {
+								float f = mp.ambient + 0.75f * mp.diffuse;
+								if (mp.transmit == 0 && mp.filter == 0) {
+									solidColor.set(mp.red * f, mp.green * f, mp.blue * f);
+									solidColor.clamp(0, 1);
+									drawable.setColor(solidColor);
+									drawFlatHashPatch(hashPatch, levels);
+								} else {
+									solidColor4.set(mp.red * f, mp.green * f, mp.blue * f, 1 - mp.transmit - mp.filter);
+									solidColor4.clamp(0, 1);
+									drawable.setColor(solidColor4);
+									drawFlatHashPatch(hashPatch, levels);
+								}
+							} else {
+								if (drawable.isLightingSupported()) {
+									//((JPatchDrawableGL) drawable).setReflectionsEnabled(true);
+									//((JPatchDrawableGL) drawable).setLightingEnabled(false);
+									drawLitHashPatch(hashPatch, normals, levels);
+								} else {
+									//drawLitHashPatch(hashPatch, normals, levels);
+									if (pass == 0)
+										drawShadedHashPatch(hashPatch, normals, levels, mp);
+									else
+										drawShadedHashPatchAlpha(hashPatch, normals, levels, mp);
+								}
+							}
 							//}
 	//					} else {
 	//						int[] levels = new int[patch.getType()];
@@ -542,6 +574,477 @@ public class Viewport2 {
 			setFogColor(p3A.z, color, c3SegmentA);
 			setFogColor(p3D.z, color, c3SegmentB);
 			drawable.drawLine(p3A, c3SegmentA, p3D, c3SegmentB);
+		}
+	}
+	
+	public void drawFlatHashPatch(Point3f[] ap3, int[] ail) {
+		boolean[] flat = new boolean[] { false, false, false, false };
+		switch (ap3.length) {
+			case 9: {
+				
+				///* set up corner normals */
+				//Vector3f[] cn = newNormals(4);
+				//v3a.sub(ap3[1], ap3[0]);
+				//v3b.sub(ap3[8], ap3[0]);
+				//cn[0].cross(v3b, v3a);
+				//v3a.sub(ap3[4], ap3[3]);
+				//v3b.sub(ap3[2], ap3[3]);
+				//cn[1].cross(v3b, v3a);
+				//v3a.sub(ap3[7], ap3[6]);
+				//v3b.sub(ap3[5], ap3[6]);
+				//cn[2].cross(v3b, v3a);
+				//cn[0].normalize();
+				//cn[1].normalize();
+				//cn[2].normalize();
+				//cn[3].set(cn[0]);
+				
+			
+				Point3f[] p = new Point3f[] {ap3[0], ap3[1], ap3[2], ap3[3], ap3[4], ap3[5], ap3[6], ap3[7], ap3[8], new Point3f(ap3[0]), new Point3f(ap3[0]), new Point3f(ap3[0])};
+				
+				//p[0].set(ap3[0]);
+				//p[1].set(ap3[1]);
+				//p[2].set(ap3[2]);
+				//p[3].set(ap3[3]);
+				//p[4].set(ap3[4]);
+				//p[5].set(ap3[5]);
+				//p[6].set(ap3[6]);
+				//p[7].set(ap3[7]);
+				//p[8].set(ap3[8]);
+				//p[9].set(ap3[0]);
+				//p[10].set(ap3[0]);
+				//p[11].set(ap3[0]);
+				//
+				//drawRectHashPatchGourad(p, n, mp, 0);
+				int[] levels = new int[] { ail[0], ail[1], ail[2], 0 };
+				drawFlatHashPatch4(p, flat, levels);
+				//if (true) return;
+				//
+				/////* set up corner normals */
+				////Vector3f[] cn = newNormals(3);
+				////v3a.sub(ap3[1], ap3[0]);
+				////v3b.sub(ap3[8], ap3[0]);
+				////cn[0].cross(v3b, v3a);
+				////v3a.sub(ap3[4], ap3[3]);
+				////v3b.sub(ap3[2], ap3[3]);
+				////cn[1].cross(v3b, v3a);
+				////v3a.sub(ap3[7], ap3[6]);
+				////v3b.sub(ap3[5], ap3[6]);
+				////cn[2].cross(v3b, v3a);
+				////cn[0].normalize();
+				////cn[1].normalize();
+				////cn[2].normalize();
+				//
+				////drawHashPatch3(ap3, cn, 0, mp);
+				////if (true) return;
+				//
+				///* set up midpoint normals */
+				//Vector3f[] mn = new Vector3f[5];
+				//mn[0] = interpolateNormal(cn[0], cn[1], ap3[0], ap3[1], ap3[2], ap3[3]);
+				//mn[1] = interpolateNormal(cn[1], cn[2], ap3[3], ap3[4], ap3[5], ap3[6]);
+				//mn[2] = interpolateNormal(cn[2], cn[0], ap3[6], ap3[7], ap3[8], ap3[0]);
+				//
+				//Point3f A = Functions.parallelogram(ap3[0],ap3[1],ap3[8]);
+				//Point3f B = Functions.parallelogram(ap3[3],ap3[4],ap3[2]);
+				//Point3f C = Functions.parallelogram(ap3[6],ap3[7],ap3[5]);
+				//
+				//Point3f F = Functions.average(A,ap3[0],ap3[1],ap3[8]);
+				//Point3f H = Functions.average(B,ap3[3],ap3[4],ap3[2]);
+				//Point3f J = Functions.average(C,ap3[6],ap3[7],ap3[5]);
+				//
+				//Point3f G = Functions.average(A,B,ap3[1],ap3[2]);
+				//Point3f I = Functions.average(B,C,ap3[4],ap3[5]);
+				//Point3f K = Functions.average(C,A,ap3[7],ap3[8]);
+				//
+				//Point3f U = Functions.average(A,B,C);
+				//
+				//Point3f P = Functions.average(U,K,F,G);
+				//Point3f Q = Functions.average(U,G,H,I);
+				//Point3f R = Functions.average(U,I,J,K);
+				//
+				//Point3f V = Functions.average(R,P);
+				//Point3f W = Functions.average(P,Q);
+				//Point3f X = Functions.average(Q,R);
+				//
+				//Point3f Center = Functions.average(P,Q,R);
+				//
+				//Vector3f vc = Functions.vector(V, Center);
+				//Vector3f wc = Functions.vector(W, Center);
+				//Vector3f xc = Functions.vector(X, Center);
+				//
+				//Vector3f[] nc = newNormals(3);
+				//nc[0].cross(wc, vc);
+				//nc[1].cross(xc, wc);
+				//nc[2].cross(vc, xc);
+				//nc[0].normalize();
+				//nc[1].normalize();
+				//nc[2].normalize();
+				//Vector3f centerNormal = Functions.vaverage(nc[0], nc[1], nc[2]);
+				//centerNormal.normalize();
+				//
+				//Vector3f[] normals = newNormals(4);
+				//
+				//Point3f[][] aap3Boundary = new Point3f[3][7];
+				//
+				//aap3Boundary[0] = Bezier.deCasteljau(ap3[0],ap3[1],ap3[2],ap3[3],0.5f);
+				//aap3Boundary[1] = Bezier.deCasteljau(ap3[3],ap3[4],ap3[5],ap3[6],0.5f);
+				//aap3Boundary[2] = Bezier.deCasteljau(ap3[6],ap3[7],ap3[8],ap3[0],0.5f);
+				//
+				//Point3f[] ap3Patches = new Point3f[12];
+				//
+				//Vector3f v;
+				//float sc = 0.33f;
+				//
+				//ap3Patches[0] = new Point3f(aap3Boundary[0][0]);
+				//ap3Patches[1] = new Point3f(aap3Boundary[0][1]);
+				//ap3Patches[2] = new Point3f(aap3Boundary[0][2]);
+				//ap3Patches[3] = new Point3f(aap3Boundary[0][3]);
+				//ap3Patches[11] = new Point3f(aap3Boundary[2][5]);
+				//v = Functions.vaverage(Functions.vector(ap3[3],ap3[4]),Functions.vector(ap3[0],ap3[8]));
+				//v.scale(sc);
+				//ap3Patches[4] = new Point3f(aap3Boundary[0][3]);
+				//ap3Patches[4].add(v);
+				////ap3Patches[4].add(Functions.average(Functions.vector(ap3[3],ap3[4]),Functions.vector(ap3[0],ap3[8])));
+				//ap3Patches[10] = new Point3f(aap3Boundary[2][4]);
+				//ap3Patches[5] = new Point3f(W);
+				//ap3Patches[9] = new Point3f(aap3Boundary[2][3]);
+				//v = Functions.vaverage(Functions.vector(ap3[0],ap3[1]),Functions.vector(ap3[6],ap3[5]));
+				//v.scale(sc);
+				//ap3Patches[8] = new Point3f(aap3Boundary[2][3]);
+				//ap3Patches[8].add(v);
+				////ap3Patches[8].add(Functions.average(Functions.vector(ap3[0],ap3[1]),Functions.vector(ap3[6],ap3[5])));
+				//ap3Patches[7] = new Point3f(V);
+				//ap3Patches[6] = new Point3f(Center);
+				//normals[0].set(cn[0]);
+				//normals[1].set(mn[0]);
+				//normals[2].set(centerNormal);
+				//normals[3].set(mn[2]);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+				//    
+				//ap3Patches[0].set(aap3Boundary[1][0]);
+				//ap3Patches[1].set(aap3Boundary[1][1]);
+				//ap3Patches[2].set(aap3Boundary[1][2]);
+				//ap3Patches[3].set(aap3Boundary[1][3]);
+				//ap3Patches[11].set(aap3Boundary[0][5]);
+				//v = Functions.vaverage(Functions.vector(ap3[6],ap3[7]),Functions.vector(ap3[3],ap3[2]));
+				//v.scale(sc);
+				//ap3Patches[4].add(aap3Boundary[1][3], v);
+				////ap3Patches[4].add(Functions.average(Functions.vector(ap3[6],ap3[7]),Functions.vector(ap3[3],ap3[2])));
+				//ap3Patches[10].set(aap3Boundary[0][4]);
+				//ap3Patches[5].set(X);
+				//ap3Patches[9].set(aap3Boundary[0][3]);
+				//v = Functions.vaverage(Functions.vector(ap3[3],ap3[4]),Functions.vector(ap3[0],ap3[8]));
+				//v.scale(sc);
+				//ap3Patches[8].add(aap3Boundary[0][3], v);
+				////ap3Patches[8].add(Functions.average(Functions.vector(ap3[3],ap3[4]),Functions.vector(ap3[0],ap3[8])));
+				//ap3Patches[7].set(W);
+				//ap3Patches[6].set(Center);
+				//normals[0].set(cn[1]);
+				//normals[1].set(mn[1]);
+				//normals[2].set(centerNormal);
+				//normals[3].set(mn[0]);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+				//
+				//ap3Patches[0].set(aap3Boundary[2][0]);
+				//ap3Patches[1].set(aap3Boundary[2][1]);
+				//ap3Patches[2].set(aap3Boundary[2][2]);
+				//ap3Patches[3].set(aap3Boundary[2][3]);
+				//ap3Patches[11].set(aap3Boundary[1][5]);
+				//v = Functions.vaverage(Functions.vector(ap3[0],ap3[1]),Functions.vector(ap3[6],ap3[5]));
+				//v.scale(sc);
+				//ap3Patches[4].add(aap3Boundary[2][3], v);
+				////ap3Patches[4].add(Functions.average(Functions.vector(ap3[0],ap3[1]),Functions.vector(ap3[6],ap3[5])));
+				//ap3Patches[10] = new Point3f(aap3Boundary[1][4]);
+				//ap3Patches[5].set(V);
+				//ap3Patches[9].set(aap3Boundary[1][3]);
+				//v = Functions.vaverage(Functions.vector(ap3[6],ap3[7]),Functions.vector(ap3[3],ap3[2]));
+				//v.scale(sc);
+				//ap3Patches[8].add(aap3Boundary[1][3], v);
+				////ap3Patches[8].add(Functions.average(Functions.vector(ap3[6],ap3[7]),Functions.vector(ap3[3],ap3[2])));
+				//ap3Patches[7].set(X);
+				//ap3Patches[6].set(Center);
+				//normals[0].set(cn[2]);
+				//normals[1].set(mn[2]);
+				//normals[2].set(centerNormal);
+				//normals[3].set(mn[1]);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+			}
+			break;
+			case 12: {
+				///* set up corner normals */
+				//Vector3f[] normals = newNormals(4);
+				//v3a.sub(ap3[1], ap3[0]);
+				//v3b.sub(ap3[11], ap3[0]);
+				//normals[0].cross(v3b, v3a);
+				//v3a.sub(ap3[4], ap3[3]);
+				//v3b.sub(ap3[2], ap3[3]);
+				//normals[1].cross(v3b, v3a);
+				//v3a.sub(ap3[7], ap3[6]);
+				//v3b.sub(ap3[5], ap3[6]);
+				//normals[2].cross(v3b, v3a);
+				//v3a.sub(ap3[10], ap3[9]);
+				//v3b.sub(ap3[8], ap3[9]);
+				//normals[3].cross(v3b, v3a);
+				//normals[0].normalize();
+				//normals[1].normalize();
+				//normals[2].normalize();
+				//normals[3].normalize();
+//				colors[0] = lighting.shade(ap3[0], av3[0], mp);
+//				colors[1] = lighting.shade(ap3[3], av3[1], mp);
+//				colors[2] = lighting.shade(ap3[6], av3[2], mp);
+//				colors[3] = lighting.shade(ap3[9], av3[3], mp);
+				drawFlatHashPatch4(ap3, flat, ail);
+				//drawRectHashPatchGourad(ap3, av3, mp, 0);
+			}
+			break;
+			case 15: {
+				///* set up corner normals */
+				//Vector3f[] cn = newNormals(5);
+				//v3a.sub(ap3[1], ap3[0]);
+				//v3b.sub(ap3[14], ap3[0]);
+				//cn[0].cross(v3b, v3a);
+				//v3a.sub(ap3[4], ap3[3]);
+				//v3b.sub(ap3[2], ap3[3]);
+				//cn[1].cross(v3b, v3a);
+				//v3a.sub(ap3[7], ap3[6]);
+				//v3b.sub(ap3[5], ap3[6]);
+				//cn[2].cross(v3b, v3a);
+				//v3a.sub(ap3[10], ap3[9]);
+				//v3b.sub(ap3[8], ap3[9]);
+				//cn[3].cross(v3b, v3a);
+				//v3a.sub(ap3[13], ap3[12]);
+				//v3b.sub(ap3[11], ap3[12]);
+				//cn[4].cross(v3b, v3a);
+				//cn[0].normalize();
+				//cn[1].normalize();
+				//cn[2].normalize();
+				//cn[3].normalize();
+				//cn[4].normalize();
+					
+				/* set up midpoint normals */
+					
+				/* compute corner-colors */
+//				int[] ccol = new int[] {
+//					lighting.shade(ap3[0], av3[0], mp),
+//					lighting.shade(ap3[3], av3[1], mp),
+//					lighting.shade(ap3[6], av3[2], mp),
+//					lighting.shade(ap3[9], av3[3], mp),
+//					lighting.shade(ap3[12], av3[4], mp)
+//				};
+					
+				Point3f A = Functions.parallelogram(ap3[0],ap3[1],ap3[14]);
+				Point3f B = Functions.parallelogram(ap3[3],ap3[4],ap3[2]);
+				Point3f C = Functions.parallelogram(ap3[6],ap3[7],ap3[5]);
+				Point3f D = Functions.parallelogram(ap3[9],ap3[10],ap3[8]);
+				Point3f E = Functions.parallelogram(ap3[12],ap3[13],ap3[11]);
+				
+				Point3f F = Functions.average(A,ap3[0],ap3[1],ap3[14]);
+				Point3f H = Functions.average(B,ap3[3],ap3[4],ap3[2]);
+				Point3f J = Functions.average(C,ap3[6],ap3[7],ap3[5]);
+				Point3f L = Functions.average(D,ap3[9],ap3[10],ap3[8]);
+				Point3f N = Functions.average(E,ap3[12],ap3[13],ap3[11]);
+				
+				Point3f G = Functions.average(A,B,ap3[1],ap3[2]);
+				Point3f I = Functions.average(B,C,ap3[4],ap3[5]);
+				Point3f K = Functions.average(C,D,ap3[7],ap3[8]);
+				Point3f M = Functions.average(D,E,ap3[10],ap3[11]);
+				Point3f O = Functions.average(E,A,ap3[13],ap3[14]);
+				
+				Point3f U = Functions.average(A,B,C,D,E);
+				
+				Point3f P = Functions.average(U,O,F,G);
+				Point3f Q = Functions.average(U,G,H,I);
+				Point3f R = Functions.average(U,I,J,K);
+				Point3f S = Functions.average(U,K,L,M);
+				Point3f T = Functions.average(U,M,N,O);
+				
+				Point3f V = Functions.average(T,P);
+				Point3f W = Functions.average(P,Q);
+				Point3f X = Functions.average(Q,R);
+				Point3f Y = Functions.average(R,S);
+				Point3f Z = Functions.average(S,T);
+				
+				Point3f Center = Functions.average(P,Q,R,S,T);
+				
+				Vector3f vc = Functions.vector(V, Center);
+				Vector3f wc = Functions.vector(W, Center);
+				Vector3f xc = Functions.vector(X, Center);
+				Vector3f yc = Functions.vector(Y, Center);
+				Vector3f zc = Functions.vector(Z, Center);
+				
+				Point3f[][] aap3Boundary = new Point3f[5][7];
+				
+				aap3Boundary[0] = Bezier.deCasteljau(ap3[0],ap3[1],ap3[2],ap3[3],0.5f);
+				aap3Boundary[1] = Bezier.deCasteljau(ap3[3],ap3[4],ap3[5],ap3[6],0.5f);
+				aap3Boundary[2] = Bezier.deCasteljau(ap3[6],ap3[7],ap3[8],ap3[9],0.5f);
+				aap3Boundary[3] = Bezier.deCasteljau(ap3[9],ap3[10],ap3[11],ap3[12],0.5f);
+				aap3Boundary[4] = Bezier.deCasteljau(ap3[12],ap3[13],ap3[14],ap3[0],0.5f);
+				
+				/* compute midpoint colors */
+//				int[] mcol = new int[] {
+//					lighting.shade(aap3Boundary[0][3], mn[0], mp),
+//					lighting.shade(aap3Boundary[1][3], mn[1], mp),
+//					lighting.shade(aap3Boundary[2][3], mn[2], mp),
+//					lighting.shade(aap3Boundary[3][3], mn[3], mp),
+//					lighting.shade(aap3Boundary[4][3], mn[4], mp)
+//				};
+				
+//				int centerColor = lighting.shade(Center, centerNormal, mp);
+				
+				Point3f[] ap3Patches = new Point3f[12];
+				
+				int[] levels = new int[4];
+				
+				ap3Patches[0] = new Point3f(aap3Boundary[0][0]);
+				ap3Patches[1] = new Point3f(aap3Boundary[0][1]);
+				ap3Patches[2] = new Point3f(aap3Boundary[0][2]);
+				ap3Patches[3] = new Point3f(aap3Boundary[0][3]);
+				ap3Patches[11] = new Point3f(aap3Boundary[4][5]);
+				ap3Patches[4] = new Point3f(aap3Boundary[0][3]);
+				ap3Patches[4].add(Functions.average(Functions.vector(ap3[3],ap3[4]),Functions.vector(ap3[0],ap3[14])));
+				ap3Patches[10] = new Point3f(aap3Boundary[4][4]);
+				ap3Patches[5] = new Point3f(W);
+				ap3Patches[9] = new Point3f(aap3Boundary[4][3]);
+				ap3Patches[8] = new Point3f(aap3Boundary[4][3]);
+				ap3Patches[8].add(Functions.average(Functions.vector(ap3[0],ap3[1]),Functions.vector(ap3[12],ap3[11])));
+				ap3Patches[7] = new Point3f(V);
+				ap3Patches[6] = new Point3f(Center);
+//				normals[0].set(av3[0]);
+//				normals[1].set(mn[0]);
+//				normals[2].set(centerNormal);
+//				normals[3].set(mn[4]);
+//				colors[0] = ccol[0];
+//				colors[1] = mcol[0];
+//				colors[2] = centerColor;
+//				colors[3] = mcol[4];
+				flat[0] = flat[1] = flat[2] = flat[3] = false;
+				levels[0] = ail[0] + 1;
+				levels[1] = 1;
+				levels[2] = 1;
+				levels[3] = ail[4] + 1;
+				drawFlatHashPatch4(ap3Patches, flat, levels);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+				    
+				ap3Patches[0].set(aap3Boundary[1][0]);
+				ap3Patches[1].set(aap3Boundary[1][1]);
+				ap3Patches[2].set(aap3Boundary[1][2]);
+				ap3Patches[3].set(aap3Boundary[1][3]);
+				ap3Patches[11].set(aap3Boundary[0][5]);
+				ap3Patches[4].set(aap3Boundary[1][3]);
+				ap3Patches[4].add(Functions.average(Functions.vector(ap3[6],ap3[7]),Functions.vector(ap3[3],ap3[2])));
+				ap3Patches[10].set(aap3Boundary[0][4]);
+				ap3Patches[5].set(X);
+				ap3Patches[9].set(aap3Boundary[0][3]);
+				ap3Patches[8].set(aap3Boundary[0][3]);
+				ap3Patches[8].add(Functions.average(Functions.vector(ap3[3],ap3[4]),Functions.vector(ap3[0],ap3[14])));
+				ap3Patches[7].set(W);
+				ap3Patches[6].set(Center);
+//				normals[0].set(av3[1]);
+//				normals[1].set(mn[1]);
+//				normals[2].set(centerNormal);
+//				normals[3].set(mn[0]);
+//				colors[0] = ccol[1];
+//				colors[1] = mcol[1];
+//				colors[2] = centerColor;
+//				colors[3] = mcol[0];
+				flat[0] = flat[1] = flat[2] = flat[3] = false;
+				levels[0] = ail[1] + 1;
+				levels[1] = 1;
+				levels[2] = 1;
+				levels[3] = ail[0] + 1;
+				drawFlatHashPatch4(ap3Patches, flat, levels);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+				
+				ap3Patches[0].set(aap3Boundary[2][0]);
+				ap3Patches[1].set(aap3Boundary[2][1]);
+				ap3Patches[2].set(aap3Boundary[2][2]);
+				ap3Patches[3].set(aap3Boundary[2][3]);
+				ap3Patches[11].set(aap3Boundary[1][5]);
+				ap3Patches[4].set(aap3Boundary[2][3]);
+				ap3Patches[4].add(Functions.average(Functions.vector(ap3[9],ap3[10]),Functions.vector(ap3[6],ap3[5])));
+				ap3Patches[10] = new Point3f(aap3Boundary[1][4]);
+				ap3Patches[5].set(Y);
+				ap3Patches[9].set(aap3Boundary[1][3]);
+				ap3Patches[8].set(aap3Boundary[1][3]);
+				ap3Patches[8].add(Functions.average(Functions.vector(ap3[6],ap3[7]),Functions.vector(ap3[3],ap3[2])));
+				ap3Patches[7].set(X);
+				ap3Patches[6].set(Center);
+//				normals[0].set(av3[2]);
+//				normals[1].set(mn[2]);
+//				normals[2].set(centerNormal);
+//				normals[3].set(mn[1]);
+//				colors[0] = ccol[2];
+//				colors[1] = mcol[2];
+//				colors[2] = centerColor;
+//				colors[3] = mcol[1];
+				flat[0] = flat[1] = flat[2] = flat[3] = false;
+				levels[0] = ail[2] + 1;
+				levels[1] = 1;
+				levels[2] = 1;
+				levels[3] = ail[1] + 1;
+				drawFlatHashPatch4(ap3Patches, flat, levels);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+				
+				ap3Patches[0].set(aap3Boundary[3][0]);
+				ap3Patches[1].set(aap3Boundary[3][1]);
+				ap3Patches[2].set(aap3Boundary[3][2]);
+				ap3Patches[3].set(aap3Boundary[3][3]);
+				ap3Patches[11].set(aap3Boundary[2][5]);
+				ap3Patches[4].set(aap3Boundary[3][3]);
+				ap3Patches[4].add(Functions.average(Functions.vector(ap3[9],ap3[8]),Functions.vector(ap3[12],ap3[13])));
+				ap3Patches[10].set(aap3Boundary[2][4]);
+				ap3Patches[5].set(Z);
+				ap3Patches[9].set(aap3Boundary[2][3]);
+				ap3Patches[8].set(aap3Boundary[2][3]);
+				ap3Patches[8].add(Functions.average(Functions.vector(ap3[9],ap3[10]),Functions.vector(ap3[6],ap3[5])));
+				ap3Patches[7].set(Y);
+				ap3Patches[6].set(Center);
+//				normals[0].set(av3[3]);
+//				normals[1].set(mn[3]);
+//				normals[2].set(centerNormal);
+//				normals[3].set(mn[2]);
+//				colors[0] = ccol[3];
+//				colors[1] = mcol[3];
+//				colors[2] = centerColor;
+//				colors[3] = mcol[2];
+				flat[0] = flat[1] = flat[2] = flat[3] = false;
+				levels[0] = ail[3] + 1;
+				levels[1] = 1;
+				levels[2] = 1;
+				levels[3] = ail[2] + 1;
+				drawFlatHashPatch4(ap3Patches, flat, levels);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+				
+				ap3Patches[0].set(aap3Boundary[4][0]);
+				ap3Patches[1].set(aap3Boundary[4][1]);
+				ap3Patches[2].set(aap3Boundary[4][2]);
+				ap3Patches[3].set(aap3Boundary[4][3]);
+				ap3Patches[11].set(aap3Boundary[3][5]);
+				ap3Patches[4].set(aap3Boundary[4][3]);
+				ap3Patches[4].add(Functions.average(Functions.vector(ap3[12],ap3[11]),Functions.vector(ap3[0],ap3[1])));
+				ap3Patches[10].set(aap3Boundary[3][4]);
+				ap3Patches[5].set(V);
+				ap3Patches[9].set(aap3Boundary[3][3]);
+				ap3Patches[8].set(aap3Boundary[3][3]);
+				ap3Patches[8].add(Functions.average(Functions.vector(ap3[9],ap3[8]),Functions.vector(ap3[12],ap3[13])));
+				ap3Patches[7].set(Z);
+				ap3Patches[6].set(Center);
+//				normals[0].set(av3[4]);
+//				normals[1].set(mn[4]);
+//				normals[2].set(centerNormal);
+//				normals[3].set(mn[3]);
+//				colors[0] = ccol[4];
+//				colors[1] = mcol[4];
+//				colors[2] = centerColor;
+//				colors[3] = mcol[3];
+				flat[0] = flat[1] = flat[2] = flat[3] = false;
+				levels[0] = ail[4] + 1;
+				levels[1] = 1;
+				levels[2] = 1;
+				levels[3] = ail[3] + 1;
+				drawFlatHashPatch4(ap3Patches, flat, levels);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+			}
+			break;
 		}
 	}
 	
@@ -1552,6 +2055,513 @@ public class Viewport2 {
 		}
 	}
 	
+	public void drawShadedHashPatchAlpha(Point3f[] ap3, Vector3f[] av3, int[] ail, MaterialProperties mp) {
+		boolean[] flat = new boolean[] { false, false, false, false };
+		Color4f[] colors = newColors4(4);
+		switch (ap3.length) {
+			case 9: {
+				
+				/* compute colors */
+				viewDef.getLighting().shade(ap3[0], av3[0], mp, colors[0]);
+				viewDef.getLighting().shade(ap3[3], av3[1], mp, colors[1]);
+				viewDef.getLighting().shade(ap3[6], av3[2], mp, colors[2]);
+				colors[3].set(colors[0]);
+				
+				///* set up corner normals */
+				//Vector3f[] cn = newNormals(4);
+				//v3a.sub(ap3[1], ap3[0]);
+				//v3b.sub(ap3[8], ap3[0]);
+				//cn[0].cross(v3b, v3a);
+				//v3a.sub(ap3[4], ap3[3]);
+				//v3b.sub(ap3[2], ap3[3]);
+				//cn[1].cross(v3b, v3a);
+				//v3a.sub(ap3[7], ap3[6]);
+				//v3b.sub(ap3[5], ap3[6]);
+				//cn[2].cross(v3b, v3a);
+				//cn[0].normalize();
+				//cn[1].normalize();
+				//cn[2].normalize();
+				//cn[3].set(cn[0]);
+				
+				Vector3f[] n = new Vector3f[] {av3[0], av3[1], av3[2], new Vector3f(av3[0])};
+				
+				Point3f[] p = new Point3f[] {ap3[0], ap3[1], ap3[2], ap3[3], ap3[4], ap3[5], ap3[6], ap3[7], ap3[8], new Point3f(ap3[0]), new Point3f(ap3[0]), new Point3f(ap3[0])};
+				
+				//p[0].set(ap3[0]);
+				//p[1].set(ap3[1]);
+				//p[2].set(ap3[2]);
+				//p[3].set(ap3[3]);
+				//p[4].set(ap3[4]);
+				//p[5].set(ap3[5]);
+				//p[6].set(ap3[6]);
+				//p[7].set(ap3[7]);
+				//p[8].set(ap3[8]);
+				//p[9].set(ap3[0]);
+				//p[10].set(ap3[0]);
+				//p[11].set(ap3[0]);
+				//
+				//drawRectHashPatchGourad(p, n, mp, 0);
+				int[] levels = new int[] { ail[0], ail[1], ail[2], 0 };
+				drawShadedHashPatch4Alpha(p, n, colors, flat, levels, mp);
+				//if (true) return;
+				//
+				/////* set up corner normals */
+				////Vector3f[] cn = newNormals(3);
+				////v3a.sub(ap3[1], ap3[0]);
+				////v3b.sub(ap3[8], ap3[0]);
+				////cn[0].cross(v3b, v3a);
+				////v3a.sub(ap3[4], ap3[3]);
+				////v3b.sub(ap3[2], ap3[3]);
+				////cn[1].cross(v3b, v3a);
+				////v3a.sub(ap3[7], ap3[6]);
+				////v3b.sub(ap3[5], ap3[6]);
+				////cn[2].cross(v3b, v3a);
+				////cn[0].normalize();
+				////cn[1].normalize();
+				////cn[2].normalize();
+				//
+				////drawHashPatch3(ap3, cn, 0, mp);
+				////if (true) return;
+				//
+				///* set up midpoint normals */
+				//Vector3f[] mn = new Vector3f[5];
+				//mn[0] = interpolateNormal(cn[0], cn[1], ap3[0], ap3[1], ap3[2], ap3[3]);
+				//mn[1] = interpolateNormal(cn[1], cn[2], ap3[3], ap3[4], ap3[5], ap3[6]);
+				//mn[2] = interpolateNormal(cn[2], cn[0], ap3[6], ap3[7], ap3[8], ap3[0]);
+				//
+				//Point3f A = Functions.parallelogram(ap3[0],ap3[1],ap3[8]);
+				//Point3f B = Functions.parallelogram(ap3[3],ap3[4],ap3[2]);
+				//Point3f C = Functions.parallelogram(ap3[6],ap3[7],ap3[5]);
+				//
+				//Point3f F = Functions.average(A,ap3[0],ap3[1],ap3[8]);
+				//Point3f H = Functions.average(B,ap3[3],ap3[4],ap3[2]);
+				//Point3f J = Functions.average(C,ap3[6],ap3[7],ap3[5]);
+				//
+				//Point3f G = Functions.average(A,B,ap3[1],ap3[2]);
+				//Point3f I = Functions.average(B,C,ap3[4],ap3[5]);
+				//Point3f K = Functions.average(C,A,ap3[7],ap3[8]);
+				//
+				//Point3f U = Functions.average(A,B,C);
+				//
+				//Point3f P = Functions.average(U,K,F,G);
+				//Point3f Q = Functions.average(U,G,H,I);
+				//Point3f R = Functions.average(U,I,J,K);
+				//
+				//Point3f V = Functions.average(R,P);
+				//Point3f W = Functions.average(P,Q);
+				//Point3f X = Functions.average(Q,R);
+				//
+				//Point3f Center = Functions.average(P,Q,R);
+				//
+				//Vector3f vc = Functions.vector(V, Center);
+				//Vector3f wc = Functions.vector(W, Center);
+				//Vector3f xc = Functions.vector(X, Center);
+				//
+				//Vector3f[] nc = newNormals(3);
+				//nc[0].cross(wc, vc);
+				//nc[1].cross(xc, wc);
+				//nc[2].cross(vc, xc);
+				//nc[0].normalize();
+				//nc[1].normalize();
+				//nc[2].normalize();
+				//Vector3f centerNormal = Functions.vaverage(nc[0], nc[1], nc[2]);
+				//centerNormal.normalize();
+				//
+				//Vector3f[] normals = newNormals(4);
+				//
+				//Point3f[][] aap3Boundary = new Point3f[3][7];
+				//
+				//aap3Boundary[0] = Bezier.deCasteljau(ap3[0],ap3[1],ap3[2],ap3[3],0.5f);
+				//aap3Boundary[1] = Bezier.deCasteljau(ap3[3],ap3[4],ap3[5],ap3[6],0.5f);
+				//aap3Boundary[2] = Bezier.deCasteljau(ap3[6],ap3[7],ap3[8],ap3[0],0.5f);
+				//
+				//Point3f[] ap3Patches = new Point3f[12];
+				//
+				//Vector3f v;
+				//float sc = 0.33f;
+				//
+				//ap3Patches[0] = new Point3f(aap3Boundary[0][0]);
+				//ap3Patches[1] = new Point3f(aap3Boundary[0][1]);
+				//ap3Patches[2] = new Point3f(aap3Boundary[0][2]);
+				//ap3Patches[3] = new Point3f(aap3Boundary[0][3]);
+				//ap3Patches[11] = new Point3f(aap3Boundary[2][5]);
+				//v = Functions.vaverage(Functions.vector(ap3[3],ap3[4]),Functions.vector(ap3[0],ap3[8]));
+				//v.scale(sc);
+				//ap3Patches[4] = new Point3f(aap3Boundary[0][3]);
+				//ap3Patches[4].add(v);
+				////ap3Patches[4].add(Functions.average(Functions.vector(ap3[3],ap3[4]),Functions.vector(ap3[0],ap3[8])));
+				//ap3Patches[10] = new Point3f(aap3Boundary[2][4]);
+				//ap3Patches[5] = new Point3f(W);
+				//ap3Patches[9] = new Point3f(aap3Boundary[2][3]);
+				//v = Functions.vaverage(Functions.vector(ap3[0],ap3[1]),Functions.vector(ap3[6],ap3[5]));
+				//v.scale(sc);
+				//ap3Patches[8] = new Point3f(aap3Boundary[2][3]);
+				//ap3Patches[8].add(v);
+				////ap3Patches[8].add(Functions.average(Functions.vector(ap3[0],ap3[1]),Functions.vector(ap3[6],ap3[5])));
+				//ap3Patches[7] = new Point3f(V);
+				//ap3Patches[6] = new Point3f(Center);
+				//normals[0].set(cn[0]);
+				//normals[1].set(mn[0]);
+				//normals[2].set(centerNormal);
+				//normals[3].set(mn[2]);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+				//    
+				//ap3Patches[0].set(aap3Boundary[1][0]);
+				//ap3Patches[1].set(aap3Boundary[1][1]);
+				//ap3Patches[2].set(aap3Boundary[1][2]);
+				//ap3Patches[3].set(aap3Boundary[1][3]);
+				//ap3Patches[11].set(aap3Boundary[0][5]);
+				//v = Functions.vaverage(Functions.vector(ap3[6],ap3[7]),Functions.vector(ap3[3],ap3[2]));
+				//v.scale(sc);
+				//ap3Patches[4].add(aap3Boundary[1][3], v);
+				////ap3Patches[4].add(Functions.average(Functions.vector(ap3[6],ap3[7]),Functions.vector(ap3[3],ap3[2])));
+				//ap3Patches[10].set(aap3Boundary[0][4]);
+				//ap3Patches[5].set(X);
+				//ap3Patches[9].set(aap3Boundary[0][3]);
+				//v = Functions.vaverage(Functions.vector(ap3[3],ap3[4]),Functions.vector(ap3[0],ap3[8]));
+				//v.scale(sc);
+				//ap3Patches[8].add(aap3Boundary[0][3], v);
+				////ap3Patches[8].add(Functions.average(Functions.vector(ap3[3],ap3[4]),Functions.vector(ap3[0],ap3[8])));
+				//ap3Patches[7].set(W);
+				//ap3Patches[6].set(Center);
+				//normals[0].set(cn[1]);
+				//normals[1].set(mn[1]);
+				//normals[2].set(centerNormal);
+				//normals[3].set(mn[0]);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+				//
+				//ap3Patches[0].set(aap3Boundary[2][0]);
+				//ap3Patches[1].set(aap3Boundary[2][1]);
+				//ap3Patches[2].set(aap3Boundary[2][2]);
+				//ap3Patches[3].set(aap3Boundary[2][3]);
+				//ap3Patches[11].set(aap3Boundary[1][5]);
+				//v = Functions.vaverage(Functions.vector(ap3[0],ap3[1]),Functions.vector(ap3[6],ap3[5]));
+				//v.scale(sc);
+				//ap3Patches[4].add(aap3Boundary[2][3], v);
+				////ap3Patches[4].add(Functions.average(Functions.vector(ap3[0],ap3[1]),Functions.vector(ap3[6],ap3[5])));
+				//ap3Patches[10] = new Point3f(aap3Boundary[1][4]);
+				//ap3Patches[5].set(V);
+				//ap3Patches[9].set(aap3Boundary[1][3]);
+				//v = Functions.vaverage(Functions.vector(ap3[6],ap3[7]),Functions.vector(ap3[3],ap3[2]));
+				//v.scale(sc);
+				//ap3Patches[8].add(aap3Boundary[1][3], v);
+				////ap3Patches[8].add(Functions.average(Functions.vector(ap3[6],ap3[7]),Functions.vector(ap3[3],ap3[2])));
+				//ap3Patches[7].set(X);
+				//ap3Patches[6].set(Center);
+				//normals[0].set(cn[2]);
+				//normals[1].set(mn[2]);
+				//normals[2].set(centerNormal);
+				//normals[3].set(mn[1]);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+			}
+			break;
+			case 12: {
+				///* set up corner normals */
+				//Vector3f[] normals = newNormals(4);
+				//v3a.sub(ap3[1], ap3[0]);
+				//v3b.sub(ap3[11], ap3[0]);
+				//normals[0].cross(v3b, v3a);
+				//v3a.sub(ap3[4], ap3[3]);
+				//v3b.sub(ap3[2], ap3[3]);
+				//normals[1].cross(v3b, v3a);
+				//v3a.sub(ap3[7], ap3[6]);
+				//v3b.sub(ap3[5], ap3[6]);
+				//normals[2].cross(v3b, v3a);
+				//v3a.sub(ap3[10], ap3[9]);
+				//v3b.sub(ap3[8], ap3[9]);
+				//normals[3].cross(v3b, v3a);
+				//normals[0].normalize();
+				//normals[1].normalize();
+				//normals[2].normalize();
+				//normals[3].normalize();
+				viewDef.getLighting().shade(ap3[0], av3[0], mp, colors[0]);
+				viewDef.getLighting().shade(ap3[3], av3[1], mp, colors[1]);
+				viewDef.getLighting().shade(ap3[6], av3[2], mp, colors[2]);
+				viewDef.getLighting().shade(ap3[9], av3[3], mp, colors[3]);
+				drawShadedHashPatch4Alpha(ap3, av3, colors, flat, ail, mp);
+				//drawRectHashPatchGourad(ap3, av3, mp, 0);
+			}
+			break;
+			case 15: {
+				///* set up corner normals */
+				//Vector3f[] cn = newNormals(5);
+				//v3a.sub(ap3[1], ap3[0]);
+				//v3b.sub(ap3[14], ap3[0]);
+				//cn[0].cross(v3b, v3a);
+				//v3a.sub(ap3[4], ap3[3]);
+				//v3b.sub(ap3[2], ap3[3]);
+				//cn[1].cross(v3b, v3a);
+				//v3a.sub(ap3[7], ap3[6]);
+				//v3b.sub(ap3[5], ap3[6]);
+				//cn[2].cross(v3b, v3a);
+				//v3a.sub(ap3[10], ap3[9]);
+				//v3b.sub(ap3[8], ap3[9]);
+				//cn[3].cross(v3b, v3a);
+				//v3a.sub(ap3[13], ap3[12]);
+				//v3b.sub(ap3[11], ap3[12]);
+				//cn[4].cross(v3b, v3a);
+				//cn[0].normalize();
+				//cn[1].normalize();
+				//cn[2].normalize();
+				//cn[3].normalize();
+				//cn[4].normalize();
+					
+				/* set up midpoint normals */
+				Vector3f[] mn = new Vector3f[5];
+				mn[0] = interpolateNormal(av3[0], av3[1], ap3[0], ap3[1], ap3[2], ap3[3]);
+				mn[1] = interpolateNormal(av3[1], av3[2], ap3[3], ap3[4], ap3[5], ap3[6]);
+				mn[2] = interpolateNormal(av3[2], av3[3], ap3[6], ap3[7], ap3[8], ap3[9]);
+				mn[3] = interpolateNormal(av3[3], av3[4], ap3[9], ap3[10], ap3[11], ap3[12]);
+				mn[4] = interpolateNormal(av3[4], av3[0], ap3[12], ap3[13], ap3[14], ap3[0]);
+				
+				/* compute corner-colors */
+				Color4f[] ccol = newColors4(5);
+				
+				viewDef.getLighting().shade(ap3[0], av3[0], mp, ccol[0]);
+				viewDef.getLighting().shade(ap3[3], av3[1], mp, ccol[1]);
+				viewDef.getLighting().shade(ap3[6], av3[2], mp, ccol[2]);
+				viewDef.getLighting().shade(ap3[9], av3[3], mp, ccol[3]);
+				viewDef.getLighting().shade(ap3[12], av3[4], mp, ccol[4]);
+					
+				Point3f A = Functions.parallelogram(ap3[0],ap3[1],ap3[14]);
+				Point3f B = Functions.parallelogram(ap3[3],ap3[4],ap3[2]);
+				Point3f C = Functions.parallelogram(ap3[6],ap3[7],ap3[5]);
+				Point3f D = Functions.parallelogram(ap3[9],ap3[10],ap3[8]);
+				Point3f E = Functions.parallelogram(ap3[12],ap3[13],ap3[11]);
+				
+				Point3f F = Functions.average(A,ap3[0],ap3[1],ap3[14]);
+				Point3f H = Functions.average(B,ap3[3],ap3[4],ap3[2]);
+				Point3f J = Functions.average(C,ap3[6],ap3[7],ap3[5]);
+				Point3f L = Functions.average(D,ap3[9],ap3[10],ap3[8]);
+				Point3f N = Functions.average(E,ap3[12],ap3[13],ap3[11]);
+				
+				Point3f G = Functions.average(A,B,ap3[1],ap3[2]);
+				Point3f I = Functions.average(B,C,ap3[4],ap3[5]);
+				Point3f K = Functions.average(C,D,ap3[7],ap3[8]);
+				Point3f M = Functions.average(D,E,ap3[10],ap3[11]);
+				Point3f O = Functions.average(E,A,ap3[13],ap3[14]);
+				
+				Point3f U = Functions.average(A,B,C,D,E);
+				
+				Point3f P = Functions.average(U,O,F,G);
+				Point3f Q = Functions.average(U,G,H,I);
+				Point3f R = Functions.average(U,I,J,K);
+				Point3f S = Functions.average(U,K,L,M);
+				Point3f T = Functions.average(U,M,N,O);
+				
+				Point3f V = Functions.average(T,P);
+				Point3f W = Functions.average(P,Q);
+				Point3f X = Functions.average(Q,R);
+				Point3f Y = Functions.average(R,S);
+				Point3f Z = Functions.average(S,T);
+				
+				Point3f Center = Functions.average(P,Q,R,S,T);
+				
+				Vector3f vc = Functions.vector(V, Center);
+				Vector3f wc = Functions.vector(W, Center);
+				Vector3f xc = Functions.vector(X, Center);
+				Vector3f yc = Functions.vector(Y, Center);
+				Vector3f zc = Functions.vector(Z, Center);
+				
+				Vector3f[] nc = newNormals(5);
+//				nc[0].cross(wc, vc);
+//				nc[1].cross(xc, wc);
+//				nc[2].cross(yc, xc);
+//				nc[3].cross(zc, yc);
+//				nc[4].cross(vc, zc);
+				nc[0].cross(vc, wc);
+				nc[1].cross(wc, xc);
+				nc[2].cross(xc, yc);
+				nc[3].cross(yc, zc);
+				nc[4].cross(zc, vc);
+				nc[0].normalize();
+				nc[1].normalize();
+				nc[2].normalize();
+				nc[3].normalize();
+				nc[4].normalize();
+				Vector3f centerNormal = Functions.vaverage(nc[0], nc[1], nc[2], nc[3], nc[4]);
+				centerNormal.normalize();
+				
+				Vector3f[] normals = newNormals(4);
+				
+				Point3f[][] aap3Boundary = new Point3f[5][7];
+				
+				aap3Boundary[0] = Bezier.deCasteljau(ap3[0],ap3[1],ap3[2],ap3[3],0.5f);
+				aap3Boundary[1] = Bezier.deCasteljau(ap3[3],ap3[4],ap3[5],ap3[6],0.5f);
+				aap3Boundary[2] = Bezier.deCasteljau(ap3[6],ap3[7],ap3[8],ap3[9],0.5f);
+				aap3Boundary[3] = Bezier.deCasteljau(ap3[9],ap3[10],ap3[11],ap3[12],0.5f);
+				aap3Boundary[4] = Bezier.deCasteljau(ap3[12],ap3[13],ap3[14],ap3[0],0.5f);
+				
+				/* compute midpoint colors */
+				//int[] mcol = new int[] {
+				Color4f[] mcol = newColors4(5);
+				viewDef.getLighting().shade(aap3Boundary[0][3], mn[0], mp, mcol[0]);
+				viewDef.getLighting().shade(aap3Boundary[1][3], mn[1], mp, mcol[1]);
+				viewDef.getLighting().shade(aap3Boundary[2][3], mn[2], mp, mcol[2]);
+				viewDef.getLighting().shade(aap3Boundary[3][3], mn[3], mp, mcol[3]);
+				viewDef.getLighting().shade(aap3Boundary[4][3], mn[4], mp, mcol[4]);
+				//};
+				
+				Color4f centerColor = new Color4f();
+				viewDef.getLighting().shade(Center, centerNormal, mp, centerColor);
+				
+				Point3f[] ap3Patches = new Point3f[12];
+				
+				int[] levels = new int[4];
+				
+				ap3Patches[0] = new Point3f(aap3Boundary[0][0]);
+				ap3Patches[1] = new Point3f(aap3Boundary[0][1]);
+				ap3Patches[2] = new Point3f(aap3Boundary[0][2]);
+				ap3Patches[3] = new Point3f(aap3Boundary[0][3]);
+				ap3Patches[11] = new Point3f(aap3Boundary[4][5]);
+				ap3Patches[4] = new Point3f(aap3Boundary[0][3]);
+				ap3Patches[4].add(Functions.average(Functions.vector(ap3[3],ap3[4]),Functions.vector(ap3[0],ap3[14])));
+				ap3Patches[10] = new Point3f(aap3Boundary[4][4]);
+				ap3Patches[5] = new Point3f(W);
+				ap3Patches[9] = new Point3f(aap3Boundary[4][3]);
+				ap3Patches[8] = new Point3f(aap3Boundary[4][3]);
+				ap3Patches[8].add(Functions.average(Functions.vector(ap3[0],ap3[1]),Functions.vector(ap3[12],ap3[11])));
+				ap3Patches[7] = new Point3f(V);
+				ap3Patches[6] = new Point3f(Center);
+				normals[0].set(av3[0]);
+				normals[1].set(mn[0]);
+				normals[2].set(centerNormal);
+				normals[3].set(mn[4]);
+				colors[0].set(ccol[0]);
+				colors[1].set(mcol[0]);
+				colors[2].set(centerColor);
+				colors[3].set(mcol[4]);
+				flat[0] = flat[1] = flat[2] = flat[3] = false;
+				levels[0] = ail[0] + 1;
+				levels[1] = 1;
+				levels[2] = 1;
+				levels[3] = ail[4] + 1;
+				drawShadedHashPatch4Alpha(ap3Patches, normals, colors, flat, levels, mp);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+				    
+				ap3Patches[0].set(aap3Boundary[1][0]);
+				ap3Patches[1].set(aap3Boundary[1][1]);
+				ap3Patches[2].set(aap3Boundary[1][2]);
+				ap3Patches[3].set(aap3Boundary[1][3]);
+				ap3Patches[11].set(aap3Boundary[0][5]);
+				ap3Patches[4].set(aap3Boundary[1][3]);
+				ap3Patches[4].add(Functions.average(Functions.vector(ap3[6],ap3[7]),Functions.vector(ap3[3],ap3[2])));
+				ap3Patches[10].set(aap3Boundary[0][4]);
+				ap3Patches[5].set(X);
+				ap3Patches[9].set(aap3Boundary[0][3]);
+				ap3Patches[8].set(aap3Boundary[0][3]);
+				ap3Patches[8].add(Functions.average(Functions.vector(ap3[3],ap3[4]),Functions.vector(ap3[0],ap3[14])));
+				ap3Patches[7].set(W);
+				ap3Patches[6].set(Center);
+				normals[0].set(av3[1]);
+				normals[1].set(mn[1]);
+				normals[2].set(centerNormal);
+				normals[3].set(mn[0]);
+				colors[0].set(ccol[1]);
+				colors[1].set(mcol[1]);
+				colors[2].set(centerColor);
+				colors[3].set(mcol[0]);
+				flat[0] = flat[1] = flat[2] = flat[3] = false;
+				levels[0] = ail[1] + 1;
+				levels[1] = 1;
+				levels[2] = 1;
+				levels[3] = ail[0] + 1;
+				drawShadedHashPatch4Alpha(ap3Patches, normals, colors, flat, levels, mp);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+				
+				ap3Patches[0].set(aap3Boundary[2][0]);
+				ap3Patches[1].set(aap3Boundary[2][1]);
+				ap3Patches[2].set(aap3Boundary[2][2]);
+				ap3Patches[3].set(aap3Boundary[2][3]);
+				ap3Patches[11].set(aap3Boundary[1][5]);
+				ap3Patches[4].set(aap3Boundary[2][3]);
+				ap3Patches[4].add(Functions.average(Functions.vector(ap3[9],ap3[10]),Functions.vector(ap3[6],ap3[5])));
+				ap3Patches[10] = new Point3f(aap3Boundary[1][4]);
+				ap3Patches[5].set(Y);
+				ap3Patches[9].set(aap3Boundary[1][3]);
+				ap3Patches[8].set(aap3Boundary[1][3]);
+				ap3Patches[8].add(Functions.average(Functions.vector(ap3[6],ap3[7]),Functions.vector(ap3[3],ap3[2])));
+				ap3Patches[7].set(X);
+				ap3Patches[6].set(Center);
+				normals[0].set(av3[2]);
+				normals[1].set(mn[2]);
+				normals[2].set(centerNormal);
+				normals[3].set(mn[1]);
+				colors[0].set(ccol[2]);
+				colors[1].set(mcol[2]);
+				colors[2].set(centerColor);
+				colors[3].set(mcol[1]);
+				flat[0] = flat[1] = flat[2] = flat[3] = false;
+				levels[0] = ail[2] + 1;
+				levels[1] = 1;
+				levels[2] = 1;
+				levels[3] = ail[1] + 1;
+				drawShadedHashPatch4Alpha(ap3Patches, normals, colors, flat, levels, mp);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+				
+				ap3Patches[0].set(aap3Boundary[3][0]);
+				ap3Patches[1].set(aap3Boundary[3][1]);
+				ap3Patches[2].set(aap3Boundary[3][2]);
+				ap3Patches[3].set(aap3Boundary[3][3]);
+				ap3Patches[11].set(aap3Boundary[2][5]);
+				ap3Patches[4].set(aap3Boundary[3][3]);
+				ap3Patches[4].add(Functions.average(Functions.vector(ap3[9],ap3[8]),Functions.vector(ap3[12],ap3[13])));
+				ap3Patches[10].set(aap3Boundary[2][4]);
+				ap3Patches[5].set(Z);
+				ap3Patches[9].set(aap3Boundary[2][3]);
+				ap3Patches[8].set(aap3Boundary[2][3]);
+				ap3Patches[8].add(Functions.average(Functions.vector(ap3[9],ap3[10]),Functions.vector(ap3[6],ap3[5])));
+				ap3Patches[7].set(Y);
+				ap3Patches[6].set(Center);
+				normals[0].set(av3[3]);
+				normals[1].set(mn[3]);
+				normals[2].set(centerNormal);
+				normals[3].set(mn[2]);
+				colors[0].set(ccol[3]);
+				colors[1].set(mcol[3]);
+				colors[2].set(centerColor);
+				colors[3].set(mcol[2]);
+				flat[0] = flat[1] = flat[2] = flat[3] = false;
+				levels[0] = ail[3] + 1;
+				levels[1] = 1;
+				levels[2] = 1;
+				levels[3] = ail[2] + 1;
+				drawShadedHashPatch4Alpha(ap3Patches, normals, colors, flat, levels, mp);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+				
+				ap3Patches[0].set(aap3Boundary[4][0]);
+				ap3Patches[1].set(aap3Boundary[4][1]);
+				ap3Patches[2].set(aap3Boundary[4][2]);
+				ap3Patches[3].set(aap3Boundary[4][3]);
+				ap3Patches[11].set(aap3Boundary[3][5]);
+				ap3Patches[4].set(aap3Boundary[4][3]);
+				ap3Patches[4].add(Functions.average(Functions.vector(ap3[12],ap3[11]),Functions.vector(ap3[0],ap3[1])));
+				ap3Patches[10].set(aap3Boundary[3][4]);
+				ap3Patches[5].set(V);
+				ap3Patches[9].set(aap3Boundary[3][3]);
+				ap3Patches[8].set(aap3Boundary[3][3]);
+				ap3Patches[8].add(Functions.average(Functions.vector(ap3[9],ap3[8]),Functions.vector(ap3[12],ap3[13])));
+				ap3Patches[7].set(Z);
+				ap3Patches[6].set(Center);
+				normals[0].set(av3[4]);
+				normals[1].set(mn[4]);
+				normals[2].set(centerNormal);
+				normals[3].set(mn[3]);
+				colors[0].set(ccol[4]);
+				colors[1].set(mcol[4]);
+				colors[2].set(centerColor);
+				colors[3].set(mcol[3]);
+				flat[0] = flat[1] = flat[2] = flat[3] = false;
+				levels[0] = ail[4] + 1;
+				levels[1] = 1;
+				levels[2] = 1;
+				levels[3] = ail[3] + 1;
+				drawShadedHashPatch4Alpha(ap3Patches, normals, colors, flat, levels, mp);
+				//drawRectHashPatchGourad(ap3Patches, normals, mp, 1);
+			}
+			break;
+		}
+	}
 	
 	private void drawLitHashPatch4(Point3f[] ap3, Vector3f[] av3, boolean[] abFlat, int[] aiLevel) {
 		
@@ -1845,6 +2855,274 @@ public class Viewport2 {
 		drawable.drawTriangle(ap3[3], av3[1], ap3[9], av3[3], ap3[6], av3[2]);
 	}
 	
+	private void drawFlatHashPatch4(Point3f[] ap3, boolean[] abFlat, int[] aiLevel) {
+		
+		//materialProperties = mp;
+		//Point3d[] adp3 = new Point3d[ap3.length];
+		//for (int i = 0; i < adp3.length; adp3[i] = new Point3d(ap3[i++]));
+		//hashPatchSubdivision.subdivHashPatch4(adp3, adp3, av3, 2, new Point3d[][] { null, null, null, null }, new Vector3f[][] { null, null, null, null });
+		//
+		//if (true) return;
+		
+		boolean visible = false;
+		int width = drawable.getComponent().getWidth() >> 1;
+		int height = drawable.getComponent().getHeight() >> 1;
+		loop:
+		for (int i = 0; i < 12; i++) {
+			if (ap3[i].x > -width && ap3[i].x < width && ap3[i].y > -height && ap3[i].y < height) {
+				visible = true;
+				break loop;
+			}
+		}
+		if (!visible) return;
+		//System.out.println(abFlat[0] + "\t" + abFlat[1] + "\t" + abFlat[2] + "\t" + abFlat[3]);
+		
+		/* check if we need to u-split */
+		float u0 = subdiv(ap3[0], ap3[1], ap3[2], ap3[3], aiLevel[0] > 0);
+		float u2 = subdiv(ap3[9], ap3[8], ap3[7], ap3[6], aiLevel[2] > 0);
+		float v3 = subdiv(ap3[0], ap3[11], ap3[10], ap3[9], aiLevel[3] > 0);
+		float v1 = subdiv(ap3[3], ap3[4], ap3[5], ap3[6], aiLevel[1] > 0);
+		
+		float ul = (aiLevel[0] >= iMaxSubdiv || aiLevel[2] >= iMaxSubdiv) ? -1 : (float) Math.max(u0, u2);
+		float uv = (aiLevel[1] >= iMaxSubdiv || aiLevel[3] >= iMaxSubdiv) ? -1 : (float) Math.max(v1, v3);
+		
+		if (true && ul >= fFlatness && ul > uv * 1.1f) {
+		//if (false) {
+		//if (subdiv(ap3[0], ap3[1], ap3[2], ap3[3], uSplit) || subdiv(ap3[9], ap3[8], ap3[7], ap3[6], uSplit)) {
+			
+			/* flatten cubics if flat enough */
+			if (!abFlat[0] && (u0 <= fFlatness)) abFlat[0] = makeFlat(ap3[0], ap3[1], ap3[2], ap3[3]);
+			if (!abFlat[1] && (v1 <= fFlatness)) abFlat[1] = makeFlat(ap3[3], ap3[4], ap3[5], ap3[6]);
+			if (!abFlat[2] && (u2 <= fFlatness)) abFlat[2] = makeFlat(ap3[9], ap3[8], ap3[7], ap3[6]);
+			if (!abFlat[3] && (v3 <= fFlatness)) abFlat[3] = makeFlat(ap3[0], ap3[11], ap3[10], ap3[9]);
+			
+			/* compute new patches */
+			Point3f[] ap3new = newPatch(12);
+			v3a.sub(ap3[11], ap3[0]);
+			v3b.sub(ap3[4], ap3[3]);
+			v3c.add(v3a, v3b);
+			v3c.scale(0.5f);
+			v3a.sub(ap3[10], ap3[9]);
+			v3b.sub(ap3[5], ap3[6]);
+			v3a.add(v3b);
+			v3a.scale(0.5f);
+			deCasteljauSplit(ap3[0], ap3[1], ap3[2], ap3[3], ap3new[0], ap3new[1], ap3new[2], ap3new[3]);
+			deCasteljauSplit(ap3[9], ap3[8], ap3[7], ap3[6], ap3new[9], ap3new[8], ap3new[7], ap3new[6]);
+			ap3new[4].set(ap3[4]);
+			ap3new[5].set(ap3[5]);
+			ap3[4].add(ap3[3], v3c);
+			ap3[5].add(ap3[6], v3a);
+			ap3new[11].set(ap3[4]);
+			ap3new[10].set(ap3[5]);
+			
+			///* compute new normals */
+			//Vector3f[] av3new = newNormals(4);
+			//av3new[1].set(av3[1]);
+			////av3new[0] = av3[1] = (uLevel > 99) ? interpolateNormal(av3[0], av3[1]) : interpolateNormal(av3[0], av3[1], ap3[0], ap3[1], ap3[2], ap3[3]);
+			//av3new[2].set(av3[2]);
+			////av3new[3] = av3[2] = (uLevel > 99) ? interpolateNormal(av3[3], av3[2]) : interpolateNormal(av3[3], av3[2], ap3[9], ap3[8], ap3[7], ap3[6]);
+			//
+			//v3a.sub(ap3[4], ap3[3]);
+			//v3b.sub(ap3[2], ap3[3]);
+			//av3[1].cross(v3b, v3a);
+			//av3[1].normalize();
+			//av3new[0].set(av3[1]);
+			//v3a.sub(ap3[5], ap3[6]);
+			//v3b.sub(ap3[7], ap3[6]);
+			//av3[2].cross(v3a, v3b);
+			//av3[2].normalize();
+			//av3new[3].set(av3[2]);
+			
+			/* set up new flatenough flags */
+			boolean[] abnew = new boolean[4];
+			abnew[0] = abFlat[0];
+			abnew[1] = abFlat[1];
+			abnew[2] = abFlat[2];
+			abnew[3] = abFlat[1] = false;
+			
+			///* compute new normals */
+			//Vector3f[] av3new = newNormals();
+			//av3new[1].set(av3[1]);
+			//v3b.sub(ap3[3],ap3[2]);
+			//av3[1].cross(v3b, v3c);
+			//av3[1].normalize();
+			//av3new[0].set(av3[1]);
+			//av3new[2].set(av3[2]);
+			//v3b.sub(ap3[7],ap3[6]);
+			//av3[2].cross(v3b, v3a);
+			//av3[2].normalize();
+			//av3new[3].set(av3[2]);
+			
+			/* recurse */
+			int l = (aiLevel[1] < aiLevel[3]) ? aiLevel[1] : aiLevel[3];
+			aiLevel[0]++;
+			aiLevel[2]++;
+			int[] newLevels = new int[aiLevel.length];
+			for (int i = 0; i < aiLevel.length; newLevels[i] = aiLevel[i++]);
+			aiLevel[1] = newLevels[3] = l;
+			drawFlatHashPatch4(ap3, abFlat, aiLevel);
+			drawFlatHashPatch4(ap3new, abnew, newLevels);
+			return;
+		}
+		/* check if we need to v-split */
+		else if (true && uv >= fFlatness) {
+		//else if (false) {
+		//else if (subdiv(ap3[0], ap3[11], ap3[10], ap3[9], vSplit) || subdiv(ap3[3], ap3[4], ap3[5], ap3[6], vSplit)) {
+			/* flatten cubics if flat enough */
+			if (!abFlat[0] && (u0 <= fFlatness)) abFlat[0] = makeFlat(ap3[0], ap3[1], ap3[2], ap3[3]);
+			if (!abFlat[1] && (v1 <= fFlatness)) abFlat[1] = makeFlat(ap3[3], ap3[4], ap3[5], ap3[6]);
+			if (!abFlat[2] && (u2 <= fFlatness)) abFlat[2] = makeFlat(ap3[9], ap3[8], ap3[7], ap3[6]);
+			if (!abFlat[3] && (v3 <= fFlatness)) abFlat[3] = makeFlat(ap3[0], ap3[11], ap3[10], ap3[9]);
+			
+			
+			/* compute new patches */
+			Point3f[] ap3new = newPatch(12);
+			v3a.sub(ap3[1], ap3[0]);
+			v3b.sub(ap3[8], ap3[9]);
+			v3c.add(v3a, v3b);
+			v3c.scale(0.5f);
+			v3a.sub(ap3[2], ap3[3]);
+			v3b.sub(ap3[7], ap3[6]);
+			v3a.add(v3b);
+			v3a.scale(0.5f);
+			deCasteljauSplit(ap3[0], ap3[11], ap3[10], ap3[9], ap3new[0], ap3new[11], ap3new[10], ap3new[9]);
+			deCasteljauSplit(ap3[3], ap3[4], ap3[5], ap3[6], ap3new[3], ap3new[4], ap3new[5], ap3new[6]);
+			ap3new[8].set(ap3[8]);
+			ap3new[7].set(ap3[7]);
+			ap3[8].add(ap3[9], v3c);
+			ap3[7].add(ap3[6], v3a);
+			ap3new[1].set(ap3[8]);
+			ap3new[2].set(ap3[7]);
+			
+			///* compute new normals */
+			//Vector3f[] av3new = newNormals(4);
+			//av3new[3].set(av3[3]);
+			////av3new[0] = av3[3] = (vLevel > 99) ? interpolateNormal(av3[0], av3[3]) : interpolateNormal(av3[0], av3[3], ap3[0], ap3[11], ap3[10], ap3[9]);
+			//av3new[2].set(av3[2]);
+			////av3new[1] = av3[2] = (vLevel > 99) ? interpolateNormal(av3[1], av3[2]) : interpolateNormal(av3[1], av3[2], ap3[3], ap3[4], ap3[5], ap3[6]);
+			//
+			//v3a.sub(ap3[10], ap3[9]);
+			//v3b.sub(ap3[8], ap3[9]);
+			//av3[3].cross(v3b, v3a);
+			//av3[3].normalize();
+			//av3new[0].set(av3[3]);
+			//v3a.sub(ap3[5], ap3[6]);
+			//v3b.sub(ap3[7], ap3[6]);
+			//av3[2].cross(v3a, v3b);
+			//av3[2].normalize();
+			//av3new[1].set(av3[2]);
+			
+			/* compute new colors */
+//			int[] acnew = new int[4];
+//			acnew[3] = ac[3];
+//			acnew[0] = ac[3] = (!abFlat[3]) ? lighting.shade(ap3[9], av3[3], mp) : interpolateColor(ac[0], ac[3]);
+//			acnew[2] = ac[2];
+//			acnew[1] = ac[2] = (!abFlat[1]) ? lighting.shade(ap3[6], av3[2], mp) : interpolateColor(ac[1], ac[2]);
+			
+			/* set up new flatenough flags */
+			boolean[] abnew = new boolean[4];
+			abnew[1] = abFlat[1];
+			abnew[3] = abFlat[3];
+			abnew[2] = abFlat[2];
+			abnew[0] = abFlat[2] = false;
+			
+			///* compute new normals */
+			//Vector3f[] av3new = newNormals();
+			//av3new[3].set(av3[3]);
+			//v3b.sub(ap3[10],ap3[9]);
+			//av3[3].cross(v3b, v3c);
+			//av3[3].normalize();
+			//av3new[0].set(av3[3]);
+			//av3new[2].set(av3[2]);
+			//v3b.sub(ap3[6],ap3[5]);
+			//av3[2].cross(v3b, v3a);
+			//av3[2].normalize();
+			//av3new[1].set(av3[2]);
+			
+			/* recurse */
+			int l = (aiLevel[0] < aiLevel[2]) ? aiLevel[0] : aiLevel[2];
+			aiLevel[1]++;
+			aiLevel[3]++;
+			int[] newLevels = new int[aiLevel.length];
+			for (int i = 0; i < aiLevel.length; newLevels[i] = aiLevel[i++]);
+			aiLevel[2] = newLevels[0] = l;
+			drawFlatHashPatch4(ap3, abFlat, aiLevel);
+			drawFlatHashPatch4(ap3new, abnew, newLevels);
+			return;
+		}
+		//}
+		/* draw the patch */
+		
+		//System.out.println("drawPatch");
+		//for (int i = 0; i < 12; System.out.println(ap3[i++]));
+		
+		//if (bBackfaceNormalFlip) flipBackfaceNormals(av3);
+		//av3[0].normalize();
+		//av3[1].normalize();
+		//av3[2].normalize();
+		//av3[3].normalize();
+		
+		//av3New[0].set(av3[0]);
+		//av3New[1].set(av3[1]);
+		//av3New[2].set(av3[2]);
+		//av3New[3].set(av3[3]);
+		//if (bBackfaceNormalFlip) flipBackfaceNormals(av3New);
+		//int c0 = lighting.shade(ap3[0], av3New[0], mp);
+		//int c1 = lighting.shade(ap3[3], av3New[1], mp);
+		//int c2 = lighting.shade(ap3[6], av3New[2], mp);
+		//int c3 = lighting.shade(ap3[9], av3New[3], mp);
+		
+		//drawLine3D(ap3[0], ap3[3]);
+		//drawLine3D(ap3[3], ap3[6]);
+		//drawLine3D(ap3[6], ap3[9]);
+		//drawLine3D(ap3[9], ap3[0]);
+		
+		//for (int i = 0; i < 12; i++) {
+		//	drawLine3D(ap3[i], ap3[(i + 1) % 12]);
+		//	drawPoint3D(ap3[i],2);
+		//}
+		
+		//Point3f p = new Point3f();
+		//p.set(ap3[0]);
+		//v3a.set(av3[0]);
+		//v3a.scale(30f);
+		//p.add(v3a);
+		//drawLine3D(ap3[0],p);
+		//
+		//p.set(ap3[3]);
+		//v3a.set(av3[1]);
+		//v3a.scale(30f);
+		//p.add(v3a);
+		//drawLine3D(ap3[3],p);
+		//
+		//p.set(ap3[6]);
+		//v3a.set(av3[2]);
+		//v3a.scale(30f);
+		//p.add(v3a);
+		//drawLine3D(ap3[6],p);
+		//
+		//p.set(ap3[9]);
+		//v3a.set(av3[3]);
+		//v3a.scale(30f);
+		//p.add(v3a);
+		//drawLine3D(ap3[9],p);
+		
+		//int ca = 0xFF777777;
+		//int cb = 0xFF999999;
+		//
+		//draw3DTriangleGourad(ap3[0], ap3[3], ap3[9], ca, ca, ca);
+		//draw3DTriangleGourad(ap3[6], ap3[9], ap3[3], cb, cb, cb);
+		
+//		if (mp.isOpaque()) {
+			drawable.drawTriangle(ap3[9], ap3[3], ap3[0]);
+			drawable.drawTriangle(ap3[3], ap3[9], ap3[6]);
+//		} else {
+//			int transparency = (int) (Math.min(1f,mp.transmit + mp.filter) * 255f);
+//			drawTriangleGouradTransparent(ap3[9], ap3[3], ap3[0], ac[3], ac[1], ac[0], transparency);
+//			drawTriangleGouradTransparent(ap3[3], ap3[9], ap3[6], ac[1], ac[3], ac[2], transparency);
+//		}
+	}
+
 	private void drawShadedHashPatch4(Point3f[] ap3, Vector3f[] av3, Color3f[] ac, boolean[] abFlat, int[] aiLevel, MaterialProperties mp) {
 		
 		//materialProperties = mp;
@@ -2147,6 +3425,308 @@ public class Viewport2 {
 //		}
 	}
 
+private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] ac, boolean[] abFlat, int[] aiLevel, MaterialProperties mp) {
+		
+		//materialProperties = mp;
+		//Point3d[] adp3 = new Point3d[ap3.length];
+		//for (int i = 0; i < adp3.length; adp3[i] = new Point3d(ap3[i++]));
+		//hashPatchSubdivision.subdivHashPatch4(adp3, adp3, av3, 2, new Point3d[][] { null, null, null, null }, new Vector3f[][] { null, null, null, null });
+		//
+		//if (true) return;
+		
+		boolean visible = false;
+		int width = drawable.getComponent().getWidth() >> 1;
+		int height = drawable.getComponent().getHeight() >> 1;
+		loop:
+		for (int i = 0; i < 12; i++) {
+			if (ap3[i].x > -width && ap3[i].x < width && ap3[i].y > -height && ap3[i].y < height) {
+				visible = true;
+				break loop;
+			}
+		}
+		if (!visible) return;
+		//System.out.println(abFlat[0] + "\t" + abFlat[1] + "\t" + abFlat[2] + "\t" + abFlat[3]);
+		
+		/* check if we need to u-split */
+		float u0 = subdiv(ap3[0], ap3[1], ap3[2], ap3[3], aiLevel[0] > 0);
+		float u2 = subdiv(ap3[9], ap3[8], ap3[7], ap3[6], aiLevel[2] > 0);
+		float v3 = subdiv(ap3[0], ap3[11], ap3[10], ap3[9], aiLevel[3] > 0);
+		float v1 = subdiv(ap3[3], ap3[4], ap3[5], ap3[6], aiLevel[1] > 0);
+		
+		float ul = (aiLevel[0] >= iMaxSubdiv || aiLevel[2] >= iMaxSubdiv) ? -1 : (float) Math.max(u0, u2);
+		float uv = (aiLevel[1] >= iMaxSubdiv || aiLevel[3] >= iMaxSubdiv) ? -1 : (float) Math.max(v1, v3);
+		
+		if (true && ul >= fFlatness && ul > uv * 1.1f) {
+		//if (false) {
+		//if (subdiv(ap3[0], ap3[1], ap3[2], ap3[3], uSplit) || subdiv(ap3[9], ap3[8], ap3[7], ap3[6], uSplit)) {
+			
+			/* flatten cubics if flat enough */
+			if (!abFlat[0] && (u0 <= fFlatness)) abFlat[0] = makeFlat(ap3[0], ap3[1], ap3[2], ap3[3]);
+			if (!abFlat[1] && (v1 <= fFlatness)) abFlat[1] = makeFlat(ap3[3], ap3[4], ap3[5], ap3[6]);
+			if (!abFlat[2] && (u2 <= fFlatness)) abFlat[2] = makeFlat(ap3[9], ap3[8], ap3[7], ap3[6]);
+			if (!abFlat[3] && (v3 <= fFlatness)) abFlat[3] = makeFlat(ap3[0], ap3[11], ap3[10], ap3[9]);
+			
+			
+			/* compute new normals */
+			Vector3f[] av3new = newNormals(4);
+			av3new[1].set(av3[1]);
+			av3new[0] = av3[1] = (aiLevel[0] > 0) ? interpolateNormal(av3[0], av3[1]) : interpolateNormal(av3[0], av3[1], ap3[0], ap3[1], ap3[2], ap3[3]);
+			av3new[2].set(av3[2]);
+			av3new[3] = av3[2] = (aiLevel[2] > 0) ? interpolateNormal(av3[3], av3[2]) : interpolateNormal(av3[3], av3[2], ap3[9], ap3[8], ap3[7], ap3[6]);
+			
+			/* compute new patches */
+			Point3f[] ap3new = newPatch(12);
+			v3a.sub(ap3[11], ap3[0]);
+			v3b.sub(ap3[4], ap3[3]);
+			v3c.add(v3a, v3b);
+			v3c.scale(0.5f);
+			v3a.sub(ap3[10], ap3[9]);
+			v3b.sub(ap3[5], ap3[6]);
+			v3a.add(v3b);
+			v3a.scale(0.5f);
+			deCasteljauSplit(ap3[0], ap3[1], ap3[2], ap3[3], ap3new[0], ap3new[1], ap3new[2], ap3new[3]);
+			deCasteljauSplit(ap3[9], ap3[8], ap3[7], ap3[6], ap3new[9], ap3new[8], ap3new[7], ap3new[6]);
+			ap3new[4].set(ap3[4]);
+			ap3new[5].set(ap3[5]);
+			ap3[4].add(ap3[3], v3c);
+			ap3[5].add(ap3[6], v3a);
+			ap3new[11].set(ap3[4]);
+			ap3new[10].set(ap3[5]);
+			
+			///* compute new normals */
+			//Vector3f[] av3new = newNormals(4);
+			//av3new[1].set(av3[1]);
+			////av3new[0] = av3[1] = (uLevel > 99) ? interpolateNormal(av3[0], av3[1]) : interpolateNormal(av3[0], av3[1], ap3[0], ap3[1], ap3[2], ap3[3]);
+			//av3new[2].set(av3[2]);
+			////av3new[3] = av3[2] = (uLevel > 99) ? interpolateNormal(av3[3], av3[2]) : interpolateNormal(av3[3], av3[2], ap3[9], ap3[8], ap3[7], ap3[6]);
+			//
+			//v3a.sub(ap3[4], ap3[3]);
+			//v3b.sub(ap3[2], ap3[3]);
+			//av3[1].cross(v3b, v3a);
+			//av3[1].normalize();
+			//av3new[0].set(av3[1]);
+			//v3a.sub(ap3[5], ap3[6]);
+			//v3b.sub(ap3[7], ap3[6]);
+			//av3[2].cross(v3a, v3b);
+			//av3[2].normalize();
+			//av3new[3].set(av3[2]);
+			
+			/* compute new colors */
+			Color4f[] acnew = newColors4(4);
+			acnew[1].set(ac[1]);
+			viewDef.getLighting().shade(ap3[3], av3[1], mp, ac[1]);
+			acnew[0].set(ac[1]);
+			acnew[2].set(ac[2]);
+			viewDef.getLighting().shade(ap3[6], av3[2], mp, ac[2]);
+			acnew[3].set(ac[2]);
+//			acnew[0] = ac[1] = (!abFlat[0]) ? lighting.shade(ap3[3], av3[1], mp) : interpolateColor(ac[0], ac[1]);
+//			acnew[2] = ac[2];
+//			acnew[3] = ac[2] = (!abFlat[2]) ? lighting.shade(ap3[6], av3[2], mp) : interpolateColor(ac[2], ac[3]);
+			
+			/* set up new flatenough flags */
+			boolean[] abnew = new boolean[4];
+			abnew[0] = abFlat[0];
+			abnew[1] = abFlat[1];
+			abnew[2] = abFlat[2];
+			abnew[3] = abFlat[1] = false;
+			
+			///* compute new normals */
+			//Vector3f[] av3new = newNormals();
+			//av3new[1].set(av3[1]);
+			//v3b.sub(ap3[3],ap3[2]);
+			//av3[1].cross(v3b, v3c);
+			//av3[1].normalize();
+			//av3new[0].set(av3[1]);
+			//av3new[2].set(av3[2]);
+			//v3b.sub(ap3[7],ap3[6]);
+			//av3[2].cross(v3b, v3a);
+			//av3[2].normalize();
+			//av3new[3].set(av3[2]);
+			
+			/* recurse */
+			int l = (aiLevel[1] < aiLevel[3]) ? aiLevel[1] : aiLevel[3];
+			aiLevel[0]++;
+			aiLevel[2]++;
+			int[] newLevels = new int[aiLevel.length];
+			for (int i = 0; i < aiLevel.length; newLevels[i] = aiLevel[i++]);
+			aiLevel[1] = newLevels[3] = l;
+			drawShadedHashPatch4Alpha(ap3, av3, ac, abFlat, aiLevel, mp);
+			drawShadedHashPatch4Alpha(ap3new, av3new, acnew, abnew, newLevels, mp);
+			return;
+		}
+		/* check if we need to v-split */
+		else if (true && uv >= fFlatness) {
+		//else if (false) {
+		//else if (subdiv(ap3[0], ap3[11], ap3[10], ap3[9], vSplit) || subdiv(ap3[3], ap3[4], ap3[5], ap3[6], vSplit)) {
+			/* flatten cubics if flat enough */
+			if (!abFlat[0] && (u0 <= fFlatness)) abFlat[0] = makeFlat(ap3[0], ap3[1], ap3[2], ap3[3]);
+			if (!abFlat[1] && (v1 <= fFlatness)) abFlat[1] = makeFlat(ap3[3], ap3[4], ap3[5], ap3[6]);
+			if (!abFlat[2] && (u2 <= fFlatness)) abFlat[2] = makeFlat(ap3[9], ap3[8], ap3[7], ap3[6]);
+			if (!abFlat[3] && (v3 <= fFlatness)) abFlat[3] = makeFlat(ap3[0], ap3[11], ap3[10], ap3[9]);
+			
+			
+			/* compute new normals */
+			Vector3f[] av3new = newNormals(4);
+			av3new[3].set(av3[3]);
+			av3new[0] = av3[3] = (aiLevel[3] > 0) ? interpolateNormal(av3[0], av3[3]) : interpolateNormal(av3[0], av3[3], ap3[0], ap3[11], ap3[10], ap3[9]);
+			av3new[2].set(av3[2]);
+			av3new[1] = av3[2] = (aiLevel[1] > 0) ? interpolateNormal(av3[1], av3[2]) : interpolateNormal(av3[1], av3[2], ap3[3], ap3[4], ap3[5], ap3[6]);
+			
+			/* compute new patches */
+			Point3f[] ap3new = newPatch(12);
+			v3a.sub(ap3[1], ap3[0]);
+			v3b.sub(ap3[8], ap3[9]);
+			v3c.add(v3a, v3b);
+			v3c.scale(0.5f);
+			v3a.sub(ap3[2], ap3[3]);
+			v3b.sub(ap3[7], ap3[6]);
+			v3a.add(v3b);
+			v3a.scale(0.5f);
+			deCasteljauSplit(ap3[0], ap3[11], ap3[10], ap3[9], ap3new[0], ap3new[11], ap3new[10], ap3new[9]);
+			deCasteljauSplit(ap3[3], ap3[4], ap3[5], ap3[6], ap3new[3], ap3new[4], ap3new[5], ap3new[6]);
+			ap3new[8].set(ap3[8]);
+			ap3new[7].set(ap3[7]);
+			ap3[8].add(ap3[9], v3c);
+			ap3[7].add(ap3[6], v3a);
+			ap3new[1].set(ap3[8]);
+			ap3new[2].set(ap3[7]);
+			
+			///* compute new normals */
+			//Vector3f[] av3new = newNormals(4);
+			//av3new[3].set(av3[3]);
+			////av3new[0] = av3[3] = (vLevel > 99) ? interpolateNormal(av3[0], av3[3]) : interpolateNormal(av3[0], av3[3], ap3[0], ap3[11], ap3[10], ap3[9]);
+			//av3new[2].set(av3[2]);
+			////av3new[1] = av3[2] = (vLevel > 99) ? interpolateNormal(av3[1], av3[2]) : interpolateNormal(av3[1], av3[2], ap3[3], ap3[4], ap3[5], ap3[6]);
+			//
+			//v3a.sub(ap3[10], ap3[9]);
+			//v3b.sub(ap3[8], ap3[9]);
+			//av3[3].cross(v3b, v3a);
+			//av3[3].normalize();
+			//av3new[0].set(av3[3]);
+			//v3a.sub(ap3[5], ap3[6]);
+			//v3b.sub(ap3[7], ap3[6]);
+			//av3[2].cross(v3a, v3b);
+			//av3[2].normalize();
+			//av3new[1].set(av3[2]);
+			
+			/* compute new colors */
+//			int[] acnew = new int[4];
+//			acnew[3] = ac[3];
+//			acnew[0] = ac[3] = (!abFlat[3]) ? lighting.shade(ap3[9], av3[3], mp) : interpolateColor(ac[0], ac[3]);
+//			acnew[2] = ac[2];
+//			acnew[1] = ac[2] = (!abFlat[1]) ? lighting.shade(ap3[6], av3[2], mp) : interpolateColor(ac[1], ac[2]);
+			Color4f[] acnew = newColors4(4);
+			acnew[3].set(ac[3]);
+			viewDef.getLighting().shade(ap3[9], av3[3], mp, ac[3]);
+			acnew[0].set(ac[3]);
+			acnew[2].set(ac[2]);
+			viewDef.getLighting().shade(ap3[6], av3[2], mp, ac[2]);
+			acnew[1].set(ac[2]);
+			
+			/* set up new flatenough flags */
+			boolean[] abnew = new boolean[4];
+			abnew[1] = abFlat[1];
+			abnew[3] = abFlat[3];
+			abnew[2] = abFlat[2];
+			abnew[0] = abFlat[2] = false;
+			
+			///* compute new normals */
+			//Vector3f[] av3new = newNormals();
+			//av3new[3].set(av3[3]);
+			//v3b.sub(ap3[10],ap3[9]);
+			//av3[3].cross(v3b, v3c);
+			//av3[3].normalize();
+			//av3new[0].set(av3[3]);
+			//av3new[2].set(av3[2]);
+			//v3b.sub(ap3[6],ap3[5]);
+			//av3[2].cross(v3b, v3a);
+			//av3[2].normalize();
+			//av3new[1].set(av3[2]);
+			
+			/* recurse */
+			int l = (aiLevel[0] < aiLevel[2]) ? aiLevel[0] : aiLevel[2];
+			aiLevel[1]++;
+			aiLevel[3]++;
+			int[] newLevels = new int[aiLevel.length];
+			for (int i = 0; i < aiLevel.length; newLevels[i] = aiLevel[i++]);
+			aiLevel[2] = newLevels[0] = l;
+			drawShadedHashPatch4Alpha(ap3, av3, ac, abFlat, aiLevel, mp);
+			drawShadedHashPatch4Alpha(ap3new, av3new, acnew, abnew, newLevels, mp);
+			return;
+		}
+		//}
+		/* draw the patch */
+		
+		//System.out.println("drawPatch");
+		//for (int i = 0; i < 12; System.out.println(ap3[i++]));
+		
+		//if (bBackfaceNormalFlip) flipBackfaceNormals(av3);
+		//av3[0].normalize();
+		//av3[1].normalize();
+		//av3[2].normalize();
+		//av3[3].normalize();
+		
+		//av3New[0].set(av3[0]);
+		//av3New[1].set(av3[1]);
+		//av3New[2].set(av3[2]);
+		//av3New[3].set(av3[3]);
+		//if (bBackfaceNormalFlip) flipBackfaceNormals(av3New);
+		//int c0 = lighting.shade(ap3[0], av3New[0], mp);
+		//int c1 = lighting.shade(ap3[3], av3New[1], mp);
+		//int c2 = lighting.shade(ap3[6], av3New[2], mp);
+		//int c3 = lighting.shade(ap3[9], av3New[3], mp);
+		
+		//drawLine3D(ap3[0], ap3[3]);
+		//drawLine3D(ap3[3], ap3[6]);
+		//drawLine3D(ap3[6], ap3[9]);
+		//drawLine3D(ap3[9], ap3[0]);
+		
+		//for (int i = 0; i < 12; i++) {
+		//	drawLine3D(ap3[i], ap3[(i + 1) % 12]);
+		//	drawPoint3D(ap3[i],2);
+		//}
+		
+		//Point3f p = new Point3f();
+		//p.set(ap3[0]);
+		//v3a.set(av3[0]);
+		//v3a.scale(30f);
+		//p.add(v3a);
+		//drawLine3D(ap3[0],p);
+		//
+		//p.set(ap3[3]);
+		//v3a.set(av3[1]);
+		//v3a.scale(30f);
+		//p.add(v3a);
+		//drawLine3D(ap3[3],p);
+		//
+		//p.set(ap3[6]);
+		//v3a.set(av3[2]);
+		//v3a.scale(30f);
+		//p.add(v3a);
+		//drawLine3D(ap3[6],p);
+		//
+		//p.set(ap3[9]);
+		//v3a.set(av3[3]);
+		//v3a.scale(30f);
+		//p.add(v3a);
+		//drawLine3D(ap3[9],p);
+		
+		//int ca = 0xFF777777;
+		//int cb = 0xFF999999;
+		//
+		//draw3DTriangleGourad(ap3[0], ap3[3], ap3[9], ca, ca, ca);
+		//draw3DTriangleGourad(ap3[6], ap3[9], ap3[3], cb, cb, cb);
+		
+//		if (mp.isOpaque()) {
+			drawable.drawTriangle(ap3[9], ac[3], ap3[3], ac[1], ap3[0], ac[0]);
+			drawable.drawTriangle(ap3[3], ac[1], ap3[9], ac[3], ap3[6], ac[2]);
+//		} else {
+//			int transparency = (int) (Math.min(1f,mp.transmit + mp.filter) * 255f);
+//			drawTriangleGouradTransparent(ap3[9], ap3[3], ap3[0], ac[3], ac[1], ac[0], transparency);
+//			drawTriangleGouradTransparent(ap3[3], ap3[9], ap3[6], ac[1], ac[3], ac[2], transparency);
+//		}
+	}
+
 	private float subdiv(Point3f p0, Point3f p1, Point3f p2, Point3f p3, boolean simple) {
 		if (!simple) {
 			v3a.set(4 * p0.x - 6 *  p1.x + 2 * p3.x, 4 * p0.y - 6 *  p1.y + 2 * p3.y, 4 * p0.z - 6 *  p1.z + 2 * p3.z);
@@ -2204,6 +3784,12 @@ public class Viewport2 {
 	private Color3f[] newColors(int n) {
 		Color3f[] c = new Color3f[n];
 		for (int i = 0; i < n; c[i++] = new Color3f());
+		return c;
+	}
+	
+	private Color4f[] newColors4(int n) {
+		Color4f[] c = new Color4f[n];
+		for (int i = 0; i < n; c[i++] = new Color4f());
 		return c;
 	}
 	

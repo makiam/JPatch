@@ -1,5 +1,5 @@
 /*
- * $Id: RealtimeLighting.java,v 1.4 2005/08/28 19:05:39 sascha_l Exp $
+ * $Id: RealtimeLighting.java,v 1.5 2005/08/29 14:00:27 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -28,7 +28,7 @@ import jpatch.entity.*;
 /**
  * This class holds information needed for realtime lighing (a list of lightsources and some global settings)
  * @author sascha
- * @version $$Revision: 1.4 $$
+ * @version $$Revision: 1.5 $$
  */
 public class RealtimeLighting {
 	
@@ -176,6 +176,21 @@ public class RealtimeLighting {
 	}
 	
 	/**
+	 * Computes shading
+	 * @param point The point to shade
+	 * @param normal The normal vector
+	 * @param mp The material properties
+	 * @param color A reference to the color object in which the computed color value will be stored
+	 */
+	public void shade(Point3f point, Vector3f normal, MaterialProperties mp, Color4f color) {
+		color.set(mp.red * mp.ambient * c3Ambient.x, mp.green * mp.ambient * c3Ambient.y, mp.blue * mp.ambient * c3Ambient.z, 1 - mp.filter - mp.transmit);
+		for (int i = 0; i < aLightSources.length; i++) {
+			aLightSources[i].shade(point, normal, mp, color);
+		}
+		color.clamp(0, 1);
+	}
+	
+	/**
 	 * The base class for all lightsources
 	 * @author sascha
 	 */
@@ -207,6 +222,15 @@ public class RealtimeLighting {
 		 * @param color A reference to the color object in which the computed color value will be stored
 		 */
 		public abstract void shade(Point3f point, Vector3f normal, MaterialProperties mp, Color3f color);
+		
+		/**
+		 * Computes shading
+		 * @param point The point to shade
+		 * @param normal The normal vector
+		 * @param mp The material properties
+		 * @param color A reference to the color object in which the computed color value will be stored
+		 */
+		public abstract void shade(Point3f point, Vector3f normal, MaterialProperties mp, Color4f color);
 		
 		/**
 		 * Applies camera transformation
@@ -312,6 +336,39 @@ public class RealtimeLighting {
 					color.x += ((1 - mp.metallic) + mp.metallic * mp.red) * c3Color.x * specular;
 					color.y += ((1 - mp.metallic) + mp.metallic * mp.green) * c3Color.y * specular;
 					color.z += ((1 - mp.metallic) + mp.metallic * mp.blue) * c3Color.z * specular;
+				}
+			}
+		}
+		
+		public void shade(Point3f point, Vector3f normal, MaterialProperties mp, Color4f color) {
+			if (normal.z < 0)N.set(normal);
+			else N.set(-normal.x, -normal.y, -normal.z);
+			if (mp.diffuse != 0) {
+				float diffuse = v3TransformedDirection.dot(N);
+				if (diffuse > 0) {
+					diffuse *= mp.diffuse;
+					color.x += mp.red * c3Color.x * diffuse;
+					color.y += mp.green * c3Color.y * diffuse;
+					color.z += mp.blue * c3Color.z * diffuse;
+				}
+			}
+			if (bHighlight && (mp.specular != 0)) {
+				if (bLocalViewer) {
+					V.sub(point, p3EyePosition);
+					V.normalize();
+					LV.sub(v3TransformedDirection, V);
+				} else {
+					LV.sub(v3TransformedDirection, v3ViewDirection);
+				}
+				LV.scale(1f / (float) Math.sqrt(LV.dot(LV)));
+				LV.normalize();
+				float spec = LV.dot(N);
+				if (spec > 0) {
+					float specular = (float)Math.pow(spec,1f/mp.roughness) * mp.specular;
+					color.x += ((1 - mp.metallic) + mp.metallic * mp.red) * c3Color.x * specular;
+					color.y += ((1 - mp.metallic) + mp.metallic * mp.green) * c3Color.y * specular;
+					color.z += ((1 - mp.metallic) + mp.metallic * mp.blue) * c3Color.z * specular;
+					color.w += specular;
 				}
 			}
 		}
@@ -439,6 +496,56 @@ public class RealtimeLighting {
 					color.x += ((1 - mp.metallic) + mp.metallic * mp.red) * C.x * specular;
 					color.y += ((1 - mp.metallic) + mp.metallic * mp.green) * C.y * specular;
 					color.z += ((1 - mp.metallic) + mp.metallic * mp.blue) * C.z * specular;
+				}
+			}
+		}
+		
+		public void shade(Point3f point, Vector3f normal, MaterialProperties mp, Color4f color) {
+			if (normal.z < 0) N.set(normal);
+			else N.set(-normal.x, -normal.y, -normal.z);
+			
+			D.sub(p3Position, point);
+			D.normalize();
+			
+			C.set(c3Color);
+			switch (iAttenuation) {
+				case 1: {
+					float dist = p3TransformedPosition.distance(point);
+					if (dist > 0) C.scale(fDistance / dist);
+				} break;
+				case 2: {
+					float dist = p3TransformedPosition.distanceSquared(point);
+					if (dist > 0) C.scale(fDistanceSquared / dist);
+				} break;
+			}
+			
+			if (mp.diffuse != 0) {
+				float diffuse = D.dot(N);
+				if (diffuse > 0) {
+					diffuse *= mp.diffuse;
+					color.x += mp.red * C.x * diffuse;
+					color.y += mp.green * C.y * diffuse;
+					color.z += mp.blue * C.z * diffuse;
+				}
+			}
+			
+			if (bHighlight && (mp.specular != 0)) {
+				if (bLocalViewer) {
+					V.sub(point, p3EyePosition);
+					V.normalize();
+					LV.sub(D, V);
+				} else {
+					LV.sub(D, v3ViewDirection);
+				}
+				LV.scale(1f / (float) Math.sqrt(LV.dot(LV)));
+				LV.normalize();
+				float spec = LV.dot(N);
+				if (spec > 0) {
+					float specular = (float)Math.pow(spec,1f/mp.roughness) * mp.specular;
+					color.x += ((1 - mp.metallic) + mp.metallic * mp.red) * C.x * specular;
+					color.y += ((1 - mp.metallic) + mp.metallic * mp.green) * C.y * specular;
+					color.z += ((1 - mp.metallic) + mp.metallic * mp.blue) * C.z * specular;
+					color.w += specular;
 				}
 			}
 		}
@@ -624,6 +731,65 @@ public class RealtimeLighting {
 					color.x += ((1 - mp.metallic) + mp.metallic * mp.red) * C.x * specular;
 					color.y += ((1 - mp.metallic) + mp.metallic * mp.green) * C.y * specular;
 					color.z += ((1 - mp.metallic) + mp.metallic * mp.blue) * C.z * specular;
+				}
+			}
+		}
+		
+		public void shade(Point3f point, Vector3f normal, MaterialProperties mp, Color4f color) {
+			if (normal.z < 0) N.set(normal);
+			else N.set(-normal.x, -normal.y, -normal.z);
+			
+			D.sub(p3Position, point);
+			D.normalize();
+			
+			float cosAngle = -D.dot(v3TransformedDirection);
+			//System.out.println(cosAngle + " " + fCosRadius + " " + fCosFalloff);
+			float spot = (cosAngle > fCosRadius) ? 1 :
+						 (cosAngle < fCosFalloff) ? 0 :
+						 (cosAngle - fCosFalloff) / (fCosRadius - fCosFalloff);
+			
+			C.set(c3Color);
+			switch (iAttenuation) {
+				case 0: {
+					C.scale(spot);
+				} break;
+				case 1: {
+					float dist = p3TransformedPosition.distance(point);
+					if (dist > 0) C.scale(fDistance / dist * spot);
+				} break;
+				case 2: {
+					float dist = p3TransformedPosition.distanceSquared(point);
+					if (dist > 0) C.scale(fDistanceSquared / dist * spot);
+				} break;
+			}
+			
+			if (mp.diffuse != 0) {
+				float diffuse = D.dot(N);
+				if (diffuse > 0) {
+					diffuse *= mp.diffuse;
+					color.x += mp.red * C.x * diffuse;
+					color.y += mp.green * C.y * diffuse;
+					color.z += mp.blue * C.z * diffuse;
+				}
+			}
+			
+			if (bHighlight && (mp.specular != 0)) {
+				if (bLocalViewer) {
+					V.sub(point, p3EyePosition);
+					V.normalize();
+					LV.sub(D, V);
+				} else {
+					LV.sub(D, v3ViewDirection);
+				}
+				LV.scale(1f / (float) Math.sqrt(LV.dot(LV)));
+				LV.normalize();
+				float spec = LV.dot(N);
+				if (spec > 0) {
+					float specular = (float)Math.pow(spec,1f/mp.roughness) * mp.specular;
+					color.x += ((1 - mp.metallic) + mp.metallic * mp.red) * C.x * specular;
+					color.y += ((1 - mp.metallic) + mp.metallic * mp.green) * C.y * specular;
+					color.z += ((1 - mp.metallic) + mp.metallic * mp.blue) * C.z * specular;
+					color.w += specular;
 				}
 			}
 		}
