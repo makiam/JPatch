@@ -188,15 +188,15 @@ public class Model extends JPatchTreeNode {
 		return true;
 	}
 	
-	public boolean checkSelection(Selection selection) {
+	public boolean checkSelection(NewSelection selection) {
 		return (!lstSelections.contains(selection));
 	}
 	
-	public Selection getSelection(Selection selection) {
-		return (Selection) lstSelections.get(lstSelections.indexOf(selection));
+	public NewSelection getSelection(NewSelection selection) {
+		return (NewSelection) lstSelections.get(lstSelections.indexOf(selection));
 	}
 	
-	public void addSelection(Selection selection) {
+	public void addSelection(NewSelection selection) {
 		/*
 		for (int m = 0; m < 32; m++) {
 			if (aJPMaterial[m] == null) {
@@ -217,7 +217,7 @@ public class Model extends JPatchTreeNode {
 		//}
 	}
 
-	public void addSelection(int index, Selection selection) {
+	public void addSelection(int index, NewSelection selection) {
 			treenodeSelections.add(index, selection);
 			lstSelections.add(index, selection);
 	}
@@ -295,7 +295,7 @@ public class Model extends JPatchTreeNode {
 		return list;
 	}
 	
-	public void removeSelection(Selection selection) {
+	public void removeSelection(NewSelection selection) {
 		treenodeSelections.remove(selection);
 		lstSelections.remove(selection);
 	}
@@ -1037,14 +1037,14 @@ public class Model extends JPatchTreeNode {
 			System.out.println(p);
 		}
 		
-		System.out.println("\n\n----------- selection -------------");
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null) {
-			ControlPoint[] acp = ps.getControlPointArray();
-			for (int p = 0; p < acp.length; p++) {
-				System.out.print(acp[p] + " ");
-			}
-		}
+//		System.out.println("\n\n----------- selection -------------");
+//		PointSelection ps = MainFrame.getInstance().getPointSelection();
+//		if (ps != null) {
+//			ControlPoint[] acp = ps.getControlPointArray();
+//			for (int p = 0; p < acp.length; p++) {
+//				System.out.print(acp[p] + " ");
+//			}
+//		}
 		
 		System.out.println("\n\n----------- morphs -------------");
 		for (Iterator it = lstMorphs.iterator(); it.hasNext(); ) {

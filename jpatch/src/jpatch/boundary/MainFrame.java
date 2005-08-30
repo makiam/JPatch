@@ -1,6 +1,7 @@
 package jpatch.boundary;
 
 import java.awt.*;
+import java.util.*;
 //import java.beans.*;
 import javax.swing.*;
 import javax.swing.plaf.metal.*;
@@ -37,7 +38,7 @@ public final class MainFrame extends JFrame {
 	private JLabel helpLabel;
 	private JMenuBar mainMenu;
 	private ButtonGroup bgAction;
-	private Selection selection;
+	private NewSelection selection;
 	private JPatchUndoManager undoManager = new JPatchUndoManager(50);
 	private JPatchKeyAdapter keyAdapter = new JPatchKeyAdapter();
 	private JDialog dialog;
@@ -368,33 +369,28 @@ public final class MainFrame extends JFrame {
 		return undoManager;
 	}
 	
-	public Selection getSelection() {
+	public NewSelection getSelection() {
 		return selection;
 	}
 	
-	public void setSelection(Selection selection) {
+	public void setSelection(NewSelection selection) {
 		this.selection = selection;
 		
 		/* unhide new selection */
-		PointSelection ps = getPointSelection();
-		if (ps != null) {
-			ControlPoint[] acp = ps.getControlPointArray();
-			for (int i = 0; i < acp.length; i++) {
-				ControlPoint[] stack = acp[i].getStack();
-				for (int j = 0; j < stack.length; stack[j++].setHidden(false));
-			}
-			
-			if (jpatchScreen.getTool() != null) {
-				try {
-					RotateTool rotateTool = (RotateTool) jpatchScreen.getTool();
-					rotateTool.reInit(ps);
-				} catch (ClassCastException e) {
-					;
+		if (selection != null) {
+			for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
+				Object object = it.next();
+				if (object instanceof ControlPoint) {
+					ControlPoint[] stack = ((ControlPoint) object).getStack();
+					for (int j = 0; j < stack.length; stack[j++].setHidden(false));
 				}
 			}
+			JPatchTool tool = jpatchScreen.getTool();
+			if (tool != null && tool instanceof RotateTool)
+				((RotateTool) tool).reInit(selection);
+//FIXME		
+			selection.arm(3);
 		}
-		
-		
 	}
 	
 	public void setHelpText(String text) {
@@ -446,14 +442,14 @@ public final class MainFrame extends JFrame {
 		return iMode;
 	}
 	
-	public PointSelection getPointSelection() {
-		Class classPointSelection = PointSelection.getPointSelectionClass();
-		PointSelection pointSelection = null;
-		if (selection != null && classPointSelection.isAssignableFrom(selection.getClass())) {
-			pointSelection = (PointSelection)selection;
-		}
-		return pointSelection;
-	}
+//	public PointSelection getPointSelection() {
+//		Class classPointSelection = PointSelection.getPointSelectionClass();
+//		PointSelection pointSelection = null;
+//		if (selection != null && classPointSelection.isAssignableFrom(selection.getClass())) {
+//			pointSelection = (PointSelection)selection;
+//		}
+//		return pointSelection;
+//	}
 	
 	public JPatchTree getTree() {
 		return tree;

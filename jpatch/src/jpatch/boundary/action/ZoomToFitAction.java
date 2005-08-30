@@ -32,7 +32,7 @@ public final class ZoomToFitAction extends AbstractAction {
 		//} else {
 		//	MainFrame.getInstance().getMeshToolBar().reset();
 		//}
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
+		NewSelection selection = MainFrame.getInstance().getSelection();
 		float left = Float.MAX_VALUE;
 		float right = -Float.MAX_VALUE;
 		float bottom = Float.MAX_VALUE;
@@ -42,11 +42,11 @@ public final class ZoomToFitAction extends AbstractAction {
 		//Matrix3f m3RotScale = new Matrix3f();
 		//m4View.getRotationScale(m3RotScale);
 		boolean doit = true;
-		if (ps != null && !ps.isSingle()) {
-			ControlPoint[] acp = ps.getControlPointArray();
-			for (int c = 0; c < acp.length; c++) {
-				if (acp[c].isHead()) {
-					p3.set(acp[c].getPosition());
+		if (selection != null && !selection.isSingle()) {
+			for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
+				Object object = it.next();
+				if (object instanceof ControlPoint) {
+					p3.set(((ControlPoint) object).getPosition());
 					m4View.transform(p3);
 					if (p3.x < left) left = p3.x;
 					if (p3.x > right) right = p3.x;

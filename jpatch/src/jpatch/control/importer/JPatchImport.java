@@ -1,16 +1,14 @@
 package jpatch.control.importer;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+
 
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
+import jpatch.boundary.NewSelection;
 import jpatch.boundary.Rotoscope;
 import jpatch.boundary.ViewDefinition;
-import jpatch.boundary.selection.PointSelection;
-import jpatch.boundary.selection.Selection;
 import jpatch.control.ModelImporter;
 import jpatch.entity.ControlPoint;
 import jpatch.entity.JPatchMaterial;
@@ -52,7 +50,7 @@ implements ModelImporter {
 	private Rotoscope rotoscope;
 	private int iRotoscopeView;
 	private JPatchMaterial material;
-	private Selection selection;
+	private String selectionName;
 	private Morph morph;
 	private List listMaterials = new ArrayList();
 	private ArrayList listCandidateFivePointPatch = new ArrayList();
@@ -103,7 +101,7 @@ implements ModelImporter {
 				} else if (localName.equals("selection")) {
 					iState = SELECTION;
 					charReader = new ArrayCharReader();
-					selection = createSelection(attributes);
+					createSelection(attributes);
 				} else if (localName.equals("rotoscope")) {
 					iState = ROTOSCOPE;
 					rotoscope = createRotoscope(attributes);
@@ -279,10 +277,11 @@ implements ModelImporter {
 				if (localName.equals("selection")) {
 					iState = MODEL;
 					int[] aiPoint = ((ArrayCharReader) charReader).getIntArray();
+					HashSet pointSet = new HashSet();
 					for (int i = 0; i < aiPoint.length; i++) {
-						((PointSelection) selection).addControlPoint((ControlPoint) listCp.get(aiPoint[i]));
+						pointSet.add(listCp.get(aiPoint[i]));
 					}
-					model.addSelection(selection);
+					model.addSelection(new NewSelection(pointSet));
 				}
 				break;
 			case ROTOSCOPE:
@@ -393,16 +392,23 @@ implements ModelImporter {
 		morph.add(cp, vector);
 	}
 	
-	private Selection createSelection(Attributes attributes) {
-		Selection selection = new PointSelection();
+	private void createSelection(Attributes attributes) {
+//		NewSelection selection = new NewSelection();
+//		for (int index = 0; index < attributes.getLength(); index++) {
+//			String localName = attributes.getLocalName(index);
+//			String value = attributes.getValue(index);
+//			if (localName.equals("name")) {
+//				selection.setName(value);
+//			}
+//		}
+//		return selection;
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);
 			if (localName.equals("name")) {
-				selection.setName(value);
+				selectionName = value;
 			}
 		}
-		return selection;
 	}
 				
 	private JPatchMaterial getPatchMaterial(Attributes attributes) {

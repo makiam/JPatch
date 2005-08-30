@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.18 2005/08/30 14:25:18 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.19 2005/08/30 22:20:18 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -135,6 +135,10 @@ public class Viewport2 {
 		return drawable;
 	}
 	
+	public Grid getGrid() {
+		return grid;
+	}
+	
 	public void drawInfo() {
 		String[] info = drawable.getInfo().split("\n");
 		drawable.setColor(new Color3f(settings.cText));
@@ -207,7 +211,7 @@ public class Viewport2 {
 		fDeltaZ += 50;
 		//fMinZ -= 1;
 		
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
+		NewSelection selection = MainFrame.getInstance().getSelection();
 		
 		if (viewDef.renderCurves()) {
 			drawable.setColor(new Color3f(settings.cCurve)); // FIXME
@@ -229,7 +233,7 @@ public class Viewport2 {
 						p0.set(cp.getPosition());
 						if (!drawable.isTransformSupported()) 
 							m4View.transform(p0);
-						if (ps != null && ps.contains(cp)) {
+						if (selection != null && selection.contains(cp)) {
 							setFogColor(p0.z, cSelected, color);
 							drawable.setColor(color);
 							drawable.drawPoint(p0);
@@ -477,8 +481,8 @@ public class Viewport2 {
 				drawable.setTransparentRenderingMode(0);
 			}
 		}
-		if (ps != null)
-			drawSelection(ps);
+		if (selection != null)
+			drawSelection(selection);
 		if (drawable.isLightingSupported())
 			drawable.setLightingEnabled(false);
 	}
@@ -505,19 +509,18 @@ public class Viewport2 {
 		}
 	}
 	
-	private void drawSelection(PointSelection ps) {
-		if (ps != null && ps.getHotCp() != null) {
-			if (ps.getHotCp().getCurve() != null && ps.getHotCp().getCurve().getModel() != null) {
-				Point3f p = new Point3f(ps.getHotCp().getPosition());
-				m4View.transform(p);
-				drawable.setColor(new Color3f(settings.cHot)); // FIXME
-				drawable.setPointSize(5);
-				drawable.drawPoint(p);
-			}
-		}
-		if (ps != null && ps.isCurve()) {
-			ControlPoint cp = ps.getControlPoint();
-			if (ps.getDirection() && cp.getNext() != null) {
+	private void drawSelection(NewSelection selection) {
+		Object hot = selection.getHotObject();
+		ControlPoint cp = null;
+		if (hot instanceof ControlPoint) {
+			cp = (ControlPoint) hot;
+			Point3f p = new Point3f(cp.getPosition());
+			m4View.transform(p);
+			drawable.setColor(new Color3f(settings.cHot)); // FIXME
+			drawable.setPointSize(5);
+			drawable.drawPoint(p);
+			int direction = selection.getDirection();
+			if (direction == 1 && cp.getNext() != null) {
 				Point3f p3A = new Point3f(cp.getPosition());
 				Point3f p3B = new Point3f(cp.getOutTangent());
 				Point3f p3C = new Point3f(cp.getNext().getInTangent());
@@ -526,9 +529,9 @@ public class Viewport2 {
 				m4View.transform(p3B);
 				m4View.transform(p3C);
 				m4View.transform(p3D);
-//				drawable.setColor(new Color3f(settings.cSelected)); // FIXME
+	//				drawable.setColor(new Color3f(settings.cSelected)); // FIXME
 				drawCurveSegment(p3A,p3B,p3C,p3D, false, 0, new Color3f(settings.cSelected)); // FIXME
-			} else if (!ps.getDirection() && cp.getPrev() != null) {
+			} else if (direction == -1 && cp.getPrev() != null) {
 				Point3f p3A = new Point3f(cp.getPrev().getPosition());
 				Point3f p3B = new Point3f(cp.getPrev().getOutTangent());
 				Point3f p3C = new Point3f(cp.getInTangent());
@@ -537,7 +540,7 @@ public class Viewport2 {
 				m4View.transform(p3B);
 				m4View.transform(p3C);
 				m4View.transform(p3D);
-//				drawable.setColor(new Color3f(settings.cSelected)); // FIXME
+	//				drawable.setColor(new Color3f(settings.cSelected)); // FIXME
 				drawCurveSegment(p3A,p3B,p3C,p3D, false, 0, new Color3f(settings.cSelected)); // FIXME
 			}
 		}

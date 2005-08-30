@@ -14,8 +14,8 @@ implements ChangeListener {
 	 */
 	private static final long serialVersionUID = -820847916109947399L;
 	JPatchInput inputName;
-	Selection selection;
-	public SelectionPanel(Selection selection) {
+	NewSelection selection;
+	public SelectionPanel(NewSelection selection) {
 		this.selection = selection;
 		//add(new JPatchButton(new EditMaterialAction(material)));
 		//add(new JPatchButton(new CloneMaterialAction(material)));

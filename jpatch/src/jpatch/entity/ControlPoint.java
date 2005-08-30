@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.2 2005/08/30 14:25:18 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.3 2005/08/30 22:20:18 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -35,7 +35,7 @@ import jpatch.control.edit.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.2 $
+ * @version    $Revision: 1.3 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -173,22 +173,36 @@ public class ControlPoint implements Comparable, Transformable {
 	* Transformable implementation
 	*/
 	
-	public JPatchAbstractUndoableEdit transformPermanently(Matrix4f m) {
-		ChangeControlPointPositionEdit edit = new ChangeControlPointPositionEdit(this, p3BackupPosition);
-		p3Position.set(p3BackupPosition);
-		m.transform(p3Position);
-		invalidateTangents();
-		return edit;
-	}
-	
-	public void transformTemporarily(Matrix4f m) {
-		p3Position.set(p3BackupPosition);
-		m.transform(p3Position);
-		invalidateTangents();
-	}
-	
-	public void prepareForTemporaryTransformation() {
+	public void beginTransform() {
 		p3BackupPosition.set(p3Position);
+	}
+	
+	public void translate(Vector3f v) {
+		p3Position.set(p3BackupPosition);
+		p3Position.add(v);
+		invalidateTangents();
+	}
+	
+	public void rotate(Quat4f q, Point3f pivot) {
+		p3Position.set(p3BackupPosition);
+		p3Position.sub(pivot);
+		Matrix3f rot = new Matrix3f();
+		rot.set(q);
+		rot.transform(p3Position);
+		p3Position.add(pivot);
+		invalidateTangents();
+	}
+	
+	public void transform(Matrix3f m, Point3f pivot) {
+		p3Position.set(p3BackupPosition);
+		p3Position.sub(pivot);
+		m.transform(p3Position);
+		p3Position.add(pivot);
+		invalidateTangents();
+	}
+	
+	public JPatchUndoableEdit endTransform() {
+		return new ChangeControlPointPositionEdit(this, p3BackupPosition);
 	}
 	
 	/**

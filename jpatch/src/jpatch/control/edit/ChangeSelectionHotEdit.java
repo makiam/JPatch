@@ -1,17 +1,19 @@
 package jpatch.control.edit;
 
+import jpatch.entity.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
 
 /**
  * Use this class for changing selections (with the default tool)
  */
 
-public class ChangeSelectionEdit extends JPatchAbstractUndoableEdit {
+public class ChangeSelectionHotEdit extends JPatchAbstractUndoableEdit {
+	private Object hot;
 	private NewSelection selection;
 	
-	public ChangeSelectionEdit(NewSelection selection) {
+	public ChangeSelectionHotEdit(NewSelection selection, Object hot) {
 		this.selection = selection;
+		this.hot = hot;
 		swap();
 	}
 	
@@ -24,8 +26,8 @@ public class ChangeSelectionEdit extends JPatchAbstractUndoableEdit {
 	}
 	
 	private void swap() {
-		NewSelection dummy = selection;
-		selection = MainFrame.getInstance().getSelection();
-		MainFrame.getInstance().setSelection(dummy);
+		Object dummy = hot;
+		hot = selection.getHotObject();
+		selection.setHotObject(dummy);
 	}
 }

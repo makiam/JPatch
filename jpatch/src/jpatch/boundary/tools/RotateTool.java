@@ -596,7 +596,7 @@ public class RotateTool extends JPatchTool {
 		//MainFrame.getInstance().getJPatchScreen().update_all();
 	}
 	
-	public void reInit(PointSelection ps) {
+	public void reInit(NewSelection selection) {
 		m3Rot = ps.getRotation();
 		p3Pivot = ps.getPivot();
 		m3RotA.set(m3Rot);
