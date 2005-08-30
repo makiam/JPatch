@@ -9,14 +9,12 @@ import jpatch.entity.*;
 
 public class ChangeMorphEdit extends JPatchAbstractUndoableEdit {
 	private Morph morph;
-	private List listPoints;
-	private List listVectors;
+	private Map map;
 	
 	
 	public ChangeMorphEdit(Morph morph) {
 		this.morph = morph;
-		listPoints = morph.getPointList();
-		listVectors = morph.getVectorList();
+		map = morph.getMorphMap();
 		morph.set();
 	}
 	
@@ -33,12 +31,9 @@ public class ChangeMorphEdit extends JPatchAbstractUndoableEdit {
 	}
 	
 	private void swap() {
-		List dummy;
-		dummy = new ArrayList(morph.getPointList());
-		morph.setPointList(listPoints);
-		listPoints = dummy;
-		dummy = new ArrayList(morph.getVectorList());
-		morph.setVectorList(listVectors);
-		listVectors = dummy;
+		Map dummy;
+		dummy = new HashMap(morph.getMorphMap());
+		morph.setMorphMap(map);
+		map = dummy;
 	}
 }

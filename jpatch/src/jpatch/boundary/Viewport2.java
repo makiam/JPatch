@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.17 2005/08/29 14:00:27 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.18 2005/08/30 14:25:18 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -127,13 +127,25 @@ public class Viewport2 {
 		}
 	}
 	
+	public ViewDefinition getViewDefinition() {
+		return viewDef;
+	}
+	
+	public JPatchDrawable2 getDrawable() {
+		return drawable;
+	}
+	
 	public void drawInfo() {
 		String[] info = drawable.getInfo().split("\n");
 		drawable.setColor(new Color3f(settings.cText));
-		drawable.drawString(viewDef.getViewName(), 4, 16);
+		drawable.drawString(viewDef.getViewName()  + (viewDef.isLocked() ? " (locked)" : ""), 4, 16);
 		for (int i = 0, y = 16; i < info.length; drawable.drawString(info[i++], 4, y += 16));
 	}
 	
+	public void drawActiveBorder() {
+		drawable.setColor(new Color3f(settings.cSelection));
+		drawable.drawRect(0, 0, (int) viewDef.getWidth() - 1, (int) viewDef.getHeight() - 1);
+	}
 	
 	public void setTool(JPatchTool tool) {
 		this.tool = tool;
@@ -192,7 +204,7 @@ public class Viewport2 {
 			}
 		}
 		fDeltaZ -= fMinZ;
-		fDeltaZ += 1;
+		fDeltaZ += 50;
 		//fMinZ -= 1;
 		
 		PointSelection ps = MainFrame.getInstance().getPointSelection();

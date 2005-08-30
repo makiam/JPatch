@@ -1,18 +1,22 @@
 /**
- * $Id: NewLatheEditorEdit.java,v 1.5 2005/08/21 15:32:08 lois Exp $
+ * $Id: NewLatheEditorEdit.java,v 1.6 2005/08/30 14:25:18 sascha_l Exp $
  */
 package jpatch.control.edit;
 
 import jpatch.auxilary.Functions;
 import jpatch.entity.ControlPoint;
 import jpatch.entity.Curve;
+import jpatch.boundary.*;
 
 /**
  * 
  * @author lois
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * 
  */
+
+// FIXME: this class should be a dialog, not an edit!!!
+
 public class NewLatheEditorEdit extends JPatchCompoundEdit {
 	
 	/**
@@ -20,8 +24,7 @@ public class NewLatheEditorEdit extends JPatchCompoundEdit {
 	*/
 	public NewLatheEditorEdit(int iSegments, int iForm, int iFill, int iSize, int iDistance, int iRotation, boolean bCloseTop, boolean bCloseBottom) {
 		
-//		float epsilon = 3f / MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().getMatrix().getScale();
-		float epsilon = 0.1f; // FIXME
+		float epsilon = 3f / MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().getMatrix().getScale();
 		
 		// calculate control points
 		ControlPoint[] cpts = new ControlPoint[iSegments/2 + (bCloseTop ? 1 : 0) + (bCloseBottom ? 1: 0) + 1];

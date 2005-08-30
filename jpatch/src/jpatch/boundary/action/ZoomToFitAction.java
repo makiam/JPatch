@@ -20,10 +20,10 @@ public final class ZoomToFitAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-//		zoomToFit(MainFrame.getInstance().getJPatchScreen().getActiveViewport());
+		zoomToFit(MainFrame.getInstance().getJPatchScreen().getActiveViewport());
 	}
 	
-	public static void zoomToFit(Viewport viewport) {
+	public static void zoomToFit(Viewport2 viewport) {
 		ViewDefinition viewdef = viewport.getViewDefinition();
 		//if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.VIEW_ZOOM) {
 		//	MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
@@ -38,7 +38,7 @@ public final class ZoomToFitAction extends AbstractAction {
 		float bottom = Float.MAX_VALUE;
 		float top = -Float.MAX_VALUE;
 		Point3f p3 = new Point3f();
-		Matrix4f m4View = viewdef.getMatrix();
+		Matrix4f m4View = viewdef.getScreenMatrix();
 		//Matrix3f m3RotScale = new Matrix3f();
 		//m4View.getRotationScale(m3RotScale);
 		boolean doit = true;

@@ -216,7 +216,6 @@ public final class Rotoscope {
 		int iTopY = (int) (viewHeight * 0.5f - (viewTranslateY + yPos) * viewScale);
 		int iHeight = (int) (scale * getPixelHeight());
 		
-		System.out.println("roto:" + iLeftX + " " + iTopY + " " + scale);
 		if (glImage)
 			((JPatchDrawableGL) drawable).drawImage(originalImage.getWidth(), originalImage.getHeight(), iLeftX, iTopY, scale, scale);
 		else

@@ -314,8 +314,8 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	
 	/** Offset to the GL Display-Lists holding the character bitmaps. */
 	private int iFontOffset;
-	/** Offset to the GL Display-Lists holding the imagess. */
-	private int iImageOffset;
+//	/** Offset to the GL Display-Lists holding the imagess. */
+//	private int iImageOffset;
 	
 	
 	public JPatchDrawableGL(final JPatchDrawableEventListener listener, boolean leightweight) {
@@ -401,7 +401,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 				}
 				
 				
-				gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_DECAL);
+				
 				
 			}
 			
@@ -490,12 +490,12 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			
 		} else {
 			//Dimension dim = glDrawable.getSize();
-			float w = dim.width;
-			float h = dim.height;
-			gl.glViewport(0, 0, (int) w, (int) h);
+			int w = dim.width;
+			int h = dim.height;
+			gl.glViewport(0, 0, w - 1, h - 1);
 		    gl.glMatrixMode(GL.GL_PROJECTION);
 		    gl.glLoadIdentity();
-		    gl.glOrtho (0.0, w, h, 0.0, 1.0, -1.0);
+		    gl.glOrtho(0, w - 1, h - 1, 0, 1.0f, -1.0f);
 		    gl.glMatrixMode(GL.GL_MODELVIEW);
 		    gl.glLoadIdentity();
 		    gl.glDisable(GL.GL_LIGHTING);
@@ -587,13 +587,13 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void setTexture(int width, int height, byte[] data) {
-		System.out.println("setTexture " + width + "x" + height);
 		gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 1);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, width, height, 0, GL.GL_BGR, GL.GL_UNSIGNED_BYTE, data);
 		gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
 	    gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
 	    gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-	    gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+	    gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+	    gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_DECAL);
 	}
 	
 	public void drawString(String string, int x, int y) {
@@ -625,10 +625,17 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void drawRect(int x, int y, int width, int height) {
-		drawLine(x, y, x + width, y);
-		drawLine(x, y + height, x + width, y + height);
-		drawLine(x, y, x, y + height);
-		drawLine(x + width, y, x + width, y + height);
+		enableRasterMode(true);							// switch to "raster mode"
+		if (iGlMode != GL.GL_LINE_STRIP) {
+			gl.glEnd();
+			iGlMode = GL.GL_LINE_STRIP;
+			gl.glBegin(iGlMode);
+		}
+		gl.glVertex2i(x, y);
+		gl.glVertex2i(x + width, y);
+		gl.glVertex2i(x + width, y + height);
+		gl.glVertex2i(x, y + height);
+		gl.glVertex2i(x, y);
 	}
 	
 	public void fillRect(int x, int y, int width, int height) {

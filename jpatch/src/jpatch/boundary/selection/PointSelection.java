@@ -2,22 +2,44 @@ package jpatch.boundary.selection;
 
 import java.util.*;
 import javax.vecmath.*;
+
 import jpatch.entity.*;
 import jpatch.boundary.*;
+import jpatch.control.edit.ChangeSelectionPivotEdit;
+import jpatch.control.edit.JPatchAbstractUndoableEdit;
+import jpatch.control.edit.JPatchUndoableEdit;
 import jpatch.auxilary.*;
+import jpatch.entity.*;
 
 public class PointSelection extends Selection {
 	private static PointSelection ps = new PointSelection(false);
 	private static ControlPoint[] acp = new ControlPoint[0];
 
 	protected Collection colCp;
-	protected Point3f p3Pivot;
+//	protected Point3f p3Pivot;
 	protected Matrix3f m3Rotation = new Matrix3f();;
 	protected Point3f p3CornerA = new Point3f();
 	protected Point3f p3CornerB = new Point3f();
 	protected ControlPoint cpHot;
 	protected boolean bDirection = false;
 	protected boolean bCurve = false;
+	protected Point3f p3TempPivot = new Point3f();
+	protected Point3f p3PermPivot = new Point3f();
+	protected Transformable pivot = new Transformable() {
+		public void prepareForTemporaryTransformation() {
+			p3TempPivot.set(p3PermPivot);
+		}
+		public JPatchAbstractUndoableEdit transformPermanently(Matrix4f m) {
+			p3TempPivot.set(p3PermPivot);
+			m.transform(p3TempPivot);
+			return new ChangeSelectionPivotEdit(PointSelection.this, p3TempPivot, null);
+		}
+
+		public void transformTemporarily(Matrix4f m) {
+			p3TempPivot.set(p3PermPivot);
+			m.transform(p3TempPivot);
+		}
+	};
 	
 	private PointSelection(boolean b) {
 	}
@@ -47,6 +69,19 @@ public class PointSelection extends Selection {
 	
 	public Collection getSelectedControlPoints() {
 		return colCp;
+	}
+	
+	public ArrayList getTransformables() {
+		ArrayList list = new ArrayList(colCp);
+		list.add(pivot);
+		if (MainFrame.getInstance().getMode() != MainFrame.MORPH) {
+			for (Iterator it = MainFrame.getInstance().getModel().getMorphIterator(); it.hasNext(); ) {
+				Transformable t = ((Morph) it.next()).getTransformable((Set) colCp);
+				if (t != null)
+					list.add(t);
+			}
+		}
+		return list;
 	}
 	
 	public void xorPointSelection(PointSelection ps) {
@@ -141,10 +176,15 @@ public class PointSelection extends Selection {
 	}
 	*/
 	public Point3f getPivot() {
-		if (p3Pivot == null) {
-			p3Pivot = getCenter();
-		}
-		return p3Pivot;
+//		if (p3TempPivot == null)
+//			resetPivotToCenter();
+		return p3TempPivot;
+	}
+	
+	public Point3f getOldPivot() {
+//		if (p3TempPivot == null)
+//			resetPivotToCenter();
+		return p3PermPivot;
 	}
 	
 	public Point3f getCornerA() {
@@ -166,10 +206,12 @@ public class PointSelection extends Selection {
 	}
 	
 	public void resetPivotToCenter() {
-		if (p3Pivot == null) {
-			p3Pivot = new Point3f();
-		}
-		p3Pivot.set(getCenter());
+		setPivot(getCenter());
+	}
+	
+	public void setPivot(Point3f pivot) {
+		p3TempPivot.set(pivot);
+		p3PermPivot.set(pivot);
 	}
 	
 	protected void computeBounds() {

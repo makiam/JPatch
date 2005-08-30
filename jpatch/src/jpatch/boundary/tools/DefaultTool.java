@@ -45,7 +45,7 @@ public class DefaultTool extends JPatchTool {
 	private ControlPoint cpHot;
 	//private int iMode;
 	private JPatchCompoundEdit compoundEdit;
-	private Point3f p3Pivot = new Point3f();
+//	private Point3f p3Pivot = new Point3f();
 	private Vector3f v3Move = new Vector3f();
 	private int iState;
 	//private Point3f p3Pivot = new Point3f();
@@ -58,6 +58,7 @@ public class DefaultTool extends JPatchTool {
 	private float fMagnitude;
 	
 	private Matrix4f m4Transform = new Matrix4f();
+	private Matrix4f m4ConstrainedTransform = new Matrix4f();
 	
 	public DefaultTool() {
 		//m3Rot.setIdentity();
@@ -216,7 +217,6 @@ public class DefaultTool extends JPatchTool {
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
 		
 //		if (MainFrame.getInstance().getJPatchScreen().showTangents() && tangentTool != null) tangentTool.paint(viewport, drawable); // FIXME
-				
 		if (ps != null && ps.getSize() > 1) {
 			Matrix4f m4View = viewDef.getMatrix();
 			Point3f p3A = new Point3f(ps.getCornerA());
@@ -305,28 +305,27 @@ public class DefaultTool extends JPatchTool {
 			//System.out.println ("ps = " + ps);
 			//viewport = (Viewport)mouseEvent.getSource();
 			
-			// FIXME
-//			if (MainFrame.getInstance().getJPatchScreen().showTangents()) {
-//				tangentHandle = tangentTool.isHit(viewport, x, y); // FIXME
-//				if (tangentHandle != null) {
-//					if (mouseEvent.getClickCount() == 2) {
-//						fMagnitude = tangentHandle.getMagnitude();
-//						tangentHandle.getCp().setMagnitude(1);
-//						tangentHandle.getCp().invalidateTangents();
-//						MainFrame.getInstance().getUndoManager().addEdit(new ChangeControlPointMagnitudeEdit(tangentHandle.getCp(),fMagnitude));
-//						MainFrame.getInstance().getJPatchScreen().update_all();
-//						return;
-//					}
-//					
-//					fMagnitude = tangentHandle.getMagnitude();
-//					tangentHandle.setFactor(mouseEvent);
-//					((Component)mouseEvent.getSource()).addMouseMotionListener(tangentHandle);
-//					iState = TANGENT;
-//					return;
-//				}
-//			}
+			if (MainFrame.getInstance().getJPatchScreen().showTangents()) {
+				tangentHandle = tangentTool.isHit(viewDef, x, y);
+				if (tangentHandle != null) {
+					if (mouseEvent.getClickCount() == 2) {
+						fMagnitude = tangentHandle.getMagnitude();
+						tangentHandle.getCp().setMagnitude(1);
+						tangentHandle.getCp().invalidateTangents();
+						MainFrame.getInstance().getUndoManager().addEdit(new ChangeControlPointMagnitudeEdit(tangentHandle.getCp(),fMagnitude));
+						MainFrame.getInstance().getJPatchScreen().update_all();
+						return;
+					}
+					
+					fMagnitude = tangentHandle.getMagnitude();
+					tangentHandle.setFactor(mouseEvent);
+					((Component)mouseEvent.getSource()).addMouseMotionListener(tangentHandle);
+					iState = TANGENT;
+					return;
+				}
+			}
 			
-			paint(viewDef);
+//			paint(viewDef);
 			compoundEdit = new JPatchCompoundEdit();
 			
 			boolean repaint = false;
@@ -335,9 +334,9 @@ public class DefaultTool extends JPatchTool {
 			setPassive();
 			iState = IDLE;
 			
-			if (ps != null) {
-				p3Pivot.set(ps.getPivot());
-			}
+//			if (ps != null) {
+//				p3Pivot.set(ps.getPivot());
+//			}
 			
 			/* check if a handle was clicked */
 			if (ps != null && ps.getSize() > 1) {
@@ -364,7 +363,7 @@ public class DefaultTool extends JPatchTool {
 						/* reset pivot to selection center */
 						//p3Pivot.set(ps.getPivot());
 						ps.resetPivotToCenter();
-						MainFrame.getInstance().getUndoManager().addEdit(new ChangeSelectionPivotEdit(ps,p3Pivot,null));
+						MainFrame.getInstance().getUndoManager().addEdit(new ChangeSelectionPivotEdit(ps,ps.getCenter(),null));
 						
 						/* clear active handle */
 						((Component)mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
@@ -390,7 +389,8 @@ public class DefaultTool extends JPatchTool {
 				if (activeHandle != pivotHandle) {
 					((DefaultHandle)activeHandle).setOldPosition(viewDef);
 					iState = SCALE_GROUP;
-					compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
+					//compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
+					prepare();
 				}	
 			} else {
 				/* no handle was clicked... */
@@ -426,12 +426,19 @@ public class DefaultTool extends JPatchTool {
 							
 							/* set state */
 							iState = MOVE_GROUP;
-							compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
-							
-							/* add motionlistener */
-							((Component)mouseEvent.getSource()).addMouseMotionListener(this);
+//							compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
+//							
+//							/* add motionlistener */
+//							((Component)mouseEvent.getSource()).addMouseMotionListener(this);
+//							iMouseX = x;
+//							iMouseY = y;
+//							bMoveZ = mouseEvent.isAltDown();
+							prepare();
+//							repaint = true;
 							iMouseX = x;
 							iMouseY = y;
+							/* add motionlistener */
+							((Component)mouseEvent.getSource()).addMouseMotionListener(this);
 							bMoveZ = mouseEvent.isAltDown();
 						} else {
 							
@@ -444,7 +451,7 @@ public class DefaultTool extends JPatchTool {
 							/* set state */
 							iState = MOVE_SINGLE_POINT;
 							//compoundEdit.addEdit(new NewMoveControlPointsEdit(new ControlPoint[] { cpHot } ));
-							cpHot.prepareForTemporaryTransform();
+							cpHot.prepareForTemporaryTransformation();
 							repaint = true;
 							iMouseX = x;
 							iMouseY = y;
@@ -495,7 +502,7 @@ public class DefaultTool extends JPatchTool {
 					
 					/* no point was hit, clear cpHot */
 					
-					if (ps != null) {
+					if (ps != null && cpHot != ps.getHotCp()) {
 						compoundEdit.addEdit(new ChangeSelectionCPHotEdit(ps,null));
 						repaint = true;
 					}
@@ -518,12 +525,20 @@ public class DefaultTool extends JPatchTool {
 							
 							/* selection box was hit, set state*/
 							iState = MOVE_GROUP;
-							compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
-							
-							/* add motionlistener */
-							((Component)mouseEvent.getSource()).addMouseMotionListener(this);
+//							compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
+//							
+//							/* add motionlistener */
+//							((Component)mouseEvent.getSource()).addMouseMotionListener(this);
+//							iMouseX = x;
+//							iMouseY = y;
+//							bMoveZ = mouseEvent.isAltDown();
+//							compoundEdit.addEdit(new NewMoveControlPointsEdit(new ControlPoint[] { cpHot } ));
+							prepare();
+//							repaint = true;
 							iMouseX = x;
 							iMouseY = y;
+							/* add motionlistener */
+							((Component)mouseEvent.getSource()).addMouseMotionListener(this);
 							bMoveZ = mouseEvent.isAltDown();
 						} else {
 							
@@ -711,16 +726,18 @@ public class DefaultTool extends JPatchTool {
 			//System.out.println(ps + " " + iState);
 			switch (iState) {
 				case MOVE_SINGLE_POINT:
-					transformPermanent();
+					transformPermanently();
 					break;
 				case MOVE_GROUP:
 					// - compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,ps.getControlPointArray()));
-					compoundEdit.addEdit(new ChangeSelectionPivotEdit(ps,p3Pivot,null));
-					MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
+//					compoundEdit.addEdit(new ChangeSelectionPivotEdit(ps,p3Pivot,null));
+//					MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
+					transformPermanently();
 					break;
 				case SCALE_GROUP:
 					// edit = new MoveControlPointsEdit(MoveControlPointsEdit.SCALE,ps.getControlPointArray());
-					MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
+					transformPermanently();
+//					MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
 					((Component)mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
 					break;
 				case DRAW_SELECTION:
@@ -771,10 +788,10 @@ public class DefaultTool extends JPatchTool {
 					selectionChanged(ps);
 					break;
 				case PIVOT:
-					if (!ps.getPivot().equals(p3Pivot)) {
-						MainFrame.getInstance().getUndoManager().addEdit(new ChangeSelectionPivotEdit(ps,p3Pivot,null));
-						((Component)mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
+					if (!ps.getPivot().equals(pivotHandle.getPosition(viewDef))) {
+						MainFrame.getInstance().getUndoManager().addEdit(new ChangeSelectionPivotEdit(ps,pivotHandle.getPosition(viewDef),null));
 					}
+					((Component)mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
 					break;
 				case TANGENT:
 					if (tangentHandle.getCp().getInMagnitude() != fMagnitude) {
@@ -823,24 +840,33 @@ public class DefaultTool extends JPatchTool {
 		m4InvScreenMatrix.invert();
 		switch(iState) {
 			case MOVE_GROUP: {
-		//if (cpHot == null) {
-				//iMouseX = mouseEvent.getX();
-				//iMouseY = mouseEvent.getY();
-				Vector3f v3Move;
-				if (bMoveZ) {
-					v3Move = new Vector3f(0,0,iDeltaY - iDeltaX);
-				} else {
-					v3Move = new Vector3f(iDeltaX,iDeltaY,0);
-				}
-				
-				//Vector3f v3Ortho = new Vector3f(0,0,1);
+				Vector3f v3Move = bMoveZ ? new Vector3f(0,0,iDeltaY - iDeltaX) : new Vector3f(iDeltaX, iDeltaY, 0);
 				m4InvScreenMatrix.transform(v3Move);
-				//m4InvScreenMatrix.transform(v3Ortho);
-				//if (Math.abs(v3Ortho.y) > 0.01f);
-				//	float f = v3Move.y / v3Ortho.y;
-				//	v3Move.addScaled(v3Ortho, -f);
-					translate(v3Move, viewDef);
-				//}
+				m4Transform.set(v3Move);
+				transformTemporarily();
+				if (bMoveZ) {
+					MainFrame.getInstance().getJPatchScreen().update_all();
+				} else {
+					MainFrame.getInstance().getJPatchScreen().single_update(viewDef.getDrawable().getComponent());
+				}
+//		//if (cpHot == null) {
+//				//iMouseX = mouseEvent.getX();
+//				//iMouseY = mouseEvent.getY();
+//				Vector3f v3Move;
+//				if (bMoveZ) {
+//					v3Move = new Vector3f(0,0,iDeltaY - iDeltaX);
+//				} else {
+//					v3Move = new Vector3f(iDeltaX,iDeltaY,0);
+//				}
+//				
+//				//Vector3f v3Ortho = new Vector3f(0,0,1);
+//				m4InvScreenMatrix.transform(v3Move);
+//				//m4InvScreenMatrix.transform(v3Ortho);
+//				//if (Math.abs(v3Ortho.y) > 0.01f);
+//				//	float f = v3Move.y / v3Ortho.y;
+//				//	v3Move.addScaled(v3Ortho, -f);
+//					translate(v3Move, viewDef);
+//				//}
 			}
 			break;
 		//} else {
@@ -849,7 +875,7 @@ public class DefaultTool extends JPatchTool {
 				Vector3f v3Move = bMoveZ ? new Vector3f(0,0,iDeltaY - iDeltaX) : new Vector3f(iDeltaX, iDeltaY, 0);
 				m4InvScreenMatrix.transform(v3Move);
 				m4Transform.set(v3Move);
-				transformTemporary();
+				transformTemporarily();
 				if (bMoveZ) {
 					MainFrame.getInstance().getJPatchScreen().update_all();
 				} else {
@@ -891,84 +917,108 @@ public class DefaultTool extends JPatchTool {
 	
 	protected void prepare() {
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		ControlPoint[] acp = ps.getControlPointArray();
-		for (int i = 0, n = acp.length; i < n; i++) {
-			acp[i].prepareForTemporaryTransform();
+		ArrayList list = ps.getTransformables();
+		for (int i = 0, n = list.size(); i < n; i++) {
+			((Transformable) list.get(i)).prepareForTemporaryTransformation();
 		}
 	}
 	
-	protected void transformPermanent() {
+	protected void transformPermanently() {
+		m4ConstrainedTransform.set(m4Transform);
+		MainFrame.getInstance().getConstraints().constrainMatrix(m4ConstrainedTransform);
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		ControlPoint[] acp = ps.getControlPointArray();
-		for (int i = 0, n = acp.length; i < n; i++) {
-			compoundEdit.addEdit(acp[i].transformPermanent(m4Transform));
+		ArrayList list = ps.getTransformables();
+//		System.out.println(list);
+		for (int i = 0, n = list.size(); i < n; i++) {
+			compoundEdit.addEdit(((Transformable) list.get(i)).transformPermanently(m4ConstrainedTransform));
 		}
 		MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
 	}
 	
-	protected void transformTemporary() {
+	protected void transformTemporarily() {
+		m4ConstrainedTransform.set(m4Transform);
+		MainFrame.getInstance().getConstraints().constrainMatrix(m4ConstrainedTransform);
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		ControlPoint[] acp = ps.getControlPointArray();
-		for (int i = 0, n = acp.length; i < n; i++) {
-			acp[i].transformTemporary(m4Transform);
+		ArrayList list = ps.getTransformables();
+		for (int i = 0, n = list.size(); i < n; i++) {
+			((Transformable) list.get(i)).transformTemporarily(m4ConstrainedTransform);
 		}
 	}
 	
-	protected void translate(Vector3f v, ViewDefinition viewDef) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		Point3f point = new Point3f();
-		ControlPoint[] acp = ps.getControlPointArray();
-		//if (bMoveZ) {
-		//	Vector3f cv = viewport.getGrid().getZCorrectionVector(v);
-		//} else {
-		//	Vector3f cv = viewport.getGrid().getCorrectionVector(v);
-		//}
-		
-		
-		Vector3f vector = new Vector3f(v);
-		if (bMoveZ) {
-//			viewport.getGrid().correctZVector(vector);
-		} else {
-//			viewport.getGrid().correctVector(vector);
-		}
-		if (cpHot != null) {
-			//System.out.println("*  " + vector);
-			if (bMoveZ) {
-//				vector.add(viewport.getGrid().getZCorrectionVector(cpHot.getPosition()));
-			} else {
-//				vector.add(viewport.getGrid().getCorrectionVector(cpHot.getPosition()));
-			}
-			//cv.set(-1,0,0);
-			//System.out.println("** " + vector);
-		}
-		
-		if (!vector.equals(v3Move)) {
-			v3Move.set(vector);
-			for (int p = 0; p < acp.length; p++) {
-				point.add(ap3[p],vector);
-				MainFrame.getInstance().getConstraints().setControlPointPosition(acp[p],point);
-			}
-			Point3f newPivot = new Point3f(p3Pivot);
-			newPivot.add(vector);
-			MainFrame.getInstance().getConstraints().setPointPosition(ps.getPivot(),newPivot);
-			
-			if (bMoveZ) {
-				MainFrame.getInstance().getJPatchScreen().update_all();
-			} else {
-				MainFrame.getInstance().getJPatchScreen().single_update(viewDef.getDrawable().getComponent());
-			}
-		}
-	}
+//	protected void translate(Vector3f v, ViewDefinition viewDef) {
+//		PointSelection ps = MainFrame.getInstance().getPointSelection();
+//		Point3f point = new Point3f();
+//		ControlPoint[] acp = ps.getControlPointArray();
+//		//if (bMoveZ) {
+//		//	Vector3f cv = viewport.getGrid().getZCorrectionVector(v);
+//		//} else {
+//		//	Vector3f cv = viewport.getGrid().getCorrectionVector(v);
+//		//}
+//		
+//		
+//		Vector3f vector = new Vector3f(v);
+//		if (bMoveZ) {
+////			viewport.getGrid().correctZVector(vector);
+//		} else {
+////			viewport.getGrid().correctVector(vector);
+//		}
+//		if (cpHot != null) {
+//			//System.out.println("*  " + vector);
+//			if (bMoveZ) {
+////				vector.add(viewport.getGrid().getZCorrectionVector(cpHot.getPosition()));
+//			} else {
+////				vector.add(viewport.getGrid().getCorrectionVector(cpHot.getPosition()));
+//			}
+//			//cv.set(-1,0,0);
+//			//System.out.println("** " + vector);
+//		}
+//		
+//		if (!vector.equals(v3Move)) {
+//			v3Move.set(vector);
+//			for (int p = 0; p < acp.length; p++) {
+//				point.add(ap3[p],vector);
+//				MainFrame.getInstance().getConstraints().setControlPointPosition(acp[p],point);
+//			}
+////			Point3f newPivot = new Point3f(p3Pivot);
+////			newPivot.add(vector);
+////			MainFrame.getInstance().getConstraints().setPointPosition(ps.getPivot(),newPivot);
+////			
+//			if (bMoveZ) {
+//				MainFrame.getInstance().getJPatchScreen().update_all();
+//			} else {
+//				MainFrame.getInstance().getJPatchScreen().single_update(viewDef.getDrawable().getComponent());
+//			}
+//		}
+//	}
 	
-	protected void scale(float scale, ViewDefinition viewDef) {
+//	protected void scale(float scale, ViewDefinition viewDef) {
+//		PointSelection ps = MainFrame.getInstance().getPointSelection();
+//		Point3f point = new Point3f();
+//		ControlPoint[] acp = ps.getControlPointArray();
+//		for (int p = 0; p < acp.length; p++) {
+//			point.sub(ap3[p],ps.getPivot());
+//			point.scale(scale);
+//			point.add(ps.getPivot());
+//			MainFrame.getInstance().getConstraints().setControlPointPosition(acp[p],point);
+//		}
+//		MainFrame.getInstance().getJPatchScreen().single_update(viewDef.getDrawable().getComponent());
+//	}
+	
+	void scale(float s, ViewDefinition viewDef) {
+//		System.out.println("scale " + s);
+		Point3f pivot = MainFrame.getInstance().getPointSelection().getPivot();
+		m4Transform = new Matrix4f(
+				 s, 0, 0, pivot.x - pivot.x * s,
+				 0, s, 0, pivot.y - pivot.y * s,
+				 0, 0, s, pivot.z - pivot.z * s,
+				 0, 0, 0, 1
+		);
+		m4ConstrainedTransform.set(m4Transform);
+		MainFrame.getInstance().getConstraints().constrainMatrix(m4ConstrainedTransform);
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		Point3f point = new Point3f();
-		ControlPoint[] acp = ps.getControlPointArray();
-		for (int p = 0; p < acp.length; p++) {
-			point.sub(ap3[p],ps.getPivot());
-			point.scale(scale);
-			point.add(ps.getPivot());
-			MainFrame.getInstance().getConstraints().setControlPointPosition(acp[p],point);
+		ArrayList list = ps.getTransformables();
+		for (int i = 0, n = list.size(); i < n; i++) {
+			((Transformable) list.get(i)).transformTemporarily(m4ConstrainedTransform);
 		}
 		MainFrame.getInstance().getJPatchScreen().single_update(viewDef.getDrawable().getComponent());
 	}

@@ -29,7 +29,7 @@ public final class JPatchScreen extends JPanel {
 	public static final int SOFTWARE = 1;
 	public static final int OPENGL = 2;
 	
-	//private Viewport activeViewport;
+	private Viewport2 activeViewport;
 	
 	//private JPatchCanvas[] aComponent = new JPatchCanvas[NUMBER_OF_VIEWPORTS];
 	private JPatchDrawable2[] aDrawable = new JPatchDrawable2[NUMBER_OF_VIEWPORTS];
@@ -77,12 +77,17 @@ public final class JPatchScreen extends JPanel {
 			JPatchDrawableEventListener listener = new JPatchDrawableEventListener() {
 				public void display(JPatchDrawable2 drawable) {
 					aViewport[I].prepare();
+					aViewport[I].drawRotoscope();
 					aViewport[I].drawGrid();
 					aViewport[I].drawModel(MainFrame.getInstance().getModel());
 					aViewport[I].drawOrigin();
 					if (tool != null)
 						aViewport[I].drawTool(tool);
+					if (bShowTangents)
+						aViewport[I].drawTool(tangentTool);
 					aViewport[I].drawInfo();
+					if (aViewport[I] == activeViewport)
+						aViewport[I].drawActiveBorder();
 				}
 			};
 			switch (JPatchSettings.getInstance().iRealtimeRenderer) {
@@ -97,6 +102,7 @@ public final class JPatchScreen extends JPanel {
 			add(aDrawable[i].getComponent());
 			aDrawable[i].getComponent().setFocusable(false);
 			//aViewDef[i].setLighting(RealtimeLighting.createThreepointLight()); // FIXME
+			activeViewport = aViewport[0];
 		}
 		setMode(mode);
 	}
@@ -114,7 +120,32 @@ public final class JPatchScreen extends JPanel {
 		}
 		throw new IllegalArgumentException("component not found");
 	}
-				
+	
+	public Viewport2 getViewport(Component component) {
+		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+			if (aDrawable[i].getComponent() == component)
+				return aViewport[i];
+		}
+		throw new IllegalArgumentException("component not found");
+	}
+	
+	public Viewport2 getActiveViewport() {
+		return activeViewport;
+	}
+	
+	public void setActiveViewport(Component component) {
+		setActiveViewport(getViewport(component));
+	}
+	
+	public void setActiveViewport(Viewport2 viewport) {
+		if (viewport != activeViewport) {
+			Viewport2 old = activeViewport;
+			activeViewport = viewport;
+			old.getDrawable().display();
+			viewport.getDrawable().display();
+		}
+	}
+	
 	public boolean isSynchronized() {
 		return bSynchronized;
 	}
@@ -154,13 +185,6 @@ public final class JPatchScreen extends JPanel {
 	
 	public void showTangents(boolean enable) {
 		bShowTangents = enable;
-		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			if (enable && !bShowTangents) {
-//				aComponent[i].addMouseListener(tangentTool);
-			} else {
-//				aComponent[i].removeMouseListener(tangentTool);
-			}
-		}
 	}
 	
 	public TangentTool getTangentTool() {
@@ -172,23 +196,15 @@ public final class JPatchScreen extends JPanel {
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 			switch(iLightMode) {
 				case LIGHT_OFF:
-//					aComponent[i].flatShade(true);
-//					aComponent[i].setLighting(Lighting.createSimpleLight());
 					aViewDef[i].setLighting(null);
 					break;
 				case LIGHT_SIMPLE:
-//					aComponent[i].flatShade(false);
-//					aComponent[i].setLighting(Lighting.createSimpleLight());
 					aViewDef[i].setLighting(RealtimeLighting.createSimpleLight());
 					break;
 				case LIGHT_HEAD:
-//					aComponent[i].flatShade(false);
-//					aComponent[i].setLighting(Lighting.createHeadLight());
 					aViewDef[i].setLighting(RealtimeLighting.createHeadLight());
 					break;
 				case LIGHT_THREE_POINT:
-//					aComponent[i].flatShade(false);
-//					aComponent[i].setLighting(Lighting.createThreePointLight());
 					aViewDef[i].setLighting(RealtimeLighting.createThreepointLight());
 					break;
 			}
@@ -289,25 +305,25 @@ public final class JPatchScreen extends JPanel {
 	}
 	
 	public void zoomToFit_all() {
-//		switch(iMode) {
-//			case SINGLE:
-//				ZoomToFitAction.zoomToFit((Viewport) aComponent[0]);
-//				break;
-//			case HORIZONTAL_SPLIT:
-//				ZoomToFitAction.zoomToFit((Viewport) aComponent[0]);
-//				ZoomToFitAction.zoomToFit((Viewport) aComponent[1]);
-//				break;
-//			case VERTICAL_SPLIT:
-//				ZoomToFitAction.zoomToFit((Viewport) aComponent[0]);
-//				ZoomToFitAction.zoomToFit((Viewport) aComponent[2]);
-//				break;
-//			case QUAD:
-//				ZoomToFitAction.zoomToFit((Viewport) aComponent[0]);
-//				ZoomToFitAction.zoomToFit((Viewport) aComponent[1]);
-//				ZoomToFitAction.zoomToFit((Viewport) aComponent[2]);
-//				ZoomToFitAction.zoomToFit((Viewport) aComponent[3]);
-//				break;
-//		}
+		switch(iMode) {
+			case SINGLE:
+				ZoomToFitAction.zoomToFit(aViewport[0]);
+				break;
+			case HORIZONTAL_SPLIT:
+				ZoomToFitAction.zoomToFit(aViewport[0]);
+				ZoomToFitAction.zoomToFit(aViewport[1]);
+				break;
+			case VERTICAL_SPLIT:
+				ZoomToFitAction.zoomToFit(aViewport[0]);
+				ZoomToFitAction.zoomToFit(aViewport[2]);
+				break;
+			case QUAD:
+				ZoomToFitAction.zoomToFit(aViewport[0]);
+				ZoomToFitAction.zoomToFit(aViewport[1]);
+				ZoomToFitAction.zoomToFit(aViewport[2]);
+				ZoomToFitAction.zoomToFit(aViewport[3]);
+				break;
+		}
 	}
 	
 //	public void prepareBackground(Component component) {

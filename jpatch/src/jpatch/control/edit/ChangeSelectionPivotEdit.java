@@ -14,9 +14,9 @@ public class ChangeSelectionPivotEdit extends JPatchAbstractUndoableEdit {
 	
 	public ChangeSelectionPivotEdit(PointSelection ps, Point3f pivot, RotateTool rotateTool) {
 		this.ps = ps;
-		p3Pivot.set(pivot);
 		this.rotateTool = rotateTool;
-		//swap();
+		p3Pivot.set(ps.getOldPivot());
+		ps.setPivot(pivot);
 	}
 	
 	public String name() {
@@ -32,12 +32,9 @@ public class ChangeSelectionPivotEdit extends JPatchAbstractUndoableEdit {
 	}
 	
 	private void swap() {
-		float x = p3Pivot.x;
-		float y = p3Pivot.y;
-		float z = p3Pivot.z;
-		Point3f p3 = ps.getPivot();
-		p3Pivot.set(p3);
-		p3.set(x,y,z);
+		Point3f p = new Point3f(p3Pivot);
+		p3Pivot.set(ps.getPivot());
+		ps.setPivot(p);
 		if (rotateTool != null) {
 			rotateTool.setRadius();
 		}

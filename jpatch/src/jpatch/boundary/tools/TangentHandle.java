@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.awt.event.*;
 import javax.vecmath.*;
+
 import jpatch.entity.*;
 import jpatch.boundary.*;
 
@@ -34,7 +35,7 @@ public class TangentHandle extends Handle {
 		return cp;
 	}
 	
-	public Point3f getPosition() {
+	public Point3f getPosition(ViewDefinition viewDef) {
 		switch (iDirection) {
 			case IN:
 				if (cp.getPrev() != null) return cp.getInTangent();
@@ -47,8 +48,9 @@ public class TangentHandle extends Handle {
 	}
 	
 	public void setFactor(MouseEvent mouseEvent) {
-		Viewport viewport = (Viewport) mouseEvent.getSource();
-		Matrix4f m4View = viewport.getViewDefinition().getMatrix();
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
+		Matrix4f m4View = viewDef.getScreenMatrix();
+		
 		Point3f p3 = new Point3f();
 		p3.set(cp.getPosition());
 		m4View.transform(p3);
@@ -64,9 +66,8 @@ public class TangentHandle extends Handle {
 	}
 	
 	public void mouseDragged(MouseEvent mouseEvent) {
-		//System.out.println(cp.getInMagnitude());
-		Viewport viewport = (Viewport) mouseEvent.getSource();
-		Matrix4f m4View = viewport.getViewDefinition().getMatrix();
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
+		Matrix4f m4View = viewDef.getScreenMatrix();
 		
 		Point2D.Float p2Mouse = new Point2D.Float((float) mouseEvent.getX(), (float) mouseEvent.getY());
 		Point3f p3 = new Point3f();

@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.1 2005/08/10 12:57:20 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.2 2005/08/30 14:25:18 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -35,7 +35,7 @@ import jpatch.control.edit.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.1 $
+ * @version    $Revision: 1.2 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -173,7 +173,7 @@ public class ControlPoint implements Comparable, Transformable {
 	* Transformable implementation
 	*/
 	
-	public JPatchAbstractUndoableEdit transformPermanent(Matrix4f m) {
+	public JPatchAbstractUndoableEdit transformPermanently(Matrix4f m) {
 		ChangeControlPointPositionEdit edit = new ChangeControlPointPositionEdit(this, p3BackupPosition);
 		p3Position.set(p3BackupPosition);
 		m.transform(p3Position);
@@ -181,13 +181,13 @@ public class ControlPoint implements Comparable, Transformable {
 		return edit;
 	}
 	
-	public void transformTemporary(Matrix4f m) {
+	public void transformTemporarily(Matrix4f m) {
 		p3Position.set(p3BackupPosition);
 		m.transform(p3Position);
 		invalidateTangents();
 	}
 	
-	public void prepareForTemporaryTransform() {
+	public void prepareForTemporaryTransformation() {
 		p3BackupPosition.set(p3Position);
 	}
 	

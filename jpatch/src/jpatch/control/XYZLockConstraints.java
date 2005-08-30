@@ -60,6 +60,27 @@ public class XYZLockConstraints {
 		point.y = bYLock ? point.y : newPosition.y;
 		point.z = bZLock ? point.z : newPosition.z;
 	}
+	
+	public void constrainMatrix(Matrix4f m) {
+		if (bXLock) {
+			m.m00 = 1;
+			m.m01 = 0;
+			m.m02 = 0;
+			m.m03 = 0;
+		}
+		if (bYLock) {
+			m.m10 = 0;
+			m.m11 = 1;
+			m.m12 = 0;
+			m.m13 = 0;
+		}
+		if (bZLock) {
+			m.m20 = 0;
+			m.m21 = 0;
+			m.m22 = 1;
+			m.m23 = 0;
+		}
+	}
 	//
 	//public void correctPointPosition(Point3f point, Point3f newPosition) {
 	//	newPosition.x = bXLock ? point.x : newPosition.x;
