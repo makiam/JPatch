@@ -31,7 +31,7 @@ public class DefaultHandle extends Handle {
 		m4View.transform(p3Pos);
 		p3Pos.z = 0;
 		
-		Point3f p3Pivot = new Point3f(MainFrame.getInstance().getPointSelection().getPivot());
+		Point3f p3Pivot = new Point3f(MainFrame.getInstance().getSelection().getPivot());
 		m4View.transform(p3Pivot);
 		p3Pivot.z = 0;
 		
@@ -77,7 +77,7 @@ public class DefaultHandle extends Handle {
 	}
 	
 	public void paint(ViewDefinition viewDef) {
-		paint(viewDef, MainFrame.getInstance().getPointSelection().getRotation());
+		paint(viewDef, MainFrame.getInstance().getSelection().getOrientation());
 	}
 }
 

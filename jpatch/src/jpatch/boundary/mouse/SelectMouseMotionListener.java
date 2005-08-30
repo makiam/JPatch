@@ -49,10 +49,10 @@ public class SelectMouseMotionListener implements MouseMotionListener {
 		}
 	}
 	
-	public Selection getSelection(ViewDefinition viewDefinition) {
+	public NewSelection getSelection(ViewDefinition viewDefinition) {
 		switch(iMode) {
 			case RECTANGLE:
-				return SelectionFactory.createRectangularPointSelection(iCornerX,iCornerY,iCornerX + iDeltaX, iCornerY + iDeltaY, viewDefinition.getScreenMatrix(), MainFrame.getInstance().getModel());
+				return NewSelection.createRectangularPointSelection(iCornerX,iCornerY,iCornerX + iDeltaX, iCornerY + iDeltaY, viewDefinition.getScreenMatrix(), MainFrame.getInstance().getModel());
 		}
 		return null;
 	}

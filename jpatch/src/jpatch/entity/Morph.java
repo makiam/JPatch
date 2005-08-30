@@ -9,6 +9,7 @@ import jpatch.boundary.selection.PointSelection;
 import jpatch.control.edit.ChangeMorphVectorsEdit;
 import jpatch.control.edit.ChangeSelectionPivotEdit;
 import jpatch.control.edit.JPatchAbstractUndoableEdit;
+import jpatch.control.edit.JPatchUndoableEdit;
 
 public class Morph extends JPatchTreeLeaf {
 //	private ArrayList listPoints = new ArrayList();
@@ -25,30 +26,69 @@ public class Morph extends JPatchTreeLeaf {
 		strName = name;
 	}
 	
-	public Transformable getTransformable(Set selectedPoints) {
+	public Transformable getTransformable(final Map selectedPoints) {
 		final HashMap changeMap = new HashMap();
+		boolean ok = false;
+		loop:
 		for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
 			Object key = it.next();
-			if (selectedPoints.contains(key))
-				changeMap.put(key, new Vector3f((Vector3f) mapMorph.get(key)));
+			if (selectedPoints.keySet().contains(key)) {
+				ok = true;
+				break loop;
+			}
 		}
-		if (changeMap.size() == 0)
+		if (!ok)
 			return null;
 		return new Transformable() {
-			public void prepareForTemporaryTransformation() { }
-			public void transformTemporarily(Matrix4f m) { }
-			public JPatchAbstractUndoableEdit transformPermanently(Matrix4f m) {
-				ArrayList remove = new ArrayList();
-				Vector3f v3 = new Vector3f();
+//			public void prepareForTemporaryTransformation() { }
+//			public void transformTemporarily(Matrix4f m) { }
+//			public JPatchAbstractUndoableEdit transformPermanently(Matrix4f m) {
+//				ArrayList remove = new ArrayList();
+//				Vector3f v3 = new Vector3f();
+//				for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
+//					Object key = it.next();
+//					Vector3f v = (Vector3f) changeMap.get(key);
+//					v3.set(v);
+//					m.transform(v);
+//					if (v.equals(v3))
+//						remove.add(key);
+//				}
+//				for (Iterator it = remove.iterator(); it.hasNext(); changeMap.remove(it.next()));
+//				return new ChangeMorphVectorsEdit(Morph.this, changeMap);
+//			}
+			public void beginTransform() {
+				for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
+					Object key = it.next();
+					if (selectedPoints.keySet().contains(key))
+						changeMap.put(key, new Vector3f((Vector3f) mapMorph.get(key)));
+				}
+			}
+			public void translate(Vector3f v) { }
+			public void rotate(Quat4f q, Point3f pivot) {
+				Quat4f identity = new Quat4f(1, 0, 0, 0);
+				Quat4f quat = new Quat4f();
+				Matrix3f rot = new Matrix3f();
 				for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
 					Object key = it.next();
 					Vector3f v = (Vector3f) changeMap.get(key);
-					v3.set(v);
-					m.transform(v);
-					if (v.equals(v3))
-						remove.add(key);
+					float weight = ((Float) selectedPoints.get(key)).floatValue();
+					quat.set(q);
+					quat.interpolate(identity, 1.0 - weight);
+					rot.set(quat);
+					rot.transform(v);
 				}
-				for (Iterator it = remove.iterator(); it.hasNext(); changeMap.remove(it.next()));
+			}
+			public void transform(Matrix3f m, Point3f pivot) {
+				Matrix3f matrix = new Matrix3f();
+				for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
+					Object key = it.next();
+					Vector3f v = (Vector3f) changeMap.get(key);
+					float weight = ((Float) selectedPoints.get(key)).floatValue();
+					matrix.set(m);
+					matrix.transform(v);
+				}
+			}
+			public JPatchUndoableEdit endTransform() {
 				return new ChangeMorphVectorsEdit(Morph.this, changeMap);
 			}
 		};

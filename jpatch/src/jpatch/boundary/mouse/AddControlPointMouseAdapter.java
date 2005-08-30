@@ -70,7 +70,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 					else
 						compoundEdit.addEdit(CorrectSelectionsEdit.attachPoints(cpA.getHead(),cp.getTail()));
 				}
-				Selection selection = new PointSelection(cpB);
+				NewSelection selection = new NewSelection(cpB);
 				MainFrame.getInstance().setSelection(selection);
 				
 				MainFrame.getInstance().getJPatchScreen().single_update(compSource);
@@ -103,7 +103,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 				//compoundEdit.addEdit(new WeldControlPointsEdit(cpA,cp));
 				compoundEdit.addEdit(new WeldControlPointsEdit(cpA,cp));
 				
-				Selection selection = new PointSelection(cpB);
+				NewSelection selection = new NewSelection(cpB);
 				MainFrame.getInstance().setSelection(selection);
 				
 				MainFrame.getInstance().getJPatchScreen().single_update(compSource);
@@ -127,21 +127,21 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 						compoundEdit.addEdit(new WeldControlPointsEdit(cpHot,cp));
 					else
 						compoundEdit.addEdit(CorrectSelectionsEdit.attachPoints(cpHot.getHead(),cp.getTail()));
-					((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
+//FIXME					((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
 					MainFrame.getInstance().getJPatchScreen().full_update();
 					setIdleState();
 				} else {
 					if (!cp.getNext().getHead().isHook() && !cp.getHead().isHook()) {
 						if (cp.getHookAt(hookPos[0]) == null) {
 							compoundEdit.addEdit(new HookEdit(cpHot,cp,hookPos[0]));
-							((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
+//FIXME							((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
 							MainFrame.getInstance().getJPatchScreen().full_update();
 							setIdleState();
 						} else {
 							ControlPoint hook = cp.getHookAt(hookPos[0]);
 							compoundEdit.addEdit(new ConvertHookToCpEdit(hook));
 							compoundEdit.addEdit(new WeldControlPointsEdit(cpHot,hook));
-							((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
+//FIXME							((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
 							MainFrame.getInstance().getJPatchScreen().full_update();
 							setIdleState();
 						}
@@ -154,13 +154,14 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 	public void mouseReleased(MouseEvent mouseEvent) {
 		if (iState == ACTIVE && mouseEvent.getButton() == MouseEvent.BUTTON1) {
 			//compSource = (Component)mouseEvent.getSource();
-			Selection selection = MainFrame.getInstance().getSelection();
-			Class classPointSelection = PointSelection.getPointSelectionClass();
-			if (selection != null && classPointSelection.isAssignableFrom(selection.getClass())) {
-				ControlPoint[] acp = new ControlPoint[1];
-				acp[0] = cpHot;
-				//compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,acp));
-			}
+//FIXME
+//			Selection selection = MainFrame.getInstance().getSelection();
+//			Class classPointSelection = PointSelection.getPointSelectionClass();
+//			if (selection != null && classPointSelection.isAssignableFrom(selection.getClass())) {
+//				ControlPoint[] acp = new ControlPoint[1];
+//				acp[0] = cpHot;
+//				//compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,acp));
+//			}
 			MainFrame.getInstance().getJPatchScreen().full_update();
 			setIdleState();
 		}
