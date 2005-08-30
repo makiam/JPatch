@@ -80,17 +80,19 @@ public final class ImportJPatchAction extends AbstractAction {
 				String name = model.getName();
 				ArrayList headsBeforeImport = model.allHeads();
 				modelImporter.importModel(model,filename);
-				PointSelection ps = new PointSelection();
+				
+				HashSet pointSet = new HashSet();
 				for (Iterator it = model.allHeads().iterator(); it.hasNext(); ) {
 					ControlPoint cp = (ControlPoint) it.next();
 					if (!headsBeforeImport.contains(cp)) {
-						ps.addControlPoint(cp);
+						pointSet.add(cp);
 					}
 				}
-				ps.setName(file.getName());
-				model.addSelection(ps);
+				NewSelection selection = new NewSelection(pointSet);
+				selection.setName(file.getName());
+				model.addSelection(selection);
 				model.setName(name);
-				MainFrame.getInstance().setSelection(ps);
+				MainFrame.getInstance().setSelection(selection);
 				MainFrame.getInstance().getUndoManager().clear();
 			} else {
 				modelImporter.importModel(MainFrame.getInstance().getModel(),filename);

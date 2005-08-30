@@ -7,10 +7,10 @@ import jpatch.boundary.*;
 
 public class RemoveSelectionEdit extends JPatchAbstractUndoableEdit {
 	
-	private Selection selection;
+	private NewSelection selection;
 	private int index = -1;
 	
-	public RemoveSelectionEdit(Selection selection) {
+	public RemoveSelectionEdit(NewSelection selection) {
 		this.selection = selection;
 		redo();
 	}
