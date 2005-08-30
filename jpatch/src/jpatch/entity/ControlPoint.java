@@ -173,7 +173,7 @@ public class ControlPoint implements Comparable, Transformable {
 	* Transformable implementation
 	*/
 	
-	public JPatchAbstractUndoableEdit transformPermanent(Matrix4f m) {
+	public JPatchAbstractUndoableEdit transformPermanently(Matrix4f m) {
 		ChangeControlPointPositionEdit edit = new ChangeControlPointPositionEdit(this, p3BackupPosition);
 		p3Position.set(p3BackupPosition);
 		m.transform(p3Position);
@@ -181,13 +181,13 @@ public class ControlPoint implements Comparable, Transformable {
 		return edit;
 	}
 	
-	public void transformTemporary(Matrix4f m) {
+	public void transformTemporarily(Matrix4f m) {
 		p3Position.set(p3BackupPosition);
 		m.transform(p3Position);
 		invalidateTangents();
 	}
 	
-	public void prepareForTemporaryTransform() {
+	public void prepareForTemporaryTransformation() {
 		p3BackupPosition.set(p3Position);
 	}
 	

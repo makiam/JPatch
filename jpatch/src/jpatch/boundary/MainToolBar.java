@@ -66,7 +66,7 @@ public final class MainToolBar extends JToolBar {
 		buttonGridSnap.setSelectedIcon(new ImageIcon(getClass().getClassLoader().getResource("jpatch/images/grid_snap.png")));
 		buttonHide.setSelectedIcon(new ImageIcon(getClass().getClassLoader().getResource("jpatch/images/hide2.png")));
 		
-		buttonGridSnap.setEnabled(false);
+//		buttonGridSnap.setEnabled(false);
 		//buttonSingle.setSelected(true);
 		
 		/* ButtonGroups */

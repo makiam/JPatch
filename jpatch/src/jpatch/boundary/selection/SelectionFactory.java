@@ -25,6 +25,7 @@ public class SelectionFactory {
 				}
 			}
 		}
+		selection.resetPivotToCenter();
 		return (selection.getSize() != 0) ? selection : null;
 	}
 	
