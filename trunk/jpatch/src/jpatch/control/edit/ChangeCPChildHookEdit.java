@@ -13,6 +13,10 @@ public class ChangeCPChildHookEdit extends JPatchAbstractUndoableEdit {
 	}
 	
 	public ChangeCPChildHookEdit(ControlPoint cp, ControlPoint childHook) {
+		System.out.println("*");
+		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+		for (int i = 0; i < stacktrace.length; System.out.println(stacktrace[i++]));
+		
 		this.cp = cp;
 		cpChildHook = childHook;
 		swap();

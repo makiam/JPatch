@@ -540,6 +540,9 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 	public void setChildHook(ControlPoint childHook) {
+		System.out.println("***");
+		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+		for (int i = 0; i < stacktrace.length; System.out.println(stacktrace[i++]));
 		cpChildHook = childHook;
 	}
 	

@@ -286,15 +286,6 @@ public class Model extends JPatchTreeNode {
 		return lstBoneShapes;
 	}
 	
-	public List getSelectionsContaining(ControlPoint cp) {
-		ArrayList list = new ArrayList();
-		for (Iterator it = lstSelections.iterator(); it.hasNext(); ) {
-			PointSelection ps = (PointSelection) it.next();
-			if (ps.contains(cp)) list.add(ps);
-		}
-		return list;
-	}
-	
 	public void removeSelection(NewSelection selection) {
 		treenodeSelections.remove(selection);
 		lstSelections.remove(selection);
@@ -1037,14 +1028,21 @@ public class Model extends JPatchTreeNode {
 			System.out.println(p);
 		}
 		
-//		System.out.println("\n\n----------- selection -------------");
-//		PointSelection ps = MainFrame.getInstance().getPointSelection();
-//		if (ps != null) {
-//			ControlPoint[] acp = ps.getControlPointArray();
-//			for (int p = 0; p < acp.length; p++) {
-//				System.out.print(acp[p] + " ");
-//			}
-//		}
+		System.out.println("\n\n--------active selection -------");
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		if (selection != null) {
+			System.out.println(selection);
+			System.out.println(selection.getMap());
+			System.out.println();
+		}
+		
+		System.out.println("\n\n----------- selections -------------");
+		for (Iterator it = lstSelections.iterator(); it.hasNext(); ) {
+			selection = (NewSelection) it.next();
+			System.out.println(selection);
+			System.out.println(selection.getMap());
+			System.out.println();
+		}
 		
 		System.out.println("\n\n----------- morphs -------------");
 		for (Iterator it = lstMorphs.iterator(); it.hasNext(); ) {

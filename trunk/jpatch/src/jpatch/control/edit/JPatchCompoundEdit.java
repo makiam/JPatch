@@ -111,4 +111,11 @@ public class JPatchCompoundEdit extends JPatchAbstractUndoableEdit {
 	public boolean isValid() {
 		return (lstEdits.size() > 0);
 	}
+	
+	public void dump(String prefix) {
+		System.out.println(prefix + getClass().getName() + " \"" + name() + "\":");
+		for (Iterator it = lstEdits.iterator(); it.hasNext(); ) {
+			((JPatchAbstractUndoableEdit) it.next()).dump(prefix + "    ");
+		}
+	}
 }

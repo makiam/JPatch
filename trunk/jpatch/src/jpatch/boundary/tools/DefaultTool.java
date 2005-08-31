@@ -18,8 +18,6 @@ public class DefaultTool extends JPatchTool {
 	//private static final int SELECTION = 2;
 	//private static final int CURSOR = 3;
 	
-	private static final int GHOST_FACTOR = JPatchSettings.getInstance().iGhost;
-	
 	private static final int IDLE = 0;
 	private static final int DRAW_SELECTION = 1;
 	private static final int MOVE_SINGLE_POINT = 2;
@@ -637,13 +635,14 @@ public class DefaultTool extends JPatchTool {
 								compoundEdit.addEdit(new WeldControlPointsEdit(cpHot,cp));
 							else
 								compoundEdit.addEdit(CorrectSelectionsEdit.attachPoints(cpHot.getHead(),cp.getTail()));
-							Collection collection = new ArrayList();
-							collection.add(cpHot);
-//FIXME						compoundEdit.addEdit(new RemoveControlPointsFromSelectionEdit(ps,collection));
-							collection.clear();
-							collection.add(cp);
-//FIXME						compoundEdit.addEdit(new AddControlPointsToSelectionEdit(ps,collection));
-							compoundEdit.addEdit(new ChangeSelectionHotEdit(selection, cp));
+//							Float weight = (Float) selection.getMap().get(cpHot);
+//							Map map = new HashMap();
+//							map.put(cpHot, weight);
+//							compoundEdit.addEdit(new RemoveControlPointsFromSelectionEdit(selection ,map));
+//							map = new HashMap();
+//							map.put(cp, weight);
+//							compoundEdit.addEdit(new AddControlPointsToSelectionEdit(selection, map));
+//							compoundEdit.addEdit(new ChangeSelectionHotEdit(selection, cp));
 							//((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
 							MainFrame.getInstance().getJPatchScreen().full_update();
 							((Component)mouseEvent.getSource()).removeMouseMotionListener(this);
@@ -674,12 +673,13 @@ public class DefaultTool extends JPatchTool {
 											ControlPoint hook = cp.getHookAt(hookPos[0]);
 											compoundEdit.addEdit(new ConvertHookToCpEdit(hook));
 											compoundEdit.addEdit(new WeldControlPointsEdit(cpHot,hook));
-											Collection collection = new ArrayList();
-											collection.add(cpHot);
-//FIXME										compoundEdit.addEdit(new RemoveControlPointsFromSelectionEdit(ps,collection));
-											collection.clear();
-											collection.add(cp);
-//FIXME											compoundEdit.addEdit(new AddControlPointsToSelectionEdit(ps,collection));
+											Float weight = (Float) selection.getMap().get(cpHot);
+											Map map = new HashMap();
+											map.put(cpHot, weight);
+											compoundEdit.addEdit(new RemoveControlPointsFromSelectionEdit(selection ,map));
+											map = new HashMap();
+											map.put(cp, weight);
+											compoundEdit.addEdit(new AddControlPointsToSelectionEdit(selection, map));
 											compoundEdit.addEdit(new ChangeSelectionHotEdit(selection, hook));
 											//((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
 											MainFrame.getInstance().getJPatchScreen().full_update();

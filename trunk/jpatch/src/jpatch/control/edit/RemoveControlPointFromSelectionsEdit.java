@@ -8,19 +8,23 @@ import jpatch.boundary.selection.*;
 public class RemoveControlPointFromSelectionsEdit extends JPatchCompoundEdit {
 	
 	public RemoveControlPointFromSelectionsEdit(ControlPoint cp) {
+		strName = "cp " + cp;
 		//System.out.println("\t\t\tremove cp from selections cp " + cp.number());
 		ArrayList remove = new ArrayList();
-		for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
-			PointSelection ps = (PointSelection) it.next();
-			if (ps.contains(cp)) {
-				addEdit(new RemoveControlPointFromSelectionEdit(cp, ps));
-				if (ps.getSize() == 0) {
-					remove.add(ps);
-				}
+		for (Iterator it = MainFrame.getInstance().getSelectionsContaining(cp).iterator(); it.hasNext(); ) {
+			NewSelection selection = (NewSelection) it.next();
+			addEdit(new RemoveControlPointFromSelectionEdit(cp, selection));
+			if (selection.getMap().size() == 0 && !selection.isActive()) {
+				remove.add(selection);
 			}
 		}
 		for (Iterator it = remove.iterator(); it.hasNext(); ) {
-			addEdit(new RemoveSelectionEdit((PointSelection) it.next()));
+			NewSelection selection = (NewSelection) it.next();
+			addEdit(new RemoveSelectionEdit(selection));
+			if (MainFrame.getInstance().getSelection() == selection) {
+				addEdit(new ChangeSelectionEdit(null));
+			}
+			
 		}
 		addEdit(new RemoveControlPointFromMorphsEdit(cp, MainFrame.getInstance().getModel()));
 	}

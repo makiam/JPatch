@@ -374,10 +374,13 @@ public final class MainFrame extends JFrame {
 	}
 	
 	public void setSelection(NewSelection selection) {
+//		getModel().removeSelection(this.selection);
 		this.selection = selection;
-		
 		/* unhide new selection */
 		if (selection != null) {
+			selection.setActive(true);
+//			getModel().addSelection(selection);
+			selection.setName("ACTIVE SELECTION");
 			for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
 				Object object = it.next();
 				if (object instanceof ControlPoint) {
@@ -387,10 +390,23 @@ public final class MainFrame extends JFrame {
 			}
 			JPatchTool tool = jpatchScreen.getTool();
 			if (tool != null && tool instanceof RotateTool)
-				((RotateTool) tool).reInit(selection);
-//FIXME		
-			selection.arm(3);
+				((RotateTool) tool).reInit(selection);		
+			int flags = NewSelection.CONTROLPOINTS;
+			if (iMode != MORPH)
+				flags |= NewSelection.MORPHS;
+			selection.arm(flags);
 		}
+	}
+	
+	public java.util.List getSelectionsContaining(ControlPoint cp) {
+		ArrayList list = new ArrayList();
+		for (Iterator it = getModel().getSelections().iterator(); it.hasNext(); ) {
+			NewSelection selection = (NewSelection) it.next();
+			if (selection.contains(cp)) list.add(selection);
+		}
+		if (getSelection() != null && getSelection().contains(cp))
+			list.add(getSelection());
+		return list;
 	}
 	
 	public void setHelpText(String text) {

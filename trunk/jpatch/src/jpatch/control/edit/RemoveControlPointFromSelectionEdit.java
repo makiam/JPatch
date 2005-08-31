@@ -1,7 +1,7 @@
 package jpatch.control.edit;
 
 import jpatch.entity.*;
-import jpatch.boundary.selection.*;
+import jpatch.boundary.*;
 
 /**
  * This class is inteded to be used if a ControlPoint has to be removed from a
@@ -12,11 +12,13 @@ import jpatch.boundary.selection.*;
 public class RemoveControlPointFromSelectionEdit extends JPatchAbstractUndoableEdit {
 	
 	private ControlPoint cp;
-	private PointSelection ps;
+	private Float weight;
+	private NewSelection selection;
 	
-	public RemoveControlPointFromSelectionEdit(ControlPoint cp, PointSelection ps) {
+	public RemoveControlPointFromSelectionEdit(ControlPoint cp, NewSelection selection) {
 		this.cp = cp;
-		this.ps = ps;
+		this.selection = selection;
+		weight = (Float) selection.getMap().get(cp);
 		redo();
 	}
 	
@@ -25,10 +27,14 @@ public class RemoveControlPointFromSelectionEdit extends JPatchAbstractUndoableE
 	}
 	
 	public void undo() {
-		ps.addControlPoint(cp);
+		selection.getMap().put(cp, weight);
 	}
 	
 	public void redo() {
-		ps.removeControlPoint(cp);
+		selection.getMap().remove(cp);
+	}
+	
+	public void dump(String prefix) {
+		System.out.println(prefix + getClass().getName() + " \"" + name() + "\" (" + selection + ")");
 	}
 }
