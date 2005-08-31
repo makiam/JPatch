@@ -24,7 +24,7 @@ public final class NewSelectionAction extends AbstractAction {
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		//System.out.println("add selection");
-		Selection selection = new PointSelection((PointSelection) MainFrame.getInstance().getSelection());
+		//Selection selection = new PointSelection((PointSelection) MainFrame.getInstance().getSelection());
 		//System.out.println("1");
 		//if (selection != null && model.addSelection(selection)) {
 		//	selection.setName("new selection #" + iNum++);
@@ -50,7 +50,9 @@ public final class NewSelectionAction extends AbstractAction {
 //			}
 //		}
 		
+		NewSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null) {
+			selection = selection.cloneSelection();
 			if (MainFrame.getInstance().getModel().checkSelection(selection)) {
 				selection.setName("new selection #" + iNum++);
 				MainFrame.getInstance().getUndoManager().addEdit(new AddSelectionEdit(selection));

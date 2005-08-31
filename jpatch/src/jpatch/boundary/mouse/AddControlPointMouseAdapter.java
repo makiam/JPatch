@@ -71,8 +71,8 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 						compoundEdit.addEdit(CorrectSelectionsEdit.attachPoints(cpA.getHead(),cp.getTail()));
 				}
 				NewSelection selection = new NewSelection(cpB);
-				MainFrame.getInstance().setSelection(selection);
-				
+//				MainFrame.getInstance().setSelection(selection);
+				compoundEdit.addEdit(new ChangeSelectionEdit(selection));
 				MainFrame.getInstance().getJPatchScreen().single_update(compSource);
 				cpHot = cpB;
 			} /*else if (cp.getNext() == null || cp.getPrev() == null) {	// CHANGE **************************************!!!!!!!!!!!!!!!!!!
@@ -127,7 +127,8 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 						compoundEdit.addEdit(new WeldControlPointsEdit(cpHot,cp));
 					else
 						compoundEdit.addEdit(CorrectSelectionsEdit.attachPoints(cpHot.getHead(),cp.getTail()));
-//FIXME					((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
+//FIXME						((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
+						compoundEdit.addEdit(new RemoveControlPointFromSelectionEdit(cpHot, MainFrame.getInstance().getSelection()));
 					MainFrame.getInstance().getJPatchScreen().full_update();
 					setIdleState();
 				} else {
@@ -135,6 +136,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 						if (cp.getHookAt(hookPos[0]) == null) {
 							compoundEdit.addEdit(new HookEdit(cpHot,cp,hookPos[0]));
 //FIXME							((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
+							compoundEdit.addEdit(new RemoveControlPointFromSelectionEdit(cpHot, MainFrame.getInstance().getSelection()));
 							MainFrame.getInstance().getJPatchScreen().full_update();
 							setIdleState();
 						} else {
@@ -142,6 +144,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 							compoundEdit.addEdit(new ConvertHookToCpEdit(hook));
 							compoundEdit.addEdit(new WeldControlPointsEdit(cpHot,hook));
 //FIXME							((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
+							compoundEdit.addEdit(new RemoveControlPointFromSelectionEdit(cpHot, MainFrame.getInstance().getSelection()));
 							MainFrame.getInstance().getJPatchScreen().full_update();
 							setIdleState();
 						}
@@ -162,6 +165,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 //				acp[0] = cpHot;
 //				//compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,acp));
 //			}
+//			compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,new ControlPoint[] { cpHot }));
 			MainFrame.getInstance().getJPatchScreen().full_update();
 			setIdleState();
 		}
@@ -198,7 +202,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
 			iState = IDLE;
 		} else {
-			throw new IllegalStateException("setActiveState() called in active state");
+			throw new IllegalStateException("setIdleState() called in idle state");
 		}
 		MainFrame.getInstance().setHelpText("Press left mousebutton to add curve segment. Press left mousebutton near existing point to weld new curve segment to it or hold CTRL to attach new curve segment.");
 		if (!bMulti) {

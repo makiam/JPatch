@@ -29,31 +29,31 @@ import jpatch.entity.*;
  * @author sascha
  *
  */
-public class AddPointsToMorphEdit extends JPatchAbstractUndoableEdit {
-	
-	private Morph morph;
-	private List listPoints;
-	private List listVectors;
-
-	public AddPointsToMorphEdit(Morph morph, List points, List vectors) {
-		this.morph = morph;
-		this.listPoints = points;
-		this.listVectors = vectors;
-		redo();
-	}
-	
-	public void redo() {
-		morph.getPointList().addAll(listPoints);
-		morph.getVectorList().addAll(listVectors);
-	}
-	
-	public void undo() {
-		List morphPoints = morph.getPointList();
-		List morphVectors = morph.getVectorList();
-		for (Iterator it = listPoints.iterator(); it.hasNext(); ) {
-			ControlPoint cp = (ControlPoint) it.next();
-			morphVectors.remove(morphPoints.indexOf(cp));
-			morphPoints.remove(cp);
-		}
-	}
-}
+//public class AddPointsToMorphEdit extends JPatchAbstractUndoableEdit {
+//	
+//	private Morph morph;
+//	private List listPoints;
+//	private List listVectors;
+//
+//	public AddPointsToMorphEdit(Morph morph, List points, List vectors) {
+//		this.morph = morph;
+//		this.listPoints = points;
+//		this.listVectors = vectors;
+//		redo();
+//	}
+//	
+//	public void redo() {
+//		morph.getPointList().addAll(listPoints);
+//		morph.getVectorList().addAll(listVectors);
+//	}
+//	
+//	public void undo() {
+//		List morphPoints = morph.getPointList();
+//		List morphVectors = morph.getVectorList();
+//		for (Iterator it = listPoints.iterator(); it.hasNext(); ) {
+//			ControlPoint cp = (ControlPoint) it.next();
+//			morphVectors.remove(morphPoints.indexOf(cp));
+//			morphPoints.remove(cp);
+//		}
+//	}
+//}
