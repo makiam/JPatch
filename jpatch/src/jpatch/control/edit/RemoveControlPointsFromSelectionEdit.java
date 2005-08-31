@@ -1,7 +1,7 @@
 package jpatch.control.edit;
 
 import java.util.*;
-import jpatch.boundary.selection.*;
+import jpatch.boundary.*;
 
 /**
  * Use this class for changing selections (with the default tool)
@@ -10,8 +10,8 @@ import jpatch.boundary.selection.*;
 
 public class RemoveControlPointsFromSelectionEdit extends AddOrRemoveControlPointsSelectionEdit {
 
-	public RemoveControlPointsFromSelectionEdit(PointSelection ps, Collection controlPoints) {
-		super(ps,controlPoints);
+	public RemoveControlPointsFromSelectionEdit(NewSelection selection, Map objects) {
+		super(selection, objects);
 		remove();
 	}
         
@@ -21,5 +21,9 @@ public class RemoveControlPointsFromSelectionEdit extends AddOrRemoveControlPoin
 	
 	public void redo() {
 		remove();
+	}
+	
+	public void dump(String prefix) {
+		System.out.println(prefix + getClass().getName() + " \"" + name() + "\" (" + selection + " " + mapCPs + ")");
 	}
 }

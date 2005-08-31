@@ -18,10 +18,10 @@ public final class DeleteControlPointAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("delete points"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null) {
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		if (selection != null) {
 			JPatchCompoundEdit compoundEdit = new JPatchCompoundEdit();
-			if (ps.isCurve()) {
+			if (selection.getDirection() != 0) {
 				return;
 				//ControlPoint cp = ps.getControlPoint();
 				//if (cp.getNextAttached() != null || cp.getPrevAttached() != null) {
@@ -36,10 +36,13 @@ public final class DeleteControlPointAction extends AbstractAction {
 				//	}
 				//}
 			} else {
-				ControlPoint[] acpSelection = ps.getControlPointArray();
-				for (int s = 0; s < acpSelection.length; s++) {
-					if (!acpSelection[s].isHook()) {
-						ControlPoint[] acpStack = acpSelection[s].getStack();
+				for (Iterator itObj = selection.getObjects().iterator(); itObj.hasNext(); ) {
+					Object object = itObj.next();
+					if (!(object instanceof ControlPoint))
+						continue;
+					ControlPoint cp = (ControlPoint) object;
+					if (!cp.isHook()) {
+						ControlPoint[] acpStack = cp.getStack();
 						for (int t = 0; t < acpStack.length; t++) {
 							if (acpStack[t].getCurve() != null) {
 								/*

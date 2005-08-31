@@ -33,6 +33,7 @@ public class Morph extends JPatchTreeLeaf {
 		for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
 			Object key = it.next();
 			if (selectedPoints.keySet().contains(key)) {
+				
 				ok = true;
 				break loop;
 			}
@@ -40,23 +41,8 @@ public class Morph extends JPatchTreeLeaf {
 		if (!ok)
 			return null;
 		return new Transformable() {
-//			public void prepareForTemporaryTransformation() { }
-//			public void transformTemporarily(Matrix4f m) { }
-//			public JPatchAbstractUndoableEdit transformPermanently(Matrix4f m) {
-//				ArrayList remove = new ArrayList();
-//				Vector3f v3 = new Vector3f();
-//				for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
-//					Object key = it.next();
-//					Vector3f v = (Vector3f) changeMap.get(key);
-//					v3.set(v);
-//					m.transform(v);
-//					if (v.equals(v3))
-//						remove.add(key);
-//				}
-//				for (Iterator it = remove.iterator(); it.hasNext(); changeMap.remove(it.next()));
-//				return new ChangeMorphVectorsEdit(Morph.this, changeMap);
-//			}
 			public void beginTransform() {
+				changeMap.clear();
 				for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
 					Object key = it.next();
 					if (selectedPoints.keySet().contains(key))
@@ -71,6 +57,7 @@ public class Morph extends JPatchTreeLeaf {
 				for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
 					Object key = it.next();
 					Vector3f v = (Vector3f) changeMap.get(key);
+					v.set((Vector3f) mapMorph.get(key));
 					float weight = ((Float) selectedPoints.get(key)).floatValue();
 					quat.set(q);
 					quat.interpolate(identity, 1.0 - weight);
@@ -83,8 +70,10 @@ public class Morph extends JPatchTreeLeaf {
 				for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
 					Object key = it.next();
 					Vector3f v = (Vector3f) changeMap.get(key);
+					v.set((Vector3f) mapMorph.get(key));
 					float weight = ((Float) selectedPoints.get(key)).floatValue();
 					matrix.set(m);
+					matrix.mul(weight);
 					matrix.transform(v);
 				}
 			}

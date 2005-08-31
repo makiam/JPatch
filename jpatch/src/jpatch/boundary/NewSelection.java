@@ -11,6 +11,7 @@ import jpatch.entity.*;
 public class NewSelection extends JPatchTreeLeaf implements Transformable {
 	public static final int CONTROLPOINTS = 1;
 	public static final int MORPHS = 2;
+	public static int NUM = 0;
 	
 	private Map mapObjects;
 	private Map mapTransformables;
@@ -18,6 +19,8 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 	private int iDirection;
 	private Matrix3f m3Orientation;
 	private Point3f p3Pivot = new Point3f();
+	private int iNum = NUM++;
+	private boolean bActive = false;
 	
 	public static NewSelection createRectangularPointSelection(int ax, int ay, int bx, int by, Matrix4f transformationMatrix, Model model) {
 		NewSelection selection = new NewSelection();
@@ -40,6 +43,7 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 	}
 	
 	private NewSelection() {
+		super("NEW SELECTION");
 		m3Orientation = new Matrix3f();
 		m3Orientation.setIdentity();
 	}
@@ -70,6 +74,10 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 		return mapObjects.keySet();
 	}
 
+	public Map getMap() {
+		return mapObjects;
+	}
+	
 	public void setHotObject(Object object) {
 		if (mapObjects.keySet().contains(object) || object == null)
 			hotObject = object;
@@ -78,6 +86,10 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 	}
 
 	public Object getHotObject() {
+		if (isSingle()) {
+			Iterator it = mapObjects.keySet().iterator();
+			return it.next();
+		}
 		return hotObject;
 	}
 
@@ -99,6 +111,14 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 	
 	public boolean isSingle() {
 		return mapObjects.keySet().size() == 1;
+	}
+	
+	public boolean isActive() {
+		return bActive;
+	}
+	
+	public void setActive(boolean active) {
+		bActive = active;
 	}
 	
 	public void getBounds(Point3f p0, Point3f p1) {
@@ -198,10 +218,40 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 
 	public JPatchUndoableEdit endTransform() {
 		JPatchCompoundEdit edit = new JPatchCompoundEdit();
-		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext(); ) {
+		for (Iterator it = mapTransformables.keySet().iterator(); it.hasNext(); ) {
 			Transformable transformable = (Transformable) it.next();
 			edit.addEdit(transformable.endTransform());
 		}
 		return edit;
+	}
+	
+	public NewSelection cloneSelection() {
+		NewSelection selection = new NewSelection(mapObjects);
+		selection.p3Pivot.set(p3Pivot);
+		selection.m3Orientation.set(m3Orientation);
+		selection.hotObject = hotObject;
+		selection.iDirection = iDirection;
+		return selection;
+	}
+	
+	public boolean equals(Object object) {
+		if (object == null)
+			return false;
+		if (object == this)
+			return true;
+		NewSelection selection = (NewSelection) object;
+		if (!mapObjects.equals(selection.mapObjects))
+			return false;
+		if (!(iDirection == selection.iDirection))
+			return false;
+		return true;
+	}
+	
+	public int hashCode() {
+		return mapObjects.hashCode();
+	}
+	
+	public String toString() {
+		return "Selection " + getName() + " (" + iNum + ")";
 	}
 }

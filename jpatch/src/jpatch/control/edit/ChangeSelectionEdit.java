@@ -28,4 +28,8 @@ public class ChangeSelectionEdit extends JPatchAbstractUndoableEdit {
 		selection = MainFrame.getInstance().getSelection();
 		MainFrame.getInstance().setSelection(dummy);
 	}
+	
+	public void dump(String prefix) {
+		System.out.println(prefix + getClass().getName() + " \"" + name() + "\" (" + selection + ")");
+	}
 }

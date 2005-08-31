@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.3 2005/08/30 22:20:18 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.4 2005/08/31 16:04:43 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -35,7 +35,7 @@ import jpatch.control.edit.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.3 $
+ * @version    $Revision: 1.4 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -540,6 +540,9 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 	public void setChildHook(ControlPoint childHook) {
+		System.out.println("***");
+		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+		for (int i = 0; i < stacktrace.length; System.out.println(stacktrace[i++]));
 		cpChildHook = childHook;
 	}
 	

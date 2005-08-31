@@ -49,4 +49,8 @@ public abstract class JPatchAbstractUndoableEdit implements JPatchUndoableEdit {
 	public boolean isAtomic() {
 		return true;
 	}
+	
+	public void dump(String prefix) {
+		System.out.println(prefix + getClass().getName() + " \"" + name() + "\"");
+	}
 }

@@ -1,19 +1,19 @@
 package jpatch.control.edit;
 
 import java.util.*;
-import jpatch.boundary.selection.*;
+import jpatch.boundary.*;
 
 /**
  * Use this class for changing selections (with the default tool)
  */
 
 public abstract class AddOrRemoveControlPointsSelectionEdit extends JPatchAbstractUndoableEdit {
-	protected PointSelection ps;
-	protected Collection colCPs;
+	protected NewSelection selection;
+	protected Map mapCPs;
 
-	public AddOrRemoveControlPointsSelectionEdit(PointSelection ps, Collection controlPoints) {
-		this.ps = ps;
-		colCPs = controlPoints;
+	public AddOrRemoveControlPointsSelectionEdit(NewSelection selection, Map controlPoints) {
+		this.selection = selection;
+		mapCPs = controlPoints;
 	}
 
 	public String name() {
@@ -21,12 +21,12 @@ public abstract class AddOrRemoveControlPointsSelectionEdit extends JPatchAbstra
 	}
 
 	protected void remove() {
-		ps.getSelectedControlPoints().removeAll(colCPs);
-		ps.resetPivotToCenter();
+		for (Iterator it = mapCPs.keySet().iterator(); it.hasNext(); selection.getMap().remove(it.next()));
+		selection.getPivot().set(selection.getCenter());
 	}
 	 
 	protected void add() {
-		ps.getSelectedControlPoints().addAll(colCPs);
-		ps.resetPivotToCenter();
+		selection.getMap().putAll(mapCPs);
+		selection.getPivot().set(selection.getCenter());
 	}
  }

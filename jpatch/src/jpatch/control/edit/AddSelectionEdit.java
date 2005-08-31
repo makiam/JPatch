@@ -6,15 +6,15 @@ import jpatch.boundary.*;
 
 public class AddSelectionEdit extends JPatchAbstractUndoableEdit {
 	
-	private Selection selection;
+	private NewSelection selection;
 	private int index = -1;
 	
-	public AddSelectionEdit(Selection selection) {
+	public AddSelectionEdit(NewSelection selection) {
 		this.selection = selection;
 		redo();
 	}
 	
-	public AddSelectionEdit(int index, Selection selection) {
+	public AddSelectionEdit(int index, NewSelection selection) {
 		this.index = index;
 		this.selection = selection;
 		redo();

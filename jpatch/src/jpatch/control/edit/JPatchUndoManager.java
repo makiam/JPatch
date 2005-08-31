@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchUndoManager.java,v 1.1 2005/08/10 12:57:20 sascha_l Exp $
+ * $Id: JPatchUndoManager.java,v 1.2 2005/08/31 16:04:43 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -29,7 +29,7 @@ import java.io.*;
  * The JPatchUndoManager stores JPatchUndoableEdits in a list and provides methods to add, redo and undo edits.<br>
  * It keeps track of the position in the position inside the list
  *
- * @version	$Revision: 1.1 $
+ * @version	$Revision: 1.2 $
  * @author	Sascha Ledinsky
  */
 public class JPatchUndoManager {
@@ -43,6 +43,8 @@ public class JPatchUndoManager {
 	private boolean bEnabled = true;
 	
 	private boolean bChange = false;
+	
+	private boolean bOpen = false;
 	
 	private int iStop = 0;
 	
@@ -72,6 +74,13 @@ public class JPatchUndoManager {
 		iStop = 0;
 	}
 	
+	public void addEdit(JPatchUndoableEdit edit) {
+//		if (edit instanceof ChangeToolEdit)
+//			addEdit(edit, true);
+//		else
+			addEdit(edit, false);
+	}
+			
 	/**
 	 * adds a new edit to the list. <br>
 	 * If the buffer size is exceeded, the first entry in the list will be dropped.
@@ -79,7 +88,12 @@ public class JPatchUndoManager {
 	 * after the last not undone edit will be dropped.
 	 * @param edit The edit to add
 	 */
-	public void addEdit(JPatchUndoableEdit edit) {
+	public void addEdit(JPatchUndoableEdit edit, boolean open) {
+		if (bOpen) {
+			addToCurrentEdit(edit, open);
+			return;
+		}
+		bOpen = open;
 		//System.out.println("UndoManager.addEdit(" + edit + ")");
 		if (bEnabled) {
 			if (iPos == lstEdits.size()) {			// check if we are at the end of the list
@@ -101,6 +115,12 @@ public class JPatchUndoManager {
 		}
 	}
 
+	private void addToCurrentEdit(JPatchUndoableEdit edit, boolean open) {
+		bOpen = open;
+		JPatchCompoundEdit compoundEdit = (JPatchCompoundEdit) lstEdits.get(iPos - 1);
+		compoundEdit.addEdit(edit);
+	}
+	
 	public void setChange(boolean change) {
 		bChange = change;
 	}
@@ -213,18 +233,20 @@ public class JPatchUndoManager {
 	public void dump() {
 		System.out.println();
 		for (int e = 0; e < iDepth; e++) {
-			String stop = (e == iStop) ? "#" : " ";
+			String prefix = (e == iStop) ? "#" : " ";
 			if (e == iPos) {
-				System.out.print(stop + "-->");
+				prefix += "-->";
 			} else {
-				System.out.print(stop + "   ");
+				prefix += "   ";
 			}
-			System.out.print(e + " ");
+			prefix += e + " ";
 			if (e < lstEdits.size()) {
-				JPatchUndoableEdit edit = (JPatchUndoableEdit)lstEdits.get(e);
-				System.out.println(edit.name() + " (" + edit.getClass().getName() + ")");
+				JPatchAbstractUndoableEdit edit = (JPatchAbstractUndoableEdit)lstEdits.get(e);
+				//System.out.println(edit.name() + " (" + edit.getClass().getName() + ")");
+				edit.dump(prefix);
 			} else {
-				System.out.println(".....");
+				System.out.println("open = " + bOpen);
+				return;
 			}
 		}
 		if (iPos == iDepth) {

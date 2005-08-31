@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchCompoundEdit.java,v 1.1 2005/08/10 12:57:20 sascha_l Exp $
+ * $Id: JPatchCompoundEdit.java,v 1.2 2005/08/31 16:04:43 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -29,7 +29,7 @@ import java.util.*;
  * It's undo() method simply calls the undo() methods of all child
  * edits (in reverse order). It's redo method calls the redo() methods of all child edits.
  *
- * @version	$Revision: 1.1 $
+ * @version	$Revision: 1.2 $
  * @author	Sascha Ledinsky
  */
 public class JPatchCompoundEdit extends JPatchAbstractUndoableEdit {
@@ -110,5 +110,12 @@ public class JPatchCompoundEdit extends JPatchAbstractUndoableEdit {
 	
 	public boolean isValid() {
 		return (lstEdits.size() > 0);
+	}
+	
+	public void dump(String prefix) {
+		System.out.println(prefix + getClass().getName() + " \"" + name() + "\":");
+		for (Iterator it = lstEdits.iterator(); it.hasNext(); ) {
+			((JPatchAbstractUndoableEdit) it.next()).dump(prefix + "    ");
+		}
 	}
 }
