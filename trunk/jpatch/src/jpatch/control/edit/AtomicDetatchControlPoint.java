@@ -8,7 +8,7 @@ import jpatch.entity.*;
  * @author     Sascha Ledinsky
  * @created    26. Dezember 2003
  */
-public class DetachControlPointEdit extends JPatchAbstractUndoableEdit {
+public class AtomicDetatchControlPoint extends JPatchAtomicEdit {
 	private ControlPoint cp;
 	private ControlPoint cpNextAttached;
 	private ControlPoint cpPrevAttached;
@@ -19,7 +19,7 @@ public class DetachControlPointEdit extends JPatchAbstractUndoableEdit {
 	 *
 	 * @param  cp  ControlPoint to remove
 	 */
-	public DetachControlPointEdit(ControlPoint cp) {
+	public AtomicDetatchControlPoint(ControlPoint cp) {
 		/*
 		 *  store ControlPoint, nextAttached and previousAttached ControlPoints for undo
 		 */
@@ -29,18 +29,10 @@ public class DetachControlPointEdit extends JPatchAbstractUndoableEdit {
 		detach();
 	}
 
-
-	/**
-	 *  redoes the edit
-	 */
 	public void redo() {
 		detach();
 	}
 
-
-	/**
-	 *  undoes the edit
-	 */
 	public void undo() {
 		attach();
 	}

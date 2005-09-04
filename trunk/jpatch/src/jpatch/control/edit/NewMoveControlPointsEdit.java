@@ -27,7 +27,7 @@ public class NewMoveControlPointsEdit extends JPatchAbstractUndoableEdit {
 		//}
 	}
 	
-	public String name() {
+	public String getName() {
 		return ("move controlpoints");
 	}
 	

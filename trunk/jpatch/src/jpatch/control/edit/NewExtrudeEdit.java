@@ -51,13 +51,13 @@ public class NewExtrudeEdit extends CloneCommonEdit {
 					cpEnd = new ControlPoint();
 					
 					/* attach it to the cpToClone */
-					addEdit(new AttachControlPointsEdit(cpEnd,cpOriginal.getTail()));
+					addEdit(new AtomicAttachControlPoints(cpEnd,cpOriginal.getTail()));
 					
 					/* and add it as a new curve */
 					cpNew.appendTo(cpEnd);
 					Curve curve = new Curve(cpEnd);
 					curve.validate();
-					addEdit(new CreateCurveEdit(curve));
+					addEdit(new AtomicAddCurve(curve));
 				} else {
 					if (cpEnd.isEnd()) {
 						addEdit(new ChangeControlPointNextEdit(cpEnd,cpNew));
@@ -67,7 +67,7 @@ public class NewExtrudeEdit extends CloneCommonEdit {
 						addEdit(new ChangeControlPointPrevEdit(cpEnd,cpNew));
 						cpNew.setNext(cpEnd);
 						cpNew.setCurve(cpEnd.getCurve());
-						addEdit(new ChangeCurveStartEdit(cpEnd.getCurve(),cpNew));
+						addEdit(new AtomicChangeCurveStart(cpEnd.getCurve(),cpNew));
 					} else {
 						System.out.println("error in extrudeEdit");
 					}

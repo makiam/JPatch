@@ -73,7 +73,7 @@ public final class DeleteControlPointAction extends AbstractAction {
 									}
 								}
 								//System.out.println("DeleteControlPointAction deleting point " + acpStack[t].number());
-								compoundEdit.addEdit(new DeleteControlPointEdit(acpStack[t]));
+								compoundEdit.addEdit(new CompoundDeleteControlPoint(acpStack[t]));
 								ArrayList patches = MainFrame.getInstance().getModel().getPatchesContaining(acpStack[t]);
 								for (Iterator it = patches.iterator(); it.hasNext();) {
 									Patch patch = (Patch) it.next();

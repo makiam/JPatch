@@ -21,7 +21,7 @@ public final class MagnetAction extends AbstractAction {
 			if (MainFrame.getInstance().getSelection() != null) {
 				JPatchCompoundEdit compoundEdit = new JPatchCompoundEdit();
 				compoundEdit.addEdit(new ChangeSelectionEdit(null));
-				compoundEdit.addEdit(new ChangeToolEdit(null));
+				compoundEdit.addEdit(new AtomicChangeTool(null));
 				MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
@@ -30,7 +30,7 @@ public final class MagnetAction extends AbstractAction {
 			MainFrame.getInstance().getJPatchScreen().addMouseListeners(new MagnetMouseAdapter());
 			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.MAGNET);
 		} else {
-			MainFrame.getInstance().getUndoManager().addEdit(new ChangeToolEdit(new DefaultTool()));
+			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(new DefaultTool()));
 			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.DEFAULT);
 		}
 	}

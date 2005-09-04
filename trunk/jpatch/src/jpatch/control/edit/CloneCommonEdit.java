@@ -201,7 +201,7 @@ public abstract class CloneCommonEdit extends JPatchCompoundEdit {
 				if (cpClone.getLoop() || cpClone.getPrev() == null) {
 					if (cpClone.getNext() != null) {
 						Curve curve = new Curve(cpClone);
-						addEdit(new CreateCurveEdit(curve));
+						addEdit(new AtomicAddCurve(curve));
 						addEdit(new ValidateCurveEdit(curve));
 						//curvesToReverse.add(curve);
 						//addEdit(new ReverseCurveEdit(curve));

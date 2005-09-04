@@ -434,6 +434,9 @@ public class Model extends JPatchTreeNode {
 		*/
 	}
 
+	public void removeCurve(Curve curve) {
+		curve.remove();
+	}
 
 	/**
 	 *  Adds a feature to the Curve attribute of the Model object

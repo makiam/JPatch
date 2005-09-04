@@ -18,7 +18,7 @@ public class ConvertHookToCpEdit extends JPatchCompoundEdit {
 		float hookPos = hook.getHookPos();
 		
 		/* remove hook from hook curve */
-		addEdit(new RemoveControlPointFromCurveEdit(hook));
+		addEdit(new AtomicRemoveControlPointFromCurve(hook));
 		
 		/* and insert it on the parent curve */
 		addEdit(new InsertControlPointEdit(hook, parentHook));
@@ -34,7 +34,7 @@ public class ConvertHookToCpEdit extends JPatchCompoundEdit {
 			/* remove hook curve */
 			//addEdit(new RemoveCurveFromModelEdit(startHook.getCurve()));
 			addEdit(new ChangeCPChildHookEdit(parentHook, null));
-			addEdit(new DeleteControlPointEdit(startHook));
+			addEdit(new CompoundDeleteControlPoint(startHook));
 		} else if (prevHook == startHook) {
 			
 			/* modify hook curve */
@@ -77,7 +77,7 @@ public class ConvertHookToCpEdit extends JPatchCompoundEdit {
 						addEdit(new ChangeCPHookPosEdit(cp, hp / hookPos));
 					} else {
 						addEdit(new ChangeCPHookPosEdit(cp, (hp - hookPos) / ( 1 - hookPos)));
-						addEdit(new RemoveControlPointFromCurveEdit(cp));
+						addEdit(new AtomicRemoveControlPointFromCurve(cp));
 						addEdit(new InsertControlPointEdit(cp, cpAppend));
 						cpAppend = cp;
 					}
@@ -85,7 +85,7 @@ public class ConvertHookToCpEdit extends JPatchCompoundEdit {
 			}
 			Curve curve = new Curve(newStartHook);
 			curve.validate();
-			addEdit(new CreateCurveEdit(curve));
+			addEdit(new AtomicAddCurve(curve));
 //			System.out.println("c");
 		}
 	}

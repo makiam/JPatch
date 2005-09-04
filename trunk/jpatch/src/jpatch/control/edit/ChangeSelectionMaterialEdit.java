@@ -16,7 +16,7 @@ public class ChangeSelectionMaterialEdit extends JPatchCompoundEdit {
 	public ChangeSelectionMaterialEdit(PointSelection pointSelection, JPatchMaterial material) {
 		for (Patch patch = MainFrame.getInstance().getModel().getFirstPatch(); patch != null; patch = patch.getNext()) {
 			if (patch.isSelected(pointSelection)) {
-				addEdit(new ChangePatchMaterialEdit(patch,material));
+				addEdit(new AtomicChangePatchMaterial(patch,material));
 			}
 		}
 	}

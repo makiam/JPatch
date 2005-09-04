@@ -40,12 +40,6 @@ public interface JPatchUndoableEdit {
 	public void redo();
 	
 	/**
-	 * returns the name of the edit
-	 * @return the name of the edit
-	 */
-	public String name();
-	
-	/**
 	 * returns fales if the edit is a compound edit
 	 */
 	public boolean isAtomic();
