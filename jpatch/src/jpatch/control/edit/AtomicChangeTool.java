@@ -7,12 +7,16 @@ import jpatch.boundary.tools.*;
  * Changes the tool
  */
 
-public class ChangeToolEdit extends JPatchAbstractUndoableEdit {
+public class AtomicChangeTool extends JPatchAtomicEdit implements JPatchRootEdit{
 	private JPatchTool tool;
 	
-	public ChangeToolEdit(JPatchTool tool) {
+	public AtomicChangeTool(JPatchTool tool) {
 		this.tool = tool;
 		swap();
+	}
+	
+	public String getName() {
+		return "Change tool";
 	}
 	
 	public void undo() {

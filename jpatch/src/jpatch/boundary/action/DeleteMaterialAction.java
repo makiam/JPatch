@@ -29,7 +29,7 @@ public final class DeleteMaterialAction extends AbstractAction {
 			JPatchCompoundEdit compoundEdit = new JPatchCompoundEdit();
 			for (Patch patch = MainFrame.getInstance().getModel().getFirstPatch(); patch != null; patch = patch.getNext()) {
 				if (patch.getMaterial() == material) {
-					compoundEdit.addEdit(new ChangePatchMaterialEdit(patch,defaultMaterial));
+					compoundEdit.addEdit(new AtomicChangePatchMaterial(patch,defaultMaterial));
 				}
 			}
 			compoundEdit.addEdit(new RemoveMaterialEdit(material));

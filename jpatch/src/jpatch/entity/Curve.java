@@ -210,40 +210,40 @@ public final class Curve {
 		}
 	}
 
-	/**
-	 * reverses the controlPoint order
-	 */
-	public final void reverse() {
-		ControlPoint cp;
-		ControlPoint cpDummy;
-		for (cp = cpStart.getEnd(); cp != null; cp = cp.getNext()) {
-			/*
-			 * if it's on a hook curve, reverse the hookPos
-			 */
-			if (cp.getHookPos() != -1) {
-				cp.setHookPos(1 - cp.getHookPos());
-			}
-			/*
-			 * if we've got a child hook, reverse child hook curve and move childhook
-			 */
-			if (cp.getChildHook() != null) {
-				//System.out.println("cp   : " + cp);
-				//System.out.println("next : " + cp.getNext());
-				//System.out.println("child: " + cp.getChildHook());
-				cp.getNext().setChildHook(cp.getChildHook().getEnd());
-				cp.getChildHook().getCurve().reverse();
-				cp.setChildHook(null);
-			}
-			/*
-			 * swap cpNext <-> cpPrev
-			 */
-			cpDummy = cp.getNext();
-			cp.setNext(cp.getPrev());
-			cp.setPrev(cpDummy);
-			cp.setTangentsValid(false);
-		}
-		cpStart = cpStart.getStart();
-	}
+//	/**
+//	 * reverses the controlPoint order
+//	 */
+//	public final void reverse() {
+//		ControlPoint cp;
+//		ControlPoint cpDummy;
+//		for (cp = cpStart.getEnd(); cp != null; cp = cp.getNext()) {
+//			/*
+//			 * if it's on a hook curve, reverse the hookPos
+//			 */
+//			if (cp.getHookPos() != -1) {
+//				cp.setHookPos(1 - cp.getHookPos());
+//			}
+//			/*
+//			 * if we've got a child hook, reverse child hook curve and move childhook
+//			 */
+//			if (cp.getChildHook() != null) {
+//				//System.out.println("cp   : " + cp);
+//				//System.out.println("next : " + cp.getNext());
+//				//System.out.println("child: " + cp.getChildHook());
+//				cp.getNext().setChildHook(cp.getChildHook().getEnd());
+//				cp.getChildHook().getCurve().reverse();
+//				cp.setChildHook(null);
+//			}
+//			/*
+//			 * swap cpNext <-> cpPrev
+//			 */
+//			cpDummy = cp.getNext();
+//			cp.setNext(cp.getPrev());
+//			cp.setPrev(cpDummy);
+//			cp.setTangentsValid(false);
+//		}
+//		cpStart = cpStart.getStart();
+//	}
 
 	/**
 	 * sets the curve attribute of all ControlPoints in this curve to this curve

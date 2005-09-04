@@ -33,7 +33,7 @@ public class ChangeSelectionRotationEdit extends JPatchAbstractUndoableEdit {
 		swap();
 	}
 	
-	public String name() {
+	public String getName() {
 		return "rotate";
 	}
 	

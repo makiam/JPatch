@@ -85,7 +85,7 @@ public class NewLatheEditorEdit extends JPatchCompoundEdit {
 		// add edits
 		Curve curve = new Curve(cpts[0]); //, MainFrame.getInstance().getModel());
 		//curve.validate();
-		addEdit(new CreateCurveEdit(curve));	// create the new curve
+		addEdit(new AtomicAddCurve(curve));	// create the new curve
 		addEdit(new ValidateCurveEdit(curve));  // validate the curve
 		addEdit(new NewLatheEdit(cpts, iSegments, epsilon)); // lathe the curve
 	}	

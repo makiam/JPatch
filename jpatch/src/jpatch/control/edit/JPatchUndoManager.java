@@ -173,7 +173,7 @@ public class JPatchUndoManager {
 	 */
 	public String undoName() {
 		if (iPos > iStop) {
-			return ((JPatchUndoableEdit)lstEdits.get(iPos - 1)).name();
+			return ((JPatchUndoableEdit)lstEdits.get(iPos - 1)).getName();
 		} else {
 			return "";
 		}
@@ -185,76 +185,76 @@ public class JPatchUndoManager {
 	 */
 	public String redoName() {
 		if (iPos < lstEdits.size()) {
-			return ((JPatchUndoableEdit)lstEdits.get(iPos)).name();
+			return ((JPatchUndoableEdit)lstEdits.get(iPos)).getName();
 		} else {
 			return "";
 		}
 	}
 	
-	/**
-	 * A main method to test the undoManager
-	 */
-	public static void main(String[] args) throws IOException {
-		JPatchUndoManager undoManager = new JPatchUndoManager(10);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		String cmd = "";
-		int edit = 1;
-		System.out.println("UndoManager test");
-		undoManager.dump();
-		System.out.println("type add, undo, redo, setstop, clearstop or end");
-		while (!cmd.equals("end")) {
-			System.out.print(">");
-			cmd = reader.readLine();
-			if (cmd.equals("add")) {
-				undoManager.addEdit(new JPatchDummyEdit("Edit " + edit++));
-				undoManager.dump();
-			} else if (cmd.equals("undo")) {
-				undoManager.undo();
-				undoManager.dump();
-			} else if (cmd.equals("redo")) {
-				undoManager.redo();
-				undoManager.dump();
-			} else if (cmd.equals("setstop")) {
-				undoManager.setStop();
-				undoManager.dump();
-			} else if (cmd.equals("clearstop")) {
-				undoManager.clearStop();
-				undoManager.dump();
-			} else {
-				System.out.println("?");
-				System.out.println("type add, undo, redo, setstop, clearstop or end");
-			}
-		}
-	}
+//	/**
+//	 * A main method to test the undoManager
+//	 */
+//	public static void main(String[] args) throws IOException {
+//		JPatchUndoManager undoManager = new JPatchUndoManager(10);
+//		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+//		String cmd = "";
+//		int edit = 1;
+//		System.out.println("UndoManager test");
+//		undoManager.dump();
+//		System.out.println("type add, undo, redo, setstop, clearstop or end");
+//		while (!cmd.equals("end")) {
+//			System.out.print(">");
+//			cmd = reader.readLine();
+//			if (cmd.equals("add")) {
+//				undoManager.addEdit(new JPatchDummyEdit("Edit " + edit++));
+//				undoManager.dump();
+//			} else if (cmd.equals("undo")) {
+//				undoManager.undo();
+//				undoManager.dump();
+//			} else if (cmd.equals("redo")) {
+//				undoManager.redo();
+//				undoManager.dump();
+//			} else if (cmd.equals("setstop")) {
+//				undoManager.setStop();
+//				undoManager.dump();
+//			} else if (cmd.equals("clearstop")) {
+//				undoManager.clearStop();
+//				undoManager.dump();
+//			} else {
+//				System.out.println("?");
+//				System.out.println("type add, undo, redo, setstop, clearstop or end");
+//			}
+//		}
+//	}
 
-	/**
-	 * a dump method used by the test-code
-	 */
-	public void dump() {
-		System.out.println();
-		for (int e = 0; e < iDepth; e++) {
-			String prefix = (e == iStop) ? "#" : " ";
-			if (e == iPos) {
-				prefix += "-->";
-			} else {
-				prefix += "   ";
-			}
-			prefix += e + " ";
-			if (e < lstEdits.size()) {
-				JPatchAbstractUndoableEdit edit = (JPatchAbstractUndoableEdit)lstEdits.get(e);
-				//System.out.println(edit.name() + " (" + edit.getClass().getName() + ")");
-				edit.dump(prefix);
-			} else {
-				System.out.println("open = " + bOpen);
-				return;
-			}
-		}
-		if (iPos == iDepth) {
-			if (iStop == iPos) {
-				System.out.println("#-->");
-			} else {
-				System.out.println(" -->");
-			}
-		}
-	}
+//	/**
+//	 * a dump method used by the test-code
+//	 */
+//	public void dump() {
+//		System.out.println();
+//		for (int e = 0; e < iDepth; e++) {
+//			String prefix = (e == iStop) ? "#" : " ";
+//			if (e == iPos) {
+//				prefix += "-->";
+//			} else {
+//				prefix += "   ";
+//			}
+//			prefix += e + " ";
+//			if (e < lstEdits.size()) {
+//				JPatchAbstractUndoableEdit edit = (JPatchAbstractUndoableEdit)lstEdits.get(e);
+//				//System.out.println(edit.name() + " (" + edit.getClass().getName() + ")");
+//				edit.dump(prefix);
+//			} else {
+//				System.out.println("open = " + bOpen);
+//				return;
+//			}
+//		}
+//		if (iPos == iDepth) {
+//			if (iStop == iPos) {
+//				System.out.println("#-->");
+//			} else {
+//				System.out.println(" -->");
+//			}
+//		}
+//	}
 }

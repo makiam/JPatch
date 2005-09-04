@@ -35,15 +35,15 @@ public class ComplexAppendControlPointsEdit extends JPatchCompoundEdit {
 				//cpA.getChildHook().setParentHook(cpB);
 			}
 			
-			addEdit(new RemoveCurveFromModelEdit(cpA.getCurve()));
-			addEdit(new SimpleAppendControlPointsEdit(cpA.getNext(),cpB));
+			addEdit(new AtomicRemoveCurve(cpA.getCurve()));
+			addEdit(new AtomicAppendControlPoints(cpA.getNext(),cpB));
 			addEdit(new ValidateCurveEdit(cpB.getCurve()));
 		} else {
 			if (cpA.getPrev() != null) {
-				addEdit(new SimpleAppendControlPointsEdit(cpB,cpA.getPrev()));
+				addEdit(new AtomicAppendControlPoints(cpB,cpA.getPrev()));
 				addEdit(new ChangeControlPointLoopEdit(cpB,true));
 			} else {
-				addEdit(new SimpleAppendControlPointsEdit(cpA,cpB.getPrev()));
+				addEdit(new AtomicAppendControlPoints(cpA,cpB.getPrev()));
 				addEdit(new ChangeControlPointLoopEdit(cpA,true));
 			}
 		}

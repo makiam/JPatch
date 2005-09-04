@@ -22,7 +22,7 @@ public class RemoveControlPointFromSelectionEdit extends JPatchAbstractUndoableE
 		redo();
 	}
 	
-	public String name() {
+	public String getName() {
 		return "remove cp from selection";
 	}
 	
@@ -35,6 +35,6 @@ public class RemoveControlPointFromSelectionEdit extends JPatchAbstractUndoableE
 	}
 	
 	public void dump(String prefix) {
-		System.out.println(prefix + getClass().getName() + " \"" + name() + "\" (" + selection + ")");
+		System.out.println(prefix + getClass().getName() + " \"" + getName() + "\" (" + selection + ")");
 	}
 }

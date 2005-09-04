@@ -24,7 +24,7 @@ public class RemoveControlPointEdit extends JPatchCompoundEdit {
 		
 		if (cp.getNext() != null && cp.getNext().getNextAttached() != null && cp.getNext().getNextAttached().isHook()) {
 			if (cp.getPrev() != null && cp.getPrev().getNextAttached() != null && cp.getPrev().getNextAttached().isHook()) {
-				addEdit(new RemoveCurveEdit(curve));
+				addEdit(new CompoundRemoveHookCurve(curve));
 				return;
 			}
 		}
@@ -36,13 +36,13 @@ public class RemoveControlPointEdit extends JPatchCompoundEdit {
 		}
 		if (cp.getChildHook() != null) {
 			if (cp.getChildHook().getCurve() != null) {
-				addEdit(new RemoveCurveEdit(cp.getChildHook().getCurve()));
+				addEdit(new CompoundRemoveHookCurve(cp.getChildHook().getCurve()));
 			}
 			addEdit(new ChangeCPChildHookEdit(cp,null));
 		}
 		if (cp.getPrev() != null && cp.getPrev().getChildHook() != null) {
 			if (cp.getPrev().getChildHook().getCurve() != null) {
-				addEdit(new RemoveCurveEdit(cp.getPrev().getChildHook().getCurve()));
+				addEdit(new CompoundRemoveHookCurve(cp.getPrev().getChildHook().getCurve()));
 			}
 			addEdit(new ChangeCPChildHookEdit(cp.getPrev(),null));
 		}
@@ -64,13 +64,13 @@ public class RemoveControlPointEdit extends JPatchCompoundEdit {
 			//	addEdit(new ChangeCPCurveEdit(acpCurve[c],null));
 			//}
 			
-			addEdit(new RemoveCurveEdit(curve));
+			addEdit(new CompoundRemoveHookCurve(curve));
 		}
 		/*
 		 * or else just remove the controlPoint
 		 */
 		else {
-			addEdit(new RemoveControlPointFromCurveEdit(cp));
+			addEdit(new AtomicRemoveControlPointFromCurve(cp));
 			addEdit(new RemoveControlPointFromSelectionsEdit(cp));
 		}
 	}

@@ -119,7 +119,7 @@ public class NewLatheEdit extends CloneCommonEdit {
 				if ((cpClone.getLoop() || cpClone.getPrev() == null) && cpClone.getNext() != null) {
 					//model.addCurve(cpClone);
 					Curve curve = new Curve(cpClone);
-					addEdit(new CreateCurveEdit(curve));	// create a new curve
+					addEdit(new AtomicAddCurve(curve));	// create a new curve
 					addEdit(new ValidateCurveEdit(curve)); // validate new curve
 				}
 				
@@ -299,7 +299,7 @@ public class NewLatheEdit extends CloneCommonEdit {
 					for (int s = 0; s < iSegments; s++) {
 						newCp[s] = new ControlPoint();
 						//newCp[s].setMode(ControlPoint.JPATCH_G3);
-						addEdit(new AttachControlPointsEdit(newCp[s],cpLathe[p][s].getTail()));
+						addEdit(new AtomicAttachControlPoints(newCp[s],cpLathe[p][s].getTail()));
 						ps.addControlPoint(newCp[s].getHead());
 					}
 					for (int s = 0; s < iSegments; s++) {
@@ -312,7 +312,7 @@ public class NewLatheEdit extends CloneCommonEdit {
 					newCp[0].setLoop(true);
 					Curve curve = new Curve(newCp[0]);
 					curve.validate();
-					addEdit(new CreateCurveEdit(curve));
+					addEdit(new AtomicAddCurve(curve));
 				} else {
 					if (iSegments % 2 == 0) {
 						for (int s = 0; s < iSegments / 2; s++) {
@@ -320,7 +320,7 @@ public class NewLatheEdit extends CloneCommonEdit {
 							addEdit(new WeldControlPointsEdit(cpLathe[p][s],cpLathe[p][s + iSegments / 2]));
 						}
 						for (int s = iSegments / 2 + 1; s < iSegments; s++) {
-							addEdit(new AttachControlPointsEdit(cpLathe[p][s],cpLathe[p][s - 1]));
+							addEdit(new AtomicAttachControlPoints(cpLathe[p][s],cpLathe[p][s - 1]));
 						}
 						addEdit(new NewMoveControlPointsEdit(new ControlPoint[] { cpLathe[p][iSegments / 2] } ));
 						cpLathe[p][iSegments / 2].setPosition(0,cpLathe[p][iSegments / 2].getPosition().y,0);
@@ -328,7 +328,7 @@ public class NewLatheEdit extends CloneCommonEdit {
 						ps.addControlPoint(cpLathe[p][iSegments / 2]);
 					} else {
 						for (int s = 1; s < iSegments; s++) {
-							addEdit(new AttachControlPointsEdit(cpLathe[p][s],cpLathe[p][s - 1]));
+							addEdit(new AtomicAttachControlPoints(cpLathe[p][s],cpLathe[p][s - 1]));
 						}
 						addEdit(new NewMoveControlPointsEdit(new ControlPoint[] { cpLathe[p][0] } ));
 						cpLathe[p][0].setPosition(0,cpLathe[p][0].getPosition().y,0);

@@ -19,7 +19,7 @@ public class ChangeSelectionPivotEdit extends JPatchAbstractUndoableEdit {
 		selection.getPivot().set(pivot);
 	}
 	
-	public String name() {
+	public String getName() {
 		return "pivot";
 	}
 	
