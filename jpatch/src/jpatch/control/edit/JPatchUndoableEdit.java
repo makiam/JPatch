@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchUndoableEdit.java,v 1.1 2005/08/10 12:57:20 sascha_l Exp $
+ * $Id: JPatchUndoableEdit.java,v 1.2 2005/09/04 18:30:32 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -25,7 +25,7 @@ package jpatch.control.edit;
 /**
  * A basic interface all edits must implement
  *
- * @version	$Revision: 1.1 $
+ * @version	$Revision: 1.2 $
  * @author	Sascha Ledinsky
  */
 public interface JPatchUndoableEdit {
@@ -38,12 +38,6 @@ public interface JPatchUndoableEdit {
 	 * redoes this edit
 	 */
 	public void redo();
-	
-	/**
-	 * returns the name of the edit
-	 * @return the name of the edit
-	 */
-	public String name();
 	
 	/**
 	 * returns fales if the edit is a compound edit

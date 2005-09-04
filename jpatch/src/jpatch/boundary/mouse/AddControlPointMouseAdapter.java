@@ -63,7 +63,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 				cpB.setPrev(cpA);
 				Curve curve = new Curve(cpA,MainFrame.getInstance().getModel());
 				curve.validate();
-				compoundEdit.addEdit(new CreateCurveEdit(curve));
+				compoundEdit.addEdit(new AtomicAddCurve(curve));
 				if (cp != null && cp.getLooseEnd() != null) {
 					if (!mouseEvent.isControlDown())
 						compoundEdit.addEdit(new WeldControlPointsEdit(cpA,cp));
@@ -99,7 +99,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 				cpB.setPrev(cpA);
 				Curve curve = new Curve(cpA,MainFrame.getInstance().getModel());
 				curve.validate();
-				compoundEdit.addEdit(new CreateCurveEdit(curve));
+				compoundEdit.addEdit(new AtomicAddCurve(curve));
 				//compoundEdit.addEdit(new WeldControlPointsEdit(cpA,cp));
 				compoundEdit.addEdit(new WeldControlPointsEdit(cpA,cp));
 				

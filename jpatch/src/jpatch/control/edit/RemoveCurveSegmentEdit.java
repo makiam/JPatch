@@ -29,7 +29,7 @@ public class RemoveCurveSegmentEdit extends JPatchCompoundEdit {
 				}
 				
 				/* remove hook curve */
-				addEdit(new RemoveCurveEdit(cp.getChildHook().getCurve()));
+				addEdit(new CompoundRemoveHookCurve(cp.getChildHook().getCurve()));
 			}
 			addEdit(new ChangeCPChildHookEdit(cp, null));
 		}
@@ -53,7 +53,7 @@ public class RemoveCurveSegmentEdit extends JPatchCompoundEdit {
 			
 			/* change curve start */
 			addEdit(new ChangeControlPointLoopEdit(curve.getStart(),false));
-			addEdit(new ChangeCurveStartEdit(cp.getCurve(),cpNext));
+			addEdit(new AtomicChangeCurveStart(cp.getCurve(),cpNext));
 		} else {
 			
 			/* check if we are the first cp on the curve */
@@ -67,37 +67,37 @@ public class RemoveCurveSegmentEdit extends JPatchCompoundEdit {
 					if (cpNext.getNextAttached() != null && cpNext.getNextAttached().isHook()) {
 						Curve hookCurve = cpNext.getNextAttached().getCurve();
 						addEdit(new RemoveControlPointFromSelectionsEdit(cpNext.getNextAttached()));
-						addEdit(new RemoveControlPointFromCurveEdit(cpNext.getNextAttached()));
+						addEdit(new AtomicRemoveControlPointFromCurve(cpNext.getNextAttached()));
 						if (hookCurve.getLength() == 2) {
 							addEdit(new ChangeCPChildHookEdit(hookCurve.getStart().getParentHook(),null));
 							//addEdit(new RemoveCurveFromModelEdit(hookCurve));
-							addEdit(new RemoveCurveEdit(hookCurve));
+							addEdit(new CompoundRemoveHookCurve(hookCurve));
 						}
 					}
 					
 					/* remove the entire curve */
-					addEdit(new RemoveCurveFromModelEdit(curve));
-					addEdit(new DetachControlPointEdit(cp));
-					addEdit(new DetachControlPointEdit(cpNext));
+					addEdit(new AtomicRemoveCurve(curve));
+					addEdit(new AtomicDetatchControlPoint(cp));
+					addEdit(new AtomicDetatchControlPoint(cpNext));
 					addEdit(new RemoveControlPointFromSelectionsEdit(cp));
 					addEdit(new RemoveControlPointFromSelectionsEdit(cpNext));
 				} else {
 					
 					/* remove the controlpoint */
 					addEdit(new RemoveControlPointFromSelectionsEdit(cp));
-					addEdit(new DetachControlPointEdit(cp));
-					addEdit(new ChangeCurveStartEdit(cp.getCurve(),cpNext));
+					addEdit(new AtomicDetatchControlPoint(cp));
+					addEdit(new AtomicChangeCurveStart(cp.getCurve(),cpNext));
 					addEdit(new ChangeCPCurveEdit(cp,null));
 				}
 				
 				/* remove hooks */
 				if (cp.getNextAttached() != null && cp.getNextAttached().isHook()) {
 					Curve hookCurve = cp.getNextAttached().getCurve();
-					addEdit(new RemoveControlPointFromCurveEdit(cp.getNextAttached()));
+					addEdit(new AtomicRemoveControlPointFromCurve(cp.getNextAttached()));
 					addEdit(new RemoveControlPointFromSelectionsEdit(cp.getNextAttached()));
 					if (hookCurve.getLength() == 2) {
 						addEdit(new ChangeCPChildHookEdit(hookCurve.getStart().getParentHook(),null));
-						addEdit(new RemoveCurveEdit(hookCurve));
+						addEdit(new CompoundRemoveHookCurve(hookCurve));
 					}
 				}
 			} else {
@@ -107,23 +107,23 @@ public class RemoveCurveSegmentEdit extends JPatchCompoundEdit {
 				
 					/* add a new curve */
 					Curve newCurve = new Curve(cpNext);
-					addEdit(new CreateCurveEdit(newCurve));
+					addEdit(new AtomicAddCurve(newCurve));
 					addEdit(new ValidateCurveEdit(newCurve));
 				} else {
 					/* remove hooks */
 					if (cpNext.getNextAttached() != null && cpNext.getNextAttached().isHook()) {
 						Curve hookCurve = cpNext.getNextAttached().getCurve();
 						addEdit(new RemoveControlPointFromSelectionsEdit(cpNext.getNextAttached()));
-						addEdit(new RemoveControlPointFromCurveEdit(cpNext.getNextAttached()));
+						addEdit(new AtomicRemoveControlPointFromCurve(cpNext.getNextAttached()));
 						if (hookCurve.getLength() == 2) {
 							addEdit(new ChangeCPChildHookEdit(hookCurve.getStart().getParentHook(),null));
 							//addEdit(new RemoveCurveFromModelEdit(hookCurve));
-							addEdit(new RemoveCurveEdit(hookCurve));
+							addEdit(new CompoundRemoveHookCurve(hookCurve));
 						}
 					}
 					
 					/* remove the next cp */
-					addEdit(new DetachControlPointEdit(cpNext));
+					addEdit(new AtomicDetatchControlPoint(cpNext));
 					addEdit(new RemoveControlPointFromSelectionsEdit(cpNext));
 				}
 			}

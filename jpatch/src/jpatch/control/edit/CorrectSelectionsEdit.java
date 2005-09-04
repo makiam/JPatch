@@ -70,7 +70,7 @@ public class CorrectSelectionsEdit extends JPatchCompoundEdit {
 			map.put(cpB, weight);
 			edit.addEdit(new AddControlPointsToSelectionEdit(selection, map));
 		}
-		edit.addEdit(new AttachControlPointsEdit(cpA, cpB));
+		edit.addEdit(new AtomicAttachControlPoints(cpA, cpB));
 		return edit;
 	}
 }

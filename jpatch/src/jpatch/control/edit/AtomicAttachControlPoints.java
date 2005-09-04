@@ -14,7 +14,7 @@ import jpatch.entity.*;
 *  B	  (unchanged)		A
 *
 **/
-public class AttachControlPointsEdit extends JPatchAbstractUndoableEdit {
+public class AtomicAttachControlPoints extends JPatchAtomicEdit {
 
 	private ControlPoint cpA;
 	private ControlPoint cpAnextAttached;
@@ -27,7 +27,7 @@ public class AttachControlPointsEdit extends JPatchAbstractUndoableEdit {
 	* @param  A  ControlPoint A
 	* @param  B  ControlPoint B
 	*/
-	public AttachControlPointsEdit(ControlPoint A, ControlPoint B) {
+	public AtomicAttachControlPoints(ControlPoint A, ControlPoint B) {
 		cpA = A;
 		cpB = B;
 		cpAnextAttached = cpA.getNextAttached();
@@ -35,19 +35,11 @@ public class AttachControlPointsEdit extends JPatchAbstractUndoableEdit {
 		redo();
 	}
 
-
-	/**
-	 *  redoes the operation
-	 */
 	public void redo() {
 		cpA.setNextAttached(cpB);
 		cpB.setPrevAttached(cpA);
 	}
 
-
-	/**
-	 *  undoes the operation
-	 */
 	public void undo() {
 		cpA.setNextAttached(cpAnextAttached);
 		cpB.setPrevAttached(cpBprevAttached);

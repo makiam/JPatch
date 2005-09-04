@@ -37,15 +37,15 @@ public class AddStubsAction extends AbstractAction {
 						vector.scale(0.5f);
 						pos.add(vector);
 						cpNew.setPosition(pos);
-						edit.addEdit(new SimpleAppendControlPointsEdit(cpNew, cp));
+						edit.addEdit(new AtomicAppendControlPoints(cpNew, cp));
 						list.add(cpNew);
 					} else if (cpPrev == null) {
 						vector.sub(cp.getPosition(), cpNext.getPosition());
 						vector.scale(0.5f);
 						pos.add(vector);
 						cpNew.setPosition(pos);
-						edit.addEdit(new SimpleAppendControlPointsEdit(cp, cpNew));
-						edit.addEdit(new ChangeCurveStartEdit(cp.getCurve(), cpNew));
+						edit.addEdit(new AtomicAppendControlPoints(cp, cpNew));
+						edit.addEdit(new AtomicChangeCurveStart(cp.getCurve(), cpNew));
 						list.add(cpNew);
 					}
 				}

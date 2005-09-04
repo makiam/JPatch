@@ -9,7 +9,7 @@ public class HookEdit extends JPatchCompoundEdit {
 		if (cpTarget.getChildHook() == null) {
 			Curve hookCurve = cpTarget.createEmptyHookCurve();
 			addEdit(new ChangeCPChildHookEdit(cpTarget));
-			addEdit(new CreateCurveEdit(hookCurve));
+			addEdit(new AtomicAddCurve(hookCurve));
 		}
 		ControlPoint cp = cpTarget.getChildHook();
 		while (cp.getNext() != null && cp.getNext().getHookPos() < hookPos) {
@@ -18,6 +18,6 @@ public class HookEdit extends JPatchCompoundEdit {
 		ControlPoint cpHook = new ControlPoint();
 		cpHook.setHookPos(hookPos);
 		addEdit(new InsertControlPointEdit(cpHook,cp));
-		addEdit(new AttachControlPointsEdit(cpTargetHook, cpHook));
+		addEdit(new AtomicAttachControlPoints(cpTargetHook, cpHook));
 	}
 }

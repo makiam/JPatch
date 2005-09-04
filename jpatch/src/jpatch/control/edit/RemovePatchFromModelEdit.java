@@ -12,7 +12,7 @@ public class RemovePatchFromModelEdit extends JPatchAbstractUndoableEdit {
 		patch.remove();
 	}
 	
-	public String name() {
+	public String getName() {
 		return "remove patch";
 	}
 	

@@ -27,7 +27,7 @@ public class RemoveControlPointFromMorphsEdit extends JPatchAbstractUndoableEdit
 		}
 	}
 	
-	public String name() {
+	public String getName() {
 		return "remove cp from morphs";
 	}
 	

@@ -8,7 +8,7 @@ import jpatch.entity.*;
  * @author     Sascha Ledinsky
  * @created    26. Dezember 2003
  */
-public class DeleteControlPointFromCurveEdit extends JPatchAbstractUndoableEdit {
+public class AtomicDeleteControlPointFromCurve extends JPatchAtomicEdit {
 	private ControlPoint cp;
 	private ControlPoint cpNext;
 	private ControlPoint cpPrev;
@@ -20,7 +20,7 @@ public class DeleteControlPointFromCurveEdit extends JPatchAbstractUndoableEdit 
 	 *
 	 * @param  cp  ControlPoint to remove
 	 */
-	public DeleteControlPointFromCurveEdit(ControlPoint cp) {
+	public AtomicDeleteControlPointFromCurve(ControlPoint cp) {
 		/*
 		 *  store ControlPoint, Curve, next and previous ControlPoints for undo
 		 */
@@ -31,19 +31,11 @@ public class DeleteControlPointFromCurveEdit extends JPatchAbstractUndoableEdit 
 		cpPrev = cp.getPrev();
 		delete();					// remove the ControlPoint
 	}
-
-
-	/**
-	 *  redoes the edit
-	 */
+	
 	public void redo() {
 		delete();
 	}
 
-
-	/**
-	 *  undoes the edit
-	 */
 	public void undo() {
 		undelete();
 	}

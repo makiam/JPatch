@@ -16,7 +16,7 @@ public abstract class AddOrRemoveControlPointsSelectionEdit extends JPatchAbstra
 		mapCPs = controlPoints;
 	}
 
-	public String name() {
+	public String getName() {
 		return "change selection";
 	}
 

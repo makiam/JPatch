@@ -29,7 +29,7 @@ public final class RotateAction extends AbstractAction {
 			PointSelection ps = MainFrame.getInstance().getPointSelection();
 			if (ps != null && ps.getSize() > 1) {
 				//MainFrame.getInstance().getJPatchScreen().setTool(new RotateTool());
-				MainFrame.getInstance().getUndoManager().addEdit(new ChangeToolEdit(new RotateTool()));
+				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(new RotateTool()));
 				MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.ROTATE);
 			} else {
 				MainFrame.getInstance().getMeshToolBar().reset();

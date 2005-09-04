@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchCompoundEdit.java,v 1.2 2005/08/31 16:04:43 sascha_l Exp $
+ * $Id: JPatchCompoundEdit.java,v 1.3 2005/09/04 18:30:32 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -29,29 +29,13 @@ import java.util.*;
  * It's undo() method simply calls the undo() methods of all child
  * edits (in reverse order). It's redo method calls the redo() methods of all child edits.
  *
- * @version	$Revision: 1.2 $
+ * @version	$Revision: 1.3 $
  * @author	Sascha Ledinsky
  */
-public class JPatchCompoundEdit extends JPatchAbstractUndoableEdit {
+public abstract class JPatchCompoundEdit implements JPatchUndoableEdit {
 
 	/** a list holding all child edits */
 	protected List lstEdits = new ArrayList();
-	
-	/** name of the edit */
-	protected String strName;
-	
-	/** Constructor */
-	public JPatchCompoundEdit() {
-		strName = "";
-	}
-	
-	/**
-	 * Constructor
-	 * @param name The name of the edit
-	 */
-	public JPatchCompoundEdit(String name) {
-		strName = name;
-	}
 	
 	/**
 	 * adds an edit to the list
@@ -69,7 +53,7 @@ public class JPatchCompoundEdit extends JPatchAbstractUndoableEdit {
 	public void undo() {
 		//System.out.println("undo " + strName);
 		if (lstEdits.size() == 0) {
-			throw new IllegalStateException("CompoundEdit " + hashCode() + "\"" + strName + "\" is empty!");
+			throw new IllegalStateException("CompoundEdit " + hashCode() + "\"" + getName() + "\" is empty!");
 		}
 		for (int e = lstEdits.size() - 1; e >= 0; e--) {
 			((JPatchUndoableEdit)lstEdits.get(e)).undo();
@@ -90,21 +74,13 @@ public class JPatchCompoundEdit extends JPatchAbstractUndoableEdit {
 	}
 	
 	/**
-	 * returns the name of this edit
-	 * @return the name of this edit
-	 */
-	public String name() {
-		return strName;
-	}
-	
-	/**
 	 * returns the size of the edit
 	 */
 	public int size() {
 		return lstEdits.size();
 	}
 	
-	public boolean isAtomic() {
+	public final boolean isAtomic() {
 		return false;
 	}
 	
@@ -112,10 +88,10 @@ public class JPatchCompoundEdit extends JPatchAbstractUndoableEdit {
 		return (lstEdits.size() > 0);
 	}
 	
-	public void dump(String prefix) {
-		System.out.println(prefix + getClass().getName() + " \"" + name() + "\":");
-		for (Iterator it = lstEdits.iterator(); it.hasNext(); ) {
-			((JPatchAbstractUndoableEdit) it.next()).dump(prefix + "    ");
-		}
-	}
+//	public void dump(String prefix) {
+//		System.out.println(prefix + getClass().getName() + " \"" + getName() + "\":");
+//		for (Iterator it = lstEdits.iterator(); it.hasNext(); ) {
+//			((JPatchUndoableEdit) it.next()).dump(prefix + "    ");
+//		}
+//	}
 }

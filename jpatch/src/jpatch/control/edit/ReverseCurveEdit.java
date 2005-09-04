@@ -11,7 +11,7 @@ public class ReverseCurveEdit extends JPatchAbstractUndoableEdit {
 		curve.reverse();
 	}
 	
-	public String name() {
+	public String getName() {
 		return "reverse curve";
 	}
 	

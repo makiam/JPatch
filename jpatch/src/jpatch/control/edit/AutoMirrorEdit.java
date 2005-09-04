@@ -67,7 +67,7 @@ public class AutoMirrorEdit extends CloneCommonEdit {
 								ControlPoint next = hook.getNext();
 								//System.out.println(hook);
 								/* remove hook from hook curve */
-								addEdit(new RemoveControlPointFromCurveEdit(hook));
+								addEdit(new AtomicRemoveControlPointFromCurve(hook));
 								
 								/* and insert it on the parent curve */
 								addEdit(new InsertControlPointEdit(hook, cpToAppend));
@@ -100,7 +100,7 @@ public class AutoMirrorEdit extends CloneCommonEdit {
 							}
 							
 							/* remove the hook-curve */
-							addEdit(new RemoveCurveFromModelEdit(hookCurve));
+							addEdit(new AtomicRemoveCurve(hookCurve));
 							addEdit(new ChangeCPChildHookEdit(cp, null));
 							
 							/* correct patches */
@@ -170,7 +170,7 @@ public class AutoMirrorEdit extends CloneCommonEdit {
 			/* remove dead curves */
 			for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
 				if (curve.getStart().getCurve() != curve) {
-					addEdit(new RemoveCurveFromModelEdit(curve));
+					addEdit(new AtomicRemoveCurve(curve));
 				}
 			}
 			

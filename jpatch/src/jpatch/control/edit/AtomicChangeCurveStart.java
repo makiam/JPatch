@@ -2,16 +2,14 @@ package jpatch.control.edit;
 
 import jpatch.entity.*;
 
-public class ChangeCurveStartEdit extends JPatchAbstractUndoableEdit {
-	
+public class AtomicChangeCurveStart extends JPatchAtomicEdit {
 	private Curve curve;
 	private ControlPoint cpStart;
 
-	public ChangeCurveStartEdit(Curve curve, ControlPoint start) {
+	public AtomicChangeCurveStart(Curve curve, ControlPoint start) {
 		this.curve = curve;
 		cpStart = start;
 		swap();
-		//System.out.println("ChangeCurveStart " + curve.hashCode() + " newstart = " + curve.getStart().number());
 	}
 	
 	public void undo() {

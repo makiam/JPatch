@@ -1,5 +1,5 @@
 /**
- * $Id: NewLatheEditorEdit.java,v 1.6 2005/08/30 14:25:18 sascha_l Exp $
+ * $Id: NewLatheEditorEdit.java,v 1.7 2005/09/04 18:30:31 sascha_l Exp $
  */
 package jpatch.control.edit;
 
@@ -11,7 +11,7 @@ import jpatch.boundary.*;
 /**
  * 
  * @author lois
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  * 
  */
 
@@ -85,7 +85,7 @@ public class NewLatheEditorEdit extends JPatchCompoundEdit {
 		// add edits
 		Curve curve = new Curve(cpts[0]); //, MainFrame.getInstance().getModel());
 		//curve.validate();
-		addEdit(new CreateCurveEdit(curve));	// create the new curve
+		addEdit(new AtomicAddCurve(curve));	// create the new curve
 		addEdit(new ValidateCurveEdit(curve));  // validate the curve
 		addEdit(new NewLatheEdit(cpts, iSegments, epsilon)); // lathe the curve
 	}	
