@@ -198,16 +198,12 @@ public final class Curve {
 	 */
 	public final ControlPoint[] getControlPointArray() {
 		int points = getLength();
-		if (points > 0) {
-			ControlPoint[] acp = new ControlPoint[points];
-			int n = 0;
-			for (ControlPoint cp = cpStart; cp != null; cp = cp.getNextCheckNextLoop()) {
-				acp[n++] = cp;
-			}
-			return acp;
-		} else {
-			return null;
+		ControlPoint[] acp = new ControlPoint[points];
+		int n = 0;
+		for (ControlPoint cp = cpStart; cp != null; cp = cp.getNextCheckNextLoop()) {
+			acp[n++] = cp;
 		}
+		return acp;
 	}
 
 //	/**
