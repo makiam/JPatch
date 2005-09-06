@@ -10,7 +10,7 @@ public class AtomicAddCurve extends JPatchAtomicEdit {
 	public AtomicAddCurve(Curve curve, Model model) {
 		this.curve = curve;
 		this.model = model;
-		model.addCurve(curve);
+		redo();
 	}
 	
 	public void undo() {
@@ -19,6 +19,11 @@ public class AtomicAddCurve extends JPatchAtomicEdit {
 	
 	public void redo() {
 		model.addCurve(curve);
+		curve.validate();
+	}
+	
+	public int sizeOf() {
+		return 8 + 4 + 4;
 	}
 }
 

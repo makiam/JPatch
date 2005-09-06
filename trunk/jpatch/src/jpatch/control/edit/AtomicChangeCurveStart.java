@@ -25,4 +25,8 @@ public class AtomicChangeCurveStart extends JPatchAtomicEdit {
 		cpStart = curve.getStart();
 		curve.setStart(cp);
 	}
+	
+	public int sizeOf() {
+		return 8 + 4 + 4;
+	}
 }

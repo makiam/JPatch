@@ -29,6 +29,10 @@ public class AtomicChangePatchMaterial extends JPatchAtomicEdit {
 		material = patch.getMaterial();
 		patch.setMaterial(dummy);
 	}
+	
+	public int sizeOf() {
+		return 8 + 4 + 4;
+	}
 }
 
 

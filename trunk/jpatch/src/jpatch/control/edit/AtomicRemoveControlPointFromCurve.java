@@ -82,5 +82,9 @@ public class AtomicRemoveControlPointFromCurve extends JPatchAtomicEdit {
 			curve.setStart(cpNext);			// set start of curve to next cp (might be null)
 		}
 	}
+	
+	public int sizeOf() {
+		return 8 + 4 + 4 + 4 + 4 + 1;
+	}
 }
 
