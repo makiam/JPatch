@@ -29,7 +29,7 @@ public class RemoveCurveSegmentEdit extends JPatchCompoundEdit {
 				}
 				
 				/* remove hook curve */
-				addEdit(new CompoundRemoveHookCurve(cp.getChildHook().getCurve()));
+				addEdit(new CompoundDropCurve(cp.getChildHook().getCurve()));
 			}
 			addEdit(new ChangeCPChildHookEdit(cp, null));
 		}
@@ -71,7 +71,7 @@ public class RemoveCurveSegmentEdit extends JPatchCompoundEdit {
 						if (hookCurve.getLength() == 2) {
 							addEdit(new ChangeCPChildHookEdit(hookCurve.getStart().getParentHook(),null));
 							//addEdit(new RemoveCurveFromModelEdit(hookCurve));
-							addEdit(new CompoundRemoveHookCurve(hookCurve));
+							addEdit(new CompoundDropCurve(hookCurve));
 						}
 					}
 					
@@ -97,7 +97,7 @@ public class RemoveCurveSegmentEdit extends JPatchCompoundEdit {
 					addEdit(new RemoveControlPointFromSelectionsEdit(cp.getNextAttached()));
 					if (hookCurve.getLength() == 2) {
 						addEdit(new ChangeCPChildHookEdit(hookCurve.getStart().getParentHook(),null));
-						addEdit(new CompoundRemoveHookCurve(hookCurve));
+						addEdit(new CompoundDropCurve(hookCurve));
 					}
 				}
 			} else {
@@ -118,7 +118,7 @@ public class RemoveCurveSegmentEdit extends JPatchCompoundEdit {
 						if (hookCurve.getLength() == 2) {
 							addEdit(new ChangeCPChildHookEdit(hookCurve.getStart().getParentHook(),null));
 							//addEdit(new RemoveCurveFromModelEdit(hookCurve));
-							addEdit(new CompoundRemoveHookCurve(hookCurve));
+							addEdit(new CompoundDropCurve(hookCurve));
 						}
 					}
 					

@@ -14,6 +14,8 @@ public final class AtomicReverseCurve extends JPatchAtomicEdit {
 	
 	public AtomicReverseCurve(Curve curve) {
 		this.curve = curve;
+		if (curve.getStart().getLoop())
+			throw new IllegalArgumentException(this.getClass().getName() + " can't be applied to closed (looped) curve " + curve);
 		reverseCurve(curve);
 	}
 	
@@ -52,5 +54,9 @@ public final class AtomicReverseCurve extends JPatchAtomicEdit {
 			cp.setPrev(cpDummy);
 			cp.setTangentsValid(false);
 		}
+	}
+	
+	public int sizeOf() {
+		return 8 + 4;
 	}
 }

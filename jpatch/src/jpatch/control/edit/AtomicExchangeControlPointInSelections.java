@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicRemoveControlPointFromSelections.java,v 1.2 2005/09/06 13:44:52 sascha_l Exp $
+ * $Id$
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -30,18 +30,19 @@ import jpatch.boundary.*;
  * @author sascha
  *
  */
-public final class AtomicRemoveControlPointFromSelections extends JPatchAtomicEdit {
-	private final ControlPoint cp;
+public final class AtomicExchangeControlPointInSelections extends JPatchAtomicEdit {
+	private final ControlPoint cpOld, cpNew;
 	private final Model model;
 	private final HashMap mapSelections = new HashMap();
 	
-	public AtomicRemoveControlPointFromSelections(ControlPoint cp) {
-		this.cp = cp;
-		this.model = cp.getCurve().getModel();
+	public AtomicExchangeControlPointInSelections(ControlPoint cpOld, ControlPoint cpNew) {
+		this.cpOld = cpOld;
+		this.cpNew = cpNew;
+		this.model = cpOld.getCurve().getModel();
 		for (Iterator it = model.getSelections().iterator(); it.hasNext(); ) {
 			NewSelection selection = (NewSelection) it.next();
-			if (selection.contains(cp))
-				mapSelections.put(selection, selection.getMap().get(cp));
+			if (selection.contains(cpOld))
+				mapSelections.put(selection, selection.getMap().get(cpOld));
 		}
 		redo();
 	}
@@ -49,18 +50,20 @@ public final class AtomicRemoveControlPointFromSelections extends JPatchAtomicEd
 	public void undo() {
 		for (Iterator it = mapSelections.keySet().iterator(); it.hasNext(); ) {
 			NewSelection selection = (NewSelection) it.next();
-			selection.getMap().put(cp, mapSelections.get(selection)); 
+			selection.getMap().remove(cpNew);
+			selection.getMap().put(cpOld, mapSelections.get(selection)); 
 		}
 	}
 	
 	public void redo() {
 		for (Iterator it = mapSelections.keySet().iterator(); it.hasNext(); ) {
 			NewSelection selection = (NewSelection) it.next();
-			selection.getMap().remove(cp); 
+			selection.getMap().remove(cpOld);
+			selection.getMap().put(cpNew, mapSelections.get(selection));
 		}
 	}
 	
 	public int sizeOf() {
-		return 8 + 4 + 4  + 4 + (8 + 4 + 4 + 4 + 4 + 8 * mapSelections.size() * 2);
+		return 8 + 4 + 4 + 4 + 4 + (8 + 4 + 4 + 4 + 4 + 8 * mapSelections.size() * 2);
 	}
 }

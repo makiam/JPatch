@@ -16,7 +16,7 @@ public class WeldControlPointsEdit extends JPatchCompoundEdit {
 			if (cpLooseEndA.getPrevAttached() != null) {
 				addEdit(CorrectSelectionsEdit.attachPoints(cpLooseEndA.getPrevAttached(),cpLooseEndB.getTail()));
 			}
-			addEdit(new ComplexAppendControlPointsEdit(cpLooseEndA, cpLooseEndB));
+			addEdit(new CompoundAppendControlPoints(cpLooseEndA, cpLooseEndB));
 		} else {
 			addEdit(CorrectSelectionsEdit.attachPoints(cpA.getHead(),cpB.getTail()));
 		}

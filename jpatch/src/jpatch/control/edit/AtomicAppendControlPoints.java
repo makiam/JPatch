@@ -48,6 +48,10 @@ public final class AtomicAppendControlPoints extends JPatchAtomicEdit {
 		cpB.setNext(cpBnext);
 		cpA.setCurve(curve);
 	}
+	
+	public int sizeOf() {
+		return 8 + 4 + 4 + 4 + 4 + 4;
+	}
 }
 
 

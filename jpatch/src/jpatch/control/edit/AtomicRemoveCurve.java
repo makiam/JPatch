@@ -14,11 +14,15 @@ public class AtomicRemoveCurve extends JPatchAtomicEdit {
 	}
 	
 	public void undo() {
-		curve.validate();
+//		curve.validate();
 		model.addCurve(curve);
 	}
 	
 	public void redo() {
 		model.removeCurve(curve);
+	}
+	
+	public int sizeOf() {
+		return 8 + 4 + 4;
 	}
 }

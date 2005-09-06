@@ -65,6 +65,10 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 			cp.setParentHook(cpParentHook);
 			cpParentHook = dummy;
 		}
+		
+		public int sizeOf() {
+			return 8 + 4 + 4;
+		}
 	}
 	
 	public static final class ChildHook extends AtomicChangeControlPoint {
@@ -81,6 +85,10 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 			cp.setChildHook(cpChildHook);
 			cpChildHook = dummy;
 		}
+		
+		public int sizeOf() {
+			return 8 + 4 + 4;
+		}
 	}
 	
 	public static final class Loop extends AtomicChangeControlPoint {
@@ -91,6 +99,10 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		
 		void swap() {
 			cp.setLoop(!cp.getLoop());
+		}
+		
+		public int sizeOf() {
+			return 8 + 4;
 		}
 	}
 	
@@ -108,6 +120,10 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 			cp.setCurve(curve);
 			curve = dummy;
 		}
+		
+		public int sizeOf() {
+			return 8 + 4 + 4;
+		}
 	}
 	
 	public static final class HookPos extends AtomicChangeControlPoint {
@@ -123,6 +139,10 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 			float dummy = cp.getHookPos();
 			cp.setHookPos(fHookPos);
 			fHookPos = dummy;
+		}
+		
+		public int sizeOf() {
+			return 8 + 4 + 4;
 		}
 	}
 	
@@ -140,6 +160,10 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 			cp.setMagnitude(fMagnitude);
 			fMagnitude = dummy;
 		}
+		
+		public int sizeOf() {
+			return 8 + 4 + 4;
+		}
 	}
 	
 	public static final class TangentMode extends AtomicChangeControlPoint {
@@ -155,6 +179,10 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 			int dummy = cp.getMode();
 			cp.setMode(iTangentMode);
 			iTangentMode = dummy;
+		}
+		
+		public int sizeOf() {
+			return 8 + 4 + 4;
 		}
 	}
 	
@@ -172,6 +200,10 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 			dummy.set(cp.getPosition());
 			cp.setPosition(p3Position);
 			p3Position.set(dummy);
+		}
+		
+		public int sizeOf() {
+			return 8 + 4 + (8 + 4 + 4 + 4);
 		}
 	}
 }
