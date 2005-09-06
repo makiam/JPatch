@@ -35,59 +35,66 @@ import java.util.*;
 public abstract class JPatchCompoundEdit implements JPatchUndoableEdit {
 
 	/** a list holding all child edits */
-	protected List lstEdits = new ArrayList();
+	protected List listEdits = new ArrayList(1);
 	
 	/**
 	 * adds an edit to the list
 	 * @param edit The edit to add
 	 */
-	public void addEdit(JPatchUndoableEdit edit) {
+	public final void addEdit(JPatchUndoableEdit edit) {
 		if (edit.isAtomic() || ((JPatchCompoundEdit) edit).isValid()) {
-			lstEdits.add(edit);
+			listEdits.add(edit);
 		}
 	}
 	
 	/**
 	 * undoes all child edits in reverse order
 	 */
-	public void undo() {
+	public final void undo() {
 		//System.out.println("undo " + strName);
-		if (lstEdits.size() == 0) {
-			throw new IllegalStateException("CompoundEdit " + hashCode() + "\"" + getName() + "\" is empty!");
+		if (listEdits.size() == 0) {
+			throw new IllegalStateException(this + " is empty!");
 		}
-		for (int e = lstEdits.size() - 1; e >= 0; e--) {
-			((JPatchUndoableEdit)lstEdits.get(e)).undo();
+		for (int e = listEdits.size() - 1; e >= 0; e--) {
+			((JPatchUndoableEdit)listEdits.get(e)).undo();
 		}
 	}
 	
 	/**
 	 * redoes all child edits
 	 */
-	public void redo() {
+	public final void redo() {
 		//System.out.println("redo " + strName);
-		if (lstEdits.size() == 0) {
+		if (listEdits.size() == 0) {
 			throw new IllegalStateException("CompoundEdit " + hashCode() + " is empty!");
 		}
-		for (int e = 0; e < lstEdits.size(); e++) {
-			((JPatchUndoableEdit)lstEdits.get(e)).redo();
+		for (int e = 0; e < listEdits.size(); e++) {
+			((JPatchUndoableEdit)listEdits.get(e)).redo();
 		}
 	}
 	
 	/**
 	 * returns the size of the edit
 	 */
-	public int size() {
-		return lstEdits.size();
+	public final int size() {
+		return listEdits.size();
 	}
 	
 	public final boolean isAtomic() {
 		return false;
 	}
 	
-	public boolean isValid() {
-		return (lstEdits.size() > 0);
+	public final boolean isValid() {
+		return (listEdits.size() > 0);
 	}
 	
+	public final int sizeOf() {
+		int size = 8 + 4 + (8 + 4 + 4 + 4);
+		for (Iterator it = listEdits.iterator(); it.hasNext(); ) {
+			size += (4 + ((JPatchUndoableEdit) it.next()).sizeOf());
+		}
+		return size;
+	}
 //	public void dump(String prefix) {
 //		System.out.println(prefix + getClass().getName() + " \"" + getName() + "\":");
 //		for (Iterator it = lstEdits.iterator(); it.hasNext(); ) {

@@ -68,4 +68,8 @@ public class AtomicDeleteControlPointFromCurve extends JPatchAtomicEdit {
 			cpNext.setPrev(null);
 		}
 	}
+	
+	public int sizeOf() {
+		return 8 + 4 + 4 + 4 + 4;
+	}
 }

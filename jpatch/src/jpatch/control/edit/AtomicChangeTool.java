@@ -37,4 +37,8 @@ public class AtomicChangeTool extends JPatchAtomicEdit implements JPatchRootEdit
 			//MainFrame.getInstance().getMeshToolBar().reset();
 		}
 	}
+	
+	public int sizeOf() {
+		return 8 + 4;
+	}
 }

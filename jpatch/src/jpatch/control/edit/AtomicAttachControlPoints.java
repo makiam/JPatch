@@ -44,6 +44,10 @@ public class AtomicAttachControlPoints extends JPatchAtomicEdit {
 		cpA.setNextAttached(cpAnextAttached);
 		cpB.setPrevAttached(cpBprevAttached);
 	}
+	
+	public int sizeOf() {
+		return 8 + 4 + 4 + 4 + 4;
+	}
 }
 
 

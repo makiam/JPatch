@@ -70,4 +70,8 @@ public class AtomicDetatchControlPoint extends JPatchAtomicEdit {
 		//cp.setNextAttached(cpNextAttached);
 		//cp.setPrevAttached(cpPrevAttached);
 	}
+	
+	public int sizeOf() {
+		return 8 + 4 + 4 + 4;
+	}
 }

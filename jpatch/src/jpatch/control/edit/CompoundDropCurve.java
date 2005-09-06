@@ -2,15 +2,15 @@ package jpatch.control.edit;
 
 import jpatch.entity.*;
 
-public class CompoundRemoveHookCurve extends JPatchCompoundEdit {
+public class CompoundDropCurve extends JPatchCompoundEdit {
 	
-	public CompoundRemoveHookCurve(Curve curve) {
-		if (curve.getStart().getParentHook() == null)
-			throw new IllegalArgumentException("Curve " + curve + " is not a hook curve");
-		ControlPoint[] acp = curve.getControlPointArray();
-		for (int i = 0; i < acp.length; i++) {
-			addEdit(new CompoundDeleteControlPoint(acp[i]));
+	public CompoundDropCurve(Curve curve) {
+		// loop over all points on the curve
+		for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
+			// drop the cp
+			addEdit(new CompoundDropControlPoint(cp));
 		}
+		// remove the curve
 		addEdit(new AtomicRemoveCurve(curve));
 	}
 }
