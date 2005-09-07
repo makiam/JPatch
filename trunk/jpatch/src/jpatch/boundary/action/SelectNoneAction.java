@@ -22,7 +22,7 @@ public final class SelectNoneAction extends AbstractAction {
 		//PointSelection ps = MainFrame.getInstance().getPointSelection();
 		//if (ps != null) {
 		//	boolean selectCurveOnly = (ps.isSingle() && (ps.isCurve() || ps.getControlPoint().getPrevAttached() == null));
-		MainFrame.getInstance().getUndoManager().addEdit(new ChangeSelectionEdit(null));
+		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(null));
 		MainFrame.getInstance().getJPatchScreen().update_all();
 		//}
 	}

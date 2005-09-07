@@ -41,7 +41,7 @@ public abstract class JPatchCompoundEdit implements JPatchUndoableEdit {
 	 * adds an edit to the list
 	 * @param edit The edit to add
 	 */
-	public final void addEdit(JPatchUndoableEdit edit) {
+	protected void addEdit(JPatchUndoableEdit edit) {
 		if (edit.isAtomic() || ((JPatchCompoundEdit) edit).isValid()) {
 			listEdits.add(edit);
 		}

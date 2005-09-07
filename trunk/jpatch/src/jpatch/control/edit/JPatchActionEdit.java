@@ -21,15 +21,22 @@
  */
 package jpatch.control.edit;
 
-import jpatch.entity.*;
-
 /**
  * @author sascha
  *
  */
-public final class CompoundExchangeControlPointInEntities extends JPatchCompoundEdit {
+public final class JPatchActionEdit extends JPatchCompoundEdit implements JPatchRootEdit {
+	private final String strName;
 	
-	public CompoundExchangeControlPointInEntities(ControlPoint cpOld, ControlPoint cpNew) {
-		addEdit(new AtomicExchangeControlPointInSelections(cpOld, cpNew));
+	public JPatchActionEdit(String name) {
+		strName = name;
+	}
+	
+	public String getName() {
+		return strName;
+	}
+	
+	public void addEdit(JPatchUndoableEdit edit) {
+		super.addEdit(edit);
 	}
 }

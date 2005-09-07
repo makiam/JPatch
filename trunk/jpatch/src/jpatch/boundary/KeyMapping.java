@@ -26,6 +26,16 @@ public class KeyMapping {
 		return null;
 	}
 
+	public static String getKeyString(String function) {
+		for (int i = 0; i < settings.astrKeyMap.length; i++) {
+			String[] m = settings.astrKeyMap[i].split("\t+");
+			if (m[0].toLowerCase().equals(function.toLowerCase())) {
+				return ("  [" + m[2] + "]");
+			}
+		}
+		return null;
+	}
+	
 	private static JPatchKey getJPatchKey(String key) {
 		String[] s = key.split("-");
 		String k;

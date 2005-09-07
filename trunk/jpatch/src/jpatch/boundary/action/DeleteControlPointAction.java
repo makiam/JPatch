@@ -87,7 +87,7 @@ public final class DeleteControlPointAction extends AbstractAction {
 				}
 			}
 			//if (compoundEdit.size() > 0) {
-				compoundEdit.addEdit(new ChangeSelectionEdit(null));
+				compoundEdit.addEdit(new AtomicChangeSelection(null));
 				MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
 			//}
 			//MainFrame.getInstance().setSelection(null);
