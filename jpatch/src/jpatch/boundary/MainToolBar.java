@@ -3,8 +3,9 @@ package jpatch.boundary;
 import javax.swing.*;
 
 import jpatch.boundary.action.*;
+import jpatch.control.edit.*;
 
-public final class MainToolBar extends JToolBar {
+public final class MainToolBar extends JToolBar implements JPatchUndoManager.UndoListener {
 	/**
 	 * 
 	 */
@@ -137,6 +138,16 @@ public final class MainToolBar extends JToolBar {
 		//<<<<< test-replace
 		
 		setFocusable(false);
+		buttonUndo.setEnabled(false);
+		buttonRedo.setEnabled(false);
+		MainFrame.getInstance().getUndoManager().addUndoListener(this);
+	}
+	
+	public void undoStateChanged(JPatchUndoManager undoManager) {
+		buttonUndo.setEnabled(undoManager.canUndo());
+		buttonUndo.setToolTipText("undo " + undoManager.undoName() + KeyMapping.getKeyString("undo"));
+		buttonRedo.setEnabled(undoManager.canRedo());
+		buttonRedo.setToolTipText("redo " + undoManager.redoName() + KeyMapping.getKeyString("redo"));
 	}
 	
 	//>>>>> test-add

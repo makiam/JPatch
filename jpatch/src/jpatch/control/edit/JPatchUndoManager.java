@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchUndoManager.java,v 1.3 2005/09/04 18:30:31 sascha_l Exp $
+ * $Id: JPatchUndoManager.java,v 1.4 2005/09/07 16:19:02 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -23,18 +23,17 @@
 package jpatch.control.edit;
 
 import java.util.*;
-import java.io.*;
 
 /**
  * The JPatchUndoManager stores JPatchUndoableEdits in a list and provides methods to add, redo and undo edits.<br>
  * It keeps track of the position in the position inside the list
  *
- * @version	$Revision: 1.3 $
+ * @version	$Revision: 1.4 $
  * @author	Sascha Ledinsky
  */
 public class JPatchUndoManager {
 	/** list holding all edits */
-	private List lstEdits = new ArrayList();
+	private List listEdits = new ArrayList();
 	/** depht of undo-list */
 	private int iDepth;
 	/** pointer to the current element in the undo-list */
@@ -48,6 +47,8 @@ public class JPatchUndoManager {
 	
 	private int iStop = 0;
 	
+	private List listListeners = new ArrayList();
+	
 	/**
 	 * Constructor
 	 * @param depth The depth of the undo buffer
@@ -57,28 +58,29 @@ public class JPatchUndoManager {
 	}
 	
 	public void clear() {
-		lstEdits.clear();
+		listEdits.clear();
 		iPos = 0;
+		fireUndoStateChanged();
 	}
 	
 	public void setStop() {
 		iStop = iPos;
+		fireUndoStateChanged();
 	}
 	
 	public void clearStop() {
 		iStop = 0;
+		fireUndoStateChanged();
 	}
 	
 	public void rewind() {
 		iPos = iStop;
 		iStop = 0;
+		fireUndoStateChanged();
 	}
 	
-	public void addEdit(JPatchUndoableEdit edit) {
-//		if (edit instanceof ChangeToolEdit)
-//			addEdit(edit, true);
-//		else
-			addEdit(edit, false);
+	public void addEdit(JPatchRootEdit edit) {
+		addEdit(edit, false);
 	}
 			
 	/**
@@ -88,37 +90,45 @@ public class JPatchUndoManager {
 	 * after the last not undone edit will be dropped.
 	 * @param edit The edit to add
 	 */
-	public void addEdit(JPatchUndoableEdit edit, boolean open) {
+	public void addEdit(JPatchRootEdit edit, boolean open) {
 		if (bOpen) {
-			addToCurrentEdit(edit, open);
+			appendEdit(edit, open);
 			return;
 		}
 		bOpen = open;
-		//System.out.println("UndoManager.addEdit(" + edit + ")");
+		add(edit);
+	}
+
+	private void add(JPatchRootEdit edit) {
 		if (bEnabled) {
-			if (iPos == lstEdits.size()) {			// check if we are at the end of the list
-				lstEdits.add(edit);
-				if (lstEdits.size() > iDepth) {
-					lstEdits.remove(0);		// remove first item if list is full
+			if (iPos == listEdits.size()) {			// check if we are at the end of the list
+				listEdits.add(edit);
+				if (listEdits.size() > iDepth) {
+					listEdits.remove(0);		// remove first item if list is full
 					if (iStop > 0) iStop--;		// move back stop marker
 				} else {
 					iPos++;				// increase pointer
 				}
 			} else {
-				while (iPos < lstEdits.size()) {	// remove all edits after current one
-					lstEdits.remove(iPos);
+				while (iPos < listEdits.size()) {	// remove all edits after current one
+					listEdits.remove(iPos);
 				}
-				lstEdits.add(edit);			// add new edit
+				listEdits.add(edit);			// add new edit
 				iPos++;					// increase pointer
 			}
 			bChange = true;
 		}
+		fireUndoStateChanged();
 	}
-
-	private void addToCurrentEdit(JPatchUndoableEdit edit, boolean open) {
+	
+	public void appendEdit(JPatchRootEdit edit, boolean open) {
 		bOpen = open;
-		JPatchCompoundEdit compoundEdit = (JPatchCompoundEdit) lstEdits.get(iPos - 1);
-		compoundEdit.addEdit(edit);
+		JPatchRootEdit oldEdit = (JPatchRootEdit) listEdits.get(--iPos);
+		listEdits.remove(iPos);
+		JPatchActionEdit newEdit = new JPatchActionEdit(edit.getName());
+		newEdit.addEdit(oldEdit);
+		newEdit.addEdit(edit);
+		add(newEdit);
 	}
 	
 	public void setChange(boolean change) {
@@ -131,6 +141,7 @@ public class JPatchUndoManager {
 	
 	public void setEnabled(boolean enable) {
 		bEnabled = enable;
+		fireUndoStateChanged();
 	}
 	
 	/**
@@ -138,17 +149,20 @@ public class JPatchUndoManager {
 	 */
 	public void undo() {
 		if (iPos > iStop) {
-			((JPatchUndoableEdit)lstEdits.get(--iPos)).undo();
+			((JPatchUndoableEdit)listEdits.get(--iPos)).undo();
 		}
+		bOpen = false;
+		fireUndoStateChanged();
 	}
 	
 	/**
 	 * redoes an edit
 	 */
 	public void redo() {
-		if (iPos < lstEdits.size()) {
-			((JPatchUndoableEdit)lstEdits.get(iPos++)).redo();
+		if (iPos < listEdits.size()) {
+			((JPatchUndoableEdit)listEdits.get(iPos++)).redo();
 		}
+		fireUndoStateChanged();
 	}
 	
 	/**
@@ -164,7 +178,7 @@ public class JPatchUndoManager {
 	 * @return true if it is possible to redo, false otherwise
 	 */
 	public boolean canRedo() {
-		return (iPos < lstEdits.size());
+		return (iPos < listEdits.size());
 	}
 	
 	/**
@@ -172,8 +186,8 @@ public class JPatchUndoManager {
 	 * @return name of the next edit which can be undone or "" othewise
 	 */
 	public String undoName() {
-		if (iPos > iStop) {
-			return ((JPatchUndoableEdit)lstEdits.get(iPos - 1)).getName();
+		if (canUndo()) {
+			return ((JPatchRootEdit)listEdits.get(iPos - 1)).getName();
 		} else {
 			return "";
 		}
@@ -184,11 +198,28 @@ public class JPatchUndoManager {
 	 * @return name of the next edit which can be redone "" otherwise
 	 */
 	public String redoName() {
-		if (iPos < lstEdits.size()) {
-			return ((JPatchUndoableEdit)lstEdits.get(iPos)).getName();
+		if (canRedo()) {
+			return ((JPatchRootEdit)listEdits.get(iPos)).getName();
 		} else {
 			return "";
 		}
+	}
+	
+	public void addUndoListener(UndoListener listener) {
+		listListeners.add(listener);
+	}
+	
+	public void removeUndoListener(UndoListener listener) {
+		listListeners.remove(listener);
+	}
+	
+	private void fireUndoStateChanged() {
+		for (int i = listListeners.size() - 1; i >= 0; i--) {
+			((UndoListener) listListeners.get(i)).undoStateChanged(this);
+		}
+	}
+	public static interface UndoListener {
+		public void undoStateChanged(JPatchUndoManager undoManager);
 	}
 	
 //	/**

@@ -34,7 +34,7 @@ public final class InsertControlPointAction extends AbstractAction {
 						compoundEdit.addEdit(new RemovePatchFromModelEdit(patch));
 					}
 				}
-				compoundEdit.addEdit(new InsertControlPointEdit(cp, scp));
+				compoundEdit.addEdit(new AtomicInsertControlPoint(cp, scp));
 				MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}

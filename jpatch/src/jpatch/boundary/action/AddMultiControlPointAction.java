@@ -20,10 +20,10 @@ public final class AddMultiControlPointAction extends AbstractAction {
 	public void actionPerformed(ActionEvent actionEvent) {
 		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.ADD_LOCK) {
 			if (MainFrame.getInstance().getSelection() != null) {
-				JPatchCompoundEdit compoundEdit = new JPatchCompoundEdit();
-				compoundEdit.addEdit(new ChangeSelectionEdit(null));
-				compoundEdit.addEdit(new AtomicChangeTool(null));
-				MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
+				JPatchActionEdit edit = new JPatchActionEdit("Reset selection, reset tool");
+				edit.addEdit(new AtomicChangeSelection(null));
+				edit.addEdit(new AtomicChangeTool(null));
+				MainFrame.getInstance().getUndoManager().addEdit(edit, true);
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
 			MainFrame.getInstance().getJPatchScreen().setTool(null);

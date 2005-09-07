@@ -21,7 +21,7 @@ public class ConvertHookToCpEdit extends JPatchCompoundEdit {
 		addEdit(new AtomicRemoveControlPointFromCurve(hook));
 		
 		/* and insert it on the parent curve */
-		addEdit(new InsertControlPointEdit(hook, parentHook));
+		addEdit(new AtomicInsertControlPoint(hook, parentHook));
 		
 		/* and convert it to a regular controlpoint by setting hookpos to -1 */
 		addEdit(new ChangeCPHookPosEdit(hook,-1));
@@ -78,7 +78,7 @@ public class ConvertHookToCpEdit extends JPatchCompoundEdit {
 					} else {
 						addEdit(new ChangeCPHookPosEdit(cp, (hp - hookPos) / ( 1 - hookPos)));
 						addEdit(new AtomicRemoveControlPointFromCurve(cp));
-						addEdit(new InsertControlPointEdit(cp, cpAppend));
+						addEdit(new AtomicInsertControlPoint(cp, cpAppend));
 						cpAppend = cp;
 					}
 				}

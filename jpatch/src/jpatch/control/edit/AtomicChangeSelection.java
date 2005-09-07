@@ -7,10 +7,10 @@ import jpatch.boundary.selection.*;
  * Use this class for changing selections (with the default tool)
  */
 
-public class ChangeSelectionEdit extends JPatchAbstractUndoableEdit {
+public class AtomicChangeSelection extends JPatchAtomicEdit {
 	private NewSelection selection;
 	
-	public ChangeSelectionEdit(NewSelection selection) {
+	public AtomicChangeSelection(NewSelection selection) {
 		this.selection = selection;
 		swap();
 	}
@@ -23,13 +23,13 @@ public class ChangeSelectionEdit extends JPatchAbstractUndoableEdit {
 		swap();
 	}
 	
+	public int sizeOf() {
+		return 8 + 4; // FIXME: add size of selection
+	}
+	
 	private void swap() {
 		NewSelection dummy = selection;
 		selection = MainFrame.getInstance().getSelection();
 		MainFrame.getInstance().setSelection(dummy);
-	}
-	
-	public void dump(String prefix) {
-		System.out.println(prefix + getClass().getName() + " \"" + name() + "\" (" + selection + ")");
 	}
 }

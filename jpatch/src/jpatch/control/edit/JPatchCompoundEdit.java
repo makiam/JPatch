@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchCompoundEdit.java,v 1.4 2005/09/06 13:44:53 sascha_l Exp $
+ * $Id: JPatchCompoundEdit.java,v 1.5 2005/09/07 16:19:02 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -29,7 +29,7 @@ import java.util.*;
  * It's undo() method simply calls the undo() methods of all child
  * edits (in reverse order). It's redo method calls the redo() methods of all child edits.
  *
- * @version	$Revision: 1.4 $
+ * @version	$Revision: 1.5 $
  * @author	Sascha Ledinsky
  */
 public abstract class JPatchCompoundEdit implements JPatchUndoableEdit {
@@ -41,7 +41,7 @@ public abstract class JPatchCompoundEdit implements JPatchUndoableEdit {
 	 * adds an edit to the list
 	 * @param edit The edit to add
 	 */
-	public final void addEdit(JPatchUndoableEdit edit) {
+	protected void addEdit(JPatchUndoableEdit edit) {
 		if (edit.isAtomic() || ((JPatchCompoundEdit) edit).isValid()) {
 			listEdits.add(edit);
 		}

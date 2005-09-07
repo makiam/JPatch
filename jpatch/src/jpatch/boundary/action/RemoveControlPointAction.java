@@ -75,7 +75,7 @@ public final class RemoveControlPointAction extends AbstractAction {
 					}
 				}
 			}
-			compoundEdit.addEdit(new ChangeSelectionEdit(null));
+			compoundEdit.addEdit(new AtomicChangeSelection(null));
 			MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
 			//MainFrame.getInstance().setSelection(null);
 			MainFrame.getInstance().getJPatchScreen().update_all();

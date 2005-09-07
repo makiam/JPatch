@@ -30,7 +30,7 @@ public final class SelectAllAction extends AbstractAction {
 				if (cp.isHead() && !cp.isHidden() && !cp.isStartHook() && !cp.isEndHook()) ps.addControlPoint(cp);
 			}
 		}
-		MainFrame.getInstance().getUndoManager().addEdit(new ChangeSelectionEdit(ps));
+		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(ps));
 		MainFrame.getInstance().getJPatchScreen().update_all();
 		//}
 	}

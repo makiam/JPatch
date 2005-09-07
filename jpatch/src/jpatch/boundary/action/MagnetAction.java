@@ -20,7 +20,7 @@ public final class MagnetAction extends AbstractAction {
 		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.MAGNET) {
 			if (MainFrame.getInstance().getSelection() != null) {
 				JPatchCompoundEdit compoundEdit = new JPatchCompoundEdit();
-				compoundEdit.addEdit(new ChangeSelectionEdit(null));
+				compoundEdit.addEdit(new AtomicChangeSelection(null));
 				compoundEdit.addEdit(new AtomicChangeTool(null));
 				MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
 				MainFrame.getInstance().getJPatchScreen().update_all();

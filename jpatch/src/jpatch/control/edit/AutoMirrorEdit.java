@@ -70,7 +70,7 @@ public class AutoMirrorEdit extends CloneCommonEdit {
 								addEdit(new AtomicRemoveControlPointFromCurve(hook));
 								
 								/* and insert it on the parent curve */
-								addEdit(new InsertControlPointEdit(hook, cpToAppend));
+								addEdit(new AtomicInsertControlPoint(hook, cpToAppend));
 								
 								/* and convert it to a regular controlpoint by setting hookpos to -1 */
 								addEdit(new ChangeCPHookPosEdit(hook,-1));

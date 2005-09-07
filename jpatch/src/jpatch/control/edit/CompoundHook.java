@@ -2,14 +2,13 @@ package jpatch.control.edit;
 
 import jpatch.entity.*;
 
-public class HookEdit extends JPatchCompoundEdit {
+public class CompoundHook extends JPatchCompoundEdit {
 
-	public HookEdit(ControlPoint cpTargetHook, ControlPoint cpTarget, float hookPos) {
-		super("hook");
+	public CompoundHook(ControlPoint cpTargetHook, ControlPoint cpTarget, float hookPos) {
 		if (cpTarget.getChildHook() == null) {
 			Curve hookCurve = cpTarget.createEmptyHookCurve();
-			addEdit(new ChangeCPChildHookEdit(cpTarget));
-			addEdit(new AtomicAddCurve(hookCurve));
+			addEdit(new AtomicChangeControlPoint.ChildHook(cpTarget, hookCurve.getStart()));
+			addEdit(new AtomicAddCurve(hookCurve, cpTarget.getCurve().getModel()));
 		}
 		ControlPoint cp = cpTarget.getChildHook();
 		while (cp.getNext() != null && cp.getNext().getHookPos() < hookPos) {
@@ -17,7 +16,7 @@ public class HookEdit extends JPatchCompoundEdit {
 		}
 		ControlPoint cpHook = new ControlPoint();
 		cpHook.setHookPos(hookPos);
-		addEdit(new InsertControlPointEdit(cpHook,cp));
+		addEdit(new AtomicInsertControlPoint(cpHook,cp));
 		addEdit(new AtomicAttachControlPoints(cpTargetHook, cpHook));
 	}
 }

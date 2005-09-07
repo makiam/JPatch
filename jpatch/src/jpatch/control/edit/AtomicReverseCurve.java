@@ -54,6 +54,7 @@ public final class AtomicReverseCurve extends JPatchAtomicEdit {
 			cp.setPrev(cpDummy);
 			cp.setTangentsValid(false);
 		}
+		curve.setStart(curve.getStart().getStart());
 	}
 	
 	public int sizeOf() {
