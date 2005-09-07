@@ -17,7 +17,7 @@ public class NewExtrudeEdit extends CloneCommonEdit {
 		PointSelection ps = createNewSelection();
 		if (ps.getSize() > 0) {
 			ps.setName("*extruded points #" + iSequenceNumber++);
-			addEdit(new ChangeSelectionEdit(ps));
+			addEdit(new AtomicChangeSelection(ps));
 			addEdit(new AddSelectionEdit(ps));
 		}
 	}

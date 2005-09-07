@@ -56,9 +56,21 @@ public class CompoundAppendControlPoints extends JPatchCompoundEdit {
 					// throw exception
 					throw new IllegalArgumentException("can't attach - not curve start/end");
 			}
-			
+			// remove cpA's curve
+			addEdit(new AtomicRemoveCurve(cpA.getCurve()));
+			// append cpA.next to cpB
+			addEdit(new AtomicAppendControlPoints(cpA.getNext(), cpB));
+			// set curve to cpB's curve on all cpA and following cps
+			Curve curve = cpB.getCurve();
+			for(ControlPoint cp = cpA; cp != null; cp = cp.getNextCheckNextLoop())
+				addEdit(new AtomicChangeControlPoint.Curve(cp, curve));
 		}
-		
+		// replace cpA with cpB in all entities
+		addEdit(new CompoundReplaceControlPointInEntities(cpA, cpB));
+		// delete all patches containing cpA
+//FIXME:	add appropriate edit!!!
+		// check for new patches containing cpB
+//FIXME:	add appropriate edit!!!
 	}
 }
 

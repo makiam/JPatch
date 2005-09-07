@@ -202,7 +202,7 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 	public JPatchUndoableEdit endTransform() {
-		return new ChangeControlPointPositionEdit(this, p3BackupPosition);
+		return new AtomicChangeControlPoint.Position(this, p3BackupPosition);
 	}
 	
 	/**

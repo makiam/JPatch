@@ -445,7 +445,7 @@ public class DefaultTool extends JPatchTool {
 							 * selection box was not hit
 							 * create a new selection containing only cphot
 							 */
-							compoundEdit.addEdit(new ChangeSelectionEdit(new NewSelection(cpHot)));
+							compoundEdit.addEdit(new AtomicChangeSelection(new NewSelection(cpHot)));
 							
 							/* set state */
 							iState = MOVE_SINGLE_POINT;
@@ -632,7 +632,7 @@ public class DefaultTool extends JPatchTool {
 						if (cp.isSingle() || cpHot.isSingle()) {
 							// - compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,ps.getControlPointArray()));
 							if (!mouseEvent.isControlDown())
-								compoundEdit.addEdit(new WeldControlPointsEdit(cpHot,cp));
+								compoundEdit.addEdit(new CompoundWeldControlPoints(cpHot,cp));
 							else
 								compoundEdit.addEdit(CorrectSelectionsEdit.attachPoints(cpHot.getHead(),cp.getTail()));
 //							Float weight = (Float) selection.getMap().get(cpHot);
@@ -657,7 +657,7 @@ public class DefaultTool extends JPatchTool {
 									if (!cp.getNext().getHead().isHook() && !cp.getHead().isHook()) {
 										if (cp.getHookAt(hookPos[0]) == null) {
 											// - compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,ps.getControlPointArray()));
-											compoundEdit.addEdit(new HookEdit(cpHot,cp,hookPos[0]));
+											compoundEdit.addEdit(new CompoundHook(cpHot,cp,hookPos[0]));
 											//Collection collection = new ArrayList();
 											//collection.add(cpHot);
 											//compoundEdit.addEdit(new RemoveControlPointsFromSelectionEdit(ps,collection));
@@ -672,7 +672,7 @@ public class DefaultTool extends JPatchTool {
 										} else {
 											ControlPoint hook = cp.getHookAt(hookPos[0]);
 											compoundEdit.addEdit(new ConvertHookToCpEdit(hook));
-											compoundEdit.addEdit(new WeldControlPointsEdit(cpHot,hook));
+											compoundEdit.addEdit(new CompoundWeldControlPoints(cpHot,hook));
 											Float weight = (Float) selection.getMap().get(cpHot);
 											Map map = new HashMap();
 											map.put(cpHot, weight);
@@ -745,7 +745,7 @@ public class DefaultTool extends JPatchTool {
 				case DRAW_SELECTION:
 					NewSelection sel = selectMouseMotionListener.getSelection(viewDef);
 					//if (sel != null)
-						MainFrame.getInstance().getUndoManager().addEdit(new ChangeSelectionEdit(sel));
+						MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(sel));
 					((Component)mouseEvent.getSource()).removeMouseMotionListener(selectMouseMotionListener);
 					selectionChanged(selection);
 					break;

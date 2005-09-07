@@ -317,7 +317,7 @@ public class NewLatheEdit extends CloneCommonEdit {
 					if (iSegments % 2 == 0) {
 						for (int s = 0; s < iSegments / 2; s++) {
 							//addEdit(new 
-							addEdit(new WeldControlPointsEdit(cpLathe[p][s],cpLathe[p][s + iSegments / 2]));
+							addEdit(new CompoundWeldControlPoints(cpLathe[p][s],cpLathe[p][s + iSegments / 2]));
 						}
 						for (int s = iSegments / 2 + 1; s < iSegments; s++) {
 							addEdit(new AtomicAttachControlPoints(cpLathe[p][s],cpLathe[p][s - 1]));
@@ -341,7 +341,7 @@ public class NewLatheEdit extends CloneCommonEdit {
 		/* add selection */
 		ps.setName("*lathe #" + iNum++);
 		if (ps.getSize() > 0) {
-			addEdit(new ChangeSelectionEdit(ps));
+			addEdit(new AtomicChangeSelection(ps));
 			addEdit(new AddSelectionEdit(ps));
 		}
 	}
