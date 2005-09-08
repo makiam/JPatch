@@ -26,7 +26,7 @@ package jpatch.control.edit;
  *
  */
 public final class JPatchActionEdit extends JPatchCompoundEdit implements JPatchRootEdit {
-	private final String strName;
+	private String strName;
 	
 	public JPatchActionEdit(String name) {
 		strName = name;
@@ -38,5 +38,9 @@ public final class JPatchActionEdit extends JPatchCompoundEdit implements JPatch
 	
 	public void addEdit(JPatchUndoableEdit edit) {
 		super.addEdit(edit);
+	}
+	
+	public void setName(String name) {
+		strName = name;
 	}
 }
