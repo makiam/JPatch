@@ -146,7 +146,7 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		}
 	}
 	
-	public static final class Magnitude extends AtomicChangeControlPoint {
+	public static final class Magnitude extends AtomicChangeControlPoint implements JPatchRootEdit {
 		private float fMagnitude;
 		
 		public Magnitude(ControlPoint cp, float magnitude) {
@@ -163,6 +163,10 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		
 		public int sizeOf() {
 			return 8 + 4 + 4;
+		}
+		
+		public String getName() {
+			return "change tangent mgnitude";
 		}
 	}
 	
@@ -192,12 +196,11 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		public Position(ControlPoint cp, Point3f position) {
 			this.cp = cp;
 			p3Position.set(position);
-			swap();
+//			swap();
 		}
 		
-		private Point3f dummy = new Point3f();
 		void swap() {
-			dummy.set(cp.getPosition());
+			Point3f dummy = new Point3f(cp.getPosition());
 			cp.setPosition(p3Position);
 			p3Position.set(dummy);
 		}

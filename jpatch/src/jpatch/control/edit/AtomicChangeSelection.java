@@ -7,7 +7,7 @@ import jpatch.boundary.selection.*;
  * Use this class for changing selections (with the default tool)
  */
 
-public class AtomicChangeSelection extends JPatchAtomicEdit {
+public class AtomicChangeSelection extends JPatchAtomicEdit implements JPatchRootEdit {
 	private NewSelection selection;
 	
 	public AtomicChangeSelection(NewSelection selection) {
@@ -24,7 +24,11 @@ public class AtomicChangeSelection extends JPatchAtomicEdit {
 	}
 	
 	public int sizeOf() {
-		return 8 + 4; // FIXME: add size of selection
+		return 8 + 4 + (8 + 4 + 4 + 4 + 4 + 8 * selection.getMap().size() * 2);
+	}
+	
+	public String getName() {
+		return "change selection";
 	}
 	
 	private void swap() {

@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchActionEdit.java,v 1.1 2005/09/07 16:19:02 sascha_l Exp $
+ * $Id: JPatchActionEdit.java,v 1.2 2005/09/08 15:03:26 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -26,7 +26,7 @@ package jpatch.control.edit;
  *
  */
 public final class JPatchActionEdit extends JPatchCompoundEdit implements JPatchRootEdit {
-	private final String strName;
+	private String strName;
 	
 	public JPatchActionEdit(String name) {
 		strName = name;
@@ -38,5 +38,9 @@ public final class JPatchActionEdit extends JPatchCompoundEdit implements JPatch
 	
 	public void addEdit(JPatchUndoableEdit edit) {
 		super.addEdit(edit);
+	}
+	
+	public void setName(String name) {
+		strName = name;
 	}
 }

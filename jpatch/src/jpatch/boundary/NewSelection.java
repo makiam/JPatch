@@ -1,10 +1,8 @@
 package jpatch.boundary;
 
 import java.util.*;
-
 import javax.vecmath.*;
 
-import jpatch.boundary.selection.PointSelection;
 import jpatch.control.edit.*;
 import jpatch.entity.*;
 
@@ -217,7 +215,7 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 	}
 
 	public JPatchUndoableEdit endTransform() {
-		JPatchCompoundEdit edit = new JPatchCompoundEdit();
+		JPatchActionEdit edit = new JPatchActionEdit("transform selection");
 		for (Iterator it = mapTransformables.keySet().iterator(); it.hasNext(); ) {
 			Transformable transformable = (Transformable) it.next();
 			edit.addEdit(transformable.endTransform());
