@@ -55,7 +55,7 @@ public final class NewSelectionAction extends AbstractAction {
 			selection = selection.cloneSelection();
 			if (MainFrame.getInstance().getModel().checkSelection(selection)) {
 				selection.setName("new selection #" + iNum++);
-				MainFrame.getInstance().getUndoManager().addEdit(new AddSelectionEdit(selection));
+				MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddSelection(selection));
 			}
 			MainFrame.getInstance().getSideBar().enableTreeSelectionListener(false);
 			MainFrame.getInstance().getTree().setSelectionPath(MainFrame.getInstance().getModel().getSelection(selection).getTreePath());

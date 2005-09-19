@@ -1,7 +1,6 @@
 package jpatch.control.edit;
 
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
 
 /**
  * Use this class for changing selections (with the default tool)
@@ -11,6 +10,8 @@ public class AtomicChangeSelection extends JPatchAtomicEdit implements JPatchRoo
 	private NewSelection selection;
 	
 	public AtomicChangeSelection(NewSelection selection) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + selection + ")");
 		this.selection = selection;
 		swap();
 	}
@@ -24,7 +25,7 @@ public class AtomicChangeSelection extends JPatchAtomicEdit implements JPatchRoo
 	}
 	
 	public int sizeOf() {
-		return 8 + 4 + (8 + 4 + 4 + 4 + 4 + 8 * selection.getMap().size() * 2);
+		return 8 + 4 + selectionSize(selection);
 	}
 	
 	public String getName() {

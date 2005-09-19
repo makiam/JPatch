@@ -11,16 +11,16 @@ public class TangentTool extends JPatchTool {
 	private TangentHandle handleIn = new TangentHandle(new Color3f(JPatchSettings.getInstance().cTangent), null, TangentHandle.IN);
 	private TangentHandle handleOut = new TangentHandle(new Color3f(JPatchSettings.getInstance().cTangent), null, TangentHandle.OUT);
 	
-	private static final int GHOST_FACTOR = JPatchSettings.getInstance().iGhost;
+//	private static final int GHOST_FACTOR = JPatchSettings.getInstance().iGhost;
 	
 	//private PointSelection ps;
 
 	public TangentHandle isHit(ViewDefinition viewDef, int x, int y) {
 		Point3f p3 = new Point3f();
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null && ps.isSingle()) {
-			ControlPoint cp = ps.getControlPoint();
-			if (ps.isCurve() || cp.getPrevAttached() == null) {
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		if (selection != null && selection.getMap().size() == 1 && selection.getHotObject() instanceof ControlPoint) {
+			ControlPoint cp = (ControlPoint) selection.getHotObject();
+			if (selection.getDirection() != 0 || cp.getPrevAttached() == null) {
 				handleIn.setControlPoint(cp);
 				handleOut.setControlPoint(cp);
 				if (cp.getNext() != null && handleOut.isHit(viewDef, x, y, p3)) return handleOut;
@@ -31,12 +31,12 @@ public class TangentTool extends JPatchTool {
 	}
 	
 	public void paint(ViewDefinition viewDef) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
 		Matrix4f m4View = viewDef.getMatrix();
 		JPatchDrawable2 drawable = viewDef.getDrawable();
-		if (ps != null && ps.isSingle()) {
-			ControlPoint cp = ps.getControlPoint();
-			if (ps.isCurve() || cp.getPrevAttached() == null) {
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		if (selection != null && selection.getMap().size() == 1 && selection.getHotObject() instanceof ControlPoint) {
+			ControlPoint cp = (ControlPoint) selection.getHotObject();
+			if (selection.getDirection() != 0 || cp.getPrevAttached() == null) {
 				handleIn.setControlPoint(cp);
 				handleOut.setControlPoint(cp);
 				Point3f p3Pos = new Point3f(cp.getPosition());

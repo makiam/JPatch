@@ -38,10 +38,10 @@ public final class NextCurveAction extends AbstractAction {
 				selection.setDirection(-1);
 			} break;
 			case -1: {
-				if (cp.getNextAttached() != null) {
+				if (cp.getPrevAttached() != null) {
 					selection.setDirection(1);
 					selection.getMap().remove(cp);
-					selection.getMap().put(cp.getNextAttached(), new Float(1.0f));
+					selection.getMap().put(cp.getPrevAttached(), new Float(1.0f));
 				} else {
 					selection.setDirection(0);
 					selection.getMap().remove(cp);

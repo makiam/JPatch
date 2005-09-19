@@ -19,9 +19,9 @@ public final class SetViewLockAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null) {
-			viewDefinition.setLock(new Point3f(ps.getPivot()));
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		if (selection != null) {
+			viewDefinition.setLock(new Point3f(selection.getPivot()));
 		}
 		//((JPatchCanvas)viewDefinition.getViewport()).updateImage();
 		//viewDefinition.reset();

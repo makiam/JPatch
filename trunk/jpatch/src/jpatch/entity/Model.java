@@ -2,6 +2,7 @@ package jpatch.entity;
 
 
 import java.util.*;
+
 import javax.vecmath.*;
 import jpatch.auxilary.*;
 import jpatch.control.edit.*;
@@ -19,13 +20,9 @@ public class Model extends JPatchTreeNode {
 	/**
 	 *  Description of the Field
 	 */
-	private Curve firstCurve;
-	private Patch firstPatch;
-	private Curve lastCurve;
-	private Patch lastPatch;
+	private HashSet setCurves = new HashSet();
+	private HashMap mapPatches = new HashMap();
 
-	private Bone firstBone;
-	
 	private JPatchTreeNode treenodeSelections;
 	private JPatchTreeNode treenodeMaterials;
 	private JPatchTreeNode treenodeExpressions; 
@@ -84,6 +81,7 @@ public class Model extends JPatchTreeNode {
 	public StringBuffer xml(int tab) {
 		StringBuffer sbIndent = XMLutils.indent(tab);
 		StringBuffer sbIndent1 = XMLutils.indent(tab + 1);
+		StringBuffer sbIndent2 = XMLutils.indent(tab + 2);
 		StringBuffer sbLineBreak = XMLutils.lineBreak();
 		StringBuffer sb = new StringBuffer();
 		sb.append(sbIndent).append("<model>").append(sbLineBreak);
@@ -113,13 +111,18 @@ public class Model extends JPatchTreeNode {
 		}
 		sb.append(sbIndent1).append("<mesh>").append(sbLineBreak);
 		setCpMap();
-		for (Curve curve = getFirstCurve(); curve != null; curve = curve.getNext()) {
-			//if (!curve.getStart().isStartHook()) {
-				sb.append(curve.xml(tab + 2));
-			//}
+		for (Iterator it = setCurves.iterator(); it.hasNext(); ) {
+			ControlPoint start = (ControlPoint) it.next();
+			sb.append(sbIndent2);
+			sb.append(start.getLoop() ? "<curve closed=\"true\">" : "<curve>");
+			sb.append(sbLineBreak);
+			for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop())
+				sb.append(cp.xml(3));
+			
+			sb.append(sbIndent2).append("</curve>").append(sbLineBreak);
 		}
-		for (Patch patch = getFirstPatch(); patch != null; patch = patch.getNext()) {
-			sb.append(patch.xml(tab + 2));
+		for (Iterator it = mapPatches.keySet().iterator(); it.hasNext(); ) {
+			sb.append(((Patch) it.next()).xml(tab + 2));
 		}
 		for (Iterator it = lstMorphs.iterator(); it.hasNext(); ) {
 			Morph morph = (Morph) it.next();
@@ -225,7 +228,8 @@ public class Model extends JPatchTreeNode {
 	public void getBounds(Point3f min, Point3f max) {
 		min.set(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
 		max.set(-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
-		for (Patch patch = firstPatch; patch != null; patch = patch.getNext()) {
+		for (Iterator it = mapPatches.keySet().iterator(); it.hasNext(); ) {
+			Patch patch = (Patch) it.next();
 			ControlPoint[] acp = patch.getControlPoints();
 			for (int i = 0; i < acp.length; i++) {
 				Point3f p = acp[i].getPosition();
@@ -246,8 +250,8 @@ public class Model extends JPatchTreeNode {
 	
 	public void setReferenceGeometry() {
 		unapplyMorphs();
-		for (Curve curve = firstCurve; curve != null; curve = curve.getNext()) {
-			for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
+		for (Iterator it = setCurves.iterator(); it.hasNext(); ) {
+			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				cp.setReference();
 			}
 		}
@@ -319,177 +323,49 @@ public class Model extends JPatchTreeNode {
 		return lstMaterials;
 	}
 	
-	/**
-	 *  Sets the firstCurve attribute of the Model object
-	 *
-	 * @param  firstCurve  The new firstCurve value
-	 */
-	public void setFirstCurve(Curve firstCurve) {
-		this.firstCurve = firstCurve;
-	}
-
-
-	/**
-	 *  Sets the lastCurve attribute of the Model object
-	 *
-	 * @param  lastCurve  The new lastCurve value
-	 */
-	public void setLastCurve(Curve lastCurve) {
-		this.lastCurve = lastCurve;
-	}
-
-
-	/**
-	 *  Gets the firstCurve attribute of the Model object
-	 *
-	 * @return    The firstCurve value
-	 */
-	public Curve getFirstCurve() {
-		return firstCurve;
-	}
+	
 
 	public JPatchTreeNode getRootBone() {
 		return treenodeBones;
 	}
 	
-	public Bone getFirstBone() {
-		return firstBone;
-	}
 	
-	public void setFirstBone(Bone bone) {
-		firstBone = bone;
-	}
-	
-	public void addBone(Bone bone) {
-		bone.insertBefore(firstBone);
-		firstBone = bone;
-	}
-	
-	/**
-	 *  Gets the firstPatch attribute of the Model object
-	 *
-	 * @return    The firstPatch value
-	 */
-	public Patch getFirstPatch() {
-		return firstPatch;
-	}
-
-	public Patch getLastPatch() {
-		return lastPatch;
-	}
-
-	public void setFirstPatch(Patch p) {
-		firstPatch = p;
-	}
-
-	public void setLastPatch(Patch p) {
-		lastPatch = p;
-	}
-	/**
-	 *  Gets the lastCurve attribute of the Model object
-	 *
-	 * @return    The lastCurve value
-	 */
-	public Curve getLastCurve() {
-		return lastCurve;
-	}
-	/*
-	public void reset() {
-		for (Curve curve = getFirstCurve(); curve != null; curve = curve.getNext()) {
-			curve.reset();
-		}
-		
-		for (Patch patch = getFirstPatch(); patch != null; patch = patch.getNext()) {
-			patch.reset();
-		}
-		
-	}
-	*/
-	// public methods
-	/**
-	 *  Adds a feature to the Curve attribute of the Model object
-	 *
-	 * @param  curve  The feature to be added to the Curve attribute
-	 */
-	public void addCurve(Curve curve) {
-		if (lastCurve != null) {
-			lastCurve.setNext(curve);
-		}
-		curve.setPrev(lastCurve);
-		curve.setNext(null);
-		lastCurve = curve;
-		if (firstCurve == null) {
-			firstCurve = curve;
-		}
-		curve.setModel(this);
-		/*
-		for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
-			ViewportManager.getInstance().addControlPoint(cp);
-		}
-		for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
-			if (cp.hasNext()) {
-				ViewportManager.getInstance().addCurveSegment(cp);
-			}
-		}
-		*/
-	}
-
-	public void removeCurve(Curve curve) {
-		curve.remove();
-	}
-
-	/**
-	 *  Adds a feature to the Curve attribute of the Model object
-	 *
-	 * @param  start  The feature to be added to the Curve attribute
-	 */
 	public void addCurve(ControlPoint start) {
-		Curve curve = new Curve(start, this);
-		curve.validate();
-		addCurve(curve);
+		setCurves.add(start);
 	}
 
+	public void removeCurve(ControlPoint start) {
+		setCurves.remove(start);
+	}
 
 	/**
 	 *  Adds a feature to the Patch attribute of the Model object
 	 *
 	 * @param  patch  The feature to be added to the Patch attribute
 	 */
-	public void addPatch(ControlPoint[] acp, JPatchCompoundEdit compoundEdit) {
-		boolean old = false;
-		patch_loop:
-		for (Patch p = firstPatch; p != null; p = p.getNext()) {
-			if (p.isEqual(acp)) {
-				old = true;
-				p.setValid(true);
-				break patch_loop;
-			}
-		}
-		if (!old) addPatch(new Patch(acp),compoundEdit);
+	public void addPatch(ControlPoint[] acp, JPatchActionEdit edit) {
+		addPatch(new Patch(acp), edit);
 	}
 
-	public void addPatch(Patch patch, JPatchCompoundEdit compoundEdit) {
-		if (compoundEdit == null) {
-			if (lastPatch != null) {
-				lastPatch.setNext(patch);
+	public void addPatch(Patch patch, JPatchActionEdit edit) {
+//		System.out.print("addPatch " + patch + " ");
+		if (!mapPatches.keySet().contains(patch)) {
+//			System.out.println("NEW");
+			if (edit == null) {
+				mapPatches.put(patch, patch);
+			} else {
+				edit.addEdit(new AtomicAddPatch(patch));
 			}
-			patch.setPrev(lastPatch);
-			patch.setNext(null);
-			lastPatch = patch;
-			if (firstPatch == null) {
-				firstPatch = patch;
-			}
-			patch.setModel(this);
 		} else {
-			compoundEdit.addEdit(new AddPatchEdit(patch));
+			((Patch) mapPatches.get(patch)).setValid(true);
 		}
 	}
 	
-	public void removePatch(Patch patch, JPatchCompoundEdit compoundEdit) {
-		if (compoundEdit == null) {
-			patch.remove();
+	public void removePatch(Patch patch, JPatchActionEdit edit) {
+		if (edit == null) {
+			mapPatches.remove(patch);
 		} else {
-			compoundEdit.addEdit(new RemovePatchFromModelEdit(patch));
+			edit.addEdit(new AtomicRemovePatch(patch));
 		}
 	}
 	
@@ -497,16 +373,18 @@ public class Model extends JPatchTreeNode {
 		lstMorphs.remove(morph);
 	}
 	
-	/**
-	 *  Removes all patches which contain cp
-	 */
-	public ArrayList getPatchesContaining(ControlPoint cp) {
-		ArrayList list = new ArrayList();
-		for (Patch p = firstPatch; p != null; p = p.getNext()) {
-			if (p.contains(cp)) list.add(p);
-		}
-		return list;
-	}
+//	/**
+//	 *  Removes all patches which contain cp
+//	 */
+//	public ArrayList getPatchesContaining(ControlPoint cp) {
+//		ArrayList list = new ArrayList();
+//		for (Iterator it = mapPatches.keySet().iterator(); it.hasNext(); ) {
+//			Patch p = (Patch) it.next();
+//			if (p.contains(cp))
+//				list.add(p);
+//		}
+//		return list;
+//	}
 	
 	/**
 	 *  Description of the Method
@@ -514,48 +392,40 @@ public class Model extends JPatchTreeNode {
 	public void clearPatches() {
 		//firstPatch = null;
 		//lastPatch = null;
-		for (Patch p = firstPatch; p != null; p = p.getNext()) {
-			p.setValid(false);
-		}
+		for (Iterator it = mapPatches.keySet().iterator(); it.hasNext(); )
+			((Patch) it.next()).setValid(false);
 	}
 	
 	public ArrayList allHeads() {
 		ArrayList lstHead = new ArrayList();
-		Curve curve = getFirstCurve();
-		while (curve != null) {
-			ControlPoint cp = curve.getStart();
-			while (cp != null) {
-				if (cp.isHead() && !cp.isChildHook()) {
+		for (Iterator it = setCurves.iterator(); it.hasNext(); )
+			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop())
+				if (cp.isHead() && !cp.isChildHook())
 					lstHead.add(cp);
-				}
-				cp = cp.getNextCheckNextLoop();
-			}
-			curve = curve.getNext();
-		}
 		return lstHead;
 	}
 	
-	public int numberOfCurves() {
-		int iNum = 0;
-		Curve curve = getFirstCurve();
-		while (curve != null) {
-			if (!curve.getStart().isHook()) {
-				iNum++;
-			}
-			curve = curve.getNext();
-		}
-		return iNum;
-	}
+//	public int numberOfCurves() {
+//		int iNum = 0;
+//		Curve curve = getFirstCurve();
+//		while (curve != null) {
+//			if (!curve.getStart().isHook()) {
+//				iNum++;
+//			}
+//			curve = curve.getNext();
+//		}
+//		return iNum;
+//	}
 	
-	public int numberOfPatches() {
-		int iNum = 0;
-		Patch patch = getFirstPatch();
-		while (patch != null) {
-			iNum++;
-			patch = patch.getNext();
-		}
-		return iNum;
-	}
+//	public int numberOfPatches() {
+//		int iNum = 0;
+//		Patch patch = getFirstPatch();
+//		while (patch != null) {
+//			iNum++;
+//			patch = patch.getNext();
+//		}
+//		return iNum;
+//	}
 	
 	///**
 	// * clone heads
@@ -706,7 +576,8 @@ public class Model extends JPatchTreeNode {
 		computePatches(null);
 	}
 	
-	public void computePatches(JPatchCompoundEdit compoundEdit) {
+	public void computePatches(JPatchActionEdit edit) {
+		System.out.println("computePatches()");
 		//System.out.println("computePatches() started... " + lstCandidateFivePointPatch.size() + " candidate 5-point-patches");
 		clearPatches();
 		//for (Curve curve = getFirstCurve(); curve != null; curve = curve.getNext()) {
@@ -835,7 +706,7 @@ public class Model extends JPatchTreeNode {
 				fpp[5].trueCp() != fpp[6].trueCp() &&
 				fpp[7].trueCp() != fpp[8].trueCp()
 			) {
-				addPatch(fpp,compoundEdit);
+				addPatch(fpp,edit);
 				num5++;
 			} else {
 				//lstCandidateFivePointPatch.remove(acp);
@@ -898,7 +769,7 @@ public class Model extends JPatchTreeNode {
 											acpNeighborZ[1],
 										};
 										//System.out.println(acpPatch[0] + " " + acpPatch[1] + " " + acpPatch[2] + " " + acpPatch[3] + " " + acpPatch[4] + " " + acpPatch[5]);
-										addPatch(acpPatch,compoundEdit);
+										addPatch(acpPatch,edit);
 										num3++;
 										//System.out.println("+");
 									}
@@ -970,7 +841,7 @@ public class Model extends JPatchTreeNode {
 													acpNeighborZ[2],
 													acpNeighborZ[1],
 												};
-												addPatch(acpPatch,compoundEdit);
+												addPatch(acpPatch,edit);
 												num4++;
 											}
 											}
@@ -993,43 +864,45 @@ public class Model extends JPatchTreeNode {
 		/*
 		 * remove invalid patches
 		 */
-		for (Patch p = firstPatch; p != null; p = p.getNext()) {
-			if (!p.isValid()) {
-				//p.remove();
-				removePatch(p,compoundEdit);
-			}
+		ArrayList list = new ArrayList();
+		for (Iterator it = mapPatches.keySet().iterator(); it.hasNext(); ) {
+			Patch p = (Patch) it.next();
+			if (!p.isValid())
+				list.add(p);
 		}
+		for (Iterator it = list.iterator(); it.hasNext(); )
+			removePatch((Patch) it.next(),edit);
 		//System.out.print(num3 + " 3-point-, " + num4 + " 4-point- and " + num5 + " 5-point-patches found ");
 		//System.out.println("(" + lstCandidateFivePointPatch.size() + " candidate 5-point-patches)");
 	//	System.out.println("...stop");
 	}
 
+	public Set getCurveSet() {
+		return setCurves;
+	}
+	
+	public Set getPatchSet() {
+		return mapPatches.keySet();
+	}
+	
 	public void dump() {
 		System.out.println("------------- curves -------------");
-		System.out.println("\tcp\tnext\tprev\tloop\tna\tpa\tphook\tchook\thpos\n");
-		Curve curve = getFirstCurve();
-		while (curve != null) {
-			System.out.println("Curve: " + curve.hashCode() + " closed: " + curve.isClosed());
-			//System.out.println(curve);
-			
-			ControlPoint cp = curve.getStart();
-			while (cp != null) {
-				System.out.println("\t" + cp + "\t" + cp.getNext() + "\t" + cp.getPrev() + "\t" + cp.getLoop() + "\t" + cp.getNextAttached() + "\t" + cp.getPrevAttached() + "\t" + cp.getParentHook() + "\t" + cp.getChildHook() + "\t" + cp.getHookPos());
+		System.out.println("\tcp\tnext\tprev\tloop\tna\tpa\tphook\tchook\thpos\tposition\n");
+		for (Iterator it = setCurves.iterator(); it.hasNext(); ) {
+			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				System.out.println("\t" + cp + "\t" + cp.getNext() + "\t" + cp.getPrev() + "\t" + cp.getLoop() + "\t" + cp.getNextAttached() + "\t" + cp.getPrevAttached() + "\t" + cp.getParentHook() + "\t" + cp.getChildHook() + "\t" + cp.getHookPos() + "\t" + cp.getPosition());
 				
 				//System.out.println("\t" + cp + "\t" + cp.getPosition() + "\t" + cp.getNext() + "\t" + cp.getPrev() + "\t" + cp.getNextAttached() + "\t" + cp.getPrevAttached() + "\t" + cp.getLoop());
 				//System.out.println("\t" + cp);
 				//System.out.println("\t" + cp.getHead());
 				//System.out.println("\t" + cp.getInTangent() + "\t" + cp.getPosition() + "\t" + cp.getOutTangent());
 				//System.out.println(cp + "\t" + cp.isHook() + "\t" + cp.isTargetHook() + "\t" + cp.getHead());
-				cp = cp.getNextCheckNextLoop();
 			}
-			
-			curve = curve.getNext();
+			System.out.println();
 		}
 		System.out.println("\n\n------------- patches -------------");
-		for (Patch p = firstPatch; p != null; p = p.getNext()) {
-			System.out.println(p);
-		}
+		for (Iterator it = mapPatches.keySet().iterator(); it.hasNext(); )
+			System.out.println(it.next());
 		
 		System.out.println("\n\n--------active selection -------");
 		NewSelection selection = MainFrame.getInstance().getSelection();
@@ -1058,11 +931,9 @@ public class Model extends JPatchTreeNode {
 	private void setCpMap() {
 		HashMap map = new HashMap();
 		int i = 0;
-		for (Curve curve = getFirstCurve(); curve != null; curve = curve.getNext()) {
-			for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
+		for (Iterator it = setCurves.iterator(); it.hasNext(); )
+			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop())
 				map.put(cp,new Integer(i++));
-			}
-		}
 		ControlPoint.setMap(map);
 	}
 	

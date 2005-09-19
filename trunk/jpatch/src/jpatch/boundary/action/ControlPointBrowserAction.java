@@ -3,7 +3,7 @@ package jpatch.boundary.action;
 import java.awt.event.*;
 import javax.swing.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
+import jpatch.entity.*;
 
 public class ControlPointBrowserAction extends AbstractAction{
 	private static final long serialVersionUID = 1L;
@@ -11,9 +11,9 @@ public class ControlPointBrowserAction extends AbstractAction{
 		super("Controlpoint Browser");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null && ps.isSingle()) {
-			new ControlPointBrowser(ps.getControlPoint());
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		if (selection != null && selection.isSingle() && (selection.getHotObject() instanceof ControlPoint)) {
+			new ControlPointBrowser((ControlPoint) selection.getHotObject());
 		}
 	}
 }

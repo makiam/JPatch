@@ -91,6 +91,8 @@ public class JPatchUndoManager {
 	 * @param edit The edit to add
 	 */
 	public void addEdit(JPatchRootEdit edit, boolean open) {
+		System.out.println(edit.sizeOf() + "\t" + edit.getClass().getName());
+//		System.out.println(Runtime.getRuntime().freeMemory());
 		if (bOpen) {
 			appendEdit(edit, open);
 			return;
@@ -119,6 +121,8 @@ public class JPatchUndoManager {
 			bChange = true;
 		}
 		fireUndoStateChanged();
+//		System.out.println("UndoManager.add():");
+//		edit.debug("    ");
 	}
 	
 	public void appendEdit(JPatchRootEdit edit, boolean open) {
@@ -129,6 +133,8 @@ public class JPatchUndoManager {
 		newEdit.addEdit(oldEdit);
 		newEdit.addEdit(edit);
 		add(newEdit);
+//		System.out.println("UndoManager.append():");
+//		newEdit.debug("    ");
 	}
 	
 	public void setChange(boolean change) {

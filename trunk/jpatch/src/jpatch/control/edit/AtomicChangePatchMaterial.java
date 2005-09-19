@@ -11,6 +11,8 @@ public class AtomicChangePatchMaterial extends JPatchAtomicEdit {
 	private JPatchMaterial material;
 	
 	public AtomicChangePatchMaterial(Patch patch, JPatchMaterial material) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + patch + ", " + material + ")");
 		this.patch = patch;
 		this.material = material;
 		swap();

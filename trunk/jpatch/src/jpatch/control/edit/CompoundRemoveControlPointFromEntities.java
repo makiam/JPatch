@@ -33,6 +33,19 @@ import jpatch.boundary.*;
 public final class CompoundRemoveControlPointFromEntities extends JPatchCompoundEdit {
 	
 	public CompoundRemoveControlPointFromEntities(ControlPoint cp) {
+		// Remove cp from selections
 		addEdit(new AtomicRemoveControlPointFromSelections(cp));
+		// Remove empty selections
+		for (Iterator it = (new HashSet(MainFrame.getInstance().getModel().getSelections())).iterator(); it.hasNext(); ) {
+			NewSelection selection = (NewSelection) it.next();
+			if (selection.getMap().size() == 0)
+				addEdit(new AtomicRemoveSelection(selection));
+		}
+		// Remove patches containing cp
+		for (Iterator it = (new HashSet(MainFrame.getInstance().getModel().getPatchSet())).iterator(); it.hasNext(); ) {
+			Patch patch = (Patch) it.next();
+			if (patch.contains(cp))
+				addEdit(new AtomicRemovePatch(patch));
+		}
 	}
 }

@@ -11,23 +11,22 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 	public static final int MORPHS = 2;
 	public static int NUM = 0;
 	
-	private Map mapObjects;
+	private final Map mapObjects = new HashMap();
 	private Map mapTransformables;
 	private Object hotObject;
 	private int iDirection;
 	private Matrix3f m3Orientation;
 	private Point3f p3Pivot = new Point3f();
-	private int iNum = NUM++;
+//	private int iNum = NUM++;
 	private boolean bActive = false;
 	
 	public static NewSelection createRectangularPointSelection(int ax, int ay, int bx, int by, Matrix4f transformationMatrix, Model model) {
 		NewSelection selection = new NewSelection();
-		selection.mapObjects = new HashMap();
 		Point3f p3 = new Point3f();
-		for (Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
-			for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
-				//if (cp.isHead() && !cp.isHidden() && !cp.isStartHook() && !cp.isEndHook()) {
-				if (cp.isHead() && !cp.isHidden()) {
+		for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
+			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				if (cp.isHead() && !cp.isHidden() && !cp.isStartHook() && !cp.isEndHook()) {
+				//if (cp.isHead() && !cp.isHidden()) {
 					p3.set(cp.getPosition());
 					transformationMatrix.transform(p3);
 					if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by) {
@@ -48,20 +47,20 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 	
 	public NewSelection(ControlPoint cp) {
 		this();
-		mapObjects = new HashMap();
 		mapObjects.put(cp, new Float(1.0f));
 		hotObject = cp;
 	}
 	
 	public NewSelection(Map objectWeightMap) {
 		this();
-		mapObjects = new HashMap(objectWeightMap);
+		mapObjects.putAll(objectWeightMap);
 	}
 
 	public NewSelection(Collection objects) {
 		this();
-		HashMap mapObjects = new HashMap();
-		for (Iterator it = objects.iterator(); it.hasNext(); mapObjects.put(it.next(), new Float(1.0f)));
+		for (Iterator it = objects.iterator(); it.hasNext(); ) {
+			mapObjects.put(it.next(), new Float(1.0f));
+		}
 	}
 
 	public int getNodeType() {
@@ -250,6 +249,7 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 	}
 	
 	public String toString() {
-		return "Selection " + getName() + " (" + iNum + ")";
+//		return "Selection " + getName() + " (" + iNum + ")";
+		return getName();
 	}
 }

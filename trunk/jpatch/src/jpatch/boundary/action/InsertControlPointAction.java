@@ -31,7 +31,7 @@ public final class InsertControlPointAction extends AbstractAction {
 				for (Iterator it = patches1.iterator(); it.hasNext();) {
 					Patch patch = (Patch) it.next();
 					if (patches2.contains(patch) && patch.getModel() != null) {
-						compoundEdit.addEdit(new RemovePatchFromModelEdit(patch));
+						compoundEdit.addEdit(new AtomicRemovePatch(patch));
 					}
 				}
 				compoundEdit.addEdit(new AtomicInsertControlPoint(cp, scp));

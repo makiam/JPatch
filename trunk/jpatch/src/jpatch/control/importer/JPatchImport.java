@@ -281,7 +281,10 @@ implements ModelImporter {
 					for (int i = 0; i < aiPoint.length; i++) {
 						pointSet.add(listCp.get(aiPoint[i]));
 					}
-					model.addSelection(new NewSelection(pointSet));
+					System.out.println("selectionName" + " " + pointSet.size());
+					NewSelection selection = new NewSelection(pointSet);
+					selection.setName(selectionName);
+					model.addSelection(selection);
 				}
 				break;
 			case ROTOSCOPE:

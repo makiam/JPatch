@@ -7,12 +7,14 @@ import jpatch.entity.*;
  * Use this class for changing morphs
  */
 
-public class ChangeMorphVectorsEdit extends JPatchAbstractUndoableEdit {
+public class AtomicChangeMorphVectors extends JPatchAtomicEdit {
 	private Morph morph;
 	private Map mapChange;
 	
 	
-	public ChangeMorphVectorsEdit(Morph morph, Map change) {
+	public AtomicChangeMorphVectors(Morph morph, Map change) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + morph + ", " + change + ")");
 		this.morph = morph;
 		mapChange = change;
 		swap();
@@ -42,5 +44,9 @@ public class ChangeMorphVectorsEdit extends JPatchAbstractUndoableEdit {
 //		dummy = new ArrayList(morph.getVectorList());
 //		morph.setVectorList(listVectors);
 //		listVectors = dummy;
+	}
+	
+	public int sizeOf() {
+		return 8 + 4 + 4 + (8 + 4 + 4 + 4 + 4 + 8 * mapChange.size() * 2);
 	}
 }

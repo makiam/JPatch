@@ -1,25 +1,25 @@
 package jpatch.control.edit;
 
+import jpatch.boundary.*;
 import jpatch.entity.*;
 
 public class AtomicRemoveCurve extends JPatchAtomicEdit {
 	
-	private Model model;
-	private Curve curve;
+	private ControlPoint cpStart;
 	
-	public AtomicRemoveCurve(Curve curve) {
-		this.curve = curve;
-		model = curve.getModel();
-		model.removeCurve(curve);
+	public AtomicRemoveCurve(ControlPoint start) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + start + ")");
+		cpStart = start;
+		redo();
 	}
 	
 	public void undo() {
-//		curve.validate();
-		model.addCurve(curve);
+		MainFrame.getInstance().getModel().addCurve(cpStart);
 	}
 	
 	public void redo() {
-		model.removeCurve(curve);
+		MainFrame.getInstance().getModel().removeCurve(cpStart);
 	}
 	
 	public int sizeOf() {
