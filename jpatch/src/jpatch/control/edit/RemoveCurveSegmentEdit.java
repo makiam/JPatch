@@ -24,7 +24,7 @@ public class RemoveCurveSegmentEdit extends JPatchCompoundEdit {
 				for (Iterator it = patches.iterator(); it.hasNext(); ) {
 					Patch patch = (Patch) it.next();
 					//if (patch.getModel() != null) {
-						addEdit(new RemovePatchFromModelEdit(patch));
+						addEdit(new AtomicRemovePatch(patch));
 					//}
 				}
 				
@@ -44,7 +44,7 @@ public class RemoveCurveSegmentEdit extends JPatchCompoundEdit {
 		for (Iterator it = patches1.iterator(); it.hasNext();) {
 			Patch patch = (Patch) it.next();
 			if (patches2.contains(patch) && patch.getModel() != null) {
-				addEdit(new RemovePatchFromModelEdit(patch));
+				addEdit(new AtomicRemovePatch(patch));
 			}
 		}
 		

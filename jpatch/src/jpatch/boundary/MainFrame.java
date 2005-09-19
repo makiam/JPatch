@@ -276,7 +276,7 @@ public final class MainFrame extends JFrame {
 		//getContentPane().remove(sideBar);
 		model = new Model();
 		selection = null;
-		undoManager = new JPatchUndoManager(30);
+		undoManager.clear();
 		initTree();
 		sideBar.setTree(tree);
 		//getContentPane().add(sideBar,BorderLayout.EAST);

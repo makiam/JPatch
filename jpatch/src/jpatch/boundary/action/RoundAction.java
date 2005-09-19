@@ -1,10 +1,11 @@
 package jpatch.boundary.action;
 
 import java.awt.event.*;
+import java.util.Iterator;
+
 import javax.swing.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
 import jpatch.entity.*;
 
 public final class RoundAction extends AbstractAction {
@@ -17,20 +18,22 @@ public final class RoundAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,"Round");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null && ps.isCurve()) {
-			MainFrame.getInstance().getUndoManager().addEdit(new ChangeControlPointTangentModeEdit(ps.getControlPoint(),ControlPoint.JPATCH_G1));
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		if (selection != null && selection.getDirection() != 0) {
+			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeControlPoint.TangentMode((ControlPoint) selection.getHotObject(),ControlPoint.JPATCH_G1));
 			MainFrame.getInstance().getJPatchScreen().update_all();
-		} else if (ps != null) {
-			JPatchCompoundEdit compoundEdit = new JPatchCompoundEdit();
-			ControlPoint[] acp = ps.getControlPointArray();
-			for (int i = 0; i < acp.length; i++) {
-				ControlPoint[] stack = acp[i].getStack();
-				for (int j = 0; j < stack.length; j++) {
-					compoundEdit.addEdit(new ChangeControlPointTangentModeEdit(stack[j],ControlPoint.JPATCH_G1));
+		} else if (selection != null) {
+			JPatchActionEdit edit = new JPatchActionEdit("round tangents");
+			for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
+				Object object = it.next();
+				if (object instanceof ControlPoint) {
+					ControlPoint[] stack = ((ControlPoint) object).getStack();
+					for (int j = 0; j < stack.length; j++) {
+						edit.addEdit(new AtomicChangeControlPoint.TangentMode(stack[j],ControlPoint.JPATCH_G1));
+					}
 				}
 			}
-			MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
+			MainFrame.getInstance().getUndoManager().addEdit(edit);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 		ControlPoint.setDefaultMode(ControlPoint.JPATCH_G1);

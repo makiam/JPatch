@@ -5,12 +5,12 @@ import jpatch.boundary.selection.*;
 import jpatch.boundary.sidebar.*;
 import jpatch.boundary.*;
 
-public class RemoveSelectionEdit extends JPatchAbstractUndoableEdit {
+public class AtomicRemoveSelection extends JPatchAtomicEdit {
 	
 	private NewSelection selection;
 	private int index = -1;
 	
-	public RemoveSelectionEdit(NewSelection selection) {
+	public AtomicRemoveSelection(NewSelection selection) {
 		this.selection = selection;
 		redo();
 	}
@@ -44,5 +44,9 @@ public class RemoveSelectionEdit extends JPatchAbstractUndoableEdit {
 		MainFrame.getInstance().getSideBar().validate();
 		//MainFrame.getInstance().getTree().setSelectionPath(path);
 		//MainFrame.getInstance().getTree().makeVisible(path);
+	}
+	
+	public int sizeOf() {
+		return 8 + 4 + 4;
 	}
 }

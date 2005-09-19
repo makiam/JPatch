@@ -1,5 +1,5 @@
 /*
- * $Id: Patch.java,v 1.1 2005/08/10 12:57:20 sascha_l Exp $
+ * $Id: Patch.java,v 1.2 2005/09/19 12:40:16 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -31,20 +31,17 @@ import jpatch.auxilary.*;
  * A Patch. Currently 3-, 4- and 5-point patches are supported
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.1 $
+ * @version    $Revision: 1.2 $
  * @see		jpatch.entity.Curve
  * @see		jpatch.entity.ControlPoint
  */
 public final class Patch {
-	private Patch ptNext;
-	private Patch ptPrev;
 	private ControlPoint[] acpPoint;
 	//private boolean bReTriangulize = true;
 	//private TriangulizedPatch triangulizedPatch;
 	private JPatchMaterial material;
 	private boolean bDynamic = false;
 	private boolean bValid = true;
-	private Model model;
 	//private Point3f[] ap3ReferenceCoonsPatch;
 	
 	private static final Point3f[] ap3CoonsPatch9 = new Point3f[9];
@@ -95,22 +92,23 @@ public final class Patch {
 	}
 	
 	public String toString() {
-		String s = "Patch@" + hashCode() + " ";
+		String s = "Patch@" + hashCode() + " " + material + " ";
 		for (int n = 0; n < acpPoint.length; n++) {
 			s += acpPoint[n].toString() + " ";
 		}
 		return s;
 	}
 	
-	public final boolean isEqual(ControlPoint[] acp) {
+	public final boolean equals(Object o) {
+		ControlPoint[] acp = ((Patch) o).acpPoint;
 		/*
 		 * check for equal size
 		 */
-		if (acpPoint.length == acp.length) {
+		if (acpPoint.length == acp.length) {		
 			int l = acpPoint.length;
-			for (int n = 0; n < l; n++) {
+			for (int n = 0; n < l; n++) {			
 				if (acpPoint[0] == acp[n]) {
-					if (acpPoint[1] == acp[(n + 1) % l]) {
+					if (acpPoint[1] == acp[(n + 1) % l]) {	
 						for (int m = 2; m < l; m++) {
 							if (acpPoint[m] != acp[(n + m) % l]) {
 								return false;
@@ -131,6 +129,13 @@ public final class Patch {
 		return false;
 	}
 
+	public int hashCode() {
+		int hash = 0;
+		for (int i = 0; i < acpPoint.length; i++)
+			hash += acpPoint[i].hashCode();
+		return hash;
+	}
+	
 	public final void check(PointSelection ps) {
 		bDynamic = false;
 		loop:
@@ -142,14 +147,14 @@ public final class Patch {
 		}
 	}
 	
-	public final boolean isSelected(PointSelection ps) {
-		for (int i = 0; i < acpPoint.length; i++) {
-			if (!ps.contains(acpPoint[i].getHead())) {
-				if (!acpPoint[i].isTargetHook() && !acpPoint[i].isChildHook()) return false;
-			}
-		}
-		return true;
-	}
+//	public final boolean isSelected(PointSelection ps) {
+//		for (int i = 0; i < acpPoint.length; i++) {
+//			if (!ps.contains(acpPoint[i].getHead())) {
+//				if (!acpPoint[i].isTargetHook() && !acpPoint[i].isChildHook()) return false;
+//			}
+//		}
+//		return true;
+//	}
 	
 	public final boolean isValid() {
 		return bValid;
@@ -171,21 +176,7 @@ public final class Patch {
 		return triangulizedPatch;
 	}
 	*/
-	public final void setNext(Patch next) {
-		ptNext = next;
-	}
 	
-	public final void setPrev(Patch prev) {
-		ptPrev = prev;
-	}
-	
-	public final Patch getNext() {
-		return ptNext;
-	}
-	
-	public final Patch getPrev() {
-		return ptPrev;
-	}
 	
 	public final int getType() {
 		int l = acpPoint.length;
@@ -208,29 +199,6 @@ public final class Patch {
 		return -1;
 	}
 	
-	public final void remove() {
-		if (ptPrev != null) {
-			ptPrev.ptNext = ptNext;
-		}
-		if (ptNext != null) {
-			ptNext.ptPrev = ptPrev;
-		}
-		if (model != null && model.getLastPatch() == this) {
-			model.setLastPatch(ptPrev);
-		}
-		if (model != null && model.getFirstPatch() == this) {
-			model.setFirstPatch(ptNext);
-		}
-		model = null;
-	}
-
-	public Model getModel() {
-		return model;
-	}
-	
-	public void setModel(Model model) {
-		this.model = model;
-	}
 	
 	/**
 	 * returns StringBuffer containing an XML representation of the curve, used to save

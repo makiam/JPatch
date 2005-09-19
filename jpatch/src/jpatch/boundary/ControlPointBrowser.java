@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPointBrowser.java,v 1.1 2005/08/10 12:57:20 sascha_l Exp $
+ * $Id: ControlPointBrowser.java,v 1.2 2005/09/19 12:40:16 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -55,7 +55,6 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 	private JTextField textLoop = new JTextField();
 	private JTextField textId = new JTextField();
 	private JTextField textHookPos = new JTextField();
-	private JTextField textCurve = new JTextField();
 	
 	/**
 	 * @param cp The initial controlpoint to be shown in the browser
@@ -70,7 +69,6 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		 */
 		JPatchForm form = new JPatchForm();
 		form.addEntry("Controlpoint ID:", textId);
-		form.addEntry("Curve ID:", textCurve);
 		form.addEntry("loop flag:", textLoop);
 		form.addEntry("next:", buttonNext);
 		form.addEntry("prev:", buttonPrev);
@@ -90,7 +88,6 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		textId.setEditable(false);								
 		textLoop.setEditable(false);
 		textHookPos.setEditable(false);
-		textCurve.setEditable(false);
 		
 		/*
 		 * set alignment of textfields to right
@@ -98,7 +95,6 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		textId.setHorizontalAlignment(JTextField.RIGHT);
 		textLoop.setHorizontalAlignment(JTextField.RIGHT);
 		textHookPos.setHorizontalAlignment(JTextField.RIGHT);
-		textCurve.setHorizontalAlignment(JTextField.RIGHT);
 		
 		/*
 		 * add actionlisteners to buttons 
@@ -113,15 +109,15 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		buttonRefresh.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				initFields();
-				MainFrame.getInstance().setSelection(new PointSelection(getCp()));
+				MainFrame.getInstance().setSelection(new NewSelection(getCp()));
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
 		});
 		buttonSync.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				PointSelection ps = MainFrame.getInstance().getPointSelection();
-				if (ps != null && ps.isSingle()) {
-					setCp(ps.getControlPoint());
+				NewSelection selection = MainFrame.getInstance().getSelection();
+				if (selection != null && selection.isSingle() && (selection.getHotObject() instanceof ControlPoint)) {
+					setCp((ControlPoint) selection.getHotObject());
 				}
 			}
 		});
@@ -168,7 +164,6 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		textLoop.setText(cp.getLoop() ? "true" : "false");
 		textId.setText(cp.toString());
 		textHookPos.setText(Float.toString(cp.getHookPos()));
-		textCurve.setText((cp.getCurve() != null) ? cp.getCurve().toString() : "null");
 	}
 	
 	/**
@@ -218,7 +213,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		else if (event.getSource() == buttonParentHook) setCp(cp.getParentHook());
 		else if (event.getSource() == buttonBack) setCp(cpOld);
 		
-		MainFrame.getInstance().setSelection(new PointSelection(cp));	// create a new pointselection
+		MainFrame.getInstance().setSelection(new NewSelection(cp));	// create a new pointselection
 		MainFrame.getInstance().getJPatchScreen().update_all();			// update all viewports
 	}
 }

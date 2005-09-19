@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.5 2005/09/07 16:19:02 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.6 2005/09/19 12:40:16 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -26,6 +26,7 @@ import java.util.*;
 import javax.vecmath.*;
 import jpatch.auxilary.*;
 import jpatch.control.edit.*;
+import jpatch.boundary.*;
 
 /**
  *  A ControlPoint object stores all information relevant to the model's geometry and
@@ -35,7 +36,7 @@ import jpatch.control.edit.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.5 $
+ * @version    $Revision: 1.6 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -93,8 +94,6 @@ public class ControlPoint implements Comparable, Transformable {
 	private ControlPoint cpParentHook;
 	/** position of hook (may be 0.25, 0.5, 0.75 or -1) */
 	private float fHookPos = -1f;
-	/** curve this ControlPoint belongs to */
-	private Curve curve;
 	/** in curvature */
 	private float fInMagnitude = fDefaultMagnitude;
 	/** out curvature */
@@ -119,7 +118,8 @@ public class ControlPoint implements Comparable, Transformable {
 	private Point3f p3BackupPosition = new Point3f();
 	
 	private boolean bHidden = false;
-		
+	private boolean bDeleted = false;
+	
 	/**
 	 * Constructor
 	 */
@@ -264,7 +264,6 @@ public class ControlPoint implements Comparable, Transformable {
 		clone.cpPrevAttached = cpPrevAttached;
 		clone.cpParentHook = cpParentHook;
 		clone.cpChildHook = cpChildHook;
-		clone.curve = curve;
 		return clone;
 	}
 	
@@ -278,21 +277,19 @@ public class ControlPoint implements Comparable, Transformable {
 		cpPrevAttached = cp.cpPrevAttached;
 		cpParentHook = cp.cpParentHook;
 		cpChildHook = cp.cpChildHook;
-		curve = cp.curve;
 	}
 	
-	/**
-	 * sets all references to null
-	 */
-	public void free() {
-		 cpNext = null;
-		 cpPrev = null;
-		 cpNextAttached = null;
-		 cpPrevAttached = null;
-		 cpParentHook = null;
-		 cpChildHook = null;
-		 curve = null;
-	}
+//	/**
+//	 * sets all references to null
+//	 */
+//	public void free() {
+//		 cpNext = null;
+//		 cpPrev = null;
+//		 cpNextAttached = null;
+//		 cpPrevAttached = null;
+//		 cpParentHook = null;
+//		 cpChildHook = null;
+//	}
 
 	public Point3f getHookPosition(int hook) {
 		if (cpNext != null) {
@@ -308,7 +305,20 @@ public class ControlPoint implements Comparable, Transformable {
 			return null;
 		}
 	}
-		
+	
+	/**
+	 * returns the length of a curve. must be called on curve start, throws exception otherwise
+	 * @return the length of the curve
+	 */
+	public int getLength() {
+		if (!bLoop && cpPrev != null)
+			throw new IllegalArgumentException(getClass().getName()+ ".getLength() must be called on curve-start");
+		int n = 0;
+		for (ControlPoint cp = this; cp != null; cp = cp.getNextCheckNextLoop())
+			n++;
+		return n;
+	}
+	
 	/**
 	 * returns an array of all attached controlPoints
 	 */
@@ -342,7 +352,7 @@ public class ControlPoint implements Comparable, Transformable {
 		ControlPoint cp;
 		ControlPoint cpHook;
 		if (cpChildHook == null) {
-			curve.getModel().addCurve(createEmptyHookCurve());
+			MainFrame.getInstance().getModel().addCurve(createEmptyHookCurve());
 		}
 		cp = cpChildHook;
 		while (cp.cpNext != null && cp.cpNext.fHookPos < hookPos) {
@@ -421,7 +431,6 @@ public class ControlPoint implements Comparable, Transformable {
 		cp.setNext(this);
 		setPrev(cp);
 		setNext(next);
-		curve = cp.curve;
 	}
 
 	/**
@@ -521,15 +530,6 @@ public class ControlPoint implements Comparable, Transformable {
 		}
 		return this;
 	}
-		
-	/**
-	 * Gets the curve the ControlPoint belongs to
-	 *
-	 * @return    returns the curve the ControlPoint belongs to
-	 */
-	public Curve getCurve() {
-		return curve;
-	}
 
 	public ControlPoint getChildHook() {
 		return cpChildHook;
@@ -540,9 +540,9 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 	public void setChildHook(ControlPoint childHook) {
-		System.out.println("***");
-		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-		for (int i = 0; i < stacktrace.length; System.out.println(stacktrace[i++]));
+//		System.out.println("***");
+//		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+//		for (int i = 0; i < stacktrace.length; System.out.println(stacktrace[i++]));
 		cpChildHook = childHook;
 	}
 	
@@ -568,10 +568,10 @@ public class ControlPoint implements Comparable, Transformable {
 	
 	
 	/**
-	 *
+	 * ????? no idea..... FIXME!!!!
 	 */
-	public Curve getHookCurve() {
-		return ((getStart().cpParentHook != null) ? getStart().cpParentHook.curve : curve);
+	public ControlPoint getHookCurve() {
+		return ((getStart().cpParentHook != null) ? getStart().cpParentHook : getStart());
 	}
 
 	/**
@@ -974,16 +974,6 @@ public class ControlPoint implements Comparable, Transformable {
 		fOutMagnitude = curvature;
 	}
 
-
-	/**
-	 *  Sets the curve the ControlPoint belongs to
-	 *
-	 * @param  curve  The Curve object
-	 */
-	public void setCurve(Curve curve) {
-		this.curve = curve;
-	}
-
 	/**
 	 *  Sets the loop flag
 	 *
@@ -993,6 +983,13 @@ public class ControlPoint implements Comparable, Transformable {
 		bLoop = loop;
 	}
 
+	public void setDeleted(boolean deleted) {
+		bDeleted = deleted;
+	}
+	
+	public boolean isDeleted() {
+		return bDeleted;
+	}
 
 	/**
 	 *  Sets the tangent mode of the ControlPoint object
@@ -1104,7 +1101,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 * @return    The objects hashCode as a String
 	 */
 	public String toString() {
-		return String.valueOf(iNumber);
+		return "cp_" + iNumber;
 	}
 
 	/**
@@ -1576,7 +1573,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 *  Creates an empty hook Curve (a starthook on this position, and an
 	 *  end hook on "next"'s position)
 	 */
-	public Curve createEmptyHookCurve() {
+	public ControlPoint createEmptyHookCurve() {
 		if (cpNext == null) {
 			throw new IllegalStateException("Can't add hook to end of curve " + " on " + this);
 		}
@@ -1593,9 +1590,7 @@ public class ControlPoint implements Comparable, Transformable {
 		cpChildHook = cpStart;
 	//cpNext.cpChildHook = cpEnd;
 		cpEnd.appendTo(cpStart);
-		Curve curve = new Curve(cpStart);
-		curve.validate();
-		return curve;
+		return cpStart;
 	}
 
 
@@ -1687,9 +1682,9 @@ public class ControlPoint implements Comparable, Transformable {
 		p3StartPosition = cpStart.getPosition();
 		p3EndPosition = cpEnd.getPosition();
 		fMinAngle = (float) Math.PI;
-		Curve parentHookCurve = getHead().getStart().cpParentHook.curve;
+		ControlPoint parentHook = getHead().getStart().cpParentHook;
 		while (cpStart != null) {
-			if (cpStart.curve != parentHookCurve) {
+			if (cpStart != parentHook) {
 				if (cpStart.cpNext != null) {
 					v3Test.set(cpStart.getOutTangent());
 					v3Test.sub(p3StartPosition);
@@ -1713,7 +1708,7 @@ public class ControlPoint implements Comparable, Transformable {
 		}
 		fMinAngle = (float) Math.PI;
 		while (cpEnd != null) {
-			if (cpEnd.curve != parentHookCurve) {
+			if (cpEnd != parentHook) {
 				if (cpEnd.cpNext != null) {
 					v3Test.set(cpEnd.getOutTangent());
 					v3Test.sub(p3EndPosition);
@@ -1760,9 +1755,9 @@ public class ControlPoint implements Comparable, Transformable {
 		p3StartPosition = cpStart.getRefPosition();
 		p3EndPosition = cpEnd.getRefPosition();
 		fMinAngle = (float) Math.PI;
-		Curve parentHookCurve = getHead().getStart().cpParentHook.curve;
+		ControlPoint parentHook = getHead().getStart().cpParentHook;
 		while (cpStart != null) {
-			if (cpStart.curve != parentHookCurve) {
+			if (cpStart != parentHook) {
 				if (cpStart.cpNext != null) {
 					v3Test.set(cpStart.getRefOutTangent());
 					v3Test.sub(p3StartPosition);
@@ -1786,7 +1781,7 @@ public class ControlPoint implements Comparable, Transformable {
 		}
 		fMinAngle = (float) Math.PI;
 		while (cpEnd != null) {
-			if (cpEnd.curve != parentHookCurve) {
+			if (cpEnd != parentHook) {
 				if (cpEnd.cpNext != null) {
 					v3Test.set(cpEnd.getRefOutTangent());
 					v3Test.sub(p3EndPosition);

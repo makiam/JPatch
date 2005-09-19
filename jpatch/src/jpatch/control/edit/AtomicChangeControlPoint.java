@@ -18,43 +18,53 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 	
 	abstract void swap();
 	
-//	public static final class Next extends AtomicChangeControlPoint {
-//		private ControlPoint cpNext;
-//		
-//		public Next(ControlPoint cp, ControlPoint next) {
-//			super(cp);
-//			cpNext = next;
-//			swap();
-//		}
-//		
-//		void swap() {
-//			ControlPoint dummy = cp.getNext();
-//			cp.setNext(cpNext);
-//			cpNext = dummy;
-//		}
-//	}
-//	
-//	public static final class Prev extends AtomicChangeControlPoint {
-//		private ControlPoint cpPrev;
-//		
-//		public Prev(ControlPoint cp, ControlPoint prev) {
-//			super(cp);
-//			cpPrev = prev;
-//			swap();
-//		}
-//		
-//		void swap() {
-//			ControlPoint dummy = cp.getPrev();
-//			cp.setPrev(cpPrev);
-//			cpPrev = dummy;
-//		}
-//	}
+	public static final class NextAttached extends AtomicChangeControlPoint {
+		private ControlPoint cpNextAttached;
+		
+		public NextAttached(ControlPoint cp, ControlPoint nextAttached) {
+			this.cp = cp;
+			cpNextAttached = nextAttached;
+			swap();
+		}
+		
+		void swap() {
+			ControlPoint dummy = cp.getNextAttached();
+			cp.setNextAttached(cpNextAttached);
+			cpNextAttached = dummy;
+		}
+		
+		public int sizeOf() {
+			return 8 + 4 + 4;
+		}
+	}
+	
+	public static final class PrevAttached extends AtomicChangeControlPoint {
+		private ControlPoint cpPrevAttached;
+		
+		public PrevAttached(ControlPoint cp, ControlPoint prevAttached) {
+			this.cp = cp;
+			cpPrevAttached = prevAttached;
+			swap();
+		}
+		
+		void swap() {
+			ControlPoint dummy = cp.getPrevAttached();
+			cp.setPrevAttached(cpPrevAttached);
+			cpPrevAttached = dummy;
+		}
+		
+		public int sizeOf() {
+			return 8 + 4 + 4;
+		}
+	}
 	
 
 	public static final class ParentHook extends AtomicChangeControlPoint {
 		private ControlPoint cpParentHook;
 		
 		public ParentHook(ControlPoint cp, ControlPoint parentHook) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + cp + ", " + parentHook + ")");
 			this.cp = cp;
 			cpParentHook = parentHook;
 			swap();
@@ -75,6 +85,8 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		private ControlPoint cpChildHook;
 		
 		public ChildHook(ControlPoint cp, ControlPoint childHook) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + cp + ", " + childHook + ")");
 			this.cp = cp;
 			cpChildHook = childHook;
 			swap();
@@ -91,8 +103,10 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		}
 	}
 	
-	public static final class Loop extends AtomicChangeControlPoint {
+	public static final class Loop extends AtomicChangeControlPoint {	
 		public Loop(ControlPoint cp) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + cp + ")");
 			this.cp = cp;
 			swap();
 		}
@@ -106,23 +120,20 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		}
 	}
 	
-	public static final class Curve extends AtomicChangeControlPoint {
-		private jpatch.entity.Curve curve;
-		
-		public Curve(ControlPoint cp, jpatch.entity.Curve curve) {
+	public static final class Deleted extends AtomicChangeControlPoint {	
+		public Deleted(ControlPoint cp) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + cp + ")");
 			this.cp = cp;
-			this.curve = curve;
 			swap();
 		}
 		
 		void swap() {
-			jpatch.entity.Curve dummy = cp.getCurve();
-			cp.setCurve(curve);
-			curve = dummy;
+			cp.setDeleted(!cp.isDeleted());
 		}
 		
 		public int sizeOf() {
-			return 8 + 4 + 4;
+			return 8 + 4;
 		}
 	}
 	
@@ -130,6 +141,8 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		private float fHookPos;
 		
 		public HookPos(ControlPoint cp, float hookPos) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + cp + ", " + hookPos + ")");
 			this.cp = cp;
 			fHookPos = hookPos;
 			swap();
@@ -150,9 +163,11 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		private float fMagnitude;
 		
 		public Magnitude(ControlPoint cp, float magnitude) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + cp + ", " + magnitude + ")");
 			this.cp = cp;
 			fMagnitude = magnitude;
-			swap();
+//			swap();
 		}
 		
 		void swap() {
@@ -170,10 +185,12 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		}
 	}
 	
-	public static final class TangentMode extends AtomicChangeControlPoint {
+	public static final class TangentMode extends AtomicChangeControlPoint implements JPatchRootEdit {
 		private int iTangentMode;
 		
 		public TangentMode(ControlPoint cp, int tangentMode) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + cp + ", " + tangentMode + ")");
 			this.cp = cp;
 			iTangentMode = tangentMode;
 			swap();
@@ -183,30 +200,47 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 			int dummy = cp.getMode();
 			cp.setMode(iTangentMode);
 			iTangentMode = dummy;
+			cp.invalidateTangents();
 		}
 		
 		public int sizeOf() {
 			return 8 + 4 + 4;
 		}
+		
+		public String getName() {
+			switch (iTangentMode) {
+				case ControlPoint.PEAK: return "peak tangents";
+				default: return "round tangents";
+			}
+		}
 	}
 	
 	public static final class Position extends AtomicChangeControlPoint {
-		private Point3f p3Position = new Point3f();
+		private float x, y, z;
 		
 		public Position(ControlPoint cp, Point3f position) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + cp + ", " + position + ")");
 			this.cp = cp;
-			p3Position.set(position);
+			x = position.x;
+			y = position.y;
+			z = position.z;
 //			swap();
 		}
 		
 		void swap() {
-			Point3f dummy = new Point3f(cp.getPosition());
-			cp.setPosition(p3Position);
-			p3Position.set(dummy);
+			Point3f p = cp.getPosition();
+			float dummyX = p.x;
+			float dummyY = p.y;
+			float dummyZ = p.z;
+			cp.setPosition(x, y, z);
+			x = dummyX;
+			y = dummyY;
+			z = dummyZ;
 		}
 		
 		public int sizeOf() {
-			return 8 + 4 + (8 + 4 + 4 + 4);
+			return 8 + 4 + 4 + 4 + 4;
 		}
 	}
 }

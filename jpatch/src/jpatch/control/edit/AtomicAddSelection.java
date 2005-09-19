@@ -1,26 +1,25 @@
 package jpatch.control.edit;
 
 import javax.swing.tree.*;
-import jpatch.boundary.selection.*;
 import jpatch.boundary.*;
 
-public class AddSelectionEdit extends JPatchAbstractUndoableEdit {
+public class AtomicAddSelection extends JPatchAtomicEdit implements JPatchRootEdit {
 	
 	private NewSelection selection;
 	private int index = -1;
 	
-	public AddSelectionEdit(NewSelection selection) {
+	public AtomicAddSelection(NewSelection selection) {
 		this.selection = selection;
 		redo();
 	}
 	
-	public AddSelectionEdit(int index, NewSelection selection) {
+	public AtomicAddSelection(int index, NewSelection selection) {
 		this.index = index;
 		this.selection = selection;
 		redo();
 	}
 	
-	public String getPresentationName() {
+	public String getName() {
 		return "add selection";
 	}
 	
@@ -47,5 +46,9 @@ public class AddSelectionEdit extends JPatchAbstractUndoableEdit {
 		TreePath path = selection.getTreePath();
 		//MainFrame.getInstance().getTree().setSelectionPath(path);
 		MainFrame.getInstance().getTree().makeVisible(path);
+	}
+	
+	public int sizeOf() {
+		return 8 + 4 + 4;
 	}
 }

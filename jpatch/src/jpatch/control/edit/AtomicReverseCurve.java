@@ -1,5 +1,6 @@
 package jpatch.control.edit;
 
+import jpatch.boundary.*;
 import jpatch.entity.*;
 
 /**
@@ -10,25 +11,27 @@ import jpatch.entity.*;
  */
 public final class AtomicReverseCurve extends JPatchAtomicEdit {
 
-	private Curve curve;
+	private ControlPoint cpStart;
 	
-	public AtomicReverseCurve(Curve curve) {
-		this.curve = curve;
-		if (curve.getStart().getLoop())
-			throw new IllegalArgumentException(this.getClass().getName() + " can't be applied to closed (looped) curve " + curve);
-		reverseCurve(curve);
+	public AtomicReverseCurve(ControlPoint start) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + start + ")");
+		cpStart = start;
+		if (cpStart.getLoop())
+			throw new IllegalArgumentException(this.getClass().getName() + " can't be applied to closed (looped) curve starting at " + cpStart);
+		reverseCurve(cpStart);
 	}
 	
 	public void undo() {
-		reverseCurve(curve);
+		reverseCurve(cpStart);
 	}
 
 	public void redo() {
-		reverseCurve(curve);
+		reverseCurve(cpStart);
 	}
 
-	private void reverseCurve(Curve curve) {
-		for (ControlPoint cp = curve.getStart().getEnd(); cp != null; cp = cp.getNext()) {
+	private void reverseCurve(ControlPoint start) {
+		for (ControlPoint cp = start.getEnd(); cp != null; cp = cp.getNext()) {
 			/*
 			 * if it's on a hook curve, reverse the hookPos
 			 */
@@ -43,7 +46,7 @@ public final class AtomicReverseCurve extends JPatchAtomicEdit {
 				//System.out.println("next : " + cp.getNext());
 				//System.out.println("child: " + cp.getChildHook());
 				cp.getNext().setChildHook(cp.getChildHook().getEnd());
-				reverseCurve(cp.getChildHook().getCurve());
+				reverseCurve(cp.getChildHook());
 				cp.setChildHook(null);
 			}
 			/*
@@ -54,7 +57,9 @@ public final class AtomicReverseCurve extends JPatchAtomicEdit {
 			cp.setPrev(cpDummy);
 			cp.setTangentsValid(false);
 		}
-		curve.setStart(curve.getStart().getStart());
+		MainFrame.getInstance().getModel().getCurveSet().remove(cpStart);
+		cpStart = cpStart.getStart();
+		MainFrame.getInstance().getModel().getCurveSet().add(cpStart);
 	}
 	
 	public int sizeOf() {

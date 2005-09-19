@@ -175,7 +175,7 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 									//acp[8].getHead()
 								};
 							model.getCandidateFivePointPatchList().add(acp5);
-							MainFrame.getInstance().getUndoManager().addEdit(new AddPatchEdit(patch));
+							MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddPatch(patch));
 							MainFrame.getInstance().getJPatchScreen().update_all();
 						}
 					}

@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchCompoundEdit.java,v 1.5 2005/09/07 16:19:02 sascha_l Exp $
+ * $Id: JPatchCompoundEdit.java,v 1.6 2005/09/19 12:40:15 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -29,13 +29,15 @@ import java.util.*;
  * It's undo() method simply calls the undo() methods of all child
  * edits (in reverse order). It's redo method calls the redo() methods of all child edits.
  *
- * @version	$Revision: 1.5 $
+ * @version	$Revision: 1.6 $
  * @author	Sascha Ledinsky
  */
 public abstract class JPatchCompoundEdit implements JPatchUndoableEdit {
-
+	
 	/** a list holding all child edits */
 	protected List listEdits = new ArrayList(1);
+	
+	protected JPatchCompoundEdit() { }
 	
 	/**
 	 * adds an edit to the list
@@ -95,10 +97,12 @@ public abstract class JPatchCompoundEdit implements JPatchUndoableEdit {
 		}
 		return size;
 	}
-//	public void dump(String prefix) {
-//		System.out.println(prefix + getClass().getName() + " \"" + getName() + "\":");
-//		for (Iterator it = lstEdits.iterator(); it.hasNext(); ) {
-//			((JPatchUndoableEdit) it.next()).dump(prefix + "    ");
-//		}
-//	}
+	
+	public void debug(String prefix) {
+		String name = this instanceof JPatchRootEdit ? getClass().getName() + " \"" + ((JPatchRootEdit) this).getName() + "\"" : getClass().getName();
+		System.out.println(prefix + name + " " + sizeOf() + ":");
+		for (Iterator it = listEdits.iterator(); it.hasNext(); ) {
+			((JPatchUndoableEdit) it.next()).debug(prefix + "    ");
+		}
+	}
 }

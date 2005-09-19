@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchUndoableEdit.java,v 1.3 2005/09/06 13:44:53 sascha_l Exp $
+ * $Id: JPatchUndoableEdit.java,v 1.4 2005/09/19 12:40:15 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -25,10 +25,15 @@ package jpatch.control.edit;
 /**
  * A basic interface all edits must implement
  *
- * @version	$Revision: 1.3 $
+ * @version	$Revision: 1.4 $
  * @author	Sascha Ledinsky
  */
 public interface JPatchUndoableEdit {
+	/**
+	 * debug flag
+	 */
+	static final boolean DEBUG = false;
+	
 	/**
 	 * undoes this edit
 	 */
@@ -48,5 +53,7 @@ public interface JPatchUndoableEdit {
 	 * returns the (guessed) size of the edit object
 	 */
 	public int sizeOf();
+	
+	public void debug(String prefix);
 }
 

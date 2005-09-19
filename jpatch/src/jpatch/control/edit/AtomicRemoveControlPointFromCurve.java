@@ -13,8 +13,6 @@ public class AtomicRemoveControlPointFromCurve extends JPatchAtomicEdit {
 	private ControlPoint cp;
 	private ControlPoint cpNext;
 	private ControlPoint cpPrev;
-	private Curve curve;
-	private boolean bStart;
 	
 	/**
 	 *Constructor for the RemoveControlPointFromCurveEdit object
@@ -23,14 +21,14 @@ public class AtomicRemoveControlPointFromCurve extends JPatchAtomicEdit {
 	 * @param  cp  ControlPoint to remove
 	 */
 	public AtomicRemoveControlPointFromCurve(ControlPoint cp) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + cp + ")");
 		/*
 		 *  store ControlPoint, Curve, next and previous ControlPoints for undo
 		 */
 		this.cp = cp;
-		curve = cp.getCurve();
 		cpNext = cp.getNext();
 		cpPrev = cp.getPrev();
-		bStart = (curve.getStart() == cp);		// set bStart flag is we're the start of the curve
 		remove();					// remove the ControlPoint
 	}
 
@@ -46,7 +44,6 @@ public class AtomicRemoveControlPointFromCurve extends JPatchAtomicEdit {
 	 *  This method adds the ControlPoint to the curve again
 	 */
 	private void readdEdit() {
-		cp.setCurve(curve);				// set curve
 		if (cpNext != null) {				// if next cp exists
 			cpNext.setPrev(cp);			// point it's prev to us
 			if (cp.getLoop()) {
@@ -55,9 +52,6 @@ public class AtomicRemoveControlPointFromCurve extends JPatchAtomicEdit {
 		}
 		if (cpPrev != null) {				// if prev cp exists
 			cpPrev.setNext(cp);			// point it's next to us
-		}
-		if (bStart) {					// cp has been start of curve
-			curve.setStart(cp);			// set start of curve to cp
 		}
 		cp.setNext(cpNext);
 		cp.setPrev(cpPrev);
@@ -68,7 +62,6 @@ public class AtomicRemoveControlPointFromCurve extends JPatchAtomicEdit {
 	 *  This Method removes the ControlPoint from the curve
 	 */
 	private void remove() {
-		cp.setCurve(null);				// set curve to null
 		if (cpNext != null) {				// if next cp exists
 			cpNext.setPrev(cpPrev);			// point next cp's prev to prev cp (might be null)
 			if (cp.getLoop()) {
@@ -78,13 +71,10 @@ public class AtomicRemoveControlPointFromCurve extends JPatchAtomicEdit {
 		if (cpPrev != null) {				// if prev cp exitsis
 			cpPrev.setNext(cpNext);			// point prev cp's next to next cp (might be null)
 		}
-		if (bStart) {					// cp has been start of curve
-			curve.setStart(cpNext);			// set start of curve to next cp (might be null)
-		}
 	}
 	
 	public int sizeOf() {
-		return 8 + 4 + 4 + 4 + 4 + 1;
+		return 8 + 4 + 4 + 4;
 	}
 }
 

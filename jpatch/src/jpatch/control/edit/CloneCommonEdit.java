@@ -277,7 +277,7 @@ public abstract class CloneCommonEdit extends JPatchCompoundEdit {
 		for (Iterator it = list.iterator(); it.hasNext(); ) {
 			Patch patch = new Patch((ControlPoint[]) it.next());
 			patch.setMaterial((JPatchMaterial) it.next());
-			addEdit(new AddPatchEdit(patch));
+			addEdit(new AtomicAddPatch(patch));
 			if(mirror != null) patch.flip();
 		}
 	}

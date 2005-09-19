@@ -603,7 +603,6 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			gl.glEnd();
 		}
 		Dimension dim = glDrawable.getSize();
-		float h = dim.height;						
 		gl.glRasterPos2i(x, y);			// set raster position
 		char[] c = string.toCharArray();
 	    for (int i = 0, n = c.length; i < n; i++) {		// loop over characters
@@ -1077,8 +1076,6 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		gl.glNormal3f(-n2.x, -n2.y, -n2.z);
 		gl.glVertex3f(p2.x, p2.y, p2.z + 1);
 	}
-	
-	public void drawCurve(Curve curve) { }
 	
 	public boolean isDepthBufferSupported() {
 		return true;

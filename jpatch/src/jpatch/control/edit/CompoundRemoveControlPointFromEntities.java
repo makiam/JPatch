@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundRemoveControlPointFromEntities.java,v 1.1 2005/09/05 14:34:18 sascha_l Exp $
+ * $Id: CompoundRemoveControlPointFromEntities.java,v 1.2 2005/09/19 12:40:15 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -33,6 +33,19 @@ import jpatch.boundary.*;
 public final class CompoundRemoveControlPointFromEntities extends JPatchCompoundEdit {
 	
 	public CompoundRemoveControlPointFromEntities(ControlPoint cp) {
+		// Remove cp from selections
 		addEdit(new AtomicRemoveControlPointFromSelections(cp));
+		// Remove empty selections
+		for (Iterator it = (new HashSet(MainFrame.getInstance().getModel().getSelections())).iterator(); it.hasNext(); ) {
+			NewSelection selection = (NewSelection) it.next();
+			if (selection.getMap().size() == 0)
+				addEdit(new AtomicRemoveSelection(selection));
+		}
+		// Remove patches containing cp
+		for (Iterator it = (new HashSet(MainFrame.getInstance().getModel().getPatchSet())).iterator(); it.hasNext(); ) {
+			Patch patch = (Patch) it.next();
+			if (patch.contains(cp))
+				addEdit(new AtomicRemovePatch(patch));
+		}
 	}
 }

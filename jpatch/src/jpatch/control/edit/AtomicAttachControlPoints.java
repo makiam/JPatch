@@ -28,6 +28,8 @@ public class AtomicAttachControlPoints extends JPatchAtomicEdit {
 	* @param  B  ControlPoint B
 	*/
 	public AtomicAttachControlPoints(ControlPoint A, ControlPoint B) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + A + ", " + B + ")");
 		cpA = A;
 		cpB = B;
 		cpAnextAttached = cpA.getNextAttached();

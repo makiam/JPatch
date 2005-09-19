@@ -1,25 +1,26 @@
 package jpatch.control.edit;
 
+import jpatch.boundary.*;
 import jpatch.entity.*;
 
 public class AtomicAddCurve extends JPatchAtomicEdit {
+	private ControlPoint cpStart;
 	
-	private Model model;
-	private Curve curve;
-	
-	public AtomicAddCurve(Curve curve, Model model) {
-		this.curve = curve;
-		this.model = model;
+	public AtomicAddCurve(ControlPoint start) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + start + ")");
+		cpStart = start;
+		if (cpStart == null || cpStart.getNext() == null)
+			throw new IllegalArgumentException("bad curve");
 		redo();
 	}
 	
 	public void undo() {
-		model.removeCurve(curve);
+		MainFrame.getInstance().getModel().removeCurve(cpStart);
 	}
 	
 	public void redo() {
-		model.addCurve(curve);
-		curve.validate();
+		MainFrame.getInstance().getModel().addCurve(cpStart);
 	}
 	
 	public int sizeOf() {

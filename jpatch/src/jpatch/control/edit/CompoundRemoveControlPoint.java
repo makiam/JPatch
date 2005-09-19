@@ -1,6 +1,6 @@
 package jpatch.control.edit;
 /*
- * $Id: CompoundRemoveControlPoint.java,v 1.1 2005/09/07 16:19:02 sascha_l Exp $
+ * $Id: CompoundRemoveControlPoint.java,v 1.2 2005/09/19 12:40:15 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -30,9 +30,9 @@ import jpatch.entity.*;
 public class CompoundRemoveControlPoint extends JPatchCompoundEdit {
 
 	public CompoundRemoveControlPoint(ControlPoint cp) {
-		Curve curve = cp.getCurve();
 		//is curve closed and length == 3?
-		if (curve.isClosed() && curve.getLength() == 3) {
+		ControlPoint start = cp.getStart();
+		if (start.getLoop() && start.getLength() == 3) {
 			// YES
 			// delete cp
 			addEdit(new CompoundDeleteControlPoint(cp));
@@ -40,12 +40,19 @@ public class CompoundRemoveControlPoint extends JPatchCompoundEdit {
 			return;
 		}
 		// is curve length < 3?
-		if (curve.getLength() < 3) {
+		if (start.getLength() < 3) {
 			// YES
 			// remove entire curve
-			addEdit(new CompoundDropCurve(curve));
+			addEdit(new CompoundDropCurve(start, false));
 			// return
 			return;
+		}
+		// is cp start of curve?
+		if (cp == start) {
+			// YES
+			// set curve start to next cp
+			addEdit(new AtomicRemoveCurve(start));
+			addEdit(new AtomicAddCurve(cp.getNext()));
 		}
 		// drop the cp
 		addEdit(new CompoundDropControlPoint(cp));

@@ -2,7 +2,7 @@ package jpatch.boundary;
 
 import javax.swing.*;
 import jpatch.boundary.action.*;
-import jpatch.boundary.selection.*;
+import jpatch.entity.*;
 
 public class JPatchPopupMenu extends JPopupMenu {
 	/**
@@ -129,7 +129,7 @@ public class JPatchPopupMenu extends JPopupMenu {
 		JMenuItem miRemoveStubs = new JMenuItem(new RemoveStubsAction());
 		JMenuItem miConvertToCp = new JMenuItem(new ConvertHookToCpAction());
 		
-		if (MainFrame.getInstance().getPointSelection() == null) {
+		if (MainFrame.getInstance().getSelection() == null) {
 			miSelectNone.setEnabled(false);
 			miExtendSelection.setEnabled(false);
 			miInvertSelection.setEnabled(false);
@@ -141,9 +141,9 @@ public class JPatchPopupMenu extends JPopupMenu {
 			miRemoveStubs.setEnabled(false);
 			miConvertToCp.setEnabled(false);
 		} else {
-			PointSelection ps = MainFrame.getInstance().getPointSelection();
-			miConvertToCp.setEnabled(ps.isSingle() && ps.getControlPoint().isHook());
-			if (!MainFrame.getInstance().getPointSelection().isCurve() && !MainFrame.getInstance().getPointSelection().isSingle())
+			NewSelection selection = MainFrame.getInstance().getSelection();
+			miConvertToCp.setEnabled(selection.isSingle() && (selection.getHotObject() instanceof ControlPoint) && ((ControlPoint) selection.getHotObject()).isHook());
+			if (MainFrame.getInstance().getSelection().getDirection() != 0 && !MainFrame.getInstance().getSelection().isSingle())
 				miNextCurve.setEnabled(false);
 		}
 

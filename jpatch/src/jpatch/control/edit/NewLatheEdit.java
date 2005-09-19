@@ -342,7 +342,7 @@ public class NewLatheEdit extends CloneCommonEdit {
 		ps.setName("*lathe #" + iNum++);
 		if (ps.getSize() > 0) {
 			addEdit(new AtomicChangeSelection(ps));
-			addEdit(new AddSelectionEdit(ps));
+			addEdit(new AtomicAddSelection(ps));
 		}
 	}
 }

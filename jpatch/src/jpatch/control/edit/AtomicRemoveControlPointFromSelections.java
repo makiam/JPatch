@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicRemoveControlPointFromSelections.java,v 1.2 2005/09/06 13:44:52 sascha_l Exp $
+ * $Id: AtomicRemoveControlPointFromSelections.java,v 1.3 2005/09/19 12:40:15 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -32,13 +32,13 @@ import jpatch.boundary.*;
  */
 public final class AtomicRemoveControlPointFromSelections extends JPatchAtomicEdit {
 	private final ControlPoint cp;
-	private final Model model;
 	private final HashMap mapSelections = new HashMap();
 	
 	public AtomicRemoveControlPointFromSelections(ControlPoint cp) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + cp + ")");
 		this.cp = cp;
-		this.model = cp.getCurve().getModel();
-		for (Iterator it = model.getSelections().iterator(); it.hasNext(); ) {
+		for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
 			NewSelection selection = (NewSelection) it.next();
 			if (selection.contains(cp))
 				mapSelections.put(selection, selection.getMap().get(cp));
@@ -61,6 +61,6 @@ public final class AtomicRemoveControlPointFromSelections extends JPatchAtomicEd
 	}
 	
 	public int sizeOf() {
-		return 8 + 4 + 4  + 4 + (8 + 4 + 4 + 4 + 4 + 8 * mapSelections.size() * 2);
+		return mapSelections == null ? 8 + 4 + 4 : 8 + 4 + 4 + (8 + 4 + 4 + 4 + 4 + 8 * mapSelections.size() * 2);
 	}
 }

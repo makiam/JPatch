@@ -11,6 +11,8 @@ public class AtomicChangeTool extends JPatchAtomicEdit implements JPatchRootEdit
 	private JPatchTool tool;
 	
 	public AtomicChangeTool(JPatchTool tool) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + tool + ")");
 		this.tool = tool;
 		swap();
 	}

@@ -5,11 +5,7 @@ import javax.vecmath.*;
 
 import jpatch.auxilary.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.PointSelection;
-import jpatch.control.edit.ChangeMorphVectorsEdit;
-import jpatch.control.edit.ChangeSelectionPivotEdit;
-import jpatch.control.edit.JPatchAbstractUndoableEdit;
-import jpatch.control.edit.JPatchUndoableEdit;
+import jpatch.control.edit.*;
 
 public class Morph extends JPatchTreeLeaf {
 //	private ArrayList listPoints = new ArrayList();
@@ -78,7 +74,7 @@ public class Morph extends JPatchTreeLeaf {
 				}
 			}
 			public JPatchUndoableEdit endTransform() {
-				return new ChangeMorphVectorsEdit(Morph.this, changeMap);
+				return new AtomicChangeMorphVectors(Morph.this, changeMap);
 			}
 		};
 	}

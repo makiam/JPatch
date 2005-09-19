@@ -1,5 +1,5 @@
 /*
- * $Id: DeleteDefaultSelectionsAction.java,v 1.1 2005/08/10 12:57:19 sascha_l Exp $
+ * $Id: DeleteDefaultSelectionsAction.java,v 1.2 2005/09/19 12:40:16 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -34,7 +34,7 @@ import jpatch.control.edit.*;
  * @author lois
  * modified by sascha
  * This Action removes all selections starting with a "*" character
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public final class DeleteDefaultSelectionsAction extends AbstractAction {
 	
@@ -55,7 +55,7 @@ public final class DeleteDefaultSelectionsAction extends AbstractAction {
 		for (Iterator it = list.iterator(); it.hasNext(); ) {
 			Selection selection = (Selection) it.next();
 			if (selection.toString().startsWith("*"))
-				edit.addEdit(new RemoveSelectionEdit(selection));		
+				edit.addEdit(new AtomicRemoveSelection(selection));		
 		}
 		
 		/* add edit to undomanager */

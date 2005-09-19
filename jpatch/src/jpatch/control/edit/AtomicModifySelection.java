@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicModifySelection.java,v 1.1 2005/09/08 15:03:26 sascha_l Exp $
+ * $Id: AtomicModifySelection.java,v 1.2 2005/09/19 12:40:15 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -47,6 +47,8 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	public static final class AddObjects extends AtomicModifySelection {
 		private final Map mapObjects;
 		public AddObjects(NewSelection selection, Map objects) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + selection + ", " + objects + ")");
 			this.selection = selection;
 			mapObjects = new HashMap(objects);
 		}
@@ -70,6 +72,8 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	public static final class RemoveObjects extends AtomicModifySelection {
 		private final Map mapObjects;
 		public RemoveObjects(NewSelection selection, Map objects) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + selection + ", " + objects + ")");
 			this.selection = selection;
 			mapObjects = new HashMap(objects);
 		}
@@ -91,16 +95,25 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	}
 	
 	public static final class Pivot extends AtomicModifySelection implements JPatchRootEdit {
-		private final Point3f p3Pivot = new Point3f();
+		private float x, y, z;
 		public Pivot(NewSelection selection, Point3f pivot) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + selection + ", " + pivot + ")");
 			this.selection = selection;
-			p3Pivot.set(pivot);
+			x = pivot.x;
+			y = pivot.y;
+			z = pivot.z;
 		}
 		
 		private void swap() {
-			Point3f dummy = new Point3f(p3Pivot);
-			p3Pivot.set(selection.getPivot());
-			selection.getPivot().set(dummy);
+			Point3f p = selection.getPivot();
+			float dummyX = p.x;
+			float dummyY = p.y;
+			float dummyZ = p.z;
+			selection.getPivot().set(x, y, z);
+			x = dummyX;
+			y = dummyY;
+			z = dummyZ;
 		}
 		
 		public void undo() {
@@ -112,7 +125,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 		}
 		
 		public int sizeOf() {
-			return 8 + 4 + 4 + 8 + 4 + 4 + 4;
+			return 8 + 4 + 4 + 4 + 4 + 4;
 		}
 		
 		public String getName() {
@@ -123,6 +136,8 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	public static final class HotObject extends AtomicModifySelection {
 		private Object hot;
 		public HotObject(NewSelection selection, Object hot) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + selection + ", " + hot + ")");
 			this.selection = selection;
 			this.hot = hot;
 		}
@@ -149,6 +164,8 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	public static final class Orientation extends AtomicModifySelection {
 		private final Matrix3f m3Orient = new Matrix3f();
 		public Orientation(NewSelection selection, Matrix3f orientation) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + selection + ", " + orientation + ")");
 			this.selection = selection;
 			m3Orient.set(orientation);
 		}

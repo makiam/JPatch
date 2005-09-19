@@ -41,7 +41,6 @@ public interface JPatchDrawable2 {
 	public void drawTriangle(Point3f p0, Color3f c0, Point3f p1, Color3f c1, Point3f p2, Color3f c2);
 	public void drawTriangle(Point3f p0, Color4f c0, Point3f p1, Color4f c1, Point3f p2, Color4f c2);
 	public void drawTriangle(Point3f p0, Vector3f n0, Point3f p1, Vector3f n1, Point3f p2, Vector3f n2);
-	public void drawCurve(Curve curve);
 	public void drawString(String string, int x, int y);
 	public boolean isDepthBufferSupported();
 	public boolean isShadingSupported();

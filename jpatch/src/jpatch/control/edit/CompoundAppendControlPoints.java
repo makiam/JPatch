@@ -6,13 +6,13 @@ public class CompoundAppendControlPoints extends JPatchCompoundEdit {
 	
 	public CompoundAppendControlPoints(ControlPoint cpA, ControlPoint cpB) {
 		// cpA and cpB on the same curve?
-		if(cpA.getCurve() == cpB.getCurve()) {
+		if(cpA.getStart() == cpB.getStart()) {
 			// YES
 			// is cpA curve-start and cpB curve-end?
 			if (cpA.getPrev() == null && cpB.getNext() == null)
 				// YES
 				// reverse curve
-				addEdit(new AtomicReverseCurve(cpA.getCurve()));
+				addEdit(new AtomicReverseCurve(cpA));
 			else
 				// NO
 				// is cpB curve-start and cpA curve-end?
@@ -21,7 +21,7 @@ public class CompoundAppendControlPoints extends JPatchCompoundEdit {
 					// throw exception
 					throw new IllegalArgumentException("can't attach - not curve start/end");
 			// is curve lenght >= 4?
-			if (cpA.getCurve().getLength() < 4)
+			if (cpA.getStart().getLength() < 4)
 				// NO
 				// throw exception
 				throw new IllegalArgumentException("can't attach - loop curve too short");
@@ -37,7 +37,7 @@ public class CompoundAppendControlPoints extends JPatchCompoundEdit {
 				if (cpB.getPrev() == null)
 					// YES
 					// reverse cpB's curve
-					addEdit(new AtomicReverseCurve(cpB.getCurve()));
+					addEdit(new AtomicReverseCurve(cpB));
 				else
 					// NO
 					// throw exception
@@ -50,20 +50,20 @@ public class CompoundAppendControlPoints extends JPatchCompoundEdit {
 				if (cpA.getNext() == null)
 					// YES
 					// reverse cpA's curve
-					addEdit(new AtomicReverseCurve(cpA.getCurve()));
+					addEdit(new AtomicReverseCurve(cpA));
 				else
 					// NO
 					// throw exception
 					throw new IllegalArgumentException("can't attach - not curve start/end");
 			}
 			// remove cpA's curve
-			addEdit(new AtomicRemoveCurve(cpA.getCurve()));
+			addEdit(new AtomicRemoveCurve(cpA));
 			// append cpA.next to cpB
 			addEdit(new AtomicAppendControlPoints(cpA.getNext(), cpB));
-			// set curve to cpB's curve on all cpA and following cps
-			Curve curve = cpB.getCurve();
-			for(ControlPoint cp = cpA; cp != null; cp = cp.getNextCheckNextLoop())
-				addEdit(new AtomicChangeControlPoint.Curve(cp, curve));
+//			// set curve to cpB's curve on all cpA and following cps
+//			Curve curve = cpB.getCurve();
+//			for(ControlPoint cp = cpA; cp != null; cp = cp.getNextCheckNextLoop())
+//				addEdit(new AtomicChangeControlPoint.Curve(cp, curve));
 		}
 		// replace cpA with cpB in all entities
 		addEdit(new CompoundReplaceControlPointInEntities(cpA, cpB));

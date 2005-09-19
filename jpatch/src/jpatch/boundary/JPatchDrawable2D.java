@@ -318,8 +318,6 @@ public class JPatchDrawable2D implements JPatchDrawable2 {
 		throw new UnsupportedOperationException(this.getClass().getName() + " does not support shading");
 	}
 	
-	public void drawCurve(Curve curve) { }
-	
 	public boolean isShadingSupported() {
 		return false;
 	}

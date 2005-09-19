@@ -20,6 +20,8 @@ public class AtomicDetatchControlPoint extends JPatchAtomicEdit {
 	 * @param  cp  ControlPoint to remove
 	 */
 	public AtomicDetatchControlPoint(ControlPoint cp) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + cp + ")");
 		/*
 		 *  store ControlPoint, nextAttached and previousAttached ControlPoints for undo
 		 */

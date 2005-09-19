@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.19 2005/08/30 22:20:18 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.20 2005/09/19 12:40:16 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -21,6 +21,8 @@
  */
 package jpatch.boundary;
 
+import java.util.*;
+
 import javax.vecmath.*;
 
 import jpatch.auxilary.Bezier;
@@ -34,15 +36,15 @@ import jpatch.entity.*;
  *
  */
 public class Viewport2 {
-	private static int iCurveSubdiv = 5;
-	
-	private static float[] cB0;
-	private static float[] cB1;
-	private static float[] cB2;
-	private static float[] cB3;
-	
-	private static Point3f pa = new Point3f();
-	private static Point3f pb = new Point3f();
+//	private static int iCurveSubdiv = 5;
+//	
+//	private static float[] cB0;
+//	private static float[] cB1;
+//	private static float[] cB2;
+//	private static float[] cB3;
+//	
+//	private static Point3f pa = new Point3f();
+//	private static Point3f pb = new Point3f();
 	private static Point3f p0 = new Point3f();
 	private static Point3f p1 = new Point3f();
 	private static Point3f p2 = new Point3f();
@@ -53,7 +55,7 @@ public class Viewport2 {
 	private JPatchSettings settings = JPatchSettings.getInstance();
 	
 	private Matrix4f m4View = new Matrix4f();
-	private JPatchTool tool;
+//	private JPatchTool tool;
 	
 	private static float fFlatness;
 	//private static float fFlatnessSquared = fFlatness * fFlatness;
@@ -152,7 +154,7 @@ public class Viewport2 {
 	}
 	
 	public void setTool(JPatchTool tool) {
-		this.tool = tool;
+//		this.tool = tool;
 		if (tool != null)
 			drawable.getComponent().addMouseListener(tool);
 	}
@@ -195,9 +197,9 @@ public class Viewport2 {
 		fMinZ = Short.MAX_VALUE;
 		fDeltaZ = Short.MIN_VALUE;
 		Point3f pz = new Point3f();
-		for (Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
-			for(ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
-				if (cp.isHead() && !cp.isHidden()){
+		for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
+			for(ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				if (cp.isHead() && !cp.isHidden()) {
 					pz.set(cp.getPosition());
 					m4View.transform(pz);
 					if (pz.z > fDeltaZ)
@@ -215,9 +217,10 @@ public class Viewport2 {
 		
 		if (viewDef.renderCurves()) {
 			drawable.setColor(new Color3f(settings.cCurve)); // FIXME
-			for (Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
-				if (!curve.getStart().isStartHook())
-					drawCurve(curve);
+			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
+				ControlPoint start = (ControlPoint) it.next();
+				if (!start.isStartHook())
+					drawCurve(start);
 			}
 		}
 		Color3f cSelected = new Color3f(settings.cSelected);
@@ -227,8 +230,8 @@ public class Viewport2 {
 		Color3f color = new Color3f();
 		if (viewDef.renderPoints()) {
 			drawable.setPointSize(3);
-			for(Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
-				for(ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
+			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
+				for(ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 					if (cp.isHead()) {
 						p0.set(cp.getPosition());
 						if (!drawable.isTransformSupported()) 
@@ -267,7 +270,8 @@ public class Viewport2 {
 			for (int pass = 0; pass < passes; pass++) {
 				drawable.setTransparentRenderingMode(pass);
 				pass:
-				for (Patch patch = model.getFirstPatch(); patch != null; patch = patch.getNext()) {
+				for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
+					Patch patch = (Patch) it.next();
 					if (!patch.isHidden() && patch.getMaterial() != null) {
 						MaterialProperties mp = patch.getMaterial().getMaterialProperties();
 						if (pass == 0) {
@@ -547,9 +551,9 @@ public class Viewport2 {
 	}
 	
 	private Color3f c3Curve = new Color3f(settings.cCurve);
-	private void drawCurve(Curve curve) {
+	private void drawCurve(ControlPoint start) {
 		ControlPoint cpNext;
-		for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
+		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
 			cpNext = cp.getNext();
 			if (cpNext != null && !cp.isHidden() && !cpNext.isHidden()) {
 				if (!drawable.isTransformSupported()) {

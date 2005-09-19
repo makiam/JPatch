@@ -1,10 +1,10 @@
 package jpatch.boundary.action;
 
 import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
 import jpatch.entity.*;
 
 public final class PeakAction extends AbstractAction {
@@ -17,20 +17,22 @@ public final class PeakAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,"Peak");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null && ps.isCurve()) {
-			MainFrame.getInstance().getUndoManager().addEdit(new ChangeControlPointTangentModeEdit(ps.getControlPoint(),ControlPoint.PEAK));
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		if (selection != null && selection.getDirection() != 0) {
+			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeControlPoint.TangentMode((ControlPoint) selection.getHotObject(),ControlPoint.PEAK));
 			MainFrame.getInstance().getJPatchScreen().update_all();
-		} else if (ps != null) {
-			JPatchCompoundEdit compoundEdit = new JPatchCompoundEdit();
-			ControlPoint[] acp = ps.getControlPointArray();
-			for (int i = 0; i < acp.length; i++) {
-				ControlPoint[] stack = acp[i].getStack();
-				for (int j = 0; j < stack.length; j++) {
-					compoundEdit.addEdit(new ChangeControlPointTangentModeEdit(stack[j],ControlPoint.PEAK));
+		} else if (selection != null) {
+			JPatchActionEdit edit = new JPatchActionEdit("peak tangents");
+			for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
+				Object object = it.next();
+				if (object instanceof ControlPoint) {
+					ControlPoint[] stack = ((ControlPoint) object).getStack();
+					for (int j = 0; j < stack.length; j++) {
+						edit.addEdit(new AtomicChangeControlPoint.TangentMode(stack[j],ControlPoint.PEAK));
+					}
 				}
 			}
-			MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
+			MainFrame.getInstance().getUndoManager().addEdit(edit);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 		ControlPoint.setDefaultMode(ControlPoint.PEAK);

@@ -489,8 +489,6 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 		drawTriangle(p0, c0, p1, c1, p2, c2);
 	}
 	
-	public void drawCurve(Curve curve) { }
-	
 	public boolean isShadingSupported() {
 		return true;
 	}

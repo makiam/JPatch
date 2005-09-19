@@ -15,10 +15,10 @@ public final class ComputePatchesAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("compute patches"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		JPatchCompoundEdit compoundEdit = new JPatchCompoundEdit("compute Patches");
-		MainFrame.getInstance().getModel().computePatches(compoundEdit);
-		if (compoundEdit.isValid()) {
-			MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
+		JPatchActionEdit edit = new JPatchActionEdit("compute patches");
+		MainFrame.getInstance().getModel().computePatches(edit);
+		if (edit.isValid()) {
+			MainFrame.getInstance().getUndoManager().addEdit(edit);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 	}

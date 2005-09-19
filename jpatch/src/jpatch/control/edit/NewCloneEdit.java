@@ -18,7 +18,7 @@ public class NewCloneEdit extends CloneCommonEdit {
 		if (ps.getSize() > 0) {
 			ps.setName("*clone #" + iSequenceNumber++);
 			addEdit(new AtomicChangeSelection(ps));
-			addEdit(new AddSelectionEdit(ps));
+			addEdit(new AtomicAddSelection(ps));
 		}
 	}
 }

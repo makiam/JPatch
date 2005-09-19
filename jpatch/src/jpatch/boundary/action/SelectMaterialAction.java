@@ -1,7 +1,9 @@
 package jpatch.boundary.action;
 
 import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
+
 import jpatch.boundary.*;
 import jpatch.boundary.selection.*;
 import jpatch.entity.*;
@@ -22,16 +24,17 @@ public final class SelectMaterialAction extends AbstractAction {
 	
 	public void actionPerformed(ActionEvent actionEvent) {
 		//System.out.println("select material");
-		PointSelection ps = new PointSelection();
-		for (Patch patch = MainFrame.getInstance().getModel().getFirstPatch(); patch != null; patch = patch.getNext()) {
+		ArrayList list = new ArrayList();
+		for (Iterator it = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {
+			Patch patch = (Patch) it.next();
 			if (material == patch.getMaterial()) {
 				ControlPoint[] acp = patch.getControlPoints();
 				for (int i = 0; i < acp.length; i++) {
-					ps.addControlPoint(acp[i].getHead());
+					list.add(acp[i].getHead());
 				}
 			}
 		}
-		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(ps));
+		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new NewSelection(list)));
 		MainFrame.getInstance().getJPatchScreen().update_all();
 	}
 }

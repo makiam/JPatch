@@ -12,8 +12,7 @@ public class AtomicDeleteControlPointFromCurve extends JPatchAtomicEdit {
 	private ControlPoint cp;
 	private ControlPoint cpNext;
 	private ControlPoint cpPrev;
-	private Curve curve;
-
+	
 	/**
 	 * Constructor
 	 * The controlPoint will be deleted immediately
@@ -21,12 +20,13 @@ public class AtomicDeleteControlPointFromCurve extends JPatchAtomicEdit {
 	 * @param  cp  ControlPoint to remove
 	 */
 	public AtomicDeleteControlPointFromCurve(ControlPoint cp) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + cp + ")");
 		/*
 		 *  store ControlPoint, Curve, next and previous ControlPoints for undo
 		 */
 		//System.out.println("\t\tdeleteControlPointFromCurve " + cp);
 		this.cp = cp;
-		curve = cp.getCurve();
 		cpNext = cp.getNext();
 		cpPrev = cp.getPrev();
 		delete();					// remove the ControlPoint
@@ -45,7 +45,6 @@ public class AtomicDeleteControlPointFromCurve extends JPatchAtomicEdit {
 	 *  This method inserts the ControlPoint to the curve again
 	 */
 	private void undelete() {
-		cp.setCurve(curve);				// set curve
 		if (cpNext != null) {				// if next cp exists
 			cpNext.setPrev(cp);			// point it's prev to us
 		}
@@ -60,7 +59,6 @@ public class AtomicDeleteControlPointFromCurve extends JPatchAtomicEdit {
 	 */
 	private void delete() {
 		//System.out.println("delete " + cp);
-		cp.setCurve(null);
 		if (cpPrev != null) {
 			cpPrev.setNext(null);
 		}

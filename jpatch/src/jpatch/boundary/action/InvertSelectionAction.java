@@ -1,9 +1,10 @@
 package jpatch.boundary.action;
 
 import java.awt.event.*;
+import java.util.*;
+
 import javax.swing.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
 import jpatch.control.edit.*;
 import jpatch.entity.*;
 
@@ -24,14 +25,14 @@ public final class InvertSelectionAction extends AbstractAction {
 		//PointSelection ps = MainFrame.getInstance().getPointSelection();
 		//if (ps != null) {
 		//	boolean selectCurveOnly = (ps.isSingle() && (ps.isCurve() || ps.getControlPoint().getPrevAttached() == null));
-		PointSelection currentPs = MainFrame.getInstance().getPointSelection();
-		PointSelection ps = new PointSelection();
-		for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
-			for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
-				if (!currentPs.contains(cp) && cp.isHead() && !cp.isHidden() && !cp.isStartHook() && !cp.isEndHook()) ps.addControlPoint(cp);
+		ArrayList list = new ArrayList();
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
+			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				if (!selection.contains(cp) && cp.isHead() && !cp.isHidden() && !cp.isStartHook() && !cp.isEndHook()) list.add(cp);
 			}
 		}
-		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(ps));
+		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new NewSelection(list)));
 		MainFrame.getInstance().getJPatchScreen().update_all();
 		//}
 	}
