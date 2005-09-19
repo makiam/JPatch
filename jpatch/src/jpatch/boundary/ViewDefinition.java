@@ -4,6 +4,7 @@ import javax.vecmath.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.util.*;
 import jpatch.entity.*;
 
 public final class ViewDefinition
@@ -531,8 +532,8 @@ implements ComponentListener {
 		}
 		
 		ControlPoint cpClosest = null;
-		for (Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
-			cp = curve.getStart();
+		for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
+			cp = (ControlPoint) it.next();
 			//if (cp.getHookPos() == -1) {
 				if ((selectHooks && cp.getHookPos() != 0 && cp.getHookPos() != 1) || cp.getHookPos() == -1) {
 				while (cp != null) {

@@ -1,6 +1,8 @@
 package jpatch.boundary.action;
 
 import java.awt.event.*;
+import java.util.*;
+
 import javax.swing.*;
 import jpatch.boundary.*;
 import jpatch.boundary.selection.*;
@@ -24,13 +26,13 @@ public final class SelectAllAction extends AbstractAction {
 		//PointSelection ps = MainFrame.getInstance().getPointSelection();
 		//if (ps != null) {
 		//	boolean selectCurveOnly = (ps.isSingle() && (ps.isCurve() || ps.getControlPoint().getPrevAttached() == null));
-		PointSelection ps = new PointSelection();
-		for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
-			for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
-				if (cp.isHead() && !cp.isHidden() && !cp.isStartHook() && !cp.isEndHook()) ps.addControlPoint(cp);
+		ArrayList list = new ArrayList();
+		for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
+			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				if (cp.isHead() && !cp.isHidden() && !cp.isStartHook() && !cp.isEndHook()) list.add(cp);
 			}
 		}
-		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(ps));
+		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new NewSelection(list)));
 		MainFrame.getInstance().getJPatchScreen().update_all();
 		//}
 	}

@@ -31,39 +31,39 @@ import jpatch.boundary.*;
  *
  */
 public final class AtomicExchangeControlPointInSelections extends JPatchAtomicEdit {
-	private final ControlPoint cpOld, cpNew;
-	private final Model model;
-	private final HashMap mapSelections = new HashMap();
+	private ControlPoint cpOld, cpNew;
 	
 	public AtomicExchangeControlPointInSelections(ControlPoint cpOld, ControlPoint cpNew) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + cpOld + ", " + cpNew + ")");
 		this.cpOld = cpOld;
 		this.cpNew = cpNew;
-		this.model = cpOld.getCurve().getModel();
-		for (Iterator it = model.getSelections().iterator(); it.hasNext(); ) {
+		swap();
+	}
+	
+	private void swap() {
+		for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
 			NewSelection selection = (NewSelection) it.next();
-			if (selection.contains(cpOld))
-				mapSelections.put(selection, selection.getMap().get(cpOld));
+			if (selection.contains(cpOld)) {
+				Object weight = selection.getMap().get(cpOld);
+				selection.getMap().remove(cpOld);
+				selection.getMap().put(cpNew, weight);
+			}
 		}
-		redo();
+		ControlPoint dummy = cpOld;
+		cpOld = cpNew;
+		cpNew = dummy;
 	}
 	
 	public void undo() {
-		for (Iterator it = mapSelections.keySet().iterator(); it.hasNext(); ) {
-			NewSelection selection = (NewSelection) it.next();
-			selection.getMap().remove(cpNew);
-			selection.getMap().put(cpOld, mapSelections.get(selection)); 
-		}
+		swap();
 	}
 	
 	public void redo() {
-		for (Iterator it = mapSelections.keySet().iterator(); it.hasNext(); ) {
-			NewSelection selection = (NewSelection) it.next();
-			selection.getMap().remove(cpOld);
-			selection.getMap().put(cpNew, mapSelections.get(selection));
-		}
+		swap();
 	}
 	
 	public int sizeOf() {
-		return 8 + 4 + 4 + 4 + 4 + (8 + 4 + 4 + 4 + 4 + 8 * mapSelections.size() * 2);
+		return 8 + 4 + 4;
 	}
 }

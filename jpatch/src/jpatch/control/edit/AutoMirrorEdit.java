@@ -299,7 +299,7 @@ public class AutoMirrorEdit extends CloneCommonEdit {
 				}
 			}
 			for (Iterator it = newSelections.iterator(); it.hasNext(); ) {
-				addEdit(new AddSelectionEdit((Selection) it.next()));
+				addEdit(new AtomicAddSelection((Selection) it.next()));
 			}
 			
 			//for (Iterator it = mapOriginals.keySet().iterator(); it.hasNext(); ) {

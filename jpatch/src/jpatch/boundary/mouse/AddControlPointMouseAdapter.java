@@ -61,14 +61,12 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 				ControlPoint cpB = new ControlPoint(pos);
 				cpA.setNext(cpB);
 				cpB.setPrev(cpA);
-				Curve curve = new Curve(cpA,MainFrame.getInstance().getModel());
-				curve.validate();
-				edit.addEdit(new AtomicAddCurve(curve, MainFrame.getInstance().getModel()));
+				edit.addEdit(new AtomicAddCurve(cpA));
 				if (cp != null && cp.getLooseEnd() != null) {
 					if (!mouseEvent.isControlDown())
 						edit.addEdit(new CompoundWeldControlPoints(cpA,cp));
-// FIXME			else
-// FIXME				edit.addEdit(CorrectSelectionsEdit.attachPoints(cpA.getHead(),cp.getTail()));
+					else
+						edit.addEdit(new AtomicAttachControlPoints(cpA.getHead(),cp.getTail()));
 				}
 				NewSelection selection = new NewSelection(cpB);
 //				MainFrame.getInstance().setSelection(selection);
@@ -97,9 +95,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 				ControlPoint cpB = new ControlPoint(cp);
 				cpA.setNext(cpB);
 				cpB.setPrev(cpA);
-				Curve curve = new Curve(cpA,MainFrame.getInstance().getModel());
-				curve.validate();
-				edit.addEdit(new AtomicAddCurve(curve, MainFrame.getInstance().getModel()));
+				edit.addEdit(new AtomicAddCurve(cpA));
 				//compoundEdit.addEdit(new WeldControlPointsEdit(cpA,cp));
 				edit.addEdit(new CompoundWeldControlPoints(cpA,cp));
 				
@@ -125,9 +121,9 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 				if (hookPos[0] == -1) {
 					if (!mouseEvent.isControlDown())
 						edit.addEdit(new CompoundWeldControlPoints(cpHot,cp));
-//FIXME					else
-//FIXME						edit.addEdit(CorrectSelectionsEdit.attachPoints(cpHot.getHead(),cp.getTail()));
-//FIXME						((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
+					else
+						edit.addEdit(new AtomicAttachControlPoints(cpHot.getHead(),cp.getTail()));
+//						((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
 //					edit.addEdit(new RemoveControlPointFromSelectionEdit(cpHot, MainFrame.getInstance().getSelection()));
 					MainFrame.getInstance().getJPatchScreen().full_update();
 					setIdleState();

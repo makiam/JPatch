@@ -29,6 +29,8 @@ import jpatch.entity.*;
  */
 public class CompoundDropControlPoint extends JPatchCompoundEdit {
 	public CompoundDropControlPoint(ControlPoint cp) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + cp + ")");
 		// has cp got a valid parent-hook?
 		if (cp.getParentHook() != null && cp.getParentHook().getChildHook() == cp)
 			// YES
@@ -38,15 +40,23 @@ public class CompoundDropControlPoint extends JPatchCompoundEdit {
 		if (cp.getChildHook() != null)
 			// YES
 			// drop child-hook's curve
-			addEdit(new CompoundDropCurve(cp.getChildHook().getCurve()));
+			addEdit(new CompoundDropCurve(cp.getChildHook(), true));
 		// has previous cp got a child-hook?
 		if (cp.getPrev() != null && cp.getPrev().getChildHook() != null)
 			// YES
 			// drop previous cp's child-hook's curve
-			addEdit(new CompoundDropCurve(cp.getPrev().getChildHook().getCurve()));
+			addEdit(new CompoundDropCurve(cp.getPrev().getChildHook(), true));
 		// remove cp from all entities
 		addEdit(new CompoundRemoveControlPointFromEntities(cp));
-		// detauch the cp
-		addEdit(new AtomicDetatchControlPoint(cp));
+		addEdit(new AtomicChangeControlPoint.Deleted(cp));
+		// detach the cp
+		if (cp.getHookPos() == -1)
+			addEdit(new AtomicDetatchControlPoint(cp));
+//		if (cp.getPrevAttached() != null && cp.getNextAttached() != null)
+//			addEdit(new AtomicDetatchControlPoint(cp));
+//		else if (cp.getPrevAttached() != null)
+//			addEdit(new AtomicChangeControlPoint.PrevAttached(cp, null));
+//		else if (cp.getNextAttached() != null)
+//			addEdit(new AtomicChangeControlPoint.NextAttached(cp, null));
 	}
 }

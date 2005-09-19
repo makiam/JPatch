@@ -21,6 +21,8 @@ public class AtomicInsertControlPoint extends JPatchAtomicEdit implements JPatch
 	 */
 	
 	public AtomicInsertControlPoint(ControlPoint A, ControlPoint B) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + A + ", " + B + ")");
 		cpA = A;
 		cpB = B;
 //		cpAprev = cpA.getPrev();
@@ -40,7 +42,6 @@ public class AtomicInsertControlPoint extends JPatchAtomicEdit implements JPatch
 		}
 		cpA.setPrev(cpB);
 		cpB.setNext(cpA);
-		cpA.setCurve(cpB.getCurve());
 		if (cpB.getPrev() != null)
 			cpB.getPrev().invalidateTangents();
 		cpB.invalidateTangents();

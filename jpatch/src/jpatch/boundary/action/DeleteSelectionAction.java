@@ -25,7 +25,7 @@ public final class DeleteSelectionAction extends AbstractAction {
 		//MainFrame.getInstance().getJPatchScreen().addMouseListeners(new AddControlPointMouseAdapter());
 		//MainFrame.getInstance().clearDialog();
 		
-		MainFrame.getInstance().getUndoManager().addEdit(new RemoveSelectionEdit(selection));
+		MainFrame.getInstance().getUndoManager().addEdit(new AtomicRemoveSelection(selection));
 		
 		
 	}

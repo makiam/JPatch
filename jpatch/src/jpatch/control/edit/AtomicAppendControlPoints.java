@@ -9,8 +9,6 @@ import jpatch.entity.*;
  * @created    08. Juni 2003
  */
 public final class AtomicAppendControlPoints extends JPatchAtomicEdit {
-
-	private Curve curve;
 	private ControlPoint cpA;
 	private ControlPoint cpAprev;
 	private ControlPoint cpB;
@@ -28,27 +26,25 @@ public final class AtomicAppendControlPoints extends JPatchAtomicEdit {
 	 * @param  A  ControlPoint A
 	 * @param  B  ControlPoint B
 	 */
-	 public AtomicAppendControlPoints(ControlPoint A, ControlPoint B) {
+	public AtomicAppendControlPoints(ControlPoint A, ControlPoint B) {
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + A + ", " + B + ")");
 		cpA = A;
 		cpB = B;
 		cpAprev = cpA.getPrev();
 		cpBnext = cpB.getNext();
-		curve = cpB.getCurve();
 		redo();
 	}
  
 	public void redo() {
 		cpA.setPrev(cpB);
 		cpB.setNext(cpA);
-		cpA.setCurve(cpB.getCurve());
 		invalidateTangents();
-		
 	}
 
 	public void undo() {
 		cpA.setPrev(cpAprev);
 		cpB.setNext(cpBnext);
-		cpA.setCurve(curve);
 		invalidateTangents();
 	}
 	

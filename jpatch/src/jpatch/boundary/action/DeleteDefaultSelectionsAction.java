@@ -55,7 +55,7 @@ public final class DeleteDefaultSelectionsAction extends AbstractAction {
 		for (Iterator it = list.iterator(); it.hasNext(); ) {
 			Selection selection = (Selection) it.next();
 			if (selection.toString().startsWith("*"))
-				edit.addEdit(new RemoveSelectionEdit(selection));		
+				edit.addEdit(new AtomicRemoveSelection(selection));		
 		}
 		
 		/* add edit to undomanager */

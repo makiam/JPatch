@@ -6,9 +6,9 @@ public class CompoundHook extends JPatchCompoundEdit {
 
 	public CompoundHook(ControlPoint cpTargetHook, ControlPoint cpTarget, float hookPos) {
 		if (cpTarget.getChildHook() == null) {
-			Curve hookCurve = cpTarget.createEmptyHookCurve();
-			addEdit(new AtomicChangeControlPoint.ChildHook(cpTarget, hookCurve.getStart()));
-			addEdit(new AtomicAddCurve(hookCurve, cpTarget.getCurve().getModel()));
+			ControlPoint startHook = cpTarget.createEmptyHookCurve();
+			addEdit(new AtomicChangeControlPoint.ChildHook(cpTarget, startHook));
+			addEdit(new AtomicAddCurve(startHook));
 		}
 		ControlPoint cp = cpTarget.getChildHook();
 		while (cp.getNext() != null && cp.getNext().getHookPos() < hookPos) {

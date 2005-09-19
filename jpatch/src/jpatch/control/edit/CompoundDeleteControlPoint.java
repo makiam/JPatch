@@ -19,14 +19,18 @@ public class CompoundDeleteControlPoint extends JPatchCompoundEdit {
 	 * @param  cp  ControlPoint to be removed
 	 */
 	public CompoundDeleteControlPoint(ControlPoint cp) {
-		Curve curve = cp.getCurve();
-		// is the curve open?
-		if (curve.isClosed()) {
-			// NO
+		if (DEBUG)
+			System.out.println(getClass().getName() + "(" + cp + ")");
+		ControlPoint start = cp.getStart();
+		// is the curve closed?
+		if (start.getLoop()) {
+			// YES
 			// clear loop on start-cp
-			addEdit(new AtomicChangeControlPoint.Loop(curve.getStart()));
+			addEdit(new AtomicChangeControlPoint.Loop(start));
 			// set curve-start to next cp
-			addEdit(new AtomicChangeCurveStart(curve, cp.getNext()));
+			addEdit(new AtomicRemoveCurve(start));
+			addEdit(new AtomicAddCurve(cp.getNext()));
+//			addEdit(new AtomicChangeCurveStart(curve, cp.getNext()));
 			// drop this cp
 			addEdit(new CompoundDropControlPoint(cp));
 			// delete this cp from curve
@@ -35,16 +39,17 @@ public class CompoundDeleteControlPoint extends JPatchCompoundEdit {
 			return;
 		}
 		// is this cp on a 2-point curve or the center of a 3-point curve?
-		if (curve.getLength() == 2 || (curve.getLength() == 3 && cp.getNext() != null && cp.getPrev() != null)) {
+		if (start.getLength() == 2 || (start.getLength() == 3 && cp.getNext() != null && cp.getPrev() != null)) {
 			// YES
 			// drop the entire curve
-			addEdit(new CompoundDropCurve(curve));
+			addEdit(new CompoundDropCurve(start, false));
 			// return
 			return;
 		}
 		// drop this cp
 		addEdit(new CompoundDropControlPoint(cp));
 		// delete this cp from curve
+		ControlPoint cpNext = cp.getNext();
 		addEdit(new AtomicDeleteControlPointFromCurve(cp));
 		// is this cp the first or second point on the curve?
 		if (cp.getPrev() == null || cp.getPrev().getPrev() == null) {
@@ -55,7 +60,9 @@ public class CompoundDeleteControlPoint extends JPatchCompoundEdit {
 				// drop the first cp
 				addEdit(new CompoundDropControlPoint(cp.getPrev()));
 			// set curve-start to next cp
-			addEdit(new AtomicChangeCurveStart(curve, cp.getNext()));
+			addEdit(new AtomicRemoveCurve(start));
+			addEdit(new AtomicAddCurve(cpNext));
+//			addEdit(new AtomicChangeCurveStart(curve, cp.getNext()));
 			// return
 			return;
 		}
@@ -66,12 +73,12 @@ public class CompoundDeleteControlPoint extends JPatchCompoundEdit {
 			if (cp.getNext() != null)
 				// YES
 				// drop the last cp
-				addEdit(new CompoundDropControlPoint(cp.getNext()));
+				addEdit(new CompoundDropControlPoint(cpNext));
 			// return
 			return;
 		}
 		// add new curve starting with next cp
-		addEdit(new AtomicAddCurve(new Curve(cp.getNext()), curve.getModel()));
+		addEdit(new AtomicAddCurve(cp.getNext()));
 	}
 }
 //		//System.out.println("\tdelete controlpoint edit " + cp.number());

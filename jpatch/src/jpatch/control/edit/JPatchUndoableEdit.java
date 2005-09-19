@@ -30,6 +30,11 @@ package jpatch.control.edit;
  */
 public interface JPatchUndoableEdit {
 	/**
+	 * debug flag
+	 */
+	static final boolean DEBUG = false;
+	
+	/**
 	 * undoes this edit
 	 */
 	public void undo();
@@ -48,5 +53,7 @@ public interface JPatchUndoableEdit {
 	 * returns the (guessed) size of the edit object
 	 */
 	public int sizeOf();
+	
+	public void debug(String prefix);
 }
 

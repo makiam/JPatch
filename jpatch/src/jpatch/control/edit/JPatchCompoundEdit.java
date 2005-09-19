@@ -33,9 +33,11 @@ import java.util.*;
  * @author	Sascha Ledinsky
  */
 public abstract class JPatchCompoundEdit implements JPatchUndoableEdit {
-
+	
 	/** a list holding all child edits */
 	protected List listEdits = new ArrayList(1);
+	
+	protected JPatchCompoundEdit() { }
 	
 	/**
 	 * adds an edit to the list
@@ -95,10 +97,12 @@ public abstract class JPatchCompoundEdit implements JPatchUndoableEdit {
 		}
 		return size;
 	}
-//	public void dump(String prefix) {
-//		System.out.println(prefix + getClass().getName() + " \"" + getName() + "\":");
-//		for (Iterator it = lstEdits.iterator(); it.hasNext(); ) {
-//			((JPatchUndoableEdit) it.next()).dump(prefix + "    ");
-//		}
-//	}
+	
+	public void debug(String prefix) {
+		String name = this instanceof JPatchRootEdit ? getClass().getName() + " \"" + ((JPatchRootEdit) this).getName() + "\"" : getClass().getName();
+		System.out.println(prefix + name + " " + sizeOf() + ":");
+		for (Iterator it = listEdits.iterator(); it.hasNext(); ) {
+			((JPatchUndoableEdit) it.next()).debug(prefix + "    ");
+		}
+	}
 }
