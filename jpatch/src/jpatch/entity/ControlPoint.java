@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.6 2005/09/19 12:40:16 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.7 2005/09/20 16:17:54 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -36,7 +36,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.6 $
+ * @version    $Revision: 1.7 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -1844,11 +1844,9 @@ public class ControlPoint implements Comparable, Transformable {
 	/**
 	 *
 	 */
-	public StringBuffer xml(int tabs) {
-		StringBuffer sbIndent = XMLutils.indent(tabs);
-		StringBuffer sbLineBreak = XMLutils.lineBreak();
+	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(sbIndent).append("<cp");
+		sb.append(prefix).append("<cp");
 		//if (cpNextAttached == null) {
 		//	//
 		//	//
@@ -1902,7 +1900,7 @@ public class ControlPoint implements Comparable, Transformable {
 		if (fInMagnitude != fDefaultMagnitude) {
 			sb.append(" magnitude=").append(XMLutils.quote(fInMagnitude));
 		}
-		sb.append("/>").append(sbLineBreak);
+		sb.append("/>").append("\n");
 		return sb;
 	}
 	

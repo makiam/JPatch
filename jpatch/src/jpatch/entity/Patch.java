@@ -1,5 +1,5 @@
 /*
- * $Id: Patch.java,v 1.2 2005/09/19 12:40:16 sascha_l Exp $
+ * $Id: Patch.java,v 1.3 2005/09/20 16:17:54 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -24,14 +24,13 @@ package jpatch.entity;
 
 import javax.vecmath.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
 import jpatch.auxilary.*;
 
 /**
  * A Patch. Currently 3-, 4- and 5-point patches are supported
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.2 $
+ * @version    $Revision: 1.3 $
  * @see		jpatch.entity.Curve
  * @see		jpatch.entity.ControlPoint
  */
@@ -136,16 +135,16 @@ public final class Patch {
 		return hash;
 	}
 	
-	public final void check(PointSelection ps) {
-		bDynamic = false;
-		loop:
-		for (int i = 0; i < acpPoint.length; i++) {
-			if (ps.contains(acpPoint[i].getHead())) bDynamic = true;
-			if (acpPoint[i].getPrev() != null && ps.contains(acpPoint[i].getPrev().getHead())) bDynamic = true;
-			if (acpPoint[i].getNext() != null && ps.contains(acpPoint[i].getNext().getHead())) bDynamic = true;
-			if (bDynamic) break loop;
-		}
-	}
+//	public final void check(PointSelection ps) {
+//		bDynamic = false;
+//		loop:
+//		for (int i = 0; i < acpPoint.length; i++) {
+//			if (ps.contains(acpPoint[i].getHead())) bDynamic = true;
+//			if (acpPoint[i].getPrev() != null && ps.contains(acpPoint[i].getPrev().getHead())) bDynamic = true;
+//			if (acpPoint[i].getNext() != null && ps.contains(acpPoint[i].getNext().getHead())) bDynamic = true;
+//			if (bDynamic) break loop;
+//		}
+//	}
 	
 //	public final boolean isSelected(PointSelection ps) {
 //		for (int i = 0; i < acpPoint.length; i++) {
@@ -206,14 +205,11 @@ public final class Patch {
 	 *
 	 * @return A StringBuffer containing an XML representation of this curve
 	 */
-	public StringBuffer xml(int tabs) {
-		StringBuffer sbIndent = XMLutils.indent(tabs);
-		StringBuffer sbIndent1 = XMLutils.indent(tabs + 1);
-		StringBuffer sbLineBreak = XMLutils.lineBreak();
+	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
 		int materialNumber = (material != null) ? material.getXmlNumber() : -1;
-		sb.append(sbIndent).append("<patch material=\"" + materialNumber + "\">").append(sbLineBreak);
-		sb.append(sbIndent1).append("<points>");
+		sb.append(prefix).append("<patch material=\"" + materialNumber + "\">").append("\n");
+		sb.append(prefix).append("\t<points>");
 		//int size = getType();
 		//int p = 0;
 		for (int i = 0; i < acpPoint.length; i++) {
@@ -222,8 +218,8 @@ public final class Patch {
 				sb.append(",");
 			}
 		}
-		sb.append("</points>").append(sbLineBreak);
-		sb.append(sbIndent).append("</patch>").append(sbLineBreak);
+		sb.append("</points>").append("\n");
+		sb.append(prefix).append("</patch>").append("\n");
 		return sb;
 	}
 	

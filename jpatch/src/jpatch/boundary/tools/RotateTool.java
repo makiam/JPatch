@@ -6,7 +6,7 @@ import java.awt.event.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
+
 import jpatch.control.edit.*;
 import jpatch.entity.*;
 

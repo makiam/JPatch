@@ -4,7 +4,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
 import jpatch.control.edit.*;
 
 public final class NewSelectionAction extends AbstractAction {

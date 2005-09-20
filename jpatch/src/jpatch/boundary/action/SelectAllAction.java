@@ -5,7 +5,7 @@ import java.util.*;
 
 import javax.swing.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
+
 import jpatch.control.edit.*;
 import jpatch.entity.*;
 

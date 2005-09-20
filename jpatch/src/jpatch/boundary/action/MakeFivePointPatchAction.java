@@ -5,7 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
+
 import jpatch.entity.*;
 
 public final class MakeFivePointPatchAction extends AbstractAction {

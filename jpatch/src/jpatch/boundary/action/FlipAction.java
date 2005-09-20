@@ -4,7 +4,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
+
 
 public final class FlipAction extends AbstractAction {
 	/**

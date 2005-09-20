@@ -6,7 +6,7 @@ import javax.vecmath.*;
 
 import jpatch.entity.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
+
 
 public class AutoMirrorEdit extends CloneCommonEdit {
 	

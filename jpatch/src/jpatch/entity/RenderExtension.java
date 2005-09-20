@@ -36,9 +36,7 @@ public class RenderExtension {
 		return null;
 	}
 	
-	public StringBuffer xml(int tabs) {
-		StringBuffer sbIndent = XMLutils.indent(tabs);
-		StringBuffer sbLineBreak = XMLutils.lineBreak();
+	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
 		Iterator iterator = mapRenderStrings.keySet().iterator();
 		while (iterator.hasNext()) {
@@ -50,9 +48,9 @@ public class RenderExtension {
 				r = r.replaceAll("\"","&quot;");
 				r = r.replaceAll(">","&gt;");
 				r = r.replaceAll("<","&lt;");
-				sb.append(sbIndent).append("<renderer format=").append(XMLutils.quote(key)).append(">");
+				sb.append(prefix).append("<renderer format=").append(XMLutils.quote(key)).append(">");
 				sb.append(r);
-				sb.append("</renderer>").append(sbLineBreak);
+				sb.append("</renderer>").append("\n");
 			}
 		}
 		return sb;

@@ -1,7 +1,7 @@
 package jpatch.control.edit;
 
 import java.util.*;
-import jpatch.boundary.selection.*;
+
 import jpatch.entity.*;
 
 /**

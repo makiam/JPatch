@@ -1,7 +1,7 @@
 package jpatch.control.edit;
 
 import javax.vecmath.*;
-import jpatch.boundary.selection.*;
+
 import jpatch.boundary.tools.*;
 
 /**

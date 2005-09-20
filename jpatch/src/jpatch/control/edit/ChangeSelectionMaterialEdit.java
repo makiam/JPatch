@@ -2,7 +2,7 @@ package jpatch.control.edit;
 
 import jpatch.boundary.*;
 import jpatch.entity.*;
-import jpatch.boundary.selection.*;
+
 
 /**
  *  Changes the bLoop flag of a ControlPoint

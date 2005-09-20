@@ -3,7 +3,7 @@ package jpatch.boundary.action;
 import javax.swing.*;
 import java.awt.event.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
+
 
 public final class DetachBoneAction extends AbstractAction {
 	/**

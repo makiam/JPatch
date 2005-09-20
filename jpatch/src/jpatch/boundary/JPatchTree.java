@@ -1,5 +1,5 @@
 /**
- * $Id: JPatchTree.java,v 1.2 2005/08/30 22:20:18 sascha_l Exp $
+ * $Id: JPatchTree.java,v 1.3 2005/09/20 16:17:54 sascha_l Exp $
  */
 package jpatch.boundary;
 
@@ -8,7 +8,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 
-import jpatch.boundary.selection.*;
 import jpatch.entity.*;
 //import jpatch.control.edit.AddSelectionEdit;
 //import jpatch.control.edit.RemoveSelectionEdit;

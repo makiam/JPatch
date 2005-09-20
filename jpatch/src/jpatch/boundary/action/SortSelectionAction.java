@@ -1,5 +1,5 @@
 /*
- * $Id: SortSelectionAction.java,v 1.1 2005/08/10 12:57:19 sascha_l Exp $
+ * $Id: SortSelectionAction.java,v 1.2 2005/09/20 16:17:54 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -28,7 +28,7 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
+
 import jpatch.entity.*;
 
 
@@ -36,7 +36,7 @@ import jpatch.entity.*;
  * @author lois
  * modified by sascha
  * This Action sorts all the elements under the Selections treenode.
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 
 public final class SortSelectionAction extends AbstractAction {

@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.20 2005/09/19 12:40:16 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.21 2005/09/20 16:17:54 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -27,7 +27,6 @@ import javax.vecmath.*;
 
 import jpatch.auxilary.Bezier;
 import jpatch.auxilary.Functions;
-import jpatch.boundary.selection.*;
 import jpatch.boundary.tools.*;
 import jpatch.entity.*;
 

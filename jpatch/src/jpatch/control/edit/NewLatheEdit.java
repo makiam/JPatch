@@ -4,7 +4,7 @@ import java.util.*;
 import javax.vecmath.*;
 import jpatch.auxilary.*;
 import jpatch.entity.*;
-import jpatch.boundary.selection.*;
+
 
 /**
 * Undoable Clone Edit

@@ -1,7 +1,7 @@
 package jpatch.control.edit;
 
 import jpatch.entity.*;
-import jpatch.boundary.selection.*;
+
 
 public class NewCloneEdit extends CloneCommonEdit {
 	

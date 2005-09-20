@@ -14,7 +14,6 @@ import jpatch.boundary.tools.*;
 import jpatch.control.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.laf.*;
-import jpatch.boundary.selection.*;
 
 public final class MainFrame extends JFrame {
 	/**
