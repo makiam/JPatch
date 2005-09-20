@@ -5,7 +5,7 @@ import java.util.*;
 import javax.vecmath.*;
 import jpatch.control.*;
 import jpatch.entity.*;
-import jpatch.boundary.selection.*;
+
 
 public class AnimationMasterImport implements ModelImporter {
 	

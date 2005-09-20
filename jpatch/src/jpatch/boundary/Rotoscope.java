@@ -236,14 +236,12 @@ public final class Rotoscope {
 	 *
 	 * @param tabs The indent level
 	 */
-	public StringBuffer xml(int tabs,String view) {
-		StringBuffer sbIndent = XMLutils.indent(tabs);
-		StringBuffer sbLineBreak = XMLutils.lineBreak();
+	public StringBuffer xml(String prefix, String view) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(sbIndent).append("<rotoscope view=\"" + view + "\">").append(sbLineBreak);
-		sb.append(sbIndent).append("\t<image>").append(strFilename).append("</image>").append(sbLineBreak);
-		sb.append(sbIndent).append("\t<display x=\"" + fXPosition + "\" y=\"" +fYPosition + "\" scale=\"" + fScale + "\" opacity=\"" + iOpacity +"\"/>").append(sbLineBreak);
-		sb.append(sbIndent).append("</rotoscope>").append(sbLineBreak);
+		sb.append(prefix).append("<rotoscope view=\"" + view + "\">").append("\n");
+		sb.append(prefix).append("\t<image>").append(strFilename).append("</image>").append("\n");
+		sb.append(prefix).append("\t<display x=\"" + fXPosition + "\" y=\"" +fYPosition + "\" scale=\"" + fScale + "\" opacity=\"" + iOpacity +"\"/>").append("\n");
+		sb.append(prefix).append("</rotoscope>").append("\n");
 		return sb;
 	}
 }

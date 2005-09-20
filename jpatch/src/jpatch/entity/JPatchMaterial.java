@@ -122,8 +122,8 @@ public class JPatchMaterial extends JPatchTreeLeaf {
 		return re.getRenderString(format, version);
 	}
 	
-	public StringBuffer renderStrings(int tabs) {
-		return re.xml(tabs);
+	public StringBuffer renderStrings(String prefix) {
+		return re.xml(prefix);
 	}
 
 	public Map getRenderStrings() {
@@ -139,15 +139,14 @@ public class JPatchMaterial extends JPatchTreeLeaf {
 	 *
 	 * @param tabs The indent level
 	 */
-	public StringBuffer xml(int tabs) {
-		StringBuffer sbIndent = XMLutils.indent(tabs);
-		StringBuffer sbLineBreak = XMLutils.lineBreak();
+	public StringBuffer xml(String prefix) {
+		String prefix2 = prefix + "\t";
 		StringBuffer sb = new StringBuffer();
-		sb.append(sbIndent).append("<material>").append(sbLineBreak);
-		sb.append(sbIndent).append("\t<name>").append(strName).append("</name>").append(sbLineBreak);
-		sb.append(materialProperties.xml(tabs + 1));
-		sb.append(renderStrings(tabs + 1));
-		sb.append(sbIndent).append("</material>").append(sbLineBreak);
+		sb.append(prefix).append("<material>").append("\n");
+		sb.append(prefix).append("\t<name>").append(strName).append("</name>").append("\n");
+		sb.append(materialProperties.xml(prefix2));
+		sb.append(renderStrings(prefix2));
+		sb.append(prefix).append("</material>").append("\n");
 		return sb;
 	}
 

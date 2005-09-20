@@ -212,24 +212,22 @@ public class MaterialProperties {
 	 * Output in XML format
 	 * @return MaterialProperties in XML format
 	 */
-	public StringBuffer xml(int tabs) {
-		StringBuffer sbIndent = XMLutils.indent(tabs);
-		StringBuffer sbLineBreak = XMLutils.lineBreak();
+	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
 		StringBuffer sbColor = colorString();
 		StringBuffer sbFinish = finishString();
 		StringBuffer sbReflection = reflectionString();
 		StringBuffer sbRefraction = refractionString();
 		
-		sb.append(sbIndent).append(sbColor).append(sbLineBreak);
+		sb.append(prefix).append(sbColor).append("\n");
 		if (sbFinish != null) {
-			sb.append(sbIndent).append(sbFinish).append(sbLineBreak);
+			sb.append(prefix).append(sbFinish).append("\n");
 		}
 		if (sbReflection != null) {
-			sb.append(sbIndent).append(sbReflection).append(sbLineBreak);
+			sb.append(prefix).append(sbReflection).append("\n");
 		}
 		if (sbRefraction != null) {
-			sb.append(sbIndent).append(sbRefraction).append(sbLineBreak);
+			sb.append(prefix).append(sbRefraction).append("\n");
 		}
 		return sb;
 	}

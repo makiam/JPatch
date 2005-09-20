@@ -7,7 +7,6 @@ import java.awt.geom.*;
 import javax.vecmath.*;
 import jpatch.boundary.*;
 import jpatch.boundary.mouse.*;
-import jpatch.boundary.selection.*;
 import jpatch.entity.*;
 import jpatch.control.edit.*;
 

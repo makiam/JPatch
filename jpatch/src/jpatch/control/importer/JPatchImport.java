@@ -54,13 +54,17 @@ implements ModelImporter {
 	private Morph morph;
 	private List listMaterials = new ArrayList();
 	private ArrayList listCandidateFivePointPatch = new ArrayList();
-		
-	private CharReader charReader = new CharReader();
+	private String strRendererFormat;
+	private String strRendererVersion;
 	
-	private class CharReader {
-		protected void string(String srt) {
-		}
-	}
+//	private CharReader charReader = new CharReader();
+	private StringBuffer sbChars = new StringBuffer();
+	private int[] aiList;
+	private float[] afList;
+//	private class CharReader {
+//		protected void string(String srt) {
+//		}
+//	}
 	
 	public final String importModel(Model model, String filename) {
 		this.model = model;
@@ -92,7 +96,8 @@ implements ModelImporter {
 				break;
 			case MODEL:
 				if (localName.equals("name")) {
-					charReader = new ModelNameCharReader(model);
+//					charReader = new ModelNameCharReader(model);
+					sbChars.setLength(0);
 				} else if (localName.equals("material")) {
 					iState = MATERIAL;
 					material = createMaterial(attributes);
@@ -100,7 +105,10 @@ implements ModelImporter {
 					iState = MESH;
 				} else if (localName.equals("selection")) {
 					iState = SELECTION;
-					charReader = new ArrayCharReader();
+//					charReader = new ArrayCharReader();
+					sbChars.setLength(0);
+					aiList = null;
+					afList = null;
 					createSelection(attributes);
 				} else if (localName.equals("rotoscope")) {
 					iState = ROTOSCOPE;
@@ -129,12 +137,14 @@ implements ModelImporter {
 				break;
 			case PATCH:
 				if (localName.equals("points")) {
-					charReader = new ArrayCharReader();
+//					charReader = new ArrayCharReader();
+					sbChars.setLength(0);
 				}
 				break;
 			case MATERIAL:
 				if (localName.equals("name")) {
-					charReader = new MaterialNameCharReader(material);
+//					charReader = new MaterialNameCharReader(material);
+					sbChars.setLength(0);
 				} else if (localName.equals("color")) {
 					parseMaterialColor(attributes,material.getMaterialProperties());
 				} else if (localName.equals("finish")) {
@@ -144,15 +154,15 @@ implements ModelImporter {
 				} else if (localName.equals("refraction")) {
 					parseMaterialRefraction(attributes,material.getMaterialProperties());
 				} else if (localName.equals("renderer")) {
-					StringBuffer format = new StringBuffer();
-					StringBuffer version = new StringBuffer();
-					parseMaterialRenderer(attributes,format,version);
-					charReader = new RenderStringCharReader(format.toString(),version.toString());
+					parseMaterialRenderer(attributes, strRendererFormat, strRendererVersion);
+//					charReader = new RenderStringCharReader(format.toString(),version.toString());
+					sbChars.setLength(0);
 				}
 				break;
 			case ROTOSCOPE:
 				if (localName.equals("image")) {
-					charReader = new RotoscopeImageCharReader(rotoscope);
+//					charReader = new RotoscopeImageCharReader(rotoscope);
+					sbChars.setLength(0);
 				} else if (localName.equals("display")) {
 					parseRotoscopeDisplay(attributes,rotoscope);
 				}
@@ -183,7 +193,8 @@ implements ModelImporter {
 					//((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).reload();
 					iState = NULL;
 				} else if (localName.equals("name")) {
-					charReader = new CharReader();
+//					charReader = new CharReader();
+					model.setName(sbChars.toString());
 				}
 				break;
 			case MATERIAL:
@@ -208,16 +219,10 @@ implements ModelImporter {
 					listMaterials.add(material);
 					iState = MODEL;
 				} else if (localName.equals("name")) {
-					charReader = new CharReader();
+//					charReader = new CharReader();
+					material.setName(sbChars.toString());
 				} else if (localName.equals("renderer")) {
-					String format = ((RenderStringCharReader)charReader).getFormat();
-					String version = ((RenderStringCharReader)charReader).getVersion();
-					String renderstring = ((RenderStringCharReader)charReader).getRenderString();
-					//System.out.println("---");
-					//System.out.println(renderstring);
-					//System.out.println("---");
-					material.setRenderString(format,version,renderstring);
-					charReader = new CharReader();
+					material.setRenderString(strRendererFormat, strRendererVersion, sbChars.toString());
 				}
 				break;
 			case MESH:
@@ -245,7 +250,7 @@ implements ModelImporter {
 				break;
 			case PATCH:
 				if (localName.equals("points")) {
-					int[] aiPoint = ((ArrayCharReader) charReader).getIntArray();
+					int[] aiPoint = splitIntoIntArray(sbChars.toString());
 					ControlPoint[] acp = new ControlPoint[aiPoint.length];
 					for (int i = 0; i < acp.length; i++) {
 						acp[i] = (ControlPoint) listCp.get(aiPoint[i]);
@@ -268,7 +273,6 @@ implements ModelImporter {
 						};
 						listCandidateFivePointPatch.add(acp5);
 					}
-					charReader = new CharReader();
 				} else if (localName.equals("patch")) {
 					iState = MESH;
 				}
@@ -276,15 +280,27 @@ implements ModelImporter {
 			case SELECTION:
 				if (localName.equals("selection")) {
 					iState = MODEL;
-					int[] aiPoint = ((ArrayCharReader) charReader).getIntArray();
-					HashSet pointSet = new HashSet();
-					for (int i = 0; i < aiPoint.length; i++) {
-						pointSet.add(listCp.get(aiPoint[i]));
+					NewSelection selection;
+					if (aiList == null) {
+						int[] aiPoint = splitIntoIntArray(sbChars.toString());
+						HashSet pointSet = new HashSet();
+						for (int i = 0; i < aiPoint.length; i++) {
+							pointSet.add(listCp.get(aiPoint[i]));
+						}
+						selection = new NewSelection(pointSet);
+					} else {
+						HashMap pointMap = new HashMap();
+						for (int i = 0; i < aiList.length; i++) {
+							pointMap.put(listCp.get(aiList[i]), new Float(afList[i]));
+						}
+						selection = new NewSelection(pointMap);
 					}
-					System.out.println("selectionName" + " " + pointSet.size());
-					NewSelection selection = new NewSelection(pointSet);
 					selection.setName(selectionName);
 					model.addSelection(selection);
+				} else if (localName.equals("points")) {
+					aiList = splitIntoIntArray(sbChars.toString());
+				} else if (localName.equals("pointweights")) {
+					afList = splitIntoFloatArray(sbChars.toString());
 				}
 				break;
 			case ROTOSCOPE:
@@ -294,7 +310,7 @@ implements ModelImporter {
 						model.setRotoscope(iRotoscopeView,rotoscope);
 					}
 				} else if(localName.equals("image")) {
-					charReader = new CharReader();
+					rotoscope.loadImageFromFile(sbChars.toString());
 				}
 				break;
 			case MORPH:
@@ -317,9 +333,10 @@ implements ModelImporter {
 	}
 	
 	public void characters(char[] ch, int start, int length) {
-		String string = new String(ch,start,length);
-		//System.out.println("characters " + start + " " + length + " " + string);
-		charReader.string(string);
+		sbChars.append(ch, start, length);
+//		String string = new String(ch,start,length);
+//		//System.out.println("characters " + start + " " + length + " " + string);
+//		charReader.string(string);
 	}
 	
 	/**
@@ -604,17 +621,14 @@ implements ModelImporter {
 		}
 	}
 	
-	private void parseMaterialRenderer(Attributes attributes, StringBuffer format, StringBuffer version) {
+	private void parseMaterialRenderer(Attributes attributes, String format, String version) {
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);
-			if (localName.equals("format")) {
-				format.append(value);
-				//System.out.println("format = " + format);
-			} else if (localName.equals("version")) {
-				version.append(value);
-				//System.out.println("version = " + version);
-			}
+			if (localName.equals("format"))
+				format = value;
+			else if (localName.equals("version"))
+				version = value;
 		}
 	}
 	
@@ -651,89 +665,108 @@ implements ModelImporter {
 		return (cp.getParentHook() == null) ? cp.getHead() : cp.getParentHook().getHead();
 	}
 	
-	class ArrayCharReader extends CharReader {
-		private String str = "";
-		
-		protected void string(String str) {
-			this.str += str;
-		}
-		
-		protected String[] getStringArray() {
-			return str.split(",");
-		}
-		
-		protected int[] getIntArray() {
-			String[] astr = str.split(",");
-			int[] ai = new int[astr.length];
-			for (int i = 0; i < astr.length; i++) {
-				//System.out.println(astr[i]);
-				ai[i] = (new Integer(astr[i])).intValue();
-			}
-			return ai;
-		}
-	}
-		
-	class ModelNameCharReader extends CharReader {
-		private Model model;
-		
-		private ModelNameCharReader(Model model) {
-			this.model = model;
-		}
-		
-		protected void string(String str) {
-			model.setName(str);
-		}
+	private String[] splitIntoStringArray(String string) {
+		return string.split(",");
 	}
 	
-	class MaterialNameCharReader extends CharReader {
-		private JPatchMaterial material;
-		
-		private MaterialNameCharReader(JPatchMaterial material) {
-			this.material = material;
-		}
-		
-		protected void string(String str) {
-			material.setName(str);
-		}
+	private int[] splitIntoIntArray(String string) {
+		String[] number = string.replaceAll("\\s", "").split(",");
+		int[] ai = new int[number.length];
+		for (int i = 0; i < number.length; i++)
+			ai[i] = Integer.parseInt(number[i]);
+		return ai;
 	}
 	
-	class RotoscopeImageCharReader extends CharReader {
-		private Rotoscope rotoscope;
-		
-		private RotoscopeImageCharReader(Rotoscope rotoscope) {
-			this.rotoscope = rotoscope;
-		}
-		
-		protected void string(String str) {
-			rotoscope.loadImageFromFile(str);
-		}
+	private float[] splitIntoFloatArray(String string) {
+		String[] number = string.replaceAll("\\s", "").split(",");
+		float[] af = new float[number.length];
+		for (int i = 0; i < number.length; i++)
+			af[i] = Float.parseFloat(number[i]);
+		return af;
 	}
-	
-	class RenderStringCharReader extends CharReader {
-		private StringBuffer stringBuffer = new StringBuffer();
-		private String format;
-		private String version;
-		
-		private RenderStringCharReader(String format, String version) {
-			this.format = format;
-			this.version = version;
-			//System.out.println("renderer: " + format + " " + version);
-		}
-		
-		protected void string(String str) {
-			stringBuffer.append(str);
-		}
-		
-		protected String getRenderString() {
-			return stringBuffer.toString();
-		}
-		
-		protected String getFormat() {
-			return format;
-		}
-		
-		protected String getVersion() {
-			return version;
-		}
-	}
+//	class ArrayCharReader extends CharReader {
+//		private String str = "";
+//		
+//		protected void string(String str) {
+//			this.str += str;
+//		}
+//		
+//		protected String[] getStringArray() {
+//			return str.split(",");
+//		}
+//		
+//		protected int[] getIntArray() {
+//			String[] astr = str.split(",");
+//			int[] ai = new int[astr.length];
+//			for (int i = 0; i < astr.length; i++) {
+//				//System.out.println(astr[i]);
+//				ai[i] = (new Integer(astr[i])).intValue();
+//			}
+//			return ai;
+//		}
+//	}
+//		
+//	class ModelNameCharReader extends CharReader {
+//		private Model model;
+//		
+//		private ModelNameCharReader(Model model) {
+//			this.model = model;
+//		}
+//		
+//		protected void string(String str) {
+//			model.setName(str);
+//		}
+//	}
+//	
+//	class MaterialNameCharReader extends CharReader {
+//		private JPatchMaterial material;
+//		
+//		private MaterialNameCharReader(JPatchMaterial material) {
+//			this.material = material;
+//		}
+//		
+//		protected void string(String str) {
+//			material.setName(str);
+//		}
+//	}
+//	
+//	class RotoscopeImageCharReader extends CharReader {
+//		private Rotoscope rotoscope;
+//		
+//		private RotoscopeImageCharReader(Rotoscope rotoscope) {
+//			this.rotoscope = rotoscope;
+//		}
+//		
+//		protected void string(String str) {
+//			rotoscope.loadImageFromFile(str);
+//		}
+//	}
+//	
+//	class RenderStringCharReader extends CharReader {
+//		private StringBuffer stringBuffer = new StringBuffer();
+//		private String format;
+//		private String version;
+//		
+//		private RenderStringCharReader(String format, String version) {
+//			this.format = format;
+//			this.version = version;
+//			//System.out.println("renderer: " + format + " " + version);
+//		}
+//		
+//		protected void string(String str) {
+//			stringBuffer.append(str);
+//		}
+//		
+//		protected String getRenderString() {
+//			return stringBuffer.toString();
+//		}
+//		
+//		protected String getFormat() {
+//			return format;
+//		}
+//		
+//		protected String getVersion() {
+//			return version;
+//		}
+//	}
 }

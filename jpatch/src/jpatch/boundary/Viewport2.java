@@ -27,7 +27,6 @@ import javax.vecmath.*;
 
 import jpatch.auxilary.Bezier;
 import jpatch.auxilary.Functions;
-import jpatch.boundary.selection.*;
 import jpatch.boundary.tools.*;
 import jpatch.entity.*;
 

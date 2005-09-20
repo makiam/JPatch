@@ -3,7 +3,7 @@ package jpatch.control.edit;
 import java.util.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
+
 
 /**
  * Use this class for changing morphs

@@ -2,7 +2,7 @@ package jpatch.control.edit;
 
 import javax.vecmath.*;
 import jpatch.entity.*;
-import jpatch.boundary.selection.*;
+
 
 public class FlipEdit extends JPatchCompoundEdit {
 	public static final int X = 0;

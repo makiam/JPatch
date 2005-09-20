@@ -83,7 +83,7 @@ public final class SaveAsAction extends AbstractAction {
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
 			writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-			writer.write(MainFrame.getInstance().getModel().xml(0).toString());
+			writer.write(MainFrame.getInstance().getModel().xml("").toString());
 			writer.close();
 			MainFrame.getInstance().getUndoManager().setChange(false);
 			//System.out.println("file " + filename + " written.");

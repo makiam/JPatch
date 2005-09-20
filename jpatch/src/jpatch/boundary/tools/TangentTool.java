@@ -3,7 +3,6 @@ package jpatch.boundary.tools;
 import java.awt.event.*;
 import javax.vecmath.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
 import jpatch.entity.*;
 
 public class TangentTool extends JPatchTool {

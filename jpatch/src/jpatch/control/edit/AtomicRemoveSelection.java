@@ -1,7 +1,7 @@
 package jpatch.control.edit;
 
 import javax.swing.tree.*;
-import jpatch.boundary.selection.*;
+
 import jpatch.boundary.sidebar.*;
 import jpatch.boundary.*;
 

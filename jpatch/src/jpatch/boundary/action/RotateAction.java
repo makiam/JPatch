@@ -5,7 +5,7 @@ import javax.swing.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.*;
 import jpatch.boundary.tools.*;
-import jpatch.boundary.selection.*;
+
 
 public final class RotateAction extends AbstractAction {
 	/**

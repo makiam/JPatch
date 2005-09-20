@@ -9,7 +9,6 @@ import jpatch.auxilary.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
 import jpatch.boundary.filefilters.*;
-import jpatch.boundary.selection.*;
 import jpatch.control.*;
 import jpatch.control.importer.*;
 

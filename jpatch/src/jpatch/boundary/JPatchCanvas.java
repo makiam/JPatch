@@ -6,7 +6,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.vecmath.*;
 import jpatch.entity.*;
-import jpatch.boundary.selection.*;
+
 import jpatch.boundary.tools.*;
 
 public class JPatchCanvas extends JPanel

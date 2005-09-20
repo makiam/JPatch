@@ -7,7 +7,6 @@ import javax.vecmath.*;
 import jpatch.auxilary.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
 
 /**
  *  Description of the Class
@@ -78,14 +77,13 @@ public class Model extends JPatchTreeNode {
 	//	return sb;
 	//}
 	
-	public StringBuffer xml(int tab) {
-		StringBuffer sbIndent = XMLutils.indent(tab);
-		StringBuffer sbIndent1 = XMLutils.indent(tab + 1);
-		StringBuffer sbIndent2 = XMLutils.indent(tab + 2);
-		StringBuffer sbLineBreak = XMLutils.lineBreak();
+	public StringBuffer xml(String prefix) {
+		String prefix2 = prefix + "\t";
+		String prefix3 = prefix + "\t\t";
+		String prefix4 = prefix + "\t\t\t";
 		StringBuffer sb = new StringBuffer();
-		sb.append(sbIndent).append("<model>").append(sbLineBreak);
-		sb.append(sbIndent1).append("<name>").append(strName).append("</name>").append(sbLineBreak);
+		sb.append(prefix).append("<model>").append("\n");
+		sb.append(prefix2).append("<name>").append(strName).append("</name>").append("\n");
 		/*
 		for (int m = 0; m < 32; m++) {
 			if (aJPMaterial[m] != null) {
@@ -99,7 +97,7 @@ public class Model extends JPatchTreeNode {
 		String[] viewName = new String[] { "front","rear","top","bottom","left","right" };
 		for (int i = 0; i < 6; i++) {
 			if (aRotoscope[i] != null) {
-				sb.append(aRotoscope[i].xml(tab + 1,viewName[i]));
+				sb.append(aRotoscope[i].xml(prefix2, viewName[i]));
 			}
 		}
 		
@@ -107,44 +105,44 @@ public class Model extends JPatchTreeNode {
 		for (Iterator it = lstMaterials.iterator(); it.hasNext();) {
 			JPatchMaterial mat = (JPatchMaterial) it.next();
 			mat.setXmlNumber(n++);
-			sb.append(mat.xml(tab + 1));
+			sb.append(mat.xml(prefix2));
 		}
-		sb.append(sbIndent1).append("<mesh>").append(sbLineBreak);
+		sb.append(prefix2).append("<mesh>").append("\n");
 		setCpMap();
 		for (Iterator it = setCurves.iterator(); it.hasNext(); ) {
 			ControlPoint start = (ControlPoint) it.next();
-			sb.append(sbIndent2);
+			sb.append(prefix3);
 			sb.append(start.getLoop() ? "<curve closed=\"true\">" : "<curve>");
-			sb.append(sbLineBreak);
+			sb.append("\n");
 			for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop())
-				sb.append(cp.xml(3));
+				sb.append(cp.xml(prefix4));
 			
-			sb.append(sbIndent2).append("</curve>").append(sbLineBreak);
+			sb.append(prefix3).append("</curve>").append("\n");
 		}
 		for (Iterator it = mapPatches.keySet().iterator(); it.hasNext(); ) {
-			sb.append(((Patch) it.next()).xml(tab + 2));
+			sb.append(((Patch) it.next()).xml(prefix3));
 		}
 		for (Iterator it = lstMorphs.iterator(); it.hasNext(); ) {
 			Morph morph = (Morph) it.next();
-			sb.append(morph.xml(tab + 2));
+			sb.append(morph.xml(prefix3));
 		}
 		StringBuffer lipSyncMap = new StringBuffer();
 		for (Iterator it = mapPhonemes.keySet().iterator(); it.hasNext(); ) {
 			String phoneme = (String) it.next();
 			Morph morph = (Morph) mapPhonemes.get(phoneme);
-			if (morph != null) lipSyncMap.append(sbIndent1).append("\t\t<map phoneme=\"" + phoneme + "\" morph=\"" + lstMorphs.indexOf(morph) + "\"/>").append(sbLineBreak);
+			if (morph != null) lipSyncMap.append(prefix).append("\t\t<map phoneme=\"" + phoneme + "\" morph=\"" + lstMorphs.indexOf(morph) + "\"/>").append("\n");
 		}
 		if (lipSyncMap.length() > 0) {
-			sb.append(sbIndent1).append("\t<lipsync>").append(sbLineBreak);
+			sb.append(prefix).append("\t<lipsync>").append("\n");
 			sb.append(lipSyncMap);
-			sb.append(sbIndent1).append("\t</lipsync>").append(sbLineBreak);
+			sb.append(prefix).append("\t</lipsync>").append("\n");
 		}
-		sb.append(sbIndent1).append("</mesh>").append(sbLineBreak);
+		sb.append(prefix2).append("</mesh>").append("\n");
 		for (Iterator it = lstSelections.iterator(); it.hasNext();) {
-			PointSelection selection = (PointSelection) it.next();
-			sb.append(selection.xml(tab + 1));
+			NewSelection selection = (NewSelection) it.next();
+			sb.append(selection.xml(prefix2));
 		}
-		sb.append(sbIndent).append("</model>").append(sbLineBreak);
+		sb.append(prefix).append("</model>").append("\n");
 		return sb;
 	}
 	
