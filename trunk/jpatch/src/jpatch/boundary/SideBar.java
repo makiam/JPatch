@@ -4,7 +4,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import jpatch.boundary.sidebar.*;
-import jpatch.boundary.selection.*;
 import jpatch.entity.*;
 import jpatch.control.edit.*;
 

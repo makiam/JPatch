@@ -4,7 +4,7 @@ import java.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
+
 import jpatch.entity.*;
 
 public final class HideAction extends AbstractAction {

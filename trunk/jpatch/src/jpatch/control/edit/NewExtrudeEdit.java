@@ -2,7 +2,7 @@ package jpatch.control.edit;
 
 import java.util.*;
 import jpatch.entity.*;
-import jpatch.boundary.selection.*;
+
 
 public class NewExtrudeEdit extends CloneCommonEdit {
 	

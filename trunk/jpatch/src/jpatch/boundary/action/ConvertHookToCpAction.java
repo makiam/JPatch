@@ -3,7 +3,7 @@ package jpatch.boundary.action;
 import java.awt.event.*;
 import javax.swing.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
+
 import jpatch.control.edit.*;
 
 public final class ConvertHookToCpAction extends AbstractAction {

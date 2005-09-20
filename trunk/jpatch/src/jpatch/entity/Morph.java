@@ -261,31 +261,26 @@ public class Morph extends JPatchTreeLeaf {
 		}
 	}
 	
-	public StringBuffer xml(int tabs) {
-		StringBuffer sbIndent = XMLutils.indent(tabs);
-		StringBuffer sbIndent2 = XMLutils.indent(tabs + 1);
-		StringBuffer sbIndent3 = XMLutils.indent(tabs + 2);
-		StringBuffer sbLineBreak = XMLutils.lineBreak();
+	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(sbIndent).append("<morph name=\"").append(strName).append("\" ");
+		sb.append(prefix).append("<morph name=\"").append(strName).append("\" ");
 		sb.append("min=\"").append(fMin).append("\" ");
 		sb.append("max=\"").append(fMax).append("\" ");
 		sb.append("value=\"").append(fValue).append("\">");
-		sb.append(sbLineBreak);
-		sb.append(sbIndent2).append("<target value=\"1.0\">");
-		sb.append(sbLineBreak);
+		sb.append("\n");
+		sb.append(prefix).append("\t<target value=\"1.0\">").append("\n");
 		for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
 			ControlPoint cp = (ControlPoint) it.next();
 			Vector3f v3 = (Vector3f) mapMorph.get(cp);
-			sb.append(sbIndent3);
-			sb.append("<point nr=\"").append(cp.getXmlNumber()).append("\" ");
+			sb.append(prefix);
+			sb.append("\t\t<point nr=\"").append(cp.getXmlNumber()).append("\" ");
 			sb.append("x=\"").append(v3.x).append("\" " );
 			sb.append("y=\"").append(v3.y).append("\" " );
 			sb.append("z=\"").append(v3.z).append("\"/>");
-			sb.append(sbLineBreak);
+			sb.append("\n");
 		}
-		sb.append(sbIndent2).append("</target>").append(sbLineBreak);
-		sb.append(sbIndent).append("</morph>").append(sbLineBreak);
+		sb.append(prefix).append("\t</target>").append("\n");
+		sb.append(prefix).append("</morph>").append("\n");
 		return sb;
 	}
 }

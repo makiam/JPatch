@@ -4,7 +4,7 @@ import java.util.*;
 import jpatch.auxilary.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
+
 
 /**
 * This abstract class provides common methods to clone ControlPoints which are

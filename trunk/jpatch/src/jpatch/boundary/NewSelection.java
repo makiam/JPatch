@@ -1,8 +1,10 @@
 package jpatch.boundary;
 
 import java.util.*;
+
 import javax.vecmath.*;
 
+import jpatch.auxilary.XMLutils;
 import jpatch.control.edit.*;
 import jpatch.entity.*;
 
@@ -251,5 +253,28 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 	public String toString() {
 //		return "Selection " + getName() + " (" + iNum + ")";
 		return getName();
+	}
+	
+	public StringBuffer xml(String prefix) {
+		StringBuffer sb = new StringBuffer();
+		StringBuffer cpList = new StringBuffer();
+		StringBuffer cpWeightList = new StringBuffer();
+		sb.append(prefix).append("<selection name=\"" + getName() + "\">\n");
+		//int size = getType();
+		//int p = 0;
+		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext();) {
+			Object object = it.next();
+			if (object instanceof ControlPoint) {
+				ControlPoint cp = (ControlPoint) object;
+				cpList.append(cp.getXmlNumber()).append(",");
+				cpWeightList.append(mapObjects.get(cp).toString()).append(",");
+			}			
+		}
+		cpList.setLength(cpList.length() - 1); // remove last ","
+		cpWeightList.setLength(cpWeightList.length() - 1); // remove last ","
+		sb.append(prefix).append("\t<points>").append(cpList).append("</points>\n");
+		sb.append(prefix).append("\t<pointweights>").append(cpWeightList).append("</pointweights>\n");
+		sb.append(prefix).append("</selection>").append("\n");
+		return sb;
 	}
 }

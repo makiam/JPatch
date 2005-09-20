@@ -8,7 +8,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 
-import jpatch.boundary.selection.*;
 import jpatch.entity.*;
 //import jpatch.control.edit.AddSelectionEdit;
 //import jpatch.control.edit.RemoveSelectionEdit;

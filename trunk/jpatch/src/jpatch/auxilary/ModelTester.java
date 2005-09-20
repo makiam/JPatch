@@ -2,7 +2,7 @@ package jpatch.auxilary;
 
 import java.util.*;
 import jpatch.entity.*;
-import jpatch.boundary.selection.*;
+
 
 public class ModelTester {
 	

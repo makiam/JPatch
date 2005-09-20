@@ -28,7 +28,7 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
+
 import jpatch.entity.*;
 
 

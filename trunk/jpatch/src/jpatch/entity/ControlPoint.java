@@ -1844,11 +1844,9 @@ public class ControlPoint implements Comparable, Transformable {
 	/**
 	 *
 	 */
-	public StringBuffer xml(int tabs) {
-		StringBuffer sbIndent = XMLutils.indent(tabs);
-		StringBuffer sbLineBreak = XMLutils.lineBreak();
+	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(sbIndent).append("<cp");
+		sb.append(prefix).append("<cp");
 		//if (cpNextAttached == null) {
 		//	//
 		//	//
@@ -1902,7 +1900,7 @@ public class ControlPoint implements Comparable, Transformable {
 		if (fInMagnitude != fDefaultMagnitude) {
 			sb.append(" magnitude=").append(XMLutils.quote(fInMagnitude));
 		}
-		sb.append("/>").append(sbLineBreak);
+		sb.append("/>").append("\n");
 		return sb;
 	}
 	

@@ -6,7 +6,7 @@ import java.awt.event.*;
 import javax.vecmath.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
-import jpatch.boundary.selection.*;
+
 
 public class SelectMoveBoneMouseAdapter extends JPatchMouseAdapter {
 	//private static int IDLE = 0;
