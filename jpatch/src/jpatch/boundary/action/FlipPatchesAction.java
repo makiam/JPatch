@@ -18,7 +18,7 @@ public final class FlipPatchesAction extends AbstractAction {
 	public void actionPerformed(ActionEvent actionEvent) {
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
 		if (ps != null) {
-			MainFrame.getInstance().getUndoManager().addEdit(new FlipPatchesEdit(ps));
+			MainFrame.getInstance().getUndoManager().addEdit(new AtomicFlipPatches(ps));
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 	}

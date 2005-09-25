@@ -146,14 +146,14 @@ public final class Patch {
 //		}
 //	}
 	
-//	public final boolean isSelected(PointSelection ps) {
-//		for (int i = 0; i < acpPoint.length; i++) {
-//			if (!ps.contains(acpPoint[i].getHead())) {
-//				if (!acpPoint[i].isTargetHook() && !acpPoint[i].isChildHook()) return false;
-//			}
-//		}
-//		return true;
-//	}
+	public final boolean isSelected(NewSelection selection) {
+		for (int i = 0; i < acpPoint.length; i++) {
+			if (!selection.contains(acpPoint[i].getHead())) {
+				if (!acpPoint[i].isTargetHook() && !acpPoint[i].isChildHook()) return false;
+			}
+		}
+		return true;
+	}
 	
 	public final boolean isValid() {
 		return bValid;

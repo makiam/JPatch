@@ -17,10 +17,10 @@ public final class ExtendSelectionAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null) {
-			boolean selectCurveOnly = (ps.isSingle() && (ps.isCurve() || ps.getControlPoint().getPrevAttached() == null));
-			MainFrame.getInstance().getUndoManager().addEdit(new ExtendSelectionEdit(ps, !selectCurveOnly));
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		if (selection != null) {
+//			boolean selectCurveOnly = (ps.isSingle() && (ps.isCurve() || ps.getControlPoint().getPrevAttached() == null));
+			MainFrame.getInstance().getUndoManager().addEdit(new ExtendSelectionEdit(selection));
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 	}

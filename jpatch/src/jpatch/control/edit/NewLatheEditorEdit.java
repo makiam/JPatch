@@ -4,8 +4,7 @@
 package jpatch.control.edit;
 
 import jpatch.auxilary.Functions;
-import jpatch.entity.ControlPoint;
-import jpatch.entity.Curve;
+import jpatch.entity.*;
 import jpatch.boundary.*;
 
 /**
@@ -17,7 +16,7 @@ import jpatch.boundary.*;
 
 // FIXME: this class should be a dialog, not an edit!!!
 
-public class NewLatheEditorEdit extends JPatchCompoundEdit {
+public class NewLatheEditorEdit extends JPatchCompoundEdit implements JPatchRootEdit {
 	
 	/**
 	* Creates and performes the edit
@@ -83,10 +82,14 @@ public class NewLatheEditorEdit extends JPatchCompoundEdit {
 		}
 
 		// add edits
-		Curve curve = new Curve(cpts[0]); //, MainFrame.getInstance().getModel());
+		//Curve curve = new Curve(cpts[0]); //, MainFrame.getInstance().getModel());
 		//curve.validate();
-		addEdit(new AtomicAddCurve(curve));	// create the new curve
-		addEdit(new ValidateCurveEdit(curve));  // validate the curve
+		addEdit(new AtomicAddCurve(cpts[0]));	// create the new curve
+		//addEdit(new ValidateCurveEdit(curve));  // validate the curve
 		addEdit(new NewLatheEdit(cpts, iSegments, epsilon)); // lathe the curve
 	}	
+	
+	public String getName() {
+		return "lathe";
+	}
 }

@@ -395,7 +395,7 @@ public class DefaultTool extends JPatchTool {
 				}	
 			} else {
 				/* no handle was clicked... */
-				Matrix4f m4View = viewDef.getMatrix();
+//				Matrix4f m4View = viewDef.getMatrix();
 				
 				/* check if a controlpoint was clicked... */
 				cpHot = viewDef.getClosestControlPoint(new Point2D.Float(x,y),null,null,true,false,cpHot);
@@ -752,10 +752,11 @@ public class DefaultTool extends JPatchTool {
 //FIXME					
 				case DRAW_SELECTION:
 					NewSelection sel = selectMouseMotionListener.getSelection(viewDef);
-					//if (sel != null)
+					if ((selection != null ^ sel != null) || sel != null && !sel.equals(selection)) {
 						MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(sel));
-					((Component)mouseEvent.getSource()).removeMouseMotionListener(selectMouseMotionListener);
-					selectionChanged(selection);
+						((Component)mouseEvent.getSource()).removeMouseMotionListener(selectMouseMotionListener);
+						selectionChanged(selection);
+					}
 					break;
 				case ADD_MODIFY_SELECTION:
 //					PointSelection psNew = (PointSelection)selectMouseMotionListener.getSelection(viewDef);

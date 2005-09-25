@@ -32,7 +32,7 @@ public final class DeleteMaterialAction extends AbstractAction {
 					compoundEdit.addEdit(new AtomicChangePatchMaterial(patch,defaultMaterial));
 				}
 			}
-			compoundEdit.addEdit(new RemoveMaterialEdit(material));
+			compoundEdit.addEdit(new AtomicRemoveMaterial(material));
 			MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}

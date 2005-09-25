@@ -426,7 +426,7 @@ public class RotateTool extends JPatchTool {
 				} else {
 					iState = ROTATE;
 					compoundEdit = new JPatchCompoundEdit("rotate");
-					compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
+					compoundEdit.addEdit(new AtomicMoveControlPoints(ps.getControlPointArray()));
 				}
 			} else {
 				Point3f p3 = new Point3f(p3Pivot);
@@ -443,7 +443,7 @@ public class RotateTool extends JPatchTool {
 					((Component)mouseEvent.getSource()).addMouseMotionListener(this);
 					iState = ROTATE_FREE;
 					compoundEdit = new JPatchCompoundEdit("rotate");
-					compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
+					compoundEdit.addEdit(new AtomicMoveControlPoints(ps.getControlPointArray()));
 				}
 			}	
 			if (repaint) {

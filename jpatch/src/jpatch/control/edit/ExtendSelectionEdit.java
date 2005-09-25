@@ -1,45 +1,51 @@
 package jpatch.control.edit;
 
 import java.util.*;
-
+import jpatch.boundary.*;
 import jpatch.entity.*;
 
 /**
  *  Extends a selection
  */
-public class ExtendSelectionEdit extends JPatchCompoundEdit {
+public class ExtendSelectionEdit extends JPatchCompoundEdit implements JPatchRootEdit {
 	
-	public ExtendSelectionEdit(PointSelection ps, boolean complete) {
-		Collection pointsToAdd = new ArrayList();
-		Collection pointsToRemove = new ArrayList();
-		if (!complete) {
-			ControlPoint cpa = ps.getControlPoint();
-			for (ControlPoint cp = cpa.getCurve().getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
-				pointsToAdd.add(cp.getHead());
+	public ExtendSelectionEdit(NewSelection selection) {
+		Map pointsToAdd = new HashMap();
+		Map pointsToRemove = new HashMap();
+		if (selection.getDirection() != 0) {
+			ControlPoint cpa = (ControlPoint) selection.getHotObject();
+			for (ControlPoint cp = cpa.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				pointsToAdd.put(cp.getHead(), new Float(1));
 			}
 			if (!cpa.isHead()) {
-				pointsToRemove.add(cpa);
+				pointsToRemove.put(cpa, new Float(1));
 			}
 		} else {
-			HashSet setPoints = new HashSet();
-			ControlPoint[] acp = ps.getControlPointArray();
-			for (int i = 0; i < acp.length; selectPoint(acp[i++], setPoints));
-			pointsToAdd.addAll(setPoints);
-			pointsToAdd.removeAll(ps.getSelectedControlPoints());
+			HashMap mapPoints = new HashMap();
+			ControlPoint[] acp = selection.getControlPointArray();
+			for (int i = 0; i < acp.length; i++)
+				selectPoint(acp[i], mapPoints);
+			pointsToAdd.putAll(mapPoints);
+			for (Iterator it = selection.getObjects().iterator(); it.hasNext(); )
+				pointsToAdd.remove(it.next());
 		}
-		addEdit(new AddControlPointsToSelectionEdit(ps,pointsToAdd));
-		addEdit(new RemoveControlPointsFromSelectionEdit(ps,pointsToRemove));
+		addEdit(new AtomicModifySelection.AddObjects(selection, pointsToAdd));
+		addEdit(new AtomicModifySelection.RemoveObjects(selection,pointsToRemove));
 	}
 	
-	private void selectPoint(ControlPoint cp, HashSet setPoints) {
+	public String getName() {
+		return "extend selection";
+	}
+	
+	private void selectPoint(ControlPoint cp, HashMap mapPoints) {
 		if (cp != null) {
 			cp = cp.getHead();
-			if (!setPoints.contains(cp)) {
-				setPoints.add(cp);
+			if (!mapPoints.keySet().contains(cp)) {
+				mapPoints.put(cp, new Float(1));
 				ControlPoint[] stack = cp.getStack();
 				for (int i = 0; i < stack.length; i++) {
-					selectPoint(stack[i].getNext(), setPoints);
-					selectPoint(stack[i].getPrev(), setPoints);
+					selectPoint(stack[i].getNext(), mapPoints);
+					selectPoint(stack[i].getPrev(), mapPoints);
 				}
 			}
 		}
