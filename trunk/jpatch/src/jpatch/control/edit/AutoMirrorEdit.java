@@ -8,7 +8,7 @@ import jpatch.entity.*;
 import jpatch.boundary.*;
 
 
-public class AutoMirrorEdit extends CloneCommonEdit {
+public class AutoMirrorEdit extends AbstractClone {
 	
 	protected List mirrorList = new ArrayList();
 	

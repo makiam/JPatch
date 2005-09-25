@@ -3,26 +3,11 @@
  */
 package jpatch.boundary.dialog;
 
-import java.awt.Color;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import jpatch.control.edit.JPatchCompoundEdit;
-import jpatch.control.edit.NewLatheEditorEdit;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import jpatch.control.edit.*;
 
 /**
  * 
@@ -66,7 +51,7 @@ public class LatheEditorDialog extends JDialog implements ActionListener, Change
 	private JComboBox comboBoxPresets;
 	
 	//private boolean okPressed = false;
-	private JPatchCompoundEdit edit;
+	private JPatchRootEdit edit;
 
 	/** the Lathe CurvePanel */
 	private class CurvePanel extends JPanel {
@@ -405,7 +390,7 @@ public class LatheEditorDialog extends JDialog implements ActionListener, Change
 		pack();
 	}
 
-	public JPatchCompoundEdit getEdit() {
+	public JPatchRootEdit getEdit() {
 		return edit;
 	}
 

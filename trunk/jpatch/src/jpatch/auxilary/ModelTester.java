@@ -1,8 +1,9 @@
 package jpatch.auxilary;
 
 import java.util.*;
-import jpatch.entity.*;
 
+import jpatch.entity.*;
+import jpatch.boundary.*;
 
 public class ModelTester {
 	
@@ -16,12 +17,11 @@ public class ModelTester {
 		/*
 		* populate lists of curves and points
 		*/
-		listCurves = new ArrayList();
+		listCurves  = new ArrayList(model.getCurveSet());
 		listControlPoints = new ArrayList();
 		
-		for (Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
-			listCurves.add(curve);
-			for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
+		for (Iterator it = listCurves.iterator(); it.hasNext(); ) {
+			for(ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				listControlPoints.add(cp);
 			}
 		}
@@ -33,30 +33,31 @@ public class ModelTester {
 		* perform tests on curves and points
 		*/
 		curveLoop:
-		for (Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
+		for (Iterator it = listCurves.iterator(); it.hasNext(); ) {
 			
-			// check if model is set
-			if (curve.getModel() != model) {
-				error("curve " + curve + " model is " + curve.getModel());
-			}
+//			// check if model is set
+//			if (curve.getModel() != model) {
+//				error("curve " + curve + " model is " + curve.getModel());
+//			}
 			
-			ControlPoint cp = curve.getStart();
+			ControlPoint cp = (ControlPoint) it.next();
+			ControlPoint start = cp;
 			
 			// check if we have a start
 			if (cp == null) {
-				error("Curve start for " +curve + " points to null");
+				error("Curve start is null");
 				break curveLoop;
 			}
 			
 			// check if start ist first point or has loop flag set
 			if (cp.getPrev() != null && !cp.getLoop()) {
-				error("Start of curve " + curve + " is not the first cp, but loop is false");
+				error("Start of curve " + cp + " is not the first cp, but loop is false");
 				break curveLoop;
 			}
 			
 			// check if there is at least one more controlpoint on this curve
 			if (cp.getNext() == null) {
-				error("Curve " + curve + " has just one controlPoint");
+				error("Curve starting with " + cp + " has just one controlPoint");
 				break curveLoop;
 			}
 			
@@ -65,10 +66,10 @@ public class ModelTester {
 			// loop over controlPoints
 			while (cp != null) {
 				
-				// check if the cp belongs to the curve
-				if (cp.getCurve() != curve) {
-					error("Cp " + cp + " curve pointer points to wrong curve");
-				}
+//				// check if the cp belongs to the curve
+//				if (cp.getCurve() != curve) {
+//					error("Cp " + cp + " curve pointer points to wrong curve");
+//				}
 				
 				// check if prev cp is ok
 				if (cp.getPrev() != cpLast) {
@@ -76,7 +77,7 @@ public class ModelTester {
 				}
 				
 				//check if loop is set
-				if (cp.getLoop() == true && cp != curve.getStart()) {
+				if (cp.getLoop() == true && cp != start) {
 					error("Cp " + cp + " has loop flag set but is not start of curve!");
 				}
 				
@@ -142,7 +143,7 @@ public class ModelTester {
 							
 							// check if end hook points to the right cp
 							if (cp.getEnd().getParentHook() != parentHook.getNext()) {
-								error("Hook curve " + curve + ": parent hook of curve end is wrong");
+								error("Hook curve " + cp + ": parent hook of curve end is wrong");
 							}
 						}
 					}
@@ -174,14 +175,17 @@ public class ModelTester {
 		*/
 		int selections = 0;
 		for (Iterator it = model.getSelections().iterator(); it.hasNext(); ) {
-			PointSelection ps = (PointSelection) it.next();
-			ControlPoint[] acp = ps.getControlPointArray();
-			for (int c = 0; c < acp.length; c++) {
-				if (!listControlPoints.contains(acp[c])) {
-					error ("cp " + acp[c] + " of selection " + ps.getName() + " is invalid");
-				}
-				if (!acp[c].isHead()) {
-					error ("cp " + acp[c] + " of selection " + ps.getName() + " is not a head");
+			NewSelection selection = (NewSelection) it.next();
+			for (Iterator it2 = selection.getObjects().iterator(); it.hasNext(); ) {
+				Object object = it2.next();
+				if (object instanceof ControlPoint) {
+					ControlPoint cp = (ControlPoint) object;
+					if (!listControlPoints.contains(cp)) {
+						error ("cp " + cp + " of selection " + selection.getName() + " is invalid");
+					}
+					if (!cp.isHead()) {
+						error ("cp " + cp + " of selection " + selection.getName() + " is not a head");
+					}
 				}
 			}
 			selections++;
@@ -192,7 +196,8 @@ public class ModelTester {
 		* perform tests on patches
 		*/
 		int patches = 0;
-		for (Patch patch = model.getFirstPatch(); patch != null; patch = patch.getNext()) {
+		for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
+			Patch patch = (Patch) it.next();
 			ControlPoint[] acp = patch.getControlPoints();
 			for (int c = 0; c < acp.length; c++) {
 				if (!listControlPoints.contains(acp[c])) {
@@ -203,25 +208,25 @@ public class ModelTester {
 		}
 		System.out.println(patches + " patches");
 		
-		/*
-		* perform tests on morphs
-		*/
-		
-		int morphs = 0;
-		for (Iterator it = model.getMorphIterator(); it.hasNext(); ) {
-			Morph morph = (Morph) it.next();
-			for (Iterator itMorph = morph.getPointList().iterator(); itMorph.hasNext(); ) {
-				ControlPoint cp = (ControlPoint) itMorph.next();
-				if (!listControlPoints.contains(cp)) {
-					error ("cp " + cp + " of morph " + morph.getName() + " is invalid");
-				}
-				if (!cp.isHead()) {
-					error ("cp " + cp + " of morph " + morph.getName() + " is not a head");
-				}
-			}
-			morphs++;
-		}
-		System.out.println(morphs + " morphs");
+//		/*
+//		* perform tests on morphs
+//		*/
+//		
+//		int morphs = 0;
+//		for (Iterator it = model.getMorphIterator(); it.hasNext(); ) {
+//			Morph morph = (Morph) it.next();
+//			for (Iterator itMorph = morph.getPointList().iterator(); itMorph.hasNext(); ) {
+//				ControlPoint cp = (ControlPoint) itMorph.next();
+//				if (!listControlPoints.contains(cp)) {
+//					error ("cp " + cp + " of morph " + morph.getName() + " is invalid");
+//				}
+//				if (!cp.isHead()) {
+//					error ("cp " + cp + " of morph " + morph.getName() + " is not a head");
+//				}
+//			}
+//			morphs++;
+//		}
+//		System.out.println(morphs + " morphs");
 		
 		return bSuccess;
 	}

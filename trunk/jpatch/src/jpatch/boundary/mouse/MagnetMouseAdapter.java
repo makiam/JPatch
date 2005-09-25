@@ -52,7 +52,7 @@ public class MagnetMouseAdapter extends JPatchMouseAdapter {
 				g.setXORMode(new Color(settings.cBackground.getRGB() ^ settings.cSelection.getRGB()));
 				drawSelectionCircle(g,iMouseX,iMouseY,iRadius);
 				setActiveState();
-				compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
+				compoundEdit.addEdit(new AtomicMoveControlPoints(ps.getControlPointArray()));
 			} else {
 				MainFrame.getInstance().setSelection(null);
 				//MainFrame.getInstance().getJPatchScreen().clearBackground();

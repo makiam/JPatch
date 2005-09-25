@@ -51,6 +51,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 				System.out.println(getClass().getName() + "(" + selection + ", " + objects + ")");
 			this.selection = selection;
 			mapObjects = new HashMap(objects);
+			redo();
 		}
 		public void redo() {
 			addObjects(mapObjects);
@@ -76,6 +77,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 				System.out.println(getClass().getName() + "(" + selection + ", " + objects + ")");
 			this.selection = selection;
 			mapObjects = new HashMap(objects);
+			redo();
 		}
 		public void redo() {
 			removeObjects(mapObjects);

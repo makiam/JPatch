@@ -17,9 +17,9 @@ public final class LatheAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("lathe"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null && !ps.isSingle()) {
-			if (CloneCommonEdit.checkForHooks(ps.getControlPointArray())) {
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		if (selection != null && !selection.isSingle()) {
+			if (AbstractClone.checkForHooks(selection.getControlPointArray())) {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Lathe operation can not be performed bacause the selection contains hooks", "Can't lathe", JOptionPane.ERROR_MESSAGE);
 			} else {
 				//PointSelection newPs = MainFrame.getInstance().getModel().clone(ps.getControlPointArray());

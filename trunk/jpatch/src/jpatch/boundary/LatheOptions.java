@@ -53,9 +53,9 @@ public class LatheOptions extends JDialog implements ActionListener {
 			dispose();
 			int segments = (new Integer(textSegments.getText())).intValue();
 			if (segments >=3 && segments <=256) {
-				JPatchCompoundEdit compoundEdit = new NewLatheEdit(MainFrame.getInstance().getPointSelection().getControlPointArray(), segments, fEpsilon);
-				if (compoundEdit.size() > 0) {
-					MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
+				NewLatheEdit edit = new NewLatheEdit(MainFrame.getInstance().getSelection().getControlPointArray(), segments, fEpsilon);
+				if (edit.size() > 0) {
+					MainFrame.getInstance().getUndoManager().addEdit(edit);
 				}
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}

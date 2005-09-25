@@ -3,7 +3,7 @@ package jpatch.control.edit;
 import jpatch.entity.*;
 import jpatch.boundary.*;
 
-public class AtomicAddPatch extends JPatchAtomicEdit {
+public class AtomicAddPatch extends JPatchAtomicEdit implements JPatchRootEdit {
 	
 	private Patch patch;
 	
@@ -14,7 +14,7 @@ public class AtomicAddPatch extends JPatchAtomicEdit {
 		MainFrame.getInstance().getModel().addPatch(patch,null);
 	}
 	
-	public String getPresentationName() {
+	public String getName() {
 		return "add patch";
 	}
 	

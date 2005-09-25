@@ -3,8 +3,8 @@ package jpatch.boundary.action;
 import java.awt.event.*;
 import javax.swing.*;
 import jpatch.control.edit.*;
+import jpatch.entity.*;
 import jpatch.boundary.*;
-
 
 public final class FlipAction extends AbstractAction {
 	/**
@@ -25,13 +25,14 @@ public final class FlipAction extends AbstractAction {
 		//putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("lathe"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null) {
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		ControlPoint[] acp = selection.getControlPointArray();
+		if (acp.length > 0) {
 			//PointSelection newPs = MainFrame.getInstance().getModel().clone(ps.getControlPointArray());
 			//MainFrame.getInstance().setSelection(newPs);
 			//float epsilon = 3f / MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().getMatrix().getScale();
 			//System.out.println(epsilon);
-			MainFrame.getInstance().getUndoManager().addEdit(new FlipEdit(ps, iAxis, true, false));
+			MainFrame.getInstance().getUndoManager().addEdit(new CompoundFlip(acp, selection.getPivot(), iAxis, true, false));
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 	}
