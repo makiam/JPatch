@@ -1,12 +1,17 @@
 package jpatch.boundary;
 
 import javax.swing.*;
+import javax.vecmath.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import jpatch.control.edit.*;
+import jpatch.entity.*;
 
 public class AlignOptions extends JDialog implements ActionListener {
-
+	public static final int XPLANE = 1;
+	public static final int YPLANE = 2;
+	public static final int ZPLANE = 3;
 	/**
 	 * 
 	 */
@@ -64,9 +69,27 @@ public class AlignOptions extends JDialog implements ActionListener {
 		} else if (actionEvent.getSource() == buttonOK) {
 			setVisible(false);
 			dispose();
-			float position = (new Float(textPosition.getText())).floatValue();
+			float value = (new Float(textPosition.getText())).floatValue();
 			int plane = comboPlane.getSelectedIndex() + 1;
-			JPatchCompoundEdit edit = new AlignControlPointsEdit(MainFrame.getInstance().getPointSelection().getControlPointArray(), plane, position);
+			
+			JPatchActionEdit edit = new JPatchActionEdit("align controlpoints");
+			ControlPoint[] acp = MainFrame.getInstance().getSelection().getControlPointArray();
+			edit.addEdit(new AtomicMoveControlPoints(acp));
+			for (int i = 0; i < acp.length; i++) {
+				Point3f p3 = acp[i].getPosition();
+				switch (plane) {
+					case XPLANE:
+						p3.x = value;
+						break;
+					case YPLANE:
+						p3.y = value;
+						break;
+					case ZPLANE:
+						p3.z = value;
+						break;
+				}
+				acp[i].setPosition(p3);
+			}
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
 		}
 	}

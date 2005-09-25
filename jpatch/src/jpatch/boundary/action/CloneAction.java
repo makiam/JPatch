@@ -16,13 +16,13 @@ public final class CloneAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("clone"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null && !ps.isSingle()) {
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		if (selection != null && !selection.isSingle()) {
 			//PointSelection newPs = MainFrame.getInstance().getModel().clone(ps.getControlPointArray());
 			//MainFrame.getInstance().setSelection(newPs);
-			JPatchCompoundEdit compoundEdit = new NewCloneEdit(ps.getControlPointArray());
-			if (compoundEdit.size() > 0) {
-				MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
+			CompoundClone edit = new CompoundClone(selection.getControlPointArray());
+			if (edit.size() > 0) {
+				MainFrame.getInstance().getUndoManager().addEdit(edit);
 			}
 			//MainFrame.getInstance().setSelection(null);
 			MainFrame.getInstance().getJPatchScreen().update_all();

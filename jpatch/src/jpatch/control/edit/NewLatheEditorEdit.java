@@ -1,23 +1,22 @@
 /**
- * $Id: NewLatheEditorEdit.java,v 1.7 2005/09/04 18:30:31 sascha_l Exp $
+ * $Id: NewLatheEditorEdit.java,v 1.8 2005/09/25 13:16:14 sascha_l Exp $
  */
 package jpatch.control.edit;
 
 import jpatch.auxilary.Functions;
-import jpatch.entity.ControlPoint;
-import jpatch.entity.Curve;
+import jpatch.entity.*;
 import jpatch.boundary.*;
 
 /**
  * 
  * @author lois
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  * 
  */
 
 // FIXME: this class should be a dialog, not an edit!!!
 
-public class NewLatheEditorEdit extends JPatchCompoundEdit {
+public class NewLatheEditorEdit extends JPatchCompoundEdit implements JPatchRootEdit {
 	
 	/**
 	* Creates and performes the edit
@@ -83,10 +82,14 @@ public class NewLatheEditorEdit extends JPatchCompoundEdit {
 		}
 
 		// add edits
-		Curve curve = new Curve(cpts[0]); //, MainFrame.getInstance().getModel());
+		//Curve curve = new Curve(cpts[0]); //, MainFrame.getInstance().getModel());
 		//curve.validate();
-		addEdit(new AtomicAddCurve(curve));	// create the new curve
-		addEdit(new ValidateCurveEdit(curve));  // validate the curve
+		addEdit(new AtomicAddCurve(cpts[0]));	// create the new curve
+		//addEdit(new ValidateCurveEdit(curve));  // validate the curve
 		addEdit(new NewLatheEdit(cpts, iSegments, epsilon)); // lathe the curve
 	}	
+	
+	public String getName() {
+		return "lathe";
+	}
 }

@@ -19,20 +19,23 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 		//putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("clone"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
+		NewSelection selection = MainFrame.getInstance().getSelection();
 		Model model = MainFrame.getInstance().getModel();
-		if (ps != null) {
-			for (Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
-				for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
-					if (!ps.contains(cp) && cp.getParentHook() != null && ps.contains(cp.getParentHook().getHead())) {
-						ps.addControlPoint(cp);
-				      	}
+		ArrayList points = new ArrayList();
+		if (selection != null) {
+			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
+				for(ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+					if (selection.contains(cp))
+						points.add(cp);
+					else if (cp.getParentHook() != null && selection.contains(cp.getParentHook().getHead())) {
+						points.add(cp);
 				}
 			}
                 	
-			test:
-			if (ps != null) {
-				ControlPoint[] acp = ps.getControlPointArray();
+			//test:
+			
+				ControlPoint[] acp = new ControlPoint[points.size()];
+				points.toArray(acp);
 				HashMap mapHeadList = new HashMap();
 				HashSet setHeads = new HashSet();
 				for (int i = 0; i < acp.length; i++) {
@@ -143,7 +146,7 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 						}
 						if (!found) {
 							//System.out.println("*break*");
-							break test;
+							return;
 						}
 					}
 					//for (Iterator it = fivePointPatch.iterator(); it.hasNext(); ) {

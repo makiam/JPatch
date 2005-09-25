@@ -6,10 +6,10 @@ import jpatch.entity.*;
  * Use this class for changing morphs
  */
 
-public class FlipPatchEdit extends JPatchAbstractUndoableEdit {
+public class AtomicFlipPatch extends JPatchAtomicEdit {
 	private Patch patch;
 	
-	public FlipPatchEdit(Patch patch) {
+	public AtomicFlipPatch(Patch patch) {
 		this.patch = patch;
 		flip();
 	}
@@ -24,5 +24,9 @@ public class FlipPatchEdit extends JPatchAbstractUndoableEdit {
 	
 	private void flip() {
 		patch.flip();
+	}
+	
+	public int sizeOf() {
+		return 8 + 4;
 	}
 }

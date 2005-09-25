@@ -4,7 +4,6 @@ import java.util.*;
 
 import javax.vecmath.*;
 
-import jpatch.auxilary.XMLutils;
 import jpatch.control.edit.*;
 import jpatch.entity.*;
 
@@ -92,6 +91,17 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 		return hotObject;
 	}
 
+	public ControlPoint[] getControlPointArray() {
+		ArrayList points = new ArrayList();
+		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext(); ) {
+			Object object = it.next();
+			if (object instanceof ControlPoint)
+				points.add(object);
+		}
+		ControlPoint[] array = new ControlPoint[points.size()];
+		return (ControlPoint[]) points.toArray(array);
+	}
+	
 	public int getDirection() {
 		return iDirection;
 	}

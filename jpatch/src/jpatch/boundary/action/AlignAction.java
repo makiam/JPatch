@@ -16,8 +16,7 @@ public final class AlignAction extends AbstractAction {
 		//putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("lathe"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null) {
+		if (MainFrame.getInstance().getSelection() != null) {
 			//PointSelection newPs = MainFrame.getInstance().getModel().clone(ps.getControlPointArray());
 			//MainFrame.getInstance().setSelection(newPs);
 			//float epsilon = 3f / MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().getMatrix().getScale();

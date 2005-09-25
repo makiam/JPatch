@@ -4,12 +4,12 @@ import java.util.*;
 import javax.vecmath.*;
 import jpatch.auxilary.*;
 import jpatch.entity.*;
-
+import jpatch.boundary.*;
 
 /**
 * Undoable Clone Edit
 **/
-public class NewLatheEdit extends CloneCommonEdit {
+public class NewLatheEdit extends AbstractClone implements JPatchRootEdit {
 
 	static private int iNum = 1;
 	//private int iSegments = 8;
@@ -63,7 +63,8 @@ public class NewLatheEdit extends CloneCommonEdit {
 		 * clone controlpoints
 		 */
 		HashMap mapCPs = new HashMap();
-		PointSelection ps = new PointSelection();
+//		NewSelection selection = new NewSelection();
+		ArrayList pointList = new ArrayList();
 		
 		/* store all the points in an array */
 				
@@ -118,9 +119,9 @@ public class NewLatheEdit extends CloneCommonEdit {
 				/* add a curve if we are a start point AND have a next point */
 				if ((cpClone.getLoop() || cpClone.getPrev() == null) && cpClone.getNext() != null) {
 					//model.addCurve(cpClone);
-					Curve curve = new Curve(cpClone);
-					addEdit(new AtomicAddCurve(curve));	// create a new curve
-					addEdit(new ValidateCurveEdit(curve)); // validate new curve
+//					Curve curve = new Curve(cpClone);
+					addEdit(new AtomicAddCurve(cpClone));	// create a new curve
+//					addEdit(new ValidateCurveEdit(curve)); // validate new curve
 				}
 				
 				/* detach empty points */
@@ -300,7 +301,7 @@ public class NewLatheEdit extends CloneCommonEdit {
 						newCp[s] = new ControlPoint();
 						//newCp[s].setMode(ControlPoint.JPATCH_G3);
 						addEdit(new AtomicAttachControlPoints(newCp[s],cpLathe[p][s].getTail()));
-						ps.addControlPoint(newCp[s].getHead());
+						pointList.add(newCp[s].getHead());
 					}
 					for (int s = 0; s < iSegments; s++) {
 						int prev = (s - 1 + iSegments) % iSegments;
@@ -310,9 +311,9 @@ public class NewLatheEdit extends CloneCommonEdit {
 						newCp[s].setMagnitude(mag);
 					}
 					newCp[0].setLoop(true);
-					Curve curve = new Curve(newCp[0]);
-					curve.validate();
-					addEdit(new AtomicAddCurve(curve));
+//					Curve curve = new Curve(newCp[0]);
+//					curve.validate();
+					addEdit(new AtomicAddCurve(newCp[0]));
 				} else {
 					if (iSegments % 2 == 0) {
 						for (int s = 0; s < iSegments / 2; s++) {
@@ -322,27 +323,32 @@ public class NewLatheEdit extends CloneCommonEdit {
 						for (int s = iSegments / 2 + 1; s < iSegments; s++) {
 							addEdit(new AtomicAttachControlPoints(cpLathe[p][s],cpLathe[p][s - 1]));
 						}
-						addEdit(new NewMoveControlPointsEdit(new ControlPoint[] { cpLathe[p][iSegments / 2] } ));
+						addEdit(new AtomicMoveControlPoints(new ControlPoint[] { cpLathe[p][iSegments / 2] } ));
 						cpLathe[p][iSegments / 2].setPosition(0,cpLathe[p][iSegments / 2].getPosition().y,0);
 						//addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,new ControlPoint[] { cpLathe[p][iSegments / 2] } ));
-						ps.addControlPoint(cpLathe[p][iSegments / 2]);
+						pointList.add(cpLathe[p][iSegments / 2]);
 					} else {
 						for (int s = 1; s < iSegments; s++) {
 							addEdit(new AtomicAttachControlPoints(cpLathe[p][s],cpLathe[p][s - 1]));
 						}
-						addEdit(new NewMoveControlPointsEdit(new ControlPoint[] { cpLathe[p][0] } ));
+						addEdit(new AtomicMoveControlPoints(new ControlPoint[] { cpLathe[p][0] } ));
 						cpLathe[p][0].setPosition(0,cpLathe[p][0].getPosition().y,0);
 						//addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,new ControlPoint[] { cpLathe[p][0] } ));
-						ps.addControlPoint(cpLathe[p][0]);
+						pointList.add(cpLathe[p][0]);
 					}
 				}
 			}
 		}
 		/* add selection */
-		ps.setName("*lathe #" + iNum++);
-		if (ps.getSize() > 0) {
-			addEdit(new AtomicChangeSelection(ps));
-			addEdit(new AtomicAddSelection(ps));
+		NewSelection selection = new NewSelection(pointList);
+		selection.setName("*lathe #" + iNum++);
+		if (selection.getMap().size() > 0) {
+			addEdit(new AtomicChangeSelection(selection));
+			addEdit(new AtomicAddSelection(selection));
 		}
+	}
+	
+	public String getName() {
+		return "lathe";
 	}
 }

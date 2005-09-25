@@ -58,6 +58,46 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		}
 	}
 	
+	public static final class Next extends AtomicChangeControlPoint {
+		private ControlPoint cpNext;
+		
+		public Next(ControlPoint cp, ControlPoint next) {
+			this.cp = cp;
+			cpNext = next;
+			swap();
+		}
+		
+		void swap() {
+			ControlPoint dummy = cp.getNext();
+			cp.setNext(cpNext);
+			cpNext = dummy;
+		}
+		
+		public int sizeOf() {
+			return 8 + 4 + 4;
+		}
+	}
+	
+	public static final class Prev extends AtomicChangeControlPoint {
+		private ControlPoint cpPrev;
+		
+		public Prev(ControlPoint cp, ControlPoint prev) {
+			this.cp = cp;
+			cpPrev = prev;
+			swap();
+		}
+		
+		void swap() {
+			ControlPoint dummy = cp.getPrev();
+			cp.setPrev(cpPrev);
+			cpPrev = dummy;
+		}
+		
+		public int sizeOf() {
+			return 8 + 4 + 4;
+		}
+	}
+	
 
 	public static final class ParentHook extends AtomicChangeControlPoint {
 		private ControlPoint cpParentHook;

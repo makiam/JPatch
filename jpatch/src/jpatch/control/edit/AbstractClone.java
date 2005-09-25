@@ -11,7 +11,7 @@ import jpatch.boundary.*;
 * needed by CopyEdit, LatheEdit and ExtrudeEdit
 **/
 
-public abstract class CloneCommonEdit extends JPatchCompoundEdit {
+public abstract class AbstractClone extends JPatchCompoundEdit {
 
 	/** Array containing all ControlPoints to be cloned (in most cases the selection) **/
 	protected ControlPoint[] acp;
@@ -20,11 +20,11 @@ public abstract class CloneCommonEdit extends JPatchCompoundEdit {
 	/** maps originals to their clones **/
 	protected Map mapOriginals = new HashMap();
 
-	public CloneCommonEdit(ControlPoint[] controlPointsToClone) {
+	public AbstractClone(ControlPoint[] controlPointsToClone) {
 		acp = controlPointsToClone;
 	}
 
-	public CloneCommonEdit() {
+	public AbstractClone() {
 	}
 	
 	public static boolean checkForHooks(ControlPoint[] acp) {
@@ -153,12 +153,12 @@ public abstract class CloneCommonEdit extends JPatchCompoundEdit {
 				
 				/* set hook pos */
 				if (cpOriginal.getHookPos() != -1) {
-					addEdit(new ChangeCPHookPosEdit(cpClone, 1 - cpOriginal.getHookPos()));
+					addEdit(new AtomicChangeControlPoint.HookPos(cpClone, 1 - cpOriginal.getHookPos()));
 				}
 			//}
 		}
 		for (Iterator it = childHooks.iterator(); it.hasNext(); ) {
-			addEdit(new ChangeCPChildHookEdit((ControlPoint) it.next(), (ControlPoint) it.next()));
+			addEdit(new AtomicChangeControlPoint.ChildHook((ControlPoint) it.next(), (ControlPoint) it.next()));
 		}
 		
 		for (Iterator it = mapOriginals.keySet().iterator(); it.hasNext(); ) {
@@ -168,7 +168,7 @@ public abstract class CloneCommonEdit extends JPatchCompoundEdit {
 				/* correct child hooks (as hook curves have been reversed */
 				ControlPoint cp = cpClone;
 				if (cp.getChildHook() != null) {
-					addEdit(new ChangeCPChildHookEdit(cp,cp.getChildHook().getStart()));
+					addEdit(new AtomicChangeControlPoint.ChildHook(cp,cp.getChildHook().getStart()));
 				}
 			//}
 		}
@@ -200,11 +200,7 @@ public abstract class CloneCommonEdit extends JPatchCompoundEdit {
 				/* if we are the start, add the curve */
 				if (cpClone.getLoop() || cpClone.getPrev() == null) {
 					if (cpClone.getNext() != null) {
-						Curve curve = new Curve(cpClone);
-						addEdit(new AtomicAddCurve(curve));
-						addEdit(new ValidateCurveEdit(curve));
-						//curvesToReverse.add(curve);
-						//addEdit(new ReverseCurveEdit(curve));
+						addEdit(new AtomicAddCurve(cpClone));
 					} else {
 						System.err.println("Error in CloneCommonEdit - attempted to add invalid curve");
 					}
@@ -219,15 +215,15 @@ public abstract class CloneCommonEdit extends JPatchCompoundEdit {
 	/**
 	* create new selection
 	**/
-	protected PointSelection createNewSelection() {
-		PointSelection ps = new PointSelection();
+	protected NewSelection createNewSelection() {
+		ArrayList list = new ArrayList(); 
 		for (Iterator it = mapOriginals.keySet().iterator(); it.hasNext(); ) {
 			ControlPoint cpClone = (ControlPoint) it.next();
 			if (cpClone.isHead()) {
-				ps.addControlPoint(cpClone);
+				list.add(cpClone);
 			}
 		}
-		return ps;
+		return new NewSelection(list);
 	}
 
 	/**
@@ -240,7 +236,8 @@ public abstract class CloneCommonEdit extends JPatchCompoundEdit {
 	protected void clonePatches(List mirror) {
 		List list = new ArrayList();
 		Model model = MainFrame.getInstance().getModel();
-		for (Patch patch = model.getFirstPatch(); patch != null; patch = patch.getNext()) {
+		for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
+			Patch patch = (Patch) it.next();
 			ControlPoint[] acpOriginalPatch = patch.getControlPoints();
 			ControlPoint[] acpClonePatch = new ControlPoint[acpOriginalPatch.length];
 			boolean addPatch = true;

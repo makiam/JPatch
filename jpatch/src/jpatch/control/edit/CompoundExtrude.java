@@ -2,23 +2,23 @@ package jpatch.control.edit;
 
 import java.util.*;
 import jpatch.entity.*;
+import jpatch.boundary.*;
 
-
-public class NewExtrudeEdit extends CloneCommonEdit {
+public class CompoundExtrude extends AbstractClone implements JPatchRootEdit {
 	
 	private static int iSequenceNumber = 1;
 	
-	public NewExtrudeEdit(ControlPoint[] controlPointsToClone) {
+	public CompoundExtrude(ControlPoint[] controlPointsToClone) {
 		super(controlPointsToClone);
 		buildCloneMap(false);
 		cloneControlPoints();
 		cloneCurves();
 		extrude();
-		PointSelection ps = createNewSelection();
-		if (ps.getSize() > 0) {
-			ps.setName("*extruded points #" + iSequenceNumber++);
-			addEdit(new AtomicChangeSelection(ps));
-			addEdit(new AtomicAddSelection(ps));
+		NewSelection selection = createNewSelection();
+		if (selection.getMap().size() > 0) {
+			selection.setName("*extruded points #" + iSequenceNumber++);
+			addEdit(new AtomicChangeSelection(selection));
+			addEdit(new AtomicAddSelection(selection));
 		}
 	}
 	
@@ -55,25 +55,29 @@ public class NewExtrudeEdit extends CloneCommonEdit {
 					
 					/* and add it as a new curve */
 					cpNew.appendTo(cpEnd);
-					Curve curve = new Curve(cpEnd);
-					curve.validate();
-					addEdit(new AtomicAddCurve(curve));
+//					Curve curve = new Curve(cpEnd);
+//					curve.validate();
+					addEdit(new AtomicAddCurve(cpEnd));
 				} else {
 					if (cpEnd.isEnd()) {
-						addEdit(new ChangeControlPointNextEdit(cpEnd,cpNew));
+						addEdit(new AtomicChangeControlPoint.Next(cpEnd,cpNew));
 						cpNew.setPrev(cpEnd);
-						cpNew.setCurve(cpEnd.getCurve());
+//						cpNew.setCurve(cpEnd.getCurve());
 					} else if (cpEnd.isStart()) {
-						addEdit(new ChangeControlPointPrevEdit(cpEnd,cpNew));
+						addEdit(new AtomicChangeControlPoint.Prev(cpEnd,cpNew));
 						cpNew.setNext(cpEnd);
-						cpNew.setCurve(cpEnd.getCurve());
-						addEdit(new AtomicChangeCurveStart(cpEnd.getCurve(),cpNew));
+//						cpNew.setCurve(cpEnd.getCurve());
+//						addEdit(new AtomicChangeCurveStart(cpEnd.getCurve(),cpNew));
 					} else {
 						System.out.println("error in extrudeEdit");
 					}
 				}
 			}
 		}
+	}
+	
+	public String getName() {
+		return "extrude";
 	}
 }
 

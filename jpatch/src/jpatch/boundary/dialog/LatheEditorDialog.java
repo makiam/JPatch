@@ -1,33 +1,18 @@
 /*
- * $Id: LatheEditorDialog.java,v 1.1 2005/08/21 15:32:08 lois Exp $ 
+ * $Id: LatheEditorDialog.java,v 1.2 2005/09/25 13:16:14 sascha_l Exp $ 
  */
 package jpatch.boundary.dialog;
 
-import java.awt.Color;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import jpatch.control.edit.JPatchCompoundEdit;
-import jpatch.control.edit.NewLatheEditorEdit;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import jpatch.control.edit.*;
 
 /**
  * 
  * @author lois
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
  */
 public class LatheEditorDialog extends JDialog implements ActionListener, ChangeListener {
@@ -66,7 +51,7 @@ public class LatheEditorDialog extends JDialog implements ActionListener, Change
 	private JComboBox comboBoxPresets;
 	
 	//private boolean okPressed = false;
-	private JPatchCompoundEdit edit;
+	private JPatchRootEdit edit;
 
 	/** the Lathe CurvePanel */
 	private class CurvePanel extends JPanel {
@@ -405,7 +390,7 @@ public class LatheEditorDialog extends JDialog implements ActionListener, Change
 		pack();
 	}
 
-	public JPatchCompoundEdit getEdit() {
+	public JPatchRootEdit getEdit() {
 		return edit;
 	}
 

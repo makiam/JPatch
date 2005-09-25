@@ -5,11 +5,11 @@ import jpatch.entity.*;
 import jpatch.boundary.sidebar.*;
 import jpatch.boundary.*;
 
-public class RemoveMaterialEdit extends JPatchAbstractUndoableEdit {
+public class AtomicRemoveMaterial extends JPatchAtomicEdit implements JPatchRootEdit {
 	
 	private JPatchMaterial material;
 	
-	public RemoveMaterialEdit(JPatchMaterial material) {
+	public AtomicRemoveMaterial(JPatchMaterial material) {
 		this.material = material;
 		redo();
 	}
@@ -37,5 +37,13 @@ public class RemoveMaterialEdit extends JPatchAbstractUndoableEdit {
 		MainFrame.getInstance().getSideBar().validate();
 		//MainFrame.getInstance().getTree().setSelectionPath(path);
 		//MainFrame.getInstance().getTree().makeVisible(path);
+	}
+	
+	public int sizeOf() {
+		return 8 + 4;
+	}
+	
+	public String getName() {
+		return "remove material";
 	}
 }

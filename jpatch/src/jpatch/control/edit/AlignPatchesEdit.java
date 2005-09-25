@@ -34,7 +34,7 @@ public class AlignPatchesEdit extends JPatchCompoundEdit {
 			if (patches.contains(p)) {
 				int r = comparePatches(patch, p);
 				if (r < 0) {
-					addEdit(new FlipPatchEdit(p));
+					addEdit(new AtomicFlipPatch(p));
 					processPatch(p);
 				} else if (r > 0) processPatch(p);
 			}
