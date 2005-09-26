@@ -409,7 +409,7 @@ implements ModelImporter {
 			}
 		}
 		//morph.dump();
-		morph.add(cp, vector);
+		morph.addPoint(cp, vector);
 	}
 	
 	private void createSelection(Attributes attributes) {

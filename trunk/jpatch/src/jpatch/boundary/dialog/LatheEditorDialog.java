@@ -169,7 +169,7 @@ public class LatheEditorDialog extends JDialog implements ActionListener, Change
 				iSegments = (new Integer(segmentsText.getText())).intValue();
 				//okPressed = true;
 				// do the edit
-				edit = new NewLatheEditorEdit(iSegments, iForm, iFill, iSize, iDistance, iRotation, bCloseTop, bCloseBottom);
+				edit = new CompoundLatheEditor(iSegments, iForm, iFill, iSize, iDistance, iRotation, bCloseTop, bCloseBottom);
 			}
 		} else if (evt.getSource() instanceof JComboBox){
 			String sel = (String)((JComboBox)evt.getSource()).getSelectedItem();

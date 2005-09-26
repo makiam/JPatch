@@ -16,12 +16,12 @@ import jpatch.boundary.*;
 
 // FIXME: this class should be a dialog, not an edit!!!
 
-public class NewLatheEditorEdit extends JPatchCompoundEdit implements JPatchRootEdit {
+public class CompoundLatheEditor extends JPatchCompoundEdit implements JPatchRootEdit {
 	
 	/**
 	* Creates and performes the edit
 	*/
-	public NewLatheEditorEdit(int iSegments, int iForm, int iFill, int iSize, int iDistance, int iRotation, boolean bCloseTop, boolean bCloseBottom) {
+	public CompoundLatheEditor(int iSegments, int iForm, int iFill, int iSize, int iDistance, int iRotation, boolean bCloseTop, boolean bCloseBottom) {
 		
 		float epsilon = 3f / MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().getMatrix().getScale();
 		
@@ -86,7 +86,7 @@ public class NewLatheEditorEdit extends JPatchCompoundEdit implements JPatchRoot
 		//curve.validate();
 		addEdit(new AtomicAddCurve(cpts[0]));	// create the new curve
 		//addEdit(new ValidateCurveEdit(curve));  // validate the curve
-		addEdit(new NewLatheEdit(cpts, iSegments, epsilon)); // lathe the curve
+		addEdit(new CompoundLathe(cpts, iSegments, epsilon)); // lathe the curve
 	}	
 	
 	public String getName() {

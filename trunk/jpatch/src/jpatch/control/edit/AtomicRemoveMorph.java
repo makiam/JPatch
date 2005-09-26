@@ -5,17 +5,17 @@ import jpatch.entity.*;
 import jpatch.boundary.sidebar.*;
 import jpatch.boundary.*;
 
-public class RemoveMorphEdit extends JPatchAbstractUndoableEdit {
+public class AtomicRemoveMorph extends JPatchAtomicEdit implements JPatchRootEdit {
 	
 	private Morph morph;
 	
-	public RemoveMorphEdit(Morph morph) {
+	public AtomicRemoveMorph(Morph morph) {
 		this.morph = morph;
 		redo();
 	}
 	
-	public String getPresentationName() {
-		return "remove morph";
+	public String getName() {
+		return "delete morph";
 	}
 	
 	public void redo() {
@@ -45,5 +45,9 @@ public class RemoveMorphEdit extends JPatchAbstractUndoableEdit {
 		
 		//MainFrame.getInstance().getTree().setSelectionPath(path);
 		//MainFrame.getInstance().getTree().makeVisible(path);
+	}
+	
+	public int sizeOf() {
+		return 8 + 4;
 	}
 }

@@ -35,7 +35,7 @@ public final class NewMorphAction extends AbstractAction {
 		//MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
 		//MainFrame.getInstance().getJPatchScreen().addMouseListeners(new AddControlPointMouseAdapter());
 		//MainFrame.getInstance().clearDialog();
-		MainFrame.getInstance().getUndoManager().addEdit(new AddMorphEdit(morph));
+		MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddMorph(morph));
 		MainFrame.getInstance().getTree().setSelectionPath(morph.getTreePath());
 		((MorphPanel) MainFrame.getInstance().getSideBar().getSidePanel()).edit();
 	}

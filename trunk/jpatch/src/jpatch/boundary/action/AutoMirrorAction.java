@@ -21,7 +21,7 @@ public final class AutoMirrorAction extends AbstractAction {
 			//PointSelection newPs = MainFrame.getInstance().getModel().clone(ps.getControlPointArray());
 			//MainFrame.getInstance().setSelection(newPs);
 			JPatchCompoundEdit compoundEdit = new JPatchCompoundEdit();
-			compoundEdit.addEdit(new ExtendSelectionEdit(ps, true));
+			compoundEdit.addEdit(new CompoundExtandSelection(ps, true));
 			compoundEdit.addEdit(new AutoMirrorEdit(ps));
 			if (compoundEdit.size() > 0) {
 				MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);

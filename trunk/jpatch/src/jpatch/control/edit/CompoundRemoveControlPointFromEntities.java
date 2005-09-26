@@ -47,5 +47,13 @@ public final class CompoundRemoveControlPointFromEntities extends JPatchCompound
 			if (patch.contains(cp))
 				addEdit(new AtomicRemovePatch(patch));
 		}
+		// Remove cp from morphs
+		addEdit(new AtomicRemoveControlPointFromMorphs(cp));
+		// Remove empty morphs
+		for (Iterator it = (new ArrayList(MainFrame.getInstance().getModel().getMorphList())).iterator(); it.hasNext(); ) {
+			Morph morph = (Morph) it.next();
+			if (morph.getNumberOfPoints() == 0)
+				addEdit(new AtomicRemoveMorph(morph));
+		}
 	}
 }

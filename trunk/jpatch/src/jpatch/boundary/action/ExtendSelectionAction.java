@@ -20,7 +20,7 @@ public final class ExtendSelectionAction extends AbstractAction {
 		NewSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null) {
 //			boolean selectCurveOnly = (ps.isSingle() && (ps.isCurve() || ps.getControlPoint().getPrevAttached() == null));
-			MainFrame.getInstance().getUndoManager().addEdit(new ExtendSelectionEdit(selection));
+			MainFrame.getInstance().getUndoManager().addEdit(new CompoundExtandSelection(selection));
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 	}
