@@ -127,7 +127,7 @@ public class JPatchPopupMenu extends JPopupMenu {
 		JMenuItem miNextCurve = new JMenuItem(new NextCurveAction());
 		JMenuItem miAddStubs = new JMenuItem(new AddStubsAction());
 		JMenuItem miRemoveStubs = new JMenuItem(new RemoveStubsAction());
-		JMenuItem miConvertToCp = new JMenuItem(new ConvertHookToCpAction());
+//		JMenuItem miConvertToCp = new JMenuItem(new ConvertHookToCpAction());
 		
 		if (MainFrame.getInstance().getSelection() == null) {
 			miSelectNone.setEnabled(false);
@@ -139,10 +139,10 @@ public class JPatchPopupMenu extends JPopupMenu {
 			miNextCurve.setEnabled(false);
 			miAddStubs.setEnabled(false);
 			miRemoveStubs.setEnabled(false);
-			miConvertToCp.setEnabled(false);
+//			miConvertToCp.setEnabled(false);
 		} else {
-			NewSelection selection = MainFrame.getInstance().getSelection();
-			miConvertToCp.setEnabled(selection.isSingle() && (selection.getHotObject() instanceof ControlPoint) && ((ControlPoint) selection.getHotObject()).isHook());
+			Selection selection = MainFrame.getInstance().getSelection();
+//			miConvertToCp.setEnabled(selection.isSingle() && (selection.getHotObject() instanceof ControlPoint) && ((ControlPoint) selection.getHotObject()).isHook());
 			if (MainFrame.getInstance().getSelection().getDirection() != 0 && !MainFrame.getInstance().getSelection().isSingle())
 				miNextCurve.setEnabled(false);
 		}

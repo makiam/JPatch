@@ -6,7 +6,7 @@ import java.util.*;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
-import jpatch.boundary.NewSelection;
+import jpatch.boundary.Selection;
 import jpatch.boundary.Rotoscope;
 import jpatch.boundary.ViewDefinition;
 import jpatch.control.ModelImporter;
@@ -280,20 +280,20 @@ implements ModelImporter {
 			case SELECTION:
 				if (localName.equals("selection")) {
 					iState = MODEL;
-					NewSelection selection;
+					Selection selection;
 					if (aiList == null) {
 						int[] aiPoint = splitIntoIntArray(sbChars.toString());
 						HashSet pointSet = new HashSet();
 						for (int i = 0; i < aiPoint.length; i++) {
 							pointSet.add(listCp.get(aiPoint[i]));
 						}
-						selection = new NewSelection(pointSet);
+						selection = new Selection(pointSet);
 					} else {
 						HashMap pointMap = new HashMap();
 						for (int i = 0; i < aiList.length; i++) {
 							pointMap.put(listCp.get(aiList[i]), new Float(afList[i]));
 						}
-						selection = new NewSelection(pointMap);
+						selection = new Selection(pointMap);
 					}
 					selection.setName(selectionName);
 					model.addSelection(selection);

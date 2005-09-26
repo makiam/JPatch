@@ -43,7 +43,7 @@ public final class AtomicReplaceControlPointInSelections extends JPatchAtomicEdi
 	
 	private void swap() {
 		for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
-			NewSelection selection = (NewSelection) it.next();
+			Selection selection = (Selection) it.next();
 			if (selection.contains(cpOld)) {
 				Object weight = selection.getMap().get(cpOld);
 				selection.getMap().remove(cpOld);

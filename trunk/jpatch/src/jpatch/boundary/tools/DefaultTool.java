@@ -140,7 +140,7 @@ public class DefaultTool extends JPatchTool {
 	}
 	
 	protected boolean isHit(int x, int y, Matrix4f m4View) {
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		Point3f p3A = new Point3f();
 		Point3f p3B = new Point3f();
 		selection.getBounds(p3A, p3B);
@@ -214,7 +214,7 @@ public class DefaultTool extends JPatchTool {
 	public void paint(ViewDefinition viewDef) {
 		//drawable.clearZBuffer();
 		JPatchDrawable2 drawable = viewDef.getDrawable();
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		
 //		if (MainFrame.getInstance().getJPatchScreen().showTangents() && tangentTool != null) tangentTool.paint(viewport, drawable); // FIXME
 		if (selection != null && !selection.isSingle()) {
@@ -300,7 +300,7 @@ public class DefaultTool extends JPatchTool {
 			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(false);
 			int x = mouseEvent.getX();
 			int y = mouseEvent.getY();
-			NewSelection selection = MainFrame.getInstance().getSelection();
+			Selection selection = MainFrame.getInstance().getSelection();
 			
 			
 			//System.out.println ("ps = " + ps);
@@ -448,7 +448,7 @@ public class DefaultTool extends JPatchTool {
 							 * selection box was not hit
 							 * create a new selection containing only cphot
 							 */
-							edit.addEdit(new AtomicChangeSelection(new NewSelection(cpHot)));
+							edit.addEdit(new AtomicChangeSelection(new Selection(cpHot)));
 							
 							/* set state */
 							iState = MOVE_SINGLE_POINT;
@@ -716,7 +716,7 @@ public class DefaultTool extends JPatchTool {
 		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 		//Viewport viewport = (Viewport)mouseEvent.getSource();
 		if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
-			NewSelection selection = MainFrame.getInstance().getSelection();
+			Selection selection = MainFrame.getInstance().getSelection();
 			
 			/* check if Control or Shift was down (on mouse release) and modify state if necessary */
 			if ((iState == DRAW_SELECTION || iState == ADD_MODIFY_SELECTION || iState == XOR_MODIFY_SELECTION) && selection != null) {
@@ -751,7 +751,7 @@ public class DefaultTool extends JPatchTool {
 					break;
 //FIXME					
 				case DRAW_SELECTION:
-					NewSelection sel = selectMouseMotionListener.getSelection(viewDef);
+					Selection sel = selectMouseMotionListener.getSelection(viewDef);
 					if ((selection != null ^ sel != null) || sel != null && !sel.equals(selection)) {
 						MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(sel));
 						((Component)mouseEvent.getSource()).removeMouseMotionListener(selectMouseMotionListener);
@@ -844,7 +844,7 @@ public class DefaultTool extends JPatchTool {
 		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 		Grid grid = MainFrame.getInstance().getJPatchScreen().getViewport((Component) mouseEvent.getSource()).getGrid();
 		//System.out.println("mouseDragged");
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		int iDeltaX = mouseEvent.getX() - iMouseX;
 		int iDeltaY = mouseEvent.getY() - iMouseY;
 		Matrix4f m4InvScreenMatrix = new Matrix4f(viewDef.getScreenMatrix());
@@ -928,11 +928,11 @@ public class DefaultTool extends JPatchTool {
 //		for (int i = 0, n = list.size(); i < n; i++) {
 //			((Transformable) list.get(i)).beginTransform();
 //		}
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 //FIXME
-		int mask = NewSelection.CONTROLPOINTS;
+		int mask = Selection.CONTROLPOINTS;
 		if (!(MainFrame.getInstance().getMode() == MainFrame.MORPH))
-			mask |= NewSelection.MORPHS;
+			mask |= Selection.MORPHS;
 		selection.arm(mask);
 //FIXME
 		selection.beginTransform();
@@ -947,7 +947,7 @@ public class DefaultTool extends JPatchTool {
 //		for (int i = 0, n = list.size(); i < n; i++) {
 //			compoundEdit.addEdit(((Transformable) list.get(i)).endTransform();
 //		}
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		edit.addEdit(selection.endTransform());
 		MainFrame.getInstance().getUndoManager().addEdit(edit);
 	}
@@ -962,7 +962,7 @@ public class DefaultTool extends JPatchTool {
 //		}
 //	}
 	protected void translate(Vector3f v, ViewDefinition viewDef, Grid grid) {
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		selection.translate(v);
 		if (bMoveZ) {
 			MainFrame.getInstance().getJPatchScreen().update_all();
@@ -972,7 +972,7 @@ public class DefaultTool extends JPatchTool {
 	}
 	
 	protected void scale(float scale, ViewDefinition viewDef) {
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		Matrix3f matrix = new Matrix3f(
 				scale, 0, 0,
 				0, scale, 0,
@@ -1065,7 +1065,7 @@ public class DefaultTool extends JPatchTool {
 //		MainFrame.getInstance().getJPatchScreen().single_update(viewDef.getDrawable().getComponent());
 //	}
 	
-	private void selectionChanged(NewSelection selection) {
+	private void selectionChanged(Selection selection) {
 		JPatchTreeLeaf leaf = null;
 		if (MainFrame.getInstance().getTree().getSelectionPath() != null)
 			leaf = (JPatchTreeLeaf) MainFrame.getInstance().getTree().getSelectionPath().getLastPathComponent();

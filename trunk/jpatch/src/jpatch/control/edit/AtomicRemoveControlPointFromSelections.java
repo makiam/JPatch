@@ -39,7 +39,7 @@ public final class AtomicRemoveControlPointFromSelections extends JPatchAtomicEd
 			System.out.println(getClass().getName() + "(" + cp + ")");
 		this.cp = cp;
 		for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
-			NewSelection selection = (NewSelection) it.next();
+			Selection selection = (Selection) it.next();
 			if (selection.contains(cp))
 				mapSelections.put(selection, selection.getMap().get(cp));
 		}
@@ -48,14 +48,14 @@ public final class AtomicRemoveControlPointFromSelections extends JPatchAtomicEd
 	
 	public void undo() {
 		for (Iterator it = mapSelections.keySet().iterator(); it.hasNext(); ) {
-			NewSelection selection = (NewSelection) it.next();
+			Selection selection = (Selection) it.next();
 			selection.getMap().put(cp, mapSelections.get(selection)); 
 		}
 	}
 	
 	public void redo() {
 		for (Iterator it = mapSelections.keySet().iterator(); it.hasNext(); ) {
-			NewSelection selection = (NewSelection) it.next();
+			Selection selection = (Selection) it.next();
 			selection.getMap().remove(cp); 
 		}
 	}

@@ -19,7 +19,7 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 		//putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("clone"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		Model model = MainFrame.getInstance().getModel();
 		ArrayList points = new ArrayList();
 		if (selection != null) {

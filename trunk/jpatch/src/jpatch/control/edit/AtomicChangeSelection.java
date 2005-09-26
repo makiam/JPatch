@@ -7,9 +7,9 @@ import jpatch.boundary.*;
  */
 
 public class AtomicChangeSelection extends JPatchAtomicEdit implements JPatchRootEdit {
-	private NewSelection selection;
+	private Selection selection;
 	
-	public AtomicChangeSelection(NewSelection selection) {
+	public AtomicChangeSelection(Selection selection) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + selection + ")");
 		this.selection = selection;
@@ -33,7 +33,7 @@ public class AtomicChangeSelection extends JPatchAtomicEdit implements JPatchRoo
 	}
 	
 	private void swap() {
-		NewSelection dummy = selection;
+		Selection dummy = selection;
 		selection = MainFrame.getInstance().getSelection();
 		MainFrame.getInstance().setSelection(dummy);
 	}

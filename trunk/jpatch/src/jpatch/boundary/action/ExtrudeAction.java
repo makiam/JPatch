@@ -16,7 +16,7 @@ public final class ExtrudeAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("extrude"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && !selection.isSingle()) {
 			ControlPoint[] acp = selection.getControlPointArray();
 			if (AbstractClone.checkForHooks(acp)) {

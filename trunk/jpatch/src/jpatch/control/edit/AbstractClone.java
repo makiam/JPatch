@@ -215,7 +215,7 @@ public abstract class AbstractClone extends JPatchCompoundEdit {
 	/**
 	* create new selection
 	**/
-	protected NewSelection createNewSelection() {
+	protected Selection createNewSelection() {
 		ArrayList list = new ArrayList(); 
 		for (Iterator it = mapOriginals.keySet().iterator(); it.hasNext(); ) {
 			ControlPoint cpClone = (ControlPoint) it.next();
@@ -223,7 +223,7 @@ public abstract class AbstractClone extends JPatchCompoundEdit {
 				list.add(cpClone);
 			}
 		}
-		return new NewSelection(list);
+		return new Selection(list);
 	}
 
 	/**

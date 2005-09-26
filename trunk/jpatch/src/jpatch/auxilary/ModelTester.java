@@ -175,7 +175,7 @@ public class ModelTester {
 		*/
 		int selections = 0;
 		for (Iterator it = model.getSelections().iterator(); it.hasNext(); ) {
-			NewSelection selection = (NewSelection) it.next();
+			Selection selection = (Selection) it.next();
 			for (Iterator it2 = selection.getObjects().iterator(); it.hasNext(); ) {
 				Object object = it2.next();
 				if (object instanceof ControlPoint) {
