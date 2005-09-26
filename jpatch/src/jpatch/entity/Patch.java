@@ -1,5 +1,5 @@
 /*
- * $Id: Patch.java,v 1.4 2005/09/25 13:16:14 sascha_l Exp $
+ * $Id: Patch.java,v 1.5 2005/09/26 15:07:42 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -30,7 +30,7 @@ import jpatch.auxilary.*;
  * A Patch. Currently 3-, 4- and 5-point patches are supported
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.4 $
+ * @version    $Revision: 1.5 $
  * @see		jpatch.entity.Curve
  * @see		jpatch.entity.ControlPoint
  */
@@ -146,7 +146,7 @@ public final class Patch {
 //		}
 //	}
 	
-	public final boolean isSelected(NewSelection selection) {
+	public final boolean isSelected(Selection selection) {
 		for (int i = 0; i < acpPoint.length; i++) {
 			if (!selection.contains(acpPoint[i].getHead())) {
 				if (!acpPoint[i].isTargetHook() && !acpPoint[i].isChildHook()) return false;

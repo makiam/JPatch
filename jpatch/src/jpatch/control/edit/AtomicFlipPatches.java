@@ -12,7 +12,7 @@ import jpatch.boundary.*;
 public class AtomicFlipPatches extends JPatchAtomicEdit implements JPatchRootEdit {
 	private List listPatches = new ArrayList();
 	
-	public AtomicFlipPatches(NewSelection selection) {
+	public AtomicFlipPatches(Selection selection) {
 		for (Iterator it = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {
 		Patch patch = (Patch) it.next();
 			if (patch.isSelected(selection)) listPatches.add(patch);

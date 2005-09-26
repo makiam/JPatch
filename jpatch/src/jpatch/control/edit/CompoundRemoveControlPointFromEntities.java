@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundRemoveControlPointFromEntities.java,v 1.3 2005/09/26 10:36:28 sascha_l Exp $
+ * $Id: CompoundRemoveControlPointFromEntities.java,v 1.4 2005/09/26 15:07:42 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -37,7 +37,7 @@ public final class CompoundRemoveControlPointFromEntities extends JPatchCompound
 		addEdit(new AtomicRemoveControlPointFromSelections(cp));
 		// Remove empty selections
 		for (Iterator it = (new HashSet(MainFrame.getInstance().getModel().getSelections())).iterator(); it.hasNext(); ) {
-			NewSelection selection = (NewSelection) it.next();
+			Selection selection = (Selection) it.next();
 			if (selection.getMap().size() == 0)
 				addEdit(new AtomicRemoveSelection(selection));
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: SortSelectionAction.java,v 1.3 2005/09/26 15:00:31 sascha_l Exp $
+ * $Id: SortSelectionAction.java,v 1.4 2005/09/26 15:07:42 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -36,7 +36,7 @@ import jpatch.entity.*;
  * @author lois
  * modified by sascha
  * This Action sorts all the elements under the Selections treenode.
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 
 public final class SortSelectionAction extends AbstractAction {
@@ -64,14 +64,14 @@ public final class SortSelectionAction extends AbstractAction {
 		});
 		
 		/* remove all selections and add them again in order. */
-		for (Iterator it = list.iterator(); it.hasNext(); model.removeSelection((NewSelection) it.next()));
-		for (Iterator it = list.iterator(); it.hasNext(); model.addSelection((NewSelection) it.next()));
+		for (Iterator it = list.iterator(); it.hasNext(); model.removeSelection((Selection) it.next()));
+		for (Iterator it = list.iterator(); it.hasNext(); model.addSelection((Selection) it.next()));
 		
 		/* reload the tree model */
 		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).reload();
 		
 		/* make the slections visible */
-		TreePath path = ((NewSelection) list.get(list.size() - 1)).getTreePath();
+		TreePath path = ((Selection) list.get(list.size() - 1)).getTreePath();
 		MainFrame.getInstance().getTree().makeVisible(path);
 	}
 	

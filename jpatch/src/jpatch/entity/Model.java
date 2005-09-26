@@ -139,7 +139,7 @@ public class Model extends JPatchTreeNode {
 		}
 		sb.append(prefix2).append("</mesh>").append("\n");
 		for (Iterator it = lstSelections.iterator(); it.hasNext();) {
-			NewSelection selection = (NewSelection) it.next();
+			Selection selection = (Selection) it.next();
 			sb.append(selection.xml(prefix2));
 		}
 		sb.append(prefix).append("</model>").append("\n");
@@ -189,15 +189,15 @@ public class Model extends JPatchTreeNode {
 		return true;
 	}
 	
-	public boolean checkSelection(NewSelection selection) {
+	public boolean checkSelection(Selection selection) {
 		return (!lstSelections.contains(selection));
 	}
 	
-	public NewSelection getSelection(NewSelection selection) {
-		return (NewSelection) lstSelections.get(lstSelections.indexOf(selection));
+	public Selection getSelection(Selection selection) {
+		return (Selection) lstSelections.get(lstSelections.indexOf(selection));
 	}
 	
-	public void addSelection(NewSelection selection) {
+	public void addSelection(Selection selection) {
 		/*
 		for (int m = 0; m < 32; m++) {
 			if (aJPMaterial[m] == null) {
@@ -218,7 +218,7 @@ public class Model extends JPatchTreeNode {
 		//}
 	}
 
-	public void addSelection(int index, NewSelection selection) {
+	public void addSelection(int index, Selection selection) {
 			treenodeSelections.add(index, selection);
 			lstSelections.add(index, selection);
 	}
@@ -288,7 +288,7 @@ public class Model extends JPatchTreeNode {
 		return lstBoneShapes;
 	}
 	
-	public void removeSelection(NewSelection selection) {
+	public void removeSelection(Selection selection) {
 		treenodeSelections.remove(selection);
 		lstSelections.remove(selection);
 	}
@@ -903,7 +903,7 @@ public class Model extends JPatchTreeNode {
 			System.out.println(it.next());
 		
 		System.out.println("\n\n--------active selection -------");
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection != null) {
 			System.out.println(selection);
 			System.out.println(selection.getMap());
@@ -912,7 +912,7 @@ public class Model extends JPatchTreeNode {
 		
 		System.out.println("\n\n----------- selections -------------");
 		for (Iterator it = lstSelections.iterator(); it.hasNext(); ) {
-			selection = (NewSelection) it.next();
+			selection = (Selection) it.next();
 			System.out.println(selection);
 			System.out.println(selection.getMap());
 			System.out.println();

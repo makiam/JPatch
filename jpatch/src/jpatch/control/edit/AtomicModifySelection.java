@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicModifySelection.java,v 1.4 2005/09/26 10:36:28 sascha_l Exp $
+ * $Id: AtomicModifySelection.java,v 1.5 2005/09/26 15:07:42 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -31,7 +31,7 @@ import jpatch.boundary.*;
  *
  */
 public abstract class AtomicModifySelection extends JPatchAtomicEdit {
-	NewSelection selection;
+	Selection selection;
 	
 	private AtomicModifySelection() { }
 	
@@ -46,7 +46,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 
 	public static final class AddObjects extends AtomicModifySelection {
 		private final Map mapObjects;
-		public AddObjects(NewSelection selection, Map objects) {
+		public AddObjects(Selection selection, Map objects) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + selection + ", " + objects + ")");
 			this.selection = selection;
@@ -72,7 +72,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	
 	public static final class RemoveObjects extends AtomicModifySelection {
 		private final Map mapObjects;
-		public RemoveObjects(NewSelection selection, Map objects) {
+		public RemoveObjects(Selection selection, Map objects) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + selection + ", " + objects + ")");
 			this.selection = selection;
@@ -98,7 +98,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	
 	public static final class Pivot extends AtomicModifySelection implements JPatchRootEdit {
 		private float x, y, z;
-		public Pivot(NewSelection selection, Point3f pivot) {
+		public Pivot(Selection selection, Point3f pivot) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + selection + ", " + pivot + ")");
 			this.selection = selection;
@@ -137,7 +137,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	
 	public static final class HotObject extends AtomicModifySelection {
 		private Object hot;
-		public HotObject(NewSelection selection, Object hot) {
+		public HotObject(Selection selection, Object hot) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + selection + ", " + hot + ")");
 			this.selection = selection;
@@ -165,7 +165,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	
 	public static final class Orientation extends AtomicModifySelection implements JPatchRootEdit {
 		private final Matrix3f m3Orient = new Matrix3f();
-		public Orientation(NewSelection selection, Matrix3f orientation) {
+		public Orientation(Selection selection, Matrix3f orientation) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + selection + ", " + orientation + ")");
 			this.selection = selection;

@@ -34,7 +34,7 @@ public final class SelectMaterialAction extends AbstractAction {
 				}
 			}
 		}
-		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new NewSelection(list)));
+		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new Selection(list)));
 		MainFrame.getInstance().getJPatchScreen().update_all();
 	}
 }

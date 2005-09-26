@@ -18,7 +18,7 @@ public final class RoundAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,"Round");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && selection.getDirection() != 0) {
 			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeControlPoint.TangentMode((ControlPoint) selection.getHotObject(),ControlPoint.JPATCH_G1));
 			MainFrame.getInstance().getJPatchScreen().update_all();

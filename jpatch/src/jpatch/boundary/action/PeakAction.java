@@ -17,7 +17,7 @@ public final class PeakAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,"Peak");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && selection.getDirection() != 0) {
 			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeControlPoint.TangentMode((ControlPoint) selection.getHotObject(),ControlPoint.PEAK));
 			MainFrame.getInstance().getJPatchScreen().update_all();

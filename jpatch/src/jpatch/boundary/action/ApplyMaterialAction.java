@@ -41,7 +41,7 @@ public final class ApplyMaterialAction extends AbstractAction {
 		//MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
 		//MainFrame.getInstance().getJPatchScreen().addMouseListeners(new AddControlPointMouseAdapter());
 		//MainFrame.getInstance().clearDialog();
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection != null) {
 			//ps.applyMaterial(material);
 			JPatchActionEdit edit = new JPatchActionEdit("change material");

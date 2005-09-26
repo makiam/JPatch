@@ -16,7 +16,7 @@ public class TangentTool extends JPatchTool {
 
 	public TangentHandle isHit(ViewDefinition viewDef, int x, int y) {
 		Point3f p3 = new Point3f();
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && selection.getMap().size() == 1 && selection.getHotObject() instanceof ControlPoint) {
 			ControlPoint cp = (ControlPoint) selection.getHotObject();
 			if (selection.getDirection() != 0 || cp.getPrevAttached() == null) {
@@ -32,7 +32,7 @@ public class TangentTool extends JPatchTool {
 	public void paint(ViewDefinition viewDef) {
 		Matrix4f m4View = viewDef.getMatrix();
 		JPatchDrawable2 drawable = viewDef.getDrawable();
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && selection.getMap().size() == 1 && selection.getHotObject() instanceof ControlPoint) {
 			ControlPoint cp = (ControlPoint) selection.getHotObject();
 			if (selection.getDirection() != 0 || cp.getPrevAttached() == null) {

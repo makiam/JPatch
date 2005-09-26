@@ -31,7 +31,7 @@ public final class ChangeTangentModeAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection == null)
 			return;
 		if (selection.getDirection() != 0) {

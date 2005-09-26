@@ -14,7 +14,7 @@ public class CompoundClone extends AbstractClone implements JPatchRootEdit {
 		cloneHooks();
 		cloneCurves();
 		clonePatches();
-		NewSelection selection = createNewSelection();
+		Selection selection = createNewSelection();
 		if (selection.getMap().size() > 0) {
 			selection.setName("*clone #" + iSequenceNumber++);
 			addEdit(new AtomicAddSelection(selection));

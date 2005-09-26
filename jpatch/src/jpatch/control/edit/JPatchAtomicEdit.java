@@ -13,7 +13,7 @@ public abstract class JPatchAtomicEdit implements JPatchUndoableEdit {
 		System.out.println(prefix + name + " " + sizeOf());
 	}
 	
-	static final int selectionSize(NewSelection selection) {
+	static final int selectionSize(Selection selection) {
 		return selection == null ? 0 : (8 + 4 + 4 + 4 + 4 + 8 * selection.getMap().size() * 2);
 	}
 }

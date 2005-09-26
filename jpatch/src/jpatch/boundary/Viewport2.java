@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.21 2005/09/20 16:17:54 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.22 2005/09/26 15:07:42 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -212,7 +212,7 @@ public class Viewport2 {
 		fDeltaZ += 50;
 		//fMinZ -= 1;
 		
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		
 		if (viewDef.renderCurves()) {
 			drawable.setColor(new Color3f(settings.cCurve)); // FIXME
@@ -382,7 +382,7 @@ public class Viewport2 {
 									n2.cross(v3End, v);
 									n2.normalize();
 									//System.out.println(n1 + " " + n2);
-									Vector3f ncenter = JPatchDrawableZBuffer.interpolateNormal(n1, n2, p0, p1, p2, p3);
+									Vector3f ncenter = interpolateNormal(n1, n2, p0, p1, p2, p3);
 									
 									//System.out.println(ncenter);
 									//System.out.println();
@@ -391,8 +391,8 @@ public class Viewport2 {
 									//System.out.println(reversePatch + " " + hookpos);
 									
 									if (hookpos == 0.5f) v.set(ncenter);
-									else if (hookpos == 0.25f) v = JPatchDrawableZBuffer.interpolateNormal(n1, ncenter);
-									else v = JPatchDrawableZBuffer.interpolateNormal(ncenter, n2);
+									else if (hookpos == 0.25f) v = interpolateNormal(n1, ncenter);
+									else v = interpolateNormal(ncenter, n2);
 									//else if (hookpos == 0.25f ^ !reversePatch) {
 									//	v = JPatchDrawableZBuffer.interpolateNormal(n1, ncenter);
 									//	System.out.println("n1");
@@ -512,7 +512,7 @@ public class Viewport2 {
 		}
 	}
 	
-	private void drawSelection(NewSelection selection) {
+	private void drawSelection(Selection selection) {
 		Object hot = selection.getHotObject();
 		ControlPoint cp = null;
 		if (hot instanceof ControlPoint) {

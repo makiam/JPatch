@@ -1,5 +1,5 @@
 /**
- * $Id: JPatchTree.java,v 1.3 2005/09/20 16:17:54 sascha_l Exp $
+ * $Id: JPatchTree.java,v 1.4 2005/09/26 15:07:42 sascha_l Exp $
  */
 package jpatch.boundary;
 
@@ -27,7 +27,7 @@ public class JPatchTree extends JTree {
 //	private boolean dragStarted = false;
 //	private PointSelection dragSelection = null;
 //	private TreePath currentPath, lastPath = null;
-	private NewSelection dragSelection;
+	private Selection dragSelection;
 	
 	public JPatchTree (JPatchTreeNode jptn) {
 		super(jptn);
@@ -38,8 +38,8 @@ public class JPatchTree extends JTree {
 		addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent mouseEvent) {
 				Object component = getClosestPathForLocation(mouseEvent.getX(), mouseEvent.getY()).getLastPathComponent();
-				if (component instanceof NewSelection)
-					dragSelection = (NewSelection) component;
+				if (component instanceof Selection)
+					dragSelection = (Selection) component;
 				else
 					dragSelection = null;
 			}
@@ -54,8 +54,8 @@ public class JPatchTree extends JTree {
 				if (dragSelection == null)
 					return;
 				Object component = getClosestPathForLocation(mouseEvent.getX(), mouseEvent.getY()).getLastPathComponent();
-				if (component instanceof NewSelection && component != dragSelection) {
-					NewSelection selection = (NewSelection) component;
+				if (component instanceof Selection && component != dragSelection) {
+					Selection selection = (Selection) component;
 					Model model = MainFrame.getInstance().getModel();
 					java.util.List list = model.getSelections();
 					int index = list.indexOf(selection);

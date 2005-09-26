@@ -20,7 +20,7 @@ public final class HideAction extends AbstractAction {
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		if (!bActive) {
-			NewSelection selection = MainFrame.getInstance().getSelection();
+			Selection selection = MainFrame.getInstance().getSelection();
 			if (selection != null) {
 //				ControlPoint[] acp = selection.getControlPointArray();
 				ArrayList selectedPoints = new ArrayList();

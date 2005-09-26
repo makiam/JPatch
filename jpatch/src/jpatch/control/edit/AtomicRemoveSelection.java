@@ -7,10 +7,10 @@ import jpatch.boundary.*;
 
 public class AtomicRemoveSelection extends JPatchAtomicEdit implements JPatchRootEdit {
 	
-	private NewSelection selection;
+	private Selection selection;
 	private int index = -1;
 	
-	public AtomicRemoveSelection(NewSelection selection) {
+	public AtomicRemoveSelection(Selection selection) {
 		this.selection = selection;
 		redo();
 	}

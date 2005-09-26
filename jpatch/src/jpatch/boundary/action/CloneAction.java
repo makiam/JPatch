@@ -16,7 +16,7 @@ public final class CloneAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("clone"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && !selection.isSingle()) {
 			//PointSelection newPs = MainFrame.getInstance().getModel().clone(ps.getControlPointArray());
 			//MainFrame.getInstance().setSelection(newPs);

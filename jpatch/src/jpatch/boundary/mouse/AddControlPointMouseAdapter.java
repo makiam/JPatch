@@ -68,7 +68,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 					else
 						edit.addEdit(new AtomicAttachControlPoints(cpA.getHead(),cp.getTail()));
 				}
-				NewSelection selection = new NewSelection(cpB);
+				Selection selection = new Selection(cpB);
 //				MainFrame.getInstance().setSelection(selection);
 				edit.addEdit(new AtomicChangeSelection(selection));
 				MainFrame.getInstance().getJPatchScreen().single_update(compSource);
@@ -99,7 +99,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 				//compoundEdit.addEdit(new WeldControlPointsEdit(cpA,cp));
 				edit.addEdit(new CompoundWeldControlPoints(cpA,cp));
 				
-				NewSelection selection = new NewSelection(cpB);
+				Selection selection = new Selection(cpB);
 				MainFrame.getInstance().setSelection(selection);
 				
 				MainFrame.getInstance().getJPatchScreen().single_update(compSource);

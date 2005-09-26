@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPointBrowser.java,v 1.3 2005/09/20 16:17:54 sascha_l Exp $
+ * $Id: ControlPointBrowser.java,v 1.4 2005/09/26 15:07:42 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -101,13 +101,13 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		buttonRefresh.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				initFields();
-				MainFrame.getInstance().setSelection(new NewSelection(getCp()));
+				MainFrame.getInstance().setSelection(new Selection(getCp()));
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
 		});
 		buttonSync.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				NewSelection selection = MainFrame.getInstance().getSelection();
+				Selection selection = MainFrame.getInstance().getSelection();
 				if (selection != null && selection.isSingle() && (selection.getHotObject() instanceof ControlPoint)) {
 					setCp((ControlPoint) selection.getHotObject());
 				}
@@ -205,7 +205,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		else if (event.getSource() == buttonParentHook) setCp(cp.getParentHook());
 		else if (event.getSource() == buttonBack) setCp(cpOld);
 		
-		MainFrame.getInstance().setSelection(new NewSelection(cp));	// create a new pointselection
+		MainFrame.getInstance().setSelection(new Selection(cp));	// create a new pointselection
 		MainFrame.getInstance().getJPatchScreen().update_all();			// update all viewports
 	}
 }
