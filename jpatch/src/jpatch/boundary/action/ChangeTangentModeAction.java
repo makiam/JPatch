@@ -31,20 +31,27 @@ public final class ChangeTangentModeAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null && ps.isCurve()) {
-			MainFrame.getInstance().getUndoManager().addEdit(new ChangeControlPointTangentModeEdit(ps.getControlPoint(),iMode));
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		if (selection == null)
+			return;
+		if (selection.getDirection() != 0) {
+			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeControlPoint.TangentMode((ControlPoint) selection.getHotObject(),iMode));
 			MainFrame.getInstance().getJPatchScreen().update_all();
-		} else if (ps != null) {
-			JPatchCompoundEdit compoundEdit = new JPatchCompoundEdit();
-			ControlPoint[] acp = ps.getControlPointArray();
+		} else {
+			String name;
+			switch (iMode) {
+				case ControlPoint.PEAK: name = "peak tangents";
+				default: name = "round tangents";
+			}
+			JPatchActionEdit edit = new JPatchActionEdit(name);
+			ControlPoint[] acp = selection.getControlPointArray();
 			for (int i = 0; i < acp.length; i++) {
 				ControlPoint[] stack = acp[i].getStack();
 				for (int j = 0; j < stack.length; j++) {
-					compoundEdit.addEdit(new ChangeControlPointTangentModeEdit(stack[j],iMode));
+					edit.addEdit(new AtomicChangeControlPoint.TangentMode(stack[j],iMode));
 				}
 			}
-			MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
+			MainFrame.getInstance().getUndoManager().addEdit(edit);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 	}

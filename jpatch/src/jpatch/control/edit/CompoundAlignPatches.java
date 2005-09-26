@@ -5,9 +5,14 @@ import jpatch.entity.*;
 import java.util.*;
 
 public class CompoundAlignPatches extends JPatchCompoundEdit implements JPatchRootEdit {
-	private HashSet patches = new HashSet(MainFrame.getInstance().getModel().getPatchSet());
+	private HashSet patches;
 	
 	public CompoundAlignPatches() {
+		this(MainFrame.getInstance().getModel().getPatchSet());
+	}
+	
+	public CompoundAlignPatches(Collection patches) {
+		this.patches = new HashSet(patches);
 		for (Iterator it = (new HashSet(patches)).iterator(); it.hasNext(); ) {
 			Patch patch = (Patch) it.next();
 			if (patches.contains(patch)) processPatch(patch);
@@ -17,11 +22,6 @@ public class CompoundAlignPatches extends JPatchCompoundEdit implements JPatchRo
 	public String getName() {
 		return "align patches";
 	}
-	
-//	public AlignPatchesEdit(Collection patches) {
-//		this.patches = new HashSet(patches);
-//		alignPatches();
-//	}
 	
 	private void processPatch(Patch patch) {
 		patches.remove(patch);

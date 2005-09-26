@@ -5,7 +5,7 @@ import javax.swing.tree.*;
 import jpatch.boundary.sidebar.*;
 import jpatch.boundary.*;
 
-public class AtomicRemoveSelection extends JPatchAtomicEdit {
+public class AtomicRemoveSelection extends JPatchAtomicEdit implements JPatchRootEdit {
 	
 	private NewSelection selection;
 	private int index = -1;
@@ -15,7 +15,7 @@ public class AtomicRemoveSelection extends JPatchAtomicEdit {
 		redo();
 	}
 	
-	public String getPresentationName() {
+	public String getName() {
 		return "remove selection";
 	}
 	

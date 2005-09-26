@@ -1,6 +1,8 @@
 package jpatch.boundary.action;
 
 import java.awt.event.*;
+import java.util.Iterator;
+
 import javax.swing.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
@@ -26,14 +28,15 @@ public final class DeleteMaterialAction extends AbstractAction {
 		//MainFrame.getInstance().clearDialog();
 		JPatchMaterial defaultMaterial = (JPatchMaterial) MainFrame.getInstance().getModel().getMaterialList().get(0);
 		if (material != defaultMaterial) {
-			JPatchCompoundEdit compoundEdit = new JPatchCompoundEdit();
-			for (Patch patch = MainFrame.getInstance().getModel().getFirstPatch(); patch != null; patch = patch.getNext()) {
+			JPatchActionEdit edit = new JPatchActionEdit("delete material");
+			for (Iterator it = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {
+				Patch patch = (Patch) it.next();
 				if (patch.getMaterial() == material) {
-					compoundEdit.addEdit(new AtomicChangePatchMaterial(patch,defaultMaterial));
+					edit.addEdit(new AtomicChangePatchMaterial(patch,defaultMaterial));
 				}
 			}
-			compoundEdit.addEdit(new AtomicRemoveMaterial(material));
-			MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
+			edit.addEdit(new AtomicRemoveMaterial(material));
+			MainFrame.getInstance().getUndoManager().addEdit(edit);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 	}

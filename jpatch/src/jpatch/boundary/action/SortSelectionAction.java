@@ -64,14 +64,14 @@ public final class SortSelectionAction extends AbstractAction {
 		});
 		
 		/* remove all selections and add them again in order. */
-		for (Iterator it = list.iterator(); it.hasNext(); model.removeSelection((Selection) it.next()));
-		for (Iterator it = list.iterator(); it.hasNext(); model.addSelection((Selection) it.next()));
+		for (Iterator it = list.iterator(); it.hasNext(); model.removeSelection((NewSelection) it.next()));
+		for (Iterator it = list.iterator(); it.hasNext(); model.addSelection((NewSelection) it.next()));
 		
 		/* reload the tree model */
 		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).reload();
 		
 		/* make the slections visible */
-		TreePath path = ((Selection) list.get(list.size() - 1)).getTreePath();
+		TreePath path = ((NewSelection) list.get(list.size() - 1)).getTreePath();
 		MainFrame.getInstance().getTree().makeVisible(path);
 	}
 	
