@@ -7,7 +7,7 @@ import javax.vecmath.*;
 import jpatch.control.edit.*;
 import jpatch.entity.*;
 
-public class NewSelection extends JPatchTreeLeaf implements Transformable {
+public class Selection extends JPatchTreeLeaf implements Transformable {
 	public static final int CONTROLPOINTS = 1;
 	public static final int MORPHS = 2;
 	public static int NUM = 0;
@@ -21,8 +21,8 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 //	private int iNum = NUM++;
 	private boolean bActive = false;
 	
-	public static NewSelection createRectangularPointSelection(int ax, int ay, int bx, int by, Matrix4f transformationMatrix, Model model) {
-		NewSelection selection = new NewSelection();
+	public static Selection createRectangularPointSelection(int ax, int ay, int bx, int by, Matrix4f transformationMatrix, Model model) {
+		Selection selection = new Selection();
 		Point3f p3 = new Point3f();
 		for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
 			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
@@ -40,24 +40,24 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 		return (selection.mapObjects.size() > 0) ? selection : null;
 	}
 	
-	private NewSelection() {
+	private Selection() {
 		super("NEW SELECTION");
 		m3Orientation = new Matrix3f();
 		m3Orientation.setIdentity();
 	}
 	
-	public NewSelection(ControlPoint cp) {
+	public Selection(ControlPoint cp) {
 		this();
 		mapObjects.put(cp, new Float(1.0f));
 		hotObject = cp;
 	}
 	
-	public NewSelection(Map objectWeightMap) {
+	public Selection(Map objectWeightMap) {
 		this();
 		mapObjects.putAll(objectWeightMap);
 	}
 
-	public NewSelection(Collection objects) {
+	public Selection(Collection objects) {
 		this();
 		for (Iterator it = objects.iterator(); it.hasNext(); ) {
 			mapObjects.put(it.next(), new Float(1.0f));
@@ -238,8 +238,8 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 		return edit;
 	}
 	
-	public NewSelection cloneSelection() {
-		NewSelection selection = new NewSelection(mapObjects);
+	public Selection cloneSelection() {
+		Selection selection = new Selection(mapObjects);
 		selection.p3Pivot.set(p3Pivot);
 		selection.m3Orientation.set(m3Orientation);
 		selection.hotObject = hotObject;
@@ -252,7 +252,7 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 			return false;
 		if (object == this)
 			return true;
-		NewSelection selection = (NewSelection) object;
+		Selection selection = (Selection) object;
 		if (!mapObjects.equals(selection.mapObjects))
 			return false;
 		if (!(iDirection == selection.iDirection))

@@ -50,7 +50,7 @@ public class RotateTool extends JPatchTool {
 	private float fRotY = 0;
 	private boolean bChange;
 	
-	private NewSelection selection;
+	private Selection selection;
 	
 	private JPatchActionEdit edit;
 	
@@ -600,7 +600,7 @@ public class RotateTool extends JPatchTool {
 		//MainFrame.getInstance().getJPatchScreen().update_all();
 	}
 	
-	public void reInit(NewSelection selection) {
+	public void reInit(Selection selection) {
 		this.selection = selection;
 		m3Rot = selection.getOrientation();
 		p3Pivot = selection.getPivot();

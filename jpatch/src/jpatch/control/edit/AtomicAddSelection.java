@@ -5,15 +5,15 @@ import jpatch.boundary.*;
 
 public class AtomicAddSelection extends JPatchAtomicEdit implements JPatchRootEdit {
 	
-	private NewSelection selection;
+	private Selection selection;
 	private int index = -1;
 	
-	public AtomicAddSelection(NewSelection selection) {
+	public AtomicAddSelection(Selection selection) {
 		this.selection = selection;
 		redo();
 	}
 	
-	public AtomicAddSelection(int index, NewSelection selection) {
+	public AtomicAddSelection(int index, Selection selection) {
 		this.index = index;
 		this.selection = selection;
 		redo();

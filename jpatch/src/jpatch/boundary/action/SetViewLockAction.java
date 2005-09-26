@@ -19,7 +19,7 @@ public final class SetViewLockAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection != null) {
 			viewDefinition.setLock(new Point3f(selection.getPivot()));
 		}

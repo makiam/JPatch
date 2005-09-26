@@ -125,9 +125,9 @@ implements TreeSelectionListener {
 				replacePanel(new SelectionsPanel((Model)selectedLeaf.getParent()));
 				break;
 			case JPatchTreeNode.SELECTION:
-				replacePanel(new SelectionPanel((NewSelection) selectedLeaf));
+				replacePanel(new SelectionPanel((Selection) selectedLeaf));
 				if (!selectedLeaf.equals(MainFrame.getInstance().getSelection())) {
-					MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(((NewSelection) selectedLeaf).cloneSelection()));
+					MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(((Selection) selectedLeaf).cloneSelection()));
 					MainFrame.getInstance().getJPatchScreen().update_all();
 				}break;
 			default:

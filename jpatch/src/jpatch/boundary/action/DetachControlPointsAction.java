@@ -37,7 +37,7 @@ public final class DetachControlPointsAction extends AbstractAction {
 //				MainFrame.getInstance().getJPatchScreen().update_all();
 //			}
 //		}
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection == null || !selection.isSingle())
 			return;
 		Object object = selection.getHotObject();

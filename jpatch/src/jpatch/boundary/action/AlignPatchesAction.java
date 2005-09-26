@@ -18,7 +18,7 @@ public final class AlignPatchesAction extends AbstractAction {
 		super("align patches");
 		}
 	public void actionPerformed(ActionEvent actionEvent) {
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection != null) {
 			HashSet patches = new HashSet();
 			for (Iterator it = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {

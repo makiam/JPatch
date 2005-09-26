@@ -18,7 +18,7 @@ public class RemoveStubsAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		ControlPoint[] acp = selection.getControlPointArray();
 		JPatchActionEdit edit = new JPatchActionEdit("remove curve stubs");
 		ArrayList list = new ArrayList();

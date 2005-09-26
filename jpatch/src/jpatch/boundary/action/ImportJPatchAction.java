@@ -87,7 +87,7 @@ public final class ImportJPatchAction extends AbstractAction {
 						pointSet.add(cp);
 					}
 				}
-				NewSelection selection = new NewSelection(pointSet);
+				Selection selection = new Selection(pointSet);
 				selection.setName(file.getName());
 				model.addSelection(selection);
 				model.setName(name);

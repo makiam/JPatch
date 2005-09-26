@@ -37,7 +37,7 @@ public final class MainFrame extends JFrame {
 	private JLabel helpLabel;
 	private JMenuBar mainMenu;
 	private ButtonGroup bgAction;
-	private NewSelection selection;
+	private Selection selection;
 	private JPatchUndoManager undoManager = new JPatchUndoManager(50);
 	private JPatchKeyAdapter keyAdapter = new JPatchKeyAdapter();
 	private JDialog dialog;
@@ -368,11 +368,11 @@ public final class MainFrame extends JFrame {
 		return undoManager;
 	}
 	
-	public NewSelection getSelection() {
+	public Selection getSelection() {
 		return selection;
 	}
 	
-	public void setSelection(NewSelection selection) {
+	public void setSelection(Selection selection) {
 //		getModel().removeSelection(this.selection);
 		this.selection = selection;
 		/* unhide new selection */
@@ -390,9 +390,9 @@ public final class MainFrame extends JFrame {
 			JPatchTool tool = jpatchScreen.getTool();
 			if (tool != null && tool instanceof RotateTool)
 				((RotateTool) tool).reInit(selection);		
-			int flags = NewSelection.CONTROLPOINTS;
+			int flags = Selection.CONTROLPOINTS;
 			if (iMode != MORPH)
-				flags |= NewSelection.MORPHS;
+				flags |= Selection.MORPHS;
 			selection.arm(flags);
 		}
 	}
@@ -400,7 +400,7 @@ public final class MainFrame extends JFrame {
 	public java.util.List getSelectionsContaining(ControlPoint cp) {
 		ArrayList list = new ArrayList();
 		for (Iterator it = getModel().getSelections().iterator(); it.hasNext(); ) {
-			NewSelection selection = (NewSelection) it.next();
+			Selection selection = (Selection) it.next();
 			if (selection.contains(cp)) list.add(selection);
 		}
 		if (getSelection() != null && getSelection().contains(cp))

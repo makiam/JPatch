@@ -12,9 +12,9 @@ public final class DeleteSelectionAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private NewSelection selection;
+	private Selection selection;
 	
-	public DeleteSelectionAction(NewSelection selection) {
+	public DeleteSelectionAction(Selection selection) {
 		super("Delete");
 		this.selection = selection;
 		//putValue(Action.SHORT_DESCRIPTION,"Add Controlpoint [A]");

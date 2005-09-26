@@ -32,7 +32,7 @@ public final class ZoomToFitAction extends AbstractAction {
 		//} else {
 		//	MainFrame.getInstance().getMeshToolBar().reset();
 		//}
-		NewSelection selection = MainFrame.getInstance().getSelection();
+		Selection selection = MainFrame.getInstance().getSelection();
 		float left = Float.MAX_VALUE;
 		float right = -Float.MAX_VALUE;
 		float bottom = Float.MAX_VALUE;
