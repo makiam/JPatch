@@ -1,5 +1,5 @@
 /**
- * $Id: NewLatheEditorEdit.java,v 1.8 2005/09/25 13:16:14 sascha_l Exp $
+ * $Id: CompoundLatheEditor.java,v 1.1 2005/09/26 10:36:27 sascha_l Exp $
  */
 package jpatch.control.edit;
 
@@ -10,18 +10,18 @@ import jpatch.boundary.*;
 /**
  * 
  * @author lois
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.1 $
  * 
  */
 
 // FIXME: this class should be a dialog, not an edit!!!
 
-public class NewLatheEditorEdit extends JPatchCompoundEdit implements JPatchRootEdit {
+public class CompoundLatheEditor extends JPatchCompoundEdit implements JPatchRootEdit {
 	
 	/**
 	* Creates and performes the edit
 	*/
-	public NewLatheEditorEdit(int iSegments, int iForm, int iFill, int iSize, int iDistance, int iRotation, boolean bCloseTop, boolean bCloseBottom) {
+	public CompoundLatheEditor(int iSegments, int iForm, int iFill, int iSize, int iDistance, int iRotation, boolean bCloseTop, boolean bCloseBottom) {
 		
 		float epsilon = 3f / MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().getMatrix().getScale();
 		
@@ -86,7 +86,7 @@ public class NewLatheEditorEdit extends JPatchCompoundEdit implements JPatchRoot
 		//curve.validate();
 		addEdit(new AtomicAddCurve(cpts[0]));	// create the new curve
 		//addEdit(new ValidateCurveEdit(curve));  // validate the curve
-		addEdit(new NewLatheEdit(cpts, iSegments, epsilon)); // lathe the curve
+		addEdit(new CompoundLathe(cpts, iSegments, epsilon)); // lathe the curve
 	}	
 	
 	public String getName() {

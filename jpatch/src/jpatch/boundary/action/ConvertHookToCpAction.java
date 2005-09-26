@@ -16,7 +16,7 @@ public final class ConvertHookToCpAction extends AbstractAction {
 	public void actionPerformed(ActionEvent actionEvent) {
 		PointSelection ps = MainFrame.getInstance().getPointSelection();
 		if (ps != null && ps.isSingle() && ps.getControlPoint().isHook()) {
-			MainFrame.getInstance().getUndoManager().addEdit(new ConvertHookToCpEdit(ps.getControlPoint()));
+			MainFrame.getInstance().getUndoManager().addEdit(new CompoundConvertHookToCp(ps.getControlPoint()));
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 	}

@@ -140,6 +140,10 @@ public class Morph extends JPatchTreeLeaf {
 		mapMorph.putAll(map);
 	}
 	
+	public boolean contains(ControlPoint cp) {
+		return mapMorph.keySet().contains(cp);
+	}
+	
 	public Map modifyMorphMap(Map map) {
 //		System.out.println("modifying morph...");
 //		System.out.println("before:");
@@ -180,10 +184,18 @@ public class Morph extends JPatchTreeLeaf {
 		fValue = -fValue;
 	}
 	
-	public void add(ControlPoint cp, Vector3f vector) {
+	public Vector3f getVectorFor(ControlPoint cp) {
+		return (Vector3f) mapMorph.get(cp);
+	}
+	
+	public void addPoint(ControlPoint cp, Vector3f vector) {
 //		listPoints.add(cp);
 //		listVectors.add(vector);
 		mapMorph.put(cp, vector);
+	}
+	
+	public int getNumberOfPoints() {
+		return mapMorph.size();
 	}
 	
 	public Vector3f removePoint(ControlPoint cp) {

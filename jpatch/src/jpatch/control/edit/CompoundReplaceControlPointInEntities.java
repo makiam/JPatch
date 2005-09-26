@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundReplaceControlPointInEntities.java,v 1.1 2005/09/07 16:19:02 sascha_l Exp $
+ * $Id: CompoundReplaceControlPointInEntities.java,v 1.2 2005/09/26 10:36:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -30,6 +30,7 @@ import jpatch.entity.*;
 public final class CompoundReplaceControlPointInEntities extends JPatchCompoundEdit {
 	
 	public CompoundReplaceControlPointInEntities(ControlPoint cpOld, ControlPoint cpNew) {
-		addEdit(new AtomicExchangeControlPointInSelections(cpOld, cpNew));
+		addEdit(new AtomicReplaceControlPointInSelections(cpOld, cpNew));
+		addEdit(new AtomicReplaceControlPointInPatches(cpOld, cpNew));
 	}
 }

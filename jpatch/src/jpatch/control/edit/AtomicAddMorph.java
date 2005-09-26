@@ -6,18 +6,18 @@ import javax.swing.tree.TreePath;
 import jpatch.boundary.MainFrame;
 import jpatch.entity.Morph;
 
-public class AddMorphEdit extends JPatchAbstractUndoableEdit {
+public class AtomicAddMorph extends JPatchAtomicEdit implements JPatchRootEdit {
 	
 	private Morph morph;
 	//private float value;
 	
-	public AddMorphEdit(Morph morph) {
+	public AtomicAddMorph(Morph morph) {
 		this.morph = morph;
 		//value = morph.getValue();
 		redo();
 	}
 	
-	public String getPresentationName() {
+	public String getName() {
 		return "add morph";
 	}
 	
@@ -43,5 +43,9 @@ public class AddMorphEdit extends JPatchAbstractUndoableEdit {
 		//morph.setValue(value);
 		morph.apply();
 		//MainFrame.getInstance().getModel().applyMorphs();
+	}
+	
+	public int sizeOf() {
+		return 8 + 4;
 	}
 }

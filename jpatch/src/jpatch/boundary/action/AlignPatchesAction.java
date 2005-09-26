@@ -24,9 +24,9 @@ public final class AlignPatchesAction extends AbstractAction {
 			for (Patch patch = MainFrame.getInstance().getModel().getFirstPatch(); patch != null; patch = patch.getNext()) {
 				if (patch.isSelected(ps)) patches.add(patch);
 			}
-			MainFrame.getInstance().getUndoManager().addEdit(new AlignPatchesEdit(patches));
+			MainFrame.getInstance().getUndoManager().addEdit(new CompoundAlignPatches(patches));
 		} else {
-			MainFrame.getInstance().getUndoManager().addEdit(new AlignPatchesEdit());
+			MainFrame.getInstance().getUndoManager().addEdit(new CompoundAlignPatches());
 		}
 		MainFrame.getInstance().getJPatchScreen().update_all();
 	}

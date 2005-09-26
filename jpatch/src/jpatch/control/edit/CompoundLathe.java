@@ -9,7 +9,7 @@ import jpatch.boundary.*;
 /**
 * Undoable Clone Edit
 **/
-public class NewLatheEdit extends AbstractClone implements JPatchRootEdit {
+public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 
 	static private int iNum = 1;
 	//private int iSegments = 8;
@@ -18,7 +18,7 @@ public class NewLatheEdit extends AbstractClone implements JPatchRootEdit {
 	* @param  A  ControlPoint A
 	* @param  B  ControlPoint B
 	*/
-	public NewLatheEdit(ControlPoint[] acp, int iSegments, float epsilon) {
+	public CompoundLathe(ControlPoint[] acp, int iSegments, float epsilon) {
 		super(acp);
 		/*
 		 * create set of points to clone

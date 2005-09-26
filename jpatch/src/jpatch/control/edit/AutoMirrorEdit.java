@@ -239,7 +239,7 @@ public class AutoMirrorEdit extends AbstractClone {
 							ControlPoint clone = (ControlPoint) mapClones.get(cp);
 							Vector3f vector = new Vector3f((Vector3f) vectorList.get(i));
 							vector.x = -vector.x;
-							newMorph.add(clone, vector);
+							newMorph.addPoint(clone, vector);
 							newMorph.setMax(morph.getMax());
 							newMorph.setMin(morph.getMin());
 							newMorph.setSliderValue(morph.getSliderValue());
@@ -248,7 +248,7 @@ public class AutoMirrorEdit extends AbstractClone {
 					}
 				}
 			}
-			for (Iterator it = newMorphList.iterator(); it.hasNext(); addEdit(new AddMorphEdit((Morph) it.next())));
+			for (Iterator it = newMorphList.iterator(); it.hasNext(); addEdit(new AtomicAddMorph((Morph) it.next())));
 			
 			/*
 			* mirror selections

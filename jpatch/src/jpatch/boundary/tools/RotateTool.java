@@ -11,7 +11,7 @@ import jpatch.control.edit.*;
 import jpatch.entity.*;
 
 public class RotateTool extends JPatchTool {
-	private static final int GHOST_FACTOR = JPatchSettings.getInstance().iGhost;
+//	private static final int GHOST_FACTOR = JPatchSettings.getInstance().iGhost;
 	
 	private static final int SUBDIV = 64;
 	private static final float S = 1f / (float) Math.sqrt(2);
@@ -50,7 +50,9 @@ public class RotateTool extends JPatchTool {
 	private float fRotY = 0;
 	private boolean bChange;
 	
-	private JPatchCompoundEdit compoundEdit;
+	private NewSelection selection;
+	
+	private JPatchActionEdit edit;
 	
 	static {
 		for (int s = 0; s < SUBDIV; s++) {
@@ -64,12 +66,13 @@ public class RotateTool extends JPatchTool {
 		//m3RotA.setIdentity();
 		
 		//fRadius = 2;
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		p3Pivot = ps.getPivot();
-		m3Rot = ps.getRotation();
-		m3RotA.set(m3Rot);
-		
-		setRadius();
+//		NewSelection selection = MainFrame.getInstance().getSelection();
+//		p3Pivot = selection.getPivot();
+//		m3Rot = selection.getOrientation();
+//		m3RotA.set(m3Rot);
+//		
+//		setRadius();
+		reInit(MainFrame.getInstance().getSelection());
 		
 		Matrix3f m3X = new Matrix3f();
 		Matrix3f m3Y = new Matrix3f();
@@ -109,13 +112,14 @@ public class RotateTool extends JPatchTool {
 	}
 	
 	public void setRadius() {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
+//		PointSelection ps = MainFrame.getInstance().getPointSelection();
 		float r = 0;
 		float ds = 0;
-		ap3 = ps.getPointArray();
-		acp = ps.getControlPointArray();
-		for (int p = 0; p < ap3.length; p++) {
-			ds = p3Pivot.distanceSquared(ap3[p]);
+//		ap3 = ps.getPointArray();
+//		acp = selection.getControlPointArray();
+//		ControlPoint[] acp = selection.getControlPointArray();
+		for (int i = 0; i < ap3.length; i++) {
+			ds = p3Pivot.distanceSquared(ap3[i]);
 			if (ds > r) r = ds;
 		}
 		fRadius = (float)Math.sqrt(r);
@@ -377,9 +381,9 @@ public class RotateTool extends JPatchTool {
 			fBeta = fAlpha;
 			int x = mouseEvent.getX();
 			int y = mouseEvent.getY();
-			PointSelection ps = MainFrame.getInstance().getPointSelection();
-			ap3 = ps.getPointArray();
-			acp = ps.getControlPointArray();
+//			PointSelection ps = MainFrame.getInstance().getPointSelection();
+//			ap3 = ps.getPointArray();
+//			acp = ps.getControlPointArray();
 			boolean repaint = false;
 //			Viewport viewport = (Viewport)mouseEvent.getSource();
 			paint(viewDef);
@@ -399,15 +403,15 @@ public class RotateTool extends JPatchTool {
 			if (activeHandle != null && mouseEvent.getClickCount() == 2 && !bChange) {
 				if (activeHandle == pivotHandle) {
 					p3OldPivot.set(p3Pivot);
-					ps.resetPivotToCenter();
+					selection.setPivot(selection.getCenter());
 					setRadius();
-					MainFrame.getInstance().getUndoManager().addEdit(new ChangeSelectionPivotEdit(ps,p3OldPivot,this));
+					MainFrame.getInstance().getUndoManager().addEdit(new AtomicModifySelection.Pivot(selection,p3OldPivot));
 				} else {
 					//Matrix3f m3Dummy = new Matrix3f(m3RotA);
 					//float fDummy = fBeta;
 					//reset();
 					m3RotA.setIdentity();
-					MainFrame.getInstance().getUndoManager().addEdit(new ChangeSelectionRotationEdit(ps,m3RotA,0,this));
+					MainFrame.getInstance().getUndoManager().addEdit(new AtomicModifySelection.Orientation(selection,m3RotA));
 				}
 			}
 			
@@ -425,8 +429,8 @@ public class RotateTool extends JPatchTool {
 					p3OldPivot.set(p3Pivot);
 				} else {
 					iState = ROTATE;
-					compoundEdit = new JPatchCompoundEdit("rotate");
-					compoundEdit.addEdit(new AtomicMoveControlPoints(ps.getControlPointArray()));
+					edit = new JPatchActionEdit("rotate");
+					edit.addEdit(new AtomicMoveControlPoints(selection.getControlPointArray()));
 				}
 			} else {
 				Point3f p3 = new Point3f(p3Pivot);
@@ -442,8 +446,8 @@ public class RotateTool extends JPatchTool {
 					iMouseY = mouseEvent.getY();
 					((Component)mouseEvent.getSource()).addMouseMotionListener(this);
 					iState = ROTATE_FREE;
-					compoundEdit = new JPatchCompoundEdit("rotate");
-					compoundEdit.addEdit(new AtomicMoveControlPoints(ps.getControlPointArray()));
+					edit = new JPatchActionEdit("rotate");
+					edit.addEdit(new AtomicMoveControlPoints(selection.getControlPointArray()));
 				}
 			}	
 			if (repaint) {
@@ -461,21 +465,21 @@ public class RotateTool extends JPatchTool {
 			//if (mouseEvent.getClickCount() != 2) {
 				//if (!mouseEvent.isAltDown() || mouseEvent.isControlDown()) {
 					//m3Rot.set(m3RotA);
-					PointSelection ps = MainFrame.getInstance().getPointSelection();
+//					PointSelection ps = MainFrame.getInstance().getPointSelection();
 					//System.out.println("fAlpha = " + fAlpha);
-					if (ps != null) {
+//					if (ps != null) {
 						//JPatchCompoundEdit compoundEdit = null;
 						if (iState == ROTATE || iState == ROTATE_FREE) {
 							//compoundEdit = new JPatchCompoundEdit("rotate");
 							//compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.ROTATE,ps.getControlPointArray()));
-							compoundEdit.addEdit(new ChangeSelectionRotationEdit(ps,m3RotA,fBeta,this));
+							edit.addEdit(new AtomicModifySelection.Orientation(selection,m3RotA));
 						} else if(iState == PIVOT) {
-							compoundEdit = new JPatchCompoundEdit("pivot");
-							compoundEdit.addEdit(new ChangeSelectionPivotEdit(ps,p3OldPivot,this));
+							edit = new JPatchActionEdit("move pivot");
+							edit.addEdit(new AtomicModifySelection.Pivot(selection,p3OldPivot));
 						} else {
 							System.err.println("error in RotateTool");
 						}
-						MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
+						MainFrame.getInstance().getUndoManager().addEdit(edit);
 						MainFrame.getInstance().getJPatchScreen().full_update();
 					}
 					//System.out.println("fAlpha = " + fAlpha);
@@ -494,7 +498,7 @@ public class RotateTool extends JPatchTool {
 				//}
 				iState = IDLE;
 				bChange = false;
-			}
+//			}
 			((Component) mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
 			((Component) mouseEvent.getSource()).removeMouseMotionListener(this);
 			MainFrame.getInstance().setHelpText("Click and drag handles to rotate or move pivot. Click and drag inside sphere to rotate freely. Doubleclick to reset coordinate system or pivot.");
@@ -597,9 +601,15 @@ public class RotateTool extends JPatchTool {
 	}
 	
 	public void reInit(NewSelection selection) {
-		m3Rot = ps.getRotation();
-		p3Pivot = ps.getPivot();
+		this.selection = selection;
+		m3Rot = selection.getOrientation();
+		p3Pivot = selection.getPivot();
 		m3RotA.set(m3Rot);
+		acp = selection.getControlPointArray();
+		ap3 = new Point3f[acp.length];
+		for (int i = 0; i < acp.length; i++)
+			ap3[i] = new Point3f(acp[i].getPosition());
+		setRadius();
 		//MainFrame.getInstance().getJPatchScreen().update_all();
 		//System.out.println("PointSelection.reInit(" + ps + ")");
 		//fBeta = 0;

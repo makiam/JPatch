@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: AtomicReplaceControlPointInPatches.java,v 1.1 2005/09/26 10:36:27 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -30,29 +30,21 @@ import jpatch.boundary.*;
  * @author sascha
  *
  */
-public final class AtomicExchangeControlPointInSelections extends JPatchAtomicEdit {
+public final class AtomicReplaceControlPointInPatches extends JPatchAtomicEdit {
 	private ControlPoint cpOld, cpNew;
+	private final ArrayList listPatches = new ArrayList();
 	
-	public AtomicExchangeControlPointInSelections(ControlPoint cpOld, ControlPoint cpNew) {
+	public AtomicReplaceControlPointInPatches(ControlPoint cpOld, ControlPoint cpNew) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + cpOld + ", " + cpNew + ")");
 		this.cpOld = cpOld;
 		this.cpNew = cpNew;
-		swap();
-	}
-	
-	private void swap() {
-		for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
-			NewSelection selection = (NewSelection) it.next();
-			if (selection.contains(cpOld)) {
-				Object weight = selection.getMap().get(cpOld);
-				selection.getMap().remove(cpOld);
-				selection.getMap().put(cpNew, weight);
-			}
+		for (Iterator it = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {
+			Patch patch = (Patch) it.next();
+			if (patch.contains(cpOld))
+				listPatches.add(patch);
 		}
-		ControlPoint dummy = cpOld;
-		cpOld = cpNew;
-		cpNew = dummy;
+		swap();
 	}
 	
 	public void undo() {
@@ -64,6 +56,19 @@ public final class AtomicExchangeControlPointInSelections extends JPatchAtomicEd
 	}
 	
 	public int sizeOf() {
-		return 8 + 4 + 4;
+		return 8 + 4 + 4 +(8 + 4 + 4 + 4 + 8 * listPatches.size() * 2);
+	}
+	
+	private void swap() {
+		for (Iterator it = listPatches.iterator(); it.hasNext(); ) {
+			Patch patch = (Patch) it.next();
+			ControlPoint[] acp = patch.getControlPoints();
+			for (int i = 0; i < acp.length; i++)
+				if (acp[i] == cpOld)
+					acp[i] = cpNew;
+		}
+		ControlPoint dummy = cpOld;
+		cpOld = cpNew;
+		cpNew = dummy;
 	}
 }

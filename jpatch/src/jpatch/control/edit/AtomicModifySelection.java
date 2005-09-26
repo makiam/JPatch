@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicModifySelection.java,v 1.3 2005/09/25 13:16:14 sascha_l Exp $
+ * $Id: AtomicModifySelection.java,v 1.4 2005/09/26 10:36:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -163,7 +163,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 		}
 	}
 	
-	public static final class Orientation extends AtomicModifySelection {
+	public static final class Orientation extends AtomicModifySelection implements JPatchRootEdit {
 		private final Matrix3f m3Orient = new Matrix3f();
 		public Orientation(NewSelection selection, Matrix3f orientation) {
 			if (DEBUG)
@@ -184,6 +184,10 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 		
 		public void redo() {
 			swap();
+		}
+		
+		public String getName() {
+			return "change tool orientation";
 		}
 		
 		public int sizeOf() {

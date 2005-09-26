@@ -169,6 +169,10 @@ public class NewSelection extends JPatchTreeLeaf implements Transformable {
 		return p3Pivot;
 	}
 	
+	public void setPivot(Point3f pivot) {
+		p3Pivot = pivot;
+	}
+	
 	public void arm(int mask) {
 		mapTransformables = new HashMap();
 		if ((mask & CONTROLPOINTS) != 0) {

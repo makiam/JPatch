@@ -1,5 +1,5 @@
 /*
- * $Id: LatheEditorDialog.java,v 1.2 2005/09/25 13:16:14 sascha_l Exp $ 
+ * $Id: LatheEditorDialog.java,v 1.3 2005/09/26 10:36:28 sascha_l Exp $ 
  */
 package jpatch.boundary.dialog;
 
@@ -12,7 +12,7 @@ import jpatch.control.edit.*;
 /**
  * 
  * @author lois
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  *
  */
 public class LatheEditorDialog extends JDialog implements ActionListener, ChangeListener {
@@ -169,7 +169,7 @@ public class LatheEditorDialog extends JDialog implements ActionListener, Change
 				iSegments = (new Integer(segmentsText.getText())).intValue();
 				//okPressed = true;
 				// do the edit
-				edit = new NewLatheEditorEdit(iSegments, iForm, iFill, iSize, iDistance, iRotation, bCloseTop, bCloseBottom);
+				edit = new CompoundLatheEditor(iSegments, iForm, iFill, iSize, iDistance, iRotation, bCloseTop, bCloseBottom);
 			}
 		} else if (evt.getSource() instanceof JComboBox){
 			String sel = (String)((JComboBox)evt.getSource()).getSelectedItem();
