@@ -18,9 +18,9 @@ public class RemoveStubsAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		ControlPoint[] acp = ps.getControlPointArray();
-		JPatchCompoundEdit edit = new JPatchCompoundEdit();
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		ControlPoint[] acp = selection.getControlPointArray();
+		JPatchActionEdit edit = new JPatchActionEdit("remove curve stubs");
 		ArrayList list = new ArrayList();
 		for (int i = 0; i < acp.length; i++) {
 			for (ControlPoint cp = acp[i].getHead(); cp != null; cp = cp.getPrevAttached()) {
@@ -31,13 +31,14 @@ public class RemoveStubsAction extends AbstractAction {
 		}
 					
 		if (list.size() > 0) {
-			for (Iterator it = list.iterator(); it.hasNext(); edit.addEdit(new CompoundDeleteControlPoint((ControlPoint) it.next())));
-			edit.addEdit(new RemoveControlPointsFromSelectionEdit(ps, list));
-			acp = ps.getControlPointArray();
-			for (int i = 0; i < acp.length; i++) {
-				if (acp[i].getCurve() == null)
-					edit.addEdit(new RemoveControlPointFromSelectionEdit(acp[i], ps));
-			}
+			for (Iterator it = list.iterator(); it.hasNext(); )
+				edit.addEdit(new CompoundDeleteControlPoint((ControlPoint) it.next()));
+//			edit.addEdit(new RemoveControlPointsFromSelectionEdit(ps, list));
+//			acp = ps.getControlPointArray();
+//			for (int i = 0; i < acp.length; i++) {
+//				if (acp[i].getCurve() == null)
+//					edit.addEdit(new RemoveControlPointFromSelectionEdit(acp[i], ps));
+//			}
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}

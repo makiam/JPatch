@@ -2,8 +2,9 @@ package jpatch.boundary.action;
 
 import java.awt.event.*;
 import javax.swing.*;
-import jpatch.boundary.*;
+import java.util.*;
 
+import jpatch.boundary.*;
 import jpatch.entity.*;
 import jpatch.control.edit.*;
 
@@ -40,18 +41,19 @@ public final class ApplyMaterialAction extends AbstractAction {
 		//MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
 		//MainFrame.getInstance().getJPatchScreen().addMouseListeners(new AddControlPointMouseAdapter());
 		//MainFrame.getInstance().clearDialog();
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null) {
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		if (selection != null) {
 			//ps.applyMaterial(material);
-			MainFrame.getInstance().getUndoManager().addEdit(new ChangeSelectionMaterialEdit(ps,material));
-			/*
-			for (Patch patch = MainFrame.getInstance().getModel().getFirstPatch(); patch != null; patch = patch.getNext()) {
-				if (patch.isSelected(ps)) {
-					patch.setMaterial(material);
-				}
+			JPatchActionEdit edit = new JPatchActionEdit("change material");
+			for (Iterator it = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {
+				Patch patch = (Patch) it.next();
+				if (patch.isSelected(selection))
+					edit.addEdit(new AtomicChangePatchMaterial(patch, material));
 			}
-			*/
-			MainFrame.getInstance().getJPatchScreen().update_all();
+			if (edit.isValid()) {
+				MainFrame.getInstance().getUndoManager().addEdit(edit);
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			}
 		}
 	}
 }
