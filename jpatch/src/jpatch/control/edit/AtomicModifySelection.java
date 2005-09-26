@@ -163,7 +163,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 		}
 	}
 	
-	public static final class Orientation extends AtomicModifySelection {
+	public static final class Orientation extends AtomicModifySelection implements JPatchRootEdit {
 		private final Matrix3f m3Orient = new Matrix3f();
 		public Orientation(NewSelection selection, Matrix3f orientation) {
 			if (DEBUG)
@@ -184,6 +184,10 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 		
 		public void redo() {
 			swap();
+		}
+		
+		public String getName() {
+			return "change tool orientation";
 		}
 		
 		public int sizeOf() {

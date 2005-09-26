@@ -4,28 +4,24 @@ import jpatch.boundary.*;
 import jpatch.entity.*;
 import java.util.*;
 
-public class AlignPatchesEdit extends JPatchCompoundEdit {
-	private HashSet patches;
+public class CompoundAlignPatches extends JPatchCompoundEdit implements JPatchRootEdit {
+	private HashSet patches = new HashSet(MainFrame.getInstance().getModel().getPatchSet());
 	
-	public AlignPatchesEdit() {
-		patches = new HashSet();
-		for (Patch patch = MainFrame.getInstance().getModel().getFirstPatch(); patch != null; patch = patch.getNext()) {
-			patches.add(patch);
-		}
-		alignPatches();
-	}
-	
-	public AlignPatchesEdit(Collection patches) {
-		this.patches = new HashSet(patches);
-		alignPatches();
-	}
-	
-	private void alignPatches() {
+	public CompoundAlignPatches() {
 		for (Iterator it = (new HashSet(patches)).iterator(); it.hasNext(); ) {
 			Patch patch = (Patch) it.next();
 			if (patches.contains(patch)) processPatch(patch);
 		}
 	}
+	
+	public String getName() {
+		return "align patches";
+	}
+	
+//	public AlignPatchesEdit(Collection patches) {
+//		this.patches = new HashSet(patches);
+//		alignPatches();
+//	}
 	
 	private void processPatch(Patch patch) {
 		patches.remove(patch);

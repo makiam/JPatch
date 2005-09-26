@@ -5,9 +5,9 @@ import javax.vecmath.*;
 import jpatch.entity.*;
 
 
-public class ConvertHookToCpEdit extends JPatchCompoundEdit {
+public class CompoundConvertHookToCp extends JPatchCompoundEdit {
 
-	public ConvertHookToCpEdit(ControlPoint hook) {
+	public CompoundConvertHookToCp(ControlPoint hook) {
 //		ControlPoint targetHook = hook.getPrevAttached();
 		ControlPoint startHook = hook.getStart();
 		ControlPoint endHook = hook.getEnd();
