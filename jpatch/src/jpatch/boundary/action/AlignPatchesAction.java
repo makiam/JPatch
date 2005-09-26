@@ -18,11 +18,12 @@ public final class AlignPatchesAction extends AbstractAction {
 		super("align patches");
 		}
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null) {
+		NewSelection selection = MainFrame.getInstance().getSelection();
+		if (selection != null) {
 			HashSet patches = new HashSet();
-			for (Patch patch = MainFrame.getInstance().getModel().getFirstPatch(); patch != null; patch = patch.getNext()) {
-				if (patch.isSelected(ps)) patches.add(patch);
+			for (Iterator it = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {
+				Patch patch = (Patch) it.next();
+				if (patch.isSelected(selection)) patches.add(patch);
 			}
 			MainFrame.getInstance().getUndoManager().addEdit(new CompoundAlignPatches(patches));
 		} else {
