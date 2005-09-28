@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundDropControlPoint.java,v 1.2 2005/09/19 12:40:15 sascha_l Exp $
+ * $Id: CompoundDropControlPoint.java,v 1.3 2005/09/28 18:47:50 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -48,7 +48,7 @@ public class CompoundDropControlPoint extends JPatchCompoundEdit {
 			addEdit(new CompoundDropCurve(cp.getPrev().getChildHook(), true));
 		// remove cp from all entities
 		addEdit(new CompoundRemoveControlPointFromEntities(cp));
-		addEdit(new AtomicChangeControlPoint.Deleted(cp));
+//		addEdit(new AtomicChangeControlPoint.Deleted(cp));
 		// detach the cp
 		if (cp.getHookPos() == -1)
 			addEdit(new AtomicDetatchControlPoint(cp));
