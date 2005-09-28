@@ -1,0 +1,13 @@
+#Fat Jar Configuration File
+#Wed Sep 28 17:10:29 CEST 2005
+onejar.license.required=false
+manifest.classpath=
+onejar.checkbox=false
+jarname=jpatch_fat.jar
+manifest.mergeall=false
+manifest.mainclass=jpatch.Launcher
+manifest.file=<createnew>
+jarname.isextern=false
+onejar.expand=
+excludes=
+includes=
