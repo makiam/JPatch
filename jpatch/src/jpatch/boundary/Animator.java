@@ -359,8 +359,8 @@ public final class Animator extends BFrame {
 		return re.getRenderString(format, version);
 	}
 	
-	public StringBuffer renderStrings(int tabs) {
-		return re.xml(tabs);
+	public StringBuffer renderStrings(String prefix) {
+		return re.xml(prefix);
 	}
 	
 	private void openFileChooser() {
@@ -796,18 +796,18 @@ public final class Animator extends BFrame {
 	}
 	
 	public StringBuffer xml() {
-		StringBuffer indent = XMLutils.indent(1);
-		StringBuffer indent2 = XMLutils.indent(2);
-		StringBuffer linebreak = XMLutils.lineBreak();
+//		StringBuffer indent = XMLutils.indent(1);
+//		StringBuffer indent2 = XMLutils.indent(2);
+//		StringBuffer linebreak = XMLutils.lineBreak();
 		StringBuffer sb = new StringBuffer();
-		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append(linebreak);
-		sb.append("<sequence>").append(linebreak);
-		sb.append(indent).append("<name>New Sequence</name>").append(linebreak);
-		sb.append(indent).append("<start>" + fStart + "</start>").append(linebreak);
-		sb.append(indent).append("<end>" + fEnd + "</end>").append(linebreak);
-		sb.append(indent).append("<framerate>" + fFramerate + "</framerate>").append(linebreak);
-		sb.append(indent).append("<prefix>" + strPrefix + "</prefix>").append(linebreak);
-		sb.append(renderStrings(1));
+		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("\n");
+		sb.append("<sequence>").append("\n");
+		sb.append("\t<name>New Sequence</name>").append("\n");
+		sb.append("\t<start>" + fStart + "</start>").append("\n");
+		sb.append("\t<end>" + fEnd + "</end>").append("\n");
+		sb.append("\t<framerate>" + fFramerate + "</framerate>").append("\n");
+		sb.append("\t<prefix>" + strPrefix + "</prefix>").append("\n");
+		sb.append(renderStrings("\t"));
 		
 		/* Cameras */
 		
@@ -815,10 +815,10 @@ public final class Animator extends BFrame {
 			Object o = it.next();
 			if (o instanceof Camera) {
 				Camera cam = (Camera) o;
-				sb.append(indent).append("<camera>").append(linebreak);
-				sb.append(indent2).append("<name>" + cam.getName() + "</name>").append(linebreak);
-				getMotionCurveSetFor(cam).xml(sb, 2);
-				sb.append(indent).append("</camera>").append(linebreak);
+				sb.append("\t<camera>").append("\n");
+				sb.append("\t\t<name>" + cam.getName() + "</name>").append("\n");
+				getMotionCurveSetFor(cam).xml(sb, "\t\t");
+				sb.append("\t</camera>").append("\n");
 			}
 		}
 		
@@ -828,12 +828,13 @@ public final class Animator extends BFrame {
 			Object o = it.next();
 			if (o instanceof AnimLight) {
 				AnimLight light = (AnimLight) o;
-				sb.append(indent).append("<lightsource>").append(linebreak);
-				sb.append(indent2).append("<name>" + light.getName() + "</name>").append(linebreak);
-				if (!light.isActive()) sb.append(indent2).append("<inactive/>").append(linebreak);
-				sb.append(light.renderStrings(2));
-				getMotionCurveSetFor(light).xml(sb, 2);
-				sb.append(indent).append("</lightsource>").append(linebreak);
+				sb.append("\t<lightsource>").append("\n");
+				sb.append("\t\t<name>" + light.getName() + "</name>").append("\n");
+				if (!light.isActive())
+					sb.append("\t\t<inactive/>").append("\n");
+				sb.append(light.renderStrings("\t\t"));
+				getMotionCurveSetFor(light).xml(sb, "\t\t");
+				sb.append("\t</lightsource>").append("\n");
 			}
 		}
 		
@@ -844,20 +845,20 @@ public final class Animator extends BFrame {
 			if (o instanceof AnimModel) {
 				AnimModel animModel = (AnimModel) o;
 				String filename = (String) mapFilenames.get(animModel);
-				sb.append(indent).append("<model>").append(linebreak);
-				sb.append(indent2).append("<name>" + animModel.getName() + "</name>").append(linebreak);
-				sb.append(indent2).append("<filename>" + filename + "</filename>").append(linebreak);
+				sb.append("\t<model>").append("\n");
+				sb.append("\t\t<name>" + animModel.getName() + "</name>").append("\n");
+				sb.append("\t\t<filename>" + filename + "</filename>").append("\n");
 				int sdo = animModel.getSubdivisionOffset();
 				if (sdo != 0) {
-					sb.append(indent2).append("<subdivisionoffset>" + sdo + "</subdivisionoffset>").append(linebreak);
+					sb.append("\t\t<subdivisionoffset>" + sdo + "</subdivisionoffset>").append("\n");
 				}
-				sb.append(animModel.renderStrings(2));
-				getMotionCurveSetFor(animModel).xml(sb, 2);
-				sb.append(indent).append("</model>").append(linebreak);
+				sb.append(animModel.renderStrings("\t\t"));
+				getMotionCurveSetFor(animModel).xml(sb, "\t\t");
+				sb.append("\t</model>").append("\n");
 			}
 		}
 		
-		sb.append("</sequence>").append(linebreak);
+		sb.append("</sequence>").append("\n");
 		return sb;
 	}
 	
