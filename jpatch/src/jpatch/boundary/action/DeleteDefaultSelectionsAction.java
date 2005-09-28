@@ -1,5 +1,5 @@
 /*
- * $Id: DeleteDefaultSelectionsAction.java,v 1.3 2005/09/20 16:17:54 sascha_l Exp $
+ * $Id: DeleteDefaultSelectionsAction.java,v 1.4 2005/09/28 14:02:12 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -34,7 +34,7 @@ import jpatch.control.edit.*;
  * @author lois
  * modified by sascha
  * This Action removes all selections starting with a "*" character
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final class DeleteDefaultSelectionsAction extends AbstractAction {
 	
@@ -46,7 +46,7 @@ public final class DeleteDefaultSelectionsAction extends AbstractAction {
 	
 	public void actionPerformed(ActionEvent actionEvent) {
 		/* make a new CompoundEdit */
-		JPatchCompoundEdit edit = new JPatchCompoundEdit("Remove * Selections");
+		JPatchActionEdit edit = new JPatchActionEdit("Remove * Selections");
 		
 		/* make a new(!) list containing all selections */
 		ArrayList list = new ArrayList(MainFrame.getInstance().getModel().getSelections());

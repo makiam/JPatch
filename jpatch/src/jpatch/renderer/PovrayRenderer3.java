@@ -2,6 +2,7 @@ package jpatch.renderer;
 
 import java.io.*;
 import java.util.*;
+
 import javax.vecmath.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
@@ -171,7 +172,8 @@ public class PovrayRenderer3 {
 				case 1: {
 					boolean active = false;
 					int steps = JPatchSettings.getInstance().povraySettings.iSubdivMode;
-					for (Patch patch = model.getFirstPatch();patch != null; patch = patch.getNext()) {
+					for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
+						Patch patch = (Patch) it.next();
 						if (patch.getMaterial() == material) {
 							if (!active) {
 								file.write("\t/*\n");

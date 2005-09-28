@@ -72,9 +72,8 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 		for (Iterator iterator = model.getMaterialList().iterator(); iterator.hasNext();) {
 			material = (JPatchMaterial)iterator.next();
 			
-			
-	       
-			for(Patch patch = model.getFirstPatch();patch != null; patch = patch.getNext()) {
+			for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
+				Patch patch = (Patch) it.next();
 				if (patch.getMaterial() == material) {
 					
 					Point3f[] hashPatch = patch.coonsPatch();

@@ -13,7 +13,7 @@ public final class DumpUndoStackAction extends AbstractAction {
 		super("Dump undoStack");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		MainFrame.getInstance().getUndoManager().dump();
+//		MainFrame.getInstance().getUndoManager().dump();
 	}
 }
 

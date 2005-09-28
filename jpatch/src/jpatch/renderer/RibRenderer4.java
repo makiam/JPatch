@@ -2,6 +2,7 @@ package jpatch.renderer;
 
 import java.io.*;
 import java.util.*;
+
 import javax.vecmath.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
@@ -170,7 +171,8 @@ public class RibRenderer4 {
 			for (Iterator itMat = model.getMaterialList().iterator(); itMat.hasNext(); ) {
 				JPatchMaterial material = (JPatchMaterial) itMat.next();
 				boolean active = false;
-				for(Patch patch = model.getFirstPatch();patch != null; patch = patch.getNext()) {
+				for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
+					Patch patch = (Patch) it.next();
 					if (patch.getMaterial() == material) {
 						if (!active) {
 							file.write(renderString);

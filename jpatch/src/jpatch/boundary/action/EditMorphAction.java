@@ -42,7 +42,7 @@ public final class EditMorphAction extends AbstractAction {
 			MainFrame.getInstance().editMorph(null);
 			//MainFrame.getInstance().getUndoManager().clearStop();	//clear stop marker for undoes
 			MainFrame.getInstance().getUndoManager().rewind();
-			MainFrame.getInstance().getUndoManager().addEdit(new ChangeMorphEdit(morph));
+			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeMorph(morph));
 			//morph.set();
 			morphPanel.editMorphDone();
 			

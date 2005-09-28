@@ -37,9 +37,9 @@ public class MotionCurveSet {
 		if (!orientation.getQuat4fAt(pos).equals(animObject.getOrientation())) orientation.setQuat4fAt(pos, animObject.getOrientation());
 	}
 	
-	public void xml(StringBuffer sb, int tab) {
-		position.xml(sb, tab, "type=\"position\"");
-		orientation.xml(sb, tab, "type=\"orientation\" subtype=\"quaternion\"");
+	public void xml(StringBuffer sb, String prefix) {
+		position.xml(sb, prefix, "type=\"position\"");
+		orientation.xml(sb, prefix, "type=\"orientation\" subtype=\"quaternion\"");
 	}
 	
 	public void populateList() {
@@ -68,9 +68,9 @@ public class MotionCurveSet {
 			if (focalLength.getFloatAt(pos) != ((jpatch.entity.Camera) animObject).getFocalLength()) focalLength.setFloatAt(pos, ((jpatch.entity.Camera) animObject).getFocalLength());
 		}
 		
-		public void xml(StringBuffer sb, int tab) {
-			super.xml(sb, tab);
-			focalLength.xml(sb, tab, "type=\"focallength\"");
+		public void xml(StringBuffer sb, String prefix) {
+			super.xml(sb, prefix);
+			focalLength.xml(sb, prefix, "type=\"focallength\"");
 		}
 		
 		public void populateList() {
@@ -111,11 +111,11 @@ public class MotionCurveSet {
 			if (!color.getColor3fAt(pos).equals(light.getColor())) color.setColor3fAt(pos, light.getColor());
 		}
 		
-		public void xml(StringBuffer sb, int tab) {
-			super.xml(sb, tab);
-			size.xml(sb, tab, "type=\"size\"");
-			intensity.xml(sb, tab, "type=\"intensity\"");
-			color.xml(sb, tab, "type=\"color\"");
+		public void xml(StringBuffer sb, String prefix) {
+			super.xml(sb, prefix);
+			size.xml(sb, prefix, "type=\"size\"");
+			intensity.xml(sb, prefix, "type=\"intensity\"");
+			color.xml(sb, prefix, "type=\"color\"");
 		}
 		
 		public void populateList() {
@@ -166,12 +166,12 @@ public class MotionCurveSet {
 			if (scale.getFloatAt(pos) != ((AnimModel) animObject).getScale()) scale.setFloatAt(pos, ((AnimModel) animObject).getScale());
 		}
 		
-		public void xml(StringBuffer sb, int tab) {
-			super.xml(sb, tab);
-			scale.xml(sb, tab, "type=\"scale\" subtype=\"uniform\"");
+		public void xml(StringBuffer sb, String prefix) {
+			super.xml(sb, prefix);
+			scale.xml(sb, prefix, "type=\"scale\" subtype=\"uniform\"");
 			int m = 0;
 			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
-				((MotionCurve2.Float) map.get(it.next())).xml(sb, tab, "type=\"morph\" morph=\"" + m++ + "\"");
+				((MotionCurve2.Float) map.get(it.next())).xml(sb, prefix, "type=\"morph\" morph=\"" + m++ + "\"");
 			}
 		}
 		

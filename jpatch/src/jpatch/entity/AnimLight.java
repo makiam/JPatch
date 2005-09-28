@@ -66,7 +66,7 @@ public class AnimLight extends AnimObject {
 		return re.getRenderString(format, version);
 	}
 	
-	public StringBuffer renderStrings(int tabs) {
-		return re.xml(tabs);
+	public StringBuffer renderStrings(String prefix) {
+		return re.xml(prefix);
 	}
 }

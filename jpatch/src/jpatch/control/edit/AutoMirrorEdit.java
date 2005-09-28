@@ -12,8 +12,8 @@ public class AutoMirrorEdit extends AbstractClone {
 	
 	protected List mirrorList = new ArrayList();
 	
-	public AutoMirrorEdit(PointSelection ps) {
-		super(ps.getControlPointArray());
+	public AutoMirrorEdit(Selection selection) {
+		super(selection.getControlPointArray());
 		//System.out.println("automirror");
 		int side = 0;
 		boolean valid = true;
@@ -38,12 +38,13 @@ public class AutoMirrorEdit extends AbstractClone {
 		} else {
 			
 			/* convert all hooks on boundary curves to regular controlpoints... */
-			for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
-				
+			for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
+//			for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
+				ControlPoint start = (ControlPoint) it.next();
 				/* check if this is a boundary curve */
 				boolean boundary = true;
 				loop:
-				for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
 					if (cp.getPosition().x != 0) {
 						boundary = false;
 						break loop;
@@ -51,17 +52,17 @@ public class AutoMirrorEdit extends AbstractClone {
 				}
 				
 				if (boundary) {
-					for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
+					for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
 					
 						/* check if we are start of a hook curve, and if both, start and end are on the boundary */
-						if (ps.contains(cp.getHead()) && cp.getChildHook() != null && cp.getNext() != null && ps.contains(cp.getNext().getHead())) { //&& cp.getPosition().x == 0 && cp.getNext().getPosition().x == 0) {
+						if (selection.contains(cp.getHead()) && cp.getChildHook() != null && cp.getNext() != null && selection.contains(cp.getNext().getHead())) { //&& cp.getPosition().x == 0 && cp.getNext().getPosition().x == 0) {
 							
 							/* convert hooks... */
 							ControlPoint startHook = cp.getChildHook();
 							ControlPoint endHook = startHook.getEnd();
 							ControlPoint cpToAppend = cp;
 							ControlPoint cpEnd = cp.getNext();
-							Curve hookCurve = cp.getChildHook().getCurve();
+//							Curve hookCurve = cp.getChildHook().getCurve();
 							for (ControlPoint hook = cp.getChildHook().getNext(); hook.getHookPos() < 1;) {
 								Point3f position = hook.getPosition();
 								ControlPoint next = hook.getNext();
@@ -73,55 +74,75 @@ public class AutoMirrorEdit extends AbstractClone {
 								addEdit(new AtomicInsertControlPoint(hook, cpToAppend));
 								
 								/* and convert it to a regular controlpoint by setting hookpos to -1 */
-								addEdit(new ChangeCPHookPosEdit(hook,-1));
+								addEdit(new AtomicChangeControlPoint.HookPos(hook,-1));
 								
 								hook.setPosition(position);
 								//hook.fixPosition();
 								
 								/* add "new" cp to all relevant selections */
-								ArrayList listAdd = new ArrayList();
-								ArrayList listRemove = new ArrayList();
-								listAdd.add(hook);
-								listRemove.add(startHook);
-								listRemove.add(endHook);
-								for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
-									PointSelection psLoop = (PointSelection) it.next();
-									if (psLoop.contains(cpEnd) && ps.contains(cpEnd.getPrev())) {
-										addEdit(new AddControlPointsToSelectionEdit(psLoop, listAdd));
+//								ArrayList listAdd = new ArrayList();
+//								ArrayList listRemove = new ArrayList();
+//								listAdd.add(hook);
+//								listRemove.add(startHook);
+//								listRemove.add(endHook);
+//								for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
+//									PointSelection psLoop = (PointSelection) it.next();
+//									if (psLoop.contains(cpEnd) && ps.contains(cpEnd.getPrev())) {
+//										addEdit(new AddControlPointsToSelectionEdit(psLoop, listAdd));
+//									}
+//									if (psLoop.contains(startHook) && psLoop.contains(endHook)) {
+//										addEdit(new RemoveControlPointsFromSelectionEdit(psLoop, listRemove));
+//									}
+//								}
+//								addEdit(new AddControlPointsToSelectionEdit(ps, listAdd));
+//								addEdit(new RemoveControlPointsFromSelectionEdit(ps, listRemove));
+								HashMap mapAdd = new HashMap();
+								mapAdd.put(hook, new Float(1));
+								HashMap mapRemove = new HashMap();
+								mapRemove.put(startHook, new Float(1));
+								mapRemove.put(endHook, new Float(1));
+								for (Iterator it2 = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
+									Selection loopSelection = (Selection) it.next();
+									if (loopSelection.contains(cpEnd) && loopSelection.contains(cpEnd.getPrev())) {
+										addEdit(new AtomicModifySelection.AddObjects(loopSelection, mapAdd));
 									}
-									if (psLoop.contains(startHook) && psLoop.contains(endHook)) {
-										addEdit(new RemoveControlPointsFromSelectionEdit(psLoop, listRemove));
+									if (loopSelection.contains(startHook) && loopSelection.contains(endHook)) {
+										addEdit(new AtomicModifySelection.RemoveObjects(loopSelection, mapRemove));
 									}
 								}
-								addEdit(new AddControlPointsToSelectionEdit(ps, listAdd));
-								addEdit(new RemoveControlPointsFromSelectionEdit(ps, listRemove));
+								addEdit(new AtomicModifySelection.AddObjects(selection, mapAdd));
+								addEdit(new AtomicModifySelection.RemoveObjects(selection, mapRemove));
 								cpToAppend = hook;
 								hook = next;
 							}
 							
 							/* remove the hook-curve */
-							addEdit(new AtomicRemoveCurve(hookCurve));
-							addEdit(new ChangeCPChildHookEdit(cp, null));
+							addEdit(new AtomicRemoveCurve(cp.getChildHook()));
+							addEdit(new AtomicChangeControlPoint.ChildHook(cp, null));
 							
 							/* correct patches */
 							ArrayList patches;
-							patches = MainFrame.getInstance().getModel().getPatchesContaining(startHook);
-							for (Iterator it = patches.iterator(); it.hasNext(); ) {
+//							patches = MainFrame.getInstance().getModel().getPatchesContaining(startHook);
+							for (Iterator it2 = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {
 								Patch patch = (Patch) it.next();
-								ControlPoint[] patchCPs = patch.getControlPoints();
-								for (int i = 0; i < patchCPs.length; i++) {
-									if (patchCPs[i] == startHook) {
-										patchCPs[i] = cp;
+								if (patch.contains(startHook)) {
+									ControlPoint[] patchCPs = patch.getControlPoints();
+									for (int i = 0; i < patchCPs.length; i++) {
+										if (patchCPs[i] == startHook) {
+											patchCPs[i] = cp;
+										}
 									}
 								}
 							}
-							patches = MainFrame.getInstance().getModel().getPatchesContaining(endHook);
-							for (Iterator it = patches.iterator(); it.hasNext(); ) {
+//							patches = MainFrame.getInstance().getModel().getPatchesContaining(endHook);
+							for (Iterator it2 = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {
 								Patch patch = (Patch) it.next();
-								ControlPoint[] patchCPs = patch.getControlPoints();
-								for (int i = 0; i < patchCPs.length; i++) {
-									if (patchCPs[i] == endHook) {
-										patchCPs[i] = cpEnd;
+								if (patch.contains(endHook)) {
+									ControlPoint[] patchCPs = patch.getControlPoints();
+									for (int i = 0; i < patchCPs.length; i++) {
+										if (patchCPs[i] == endHook) {
+											patchCPs[i] = cpEnd;
+										}
 									}
 								}
 							}
@@ -143,9 +164,9 @@ public class AutoMirrorEdit extends AbstractClone {
 				if (cpClone == cpOriginal) {
 					ControlPoint cp = cpClone;
 					if (cp.getNext() == null) {
-						addEdit(new ChangeControlPointNextEdit(cp,getClone(cp.getPrev())));
+						addEdit(new AtomicChangeControlPoint.Next(cp,getClone(cp.getPrev())));
 					} else {
-						addEdit(new ChangeControlPointPrevEdit(cp,getClone(cp.getNext())));
+						addEdit(new AtomicChangeControlPoint.Prev(cp,getClone(cp.getNext())));
 						//addEdit(new ChangeControlPointLoopEdit(cp.getCurve().getStart(),true));
 					}
 					
@@ -167,30 +188,33 @@ public class AutoMirrorEdit extends AbstractClone {
 				}
 			}
 			
+			
+			// FIXME huh???
 			/* remove dead curves */
-			for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
-				if (curve.getStart().getCurve() != curve) {
-					addEdit(new AtomicRemoveCurve(curve));
-				}
-			}
+//			for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
+//				if (curve.getStart().getCurve() != curve) {
+//					addEdit(new AtomicRemoveCurve(curve));
+//				}
+//			}
 			
 			/* add loop flags */
-			for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
-				ControlPoint cp = curve.getStart();
+//			for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
+			for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
+				ControlPoint cp = (ControlPoint) it.next();
 				if (!cp.getLoop()) {
 					ControlPoint cpStart = cp;
 					cp = cp.getNext();
 					while (cp != null && cp != cpStart) cp = cp.getNext();
-					if (cp == cpStart) {
-						addEdit(new ChangeControlPointLoopEdit(cp, true));
+					if (cp == cpStart && !cp.getLoop()) {
+						addEdit(new AtomicChangeControlPoint.Loop(cp));
 					}
 				}
 			}
 			
-			/* validate all curves */
-			for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
-				curve.validate();
-			}
+//			/* validate all curves */
+//			for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
+//				curve.validate();
+//			}
 			
 			cloneHooks();
 			
@@ -198,109 +222,109 @@ public class AutoMirrorEdit extends AbstractClone {
 			
 			clonePatches(mirrorList);
 			
-			/*
-			 * mirror morphs
-			 */
-			ArrayList newMorphList = new ArrayList();
-			for (Iterator it = MainFrame.getInstance().getModel().getMorphList().iterator(); it.hasNext(); ) {
-				Morph morph = (Morph) it.next();
-				
-				boolean expand = false;
-				boolean mirror = true;
-				for (Iterator jt = morph.getPointList().iterator(); jt.hasNext(); ) {
-					ControlPoint cp = (ControlPoint) jt.next();
-					if (!mapClones.containsKey(cp) && !mirrorList.contains(cp))
-						mirror = false;
-					else if (mapClones.get(cp) == cp || mirrorList.contains(cp))
-						expand = true;
-				}
-				if (mirror) {
-					List pointList = morph.getPointList();
-					List vectorList = morph.getVectorList();
-					if (expand) {
-						ArrayList newPointList = new ArrayList();
-						ArrayList newVectorList = new ArrayList();
-						for (int i = 0, n = pointList.size(); i < n; i++) {
-							ControlPoint cp = (ControlPoint) pointList.get(i);
-							ControlPoint clone = (ControlPoint) mapClones.get(cp);
-							if (cp != clone && !mirrorList.contains(cp)) {
-								Vector3f vector = new Vector3f((Vector3f) vectorList.get(i));
-								vector.x = -vector.x;
-								newPointList.add(clone);
-								newVectorList.add(vector);
-							}
-						}
-						if (newPointList.size() > 0)
-							addEdit(new AddPointsToMorphEdit(morph, newPointList, newVectorList));
-					} else {
-						Morph newMorph = new Morph(morph.getNodeType(), "mirrored " + morph.getName());
-						for (int i = 0, n = pointList.size(); i < n; i++) {
-							ControlPoint cp = (ControlPoint) pointList.get(i);
-							ControlPoint clone = (ControlPoint) mapClones.get(cp);
-							Vector3f vector = new Vector3f((Vector3f) vectorList.get(i));
-							vector.x = -vector.x;
-							newMorph.addPoint(clone, vector);
-							newMorph.setMax(morph.getMax());
-							newMorph.setMin(morph.getMin());
-							newMorph.setSliderValue(morph.getSliderValue());
-						}
-						newMorphList.add(newMorph);
-					}
-				}
-			}
-			for (Iterator it = newMorphList.iterator(); it.hasNext(); addEdit(new AtomicAddMorph((Morph) it.next())));
-			
-			/*
-			* mirror selections
-			*/
-			//System.out.println(mirrorList);
-			ArrayList newSelections = new ArrayList();
-			for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
-				ps = (PointSelection) it.next();
-				ControlPoint[] acp = ps.getControlPointArray();
-				boolean mirror = true;
-				boolean expand = false;
-				for (int c = 0; c < acp.length; c++) {
-					if (!mapClones.containsKey(acp[c]) && !mirrorList.contains(acp[c])) {
-						mirror = false;
-					} //else if (mirrorList.contains(acp[c])) {
-					//else if (acp[c].getPosition().x == 0) {
-					else if (mapClones.get(acp[c]) == acp[c] || mirrorList.contains(acp[c])) {
-						expand = true;
-					}
-				}
-				//System.out.println(ps.getName() + "\t" + mirror + "\t" + expand);
-				if (mirror) {
-					if (expand) {
-						//System.out.println("expand " + ps.getName());
-						ArrayList pointsToAdd = new ArrayList();
-						for (int c = 0; c < acp.length; c++) {
-							//if (!mirrorList.contains(acp[c])) {
-							//if (acp[c].getPosition().x != 0) {
-							if (mapClones.get(acp[c]) != acp[c] && !mirrorList.contains(acp[c])) {
-								//System.out.println(acp[c] + " " + mapClones.get(acp[c]));
-								pointsToAdd.add(mapClones.get(acp[c]));
-							}
-						}
-						if (pointsToAdd.size() > 0) {
-							addEdit(new AddControlPointsToSelectionEdit(ps, pointsToAdd));
-						}
-					} else {
-						PointSelection selection = new PointSelection();
-						for (int c = 0; c < acp.length; c++) {
-							selection.addControlPoint((ControlPoint) mapClones.get(acp[c]));
-						}
-						if (ps.getName().startsWith("*"))
-							selection.setName("*mirrored " + ps.getName().substring(1));
-						else
-							selection.setName("mirrored " + ps.getName());
-						newSelections.add(selection);
-					}
-				}
-			}
-			for (Iterator it = newSelections.iterator(); it.hasNext(); ) {
-				addEdit(new AtomicAddSelection((Selection) it.next()));
-			}
+//			/*
+//			 * mirror morphs
+//			 */
+//			ArrayList newMorphList = new ArrayList();
+//			for (Iterator it = MainFrame.getInstance().getModel().getMorphList().iterator(); it.hasNext(); ) {
+//				Morph morph = (Morph) it.next();
+//				
+//				boolean expand = false;
+//				boolean mirror = true;
+//				for (Iterator jt = morph.getPointList().iterator(); jt.hasNext(); ) {
+//					ControlPoint cp = (ControlPoint) jt.next();
+//					if (!mapClones.containsKey(cp) && !mirrorList.contains(cp))
+//						mirror = false;
+//					else if (mapClones.get(cp) == cp || mirrorList.contains(cp))
+//						expand = true;
+//				}
+//				if (mirror) {
+//					List pointList = morph.getPointList();
+//					List vectorList = morph.getVectorList();
+//					if (expand) {
+//						ArrayList newPointList = new ArrayList();
+//						ArrayList newVectorList = new ArrayList();
+//						for (int i = 0, n = pointList.size(); i < n; i++) {
+//							ControlPoint cp = (ControlPoint) pointList.get(i);
+//							ControlPoint clone = (ControlPoint) mapClones.get(cp);
+//							if (cp != clone && !mirrorList.contains(cp)) {
+//								Vector3f vector = new Vector3f((Vector3f) vectorList.get(i));
+//								vector.x = -vector.x;
+//								newPointList.add(clone);
+//								newVectorList.add(vector);
+//							}
+//						}
+//						if (newPointList.size() > 0)
+//							addEdit(new AddPointsToMorphEdit(morph, newPointList, newVectorList));
+//					} else {
+//						Morph newMorph = new Morph(morph.getNodeType(), "mirrored " + morph.getName());
+//						for (int i = 0, n = pointList.size(); i < n; i++) {
+//							ControlPoint cp = (ControlPoint) pointList.get(i);
+//							ControlPoint clone = (ControlPoint) mapClones.get(cp);
+//							Vector3f vector = new Vector3f((Vector3f) vectorList.get(i));
+//							vector.x = -vector.x;
+//							newMorph.addPoint(clone, vector);
+//							newMorph.setMax(morph.getMax());
+//							newMorph.setMin(morph.getMin());
+//							newMorph.setSliderValue(morph.getSliderValue());
+//						}
+//						newMorphList.add(newMorph);
+//					}
+//				}
+//			}
+//			for (Iterator it = newMorphList.iterator(); it.hasNext(); addEdit(new AtomicAddMorph((Morph) it.next())));
+//			
+//			/*
+//			* mirror selections
+//			*/
+//			//System.out.println(mirrorList);
+//			ArrayList newSelections = new ArrayList();
+//			for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
+//				ps = (PointSelection) it.next();
+//				ControlPoint[] acp = ps.getControlPointArray();
+//				boolean mirror = true;
+//				boolean expand = false;
+//				for (int c = 0; c < acp.length; c++) {
+//					if (!mapClones.containsKey(acp[c]) && !mirrorList.contains(acp[c])) {
+//						mirror = false;
+//					} //else if (mirrorList.contains(acp[c])) {
+//					//else if (acp[c].getPosition().x == 0) {
+//					else if (mapClones.get(acp[c]) == acp[c] || mirrorList.contains(acp[c])) {
+//						expand = true;
+//					}
+//				}
+//				//System.out.println(ps.getName() + "\t" + mirror + "\t" + expand);
+//				if (mirror) {
+//					if (expand) {
+//						//System.out.println("expand " + ps.getName());
+//						ArrayList pointsToAdd = new ArrayList();
+//						for (int c = 0; c < acp.length; c++) {
+//							//if (!mirrorList.contains(acp[c])) {
+//							//if (acp[c].getPosition().x != 0) {
+//							if (mapClones.get(acp[c]) != acp[c] && !mirrorList.contains(acp[c])) {
+//								//System.out.println(acp[c] + " " + mapClones.get(acp[c]));
+//								pointsToAdd.add(mapClones.get(acp[c]));
+//							}
+//						}
+//						if (pointsToAdd.size() > 0) {
+//							addEdit(new AddControlPointsToSelectionEdit(ps, pointsToAdd));
+//						}
+//					} else {
+//						PointSelection selection = new PointSelection();
+//						for (int c = 0; c < acp.length; c++) {
+//							selection.addControlPoint((ControlPoint) mapClones.get(acp[c]));
+//						}
+//						if (ps.getName().startsWith("*"))
+//							selection.setName("*mirrored " + ps.getName().substring(1));
+//						else
+//							selection.setName("mirrored " + ps.getName());
+//						newSelections.add(selection);
+//					}
+//				}
+//			}
+//			for (Iterator it = newSelections.iterator(); it.hasNext(); ) {
+//				addEdit(new AtomicAddSelection((Selection) it.next()));
+//			}
 			
 			//for (Iterator it = mapOriginals.keySet().iterator(); it.hasNext(); ) {
 			//	ControlPoint cpClone = (ControlPoint) it.next();
@@ -382,7 +406,7 @@ public class AutoMirrorEdit extends AbstractClone {
 								//System.put.println(cp + " + prev attched curve");
 								boolean onMirror = true;
 								loop:
-								for (ControlPoint c = cp.getPrevAttached().getCurve().getStart(); c != null; c = c.getNextCheckNextLoop()) {
+								for (ControlPoint c = cp.getPrevAttached().getStart(); c != null; c = c.getNextCheckNextLoop()) {
 									if (c.getPosition().x != 0) {
 										onMirror = false;
 										break loop;
@@ -398,7 +422,7 @@ public class AutoMirrorEdit extends AbstractClone {
 								//System.put.println(cp + " next attached curve");
 								boolean onMirror = true;
 								loop:
-								for (ControlPoint c = cp.getNextAttached().getCurve().getStart(); c != null; c = c.getNextCheckNextLoop()) {
+								for (ControlPoint c = cp.getNextAttached().getStart(); c != null; c = c.getNextCheckNextLoop()) {
 									if (c.getPosition().x != 0) {
 										onMirror = false;
 										break loop;
@@ -418,7 +442,7 @@ public class AutoMirrorEdit extends AbstractClone {
 						} else {
 							boolean onMirror = true;
 							loop:
-							for (ControlPoint c = cp.getCurve().getStart(); c != null; c = c.getNextCheckNextLoop()) {
+							for (ControlPoint c = cp.getStart(); c != null; c = c.getNextCheckNextLoop()) {
 								if (c.getPosition().x != 0) {
 									onMirror = false;
 									break loop;

@@ -7,12 +7,12 @@ import jpatch.entity.*;
  * Use this class for changing morphs
  */
 
-public class ChangeMorphEdit extends JPatchAbstractUndoableEdit {
+public class AtomicChangeMorph extends JPatchAtomicEdit implements JPatchRootEdit {
 	private Morph morph;
 	private Map map;
 	
 	
-	public ChangeMorphEdit(Morph morph) {
+	public AtomicChangeMorph(Morph morph) {
 		this.morph = morph;
 		map = morph.getMorphMap();
 		morph.set();
@@ -28,6 +28,14 @@ public class ChangeMorphEdit extends JPatchAbstractUndoableEdit {
 		morph.unapply();
 		swap();
 		morph.apply();
+	}
+	
+	public int sizeOf() {
+		return map == null ? 8 + 4 + 4 : 8 + 4 + 4 + (8 + 4 + 4 + 4 + 4 + 8 * map.size() * 2);
+	}
+	
+	public String getName() {
+		return "modify morph";
 	}
 	
 	private void swap() {

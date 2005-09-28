@@ -168,12 +168,12 @@ public abstract class MotionCurve2 {
 		} else return null;
 	}
 	
-	public void xml(StringBuffer sb, int tab, String type) {
-		StringBuffer indent = XMLutils.indent(tab);
-		StringBuffer indent2 = XMLutils.indent(tab + 1);
-		sb.append(indent).append("<motioncurve " + type + " interpolation=\"" + interpolationMethod.toString() + "\">\n");
-		for (Iterator it = list.iterator(); it.hasNext(); sb.append(indent2).append(it.next().toString()).append(XMLutils.lineBreak()));
-		sb.append(indent).append("</motioncurve>").append(XMLutils.lineBreak());
+	public void xml(StringBuffer sb, String prefix, String type) {
+//		StringBuffer indent = XMLutils.indent(tab);
+//		StringBuffer indent2 = XMLutils.indent(tab + 1);
+		sb.append(prefix).append("<motioncurve " + type + " interpolation=\"" + interpolationMethod.toString() + "\">\n");
+		for (Iterator it = list.iterator(); it.hasNext(); sb.append(prefix + "\t").append(it.next().toString()).append("\n"));
+		sb.append(prefix).append("</motioncurve>").append("\n");
 	}
 	
 	public MotionKey2 getPrevKey(float position) {
