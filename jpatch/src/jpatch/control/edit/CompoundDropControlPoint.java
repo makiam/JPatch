@@ -48,7 +48,7 @@ public class CompoundDropControlPoint extends JPatchCompoundEdit {
 			addEdit(new CompoundDropCurve(cp.getPrev().getChildHook(), true));
 		// remove cp from all entities
 		addEdit(new CompoundRemoveControlPointFromEntities(cp));
-		addEdit(new AtomicChangeControlPoint.Deleted(cp));
+//		addEdit(new AtomicChangeControlPoint.Deleted(cp));
 		// detach the cp
 		if (cp.getHookPos() == -1)
 			addEdit(new AtomicDetatchControlPoint(cp));
