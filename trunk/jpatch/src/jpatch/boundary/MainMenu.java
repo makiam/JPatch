@@ -209,7 +209,7 @@ public final class MainMenu extends JMenuBar {
 		menuOptions.add(menuPlaf);
 		//>>>>> test-add
 		menuOptions.add(new EditPhonemesAction());
-		menuOptions.add(new KeyMapAction());
+//		menuOptions.add(new KeyMapAction());
 		//<<<<< test-add
 		
 		menuTools.add(new AlignAction());
