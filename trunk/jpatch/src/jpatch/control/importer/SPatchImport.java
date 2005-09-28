@@ -1,17 +1,12 @@
 package jpatch.control.importer;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
 
-import javax.vecmath.Color3f;
-import javax.vecmath.Point3f;
-
-import jpatch.boundary.selection.PointSelection;
-import jpatch.control.ModelImporter;
-import jpatch.entity.ControlPoint;
-import jpatch.entity.JPatchMaterial;
-import jpatch.entity.Model;
+import javax.vecmath.*;
+import jpatch.boundary.*;
+import jpatch.control.*;
+import jpatch.entity.*;
 
 public class SPatchImport implements ModelImporter {
 	private static final int MAX_LAYERS = 8;
@@ -25,7 +20,7 @@ public class SPatchImport implements ModelImporter {
 		ControlPoint[] acpHead = new ControlPoint[0];
 		int iVersion = 1;
 		int iHighestLayer = 0;
-		PointSelection[] layers = new PointSelection[MAX_LAYERS];
+		ArrayList[] layers = new ArrayList[MAX_LAYERS];
 		JPatchMaterial[] materials = new JPatchMaterial[MAX_LAYERS];
 		materials[0] = new JPatchMaterial(new Color3f(0.549f, 0.6745f, 0.4667f));
 		materials[1] = new JPatchMaterial(new Color3f(0.4784f, 0.5373f, 0.6706f));
@@ -36,8 +31,8 @@ public class SPatchImport implements ModelImporter {
 		materials[6] = new JPatchMaterial(new Color3f(0.4784f, 0.5373f, 0.6706f));
 		materials[7] = new JPatchMaterial(new Color3f(0.6745f, 0.4667f, 0.4667f));
 		for (int l = 0; l < MAX_LAYERS; l++) {
-			layers[l] = new PointSelection();
-			layers[l].setName("sPatch Layer " + l);
+			layers[l] = new ArrayList();
+//			layers[l].setName("sPatch Layer " + l);
 			materials[l].setName("sPatch Layer " + l);
 		}
 		try {
@@ -109,7 +104,7 @@ public class SPatchImport implements ModelImporter {
 							//cp.layer = layers[pointID];
 							if (acpHead[iPointID] == null) {
 								acpHead[iPointID] = cp;
-								layers[aiLayer[iPointID]].addControlPoint(cp);
+								layers[aiLayer[iPointID]].add(cp);
 							} else {
 								cp.attachTo(acpHead[iPointID]);
 							}
@@ -132,9 +127,15 @@ public class SPatchImport implements ModelImporter {
 			brFile.close();
 			model.computePatches();
 			for (int l = 0; l <= iHighestLayer; l++) {
-				model.addSelection(layers[l]);
+				Selection selection = new Selection(layers[l]);
+				selection.setName("sPatch layer " + l);
+				model.addSelection(selection);
 				model.addMaterial(materials[l]);
-				layers[l].applyMaterial(materials[l]);
+				for (Iterator it = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {
+					Patch patch = (Patch) it.next();
+					if (patch.isSelected(selection))
+						patch.setMaterial(materials[l]);
+				}
 				//((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(layer[l].getParent(),aiIndex);
 			}
 		}

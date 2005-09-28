@@ -16,18 +16,18 @@ public final class AutoMirrorAction extends AbstractAction {
 		//putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("clone"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		PointSelection ps = MainFrame.getInstance().getPointSelection();
-		if (ps != null && !ps.isSingle()) {
+		Selection selection = MainFrame.getInstance().getSelection();
+		if (selection != null && !selection.isSingle()) {
 			//PointSelection newPs = MainFrame.getInstance().getModel().clone(ps.getControlPointArray());
 			//MainFrame.getInstance().setSelection(newPs);
-			JPatchCompoundEdit compoundEdit = new JPatchCompoundEdit();
-			compoundEdit.addEdit(new CompoundExtandSelection(ps, true));
-			compoundEdit.addEdit(new AutoMirrorEdit(ps));
-			if (compoundEdit.size() > 0) {
-				MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
+			JPatchActionEdit edit = new JPatchActionEdit("auto mirror");
+			edit.addEdit(new CompoundExtandSelection(selection));
+			edit.addEdit(new AutoMirrorEdit(selection));
+			if (edit.size() > 0) {
+				MainFrame.getInstance().getUndoManager().addEdit(edit);
 			}
 			//MainFrame.getInstance().setSelection(null);
-			MainFrame.getInstance().getModel().computePatches(compoundEdit);
+//			MainFrame.getInstance().getModel().computePatches(edit);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 	}

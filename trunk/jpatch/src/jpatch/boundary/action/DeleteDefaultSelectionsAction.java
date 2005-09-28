@@ -46,7 +46,7 @@ public final class DeleteDefaultSelectionsAction extends AbstractAction {
 	
 	public void actionPerformed(ActionEvent actionEvent) {
 		/* make a new CompoundEdit */
-		JPatchCompoundEdit edit = new JPatchCompoundEdit("Remove * Selections");
+		JPatchActionEdit edit = new JPatchActionEdit("Remove * Selections");
 		
 		/* make a new(!) list containing all selections */
 		ArrayList list = new ArrayList(MainFrame.getInstance().getModel().getSelections());

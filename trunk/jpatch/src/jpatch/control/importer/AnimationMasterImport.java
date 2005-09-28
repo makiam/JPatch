@@ -2,8 +2,11 @@ package jpatch.control.importer;
 
 import java.io.*;
 import java.util.*;
+
 import javax.vecmath.*;
+import jpatch.boundary.*;
 import jpatch.control.*;
+import jpatch.control.edit.AtomicChangePatchMaterial;
 import jpatch.entity.*;
 
 
@@ -292,23 +295,30 @@ public class AnimationMasterImport implements ModelImporter {
 		//System.out.println("materials.size() = " + model.getMaterialList().size());
 		for (int group = 0; group < lstGroup.size(); group++) {
 			int[] aiPoints = (int[])lstGroup.get(group);
-			PointSelection ps = new PointSelection();
+			ArrayList pointList = new ArrayList();
+			
 			
 			//JPatchMaterial material = model.getMaterial(group + 1);
-			ps.setName((String) lstGroupName.get(group));
+			
 			for (int p = 0; p < aiPoints.length; p++) {
 				Integer key = new Integer(aiPoints[p]);
 				ControlPoint cp = (ControlPoint)mapControlPoint.get(key);
 				//if (cp.isHead() || cp.isTargetHook()) {
-					ps.addControlPoint(cp.getHead());
+				pointList.add(cp.getHead());
 				//}
 				//cp.getHead().addToGroup(group + 1);
 			}
-			model.addSelection(ps);
+			Selection selection = new Selection(pointList);
+			selection.setName((String) lstGroupName.get(group));
+			model.addSelection(selection);
 			JPatchMaterial material = (JPatchMaterial) mapGroupMaterials.get(new Integer(group + 1));
 			if (material != null) {
-				ps.applyMaterial(material);
-				material.setName(ps.getName());
+				for (Iterator it = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {
+					Patch patch = (Patch) it.next();
+					if (patch.isSelected(selection))
+						patch.setMaterial(material);
+				}
+				material.setName(selection.getName());
 			}
 		}
 		

@@ -474,9 +474,11 @@ public class CameraViewport implements JPatchDrawableEventListener {
 				if (Animator.getInstance().getActiveObject() == character) viewport.setColor(new Color3f(1,1,0));
 				else viewport.setColor(new Color3f(1,1,1));
 				if (true) { // draw curves
-					for (Curve curve = character.getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
-						if (!curve.getStart().isStartHook()) {
-							for (ControlPoint cp = curve.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
+					for (Iterator it2 = character.getModel().getCurveSet().iterator(); it.hasNext(); ) {
+//					for (Curve curve = character.getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
+						ControlPoint start = (ControlPoint) it2.next();
+						if (!start.isStartHook()) {
+							for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
 								if (cp.getNext() != null) {
 									p0.set(cp.getPosition());
 									p1.set(cp.getOutTangent());
