@@ -91,7 +91,7 @@ public class JPatchUndoManager {
 	 * @param edit The edit to add
 	 */
 	public void addEdit(JPatchRootEdit edit, boolean open) {
-		System.out.println(edit.sizeOf() + "\t" + edit.getClass().getName());
+		System.out.println(edit.sizeOf() + "\t" + edit.getClass().getName() + "\t" + edit.getName());
 //		System.out.println(Runtime.getRuntime().freeMemory());
 		if (bOpen) {
 			appendEdit(edit, open);
