@@ -227,6 +227,8 @@ public class Viewport2 {
 		Color3f cHeadPoint = new Color3f(settings.cHeadPoint);
 		Color3f cMultiPoint = new Color3f(settings.cMultiPoint);
 		Color3f color = new Color3f();
+		Color3f cWeight = new Color3f();
+		Color3f cBlack = new Color3f(0,0,0);
 		if (viewDef.renderPoints()) {
 			drawable.setPointSize(3);
 			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
@@ -235,8 +237,13 @@ public class Viewport2 {
 						p0.set(cp.getPosition());
 						if (!drawable.isTransformSupported()) 
 							m4View.transform(p0);
-						if (selection != null && selection.contains(cp)) {
-							setFogColor(p0.z, cSelected, color);
+						float w = 0;
+						Float weight;
+						if (selection != null && (weight = (Float) selection.getMap().get(cp)) != null) {
+							w = ((Float) weight).floatValue();
+							cWeight.interpolate(cBlack, cSelected, w);
+//							System.out.println(cp + " " + w + " " + cWeight);
+							setFogColor(p0.z, cWeight, color);
 							drawable.setColor(color);
 							drawable.drawPoint(p0);
 						} else if (!cp.isHook() && ! cp.isHidden()){

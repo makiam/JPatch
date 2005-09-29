@@ -754,9 +754,9 @@ public class DefaultTool extends JPatchTool {
 					Selection sel = selectMouseMotionListener.getSelection(viewDef);
 					if ((selection != null ^ sel != null) || sel != null && !sel.equals(selection)) {
 						MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(sel));
-						((Component)mouseEvent.getSource()).removeMouseMotionListener(selectMouseMotionListener);
 						selectionChanged(selection);
 					}
+					((Component)mouseEvent.getSource()).removeMouseMotionListener(selectMouseMotionListener);
 					break;
 				case ADD_MODIFY_SELECTION:
 //					PointSelection psNew = (PointSelection)selectMouseMotionListener.getSelection(viewDef);

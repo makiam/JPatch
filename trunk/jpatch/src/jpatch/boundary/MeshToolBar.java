@@ -27,6 +27,7 @@ public final class MeshToolBar extends JToolBar {
 	
 	private AbstractAction selectMoveAction = new SelectMoveAction();
 	private AbstractAction magnetAction = new MagnetAction();
+	private AbstractAction weightAction = new WeightSelectionAction();
 	private AbstractAction addControlPointAction = new AddControlPointAction();
 	private AbstractAction addMultiControlPointAction = new AddMultiControlPointAction();
 	private AbstractAction rotateAction = new RotateAction();
@@ -38,7 +39,7 @@ public final class MeshToolBar extends JToolBar {
 	private AbstractAction latheEditorAction = new LatheEditorAction();
 	
 	private AbstractButton buttonSelectMove = new JPatchToggleButton(selectMoveAction);
-	private AbstractButton buttonMagnet = new JPatchToggleButton(magnetAction);
+	private AbstractButton buttonWeight = new JPatchToggleButton(weightAction);
 	private AbstractButton buttonAdd = new JPatchToggleButton(addControlPointAction);
 	private AbstractButton buttonAddMulti = new JPatchToggleButton(addMultiControlPointAction);
 	private AbstractButton buttonRotate = new JPatchToggleButton(rotateAction);
@@ -64,13 +65,14 @@ public final class MeshToolBar extends JToolBar {
 		//setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		
 		/* Buttons */
+		buttonWeight.setEnabled(false);
 		
 		/* ButtonGroups */
 		bgAction = action;
 		
 		bgAction.add(buttonSelectMove);
 		bgAction.add(buttonRotate);
-		bgAction.add(buttonMagnet);
+		bgAction.add(buttonWeight);
 		bgAction.add(buttonAdd);
 		bgAction.add(buttonAddMulti);
 		bgAction.add(buttonRotoscope);
@@ -85,9 +87,9 @@ public final class MeshToolBar extends JToolBar {
 		add(buttonSelectMove);
 		add(buttonAdd);
 		add(buttonAddMulti);
-		add(JPatchSeparator.createVerticalSeparator());
+		//add(JPatchSeparator.createVerticalSeparator());
 		add(buttonRotate);
-		add(buttonMagnet);
+		add(buttonWeight);
 		add(JPatchSeparator.createVerticalSeparator());
 		add(buttonRotoscope);
 		//add(buttonRemove);
@@ -112,6 +114,10 @@ public final class MeshToolBar extends JToolBar {
 		setFocusable(false);
 	}
 	
+	public AbstractButton getWeightButton() {
+		return buttonWeight;
+	}
+	
 	public void addKeyBindings() {
 		MainFrame.getInstance().getKeyAdapter().addKey(KeyMapping.getKey("next curve"), new NextCurveAction());
 		MainFrame.getInstance().getKeyAdapter().addKey(KeyMapping.getKey("extend selection"), new ExtendSelectionAction());
@@ -119,7 +125,7 @@ public final class MeshToolBar extends JToolBar {
 		
 		MainFrame.getInstance().getKeyAdapter().addKey(KeyMapping.getKey("default tool"), buttonSelectMove);
 		MainFrame.getInstance().getKeyAdapter().addKey(KeyMapping.getKey("rotate tool"), buttonRotate);
-		MainFrame.getInstance().getKeyAdapter().addKey(KeyMapping.getKey("magnet tool"), buttonMagnet);
+//		MainFrame.getInstance().getKeyAdapter().addKey(KeyMapping.getKey("magnet tool"), buttonMagnet);
 		MainFrame.getInstance().getKeyAdapter().addKey(KeyMapping.getKey("add point"), buttonAdd);
 		MainFrame.getInstance().getKeyAdapter().addKey(KeyMapping.getKey("add multiple points"), buttonAddMulti);
 		MainFrame.getInstance().getKeyAdapter().addKey(KeyMapping.getKey("remove points"), removeAction);
@@ -152,7 +158,7 @@ public final class MeshToolBar extends JToolBar {
 		return new AbstractButton[] {
 			buttonSelectMove,
 			buttonRotate,
-			buttonMagnet,
+//			buttonMagnet,
 			buttonRotoscope
 		};
 	}
