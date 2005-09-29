@@ -1,6 +1,6 @@
 package jpatch.control.edit;
 /*
- * $Id: CompoundRemoveControlPoint.java,v 1.2 2005/09/19 12:40:15 sascha_l Exp $
+ * $Id: CompoundRemoveControlPoint.java,v 1.3 2005/09/29 15:12:12 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -43,7 +43,7 @@ public class CompoundRemoveControlPoint extends JPatchCompoundEdit {
 		if (start.getLength() < 3) {
 			// YES
 			// remove entire curve
-			addEdit(new CompoundDropCurve(start, false));
+			addEdit(new CompoundDropCurve(start));
 			// return
 			return;
 		}

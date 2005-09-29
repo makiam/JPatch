@@ -25,16 +25,23 @@ public class CompoundDeleteControlPoint extends JPatchCompoundEdit {
 		// is the curve closed?
 		if (start.getLoop()) {
 			// YES
+			// are there less than 3 points on the curve?
+			if (start.getLength() < 3) {
+				// YES
+				// drop the curve
+				addEdit(new CompoundDropCurve(start));
+				return;
+			}
 			// clear loop on start-cp
 			addEdit(new AtomicChangeControlPoint.Loop(start));
 			// set curve-start to next cp
 			addEdit(new AtomicRemoveCurve(start));
 			addEdit(new AtomicAddCurve(cp.getNext()));
 //			addEdit(new AtomicChangeCurveStart(curve, cp.getNext()));
-			// drop this cp
-			addEdit(new CompoundDropControlPoint(cp));
 			// delete this cp from curve
 			addEdit(new AtomicDeleteControlPointFromCurve(cp));
+			// drop this cp
+			addEdit(new CompoundDropControlPoint(cp));
 			// return
 			return;
 		}
@@ -42,7 +49,7 @@ public class CompoundDeleteControlPoint extends JPatchCompoundEdit {
 		if (start.getLength() == 2 || (start.getLength() == 3 && cp.getNext() != null && cp.getPrev() != null)) {
 			// YES
 			// drop the entire curve
-			addEdit(new CompoundDropCurve(start, false));
+			addEdit(new CompoundDropCurve(start));
 			// return
 			return;
 		}

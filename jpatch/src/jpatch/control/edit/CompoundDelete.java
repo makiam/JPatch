@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundDelete.java,v 1.1 2005/09/19 12:40:15 sascha_l Exp $
+ * $Id: CompoundDelete.java,v 1.2 2005/09/29 15:12:12 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -46,14 +46,14 @@ public class CompoundDelete extends JPatchCompoundEdit {
 		}
 		if (DEBUG)
 			System.out.println("\t" + controlPointSet);
-//		for (Iterator it = (new HashSet(MainFrame.getInstance().getModel().getCurveSet())).iterator(); it.hasNext(); ) {
-//			ControlPoint start = (ControlPoint) it.next();
-//			if (dropCurve(start, objects)) {
-//				for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop())
-//					controlPointSet.remove(cp);
-//				addEdit(new CompoundDropCurve(start, start.getHookPos() == 0));
-//			}
-//		}
+		for (Iterator it = (new HashSet(MainFrame.getInstance().getModel().getCurveSet())).iterator(); it.hasNext(); ) {
+			ControlPoint start = (ControlPoint) it.next();
+			if (!start.isDeleted() && dropCurve(start, objects)) {
+				for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop())
+					controlPointSet.remove(cp);
+				addEdit(new CompoundDropCurve(start));
+			}
+		}
 		for (Iterator it = controlPointSet.iterator(); it.hasNext(); ) {
 			ControlPoint cp = (ControlPoint) it.next();
 			if (!cp.isDeleted())
@@ -80,17 +80,17 @@ public class CompoundDelete extends JPatchCompoundEdit {
 //		}
 //	}
 	
-//	private boolean dropCurve(ControlPoint start, Collection objects) {
-//		boolean consecutive = false;
-//		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
-//			if (!objects.contains(cp.getHead())) {
-//				if (consecutive)
-//					return false;
-//				consecutive = true;
-//			} else {
-//				consecutive = false;
-//			}
-//		}
-//		return true;
-//	}
+	private boolean dropCurve(ControlPoint start, Collection objects) {
+		boolean consecutive = false;
+		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
+			if (!objects.contains(cp.getHead())) {
+				if (consecutive)
+					return false;
+				consecutive = true;
+			} else {
+				consecutive = false;
+			}
+		}
+		return true;
+	}
 }

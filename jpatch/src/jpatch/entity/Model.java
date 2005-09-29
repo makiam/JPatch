@@ -888,7 +888,7 @@ public class Model extends JPatchTreeNode {
 		System.out.println("\tcp\tnext\tprev\tloop\tna\tpa\tphook\tchook\thpos\tposition\n");
 		for (Iterator it = setCurves.iterator(); it.hasNext(); ) {
 			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
-				System.out.println("\t" + cp + "\t" + cp.getNext() + "\t" + cp.getPrev() + "\t" + cp.getLoop() + "\t" + cp.getNextAttached() + "\t" + cp.getPrevAttached() + "\t" + cp.getParentHook() + "\t" + cp.getChildHook() + "\t" + cp.getHookPos() + "\t" + cp.getPosition());
+				System.out.println("\t" + cp + "\t" + cp.getNext() + "\t" + cp.getPrev() + "\t" + cp.getLoop() + "\t" + cp.getNextAttached() + "\t" + cp.getPrevAttached() + "\t" + cp.getParentHook() + "\t" + cp.getChildHook() + "\t" + cp.getHookPos() + "\t" + cp.getPosition() + "\t" + cp.isDeleted());
 				
 				//System.out.println("\t" + cp + "\t" + cp.getPosition() + "\t" + cp.getNext() + "\t" + cp.getPrev() + "\t" + cp.getNextAttached() + "\t" + cp.getPrevAttached() + "\t" + cp.getLoop());
 				//System.out.println("\t" + cp);

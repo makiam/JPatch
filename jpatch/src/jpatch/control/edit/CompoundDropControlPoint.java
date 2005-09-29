@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundDropControlPoint.java,v 1.3 2005/09/28 18:47:50 sascha_l Exp $
+ * $Id: CompoundDropControlPoint.java,v 1.4 2005/09/29 15:12:12 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -24,14 +24,20 @@ package jpatch.control.edit;
 import jpatch.entity.*;
 
 /**
+ * Drops the controlpoints.
+ * If it is the start of a hook-curve, sets the parent hook's child-hook to null.
+ * If it has a child hook (or the previous point has a child hook), drops the hook curve.
+ * Removes the point from all entities
+ * Detaches the point.
  * @author sascha
- *
  */
 public class CompoundDropControlPoint extends JPatchCompoundEdit {
 	public CompoundDropControlPoint(ControlPoint cp) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + cp + ")");
 		// has cp got a valid parent-hook?
+		if (cp.isDeleted())
+			throw new IllegalStateException(cp + " is already deleted.");
 		if (cp.getParentHook() != null && cp.getParentHook().getChildHook() == cp)
 			// YES
 			// change parent-hook's child-hook to null
@@ -40,17 +46,17 @@ public class CompoundDropControlPoint extends JPatchCompoundEdit {
 		if (cp.getChildHook() != null)
 			// YES
 			// drop child-hook's curve
-			addEdit(new CompoundDropCurve(cp.getChildHook(), true));
+			addEdit(new CompoundDropCurve(cp.getChildHook()));
 		// has previous cp got a child-hook?
 		if (cp.getPrev() != null && cp.getPrev().getChildHook() != null)
 			// YES
 			// drop previous cp's child-hook's curve
-			addEdit(new CompoundDropCurve(cp.getPrev().getChildHook(), true));
+			addEdit(new CompoundDropCurve(cp.getPrev().getChildHook()));
 		// remove cp from all entities
 		addEdit(new CompoundRemoveControlPointFromEntities(cp));
-//		addEdit(new AtomicChangeControlPoint.Deleted(cp));
+		addEdit(new AtomicChangeControlPoint.Deleted(cp));
 		// detach the cp
-		if (cp.getHookPos() == -1)
+//		if (cp.getHookPos() == -1)
 			addEdit(new AtomicDetatchControlPoint(cp));
 //		if (cp.getPrevAttached() != null && cp.getNextAttached() != null)
 //			addEdit(new AtomicDetatchControlPoint(cp));

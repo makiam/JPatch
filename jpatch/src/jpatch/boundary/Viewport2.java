@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.22 2005/09/26 15:07:42 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.23 2005/09/29 15:12:12 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -255,6 +255,10 @@ public class Viewport2 {
 							}
 							//if (cp.isHidden()) drawable.setColor(Color.BLUE);
 							
+						}
+						if (cp.toString().equals("cp_2389")) {
+							drawable.setColor(new Color3f(1,1,1));
+							drawable.drawPoint(p0);
 						}
 					}
 				}

@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicRemoveControlPointFromMorphs.java,v 1.1 2005/09/26 10:36:27 sascha_l Exp $
+ * $Id: AtomicRemoveControlPointFromMorphs.java,v 1.2 2005/09/29 15:12:12 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -41,16 +41,18 @@ public final class AtomicRemoveControlPointFromMorphs extends JPatchAtomicEdit {
 		this.cp = cp;
 		for (Iterator it = MainFrame.getInstance().getModel().getMorphList().iterator(); it.hasNext(); ) {
 			Morph morph = (Morph) it.next();
-			if (morph.contains(cp))
+			Object vector = morph.getVectorFor(cp);
+			if (vector != null) {
 				mapMorphs.put(morph, morph.getVectorFor(cp));
+				morph.removePoint(cp);
+			}
 		}
-		redo();
 	}
 	
 	public void undo() {
 		for (Iterator it = mapMorphs.keySet().iterator(); it.hasNext(); ) {
 			Morph morph = (Morph) it.next();
-			morph.addPoint(cp, (Vector3f) mapMorphs.get(cp)); 
+			morph.addPoint(cp, (Vector3f) mapMorphs.get(morph)); 
 		}
 	}
 	

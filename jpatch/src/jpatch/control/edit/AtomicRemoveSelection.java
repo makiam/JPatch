@@ -20,30 +20,32 @@ public class AtomicRemoveSelection extends JPatchAtomicEdit implements JPatchRoo
 	}
 	
 	public void redo() {
-		int[] aiIndex = new int[] { selection.getParent().getIndex(selection) };
-		Object[] aObject = new Object[] { selection };
+//		int[] aiIndex = new int[] { selection.getParent().getIndex(selection) };
+//		Object[] aObject = new Object[] { selection };
 		MainFrame.getInstance().getModel().removeSelection(selection);
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereRemoved(selection.getParent(),aiIndex,aObject);
-		MainFrame.getInstance().getSideBar().replacePanel(new SidePanel());
-		MainFrame.getInstance().getSideBar().clearDetailPanel();
-		MainFrame.getInstance().getSideBar().validate();
+//		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereRemoved(selection.getParent(),aiIndex,aObject);
+//		MainFrame.getInstance().getSideBar().replacePanel(new SidePanel());
+//		MainFrame.getInstance().getSideBar().clearDetailPanel();
+//		MainFrame.getInstance().getSideBar().validate();
+		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).reload();
 	}
 	
 	public void undo() {
-		if (index < 0) 
+//		if (index < 0) 
 			MainFrame.getInstance().getModel().addSelection(selection);
-		else
-			// undo at deleted position ( not yet implemented @lois )
-			MainFrame.getInstance().getModel().addSelection(index, selection);
-		int[] aiIndex = new int[] { selection.getParent().getIndex(selection) };
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(selection.getParent(),aiIndex);
+//		else
+//			// undo at deleted position ( not yet implemented @lois )
+//			MainFrame.getInstance().getModel().addSelection(index, selection);
+//		int[] aiIndex = new int[] { selection.getParent().getIndex(selection) };
+//		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(selection.getParent(),aiIndex);
 		//TreePath path = selection.getTreePath();
-		
-		MainFrame.getInstance().getSideBar().replacePanel(new SidePanel());
-		MainFrame.getInstance().getSideBar().clearDetailPanel();
-		MainFrame.getInstance().getSideBar().validate();
-		//MainFrame.getInstance().getTree().setSelectionPath(path);
-		//MainFrame.getInstance().getTree().makeVisible(path);
+//		
+//		MainFrame.getInstance().getSideBar().replacePanel(new SidePanel());
+//		MainFrame.getInstance().getSideBar().clearDetailPanel();
+//		MainFrame.getInstance().getSideBar().validate();
+//		//MainFrame.getInstance().getTree().setSelectionPath(path);
+//		//MainFrame.getInstance().getTree().makeVisible(path);
+		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).reload();
 	}
 	
 	public int sizeOf() {

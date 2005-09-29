@@ -41,7 +41,7 @@ public class Morph extends JPatchTreeLeaf {
 				changeMap.clear();
 				for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
 					Object key = it.next();
-					if (selectedPoints.keySet().contains(key))
+					if (selectedPoints.containsKey(key))
 						changeMap.put(key, new Vector3f((Vector3f) mapMorph.get(key)));
 				}
 			}
