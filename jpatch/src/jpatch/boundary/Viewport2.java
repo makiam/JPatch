@@ -256,6 +256,10 @@ public class Viewport2 {
 							//if (cp.isHidden()) drawable.setColor(Color.BLUE);
 							
 						}
+						if (cp.toString().equals("cp_2389")) {
+							drawable.setColor(new Color3f(1,1,1));
+							drawable.drawPoint(p0);
+						}
 					}
 				}
 			}

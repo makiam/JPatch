@@ -4,15 +4,16 @@ import jpatch.entity.*;
 
 public class CompoundDropCurve extends JPatchCompoundEdit {
 	
-	public CompoundDropCurve(ControlPoint start, boolean hook) {
+	public CompoundDropCurve(ControlPoint start) {
 		if (DEBUG)
-			System.out.println(getClass().getName() + "(" + start + ", " + hook + ")");
+			System.out.println(getClass().getName() + "(" + start + ")");
+		boolean hook = (start.getHookPos() == 0.0f);
 		// loop over all points on the curve
 		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
 			// drop the cp
-			addEdit(new CompoundDropControlPoint(cp));
 			if (hook && cp.getPrevAttached() != null)
 				addEdit(new CompoundDeleteControlPoint(cp.getPrevAttached()));
+			addEdit(new CompoundDropControlPoint(cp));
 		}
 		// remove the curve
 		addEdit(new AtomicRemoveCurve(start));

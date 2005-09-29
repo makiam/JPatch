@@ -160,22 +160,22 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		}
 	}
 	
-//	public static final class Deleted extends AtomicChangeControlPoint {	
-//		public Deleted(ControlPoint cp) {
-//			if (DEBUG)
-//				System.out.println(getClass().getName() + "(" + cp + ")");
-//			this.cp = cp;
-//			swap();
-//		}
-//		
-//		void swap() {
-//			cp.setDeleted(!cp.isDeleted());
-//		}
-//		
-//		public int sizeOf() {
-//			return 8 + 4;
-//		}
-//	}
+	public static final class Deleted extends AtomicChangeControlPoint {	
+		public Deleted(ControlPoint cp) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + cp + ")");
+			this.cp = cp;
+			swap();
+		}
+		
+		void swap() {
+			cp.setDeleted(!cp.isDeleted());
+		}
+		
+		public int sizeOf() {
+			return 8 + 4;
+		}
+	}
 	
 	public static final class HookPos extends AtomicChangeControlPoint {
 		private float fHookPos;

@@ -45,6 +45,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 	private JButton buttonRefresh = new JButton("refresh");
 	private JButton buttonSync = new JButton("sync");
 	private JTextField textLoop = new JTextField();
+	private JTextField textDeleted = new JTextField();
 	private JTextField textId = new JTextField();
 	private JTextField textHookPos = new JTextField();
 	
@@ -61,6 +62,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		 */
 		JPatchForm form = new JPatchForm();
 		form.addEntry("Controlpoint ID:", textId);
+		form.addEntry("deleted:", textDeleted);
 		form.addEntry("loop flag:", textLoop);
 		form.addEntry("next:", buttonNext);
 		form.addEntry("prev:", buttonPrev);
@@ -79,6 +81,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		 */
 		textId.setEditable(false);								
 		textLoop.setEditable(false);
+		textDeleted.setEditable(false);
 		textHookPos.setEditable(false);
 		
 		/*
@@ -86,6 +89,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		 */
 		textId.setHorizontalAlignment(JTextField.RIGHT);
 		textLoop.setHorizontalAlignment(JTextField.RIGHT);
+		textDeleted.setHorizontalAlignment(JTextField.RIGHT);
 		textHookPos.setHorizontalAlignment(JTextField.RIGHT);
 		
 		/*
@@ -154,6 +158,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		initButton(buttonChildHook, cp.getChildHook());
 		initButton(buttonParentHook, cp.getParentHook());
 		textLoop.setText(cp.getLoop() ? "true" : "false");
+		textDeleted.setText(cp.isDeleted() ? "true" : "false");
 		textId.setText(cp.toString());
 		textHookPos.setText(Float.toString(cp.getHookPos()));
 	}

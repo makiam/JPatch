@@ -115,11 +115,11 @@ public class Selection extends JPatchTreeLeaf implements Transformable {
 	}
 	
 	public boolean contains(Object object) {
-		return mapObjects.keySet().contains(object);
+		return mapObjects.containsKey(object);
 	}
 	
 	public boolean isSingle() {
-		return mapObjects.keySet().size() == 1;
+		return mapObjects.size() == 1;
 	}
 	
 	public boolean isActive() {
