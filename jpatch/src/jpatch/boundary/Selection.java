@@ -219,12 +219,16 @@ public class Selection extends JPatchTreeLeaf implements Transformable {
 	}
 
 	public void transform(Matrix3f m, Point3f pivot) {
+		Matrix3f identity = new Matrix3f();
 		Matrix3f matrix = new Matrix3f();
 		for (Iterator it = mapTransformables.keySet().iterator(); it.hasNext(); ) {
 			Transformable transformable = (Transformable) it.next();
 			float weight = ((Float) mapTransformables.get(transformable)).floatValue();
 			matrix.set(m);
 			matrix.mul(weight);
+			identity.setIdentity();
+			identity.mul(1 - weight);
+			matrix.add(identity);
 			transformable.transform(matrix, pivot);
 		}
 	}

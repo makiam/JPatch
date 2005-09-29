@@ -149,6 +149,7 @@ public class RotateHandle extends Handle {
 		
 		if (newAngle != angle) {
 			angle = newAngle;
+			
 			v3AxisA.set(v3Axis);
 			v3AxisA.normalize();
 			axisAngle.set(v3AxisA, angle / 360f * 2f * (float)Math.PI);
