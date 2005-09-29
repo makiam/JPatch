@@ -43,7 +43,7 @@ public class CompoundRemoveControlPoint extends JPatchCompoundEdit {
 		if (start.getLength() < 3) {
 			// YES
 			// remove entire curve
-			addEdit(new CompoundDropCurve(start, false));
+			addEdit(new CompoundDropCurve(start));
 			// return
 			return;
 		}

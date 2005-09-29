@@ -40,10 +40,12 @@ public final class AtomicRemoveControlPointFromSelections extends JPatchAtomicEd
 		this.cp = cp;
 		for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
 			Selection selection = (Selection) it.next();
-			if (selection.contains(cp))
-				mapSelections.put(selection, selection.getMap().get(cp));
+			Object weight = selection.getMap().get(cp);
+			if ((weight) != null) {
+				mapSelections.put(selection, weight);
+				selection.getMap().remove(cp);
+			}
 		}
-		redo();
 	}
 	
 	public void undo() {
