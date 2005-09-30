@@ -15,8 +15,8 @@ public class WeightSelectionMouseAdapter extends JPatchMouseAdapter {
 	private int iStartX;
 	private int iStartY;
 	
-	private int iEndX;
-	private int iEndY;
+	private int iEndX, iEndX1, iEndX2;
+	private int iEndY, iEndY1, iEndY2;
 	
 	private JPatchSettings settings = JPatchSettings.getInstance();
 
@@ -33,6 +33,13 @@ public class WeightSelectionMouseAdapter extends JPatchMouseAdapter {
 		drawLine(g2);
 		iEndX = eventX;
 		iEndY = eventY;
+		int dx = iEndX - iStartX;
+		int dy = iEndY - iStartY;
+		iEndX1 = iEndX + dy / 24;
+		iEndY1 = iEndY - dx / 24;
+		iEndX2 = iEndX - dy / 24;
+		iEndY2 = iEndY + dx / 24;
+		
 		drawLine(g2);
 	}
 	
@@ -73,16 +80,20 @@ public class WeightSelectionMouseAdapter extends JPatchMouseAdapter {
 	}
 	
 	private void drawLine(Graphics2D g2) {
-		final int N = 32;
-		g2.setXORMode(new Color(settings.cBackground.getRGB() ^ settings.cSelection.getRGB()));
-		//g2.setStroke(new BasicStroke(1.0f,BasicStroke.CAP_BUTT,BasicStroke.JOIN_BEVEL,0.0f,new float[] { 5.0f, 5.0f }, 0.0f));
+		final int N = 1;
+		g2.setXORMode(new Color(settings.cBackground.getRGB() ^ settings.cSelected.getRGB()));
+		int[] x = new int[4];
+		int[] y = new int[4];
 		for (int i = 0; i < N; i++) {
-			int x0 = iStartX + (iEndX - iStartX) * i / N;
-			int y0 = iStartY + (iEndY - iStartY) * i / N;
-			int x1 = iStartX + (iEndX - iStartX) * (i + 1) / N;
-			int y1 = iStartY + (iEndY - iStartY) * (i + 1) / N;
-			g2.drawLine(x0, y0, x1, y1);
-//			System.out.println(i + "\t" + x0 + "," + y0 + " " + x1 + "," + y1);
+			x[0] = iStartX + (iEndX1 - iStartX) * i / N;
+			y[0] = iStartY + (iEndY1 - iStartY) * i / N;
+			x[1] = iStartX + (iEndX1 - iStartX) * (i + 1) / N;
+			y[1] = iStartY + (iEndY1 - iStartY) * (i + 1) / N;
+			x[3] = iStartX + (iEndX2 - iStartX) * i / N;
+			y[3] = iStartY + (iEndY2 - iStartY) * i / N;
+			x[2] = iStartX + (iEndX2 - iStartX) * (i + 1) / N;
+			y[2] = iStartY + (iEndY2 - iStartY) * (i + 1) / N;
+			g2.fillPolygon(x, y , 4);
 		}
 	}
 //	public Selection getSelection(ViewDefinition viewDefinition) {
