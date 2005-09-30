@@ -26,11 +26,14 @@ public class RotateHandleS extends RotateHandle {
 		Point3f p3 = new Point3f();
 		p3.set(p3Position);
 		p3.scale(rotateTool.getRadius(viewDef.getScreenMatrix().getScale()));
+		
+		m3.rotZ(-rotateTool.getAlpha());
+		m3.transform(p3);
+		
 		viewDef.getScreenMatrix().get(m3);
 		m3.invert();
 		m3.transform(p3);
-		m3.rotZ(-rotateTool.getAlpha());
-		m3.transform(p3);
+		
 		p3.add(rotateTool.getPivot());
 		return p3;
 	}
@@ -212,6 +215,9 @@ public class RotateHandleS extends RotateHandle {
 		
 		Vector3f V = new Vector3f();
 		Vector3f P = new Vector3f(p3Position);
+		m3.rotZ(-rotateTool.getBeta());
+		m3.transform(P);
+		
 		Vector3f A = new Vector3f(0,0,-1);
 		//rotateTool.getRotA().transform(P);
 		//rotateTool.getRot().transform(A);
