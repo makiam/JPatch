@@ -47,7 +47,7 @@ public class Morph extends JPatchTreeLeaf {
 			}
 			public void translate(Vector3f v) { }
 			public void rotate(Quat4f q, Point3f pivot) {
-				Quat4f identity = new Quat4f(1, 0, 0, 0);
+				Quat4f identity = new Quat4f(0, 0, 0, 1);
 				Quat4f quat = new Quat4f();
 				Matrix3f rot = new Matrix3f();
 				for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
