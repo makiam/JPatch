@@ -62,6 +62,7 @@ public class Morph extends JPatchTreeLeaf {
 				}
 			}
 			public void transform(Matrix3f m, Point3f pivot) {
+				Matrix3f identity = new Matrix3f();
 				Matrix3f matrix = new Matrix3f();
 				for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
 					Object key = it.next();
@@ -70,6 +71,9 @@ public class Morph extends JPatchTreeLeaf {
 					float weight = ((Float) selectedPoints.get(key)).floatValue();
 					matrix.set(m);
 					matrix.mul(weight);
+					identity.setIdentity();
+					identity.mul(1 - weight);
+					matrix.add(identity);
 					matrix.transform(v);
 				}
 			}

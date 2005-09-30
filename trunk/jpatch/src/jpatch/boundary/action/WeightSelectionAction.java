@@ -13,8 +13,9 @@ public final class WeightSelectionAction extends AbstractAction {
 	 */
 	private static final long serialVersionUID = 1L;
 	public WeightSelectionAction() {
-		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/magnet.png")));
+		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/weight.png")));
 		//putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("set weight"));
+		putValue(Action.SHORT_DESCRIPTION, "add weight to selection");
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
