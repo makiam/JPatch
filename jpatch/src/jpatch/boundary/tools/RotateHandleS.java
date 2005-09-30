@@ -25,8 +25,8 @@ public class RotateHandleS extends RotateHandle {
 	public Point3f getPosition(ViewDefinition viewDef) {
 		Point3f p3 = new Point3f();
 		p3.set(p3Position);
-		p3.scale(rotateTool.getRadius(viewDef.getMatrix().getScale()));
-		viewDef.getMatrix().get(m3);
+		p3.scale(rotateTool.getRadius(viewDef.getScreenMatrix().getScale()));
+		viewDef.getScreenMatrix().get(m3);
 		m3.invert();
 		m3.transform(p3);
 		m3.rotZ(-rotateTool.getAlpha());
@@ -58,13 +58,16 @@ public class RotateHandleS extends RotateHandle {
 		Matrix3f m3 = new Matrix3f();
 		viewDef.getMatrix().get(m3);
 		m3.invert();
-		m4Transform.setIdentity();
-		m4Transform.setRotationScale(m3);
+		
 		Matrix4f mm4 = new Matrix4f();
 		mm4.setIdentity();
 		Matrix3f mm3 = new Matrix3f();
 		mm3.rotZ(-rotateTool.getAlpha());
+//	System.out.println(rotateTool.getAlpha());
+		m3.mul(mm3);
 		mm4.setRotationScale(mm3);
+		m4Transform.setIdentity();
+		m4Transform.setRotationScale(m3);
 //		m4Transform.mul(mm4);
 		m4Transform.setScale(fSize / viewDef.getMatrix().getScale());
 //		p3.set(p3Position);
@@ -209,10 +212,11 @@ public class RotateHandleS extends RotateHandle {
 		
 		Vector3f V = new Vector3f();
 		Vector3f P = new Vector3f(p3Position);
-		Vector3f A = new Vector3f(0,0,1);
+		Vector3f A = new Vector3f(0,0,-1);
 		//rotateTool.getRotA().transform(P);
 		//rotateTool.getRot().transform(A);
-		
+		//rotateTool.getInitialRotation().transform(P);
+		//rotateTool.getInitialRotation().transform(A);
 		V.cross(A, P);
 		
 		//m4.transform(V);
@@ -226,7 +230,7 @@ public class RotateHandleS extends RotateHandle {
 		m3Helper.set(new AxisAngle4f(v3Helper,rotateTool.getBeta()));
 		m3Helper.transform(M);
 		
-		float l = M.length() / m4.getScale() / rotateTool.getRadius(scale) * 180 / (float)Math.PI;
+		float l = -M.length() / m4.getScale() / rotateTool.getRadius(scale) * 180 / (float)Math.PI;
 		M.normalize();
 		//System.out.println("r = " + rotateTool.getRadius() + "s = " + m4View.getScale());
 		//System.out.println("V = " + V + " M = " + M);
@@ -241,15 +245,15 @@ public class RotateHandleS extends RotateHandle {
 			angle = newAngle;
 			rotateTool.setAlpha(rotateTool.getBeta() + angle / 180f * (float)Math.PI);
 			v3AxisA.set(v3Axis);
-			m3.set(rotateTool.getRot());
+			m3.set(rotateTool.getInitialRotation());
 			m3.invert();
 			m3.transform(v3AxisA);
 			v3AxisA.normalize();
-			axisAngle.set(v3AxisA, angle / 180f * (float)Math.PI);
+			axisAngle.set(v3Axis, angle / 180f * (float)Math.PI);
 			//System.out.println(v3AxisA);
 			m3.set(axisAngle);
-			rotateTool.getRotA().set(rotateTool.getRot());
-			rotateTool.getRotA().mul(m3);
+			//rotateTool.getRotation().set(rotateTool.getInitialRotation());
+			rotateTool.getRotation().set(m3);
 			if (!mouseEvent.isControlDown()) rotateTool.rotate();
 			MainFrame.getInstance().getJPatchScreen().single_update((Component)mouseEvent.getSource());
 		}

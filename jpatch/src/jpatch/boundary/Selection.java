@@ -207,7 +207,7 @@ public class Selection extends JPatchTreeLeaf implements Transformable {
 	}
 
 	public void rotate(Quat4f q, Point3f pivot) {
-		Quat4f identity = new Quat4f(1, 0, 0, 0);
+		Quat4f identity = new Quat4f(0, 0, 0, 1);
 		Quat4f quat = new Quat4f();
 		for (Iterator it = mapTransformables.keySet().iterator(); it.hasNext(); ) {
 			Transformable transformable = (Transformable) it.next();
