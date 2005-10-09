@@ -3,7 +3,6 @@ package jpatch.entity;
 import java.util.*;
 import javax.vecmath.*;
 
-import jpatch.auxilary.*;
 import jpatch.boundary.*;
 import jpatch.control.edit.*;
 
@@ -46,18 +45,20 @@ public class Morph extends JPatchTreeLeaf {
 				}
 			}
 			public void translate(Vector3f v) { }
-			public void rotate(Quat4f q, Point3f pivot) {
-				Quat4f identity = new Quat4f(0, 0, 0, 1);
-				Quat4f quat = new Quat4f();
+			public void rotate(AxisAngle4f a, Point3f pivot) {
+//				Quat4f identity = new Quat4f(0, 0, 0, 1);
+//				Quat4f quat = new Quat4f();
+				AxisAngle4f aa = new AxisAngle4f(a);
 				Matrix3f rot = new Matrix3f();
 				for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
 					Object key = it.next();
 					Vector3f v = (Vector3f) changeMap.get(key);
 					v.set((Vector3f) mapMorph.get(key));
 					float weight = ((Float) selectedPoints.get(key)).floatValue();
-					quat.set(q);
-					quat.interpolate(identity, 1.0 - weight);
-					rot.set(quat);
+					aa.angle = a.angle * weight;
+//					quat.set(q);
+//					quat.interpolate(identity, 1.0 - weight);
+					rot.set(aa);
 					rot.transform(v);
 				}
 			}
@@ -79,6 +80,9 @@ public class Morph extends JPatchTreeLeaf {
 			}
 			public JPatchUndoableEdit endTransform() {
 				return new AtomicChangeMorphVectors(Morph.this, changeMap);
+			}
+			public Point3f getPosition() {
+				throw new UnsupportedOperationException();
 			}
 		};
 	}

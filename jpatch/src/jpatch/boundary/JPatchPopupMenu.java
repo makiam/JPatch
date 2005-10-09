@@ -2,7 +2,6 @@ package jpatch.boundary;
 
 import javax.swing.*;
 import jpatch.boundary.action.*;
-import jpatch.entity.*;
 
 public class JPatchPopupMenu extends JPopupMenu {
 	/**
@@ -141,7 +140,7 @@ public class JPatchPopupMenu extends JPopupMenu {
 			miRemoveStubs.setEnabled(false);
 //			miConvertToCp.setEnabled(false);
 		} else {
-			Selection selection = MainFrame.getInstance().getSelection();
+//			Selection selection = MainFrame.getInstance().getSelection();
 //			miConvertToCp.setEnabled(selection.isSingle() && (selection.getHotObject() instanceof ControlPoint) && ((ControlPoint) selection.getHotObject()).isHook());
 			if (MainFrame.getInstance().getSelection().getDirection() != 0 && !MainFrame.getInstance().getSelection().isSingle())
 				miNextCurve.setEnabled(false);

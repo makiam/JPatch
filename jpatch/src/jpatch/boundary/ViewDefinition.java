@@ -37,7 +37,7 @@ implements ComponentListener {
 	private ControlPoint cpTangentHandles = null;
 	//private Matrix4f m4Screen = new Matrix4f();
 	private Vector4f v4Screen = new Vector4f();
-	private Vector4f v4ScreenOffset = new Vector4f();
+//	private Vector4f v4ScreenOffset = new Vector4f();
 	private Matrix4f m4View = new Matrix4f();
 	private RealtimeLighting lighting;
 	
@@ -341,16 +341,16 @@ implements ComponentListener {
 		//m4View.mul(m);
 		//m4View.setScale(fScale);
 		float width = getWidth();
-		float height = getHeight();
+//		float height = getHeight();
 		//if (viewport != null) {
 			//float fWidth = viewport.getWidth();
 			//float fHeight = viewport.getHeight();
 			//fMin = (fWidth < fHeight) ? fWidth : fHeight;
-			float fMin = width;
+//			float fMin = width;
 			//m4Screen = new Matrix4f(m4View);
 			//Matrix4f m4 = new Matrix4f();
 			
-			m4View.mul(fMin/2);
+			m4View.mul(width / 2);
 			m4View.setRow(3,0,0,0,1);
 			
 			m4View.getColumn(3,v4Screen);
@@ -480,6 +480,69 @@ implements ComponentListener {
 		return p3;
 	}
 	
+	public Bone getClosestBone(Point2D.Float target) {
+		Matrix4f m4Screen = getScreenMatrix();
+		Point3f p3 = new Point3f();
+		Line2D.Float line = new Line2D.Float();
+		float fMinDistance = 64;
+		float fDistance;
+		Bone closest = null;
+		for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {
+			Bone bone = (Bone) it.next();
+			bone.getStart(p3);
+			m4Screen.transform(p3);
+			line.x1 = p3.x;
+			line.y1 = p3.y;
+			bone.getEnd(p3);
+			m4Screen.transform(p3);
+			line.x2 = p3.x;
+			line.y2 = p3.y;
+			fDistance = (float) line.ptLineDistSq(target);
+			if (fDistance <= fMinDistance) {
+				fMinDistance = fDistance;
+				closest = bone;
+			}
+		}
+		return closest;
+	}
+	
+	public Bone.BoneTransformable getClosestBoneEnd(Point2D.Float target, Bone.BoneTransformable except, boolean includeStarts, boolean includeEnds) {
+		Matrix4f m4Screen = getScreenMatrix();
+		Point3f p3 = new Point3f();
+		Point2D.Float p2 = new Point2D.Float();
+		float fMinDistance = 64;
+		float fDistance;
+		Model model = MainFrame.getInstance().getModel();
+		Bone.BoneTransformable closest = null;
+		for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
+			Bone bone = (Bone) it.next();
+			Bone.BoneTransformable bt;
+			if (includeEnds) {
+				bt = bone.getBoneEnd();
+				p3.set(bt.getPosition());
+				m4Screen.transform(p3);
+				p2.setLocation(p3.x,p3.y);
+				fDistance = (float) p2.distanceSq(target);
+				if (fDistance <= fMinDistance && bt != except) {
+					fMinDistance = fDistance;
+					closest = bt;
+				}
+			}
+			if (includeStarts && bone.getParentBone() == null) {
+				bt = bone.getBoneStart();
+				p3.set(bt.getPosition());
+				m4Screen.transform(p3);
+				p2.setLocation(p3.x,p3.y);
+				fDistance = (float)p2.distanceSq(target);
+				if (fDistance <= fMinDistance && bt != except) {
+					fMinDistance = fDistance;
+					closest = bt;
+				}
+			}
+		}
+		return closest;
+	}
+	
 	public final ControlPoint getClosestControlPoint(Point2D.Float target, ControlPoint except) {
 		return getClosestControlPoint(target, except, null);
 	}
@@ -575,6 +638,7 @@ implements ComponentListener {
 		}
 		return cpClosest;
 	}
+	
 	
 	/*
 	public final void setZ(Point3f point) {

@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.7 2005/09/20 16:17:54 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.8 2005/10/09 07:41:30 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -36,7 +36,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.7 $
+ * @version    $Revision: 1.8 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -183,11 +183,11 @@ public class ControlPoint implements Comparable, Transformable {
 		invalidateTangents();
 	}
 	
-	public void rotate(Quat4f q, Point3f pivot) {
+	public void rotate(AxisAngle4f a, Point3f pivot) {
 		p3Position.set(p3BackupPosition);
 		p3Position.sub(pivot);
 		Matrix3f rot = new Matrix3f();
-		rot.set(q);
+		rot.set(a);
 		rot.transform(p3Position);
 		p3Position.add(pivot);
 		invalidateTangents();

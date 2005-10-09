@@ -31,7 +31,9 @@ public class RotateHandle extends Handle {
 		p3.scale(rotateTool.getRadius(viewDef.getScreenMatrix().getScale()));
 		//p3.scale(radius);
 		rotateTool.getInitialRotation().transform(p3);
-		rotateTool.getRotation().transform(p3);
+		Matrix3f m = new Matrix3f();
+		m.set(rotateTool.getRotation());
+		m.transform(p3);
 		
 		p3.add(rotateTool.getPivot());
 		return p3;
@@ -162,11 +164,11 @@ public class RotateHandle extends Handle {
 			
 			//v3AxisA.set(v3Axis);
 			//v3AxisA.normalize();
-			axisAngle.set(A, angle / 360f * 2f * (float)Math.PI);
-			m3.set(axisAngle);
+			rotateTool.getRotation().set(A, angle / 360f * 2f * (float)Math.PI);
+			//m3.set(axisAngle);
 			//rotateTool.getRotation().set(rotateTool.getInitialRotation());
 			//rotateTool.getRotation().mul(m3);
-			rotateTool.getRotation().set(m3);
+			//rotateTool.getRotation().set(m3);
 			if (!mouseEvent.isControlDown()) rotateTool.rotate();
 			MainFrame.getInstance().getJPatchScreen().single_update(viewDef.getDrawable().getComponent());
 		}

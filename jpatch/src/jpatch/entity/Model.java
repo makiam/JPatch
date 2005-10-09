@@ -20,6 +20,7 @@ public class Model extends JPatchTreeNode {
 	 *  Description of the Field
 	 */
 	private HashSet setCurves = new HashSet();
+	private HashSet setBones = new HashSet();
 	private HashMap mapPatches = new HashMap();
 
 	private JPatchTreeNode treenodeSelections;
@@ -34,7 +35,7 @@ public class Model extends JPatchTreeNode {
 	private List lstMaterials = new ArrayList();
 	private List lstSelections = new ArrayList();
 	private List lstMorphs = new ArrayList();
-	private List lstBoneShapes = new ArrayList();
+//	private List lstBoneShapes = new ArrayList();
 	private HashMap mapPhonemes = new HashMap();
 	
 	private Rotoscope[] aRotoscope = new Rotoscope[6];
@@ -50,6 +51,13 @@ public class Model extends JPatchTreeNode {
 		JPatchMaterial material = new JPatchMaterial(new Color3f(1,1,1));
 		material.setName("Default Material");
 		addMaterial(material);
+		
+//		addBone(new Bone(this, new Point3f(0, 0, 0), new Vector3f(1, 0, 0)));
+//		addBone(new Bone(this, new Point3f(1, 0, 0), new Vector3f(1, 0, 0)));
+//		addBone(new Bone(this, new Point3f(2, 0, 0), new Vector3f(1, 0, 0)));
+//		addBone(new Bone(this, new Point3f(3, 0, 0), new Vector3f(1, 0, 0)));
+//		addBone(new Bone(this, new Point3f(4, 0, 0), new Vector3f(1, 0, 0)));
+//		addBone(new Bone(this, new Point3f(5, 0, 0), new Vector3f(1, 0, 0)));
 	}
 	
 	public void setRotoscope(int view, Rotoscope rotoscope) {
@@ -284,9 +292,9 @@ public class Model extends JPatchTreeNode {
 		return lstMorphs;
 	}
 	
-	public List getBoneShapeList() {
-		return lstBoneShapes;
-	}
+//	public List getBoneShapeList() {
+//		return lstBoneShapes;
+//	}
 	
 	public void removeSelection(Selection selection) {
 		treenodeSelections.remove(selection);
@@ -336,6 +344,16 @@ public class Model extends JPatchTreeNode {
 		setCurves.remove(start);
 	}
 
+	public void addBone(Bone bone) {
+		setBones.add(bone);
+		if (bone.getParentBone() == null)
+			treenodeBones.add(bone);
+	}
+
+	public void removeBone(Bone bone) {
+		setBones.remove(bone);
+	}
+	
 	/**
 	 *  Adds a feature to the Patch attribute of the Model object
 	 *
@@ -883,6 +901,11 @@ public class Model extends JPatchTreeNode {
 		return mapPatches.keySet();
 	}
 	
+	public Set getBoneSet() {
+		return setBones;
+	}
+	
+	
 	public void dump() {
 		System.out.println("------------- curves -------------");
 		System.out.println("\tcp\tnext\tprev\tloop\tna\tpa\tphook\tchook\thpos\tposition\n");
@@ -921,6 +944,12 @@ public class Model extends JPatchTreeNode {
 		System.out.println("\n\n----------- morphs -------------");
 		for (Iterator it = lstMorphs.iterator(); it.hasNext(); ) {
 			((Morph) it.next()).dump();
+		}
+		
+		System.out.println("\n\n----------- bones -------------");
+		for (Iterator it = setBones.iterator(); it.hasNext(); ) {
+			Bone bone = (Bone) it.next();
+			System.out.println(bone + " \t" + bone.getParentBone());
 		}
 		
 		System.out.println("\n\n----------- end -------------");

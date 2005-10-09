@@ -362,6 +362,7 @@ public final class JPatchScreen extends JPanel {
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 			aDrawable[i].getComponent().addMouseListener(mouseAdapter);
 		}
+		MainFrame.getInstance().getDefaultToolTimer().stop();
 	}
 	
 	public void setTool(JPatchTool tool) {

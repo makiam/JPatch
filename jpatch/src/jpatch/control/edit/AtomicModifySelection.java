@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicModifySelection.java,v 1.5 2005/09/26 15:07:42 sascha_l Exp $
+ * $Id: AtomicModifySelection.java,v 1.6 2005/10/09 07:41:30 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -142,6 +142,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 				System.out.println(getClass().getName() + "(" + selection + ", " + hot + ")");
 			this.selection = selection;
 			this.hot = hot;
+			swap();
 		}
 		
 		private void swap() {
@@ -170,6 +171,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 				System.out.println(getClass().getName() + "(" + selection + ", " + orientation + ")");
 			this.selection = selection;
 			m3Orient.set(orientation);
+			swap();
 		}
 		
 		private void swap() {

@@ -22,7 +22,7 @@ public final class AutoMirrorAction extends AbstractAction {
 			//MainFrame.getInstance().setSelection(newPs);
 			JPatchActionEdit edit = new JPatchActionEdit("auto mirror");
 			edit.addEdit(new CompoundExtandSelection(selection));
-			edit.addEdit(new AutoMirrorEdit(selection));
+			edit.addEdit(new CompoundAutoMirror(selection));
 			if (edit.size() > 0) {
 				MainFrame.getInstance().getUndoManager().addEdit(edit);
 			}

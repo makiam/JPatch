@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.24 2005/09/29 19:50:41 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.25 2005/10/09 07:41:30 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -25,10 +25,10 @@ import java.util.*;
 
 import javax.vecmath.*;
 
-import jpatch.auxilary.Bezier;
-import jpatch.auxilary.Functions;
+import jpatch.auxilary.*;
 import jpatch.boundary.tools.*;
 import jpatch.entity.*;
+import jpatch.entity.Bone.BoneTransformable;
 
 /**
  * @author sascha
@@ -73,6 +73,7 @@ public class Viewport2 {
 	private static Vector3f v3c = new Vector3f();
 	
 	private Grid grid = new Grid();
+	private BoneRenderer boneRenderer = new BoneRenderer();
 	
 	private float fMinZ, fDeltaZ;
 	private Color3f c3Background = new Color3f(settings.cBackground);
@@ -188,6 +189,14 @@ public class Viewport2 {
 	
 	private Color3f solidColor = new Color3f();
 	private Color4f solidColor4 = new Color4f();
+	
+	private void drawBones(Model model) {
+		for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
+			Bone bone = (Bone) it.next();
+			boneRenderer.drawBone(drawable, viewDef, bone);
+		}
+	}
+	
 	public void drawModel(Model model) {
 		
 		/*
@@ -497,6 +506,13 @@ public class Viewport2 {
 		}
 		if (selection != null)
 			drawSelection(selection);
+		
+		drawable.setGhostRenderingEnabled(true);
+		drawBones(model);
+		drawable.setGhostRenderingEnabled(false);
+		if (drawable instanceof JPatchDrawableGL)
+			drawBones(model);
+		
 		if (drawable.isLightingSupported())
 			drawable.setLightingEnabled(false);
 	}
@@ -524,39 +540,44 @@ public class Viewport2 {
 	}
 	
 	private void drawSelection(Selection selection) {
-		Object hot = selection.getHotObject();
-		ControlPoint cp = null;
-		if (hot instanceof ControlPoint) {
-			cp = (ControlPoint) hot;
-			Point3f p = new Point3f(cp.getPosition());
-			m4View.transform(p);
-			drawable.setColor(new Color3f(settings.cHot)); // FIXME
-			drawable.setPointSize(5);
-			drawable.drawPoint(p);
-			int direction = selection.getDirection();
-			if (direction == 1 && cp.getNext() != null) {
-				Point3f p3A = new Point3f(cp.getPosition());
-				Point3f p3B = new Point3f(cp.getOutTangent());
-				Point3f p3C = new Point3f(cp.getNext().getInTangent());
-				Point3f p3D = new Point3f(cp.getNext().getPosition());
-				m4View.transform(p3A);
-				m4View.transform(p3B);
-				m4View.transform(p3C);
-				m4View.transform(p3D);
-	//				drawable.setColor(new Color3f(settings.cSelected)); // FIXME
-				drawCurveSegment(p3A,p3B,p3C,p3D, false, 0, new Color3f(settings.cSelected)); // FIXME
-			} else if (direction == -1 && cp.getPrev() != null) {
-				Point3f p3A = new Point3f(cp.getPrev().getPosition());
-				Point3f p3B = new Point3f(cp.getPrev().getOutTangent());
-				Point3f p3C = new Point3f(cp.getInTangent());
-				Point3f p3D = new Point3f(cp.getPosition());
-				m4View.transform(p3A);
-				m4View.transform(p3B);
-				m4View.transform(p3C);
-				m4View.transform(p3D);
-	//				drawable.setColor(new Color3f(settings.cSelected)); // FIXME
-				drawCurveSegment(p3A,p3B,p3C,p3D, false, 0, new Color3f(settings.cSelected)); // FIXME
-			}
+//		System.out.println(selection.getHotObject());
+		if (selection.getHotObject() == null)
+			return;
+		Transformable transformable = (Transformable) selection.getHotObject();
+//		ControlPoint cp = null;
+//		if (hot instanceof ControlPoint) {
+//			cp = (ControlPoint) hot;
+		Point3f p = new Point3f(transformable.getPosition());
+		m4View.transform(p);
+		drawable.setColor(new Color3f(settings.cHot)); // FIXME
+		drawable.setPointSize(5);
+		drawable.drawPoint(p);
+		int direction = selection.getDirection();
+		if (direction == 0)
+			return;
+		ControlPoint cp = (ControlPoint) transformable;
+		if (direction == 1 && cp.getNext() != null) {
+			Point3f p3A = new Point3f(cp.getPosition());
+			Point3f p3B = new Point3f(cp.getOutTangent());
+			Point3f p3C = new Point3f(cp.getNext().getInTangent());
+			Point3f p3D = new Point3f(cp.getNext().getPosition());
+			m4View.transform(p3A);
+			m4View.transform(p3B);
+			m4View.transform(p3C);
+			m4View.transform(p3D);
+//				drawable.setColor(new Color3f(settings.cSelected)); // FIXME
+			drawCurveSegment(p3A,p3B,p3C,p3D, false, 0, new Color3f(settings.cSelected)); // FIXME
+		} else if (direction == -1 && cp.getPrev() != null) {
+			Point3f p3A = new Point3f(cp.getPrev().getPosition());
+			Point3f p3B = new Point3f(cp.getPrev().getOutTangent());
+			Point3f p3C = new Point3f(cp.getInTangent());
+			Point3f p3D = new Point3f(cp.getPosition());
+			m4View.transform(p3A);
+			m4View.transform(p3B);
+			m4View.transform(p3C);
+			m4View.transform(p3D);
+//				drawable.setColor(new Color3f(settings.cSelected)); // FIXME
+			drawCurveSegment(p3A,p3B,p3C,p3D, false, 0, new Color3f(settings.cSelected)); // FIXME
 		}
 	}
 	
@@ -894,11 +915,11 @@ public class Viewport2 {
 				
 				Point3f Center = Functions.average(P,Q,R,S,T);
 				
-				Vector3f vc = Functions.vector(V, Center);
-				Vector3f wc = Functions.vector(W, Center);
-				Vector3f xc = Functions.vector(X, Center);
-				Vector3f yc = Functions.vector(Y, Center);
-				Vector3f zc = Functions.vector(Z, Center);
+//				Vector3f vc = Functions.vector(V, Center);
+//				Vector3f wc = Functions.vector(W, Center);
+//				Vector3f xc = Functions.vector(X, Center);
+//				Vector3f yc = Functions.vector(Y, Center);
+//				Vector3f zc = Functions.vector(Z, Center);
 				
 				Point3f[][] aap3Boundary = new Point3f[5][7];
 				
@@ -3849,5 +3870,158 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 		p2.set((p1.x + pn0.x) * 0.5f, (p1.y + pn0.y) * 0.5f, (p1.z + pn0.z) * 0.5f);
 		p3.set((p2.x + pn1.x) * 0.5f, (p2.y + pn1.y) * 0.5f, (p2.z + pn1.z) * 0.5f);
 		pn0.set(p3);
+	}
+	
+	private static class BoneRenderer {
+		static final float R = 0.05f;
+		static final float A = 0.2f;
+		static final float B = A - 1;
+		static final int[] LINES = new int[] {
+				0, 1,
+				0, 2,
+				0, 3,
+				0, 4,
+				5, 1,
+				5, 2,
+				5, 3,
+				5, 4,
+				1, 2,
+				2, 3,
+				3, 4,
+				4, 1
+		};
+		static final int[] TRIANGLES = new int[] {
+//				0,1,2,
+//				0,2,3,
+//				0,3,4,
+//				0,4,1,
+//				5,2,1,
+//				5,3,2,
+//				5,4,3,
+//				5,1,4
+				2, 1, 0,
+				3, 2, 0,
+				4, 3, 0,
+				1, 4, 0,
+				1, 2, 5,
+				2, 3, 5,
+				3, 4, 5,
+				4, 1, 5
+		};
+		static final int[] NORMAL_INDICES = new int[] {
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7
+		};
+		final MaterialProperties mp = new MaterialProperties();
+		final Point3f[] ap3Points = new Point3f[6];
+		final Vector3f[] av3Normals = new Vector3f[8];
+		final Point3f p3Start = new Point3f();
+		final Vector3f v3Extent = new Vector3f();
+		final Color3f c3Selected = new Color3f(JPatchSettings.getInstance().cSelected);
+		final Color3f c3FreeEnd = new Color3f(JPatchSettings.getInstance().cPoint);
+		final Color3f c3AttachedEnd = new Color3f(JPatchSettings.getInstance().cHeadPoint);
+		public BoneRenderer() {
+			for (int i = 0; i < 6; ap3Points[i++] = new Point3f());
+			for (int i = 0; i < 8; av3Normals[i++] = new Vector3f());
+		}
+		
+		private void reset() {
+			ap3Points[0].set( 0, 0, 0);
+			ap3Points[1].set(-R, A,-R);
+			ap3Points[2].set( R, A,-R);
+			ap3Points[3].set( R, A, R);
+			ap3Points[4].set(-R, A, R);
+			ap3Points[5].set( 0, 1, 0);
+			av3Normals[0].set( 0,-R,-A);
+			av3Normals[1].set( A,-R, 0);
+			av3Normals[2].set( 0,-R, A);
+			av3Normals[3].set(-A,-R, 0);
+			av3Normals[4].set( 0, R, B);
+			av3Normals[5].set(-B, R, 0);
+			av3Normals[6].set( 0, R,-B);
+			av3Normals[7].set( B, R, 0);
+//			av3Normals[0].set( 0, R, A);
+//			av3Normals[1].set(-A, R, 0);
+//			av3Normals[2].set( 0, R,-A);
+//			av3Normals[3].set( A, R, 0);
+//			av3Normals[4].set( 0,-R,-B);
+//			av3Normals[5].set( B,-R, 0);
+//			av3Normals[6].set( 0,-R, B);
+//			av3Normals[7].set(-B,-R, 0);
+		}
+		
+		public void drawBone(JPatchDrawable2 drawable, ViewDefinition viewDef, Bone bone) {
+//			System.out.println("drawBone bone=" + bone);
+			reset();
+			bone.getStart(p3Start);
+			bone.setExtent();
+			v3Extent.set(bone.getExtent());
+			float length = v3Extent.length();
+			v3Extent.scale(1f / length);
+			Vector3f v3X = Utils3D.perpendicularVector(v3Extent);
+			Vector3f v3Z = new Vector3f();
+			v3Z.cross(v3X, v3Extent);
+			Matrix4f matrix = new Matrix4f(
+					v3X.x * length, v3Extent.x * length, v3Z.x * length, p3Start.x,
+					v3X.y * length, v3Extent.y * length, v3Z.y * length, p3Start.y,
+					v3X.z * length, v3Extent.z * length, v3Z.z * length, p3Start.z,
+					0f,    0f,    0f,   1f
+			);
+			Matrix4f m = new Matrix4f(viewDef.getMatrix());
+			m.mul(matrix);
+			for (int i = 0; i < ap3Points.length; i++)
+				m.transform(ap3Points[i]);
+			for (int i = 0; i < av3Normals.length; i++) {
+				m.transform(av3Normals[i]);
+				av3Normals[i].normalize();
+			}
+			if (drawable.isShadingSupported()) {
+				Color3f color = bone.getColor();
+				mp.red = color.x;
+				mp.green = color.y;
+				mp.blue = color.z;
+				if (drawable.isLightingSupported()) {
+					drawable.setLightingEnabled(true);
+					drawable.setMaterial(mp);
+					for (int i = 0, t = 0; i < NORMAL_INDICES.length; i++) {
+						drawable.drawTriangle(
+								ap3Points[TRIANGLES[t++]], av3Normals[NORMAL_INDICES[i]],
+								ap3Points[TRIANGLES[t++]], av3Normals[NORMAL_INDICES[i]],
+								ap3Points[TRIANGLES[t++]], av3Normals[NORMAL_INDICES[i]]
+						);
+					}
+					drawable.setLightingEnabled(false);
+				} else {
+					Color3f c = new Color3f();
+					for (int i = 0, t = 0; i < NORMAL_INDICES.length; i++) {	
+						viewDef.getLighting().shade(ap3Points[TRIANGLES[t]], av3Normals[NORMAL_INDICES[i]], mp, c);
+						drawable.setColor(c);
+						drawable.drawTriangle(ap3Points[TRIANGLES[t++]], ap3Points[TRIANGLES[t++]], ap3Points[TRIANGLES[t++]]);
+					}
+				}
+			} else {
+				drawable.setColor(bone.getColor());
+				for (int i = 0; i < LINES.length; )
+					drawable.drawLine(ap3Points[LINES[i++]], ap3Points[LINES[i++]]);
+			}
+//			if (bone.getParentBone() == null) {
+//				drawable.setColor(c3FreeEnd);
+//				drawable.drawPoint(ap3Points[0]);
+//			}
+			drawable.setPointSize(3);
+			Selection selection = MainFrame.getInstance().getSelection();
+			drawable.setColor(selection != null && selection.contains(bone.getBoneEnd()) ? c3Selected : (bone.getChildCount() == 0) ? c3FreeEnd: c3AttachedEnd);
+			drawable.drawPoint(ap3Points[5]);
+			if (bone.getParent() != null && selection != null && selection.contains(bone.getBoneStart())) {
+				drawable.setColor(c3Selected);
+				drawable.drawPoint(ap3Points[0]);
+			}
+		}
 	}
 }

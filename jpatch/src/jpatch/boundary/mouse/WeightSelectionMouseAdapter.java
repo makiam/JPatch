@@ -59,22 +59,19 @@ public class WeightSelectionMouseAdapter extends JPatchMouseAdapter {
 		//boolean x = Math.abs(dx) > Math.abs(dy);
 		//System.out.println(x + " " + dx + " " + dy);
 		for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
-			Object object = it.next();
-			if (object instanceof ControlPoint) {
-				ControlPoint cp = (ControlPoint) object;
-				p.set(cp.getPosition());
-				viewDef.getScreenMatrix().transform(p);
-				p.x -= iStartX;
-				p.y -= iStartY;
-				//System.out.println(p);
-				if (x) {
-					w = (p.x + p.y * (dy/dx)) / dx;
-				} else
-					w = (p.y + p.x * (dx/dy)) / dy;
-				w = (w < 0) ? 0 : (w > 1) ? 1 : w;
-				selection.getMap().put(cp, new Float(w));
-				System.out.println(w);
-			}
+			Transformable transformable = (Transformable) it.next();
+			p.set(((Transformable) transformable).getPosition());
+			viewDef.getScreenMatrix().transform(p);
+			p.x -= iStartX;
+			p.y -= iStartY;
+			//System.out.println(p);
+			if (x) {
+				w = (p.x + p.y * (dy/dx)) / dx;
+			} else
+				w = (p.y + p.x * (dx/dy)) / dy;
+			w = (w < 0) ? 0 : (w > 1) ? 1 : w;
+			selection.getMap().put(transformable, new Float(w));
+//			System.out.println(w);
 		}
 		MainFrame.getInstance().getJPatchScreen().update_all();
 	}

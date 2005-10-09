@@ -1,5 +1,5 @@
 /*
- * $Id: AddPointsToMorphEdit.java,v 1.3 2005/10/09 07:41:30 sascha_l Exp $
+ * $Id: AtomicAttachBone.java,v 1.1 2005/10/09 07:43:06 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -19,46 +19,38 @@
  * along with JPatch; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 package jpatch.control.edit;
 
-import java.util.*;
+import javax.vecmath.*;
 import jpatch.entity.*;
 
 /**
  * @author sascha
  *
  */
-public class AddPointsToMorphEdit extends JPatchAtomicEdit {
+public class AtomicAttachBone extends JPatchAtomicEdit implements JPatchRootEdit {
+	private Bone boneChild;
+	private Bone boneParent;
 	
-	private Morph morph;
-	private Map map;
-
-	public AddPointsToMorphEdit(Morph morph, Map map) {
-		this.morph = morph;
-		this.map = map;
+	public AtomicAttachBone(Bone child, Bone parent) {
+		boneChild = child;
+		boneParent = parent;
 		redo();
 	}
 	
-	public void redo() {
-		morph.getMorphMap().putAll(map);
-//		morph.getPointList().addAll(listPoints);
-//		morph.getVectorList().addAll(listVectors);
-	}
-	
 	public void undo() {
-//		List morphPoints = morph.getPointList();
-//		List morphVectors = morph.getVectorList();
-		Map morphMap = morph.getMorphMap();
-		for (Iterator it = map.keySet().iterator(); it.hasNext(); ) {
-//			ControlPoint cp = (ControlPoint) it.next();
-//			morphVectors.remove(morphPoints.indexOf(cp));
-//			morphPoints.remove(cp);
-			morphMap.remove(it.next());
-		}
+		boneChild.detach();
 	}
 	
+	public void redo() {
+		boneChild.attachTo(boneParent);
+	}
+
 	public int sizeOf() {
-		return 8 + 4 + (8 + 4 + 4 + 4 + 4 + 8 * map.size() * 2);
+		return 8 + 4 + 4;
+	}
+
+	public String getName() {
+		return "attach bone";
 	}
 }

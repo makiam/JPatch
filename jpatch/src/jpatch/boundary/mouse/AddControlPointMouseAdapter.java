@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.swing.*;
 import javax.vecmath.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
@@ -189,6 +190,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 			throw new IllegalStateException("setActiveState() called in active state");
 		}
 		MainFrame.getInstance().setHelpText("Drag to move curve-end. Press right mouse button to weld to closest point. Hold CTRL and press right mouse button to attach to closest point.");
+		MainFrame.getInstance().getDefaultToolTimer().stop();
 	}
 	
 	private void setIdleState() {
@@ -201,9 +203,10 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 			throw new IllegalStateException("setIdleState() called in idle state");
 		}
 		MainFrame.getInstance().setHelpText("Press left mousebutton to add curve segment. Press left mousebutton near existing point to weld new curve segment to it or hold CTRL to attach new curve segment.");
-		if (!bMulti) {
-			MainFrame.getInstance().getMeshToolBar().reset();
-		}
+//		if (!bMulti) {
+//			MainFrame.getInstance().getMeshToolBar().reset();
+//		}
+		MainFrame.getInstance().getDefaultToolTimer().restart();
 	}
 }
 

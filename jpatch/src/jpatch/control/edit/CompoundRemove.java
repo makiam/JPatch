@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundRemove.java,v 1.1 2005/09/19 12:40:15 sascha_l Exp $
+ * $Id: CompoundRemove.java,v 1.2 2005/10/09 07:41:30 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -23,6 +23,7 @@ package jpatch.control.edit;
 
 import java.util.*;
 
+import jpatch.boundary.MainFrame;
 import jpatch.entity.*;
 
 /**
@@ -34,13 +35,20 @@ public class CompoundRemove extends JPatchCompoundEdit {
 	public CompoundRemove(Collection objects) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + objects + ")");
+		/*
+		 * Remove ControlPoints
+		 */
 		HashSet controlPointSet = new HashSet();
+		HashSet btSet = new HashSet();
 		for (Iterator it = objects.iterator(); it.hasNext(); ) {
-			ControlPoint head = (ControlPoint) it.next();
-			for (ControlPoint cp = head; cp != null; cp = cp.getPrevAttached()) {
-//				System.out.println(cp.getHookPos() + " " + cp.getNextAttached() + " " + ((cp.getNextAttached() != null) ? "" + cp.getNextAttached().getHookPos() : ""));
-//				if (cp.getHookPos() == -1 && (cp.getNextAttached() == null || cp.getNextAttached().getHookPos() == -1))
+			Object object = it.next();
+			if (object instanceof ControlPoint) {
+				ControlPoint head = (ControlPoint) object;
+				for (ControlPoint cp = head; cp != null; cp = cp.getPrevAttached()) {
 					controlPointSet.add(cp);
+				}
+			} else if (object instanceof Bone.BoneTransformable) {
+				btSet.add(object);
 			}
 		}
 		if (DEBUG)
@@ -57,6 +65,32 @@ public class CompoundRemove extends JPatchCompoundEdit {
 			ControlPoint cp = (ControlPoint) it.next();
 			if (!cp.isDeleted())
 				addEdit(new CompoundRemoveControlPoint(cp));
+		}
+		
+		/*
+		 * Remove Bones
+		 */
+		Set boneSet = new HashSet();
+		// create set of bones to be deleted
+		for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {
+			Bone bone = (Bone) it.next();
+			Bone.BoneTransformable start = (bone.getParentBone() == null) ? bone.getBoneStart() : bone.getParentBone().getBoneEnd();
+			if (btSet.contains(bone.getBoneEnd()) && btSet.contains(start))
+				boneSet.add(bone);
+		}
+		// drop bones
+		for (Iterator it = boneSet.iterator(); it.hasNext(); ) {
+			Bone bone = (Bone) it.next();
+			addEdit(new AtomicDropBone(bone));
+		}
+		// set parents of orphanized bones to null
+		for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {
+			Bone bone = (Bone) it.next();
+			if (boneSet.contains(bone.getParentBone())) {
+				Bone parent;
+				for (parent = bone.getParentBone(); parent != null && boneSet.contains(parent); parent = parent.getParentBone());
+				addEdit(new AtomicChangeBone.Parent(bone, parent));
+			}
 		}
 	}
 	

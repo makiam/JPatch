@@ -602,7 +602,6 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			iGlMode = -1;
 			gl.glEnd();
 		}
-		Dimension dim = glDrawable.getSize();
 		gl.glRasterPos2i(x, y);			// set raster position
 		char[] c = string.toCharArray();
 	    for (int i = 0, n = c.length; i < n; i++) {		// loop over characters
