@@ -322,8 +322,11 @@ implements ModelImporter {
 					model.addSelection(selection);
 				} else if (localName.equals("points")) {
 					aiList = splitIntoIntArray(sbChars.toString());
+					sbChars.setLength(0);
 				} else if (localName.equals("pointweights")) {
 					afList = splitIntoFloatArray(sbChars.toString());
+					sbChars.setLength(0);
+//					for (int i = 0; i < afList.length; System.out.println(afList[i++]));
 				}
 				break;
 			case ROTOSCOPE:
