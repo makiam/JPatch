@@ -115,9 +115,20 @@ public class Model extends JPatchTreeNode {
 			mat.setXmlNumber(n++);
 			sb.append(mat.xml(prefix2));
 		}
-		sb.append(prefix2).append("<mesh>").append("\n");
-		setCpMap();
-		for (Iterator it = setCurves.iterator(); it.hasNext(); ) {
+		
+		ArrayList list;
+		list = new ArrayList(setBones);
+		setBoneMap(list);
+		sb.append(prefix2).append("<skeleton>\n");
+		for (Iterator it = list.iterator(); it.hasNext(); ) {
+			sb.append(((Bone) it.next()).xml(prefix3));
+		}
+		sb.append(prefix2).append("</skeleton>\n");
+		
+		list = new ArrayList(setCurves);
+		setCpMap(list);
+		sb.append(prefix2).append("<mesh>\n");
+		for (Iterator it = list.iterator(); it.hasNext(); ) {
 			ControlPoint start = (ControlPoint) it.next();
 			sb.append(prefix3);
 			sb.append(start.getLoop() ? "<curve closed=\"true\">" : "<curve>");
@@ -955,13 +966,22 @@ public class Model extends JPatchTreeNode {
 		System.out.println("\n\n----------- end -------------");
 	}
 	
-	private void setCpMap() {
+	private void setCpMap(List list) {
 		HashMap map = new HashMap();
 		int i = 0;
-		for (Iterator it = setCurves.iterator(); it.hasNext(); )
+		for (Iterator it = list.iterator(); it.hasNext(); )
 			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop())
 				map.put(cp,new Integer(i++));
 		ControlPoint.setMap(map);
+	}
+	
+	private void setBoneMap(List list) {
+		HashMap map = new HashMap();
+		int i = 0;
+		for (Iterator it = list.iterator(); it.hasNext(); )
+			map.put(it.next(), new Integer(i++));
+		Bone.setMap(map);
+		System.out.println(map);
 	}
 	
 	private ControlPoint trueHead(ControlPoint cp) {
