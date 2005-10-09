@@ -3,25 +3,14 @@ package jpatch.control.importer;
 import java.util.*;
 
 
-import javax.vecmath.Point3f;
-import javax.vecmath.Vector3f;
+import javax.vecmath.*;
 
-import jpatch.boundary.Selection;
-import jpatch.boundary.Rotoscope;
-import jpatch.boundary.ViewDefinition;
+import jpatch.boundary.*;
 import jpatch.control.ModelImporter;
-import jpatch.entity.ControlPoint;
-import jpatch.entity.JPatchMaterial;
-import jpatch.entity.MaterialProperties;
-import jpatch.entity.Model;
-import jpatch.entity.Morph;
-import jpatch.entity.Patch;
+import jpatch.entity.*;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
 
 public class JPatchImport extends DefaultHandler
 implements ModelImporter {
@@ -37,6 +26,8 @@ implements ModelImporter {
 	private static final int MORPH = 7;
 	private static final int TARGET = 8;
 	private static final int LIPSYNC = 9;
+	private static final int SKELETON = 10;
+	private static final int BONE = 11;
 	
 	private int iState = NULL;
 	private ArrayList listCp = new ArrayList();
@@ -48,11 +39,14 @@ implements ModelImporter {
 	private ControlPoint cp;
 	private ControlPoint cpPrev;
 	private Rotoscope rotoscope;
+	private Bone bone;
 	private int iRotoscopeView;
 	private JPatchMaterial material;
 	private String selectionName;
 	private Morph morph;
 	private List listMaterials = new ArrayList();
+	private List listBones = new ArrayList();
+	private Map mapBoneParents = new HashMap();
 	private ArrayList listCandidateFivePointPatch = new ArrayList();
 	private String strRendererFormat;
 	private String strRendererVersion;
@@ -113,7 +107,15 @@ implements ModelImporter {
 				} else if (localName.equals("rotoscope")) {
 					iState = ROTOSCOPE;
 					rotoscope = createRotoscope(attributes);
-				}	
+				} else if (localName.equals("skeleton")) {
+					iState = SKELETON;
+				}
+				break;
+			case SKELETON:
+				if (localName.equals("bone")) {
+					bone = createBone(attributes);
+					iState = BONE;
+				}
 				break;
 			case MESH:
 				if (localName.equals("curve")) {
@@ -180,6 +182,27 @@ implements ModelImporter {
 			case LIPSYNC:
 				if (localName.equals("map")) {
 					parseLipsyncMap(attributes);
+				}
+				break;
+			case BONE:
+				if (localName.equals("parent")) {
+					for (int index = 0; index < attributes.getLength(); index++) {
+						if (attributes.getLocalName(index).equals("id"))
+							mapBoneParents.put(bone, new Integer(attributes.getValue(index)));
+					}
+				} else if (localName.equals("start")) {
+					bone.setStart(createPoint(attributes));
+				} else if (localName.equals("end")) {
+					bone.setEnd(createPoint(attributes));
+				} else if (localName.equals("color")) {
+					bone.setColor(createColor(attributes));
+				} else if (localName.equals("influence")) {
+					for (int index = 0; index < attributes.getLength(); index++) {
+						if (attributes.getLocalName(index).equals("start"))
+							bone.setStartInfluence(Float.parseFloat(attributes.getValue(index)));
+						else if (attributes.getLocalName(index).equals("end"))
+							bone.setEndInfluence(Float.parseFloat(attributes.getValue(index)));
+					}
 				}
 				break;
 		}
@@ -329,6 +352,24 @@ implements ModelImporter {
 					iState = MESH;
 				}
 				break;
+			case BONE:
+				if (localName.equals("bone")) {
+					listBones.add(bone);
+					iState = SKELETON;
+				}
+				break;
+			case SKELETON:
+				if (localName.equals("skeleton")) {
+					for (Iterator it = listBones.iterator(); it.hasNext(); ) {
+						Bone bone = (Bone) it.next();
+						if (mapBoneParents.containsKey(bone)) {
+							bone.setParent((Bone) listBones.get(((Integer) mapBoneParents.get(bone)).intValue()));
+						}
+						model.addBone(bone);
+					}
+					iState = MODEL;
+				}
+				break;
 		}
 	}
 	
@@ -456,6 +497,43 @@ implements ModelImporter {
 		//}
 		//return material;
 		return material;
+	}
+	
+	private Bone createBone(Attributes attributes) {
+		Bone bone = new Bone(model, new Point3f(), new Vector3f());
+		for (int index = 0; index < attributes.getLength(); index++) {
+			if (attributes.getLocalName(index).equals("name"))
+				bone.setName(attributes.getValue(index));
+		}
+		return bone;
+	}
+	
+	private Color3f createColor(Attributes attributes) {
+		Color3f color = new Color3f();
+		for (int index = 0; index < attributes.getLength(); index++) {
+			String localName = attributes.getLocalName(index);
+			if (localName.equals("r"))
+				color.x = Float.parseFloat(attributes.getValue(index));
+			else if (localName.equals("g"))
+				color.y = Float.parseFloat(attributes.getValue(index));
+			else if (localName.equals("b"))
+				color.z = Float.parseFloat(attributes.getValue(index));
+		}
+		return color;
+	}
+	
+	private Point3f createPoint(Attributes attributes) {
+		Point3f point = new Point3f();
+		for (int index = 0; index < attributes.getLength(); index++) {
+			String localName = attributes.getLocalName(index);
+			if (localName.equals("x"))
+				point.x = Float.parseFloat(attributes.getValue(index));
+			else if (localName.equals("y"))
+				point.y = Float.parseFloat(attributes.getValue(index));
+			else if (localName.equals("z"))
+				point.z = Float.parseFloat(attributes.getValue(index));
+		}
+		return point;
 	}
 	
 	private ControlPoint createCp(Attributes attributes) {
