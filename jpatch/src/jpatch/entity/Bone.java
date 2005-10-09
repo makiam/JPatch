@@ -1,9 +1,11 @@
 package jpatch.entity;
 
 import java.util.*;
+
 import javax.swing.tree.*;
 import javax.vecmath.*;
 
+import jpatch.auxilary.XMLutils;
 import jpatch.boundary.*;
 import jpatch.control.edit.*;
 //import jpatch.auxilary.*;
@@ -11,8 +13,9 @@ import jpatch.control.edit.*;
 public class Bone extends JPatchTreeNode {
 //	public static final BoneTransformableType START = new BoneTransformableType();
 //	public static final BoneTransformableType END = new BoneTransformableType();
-	
+	private static final float DEFAULT_INFLUENCE = 0.33f; 
 	private static int NUM = 0;
+	private static Map mapBones;
 //	
 //	private static final Bone[] emptyBoneArray = new Bone[0];
 	private static int col = 0;
@@ -31,8 +34,8 @@ public class Bone extends JPatchTreeNode {
 	private Vector3f v3Extent;
 //	private Vector3f v3TempExtent = new Vector3f();
 //	private final Point3f p3End = new Point3f();
-////	private float fStartRadius = 0.33f;
-////	private float fEndRadius = 0.33f;
+	private float fStartRadius = DEFAULT_INFLUENCE;
+	private float fEndRadius = DEFAULT_INFLUENCE;
 	private Bone boneParent;
 //	private Bone boneNext;
 //	private Bone bonePrev;
@@ -76,9 +79,13 @@ public class Bone extends JPatchTreeNode {
 		col++;
 		if (col >= COLORS.length)
 			col = 0;
-		return color;
+		return new Color3f(color);
 	}
 
+	public static void setMap(Map map) {
+		mapBones = map;
+	}
+	
 	/*
 	* TreeNode interface implementation
 	*/
@@ -232,6 +239,18 @@ public class Bone extends JPatchTreeNode {
 		p3End.add(v3Extent);
 	}
 	
+	public void setColor(Color3f color) {
+		this.color.set(color);
+	}
+	
+	public void setStartInfluence(float influence) {
+		fStartRadius = influence;
+	}
+	
+	public void setEndInfluence(float influence) {
+		fEndRadius = influence;
+	}
+	
 	public BoneTransformable getBoneStart() {
 		return (boneParent == null) ? boneStart : null;
 	}
@@ -244,7 +263,31 @@ public class Bone extends JPatchTreeNode {
 		return strName;
 	}
 	
-	
+	public StringBuffer xml(String prefix) {
+		System.out.println(this);
+		StringBuffer sb = new StringBuffer();
+		sb.append(prefix).append("<bone name=").append(XMLutils.quote(getName())).append(">\n");
+		if (boneParent != null) {
+			int parent = ((Integer) mapBones.get(boneParent)).intValue();
+			sb.append(prefix).append("\t<parent id=").append(XMLutils.quote(parent)).append("/>\n");
+		} else {
+			sb.append(prefix).append("\t<start x=").append(XMLutils.quote(p3Start.x));
+			sb.append(" y=").append(XMLutils.quote(p3Start.y));
+			sb.append(" z=").append(XMLutils.quote(p3Start.z)).append("/>\n");
+		}
+		sb.append(prefix).append("\t<end x=").append(XMLutils.quote(p3End.x));
+		sb.append(" y=").append(XMLutils.quote(p3End.y));
+		sb.append(" z=").append(XMLutils.quote(p3End.z)).append("/>\n");
+		sb.append(prefix).append("\t<color r=").append(XMLutils.quote(color.x));
+		sb.append(" g=").append(XMLutils.quote(color.y));
+		sb.append(" b=").append(XMLutils.quote(color.z)).append("/>\n");
+		if (fStartRadius != DEFAULT_INFLUENCE || fEndRadius != DEFAULT_INFLUENCE) {
+			sb.append(prefix).append("\t<influence start=").append(XMLutils.quote(fStartRadius));
+			sb.append(" end=").append(XMLutils.quote(fEndRadius)).append("/>\n");
+		}
+		sb.append(prefix).append("</bone>\n");
+		return sb;
+	}
 	
 	public final class BoneTransformable implements Transformable {
 		private final Point3f p3Temp = new Point3f();

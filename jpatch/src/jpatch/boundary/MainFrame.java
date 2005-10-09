@@ -32,7 +32,7 @@ public final class MainFrame extends JFrame {
 	private static MainFrame INSTANCE;
 	private MainToolBar mainToolBar;
 	private MeshToolBar meshToolBar;
-	private BoneToolBar boneToolBar;
+//	private BoneToolBar boneToolBar;
 	private MorphToolBar morphToolBar;
 	private JPanel helpPanel;
 	private JLabel helpLabel;
@@ -161,7 +161,7 @@ public final class MainFrame extends JFrame {
 			//mainToolBar.setOrientation(SwingConstants.HORIZONTAL);
 			getContentPane().add(mainToolBar,BorderLayout.NORTH);
 			
-			boneToolBar = new BoneToolBar(bgAction);
+//			boneToolBar = new BoneToolBar(bgAction);
 			
 			meshToolBar = new MeshToolBar(bgAction);
 			meshToolBar.addKeyBindings();
@@ -454,9 +454,9 @@ public final class MainFrame extends JFrame {
 					meshToolBar.removeKeyBindings();
 					getContentPane().remove(meshToolBar);
 					break;
-				case BONE:
-					getContentPane().remove(boneToolBar);
-					break;
+//				case BONE:
+//					getContentPane().remove(boneToolBar);
+//					break;
 				case MORPH:
 					morphToolBar.removeKeyBindings();
 					getContentPane().remove(morphToolBar);
@@ -469,10 +469,10 @@ public final class MainFrame extends JFrame {
 					meshToolBar.addKeyBindings();
 					//meshToolBar.repaint();
 					break;
-				case BONE:
-					getContentPane().add(boneToolBar,BorderLayout.WEST);
-					//boneToolBar.validate();
-					break;
+//				case BONE:
+//					getContentPane().add(boneToolBar,BorderLayout.WEST);
+//					//boneToolBar.validate();
+//					break;
 				case MORPH:
 					getContentPane().add(morphToolBar,BorderLayout.WEST);
 					morphToolBar.addKeyBindings();

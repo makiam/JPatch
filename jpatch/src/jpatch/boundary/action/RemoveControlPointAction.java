@@ -7,8 +7,6 @@ import javax.swing.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.*;
 
-import jpatch.entity.*;
-
 public final class RemoveControlPointAction extends AbstractAction {
 	/**
 	 * 
@@ -20,6 +18,8 @@ public final class RemoveControlPointAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
+		if (MainFrame.getInstance().getSelection() == null)
+			return;
 		HashSet selectionSet = new HashSet(MainFrame.getInstance().getSelection().getObjects());
 		JPatchActionEdit edit = new JPatchActionEdit("remove");
 		edit.addEdit(new CompoundRemove(selectionSet));

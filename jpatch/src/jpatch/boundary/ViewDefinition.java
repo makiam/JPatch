@@ -497,7 +497,7 @@ implements ComponentListener {
 			m4Screen.transform(p3);
 			line.x2 = p3.x;
 			line.y2 = p3.y;
-			fDistance = (float) line.ptLineDistSq(target);
+			fDistance = (float) line.ptSegDistSq(target);
 			if (fDistance <= fMinDistance) {
 				fMinDistance = fDistance;
 				closest = bone;
