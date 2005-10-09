@@ -26,7 +26,7 @@ public final class MeshToolBar extends JToolBar {
 	private ButtonGroup bgTangentMode = new ButtonGroup();
 	
 	private AbstractAction selectMoveAction = new SelectMoveAction();
-	private AbstractAction magnetAction = new MagnetAction();
+//	private AbstractAction magnetAction = new MagnetAction();
 	private AbstractAction weightAction = new WeightSelectionAction();
 	private AbstractAction addControlPointAction = new AddControlPointAction();
 	private AbstractAction addMultiControlPointAction = new AddMultiControlPointAction();
@@ -37,6 +37,7 @@ public final class MeshToolBar extends JToolBar {
 	private AbstractAction extrudeAction = new ExtrudeAction();
 	private AbstractAction latheAction = new LatheAction();
 	private AbstractAction latheEditorAction = new LatheEditorAction();
+	private AbstractAction addBoneAction = new AddBoneAction();
 	
 	private AbstractButton buttonSelectMove = new JPatchToggleButton(selectMoveAction);
 	private AbstractButton buttonWeight = new JPatchToggleButton(weightAction);
@@ -45,6 +46,8 @@ public final class MeshToolBar extends JToolBar {
 	private AbstractButton buttonRotate = new JPatchToggleButton(rotateAction);
 //	private AbstractButton buttonRemove = new JPatchButton(removeAction);
 //	private AbstractButton buttonDelete = new JPatchButton(deleteAction);
+	private AbstractButton buttonAddBone = new JPatchToggleButton(addBoneAction);
+	
 	private AbstractButton buttonClone = new JPatchButton(cloneAction);
 	private AbstractButton buttonExtrude = new JPatchButton(extrudeAction);
 	private AbstractButton buttonLathe = new JPatchButton(latheAction);
@@ -76,6 +79,7 @@ public final class MeshToolBar extends JToolBar {
 		bgAction.add(buttonAdd);
 		bgAction.add(buttonAddMulti);
 		bgAction.add(buttonRotoscope);
+		bgAction.add(buttonAddBone);
 		
 		bgTangentMode.add(buttonPeak);
 		bgTangentMode.add(buttonRound);
@@ -86,7 +90,8 @@ public final class MeshToolBar extends JToolBar {
 		add(JPatchSeparator.createVerticalSeparator());
 		add(buttonSelectMove);
 		add(buttonAdd);
-		add(buttonAddMulti);
+		//add(buttonAddMulti);
+		add(buttonAddBone);
 		//add(JPatchSeparator.createVerticalSeparator());
 		add(buttonRotate);
 		add(buttonWeight);

@@ -1,13 +1,10 @@
 package jpatch.boundary;
 
-import java.awt.*;
-import java.awt.geom.*;
 import java.awt.image.*;
 import java.io.*;
 import javax.swing.*;
 import javax.imageio.*;
 import javax.vecmath.*;
-import jpatch.auxilary.*;
 
 public final class Rotoscope {
 

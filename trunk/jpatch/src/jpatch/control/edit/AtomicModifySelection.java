@@ -142,6 +142,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 				System.out.println(getClass().getName() + "(" + selection + ", " + hot + ")");
 			this.selection = selection;
 			this.hot = hot;
+			swap();
 		}
 		
 		private void swap() {
@@ -170,6 +171,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 				System.out.println(getClass().getName() + "(" + selection + ", " + orientation + ")");
 			this.selection = selection;
 			m3Orient.set(orientation);
+			swap();
 		}
 		
 		private void swap() {

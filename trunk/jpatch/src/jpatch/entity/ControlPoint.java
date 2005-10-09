@@ -183,11 +183,11 @@ public class ControlPoint implements Comparable, Transformable {
 		invalidateTangents();
 	}
 	
-	public void rotate(Quat4f q, Point3f pivot) {
+	public void rotate(AxisAngle4f a, Point3f pivot) {
 		p3Position.set(p3BackupPosition);
 		p3Position.sub(pivot);
 		Matrix3f rot = new Matrix3f();
-		rot.set(q);
+		rot.set(a);
 		rot.transform(p3Position);
 		p3Position.add(pivot);
 		invalidateTangents();

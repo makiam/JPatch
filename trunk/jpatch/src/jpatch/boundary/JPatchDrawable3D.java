@@ -1,7 +1,6 @@
 package jpatch.boundary;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
 
@@ -1739,11 +1738,11 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 					int index = y * iWidth + xstart;
 					for (int x = xstart; x < xend; x++) {
 						if (z < zBuffer[index]) {
-							int fb = aiColorBuffer[index];
+							int fb = frameBuffer[index];
 							int fbRed = ((((fb & 0x00FF0000) * A1) >> 8) + red) & 0x00FF0000;
 							int fbGreen = ((((fb & 0x0000FF00) * A1) >> 8) + green) & 0x0000FF00;
 							int fbBlue = ((((fb & 0x000000FF) * A1) >> 8) + blue) & 0x000000FF;
-							aiColorBuffer[index] = 0xFF000000 | fbRed | fbGreen | fbBlue;
+							frameBuffer[index] = 0xFF000000 | fbRed | fbGreen | fbBlue;
 							zBuffer[index] = z;
 						}
 						z += mzx;
@@ -1805,11 +1804,11 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 					int index = y * iWidth + xstart;
 					for (int x = xstart; x < xend; x++) {
 						if (z < zBuffer[index]) {
-							int fb = aiColorBuffer[index];
+							int fb = frameBuffer[index];
 							int fbRed = ((((fb & 0x00FF0000) * A1) >> 8) + red) & 0x00FF0000;
 							int fbGreen = ((((fb & 0x0000FF00) * A1) >> 8) + green) & 0x0000FF00;
 							int fbBlue = ((((fb & 0x000000FF) * A1) >> 8) + blue) & 0x000000FF;
-							aiColorBuffer[index] = 0xFF000000 | fbRed | fbGreen | fbBlue;
+							frameBuffer[index] = 0xFF000000 | fbRed | fbGreen | fbBlue;
 							zBuffer[index] = z;
 						}
 						z += mzx;

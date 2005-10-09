@@ -1,10 +1,11 @@
 package jpatch.boundary;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.*;
 //import java.beans.*;
 import javax.swing.*;
-import javax.swing.plaf.metal.*;
 import javax.swing.tree.*;
 
 import jpatch.*;
@@ -48,8 +49,33 @@ public final class MainFrame extends JFrame {
 	private SideBar sideBar;
 	private JPatchTreeNode treenodeRoot;
 	private Morph editedMorph;
+	private javax.swing.Timer defaultToolTimer = new javax.swing.Timer(2500, new ActionListener() {
+		public void actionPerformed(ActionEvent event) {
+			defaultToolTimer.stop();
+			meshToolBar.reset();
+		}
+	});
 	
 	public MainFrame(Model model) {
+//		Thread timerMonitor = new Thread() {
+//			public void run() {
+//				try {
+//					for (;;) {
+//						EventQueue.invokeAndWait(new Runnable() {
+//							public void run() {
+//								setTitle(defaultToolTimer.isRunning() ? "timer running" : "timer stopped");
+//							} 
+//						});
+//						Thread.sleep(100);
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		};
+//		timerMonitor.start();
+		
+		
 		if (VersionInfo.release) {
 			setTitle("JPatch Modeler " + VersionInfo.version);
 		} else {
@@ -222,6 +248,10 @@ public final class MainFrame extends JFrame {
 			dialog.dispose();
 			dialog = null;
 		}
+	}
+	
+	public javax.swing.Timer getDefaultToolTimer() {
+		return defaultToolTimer;
 	}
 	
 	public void setEditedMorph(Morph morph) {
