@@ -6,10 +6,12 @@ import javax.vecmath.*;
 
 import jpatch.control.edit.*;
 import jpatch.entity.*;
+import jpatch.entity.Bone.BoneTransformable;
 
-public class Selection extends JPatchTreeLeaf implements Transformable {
+public class Selection extends JPatchTreeLeaf {
 	public static final int CONTROLPOINTS = 1;
 	public static final int MORPHS = 2;
+	public static final int BONES = 4;
 	public static int NUM = 0;
 	
 	private final Map mapObjects = new HashMap();
@@ -18,6 +20,7 @@ public class Selection extends JPatchTreeLeaf implements Transformable {
 	private int iDirection;
 	private Matrix3f m3Orientation;
 	private Point3f p3Pivot = new Point3f();
+	private Transformable pivotTransformable = new PivotTransformable();
 //	private int iNum = NUM++;
 	private boolean bActive = false;
 	
@@ -36,8 +39,23 @@ public class Selection extends JPatchTreeLeaf implements Transformable {
 				}
 			}
 		}
+		for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
+			Bone bone = (Bone) it.next();
+			if (bone.getParentBone() == null) {
+				bone.getStart(p3);
+				transformationMatrix.transform(p3);
+				if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by)
+					selection.mapObjects.put(bone.getBoneStart(), new Float(1.0f));
+			}
+			bone.getStart(p3);
+			p3.add(bone.getExtent());
+			transformationMatrix.transform(p3);
+			if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by)
+				selection.mapObjects.put(bone.getBoneEnd(), new Float(1.0f));
+		}
 		selection.p3Pivot.set(selection.getCenter());
-		return (selection.mapObjects.size() > 0) ? selection : null;
+		selection.mapObjects.put(selection.pivotTransformable, new Float(1));
+		return (selection.mapObjects.size() > 1) ? selection : null;
 	}
 	
 	private Selection() {
@@ -46,15 +64,17 @@ public class Selection extends JPatchTreeLeaf implements Transformable {
 		m3Orientation.setIdentity();
 	}
 	
-	public Selection(ControlPoint cp) {
+	public Selection(Object object) {
 		this();
-		mapObjects.put(cp, new Float(1.0f));
-		hotObject = cp;
+		mapObjects.put(object, new Float(1.0f));
+		hotObject = object;
 	}
 	
 	public Selection(Map objectWeightMap) {
 		this();
 		mapObjects.putAll(objectWeightMap);
+		mapObjects.put(pivotTransformable, new Float(1));
+		p3Pivot.set(getCenter());
 	}
 
 	public Selection(Collection objects) {
@@ -62,6 +82,8 @@ public class Selection extends JPatchTreeLeaf implements Transformable {
 		for (Iterator it = objects.iterator(); it.hasNext(); ) {
 			mapObjects.put(it.next(), new Float(1.0f));
 		}
+		mapObjects.put(pivotTransformable, new Float(1));
+		p3Pivot.set(getCenter());
 	}
 
 	public int getNodeType() {
@@ -141,9 +163,9 @@ public class Selection extends JPatchTreeLeaf implements Transformable {
 		Matrix3f m3 = new Matrix3f(m3Orientation);
 		m3.invert();
 		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext(); ) {
-			Object object = it.next();
-			if (object instanceof ControlPoint) {
-				p3.set(((ControlPoint) object).getPosition());
+			Transformable t = (Transformable) it.next();
+			if (t != pivotTransformable) {
+				p3.set(t.getPosition());
 				m3.transform(p3);
 				if (p3.x > xMax) xMax = p3.x;
 				if (p3.x < xMin) xMin = p3.x;
@@ -158,12 +180,49 @@ public class Selection extends JPatchTreeLeaf implements Transformable {
 	}
 	
 	public Point3f getCenter() {
-		Point3f p0 = new Point3f();
-		Point3f p1 = new Point3f();
-		getBounds(p0, p1);
-		p0.interpolate(p1, 0.5f);
-		return p0;
+		Bone bone = null;
+		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext(); ) {
+			Object object = it.next();
+			if (object instanceof BoneTransformable) {
+				bone = ((BoneTransformable) object).getBone();
+				break;
+			}
+		}
+		if (bone == null) {
+			Point3f p0 = new Point3f();
+			Point3f p1 = new Point3f();
+			getBounds(p0, p1);
+			p0.interpolate(p1, 0.5f);
+			//return recurseGetCenter(p0);
+			return p0;
+		} else {
+			while (bone.getParentBone() != null && (mapObjects.containsKey(bone.getParentBone().getBoneEnd())))
+				bone = bone.getParentBone();
+			//System.out.println(bone);
+			//return bone.getStart(null);
+			return mapObjects.containsKey(bone.getBoneStart()) ? bone.getStart(null) :  bone.getEnd(null);
+		}
 	}
+	
+//	private Point3f recurseGetCenter(final Point3f center) {
+//		List list = new ArrayList(mapObjects.keySet());
+//		Collections.sort(list, new Comparator() {
+//			public int compare(Object o0, Object o1) {
+//				float d0 = center.distanceSquared(((Transformable) o0).getPosition());
+//				float d1 = center.distanceSquared(((Transformable) o1).getPosition());
+//				return d0 < d1 ? 1 : d0 > d1 ? -1 : 0;
+//			}
+//		});
+//		// FIXME: wrong - need the "Umkreismittelpunkt"
+//		Point3f p = new Point3f(((Transformable) list.get(0)).getPosition());
+//		p.add(((Transformable) list.get(1)).getPosition());
+//		p.add(((Transformable) list.get(2)).getPosition());
+//		p.scale(1f / 3f);
+//		if (!p.equals(center))
+//			return recurseGetCenter(p);
+//		else
+//			return p;
+//	}
 	
 	public Point3f getPivot() {
 		return p3Pivot;
@@ -206,18 +265,16 @@ public class Selection extends JPatchTreeLeaf implements Transformable {
 		}
 	}
 
-	public void rotate(Quat4f q, Point3f pivot) {
-		Quat4f identity = new Quat4f(0, 0, 0, 1);
-		Quat4f quat = new Quat4f();
+	public void rotate(AxisAngle4f a, Point3f pivot) {
+		AxisAngle4f aa = new AxisAngle4f(a);
 		for (Iterator it = mapTransformables.keySet().iterator(); it.hasNext(); ) {
 			Transformable transformable = (Transformable) it.next();
 			float weight = ((Float) mapTransformables.get(transformable)).floatValue();
-			quat.set(q);
-			quat.interpolate(identity, 1.0 - weight);
-			transformable.rotate(quat, pivot);
+			aa.angle = a.angle * weight;
+			transformable.rotate(aa, pivot);
 		}
 	}
-
+	
 	public void transform(Matrix3f m, Point3f pivot) {
 		Matrix3f identity = new Matrix3f();
 		Matrix3f matrix = new Matrix3f();
@@ -294,5 +351,31 @@ public class Selection extends JPatchTreeLeaf implements Transformable {
 		sb.append(prefix).append("\t<pointweights>").append(cpWeightList).append("</pointweights>\n");
 		sb.append(prefix).append("</selection>").append("\n");
 		return sb;
+	}
+	
+	private class PivotTransformable implements Transformable {
+		private Point3f p3Temp = new Point3f();
+		public Point3f getPosition() {
+			return p3Pivot;
+		}
+
+		public void beginTransform() {
+			p3Temp.set(p3Pivot);
+		}
+
+		public void translate(Vector3f v) {
+			p3Pivot.set(p3Temp);
+			p3Pivot.add(v);
+		}
+
+		public void rotate(AxisAngle4f a, Point3f pivot) {
+		}
+
+		public void transform(Matrix3f m, Point3f pivot) {
+		}
+
+		public JPatchUndoableEdit endTransform() {
+			return new AtomicModifySelection.Pivot(Selection.this, p3Temp);
+		}
 	}
 }

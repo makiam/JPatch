@@ -22,10 +22,11 @@ public class DefaultTool extends JPatchTool {
 	private static final int MOVE_SINGLE_POINT = 2;
 	private static final int MOVE_GROUP = 3;
 	private static final int SCALE_GROUP = 4;
-	private static final int PIVOT = 5;
+//	private static final int PIVOT = 5;
 	private static final int ADD_MODIFY_SELECTION = 6;
 	private static final int XOR_MODIFY_SELECTION = 7;
 	private static final int TANGENT = 8;
+	private static final int MOVE_SINGLE_BONENED = 9;
 	
 	private Handle[] aHandle;
 	//private Point3f p3Pivot;
@@ -37,13 +38,14 @@ public class DefaultTool extends JPatchTool {
 	private HandleZOrderComparator comparator = new HandleZOrderComparator();
 	private Handle activeHandle;
 	//private PointSelection ps;
-	private Point3f[] ap3;
-	private PivotHandle2 pivotHandle;
+//	private Point3f[] ap3;
+//	private PivotHandle2 pivotHandle;
 	private ControlPoint cpHot;
+	private Bone.BoneTransformable btHot;
 	//private int iMode;
 	private JPatchActionEdit edit;
 //	private Point3f p3Pivot = new Point3f();
-	private Vector3f v3Move = new Vector3f();
+//	private Vector3f v3Move = new Vector3f();
 	private int iState;
 	//private Point3f p3Pivot = new Point3f();
 	//private boolean bChange;
@@ -55,9 +57,9 @@ public class DefaultTool extends JPatchTool {
 	private float fMagnitude;
 	
 	private Matrix4f m4Transform = new Matrix4f();
-	private Matrix4f m4ConstrainedTransform = new Matrix4f();
+//	private Matrix4f m4ConstrainedTransform = new Matrix4f();
 	
-	private Point3f p3Pivot = new Point3f();
+//	private Point3f p3Pivot = new Point3f();
 	
 	public DefaultTool() {
 		//m3Rot.setIdentity();
@@ -70,7 +72,7 @@ public class DefaultTool extends JPatchTool {
 		//p3CornerA = ps.getCornerA();
 		//p3CornerB = ps.getCornerB();
 		Color3f color = new Color3f(settings.cSelection);
-		pivotHandle = new PivotHandle2(color);
+//		pivotHandle = new PivotHandle2(color);
 		aHandle = new Handle[] {
 			new DefaultHandle(this, new Point3f(), color),
 			new DefaultHandle(this, new Point3f(), color),
@@ -80,7 +82,7 @@ public class DefaultTool extends JPatchTool {
 			new DefaultHandle(this, new Point3f(), color),
 			new DefaultHandle(this, new Point3f(), color),
 			new DefaultHandle(this, new Point3f(), color),
-			pivotHandle
+//			pivotHandle
 		};
 		if (MainFrame.getInstance().getSelection() == null) {
 			MainFrame.getInstance().setHelpText("Drag to move or select points. Use ATL to move perpendicular to screen plane.");
@@ -130,9 +132,9 @@ public class DefaultTool extends JPatchTool {
 			case XOR_MODIFY_SELECTION:
 				MainFrame.getInstance().setHelpText("Drag to select points to be removed from current selection");
 				break;
-			case PIVOT:
-				MainFrame.getInstance().setHelpText("Drag to move pivot");
-				break;
+//			case PIVOT:
+//				MainFrame.getInstance().setHelpText("Drag to move pivot");
+//				break;
 			case SCALE_GROUP:
 				MainFrame.getInstance().setHelpText("Drag to scale selected points");
 				break;
@@ -278,6 +280,10 @@ public class DefaultTool extends JPatchTool {
 				aHandleCopy[h].paint(viewDef);
 //				aHandleCopy[h].paint(viewport, drawable); // FIXME
 			}
+			p3A.set(selection.getPivot());
+			m4View.transform(p3A);
+			drawable.setPointSize(3);
+			drawable.drawPoint(p3A);
 		}
 	}
 	
@@ -356,21 +362,21 @@ public class DefaultTool extends JPatchTool {
 					}
 				}
 				
-				/* check for double-click on pivot handle */
-				if (mouseEvent.getClickCount() == 2) {
-					if (activeHandle == pivotHandle) {
-						
-						/* reset pivot to selection center */
-						//p3Pivot.set(ps.getPivot());
-						//selection.resetPivot();
-						MainFrame.getInstance().getUndoManager().addEdit(new AtomicModifySelection.Pivot(selection, selection.getCenter()));
-						
-						/* clear active handle */
-						((Component)mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
-						activeHandle = null;
-						return;
-					}
-				}
+//				/* check for double-click on pivot handle */
+//				if (mouseEvent.getClickCount() == 2) {
+//					if (activeHandle == pivotHandle) {
+//						
+//						/* reset pivot to selection center */
+//						//p3Pivot.set(ps.getPivot());
+//						//selection.resetPivot();
+//						MainFrame.getInstance().getUndoManager().addEdit(new AtomicModifySelection.Pivot(selection, selection.getCenter()));
+//						
+//						/* clear active handle */
+//						((Component)mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
+//						activeHandle = null;
+//						return;
+//					}
+//				}
 			}
 			
 			/* if a handle was clicked */
@@ -385,21 +391,23 @@ public class DefaultTool extends JPatchTool {
 				repaint = true;
 				
 				/* check if a scale or the pivot handle is active and set state */
-				iState = PIVOT;
-				p3Pivot.set(selection.getPivot());
-				if (activeHandle != pivotHandle) {
+//				iState = PIVOT;
+//				p3Pivot.set(selection.getPivot());
+//				if (activeHandle != pivotHandle) {
 					((DefaultHandle)activeHandle).setOldPosition(viewDef);
 					iState = SCALE_GROUP;
 					//compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
 					beginTransform();
-				}	
+//				}	
 			} else {
 				/* no handle was clicked... */
 //				Matrix4f m4View = viewDef.getMatrix();
 				
 				/* check if a controlpoint was clicked... */
-				cpHot = viewDef.getClosestControlPoint(new Point2D.Float(x,y),null,null,true,false,cpHot);
-				
+				Point2D.Float p2 = new Point2D.Float(x,y);
+				cpHot = viewDef.getClosestControlPoint(p2, null, null, true, false, cpHot);
+				btHot = viewDef.getClosestBoneEnd(p2, null, true, true);
+				Bone hitBone = viewDef.getClosestBone(p2);
 				/* if a point was hit... */
 				if (cpHot != null) {
 					
@@ -414,36 +422,16 @@ public class DefaultTool extends JPatchTool {
 								edit.addEdit(new AtomicModifySelection.HotObject(selection, cpHot));
 								repaint = true;
 							}
-							
-							///* check if the selection contains the hotCp */
-							//if (!ps.contains(cpHot)) {
-							//	
-							//	/* add it to the selection */
-							//	Collection collection = new ArrayList();
-							//	collection.add(cpHot);
-							//	compoundEdit.addEdit(new AddControlPointsToSelectionEdit(ps, collection));
-							//	repaint = true;
-							//}
-							
 							/* set state */
 							iState = MOVE_GROUP;
-//							compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
-//							
-//							/* add motionlistener */
-//							((Component)mouseEvent.getSource()).addMouseMotionListener(this);
-//							iMouseX = x;
-//							iMouseY = y;
-//							bMoveZ = mouseEvent.isAltDown();
 							beginTransform();
-//							repaint = true;
 							iMouseX = x;
 							iMouseY = y;
 							/* add motionlistener */
 							((Component)mouseEvent.getSource()).addMouseMotionListener(this);
 							bMoveZ = mouseEvent.isAltDown();
-							p3Pivot.set(selection.getPivot());
+//							p3Pivot.set(selection.getPivot());
 						} else {
-							
 							/*
 							 * selection box was not hit
 							 * create a new selection containing only cphot
@@ -467,10 +455,11 @@ public class DefaultTool extends JPatchTool {
 						if (mouseEvent.isControlDown() && selection.contains(cpHot)) {
 							
 							/* remove the cp from the selection */
-							Collection collection = new ArrayList();
-							collection.add(cpHot);
-//FIXME						compoundEdit.addEdit(new RemoveControlPointsFromSelectionEdit(ps,collection));
+							Map map = new HashMap();
+							map.put(cpHot, new Float(1));
+							edit.addEdit(new AtomicModifySelection.RemoveObjects(selection, map));
 							edit.addEdit(new AtomicModifySelection.HotObject(selection, null));
+							edit.setName("remove point from selection");
 							MainFrame.getInstance().getUndoManager().addEdit(edit);
 							
 							/* set state */
@@ -481,76 +470,226 @@ public class DefaultTool extends JPatchTool {
 						} else if ((mouseEvent.isShiftDown() || (mouseEvent.isControlDown()) && !selection.contains(cpHot))) {
 							
 							/* add the cp to the selection */
-							Collection collection = new ArrayList();
-							collection.add(cpHot);
-//FIXME						compoundEdit.addEdit(new AddControlPointsToSelectionEdit(ps,collection));
+							Map map = new HashMap();
+							map.put(cpHot, new Float(1));
+							edit.addEdit(new AtomicModifySelection.AddObjects(selection, map));
 							edit.addEdit(new AtomicModifySelection.HotObject(selection, cpHot));
+							edit.setName("add point to selection");
 							MainFrame.getInstance().getUndoManager().addEdit(edit);
-							//ps.addControlPoint(cpHot);
-							//ps.setHotCp(cpHot);
 							
 							/* set state */
-							
 							iState = IDLE;
-							//} else {
-							//	iState = (mouseEvent.isShiftDown()) ? ADD_MODIFY_SELECTION : XOR_MODIFY_SELECTION;
-							//	iMouseX = x;
-							//	iMouseY = y;
-							//}
 							repaint = true;
 						}
 					}
 				} else {
 					
-					/* no point was hit, clear cpHot */
-					
-					if (selection != null && cpHot != selection.getHotObject()) {
-						edit.addEdit(new AtomicModifySelection.HotObject(selection, null));
-						repaint = true;
-					}
-					//System.out.println("* " + ps);
-					/* is shift or control down? set state */
-					if (mouseEvent.isShiftDown() && selection != null) {
-						iState = ADD_MODIFY_SELECTION;
-						iMouseX = x;
-						iMouseY = y;
-					} else if (mouseEvent.isControlDown() && selection != null) {
-						iState = XOR_MODIFY_SELECTION;
-						iMouseX = x;
-						iMouseY = y;
-					} else {
-						//System.out.println("**");
-						/* neither shift nor control are down */
+					if (btHot != null) {
+						/* bone end was hit */
 						
-						/* check if selection box was hit and set state*/
-						if (selection != null && !selection.isSingle() && isHit(x,y,viewDef.getScreenMatrix())) {
+						/* if neither shift nor control is down */
+						if ((!mouseEvent.isControlDown() && !mouseEvent.isShiftDown()) || selection == null) {
 							
-							/* selection box was hit, set state*/
-							iState = MOVE_GROUP;
-//							compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
-//							
-//							/* add motionlistener */
-//							((Component)mouseEvent.getSource()).addMouseMotionListener(this);
-//							iMouseX = x;
-//							iMouseY = y;
-//							bMoveZ = mouseEvent.isAltDown();
-//							compoundEdit.addEdit(new NewMoveControlPointsEdit(new ControlPoint[] { cpHot } ));
-							beginTransform();
-//							repaint = true;
-							iMouseX = x;
-							iMouseY = y;
-							/* add motionlistener */
-							((Component)mouseEvent.getSource()).addMouseMotionListener(this);
-							bMoveZ = mouseEvent.isAltDown();
-							p3Pivot.set(selection.getPivot());
+							/* is the point inside the selection box? */
+							if (selection != null && !selection.isSingle() && isHit(x,y,viewDef.getScreenMatrix())) {
+								
+								/* change the hot cp */
+								if (selection.contains(btHot)) {
+									edit.addEdit(new AtomicModifySelection.HotObject(selection, btHot));
+									repaint = true;
+								}
+								/* set state */
+								iState = MOVE_GROUP;
+								beginTransform();
+								iMouseX = x;
+								iMouseY = y;
+								/* add motionlistener */
+								((Component)mouseEvent.getSource()).addMouseMotionListener(this);
+								bMoveZ = mouseEvent.isAltDown();
+//								p3Pivot.set(selection.getPivot());
+							} else {
+								/*
+								 * selection box was not hit
+								 * create a new selection containing only cphot
+								 */
+								edit.addEdit(new AtomicChangeSelection(new Selection(btHot)));
+								
+								/* set state */
+								iState = MOVE_SINGLE_BONENED;
+								//compoundEdit.addEdit(new NewMoveControlPointsEdit(new ControlPoint[] { cpHot } ));
+								beginTransform();
+								repaint = true;
+								iMouseX = x;
+								iMouseY = y;
+								/* add motionlistener */
+								((Component)mouseEvent.getSource()).addMouseMotionListener(this);
+								bMoveZ = mouseEvent.isAltDown();
+							}
 						} else {
 							
-							/* selection box was not it, set state */
-							iState = DRAW_SELECTION;
+							/* control or shift was down */
+							if (mouseEvent.isControlDown() && selection.contains(btHot)) {
+								
+								/* remove the cp from the selection */
+								Map map = new HashMap();
+								map.put(btHot, new Float(1));
+								edit.addEdit(new AtomicModifySelection.RemoveObjects(selection, map));
+								edit.addEdit(new AtomicModifySelection.HotObject(selection, null));
+								edit.setName("remove bone-end from selection");
+								MainFrame.getInstance().getUndoManager().addEdit(edit);
+								
+								/* set state */
+								
+								iState = IDLE;
+								
+								repaint = true;
+							} else if ((mouseEvent.isShiftDown() || (mouseEvent.isControlDown()) && !selection.contains(btHot))) {
+								
+								/* add the cp to the selection */
+								Map map = new HashMap();
+								map.put(btHot, new Float(1));
+								edit.addEdit(new AtomicModifySelection.AddObjects(selection, map));
+								edit.addEdit(new AtomicModifySelection.HotObject(selection, btHot));
+								edit.setName("add bone-end to selection");
+								MainFrame.getInstance().getUndoManager().addEdit(edit);
+								
+								/* set state */
+								iState = IDLE;
+								repaint = true;
+							}
+						}
+					} else if (hitBone != null) {
+						/* bone was hit */
+						
+						/* if neither shift nor control is down */
+						if ((!mouseEvent.isControlDown() && !mouseEvent.isShiftDown()) || selection == null) {
+							
+							/* is the point inside the selection box? */
+							if (selection != null && !selection.isSingle() && isHit(x,y,viewDef.getScreenMatrix())) {
+								
+								/* change the hot cp */
+								//if (selection.contains(btHot)) {
+									edit.addEdit(new AtomicModifySelection.HotObject(selection, null));
+									repaint = true;
+								//}
+								/* set state */
+								iState = MOVE_GROUP;
+								beginTransform();
+								iMouseX = x;
+								iMouseY = y;
+								/* add motionlistener */
+								((Component)mouseEvent.getSource()).addMouseMotionListener(this);
+								bMoveZ = mouseEvent.isAltDown();
+//								p3Pivot.set(selection.getPivot());
+							} else {
+								/*
+								 * selection box was not hit
+								 * create a new selection containing only cphot
+								 */
+								Map map = new HashMap();
+								map.put(hitBone.getBoneEnd(), new Float(1));
+								map.put(hitBone.getParentBone() == null ? hitBone.getBoneStart() : hitBone.getParentBone().getBoneEnd(), new Float(1));
+								edit.addEdit(new AtomicChangeSelection(new Selection(map)));
+								
+								/* set state */
+								iState = MOVE_GROUP;
+								//compoundEdit.addEdit(new NewMoveControlPointsEdit(new ControlPoint[] { cpHot } ));
+								beginTransform();
+								repaint = true;
+								iMouseX = x;
+								iMouseY = y;
+								/* add motionlistener */
+								((Component)mouseEvent.getSource()).addMouseMotionListener(this);
+								bMoveZ = mouseEvent.isAltDown();
+							}
+						} else {
+							
+							/* control or shift was down */
+//							if (mouseEvent.isControlDown()) {
+//								
+//								/* remove the cp from the selection */
+//								Map map = new HashMap();
+//								map.put(hitBone.getBoneEnd(), new Float(1));
+//								map.put(hitBone.getParentBone() == null ? hitBone.getBoneStart() : hitBone.getParentBone().getBoneEnd(), new Float(1));
+//								edit.addEdit(new AtomicModifySelection.RemoveObjects(selection, map));
+//								edit.addEdit(new AtomicModifySelection.HotObject(selection, null));
+//								edit.setName("remove bone from selection");
+//								MainFrame.getInstance().getUndoManager().addEdit(edit);
+//								
+//								/* set state */
+//								
+//								iState = IDLE;
+//								
+//								repaint = true;
+//							} else 
+							if (mouseEvent.isShiftDown()) {
+								
+								/* add the cp to the selection */
+								Map map = new HashMap();
+								map.put(hitBone.getBoneEnd(), new Float(1));
+								map.put(hitBone.getParentBone() == null ? hitBone.getBoneStart() : hitBone.getParentBone().getBoneEnd(), new Float(1));
+								edit.addEdit(new AtomicModifySelection.AddObjects(selection, map));
+								edit.addEdit(new AtomicModifySelection.HotObject(selection, null));
+								edit.setName("add bone to selection");
+								MainFrame.getInstance().getUndoManager().addEdit(edit);
+								
+								/* set state */
+								iState = IDLE;
+								repaint = true;
+							}
+						}
+					} else { 
+					
+						/* no point was hit, clear cpHot */
+						
+						if (selection != null && cpHot != selection.getHotObject()) {
+							edit.addEdit(new AtomicModifySelection.HotObject(selection, null));
+							repaint = true;
+						}
+						//System.out.println("* " + ps);
+						/* is shift or control down? set state */
+						if (mouseEvent.isShiftDown() && selection != null) {
+							iState = ADD_MODIFY_SELECTION;
 							iMouseX = x;
 							iMouseY = y;
+						} else if (mouseEvent.isControlDown() && selection != null) {
+							iState = XOR_MODIFY_SELECTION;
+							iMouseX = x;
+							iMouseY = y;
+						} else {
+							//System.out.println("**");
+							/* neither shift nor control are down */
 							
-							
+							/* check if selection box was hit and set state*/
+							if (selection != null && !selection.isSingle() && isHit(x,y,viewDef.getScreenMatrix())) {
+								
+								/* selection box was hit, set state*/
+								iState = MOVE_GROUP;
+	//							compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
+	//							
+	//							/* add motionlistener */
+	//							((Component)mouseEvent.getSource()).addMouseMotionListener(this);
+	//							iMouseX = x;
+	//							iMouseY = y;
+	//							bMoveZ = mouseEvent.isAltDown();
+	//							compoundEdit.addEdit(new NewMoveControlPointsEdit(new ControlPoint[] { cpHot } ));
+								beginTransform();
+	//							repaint = true;
+								iMouseX = x;
+								iMouseY = y;
+								/* add motionlistener */
+								((Component)mouseEvent.getSource()).addMouseMotionListener(this);
+								bMoveZ = mouseEvent.isAltDown();
+//								p3Pivot.set(selection.getPivot());
+							} else {
+								
+								/* selection box was not it, set state */
+								iState = DRAW_SELECTION;
+								iMouseX = x;
+								iMouseY = y;
+								
+								
+							}
 						}
 					}
 				}
@@ -625,7 +764,15 @@ public class DefaultTool extends JPatchTool {
 			/* RIGHT MOUSE BUTTON */
 			
 			/* check state */
-			if (iState == MOVE_SINGLE_POINT || (cpHot != null && iState == MOVE_GROUP)) {
+			if (iState == MOVE_SINGLE_BONENED || (btHot != null && iState == MOVE_GROUP)) {
+				if (btHot.isStart()) {
+					Bone.BoneTransformable bt = viewDef.getClosestBoneEnd(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()), btHot, false, true);
+					edit.addEdit(new AtomicAttachBone(btHot.getBone(), bt.getBone()));
+				} else if (btHot.isEnd()) {
+					Bone.BoneTransformable bt = viewDef.getClosestBoneEnd(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()), btHot, true, false);
+					edit.addEdit(new AtomicAttachBone(bt.getBone(), btHot.getBone()));
+				}
+			} else if (iState == MOVE_SINGLE_POINT || (cpHot != null && iState == MOVE_GROUP)) {
 //				Viewport viewport = (Viewport)mouseEvent.getSource();
 				float[] hookPos = new float[1];
 				ControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()),cpHot,hookPos,false,true);
@@ -731,14 +878,18 @@ public class DefaultTool extends JPatchTool {
 			//System.out.println(ps + " " + iState);
 			switch (iState) {
 				case MOVE_SINGLE_POINT:
-					edit.setName("move single point");
+					edit.setName("move point");
+					endTransform();
+					break;
+				case MOVE_SINGLE_BONENED:
+					edit.setName("move bone");
 					endTransform();
 					break;
 				case MOVE_GROUP:
 					// - compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,ps.getControlPointArray()));
 //					compoundEdit.addEdit(new ChangeSelectionPivotEdit(ps,p3Pivot,null));
 //					MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
-					edit.addEdit(new AtomicModifySelection.Pivot(selection, p3Pivot));
+//					edit.addEdit(new AtomicModifySelection.Pivot(selection, p3Pivot));
 					edit.setName("move objects");
 					endTransform();
 					break;
@@ -758,7 +909,13 @@ public class DefaultTool extends JPatchTool {
 					}
 					((Component)mouseEvent.getSource()).removeMouseMotionListener(selectMouseMotionListener);
 					break;
-				case ADD_MODIFY_SELECTION:
+				case ADD_MODIFY_SELECTION: {
+					Selection newSelection = selectMouseMotionListener.getSelection(viewDef);
+					if (newSelection != null) {
+						edit.addEdit(new AtomicModifySelection.AddObjects(selection, newSelection.getMap()));
+						edit.setName("add objects to selection");
+						MainFrame.getInstance().getUndoManager().addEdit(edit);
+					}
 //					PointSelection psNew = (PointSelection)selectMouseMotionListener.getSelection(viewDef);
 //					if (psNew != null) {
 //						Collection colPointsToAdd = psNew.getSelectedControlPoints();
@@ -769,8 +926,8 @@ public class DefaultTool extends JPatchTool {
 //					}
 					((Component)mouseEvent.getSource()).removeMouseMotionListener(selectMouseMotionListener);
 //					selectionChanged(ps);
-					break;
-				case XOR_MODIFY_SELECTION:
+				} break;
+				case XOR_MODIFY_SELECTION: {
 //					psNew = (PointSelection)selectMouseMotionListener.getSelection(viewDef);
 //					if (psNew != null) {
 //						Collection colNewSelection = psNew.getSelectedControlPoints();
@@ -793,15 +950,23 @@ public class DefaultTool extends JPatchTool {
 //						//compoundEdit.addEdit(new ChangeSelectionPivotEdit(ps,ps.getCenter(),null));
 //						MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
 //					}
+					Selection newSelection = selectMouseMotionListener.getSelection(viewDef);
+					if (newSelection != null) {
+						edit.addEdit(new AtomicModifySelection.RemoveObjects(selection, newSelection.getMap()));
+						if (newSelection.contains(selection.getHotObject()))
+							edit.addEdit(new AtomicModifySelection.HotObject(selection, null));
+						edit.setName("remove objects from selection");
+						MainFrame.getInstance().getUndoManager().addEdit(edit);
+					}
 					((Component)mouseEvent.getSource()).removeMouseMotionListener(selectMouseMotionListener);
 //					selectionChanged(ps);
-					break;
-				case PIVOT:
-					//if (!selection.getPivot().equals(pivotHandle.getPosition(viewDef))) {
-						MainFrame.getInstance().getUndoManager().addEdit(new AtomicModifySelection.Pivot(selection, p3Pivot));
-					//}
-					((Component)mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
-					break;
+				} break;
+//				case PIVOT:
+//					//if (!selection.getPivot().equals(pivotHandle.getPosition(viewDef))) {
+//						MainFrame.getInstance().getUndoManager().addEdit(new AtomicModifySelection.Pivot(selection, p3Pivot));
+//					//}
+//					((Component)mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
+//					break;
 				case TANGENT:
 					if (tangentHandle.getCp().getInMagnitude() != fMagnitude) {
 						MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeControlPoint.Magnitude(tangentHandle.getCp(),fMagnitude));
@@ -844,7 +1009,7 @@ public class DefaultTool extends JPatchTool {
 		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 		Grid grid = MainFrame.getInstance().getJPatchScreen().getViewport((Component) mouseEvent.getSource()).getGrid();
 		//System.out.println("mouseDragged");
-		Selection selection = MainFrame.getInstance().getSelection();
+//		Selection selection = MainFrame.getInstance().getSelection();
 		int iDeltaX = mouseEvent.getX() - iMouseX;
 		int iDeltaY = mouseEvent.getY() - iMouseY;
 		Matrix4f m4InvScreenMatrix = new Matrix4f(viewDef.getScreenMatrix());
@@ -855,8 +1020,8 @@ public class DefaultTool extends JPatchTool {
 				m4InvScreenMatrix.transform(v3Move);
 //				m4Transform.set(v3Move);
 //				transformTemporarily();
-				selection.getPivot().set(p3Pivot);
-				selection.getPivot().add(v3Move);
+//				selection.getPivot().set(p3Pivot);
+//				selection.getPivot().add(v3Move);
 				translate(v3Move, viewDef, grid);
 				
 //				if (cpHot == null) {
@@ -880,45 +1045,13 @@ public class DefaultTool extends JPatchTool {
 			}
 			break;
 		//} else {
+			case MOVE_SINGLE_BONENED: // intentionally falls through to MOVE_SINGLE_POINT!
 			case MOVE_SINGLE_POINT: {
 			
 				Vector3f v3Move = bMoveZ ? new Vector3f(0,0,iDeltaY - iDeltaX) : new Vector3f(iDeltaX, iDeltaY, 0);
 				m4InvScreenMatrix.transform(v3Move);
-//				m4Transform.set(v3Move);
-//				transformTemporarily();
 				translate(v3Move, viewDef, grid);
-				
-				//Point3f p3Old = cpHot.getPosition();
-				//viewport.getViewDefinition().setZ(p3Old);
-				//Point3f p3New;
-				//if (bMoveZ) {
-				//	p3New = new Point3f(cpHot.getPosition());
-				//	//System.out.println(p3New);
-				//	Vector3f v3Z = new Vector3f(0,0,iDeltaY - iDeltaX);
-				//	m4InvScreenMatrix.transform(v3Z);
-				//	//m4InvScreenMatrix.transform(p3New);
-				//	p3New.add(v3Z);
-				//	//viewport.getViewDefinition().getMatrix().transform(p3New);
-				//} else {
-				//	p3New = viewport.getViewDefinition().get3DPosition((float)mouseEvent.getX(),(float)mouseEvent.getY());
-				//}
-				////MainFrame.getInstance().getConstraints().setPointPosition(p3Old,p3New);
-				//if ((bMoveZ && viewport.getGrid().correctZPosition(p3Old,p3New)) || viewport.getGrid().correctPosition(p3Old,p3New)) {
-				//	//Point3f p3NewPos = viewport.getGrid().getCorrectedPosition(viewport.getViewDefinition().get3DPosition((float)mouseEvent.getX(),(float)mouseEvent.getY()));
-				//	//if (cpH
-				//	//MainFrame.getInstance().getConstraints().setControlPointPosition(cpHot,viewport.getGrid().getCorrectedPosition(viewport.getViewDefinition().get3DPosition((float)mouseEvent.getX(),(float)mouseEvent.getY())));
-				//	//if (!p3New.equals(p3Old)) {
-				//	//cpHot.setPosition(p3New);
-				//	MainFrame.getInstance().getConstraints().setControlPointPosition(cpHot,p3New);
-				//	if (bMoveZ) {
-				//		MainFrame.getInstance().getJPatchScreen().update_all();
-				//	} else {
-				//		MainFrame.getInstance().getJPatchScreen().single_update((Component)viewport);
-				//	}
-				//}
-				//break;
-			}
-			break;
+			} break;
 		}
 	}
 	

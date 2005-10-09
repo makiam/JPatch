@@ -11,7 +11,7 @@ public class Grid {
 	
 	private int iPlane = XZ;
 	private float fSpacing = JPatchSettings.getInstance().fGridSpacing;
-	private int iSize = 25;
+//	private int iSize = 25;
 	private boolean bSnap = true;
 	private JPatchSettings settings = JPatchSettings.getInstance();
 	

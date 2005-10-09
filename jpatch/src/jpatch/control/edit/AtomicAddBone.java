@@ -19,46 +19,34 @@
  * along with JPatch; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 package jpatch.control.edit;
 
-import java.util.*;
+import jpatch.boundary.*;
 import jpatch.entity.*;
 
 /**
  * @author sascha
  *
  */
-public class AddPointsToMorphEdit extends JPatchAtomicEdit {
-	
-	private Morph morph;
-	private Map map;
+public class AtomicAddBone extends JPatchAtomicEdit {
 
-	public AddPointsToMorphEdit(Morph morph, Map map) {
-		this.morph = morph;
-		this.map = map;
+	private Bone bone;
+	
+	public AtomicAddBone(Bone bone) {
+		this.bone = bone;
 		redo();
 	}
 	
-	public void redo() {
-		morph.getMorphMap().putAll(map);
-//		morph.getPointList().addAll(listPoints);
-//		morph.getVectorList().addAll(listVectors);
-	}
-	
 	public void undo() {
-//		List morphPoints = morph.getPointList();
-//		List morphVectors = morph.getVectorList();
-		Map morphMap = morph.getMorphMap();
-		for (Iterator it = map.keySet().iterator(); it.hasNext(); ) {
-//			ControlPoint cp = (ControlPoint) it.next();
-//			morphVectors.remove(morphPoints.indexOf(cp));
-//			morphPoints.remove(cp);
-			morphMap.remove(it.next());
-		}
+		MainFrame.getInstance().getModel().removeBone(bone);
 	}
-	
+
+	public void redo() {
+		MainFrame.getInstance().getModel().addBone(bone);
+	}
+
 	public int sizeOf() {
-		return 8 + 4 + (8 + 4 + 4 + 4 + 4 + 8 * map.size() * 2);
+		return 8 + 4;
 	}
+
 }
