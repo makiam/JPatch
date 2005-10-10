@@ -3,6 +3,8 @@ package jpatch.boundary;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+
+import jpatch.auxilary.*;
 import jpatch.entity.*;
 import jpatch.boundary.action.*;
 import jpatch.boundary.mouse.*;
@@ -72,6 +74,8 @@ public final class JPatchScreen extends JPanel {
 	public void initScreen() {
 		int mode = iMode;
 		setMode(0);
+		if (JPatchSettings.getInstance().iRealtimeRenderer == OPENGL && !JoglInstall.isInstalled())
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), new JLabel("Can't use OpenGL display: native JOGL libraries not found."), "Warning", JOptionPane.WARNING_MESSAGE);
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 			final int I = i;
 			JPatchDrawableEventListener listener = new JPatchDrawableEventListener() {
@@ -93,7 +97,12 @@ public final class JPatchScreen extends JPanel {
 			switch (JPatchSettings.getInstance().iRealtimeRenderer) {
 				case JAVA2D: aDrawable[i] = new JPatchDrawable2D(listener, false); break;
 				case SOFTWARE: aDrawable[i] = new JPatchDrawable3D(listener, false); break;
-				case OPENGL: aDrawable[i] = new JPatchDrawableGL(listener, false); break;
+				case OPENGL: {
+					if (JoglInstall.isInstalled())
+						aDrawable[i] = new JPatchDrawableGL(listener, false);
+					else
+						aDrawable[i] = new JPatchDrawable3D(listener, false);
+				} break;
 			}
 			aDrawable[i].setProjection(JPatchDrawable2.ORTHOGONAL);
 			aViewport[i] = new Viewport2(aDrawable[i], aViewDef[i]);

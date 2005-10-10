@@ -81,7 +81,7 @@ public class GlTest {
 							logger.log("found in " + folders[i] + "\n");
 						}
 					}
-					if (!loaded) {
+					if (true || !loaded) {
 						logger.log("not found.\n");
 						logger.log("\n");
 						if (platform != WINDOWS_X86 && platform != LINUX_X86 && platform != OSX_PPC) {
