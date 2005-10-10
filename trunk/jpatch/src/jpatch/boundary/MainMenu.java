@@ -164,6 +164,7 @@ public final class MainMenu extends JMenuBar {
 		menuOptions.add(new ColorPreferencesAction());
 		menuOptions.add(new SetGridSpacingAction());
 		menuOptions.add(new ZBufferQualityAction());
+		menuOptions.add(new InstallJoglAction());
 //		menuOptions.add(menuLight);
 		
 		
