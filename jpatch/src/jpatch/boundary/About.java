@@ -38,7 +38,7 @@ public class About extends JDialog implements ActionListener {
 		strAbout =
 			"<html>" +
 			"<div align='center'><b>JPatch " + VersionInfo.version + "</b><br>" +
-			"compiled " + VersionInfo.compileTime + "<br>" +
+//			"compiled " + VersionInfo.compileTime + "<br>" +
 			"<br>" +
 			"written by Sascha Ledinsky<br>" +
 			"Copyright &copy; 2002-2005<br>"+ 

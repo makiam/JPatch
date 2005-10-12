@@ -765,12 +765,27 @@ public class DefaultTool extends JPatchTool {
 			
 			/* check state */
 			if (iState == MOVE_SINGLE_BONENED || (btHot != null && iState == MOVE_GROUP)) {
+				boolean weld = false;
 				if (btHot.isStart()) {
 					Bone.BoneTransformable bt = viewDef.getClosestBoneEnd(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()), btHot, false, true);
-					edit.addEdit(new AtomicAttachBone(btHot.getBone(), bt.getBone()));
+					if (bt != null) {
+						edit.addEdit(new AtomicAttachBone(btHot.getBone(), bt.getBone()));
+						weld = true;
+					}
 				} else if (btHot.isEnd()) {
 					Bone.BoneTransformable bt = viewDef.getClosestBoneEnd(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()), btHot, true, false);
-					edit.addEdit(new AtomicAttachBone(bt.getBone(), btHot.getBone()));
+					if (bt != null) {
+						edit.addEdit(new AtomicAttachBone(bt.getBone(), btHot.getBone()));
+						weld = true;
+					}
+				}
+				if (weld) {
+					System.out.println("*");
+					if (iState == MOVE_SINGLE_BONENED)
+						edit.addEdit(new AtomicChangeSelection(null));
+					else
+						MainFrame.getInstance().getSelection().setHotObject(null);
+					endTransform();
 				}
 			} else if (iState == MOVE_SINGLE_POINT || (cpHot != null && iState == MOVE_GROUP)) {
 //				Viewport viewport = (Viewport)mouseEvent.getSource();
@@ -880,10 +895,12 @@ public class DefaultTool extends JPatchTool {
 				case MOVE_SINGLE_POINT:
 					edit.setName("move point");
 					endTransform();
+					edit.addEdit(new AtomicChangeSelection(null));
 					break;
 				case MOVE_SINGLE_BONENED:
 					edit.setName("move bone");
 					endTransform();
+					edit.addEdit(new AtomicChangeSelection(null));
 					break;
 				case MOVE_GROUP:
 					// - compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,ps.getControlPointArray()));
@@ -892,6 +909,8 @@ public class DefaultTool extends JPatchTool {
 //					edit.addEdit(new AtomicModifySelection.Pivot(selection, p3Pivot));
 					edit.setName("move objects");
 					endTransform();
+					if (selection.getHotObject() != null)
+						selection.setHotObject(null);
 					break;
 				case SCALE_GROUP:
 					// edit = new MoveControlPointsEdit(MoveControlPointsEdit.SCALE,ps.getControlPointArray());
@@ -905,7 +924,7 @@ public class DefaultTool extends JPatchTool {
 					Selection sel = selectMouseMotionListener.getSelection(viewDef);
 					if ((selection != null ^ sel != null) || sel != null && !sel.equals(selection)) {
 						MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(sel));
-						selectionChanged(selection);
+						selectionChanged(sel);
 					}
 					((Component)mouseEvent.getSource()).removeMouseMotionListener(selectMouseMotionListener);
 					break;
@@ -976,8 +995,10 @@ public class DefaultTool extends JPatchTool {
 			}
 			((Component)mouseEvent.getSource()).removeMouseMotionListener(this);
 			for (int i = 0; i < aHandle.length; aHandle[i++].setActive(false));
-			MainFrame.getInstance().getJPatchScreen().update_all();
-			iState = IDLE;
+			if (iState != IDLE) {
+				MainFrame.getInstance().getJPatchScreen().update_all();
+				iState = IDLE;
+			}
 			if (MainFrame.getInstance().getSelection() == null) {
 				MainFrame.getInstance().setHelpText("Drag to move or select points. Use ATL to move perpendicular to screen plane.");
 			} else if (MainFrame.getInstance().getSelection().isSingle()) {
@@ -1205,7 +1226,9 @@ public class DefaultTool extends JPatchTool {
 		if (leaf == null || leaf.getNodeType() == JPatchTreeLeaf.SELECTIONS || leaf.getNodeType() == JPatchTreeLeaf.SELECTION || leaf.getNodeType() == JPatchTreeLeaf.MODEL) {
 			//MainFrame.getInstance().getSideBar().enableTreeSelectionListener(false);
 			if (selection != null && !MainFrame.getInstance().getModel().checkSelection(selection)) {
+			//	System.out.println("*");
 			//	MainFrame.getInstance().getSideBar().enableTreeSelectionListener(false);
+			//	System.out.println(selection + " " + MainFrame.getInstance().getModel().getSelection(selection));
 				MainFrame.getInstance().getTree().setSelectionPath(MainFrame.getInstance().getModel().getSelection(selection).getTreePath());
 			//	MainFrame.getInstance().getSideBar().enableTreeSelectionListener(true);
 			} else {
