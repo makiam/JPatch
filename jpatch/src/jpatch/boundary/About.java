@@ -4,6 +4,10 @@ import jpatch.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
+
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -417,7 +421,70 @@ public class About extends JDialog implements ActionListener {
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(tabbedPane,BorderLayout.CENTER);
 		getContentPane().add(panel,BorderLayout.SOUTH);
-		getContentPane().add(new ImagePane(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/jpatch.png"))),BorderLayout.WEST);
+		Icon jpatchIcon = new Icon() {
+
+			public void paintIcon(Component c, Graphics g, int x, int y) {
+				System.out.println(x + " " + y);
+				Graphics2D g2 = (Graphics2D) g;
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+				FontRenderContext frc = g2.getFontRenderContext();
+				Font font;
+				GlyphVector gv;
+				Shape shape;
+				font = new Font("sans-serif", Font.BOLD, 40);
+				gv = font.createGlyphVector(frc, VersionInfo.name);
+				shape = (new AffineTransform(0,-1, 1, 0, 31, 370)).createTransformedShape(gv.getOutline());
+//				g2.setPaint(new GradientPaint(0, 0, new Color(0.0f, 0.0f, 0.0f, 1.0f), 0, -40, new Color(0.0f, 0.0f, 0.0f, 0.0f)));
+//				g2.fill(shape);
+				
+				g2.setTransform(new AffineTransform(1, 0, 0, 1, x, y));
+				
+				g2.setColor(Color.BLACK);
+				g2.setStroke(new BasicStroke(2));
+				g2.draw(shape);
+				
+				g2.setClip(0, 0, 25, 380);
+				g2.setPaint(new GradientPaint(0, 0, Color.BLUE, 25, 0, Color.WHITE));
+				g2.fill(shape);
+				g2.setClip(25, 0, 15, 380);
+				g2.setPaint(new GradientPaint(25, 0, Color.BLACK, 40, 0, Color.WHITE));
+				g2.fill(shape);
+				
+				g2.setClip(0, 0, 40, 380);
+				g2.setColor(Color.WHITE);
+				g2.setStroke(new BasicStroke(1));
+				g2.draw(shape);
+				
+				font = new Font("sans-serif", Font.ITALIC, 20);
+				gv = font.createGlyphVector(frc, VersionInfo.url);
+				shape = (new AffineTransform(0,-1, 1, 0, 35, 160)).createTransformedShape(gv.getOutline());
+				Color col = c.getBackground();
+				g2.setColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), 192));
+				g2.setPaint(g2.getColor());
+				g2.fill(shape);
+				g2.setStroke(new BasicStroke(3));
+				g2.draw(shape);
+				
+				g2.setColor(new Color(0, 0, 0, 128));
+				g2.setStroke(new BasicStroke(1));
+				g2.draw(shape);
+				
+				g2.setPaint(new Color(255, 128, 0, 192));
+				g2.fill(shape);
+				
+			}
+
+			public int getIconWidth() {
+				return 40;
+			}
+
+			public int getIconHeight() {
+				return 380;
+			}
+			
+		};
+		getContentPane().add(new IconPane(jpatchIcon),BorderLayout.WEST);
 		setSize(640,480);
 		setLocationRelativeTo(owner);
 		setVisible(true);
@@ -427,13 +494,13 @@ public class About extends JDialog implements ActionListener {
 		new About(null);
 	}
 	
-	class ImagePane extends JPanel {
+	class IconPane extends JPanel {
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
-		private ImageIcon icon;
-		private ImagePane(ImageIcon icon) {
+		private Icon icon;
+		private IconPane(Icon icon) {
 			this.icon = icon;
 			Dimension dim = new Dimension(icon.getIconWidth() + 10,icon.getIconHeight() + 10);
 			setPreferredSize(dim);
