@@ -5,6 +5,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 import jpatch.control.edit.*;
+import jpatch.entity.ControlPoint;
 import jpatch.boundary.*;
 
 public final class RemoveControlPointAction extends AbstractAction {
@@ -18,14 +19,35 @@ public final class RemoveControlPointAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		if (MainFrame.getInstance().getSelection() == null)
+		
+	JPatchActionEdit edit = null;
+		Selection selection = MainFrame.getInstance().getSelection();
+		if (selection == null)
 			return;
-		HashSet selectionSet = new HashSet(MainFrame.getInstance().getSelection().getObjects());
-		JPatchActionEdit edit = new JPatchActionEdit("remove");
-		edit.addEdit(new CompoundRemove(selectionSet));
+		if (selection.getDirection() != 0) {
+			ControlPoint cp = (ControlPoint) selection.getHotObject();
+			if (selection.getDirection() == -1)
+				cp = cp.getPrev();
+			edit = new JPatchActionEdit("remove curve segment");
+			edit.addEdit(new CompoundRemoveCurveSegment(cp));
+		} else {
+			HashSet selectionSet = new HashSet(MainFrame.getInstance().getSelection().getObjects());
+			edit = new JPatchActionEdit("remove");
+			edit.addEdit(new CompoundRemove(selectionSet));
+		}
 		edit.addEdit(new AtomicChangeSelection(null));
 		MainFrame.getInstance().getUndoManager().addEdit(edit);
 		MainFrame.getInstance().getJPatchScreen().update_all();
+		
+		
+//		if (MainFrame.getInstance().getSelection() == null)
+//			return;
+//		HashSet selectionSet = new HashSet(MainFrame.getInstance().getSelection().getObjects());
+//		JPatchActionEdit edit = new JPatchActionEdit("remove");
+//		edit.addEdit(new CompoundRemove(selectionSet));
+//		edit.addEdit(new AtomicChangeSelection(null));
+//		MainFrame.getInstance().getUndoManager().addEdit(edit);
+//		MainFrame.getInstance().getJPatchScreen().update_all();
 	}
 	
 //	public void actionPerformed(ActionEvent actionEvent) {
