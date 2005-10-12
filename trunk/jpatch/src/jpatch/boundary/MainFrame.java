@@ -405,7 +405,7 @@ public final class MainFrame extends JFrame {
 	public void setSelection(Selection selection) {
 //		getModel().removeSelection(this.selection);
 		this.selection = selection;
-		meshToolBar.getWeightButton().setEnabled(selection != null);
+		meshToolBar.getWeightButton().setEnabled(selection != null && !selection.isSingle());
 		/* unhide new selection */
 		if (selection != null) {
 			selection.setActive(true);

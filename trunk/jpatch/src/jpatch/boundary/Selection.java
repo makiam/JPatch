@@ -301,6 +301,7 @@ public class Selection extends JPatchTreeLeaf {
 	
 	public Selection cloneSelection() {
 		Selection selection = new Selection(mapObjects);
+		selection.mapObjects.remove(pivotTransformable);
 		selection.p3Pivot.set(p3Pivot);
 		selection.m3Orientation.set(m3Orientation);
 		selection.hotObject = hotObject;
@@ -314,8 +315,17 @@ public class Selection extends JPatchTreeLeaf {
 		if (object == this)
 			return true;
 		Selection selection = (Selection) object;
-		if (!mapObjects.equals(selection.mapObjects))
-			return false;
+//		System.out.println("comparting " + this + " with " + selection);
+//		System.out.println(mapObjects);
+//		System.out.println(selection.mapObjects);
+//		System.out.println(mapObjects.equals(selection.mapObjects));
+		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext(); ) {
+			Object o = it.next();
+			if (o != pivotTransformable && !selection.contains(o))
+				return false;
+		}
+//		if (!mapObjects.equals(selection.mapObjects))
+//			return false;
 		if (!(iDirection == selection.iDirection))
 			return false;
 		return true;

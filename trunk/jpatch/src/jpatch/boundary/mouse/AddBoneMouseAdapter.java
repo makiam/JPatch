@@ -182,6 +182,8 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 	public void mouseReleased(MouseEvent mouseEvent) {
 		if (mouseEvent.getButton() == MouseEvent.BUTTON1 && bActive == true) {
 			compSource.removeMouseMotionListener(this);
+			if (MainFrame.getInstance().getSelection() != null)
+				edit.addEdit(new AtomicChangeSelection(null));
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 //			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
