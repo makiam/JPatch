@@ -11,6 +11,10 @@ public final class Launcher {
 	private static BFrame frame;
 	/* private static GlTest gltest; */
 	public static void main(String[] args) {
+		if (true) {
+			new MainFrame(new Model());
+			return;
+		}
 		if (args.length >=1) {
 			if (args[0].equals("-animator")) launchAnimator();
 			else if (args[0].equals("-modeler")) launchModeler();

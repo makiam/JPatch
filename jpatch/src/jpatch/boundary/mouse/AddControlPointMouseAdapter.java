@@ -127,7 +127,8 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 							edit.addEdit(new AtomicAttachControlPoints(cpHot.getHead(),cp.getTail()));
 	//						((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
 	//					edit.addEdit(new RemoveControlPointFromSelectionEdit(cpHot, MainFrame.getInstance().getSelection()));
-						MainFrame.getInstance().getJPatchScreen().full_update();
+						edit.addEdit(new AtomicChangeSelection(null));
+						MainFrame.getInstance().getJPatchScreen().update_all();
 						setIdleState();
 					} else {
 						if (!cp.getNext().getHead().isHook() && !cp.getHead().isHook()) {
@@ -135,7 +136,8 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 								edit.addEdit(new CompoundHook(cpHot,cp,hookPos[0]));
 	//FIXME							((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
 	//							compoundEdit.addEdit(new RemoveControlPointFromSelectionEdit(cpHot, MainFrame.getInstance().getSelection()));
-								MainFrame.getInstance().getJPatchScreen().full_update();
+								edit.addEdit(new AtomicChangeSelection(null));
+								MainFrame.getInstance().getJPatchScreen().update_all();
 								setIdleState();
 							} else {
 	//							ControlPoint hook = cp.getHookAt(hookPos[0]);
@@ -168,7 +170,9 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 //				//compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,acp));
 //			}
 //			compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,new ControlPoint[] { cpHot }));
-			MainFrame.getInstance().getJPatchScreen().full_update();
+			if (MainFrame.getInstance().getSelection() != null)
+				edit.addEdit(new AtomicChangeSelection(null));
+			MainFrame.getInstance().getJPatchScreen().update_all();
 			setIdleState();
 		}
 	}

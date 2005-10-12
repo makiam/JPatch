@@ -343,7 +343,7 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 		Selection selection = new Selection(pointList);
 		selection.setName("*lathe #" + iNum++);
 		if (selection.getMap().size() > 0) {
-			addEdit(new AtomicChangeSelection(selection));
+			addEdit(new AtomicChangeSelection(selection.cloneSelection()));
 			addEdit(new AtomicAddSelection(selection));
 		}
 	}
