@@ -54,8 +54,8 @@ public class AtomicDetatchControlPoint extends JPatchAtomicEdit {
 				cpPrevAttached.setPosition(cp.getPosition());
 			}
 		}
-		//cp.setNextAttached(null);
-		//cp.setPrevAttached(null);
+		cp.setNextAttached(null);
+		cp.setPrevAttached(null);
 	}
 
 
@@ -69,8 +69,8 @@ public class AtomicDetatchControlPoint extends JPatchAtomicEdit {
 		if (cpPrevAttached != null) {
 			cpPrevAttached.setNextAttached(cp);
 		}
-		//cp.setNextAttached(cpNextAttached);
-		//cp.setPrevAttached(cpPrevAttached);
+		cp.setNextAttached(cpNextAttached);
+		cp.setPrevAttached(cpPrevAttached);
 	}
 	
 	public int sizeOf() {

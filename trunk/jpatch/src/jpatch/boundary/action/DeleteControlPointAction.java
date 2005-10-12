@@ -3,8 +3,10 @@ package jpatch.boundary.action;
 import java.util.*;
 import java.awt.event.*;
 import javax.swing.*;
+
 import jpatch.control.edit.*;
 import jpatch.boundary.*;
+import jpatch.entity.*;
 
 public final class DeleteControlPointAction extends AbstractAction {
 	/**
@@ -18,11 +20,21 @@ public final class DeleteControlPointAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		if (MainFrame.getInstance().getSelection() == null)
+		JPatchActionEdit edit = null;
+		Selection selection = MainFrame.getInstance().getSelection();
+		if (selection == null)
 			return;
-		HashSet selectionSet = new HashSet(MainFrame.getInstance().getSelection().getObjects());
-		JPatchActionEdit edit = new JPatchActionEdit("delete");
-		edit.addEdit(new CompoundDelete(selectionSet));
+		if (selection.getDirection() != 0) {
+			ControlPoint cp = (ControlPoint) selection.getHotObject();
+			if (selection.getDirection() == -1)
+				cp = cp.getPrev();
+			edit = new JPatchActionEdit("remove curve segment");
+			edit.addEdit(new CompoundRemoveCurveSegment(cp));
+		} else {
+			HashSet selectionSet = new HashSet(MainFrame.getInstance().getSelection().getObjects());
+			edit = new JPatchActionEdit("delete");
+			edit.addEdit(new CompoundDelete(selectionSet));
+		}
 		edit.addEdit(new AtomicChangeSelection(null));
 		MainFrame.getInstance().getUndoManager().addEdit(edit);
 		MainFrame.getInstance().getJPatchScreen().update_all();
