@@ -158,18 +158,22 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 				setIdleState();
 			}
 		*/
-		} else if (mouseEvent.getButton() == MouseEvent.BUTTON3 && bActive == true) {
-			Bone.BoneTransformable bt = viewDef.getClosestBoneEnd(new Point2D.Float(mouseEvent.getX(), mouseEvent.getY()), null, true, false);
-			if (bt != null) {
-				bone.setEnd(bt.getBone().getStart(null));
-				edit.addEdit(new AtomicAttachBone(bt.getBone(), bone));
-				edit.addEdit(new AtomicChangeSelection(null));
-				compSource.removeMouseMotionListener(this);
-				MainFrame.getInstance().getUndoManager().addEdit(edit);
-				MainFrame.getInstance().getJPatchScreen().update_all();
-				MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
-				bActive = false;
-				MainFrame.getInstance().getDefaultToolTimer().restart();
+		} else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
+			if (bActive == true) {
+				Bone.BoneTransformable bt = viewDef.getClosestBoneEnd(new Point2D.Float(mouseEvent.getX(), mouseEvent.getY()), null, true, false);
+				if (bt != null) {
+					bone.setEnd(bt.getBone().getStart(null));
+					edit.addEdit(new AtomicAttachBone(bt.getBone(), bone));
+					edit.addEdit(new AtomicChangeSelection(null));
+					compSource.removeMouseMotionListener(this);
+					MainFrame.getInstance().getUndoManager().addEdit(edit);
+					MainFrame.getInstance().getJPatchScreen().update_all();
+					MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
+					bActive = false;
+					MainFrame.getInstance().getDefaultToolTimer().restart();
+				}
+			} else {
+				MainFrame.getInstance().getMeshToolBar().reset();
 			}
 		}
 		
@@ -180,7 +184,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 			compSource.removeMouseMotionListener(this);
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
 			MainFrame.getInstance().getJPatchScreen().update_all();
-			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
+//			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
 			bActive = false;
 			MainFrame.getInstance().getDefaultToolTimer().restart();
 		} 

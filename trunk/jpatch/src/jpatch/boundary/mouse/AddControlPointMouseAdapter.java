@@ -23,13 +23,13 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 	private JPatchActionEdit edit;
 	private ControlPoint cpHot;
 	private int iState = IDLE;
-	private boolean bMulti = false;
+//	private boolean bMulti = false;
 	
 	private Component compSource;
 	
 	public AddControlPointMouseAdapter(boolean multi) {
 		this();
-		bMulti = multi;
+//		bMulti = multi;
 	}
 	
 	public AddControlPointMouseAdapter() {
@@ -109,46 +109,51 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 			}
 			 
 			setActiveState();
-		} else if (iState == ACTIVE && mouseEvent.getButton() == MouseEvent.BUTTON3) {
-			/**
-			* right mouse button pressed (in active state)
-			**/
-			compSource = (Component)mouseEvent.getSource();
-			int iMouseX = mouseEvent.getX();
-			int iMouseY = mouseEvent.getY();
-			float[] hookPos = new float[1];
-			ControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(iMouseX,iMouseY),cpHot,hookPos,false,true);
-			if (cp != null && cp != cpHot.getPrev()) {
-				if (hookPos[0] == -1) {
-					if (!mouseEvent.isControlDown())
-						edit.addEdit(new CompoundWeldControlPoints(cpHot,cp));
-					else
-						edit.addEdit(new AtomicAttachControlPoints(cpHot.getHead(),cp.getTail()));
-//						((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
-//					edit.addEdit(new RemoveControlPointFromSelectionEdit(cpHot, MainFrame.getInstance().getSelection()));
-					MainFrame.getInstance().getJPatchScreen().full_update();
-					setIdleState();
-				} else {
-					if (!cp.getNext().getHead().isHook() && !cp.getHead().isHook()) {
-						if (cp.getHookAt(hookPos[0]) == null) {
-							edit.addEdit(new CompoundHook(cpHot,cp,hookPos[0]));
-//FIXME							((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
-//							compoundEdit.addEdit(new RemoveControlPointFromSelectionEdit(cpHot, MainFrame.getInstance().getSelection()));
-							MainFrame.getInstance().getJPatchScreen().full_update();
-							setIdleState();
-						} else {
-//							ControlPoint hook = cp.getHookAt(hookPos[0]);
-//							compoundEdit.addEdit(new ConvertHookToCpEdit(hook));
-//							compoundEdit.addEdit(new CompoundWeldControlPoints(cpHot,hook));
-////FIXME							((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
-//							compoundEdit.addEdit(new RemoveControlPointFromSelectionEdit(cpHot, MainFrame.getInstance().getSelection()));
-//							MainFrame.getInstance().getJPatchScreen().full_update();
-//							setIdleState();
+		} else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
+			if (iState == ACTIVE) {
+				/**
+				* right mouse button pressed (in active state)
+				**/
+				compSource = (Component)mouseEvent.getSource();
+				int iMouseX = mouseEvent.getX();
+				int iMouseY = mouseEvent.getY();
+				float[] hookPos = new float[1];
+				ControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(iMouseX,iMouseY),cpHot,hookPos,false,true);
+				if (cp != null && cp != cpHot.getPrev()) {
+					if (hookPos[0] == -1) {
+						if (!mouseEvent.isControlDown())
+							edit.addEdit(new CompoundWeldControlPoints(cpHot,cp));
+						else
+							edit.addEdit(new AtomicAttachControlPoints(cpHot.getHead(),cp.getTail()));
+	//						((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
+	//					edit.addEdit(new RemoveControlPointFromSelectionEdit(cpHot, MainFrame.getInstance().getSelection()));
+						MainFrame.getInstance().getJPatchScreen().full_update();
+						setIdleState();
+					} else {
+						if (!cp.getNext().getHead().isHook() && !cp.getHead().isHook()) {
+							if (cp.getHookAt(hookPos[0]) == null) {
+								edit.addEdit(new CompoundHook(cpHot,cp,hookPos[0]));
+	//FIXME							((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
+	//							compoundEdit.addEdit(new RemoveControlPointFromSelectionEdit(cpHot, MainFrame.getInstance().getSelection()));
+								MainFrame.getInstance().getJPatchScreen().full_update();
+								setIdleState();
+							} else {
+	//							ControlPoint hook = cp.getHookAt(hookPos[0]);
+	//							compoundEdit.addEdit(new ConvertHookToCpEdit(hook));
+	//							compoundEdit.addEdit(new CompoundWeldControlPoints(cpHot,hook));
+	////FIXME							((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
+	//							compoundEdit.addEdit(new RemoveControlPointFromSelectionEdit(cpHot, MainFrame.getInstance().getSelection()));
+	//							MainFrame.getInstance().getJPatchScreen().full_update();
+	//							setIdleState();
+							}
 						}
-					}
-				}				
+					}				
+				}
+			} else if (iState == IDLE) {
+				// Right MouseButton pressed in IDLE state
+				MainFrame.getInstance().getMeshToolBar().reset();
 			}
-		}
+		}  
 	}
 	
 	public void mouseReleased(MouseEvent mouseEvent) {
@@ -182,7 +187,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 	}
 	
 	private void setActiveState() {
-		if (iState == IDLE) {
+		if (iState != ACTIVE) {
 			compSource.addMouseMotionListener(this);
 			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(false);
 			iState = ACTIVE;
@@ -197,7 +202,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 		if (iState == ACTIVE) {
 			compSource.removeMouseMotionListener(this);
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
-			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
+//			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
 			iState = IDLE;
 		} else {
 			throw new IllegalStateException("setIdleState() called in idle state");

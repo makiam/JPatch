@@ -18,6 +18,7 @@ public final class AddBoneAction extends AbstractAction {
 	public void actionPerformed(ActionEvent actionEvent) {
 		MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
 		MainFrame.getInstance().getJPatchScreen().addMouseListeners(new AddBoneMouseAdapter());
+		MainFrame.getInstance().getJPatchScreen().enablePopupMenu(false);
 		MainFrame.getInstance().clearDialog();
 	}
 }
