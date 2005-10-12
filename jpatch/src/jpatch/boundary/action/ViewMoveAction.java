@@ -18,6 +18,7 @@ public final class ViewMoveAction extends AbstractAction {
 		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.VIEW_MOVE) {
 			MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
 			MainFrame.getInstance().getJPatchScreen().addMouseListeners(new ChangeViewMouseListener(MouseEvent.BUTTON1,ChangeViewMouseListener.MOVE));
+			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(false);
 			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.VIEW_MOVE);
 		} else {
 			MainFrame.getInstance().getMeshToolBar().reset();

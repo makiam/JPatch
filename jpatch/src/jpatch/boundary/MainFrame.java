@@ -49,7 +49,7 @@ public final class MainFrame extends JFrame {
 	private SideBar sideBar;
 	private JPatchTreeNode treenodeRoot;
 	private Morph editedMorph;
-	private javax.swing.Timer defaultToolTimer = new javax.swing.Timer(2500, new ActionListener() {
+	private javax.swing.Timer defaultToolTimer = new javax.swing.Timer(5000, new ActionListener() {
 		public void actionPerformed(ActionEvent event) {
 			defaultToolTimer.stop();
 			meshToolBar.reset();

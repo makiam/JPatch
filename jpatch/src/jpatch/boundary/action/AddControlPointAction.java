@@ -30,6 +30,7 @@ public final class AddControlPointAction extends AbstractAction {
 			}
 			MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
 			MainFrame.getInstance().getJPatchScreen().addMouseListeners(new AddControlPointMouseAdapter());
+			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(false);
 			MainFrame.getInstance().clearDialog();
 			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.ADD);
 		} else {
