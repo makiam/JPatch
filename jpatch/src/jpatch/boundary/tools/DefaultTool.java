@@ -775,17 +775,22 @@ public class DefaultTool extends JPatchTool {
 				} else if (btHot.isEnd()) {
 					Bone.BoneTransformable bt = viewDef.getClosestBoneEnd(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()), btHot, true, false);
 					if (bt != null) {
+						btHot.getBone().setEnd(bt.getBone().getStart(null));
 						edit.addEdit(new AtomicAttachBone(bt.getBone(), btHot.getBone()));
 						weld = true;
 					}
 				}
 				if (weld) {
-					System.out.println("*");
+					Selection selection = MainFrame.getInstance().getSelection();
 					if (iState == MOVE_SINGLE_BONENED)
 						edit.addEdit(new AtomicChangeSelection(null));
 					else
 						MainFrame.getInstance().getSelection().setHotObject(null);
-					endTransform();
+					((Component)mouseEvent.getSource()).removeMouseMotionListener(this);
+					edit.addEdit(selection.endTransform());
+					MainFrame.getInstance().getUndoManager().addEdit(edit);
+					MainFrame.getInstance().getJPatchScreen().update_all();
+					iState = IDLE;
 				}
 			} else if (iState == MOVE_SINGLE_POINT || (cpHot != null && iState == MOVE_GROUP)) {
 //				Viewport viewport = (Viewport)mouseEvent.getSource();
