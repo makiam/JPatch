@@ -133,7 +133,7 @@ public final class MainMenu extends JMenuBar {
 		menuFile.add(new QuitAction());
 		
 		menuHelp.add(new AboutAction());
-		
+		menuHelp.add(new ShowSplashAction());
 //		JMenu menuRenderer = new JMenu("Renderer");
 //		JRadioButtonMenuItem miJava2D = new JRadioButtonMenuItem(new SwitchRendererAction(0, rendererName[0]));
 //		JRadioButtonMenuItem miSoftware = new JRadioButtonMenuItem(new SwitchRendererAction(1, rendererName[1]));

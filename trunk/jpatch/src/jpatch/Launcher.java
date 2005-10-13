@@ -12,7 +12,19 @@ public final class Launcher {
 	/* private static GlTest gltest; */
 	public static void main(String[] args) {
 		if (true) {
-			new MainFrame(new Model());
+			try {
+				UIManager.setLookAndFeel(JPatchSettings.getInstance().strPlafClassName);
+			} catch (Exception e) { }
+			SplashScreen splash = new SplashScreen();
+			splash.showSplash(true);
+			try {
+				Thread.sleep(100);
+			} catch (Exception e) { }
+			launchModeler();
+			try {
+				Thread.sleep(900);
+			} catch (Exception e) { }
+			splash.clearSplash();
 			return;
 		}
 		if (args.length >=1) {
