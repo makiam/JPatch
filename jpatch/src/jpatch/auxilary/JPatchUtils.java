@@ -22,7 +22,8 @@ public final class JPatchUtils {
 	}
 	
 	public static int showSaveDialog() {
-		return JOptionPane.showConfirmDialog(MainFrame.getInstance(),"The model has been changed, and all changes will be lost. Do you like to save?", "Save changes?", JOptionPane.YES_NO_CANCEL_OPTION);
+		//return JOptionPane.showConfirmDialog(MainFrame.getInstance(),"The model has been changed, and all changes will be lost. Do you like to save?", "Save changes?", JOptionPane.YES_NO_CANCEL_OPTION, );
+		return JOptionPane.showOptionDialog(MainFrame.getInstance(), "Do you want to save changes?", "Save changes?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] { "Save", "Don't save", "Cancel" }, "Save");
 	}
 	
 	public static int[] getJvmVersion() {
