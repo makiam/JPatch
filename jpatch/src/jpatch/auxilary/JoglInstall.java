@@ -1,5 +1,5 @@
 /*
- * $Id: JoglInstall.java,v 1.1 2005/10/10 15:45:08 sascha_l Exp $
+ * $Id: JoglInstall.java,v 1.2 2005/10/14 13:12:31 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -102,7 +102,7 @@ public class JoglInstall {
 	public static void extractJoglLibraries(int platform, String dir) throws IOException {
 		switch(platform) {
 			case WINDOWS_X86: {
-				copyFromURL(ClassLoader.getSystemResource("native/windows_x86/jogl.dll"), dir);
+				copyFromURL(ClassLoader.getSystemResource("native/windows/jogl.dll"), dir);
 				}
 			break;
 			case LINUX_X86: {

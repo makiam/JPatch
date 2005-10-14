@@ -1,5 +1,5 @@
 /*
- * $Id: SplashScreen.java,v 1.2 2005/10/14 12:07:23 sascha_l Exp $
+ * $Id: SplashScreen.java,v 1.3 2005/10/14 13:12:31 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -35,7 +35,7 @@ import jpatch.VersionInfo;
  *
  */
 public class SplashScreen {
-	private static boolean shown = false;
+	public static SplashScreen instance;
 	JWindow window = new JWindow();
 	JPanel logo = new JPanel() {
 		private static final long serialVersionUID = 1L;
@@ -79,7 +79,7 @@ public class SplashScreen {
 	};
 	
 	public void showSplash(boolean progressBar) {
-		if (shown)
+		if (instance != null)
 			return;
 		if (!progressBar)
 			MainFrame.getInstance().setEnabled(false);
@@ -123,7 +123,7 @@ public class SplashScreen {
 		window.setSize(400,300);
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);
-		shown = true;
+		instance = this;
 		window.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				clearSplash();
@@ -135,6 +135,6 @@ public class SplashScreen {
 		window.setVisible(false);
 		window.dispose();
 		MainFrame.getInstance().setEnabled(true);
-		shown = false;
+		instance = null;
 	}
 }
