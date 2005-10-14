@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.vecmath.*;
 
+import sun.security.krb5.internal.crypto.m;
+
 import jpatch.control.edit.*;
 import jpatch.entity.*;
 import jpatch.entity.Bone.BoneTransformable;
@@ -53,9 +55,11 @@ public class Selection extends JPatchTreeLeaf {
 			if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by)
 				selection.mapObjects.put(bone.getBoneEnd(), new Float(1.0f));
 		}
-		selection.p3Pivot.set(selection.getCenter());
-		selection.mapObjects.put(selection.pivotTransformable, new Float(1));
-		return (selection.mapObjects.size() > 1) ? selection : null;
+		if (selection.mapObjects.size() > 1) {
+			selection.p3Pivot.set(selection.getCenter());
+			selection.mapObjects.put(selection.pivotTransformable, new Float(1));
+		}
+		return (selection.mapObjects.size() > 0) ? selection : null;
 	}
 	
 	private Selection() {
@@ -73,8 +77,10 @@ public class Selection extends JPatchTreeLeaf {
 	public Selection(Map objectWeightMap) {
 		this();
 		mapObjects.putAll(objectWeightMap);
-		mapObjects.put(pivotTransformable, new Float(1));
-		p3Pivot.set(getCenter());
+		if (mapObjects.size() > 1) {
+			mapObjects.put(pivotTransformable, new Float(1));
+			p3Pivot.set(getCenter());
+		}
 	}
 
 	public Selection(Collection objects) {
@@ -319,6 +325,8 @@ public class Selection extends JPatchTreeLeaf {
 //		System.out.println(mapObjects);
 //		System.out.println(selection.mapObjects);
 //		System.out.println(mapObjects.equals(selection.mapObjects));
+		if (mapObjects.size() != selection.mapObjects.size())
+			return false;
 		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext(); ) {
 			Object o = it.next();
 			if (o != pivotTransformable && !selection.contains(o))

@@ -46,6 +46,14 @@ public final class AtomicRemoveControlPointFromSelections extends JPatchAtomicEd
 				selection.getMap().remove(cp);
 			}
 		}
+		Selection selection = MainFrame.getInstance().getSelection();
+		if (selection != null) {
+			Object weight = selection.getMap().get(cp);
+			if ((weight) != null) {
+				mapSelections.put(selection, weight);
+				selection.getMap().remove(cp);
+			}
+		}
 	}
 	
 	public void undo() {
