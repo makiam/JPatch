@@ -28,6 +28,7 @@ public class SwitchLookAndFeelAction extends AbstractAction {
 					UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 			else
 				UIManager.setLookAndFeel(lookAndFeel);
+			JPatchSettings.getInstance().strPlafClassName = lookAndFeel.getClass().getName();
 			SwingUtilities.updateComponentTreeUI(MainFrame.getInstance());
 		} catch (Exception e) {
 			e.printStackTrace();
