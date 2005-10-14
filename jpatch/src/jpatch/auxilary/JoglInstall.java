@@ -102,7 +102,7 @@ public class JoglInstall {
 	public static void extractJoglLibraries(int platform, String dir) throws IOException {
 		switch(platform) {
 			case WINDOWS_X86: {
-				copyFromURL(ClassLoader.getSystemResource("native/windows_x86/jogl.dll"), dir);
+				copyFromURL(ClassLoader.getSystemResource("native/windows/jogl.dll"), dir);
 				}
 			break;
 			case LINUX_X86: {

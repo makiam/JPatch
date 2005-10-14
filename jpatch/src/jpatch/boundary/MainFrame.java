@@ -203,6 +203,8 @@ public final class MainFrame extends JFrame {
 			mainToolBar.setScreenMode(jpatchScreen);
 			
 			if (JPatchSettings.getInstance().bFirstStart) {
+				if (SplashScreen.instance != null)
+					SplashScreen.instance.clearSplash();
 				new About(this);
 				JPatchSettings.getInstance().bFirstStart = false;
 			}
