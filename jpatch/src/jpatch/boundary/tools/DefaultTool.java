@@ -795,6 +795,7 @@ public class DefaultTool extends JPatchTool {
 			} else if (iState == MOVE_SINGLE_POINT || (cpHot != null && iState == MOVE_GROUP)) {
 //				Viewport viewport = (Viewport)mouseEvent.getSource();
 				float[] hookPos = new float[1];
+				boolean singlePoint = (iState == MOVE_SINGLE_POINT);
 				ControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()),cpHot,hookPos,false,true);
 //				NewSelection selection = MainFrame.getInstance().getSelection();
 				if (cp != null && cp != cpHot.getPrev() && cp != cpHot.getNext()) {
@@ -816,6 +817,10 @@ public class DefaultTool extends JPatchTool {
 //							compoundEdit.addEdit(new AddControlPointsToSelectionEdit(selection, map));
 //							compoundEdit.addEdit(new ChangeSelectionHotEdit(selection, cp));
 							//((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
+							if (singlePoint)
+								edit.addEdit(new AtomicChangeSelection(null));
+							else
+								edit.addEdit(new AtomicModifySelection.HotObject(MainFrame.getInstance().getSelection(), null));
 							MainFrame.getInstance().getJPatchScreen().full_update();
 							((Component)mouseEvent.getSource()).removeMouseMotionListener(this);
 							MainFrame.getInstance().getUndoManager().addEdit(edit);
@@ -837,6 +842,10 @@ public class DefaultTool extends JPatchTool {
 											//collection.add(cpHot.getHead());
 											//compoundEdit.addEdit(new AddControlPointsToSelectionEdit(ps,collection));
 											//((PointSelection)MainFrame.getInstance().getSelection()).removeControlPoint(cpHot);
+											if (singlePoint)
+												edit.addEdit(new AtomicChangeSelection(null));
+											else
+												edit.addEdit(new AtomicModifySelection.HotObject(MainFrame.getInstance().getSelection(), null));
 											MainFrame.getInstance().getJPatchScreen().full_update();
 											((Component)mouseEvent.getSource()).removeMouseMotionListener(this);
 											MainFrame.getInstance().getUndoManager().addEdit(edit);
@@ -900,7 +909,7 @@ public class DefaultTool extends JPatchTool {
 				case MOVE_SINGLE_POINT:
 					edit.setName("move point");
 					endTransform();
-					edit.addEdit(new AtomicChangeSelection(null));
+//					edit.addEdit(new AtomicChangeSelection(null));
 					break;
 				case MOVE_SINGLE_BONENED:
 					edit.setName("move bone");
@@ -914,8 +923,8 @@ public class DefaultTool extends JPatchTool {
 //					edit.addEdit(new AtomicModifySelection.Pivot(selection, p3Pivot));
 					edit.setName("move objects");
 					endTransform();
-					if (selection.getHotObject() != null)
-						selection.setHotObject(null);
+//					if (selection.getHotObject() != null)
+//						selection.setHotObject(null);
 					break;
 				case SCALE_GROUP:
 					// edit = new MoveControlPointsEdit(MoveControlPointsEdit.SCALE,ps.getControlPointArray());
@@ -1122,7 +1131,15 @@ public class DefaultTool extends JPatchTool {
 //	}
 	protected void translate(Vector3f v, ViewDefinition viewDef, Grid grid) {
 		Selection selection = MainFrame.getInstance().getSelection();
-		selection.translate(v);
+		Vector3f vv = new Vector3f(v);
+		if (selection.getHotObject() != null) {
+			float scale = ((Float) selection.getMap().get(selection.getHotObject())).floatValue();
+			if (scale != 0)
+				vv.scale(1f / scale);
+			else
+				return;
+		}
+		selection.translate(vv);
 		if (bMoveZ) {
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		} else {

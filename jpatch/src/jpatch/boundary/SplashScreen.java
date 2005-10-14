@@ -1,5 +1,5 @@
 /*
- * $Id: SplashScreen.java,v 1.1 2005/10/13 14:41:16 sascha_l Exp $
+ * $Id: SplashScreen.java,v 1.2 2005/10/14 12:07:23 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -26,6 +26,7 @@ import java.awt.geom.*;
 import java.awt.event.*;
 import java.awt.font.*;
 import javax.swing.*;
+import javax.swing.text.LayeredHighlighter;
 
 import jpatch.VersionInfo;
 
@@ -83,14 +84,27 @@ public class SplashScreen {
 		if (!progressBar)
 			MainFrame.getInstance().setEnabled(false);
 		JPanel panel = new JPanel();
+		JPanel foreground = new JPanel();
+		foreground.setOpaque(false);
+		JPanel background = new JPanel() {
+			public void paintComponent(Graphics g) {
+				Graphics2D g2 = (Graphics2D) g;
+				g2.setPaint(new GradientPaint(0, 0, Color.WHITE, getWidth() / 2, getHeight() * 3, Color.GRAY));
+				g2.fillRect(0, 0, getWidth(), getHeight());
+			}
+		};
+		panel.setLayout(new OverlayLayout(panel));
+		
+		panel.add(foreground);
+		panel.add(background);
 		window.setAlwaysOnTop(true);
-		panel.setLayout(new BorderLayout());
+		foreground.setLayout(new BorderLayout());
 		JProgressBar progress = new JProgressBar();
 		progress.setIndeterminate(true);
 		progress.setName("Starting JPatch...");
 		progress.setBorderPainted(false);
 		progress.setBackground(Color.GRAY);
-		panel.add(logo, BorderLayout.NORTH);
+		foreground.add(logo, BorderLayout.NORTH);
 		JLabel label = new JLabel("<html><center><font size='+1' color='red'><b>DEVELOPMENT VERSION</b></font><br><br>written by Sascha Ledinsky<br>Copyright &copy; 2002-2005<br><br>" +
 				"<font size = '-2'>This program is free software.<br>You can redistribute it and/or modify" +
 				"it under the terms of the<br>GNU General Public License as published by" +
@@ -100,9 +114,10 @@ public class SplashScreen {
 		label.setFont(new Font("Sans Serif", Font.PLAIN, 14));
 		JPanel testPanel = new JPanel();
 		testPanel.add(label);
-		panel.add(testPanel, BorderLayout.CENTER);
+		testPanel.setOpaque(false);
+		foreground.add(testPanel, BorderLayout.CENTER);
 		if (progressBar)
-			panel.add(progress, BorderLayout.SOUTH);
+			foreground.add(progress, BorderLayout.SOUTH);
 		panel.setBorder(BorderFactory.createRaisedBevelBorder());
 		window.getContentPane().add(panel);
 		window.setSize(400,300);

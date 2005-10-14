@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicRemoveControlPointFromSelections.java,v 1.5 2005/09/29 15:12:12 sascha_l Exp $
+ * $Id: AtomicRemoveControlPointFromSelections.java,v 1.6 2005/10/14 12:07:23 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -40,6 +40,14 @@ public final class AtomicRemoveControlPointFromSelections extends JPatchAtomicEd
 		this.cp = cp;
 		for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
 			Selection selection = (Selection) it.next();
+			Object weight = selection.getMap().get(cp);
+			if ((weight) != null) {
+				mapSelections.put(selection, weight);
+				selection.getMap().remove(cp);
+			}
+		}
+		Selection selection = MainFrame.getInstance().getSelection();
+		if (selection != null) {
 			Object weight = selection.getMap().get(cp);
 			if ((weight) != null) {
 				mapSelections.put(selection, weight);
