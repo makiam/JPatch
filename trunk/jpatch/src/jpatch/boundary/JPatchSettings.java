@@ -234,7 +234,7 @@ public class JPatchSettings {
 		mapDefaults.put("rendermanPath", "");
 		mapDefaults.put("rotoscopePath", "");
 		
-		mapDefaults.put("lookAndFeel", "jpatch.boundary.laf.SmoothLookAndFeel");
+		mapDefaults.put("lookAndFeel", "javax.swing.plaf.metal.MetalLookAndFeel");
 		
 		mapDefaults.put("renderer", new Integer(RENDERER_POVRAY));
 		mapDefaults.put("rendererBackgroundColor",new Color(0x7f,0x7f,0x7f));
