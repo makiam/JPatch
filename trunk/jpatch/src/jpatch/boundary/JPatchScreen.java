@@ -74,8 +74,11 @@ public final class JPatchScreen extends JPanel {
 	public void initScreen() {
 		int mode = iMode;
 		setMode(0);
-		if (JPatchSettings.getInstance().iRealtimeRenderer == OPENGL && !JoglInstall.isInstalled())
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), new JLabel("Can't use OpenGL display: native JOGL libraries not found."), "Warning", JOptionPane.WARNING_MESSAGE);
+		if (JPatchSettings.getInstance().iRealtimeRenderer == OPENGL && !JoglInstall.isInstalled()) {
+			if (SplashScreen.instance != null)
+				SplashScreen.instance.clearSplash();
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), new JLabel("Can't use OpenGL display: native JOGL libraries not found."), "Warning", JOptionPane.WARNING_MESSAGE);		
+		}
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 			final int I = i;
 			JPatchDrawableEventListener listener = new JPatchDrawableEventListener() {
