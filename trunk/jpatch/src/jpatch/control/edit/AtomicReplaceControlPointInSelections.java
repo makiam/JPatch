@@ -48,7 +48,17 @@ public final class AtomicReplaceControlPointInSelections extends JPatchAtomicEdi
 				Object weight = selection.getMap().get(cpOld);
 				selection.getMap().remove(cpOld);
 				selection.getMap().put(cpNew, weight);
+				if (selection.getHotObject() == cpOld)
+					selection.setHotObject(cpNew);
 			}
+		}
+		Selection selection = MainFrame.getInstance().getSelection();
+		if (selection != null && selection.contains(cpOld)) {
+			Object weight = selection.getMap().get(cpOld);
+			selection.getMap().remove(cpOld);
+			selection.getMap().put(cpNew, weight);
+			if (selection.getHotObject() == cpOld)
+				selection.setHotObject(cpNew);
 		}
 		ControlPoint dummy = cpOld;
 		cpOld = cpNew;
