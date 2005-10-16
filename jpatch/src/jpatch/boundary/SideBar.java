@@ -130,6 +130,18 @@ implements TreeSelectionListener {
 					MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(((Selection) selectedLeaf).cloneSelection()));
 					MainFrame.getInstance().getJPatchScreen().update_all();
 				}break;
+			case JPatchTreeNode.BONES:
+				replacePanel(new SidePanel());
+				MainFrame.getInstance().getSideBar().clearDetailPanel();
+				break;
+			case JPatchTreeNode.BONE:
+				replacePanel(new BonePanel((Bone) selectedLeaf));
+				//MainFrame.getInstance().switchMode(MainFrame.MORPH);
+				break;
+			case JPatchTreeNode.RDOF:
+				replacePanel(new DofPanel((RotationDof) selectedLeaf));
+				//MainFrame.getInstance().switchMode(MainFrame.MORPH);
+				break;
 			default:
 				replacePanel(new SidePanel());
 				break;

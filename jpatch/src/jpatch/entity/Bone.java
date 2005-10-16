@@ -16,7 +16,6 @@ public class Bone extends JPatchTreeNode {
 	private static final float DEFAULT_INFLUENCE = 0.33f; 
 	private static int NUM = 0;
 	private static Map mapBones;
-//	
 //	private static final Bone[] emptyBoneArray = new Bone[0];
 	private static int col = 0;
 	private static final Color3f[] COLORS = new Color3f[] {
@@ -43,11 +42,13 @@ public class Bone extends JPatchTreeNode {
 	private boolean bSelected = false;
 	private BoneTransformable boneStart = new BoneTransformable(p3Start);
 	private BoneTransformable boneEnd = new BoneTransformable(p3End);
-
+	private ArrayList listDofs = new ArrayList();
+	
 //	private int iNum = NUM++;
 //	
 	public Bone(Model model, Point3f start, Vector3f extent) {
 		this.model = model;
+		iNodeType = BONE;
 		p3Start.set(start);
 		v3Extent = extent;
 		setEnd();
@@ -135,7 +136,7 @@ public class Bone extends JPatchTreeNode {
 	}
 	
 	public List getChildren() {
-		ArrayList list = new ArrayList();
+		ArrayList list = new ArrayList(listDofs);
 		if (iChildren > 0) {
 			for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
 			Bone bone = (Bone) it.next();
@@ -162,6 +163,16 @@ public class Bone extends JPatchTreeNode {
 	
 	public Bone getParentBone() {
 		return boneParent;
+	}
+	
+	public void addDof(RotationDof dof) {
+		listDofs.add(dof);
+		iChildren++;
+	}
+	
+	public void removeDof(RotationDof dof) {
+		listDofs.remove(dof);
+		iChildren--;
 	}
 	
 	/**
@@ -261,6 +272,18 @@ public class Bone extends JPatchTreeNode {
 	
 	public String toString() {
 		return strName;
+	}
+	
+	public int getDofIndex(RotationDof dof) {
+		return listDofs.indexOf(dof);
+	}
+	
+	public RotationDof getDof(int index) {
+		if (index > 0)
+			return (RotationDof) listDofs.get(index);
+		else
+			// return last dof
+			return (RotationDof) listDofs.get(listDofs.size() - 1);
 	}
 	
 	public StringBuffer xml(String prefix) {
