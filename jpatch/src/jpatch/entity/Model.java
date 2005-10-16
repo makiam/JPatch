@@ -365,6 +365,14 @@ public class Model extends JPatchTreeNode {
 		setBones.remove(bone);
 	}
 	
+	public void addDof(RotationDof dof) {
+		dof.getBone().addDof(dof);
+	}
+	
+	public void removeDof(RotationDof dof) {
+		dof.getBone().removeDof(dof);
+	}
+	
 	/**
 	 *  Adds a feature to the Patch attribute of the Model object
 	 *
