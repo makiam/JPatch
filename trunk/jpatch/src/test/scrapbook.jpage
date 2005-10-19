@@ -38,3 +38,16 @@ System.out.println(p);
 p = new javax.vecmath.Point3f(1, 1, 1);
 m.transform(p);
 System.out.println(p);
+
+javax.vecmath.Matrix4f m = new javax.vecmath.Matrix4f(
+		1,0,0,10,
+		0,1,0,11,
+		0,0,1,12,
+		0,0,0,1
+		);
+System.out.println(m);
+m.setTranslation(new javax.vecmath.Vector3f(1,2,3));
+System.out.println(m);
+javax.vecmath.Matrix4f m1 = new javax.vecmath.Matrix4f();
+m1.invert(m);
+System.out.println(m1);

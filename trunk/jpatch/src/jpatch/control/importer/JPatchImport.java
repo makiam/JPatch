@@ -366,7 +366,7 @@ implements ModelImporter {
 					for (Iterator it = listBones.iterator(); it.hasNext(); ) {
 						Bone bone = (Bone) it.next();
 						if (mapBoneParents.containsKey(bone)) {
-							bone.setParent((Bone) listBones.get(((Integer) mapBoneParents.get(bone)).intValue()));
+							bone.setParentBone((Bone) listBones.get(((Integer) mapBoneParents.get(bone)).intValue()));
 						}
 						model.addBone(bone);
 					}

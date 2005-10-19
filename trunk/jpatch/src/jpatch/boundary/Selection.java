@@ -49,8 +49,7 @@ public class Selection extends JPatchTreeLeaf {
 				if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by)
 					selection.mapObjects.put(bone.getBoneStart(), new Float(1.0f));
 			}
-			bone.getStart(p3);
-			p3.add(bone.getExtent());
+			bone.getEnd(p3);
 			transformationMatrix.transform(p3);
 			if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by)
 				selection.mapObjects.put(bone.getBoneEnd(), new Float(1.0f));
