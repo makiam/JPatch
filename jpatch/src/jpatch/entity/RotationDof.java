@@ -42,10 +42,9 @@ public class RotationDof extends JPatchTreeLeaf {
 		int index = bone.getDofIndex(this);
 		if (index > 0)
 			return bone.getDof(index - 1);
-		else if (bone.getParentBone() != null)
+		if (bone.getParentBone() != null)
 			return bone.getParentBone().getDof(-1);
-		else
-			return null;
+		return null;
 	}
 	
 	public Vector3f getAxis() {
@@ -77,6 +76,7 @@ public class RotationDof extends JPatchTreeLeaf {
 		v3Axis.set(v3ReferenceAxis);
 		m4Transform.transform(v3Axis);
 		Matrix4f m4 = new Matrix4f();
+		m4.setIdentity();
 		m4.set(new AxisAngle4f(v3Axis, fCurrentAngle));
 		Point3f pivot = bone.getStart(null);
 		Vector3f v = new Vector3f(pivot);
@@ -84,20 +84,20 @@ public class RotationDof extends JPatchTreeLeaf {
 		m4.transform(v2);
 		v.sub(v2);
 		m4.setTranslation(v);
+		m4Transform.mul(m4);
+		m4InvTransform.invert(m4Transform);
 		bValid = true;
 	}
 	
 	public Matrix4f getTransform() {
-		if (!isTransformValid())
+//		if (!isTransformValid())
 			computeTransform();
 		return m4Transform;
 	}
 
 	public Matrix4f getInvTransform() {
-		if (!bValid) {
+//		if (!bValid)
 			computeTransform();
-			m4InvTransform.invert(m4Transform);
-		}
 		return m4InvTransform;
 	}
 	
@@ -140,5 +140,6 @@ public class RotationDof extends JPatchTreeLeaf {
 	
 	public void setSliderValue(int sliderValue) {
 		fCurrentAngle = fMinAngle + (fMaxAngle - fMinAngle) / 100f * (float) sliderValue;
+		bValid = false;
 	}
 }
