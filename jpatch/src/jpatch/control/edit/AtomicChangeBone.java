@@ -36,7 +36,6 @@ public abstract class AtomicChangeBone extends JPatchAtomicEdit {
 			Point3f dummy = new Point3f(p3Point);
 			p3Point.set(p3New);
 			p3New.set(dummy);
-			bone.setExtent();
 		}
 		
 		public int sizeOf() {
@@ -56,7 +55,7 @@ public abstract class AtomicChangeBone extends JPatchAtomicEdit {
 		void swap() {
 			Bone dummy = parentBone;
 			parentBone = bone.getParentBone();
-			bone.setParent(dummy);
+			bone.setParentBone(dummy);
 		}
 		
 		public int sizeOf() {

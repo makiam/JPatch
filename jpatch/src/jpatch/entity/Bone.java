@@ -30,7 +30,9 @@ public class Bone extends JPatchTreeNode {
 	private Model model;
 	private final Point3f p3Start = new Point3f();
 	private final Point3f p3End = new Point3f();
-	private Vector3f v3Extent;
+//	private Vector3f v3Extent;
+//	private final Point3f p3ReferenceStart = new Point3f();
+//	private final Point3f p3ReferenceEnd = new Point3f();
 //	private Vector3f v3TempExtent = new Vector3f();
 //	private final Point3f p3End = new Point3f();
 	private float fStartRadius = DEFAULT_INFLUENCE;
@@ -38,7 +40,7 @@ public class Bone extends JPatchTreeNode {
 	private Bone boneParent;
 //	private Bone boneNext;
 //	private Bone bonePrev;
-	private int iChildren = 0;
+	private ArrayList listChildren = new ArrayList();
 	private boolean bSelected = false;
 	private BoneTransformable boneStart = new BoneTransformable(p3Start);
 	private BoneTransformable boneEnd = new BoneTransformable(p3End);
@@ -50,8 +52,9 @@ public class Bone extends JPatchTreeNode {
 		this.model = model;
 		iNodeType = BONE;
 		p3Start.set(start);
-		v3Extent = extent;
-		setEnd();
+		p3End.set(start);
+		p3End.add(extent);
+//		v3Extent = extent;
 //		boneStart = new BoneTransformable(START);
 //		boneEnd = new BoneTransformable(END);
 		strName = "new bone #" + NUM++;
@@ -112,7 +115,7 @@ public class Bone extends JPatchTreeNode {
 	}
 
 	public int getChildCount() {
-		return iChildren;
+		return listChildren.size() + listDofs.size();
 	}
 
 	public int getIndex(TreeNode node) {
@@ -124,7 +127,7 @@ public class Bone extends JPatchTreeNode {
 	}
 
 	public boolean isLeaf() {
-		return (iChildren == 0);
+		return (listChildren.size() == 0 && listDofs.size() == 0);
 	}
 
 	/*
@@ -137,27 +140,25 @@ public class Bone extends JPatchTreeNode {
 	
 	public List getChildren() {
 		ArrayList list = new ArrayList(listDofs);
-		if (iChildren > 0) {
-			for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
-			Bone bone = (Bone) it.next();
-			if (bone.boneParent == this)
-				list.add(bone);
-			}
-		}
+		list.addAll(listChildren);
 		return list;
 	}
 
 	public void attachTo(Bone parent) {
 		if (boneParent != null)
 			throw new IllegalStateException("bone is already attached");
+		for (Bone bone = parent; bone != null; bone = bone.boneParent) {
+			if (bone == this)
+				return;
+		}
 		boneParent = parent;
-		parent.iChildren++;
+		boneParent.listChildren.add(this);
 	}
 	
 	public void detach() {
 		if (boneParent == null)
 			throw new IllegalStateException("bone isn't attached");
-		boneParent.iChildren--;
+		boneParent.listChildren.remove(this);
 		boneParent = null;
 	}
 	
@@ -165,14 +166,16 @@ public class Bone extends JPatchTreeNode {
 		return boneParent;
 	}
 	
+	public void setParentBone(Bone parent) {
+		boneParent = parent;
+	}
+	
 	public void addDof(RotationDof dof) {
 		listDofs.add(dof);
-		iChildren++;
 	}
 	
 	public void removeDof(RotationDof dof) {
 		listDofs.remove(dof);
-		iChildren--;
 	}
 	
 	/**
@@ -193,62 +196,66 @@ public class Bone extends JPatchTreeNode {
 		return start;
 	}
 
-	public Vector3f getExtent() {
-		return v3Extent;
+	private Point3f getReferenceStart() {
+		if (boneParent == null)
+			return p3Start;
+		else
+			return boneParent.p3End;
 	}
+	
+//	public Vector3f getExtent() {
+//		return v3Extent;
+//	}
 
 	public Point3f getEnd(Point3f end) {
 		if (end == null)
-			end = new Point3f();
-		end.set(p3End);
+			end = getStart(null);
+		else
+			getStart(end);
+		Vector3f v = new Vector3f(p3End);
+		v.sub(getReferenceStart());
+		lastDofTransform(v);
+		end.add(v);
 		return end;
 	}
 	
 	public void setEnd(Point3f end) {
 		p3End.set(end);
-		setExtent();
+		lastDofInvTransform(p3End);
 	}
 	
 	public void setStart(Point3f start) {
-		if (boneParent == null) {
-			p3Start.set(start);
-		} else {
-			Vector3f parentExtent = boneParent.getExtent();
-			parentExtent.set(start);
-			parentExtent.sub(boneParent.getStart(null));
-		}
+		p3Start.set(start);
 	}
+//	
+//	public void setStart(Point3f start) {
+//		if (boneParent == null) {
+//			p3Start.set(start);
+//		} else {
+//			Vector3f parentExtent = boneParent.getExtent();
+//			parentExtent.set(start);
+//			parentExtent.sub(boneParent.getStart(null));
+//		}
+//	}
+//
+//	public void setExtent(Vector3f extent) {
+//		v3Extent.set(extent);
+//		setEnd();
+//	}
 
-	public void setExtent(Vector3f extent) {
-		v3Extent.set(extent);
-		setEnd();
-	}
-
-	public void setParent(Bone parent) {
-		boolean loop = false;
-		for (Bone bone = parent; bone != null; bone = bone.boneParent) {
-			loop |= (bone == this);
-		}
-		if (!loop) {	
-			if (boneParent != null)
-				boneParent.iChildren--;
-			if (parent != null)
-				parent.iChildren++;
-			else
-				getStart(p3Start);
-			boneParent = parent;
-		}
-	}
+//	public void setParent(Bone parent) {
+//		
+//	}
 	
-	public void setExtent() {
-		v3Extent.set(p3End);
-		v3Extent.sub(getStart(null));
-	}
-	
-	public void setEnd() {
-		getStart(p3End);
-		p3End.add(v3Extent);
-	}
+//	public void setExtent() {
+//		v3Extent.set(p3End);
+//		v3Extent.sub(getStart(null));
+//	}
+//	
+//	public void setEnd() {
+//		getStart(p3End);
+//		p3End.add(v3Extent);
+//	}
 	
 	public void setColor(Color3f color) {
 		this.color.set(color);
@@ -279,12 +286,47 @@ public class Bone extends JPatchTreeNode {
 	}
 	
 	public RotationDof getDof(int index) {
-		if (index > 0)
+		if (listDofs.size() == 0)
+			return null;
+		if (index >= 0)
 			return (RotationDof) listDofs.get(index);
 		else
 			// return last dof
 			return (RotationDof) listDofs.get(listDofs.size() - 1);
 	}
+	
+	public RotationDof getLastDof() {
+		if (listDofs.size() > 0)
+			return getDof(-1);
+		if (boneParent != null)
+			return boneParent.getLastDof();
+		return null;
+	}
+	
+	private void lastDofTransform(Point3f p) {
+		RotationDof dof = getLastDof();
+		if (dof != null)
+			dof.getTransform().transform(p);
+	}
+	
+	private void lastDofTransform(Vector3f v) {
+		RotationDof dof = getLastDof();
+		if (dof != null)
+			dof.getTransform().transform(v);
+	}
+	
+	private void lastDofInvTransform(Point3f p) {
+		RotationDof dof = getLastDof();
+		if (dof != null)
+			dof.getInvTransform().transform(p);
+	}
+	
+	private void lastDofInvTransform(Vector3f v) {
+		RotationDof dof = getLastDof();
+		if (dof != null)
+			dof.getInvTransform().transform(v);
+	}
+	
 	
 	public StringBuffer xml(String prefix) {
 		System.out.println(this);
@@ -312,10 +354,46 @@ public class Bone extends JPatchTreeNode {
 		return sb;
 	}
 	
+//	public void setReferencePose() {
+//		System.out.println("setReferencePose");
+//		if (boneParent != null) {
+//			RotationDof dof = boneParent.getLastDof();
+//			if (dof != null) {
+//				p3ReferenceStart.set(p3Start);
+//				dof.getInvTransform().transform(p3ReferenceStart);
+//			}
+//		}
+//		RotationDof dof = getLastDof();
+//		if (dof != null) {
+//			p3ReferenceEnd.set(p3End);
+//			dof.getInvTransform().transform(p3ReferenceEnd);
+//		}
+//	}
+//	
+//	public void setPose() {
+//		if (boneParent != null) {
+//			RotationDof dof = boneParent.getLastDof();
+//			if (dof != null) {
+//				p3Start.set(p3ReferenceStart);
+//				dof.getTransform().transform(p3Start);
+//			}
+//		}
+//		RotationDof dof = getLastDof();
+//		if (dof != null) {
+//			p3End.set(p3ReferenceEnd);
+//			dof.getTransform().transform(p3End);
+//		}
+//		setExtent();
+//	}
+	
+	
 	public final class BoneTransformable implements Transformable {
 		private final Point3f p3Temp = new Point3f();
+		private final Point3f p3Dummy = new Point3f();
+//		private final Point3f p3Move = new Point3f();
 		private final Point3f p3;
 //		private final BoneTransformableType type;
+//		private boolean bStart;
 		
 		public BoneTransformable(Point3f p) {
 			p3 = p;
@@ -338,45 +416,67 @@ public class Bone extends JPatchTreeNode {
 		}
 		
 		public Point3f getPosition() {
-			return p3;
+			Point3f p = new Point3f(p3);
+			if (isStart() && boneParent != null)
+				boneParent.lastDofTransform(p);
+			else
+				lastDofTransform(p);
+			return p;
 		}
 		
 		public void beginTransform() {
-			setEnd();
 			p3Temp.set(p3);
 		}
 
+		private void setDummy() {
+			p3Dummy.set(p3Temp);
+			if (isStart() && boneParent != null)
+				boneParent.lastDofTransform(p3Dummy);
+			else
+				lastDofTransform(p3Dummy);
+		}
+		
+		private void setPoint() {
+			if (isStart() && boneParent != null)
+				boneParent.lastDofInvTransform(p3Dummy);
+			else
+				lastDofInvTransform(p3Dummy);
+			p3.set(p3Dummy);
+		}
+		
+		
 		public void translate(Vector3f v) {
-			p3.set(p3Temp);
-			p3.add(v);
-			setExtent();
+			setDummy();
+			p3Dummy.add(v);
+			setPoint();
 		}
 
 		public void rotate(AxisAngle4f a, Point3f pivot) {
-			p3.set(p3Temp);
-			p3.sub(pivot);
+			setDummy();
+			p3Dummy.sub(pivot);
 			Matrix3f m = new Matrix3f();
 			m.set(a);
-			m.transform(p3);
-			p3.add(pivot);
-			setExtent();
+			m.transform(p3Dummy);
+			p3Dummy.add(pivot);
+			setPoint();
 		}
 
 		public void transform(Matrix3f m, Point3f pivot) {
-			p3.set(p3Temp);
-			p3.sub(pivot);
-			m.transform(p3);
-			p3.add(pivot);
-			setExtent();
+			setDummy();
+			p3Dummy.sub(pivot);
+			m.transform(p3Dummy);
+			p3Dummy.add(pivot);
+			setPoint();
 		}
 
 		public JPatchUndoableEdit endTransform() {
 			return new AtomicChangeBone.Point(Bone.this, p3Temp, p3);
 		}
 		
-		public String toString() {
-			return Bone.this.toString() + "-" + (isStart() ? "start " + Bone.this.getStart(null): "end" + Bone.this.getEnd(null)) + " " + p3;
-		}
+//		public String toString() {
+//			return Bone.this.toString() + "-" + (isStart() ? "start " + Bone.this.getStart(null): "end" + Bone.this.getEnd(null)) + " " + p3;
+//		}
+		
 		
 //		public boolean equals(Object o) {
 //			BoneTransformable bt = (BoneTransformable) o;

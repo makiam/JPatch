@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.25 2005/10/09 07:41:30 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.26 2005/10/19 14:51:29 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -3960,8 +3960,9 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 //			System.out.println("drawBone bone=" + bone);
 			reset();
 			bone.getStart(p3Start);
-			bone.setExtent();
-			v3Extent.set(bone.getExtent());
+//			bone.setExtent();
+			v3Extent.set(bone.getEnd(null));
+			v3Extent.sub(p3Start);
 			float length = v3Extent.length();
 			v3Extent.scale(1f / length);
 			Vector3f v3X = Utils3D.perpendicularVector(v3Extent);

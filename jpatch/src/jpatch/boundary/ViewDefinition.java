@@ -469,8 +469,7 @@ implements ComponentListener {
 		fZ = z;
 	}
 	
-	public final Point3f get3DPosition(float x, float y)
-	{
+	public final Point3f get3DPosition(float x, float y) {
 		Point3f p3 = new Point3f(x, y, fZ);
 		Matrix4f m4Screen = getScreenMatrix();
 		Matrix4f m4Inverse = new Matrix4f();

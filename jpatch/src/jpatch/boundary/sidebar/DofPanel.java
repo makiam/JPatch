@@ -1,5 +1,6 @@
 package jpatch.boundary.sidebar;
 
+import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
@@ -64,6 +65,8 @@ implements ChangeListener {
 		inputZ.addChangeListener(this);
 		slider.addChangeListener(this);
 		
+		
+		
 //		if (morph == editedMorph) {
 //			editButton.setSelected(true);
 //			deleteButton.setEnabled(false);
@@ -95,20 +98,29 @@ implements ChangeListener {
 			slider.setValue(dof.getSliderValue());
 		} else if (changeEvent.getSource() == slider) {
 			if (slider.getValueIsAdjusting()) {
+//				for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {
+//					Bone bone = (Bone) it.next();
+//					bone.setReferencePose();
+//				}
 				dof.setSliderValue(slider.getValue());
+//				for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {
+//					Bone bone = (Bone) it.next();
+//					bone.setPose();
+//				}
+				MainFrame.getInstance().getJPatchScreen().update_all();
 			} else {
 			}
 		} else if (changeEvent.getSource() == inputX) {
 			Vector3f v = dof.getAxis();
 			v.x = inputX.getFloatValue();
 			dof.setAxis(v);
-		} else if (changeEvent.getSource() == inputX) {
+		} else if (changeEvent.getSource() == inputY) {
 			Vector3f v = dof.getAxis();
-			v.x = inputX.getFloatValue();
+			v.y = inputY.getFloatValue();
 			dof.setAxis(v);
-		} else if (changeEvent.getSource() == inputX) {
+		} else if (changeEvent.getSource() == inputZ) {
 			Vector3f v = dof.getAxis();
-			v.x = inputX.getFloatValue();
+			v.z = inputZ.getFloatValue();
 			dof.setAxis(v);
 		}
 	}
