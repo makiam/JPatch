@@ -1,5 +1,5 @@
 /*
- * $Id: SplashScreen.java,v 1.3 2005/10/14 13:12:31 sascha_l Exp $
+ * $Id: SplashScreen.java,v 1.4 2005/10/23 13:34:41 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -26,7 +26,6 @@ import java.awt.geom.*;
 import java.awt.event.*;
 import java.awt.font.*;
 import javax.swing.*;
-import javax.swing.text.LayeredHighlighter;
 
 import jpatch.VersionInfo;
 
@@ -87,6 +86,7 @@ public class SplashScreen {
 		JPanel foreground = new JPanel();
 		foreground.setOpaque(false);
 		JPanel background = new JPanel() {
+			private static final long serialVersionUID = 1L;
 			public void paintComponent(Graphics g) {
 				Graphics2D g2 = (Graphics2D) g;
 				g2.setPaint(new GradientPaint(0, 0, Color.WHITE, getWidth() / 2, getHeight() * 3, Color.GRAY));
@@ -97,7 +97,11 @@ public class SplashScreen {
 		
 		panel.add(foreground);
 		panel.add(background);
-		window.setAlwaysOnTop(true);
+		try {
+			window.setAlwaysOnTop(true);
+		} catch (NoSuchMethodError e) {
+			window.toFront();
+		}
 		foreground.setLayout(new BorderLayout());
 		JProgressBar progress = new JProgressBar();
 		progress.setIndeterminate(true);
