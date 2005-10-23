@@ -305,6 +305,7 @@ public class JPatchSettings {
 		
 		loadSettings();
 		saveSettings();
+		
 	}
 	
 	/**
