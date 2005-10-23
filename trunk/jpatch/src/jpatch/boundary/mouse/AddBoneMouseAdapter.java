@@ -7,6 +7,7 @@ import java.awt.event.*;
 import javax.vecmath.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
+import jpatch.boundary.tools.*;
 import jpatch.control.edit.*;
 
 
@@ -45,7 +46,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 			**/
 			bActive = true;
 			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(false);
-			MainFrame.getInstance().getDefaultToolTimer().stop();
+//			MainFrame.getInstance().getDefaultToolTimer().stop();
 			compSource = (Component)mouseEvent.getSource();
 			iMouseX = mouseEvent.getX();
 			iMouseY = mouseEvent.getY();
@@ -170,7 +171,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 					MainFrame.getInstance().getJPatchScreen().update_all();
 					MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
 					bActive = false;
-					MainFrame.getInstance().getDefaultToolTimer().restart();
+//					MainFrame.getInstance().getDefaultToolTimer().restart();
 				}
 			} else {
 				MainFrame.getInstance().getMeshToolBar().reset();
@@ -184,11 +185,13 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 			compSource.removeMouseMotionListener(this);
 			if (MainFrame.getInstance().getSelection() != null)
 				edit.addEdit(new AtomicChangeSelection(null));
+			edit.addEdit(new AtomicChangeTool(new DefaultTool()));
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
+			MainFrame.getInstance().getMeshToolBar().reset();
 			MainFrame.getInstance().getJPatchScreen().update_all();
 //			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
 			bActive = false;
-			MainFrame.getInstance().getDefaultToolTimer().restart();
+//			MainFrame.getInstance().getDefaultToolTimer().restart();
 		} 
 		/*
 		if (iState == ACTIVE && mouseEvent.getButton() == MouseEvent.BUTTON1) {
