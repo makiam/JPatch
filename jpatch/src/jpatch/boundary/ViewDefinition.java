@@ -559,6 +559,7 @@ implements ComponentListener {
 	}
 		
 	public final ControlPoint getClosestControlPoint(Point2D.Float t, ControlPoint except, float[] hookPos, boolean selectHooks, boolean grid, ControlPoint selected) {
+//		System.out.println("getClosestPoint called");
 		Point2D.Float target;
 //		if (grid && viewport.getGrid().snap()) {
 //			Point3f p3Target = new Point3f(t.x,t.y,0);
@@ -635,6 +636,7 @@ implements ComponentListener {
 		if (hookPos != null) {
 			hookPos[0] = fHookPos;
 		}
+//		System.out.println("closest point is " + cpClosest + "\n");
 		return cpClosest;
 	}
 	

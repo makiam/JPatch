@@ -206,7 +206,7 @@ public final class MeshToolBar extends JToolBar {
 	public void reset() {
 		//buttonSelectMove.doClick();
 		buttonSelectMove.setSelected(true);
-		MainFrame.getInstance().getJPatchScreen().setTool(new DefaultTool());
+//		MainFrame.getInstance().getJPatchScreen().setTool(new DefaultTool());
 		iMode = DEFAULT;
 	}
 }

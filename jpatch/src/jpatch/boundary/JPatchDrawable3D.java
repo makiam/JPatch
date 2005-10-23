@@ -681,7 +681,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 			while (y < end) {
 				if (x >= 0 && x < edge) {
 					index = iWidth * y + (x >> 16);
-					if (z < aiDepthBuffer[index]) {
+					if (z <= aiDepthBuffer[index]) {
 						aiColorBuffer[index] = iColor;
 						aiDepthBuffer[index] = z;
 					}

@@ -31,7 +31,7 @@ public class ChangeViewMouseListener extends MouseAdapter {
 	
 	public void mousePressed(MouseEvent mouseEvent) {
 		if (mouseEvent.getButton() == iButton) {
-			MainFrame.getInstance().getDefaultToolTimer().stop();
+//			MainFrame.getInstance().getDefaultToolTimer().stop();
 			switch(iMode) {
 				
 				case MOVE:
@@ -54,7 +54,7 @@ public class ChangeViewMouseListener extends MouseAdapter {
 	public void mouseReleased(MouseEvent mouseEvent) {
 		if (mouseEvent.getButton() == iButton) {
 			((Component)mouseEvent.getSource()).removeMouseMotionListener(mouseMotionListener);
-			MainFrame.getInstance().getDefaultToolTimer().restart();
+//			MainFrame.getInstance().getDefaultToolTimer().restart();
 		}
 	}
 }

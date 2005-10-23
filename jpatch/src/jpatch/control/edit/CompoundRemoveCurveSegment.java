@@ -34,15 +34,21 @@ public class CompoundRemoveCurveSegment extends JPatchCompoundEdit {
 			addEdit(new AtomicAddCurve(cpNext));
 		} else {
 			// check if this was the stat of the curve
-			if (cp.getPrev() == null)
+			if (cp.getPrev() == null) {
 				// YES
 				// remove the curve
 				addEdit(new AtomicRemoveCurve(cp));
+				// drop first cp
+				addEdit(new CompoundDropControlPoint(cp));
+			}
 			// check if this was the end of the curve
 			if (cpNext.getNext() != null)
 				// NO
 				// add new curve
 				addEdit(new AtomicAddCurve(cpNext));
+			else
+				// drop last cp
+				addEdit(new CompoundDropControlPoint(cpNext));
 		}
 	}
 }

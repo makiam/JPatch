@@ -825,6 +825,7 @@ public class DefaultTool extends JPatchTool {
 							((Component)mouseEvent.getSource()).removeMouseMotionListener(this);
 							MainFrame.getInstance().getUndoManager().addEdit(edit);
 							MainFrame.getInstance().getJPatchScreen().update_all();
+							cpHot = null;
 							iState = IDLE;
 						}
 					} else if (iState == MOVE_SINGLE_POINT && cpHot.isSingle()) {
