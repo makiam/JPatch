@@ -33,10 +33,17 @@ public class AnimationImporter extends DefaultHandler {
 	private Animator animation = Animator.getInstance();
 	
 	public void loadAnimation(String filename) {
-		XMLReader xmlReader;
+		XMLReader xmlReader = null;
 		try {
 			xmlReader = XMLReaderFactory.createXMLReader();
-			//xmlReader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
+		} catch (SAXException e) {
+			try {
+				xmlReader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
+			} catch (SAXException ee) {
+				ee.printStackTrace();
+			}
+		}
+		try {
 			xmlReader.setContentHandler(this);
 			xmlReader.parse(new InputSource(filename));
 		} catch (Exception e) {

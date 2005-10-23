@@ -1,5 +1,5 @@
 #Fat Jar Configuration File
-#Fri Oct 14 14:46:23 CEST 2005
+#Sun Oct 23 15:31:13 CEST 2005
 onejar.license.required=true
 manifest.classpath=
 onejar.checkbox=false
@@ -9,5 +9,5 @@ manifest.mainclass=jpatch.Launcher
 manifest.file=<createnew>
 jarname.isextern=false
 onejar.expand=
-excludes=<po|jpatch>~jpatch_fat.jar
+excludes=
 includes=<inc|jpatch/lib>~native/~linux_x86/~libjogl.so;<inc|jpatch/lib>~native/~windows/~jogl.dll

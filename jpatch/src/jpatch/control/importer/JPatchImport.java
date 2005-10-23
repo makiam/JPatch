@@ -62,9 +62,17 @@ implements ModelImporter {
 	
 	public final String importModel(Model model, String filename) {
 		this.model = model;
-		XMLReader xmlReader;
+		XMLReader xmlReader = null;
 		try {
-			xmlReader = XMLReaderFactory.createXMLReader();//"com.sun.org.apache.xerces.internal.parsers.SAXParser");
+			xmlReader = XMLReaderFactory.createXMLReader();
+		} catch (SAXException e) {
+			try {
+				xmlReader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
+			} catch (SAXException ee) {
+				ee.printStackTrace();
+			}
+		}
+		try {
 			xmlReader.setContentHandler(this);
 			//xmlReader.setFeature("http://xml.org/sax/features/validation",true);
 			xmlReader.parse(new InputSource(filename));

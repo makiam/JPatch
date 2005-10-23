@@ -72,13 +72,11 @@ public class About extends JDialog implements ActionListener {
 			"<ul>" +
 			"<li>An <b>'unofficial' Java3D vecmath package</b> by <i>Kenji Hirabane</i>. " +
 			"See <a href='http://objectclub.esm.co.jp/vecmath/'>http://objectclub.esm.co.jp/vecmath/</a></li>" +
-//			"<li>The <b>Xerces2 XML parser</b> Copyright 1999-2004 <i>The Apache Software Foundation</i>. " +
-//			"See <a href='http://xml.apache.org/xerces2-j/index.html'>http://xml.apache.org/xerces2-j/index.html</a></li>" +
+			"<li>The <b>Xerces2 XML parser</b> Copyright 1999-2004 <i>The Apache Software Foundation</i>. " +
+			"See <a href='http://xml.apache.org/xerces2-j/index.html'>http://xml.apache.org/xerces2-j/index.html</a></li>" +
 			"<li><b>BeanShell</b> by <i>Pat Niemeyer</i>. " +
 			"See <a href='http://www.beanshell.org'>http://www.beanshell.org</a></li>" +
 			"<li><b>Buoy</b> by <i>Peter Eastman</i>. " +
-//			"See <a href='http://buoy.sourceforge.net'>http://buoy.sourceforge.net</a></li>" +
-//			"<li><b>Inyo</b> by <i>David Cuny</i>. "+
 			"See <a href='http://bouy.sourceforge.net'>http://bouy.sourceforge.net</a></li>" +
 			"<li><b>The JOGL Java bindings for OpenGL</b>. "+
 			"See <a href='https://jogl.dev.java.net/'>https://jogl.dev.java.net/</a></li>" +
