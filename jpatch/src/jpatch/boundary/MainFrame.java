@@ -49,12 +49,12 @@ public final class MainFrame extends JFrame {
 	private SideBar sideBar;
 	private JPatchTreeNode treenodeRoot;
 	private Morph editedMorph;
-	private javax.swing.Timer defaultToolTimer = new javax.swing.Timer(5000, new ActionListener() {
-		public void actionPerformed(ActionEvent event) {
-			defaultToolTimer.stop();
-			meshToolBar.reset();
-		}
-	});
+//	private javax.swing.Timer defaultToolTimer = new javax.swing.Timer(0, new ActionListener() {
+//		public void actionPerformed(ActionEvent event) {
+//			defaultToolTimer.stop();
+//			meshToolBar.reset();
+//		}
+//	});
 	
 	public MainFrame(Model model) {
 //		Thread timerMonitor = new Thread() {
@@ -252,9 +252,9 @@ public final class MainFrame extends JFrame {
 		}
 	}
 	
-	public javax.swing.Timer getDefaultToolTimer() {
-		return defaultToolTimer;
-	}
+//	public javax.swing.Timer getDefaultToolTimer() {
+//		return defaultToolTimer;
+//	}
 	
 	public void setEditedMorph(Morph morph) {
 		editedMorph = morph;

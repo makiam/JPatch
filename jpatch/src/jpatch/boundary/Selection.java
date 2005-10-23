@@ -4,8 +4,6 @@ import java.util.*;
 
 import javax.vecmath.*;
 
-import sun.security.krb5.internal.crypto.m;
-
 import jpatch.control.edit.*;
 import jpatch.entity.*;
 import jpatch.entity.Bone.BoneTransformable;

@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.vecmath.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
+import jpatch.boundary.tools.DefaultTool;
 
 import jpatch.control.edit.*;
 
@@ -170,9 +171,10 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 //				//compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,acp));
 //			}
 //			compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,new ControlPoint[] { cpHot }));
-			if (MainFrame.getInstance().getSelection() != null)
-				edit.addEdit(new AtomicChangeSelection(null));
-			MainFrame.getInstance().getJPatchScreen().update_all();
+			
+//			if (MainFrame.getInstance().getSelection() != null)
+//				edit.addEdit(new AtomicChangeSelection(null));
+//			MainFrame.getInstance().getJPatchScreen().update_all();
 			setIdleState();
 		}
 	}
@@ -199,14 +201,16 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 			throw new IllegalStateException("setActiveState() called in active state");
 		}
 		MainFrame.getInstance().setHelpText("Drag to move curve-end. Press right mouse button to weld to closest point. Hold CTRL and press right mouse button to attach to closest point.");
-		MainFrame.getInstance().getDefaultToolTimer().stop();
+//		MainFrame.getInstance().getDefaultToolTimer().stop();
 	}
 	
 	private void setIdleState() {
 		if (iState == ACTIVE) {
 			compSource.removeMouseMotionListener(this);
+			edit.addEdit(new AtomicChangeTool(new DefaultTool()));
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
 //			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
+			MainFrame.getInstance().getMeshToolBar().reset();
 			iState = IDLE;
 		} else {
 			throw new IllegalStateException("setIdleState() called in idle state");
@@ -215,7 +219,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 //		if (!bMulti) {
 //			MainFrame.getInstance().getMeshToolBar().reset();
 //		}
-		MainFrame.getInstance().getDefaultToolTimer().restart();
+//		MainFrame.getInstance().getDefaultToolTimer().restart();
 	}
 }
 
