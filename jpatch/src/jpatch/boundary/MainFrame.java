@@ -47,7 +47,8 @@ public final class MainFrame extends JFrame {
 	private ViewDefinition[] aViewDef = new ViewDefinition[JPatchScreen.NUMBER_OF_VIEWPORTS];
 	private JPatchTree tree;
 	private SideBar sideBar;
-	private JPatchTreeNode treenodeRoot;
+	private MutableTreeNode treenodeRoot;
+	private MutableTreeNode treenodeModel;
 	private Morph editedMorph;
 //	private javax.swing.Timer defaultToolTimer = new javax.swing.Timer(0, new ActionListener() {
 //		public void actionPerformed(ActionEvent event) {
@@ -507,13 +508,21 @@ public final class MainFrame extends JFrame {
 		return sideBar;
 	}
 	
-	public JPatchTreeNode getRootTreenode() {
+	public MutableTreeNode getRootTreenode() {
 		return treenodeRoot;
 	}
 	
+	public MutableTreeNode getModelTreenode() {
+		return treenodeModel;
+	}
 	private void initTree() {
-		treenodeRoot = new JPatchTreeNode(JPatchTreeNode.ROOT,null,"ROOT");
-		treenodeRoot.add(model);
+		treenodeRoot = new DefaultMutableTreeNode("ROOT");
+		treenodeModel = new DefaultMutableTreeNode(model);
+		treenodeRoot.insert(treenodeModel, 0);
+		treenodeModel.insert(model.getTreenodeSelections(), 0);
+		treenodeModel.insert(model.getTreenodeMaterials(), 1);
+		treenodeModel.insert(model.getTreenodeExpressions(), 2);
+		treenodeModel.insert(model.getTreenodeBones(), 3);
 		//JPatchTreeNode treenodeModel = new JPatchTreeNode(JPatchTreeNode.MODEL,treenodeRoot);
 		
 		//JPatchTreeNode treenodeMorphGroup1 = new JPatchTreeNode(JPatchTreeNode.MORPHGROUP,treenodeExpressions);

@@ -10,7 +10,7 @@ import jpatch.boundary.*;
 import jpatch.control.edit.*;
 //import jpatch.auxilary.*;
 //
-public class Bone extends JPatchTreeNode {
+public class Bone implements MutableTreeNode {
 //	public static final BoneTransformableType START = new BoneTransformableType();
 //	public static final BoneTransformableType END = new BoneTransformableType();
 	private static final float DEFAULT_INFLUENCE = 0.33f; 
@@ -40,17 +40,21 @@ public class Bone extends JPatchTreeNode {
 	private Bone boneParent;
 //	private Bone boneNext;
 //	private Bone bonePrev;
+	private ArrayList listChildBones = new ArrayList();
+	private ArrayList listDofs = new ArrayList();
 	private ArrayList listChildren = new ArrayList();
+	
 	private boolean bSelected = false;
 	private BoneTransformable boneStart = new BoneTransformable(p3Start);
 	private BoneTransformable boneEnd = new BoneTransformable(p3End);
-	private ArrayList listDofs = new ArrayList();
+	
+	private String strName;
+	private boolean bParentSet = false;
 	
 //	private int iNum = NUM++;
 //	
 	public Bone(Model model, Point3f start, Vector3f extent) {
 		this.model = model;
-		iNodeType = BONE;
 		p3Start.set(start);
 		p3End.set(start);
 		p3End.add(extent);
@@ -90,12 +94,16 @@ public class Bone extends JPatchTreeNode {
 		mapBones = map;
 	}
 	
+	public List getChildBones() {
+		return listChildBones;
+	}
+	
 	/*
 	* TreeNode interface implementation
 	*/
 
 	public Enumeration children() {
-		return Collections.enumeration(getChildren());
+		return Collections.enumeration(listChildren);
 	}
 
 	public boolean getAllowsChildren() {
@@ -111,25 +119,64 @@ public class Bone extends JPatchTreeNode {
 	}
 
 	public TreeNode getChildAt(int index) {
-		return (TreeNode) getChildren().get(index);
+		return (TreeNode) listChildren.get(index);
 	}
 
 	public int getChildCount() {
-		return listChildren.size() + listDofs.size();
+		return listChildren.size();
 	}
 
 	public int getIndex(TreeNode node) {
-		return getChildren().indexOf(node);
+		return listChildren.indexOf(node);
 	}
 
 	public TreeNode getParent() {
-		return (boneParent != null) ? (TreeNode) boneParent : (TreeNode) model.getRootBone();
+		return !bParentSet ? null : (boneParent != null) ? (MutableTreeNode) boneParent : model.getTreenodeBones();
 	}
 
 	public boolean isLeaf() {
-		return (listChildren.size() == 0 && listDofs.size() == 0);
+		return (listChildren.size() == 0);
 	}
 
+	public void insert(MutableTreeNode child, int index) {
+		listChildren.add(index, child);
+		if (child instanceof Bone)
+			listChildBones.add(child);
+		else if (child instanceof RotationDof)
+			listDofs.add(child);
+	}
+
+	public void remove(int index) {
+		Object object = listChildren.get(index);
+		listChildren.remove(index);
+		if (object instanceof Bone)
+			listChildBones.remove(object);
+		else if (object instanceof RotationDof)
+			listDofs.remove(object);
+	}
+
+	public void remove(MutableTreeNode node) {
+		listChildren.remove(node);
+		if (node instanceof Bone)
+			listChildBones.remove(node);
+		else if (node instanceof RotationDof)
+			listDofs.remove(node);
+	}
+
+	public void setUserObject(Object object) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void removeFromParent() {
+		((MutableTreeNode) getParent()).remove(this);
+	}
+
+	public void setParent(MutableTreeNode newParent) {
+		if (boneParent instanceof Bone)
+			boneParent = (Bone) newParent;
+		bParentSet = true;
+	}
+	
 	/*
 	* TreeNode interface implementation end
 	*/
@@ -138,11 +185,9 @@ public class Bone extends JPatchTreeNode {
 		return color;
 	}
 	
-	public List getChildren() {
-		ArrayList list = new ArrayList(listDofs);
-		list.addAll(listChildren);
-		return list;
-	}
+//	public List getChildren() {
+//		return listChildren;
+//	}
 
 	public void attachTo(Bone parent) {
 		if (boneParent != null)
@@ -152,12 +197,14 @@ public class Bone extends JPatchTreeNode {
 				return;
 		}
 		boneParent = parent;
+		boneParent.listChildBones.add(this);
 		boneParent.listChildren.add(this);
 	}
 	
 	public void detach() {
 		if (boneParent == null)
 			throw new IllegalStateException("bone isn't attached");
+		boneParent.listChildBones.remove(this);
 		boneParent.listChildren.remove(this);
 		boneParent = null;
 	}
@@ -166,16 +213,18 @@ public class Bone extends JPatchTreeNode {
 		return boneParent;
 	}
 	
-	public void setParentBone(Bone parent) {
-		boneParent = parent;
-	}
+//	public void setParentBone(Bone parent) {
+//		boneParent = parent;
+//	}
 	
 	public void addDof(RotationDof dof) {
 		listDofs.add(dof);
+		listChildren.add(dof);
 	}
 	
 	public void removeDof(RotationDof dof) {
 		listDofs.remove(dof);
+		listChildren.add(dof);
 	}
 	
 	/**
@@ -331,7 +380,7 @@ public class Bone extends JPatchTreeNode {
 	public StringBuffer xml(String prefix) {
 		System.out.println(this);
 		StringBuffer sb = new StringBuffer();
-		sb.append(prefix).append("<bone name=").append(XMLutils.quote(getName())).append(">\n");
+		sb.append(prefix).append("<bone name=").append(XMLutils.quote(strName)).append(">\n");
 		if (boneParent != null) {
 			int parent = ((Integer) mapBones.get(boneParent)).intValue();
 			sb.append(prefix).append("\t<parent id=").append(XMLutils.quote(parent)).append("/>\n");
@@ -487,6 +536,16 @@ public class Bone extends JPatchTreeNode {
 //			return Bone.this.hashCode() + 3 * type.hashCode();
 //		}
 	}
+
+	public String getName() {
+		return strName;
+	}
+
+	public void setName(String name) {
+		this.strName = name;
+	}
+
+
 	
 //	public static final class BoneTransformableType { }
 }

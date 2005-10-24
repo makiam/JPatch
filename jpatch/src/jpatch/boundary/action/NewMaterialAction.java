@@ -21,12 +21,12 @@ public final class NewMaterialAction extends AbstractAction {
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		JPatchMaterial material = new JPatchMaterial();
-		if (model.addMaterial(material)) {
-			int[] aiIndex = new int[] { material.getParent().getIndex(material) };
-			((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(material.getParent(),aiIndex);
-			TreePath path = material.getTreePath();
-			MainFrame.getInstance().getTree().makeVisible(path);
-		}
+		model.addMaterial(material);
+//			int[] aiIndex = new int[] { material.getParent().getIndex(material) };
+//			((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(material.getParent(),aiIndex);
+//			TreePath path = material.getTreePath();
+//			MainFrame.getInstance().getTree().makeVisible(path);
+//		}
 		//MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
 		//MainFrame.getInstance().getJPatchScreen().addMouseListeners(new AddControlPointMouseAdapter());
 		//MainFrame.getInstance().clearDialog();

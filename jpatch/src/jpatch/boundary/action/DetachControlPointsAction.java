@@ -85,15 +85,15 @@ public final class DetachControlPointsAction extends AbstractAction {
 				}
 			}
 		} else if (object instanceof Bone.BoneTransformable) {
-			Bone.BoneTransformable bt = (Bone.BoneTransformable) object;
-			if (bt.isEnd()) {
-				List list = bt.getBone().getChildren();
-				edit = new JPatchActionEdit(list.size() == 1 ? "detach point" : "detach points");
-				for (Iterator it = list.iterator(); it.hasNext(); ) {
-					Bone bone = (Bone) it.next();
-					edit.addEdit(new AtomicChangeBone.Parent(bone, null));
-				}
-			}
+//			Bone.BoneTransformable bt = (Bone.BoneTransformable) object;
+//			if (bt.isEnd()) {
+//				List list = bt.getBone().getChildBones();
+//				edit = new JPatchActionEdit(list.size() == 1 ? "detach point" : "detach points");
+//				for (Iterator it = list.iterator(); it.hasNext(); ) {
+//					Bone bone = (Bone) it.next();
+//					edit.addEdit(new AtomicChangeBone.Parent(bone, null));
+//				}
+//			}
 		}
 		if (edit != null && edit.isValid()) {
 			MainFrame.getInstance().getUndoManager().addEdit(edit);

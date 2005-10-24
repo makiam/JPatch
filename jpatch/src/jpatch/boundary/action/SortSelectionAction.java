@@ -48,31 +48,31 @@ public final class SortSelectionAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		Model model = MainFrame.getInstance().getModel();
-		
-		/* make a new(!) list containing all selections */
-		ArrayList list = new ArrayList(model.getSelections());
-		
-		/* sort it (by simply comparing the string representations of the selections) */
-		Collections.sort(list, new Comparator() {
-			public int compare(Object o1, Object o2) {
-				return (o1.toString().compareToIgnoreCase(o2.toString()));
-			}
-			public boolean equals(Object o1, Object o2) {
-				return (compare(o1, o2) == 0);
-			}
-		});
-		
-		/* remove all selections and add them again in order. */
-		for (Iterator it = list.iterator(); it.hasNext(); model.removeSelection((Selection) it.next()));
-		for (Iterator it = list.iterator(); it.hasNext(); model.addSelection((Selection) it.next()));
-		
-		/* reload the tree model */
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).reload();
-		
-		/* make the slections visible */
-		TreePath path = ((Selection) list.get(list.size() - 1)).getTreePath();
-		MainFrame.getInstance().getTree().makeVisible(path);
+//		Model model = MainFrame.getInstance().getModel();
+//		
+//		/* make a new(!) list containing all selections */
+//		ArrayList list = new ArrayList(model.getSelections());
+//		
+//		/* sort it (by simply comparing the string representations of the selections) */
+//		Collections.sort(list, new Comparator() {
+//			public int compare(Object o1, Object o2) {
+//				return (o1.toString().compareToIgnoreCase(o2.toString()));
+//			}
+//			public boolean equals(Object o1, Object o2) {
+//				return (compare(o1, o2) == 0);
+//			}
+//		});
+//		
+//		/* remove all selections and add them again in order. */
+//		for (Iterator it = list.iterator(); it.hasNext(); model.removeSelection((Selection) it.next()));
+//		for (Iterator it = list.iterator(); it.hasNext(); model.addSelection((Selection) it.next()));
+//		
+//		/* reload the tree model */
+//		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).reload();
+//		
+//		/* make the slections visible */
+//		TreePath path = ((Selection) list.get(list.size() - 1)).getTreePath();
+//		MainFrame.getInstance().getTree().makeVisible(path);
 	}
 	
 //	// quick sort

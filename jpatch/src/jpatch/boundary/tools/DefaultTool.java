@@ -4,6 +4,11 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreePath;
 import javax.vecmath.*;
 import jpatch.boundary.*;
 import jpatch.boundary.mouse.*;
@@ -1243,19 +1248,21 @@ public class DefaultTool extends JPatchTool {
 //	}
 	
 	private void selectionChanged(Selection selection) {
-		JPatchTreeLeaf leaf = null;
+		MutableTreeNode leaf = null;
 		if (MainFrame.getInstance().getTree().getSelectionPath() != null)
-			leaf = (JPatchTreeLeaf) MainFrame.getInstance().getTree().getSelectionPath().getLastPathComponent();
-		if (leaf == null || leaf.getNodeType() == JPatchTreeLeaf.SELECTIONS || leaf.getNodeType() == JPatchTreeLeaf.SELECTION || leaf.getNodeType() == JPatchTreeLeaf.MODEL) {
+			leaf = (MutableTreeNode) MainFrame.getInstance().getTree().getSelectionPath().getLastPathComponent();
+		if (leaf == null || leaf == MainFrame.getInstance().getModel().getTreenodeSelections() || leaf == MainFrame.getInstance().getModelTreenode() || leaf instanceof Selection) {
 			//MainFrame.getInstance().getSideBar().enableTreeSelectionListener(false);
 			if (selection != null && !MainFrame.getInstance().getModel().checkSelection(selection)) {
 			//	System.out.println("*");
 			//	MainFrame.getInstance().getSideBar().enableTreeSelectionListener(false);
 			//	System.out.println(selection + " " + MainFrame.getInstance().getModel().getSelection(selection));
-				MainFrame.getInstance().getTree().setSelectionPath(MainFrame.getInstance().getModel().getSelection(selection).getTreePath());
+				DefaultTreeModel treeModel = (DefaultTreeModel) MainFrame.getInstance().getTree().getModel();
+				MainFrame.getInstance().getTree().setSelectionPath(new TreePath(treeModel.getPathToRoot(selection)));
 			//	MainFrame.getInstance().getSideBar().enableTreeSelectionListener(true);
 			} else {
-				MainFrame.getInstance().getTree().setSelectionPath(MainFrame.getInstance().getModel().getTreenodeSelections().getTreePath());
+				DefaultTreeModel treeModel = (DefaultTreeModel) MainFrame.getInstance().getTree().getModel();
+				MainFrame.getInstance().getTree().setSelectionPath(new TreePath(treeModel.getPathToRoot(MainFrame.getInstance().getModel().getTreenodeSelections())));
 			}
 			//MainFrame.getInstance().getSideBar().enableTreeSelectionListener(true);
 		}
