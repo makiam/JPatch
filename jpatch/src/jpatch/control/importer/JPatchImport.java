@@ -374,7 +374,8 @@ implements ModelImporter {
 					for (Iterator it = listBones.iterator(); it.hasNext(); ) {
 						Bone bone = (Bone) it.next();
 						if (mapBoneParents.containsKey(bone)) {
-							bone.setParentBone((Bone) listBones.get(((Integer) mapBoneParents.get(bone)).intValue()));
+							Bone parent = (Bone) listBones.get(((Integer) mapBoneParents.get(bone)).intValue());
+							bone.insert(parent, parent.getChildCount());
 						}
 						model.addBone(bone);
 					}
@@ -415,7 +416,7 @@ implements ModelImporter {
 	
 	private Morph createMorph(Attributes attributes) {
 		//System.out.println("createMorph");
-		Morph morph = new Morph(Morph.MORPH,"");
+		Morph morph = new Morph(0, "");
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);

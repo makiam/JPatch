@@ -21,12 +21,9 @@ public class AtomicAddDof extends JPatchAtomicEdit implements JPatchRootEdit {
 	}
 
 	public void undo() {
-		int[] aiIndex = new int[] { dof.getParent().getIndex(dof) };
-		Object[] aObject = new Object[] { dof };
-		MainFrame.getInstance().getModel().removeDof(dof);
-		MainFrame.getInstance().getUndoManager().setEnabled(false);
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereRemoved(dof.getParent(),aiIndex,aObject);
-		MainFrame.getInstance().getUndoManager().setEnabled(true);
+//		MainFrame.getInstance().getUndoManager().setEnabled(false);
+		dof.getBone().remove(dof);
+//		MainFrame.getInstance().getUndoManager().setEnabled(true);
 		//morph.setValue(0);
 		//MainFrame.getInstance().getModel().applyMorphs();
 		MainFrame.getInstance().getSideBar().clearDetailPanel();
@@ -34,11 +31,12 @@ public class AtomicAddDof extends JPatchAtomicEdit implements JPatchRootEdit {
 	}
 	
 	public void redo() {
-		MainFrame.getInstance().getModel().addDof(dof);
-		int[] aiIndex = new int[] { dof.getParent().getIndex(dof) };
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(dof.getParent(),aiIndex);
-		TreePath path = dof.getTreePath();
-		MainFrame.getInstance().getTree().makeVisible(path);
+//		MainFrame.getInstance().getModel().addDof(dof);
+//		int[] aiIndex = new int[] { dof.getParent().getIndex(dof) };
+//		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(dof.getParent(),aiIndex);
+//		TreePath path = dof.getTreePath();
+		dof.getBone().insert(dof, 0);
+//		MainFrame.getInstance().getTree().makeVisible(dof.get);
 		//morph.setValue(value);
 //		morph.apply();
 		//MainFrame.getInstance().getModel().applyMorphs();

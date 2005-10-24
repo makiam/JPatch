@@ -1,6 +1,5 @@
 package jpatch.entity;
 
-import javax.swing.tree.TreeNode;
 import javax.vecmath.*;
 
 import jpatch.boundary.JPatchTreeLeaf;
@@ -26,15 +25,10 @@ public class RotationDof extends JPatchTreeLeaf {
 		v3Axis = new Vector3f();
 		fMinAngle = (float) - Math.PI / 2;
 		fMaxAngle = (float) Math.PI / 2;
-		iNodeType = RDOF;
 		strName = "RDOF";
 	}
 	
 	public Bone getBone() {
-		return bone;
-	}
-	
-	public TreeNode getParent() {
 		return bone;
 	}
 	

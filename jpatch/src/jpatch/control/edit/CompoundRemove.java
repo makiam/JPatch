@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundRemove.java,v 1.2 2005/10/09 07:41:30 sascha_l Exp $
+ * $Id: CompoundRemove.java,v 1.3 2005/10/24 16:31:31 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -84,14 +84,14 @@ public class CompoundRemove extends JPatchCompoundEdit {
 			addEdit(new AtomicDropBone(bone));
 		}
 		// set parents of orphanized bones to null
-		for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {
-			Bone bone = (Bone) it.next();
-			if (boneSet.contains(bone.getParentBone())) {
-				Bone parent;
-				for (parent = bone.getParentBone(); parent != null && boneSet.contains(parent); parent = parent.getParentBone());
-				addEdit(new AtomicChangeBone.Parent(bone, parent));
-			}
-		}
+//		for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {
+//			Bone bone = (Bone) it.next();
+//			if (boneSet.contains(bone.getParentBone())) {
+//				Bone parent;
+//				for (parent = bone.getParentBone(); parent != null && boneSet.contains(parent); parent = parent.getParentBone());
+//				addEdit(new AtomicChangeBone.Parent(bone, parent));
+//			}
+//		}
 	}
 	
 //	public CompoundRemove(Model model, Collection objects) {

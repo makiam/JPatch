@@ -17,7 +17,6 @@ public class Morph extends JPatchTreeLeaf {
 	private boolean bPrepared = false;
 	
 	public Morph(int type, String name) {
-		iNodeType = type;
 		strName = name;
 	}
 	

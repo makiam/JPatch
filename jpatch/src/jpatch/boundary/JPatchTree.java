@@ -1,5 +1,5 @@
 /**
- * $Id: JPatchTree.java,v 1.4 2005/09/26 15:07:42 sascha_l Exp $
+ * $Id: JPatchTree.java,v 1.5 2005/10/24 16:31:31 sascha_l Exp $
  */
 package jpatch.boundary;
 
@@ -29,48 +29,48 @@ public class JPatchTree extends JTree {
 //	private TreePath currentPath, lastPath = null;
 	private Selection dragSelection;
 	
-	public JPatchTree (JPatchTreeNode jptn) {
-		super(jptn);
-		
-		/*
-		 * add MouseListener and MouseMotionListener to support dragging of selections
-		 */
-		addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent mouseEvent) {
-				Object component = getClosestPathForLocation(mouseEvent.getX(), mouseEvent.getY()).getLastPathComponent();
-				if (component instanceof Selection)
-					dragSelection = (Selection) component;
-				else
-					dragSelection = null;
-			}
-			
-			public void mouseReleased(MouseEvent mouseEvent) {
-				dragSelection = null;
-			}
-		});
-		
-		addMouseMotionListener(new MouseMotionAdapter() {
-			public void mouseDragged(MouseEvent mouseEvent) {
-				if (dragSelection == null)
-					return;
-				Object component = getClosestPathForLocation(mouseEvent.getX(), mouseEvent.getY()).getLastPathComponent();
-				if (component instanceof Selection && component != dragSelection) {
-					Selection selection = (Selection) component;
-					Model model = MainFrame.getInstance().getModel();
-					java.util.List list = model.getSelections();
-					int index = list.indexOf(selection);
-					int[] aiIndex = new int[] { dragSelection.getParent().getIndex(dragSelection) };
-					Object[] aObject = new Object[] { dragSelection };
-					MainFrame.getInstance().getUndoManager().setEnabled(false);
-					model.removeSelection(dragSelection);
-					((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereRemoved(dragSelection.getParent(),aiIndex,aObject);
-					model.addSelection(index, dragSelection);
-					aiIndex = new int[] { dragSelection.getParent().getIndex(dragSelection) };
-					((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(dragSelection.getParent(),aiIndex);
-					MainFrame.getInstance().getTree().setSelectionPath(dragSelection.getTreePath());
-					MainFrame.getInstance().getUndoManager().setEnabled(true);
-				}
-			}
-		});
+	public JPatchTree (TreeNode treeNode) {
+		super(treeNode);
+//		
+//		/*
+//		 * add MouseListener and MouseMotionListener to support dragging of selections
+//		 */
+//		addMouseListener(new MouseAdapter() {
+//			public void mousePressed(MouseEvent mouseEvent) {
+//				Object component = getClosestPathForLocation(mouseEvent.getX(), mouseEvent.getY()).getLastPathComponent();
+//				if (component instanceof Selection)
+//					dragSelection = (Selection) component;
+//				else
+//					dragSelection = null;
+//			}
+//			
+//			public void mouseReleased(MouseEvent mouseEvent) {
+//				dragSelection = null;
+//			}
+//		});
+//		
+//		addMouseMotionListener(new MouseMotionAdapter() {
+//			public void mouseDragged(MouseEvent mouseEvent) {
+//				if (dragSelection == null)
+//					return;
+//				Object component = getClosestPathForLocation(mouseEvent.getX(), mouseEvent.getY()).getLastPathComponent();
+//				if (component instanceof Selection && component != dragSelection) {
+//					Selection selection = (Selection) component;
+//					Model model = MainFrame.getInstance().getModel();
+//					java.util.List list = model.getSelections();
+//					int index = list.indexOf(selection);
+//					int[] aiIndex = new int[] { dragSelection.getParent().getIndex(dragSelection) };
+//					Object[] aObject = new Object[] { dragSelection };
+//					MainFrame.getInstance().getUndoManager().setEnabled(false);
+//					model.removeSelection(dragSelection);
+//					((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereRemoved(dragSelection.getParent(),aiIndex,aObject);
+//					model.addSelection(index, dragSelection);
+//					aiIndex = new int[] { dragSelection.getParent().getIndex(dragSelection) };
+//					((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(dragSelection.getParent(),aiIndex);
+//					MainFrame.getInstance().getTree().setSelectionPath(dragSelection.getTreePath());
+//					MainFrame.getInstance().getUndoManager().setEnabled(true);
+//				}
+//			}
+//		});
 	}
 }

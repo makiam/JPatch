@@ -60,9 +60,13 @@ public class Selection extends JPatchTreeLeaf {
 	}
 	
 	private Selection() {
-		super("NEW SELECTION");
+		this("NEW SELECTION");
 		m3Orientation = new Matrix3f();
 		m3Orientation.setIdentity();
+	}
+	
+	public Selection(String name) {
+		super(name);
 	}
 	
 	public Selection(Object object) {
@@ -87,10 +91,6 @@ public class Selection extends JPatchTreeLeaf {
 		}
 		mapObjects.put(pivotTransformable, new Float(1));
 		p3Pivot.set(getCenter());
-	}
-
-	public int getNodeType() {
-		return SELECTION;
 	}
 
 	public Set getObjects() {
@@ -342,14 +342,18 @@ public class Selection extends JPatchTreeLeaf {
 	
 	public String toString() {
 //		return "Selection " + getName() + " (" + iNum + ")";
-		return getName();
+		return strName;
+	}
+	
+	public String getName() {
+		return strName;
 	}
 	
 	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
 		StringBuffer cpList = new StringBuffer();
 		StringBuffer cpWeightList = new StringBuffer();
-		sb.append(prefix).append("<selection name=\"" + getName() + "\">\n");
+		sb.append(prefix).append("<selection name=\"" + strName + "\">\n");
 		//int size = getType();
 		//int p = 0;
 		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext();) {

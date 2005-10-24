@@ -1,5 +1,5 @@
 /*
- * $Id: SortSelectionAction.java,v 1.4 2005/09/26 15:07:42 sascha_l Exp $
+ * $Id: SortSelectionAction.java,v 1.5 2005/10/24 16:31:31 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -36,7 +36,7 @@ import jpatch.entity.*;
  * @author lois
  * modified by sascha
  * This Action sorts all the elements under the Selections treenode.
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 
 public final class SortSelectionAction extends AbstractAction {
@@ -48,31 +48,31 @@ public final class SortSelectionAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		Model model = MainFrame.getInstance().getModel();
-		
-		/* make a new(!) list containing all selections */
-		ArrayList list = new ArrayList(model.getSelections());
-		
-		/* sort it (by simply comparing the string representations of the selections) */
-		Collections.sort(list, new Comparator() {
-			public int compare(Object o1, Object o2) {
-				return (o1.toString().compareToIgnoreCase(o2.toString()));
-			}
-			public boolean equals(Object o1, Object o2) {
-				return (compare(o1, o2) == 0);
-			}
-		});
-		
-		/* remove all selections and add them again in order. */
-		for (Iterator it = list.iterator(); it.hasNext(); model.removeSelection((Selection) it.next()));
-		for (Iterator it = list.iterator(); it.hasNext(); model.addSelection((Selection) it.next()));
-		
-		/* reload the tree model */
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).reload();
-		
-		/* make the slections visible */
-		TreePath path = ((Selection) list.get(list.size() - 1)).getTreePath();
-		MainFrame.getInstance().getTree().makeVisible(path);
+//		Model model = MainFrame.getInstance().getModel();
+//		
+//		/* make a new(!) list containing all selections */
+//		ArrayList list = new ArrayList(model.getSelections());
+//		
+//		/* sort it (by simply comparing the string representations of the selections) */
+//		Collections.sort(list, new Comparator() {
+//			public int compare(Object o1, Object o2) {
+//				return (o1.toString().compareToIgnoreCase(o2.toString()));
+//			}
+//			public boolean equals(Object o1, Object o2) {
+//				return (compare(o1, o2) == 0);
+//			}
+//		});
+//		
+//		/* remove all selections and add them again in order. */
+//		for (Iterator it = list.iterator(); it.hasNext(); model.removeSelection((Selection) it.next()));
+//		for (Iterator it = list.iterator(); it.hasNext(); model.addSelection((Selection) it.next()));
+//		
+//		/* reload the tree model */
+//		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).reload();
+//		
+//		/* make the slections visible */
+//		TreePath path = ((Selection) list.get(list.size() - 1)).getTreePath();
+//		MainFrame.getInstance().getTree().makeVisible(path);
 	}
 	
 //	// quick sort

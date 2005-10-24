@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchMaterial.java,v 1.2 2005/09/20 16:17:54 sascha_l Exp $
+ * $Id: JPatchMaterial.java,v 1.3 2005/10/24 16:31:30 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -57,12 +57,11 @@ import jpatch.auxilary.*;
  * </table>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.2 $
+ * @version    $Revision: 1.3 $
  * @see		jpatch.entity.MaterialProperties
  */
 
 public class JPatchMaterial extends JPatchTreeLeaf {
-	
 	private RenderExtension re = new RenderExtension(new String[] {
 		"povray", "pigment {\n\tcolor rgbft <$r,$g,$b,$filter,$transmit>\n}\nfinish {\n\tambient $ambient\n\tdiffuse $diffuse brilliance $brilliance\n\tspecular $specular roughness $roughness metallic $metallic\n\t#if ($conserve_energy) conserve_energy #end\n\treflection {\n\t\t$reflection_min,$reflection_max\n\t\tfalloff $reflection_falloff\n\t\tmetallic $metallic\n\t}\n}\ninterior {\n\tior $refraction\n}\n",
 		"renderman", "Color [$r $g $b]\nOpacity [$opacity]\nSurface \"plastic\" \"Ka\" [$ambient] \"Kd\" [$diffuse] \"Ks\" [$specular] \"roughness\" [$roughness]\n",
@@ -78,7 +77,6 @@ public class JPatchMaterial extends JPatchTreeLeaf {
 	 */
 	public JPatchMaterial() {
 		strName = "New Material";
-		iNodeType = MATERIAL;
 	}
 
 	/**
@@ -105,7 +103,6 @@ public class JPatchMaterial extends JPatchTreeLeaf {
 		materialProperties.blue = color.z;
 	}
 
-	
 	public void setXmlNumber(int n) {
 		iXmlNumber = n;
 	}

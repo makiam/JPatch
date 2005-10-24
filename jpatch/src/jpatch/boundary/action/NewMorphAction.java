@@ -17,14 +17,14 @@ public final class NewMorphAction extends AbstractAction {
 	
 	//private JPatchTreeNode treeNode;
 	
-	public NewMorphAction(JPatchTreeNode node) {
+	public NewMorphAction() {
 		super("New Morph");
 		//treeNode = node;
 		//putValue(Action.SHORT_DESCRIPTION,"Add Controlpoint [A]");
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		Morph morph = new Morph(Morph.MORPH,"new morph #" + iNum++);
+		Morph morph = new Morph(0, "new morph #" + iNum++);
 		//MainFrame.getInstance().getModel().addExpression(morph);
 		////treeNode.add(morph);
 		//int[] aiIndex = new int[] { treeNode.getIndex(morph) };
@@ -36,8 +36,8 @@ public final class NewMorphAction extends AbstractAction {
 		//MainFrame.getInstance().getJPatchScreen().addMouseListeners(new AddControlPointMouseAdapter());
 		//MainFrame.getInstance().clearDialog();
 		MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddMorph(morph));
-		MainFrame.getInstance().getTree().setSelectionPath(morph.getTreePath());
-		((MorphPanel) MainFrame.getInstance().getSideBar().getSidePanel()).edit();
+//		MainFrame.getInstance().getTree().setSelectionPath(morph.getTreePath());
+//		((MorphPanel) MainFrame.getInstance().getSideBar().getSidePanel()).edit();
 	}
 }
 
