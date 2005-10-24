@@ -24,6 +24,7 @@ package jpatch.control.edit;
 import java.util.*;
 
 import jpatch.boundary.*;
+import jpatch.boundary.action.DetachControlPointsAction;
 import jpatch.entity.*;
 
 /**
@@ -84,13 +85,13 @@ public class CompoundDelete extends JPatchCompoundEdit {
 			addEdit(new AtomicDropBone(bone));
 		}
 		// set parents of orphanized bones to null
-		for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {
-			Bone bone = (Bone) it.next();
-			if (boneSet.contains(bone.getParentBone())) {
-				System.out.println("*");
-				addEdit(new AtomicChangeBone.Parent(bone, null));
-			}
-		}
+//		for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {
+//			Bone bone = (Bone) it.next();
+//			if (boneSet.contains(bone.getParentBone())) {
+//				System.out.println("*");
+//				addEdit(new AtomicDropBone(bone) new AtomicChangeBone.Parent(bone, null));
+//			}
+//		}
 	}
 ////		for (Curve curve = model.getFirstCurve(); curve != null; curve = curve.getNext()) {
 ////			if (dropCurve(curve, objects)) {

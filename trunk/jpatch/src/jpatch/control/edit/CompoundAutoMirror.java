@@ -261,7 +261,7 @@ public class CompoundAutoMirror extends AbstractClone {
 						if (newMap.size() > 0)
 							addEdit(new AddPointsToMorphEdit(morph, newMap));
 					} else {
-						Morph newMorph = new Morph(morph.getNodeType(), "mirrored " + morph.getName());
+						Morph newMorph = new Morph(0, "mirrored " + morph.getName());
 						for (Iterator jt = morphMap.keySet().iterator(); jt.hasNext(); ) {
 							ControlPoint cp = (ControlPoint) jt.next();
 							ControlPoint clone = (ControlPoint) mapClones.get(cp);

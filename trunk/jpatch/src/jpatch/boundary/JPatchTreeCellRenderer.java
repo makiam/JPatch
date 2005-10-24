@@ -28,7 +28,7 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 	
 	public Component getTreeCellRendererComponent(JTree tree,Object value,boolean sel,boolean expanded,boolean leaf,int row,boolean hasFocus) {
 		super.getTreeCellRendererComponent(tree,value,sel,expanded,leaf,row,hasFocus);
-		setIcon(aimageicon[((JPatchTreeLeaf)value).getNodeType()]);
+//		setIcon(aimageicon[((JPatchTreeLeaf)value).getNodeType()]);
 		return this;
 	}
 }

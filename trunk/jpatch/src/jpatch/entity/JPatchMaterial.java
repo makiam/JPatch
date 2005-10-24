@@ -62,7 +62,6 @@ import jpatch.auxilary.*;
  */
 
 public class JPatchMaterial extends JPatchTreeLeaf {
-	
 	private RenderExtension re = new RenderExtension(new String[] {
 		"povray", "pigment {\n\tcolor rgbft <$r,$g,$b,$filter,$transmit>\n}\nfinish {\n\tambient $ambient\n\tdiffuse $diffuse brilliance $brilliance\n\tspecular $specular roughness $roughness metallic $metallic\n\t#if ($conserve_energy) conserve_energy #end\n\treflection {\n\t\t$reflection_min,$reflection_max\n\t\tfalloff $reflection_falloff\n\t\tmetallic $metallic\n\t}\n}\ninterior {\n\tior $refraction\n}\n",
 		"renderman", "Color [$r $g $b]\nOpacity [$opacity]\nSurface \"plastic\" \"Ka\" [$ambient] \"Kd\" [$diffuse] \"Ks\" [$specular] \"roughness\" [$roughness]\n",
@@ -78,7 +77,6 @@ public class JPatchMaterial extends JPatchTreeLeaf {
 	 */
 	public JPatchMaterial() {
 		strName = "New Material";
-		iNodeType = MATERIAL;
 	}
 
 	/**
@@ -105,7 +103,6 @@ public class JPatchMaterial extends JPatchTreeLeaf {
 		materialProperties.blue = color.z;
 	}
 
-	
 	public void setXmlNumber(int n) {
 		iXmlNumber = n;
 	}

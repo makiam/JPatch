@@ -24,15 +24,15 @@ public class AtomicAddSelection extends JPatchAtomicEdit implements JPatchRootEd
 	}
 	
 	public void undo() {
-		int[] aiIndex = new int[] { selection.getParent().getIndex(selection) };
-		Object[] aObject = new Object[] { selection };
+//		int[] aiIndex = new int[] { selection.getParent().getIndex(selection) };
+//		Object[] aObject = new Object[] { selection };
 		MainFrame.getInstance().getModel().removeSelection(selection);
 		//System.out.println("<");
 		//TreePath path = selection.getParent().getTreePath();
 		//MainFrame.getInstance().getTree().setSelectionPath(path);
-		MainFrame.getInstance().getUndoManager().setEnabled(false);
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereRemoved(selection.getParent(),aiIndex,aObject);
-		MainFrame.getInstance().getUndoManager().setEnabled(true);
+//		MainFrame.getInstance().getUndoManager().setEnabled(false);
+//		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereRemoved(selection.getParent(),aiIndex,aObject);
+//		MainFrame.getInstance().getUndoManager().setEnabled(true);
 		//System.out.println(">");
 	}
 	
@@ -41,11 +41,11 @@ public class AtomicAddSelection extends JPatchAtomicEdit implements JPatchRootEd
 			MainFrame.getInstance().getModel().addSelection(selection);
 		else
 			MainFrame.getInstance().getModel().addSelection(index, selection);
-		int[] aiIndex = new int[] { selection.getParent().getIndex(selection) };
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(selection.getParent(),aiIndex);
-		TreePath path = selection.getTreePath();
-		//MainFrame.getInstance().getTree().setSelectionPath(path);
-		MainFrame.getInstance().getTree().makeVisible(path);
+//		int[] aiIndex = new int[] { selection.getParent().getIndex(selection) };
+//		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(selection.getParent(),aiIndex);
+//		TreePath path = selection.getTreePath();
+//		//MainFrame.getInstance().getTree().setSelectionPath(path);
+//		MainFrame.getInstance().getTree().makeVisible(path);
 	}
 	
 	public int sizeOf() {

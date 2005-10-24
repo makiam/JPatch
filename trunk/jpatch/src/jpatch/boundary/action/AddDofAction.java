@@ -22,7 +22,7 @@ public final class AddDofAction extends AbstractAction {
 	public void actionPerformed(ActionEvent actionEvent) {
 		RotationDof dof = new RotationDof(bone);
 		MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddDof(dof));
-		MainFrame.getInstance().getTree().setSelectionPath(dof.getTreePath());
+//		MainFrame.getInstance().getTree().setSelectionPath(dof.getTreePath());
 	}
 }
 

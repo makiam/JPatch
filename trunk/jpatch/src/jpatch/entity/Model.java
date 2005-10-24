@@ -3,6 +3,9 @@ package jpatch.entity;
 
 import java.util.*;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
 import javax.vecmath.*;
 import jpatch.auxilary.*;
 import jpatch.control.edit.*;
@@ -14,7 +17,7 @@ import jpatch.boundary.*;
  * @author     aledinsk
  * @created    02. Mai 2003
  */
-public class Model extends JPatchTreeNode {
+public class Model {
 
 	/**
 	 *  Description of the Field
@@ -23,10 +26,10 @@ public class Model extends JPatchTreeNode {
 	private HashSet setBones = new HashSet();
 	private HashMap mapPatches = new HashMap();
 
-	private JPatchTreeNode treenodeSelections;
-	private JPatchTreeNode treenodeMaterials;
-	private JPatchTreeNode treenodeExpressions; 
-	private JPatchTreeNode treenodeBones;
+	private MutableTreeNode treenodeSelections;
+	private MutableTreeNode treenodeMaterials;
+	private MutableTreeNode treenodeExpressions; 
+	private MutableTreeNode treenodeBones;
 	
 	private ArrayList lstCandidateFivePointPatch = new ArrayList();
 	
@@ -37,17 +40,16 @@ public class Model extends JPatchTreeNode {
 	private List lstMorphs = new ArrayList();
 //	private List lstBoneShapes = new ArrayList();
 	private HashMap mapPhonemes = new HashMap();
-	
+	private String strName;
 	private Rotoscope[] aRotoscope = new Rotoscope[6];
 	//private ArrayList listeners = new ArrayList();
 	
 	public Model() {
-		iNodeType = JPatchTreeNode.MODEL;
 		strName = "New Model";
-		treenodeSelections= new JPatchTreeNode(JPatchTreeNode.SELECTIONS,this,"Selections");
-		treenodeMaterials = new JPatchTreeNode(JPatchTreeNode.MATERIALS,this,"Materials");
-		treenodeExpressions = new JPatchTreeNode(JPatchTreeNode.MORPHS,this,"Expressions");
-		treenodeBones = new JPatchTreeNode(JPatchTreeNode.BONES,this,"Bones");
+		treenodeSelections= new DefaultMutableTreeNode("Selections");
+		treenodeMaterials = new DefaultMutableTreeNode("Materials");
+		treenodeExpressions = new DefaultMutableTreeNode("Expressions");
+		treenodeBones = new DefaultMutableTreeNode("Bones");
 		JPatchMaterial material = new JPatchMaterial(new Color3f(1,1,1));
 		material.setName("Default Material");
 		addMaterial(material);
@@ -84,6 +86,10 @@ public class Model extends JPatchTreeNode {
 	//	}
 	//	return sb;
 	//}
+	
+	public String toString() {
+		return strName;
+	}
 	
 	public StringBuffer xml(String prefix) {
 		String prefix2 = prefix + "\t";
@@ -175,6 +181,14 @@ public class Model extends JPatchTreeNode {
 	}
 	*/
 	
+	public String getName() {
+		return strName;
+	}
+	
+	public void setName(String name) {
+		strName = name;
+	}
+	
 	public void setMorphFor(String phoneme, Morph morph) {
 		mapPhonemes.put(phoneme, morph);
 	}
@@ -191,7 +205,7 @@ public class Model extends JPatchTreeNode {
 		return set;
 	}
 	
-	public boolean addMaterial(JPatchMaterial material) {
+	public void addMaterial(JPatchMaterial material) {
 		/*
 		for (int m = 0; m < 32; m++) {
 			if (aJPMaterial[m] == null) {
@@ -203,9 +217,9 @@ public class Model extends JPatchTreeNode {
 		}
 		return false;
 		*/
-		treenodeMaterials.add(material);
+		treenodeMaterials.insert(material, 0);
 		lstMaterials.add(material);
-		return true;
+//		return true;
 	}
 	
 	public boolean checkSelection(Selection selection) {
@@ -229,7 +243,7 @@ public class Model extends JPatchTreeNode {
 		return false;
 		*/
 		//if (!lstSelections.contains(selection)) {
-			treenodeSelections.add(selection);
+			treenodeSelections.insert(selection, 0);
 			lstSelections.add(selection);
 		//	return true;
 		//} else {
@@ -238,7 +252,7 @@ public class Model extends JPatchTreeNode {
 	}
 
 	public void addSelection(int index, Selection selection) {
-			treenodeSelections.add(index, selection);
+			treenodeSelections.insert(selection, index);
 			lstSelections.add(index, selection);
 	}
 	
@@ -261,7 +275,7 @@ public class Model extends JPatchTreeNode {
 	}
 	
 	public void addExpression(Morph morph) {
-		treenodeExpressions.add(morph);
+		treenodeExpressions.insert(morph, 0);
 		lstMorphs.add(morph);
 	}
 	
@@ -312,8 +326,17 @@ public class Model extends JPatchTreeNode {
 		lstSelections.remove(selection);
 	}
 	
-	public JPatchTreeNode getTreenodeSelections() {
+	public MutableTreeNode getTreenodeSelections() {
 		return treenodeSelections;
+	}
+	public MutableTreeNode getTreenodeMaterials() {
+		return treenodeMaterials;
+	}
+	public MutableTreeNode getTreenodeExpressions() {
+		return treenodeExpressions;
+	}
+	public MutableTreeNode getTreenodeBones() {
+		return treenodeBones;
 	}
 	
 	public void removeMaterial(JPatchMaterial material) {
@@ -342,9 +365,9 @@ public class Model extends JPatchTreeNode {
 	
 	
 
-	public JPatchTreeNode getRootBone() {
-		return treenodeBones;
-	}
+//	public MutableTreeNode getRootBone() {
+//		return treenodeBones;
+//	}
 	
 	
 	public void addCurve(ControlPoint start) {
@@ -357,21 +380,30 @@ public class Model extends JPatchTreeNode {
 
 	public void addBone(Bone bone) {
 		setBones.add(bone);
-		if (bone.getParentBone() == null)
-			treenodeBones.add(bone);
+		System.out.println("addBone() called");
+		System.out.println("parent = " + bone.getParent());
+		MutableTreeNode node = (MutableTreeNode) bone.getParent();
+		if (node != null)
+			((MutableTreeNode) bone.getParent()).insert(bone, bone.getParent().getChildCount());
+		else
+			treenodeBones.insert(bone, treenodeBones.getChildCount());
+//		DefaultTreeModel treeModel = (DefaultTreeModel) MainFrame.getInstance().getTree().getModel();
+//		treeModel.reload(bone.getParent());
+//		if (bone.getParentBone() == null)
+//			treenodeBones.add(bone);
 	}
 
 	public void removeBone(Bone bone) {
 		setBones.remove(bone);
 	}
 	
-	public void addDof(RotationDof dof) {
-		dof.getBone().addDof(dof);
-	}
-	
-	public void removeDof(RotationDof dof) {
-		dof.getBone().removeDof(dof);
-	}
+//	public void addDof(RotationDof dof) {
+//		dof.getBone().addDof(dof);
+//	}
+//	
+//	public void removeDof(RotationDof dof) {
+//		dof.getBone().removeDof(dof);
+//	}
 	
 	/**
 	 *  Adds a feature to the Patch attribute of the Model object

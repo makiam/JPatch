@@ -43,23 +43,23 @@ public abstract class AtomicChangeBone extends JPatchAtomicEdit {
 		}
 	}
 	
-	public static final class Parent extends AtomicChangeBone {
-		private Bone parentBone;
-		
-		public Parent(Bone bone, Bone parent) {
-			this.bone = bone;
-			this.parentBone = parent;
-			swap();
-		}
-		
-		void swap() {
-			Bone dummy = parentBone;
-			parentBone = bone.getParentBone();
-			bone.setParentBone(dummy);
-		}
-		
-		public int sizeOf() {
-			return 8 + 4 + 4;
-		}
-	}
+//	public static final class Parent extends AtomicChangeBone {
+//		private Bone parentBone;
+//		
+//		public Parent(Bone bone, Bone parent) {
+//			this.bone = bone;
+//			this.parentBone = parent;
+//			swap();
+//		}
+//		
+//		void swap() {
+//			Bone dummy = parentBone;
+//			parentBone = bone.getParentBone();
+//			bone.setParentBone(dummy);
+//		}
+//		
+//		public int sizeOf() {
+//			return 8 + 4 + 4;
+//		}
+//	}
 }

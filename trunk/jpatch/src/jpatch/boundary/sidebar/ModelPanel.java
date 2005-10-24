@@ -30,7 +30,7 @@ implements ChangeListener {
 	
 	public void stateChanged(ChangeEvent changeEvent) {
 		model.setName(inputName.getStringValue());
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodeChanged(model);
+		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodeChanged(MainFrame.getInstance().getModelTreenode());
 		MainFrame.getInstance().requestFocus();
 	}
 }
