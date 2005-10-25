@@ -6,6 +6,7 @@ import java.util.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.vecmath.*;
 import jpatch.auxilary.*;
 import jpatch.control.edit.*;
@@ -17,7 +18,7 @@ import jpatch.boundary.*;
  * @author     aledinsk
  * @created    02. Mai 2003
  */
-public class Model {
+public class Model implements MutableTreeNode {
 
 	/**
 	 *  Description of the Field
@@ -42,17 +43,19 @@ public class Model {
 	private HashMap mapPhonemes = new HashMap();
 	private String strName;
 	private Rotoscope[] aRotoscope = new Rotoscope[6];
+	private boolean bInserted = false;
 	//private ArrayList listeners = new ArrayList();
 	
 	public Model() {
 		strName = "New Model";
-		treenodeSelections= new DefaultMutableTreeNode("Selections");
-		treenodeMaterials = new DefaultMutableTreeNode("Materials");
-		treenodeExpressions = new DefaultMutableTreeNode("Expressions");
-		treenodeBones = new DefaultMutableTreeNode("Bones");
+		treenodeSelections = new ModelTreeNode("Selections", lstSelections);
+		treenodeMaterials = new ModelTreeNode("Materials", lstMaterials);
+		treenodeExpressions = new ModelTreeNode("Expressions", lstMorphs);
+		treenodeBones = new ModelTreeNode("Bones", new ArrayList());
 		JPatchMaterial material = new JPatchMaterial(new Color3f(1,1,1));
 		material.setName("Default Material");
-		addMaterial(material);
+		lstMaterials.add(material);
+//		treenodeMaterials.insert(material, 0);
 		
 //		addBone(new Bone(this, new Point3f(0, 0, 0), new Vector3f(1, 0, 0)));
 //		addBone(new Bone(this, new Point3f(1, 0, 0), new Vector3f(1, 0, 0)));
@@ -217,8 +220,11 @@ public class Model {
 		}
 		return false;
 		*/
-		treenodeMaterials.insert(material, 0);
-		lstMaterials.add(material);
+		MainFrame.getInstance().getTreeModel().insertNodeInto(material, treenodeMaterials, treenodeMaterials.getChildCount());
+//		MainFrame.getInstance().getTreeModel().nodeStructureChanged(treenodeMaterials);
+//		treenodeMaterials.insert(material, 0);
+//		lstMaterials.add(material);
+//		MainFrame.getInstance().getTreeModel().nodesWereInserted(treenodeMaterials, new int[] { treenodeMaterials.getChildCount() } );
 //		return true;
 	}
 	
@@ -243,17 +249,19 @@ public class Model {
 		return false;
 		*/
 		//if (!lstSelections.contains(selection)) {
-			treenodeSelections.insert(selection, 0);
-			lstSelections.add(selection);
+//			treenodeSelections.insert(selection, 0);
+//			lstSelections.add(selection);
 		//	return true;
 		//} else {
 		//	return false;
 		//}
+		MainFrame.getInstance().getTreeModel().insertNodeInto(selection, treenodeSelections, treenodeSelections.getChildCount());
 	}
 
 	public void addSelection(int index, Selection selection) {
-			treenodeSelections.insert(selection, index);
-			lstSelections.add(index, selection);
+//			treenodeSelections.insert(selection, index);
+//			lstSelections.add(index, selection);
+		MainFrame.getInstance().getTreeModel().insertNodeInto(selection, treenodeSelections, index);
 	}
 	
 	public void getBounds(Point3f min, Point3f max) {
@@ -275,8 +283,9 @@ public class Model {
 	}
 	
 	public void addExpression(Morph morph) {
-		treenodeExpressions.insert(morph, 0);
-		lstMorphs.add(morph);
+//		treenodeExpressions.insert(morph, 0);
+//		lstMorphs.add(morph);
+		MainFrame.getInstance().getTreeModel().insertNodeInto(morph, treenodeExpressions, treenodeExpressions.getChildCount());
 	}
 	
 	public void setReferenceGeometry() {
@@ -322,8 +331,7 @@ public class Model {
 //	}
 	
 	public void removeSelection(Selection selection) {
-		treenodeSelections.remove(selection);
-		lstSelections.remove(selection);
+		MainFrame.getInstance().getTreeModel().removeNodeFromParent(selection);
 	}
 	
 	public MutableTreeNode getTreenodeSelections() {
@@ -340,13 +348,11 @@ public class Model {
 	}
 	
 	public void removeMaterial(JPatchMaterial material) {
-		treenodeMaterials.remove(material);
-		lstMaterials.remove(material);
+		MainFrame.getInstance().getTreeModel().removeNodeFromParent(material);
 	}
 	
 	public void removeExpression(Morph morph) {
-		treenodeExpressions.remove(morph);
-		lstMorphs.remove(morph);
+		MainFrame.getInstance().getTreeModel().removeNodeFromParent(morph);
 	}
 	
 	// accessor methods
@@ -383,10 +389,10 @@ public class Model {
 		System.out.println("addBone() called");
 		System.out.println("parent = " + bone.getParent());
 		MutableTreeNode node = (MutableTreeNode) bone.getParent();
-		if (node != null)
-			((MutableTreeNode) bone.getParent()).insert(bone, bone.getParent().getChildCount());
-		else
-			treenodeBones.insert(bone, treenodeBones.getChildCount());
+		System.out.println(bone + " " + node);
+		if (node == null)
+			node = treenodeBones;
+		MainFrame.getInstance().getTreeModel().insertNodeInto(bone, node, node.getChildCount());	
 //		DefaultTreeModel treeModel = (DefaultTreeModel) MainFrame.getInstance().getTree().getModel();
 //		treeModel.reload(bone.getParent());
 //		if (bone.getParentBone() == null)
@@ -394,6 +400,8 @@ public class Model {
 	}
 
 	public void removeBone(Bone bone) {
+		System.out.println("remove bone from " + bone.getParent());
+		MainFrame.getInstance().getTreeModel().removeNodeFromParent(bone);
 		setBones.remove(bone);
 	}
 	
@@ -1026,6 +1034,146 @@ public class Model {
 	
 	private ControlPoint trueHead(ControlPoint cp) {
 		return (cp.getParentHook() == null) ? cp.getHead() : cp.getParentHook().getHead();
+	}
+
+	
+	/* MutableTreeNode interface implementation */
+	
+	public void insert(MutableTreeNode child, int index) {
+		throw new UnsupportedOperationException("Can't insert nodes into model");
+	}
+
+	public void remove(int index) {
+		throw new UnsupportedOperationException("Can't remove nodes from model");
+	}
+
+	public void remove(MutableTreeNode node) {
+		throw new UnsupportedOperationException("Can't remove nodes from model");
+	}
+
+	public void setUserObject(Object object) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void removeFromParent() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setParent(MutableTreeNode newParent) {
+		bInserted = true;
+	}
+
+	public TreeNode getChildAt(int childIndex) {
+		switch(childIndex) {
+		case 0:
+			return treenodeSelections;
+		case 1:
+			return treenodeMaterials;
+		case 2:
+			return treenodeExpressions;
+		case 3:
+			return treenodeBones;
+		}
+		throw new ArrayIndexOutOfBoundsException();
+	}
+
+	public int getChildCount() {
+		return 4;
+	}
+
+	public TreeNode getParent() {
+		return bInserted ? MainFrame.getInstance().getRootTreenode() : null;
+	}
+
+	public int getIndex(TreeNode node) {
+		return 0;
+	}
+
+	public boolean getAllowsChildren() {
+		return true;
+	}
+
+	public boolean isLeaf() {
+		return false;
+	}
+
+	public Enumeration children() {
+		return new Enumeration() {
+			private int i = 0;
+			public boolean hasMoreElements() {
+				return i < 4;
+			}
+
+			public Object nextElement() {
+				return getChildAt(i++);
+			}
+		};
+	}
+	
+	private class ModelTreeNode implements MutableTreeNode {
+		private List list;
+		private String strName;
+		
+		public ModelTreeNode(String name, List list) {
+			strName = name;
+			this.list = list;
+		}
+		
+		public String toString() {
+			return strName;
+		}
+		
+		public void setUserObject(Object object) {
+			throw new UnsupportedOperationException();
+		}
+
+		public void removeFromParent() {
+			throw new UnsupportedOperationException();
+		}
+
+		public void setParent(MutableTreeNode newParent) {
+		}
+
+		public TreeNode getParent() {
+			return Model.this;
+		}
+
+		public boolean getAllowsChildren() {
+			return true;
+		}
+
+		public void insert(MutableTreeNode child, int index) {
+			list.add(index, child);
+			child.setParent(this);
+		}
+
+		public void remove(int index) {
+			list.remove(index);
+		}
+
+		public void remove(MutableTreeNode node) {
+			list.remove(node);
+		}
+
+		public TreeNode getChildAt(int childIndex) {
+			return (TreeNode) list.get(childIndex);
+		}
+
+		public int getChildCount() {
+			return list.size();
+		}
+
+		public int getIndex(TreeNode node) {
+			return list.indexOf(node);
+		}
+
+		public boolean isLeaf() {
+			return list.size() <= 0;
+		}
+
+		public Enumeration children() {
+			return Collections.enumeration(list);
+		}
 	}
 }
 

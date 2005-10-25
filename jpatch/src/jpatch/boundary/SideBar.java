@@ -154,7 +154,7 @@ implements TreeSelectionListener {
 		
 		MutableTreeNode selectedNode = (MutableTreeNode) treeSelectionEvent.getPath().getLastPathComponent();
 		if (selectedNode == MainFrame.getInstance().getModel().getTreenodeMaterials()) {
-			replacePanel(new MaterialsPanel((Model) ((DefaultMutableTreeNode) selectedNode.getParent()).getUserObject()));
+			replacePanel(new MaterialsPanel((Model) selectedNode.getParent()));
 		} else if (selectedNode instanceof JPatchMaterial) {
 			replacePanel(new MaterialPanel((JPatchMaterial) selectedNode));
 		} else if (selectedNode == MainFrame.getInstance().getModel().getTreenodeExpressions()) {
@@ -162,7 +162,7 @@ implements TreeSelectionListener {
 		} else if (selectedNode instanceof Morph) {
 			replacePanel(new MorphPanel((Morph) selectedNode));
 		} else if (selectedNode == MainFrame.getInstance().getModel().getTreenodeSelections()) {
-			replacePanel(new SelectionsPanel((Model) ((DefaultMutableTreeNode) selectedNode.getParent()).getUserObject()));
+			replacePanel(new SelectionsPanel((Model) selectedNode.getParent()));
 		} else if (selectedNode instanceof Selection) {
 			replacePanel(new SelectionPanel((Selection) selectedNode));
 			if (!selectedNode.equals(MainFrame.getInstance().getSelection())) {
@@ -176,8 +176,8 @@ implements TreeSelectionListener {
 			replacePanel(new BonePanel((Bone) selectedNode));
 		} else if (selectedNode instanceof RotationDof) {
 			replacePanel(new DofPanel((RotationDof) selectedNode));
-		} else if (selectedNode instanceof DefaultMutableTreeNode) {
-			replacePanel(new ModelPanel((Model) ((DefaultMutableTreeNode) selectedNode).getUserObject()));
+		} else if (selectedNode instanceof Model) {
+			replacePanel(new ModelPanel((Model) selectedNode));
 		} else {
 			replacePanel(new SidePanel());
 		}

@@ -20,10 +20,10 @@ public class AtomicRemoveMorph extends JPatchAtomicEdit implements JPatchRootEdi
 	
 	public void redo() {
 		morph.unapply();
-		int[] aiIndex = new int[] { morph.getParent().getIndex(morph) };
-		Object[] aObject = new Object[] { morph };
+//		int[] aiIndex = new int[] { morph.getParent().getIndex(morph) };
+//		Object[] aObject = new Object[] { morph };
 		MainFrame.getInstance().getModel().removeExpression(morph);
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereRemoved(morph.getParent(),aiIndex,aObject);
+//		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereRemoved(morph.getParent(),aiIndex,aObject);
 		MainFrame.getInstance().getSideBar().replacePanel(new SidePanel());
 		MainFrame.getInstance().getSideBar().clearDetailPanel();
 		MainFrame.getInstance().getSideBar().validate();

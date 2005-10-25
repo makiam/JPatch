@@ -48,7 +48,7 @@ public final class MainFrame extends JFrame {
 	private JPatchTree tree;
 	private SideBar sideBar;
 	private MutableTreeNode treenodeRoot;
-	private MutableTreeNode treenodeModel;
+//	private MutableTreeNode treenodeModel;
 	private Morph editedMorph;
 //	private javax.swing.Timer defaultToolTimer = new javax.swing.Timer(0, new ActionListener() {
 //		public void actionPerformed(ActionEvent event) {
@@ -512,17 +512,20 @@ public final class MainFrame extends JFrame {
 		return treenodeRoot;
 	}
 	
-	public MutableTreeNode getModelTreenode() {
-		return treenodeModel;
+//	public MutableTreeNode getModelTreenode() {
+//		return treenodeModel;
+//	}
+	
+	public DefaultTreeModel getTreeModel() {
+		return (DefaultTreeModel) tree.getModel();
 	}
+	
 	private void initTree() {
-		treenodeRoot = new DefaultMutableTreeNode("ROOT");
-		treenodeModel = new DefaultMutableTreeNode(model);
-		treenodeRoot.insert(treenodeModel, 0);
-		treenodeModel.insert(model.getTreenodeSelections(), 0);
-		treenodeModel.insert(model.getTreenodeMaterials(), 1);
-		treenodeModel.insert(model.getTreenodeExpressions(), 2);
-		treenodeModel.insert(model.getTreenodeBones(), 3);
+//		treenodeRoot.insert(model, 0);
+//		treenodeModel.insert(model.getTreenodeSelections(), 0);
+//		treenodeModel.insert(model.getTreenodeMaterials(), 1);
+//		treenodeModel.insert(model.getTreenodeExpressions(), 2);
+//		treenodeModel.insert(model.getTreenodeBones(), 3);
 		//JPatchTreeNode treenodeModel = new JPatchTreeNode(JPatchTreeNode.MODEL,treenodeRoot);
 		
 		//JPatchTreeNode treenodeMorphGroup1 = new JPatchTreeNode(JPatchTreeNode.MORPHGROUP,treenodeExpressions);
@@ -533,11 +536,15 @@ public final class MainFrame extends JFrame {
 		//treenodeMorphGroup1.add(new JPatchTreeLeaf(JPatchTreeLeaf.MORPH,null));
 		//treenodeMorphGroup2.add(new JPatchTreeLeaf(JPatchTreeLeaf.MORPH,null));
 		
+		treenodeRoot = new DefaultMutableTreeNode("ROOT");
 		tree = new JPatchTree(treenodeRoot);
+		((DefaultTreeModel) tree.getModel()).insertNodeInto(model, treenodeRoot, 0);
+		((DefaultTreeModel) tree.getModel()).reload();
 		tree.setCellRenderer(new JPatchTreeCellRenderer());
 		tree.setRootVisible(false);
 		tree.setShowsRootHandles(true);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		tree.expandRow(0);
 		//tree.makeVisible(treenodeMaterials.getTreePath());
 		//tree.setDragEnabled(true);
 	}

@@ -1251,7 +1251,7 @@ public class DefaultTool extends JPatchTool {
 		MutableTreeNode leaf = null;
 		if (MainFrame.getInstance().getTree().getSelectionPath() != null)
 			leaf = (MutableTreeNode) MainFrame.getInstance().getTree().getSelectionPath().getLastPathComponent();
-		if (leaf == null || leaf == MainFrame.getInstance().getModel().getTreenodeSelections() || leaf == MainFrame.getInstance().getModelTreenode() || leaf instanceof Selection) {
+		if (leaf == null || leaf == MainFrame.getInstance().getModel().getTreenodeSelections() || leaf == MainFrame.getInstance().getModel() || leaf instanceof Selection) {
 			//MainFrame.getInstance().getSideBar().enableTreeSelectionListener(false);
 			if (selection != null && !MainFrame.getInstance().getModel().checkSelection(selection)) {
 			//	System.out.println("*");
