@@ -37,19 +37,17 @@ public class Bone implements MutableTreeNode {
 //	private final Point3f p3End = new Point3f();
 	private float fStartRadius = DEFAULT_INFLUENCE;
 	private float fEndRadius = DEFAULT_INFLUENCE;
-	private Bone boneParent;
+	private MutableTreeNode parent;
 //	private Bone boneNext;
 //	private Bone bonePrev;
 	private ArrayList listChildBones = new ArrayList();
 	private ArrayList listDofs = new ArrayList();
-	private ArrayList listChildren = new ArrayList();
 	
 	private boolean bSelected = false;
 	private BoneTransformable boneStart = new BoneTransformable(p3Start);
 	private BoneTransformable boneEnd = new BoneTransformable(p3End);
 	
 	private String strName;
-	private boolean bParentSet = false;
 	
 //	private int iNum = NUM++;
 //	
@@ -103,7 +101,16 @@ public class Bone implements MutableTreeNode {
 	*/
 
 	public Enumeration children() {
-		return Collections.enumeration(listChildren);
+		return new Enumeration() {
+			private int i = 0;
+			public boolean hasMoreElements() {
+				return i < listDofs.size() + listChildBones.size();
+			}
+
+			public Object nextElement() {
+				return getChildAt(i++);
+			}
+		};
 	}
 
 	public boolean getAllowsChildren() {
@@ -119,44 +126,50 @@ public class Bone implements MutableTreeNode {
 	}
 
 	public TreeNode getChildAt(int index) {
-		return (TreeNode) listChildren.get(index);
+		if (index < listDofs.size())
+			return (TreeNode) listDofs.get(index);
+		else
+			return (TreeNode) listChildBones.get(index - listDofs.size());
 	}
 
 	public int getChildCount() {
-		return listChildren.size();
+		return listDofs.size() + listChildBones.size();
 	}
 
 	public int getIndex(TreeNode node) {
-		return listChildren.indexOf(node);
+		int i = listDofs.indexOf(node);
+		if (i > -1)
+			return i;
+		i = listChildBones.indexOf(node);
+		if (i > -1)
+			return listDofs.size() + i;
+		return -1;
 	}
 
 	public TreeNode getParent() {
-		return !bParentSet ? null : (boneParent != null) ? (MutableTreeNode) boneParent : model.getTreenodeBones();
+		return parent;
 	}
 
 	public boolean isLeaf() {
-		return (listChildren.size() == 0);
+		return (listDofs.size() <= 0 && listChildBones.size() <= 0);
 	}
 
 	public void insert(MutableTreeNode child, int index) {
-		listChildren.add(index, child);
-		if (child instanceof Bone)
-			listChildBones.add(child);
-		else if (child instanceof RotationDof)
-			listDofs.add(child);
+		if (child instanceof RotationDof)
+			listDofs.add(index, child);
+		else if (child instanceof Bone)
+			listChildBones.add(index - listDofs.size(), child);
+		child.setParent(this);
 	}
 
 	public void remove(int index) {
-		Object object = listChildren.get(index);
-		listChildren.remove(index);
-		if (object instanceof Bone)
-			listChildBones.remove(object);
-		else if (object instanceof RotationDof)
-			listDofs.remove(object);
+		if (index < listDofs.size())
+			listDofs.remove(index);
+		else
+			listChildBones.remove(index - listDofs.size());
 	}
 
 	public void remove(MutableTreeNode node) {
-		listChildren.remove(node);
 		if (node instanceof Bone)
 			listChildBones.remove(node);
 		else if (node instanceof RotationDof)
@@ -172,9 +185,7 @@ public class Bone implements MutableTreeNode {
 	}
 
 	public void setParent(MutableTreeNode newParent) {
-		if (boneParent instanceof Bone)
-			boneParent = (Bone) newParent;
-		bParentSet = true;
+		parent = newParent;
 	}
 	
 	/*
@@ -189,67 +200,68 @@ public class Bone implements MutableTreeNode {
 //		return listChildren;
 //	}
 
-	public void attachTo(Bone parent) {
-		if (boneParent != null)
-			throw new IllegalStateException("bone is already attached");
-		for (Bone bone = parent; bone != null; bone = bone.boneParent) {
-			if (bone == this)
-				return;
-		}
-		boneParent = parent;
-		boneParent.listChildBones.add(this);
-		boneParent.listChildren.add(this);
-	}
-	
-	public void detach() {
-		if (boneParent == null)
-			throw new IllegalStateException("bone isn't attached");
-		boneParent.listChildBones.remove(this);
-		boneParent.listChildren.remove(this);
-		boneParent = null;
-	}
+//	public void attachTo(Bone parent) {
+//		if (boneParent != null)
+//			throw new IllegalStateException("bone is already attached");
+//		for (Bone bone = parent; bone != null; bone = bone.boneParent) {
+//			if (bone == this)
+//				return;
+//		}
+//		boneParent = parent;
+//		boneParent.listChildBones.add(this);
+//		boneParent.listChildren.add(this);
+//	}
+//	
+//	public void detach() {
+//		if (boneParent == null)
+//			throw new IllegalStateException("bone isn't attached");
+//		boneParent.listChildBones.remove(this);
+//		boneParent.listChildren.remove(this);
+//		boneParent = null;
+//	}
 	
 	public Bone getParentBone() {
-		return boneParent;
+		return parent instanceof Bone ? (Bone) parent : null;
 	}
 	
 //	public void setParentBone(Bone parent) {
 //		boneParent = parent;
 //	}
 	
-	public void addDof(RotationDof dof) {
-		listDofs.add(dof);
-		listChildren.add(dof);
-	}
-	
-	public void removeDof(RotationDof dof) {
-		listDofs.remove(dof);
-		listChildren.add(dof);
-	}
+//	public void addDof(RotationDof dof) {
+//		listDofs.add(dof);
+//		listChildren.add(dof);
+//	}
+//	
+//	public void removeDof(RotationDof dof) {
+//		listDofs.remove(dof);
+//		listChildren.add(dof);
+//	}
 	
 	/**
 	* return root bone
 	**/
 	public Bone getRoot() {
 		/* recursively search root bone */
-		return (boneParent == null) ? this : boneParent.getRoot();
+		Bone parentBone = getParentBone();
+		return parentBone == null ? this : parentBone.getRoot();
 	}
 
 	public Point3f getStart(Point3f start) {
 		if (start == null)
 			start = new Point3f();
-		if (boneParent == null)
+		if (getParentBone() == null)
 			start.set(p3Start);
 		else
-			boneParent.getEnd(start);
+			getParentBone().getEnd(start);
 		return start;
 	}
 
 	private Point3f getReferenceStart() {
-		if (boneParent == null)
+		if (getParentBone() == null)
 			return p3Start;
 		else
-			return boneParent.p3End;
+			return getParentBone().p3End;
 	}
 	
 //	public Vector3f getExtent() {
@@ -319,7 +331,7 @@ public class Bone implements MutableTreeNode {
 	}
 	
 	public BoneTransformable getBoneStart() {
-		return (boneParent == null) ? boneStart : null;
+		return (getParentBone() == null) ? boneStart : null;
 	}
 	
 	public BoneTransformable getBoneEnd() {
@@ -347,8 +359,8 @@ public class Bone implements MutableTreeNode {
 	public RotationDof getLastDof() {
 		if (listDofs.size() > 0)
 			return getDof(-1);
-		if (boneParent != null)
-			return boneParent.getLastDof();
+		if (getParentBone() != null)
+			return getParentBone().getLastDof();
 		return null;
 	}
 	
@@ -381,8 +393,8 @@ public class Bone implements MutableTreeNode {
 		System.out.println(this);
 		StringBuffer sb = new StringBuffer();
 		sb.append(prefix).append("<bone name=").append(XMLutils.quote(strName)).append(">\n");
-		if (boneParent != null) {
-			int parent = ((Integer) mapBones.get(boneParent)).intValue();
+		if (getParentBone() != null) {
+			int parent = ((Integer) mapBones.get(getParentBone())).intValue();
 			sb.append(prefix).append("\t<parent id=").append(XMLutils.quote(parent)).append("/>\n");
 		} else {
 			sb.append(prefix).append("\t<start x=").append(XMLutils.quote(p3Start.x));
@@ -466,8 +478,8 @@ public class Bone implements MutableTreeNode {
 		
 		public Point3f getPosition() {
 			Point3f p = new Point3f(p3);
-			if (isStart() && boneParent != null)
-				boneParent.lastDofTransform(p);
+			if (isStart() && getParentBone() != null)
+				getParentBone().lastDofTransform(p);
 			else
 				lastDofTransform(p);
 			return p;
@@ -479,15 +491,15 @@ public class Bone implements MutableTreeNode {
 
 		private void setDummy() {
 			p3Dummy.set(p3Temp);
-			if (isStart() && boneParent != null)
-				boneParent.lastDofTransform(p3Dummy);
+			if (isStart() && getParentBone() != null)
+				getParentBone().lastDofTransform(p3Dummy);
 			else
 				lastDofTransform(p3Dummy);
 		}
 		
 		private void setPoint() {
-			if (isStart() && boneParent != null)
-				boneParent.lastDofInvTransform(p3Dummy);
+			if (isStart() && getParentBone() != null)
+				getParentBone().lastDofInvTransform(p3Dummy);
 			else
 				lastDofInvTransform(p3Dummy);
 			p3.set(p3Dummy);

@@ -27,7 +27,7 @@ public class AtomicRemoveSelection extends JPatchAtomicEdit implements JPatchRoo
 //		MainFrame.getInstance().getSideBar().replacePanel(new SidePanel());
 //		MainFrame.getInstance().getSideBar().clearDetailPanel();
 //		MainFrame.getInstance().getSideBar().validate();
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).reload();
+//		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).reload();
 	}
 	
 	public void undo() {
@@ -45,7 +45,7 @@ public class AtomicRemoveSelection extends JPatchAtomicEdit implements JPatchRoo
 //		MainFrame.getInstance().getSideBar().validate();
 //		//MainFrame.getInstance().getTree().setSelectionPath(path);
 //		//MainFrame.getInstance().getTree().makeVisible(path);
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).reload();
+//		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).reload();
 	}
 	
 	public int sizeOf() {

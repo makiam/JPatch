@@ -11,17 +11,17 @@ public final class NewMaterialAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Model model;
+//	private Model model;
 	
 	public NewMaterialAction(Model model) {
 		super("New Material");
-		this.model = model;
+//		this.model = model;
 		//putValue(Action.SHORT_DESCRIPTION,"Add Controlpoint [A]");
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		JPatchMaterial material = new JPatchMaterial();
-		model.addMaterial(material);
+		MainFrame.getInstance().getModel().addMaterial(material);
 //			int[] aiIndex = new int[] { material.getParent().getIndex(material) };
 //			((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(material.getParent(),aiIndex);
 //			TreePath path = material.getTreePath();
