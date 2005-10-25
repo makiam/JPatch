@@ -22,6 +22,7 @@
 package jpatch.control.edit;
 
 import javax.vecmath.*;
+import jpatch.boundary.*;
 import jpatch.entity.*;
 
 /**
@@ -39,11 +40,13 @@ public class AtomicAttachBone extends JPatchAtomicEdit implements JPatchRootEdit
 	}
 	
 	public void undo() {
-		boneChild.detach();
+//		boneChild.detach();
+		MainFrame.getInstance().getTreeModel().removeNodeFromParent(boneChild);
 	}
 	
 	public void redo() {
-		boneChild.attachTo(boneParent);
+		MainFrame.getInstance().getTreeModel().insertNodeInto(boneChild, boneParent, boneParent.getChildCount());
+//		boneChild.attachTo(boneParent);
 	}
 
 	public int sizeOf() {

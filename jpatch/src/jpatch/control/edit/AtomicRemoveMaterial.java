@@ -19,10 +19,10 @@ public class AtomicRemoveMaterial extends JPatchAtomicEdit implements JPatchRoot
 	}
 	
 	public void redo() {
-		int[] aiIndex = new int[] { material.getParent().getIndex(material) };
-		Object[] aObject = new Object[] { material };
+//		int[] aiIndex = new int[] { material.getParent().getIndex(material) };
+//		Object[] aObject = new Object[] { material };
 		MainFrame.getInstance().getModel().removeMaterial(material);
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereRemoved(material.getParent(),aiIndex,aObject);
+//		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereRemoved(material.getParent(),aiIndex,aObject);
 		MainFrame.getInstance().getSideBar().replacePanel(new SidePanel());
 		MainFrame.getInstance().getSideBar().clearDetailPanel();
 		MainFrame.getInstance().getSideBar().validate();
@@ -30,8 +30,8 @@ public class AtomicRemoveMaterial extends JPatchAtomicEdit implements JPatchRoot
 	
 	public void undo() {
 		MainFrame.getInstance().getModel().addMaterial(material);
-		int[] aiIndex = new int[] { material.getParent().getIndex(material) };
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(material.getParent(),aiIndex);
+//		int[] aiIndex = new int[] { material.getParent().getIndex(material) };
+//		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(material.getParent(),aiIndex);
 		MainFrame.getInstance().getSideBar().replacePanel(new SidePanel());
 		MainFrame.getInstance().getSideBar().clearDetailPanel();
 		MainFrame.getInstance().getSideBar().validate();
