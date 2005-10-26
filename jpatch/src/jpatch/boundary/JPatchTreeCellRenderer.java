@@ -46,6 +46,8 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 			setIcon(iconMorph);
 		else if (value instanceof Bone)
 			setIcon(iconBone);
+		else if (value instanceof RotationDof)
+			setIcon(iconRotDof);
 		return this;
 	}
 }

@@ -96,6 +96,10 @@ public class Bone implements MutableTreeNode {
 		return listChildBones;
 	}
 	
+	public List getDofs() {
+		return listDofs;
+	}
+	
 	/*
 	* TreeNode interface implementation
 	*/

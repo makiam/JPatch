@@ -9,9 +9,11 @@ import jpatch.entity.*;
 public class AtomicAddDof extends JPatchAtomicEdit implements JPatchRootEdit {
 
 	private RotationDof dof;
-	
-	public AtomicAddDof(RotationDof dof) {
+	private Bone bone;
+
+	public AtomicAddDof(RotationDof dof, Bone bone) {
 		this.dof = dof;
+		this.bone = bone;
 		redo();
 		//dof.setName(dof.getBone().getName() + " DOF #" + dof.getBone().getDofIndex(dof));
 	}
@@ -22,7 +24,7 @@ public class AtomicAddDof extends JPatchAtomicEdit implements JPatchRootEdit {
 
 	public void undo() {
 //		MainFrame.getInstance().getUndoManager().setEnabled(false);
-		dof.getBone().remove(dof);
+		MainFrame.getInstance().getTreeModel().removeNodeFromParent(dof);
 //		MainFrame.getInstance().getUndoManager().setEnabled(true);
 		//morph.setValue(0);
 		//MainFrame.getInstance().getModel().applyMorphs();
@@ -35,7 +37,8 @@ public class AtomicAddDof extends JPatchAtomicEdit implements JPatchRootEdit {
 //		int[] aiIndex = new int[] { dof.getParent().getIndex(dof) };
 //		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(dof.getParent(),aiIndex);
 //		TreePath path = dof.getTreePath();
-		dof.getBone().insert(dof, 0);
+//		dof.getBone().insert(dof, 0);
+		MainFrame.getInstance().getTreeModel().insertNodeInto(dof, bone, bone.getDofs().size());
 //		MainFrame.getInstance().getTree().makeVisible(dof.get);
 		//morph.setValue(value);
 //		morph.apply();
