@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicAttachBone.java,v 1.3 2005/10/26 09:55:10 sascha_l Exp $
+ * $Id: AtomicDetachBone.java,v 1.1 2005/10/26 09:55:10 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -30,32 +30,33 @@ import jpatch.entity.*;
  * @author sascha
  *
  */
-public class AtomicAttachBone extends JPatchAtomicEdit implements JPatchRootEdit {
+public class AtomicDetachBone extends JPatchAtomicEdit implements JPatchRootEdit {
 	private Bone boneChild;
 	private Bone boneParent;
 	
-	public AtomicAttachBone(Bone child, Bone parent) {
+	public AtomicDetachBone(Bone child) {
 		boneChild = child;
-		boneParent = parent;
+		boneParent = child.getParentBone();
 		redo();
 	}
 	
-	public void undo() {
+	public void redo() {
 		MutableTreeNode bones = MainFrame.getInstance().getModel().getTreenodeBones();
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(boneChild);
 		MainFrame.getInstance().getTreeModel().insertNodeInto(boneChild, bones, bones.getChildCount());
 	}
 	
-	public void redo() {
+	public void undo() {
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(boneChild);
 		MainFrame.getInstance().getTreeModel().insertNodeInto(boneChild, boneParent, boneParent.getChildCount());
 	}
 
+	
 	public int sizeOf() {
 		return 8 + 4 + 4;
 	}
 
 	public String getName() {
-		return "attach bone";
+		return "detach bone";
 	}
 }

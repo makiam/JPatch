@@ -1,5 +1,5 @@
 /*
- * $Id: SplashScreen.java,v 1.4 2005/10/23 13:34:41 sascha_l Exp $
+ * $Id: SplashScreen.java,v 1.5 2005/10/26 09:55:10 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -46,11 +46,12 @@ public class SplashScreen {
 			Font font;
 			GlyphVector gv;
 			Shape shape;
-			font = new Font("sans-serif", Font.BOLD, 60);
+//			font = new Font("sans-serif", Font.BOLD, 60);
+			font = new Font("sans-serif", Font.BOLD, 45);
 			gv = font.createGlyphVector(frc, VersionInfo.name);
 			shape = gv.getOutline();
 			Rectangle bounds = shape.getBounds();
-			AffineTransform at = new AffineTransform(1, 0, 0, 1, (getWidth() - bounds.width) / 2, bounds.height + 10);
+			AffineTransform at = new AffineTransform(1, 0, 0, 1, (getWidth() - bounds.width) / 2, bounds.height + 20);
 			shape = at.createTransformedShape(gv.getOutline());
 //			shape = gv.getOutline();
 //			g2.setPaint(new GradientPaint(0, 0, new Color(0.0f, 0.0f, 0.0f, 1.0f), 0, -40, new Color(0.0f, 0.0f, 0.0f, 0.0f)));

@@ -920,7 +920,7 @@ public class DefaultTool extends JPatchTool {
 				case MOVE_SINGLE_BONENED:
 					edit.setName("move bone");
 					endTransform();
-					edit.addEdit(new AtomicChangeSelection(null));
+//					edit.addEdit(new AtomicChangeSelection(null));
 					break;
 				case MOVE_GROUP:
 					// - compoundEdit.addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,ps.getControlPointArray()));

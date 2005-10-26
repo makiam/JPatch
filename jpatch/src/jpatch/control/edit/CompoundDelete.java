@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundDelete.java,v 1.4 2005/10/24 16:31:31 sascha_l Exp $
+ * $Id: CompoundDelete.java,v 1.5 2005/10/26 09:55:10 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -82,6 +82,10 @@ public class CompoundDelete extends JPatchCompoundEdit {
 		// drop bones
 		for (Iterator it = boneSet.iterator(); it.hasNext(); ) {
 			Bone bone = (Bone) it.next();
+			for (Iterator jt = (new ArrayList(bone.getChildBones())).iterator(); jt.hasNext(); ) {
+				Bone child = (Bone) jt.next();
+				addEdit(new AtomicDetachBone(child));
+			}
 			addEdit(new AtomicDropBone(bone));
 		}
 		// set parents of orphanized bones to null

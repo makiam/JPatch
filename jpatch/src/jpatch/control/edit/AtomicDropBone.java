@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicDropBone.java,v 1.1 2005/10/09 07:43:06 sascha_l Exp $
+ * $Id: AtomicDropBone.java,v 1.2 2005/10/26 09:55:10 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -31,7 +31,7 @@ import jpatch.entity.*;
 public class AtomicDropBone extends JPatchAtomicEdit {
 
 	private Bone bone;
-	
+
 	public AtomicDropBone(Bone bone) {
 		this.bone = bone;
 		redo();
