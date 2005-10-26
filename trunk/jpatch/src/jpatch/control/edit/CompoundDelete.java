@@ -82,6 +82,10 @@ public class CompoundDelete extends JPatchCompoundEdit {
 		// drop bones
 		for (Iterator it = boneSet.iterator(); it.hasNext(); ) {
 			Bone bone = (Bone) it.next();
+			for (Iterator jt = (new ArrayList(bone.getChildBones())).iterator(); jt.hasNext(); ) {
+				Bone child = (Bone) jt.next();
+				addEdit(new AtomicDetachBone(child));
+			}
 			addEdit(new AtomicDropBone(bone));
 		}
 		// set parents of orphanized bones to null

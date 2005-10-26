@@ -430,7 +430,8 @@ public class About extends JDialog implements ActionListener {
 				Font font;
 				GlyphVector gv;
 				Shape shape;
-				font = new Font("sans-serif", Font.BOLD, 40);
+//				font = new Font("sans-serif", Font.BOLD, 40);
+				font = new Font("sans-serif", Font.BOLD, 30);
 				gv = font.createGlyphVector(frc, VersionInfo.name);
 				shape = (new AffineTransform(0,-1, 1, 0, 31, 370)).createTransformedShape(gv.getOutline());
 //				g2.setPaint(new GradientPaint(0, 0, new Color(0.0f, 0.0f, 0.0f, 1.0f), 0, -40, new Color(0.0f, 0.0f, 0.0f, 0.0f)));

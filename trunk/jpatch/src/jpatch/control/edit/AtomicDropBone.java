@@ -31,7 +31,7 @@ import jpatch.entity.*;
 public class AtomicDropBone extends JPatchAtomicEdit {
 
 	private Bone bone;
-	
+
 	public AtomicDropBone(Bone bone) {
 		this.bone = bone;
 		redo();
