@@ -7,6 +7,8 @@ import javax.swing.tree.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
+import jpatch.boundary.action.DeleteDofAction;
+import jpatch.boundary.action.DeleteMaterialAction;
 import jpatch.entity.*;
 
 public class DofPanel extends SidePanel
@@ -33,7 +35,7 @@ implements ChangeListener {
 //		editButton = new JPatchToggleButton(new EditMorphAction(morph, this));
 //		add(editButton);
 //		add(deleteButton);
-		
+		add(new JPatchButton(new DeleteDofAction(dof)));
 		//JPatchSlider.setDimensions(0,150,50,20);
 		JPanel detailPanel = MainFrame.getInstance().getSideBar().getDetailPanel();
 		JPatchInput.setDimensions(50,150,20);
