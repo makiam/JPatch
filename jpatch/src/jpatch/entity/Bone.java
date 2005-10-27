@@ -261,7 +261,7 @@ public class Bone implements MutableTreeNode {
 		return start;
 	}
 
-	private Point3f getReferenceStart() {
+	public Point3f getReferenceStart() {
 		if (getParentBone() == null)
 			return p3Start;
 		else
@@ -273,6 +273,7 @@ public class Bone implements MutableTreeNode {
 //	}
 
 	public Point3f getEnd(Point3f end) {
+//		System.out.println("getEnd() Bone = " + this);
 		if (end == null)
 			end = getStart(null);
 		else
@@ -290,6 +291,8 @@ public class Bone implements MutableTreeNode {
 	}
 	
 	public void setStart(Point3f start) {
+		if (getParentBone() != null)
+			throw new IllegalStateException("can set start of attached bone");
 		p3Start.set(start);
 	}
 //	
@@ -502,11 +505,43 @@ public class Bone implements MutableTreeNode {
 		}
 		
 		private void setPoint() {
-			if (isStart() && getParentBone() != null)
+			if (isStart() && getParentBone() != null) {
 				getParentBone().lastDofInvTransform(p3Dummy);
-			else
-				lastDofInvTransform(p3Dummy);
-			p3.set(p3Dummy);
+				p3.set(p3Dummy);
+			} else {
+				System.out.println(p3Dummy);
+				int children = listChildBones.size();
+				//if (children > 0) {
+					Vector3f[] v = new Vector3f[children];
+					for (int i = 0; i < children; i++) {
+						Bone child = (Bone) listChildBones.get(i);
+						v[i] = new Vector3f(child.getEnd(null));
+						v[i].sub(p3Dummy);
+//						child.lastDofInvTransform(v[i]);
+//						child.p3End.set(child.getReferenceStart());
+//						child.p3End.add(v[i]);
+	//					System.out.println(child + " " + child.p3End);
+	//					child.setEnd(child.p3End);
+	//					lastDofTransform(child.p3End);
+	//					System.out.println(child + " " + child.p3End);
+					}
+					lastDofInvTransform(p3Dummy);
+					p3.set(p3Dummy);
+					for (int i = 0; i < children; i++) {
+						Bone child = (Bone) listChildBones.get(i);
+						child.lastDofInvTransform(v[i]);
+						child.p3End.set(child.getReferenceStart());
+						child.p3End.add(v[i]);
+					}
+//						child.lastDofInvTransform(v[i]);
+//						child.p3End.set(child.getStart(null));
+//						child.p3End.add(v[i]);
+//	//					System.out.println(child + " " + child.p3End);
+//	//					System.out.println();
+//					}
+				//}
+				
+			}
 		}
 		
 		
