@@ -21,7 +21,7 @@ public class RotationDof extends JPatchTreeLeaf {
 	
 	public RotationDof(Bone bone) {
 		this.bone = bone;
-		v3ReferenceAxis = new Vector3f(1,0,0);
+		v3ReferenceAxis = new Vector3f(0,0,1);
 		v3Axis = new Vector3f();
 		fMinAngle = (float) - Math.PI / 2;
 		fMaxAngle = (float) Math.PI / 2;
@@ -62,17 +62,20 @@ public class RotationDof extends JPatchTreeLeaf {
 	}
 	
 	private void computeTransform() {
+//		System.out.println(" computeTransform " + bone + " " + bone.getDofs().indexOf(this));
 		RotationDof parentDof = getParentDof();
 		if (parentDof != null)
 			m4Transform.set(getParentDof().getTransform());
 		else
 			m4Transform.setIdentity();
 		v3Axis.set(v3ReferenceAxis);
-		m4Transform.transform(v3Axis);
+//		m4Transform.transform(v3Axis);
+//		System.out.println("  raxis=" + v3ReferenceAxis + " axis=" + v3Axis + " angle=" + fCurrentAngle / Math.PI * 180);
 		Matrix4f m4 = new Matrix4f();
 		m4.setIdentity();
 		m4.set(new AxisAngle4f(v3Axis, fCurrentAngle));
 		Point3f pivot = bone.getStart(null);
+//		System.out.println("  Pivot = " + pivot);
 		Vector3f v = new Vector3f(pivot);
 		Vector3f v2 = new Vector3f(v);
 		m4.transform(v2);
