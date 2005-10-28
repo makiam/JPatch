@@ -1,6 +1,7 @@
 package jpatch.boundary;
 
 import java.awt.*;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -170,10 +171,16 @@ implements TreeSelectionListener {
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
 		} else if (selectedNode == MainFrame.getInstance().getModel().getTreenodeBones()) {
-			replacePanel(new SidePanel());
+			replacePanel(new BonesPanel(MainFrame.getInstance().getModel()));
 			MainFrame.getInstance().getSideBar().clearDetailPanel();
 		} else if (selectedNode instanceof Bone) {
-			replacePanel(new BonePanel((Bone) selectedNode));
+			Bone bone = (Bone) selectedNode;
+			replacePanel(new BonePanel(bone));
+			Map map = new HashMap();
+			map.put(bone.getBoneEnd(), new Float(1));
+			map.put(bone.getParentBone() == null ? bone.getBoneStart() : bone.getParentBone().getBoneEnd(), new Float(1));
+			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new Selection(map)));
+			MainFrame.getInstance().getJPatchScreen().update_all();
 		} else if (selectedNode instanceof RotationDof) {
 			replacePanel(new DofPanel((RotationDof) selectedNode));
 		} else if (selectedNode instanceof Model) {

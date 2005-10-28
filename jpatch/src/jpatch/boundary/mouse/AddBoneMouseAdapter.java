@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.awt.event.*;
 import javax.vecmath.*;
+
 import jpatch.entity.*;
 import jpatch.boundary.*;
 import jpatch.boundary.tools.*;
@@ -51,6 +52,8 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 			iMouseX = mouseEvent.getX();
 			iMouseY = mouseEvent.getY();
 			p3Start = new Point3f(viewDef.get3DPosition(iMouseX,iMouseY));
+			if (MainFrame.getInstance().getJPatchScreen().snapToGrid())
+				MainFrame.getInstance().getJPatchScreen().getGrid().correctVector(p3Start, viewDef.getGridPlane());
 			edit = new JPatchActionEdit("add bone");
 //			float fDistance = 64;
 //			Point3f p3End = new Point3f();
@@ -217,7 +220,11 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 		iMouseY = mouseEvent.getY();
 		viewDef.setZ(p3Start);
 		//cpHot.setPosition(viewDefinition.get3DPosition((float)iMouseX,(float)iMouseY));
-		bone.setEnd(viewDef.get3DPosition((float) iMouseX,(float) iMouseY));
+		Point3f pos = viewDef.get3DPosition((float)iMouseX,(float)iMouseY);
+		if (MainFrame.getInstance().getJPatchScreen().snapToGrid())
+			MainFrame.getInstance().getJPatchScreen().getGrid().correctVector(pos, viewDef.getGridPlane());
+		if (!bone.getEnd(null).equals(pos)) 
+			bone.setEnd(pos);
 //		Vector3f extent = bone.getExtent();
 //		extent.set(end);
 //		extent.sub(p3Start);

@@ -30,6 +30,7 @@ public class Bone implements MutableTreeNode {
 	private Model model;
 	private final Point3f p3Start = new Point3f();
 	private final Point3f p3End = new Point3f();
+	private final Point3f p3TempEnd = new Point3f();
 //	private Vector3f v3Extent;
 //	private final Point3f p3ReferenceStart = new Point3f();
 //	private final Point3f p3ReferenceEnd = new Point3f();
@@ -159,6 +160,7 @@ public class Bone implements MutableTreeNode {
 	}
 
 	public void insert(MutableTreeNode child, int index) {
+		System.out.println("insert at " + index + "/" + listChildBones.size() + "/" + listDofs.size() + "/" + getChildCount());
 		if (child instanceof RotationDof)
 			listDofs.add(index, child);
 		else if (child instanceof Bone)
@@ -274,14 +276,22 @@ public class Bone implements MutableTreeNode {
 
 	public Point3f getEnd(Point3f end) {
 //		System.out.println("getEnd() Bone = " + this);
+		
+//		if (end == null)
+//			end = getStart(null);
+//		else
+//			getStart(end);
+//		Vector3f v = new Vector3f(p3End);
+//		v.sub(getReferenceStart());
+//		lastDofTransform(v);
+//		end.add(v);
+//		return end;
+		
 		if (end == null)
-			end = getStart(null);
+			end = new Point3f(p3End);
 		else
-			getStart(end);
-		Vector3f v = new Vector3f(p3End);
-		v.sub(getReferenceStart());
-		lastDofTransform(v);
-		end.add(v);
+			end.set(p3End);
+		lastDofTransform(end);
 		return end;
 	}
 	
@@ -397,7 +407,6 @@ public class Bone implements MutableTreeNode {
 	
 	
 	public StringBuffer xml(String prefix) {
-		System.out.println(this);
 		StringBuffer sb = new StringBuffer();
 		sb.append(prefix).append("<bone name=").append(XMLutils.quote(strName)).append(">\n");
 		if (getParentBone() != null) {
@@ -418,6 +427,8 @@ public class Bone implements MutableTreeNode {
 			sb.append(prefix).append("\t<influence start=").append(XMLutils.quote(fStartRadius));
 			sb.append(" end=").append(XMLutils.quote(fEndRadius)).append("/>\n");
 		}
+		for (Iterator it = listDofs.iterator(); it.hasNext(); )
+			sb.append(((RotationDof) it.next()).xml(prefix + "\t"));
 		sb.append(prefix).append("</bone>\n");
 		return sb;
 	}
@@ -454,6 +465,27 @@ public class Bone implements MutableTreeNode {
 //		setExtent();
 //	}
 	
+	private static void applyCorrection(Bone bone, boolean inverse) {
+		for (Iterator it = bone.listChildBones.iterator(); it.hasNext(); ) {
+			Bone child = (Bone) it.next();
+			if (inverse) {
+				child.lastDofInvTransform(child.p3TempEnd);
+				child.p3End.set(child.p3TempEnd);
+			} else {
+				child.p3TempEnd.set(child.p3End);
+				child.lastDofTransform(child.p3TempEnd);
+			}
+			applyCorrection(child, inverse);
+		}
+	}
+	
+//	private void buildDownstreamBoneList(List list) {
+//		for (Iterator it = listChildBones.iterator(); it.hasNext(); ) {
+//			Bone child = (Bone) it.next();
+//			child.buildDownstreamBoneList(list);
+//		}
+//		list.add(this);
+//	}
 	
 	public final class BoneTransformable implements Transformable {
 		private final Point3f p3Temp = new Point3f();
@@ -504,42 +536,49 @@ public class Bone implements MutableTreeNode {
 				lastDofTransform(p3Dummy);
 		}
 		
+		
+		
 		private void setPoint() {
 			if (isStart() && getParentBone() != null) {
 				getParentBone().lastDofInvTransform(p3Dummy);
 				p3.set(p3Dummy);
 			} else {
-				System.out.println(p3Dummy);
-				int children = listChildBones.size();
-				//if (children > 0) {
-					Vector3f[] v = new Vector3f[children];
-					for (int i = 0; i < children; i++) {
-						Bone child = (Bone) listChildBones.get(i);
-						v[i] = new Vector3f(child.getEnd(null));
-						v[i].sub(p3Dummy);
+				
+				Bone.applyCorrection(Bone.this, false);
+				lastDofInvTransform(p3Dummy);
+				p3.set(p3Dummy);
+				Bone.applyCorrection(Bone.this, true);
+//				System.out.println(p3Dummy);
+//				int children = listChildBones.size();
+//				//if (children > 0) {
+//					Vector3f[] v = new Vector3f[children];
+//					for (int i = 0; i < children; i++) {
+//						Bone child = (Bone) listChildBones.get(i);
+//						v[i] = new Vector3f(child.getEnd(null));
+//						v[i].sub(p3Dummy);
+////						child.lastDofInvTransform(v[i]);
+////						child.p3End.set(child.getReferenceStart());
+////						child.p3End.add(v[i]);
+//	//					System.out.println(child + " " + child.p3End);
+//	//					child.setEnd(child.p3End);
+//	//					lastDofTransform(child.p3End);
+//	//					System.out.println(child + " " + child.p3End);
+//					}
+//					lastDofInvTransform(p3Dummy);
+//					p3.set(p3Dummy);
+//					for (int i = 0; i < children; i++) {
+//						Bone child = (Bone) listChildBones.get(i);
 //						child.lastDofInvTransform(v[i]);
 //						child.p3End.set(child.getReferenceStart());
 //						child.p3End.add(v[i]);
-	//					System.out.println(child + " " + child.p3End);
-	//					child.setEnd(child.p3End);
-	//					lastDofTransform(child.p3End);
-	//					System.out.println(child + " " + child.p3End);
-					}
-					lastDofInvTransform(p3Dummy);
-					p3.set(p3Dummy);
-					for (int i = 0; i < children; i++) {
-						Bone child = (Bone) listChildBones.get(i);
-						child.lastDofInvTransform(v[i]);
-						child.p3End.set(child.getReferenceStart());
-						child.p3End.add(v[i]);
-					}
-//						child.lastDofInvTransform(v[i]);
-//						child.p3End.set(child.getStart(null));
-//						child.p3End.add(v[i]);
-//	//					System.out.println(child + " " + child.p3End);
-//	//					System.out.println();
 //					}
-				//}
+////						child.lastDofInvTransform(v[i]);
+////						child.p3End.set(child.getStart(null));
+////						child.p3End.add(v[i]);
+////	//					System.out.println(child + " " + child.p3End);
+////	//					System.out.println();
+////					}
+//				//}
 				
 			}
 		}

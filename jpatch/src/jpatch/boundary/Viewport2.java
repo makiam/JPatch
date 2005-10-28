@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.27 2005/10/27 14:32:06 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.28 2005/10/28 15:14:04 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -72,7 +72,7 @@ public class Viewport2 {
 	private static Vector3f v3b = new Vector3f();
 	private static Vector3f v3c = new Vector3f();
 	
-	private Grid grid = new Grid();
+//	private Grid grid = new Grid();
 	private BoneRenderer boneRenderer = new BoneRenderer();
 	
 	private float fMinZ, fDeltaZ;
@@ -137,9 +137,9 @@ public class Viewport2 {
 		return drawable;
 	}
 	
-	public Grid getGrid() {
-		return grid;
-	}
+//	public Grid getGrid() {
+//		return grid;
+//	}
 	
 	public void drawInfo() {
 		String[] info = drawable.getInfo().split("\n");
@@ -176,7 +176,7 @@ public class Viewport2 {
 	}
 	
 	public void drawGrid() {
-		grid.paint(viewDef);
+		MainFrame.getInstance().getJPatchScreen().getGrid().paint(viewDef);
 	}
 	
 	public void drawTool(JPatchTool tool) {

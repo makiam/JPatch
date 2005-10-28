@@ -58,6 +58,8 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 					viewDef.setZ(cp.getPosition());
 				}
 				Point3f pos = viewDef.get3DPosition((float)iMouseX,(float)iMouseY);
+				if (MainFrame.getInstance().getJPatchScreen().snapToGrid())
+					MainFrame.getInstance().getJPatchScreen().getGrid().correctVector(pos, viewDef.getGridPlane());
 //				viewport.getGrid().correctVector(pos);
 				ControlPoint cpA = new ControlPoint(pos);
 				ControlPoint cpB = new ControlPoint(pos);
@@ -187,9 +189,12 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 		//viewDefinition.setZ(cpHot.getPosition());
 		Point3f pos = viewDef.get3DPosition((float)iMouseX,(float)iMouseY);
 //		viewport.getGrid().correctVector(pos);
-		cpHot.setPosition(pos);
-		MainFrame.getInstance().getJPatchScreen().single_update(compSource);
-		//MainFrame.getInstance().getJPatchScreen().repaint();
+		if (MainFrame.getInstance().getJPatchScreen().snapToGrid())
+			MainFrame.getInstance().getJPatchScreen().getGrid().correctVector(pos, viewDef.getGridPlane());
+		if (!cpHot.getPosition().equals(pos)) {
+			cpHot.setPosition(pos);
+			MainFrame.getInstance().getJPatchScreen().single_update(compSource);
+		}
 	}
 	
 	private void setActiveState() {

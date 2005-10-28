@@ -59,11 +59,11 @@ implements ComponentListener {
 //			viewport.getGrid().setPlane(aiGridPlane[iView]);
 //		//}
 //	}
-	/*
+	
 	public final int getGridPlane() {
-		return iGridPlane;
+		return aiGridPlane[iView];
 	}
-	*/
+	
 	public final void componentHidden(ComponentEvent componentEvent) {
 		;
 	}

@@ -13,6 +13,7 @@ import javax.vecmath.*;
 import jpatch.boundary.*;
 import jpatch.boundary.mouse.*;
 import jpatch.entity.*;
+import jpatch.entity.Bone.BoneTransformable;
 import jpatch.control.edit.*;
 
 public class DefaultTool extends JPatchTool {
@@ -60,6 +61,8 @@ public class DefaultTool extends JPatchTool {
 	private TangentTool tangentTool = MainFrame.getInstance().getJPatchScreen().getTangentTool();
 	private TangentHandle tangentHandle;
 	private float fMagnitude;
+	private Vector3f v3Translate = new Vector3f();
+	private Point3f p3Hot;
 	
 	private Matrix4f m4Transform = new Matrix4f();
 //	private Matrix4f m4ConstrainedTransform = new Matrix4f();
@@ -569,6 +572,9 @@ public class DefaultTool extends JPatchTool {
 						/* if neither shift nor control is down */
 						if ((!mouseEvent.isControlDown() && !mouseEvent.isShiftDown()) || selection == null) {
 							
+							DefaultTreeModel treeModel = (DefaultTreeModel) MainFrame.getInstance().getTree().getModel();
+							MainFrame.getInstance().getTree().setSelectionPath(new TreePath(treeModel.getPathToRoot(hitBone)));
+							
 							/* is the point inside the selection box? */
 							if (selection != null && !selection.isSingle() && isHit(x,y,viewDef.getScreenMatrix())) {
 								
@@ -1048,7 +1054,6 @@ public class DefaultTool extends JPatchTool {
 	
 	public void mouseDragged(MouseEvent mouseEvent) {
 		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
-		Grid grid = MainFrame.getInstance().getJPatchScreen().getViewport((Component) mouseEvent.getSource()).getGrid();
 		//System.out.println("mouseDragged");
 //		Selection selection = MainFrame.getInstance().getSelection();
 		int iDeltaX = mouseEvent.getX() - iMouseX;
@@ -1063,7 +1068,7 @@ public class DefaultTool extends JPatchTool {
 //				transformTemporarily();
 //				selection.getPivot().set(p3Pivot);
 //				selection.getPivot().add(v3Move);
-				translate(v3Move, viewDef, grid);
+				translate(v3Move, viewDef);
 				
 //				if (cpHot == null) {
 //				//iMouseX = mouseEvent.getX();
@@ -1091,7 +1096,7 @@ public class DefaultTool extends JPatchTool {
 			
 				Vector3f v3Move = bMoveZ ? new Vector3f(0,0,iDeltaY - iDeltaX) : new Vector3f(iDeltaX, iDeltaY, 0);
 				m4InvScreenMatrix.transform(v3Move);
-				translate(v3Move, viewDef, grid);
+				translate(v3Move, viewDef);
 			} break;
 		}
 	}
@@ -1110,6 +1115,10 @@ public class DefaultTool extends JPatchTool {
 		selection.arm(mask);
 //FIXME
 		selection.beginTransform();
+		if (selection.getHotObject() != null)
+			p3Hot = new Point3f(((Transformable) selection.getHotObject()).getPosition());
+		else
+			p3Hot = null;
 	}
 	
 	protected void endTransform() {
@@ -1135,7 +1144,7 @@ public class DefaultTool extends JPatchTool {
 //			((Transformable) list.get(i)).transformTemporarily(m4ConstrainedTransform);
 //		}
 //	}
-	protected void translate(Vector3f v, ViewDefinition viewDef, Grid grid) {
+	protected void translate(Vector3f v, ViewDefinition viewDef) {
 		Selection selection = MainFrame.getInstance().getSelection();
 		Vector3f vv = new Vector3f(v);
 		if (selection.getHotObject() != null) {
@@ -1145,11 +1154,21 @@ public class DefaultTool extends JPatchTool {
 			else
 				return;
 		}
-		selection.translate(vv);
-		if (bMoveZ) {
-			MainFrame.getInstance().getJPatchScreen().update_all();
-		} else {
-			MainFrame.getInstance().getJPatchScreen().single_update(viewDef.getDrawable().getComponent());
+		if (MainFrame.getInstance().getJPatchScreen().snapToGrid()) {
+			if (p3Hot != null)
+				vv.add(p3Hot);
+			MainFrame.getInstance().getJPatchScreen().getGrid().correctVector(vv, viewDef.getGridPlane());
+			if (p3Hot != null)
+				vv.sub(p3Hot);
+			//vv.sub(cor);
+		}
+		if (!vv.equals(v3Translate)) {
+			v3Translate.set(vv);
+			selection.translate(vv);
+			if (bMoveZ)
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			else
+				MainFrame.getInstance().getJPatchScreen().single_update(viewDef.getDrawable().getComponent());
 		}
 	}
 	
@@ -1266,5 +1285,35 @@ public class DefaultTool extends JPatchTool {
 			}
 			//MainFrame.getInstance().getSideBar().enableTreeSelectionListener(true);
 		}
+//		if (leaf == null || leaf == MainFrame.getInstance().getModel().getTreenodeBones() || leaf == MainFrame.getInstance().getModel() || leaf instanceof Bone || leaf instanceof RotationDof) {
+//			System.out.println("1");
+//			if (selection != null) {
+//				System.out.println("2");
+//				if (selection.getMap().size() == 2) {
+//					System.out.println("3");
+//					ArrayList list = new ArrayList(selection.getMap().keySet());
+//					BoneTransformable[] bt = new BoneTransformable[2];
+//					for (int i = 0; i < 2; i++) {
+//						if (list.get(i) instanceof BoneTransformable)
+//							bt[i] = (BoneTransformable) list.get(i);
+//						else
+//							return;
+//					}
+//					System.out.println("4");
+//					Bone bone = null;
+//					if (bt[0].getBone() == bt[1].getBone())
+//						bone = bt[0].getBone();
+//					else if (bt[0].getBone() == bt[1].getBone().getParentBone())
+//						bone = bt[0].getBone();
+//					else if (bt[1].getBone() == bt[0].getBone().getParentBone())
+//						bone = bt[1].getBone();
+//					System.out.println("bone=" + bone);
+//					if (bone != null) {
+//						DefaultTreeModel treeModel = (DefaultTreeModel) MainFrame.getInstance().getTree().getModel();
+//						MainFrame.getInstance().getTree().setSelectionPath(new TreePath(treeModel.getPathToRoot(bone)));
+//					}
+//				}
+//			}
+//		}
 	}
 }
