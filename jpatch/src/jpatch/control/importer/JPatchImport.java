@@ -28,6 +28,7 @@ implements ModelImporter {
 	private static final int LIPSYNC = 9;
 	private static final int SKELETON = 10;
 	private static final int BONE = 11;
+	private static final int DOF = 12;
 	
 	private int iState = NULL;
 	private ArrayList listCp = new ArrayList();
@@ -40,6 +41,7 @@ implements ModelImporter {
 	private ControlPoint cpPrev;
 	private Rotoscope rotoscope;
 	private Bone bone;
+	private RotationDof dof;
 	private int iRotoscopeView;
 	private JPatchMaterial material;
 	private String selectionName;
@@ -211,6 +213,28 @@ implements ModelImporter {
 						else if (attributes.getLocalName(index).equals("end"))
 							bone.setEndInfluence(Float.parseFloat(attributes.getValue(index)));
 					}
+				} else if (localName.equals("dof")) {
+					dof = new RotationDof(bone);
+					for (int index = 0; index < attributes.getLength(); index++) {
+						if (attributes.getLocalName(index).equals("name"))
+							dof.setName(attributes.getValue(index));
+					}
+					bone.insert(dof, bone.getChildCount());
+					iState = DOF;
+				}
+				break;
+			case DOF:
+				if (localName.equals("axis")) {
+					dof.setAxis(new Vector3f(createPoint(attributes)));
+				} else if (localName.equals("angle")) {
+					for (int index = 0; index < attributes.getLength(); index++) {
+						if (attributes.getLocalName(index).equals("min"))
+							dof.setMinAngle(Float.parseFloat(attributes.getValue(index)) * (float) Math.PI / 180);
+						else if (attributes.getLocalName(index).equals("max"))
+							dof.setMaxAngle(Float.parseFloat(attributes.getValue(index)) * (float) Math.PI / 180);
+						else if (attributes.getLocalName(index).equals("current"))
+							dof.setCurrentAngle(Float.parseFloat(attributes.getValue(index)) * (float) Math.PI / 180);
+					}
 				}
 				break;
 		}
@@ -363,6 +387,10 @@ implements ModelImporter {
 					iState = MESH;
 				}
 				break;
+			case DOF:
+				if (localName.equals("dof"))
+					iState = BONE;
+				break;
 			case BONE:
 				if (localName.equals("bone")) {
 					listBones.add(bone);
@@ -373,11 +401,13 @@ implements ModelImporter {
 				if (localName.equals("skeleton")) {
 					for (Iterator it = listBones.iterator(); it.hasNext(); ) {
 						Bone bone = (Bone) it.next();
+						System.out.println(bone.getName());
 						if (mapBoneParents.containsKey(bone)) {
 							Bone parent = (Bone) listBones.get(((Integer) mapBoneParents.get(bone)).intValue());
-							bone.insert(parent, parent.getChildCount());
-						}
-						model.addBone(bone);
+//							parent.insert(bone, parent.getChildCount());
+							bone.setParent(parent);
+						} 
+						model.addBone(bone);					
 					}
 					iState = MODEL;
 				}
