@@ -13,7 +13,7 @@ public class GridDialog extends JDialog implements ActionListener {
 
 	private JLabel labelSpacing = new JLabel("Spacing:");
 
-	private JTextField textSpacing = new JTextField("" + MainFrame.getInstance().getJPatchScreen().getGridSpacing());
+	private JTextField textSpacing = new JTextField("" + MainFrame.getInstance().getJPatchScreen().getGrid().getSpacing());
 
 	private JButton buttonOK = new JButton("OK",new ImageIcon(getClass().getClassLoader().getResource("jpatch/images/ok.png")));
 	private JButton buttonCancel = new JButton("Cancel",new ImageIcon(getClass().getClassLoader().getResource("jpatch/images/cancel.png")));

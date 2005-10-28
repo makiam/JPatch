@@ -58,6 +58,7 @@ public final class JPatchScreen extends JPanel {
 	private ActiveViewportMouseAdapter activeViewportMouseAdapter = new ActiveViewportMouseAdapter();
 	private boolean bShowTangents = false;
 	private TangentTool tangentTool = new TangentTool();
+	private Grid grid = new Grid();
 	
 	public JPatchScreen(Model model,int mode,ViewDefinition[] viewDefinitions) {
 		aViewDef = viewDefinitions;
@@ -156,6 +157,10 @@ public final class JPatchScreen extends JPanel {
 			old.getDrawable().display();
 			viewport.getDrawable().display();
 		}
+	}
+	
+	public Grid getGrid() {
+		return grid;
 	}
 	
 	public boolean isSynchronized() {
@@ -263,15 +268,16 @@ public final class JPatchScreen extends JPanel {
 		JPatchSettings.getInstance().bGridSnap = enable;
 	}
 	
-	public float getGridSpacing() {
-		return fGridSpacing;
-	}
+//	public float getGridSpacing() {
+//		return fGridSpacing;
+//	}
 	
 	public void setGridSpacing(float gridSpacing) {
-		fGridSpacing = gridSpacing;
-		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-//			aComponent[i].getGrid().setSpacing(gridSpacing);
-		}
+		grid.setSpacing(gridSpacing);
+//		fGridSpacing = gridSpacing;
+//		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+////			aComponent[i].getGrid().setSpacing(gridSpacing);
+//		}
 		update_all();
 	}
 	

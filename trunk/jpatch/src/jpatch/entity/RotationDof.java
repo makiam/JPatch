@@ -1,7 +1,10 @@
 package jpatch.entity;
 
+import java.util.Iterator;
+
 import javax.vecmath.*;
 
+import jpatch.auxilary.XMLutils;
 import jpatch.boundary.JPatchTreeLeaf;
 /**
  * Rotation Degree of freedom (Dof) for joints
@@ -36,8 +39,13 @@ public class RotationDof extends JPatchTreeLeaf {
 		int index = bone.getDofIndex(this);
 		if (index > 0)
 			return bone.getDof(index - 1);
-		if (bone.getParentBone() != null)
-			return bone.getParentBone().getDof(-1);
+		Bone b = bone.getParentBone();
+		while (b != null) {
+			RotationDof d = b.getDof(-1);
+			if (d != null)
+				return d;
+			b = b.getParentBone();
+		}
 		return null;
 	}
 	
@@ -50,14 +58,32 @@ public class RotationDof extends JPatchTreeLeaf {
 	}
 	
 	public boolean isTransformValid() {
-		if (!bValid) {
-			return false;
-		} else {
-			RotationDof parentDof = getParentDof();
-			if (parentDof != null) {
-				return parentDof.isTransformValid();
-			} else
-				return true;
+		return bValid;
+//		System.out.println(bone + "." + this + " isTransformValid()");
+//		if (!bValid) {
+//			return false;
+//		} else {
+//			RotationDof parentDof = getParentDof();
+//			if (parentDof != null) {
+//				return parentDof.isTransformValid();
+//			} else
+//				return true;
+//		}
+	}
+	
+	private void invalidate() {
+		for (int i = bone.getDofIndex(this), n = bone.getDofs().size(); i < n; i++)
+			((RotationDof) bone.getDof(i)).bValid = false;
+		invalidate(bone);
+//		bValid = false;
+	}
+	
+	private void invalidate(Bone bone) {
+		for (Iterator it = bone.getChildBones().iterator(); it.hasNext(); ) {
+			Bone b = (Bone) it.next();
+			for (Iterator jt = b.getDofs().iterator(); jt.hasNext(); )
+				((RotationDof) jt.next()).bValid = false;
+			invalidate(b);
 		}
 	}
 	
@@ -69,7 +95,7 @@ public class RotationDof extends JPatchTreeLeaf {
 		else
 			m4Transform.setIdentity();
 		v3Axis.set(v3ReferenceAxis);
-//		m4Transform.transform(v3Axis);
+		m4Transform.transform(v3Axis);
 //		System.out.println("  raxis=" + v3ReferenceAxis + " axis=" + v3Axis + " angle=" + fCurrentAngle / Math.PI * 180);
 		Matrix4f m4 = new Matrix4f();
 		m4.setIdentity();
@@ -81,19 +107,23 @@ public class RotationDof extends JPatchTreeLeaf {
 		m4.transform(v2);
 		v.sub(v2);
 		m4.setTranslation(v);
-		m4Transform.mul(m4);
+		
+		//m4Transform.mul(m4);
+		m4.mul(m4Transform);
+		m4Transform.set(m4);
+		
 		m4InvTransform.invert(m4Transform);
 		bValid = true;
 	}
 	
 	public Matrix4f getTransform() {
-//		if (!isTransformValid())
+		if (!isTransformValid())
 			computeTransform();
 		return m4Transform;
 	}
 
 	public Matrix4f getInvTransform() {
-//		if (!bValid)
+		if (!bValid)
 			computeTransform();
 		return m4InvTransform;
 	}
@@ -104,7 +134,7 @@ public class RotationDof extends JPatchTreeLeaf {
 
 	public void setCurrentAngle(float currentAngle) {
 		fCurrentAngle = currentAngle;
-		bValid = false;
+		invalidate();
 	}
 
 	public float getDefaultAngle() {
@@ -137,6 +167,15 @@ public class RotationDof extends JPatchTreeLeaf {
 	
 	public void setSliderValue(int sliderValue) {
 		fCurrentAngle = fMinAngle + (fMaxAngle - fMinAngle) / 100f * (float) sliderValue;
-		bValid = false;
+		invalidate();
+	}
+	
+	public StringBuffer xml(String prefix) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(prefix).append("<dof type=\"rotation\" name=").append(XMLutils.quote(strName)).append(">\n");
+		sb.append(prefix).append("\t<axis x=\"" + v3ReferenceAxis.x + "\" y=\"" + v3ReferenceAxis.y + "\" z=\"" + v3ReferenceAxis.z + "\"/>\n");
+		sb.append(prefix).append("\t<angle min=\"" + fMinAngle * 180 / (float) Math.PI + "\" max=\"" + fMaxAngle * 180 / (float) Math.PI + "\" current=\"" + fCurrentAngle * 180 / (float) Math.PI + "\"/>\n");
+		sb.append(prefix).append("</dof>\n");
+		return sb;
 	}
 }

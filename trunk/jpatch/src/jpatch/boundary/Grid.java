@@ -155,12 +155,12 @@ public class Grid {
 		return (!from.equals(to));
 	}
 	
-	public void correctVector(Tuple3f t) {
+	public void correctVector(Tuple3f t, int plane) {
 		//System.out.println("correctVector");
-		if (bSnap && iPlane != NONE) {
-			t.x = (iPlane == YZ) ? 0 : Math.round(t.x / fSpacing) * fSpacing;
-			t.y = (iPlane == XZ) ? 0 : Math.round(t.y / fSpacing) * fSpacing;
-			t.z = (iPlane == XY) ? 0 : Math.round(t.z / fSpacing) * fSpacing;
+		if (plane != NONE) {
+			t.x = (plane == YZ) ? t.x : Math.round(t.x / fSpacing) * fSpacing;
+			t.y = (plane == XZ) ? t.y : Math.round(t.y / fSpacing) * fSpacing;
+			t.z = (plane == XY) ? t.z : Math.round(t.z / fSpacing) * fSpacing;
 		}
 	}
 	
