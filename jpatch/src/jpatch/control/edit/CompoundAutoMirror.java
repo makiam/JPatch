@@ -15,6 +15,7 @@ public class CompoundAutoMirror extends AbstractClone {
 	
 	public CompoundAutoMirror(Selection selection) {
 		super(selection.getControlPointArray());
+		
 		//System.out.println("automirror");
 		int side = 0;
 		boolean valid = true;
@@ -102,8 +103,8 @@ public class CompoundAutoMirror extends AbstractClone {
 								HashMap mapRemove = new HashMap();
 								mapRemove.put(startHook, new Float(1));
 								mapRemove.put(endHook, new Float(1));
-								for (Iterator it2 = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
-									Selection loopSelection = (Selection) it.next();
+								for (Iterator it2 = MainFrame.getInstance().getModel().getSelections().iterator(); it2.hasNext(); ) {
+									Selection loopSelection = (Selection) it2.next();
 									if (loopSelection.contains(cpEnd) && loopSelection.contains(cpEnd.getPrev())) {
 										addEdit(new AtomicModifySelection.AddObjects(loopSelection, mapAdd));
 									}
@@ -122,10 +123,10 @@ public class CompoundAutoMirror extends AbstractClone {
 							addEdit(new AtomicChangeControlPoint.ChildHook(cp, null));
 							
 							/* correct patches */
-							ArrayList patches;
+//							ArrayList patches;
 //							patches = MainFrame.getInstance().getModel().getPatchesContaining(startHook);
-							for (Iterator it2 = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {
-								Patch patch = (Patch) it.next();
+							for (Iterator it2 = MainFrame.getInstance().getModel().getPatchSet().iterator(); it2.hasNext(); ) {
+								Patch patch = (Patch) it2.next();
 								if (patch.contains(startHook)) {
 									ControlPoint[] patchCPs = patch.getControlPoints();
 									for (int i = 0; i < patchCPs.length; i++) {
@@ -136,8 +137,8 @@ public class CompoundAutoMirror extends AbstractClone {
 								}
 							}
 //							patches = MainFrame.getInstance().getModel().getPatchesContaining(endHook);
-							for (Iterator it2 = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {
-								Patch patch = (Patch) it.next();
+							for (Iterator it2 = MainFrame.getInstance().getModel().getPatchSet().iterator(); it2.hasNext(); ) {
+								Patch patch = (Patch) it2.next();
 								if (patch.contains(endHook)) {
 									ControlPoint[] patchCPs = patch.getControlPoints();
 									for (int i = 0; i < patchCPs.length; i++) {
@@ -282,10 +283,14 @@ public class CompoundAutoMirror extends AbstractClone {
 			* mirror selections
 			*/
 			//System.out.println(mirrorList);
+			
+			System.out.println("mapClones=" + mapClones);
+			System.out.println("mirrorList=" + mirrorList);
 			ArrayList newSelections = new ArrayList();
 			for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
 				Selection sel = (Selection) it.next();
-				ControlPoint[] acp = selection.getControlPointArray();
+				System.out.println("selection " + sel.getName() + "=" + sel.getMap());
+				ControlPoint[] acp = sel.getControlPointArray();
 				boolean mirror = true;
 				boolean expand = false;
 				for (int c = 0; c < acp.length; c++) {

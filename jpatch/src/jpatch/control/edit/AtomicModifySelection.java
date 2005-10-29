@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicModifySelection.java,v 1.6 2005/10/09 07:41:30 sascha_l Exp $
+ * $Id: AtomicModifySelection.java,v 1.7 2005/10/29 16:01:03 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -47,7 +47,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	public static final class AddObjects extends AtomicModifySelection {
 		private final Map mapObjects;
 		public AddObjects(Selection selection, Map objects) {
-			if (DEBUG)
+//			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + selection + ", " + objects + ")");
 			this.selection = selection;
 			mapObjects = new HashMap(objects);

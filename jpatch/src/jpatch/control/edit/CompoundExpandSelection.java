@@ -7,9 +7,9 @@ import jpatch.entity.*;
 /**
  *  Extends a selection
  */
-public class CompoundExtandSelection extends JPatchCompoundEdit implements JPatchRootEdit {
+public class CompoundExpandSelection extends JPatchCompoundEdit implements JPatchRootEdit {
 	
-	public CompoundExtandSelection(Selection selection) {
+	public CompoundExpandSelection(Selection selection) {
 		Map pointsToAdd = new HashMap();
 		Map pointsToRemove = new HashMap();
 		if (selection.getDirection() != 0) {
