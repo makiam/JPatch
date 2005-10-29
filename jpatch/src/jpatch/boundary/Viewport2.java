@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.28 2005/10/28 15:14:04 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.29 2005/10/29 17:57:12 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -3929,6 +3929,7 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 		public BoneRenderer() {
 			for (int i = 0; i < 6; ap3Points[i++] = new Point3f());
 			for (int i = 0; i < 8; av3Normals[i++] = new Vector3f());
+			mp.metallic = 0.5f;
 		}
 		
 		private void reset() {
@@ -3986,8 +3987,13 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 			for (int i = 0; i < ap3Points.length; i++)
 				m.transform(ap3Points[i]);
 			for (int i = 0; i < av3Normals.length; i++) {
-				m.transform(av3Normals[i]);
-				av3Normals[i].normalize();
+//				Vector3f a = new Vector3f(ap3Points[TRIANGLES[i * 3 + 1]]);
+//				Vector3f b = new Vector3f(ap3Points[TRIANGLES[i * 3 + 2]]);
+//				a.sub(ap3Points[TRIANGLES[i * 3]]);
+//				b.sub(ap3Points[TRIANGLES[i * 3]]);
+//				av3Normals[NORMAL_INDICES[i]].cross(b, a);
+				m.transform(av3Normals[NORMAL_INDICES[i]]);
+				av3Normals[NORMAL_INDICES[i]].normalize();
 			}
 			if (drawable.isShadingSupported()) {
 				Color3f color = bone.getColor();
@@ -3998,19 +4004,36 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 					drawable.setLightingEnabled(true);
 					drawable.setMaterial(mp);
 					for (int i = 0, t = 0; i < NORMAL_INDICES.length; i++) {
-						drawable.drawTriangle(
-								ap3Points[TRIANGLES[t++]], av3Normals[NORMAL_INDICES[i]],
-								ap3Points[TRIANGLES[t++]], av3Normals[NORMAL_INDICES[i]],
-								ap3Points[TRIANGLES[t++]], av3Normals[NORMAL_INDICES[i]]
-						);
+						Vector3f normal = av3Normals[NORMAL_INDICES[i]];
+						if (normal.z < 0) {
+							drawable.drawTriangle(
+									ap3Points[TRIANGLES[t++]], normal,
+									ap3Points[TRIANGLES[t++]], normal,
+									ap3Points[TRIANGLES[t++]], normal
+							);
+//							t -= 3;
+//							Point3f p1 = Functions.average(ap3Points[TRIANGLES[t++]], ap3Points[TRIANGLES[t++]], ap3Points[TRIANGLES[t++]]);
+//							Point3f p2 = new Point3f(p1);
+//							Vector3f n = new Vector3f(av3Normals[NORMAL_INDICES[i]]);
+//							n.scale(100);
+//							p2.add(n);
+//							drawable.drawLine(p1, p2);
+						} else {
+							t += 3;
+						}
 					}
 					drawable.setLightingEnabled(false);
 				} else {
 					Color3f c = new Color3f();
-					for (int i = 0, t = 0; i < NORMAL_INDICES.length; i++) {	
-						viewDef.getLighting().shade(ap3Points[TRIANGLES[t]], av3Normals[NORMAL_INDICES[i]], mp, c);
-						drawable.setColor(c);
-						drawable.drawTriangle(ap3Points[TRIANGLES[t++]], ap3Points[TRIANGLES[t++]], ap3Points[TRIANGLES[t++]]);
+					for (int i = 0, t = 0; i < NORMAL_INDICES.length; i++) {
+						Vector3f normal = av3Normals[NORMAL_INDICES[i]];
+						if (normal.z < 0) {
+							viewDef.getLighting().shade(ap3Points[TRIANGLES[t]], normal, mp, c);
+							drawable.setColor(c);
+							drawable.drawTriangle(ap3Points[TRIANGLES[t++]], ap3Points[TRIANGLES[t++]], ap3Points[TRIANGLES[t++]]);
+						} else {
+							t += 3;
+						}
 					}
 				}
 			} else {
