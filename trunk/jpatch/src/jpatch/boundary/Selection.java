@@ -364,8 +364,10 @@ public class Selection extends JPatchTreeLeaf {
 				cpWeightList.append(mapObjects.get(cp).toString()).append(",");
 			}			
 		}
-		cpList.setLength(cpList.length() - 1); // remove last ","
-		cpWeightList.setLength(cpWeightList.length() - 1); // remove last ","
+		if (cpList.length() > 0)
+			cpList.setLength(cpList.length() - 1); // remove last ","
+		if (cpWeightList.length() > 0)
+			cpWeightList.setLength(cpWeightList.length() - 1); // remove last ","
 		sb.append(prefix).append("\t<points>").append(cpList).append("</points>\n");
 		sb.append(prefix).append("\t<pointweights>").append(cpWeightList).append("</pointweights>\n");
 		sb.append(prefix).append("</selection>").append("\n");

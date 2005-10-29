@@ -81,9 +81,25 @@ public final class SaveAsAction extends AbstractAction {
 	
 	private boolean write(String filename) {
 		try {
+			// create xml representation
+			StringBuffer xml = MainFrame.getInstance().getModel().xml("");
+			
+			File file = new File(filename);
+			// make backup
+			if (file.exists()) {
+				BufferedReader reader = new BufferedReader(new FileReader(filename));
+				BufferedWriter writer = new BufferedWriter(new FileWriter(filename + "~"));
+				char[] buffer = new char[65536];
+				int charsRead = 0;
+				while ((charsRead = reader.read(buffer)) > 0)
+					writer.write(buffer, 0, charsRead);
+				reader.close();
+				writer.close();
+			}
+			// write to file
 			BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
 			writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-			writer.write(MainFrame.getInstance().getModel().xml("").toString());
+			writer.write(xml.toString());
 			writer.close();
 			MainFrame.getInstance().getUndoManager().setChange(false);
 			//System.out.println("file " + filename + " written.");
