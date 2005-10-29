@@ -176,7 +176,7 @@ public class ModelTester {
 		int selections = 0;
 		for (Iterator it = model.getSelections().iterator(); it.hasNext(); ) {
 			Selection selection = (Selection) it.next();
-			for (Iterator it2 = selection.getObjects().iterator(); it.hasNext(); ) {
+			for (Iterator it2 = selection.getObjects().iterator(); it2.hasNext(); ) {
 				Object object = it2.next();
 				if (object instanceof ControlPoint) {
 					ControlPoint cp = (ControlPoint) object;
