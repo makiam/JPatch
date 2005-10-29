@@ -47,7 +47,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	public static final class AddObjects extends AtomicModifySelection {
 		private final Map mapObjects;
 		public AddObjects(Selection selection, Map objects) {
-			if (DEBUG)
+//			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + selection + ", " + objects + ")");
 			this.selection = selection;
 			mapObjects = new HashMap(objects);
