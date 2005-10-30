@@ -595,6 +595,7 @@ public class Bone implements MutableTreeNode {
 		}
 
 		public void rotate(AxisAngle4f a, Point3f pivot) {
+// FIXME: doesn't work if bone isn't in reference pose
 			setDummy();
 			p3Dummy.sub(pivot);
 			Matrix3f m = new Matrix3f();
@@ -605,6 +606,7 @@ public class Bone implements MutableTreeNode {
 		}
 
 		public void transform(Matrix3f m, Point3f pivot) {
+// FIXME: doesn't work if bone isn't in reference pose
 			setDummy();
 			p3Dummy.sub(pivot);
 			m.transform(p3Dummy);
