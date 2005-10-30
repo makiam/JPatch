@@ -256,7 +256,10 @@ public class Viewport2 {
 							drawable.setColor(color);
 							drawable.drawPoint(p0);
 						} else if (!cp.isHook() && ! cp.isHidden()){
-							if (cp.isSingle()) {
+							if (cp.getBone() != null) {
+								drawable.setColor(cp.getBone().getColor());
+								drawable.drawPoint(p0);
+							} else if (cp.isSingle()) {
 								setFogColor(p0.z, cPoint, color);
 								drawable.setColor(color);
 								drawable.drawPoint(p0);

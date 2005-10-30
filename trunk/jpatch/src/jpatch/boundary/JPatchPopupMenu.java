@@ -126,6 +126,7 @@ public class JPatchPopupMenu extends JPopupMenu {
 		JMenuItem miNextCurve = new JMenuItem(new NextCurveAction());
 		JMenuItem miAddStubs = new JMenuItem(new AddStubsAction());
 		JMenuItem miRemoveStubs = new JMenuItem(new RemoveStubsAction());
+		JMenuItem miAssign = new JMenuItem(new AssignPointsToBonesAction());
 //		JMenuItem miConvertToCp = new JMenuItem(new ConvertHookToCpAction());
 		
 		if (MainFrame.getInstance().getSelection() == null) {
@@ -138,6 +139,7 @@ public class JPatchPopupMenu extends JPopupMenu {
 			miNextCurve.setEnabled(false);
 			miAddStubs.setEnabled(false);
 			miRemoveStubs.setEnabled(false);
+			miAssign.setEnabled(false);
 //			miConvertToCp.setEnabled(false);
 		} else {
 //			Selection selection = MainFrame.getInstance().getSelection();
@@ -169,6 +171,7 @@ public class JPatchPopupMenu extends JPopupMenu {
 		menuTools.add(miAddStubs);
 		menuTools.add(miRemoveStubs);
 		menuTools.add(menuTangents);
+		menuTools.add(miAssign);
 //		menuTools.add(miConvertToCp);
 		
 		
