@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.9 2005/10/30 10:02:01 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.10 2005/10/30 13:18:16 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -36,7 +36,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.9 $
+ * @version    $Revision: 1.10 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -187,29 +187,42 @@ public class ControlPoint implements Comparable, Transformable {
 	
 	public void translate(Vector3f v) {
 		p3Position.set(p3BackupPosition);
-		p3Position.add(v);
-		invalidateTangents();
+		Vector3f vv = new Vector3f(v);
+		m4InvTransform.transform(vv);
+		p3Position.add(vv);
+//		invalidateTangents();
 	}
 	
 	public void rotate(AxisAngle4f a, Point3f pivot) {
 		p3Position.set(p3BackupPosition);
-		p3Position.sub(pivot);
+		Point3f p = new Point3f(pivot);
+		m4InvTransform.transform(p);
+		p3Position.sub(p);
 		Matrix3f rot = new Matrix3f();
-		rot.set(a);
+		Vector3f axis = new Vector3f(a.x, a.y, a.z);
+		m4InvTransform.transform(axis);
+		rot.set(new AxisAngle4f(axis, a.angle));
 		rot.transform(p3Position);
-		p3Position.add(pivot);
-		invalidateTangents();
+		p3Position.add(p);
+//		invalidateTangents();
 	}
 	
 	public void transform(Matrix3f m, Point3f pivot) {
 		p3Position.set(p3BackupPosition);
-		p3Position.sub(pivot);
+		Point3f p = new Point3f(pivot);
+		m4InvTransform.transform(p);
+		p3Position.sub(p);
+		Matrix3f mm = new Matrix3f(m);
+		Matrix3f mt = new Matrix3f();
+		m4InvTransform.getRotationScale(mt);
+		mt.mul(mm);
 		m.transform(p3Position);
-		p3Position.add(pivot);
-		invalidateTangents();
+		p3Position.add(p);
+//		invalidateTangents();
 	}
 	
 	public JPatchUndoableEdit endTransform() {
+		
 		return new AtomicChangeControlPoint.Position(this, p3BackupPosition);
 	}
 	

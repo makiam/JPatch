@@ -180,7 +180,7 @@ public class Morph extends JPatchTreeLeaf {
 			ControlPoint cp = (ControlPoint) it.next();
 			v3.set((Vector3f) mapMorph.get(cp));
 			v3.scale(fValue);
-			cp.getPosition().add(v3);
+			cp.getRefPosition().add(v3);
 			cp.invalidateTangents();
 		}
 	}
