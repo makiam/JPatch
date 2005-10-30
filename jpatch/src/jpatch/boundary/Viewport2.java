@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.29 2005/10/29 17:57:12 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.30 2005/10/30 10:02:01 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -256,7 +256,10 @@ public class Viewport2 {
 							drawable.setColor(color);
 							drawable.drawPoint(p0);
 						} else if (!cp.isHook() && ! cp.isHidden()){
-							if (cp.isSingle()) {
+							if (cp.getBone() != null) {
+								drawable.setColor(cp.getBone().getColor());
+								drawable.drawPoint(p0);
+							} else if (cp.isSingle()) {
 								setFogColor(p0.z, cPoint, color);
 								drawable.setColor(color);
 								drawable.drawPoint(p0);

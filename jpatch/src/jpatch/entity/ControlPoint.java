@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.8 2005/10/09 07:41:30 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.9 2005/10/30 10:02:01 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -36,7 +36,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.8 $
+ * @version    $Revision: 1.9 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -120,11 +120,19 @@ public class ControlPoint implements Comparable, Transformable {
 	private boolean bHidden = false;
 	private boolean bDeleted = false;
 	
+	private Bone bone;
+	private float fBonePosition;
+	
+	private Matrix4f m4Transform = new Matrix4f();
+	private Matrix4f m4InvTransform = new Matrix4f();
+	
 	/**
 	 * Constructor
 	 */
 	public ControlPoint() {
 		iNumber = iSequence++;
+		m4Transform.setIdentity();
+		m4InvTransform.invert(m4Transform);
 	}
 
 	/**
@@ -242,7 +250,8 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 	public Point3f getRefPosition() {
-		return p3RefPosition;
+//		return p3RefPosition;
+		return p3Position;
 	}
 	
 	public Point3f getRefInTangent() {
@@ -251,6 +260,15 @@ public class ControlPoint implements Comparable, Transformable {
 	
 	public Point3f getRefOutTangent() {
 		return p3RefOutTangent;
+	}
+	
+	public void setBone(Bone bone, float position) {
+		this.bone = bone;
+		this.fBonePosition = position;
+	}
+	
+	public Bone getBone() {
+		return bone;
 	}
 	
 	/**
@@ -653,9 +671,9 @@ public class ControlPoint implements Comparable, Transformable {
 			Point3f[] ap3Bezier2 = Bezier.deCasteljau(ap3Bezier1[0], ap3Bezier1[1], ap3Bezier1[2], ap3Bezier1[3], cpPrev.fHookPos);
 			return ap3Bezier2[5];
 		}
-		if (!bTangentsValid) {			// if the tangents are invalid
+		//if (!bTangentsValid) {			// if the tangents are invalid
 			computeTangents();		// compute them
-		}
+		//}
 		return p3InTangent;			// return cached in tangent
 	}
 
@@ -691,9 +709,9 @@ public class ControlPoint implements Comparable, Transformable {
 			Point3f[] ap3Bezier2 = Bezier.deCasteljau(ap3Bezier1[3], ap3Bezier1[4], ap3Bezier1[5], ap3Bezier1[6], cpNext.fHookPos);
 			return ap3Bezier2[1];
 		}
-		if (!bTangentsValid) {			// if the tangents are invalid
+		//if (!bTangentsValid) {			// if the tangents are invalid
 			computeTangents();		// compute them
-		}
+		//}
 		return p3OutTangent;			// return cached out tangent
 	}
 	
@@ -770,7 +788,19 @@ public class ControlPoint implements Comparable, Transformable {
 		} else if (cpParentHook != null) {
 			return cpParentHook.getPosition();
 		} else if (isHead()) {
-			return p3Position;
+			Point3f p = new Point3f(p3Position);
+			if (bone != null) {
+				RotationDof dof = bone.getLastDof();
+				if (dof != null) {
+					//if (!dof.isTransformValid()) {
+						m4Transform.set(dof.getTransform());
+						m4InvTransform.set(dof.getInvTransform());
+						bTangentsValid = false;
+					//}
+				}
+			}
+			m4Transform.transform(p);
+			return p;
 		} else {
 			return getHead().getPosition();
 		}
@@ -1038,6 +1068,7 @@ public class ControlPoint implements Comparable, Transformable {
 	public void setPosition(Point3f position) {
 		if (!isHead()) throw new IllegalStateException("attempted to set potsition on attached point");
 		p3Position.set(position);
+		m4InvTransform.transform(p3Position);
 		invalidateTangents();
 	}
 
@@ -1053,6 +1084,7 @@ public class ControlPoint implements Comparable, Transformable {
 	public void setPosition(float x, float y, float z) {
 		if (!isHead()) throw new IllegalStateException("attempted to set potsition on attached point");
 		p3Position.set(x, y,z);
+		m4InvTransform.transform(p3Position);
 		invalidateTangents();
 	}
 

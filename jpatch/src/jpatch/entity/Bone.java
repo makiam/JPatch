@@ -270,6 +270,10 @@ public class Bone implements MutableTreeNode {
 			return getParentBone().p3End;
 	}
 	
+	public Point3f getReferenceEnd() {
+		return p3End;
+	}
+	
 //	public Vector3f getExtent() {
 //		return v3Extent;
 //	}

@@ -20,10 +20,19 @@ public class Utils3D {
 		b = Math.min(b,1);
 		b = Math.max(b,0);
 		
-		Point3f P = new Point3f(p0);
-		v.scale(b);
-		P.add(v);
-		return P;
+		float b1 = 1 - b;
+		
+		return new Point3f(p0.x * b1 + p1.x * b, p0.y * b1 + p1.y * b, p0.z * b1 + p1.z * b);
+	}
+	
+	public static float positionOnLine(Point3f p0, Point3f p1, Point3f p) {
+		v.sub(p1,p0);
+		w.sub(p,p0);
+		
+		float c1 = w.dot(v);
+		float c2 = v.dot(v);
+		float b = c1/c2;
+		return b;
 	}
 	
 	public static Vector3f perpendicularVector(Vector3f v0) {
