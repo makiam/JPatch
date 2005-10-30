@@ -128,6 +128,9 @@ public class RotationDof extends JPatchTreeLeaf {
 		return m4InvTransform;
 	}
 	
+	public void setPointTransform(Matrix4f m) {
+		
+	}
 	public float getCurrentAngle() {
 		return fCurrentAngle;
 	}
