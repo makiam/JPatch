@@ -2,6 +2,8 @@ package jpatch.boundary.action;
 
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.tree.TreePath;
+
 import jpatch.boundary.*;
 import jpatch.boundary.sidebar.*;
 import jpatch.entity.*;
@@ -36,8 +38,9 @@ public final class NewMorphAction extends AbstractAction {
 		//MainFrame.getInstance().getJPatchScreen().addMouseListeners(new AddControlPointMouseAdapter());
 		//MainFrame.getInstance().clearDialog();
 		MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddMorph(morph));
+		MainFrame.getInstance().selectTreeNode(morph);
 //		MainFrame.getInstance().getTree().setSelectionPath(morph.getTreePath());
-//		((MorphPanel) MainFrame.getInstance().getSideBar().getSidePanel()).edit();
+		((MorphPanel) MainFrame.getInstance().getSideBar().getSidePanel()).edit();
 	}
 }
 

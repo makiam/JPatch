@@ -20,6 +20,13 @@ public final class EditMorphAction extends AbstractAction {
 		this.morph = morph;
 		this.morphPanel = morphPanel;
 	}
+	
+	public EditMorphAction(Morph morph, String name) {
+		super(name);
+		this.morph = morph;
+		this.morphPanel = null;
+	}
+	
 	public void actionPerformed(ActionEvent actionEvent) {
 		int mode = MainFrame.getInstance().getMode();
 		if (mode != MainFrame.MORPH) {
@@ -35,8 +42,8 @@ public final class EditMorphAction extends AbstractAction {
 			MainFrame.getInstance().getUndoManager().setStop();	//set stop marker for undoes
 			
 			//MainFrame.getInstance().getUndoManager().setEnabled(false);	// disables undo manager for now
-			
-			morphPanel.editMorph();
+			if (morphPanel != null)
+				morphPanel.editMorph();
 		} else {
 			/* turn off edit morph mode */
 			MainFrame.getInstance().editMorph(null);
@@ -44,7 +51,8 @@ public final class EditMorphAction extends AbstractAction {
 			MainFrame.getInstance().getUndoManager().rewind();
 			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeMorph(morph));
 			//morph.set();
-			morphPanel.editMorphDone();
+			if (morphPanel != null)
+				morphPanel.editMorphDone();
 			
 			//MainFrame.getInstance().getUndoManager().setEnabled(true);	// re-enables undo manager
 		}

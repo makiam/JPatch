@@ -57,6 +57,7 @@ public final class NewSelectionAction extends AbstractAction {
 				MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddSelection(selection));
 			}
 			MainFrame.getInstance().getSideBar().enableTreeSelectionListener(false);
+			MainFrame.getInstance().selectTreeNode(selection);
 //			MainFrame.getInstance().getTree().setSelectionPath(MainFrame.getInstance().getModel().getSelection(selection).getTreePath());
 			MainFrame.getInstance().getSideBar().enableTreeSelectionListener(true);
 		}

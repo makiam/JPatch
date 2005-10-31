@@ -67,6 +67,8 @@ public class CompoundExtrude extends AbstractClone implements JPatchRootEdit {
 						addEdit(new AtomicChangeControlPoint.Prev(cpEnd,cpNew));
 						cpNew.setNext(cpEnd);
 //						cpNew.setCurve(cpEnd.getCurve());
+						addEdit(new AtomicRemoveCurve(cpEnd));
+						addEdit(new AtomicAddCurve(cpNew));
 //						addEdit(new AtomicChangeCurveStart(cpEnd.getCurve(),cpNew));
 					} else {
 						System.out.println("error in extrudeEdit");
