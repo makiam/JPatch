@@ -93,6 +93,10 @@ public class Bone implements MutableTreeNode {
 		mapBones = map;
 	}
 	
+	public int getXmlNumber() {
+		return ((Integer) mapBones.get(this)).intValue();
+	}
+	
 	public List getChildBones() {
 		return listChildBones;
 	}
@@ -540,8 +544,6 @@ public class Bone implements MutableTreeNode {
 				lastDofTransform(p3Dummy);
 		}
 		
-		
-		
 		private void setPoint() {
 			if (isStart() && getParentBone() != null) {
 				getParentBone().lastDofInvTransform(p3Dummy);
@@ -597,6 +599,10 @@ public class Bone implements MutableTreeNode {
 		public void rotate(AxisAngle4f a, Point3f pivot) {
 // FIXME: doesn't work if bone isn't in reference pose
 			setDummy();
+//			if (isStart() && getParentBone() != null)
+//				getParentBone().lastDofInvTransform(p);
+//			else
+//				lastDofInvTransform(p);
 			p3Dummy.sub(pivot);
 			Matrix3f m = new Matrix3f();
 			m.set(a);

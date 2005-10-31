@@ -269,11 +269,11 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		}
 		
 		void swap() {
-			Point3f p = cp.getPosition();
+			Point3f p = cp.getRefPosition();
 			float dummyX = p.x;
 			float dummyY = p.y;
 			float dummyZ = p.z;
-			cp.setPosition(x, y, z);
+			cp.setReferencePosition(x, y, z);
 			x = dummyX;
 			y = dummyY;
 			z = dummyZ;
