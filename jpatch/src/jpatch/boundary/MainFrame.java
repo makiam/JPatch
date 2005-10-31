@@ -508,6 +508,10 @@ public final class MainFrame extends JFrame {
 		return sideBar;
 	}
 	
+	public void selectTreeNode(TreeNode treeNode) {
+		tree.setSelectionPath(new TreePath(getTreeModel().getPathToRoot(treeNode)));
+	}
+	
 	public MutableTreeNode getRootTreenode() {
 		return treenodeRoot;
 	}

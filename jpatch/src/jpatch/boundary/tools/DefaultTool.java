@@ -390,6 +390,7 @@ public class DefaultTool extends JPatchTool {
 			/* if a handle was clicked */
 			if (activeHandle != null) {
 				
+				System.out.println("handle hit");
 				/* activate it */
 				activeHandle.setActive(true);
 				activeHandle.setMouse(x, y);
@@ -1273,15 +1274,17 @@ public class DefaultTool extends JPatchTool {
 		if (leaf == null || leaf == MainFrame.getInstance().getModel().getTreenodeSelections() || leaf == MainFrame.getInstance().getModel() || leaf instanceof Selection) {
 			//MainFrame.getInstance().getSideBar().enableTreeSelectionListener(false);
 			if (selection != null && !MainFrame.getInstance().getModel().checkSelection(selection)) {
+				MainFrame.getInstance().selectTreeNode(MainFrame.getInstance().getModel().getSelection(selection));
 			//	System.out.println("*");
 			//	MainFrame.getInstance().getSideBar().enableTreeSelectionListener(false);
 			//	System.out.println(selection + " " + MainFrame.getInstance().getModel().getSelection(selection));
-				DefaultTreeModel treeModel = (DefaultTreeModel) MainFrame.getInstance().getTree().getModel();
-				MainFrame.getInstance().getTree().setSelectionPath(new TreePath(treeModel.getPathToRoot(selection)));
+			//	DefaultTreeModel treeModel = (DefaultTreeModel) MainFrame.getInstance().getTree().getModel();
+			//	MainFrame.getInstance().getTree().setSelectionPath(new TreePath(treeModel.getPathToRoot(selection)));
 			//	MainFrame.getInstance().getSideBar().enableTreeSelectionListener(true);
 			} else {
-				DefaultTreeModel treeModel = (DefaultTreeModel) MainFrame.getInstance().getTree().getModel();
-				MainFrame.getInstance().getTree().setSelectionPath(new TreePath(treeModel.getPathToRoot(MainFrame.getInstance().getModel().getTreenodeSelections())));
+				MainFrame.getInstance().selectTreeNode(MainFrame.getInstance().getModel().getTreenodeSelections());
+			//	DefaultTreeModel treeModel = (DefaultTreeModel) MainFrame.getInstance().getTree().getModel();
+			//	MainFrame.getInstance().getTree().setSelectionPath(new TreePath(treeModel.getPathToRoot(MainFrame.getInstance().getModel().getTreenodeSelections())));
 			}
 			//MainFrame.getInstance().getSideBar().enableTreeSelectionListener(true);
 		}

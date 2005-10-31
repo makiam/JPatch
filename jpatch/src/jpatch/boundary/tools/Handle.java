@@ -11,7 +11,7 @@ implements MouseMotionListener {
 	protected Matrix4f m4Transform = new Matrix4f();
 	protected SimpleShape shape = SimpleShape.createCube(1);
 	protected float fSize = 3;
-	protected int iHitSize = 4;
+	protected int iHitSize = 8;
 	protected Color3f c3Passive;
 	protected Color3f c3Active = new Color3f(1, 1, 1);
 	protected int iPassive;
@@ -68,6 +68,7 @@ implements MouseMotionListener {
 //		Point3f p3 = getTransformedPosition(viewDef.getScreenMatrix());
 		Point3f p3 = new Point3f(getPosition(viewDef));
 		viewDef.getScreenMatrix().transform(p3);
+//		System.out.println("handle isHit? x=" + x + " y=" + y + " hx=" + p3.x + " hy=" + p3.y);
 		if (x >= p3.x - iHitSize && x <= p3.x + iHitSize && y >= p3.y - iHitSize && y <= p3.y + iHitSize) {
 			hit.set(p3);
 			return true;

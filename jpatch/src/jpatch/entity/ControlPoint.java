@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.10 2005/10/30 13:18:16 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.11 2005/10/31 16:18:54 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -36,7 +36,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.10 $
+ * @version    $Revision: 1.11 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -77,7 +77,7 @@ public class ControlPoint implements Comparable, Transformable {
 	/** loop flag */
 	private boolean bLoop = false;
 	/** tangents valid flag */
-	private boolean bTangentsValid = false;
+//	private boolean bTangentsValid = false;
 	/** tangent mode */
 	private int iMode = iDefaultMode;
 	/** next ControlPoint on curve */
@@ -808,7 +808,7 @@ public class ControlPoint implements Comparable, Transformable {
 					//if (!dof.isTransformValid()) {
 						m4Transform.set(dof.getTransform());
 						m4InvTransform.set(dof.getInvTransform());
-						bTangentsValid = false;
+//						bTangentsValid = false;
 					//}
 				}
 			}
@@ -1101,6 +1101,12 @@ public class ControlPoint implements Comparable, Transformable {
 		invalidateTangents();
 	}
 
+	public void setReferencePosition(float x, float y, float z) {
+		if (!isHead()) throw new IllegalStateException("attempted to set reference potsition on attached point");
+		p3Position.set(x, y,z);
+		invalidateTangents();
+	}
+	
 	/**
 	 *  Sets the prev ControlPoint and invalidates the tangents
 	 *
@@ -1137,7 +1143,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 *		Invalid tangents will become re-computed the next time the're needed.
 	 */
 	public void setTangentsValid(boolean valid) {
-		bTangentsValid = valid;
+//		bTangentsValid = valid;
 	}
 
 	/**
@@ -1611,7 +1617,7 @@ public class ControlPoint implements Comparable, Transformable {
 				computeG1Tangents();
 				
 		}
-		bTangentsValid = true;
+//		bTangentsValid = true;
 	}
 
 	/**
@@ -1862,24 +1868,24 @@ public class ControlPoint implements Comparable, Transformable {
 	 *  Invalidates the tangents of this and ALL neighbor ControlPoints
 	 */
 	public void invalidateTangents() {
-		bTangentsValid = false;
-		if (cpNext != null) {
-			cpNext.bTangentsValid = false;
-			if (cpNext.cpNext != null) {
-				cpNext.cpNext.bTangentsValid = false;
-			}
-		}
-		if (cpPrev != null) {
-			cpPrev.bTangentsValid = false;
-			if (cpPrev.cpPrev != null) {
-				cpPrev.cpPrev.bTangentsValid = false;
-			}
-		}
-		if (cpPrevAttached != null) {
-			cpPrevAttached.invalidateTangents();
-		}
-		//reTriangulizePatches();
-		//bCurveSegmentValid = false;
+//		bTangentsValid = false;
+//		if (cpNext != null) {
+//			cpNext.bTangentsValid = false;
+//			if (cpNext.cpNext != null) {
+//				cpNext.cpNext.bTangentsValid = false;
+//			}
+//		}
+//		if (cpPrev != null) {
+//			cpPrev.bTangentsValid = false;
+//			if (cpPrev.cpPrev != null) {
+//				cpPrev.cpPrev.bTangentsValid = false;
+//			}
+//		}
+//		if (cpPrevAttached != null) {
+//			cpPrevAttached.invalidateTangents();
+//		}
+//		//reTriangulizePatches();
+//		//bCurveSegmentValid = false;
 	}
 	
 	public int getXmlNumber() {

@@ -3,6 +3,7 @@ package jpatch.entity;
 import java.util.*;
 import javax.vecmath.*;
 
+import jpatch.auxilary.XMLutils;
 import jpatch.boundary.*;
 import jpatch.control.edit.*;
 
@@ -232,7 +233,7 @@ public class Morph extends JPatchTreeLeaf {
 	public void prepare() {
 		for (Iterator it = MainFrame.getInstance().getModel().allHeads().iterator(); it.hasNext(); ) {
 			ControlPoint cp = (ControlPoint) it.next();
-			mapPositions.put(cp, new Point3f(cp.getPosition()));
+			mapPositions.put(cp, new Point3f(cp.getRefPosition()));
 		}
 		bPrepared = true;
 	}
@@ -253,7 +254,7 @@ public class Morph extends JPatchTreeLeaf {
 //		listVectors.clear();
 		for (Iterator it = MainFrame.getInstance().getModel().allHeads().iterator(); it.hasNext(); ) {
 			ControlPoint cp = (ControlPoint) it.next();
-			v3.set(cp.getPosition());
+			v3.set(cp.getRefPosition());
 			v3.sub((Tuple3f) mapPositions.get(cp));
 			if (v3.x != 0f || v3.y != 0f || v3.z != 0f) {
 //				listPoints.add(cp);
@@ -281,8 +282,18 @@ public class Morph extends JPatchTreeLeaf {
 	}
 	
 	public StringBuffer xml(String prefix) {
+		return xml(prefix, null, null);
+	}
+			
+	public StringBuffer xml(String prefix, RotationDof dof, String type) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(prefix).append("<morph name=\"").append(strName).append("\" ");
+		if (dof== null) {
+			sb.append(prefix).append("<morph name=\"").append(strName).append("\" ");
+		} else {
+			Bone bone = dof.getBone();
+			int index = bone.getDofIndex(dof);
+			sb.append(prefix).append("<morph bone=\"").append(bone.getXmlNumber()).append("\" dof=\"").append(index).append("\" type=\"").append(type).append("\" ");
+		}
 		sb.append("min=\"").append(fMin).append("\" ");
 		sb.append("max=\"").append(fMax).append("\" ");
 		sb.append("value=\"").append(fValue).append("\">");

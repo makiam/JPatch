@@ -21,6 +21,8 @@ public class RotationDof extends JPatchTreeLeaf {
 	private Matrix4f m4Transform = new Matrix4f();
 	private Matrix4f m4InvTransform = new Matrix4f();
 	private boolean bValid = false;
+	private Morph minMorph;
+	private Morph maxMorph;
 	
 	public RotationDof(Bone bone) {
 		this.bone = bone;
@@ -29,6 +31,8 @@ public class RotationDof extends JPatchTreeLeaf {
 		fMinAngle = (float) - Math.PI / 2;
 		fMaxAngle = (float) Math.PI / 2;
 		strName = "RDOF";
+		minMorph = new Morph(0, "min");
+		maxMorph = new Morph(0, "max");
 	}
 	
 	public Bone getBone() {
@@ -131,6 +135,7 @@ public class RotationDof extends JPatchTreeLeaf {
 	public void setPointTransform(Matrix4f m) {
 		
 	}
+	
 	public float getCurrentAngle() {
 		return fCurrentAngle;
 	}
@@ -138,6 +143,7 @@ public class RotationDof extends JPatchTreeLeaf {
 	public void setCurrentAngle(float currentAngle) {
 		fCurrentAngle = currentAngle;
 		invalidate();
+		setMorphValues();
 	}
 
 	public float getDefaultAngle() {
@@ -171,8 +177,30 @@ public class RotationDof extends JPatchTreeLeaf {
 	public void setSliderValue(int sliderValue) {
 		fCurrentAngle = fMinAngle + (fMaxAngle - fMinAngle) / 100f * (float) sliderValue;
 		invalidate();
+		setMorphValues();
 	}
 	
+	private void setMorphValues() {
+		float min = 0;
+		float max = 0;
+		if (fCurrentAngle > 0)
+			max = fCurrentAngle / fMaxAngle;
+		else if (fCurrentAngle < 0)
+			min = fCurrentAngle / fMinAngle;
+		if (minMorph != null) {
+			if (minMorph.getValue() != min) {
+				minMorph.unapply();
+				minMorph.setValue(min);
+				minMorph.apply();
+			}
+		if (maxMorph != null)
+			if (maxMorph.getValue() != max) {
+				maxMorph.unapply();
+				maxMorph.setValue(max);
+				maxMorph.apply();
+			}
+		}
+	}
 	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(prefix).append("<dof type=\"rotation\" name=").append(XMLutils.quote(strName)).append(">\n");
@@ -180,5 +208,21 @@ public class RotationDof extends JPatchTreeLeaf {
 		sb.append(prefix).append("\t<angle min=\"" + fMinAngle * 180 / (float) Math.PI + "\" max=\"" + fMaxAngle * 180 / (float) Math.PI + "\" current=\"" + fCurrentAngle * 180 / (float) Math.PI + "\"/>\n");
 		sb.append(prefix).append("</dof>\n");
 		return sb;
+	}
+
+	public Morph getMaxMorph() {
+		return maxMorph;
+	}
+
+	public void setMaxMorph(Morph maxMorph) {
+		this.maxMorph = maxMorph;
+	}
+
+	public Morph getMinMorph() {
+		return minMorph;
+	}
+
+	public void setMinMorph(Morph minMorph) {
+		this.minMorph = minMorph;
 	}
 }

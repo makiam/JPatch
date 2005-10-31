@@ -85,6 +85,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 				bone = new Bone(model,p3Start,new Vector3f());
 				edit.addEdit(new AtomicAddBone(bone));
 			}
+			MainFrame.getInstance().selectTreeNode(bone);
 			edit.addEdit(new AtomicChangeSelection(new Selection(bone.getBoneEnd())));
 //			MainFrame.getInstance().setSelection(new BoneSelection(bone));
 //			MainFrame.getInstance().getModel().addBone(bone);

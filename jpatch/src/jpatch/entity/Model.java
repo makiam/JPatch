@@ -154,6 +154,13 @@ public class Model implements MutableTreeNode {
 			Morph morph = (Morph) it.next();
 			sb.append(morph.xml(prefix3));
 		}
+		for (Iterator itBones = setBones.iterator(); itBones.hasNext(); ) {
+			for (Iterator itDofs = ((Bone) itBones.next()).getDofs().iterator(); itDofs.hasNext(); ) {
+				RotationDof dof = (RotationDof) itDofs.next();
+				sb.append(dof.getMinMorph().xml(prefix3, dof, "min"));
+				sb.append(dof.getMaxMorph().xml(prefix3, dof, "max"));
+			}
+		}
 		StringBuffer lipSyncMap = new StringBuffer();
 		for (Iterator it = mapPhonemes.keySet().iterator(); it.hasNext(); ) {
 			String phoneme = (String) it.next();
