@@ -1,12 +1,19 @@
 package jpatch.boundary;
 
 import java.awt.*;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.*;
 //import java.beans.*;
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 import javax.swing.tree.*;
+
+import buoy.event.KeyPressedEvent;
 
 import jpatch.*;
 import jpatch.entity.*;
@@ -185,8 +192,54 @@ public final class MainFrame extends JFrame {
 			jpatchScreen.addMMBListener();
 			//keyEventDispatcher = new JPatchKeyEventDispatcher();
 			//KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyEventDispatcher);
-			addKeyListener(keyAdapter);
+//			addKeyListener(keyAdapter);
+			KeyEventDispatcher keyEventDispatcher = new KeyEventDispatcher() {
+				public boolean dispatchKeyEvent(KeyEvent e) {
+					Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+					System.out.println(focusOwner);
+					if (
+							focusOwner instanceof JTextComponent ||
+							e.isActionKey()
+							)
+						return false;
+					switch (e.getID()) {
+					case KeyEvent.KEY_PRESSED:
+			            keyAdapter.keyPressed(e);
+			          break;
+			          case KeyEvent.KEY_RELEASED:
+			        	  keyAdapter.keyReleased(e);
+			          break;
+			          case KeyEvent.KEY_TYPED:
+			        	  keyAdapter.keyTyped(e);
+			          break;
+					}
+					return true;
+				}
+			};
 			
+//			try {
+//				final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("/home/sascha/jpatch.out"));
+//					java.awt.Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+//						public void eventDispatched(AWTEvent event) {
+//							try {
+//								System.out.println(event);
+//								out.writeObject(event);
+//							} catch (Exception e) {
+//								e.printStackTrace();
+//							}
+//						}
+//					}, AWTEvent.ACTION_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//			
+//			try {
+//				Robot robot = new Robot();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+			
+			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyEventDispatcher);
 			//mainMenu.setFocusable(false);
 			//mainToolBar.setFocusable(false);
 			//meshToolBar.setFocusable(false);
