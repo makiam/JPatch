@@ -114,9 +114,10 @@ public final class MeshToolBar extends JToolBar {
 		add(buttonFivePoint);
 		add(buttonComputePatches);
 		
+//		buttonAdd.getAction().setEnabled(false);
 		
 		/* set keyboard shortcuts */
-		setFocusable(false);
+//		setFocusable(false);
 	}
 	
 	public AbstractButton getWeightButton() {
