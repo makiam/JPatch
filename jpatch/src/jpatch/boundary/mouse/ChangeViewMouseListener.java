@@ -3,6 +3,7 @@ package jpatch.boundary.mouse;
 import java.awt.*;
 import java.awt.event.*;
 import jpatch.boundary.*;
+import jpatch.boundary.tools.*;
 
 public class ChangeViewMouseListener extends MouseAdapter {
 	public static final int MOVE = 1;
@@ -55,6 +56,7 @@ public class ChangeViewMouseListener extends MouseAdapter {
 		if (mouseEvent.getButton() == iButton) {
 			((Component)mouseEvent.getSource()).removeMouseMotionListener(mouseMotionListener);
 //			MainFrame.getInstance().getDefaultToolTimer().restart();
+			MainFrame.getInstance().getJPatchScreen().setTool(new DefaultTool());
 		}
 	}
 }

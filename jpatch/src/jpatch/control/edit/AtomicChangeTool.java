@@ -33,11 +33,11 @@ public class AtomicChangeTool extends JPatchAtomicEdit implements JPatchRootEdit
 		JPatchTool dummy = tool;
 		tool = MainFrame.getInstance().getJPatchScreen().getTool();
 		MainFrame.getInstance().getJPatchScreen().setTool(dummy);
-		if (dummy != null) {
-			MainFrame.getInstance().getMeshToolBar().selectButton(dummy.getButton());
-		} else {
-			//MainFrame.getInstance().getMeshToolBar().reset();
-		}
+//		if (dummy != null) {
+//			MainFrame.getInstance().getMeshToolBar().selectButton(dummy.getButton());
+//		} else {
+//			//MainFrame.getInstance().getMeshToolBar().reset();
+//		}
 	}
 	
 	public int sizeOf() {

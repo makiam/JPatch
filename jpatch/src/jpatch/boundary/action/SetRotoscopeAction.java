@@ -12,14 +12,13 @@ public final class SetRotoscopeAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private ViewDefinition viewDefinition;
 	
-	public SetRotoscopeAction(ViewDefinition viewDefinition) {
+	public SetRotoscopeAction() {
 		super("set image");
-		this.viewDefinition = viewDefinition;
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition();
 		JFileChooser fileChooser = new JFileChooser(JPatchSettings.getInstance().strRotoscopePath);
 		fileChooser.addChoosableFileFilter(new ImageFilter());
 		if (fileChooser.showOpenDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
@@ -28,7 +27,7 @@ public final class SetRotoscopeAction extends AbstractAction {
 			Rotoscope rotoscope = new Rotoscope(filename);
 			if (rotoscope.isValid()) {
 				//rotoscope = null;
-				MainFrame.getInstance().getModel().setRotoscope(viewDefinition.getView(),rotoscope);
+				MainFrame.getInstance().getModel().setRotoscope(viewDef.getView(),rotoscope);
 				MainFrame.getInstance().getJPatchScreen().update_all();
 				JPatchSettings.getInstance().strRotoscopePath = file.getParent();
 			}

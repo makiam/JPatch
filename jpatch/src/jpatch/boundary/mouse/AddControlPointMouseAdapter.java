@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.vecmath.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
+import jpatch.boundary.action.Command;
 import jpatch.boundary.tools.DefaultTool;
 
 import jpatch.control.edit.*;
@@ -215,7 +216,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 			edit.addEdit(new AtomicChangeTool(new DefaultTool()));
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
 //			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
-			MainFrame.getInstance().getMeshToolBar().reset();
+//			MainFrame.getInstance().getMeshToolBar().reset();
 			iState = IDLE;
 		} else {
 			throw new IllegalStateException("setIdleState() called in idle state");
@@ -225,6 +226,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 //			MainFrame.getInstance().getMeshToolBar().reset();
 //		}
 //		MainFrame.getInstance().getDefaultToolTimer().restart();
+//		Command.getInstance().executeCommand("default tool");
 	}
 }
 

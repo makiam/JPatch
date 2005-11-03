@@ -20,7 +20,7 @@ public final class AddControlPointAction extends AbstractAction {
 	public void actionPerformed(ActionEvent actionEvent) {
 		//MainFrame.getInstance().getJPatchScreen().setTool(null);
 		
-		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.ADD) {
+//		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.ADD) {
 			if (MainFrame.getInstance().getSelection() != null) {
 				JPatchActionEdit edit = new JPatchActionEdit("Clear selection, clear tool");
 				edit.addEdit(new AtomicChangeSelection(null));
@@ -32,11 +32,11 @@ public final class AddControlPointAction extends AbstractAction {
 			MainFrame.getInstance().getJPatchScreen().addMouseListeners(new AddControlPointMouseAdapter());
 			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(false);
 			MainFrame.getInstance().clearDialog();
-			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.ADD);
-		} else {
-			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(new DefaultTool()), true);
-			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.DEFAULT);
-		}
+//			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.ADD);
+//		} else {
+//			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(new DefaultTool()), true);
+//			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.DEFAULT);
+//		}
 	}
 }
 

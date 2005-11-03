@@ -9,17 +9,15 @@ public final class ShowPatchesAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private ViewDefinition viewDefinition;
 	
-	public ShowPatchesAction(ViewDefinition viewDefinition) {
+	public ShowPatchesAction() {
 		super("patches");
-		this.viewDefinition = viewDefinition;
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		viewDefinition.renderPatches(!viewDefinition.renderPatches());
-		//((JPatchCanvas)viewDefinition.getViewport()).updateImage();
-//		viewDefinition.reset();
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition();
+		viewDef.renderPatches(!viewDef.renderPatches());
+		viewDef.repaint();
 	}
 }
 

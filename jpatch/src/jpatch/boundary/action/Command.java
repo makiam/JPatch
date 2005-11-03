@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.1 2005/11/03 16:59:38 sascha_l Exp $
+ * $Id: Command.java,v 1.2 2005/11/03 20:58:50 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -54,10 +54,13 @@ public final class Command implements KeyListener {
 		AbstractButton button = (AbstractButton) INSTANCE.commandButtonMap.get(command);
 		AbstractButton newButton;
 		if (button instanceof JPatchToggleButton)
-			newButton = new JPatchToggleButton(button.getAction());
+			newButton = new JPatchToggleButton();//button.getAction());
 		else
-			newButton = new JPatchButton(button.getAction());
+			newButton = new JPatchButton();//button.getAction());
 		newButton.setModel(button.getModel());
+		newButton.setText(button.getText());
+		newButton.setIcon(button.getIcon());
+		newButton.setSelectedIcon(button.getSelectedIcon());
 		return newButton;
 	}
 	
@@ -65,11 +68,11 @@ public final class Command implements KeyListener {
 		JMenuItem menuItem = (JMenuItem) INSTANCE.commandMenuItemMap.get(command);
 		JMenuItem newItem;
 		if (menuItem instanceof JRadioButtonMenuItem)
-			newItem = new JRadioButtonMenuItem(menuItem.getAction());
+			newItem = new JRadioButtonMenuItem();//menuItem.getAction());
 		else if (menuItem instanceof JCheckBoxMenuItem)
-			newItem = new JCheckBoxMenuItem(menuItem.getAction());
+			newItem = new JCheckBoxMenuItem();//menuItem.getAction());
 		else
-			newItem = new JMenuItem(menuItem.getAction());
+			newItem = new JMenuItem();//menuItem.getAction());
 		newItem.setText(menuItem.getText());
 		newItem.setIcon(menuItem.getIcon());
 		newItem.setModel(menuItem.getModel());
@@ -79,6 +82,14 @@ public final class Command implements KeyListener {
 	
 	public static Action getActionFor(String command) {
 		return (Action) INSTANCE.commandActionMap.get(command);
+	}
+	
+	public static void setViewDefinition(ViewDefinition viewDef) {
+		((JMenuItem) INSTANCE.commandMenuItemMap.get(viewDef.getViewName())).setSelected(true);
+		((JMenuItem) INSTANCE.commandMenuItemMap.get("show points")).setSelected(viewDef.renderPoints());
+		((JMenuItem) INSTANCE.commandMenuItemMap.get("show curves")).setSelected(viewDef.renderCurves());
+		((JMenuItem) INSTANCE.commandMenuItemMap.get("show patches")).setSelected(viewDef.renderPatches());
+		((JMenuItem) INSTANCE.commandMenuItemMap.get("show rotoscope")).setSelected(viewDef.showRotoscope());
 	}
 	
 	public Command() {
@@ -168,9 +179,40 @@ public final class Command implements KeyListener {
 		put("show splashscreen",		new ShowSplashAction(),				new JMenuItem());
 		
 		/*
-		 * ButtonGroups
+		 * Popup menu commands
 		 */
 		
+		// Show
+		put("show points",				new ShowPointsAction(),				new JCheckBoxMenuItem());
+		put("show curves",				new ShowCurvesAction(),				new JCheckBoxMenuItem());
+		put("show patches",				new ShowPatchesAction(),			new JCheckBoxMenuItem());
+		put("show rotoscope",			new ShowRotoscopeAction(),			new JCheckBoxMenuItem());
+		
+		// View
+		put("front view",				new ViewAction(ViewDefinition.FRONT),		new JRadioButtonMenuItem());
+		put("rear view",				new ViewAction(ViewDefinition.REAR),		new JRadioButtonMenuItem());
+		put("top view",					new ViewAction(ViewDefinition.TOP),			new JRadioButtonMenuItem());
+		put("bottom view",				new ViewAction(ViewDefinition.BOTTOM),		new JRadioButtonMenuItem());
+		put("left view",				new ViewAction(ViewDefinition.LEFT),		new JRadioButtonMenuItem());
+		put("right view",				new ViewAction(ViewDefinition.RIGHT),		new JRadioButtonMenuItem());
+		put("bird's eye view",			new ViewAction(ViewDefinition.BIRDS_EYE),	new JRadioButtonMenuItem());
+		
+		// Rotoscope
+		put("set rotoscope image",		new SetRotoscopeAction(),	new JMenuItem());
+		put("clear rotoscope image",	new ClearRotoscopeAction(),	new JMenuItem());
+		
+		/*
+		 * Pressed icons
+		 */
+		((AbstractButton) commandButtonMap.get("lock x")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/xlocked.png")));
+		((AbstractButton) commandButtonMap.get("lock y")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/ylocked.png")));
+		((AbstractButton) commandButtonMap.get("lock z")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/zlocked.png")));
+		((AbstractButton) commandButtonMap.get("snap to grid")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/grid_snap.png")));
+		((AbstractButton) commandButtonMap.get("hide")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/hide2.png")));
+		
+		/*
+		 * ButtonGroups
+		 */
 		createGroup(new String[] {
 				"default tool",
 				"add curve segment",
@@ -189,6 +231,16 @@ public final class Command implements KeyListener {
 				"vertically split view",
 				"quad view"
 		}, JPatchSettings.getInstance().iScreenMode - 1);
+		
+		createGroup(new String[] {
+				"front view",
+				"rear view",
+				"top view",
+				"bottom view",
+				"left view",
+				"right view",
+				"bird's eye view"
+		}, 0);
 	}
 
 	public void executeCommand(String command) {
@@ -236,7 +288,9 @@ public final class Command implements KeyListener {
 	private void put(String command, Action action, JMenuItem menuItem, AbstractButton button) {
 		commandActionMap.put(command, action);
 		if (button != null) {
-			button.setAction(action);
+//			button.setAction(action);
+//			button.setText((String) action.getValue(Action.SHORT_DESCRIPTION));
+			button.setIcon((Icon) action.getValue(Action.SMALL_ICON));
 			button.setModel(menuItem.getModel());
 			commandButtonMap.put(command, button);
 		}

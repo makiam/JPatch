@@ -2,6 +2,7 @@ package jpatch.boundary;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 
 import jpatch.auxilary.*;
@@ -51,7 +52,20 @@ public final class JPatchScreen extends JPanel {
 	private boolean bStickyLight = JPatchSettings.getInstance().bStickyLight;
 	private JPatchTool tool;
 	
-	private PopupMouseListener popupMouseListener = new PopupMouseListener(MouseEvent.BUTTON3);
+	private MouseListener popupMouseListener = new MouseAdapter() {
+		public void mousePressed(MouseEvent mouseEvent) {
+			System.out.println("*");
+			if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
+				if (popupMenu != null) {
+					if (popupMenu.isShowing()) {
+						popupMenu.setVisible(false);
+					} else {
+						popupMenu.show((Component) mouseEvent.getSource(), mouseEvent.getX(),mouseEvent.getY());
+					}
+				}
+			}
+		}
+	};
 	private MoveZoomRotateMouseAdapter moveZoomRotateMouseAdapter = new MoveZoomRotateMouseAdapter();
 	
 	private boolean bPopupEnabled;
@@ -59,6 +73,7 @@ public final class JPatchScreen extends JPanel {
 	private boolean bShowTangents = false;
 	private TangentTool tangentTool = new TangentTool();
 	private Grid grid = new Grid();
+	private JPopupMenu popupMenu;
 	
 	public JPatchScreen(Model model,int mode,ViewDefinition[] viewDefinitions) {
 		aViewDef = viewDefinitions;
@@ -120,6 +135,10 @@ public final class JPatchScreen extends JPanel {
 		setMode(mode);
 	}
 	
+	public void setPopupMenu(JPopupMenu popupMenu){
+		this.popupMenu = popupMenu;
+	}
+	
 	public void switchRenderer(int renderer) {
 		JPatchSettings.getInstance().iRealtimeRenderer = renderer;
 		initScreen();
@@ -148,6 +167,7 @@ public final class JPatchScreen extends JPanel {
 	
 	public void setActiveViewport(Component component) {
 		setActiveViewport(getViewport(component));
+		Command.setViewDefinition(activeViewport.getViewDefinition());
 	}
 	
 	public void setActiveViewport(Viewport2 viewport) {
@@ -391,6 +411,8 @@ public final class JPatchScreen extends JPanel {
 			aViewport[i].setTool(tool);
 		}
 		update_all();
+		if (tool instanceof DefaultTool)
+			Command.getMenuItemFor("default tool").setSelected(true);
 	}
 	
 	public JPatchTool getTool() {
