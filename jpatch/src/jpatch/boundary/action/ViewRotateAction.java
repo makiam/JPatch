@@ -15,14 +15,14 @@ public final class ViewRotateAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("rotate view"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.VIEW_ROTATE) {
+//		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.VIEW_ROTATE) {
 			MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
 			MainFrame.getInstance().getJPatchScreen().addMouseListeners(new ChangeViewMouseListener(MouseEvent.BUTTON1,ChangeViewMouseListener.ROTATE));
 			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(false);
-			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.VIEW_ROTATE);
-		} else {
-			MainFrame.getInstance().getMeshToolBar().reset();
-		}
+//			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.VIEW_ROTATE);
+//		} else {
+//			MainFrame.getInstance().getMeshToolBar().reset();
+//		}
 	}	
 }
 

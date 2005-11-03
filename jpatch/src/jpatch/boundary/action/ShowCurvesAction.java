@@ -9,16 +9,15 @@ public final class ShowCurvesAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private ViewDefinition viewDefinition;
 	
-	public ShowCurvesAction(ViewDefinition viewDefinition) {
+	public ShowCurvesAction() {
 		super("curves");
-		this.viewDefinition = viewDefinition;
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		viewDefinition.renderCurves(!viewDefinition.renderCurves());
-		viewDefinition.repaint();
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition();
+		viewDef.renderCurves(!viewDef.renderCurves());
+		viewDef.repaint();
 	}
 }
 

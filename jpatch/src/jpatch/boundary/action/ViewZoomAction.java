@@ -15,14 +15,14 @@ public final class ViewZoomAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("zoom view"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.VIEW_ZOOM) {
+//		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.VIEW_ZOOM) {
 			MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
 			MainFrame.getInstance().getJPatchScreen().addMouseListeners(new ChangeViewMouseListener(MouseEvent.BUTTON1,ChangeViewMouseListener.ZOOM));
 			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(false);
-			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.VIEW_ZOOM);
-		} else {
-			MainFrame.getInstance().getMeshToolBar().reset();
-		}
+//			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.VIEW_ZOOM);
+//		} else {
+//			MainFrame.getInstance().getMeshToolBar().reset();
+//		}
 	}
 }
 

@@ -124,7 +124,7 @@
 			</menu>
 		</menu>
 	</menu>
-<!--
+
 	<menu name="viewport popup">
 		<menu name="show">
 			<item command="show points"/>
@@ -145,6 +145,7 @@
 			<item command="set rotoscope image"/>
 			<item command="clear rotoscope image"/>
 		</menu>
+<!--
 		<item command="lock view"/>
 		<separator/>
 		<menu name="selection"/>
@@ -172,8 +173,8 @@
 			</menu>
 			<item command="assign controlpoints to bones"/>
 		</menu>
-	</menu>
 -->
+	</menu>
 </layout>	
 		
 

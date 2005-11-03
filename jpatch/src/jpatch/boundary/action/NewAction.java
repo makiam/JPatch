@@ -15,6 +15,7 @@ public final class NewAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,"New");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
+		System.out.println("new");
 		if (MainFrame.getInstance().getUndoManager().hasChanged()) {
 			int option = JPatchUtils.showSaveDialog();
 			switch (option) {
