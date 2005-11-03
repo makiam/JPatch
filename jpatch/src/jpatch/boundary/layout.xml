@@ -1,0 +1,184 @@
+<layout>
+	<toolbar name="main toolbar" position="north">
+		<button command="new"/>
+		<button command="open"/>
+		<button command="save"/>
+		<separator/>
+		<button command="single view"/>
+		<button command="horizontally split view"/>
+		<button command="vertically split view"/>
+		<button command="quad view"/>
+		<separator/>
+		<button command="rotate view"/>
+		<button command="move view"/>
+		<button command="zoom view"/>
+		<separator/>
+		<button command="zoom to fit"/>
+		<separator/>
+		<button command="undo"/>
+		<button command="redo"/>
+		<separator/>
+		<button command="lock x"/>
+		<button command="lock y"/>
+		<button command="lock z"/>
+		<separator/>
+		<button command="snap to grid"/>
+		<button command="hide"/>
+	</toolbar>
+	
+	<toolbar name="edit toolbar" position="west">
+		<separator/>
+		<button command="default tool"/>
+		<button command="add curve segment"/>
+		<button command="add bone"/>
+		<button command="rotate tool"/>
+		<button command="weight selection tool"/>
+		<separator/>
+		<button command="rotoscope tool"/>
+		<separator/>
+		<button command="tangent tool"/>
+		<button command="peak tangents"/>
+		<button command="round tangents"/>
+		<separator/>
+		<button command="clone"/>
+		<button command="extrude"/>
+		<button command="lathe"/>
+		<button command="lathe editor"/>
+		<separator/>
+		<button command="make patch"/>
+		<button command="compute patches"/>
+<!-- test
+		<separator/>
+		<button command="single view"/>
+		<button command="horizontally split view"/>
+		<button command="vertically split view"/>
+		<button command="quad view"/>
+-->
+	</toolbar>
+	
+	<sidebar position="east"/>
+	
+	<menu name="menubar">
+		<menu name="File">
+			<item command="new"/>
+			<item command="open"/>
+			<item command="append"/>
+			<item command="save"/>
+			<item command="save as"/>
+			<separator/>
+			<menu name="Import">
+				<item command="import spatch"/>
+				<item command="import animationmaster"/>
+			</menu>
+			<menu name="Export">
+				<item command="export aliaswavefront"/>
+				<item command="export povray"/>
+				<item command="export renderman"/>
+			</menu>
+			<separator/>
+			<item command="quit"/>
+		</menu>
+		<menu name="Options">
+			<item command="synchronize viewports"/>
+			<item command="colors settings"/>
+			<item command="grid spacing settings"/>
+			<item command="realtime renderer settings"/>
+			<item command="install jogl"/>
+			<menu name="Look and feel">
+				<item command="jpatch lookandfeel"/>
+				<item command="crossplatform lookandfeel"/>
+				<item command="system lookandfeel"/>
+			</menu>
+			<item command="phoneme morph mapping"/>
+		</menu>
+		<menu name="Test">
+			<item command="dump"/>
+			<item command="dump undo stack"/>
+			<item command="check model"/>
+			<item command="controlpoint browser"/>
+		</menu>
+		<menu name="Help">
+			<item command="show about"/>
+			<item command="show splashscreen"/>
+		</menu>
+		<menu name="Menu test">
+			<menu name="Tools">
+				<item command="default tool"/>
+				<item command="add curve segment"/>
+				<item command="add bone"/>
+				<item command="rotate tool"/>
+				<item command="weight selection tool"/>
+				<item command="rotoscope tool"/>
+			</menu>
+			<menu name="View">
+				<item command="single view"/>
+				<item command="horizontally split view"/>
+				<item command="vertically split view"/>
+				<item command="quad view"/>
+				<menu name="View2">
+					<item command="single view"/>
+					<item command="horizontally split view"/>
+					<item command="vertically split view"/>
+					<item command="quad view"/>
+				</menu>
+			</menu>
+		</menu>
+	</menu>
+<!--
+	<menu name="viewport popup">
+		<menu name="show">
+			<item command="show points"/>
+			<item command="show curves"/>
+			<item command="show patches"/>
+			<item command="show rotoscope"/>
+		</menu>
+		<menu name="view">
+			<item command="front view"/>
+			<item command="rear view"/>
+			<item command="top view"/>
+			<item command="bottom view"/>
+			<item command="left view"/>
+			<item command="right view"/>
+			<item command="bird's eye view"/>
+		</menu>
+		<menu name="rotoscope">
+			<item command="set rotoscope image"/>
+			<item command="clear rotoscope image"/>
+		</menu>
+		<item command="lock view"/>
+		<separator/>
+		<menu name="selection"/>
+			<item command="select none"/>
+			<item command="select all"/>
+			<item command="invert selection"/>
+			<item command="expand selection"/>
+		</menu>
+		<menu name="tools">
+			<menu name="flip">
+				<item command="flip x"/>
+				<item command="flip y"/>
+				<item command="flip z"/>
+			</menu>
+			<item command="flip patches"/>
+			<item command="align patches"/>
+			<item command="align controlpoints"/>
+			<item command="automirrot"/>
+			<item command="add stubs"/>
+			<item command="remove stubs"/>
+			<menu name="tangents"/>
+				<item command="peak tangents"/>
+				<item command="round tangents"/>
+				<item command="spatch round tangents"/>
+			</menu>
+			<item command="assign controlpoints to bones"/>
+		</menu>
+	</menu>
+-->
+</layout>	
+		
+
+			
+		
+		
+	
+	

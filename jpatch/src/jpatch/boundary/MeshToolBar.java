@@ -39,7 +39,7 @@ public final class MeshToolBar extends JToolBar {
 	private AbstractAction latheEditorAction = new LatheEditorAction();
 	private AbstractAction addBoneAction = new AddBoneAction();
 	
-	private AbstractButton buttonSelectMove = new JPatchToggleButton(selectMoveAction);
+	private AbstractButton buttonSelectMove = Command.getButtonFor("default tool");//new JPatchToggleButton(selectMoveAction);
 	private AbstractButton buttonWeight = new JPatchToggleButton(weightAction);
 	private AbstractButton buttonAdd = new JPatchToggleButton(addControlPointAction);
 	private AbstractButton buttonAddMulti = new JPatchToggleButton(addMultiControlPointAction);

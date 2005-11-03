@@ -22,6 +22,7 @@ import jpatch.boundary.tools.*;
 import jpatch.control.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.laf.*;
+import jpatch.boundary.action.*;
 
 public final class MainFrame extends JFrame {
 	/**
@@ -143,7 +144,8 @@ public final class MainFrame extends JFrame {
 			
 			
 			
-			
+			UIFactory uiFactory = new UIFactory();
+			uiFactory.parseLayout(ClassLoader.getSystemResource("jpatch/boundary/layout.xml"));
 			
 			getContentPane().setLayout(new BorderLayout());
 			
@@ -163,20 +165,23 @@ public final class MainFrame extends JFrame {
 			
 			mainMenu = new MainMenu();
 			
-			setJMenuBar(mainMenu);
+//			setJMenuBar(mainMenu);
+			setJMenuBar((JMenuBar) uiFactory.getComponent("menubar"));
 			
 			mainToolBar = new MainToolBar(bgAction);
 			//mainToolBar.setOrientation(SwingConstants.HORIZONTAL);
-			getContentPane().add(mainToolBar,BorderLayout.NORTH);
+//			getContentPane().add(mainToolBar,BorderLayout.NORTH);
+			getContentPane().add(uiFactory.getComponent("main toolbar"), uiFactory.getLayout("main toolbar"));
 			
 //			boneToolBar = new BoneToolBar(bgAction);
 			
-			meshToolBar = new MeshToolBar(bgAction);
-			meshToolBar.addKeyBindings();
-			morphToolBar = new MorphToolBar(bgAction);
+//			meshToolBar = new MeshToolBar(bgAction);
+//			meshToolBar.addKeyBindings();
+//			morphToolBar = new MorphToolBar(bgAction);
 			
 			//meshToolBar.setOrientation(SwingConstants.VERTICAL);
-			getContentPane().add(meshToolBar,BorderLayout.WEST);
+//			getContentPane().add(meshToolBar,BorderLayout.WEST);
+			getContentPane().add(uiFactory.getComponent("edit toolbar"), uiFactory.getLayout("edit toolbar"));
 			
 			//mainToolBar.setFloatable(false);
 			//meshToolBar.setFloatable(false);
@@ -196,21 +201,17 @@ public final class MainFrame extends JFrame {
 			KeyEventDispatcher keyEventDispatcher = new KeyEventDispatcher() {
 				public boolean dispatchKeyEvent(KeyEvent e) {
 					Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-					System.out.println(focusOwner);
-					if (
-							focusOwner instanceof JTextComponent ||
-							e.isActionKey()
-							)
+					if (focusOwner instanceof JTextComponent)
 						return false;
 					switch (e.getID()) {
 					case KeyEvent.KEY_PRESSED:
-			            keyAdapter.keyPressed(e);
+			            Command.getInstance().keyPressed(e);
 			          break;
 			          case KeyEvent.KEY_RELEASED:
-			        	  keyAdapter.keyReleased(e);
+			        	  //
 			          break;
 			          case KeyEvent.KEY_TYPED:
-			        	  keyAdapter.keyTyped(e);
+			        	  //Command.getInstance().keyTyped(e);
 			          break;
 					}
 					return true;
@@ -263,7 +264,7 @@ public final class MainFrame extends JFrame {
 				JPatchSettings.getInstance().bFirstStart = false;
 			}
 			
-			meshToolBar.reset();
+//			meshToolBar.reset();
 			//JPatchScreen.setTool(new RotoscopeTool());
 			requestFocus();
 			//jpatchScreen.setMouseListeners(new ChangeViewListener(MouseEvent.BUTTON1,ChangeViewListener.ROTATE));
