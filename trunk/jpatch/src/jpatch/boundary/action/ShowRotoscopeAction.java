@@ -9,16 +9,15 @@ public final class ShowRotoscopeAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private ViewDefinition viewDefinition;
 	
-	public ShowRotoscopeAction(ViewDefinition viewDefinition) {
+	public ShowRotoscopeAction() {
 		super("rotoscope");
-		this.viewDefinition = viewDefinition;
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		viewDefinition.showRotoscope(!viewDefinition.showRotoscope());
-		viewDefinition.repaint();
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition();
+		viewDef.showRotoscope(!viewDef.showRotoscope());
+		viewDef.repaint();
 	}
 }
 

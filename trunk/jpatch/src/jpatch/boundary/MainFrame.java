@@ -58,6 +58,7 @@ public final class MainFrame extends JFrame {
 	private MutableTreeNode treenodeRoot;
 //	private MutableTreeNode treenodeModel;
 	private Morph editedMorph;
+	
 //	private javax.swing.Timer defaultToolTimer = new javax.swing.Timer(0, new ActionListener() {
 //		public void actionPerformed(ActionEvent event) {
 //			defaultToolTimer.stop();
@@ -167,6 +168,8 @@ public final class MainFrame extends JFrame {
 			
 //			setJMenuBar(mainMenu);
 			setJMenuBar((JMenuBar) uiFactory.getComponent("menubar"));
+			
+			jpatchScreen.setPopupMenu((JPopupMenu) uiFactory.getComponent("viewport popup"));
 			
 			mainToolBar = new MainToolBar(bgAction);
 			//mainToolBar.setOrientation(SwingConstants.HORIZONTAL);
@@ -366,7 +369,7 @@ public final class MainFrame extends JFrame {
 		initTree();
 		sideBar.setTree(tree);
 		//getContentPane().add(sideBar,BorderLayout.EAST);
-		meshToolBar.reset();
+//		meshToolBar.reset();
 		//repaint();
 		//sideBar.repaint();
 		JPatchSettings.getInstance().strJPatchFile = "";
@@ -462,7 +465,8 @@ public final class MainFrame extends JFrame {
 	public void setSelection(Selection selection) {
 //		getModel().removeSelection(this.selection);
 		this.selection = selection;
-		meshToolBar.getWeightButton().setEnabled(selection != null && !selection.isSingle());
+//		meshToolBar.getWeightButton().setEnabled(selection != null && !selection.isSingle());
+		Command.getActionFor("weight selection tool").setEnabled(selection != null && !selection.isSingle());
 		/* unhide new selection */
 		if (selection != null) {
 			selection.setActive(true);
