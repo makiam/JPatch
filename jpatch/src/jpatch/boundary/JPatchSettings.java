@@ -132,44 +132,12 @@ public class JPatchSettings {
 	
 	//>>>>> test-replace
 //	public String[] astrKeyMap;
-	public String[] astrKeyMap = new String[] {
+//	public String[] astrKeyMap = new String[] {
 //	public String[] astrKeyMapDefault = new String[] {
-		"Single View				Single view					1",
-		"Horizontal Split View		Horizontal split view		2",
-		"Vertical Split View		Vertical split view			3",
-		"Quad View					Quad view					4",
-		"Rotate View				Rotate view					SHIFT-R",
-		"Move View					Move view					SHIFT-M",
-		"Zoom View					Zoom view					SHIFT-Z",
-		"Undo						Undo						CTRL-Z",
-		"Redo						Redo						CTRL-Y",
-		"Lock X						Lock/unlock X				X",
-		"Lock Y						Lock/unlock Y				Y",
-		"Lock Z						Lock/unlock Z				Z",
-		"Default Tool				Default tool				ESC",
-		"Add Point					Add point					A",
-		"Add Multiple Points		Add multiple points			SHIFT-A",
-		"Magnet Tool				Magnet tool					M",
-		"Rotate Tool				Rotate tool					R",
-		"Remove Points				Remove points				BACKSPACE",
-		"Delete Points				Delete points				DEL",
-		"Compute Patches			Compute patches				F5",
-		"Clone						Copy						CTRL-C",
-		"Extrude					Extrude						E",
-		"Lathe						Lathe						L",
-		"Extend Selection			Extend selection			ENTER",
-		"Next Curve					cycle through curves		TAB",
-		"Insert Point				Insert point				INS",
-		"Bottom View				Bottom view					NUM0",
-		"Front View					Front view					NUM2",
-		"Right View					Right view					NUM4",
-		"Top View					Top view					NUM5",
-		"Left View					Left view					NUM6",
-		"Bird's Eye View			Bird's eye view				NUM7",
-		"Rear View					Rear view					NUM8",
-		"Grid						Snap to grid				G",
-		"Hide						Hide/show unselected points	H"
-	};
+	
+	private Map defaultCommandKeyMap = new HashMap();
+	public Map commandKeyMap = new HashMap();
+
 	//<<<<< test-replace
 	
 	private static JPatchSettings INSTANCE;
@@ -181,6 +149,79 @@ public class JPatchSettings {
 	 */
 	public JPatchSettings() {
 		
+		defaultCommandKeyMap.put("single view",					"1"				);
+		defaultCommandKeyMap.put("horizontally split view",		"2"				);
+		defaultCommandKeyMap.put("vertically split view",		"3"				);
+		defaultCommandKeyMap.put("quad view",					"4"				);
+		defaultCommandKeyMap.put("rotate view",					"shift R"		);
+		defaultCommandKeyMap.put("move view",					"shift M"		);
+		defaultCommandKeyMap.put("zoom view",					"shift Z"		);
+		defaultCommandKeyMap.put("undo",						"ctrl Z"		);
+		defaultCommandKeyMap.put("redo",						"ctrl Y"		);
+		defaultCommandKeyMap.put("lock x",						"X"				);
+		defaultCommandKeyMap.put("lock y",						"Y"				);
+		defaultCommandKeyMap.put("lock z",						"Z"				);
+		defaultCommandKeyMap.put("default tool",				"ESCAPE"		);
+		defaultCommandKeyMap.put("rotate tool",					"R"				);
+		defaultCommandKeyMap.put("add curve segment",			"A"				);
+		defaultCommandKeyMap.put("add bone",					"B"				);
+		defaultCommandKeyMap.put("remove",						"BACK_SPACE"	);
+		defaultCommandKeyMap.put("delete",						"DELETE"		);
+		defaultCommandKeyMap.put("insert point",				"INSERT"		);
+		defaultCommandKeyMap.put("compute patches",				"F5"			);
+		defaultCommandKeyMap.put("clone",						"ctrl C"		);
+		defaultCommandKeyMap.put("extrude",						"E"				);
+		defaultCommandKeyMap.put("lathe",						"L"				);
+		defaultCommandKeyMap.put("expand selection",			"ENTER"			);
+		defaultCommandKeyMap.put("next curve",					"TAB"			);
+		defaultCommandKeyMap.put("prev curve",					"shift TAB"		);
+		defaultCommandKeyMap.put("next point",					"RIGHT"			);
+		defaultCommandKeyMap.put("prev point",					"LEFT"			);
+		defaultCommandKeyMap.put("bottom view",					"NUM0"			);
+		defaultCommandKeyMap.put("top view",					"NUM5"			);
+		defaultCommandKeyMap.put("front view",					"NUM2"			);
+		defaultCommandKeyMap.put("rear view",					"NUM8"			);
+		defaultCommandKeyMap.put("left view",					"NUM4"			);
+		defaultCommandKeyMap.put("right view",					"NUM6"			);
+		defaultCommandKeyMap.put("bird's eye view",				"NUM7"			);
+		defaultCommandKeyMap.put("snap to grid",				"G"			);
+		defaultCommandKeyMap.put("hide",						"H"			);
+		
+//		"Single View				Single view					1",
+//		"Horizontal Split View		Horizontal split view		2",
+//		"Vertical Split View		Vertical split view			3",
+//		"Quad View					Quad view					4",
+//		"Rotate View				Rotate view					SHIFT-R",
+//		"Move View					Move view					SHIFT-M",
+//		"Zoom View					Zoom view					SHIFT-Z",
+//		"Undo						Undo						CTRL-Z",
+//		"Redo						Redo						CTRL-Y",
+//		"Lock X						Lock/unlock X				X",
+//		"Lock Y						Lock/unlock Y				Y",
+//		"Lock Z						Lock/unlock Z				Z",
+//		"Default Tool				Default tool				ESC",
+//		"Add Point					Add point					A",
+//		"Add Multiple Points		Add multiple points			SHIFT-A",
+//		"Magnet Tool				Magnet tool					M",
+//		"Rotate Tool				Rotate tool					R",
+//		"Remove Points				Remove points				BACKSPACE",
+//		"Delete Points				Delete points				DEL",
+//		"Compute Patches			Compute patches				F5",
+//		"Clone						Copy						CTRL-C",
+//		"Extrude					Extrude						E",
+//		"Lathe						Lathe						L",
+//		"Extend Selection			Extend selection			ENTER",
+//		"Next Curve					cycle through curves		TAB",
+//		"Insert Point				Insert point				INS",
+//		"Bottom View				Bottom view					NUM0",
+//		"Front View					Front view					NUM2",
+//		"Right View					Right view					NUM4",
+//		"Top View					Top view					NUM5",
+//		"Left View					Left view					NUM6",
+//		"Bird's Eye View			Bird's eye view				NUM7",
+//		"Rear View					Rear view					NUM8",
+//		"Grid						Snap to grid				G",
+//		"Hide						Hide/show unselected points	H"
 		//>>>>> test-add
 //		mapDefaults.put("keyMap", join("||", astrKeyMapDefault));
 		//<<<<< test-add
@@ -529,6 +570,10 @@ public class JPatchSettings {
 		//strPixieLauncher = getString("pixieLauncher");
 		//str3DelightLauncher = getString("3delightLauncher");
 		//strBmrtLauncher = getString("bmrtLauncher");
+		for (Iterator it = new ArrayList(defaultCommandKeyMap.keySet()).iterator(); it.hasNext(); ) {
+			String command = (String) it.next();
+			commandKeyMap.put(command, userPrefs.get(command, (String) defaultCommandKeyMap.get(command)));
+		}
 	}
 	
 	public void loadDefaults() {
@@ -657,6 +702,8 @@ public class JPatchSettings {
 		bDeleteSources = getBooleanDefault("deleteSources");
 		
 		iRealtimeRenderer= getIntDefault("realtimeRenderer");
+		commandKeyMap.clear();
+		commandKeyMap.putAll(defaultCommandKeyMap);
 	}
 	
 	/**
@@ -664,7 +711,7 @@ public class JPatchSettings {
 	 */
 	public void saveSettings() {
 		//>>>>> test-add
-		putString("keyMap", join("||", astrKeyMap));
+//		putString("keyMap", join("||", astrKeyMap));
 		//<<<<< test-add
 		putBoolean("firstStart", bFirstStart);
 		
@@ -785,6 +832,11 @@ public class JPatchSettings {
 		putBoolean("deleteSources", bDeleteSources);
 		
 		putInt("realtimeRenderer", iRealtimeRenderer);
+		
+		for (Iterator it = new ArrayList(commandKeyMap.keySet()).iterator(); it.hasNext(); ) {
+			String command = (String) it.next();
+			putString(command, (String) commandKeyMap.get(command));
+		}
 		
 		try {
 			userPrefs.flush();

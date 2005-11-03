@@ -7,32 +7,32 @@ public class KeyMapping {
 	private static JPatchSettings settings = JPatchSettings.getInstance();
 	
 	public static JPatchKey getKey(String function) {
-		for (int i = 0; i < settings.astrKeyMap.length; i++) {
-			String[] m = settings.astrKeyMap[i].split("\t+");
-			if (m[0].toLowerCase().equals(function.toLowerCase())) {
-				return getJPatchKey(m[2]);
-			}
-		}
+//		for (int i = 0; i < settings.astrKeyMap.length; i++) {
+//			String[] m = settings.astrKeyMap[i].split("\t+");
+//			if (m[0].toLowerCase().equals(function.toLowerCase())) {
+//				return getJPatchKey(m[2]);
+//			}
+//		}
 		return null;
 	}
 
 	public static String getDescription(String function) {
-		for (int i = 0; i < settings.astrKeyMap.length; i++) {
-			String[] m = settings.astrKeyMap[i].split("\t+");
-			if (m[0].toLowerCase().equals(function.toLowerCase())) {
-				return (m[1] + "  [" + m[2] + "]");
-			}
-		}
+//		for (int i = 0; i < settings.astrKeyMap.length; i++) {
+//			String[] m = settings.astrKeyMap[i].split("\t+");
+//			if (m[0].toLowerCase().equals(function.toLowerCase())) {
+//				return (m[1] + "  [" + m[2] + "]");
+//			}
+//		}
 		return null;
 	}
 
 	public static String getKeyString(String function) {
-		for (int i = 0; i < settings.astrKeyMap.length; i++) {
-			String[] m = settings.astrKeyMap[i].split("\t+");
-			if (m[0].toLowerCase().equals(function.toLowerCase())) {
-				return ("  [" + m[2] + "]");
-			}
-		}
+//		for (int i = 0; i < settings.astrKeyMap.length; i++) {
+//			String[] m = settings.astrKeyMap[i].split("\t+");
+//			if (m[0].toLowerCase().equals(function.toLowerCase())) {
+//				return ("  [" + m[2] + "]");
+//			}
+//		}
 		return null;
 	}
 	
