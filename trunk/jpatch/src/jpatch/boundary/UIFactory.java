@@ -122,7 +122,11 @@ public class UIFactory extends DefaultHandler {
 				else
 					toolBar.add(JPatchSeparator.createVerticalSeparator());
 			} else if (getMenu() != null) {
-				((JMenu) getMenu()).addSeparator();
+				JComponent menu = getMenu();
+				if (menu instanceof JMenu)
+					((JMenu) menu).addSeparator();
+				else if (menu instanceof JPopupMenu)
+					((JPopupMenu) menu).addSeparator();
 			}
 		} else if (localName.equals("button")) {
 			for (int i = 0; i < attributes.getLength(); i++) {

@@ -145,10 +145,10 @@
 			<item command="set rotoscope image"/>
 			<item command="clear rotoscope image"/>
 		</menu>
-<!--
 		<item command="lock view"/>
+		<item command="unlock view"/>
 		<separator/>
-		<menu name="selection"/>
+		<menu name="selection">
 			<item command="select none"/>
 			<item command="select all"/>
 			<item command="invert selection"/>
@@ -163,17 +163,16 @@
 			<item command="flip patches"/>
 			<item command="align patches"/>
 			<item command="align controlpoints"/>
-			<item command="automirrot"/>
+			<item command="automirror"/>
 			<item command="add stubs"/>
 			<item command="remove stubs"/>
-			<menu name="tangents"/>
-				<item command="peak tangents"/>
-				<item command="round tangents"/>
-				<item command="spatch round tangents"/>
+			<menu name="tangents">
+				<item command="change tangents: peak"/>
+				<item command="change tangents: round"/>
+				<item command="change tangents: spatch"/>
 			</menu>
 			<item command="assign controlpoints to bones"/>
 		</menu>
--->
 	</menu>
 </layout>	
 		
