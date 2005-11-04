@@ -1,5 +1,5 @@
 /*
- * $Id: UIFactory.java,v 1.1 2005/11/03 16:59:37 sascha_l Exp $
+ * $Id: UIFactory.java,v 1.2 2005/11/04 15:55:22 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -122,7 +122,11 @@ public class UIFactory extends DefaultHandler {
 				else
 					toolBar.add(JPatchSeparator.createVerticalSeparator());
 			} else if (getMenu() != null) {
-				((JMenu) getMenu()).addSeparator();
+				JComponent menu = getMenu();
+				if (menu instanceof JMenu)
+					((JMenu) menu).addSeparator();
+				else if (menu instanceof JPopupMenu)
+					((JPopupMenu) menu).addSeparator();
 			}
 		} else if (localName.equals("button")) {
 			for (int i = 0; i < attributes.getLength(); i++) {

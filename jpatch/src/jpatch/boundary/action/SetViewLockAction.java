@@ -11,18 +11,23 @@ public final class SetViewLockAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private ViewDefinition viewDefinition;
+	private boolean lock;
 	
-	public SetViewLockAction(ViewDefinition viewDefinition) {
-		super("lock view to selection");
-		this.viewDefinition = viewDefinition;
+	public SetViewLockAction(boolean lock) {
+		super(lock ? "lock view to selection" : "unlock view");
+		this.lock = lock;
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
+		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition();
 		Selection selection = MainFrame.getInstance().getSelection();
-		if (selection != null) {
-			viewDefinition.setLock(new Point3f(selection.getPivot()));
+		if (lock && selection != null) {
+			viewDef.setLock(new Point3f(selection.getPivot()));
+		} else {
+			viewDef.setLock(null);
 		}
+		Command.setViewDefinition(viewDef);
+		viewDef.repaint();
 		//((JPatchCanvas)viewDefinition.getViewport()).updateImage();
 		//viewDefinition.reset();
 	}

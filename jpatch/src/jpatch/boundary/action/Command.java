@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.2 2005/11/03 20:58:50 sascha_l Exp $
+ * $Id: Command.java,v 1.3 2005/11/04 15:55:22 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -44,6 +44,7 @@ public final class Command implements KeyListener {
 	private Map commandActionMap = new HashMap();
 	private Map commandButtonMap = new HashMap();
 	private Map commandMenuItemMap = new HashMap();
+	private Map commandKeyMap = new HashMap();
 	private Map keyCommandMap = new HashMap();
 	
 	public static Command getInstance() {
@@ -61,6 +62,13 @@ public final class Command implements KeyListener {
 		newButton.setText(button.getText());
 		newButton.setIcon(button.getIcon());
 		newButton.setSelectedIcon(button.getSelectedIcon());
+		String toolTipText = (String) ((Action) INSTANCE.commandActionMap.get(command)).getValue(Action.SHORT_DESCRIPTION);
+		if (toolTipText == null)
+			toolTipText = command;
+		String key = (String) INSTANCE.commandKeyMap.get(command);
+		if (key != null)
+			toolTipText = toolTipText + " [" + key + "]";
+		newButton.setToolTipText(toolTipText);
 		return newButton;
 	}
 	
@@ -73,7 +81,12 @@ public final class Command implements KeyListener {
 			newItem = new JCheckBoxMenuItem();//menuItem.getAction());
 		else
 			newItem = new JMenuItem();//menuItem.getAction());
-		newItem.setText(menuItem.getText());
+		String itemText = menuItem.getText();
+		String key = (String) INSTANCE.commandKeyMap.get(command);
+		System.out.println(command + " " + key);
+		if (key != null)
+			itemText = itemText + " [" + key + "]";
+		newItem.setText(itemText);
 		newItem.setIcon(menuItem.getIcon());
 		newItem.setModel(menuItem.getModel());
 		return newItem;
@@ -90,6 +103,9 @@ public final class Command implements KeyListener {
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("show curves")).setSelected(viewDef.renderCurves());
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("show patches")).setSelected(viewDef.renderPatches());
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("show rotoscope")).setSelected(viewDef.showRotoscope());
+		((JMenuItem) INSTANCE.commandMenuItemMap.get("lock view")).setSelected(viewDef.isLocked());
+		((Action) INSTANCE.commandActionMap.get("unlock view")).setEnabled(viewDef.isLocked());
+		((Action) INSTANCE.commandActionMap.get("show patches")).setEnabled(viewDef.getDrawable().isShadingSupported());
 	}
 	
 	public Command() {
@@ -172,7 +188,7 @@ public final class Command implements KeyListener {
 		put("dump",						new DumpAction(),					new JMenuItem());
 		put("dump undo stack",			new DumpUndoStackAction(),			new JMenuItem());
 		put("check model",				new CheckModelAction(),				new JMenuItem());
-		put("controlpoint browser",		new ControlPointBrowserAction(),	new JCheckBoxMenuItem());
+		put("controlpoint browser",		new ControlPointBrowserAction(),	new JMenuItem());
 		
 		// Help
 		put("show about",				new AboutAction(),					new JMenuItem());
@@ -200,6 +216,31 @@ public final class Command implements KeyListener {
 		// Rotoscope
 		put("set rotoscope image",		new SetRotoscopeAction(),	new JMenuItem());
 		put("clear rotoscope image",	new ClearRotoscopeAction(),	new JMenuItem());
+		
+		// Lock view
+		put("lock view",				new SetViewLockAction(true),new JCheckBoxMenuItem());
+		put("unlock view",				new SetViewLockAction(true),new JMenuItem());
+		
+		// Selection
+		put("select none",				new SelectNoneAction(),		new JMenuItem());
+		put("select all",				new SelectAllAction(),		new JMenuItem());
+		put("invert selection",			new InvertSelectionAction(),new JMenuItem());
+		put("expand selection",			new ExtendSelectionAction(),new JMenuItem());
+		
+		// Tools
+		put("flip x",							new FlipAction(FlipAction.X),	new JMenuItem());
+		put("flip y",							new FlipAction(FlipAction.Y),	new JMenuItem());
+		put("flip z",							new FlipAction(FlipAction.Z),	new JMenuItem());
+		put("flip patches",						new FlipPatchesAction(),		new JMenuItem());
+		put("align patches",					new AlignPatchesAction(),		new JMenuItem());
+		put("align controlpoints",				new AlignAction(),				new JMenuItem());
+		put("automirror",						new AutoMirrorAction(),			new JMenuItem());
+		put("add stubs",						new AddStubsAction(),			new JMenuItem());
+		put("remove stubs",						new RemoveStubsAction(),		new JMenuItem());
+		put("change tangents: round",			new ChangeTangentModeAction(ChangeTangentModeAction.JPATCH),	new JMenuItem());
+		put("change tangents: peak",			new ChangeTangentModeAction(ChangeTangentModeAction.PEAK),		new JMenuItem());
+		put("change tangents: spatch",			new ChangeTangentModeAction(ChangeTangentModeAction.SPATCH),	new JMenuItem());
+		put("assign controlpoints to bones",	new AssignPointsToBonesAction(),	new JMenuItem());
 		
 		/*
 		 * Pressed icons
@@ -241,6 +282,18 @@ public final class Command implements KeyListener {
 				"right view",
 				"bird's eye view"
 		}, 0);
+		
+		String laf = UIManager.getLookAndFeel().getClass().getName();
+		int i = 0;
+		if (laf.equals(UIManager.getCrossPlatformLookAndFeelClassName()))
+			i = 1;
+		else if (laf.equals(UIManager.getSystemLookAndFeelClassName()))
+			i = 2;
+		createGroup(new String[] {
+				"jpatch lookandfeel",
+				"crossplatform lookandfeel",
+				"system lookandfeel"
+		}, i);
 	}
 
 	public void executeCommand(String command) {
@@ -302,8 +355,10 @@ public final class Command implements KeyListener {
 				menuItem.setText(command);
 		}
 		String keyString = (String) JPatchSettings.getInstance().commandKeyMap.get(command);
-		if (keyString != null)
+		if (keyString != null) {
 			keyCommandMap.put(KeyStroke.getKeyStroke(keyString), command);
+			commandKeyMap.put(command, keyString);
+		}
 	}
 	
 	private void createGroup(String[] commands, int selectedIndex) {
