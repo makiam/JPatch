@@ -192,7 +192,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 				edit.addEdit(new AtomicChangeSelection(null));
 			edit.addEdit(new AtomicChangeTool(new DefaultTool()));
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
-			MainFrame.getInstance().getMeshToolBar().reset();
+//			MainFrame.getInstance().getMeshToolBar().reset();
 			MainFrame.getInstance().getJPatchScreen().update_all();
 //			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
 			bActive = false;

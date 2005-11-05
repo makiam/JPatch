@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.3 2005/11/04 15:55:22 sascha_l Exp $
+ * $Id: Command.java,v 1.4 2005/11/05 09:45:30 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -25,18 +25,13 @@ package jpatch.boundary.action;
  * @author sascha
  */
 
-import java.awt.ItemSelectable;
+
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import sun.security.action.OpenFileInputStreamAction;
 
 import jpatch.boundary.*;
-import jpatch.boundary.laf.SmoothLookAndFeel;
-import jpatch.boundary.mouse.RotateViewMotionListener;
+import jpatch.boundary.laf.*;
 
 public final class Command implements KeyListener {
 	private static final boolean DEBUG = true;
@@ -104,8 +99,9 @@ public final class Command implements KeyListener {
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("show patches")).setSelected(viewDef.renderPatches());
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("show rotoscope")).setSelected(viewDef.showRotoscope());
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("lock view")).setSelected(viewDef.isLocked());
-		((Action) INSTANCE.commandActionMap.get("unlock view")).setEnabled(viewDef.isLocked());
-		((Action) INSTANCE.commandActionMap.get("show patches")).setEnabled(viewDef.getDrawable().isShadingSupported());
+		INSTANCE.enableCommand("unlock view", viewDef.isLocked());
+		INSTANCE.enableCommand("show patches", viewDef.getDrawable().isShadingSupported());
+		INSTANCE.enableCommand("clear rotoscope image", MainFrame.getInstance().getModel().getRotoscope(viewDef.getView()) != null);
 	}
 	
 	public Command() {
@@ -294,9 +290,18 @@ public final class Command implements KeyListener {
 				"crossplatform lookandfeel",
 				"system lookandfeel"
 		}, i);
+		
+		/*
+		 * Disable commands
+		 */
+		enableCommand("clear rotoscope image", false);
+		enableCommand("lock x", false);
+		enableCommand("lock y", false);
+		enableCommand("lock z", false);
 	}
-
+	
 	public void executeCommand(String command) {
+		checkCommand(command);
 		AbstractButton button = (AbstractButton) commandButtonMap.get(command);
 		if (button != null) {
 			button.doClick();
@@ -306,6 +311,21 @@ public final class Command implements KeyListener {
 		if (action != null) {
 			action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, (String) action.getValue(Action.ACTION_COMMAND_KEY))); 
 		}
+	}
+	
+	public void enableCommand(String command, boolean enable) {
+		checkCommand(command);
+		((Action) commandActionMap.get(command)).setEnabled(enable);
+	}
+	
+	public void enableCommands(String[] commands, boolean enable) {
+		for (int i = 0; i < commands.length; i++)
+			enableCommand(commands[i], enable);
+	}
+	
+	public boolean isCommandEnabled(String command) {
+		checkCommand(command);
+		return ((Action) commandActionMap.get(command)).isEnabled();
 	}
 	
 	/*
@@ -363,8 +383,15 @@ public final class Command implements KeyListener {
 	
 	private void createGroup(String[] commands, int selectedIndex) {
 		ButtonGroup items = new ButtonGroup();
-		for (int i = 0; i < commands.length; i++)
+		for (int i = 0; i < commands.length; i++) {
+			checkCommand(commands[i]);
 			items.add((JMenuItem) commandMenuItemMap.get(commands[i]));
+		}
 		items.setSelected(((JMenuItem) commandMenuItemMap.get(commands[selectedIndex])).getModel(), true);
+	}
+	
+	private void checkCommand(String command) {
+		if (!commandActionMap.containsKey(command))
+			throw new IllegalArgumentException("unknown command: " + command);
 	}
 }
