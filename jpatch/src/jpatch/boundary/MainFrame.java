@@ -273,6 +273,7 @@ public final class MainFrame extends JFrame {
 			//jpatchScreen.setMouseListeners(new ChangeViewListener(MouseEvent.BUTTON1,ChangeViewListener.ROTATE));
 			//jpatchScreen.setMouseListeners(new ChangeViewListener(MouseEvent.BUTTON2,ChangeViewListener.ZOOM));
 			//jpatchScreen.setMouseListeners(new ChangeViewListener(MouseEvent.BUTTON3,ChangeViewListener.MOVE));
+			setSelection(null);
 			setVisible(true);
 			
 			if (!VersionInfo.release) {
@@ -364,7 +365,7 @@ public final class MainFrame extends JFrame {
 		//INSTANCE = new MainFrame(new Model());
 		//getContentPane().remove(sideBar);
 		model = new Model();
-		selection = null;
+		setSelection(null);
 		undoManager.clear();
 		initTree();
 		sideBar.setTree(tree);
@@ -464,9 +465,10 @@ public final class MainFrame extends JFrame {
 	
 	public void setSelection(Selection selection) {
 //		getModel().removeSelection(this.selection);
+		boolean bonesAndPoints = false;
+		boolean moreThanOnePoint = false;
 		this.selection = selection;
 //		meshToolBar.getWeightButton().setEnabled(selection != null && !selection.isSingle());
-		Command.getActionFor("weight selection tool").setEnabled(selection != null && !selection.isSingle());
 		/* unhide new selection */
 		if (selection != null) {
 			selection.setActive(true);
@@ -486,7 +488,41 @@ public final class MainFrame extends JFrame {
 			if (iMode != MORPH)
 				flags |= Selection.MORPHS;
 			selection.arm(flags);
+			int points = 0, bones = 0;
+			for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
+				Object o = it.next();
+				if (o instanceof ControlPoint)
+					points++;
+				else if (o instanceof Bone.BoneTransformable)
+					bones++;
+			}
+			bonesAndPoints = (points > 0 && bones > 1);
+			moreThanOnePoint = (points > 1);
 		}
+		Command.getInstance().enableCommand("select none", selection != null);
+		Command.getInstance().enableCommand("invert selection", selection != null);
+		Command.getInstance().enableCommand("expand selection", selection != null);
+		Command.getInstance().enableCommand("align controlpoints", selection != null);
+		Command.getInstance().enableCommand("change tangents: round", selection != null);
+		Command.getInstance().enableCommand("change tangents: peak", selection != null);
+		Command.getInstance().enableCommand("change tangents: spatch", selection != null);
+		Command.getInstance().enableCommand("automirror", selection != null);
+		Command.getInstance().enableCommand("flip x", moreThanOnePoint);
+		Command.getInstance().enableCommand("flip y", moreThanOnePoint);
+		Command.getInstance().enableCommand("flip z", moreThanOnePoint);
+		Command.getInstance().enableCommand("flip patches", moreThanOnePoint);
+		Command.getInstance().enableCommand("make patch", moreThanOnePoint);
+		Command.getInstance().enableCommand("align patches", moreThanOnePoint);
+		Command.getInstance().enableCommand("make patch", moreThanOnePoint);
+		Command.getInstance().enableCommand("add stubs", moreThanOnePoint);
+		Command.getInstance().enableCommand("remove stubs", moreThanOnePoint);
+		Command.getInstance().enableCommand("make patch", moreThanOnePoint);
+		Command.getInstance().enableCommand("weight selection tool", moreThanOnePoint);
+		Command.getInstance().enableCommand("rotate tool", moreThanOnePoint);
+		Command.getInstance().enableCommand("extrude", moreThanOnePoint);
+		Command.getInstance().enableCommand("lathe", moreThanOnePoint);
+		Command.getInstance().enableCommand("clone", moreThanOnePoint);
+		Command.getInstance().enableCommand("assign controlpoints to bones", bonesAndPoints);
 	}
 	
 	public java.util.List getSelectionsContaining(ControlPoint cp) {
