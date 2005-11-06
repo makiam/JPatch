@@ -18,7 +18,7 @@ public final class RotateAction extends AbstractAction {
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.ROTATE) {
+//		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.ROTATE) {
 			/*
 			MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
 			JPatchCompoundEdit compoundEdit = new JPatchCompoundEdit();
@@ -30,13 +30,14 @@ public final class RotateAction extends AbstractAction {
 			if (selection != null && selection.getMap().size() > 1) {
 				//MainFrame.getInstance().getJPatchScreen().setTool(new RotateTool());
 				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(new RotateTool()));
-				MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.ROTATE);
-			} else {
-				MainFrame.getInstance().getMeshToolBar().reset();
+//				MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.ROTATE);
 			}
-		} else {
-			MainFrame.getInstance().getMeshToolBar().reset();
-		}
+//			} else {
+//				MainFrame.getInstance().getMeshToolBar().reset();
+//			}
+//		} else {
+//			MainFrame.getInstance().getMeshToolBar().reset();
+//		}
 	}
 }
 

@@ -28,8 +28,8 @@ public final class EditMorphAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		int mode = MainFrame.getInstance().getMode();
-		if (mode != MainFrame.MORPH) {
+//		int mode = MainFrame.getInstance().getMode();
+		if (MainFrame.getInstance().getEditedMorph() == null) {
 			/* turn on edit morph mode */
 			//MainFrame.getInstance().switchMode(MainFrame.MORPH);
 			MainFrame.getInstance().editMorph(morph);
