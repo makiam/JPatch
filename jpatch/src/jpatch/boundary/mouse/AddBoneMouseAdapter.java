@@ -179,7 +179,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 //					MainFrame.getInstance().getDefaultToolTimer().restart();
 				}
 			} else {
-				MainFrame.getInstance().getMeshToolBar().reset();
+//				MainFrame.getInstance().getMeshToolBar().reset();
 			}
 		}
 		

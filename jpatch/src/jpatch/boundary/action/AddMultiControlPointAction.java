@@ -18,7 +18,7 @@ public final class AddMultiControlPointAction extends AbstractAction {
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.ADD_LOCK) {
+//		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.ADD_LOCK) {
 			if (MainFrame.getInstance().getSelection() != null) {
 				JPatchActionEdit edit = new JPatchActionEdit("Reset selection, reset tool");
 				edit.addEdit(new AtomicChangeSelection(null));
@@ -34,11 +34,11 @@ public final class AddMultiControlPointAction extends AbstractAction {
 			//	MainFrame.getInstance().getUndoManager().addEdit(new ChangeSelectionEdit(null));
 			//	MainFrame.getInstance().getJPatchScreen().update_all();
 			//}
-			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.ADD_LOCK);
-		} else {
-			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(new DefaultTool()));
-			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.DEFAULT);
-		}
+//			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.ADD_LOCK);
+//		} else {
+//			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(new DefaultTool()));
+//			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.DEFAULT);
+//		}
 	}
 }
 

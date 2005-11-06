@@ -48,7 +48,7 @@ public class ChangeViewMouseListener extends MouseAdapter {
 			}
 			((Component)mouseEvent.getSource()).addMouseMotionListener(mouseMotionListener);
 		} else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
-			MainFrame.getInstance().getMeshToolBar().reset();
+//			MainFrame.getInstance().getMeshToolBar().reset();
 		}
 	}
 	
