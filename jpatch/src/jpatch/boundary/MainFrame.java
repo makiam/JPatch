@@ -38,13 +38,13 @@ public final class MainFrame extends JFrame {
 	private Model model;
 	private JPatchScreen jpatchScreen;
 	private static MainFrame INSTANCE;
-	private MainToolBar mainToolBar;
-	private MeshToolBar meshToolBar;
+//	private MainToolBar mainToolBar;
+//	private MeshToolBar meshToolBar;
 //	private BoneToolBar boneToolBar;
-	private MorphToolBar morphToolBar;
+//	private MorphToolBar morphToolBar;
 	private JPanel helpPanel;
 	private JLabel helpLabel;
-	private JMenuBar mainMenu;
+//	private JMenuBar mainMenu;
 	private ButtonGroup bgAction;
 	private Selection selection;
 	private JPatchUndoManager undoManager = new JPatchUndoManager(50);
@@ -164,14 +164,14 @@ public final class MainFrame extends JFrame {
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			addWindowListener(new JPatchWindowAdapter());
 			
-			mainMenu = new MainMenu();
+//			mainMenu = new MainMenu();
 			
 //			setJMenuBar(mainMenu);
 			setJMenuBar((JMenuBar) uiFactory.getComponent("menubar"));
 			
 			jpatchScreen.setPopupMenu((JPopupMenu) uiFactory.getComponent("viewport popup"));
 			
-			mainToolBar = new MainToolBar(bgAction);
+//			mainToolBar = new MainToolBar(bgAction);
 			//mainToolBar.setOrientation(SwingConstants.HORIZONTAL);
 //			getContentPane().add(mainToolBar,BorderLayout.NORTH);
 			getContentPane().add(uiFactory.getComponent("main toolbar"), uiFactory.getLayout("main toolbar"));
@@ -258,7 +258,7 @@ public final class MainFrame extends JFrame {
 			getRootPane().setFocusable(false);
 			setFocusTraversalKeysEnabled(false);
 			
-			mainToolBar.setScreenMode(jpatchScreen);
+//			mainToolBar.setScreenMode(jpatchScreen);
 			
 			if (JPatchSettings.getInstance().bFirstStart) {
 				if (SplashScreen.instance != null)
@@ -330,9 +330,45 @@ public final class MainFrame extends JFrame {
 	public void editMorph(Morph morph) {
 		setEditedMorph(morph);
 		if (morph != null) {
-			switchMode(MORPH);
+//			switchMode(MORPH);
+			Command.getInstance().enableCommands(new String[] {
+					"add curve segment",
+					"add bone",
+					"tangent tool",
+					"peak tangents",
+					"round tangents",
+					"clone",
+					"extrude",
+					"lathe",
+					"lathe editor",
+					"append",
+					"automirror",
+					"add stubs",
+					"remove stubs",
+					"change tangents: round",
+					"change tangents: peak",
+					"change tangents: spatch"
+			}, false);
 		} else {
-			switchMode(MESH);
+//			switchMode(MESH);
+			Command.getInstance().enableCommands(new String[] {
+					"add curve segment",
+					"add bone",
+					"tangent tool",
+					"peak tangents",
+					"round tangents",
+					"clone",
+					"extrude",
+					"lathe",
+					"lathe editor",
+					"append",
+					"automirror",
+					"add stubs",
+					"remove stubs",
+					"change tangents: round",
+					"change tangents: peak",
+					"change tangents: spatch"
+			}, true);
 		}
 	}
 	
@@ -435,20 +471,20 @@ public final class MainFrame extends JFrame {
 		}
 	}
 	
-	public MeshToolBar getMeshToolBar() {
-		return meshToolBar;
-	}
+//	public MeshToolBar getMeshToolBar() {
+//		return meshToolBar;
+//	}
 	
 	//>>>>> test-add
-	public MainToolBar getMainToolBar() {
-		return mainToolBar;
-	}
-	public MainMenu getMainMenu() {
-		return (MainMenu)mainMenu;
-	}
-	public MorphToolBar getMorphToolBar() {
-		return morphToolBar;
-	}
+//	public MainToolBar getMainToolBar() {
+//		return mainToolBar;
+//	}
+//	public MainMenu getMainMenu() {
+//		return (MainMenu)mainMenu;
+//	}
+//	public MorphToolBar getMorphToolBar() {
+//		return morphToolBar;
+//	}
 	//<<<<< test-add
 	
 	public ButtonGroup getActionButtonGroup() {
@@ -544,46 +580,46 @@ public final class MainFrame extends JFrame {
 		helpLabel.setText(" ");
 	}
 	
-	public void switchMode(int mode) {
-		if (mode != iMode) {
-			switch(iMode) {
-				case MESH:
-					meshToolBar.removeKeyBindings();
-					getContentPane().remove(meshToolBar);
-					break;
-//				case BONE:
-//					getContentPane().remove(boneToolBar);
+//	public void switchMode(int mode) {
+//		if (mode != iMode) {
+//			switch(iMode) {
+//				case MESH:
+//					meshToolBar.removeKeyBindings();
+//					getContentPane().remove(meshToolBar);
 //					break;
-				case MORPH:
-					morphToolBar.removeKeyBindings();
-					getContentPane().remove(morphToolBar);
-					break;
-			}
-			iMode = mode;
-			switch(iMode) {
-				case MESH:
-					getContentPane().add(meshToolBar,BorderLayout.WEST);
-					meshToolBar.addKeyBindings();
-					//meshToolBar.repaint();
-					break;
-//				case BONE:
-//					getContentPane().add(boneToolBar,BorderLayout.WEST);
-//					//boneToolBar.validate();
+////				case BONE:
+////					getContentPane().remove(boneToolBar);
+////					break;
+//				case MORPH:
+//					morphToolBar.removeKeyBindings();
+//					getContentPane().remove(morphToolBar);
 //					break;
-				case MORPH:
-					getContentPane().add(morphToolBar,BorderLayout.WEST);
-					morphToolBar.addKeyBindings();
-					//boneToolBar.repaint();
-					break;
-			}
-			validate();
-			repaint();
-		}
-	}
-	
-	public int getMode() {
-		return iMode;
-	}
+//			}
+//			iMode = mode;
+//			switch(iMode) {
+//				case MESH:
+//					getContentPane().add(meshToolBar,BorderLayout.WEST);
+//					meshToolBar.addKeyBindings();
+//					//meshToolBar.repaint();
+//					break;
+////				case BONE:
+////					getContentPane().add(boneToolBar,BorderLayout.WEST);
+////					//boneToolBar.validate();
+////					break;
+//				case MORPH:
+//					getContentPane().add(morphToolBar,BorderLayout.WEST);
+//					morphToolBar.addKeyBindings();
+//					//boneToolBar.repaint();
+//					break;
+//			}
+//			validate();
+//			repaint();
+//		}
+//	}
+//	
+//	public int getMode() {
+//		return iMode;
+//	}
 	
 //	public PointSelection getPointSelection() {
 //		Class classPointSelection = PointSelection.getPointSelectionClass();

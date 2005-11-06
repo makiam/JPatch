@@ -21,12 +21,12 @@ public final class WeightSelectionAction extends AbstractAction {
 	public void actionPerformed(ActionEvent actionEvent) {
 		//MainFrame.getInstance().getJPatchScreen().setTool(null);
 		
-		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.ADD) {
+//		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.ADD) {
 			if (MainFrame.getInstance().getSelection() != null) {
 				MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
 				MainFrame.getInstance().getJPatchScreen().addMouseListeners(new WeightSelectionMouseAdapter());
 			}
-		}
+//		}
 	}
 }
 

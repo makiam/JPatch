@@ -157,7 +157,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 				}
 			} else if (iState == IDLE) {
 				// Right MouseButton pressed in IDLE state
-				MainFrame.getInstance().getMeshToolBar().reset();
+//				MainFrame.getInstance().getMeshToolBar().reset();
 			}
 		}  
 	}

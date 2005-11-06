@@ -1111,7 +1111,7 @@ public class DefaultTool extends JPatchTool {
 		Selection selection = MainFrame.getInstance().getSelection();
 //FIXME
 		int mask = Selection.CONTROLPOINTS;
-		if (!(MainFrame.getInstance().getMode() == MainFrame.MORPH))
+		if (!(MainFrame.getInstance().getEditedMorph() != null))
 			mask |= Selection.MORPHS;
 		selection.arm(mask);
 //FIXME
