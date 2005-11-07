@@ -19,7 +19,7 @@ public final class StopEditMorphAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		Morph morph = MainFrame.getInstance().getEditedMorph();
+		MorphTarget morph = MainFrame.getInstance().getEditedMorph();
 		if (morph == null)
 			throw new IllegalStateException("StopEditMorphAction called when no morph was edited");
 		MainFrame.getInstance().setEditedMorph(null);

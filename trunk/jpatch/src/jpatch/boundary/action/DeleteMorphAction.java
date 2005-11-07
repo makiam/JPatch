@@ -12,9 +12,9 @@ public final class DeleteMorphAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Morph morph;
+	private MorphTarget morph;
 	
-	public DeleteMorphAction(Morph morph) {
+	public DeleteMorphAction(MorphTarget morph) {
 		super("Delete");
 		this.morph = morph;
 		//putValue(Action.SHORT_DESCRIPTION,"Add Controlpoint [A]");

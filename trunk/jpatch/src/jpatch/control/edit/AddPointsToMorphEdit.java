@@ -31,10 +31,10 @@ import jpatch.entity.*;
  */
 public class AddPointsToMorphEdit extends JPatchAtomicEdit {
 	
-	private Morph morph;
+	private MorphTarget morph;
 	private Map map;
 
-	public AddPointsToMorphEdit(Morph morph, Map map) {
+	public AddPointsToMorphEdit(MorphTarget morph, Map map) {
 		this.morph = morph;
 		this.map = map;
 		redo();

@@ -19,12 +19,12 @@ public class PhonemeMappingEditor extends BDialog {
 		aMorphs = new Object[model.getMorphList().size() + 1];
 		aMorphs[0] = "neutral";
 		for (int i = 1; i < aMorphs.length; i++) {
-			aMorphs[i] = (Morph) model.getMorphList().get(i - 1);
+			aMorphs[i] = (MorphTarget) model.getMorphList().get(i - 1);
 		}
 		FormContainer form = new FormContainer(6, astrPhoneme.length / 3);
 		for (int i = 0; i < astrPhoneme.length; i++) {
 			cbMorphs[i] = new BComboBox(aMorphs);
-			Morph morph = model.getMorphFor(astrPhoneme[i]);
+			MorphTarget morph = model.getMorphFor(astrPhoneme[i]);
 			if (morph != null) cbMorphs[i].setSelectedValue(morph);
 			if (i < astrPhoneme.length / 3) {
 				form.add(new BLabel("     " + astrPhoneme[i] + ": "), 0, i);
@@ -58,8 +58,8 @@ public class PhonemeMappingEditor extends BDialog {
 	private void set() {
 		for (int i = 0; i < astrPhoneme.length; i++) {
 			Object o = cbMorphs[i].getSelectedValue();
-			if (!(o instanceof Morph)) o = null;
-			Morph morph = (Morph) o;
+			if (!(o instanceof MorphTarget)) o = null;
+			MorphTarget morph = (MorphTarget) o;
 			MainFrame.getInstance().getModel().setMorphFor(astrPhoneme[i], morph);
 		}
 		dispose();

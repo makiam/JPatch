@@ -26,7 +26,7 @@ public final class NewMorphAction extends AbstractAction {
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		Morph morph = new Morph(0, "new morph #" + iNum++);
+		MorphTarget morph = new MorphTarget(0, "new morph #" + iNum++);
 		//MainFrame.getInstance().getModel().addExpression(morph);
 		////treeNode.add(morph);
 		//int[] aiIndex = new int[] { treeNode.getIndex(morph) };

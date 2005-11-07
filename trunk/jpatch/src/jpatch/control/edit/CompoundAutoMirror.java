@@ -229,7 +229,7 @@ public class CompoundAutoMirror extends AbstractClone {
 			 */
 			ArrayList newMorphList = new ArrayList();
 			for (Iterator it = MainFrame.getInstance().getModel().getMorphList().iterator(); it.hasNext(); ) {
-				Morph morph = (Morph) it.next();
+				MorphTarget morph = (MorphTarget) it.next();
 				
 				boolean expand = false;
 				boolean mirror = true;
@@ -262,7 +262,7 @@ public class CompoundAutoMirror extends AbstractClone {
 						if (newMap.size() > 0)
 							addEdit(new AddPointsToMorphEdit(morph, newMap));
 					} else {
-						Morph newMorph = new Morph(0, "mirrored " + morph.getName());
+						MorphTarget newMorph = new MorphTarget(0, "mirrored " + morph.getName());
 						for (Iterator jt = morphMap.keySet().iterator(); jt.hasNext(); ) {
 							ControlPoint cp = (ControlPoint) jt.next();
 							ControlPoint clone = (ControlPoint) mapClones.get(cp);
@@ -277,7 +277,7 @@ public class CompoundAutoMirror extends AbstractClone {
 					}
 				}
 			}
-			for (Iterator it = newMorphList.iterator(); it.hasNext(); addEdit(new AtomicAddMorph((Morph) it.next())));
+			for (Iterator it = newMorphList.iterator(); it.hasNext(); addEdit(new AtomicAddMorph((MorphTarget) it.next())));
 			
 			/*
 			* mirror selections

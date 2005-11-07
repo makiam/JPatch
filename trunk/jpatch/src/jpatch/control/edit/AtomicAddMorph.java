@@ -4,14 +4,14 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import jpatch.boundary.MainFrame;
-import jpatch.entity.Morph;
+import jpatch.entity.MorphTarget;
 
 public class AtomicAddMorph extends JPatchAtomicEdit implements JPatchRootEdit {
 	
-	private Morph morph;
+	private MorphTarget morph;
 	//private float value;
 	
-	public AtomicAddMorph(Morph morph) {
+	public AtomicAddMorph(MorphTarget morph) {
 		this.morph = morph;
 		//value = morph.getValue();
 		redo();
