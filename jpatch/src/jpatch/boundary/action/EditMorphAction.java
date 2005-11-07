@@ -12,16 +12,16 @@ public final class EditMorphAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Morph morph;
+	private MorphTarget morph;
 	private MorphPanel morphPanel;
 	
-	public EditMorphAction(Morph morph, MorphPanel morphPanel) {
+	public EditMorphAction(MorphTarget morph, MorphPanel morphPanel) {
 		super("Edit");
 		this.morph = morph;
 		this.morphPanel = morphPanel;
 	}
 	
-	public EditMorphAction(Morph morph, String name) {
+	public EditMorphAction(MorphTarget morph, String name) {
 		super(name);
 		this.morph = morph;
 		this.morphPanel = null;

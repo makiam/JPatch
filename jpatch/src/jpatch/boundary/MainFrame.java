@@ -57,7 +57,7 @@ public final class MainFrame extends JFrame {
 	private SideBar sideBar;
 	private MutableTreeNode treenodeRoot;
 //	private MutableTreeNode treenodeModel;
-	private Morph editedMorph;
+	private MorphTarget editedMorph;
 	
 //	private javax.swing.Timer defaultToolTimer = new javax.swing.Timer(0, new ActionListener() {
 //		public void actionPerformed(ActionEvent event) {
@@ -319,7 +319,7 @@ public final class MainFrame extends JFrame {
 //		editedMorph = morph;
 //	}
 	
-	public Morph getEditedMorph() {
+	public MorphTarget getEditedMorph() {
 		return editedMorph;
 	}
 	
@@ -327,7 +327,7 @@ public final class MainFrame extends JFrame {
 		return constraints;
 	}
 	
-	public void setEditedMorph(Morph morph) {
+	public void setEditedMorph(MorphTarget morph) {
 		editedMorph = morph;
 		if (morph != null) {
 //			switchMode(MORPH);
