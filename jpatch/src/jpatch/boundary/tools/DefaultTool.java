@@ -470,7 +470,7 @@ public class DefaultTool extends JPatchTool {
 							edit.addEdit(new AtomicModifySelection.HotObject(selection, null));
 							edit.setName("remove point from selection");
 							MainFrame.getInstance().getUndoManager().addEdit(edit);
-							
+							selectionChanged(selection);
 							/* set state */
 							
 							iState = IDLE;
@@ -485,7 +485,7 @@ public class DefaultTool extends JPatchTool {
 							edit.addEdit(new AtomicModifySelection.HotObject(selection, cpHot));
 							edit.setName("add point to selection");
 							MainFrame.getInstance().getUndoManager().addEdit(edit);
-							
+							selectionChanged(selection);
 							/* set state */
 							iState = IDLE;
 							repaint = true;
@@ -960,7 +960,9 @@ public class DefaultTool extends JPatchTool {
 					if (newSelection != null) {
 						edit.addEdit(new AtomicModifySelection.AddObjects(selection, newSelection.getMap()));
 						edit.setName("add objects to selection");
+						edit.addEdit(new AtomicModifySelection.Pivot(selection, selection.getCenter()));
 						MainFrame.getInstance().getUndoManager().addEdit(edit);
+						selectionChanged(selection);
 					}
 //					PointSelection psNew = (PointSelection)selectMouseMotionListener.getSelection(viewDef);
 //					if (psNew != null) {
@@ -1001,8 +1003,10 @@ public class DefaultTool extends JPatchTool {
 						edit.addEdit(new AtomicModifySelection.RemoveObjects(selection, newSelection.getMap()));
 						if (newSelection.contains(selection.getHotObject()))
 							edit.addEdit(new AtomicModifySelection.HotObject(selection, null));
+						edit.addEdit(new AtomicModifySelection.Pivot(selection, selection.getCenter()));
 						edit.setName("remove objects from selection");
 						MainFrame.getInstance().getUndoManager().addEdit(edit);
+						selectionChanged(selection);
 					}
 					((Component)mouseEvent.getSource()).removeMouseMotionListener(selectMouseMotionListener);
 //					selectionChanged(ps);
@@ -1268,6 +1272,7 @@ public class DefaultTool extends JPatchTool {
 //	}
 	
 	private void selectionChanged(Selection selection) {
+//		System.out.println("Selection changed: " + selection.getObjects());
 		MutableTreeNode leaf = null;
 		if (MainFrame.getInstance().getTree().getSelectionPath() != null)
 			leaf = (MutableTreeNode) MainFrame.getInstance().getTree().getSelectionPath().getLastPathComponent();
@@ -1288,6 +1293,7 @@ public class DefaultTool extends JPatchTool {
 			}
 			//MainFrame.getInstance().getSideBar().enableTreeSelectionListener(true);
 		}
+//		MainFrame.getInstance().setSelection(selection);
 //		if (leaf == null || leaf == MainFrame.getInstance().getModel().getTreenodeBones() || leaf == MainFrame.getInstance().getModel() || leaf instanceof Bone || leaf instanceof RotationDof) {
 //			System.out.println("1");
 //			if (selection != null) {

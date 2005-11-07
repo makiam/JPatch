@@ -55,4 +55,32 @@ public class Utils3D {
 			return vn;
 		}
 	}
+	
+	public static Point3f circumCenter(Point3f A, Point3f B, Point3f C) {
+		
+		float xba = B.x - A.x;
+		float yba = B.y - A.y;
+		float zba = B.z - A.z;
+		float xca = C.x - A.x;
+		float yca = C.y - A.y;
+		float zca = C.z - A.z;
+		
+		Vector3f vBA = new Vector3f(B.x - A.x, B.y - A.y, B.z - A.z);
+		Vector3f vCA = new Vector3f(C.x - A.x, C.y - A.y, C.z - A.z);
+		float balength = vBA.lengthSquared();
+		float calength = vCA.lengthSquared();
+		
+		Vector3f crossBC = new Vector3f();
+		crossBC.cross(vBA, vCA);
+		
+		float denominator = 0.5f / (crossBC.x * crossBC.x + crossBC.y * crossBC.y + crossBC.z * crossBC.z);
+		
+		float x = ((balength * yca - calength * yba) * crossBC.z -
+				(balength * zca - calength * zba) * crossBC.y) * denominator;
+		float y = ((balength * zca - calength * zba) * crossBC.x -
+				(balength * xca - calength * xba) * crossBC.z) * denominator;
+		float z = ((balength * xca - calength * xba) * crossBC.y -
+				(balength * yca - calength * yba) * crossBC.x) * denominator;
+		return new Point3f(x + A.x, y + A.y, z + A.z);
+	}
 }

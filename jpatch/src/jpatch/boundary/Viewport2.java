@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.30 2005/10/30 10:02:01 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.31 2005/11/07 16:12:03 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -146,6 +146,8 @@ public class Viewport2 {
 		drawable.setColor(new Color3f(settings.cText));
 		drawable.drawString(viewDef.getViewName()  + (viewDef.isLocked() ? " (locked)" : ""), 4, 16);
 		for (int i = 0, y = 16; i < info.length; drawable.drawString(info[i++], 4, y += 16));
+		if (MainFrame.getInstance().getEditedMorph() != null)
+			drawable.drawString("!!!EDIT MORPH MODE!!!", (int) viewDef.getWidth() - 140, 16);
 	}
 	
 	public void drawActiveBorder() {

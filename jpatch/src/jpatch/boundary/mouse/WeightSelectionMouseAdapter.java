@@ -6,6 +6,7 @@ import java.util.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
+import jpatch.boundary.tools.DefaultTool;
 import jpatch.entity.*;
 
 //import jpatch.control.edit.*;
@@ -49,6 +50,7 @@ public class WeightSelectionMouseAdapter extends JPatchMouseAdapter {
 		((Component) mouseEvent.getSource()).removeMouseMotionListener(this);
 		drawLine(g2);
 //		MainFrame.getInstance().getMeshToolBar().reset();
+		MainFrame.getInstance().getJPatchScreen().setTool(new DefaultTool());
 		Selection selection = MainFrame.getInstance().getSelection();
 		Point3f p = new Point3f();
 		float dx = iEndX - iStartX;
@@ -64,15 +66,23 @@ public class WeightSelectionMouseAdapter extends JPatchMouseAdapter {
 			viewDef.getScreenMatrix().transform(p);
 			p.x -= iStartX;
 			p.y -= iStartY;
-			//System.out.println(p);
 			if (x) {
 				w = (p.x + p.y * (dy/dx)) / dx;
 			} else
 				w = (p.y + p.x * (dx/dy)) / dy;
 			w = (w < 0) ? 0 : (w > 1) ? 1 : w;
 			selection.getMap().put(transformable, new Float(w));
-//			System.out.println(w);
 		}
+		p.set(selection.getPivot());
+		viewDef.getScreenMatrix().transform(p);
+		p.x -= iStartX;
+		p.y -= iStartY;
+		if (x) {
+			w = (p.x + p.y * (dy/dx)) / dx;
+		} else
+			w = (p.y + p.x * (dx/dy)) / dy;
+		w = (w < 0) ? 0 : (w > 1) ? 1 : w;
+		selection.setPivotWeight(w);
 		MainFrame.getInstance().getJPatchScreen().update_all();
 	}
 	
