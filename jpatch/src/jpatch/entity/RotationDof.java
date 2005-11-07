@@ -21,8 +21,8 @@ public class RotationDof extends JPatchTreeLeaf {
 	private Matrix4f m4Transform = new Matrix4f();
 	private Matrix4f m4InvTransform = new Matrix4f();
 	private boolean bValid = false;
-	private Morph minMorph;
-	private Morph maxMorph;
+	private MorphTarget minMorph;
+	private MorphTarget maxMorph;
 	
 	public RotationDof(Bone bone) {
 		this.bone = bone;
@@ -31,8 +31,8 @@ public class RotationDof extends JPatchTreeLeaf {
 		fMinAngle = (float) - Math.PI / 2;
 		fMaxAngle = (float) Math.PI / 2;
 		strName = "RDOF";
-		minMorph = new Morph(0, "min");
-		maxMorph = new Morph(0, "max");
+		minMorph = new MorphTarget(0, "min");
+		maxMorph = new MorphTarget(0, "max");
 	}
 	
 	public Bone getBone() {
@@ -210,19 +210,19 @@ public class RotationDof extends JPatchTreeLeaf {
 		return sb;
 	}
 
-	public Morph getMaxMorph() {
+	public MorphTarget getMaxMorph() {
 		return maxMorph;
 	}
 
-	public void setMaxMorph(Morph maxMorph) {
+	public void setMaxMorph(MorphTarget maxMorph) {
 		this.maxMorph = maxMorph;
 	}
 
-	public Morph getMinMorph() {
+	public MorphTarget getMinMorph() {
 		return minMorph;
 	}
 
-	public void setMinMorph(Morph minMorph) {
+	public void setMinMorph(MorphTarget minMorph) {
 		this.minMorph = minMorph;
 	}
 }

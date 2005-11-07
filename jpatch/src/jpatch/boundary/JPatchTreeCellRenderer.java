@@ -42,7 +42,7 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 			setIcon(iconSelection);
 		else if (value instanceof JPatchMaterial)
 			setIcon(iconMaterial);
-		else if (value instanceof Morph)
+		else if (value instanceof MorphTarget)
 			setIcon(iconMorph);
 		else if (value instanceof Bone)
 			setIcon(iconBone);

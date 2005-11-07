@@ -135,18 +135,18 @@ public class MotionCurveSet {
 			float pos = Animator.getInstance().getStart();
 			scale = MotionCurve2.createScaleCurve(new MotionKey2.Float(pos, animModel.getScale()));
 			for (Iterator it = animModel.getModel().getMorphList().iterator(); it.hasNext(); ) {
-				Morph morph = (Morph) it.next();
+				MorphTarget morph = (MorphTarget) it.next();
 				MotionCurve2.Float morphCurve = MotionCurve2.createMorphCurve(morph, new MotionKey2.Float(pos, morph.getValue()));
 				map.put(morph, morphCurve);
 			}
 			populateList();
 		}
 		
-		public MotionCurve2.Float morph(Morph morph) {
+		public MotionCurve2.Float morph(MorphTarget morph) {
 			return (MotionCurve2.Float) map.get(morph);
 		}
 		
-		public void setMorphCurve(Morph morph, MotionCurve2.Float curve) {
+		public void setMorphCurve(MorphTarget morph, MotionCurve2.Float curve) {
 			map.put(morph, curve);
 		}
 		
@@ -154,7 +154,7 @@ public class MotionCurveSet {
 			super.setPosition(pos);
 			((AnimModel) animObject).setScale(scale.getFloatAt(pos));
 			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
-				Morph morph = (Morph) it.next();
+				MorphTarget morph = (MorphTarget) it.next();
 				morph.unapply();
 				morph.setValue(morph(morph).getFloatAt(pos));
 				morph.apply();
@@ -179,7 +179,7 @@ public class MotionCurveSet {
 			super.populateList();
 			motionCurveList.add(scale);
 			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
-				Morph morph = (Morph) it.next();
+				MorphTarget morph = (MorphTarget) it.next();
 				motionCurveList.add(map.get(morph));
 			}
 		}

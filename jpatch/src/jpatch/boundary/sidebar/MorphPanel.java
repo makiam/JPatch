@@ -19,13 +19,13 @@ implements ChangeListener {
 	JPatchInput inputMin;
 	JPatchInput inputMax;
 	JSlider slider;
-	Morph morph;
+	MorphTarget morph;
 	AbstractButton editButton;
 	AbstractButton deleteButton;
 	
-	public MorphPanel(Morph morph) {
+	public MorphPanel(MorphTarget morph) {
 		this.morph = morph;
-		Morph editedMorph = MainFrame.getInstance().getEditedMorph();
+		MorphTarget editedMorph = MainFrame.getInstance().getEditedMorph();
 		deleteButton = new JPatchButton(new DeleteMorphAction(morph));
 		editButton = new JPatchToggleButton(new EditMorphAction(morph, this));
 		add(editButton);

@@ -45,7 +45,7 @@ implements ModelImporter {
 	private int iRotoscopeView;
 	private JPatchMaterial material;
 	private String selectionName;
-	private Morph morph;
+	private MorphTarget morph;
 	private List listMaterials = new ArrayList();
 	private List listBones = new ArrayList();
 	private Map mapBoneParents = new HashMap();
@@ -444,9 +444,9 @@ implements ModelImporter {
 		return rotoscope;
 	}
 	
-	private Morph createMorph(Attributes attributes) {
+	private MorphTarget createMorph(Attributes attributes) {
 		//System.out.println("createMorph");
-		Morph morph = new Morph(0, "");
+		MorphTarget morph = new MorphTarget(0, "");
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);
@@ -472,10 +472,10 @@ implements ModelImporter {
 			if (localName.equals("phoneme")) phoneme = value;
 			else if (localName.equals("morph")) morphIndex = Integer.parseInt(value);
 		}
-		model.setMorphFor(phoneme, (Morph) model.getMorphList().get(morphIndex));
+		model.setMorphFor(phoneme, (MorphTarget) model.getMorphList().get(morphIndex));
 	}
 	
-	private void parseMorphVector(Attributes attributes, Morph morph) {
+	private void parseMorphVector(Attributes attributes, MorphTarget morph) {
 		ControlPoint cp = null;
 		Vector3f vector = new Vector3f();
 		for (int index = 0; index < attributes.getLength(); index++) {

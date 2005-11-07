@@ -7,9 +7,9 @@ import jpatch.boundary.*;
 
 public class AtomicRemoveMorph extends JPatchAtomicEdit implements JPatchRootEdit {
 	
-	private Morph morph;
+	private MorphTarget morph;
 	
-	public AtomicRemoveMorph(Morph morph) {
+	public AtomicRemoveMorph(MorphTarget morph) {
 		this.morph = morph;
 		redo();
 	}

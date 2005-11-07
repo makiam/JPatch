@@ -247,7 +247,7 @@ public class Selection extends JPatchTreeLeaf {
 		}
 		if ((mask & MORPHS) != 0) {
 			for (Iterator it = MainFrame.getInstance().getModel().getMorphIterator(); it.hasNext();) {
-				Transformable transformable = ((Morph) it.next()).getTransformable(mapObjects);
+				Transformable transformable = ((MorphTarget) it.next()).getTransformable(mapObjects);
 				if (transformable != null)
 					mapTransformables.put(transformable, new Float(1.0f));
 

@@ -250,7 +250,7 @@ public class AnimationImporter extends DefaultHandler {
 					}
 				}
 			} else if (type == MORPH && localName.equals("morph")) {
-				Morph morph = (Morph) ((AnimModel) animObject).getModel().getMorphList().get(Integer.parseInt(value));
+				MorphTarget morph = (MorphTarget) ((AnimModel) animObject).getModel().getMorphList().get(Integer.parseInt(value));
 				motionCurve = MotionCurve2.createMorphCurve(morph);
 				((MotionCurveSet.Model) motionCurveSet).setMorphCurve(morph, (MotionCurve2.Float) motionCurve);
 				iState = FLOAT_CURVE;

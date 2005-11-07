@@ -1,5 +1,5 @@
 /*
- * $Id: AddPointsToMorphEdit.java,v 1.3 2005/10/09 07:41:30 sascha_l Exp $
+ * $Id: AddPointsToMorphEdit.java,v 1.4 2005/11/07 21:27:29 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -31,10 +31,10 @@ import jpatch.entity.*;
  */
 public class AddPointsToMorphEdit extends JPatchAtomicEdit {
 	
-	private Morph morph;
+	private MorphTarget morph;
 	private Map map;
 
-	public AddPointsToMorphEdit(Morph morph, Map map) {
+	public AddPointsToMorphEdit(MorphTarget morph, Map map) {
 		this.morph = morph;
 		this.map = map;
 		redo();

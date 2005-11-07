@@ -8,11 +8,11 @@ import jpatch.entity.*;
  */
 
 public class AtomicChangeMorphVectors extends JPatchAtomicEdit {
-	private Morph morph;
+	private MorphTarget morph;
 	private Map mapChange;
 	
 	
-	public AtomicChangeMorphVectors(Morph morph, Map change) {
+	public AtomicChangeMorphVectors(MorphTarget morph, Map change) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + morph + ", " + change + ")");
 		this.morph = morph;
