@@ -135,7 +135,8 @@ public final class Command implements KeyListener {
 		put("lock z",					new ZLockAction(), 				new JCheckBoxMenuItem(),	new JPatchToggleButton());
 		put("snap to grid",				new GridSnapAction(), 			new JCheckBoxMenuItem(),	new JPatchToggleButton());
 		put("hide",						new HideAction(), 				new JCheckBoxMenuItem(),	new JPatchToggleButton());
-
+		put("stop edit morph",			new StopEditMorphAction(),		new JMenuItem(),			new JPatchButton());
+		
 		/*
 		 * Edit toolbar buttons
 		 */
@@ -214,8 +215,8 @@ public final class Command implements KeyListener {
 		put("clear rotoscope image",	new ClearRotoscopeAction(),	new JMenuItem());
 		
 		// Lock view
-		put("lock view",				new SetViewLockAction(true),new JCheckBoxMenuItem());
-		put("unlock view",				new SetViewLockAction(true),new JMenuItem());
+		put("lock view",				new SetViewLockAction(true),	new JCheckBoxMenuItem());
+		put("unlock view",				new SetViewLockAction(false),	new JMenuItem());
 		
 		// Selection
 		put("select none",				new SelectNoneAction(),		new JMenuItem());
@@ -298,6 +299,7 @@ public final class Command implements KeyListener {
 		enableCommand("lock x", false);
 		enableCommand("lock y", false);
 		enableCommand("lock z", false);
+		enableCommand("stop edit morph", false);
 	}
 	
 	public void executeCommand(String command) {

@@ -37,11 +37,13 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	
 	void addObjects(Map objects) {
 		selection.getMap().putAll(objects);
+		MainFrame.getInstance().setSelection(selection);
 	}
 	
 	void removeObjects(Map objects) {
 		for (Iterator it = objects.keySet().iterator(); it.hasNext(); )
 			selection.getMap().remove(it.next());
+		MainFrame.getInstance().setSelection(selection);
 	}
 
 	public static final class AddObjects extends AtomicModifySelection {

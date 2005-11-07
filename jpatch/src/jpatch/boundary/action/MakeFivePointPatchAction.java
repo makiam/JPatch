@@ -18,12 +18,36 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,"make five point patch");
 		//putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("clone"));
 	}
+	
 	public void actionPerformed(ActionEvent actionEvent) {
+		Patch patch = checkSelection();
+		if (patch == null)
+			return;
+		Model model = MainFrame.getInstance().getModel();
+		ControlPoint[] acp = patch.getControlPoints();
+		ControlPoint[] acp5 = new ControlPoint[] {
+				acp[0].trueHead(),
+				acp[2].trueHead(),
+				acp[4].trueHead(),
+				acp[6].trueHead(),
+				acp[8].trueHead()
+				//acp[0].getHead(),
+				//acp[2].getHead(),
+				//acp[4].getHead(),
+				//acp[6].getHead(),
+				//acp[8].getHead()
+		};
+		model.getCandidateFivePointPatchList().add(acp5);
+		MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddPatch(patch));
+		MainFrame.getInstance().getJPatchScreen().update_all();
+	}
+	
+	public static Patch checkSelection() {
 		Selection selection = MainFrame.getInstance().getSelection();
 		Model model = MainFrame.getInstance().getModel();
 		ArrayList points = new ArrayList();
 		if (selection == null)
-			return;
+			return null;
 		
 		for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
 			for(ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
@@ -148,7 +172,7 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 					}
 				if (!found) {
 					//System.out.println("*break*");
-					return;
+					return null;
 				}
 			}
 			//for (Iterator it = fivePointPatch.iterator(); it.hasNext(); ) {
@@ -167,24 +191,26 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 						acp[9].trueCp() != acp[0].trueCp()
 				) {
 					Patch patch = new Patch(acp);
-					ControlPoint[] acp5 = new ControlPoint[] {
-							acp[0].trueHead(),
-							acp[2].trueHead(),
-							acp[4].trueHead(),
-							acp[6].trueHead(),
-							acp[8].trueHead()
-							//acp[0].getHead(),
-							//acp[2].getHead(),
-							//acp[4].getHead(),
-							//acp[6].getHead(),
-							//acp[8].getHead()
-					};
-					model.getCandidateFivePointPatchList().add(acp5);
-					MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddPatch(patch));
-					MainFrame.getInstance().getJPatchScreen().update_all();
+					return patch;
+//					ControlPoint[] acp5 = new ControlPoint[] {
+//							acp[0].trueHead(),
+//							acp[2].trueHead(),
+//							acp[4].trueHead(),
+//							acp[6].trueHead(),
+//							acp[8].trueHead()
+//							//acp[0].getHead(),
+//							//acp[2].getHead(),
+//							//acp[4].getHead(),
+//							//acp[6].getHead(),
+//							//acp[8].getHead()
+//					};
+//					model.getCandidateFivePointPatchList().add(acp5);
+//					MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddPatch(patch));
+//					MainFrame.getInstance().getJPatchScreen().update_all();
 				}
 			}
 		}
+		return null;
 	}
 }
 
