@@ -146,6 +146,8 @@ public class Viewport2 {
 		drawable.setColor(new Color3f(settings.cText));
 		drawable.drawString(viewDef.getViewName()  + (viewDef.isLocked() ? " (locked)" : ""), 4, 16);
 		for (int i = 0, y = 16; i < info.length; drawable.drawString(info[i++], 4, y += 16));
+		if (MainFrame.getInstance().getEditedMorph() != null)
+			drawable.drawString("!!!EDIT MORPH MODE!!!", (int) viewDef.getWidth() - 140, 16);
 	}
 	
 	public void drawActiveBorder() {

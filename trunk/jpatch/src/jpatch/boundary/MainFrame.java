@@ -315,9 +315,9 @@ public final class MainFrame extends JFrame {
 //		return defaultToolTimer;
 //	}
 	
-	public void setEditedMorph(Morph morph) {
-		editedMorph = morph;
-	}
+//	public void setEditedMorph(Morph morph) {
+//		editedMorph = morph;
+//	}
 	
 	public Morph getEditedMorph() {
 		return editedMorph;
@@ -327,8 +327,8 @@ public final class MainFrame extends JFrame {
 		return constraints;
 	}
 	
-	public void editMorph(Morph morph) {
-		setEditedMorph(morph);
+	public void setEditedMorph(Morph morph) {
+		editedMorph = morph;
 		if (morph != null) {
 //			switchMode(MORPH);
 			Command.getInstance().enableCommands(new String[] {
@@ -349,6 +349,7 @@ public final class MainFrame extends JFrame {
 					"change tangents: peak",
 					"change tangents: spatch"
 			}, false);
+			Command.getInstance().enableCommand("stop edit morph", true);
 		} else {
 //			switchMode(MESH);
 			Command.getInstance().enableCommands(new String[] {
@@ -369,7 +370,9 @@ public final class MainFrame extends JFrame {
 					"change tangents: peak",
 					"change tangents: spatch"
 			}, true);
+			Command.getInstance().enableCommand("stop edit morph", false);
 		}
+		jpatchScreen.update_all();
 	}
 	
 	public void setDialog(JDialog dialog) {
@@ -552,7 +555,7 @@ public final class MainFrame extends JFrame {
 		Command.getInstance().enableCommand("make patch", moreThanOnePoint);
 		Command.getInstance().enableCommand("add stubs", moreThanOnePoint);
 		Command.getInstance().enableCommand("remove stubs", moreThanOnePoint);
-		Command.getInstance().enableCommand("make patch", moreThanOnePoint);
+		Command.getInstance().enableCommand("make patch", MakeFivePointPatchAction.checkSelection() != null);
 		Command.getInstance().enableCommand("weight selection tool", moreThanOnePoint);
 		Command.getInstance().enableCommand("rotate tool", moreThanOnePoint);
 		Command.getInstance().enableCommand("extrude", moreThanOnePoint);

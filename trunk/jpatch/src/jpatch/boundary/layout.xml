@@ -24,6 +24,7 @@
 		<separator/>
 		<button command="snap to grid"/>
 		<button command="hide"/>
+		<button command="stop edit morph"/>
 	</toolbar>
 	
 	<toolbar name="edit toolbar" position="west">
@@ -47,13 +48,6 @@
 		<separator/>
 		<button command="make patch"/>
 		<button command="compute patches"/>
-<!-- test
-		<separator/>
-		<button command="single view"/>
-		<button command="horizontally split view"/>
-		<button command="vertically split view"/>
-		<button command="quad view"/>
--->
 	</toolbar>
 	
 	<sidebar position="east"/>
@@ -91,7 +85,7 @@
 			</menu>
 			<item command="phoneme morph mapping"/>
 		</menu>
-		<menu name="Test">
+		<menu name="Debug">
 			<item command="dump"/>
 			<item command="dump undo stack"/>
 			<item command="check model"/>
@@ -101,6 +95,7 @@
 			<item command="show about"/>
 			<item command="show splashscreen"/>
 		</menu>
+<!--
 		<menu name="Menu test">
 			<menu name="Tools">
 				<item command="default tool"/>
@@ -123,6 +118,7 @@
 				</menu>
 			</menu>
 		</menu>
+-->
 	</menu>
 
 	<menu name="viewport popup">
