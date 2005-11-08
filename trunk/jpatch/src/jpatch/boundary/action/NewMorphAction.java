@@ -26,7 +26,8 @@ public final class NewMorphAction extends AbstractAction {
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		MorphTarget morph = new MorphTarget(0, "new morph #" + iNum++);
+		Morph morph = new Morph("new morph #" + iNum++);
+		morph.addTarget(new MorphTarget(morph.getMax(), morph));
 		//MainFrame.getInstance().getModel().addExpression(morph);
 		////treeNode.add(morph);
 		//int[] aiIndex = new int[] { treeNode.getIndex(morph) };
@@ -40,7 +41,7 @@ public final class NewMorphAction extends AbstractAction {
 		MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddMorph(morph));
 		MainFrame.getInstance().selectTreeNode(morph);
 //		MainFrame.getInstance().getTree().setSelectionPath(morph.getTreePath());
-		((MorphPanel) MainFrame.getInstance().getSideBar().getSidePanel()).edit();
+//		((MorphPanel) MainFrame.getInstance().getSideBar().getSidePanel()).edit();
 	}
 }
 

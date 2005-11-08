@@ -24,7 +24,7 @@ public class PhonemeMappingEditor extends BDialog {
 		FormContainer form = new FormContainer(6, astrPhoneme.length / 3);
 		for (int i = 0; i < astrPhoneme.length; i++) {
 			cbMorphs[i] = new BComboBox(aMorphs);
-			MorphTarget morph = model.getMorphFor(astrPhoneme[i]);
+			Morph morph = model.getMorphFor(astrPhoneme[i]);
 			if (morph != null) cbMorphs[i].setSelectedValue(morph);
 			if (i < astrPhoneme.length / 3) {
 				form.add(new BLabel("     " + astrPhoneme[i] + ": "), 0, i);

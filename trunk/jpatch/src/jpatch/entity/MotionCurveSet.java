@@ -135,18 +135,18 @@ public class MotionCurveSet {
 			float pos = Animator.getInstance().getStart();
 			scale = MotionCurve2.createScaleCurve(new MotionKey2.Float(pos, animModel.getScale()));
 			for (Iterator it = animModel.getModel().getMorphList().iterator(); it.hasNext(); ) {
-				MorphTarget morph = (MorphTarget) it.next();
+				Morph morph = (Morph) it.next();
 				MotionCurve2.Float morphCurve = MotionCurve2.createMorphCurve(morph, new MotionKey2.Float(pos, morph.getValue()));
 				map.put(morph, morphCurve);
 			}
 			populateList();
 		}
 		
-		public MotionCurve2.Float morph(MorphTarget morph) {
+		public MotionCurve2.Float morph(Morph morph) {
 			return (MotionCurve2.Float) map.get(morph);
 		}
 		
-		public void setMorphCurve(MorphTarget morph, MotionCurve2.Float curve) {
+		public void setMorphCurve(Morph morph, MotionCurve2.Float curve) {
 			map.put(morph, curve);
 		}
 		
@@ -154,10 +154,11 @@ public class MotionCurveSet {
 			super.setPosition(pos);
 			((AnimModel) animObject).setScale(scale.getFloatAt(pos));
 			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
-				MorphTarget morph = (MorphTarget) it.next();
-				morph.unapply();
-				morph.setValue(morph(morph).getFloatAt(pos));
-				morph.apply();
+				Morph morph = (Morph) it.next();
+				//FIXME
+//				morph.unapply();
+//				morph.setValue(morph(morph).getFloatAt(pos));
+//				morph.apply();
 			}
 		}
 		

@@ -24,15 +24,15 @@ public class AtomicChangeMorphVectors extends JPatchAtomicEdit {
 	}
 	
 	public void undo() {
-		morph.unapply();
+//		morph.unapply();
 		swap();
-		morph.apply();
+//		morph.apply();
 	}
 	
 	public void redo() {
-		morph.unapply();
+//		morph.unapply();
 		swap();
-		morph.apply();
+//		morph.apply();
 	}
 	
 	private void swap() {
