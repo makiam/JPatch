@@ -373,7 +373,7 @@ implements ModelImporter {
 				break;
 			case MORPH:
 				if (localName.equals("morph")) {
-					model.addExpression(morph);
+//					model.addExpression(morph);
 					iState = MESH;
 				}
 				break;
@@ -445,22 +445,24 @@ implements ModelImporter {
 	}
 	
 	private MorphTarget createMorph(Attributes attributes) {
-		//System.out.println("createMorph");
-		MorphTarget morph = new MorphTarget(0, "");
-		for (int index = 0; index < attributes.getLength(); index++) {
-			String localName = attributes.getLocalName(index);
-			String value = attributes.getValue(index);
-			if (localName.equals("name")) {
-				morph.setName(value);
-			} else if (localName.equals("min")) {
-				morph.setMin((new Float(value)).floatValue());
-			} else if (localName.equals("max")) {
-				morph.setMax((new Float(value)).floatValue());
-			} else if (localName.equals("value")) {
-				morph.setValue((new Float(value)).floatValue());
-			}
-		}
-		return morph;
+//		FIXME
+//		//System.out.println("createMorph");
+//		MorphTarget morph = new MorphTarget(0, "");
+//		for (int index = 0; index < attributes.getLength(); index++) {
+//			String localName = attributes.getLocalName(index);
+//			String value = attributes.getValue(index);
+//			if (localName.equals("name")) {
+//				morph.setName(value);
+//			} else if (localName.equals("min")) {
+//				morph.setMin((new Float(value)).floatValue());
+//			} else if (localName.equals("max")) {
+//				morph.setMax((new Float(value)).floatValue());
+//			} else if (localName.equals("value")) {
+//				morph.setValue((new Float(value)).floatValue());
+//			}
+//		}
+//		return morph;
+		return null;
 	}
 	
 	private void parseLipsyncMap(Attributes attributes) {

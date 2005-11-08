@@ -19,16 +19,16 @@ implements ChangeListener {
 	JPatchInput inputMin;
 	JPatchInput inputMax;
 	JSlider slider;
-	MorphTarget morph;
+	Morph morph;
 	AbstractButton editButton;
 	AbstractButton deleteButton;
 	
-	public MorphPanel(MorphTarget morph) {
+	public MorphPanel(Morph morph) {
 		this.morph = morph;
 		MorphTarget editedMorph = MainFrame.getInstance().getEditedMorph();
 		deleteButton = new JPatchButton(new DeleteMorphAction(morph));
-		editButton = new JPatchToggleButton(new EditMorphAction(morph, this));
-		add(editButton);
+//		editButton = new JPatchToggleButton(new EditMorphAction(morph, this));
+//		add(editButton);
 		add(deleteButton);
 		
 		//JPatchSlider.setDimensions(0,150,50,20);
@@ -53,18 +53,18 @@ implements ChangeListener {
 		inputMax.addChangeListener(this);
 		slider.addChangeListener(this);
 		
-		if (morph == editedMorph) {
-			editButton.setSelected(true);
-			deleteButton.setEnabled(false);
-			slider.setEnabled(false);
-		} else if (editedMorph != null) {
-			editButton.setEnabled(false);
-		}
+//		if (morph == editedMorph) {
+//			editButton.setSelected(true);
+//			deleteButton.setEnabled(false);
+//			slider.setEnabled(false);
+//		} else if (editedMorph != null) {
+//			editButton.setEnabled(false);
+//		}
 	}
 	
-	public void edit() {
-		editButton.doClick();
-	}
+//	public void edit() {
+//		editButton.doClick();
+//	}
 	
 	public void stateChanged(ChangeEvent changeEvent) {
 		if (changeEvent.getSource() == inputName) {
@@ -73,41 +73,41 @@ implements ChangeListener {
 		} else if (changeEvent.getSource() == inputMin) {
 			morph.setMin(inputMin.getFloatValue());
 			if (inputMin.getFloatValue() > morph.getValue()) {
-				morph.unapply();
+//				morph.unapply();
 				morph.setValue(inputMin.getFloatValue());
-				morph.apply();
+//				morph.apply();
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
 			slider.setValue(morph.getSliderValue());
 		} else if (changeEvent.getSource() == inputMax) {
 			morph.setMax(inputMax.getFloatValue());
 			if (inputMax.getFloatValue() < morph.getValue()) {
-				morph.unapply();
+//				morph.unapply();
 				morph.setValue(inputMax.getFloatValue());
-				morph.apply();
+//				morph.apply();
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
 			slider.setValue(morph.getSliderValue());
 		} else if (changeEvent.getSource() == slider) {
 			if (slider.getValueIsAdjusting()) {
-				morph.unapply();
+//				morph.unapply();
 				morph.setSliderValue(slider.getValue());
-				morph.apply();
+//				morph.apply();
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			} else {
 			}
 		}
 	}
 	
-	public void editMorph() {
-		slider.setValue(morph.getSliderValue());
-		slider.setEnabled(false);
-		deleteButton.setEnabled(false);
-	}
-	
-	public void editMorphDone() {
-		slider.setEnabled(true);
-		deleteButton.setEnabled(true);
-	}
+//	public void editMorph() {
+//		slider.setValue(morph.getSliderValue());
+//		slider.setEnabled(false);
+//		deleteButton.setEnabled(false);
+//	}
+//	
+//	public void editMorphDone() {
+//		slider.setEnabled(true);
+//		deleteButton.setEnabled(true);
+//	}
 }
 

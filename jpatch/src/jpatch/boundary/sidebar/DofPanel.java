@@ -9,7 +9,7 @@ import javax.vecmath.*;
 import jpatch.boundary.*;
 import jpatch.boundary.action.DeleteDofAction;
 import jpatch.boundary.action.DeleteMaterialAction;
-import jpatch.boundary.action.EditMorphAction;
+import jpatch.boundary.action.EditMorphTargetAction;
 import jpatch.entity.*;
 
 public class DofPanel extends SidePanel
@@ -37,8 +37,7 @@ implements ChangeListener {
 //		add(editButton);
 //		add(deleteButton);
 		add(new JPatchButton(new DeleteDofAction(dof)));
-		add(new JPatchToggleButton(new EditMorphAction(dof.getMinMorph(), "edit min morph")));
-		add(new JPatchToggleButton(new EditMorphAction(dof.getMaxMorph(), "edit max morph")));
+//		add(new JPatchToggleButton(new EditMorphAction(dof.getMorph(), "edit morph")));
 		//JPatchSlider.setDimensions(0,150,50,20);
 		JPanel detailPanel = MainFrame.getInstance().getSideBar().getDetailPanel();
 		JPatchInput.setDimensions(50,150,20);
