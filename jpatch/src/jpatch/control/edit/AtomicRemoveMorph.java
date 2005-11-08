@@ -7,9 +7,9 @@ import jpatch.boundary.*;
 
 public class AtomicRemoveMorph extends JPatchAtomicEdit implements JPatchRootEdit {
 	
-	private MorphTarget morph;
+	private Morph morph;
 	
-	public AtomicRemoveMorph(MorphTarget morph) {
+	public AtomicRemoveMorph(Morph morph) {
 		this.morph = morph;
 		redo();
 	}
@@ -19,7 +19,7 @@ public class AtomicRemoveMorph extends JPatchAtomicEdit implements JPatchRootEdi
 	}
 	
 	public void redo() {
-		morph.unapply();
+//		morph.unapply();
 //		int[] aiIndex = new int[] { morph.getParent().getIndex(morph) };
 //		Object[] aObject = new Object[] { morph };
 		MainFrame.getInstance().getModel().removeExpression(morph);
@@ -40,7 +40,7 @@ public class AtomicRemoveMorph extends JPatchAtomicEdit implements JPatchRootEdi
 		MainFrame.getInstance().getSideBar().replacePanel(new SidePanel());
 		MainFrame.getInstance().getSideBar().clearDetailPanel();
 		MainFrame.getInstance().getSideBar().validate();
-		morph.apply();
+//		morph.apply();
 		//MainFrame.getInstance().getModel().applyMorphs();
 		
 		//MainFrame.getInstance().getTree().setSelectionPath(path);

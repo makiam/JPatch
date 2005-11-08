@@ -19,6 +19,10 @@ public class Morph implements MutableTreeNode {
 		strName = name;
 	}
 	
+	public String getName() {
+		return strName;
+	}
+	
 	public String toString() {
 		return strName;
 	}
@@ -143,6 +147,10 @@ public class Morph implements MutableTreeNode {
 			}
 		}
 		return max;
+	}
+	
+	public List getTargets() {
+		return listTargets;
 	}
 	
 	/*

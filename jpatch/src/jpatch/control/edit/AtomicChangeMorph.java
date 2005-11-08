@@ -19,15 +19,15 @@ public class AtomicChangeMorph extends JPatchAtomicEdit implements JPatchRootEdi
 	}
 	
 	public void undo() {
-		morph.unapply();
+//		morph.unapply();
 		swap();
-		morph.apply();
+//		morph.apply();
 	}
 	
 	public void redo() {
-		morph.unapply();
+//		morph.unapply();
 		swap();
-		morph.apply();
+//		morph.apply();
 	}
 	
 	public int sizeOf() {

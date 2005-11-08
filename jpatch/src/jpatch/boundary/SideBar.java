@@ -160,8 +160,10 @@ implements TreeSelectionListener {
 			replacePanel(new MaterialPanel((JPatchMaterial) selectedNode));
 		} else if (selectedNode == MainFrame.getInstance().getModel().getTreenodeExpressions()) {
 			replacePanel(new MorphsPanel());
+		} else if (selectedNode instanceof Morph) {
+			replacePanel(new MorphPanel((Morph) selectedNode));
 		} else if (selectedNode instanceof MorphTarget) {
-			replacePanel(new MorphPanel((MorphTarget) selectedNode));
+			replacePanel(new MorphTargetPanel((MorphTarget) selectedNode));
 		} else if (selectedNode == MainFrame.getInstance().getModel().getTreenodeSelections()) {
 			replacePanel(new SelectionsPanel((Model) selectedNode.getParent()));
 		} else if (selectedNode instanceof Selection) {

@@ -10,20 +10,26 @@ import jpatch.control.edit.*;
 public class MorphTarget extends JPatchTreeLeaf {
 //	private ArrayList listPoints = new ArrayList();
 //	private ArrayList listVectors = new ArrayList();
-	private float fValue = 0;
-	private float fMin = 0;
-	private float fMax = 1;
+//	private float fValue = 0;
+//	private float fMin = 0;
+//	private float fMax = 1;
+	private Morph morph;
 	private float fPosition;
 	private Map mapMorph = new HashMap();
 	private Map mapPositions = new HashMap();
 	private boolean bPrepared = false;
 	
-	public MorphTarget(float position) {
+	public MorphTarget(float position, Morph morph) {
 		fPosition = position;
+		this.morph = morph;
 	}
 	
 	public String toString() {
-		return "Target @ " + fPosition;
+		return "Target " + fPosition;
+	}
+	
+	public Morph getMorph() {
+		return morph;
 	}
 	
 	public float getPosition() {
@@ -150,30 +156,30 @@ public class MorphTarget extends JPatchTreeLeaf {
 		return changes;
 	}
 	
-	public void apply() {
+//	public void apply() {
+////		Vector3f v3 = new Vector3f();
+////		for (int i = 0, n = listPoints.size(); i < n; i++) {
+////			ControlPoint cp = (ControlPoint) listPoints.get(i);
+////			v3.set((Vector3f) listVectors.get(i));
+////			v3.scale(fValue);
+////			cp.getPosition().add(v3);
+////			cp.invalidateTangents();
+////		}
 //		Vector3f v3 = new Vector3f();
-//		for (int i = 0, n = listPoints.size(); i < n; i++) {
-//			ControlPoint cp = (ControlPoint) listPoints.get(i);
-//			v3.set((Vector3f) listVectors.get(i));
+//		for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
+//			ControlPoint cp = (ControlPoint) it.next();
+//			v3.set((Vector3f) mapMorph.get(cp));
 //			v3.scale(fValue);
-//			cp.getPosition().add(v3);
+//			cp.getRefPosition().add(v3);
 //			cp.invalidateTangents();
 //		}
-		Vector3f v3 = new Vector3f();
-		for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
-			ControlPoint cp = (ControlPoint) it.next();
-			v3.set((Vector3f) mapMorph.get(cp));
-			v3.scale(fValue);
-			cp.getRefPosition().add(v3);
-			cp.invalidateTangents();
-		}
-	}
-	
-	public void unapply() {
-		fValue = -fValue;
-		apply();
-		fValue = -fValue;
-	}
+//	}
+//	
+//	public void unapply() {
+//		fValue = -fValue;
+//		apply();
+//		fValue = -fValue;
+//	}
 	
 	public Vector3f getVectorFor(ControlPoint cp) {
 		return (Vector3f) mapMorph.get(cp);
@@ -245,7 +251,7 @@ public class MorphTarget extends JPatchTreeLeaf {
 				mapMorph.put(cp, new Vector3f(v3));
 			}
 		}
-		fValue = 1;
+//		fValue = 1;
 		//apply();
 		mapPositions.clear();
 		bPrepared = false;
@@ -270,30 +276,30 @@ public class MorphTarget extends JPatchTreeLeaf {
 			
 	public StringBuffer xml(String prefix, RotationDof dof, String type) {
 		StringBuffer sb = new StringBuffer();
-		if (dof== null) {
-			sb.append(prefix).append("<morph name=\"").append(strName).append("\" ");
-		} else {
-			Bone bone = dof.getBone();
-			int index = bone.getDofIndex(dof);
-			sb.append(prefix).append("<morph bone=\"").append(bone.getXmlNumber()).append("\" dof=\"").append(index).append("\" type=\"").append(type).append("\" ");
-		}
-		sb.append("min=\"").append(fMin).append("\" ");
-		sb.append("max=\"").append(fMax).append("\" ");
-		sb.append("value=\"").append(fValue).append("\">");
-		sb.append("\n");
-		sb.append(prefix).append("\t<target value=\"1.0\">").append("\n");
-		for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
-			ControlPoint cp = (ControlPoint) it.next();
-			Vector3f v3 = (Vector3f) mapMorph.get(cp);
-			sb.append(prefix);
-			sb.append("\t\t<point nr=\"").append(cp.getXmlNumber()).append("\" ");
-			sb.append("x=\"").append(v3.x).append("\" " );
-			sb.append("y=\"").append(v3.y).append("\" " );
-			sb.append("z=\"").append(v3.z).append("\"/>");
-			sb.append("\n");
-		}
-		sb.append(prefix).append("\t</target>").append("\n");
-		sb.append(prefix).append("</morph>").append("\n");
+//		if (dof== null) {
+//			sb.append(prefix).append("<morph name=\"").append(strName).append("\" ");
+//		} else {
+//			Bone bone = dof.getBone();
+//			int index = bone.getDofIndex(dof);
+//			sb.append(prefix).append("<morph bone=\"").append(bone.getXmlNumber()).append("\" dof=\"").append(index).append("\" type=\"").append(type).append("\" ");
+//		}
+//		sb.append("min=\"").append(fMin).append("\" ");
+//		sb.append("max=\"").append(fMax).append("\" ");
+//		sb.append("value=\"").append(fValue).append("\">");
+//		sb.append("\n");
+//		sb.append(prefix).append("\t<target value=\"1.0\">").append("\n");
+//		for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
+//			ControlPoint cp = (ControlPoint) it.next();
+//			Vector3f v3 = (Vector3f) mapMorph.get(cp);
+//			sb.append(prefix);
+//			sb.append("\t\t<point nr=\"").append(cp.getXmlNumber()).append("\" ");
+//			sb.append("x=\"").append(v3.x).append("\" " );
+//			sb.append("y=\"").append(v3.y).append("\" " );
+//			sb.append("z=\"").append(v3.z).append("\"/>");
+//			sb.append("\n");
+//		}
+//		sb.append(prefix).append("\t</target>").append("\n");
+//		sb.append(prefix).append("</morph>").append("\n");
 		return sb;
 	}
 }

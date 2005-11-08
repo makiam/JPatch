@@ -65,7 +65,7 @@ public class PoseSliders extends BFrame {
 		if (activeObject != null && activeObject instanceof AnimModel) {
 			AnimModel activeModel = (AnimModel) activeObject;
 			for (Iterator it = activeModel.getModel().getMorphList().iterator(); it.hasNext(); ) {
-				MorphTarget morph = (MorphTarget) it.next();
+				Morph morph = (Morph) it.next();
 				BSlider slider = (BSlider) mapSlider.get(morph);
 				slider.setValue(morph.getSliderValue());
 			}
@@ -111,7 +111,7 @@ public class PoseSliders extends BFrame {
 				if (model.getMorphList().size() > 0) {
 					morphs.setRowCount(model.getMorphList().size());
 					for (int row = 0; row < model.getMorphList().size(); row++) {
-						final MorphTarget morph = (MorphTarget) model.getMorphList().get(row);
+						final Morph morph = (Morph) model.getMorphList().get(row);
 						final BSlider slider = new BSlider(morph.getSliderValue(), 0, 100, BSlider.HORIZONTAL);
 						mapSlider.put(morph, slider);
 						BLabel label = new BLabel(morph.toString());
@@ -121,9 +121,9 @@ public class PoseSliders extends BFrame {
 						((JComponent) slider.getComponent()).setPreferredSize(new Dimension(100,20));
 						slider.addEventLink(ValueChangedEvent.class, new Object() {
 							void processEvent() {
-								morph.unapply();
+//								morph.unapply();
 								morph.setSliderValue(slider.getValue());
-								morph.apply();
+//								morph.apply();
 								Animator.getInstance().setMorphValue(activeModel, morph);
 							}
 						});

@@ -1,17 +1,16 @@
 package jpatch.control.edit;
 
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
+import javax.swing.tree.*;
 
-import jpatch.boundary.MainFrame;
-import jpatch.entity.MorphTarget;
+import jpatch.boundary.*;
+import jpatch.entity.*;
 
 public class AtomicAddMorph extends JPatchAtomicEdit implements JPatchRootEdit {
 	
-	private MorphTarget morph;
+	private Morph morph;
 	//private float value;
 	
-	public AtomicAddMorph(MorphTarget morph) {
+	public AtomicAddMorph(Morph morph) {
 		this.morph = morph;
 		//value = morph.getValue();
 		redo();
@@ -31,7 +30,7 @@ public class AtomicAddMorph extends JPatchAtomicEdit implements JPatchRootEdit {
 //		//morph.setValue(0);
 //		//MainFrame.getInstance().getModel().applyMorphs();
 //		MainFrame.getInstance().getSideBar().clearDetailPanel();
-		morph.unapply();
+//		morph.unapply();
 	}
 	
 	public void redo() {
@@ -41,7 +40,7 @@ public class AtomicAddMorph extends JPatchAtomicEdit implements JPatchRootEdit {
 //		TreePath path = morph.getTreePath();
 //		MainFrame.getInstance().getTree().makeVisible(path);
 		//morph.setValue(value);
-		morph.apply();
+//		morph.apply();
 		//MainFrame.getInstance().getModel().applyMorphs();
 	}
 	

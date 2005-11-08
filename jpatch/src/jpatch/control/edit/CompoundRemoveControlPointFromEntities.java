@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundRemoveControlPointFromEntities.java,v 1.5 2005/11/07 21:27:29 sascha_l Exp $
+ * $Id: CompoundRemoveControlPointFromEntities.java,v 1.6 2005/11/08 16:20:24 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -50,10 +50,16 @@ public final class CompoundRemoveControlPointFromEntities extends JPatchCompound
 		// Remove cp from morphs
 		addEdit(new AtomicRemoveControlPointFromMorphs(cp));
 		// Remove empty morphs
-		for (Iterator it = (new ArrayList(MainFrame.getInstance().getModel().getMorphList())).iterator(); it.hasNext(); ) {
-			MorphTarget morph = (MorphTarget) it.next();
-			if (morph.getNumberOfPoints() == 0)
+		for (Iterator itMorph = (new ArrayList(MainFrame.getInstance().getModel().getMorphList())).iterator(); itMorph.hasNext(); ) {
+			Morph morph = (Morph) itMorph.next();
+			for (Iterator itTarget = new ArrayList(morph.getTargets()).iterator(); itTarget.hasNext(); ) {
+				MorphTarget morphTarget = (MorphTarget) itTarget.next();
+//				if (morphTarget.getNumberOfPoints() == 0)
+//					addEdit(new AtomicRemoveMorphTarget(morphTarget));
+			}
+			if (morph.getChildCount() == 0)
 				addEdit(new AtomicRemoveMorph(morph));
+					
 		}
 	}
 }

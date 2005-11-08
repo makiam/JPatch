@@ -157,8 +157,9 @@ public class Model implements MutableTreeNode {
 		for (Iterator itBones = setBones.iterator(); itBones.hasNext(); ) {
 			for (Iterator itDofs = ((Bone) itBones.next()).getDofs().iterator(); itDofs.hasNext(); ) {
 				RotationDof dof = (RotationDof) itDofs.next();
-				sb.append(dof.getMinMorph().xml(prefix3, dof, "min"));
-				sb.append(dof.getMaxMorph().xml(prefix3, dof, "max"));
+				//FIXME
+//				sb.append(dof.getMinMorph().xml(prefix3, dof, "min"));
+//				sb.append(dof.getMaxMorph().xml(prefix3, dof, "max"));
 			}
 		}
 		StringBuffer lipSyncMap = new StringBuffer();
@@ -203,8 +204,8 @@ public class Model implements MutableTreeNode {
 		mapPhonemes.put(phoneme, morph);
 	}
 	
-	public MorphTarget getMorphFor(String phoneme) {
-		return (MorphTarget) mapPhonemes.get(phoneme);
+	public Morph getMorphFor(String phoneme) {
+		return (Morph) mapPhonemes.get(phoneme);
 	}
 	
 	public Set getPhonemeMorphSet() {
@@ -289,7 +290,7 @@ public class Model implements MutableTreeNode {
 		}
 	}
 	
-	public void addExpression(MorphTarget morph) {
+	public void addExpression(Morph morph) {
 //		treenodeExpressions.insert(morph, 0);
 //		lstMorphs.add(morph);
 		MainFrame.getInstance().getTreeModel().insertNodeInto(morph, treenodeExpressions, treenodeExpressions.getChildCount());
@@ -306,15 +307,15 @@ public class Model implements MutableTreeNode {
 	}
 	
 	public void unapplyMorphs() {
-		for (Iterator it = lstMorphs.iterator(); it.hasNext(); ) {
-			((MorphTarget) it.next()).unapply();
-		}
+//		for (Iterator it = lstMorphs.iterator(); it.hasNext(); ) {
+//			((MorphTarget) it.next()).unapply();
+//		}
 	}
 	
 	public void applyMorphs() {
-		for (Iterator it = lstMorphs.iterator(); it.hasNext(); ) {
-			((MorphTarget) it.next()).apply();
-		}
+//		for (Iterator it = lstMorphs.iterator(); it.hasNext(); ) {
+//			((MorphTarget) it.next()).apply();
+//		}
 	}
 	
 //	public Iterator getSelectionIterator() {
@@ -358,7 +359,7 @@ public class Model implements MutableTreeNode {
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(material);
 	}
 	
-	public void removeExpression(MorphTarget morph) {
+	public void removeExpression(Morph morph) {
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(morph);
 	}
 	

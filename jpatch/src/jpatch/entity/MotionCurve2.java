@@ -12,7 +12,7 @@ public abstract class MotionCurve2 {
 	String name = "*";
 	ArrayList list = new ArrayList();
 
-	public static MotionCurve2.Float createMorphCurve(MorphTarget morph) {
+	public static MotionCurve2.Float createMorphCurve(Morph morph) {
 		MotionCurve2.Float mc = new MotionCurve2.Float();
 		mc.name = morph.getName();
 		mc.fMin = morph.getMin();
@@ -20,7 +20,7 @@ public abstract class MotionCurve2 {
 		return mc;
 	}
 	
-	public static MotionCurve2.Float createMorphCurve(MorphTarget morph, MotionKey2.Float key) {
+	public static MotionCurve2.Float createMorphCurve(Morph morph, MotionKey2.Float key) {
 		MotionCurve2.Float mc = createMorphCurve(morph);
 		mc.addKey(key);
 		return mc;

@@ -229,7 +229,7 @@ public final class Animator extends BFrame {
 		mapMotionCurves.put(animObject, motionCurveSet);
 	}
 	
-	public void setMorphValue(AnimModel animModel, MorphTarget morph) {
+	public void setMorphValue(AnimModel animModel, Morph morph) {
 		MotionCurve2.Float mc =  ((MotionCurveSet.Model) mapMotionCurves.get(animModel)).morph(morph);
 		activeCurve = mc;
 		activeKey = mc.setFloatAt(fPosition, morph.getValue());
@@ -418,10 +418,10 @@ public final class Animator extends BFrame {
 					
 					if (mpFrame.equals("Frame")) continue;
 					int frame = Integer.parseInt(mpFrame.replaceAll("^\\s*","").replaceAll("\\s*$",""));
-					MorphTarget morph = model.getMorphFor(mpMouth.replaceAll("^\\s*","").replaceAll("\\s*$",""));
+					Morph morph = model.getMorphFor(mpMouth.replaceAll("^\\s*","").replaceAll("\\s*$",""));
 					if (morph != null) {
 						for (Iterator it = model.getPhonemeMorphSet().iterator(); it.hasNext(); ) {
-							MorphTarget m = (MorphTarget) it.next();
+							Morph m = (Morph) it.next();
 							MotionCurve2.Float mc =  mcs.morph(m);
 							mc.setFloatAt((float) (frame - 1), (m == morph) ? 1 : 0);
 						}
