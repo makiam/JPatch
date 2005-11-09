@@ -40,70 +40,127 @@ public class MorphTarget extends JPatchTreeLeaf {
 		fPosition = position;
 	}
 	
-	public Transformable getTransformable(final Map selectedPoints) {
-		final HashMap changeMap = new HashMap();
-		boolean ok = false;
-		loop:
-		for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
-			Object key = it.next();
-			if (selectedPoints.keySet().contains(key)) {
-				
-				ok = true;
-				break loop;
-			}
-		}
-		if (!ok)
-			return null;
-		return new Transformable() {
-			public void beginTransform() {
-				changeMap.clear();
+	public Transformable getTransformable(final Map selectedPoints, final boolean editMorphTarget) {
+		if (!editMorphTarget) {
+			boolean ok = false;
+			loop:
 				for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
 					Object key = it.next();
-					if (selectedPoints.containsKey(key))
-						changeMap.put(key, new Vector3f((Vector3f) mapMorph.get(key)));
+					if (selectedPoints.keySet().contains(key)) {
+						
+						ok = true;
+					break loop;
+					}
 				}
-			}
-			public void translate(Vector3f v) { }
-			public void rotate(AxisAngle4f a, Point3f pivot) {
-//				Quat4f identity = new Quat4f(0, 0, 0, 1);
-//				Quat4f quat = new Quat4f();
-				AxisAngle4f aa = new AxisAngle4f(a);
-				Matrix3f rot = new Matrix3f();
-				for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
-					Object key = it.next();
-					Vector3f v = (Vector3f) changeMap.get(key);
-					v.set((Vector3f) mapMorph.get(key));
-					float weight = ((Float) selectedPoints.get(key)).floatValue();
-					aa.angle = a.angle * weight;
-//					quat.set(q);
-//					quat.interpolate(identity, 1.0 - weight);
-					rot.set(aa);
-					rot.transform(v);
+			if (!ok)
+				return null;
+		}
+		
+		if (editMorphTarget) {
+			return new Transformable() {
+				private Map initMap = new HashMap();
+				public void beginTransform() {
+					initMap.clear();
+					Map newPointsMap = new HashMap();
+					for (Iterator it = selectedPoints.keySet().iterator(); it.hasNext(); ) {
+						ControlPoint cp = (ControlPoint) it.next();
+						Vector3f morphVector = (Vector3f) mapMorph.get(cp);
+						if (morphVector == null) {
+							morphVector = new Vector3f();
+							newPointsMap.put(cp, morphVector);
+						}
+						initMap.put(cp, new Vector3f(morphVector));
+					}
+					MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeMorph.AddPoints(MorphTarget.this, newPointsMap), true);
+					morph.setupMorphMap();
 				}
-			}
-			public void transform(Matrix3f m, Point3f pivot) {
-				Matrix3f identity = new Matrix3f();
-				Matrix3f matrix = new Matrix3f();
-				for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
-					Object key = it.next();
-					Vector3f v = (Vector3f) changeMap.get(key);
-					v.set((Vector3f) mapMorph.get(key));
-					float weight = ((Float) selectedPoints.get(key)).floatValue();
-					matrix.set(m);
-					matrix.mul(weight);
-					identity.setIdentity();
-					identity.mul(1 - weight);
-					matrix.add(identity);
-					matrix.transform(v);
+				
+				public void translate(Vector3f v) {
+					for (Iterator it = initMap.keySet().iterator(); it.hasNext(); ) {
+						ControlPoint cp = (ControlPoint) it.next();
+						Vector3f vector = (Vector3f) mapMorph.get(cp);
+						vector.set((Vector3f) initMap.get(cp));
+						float weight = ((Float) selectedPoints.get(cp)).floatValue();
+						vector.x = v.x * weight;
+						vector.y = v.y * weight;
+						vector.z = v.z * weight;
+					}
+					morph.setMorphMap();
+					MainFrame.getInstance().getModel().setPose();
 				}
-			}
-			public JPatchUndoableEdit endTransform() {
-				return new AtomicChangeMorphVectors(MorphTarget.this, changeMap);
-			}
-			public Point3f getPosition() {
-				throw new UnsupportedOperationException();
-			}
-		};
+				
+				public void rotate(AxisAngle4f a, Point3f pivot) {
+					;
+				}
+				
+				public void transform(Matrix3f m, Point3f pivot) {
+					;
+				}
+				
+				public JPatchUndoableEdit endTransform() {
+					return null;
+				}
+				
+				public Point3f getPosition() {
+					throw new UnsupportedOperationException();
+				}
+			};
+		} else {
+			return new Transformable() {
+				private Map changeMap = new HashMap();
+				public void beginTransform() {
+					changeMap.clear();
+					for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
+						Object key = it.next();
+						if (selectedPoints.containsKey(key))
+							changeMap.put(key, new Vector3f((Vector3f) mapMorph.get(key)));
+					}					
+				}
+				
+				public void translate(Vector3f v) {
+					;
+				}
+				
+				public void rotate(AxisAngle4f a, Point3f pivot) {
+					AxisAngle4f aa = new AxisAngle4f(a);
+					Matrix3f rot = new Matrix3f();
+					for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
+						Object key = it.next();
+						Vector3f v = (Vector3f) changeMap.get(key);
+						v.set((Vector3f) mapMorph.get(key));
+						float weight = ((Float) selectedPoints.get(key)).floatValue();
+						aa.angle = a.angle * weight;
+						rot.set(aa);
+						rot.transform(v);
+					}
+				}
+				
+				public void transform(Matrix3f m, Point3f pivot) {
+					Matrix3f identity = new Matrix3f();
+					Matrix3f matrix = new Matrix3f();
+					for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
+						Object key = it.next();
+						Vector3f v = (Vector3f) changeMap.get(key);
+						v.set((Vector3f) mapMorph.get(key));
+						float weight = ((Float) selectedPoints.get(key)).floatValue();
+						matrix.set(m);
+						matrix.mul(weight);
+						identity.setIdentity();
+						identity.mul(1 - weight);
+						matrix.add(identity);
+						matrix.transform(v);
+					}
+				}
+				
+				public JPatchUndoableEdit endTransform() {
+					return new AtomicChangeMorphVectors(MorphTarget.this, changeMap);
+				}
+				
+				public Point3f getPosition() {
+					throw new UnsupportedOperationException();
+				}
+			};
+		}
 	}
 	
 	
@@ -219,46 +276,46 @@ public class MorphTarget extends JPatchTreeLeaf {
 //		return false;
 //	}
 	
-	public void prepare() {
-		for (Iterator it = MainFrame.getInstance().getModel().allHeads().iterator(); it.hasNext(); ) {
-			ControlPoint cp = (ControlPoint) it.next();
-			mapPositions.put(cp, new Point3f(cp.getRefPosition()));
-		}
-		bPrepared = true;
-	}
+//	public void prepare() {
+//		for (Iterator it = MainFrame.getInstance().getModel().allHeads().iterator(); it.hasNext(); ) {
+//			ControlPoint cp = (ControlPoint) it.next();
+//			mapPositions.put(cp, new Point3f(cp.getRefPosition()));
+//		}
+//		bPrepared = true;
+//	}
 	
-	public void set() {
-		if (!bPrepared) throw new IllegalStateException("attempted to set unprepared morph");
-		//MainFrame.getInstance().getJPatchScreen().update_all();
-		//HashMap pointMap = new HashMap();
-		//for (Iterator it = MainFrame.getInstance().getModel().allHeads().iterator(); it.hasNext(); ) {
-		//	ControlPoint cp = (ControlPoint) it.next();
-		//	pointMap.put(cp, new Point3f(cp.getPosition()));
-		//}
-		//fValue = 0;
-		//MainFrame.getInstance().getModel().applyMorphs();
-		//MainFrame.getInstance().getJPatchScreen().update_all();
-		Vector3f v3 = new Vector3f();
-//		listPoints.clear();
-//		listVectors.clear();
-		for (Iterator it = MainFrame.getInstance().getModel().allHeads().iterator(); it.hasNext(); ) {
-			ControlPoint cp = (ControlPoint) it.next();
-			v3.set(cp.getRefPosition());
-			v3.sub((Tuple3f) mapPositions.get(cp));
-			if (v3.x != 0f || v3.y != 0f || v3.z != 0f) {
-//				listPoints.add(cp);
-//				listVectors.add(new Vector3f(v3));
-				mapMorph.put(cp, new Vector3f(v3));
-			}
-		}
-//		fValue = 1;
-		//apply();
-		mapPositions.clear();
-		bPrepared = false;
-	}
+//	public void set() {
+//		if (!bPrepared) throw new IllegalStateException("attempted to set unprepared morph");
+//		//MainFrame.getInstance().getJPatchScreen().update_all();
+//		//HashMap pointMap = new HashMap();
+//		//for (Iterator it = MainFrame.getInstance().getModel().allHeads().iterator(); it.hasNext(); ) {
+//		//	ControlPoint cp = (ControlPoint) it.next();
+//		//	pointMap.put(cp, new Point3f(cp.getPosition()));
+//		//}
+//		//fValue = 0;
+//		//MainFrame.getInstance().getModel().applyMorphs();
+//		//MainFrame.getInstance().getJPatchScreen().update_all();
+//		Vector3f v3 = new Vector3f();
+////		listPoints.clear();
+////		listVectors.clear();
+//		for (Iterator it = MainFrame.getInstance().getModel().allHeads().iterator(); it.hasNext(); ) {
+//			ControlPoint cp = (ControlPoint) it.next();
+//			v3.set(cp.getRefPosition());
+//			v3.sub((Tuple3f) mapPositions.get(cp));
+//			if (v3.x != 0f || v3.y != 0f || v3.z != 0f) {
+////				listPoints.add(cp);
+////				listVectors.add(new Vector3f(v3));
+//				mapMorph.put(cp, new Vector3f(v3));
+//			}
+//		}
+////		fValue = 1;
+//		//apply();
+//		mapPositions.clear();
+//		bPrepared = false;
+//	}
 	
 	public void dump() {
-		System.out.println(strName);
+		System.out.println(toString());
 //		for (int i = 0, n = listPoints.size(); i < n; i++) {
 //			ControlPoint cp = (ControlPoint) listPoints.get(i);
 //			Vector3f v3 = (Vector3f) listVectors.get(i);

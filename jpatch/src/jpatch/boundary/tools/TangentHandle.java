@@ -78,7 +78,7 @@ public class TangentHandle extends Handle {
 		float d = (float) p2Center.distance(p2Mouse);
 		//System.out.println(d + " " + fFactor);
 		cp.setMagnitude (d * fFactor);
-		cp.invalidateTangents();
+//		cp.invalidateTangents();
 		MainFrame.getInstance().getJPatchScreen().single_update((Component)mouseEvent.getSource());
 	}
 }

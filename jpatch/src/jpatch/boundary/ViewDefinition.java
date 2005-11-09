@@ -34,6 +34,8 @@ implements ComponentListener {
 	private boolean bRenderBezierCPs = false;
 	private boolean bShowRotoscope = true;
 	private boolean bAlwaysUseZBuffer = false;
+	private boolean bRenderReference = false;
+	
 	private ControlPoint cpTangentHandles = null;
 	//private Matrix4f m4Screen = new Matrix4f();
 	private Vector4f v4Screen = new Vector4f();
@@ -46,7 +48,7 @@ implements ComponentListener {
 //	private boolean bVisible;
 	
 	private Point3f p3Lock;
-	
+
 	public ViewDefinition(int view) {
 		//setView(view);
 		iView = view;
@@ -230,6 +232,10 @@ implements ComponentListener {
 		return bRenderBezierCPs;
 	}
 	
+	public final boolean renderReference() {
+		return bRenderReference;
+	}
+	
 	public final boolean showRotoscope() {
 		return bShowRotoscope;
 	}
@@ -252,6 +258,10 @@ implements ComponentListener {
 	
 	public final void renderBezierCPs(boolean enable) {
 		bRenderBezierCPs = enable;
+	}
+	
+	public final void renderReference(boolean enable) {
+		bRenderReference = enable;
 	}
 	
 	public final void showRotoscope(boolean enable) {

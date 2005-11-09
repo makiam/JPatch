@@ -52,7 +52,7 @@ public class XYZLockConstraints {
 		p3Pos.x = bXLock ? p3Pos.x : position.x;
 		p3Pos.y = bYLock ? p3Pos.y : position.y;
 		p3Pos.z = bZLock ? p3Pos.z : position.z;
-		cp.invalidateTangents();
+//		cp.invalidateTangents();
 	}
 	
 	public void setPointPosition(Point3f point, Point3f newPosition) {

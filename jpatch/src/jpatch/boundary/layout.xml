@@ -127,6 +127,7 @@
 			<item command="show curves"/>
 			<item command="show patches"/>
 			<item command="show rotoscope"/>
+			<item command="show reference"/>
 		</menu>
 		<menu name="view">
 			<item command="front view"/>

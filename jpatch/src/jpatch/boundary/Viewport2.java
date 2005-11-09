@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.31 2005/11/07 16:12:03 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.32 2005/11/09 15:55:08 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -229,7 +229,7 @@ public class Viewport2 {
 			drawable.setColor(new Color3f(settings.cCurve)); // FIXME
 			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
 				ControlPoint start = (ControlPoint) it.next();
-				if (!start.isStartHook())
+				if (start.getChildHook() == null)
 					drawCurve(start);
 			}
 		}
@@ -593,15 +593,24 @@ public class Viewport2 {
 			cpNext = cp.getNext();
 			if (cpNext != null && !cp.isHidden() && !cpNext.isHidden()) {
 				if (!drawable.isTransformSupported()) {
-					p0.set(cp.getPosition());
-					p1.set(cp.getOutTangent());
-					p2.set(cp.getNext().getInTangent());
-					p3.set(cp.getNext().getPosition());
+					if (viewDef.renderReference()) {
+						p0.set(cp.getReferencePosition());
+						p1.set(cp.getReferenceOutTangent());
+						p2.set(cp.getNext().getReferenceInTangent());
+						p3.set(cp.getNext().getReferencePosition());
+					} else {
+						p0.set(cp.getPosition());
+						p1.set(cp.getOutTangent());
+						p2.set(cp.getNext().getInTangent());
+						p3.set(cp.getNext().getPosition());
+					}
 					m4View.transform(p0);
 					m4View.transform(p1);
 					m4View.transform(p2);
 					m4View.transform(p3);
 					drawCurveSegment(p0, p1, p2, p3, false, 0, c3Curve);
+					drawable.drawLine(p0, p1);
+					drawable.drawLine(p3, p2);
 				} else {
 //					drawCurveSegment(cp.getPosition(), cp.getOutTangent(), cp.getNext().getInTangent(), cp.getNext().getPosition(), false, 0);
 				}

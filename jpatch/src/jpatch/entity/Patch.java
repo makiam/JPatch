@@ -1,5 +1,5 @@
 /*
- * $Id: Patch.java,v 1.5 2005/09/26 15:07:42 sascha_l Exp $
+ * $Id: Patch.java,v 1.6 2005/11/09 15:55:08 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -30,7 +30,7 @@ import jpatch.auxilary.*;
  * A Patch. Currently 3-, 4- and 5-point patches are supported
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.5 $
+ * @version    $Revision: 1.6 $
  * @see		jpatch.entity.Curve
  * @see		jpatch.entity.ControlPoint
  */
@@ -264,13 +264,13 @@ public final class Patch {
 		int coon = 0;
 		int p = 0;
 		while (p < acpPoint.length) {
-			ap3CoonsPatch[coon++] = new Point3f(acpPoint[p].getRefPosition());
+			ap3CoonsPatch[coon++] = new Point3f(acpPoint[p].getReferencePosition());
 			if (acpPoint[p].getNext() == acpPoint[p + 1]) {
-				ap3CoonsPatch[coon++] = new Point3f(acpPoint[p].getRefOutTangent());
-				ap3CoonsPatch[coon++] = new Point3f(acpPoint[++p].getRefInTangent());
+				ap3CoonsPatch[coon++] = new Point3f(acpPoint[p].getReferenceOutTangent());
+				ap3CoonsPatch[coon++] = new Point3f(acpPoint[++p].getReferenceInTangent());
 			} else {
-				ap3CoonsPatch[coon++] = new Point3f(acpPoint[p].getRefInTangent());
-				ap3CoonsPatch[coon++] = new Point3f(acpPoint[++p].getRefOutTangent());
+				ap3CoonsPatch[coon++] = new Point3f(acpPoint[p].getReferenceInTangent());
+				ap3CoonsPatch[coon++] = new Point3f(acpPoint[++p].getReferenceOutTangent());
 			}
 			p++;
 		}

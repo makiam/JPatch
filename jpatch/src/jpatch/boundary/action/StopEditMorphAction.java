@@ -24,7 +24,7 @@ public final class StopEditMorphAction extends AbstractAction {
 			throw new IllegalStateException("StopEditMorphAction called when no morph was edited");
 		MainFrame.getInstance().setEditedMorph(null);
 		MainFrame.getInstance().getUndoManager().rewind();
-		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeMorph(morph));
+//		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeMorph(morph));
 	}
 }
 

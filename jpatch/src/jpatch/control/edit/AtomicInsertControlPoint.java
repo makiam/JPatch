@@ -42,12 +42,12 @@ public class AtomicInsertControlPoint extends JPatchAtomicEdit implements JPatch
 		}
 		cpA.setPrev(cpB);
 		cpB.setNext(cpA);
-		if (cpB.getPrev() != null)
-			cpB.getPrev().invalidateTangents();
-		cpB.invalidateTangents();
-		cpA.invalidateTangents();
-		if (cpA.getNext() != null)
-			cpA.getNext().invalidateTangents();
+//		if (cpB.getPrev() != null)
+//			cpB.getPrev().invalidateTangents();
+//		cpB.invalidateTangents();
+//		cpA.invalidateTangents();
+//		if (cpA.getNext() != null)
+//			cpA.getNext().invalidateTangents();
 			
 	}
 
@@ -63,11 +63,11 @@ public class AtomicInsertControlPoint extends JPatchAtomicEdit implements JPatch
 //		cpA.setPrev(cpAprev);
 		cpB.setNext(cpBnext);
 //		cpA.setCurve(curve);
-		if (cpB.getPrev() != null)
-			cpB.getPrev().invalidateTangents();
-		cpB.invalidateTangents();
-		if (cpBnext != null)
-			cpBnext.invalidateTangents();
+//		if (cpB.getPrev() != null)
+//			cpB.getPrev().invalidateTangents();
+//		cpB.invalidateTangents();
+//		if (cpBnext != null)
+//			cpBnext.invalidateTangents();
 	}
 	
 	public String getName() {

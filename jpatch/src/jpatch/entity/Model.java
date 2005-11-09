@@ -3,6 +3,7 @@ package jpatch.entity;
 
 import java.util.*;
 
+import javax.swing.ListModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -29,16 +30,16 @@ public class Model implements MutableTreeNode {
 
 	private MutableTreeNode treenodeSelections;
 	private MutableTreeNode treenodeMaterials;
-	private MutableTreeNode treenodeExpressions; 
+	private MutableTreeNode treenodeMorphs; 
 	private MutableTreeNode treenodeBones;
 	
 	private ArrayList lstCandidateFivePointPatch = new ArrayList();
 	
 	//private JPatchMaterial[] aJPMaterial = new JPatchMaterial[32];
 	
-	private List lstMaterials = new ArrayList();
-	private List lstSelections = new ArrayList();
-	private List lstMorphs = new ArrayList();
+	private List listMaterials = new ArrayList();
+	private List listSelections = new ArrayList();
+	private List listMorphs = new ArrayList();
 //	private List lstBoneShapes = new ArrayList();
 	private HashMap mapPhonemes = new HashMap();
 	private String strName;
@@ -48,13 +49,13 @@ public class Model implements MutableTreeNode {
 	
 	public Model() {
 		strName = "New Model";
-		treenodeSelections = new ModelTreeNode("Selections", lstSelections);
-		treenodeMaterials = new ModelTreeNode("Materials", lstMaterials);
-		treenodeExpressions = new ModelTreeNode("Expressions", lstMorphs);
+		treenodeSelections = new ModelTreeNode("Selections", listSelections);
+		treenodeMaterials = new ModelTreeNode("Materials", listMaterials);
+		treenodeMorphs = new ModelTreeNode("Morphs", listMorphs);
 		treenodeBones = new ModelTreeNode("Bones", new ArrayList());
 		JPatchMaterial material = new JPatchMaterial(new Color3f(1,1,1));
 		material.setName("Default Material");
-		lstMaterials.add(material);
+		listMaterials.add(material);
 //		treenodeMaterials.insert(material, 0);
 		
 //		addBone(new Bone(this, new Point3f(0, 0, 0), new Vector3f(1, 0, 0)));
@@ -119,7 +120,7 @@ public class Model implements MutableTreeNode {
 		}
 		
 		int n = 0;
-		for (Iterator it = lstMaterials.iterator(); it.hasNext();) {
+		for (Iterator it = listMaterials.iterator(); it.hasNext();) {
 			JPatchMaterial mat = (JPatchMaterial) it.next();
 			mat.setXmlNumber(n++);
 			sb.append(mat.xml(prefix2));
@@ -150,7 +151,7 @@ public class Model implements MutableTreeNode {
 		for (Iterator it = mapPatches.keySet().iterator(); it.hasNext(); ) {
 			sb.append(((Patch) it.next()).xml(prefix3));
 		}
-		for (Iterator it = lstMorphs.iterator(); it.hasNext(); ) {
+		for (Iterator it = listMorphs.iterator(); it.hasNext(); ) {
 			MorphTarget morph = (MorphTarget) it.next();
 			sb.append(morph.xml(prefix3));
 		}
@@ -166,7 +167,7 @@ public class Model implements MutableTreeNode {
 		for (Iterator it = mapPhonemes.keySet().iterator(); it.hasNext(); ) {
 			String phoneme = (String) it.next();
 			MorphTarget morph = (MorphTarget) mapPhonemes.get(phoneme);
-			if (morph != null) lipSyncMap.append(prefix).append("\t\t<map phoneme=\"" + phoneme + "\" morph=\"" + lstMorphs.indexOf(morph) + "\"/>").append("\n");
+			if (morph != null) lipSyncMap.append(prefix).append("\t\t<map phoneme=\"" + phoneme + "\" morph=\"" + listMorphs.indexOf(morph) + "\"/>").append("\n");
 		}
 		if (lipSyncMap.length() > 0) {
 			sb.append(prefix).append("\t<lipsync>").append("\n");
@@ -174,7 +175,7 @@ public class Model implements MutableTreeNode {
 			sb.append(prefix).append("\t</lipsync>").append("\n");
 		}
 		sb.append(prefix2).append("</mesh>").append("\n");
-		for (Iterator it = lstSelections.iterator(); it.hasNext();) {
+		for (Iterator it = listSelections.iterator(); it.hasNext();) {
 			Selection selection = (Selection) it.next();
 			sb.append(selection.xml(prefix2));
 		}
@@ -237,11 +238,11 @@ public class Model implements MutableTreeNode {
 	}
 	
 	public boolean checkSelection(Selection selection) {
-		return (!lstSelections.contains(selection));
+		return (!listSelections.contains(selection));
 	}
 	
 	public Selection getSelection(Selection selection) {
-		return (Selection) lstSelections.get(lstSelections.indexOf(selection));
+		return (Selection) listSelections.get(listSelections.indexOf(selection));
 	}
 	
 	public void addSelection(Selection selection) {
@@ -293,29 +294,57 @@ public class Model implements MutableTreeNode {
 	public void addExpression(Morph morph) {
 //		treenodeExpressions.insert(morph, 0);
 //		lstMorphs.add(morph);
-		MainFrame.getInstance().getTreeModel().insertNodeInto(morph, treenodeExpressions, treenodeExpressions.getChildCount());
+		MainFrame.getInstance().getTreeModel().insertNodeInto(morph, treenodeMorphs, treenodeMorphs.getChildCount());
 	}
 	
 	public void setReferenceGeometry() {
-		unapplyMorphs();
-		for (Iterator it = setCurves.iterator(); it.hasNext(); ) {
-			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
-				cp.setReference();
-			}
-		}
-		applyMorphs();
+		//FIXME
+//		unapplyMorphs();
+//		for (Iterator it = setCurves.iterator(); it.hasNext(); ) {
+//			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+//				cp.setReference();
+//			}
+//		}
+//		applyMorphs();
 	}
 	
 	public void unapplyMorphs() {
+//		FIXME
 //		for (Iterator it = lstMorphs.iterator(); it.hasNext(); ) {
 //			((MorphTarget) it.next()).unapply();
 //		}
 	}
 	
 	public void applyMorphs() {
+//		FIXME
 //		for (Iterator it = lstMorphs.iterator(); it.hasNext(); ) {
 //			((MorphTarget) it.next()).apply();
 //		}
+	}
+	
+	public void setPose() {
+		
+		/* reset morph vectors */
+		for (Iterator itCurves = setCurves.iterator(); itCurves.hasNext(); ) {
+			for (ControlPoint cp = (ControlPoint) itCurves.next(); cp != null; cp = cp.getNextCheckNextLoop())
+				cp.getMorphVector().set(0, 0, 0);
+		}
+		
+		/* apply morphs */
+		for (Iterator itMorphs = listMorphs.iterator(); itMorphs.hasNext(); ) {
+			Morph morph = (Morph) itMorphs.next();
+			Map morphMap = morph.getMorphMap();
+			for (Iterator itCps = morphMap.keySet().iterator(); itCps.hasNext(); ) {
+				ControlPoint cp = (ControlPoint) itCps.next();
+				cp.getMorphVector().add((Vector3f) morphMap.get(cp));
+			}
+		}
+		
+		/* apply pose */
+		for (Iterator itCurves = setCurves.iterator(); itCurves.hasNext(); ) {
+			for (ControlPoint cp = (ControlPoint) itCurves.next(); cp != null; cp = cp.getNextCheckNextLoop())
+				cp.setPose();
+		}
 	}
 	
 //	public Iterator getSelectionIterator() {
@@ -323,15 +352,15 @@ public class Model implements MutableTreeNode {
 //	}
 	
 	public List getSelections() {
-		return lstSelections;
+		return listSelections;
 	}
 	
 	public Iterator getMorphIterator() {
-		return lstMorphs.iterator();
+		return listMorphs.iterator();
 	}
 	
 	public List getMorphList() {
-		return lstMorphs;
+		return listMorphs;
 	}
 	
 //	public List getBoneShapeList() {
@@ -349,7 +378,7 @@ public class Model implements MutableTreeNode {
 		return treenodeMaterials;
 	}
 	public MutableTreeNode getTreenodeExpressions() {
-		return treenodeExpressions;
+		return treenodeMorphs;
 	}
 	public MutableTreeNode getTreenodeBones() {
 		return treenodeBones;
@@ -370,11 +399,11 @@ public class Model implements MutableTreeNode {
 	
 	public JPatchMaterial getMaterial(int m) {
 		//if (m > 31) m = 0;
-		return (JPatchMaterial)lstMaterials.get(m);
+		return (JPatchMaterial)listMaterials.get(m);
 	}
 	
 	public List getMaterialList() {
-		return lstMaterials;
+		return listMaterials;
 	}
 	
 	
@@ -453,7 +482,7 @@ public class Model implements MutableTreeNode {
 	}
 	
 	public void removeMorph(MorphTarget morph) {
-		lstMorphs.remove(morph);
+		listMorphs.remove(morph);
 	}
 	
 //	/**
@@ -1001,7 +1030,7 @@ public class Model implements MutableTreeNode {
 		}
 		
 		System.out.println("\n\n----------- selections -------------");
-		for (Iterator it = lstSelections.iterator(); it.hasNext(); ) {
+		for (Iterator it = listSelections.iterator(); it.hasNext(); ) {
 			selection = (Selection) it.next();
 			System.out.println(selection);
 			System.out.println(selection.getMap());
@@ -1009,8 +1038,8 @@ public class Model implements MutableTreeNode {
 		}
 		
 		System.out.println("\n\n----------- morphs -------------");
-		for (Iterator it = lstMorphs.iterator(); it.hasNext(); ) {
-			((MorphTarget) it.next()).dump();
+		for (Iterator it = listMorphs.iterator(); it.hasNext(); ) {
+			((Morph) it.next()).dump();
 		}
 		
 		System.out.println("\n\n----------- bones -------------");
@@ -1078,7 +1107,7 @@ public class Model implements MutableTreeNode {
 		case 1:
 			return treenodeMaterials;
 		case 2:
-			return treenodeExpressions;
+			return treenodeMorphs;
 		case 3:
 			return treenodeBones;
 		}

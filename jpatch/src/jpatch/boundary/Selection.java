@@ -13,6 +13,7 @@ public class Selection extends JPatchTreeLeaf {
 	public static final int CONTROLPOINTS = 1;
 	public static final int MORPHS = 2;
 	public static final int BONES = 4;
+	public static final int MORPHTARGET = 8;
 	public static int NUM = 0;
 	
 	private final Map mapObjects = new HashMap();
@@ -238,6 +239,7 @@ public class Selection extends JPatchTreeLeaf {
 	}
 	
 	public void arm(int mask) {
+//		System.out.println("Selection.arm(" + mask + ")");
 		mapTransformables = new HashMap();
 		if ((mask & CONTROLPOINTS) != 0) {
 			for (Iterator it = mapObjects.keySet().iterator(); it.hasNext();) {
@@ -246,16 +248,22 @@ public class Selection extends JPatchTreeLeaf {
 			}
 		}
 		if ((mask & MORPHS) != 0) {
-			for (Iterator it = MainFrame.getInstance().getModel().getMorphIterator(); it.hasNext();) {
-				Transformable transformable = ((MorphTarget) it.next()).getTransformable(mapObjects);
-				if (transformable != null)
-					mapTransformables.put(transformable, new Float(1.0f));
-
+			for (Iterator itMorphs = MainFrame.getInstance().getModel().getMorphIterator(); itMorphs.hasNext(); ) {
+				Morph moprh = (Morph) itMorphs.next();
+				for (Iterator itTargets = moprh.getTargets().iterator(); itTargets.hasNext(); ) {
+					Transformable transformable = ((MorphTarget) itTargets.next()).getTransformable(mapObjects, false);
+					if (transformable != null)
+						mapTransformables.put(transformable, new Float(1.0f));
+				}
 			}
+		}
+		if ((mask & MORPHTARGET) != 0) {
+			mapTransformables.put(MainFrame.getInstance().getEditedMorph().getTransformable(mapObjects, true), new Float(1.0f));
 		}
 	}
 
 	public void beginTransform() {
+		System.out.println("beginTransform: " + mapTransformables);
 		for (Iterator it = mapTransformables.keySet().iterator(); it.hasNext(); )
 			((Transformable) it.next()).beginTransform();
 		pivotTransformable.beginTransform();

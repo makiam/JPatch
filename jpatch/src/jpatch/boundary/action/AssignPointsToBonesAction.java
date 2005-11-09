@@ -45,7 +45,7 @@ public final class AssignPointsToBonesAction extends AbstractAction {
 		
 		for (int i = 0, n = cpList.size(); i < n; i++) {
 			ControlPoint cp = (ControlPoint) cpList.get(i);
-			Point3f p = cp.getRefPosition();
+			Point3f p = cp.getReferencePosition();
 			float minDist = Float.MAX_VALUE;
 			float closestPosOnLine = 0;
 			Bone closestBone = null;

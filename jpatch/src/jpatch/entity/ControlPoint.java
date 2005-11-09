@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.11 2005/10/31 16:18:54 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.12 2005/11/09 15:55:08 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -36,7 +36,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.11 $
+ * @version    $Revision: 1.12 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -71,7 +71,7 @@ public class ControlPoint implements Comparable, Transformable {
 	private int iNumber;
 	
 	/** position of this ConrolPoint */
-	private Point3f p3Position = new Point3f();
+	private Point3f p3ReferencePosition = new Point3f();
 	/** reference position of this ControlPoint */
 	//private Point3f p3ReferencePosition = new Point3f();
 	/** loop flag */
@@ -106,16 +106,21 @@ public class ControlPoint implements Comparable, Transformable {
 	//private float fInGamma = 0;
 	///** out gamma */
 	//private float fOutGamma = 0;
+	/** cached reference in tangent */
+	private Point3f p3ReferenceInTangent = new Point3f();
+	/** cached reference out tangent */
+	private Point3f p3ReferenceOutTangent = new Point3f();
 	/** cached in tangent */
 	private Point3f p3InTangent = new Point3f();
 	/** cached out tangent */
 	private Point3f p3OutTangent = new Point3f();
 	
-	private Point3f p3RefPosition = new Point3f();
-	private Point3f p3RefInTangent = new Point3f();
-	private Point3f p3RefOutTangent = new Point3f();
+//	private Point3f p3RefPosition = new Point3f();
+//	private Point3f p3RefInTangent = new Point3f();
+//	private Point3f p3RefOutTangent = new Point3f();
 	
 	private Point3f p3BackupPosition = new Point3f();
+	private Vector3f v3Morph = new Vector3f();
 	
 	private boolean bHidden = false;
 	private boolean bDeleted = false;
@@ -131,8 +136,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 */
 	public ControlPoint() {
 		iNumber = iSequence++;
-		m4Transform.setIdentity();
-		m4InvTransform.invert(m4Transform);
+		setPose();
 	}
 
 	/**
@@ -141,7 +145,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 * @param cp	The controlpoint which position is copied
 	 */
 	public ControlPoint(ControlPoint cp) {
-		this(cp.getHead().p3Position);
+		this(cp.getHead().p3ReferencePosition);
 		iMode = cp.iMode;
 		fInMagnitude = cp.fInMagnitude;
 		fOutMagnitude = cp.fOutMagnitude;
@@ -153,7 +157,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 */
 	public ControlPoint(Point3f position) {
 		this();
-		p3Position.set(position);
+		p3ReferencePosition.set(position);
 		//p3ReferencePosition.set(position);
 	}
 
@@ -166,7 +170,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 */
 	public ControlPoint(float x, float y, float z) {
 		this();
-		p3Position.set(x, y, z);
+		p3ReferencePosition.set(x, y, z);
 		//p3ReferencePosition.set(x, y, z);
 	}
 
@@ -182,42 +186,42 @@ public class ControlPoint implements Comparable, Transformable {
 	*/
 	
 	public void beginTransform() {
-		p3BackupPosition.set(p3Position);
+		p3BackupPosition.set(p3ReferencePosition);
 	}
 	
 	public void translate(Vector3f v) {
-		p3Position.set(p3BackupPosition);
+		p3ReferencePosition.set(p3BackupPosition);
 		Vector3f vv = new Vector3f(v);
 		m4InvTransform.transform(vv);
-		p3Position.add(vv);
+		p3ReferencePosition.add(vv);
 //		invalidateTangents();
 	}
 	
 	public void rotate(AxisAngle4f a, Point3f pivot) {
-		p3Position.set(p3BackupPosition);
+		p3ReferencePosition.set(p3BackupPosition);
 		Point3f p = new Point3f(pivot);
 		m4InvTransform.transform(p);
-		p3Position.sub(p);
+		p3ReferencePosition.sub(p);
 		Matrix3f rot = new Matrix3f();
 		Vector3f axis = new Vector3f(a.x, a.y, a.z);
 		m4InvTransform.transform(axis);
 		rot.set(new AxisAngle4f(axis, a.angle));
-		rot.transform(p3Position);
-		p3Position.add(p);
+		rot.transform(p3ReferencePosition);
+		p3ReferencePosition.add(p);
 //		invalidateTangents();
 	}
 	
 	public void transform(Matrix3f m, Point3f pivot) {
-		p3Position.set(p3BackupPosition);
+		p3ReferencePosition.set(p3BackupPosition);
 		Point3f p = new Point3f(pivot);
 		m4InvTransform.transform(p);
-		p3Position.sub(p);
+		p3ReferencePosition.sub(p);
 		Matrix3f mm = new Matrix3f(m);
 		Matrix3f mt = new Matrix3f();
 		m4InvTransform.getRotationScale(mt);
 		mt.mul(mm);
-		m.transform(p3Position);
-		p3Position.add(p);
+		m.transform(p3ReferencePosition);
+		p3ReferencePosition.add(p);
 //		invalidateTangents();
 	}
 	
@@ -256,24 +260,11 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 
-	public void setReference() {
-		p3RefPosition.set(getPosition());
-		if (cpPrev != null) p3RefInTangent.set(getInTangent());
-		if (cpNext != null) p3RefOutTangent.set(getOutTangent());
-	}
-	
-	public Point3f getRefPosition() {
-//		return p3RefPosition;
-		return p3Position;
-	}
-	
-	public Point3f getRefInTangent() {
-		return p3RefInTangent;
-	}
-	
-	public Point3f getRefOutTangent() {
-		return p3RefOutTangent;
-	}
+//	public void setReference() {
+//		p3RefPosition.set(getPosition());
+//		if (cpPrev != null) p3RefInTangent.set(getInTangent());
+//		if (cpNext != null) p3RefOutTangent.set(getOutTangent());
+//	}
 	
 	public void setBone(Bone bone, float position) {
 		this.bone = bone;
@@ -322,12 +313,12 @@ public class ControlPoint implements Comparable, Transformable {
 //		 cpChildHook = null;
 //	}
 
-	public Point3f getHookPosition(int hook) {
+	public Point3f getReferenceHookPosition(int hook) {
 		if (cpNext != null) {
-			Point3f p0 = getPosition();
-			Point3f p1 = getOutTangent();
-			Point3f p2 = cpNext.getInTangent();
-			Point3f p3 = cpNext.getPosition();
+			Point3f p0 = getReferencePosition();
+			Point3f p1 = getReferenceOutTangent();
+			Point3f p2 = cpNext.getReferenceInTangent();
+			Point3f p3 = cpNext.getReferencePosition();
 			float x = p0.x * HOOK_B0[hook] + p1.x * HOOK_B1[hook] + p2.x * HOOK_B2[hook] + p3.x * HOOK_B3[hook];
 			float y = p0.y * HOOK_B0[hook] + p1.y * HOOK_B1[hook] + p2.y * HOOK_B2[hook] + p3.y * HOOK_B3[hook];
 			float z = p0.z * HOOK_B0[hook] + p1.z * HOOK_B1[hook] + p2.z * HOOK_B2[hook] + p3.z * HOOK_B3[hook];
@@ -335,6 +326,13 @@ public class ControlPoint implements Comparable, Transformable {
 		} else {
 			return null;
 		}
+	}
+	
+	public Point3f getHookPosition(int hook) {
+		Point3f p = getReferenceHookPosition(hook);
+		if (p != null)
+			m4Transform.transform(p);
+		return p;
 	}
 	
 	/**
@@ -658,14 +656,46 @@ public class ControlPoint implements Comparable, Transformable {
 	 *
 	 * @return    The inTangent (javax.vecmath.Point3f)
 	 */
+	public Point3f getReferenceInTangent() {
+		if (cpPrev == null) {
+			//throw new JPatchException("attempted to get inTangent on hookStart " + this);
+			return null;
+		}
+		if (isTargetHook()) {
+			Vector3f v3Direction = new Vector3f(cpPrev.getReferencePosition());
+			v3Direction.sub(getReferencePosition());
+			Vector3f v3InTangent = getReferenceTargetHookTangent(v3Direction);
+			v3InTangent.normalize();
+			v3InTangent.scale(v3Direction.length() * fInMagnitude / 3f);
+			Point3f p3InTangent = new Point3f(getReferencePosition());
+			p3InTangent.add(v3InTangent);
+			return p3InTangent;
+		}
+		if (isHook()) {
+		//if (cpParentHook != null) {
+			Point3f[] ap3Bezier1 = Bezier.deCasteljau(getStart().cpParentHook.getReferencePosition(),
+				getStart().cpParentHook.getReferenceOutTangent(),
+				getEnd().cpParentHook.getReferenceInTangent(),
+				getEnd().cpParentHook.getReferencePosition(),
+				fHookPos);
+			//float alpha = (fHookPos - cpPrev.fHookPos) / (1 - cpPrev.fHookPos);
+			Point3f[] ap3Bezier2 = Bezier.deCasteljau(ap3Bezier1[0], ap3Bezier1[1], ap3Bezier1[2], ap3Bezier1[3], cpPrev.fHookPos);
+			return ap3Bezier2[5];
+		}
+		//if (!bTangentsValid) {			// if the tangents are invalid
+			computeReferenceTangents();		// compute them
+		//}
+		return p3ReferenceInTangent;			// return cached in tangent
+	}
+
 	public Point3f getInTangent() {
 		if (cpPrev == null) {
 			//throw new JPatchException("attempted to get inTangent on hookStart " + this);
 			return null;
 		}
 		if (isTargetHook()) {
-			Vector3f v3Direction = new Vector3f(cpPrev.getPosition());
-			v3Direction.sub(getPosition());
+			Vector3f v3Direction = new Vector3f(cpPrev.getReferencePosition());
+			v3Direction.sub(getReferencePosition());
 			Vector3f v3InTangent = getTargetHookTangent(v3Direction);
 			v3InTangent.normalize();
 			v3InTangent.scale(v3Direction.length() * fInMagnitude / 3f);
@@ -675,34 +705,69 @@ public class ControlPoint implements Comparable, Transformable {
 		}
 		if (isHook()) {
 		//if (cpParentHook != null) {
-			Point3f[] ap3Bezier1 = Bezier.deCasteljau(getStart().cpParentHook.getPosition(),
-				getStart().cpParentHook.getOutTangent(),
-				getEnd().cpParentHook.getInTangent(),
-				getEnd().cpParentHook.getPosition(),
-				fHookPos);
+			Point3f[] ap3Bezier1 = Bezier.deCasteljau(
+					getStart().cpParentHook.getPosition(),
+					getStart().cpParentHook.getOutTangent(),
+					getEnd().cpParentHook.getInTangent(),
+					getEnd().cpParentHook.getPosition(),
+					fHookPos
+			);
 			//float alpha = (fHookPos - cpPrev.fHookPos) / (1 - cpPrev.fHookPos);
 			Point3f[] ap3Bezier2 = Bezier.deCasteljau(ap3Bezier1[0], ap3Bezier1[1], ap3Bezier1[2], ap3Bezier1[3], cpPrev.fHookPos);
 			return ap3Bezier2[5];
 		}
 		//if (!bTangentsValid) {			// if the tangents are invalid
-			computeTangents();		// compute them
+		computeTangents();		// compute them
 		//}
-		return p3InTangent;			// return cached in tangent
+		return p3InTangent;
 	}
-
+	
 	/**
 	 *  Computes or retunes the cached inTangent of this ControlPoint
 	 *
 	 * @return    The inTangent (javax.vecmath.Point3f)
 	 */
+	public Point3f getReferenceOutTangent() {
+		if (cpNext == null) {
+			//throw new JPatchException("attempted to get outTangent on hookEnd " + this);
+			return null;
+		}
+		if (isTargetHook()) {
+			Vector3f v3Direction = new Vector3f(cpNext.getReferencePosition());
+			v3Direction.sub(getReferencePosition());
+			Vector3f v3OutTangent = getReferenceTargetHookTangent(v3Direction);
+			v3OutTangent.normalize();
+			v3OutTangent.scale(v3Direction.length() * fOutMagnitude / 3f);
+			Point3f p3OutTangent = new Point3f(getReferencePosition());
+			p3OutTangent.add(v3OutTangent);
+			return p3OutTangent;
+		}
+		if (isHook()) {
+		//if (cpParentHook != null) {
+			Point3f[] ap3Bezier1 = Bezier.deCasteljau(
+				getStart().cpParentHook.getReferencePosition(),
+				getStart().cpParentHook.getReferenceOutTangent(),
+				getEnd().cpParentHook.getReferenceInTangent(),
+				getEnd().cpParentHook.getReferencePosition(),
+				fHookPos
+				);
+			Point3f[] ap3Bezier2 = Bezier.deCasteljau(ap3Bezier1[3], ap3Bezier1[4], ap3Bezier1[5], ap3Bezier1[6], cpNext.fHookPos);
+			return ap3Bezier2[1];
+		}
+		//if (!bTangentsValid) {			// if the tangents are invalid
+			computeReferenceTangents();		// compute them
+		//}
+		return p3ReferenceOutTangent;			// return cached out tangent
+	}
+	
 	public Point3f getOutTangent() {
 		if (cpNext == null) {
 			//throw new JPatchException("attempted to get outTangent on hookEnd " + this);
 			return null;
 		}
 		if (isTargetHook()) {
-			Vector3f v3Direction = new Vector3f(cpNext.getPosition());
-			v3Direction.sub(getPosition());
+			Vector3f v3Direction = new Vector3f(cpNext.getReferencePosition());
+			v3Direction.sub(getReferencePosition());
 			Vector3f v3OutTangent = getTargetHookTangent(v3Direction);
 			v3OutTangent.normalize();
 			v3OutTangent.scale(v3Direction.length() * fOutMagnitude / 3f);
@@ -723,11 +788,10 @@ public class ControlPoint implements Comparable, Transformable {
 			return ap3Bezier2[1];
 		}
 		//if (!bTangentsValid) {			// if the tangents are invalid
-			computeTangents();		// compute them
+		computeTangents();		// compute them
 		//}
-		return p3OutTangent;			// return cached out tangent
+		return p3OutTangent;
 	}
-	
 
 	/**
 	 *  Goes through all ControlPoints this one is attached to and
@@ -787,6 +851,39 @@ public class ControlPoint implements Comparable, Transformable {
 	 *
 	 * @return    The position
 	 */
+	public Point3f getReferencePosition() {
+		if (isTargetHook()) {
+			return cpNextAttached.getReferencePosition();
+		} else if (isHook()) {
+			return Bezier.evaluate(
+				getStart().cpParentHook.getReferencePosition(),
+				getStart().cpParentHook.getReferenceOutTangent(),
+				getEnd().cpParentHook.getReferenceInTangent(),
+				getEnd().cpParentHook.getReferencePosition(),
+				fHookPos
+				);
+		} else if (cpParentHook != null) {
+			return cpParentHook.getReferencePosition();
+		} else if (isHead()) {
+			return p3ReferencePosition;
+//			Point3f p = new Point3f(p3ReferencePosition);
+//			if (bone != null) {
+//				RotationDof dof = bone.getLastDof();
+//				if (dof != null) {
+//					//if (!dof.isTransformValid()) {
+//						m4Transform.set(dof.getTransform());
+//						m4InvTransform.set(dof.getInvTransform());
+////						bTangentsValid = false;
+//					//}
+//				}
+//			}
+//			m4Transform.transform(p);
+//			return p;
+		} else {
+			return getHead().getReferencePosition();
+		}
+	}
+
 	public Point3f getPosition() {
 		if (isTargetHook()) {
 			return cpNextAttached.getPosition();
@@ -801,17 +898,7 @@ public class ControlPoint implements Comparable, Transformable {
 		} else if (cpParentHook != null) {
 			return cpParentHook.getPosition();
 		} else if (isHead()) {
-			Point3f p = new Point3f(p3Position);
-			if (bone != null) {
-				RotationDof dof = bone.getLastDof();
-				if (dof != null) {
-					//if (!dof.isTransformValid()) {
-						m4Transform.set(dof.getTransform());
-						m4InvTransform.set(dof.getInvTransform());
-//						bTangentsValid = false;
-					//}
-				}
-			}
+			Point3f p = new Point3f(p3ReferencePosition);
 			m4Transform.transform(p);
 			return p;
 		} else {
@@ -819,7 +906,26 @@ public class ControlPoint implements Comparable, Transformable {
 		}
 	}
 
-
+	public void setPose() {
+		if (bone != null) {
+			RotationDof dof = bone.getLastDof();
+			if (dof != null) {
+				m4Transform.set(dof.getTransform());				
+			}
+		} else {
+			m4Transform.setIdentity();
+		}
+		m4Transform.transform(v3Morph);
+		m4Transform.m03 += v3Morph.x;
+		m4Transform.m13 += v3Morph.y;
+		m4Transform.m23 += v3Morph.z;
+		m4InvTransform.invert(m4Transform);
+	}
+	
+	public Vector3f getMorphVector() {
+		return v3Morph;
+	}
+	
 	/**
 	 *  Gets the previous ControlPoint on the curve
 	 *
@@ -900,7 +1006,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 * @return    a string with some information about this ControlPoint
 	 */
 	public String info() {
-		return p3Position + "\tthis:" + this + "\tnext:" + cpNext + "\tprev:" + cpPrev + "\tup  :" + cpNextAttached + "\tdown:" + cpPrevAttached
+		return p3ReferencePosition + "\tthis:" + this + "\tnext:" + cpNext + "\tprev:" + cpPrev + "\tup  :" + cpNextAttached + "\tdown:" + cpPrevAttached
 			 + "\tpar :" + cpParentHook + "\tchld:" + cpChildHook + "\thp:" + fHookPos;
 	}
 
@@ -1059,7 +1165,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 */
 	public void setNext(ControlPoint next) {
 		cpNext = next;
-		setTangentsValid(false);
+//		invalidateTangents();
 	}
 
 	/**
@@ -1069,7 +1175,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 */
 	public void setNextAttached(ControlPoint nextAttached) {
 		cpNextAttached = nextAttached;
-		invalidateTangents();
+//		invalidateTangents();
 	}
 
 	/**
@@ -1080,9 +1186,9 @@ public class ControlPoint implements Comparable, Transformable {
 	 */
 	public void setPosition(Point3f position) {
 		if (!isHead()) throw new IllegalStateException("attempted to set potsition on attached point");
-		p3Position.set(position);
-		m4InvTransform.transform(p3Position);
-		invalidateTangents();
+		p3ReferencePosition.set(position);
+		m4InvTransform.transform(p3ReferencePosition);
+//		invalidateTangents();
 	}
 
 
@@ -1096,15 +1202,15 @@ public class ControlPoint implements Comparable, Transformable {
 	 */
 	public void setPosition(float x, float y, float z) {
 		if (!isHead()) throw new IllegalStateException("attempted to set potsition on attached point");
-		p3Position.set(x, y,z);
-		m4InvTransform.transform(p3Position);
-		invalidateTangents();
+		p3ReferencePosition.set(x, y,z);
+		m4InvTransform.transform(p3ReferencePosition);
+//		invalidateTangents();
 	}
 
 	public void setReferencePosition(float x, float y, float z) {
 		if (!isHead()) throw new IllegalStateException("attempted to set reference potsition on attached point");
-		p3Position.set(x, y,z);
-		invalidateTangents();
+		p3ReferencePosition.set(x, y,z);
+//		invalidateTangents();
 	}
 	
 	/**
@@ -1114,7 +1220,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 */
 	public void setPrev(ControlPoint prev) {
 		cpPrev = prev;
-		setTangentsValid(false);
+//		invalidateTangents();
 	}
 
 	/**
@@ -1136,15 +1242,15 @@ public class ControlPoint implements Comparable, Transformable {
 	//}
 
 
-	/**
-	 *  Sets the tangentsValid attribute of the ControlPoint object
-	 *
-	 * @param  valid  Sets the tangents valid or invalid.
-	 *		Invalid tangents will become re-computed the next time the're needed.
-	 */
-	public void setTangentsValid(boolean valid) {
+//	/**
+//	 *  Sets the tangentsValid attribute of the ControlPoint object
+//	 *
+//	 * @param  valid  Sets the tangents valid or invalid.
+//	 *		Invalid tangents will become re-computed the next time the're needed.
+//	 */
+//	public void setTangentsValid(boolean valid) {
 //		bTangentsValid = valid;
-	}
+//	}
 
 	/**
 	 *  Just returns the hashCode as a String
@@ -1156,6 +1262,18 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 
 	/**
+	 *  Computes reference tangents for "PEAK" mode
+	 */
+	private void computeReferencePeakTangents() {
+		if (cpPrev != null) {
+			p3ReferenceInTangent.interpolate(getReferencePosition(), cpPrev.getReferencePosition(), fInMagnitude / 3f);
+		}
+		if (cpNext != null) {
+			p3ReferenceOutTangent.interpolate(getReferencePosition(), cpNext.getReferencePosition(), fOutMagnitude /3f);
+		}
+	}
+	
+	/**
 	 *  Computes tangents for "PEAK" mode
 	 */
 	private void computePeakTangents() {
@@ -1166,7 +1284,32 @@ public class ControlPoint implements Comparable, Transformable {
 			p3OutTangent.interpolate(getPosition(), cpNext.getPosition(), fOutMagnitude /3f);
 		}
 	}
+	
        
+	/**
+	 *  Computes reference tangents for "SPATCH_ROUND" mode
+	 */
+	private void computeReferenceSPatchRoundTangents() {
+		Vector3f v3InTangent;
+		Vector3f v3OutTangent;
+		float fInLength = 0f;
+		float fOutLength = 0f;
+		if (cpPrev != null) {
+			fInLength = cpPrev.getReferencePosition().distance(getReferencePosition());
+		}
+		if (cpNext != null) {
+			fOutLength = cpNext.getReferencePosition().distance(getReferencePosition());
+		}
+		v3InTangent = getReferenceNormalizedTangent();
+		v3OutTangent = new Vector3f(v3InTangent);
+		v3InTangent.scale(fInMagnitude * fInLength / 3f);
+		v3OutTangent.scale(fOutMagnitude * fOutLength /3f);
+		p3ReferenceInTangent.set(getReferencePosition());
+		p3ReferenceOutTangent.set(getReferencePosition());
+		p3ReferenceInTangent.sub(v3InTangent);
+		p3ReferenceOutTangent.add(v3OutTangent);
+	}
+
 	/**
 	 *  Computes tangents for "SPATCH_ROUND" mode
 	 */
@@ -1190,18 +1333,17 @@ public class ControlPoint implements Comparable, Transformable {
 		p3InTangent.sub(v3InTangent);
 		p3OutTangent.add(v3OutTangent);
 	}
-
+	
 	/**
-	 * Compute G1 tangents
+	 * Compute reference G1 tangents
 	 */
-	 
-	private void computeG1Tangents() {
+	private void computeReferenceG1Tangents() {
 		float s;
 		Vector3f v3 = new Vector3f();
 		if (cpPrev != null && cpNext != null) {
-			Point3f A = new Point3f(cpPrev.getPosition());
-			Point3f B = new Point3f(cpNext.getPosition());
-			Point3f C = new Point3f(getPosition());
+			Point3f A = new Point3f(cpPrev.getReferencePosition());
+			Point3f B = new Point3f(cpNext.getReferencePosition());
+			Point3f C = new Point3f(getReferencePosition());
 			
 			float ca = C.distance(A);
 			float cb = C.distance(B);
@@ -1231,6 +1373,111 @@ public class ControlPoint implements Comparable, Transformable {
 			v3.set(x,y,z);
 			v3.sub(C);
 			v3.scale(fInMagnitude);
+			p3ReferenceInTangent.add(C,v3);
+			
+			x = BC.x * b0 + AC.x * b1 + B.x * b2; 
+			y = BC.y * b0 + AC.y * b1 + B.y * b2; 
+			z = BC.z * b0 + AC.z * b1 + B.z * b2; 
+			
+			v3.set(x,y,z);
+			v3.sub(C);
+			v3.scale(fOutMagnitude);
+			p3ReferenceOutTangent.add(C,v3);
+			
+		} else if (cpPrev == null) {
+			if (cpNext != null && cpNext.cpNext != null) {
+				Point3f A = new Point3f(getReferencePosition());
+				Point3f B = new Point3f(cpNext.cpNext.getReferencePosition());
+				Point3f C = new Point3f(cpNext.getReferencePosition());
+		        	
+				float ca = C.distance(A);
+				float cb = C.distance(B);
+				
+				Point3f AC = new Point3f(C);
+				AC.sub(A);
+				s = (ca == 0) ? 0 : cb / ca / 3f;
+				AC.scaleAdd(s, C);
+				
+				Point3f BC = new Point3f(C);
+				BC.sub(B);
+				s = (cb == 0) ? 0 : ca / cb / 3f;
+				BC.scaleAdd(s, C);
+				
+				float a = (float) Math.sqrt(ca);
+				float b = (float) Math.sqrt(cb);
+				float t = a / (a + b);
+				p3ReferenceOutTangent.interpolate(A,BC,t * fOutMagnitude);
+			} else {
+				p3ReferenceOutTangent.interpolate(getReferencePosition(),cpNext.getReferencePosition(),fOutMagnitude / 3f);
+			}
+		} else {	//cpNext == null
+			if (cpPrev != null && cpPrev.cpPrev != null) {
+				Point3f A = new Point3f(getReferencePosition());
+				Point3f B = new Point3f(cpPrev.cpPrev.getReferencePosition());
+				Point3f C = new Point3f(cpPrev.getReferencePosition());
+		        	
+				float ca = C.distance(A);
+				float cb = C.distance(B);
+				
+				Point3f AC = new Point3f(C);
+				AC.sub(A);
+				s = (ca == 0) ? 0 : cb / ca / 3f;
+				AC.scaleAdd(s, C);
+				
+				Point3f BC = new Point3f(C);
+				BC.sub(B);
+				s = (cb == 0) ? 0 : ca / cb / 3f;
+				BC.scaleAdd(s, C);
+				
+				float a = (float) Math.sqrt(ca);
+				float b = (float) Math.sqrt(cb);
+				float t = a / (a + b);
+				p3ReferenceInTangent.interpolate(A,BC,t * fInMagnitude);
+			} else {
+				p3ReferenceInTangent.interpolate(getReferencePosition(),cpPrev.getReferencePosition(),fInMagnitude / 3f);
+		
+			}
+		}		
+	}
+	/**
+	 * Compute G1 tangents
+	 */
+	private void computeG1Tangents() {
+		float s;
+		Vector3f v3 = new Vector3f();
+		if (cpPrev != null && cpNext != null) {
+			Point3f A = new Point3f(cpPrev.getPosition());
+			Point3f B = new Point3f(cpNext.getPosition());
+			Point3f C = new Point3f(getPosition());
+			
+			float ca = C.distance(A);
+			float cb = C.distance(B);
+			
+			Point3f AC = new Point3f(C);
+			AC.sub(A);
+			s = (ca == 0) ? 0 : cb / ca / 3f;
+			AC.scaleAdd(s, C);
+			
+			Point3f BC = new Point3f(C);
+			BC.sub(B);
+			s = (cb == 0) ? 0 : ca / cb / 3f;
+			BC.scaleAdd(s, C);
+			
+			float a = (float) Math.sqrt(ca);
+			float b = (float) Math.sqrt(cb);
+			float t = (a != 0) ? a / (a + b) : 0;
+			float t1 = 1 - t;
+			float b0 = t1 * t1;
+			float b1 = 2 * t1 * t;
+			float b2 = t * t;
+			
+			float x = A.x * b0 + BC.x * b1 + AC.x * b2;
+			float y = A.y * b0 + BC.y * b1 + AC.y * b2;
+			float z = A.z * b0 + BC.z * b1 + AC.z * b2;
+			
+			v3.set(x,y,z);
+			v3.sub(C);
+			v3.scale(fInMagnitude);
 			p3InTangent.add(C,v3);
 			
 			x = BC.x * b0 + AC.x * b1 + B.x * b2; 
@@ -1247,7 +1494,7 @@ public class ControlPoint implements Comparable, Transformable {
 				Point3f A = new Point3f(getPosition());
 				Point3f B = new Point3f(cpNext.cpNext.getPosition());
 				Point3f C = new Point3f(cpNext.getPosition());
-		        	
+				
 				float ca = C.distance(A);
 				float cb = C.distance(B);
 				
@@ -1273,7 +1520,7 @@ public class ControlPoint implements Comparable, Transformable {
 				Point3f A = new Point3f(getPosition());
 				Point3f B = new Point3f(cpPrev.cpPrev.getPosition());
 				Point3f C = new Point3f(cpPrev.getPosition());
-		        	
+				
 				float ca = C.distance(A);
 				float cb = C.distance(B);
 				
@@ -1293,11 +1540,9 @@ public class ControlPoint implements Comparable, Transformable {
 				p3InTangent.interpolate(A,BC,t * fInMagnitude);
 			} else {
 				p3InTangent.interpolate(getPosition(),cpPrev.getPosition(),fInMagnitude / 3f);
-		
+				
 			}
 		}		
-		
-		
 		//Vector3f v3InTangent = new Vector3f();
 		//Vector3f v3OutTangent = new Vector3f();
 		//float fInLength = 0f;
@@ -1601,6 +1846,25 @@ public class ControlPoint implements Comparable, Transformable {
 	/**
 	 *  Compute the tangents and sets tangents valid
 	 */
+	private void computeReferenceTangents() {
+		switch (iMode) {
+			case PEAK:
+				computeReferencePeakTangents();
+				break;
+			case SPATCH_ROUND:
+				computeReferenceSPatchRoundTangents();
+				break;
+		//	case AM_SMOOTH:
+		//		//computeAMSmoothTangents();
+		//		computeG1Tangents();
+		//		break;
+			default:
+				computeReferenceG1Tangents();
+				
+		}
+//		bTangentsValid = true;
+	}
+
 	private void computeTangents() {
 		switch (iMode) {
 			case PEAK:
@@ -1619,7 +1883,7 @@ public class ControlPoint implements Comparable, Transformable {
 		}
 //		bTangentsValid = true;
 	}
-
+	
 	/**
 	 *  Creates an empty hook Curve (a starthook on this position, and an
 	 *  end hook on "next"'s position)
@@ -1651,6 +1915,14 @@ public class ControlPoint implements Comparable, Transformable {
 	 *
 	 * @return    The normalizedTangent value
 	 */
+	private Vector3f getReferenceNormalizedTangent() {
+		Vector3f v3Tangent = getReferenceTangent();
+		if (v3Tangent.lengthSquared() > 0) {
+			v3Tangent.normalize();
+		}
+		return v3Tangent;
+	}
+
 	private Vector3f getNormalizedTangent() {
 		Vector3f v3Tangent = getTangent();
 		if (v3Tangent.lengthSquared() > 0) {
@@ -1658,13 +1930,34 @@ public class ControlPoint implements Comparable, Transformable {
 		}
 		return v3Tangent;
 	}
-
+	
 	/**
 	 *  Compute the tangent (which is parallel to the line between the previous
 	 *  and the next ControlPoint on this curve).
 	 *
 	 * @return    The tangent value
 	 */
+	private Vector3f getReferenceTangent() {
+		Point3f p3NextPos;
+		Point3f p3PrevPos;
+		Vector3f v3Tangent;
+
+		if (cpNext != null) {
+			p3NextPos = cpNext.getReferencePosition();
+		} else {
+			p3NextPos = getReferencePosition();
+		}
+		if (cpPrev != null) {
+			p3PrevPos = cpPrev.getReferencePosition();
+		} else {
+			p3PrevPos = getReferencePosition();
+		}
+
+		v3Tangent = new Vector3f(p3NextPos);
+		v3Tangent.sub(p3PrevPos);
+		return v3Tangent;
+	}
+
 	private Vector3f getTangent() {
 		Point3f p3NextPos;
 		Point3f p3PrevPos;
@@ -1685,7 +1978,7 @@ public class ControlPoint implements Comparable, Transformable {
 		v3Tangent.sub(p3PrevPos);
 		return v3Tangent;
 	}
-
+	
 	/**
 	 *  Assuming that this is a target-hook, compute the tangent by interpolating
 	 *  between the tangents of the next and previous controlPoints that points
@@ -1694,22 +1987,22 @@ public class ControlPoint implements Comparable, Transformable {
 	 * @param  v3Direction  The direction
 	 * @return              The targetHookTangent value
 	 */
+	private Vector3f getReferenceTargetHookTangent(Vector3f v3Direction) {
+		Vector3f v3Start = new Vector3f();
+		Vector3f v3End = new Vector3f();
+		computeReferenceTargetHookBorderTangents(v3Direction, v3Start, v3End);
+		v3Start.interpolate(v3End, getHead().fHookPos);
+		return v3Start;
+	}
+
 	private Vector3f getTargetHookTangent(Vector3f v3Direction) {
-		Vector3f v3Start = new Vector3f(v3Direction);
+		Vector3f v3Start = new Vector3f();
 		Vector3f v3End = new Vector3f();
 		computeTargetHookBorderTangents(v3Direction, v3Start, v3End);
 		v3Start.interpolate(v3End, getHead().fHookPos);
 		return v3Start;
-		/*
-		 *  v3Start.normalize();
-		 *  v3Start.mul(v3Direction.length() *
-		 *  p3TargetHookTangent = new Point3f(getPosition());
-		 *  p3Targgetloos
-		 *  getLoetHookTangent.add(v3Start);
-		 *  return p3TargetHookTangent;
-		 */
 	}
-
+	
 	///**
 	// *  Assuming that this is a target-hook, compute the tangent by interpolating
 	// *  between the tangents of the next and previous controlPoints that points
@@ -1722,6 +2015,8 @@ public class ControlPoint implements Comparable, Transformable {
 		Vector3f v3Test = new Vector3f(v3Direction);
 		//Vector3f v3Start = new Vector3f(v3Direction);
 		//Vector3f v3End = new Vector3f();
+		Point3f p3ReferenceStartPosition;
+		Point3f p3ReferenceEndPosition;
 		Point3f p3StartPosition;
 		Point3f p3EndPosition;
 		ControlPoint cpStart;
@@ -1730,6 +2025,8 @@ public class ControlPoint implements Comparable, Transformable {
 		float fAngle = 0;
 		cpStart = getHead().getStart().cpParentHook.getHead();
 		cpEnd = getHead().getEnd().cpParentHook.getHead();
+		p3ReferenceStartPosition = cpStart.getReferencePosition();
+		p3ReferenceEndPosition = cpEnd.getReferencePosition();
 		p3StartPosition = cpStart.getPosition();
 		p3EndPosition = cpEnd.getPosition();
 		fMinAngle = (float) Math.PI;
@@ -1737,21 +2034,19 @@ public class ControlPoint implements Comparable, Transformable {
 		while (cpStart != null) {
 			if (cpStart != parentHook) {
 				if (cpStart.cpNext != null) {
-					v3Test.set(cpStart.getOutTangent());
-					v3Test.sub(p3StartPosition);
+					v3Test.sub(cpStart.getReferenceOutTangent(), p3ReferenceStartPosition);
 					fAngle = v3Test.angle(v3Direction);
 					if (fAngle < fMinAngle) {
 						fMinAngle = fAngle;
-						v3Start.set(v3Test);
+						v3Start.sub(cpStart.getOutTangent(), p3StartPosition);
 					}
 				}
 				if (cpStart.cpPrev != null) {
-					v3Test.set(cpStart.getInTangent());
-					v3Test.sub(p3StartPosition);
+					v3Test.sub(cpStart.getReferenceInTangent(), p3ReferenceStartPosition);
 					fAngle = v3Test.angle(v3Direction);
 					if (fAngle < fMinAngle) {
 						fMinAngle = fAngle;
-						v3Start.set(v3Test);
+						v3Start.sub(cpStart.getInTangent(), p3StartPosition);
 					}
 				}
 			}
@@ -1761,21 +2056,19 @@ public class ControlPoint implements Comparable, Transformable {
 		while (cpEnd != null) {
 			if (cpEnd != parentHook) {
 				if (cpEnd.cpNext != null) {
-					v3Test.set(cpEnd.getOutTangent());
-					v3Test.sub(p3EndPosition);
+					v3Test.sub(cpEnd.getReferenceOutTangent(), p3ReferenceEndPosition);
 					fAngle = v3Test.angle(v3Direction);
 					if (fAngle < fMinAngle) {
 						fMinAngle = fAngle;
-						v3End.set(v3Test);
+						v3End.sub(cpEnd.getOutTangent(), p3EndPosition);
 					}
 				}
 				if (cpEnd.cpPrev != null) {
-					v3Test.set(cpEnd.getInTangent());
-					v3Test.sub(p3EndPosition);
+					v3Test.sub(cpEnd.getReferenceInTangent(), p3ReferenceEndPosition);
 					fAngle = v3Test.angle(v3Direction);
 					if (fAngle < fMinAngle) {
 						fMinAngle = fAngle;
-						v3End.set(v3Test);
+						v3End.sub(cpEnd.getInTangent(), p3EndPosition);
 					}
 				}
 			}
@@ -1791,7 +2084,7 @@ public class ControlPoint implements Comparable, Transformable {
 		 */
 	}
 	
-	public void computeTargetHookReferenceBorderTangents(Vector3f v3Direction, Vector3f v3Start, Vector3f v3End) {
+	public void computeReferenceTargetHookBorderTangents(Vector3f v3Direction, Vector3f v3Start, Vector3f v3End) {
 		Vector3f v3Test = new Vector3f(v3Direction);
 		//Vector3f v3Start = new Vector3f(v3Direction);
 		//Vector3f v3End = new Vector3f();
@@ -1803,15 +2096,14 @@ public class ControlPoint implements Comparable, Transformable {
 		float fAngle = 0;
 		cpStart = getHead().getStart().cpParentHook.getHead();
 		cpEnd = getHead().getEnd().cpParentHook.getHead();
-		p3StartPosition = cpStart.getRefPosition();
-		p3EndPosition = cpEnd.getRefPosition();
+		p3StartPosition = cpStart.getReferencePosition();
+		p3EndPosition = cpEnd.getReferencePosition();
 		fMinAngle = (float) Math.PI;
 		ControlPoint parentHook = getHead().getStart().cpParentHook;
 		while (cpStart != null) {
 			if (cpStart != parentHook) {
 				if (cpStart.cpNext != null) {
-					v3Test.set(cpStart.getRefOutTangent());
-					v3Test.sub(p3StartPosition);
+					v3Test.sub(cpStart.getReferenceOutTangent(), p3StartPosition);
 					fAngle = v3Test.angle(v3Direction);
 					if (fAngle < fMinAngle) {
 						fMinAngle = fAngle;
@@ -1819,8 +2111,7 @@ public class ControlPoint implements Comparable, Transformable {
 					}
 				}
 				if (cpStart.cpPrev != null) {
-					v3Test.set(cpStart.getRefInTangent());
-					v3Test.sub(p3StartPosition);
+					v3Test.sub(cpStart.getReferenceInTangent(), p3StartPosition);
 					fAngle = v3Test.angle(v3Direction);
 					if (fAngle < fMinAngle) {
 						fMinAngle = fAngle;
@@ -1834,8 +2125,7 @@ public class ControlPoint implements Comparable, Transformable {
 		while (cpEnd != null) {
 			if (cpEnd != parentHook) {
 				if (cpEnd.cpNext != null) {
-					v3Test.set(cpEnd.getRefOutTangent());
-					v3Test.sub(p3EndPosition);
+					v3Test.sub(cpEnd.getReferenceOutTangent(), p3EndPosition);
 					fAngle = v3Test.angle(v3Direction);
 					if (fAngle < fMinAngle) {
 						fMinAngle = fAngle;
@@ -1843,8 +2133,7 @@ public class ControlPoint implements Comparable, Transformable {
 					}
 				}
 				if (cpEnd.cpPrev != null) {
-					v3Test.set(cpEnd.getRefInTangent());
-					v3Test.sub(p3EndPosition);
+					v3Test.sub(cpEnd.getReferenceInTangent(), p3EndPosition);
 					fAngle = v3Test.angle(v3Direction);
 					if (fAngle < fMinAngle) {
 						fMinAngle = fAngle;
@@ -1864,10 +2153,10 @@ public class ControlPoint implements Comparable, Transformable {
 		 */
 	}
 	
-	/**
-	 *  Invalidates the tangents of this and ALL neighbor ControlPoints
-	 */
-	public void invalidateTangents() {
+//	/**
+//	 *  Invalidates the tangents of this and ALL neighbor ControlPoints
+//	 */
+//	public void invalidateTangents() {
 //		bTangentsValid = false;
 //		if (cpNext != null) {
 //			cpNext.bTangentsValid = false;
@@ -1886,7 +2175,7 @@ public class ControlPoint implements Comparable, Transformable {
 //		}
 //		//reTriangulizePatches();
 //		//bCurveSegmentValid = false;
-	}
+//	}
 	
 	public int getXmlNumber() {
 		Integer i = (Integer) mapCp.get(this);
@@ -1935,9 +2224,9 @@ public class ControlPoint implements Comparable, Transformable {
 			//
 			//fixPosition();
 			//
-			sb.append(" x=").append(XMLutils.quote(p3Position.x));
-			sb.append(" y=").append(XMLutils.quote(p3Position.y));
-			sb.append(" z=").append(XMLutils.quote(p3Position.z));
+			sb.append(" x=").append(XMLutils.quote(p3ReferencePosition.x));
+			sb.append(" y=").append(XMLutils.quote(p3ReferencePosition.y));
+			sb.append(" z=").append(XMLutils.quote(p3ReferencePosition.z));
 			//if (cpChildHook != null) {
 			//	int chook = ((Integer)mapCp.get(cpChildHook)).intValue();
 			//	sb.append(" chook=").append(XMLutils.quote(chook));

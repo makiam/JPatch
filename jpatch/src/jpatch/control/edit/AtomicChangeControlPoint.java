@@ -240,7 +240,7 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 			int dummy = cp.getMode();
 			cp.setMode(iTangentMode);
 			iTangentMode = dummy;
-			cp.invalidateTangents();
+//			cp.invalidateTangents();
 		}
 		
 		public int sizeOf() {
@@ -269,7 +269,7 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		}
 		
 		void swap() {
-			Point3f p = cp.getRefPosition();
+			Point3f p = cp.getReferencePosition();
 			float dummyX = p.x;
 			float dummyY = p.y;
 			float dummyZ = p.z;

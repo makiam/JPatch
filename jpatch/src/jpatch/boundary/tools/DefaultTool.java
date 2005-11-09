@@ -326,7 +326,7 @@ public class DefaultTool extends JPatchTool {
 					if (mouseEvent.getClickCount() == 2) {
 						fMagnitude = tangentHandle.getMagnitude();
 						tangentHandle.getCp().setMagnitude(1);
-						tangentHandle.getCp().invalidateTangents();
+//						tangentHandle.getCp().invalidateTangents();
 						MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeControlPoint.Magnitude(tangentHandle.getCp(),fMagnitude));
 						MainFrame.getInstance().getJPatchScreen().update_all();
 						return;
@@ -1113,12 +1113,13 @@ public class DefaultTool extends JPatchTool {
 //			((Transformable) list.get(i)).beginTransform();
 //		}
 		Selection selection = MainFrame.getInstance().getSelection();
-//FIXME
-		int mask = Selection.CONTROLPOINTS;
-		if (!(MainFrame.getInstance().getEditedMorph() != null))
-			mask |= Selection.MORPHS;
+		int mask;
+		if (MainFrame.getInstance().getEditedMorph() != null)
+			mask = Selection.MORPHTARGET;
+		else
+			mask = Selection.CONTROLPOINTS | Selection.MORPHS;
+//		System.out.println(MainFrame.getInstance().getEditedMorph() + " " + mask);
 		selection.arm(mask);
-//FIXME
 		selection.beginTransform();
 		if (selection.getHotObject() != null)
 			p3Hot = new Point3f(((Transformable) selection.getHotObject()).getPosition());

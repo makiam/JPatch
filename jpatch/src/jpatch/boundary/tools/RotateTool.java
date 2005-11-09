@@ -611,12 +611,12 @@ public class RotateTool extends JPatchTool {
 //			((Transformable) list.get(i)).beginTransform();
 //		}
 		Selection selection = MainFrame.getInstance().getSelection();
-//FIXME
-		int mask = Selection.CONTROLPOINTS;
-		if (!(MainFrame.getInstance().getEditedMorph() != null))
-			mask |= Selection.MORPHS;
+		int mask;
+		if (MainFrame.getInstance().getEditedMorph() != null)
+			mask = Selection.MORPHS;
+		else
+			mask = Selection.CONTROLPOINTS | Selection.MORPHS;
 		selection.arm(mask);
-//FIXME
 		selection.beginTransform();
 	}
 	

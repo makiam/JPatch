@@ -22,7 +22,7 @@ public class CompoundFlip extends JPatchCompoundEdit implements JPatchRootEdit {
 					break;
 			}
 			if (pivot) position.add(p3pivot);
-			acp[c].invalidateTangents();
+//			acp[c].invalidateTangents();
 		}
 		//addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.FLIP, acp));
 	}
