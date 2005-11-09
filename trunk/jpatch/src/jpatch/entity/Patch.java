@@ -264,13 +264,13 @@ public final class Patch {
 		int coon = 0;
 		int p = 0;
 		while (p < acpPoint.length) {
-			ap3CoonsPatch[coon++] = new Point3f(acpPoint[p].getRefPosition());
+			ap3CoonsPatch[coon++] = new Point3f(acpPoint[p].getReferencePosition());
 			if (acpPoint[p].getNext() == acpPoint[p + 1]) {
-				ap3CoonsPatch[coon++] = new Point3f(acpPoint[p].getRefOutTangent());
-				ap3CoonsPatch[coon++] = new Point3f(acpPoint[++p].getRefInTangent());
+				ap3CoonsPatch[coon++] = new Point3f(acpPoint[p].getReferenceOutTangent());
+				ap3CoonsPatch[coon++] = new Point3f(acpPoint[++p].getReferenceInTangent());
 			} else {
-				ap3CoonsPatch[coon++] = new Point3f(acpPoint[p].getRefInTangent());
-				ap3CoonsPatch[coon++] = new Point3f(acpPoint[++p].getRefOutTangent());
+				ap3CoonsPatch[coon++] = new Point3f(acpPoint[p].getReferenceInTangent());
+				ap3CoonsPatch[coon++] = new Point3f(acpPoint[++p].getReferenceOutTangent());
 			}
 			p++;
 		}

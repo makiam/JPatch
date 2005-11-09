@@ -39,27 +39,27 @@ public final class AtomicAppendControlPoints extends JPatchAtomicEdit {
 	public void redo() {
 		cpA.setPrev(cpB);
 		cpB.setNext(cpA);
-		invalidateTangents();
+//		invalidateTangents();
 	}
 
 	public void undo() {
 		cpA.setPrev(cpAprev);
 		cpB.setNext(cpBnext);
-		invalidateTangents();
+//		invalidateTangents();
 	}
 	
 	public int sizeOf() {
 		return 8 + 4 + 4 + 4 + 4 + 4;
 	}
 	
-	private void invalidateTangents() {
-		if (cpB.getPrev() != null)
-			cpB.getPrev().invalidateTangents();
-		cpB.invalidateTangents();
-		cpA.invalidateTangents();
-		if (cpA.getNext() != null)
-			cpA.getNext().invalidateTangents();
-	}
+//	private void invalidateTangents() {
+//		if (cpB.getPrev() != null)
+//			cpB.getPrev().invalidateTangents();
+//		cpB.invalidateTangents();
+//		cpA.invalidateTangents();
+//		if (cpA.getNext() != null)
+//			cpA.getNext().invalidateTangents();
+//	}
 }
 
 

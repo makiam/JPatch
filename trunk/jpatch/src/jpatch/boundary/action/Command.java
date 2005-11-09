@@ -186,6 +186,7 @@ public final class Command implements KeyListener {
 		put("dump undo stack",			new DumpUndoStackAction(),			new JMenuItem());
 		put("check model",				new CheckModelAction(),				new JMenuItem());
 		put("controlpoint browser",		new ControlPointBrowserAction(),	new JMenuItem());
+		put("show reference",			new ShowReferenceAction(),			new JCheckBoxMenuItem());
 		
 		// Help
 		put("show about",				new AboutAction(),					new JMenuItem());
