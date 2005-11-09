@@ -111,6 +111,7 @@ implements ChangeListener {
 //					Bone bone = (Bone) it.next();
 //					bone.setPose();
 //				}
+				MainFrame.getInstance().getModel().setPose();
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			} else {
 			}

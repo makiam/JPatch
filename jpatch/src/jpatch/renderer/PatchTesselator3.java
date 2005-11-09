@@ -121,12 +121,12 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 								targetHook = acp[(i2 + 2) % cn];
 							}
 							Vector3f v3Dir = new Vector3f();
-							Point3f p = targetHook.getRefPosition();
-							if (targetHook.getNext() != null) v3Dir.sub(targetHook.getNext().getRefPosition(), p);
-							else v3Dir.sub(targetHook.getPrev().getRefPosition(), p);
+							Point3f p = targetHook.getReferencePosition();
+							if (targetHook.getNext() != null) v3Dir.sub(targetHook.getNext().getReferencePosition(), p);
+							else v3Dir.sub(targetHook.getPrev().getReferencePosition(), p);
 							Vector3f v3Start = new Vector3f(v3Dir);
 							Vector3f v3End = new Vector3f(v3Dir);
-							targetHook.computeTargetHookReferenceBorderTangents(v3Dir, v3Start, v3End);
+							targetHook.computeReferenceTargetHookBorderTangents(v3Dir, v3Start, v3End);
 							ControlPoint cpStart = targetHook.getHead().getStart().getParentHook();
 							ControlPoint cpEnd = cpStart.getNext();
 							Point3f p0 = new Point3f(cpStart.getPosition());
@@ -136,10 +136,10 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 							
 							aap3HookCurve[i] = hashPatchSubdivision.subdivCurve(new Point3d(p0), new Point3d(p1), new Point3d(p2), new Point3d(p3));
 							
-							Point3f r0 = new Point3f(cpStart.getRefPosition());
-							Point3f r1 = new Point3f(cpStart.getRefOutTangent());
-							Point3f r2 = new Point3f(cpEnd.getRefInTangent());
-							Point3f r3 = new Point3f(cpEnd.getRefPosition());
+							Point3f r0 = new Point3f(cpStart.getReferencePosition());
+							Point3f r1 = new Point3f(cpStart.getReferenceOutTangent());
+							Point3f r2 = new Point3f(cpEnd.getReferenceInTangent());
+							Point3f r3 = new Point3f(cpEnd.getReferencePosition());
 							
 							aap3RefHookCurve[i] = hashPatchSubdivision.subdivCurve(new Point3d(r0), new Point3d(r1), new Point3d(r2), new Point3d(r3));
 							
@@ -212,18 +212,18 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 							}
 							
 							Vector3f v3Dir = new Vector3f();
-							Point3f p = targetHook.getRefPosition();
-							if (targetHook.getNext() != null) v3Dir.sub(targetHook.getNext().getRefPosition(), p);
-							else v3Dir.sub(targetHook.getPrev().getRefPosition(), p);
+							Point3f p = targetHook.getReferencePosition();
+							if (targetHook.getNext() != null) v3Dir.sub(targetHook.getNext().getReferencePosition(), p);
+							else v3Dir.sub(targetHook.getPrev().getReferencePosition(), p);
 							Vector3f v3Start = new Vector3f(v3Dir);
 							Vector3f v3End = new Vector3f(v3Dir);
-							targetHook.computeTargetHookReferenceBorderTangents(v3Dir, v3Start, v3End);
+							targetHook.computeReferenceTargetHookBorderTangents(v3Dir, v3Start, v3End);
 							ControlPoint cpStart = targetHook.getHead().getStart().getParentHook();
 							ControlPoint cpEnd = cpStart.getNext();
-							Point3f r0 = cpStart.getRefPosition();
-							Point3f r1 = cpStart.getRefOutTangent();
-							Point3f r2 = cpEnd.getRefInTangent();
-							Point3f r3 = cpEnd.getRefPosition();
+							Point3f r0 = cpStart.getReferencePosition();
+							Point3f r1 = cpStart.getReferenceOutTangent();
+							Point3f r2 = cpEnd.getReferenceInTangent();
+							Point3f r3 = cpEnd.getReferencePosition();
 							Vector3f v = new Vector3f();
 							Vector3f n1 = new Vector3f();
 							Vector3f n2 = new Vector3f();

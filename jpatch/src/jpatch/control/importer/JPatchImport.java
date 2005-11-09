@@ -45,7 +45,8 @@ implements ModelImporter {
 	private int iRotoscopeView;
 	private JPatchMaterial material;
 	private String selectionName;
-	private MorphTarget morph;
+	private Morph morph;
+	private MorphTarget morphTarget;
 	private List listMaterials = new ArrayList();
 	private List listBones = new ArrayList();
 	private Map mapBoneParents = new HashMap();
@@ -181,12 +182,13 @@ implements ModelImporter {
 				break;
 			case MORPH:
 				if (localName.equals("target")) {
+					morphTarget = createMorphTarget(attributes);
 					iState = TARGET;
 				}
 				break;
 			case TARGET:
 				if (localName.equals("point")) {
-					parseMorphVector(attributes,morph);
+					parseMorphVector(attributes, morphTarget);
 				}
 				break;
 			case LIPSYNC:
@@ -373,12 +375,13 @@ implements ModelImporter {
 				break;
 			case MORPH:
 				if (localName.equals("morph")) {
-//					model.addExpression(morph);
+					model.addExpression(morph);
 					iState = MESH;
 				}
 				break;
 			case TARGET:
 				if (localName.equals("target")) {
+					morph.addTarget(morphTarget);
 					iState = MORPH;
 				}
 				break;
@@ -444,25 +447,34 @@ implements ModelImporter {
 		return rotoscope;
 	}
 	
-	private MorphTarget createMorph(Attributes attributes) {
-//		FIXME
-//		//System.out.println("createMorph");
-//		MorphTarget morph = new MorphTarget(0, "");
-//		for (int index = 0; index < attributes.getLength(); index++) {
-//			String localName = attributes.getLocalName(index);
-//			String value = attributes.getValue(index);
-//			if (localName.equals("name")) {
-//				morph.setName(value);
-//			} else if (localName.equals("min")) {
-//				morph.setMin((new Float(value)).floatValue());
-//			} else if (localName.equals("max")) {
-//				morph.setMax((new Float(value)).floatValue());
-//			} else if (localName.equals("value")) {
-//				morph.setValue((new Float(value)).floatValue());
-//			}
-//		}
-//		return morph;
-		return null;
+	private Morph createMorph(Attributes attributes) {
+		Morph morph = new Morph("");
+		for (int index = 0; index < attributes.getLength(); index++) {
+			String localName = attributes.getLocalName(index);
+			String value = attributes.getValue(index);
+			if (localName.equals("name")) {
+				morph.setName(value);
+			} else if (localName.equals("min")) {
+				morph.setMin((new Float(value)).floatValue());
+			} else if (localName.equals("max")) {
+				morph.setMax((new Float(value)).floatValue());
+			} else if (localName.equals("value")) {
+				morph.setValue((new Float(value)).floatValue());
+			}
+		}
+		return morph;
+	}
+	
+	private MorphTarget createMorphTarget(Attributes attributes) {
+		MorphTarget morphTarget = new MorphTarget(0, morph);
+		for (int index = 0; index < attributes.getLength(); index++) {
+			String localName = attributes.getLocalName(index);
+			String value = attributes.getValue(index);
+			if (localName.equals("value")) {
+				morphTarget.setPosition(Float.parseFloat(value));
+			}
+		}
+		return morphTarget;
 	}
 	
 	private void parseLipsyncMap(Attributes attributes) {
