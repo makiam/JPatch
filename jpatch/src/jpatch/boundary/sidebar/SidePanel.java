@@ -1,7 +1,11 @@
 package jpatch.boundary.sidebar;
 
 import javax.swing.*;
+
 import java.awt.*;
+
+import jpatch.boundary.MainFrame;
+import jpatch.boundary.action.DetachControlPointsAction;
 
 public class SidePanel extends JPanel {
 	/**
@@ -16,6 +20,7 @@ public class SidePanel extends JPanel {
 		setPreferredSize(dim);
 		setMinimumSize(dim);
 		setMaximumSize(dim);
+		
 		//MainFrame.getInstance().getSideBar().clearDetailPanel();
 	}
 }

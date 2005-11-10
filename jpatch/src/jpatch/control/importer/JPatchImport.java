@@ -462,11 +462,12 @@ implements ModelImporter {
 				morph.setValue((new Float(value)).floatValue());
 			}
 		}
+		morph.addTarget(new MorphTarget(0));
 		return morph;
 	}
 	
 	private MorphTarget createMorphTarget(Attributes attributes) {
-		MorphTarget morphTarget = new MorphTarget(0, morph);
+		MorphTarget morphTarget = new MorphTarget(0);
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);

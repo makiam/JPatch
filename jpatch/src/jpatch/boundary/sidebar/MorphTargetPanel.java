@@ -54,8 +54,10 @@ implements ChangeListener {
 //	}
 	
 	public void stateChanged(ChangeEvent changeEvent) {
+		System.out.println(changeEvent);
 		if (changeEvent.getSource() == inputPosition) {
 			morphTarget.getMorph().changeTargetPosition(morphTarget, inputPosition.getFloatValue());
+			MainFrame.getInstance().selectTreeNode(morphTarget);
 		}
 	}
 	

@@ -17,7 +17,7 @@ public class AtomicChangeMorphVectors extends JPatchAtomicEdit {
 			System.out.println(getClass().getName() + "(" + morph + ", " + change + ")");
 		this.morph = morph;
 		mapChange = change;
-		swap();
+//		swap();
 		//morph.dump();
 		//System.out.println(mapChange);
 		//morph.set();

@@ -34,6 +34,7 @@ implements ActionListener, FocusListener {
 	
 	private float fValue;
 	private int iValue;
+	private boolean bChanged = false;
 	
 	private NumberFormat numberFormat = null;
 	
@@ -139,6 +140,7 @@ implements ActionListener, FocusListener {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
+		float old = fValue;
 		try {
 			switch (iType) {
 				case FLOAT:
@@ -156,7 +158,9 @@ implements ActionListener, FocusListener {
 		}
 		//clampValue();
 		updateTextField();
-		fireStateChanged();
+		bChanged = fValue != old;
+		if (bChanged)
+			fireStateChanged();
 	}
 	
 	public void focusGained(FocusEvent focusEvent) {

@@ -163,7 +163,15 @@ implements TreeSelectionListener {
 		} else if (selectedNode instanceof Morph) {
 			replacePanel(new MorphPanel((Morph) selectedNode));
 		} else if (selectedNode instanceof MorphTarget) {
-			replacePanel(new MorphTargetPanel((MorphTarget) selectedNode));
+			MorphTarget target = (MorphTarget) selectedNode;
+			if (target.getPosition() != 0) {
+				replacePanel(new MorphTargetPanel(target));
+			} else {
+				replacePanel(new SidePanel());
+				MainFrame.getInstance().getSideBar().clearDetailPanel();
+			}
+			target.getMorph().setValue(target.getPosition());
+			MainFrame.getInstance().getJPatchScreen().update_all();
 		} else if (selectedNode == MainFrame.getInstance().getModel().getTreenodeSelections()) {
 			replacePanel(new SelectionsPanel((Model) selectedNode.getParent()));
 		} else if (selectedNode instanceof Selection) {

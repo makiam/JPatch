@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchTreeLeaf.java,v 1.2 2005/10/24 16:31:31 sascha_l Exp $
+ * $Id: JPatchTreeLeaf.java,v 1.3 2005/11/10 15:31:32 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -102,7 +102,7 @@ public class JPatchTreeLeaf implements MutableTreeNode {
 	}
 
 	public int getIndex(TreeNode node) {
-		return parent.getIndex(this);
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean getAllowsChildren() {

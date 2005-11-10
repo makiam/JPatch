@@ -20,16 +20,17 @@ implements ChangeListener {
 	JPatchInput inputMax;
 	JSlider slider;
 	Morph morph;
-	AbstractButton editButton;
+	AbstractButton addTargetButton;
 	AbstractButton deleteButton;
 	
 	public MorphPanel(Morph morph) {
 		this.morph = morph;
 		MorphTarget editedMorph = MainFrame.getInstance().getEditedMorph();
 		deleteButton = new JPatchButton(new DeleteMorphAction(morph));
-//		editButton = new JPatchToggleButton(new EditMorphAction(morph, this));
-//		add(editButton);
+		addTargetButton = new JPatchToggleButton(new NewMorphTargetAction(morph));
+		
 		add(deleteButton);
+		add(addTargetButton);
 		
 		//JPatchSlider.setDimensions(0,150,50,20);
 		JPanel detailPanel = MainFrame.getInstance().getSideBar().getDetailPanel();

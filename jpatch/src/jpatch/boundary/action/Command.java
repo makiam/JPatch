@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.6 2005/11/09 15:55:08 sascha_l Exp $
+ * $Id: Command.java,v 1.7 2005/11/10 15:31:32 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -78,7 +78,7 @@ public final class Command implements KeyListener {
 			newItem = new JMenuItem();//menuItem.getAction());
 		String itemText = menuItem.getText();
 		String key = (String) INSTANCE.commandKeyMap.get(command);
-		System.out.println(command + " " + key);
+//		System.out.println(command + " " + key);
 		if (key != null)
 			itemText = itemText + " [" + key + "]";
 		newItem.setText(itemText);

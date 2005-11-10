@@ -59,7 +59,12 @@ public class Morph implements MutableTreeNode {
 	}
 	
 	public int getSliderValue() {
-		return (int) ((fValue - fMin) / (fMax - fMin) * 100f);
+		int i = (int) ((fValue - fMin) / (fMax - fMin) * 100f);
+		if (i < 0)
+			i = 0;
+		if (i > 100)
+			i = 100;
+		return i;
 	}
 	
 	public void setSliderValue(int sliderValue) {
@@ -149,9 +154,13 @@ public class Morph implements MutableTreeNode {
 	}
 	
 	public void changeTargetPosition(MorphTarget target, float newPosition) {
+		System.out.println("changeTargetPosition() " + target + ", " + newPosition);
+		System.out.println(listTargets);
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(target);
+		System.out.println(listTargets);
 		target.setPosition(newPosition);
 		MainFrame.getInstance().getTreeModel().insertNodeInto(target, this, binarySearch(target.getPosition()));
+		System.out.println(listTargets);
 		setMorphMap();
 	}
 	
@@ -200,7 +209,7 @@ public class Morph implements MutableTreeNode {
 	}
 
 	public int getIndex(TreeNode node) {
-		return MainFrame.getInstance().getModel().getMorphList().indexOf(this);
+		return listTargets.indexOf(node);
 	}
 
 	public boolean getAllowsChildren() {
@@ -223,13 +232,16 @@ public class Morph implements MutableTreeNode {
 	 */
 	public void insert(MutableTreeNode child, int index) {
 		listTargets.add(index, child);
+		child.setParent(this);
 	}
 
 	public void remove(int index) {
+		System.out.println("remove " + index);
 		listTargets.remove(index);
 	}
 
 	public void remove(MutableTreeNode node) {
+		System.out.println("remove " + node);
 		listTargets.remove(node);
 	}
 

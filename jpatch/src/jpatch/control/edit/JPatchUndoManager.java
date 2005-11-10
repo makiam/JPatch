@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchUndoManager.java,v 1.6 2005/09/29 19:50:41 sascha_l Exp $
+ * $Id: JPatchUndoManager.java,v 1.7 2005/11/10 15:31:32 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -28,7 +28,7 @@ import java.util.*;
  * The JPatchUndoManager stores JPatchUndoableEdits in a list and provides methods to add, redo and undo edits.<br>
  * It keeps track of the position in the position inside the list
  *
- * @version	$Revision: 1.6 $
+ * @version	$Revision: 1.7 $
  * @author	Sascha Ledinsky
  */
 public class JPatchUndoManager {
@@ -44,6 +44,7 @@ public class JPatchUndoManager {
 	private boolean bChange = false;
 	
 	private boolean bOpen = false;
+	private boolean bStopOpen = false;
 	
 	private int iStop = 0;
 	
@@ -60,12 +61,14 @@ public class JPatchUndoManager {
 	public void clear() {
 		listEdits.clear();
 		iPos = 0;
+		bOpen = false;
 		fireUndoStateChanged();
 	}
 	
 	public void setStop() {
 		iStop = iPos;
 		fireUndoStateChanged();
+		bStopOpen = bOpen;
 	}
 	
 	public void clearStop() {
@@ -76,6 +79,7 @@ public class JPatchUndoManager {
 	public void rewind() {
 		iPos = iStop;
 		iStop = 0;
+		bOpen = bStopOpen;
 		fireUndoStateChanged();
 	}
 	
