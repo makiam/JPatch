@@ -102,7 +102,7 @@ public class JPatchTreeLeaf implements MutableTreeNode {
 	}
 
 	public int getIndex(TreeNode node) {
-		return parent.getIndex(this);
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean getAllowsChildren() {

@@ -1,13 +1,16 @@
 package jpatch.entity;
 
 import java.util.*;
+
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.vecmath.*;
 
 import jpatch.auxilary.XMLutils;
 import jpatch.boundary.*;
 import jpatch.control.edit.*;
 
-public class MorphTarget extends JPatchTreeLeaf {
+public class MorphTarget implements MutableTreeNode {
 //	private ArrayList listPoints = new ArrayList();
 //	private ArrayList listVectors = new ArrayList();
 //	private float fValue = 0;
@@ -17,11 +20,9 @@ public class MorphTarget extends JPatchTreeLeaf {
 	private float fPosition;
 	private Map mapMorph = new HashMap();
 	private Map mapPositions = new HashMap();
-	private boolean bPrepared = false;
 	
-	public MorphTarget(float position, Morph morph) {
+	public MorphTarget(float position) {
 		fPosition = position;
-		this.morph = morph;
 	}
 	
 	public String toString() {
@@ -73,6 +74,7 @@ public class MorphTarget extends JPatchTreeLeaf {
 					}
 					MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeMorph.AddPoints(MorphTarget.this, newPointsMap), true);
 					morph.setupMorphMap();
+//					System.out.println("initMap=" + initMap);
 				}
 				
 				public void translate(Vector3f v) {
@@ -81,9 +83,9 @@ public class MorphTarget extends JPatchTreeLeaf {
 						Vector3f vector = (Vector3f) mapMorph.get(cp);
 						vector.set((Vector3f) initMap.get(cp));
 						float weight = ((Float) selectedPoints.get(cp)).floatValue();
-						vector.x = v.x * weight;
-						vector.y = v.y * weight;
-						vector.z = v.z * weight;
+						vector.x += v.x * weight;
+						vector.y += v.y * weight;
+						vector.z += v.z * weight;
 					}
 					morph.setMorphMap();
 					MainFrame.getInstance().getModel().setPose();
@@ -98,7 +100,7 @@ public class MorphTarget extends JPatchTreeLeaf {
 				}
 				
 				public JPatchUndoableEdit endTransform() {
-					return null;
+					return new AtomicChangeMorphVectors(MorphTarget.this, initMap);
 				}
 				
 				public Point3f getPosition() {
@@ -358,5 +360,63 @@ public class MorphTarget extends JPatchTreeLeaf {
 //		sb.append(prefix).append("\t</target>").append("\n");
 //		sb.append(prefix).append("</morph>").append("\n");
 		return sb;
+	}
+
+	/*
+	 * Mutable treenode interface implementation
+	 */
+	public void insert(MutableTreeNode child, int index) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void remove(int index) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void remove(MutableTreeNode node) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setUserObject(Object object) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void removeFromParent() {
+		if (morph != null)
+			morph.remove(this);
+		else
+			throw new IllegalStateException(this + " node does not have a parent");
+	}
+
+	public void setParent(MutableTreeNode newParent) {
+		morph = (Morph) newParent;
+	}
+
+	public TreeNode getChildAt(int childIndex) {
+		return null;
+	}
+
+	public int getChildCount() {
+		return 0;
+	}
+
+	public TreeNode getParent() {
+		return morph;
+	}
+
+	public int getIndex(TreeNode node) {
+		return morph.getIndex(this);
+	}
+
+	public boolean getAllowsChildren() {
+		return false;
+	}
+
+	public boolean isLeaf() {
+		return true;
+	}
+
+	public Enumeration children() {
+		return null;
 	}
 }

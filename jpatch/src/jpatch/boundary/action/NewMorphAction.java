@@ -27,7 +27,8 @@ public final class NewMorphAction extends AbstractAction {
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		Morph morph = new Morph("new morph #" + iNum++);
-		morph.addTarget(new MorphTarget(morph.getMax(), morph));
+		morph.addTarget(new MorphTarget(0));
+		morph.addTarget(new MorphTarget(morph.getMax()));
 		//MainFrame.getInstance().getModel().addExpression(morph);
 		////treeNode.add(morph);
 		//int[] aiIndex = new int[] { treeNode.getIndex(morph) };
