@@ -44,6 +44,7 @@ public class JPatchUndoManager {
 	private boolean bChange = false;
 	
 	private boolean bOpen = false;
+	private boolean bStopOpen = false;
 	
 	private int iStop = 0;
 	
@@ -60,12 +61,14 @@ public class JPatchUndoManager {
 	public void clear() {
 		listEdits.clear();
 		iPos = 0;
+		bOpen = false;
 		fireUndoStateChanged();
 	}
 	
 	public void setStop() {
 		iStop = iPos;
 		fireUndoStateChanged();
+		bStopOpen = bOpen;
 	}
 	
 	public void clearStop() {
@@ -76,6 +79,7 @@ public class JPatchUndoManager {
 	public void rewind() {
 		iPos = iStop;
 		iStop = 0;
+		bOpen = bStopOpen;
 		fireUndoStateChanged();
 	}
 	

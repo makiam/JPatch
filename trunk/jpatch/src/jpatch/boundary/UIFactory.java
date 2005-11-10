@@ -87,10 +87,10 @@ public class UIFactory extends DefaultHandler {
 	}
 	
 	public void startElement(String namespaceURI, String localName, String qName, Attributes attributes) {	
-		System.out.print("<" + localName);
-		for (int i = 0; i < attributes.getLength(); i++)
-			System.out.print(" " + attributes.getLocalName(i) + "=\"" + attributes.getValue(i) + "\"");
-		System.out.println(">");
+//		System.out.print("<" + localName);
+//		for (int i = 0; i < attributes.getLength(); i++)
+//			System.out.print(" " + attributes.getLocalName(i) + "=\"" + attributes.getValue(i) + "\"");
+//		System.out.println(">");
 		if (localName.equals("toolbar")) {
 			toolBar = new JToolBar();
 			toolBar.setFloatable(false);
@@ -162,7 +162,7 @@ public class UIFactory extends DefaultHandler {
 	}
 	
 	public void endElement(String namespaceURI, String localName, String qName) {
-		System.out.println("</" + localName + ">");
+//		System.out.println("</" + localName + ">");
 		if (localName.equals("menu")) {
 			listMenu.remove((listMenu.size() - 1));
 		} else if (localName.equals("toolbar")) {

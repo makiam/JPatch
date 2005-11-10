@@ -29,6 +29,7 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 	
 	public Component getTreeCellRendererComponent(JTree tree,Object value,boolean sel,boolean expanded,boolean leaf,int row,boolean hasFocus) {
 		super.getTreeCellRendererComponent(tree,value,sel,expanded,leaf,row,hasFocus);
+		
 		if (value instanceof Model)
 			setIcon(iconModel);
 		else if (value == MainFrame.getInstance().getModel().getTreenodeSelections())
@@ -45,8 +46,11 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 			setIcon(iconMaterial);
 		else if (value instanceof Morph)
 			setIcon(iconMorph);
-		else if (value instanceof MorphTarget)
+		else if (value instanceof MorphTarget) {
 			setIcon(iconTarget);
+			if (((MorphTarget) value).getPosition() == 0)
+				setEnabled(false);
+		}
 		else if (value instanceof Bone)
 			setIcon(iconBone);
 		else if (value instanceof RotationDof)

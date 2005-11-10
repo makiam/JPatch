@@ -78,7 +78,7 @@ public final class Command implements KeyListener {
 			newItem = new JMenuItem();//menuItem.getAction());
 		String itemText = menuItem.getText();
 		String key = (String) INSTANCE.commandKeyMap.get(command);
-		System.out.println(command + " " + key);
+//		System.out.println(command + " " + key);
 		if (key != null)
 			itemText = itemText + " [" + key + "]";
 		newItem.setText(itemText);
