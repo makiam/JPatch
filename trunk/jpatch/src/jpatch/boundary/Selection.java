@@ -17,7 +17,7 @@ public class Selection extends JPatchTreeLeaf {
 	public static int NUM = 0;
 	
 	private final Map mapObjects = new HashMap();
-	private Map mapTransformables;
+	private Map mapTransformables = new HashMap();
 	private Object hotObject;
 	private int iDirection;
 	private Matrix3f m3Orientation;
@@ -27,33 +27,37 @@ public class Selection extends JPatchTreeLeaf {
 //	private int iNum = NUM++;
 	private boolean bActive = false;
 	
-	public static Selection createRectangularPointSelection(int ax, int ay, int bx, int by, Matrix4f transformationMatrix, Model model) {
+	public static Selection createRectangularPointSelection(int ax, int ay, int bx, int by, Matrix4f transformationMatrix, Model model, int mask) {
 		Selection selection = new Selection();
 		Point3f p3 = new Point3f();
-		for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
-			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
-				if (cp.isHead() && !cp.isHidden() && !cp.isStartHook() && !cp.isEndHook()) {
-				//if (cp.isHead() && !cp.isHidden()) {
-					p3.set(cp.getPosition());
-					transformationMatrix.transform(p3);
-					if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by) {
-						selection.mapObjects.put(cp, new Float(1.0f));
+		if ((mask & CONTROLPOINTS) != 0) {
+			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
+				for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+					if (cp.isHead() && !cp.isHidden() && !cp.isStartHook() && !cp.isEndHook()) {
+					//if (cp.isHead() && !cp.isHidden()) {
+						p3.set(cp.getPosition());
+						transformationMatrix.transform(p3);
+						if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by) {
+							selection.mapObjects.put(cp, new Float(1.0f));
+						}
 					}
 				}
 			}
 		}
-		for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
-			Bone bone = (Bone) it.next();
-			if (bone.getParentBone() == null) {
-				bone.getStart(p3);
+		if ((mask & BONES) != 0) {
+			for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
+				Bone bone = (Bone) it.next();
+				if (bone.getParentBone() == null) {
+					bone.getStart(p3);
+					transformationMatrix.transform(p3);
+					if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by)
+						selection.mapObjects.put(bone.getBoneStart(), new Float(1.0f));
+				}
+				bone.getEnd(p3);
 				transformationMatrix.transform(p3);
 				if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by)
-					selection.mapObjects.put(bone.getBoneStart(), new Float(1.0f));
+					selection.mapObjects.put(bone.getBoneEnd(), new Float(1.0f));
 			}
-			bone.getEnd(p3);
-			transformationMatrix.transform(p3);
-			if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by)
-				selection.mapObjects.put(bone.getBoneEnd(), new Float(1.0f));
 		}
 		selection.p3Pivot.set(selection.getCenter());
 		return (selection.mapObjects.size() > 0) ? selection : null;
@@ -94,6 +98,18 @@ public class Selection extends JPatchTreeLeaf {
 
 	public Map getMap() {
 		return mapObjects;
+	}
+	
+	public void applyMask(int mask) {
+		boolean cps = (mask & CONTROLPOINTS) != 0;
+		boolean bones = (mask & BONES) != 0;
+		for (Iterator it = new HashSet(mapObjects.keySet()).iterator(); it.hasNext(); ) {
+			Object key = it.next();
+			if (!cps && key instanceof ControlPoint)
+				mapObjects.remove(key);
+			if (!bones && key instanceof Bone.BoneTransformable)
+				mapObjects.remove(key);
+		}
 	}
 	
 	public void setPivotWeight(float weight) {
@@ -239,12 +255,17 @@ public class Selection extends JPatchTreeLeaf {
 	}
 	
 	public void arm(int mask) {
-//		System.out.println("Selection.arm(" + mask + ")");
-		mapTransformables = new HashMap();
-		if ((mask & CONTROLPOINTS) != 0) {
+		System.out.println("Selection.arm(" + mask + ")");
+		mapTransformables.clear();
+		if (((mask & CONTROLPOINTS) != 0) || ((mask & BONES) != 0)) {
+			boolean cps = (mask & CONTROLPOINTS) != 0;
+			boolean bones = (mask & BONES) != 0;
 			for (Iterator it = mapObjects.keySet().iterator(); it.hasNext();) {
 				Object key = it.next();
-				mapTransformables.put(key, mapObjects.get(key));
+				if (cps && key instanceof ControlPoint)
+					mapTransformables.put(key, mapObjects.get(key));
+				if (bones && key instanceof Bone.BoneTransformable)
+					mapTransformables.put(key, mapObjects.get(key));
 			}
 		}
 		if ((mask & MORPHS) != 0) {

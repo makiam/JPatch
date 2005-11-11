@@ -613,9 +613,9 @@ public class RotateTool extends JPatchTool {
 		Selection selection = MainFrame.getInstance().getSelection();
 		int mask;
 		if (MainFrame.getInstance().getEditedMorph() != null)
-			mask = Selection.MORPHS;
+			mask = Selection.MORPHTARGET;
 		else
-			mask = Selection.CONTROLPOINTS | Selection.MORPHS;
+			mask = Selection.CONTROLPOINTS | Selection.MORPHS | Selection.BONES;
 		selection.arm(mask);
 		selection.beginTransform();
 	}

@@ -44,8 +44,8 @@ implements ChangeListener {
 		inputName = new JPatchInput("Name:",dof.getName());
 		panelMinMax.setLayout(new BoxLayout(panelMinMax,BoxLayout.X_AXIS));
 		JPatchInput.setDimensions(50,50,20);
-		inputMin = new JPatchInput("Min:",dof.getMinAngle() * 180 / (float) Math.PI);
-		inputMax = new JPatchInput("Max:",dof.getMaxAngle() * 180 / (float) Math.PI);
+		inputMin = new JPatchInput("Min:",dof.getMin());
+		inputMax = new JPatchInput("Max:",dof.getMax());
 		panelMinMax.add(inputMin);
 		panelMinMax.add(inputMax);
 		inputX = new JPatchInput("X:", dof.getAxis().x);
@@ -89,15 +89,15 @@ implements ChangeListener {
 			dof.setName(inputName.getStringValue());
 			((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodeChanged(dof);
 		} else if (changeEvent.getSource() == inputMin) {
-			dof.setMinAngle(inputMin.getFloatValue() / 180 * (float) Math.PI);
-			if (dof.getMinAngle() > dof.getCurrentAngle()) {
-				dof.setCurrentAngle(dof.getMinAngle());
+			dof.setMin(inputMin.getFloatValue());
+			if (dof.getMin() > dof.getValue()) {
+				dof.setValue(dof.getValue());
 			}
 			slider.setValue(dof.getSliderValue());
 		} else if (changeEvent.getSource() == inputMax) {
-			dof.setMaxAngle(inputMax.getFloatValue() / 180 * (float) Math.PI);
-			if (dof.getMaxAngle() < dof.getCurrentAngle()) {
-				dof.setCurrentAngle(dof.getMaxAngle());
+			dof.setMax(inputMax.getFloatValue());
+			if (dof.getMax() < dof.getValue()) {
+				dof.setValue(dof.getMax());
 				}
 			slider.setValue(dof.getSliderValue());
 		} else if (changeEvent.getSource() == slider) {
