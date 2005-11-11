@@ -111,6 +111,16 @@ implements ActionListener, FocusListener {
 		return iValue;
 	}
 	
+	public void setValue(int i) {
+		iValue = i;
+		updateTextField();
+	}
+	
+	public void setValue(float f) {
+		fValue = f;
+		updateTextField();
+	}
+	
 	public String getStringValue() {
 		return textField.getText();
 	}
