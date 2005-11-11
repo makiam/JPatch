@@ -44,8 +44,12 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 			setIcon(iconSelection);
 		else if (value instanceof JPatchMaterial)
 			setIcon(iconMaterial);
-		else if (value instanceof Morph)
-			setIcon(iconMorph);
+		else if (value instanceof Morph) {
+			if (value instanceof RotationDof)
+				setIcon(iconRotDof);
+			else
+				setIcon(iconMorph);
+		}
 		else if (value instanceof MorphTarget) {
 			setIcon(iconTarget);
 			if (((MorphTarget) value).getPosition() == 0)
@@ -53,8 +57,6 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 		}
 		else if (value instanceof Bone)
 			setIcon(iconBone);
-		else if (value instanceof RotationDof)
-			setIcon(iconRotDof);
 		return this;
 	}
 }

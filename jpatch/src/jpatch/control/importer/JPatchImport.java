@@ -231,11 +231,11 @@ implements ModelImporter {
 				} else if (localName.equals("angle")) {
 					for (int index = 0; index < attributes.getLength(); index++) {
 						if (attributes.getLocalName(index).equals("min"))
-							dof.setMinAngle(Float.parseFloat(attributes.getValue(index)) * (float) Math.PI / 180);
+							dof.setMin(Float.parseFloat(attributes.getValue(index)));
 						else if (attributes.getLocalName(index).equals("max"))
-							dof.setMaxAngle(Float.parseFloat(attributes.getValue(index)) * (float) Math.PI / 180);
+							dof.setMax(Float.parseFloat(attributes.getValue(index)));
 						else if (attributes.getLocalName(index).equals("current"))
-							dof.setCurrentAngle(Float.parseFloat(attributes.getValue(index)) * (float) Math.PI / 180);
+							dof.setValue(Float.parseFloat(attributes.getValue(index)));
 					}
 				}
 				break;

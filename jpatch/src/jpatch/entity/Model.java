@@ -316,14 +316,6 @@ public class Model implements MutableTreeNode {
 	}
 	
 	public void applyMorphs() {
-//		FIXME
-//		for (Iterator it = lstMorphs.iterator(); it.hasNext(); ) {
-//			((MorphTarget) it.next()).apply();
-//		}
-	}
-	
-	public void setPose() {
-		
 		/* reset morph vectors */
 		for (Iterator itCurves = setCurves.iterator(); itCurves.hasNext(); ) {
 			for (ControlPoint cp = (ControlPoint) itCurves.next(); cp != null; cp = cp.getNextCheckNextLoop())
@@ -339,11 +331,32 @@ public class Model implements MutableTreeNode {
 				cp.getMorphVector().add((Vector3f) morphMap.get(cp));
 			}
 		}
-		
+		for (Iterator itBones = setBones.iterator(); itBones.hasNext(); ) {
+			for (Iterator itDofs = ((Bone) itBones.next()).getDofs().iterator(); itDofs.hasNext(); ) {
+				Morph morph = (Morph) itDofs.next();
+				Map morphMap = morph.getMorphMap();
+				for (Iterator itCps = morphMap.keySet().iterator(); itCps.hasNext(); ) {
+					ControlPoint cp = (ControlPoint) itCps.next();
+					cp.getMorphVector().add((Vector3f) morphMap.get(cp));
+				}
+			}
+		}
+	}
+	
+	public void setMorphPose() {
 		/* apply pose */
 		for (Iterator itCurves = setCurves.iterator(); itCurves.hasNext(); ) {
 			for (ControlPoint cp = (ControlPoint) itCurves.next(); cp != null; cp = cp.getNextCheckNextLoop())
-				cp.setPose();
+				cp.setMorphPose();
+		}
+	}
+	
+	public void setPose() {
+		for (Iterator itCurves = setCurves.iterator(); itCurves.hasNext(); ) {
+			for (ControlPoint cp = (ControlPoint) itCurves.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				cp.setBonePose();
+				cp.setMorphPose();
+			}
 		}
 	}
 	
@@ -1043,9 +1056,11 @@ public class Model implements MutableTreeNode {
 		}
 		
 		System.out.println("\n\n----------- bones -------------");
-		for (Iterator it = setBones.iterator(); it.hasNext(); ) {
-			Bone bone = (Bone) it.next();
+		for (Iterator itBones = setBones.iterator(); itBones.hasNext(); ) {
+			Bone bone = (Bone) itBones.next();
 			System.out.println(bone + " \t" + bone.getParentBone());
+			for (Iterator itDofs = bone.getDofs().iterator(); itDofs.hasNext(); )
+				((RotationDof) itDofs.next()).dump();
 		}
 		
 		System.out.println("\n\n----------- end -------------");

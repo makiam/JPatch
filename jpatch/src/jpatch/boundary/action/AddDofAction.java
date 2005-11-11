@@ -21,6 +21,9 @@ public final class AddDofAction extends AbstractAction {
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		RotationDof dof = new RotationDof(bone);
+		dof.addTarget(new MorphTarget(dof.getMin()));
+		dof.addTarget(new MorphTarget(0));
+		dof.addTarget(new MorphTarget(dof.getMax()));
 		MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddDof(dof, bone));
 		MainFrame.getInstance().selectTreeNode(dof);
 //		MainFrame.getInstance().getTree().setSelectionPath(dof.getTreePath());

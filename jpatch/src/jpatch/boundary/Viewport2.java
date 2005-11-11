@@ -4098,9 +4098,9 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 				AxisAngle4f aa = new AxisAngle4f(axis, 0);
 				Vector3f v = new Vector3f();
 				Vector3f vv = new Vector3f();
-				for (float alpha = dof.getMinAngle(); alpha < dof.getMaxAngle(); alpha += 5 * Math.PI / 180) {
+				for (float alpha = dof.getMin(); alpha < dof.getMax(); alpha += 5) {
 					v.scale(length * 0.5f, v3Extent);
-					aa.angle = alpha - dof.getCurrentAngle();
+					aa.angle = (alpha - dof.getValue()) / 180 * (float) Math.PI;
 					m3.set(aa);
 					m3.transform(v);
 					vv.scale(0.9f, v);
@@ -4113,7 +4113,7 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 					drawable.drawLine(a, b);
 				}
 				v.scale(length * 0.5f, v3Extent);
-				aa.angle = dof.getMinAngle() - dof.getCurrentAngle();
+				aa.angle = (dof.getMin() - dof.getValue()) / 180 * (float) Math.PI;
 				m3.set(aa);
 				m3.transform(v);
 				vv.scale(0.5f, v);
@@ -4125,7 +4125,7 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 				viewDef.getMatrix().transform(b);
 				drawable.drawLine(a, b);
 				v.scale(length * 0.5f, v3Extent);
-				aa.angle = dof.getMaxAngle() - dof.getCurrentAngle();
+				aa.angle = (dof.getMin() - dof.getValue()) / 180 * (float) Math.PI;
 				m3.set(aa);
 				m3.transform(v);
 				vv.scale(0.5f, v);
