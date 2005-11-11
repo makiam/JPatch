@@ -64,7 +64,10 @@ public class MorphTarget implements MutableTreeNode {
 					initMap.clear();
 					Map newPointsMap = new HashMap();
 					for (Iterator it = selectedPoints.keySet().iterator(); it.hasNext(); ) {
-						ControlPoint cp = (ControlPoint) it.next();
+						Object o = it.next();
+						if (!(o instanceof ControlPoint))
+							continue;
+						ControlPoint cp = (ControlPoint) o;
 						Vector3f morphVector = (Vector3f) mapMorph.get(cp);
 						if (morphVector == null) {
 							morphVector = new Vector3f();
@@ -74,29 +77,91 @@ public class MorphTarget implements MutableTreeNode {
 					}
 					MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeMorph.AddPoints(MorphTarget.this, newPointsMap), true);
 					morph.setupMorphMap();
-//					System.out.println("initMap=" + initMap);
 				}
 				
 				public void translate(Vector3f v) {
+					Vector3f vv = new Vector3f();
 					for (Iterator it = initMap.keySet().iterator(); it.hasNext(); ) {
 						ControlPoint cp = (ControlPoint) it.next();
 						Vector3f vector = (Vector3f) mapMorph.get(cp);
 						vector.set((Vector3f) initMap.get(cp));
 						float weight = ((Float) selectedPoints.get(cp)).floatValue();
-						vector.x += v.x * weight;
-						vector.y += v.y * weight;
-						vector.z += v.z * weight;
+						vv.set(v);
+						vv.scale(weight);
+						cp.getInvTransform().transform(vv);
+						vector.add(vv);
 					}
 					morph.setMorphMap();
-					MainFrame.getInstance().getModel().setPose();
+					MainFrame.getInstance().getModel().applyMorphs();
+					MainFrame.getInstance().getModel().setMorphPose();
 				}
 				
 				public void rotate(AxisAngle4f a, Point3f pivot) {
-					;
+					Point3f p0 = new Point3f();
+					Point3f p1 = new Point3f();
+					Vector3f vv = new Vector3f();
+					Matrix3f rot = new Matrix3f();
+					AxisAngle4f aa = new AxisAngle4f();
+					for (Iterator it = initMap.keySet().iterator(); it.hasNext(); ) {
+						ControlPoint cp = (ControlPoint) it.next();
+						Vector3f vector = (Vector3f) mapMorph.get(cp);
+						vector.set((Vector3f) initMap.get(cp));
+					}
+					morph.setMorphMap();
+					MainFrame.getInstance().getModel().applyMorphs();
+					MainFrame.getInstance().getModel().setMorphPose();
+					for (Iterator it = initMap.keySet().iterator(); it.hasNext(); ) {
+						ControlPoint cp = (ControlPoint) it.next();
+						Vector3f vector = (Vector3f) mapMorph.get(cp);
+						p0.set(cp.getPosition());
+						p1.set(p0);
+						p1.sub(pivot);
+						float weight = ((Float) selectedPoints.get(cp)).floatValue();
+						aa.set(a);
+						aa.angle *= weight;
+						rot.set(aa);
+						rot.transform(p1);
+						p1.add(pivot);
+						vv.sub(p1, p0);
+						cp.getInvTransform().transform(vv);
+						vector.add(vv);
+					}
+					morph.setMorphMap();
+					MainFrame.getInstance().getModel().applyMorphs();
+					MainFrame.getInstance().getModel().setMorphPose();
 				}
 				
 				public void transform(Matrix3f m, Point3f pivot) {
-					;
+					Point3f p0 = new Point3f();
+					Point3f p1 = new Point3f();
+					Vector3f vv = new Vector3f();
+					Matrix3f mm = new Matrix3f();
+					AxisAngle4f aa = new AxisAngle4f();
+					for (Iterator it = initMap.keySet().iterator(); it.hasNext(); ) {
+						ControlPoint cp = (ControlPoint) it.next();
+						Vector3f vector = (Vector3f) mapMorph.get(cp);
+						vector.set((Vector3f) initMap.get(cp));
+					}
+					morph.setMorphMap();
+					MainFrame.getInstance().getModel().applyMorphs();
+					MainFrame.getInstance().getModel().setMorphPose();
+					for (Iterator it = initMap.keySet().iterator(); it.hasNext(); ) {
+						ControlPoint cp = (ControlPoint) it.next();
+						Vector3f vector = (Vector3f) mapMorph.get(cp);
+						p0.set(cp.getPosition());
+						p1.set(p0);
+						p1.sub(pivot);
+						float weight = ((Float) selectedPoints.get(cp)).floatValue();
+						weightMatrix(m, weight, mm);
+						mm.transform(p1);
+						p1.add(pivot);
+						vv.sub(p1, p0);
+						cp.getInvTransform().transform(vv);
+						vector.add(vv);
+					}
+					morph.setMorphMap();
+					MainFrame.getInstance().getModel().applyMorphs();
+					MainFrame.getInstance().getModel().setMorphPose();
 				}
 				
 				public JPatchUndoableEdit endTransform() {
@@ -165,7 +230,17 @@ public class MorphTarget implements MutableTreeNode {
 		}
 	}
 	
-	
+	static private void weightMatrix(Matrix3f matrix, float weight, Matrix3f weightedMatrix) {
+		weightedMatrix.m00 = matrix.m00 * weight + 1 - weight;
+		weightedMatrix.m01 = matrix.m01 * weight;
+		weightedMatrix.m02 = matrix.m02 * weight;
+		weightedMatrix.m10 = matrix.m10 * weight;
+		weightedMatrix.m11 = matrix.m11 * weight + 1 - weight;
+		weightedMatrix.m12 = matrix.m12 * weight;
+		weightedMatrix.m20 = matrix.m20 * weight;
+		weightedMatrix.m21 = matrix.m21 * weight;
+		weightedMatrix.m22 = matrix.m22 * weight + 1 - weight;	
+	}
 	
 //	public List getPointList() {
 ////		return new ArrayList(listPoints);

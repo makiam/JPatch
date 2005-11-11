@@ -350,9 +350,13 @@ public final class MainFrame extends JFrame {
 					"change tangents: spatch"
 			}, false);
 			Command.getInstance().enableCommand("stop edit morph", true);
+			if (selection != null)
+				selection.applyMask(Selection.CONTROLPOINTS);
 		} else {
 //			switchMode(MESH);
 			Command.getInstance().enableCommands(new String[] {
+					"default tool",
+					"rotate tool",
 					"add curve segment",
 					"add bone",
 					"tangent tool",

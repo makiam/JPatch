@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.12 2005/11/09 15:55:08 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.13 2005/11/11 22:18:12 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -36,7 +36,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.12 $
+ * @version    $Revision: 1.13 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -120,6 +120,7 @@ public class ControlPoint implements Comparable, Transformable {
 //	private Point3f p3RefOutTangent = new Point3f();
 	
 	private Point3f p3BackupPosition = new Point3f();
+	private Vector3f v3ReferenceMorph = new Vector3f();
 	private Vector3f v3Morph = new Vector3f();
 	
 	private boolean bHidden = false;
@@ -130,13 +131,16 @@ public class ControlPoint implements Comparable, Transformable {
 	
 	private Matrix4f m4Transform = new Matrix4f();
 	private Matrix4f m4InvTransform = new Matrix4f();
+	private Matrix4f m4BoneTransform = new Matrix4f();
+	private Matrix4f m4InvBoneTransform = new Matrix4f();
 	
 	/**
 	 * Constructor
 	 */
 	public ControlPoint() {
 		iNumber = iSequence++;
-		setPose();
+		setBonePose();
+		setMorphPose();
 	}
 
 	/**
@@ -906,16 +910,22 @@ public class ControlPoint implements Comparable, Transformable {
 		}
 	}
 
-	public void setPose() {
+	public void setBonePose() {
 		if (bone != null) {
 			RotationDof dof = bone.getLastDof();
 			if (dof != null) {
-				m4Transform.set(dof.getTransform());				
+				m4BoneTransform.set(dof.getTransform());				
 			}
 		} else {
-			m4Transform.setIdentity();
+			m4BoneTransform.setIdentity();
 		}
-		m4Transform.transform(v3Morph);
+		m4InvBoneTransform.invert(m4BoneTransform);
+	}
+	
+	public void setMorphPose() {
+		v3Morph.set(v3ReferenceMorph);
+		m4BoneTransform.transform(v3Morph);
+		m4Transform.set(m4BoneTransform);
 		m4Transform.m03 += v3Morph.x;
 		m4Transform.m13 += v3Morph.y;
 		m4Transform.m23 += v3Morph.z;
@@ -923,7 +933,7 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 	public Vector3f getMorphVector() {
-		return v3Morph;
+		return v3ReferenceMorph;
 	}
 	
 	/**
@@ -2251,6 +2261,22 @@ public class ControlPoint implements Comparable, Transformable {
 	public ControlPoint trueCp() {
 		return (cpParentHook != null) ? cpParentHook : this;
 	}
+
+	public Matrix4f getInvTransform() {
+		return m4InvTransform;
+	}
+
+	public Matrix4f getTransform() {
+		return m4Transform;
+	}
+	
+//	public Matrix4f getInvBoneTransform() {
+//		return m4InvBoneTransform;
+//	}
+
+//	public Matrix4f getBoneTransform() {
+//		return m4BoneTransform;
+//	}
 	
 	//public Point3f() getTwist() {
 	//	if (cpPrevAttached == null || cpPrevAttached.cpPrevAttached != null) {

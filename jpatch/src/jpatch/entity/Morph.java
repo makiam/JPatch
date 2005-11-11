@@ -7,13 +7,15 @@ import javax.vecmath.*;
 import jpatch.boundary.*;
 
 public class Morph implements MutableTreeNode {
-	private boolean bInserted = false;
-	private List listTargets = new ArrayList();
-	private String strName;
-	private float fMin = 0;
-	private float fMax = 100;
-	private float fValue = 0;
-	private Map mapMorph = new HashMap();
+	boolean bInserted = false;
+	List listTargets = new ArrayList();
+	String strName;
+	float fMin = 0;
+	float fMax = 100;
+	float fValue = 0;
+	Map mapMorph = new HashMap();
+	
+	Morph() { }
 	
 	public Morph(String name) {
 		strName = name;
@@ -55,7 +57,8 @@ public class Morph implements MutableTreeNode {
 		fValue = value;
 		setMorphMap();
 		System.out.println("value = " + value + " " + mapMorph);
-		MainFrame.getInstance().getModel().setPose();
+		MainFrame.getInstance().getModel().applyMorphs();
+		MainFrame.getInstance().getModel().setMorphPose();
 	}
 	
 	public boolean isTarget() {

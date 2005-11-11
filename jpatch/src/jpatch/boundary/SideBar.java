@@ -161,7 +161,10 @@ implements TreeSelectionListener {
 		} else if (selectedNode == MainFrame.getInstance().getModel().getTreenodeExpressions()) {
 			replacePanel(new MorphsPanel());
 		} else if (selectedNode instanceof Morph) {
-			replacePanel(new MorphPanel((Morph) selectedNode));
+			if (selectedNode instanceof RotationDof)
+				replacePanel(new DofPanel((RotationDof) selectedNode));
+			else	
+				replacePanel(new MorphPanel((Morph) selectedNode));
 		} else if (selectedNode instanceof MorphTarget) {
 			MorphTarget target = (MorphTarget) selectedNode;
 //			if (target.getPosition() != 0) {
@@ -191,8 +194,6 @@ implements TreeSelectionListener {
 			map.put(bone.getParentBone() == null ? bone.getBoneStart() : bone.getParentBone().getBoneEnd(), new Float(1));
 			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new Selection(map)));
 			MainFrame.getInstance().getJPatchScreen().update_all();
-		} else if (selectedNode instanceof RotationDof) {
-			replacePanel(new DofPanel((RotationDof) selectedNode));
 		} else if (selectedNode instanceof Model) {
 			replacePanel(new ModelPanel((Model) selectedNode));
 		} else {

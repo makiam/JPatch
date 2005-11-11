@@ -23,7 +23,7 @@ public final class ResetPoseAction extends AbstractAction {
 		for (Iterator itB = model.getBoneSet().iterator(); itB.hasNext(); ) {
 			Bone bone = (Bone) itB.next();
 			for (Iterator itD = bone.getDofs().iterator(); itD.hasNext(); ) {
-				((RotationDof) itD.next()).setCurrentAngle(0);
+				((RotationDof) itD.next()).setValue(0);
 			}
 		}
 		MainFrame.getInstance().getJPatchScreen().update_all();

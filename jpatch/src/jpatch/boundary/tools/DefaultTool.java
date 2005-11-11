@@ -1117,7 +1117,7 @@ public class DefaultTool extends JPatchTool {
 		if (MainFrame.getInstance().getEditedMorph() != null)
 			mask = Selection.MORPHTARGET;
 		else
-			mask = Selection.CONTROLPOINTS | Selection.MORPHS;
+			mask = Selection.CONTROLPOINTS | Selection.MORPHS | Selection.BONES;
 //		System.out.println(MainFrame.getInstance().getEditedMorph() + " " + mask);
 		selection.arm(mask);
 		selection.beginTransform();
