@@ -19,7 +19,7 @@ public final class NewMorphTargetAction extends AbstractAction {
 	private Morph morph;
 	
 	public NewMorphTargetAction(Morph morph) {
-		super("New Target");
+		super("Add new target");
 		this.morph = morph;
 	}
 	public void actionPerformed(ActionEvent actionEvent) {

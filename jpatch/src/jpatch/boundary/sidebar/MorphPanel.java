@@ -15,9 +15,10 @@ implements ChangeListener {
 	 */
 	private static final long serialVersionUID = 1319926408036866674L;
 	JPatchInput inputName;
-	JPanel panelMinMax = new JPanel();
+//	JPanel panelMinMax = new JPanel();
 	JPatchInput inputMin;
 	JPatchInput inputMax;
+	JPatchInput inputCurrent;
 	JSlider slider;
 	Morph morph;
 	AbstractButton addTargetButton;
@@ -27,24 +28,29 @@ implements ChangeListener {
 		this.morph = morph;
 		MorphTarget editedMorph = MainFrame.getInstance().getEditedMorph();
 		deleteButton = new JPatchButton(new DeleteMorphAction(morph));
-		addTargetButton = new JPatchToggleButton(new NewMorphTargetAction(morph));
+		addTargetButton = new JPatchButton(new NewMorphTargetAction(morph));
 		
 		add(deleteButton);
 		add(addTargetButton);
 		
+		addTargetButton.setEnabled(!morph.isTarget());
 		//JPatchSlider.setDimensions(0,150,50,20);
 		JPanel detailPanel = MainFrame.getInstance().getSideBar().getDetailPanel();
 		JPatchInput.setDimensions(50,150,20);
 		inputName = new JPatchInput("Name:",morph.getName());
-		panelMinMax.setLayout(new BoxLayout(panelMinMax,BoxLayout.X_AXIS));
-		JPatchInput.setDimensions(50,50,20);
+//		panelMinMax.setLayout(new BoxLayout(panelMinMax,BoxLayout.X_AXIS));
+//		JPatchInput.setDimensions(100,100,20);
 		inputMin = new JPatchInput("Min:",morph.getMin());
 		inputMax = new JPatchInput("Max:",morph.getMax());
-		panelMinMax.add(inputMin);
-		panelMinMax.add(inputMax);
+		inputCurrent = new JPatchInput("Value:",morph.getValue());
+//		panelMinMax.add(inputMin);
+//		panelMinMax.add(inputMax);
 		detailPanel.removeAll();
 		detailPanel.add(inputName);
-		detailPanel.add(panelMinMax);
+		detailPanel.add(inputMin);
+		detailPanel.add(inputMax);
+		detailPanel.add(inputCurrent);
+//		detailPanel.add(panelMinMax);
 		slider = new JSlider(JSlider.HORIZONTAL,0,100,morph.getSliderValue());
 		slider.setFocusable(false);
 		detailPanel.add(slider);
@@ -52,6 +58,7 @@ implements ChangeListener {
 		inputName.addChangeListener(this);
 		inputMin.addChangeListener(this);
 		inputMax.addChangeListener(this);
+		inputCurrent.addChangeListener(this);
 		slider.addChangeListener(this);
 		
 //		if (morph == editedMorph) {
@@ -89,12 +96,26 @@ implements ChangeListener {
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
 			slider.setValue(morph.getSliderValue());
+		} else if (changeEvent.getSource() == inputCurrent) {
+			float v = inputCurrent.getFloatValue();
+//			if (v < morph.getMin())
+//				v = morph.getMin();
+//			if (v > morph.getMax())
+//				v = morph.getMax();
+//			inputCurrent.setValue(v);
+			if (v != morph.getValue()) {
+				morph.setValue(v);
+				MainFrame.getInstance().getJPatchScreen().update_all();
+				slider.setValue(morph.getSliderValue());
+			}
 		} else if (changeEvent.getSource() == slider) {
 			if (slider.getValueIsAdjusting()) {
 //				morph.unapply();
 				morph.setSliderValue(slider.getValue());
+				inputCurrent.setValue(morph.getValue());
 //				morph.apply();
 				MainFrame.getInstance().getJPatchScreen().update_all();
+				addTargetButton.setEnabled(!morph.isTarget());
 			} else {
 			}
 		}

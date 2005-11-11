@@ -33,9 +33,9 @@ public class AtomicRemoveMorph extends JPatchAtomicEdit implements JPatchRootEdi
 	public void undo() {
 		
 		MainFrame.getInstance().getModel().addExpression(morph);
-		int[] aiIndex = new int[] { morph.getParent().getIndex(morph) };
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(morph.getParent(),aiIndex);
-		//TreePath path = morph.getTreePath();
+//		int[] aiIndex = new int[] { morph.getParent().getIndex(morph) };
+//		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(morph.getParent(),aiIndex);
+//		//TreePath path = morph.getTreePath();
 		
 		MainFrame.getInstance().getSideBar().replacePanel(new SidePanel());
 		MainFrame.getInstance().getSideBar().clearDetailPanel();

@@ -15,7 +15,7 @@ public final class DeleteMorphAction extends AbstractAction {
 	private Morph morph;
 	
 	public DeleteMorphAction(Morph morph) {
-		super("Delete");
+		super("Delete morph");
 		this.morph = morph;
 		//putValue(Action.SHORT_DESCRIPTION,"Add Controlpoint [A]");
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);

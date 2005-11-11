@@ -58,6 +58,11 @@ public class Morph implements MutableTreeNode {
 		MainFrame.getInstance().getModel().setPose();
 	}
 	
+	public boolean isTarget() {
+		int index = binarySearch(fValue) - 1;
+		return (index >= 0 && index <= listTargets.size() - 1 && fValue == ((MorphTarget) listTargets.get(index)).getPosition());
+	
+	}
 	public int getSliderValue() {
 		int i = (int) ((fValue - fMin) / (fMax - fMin) * 100f);
 		if (i < 0)
@@ -76,28 +81,27 @@ public class Morph implements MutableTreeNode {
 	}
 	
 	public void setMorphMap() {
+		if (listTargets.size() < 2)
+			return;
 		MorphTarget mt0 = null, mt1 = null;
 		float f0 = 0, f1 = 0;
 		Vector3f v0 = null, v1 = null;
 		int index = binarySearch(fValue) - 1;
-		if (index >= 0)
-			mt0 = ((MorphTarget) listTargets.get(index));
-		if (index < listTargets.size() - 1)
-			mt1 = ((MorphTarget) listTargets.get(index + 1));
-		if (mt0 != null) {
-			if (mt1 != null) {
-				f1 = (fValue - mt0.getPosition());
-				if (f1 > 0)
-					f1 /= (mt1.getPosition() - mt0.getPosition());
-				f0 = 1f - f1;
-			} else {
-				f0 = 1;
-			}
-		} else if (mt1 != null) {
-			f1 = fValue / mt1.getPosition();
+		System.out.println("binarysearch for " + fValue + " index " + index);
+		if (index == -1) {
+			mt0 = ((MorphTarget) listTargets.get(0));
+			mt1 = ((MorphTarget) listTargets.get(1));
+		} else if (index == listTargets.size() - 1) {
+			mt0 = ((MorphTarget) listTargets.get(listTargets.size() - 2));
+			mt1 = ((MorphTarget) listTargets.get(listTargets.size() - 1));
 		} else {
-			return;
+			mt0 = ((MorphTarget) listTargets.get(index));
+			mt1 = ((MorphTarget) listTargets.get(index + 1));
 		}
+		f1 = (fValue - mt0.getPosition());
+		if (f1 != 0)
+			f1 /= (mt1.getPosition() - mt0.getPosition());
+		f0 = 1f - f1;
 		System.out.println("mapmorph=" + mapMorph);
 		System.out.println("mt0 = " + mt0);
 		if (mt0 != null)
@@ -167,7 +171,7 @@ public class Morph implements MutableTreeNode {
 	int binarySearch(float position) {
 		if (listTargets.size() == 0) return 0;
 		if (position < ((MorphTarget) listTargets.get(0)).getPosition()) return 0;
-		if (position > ((MorphTarget) listTargets.get(listTargets.size() - 1)).getPosition()) return listTargets.size();
+		if (position >= ((MorphTarget) listTargets.get(listTargets.size() - 1)).getPosition()) return listTargets.size();
 		int min = 0;
 		int max = listTargets.size() - 1;
 		int i = max >> 1;

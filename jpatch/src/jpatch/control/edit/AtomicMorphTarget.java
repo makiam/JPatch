@@ -45,7 +45,7 @@ public abstract class AtomicMorphTarget extends JPatchAtomicEdit implements JPat
 	public static class Remove extends AtomicMorphTarget {
 		public Remove(Morph morph, MorphTarget morphTarget) {
 			super(morph, morphTarget);
-			add();
+			remove();
 		}
 		
 		public String getName() {
