@@ -22,7 +22,7 @@ implements ChangeListener {
 	public MorphTargetPanel(MorphTarget morphTarget) {
 		this.morphTarget = morphTarget;
 		MorphTarget editedMorph = MainFrame.getInstance().getEditedMorph();
-		deleteButton = new JPatchButton();//new DeleteMorphAction(morph));
+		deleteButton = new JPatchButton(new DeleteMorphTargetAction(morphTarget));
 		editButton = new JPatchToggleButton(new EditMorphTargetAction(morphTarget));
 		add(editButton);
 		add(deleteButton);
@@ -33,6 +33,9 @@ implements ChangeListener {
 		
 		inputPosition = new JPatchInput("Position:", morphTarget.getPosition());
 		
+		inputPosition.setEnabled(morphTarget.getPosition() != 0);
+		editButton.setEnabled(morphTarget.getPosition() != 0);
+		deleteButton.setEnabled(morphTarget.getMorph().getChildCount() > 2 && morphTarget.getPosition() != 0);
 		detailPanel.removeAll();
 		detailPanel.add(inputPosition);
 		
