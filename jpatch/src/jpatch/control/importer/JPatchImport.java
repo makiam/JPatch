@@ -216,7 +216,7 @@ implements ModelImporter {
 							bone.setEndInfluence(Float.parseFloat(attributes.getValue(index)));
 					}
 				} else if (localName.equals("dof")) {
-					dof = new RotationDof(bone);
+//					dof = new RotationDof(bone);
 					for (int index = 0; index < attributes.getLength(); index++) {
 						if (attributes.getLocalName(index).equals("name"))
 							dof.setName(attributes.getValue(index));
@@ -227,7 +227,7 @@ implements ModelImporter {
 				break;
 			case DOF:
 				if (localName.equals("axis")) {
-					dof.setAxis(new Vector3f(createPoint(attributes)));
+//					dof.setAxis(new Vector3f(createPoint(attributes)));
 				} else if (localName.equals("angle")) {
 					for (int index = 0; index < attributes.getLength(); index++) {
 						if (attributes.getLocalName(index).equals("min"))

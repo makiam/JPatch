@@ -49,7 +49,7 @@ public class Bone implements MutableTreeNode {
 	private BoneTransformable boneEnd = new BoneTransformable(p3End);
 	
 	private String strName;
-	
+	private int iDofAxis = 0;
 //	private int iNum = NUM++;
 //	
 	public Bone(Model model, Point3f start, Vector3f extent) {
@@ -91,6 +91,28 @@ public class Bone implements MutableTreeNode {
 
 	public static void setMap(Map map) {
 		mapBones = map;
+	}
+	
+	public void addDofAxis(int axis) {
+		iDofAxis |= axis;
+	}
+	
+	public void removeDofAxis(int axis) {
+		iDofAxis &= (~axis);
+	}
+	
+	public int getDofAxis() {
+		if ((iDofAxis & 1) == 0) {
+			iDofAxis |= 1;
+			return RotationDof.ORTHO_1;
+		} else if ((iDofAxis & 2) == 0) {
+			iDofAxis |= 2;
+			return RotationDof.ORTHO_2;
+		} else if ((iDofAxis & 4) == 0) {
+			iDofAxis |= 4;
+			return RotationDof.RADIAL;
+		}
+		return -1;
 	}
 	
 	public int getXmlNumber() {

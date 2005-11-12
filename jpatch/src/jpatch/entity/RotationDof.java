@@ -6,6 +6,7 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.vecmath.*;
 
+import jpatch.auxilary.Utils3D;
 import jpatch.auxilary.XMLutils;
 import jpatch.boundary.JPatchTreeLeaf;
 import jpatch.boundary.MainFrame;
@@ -14,9 +15,14 @@ import jpatch.boundary.MainFrame;
  * @author sascha
  */
 public class RotationDof extends Morph {
+	public static final int ORTHO_1 = 1;
+	public static final int ORTHO_2 = 2;
+	public static final int RADIAL = 4;
+	
 	private Bone bone;
-	private Vector3f v3ReferenceAxis;
-	private Vector3f v3Axis;
+	private int iAxis;
+//	private Vector3f v3ReferenceAxis;
+//	private Vector3f v3Axis;
 //	private float fMinAngle;
 //	private float fMaxAngle;
 //	private float fDefaultAngle;
@@ -26,13 +32,14 @@ public class RotationDof extends Morph {
 	private boolean bValid = false;
 //	private Morph morph;
 	
-	public RotationDof(Bone bone) {
+	public RotationDof(Bone bone, int axis) {
 		this.bone = bone;
-		v3ReferenceAxis = new Vector3f(0,0,1);
-		v3Axis = new Vector3f();
+//		v3ReferenceAxis = new Vector3f(0,0,1);
+//		v3Axis = new Vector3f();
+		iAxis = axis;
 		fMin = -90;
 		fMax = 90;
-		strName = "RDOF";
+		strName = getAxisName();
 	}
 	
 	public Bone getBone() {
@@ -53,13 +60,48 @@ public class RotationDof extends Morph {
 		return null;
 	}
 	
-	public Vector3f getAxis() {
-		return new Vector3f(v3ReferenceAxis);
+	public int getType() {
+		return iAxis;
 	}
 	
-	public void setAxis(Vector3f axis) {
-		v3ReferenceAxis.set(axis);
+	public String getAxisName() {
+		if (iAxis == 1)
+			return "Pitch (bend)";
+		else if (iAxis == 2)
+			return "Yaw (bend)";
+		else if (iAxis == 4)
+			return "Roll (twist)";
+		else
+			return "";
 	}
+	
+	public Vector3f getAxis() {
+		Vector3f axis = null;
+		Vector3f v = new Vector3f(bone.getReferenceEnd());
+		v.sub(bone.getReferenceStart());
+		switch (iAxis) {
+			case ORTHO_1: {
+				axis = Utils3D.perpendicularVector(v);
+			}
+			break;
+			case ORTHO_2: {
+				Vector3f vv = Utils3D.perpendicularVector(v);
+				axis = new Vector3f();
+				axis.cross(v, vv);
+			}
+			break;
+			case RADIAL: {
+				axis = v;
+			}
+			break;
+		}
+		axis.normalize();
+		return axis;
+	}
+//	
+//	public void setAxis(Vector3f axis) {
+//		v3ReferenceAxis.set(axis);
+//	}
 	
 	public boolean isTransformValid() {
 		return bValid;
@@ -98,7 +140,7 @@ public class RotationDof extends Morph {
 			m4Transform.set(getParentDof().getTransform());
 		else
 			m4Transform.setIdentity();
-		v3Axis.set(v3ReferenceAxis);
+		Vector3f v3Axis = getAxis();
 		m4Transform.transform(v3Axis);
 //		System.out.println("  raxis=" + v3ReferenceAxis + " axis=" + v3Axis + " angle=" + fCurrentAngle / Math.PI * 180);
 		Matrix4f m4 = new Matrix4f();
@@ -202,7 +244,7 @@ public class RotationDof extends Morph {
 	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(prefix).append("<dof type=\"rotation\" name=").append(XMLutils.quote(strName)).append(">\n");
-		sb.append(prefix).append("\t<axis x=\"" + v3ReferenceAxis.x + "\" y=\"" + v3ReferenceAxis.y + "\" z=\"" + v3ReferenceAxis.z + "\"/>\n");
+//		sb.append(prefix).append("\t<axis x=\"" + v3ReferenceAxis.x + "\" y=\"" + v3ReferenceAxis.y + "\" z=\"" + v3ReferenceAxis.z + "\"/>\n");
 		sb.append(prefix).append("\t<angle min=\"" + fMin + "\" max=\"" + fMax + "\" current=\"" + fValue + "\"/>\n");
 		sb.append(prefix).append("</dof>\n");
 		return sb;

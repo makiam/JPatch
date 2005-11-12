@@ -35,7 +35,7 @@ implements ChangeListener {
 		
 		inputPosition.setEnabled(morphTarget.getPosition() != 0);
 		editButton.setEnabled(morphTarget.getPosition() != 0);
-		deleteButton.setEnabled(morphTarget.getMorph().getChildCount() > 2 && morphTarget.getPosition() != 0);
+		deleteButton.setEnabled(morphTarget.getMorph().getChildCount() > 1 && morphTarget.getPosition() != 0);
 		detailPanel.removeAll();
 		detailPanel.add(inputPosition);
 		

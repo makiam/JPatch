@@ -52,9 +52,9 @@ implements ChangeListener {
 		inputY = new JPatchInput("Y:", dof.getAxis().y);
 		inputZ = new JPatchInput("Z:", dof.getAxis().z);
 		detailPanel.removeAll();
-		detailPanel.add(inputX);
-		detailPanel.add(inputY);
-		detailPanel.add(inputZ);
+//		detailPanel.add(inputX);
+//		detailPanel.add(inputY);
+//		detailPanel.add(inputZ);
 		detailPanel.add(inputName);
 		detailPanel.add(panelMinMax);
 		slider = new JSlider(JSlider.HORIZONTAL,0,100,dof.getSliderValue());
@@ -115,18 +115,18 @@ implements ChangeListener {
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			} else {
 			}
-		} else if (changeEvent.getSource() == inputX) {
-			Vector3f v = dof.getAxis();
-			v.x = inputX.getFloatValue();
-			dof.setAxis(v);
-		} else if (changeEvent.getSource() == inputY) {
-			Vector3f v = dof.getAxis();
-			v.y = inputY.getFloatValue();
-			dof.setAxis(v);
-		} else if (changeEvent.getSource() == inputZ) {
-			Vector3f v = dof.getAxis();
-			v.z = inputZ.getFloatValue();
-			dof.setAxis(v);
+//		} else if (changeEvent.getSource() == inputX) {
+//			Vector3f v = dof.getAxis();
+//			v.x = inputX.getFloatValue();
+//			dof.setAxis(v);
+//		} else if (changeEvent.getSource() == inputY) {
+//			Vector3f v = dof.getAxis();
+//			v.y = inputY.getFloatValue();
+//			dof.setAxis(v);
+//		} else if (changeEvent.getSource() == inputZ) {
+//			Vector3f v = dof.getAxis();
+//			v.z = inputZ.getFloatValue();
+//			dof.setAxis(v);
 		}
 	}
 	
