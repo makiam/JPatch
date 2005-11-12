@@ -16,6 +16,7 @@ implements ChangeListener {
 	 */
 	private static final long serialVersionUID = 7041600166377802101L;
 	JPatchInput inputName;
+	JSlider slider;
 	Bone bone;
 	
 	public BonePanel(Bone bone) {
@@ -25,16 +26,34 @@ implements ChangeListener {
 		JPanel detailPanel = MainFrame.getInstance().getSideBar().getDetailPanel();
 		detailPanel.removeAll();
 		detailPanel.add(inputName);
-		detailPanel.repaint();
+		detailPanel.add(new JLabel("Joint rotation:"));
 		inputName.addChangeListener(this);
+		slider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (bone.getJointRotation() / 3.6f));
+		slider.setFocusable(false);
+		detailPanel.add(slider);
+		detailPanel.repaint();
+		slider.addChangeListener(this);
 		
-		add(new JButton(new AddDofAction(bone)));
+		add(new JButton(new AddDofAction(bone, 1, "add yaw")));
+		add(new JButton(new AddDofAction(bone, 2, "add pitch")));
+		add(new JButton(new AddDofAction(bone, 4, "add roll")));
 	}
 	
 	public void stateChanged(ChangeEvent changeEvent) {
-		bone.setName(inputName.getStringValue());
-		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodeChanged(bone);
-		MainFrame.getInstance().requestFocus();
+		if (changeEvent.getSource() == inputName) {
+			bone.setName(inputName.getStringValue());
+			((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodeChanged(bone);
+			MainFrame.getInstance().requestFocus();
+		} else if (changeEvent.getSource() == slider) {
+			if (slider.getValueIsAdjusting()) {
+//				morph.unapply();
+				bone.setJointRotation(slider.getValue() * 3.6f);
+				MainFrame.getInstance().getModel().applyMorphs();
+				MainFrame.getInstance().getModel().setPose();
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			} else {
+			}
+		}
 	}
 }
 

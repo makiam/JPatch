@@ -404,12 +404,14 @@ public class MorphTarget implements MutableTreeNode {
 		}
 	}
 	
-	public StringBuffer xml(String prefix) {
-		return xml(prefix, null, null);
-	}
+//	public StringBuffer xml(String prefix) {
+//		return xml(prefix, null, null);
+//	}
 			
-	public StringBuffer xml(String prefix, RotationDof dof, String type) {
+	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
+		if (fPosition == 0)
+			return sb;
 //		if (dof== null) {
 //			sb.append(prefix).append("<morph name=\"").append(strName).append("\" ");
 //		} else {
@@ -434,6 +436,18 @@ public class MorphTarget implements MutableTreeNode {
 //		}
 //		sb.append(prefix).append("\t</target>").append("\n");
 //		sb.append(prefix).append("</morph>").append("\n");
+		sb.append(prefix).append("<target value=\"" + fPosition + "\">\n");
+		for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
+			ControlPoint cp = (ControlPoint) it.next();
+			Vector3f v3 = (Vector3f) mapMorph.get(cp);
+			sb.append(prefix);
+			sb.append("\t<point nr=\"").append(cp.getXmlNumber()).append("\" ");
+			sb.append("x=\"").append(v3.x).append("\" " );
+			sb.append("y=\"").append(v3.y).append("\" " );
+			sb.append("z=\"").append(v3.z).append("\"/>");
+			sb.append("\n");
+		}
+		sb.append(prefix).append("</target>").append("\n");
 		return sb;
 	}
 

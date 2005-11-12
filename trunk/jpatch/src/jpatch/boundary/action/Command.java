@@ -183,6 +183,7 @@ public final class Command implements KeyListener {
 		
 		// Test
 		put("dump",						new DumpAction(),					new JMenuItem());
+		put("dump xml",					new XmlDumpAction(),				new JMenuItem());
 		put("dump undo stack",			new DumpUndoStackAction(),			new JMenuItem());
 		put("check model",				new CheckModelAction(),				new JMenuItem());
 		put("controlpoint browser",		new ControlPointBrowserAction(),	new JMenuItem());

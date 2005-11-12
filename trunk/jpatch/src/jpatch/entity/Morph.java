@@ -230,6 +230,46 @@ public class Morph implements MutableTreeNode {
 	public Enumeration children() {
 		return Collections.enumeration(listTargets);
 	}
+	
+	public StringBuffer xml(String prefix) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(prefix).append("<morph name=\"").append(strName).append("\" ");
+		sb.append("min=\"").append(fMin).append("\" ");
+		sb.append("max=\"").append(fMax).append("\" ");
+		sb.append("value=\"").append(fValue).append("\">\n");
+		String prefix2 = prefix + "\t";
+		for (Iterator it = listTargets.iterator(); it.hasNext(); ) {
+			sb.append(((MorphTarget) it.next()).xml(prefix2));
+		}
+		sb.append(prefix).append("</morph>").append("\n");
+		return sb;
+	}
+	
+//		if (dof== null) {
+//			sb.append(prefix).append("<morph name=\"").append(strName).append("\" ");
+//		} else {
+//			Bone bone = dof.getBone();
+//			int index = bone.getDofIndex(dof);
+//			sb.append(prefix).append("<morph bone=\"").append(bone.getXmlNumber()).append("\" dof=\"").append(index).append("\" type=\"").append(type).append("\" ");
+//		}
+//		sb.append("min=\"").append(fMin).append("\" ");
+//		sb.append("max=\"").append(fMax).append("\" ");
+//		sb.append("value=\"").append(fValue).append("\">");
+//		sb.append("\n");
+//		sb.append(prefix).append("\t<target value=\"1.0\">").append("\n");
+//		for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
+//			ControlPoint cp = (ControlPoint) it.next();
+//			Vector3f v3 = (Vector3f) mapMorph.get(cp);
+//			sb.append(prefix);
+//			sb.append("\t\t<point nr=\"").append(cp.getXmlNumber()).append("\" ");
+//			sb.append("x=\"").append(v3.x).append("\" " );
+//			sb.append("y=\"").append(v3.y).append("\" " );
+//			sb.append("z=\"").append(v3.z).append("\"/>");
+//			sb.append("\n");
+//		}
+//		sb.append(prefix).append("\t</target>").append("\n");
+//		sb.append(prefix).append("</morph>").append("\n");
+		
 	/*
 	 * end of TreeNode interface implementation
 	 */

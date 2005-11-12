@@ -152,7 +152,7 @@ public class Model implements MutableTreeNode {
 			sb.append(((Patch) it.next()).xml(prefix3));
 		}
 		for (Iterator it = listMorphs.iterator(); it.hasNext(); ) {
-			MorphTarget morph = (MorphTarget) it.next();
+			Morph morph = (Morph) it.next();
 			sb.append(morph.xml(prefix3));
 		}
 		for (Iterator itBones = setBones.iterator(); itBones.hasNext(); ) {

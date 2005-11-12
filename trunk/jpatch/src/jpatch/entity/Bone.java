@@ -49,7 +49,8 @@ public class Bone implements MutableTreeNode {
 	private BoneTransformable boneEnd = new BoneTransformable(p3End);
 	
 	private String strName;
-	private int iDofAxis = 0;
+	private int iDofAxis = 7;
+	private float fJointRotation = 0;
 //	private int iNum = NUM++;
 //	
 	public Bone(Model model, Point3f start, Vector3f extent) {
@@ -61,6 +62,9 @@ public class Bone implements MutableTreeNode {
 //		boneStart = new BoneTransformable(START);
 //		boneEnd = new BoneTransformable(END);
 		strName = "new bone #" + NUM++;
+		//MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(this, 1), this, 0);
+		//MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(this, 2), this, 1);
+		//MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(this, 4), this, 2);
 	}
 
 //	public Bone(Model model, Bone parent) {
@@ -101,18 +105,33 @@ public class Bone implements MutableTreeNode {
 		iDofAxis &= (~axis);
 	}
 	
-	public int getDofAxis() {
-		if ((iDofAxis & 1) == 0) {
-			iDofAxis |= 1;
-			return RotationDof.ORTHO_1;
-		} else if ((iDofAxis & 2) == 0) {
-			iDofAxis |= 2;
-			return RotationDof.ORTHO_2;
-		} else if ((iDofAxis & 4) == 0) {
-			iDofAxis |= 4;
-			return RotationDof.RADIAL;
-		}
-		return -1;
+	public float getJointRotation() {
+		return fJointRotation;
+	}
+	
+	public void setJointRotation(float jointRotation) {
+		fJointRotation = jointRotation;
+		if (listDofs.size() > 0)
+			getDof(0).invalidate();
+		else
+			RotationDof.invalidate(this);
+	}
+	
+//	public int getDofAxis() {
+//		if ((iDofAxis & 1) == 0) {
+//			iDofAxis |= 1;
+//			return RotationDof.ORTHO_1;
+//		} else if ((iDofAxis & 2) == 0) {
+//			iDofAxis |= 2;
+//			return RotationDof.ORTHO_2;
+//		} else if ((iDofAxis & 4) == 0) {
+//			iDofAxis |= 4;
+//			return RotationDof.RADIAL;
+//		}
+//		return -1;
+//	}
+	public int getDofMask() {
+		return iDofAxis;
 	}
 	
 	public int getXmlNumber() {
@@ -457,6 +476,7 @@ public class Bone implements MutableTreeNode {
 			sb.append(prefix).append("\t<influence start=").append(XMLutils.quote(fStartRadius));
 			sb.append(" end=").append(XMLutils.quote(fEndRadius)).append("/>\n");
 		}
+		sb.append(prefix).append("\t<joint rotation=\"" + fJointRotation + "\"/>\n");
 		for (Iterator it = listDofs.iterator(); it.hasNext(); )
 			sb.append(((RotationDof) it.next()).xml(prefix + "\t"));
 		sb.append(prefix).append("</bone>\n");
