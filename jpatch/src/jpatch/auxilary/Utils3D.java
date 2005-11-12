@@ -43,11 +43,11 @@ public class Utils3D {
 			float ax = Math.abs(v0.x);
 			float ay = Math.abs(v0.y);
 			float az = Math.abs(v0.z);
-			float dm = Math.min(ax,Math.min(ay,az));
+			float dm = Math.max(ax,Math.max(ay,az));
 			if (ax == dm) {
+				vn.cross(v0,v3Z);
+			} else if (az == dm) {
 				vn.cross(v0,v3X);
-			} else if (ay == dm) {
-				vn.cross(v0,v3Y);
 			} else {
 				vn.cross(v0,v3Z);
 			}

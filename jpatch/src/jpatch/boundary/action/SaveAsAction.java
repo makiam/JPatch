@@ -3,6 +3,8 @@ package jpatch.boundary.action;
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
+
+import jpatch.VersionInfo;
 import jpatch.auxilary.*;
 import jpatch.boundary.*;
 import jpatch.boundary.filefilters.*;
@@ -82,7 +84,7 @@ public final class SaveAsAction extends AbstractAction {
 	private boolean write(String filename) {
 		try {
 			// create xml representation
-			StringBuffer xml = MainFrame.getInstance().getModel().xml("");
+			StringBuffer xml = MainFrame.getInstance().getModel().xml("\t");
 			
 			File file = new File(filename);
 			// make backup
@@ -99,7 +101,9 @@ public final class SaveAsAction extends AbstractAction {
 			// write to file
 			BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
 			writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+			writer.write("<jpatch version=\"" + VersionInfo.ver + "\">\n");
 			writer.write(xml.toString());
+			writer.write("</jpatch>\n");
 			writer.close();
 			MainFrame.getInstance().getUndoManager().setChange(false);
 			//System.out.println("file " + filename + " written.");

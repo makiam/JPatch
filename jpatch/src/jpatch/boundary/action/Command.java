@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.7 2005/11/10 15:31:32 sascha_l Exp $
+ * $Id: Command.java,v 1.8 2005/11/12 20:06:16 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -183,6 +183,7 @@ public final class Command implements KeyListener {
 		
 		// Test
 		put("dump",						new DumpAction(),					new JMenuItem());
+		put("dump xml",					new XmlDumpAction(),				new JMenuItem());
 		put("dump undo stack",			new DumpUndoStackAction(),			new JMenuItem());
 		put("check model",				new CheckModelAction(),				new JMenuItem());
 		put("controlpoint browser",		new ControlPointBrowserAction(),	new JMenuItem());

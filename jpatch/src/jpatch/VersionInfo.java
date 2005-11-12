@@ -2,7 +2,7 @@ package jpatch;
 
 public class VersionInfo {
 
-	private static final String ver = "0.5.1.cvs";
+	public static final String ver = "0.5.1.cvs";
 	public static final String name = "JPatch " + ver;
 	public static final String version = ver + " (development version)";
 	public static final String compileTime = "unknown";

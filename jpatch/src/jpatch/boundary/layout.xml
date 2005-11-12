@@ -87,6 +87,7 @@
 		</menu>
 		<menu name="Debug">
 			<item command="dump"/>
+			<item command="dump xml"/>
 			<item command="dump undo stack"/>
 			<item command="check model"/>
 			<item command="controlpoint browser"/>

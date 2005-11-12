@@ -66,9 +66,9 @@ public class RotationDof extends Morph {
 	
 	public String getAxisName() {
 		if (iAxis == 1)
-			return "Pitch (bend)";
-		else if (iAxis == 2)
 			return "Yaw (bend)";
+		else if (iAxis == 2)
+			return "Pitch (bend)";
 		else if (iAxis == 4)
 			return "Roll (twist)";
 		else
@@ -76,6 +76,7 @@ public class RotationDof extends Morph {
 	}
 	
 	public Vector3f getAxis() {
+		System.out.println(iAxis);
 		Vector3f axis = null;
 		Vector3f v = new Vector3f(bone.getReferenceEnd());
 		v.sub(bone.getReferenceStart());
@@ -96,6 +97,9 @@ public class RotationDof extends Morph {
 			break;
 		}
 		axis.normalize();
+		Matrix3f m = new Matrix3f();
+		m.set(new AxisAngle4f(v, bone.getJointRotation() / 180f * (float) Math.PI));
+		m.transform(axis);
 		return axis;
 	}
 //	
@@ -117,14 +121,14 @@ public class RotationDof extends Morph {
 //		}
 	}
 	
-	private void invalidate() {
+	public void invalidate() {
 		for (int i = bone.getDofIndex(this), n = bone.getDofs().size(); i < n; i++)
 			((RotationDof) bone.getDof(i)).bValid = false;
 		invalidate(bone);
 //		bValid = false;
 	}
 	
-	private void invalidate(Bone bone) {
+	public static void invalidate(Bone bone) {
 		for (Iterator it = bone.getChildBones().iterator(); it.hasNext(); ) {
 			Bone b = (Bone) it.next();
 			for (Iterator jt = b.getDofs().iterator(); jt.hasNext(); )
@@ -243,10 +247,18 @@ public class RotationDof extends Morph {
 	
 	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(prefix).append("<dof type=\"rotation\" name=").append(XMLutils.quote(strName)).append(">\n");
-//		sb.append(prefix).append("\t<axis x=\"" + v3ReferenceAxis.x + "\" y=\"" + v3ReferenceAxis.y + "\" z=\"" + v3ReferenceAxis.z + "\"/>\n");
-		sb.append(prefix).append("\t<angle min=\"" + fMin + "\" max=\"" + fMax + "\" current=\"" + fValue + "\"/>\n");
-		sb.append(prefix).append("</dof>\n");
+		String type = (iAxis == 1) ? "yaw" : (iAxis == 2) ? "pitch" : "roll";
+		sb.append(prefix).append("<dof type=\"" + type + "\"> angle min=\"" + fMin + "\" max=\"" + fMax + "\" value=\"" + fValue + "\"");
+		if (listTargets.size() == 0) {
+			sb.append("/>\n");
+		} else {
+			sb.append(">\n");
+			String prefix2 = prefix + "\t";
+			for (Iterator it = listTargets.iterator(); it.hasNext(); ) {
+				sb.append(((MorphTarget) it.next()).xml(prefix2));
+			}
+			sb.append(prefix).append("</dof>\n");
+		}
 		return sb;
 	}
 
