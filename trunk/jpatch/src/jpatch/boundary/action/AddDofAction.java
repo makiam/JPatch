@@ -20,13 +20,15 @@ public final class AddDofAction extends AbstractAction {
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		RotationDof dof = new RotationDof(bone);
+		int axis = bone.getDofAxis();
+		if (axis == -1)
+			return;
+		RotationDof dof = new RotationDof(bone, axis);
 		dof.addTarget(new MorphTarget(dof.getMin()));
 		dof.addTarget(new MorphTarget(0));
 		dof.addTarget(new MorphTarget(dof.getMax()));
 		MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddDof(dof, bone));
 		MainFrame.getInstance().selectTreeNode(dof);
-//		MainFrame.getInstance().getTree().setSelectionPath(dof.getTreePath());
 	}
 }
 

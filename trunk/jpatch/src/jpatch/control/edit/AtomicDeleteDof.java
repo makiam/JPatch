@@ -40,9 +40,11 @@ public class AtomicDeleteDof extends JPatchAtomicEdit implements JPatchRootEdit 
 	
 	public void undo() {
 		MainFrame.getInstance().getTreeModel().insertNodeInto(dof, dof.getBone(), dof.getBone().getChildCount());
+		dof.getBone().addDofAxis(dof.getType());
 	}
 	
 	public void redo() {
+		dof.getBone().removeDofAxis(dof.getType());
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(dof);
 	}
 
