@@ -12,16 +12,20 @@ public final class AddDofAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
 	
 	private Bone bone;
+	private int axis;
 	
-	public AddDofAction(Bone bone) {
-		super("add DOF");
+	public AddDofAction(Bone bone, int axis, String name) {
+		super(name);
 		this.bone = bone;
+		this.axis = axis;
 		//putValue(Action.SHORT_DESCRIPTION,"Add Bone");
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		int axis = bone.getDofAxis();
-		if (axis == -1)
+//		int axis = bone.getDofAxis();
+//		if (axis == -1)
+//			return;
+		if ((bone.getDofMask() & axis) != 0)
 			return;
 		RotationDof dof = new RotationDof(bone, axis);
 		dof.addTarget(new MorphTarget(dof.getMin()));
