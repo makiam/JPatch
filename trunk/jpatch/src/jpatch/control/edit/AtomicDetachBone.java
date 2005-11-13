@@ -44,6 +44,7 @@ public class AtomicDetachBone extends JPatchAtomicEdit implements JPatchRootEdit
 		MutableTreeNode bones = MainFrame.getInstance().getModel().getTreenodeBones();
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(boneChild);
 		MainFrame.getInstance().getTreeModel().insertNodeInto(boneChild, bones, bones.getChildCount());
+		boneChild.setStart(boneParent.getEnd(null));
 	}
 	
 	public void undo() {

@@ -15,7 +15,7 @@ public final class DeleteDofAction extends AbstractAction {
 	private RotationDof dof;
 	
 	public DeleteDofAction(RotationDof dof) {
-		super("Delete");
+		super("Delete DOF");
 		this.dof = dof;
 		//putValue(Action.SHORT_DESCRIPTION,"Add Controlpoint [A]");
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);

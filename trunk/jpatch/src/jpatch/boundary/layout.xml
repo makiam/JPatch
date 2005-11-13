@@ -35,6 +35,8 @@
 		<button command="rotate tool"/>
 		<button command="weight selection tool"/>
 		<separator/>
+		<button command="detatch"/>
+		<separator/>
 		<button command="rotoscope tool"/>
 		<separator/>
 		<button command="tangent tool"/>

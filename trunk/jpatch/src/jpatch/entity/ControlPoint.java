@@ -24,6 +24,8 @@ package jpatch.entity;
 
 import java.util.*;
 import javax.vecmath.*;
+
+import sun.misc.FpUtils;
 import jpatch.auxilary.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.*;
@@ -128,6 +130,7 @@ public class ControlPoint implements Comparable, Transformable {
 	
 	private Bone bone;
 	private float fBonePosition;
+	private float fDistanceToLine;
 	
 	private Matrix4f m4Transform = new Matrix4f();
 	private Matrix4f m4InvTransform = new Matrix4f();
@@ -270,9 +273,10 @@ public class ControlPoint implements Comparable, Transformable {
 //		if (cpNext != null) p3RefOutTangent.set(getOutTangent());
 //	}
 	
-	public void setBone(Bone bone, float position) {
+	public void setBone(Bone bone, float position, float distanceToLine) {
 		this.bone = bone;
 		this.fBonePosition = position;
+		this.fDistanceToLine = distanceToLine;
 	}
 	
 	public Bone getBone() {
@@ -914,7 +918,7 @@ public class ControlPoint implements Comparable, Transformable {
 		if (bone != null) {
 			RotationDof dof = bone.getLastDof();
 			if (dof != null) {
-				m4BoneTransform.set(dof.getTransform());				
+				dof.getTransform(m4BoneTransform, fBonePosition, fDistanceToLine);			
 			}
 		} else {
 			m4BoneTransform.setIdentity();

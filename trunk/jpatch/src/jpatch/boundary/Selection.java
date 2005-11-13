@@ -158,6 +158,14 @@ public class Selection extends JPatchTreeLeaf {
 		return mapObjects.containsKey(object);
 	}
 	
+	public boolean containsBone(Bone bone) {
+		Bone parent = bone.getParentBone();
+		if (parent != null)
+			return (mapObjects.containsKey(parent.getBoneEnd()) && mapObjects.containsKey(bone.getBoneEnd()));
+		else
+			return (mapObjects.containsKey(bone.getBoneStart()) && mapObjects.containsKey(bone.getBoneEnd()));
+	}
+	
 	public boolean isSingle() {
 		return mapObjects.size() == 1;
 	}
