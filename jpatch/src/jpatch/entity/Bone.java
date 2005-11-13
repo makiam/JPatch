@@ -117,6 +117,9 @@ public class Bone implements MutableTreeNode {
 			RotationDof.invalidate(this);
 	}
 	
+	public float getLength() {
+		return getReferenceStart().distance(getReferenceEnd());
+	}
 //	public int getDofAxis() {
 //		if ((iDofAxis & 1) == 0) {
 //			iDofAxis |= 1;

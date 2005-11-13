@@ -126,16 +126,7 @@ public class Model implements MutableTreeNode {
 			sb.append(mat.xml(prefix2));
 		}
 		
-		ArrayList list;
-		list = new ArrayList(setBones);
-		setBoneMap(list);
-		sb.append(prefix2).append("<skeleton>\n");
-		for (Iterator it = list.iterator(); it.hasNext(); ) {
-			sb.append(((Bone) it.next()).xml(prefix3));
-		}
-		sb.append(prefix2).append("</skeleton>\n");
-		
-		list = new ArrayList(setCurves);
+		ArrayList list = new ArrayList(setCurves);
 		setCpMap(list);
 		sb.append(prefix2).append("<mesh>\n");
 		for (Iterator it = list.iterator(); it.hasNext(); ) {
@@ -155,14 +146,14 @@ public class Model implements MutableTreeNode {
 			Morph morph = (Morph) it.next();
 			sb.append(morph.xml(prefix3));
 		}
-		for (Iterator itBones = setBones.iterator(); itBones.hasNext(); ) {
-			for (Iterator itDofs = ((Bone) itBones.next()).getDofs().iterator(); itDofs.hasNext(); ) {
-				RotationDof dof = (RotationDof) itDofs.next();
-				//FIXME
-//				sb.append(dof.getMinMorph().xml(prefix3, dof, "min"));
-//				sb.append(dof.getMaxMorph().xml(prefix3, dof, "max"));
-			}
-		}
+//		for (Iterator itBones = setBones.iterator(); itBones.hasNext(); ) {
+//			for (Iterator itDofs = ((Bone) itBones.next()).getDofs().iterator(); itDofs.hasNext(); ) {
+//				RotationDof dof = (RotationDof) itDofs.next();
+//				//FIXME
+////				sb.append(dof.getMinMorph().xml(prefix3, dof, "min"));
+////				sb.append(dof.getMaxMorph().xml(prefix3, dof, "max"));
+//			}
+//		}
 		StringBuffer lipSyncMap = new StringBuffer();
 		for (Iterator it = mapPhonemes.keySet().iterator(); it.hasNext(); ) {
 			String phoneme = (String) it.next();
@@ -179,6 +170,13 @@ public class Model implements MutableTreeNode {
 			Selection selection = (Selection) it.next();
 			sb.append(selection.xml(prefix2));
 		}
+		list = new ArrayList(setBones);
+		setBoneMap(list);
+		sb.append(prefix2).append("<skeleton>\n");
+		for (Iterator it = list.iterator(); it.hasNext(); ) {
+			sb.append(((Bone) it.next()).xml(prefix3));
+		}
+		sb.append(prefix2).append("</skeleton>\n");
 		sb.append(prefix).append("</model>").append("\n");
 		return sb;
 	}

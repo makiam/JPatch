@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.34 2005/11/12 20:06:16 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.35 2005/11/13 14:06:07 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -3916,23 +3916,24 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 				2, 1, 0,
 				3, 2, 0,
 				4, 3, 0,
-				1, 4, 0,
 				1, 2, 5,
 				2, 3, 5,
 				3, 4, 5,
+				1, 4, 0,
 				4, 1, 5
 		};
 		static final int[] NORMAL_INDICES = new int[] {
 				0,
 				1,
 				2,
-				3,
 				4,
 				5,
 				6,
+				3,
 				7
 		};
 		final MaterialProperties mp = new MaterialProperties();
+		final MaterialProperties mpBlack = new MaterialProperties();
 		final Point3f[] ap3Points = new Point3f[6];
 		final Vector3f[] av3Normals = new Vector3f[8];
 		final Point3f p3Start = new Point3f();
@@ -3944,6 +3945,7 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 			for (int i = 0; i < 6; ap3Points[i++] = new Point3f());
 			for (int i = 0; i < 8; av3Normals[i++] = new Vector3f());
 			mp.metallic = 0.5f;
+			mpBlack.metallic = 0.5f;
 		}
 		
 		private void reset() {
@@ -3972,6 +3974,8 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 		}
 		
 		public void drawBone(JPatchDrawable2 drawable, ViewDefinition viewDef, Bone bone) {
+			Selection selection = MainFrame.getInstance().getSelection();
+			boolean selected = selection != null && selection.containsBone(bone);
 //			System.out.println("drawBone bone=" + bone);
 			reset();
 			bone.getStart(p3Start);
@@ -4000,6 +4004,17 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 			m.mul(matrix);
 			for (int i = 0; i < ap3Points.length; i++)
 				m.transform(ap3Points[i]);
+			
+			if (bone.getDofs().size() == 0) {
+				if (selected)
+					drawable.setColor(new Color3f(0.75f, 0.75f, 0.75f));
+				else
+					drawable.setColor(new Color3f(1.0f, 1.0f, 1.0f));		
+				for (int i = 0; i < LINES.length; )
+					drawable.drawLine(ap3Points[LINES[i++]], ap3Points[LINES[i++]]);
+				return;
+			}
+			
 			for (int i = 0; i < av3Normals.length; i++) {
 //				Vector3f a = new Vector3f(ap3Points[TRIANGLES[i * 3 + 1]]);
 //				Vector3f b = new Vector3f(ap3Points[TRIANGLES[i * 3 + 2]]);
@@ -4014,10 +4029,15 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 				mp.red = color.x;
 				mp.green = color.y;
 				mp.blue = color.z;
+				mpBlack.red = color.x * 0.25f;
+				mpBlack.green = color.y * 0.25f;
+				mpBlack.blue = color.z * 0.25f;
 				if (drawable.isLightingSupported()) {
 					drawable.setLightingEnabled(true);
 					drawable.setMaterial(mp);
 					for (int i = 0, t = 0; i < NORMAL_INDICES.length; i++) {
+						if (i == 6)
+							drawable.setMaterial(mpBlack);
 						Vector3f normal = av3Normals[NORMAL_INDICES[i]];
 						if (normal.z < 0) {
 							drawable.drawTriangle(
@@ -4039,10 +4059,13 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 					drawable.setLightingEnabled(false);
 				} else {
 					Color3f c = new Color3f();
+					MaterialProperties mat = mp;
 					for (int i = 0, t = 0; i < NORMAL_INDICES.length; i++) {
+						if (i == 6)
+							mat = mpBlack;
 						Vector3f normal = av3Normals[NORMAL_INDICES[i]];
 						if (normal.z < 0) {
-							viewDef.getLighting().shade(ap3Points[TRIANGLES[t]], normal, mp, c);
+							viewDef.getLighting().shade(ap3Points[TRIANGLES[t]], normal, mat, c);
 							drawable.setColor(c);
 							drawable.drawTriangle(ap3Points[TRIANGLES[t++]], ap3Points[TRIANGLES[t++]], ap3Points[TRIANGLES[t++]]);
 						} else {
@@ -4050,17 +4073,22 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 						}
 					}
 				}
-			} else {
+			} else if (!selected) {
 				drawable.setColor(bone.getColor());
 				for (int i = 0; i < LINES.length; )
 					drawable.drawLine(ap3Points[LINES[i++]], ap3Points[LINES[i++]]);
 			}
+			if (selected) {
+				drawable.setColor(new Color3f(1, 1, 1));
+				for (int i = 0; i < LINES.length; )
+					drawable.drawLine(ap3Points[LINES[i++]], ap3Points[LINES[i++]]);
+			}
+			
 //			if (bone.getParentBone() == null) {
 //				drawable.setColor(c3FreeEnd);
 //				drawable.drawPoint(ap3Points[0]);
 //			}
 			drawable.setPointSize(3);
-			Selection selection = MainFrame.getInstance().getSelection();
 			drawable.setColor(selection != null && selection.contains(bone.getBoneEnd()) ? c3Selected : (bone.getChildCount() == 0) ? c3FreeEnd: c3AttachedEnd);
 			drawable.drawPoint(ap3Points[5]);
 			if (bone.getParent() != null && selection != null && selection.contains(bone.getBoneStart())) {
@@ -4068,42 +4096,56 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 				drawable.drawPoint(ap3Points[0]);
 			}
 			
-			int d = 0;
-			for (Iterator it = bone.getDofs().iterator(); it.hasNext(); ) {
-				RotationDof dof = (RotationDof) it.next();
-				Vector3f axis = dof.getAxis();
-				if (dof.getParentDof() != null)
-					dof.getParentDof().getTransform().transform(axis);
-				axis.normalize();
-				axis.scale(length * 0.25f);
-				viewDef.getMatrix().transform(axis);
-				Point3f a = new Point3f(bone.getStart(null));
-				viewDef.getMatrix().transform(a);
-				Point3f b = new Point3f(a);
-				a.add(axis);
-				b.sub(axis);
-				switch(d) {
-					case 0: drawable.setColor(new Color3f(1,0,0)); break;
-					case 1: drawable.setColor(new Color3f(0,1,0)); break;
-					case 2: drawable.setColor(new Color3f(0,0,1)); break;
-				}
-				drawable.drawLine(a, b);
-				axis = dof.getAxis();
-				if (dof.getParentDof() != null)
-					dof.getParentDof().getTransform().transform(axis);
-//				if (bone.getParentBone() != null)
-//					bone.getParentBone().getLastDof().getTransform().transform(axis);
-				axis.normalize();
-				Matrix3f m3 = new Matrix3f();
-				AxisAngle4f aa = new AxisAngle4f(axis, 0);
-				Vector3f v = new Vector3f();
-				Vector3f vv = new Vector3f();
-				for (float alpha = dof.getMin(); alpha <= dof.getMax(); alpha += 5) {
+			if (selected && selection.getMap().size() == 2) {
+				int d = 0;
+				for (Iterator it = bone.getDofs().iterator(); it.hasNext(); ) {
+					RotationDof dof = (RotationDof) it.next();
+					Vector3f axis = dof.getAxis();
+					if (dof.getParentDof() != null)
+						dof.getParentDof().getTransform().transform(axis);
+					axis.normalize();
+					axis.scale(length * 0.25f);
+					viewDef.getMatrix().transform(axis);
+					Point3f a = new Point3f(bone.getStart(null));
+					viewDef.getMatrix().transform(a);
+					Point3f b = new Point3f(a);
+					a.add(axis);
+					b.sub(axis);
+					switch(d) {
+						case 0: drawable.setColor(new Color3f(1,0,0)); break;
+						case 1: drawable.setColor(new Color3f(0,1,0)); break;
+						case 2: drawable.setColor(new Color3f(0,0,1)); break;
+					}
+					drawable.drawLine(a, b);
+					axis = dof.getAxis();
+					if (dof.getParentDof() != null)
+						dof.getParentDof().getTransform().transform(axis);
+	//				if (bone.getParentBone() != null)
+	//					bone.getParentBone().getLastDof().getTransform().transform(axis);
+					axis.normalize();
+					Matrix3f m3 = new Matrix3f();
+					AxisAngle4f aa = new AxisAngle4f(axis, 0);
+					Vector3f v = new Vector3f();
+					Vector3f vv = new Vector3f();
+					for (float alpha = dof.getMin(); alpha <= dof.getMax(); alpha += 5) {
+						v.scale(length * 0.5f, v3Extent);
+						aa.angle = (alpha - dof.getValue()) / 180 * (float) Math.PI;
+						m3.set(aa);
+						m3.transform(v);
+						vv.scale(0.9f, v);
+						bone.getStart(a);
+						b.set(a);
+						a.add(v);
+						b.add(vv);
+						viewDef.getMatrix().transform(a);
+						viewDef.getMatrix().transform(b);
+						drawable.drawLine(a, b);
+					}
 					v.scale(length * 0.5f, v3Extent);
-					aa.angle = (alpha - dof.getValue()) / 180 * (float) Math.PI;
+					aa.angle = (dof.getMin() - dof.getValue()) / 180 * (float) Math.PI;
 					m3.set(aa);
 					m3.transform(v);
-					vv.scale(0.9f, v);
+					vv.scale(0.5f, v);
 					bone.getStart(a);
 					b.set(a);
 					a.add(v);
@@ -4111,33 +4153,21 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 					viewDef.getMatrix().transform(a);
 					viewDef.getMatrix().transform(b);
 					drawable.drawLine(a, b);
+					v.scale(length * 0.5f, v3Extent);
+					aa.angle = (dof.getMax() - dof.getValue()) / 180 * (float) Math.PI;
+					m3.set(aa);
+					m3.transform(v);
+					vv.scale(0.5f, v);
+					bone.getStart(a);
+					b.set(a);
+					a.add(v);
+					b.add(vv);
+					viewDef.getMatrix().transform(a);
+					viewDef.getMatrix().transform(b);
+					drawable.drawLine(a, b);
+					
+					d++;
 				}
-				v.scale(length * 0.5f, v3Extent);
-				aa.angle = (dof.getMin() - dof.getValue()) / 180 * (float) Math.PI;
-				m3.set(aa);
-				m3.transform(v);
-				vv.scale(0.5f, v);
-				bone.getStart(a);
-				b.set(a);
-				a.add(v);
-				b.add(vv);
-				viewDef.getMatrix().transform(a);
-				viewDef.getMatrix().transform(b);
-				drawable.drawLine(a, b);
-				v.scale(length * 0.5f, v3Extent);
-				aa.angle = (dof.getMax() - dof.getValue()) / 180 * (float) Math.PI;
-				m3.set(aa);
-				m3.transform(v);
-				vv.scale(0.5f, v);
-				bone.getStart(a);
-				b.set(a);
-				a.add(v);
-				b.add(vv);
-				viewDef.getMatrix().transform(a);
-				viewDef.getMatrix().transform(b);
-				drawable.drawLine(a, b);
-				
-				d++;
 			}
 		}
 	}

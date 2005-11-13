@@ -48,11 +48,13 @@ public final class AssignPointsToBonesAction extends AbstractAction {
 			Point3f p = cp.getReferencePosition();
 			float minDist = Float.MAX_VALUE;
 			float closestPosOnLine = 0;
+			float distToLine = 0;
 			Bone closestBone = null;
 			for (int j = 0, m = boneList.size(); j < m; j++) {
 				Bone bone = (Bone) boneList.get(j);
 				Point3f p0 = bone.getReferenceStart();
 				Point3f p1 = bone.getReferenceEnd();
+				float l = p0.distance(p1);
 				float posOnLine = Utils3D.positionOnLine(p0, p1, p);
 				float posOnSegment = posOnLine < 0 ? 0 : posOnLine > 1 ? 1 : posOnLine;
 				Point3f pBone = new Point3f();
@@ -62,10 +64,12 @@ public final class AssignPointsToBonesAction extends AbstractAction {
 					minDist = distance;
 					closestBone = bone;
 					closestPosOnLine = posOnLine;
+					pBone.interpolate(p0, p1, posOnLine);
+					distToLine = pBone.distance(p) / l;
 				}
 			}
-			System.out.println(cp + " -> " + closestBone);
-			cp.setBone(closestBone, closestPosOnLine);
+			System.out.println(cp + " -> " + closestBone + " b=" + closestPosOnLine + " d=" + distToLine);
+			cp.setBone(closestBone, closestPosOnLine, distToLine);
 		}
 	}
 }

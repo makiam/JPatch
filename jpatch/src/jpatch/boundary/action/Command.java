@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.8 2005/11/12 20:06:16 sascha_l Exp $
+ * $Id: Command.java,v 1.9 2005/11/13 14:06:07 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -115,6 +115,13 @@ public final class Command implements KeyListener {
 		}
 		
 		/*
+		 * Keyboard only
+		 */
+		put("delete",		new DeleteControlPointAction(),	new JMenuItem());
+		put("remove",		new RemoveControlPointAction(),	new JMenuItem());
+		put("insert point",	new InsertControlPointAction(),	new JMenuItem());
+		
+		/*
 		 * Main toolbar buttons
 		 */
 		put("new",						new NewAction(), 				new JMenuItem(),			new JPatchButton());
@@ -145,6 +152,7 @@ public final class Command implements KeyListener {
 		put("add bone",					new AddBoneAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("rotate tool",				new RotateAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("weight selection tool",	new WeightSelectionAction(), 	new JRadioButtonMenuItem(),	new JPatchToggleButton());
+		put("detatch",					new DetachControlPointsAction(),new JMenuItem(),			new JPatchButton());
 		put("rotoscope tool",			new RotoscopeAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("tangent tool",				new TangentAction(), 			new JCheckBoxMenuItem(),	new JPatchToggleButton());
 		put("peak tangents",			new PeakAction(), 				new JCheckBoxMenuItem(),	new JPatchToggleButton());
