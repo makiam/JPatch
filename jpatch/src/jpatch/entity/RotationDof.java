@@ -19,6 +19,12 @@ public class RotationDof extends Morph {
 	public static final int ORTHO_2 = 2;
 	public static final int RADIAL = 4;
 	
+	public static final int RIGID = 0;
+	public static final int SOFT = 1;
+	public static final int SMOOTH = 2;
+	
+	public static final String[] MODES = new String[] { "rigid", "soft", "smooth" };
+	
 	private Bone bone;
 	private int iAxis;
 //	private Vector3f v3ReferenceAxis;
@@ -30,6 +36,7 @@ public class RotationDof extends Morph {
 	private Matrix4f m4Transform = new Matrix4f();
 	private Matrix4f m4InvTransform = new Matrix4f();
 	private boolean bValid = false;
+	private int iMode = SOFT;
 //	private Morph morph;
 	
 	public RotationDof(Bone bone, int axis) {
@@ -76,7 +83,7 @@ public class RotationDof extends Morph {
 	}
 	
 	public Vector3f getAxis() {
-		System.out.println(iAxis);
+//		System.out.println(iAxis);
 		Vector3f axis = null;
 		Vector3f v = new Vector3f(bone.getReferenceEnd());
 		v.sub(bone.getReferenceStart());
@@ -119,6 +126,14 @@ public class RotationDof extends Morph {
 //			} else
 //				return true;
 //		}
+	}
+	
+	public int getMode() {
+		return iMode;
+	}
+	
+	public void setMode(int mode) {
+		iMode = mode;
 	}
 	
 	public void invalidate() {
@@ -165,6 +180,54 @@ public class RotationDof extends Morph {
 //		m4Transform.setIdentity();
 		m4InvTransform.invert(m4Transform);
 		bValid = true;
+	}
+	
+	public void getTransform(Matrix4f m, float positionOnBone, float distanceToLine) {
+		float factor = 0;
+		if (iMode == RIGID)
+			factor = positionOnBone < 0 ? 0 : 1;
+		else if (iMode == SOFT) {
+			factor = positionOnBone + distanceToLine;
+			if (factor > 0)
+				factor /= (distanceToLine * 2);
+			if (factor > 1)
+				factor = 1;
+		} else if (iMode == SMOOTH) {
+			factor = positionOnBone;
+			if (factor < 0)
+				factor = 0;
+			else if (factor > 1)
+				factor = 1;
+		}
+//		System.out.println(" computeTransform " + bone + " " + bone.getDofs().indexOf(this));
+		RotationDof parentDof = getParentDof();
+		if (parentDof != null) {
+			if (bone.getDofIndex(this) > 0)
+				parentDof.getTransform(m, positionOnBone, distanceToLine);
+			else
+				m.set(getParentDof().getTransform());
+		} else {
+			m.setIdentity();
+		}
+		Vector3f v3Axis = getAxis();
+		m.transform(v3Axis);
+//		System.out.println("  raxis=" + v3ReferenceAxis + " axis=" + v3Axis + " angle=" + fCurrentAngle / Math.PI * 180);
+		Matrix4f m4 = new Matrix4f();
+		m4.setIdentity();
+		m4.set(new AxisAngle4f(v3Axis, fValue / 180 * (float) Math.PI * factor));
+		Point3f pivot = bone.getStart(null);
+//		System.out.println("  Pivot = " + pivot);
+		Vector3f v = new Vector3f(pivot);
+		Vector3f v2 = new Vector3f(v);
+		m4.transform(v2);
+		v.sub(v2);
+		m4.setTranslation(v);
+		
+		//m4Transform.mul(m4);
+		m4.mul(m);
+		m.set(m4);
+		
+//		m4Transform.setIdentity();
 	}
 	
 	public Matrix4f getTransform() {
@@ -216,12 +279,12 @@ public class RotationDof extends Morph {
 //		return (int) ((fCurrentAngle - fMinAngle) / (fMaxAngle - fMinAngle) * 100f);
 //	}
 	
-	public void setSliderValue(int sliderValue) {
-//		fCurrentAngle = fMinAngle + (fMaxAngle - fMinAngle) / 100f * (float) sliderValue;
-		setValue(fMin + (fMax - fMin) / 100f * (float) sliderValue);
-//		invalidate();
-//		setMorphValues();
-	}
+//	public void setSliderValue(int sliderValue, int size) {
+////		fCurrentAngle = fMinAngle + (fMaxAngle - fMinAngle) / 100f * (float) sliderValue;
+//		setValue(fMin + (fMax - fMin) / 100f * (float) sliderValue);
+////		invalidate();
+////		setMorphValues();
+//	}
 	
 //	private void setMorphValues() {
 //		float min = 0;
@@ -248,7 +311,7 @@ public class RotationDof extends Morph {
 	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
 		String type = (iAxis == 1) ? "yaw" : (iAxis == 2) ? "pitch" : "roll";
-		sb.append(prefix).append("<dof type=\"" + type + "\"> angle min=\"" + fMin + "\" max=\"" + fMax + "\" value=\"" + fValue + "\"");
+		sb.append(prefix).append("<dof type=\"" + type + "\" assignment=\"" + MODES[iMode] + "\" min=\"" + fMin + "\" max=\"" + fMax + "\" value=\"" + fValue + "\"");
 		if (listTargets.size() == 0) {
 			sb.append("/>\n");
 		} else {

@@ -107,6 +107,7 @@ implements ChangeListener {
 				morph.setValue(v);
 				MainFrame.getInstance().getJPatchScreen().update_all();
 				slider.setValue(morph.getSliderValue());
+				addTargetButton.setEnabled(!morph.isTarget());
 			}
 		} else if (changeEvent.getSource() == slider) {
 			if (slider.getValueIsAdjusting()) {

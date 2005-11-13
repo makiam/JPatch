@@ -1,5 +1,6 @@
 package jpatch.boundary.sidebar;
 
+import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -7,13 +8,16 @@ import javax.swing.tree.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
+import jpatch.boundary.action.AddMultiControlPointAction;
 import jpatch.boundary.action.DeleteDofAction;
 import jpatch.boundary.action.DeleteMaterialAction;
 import jpatch.boundary.action.EditMorphTargetAction;
+import jpatch.boundary.action.NewMorphTargetAction;
+import jpatch.boundary.action.UseDofMorphAction;
 import jpatch.entity.*;
 
 public class DofPanel extends SidePanel
-implements ChangeListener {
+implements ChangeListener, ActionListener {
 	
 	/**
 	 * 
@@ -23,40 +27,57 @@ implements ChangeListener {
 	JPanel panelMinMax = new JPanel();
 	JPatchInput inputMin;
 	JPatchInput inputMax;
-	JPatchInput inputX, inputY, inputZ;
+	JPatchInput inputCurrent;
 	JSlider slider;
+	JComboBox combo = new JComboBox(RotationDof.MODES);
 	RotationDof dof;
+	
+	AbstractButton useMorphButton;
+	AbstractButton discardMorphButton;
+	AbstractButton addTargetButton;
+	
 //	AbstractButton editButton;
 //	AbstractButton deleteButton;
 	
 	public DofPanel(RotationDof dof) {
 		this.dof = dof;
+		combo.setSelectedIndex(dof.getMode());
 //		Morph editedMorph = MainFrame.getInstance().getEditedMorph();
 //		deleteButton = new JPatchButton("delete");//new DeleteDofAction(dof));
 //		editButton = new JPatchToggleButton(new EditMorphAction(morph, this));
 //		add(editButton);
 //		add(deleteButton);
 		add(new JPatchButton(new DeleteDofAction(dof)));
+		useMorphButton = new JPatchButton(new UseDofMorphAction(dof, true));
+		discardMorphButton = new JPatchButton(new UseDofMorphAction(dof, false));
+		addTargetButton = new JPatchButton(new NewMorphTargetAction(dof));
+		
+		add(useMorphButton);
+		add(discardMorphButton);
+		add(addTargetButton);
+		
+		useMorphButton.setEnabled(dof.getChildCount() == 0);
+		discardMorphButton.setEnabled(dof.getChildCount() > 0);
+		addTargetButton.setEnabled(dof.getChildCount() > 0 && !dof.isTarget());
+		
 //		add(new JPatchToggleButton(new EditMorphAction(dof.getMorph(), "edit morph")));
 		//JPatchSlider.setDimensions(0,150,50,20);
 		JPanel detailPanel = MainFrame.getInstance().getSideBar().getDetailPanel();
 		JPatchInput.setDimensions(50,150,20);
 		inputName = new JPatchInput("Name:",dof.getName());
-		panelMinMax.setLayout(new BoxLayout(panelMinMax,BoxLayout.X_AXIS));
-		JPatchInput.setDimensions(50,50,20);
+//		panelMinMax.setLayout(new BoxLayout(panelMinMax,BoxLayout.X_AXIS));
+//		JPatchInput.setDimensions(100,100,20);
 		inputMin = new JPatchInput("Min:",dof.getMin());
 		inputMax = new JPatchInput("Max:",dof.getMax());
-		panelMinMax.add(inputMin);
-		panelMinMax.add(inputMax);
-		inputX = new JPatchInput("X:", dof.getAxis().x);
-		inputY = new JPatchInput("Y:", dof.getAxis().y);
-		inputZ = new JPatchInput("Z:", dof.getAxis().z);
+		inputCurrent = new JPatchInput("Value:",dof.getValue());
+//		panelMinMax.add(inputMin);
+//		panelMinMax.add(inputMax);
 		detailPanel.removeAll();
-//		detailPanel.add(inputX);
-//		detailPanel.add(inputY);
-//		detailPanel.add(inputZ);
-		detailPanel.add(inputName);
-		detailPanel.add(panelMinMax);
+//		detailPanel.add(inputName);
+		detailPanel.add(combo);
+		detailPanel.add(inputMin);
+		detailPanel.add(inputMax);
+		detailPanel.add(inputCurrent);
 		slider = new JSlider(JSlider.HORIZONTAL,0,100,dof.getSliderValue());
 		slider.setFocusable(false);
 		detailPanel.add(slider);
@@ -64,12 +85,8 @@ implements ChangeListener {
 		inputName.addChangeListener(this);
 		inputMin.addChangeListener(this);
 		inputMax.addChangeListener(this);
-		inputX.addChangeListener(this);
-		inputY.addChangeListener(this);
-		inputZ.addChangeListener(this);
 		slider.addChangeListener(this);
-		
-		
+		combo.addActionListener(this);
 		
 //		if (morph == editedMorph) {
 //			editButton.setSelected(true);
@@ -100,33 +117,34 @@ implements ChangeListener {
 				dof.setValue(dof.getMax());
 				}
 			slider.setValue(dof.getSliderValue());
+		} else if (changeEvent.getSource() == inputCurrent) {
+			float v = inputCurrent.getFloatValue();
+//			if (v < morph.getMin())
+//				v = morph.getMin();
+//			if (v > morph.getMax())
+//				v = morph.getMax();
+//			inputCurrent.setValue(v);
+			if (v != dof.getValue()) {
+				dof.setValue(v);
+				MainFrame.getInstance().getJPatchScreen().update_all();
+				addTargetButton.setEnabled(dof.getChildCount() > 0 && !dof.isTarget());
+				slider.setValue(dof.getSliderValue());
+			}
 		} else if (changeEvent.getSource() == slider) {
 			if (slider.getValueIsAdjusting()) {
-//				for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {
-//					Bone bone = (Bone) it.next();
-//					bone.setReferencePose();
-//				}
 				dof.setSliderValue(slider.getValue());
-//				for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {
-//					Bone bone = (Bone) it.next();
-//					bone.setPose();
-//				}
+				inputCurrent.setValue(dof.getValue());
+				addTargetButton.setEnabled(dof.getChildCount() > 0 && !dof.isTarget());
 				MainFrame.getInstance().getModel().setPose();
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			} else {
 			}
-//		} else if (changeEvent.getSource() == inputX) {
-//			Vector3f v = dof.getAxis();
-//			v.x = inputX.getFloatValue();
-//			dof.setAxis(v);
-//		} else if (changeEvent.getSource() == inputY) {
-//			Vector3f v = dof.getAxis();
-//			v.y = inputY.getFloatValue();
-//			dof.setAxis(v);
-//		} else if (changeEvent.getSource() == inputZ) {
-//			Vector3f v = dof.getAxis();
-//			v.z = inputZ.getFloatValue();
-//			dof.setAxis(v);
+		}
+	}
+	
+	public void actionPerformed(ActionEvent actionEvent) {
+		if (actionEvent.getSource() == combo) {
+			dof.setMode(combo.getSelectedIndex());
 		}
 	}
 	
