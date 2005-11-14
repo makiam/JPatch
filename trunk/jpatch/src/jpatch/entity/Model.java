@@ -126,10 +126,12 @@ public class Model implements MutableTreeNode {
 			sb.append(mat.xml(prefix2));
 		}
 		
-		ArrayList list = new ArrayList(setCurves);
-		setCpMap(list);
+		ArrayList curveList = new ArrayList(setCurves);
+		setCpMap(curveList);
+		ArrayList boneList = new ArrayList(setBones);
+		setBoneMap(boneList);
 		sb.append(prefix2).append("<mesh>\n");
-		for (Iterator it = list.iterator(); it.hasNext(); ) {
+		for (Iterator it = curveList.iterator(); it.hasNext(); ) {
 			ControlPoint start = (ControlPoint) it.next();
 			sb.append(prefix3);
 			sb.append(start.getLoop() ? "<curve closed=\"true\">" : "<curve>");
@@ -170,10 +172,9 @@ public class Model implements MutableTreeNode {
 			Selection selection = (Selection) it.next();
 			sb.append(selection.xml(prefix2));
 		}
-		list = new ArrayList(setBones);
-		setBoneMap(list);
+		
 		sb.append(prefix2).append("<skeleton>\n");
-		for (Iterator it = list.iterator(); it.hasNext(); ) {
+		for (Iterator it = boneList.iterator(); it.hasNext(); ) {
 			sb.append(((Bone) it.next()).xml(prefix3));
 		}
 		sb.append(prefix2).append("</skeleton>\n");
@@ -1079,7 +1080,7 @@ public class Model implements MutableTreeNode {
 		for (Iterator it = list.iterator(); it.hasNext(); )
 			map.put(it.next(), new Integer(i++));
 		Bone.setMap(map);
-		System.out.println(map);
+//		System.out.println(map);
 	}
 	
 	private ControlPoint trueHead(ControlPoint cp) {

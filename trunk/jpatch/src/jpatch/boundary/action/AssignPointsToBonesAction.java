@@ -48,10 +48,12 @@ public final class AssignPointsToBonesAction extends AbstractAction {
 			Point3f p = cp.getReferencePosition();
 			float minDist = Float.MAX_VALUE;
 			float closestPosOnLine = 0;
-			float distToLine = 0;
+			float closestDistToLine = 0;
 			Bone closestBone = null;
 			for (int j = 0, m = boneList.size(); j < m; j++) {
 				Bone bone = (Bone) boneList.get(j);
+//				Bone parent = (bone.getParentBone() != null && bone.getParentBone().getChildBones().size() == 1) ? bone.getParentBone() : null;
+				Bone child = bone.getChildBones().size() == 1 ? (Bone) bone.getChildBones().get(0) : null;
 				Point3f p0 = bone.getReferenceStart();
 				Point3f p1 = bone.getReferenceEnd();
 				float l = p0.distance(p1);
@@ -59,17 +61,51 @@ public final class AssignPointsToBonesAction extends AbstractAction {
 				float posOnSegment = posOnLine < 0 ? 0 : posOnLine > 1 ? 1 : posOnLine;
 				Point3f pBone = new Point3f();
 				pBone.interpolate(p0, p1, posOnSegment);
-				float distance = pBone.distance(p);
+				float distance = pBone.distance(p) / l;
+				pBone.interpolate(p0, p1, posOnLine);
+				float distToLine = pBone.distance(p) / l;
+//				System.out.println("b=" + bone + "par=" + parent + " child=" + child + " pos=" + cp.getPosition() + " cl=" + closestBone + " pol=" + posOnLine + " dtl=" + distToLine + " d=" + distance);
+//				if (closestBone != null) {
+//					if (closestBone == parent) {
+//						if (Math.abs(posOnLine) < distToLine && distToLine < minDist) {
+//							minDist = distToLine;
+//							closestBone = bone;
+//							closestPosOnLine = posOnLine;
+//							closestDistToLine = distToLine;
+//						} else if (distance < minDist) {
+//							minDist = distance;
+//							closestBone = bone;
+//							closestPosOnLine = posOnLine;
+//							closestDistToLine = distToLine;
+//						}
+//					} else if (closestBone == child) {
+//						if ((1 - posOnLine) > distToLine && distToLine < minDist) {
+//							minDist = distToLine;
+//							closestBone = bone;
+//							closestPosOnLine = posOnLine;
+//							closestDistToLine = distToLine;	
+//						} else if (distance < minDist) {
+//							minDist = distance;
+//							closestBone = bone;
+//							closestPosOnLine = posOnLine;
+//							closestDistToLine = distToLine;
+//						}
+//					}
+//				} else
 				if (distance < minDist) {
 					minDist = distance;
-					closestBone = bone;
-					closestPosOnLine = posOnLine;
-					pBone.interpolate(p0, p1, posOnLine);
-					distToLine = pBone.distance(p) / l;
+					if (child != null && distToLine > 1 - posOnLine) {
+						closestBone = child;
+						closestPosOnLine = posOnLine - 1;
+					} else {
+						closestBone = bone;
+						closestPosOnLine = posOnLine;
+					}
+					closestDistToLine = distToLine;
 				}
 			}
-			System.out.println(cp + " -> " + closestBone + " b=" + closestPosOnLine + " d=" + distToLine);
-			cp.setBone(closestBone, closestPosOnLine, distToLine);
+			System.out.println(cp + " -> " + closestBone + " b=" + closestPosOnLine + " d=" + closestDistToLine);
+			cp.setBone(closestBone, closestPosOnLine, closestDistToLine);
 		}
 	}
 }

@@ -2254,6 +2254,9 @@ public class ControlPoint implements Comparable, Transformable {
 		if (fInMagnitude != fDefaultMagnitude) {
 			sb.append(" magnitude=").append(XMLutils.quote(fInMagnitude));
 		}
+		if (bone != null) {
+			sb.append(" bone=\"" + bone.getId() + "\"");// pos=\"" + fBonePosition + "\" dist=\"" + fDistanceToLine + "\"");
+		}
 		sb.append("/>").append("\n");
 		return sb;
 	}
