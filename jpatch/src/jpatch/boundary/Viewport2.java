@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.35 2005/11/13 14:06:07 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.36 2005/11/14 16:02:15 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -3919,8 +3919,12 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 				1, 2, 5,
 				2, 3, 5,
 				3, 4, 5,
-				1, 4, 0,
-				4, 1, 5
+				1, 7, 0,
+				7, 1, 5,
+				6, 4, 0,
+				4, 6, 5,
+				7, 6, 0,
+				6, 7, 5
 		};
 		static final int[] NORMAL_INDICES = new int[] {
 				0,
@@ -3930,11 +3934,15 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 				5,
 				6,
 				3,
+				7,
+				3,
+				7,
+				3,
 				7
 		};
 		final MaterialProperties mp = new MaterialProperties();
-		final MaterialProperties mpBlack = new MaterialProperties();
-		final Point3f[] ap3Points = new Point3f[6];
+		final MaterialProperties mpBlack = new MaterialProperties(0, 0, 0);
+		final Point3f[] ap3Points = new Point3f[8];
 		final Vector3f[] av3Normals = new Vector3f[8];
 		final Point3f p3Start = new Point3f();
 		final Vector3f v3Extent = new Vector3f();
@@ -3942,7 +3950,7 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 		final Color3f c3FreeEnd = new Color3f(JPatchSettings.getInstance().cPoint);
 		final Color3f c3AttachedEnd = new Color3f(JPatchSettings.getInstance().cHeadPoint);
 		public BoneRenderer() {
-			for (int i = 0; i < 6; ap3Points[i++] = new Point3f());
+			for (int i = 0; i < 8; ap3Points[i++] = new Point3f());
 			for (int i = 0; i < 8; av3Normals[i++] = new Vector3f());
 			mp.metallic = 0.5f;
 			mpBlack.metallic = 0.5f;
@@ -3955,6 +3963,8 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 			ap3Points[3].set( R, A, R);
 			ap3Points[4].set(-R, A, R);
 			ap3Points[5].set( 0, 1, 0);
+			ap3Points[6].set(-R, A, R * 0.333333f);
+			ap3Points[7].set(-R, A,-R * 0.333333f);
 			av3Normals[0].set( 0,-R,-A);
 			av3Normals[1].set( A,-R, 0);
 			av3Normals[2].set( 0,-R, A);
@@ -4029,14 +4039,14 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 				mp.red = color.x;
 				mp.green = color.y;
 				mp.blue = color.z;
-				mpBlack.red = color.x * 0.25f;
-				mpBlack.green = color.y * 0.25f;
-				mpBlack.blue = color.z * 0.25f;
+//				mpBlack.red = color.x * 0.25f;
+//				mpBlack.green = color.y * 0.25f;
+//				mpBlack.blue = color.z * 0.25f;
 				if (drawable.isLightingSupported()) {
 					drawable.setLightingEnabled(true);
 					drawable.setMaterial(mp);
 					for (int i = 0, t = 0; i < NORMAL_INDICES.length; i++) {
-						if (i == 6)
+						if (i == 10)
 							drawable.setMaterial(mpBlack);
 						Vector3f normal = av3Normals[NORMAL_INDICES[i]];
 						if (normal.z < 0) {
@@ -4061,7 +4071,7 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 					Color3f c = new Color3f();
 					MaterialProperties mat = mp;
 					for (int i = 0, t = 0; i < NORMAL_INDICES.length; i++) {
-						if (i == 6)
+						if (i == 10)
 							mat = mpBlack;
 						Vector3f normal = av3Normals[NORMAL_INDICES[i]];
 						if (normal.z < 0) {

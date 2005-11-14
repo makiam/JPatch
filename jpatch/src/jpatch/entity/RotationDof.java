@@ -184,21 +184,25 @@ public class RotationDof extends Morph {
 	
 	public void getTransform(Matrix4f m, float positionOnBone, float distanceToLine) {
 		float factor = 0;
-		if (iMode == RIGID)
-			factor = positionOnBone < 0 ? 0 : 1;
-		else if (iMode == SOFT) {
-			factor = positionOnBone + distanceToLine;
-			if (factor > 0)
-				factor /= (distanceToLine * 2);
-			if (factor > 1)
-				factor = 1;
-		} else if (iMode == SMOOTH) {
-			factor = positionOnBone;
-			if (factor < 0)
-				factor = 0;
-			else if (factor > 1)
-				factor = 1;
-		}
+//		if (bone.getParentBone() == null) {
+//			factor = 1;
+//		} else {
+			if (iMode == RIGID)
+				factor = positionOnBone < 0 ? 0 : 1;
+			else if (iMode == SOFT) {
+				factor = positionOnBone + distanceToLine;
+				if (factor > 0)
+					factor /= (distanceToLine * 2);
+				if (factor > 1)
+					factor = 1;
+			} else if (iMode == SMOOTH) {
+				factor = positionOnBone;
+				if (factor < 0)
+					factor = 0;
+				else if (factor > 1)
+					factor = 1;
+			}
+//		}
 //		System.out.println(" computeTransform " + bone + " " + bone.getDofs().indexOf(this));
 		RotationDof parentDof = getParentDof();
 		if (parentDof != null) {

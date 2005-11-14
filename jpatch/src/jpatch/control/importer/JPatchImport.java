@@ -5,6 +5,7 @@ import java.util.*;
 
 import javax.vecmath.*;
 
+import jpatch.auxilary.Utils3D;
 import jpatch.boundary.*;
 import jpatch.control.ModelImporter;
 import jpatch.entity.*;
@@ -29,11 +30,13 @@ implements ModelImporter {
 	private static final int SKELETON = 10;
 	private static final int BONE = 11;
 	private static final int DOF = 12;
+	private static final int DOF_TARGET = 13;
 	
 	private int iState = NULL;
 	private ArrayList listCp = new ArrayList();
 	private ArrayList listAttach = new ArrayList();
 	private ArrayList listHook = new ArrayList();
+	private HashMap mapBones = new HashMap();
 	
 	private boolean bCurveClosed;
 	private ControlPoint cpFirst;
@@ -82,6 +85,19 @@ implements ModelImporter {
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
+		}
+		for (Iterator it = mapBones.keySet().iterator(); it.hasNext(); ) {
+			ControlPoint cp = (ControlPoint) it.next();
+			Bone bone = (Bone) listBones.get(((Integer) mapBones.get(cp)).intValue());
+			Point3f p = cp.getReferencePosition();
+			Point3f p0 = bone.getReferenceStart();
+			Point3f p1 = bone.getReferenceEnd();
+			float l = p0.distance(p1);
+			float posOnLine = Utils3D.positionOnLine(p0, p1, p);
+			Point3f pBone = new Point3f();
+			pBone.interpolate(p0, p1, posOnLine);
+			float distToLine = pBone.distance(p) / l;
+			cp.setBone(bone, posOnLine, distToLine);
 		}
 		model.addCandidateFivePointPatchList(listCandidateFivePointPatch);
 		model.computePatches();
@@ -187,6 +203,7 @@ implements ModelImporter {
 				}
 				break;
 			case TARGET:
+			case DOF_TARGET:
 				if (localName.equals("point")) {
 					parseMorphVector(attributes, morphTarget);
 				}
@@ -216,27 +233,51 @@ implements ModelImporter {
 							bone.setEndInfluence(Float.parseFloat(attributes.getValue(index)));
 					}
 				} else if (localName.equals("dof")) {
-//					dof = new RotationDof(bone);
 					for (int index = 0; index < attributes.getLength(); index++) {
-						if (attributes.getLocalName(index).equals("name"))
-							dof.setName(attributes.getValue(index));
+						String name = attributes.getLocalName(index);
+						String value = attributes.getValue(index);
+						if (name.equals("type")) {
+							if (value.equals("yaw"))
+								dof = new RotationDof(bone, RotationDof.ORTHO_1);
+							else if (value.equals("pitch"))
+								dof = new RotationDof(bone, RotationDof.ORTHO_2);
+							else if (value.equals("roll"))
+								dof = new RotationDof(bone, RotationDof.RADIAL);
+						} else if (name.equals("assignment")) {
+							if (value.equals("rigid"))
+								dof.setMode(RotationDof.RIGID);
+							else if (value.equals("soft"))
+								dof.setMode(RotationDof.SOFT);
+							else if (value.equals("smooth"))
+								dof.setMode(RotationDof.SMOOTH);
+						} else if (name.equals("min")) {
+							dof.setMin(Float.parseFloat(value));
+						} else if (name.equals("max")) {
+							dof.setMax(Float.parseFloat(value));
+						} else if (name.equals("current")) {
+							dof.setValue(Float.parseFloat(value));
+						}
 					}
-					bone.insert(dof, bone.getChildCount());
+					MainFrame.getInstance().getTreeModel().insertNodeInto(dof, bone, bone.getDofs().size());
 					iState = DOF;
+//					bone.insert(dof, bone.getChildCount());
 				}
 				break;
 			case DOF:
-				if (localName.equals("axis")) {
-//					dof.setAxis(new Vector3f(createPoint(attributes)));
-				} else if (localName.equals("angle")) {
-					for (int index = 0; index < attributes.getLength(); index++) {
-						if (attributes.getLocalName(index).equals("min"))
-							dof.setMin(Float.parseFloat(attributes.getValue(index)));
-						else if (attributes.getLocalName(index).equals("max"))
-							dof.setMax(Float.parseFloat(attributes.getValue(index)));
-						else if (attributes.getLocalName(index).equals("current"))
-							dof.setValue(Float.parseFloat(attributes.getValue(index)));
-					}
+//				if (localName.equals("axis")) {
+////					dof.setAxis(new Vector3f(createPoint(attributes)));
+//				} else if (localName.equals("angle")) {
+//					for (int index = 0; index < attributes.getLength(); index++) {
+//						if (attributes.getLocalName(index).equals("min"))
+//							dof.setMin(Float.parseFloat(attributes.getValue(index)));
+//						else if (attributes.getLocalName(index).equals("max"))
+//							dof.setMax(Float.parseFloat(attributes.getValue(index)));
+//						else if (attributes.getLocalName(index).equals("current"))
+//							dof.setValue(Float.parseFloat(attributes.getValue(index)));
+//					}
+				if (localName.equals("target")) {
+					morphTarget = createMorphTarget(attributes);
+					iState = DOF_TARGET;
 				}
 				break;
 		}
@@ -385,14 +426,23 @@ implements ModelImporter {
 					iState = MORPH;
 				}
 				break;
+			case DOF_TARGET:
+				if (localName.equals("target")) {
+					dof.addTarget(morphTarget);
+					iState = DOF;
+				}
+				break;
 			case LIPSYNC:
 				if (localName.equals("lipsync")) {
 					iState = MESH;
 				}
 				break;
 			case DOF:
-				if (localName.equals("dof"))
+				if (localName.equals("dof")) {
 					iState = BONE;
+					if (dof.getTargets().size() > 0)
+						dof.addTarget(new MorphTarget(0));
+				}
 				break;
 			case BONE:
 				if (localName.equals("bone")) {
@@ -662,6 +712,8 @@ implements ModelImporter {
 				//} else if (value.equals("c1")) {
 				//	controlPoint.setMode(ControlPoint.JPATCH_C1);
 				//}
+			} else if (localName.equals("bone")) {
+				mapBones.put(controlPoint, new Integer(value));
 			}
 		}
 		controlPoint.setPosition(p3);

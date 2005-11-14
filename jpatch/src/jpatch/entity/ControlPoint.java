@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.14 2005/11/13 14:06:07 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.15 2005/11/14 16:02:15 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -38,7 +38,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.14 $
+ * @version    $Revision: 1.15 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -2253,6 +2253,9 @@ public class ControlPoint implements Comparable, Transformable {
 		}
 		if (fInMagnitude != fDefaultMagnitude) {
 			sb.append(" magnitude=").append(XMLutils.quote(fInMagnitude));
+		}
+		if (bone != null) {
+			sb.append(" bone=\"" + bone.getId() + "\"");// pos=\"" + fBonePosition + "\" dist=\"" + fDistanceToLine + "\"");
 		}
 		sb.append("/>").append("\n");
 		return sb;
