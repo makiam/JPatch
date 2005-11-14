@@ -20,11 +20,11 @@ public class Bone implements MutableTreeNode {
 	private static int col = 0;
 	private static final Color3f[] COLORS = new Color3f[] {
 		new Color3f(1, 0, 0),
-		new Color3f(1, 1, 0),
 		new Color3f(0, 1, 0),
-		new Color3f(0, 1, 1),
 		new Color3f(0, 0, 1),
+		new Color3f(1, 1, 0),
 		new Color3f(1, 0, 1),
+		new Color3f(0, 1, 1),
 	};
 	private Color3f color = nextColor();
 	private Model model;
@@ -457,6 +457,9 @@ public class Bone implements MutableTreeNode {
 			dof.getInvTransform().transform(v);
 	}
 	
+	public int getId() {
+		return ((Integer) mapBones.get(this)).intValue();
+	}
 	
 	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();

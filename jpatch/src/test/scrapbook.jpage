@@ -51,3 +51,7 @@ System.out.println(m);
 javax.vecmath.Matrix4f m1 = new javax.vecmath.Matrix4f();
 m1.invert(m);
 System.out.println(m1);
+
+
+System.out.println(null == null);
+
