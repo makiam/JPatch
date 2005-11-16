@@ -90,7 +90,7 @@ public class Morph implements MutableTreeNode {
 		float f0 = 0, f1 = 0;
 		Vector3f v0 = null, v1 = null;
 		int index = binarySearch(fValue) - 1;
-		System.out.println("binarysearch for " + fValue + " index " + index);
+//		System.out.println("binarysearch for " + fValue + " index " + index);
 		if (index == -1) {
 			mt0 = ((MorphTarget) listTargets.get(0));
 			mt1 = ((MorphTarget) listTargets.get(1));
@@ -105,15 +105,15 @@ public class Morph implements MutableTreeNode {
 		if (f1 != 0)
 			f1 /= (mt1.getPosition() - mt0.getPosition());
 		f0 = 1f - f1;
-		System.out.println("mapmorph=" + mapMorph);
-		System.out.println("mt0 = " + mt0);
-		if (mt0 != null)
-			System.out.println(mt0.getMorphMap());
-		System.out.println("f0 = " + f0);
-		System.out.println("mt1 = " + mt1);
-		if (mt1 != null)
-			System.out.println(mt1.getMorphMap());
-		System.out.println("f1 = " + f1);
+//		System.out.println("mapmorph=" + mapMorph);
+//		System.out.println("mt0 = " + mt0);
+//		if (mt0 != null)
+//			System.out.println(mt0.getMorphMap());
+//		System.out.println("f0 = " + f0);
+//		System.out.println("mt1 = " + mt1);
+//		if (mt1 != null)
+//			System.out.println(mt1.getMorphMap());
+//		System.out.println("f1 = " + f1);
 		
 		for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
 			ControlPoint cp = (ControlPoint) it.next();
@@ -122,7 +122,7 @@ public class Morph implements MutableTreeNode {
 				v0 = (Vector3f) mt0.getMorphMap().get(cp);
 			if (mt1 != null)
 				v1 = (Vector3f) mt1.getMorphMap().get(cp);
-			System.out.println("cp = " + cp + " v0=" + v0 + " v1=" + v1);
+//			System.out.println("cp = " + cp + " v0=" + v0 + " v1=" + v1);
 			if (v0 != null) {
 				if (v1 != null) {
 					vector.set(v0.x * f0 + v1.x * f1, v0.y * f0 + v1.y * f1, v0.z * f0 + v1.z * f1);

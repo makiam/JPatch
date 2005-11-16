@@ -139,6 +139,15 @@ public class MotionCurveSet {
 				MotionCurve2.Float morphCurve = MotionCurve2.createMorphCurve(morph, new MotionKey2.Float(pos, morph.getValue()));
 				map.put(morph, morphCurve);
 			}
+			Set rootBoneSet = new HashSet();
+			for (Iterator itBone = animModel.getModel().getBoneSet().iterator(); itBone.hasNext(); ) {
+				Bone bone = ((Bone) itBone.next()).getRoot();
+				System.out.println("**:" + bone);
+				if (!rootBoneSet.contains(bone)) {
+					rootBoneSet.add(bone);
+					recursiveAddBoneDofs(bone, map, pos);
+				}
+			}
 			populateList();
 		}
 		
@@ -155,10 +164,15 @@ public class MotionCurveSet {
 			((AnimModel) animObject).setScale(scale.getFloatAt(pos));
 			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
 				Morph morph = (Morph) it.next();
-				//FIXME
 //				morph.unapply();
-//				morph.setValue(morph(morph).getFloatAt(pos));
+				morph.setValue(morph(morph).getFloatAt(pos));
 //				morph.apply();
+			}
+			for (Iterator itBone = ((AnimModel) animObject).getModel().getBoneSet().iterator(); itBone.hasNext(); ) {
+				for (Iterator itDof = ((Bone) itBone.next()).getDofs().iterator(); itDof.hasNext(); ) {
+					RotationDof dof = (RotationDof) itDof.next();
+					dof.setValue(morph(dof).getFloatAt(pos));
+				}
 			}
 		}
 		
@@ -180,8 +194,29 @@ public class MotionCurveSet {
 			super.populateList();
 			motionCurveList.add(scale);
 			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
-				MorphTarget morph = (MorphTarget) it.next();
+				Morph morph = (Morph) it.next();
+				System.out.println("populateList morph=" + morph);
 				motionCurveList.add(map.get(morph));
+			}
+			for (Iterator itBone = ((AnimModel) animObject).getModel().getBoneSet().iterator(); itBone.hasNext(); ) {
+				for (Iterator itDof = ((Bone) itBone.next()).getDofs().iterator(); itDof.hasNext(); ) {
+					RotationDof dof = (RotationDof) itDof.next();
+					System.out.println("populateList dof=" + dof);
+					motionCurveList.add(map.get(dof));
+				}
+			}
+		}
+		
+		private void recursiveAddBoneDofs(Bone bone, Map map, float pos) {
+			System.out.println("\trecursiveAddBoneDofs bone=" + bone);
+			for (Iterator itDofs = bone.getDofs().iterator(); itDofs.hasNext(); ) {
+				RotationDof dof = (RotationDof) itDofs.next();
+				System.out.println("\t\tdof=" + dof);
+				MotionCurve2.Float morphCurve = MotionCurve2.createMorphCurve(dof, new MotionKey2.Float(pos, dof.getValue()));
+				map.put(dof, morphCurve);
+			}
+			for (Iterator itBones = bone.getChildBones().iterator(); itBones.hasNext(); ) {
+				recursiveAddBoneDofs((Bone) itBones.next(), map, pos);
 			}
 		}
 	}

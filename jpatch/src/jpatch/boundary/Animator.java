@@ -102,6 +102,7 @@ public final class Animator extends BFrame {
 		poseSliders.init();
 		rerenderViewports();
 		setActiveObject(camera1);
+		new MainFrame(new Model());
 	}
 	
 	public void NEW() {
@@ -185,7 +186,16 @@ public final class Animator extends BFrame {
 	
 	public void setPosition(float position) {
 		fPosition = position;
-		for (Iterator it = listObjects.iterator(); it.hasNext(); ((MotionCurveSet) mapMotionCurves.get(it.next())).setPosition(position));
+		System.out.println("position = " + position);
+		for (Iterator it = listObjects.iterator(); it.hasNext(); ) {
+			AnimObject animObject = (AnimObject) it.next();
+			((MotionCurveSet) mapMotionCurves.get(animObject)).setPosition(position);
+			if (animObject instanceof AnimModel) {
+				Model model = ((AnimModel) animObject).getModel();
+				model.applyMorphs();
+				model.setPose();
+			}
+		}
 		motionCurveEditor.setPosition(position);
 		poseSliders.moveSliders();
 		poseSliders.repaint();
@@ -214,7 +224,7 @@ public final class Animator extends BFrame {
 	}
 	
 	public void rerenderViewports() {
-		cameraViewport.repaint();
+		cameraViewport.rerender();
 	}
 
 	public void repaintViewports() {
