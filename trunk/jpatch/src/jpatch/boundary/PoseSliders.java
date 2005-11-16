@@ -2,6 +2,7 @@ package jpatch.boundary;
 
 import java.awt.*;
 import java.util.*;
+
 import javax.swing.*;
 import buoy.widget.*;
 import buoy.event.*;
@@ -67,6 +68,7 @@ public class PoseSliders extends BFrame {
 			for (Iterator it = activeModel.getModel().getMorphList().iterator(); it.hasNext(); ) {
 				Morph morph = (Morph) it.next();
 				BSlider slider = (BSlider) mapSlider.get(morph);
+				System.out.println("morph = " + morph + " slider = " + slider);
 				slider.setValue(morph.getSliderValue());
 			}
 		}
@@ -106,12 +108,23 @@ public class PoseSliders extends BFrame {
 			buttonEdit.addEventLink(CommandEvent.class, eventEdit);
 			buttonRemove.addEventLink(CommandEvent.class, eventRemove);
 			if (activeModel != null) {
-				Model model = activeModel.getModel();
+				final Model model = activeModel.getModel();
 				morphs.setColumnCount(2);
 				if (model.getMorphList().size() > 0) {
-					morphs.setRowCount(model.getMorphList().size());
-					for (int row = 0; row < model.getMorphList().size(); row++) {
-						final Morph morph = (Morph) model.getMorphList().get(row);
+					ArrayList sliderList = new ArrayList();
+					for (Iterator it = model.getMorphList().iterator(); it.hasNext(); ) {
+						Morph morph = (Morph) it.next();
+						sliderList.add(morph);
+					}
+					for (Iterator itBone = model.getBoneSet().iterator(); itBone.hasNext(); ) {
+						for (Iterator itDof = ((Bone) itBone.next()).getDofs().iterator(); itDof.hasNext(); ) {
+							RotationDof dof = (RotationDof) itDof.next();
+							sliderList.add(dof);
+						}
+					}
+					morphs.setRowCount(sliderList.size());
+					for (int row = 0; row < sliderList.size(); row++) {
+						final Morph morph = (Morph) sliderList.get(row);
 						final BSlider slider = new BSlider(morph.getSliderValue(), 0, 100, BSlider.HORIZONTAL);
 						mapSlider.put(morph, slider);
 						BLabel label = new BLabel(morph.toString());
@@ -123,6 +136,8 @@ public class PoseSliders extends BFrame {
 							void processEvent() {
 //								morph.unapply();
 								morph.setSliderValue(slider.getValue());
+								model.applyMorphs();
+								model.setPose();
 //								morph.apply();
 								Animator.getInstance().setMorphValue(activeModel, morph);
 							}

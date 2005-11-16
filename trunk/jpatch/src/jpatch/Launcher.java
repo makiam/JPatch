@@ -11,7 +11,7 @@ public final class Launcher {
 	private static BFrame frame;
 	/* private static GlTest gltest; */
 	public static void main(String[] args) {
-		if (true) {
+		if (false) {
 			try {
 				UIManager.setLookAndFeel(JPatchSettings.getInstance().strPlafClassName);
 			} catch (Exception e) { }
