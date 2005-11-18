@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.36 2005/11/14 16:02:15 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.37 2005/11/18 19:31:03 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -609,8 +609,8 @@ public class Viewport2 {
 					m4View.transform(p2);
 					m4View.transform(p3);
 					drawCurveSegment(p0, p1, p2, p3, false, 0, c3Curve);
-					drawable.drawLine(p0, p1);
-					drawable.drawLine(p3, p2);
+//					drawable.drawLine(p0, p1);
+//					drawable.drawLine(p3, p2);
 				} else {
 //					drawCurveSegment(cp.getPosition(), cp.getOutTangent(), cp.getNext().getInTangent(), cp.getNext().getPosition(), false, 0);
 				}
