@@ -54,6 +54,8 @@ public final class AssignPointsToBonesAction extends AbstractAction {
 				Bone bone = (Bone) boneList.get(j);
 //				Bone parent = (bone.getParentBone() != null && bone.getParentBone().getChildBones().size() == 1) ? bone.getParentBone() : null;
 				Bone child = bone.getChildBones().size() == 1 ? (Bone) bone.getChildBones().get(0) : null;
+				if (!boneList.contains(child))
+					child = null;
 				Point3f p0 = bone.getReferenceStart();
 				Point3f p1 = bone.getReferenceEnd();
 				float l = p0.distance(p1);

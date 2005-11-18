@@ -609,8 +609,8 @@ public class Viewport2 {
 					m4View.transform(p2);
 					m4View.transform(p3);
 					drawCurveSegment(p0, p1, p2, p3, false, 0, c3Curve);
-					drawable.drawLine(p0, p1);
-					drawable.drawLine(p3, p2);
+//					drawable.drawLine(p0, p1);
+//					drawable.drawLine(p3, p2);
 				} else {
 //					drawCurveSegment(cp.getPosition(), cp.getOutTangent(), cp.getNext().getInTangent(), cp.getNext().getPosition(), false, 0);
 				}
