@@ -11,7 +11,7 @@ public final class ComputePatchesAction extends AbstractAction {
 	 */
 	private static final long serialVersionUID = 1L;
 	public ComputePatchesAction() {
-		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/gear.png")));
+		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/computepatches.png")));
 		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("compute patches"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {

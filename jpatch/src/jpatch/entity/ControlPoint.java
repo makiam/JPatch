@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.15 2005/11/14 16:02:15 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.16 2005/11/18 16:00:33 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -38,7 +38,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.15 $
+ * @version    $Revision: 1.16 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -197,6 +197,8 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 	public void translate(Vector3f v) {
+		if (MainFrame.getInstance().getJPatchScreen().isLockPoints())
+			return;
 		p3ReferencePosition.set(p3BackupPosition);
 		Vector3f vv = new Vector3f(v);
 		m4InvTransform.transform(vv);
@@ -205,6 +207,8 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 	public void rotate(AxisAngle4f a, Point3f pivot) {
+		if (MainFrame.getInstance().getJPatchScreen().isLockPoints())
+			return;
 		p3ReferencePosition.set(p3BackupPosition);
 		Point3f p = new Point3f(pivot);
 		m4InvTransform.transform(p);
@@ -219,6 +223,8 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 	public void transform(Matrix3f m, Point3f pivot) {
+		if (MainFrame.getInstance().getJPatchScreen().isLockPoints())
+			return;
 		p3ReferencePosition.set(p3BackupPosition);
 		Point3f p = new Point3f(pivot);
 		m4InvTransform.transform(p);
@@ -233,7 +239,8 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 	public JPatchUndoableEdit endTransform() {
-		
+		if (MainFrame.getInstance().getJPatchScreen().isLockPoints())
+			return null;
 		return new AtomicChangeControlPoint.Position(this, p3BackupPosition);
 	}
 	

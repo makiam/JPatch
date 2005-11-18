@@ -639,12 +639,16 @@ public class Bone implements MutableTreeNode {
 		
 		
 		public void translate(Vector3f v) {
+			if (MainFrame.getInstance().getJPatchScreen().isLockBones())
+				return;
 			setDummy();
 			p3Dummy.add(v);
 			setPoint();
 		}
 
 		public void rotate(AxisAngle4f a, Point3f pivot) {
+			if (MainFrame.getInstance().getJPatchScreen().isLockBones())
+				return;
 // FIXME: doesn't work if bone isn't in reference pose
 			setDummy();
 //			if (isStart() && getParentBone() != null)
@@ -660,6 +664,8 @@ public class Bone implements MutableTreeNode {
 		}
 
 		public void transform(Matrix3f m, Point3f pivot) {
+			if (MainFrame.getInstance().getJPatchScreen().isLockBones())
+				return;
 // FIXME: doesn't work if bone isn't in reference pose
 			setDummy();
 			p3Dummy.sub(pivot);
@@ -669,6 +675,8 @@ public class Bone implements MutableTreeNode {
 		}
 
 		public JPatchUndoableEdit endTransform() {
+			if (MainFrame.getInstance().getJPatchScreen().isLockBones())
+				return null;
 			return new AtomicChangeBone.Point(Bone.this, p3Temp, p3);
 		}
 		

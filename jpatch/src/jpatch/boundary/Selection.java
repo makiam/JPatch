@@ -30,7 +30,7 @@ public class Selection extends JPatchTreeLeaf {
 	public static Selection createRectangularPointSelection(int ax, int ay, int bx, int by, Matrix4f transformationMatrix, Model model, int mask) {
 		Selection selection = new Selection();
 		Point3f p3 = new Point3f();
-		if ((mask & CONTROLPOINTS) != 0) {
+		if ((mask & CONTROLPOINTS) != 0 && MainFrame.getInstance().getJPatchScreen().isSelectPoints()) {
 			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
 				for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 					if (cp.isHead() && !cp.isHidden() && !cp.isStartHook() && !cp.isEndHook()) {
@@ -44,7 +44,7 @@ public class Selection extends JPatchTreeLeaf {
 				}
 			}
 		}
-		if ((mask & BONES) != 0) {
+		if ((mask & BONES) != 0 && MainFrame.getInstance().getJPatchScreen().isSelectBones()) {
 			for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
 				Bone bone = (Bone) it.next();
 				if (bone.getParentBone() == null) {
@@ -347,7 +347,9 @@ public class Selection extends JPatchTreeLeaf {
 		JPatchActionEdit edit = new JPatchActionEdit("transform selection");
 		for (Iterator it = mapTransformables.keySet().iterator(); it.hasNext(); ) {
 			Transformable transformable = (Transformable) it.next();
-			edit.addEdit(transformable.endTransform());
+			JPatchUndoableEdit transformEdit = transformable.endTransform();
+			if (transformEdit != null)
+				edit.addEdit(transformEdit);
 		}
 		edit.addEdit(pivotTransformable.endTransform());
 		return edit;

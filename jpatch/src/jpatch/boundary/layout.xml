@@ -18,12 +18,19 @@
 		<button command="undo"/>
 		<button command="redo"/>
 		<separator/>
+		<button command="snap to grid"/>
+		<button command="hide"/>
+		<separator/>
+		<button command="select points"/>
+		<button command="select bones"/>
+		<separator/>
+		<button command="lock points"/>
+		<button command="lock bones"/>
+		<separator/>
 		<button command="lock x"/>
 		<button command="lock y"/>
 		<button command="lock z"/>
 		<separator/>
-		<button command="snap to grid"/>
-		<button command="hide"/>
 		<button command="stop edit morph"/>
 	</toolbar>
 	

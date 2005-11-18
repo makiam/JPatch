@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundRemove.java,v 1.4 2005/10/26 09:55:10 sascha_l Exp $
+ * $Id: CompoundRemove.java,v 1.5 2005/11/18 16:00:33 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -24,6 +24,7 @@ package jpatch.control.edit;
 import java.util.*;
 
 import jpatch.boundary.MainFrame;
+import jpatch.boundary.Selection;
 import jpatch.entity.*;
 
 /**
@@ -88,7 +89,30 @@ public class CompoundRemove extends JPatchCompoundEdit {
 					addEdit(new AtomicAttachBone(child, bone.getParentBone()));
 			}
 			addEdit(new AtomicDropBone(bone));
+			addEdit(new AtomicRemoveBoneFromSelections(bone));
 		}
+		
+		
+//		Remove empty selections
+		for (Iterator it = (new HashSet(MainFrame.getInstance().getModel().getSelections())).iterator(); it.hasNext(); ) {
+			Selection selection = (Selection) it.next();
+			if (selection.getMap().size() == 0)
+				addEdit(new AtomicRemoveSelection(selection));
+		}
+		
+//		 Remove empty morphs
+		for (Iterator itMorph = (new ArrayList(MainFrame.getInstance().getModel().getMorphList())).iterator(); itMorph.hasNext(); ) {
+			Morph morph = (Morph) itMorph.next();
+			for (Iterator itTarget = new ArrayList(morph.getTargets()).iterator(); itTarget.hasNext(); ) {
+				MorphTarget morphTarget = (MorphTarget) itTarget.next();
+//				if (morphTarget.getNumberOfPoints() == 0)
+//					addEdit(new AtomicRemoveMorphTarget(morphTarget));
+			}
+			if (morph.getChildCount() == 0)
+				addEdit(new AtomicRemoveMorph(morph));
+					
+		}
+		
 		// set parents of orphanized bones to null
 //		for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {
 //			Bone bone = (Bone) it.next();

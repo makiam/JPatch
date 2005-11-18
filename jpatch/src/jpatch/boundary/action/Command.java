@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.9 2005/11/13 14:06:07 sascha_l Exp $
+ * $Id: Command.java,v 1.10 2005/11/18 16:00:33 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -29,6 +29,8 @@ package jpatch.boundary.action;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import jpatch.boundary.*;
 import jpatch.boundary.laf.*;
@@ -143,6 +145,10 @@ public final class Command implements KeyListener {
 		put("snap to grid",				new GridSnapAction(), 			new JCheckBoxMenuItem(),	new JPatchToggleButton());
 		put("hide",						new HideAction(), 				new JCheckBoxMenuItem(),	new JPatchToggleButton());
 		put("stop edit morph",			new StopEditMorphAction(),		new JMenuItem(),			new JPatchButton());
+		put("select points",			new SelectPointsAction(),		new JCheckBoxMenuItem(),	new JPatchToggleButton());
+		put("select bones",				new SelectBonesAction(),		new JCheckBoxMenuItem(),	new JPatchToggleButton());
+		put("lock points",				new LockPointsAction(),			new JCheckBoxMenuItem(),	new JPatchToggleButton());
+		put("lock bones",				new LockBonesAction(),			new JCheckBoxMenuItem(),	new JPatchToggleButton());
 		
 		/*
 		 * Edit toolbar buttons
@@ -257,6 +263,10 @@ public final class Command implements KeyListener {
 		((AbstractButton) commandButtonMap.get("lock z")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/zlocked.png")));
 		((AbstractButton) commandButtonMap.get("snap to grid")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/grid_snap.png")));
 		((AbstractButton) commandButtonMap.get("hide")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/hide2.png")));
+		((AbstractButton) commandButtonMap.get("select points")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/cp_selected.png")));
+		((AbstractButton) commandButtonMap.get("select bones")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/bone_selected.png")));
+		((AbstractButton) commandButtonMap.get("lock points")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/cp_locked.png")));
+		((AbstractButton) commandButtonMap.get("lock bones")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/bone_locked.png")));	
 		
 		/*
 		 * ButtonGroups
@@ -310,6 +320,43 @@ public final class Command implements KeyListener {
 		enableCommand("lock y", false);
 		enableCommand("lock z", false);
 		enableCommand("stop edit morph", false);
+		
+		/*
+		 * Set toggle button states
+		 */
+		((AbstractButton) commandMenuItemMap.get("select points")).setSelected(true);
+		((AbstractButton) commandMenuItemMap.get("select bones")).setSelected(true);
+		
+		/*
+		 * Add change listeners to toggle buttons
+		 */
+		((AbstractButton) commandMenuItemMap.get("select points")).getModel().addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				MainFrame.getInstance().getJPatchScreen().setSelectPoints(e.getStateChange() == ItemEvent.SELECTED);
+			}
+		});
+		
+		((AbstractButton) commandMenuItemMap.get("select bones")).getModel().addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				MainFrame.getInstance().getJPatchScreen().setSelectBones(e.getStateChange() == ItemEvent.SELECTED);
+			}
+		});
+		
+		((AbstractButton) commandMenuItemMap.get("lock points")).getModel().addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				boolean selected = e.getStateChange() == ItemEvent.SELECTED;
+				MainFrame.getInstance().getJPatchScreen().setLockPoints(selected);
+				((Action) commandActionMap.get("add curve segment")).setEnabled(!selected);
+			}
+		});
+		
+		((AbstractButton) commandMenuItemMap.get("lock bones")).getModel().addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				boolean selected = e.getStateChange() == ItemEvent.SELECTED;
+				MainFrame.getInstance().getJPatchScreen().setLockBones(selected);
+				((Action) commandActionMap.get("add bone")).setEnabled(!selected);
+			}
+		});
 	}
 	
 	public void executeCommand(String command) {

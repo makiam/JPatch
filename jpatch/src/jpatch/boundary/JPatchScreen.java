@@ -42,6 +42,11 @@ public final class JPatchScreen extends JPanel {
 	private boolean bSnapToGrid = JPatchSettings.getInstance().bGridSnap;
 	private float fGridSpacing = JPatchSettings.getInstance().fGridSpacing;
 	
+	private boolean bSelectPoints = true;
+	private boolean bSelectBones = true;
+	private boolean bLockPoints = false;
+	private boolean bLockBones = false;
+	
 	private int iMode;
 	//protected ControlPoint cpCursor = new ControlPoint(0,0,0);
 	
@@ -598,5 +603,37 @@ public final class JPatchScreen extends JPanel {
 	
 	public void resetMode(int mode) {
 		setMode(mode);
+	}
+
+	public boolean isLockBones() {
+		return bLockBones;
+	}
+
+	public void setLockBones(boolean lockBones) {
+		bLockBones = lockBones;
+	}
+
+	public boolean isLockPoints() {
+		return bLockPoints;
+	}
+
+	public void setLockPoints(boolean lockPoints) {
+		bLockPoints = lockPoints;
+	}
+
+	public boolean isSelectBones() {
+		return bSelectBones;
+	}
+
+	public void setSelectBones(boolean selectBones) {
+		bSelectBones = selectBones;
+	}
+
+	public boolean isSelectPoints() {
+		return bSelectPoints;
+	}
+
+	public void setSelectPoints(boolean selectPoints) {
+		bSelectPoints = selectPoints;
 	}
 }
