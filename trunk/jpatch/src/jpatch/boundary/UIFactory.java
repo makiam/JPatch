@@ -87,10 +87,10 @@ public class UIFactory extends DefaultHandler {
 	}
 	
 	public void startElement(String namespaceURI, String localName, String qName, Attributes attributes) {	
-//		System.out.print("<" + localName);
-//		for (int i = 0; i < attributes.getLength(); i++)
-//			System.out.print(" " + attributes.getLocalName(i) + "=\"" + attributes.getValue(i) + "\"");
-//		System.out.println(">");
+		System.out.print("<" + localName);
+		for (int i = 0; i < attributes.getLength(); i++)
+			System.out.print(" " + attributes.getLocalName(i) + "=\"" + attributes.getValue(i) + "\"");
+		System.out.println(">");
 		if (localName.equals("toolbar")) {
 			toolBar = new JToolBar();
 			toolBar.setFloatable(false);

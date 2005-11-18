@@ -197,6 +197,8 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 	public void translate(Vector3f v) {
+		if (MainFrame.getInstance().getJPatchScreen().isLockPoints())
+			return;
 		p3ReferencePosition.set(p3BackupPosition);
 		Vector3f vv = new Vector3f(v);
 		m4InvTransform.transform(vv);
@@ -205,6 +207,8 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 	public void rotate(AxisAngle4f a, Point3f pivot) {
+		if (MainFrame.getInstance().getJPatchScreen().isLockPoints())
+			return;
 		p3ReferencePosition.set(p3BackupPosition);
 		Point3f p = new Point3f(pivot);
 		m4InvTransform.transform(p);
@@ -219,6 +223,8 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 	public void transform(Matrix3f m, Point3f pivot) {
+		if (MainFrame.getInstance().getJPatchScreen().isLockPoints())
+			return;
 		p3ReferencePosition.set(p3BackupPosition);
 		Point3f p = new Point3f(pivot);
 		m4InvTransform.transform(p);
@@ -233,7 +239,8 @@ public class ControlPoint implements Comparable, Transformable {
 	}
 	
 	public JPatchUndoableEdit endTransform() {
-		
+		if (MainFrame.getInstance().getJPatchScreen().isLockPoints())
+			return null;
 		return new AtomicChangeControlPoint.Position(this, p3BackupPosition);
 	}
 	

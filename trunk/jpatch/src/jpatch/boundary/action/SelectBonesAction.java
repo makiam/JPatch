@@ -19,29 +19,23 @@
  * along with JPatch; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package jpatch.control.edit;
+package jpatch.boundary.action;
 
-import java.util.*;
-
-import jpatch.entity.*;
-import jpatch.boundary.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * @author sascha
  *
  */
-public final class CompoundRemoveControlPointFromEntities extends JPatchCompoundEdit {
+public class SelectBonesAction extends AbstractAction implements Action {
+	private static final long serialVersionUID = 1L;
+
+	public SelectBonesAction() {
+		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/bone_unselected.png")));
+	}
 	
-	public CompoundRemoveControlPointFromEntities(ControlPoint cp) {
-		// Remove cp from selections
-		addEdit(new AtomicRemoveControlPointFromSelections(cp));
-		// Remove patches containing cp
-		for (Iterator it = (new HashSet(MainFrame.getInstance().getModel().getPatchSet())).iterator(); it.hasNext(); ) {
-			Patch patch = (Patch) it.next();
-			if (patch.contains(cp))
-				addEdit(new AtomicRemovePatch(patch));
-		}
-		// Remove cp from morphs
-		addEdit(new AtomicRemoveControlPointFromMorphs(cp));
+	public void actionPerformed(ActionEvent event) {
+		
 	}
 }

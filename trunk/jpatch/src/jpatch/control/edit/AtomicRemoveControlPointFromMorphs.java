@@ -33,37 +33,40 @@ import jpatch.boundary.*;
  */
 public final class AtomicRemoveControlPointFromMorphs extends JPatchAtomicEdit {
 	private final ControlPoint cp;
-	private final HashMap mapMorphs = new HashMap();;
+	private final HashMap mapMorphTargets = new HashMap();;
 	
 	public AtomicRemoveControlPointFromMorphs(ControlPoint cp) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + cp + ")");
 		this.cp = cp;
-		for (Iterator it = MainFrame.getInstance().getModel().getMorphList().iterator(); it.hasNext(); ) {
-			MorphTarget morph = (MorphTarget) it.next();
-			Object vector = morph.getVectorFor(cp);
-			if (vector != null) {
-				mapMorphs.put(morph, morph.getVectorFor(cp));
-				morph.removePoint(cp);
+		for (Iterator itMorph = MainFrame.getInstance().getModel().getMorphList().iterator(); itMorph.hasNext(); ) {
+			Morph morph = (Morph) itMorph.next();
+			for (Iterator itTarget = morph.getTargets().iterator(); itTarget.hasNext(); ) {
+				MorphTarget target = (MorphTarget) itTarget.next();
+				Object vector = target.getVectorFor(cp);
+				if (vector != null) {
+					mapMorphTargets.put(target, target.getVectorFor(cp));
+					target.removePoint(cp);
+				}
 			}
 		}
 	}
 	
 	public void undo() {
-		for (Iterator it = mapMorphs.keySet().iterator(); it.hasNext(); ) {
+		for (Iterator it = mapMorphTargets.keySet().iterator(); it.hasNext(); ) {
 			MorphTarget morph = (MorphTarget) it.next();
-			morph.addPoint(cp, (Vector3f) mapMorphs.get(morph)); 
+			morph.addPoint(cp, (Vector3f) mapMorphTargets.get(morph)); 
 		}
 	}
 	
 	public void redo() {
-		for (Iterator it = mapMorphs.keySet().iterator(); it.hasNext(); ) {
+		for (Iterator it = mapMorphTargets.keySet().iterator(); it.hasNext(); ) {
 			MorphTarget morph = (MorphTarget) it.next();
 			morph.removePoint(cp); 
 		}
 	}
 	
 	public int sizeOf() {
-		return mapMorphs == null ? 8 + 4 + 4 : 8 + 4 + 4 + (8 + 4 + 4 + 4 + 4 + 8 * mapMorphs.size() * 2);
+		return mapMorphTargets == null ? 8 + 4 + 4 : 8 + 4 + 4 + (8 + 4 + 4 + 4 + 4 + 8 * mapMorphTargets.size() * 2);
 	}
 }
