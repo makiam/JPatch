@@ -24,6 +24,8 @@ public final class AssignPointsToBonesAction extends AbstractAction {
 			if (object instanceof Bone.BoneTransformable) {
 				Bone.BoneTransformable bt = (Bone.BoneTransformable) object;
 				Bone bone = bt.getBone();
+				if (bone.getDofs().size() == 0)
+					continue;
 				Bone parent = bone.getParentBone();
 				if (bt.isEnd()) {
 					if (parent == null) {

@@ -417,6 +417,13 @@ public class DefaultTool extends JPatchTool {
 				cpHot = viewDef.getClosestControlPoint(p2, null, null, true, false, cpHot);
 				btHot = viewDef.getClosestBoneEnd(p2, null, true, true);
 				Bone hitBone = viewDef.getClosestBone(p2);
+				if (!MainFrame.getInstance().getJPatchScreen().isSelectBones()) {
+					btHot = null;
+					hitBone = null;
+				}
+				if (!MainFrame.getInstance().getJPatchScreen().isSelectPoints()) {
+					cpHot = null;
+				}
 				/* if a point was hit... */
 				if (cpHot != null) {
 					
@@ -573,12 +580,9 @@ public class DefaultTool extends JPatchTool {
 						/* if neither shift nor control is down */
 						if ((!mouseEvent.isControlDown() && !mouseEvent.isShiftDown()) || selection == null) {
 							
-							DefaultTreeModel treeModel = (DefaultTreeModel) MainFrame.getInstance().getTree().getModel();
-							MainFrame.getInstance().getTree().setSelectionPath(new TreePath(treeModel.getPathToRoot(hitBone)));
 							
 							/* is the point inside the selection box? */
-							if (selection != null && !selection.isSingle() && isHit(x,y,viewDef.getScreenMatrix())) {
-								
+							if (selection != null && isHit(x,y,viewDef.getScreenMatrix())) {
 								/* change the hot cp */
 								//if (selection.contains(btHot)) {
 									edit.addEdit(new AtomicModifySelection.HotObject(selection, null));
@@ -598,6 +602,10 @@ public class DefaultTool extends JPatchTool {
 								 * selection box was not hit
 								 * create a new selection containing only cphot
 								 */
+								DefaultTreeModel treeModel = (DefaultTreeModel) MainFrame.getInstance().getTree().getModel();
+								MainFrame.getInstance().getTree().setSelectionPath(new TreePath(treeModel.getPathToRoot(hitBone)));
+								
+								
 								Map map = new HashMap();
 								map.put(hitBone.getBoneEnd(), new Float(1));
 								map.put(hitBone.getParentBone() == null ? hitBone.getBoneStart() : hitBone.getParentBone().getBoneEnd(), new Float(1));

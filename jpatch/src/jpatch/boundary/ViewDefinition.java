@@ -493,7 +493,7 @@ implements ComponentListener {
 		Matrix4f m4Screen = getScreenMatrix();
 		Point3f p3 = new Point3f();
 		Line2D.Float line = new Line2D.Float();
-		float fMinDistance = 64;
+		float fMinDistance = 256;
 		float fDistance;
 		Bone closest = null;
 		for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {

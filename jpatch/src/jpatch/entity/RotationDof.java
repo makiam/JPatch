@@ -84,18 +84,22 @@ public class RotationDof extends Morph {
 	
 	public Vector3f getAxis() {
 //		System.out.println(iAxis);
-		Vector3f axis = null;
+		Vector3f axis = new Vector3f();
 		Vector3f v = new Vector3f(bone.getReferenceEnd());
 		v.sub(bone.getReferenceStart());
 		switch (iAxis) {
 			case ORTHO_1: {
-				axis = Utils3D.perpendicularVector(v);
+				Utils3D.perpendicularVector(v, axis);
 			}
 			break;
 			case ORTHO_2: {
-				Vector3f vv = Utils3D.perpendicularVector(v);
+				Vector3f vv = new Vector3f();
+				boolean b = Utils3D.perpendicularVector(v, vv);
 				axis = new Vector3f();
-				axis.cross(v, vv);
+				if (b)
+					axis.cross(v, vv);
+				else
+					axis.cross(vv, v);
 			}
 			break;
 			case RADIAL: {
@@ -338,7 +342,7 @@ public class RotationDof extends Morph {
 //	}
 	
 	public void dump() {
-		System.out.println("RDOF " + strName);
+		System.out.println("RDOF " + strName + " " + fMin + " " + fMax);
 		for (Iterator it = listTargets.iterator(); it.hasNext(); ) {
 			((MorphTarget) it.next()).dump();
 		}
