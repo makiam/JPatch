@@ -11,7 +11,7 @@ import jpatch.boundary.sidebar.*;
 import jpatch.entity.*;
 import jpatch.control.edit.*;
 
-public class SideBar extends JPanel
+public class SideBar extends JSplitPane
 implements TreeSelectionListener {
 	/**
 	 * 
@@ -21,44 +21,57 @@ implements TreeSelectionListener {
 	private SidePanel sidePanel;
 	private JPanel detailPanel = new JPanel();
 	private boolean bListener = true;
+	private JPanel box;
+	private JPanel box2;
 	//private TransformPanel transformPanel = new TransformPanel();
 	
 	public SideBar(JPatchTree tree) {
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		super(VERTICAL_SPLIT);
+		//setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		
 		//setWidth(200);
 		//setPreferredSize
 		//scrollPane = new JScrollPane(tree,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		setDividerSize(4);
+		setContinuousLayout(true);
 		scrollPane = new JScrollPane(tree);
-		Dimension dim = new Dimension(198,300);
-		scrollPane.setPreferredSize(dim);
-		scrollPane.setMinimumSize(dim);
-		scrollPane.setMaximumSize(dim);
+		//Dimension dim = new Dimension(248,400);
+		//scrollPane.setPreferredSize(dim);
+		//scrollPane.setMinimumSize(dim);
+		//scrollPane.setMaximumSize(dim);
 		//add(new JLabel("Tree",SwingConstants.LEFT));
 		sidePanel = new SidePanel();
-		dim = new Dimension(200,100);
+		//dim = new Dimension(200,100);
 		add(scrollPane);
 		//add(new JSeparator(SwingConstants.HORIZONTAL));
-		add(sidePanel);
+		box = new JPanel();
+		box.setLayout(new BorderLayout());
+		box.add(sidePanel, BorderLayout.NORTH);
+		box2 = new JPanel();
+		box2.setLayout(new BorderLayout());
+		box2.add(detailPanel, BorderLayout.NORTH);
 		sidePanel.setBorder(BorderFactory.createEtchedBorder());
 		//detailPanel.add(new JLabel("test"));
-		add(detailPanel);
+		box.add(box2, BorderLayout.CENTER);
 		tree.setFocusable(false);
 		tree.addTreeSelectionListener(this);
 		//detailPanel.setLayout(new GridLayout(10,1));
-		dim = new Dimension(198,1000);
-		detailPanel.setPreferredSize(dim);
-		detailPanel.setMinimumSize(dim);
-		detailPanel.setMaximumSize(dim);
+//		dim = new Dimension(248,1000);
+//		detailPanel.setPreferredSize(dim);
+//		detailPanel.setMinimumSize(dim);
+//		detailPanel.setMaximumSize(dim);
 		scrollPane.setEnabled(false);
+		add(box);
+		detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
 	}
 	
 	
 	public void replacePanel(SidePanel newSidePanel) {
-		remove(detailPanel);
-		remove(sidePanel);
+		box.remove(sidePanel);
+		box2.remove(detailPanel);
 		sidePanel = newSidePanel;
-		add(sidePanel);
-		add(detailPanel);
+		box.add(sidePanel, BorderLayout.NORTH);
+		box2.add(detailPanel, BorderLayout.NORTH);
 		
 		sidePanel.setBorder(BorderFactory.createEtchedBorder()); //(new Color(0,0,0)));
 		sidePanel.repaint();
@@ -69,10 +82,10 @@ implements TreeSelectionListener {
 //		scrollPane.add(tree);
 		remove(scrollPane);
 		scrollPane = new JScrollPane(tree);
-		Dimension dim = new Dimension(198,300);
-		scrollPane.setPreferredSize(dim);
-		scrollPane.setMinimumSize(dim);
-		scrollPane.setMaximumSize(dim);
+//		Dimension dim = new Dimension(198,300);
+//		scrollPane.setPreferredSize(dim);
+//		scrollPane.setMinimumSize(dim);
+//		scrollPane.setMaximumSize(dim);
 		tree.setFocusable(false);
 		tree.addTreeSelectionListener(this);
 		add(scrollPane,0);

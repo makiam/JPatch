@@ -16,7 +16,7 @@ public class SidePanel extends JPanel {
 	public SidePanel() {
 		super();
 		setLayout(new GridLayout(3,2));
-		Dimension dim = new Dimension(196,60);
+		Dimension dim = new Dimension(200,60);
 		setPreferredSize(dim);
 		setMinimumSize(dim);
 		setMaximumSize(dim);

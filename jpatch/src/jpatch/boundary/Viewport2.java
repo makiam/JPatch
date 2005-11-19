@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.37 2005/11/18 19:31:03 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.38 2005/11/19 19:38:13 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -200,7 +200,7 @@ public class Viewport2 {
 	}
 	
 	public void drawModel(Model model) {
-		
+		System.out.println(this + " drawModel");
 		/*
 		 * get max and min z-values (for fog effect)
 		 */
@@ -4025,6 +4025,18 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 				return;
 			}
 			
+			Vector3f vBone = new Vector3f(bone.getReferenceEnd());
+			vBone.sub(bone.getReferenceStart());
+			Vector3f vPerp = Utils3D.perpendicularVector(vBone);
+			vPerp.normalize();
+			vPerp.scale(vBone.length());
+			if (bone.getLastDof() != null)
+				bone.getLastDof().getTransform().transform(vPerp);
+			viewDef.getMatrix().transform(vPerp);
+			Point3f pp = new Point3f(ap3Points[0]);
+			pp.add(vPerp);
+			drawable.drawLine(ap3Points[0], pp);
+			
 			for (int i = 0; i < av3Normals.length; i++) {
 //				Vector3f a = new Vector3f(ap3Points[TRIANGLES[i * 3 + 1]]);
 //				Vector3f b = new Vector3f(ap3Points[TRIANGLES[i * 3 + 2]]);
@@ -4108,8 +4120,10 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 			
 			if (selected && selection.getMap().size() == 2) {
 				int d = 0;
+				System.out.println(bone.getDofs().size());
 				for (Iterator it = bone.getDofs().iterator(); it.hasNext(); ) {
 					RotationDof dof = (RotationDof) it.next();
+					System.out.println("drawing " + bone + "." + dof + " " + d);
 					Vector3f axis = dof.getAxis();
 					if (dof.getParentDof() != null)
 						dof.getParentDof().getTransform().transform(axis);

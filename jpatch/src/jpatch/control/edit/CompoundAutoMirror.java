@@ -228,61 +228,137 @@ public class CompoundAutoMirror extends AbstractClone {
 			 * mirror morphs
 			 */
 			//FIXME
-//			ArrayList newMorphList = new ArrayList();
-//			for (Iterator it = MainFrame.getInstance().getModel().getMorphList().iterator(); it.hasNext(); ) {
-//				MorphTarget morph = (MorphTarget) it.next();
-//				
-//				boolean expand = false;
-//				boolean mirror = true;
-//				for (Iterator jt = morph.getMorphMap().keySet().iterator(); jt.hasNext(); ) {
-//					ControlPoint cp = (ControlPoint) jt.next();
-//					if (!mapClones.containsKey(cp) && !mirrorList.contains(cp))
-//						mirror = false;
-//					else if (mapClones.get(cp) == cp || mirrorList.contains(cp))
-//						expand = true;
-//				}
-//				if (mirror) {
-////					List pointList = morph.getPointList();
-////					List vectorList = morph.getVectorList();
-//					Map morphMap = morph.getMorphMap();
-//					if (expand) {
-////						ArrayList newPointList = new ArrayList();
-////						ArrayList newVectorList = new ArrayList();
-//						Map newMap = new HashMap();
-//						for (Iterator jt = morphMap.keySet().iterator(); jt.hasNext(); ) {
-//							ControlPoint cp = (ControlPoint) jt.next();
-//							ControlPoint clone = (ControlPoint) mapClones.get(cp);
-//							if (cp != clone && !mirrorList.contains(cp)) {
-//								Vector3f vector = new Vector3f((Vector3f) morphMap.get(cp));
-//								vector.x = -vector.x;
-////								newPointList.add(clone);
-////								newVectorList.add(vector);
-//								newMap.put(clone, vector);
-//							}
-//						}
-//						if (newMap.size() > 0)
-//							addEdit(new AddPointsToMorphEdit(morph, newMap));
-//					} else {
-//						MorphTarget newMorph = new MorphTarget(0, "mirrored " + morph.getName());
-//						for (Iterator jt = morphMap.keySet().iterator(); jt.hasNext(); ) {
-//							ControlPoint cp = (ControlPoint) jt.next();
-//							ControlPoint clone = (ControlPoint) mapClones.get(cp);
-//							Vector3f vector = new Vector3f((Vector3f) morphMap.get(cp));
-//							vector.x = -vector.x;
-//							newMorph.addPoint(clone, vector);
-//							newMorph.setMax(morph.getMax());
-//							newMorph.setMin(morph.getMin());
-//							newMorph.setSliderValue(morph.getSliderValue());
-//						}
-//						newMorphList.add(newMorph);
-//					}
-//				}
-//			}
-//			for (Iterator it = newMorphList.iterator(); it.hasNext(); addEdit(new AtomicAddMorph((MorphTarget) it.next())));
-//			
+			ArrayList newMorphList = new ArrayList();
+			for (Iterator itMorph = MainFrame.getInstance().getModel().getMorphList().iterator(); itMorph.hasNext(); ) {
+				Morph morph = (Morph) itMorph.next();
+				
+				boolean expand = false;
+				boolean mirror = true;
+				for (Iterator it = morph.getMorphMap().keySet().iterator(); it.hasNext(); ) {
+					ControlPoint cp = (ControlPoint) it.next();
+					if (!mapClones.containsKey(cp) && !mirrorList.contains(cp))
+						mirror = false;
+					else if (mapClones.get(cp) == cp || mirrorList.contains(cp))
+						expand = true;
+				}
+				if (mirror) {
+					
+					if (expand) {
+						for (Iterator itTarget = morph.getTargets().iterator(); itTarget.hasNext(); ) {
+							MorphTarget target = (MorphTarget) itTarget.next();
+							
+//							List pointList = morph.getPointList();
+//							List vectorList = morph.getVectorList();
+							Map morphMap = target.getMorphMap();
+//							ArrayList newPointList = new ArrayList();
+//							ArrayList newVectorList = new ArrayList();
+							Map newMap = new HashMap();
+							for (Iterator it = morphMap.keySet().iterator(); it.hasNext(); ) {
+								ControlPoint cp = (ControlPoint) it.next();
+								ControlPoint clone = (ControlPoint) mapClones.get(cp);
+								if (cp != clone && !mirrorList.contains(cp)) {
+									Vector3f vector = new Vector3f((Vector3f) morphMap.get(cp));
+									vector.x = -vector.x;
+//									newPointList.add(clone);
+//									newVectorList.add(vector);
+									newMap.put(clone, vector);
+								}
+							}
+							if (newMap.size() > 0)
+								addEdit(new AddPointsToMorphEdit(target, newMap));
+						}
+					} else {
+						Morph newMorph = new Morph("mirrored " + morph.getName());
+						newMorph.setMax(morph.getMax());
+						newMorph.setMin(morph.getMin());
+						newMorph.setSliderValue(morph.getSliderValue());
+						for (Iterator itTarget = morph.getTargets().iterator(); itTarget.hasNext(); ) {
+							MorphTarget target = (MorphTarget) itTarget.next();
+							Map morphMap = target.getMorphMap();
+							MorphTarget newTarget = new MorphTarget(0);
+							for (Iterator it = morphMap.keySet().iterator(); it.hasNext(); ) {
+								ControlPoint cp = (ControlPoint) it.next();
+								ControlPoint clone = (ControlPoint) mapClones.get(cp);
+								Vector3f vector = new Vector3f((Vector3f) morphMap.get(cp));
+								vector.x = -vector.x;
+								newTarget.addPoint(clone, vector);
+								newMorph.addTarget(newTarget);
+							}
+							
+						}
+						newMorphList.add(newMorph);
+					}
+				}
+			}
+			for (Iterator it = newMorphList.iterator(); it.hasNext(); addEdit(new AtomicAddMorph((Morph) it.next())));
+			
 			/*
-			* mirror selections
-			*/
+			 * mirror bones
+			 */
+			Map mapBoneClones = new HashMap();
+			for (Iterator itBone = new ArrayList(MainFrame.getInstance().getModel().getBoneSet()).iterator(); itBone.hasNext(); ) {
+				Bone bone = (Bone) itBone.next();
+				if (!selection.containsBone(bone))
+					continue;
+				Point3f p3Start = bone.getReferenceStart();
+				Point3f p3End = bone.getReferenceEnd();
+				boolean clone = p3Start.x != 0 || p3End.x != 0;
+				if (!clone) {
+					System.out.println("not mirror " + bone);
+					mapBoneClones.put(bone, bone);
+				} else {
+					System.out.println("mirror " + bone);
+					Vector3f v3Extent = new Vector3f(p3End);
+					v3Extent.sub(p3Start);
+					Bone newBone = new Bone(null, new Point3f(-p3Start.x, p3Start.y, p3Start.z), new Vector3f(-v3Extent.x, v3Extent.y, v3Extent.z));
+					//newBone.setEnd(new Point3f(-p3End.x, p3End.y, p3End.z));
+					int i = 0;
+					for (Iterator itDof = bone.getDofs().iterator(); itDof.hasNext(); ) {
+						RotationDof dof = (RotationDof) itDof.next();
+						RotationDof newDof = new RotationDof(newBone, dof.getType());
+						newBone.insert(newDof, i++);
+//						Vector3f ax1 = dof.getAxis();
+//						Vector3f ax2 = newDof.getAxis();
+//						int rev = 0;
+//						if (ax1.x != ax2.x)
+//							rev++;
+//						if (ax1.y != ax2.y)
+//							rev++;
+//						if (ax1.z != ax2.z)
+//							rev++;
+//						if (rev == 0 || rev == 2) {
+							newDof.setMin(dof.getMin());
+							newDof.setMax(dof.getMax());
+							newDof.setValue(dof.getValue());
+//						} else {
+//							newDof.setMin(-dof.getMax());
+//							newDof.setMax(-dof.getMin());
+//							newDof.setValue(-dof.getValue());
+//						}
+					}
+					newBone.setJointRotation((bone.getJointRotation() + 180) % 360);
+					mapBoneClones.put(bone, newBone);
+					newBone.setColor(bone.getColor());
+				}
+			}
+			
+			for (Iterator it = mapBoneClones.keySet().iterator(); it.hasNext(); ) {
+				Bone bone = (Bone) it.next();
+				Bone clone = (Bone) mapBoneClones.get(bone);
+				if (bone != clone) {
+					Bone parent = bone.getParentBone();
+					if (parent != null) {
+						Bone parentClone = (Bone) mapBoneClones.get(bone.getParentBone());
+						clone.setParent(parentClone);
+//						parentClone.insert(clone, parentClone.getChildCount());
+					}
+					addEdit(new AtomicAddBone(clone));
+				}
+			}
+			
+			/*
+			 * mirror selections
+			 */
 			//System.out.println(mirrorList);
 			
 			System.out.println("mapClones=" + mapClones);

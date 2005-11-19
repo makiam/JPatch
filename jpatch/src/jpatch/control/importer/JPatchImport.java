@@ -251,6 +251,7 @@ implements ModelImporter {
 							else if (value.equals("smooth"))
 								dof.setMode(RotationDof.SMOOTH);
 						} else if (name.equals("min")) {
+							System.out.println("min");
 							dof.setMin(Float.parseFloat(value));
 						} else if (name.equals("max")) {
 							dof.setMax(Float.parseFloat(value));

@@ -155,7 +155,7 @@ public final class MainFrame extends JFrame {
 			//jpatchScreen.add(new JButton("test"));
 			//getContentPane().add(panelTest,BorderLayout.CENTER);
 			/* -------------------------- */
-			getContentPane().add(jpatchScreen,BorderLayout.CENTER);
+//			getContentPane().add(jpatchScreen,BorderLayout.CENTER);
 			
 			JPatchSettings settings = JPatchSettings.getInstance();
 			setLocation(settings.iScreenX,settings.iScreenY);
@@ -191,9 +191,23 @@ public final class MainFrame extends JFrame {
 			
 			initTree();
 			sideBar = new SideBar(tree);
-			getContentPane().add(sideBar,BorderLayout.EAST);
+//			getContentPane().add(sideBar,BorderLayout.EAST);
 			
 			getContentPane().add(helpPanel,BorderLayout.SOUTH);
+			
+			
+			JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+//			JPanel panel = new JPanel();
+//			panel.setLayout(new BorderLayout());
+//			panel.add(jpatchScreen, BorderLayout.CENTER);
+			splitPane.add(jpatchScreen);
+			splitPane.add(sideBar);
+			splitPane.setOneTouchExpandable(false);
+			splitPane.setContinuousLayout(true);
+			splitPane.setResizeWeight(1);
+			splitPane.setDividerSize(4);
+			getContentPane().add(splitPane, BorderLayout.CENTER);
+			
 			helpPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 			helpPanel.add(helpLabel);
 			jpatchScreen.enablePopupMenu(true);

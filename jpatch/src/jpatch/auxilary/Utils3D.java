@@ -4,8 +4,11 @@ import javax.vecmath.*;
 
 public class Utils3D {
 	private static final Vector3f v3X = new Vector3f(1,0,0);
-	private static final Vector3f v3Y = new Vector3f(0,1,0);
+//	private static final Vector3f v3Y = new Vector3f(0,1,0);
 	private static final Vector3f v3Z = new Vector3f(0,0,1);
+//	private static final Vector3f v3X1 = new Vector3f(-1,0,0);
+//	private static final Vector3f v3Y1 = new Vector3f(0,-1,0);
+//	private static final Vector3f v3Z1 = new Vector3f(0,0,-1);
 	
 	private static Vector3f v = new Vector3f();
 	private static Vector3f w = new Vector3f();
@@ -40,19 +43,69 @@ public class Utils3D {
 		if (v0.lengthSquared() == 0) {
 			return vn;
 		} else {
+//			System.out.println("perp " + v0);
 			float ax = Math.abs(v0.x);
 			float ay = Math.abs(v0.y);
 			float az = Math.abs(v0.z);
 			float dm = Math.max(ax,Math.max(ay,az));
+//			System.out.println(dm + " " + Math.signum(ax));
 			if (ax == dm) {
-				vn.cross(v0,v3Z);
+				if (Math.signum(v0.x) > 0)
+					vn.cross(v0,v3Z);
+				else
+					vn.cross(v3Z, v0);
 			} else if (az == dm) {
-				vn.cross(v0,v3X);
+				if (Math.signum(v0.z) > 0)
+					vn.cross(v0,v3X);
+				else
+					vn.cross(v3X, v0);
 			} else {
-				vn.cross(v0,v3Z);
+				if (Math.signum(v0.y) > 0)
+					vn.cross(v0,v3Z);
+				else
+					vn.cross(v3Z, v0);
 			}
 			vn.normalize();
 			return vn;
+		}
+	}
+	
+	public static boolean perpendicularVector(Vector3f v0, Vector3f vn) {
+		if (v0.lengthSquared() == 0) {
+			vn.set(0, 0, 0);
+			return false;
+		} else {
+//			System.out.println("perp " + v0);
+			float ax = Math.abs(v0.x);
+			float ay = Math.abs(v0.y);
+			float az = Math.abs(v0.z);
+			float dm = Math.max(ax,Math.max(ay,az));
+//			System.out.println(dm + " " + Math.signum(ax));
+			boolean b = false;
+			if (ax == dm) {
+				if (Math.signum(v0.x) > 0) {
+					vn.cross(v0,v3Z);
+					b = true;
+				} else {
+					vn.cross(v3Z, v0);
+				}
+			} else if (az == dm) {
+				if (Math.signum(v0.z) > 0) {
+					vn.cross(v0,v3X);
+					b = true;
+				} else {
+					vn.cross(v3X, v0);
+				}
+			} else {
+				if (Math.signum(v0.y) > 0) {
+					vn.cross(v0,v3Z);
+					b = true;
+				} else {
+					vn.cross(v3Z, v0);
+				}
+			}
+			vn.normalize();
+			return b;
 		}
 	}
 	
