@@ -125,7 +125,7 @@ public final class JPatchScreen extends JPanel {
 					if (JoglInstall.isInstalled())
 						aDrawable[i] = new JPatchDrawableGL(listener, false);
 					else
-						aDrawable[i] = new JPatchDrawable3D(listener, false);
+						aDrawable[i] = new JPatchDrawable3D(listener, true);
 				} break;
 			}
 			aDrawable[i].setProjection(JPatchDrawable2.ORTHOGONAL);
@@ -496,7 +496,12 @@ public final class JPatchScreen extends JPanel {
 		return iMode;
 	}
 	
+	public Dimension getMinimumSize() {
+		return new Dimension(100, 100);
+	}
+	
 	public void setMode(int mode) {
+		
 		iMode = mode;
 		int h = getHeight();
 		int w = getWidth();
@@ -511,6 +516,7 @@ public final class JPatchScreen extends JPanel {
 //		aComponent[2].clearImage();
 //		aComponent[3].clearImage();
 		//update_all();
+		
 		if (h > 0 && w > 0) {
 			switch(mode) {
 				case 0:
@@ -598,6 +604,7 @@ public final class JPatchScreen extends JPanel {
 	}
 	
 	public void doLayout() {
+		super.doLayout();
 		setMode(iMode);
 	}
 	
