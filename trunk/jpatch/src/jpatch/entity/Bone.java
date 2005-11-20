@@ -49,7 +49,7 @@ public class Bone implements MutableTreeNode {
 	private BoneTransformable boneEnd = new BoneTransformable(p3End);
 	
 	private String strName;
-	private int iDofAxis = 7;
+	private int iDofAxis = 0;
 	private float fJointRotation = 0;
 //	private int iNum = NUM++;
 //	
@@ -66,7 +66,7 @@ public class Bone implements MutableTreeNode {
 		//MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(this, 2), this, 1);
 		//MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(this, 4), this, 2);
 	}
-
+	
 //	public Bone(Model model, Bone parent) {
 //		this.model = model;
 //		parent.getStart(p3Start);

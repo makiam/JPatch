@@ -853,12 +853,13 @@ implements ModelImporter {
 		return (cp.getParentHook() == null) ? cp.getHead() : cp.getParentHook().getHead();
 	}
 	
-	private String[] splitIntoStringArray(String string) {
-		return string.split(",");
-	}
+//	private String[] splitIntoStringArray(String string) {
+//		return string.trim().split("[\\s,]+");
+//	}
 	
 	private int[] splitIntoIntArray(String string) {
-		String[] number = string.replaceAll("\\s", "").split(",");
+		System.out.println("\"" + string + "\"");
+		String[] number = string.trim().split("[\\s,]+");
 		int[] ai = new int[number.length];
 		for (int i = 0; i < number.length; i++)
 			ai[i] = Integer.parseInt(number[i]);
@@ -866,7 +867,7 @@ implements ModelImporter {
 	}
 	
 	private float[] splitIntoFloatArray(String string) {
-		String[] number = string.replaceAll("\\s", "").split(",");
+		String[] number = string.trim().split("[\\s,]+");
 		float[] af = new float[number.length];
 		for (int i = 0; i < number.length; i++)
 			af[i] = Float.parseFloat(number[i]);

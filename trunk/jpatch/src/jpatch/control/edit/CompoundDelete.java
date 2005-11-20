@@ -88,11 +88,18 @@ public class CompoundDelete extends JPatchCompoundEdit {
 			}
 			addEdit(new AtomicDropBone(bone));
 			addEdit(new AtomicRemoveBoneFromSelections(bone));
+			for (Iterator jt = MainFrame.getInstance().getModel().getCurveSet().iterator(); jt.hasNext(); ) {
+				ControlPoint start = (ControlPoint) jt.next();
+				for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
+					if (cp.getBone() == bone)
+						addEdit(new AtomicChangeControlPoint.Bone(cp, null));
+				}
+			}
 		}
 		
 		
 //		Remove empty selections
-		for (Iterator it = (new HashSet(MainFrame.getInstance().getModel().getSelections())).iterator(); it.hasNext(); ) {
+		for (Iterator it = (new ArrayList(MainFrame.getInstance().getModel().getSelections())).iterator(); it.hasNext(); ) {
 			Selection selection = (Selection) it.next();
 			if (selection.getMap().size() == 0)
 				addEdit(new AtomicRemoveSelection(selection));

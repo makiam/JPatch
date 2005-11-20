@@ -1,12 +1,16 @@
 package jpatch.boundary.sidebar;
 
 //import java.awt.event.*;
+import java.awt.Color;
+import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
+import javax.vecmath.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
-import jpatch.boundary.action.AddDofAction;
+import jpatch.boundary.action.*;
 
 public class BonePanel extends SidePanel
 implements ChangeListener {
@@ -19,7 +23,7 @@ implements ChangeListener {
 	JSlider slider;
 	Bone bone;
 	
-	public BonePanel(Bone bone) {
+	public BonePanel(final Bone bone) {
 		this.bone = bone;
 		JPatchInput.setDimensions(50,150,20);
 		inputName = new JPatchInput("Name:",bone.getName());
@@ -33,10 +37,22 @@ implements ChangeListener {
 		detailPanel.add(slider);
 		detailPanel.repaint();
 		slider.addChangeListener(this);
-		
-		add(new JButton(new AddDofAction(bone, 1, "add yaw")));
-		add(new JButton(new AddDofAction(bone, 2, "add pitch")));
-		add(new JButton(new AddDofAction(bone, 4, "add roll")));
+		JButton addYaw = new JButton(new AddDofAction(bone, 1, "add yaw"));
+		JButton addPitch = new JButton(new AddDofAction(bone, 2, "add pitch"));
+		JButton addRoll = new JButton(new AddDofAction(bone, 4, "add roll"));
+		addYaw.setEnabled((bone.getDofMask() & 1) == 0);
+		addPitch.setEnabled((bone.getDofMask() & 2) == 0);
+		addRoll.setEnabled((bone.getDofMask() & 4) == 0);
+		JButton colorButton = new JButton("set color");
+		add(colorButton);
+		add(addYaw);
+		add(addPitch);
+		add(addRoll);
+		colorButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				bone.setColor(new Color3f(JColorChooser.showDialog(MainFrame.getInstance(), "Set bone's color", bone.getColor().get())));
+			}
+		});
 	}
 	
 	public void stateChanged(ChangeEvent changeEvent) {

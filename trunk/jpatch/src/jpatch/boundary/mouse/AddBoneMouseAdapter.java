@@ -197,7 +197,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 			MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(bone, 1), bone, 0);
 			MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(bone, 2), bone, 1);
 			MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(bone, 4), bone, 2);
-			
+			bone.addDofAxis(7);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 //			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
 			bActive = false;

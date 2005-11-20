@@ -122,6 +122,7 @@ public final class Command implements KeyListener {
 		put("delete",		new DeleteControlPointAction(),	new JMenuItem());
 		put("remove",		new RemoveControlPointAction(),	new JMenuItem());
 		put("insert point",	new InsertControlPointAction(),	new JMenuItem());
+		put("next curve",	new NextCurveAction(), new JMenuItem());
 		
 		/*
 		 * Main toolbar buttons

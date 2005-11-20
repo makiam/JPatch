@@ -365,34 +365,34 @@ public class Selection extends JPatchTreeLeaf {
 		return selection;
 	}
 	
-	public boolean equals(Object object) {
-		if (object == null)
-			return false;
-		return mapObjects.equals(((Selection) object).mapObjects);
-//		if (object == this)
-//			return true;
-//		Selection selection = (Selection) object;
-////		System.out.println("comparting " + this + " with " + selection);
-////		System.out.println(mapObjects);
-////		System.out.println(selection.mapObjects);
-////		System.out.println(mapObjects.equals(selection.mapObjects));
-//		if (mapObjects.size() != selection.mapObjects.size())
+//	public boolean equals(Object object) {
+//		if (object == null)
 //			return false;
-//		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext(); ) {
-//			Object o = it.next();
-//			if (o != pivotTransformable && !selection.contains(o))
-//				return false;
-//		}
-////		if (!mapObjects.equals(selection.mapObjects))
+//		return mapObjects.equals(((Selection) object).mapObjects);
+////		if (object == this)
+////			return true;
+////		Selection selection = (Selection) object;
+//////		System.out.println("comparting " + this + " with " + selection);
+//////		System.out.println(mapObjects);
+//////		System.out.println(selection.mapObjects);
+//////		System.out.println(mapObjects.equals(selection.mapObjects));
+////		if (mapObjects.size() != selection.mapObjects.size())
 ////			return false;
-//		if (!(iDirection == selection.iDirection))
-//			return false;
-//		return true;
-	}
-	
-	public int hashCode() {
-		return mapObjects.hashCode();
-	}
+////		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext(); ) {
+////			Object o = it.next();
+////			if (o != pivotTransformable && !selection.contains(o))
+////				return false;
+////		}
+//////		if (!mapObjects.equals(selection.mapObjects))
+//////			return false;
+////		if (!(iDirection == selection.iDirection))
+////			return false;
+////		return true;
+//	}
+//	
+//	public int hashCode() {
+//		return mapObjects.hashCode();
+//	}
 	
 	public String toString() {
 //		return "Selection " + getName() + " (" + iNum + ")";

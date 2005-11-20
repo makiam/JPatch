@@ -50,20 +50,20 @@ public class Utils3D {
 			float dm = Math.max(ax,Math.max(ay,az));
 //			System.out.println(dm + " " + Math.signum(ax));
 			if (ax == dm) {
-				if (Math.signum(v0.x) > 0)
-					vn.cross(v0,v3Z);
-				else
+				if (Math.signum(v0.x) < 0)
 					vn.cross(v3Z, v0);
+				else
+					vn.cross(v0,v3Z);
 			} else if (az == dm) {
-				if (Math.signum(v0.z) > 0)
+				if (Math.signum(v0.z) < 0)
 					vn.cross(v0,v3X);
 				else
 					vn.cross(v3X, v0);
 			} else {
-				if (Math.signum(v0.y) > 0)
-					vn.cross(v0,v3Z);
+				if (Math.signum(v0.y) < 0)
+					vn.cross(v0,v3X);
 				else
-					vn.cross(v3Z, v0);
+					vn.cross(v3X, v0);
 			}
 			vn.normalize();
 			return vn;

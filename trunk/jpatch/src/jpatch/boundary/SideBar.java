@@ -167,6 +167,7 @@ implements TreeSelectionListener {
 		//System.out.println(selectedLeaf);
 		
 		MutableTreeNode selectedNode = (MutableTreeNode) treeSelectionEvent.getPath().getLastPathComponent();
+		System.out.println("tree hit: selected node = " + selectedNode);
 		if (selectedNode == MainFrame.getInstance().getModel().getTreenodeMaterials()) {
 			replacePanel(new MaterialsPanel((Model) selectedNode.getParent()));
 		} else if (selectedNode instanceof JPatchMaterial) {
@@ -174,10 +175,18 @@ implements TreeSelectionListener {
 		} else if (selectedNode == MainFrame.getInstance().getModel().getTreenodeExpressions()) {
 			replacePanel(new MorphsPanel());
 		} else if (selectedNode instanceof Morph) {
-			if (selectedNode instanceof RotationDof)
-				replacePanel(new DofPanel((RotationDof) selectedNode));
-			else	
+			if (selectedNode instanceof RotationDof) {
+				RotationDof dof = (RotationDof) selectedNode;
+				replacePanel(new DofPanel(dof));
+				Map map = new HashMap();
+				Bone bone = dof.getBone();
+				map.put(bone.getBoneEnd(), new Float(1));
+				map.put(bone.getParentBone() == null ? bone.getBoneStart() : bone.getParentBone().getBoneEnd(), new Float(1));
+				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new Selection(map)));
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			} else {	
 				replacePanel(new MorphPanel((Morph) selectedNode));
+			}
 		} else if (selectedNode instanceof MorphTarget) {
 			MorphTarget target = (MorphTarget) selectedNode;
 //			if (target.getPosition() != 0) {
@@ -205,6 +214,8 @@ implements TreeSelectionListener {
 			Map map = new HashMap();
 			map.put(bone.getBoneEnd(), new Float(1));
 			map.put(bone.getParentBone() == null ? bone.getBoneStart() : bone.getParentBone().getBoneEnd(), new Float(1));
+			if (bone.getDofs().size() > 0)
+				MainFrame.getInstance().getTree().expandPath(treeSelectionEvent.getPath());
 			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new Selection(map)));
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		} else if (selectedNode instanceof Model) {
