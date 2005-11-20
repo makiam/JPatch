@@ -27,6 +27,7 @@ public class RotationDof extends Morph {
 	
 	private Bone bone;
 	private int iAxis;
+	private boolean bFlipped;
 //	private Vector3f v3ReferenceAxis;
 //	private Vector3f v3Axis;
 //	private float fMinAngle;
@@ -51,6 +52,14 @@ public class RotationDof extends Morph {
 	
 	public Bone getBone() {
 		return bone;
+	}
+	
+	public boolean isFlipped() {
+		return bFlipped;
+	}
+	
+	public void setFlipped(boolean flipped) {
+		bFlipped = flipped;
 	}
 	
 	public RotationDof getParentDof() {
@@ -84,22 +93,18 @@ public class RotationDof extends Morph {
 	
 	public Vector3f getAxis() {
 //		System.out.println(iAxis);
-		Vector3f axis = new Vector3f();
+		Vector3f axis = null;
 		Vector3f v = new Vector3f(bone.getReferenceEnd());
 		v.sub(bone.getReferenceStart());
 		switch (iAxis) {
 			case ORTHO_1: {
-				Utils3D.perpendicularVector(v, axis);
+				axis = Utils3D.perpendicularVector(v);
 			}
 			break;
 			case ORTHO_2: {
-				Vector3f vv = new Vector3f();
-				boolean b = Utils3D.perpendicularVector(v, vv);
+				Vector3f vv = Utils3D.perpendicularVector(v);
 				axis = new Vector3f();
-				if (b)
-					axis.cross(v, vv);
-				else
-					axis.cross(vv, v);
+				axis.cross(v, vv);
 			}
 			break;
 			case RADIAL: {
@@ -107,6 +112,8 @@ public class RotationDof extends Morph {
 			}
 			break;
 		}
+		if (bFlipped)
+			axis.scale(-1);
 		axis.normalize();
 		Matrix3f m = new Matrix3f();
 		m.set(new AxisAngle4f(v, bone.getJointRotation() / 180f * (float) Math.PI));

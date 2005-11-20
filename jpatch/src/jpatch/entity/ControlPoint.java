@@ -280,6 +280,10 @@ public class ControlPoint implements Comparable, Transformable {
 //		if (cpNext != null) p3RefOutTangent.set(getOutTangent());
 //	}
 	
+	public void setBone(Bone bone) {
+		this.bone = bone;
+	}
+	
 	public void setBone(Bone bone, float position, float distanceToLine) {
 		this.bone = bone;
 		this.fBonePosition = position;
@@ -348,6 +352,14 @@ public class ControlPoint implements Comparable, Transformable {
 		if (p != null)
 			m4Transform.transform(p);
 		return p;
+	}
+	
+	public float getBonePosition() {
+		return fBonePosition;
+	}
+	
+	public float getBoneDistance() {
+		return fDistanceToLine;
 	}
 	
 	/**

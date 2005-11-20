@@ -30,6 +30,7 @@ implements ChangeListener, ActionListener {
 	JPatchInput inputCurrent;
 	JSlider slider;
 	JComboBox combo = new JComboBox(RotationDof.MODES);
+	JCheckBox cbFlip = new JCheckBox("flip axis");
 	RotationDof dof;
 	
 	AbstractButton useMorphButton;
@@ -39,7 +40,7 @@ implements ChangeListener, ActionListener {
 //	AbstractButton editButton;
 //	AbstractButton deleteButton;
 	
-	public DofPanel(RotationDof dof) {
+	public DofPanel(final RotationDof dof) {
 		this.dof = dof;
 		combo.setSelectedIndex(dof.getMode());
 //		Morph editedMorph = MainFrame.getInstance().getEditedMorph();
@@ -75,6 +76,7 @@ implements ChangeListener, ActionListener {
 		detailPanel.removeAll();
 //		detailPanel.add(inputName);
 		detailPanel.add(combo);
+		detailPanel.add(cbFlip);
 		detailPanel.add(inputMin);
 		detailPanel.add(inputMax);
 		detailPanel.add(inputCurrent);
@@ -87,6 +89,37 @@ implements ChangeListener, ActionListener {
 		inputMax.addChangeListener(this);
 		slider.addChangeListener(this);
 		combo.addActionListener(this);
+		cbFlip.setSelected(dof.isFlipped());
+		cbFlip.addActionListener(this);
+		
+		JButton buttonUp = new JButton("up");
+		buttonUp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int i = dof.getBone().getDofIndex(dof);
+				if (i > 0) {
+					MainFrame.getInstance().getTreeModel().removeNodeFromParent(dof);
+					MainFrame.getInstance().getTreeModel().insertNodeInto(dof, dof.getBone(), i - 1);
+					MainFrame.getInstance().getModel().setPose();
+					MainFrame.getInstance().getJPatchScreen().update_all();
+				}
+			}
+		});
+		
+		JButton buttonDown = new JButton("down");
+		buttonDown.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int i = dof.getBone().getDofIndex(dof);
+				if (i < 2) {
+					MainFrame.getInstance().getTreeModel().removeNodeFromParent(dof);
+					MainFrame.getInstance().getTreeModel().insertNodeInto(dof, dof.getBone(), i + 1);
+					MainFrame.getInstance().getModel().setPose();
+					MainFrame.getInstance().getJPatchScreen().update_all();
+				}
+			}
+		});
+		
+		add(buttonUp);
+		add(buttonDown);
 		
 //		if (morph == editedMorph) {
 //			editButton.setSelected(true);
@@ -139,12 +172,17 @@ implements ChangeListener, ActionListener {
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			} else {
 			}
-		}
+		} 
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
 		if (actionEvent.getSource() == combo) {
 			dof.setMode(combo.getSelectedIndex());
+		} else if (actionEvent.getSource() == cbFlip) {
+			dof.setFlipped(cbFlip.isSelected());
+			dof.invalidate();
+			MainFrame.getInstance().getModel().setPose();
+			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 	}
 	
