@@ -257,6 +257,8 @@ implements ModelImporter {
 							dof.setMax(Float.parseFloat(value));
 						} else if (name.equals("current")) {
 							dof.setValue(Float.parseFloat(value));
+						} else if (name.equals("flipped")) {
+							dof.setFlipped(Boolean.parseBoolean(value));
 						}
 					}
 					MainFrame.getInstance().getTreeModel().insertNodeInto(dof, bone, bone.getDofs().size());

@@ -326,7 +326,7 @@ public class RotationDof extends Morph {
 	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
 		String type = (iAxis == 1) ? "yaw" : (iAxis == 2) ? "pitch" : "roll";
-		sb.append(prefix).append("<dof type=\"" + type + "\" assignment=\"" + MODES[iMode] + "\" min=\"" + fMin + "\" max=\"" + fMax + "\" value=\"" + fValue + "\"");
+		sb.append(prefix).append("<dof type=\"" + type + "\" flipped=\"" + bFlipped + "\" assignment=\"" + MODES[iMode] + "\" min=\"" + fMin + "\" max=\"" + fMax + "\" value=\"" + fValue + "\"");
 		if (listTargets.size() == 0) {
 			sb.append("/>\n");
 		} else {
