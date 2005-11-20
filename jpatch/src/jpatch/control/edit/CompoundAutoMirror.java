@@ -317,24 +317,24 @@ public class CompoundAutoMirror extends AbstractClone {
 						RotationDof dof = (RotationDof) itDof.next();
 						RotationDof newDof = new RotationDof(newBone, dof.getType());
 						newBone.insert(newDof, i++);
-//						Vector3f ax1 = dof.getAxis();
-//						Vector3f ax2 = newDof.getAxis();
-//						int rev = 0;
-//						if (ax1.x != ax2.x)
-//							rev++;
-//						if (ax1.y != ax2.y)
-//							rev++;
-//						if (ax1.z != ax2.z)
-//							rev++;
-//						if (rev == 0 || rev == 2) {
-							newDof.setMin(dof.getMin());
-							newDof.setMax(dof.getMax());
-							newDof.setValue(dof.getValue());
-//						} else {
-//							newDof.setMin(-dof.getMax());
-//							newDof.setMax(-dof.getMin());
-//							newDof.setValue(-dof.getValue());
-//						}
+						Vector3f ax1 = dof.getAxis();
+						Vector3f ax2 = newDof.getAxis();
+						int rev = 0;
+						if (ax1.x != ax2.x)
+							rev++;
+						if (ax1.y == ax2.y)
+							rev++;
+						if (ax1.z != ax2.z)
+							rev++;
+						newDof.setMode(dof.getMode());
+						newDof.setMin(dof.getMin());
+						newDof.setMax(dof.getMax());
+						newDof.setValue(dof.getValue());
+						if (rev == 0 || rev == 2)
+							newDof.setFlipped(dof.isFlipped());
+						else
+							newDof.setFlipped(!dof.isFlipped());
+
 					}
 					newBone.setJointRotation((bone.getJointRotation() + 180) % 360);
 					mapBoneClones.put(bone, newBone);
@@ -354,6 +354,13 @@ public class CompoundAutoMirror extends AbstractClone {
 					}
 					addEdit(new AtomicAddBone(clone));
 				}
+			}
+			for (Iterator it = mapClones.keySet().iterator(); it.hasNext(); ) {
+				ControlPoint cp = (ControlPoint) it.next();
+				ControlPoint clone = (ControlPoint) mapClones.get(cp);
+				if (cp == clone)
+					continue;
+				clone.setBone((Bone) mapBoneClones.get(cp.getBone()), cp.getBonePosition(), cp.getBoneDistance());
 			}
 			
 			/*
@@ -413,6 +420,7 @@ public class CompoundAutoMirror extends AbstractClone {
 				addEdit(new AtomicAddSelection((Selection) it.next()));
 			}
 			
+			MainFrame.getInstance().getModel().setPose();
 			//for (Iterator it = mapOriginals.keySet().iterator(); it.hasNext(); ) {
 			//	ControlPoint cpClone = (ControlPoint) it.next();
 			//	ControlPoint cpOriginal = getOriginal(cpClone);

@@ -24,7 +24,9 @@ public class AtomicAddDof extends JPatchAtomicEdit implements JPatchRootEdit {
 
 	public void undo() {
 //		MainFrame.getInstance().getUndoManager().setEnabled(false);
+		bone.removeDofAxis(dof.getType());
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(dof);
+		
 //		MainFrame.getInstance().getUndoManager().setEnabled(true);
 		//morph.setValue(0);
 		//MainFrame.getInstance().getModel().applyMorphs();
@@ -38,7 +40,9 @@ public class AtomicAddDof extends JPatchAtomicEdit implements JPatchRootEdit {
 //		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(dof.getParent(),aiIndex);
 //		TreePath path = dof.getTreePath();
 //		dof.getBone().insert(dof, 0);
+		bone.addDofAxis(dof.getType());
 		MainFrame.getInstance().getTreeModel().insertNodeInto(dof, bone, bone.getDofs().size());
+	
 //		MainFrame.getInstance().getTree().makeVisible(dof.get);
 		//morph.setValue(value);
 //		morph.apply();

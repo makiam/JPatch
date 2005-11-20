@@ -604,8 +604,11 @@ public class DefaultTool extends JPatchTool {
 								 */
 								DefaultTreeModel treeModel = (DefaultTreeModel) MainFrame.getInstance().getTree().getModel();
 								MainFrame.getInstance().getTree().setSelectionPath(new TreePath(treeModel.getPathToRoot(hitBone)));
-								
-								
+								MutableTreeNode lastNode = hitBone.getDofs().size() > 0 ? (MutableTreeNode) hitBone.getDof(hitBone.getDofs().size() - 1) : hitBone;
+//								MainFrame.getInstance().getTree().expandPath(new TreePath(treeModel.getPathToRoot(hitBone)));
+								MainFrame.getInstance().getTree().makeVisible(new TreePath(treeModel.getPathToRoot(lastNode)));
+								MainFrame.getInstance().getTree().scrollPathToVisible(new TreePath(treeModel.getPathToRoot(hitBone)));
+								MainFrame.getInstance().getTree().scrollPathToVisible(new TreePath(treeModel.getPathToRoot(lastNode)));
 								Map map = new HashMap();
 								map.put(hitBone.getBoneEnd(), new Float(1));
 								map.put(hitBone.getParentBone() == null ? hitBone.getBoneStart() : hitBone.getParentBone().getBoneEnd(), new Float(1));

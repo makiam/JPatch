@@ -237,11 +237,22 @@ public class Model implements MutableTreeNode {
 	}
 	
 	public boolean checkSelection(Selection selection) {
-		return (!listSelections.contains(selection));
+		for (int i = 0, n = listSelections.size(); i < n; i++) {
+			Selection sel = (Selection) listSelections.get(i);
+//			System.out.println(sel + " " + selection + " " + selection.getMap().equals(sel.getMap()));
+			if (selection.getMap().equals(sel.getMap()))
+				return false;
+		}
+		return true;
 	}
 	
 	public Selection getSelection(Selection selection) {
-		return (Selection) listSelections.get(listSelections.indexOf(selection));
+		for (int i = 0, n = listSelections.size(); i < n; i++) {
+			Selection sel = (Selection) listSelections.get(i);
+			if (selection.getMap().equals(sel.getMap()))
+				return sel;
+		}
+		return null;
 	}
 	
 	public void addSelection(Selection selection) {

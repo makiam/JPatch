@@ -283,4 +283,26 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 			return 8 + 4 + 4 + 4 + 4;
 		}
 	}
+	
+	public static final class Bone extends AtomicChangeControlPoint {
+		private jpatch.entity.Bone bone;
+		
+		public Bone(ControlPoint cp, jpatch.entity.Bone bone) {
+			if (DEBUG)
+				System.out.println(getClass().getName() + "(" + cp + ", " + bone + ")");
+			this.cp = cp;
+			this.bone = bone;
+			swap();
+		}
+		
+		void swap() {
+			jpatch.entity.Bone dummy = cp.getBone();
+			cp.setBone(bone);
+			bone = dummy;
+		}
+		
+		public int sizeOf() {
+			return 8 + 4 + 4;
+		}
+	}
 }

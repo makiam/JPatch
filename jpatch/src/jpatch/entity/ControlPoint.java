@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.16 2005/11/18 16:00:33 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.17 2005/11/20 12:19:10 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -38,7 +38,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.16 $
+ * @version    $Revision: 1.17 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -280,6 +280,10 @@ public class ControlPoint implements Comparable, Transformable {
 //		if (cpNext != null) p3RefOutTangent.set(getOutTangent());
 //	}
 	
+	public void setBone(Bone bone) {
+		this.bone = bone;
+	}
+	
 	public void setBone(Bone bone, float position, float distanceToLine) {
 		this.bone = bone;
 		this.fBonePosition = position;
@@ -348,6 +352,14 @@ public class ControlPoint implements Comparable, Transformable {
 		if (p != null)
 			m4Transform.transform(p);
 		return p;
+	}
+	
+	public float getBonePosition() {
+		return fBonePosition;
+	}
+	
+	public float getBoneDistance() {
+		return fDistanceToLine;
 	}
 	
 	/**

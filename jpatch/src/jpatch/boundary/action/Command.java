@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.10 2005/11/18 16:00:33 sascha_l Exp $
+ * $Id: Command.java,v 1.11 2005/11/20 12:19:10 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -122,6 +122,7 @@ public final class Command implements KeyListener {
 		put("delete",		new DeleteControlPointAction(),	new JMenuItem());
 		put("remove",		new RemoveControlPointAction(),	new JMenuItem());
 		put("insert point",	new InsertControlPointAction(),	new JMenuItem());
+		put("next curve",	new NextCurveAction(), new JMenuItem());
 		
 		/*
 		 * Main toolbar buttons
