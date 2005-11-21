@@ -90,10 +90,15 @@ public final class Animator extends BFrame {
 			
 		splitPane = new BSplitPane(BSplitPane.VERTICAL, cameraViewport.getWidget(), motionCurveEditor);
 		splitPane.addEventLink(ValueChangedEvent.class, this, "rerenderViewports");
-		content.add(splitPane, BorderContainer.CENTER);
 		
-		content.add(poseSliders.getContent(), BorderContainer.EAST);
-		setContent(content);
+		BSplitPane splitPane2 = new BSplitPane(BSplitPane.HORIZONTAL, splitPane, poseSliders.getContent());
+		
+		//content.add(splitPane, BorderContainer.CENTER);
+		
+		//content.add(poseSliders.getContent(), BorderContainer.EAST);
+		
+		//setContent(content);
+		setContent(splitPane2);
 		setMenuBar(new AnimatorMainMenu());
 		pack();
 		addEventLink(WindowClosingEvent.class, this, "quit");
