@@ -191,13 +191,14 @@ public class CompoundAutoMirror extends AbstractClone {
 			}
 			
 			
-			// FIXME huh???
+			
 			/* remove dead curves */
 //			for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
 //				if (curve.getStart().getCurve() != curve) {
 //					addEdit(new AtomicRemoveCurve(curve));
 //				}
 //			}
+			
 			
 			/* add loop flags */
 //			for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
@@ -210,6 +211,15 @@ public class CompoundAutoMirror extends AbstractClone {
 					if (cp == cpStart && !cp.getLoop()) {
 						addEdit(new AtomicChangeControlPoint.Loop(cp));
 					}
+				}
+			}
+			
+			/* remove dead curves */
+			for (Iterator it = new ArrayList(MainFrame.getInstance().getModel().getCurveSet()).iterator(); it.hasNext(); ) {
+				ControlPoint cp = (ControlPoint) it.next();
+				if (cp.getPrev() != null && !cp.getLoop()) {
+					System.out.println(cp);
+					addEdit(new AtomicRemoveCurve(cp));
 				}
 			}
 			
@@ -308,10 +318,10 @@ public class CompoundAutoMirror extends AbstractClone {
 				Point3f p3End = bone.getReferenceEnd();
 				boolean clone = p3Start.x != 0 || p3End.x != 0;
 				if (!clone) {
-					System.out.println("not mirror " + bone);
+//					System.out.println("not mirror " + bone);
 					mapBoneClones.put(bone, bone);
 				} else {
-					System.out.println("mirror " + bone);
+//					System.out.println("mirror " + bone);
 					Vector3f v3Extent = new Vector3f(p3End);
 					v3Extent.sub(p3Start);
 					Bone newBone = new Bone(null, new Point3f(-p3Start.x, p3Start.y, p3Start.z), new Vector3f(-v3Extent.x, v3Extent.y, v3Extent.z));
@@ -348,7 +358,7 @@ public class CompoundAutoMirror extends AbstractClone {
 						if (ax1.z != ax2.z)
 							rev++;
 						
-						System.out.println(bone + " " + dof + "\n\t" + ax1 + "\n\t" + ax2 + "\n" + rev);
+//						System.out.println(bone + " " + dof + "\n\t" + ax1 + "\n\t" + ax2 + "\n" + rev);
 						
 						if (rev == 0 || rev == 3) // 0,1,2 = tested, 3..?
 							newDof.setFlipped(!dof.isFlipped());
@@ -444,12 +454,12 @@ public class CompoundAutoMirror extends AbstractClone {
 			 */
 			//System.out.println(mirrorList);
 			
-			System.out.println("mapClones=" + mapClones);
-			System.out.println("mirrorList=" + mirrorList);
+//			System.out.println("mapClones=" + mapClones);
+//			System.out.println("mirrorList=" + mirrorList);
 			ArrayList newSelections = new ArrayList();
 			for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
 				Selection sel = (Selection) it.next();
-				System.out.println("selection " + sel.getName() + "=" + sel.getMap());
+//				System.out.println("selection " + sel.getName() + "=" + sel.getMap());
 				ControlPoint[] acp = sel.getControlPointArray();
 				boolean mirror = true;
 				boolean expand = false;

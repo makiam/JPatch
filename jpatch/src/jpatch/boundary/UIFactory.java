@@ -1,5 +1,5 @@
 /*
- * $Id: UIFactory.java,v 1.4 2005/11/18 16:00:33 sascha_l Exp $
+ * $Id: UIFactory.java,v 1.5 2005/11/21 14:48:59 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -87,10 +87,10 @@ public class UIFactory extends DefaultHandler {
 	}
 	
 	public void startElement(String namespaceURI, String localName, String qName, Attributes attributes) {	
-		System.out.print("<" + localName);
-		for (int i = 0; i < attributes.getLength(); i++)
-			System.out.print(" " + attributes.getLocalName(i) + "=\"" + attributes.getValue(i) + "\"");
-		System.out.println(">");
+//		System.out.print("<" + localName);
+//		for (int i = 0; i < attributes.getLength(); i++)
+//			System.out.print(" " + attributes.getLocalName(i) + "=\"" + attributes.getValue(i) + "\"");
+//		System.out.println(">");
 		if (localName.equals("toolbar")) {
 			toolBar = new JToolBar();
 			toolBar.setFloatable(false);
