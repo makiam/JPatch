@@ -58,3 +58,4 @@ System.out.println(null == null);
 System.out.println("\n\t\t1,2,3,4".trim());
 System.out.println("\n\t\t1,2,3,4".split("[\\n\\r ,]+")[1]);
 
+System.out.println(Math.signum(-2.0f));

@@ -329,6 +329,7 @@ public class CameraViewport {
 			}
 		});
 		panel.setPreferredSize(new Dimension(640,480));
+		panel.setMinimumSize(new Dimension(0,0));
 	}
 
 	// ADDED DFC
