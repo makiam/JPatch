@@ -208,7 +208,7 @@ public class Bone implements MutableTreeNode {
 	}
 
 	public void insert(MutableTreeNode child, int index) {
-		System.out.println("insert at " + index + "/" + listChildBones.size() + "/" + listDofs.size() + "/" + getChildCount());
+//		System.out.println("insert at " + index + "/" + listChildBones.size() + "/" + listDofs.size() + "/" + getChildCount());
 		if (child instanceof RotationDof)
 			listDofs.add(index, child);
 		else if (child instanceof Bone)

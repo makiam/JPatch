@@ -446,10 +446,10 @@ public class Model implements MutableTreeNode {
 
 	public void addBone(Bone bone) {
 		setBones.add(bone);
-		System.out.println("addBone() called");
-		System.out.println("parent = " + bone.getParent());
+//		System.out.println("addBone() called");
+//		System.out.println("parent = " + bone.getParent());
 		MutableTreeNode node = (MutableTreeNode) bone.getParent();
-		System.out.println(bone + " " + node);
+//		System.out.println(bone + " " + node);
 		if (node == null)
 			node = treenodeBones;
 		MainFrame.getInstance().getTreeModel().insertNodeInto(bone, node, node.getChildCount());	
@@ -460,7 +460,7 @@ public class Model implements MutableTreeNode {
 	}
 
 	public void removeBone(Bone bone) {
-		System.out.println("remove bone from " + bone.getParent());
+//		System.out.println("remove bone from " + bone.getParent());
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(bone);
 		setBones.remove(bone);
 	}
