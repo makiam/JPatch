@@ -251,7 +251,7 @@ implements ModelImporter {
 							else if (value.equals("smooth"))
 								dof.setMode(RotationDof.SMOOTH);
 						} else if (name.equals("min")) {
-							System.out.println("min");
+//							System.out.println("min");
 							dof.setMin(Float.parseFloat(value));
 						} else if (name.equals("max")) {
 							dof.setMax(Float.parseFloat(value));
@@ -457,7 +457,7 @@ implements ModelImporter {
 				if (localName.equals("skeleton")) {
 					for (Iterator it = listBones.iterator(); it.hasNext(); ) {
 						Bone bone = (Bone) it.next();
-						System.out.println(bone.getName());
+//						System.out.println(bone.getName());
 						if (mapBoneParents.containsKey(bone)) {
 							Bone parent = (Bone) listBones.get(((Integer) mapBoneParents.get(bone)).intValue());
 //							parent.insert(bone, parent.getChildCount());
@@ -860,7 +860,7 @@ implements ModelImporter {
 //	}
 	
 	private int[] splitIntoIntArray(String string) {
-		System.out.println("\"" + string + "\"");
+//		System.out.println("\"" + string + "\"");
 		String[] number = string.trim().split("[\\s,]+");
 		int[] ai = new int[number.length];
 		for (int i = 0; i < number.length; i++)
