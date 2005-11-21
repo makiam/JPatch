@@ -110,27 +110,54 @@ public class PoseSliders extends BFrame {
 			if (activeModel != null) {
 				final Model model = activeModel.getModel();
 				morphs.setColumnCount(2);
-				if (model.getMorphList().size() > 0) {
+//				if (model.getMorphList().size() > 0) {
 					ArrayList sliderList = new ArrayList();
 					for (Iterator it = model.getMorphList().iterator(); it.hasNext(); ) {
 						Morph morph = (Morph) it.next();
 						sliderList.add(morph);
+//						System.out.println(morph);
 					}
 					for (Iterator itBone = model.getBoneSet().iterator(); itBone.hasNext(); ) {
 						for (Iterator itDof = ((Bone) itBone.next()).getDofs().iterator(); itDof.hasNext(); ) {
 							RotationDof dof = (RotationDof) itDof.next();
 							sliderList.add(dof);
+//							System.out.println(dof);
 						}
 					}
+//					System.out.println(sliderList.size());
+					LayoutInfo labelLayout = new LayoutInfo(LayoutInfo.WEST, LayoutInfo.HORIZONTAL);
 					morphs.setRowCount(sliderList.size());
+					ArrayList poseSliderList = new ArrayList();
 					for (int row = 0; row < sliderList.size(); row++) {
 						final Morph morph = (Morph) sliderList.get(row);
 						final BSlider slider = new BSlider(morph.getSliderValue(), 0, 100, BSlider.HORIZONTAL);
 						mapSlider.put(morph, slider);
-						BLabel label = new BLabel(morph.toString());
-						morphs.add(label, 0, row);
+						String name;
+						if (morph instanceof RotationDof)
+							name = ((RotationDof) morph).getBone().getName() + "." + morph.getName();
+						else
+							name = morph.getName();
+						BLabel label = new BLabel(name);
+						poseSliderList.add(new PoseSlider(label, slider, morph));
+					}
+					Collections.sort(poseSliderList);
+					for (int row = 0; row < sliderList.size(); row++) {
+						PoseSlider ps = (PoseSlider) poseSliderList.get(row);
+//						final Morph morph = (Morph) sliderList.get(row);
+//						final BSlider slider = new BSlider(morph.getSliderValue(), 0, 100, BSlider.HORIZONTAL);
+//						mapSlider.put(morph, slider);
+//						String name;
+//						if (morph instanceof RotationDof)
+//							name = ((RotationDof) morph).getBone().getName() + "." + morph.getName();
+//						else
+//							name = morph.getName();
+//						BLabel label = new BLabel(name);
+						final BLabel label = ps.label;
+						final BSlider slider = ps.slider;
+						final Morph morph = ps.morph;
+						morphs.add(label, 0, row, labelLayout);
 						morphs.add(slider, 1, row);
-						((JComponent) label.getComponent()).setPreferredSize(new Dimension(80,20));
+//						((JComponent) label.getComponent()).setPreferredSize(new Dimension(80,20));
 						((JComponent) slider.getComponent()).setPreferredSize(new Dimension(100,20));
 						slider.addEventLink(ValueChangedEvent.class, new Object() {
 							void processEvent() {
@@ -143,8 +170,22 @@ public class PoseSliders extends BFrame {
 							}
 						});
 					}
-				}
+//				}
 			}
+		}
+	}
+	
+	private static class PoseSlider implements Comparable {
+		BLabel label;
+		BSlider slider;
+		Morph morph;
+		PoseSlider(BLabel label, BSlider slider, Morph morph) {
+			this.label = label;
+			this.slider = slider;
+			this.morph = morph;
+		}
+		public int compareTo(Object arg0) {
+			return label.getText().compareTo(((PoseSlider) arg0).label.getText());
 		}
 	}
 }
