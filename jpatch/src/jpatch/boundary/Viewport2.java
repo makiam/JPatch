@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.39 2005/11/21 14:48:59 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.40 2005/12/01 16:59:53 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -229,7 +229,7 @@ public class Viewport2 {
 			drawable.setColor(new Color3f(settings.cCurve)); // FIXME
 			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
 				ControlPoint start = (ControlPoint) it.next();
-				if (start.getChildHook() == null)
+				if (!start.isStartHook())
 					drawCurve(start);
 			}
 		}

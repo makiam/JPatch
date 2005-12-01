@@ -13,10 +13,10 @@ public final class AtomicReverseCurve extends JPatchAtomicEdit {
 
 	private ControlPoint cpStart;
 	
-	public AtomicReverseCurve(ControlPoint start) {
+	public AtomicReverseCurve(ControlPoint cp) {
 		if (DEBUG)
-			System.out.println(getClass().getName() + "(" + start + ")");
-		cpStart = start;
+			System.out.println(getClass().getName() + "(" + cp + ")");
+		cpStart = cp.getStart();
 		if (cpStart.getLoop())
 			throw new IllegalArgumentException(this.getClass().getName() + " can't be applied to closed (looped) curve starting at " + cpStart);
 		reverseCurve(cpStart);

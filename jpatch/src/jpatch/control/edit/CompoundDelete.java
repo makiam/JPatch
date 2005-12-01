@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundDelete.java,v 1.7 2005/11/20 12:19:09 sascha_l Exp $
+ * $Id: CompoundDelete.java,v 1.8 2005/12/01 16:59:53 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -147,16 +147,17 @@ public class CompoundDelete extends JPatchCompoundEdit {
 //	}
 	
 	private boolean dropCurve(ControlPoint start, Collection objects) {
-		boolean consecutive = false;
-		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
-			if (!objects.contains(cp.getHead())) {
-				if (consecutive)
-					return false;
-				consecutive = true;
-			} else {
-				consecutive = false;
-			}
-		}
-		return true;
+//		boolean consecutive = false;
+//		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
+//			if (!objects.contains(cp.getHead())) {
+//				if (consecutive)
+//					return false;
+//				consecutive = true;
+//			} else {
+//				consecutive = false;
+//			}
+//		}
+//		return true;
+		return false;
 	}
 }

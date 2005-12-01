@@ -81,6 +81,12 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			mapCPs.clear();
 			for (Iterator it = setCPs.iterator(); it.hasNext(); ) {
 				ControlPoint cpToClone = (ControlPoint) it.next();
+				if (cpToClone.isStart() || cpToClone.isEnd()) {
+					float x = cpToClone.getReferencePosition().x;
+					float z = cpToClone.getReferencePosition().z;
+					if (x * x + z * z == 0)
+						continue;
+				}
 				ControlPoint cpClone = new ControlPoint(cpToClone);
 				mapCPs.put(cpToClone, cpClone);
 			}
@@ -89,6 +95,8 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			for (Iterator it = setCPs.iterator(); it.hasNext(); ) {
 				ControlPoint cpToClone = (ControlPoint) it.next();
 				ControlPoint cpClone = (ControlPoint) mapCPs.get(cpToClone);
+				if (cpClone == null)
+					continue;
 				cpClone.setNext((ControlPoint) mapCPs.get(cpToClone.getNext()));
 				cpClone.setPrev((ControlPoint) mapCPs.get(cpToClone.getPrev()));
 				cpClone.setNextAttached((ControlPoint) mapCPs.get(cpToClone.getNextAttached()));
@@ -102,6 +110,9 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			for (Iterator it = setCPs.iterator(); it.hasNext(); ) {
 				ControlPoint cpToClone = (ControlPoint) it.next();
 				ControlPoint cpClone = (ControlPoint) mapCPs.get(cpToClone);
+				
+				if (cpClone == null)
+					continue;
 				
 				/* check if the cloned curve is closed */
 				if (cpToClone.getLoop()) {
@@ -145,6 +156,10 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			for (Iterator it = setCPs.iterator(); it.hasNext(); ) {
 				ControlPoint cpToClone = (ControlPoint) it.next();
 				ControlPoint cpClone = (ControlPoint) mapCPs.get(cpToClone);
+				
+				if (cpClone == null)
+					continue;
+				
 				if (cpClone.isHead()) {
 				//if (cpClone.isHead() && !cpClone.isHook()) {
 					/* if we are a head, add us to the new selection */
@@ -162,6 +177,10 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			for (Iterator it = setCPs.iterator(); it.hasNext(); ) {
 				ControlPoint cpToClone = (ControlPoint) it.next();
 				ControlPoint cpClone = (ControlPoint) mapCPs.get(cpToClone);
+				
+				if (cpClone == null)
+					continue;
+				
 				if (cpClone.getPrev() != null || cpClone.getNext() != null) {
 					cpLathe[i][s] = cpClone;
 				}
@@ -278,6 +297,10 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			//	}
 			//}
 		}
+		
+		if (true)
+			return;
+		
 			/* create lathe curves */
 		int n = setCPs.size();
 		ControlPoint[] newCp = new ControlPoint[iSegments];
@@ -287,10 +310,10 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			if (cp != null && cp.isHead()) {
 				boolean addCircle = true;
 				if (cp.isStart() || cp.isEnd()) {
-					float x = cp.getPosition().x;
-					float z = cp.getPosition().z;
+					float x = cp.getReferencePosition().x;
+					float z = cp.getReferencePosition().z;
 					//System.out.println(x + " " + z + " " + (x*x+z*z));
-					if (x * x + z * z < epsilon * epsilon) {
+					if (x * x + z * z <= epsilon * epsilon) {
 						//System.out.println("*");
 						addCircle = false;
 					}
