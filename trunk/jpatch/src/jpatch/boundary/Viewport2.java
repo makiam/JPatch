@@ -229,7 +229,7 @@ public class Viewport2 {
 			drawable.setColor(new Color3f(settings.cCurve)); // FIXME
 			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
 				ControlPoint start = (ControlPoint) it.next();
-				if (start.getChildHook() == null)
+				if (!start.isStartHook())
 					drawCurve(start);
 			}
 		}

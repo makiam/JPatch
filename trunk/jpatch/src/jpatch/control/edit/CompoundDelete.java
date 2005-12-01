@@ -147,16 +147,17 @@ public class CompoundDelete extends JPatchCompoundEdit {
 //	}
 	
 	private boolean dropCurve(ControlPoint start, Collection objects) {
-		boolean consecutive = false;
-		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
-			if (!objects.contains(cp.getHead())) {
-				if (consecutive)
-					return false;
-				consecutive = true;
-			} else {
-				consecutive = false;
-			}
-		}
-		return true;
+//		boolean consecutive = false;
+//		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
+//			if (!objects.contains(cp.getHead())) {
+//				if (consecutive)
+//					return false;
+//				consecutive = true;
+//			} else {
+//				consecutive = false;
+//			}
+//		}
+//		return true;
+		return false;
 	}
 }
