@@ -23,7 +23,7 @@ public final class NextCurveAction extends AbstractAction {
 //		}
 		
 		Selection selection = MainFrame.getInstance().getSelection();
-		if (!selection.isSingle())
+		if (selection == null || !selection.isSingle())
 			return;
 		Object object = selection.getHotObject();
 		if (!(object instanceof ControlPoint))

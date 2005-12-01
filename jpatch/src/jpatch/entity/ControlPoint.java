@@ -1114,7 +1114,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 */
 	 
 	public boolean isStartHook() {
-		return (isHook() && fHookPos == 0f);
+		return (fHookPos == 0f);
 	}
 	
 
@@ -1935,7 +1935,7 @@ public class ControlPoint implements Comparable, Transformable {
 	//cpEnd.attachTo(cpNext);
 		cpStart.fHookPos = 0f;
 		cpEnd.fHookPos = 1f;
-		cpChildHook = cpStart;
+//		cpChildHook = cpStart;
 	//cpNext.cpChildHook = cpEnd;
 		cpEnd.appendTo(cpStart);
 		return cpStart;
