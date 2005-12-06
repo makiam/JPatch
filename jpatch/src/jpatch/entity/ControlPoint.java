@@ -408,7 +408,8 @@ public class ControlPoint implements Comparable, Transformable {
 		ControlPoint cp;
 		ControlPoint cpHook;
 		if (cpChildHook == null) {
-			MainFrame.getInstance().getModel().addCurve(createEmptyHookCurve());
+			cpChildHook = createEmptyHookCurve();
+			MainFrame.getInstance().getModel().addCurve(cpChildHook);
 		}
 		cp = cpChildHook;
 		while (cp.cpNext != null && cp.cpNext.fHookPos < hookPos) {
