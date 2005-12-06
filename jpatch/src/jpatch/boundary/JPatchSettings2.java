@@ -21,47 +21,52 @@
  */
 package jpatch.boundary;
 
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.List;
 import java.util.prefs.*;
 
 import javax.swing.*;
-import javax.swing.event.TableModelListener;
+import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.tree.*;
+import javax.vecmath.*;
+
+import jpatch.entity.Model;
 
 /**
  * @author sascha
  *
  */
-public class JPatchSettings2 implements TreeNode, TableModel {
+public class JPatchSettings2 implements TreeNode {
 	private Preferences userPrefs = Preferences.userRoot().node("/JPatch/Preferences");
 	private Map mapDefaults = new HashMap();
 	private List<Field> fields = new ArrayList<Field>();
 	private List<TreeNode> children = new ArrayList<TreeNode>();
 	private TreeNode parent = null;
 	private String nodeName = "settings";
+	private Icon icon = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/prefs/settings.png"));
 	private TableModel tableModel = new AbstractTableModel() {
 		public int getRowCount() {
 			return fields.size();
 		}
 
 		public int getColumnCount() {
-			return 3;
+			return 2;
 		}
 
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			switch (columnIndex) {
 			case 0:
 				return fields.get(rowIndex).getName().replace('_', ' ');
+//			case 1:
+//				return fields.get(rowIndex).getType().getSimpleName();
 			case 1:
-				return fields.get(rowIndex).getType().getSimpleName();
-			case 2:
 				try {
 					Object o = fields.get(rowIndex).get(JPatchSettings2.this);
 					if (o != null)
@@ -80,34 +85,324 @@ public class JPatchSettings2 implements TreeNode, TableModel {
 			}
 		}
 		
+		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+			try {
+				Field field = fields.get(rowIndex);
+				if (field.getType().equals(String.class)) {
+					fields.get(rowIndex).set(JPatchSettings2.this, aValue);	
+				} else if (field.getType().equals(int.class)) {
+					fields.get(rowIndex).set(JPatchSettings2.this, Integer.parseInt((String) aValue));
+				} else if (field.getType().equals(long.class)) {
+					fields.get(rowIndex).set(JPatchSettings2.this, Long.parseLong((String) aValue));
+				} else if (field.getType().equals(short.class)) {
+					fields.get(rowIndex).set(JPatchSettings2.this, Short.parseShort((String) aValue));
+				} else if (field.getType().equals(byte.class)) {
+					fields.get(rowIndex).set(JPatchSettings2.this, Byte.parseByte((String) aValue));
+				} else if (field.getType().equals(char.class)) {
+					char[] ca = ((String) aValue).toCharArray();
+					if (ca.length > 0)
+						fields.get(rowIndex).set(JPatchSettings2.this, ca[0]);
+				} else if (field.getType().equals(float.class)) {
+					fields.get(rowIndex).set(JPatchSettings2.this, Float.parseFloat((String) aValue));
+				} else if (field.getType().equals(double.class)) {
+					fields.get(rowIndex).set(JPatchSettings2.this, Double.parseDouble((String) aValue));
+				}
+			} catch (Exception e) {
+//				e.printStackTrace();
+			}
+		}
+		
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return columnIndex == 2;
+			return columnIndex == 1;
+		}
+	};
+	
+	private JTable table = new JTable();
+	
+	private TreeCellRenderer treeCellRenderer = new DefaultTreeCellRenderer() {
+		public Component getTreeCellRendererComponent(JTree tree,Object value,boolean sel,boolean expanded,boolean leaf,int row,boolean hasFocus) {
+			super.getTreeCellRendererComponent(tree,value,sel,expanded,leaf,row,hasFocus);
+			setIcon(((JPatchSettings2) value).getIcon());
+			return this;
 		}
 	};
 	
 	private TableCellRenderer tableCellRenderer = new DefaultTableCellRenderer() {
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-			if (column < 3) {
-				Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-				if (!isDefault(fields.get(row)))
-					component.setFont(component.getFont().deriveFont(Font.BOLD));
-//				return new JLabel(value.getClass().getSimpleName() + " " + value);
-				return component;
+			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+//			JLabel label = new JLabel();
+//			label.setBackground(getBackground());
+//			label.setForeground(getForeground());
+//			label.setBorder(getBorder());
+//			label.setText(getText());
+//			label.setFont(getFont())
+			if (column == 0) {
+				setFocusable(false);
+//				setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+//				setText(getText() + ": ");
 			} else {
-				
-				JCheckBox button = new JCheckBox("Reset");
-				button.addActionListener(new ActionListener() {
-
-					public void actionPerformed(ActionEvent e) {
-						System.out.println("*");
-						
-					}
-					
-				});
-				return button;
+				setFocusable(true);
+//				setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
 			}
+			
+//				if (value instanceof Color) {
+//					JLabel label = new JLabel();
+//					label.setBackground((Color) value);
+//					label.setOpaque(true);
+//					return label;
+//				}
+//				if (value instanceof Boolean)
+//					return tableCellEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
+//				if (!isDefault(fields.get(row)))
+//					setFont(getFont().deriveFont(Font.BOLD));
+				if (value instanceof Color) {
+					Color color = (Color) value;
+					setText(" [" + color.getRed() + " " + color.getBlue() + " " + color.getGreen() + "]");
+//					label.setBackground((Color) value);
+//					label.setOpaque(true);
+					setIcon(new ColorIcon(color));
+				} else if (value instanceof Color3f) {
+					Color color = ((Color3f) value).get();
+					setText(" [" + color.getRed() + " " + color.getBlue() + " " + color.getGreen() + "]");
+//					label.setBackground((Color) value);
+//					label.setOpaque(true);
+					setIcon(new ColorIcon(color));
+				} else {
+					setIcon(null);
+				}
+				if (value instanceof File) {
+					File file = (File) value;
+					setText(file.getAbsolutePath());
+				}
+//				return new JLabel(value.getClass().getSimpleName() + " " + value);
+				if (column == 1) {
+					setOpaque(true);
+					if (!isSelected)
+						setBackground(Color.WHITE);
+					setToolTipText("doubleclick to edit");
+				} else {
+					setOpaque(false);
+//					setBackground(new JPanel().getBackground());
+					setBorder(noFocusBorder);
+					setToolTipText(null);
+				}
+//				setOpaque(true);
+				return this;
+			
 		}
 	};
+	
+	private DefaultCellEditor tableCellEditor = new DefaultCellEditor(new JTextField()) {
+//		private JCheckBox checkBox = new JCheckBox();
+//		private JComboBox comboBox = new JComboBox();
+//		private TableCellEditor checkBoxCellEditor = new DefaultCellEditor(checkBox);
+//		private TableCellEditor comboBoxCellEditor = new DefaultCellEditor(comboBox);
+		public Component getTableCellEditorComponent(final JTable table, Object value, boolean isSelected, final int row, int column) {
+			if (value instanceof Boolean) {
+				final JComboBox comboBox = new JComboBox();
+				comboBox.addItem(true);
+				comboBox.addItem(false);
+				try {
+					comboBox.setSelectedItem(fields.get(row).get(JPatchSettings2.this));
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+				comboBox.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent event) {
+//						System.out.println(event);
+//						System.out.println("boolean itemChanged " + comboBox.hashCode() + " " + comboBox.getSelectedItem());
+						try {
+							fields.get(row).set(JPatchSettings2.this, comboBox.getSelectedItem());
+						} catch (IllegalAccessException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				return comboBox;
+			} else if (value instanceof Enum) {
+				final JComboBox comboBox = new JComboBox();
+				for (Object o:((Enum) value).getDeclaringClass().getEnumConstants())
+					comboBox.addItem(o);
+				try {
+					comboBox.setSelectedItem(fields.get(row).get(JPatchSettings2.this));
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+				comboBox.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent event) {
+//						System.out.println(event);
+//						System.out.println("boolean itemChanged " + comboBox.hashCode() + " " + comboBox.getSelectedItem());
+						try {
+							System.out.println(fields.get(row));
+							fields.get(row).set(JPatchSettings2.this, comboBox.getSelectedItem());
+						} catch (IllegalAccessException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				return comboBox;
+//				checkBox.setSelected((Boolean) value);
+//				return checkBoxCellEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
+//			} else if (value instanceof Enum) {
+//				for (ActionListener l:comboBox.getActionListeners())
+//					comboBox.removeActionListener(l);
+//				comboBox.addActionListener(new ActionListener() {
+//					public void actionPerformed(ActionEvent e) {
+//						System.out.println("enum itemChanged " + this + " " + comboBox.getSelectedItem());
+//						try {
+//							fields.get(row).set(JPatchSettings2.this, comboBox.getSelectedItem());
+//						} catch (IllegalArgumentException e1) {
+//							// TODO Auto-generated catch block
+//							e1.printStackTrace();
+//						} catch (IllegalAccessException e1) {
+//							// TODO Auto-generated catch block
+//							e1.printStackTrace();
+//						}
+//					}
+//				});
+//				comboBox.removeAllItems();
+//				for (Object o:((Enum) value).getDeclaringClass().getEnumConstants())
+//					comboBox.addItem(o);
+//				return comboBoxCellEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
+			} else if (value instanceof Color) {
+				Color color = JColorChooser.showDialog(table, "Choose a color", (Color) value);
+				if (color == null)
+					color = (Color) value;
+				try {
+					fields.get(row).set(JPatchSettings2.this, color);
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+				JLabel label = (JLabel) tableCellRenderer.getTableCellRendererComponent(table, value, isSelected, true, row, column);
+				JLabel newLabel = new JLabel();
+				newLabel.setForeground(label.getForeground());
+				newLabel.setBackground(label.getBackground());
+				newLabel.setBorder(label.getBorder());
+				newLabel.setText(" [" + color.getRed() + " " + color.getBlue() + " " + color.getGreen() + "]");
+				newLabel.setIcon(new ColorIcon(color));
+				newLabel.setOpaque(label.isOpaque());
+//				label.setBackground(color);
+//				label.setOpaque(true);
+				table.repaint();
+				return newLabel;
+			} else if (value instanceof Color3f) {
+				Color color = JColorChooser.showDialog(table, "Choose a color", ((Color3f) value).get());
+				if (color == null)
+					color = ((Color3f) value).get();
+				try {
+					fields.get(row).set(JPatchSettings2.this, new Color3f(color));
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+				JLabel label = (JLabel) tableCellRenderer.getTableCellRendererComponent(table, value, isSelected, true, row, column);
+				JLabel newLabel = new JLabel();
+				newLabel.setForeground(label.getForeground());
+				newLabel.setBackground(label.getBackground());
+				newLabel.setBorder(label.getBorder());
+				newLabel.setText(" [" + color.getRed() + " " + color.getBlue() + " " + color.getGreen() + "]");
+				newLabel.setIcon(new ColorIcon(color));
+				newLabel.setOpaque(label.isOpaque());
+//				label.setBackground(color);
+//				label.setOpaque(true);
+				table.repaint();
+				return newLabel;
+			} else if (value instanceof File) {
+				File file = (File) value;
+				JFileChooser fileChooser = new JFileChooser();
+//				System.out.println(file + " " + file.isFile() + " " + file.isDirectory());
+				if (file.isDirectory()) {
+					fileChooser.setSelectedFile(file);
+					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				} else {
+					fileChooser.setSelectedFile(file);
+					fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				}
+				if (fileChooser.showDialog(table, "Select") == JFileChooser.APPROVE_OPTION) {
+					file = fileChooser.getSelectedFile();
+					try {
+						fields.get(row).set(JPatchSettings2.this, file);
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					}
+				}
+				JLabel label = (JLabel) tableCellRenderer.getTableCellRendererComponent(table, value, isSelected, true, row, column);
+				JLabel newLabel = new JLabel();
+				newLabel.setForeground(label.getForeground());
+				newLabel.setBackground(label.getBackground());
+				newLabel.setBorder(label.getBorder());
+				newLabel.setText(file.getAbsolutePath());
+				newLabel.setFont(label.getFont());
+				newLabel.setOpaque(label.isOpaque());
+//				label.setBackground(color);
+//				label.setOpaque(true);
+				table.repaint();
+				return newLabel;
+//				return tableCellRenderer.getTableCellRendererComponent(table, value, isSelected, true, row, column);
+//			} else if (value instanceof String) {
+//				final JTextField textField = new JTextField();
+//				try {
+//					textField.setText((String) fields.get(row).get(JPatchSettings2.this));
+//				} catch (IllegalAccessException e) {
+//					e.printStackTrace();
+//				}
+//				class Updater {
+//					void update(Component component) {
+//						try {
+//							System.out.println("update" + row);
+//							fields.get(row).set(JPatchSettings2.this, textField.getText());
+//							component.transferFocus();
+//							table.repaint();
+//						} catch (IllegalAccessException e) {
+//							e.printStackTrace();
+//						}
+//					}
+//				};
+//				final Updater updater = new Updater();
+//				
+//				textField.addActionListener(new ActionListener() {
+//					public void actionPerformed(ActionEvent event) {
+//						System.out.println("actionPerformed");
+//						updater.update((Component) event.getSource());
+//					}
+//				});
+//				textField.addFocusListener(new FocusListener() {
+//					public void focusGained(FocusEvent event) { }
+//					
+//					public void focusLost(FocusEvent event) {
+//						System.out.println("focus");
+//						updater.update((Component) event.getSource());
+//					}
+//				});
+//				textField.addCaretListener(new CaretListener() {
+//
+//					public void caretUpdate(CaretEvent e) {
+//						System.out.println("caret " + e);
+//						
+//					}
+//					
+//				});
+//				
+//				return textField;
+//			}
+			}
+			return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+		}
+	};
+	
+	public JPatchSettings2() {
+		table.setModel(tableModel);
+		table.setShowGrid(false);
+		table.setBackground(new JPanel().getBackground());
+		table.setShowHorizontalLines(true);
+		table.setGridColor(Color.WHITE);
+		table.setShowVerticalLines(false);
+		table.getColumnModel().getColumn(0).setHeaderValue("Preference Name");
+//		table.getColumnModel().getColumn(1).setHeaderValue("Type");
+		table.getColumnModel().getColumn(1).setHeaderValue("Value");
+		table.setDefaultEditor(Object.class, tableCellEditor);
+		table.setDefaultRenderer(Object.class, tableCellRenderer);
+//		tableCellEditor.setClickCountToStart(1);
+	}
 	
 	public void setNodeName(String nodeName) {
 		this.nodeName = nodeName;
@@ -121,8 +416,16 @@ public class JPatchSettings2 implements TreeNode, TableModel {
 		return fields;
 	}
 	
-	public TableCellRenderer getTableCellRenderer() {
-		return tableCellRenderer;
+	public TreeCellRenderer getTreeCellRenderer() {
+		return treeCellRenderer;
+	}
+	
+	public TableCellEditor getTableCellEditor() {
+		return tableCellEditor;
+	}
+	
+	public JTable getTable() {
+		return table;
 	}
 	
 	public void initTree() {
@@ -131,21 +434,23 @@ public class JPatchSettings2 implements TreeNode, TableModel {
 				if (JPatchSettings2.class.isAssignableFrom(field.getType())) {
 					JPatchSettings2 childNode = (JPatchSettings2) field.get(this);
 					childNode.initTree();
+					childNode.setParent(this);
+					childNode.setNodeName(field.getName());
 					children.add(childNode);
 				} else {
 					fields.add(field);
 				}
 			}
-			Collections.sort(children, new Comparator<TreeNode>() {
-				public int compare(TreeNode o1, TreeNode o2) {
-					return o1.toString().compareTo(o2.toString());
-				}
-			});
-			Collections.sort(fields, new Comparator<Field>() {
-				public int compare(Field o1, Field o2) {
-					return o1.getName().compareTo(o2.getName());
-				}
-			});
+//			Collections.sort(children, new Comparator<TreeNode>() {
+//				public int compare(TreeNode o1, TreeNode o2) {
+//					return o1.toString().compareTo(o2.toString());
+//				}
+//			});
+//			Collections.sort(fields, new Comparator<Field>() {
+//				public int compare(Field o1, Field o2) {
+//					return o1.getName().compareTo(o2.getName());
+//				}
+//			});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -286,6 +591,14 @@ public class JPatchSettings2 implements TreeNode, TableModel {
 		}
 	}
 	
+	public TableModel getTableModel() {
+		return tableModel;
+	}
+	
+	public Icon getIcon() {
+		return icon;
+	}
+	
 	/*
 	 * TreeNode interface implementation
 	 */
@@ -319,46 +632,81 @@ public class JPatchSettings2 implements TreeNode, TableModel {
 	}
 	
 	public String toString() {
-		return nodeName;
+		return nodeName.replace('_', ' ');
 	}
 
-	/*
-	 * TableModel interface implementation
-	 */
-	
-	public int getRowCount() {
-		return tableModel.getRowCount();
-	}
+//	/*
+//	 * TableModel interface implementation
+//	 */
+//	
+//	public int getRowCount() {
+//		return tableModel.getRowCount();
+//	}
+//
+//	public int getColumnCount() {
+//		return tableModel.getColumnCount();
+//	}
+//
+//	public String getColumnName(int columnIndex) {
+//		return tableModel.getColumnName(columnIndex);
+//	}
+//
+//	public Class<?> getColumnClass(int columnIndex) {
+//		return tableModel.getColumnClass(columnIndex);
+//	}
+//
+//	public boolean isCellEditable(int rowIndex, int columnIndex) {
+//		return tableModel.isCellEditable(rowIndex, columnIndex);
+//	}
+//
+//	public Object getValueAt(int rowIndex, int columnIndex) {
+//		return tableModel.getValueAt(rowIndex, columnIndex);
+//	}
+//
+//	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+//		tableModel.setValueAt(aValue, rowIndex, columnIndex);		
+//	}
+//
+//	public void addTableModelListener(TableModelListener l) {
+//		tableModel.addTableModelListener(l);	
+//	}
+//
+//	public void removeTableModelListener(TableModelListener l) {
+//		tableModel.removeTableModelListener(l);
+//	}
+//	
+	public class ColorIcon implements Icon {
+		private Color color;
+		/* (non-Javadoc)
+		 * @see javax.swing.Icon#paintIcon(java.awt.Component, java.awt.Graphics, int, int)
+		 */
+		
+		public ColorIcon(Color color) {
+			this.color = color;
+		}
+		
+		public void paintIcon(Component c, Graphics g, int x, int y) {
+			g.setColor(color);
+			g.fillRect(2, 2, 10, 10);
+			g.setColor(Color.BLACK);
+			g.drawRect(2, 2, 10, 10);
+		}
 
-	public int getColumnCount() {
-		return tableModel.getColumnCount();
-	}
+		/* (non-Javadoc)
+		 * @see javax.swing.Icon#getIconWidth()
+		 */
+		public int getIconWidth() {
+			// TODO Auto-generated method stub
+			return 10;
+		}
 
-	public String getColumnName(int columnIndex) {
-		return tableModel.getColumnName(columnIndex);
-	}
-
-	public Class<?> getColumnClass(int columnIndex) {
-		return tableModel.getColumnClass(columnIndex);
-	}
-
-	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		return tableModel.isCellEditable(rowIndex, columnIndex);
-	}
-
-	public Object getValueAt(int rowIndex, int columnIndex) {
-		return tableModel.getValueAt(rowIndex, columnIndex);
-	}
-
-	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		tableModel.setValueAt(aValue, rowIndex, columnIndex);		
-	}
-
-	public void addTableModelListener(TableModelListener l) {
-		tableModel.addTableModelListener(l);	
-	}
-
-	public void removeTableModelListener(TableModelListener l) {
-		tableModel.removeTableModelListener(l);
+		/* (non-Javadoc)
+		 * @see javax.swing.Icon#getIconHeight()
+		 */
+		public int getIconHeight() {
+			// TODO Auto-generated method stub
+			return 10;
+		}
+		
 	}
 }

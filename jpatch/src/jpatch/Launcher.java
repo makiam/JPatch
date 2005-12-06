@@ -42,12 +42,15 @@ public final class Launcher {
 			ColumnContainer container = new ColumnContainer();
 			BButton buttonModeler = new BButton("Start JPatch Modeler");
 			BButton buttonAnimator = new BButton("Start JPatch Animator");
+			BButton buttonSettings = new BButton("Preferences");
 			buttonModeler.addEventLink(CommandEvent.class, new Launcher(), "launchModeler");
 			buttonAnimator.addEventLink(CommandEvent.class, new Launcher(), "launchAnimator");
+			buttonSettings.addEventLink(CommandEvent.class, new Launcher(), "settings");
 			BLabel labelInfo1 = new BLabel("You can start the modeler\n or animator directly by");
 			BLabel labelInfo2 = new BLabel("using the -modeler or -animator commandline options");
 			container.add(buttonModeler);
 			container.add(buttonAnimator);
+			container.add(buttonSettings);
 			container.add(labelInfo1);
 			container.add(labelInfo2);
 			frame.setContent(container);
@@ -67,5 +70,9 @@ public final class Launcher {
 		Model model = new Model();
 		new MainFrame(model);
 		if (frame != null) frame.dispose();
+	}
+	
+	private static void settings() {
+		JPatchUserSettings.main(new String[0]);
 	}
 }
