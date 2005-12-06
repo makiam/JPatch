@@ -27,6 +27,7 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 		
 		
 		float mag = Functions.optimumCurvature(iSegments);
+		float mag4 = Functions.optimumCurvature(4);
 		
 		Set setCPs = new HashSet();
 		for (int i = 0; i < acp.length; i++) {
@@ -81,12 +82,12 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			mapCPs.clear();
 			for (Iterator it = setCPs.iterator(); it.hasNext(); ) {
 				ControlPoint cpToClone = (ControlPoint) it.next();
-				if (cpToClone.isStart() || cpToClone.isEnd()) {
-					float x = cpToClone.getReferencePosition().x;
-					float z = cpToClone.getReferencePosition().z;
-					if (x * x + z * z == 0)
-						continue;
-				}
+//				if (cpToClone.isStart() || cpToClone.isEnd()) {
+//					float x = cpToClone.getReferencePosition().x;
+//					float z = cpToClone.getReferencePosition().z;
+//					if (x * x + z * z == 0)
+//						continue;
+//				}
 				ControlPoint cpClone = new ControlPoint(cpToClone);
 				mapCPs.put(cpToClone, cpClone);
 			}
@@ -298,7 +299,7 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			//}
 		}
 		
-		if (true)
+		if (false)
 			return;
 		
 			/* create lathe curves */
@@ -309,16 +310,31 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			//if (cp != null) {
 			if (cp != null && cp.isHead()) {
 				boolean addCircle = true;
+				boolean hookCurve = false;
 				if (cp.isStart() || cp.isEnd()) {
 					float x = cp.getReferencePosition().x;
 					float z = cp.getReferencePosition().z;
-					//System.out.println(x + " " + z + " " + (x*x+z*z));
 					if (x * x + z * z <= epsilon * epsilon) {
-						//System.out.println("*");
 						addCircle = false;
 					}
 				}
-				
+				if (cp.getNext() != null && (cp.getNext().isStart() || cp.getNext().isEnd())) {
+					float x = cp.getNext().getReferencePosition().x;
+					float z = cp.getNext().getReferencePosition().z;
+					if (x * x + z * z <= epsilon * epsilon) {
+						addCircle = false;
+						hookCurve = true;
+					}
+				}
+				if (cp.getPrev() != null && (cp.getPrev().isStart() || cp.getPrev().isEnd())) {
+					float x = cp.getPrev().getReferencePosition().x;
+					float z = cp.getPrev().getReferencePosition().z;
+					if (x * x + z * z <= epsilon * epsilon) {
+						addCircle = false;
+						hookCurve = true;
+					}
+				}
+				System.out.println(cp + " " + addCircle + " " + hookCurve);
 				if (addCircle) {
 					for (int s = 0; s < iSegments; s++) {
 						newCp[s] = new ControlPoint();
@@ -337,28 +353,64 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 //					Curve curve = new Curve(newCp[0]);
 //					curve.validate();
 					addEdit(new AtomicAddCurve(newCp[0]));
-				} else {
+				} else if (!hookCurve) {
 					if (iSegments % 2 == 0) {
-						for (int s = 0; s < iSegments / 2; s++) {
+						for (int s = 0; s < iSegments / 2; s += iSegments / 4) {
 							//addEdit(new 
 							addEdit(new CompoundWeldControlPoints(cpLathe[p][s],cpLathe[p][s + iSegments / 2]));
 						}
-						for (int s = iSegments / 2 + 1; s < iSegments; s++) {
-							addEdit(new AtomicAttachControlPoints(cpLathe[p][s],cpLathe[p][s - 1]));
+						for (int s = iSegments / 2 + iSegments / 4; s < iSegments; s += iSegments / 4) {
+							addEdit(new AtomicAttachControlPoints(cpLathe[p][s],cpLathe[p][s - iSegments / 4]));
 						}
-						addEdit(new AtomicMoveControlPoints(new ControlPoint[] { cpLathe[p][iSegments / 2] } ));
-						cpLathe[p][iSegments / 2].setPosition(0,cpLathe[p][iSegments / 2].getPosition().y,0);
+						for (int s = 0; s < iSegments; s++)
+							if (s % (iSegments / 4) != 0)
+								addEdit(new CompoundDeleteControlPoint(cpLathe[p][s]));
+					
+//						addEdit(new AtomicMoveControlPoints(new ControlPoint[] { cpLathe[p][iSegments / 2] } ));
+//						cpLathe[p][iSegments / 2].setPosition(0,cpLathe[p][iSegments / 2].getPosition().y,0);
 						//addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,new ControlPoint[] { cpLathe[p][iSegments / 2] } ));
 						pointList.add(cpLathe[p][iSegments / 2]);
 					} else {
-						for (int s = 1; s < iSegments; s++) {
-							addEdit(new AtomicAttachControlPoints(cpLathe[p][s],cpLathe[p][s - 1]));
-						}
-						addEdit(new AtomicMoveControlPoints(new ControlPoint[] { cpLathe[p][0] } ));
-						cpLathe[p][0].setPosition(0,cpLathe[p][0].getPosition().y,0);
-						//addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,new ControlPoint[] { cpLathe[p][0] } ));
-						pointList.add(cpLathe[p][0]);
+//						for (int s = 1; s < iSegments; s++) {
+//							addEdit(new AtomicAttachControlPoints(cpLathe[p][s],cpLathe[p][s - 1]));
+//						}
+//						addEdit(new AtomicMoveControlPoints(new ControlPoint[] { cpLathe[p][0] } ));
+//						cpLathe[p][0].setPosition(0,cpLathe[p][0].getPosition().y,0);
+//						//addEdit(new MoveControlPointsEdit(MoveControlPointsEdit.TRANSLATE,new ControlPoint[] { cpLathe[p][0] } ));
+//						pointList.add(cpLathe[p][0]);
 					}
+				} else {
+					for (int s = 0; s < iSegments; s += iSegments / 4) {
+						newCp[s] = new ControlPoint();
+						//newCp[s].setMode(ControlPoint.JPATCH_G3);
+						addEdit(new AtomicAttachControlPoints(newCp[s],cpLathe[p][s].getTail()));
+						pointList.add(newCp[s].getHead());
+					}
+					ControlPoint startHook = null;
+					for (int s = 0; s < iSegments; s ++) {
+						int sm = s % (iSegments / 4);
+						System.out.println("#####" + sm);
+						if (sm == 0) {
+							int prev = (s - iSegments / 4 + iSegments) % iSegments;
+							int next = (s + iSegments / 4) % iSegments;
+							newCp[s].setNext(newCp[next]);
+							newCp[s].setPrev(newCp[prev]);
+							newCp[s].setMagnitude(mag4);
+							System.out.println(newCp[s]);
+							startHook = newCp[s];
+//							newCp[s].setChildHook(startHook);
+						} else {
+							System.out.println(cpLathe[p][s].getTail() + " hookto " + startHook + " " + (float) (s % (iSegments / 4)) / (iSegments / 4));
+							
+							addEdit(new CompoundHook(cpLathe[p][s].getTail(), startHook, (float) (s % (iSegments / 4)) / (iSegments / 4)));
+							
+//							cpLathe[p][s].getTail().hookTo(startHook, (float) (s % (iSegments / 4)) / (iSegments / 4));
+						}
+					}
+					newCp[0].setLoop(true);
+//					Curve curve = new Curve(newCp[0]);
+//					curve.validate();
+					addEdit(new AtomicAddCurve(newCp[0]));
 				}
 			}
 		}

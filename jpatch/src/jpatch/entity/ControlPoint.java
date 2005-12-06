@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.18 2005/12/01 16:59:53 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.19 2005/12/06 20:43:07 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -38,7 +38,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.18 $
+ * @version    $Revision: 1.19 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -408,7 +408,8 @@ public class ControlPoint implements Comparable, Transformable {
 		ControlPoint cp;
 		ControlPoint cpHook;
 		if (cpChildHook == null) {
-			MainFrame.getInstance().getModel().addCurve(createEmptyHookCurve());
+			cpChildHook = createEmptyHookCurve();
+			MainFrame.getInstance().getModel().addCurve(cpChildHook);
 		}
 		cp = cpChildHook;
 		while (cp.cpNext != null && cp.cpNext.fHookPos < hookPos) {
