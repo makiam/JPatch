@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundDelete.java,v 1.8 2005/12/01 16:59:53 sascha_l Exp $
+ * $Id: CompoundDelete.java,v 1.9 2005/12/07 16:31:41 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -46,7 +46,8 @@ public class CompoundDelete extends JPatchCompoundEdit {
 			if (object instanceof ControlPoint) {
 				ControlPoint head = (ControlPoint) object;
 				for (ControlPoint cp = head; cp != null; cp = cp.getPrevAttached()) {
-					controlPointSet.add(cp);
+					if (!cp.isHook())
+						controlPointSet.add(cp);
 				}
 			} else if (object instanceof Bone.BoneTransformable) {
 				btSet.add(object);

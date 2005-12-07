@@ -305,37 +305,48 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			/* create lathe curves */
 		int n = setCPs.size();
 		ControlPoint[] newCp = new ControlPoint[iSegments];
+		boolean[] addCircle = new boolean[n];
+		boolean[] hookCurve = new boolean[n];
 		for (int p = 0; p < n; p++) {
-			ControlPoint cp = cpLathe[p][1];
+			ControlPoint cp = cpLathe[p][0]; // was ...=cpLath[p][1] !?
 			//if (cp != null) {
 			if (cp != null && cp.isHead()) {
-				boolean addCircle = true;
-				boolean hookCurve = false;
+				addCircle[p] = true;
+				hookCurve[p] = false;
+				System.out.println("cp=" + cp + " next=" + cp.getNext() + " prev=" + cp.getPrev());
 				if (cp.isStart() || cp.isEnd()) {
+					System.out.println("is start or end");
 					float x = cp.getReferencePosition().x;
 					float z = cp.getReferencePosition().z;
 					if (x * x + z * z <= epsilon * epsilon) {
-						addCircle = false;
+						addCircle[p] = false;
 					}
 				}
-				if (cp.getNext() != null && (cp.getNext().isStart() || cp.getNext().isEnd())) {
+				if (cp.getNext() != null && cp.getNext().isEnd()) {
+					System.out.println("next is end");
 					float x = cp.getNext().getReferencePosition().x;
 					float z = cp.getNext().getReferencePosition().z;
 					if (x * x + z * z <= epsilon * epsilon) {
-						addCircle = false;
-						hookCurve = true;
+						addCircle[p] = false;
+						hookCurve[p] = true;
 					}
 				}
-				if (cp.getPrev() != null && (cp.getPrev().isStart() || cp.getPrev().isEnd())) {
+				if (cp.getPrev() != null && cp.getPrev().isStart()) {
+					System.out.println("prev is start");
 					float x = cp.getPrev().getReferencePosition().x;
 					float z = cp.getPrev().getReferencePosition().z;
 					if (x * x + z * z <= epsilon * epsilon) {
-						addCircle = false;
-						hookCurve = true;
+						addCircle[p] = false;
+						hookCurve[p] = true;
 					}
 				}
-				System.out.println(cp + " " + addCircle + " " + hookCurve);
-				if (addCircle) {
+			}
+		}
+		for (int p = 0; p < n; p++) {
+			ControlPoint cp = cpLathe[p][0]; // was ...=cpLath[p][1] !?
+			//if (cp != null) {
+			if (cp != null && cp.isHead()) {
+				if (addCircle[p]) {
 					for (int s = 0; s < iSegments; s++) {
 						newCp[s] = new ControlPoint();
 						//newCp[s].setMode(ControlPoint.JPATCH_G3);
@@ -353,7 +364,7 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 //					Curve curve = new Curve(newCp[0]);
 //					curve.validate();
 					addEdit(new AtomicAddCurve(newCp[0]));
-				} else if (!hookCurve) {
+				} else if (!hookCurve[p]) {
 					if (iSegments % 2 == 0) {
 						for (int s = 0; s < iSegments / 2; s += iSegments / 4) {
 							//addEdit(new 

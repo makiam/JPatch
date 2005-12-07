@@ -146,6 +146,14 @@ public class ModelTester {
 								error("Hook curve " + cp + ": parent hook of curve end is wrong");
 							}
 						}
+						
+						// we must have no attached points [
+						if (cp.getNextAttached() != null) {
+							error("Start-Hook " + cp + " has next attached point!");
+						}
+						if (cp.getPrevAttached() != null) {
+							error("Start-Hook " + cp + " has prev attached point!");
+						}
 					}
 					
 					// check if we are the end hook
@@ -154,6 +162,25 @@ public class ModelTester {
 						//do we have a parent hook
 						if (cp.getParentHook() == null) {
 							error("End-Hook " + cp + " has no parent hook!");
+						}
+						
+						//we must have no attached points [
+						if (cp.getNextAttached() != null) {
+							error("End-Hook " + cp + " has next attached point!");
+						}
+						if (cp.getPrevAttached() != null) {
+							error("End-Hook " + cp + " has prev attached point!");
+						}
+					}
+					
+					else {
+						
+						// normal hook, must not have next-attached, must have prev-attached
+						if (cp.getNextAttached() != null) {
+							error("Hook " + cp + " has next attached point!");
+						}
+						if (cp.getPrevAttached() == null) {
+							error("Hook " + cp + " has no prev attached point!");
 						}
 					}
 				} else {

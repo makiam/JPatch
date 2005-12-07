@@ -1,6 +1,6 @@
 package jpatch.control.edit;
 /*
- * $Id: CompoundRemoveControlPoint.java,v 1.3 2005/09/29 15:12:12 sascha_l Exp $
+ * $Id: CompoundRemoveControlPoint.java,v 1.4 2005/12/07 16:31:41 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -39,8 +39,9 @@ public class CompoundRemoveControlPoint extends JPatchCompoundEdit {
 			// return
 			return;
 		}
-		// is curve length < 3?
-		if (start.getLength() < 3) {
+		// is curve length < 3 (or < 4 in case of hook-curve)?
+		int min = start.isStartHook() ? 4 : 3;
+		if (start.getLength() < min) {
 			// YES
 			// remove entire curve
 			addEdit(new CompoundDropCurve(start));
