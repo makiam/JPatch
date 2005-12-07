@@ -57,7 +57,16 @@ public class CompoundDropControlPoint extends JPatchCompoundEdit {
 		addEdit(new AtomicChangeControlPoint.Deleted(cp));
 		// detach the cp
 //		if (cp.getHookPos() == -1)
+		// is this point is hooked to a hook?
+		if (cp.getNextAttached() != null && cp.getNextAttached().isHook()) {
+			// YES
+			// remove hook from hook-curve
+			ControlPoint na = cp.getNextAttached();
 			addEdit(new AtomicDetatchControlPoint(cp));
+			addEdit(new CompoundRemoveControlPoint(na));
+		} else {
+			addEdit(new AtomicDetatchControlPoint(cp));
+		}
 //		if (cp.getPrevAttached() != null && cp.getNextAttached() != null)
 //			addEdit(new AtomicDetatchControlPoint(cp));
 //		else if (cp.getPrevAttached() != null)

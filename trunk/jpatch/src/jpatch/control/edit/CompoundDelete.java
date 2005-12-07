@@ -46,7 +46,8 @@ public class CompoundDelete extends JPatchCompoundEdit {
 			if (object instanceof ControlPoint) {
 				ControlPoint head = (ControlPoint) object;
 				for (ControlPoint cp = head; cp != null; cp = cp.getPrevAttached()) {
-					controlPointSet.add(cp);
+					if (!cp.isHook())
+						controlPointSet.add(cp);
 				}
 			} else if (object instanceof Bone.BoneTransformable) {
 				btSet.add(object);

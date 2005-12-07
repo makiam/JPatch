@@ -39,8 +39,9 @@ public class CompoundRemoveControlPoint extends JPatchCompoundEdit {
 			// return
 			return;
 		}
-		// is curve length < 3?
-		if (start.getLength() < 3) {
+		// is curve length < 3 (or < 4 in case of hook-curve)?
+		int min = start.isStartHook() ? 4 : 3;
+		if (start.getLength() < min) {
 			// YES
 			// remove entire curve
 			addEdit(new CompoundDropCurve(start));
