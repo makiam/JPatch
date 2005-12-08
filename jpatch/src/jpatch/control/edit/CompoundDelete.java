@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundDelete.java,v 1.9 2005/12/07 16:31:41 sascha_l Exp $
+ * $Id: CompoundDelete.java,v 1.10 2005/12/08 08:58:11 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -45,6 +45,8 @@ public class CompoundDelete extends JPatchCompoundEdit {
 			Object object = it.next();
 			if (object instanceof ControlPoint) {
 				ControlPoint head = (ControlPoint) object;
+				if (head.getNextAttached() != null)
+					throw new IllegalArgumentException("selected point " + head + " is not a head!");
 				for (ControlPoint cp = head; cp != null; cp = cp.getPrevAttached()) {
 					if (!cp.isHook())
 						controlPointSet.add(cp);
@@ -57,7 +59,7 @@ public class CompoundDelete extends JPatchCompoundEdit {
 			System.out.println("\t" + controlPointSet);
 		for (Iterator it = (new HashSet(MainFrame.getInstance().getModel().getCurveSet())).iterator(); it.hasNext(); ) {
 			ControlPoint start = (ControlPoint) it.next();
-			if (!start.isDeleted() && dropCurve(start, objects)) {
+			if (!start.isDeleted() && !start.isHook() && dropCurve(start, objects)) {
 				for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop())
 					controlPointSet.remove(cp);
 				addEdit(new CompoundDropCurve(start));

@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.19 2005/12/06 20:43:07 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.20 2005/12/08 08:58:11 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -38,7 +38,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.19 $
+ * @version    $Revision: 1.20 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -718,8 +718,8 @@ public class ControlPoint implements Comparable, Transformable {
 
 	public Point3f getInTangent() {
 		if (cpPrev == null) {
-			//throw new JPatchException("attempted to get inTangent on hookStart " + this);
-			return null;
+			throw new IllegalArgumentException("attempted to get inTangent on hookStart " + this);
+//			return null;
 		}
 		if (isTargetHook()) {
 			Vector3f v3Direction = new Vector3f(cpPrev.getReferencePosition());
@@ -757,8 +757,8 @@ public class ControlPoint implements Comparable, Transformable {
 	 */
 	public Point3f getReferenceOutTangent() {
 		if (cpNext == null) {
-			//throw new JPatchException("attempted to get outTangent on hookEnd " + this);
-			return null;
+			throw new IllegalArgumentException("attempted to get outTangent on hookEnd " + this);
+//			return null;
 		}
 		if (isTargetHook()) {
 			Vector3f v3Direction = new Vector3f(cpNext.getReferencePosition());
@@ -2086,6 +2086,7 @@ public class ControlPoint implements Comparable, Transformable {
 			}
 			cpStart = cpStart.cpPrevAttached;
 		}
+		parentHook = getHead().getEnd().cpParentHook;
 		fMinAngle = (float) Math.PI;
 		while (cpEnd != null) {
 			if (cpEnd != parentHook) {
