@@ -11,9 +11,12 @@ public class CompoundDropCurve extends JPatchCompoundEdit {
 		// loop over all points on the curve
 		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
 			// drop the cp
-			if (hook && cp.getPrevAttached() != null)
-				addEdit(new CompoundDeleteControlPoint(cp.getPrevAttached()));
-			addEdit(new CompoundDropControlPoint(cp));
+			if (hook) {
+				if (cp.getPrevAttached() != null)
+					addEdit(new CompoundDeleteControlPoint(cp.getPrevAttached()));
+			} else {
+				addEdit(new CompoundDropControlPoint(cp));
+			}
 		}
 		// remove the curve
 		addEdit(new AtomicRemoveCurve(start));

@@ -116,15 +116,17 @@ public class CheckCompoundEdits {
 			dump(className, "");
 			System.out.println();
 		}
+		System.out.println("\n\n*****\n");
 		for (String error:errors) {
-			System.out.println("Recursion in " + error);
+			dump(error, "");
+			System.out.println();
 		}
 	}
 	
 	public void dump(String className, String prefix) {
 		System.out.println(prefix + className);
 		if (visitedClasses.contains(className)) {
-			System.out.println("RECURSION ERROR!!!");
+			System.out.println(prefix + "RECURSION ERROR!!!");
 			errors.add(className);
 			return;
 		}
