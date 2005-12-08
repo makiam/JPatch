@@ -41,7 +41,7 @@ public final class AtomicRemoveBoneFromSelections extends JPatchAtomicEdit {
 			System.out.println(getClass().getName() + "(" + bone + ")");
 		boneStart = bone.getParentBone() == null ? bone.getBoneStart() : bone.getParentBone().getBoneEnd();
 		boneEnd = bone.getBoneEnd();
-		System.out.println("remove bone from selections " + boneStart + " " + boneEnd);
+//		System.out.println("remove bone from selections " + boneStart + " " + boneEnd);
 		for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
 			Selection selection = (Selection) it.next();
 			Object weight = selection.getMap().get(boneStart);
