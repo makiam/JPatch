@@ -62,12 +62,17 @@ implements MouseMotionListener {
 		m4Transform.m13 += getPosition(viewDef).y;
 		m4Transform.m23 += getPosition(viewDef).z;
 		shape.paint(viewDef, m4Transform, viewDef.getMatrix());
+//		Point3f pp = getPosition(viewDef);
+//		
+//		viewDef.getDrawable().drawRect
 	}
 	
 	public boolean isHit(ViewDefinition viewDef, int x, int y, Point3f hit) {
 //		Point3f p3 = getTransformedPosition(viewDef.getScreenMatrix());
 		Point3f p3 = new Point3f(getPosition(viewDef));
+		System.out.println(p3);
 		viewDef.getScreenMatrix().transform(p3);
+		System.out.println("handle hit? " + x + " " + y + " " + p3);
 //		System.out.println("handle isHit? x=" + x + " y=" + y + " hx=" + p3.x + " hy=" + p3.y);
 		if (x >= p3.x - iHitSize && x <= p3.x + iHitSize && y >= p3.y - iHitSize && y <= p3.y + iHitSize) {
 			hit.set(p3);
