@@ -71,6 +71,11 @@ public class ModelTester {
 //					error("Cp " + cp + " curve pointer points to wrong curve");
 //				}
 				
+				// check if cp is deleted
+				if (cp.isDeleted()) {
+					error("Cp " + cp + " has deleted flag set");
+				}
+				
 				// check if prev cp is ok
 				if (cp.getPrev() != cpLast) {
 					error("Cp " + cp + " cpLast pointer is wrong");
@@ -235,25 +240,32 @@ public class ModelTester {
 		}
 		System.out.println(patches + " patches");
 		
-//		/*
-//		* perform tests on morphs
-//		*/
-//		
-//		int morphs = 0;
-//		for (Iterator it = model.getMorphIterator(); it.hasNext(); ) {
-//			Morph morph = (Morph) it.next();
-//			for (Iterator itMorph = morph.getPointList().iterator(); itMorph.hasNext(); ) {
-//				ControlPoint cp = (ControlPoint) itMorph.next();
-//				if (!listControlPoints.contains(cp)) {
-//					error ("cp " + cp + " of morph " + morph.getName() + " is invalid");
-//				}
-//				if (!cp.isHead()) {
-//					error ("cp " + cp + " of morph " + morph.getName() + " is not a head");
-//				}
-//			}
-//			morphs++;
-//		}
-//		System.out.println(morphs + " morphs");
+		/*
+		* perform tests on morphs
+		*/
+		
+		int morphs = 0;
+		
+		for (Iterator itMorph = MainFrame.getInstance().getModel().getMorphList().iterator(); itMorph.hasNext(); ) {
+			Morph morph = (Morph) itMorph.next();
+			for (Iterator itTarget = morph.getTargets().iterator(); itTarget.hasNext(); ) {
+				MorphTarget target = (MorphTarget) itTarget.next();
+				for (Iterator itCp = target.getMorphMap().keySet().iterator(); itCp.hasNext(); ) {
+					ControlPoint cp = (ControlPoint) itCp.next();
+					if (!listControlPoints.contains(cp)) {
+						error ("cp " + cp + " of morph " + morph.getName() + " is invalid");
+					}
+					if (!cp.isHead()) {
+						error ("cp " + cp + " of morph " + morph.getName() + " is not a head");
+					}
+					if (target.getVectorFor(cp) == null) {
+						error ("cp " + cp + " of morph " + morph.getName() + " has null vector");
+					}
+				}
+			}
+			morphs++;
+		}
+		System.out.println(morphs + " morphs");
 		
 		return bSuccess;
 	}

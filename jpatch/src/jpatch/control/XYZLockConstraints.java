@@ -81,6 +81,34 @@ public class XYZLockConstraints {
 			m.m23 = 0;
 		}
 	}
+	
+	public void constrainMatrix(Matrix3f m) {
+		if (bXLock) {
+			m.m00 = 1;
+			m.m01 = 0;
+			m.m02 = 0;
+		}
+		if (bYLock) {
+			m.m10 = 0;
+			m.m11 = 1;
+			m.m12 = 0;
+		}
+		if (bZLock) {
+			m.m20 = 0;
+			m.m21 = 0;
+			m.m22 = 1;
+		}
+	}
+	
+	public void constrainVector(Vector3f v) {
+		if (bXLock)
+			v.x = 0;
+		if (bYLock)
+			v.y = 0;
+		if (bZLock)
+			v.z = 0;
+	}
+	
 	//
 	//public void correctPointPosition(Point3f point, Point3f newPosition) {
 	//	newPosition.x = bXLock ? point.x : newPosition.x;

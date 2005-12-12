@@ -17,7 +17,7 @@ public class CompoundExtrude extends AbstractClone implements JPatchRootEdit {
 		Selection selection = createNewSelection();
 		if (selection.getMap().size() > 0) {
 			selection.setName("*extruded points #" + iSequenceNumber++);
-			addEdit(new AtomicChangeSelection(selection));
+			addEdit(new AtomicChangeSelection(selection.cloneSelection()));
 			addEdit(new AtomicAddSelection(selection));
 		}
 	}

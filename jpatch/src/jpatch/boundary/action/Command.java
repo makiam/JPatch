@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.11 2005/11/20 12:19:10 sascha_l Exp $
+ * $Id: Command.java,v 1.12 2005/12/12 16:51:34 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -317,9 +317,9 @@ public final class Command implements KeyListener {
 		 * Disable commands
 		 */
 		enableCommand("clear rotoscope image", false);
-		enableCommand("lock x", false);
-		enableCommand("lock y", false);
-		enableCommand("lock z", false);
+//		enableCommand("lock x", false);
+//		enableCommand("lock y", false);
+//		enableCommand("lock z", false);
 		enableCommand("stop edit morph", false);
 		
 		/*
@@ -327,6 +327,7 @@ public final class Command implements KeyListener {
 		 */
 		((AbstractButton) commandMenuItemMap.get("select points")).setSelected(true);
 		((AbstractButton) commandMenuItemMap.get("select bones")).setSelected(true);
+		((AbstractButton) commandMenuItemMap.get("snap to grid")).setSelected(JPatchSettings.getInstance().bGridSnap);
 		
 		/*
 		 * Add change listeners to toggle buttons

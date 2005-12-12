@@ -56,7 +56,7 @@ public class Morph implements MutableTreeNode {
 	public void setValue(float value) {
 		fValue = value;
 		setMorphMap();
-		System.out.println("value = " + value + " " + mapMorph);
+//		System.out.println("value = " + value + " " + mapMorph);
 		MainFrame.getInstance().getModel().applyMorphs();
 		MainFrame.getInstance().getModel().setMorphPose();
 	}

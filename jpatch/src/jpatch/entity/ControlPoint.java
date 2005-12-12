@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.20 2005/12/08 08:58:11 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.21 2005/12/12 16:51:34 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -38,7 +38,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.20 $
+ * @version    $Revision: 1.21 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -196,32 +196,28 @@ public class ControlPoint implements Comparable, Transformable {
 		p3BackupPosition.set(p3ReferencePosition);
 	}
 	
+	private static final Vector3f vv = new Vector3f();
 	public void translate(Vector3f v) {
 		if (MainFrame.getInstance().getJPatchScreen().isLockPoints())
 			return;
 		p3ReferencePosition.set(p3BackupPosition);
-		Vector3f vv = new Vector3f(v);
+		vv.set(v);
+		MainFrame.getInstance().getConstraints().constrainVector(vv);
 		m4InvTransform.transform(vv);
 		p3ReferencePosition.add(vv);
-//		invalidateTangents();
 	}
 	
 	public void rotate(AxisAngle4f a, Point3f pivot) {
 		if (MainFrame.getInstance().getJPatchScreen().isLockPoints())
 			return;
-		p3ReferencePosition.set(p3BackupPosition);
-		Point3f p = new Point3f(pivot);
-		m4InvTransform.transform(p);
-		p3ReferencePosition.sub(p);
-		Matrix3f rot = new Matrix3f();
-		Vector3f axis = new Vector3f(a.x, a.y, a.z);
-		m4InvTransform.transform(axis);
-		rot.set(new AxisAngle4f(axis, a.angle));
-		rot.transform(p3ReferencePosition);
-		p3ReferencePosition.add(p);
-//		invalidateTangents();
+		Matrix3f m = new Matrix3f();
+		m.set(a);
+		transform(m, pivot);
 	}
 	
+	private static final Matrix3f m1 = new Matrix3f();
+	private static final Matrix3f m2 = new Matrix3f();
+	private static final Matrix3f m3 = new Matrix3f();
 	public void transform(Matrix3f m, Point3f pivot) {
 		if (MainFrame.getInstance().getJPatchScreen().isLockPoints())
 			return;
@@ -229,11 +225,13 @@ public class ControlPoint implements Comparable, Transformable {
 		Point3f p = new Point3f(pivot);
 		m4InvTransform.transform(p);
 		p3ReferencePosition.sub(p);
-		Matrix3f mm = new Matrix3f(m);
-		Matrix3f mt = new Matrix3f();
-		m4InvTransform.getRotationScale(mt);
-		mt.mul(mm);
-		m.transform(p3ReferencePosition);
+		m4Transform.getRotationScale(m1);
+		m4InvTransform.getRotationScale(m2);
+		m3.set(m);
+		MainFrame.getInstance().getConstraints().constrainMatrix(m3);
+		m2.mul(m3);
+		m2.mul(m1);
+		m2.transform(p3ReferencePosition);
 		p3ReferencePosition.add(p);
 //		invalidateTangents();
 	}

@@ -88,6 +88,7 @@ public class MorphTarget implements MutableTreeNode {
 						float weight = ((Float) selectedPoints.get(cp)).floatValue();
 						vv.set(v);
 						vv.scale(weight);
+						MainFrame.getInstance().getConstraints().constrainVector(vv);
 						cp.getInvTransform().transform(vv);
 						vector.add(vv);
 					}
@@ -123,6 +124,7 @@ public class MorphTarget implements MutableTreeNode {
 						rot.transform(p1);
 						p1.add(pivot);
 						vv.sub(p1, p0);
+						MainFrame.getInstance().getConstraints().constrainVector(vv);
 						cp.getInvTransform().transform(vv);
 						vector.add(vv);
 					}
@@ -156,6 +158,7 @@ public class MorphTarget implements MutableTreeNode {
 						mm.transform(p1);
 						p1.add(pivot);
 						vv.sub(p1, p0);
+						MainFrame.getInstance().getConstraints().constrainVector(vv);
 						cp.getInvTransform().transform(vv);
 						vector.add(vv);
 					}
@@ -165,7 +168,7 @@ public class MorphTarget implements MutableTreeNode {
 				}
 				
 				public JPatchUndoableEdit endTransform() {
-					return new AtomicChangeMorphVectors(MorphTarget.this, initMap);
+					return new AtomicChangeMorphVectors(MorphTarget.this, initMap, false);
 				}
 				
 				public Point3f getPosition() {
@@ -181,7 +184,7 @@ public class MorphTarget implements MutableTreeNode {
 						Object key = it.next();
 						if (selectedPoints.containsKey(key))
 							changeMap.put(key, new Vector3f((Vector3f) mapMorph.get(key)));
-					}					
+					}		
 				}
 				
 				public void translate(Vector3f v) {
@@ -189,38 +192,54 @@ public class MorphTarget implements MutableTreeNode {
 				}
 				
 				public void rotate(AxisAngle4f a, Point3f pivot) {
+//					System.out.println("rotate " + this + " " + a);
 					AxisAngle4f aa = new AxisAngle4f(a);
-					Matrix3f rot = new Matrix3f();
+					Matrix3f m1 = new Matrix3f();
+					Matrix3f m2 = new Matrix3f();
+					Matrix3f m3 = new Matrix3f();
 					for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
-						Object key = it.next();
-						Vector3f v = (Vector3f) changeMap.get(key);
-						v.set((Vector3f) mapMorph.get(key));
-						float weight = ((Float) selectedPoints.get(key)).floatValue();
+						ControlPoint cp = (ControlPoint) it.next();
+						Vector3f v = (Vector3f) changeMap.get(cp);
+						v.set((Vector3f) mapMorph.get(cp));
+						float weight = ((Float) selectedPoints.get(cp)).floatValue();
 						aa.angle = a.angle * weight;
-						rot.set(aa);
-						rot.transform(v);
+						m3.set(aa);
+						cp.getTransform().getRotationScale(m1);
+						cp.getInvTransform().getRotationScale(m2);
+						MainFrame.getInstance().getConstraints().constrainMatrix(m3);
+						m2.mul(m3);
+						m2.mul(m1);
+						m2.transform(v);
 					}
 				}
 				
 				public void transform(Matrix3f m, Point3f pivot) {
 					Matrix3f identity = new Matrix3f();
-					Matrix3f matrix = new Matrix3f();
+					Matrix3f m1 = new Matrix3f();
+					Matrix3f m2 = new Matrix3f();
+					Matrix3f m3 = new Matrix3f();
 					for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
-						Object key = it.next();
-						Vector3f v = (Vector3f) changeMap.get(key);
-						v.set((Vector3f) mapMorph.get(key));
-						float weight = ((Float) selectedPoints.get(key)).floatValue();
-						matrix.set(m);
-						matrix.mul(weight);
+						ControlPoint cp = (ControlPoint) it.next();
+						Vector3f v = (Vector3f) changeMap.get(cp);
+						v.set((Vector3f) mapMorph.get(cp));
+						float weight = ((Float) selectedPoints.get(cp)).floatValue();
+						m3.set(m);
+						m3.mul(weight);
 						identity.setIdentity();
 						identity.mul(1 - weight);
-						matrix.add(identity);
-						matrix.transform(v);
+						m3.add(identity);
+						cp.getTransform().getRotationScale(m1);
+						cp.getInvTransform().getRotationScale(m2);
+						MainFrame.getInstance().getConstraints().constrainMatrix(m3);
+						m2.mul(m3);
+						m2.mul(m1);
+						m2.transform(v);
 					}
 				}
 				
 				public JPatchUndoableEdit endTransform() {
-					return new AtomicChangeMorphVectors(MorphTarget.this, changeMap);
+//					System.out.println(changeMap);
+					return new AtomicChangeMorphVectors(MorphTarget.this, changeMap, true);
 				}
 				
 				public Point3f getPosition() {

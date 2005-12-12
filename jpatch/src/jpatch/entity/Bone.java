@@ -637,30 +637,23 @@ public class Bone implements MutableTreeNode {
 			}
 		}
 		
-		
+		private Vector3f vv = new Vector3f();
 		public void translate(Vector3f v) {
 			if (MainFrame.getInstance().getJPatchScreen().isLockBones())
 				return;
 			setDummy();
-			p3Dummy.add(v);
+			vv.set(v);
+			MainFrame.getInstance().getConstraints().constrainVector(vv);
+			p3Dummy.add(vv);
 			setPoint();
 		}
 
+		private Matrix3f mm = new Matrix3f();
 		public void rotate(AxisAngle4f a, Point3f pivot) {
 			if (MainFrame.getInstance().getJPatchScreen().isLockBones())
 				return;
-// FIXME: doesn't work if bone isn't in reference pose
-			setDummy();
-//			if (isStart() && getParentBone() != null)
-//				getParentBone().lastDofInvTransform(p);
-//			else
-//				lastDofInvTransform(p);
-			p3Dummy.sub(pivot);
-			Matrix3f m = new Matrix3f();
-			m.set(a);
-			m.transform(p3Dummy);
-			p3Dummy.add(pivot);
-			setPoint();
+			mm.set(a);
+			transform(mm, pivot);
 		}
 
 		public void transform(Matrix3f m, Point3f pivot) {
@@ -669,7 +662,9 @@ public class Bone implements MutableTreeNode {
 // FIXME: doesn't work if bone isn't in reference pose
 			setDummy();
 			p3Dummy.sub(pivot);
-			m.transform(p3Dummy);
+			mm.set(m);
+			MainFrame.getInstance().getConstraints().constrainMatrix(mm);
+			mm.transform(p3Dummy);
 			p3Dummy.add(pivot);
 			setPoint();
 		}
