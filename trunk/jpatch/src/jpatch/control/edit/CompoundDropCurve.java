@@ -8,15 +8,16 @@ public class CompoundDropCurve extends JPatchCompoundEdit {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + start + ")");
 		boolean hook = (start.getHookPos() == 0.0f);
+		// if hook-curve, set child-hook to null
+		if (hook)
+			addEdit(new AtomicChangeControlPoint.ChildHook(start.getParentHook(), null));
 		// loop over all points on the curve
 		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
 			// drop the cp
-			if (hook) {
-				if (cp.getPrevAttached() != null)
-					addEdit(new CompoundDeleteControlPoint(cp.getPrevAttached()));
-			} else {
+			if (hook && cp.getPrevAttached() != null)
+				addEdit(new CompoundDeleteControlPoint(cp.getPrevAttached()));
+			if (!cp.isDeleted())
 				addEdit(new CompoundDropControlPoint(cp));
-			}
 		}
 		// remove the curve
 		addEdit(new AtomicRemoveCurve(start));

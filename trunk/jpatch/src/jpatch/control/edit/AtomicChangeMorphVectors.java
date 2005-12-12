@@ -12,12 +12,13 @@ public class AtomicChangeMorphVectors extends JPatchAtomicEdit {
 	private Map mapChange;
 	
 	
-	public AtomicChangeMorphVectors(MorphTarget morph, Map change) {
+	public AtomicChangeMorphVectors(MorphTarget morph, Map change, boolean applyNow) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + morph + ", " + change + ")");
 		this.morph = morph;
 		mapChange = change;
-//		swap();
+		if (applyNow)
+			swap();
 		//morph.dump();
 		//System.out.println(mapChange);
 		//morph.set();

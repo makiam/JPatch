@@ -35,9 +35,9 @@ public class CompoundDropControlPoint extends JPatchCompoundEdit {
 	public CompoundDropControlPoint(ControlPoint cp) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + cp + ")");
-		// has cp got a valid parent-hook?
 		if (cp.isDeleted())
 			throw new IllegalStateException(cp + " is already deleted.");
+//		 has cp got a valid parent-hook?
 		if (cp.getParentHook() != null && cp.getParentHook().getChildHook() == cp)
 			// YES
 			// change parent-hook's child-hook to null
@@ -57,7 +57,7 @@ public class CompoundDropControlPoint extends JPatchCompoundEdit {
 		addEdit(new AtomicChangeControlPoint.Deleted(cp));
 		// detach the cp
 //		if (cp.getHookPos() == -1)
-		// is this point is hooked to a hook?
+		// is this point hooked to a hook?
 		if (cp.getNextAttached() != null && cp.getNextAttached().isHook()) {
 			// YES
 			// remove hook from hook-curve

@@ -359,6 +359,31 @@ public class DefaultTool extends JPatchTool {
 				float z = Float.MAX_VALUE;
 				Point3f p3Hit = new Point3f();
 				
+				
+				Matrix4f m4View = viewDef.getMatrix();
+				Point3f p3A = new Point3f();
+				Point3f p3B = new Point3f();
+				selection.getBounds(p3A, p3B);
+				float scale = 12f / m4View.getScale();
+				Vector3f v3Margin = new Vector3f(scale,scale,scale);
+				p3A.sub(v3Margin);
+				p3B.add(v3Margin);
+				Point3f[] ap3 = new Point3f[] {
+					new Point3f(p3A.x, p3A.y, p3A.z),
+					new Point3f(p3A.x, p3A.y, p3B.z),
+					new Point3f(p3B.x, p3A.y, p3B.z),
+					new Point3f(p3B.x, p3A.y, p3A.z),
+					new Point3f(p3A.x, p3B.y, p3A.z),
+					new Point3f(p3A.x, p3B.y, p3B.z),
+					new Point3f(p3B.x, p3B.y, p3B.z),
+					new Point3f(p3B.x, p3B.y, p3A.z)
+				};
+				
+				for (int p = 0; p < 8; p++) {
+					selection.getOrientation().transform(ap3[p]);
+					aHandle[p].getPosition(viewDef).set(ap3[p]);
+				}
+				
 				for (int h = 0; h < aHandle.length; h++) {
 					if (aHandle[h].isHit(viewDef, x, y, p3Hit) && (activeHandle == null || p3Hit.z < z)) {
 						//System.out.println("hit");
@@ -1180,6 +1205,7 @@ public class DefaultTool extends JPatchTool {
 			//vv.sub(cor);
 		}
 		if (!vv.equals(v3Translate)) {
+//			MainFrame.getInstance().getConstraints().constrainVector(vv);
 			v3Translate.set(vv);
 			selection.translate(vv);
 			if (bMoveZ)
@@ -1196,6 +1222,7 @@ public class DefaultTool extends JPatchTool {
 				0, scale, 0,
 				0, 0, scale
 		);
+//		MainFrame.getInstance().getConstraints().constrainMatrix(matrix);
 		selection.transform(matrix, selection.getPivot());
 		if (bMoveZ) {
 			MainFrame.getInstance().getJPatchScreen().update_all();

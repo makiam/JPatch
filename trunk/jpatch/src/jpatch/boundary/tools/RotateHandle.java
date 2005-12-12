@@ -150,7 +150,7 @@ public class RotateHandle extends Handle {
 		float l = M.length() / m4View.getScale() / rotateTool.getRadius(scale) * 180 / (float)Math.PI;
 		M.normalize();
 		
-		System.out.println("V=" + V + " M=" + M);
+//		System.out.println("V=" + V + " M=" + M);
 		//System.out.println("r = " + rotateTool.getRadius() + "s = " + m4View.getScale());
 		//System.out.println("V = " + V + " M = " + M);
 		

@@ -289,7 +289,7 @@ public final class MainFrame extends JFrame {
 			//jpatchScreen.setMouseListeners(new ChangeViewListener(MouseEvent.BUTTON3,ChangeViewListener.MOVE));
 			setSelection(null);
 			setVisible(true);
-			
+			jpatchScreen.setTool(new DefaultTool());
 			if (!VersionInfo.release) {
 				String warning = "This is a development version of JPatch.\n" +
 						 "It has not been tested and may contain severe bugs!\n" +
