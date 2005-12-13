@@ -31,6 +31,8 @@ public class CompoundExpandSelection extends JPatchCompoundEdit implements JPatc
 		}
 		addEdit(new AtomicModifySelection.AddObjects(selection, pointsToAdd));
 		addEdit(new AtomicModifySelection.RemoveObjects(selection,pointsToRemove));
+		selection.setDirection(0);
+		addEdit(new AtomicModifySelection.Pivot(selection, selection.getCenter(), true));
 	}
 	
 	public String getName() {

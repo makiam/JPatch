@@ -169,7 +169,7 @@ implements ActionListener, FocusListener {
 		//clampValue();
 		updateTextField();
 		bChanged = fValue != old;
-		if (bChanged)
+		if (bChanged || iType == STRING)
 			fireStateChanged();
 	}
 	
