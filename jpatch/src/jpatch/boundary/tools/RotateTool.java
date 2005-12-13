@@ -416,10 +416,12 @@ public class RotateTool extends JPatchTool {
 			}
 			if (activeHandle != null && mouseEvent.getClickCount() == 2 && !bChange) {
 				if (activeHandle == pivotHandle) {
-					p3OldPivot.set(p3Pivot);
-					selection.setPivot(selection.getCenter());
+//					p3OldPivot.set(p3Pivot);
+//					selection.setPivot(selection.getCenter());
+//					p3Pivot.set(selection.getPivot());
+					MainFrame.getInstance().getUndoManager().addEdit(new AtomicModifySelection.Pivot(selection, selection.getCenter(), true));
+					p3Pivot.set(selection.getPivot());
 					setRadius();
-					MainFrame.getInstance().getUndoManager().addEdit(new AtomicModifySelection.Pivot(selection,p3OldPivot));
 				} else {
 					//Matrix3f m3Dummy = new Matrix3f(m3RotA);
 					//float fDummy = fBeta;

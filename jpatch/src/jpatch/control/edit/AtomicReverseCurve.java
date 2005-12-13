@@ -57,9 +57,8 @@ public final class AtomicReverseCurve extends JPatchAtomicEdit {
 			cp.setPrev(cpDummy);
 //			cp.setTangentsValid(false);
 		}
-		MainFrame.getInstance().getModel().getCurveSet().remove(cpStart);
-		cpStart = cpStart.getStart();
-		MainFrame.getInstance().getModel().getCurveSet().add(cpStart);
+		MainFrame.getInstance().getModel().getCurveSet().remove(start.getEnd());
+		MainFrame.getInstance().getModel().getCurveSet().add(start.getStart());
 	}
 	
 	public int sizeOf() {

@@ -122,7 +122,8 @@ public class PovrayRenderer3 {
 					
 						file.write("\t\tvertex_vectors {\n");
 						file.write("\t\t\t" + vtx.length + ",\n");
-						for (int v = 0; v < vtx.length; v++) file.write("\t\t\t" + toPovVector(vtx[v].p) + ",\n");
+						for (int v = 0; v < vtx.length; v++)
+							file.write("\t\t\t" + toPovVector(vtx[v].p) + ",\n");
 						file.write("\t\t}\n");
 						
 						file.write("\t\tnormal_vectors {\n");

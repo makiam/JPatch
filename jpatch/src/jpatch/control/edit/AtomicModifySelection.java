@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicModifySelection.java,v 1.8 2005/11/07 16:12:03 sascha_l Exp $
+ * $Id: AtomicModifySelection.java,v 1.9 2005/12/13 15:45:33 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -101,12 +101,18 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	public static final class Pivot extends AtomicModifySelection implements JPatchRootEdit {
 		private float x, y, z;
 		public Pivot(Selection selection, Point3f pivot) {
+			this (selection, pivot, false);
+		}
+		
+		public Pivot(Selection selection, Point3f pivot, boolean performNow) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + selection + ", " + pivot + ")");
 			this.selection = selection;
 			x = pivot.x;
 			y = pivot.y;
 			z = pivot.z;
+			if (performNow)
+				swap();
 		}
 		
 		private void swap() {

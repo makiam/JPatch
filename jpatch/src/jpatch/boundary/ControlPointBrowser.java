@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPointBrowser.java,v 1.5 2005/09/29 15:12:12 sascha_l Exp $
+ * $Id: ControlPointBrowser.java,v 1.6 2005/12/13 15:45:33 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -23,6 +23,7 @@
 package jpatch.boundary;
 
 import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
 import jpatch.entity.*;
 
@@ -48,6 +49,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 	private JTextField textDeleted = new JTextField();
 	private JTextField textId = new JTextField();
 	private JTextField textHookPos = new JTextField();
+	private JTextField textGoto = new JTextField();
 	
 	/**
 	 * @param cp The initial controlpoint to be shown in the browser
@@ -74,6 +76,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		form.addEntry("sync:", buttonSync);
 		form.addEntry("refresh:", buttonRefresh);
 		form.addEntry("back:", buttonBack);
+		form.addEntry("goto:", textGoto);
 		form.populate();										// add and layout form contents
 		
 		/*
@@ -114,6 +117,26 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 				Selection selection = MainFrame.getInstance().getSelection();
 				if (selection != null && selection.isSingle() && (selection.getHotObject() instanceof ControlPoint)) {
 					setCp((ControlPoint) selection.getHotObject());
+				}
+			}
+		});
+		
+		textGoto.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				try {
+					int num = Integer.parseInt(textGoto.getText());
+					for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
+						for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+							if (cp.number() == num) {
+								setCp(cp);
+								MainFrame.getInstance().setSelection(new Selection(cp));
+								MainFrame.getInstance().getJPatchScreen().update_all();
+								return;
+							}
+						}
+					}
+				} catch (NumberFormatException exception) {
+					;
 				}
 			}
 		});

@@ -1077,15 +1077,22 @@ public final class Animator extends BFrame {
 			progressBar.setValue(progressBar.getMaximum());
 		}
 		
-		synchronized void clearText() {
-			textArea.setText("");
+		void clearText() {
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					textArea.setText("");
+				}
+			});
 		}
 		
-		synchronized void addText(String line) {
-			textArea.append(line);
-			textArea.append("\n");
-			scrollBar.setValue(scrollBar.getMaximum());
-			textArea.repaint();
+		void addText(final String line) {
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					textArea.append(line);
+					textArea.append("\n");
+					scrollBar.setValue(scrollBar.getMaximum());
+				}
+			});
 		}
 		
 		//void done() {
