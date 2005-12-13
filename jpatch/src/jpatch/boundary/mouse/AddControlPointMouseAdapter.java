@@ -44,16 +44,21 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 			/**
 			* left mouse button pressed
 			**/
+			System.out.println("left mouse button pressed");
 			compSource = (Component) mouseEvent.getSource();
 			viewDef.setZ(0);
 			iMouseX = mouseEvent.getX();
 			iMouseY = mouseEvent.getY();
 			edit = new JPatchActionEdit("add curve segment");
 			ControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(iMouseX,iMouseY),null,null,false,true);
-			if (cp == null || cp.getLooseEnd() != null) {
+			System.out.println(cp);
+			if (cp != null)
+				System.out.println(cp.getLooseEnd());
+//			if (cp == null || cp.getLooseEnd() != null) {
 				/**
-				* start a entirely new curve
+				* start an entirely new curve
 				**/
+				System.out.println("start a entirely new curve");
 				//viewDef.setZ(MainFrame.getInstance().getJPatchScreen().get3DCursor().getPosition());
 				if (cp != null) {
 					viewDef.setZ(cp.getPosition());
@@ -67,7 +72,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 				cpA.setNext(cpB);
 				cpB.setPrev(cpA);
 				edit.addEdit(new AtomicAddCurve(cpA));
-				if (cp != null && cp.getLooseEnd() != null) {
+				if (cp != null) {// && cp.getLooseEnd() != null) {
 					if (!mouseEvent.isControlDown())
 						edit.addEdit(new CompoundWeldControlPoints(cpA,cp));
 					else
@@ -78,39 +83,40 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 				edit.addEdit(new AtomicChangeSelection(selection));
 				MainFrame.getInstance().getJPatchScreen().single_update(compSource);
 				cpHot = cpB;
-			} /*else if (cp.getNext() == null || cp.getPrev() == null) {	// CHANGE **************************************!!!!!!!!!!!!!!!!!!
-			else if (cp.getLooseEnd() != null) {
-				/**
-				* append to an existing curve
-				**
-				ControlPoint cpLooseEnd = cp.getLooseEnd();
-				ControlPoint cpB = new ControlPoint(cp);
-				compoundEdit.addEdit(new AppendControlPointEdit(cpB,cpA,true));
-				Selection selection = new SinglePointSelection(cpB);
-				MainFrame.getInstance().setSelection(selection);
-				
-				MainFrame.getInstance().getJPatchScreen().repaint();
-				cpHot = cpB;
-			} */else {
-				/**
-				* start a new curve, attached to the selected controlpoint
-				**/
-				viewDef.setZ(cp.getPosition());
-				ControlPoint cpA = new ControlPoint(cp);
-				ControlPoint cpB = new ControlPoint(cp);
-				cpA.setNext(cpB);
-				cpB.setPrev(cpA);
-				edit.addEdit(new AtomicAddCurve(cpA));
-				//compoundEdit.addEdit(new WeldControlPointsEdit(cpA,cp));
-				edit.addEdit(new CompoundWeldControlPoints(cpA,cp));
-				
-				Selection selection = new Selection(cpB);
-				MainFrame.getInstance().setSelection(selection);
-				
-				MainFrame.getInstance().getJPatchScreen().single_update(compSource);
-				//MainFrame.getInstance().getModel().dump();
-				cpHot = cpB;
-			}
+//			} /*else if (cp.getNext() == null || cp.getPrev() == null) {	// CHANGE **************************************!!!!!!!!!!!!!!!!!!
+//			else if (cp.getLooseEnd() != null) {
+//				/**
+//				* append to an existing curve
+//				**
+//				ControlPoint cpLooseEnd = cp.getLooseEnd();
+//				ControlPoint cpB = new ControlPoint(cp);
+//				compoundEdit.addEdit(new AppendControlPointEdit(cpB,cpA,true));
+//				Selection selection = new SinglePointSelection(cpB);
+//				MainFrame.getInstance().setSelection(selection);
+//				
+//				MainFrame.getInstance().getJPatchScreen().repaint();
+//				cpHot = cpB;
+//			} */else {
+//				/**
+//				* start a new curve, attached to the selected controlpoint
+//				**/
+//				System.out.println("start a new curve, attached to the selected controlpoint");
+//				viewDef.setZ(cp.getPosition());
+//				ControlPoint cpA = new ControlPoint(cp);
+//				ControlPoint cpB = new ControlPoint(cp);
+//				cpA.setNext(cpB);
+//				cpB.setPrev(cpA);
+////				edit.addEdit(new AtomicAddCurve(cpA));
+//				//compoundEdit.addEdit(new WeldControlPointsEdit(cpA,cp));
+//				edit.addEdit(new CompoundWeldControlPoints(cpA,cp));
+//				
+//				Selection selection = new Selection(cpB);
+//				MainFrame.getInstance().setSelection(selection);
+//				
+//				MainFrame.getInstance().getJPatchScreen().single_update(compSource);
+//				//MainFrame.getInstance().getModel().dump();
+//				cpHot = cpB;
+//			}
 			 
 			setActiveState();
 		} else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {

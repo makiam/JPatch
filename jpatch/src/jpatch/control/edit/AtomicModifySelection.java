@@ -101,12 +101,18 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	public static final class Pivot extends AtomicModifySelection implements JPatchRootEdit {
 		private float x, y, z;
 		public Pivot(Selection selection, Point3f pivot) {
+			this (selection, pivot, false);
+		}
+		
+		public Pivot(Selection selection, Point3f pivot, boolean performNow) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + selection + ", " + pivot + ")");
 			this.selection = selection;
 			x = pivot.x;
 			y = pivot.y;
 			z = pivot.z;
+			if (performNow)
+				swap();
 		}
 		
 		private void swap() {

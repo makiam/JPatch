@@ -996,7 +996,7 @@ public class DefaultTool extends JPatchTool {
 					if (newSelection != null) {
 						edit.addEdit(new AtomicModifySelection.AddObjects(selection, newSelection.getMap()));
 						edit.setName("add objects to selection");
-						edit.addEdit(new AtomicModifySelection.Pivot(selection, selection.getCenter()));
+						edit.addEdit(new AtomicModifySelection.Pivot(selection, selection.getCenter(), true));
 						MainFrame.getInstance().getUndoManager().addEdit(edit);
 						selectionChanged(selection);
 					}
@@ -1039,7 +1039,7 @@ public class DefaultTool extends JPatchTool {
 						edit.addEdit(new AtomicModifySelection.RemoveObjects(selection, newSelection.getMap()));
 						if (newSelection.contains(selection.getHotObject()))
 							edit.addEdit(new AtomicModifySelection.HotObject(selection, null));
-						edit.addEdit(new AtomicModifySelection.Pivot(selection, selection.getCenter()));
+						edit.addEdit(new AtomicModifySelection.Pivot(selection, selection.getCenter(), true));
 						edit.setName("remove objects from selection");
 						MainFrame.getInstance().getUndoManager().addEdit(edit);
 						selectionChanged(selection);

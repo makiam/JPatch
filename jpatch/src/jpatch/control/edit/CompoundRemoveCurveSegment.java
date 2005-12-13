@@ -9,7 +9,6 @@ public class CompoundRemoveCurveSegment extends JPatchCompoundEdit {
 	
 	public CompoundRemoveCurveSegment(ControlPoint cp) {
 		ControlPoint cpNext = cp.getNext();
-		
 		/* remove hooks... */
 		if (cp.getChildHook() != null)
 			addEdit(new CompoundDropCurve(cp.getChildHook()));
@@ -27,11 +26,10 @@ public class CompoundRemoveCurveSegment extends JPatchCompoundEdit {
 		
 		/* check if curve is closed */
 		if (cp.getStart().getLoop()) {
-			
 			/* change curve start */
-			addEdit(new AtomicChangeControlPoint.Loop(cp.getStart()));
 			addEdit(new AtomicRemoveCurve(cp.getStart()));
 			addEdit(new AtomicAddCurve(cpNext));
+			addEdit(new AtomicChangeControlPoint.Loop(cp.getStart()));
 		} else {
 			// check if this was the stat of the curve
 			if (cp.getPrev() == null) {
