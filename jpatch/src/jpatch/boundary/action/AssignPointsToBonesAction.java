@@ -109,7 +109,7 @@ public final class AssignPointsToBonesAction extends AbstractAction {
 				}
 			}
 			System.out.println(cp + " -> " + closestBone + " b=" + closestPosOnLine + " d=" + closestDistToLine);
-			cp.setBone(closestBone, closestPosOnLine, closestDistToLine);
+			cp.setBone(closestBone, closestPosOnLine, closestDistToLine, boneList.contains(closestBone));
 		}
 	}
 }

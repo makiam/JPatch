@@ -52,6 +52,7 @@ implements ModelImporter {
 	private MorphTarget morphTarget;
 	private List listMaterials = new ArrayList();
 	private List listBones = new ArrayList();
+	private Map mapCpParentBone = new HashMap();
 	private Map mapBoneParents = new HashMap();
 	private ArrayList listCandidateFivePointPatch = new ArrayList();
 	private String strRendererFormat;
@@ -88,7 +89,8 @@ implements ModelImporter {
 		}
 		for (Iterator it = mapBones.keySet().iterator(); it.hasNext(); ) {
 			ControlPoint cp = (ControlPoint) it.next();
-			Bone bone = (Bone) listBones.get(((Integer) mapBones.get(cp)).intValue());
+			int i = ((Integer) mapBones.get(cp)).intValue();
+			Bone bone = (Bone) listBones.get(i);
 			Point3f p = cp.getReferencePosition();
 			Point3f p0 = bone.getReferenceStart();
 			Point3f p1 = bone.getReferenceEnd();
@@ -97,7 +99,7 @@ implements ModelImporter {
 			Point3f pBone = new Point3f();
 			pBone.interpolate(p0, p1, posOnLine);
 			float distToLine = pBone.distance(p) / l;
-			cp.setBone(bone, posOnLine, distToLine);
+			cp.setBone(bone, posOnLine, distToLine, (Boolean) mapCpParentBone.get(cp));
 		}
 		model.addCandidateFivePointPatchList(listCandidateFivePointPatch);
 		model.computePatches();
@@ -717,6 +719,8 @@ implements ModelImporter {
 				//}
 			} else if (localName.equals("bone")) {
 				mapBones.put(controlPoint, new Integer(value));
+			} else if (localName.equals("parent")) {
+				mapCpParentBone.put(controlPoint, new Boolean(value));
 			}
 		}
 		controlPoint.setPosition(p3);

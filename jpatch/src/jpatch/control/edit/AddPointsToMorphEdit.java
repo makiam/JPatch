@@ -1,5 +1,5 @@
 /*
- * $Id: AddPointsToMorphEdit.java,v 1.4 2005/11/07 21:27:29 sascha_l Exp $
+ * $Id: AddPointsToMorphEdit.java,v 1.5 2005/12/14 16:36:13 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -42,6 +42,7 @@ public class AddPointsToMorphEdit extends JPatchAtomicEdit {
 	
 	public void redo() {
 		morph.getMorphMap().putAll(map);
+		morph.getMorph().setupMorphMap();
 //		morph.getPointList().addAll(listPoints);
 //		morph.getVectorList().addAll(listVectors);
 	}
@@ -56,6 +57,7 @@ public class AddPointsToMorphEdit extends JPatchAtomicEdit {
 //			morphPoints.remove(cp);
 			morphMap.remove(it.next());
 		}
+		morph.getMorph().setupMorphMap();
 	}
 	
 	public int sizeOf() {

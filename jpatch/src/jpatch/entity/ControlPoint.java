@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.21 2005/12/12 16:51:34 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.22 2005/12/14 16:36:13 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -38,7 +38,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.21 $
+ * @version    $Revision: 1.22 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -131,6 +131,7 @@ public class ControlPoint implements Comparable, Transformable {
 	private Bone bone;
 	private float fBonePosition;
 	private float fDistanceToLine;
+	private boolean bParentBone;
 	
 	private Matrix4f m4Transform = new Matrix4f();
 	private Matrix4f m4InvTransform = new Matrix4f();
@@ -282,10 +283,11 @@ public class ControlPoint implements Comparable, Transformable {
 		this.bone = bone;
 	}
 	
-	public void setBone(Bone bone, float position, float distanceToLine) {
+	public void setBone(Bone bone, float position, float distanceToLine, boolean parent) {
 		this.bone = bone;
 		this.fBonePosition = position;
 		this.fDistanceToLine = distanceToLine;
+		this.bParentBone = parent;
 	}
 	
 	public Bone getBone() {
@@ -358,6 +360,10 @@ public class ControlPoint implements Comparable, Transformable {
 	
 	public float getBoneDistance() {
 		return fDistanceToLine;
+	}
+	
+	public boolean isParentBone() {
+		return bParentBone;
 	}
 	
 	/**
@@ -936,7 +942,7 @@ public class ControlPoint implements Comparable, Transformable {
 		if (bone != null) {
 			RotationDof dof = bone.getLastDof();
 			if (dof != null) {
-				dof.getTransform(m4BoneTransform, fBonePosition, fDistanceToLine);			
+				dof.getTransform(m4BoneTransform, fBonePosition, fDistanceToLine, bParentBone);			
 			}
 		} else {
 			m4BoneTransform.setIdentity();
@@ -2274,7 +2280,7 @@ public class ControlPoint implements Comparable, Transformable {
 			sb.append(" magnitude=").append(XMLutils.quote(fInMagnitude));
 		}
 		if (bone != null) {
-			sb.append(" bone=\"" + bone.getId() + "\"");// pos=\"" + fBonePosition + "\" dist=\"" + fDistanceToLine + "\"");
+			sb.append(" bone=\"" + bone.getId() + "\" parent=\"" + bParentBone + "\"");// pos=\"" + fBonePosition + "\" dist=\"" + fDistanceToLine + "\"");
 		}
 		sb.append("/>").append("\n");
 		return sb;
