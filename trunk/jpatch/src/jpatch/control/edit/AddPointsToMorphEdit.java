@@ -42,6 +42,7 @@ public class AddPointsToMorphEdit extends JPatchAtomicEdit {
 	
 	public void redo() {
 		morph.getMorphMap().putAll(map);
+		morph.getMorph().setupMorphMap();
 //		morph.getPointList().addAll(listPoints);
 //		morph.getVectorList().addAll(listVectors);
 	}
@@ -56,6 +57,7 @@ public class AddPointsToMorphEdit extends JPatchAtomicEdit {
 //			morphPoints.remove(cp);
 			morphMap.remove(it.next());
 		}
+		morph.getMorph().setupMorphMap();
 	}
 	
 	public int sizeOf() {
