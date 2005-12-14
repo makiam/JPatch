@@ -252,8 +252,9 @@ public class CompoundAutoMirror extends AbstractClone {
 						expand = true;
 				}
 				if (mirror) {
-					
+					System.out.println("mirror");
 					if (expand) {
+						System.out.println("expand");
 						for (Iterator itTarget = morph.getTargets().iterator(); itTarget.hasNext(); ) {
 							MorphTarget target = (MorphTarget) itTarget.next();
 							
@@ -446,7 +447,7 @@ public class CompoundAutoMirror extends AbstractClone {
 				ControlPoint clone = (ControlPoint) mapClones.get(cp);
 				if (cp == clone)
 					continue;
-				clone.setBone((Bone) mapBoneClones.get(cp.getBone()), cp.getBonePosition(), cp.getBoneDistance());
+				clone.setBone((Bone) mapBoneClones.get(cp.getBone()), cp.getBonePosition(), cp.getBoneDistance(), cp.isParentBone());
 			}
 			
 			/*
