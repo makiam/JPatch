@@ -44,21 +44,21 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 			/**
 			* left mouse button pressed
 			**/
-			System.out.println("left mouse button pressed");
+//			System.out.println("left mouse button pressed");
 			compSource = (Component) mouseEvent.getSource();
 			viewDef.setZ(0);
 			iMouseX = mouseEvent.getX();
 			iMouseY = mouseEvent.getY();
 			edit = new JPatchActionEdit("add curve segment");
 			ControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(iMouseX,iMouseY),null,null,false,true);
-			System.out.println(cp);
+//			System.out.println(cp);
 			if (cp != null)
-				System.out.println(cp.getLooseEnd());
+//				System.out.println(cp.getLooseEnd());
 //			if (cp == null || cp.getLooseEnd() != null) {
 				/**
 				* start an entirely new curve
 				**/
-				System.out.println("start a entirely new curve");
+//				System.out.println("start a entirely new curve");
 				//viewDef.setZ(MainFrame.getInstance().getJPatchScreen().get3DCursor().getPosition());
 				if (cp != null) {
 					viewDef.setZ(cp.getPosition());

@@ -32,7 +32,7 @@ public interface JPatchUndoableEdit {
 	/**
 	 * debug flag
 	 */
-	static final boolean DEBUG = true;
+	static final boolean DEBUG = false;
 	
 	/**
 	 * undoes this edit

@@ -36,7 +36,7 @@ import jpatch.boundary.*;
 import jpatch.boundary.laf.*;
 
 public final class Command implements KeyListener {
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final Command INSTANCE = new Command();
 	private Map commandActionMap = new HashMap();
 	private Map commandButtonMap = new HashMap();
