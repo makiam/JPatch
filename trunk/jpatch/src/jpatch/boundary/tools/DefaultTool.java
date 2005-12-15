@@ -93,11 +93,11 @@ public class DefaultTool extends JPatchTool {
 //			pivotHandle
 		};
 		if (MainFrame.getInstance().getSelection() == null) {
-			MainFrame.getInstance().setHelpText("Drag to move or select points. Use ATL to move perpendicular to screen plane.");
+			MainFrame.getInstance().setHelpText("Drag to move or select points. Use ALT to move perpendicular to screen plane.");
 		} else if (MainFrame.getInstance().getSelection().isSingle()) {
-			MainFrame.getInstance().setHelpText("Use SHIFT or CTRL to modify selection. Use ATL to move perpendicular to screen plane. Press TAB to cycle through curve segments.");
+			MainFrame.getInstance().setHelpText("Use SHIFT or CTRL to modify selection. Use ALT to move perpendicular to screen plane. Press TAB to cycle through curve segments.");
 		} else {
-			MainFrame.getInstance().setHelpText("Drag inside box to move selection. Drag handles to scale. Use SHIFT or CTRL to modify selection, ATL to move perpendiclar. Doubleclick pivot to reset.");
+			MainFrame.getInstance().setHelpText("Drag inside box to move selection. Drag handles to scale. Use SHIFT or CTRL to modify selection, ALT to move perpendiclar. Doubleclick pivot to reset.");
 		}
 	}
 	/*
@@ -415,7 +415,7 @@ public class DefaultTool extends JPatchTool {
 			/* if a handle was clicked */
 			if (activeHandle != null) {
 				
-				System.out.println("handle hit");
+//				System.out.println("handle hit");
 				/* activate it */
 				activeHandle.setActive(true);
 				activeHandle.setMouse(x, y);
@@ -1067,11 +1067,11 @@ public class DefaultTool extends JPatchTool {
 				iState = IDLE;
 			}
 			if (MainFrame.getInstance().getSelection() == null) {
-				MainFrame.getInstance().setHelpText("Drag to move or select points. Use ATL to move perpendicular to screen plane.");
+				MainFrame.getInstance().setHelpText("Drag to move or select points. Use ALT to move perpendicular to screen plane.");
 			} else if (MainFrame.getInstance().getSelection().isSingle()) {
-				MainFrame.getInstance().setHelpText("Use SHIFT or CTRL to modify selection. Use ATL to move perpendicular to screen plane. Press TAB to cycle through curve segments.");
+				MainFrame.getInstance().setHelpText("Use SHIFT or CTRL to modify selection. Use ALT to move perpendicular to screen plane. Press TAB to cycle through curve segments.");
 			} else {
-				MainFrame.getInstance().setHelpText("Drag inside box to move selection. Drag handles to scale. Use SHIFT or CTRL to modify selection, ATL to move perpendicular. Doubleclick pivot to reset.");
+				MainFrame.getInstance().setHelpText("Drag inside box to move selection. Drag handles to scale. Use SHIFT or CTRL to modify selection, ALT to move perpendicular. Doubleclick pivot to reset.");
 			}
 		}
 				

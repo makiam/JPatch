@@ -30,7 +30,8 @@ public final class Launcher {
 		if (args.length >=1) {
 			if (args[0].equals("-animator")) launchAnimator();
 			else if (args[0].equals("-modeler")) launchModeler();
-			else System.out.println("usage java -jpatch.jar [-animator] [-modeler]");
+			else if (args[0].equals("-settings")) settings();
+			else System.out.println("usage java -jpatch.jar [-animator | -modeler | -settings]");
 		}
 		else {
 			try {
@@ -42,7 +43,7 @@ public final class Launcher {
 			ColumnContainer container = new ColumnContainer();
 			BButton buttonModeler = new BButton("Start JPatch Modeler");
 			BButton buttonAnimator = new BButton("Start JPatch Animator");
-			BButton buttonSettings = new BButton("Preferences");
+			BButton buttonSettings = new BButton("Edit settings (not yet functional)");
 			buttonModeler.addEventLink(CommandEvent.class, new Launcher(), "launchModeler");
 			buttonAnimator.addEventLink(CommandEvent.class, new Launcher(), "launchAnimator");
 			buttonSettings.addEventLink(CommandEvent.class, new Launcher(), "settings");

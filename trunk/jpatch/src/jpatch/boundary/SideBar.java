@@ -167,7 +167,7 @@ implements TreeSelectionListener {
 		//System.out.println(selectedLeaf);
 		
 		MutableTreeNode selectedNode = (MutableTreeNode) treeSelectionEvent.getPath().getLastPathComponent();
-		System.out.println("tree hit: selected node = " + selectedNode);
+//		System.out.println("tree hit: selected node = " + selectedNode);
 		if (selectedNode == MainFrame.getInstance().getModel().getTreenodeMaterials()) {
 			replacePanel(new MaterialsPanel((Model) selectedNode.getParent()));
 		} else if (selectedNode instanceof JPatchMaterial) {
