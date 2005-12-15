@@ -59,7 +59,7 @@ public final class JPatchScreen extends JPanel {
 	
 	private MouseListener popupMouseListener = new MouseAdapter() {
 		public void mousePressed(MouseEvent mouseEvent) {
-			System.out.println("*");
+//			System.out.println("*");
 			if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
 				if (popupMenu != null) {
 					if (popupMenu.isShowing()) {

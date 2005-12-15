@@ -70,9 +70,9 @@ implements MouseMotionListener {
 	public boolean isHit(ViewDefinition viewDef, int x, int y, Point3f hit) {
 //		Point3f p3 = getTransformedPosition(viewDef.getScreenMatrix());
 		Point3f p3 = new Point3f(getPosition(viewDef));
-		System.out.println(p3);
+//		System.out.println(p3);
 		viewDef.getScreenMatrix().transform(p3);
-		System.out.println("handle hit? " + x + " " + y + " " + p3);
+//		System.out.println("handle hit? " + x + " " + y + " " + p3);
 //		System.out.println("handle isHit? x=" + x + " y=" + y + " hx=" + p3.x + " hy=" + p3.y);
 		if (x >= p3.x - iHitSize && x <= p3.x + iHitSize && y >= p3.y - iHitSize && y <= p3.y + iHitSize) {
 			hit.set(p3);

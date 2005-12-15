@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchUndoManager.java,v 1.7 2005/11/10 15:31:32 sascha_l Exp $
+ * $Id: JPatchUndoManager.java,v 1.8 2005/12/15 16:47:26 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -28,7 +28,7 @@ import java.util.*;
  * The JPatchUndoManager stores JPatchUndoableEdits in a list and provides methods to add, redo and undo edits.<br>
  * It keeps track of the position in the position inside the list
  *
- * @version	$Revision: 1.7 $
+ * @version	$Revision: 1.8 $
  * @author	Sascha Ledinsky
  */
 public class JPatchUndoManager {
@@ -95,7 +95,7 @@ public class JPatchUndoManager {
 	 * @param edit The edit to add
 	 */
 	public void addEdit(JPatchRootEdit edit, boolean open) {
-		System.out.println(edit.sizeOf() + "\t" + edit.getClass().getName() + "\t" + edit.getName());
+//		System.out.println(edit.sizeOf() + "\t" + edit.getClass().getName() + "\t" + edit.getName());
 //		System.out.println(Runtime.getRuntime().freeMemory());
 		if (bOpen) {
 			appendEdit(edit, open);

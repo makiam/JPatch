@@ -126,6 +126,10 @@ public class JPatchUserSettings extends JPatchSettings2 {
 	}
 	
 	public static class AliasWavefrontSettings extends JPatchSettings2 {
+		private Icon icon = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/prefs/obj.png"));
+		public Icon getIcon() {
+			return icon;
+		}
 		public static enum Mode { TRIANGLES, QUADRILATERALS };
 		
 		public Mode output_mode = Mode.TRIANGLES;
@@ -174,6 +178,10 @@ public class JPatchUserSettings extends JPatchSettings2 {
 	}
 	
 	public static class InyoSettings extends JPatchSettings2 {
+		private Icon icon = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/prefs/inyo.png"));
+		public Icon getIcon() {
+			return icon;
+		}
 		public static enum Supersampling { ADAPTIVE, EVERYTHING };
 		
 		public File texture_directory = new File(System.getProperty("user.dir"));

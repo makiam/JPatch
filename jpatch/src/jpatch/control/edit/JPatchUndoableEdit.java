@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchUndoableEdit.java,v 1.9 2005/12/13 15:45:33 sascha_l Exp $
+ * $Id: JPatchUndoableEdit.java,v 1.10 2005/12/15 16:47:26 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -25,14 +25,14 @@ package jpatch.control.edit;
 /**
  * A basic interface all edits must implement
  *
- * @version	$Revision: 1.9 $
+ * @version	$Revision: 1.10 $
  * @author	Sascha Ledinsky
  */
 public interface JPatchUndoableEdit {
 	/**
 	 * debug flag
 	 */
-	static final boolean DEBUG = true;
+	static final boolean DEBUG = false;
 	
 	/**
 	 * undoes this edit

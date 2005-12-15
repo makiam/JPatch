@@ -263,7 +263,7 @@ public class Selection extends JPatchTreeLeaf {
 	}
 	
 	public void arm(int mask) {
-		System.out.println("Selection.arm(" + mask + ")");
+//		System.out.println("Selection.arm(" + mask + ")");
 		mapTransformables.clear();
 		if (((mask & CONTROLPOINTS) != 0) || ((mask & BONES) != 0)) {
 			boolean cps = (mask & CONTROLPOINTS) != 0;
@@ -292,7 +292,7 @@ public class Selection extends JPatchTreeLeaf {
 	}
 
 	public void beginTransform() {
-		System.out.println("beginTransform: " + mapTransformables);
+//		System.out.println("beginTransform: " + mapTransformables);
 		for (Iterator it = mapTransformables.keySet().iterator(); it.hasNext(); )
 			((Transformable) it.next()).beginTransform();
 		pivotTransformable.beginTransform();

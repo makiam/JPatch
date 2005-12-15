@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.12 2005/12/12 16:51:34 sascha_l Exp $
+ * $Id: Command.java,v 1.13 2005/12/15 16:47:26 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -36,7 +36,7 @@ import jpatch.boundary.*;
 import jpatch.boundary.laf.*;
 
 public final class Command implements KeyListener {
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final Command INSTANCE = new Command();
 	private Map commandActionMap = new HashMap();
 	private Map commandButtonMap = new HashMap();
