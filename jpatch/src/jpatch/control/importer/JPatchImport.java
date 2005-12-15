@@ -99,7 +99,7 @@ implements ModelImporter {
 			Point3f pBone = new Point3f();
 			pBone.interpolate(p0, p1, posOnLine);
 			float distToLine = pBone.distance(p) / l;
-			cp.setBone(bone, posOnLine, distToLine, (Boolean) mapCpParentBone.get(cp));
+			cp.setBone(bone, posOnLine, distToLine, Boolean.TRUE.equals(mapCpParentBone.get(cp)));
 		}
 		model.addCandidateFivePointPatchList(listCandidateFivePointPatch);
 		model.computePatches();

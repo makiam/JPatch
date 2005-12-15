@@ -75,5 +75,6 @@ public final class Launcher {
 	
 	private static void settings() {
 		JPatchUserSettings.main(new String[0]);
+		if (frame != null) frame.dispose();
 	}
 }
