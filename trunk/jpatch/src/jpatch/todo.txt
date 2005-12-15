@@ -2,10 +2,8 @@ TODO:
 -----
 
 * strech/compress dofs
-* rigid/smooth/twist mode for dofs
-* xml import for new features
 * handle old morphs in xml import
-* enable/disable buttons in tree correctly
-* enable/disable actions correctly
-* trigger screen-updates
-* automatically select items in tree (e.g. after delete dof)
+? enable/disable buttons in tree correctly
+? enable/disable actions correctly
+? trigger screen-updates
+? automatically select items in tree (e.g. after delete dof)
