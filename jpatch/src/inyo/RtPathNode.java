@@ -357,11 +357,13 @@ class RtPathNode {
 				intensity = light.calcIntensity( world, this.hitPoint );				
 			}
 			
+			// clear the light hit counter
+			int lightHitCount = 0;
+			
 			// any light to illuminate?
 			if (intensity > 0 && light.castsShadow) {				
 				
-				// clear the light hit counter
-				int lightHitCount = 0;
+				
 				
 				// run the sampling loop
 				for (int sample = 0; sample < samples; sample++ ) {
@@ -441,12 +443,18 @@ class RtPathNode {
 				// calculate diffuse contribution
 				diffuse = material.getDiffuse(this.normal, shadowRay.direction, this.direction );				
 				
-				// does the light have a specular component?
-				if (light.hasSpecular) {
-					// calculate specular contribution
-					specular = material.getSpecular(this.normal, shadowRay.direction, this.direction );
+//				 does the light have a specular component?
+				if (light.hasSpecular && lightHitCount > 0) {
+				   // calculate specular contribution based on the material's specular model
+				   specular = material.getSpecular(this.normal, shadowRay.direction, this.direction );
+				   // soft shadows?
+				   if (lightHitCount != samples) {      
+				      // scale by the ratio of samples that illuminate the surface
+				      specular *= (float)lightHitCount / (float)samples;
+				   }
 				} else {
-					specular = 0;
+				   // no specular highlight
+				   specular = 0;
 				}
 				
 				// release the shadow ray

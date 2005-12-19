@@ -75,8 +75,9 @@ public class InyoRenderer3 {
 			int subdiv = JPatchSettings.getInstance().inyoSettings.iSubdivMode + animModel.getSubdivisionOffset();
 			if (subdiv < 2) subdiv = 2;
 			if (subdiv > 5) subdiv = 5;
-			patchTesselator.tesselate(model, subdiv, animModel.getTransform(), true);
-	
+//			patchTesselator.tesselate(model, subdiv, animModel.getTransform(), true);
+			patchTesselator.tesselate(model, subdiv, null, true);
+			
 			
 			
 			for (Iterator iterator = model.getMaterialList().iterator(); iterator.hasNext();) {
