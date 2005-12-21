@@ -212,14 +212,18 @@ public class BvhTest {
 			mz.rotZ(rotation.z / 180 * (float) Math.PI);
 			
 			m = new Matrix3f();
-			m.setIdentity();
+			if (parent == null)
+				m.setIdentity();
+			else
+				m.set(parent.m);
 			m.mul(mz);
 			m.mul(mx);
 			m.mul(my);
 			Vector3f v = new Vector3f(offset);
 			v.add(position);
+//			m.transform(v);
 			if (parent != null) {
-				m.mul(parent.m);
+//				m.mul(parent.m);
 				parent.m.transform(v);
 			}
 			transformedPosition.add(v);
