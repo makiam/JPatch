@@ -1,13 +1,13 @@
 #Fat Jar Configuration File
-#Sun Oct 23 15:31:13 CEST 2005
+#Wed Dec 21 16:46:08 CET 2005
 onejar.license.required=true
 manifest.classpath=
 onejar.checkbox=false
 jarname=bin/jpatch_fat.jar
 manifest.mergeall=true
-manifest.mainclass=jpatch.Launcher
+manifest.mainclass=test.BvhTest
 manifest.file=<createnew>
 jarname.isextern=false
 onejar.expand=
-excludes=
-includes=<inc|jpatch/lib>~native/~linux_x86/~libjogl.so;<inc|jpatch/lib>~native/~windows/~jogl.dll
+excludes=<po|jpatch>~test/~scrapbook.jpage;<po|jpatch>~test/~UiTest.class;<po|jpatch>~test/~ImportDump.class;<po|jpatch>~test/~FontTest.class;<po|jpatch>~test/~CheckUnusedClasses$1.class;<po|jpatch>~test/~CheckUnusedClasses$2.class;<po|jpatch>~test/~CheckUnusedClasses.class;<po|jpatch>~test/~CheckSystemOutPrint.class;<po|jpatch>~test/~CheckSystemOutPrint$1.class;<po|jpatch>~test/~CheckSystemOutPrint$2.class;<po|jpatch>~test/~CheckCompoundEdits$1.class;<po|jpatch>~test/~CheckCompoundEdits.class;<po|jpatch>~patterns/;<po|jpatch>~objects/;<po|jpatch>~jpatch/;<po|jpatch>~inyo/;<jar|Buoy.jar>;<jar|bsh-core-2.0b4.jar>;<jar|jogl.jar>;<jar|xerces.jar>
+includes=
