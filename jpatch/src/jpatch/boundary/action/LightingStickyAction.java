@@ -18,7 +18,7 @@ public final class LightingStickyAction extends AbstractAction {
 	
 	public void actionPerformed(ActionEvent actionEvent) {
 		screen.setStickyLight(!screen.isStickyLight());
-		JPatchSettings.getInstance().bStickyLight = screen.isStickyLight();
+		JPatchUserSettings.getInstance().realtimeRenderer.lightFollowsCamera = screen.isStickyLight();
 	}
 }
 

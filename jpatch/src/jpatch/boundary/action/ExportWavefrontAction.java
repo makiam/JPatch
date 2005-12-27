@@ -14,9 +14,9 @@ public final class ExportWavefrontAction extends AbstractAction {
 		super("Alias|Wavefront [.obj]");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		ExportWavefrontDialog dialog = new ExportWavefrontDialog();
-		((JDialog) dialog.getComponent()).setLocationRelativeTo(MainFrame.getInstance());
-		dialog.setVisible(true);
+//		ExportWavefrontDialog dialog = new ExportWavefrontDialog();
+//		((JDialog) dialog.getComponent()).setLocationRelativeTo(MainFrame.getInstance());
+//		dialog.setVisible(true);
 	}
 }
 

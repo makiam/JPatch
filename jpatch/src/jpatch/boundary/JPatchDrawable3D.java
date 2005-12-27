@@ -16,8 +16,8 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	private static final int SUB_PIXEL_MASK_1 = 0xffff;
 	private static final float POLYGON_OFFSET = 1;
 	
-	private static final JPatchSettings settings = JPatchSettings.getInstance();
-	private static int ghost = settings.iGhost;
+	private static final JPatchUserSettings settings = JPatchUserSettings.getInstance();
+	private static int ghost = (int) (settings.colors.ghostFactor * 255);
 	private int ghostColor;
 	
 	private JPatchDrawableEventListener listener;
@@ -290,9 +290,11 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	
 	private void drawScreenTriangle(Point3f p1, Point3f p2, Point3f p3) {
 		if ((p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x) < 0) {
-			switch (settings.iBackfaceMode) {
-				case 1: return;
-				case 2: iColor = settings.iBackfaceColor;
+			switch (settings.realtimeRenderer.backfacingPatches) {
+				case HIDE:
+					return;
+				case HIGHLIGHT:
+					iColor = settings.colors.backfacingPatches.get().getRGB();
 			}
 		}
 		int x1, y1, z1, x2, y2, z2, x3, y3, z3;
@@ -332,9 +334,12 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	
 	private void drawScreenTriangle(Point3f p1, Color3f c1, Point3f p2, Color3f c2, Point3f p3, Color3f c3) {
 		if ((p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x) < 0) {
-			switch (settings.iBackfaceMode) {
-				case 1: return;
-				case 2: drawTriangle(p1, p2, p3); return;
+			switch (settings.realtimeRenderer.backfacingPatches) {
+			case HIDE:
+				return;
+			case HIGHLIGHT:
+				drawTriangle(p1, p2, p3);
+				return;
 			}
 		}
 		int x1, y1, z1, x2, y2, z2, x3, y3, z3;
@@ -403,9 +408,12 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	
 	private void drawScreenTriangle(Point3f p1, Color4f c1, Point3f p2, Color4f c2, Point3f p3, Color4f c3) {
 		if ((p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x) < 0) {
-			switch (settings.iBackfaceMode) {
-				case 1: return;
-				case 2: drawTriangle(p1, p2, p3); return;
+			switch (settings.realtimeRenderer.backfacingPatches) {
+			case HIDE:
+				return;
+			case HIGHLIGHT:
+				drawTriangle(p1, p2, p3);
+				return;
 			}
 		}
 		int x1, y1, z1, x2, y2, z2, x3, y3, z3;

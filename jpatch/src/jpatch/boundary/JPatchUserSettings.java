@@ -33,6 +33,7 @@ import javax.vecmath.*;
  *
  */
 public class JPatchUserSettings extends JPatchSettings2 {
+	private static JPatchUserSettings INSTANCE;
 	
 	public static class ColorSettings extends JPatchSettings2 {
 		private Icon icon = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/prefs/colors.png"));
@@ -42,20 +43,21 @@ public class JPatchUserSettings extends JPatchSettings2 {
 		public Color3f background = new Color3f(new Color(0x28,0x38,0x48));
 		public Color3f curves = new Color3f(new Color(255,255,255));
 		public Color3f points = new Color3f(new Color(255,255,0));
-		public Color3f head_points = new Color3f(new Color(255,0,0));
-		public Color3f multi_points = new Color3f(new Color(255,128,0));
-		public Color3f selected_points = new Color3f(new Color(0,255,0));
-		public Color3f hot_object = new Color3f(new Color(0,255,255));
+		public Color3f headPoints = new Color3f(new Color(255,0,0));
+		public Color3f multiPoints = new Color3f(new Color(255,128,0));
+		public Color3f selectedPoints = new Color3f(new Color(0,255,0));
+		public Color3f hotObject = new Color3f(new Color(0,255,255));
 		public Color3f tangents = new Color3f(new Color(255,255,0));
 		public Color3f selection = new Color3f(new Color(255,255,0));
 		public Color3f text = new Color3f(new Color(0x80,0x90,0xA0));
-		public Color3f major_grid = new Color3f(new Color(0x08,0x18,0x28));
-		public Color3f minor_grid = new Color3f(new Color(0x18,0x28,0x38));
-		public Color3f x_axis = new Color3f(new Color(255,64,0));
-		public Color3f y_axis = new Color3f(new Color(0,255,0));
-		public Color3f z_axis = new Color3f(new Color(128,128,255));
+		public Color3f majorGrid = new Color3f(new Color(0x08,0x18,0x28));
+		public Color3f minorGrid = new Color3f(new Color(0x18,0x28,0x38));
+		public Color3f xAxis = new Color3f(new Color(255,64,0));
+		public Color3f yAxis = new Color3f(new Color(0,255,0));
+		public Color3f zAxis = new Color3f(new Color(128,128,255));
 		public Color3f grey = new Color3f(new Color(0x50,0x60,0x70));
-		public Color3f backfacing_patches = new Color3f(new Color(255,0,0));
+		public Color3f backfacingPatches = new Color3f(new Color(255,0,0));
+		public float ghostFactor = 0.33f;
 	}
 	
 	public static class RealtimeRendererSettings extends JPatchSettings2 {
@@ -67,12 +69,12 @@ public class JPatchUserSettings extends JPatchSettings2 {
 		public static enum Backface { RENDER, HIDE, HIGHLIGHT };
 		public static enum LightingMode { OFF, SIMPLE, HEADLIGHT, THREE_POINT };
 		
-		public RealtimeRenderer realtime_renderer = RealtimeRenderer.SOFTWARE_ZBUFFER;
-		public int realtime_renerer_quality = 5;
-		public LightingMode lighting_mode = LightingMode.THREE_POINT;
-		public boolean light_follows_camera = false;
-		public Backface backfacing_patches = Backface.RENDER;
-		public boolean wireframe_fog_effect = true;
+		public RealtimeRenderer realtimeRenderer = RealtimeRenderer.SOFTWARE_ZBUFFER;
+		public int realtimeRenererQuality = 5;
+		public LightingMode lightingMode = LightingMode.THREE_POINT;
+		public boolean lightFollowsCamera = false;
+		public Backface backfacingPatches = Backface.RENDER;
+		public boolean wireframeFogEffect = true;
 	}
 	
 	public static class Directories extends JPatchSettings2 {
@@ -80,14 +82,14 @@ public class JPatchUserSettings extends JPatchSettings2 {
 		public Icon getIcon() {
 			return icon;
 		}
-		public boolean remember_last_directories = true;
-		public File JPatch_files = new File(System.getProperty("user.dir"));
-		public File sPatch_files = new File(System.getProperty("user.dir"));
-		public File Animation_Master_files = new File(System.getProperty("user.dir"));
-		public File PovRay_files = new File(System.getProperty("user.dir"));
-		public File RenderMan_files = new File(System.getProperty("user.dir"));
-		public File obj_files = new File(System.getProperty("user.dir"));
-		public File rotoscope_image_files = new File(System.getProperty("user.dir"));
+		public boolean rememberLastDirectories = true;
+		public File jpatchFiles = new File(System.getProperty("user.dir"));
+		public File spatchFiles = new File(System.getProperty("user.dir"));
+		public File animationmasterFiles = new File(System.getProperty("user.dir"));
+		public File povrayFiles = new File(System.getProperty("user.dir"));
+		public File rendermanFiles = new File(System.getProperty("user.dir"));
+		public File objFiles = new File(System.getProperty("user.dir"));
+		public File rotoscopeFiles = new File(System.getProperty("user.dir"));
 	}
 	
 	public static class Viewports extends JPatchSettings2 {
@@ -97,10 +99,10 @@ public class JPatchUserSettings extends JPatchSettings2 {
 		}
 		public static enum ScreenMode { SINGLE, HORIZONTAL_SPLIT, VERTICAL_SPLIT, QUAD };
 		
-		public ScreenMode viewport_mode = ScreenMode.SINGLE;
-		public boolean synchronize_viewports = false;
-		public boolean snap_to_grid = false;
-		public float grid_spacing = 1.0f;
+		public ScreenMode viewportMode = ScreenMode.SINGLE;
+		public boolean synchronizeViewports = false;
+		public boolean snapToGrid = false;
+		public float gridSpacing = 1.0f;
 	}
 	
 	public static class RendererSettings extends JPatchSettings2 {
@@ -108,21 +110,21 @@ public class JPatchUserSettings extends JPatchSettings2 {
 		public Icon getIcon() {
 			return icon;
 		}
-		public static enum Renderer { POV_RAY, RENDERMAN, INYO };
+		public static enum Renderer { POVRAY, RENDERMAN, INYO };
 		
-		public Renderer renderer_to_use = Renderer.INYO;
-		public int image_width = 640;
-		public int image_height = 480;
-		public float aspect_width = 4;
-		public float aspect_height = 3;
-		public Color3f background_color = new Color3f(0.5f, 0.5f, 0.5f);
-		public File working_directory = new File(System.getProperty("user.dir"));
-		public File model_directory = new File(System.getProperty("user.dir"));
-		public boolean delete_per_frame_files_after_rendering = true;
-		public PovraySettings Pov_Ray = new PovraySettings();
-		public RendermanSettings RenderMan = new RendermanSettings();
-		public InyoSettings Inyo = new InyoSettings();
-		public AliasWavefrontSettings Alias_Wavefront_export = new AliasWavefrontSettings();
+		public Renderer rendererToUse = Renderer.INYO;
+		public int imageWidth = 640;
+		public int imageHeight = 480;
+		public float aspectWidth = 4;
+		public float aspectHeight = 3;
+		public Color3f backgroundColor = new Color3f(0.5f, 0.5f, 0.5f);
+		public File workingDirectory = new File(System.getProperty("user.dir"));
+		public File modelDirectory = new File(System.getProperty("user.dir"));
+		public boolean deletePerFrameFilesAfterRendering = true;
+		public final PovraySettings povray = new PovraySettings();
+		public final RendermanSettings renderman = new RendermanSettings();
+		public final InyoSettings inyo = new InyoSettings();
+		public final AliasWavefrontSettings aliaswavefrontExport = new AliasWavefrontSettings();
 	}
 	
 	public static class AliasWavefrontSettings extends JPatchSettings2 {
@@ -132,10 +134,10 @@ public class JPatchUserSettings extends JPatchSettings2 {
 		}
 		public static enum Mode { TRIANGLES, QUADRILATERALS };
 		
-		public Mode output_mode = Mode.TRIANGLES;
-		public int subdivision_level = 2;
-		public boolean export_normals = true;
-		public boolean average_normals = true;
+		public Mode outputMode = Mode.TRIANGLES;
+		public int subdivisionLevel = 2;
+		public boolean exportNormals = true;
+		public boolean averageNormals = true;
 	}
 	
 	public static class PovraySettings extends JPatchSettings2 {
@@ -144,16 +146,18 @@ public class JPatchUserSettings extends JPatchSettings2 {
 			return icon;
 		}
 		public static enum Mode { TRIANGLES, BICUBIC_PATCHES };
-		public static enum Antialias { METHOD_1, METHOD_2 };
-		public File PovRay_executable = new File("");
-		public String environment_variables = "";
-		public Mode output_mode = Mode.TRIANGLES;
-		public int subdivision_level = 3;
-		public Antialias antialiasing_method = Antialias.METHOD_1;
-		public int antialiasing_level = 2;
-		public float antialiasing_threshold = 0.3f;
-		public float antialiasing_jitter = 1.0f;
-		public File include_file = new File("");
+		public static enum Antialias { OFF, METHOD_1, METHOD_2 };
+		public static enum Version { UNIX, WINDOWS };
+		public File executable = new File("");
+		public String environmentVariables = "";
+		public Version version = Version.UNIX;
+		public Mode outputMode = Mode.TRIANGLES;
+		public int subdivisionLevel = 3;
+		public Antialias antialiasingMethod = Antialias.METHOD_1;
+		public int antialiasingLevel = 2;
+		public float antialiasingThreshold = 0.3f;
+		public float antialiasingJitter = 1.0f;
+		public File includeFile = new File("");
 	}
 	
 	public static class RendermanSettings extends JPatchSettings2 {
@@ -163,17 +167,17 @@ public class JPatchUserSettings extends JPatchSettings2 {
 		}
 		public static enum Mode { TRIANGLES, QUADRILATERALS, CATMULL_CLARK_SUBDIVISION_SURFACE, BICUBIC_PATCHES };
 		public static enum Interpolation { CONSTANT, SMOOTH };
-		public File RenderMan_executable = new File("");
-		public String environment_variables = "";
-		public Mode output_mode = Mode.TRIANGLES;
-		public int subdivision_level = 3;
-		public int pixel_samples_x = 2;
-		public int pixel_samples_y = 2;
-		public String pixel_filter = "gaussian";
-		public int pixel_filter_x = 2;
-		public int pixel_filter_y = 2;
-		public float shading_rate = 1.0f;
-		public Interpolation shading_interpolation = Interpolation.SMOOTH;
+		public File executable = new File("");
+		public String environmentVariables = "";
+		public Mode outputMode = Mode.TRIANGLES;
+		public int subdivisionLevel = 3;
+		public int pixelSamplesX = 2;
+		public int pixelSamplesY = 2;
+		public String pixelFilter = "gaussian";
+		public int pixelFilterX = 2;
+		public int pixelFilterY = 2;
+		public float shadingRate = 1.0f;
+		public Interpolation shadingInterpolation = Interpolation.SMOOTH;
 		public float exposure = 1.0f;
 	}
 	
@@ -184,35 +188,35 @@ public class JPatchUserSettings extends JPatchSettings2 {
 		}
 		public static enum Supersampling { ADAPTIVE, EVERYTHING };
 		
-		public File texture_directory = new File(System.getProperty("user.dir"));
-		public int subdivision_level = 3;
-		public Supersampling supersampling_mode = Supersampling.ADAPTIVE;
-		public int supersampling_level = 3;
-		public int recursion_depth = 12;
-		public int shadow_samples = 8;
-		public boolean transparent_shadows = false;
+		public File textureDirectory = new File(System.getProperty("user.dir"));
+		public int subdivisionLevel = 3;
+		public Supersampling supersamplingMode = Supersampling.ADAPTIVE;
+		public int supersamplingLevel = 3;
+		public int recursionDepth = 12;
+		public int shadowSamples = 8;
+		public boolean transparentShadows = false;
 		public boolean caustics = false;
-		public boolean oversample_caustics = false;
-		public boolean ambient_occlusion = false;
-		public float ambient_occlusion_distance = 1000.0f;
-		public int ambient_occlusion_samples = 3;
-		public float ambient_occlusion_colorbleed = 0.25f;	
+		public boolean oversampleCaustics = false;
+		public boolean ambientOcclusion = false;
+		public float ambientOcclusionDistance = 1000.0f;
+		public int ambientOcclusionSamples = 3;
+		public float ambientOcclusionColorbleed = 0.25f;	
 	}
 	
-	public boolean new_installation = true;
-	public boolean clean_exit = false;
-	public int screen_position_x = 0;
-	public int screen_position_y = 0;
-	public int screen_width = 1024;
-	public int screen_height = 768;
-	public boolean save_screen_dimensions_on_exit = true;
-	public String look_and_feel_classname = "javax.swing.plaf.metal.MetalLookAndFeel";
+	public boolean newInstallation = true;
+	public boolean cleanExit = false;
+	public int screenPositionX = 0;
+	public int screenPositionY = 0;
+	public int screenWidth = 1024;
+	public int screenHeight = 768;
+	public boolean saveScreenDimensionsOnExit = true;
+	public String lookAndFeelClassname = "javax.swing.plaf.metal.MetalLookAndFeel";
 	
-	public Directories directories = new Directories();
-	public Viewports viewports = new Viewports();
-	public ColorSettings colors = new ColorSettings();
-	public RealtimeRendererSettings realtime_renderer = new RealtimeRendererSettings();
-	public RendererSettings export_settings = new RendererSettings();
+	public final Directories directories = new Directories();
+	public final Viewports viewports = new Viewports();
+	public final ColorSettings colors = new ColorSettings();
+	public final RealtimeRendererSettings realtimeRenderer = new RealtimeRendererSettings();
+	public final RendererSettings export = new RendererSettings();
 	
 	public static void main(String[] args) {
 		JPatchUserSettings settings = new JPatchUserSettings();
@@ -260,8 +264,14 @@ public class JPatchUserSettings extends JPatchSettings2 {
 		frame.setVisible(true);
 	}
 	
-	public JPatchUserSettings() {
+	private JPatchUserSettings() {
 		storeDefaults();
-//		load("");
+		INSTANCE = this;
+	}
+	
+	public static JPatchUserSettings getInstance() {
+		if (INSTANCE == null)
+			new JPatchUserSettings();
+		return INSTANCE;
 	}
 }

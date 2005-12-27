@@ -94,7 +94,7 @@ public class Lighting {
 		for (int l = 0; l < av3LightDirection.length; l++) {
 			av3TransformedLightDirection[l] = new Vector3f();
 		}
-		setStickyLight(JPatchSettings.getInstance().bStickyLight);
+		setStickyLight(JPatchUserSettings.getInstance().realtimeRenderer.lightFollowsCamera);
 	}
 	
 	public final void setStickyLight(boolean sticky) {

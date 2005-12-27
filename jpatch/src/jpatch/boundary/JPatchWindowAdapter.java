@@ -34,12 +34,12 @@ public class JPatchWindowAdapter extends WindowAdapter {
 	}
 	
 	public void quit(Window window) {
-		JPatchSettings settings = JPatchSettings.getInstance();
-		settings.iScreenX = MainFrame.getInstance().getX();
-		settings.iScreenY = MainFrame.getInstance().getY();
-		settings.iScreenWidth = MainFrame.getInstance().getWidth();
-		settings.iScreenHeight = MainFrame.getInstance().getHeight();
-		settings.saveSettings();
+		JPatchUserSettings settings = JPatchUserSettings.getInstance();
+		settings.screenPositionX = MainFrame.getInstance().getX();
+		settings.screenPositionY = MainFrame.getInstance().getY();
+		settings.screenWidth = MainFrame.getInstance().getWidth();
+		settings.screenHeight = MainFrame.getInstance().getHeight();
+		settings.save();
 		window.setVisible(false);
 		window.dispose();
 		System.exit(0);

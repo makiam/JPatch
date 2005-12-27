@@ -17,6 +17,6 @@ public final class SwitchRendererAction extends AbstractAction {
 		iRenderer = renderer;
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		MainFrame.getInstance().getJPatchScreen().switchRenderer(iRenderer);
+//		MainFrame.getInstance().getJPatchScreen().switchRenderer(iRenderer);
 	}
 }

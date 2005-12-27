@@ -71,7 +71,7 @@ public final class Animator extends BFrame {
 		INSTANCE = this;
 		
 		try {
-			UIManager.setLookAndFeel(JPatchSettings.getInstance().strPlafClassName);
+			UIManager.setLookAndFeel(JPatchUserSettings.getInstance().lookAndFeelClassname);
 			JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		} catch (Exception e) {
 		}
@@ -292,7 +292,7 @@ public final class Animator extends BFrame {
 	public void preferences() {
 		propertiesDialog = new BDialog(this, "Preferences", true);
 		propertiesDialog.setResizable(false);
-		textModelDir = new BTextField(JPatchSettings.getInstance().strModelDir, 20);
+		textModelDir = new BTextField(JPatchUserSettings.getInstance().directories.jpatchFiles.getPath(), 20);
 		FormContainer form = new FormContainer(3, 1);
 		BButton buttonBrowse = new BButton("browse");
 		form.add(new BLabel("Model directory:"), 0, 0);
@@ -333,7 +333,7 @@ public final class Animator extends BFrame {
 		textEnd = new BTextField("" + fEnd, 20);
 		textRate = new BTextField("" + fFramerate, 20);
 		textPrefix = new BTextField(strPrefix, 20);
-		//textModelDir = new BTextField(JPatchSettings.getInstance().strModelDir, 20);
+		//textModelDir = new BTextField(JPatchUserSettings.getInstance().strModelDir, 20);
 		textPov = new BTextArea(re.getRenderString("povray", ""), 10, 50);
 		textRib = new BTextArea(re.getRenderString("renderman", ""), 10, 50);
 		form.add(textStart, 1, 0);
@@ -404,8 +404,8 @@ public final class Animator extends BFrame {
 	}
 	
 	private void setPrefs() {
-		JPatchSettings.getInstance().strModelDir = textModelDir.getText();
-		JPatchSettings.getInstance().saveSettings();
+		JPatchUserSettings.getInstance().directories.jpatchFiles = new File(textModelDir.getText());
+		JPatchUserSettings.getInstance().directories.save();
 		propertiesDialog.dispose();
 	}
 	
@@ -477,7 +477,7 @@ public final class Animator extends BFrame {
 		new ProgressDisplay((int) Math.round(fPosition + 1), (int) Math.round(fPosition + 1));
 		
 		//progressDisplay.set(0,1);
-		//JPatchSettings settings = JPatchSettings.getInstance();
+		//JPatchUserSettings settings = JPatchUserSettings.getInstance();
 		//imagePanel.setImage(new BufferedImage(settings.iRenderWidth, settings.iRenderHeight, BufferedImage.TYPE_INT_RGB));
 		//renderFrame(frameName);
 	}
@@ -488,7 +488,7 @@ public final class Animator extends BFrame {
 	 */
 	public void renderFrame(String frameName, ProgressDisplay progressDisplay) {
 		
-		JPatchSettings settings = JPatchSettings.getInstance();
+		JPatchUserSettings settings = JPatchUserSettings.getInstance();
 		//progressDisplay.clearText();
 		//progressDisplay.show();
 		/* output geometry to temporary file */
@@ -505,16 +505,16 @@ public final class Animator extends BFrame {
 		}
 		
 		
-		switch (settings.iRenderer) {
-			case JPatchSettings.RENDERER_INYO: {
+		switch (settings.export.rendererToUse) {
+			case INYO: {
 				progressDisplay.clearText();
-				progressDisplay.addText("Working directory is: " + settings.strWorkingDir + "\n");
+				progressDisplay.addText("Working directory is: " + settings.export.workingDirectory + "\n");
 				progressDisplay.addText("Invoking Inyo...");
-				TextureParser.setTexturePath(settings.inyoSettings.strTexturePath);
+				TextureParser.setTexturePath(settings.export.inyo.textureDirectory.getPath());
 				InyoRenderer3 renderer = new InyoRenderer3(models, Animator.getInstance().getActiveCamera(), lights);
 				Image image = renderer.render(new RtInterface());
 				if (image != null) {
-					File imageFile = new File(settings.strWorkingDir, frameName + ".png");
+					File imageFile = new File(settings.export.workingDirectory, frameName + ".png");
 					try {
 						ImageIO.write((BufferedImage) image, "png", imageFile);
 					} catch (IOException e) {
@@ -528,13 +528,13 @@ public final class Animator extends BFrame {
 				////progressDisplay.repaint();
 			}
 			break;	
-			case JPatchSettings.RENDERER_RIB: {
+			case RENDERMAN: {
 				RibRenderer4 renderer = new RibRenderer4();
 				
 				//models, Animator.getInstance().getActiveCamera(), lights);
-				File ribFile = new File(settings.strWorkingDir, frameName + ".rib");
+				File ribFile = new File(settings.export.workingDirectory, frameName + ".rib");
 				progressDisplay.clearText();
-				progressDisplay.addText("Working directory is: " + settings.strWorkingDir + "\n");
+				progressDisplay.addText("Working directory is: " + settings.export.workingDirectory + "\n");
 				progressDisplay.addText("Generating geometry...");
 				
 				try {
@@ -544,11 +544,11 @@ public final class Animator extends BFrame {
 				} catch (Exception exception) {
 					exception.printStackTrace();
 				}
-				String[] ribCmd = { settings.ribSettings.strExecutable, frameName + ".rib" };
-				String[] ribEnv = JPatchSettings.getEnv(settings.ribSettings.strEnv);
+				String[] ribCmd = { settings.export.renderman.executable.getPath(), frameName + ".rib" };
+				String[] ribEnv = settings.export.renderman.environmentVariables.split(";");
 				
 				
-					File imageFile = new File(settings.strWorkingDir, frameName + ".tif");
+					File imageFile = new File(settings.export.workingDirectory, frameName + ".tif");
 					if (imageFile.exists()) imageFile.delete();
 					
 					StringBuffer sb = new StringBuffer();
@@ -565,23 +565,24 @@ public final class Animator extends BFrame {
 					sb.append("--------------------------------------------------------------------------------\n");
 					progressDisplay.addText(sb.toString());
 				try {
-					Process rib = Runtime.getRuntime().exec(ribCmd, ribEnv, new File(settings.strWorkingDir));
+					Process rib = Runtime.getRuntime().exec(ribCmd, ribEnv, settings.export.workingDirectory);
 					new ProcessMonitor(rib, progressDisplay);
 					rib.waitFor();
-					if (settings.bDeleteSources) ribFile.delete();
+					if (settings.export.deletePerFrameFilesAfterRendering)
+						ribFile.delete();
 					progressDisplay.loadImage(imageFile);
 				} catch (Exception exception) {
 					exception.printStackTrace();
 				}
 			}
 			break;
-			case JPatchSettings.RENDERER_POVRAY: {
+			case POVRAY: {
 				//PovrayRenderer3 renderer = new PovrayRenderer3(models, Animator.getInstance().getActiveCamera(), lights);
 				progressDisplay.clearText();
-				progressDisplay.addText("Working directory is: " + settings.strWorkingDir + "\n");
+				progressDisplay.addText("Working directory is: " + settings.export.workingDirectory + "\n");
 				progressDisplay.addText("Generating geometry...");
 				
-				File povrayFile = new File(settings.strWorkingDir, frameName + ".pov");
+				File povrayFile = new File(settings.export.workingDirectory, frameName + ".pov");
 				
 				try {
 					PovrayRenderer3 renderer = new PovrayRenderer3();
@@ -593,8 +594,8 @@ public final class Animator extends BFrame {
 				}
 				
 				ArrayList listCmd = new ArrayList();
-				listCmd.add(settings.povraySettings.strExecutable);
-				if (settings.povraySettings.iVersion == JPatchSettings.POVRAY_UNIX) {
+				listCmd.add(settings.export.povray.executable);
+				if (settings.export.povray.version == JPatchUserSettings.PovraySettings.Version.UNIX) {
 					listCmd.add("+I" + frameName + ".pov");
 				} else {
 					listCmd.add("/RENDER");
@@ -602,26 +603,34 @@ public final class Animator extends BFrame {
 					listCmd.add("/EXIT");
 				}
 				listCmd.add("+O" + frameName + ".png");
-				listCmd.add("+W" + settings.iRenderWidth);
-				listCmd.add("+H" + settings.iRenderHeight);
+				listCmd.add("+W" + settings.export.imageWidth);
+				listCmd.add("+H" + settings.export.imageHeight);
 				listCmd.add("-D");
 				listCmd.add("-P");
 				listCmd.add("+FN8");
-				if (settings.povraySettings.iAaMethod != 0) {
-					listCmd.add("+A" + settings.povraySettings.fAaThreshold);
-					listCmd.add("+AM" + settings.povraySettings.iAaMethod);
-					listCmd.add("+R" + settings.povraySettings.iAaLevel);
-				} else {
+				switch (settings.export.povray.antialiasingMethod) {
+				case OFF:
 					listCmd.add("-A");
+					break;
+				case METHOD_1:
+					listCmd.add("+A" + settings.export.povray.antialiasingThreshold);
+					listCmd.add("+AM 1");
+					listCmd.add("+R" + settings.export.povray.antialiasingLevel);
+					break;
+				case METHOD_2:
+					listCmd.add("+A" + settings.export.povray.antialiasingThreshold);
+					listCmd.add("+AM 2");
+					listCmd.add("+R" + settings.export.povray.antialiasingLevel);
+					break;
 				}
-				if (settings.povraySettings.fAaJitter != 0) {
-					listCmd.add("+J" + settings.povraySettings.fAaJitter);
+				if (settings.export.povray.antialiasingJitter != 0) {
+					listCmd.add("+J" + settings.export.povray.antialiasingJitter);
 				} else {
 					listCmd.add("-J");
 				}
 				
 				String[] povCmd = (String[]) listCmd.toArray(new String[0]);
-				String[] povEnv = JPatchSettings.getEnv(settings.povraySettings.strEnv);
+				String[] povEnv = settings.export.povray.environmentVariables.split(";");
 				
 				StringBuffer sb = new StringBuffer();
 				sb.append("Starting POV-Ray renderer using:\n");
@@ -639,15 +648,15 @@ public final class Animator extends BFrame {
 				progressDisplay.addText(sb.toString());
 				
 				//try {
-					File imageFile = new File(settings.strWorkingDir, frameName + ".png");
+					File imageFile = new File(settings.export.workingDirectory, frameName + ".png");
 					if (imageFile.exists()) imageFile.delete();
 					try {
-						Process pov = Runtime.getRuntime().exec(povCmd, povEnv, new File(settings.strWorkingDir));
+						Process pov = Runtime.getRuntime().exec(povCmd, povEnv, settings.export.workingDirectory);
 						progressDisplay.setRendererProcess(pov);
 						new ProcessMonitor(pov, progressDisplay);
 					
 						pov.waitFor();
-						if (settings.bDeleteSources) povrayFile.delete();
+						if (settings.export.deletePerFrameFilesAfterRendering) povrayFile.delete();
 						progressDisplay.loadImage(imageFile);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -717,7 +726,7 @@ public final class Animator extends BFrame {
 	//			imagePanel.setImage(image);
 	//			if (animationRenderer != null) animationRenderer.renderNextFrame();
 	//		} catch (Exception e) {
-	//			JPatchSettings settings = JPatchSettings.getInstance();
+	//			JPatchUserSettings settings = JPatchUserSettings.getInstance();
 	//			Image image = new BufferedImage(settings.iRenderWidth, settings.iRenderHeight, BufferedImage.TYPE_INT_RGB);
 	//			Graphics g = image.getGraphics();
 	//			g.setColor(Color.RED);
@@ -726,7 +735,7 @@ public final class Animator extends BFrame {
 	//		}
 	//	}
 	//	else {
-	//		JPatchSettings settings = JPatchSettings.getInstance();
+	//		JPatchUserSettings settings = JPatchUserSettings.getInstance();
 	//		Image image = new BufferedImage(settings.iRenderWidth, settings.iRenderHeight, BufferedImage.TYPE_INT_RGB);
 	//		Graphics g = image.getGraphics();
 	//		g.setColor(Color.RED);
@@ -774,7 +783,7 @@ public final class Animator extends BFrame {
 		dialog.setVisible(true);
 		
 		//ProgressDisplay progressDisplay = new ProgressDisplay((int) Math.round(fStart + 1), (int) Math.round(fEnd + 1));
-		//JPatchSettings settings = JPatchSettings.getInstance();
+		//JPatchUserSettings settings = JPatchUserSettings.getInstance();
 		//imagePanel.setImage(new BufferedImage(settings.iRenderWidth, settings.iRenderHeight, BufferedImage.TYPE_INT_RGB));
 		//animationRenderer = new AnimationRenderer((int) Math.round(fStart), (int) Math.round(fEnd));
 		//
@@ -906,7 +915,7 @@ public final class Animator extends BFrame {
 		private Image image;
 		
 		ImagePanel() {
-			setImage(new BufferedImage(JPatchSettings.getInstance().iRenderWidth, JPatchSettings.getInstance().iRenderHeight, BufferedImage.TYPE_INT_RGB));
+			setImage(new BufferedImage(JPatchUserSettings.getInstance().export.imageWidth, JPatchUserSettings.getInstance().export.imageWidth, BufferedImage.TYPE_INT_RGB));
 		}
 		
 		void setImage(Image image) {
@@ -1026,8 +1035,8 @@ public final class Animator extends BFrame {
 						g.drawString(imageFile.getName(), 7, 31);
 						imagePanel.setImage(image);
 					} catch (Exception e) {
-						JPatchSettings settings = JPatchSettings.getInstance();
-						Image image = new BufferedImage(settings.iRenderWidth, settings.iRenderHeight, BufferedImage.TYPE_INT_RGB);
+						JPatchUserSettings settings = JPatchUserSettings.getInstance();
+						Image image = new BufferedImage(settings.export.imageWidth, settings.export.imageHeight, BufferedImage.TYPE_INT_RGB);
 						Graphics g = image.getGraphics();
 						g.setColor(Color.RED);
 						g.drawString("Can't display image - error reading file", 8, 16);
@@ -1035,8 +1044,8 @@ public final class Animator extends BFrame {
 					}
 				}
 				else {
-					JPatchSettings settings = JPatchSettings.getInstance();
-					Image image = new BufferedImage(settings.iRenderWidth, settings.iRenderHeight, BufferedImage.TYPE_INT_RGB);
+					JPatchUserSettings settings = JPatchUserSettings.getInstance();
+					Image image = new BufferedImage(settings.export.imageWidth, settings.export.imageHeight, BufferedImage.TYPE_INT_RGB);
 					Graphics g = image.getGraphics();
 					g.setColor(Color.RED);
 					g.drawString("Can't display image - file not found", 8, 16);

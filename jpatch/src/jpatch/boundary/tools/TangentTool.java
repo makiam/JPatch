@@ -7,10 +7,10 @@ import jpatch.entity.*;
 
 public class TangentTool extends JPatchTool {
 	
-	private TangentHandle handleIn = new TangentHandle(new Color3f(JPatchSettings.getInstance().cTangent), null, TangentHandle.IN);
-	private TangentHandle handleOut = new TangentHandle(new Color3f(JPatchSettings.getInstance().cTangent), null, TangentHandle.OUT);
+	private TangentHandle handleIn = new TangentHandle(JPatchUserSettings.getInstance().colors.tangents, null, TangentHandle.IN);
+	private TangentHandle handleOut = new TangentHandle(JPatchUserSettings.getInstance().colors.tangents, null, TangentHandle.OUT);
 	
-//	private static final int GHOST_FACTOR = JPatchSettings.getInstance().iGhost;
+//	private static final int GHOST_FACTOR = JPatchUserSettings.getInstance().iGhost;
 	
 	//private PointSelection ps;
 
@@ -41,7 +41,7 @@ public class TangentTool extends JPatchTool {
 				Point3f p3Pos = new Point3f(cp.getPosition());
 				Point3f p3Tangent = new Point3f();
 				m4View.transform(p3Pos);
-				drawable.setColor(new Color3f(JPatchSettings.getInstance().cTangent)); // FIXME
+				drawable.setColor(JPatchUserSettings.getInstance().colors.tangents); // FIXME
 				if (cp.getNext() != null) {
 					p3Tangent.set(cp.getOutTangent());
 					m4View.transform(p3Tangent);

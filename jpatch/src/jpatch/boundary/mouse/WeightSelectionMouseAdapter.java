@@ -19,7 +19,7 @@ public class WeightSelectionMouseAdapter extends JPatchMouseAdapter {
 	private int iEndX, iEndX1, iEndX2;
 	private int iEndY, iEndY1, iEndY2;
 	
-	private JPatchSettings settings = JPatchSettings.getInstance();
+	private JPatchUserSettings settings = JPatchUserSettings.getInstance();
 
 	public void mousePressed(MouseEvent mouseEvent) {
 		iStartX = iEndX = mouseEvent.getX();
@@ -88,7 +88,7 @@ public class WeightSelectionMouseAdapter extends JPatchMouseAdapter {
 	
 	private void drawLine(Graphics2D g2) {
 		final int N = 1;
-		g2.setXORMode(new Color(settings.cBackground.getRGB() ^ settings.cSelected.getRGB()));
+		g2.setXORMode(new Color(settings.colors.background.get().getRGB() ^ settings.colors.selection.get().getRGB()));
 		int[] x = new int[4];
 		int[] y = new int[4];
 		for (int i = 0; i < N; i++) {

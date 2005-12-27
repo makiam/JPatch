@@ -12,7 +12,7 @@ public class PovrayRenderer3 {
 	private PatchTesselator3 patchTesselator = new PatchTesselator3();
 	
 	public void writeFrame(List animModels, Camera camera, List lights, String include, BufferedWriter file) throws IOException {
-		JPatchSettings settings = JPatchSettings.getInstance();
+		JPatchUserSettings settings = JPatchUserSettings.getInstance();
 
 		/* Header */
 		
@@ -34,7 +34,7 @@ public class PovrayRenderer3 {
 		file.write(" * Include block\n");
 		file.write(" */\n");
 		file.write("\n");
-		//file.write(JPatchSettings.getInstance().povraySettings.strInclude);
+		//file.write(JPatchUserSettings.getInstance().povraySettings.strInclude);
 		file.write(include);
 		
 		/* Background */
@@ -45,7 +45,7 @@ public class PovrayRenderer3 {
 		file.write(" */\n");
 		file.write("\n");
 		file.write("background {\n");
-		float[] rgb = settings.cBackgroundColor.getRGBColorComponents(new float[3]);
+		float[] rgb = settings.export.backgroundColor.get().getRGBColorComponents(new float[3]);
 		file.write("\tcolor rgb <" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ">\n");
 		file.write("}\n\n");
 		
@@ -58,8 +58,8 @@ public class PovrayRenderer3 {
 		file.write("camera {\n");
 		Matrix4d cam = camera.getTransform();
 		file.write("\tperspective\n");
-		file.write("\tright x * " + JPatchSettings.getInstance().fRenderAspectWidth + "\n");
-		file.write("\tup y * " + JPatchSettings.getInstance().fRenderAspectHeight + "\n");
+		file.write("\tright x * " + JPatchUserSettings.getInstance().export.aspectWidth + "\n");
+		file.write("\tup y * " + JPatchUserSettings.getInstance().export.aspectHeight + "\n");
 		file.write("\tmatrix <" + cam.m00 + ", " + cam.m10 + ", " + cam.m20 + ", " +
 					  cam.m01 + ", " + cam.m11 + ", " + cam.m21 + ", " +
 					  cam.m02 + ", " + cam.m12 + ", " + cam.m22 + ", " +
@@ -99,19 +99,19 @@ public class PovrayRenderer3 {
 	public void writeModel(Model model, Matrix4d m, String renderString, int subdivOffset, BufferedWriter file) throws IOException {
 		file.write("union {\n");
 		file.write("\t" + renderString + "\n");
-		if (JPatchSettings.getInstance().povraySettings.iOutputMode == 0) {
-			int subdiv = JPatchSettings.getInstance().povraySettings.iSubdivMode + subdivOffset;
+		if (JPatchUserSettings.getInstance().export.povray.outputMode == JPatchUserSettings.PovraySettings.Mode.TRIANGLES) {
+			int subdiv = JPatchUserSettings.getInstance().export.povray.subdivisionLevel + subdivOffset;
 			if (subdiv < 1) subdiv = 1;
 			if (subdiv > 5) subdiv = 5;
 			patchTesselator.tesselate(model, subdiv, null, true);
 		}
 		for (Iterator itMat = model.getMaterialList().iterator(); itMat.hasNext(); ) {
 			JPatchMaterial material = (JPatchMaterial) itMat.next();
-			switch (JPatchSettings.getInstance().povraySettings.iOutputMode) {
+			switch (JPatchUserSettings.getInstance().export.povray.outputMode) {
 				
 				/* Generate tesselated Hash-patch output */
 				
-				case 0: {
+				case TRIANGLES: {
 					PatchTesselator3.Vertex[] vtx = patchTesselator.getPerMaterialVertexArray(material);
 					if (vtx.length > 0) {
 						file.write("\t/*\n");
@@ -170,9 +170,9 @@ public class PovrayRenderer3 {
 				
 				/* generate Bezier-patch output */
 				
-				case 1: {
+				case BICUBIC_PATCHES: {
 					boolean active = false;
-					int steps = JPatchSettings.getInstance().povraySettings.iSubdivMode;
+					int steps = JPatchUserSettings.getInstance().export.povray.subdivisionLevel;
 					for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
 						Patch patch = (Patch) it.next();
 						if (patch.getMaterial() == material) {
