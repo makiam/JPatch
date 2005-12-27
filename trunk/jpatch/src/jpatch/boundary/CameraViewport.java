@@ -12,7 +12,7 @@ import buoy.widget.*;
 import jpatch.entity.*;
 
 public class CameraViewport {
-	private static JPatchSettings settings = JPatchSettings.getInstance();
+	private static JPatchUserSettings settings = JPatchUserSettings.getInstance();
 	private static int iCurveSubdiv = 5;
 	
 	private static float[] cB0;
@@ -362,11 +362,11 @@ public class CameraViewport {
 		int W = panel.getWidth();
 		int H = panel.getHeight();
 		Graphics2D g = (Graphics2D) image.getGraphics();
-		g.setColor(settings.cBackground);
+		g.setColor(settings.colors.background.get());
 		g.fillRect(0, 0, W, H);
 		float w;
 		int hh, ww;
-		float ar = settings.fRenderAspectWidth / settings.fRenderAspectHeight;
+		float ar = settings.export.aspectWidth / settings.export.aspectHeight;
 		if (W / ar < H) {
 			ww = (int) (W / fOverScan);
 			hh = (int) (ww / ar);
@@ -404,8 +404,8 @@ public class CameraViewport {
 				Point3f p2 = new Point3f();
 				Point3f p3 = new Point3f();
 				
-				if (Animator.getInstance().getActiveObject() == character) setColor(settings.cSelection);
-				else setColor(settings.cCurve);
+				if (Animator.getInstance().getActiveObject() == character) setColor(settings.colors.selection.get());
+				else setColor(settings.colors.curves.get());
 				for (Iterator itCurve = character.getModel().getCurveSet().iterator(); itCurve.hasNext(); ) {
 					ControlPoint start = (ControlPoint) itCurve.next();
 					if (start.isStartHook())
@@ -444,8 +444,8 @@ public class CameraViewport {
 			}
 			else if (o instanceof AnimLight) {
 				AnimLight light = (AnimLight) o;
-				if (Animator.getInstance().getActiveObject() == light) setColor(settings.cSelection);
-				else setColor(settings.cCurve);
+				if (Animator.getInstance().getActiveObject() == light) setColor(settings.colors.selection.get());
+				else setColor(settings.colors.curves.get());
 				m4Model.set(light.getTransform());
 				m4View.setIdentity();
 				m4View.mul(m4Screen);
@@ -471,11 +471,11 @@ public class CameraViewport {
 				drawLine3D(g, p[12], p[13]);
 			}
 		}
-		if (Animator.getInstance().getActiveObject() == camera) g.setColor(settings.cSelection);
-		else g.setColor(settings.cGrid);
+		if (Animator.getInstance().getActiveObject() == camera) setColor(settings.colors.selection.get());
+		else setColor(settings.colors.majorGrid.get());
 		g.drawRect((W - ww) >> 1, (H - hh) >> 1, ww, hh);
 		g.drawRect(((W - ww) >> 1) - 1, ((H - hh) >> 1) - 1, ww + 2, hh + 2);
-		g.setColor(settings.cText);
+		g.setColor(settings.colors.text.get());
 		
 		g.drawString(camera.getName(), 8, 15);
 		g.drawString("Position", 158, 15);

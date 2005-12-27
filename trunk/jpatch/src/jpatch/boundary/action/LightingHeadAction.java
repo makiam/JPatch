@@ -17,8 +17,8 @@ public final class LightingHeadAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		screen.setLightingMode(JPatchScreen.LIGHT_HEAD);
-		JPatchSettings.getInstance().iLightingMode = JPatchScreen.LIGHT_HEAD;
+		screen.setLightingMode(JPatchUserSettings.RealtimeRendererSettings.LightingMode.HEADLIGHT);
+		JPatchUserSettings.getInstance().realtimeRenderer.lightingMode = JPatchUserSettings.RealtimeRendererSettings.LightingMode.HEADLIGHT;
 	}
 }
 

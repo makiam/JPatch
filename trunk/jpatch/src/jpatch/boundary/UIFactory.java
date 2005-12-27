@@ -158,6 +158,16 @@ public class UIFactory extends DefaultHandler {
 					getMenu().add(Command.getMenuItemFor(attributes.getValue(i)));
 				}
 			}
+		} else if (localName.equals("shortcut")) {
+			String key = null;
+			String command = null;
+			for (int i = 0; i < attributes.getLength(); i++) {
+				if (attributes.getLocalName(i).equals("key"))
+					key = attributes.getValue(i);
+				else if (attributes.getLocalName(i).equals("command"))
+					command = attributes.getValue(i);
+			}
+			Command.getInstance().setKeyBinding(key, command);
 		}
 	}
 	

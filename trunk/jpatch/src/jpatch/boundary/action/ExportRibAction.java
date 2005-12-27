@@ -14,9 +14,9 @@ public final class ExportRibAction extends AbstractAction {
 		super("RenderMAN [.rib]");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		ExportRibDialog dialog = new ExportRibDialog();
-		((JDialog) dialog.getComponent()).setLocationRelativeTo(MainFrame.getInstance());
-		dialog.setVisible(true);
+//		ExportRibDialog dialog = new ExportRibDialog();
+//		((JDialog) dialog.getComponent()).setLocationRelativeTo(MainFrame.getInstance());
+//		dialog.setVisible(true);
 	}
 }
 

@@ -24,13 +24,13 @@ public class RibRenderer4 {
 	
 	
 	public void writeToFile(List animModels, Camera camera, List lights, BufferedWriter file, String frameName) {
-		JPatchSettings settings = JPatchSettings.getInstance();
+		JPatchUserSettings settings = JPatchUserSettings.getInstance();
 		
 		try {
 			String[] filter = { "box", "triangle", "catmullrom", "gaussian", "sinc" };
-			float screenHeight = settings.fRenderAspectHeight / settings.fRenderAspectWidth;
-			float pixelAspect = (float) settings.iRenderWidth / (float) settings.iRenderHeight * screenHeight;
-			float[] rgb = settings.cBackgroundColor.getRGBColorComponents(new float[3]);
+			float screenHeight = settings.export.aspectHeight / settings.export.aspectWidth;
+			float pixelAspect = (float) settings.export.imageWidth / (float) settings.export.imageHeight * screenHeight;
+			float[] rgb = settings.export.backgroundColor.get().getRGBColorComponents(new float[3]);
 			
 			//file = new BufferedWriter(new FileWriter(f));
 			file.write("##RenderMan RIB-Structure 1.1\n");
@@ -39,15 +39,18 @@ public class RibRenderer4 {
 			file.write("FrameBegin 1\n");
 			file.write("\n");
 			file.write("Display \"" + frameName + "\" \"tiff\" \"rgb\" \"string compression\" \"none\" \n");
-			file.write("Format " + settings.iRenderWidth + " " + settings.iRenderHeight + " " + pixelAspect + "\n");
-			file.write("PixelSamples " + settings.ribSettings.iPixelSamplesX + " " + settings.ribSettings.iPixelSamplesX + "\n");
-			file.write("PixelFilter \"" + filter[settings.ribSettings.iPixelFilter] + "\" " + settings.ribSettings.iPixelFilterX + " " + settings.ribSettings.iPixelFilterY + "\n");
-			file.write("ShadingRate " + settings.ribSettings.fShadingRate + "\n");
-			if (settings.ribSettings.iShadingInterpolation == 0)
+			file.write("Format " + settings.export.imageWidth + " " + settings.export.imageHeight + " " + pixelAspect + "\n");
+			file.write("PixelSamples " + settings.export.renderman.pixelSamplesX + " " + settings.export.renderman.pixelSamplesY + "\n");
+			file.write("PixelFilter \"" + settings.export.renderman.pixelFilter + "\" " + settings.export.renderman.pixelFilterX + " " + settings.export.renderman.pixelFilterY + "\n");
+			file.write("ShadingRate " + settings.export.renderman.shadingRate + "\n");
+			switch (settings.export.renderman.shadingInterpolation) {
+			case CONSTANT:
 				file.write("ShadingInterpolation \"constant\"\n");
-			else
+				break;
+			case SMOOTH:
 				file.write("ShadingInterpolation \"smooth\"\n");
-			
+				break;
+			}
 			file.write("\n");
 			//file.write("Declare \"background\" \"color\"\n");
 			file.write("Imager \"background\" \"color background\" [" + rgb[0] + " " + rgb[1] + " " + rgb[2] + "]\n");
@@ -94,11 +97,11 @@ public class RibRenderer4 {
 	}
 	
 	public void writeModel(Model model, Matrix4d m, String renderString, int subdivOffset, BufferedWriter file) throws IOException {
-		if (JPatchSettings.getInstance().ribSettings.iOutputMode != 3) {
-			int subdiv = JPatchSettings.getInstance().ribSettings.iSubdivMode + subdivOffset;
+		if (JPatchUserSettings.getInstance().export.renderman.outputMode != JPatchUserSettings.RendermanSettings.Mode.BICUBIC_PATCHES) {
+			int subdiv = JPatchUserSettings.getInstance().export.renderman.subdivisionLevel + subdivOffset;
 			if (subdiv < 1) subdiv = 1;
 			if (subdiv > 5) subdiv = 5;
-			patchTesselator.tesselate(model, subdiv, null, JPatchSettings.getInstance().ribSettings.iOutputMode != 2);
+			patchTesselator.tesselate(model, subdiv, null, JPatchUserSettings.getInstance().export.renderman.outputMode != JPatchUserSettings.RendermanSettings.Mode.CATMULL_CLARK_SUBDIVISION_SURFACE);
 			
 			for (Iterator itMat = model.getMaterialList().iterator(); itMat.hasNext(); ) {
 				JPatchMaterial material = (JPatchMaterial) itMat.next();
@@ -109,8 +112,8 @@ public class RibRenderer4 {
 					file.write("AttributeBegin\n");
 					file.write(AbstractRenderer.shader(material.getMaterialProperties(), material.getRenderString("renderman","")));
 					
-					switch (JPatchSettings.getInstance().ribSettings.iOutputMode) {
-						case 0: {
+					switch (JPatchUserSettings.getInstance().export.renderman.outputMode) {
+						case TRIANGLES: {
 							file.write("PointsPolygons [");
 							int[][] triangles = patchTesselator.getPerMaterialTriangleArray();
 							for (int i = 0; i < triangles.length; i++) file.write("3 ");
@@ -125,7 +128,7 @@ public class RibRenderer4 {
 							file.write("]\n");
 						}
 						break;
-						case 1: {
+						case QUADRILATERALS: {
 							file.write("PointsPolygons [");
 							int[][] quads = patchTesselator.getPerMaterialQuadArray();
 							for (int i = 0; i < quads.length; i++) file.write(quads[i].length + " ");
@@ -144,7 +147,7 @@ public class RibRenderer4 {
 							file.write("]\n");
 						}
 						break;
-						case 2: {
+						case CATMULL_CLARK_SUBDIVISION_SURFACE: {
 							file.write("SubdivisionMesh \"catmull-clark\" [ ");
 							int[][] quads = patchTesselator.getPerMaterialQuadArray();
 							for (int i = 0; i < quads.length; i++) file.write(quads[i].length + " ");

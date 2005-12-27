@@ -20,7 +20,7 @@ public class SelectMouseMotionListener implements MouseMotionListener {
 	private int iMouseX;
 	private int iMouseY;
 	
-	private JPatchSettings settings = JPatchSettings.getInstance();
+	private JPatchUserSettings settings = JPatchUserSettings.getInstance();
 
 	public SelectMouseMotionListener(int mouseX, int mouseY) {
 		iMouseX = mouseX;
@@ -35,7 +35,7 @@ public class SelectMouseMotionListener implements MouseMotionListener {
 		switch(iMode) {
 			case RECTANGLE:
 				Graphics2D g2 = (Graphics2D)((Component)mouseEvent.getSource()).getGraphics();
-				g2.setXORMode(new Color(settings.cBackground.getRGB() ^ settings.cSelection.getRGB()));
+				g2.setXORMode(new Color(settings.colors.background.get().getRGB() ^ settings.colors.selection.get().getRGB()));
 				g2.setStroke(new BasicStroke(1.0f,BasicStroke.CAP_BUTT,BasicStroke.JOIN_BEVEL,0.0f,new float[] { 5.0f, 5.0f }, 0.0f));
 				int eventX = mouseEvent.getX();
 				int eventY = mouseEvent.getY();

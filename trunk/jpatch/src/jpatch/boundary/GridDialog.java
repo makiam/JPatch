@@ -49,7 +49,7 @@ public class GridDialog extends JDialog implements ActionListener {
 			setVisible(false);
 			dispose();
 			MainFrame.getInstance().getJPatchScreen().setGridSpacing(new Float(textSpacing.getText()).floatValue());
-			JPatchSettings.getInstance().fGridSpacing = new Float(textSpacing.getText()).floatValue();
+			JPatchUserSettings.getInstance().viewports.gridSpacing = new Float(textSpacing.getText()).floatValue();
 		}
 	}
 }

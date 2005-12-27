@@ -96,7 +96,7 @@ public final class MainFrame extends JFrame {
 			INSTANCE = this;
 			
 			try {
-				String plaf = JPatchSettings.getInstance().strPlafClassName;
+				String plaf = JPatchUserSettings.getInstance().lookAndFeelClassname;
 				if (plaf.equals("jpatch.boundary.laf.SmoothLookAndFeel"))
 					if (jpatch.auxilary.JPatchUtils.isJvmVersionGreaterOrEqual(1, 5))
 						UIManager.setLookAndFeel(new SmoothLookAndFeel());
@@ -157,9 +157,9 @@ public final class MainFrame extends JFrame {
 			/* -------------------------- */
 //			getContentPane().add(jpatchScreen,BorderLayout.CENTER);
 			
-			JPatchSettings settings = JPatchSettings.getInstance();
-			setLocation(settings.iScreenX,settings.iScreenY);
-			setSize(settings.iScreenWidth,settings.iScreenHeight);
+			JPatchUserSettings settings = JPatchUserSettings.getInstance();
+			setLocation(settings.screenPositionX,settings.screenPositionY);
+			setSize(settings.screenWidth,settings.screenHeight);
 			
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			addWindowListener(new JPatchWindowAdapter());
@@ -274,11 +274,11 @@ public final class MainFrame extends JFrame {
 			
 //			mainToolBar.setScreenMode(jpatchScreen);
 			
-			if (JPatchSettings.getInstance().bFirstStart) {
+			if (JPatchUserSettings.getInstance().newInstallation) {
 				if (SplashScreen.instance != null)
 					SplashScreen.instance.clearSplash();
 				new About(this);
-				JPatchSettings.getInstance().bFirstStart = false;
+				JPatchUserSettings.getInstance().newInstallation = false;
 			}
 			
 //			meshToolBar.reset();
@@ -430,7 +430,7 @@ public final class MainFrame extends JFrame {
 //		meshToolBar.reset();
 		//repaint();
 		//sideBar.repaint();
-		JPatchSettings.getInstance().strJPatchFile = "";
+//		JPatchUserSettings.getInstance().strJPatchFile = "";
 		validate();
 	}
 	
@@ -439,7 +439,21 @@ public final class MainFrame extends JFrame {
 	}
 	
 	public void initScreen() {
-		int mode = JPatchSettings.getInstance().iScreenMode;
+		int mode = 0;
+		switch (JPatchUserSettings.getInstance().viewports.viewportMode) {
+		case SINGLE:
+			mode = 1;
+			break;
+		case HORIZONTAL_SPLIT:
+			mode = 2;
+			break;
+		case VERTICAL_SPLIT:
+			mode = 3;
+			break;
+		case QUAD:
+			mode = 4;
+			break;
+		}
 		if (jpatchScreen != null) {
 			getContentPane().remove(jpatchScreen);
 			mode = jpatchScreen.getMode();

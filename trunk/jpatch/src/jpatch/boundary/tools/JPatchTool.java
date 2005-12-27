@@ -5,7 +5,7 @@ import jpatch.boundary.mouse.*;
 
 public abstract class JPatchTool extends JPatchMouseAdapter {
 	
-	protected JPatchSettings settings = JPatchSettings.getInstance();
+	protected JPatchUserSettings settings = JPatchUserSettings.getInstance();
 
 	public abstract void paint(ViewDefinition viewDef);
 	//public abstract void reInit(PointSelection ps);

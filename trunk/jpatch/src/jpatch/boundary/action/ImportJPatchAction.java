@@ -50,7 +50,7 @@ public final class ImportJPatchAction extends AbstractAction {
 	}
 	
 	private void load() {
-		JFileChooser fileChooser = new JFileChooser(JPatchSettings.getInstance().strJPatchPath);
+		JFileChooser fileChooser = new JFileChooser(JPatchUserSettings.getInstance().directories.jpatchFiles);
 		javax.swing.filechooser.FileFilter defaultFileFilter = new JPatchFilter();
 		fileChooser.addChoosableFileFilter(defaultFileFilter);
 		fileChooser.addChoosableFileFilter(new AMFilter());
@@ -65,14 +65,14 @@ public final class ImportJPatchAction extends AbstractAction {
 			//System.out.println(extension);
 			if (extension.equals("spt")) {
 				modelImporter = new SPatchImport();
-				JPatchSettings.getInstance().strJPatchPath = file.getParent();
+				JPatchUserSettings.getInstance().directories.spatchFiles = file.getParentFile();
 			} else if (extension.equals("mdl")) {
 				modelImporter = new AnimationMasterImport();
-				JPatchSettings.getInstance().strJPatchPath = file.getParent();
+				JPatchUserSettings.getInstance().directories.animationmasterFiles = file.getParentFile();
 			} else {
 				modelImporter = new JPatchImport();
-				JPatchSettings.getInstance().strJPatchPath = file.getParent();
-				JPatchSettings.getInstance().strJPatchFile = filename;
+				JPatchUserSettings.getInstance().directories.jpatchFiles = file.getParentFile();
+//				JPatchUserSettings.getInstance().strJPatchFile = filename;
 			}
 			if (!bNewModel) {
 				Model model = MainFrame.getInstance().getModel();

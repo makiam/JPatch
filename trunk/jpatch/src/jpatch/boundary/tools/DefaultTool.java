@@ -79,7 +79,7 @@ public class DefaultTool extends JPatchTool {
 		//m3Rot = ps.getRotation();
 		//p3CornerA = ps.getCornerA();
 		//p3CornerB = ps.getCornerB();
-		Color3f color = new Color3f(settings.cSelection);
+		Color3f color = settings.colors.selection;
 //		pivotHandle = new PivotHandle2(color);
 		aHandle = new Handle[] {
 			new DefaultHandle(this, new Point3f(), color),
@@ -253,7 +253,7 @@ public class DefaultTool extends JPatchTool {
 				m4View.transform(ap3[p]);
 			}
 			
-			drawable.setColor(new Color3f(settings.cSelection)); // FIXME
+			drawable.setColor(settings.colors.selection);
 //			drawable.drawGhostLine3D(ap3[0],ap3[1],GHOST_FACTOR);
 //			drawable.drawGhostLine3D(ap3[1],ap3[2],GHOST_FACTOR);
 //			drawable.drawGhostLine3D(ap3[2],ap3[3],GHOST_FACTOR);
