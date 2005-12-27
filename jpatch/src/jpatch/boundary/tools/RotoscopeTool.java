@@ -65,11 +65,11 @@ public final class RotoscopeTool extends JPatchTool {
 	}
 	
 	public void paint(ViewDefinition viewDef) {
-		JPatchSettings settings = JPatchSettings.getInstance();
+		JPatchUserSettings settings = JPatchUserSettings.getInstance();
 		JPatchDrawable2 drawable = viewDef.getDrawable();
 		init(viewDef);
 		if (rotoscope == null) {
-			drawable.setColor(new Color3f(settings.cSelection)); // FIXME
+			drawable.setColor(settings.colors.selection);
 			drawable.drawString("No rotoscope set!", (int) (viewDef.getWidth() / 2 - 50), (int) (viewDef.getHeight() / 2 - 20));
 			return;
 		}
@@ -84,7 +84,7 @@ public final class RotoscopeTool extends JPatchTool {
 		
 		
 		Color3f white = new Color3f(1,1,1);
-		Color3f cSelection = new Color3f(settings.cSelection);
+		Color3f cSelection = settings.colors.selection;
 		if (iState == MOVE) {
 			drawable.setColor(white);
 			drawable.drawRect(iLeftX,iTopY,iWidth,iHeight);

@@ -25,9 +25,9 @@ public class InyoRenderer3 {
 		//Model model = MainFrame.getInstance().getModel();
 		//model.computePatches();
 		
-		JPatchSettings settings = JPatchSettings.getInstance();
+		JPatchUserSettings settings = JPatchUserSettings.getInstance();
 		
-		inyo.setImageSize(settings.iRenderHeight, settings.iRenderWidth, 1);
+		inyo.setImageSize(settings.export.imageWidth, settings.export.imageHeight, 1);
 		//inyo.setAspectRatio() ???
 		
 		Matrix4d cam = new Matrix4d(camera.getTransform());
@@ -35,15 +35,15 @@ public class InyoRenderer3 {
 		inyo.setCamera(cam);
 		inyo.setCameraFocalLength((float) camera.getFocalLength());
 		
-		inyo.setMaxRecursionDepth(settings.inyoSettings.iRecursion);
-		inyo.setSoftShadowSamples(settings.inyoSettings.iShadowSamples);
-		inyo.setTransparentShadows(settings.inyoSettings.bTransparentShadows);
-		inyo.setCaustics(settings.inyoSettings.bEnableCaustics, settings.inyoSettings.bOversampleCaustics);
-		inyo.setUseAmbientOcclusion(settings.inyoSettings.bEnableAmbientOcclusion);
-		inyo.setAmbientOcclusion(settings.inyoSettings.fAmbientOcclusionDistance);
-		inyo.setAmbientOcclusionSamples(settings.inyoSettings.iAmbientOcclusionSamples);
-		inyo.ambientOcclusionColorBleed(settings.inyoSettings.fAmbientOcclusionColorbleed);
-		inyo.setOversample(settings.inyoSettings.iSupersample, settings.inyoSettings. iSamplingMode == 1);
+		inyo.setMaxRecursionDepth(settings.export.inyo.recursionDepth);
+		inyo.setSoftShadowSamples(settings.export.inyo.shadowSamples);
+		inyo.setTransparentShadows(settings.export.inyo.transparentShadows);
+		inyo.setCaustics(settings.export.inyo.caustics, settings.export.inyo.oversampleCaustics);
+		inyo.setUseAmbientOcclusion(settings.export.inyo.ambientOcclusion);
+		inyo.setAmbientOcclusion(settings.export.inyo.ambientOcclusionDistance);
+		inyo.setAmbientOcclusionSamples(settings.export.inyo.ambientOcclusionSamples);
+		inyo.ambientOcclusionColorBleed(settings.export.inyo.ambientOcclusionColorbleed);
+		inyo.setOversample(settings.export.inyo.supersamplingLevel, settings.export.inyo.supersamplingMode == JPatchUserSettings.InyoSettings.Supersampling.ADAPTIVE);
 		
 		inyo.setShowStats(false);
 		
@@ -51,7 +51,7 @@ public class InyoRenderer3 {
 		 * background
 		 */
 		float[] skyColor = new float[3];
-		settings.cBackgroundColor.getRGBColorComponents(skyColor);
+		settings.export.backgroundColor.get().getRGBColorComponents(skyColor);
 		inyo.setSkyColor(skyColor[0], skyColor[1], skyColor[2]);
 		
 		/*
@@ -72,12 +72,11 @@ public class InyoRenderer3 {
 		for (Iterator it = models.iterator(); it.hasNext(); ) {
 			AnimModel animModel = (AnimModel) it.next();
 			Model model = animModel.getModel();
-			int subdiv = JPatchSettings.getInstance().inyoSettings.iSubdivMode + animModel.getSubdivisionOffset();
+			int subdiv = JPatchUserSettings.getInstance().export.inyo.subdivisionLevel + animModel.getSubdivisionOffset();
 			if (subdiv < 2) subdiv = 2;
 			if (subdiv > 5) subdiv = 5;
-//			patchTesselator.tesselate(model, subdiv, animModel.getTransform(), true);
-			patchTesselator.tesselate(model, subdiv, null, true);
-			
+			patchTesselator.tesselate(model, subdiv, animModel.getTransform(), true);
+	
 			
 			
 			for (Iterator iterator = model.getMaterialList().iterator(); iterator.hasNext();) {

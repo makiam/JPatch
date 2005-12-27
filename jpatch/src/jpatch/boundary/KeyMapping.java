@@ -4,7 +4,7 @@ import java.awt.event.*;
 
 public class KeyMapping {
 
-	private static JPatchSettings settings = JPatchSettings.getInstance();
+	private static JPatchUserSettings settings = JPatchUserSettings.getInstance();
 	
 	public static JPatchKey getKey(String function) {
 //		for (int i = 0; i < settings.astrKeyMap.length; i++) {

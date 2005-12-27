@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.13 2005/12/15 16:47:26 sascha_l Exp $
+ * $Id: Command.java,v 1.14 2005/12/27 16:27:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -289,7 +289,7 @@ public final class Command implements KeyListener {
 				"horizontally split view",
 				"vertically split view",
 				"quad view"
-		}, JPatchSettings.getInstance().iScreenMode - 1);
+		}, JPatchUserSettings.getInstance().viewports.viewportMode.ordinal());
 		
 		createGroup(new String[] {
 				"front view",
@@ -327,7 +327,7 @@ public final class Command implements KeyListener {
 		 */
 		((AbstractButton) commandMenuItemMap.get("select points")).setSelected(true);
 		((AbstractButton) commandMenuItemMap.get("select bones")).setSelected(true);
-		((AbstractButton) commandMenuItemMap.get("snap to grid")).setSelected(JPatchSettings.getInstance().bGridSnap);
+		((AbstractButton) commandMenuItemMap.get("snap to grid")).setSelected(JPatchUserSettings.getInstance().viewports.snapToGrid);
 		
 		/*
 		 * Add change listeners to toggle buttons
@@ -435,11 +435,16 @@ public final class Command implements KeyListener {
 			if (menuItem.getText() == null)
 				menuItem.setText(command);
 		}
-		String keyString = (String) JPatchSettings.getInstance().commandKeyMap.get(command);
-		if (keyString != null) {
-			keyCommandMap.put(KeyStroke.getKeyStroke(keyString), command);
-			commandKeyMap.put(command, keyString);
-		}
+//		String keyString = (String) JPatchSettings.getInstance().commandKeyMap.get(command);
+//		if (keyString != null) {
+//			keyCommandMap.put(KeyStroke.getKeyStroke(keyString), command);
+//			commandKeyMap.put(command, keyString);
+//		}
+	}
+	
+	public void setKeyBinding(String key, String command) {
+		keyCommandMap.put(KeyStroke.getKeyStroke(key), command);
+		commandKeyMap.put(command, key);
 	}
 	
 	private void createGroup(String[] commands, int selectedIndex) {

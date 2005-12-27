@@ -29,7 +29,7 @@
 //	
 //	private Component compSource;
 //	
-//	private JPatchSettings settings = JPatchSettings.getInstance();
+//	private JPatchUserSettings settings = JPatchUserSettings.getInstance();
 //
 //	public MagnetMouseAdapter() {
 //		MainFrame.getInstance().setHelpText("Click and drag empty space to set magnet influence. Click and drag on point to move.");

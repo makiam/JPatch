@@ -2,7 +2,7 @@
 //
 //import javax.swing.JOptionPane;
 //
-//import jpatch.boundary.JPatchSettings;
+//import jpatch.boundary.JPatchUserSettings;
 //import jpatch.boundary.MainFrame;
 //import buoy.event.CommandEvent;
 //import buoy.event.FocusLostEvent;
@@ -19,8 +19,8 @@
 //
 //public class KeyMapDialog extends BDialog {
 //
-//	private JPatchSettings settings = JPatchSettings.getInstance();
-//	private String[] keyMap = JPatchSettings.getInstance().astrKeyMap;
+//	private JPatchUserSettings settings = JPatchUserSettings.getInstance();
+//	private String[] keyMap = JPatchUserSettings.getInstance().astrKeyMap;
 //	private ColumnContainer content = new ColumnContainer();
 //	private RowContainer buttonPane = new RowContainer();
 //	private BButton buttonOk = new BButton("OK");

@@ -12,7 +12,7 @@ import jpatch.entity.*;
 import jpatch.entity.Bone.BoneTransformable;
 
 public class RotateTool extends JPatchTool {
-//	private static final int GHOST_FACTOR = JPatchSettings.getInstance().iGhost;
+//	private static final int GHOST_FACTOR = JPatchUserSettings.getInstance().iGhost;
 	
 	private static final int SUBDIV = 64;
 	private static final float S = 1f / (float) Math.sqrt(2);
@@ -84,10 +84,10 @@ public class RotateTool extends JPatchTool {
 		m3X.rotX((float)Math.PI/4);
 		m3Y.rotY((float)Math.PI/4);
 		m3Z.rotZ((float)Math.PI/4);
-		Color3f cSelect = new Color3f(settings.cSelection);
-		Color3f colorX = new Color3f(settings.cX);
-		Color3f colorY = new Color3f(settings.cY);
-		Color3f colorZ = new Color3f(settings.cZ);
+		Color3f cSelect = settings.colors.selection;
+		Color3f colorX = settings.colors.xAxis;
+		Color3f colorY = settings.colors.yAxis;
+		Color3f colorZ = settings.colors.zAxis;
 		pivotHandle = new PivotHandle(this, cSelect);
 		aHandle = new Handle[] {
 			new RotateHandle(new Point3f( 0, S, S), this, colorX, v3AxisX, m3X),
@@ -168,7 +168,7 @@ public class RotateTool extends JPatchTool {
 		Point3f p3a = new Point3f();
 		Point3f p3b = new Point3f();
 		Color3f c3a = new Color3f();
-		Color3f c3b = new Color3f(settings.cBackground);
+		Color3f c3b = settings.colors.background;
 		Color3f c3 = new Color3f();
 		Color3f c3la = new Color3f();
 		Color3f c3lb = new Color3f();
@@ -197,7 +197,7 @@ public class RotateTool extends JPatchTool {
 		m.transform(p3a);
 		p3a.add(p3Pivot);
 		m4View.transform(p3a);
-		c3a.set(settings.cX);
+		c3a.set(settings.colors.xAxis);
 		float f;
 		for (int s = 0; s < SUBDIV; s++) {
 			p3b.set(0, fRadius * COS[s], fRadius * SIN[s]);
@@ -227,7 +227,7 @@ public class RotateTool extends JPatchTool {
 		m4View.transform(p3a);
 		m4View.transform(p3b);
 		
-		c3a.set(settings.cX);
+		c3a.set(settings.colors.xAxis);
 		f = (p3a.z - p3TransformedPivot.z) * fInvRadius + 0.3f;
 		c3la.interpolate(c3a,c3b,f);
 		c3la.clamp(0.1f,1);
@@ -252,7 +252,7 @@ public class RotateTool extends JPatchTool {
 		m.transform(p3a);
 		p3a.add(p3Pivot);
 		m4View.transform(p3a);
-		c3a.set(settings.cY);
+		c3a.set(settings.colors.yAxis);
 		for (int s = 0; s < SUBDIV; s++) {
 			p3b.set(fRadius * COS[s], 0, fRadius * SIN[s]);
 			m.transform(p3b);
@@ -283,7 +283,7 @@ public class RotateTool extends JPatchTool {
 		//drawable.setColor(settings.cY);
 		//drawable.drawLine3D(p3a, p3b);
 		
-		c3a.set(settings.cY);
+		c3a.set(settings.colors.yAxis);
 		f = (p3a.z - p3TransformedPivot.z) * fInvRadius + 0.3f;
 		c3la.interpolate(c3a,c3b,f);
 		c3la.clamp(0.1f,1);
@@ -306,7 +306,7 @@ public class RotateTool extends JPatchTool {
 		m.transform(p3a);
 		p3a.add(p3Pivot);
 		m4View.transform(p3a);
-		c3a.set(settings.cZ);
+		c3a.set(settings.colors.zAxis);
 		for (int s = 0; s < SUBDIV; s++) {
 			p3b.set(fRadius * COS[s], fRadius * SIN[s], 0);
 			m.transform(p3b);
@@ -337,7 +337,7 @@ public class RotateTool extends JPatchTool {
 		//drawable.setColor(settings.cZ);
 		//drawable.drawLine3D(p3a, p3b);
 		
-		c3a.set(settings.cZ);
+		c3a.set(settings.colors.zAxis);
 		f = (p3a.z - p3TransformedPivot.z) * fInvRadius + 0.3f;
 		c3la.interpolate(c3a,c3b,f);
 		c3la.clamp(0.1f,1);
@@ -355,7 +355,7 @@ public class RotateTool extends JPatchTool {
 			p3la.set(p3lb);
 		}
 		
-		drawable.setColor(new Color3f(settings.cSelection)); // FIXME
+		drawable.setColor(settings.colors.selection);
 		p3a.set(fRadius * COS[SUBDIV - 1] * 1.0f, fRadius * SIN[SUBDIV - 1] * 1.0f, 0);
 		//m3RotA.transform(p3a);
 		Matrix3f m3 = new Matrix3f();

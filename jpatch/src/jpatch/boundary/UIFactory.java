@@ -1,5 +1,5 @@
 /*
- * $Id: UIFactory.java,v 1.5 2005/11/21 14:48:59 sascha_l Exp $
+ * $Id: UIFactory.java,v 1.6 2005/12/27 16:27:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -158,6 +158,16 @@ public class UIFactory extends DefaultHandler {
 					getMenu().add(Command.getMenuItemFor(attributes.getValue(i)));
 				}
 			}
+		} else if (localName.equals("shortcut")) {
+			String key = null;
+			String command = null;
+			for (int i = 0; i < attributes.getLength(); i++) {
+				if (attributes.getLocalName(i).equals("key"))
+					key = attributes.getValue(i);
+				else if (attributes.getLocalName(i).equals("command"))
+					command = attributes.getValue(i);
+			}
+			Command.getInstance().setKeyBinding(key, command);
 		}
 	}
 	

@@ -1,6 +1,7 @@
 package jpatch.boundary.action;
 
 import java.awt.event.*;
+
 import javax.swing.*;
 import jpatch.boundary.*;
 
@@ -17,8 +18,8 @@ public final class LightingSimpleAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		screen.setLightingMode(JPatchScreen.LIGHT_SIMPLE);
-		JPatchSettings.getInstance().iLightingMode = JPatchScreen.LIGHT_SIMPLE;
+		screen.setLightingMode(JPatchUserSettings.RealtimeRendererSettings.LightingMode.SIMPLE);
+		JPatchUserSettings.getInstance().realtimeRenderer.lightingMode = JPatchUserSettings.RealtimeRendererSettings.LightingMode.SIMPLE;
 	}
 }
 

@@ -77,7 +77,7 @@ public class AnimatorMainMenu extends BMenuBar {
 	}
 	
 	private void addModel() {
-		JFileChooser fileChooser = new JFileChooser(JPatchSettings.getInstance().strModelDir);
+		JFileChooser fileChooser = new JFileChooser(JPatchUserSettings.getInstance().export.modelDirectory);
 		javax.swing.filechooser.FileFilter defaultFileFilter = new JPatchFilter();
 		fileChooser.setFileFilter(defaultFileFilter);
 		if (fileChooser.showOpenDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
@@ -97,9 +97,9 @@ public class AnimatorMainMenu extends BMenuBar {
 	}
 	
 	private void rendererOptions() {
-		RendererPrefs rendererPrefs = new RendererPrefs();
-		((JDialog) rendererPrefs.getComponent()).setLocationRelativeTo(Animator.getInstance().getComponent());
-		rendererPrefs.setVisible(true);
+//		RendererPrefs rendererPrefs = new RendererPrefs();
+//		((JDialog) rendererPrefs.getComponent()).setLocationRelativeTo(Animator.getInstance().getComponent());
+//		rendererPrefs.setVisible(true);
 	}
 	
 	private void dumpXml() {
@@ -107,7 +107,7 @@ public class AnimatorMainMenu extends BMenuBar {
 	}
 	
 	private void load() {
-		JFileChooser fileChooser = new JFileChooser(JPatchSettings.getInstance().strModelDir);
+		JFileChooser fileChooser = new JFileChooser(JPatchUserSettings.getInstance().export.modelDirectory);
 		if (fileChooser.showOpenDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			String filename = fileChooser.getSelectedFile().getPath();
 			Animator.getInstance().NEW();
@@ -118,7 +118,7 @@ public class AnimatorMainMenu extends BMenuBar {
 	}
 	
 	private void save() {
-		JFileChooser fileChooser = new JFileChooser(JPatchSettings.getInstance().strJPatchPath);
+		JFileChooser fileChooser = new JFileChooser(JPatchUserSettings.getInstance().directories.jpatchFiles);
 		if (fileChooser.showSaveDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			String filename = fileChooser.getSelectedFile().getPath();
 			try {
@@ -132,7 +132,7 @@ public class AnimatorMainMenu extends BMenuBar {
 	}
 	
 	private void loadTimesheet() {
-		JFileChooser fileChooser = new JFileChooser(JPatchSettings.getInstance().strJPatchPath);
+		JFileChooser fileChooser = new JFileChooser(JPatchUserSettings.getInstance().directories.jpatchFiles);
 		//javax.swing.filechooser.FileFilter defaultFileFilter = new JPatchFilter();
 		//fileChooser.setFileFilter(defaultFileFilter);
 		if (fileChooser.showOpenDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
@@ -144,7 +144,7 @@ public class AnimatorMainMenu extends BMenuBar {
 	private void loadAudioClip() {
 		//Clip clip = Animator.getInstance().getClip();
 		//if (clip != null)
-		JFileChooser fileChooser = new JFileChooser(JPatchSettings.getInstance().strJPatchPath);
+		JFileChooser fileChooser = new JFileChooser(JPatchUserSettings.getInstance().directories.jpatchFiles);
 		if (fileChooser.showOpenDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			try {
 				AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(fileChooser.getSelectedFile());

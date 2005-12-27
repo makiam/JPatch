@@ -19,7 +19,7 @@ public final class BackfaceNormalFlipAction extends AbstractAction {
 		JPatchScreen screen = MainFrame.getInstance().getJPatchScreen();
 		screen.flipBackfacingNormals(!screen.flipBackfacingNormals());
 		screen.update_all();
-		//JPatchSettings.getInstance().bSyncWindows = screen.isSynchronized();
+		//JPatchUserSettings.getInstance().bSyncWindows = screen.isSynchronized();
 	}
 }
 

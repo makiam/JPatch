@@ -38,7 +38,7 @@ public final class ImportAnimationMasterAction extends AbstractAction {
 	}
 		
 	private void load() {
-		JFileChooser fileChooser = new JFileChooser(JPatchSettings.getInstance().strAMPath);
+		JFileChooser fileChooser = new JFileChooser(JPatchUserSettings.getInstance().directories.animationmasterFiles);
 		fileChooser.addChoosableFileFilter(new AMFilter());
 		if (fileChooser.showOpenDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
@@ -47,7 +47,7 @@ public final class ImportAnimationMasterAction extends AbstractAction {
 			ModelImporter modelImporter = new AnimationMasterImport();
 			modelImporter.importModel(MainFrame.getInstance().getModel(),filename);
 			//MainFrame.getInstance().getModel().computePatches();
-			JPatchSettings.getInstance().strAMPath = file.getParent();
+			JPatchUserSettings.getInstance().directories.animationmasterFiles = file.getParentFile();
 		}
 		MainFrame.getInstance().getJPatchScreen().zoomToFit_all();
 	}

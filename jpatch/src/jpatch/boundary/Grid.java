@@ -10,10 +10,10 @@ public class Grid {
 	public static final int YZ = 3;
 	
 	private int iPlane = XZ;
-	private float fSpacing = JPatchSettings.getInstance().fGridSpacing;
+	private float fSpacing = JPatchUserSettings.getInstance().viewports.gridSpacing;
 //	private int iSize = 25;
 	private boolean bSnap = true;
-	private JPatchSettings settings = JPatchSettings.getInstance();
+	private JPatchUserSettings settings = JPatchUserSettings.getInstance();
 	
 	public Grid() {
 	}
@@ -64,25 +64,25 @@ public class Grid {
 			int end = Math.round((2 * dx - xcenter)/gridScreenSpacing);
 			for (int x = start; x <= end; x++)
 			{
-				if (x % 5 == 0) drawable.setColor(new Color3f(settings.cGrid)); // FIXME
-				else drawable.setColor(new Color3f(settings.cGridMin)); // FIXME
+				if (x % 5 == 0) drawable.setColor(settings.colors.majorGrid);
+				else drawable.setColor(settings.colors.minorGrid);
 				drawable.drawLine((int)(xcenter + x*gridScreenSpacing),0,(int)(xcenter + x*gridScreenSpacing),(int)height);
 			}
 			start = Math.round((- ycenter)/gridScreenSpacing);
 			end = Math.round((2 * dy - ycenter)/gridScreenSpacing);
 			for (int y = start; y <= end; y++)
 			{
-				if (y % 5 == 0) drawable.setColor(new Color3f(settings.cGrid));
-				else drawable.setColor(new Color3f(settings.cGridMin));
+				if (y % 5 == 0) drawable.setColor(settings.colors.majorGrid);
+				else drawable.setColor(settings.colors.minorGrid);
 				drawable.drawLine(0,(int)(ycenter + y*gridScreenSpacing),(int)width,(int)(ycenter + y*gridScreenSpacing));
 			}
-			drawable.setColor(new Color3f(settings.cGridMin));
+			drawable.setColor(settings.colors.minorGrid);
 			drawable.drawLine((int)(xcenter + 0*dx - 1),0,(int)(xcenter + 0*dx - 1),(int)(height));
 			drawable.drawLine((int)(xcenter + 0*dx + 1),0,(int)(xcenter + 0*dx + 1),(int)(height));
 			drawable.drawLine(0,(int)(ycenter + 0*dy - 1),(int)width,(int)(ycenter + 0*dy - 1));
 			drawable.drawLine(0,(int)(ycenter + 0*dy + 1),(int)width,(int)(ycenter + 0*dy + 1));
 		}
-		drawable.setColor(new Color3f(settings.cGrid));
+		drawable.setColor(settings.colors.majorGrid);
 		drawable.drawLine((int)(xcenter + 0*dx),0,(int)(xcenter + 0*dx),(int)(height));
 		drawable.drawLine(0,(int)(ycenter + 0*dy),(int)width,(int)(ycenter + 0*dy));
 	}

@@ -7,6 +7,7 @@ import javax.swing.*;
 
 import jpatch.auxilary.*;
 import jpatch.entity.*;
+import jpatch.boundary.JPatchUserSettings.RealtimeRendererSettings.LightingMode;
 import jpatch.boundary.action.*;
 import jpatch.boundary.mouse.*;
 import jpatch.boundary.tools.*;
@@ -39,8 +40,8 @@ public final class JPatchScreen extends JPanel {
 	private ViewDefinition[] aViewDef;
 	private Viewport2[] aViewport = new Viewport2[NUMBER_OF_VIEWPORTS];
 	
-	private boolean bSnapToGrid = JPatchSettings.getInstance().bGridSnap;
-	private float fGridSpacing = JPatchSettings.getInstance().fGridSpacing;
+	private boolean bSnapToGrid = JPatchUserSettings.getInstance().viewports.snapToGrid;
+	private float fGridSpacing = JPatchUserSettings.getInstance().viewports.gridSpacing;
 	
 	private boolean bSelectPoints = true;
 	private boolean bSelectBones = true;
@@ -52,9 +53,9 @@ public final class JPatchScreen extends JPanel {
 	
 	private boolean bBackfaceNormalFlip = false;
 	private int iBackfaceCulling = 0;
-	private boolean bSynchronized = JPatchSettings.getInstance().bSyncWindows;
-	private int iLightMode = JPatchSettings.getInstance().iLightingMode;
-	private boolean bStickyLight = JPatchSettings.getInstance().bStickyLight;
+	private boolean bSynchronized = JPatchUserSettings.getInstance().viewports.synchronizeViewports;
+	private LightingMode iLightMode = JPatchUserSettings.getInstance().realtimeRenderer.lightingMode;
+	private boolean bStickyLight = JPatchUserSettings.getInstance().realtimeRenderer.lightFollowsCamera;
 	private JPatchTool tool;
 	
 	private MouseListener popupMouseListener = new MouseAdapter() {
@@ -95,7 +96,7 @@ public final class JPatchScreen extends JPanel {
 	public void initScreen() {
 		int mode = iMode;
 		setMode(0);
-		if (JPatchSettings.getInstance().iRealtimeRenderer == OPENGL && !JoglInstall.isInstalled()) {
+		if (JPatchUserSettings.getInstance().realtimeRenderer.realtimeRenderer == JPatchUserSettings.RealtimeRendererSettings.RealtimeRenderer.OPEN_GL && !JoglInstall.isInstalled()) {
 			if (SplashScreen.instance != null)
 				SplashScreen.instance.clearSplash();
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), new JLabel("Can't use OpenGL display: native JOGL libraries not found."), "Warning", JOptionPane.WARNING_MESSAGE);		
@@ -118,10 +119,10 @@ public final class JPatchScreen extends JPanel {
 						aViewport[I].drawActiveBorder();
 				}
 			};
-			switch (JPatchSettings.getInstance().iRealtimeRenderer) {
-				case JAVA2D: aDrawable[i] = new JPatchDrawable2D(listener, false); break;
-				case SOFTWARE: aDrawable[i] = new JPatchDrawable3D(listener, false); break;
-				case OPENGL: {
+			switch (JPatchUserSettings.getInstance().realtimeRenderer.realtimeRenderer) {
+				case JAVA_2D: aDrawable[i] = new JPatchDrawable2D(listener, false); break;
+				case SOFTWARE_ZBUFFER: aDrawable[i] = new JPatchDrawable3D(listener, false); break;
+				case OPEN_GL: {
 					if (JoglInstall.isInstalled())
 						aDrawable[i] = new JPatchDrawableGL(listener, false);
 					else
@@ -144,11 +145,11 @@ public final class JPatchScreen extends JPanel {
 		this.popupMenu = popupMenu;
 	}
 	
-	public void switchRenderer(int renderer) {
-		JPatchSettings.getInstance().iRealtimeRenderer = renderer;
-		initScreen();
-		update_all();
-	}
+//	public void switchRenderer(int renderer) {
+//		JPatchUserSettings.getInstance().iRealtimeRenderer = renderer;
+//		initScreen();
+//		update_all();
+//	}
 	
 	public ViewDefinition getViewDefinition(Component component) {
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
@@ -233,20 +234,20 @@ public final class JPatchScreen extends JPanel {
 		return tangentTool;
 	}
 	
-	public void setLightingMode(int mode) {
+	public void setLightingMode(LightingMode mode) {
 		iLightMode = mode;
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 			switch(iLightMode) {
-				case LIGHT_OFF:
+				case OFF:
 					aViewDef[i].setLighting(null);
 					break;
-				case LIGHT_SIMPLE:
+				case SIMPLE:
 					aViewDef[i].setLighting(RealtimeLighting.createSimpleLight());
 					break;
-				case LIGHT_HEAD:
+				case HEADLIGHT:
 					aViewDef[i].setLighting(RealtimeLighting.createHeadLight());
 					break;
-				case LIGHT_THREE_POINT:
+				case THREE_POINT:
 					aViewDef[i].setLighting(RealtimeLighting.createThreepointLight());
 					break;
 			}
@@ -254,7 +255,7 @@ public final class JPatchScreen extends JPanel {
 		update_all();
 	}
 	
-	public int getLightingMode() {
+	public LightingMode getLightingMode() {
 		return iLightMode;
 	}
 	
@@ -290,7 +291,7 @@ public final class JPatchScreen extends JPanel {
 //			aComponent[i].getGrid().snap(enable);
 		}
 		update_all();
-		JPatchSettings.getInstance().bGridSnap = enable;
+		JPatchUserSettings.getInstance().viewports.snapToGrid = enable;
 	}
 	
 //	public float getGridSpacing() {
@@ -569,8 +570,21 @@ public final class JPatchScreen extends JPanel {
 			}
 		}
 		
-		JPatchSettings.getInstance().iScreenMode = iMode;
-		//JPatchSettings.getInstance().saveSettings();
+		switch (iMode) {
+		case 0:
+			JPatchUserSettings.getInstance().viewports.viewportMode = JPatchUserSettings.Viewports.ScreenMode.SINGLE;
+			break;
+		case 1:
+			JPatchUserSettings.getInstance().viewports.viewportMode = JPatchUserSettings.Viewports.ScreenMode.HORIZONTAL_SPLIT;
+			break;
+		case 2:
+			JPatchUserSettings.getInstance().viewports.viewportMode = JPatchUserSettings.Viewports.ScreenMode.VERTICAL_SPLIT;
+			break;
+		case 3:
+			JPatchUserSettings.getInstance().viewports.viewportMode = JPatchUserSettings.Viewports.ScreenMode.QUAD;
+			break;
+		}
+		//JPatchUserSettings.getInstance().saveSettings();
 		
 		//update_all();
 		/*

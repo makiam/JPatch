@@ -14,9 +14,9 @@ public final class ExportPovrayAction extends AbstractAction {
 		super("POV-Ray [.inc]");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		ExportPovrayDialog dialog = new ExportPovrayDialog();
-		((JDialog) dialog.getComponent()).setLocationRelativeTo(MainFrame.getInstance());
-		dialog.setVisible(true);
+//		ExportPovrayDialog dialog = new ExportPovrayDialog();
+//		((JDialog) dialog.getComponent()).setLocationRelativeTo(MainFrame.getInstance());
+//		dialog.setVisible(true);
 	}
 }
 

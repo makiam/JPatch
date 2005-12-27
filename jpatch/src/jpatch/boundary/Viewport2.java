@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.40 2005/12/01 16:59:53 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.41 2005/12/27 16:27:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -51,7 +51,7 @@ public class Viewport2 {
 	
 	private JPatchDrawable2 drawable;
 	private ViewDefinition viewDef;
-	private JPatchSettings settings = JPatchSettings.getInstance();
+	private JPatchUserSettings settings = JPatchUserSettings.getInstance();
 	
 	private Matrix4f m4View = new Matrix4f();
 //	private JPatchTool tool;
@@ -76,10 +76,9 @@ public class Viewport2 {
 	private BoneRenderer boneRenderer = new BoneRenderer();
 	
 	private float fMinZ, fDeltaZ;
-	private Color3f c3Background = new Color3f(settings.cBackground);
 	
 	static {
-		setQuality(JPatchSettings.getInstance().iTesselationQuality);
+		setQuality(JPatchUserSettings.getInstance().realtimeRenderer.realtimeRenererQuality);
 	}
 	
 //	private static void init() {
@@ -114,7 +113,7 @@ public class Viewport2 {
 			drawable.setTransform(viewDef.getScreenMatrix());
 		else
 			m4View.set(viewDef.getMatrix());
-		drawable.clear(JPatchDrawable2.COLOR_BUFFER | JPatchDrawable2.DEPTH_BUFFER, new Color3f(settings.cBackground)); // FIXME
+		drawable.clear(JPatchDrawable2.COLOR_BUFFER | JPatchDrawable2.DEPTH_BUFFER, settings.colors.background); // FIXME
 		if (drawable.isLightingSupported()) {
 			RealtimeLighting rtl = viewDef.getLighting();
 			if (rtl != null) {
@@ -143,7 +142,7 @@ public class Viewport2 {
 	
 	public void drawInfo() {
 		String[] info = drawable.getInfo().split("\n");
-		drawable.setColor(new Color3f(settings.cText));
+		drawable.setColor(settings.colors.text);
 		drawable.drawString(viewDef.getViewName()  + (viewDef.isLocked() ? " (locked)" : ""), 4, 16);
 		for (int i = 0, y = 16; i < info.length; drawable.drawString(info[i++], 4, y += 16));
 		if (MainFrame.getInstance().getEditedMorph() != null)
@@ -151,7 +150,7 @@ public class Viewport2 {
 	}
 	
 	public void drawActiveBorder() {
-		drawable.setColor(new Color3f(settings.cSelection));
+		drawable.setColor(new Color3f(settings.colors.selection));
 		drawable.drawRect(0, 0, (int) viewDef.getWidth() - 1, (int) viewDef.getHeight() - 1);
 	}
 	
@@ -162,8 +161,8 @@ public class Viewport2 {
 	}
 	
 	private void setFogColor(float z, Color3f colorIn, Color3f colorOut) {
-		if (settings.bFog) {
-			colorOut.interpolate(colorIn, c3Background, (z - fMinZ) / fDeltaZ * 0.75f);
+		if (settings.realtimeRenderer.wireframeFogEffect) {
+			colorOut.interpolate(colorIn, settings.colors.background, (z - fMinZ) / fDeltaZ * 0.75f);
 			colorOut.clamp(0, 1);
 		} else {
 			colorOut.set(colorIn);
@@ -226,17 +225,17 @@ public class Viewport2 {
 		Selection selection = MainFrame.getInstance().getSelection();
 		
 		if (viewDef.renderCurves()) {
-			drawable.setColor(new Color3f(settings.cCurve)); // FIXME
+			drawable.setColor(settings.colors.curves); // FIXME
 			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
 				ControlPoint start = (ControlPoint) it.next();
 				if (!start.isStartHook())
 					drawCurve(start);
 			}
 		}
-		Color3f cSelected = new Color3f(settings.cSelected);
-		Color3f cPoint = new Color3f(settings.cPoint);
-		Color3f cHeadPoint = new Color3f(settings.cHeadPoint);
-		Color3f cMultiPoint = new Color3f(settings.cMultiPoint);
+		Color3f cSelected = settings.colors.selectedPoints;
+		Color3f cPoint = settings.colors.points;
+		Color3f cHeadPoint = settings.colors.headPoints;
+		Color3f cMultiPoint = settings.colors.multiPoints;
 		Color3f color = new Color3f();
 		Color3f cWeight = new Color3f();
 		Color3f cBlack = new Color3f(0,0,0);
@@ -286,7 +285,7 @@ public class Viewport2 {
 			}
 		}
 		if (viewDef.renderPatches() && (drawable.isShadingSupported() || drawable.isLightingSupported())) {
-			drawable.setColor(new Color3f(new java.awt.Color(JPatchSettings.getInstance().iBackfaceColor))); // FIXME
+			drawable.setColor(JPatchUserSettings.getInstance().colors.backfacingPatches);
 			int passes = (drawable instanceof JPatchDrawableGL) ? 3 : 2;
 			Vector3f[] normals = new Vector3f[] {new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f()};
 			if (drawable.isLightingSupported())
@@ -531,15 +530,15 @@ public class Viewport2 {
 			p2.set(len,0,0);
 			m4View.transform(p1);
 			m4View.transform(p2);
-			drawable.setColor(new Color3f(settings.cX)); // FIXME
+			drawable.setColor(settings.colors.xAxis); // FIXME
 			drawable.drawLine(p1,p2);
 			p2.set(0,len,0);
 			m4View.transform(p2);
-			drawable.setColor(new Color3f(settings.cY)); // FIXME
+			drawable.setColor(settings.colors.yAxis); // FIXME
 			drawable.drawLine(p1,p2);
 			p2.set(0,0,len);
 			m4View.transform(p2);
-			drawable.setColor(new Color3f(settings.cZ)); // FIXME
+			drawable.setColor(settings.colors.zAxis); // FIXME
 			drawable.drawLine(p1,p2);
 		}
 	}
@@ -554,7 +553,7 @@ public class Viewport2 {
 //			cp = (ControlPoint) hot;
 		Point3f p = new Point3f(transformable.getPosition());
 		m4View.transform(p);
-		drawable.setColor(new Color3f(settings.cHot)); // FIXME
+		drawable.setColor(settings.colors.hotObject); // FIXME
 		drawable.setPointSize(5);
 		drawable.drawPoint(p);
 		int direction = selection.getDirection();
@@ -571,7 +570,7 @@ public class Viewport2 {
 			m4View.transform(p3C);
 			m4View.transform(p3D);
 //				drawable.setColor(new Color3f(settings.cSelected)); // FIXME
-			drawCurveSegment(p3A,p3B,p3C,p3D, false, 0, new Color3f(settings.cSelected)); // FIXME
+			drawCurveSegment(p3A,p3B,p3C,p3D, false, 0, settings.colors.selectedPoints); // FIXME
 		} else if (direction == -1 && cp.getPrev() != null) {
 			Point3f p3A = new Point3f(cp.getPrev().getPosition());
 			Point3f p3B = new Point3f(cp.getPrev().getOutTangent());
@@ -582,11 +581,11 @@ public class Viewport2 {
 			m4View.transform(p3C);
 			m4View.transform(p3D);
 //				drawable.setColor(new Color3f(settings.cSelected)); // FIXME
-			drawCurveSegment(p3A,p3B,p3C,p3D, false, 0, new Color3f(settings.cSelected)); // FIXME
+			drawCurveSegment(p3A,p3B,p3C,p3D, false, 0, settings.colors.selectedPoints); // FIXME
 		}
 	}
 	
-	private Color3f c3Curve = new Color3f(settings.cCurve);
+	private Color3f c3Curve = settings.colors.curves;
 	private void drawCurve(ControlPoint start) {
 		ControlPoint cpNext;
 		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
@@ -3946,9 +3945,9 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 		final Vector3f[] av3Normals = new Vector3f[8];
 		final Point3f p3Start = new Point3f();
 		final Vector3f v3Extent = new Vector3f();
-		final Color3f c3Selected = new Color3f(JPatchSettings.getInstance().cSelected);
-		final Color3f c3FreeEnd = new Color3f(JPatchSettings.getInstance().cPoint);
-		final Color3f c3AttachedEnd = new Color3f(JPatchSettings.getInstance().cHeadPoint);
+		final Color3f c3Selected = new Color3f(JPatchUserSettings.getInstance().colors.selectedPoints);
+		final Color3f c3FreeEnd = new Color3f(JPatchUserSettings.getInstance().colors.points);
+		final Color3f c3AttachedEnd = new Color3f(JPatchUserSettings.getInstance().colors.headPoints);
 		public BoneRenderer() {
 			for (int i = 0; i < 8; ap3Points[i++] = new Point3f());
 			for (int i = 0; i < 8; av3Normals[i++] = new Vector3f());

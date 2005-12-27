@@ -112,14 +112,14 @@ public final class Rotoscope {
 			//
 			//Graphics2D g2 = (Graphics2D)filteredImage.getGraphics();
 			//g2.drawImage(image,0,0,null);
-			//Color backgroundColor = JPatchSettings.getInstance().cBackground;
+			//Color backgroundColor = JPatchUserSettings.getInstance().cBackground;
 			//g2.setColor(new Color(backgroundColor.getRed(),backgroundColor.getGreen(),backgroundColor.getBlue(),255 - iOpacity));
 			//g2.fillRect(0,0,filteredImage.getWidth(),filteredImage.getHeight());
 			//
 			// ------------------------------------------------------------------------------
-			int backgroundRed = ((JPatchSettings.getInstance().cBackground.getRed() * (255 - iOpacity)) & 0xFF00);
-			int backgroundGreen = ((JPatchSettings.getInstance().cBackground.getGreen() * (255 - iOpacity)) & 0xFF00);
-			int backgroundBlue = ((JPatchSettings.getInstance().cBackground.getBlue() * (255 - iOpacity)) & 0xFF00);
+			int backgroundRed = ((JPatchUserSettings.getInstance().colors.background.get().getRed() * (255 - iOpacity)) & 0xFF00);
+			int backgroundGreen = ((JPatchUserSettings.getInstance().colors.background.get().getGreen() * (255 - iOpacity)) & 0xFF00);
+			int backgroundBlue = ((JPatchUserSettings.getInstance().colors.background.get().getBlue() * (255 - iOpacity)) & 0xFF00);
 			//int backgroundColor = backgroundRed | backgroundGreen | backgroundBlue;
 			
 //			int[] aiRGBoriginal = ((DataBufferInt) originalRGBImage.getRaster().getDataBuffer()).getData();
@@ -217,7 +217,7 @@ public final class Rotoscope {
 			((JPatchDrawableGL) drawable).drawImage(originalImage.getWidth(), originalImage.getHeight(), iLeftX, iTopY, scale, scale);
 		else
 			drawable.drawImage(filteredImage, iLeftX, iTopY, scale, scale);
-		drawable.setColor(new Color3f(JPatchSettings.getInstance().cGrey));
+		drawable.setColor(JPatchUserSettings.getInstance().colors.grey);
 		drawable.drawRect(iLeftX, iTopY, iWidth, iHeight);
 		drawable.drawRect(iLeftX - 1, iTopY - 1, iWidth + 2, iHeight + 2);
 //		drawable.drawLine(iLeftX, iTopY, iRightX, iTopY);

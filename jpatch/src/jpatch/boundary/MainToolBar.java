@@ -85,7 +85,7 @@ public final class MainToolBar extends JToolBar implements JPatchUndoManager.Und
 		bgView.add(buttonVertical);
 		bgView.add(buttonQuad);
 		
-		buttonGridSnap.setSelected(JPatchSettings.getInstance().bGridSnap);
+		buttonGridSnap.setSelected(JPatchUserSettings.getInstance().viewports.snapToGrid);
 		
 		/* add the buttons */
 		add(new JPatchButton(new NewAction()));

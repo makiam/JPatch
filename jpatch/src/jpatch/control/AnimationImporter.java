@@ -147,7 +147,7 @@ public class AnimationImporter extends DefaultHandler {
 				else if (localName.equals("filename")) {
 					animModelFilename = sbChars.toString();
 					Model model = new Model();
-					(new JPatchImport()).importModel(model, JPatchSettings.getInstance().strModelDir + File.separatorChar + animModelFilename);
+					(new JPatchImport()).importModel(model, JPatchUserSettings.getInstance().export.modelDirectory.getPath() + File.separatorChar + animModelFilename);
 					((AnimModel) animObject).setModel(model);
 					motionCurveSet = new MotionCurveSet.Model((AnimModel) animObject);
 				}

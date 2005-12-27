@@ -13,7 +13,7 @@ public final class ColorPreferencesAction extends AbstractAction {
 		super("Colors...");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		new ColorPreferences(MainFrame.getInstance());
+//		new ColorPreferences(MainFrame.getInstance());
 	}
 }
 

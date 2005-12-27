@@ -19,7 +19,7 @@ implements MouseMotionListener {
 	protected int iMouseX;
 	protected int iMouseY;
 	
-	protected JPatchSettings settings = JPatchSettings.getInstance();
+	protected JPatchUserSettings settings = JPatchUserSettings.getInstance();
 		
 	public Handle(Point3f position, Color3f color) {
 		p3Position = position;

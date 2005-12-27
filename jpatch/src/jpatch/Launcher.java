@@ -13,7 +13,7 @@ public final class Launcher {
 	public static void main(String[] args) {
 		if (false) {
 			try {
-				UIManager.setLookAndFeel(JPatchSettings.getInstance().strPlafClassName);
+				UIManager.setLookAndFeel(JPatchUserSettings.getInstance().lookAndFeelClassname);
 			} catch (Exception e) { }
 			SplashScreen splash = new SplashScreen();
 			splash.showSplash(true);
@@ -35,7 +35,7 @@ public final class Launcher {
 		}
 		else {
 			try {
-				UIManager.setLookAndFeel(JPatchSettings.getInstance().strPlafClassName);
+				UIManager.setLookAndFeel(JPatchUserSettings.getInstance().lookAndFeelClassname);
 			} catch (Exception e) {
 			}
 			frame = new BFrame("JPatch Launcher");

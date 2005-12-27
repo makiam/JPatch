@@ -105,30 +105,6 @@
 			<item command="show about"/>
 			<item command="show splashscreen"/>
 		</menu>
-<!--
-		<menu name="Menu test">
-			<menu name="Tools">
-				<item command="default tool"/>
-				<item command="add curve segment"/>
-				<item command="add bone"/>
-				<item command="rotate tool"/>
-				<item command="weight selection tool"/>
-				<item command="rotoscope tool"/>
-			</menu>
-			<menu name="View">
-				<item command="single view"/>
-				<item command="horizontally split view"/>
-				<item command="vertically split view"/>
-				<item command="quad view"/>
-				<menu name="View2">
-					<item command="single view"/>
-					<item command="horizontally split view"/>
-					<item command="vertically split view"/>
-					<item command="quad view"/>
-				</menu>
-			</menu>
-		</menu>
--->
 	</menu>
 
 	<menu name="viewport popup">
@@ -181,6 +157,45 @@
 			<item command="assign controlpoints to bones"/>
 		</menu>
 	</menu>
+	<shortcuts>
+		<shortcut key="1" command="single view"/>
+		<shortcut key="2" command="horizontally split view"/>
+		<shortcut key="3" command="vertically split view"/>
+		<shortcut key="4" command="quad view"/>
+		<shortcut key="shift R" command="rotate view"/>
+		<shortcut key="shift M" command="move view"/>
+		<shortcut key="shift Z" command="zoom view"/>
+		<shortcut key="ctrl Z" command="undo"/>
+		<shortcut key="ctrl Y" command="redo"/>
+		<shortcut key="X" command="lock x"/>
+		<shortcut key="Y" command="lock y"/>
+		<shortcut key="Z" command="lock z"/>
+		<shortcut key="ESCAPE" command="default tool"/>
+		<shortcut key="R" command="rotate tool"/>
+		<shortcut key="A" command="add curve segment"/>
+		<shortcut key="B" command="add bone"/>
+		<shortcut key="BACK_SPACE" command="remove"/>
+		<shortcut key="DELETE" command="delete"/>
+		<shortcut key="INSERT" command="insert point"/>
+		<shortcut key="F5" command="compute patches"/>
+		<shortcut key="ctrl C" command="clone"/>
+		<shortcut key="E" command="extrude"/>
+		<shortcut key="L" command="lathe"/>
+		<shortcut key="ENTER" command="expand selection"/>
+		<shortcut key="TAB" command="next curve"/>
+		<shortcut key="shift TAB" command="prev curve"/>
+		<shortcut key="RIGHT" command="next point"/>
+		<shortcut key="LEFT" command="prev point"/>
+		<shortcut key="NUMPAD0" command="bottom view"/>
+		<shortcut key="NUMPAD5" command="top view"/>
+		<shortcut key="NUMPAD2" command="front view"/>
+		<shortcut key="NUMPAD8" command="rear view"/>
+		<shortcut key="NUMPAD4" command="left view"/>
+		<shortcut key="NUMPAD6" command="right view"/>
+		<shortcut key="NUMPAD7" command="bird's eye view"/>
+		<shortcut key="G" command="snap to grid"/>
+		<shortcut key="H" command="hide"/>
+	</shortcuts>
 </layout>	
 		
 

@@ -29,7 +29,7 @@ public final class SaveAsAction extends AbstractAction {
 	
 	public void actionPerformed(ActionEvent actionEvent) {
 		////System.out.println(MainFrame.getInstance().getModel().xml(0));
-		//JFileChooser fileChooser = new JFileChooser(JPatchSettings.getInstance().strJPatchPath);
+		//JFileChooser fileChooser = new JFileChooser(JPatchUserSettings.getInstance().strJPatchPath);
 		//if (fileChooser.showSaveDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 		//	File file = fileChooser.getSelectedFile();
 		//	String filename = file.getPath();
@@ -44,7 +44,7 @@ public final class SaveAsAction extends AbstractAction {
 		//	} catch (IOException e) {
 		//		;
 		//	}
-		//	JPatchSettings.getInstance().strJPatchPath = file.getParent();
+		//	JPatchUserSettings.getInstance().strJPatchPath = file.getParent();
 		//}
 		if (bSaveAs) {
 			saveAs();
@@ -54,7 +54,7 @@ public final class SaveAsAction extends AbstractAction {
 	}
 	
 	public boolean saveAs() {
-		JFileChooser fileChooser = new JFileChooser(JPatchSettings.getInstance().strJPatchPath);
+		JFileChooser fileChooser = new JFileChooser(JPatchUserSettings.getInstance().directories.jpatchFiles);
 		fileChooser.addChoosableFileFilter(new JPatchFilter());
 		if (fileChooser.showSaveDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
@@ -64,7 +64,7 @@ public final class SaveAsAction extends AbstractAction {
 				filename += ".jpt";
 			}
 			if (write(filename)) {
-				JPatchSettings.getInstance().strJPatchFile = filename;
+//				JPatchUserSettings.getInstance().strJPatchFile = filename;
 				return true;
 			}
 		}
@@ -73,12 +73,13 @@ public final class SaveAsAction extends AbstractAction {
 		
 		
 	public boolean save() {
-		String filename = JPatchSettings.getInstance().strJPatchFile;
-		if (filename.equals("")) {
-			return saveAs();
-		} else {
-			return write(filename);
-		}
+		return saveAs();
+//		String filename = JPatchUserSettings.getInstance().strJPatchFile;
+//		if (filename.equals("")) {
+//			return saveAs();
+//		} else {
+//			return write(filename);
+//		}
 	}
 	
 	private boolean write(String filename) {

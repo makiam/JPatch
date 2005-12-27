@@ -16,9 +16,9 @@ public final class ZBufferQualityAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		ZBufferSettings dialog = new ZBufferSettings();
-		((JDialog) dialog.getComponent()).setLocationRelativeTo(MainFrame.getInstance());
-		dialog.setVisible(true);
+//		ZBufferSettings dialog = new ZBufferSettings();
+//		((JDialog) dialog.getComponent()).setLocationRelativeTo(MainFrame.getInstance());
+//		dialog.setVisible(true);
 	}
 }
 
