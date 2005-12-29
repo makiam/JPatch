@@ -7,11 +7,13 @@ import javax.vecmath.*;
 import net.java.games.jogl.*;
 
 //import jpatch.*;
+import jpatch.boundary.settings.RealtimeRendererSettings;
+import jpatch.boundary.settings.Settings;
 import jpatch.entity.*;
 
 public class JPatchDrawableGL implements JPatchDrawable2 {
 	private static final float GHOST_ALPHA = 0.5f;
-	private static final JPatchUserSettings settings = JPatchUserSettings.getInstance();
+	private static final Settings settings = Settings.getInstance();
 	
 	private GLDrawable glDrawable;
 	private volatile GL gl;
@@ -469,8 +471,8 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			gl.glDisable(GL.GL_LIGHTING);
 			gl.glEnable(GL.GL_DEPTH_TEST);
 			gl.glShadeModel(GL.GL_SMOOTH);
-			backfaceColor = JPatchUserSettings.getInstance().colors.backfacingPatches;
-			switch(JPatchUserSettings.getInstance().realtimeRenderer.backfacingPatches) {
+			backfaceColor = Settings.getInstance().colors.backfacingPatches;
+			switch(Settings.getInstance().realtimeRenderer.backfacingPatches) {
 				case RENDER: {
 					gl.glDisable(GL.GL_CULL_FACE);
 					gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1);
@@ -755,7 +757,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void setMaterial(MaterialProperties mp) {
-		int side = (JPatchUserSettings.getInstance().realtimeRenderer.backfacingPatches == JPatchUserSettings.RealtimeRendererSettings.Backface.RENDER) ? GL.GL_FRONT_AND_BACK : GL.GL_FRONT;
+		int side = (Settings.getInstance().realtimeRenderer.backfacingPatches == RealtimeRendererSettings.Backface.RENDER) ? GL.GL_FRONT_AND_BACK : GL.GL_FRONT;
 		switch (iTransparentMode) {
 			case OFF: {
 				if (bRenderGhost) {
@@ -1013,7 +1015,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void drawTriangle(Point3f p0, Point3f p1, Point3f p2) {
-		boolean backface = (settings.realtimeRenderer.backfacingPatches == JPatchUserSettings.RealtimeRendererSettings.Backface.HIGHLIGHT && (p1.x - p0.x) * (p2.y - p0.y) - (p1.y - p0.y) * (p2.x - p0.x) < 0);
+		boolean backface = (settings.realtimeRenderer.backfacingPatches == RealtimeRendererSettings.Backface.HIGHLIGHT && (p1.x - p0.x) * (p2.y - p0.y) - (p1.y - p0.y) * (p2.x - p0.x) < 0);
 		if (backface)
 			gl.glColor3f(backfaceColor.x, backfaceColor.y, backfaceColor.z);
 		enableRasterMode(false);

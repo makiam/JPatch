@@ -34,6 +34,7 @@ import javax.swing.event.ChangeListener;
 
 import jpatch.boundary.*;
 import jpatch.boundary.laf.*;
+import jpatch.boundary.settings.Settings;
 
 public final class Command implements KeyListener {
 	private static final boolean DEBUG = false;
@@ -289,7 +290,7 @@ public final class Command implements KeyListener {
 				"horizontally split view",
 				"vertically split view",
 				"quad view"
-		}, JPatchUserSettings.getInstance().viewports.viewportMode.ordinal());
+		}, Settings.getInstance().viewports.viewportMode.ordinal());
 		
 		createGroup(new String[] {
 				"front view",
@@ -327,7 +328,7 @@ public final class Command implements KeyListener {
 		 */
 		((AbstractButton) commandMenuItemMap.get("select points")).setSelected(true);
 		((AbstractButton) commandMenuItemMap.get("select bones")).setSelected(true);
-		((AbstractButton) commandMenuItemMap.get("snap to grid")).setSelected(JPatchUserSettings.getInstance().viewports.snapToGrid);
+		((AbstractButton) commandMenuItemMap.get("snap to grid")).setSelected(Settings.getInstance().viewports.snapToGrid);
 		
 		/*
 		 * Add change listeners to toggle buttons

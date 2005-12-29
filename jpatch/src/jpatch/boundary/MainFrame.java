@@ -17,6 +17,7 @@ import buoy.event.KeyPressedEvent;
 
 import jpatch.*;
 import jpatch.entity.*;
+import jpatch.boundary.settings.Settings;
 import jpatch.boundary.tools.*;
 //	import jpatch.boundary.mouse.*;		//remove
 import jpatch.control.*;
@@ -96,7 +97,7 @@ public final class MainFrame extends JFrame {
 			INSTANCE = this;
 			
 			try {
-				String plaf = JPatchUserSettings.getInstance().lookAndFeelClassname;
+				String plaf = Settings.getInstance().lookAndFeelClassname;
 				if (plaf.equals("jpatch.boundary.laf.SmoothLookAndFeel"))
 					if (jpatch.auxilary.JPatchUtils.isJvmVersionGreaterOrEqual(1, 5))
 						UIManager.setLookAndFeel(new SmoothLookAndFeel());
@@ -157,7 +158,7 @@ public final class MainFrame extends JFrame {
 			/* -------------------------- */
 //			getContentPane().add(jpatchScreen,BorderLayout.CENTER);
 			
-			JPatchUserSettings settings = JPatchUserSettings.getInstance();
+			Settings settings = Settings.getInstance();
 			setLocation(settings.screenPositionX,settings.screenPositionY);
 			setSize(settings.screenWidth,settings.screenHeight);
 			
@@ -274,11 +275,11 @@ public final class MainFrame extends JFrame {
 			
 //			mainToolBar.setScreenMode(jpatchScreen);
 			
-			if (JPatchUserSettings.getInstance().newInstallation) {
+			if (Settings.getInstance().newInstallation) {
 				if (SplashScreen.instance != null)
 					SplashScreen.instance.clearSplash();
 				new About(this);
-				JPatchUserSettings.getInstance().newInstallation = false;
+				Settings.getInstance().newInstallation = false;
 			}
 			
 //			meshToolBar.reset();
@@ -440,7 +441,7 @@ public final class MainFrame extends JFrame {
 	
 	public void initScreen() {
 		int mode = 0;
-		switch (JPatchUserSettings.getInstance().viewports.viewportMode) {
+		switch (Settings.getInstance().viewports.viewportMode) {
 		case SINGLE:
 			mode = 1;
 			break;

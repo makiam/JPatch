@@ -5,6 +5,8 @@ import java.util.*;
 import javax.vecmath.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
+import jpatch.boundary.settings.InyoSettings;
+import jpatch.boundary.settings.Settings;
 
 import inyo.*;
 
@@ -25,7 +27,7 @@ public class InyoRenderer3 {
 		//Model model = MainFrame.getInstance().getModel();
 		//model.computePatches();
 		
-		JPatchUserSettings settings = JPatchUserSettings.getInstance();
+		Settings settings = Settings.getInstance();
 		
 		inyo.setImageSize(settings.export.imageWidth, settings.export.imageHeight, 1);
 		//inyo.setAspectRatio() ???
@@ -43,7 +45,7 @@ public class InyoRenderer3 {
 		inyo.setAmbientOcclusion(settings.export.inyo.ambientOcclusionDistance);
 		inyo.setAmbientOcclusionSamples(settings.export.inyo.ambientOcclusionSamples);
 		inyo.ambientOcclusionColorBleed(settings.export.inyo.ambientOcclusionColorbleed);
-		inyo.setOversample(settings.export.inyo.supersamplingLevel, settings.export.inyo.supersamplingMode == JPatchUserSettings.InyoSettings.Supersampling.ADAPTIVE);
+		inyo.setOversample(settings.export.inyo.supersamplingLevel, settings.export.inyo.supersamplingMode == InyoSettings.Supersampling.ADAPTIVE);
 		
 		inyo.setShowStats(false);
 		
@@ -72,7 +74,7 @@ public class InyoRenderer3 {
 		for (Iterator it = models.iterator(); it.hasNext(); ) {
 			AnimModel animModel = (AnimModel) it.next();
 			Model model = animModel.getModel();
-			int subdiv = JPatchUserSettings.getInstance().export.inyo.subdivisionLevel + animModel.getSubdivisionOffset();
+			int subdiv = Settings.getInstance().export.inyo.subdivisionLevel + animModel.getSubdivisionOffset();
 			if (subdiv < 2) subdiv = 2;
 			if (subdiv > 5) subdiv = 5;
 			patchTesselator.tesselate(model, subdiv, animModel.getTransform(), true);

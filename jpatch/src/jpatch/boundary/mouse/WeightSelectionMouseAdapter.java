@@ -6,6 +6,7 @@ import java.util.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
+import jpatch.boundary.settings.Settings;
 import jpatch.boundary.tools.DefaultTool;
 import jpatch.entity.*;
 
@@ -19,7 +20,7 @@ public class WeightSelectionMouseAdapter extends JPatchMouseAdapter {
 	private int iEndX, iEndX1, iEndX2;
 	private int iEndY, iEndY1, iEndY2;
 	
-	private JPatchUserSettings settings = JPatchUserSettings.getInstance();
+	private Settings settings = Settings.getInstance();
 
 	public void mousePressed(MouseEvent mouseEvent) {
 		iStartX = iEndX = mouseEvent.getX();

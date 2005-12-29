@@ -1,6 +1,7 @@
 package jpatch.boundary.tools;
 
 import jpatch.boundary.*;
+import jpatch.boundary.settings.Settings;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -65,7 +66,7 @@ public final class RotoscopeTool extends JPatchTool {
 	}
 	
 	public void paint(ViewDefinition viewDef) {
-		JPatchUserSettings settings = JPatchUserSettings.getInstance();
+		Settings settings = Settings.getInstance();
 		JPatchDrawable2 drawable = viewDef.getDrawable();
 		init(viewDef);
 		if (rotoscope == null) {
