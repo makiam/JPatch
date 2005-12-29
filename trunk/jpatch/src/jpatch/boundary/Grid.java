@@ -2,6 +2,8 @@ package jpatch.boundary;
 
 import javax.vecmath.*;
 
+import jpatch.boundary.settings.Settings;
+
 public class Grid {
 	
 	public static final int NONE = 0;
@@ -10,10 +12,10 @@ public class Grid {
 	public static final int YZ = 3;
 	
 	private int iPlane = XZ;
-	private float fSpacing = JPatchUserSettings.getInstance().viewports.gridSpacing;
+	private float fSpacing = Settings.getInstance().viewports.gridSpacing;
 //	private int iSize = 25;
 	private boolean bSnap = true;
-	private JPatchUserSettings settings = JPatchUserSettings.getInstance();
+	private Settings settings = Settings.getInstance();
 	
 	public Grid() {
 	}

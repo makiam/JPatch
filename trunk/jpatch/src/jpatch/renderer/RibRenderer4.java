@@ -6,6 +6,8 @@ import java.util.*;
 import javax.vecmath.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
+import jpatch.boundary.settings.RendermanSettings;
+import jpatch.boundary.settings.Settings;
 
 public class RibRenderer4 {
 	
@@ -24,7 +26,7 @@ public class RibRenderer4 {
 	
 	
 	public void writeToFile(List animModels, Camera camera, List lights, BufferedWriter file, String frameName) {
-		JPatchUserSettings settings = JPatchUserSettings.getInstance();
+		Settings settings = Settings.getInstance();
 		
 		try {
 			String[] filter = { "box", "triangle", "catmullrom", "gaussian", "sinc" };
@@ -97,11 +99,11 @@ public class RibRenderer4 {
 	}
 	
 	public void writeModel(Model model, Matrix4d m, String renderString, int subdivOffset, BufferedWriter file) throws IOException {
-		if (JPatchUserSettings.getInstance().export.renderman.outputMode != JPatchUserSettings.RendermanSettings.Mode.BICUBIC_PATCHES) {
-			int subdiv = JPatchUserSettings.getInstance().export.renderman.subdivisionLevel + subdivOffset;
+		if (Settings.getInstance().export.renderman.outputMode != RendermanSettings.Mode.BICUBIC_PATCHES) {
+			int subdiv = Settings.getInstance().export.renderman.subdivisionLevel + subdivOffset;
 			if (subdiv < 1) subdiv = 1;
 			if (subdiv > 5) subdiv = 5;
-			patchTesselator.tesselate(model, subdiv, null, JPatchUserSettings.getInstance().export.renderman.outputMode != JPatchUserSettings.RendermanSettings.Mode.CATMULL_CLARK_SUBDIVISION_SURFACE);
+			patchTesselator.tesselate(model, subdiv, null, Settings.getInstance().export.renderman.outputMode != RendermanSettings.Mode.CATMULL_CLARK_SUBDIVISION_SURFACE);
 			
 			for (Iterator itMat = model.getMaterialList().iterator(); itMat.hasNext(); ) {
 				JPatchMaterial material = (JPatchMaterial) itMat.next();
@@ -112,7 +114,7 @@ public class RibRenderer4 {
 					file.write("AttributeBegin\n");
 					file.write(AbstractRenderer.shader(material.getMaterialProperties(), material.getRenderString("renderman","")));
 					
-					switch (JPatchUserSettings.getInstance().export.renderman.outputMode) {
+					switch (Settings.getInstance().export.renderman.outputMode) {
 						case TRIANGLES: {
 							file.write("PointsPolygons [");
 							int[][] triangles = patchTesselator.getPerMaterialTriangleArray();

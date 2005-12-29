@@ -4,6 +4,7 @@ import java.awt.event.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
+import jpatch.boundary.settings.Settings;
 
 public class Handle 
 implements MouseMotionListener {
@@ -19,7 +20,7 @@ implements MouseMotionListener {
 	protected int iMouseX;
 	protected int iMouseY;
 	
-	protected JPatchUserSettings settings = JPatchUserSettings.getInstance();
+	protected Settings settings = Settings.getInstance();
 		
 	public Handle(Point3f position, Color3f color) {
 		p3Position = position;

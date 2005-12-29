@@ -3,6 +3,7 @@ package jpatch.boundary.mouse;
 import java.awt.*;
 import java.awt.event.*;
 import jpatch.boundary.*;
+import jpatch.boundary.settings.Settings;
 
 //import jpatch.control.edit.*;
 
@@ -20,7 +21,7 @@ public class SelectMouseMotionListener implements MouseMotionListener {
 	private int iMouseX;
 	private int iMouseY;
 	
-	private JPatchUserSettings settings = JPatchUserSettings.getInstance();
+	private Settings settings = Settings.getInstance();
 
 	public SelectMouseMotionListener(int mouseX, int mouseY) {
 		iMouseX = mouseX;

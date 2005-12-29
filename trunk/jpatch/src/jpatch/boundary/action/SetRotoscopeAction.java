@@ -6,6 +6,7 @@ import java.io.*;
 
 import jpatch.boundary.*;
 import jpatch.boundary.filefilters.*;
+import jpatch.boundary.settings.Settings;
 
 public final class SetRotoscopeAction extends AbstractAction {
 	/**
@@ -19,7 +20,7 @@ public final class SetRotoscopeAction extends AbstractAction {
 	
 	public void actionPerformed(ActionEvent actionEvent) {
 		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition();
-		JFileChooser fileChooser = new JFileChooser(JPatchUserSettings.getInstance().directories.rotoscopeFiles);
+		JFileChooser fileChooser = new JFileChooser(Settings.getInstance().directories.rotoscopeFiles);
 		fileChooser.addChoosableFileFilter(new ImageFilter());
 		if (fileChooser.showOpenDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
@@ -29,7 +30,7 @@ public final class SetRotoscopeAction extends AbstractAction {
 				//rotoscope = null;
 				MainFrame.getInstance().getModel().setRotoscope(viewDef.getView(),rotoscope);
 				MainFrame.getInstance().getJPatchScreen().update_all();
-				JPatchUserSettings.getInstance().directories.rotoscopeFiles = file.getParentFile();
+				Settings.getInstance().directories.rotoscopeFiles = file.getParentFile();
 			}
 		}
 	}

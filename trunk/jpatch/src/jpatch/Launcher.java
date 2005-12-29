@@ -5,6 +5,7 @@ import buoy.event.*;
 import javax.swing.*;
 
 import jpatch.boundary.*;
+import jpatch.boundary.settings.Settings;
 import jpatch.entity.*;
 
 public final class Launcher {
@@ -13,7 +14,7 @@ public final class Launcher {
 	public static void main(String[] args) {
 		if (false) {
 			try {
-				UIManager.setLookAndFeel(JPatchUserSettings.getInstance().lookAndFeelClassname);
+				UIManager.setLookAndFeel(Settings.getInstance().lookAndFeelClassname);
 			} catch (Exception e) { }
 			SplashScreen splash = new SplashScreen();
 			splash.showSplash(true);
@@ -35,7 +36,7 @@ public final class Launcher {
 		}
 		else {
 			try {
-				UIManager.setLookAndFeel(JPatchUserSettings.getInstance().lookAndFeelClassname);
+				UIManager.setLookAndFeel(Settings.getInstance().lookAndFeelClassname);
 			} catch (Exception e) {
 			}
 			frame = new BFrame("JPatch Launcher");
@@ -74,7 +75,7 @@ public final class Launcher {
 	}
 	
 	private static void settings() {
-		JPatchUserSettings.main(new String[0]);
+		Settings.main(new String[0]);
 		if (frame != null) frame.dispose();
 	}
 }

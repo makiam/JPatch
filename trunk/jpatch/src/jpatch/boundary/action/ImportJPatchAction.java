@@ -9,6 +9,7 @@ import jpatch.auxilary.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
 import jpatch.boundary.filefilters.*;
+import jpatch.boundary.settings.Settings;
 import jpatch.control.*;
 import jpatch.control.importer.*;
 
@@ -50,7 +51,7 @@ public final class ImportJPatchAction extends AbstractAction {
 	}
 	
 	private void load() {
-		JFileChooser fileChooser = new JFileChooser(JPatchUserSettings.getInstance().directories.jpatchFiles);
+		JFileChooser fileChooser = new JFileChooser(Settings.getInstance().directories.jpatchFiles);
 		javax.swing.filechooser.FileFilter defaultFileFilter = new JPatchFilter();
 		fileChooser.addChoosableFileFilter(defaultFileFilter);
 		fileChooser.addChoosableFileFilter(new AMFilter());
@@ -65,13 +66,13 @@ public final class ImportJPatchAction extends AbstractAction {
 			//System.out.println(extension);
 			if (extension.equals("spt")) {
 				modelImporter = new SPatchImport();
-				JPatchUserSettings.getInstance().directories.spatchFiles = file.getParentFile();
+				Settings.getInstance().directories.spatchFiles = file.getParentFile();
 			} else if (extension.equals("mdl")) {
 				modelImporter = new AnimationMasterImport();
-				JPatchUserSettings.getInstance().directories.animationmasterFiles = file.getParentFile();
+				Settings.getInstance().directories.animationmasterFiles = file.getParentFile();
 			} else {
 				modelImporter = new JPatchImport();
-				JPatchUserSettings.getInstance().directories.jpatchFiles = file.getParentFile();
+				Settings.getInstance().directories.jpatchFiles = file.getParentFile();
 //				JPatchUserSettings.getInstance().strJPatchFile = filename;
 			}
 			if (!bNewModel) {

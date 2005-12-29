@@ -8,6 +8,7 @@ import jpatch.VersionInfo;
 import jpatch.auxilary.*;
 import jpatch.boundary.*;
 import jpatch.boundary.filefilters.*;
+import jpatch.boundary.settings.Settings;
 
 public final class SaveAsAction extends AbstractAction {
 	
@@ -54,7 +55,7 @@ public final class SaveAsAction extends AbstractAction {
 	}
 	
 	public boolean saveAs() {
-		JFileChooser fileChooser = new JFileChooser(JPatchUserSettings.getInstance().directories.jpatchFiles);
+		JFileChooser fileChooser = new JFileChooser(Settings.getInstance().directories.jpatchFiles);
 		fileChooser.addChoosableFileFilter(new JPatchFilter());
 		if (fileChooser.showSaveDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();

@@ -4,6 +4,8 @@ import java.awt.event.*;
 
 import javax.swing.*;
 import jpatch.boundary.*;
+import jpatch.boundary.settings.RealtimeRendererSettings;
+import jpatch.boundary.settings.Settings;
 
 public final class LightingSimpleAction extends AbstractAction {
 	/**
@@ -18,8 +20,8 @@ public final class LightingSimpleAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		screen.setLightingMode(JPatchUserSettings.RealtimeRendererSettings.LightingMode.SIMPLE);
-		JPatchUserSettings.getInstance().realtimeRenderer.lightingMode = JPatchUserSettings.RealtimeRendererSettings.LightingMode.SIMPLE;
+		screen.setLightingMode(RealtimeRendererSettings.LightingMode.SIMPLE);
+		Settings.getInstance().realtimeRenderer.lightingMode = RealtimeRendererSettings.LightingMode.SIMPLE;
 	}
 }
 

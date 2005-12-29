@@ -3,6 +3,7 @@ package jpatch.boundary;
 import javax.swing.*;
 
 import jpatch.boundary.action.*;
+import jpatch.boundary.settings.Settings;
 import jpatch.control.edit.*;
 
 public final class MainToolBar extends JToolBar implements JPatchUndoManager.UndoListener {
@@ -85,7 +86,7 @@ public final class MainToolBar extends JToolBar implements JPatchUndoManager.Und
 		bgView.add(buttonVertical);
 		bgView.add(buttonQuad);
 		
-		buttonGridSnap.setSelected(JPatchUserSettings.getInstance().viewports.snapToGrid);
+		buttonGridSnap.setSelected(Settings.getInstance().viewports.snapToGrid);
 		
 		/* add the buttons */
 		add(new JPatchButton(new NewAction()));

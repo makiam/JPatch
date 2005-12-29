@@ -6,6 +6,7 @@ import javax.swing.*;
 import jpatch.auxilary.*;
 import jpatch.boundary.*;
 import jpatch.boundary.filefilters.*;
+import jpatch.boundary.settings.Settings;
 
 import jpatch.control.*;
 import jpatch.control.importer.*;
@@ -39,7 +40,7 @@ public final class ImportSPatchAction extends AbstractAction {
 	}
 	
 	private void load() {
-		JFileChooser fileChooser = new JFileChooser(JPatchUserSettings.getInstance().directories.spatchFiles);
+		JFileChooser fileChooser = new JFileChooser(Settings.getInstance().directories.spatchFiles);
 		fileChooser.addChoosableFileFilter(new SPatchFilter());
 		if (fileChooser.showOpenDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
@@ -48,7 +49,7 @@ public final class ImportSPatchAction extends AbstractAction {
 			ModelImporter modelImporter = new SPatchImport();
 			modelImporter.importModel(MainFrame.getInstance().getModel(),filename);
 			//MainFrame.getInstance().getModel().computePatches();
-			JPatchUserSettings.getInstance().directories.spatchFiles = file.getParentFile();
+			Settings.getInstance().directories.spatchFiles = file.getParentFile();
 		}
 		MainFrame.getInstance().getJPatchScreen().zoomToFit_all();
 	}
