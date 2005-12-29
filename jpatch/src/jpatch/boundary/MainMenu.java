@@ -3,6 +3,8 @@ package jpatch.boundary;
 import javax.swing.*;
 import jpatch.boundary.action.*;
 import jpatch.boundary.laf.SmoothLookAndFeel;
+import jpatch.boundary.settings.RealtimeRendererSettings;
+import jpatch.boundary.settings.Settings;
 
 public final class MainMenu extends JMenuBar {
 	/**
@@ -60,10 +62,10 @@ public final class MainMenu extends JMenuBar {
 		bgLight.add(miLightHead);
 		bgLight.add(miLightThreePoint);
 		
-		miLightOff.setSelected(MainFrame.getInstance().getJPatchScreen().getLightingMode() == JPatchUserSettings.RealtimeRendererSettings.LightingMode.OFF);
-		miLightSimple.setSelected(MainFrame.getInstance().getJPatchScreen().getLightingMode() == JPatchUserSettings.RealtimeRendererSettings.LightingMode.SIMPLE);
-		miLightHead.setSelected(MainFrame.getInstance().getJPatchScreen().getLightingMode() == JPatchUserSettings.RealtimeRendererSettings.LightingMode.HEADLIGHT);
-		miLightThreePoint.setSelected(MainFrame.getInstance().getJPatchScreen().getLightingMode() == JPatchUserSettings.RealtimeRendererSettings.LightingMode.THREE_POINT);
+		miLightOff.setSelected(MainFrame.getInstance().getJPatchScreen().getLightingMode() == RealtimeRendererSettings.LightingMode.OFF);
+		miLightSimple.setSelected(MainFrame.getInstance().getJPatchScreen().getLightingMode() == RealtimeRendererSettings.LightingMode.SIMPLE);
+		miLightHead.setSelected(MainFrame.getInstance().getJPatchScreen().getLightingMode() == RealtimeRendererSettings.LightingMode.HEADLIGHT);
+		miLightThreePoint.setSelected(MainFrame.getInstance().getJPatchScreen().getLightingMode() == RealtimeRendererSettings.LightingMode.THREE_POINT);
 		miLightSticky.setState(MainFrame.getInstance().getJPatchScreen().isStickyLight());
 		miSync.setState(MainFrame.getInstance().getJPatchScreen().isSynchronized());
 		miFlip.setState(MainFrame.getInstance().getJPatchScreen().flipBackfacingNormals());
@@ -188,19 +190,19 @@ public final class MainMenu extends JMenuBar {
 		try {
 			plaf = "jpatch.boundary.laf.SmoothLookAndFeel";
 			rmi = new JRadioButtonMenuItem(new SwitchLookAndFeelAction("JPatch", new SmoothLookAndFeel()));
-			rmi.setSelected (plaf.equals(JPatchUserSettings.getInstance().lookAndFeelClassname));
+			rmi.setSelected (plaf.equals(Settings.getInstance().lookAndFeelClassname));
 			bgPlaf.add(rmi);
 			menuPlaf.add(rmi);
 			
 			plaf = UIManager.getCrossPlatformLookAndFeelClassName();
 			rmi = new JRadioButtonMenuItem(new SwitchLookAndFeelAction("Metal", Class.forName(plaf).newInstance()));
-			rmi.setSelected (plaf.equals(JPatchUserSettings.getInstance().lookAndFeelClassname));
+			rmi.setSelected (plaf.equals(Settings.getInstance().lookAndFeelClassname));
 			bgPlaf.add(rmi);
 			menuPlaf.add(rmi);
 			
 			plaf = UIManager.getSystemLookAndFeelClassName();
 			rmi = new JRadioButtonMenuItem(new SwitchLookAndFeelAction("System", Class.forName(plaf).newInstance()));
-			rmi.setSelected (plaf.equals(JPatchUserSettings.getInstance().lookAndFeelClassname));
+			rmi.setSelected (plaf.equals(Settings.getInstance().lookAndFeelClassname));
 			bgPlaf.add(rmi);
 			menuPlaf.add(rmi);
 			

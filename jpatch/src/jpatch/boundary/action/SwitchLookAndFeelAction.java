@@ -5,6 +5,7 @@ import javax.swing.plaf.metal.*;
 import java.awt.event.*;
 import jpatch.boundary.*;
 import jpatch.boundary.laf.*;
+import jpatch.boundary.settings.Settings;
 
 public class SwitchLookAndFeelAction extends AbstractAction {
 	
@@ -28,7 +29,7 @@ public class SwitchLookAndFeelAction extends AbstractAction {
 					UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 			else
 				UIManager.setLookAndFeel(lookAndFeel);
-			JPatchUserSettings.getInstance().lookAndFeelClassname = lookAndFeel.getClass().getName();
+			Settings.getInstance().lookAndFeelClassname = lookAndFeel.getClass().getName();
 			SwingUtilities.updateComponentTreeUI(MainFrame.getInstance());
 		} catch (Exception e) {
 			e.printStackTrace();

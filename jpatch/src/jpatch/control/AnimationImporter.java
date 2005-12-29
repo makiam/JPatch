@@ -8,6 +8,7 @@ import org.xml.sax.helpers.*;
 import jpatch.control.importer.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
+import jpatch.boundary.settings.Settings;
 
 public class AnimationImporter extends DefaultHandler {
 	
@@ -147,7 +148,7 @@ public class AnimationImporter extends DefaultHandler {
 				else if (localName.equals("filename")) {
 					animModelFilename = sbChars.toString();
 					Model model = new Model();
-					(new JPatchImport()).importModel(model, JPatchUserSettings.getInstance().export.modelDirectory.getPath() + File.separatorChar + animModelFilename);
+					(new JPatchImport()).importModel(model, Settings.getInstance().export.modelDirectory.getPath() + File.separatorChar + animModelFilename);
 					((AnimModel) animObject).setModel(model);
 					motionCurveSet = new MotionCurveSet.Model((AnimModel) animObject);
 				}

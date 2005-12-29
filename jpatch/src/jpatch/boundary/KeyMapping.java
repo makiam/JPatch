@@ -2,9 +2,11 @@ package jpatch.boundary;
 
 import java.awt.event.*;
 
+import jpatch.boundary.settings.Settings;
+
 public class KeyMapping {
 
-	private static JPatchUserSettings settings = JPatchUserSettings.getInstance();
+	private static Settings settings = Settings.getInstance();
 	
 	public static JPatchKey getKey(String function) {
 //		for (int i = 0; i < settings.astrKeyMap.length; i++) {

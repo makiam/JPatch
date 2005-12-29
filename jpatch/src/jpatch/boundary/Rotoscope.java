@@ -6,6 +6,8 @@ import javax.swing.*;
 import javax.imageio.*;
 import javax.vecmath.*;
 
+import jpatch.boundary.settings.Settings;
+
 public final class Rotoscope {
 
 	private BufferedImage originalImage;
@@ -117,9 +119,9 @@ public final class Rotoscope {
 			//g2.fillRect(0,0,filteredImage.getWidth(),filteredImage.getHeight());
 			//
 			// ------------------------------------------------------------------------------
-			int backgroundRed = ((JPatchUserSettings.getInstance().colors.background.get().getRed() * (255 - iOpacity)) & 0xFF00);
-			int backgroundGreen = ((JPatchUserSettings.getInstance().colors.background.get().getGreen() * (255 - iOpacity)) & 0xFF00);
-			int backgroundBlue = ((JPatchUserSettings.getInstance().colors.background.get().getBlue() * (255 - iOpacity)) & 0xFF00);
+			int backgroundRed = ((Settings.getInstance().colors.background.get().getRed() * (255 - iOpacity)) & 0xFF00);
+			int backgroundGreen = ((Settings.getInstance().colors.background.get().getGreen() * (255 - iOpacity)) & 0xFF00);
+			int backgroundBlue = ((Settings.getInstance().colors.background.get().getBlue() * (255 - iOpacity)) & 0xFF00);
 			//int backgroundColor = backgroundRed | backgroundGreen | backgroundBlue;
 			
 //			int[] aiRGBoriginal = ((DataBufferInt) originalRGBImage.getRaster().getDataBuffer()).getData();
@@ -217,7 +219,7 @@ public final class Rotoscope {
 			((JPatchDrawableGL) drawable).drawImage(originalImage.getWidth(), originalImage.getHeight(), iLeftX, iTopY, scale, scale);
 		else
 			drawable.drawImage(filteredImage, iLeftX, iTopY, scale, scale);
-		drawable.setColor(JPatchUserSettings.getInstance().colors.grey);
+		drawable.setColor(Settings.getInstance().colors.grey);
 		drawable.drawRect(iLeftX, iTopY, iWidth, iHeight);
 		drawable.drawRect(iLeftX - 1, iTopY - 1, iWidth + 2, iHeight + 2);
 //		drawable.drawLine(iLeftX, iTopY, iRightX, iTopY);

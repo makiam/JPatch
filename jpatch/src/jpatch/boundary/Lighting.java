@@ -1,6 +1,8 @@
 package jpatch.boundary;
 
 import javax.vecmath.*;
+
+import jpatch.boundary.settings.Settings;
 import jpatch.entity.*;
 
 public class Lighting {
@@ -94,7 +96,7 @@ public class Lighting {
 		for (int l = 0; l < av3LightDirection.length; l++) {
 			av3TransformedLightDirection[l] = new Vector3f();
 		}
-		setStickyLight(JPatchUserSettings.getInstance().realtimeRenderer.lightFollowsCamera);
+		setStickyLight(Settings.getInstance().realtimeRenderer.lightFollowsCamera);
 	}
 	
 	public final void setStickyLight(boolean sticky) {

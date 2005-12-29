@@ -3,6 +3,7 @@ package jpatch.boundary.action;
 import java.awt.event.*;
 import javax.swing.*;
 import jpatch.boundary.*;
+import jpatch.boundary.settings.Settings;
 
 public final class SyncScreensAction extends AbstractAction {
 	/**
@@ -18,7 +19,7 @@ public final class SyncScreensAction extends AbstractAction {
 	public void actionPerformed(ActionEvent actionEvent) {
 		JPatchScreen screen = MainFrame.getInstance().getJPatchScreen();
 		screen.synchronize(!screen.isSynchronized());
-		JPatchUserSettings.getInstance().viewports.synchronizeViewports = screen.isSynchronized();
+		Settings.getInstance().viewports.synchronizeViewports = screen.isSynchronized();
 	}
 }
 

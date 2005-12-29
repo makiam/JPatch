@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.41 2005/12/27 16:27:20 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.42 2005/12/29 16:13:48 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -26,6 +26,7 @@ import java.util.*;
 import javax.vecmath.*;
 
 import jpatch.auxilary.*;
+import jpatch.boundary.settings.Settings;
 import jpatch.boundary.tools.*;
 import jpatch.entity.*;
 import jpatch.entity.Bone.BoneTransformable;
@@ -51,7 +52,7 @@ public class Viewport2 {
 	
 	private JPatchDrawable2 drawable;
 	private ViewDefinition viewDef;
-	private JPatchUserSettings settings = JPatchUserSettings.getInstance();
+	private Settings settings = Settings.getInstance();
 	
 	private Matrix4f m4View = new Matrix4f();
 //	private JPatchTool tool;
@@ -78,7 +79,7 @@ public class Viewport2 {
 	private float fMinZ, fDeltaZ;
 	
 	static {
-		setQuality(JPatchUserSettings.getInstance().realtimeRenderer.realtimeRenererQuality);
+		setQuality(Settings.getInstance().realtimeRenderer.realtimeRenererQuality);
 	}
 	
 //	private static void init() {
@@ -285,7 +286,7 @@ public class Viewport2 {
 			}
 		}
 		if (viewDef.renderPatches() && (drawable.isShadingSupported() || drawable.isLightingSupported())) {
-			drawable.setColor(JPatchUserSettings.getInstance().colors.backfacingPatches);
+			drawable.setColor(Settings.getInstance().colors.backfacingPatches);
 			int passes = (drawable instanceof JPatchDrawableGL) ? 3 : 2;
 			Vector3f[] normals = new Vector3f[] {new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f()};
 			if (drawable.isLightingSupported())
@@ -3945,9 +3946,9 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 		final Vector3f[] av3Normals = new Vector3f[8];
 		final Point3f p3Start = new Point3f();
 		final Vector3f v3Extent = new Vector3f();
-		final Color3f c3Selected = new Color3f(JPatchUserSettings.getInstance().colors.selectedPoints);
-		final Color3f c3FreeEnd = new Color3f(JPatchUserSettings.getInstance().colors.points);
-		final Color3f c3AttachedEnd = new Color3f(JPatchUserSettings.getInstance().colors.headPoints);
+		final Color3f c3Selected = new Color3f(Settings.getInstance().colors.selectedPoints);
+		final Color3f c3FreeEnd = new Color3f(Settings.getInstance().colors.points);
+		final Color3f c3AttachedEnd = new Color3f(Settings.getInstance().colors.headPoints);
 		public BoneRenderer() {
 			for (int i = 0; i < 8; ap3Points[i++] = new Point3f());
 			for (int i = 0; i < 8; av3Normals[i++] = new Vector3f());

@@ -7,6 +7,7 @@ import java.awt.image.*;
 import javax.swing.*;
 import javax.vecmath.*;
 
+import jpatch.boundary.settings.Settings;
 import jpatch.entity.*;
 
 public final class JPatchDrawable3D implements JPatchDrawable2 {
@@ -16,7 +17,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	private static final int SUB_PIXEL_MASK_1 = 0xffff;
 	private static final float POLYGON_OFFSET = 1;
 	
-	private static final JPatchUserSettings settings = JPatchUserSettings.getInstance();
+	private static final Settings settings = Settings.getInstance();
 	private static int ghost = (int) (settings.colors.ghostFactor * 255);
 	private int ghostColor;
 	

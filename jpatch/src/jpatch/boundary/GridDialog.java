@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import jpatch.boundary.settings.Settings;
+
 public class GridDialog extends JDialog implements ActionListener {
 
 	/**
@@ -49,7 +51,7 @@ public class GridDialog extends JDialog implements ActionListener {
 			setVisible(false);
 			dispose();
 			MainFrame.getInstance().getJPatchScreen().setGridSpacing(new Float(textSpacing.getText()).floatValue());
-			JPatchUserSettings.getInstance().viewports.gridSpacing = new Float(textSpacing.getText()).floatValue();
+			Settings.getInstance().viewports.gridSpacing = new Float(textSpacing.getText()).floatValue();
 		}
 	}
 }

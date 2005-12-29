@@ -9,10 +9,11 @@ import javax.swing.*;
 import javax.vecmath.*;
 import buoy.event.*;
 import buoy.widget.*;
+import jpatch.boundary.settings.Settings;
 import jpatch.entity.*;
 
 public class CameraViewport {
-	private static JPatchUserSettings settings = JPatchUserSettings.getInstance();
+	private static Settings settings = Settings.getInstance();
 	private static int iCurveSubdiv = 5;
 	
 	private static float[] cB0;

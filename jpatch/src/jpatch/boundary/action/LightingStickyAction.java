@@ -3,6 +3,7 @@ package jpatch.boundary.action;
 import java.awt.event.*;
 import javax.swing.*;
 import jpatch.boundary.*;
+import jpatch.boundary.settings.Settings;
 
 public final class LightingStickyAction extends AbstractAction {
 	/**
@@ -18,7 +19,7 @@ public final class LightingStickyAction extends AbstractAction {
 	
 	public void actionPerformed(ActionEvent actionEvent) {
 		screen.setStickyLight(!screen.isStickyLight());
-		JPatchUserSettings.getInstance().realtimeRenderer.lightFollowsCamera = screen.isStickyLight();
+		Settings.getInstance().realtimeRenderer.lightFollowsCamera = screen.isStickyLight();
 	}
 }
 

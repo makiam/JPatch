@@ -17,6 +17,8 @@ import buoy.widget.*;
 import jpatch.entity.*;
 import jpatch.renderer.*;
 import jpatch.auxilary.*;
+import jpatch.boundary.settings.PovraySettings;
+import jpatch.boundary.settings.Settings;
 
 public final class Animator extends BFrame {
 	private static Animator INSTANCE;
@@ -71,7 +73,7 @@ public final class Animator extends BFrame {
 		INSTANCE = this;
 		
 		try {
-			UIManager.setLookAndFeel(JPatchUserSettings.getInstance().lookAndFeelClassname);
+			UIManager.setLookAndFeel(Settings.getInstance().lookAndFeelClassname);
 			JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		} catch (Exception e) {
 		}
@@ -292,7 +294,7 @@ public final class Animator extends BFrame {
 	public void preferences() {
 		propertiesDialog = new BDialog(this, "Preferences", true);
 		propertiesDialog.setResizable(false);
-		textModelDir = new BTextField(JPatchUserSettings.getInstance().directories.jpatchFiles.getPath(), 20);
+		textModelDir = new BTextField(Settings.getInstance().directories.jpatchFiles.getPath(), 20);
 		FormContainer form = new FormContainer(3, 1);
 		BButton buttonBrowse = new BButton("browse");
 		form.add(new BLabel("Model directory:"), 0, 0);
@@ -404,8 +406,8 @@ public final class Animator extends BFrame {
 	}
 	
 	private void setPrefs() {
-		JPatchUserSettings.getInstance().directories.jpatchFiles = new File(textModelDir.getText());
-		JPatchUserSettings.getInstance().directories.save();
+		Settings.getInstance().directories.jpatchFiles = new File(textModelDir.getText());
+		Settings.getInstance().directories.save();
 		propertiesDialog.dispose();
 	}
 	
@@ -488,7 +490,7 @@ public final class Animator extends BFrame {
 	 */
 	public void renderFrame(String frameName, ProgressDisplay progressDisplay) {
 		
-		JPatchUserSettings settings = JPatchUserSettings.getInstance();
+		Settings settings = Settings.getInstance();
 		//progressDisplay.clearText();
 		//progressDisplay.show();
 		/* output geometry to temporary file */
@@ -595,7 +597,7 @@ public final class Animator extends BFrame {
 				
 				ArrayList listCmd = new ArrayList();
 				listCmd.add(settings.export.povray.executable);
-				if (settings.export.povray.version == JPatchUserSettings.PovraySettings.Version.UNIX) {
+				if (settings.export.povray.version == PovraySettings.Version.UNIX) {
 					listCmd.add("+I" + frameName + ".pov");
 				} else {
 					listCmd.add("/RENDER");
@@ -915,7 +917,7 @@ public final class Animator extends BFrame {
 		private Image image;
 		
 		ImagePanel() {
-			setImage(new BufferedImage(JPatchUserSettings.getInstance().export.imageWidth, JPatchUserSettings.getInstance().export.imageWidth, BufferedImage.TYPE_INT_RGB));
+			setImage(new BufferedImage(Settings.getInstance().export.imageWidth, Settings.getInstance().export.imageWidth, BufferedImage.TYPE_INT_RGB));
 		}
 		
 		void setImage(Image image) {
@@ -1035,7 +1037,7 @@ public final class Animator extends BFrame {
 						g.drawString(imageFile.getName(), 7, 31);
 						imagePanel.setImage(image);
 					} catch (Exception e) {
-						JPatchUserSettings settings = JPatchUserSettings.getInstance();
+						Settings settings = Settings.getInstance();
 						Image image = new BufferedImage(settings.export.imageWidth, settings.export.imageHeight, BufferedImage.TYPE_INT_RGB);
 						Graphics g = image.getGraphics();
 						g.setColor(Color.RED);
@@ -1044,7 +1046,7 @@ public final class Animator extends BFrame {
 					}
 				}
 				else {
-					JPatchUserSettings settings = JPatchUserSettings.getInstance();
+					Settings settings = Settings.getInstance();
 					Image image = new BufferedImage(settings.export.imageWidth, settings.export.imageHeight, BufferedImage.TYPE_INT_RGB);
 					Graphics g = image.getGraphics();
 					g.setColor(Color.RED);

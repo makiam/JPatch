@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import jpatch.auxilary.*;
 import jpatch.boundary.action.*;
+import jpatch.boundary.settings.Settings;
 
 /**
  * this WindowAdapter is used by JPatch's MainFrame
@@ -34,7 +35,7 @@ public class JPatchWindowAdapter extends WindowAdapter {
 	}
 	
 	public void quit(Window window) {
-		JPatchUserSettings settings = JPatchUserSettings.getInstance();
+		Settings settings = Settings.getInstance();
 		settings.screenPositionX = MainFrame.getInstance().getX();
 		settings.screenPositionY = MainFrame.getInstance().getY();
 		settings.screenWidth = MainFrame.getInstance().getWidth();

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: AbstractSettings.java,v 1.1 2005/12/29 16:13:48 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -19,7 +19,7 @@
  * along with JPatch; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package jpatch.boundary;
+package jpatch.boundary.settings;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -43,8 +43,8 @@ import jpatch.entity.Model;
  * @author sascha
  *
  */
-public class JPatchSettings2 implements TreeNode {
-	private Preferences userPrefs = Preferences.userRoot().node("/JPatch/Preferences");
+public abstract class AbstractSettings implements TreeNode {
+	private static final Preferences JPATCH_ROOT_NODE = Preferences.userRoot().node("/JPatch/Preferences");
 	private Map mapDefaults = new HashMap();
 	private List<Field> fields = new ArrayList<Field>();
 	private List<TreeNode> children = new ArrayList<TreeNode>();
@@ -68,7 +68,7 @@ public class JPatchSettings2 implements TreeNode {
 //				return fields.get(rowIndex).getType().getSimpleName();
 			case 1:
 				try {
-					Object o = fields.get(rowIndex).get(JPatchSettings2.this);
+					Object o = fields.get(rowIndex).get(AbstractSettings.this);
 					if (o != null)
 						return o;
 					else
@@ -89,23 +89,23 @@ public class JPatchSettings2 implements TreeNode {
 			try {
 				Field field = fields.get(rowIndex);
 				if (field.getType().equals(String.class)) {
-					fields.get(rowIndex).set(JPatchSettings2.this, aValue);	
+					fields.get(rowIndex).set(AbstractSettings.this, aValue);	
 				} else if (field.getType().equals(int.class)) {
-					fields.get(rowIndex).set(JPatchSettings2.this, Integer.parseInt((String) aValue));
+					fields.get(rowIndex).set(AbstractSettings.this, Integer.parseInt((String) aValue));
 				} else if (field.getType().equals(long.class)) {
-					fields.get(rowIndex).set(JPatchSettings2.this, Long.parseLong((String) aValue));
+					fields.get(rowIndex).set(AbstractSettings.this, Long.parseLong((String) aValue));
 				} else if (field.getType().equals(short.class)) {
-					fields.get(rowIndex).set(JPatchSettings2.this, Short.parseShort((String) aValue));
+					fields.get(rowIndex).set(AbstractSettings.this, Short.parseShort((String) aValue));
 				} else if (field.getType().equals(byte.class)) {
-					fields.get(rowIndex).set(JPatchSettings2.this, Byte.parseByte((String) aValue));
+					fields.get(rowIndex).set(AbstractSettings.this, Byte.parseByte((String) aValue));
 				} else if (field.getType().equals(char.class)) {
 					char[] ca = ((String) aValue).toCharArray();
 					if (ca.length > 0)
-						fields.get(rowIndex).set(JPatchSettings2.this, ca[0]);
+						fields.get(rowIndex).set(AbstractSettings.this, ca[0]);
 				} else if (field.getType().equals(float.class)) {
-					fields.get(rowIndex).set(JPatchSettings2.this, Float.parseFloat((String) aValue));
+					fields.get(rowIndex).set(AbstractSettings.this, Float.parseFloat((String) aValue));
 				} else if (field.getType().equals(double.class)) {
-					fields.get(rowIndex).set(JPatchSettings2.this, Double.parseDouble((String) aValue));
+					fields.get(rowIndex).set(AbstractSettings.this, Double.parseDouble((String) aValue));
 				}
 			} catch (Exception e) {
 //				e.printStackTrace();
@@ -122,7 +122,7 @@ public class JPatchSettings2 implements TreeNode {
 	private TreeCellRenderer treeCellRenderer = new DefaultTreeCellRenderer() {
 		public Component getTreeCellRendererComponent(JTree tree,Object value,boolean sel,boolean expanded,boolean leaf,int row,boolean hasFocus) {
 			super.getTreeCellRendererComponent(tree,value,sel,expanded,leaf,row,hasFocus);
-			setIcon(((JPatchSettings2) value).getIcon());
+			setIcon(((AbstractSettings) value).getIcon());
 			return this;
 		}
 	};
@@ -203,7 +203,7 @@ public class JPatchSettings2 implements TreeNode {
 				comboBox.addItem(true);
 				comboBox.addItem(false);
 				try {
-					comboBox.setSelectedItem(fields.get(row).get(JPatchSettings2.this));
+					comboBox.setSelectedItem(fields.get(row).get(AbstractSettings.this));
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				}
@@ -212,7 +212,7 @@ public class JPatchSettings2 implements TreeNode {
 //						System.out.println(event);
 //						System.out.println("boolean itemChanged " + comboBox.hashCode() + " " + comboBox.getSelectedItem());
 						try {
-							fields.get(row).set(JPatchSettings2.this, comboBox.getSelectedItem());
+							fields.get(row).set(AbstractSettings.this, comboBox.getSelectedItem());
 						} catch (IllegalAccessException e) {
 							e.printStackTrace();
 						}
@@ -224,7 +224,7 @@ public class JPatchSettings2 implements TreeNode {
 				for (Object o:((Enum) value).getDeclaringClass().getEnumConstants())
 					comboBox.addItem(o);
 				try {
-					comboBox.setSelectedItem(fields.get(row).get(JPatchSettings2.this));
+					comboBox.setSelectedItem(fields.get(row).get(AbstractSettings.this));
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				}
@@ -234,7 +234,7 @@ public class JPatchSettings2 implements TreeNode {
 //						System.out.println("boolean itemChanged " + comboBox.hashCode() + " " + comboBox.getSelectedItem());
 						try {
 							System.out.println(fields.get(row));
-							fields.get(row).set(JPatchSettings2.this, comboBox.getSelectedItem());
+							fields.get(row).set(AbstractSettings.this, comboBox.getSelectedItem());
 						} catch (IllegalAccessException e) {
 							e.printStackTrace();
 						}
@@ -269,7 +269,7 @@ public class JPatchSettings2 implements TreeNode {
 				if (color == null)
 					color = (Color) value;
 				try {
-					fields.get(row).set(JPatchSettings2.this, color);
+					fields.get(row).set(AbstractSettings.this, color);
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				}
@@ -290,7 +290,7 @@ public class JPatchSettings2 implements TreeNode {
 				if (color == null)
 					color = ((Color3f) value).get();
 				try {
-					fields.get(row).set(JPatchSettings2.this, new Color3f(color));
+					fields.get(row).set(AbstractSettings.this, new Color3f(color));
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				}
@@ -320,7 +320,7 @@ public class JPatchSettings2 implements TreeNode {
 				if (fileChooser.showDialog(table, "Select") == JFileChooser.APPROVE_OPTION) {
 					file = fileChooser.getSelectedFile();
 					try {
-						fields.get(row).set(JPatchSettings2.this, file);
+						fields.get(row).set(AbstractSettings.this, file);
 					} catch (IllegalAccessException e) {
 						e.printStackTrace();
 					}
@@ -389,7 +389,7 @@ public class JPatchSettings2 implements TreeNode {
 		}
 	};
 	
-	public JPatchSettings2() {
+	public AbstractSettings() {
 		table.setModel(tableModel);
 		table.setShowGrid(false);
 		table.setBackground(new JPanel().getBackground());
@@ -431,8 +431,8 @@ public class JPatchSettings2 implements TreeNode {
 	public void initTree() {
 		try {
 			for (Field field:getClass().getFields()) {
-				if (JPatchSettings2.class.isAssignableFrom(field.getType())) {
-					JPatchSettings2 childNode = (JPatchSettings2) field.get(this);
+				if (AbstractSettings.class.isAssignableFrom(field.getType())) {
+					AbstractSettings childNode = (AbstractSettings) field.get(this);
 					childNode.initTree();
 					childNode.setParent(this);
 					childNode.setNodeName(field.getName());
@@ -459,8 +459,8 @@ public class JPatchSettings2 implements TreeNode {
 	public void dump(String prefix) {
 		try {
 			for (Field field:getClass().getFields()) {
-				if (JPatchSettings2.class.isAssignableFrom(field.getType()))
-					((JPatchSettings2) field.get(this)).dump(prefix + field.getName() + ".");
+				if (AbstractSettings.class.isAssignableFrom(field.getType()))
+					((AbstractSettings) field.get(this)).dump(prefix + field.getName() + ".");
 				else
 					System.out.println(prefix + field.getName() + "\t" + field.getType() + "\t" + field.get(this) + isDefault(field));
 			}
@@ -470,22 +470,22 @@ public class JPatchSettings2 implements TreeNode {
 	}
 	
 	public void save() {
-		save("");
+		save(JPATCH_ROOT_NODE);
 	}
 	
-	void save(String prefix) {
+	void save(Preferences node) {
 		try {
 			for (Field field:getClass().getFields())
-				writeField(prefix, field);
+				writeField(node, field);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	void load(String prefix) {
+	void load(Preferences node) {
 		try {
 			for (Field field:getClass().getFields())
-				readField(prefix, field);
+				readField(node, field);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -509,30 +509,30 @@ public class JPatchSettings2 implements TreeNode {
 		}
 	}
 	
-	void readField(String prefix, Field field) throws IllegalAccessException, IOException, ClassNotFoundException, InstantiationException {
+	void readField(Preferences node, Field field) throws IllegalAccessException, IOException, ClassNotFoundException, InstantiationException {
 		if (field.getType().equals(int.class))
-			field.setInt(this, userPrefs.getInt(prefix + field.getName(), field.getInt(this)));
+			field.setInt(this, node.getInt(field.getName(), field.getInt(this)));
 		else if (field.getType().equals(long.class))
-			field.setLong(this, userPrefs.getLong(prefix + field.getName(), field.getLong(this)));
+			field.setLong(this, node.getLong(field.getName(), field.getLong(this)));
 		else if (field.getType().equals(short.class))
-			field.setShort(this, (short) userPrefs.getInt(prefix + field.getName(), field.getShort(this)));
+			field.setShort(this, (short) node.getInt(field.getName(), field.getShort(this)));
 		else if (field.getType().equals(byte.class))
-			field.setByte(this, (byte) userPrefs.getInt(prefix + field.getName(), field.getByte(this)));
+			field.setByte(this, (byte) node.getInt(field.getName(), field.getByte(this)));
 		else if (field.getType().equals(char.class))
-			field.setChar(this, (char) userPrefs.getInt(prefix + field.getName(), field.getChar(this)));
+			field.setChar(this, (char) node.getInt(field.getName(), field.getChar(this)));
 		else if (field.getType().equals(float.class))
-			field.setFloat(this, userPrefs.getFloat(prefix + field.getName(), field.getFloat(this)));
+			field.setFloat(this, node.getFloat(field.getName(), field.getFloat(this)));
 		else if (field.getType().equals(double.class))
-			field.setDouble(this, userPrefs.getDouble(prefix + field.getName(), field.getDouble(this)));
+			field.setDouble(this, node.getDouble(field.getName(), field.getDouble(this)));
 		else if (field.getType().equals(boolean.class))
-			field.setBoolean(this, userPrefs.getBoolean(prefix + field.getName(), field.getBoolean(this)));
+			field.setBoolean(this, node.getBoolean(field.getName(), field.getBoolean(this)));
 		else if (field.getType().equals(String.class))
-			field.set(this, userPrefs.get(prefix + field.getName(), (String) field.get(this)));
+			field.set(this, node.get(field.getName(), (String) field.get(this)));
 		else if (field.getType().isEnum())
-			field.set(this, Enum.valueOf((Class<Enum>) field.getType(), userPrefs.get(prefix + field.getName(), field.get(this).toString())));
-		else if (JPatchSettings2.class.isAssignableFrom(field.getType())) {
-			JPatchSettings2 child = (JPatchSettings2) field.getType().newInstance();
-			child.load(prefix + field.getName() + ".");
+			field.set(this, Enum.valueOf((Class<Enum>) field.getType(), node.get(field.getName(), field.get(this).toString())));
+		else if (AbstractSettings.class.isAssignableFrom(field.getType())) {
+			AbstractSettings child = (AbstractSettings) field.getType().newInstance();
+			child.load(node.node(field.getName()));
 			child.setNodeName(field.getName());
 			child.setParent(this);
 			field.set(this, child);
@@ -547,35 +547,35 @@ public class JPatchSettings2 implements TreeNode {
 			oos.writeObject(field.get(this));
 			oos.flush();
 			baos.flush();
-			ByteArrayInputStream bais = new ByteArrayInputStream(userPrefs.getByteArray(prefix + field.getName(), baos.toByteArray()));
+			ByteArrayInputStream bais = new ByteArrayInputStream(node.getByteArray(field.getName(), baos.toByteArray()));
 			ObjectInputStream ois = new ObjectInputStream(bais);
 			field.set(this, ois.readObject());
 		}
 	}
 	
-	void writeField(String prefix, Field field) throws IllegalAccessException, IOException {
+	void writeField(Preferences node, Field field) throws IllegalAccessException, IOException {
 		if (field.getType().equals(int.class))
-			userPrefs.putInt(prefix + field.getName(), field.getInt(this));
+			node.putInt(field.getName(), field.getInt(this));
 		else if (field.getType().equals(long.class))
-			userPrefs.putLong(prefix + field.getName(), field.getLong(this));
+			node.putLong(field.getName(), field.getLong(this));
 		else if (field.getType().equals(short.class))
-			userPrefs.putInt(prefix + field.getName(), field.getShort(this));
+			node.putInt(field.getName(), field.getShort(this));
 		else if (field.getType().equals(byte.class))
-			userPrefs.putInt(prefix + field.getName(), field.getByte(this));
+			node.putInt(field.getName(), field.getByte(this));
 		else if (field.getType().equals(char.class))
-			userPrefs.putInt(prefix + field.getName(), field.getChar(this));
+			node.putInt(field.getName(), field.getChar(this));
 		else if (field.getType().equals(float.class))
-			userPrefs.putFloat(prefix + field.getName(), field.getFloat(this));
+			node.putFloat(field.getName(), field.getFloat(this));
 		else if (field.getType().equals(double.class))
-			userPrefs.putDouble(prefix + field.getName(), field.getDouble(this));
+			node.putDouble(field.getName(), field.getDouble(this));
 		else if (field.getType().equals(boolean.class))
-			userPrefs.putBoolean(prefix + field.getName(), field.getBoolean(this));
+			node.putBoolean(field.getName(), field.getBoolean(this));
 		else if (field.getType().equals(String.class))
-			userPrefs.put(prefix + field.getName(), (String) field.get(this));
+			node.put(field.getName(), (String) field.get(this));
 		else if (field.getType().isEnum())
-			userPrefs.put(prefix + field.getName(), field.get(this).toString());
-		else if (JPatchSettings2.class.isAssignableFrom(field.getType()))
-			((JPatchSettings2) field.get(this)).save(prefix + field.getName() + ".");
+			node.put(field.getName(), field.get(this).toString());
+		else if (AbstractSettings.class.isAssignableFrom(field.getType()))
+			((AbstractSettings) field.get(this)).save(node.node(field.getName()));
 		else if (field.getType().isArray())
 			throw new IllegalArgumentException("Can't store arrays!");
 		else {
@@ -587,7 +587,7 @@ public class JPatchSettings2 implements TreeNode {
 			oos.writeObject(field.get(this));
 			oos.flush();
 			baos.flush();
-			userPrefs.putByteArray(prefix + field.getName(), baos.toByteArray());
+			node.putByteArray(field.getName(), baos.toByteArray());
 		}
 	}
 	
@@ -674,7 +674,7 @@ public class JPatchSettings2 implements TreeNode {
 //	public void removeTableModelListener(TableModelListener l) {
 //		tableModel.removeTableModelListener(l);
 //	}
-//	
+	
 	public class ColorIcon implements Icon {
 		private Color color;
 		/* (non-Javadoc)

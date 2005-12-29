@@ -3,6 +3,8 @@ package jpatch.boundary.action;
 import java.awt.event.*;
 import javax.swing.*;
 import jpatch.boundary.*;
+import jpatch.boundary.settings.RealtimeRendererSettings;
+import jpatch.boundary.settings.Settings;
 
 public final class LightingHeadAction extends AbstractAction {
 	/**
@@ -17,8 +19,8 @@ public final class LightingHeadAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		screen.setLightingMode(JPatchUserSettings.RealtimeRendererSettings.LightingMode.HEADLIGHT);
-		JPatchUserSettings.getInstance().realtimeRenderer.lightingMode = JPatchUserSettings.RealtimeRendererSettings.LightingMode.HEADLIGHT;
+		screen.setLightingMode(RealtimeRendererSettings.LightingMode.HEADLIGHT);
+		Settings.getInstance().realtimeRenderer.lightingMode = RealtimeRendererSettings.LightingMode.HEADLIGHT;
 	}
 }
 
