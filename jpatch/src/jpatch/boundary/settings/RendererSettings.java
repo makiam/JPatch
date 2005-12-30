@@ -45,5 +45,5 @@ public class RendererSettings extends AbstractSettings {
 	public final PovraySettings povray = new PovraySettings();
 	public final RendermanSettings renderman = new RendermanSettings();
 	public final InyoSettings inyo = new InyoSettings();
-	public final AliasWavefrontSettings aliaswavefrontExport = new AliasWavefrontSettings();
+	public final AliasWavefrontSettings aliaswavefront = new AliasWavefrontSettings();
 }

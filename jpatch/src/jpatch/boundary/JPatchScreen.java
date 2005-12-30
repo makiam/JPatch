@@ -15,7 +15,7 @@ import jpatch.boundary.settings.ViewportSettings;
 import jpatch.boundary.settings.RealtimeRendererSettings.LightingMode;
 import jpatch.boundary.tools.*;
 
-public final class JPatchScreen extends Panel {
+public final class JPatchScreen extends JPanel {
 	/**
 	 * 
 	 */
