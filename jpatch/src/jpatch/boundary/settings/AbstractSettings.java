@@ -1,5 +1,5 @@
 /*
- * $Id: AbstractSettings.java,v 1.1 2005/12/29 16:13:48 sascha_l Exp $
+ * $Id: AbstractSettings.java,v 1.2 2005/12/30 13:00:36 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -153,7 +153,7 @@ public abstract class AbstractSettings implements TreeNode {
 //				}
 //				if (value instanceof Boolean)
 //					return tableCellEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
-//				if (!isDefault(fields.get(row)))
+//				if (row < fields.size() && !isDefault(fields.get(row)))
 //					setFont(getFont().deriveFont(Font.BOLD));
 				if (value instanceof Color) {
 					Color color = (Color) value;
@@ -470,7 +470,12 @@ public abstract class AbstractSettings implements TreeNode {
 	}
 	
 	public void save() {
+		System.out.println("saving settings...");
 		save(JPATCH_ROOT_NODE);
+	}
+	
+	public void load() {
+		load(JPATCH_ROOT_NODE);
 	}
 	
 	void save(Preferences node) {
@@ -483,6 +488,7 @@ public abstract class AbstractSettings implements TreeNode {
 	}
 	
 	void load(Preferences node) {
+		System.out.println("load " + node);
 		try {
 			for (Field field:getClass().getFields())
 				readField(node, field);
@@ -528,14 +534,19 @@ public abstract class AbstractSettings implements TreeNode {
 			field.setBoolean(this, node.getBoolean(field.getName(), field.getBoolean(this)));
 		else if (field.getType().equals(String.class))
 			field.set(this, node.get(field.getName(), (String) field.get(this)));
+		else if (field.getType().equals(Color.class))
+			field.set(this, new Color((node.getInt(field.getName(), ((Color3f) field.get(this)).get().getRGB()))));
+		else if (field.getType().equals(Color3f.class))
+			field.set(this, new Color3f(new Color((node.getInt(field.getName(), ((Color3f) field.get(this)).get().getRGB())))));
 		else if (field.getType().isEnum())
 			field.set(this, Enum.valueOf((Class<Enum>) field.getType(), node.get(field.getName(), field.get(this).toString())));
 		else if (AbstractSettings.class.isAssignableFrom(field.getType())) {
-			AbstractSettings child = (AbstractSettings) field.getType().newInstance();
+			AbstractSettings child = (AbstractSettings) field.get(this);
+//			AbstractSettings child = (AbstractSettings) field.getType().newInstance();
 			child.load(node.node(field.getName()));
-			child.setNodeName(field.getName());
-			child.setParent(this);
-			field.set(this, child);
+//			child.setNodeName(field.getName());
+//			child.setParent(this);
+//			field.set(this, child);
 		} else if (field.getType().isArray())
 			throw new IllegalArgumentException("Can't load arrays!");
 		else {
@@ -570,6 +581,10 @@ public abstract class AbstractSettings implements TreeNode {
 			node.putDouble(field.getName(), field.getDouble(this));
 		else if (field.getType().equals(boolean.class))
 			node.putBoolean(field.getName(), field.getBoolean(this));
+		else if (field.getType().equals(Color.class))
+			node.putInt(field.getName(), ((Color) field.get(this)).getRGB());
+		else if (field.getType().equals(Color3f.class))
+			node.putInt(field.getName(), ((Color3f) field.get(this)).get().getRGB());
 		else if (field.getType().equals(String.class))
 			node.put(field.getName(), (String) field.get(this));
 		else if (field.getType().isEnum())

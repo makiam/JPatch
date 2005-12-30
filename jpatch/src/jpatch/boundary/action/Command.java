@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.15 2005/12/29 16:13:48 sascha_l Exp $
+ * $Id: Command.java,v 1.16 2005/12/30 13:00:36 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -188,9 +188,8 @@ public final class Command implements KeyListener {
 		
 		// Options
 		put("synchronize viewports", 		new SyncScreensAction(),		new JCheckBoxMenuItem());
-		put("colors settings", 				new ColorPreferencesAction(),	new JMenuItem());
+		put("settings", 					new EditSettingsAction(),			new JMenuItem());
 		put("grid spacing settings", 		new SetGridSpacingAction(),		new JMenuItem());
-		put("realtime renderer settings",	new ZBufferQualityAction(),		new JMenuItem());
 		put("install jogl", 				new InstallJoglAction(),		new JMenuItem());
 		put("jpatch lookandfeel",			new SwitchLookAndFeelAction("JPatch", jpatch), 			new JRadioButtonMenuItem());
 		put("crossplatform lookandfeel",	new SwitchLookAndFeelAction("Metal", crossplatform),	new JRadioButtonMenuItem());

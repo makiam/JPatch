@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.42 2005/12/29 16:13:48 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.43 2005/12/30 13:00:36 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -98,15 +98,18 @@ public class Viewport2 {
 	
 	public static void setQuality(int q) {
 		if (q == 0) fFlatness = 16;
-		if (q == 1) fFlatness = 8;
-		if (q == 2) fFlatness = 4;
-		if (q == 3) fFlatness = 2;
-		if (q == 4) fFlatness = 1;
+		else if (q == 1) fFlatness = 8;
+		else if (q == 2) fFlatness = 4;
+		else if (q == 3) fFlatness = 2;
+		else if (q == 4) fFlatness = 1;
+		else
+			throw new IllegalArgumentException("Quality must be between 0 and 4, is " + q);
 	}
 	
 	public Viewport2(JPatchDrawable2 drawable, ViewDefinition viewDefinition) {
 		this.drawable = drawable;
 		this.viewDef = viewDefinition;
+		setQuality(settings.realtimeRenderer.realtimeRenererQuality);
 	}
 	
 	public void prepare() {
@@ -520,6 +523,7 @@ public class Viewport2 {
 		
 		if (drawable.isLightingSupported())
 			drawable.setLightingEnabled(false);
+//		System.out.println();
 	}
 	
 	public void drawOrigin() {
@@ -588,6 +592,7 @@ public class Viewport2 {
 	
 	private Color3f c3Curve = settings.colors.curves;
 	private void drawCurve(ControlPoint start) {
+//		System.out.println("drawCurve(" + start + ")");
 		ControlPoint cpNext;
 		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
 			cpNext = cp.getNext();
@@ -621,6 +626,7 @@ public class Viewport2 {
 	private Color3f c3SegmentA = new Color3f();
 	private Color3f c3SegmentB = new Color3f();
 	private void drawCurveSegment(Point3f p3A, Point3f p3B, Point3f p3C, Point3f p3D, boolean simple, int level, Color3f color) {
+//		System.out.println("drawCurveSegment(" + level + ", " + p3A + ", " + p3B + ", " + p3C + ", " + p3D + ")");
 		if (level < iMaxSubdiv && subdiv(p3A, p3B, p3C, p3D, simple) >= fFlatness) {
 			Point3f p0 = new Point3f(p3A);
 			Point3f p1 = new Point3f(p3B);

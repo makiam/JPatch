@@ -1,5 +1,5 @@
 /*
- * $Id: RendererSettings.java,v 1.1 2005/12/29 16:13:48 sascha_l Exp $
+ * $Id: RendererSettings.java,v 1.2 2005/12/30 13:00:36 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -45,5 +45,5 @@ public class RendererSettings extends AbstractSettings {
 	public final PovraySettings povray = new PovraySettings();
 	public final RendermanSettings renderman = new RendermanSettings();
 	public final InyoSettings inyo = new InyoSettings();
-	public final AliasWavefrontSettings aliaswavefrontExport = new AliasWavefrontSettings();
+	public final AliasWavefrontSettings aliaswavefront = new AliasWavefrontSettings();
 }

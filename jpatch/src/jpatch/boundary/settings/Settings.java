@@ -1,5 +1,5 @@
 /*
- * $Id: Settings.java,v 1.1 2005/12/29 16:13:48 sascha_l Exp $
+ * $Id: Settings.java,v 1.2 2005/12/30 13:00:36 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -22,6 +22,8 @@
 package jpatch.boundary.settings;
 
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -51,24 +53,20 @@ public class Settings extends AbstractSettings {
 	public final RealtimeRendererSettings realtimeRenderer = new RealtimeRendererSettings();
 	public final RendererSettings export = new RendererSettings();
 	
-	public static void main(String[] args) {
-		Settings settings = new Settings();
-		settings.dump("");
-		settings.save();
-//		settings.testInteger = 12;
-//		settings.save();
-//		settings.dump("");
-//		settings.load("");
-		settings.dump("");
-		JFrame frame = new JFrame(settings.toString());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	public void showDialog(Component parent) {
+		load();
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		settings.initTree();
-		final JTable table = settings.getTable();
-		JTree tree = new JTree(settings);
-		tree.setCellRenderer(settings.getTreeCellRenderer());
+		initTree();
+		final JTable table = getTable();
+		table.addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent evt) {
+				table.repaint();
+				
+			}
+		});
+		JTree tree = new JTree(this);
+		tree.setCellRenderer(getTreeCellRenderer());
 		tree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
-
 			public void valueChanged(TreeSelectionEvent e) {
 				AbstractSettings settings = (AbstractSettings) e.getPath().getLastPathComponent();
 				table.setModel((TableModel) settings.getTableModel());
@@ -76,30 +74,22 @@ public class Settings extends AbstractSettings {
 				table.getColumnModel().getColumn(1).setHeaderValue("Value");
 				table.setDefaultEditor(Object.class, settings.getTableCellEditor());
 			}
-			
 		});
 		splitPane.add(new JScrollPane(tree));
-//		JPanel tablePanel = new JPanel();
+		splitPane.add(new JScrollPane(getTable()));
 		
-		
-//		settings.getTableCellEditor().addCellEditorListener(new CellEditorListener() {
-//
-//			public void editingStopped(ChangeEvent e) {
-//				System.out.println("editingStopped " + e.);
-//			}
-//
-//			public void editingCanceled(ChangeEvent e) {
-//				System.out.println("editingCanceled " + e);
-//			}
-//		});
-		splitPane.add(new JScrollPane(settings.getTable()));
-		frame.add(splitPane);
-		frame.pack();
-		frame.setVisible(true);
+		if (JOptionPane.showConfirmDialog(parent, splitPane, toString(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null) == JOptionPane.OK_OPTION) {
+			System.out.println("OK");
+			save();
+		} else {
+			System.out.println("Cancel");
+			load();
+		}
 	}
 	
 	private Settings() {
 		storeDefaults();
+		load();
 		INSTANCE = this;
 	}
 	

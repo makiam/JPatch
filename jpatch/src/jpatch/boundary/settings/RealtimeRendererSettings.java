@@ -1,5 +1,5 @@
 /*
- * $Id: RealtimeRendererSettings.java,v 1.1 2005/12/29 16:13:48 sascha_l Exp $
+ * $Id: RealtimeRendererSettings.java,v 1.2 2005/12/30 13:00:36 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -34,7 +34,7 @@ public class RealtimeRendererSettings extends AbstractSettings {
 	public static enum LightingMode { OFF, SIMPLE, HEADLIGHT, THREE_POINT };
 	
 	public RealtimeRendererSettings.RealtimeRenderer realtimeRenderer = RealtimeRenderer.SOFTWARE_ZBUFFER;
-	public int realtimeRenererQuality = 5;
+	public int realtimeRenererQuality = 2;
 	public RealtimeRendererSettings.LightingMode lightingMode = LightingMode.THREE_POINT;
 	public boolean lightFollowsCamera = false;
 	public RealtimeRendererSettings.Backface backfacingPatches = Backface.RENDER;

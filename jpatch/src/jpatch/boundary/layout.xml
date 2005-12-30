@@ -83,9 +83,8 @@
 		</menu>
 		<menu name="Options">
 			<item command="synchronize viewports"/>
-			<item command="colors settings"/>
+			<item command="settings"/>
 			<item command="grid spacing settings"/>
-			<item command="realtime renderer settings"/>
 			<item command="install jogl"/>
 			<menu name="Look and feel">
 				<item command="jpatch lookandfeel"/>
