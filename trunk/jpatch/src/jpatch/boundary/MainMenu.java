@@ -163,7 +163,7 @@ public final class MainMenu extends JMenuBar {
 		menuOptions.add(miSync);
 		//menuOptions.add(miFlip);
 		//menuOptions.add(miCull);
-		menuOptions.add(new ColorPreferencesAction());
+		menuOptions.add(new EditSettingsAction());
 		menuOptions.add(new SetGridSpacingAction());
 		menuOptions.add(new ZBufferQualityAction());
 		menuOptions.add(new InstallJoglAction());

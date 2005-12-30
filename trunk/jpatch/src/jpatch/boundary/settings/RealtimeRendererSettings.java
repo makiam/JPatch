@@ -34,7 +34,7 @@ public class RealtimeRendererSettings extends AbstractSettings {
 	public static enum LightingMode { OFF, SIMPLE, HEADLIGHT, THREE_POINT };
 	
 	public RealtimeRendererSettings.RealtimeRenderer realtimeRenderer = RealtimeRenderer.SOFTWARE_ZBUFFER;
-	public int realtimeRenererQuality = 5;
+	public int realtimeRenererQuality = 2;
 	public RealtimeRendererSettings.LightingMode lightingMode = LightingMode.THREE_POINT;
 	public boolean lightFollowsCamera = false;
 	public RealtimeRendererSettings.Backface backfacingPatches = Backface.RENDER;

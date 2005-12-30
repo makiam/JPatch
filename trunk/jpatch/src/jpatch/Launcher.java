@@ -1,5 +1,6 @@
 package jpatch;
 
+import java.awt.*;
 import buoy.widget.*;
 import buoy.event.*;
 import javax.swing.*;
@@ -75,7 +76,8 @@ public final class Launcher {
 	}
 	
 	private static void settings() {
-		Settings.main(new String[0]);
+		Component parent = (frame != null) ? frame.getComponent() : null;
+		Settings.getInstance().showDialog(parent);
 		if (frame != null) frame.dispose();
 	}
 }
