@@ -60,7 +60,7 @@ public final class ImportJPatchAction extends AbstractAction {
 		if (fileChooser.showOpenDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
 			String filename = file.getPath();
-			if (bNewModel) MainFrame.getInstance().NEW();
+			if (bNewModel) MainFrame.getInstance().newModel();
 			ModelImporter modelImporter;
 			String extension = JPatchUtils.getFileExtension(filename);
 			//System.out.println(extension);

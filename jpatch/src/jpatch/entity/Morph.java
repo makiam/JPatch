@@ -14,15 +14,21 @@ public class Morph implements MutableTreeNode {
 	float fMax = 100;
 	float fValue = 0;
 	Map mapMorph = new HashMap();
+	Model model;
 	
 	Morph() { }
 	
-	public Morph(String name) {
+	public Morph(String name, Model model) {
 		strName = name;
+		this.model = model;
 	}
 	
 	public String getName() {
 		return strName;
+	}
+	
+	public Model getModel() {
+		return model;
 	}
 	
 	public String toString() {

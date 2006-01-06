@@ -281,7 +281,7 @@ public class CompoundAutoMirror extends AbstractClone {
 					} else {
 						
 						
-						Morph newMorph = new Morph(mirrorName(morph.getName()));
+						Morph newMorph = new Morph(mirrorName(morph.getName()), morph.getModel());
 						newMorph.setMax(morph.getMax());
 						newMorph.setMin(morph.getMin());
 						newMorph.setSliderValue(morph.getSliderValue());

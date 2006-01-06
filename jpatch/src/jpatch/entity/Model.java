@@ -80,6 +80,8 @@ public class Model implements MutableTreeNode {
 		}
 	}
 	
+	
+	
 	//public StringBuffer xmlRotoscopes(int tabs) {
 	//	StringBuffer sb = new StringBuffer();
 	//	String[] viewName = new String[] { "front","rear","top","bottom","left","right" };
@@ -1148,7 +1150,7 @@ public class Model implements MutableTreeNode {
 	}
 
 	public int getIndex(TreeNode node) {
-		return 0;
+		return -1;
 	}
 
 	public boolean getAllowsChildren() {

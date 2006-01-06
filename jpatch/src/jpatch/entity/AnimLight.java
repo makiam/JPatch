@@ -1,8 +1,14 @@
 package jpatch.entity;
 
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.vecmath.*;
 
+import jpatch.boundary.MainFrame;
+
 public class AnimLight extends AnimObject {
+	
+	private boolean bParent;
 	
 	protected RenderExtension re = new RenderExtension(new String[] {
 		"povray", "light_source {\n\t$position color rgb $color * $intensity\n\tparallel\n\t#if ($size > 0)\n\t\tarea_light <$size,0,0>,<0,$size,0>,10,10 adaptive 1 jitter circular orient\n\t#end\n}\n",
@@ -68,5 +74,17 @@ public class AnimLight extends AnimObject {
 	
 	public StringBuffer renderStrings(String prefix) {
 		return re.xml(prefix);
+	}
+	
+	public void removeFromParent() {
+		MainFrame.getInstance().getAnimation().removeLight(this);
+	}
+
+	public void setParent(MutableTreeNode newParent) {
+		bParent = true;
+	}
+
+	public TreeNode getParent() {
+		return bParent ? MainFrame.getInstance().getAnimation().getTreenodeLights() : null;
 	}
 }

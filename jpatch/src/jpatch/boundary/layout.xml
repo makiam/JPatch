@@ -1,6 +1,7 @@
 <layout>
 	<toolbar name="main toolbar" position="north">
-		<button command="new"/>
+		<button command="new model"/>
+		<button command="new animation"/>
 		<button command="open"/>
 		<button command="save"/>
 		<separator/>
@@ -63,7 +64,8 @@
 	
 	<menu name="menubar">
 		<menu name="File">
-			<item command="new"/>
+			<item command="new model"/>
+			<item command="new animation"/>
 			<item command="open"/>
 			<item command="append"/>
 			<item command="save"/>

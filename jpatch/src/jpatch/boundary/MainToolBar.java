@@ -89,7 +89,7 @@ public final class MainToolBar extends JToolBar implements JPatchUndoManager.Und
 		buttonGridSnap.setSelected(Settings.getInstance().viewports.snapToGrid);
 		
 		/* add the buttons */
-		add(new JPatchButton(new NewAction()));
+		add(new JPatchButton(new NewModelAction()));
 		add(new JPatchButton(new ImportJPatchAction()));
 		add(new JPatchButton(new SaveAsAction(false)));
 		add(JPatchSeparator.createHorizontalSeparator());

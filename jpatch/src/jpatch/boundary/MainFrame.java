@@ -37,6 +37,7 @@ public final class MainFrame extends JFrame {
 	private int iMode = MESH;
 	
 	private Model model;
+	private Anim animation;
 	private JPatchScreen jpatchScreen;
 	private static MainFrame INSTANCE;
 //	private MainToolBar mainToolBar;
@@ -190,7 +191,7 @@ public final class MainFrame extends JFrame {
 			//mainToolBar.setFloatable(false);
 			//meshToolBar.setFloatable(false);
 			
-			initTree();
+			initTree(model);
 			sideBar = new SideBar(tree);
 //			getContentPane().add(sideBar,BorderLayout.EAST);
 			
@@ -417,21 +418,27 @@ public final class MainFrame extends JFrame {
 		return model;
 	}
 	
-	public void NEW() {
-		//INSTANCE.dispose();
-		//INSTANCE = null;
-		//INSTANCE = new MainFrame(new Model());
-		//getContentPane().remove(sideBar);
+	public Anim getAnimation() {
+		return animation;
+	}
+	
+	public void newModel() {
 		model = new Model();
+		animation = null;
 		setSelection(null);
 		undoManager.clear();
-		initTree();
+		initTree(model);
 		sideBar.setTree(tree);
-		//getContentPane().add(sideBar,BorderLayout.EAST);
-//		meshToolBar.reset();
-		//repaint();
-		//sideBar.repaint();
-//		JPatchUserSettings.getInstance().strJPatchFile = "";
+		validate();
+	}
+	
+	public void newAnimation() {
+		model = null;
+		animation = new Anim();
+		setSelection(null);
+		undoManager.clear();
+		initTree(animation);
+		sideBar.setTree(tree);
 		validate();
 	}
 	
@@ -690,7 +697,7 @@ public final class MainFrame extends JFrame {
 		return (DefaultTreeModel) tree.getModel();
 	}
 	
-	private void initTree() {
+	private void initTree(MutableTreeNode rootNode) {
 //		treenodeRoot.insert(model, 0);
 //		treenodeModel.insert(model.getTreenodeSelections(), 0);
 //		treenodeModel.insert(model.getTreenodeMaterials(), 1);
@@ -708,7 +715,7 @@ public final class MainFrame extends JFrame {
 		
 		treenodeRoot = new DefaultMutableTreeNode("ROOT");
 		tree = new JPatchTree(treenodeRoot);
-		((DefaultTreeModel) tree.getModel()).insertNodeInto(model, treenodeRoot, 0);
+		((DefaultTreeModel) tree.getModel()).insertNodeInto(rootNode, treenodeRoot, 0);
 		((DefaultTreeModel) tree.getModel()).reload();
 		tree.setCellRenderer(new JPatchTreeCellRenderer());
 		tree.setRootVisible(false);

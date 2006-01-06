@@ -5,14 +5,14 @@ import java.awt.event.*;
 import jpatch.auxilary.*;
 import jpatch.boundary.*;
 
-public final class NewAction extends AbstractAction {
+public final class NewModelAction extends AbstractAction {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public NewAction() {
+	public NewModelAction() {
 		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/new.png")));
-		putValue(Action.SHORT_DESCRIPTION,"New");
+		putValue(Action.SHORT_DESCRIPTION,"New Model");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		System.out.println("new");
@@ -23,15 +23,15 @@ public final class NewAction extends AbstractAction {
 				case JOptionPane.YES_OPTION:
 					SaveAsAction saveAsAction = new SaveAsAction(false);
 					if (saveAsAction.save()) {
-						MainFrame.getInstance().NEW();
+						MainFrame.getInstance().newModel();
 					}
 					break;
 				
 				case JOptionPane.NO_OPTION:
-					MainFrame.getInstance().NEW();
+					MainFrame.getInstance().newModel();
 			}
 		} else {
-			MainFrame.getInstance().NEW();
+			MainFrame.getInstance().newModel();
 		}
 	}
 }

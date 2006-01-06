@@ -11,17 +11,21 @@ public class MotionCurveSet {
 	AnimObject animObject;
 	
 	public static MotionCurveSet createMotionCurveSetFor(AnimObject animObject) {
-		if (animObject.getClass().equals(AnimModel.class)) return new MotionCurveSet.Model((AnimModel) animObject);
-		else if (animObject.getClass().equals(AnimLight.class)) return new MotionCurveSet.Light((AnimLight) animObject);
-		else if (animObject.getClass().equals(Camera.class)) return new MotionCurveSet.Camera((jpatch.entity.Camera) animObject);
-		else throw new IllegalArgumentException();
+		if (animObject instanceof AnimModel)
+			return new MotionCurveSet.Model((AnimModel) animObject);
+		else if (animObject instanceof AnimLight)
+			return new MotionCurveSet.Light((AnimLight) animObject);
+		else if (animObject instanceof jpatch.entity.Camera)
+			return new MotionCurveSet.Camera((jpatch.entity.Camera) animObject);
+		else
+			throw new IllegalArgumentException();
 	}
 	
 	private MotionCurveSet() { }
 	
 	private MotionCurveSet(AnimObject animObject) {
 		this.animObject = animObject;
-		float pos = Animator.getInstance().getStart();
+		float pos = 0; // FIXME;
 		position = MotionCurve2.createPositionCurve(new MotionKey2.Point3d(pos, animObject.getPosition()));
 		orientation = MotionCurve2.createOrientationCurve(new MotionKey2.Quat4f(pos, animObject.getOrientation()));
 		//MotionCurveSet.this.populateList();
@@ -53,7 +57,7 @@ public class MotionCurveSet {
 		
 		public Camera(jpatch.entity.Camera camera) {
 			super(camera);
-			float pos = Animator.getInstance().getStart();
+			float pos = 0; // FIXME;
 			focalLength = MotionCurve2.createFocalLengthCurve(new MotionKey2.Float(pos, camera.getFocalLength()));
 			populateList();
 		}
@@ -86,7 +90,7 @@ public class MotionCurveSet {
 		
 		public Light(AnimLight light) {
 			super(light);
-			float pos = Animator.getInstance().getStart();
+			float pos = 0; // FIXME;
 			size = MotionCurve2.createSizeCurve(new MotionKey2.Float(pos, light.getSize()));
 			intensity = MotionCurve2.createIntensityCurve(new MotionKey2.Float(pos, light.getIntensity()));
 			color = MotionCurve2.createColorCurve(new MotionKey2.Color3f(pos, light.getColor()));
@@ -132,7 +136,7 @@ public class MotionCurveSet {
 		
 		public Model(AnimModel animModel) {
 			super(animModel);
-			float pos = Animator.getInstance().getStart();
+			float pos = 0; // FIXME;
 			scale = MotionCurve2.createScaleCurve(new MotionKey2.Float(pos, animModel.getScale()));
 			for (Iterator it = animModel.getModel().getMorphList().iterator(); it.hasNext(); ) {
 				Morph morph = (Morph) it.next();

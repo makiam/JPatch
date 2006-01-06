@@ -265,8 +265,8 @@ public class RotationDof extends Morph {
 		fValue = value;
 		invalidate();
 		setMorphMap();
-		MainFrame.getInstance().getModel().applyMorphs();
-		MainFrame.getInstance().getModel().setPose();
+		getModel().applyMorphs();
+		getModel().setPose();
 //		setMorphValues();
 	}
 
