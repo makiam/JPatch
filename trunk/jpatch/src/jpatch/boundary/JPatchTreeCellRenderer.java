@@ -35,19 +35,36 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 	private ImageIcon iconSelection = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/selection.png"));
 	private ImageIcon iconTarget = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/target.png"));
 	
+	private ImageIcon iconAnimation = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/animation.png"));
+	private ImageIcon iconModels = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/models.png"));
+	private ImageIcon iconCameras = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/camera.png"));
+	private ImageIcon iconLights = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/light.png"));
+	private ImageIcon iconCamera = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/camera.png"));
+	private ImageIcon iconLight = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/light.png"));
+	
+	
+	
 	public Component getTreeCellRendererComponent(JTree tree,Object value,boolean sel,boolean expanded,boolean leaf,int row,boolean hasFocus) {
 		super.getTreeCellRendererComponent(tree,value,sel,expanded,leaf,row,hasFocus);
 		
 		if (value instanceof Model)
 			setIcon(iconModel);
-		else if (value == MainFrame.getInstance().getModel().getTreenodeSelections())
+		else if (value instanceof Anim)
+			setIcon(iconAnimation);
+		else if (MainFrame.getInstance().getModel() != null && value == MainFrame.getInstance().getModel().getTreenodeSelections())
 			setIcon(iconSelections);
-		else if (value == MainFrame.getInstance().getModel().getTreenodeMaterials())
+		else if (MainFrame.getInstance().getModel() != null && value == MainFrame.getInstance().getModel().getTreenodeMaterials())
 			setIcon(iconMaterials);
-		else if (value == MainFrame.getInstance().getModel().getTreenodeExpressions())
+		else if (MainFrame.getInstance().getModel() != null && value == MainFrame.getInstance().getModel().getTreenodeExpressions())
 			setIcon(iconExpressions);
-		else if (value == MainFrame.getInstance().getModel().getTreenodeBones())
+		else if (MainFrame.getInstance().getModel() != null && value == MainFrame.getInstance().getModel().getTreenodeBones())
 			setIcon(iconBones);
+		else if (MainFrame.getInstance().getAnimation() != null && value == MainFrame.getInstance().getAnimation().getTreenodeModels())
+			setIcon(iconModels);
+		else if (MainFrame.getInstance().getAnimation() != null && value == MainFrame.getInstance().getAnimation().getTreenodeLights())
+			setIcon(iconLights);
+		else if (MainFrame.getInstance().getAnimation() != null && value == MainFrame.getInstance().getAnimation().getTreenodeCameras())
+			setIcon(iconCameras);
 		else if (value instanceof Selection)
 			setIcon(iconSelection);
 		else if (value instanceof JPatchMaterial)
@@ -88,6 +105,12 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 		}
 		else if (value instanceof Bone)
 			setIcon(iconBone);
+		else if (value instanceof Camera)
+			setIcon(iconCamera);
+		else if (value instanceof AnimLight)
+			setIcon(iconLight);
+		else if (value instanceof AnimModel)
+			setIcon(iconModel);
 		return this;
 	}
 }

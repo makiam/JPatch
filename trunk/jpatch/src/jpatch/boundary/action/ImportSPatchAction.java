@@ -45,7 +45,7 @@ public final class ImportSPatchAction extends AbstractAction {
 		if (fileChooser.showOpenDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
 			String filename = file.getPath();
-			MainFrame.getInstance().NEW();
+			MainFrame.getInstance().newModel();
 			ModelImporter modelImporter = new SPatchImport();
 			modelImporter.importModel(MainFrame.getInstance().getModel(),filename);
 			//MainFrame.getInstance().getModel().computePatches();

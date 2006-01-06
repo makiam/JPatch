@@ -26,7 +26,7 @@ public final class NewMorphAction extends AbstractAction {
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		Morph morph = new Morph("new morph #" + iNum++);
+		Morph morph = new Morph("new morph #" + iNum++, MainFrame.getInstance().getModel());
 		morph.addTarget(new MorphTarget(0));
 		morph.addTarget(new MorphTarget(morph.getMax()));
 		//MainFrame.getInstance().getModel().addExpression(morph);

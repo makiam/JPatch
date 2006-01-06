@@ -29,7 +29,7 @@ public class InyoRenderer3 {
 		
 		Settings settings = Settings.getInstance();
 		
-		inyo.setImageSize(settings.export.imageWidth, settings.export.imageHeight, 1);
+		inyo.setImageSize(settings.export.imageHeight, settings.export.imageWidth, 1);
 		//inyo.setAspectRatio() ???
 		
 		Matrix4d cam = new Matrix4d(camera.getTransform());

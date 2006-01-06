@@ -503,7 +503,7 @@ implements ModelImporter {
 	}
 	
 	private Morph createMorph(Attributes attributes) {
-		Morph morph = new Morph("");
+		Morph morph = new Morph("", model);
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);

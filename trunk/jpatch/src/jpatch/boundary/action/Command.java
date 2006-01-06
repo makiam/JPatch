@@ -104,7 +104,7 @@ public final class Command implements KeyListener {
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("lock view")).setSelected(viewDef.isLocked());
 		INSTANCE.enableCommand("unlock view", viewDef.isLocked());
 		INSTANCE.enableCommand("show patches", viewDef.getDrawable().isShadingSupported());
-		INSTANCE.enableCommand("clear rotoscope image", MainFrame.getInstance().getModel().getRotoscope(viewDef.getView()) != null);
+		INSTANCE.enableCommand("clear rotoscope image", MainFrame.getInstance().getModel() != null && MainFrame.getInstance().getModel().getRotoscope(viewDef.getView()) != null);
 	}
 	
 	public Command() {
@@ -128,7 +128,8 @@ public final class Command implements KeyListener {
 		/*
 		 * Main toolbar buttons
 		 */
-		put("new",						new NewAction(), 				new JMenuItem(),			new JPatchButton());
+		put("new model",				new NewModelAction(), 			new JMenuItem(),			new JPatchButton());
+		put("new animation",			new NewAnimAction(), 			new JMenuItem(),			new JPatchButton());
 		put("open",						new ImportJPatchAction(), 		new JMenuItem(),			new JPatchButton());
 		put("save",						new SaveAsAction(false), 		new JMenuItem(),			new JPatchButton());
 		put("single view",				new ViewSingleAction(), 		new JRadioButtonMenuItem(),	new JPatchToggleButton());

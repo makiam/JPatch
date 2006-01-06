@@ -56,7 +56,7 @@ public final class Patch {
 	
 	public Patch(ControlPoint[] controlPoints) {
 		acpPoint = controlPoints;
-		if (MainFrame.getInstance() != null) material = MainFrame.getInstance().getModel().getMaterial(0);
+		if (MainFrame.getInstance().getModel() != null) material = MainFrame.getInstance().getModel().getMaterial(0);
 		//setGroup();
 		//reset();
 		//for (int i = 0; i < acpPoint.length; i++) {

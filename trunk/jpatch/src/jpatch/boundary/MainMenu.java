@@ -83,7 +83,7 @@ public final class MainMenu extends JMenuBar {
 		//menuImport.add(new ImportJPatchAction());
 		
 		JMenuItem mi;
-		mi = new JMenuItem(new NewAction());
+		mi = new JMenuItem(new NewModelAction());
 		mi.setIcon(null);
 		mi.setText("New");
 		menuFile.add(mi);
