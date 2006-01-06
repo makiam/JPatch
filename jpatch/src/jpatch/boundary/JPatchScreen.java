@@ -109,9 +109,13 @@ public final class JPatchScreen extends JPanel {
 			JPatchDrawableEventListener listener = new JPatchDrawableEventListener() {
 				public void display(JPatchDrawable2 drawable) {
 					aViewport[I].prepare();
-					aViewport[I].drawRotoscope();
+					if (MainFrame.getInstance().getModel() != null)
+						aViewport[I].drawRotoscope();
 					aViewport[I].drawGrid();
-					aViewport[I].drawModel(MainFrame.getInstance().getModel());
+					if (MainFrame.getInstance().getModel() != null)
+						aViewport[I].drawModel(MainFrame.getInstance().getModel());
+					if (MainFrame.getInstance().getAnimation() != null)
+						aViewport[I].drawAnimFrame(MainFrame.getInstance().getAnimation());
 					aViewport[I].drawOrigin();
 					if (tool != null)
 						aViewport[I].drawTool(tool);

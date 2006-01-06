@@ -1,21 +1,19 @@
 package jpatch.boundary.action;
 
-import javax.swing.*;
 import java.awt.event.*;
-import jpatch.auxilary.*;
-import jpatch.boundary.*;
 
-public final class NewAction extends AbstractAction {
-	/**
-	 * 
-	 */
+import javax.swing.*;
+import jpatch.auxilary.JPatchUtils;
+import jpatch.boundary.MainFrame;
+
+public class NewAnimAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
-	public NewAction() {
+	public NewAnimAction() {
 		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/new.png")));
-		putValue(Action.SHORT_DESCRIPTION,"New");
+		putValue(Action.SHORT_DESCRIPTION,"New Animation");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		System.out.println("new");
+		System.out.println("new anim");
 		if (MainFrame.getInstance().getUndoManager().hasChanged()) {
 			int option = JPatchUtils.showSaveDialog();
 			switch (option) {
@@ -23,16 +21,15 @@ public final class NewAction extends AbstractAction {
 				case JOptionPane.YES_OPTION:
 					SaveAsAction saveAsAction = new SaveAsAction(false);
 					if (saveAsAction.save()) {
-						MainFrame.getInstance().NEW();
+						MainFrame.getInstance().newAnimation();
 					}
 					break;
 				
 				case JOptionPane.NO_OPTION:
-					MainFrame.getInstance().NEW();
+					MainFrame.getInstance().newAnimation();
 			}
 		} else {
-			MainFrame.getInstance().NEW();
+			MainFrame.getInstance().newAnimation();
 		}
 	}
 }
-

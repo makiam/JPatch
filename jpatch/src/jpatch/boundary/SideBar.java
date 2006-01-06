@@ -165,14 +165,14 @@ implements TreeSelectionListener {
 //		}
 //		validate();
 		//System.out.println(selectedLeaf);
-		
+		boolean anim = MainFrame.getInstance().getAnimation() != null;
 		MutableTreeNode selectedNode = (MutableTreeNode) treeSelectionEvent.getPath().getLastPathComponent();
 //		System.out.println("tree hit: selected node = " + selectedNode);
-		if (selectedNode == MainFrame.getInstance().getModel().getTreenodeMaterials()) {
+		if (!anim && selectedNode == MainFrame.getInstance().getModel().getTreenodeMaterials()) {
 			replacePanel(new MaterialsPanel((Model) selectedNode.getParent()));
 		} else if (selectedNode instanceof JPatchMaterial) {
 			replacePanel(new MaterialPanel((JPatchMaterial) selectedNode));
-		} else if (selectedNode == MainFrame.getInstance().getModel().getTreenodeExpressions()) {
+		} else if (!anim && selectedNode == MainFrame.getInstance().getModel().getTreenodeExpressions()) {
 			replacePanel(new MorphsPanel());
 		} else if (selectedNode instanceof Morph) {
 			if (selectedNode instanceof RotationDof) {
@@ -197,7 +197,7 @@ implements TreeSelectionListener {
 //			}
 			target.getMorph().setValue(target.getPosition());
 			MainFrame.getInstance().getJPatchScreen().update_all();
-		} else if (selectedNode == MainFrame.getInstance().getModel().getTreenodeSelections()) {
+		} else if (!anim && selectedNode == MainFrame.getInstance().getModel().getTreenodeSelections()) {
 			replacePanel(new SelectionsPanel((Model) selectedNode.getParent()));
 		} else if (selectedNode instanceof Selection) {
 			replacePanel(new SelectionPanel((Selection) selectedNode));
@@ -205,7 +205,7 @@ implements TreeSelectionListener {
 				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(((Selection) selectedNode).cloneSelection()));
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
-		} else if (selectedNode == MainFrame.getInstance().getModel().getTreenodeBones()) {
+		} else if (!anim && selectedNode == MainFrame.getInstance().getModel().getTreenodeBones()) {
 			replacePanel(new BonesPanel(MainFrame.getInstance().getModel()));
 			MainFrame.getInstance().getSideBar().clearDetailPanel();
 		} else if (selectedNode instanceof Bone) {
@@ -220,6 +220,12 @@ implements TreeSelectionListener {
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		} else if (selectedNode instanceof Model) {
 			replacePanel(new ModelPanel((Model) selectedNode));
+		} else if (anim && selectedNode == MainFrame.getInstance().getAnimation().getTreenodeCameras()) {
+			replacePanel(new CamerasPanel());
+		} else if (anim && selectedNode == MainFrame.getInstance().getAnimation().getTreenodeLights()) {
+			replacePanel(new LightsPanel());
+		} else if (anim && selectedNode == MainFrame.getInstance().getAnimation().getTreenodeModels()) {
+			replacePanel(new AnimModelsPanel());
 		} else {
 			replacePanel(new SidePanel());
 		}

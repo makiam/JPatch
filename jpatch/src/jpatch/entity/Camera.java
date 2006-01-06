@@ -1,6 +1,13 @@
 package jpatch.entity;
 
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
+
+import jpatch.boundary.MainFrame;
+
 public class Camera extends AnimObject {
+	private boolean bParent;
+	
 	/* the focal lenghth of the lense */
 	protected float fFocalLength = 50.0f;
 	
@@ -188,5 +195,17 @@ public class Camera extends AnimObject {
 	
 	public boolean isMotionBlur() {
 		return bMotionBlur;
+	}
+	
+	public void removeFromParent() {
+		MainFrame.getInstance().getAnimation().removeCamera(this);
+	}
+
+	public void setParent(MutableTreeNode newParent) {
+		bParent = true;
+	}
+
+	public TreeNode getParent() {
+		return bParent ? MainFrame.getInstance().getAnimation().getTreenodeCameras() : null;
 	}
 }

@@ -1,8 +1,12 @@
 package jpatch.entity;
 
+import java.util.Enumeration;
+
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.vecmath.*;
 
-public abstract class AnimObject {
+public abstract class AnimObject implements MutableTreeNode{
 	static final double MIN_ROLL = 0.0000001;
 	
 	protected Matrix4d m4Transform = new Matrix4d();
@@ -97,5 +101,48 @@ public abstract class AnimObject {
 	
 	public String toString() {
 		return strName;
+	}
+	
+	/*
+	 * Mutable treenode interface implementation
+	 */
+	public void insert(MutableTreeNode child, int index) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void remove(int index) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void remove(MutableTreeNode node) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setUserObject(Object object) {
+		throw new UnsupportedOperationException();
+	}
+
+	public TreeNode getChildAt(int childIndex) {
+		return null;
+	}
+
+	public int getChildCount() {
+		return 0;
+	}
+
+	public int getIndex(TreeNode node) {
+		return -1;
+	}
+
+	public boolean getAllowsChildren() {
+		return false;
+	}
+
+	public boolean isLeaf() {
+		return true;
+	}
+
+	public Enumeration children() {
+		return null;
 	}
 }

@@ -112,6 +112,11 @@ public class Viewport2 {
 		setQuality(settings.realtimeRenderer.realtimeRenererQuality);
 	}
 	
+	public void setModelMatrix(Matrix4d matrix) {
+		m4View.set(matrix);
+		m4View.mul(viewDef.getMatrix());
+	}
+	
 	public void prepare() {
 		if (drawable.isTransformSupported())
 			drawable.setTransform(viewDef.getScreenMatrix());
@@ -199,6 +204,13 @@ public class Viewport2 {
 		for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
 			Bone bone = (Bone) it.next();
 			boneRenderer.drawBone(drawable, viewDef, bone);
+		}
+	}
+	
+	public void drawAnimFrame(Anim animation) {
+		for (AnimModel animModel:animation.getModels()) {
+			setModelMatrix(animModel.getTransform());
+			drawModel(animModel.getModel());
 		}
 	}
 	
