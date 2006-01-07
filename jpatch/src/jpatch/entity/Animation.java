@@ -50,11 +50,11 @@ public class Animation implements MutableTreeNode {
 
 	public void setPosition(float position) {
 		fPosition = position;
-		System.out.println("position = " + position);
+//		System.out.println("position = " + position);
 		for (AnimModel animModel:listModels) {
 			mapMotionCurves.get(animModel).setPosition(position);
-			animModel.getModel().applyMorphs();
-			animModel.getModel().setPose();
+//			animModel.getModel().applyMorphs();
+//			animModel.getModel().setPose();
 		}
 		for (AnimLight animLight:listLights) {
 			mapMotionCurves.get(animLight).setPosition(position);

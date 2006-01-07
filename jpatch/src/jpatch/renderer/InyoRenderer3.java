@@ -62,7 +62,7 @@ public class InyoRenderer3 {
 		for (Iterator it = lights.iterator(); it.hasNext(); ) {
 			AnimLight light = (AnimLight) it.next();
 			if (light.isActive()) {
-				Point3d p = light.getPosition();
+				Point3d p = light.getPositionDouble();
 				inyo.addLight(p.x, p.y, p.z, light.getIntensity());
 				Color3f c = light.getColor();
 				inyo.setLightColor(c.x, c.y, c.z);

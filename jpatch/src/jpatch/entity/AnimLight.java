@@ -5,6 +5,7 @@ import javax.swing.tree.TreeNode;
 import javax.vecmath.*;
 
 import jpatch.boundary.MainFrame;
+import jpatch.control.edit.JPatchUndoableEdit;
 
 public class AnimLight extends AnimObject {
 	
@@ -74,6 +75,10 @@ public class AnimLight extends AnimObject {
 	
 	public StringBuffer renderStrings(String prefix) {
 		return re.xml(prefix);
+	}
+	
+	public void getBounds(Point3f p3A, Point3f p3B) {
+		// FIXME
 	}
 	
 	public void removeFromParent() {

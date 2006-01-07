@@ -1,5 +1,5 @@
 /*
- * $Id: RealtimeLighting.java,v 1.5 2005/08/29 14:00:27 sascha_l Exp $
+ * $Id: RealtimeLighting.java,v 1.6 2006/01/07 21:34:10 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -28,7 +28,7 @@ import jpatch.entity.*;
 /**
  * This class holds information needed for realtime lighing (a list of lightsources and some global settings)
  * @author sascha
- * @version $$Revision: 1.5 $$
+ * @version $$Revision: 1.6 $$
  */
 public class RealtimeLighting {
 	
@@ -102,7 +102,7 @@ public class RealtimeLighting {
 		Point3f pos = new Point3f();
 		Color3f color = new Color3f();
 		for (int i = 0; i < lights.length; i++) {
-			pos.set(lights[i].getPosition());
+			pos.set(lights[i].getPositionDouble());
 			color.set(lights[i].getColor());
 			color.scale(lights[i].getIntensity());
 			rtl.add(rtl.new PointLight(color, true, true, pos, 0, 1));

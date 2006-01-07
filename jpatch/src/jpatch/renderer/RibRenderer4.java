@@ -235,7 +235,7 @@ public class RibRenderer4 {
 	public static String light(AnimLight light) {
 		String s = light.getRenderString("renderman", "");
 		s = AbstractRenderer.light(light, s);
-		s = s.replaceAll("\\$position",toRibVector(light.getPosition()));
+		s = s.replaceAll("\\$position",toRibVector(light.getPositionDouble()));
 		s = s.replaceAll("\\$color",toRibVector(light.getColor()));
 		return s;
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.45 2006/01/07 13:47:01 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.46 2006/01/07 21:34:09 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -3908,11 +3908,11 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 		pn0.set(p3);
 	}
 	
-	private static class BoneRenderer {
+	private class BoneRenderer {
 		static final float R = 0.05f;
 		static final float A = 0.2f;
 		static final float B = A - 1;
-		static final int[] LINES = new int[] {
+		final int[] LINES = new int[] {
 				0, 1,
 				0, 2,
 				0, 3,
@@ -3926,7 +3926,7 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 				3, 4,
 				4, 1
 		};
-		static final int[] TRIANGLES = new int[] {
+		final int[] TRIANGLES = new int[] {
 //				0,1,2,
 //				0,2,3,
 //				0,3,4,
@@ -3948,7 +3948,7 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 				7, 6, 0,
 				6, 7, 5
 		};
-		static final int[] NORMAL_INDICES = new int[] {
+		final int[] NORMAL_INDICES = new int[] {
 				0,
 				1,
 				2,
@@ -4032,7 +4032,7 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 					v3X.z * length, v3Extent.z * length, v3Z.z * length, p3Start.z,
 					0f,    0f,    0f,   1f
 			);
-			Matrix4f m = new Matrix4f(viewDef.getMatrix());
+			Matrix4f m = new Matrix4f(m4View);
 			m.mul(matrix);
 			for (int i = 0; i < ap3Points.length; i++)
 				m.transform(ap3Points[i]);
@@ -4151,9 +4151,9 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 						dof.getParentDof().getTransform().transform(axis);
 					axis.normalize();
 					axis.scale(length * 0.25f);
-					viewDef.getMatrix().transform(axis);
+					m4View.transform(axis);
 					Point3f a = new Point3f(bone.getStart(null));
-					viewDef.getMatrix().transform(a);
+					m4View.transform(a);
 					Point3f b = new Point3f(a);
 					a.add(axis);
 					b.sub(axis);
@@ -4183,8 +4183,8 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 						b.set(a);
 						a.add(v);
 						b.add(vv);
-						viewDef.getMatrix().transform(a);
-						viewDef.getMatrix().transform(b);
+						m4View.transform(a);
+						m4View.transform(b);
 						drawable.drawLine(a, b);
 					}
 					v.scale(length * 0.5f, v3Extent);
@@ -4196,8 +4196,8 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 					b.set(a);
 					a.add(v);
 					b.add(vv);
-					viewDef.getMatrix().transform(a);
-					viewDef.getMatrix().transform(b);
+					m4View.transform(a);
+					m4View.transform(b);
 					drawable.drawLine(a, b);
 					v.scale(length * 0.5f, v3Extent);
 					aa.angle = (dof.getMax() - dof.getValue()) / 180 * (float) Math.PI;
@@ -4208,8 +4208,8 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 					b.set(a);
 					a.add(v);
 					b.add(vv);
-					viewDef.getMatrix().transform(a);
-					viewDef.getMatrix().transform(b);
+					m4View.transform(a);
+					m4View.transform(b);
 					drawable.drawLine(a, b);
 					
 					d++;

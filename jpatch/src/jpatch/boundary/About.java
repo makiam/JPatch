@@ -91,6 +91,8 @@ public class About extends JDialog implements ActionListener {
 			"Thanks to (in alphabetical order):<br>" +
 			"<ul>" +
 			"<li>Dan Bishop</li>" +
+			"<li>Florian Bruckner</li>" +
+			"<li>Jim Calhoun</li>" +
 			"<li>David Cuny</li>" +
 			"<li>Robert Hemby</li>" +
 			"<li>Heiko Irrgang</li>" +

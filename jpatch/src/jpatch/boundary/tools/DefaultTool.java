@@ -10,6 +10,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.vecmath.*;
+
 import jpatch.boundary.*;
 import jpatch.boundary.mouse.*;
 import jpatch.entity.*;
@@ -154,6 +155,11 @@ public class DefaultTool extends JPatchTool {
 		Point3f p3A = new Point3f();
 		Point3f p3B = new Point3f();
 		selection.getBounds(p3A, p3B);
+		return isHit(x, y, m4View, p3A, p3B, selection.getOrientation());
+	}
+	
+	protected boolean isHit(int x, int y, Matrix4f m4View, Point3f p3A, Point3f p3B, Matrix3f orientation) {
+		System.out.println("isHit(" + p3A + ", " + p3B + ")");
 		float scale = 12f / m4View.getScale();
 		Vector3f v3Margin = new Vector3f(scale,scale,scale);
 		p3A.sub(v3Margin);
@@ -170,7 +176,7 @@ public class DefaultTool extends JPatchTool {
 		};
 		
 		for (int p = 0; p < 8; p++) {
-			selection.getOrientation().transform(ap3[p]);
+			orientation.transform(ap3[p]);
 			m4View.transform(ap3[p]);
 		}
 		
@@ -304,6 +310,7 @@ public class DefaultTool extends JPatchTool {
 	public void mousePressed(MouseEvent mouseEvent) {
 		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 		m4Transform.setIdentity();
+		boolean anim = MainFrame.getInstance().getAnimation() != null;
 		
 		/* LEFT MOUSE BUTTON */
 		if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
@@ -439,9 +446,18 @@ public class DefaultTool extends JPatchTool {
 				
 				/* check if a controlpoint was clicked... */
 				Point2D.Float p2 = new Point2D.Float(x,y);
-				cpHot = viewDef.getClosestControlPoint(p2, null, null, true, false, cpHot);
-				btHot = viewDef.getClosestBoneEnd(p2, null, true, true);
-				Bone hitBone = viewDef.getClosestBone(p2);
+				cpHot = anim ? null : viewDef.getClosestControlPoint(p2, null, null, true, false, cpHot);
+				btHot = anim ? null : viewDef.getClosestBoneEnd(p2, null, true, true);
+				Bone hitBone = anim ? null : viewDef.getClosestBone(p2);
+				AnimObject hitAnimObject = null;
+				if (anim) {
+					Animation animation = MainFrame.getInstance().getAnimation();
+					for (AnimModel animModel:animation.getModels()) {
+						if (animModel.isHit(x, y, viewDef.getScreenMatrix())) {
+							hitAnimObject = animModel;
+						}
+					}
+				}
 				if (!MainFrame.getInstance().getJPatchScreen().isSelectBones()) {
 					btHot = null;
 					hitBone = null;
@@ -449,8 +465,15 @@ public class DefaultTool extends JPatchTool {
 				if (!MainFrame.getInstance().getJPatchScreen().isSelectPoints()) {
 					cpHot = null;
 				}
+				
+				/* if anim-object was hit... */
+				if (hitAnimObject != null) {
+					selection = new Selection(hitAnimObject);
+					edit.addEdit(new AtomicChangeSelection(selection));
+					
+				}
 				/* if a point was hit... */
-				if (cpHot != null) {
+				else if (cpHot != null) {
 					
 					/* if neither shift nor control is down */
 					if ((!mouseEvent.isControlDown() && !mouseEvent.isShiftDown()) || selection == null) {
@@ -690,7 +713,7 @@ public class DefaultTool extends JPatchTool {
 					
 						/* no point was hit, clear cpHot */
 						
-						if (selection != null && cpHot != selection.getHotObject()) {
+						if (selection != null && cpHot != selection.getHotObject() && !(selection.getHotObject() instanceof AnimObject)) {
 							edit.addEdit(new AtomicModifySelection.HotObject(selection, null));
 							repaint = true;
 						}
@@ -705,12 +728,17 @@ public class DefaultTool extends JPatchTool {
 							iMouseX = x;
 							iMouseY = y;
 						} else {
-							//System.out.println("**");
+							System.out.println("**");
+							System.out.println(selection);
+							if (selection != null) {
+								System.out.println(selection.isSingle());
+								System.out.println(isHit(x,y,viewDef.getScreenMatrix()));
+							}
 							/* neither shift nor control are down */
 							
 							/* check if selection box was hit and set state*/
 							if (selection != null && !selection.isSingle() && isHit(x,y,viewDef.getScreenMatrix())) {
-								
+								System.out.println("move group");
 								/* selection box was hit, set state*/
 								iState = MOVE_GROUP;
 	//							compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));
@@ -732,11 +760,12 @@ public class DefaultTool extends JPatchTool {
 							} else {
 								
 								/* selection box was not it, set state */
-								iState = DRAW_SELECTION;
-								iMouseX = x;
-								iMouseY = y;
+								if (!anim) {
+									iState = DRAW_SELECTION;
+									iMouseX = x;
+									iMouseY = y;
 								
-								
+								}
 							}
 						}
 					}
