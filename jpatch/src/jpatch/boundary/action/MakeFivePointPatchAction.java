@@ -46,7 +46,7 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 		Selection selection = MainFrame.getInstance().getSelection();
 		Model model = MainFrame.getInstance().getModel();
 		ArrayList points = new ArrayList();
-		if (selection == null)
+		if (selection == null || MainFrame.getInstance().getAnimation() != null)
 			return null;
 		
 		for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {

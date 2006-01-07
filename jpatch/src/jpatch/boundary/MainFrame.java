@@ -586,7 +586,8 @@ public final class MainFrame extends JFrame {
 			int flags = Selection.CONTROLPOINTS;
 			if (iMode != MORPH)
 				flags |= Selection.MORPHS;
-			selection.arm(flags);
+			if (animation == null)
+				selection.arm(flags);
 			int points = 0, bones = 0;
 			for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
 				Object o = it.next();

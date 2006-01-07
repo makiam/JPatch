@@ -140,7 +140,7 @@ public class CameraViewport {
 					Matrix3d m = new Matrix3d();
 					camera.getTransform().getRotationScale(m);
 					m.transform(v);
-					Point3d p = camera.getPosition();
+					Point3d p = camera.getPositionDouble();
 					p.add(v);
 					camera.setPosition(p);
 					
@@ -164,7 +164,7 @@ public class CameraViewport {
 					Matrix3d m = new Matrix3d();
 					camera.getTransform().getRotationScale(m);
 					m.transform(v);
-					Point3d p = camera.getPosition();
+					Point3d p = camera.getPositionDouble();
 					p.add(v);
 					camera.setPosition(p);
 					bChange = true;
@@ -211,7 +211,7 @@ public class CameraViewport {
 					// move object button pressed?
 					if (buttonObjectMove.isPressed()) {
 						// get the current position of the object
-						Point3d p = activeObject.getPosition(); 
+						Point3d p = activeObject.getPositionDouble(); 
 						
 						// middle mouse?
 						if (SwingUtilities.isMiddleMouseButton(mouseEvent)) {
@@ -480,7 +480,7 @@ public class CameraViewport {
 		
 		g.drawString(camera.getName(), 8, 15);
 		g.drawString("Position", 158, 15);
-		g.drawString(number(camera.getPosition().x) + "/" + number(camera.getPosition().y) + "/" + number(camera.getPosition().z), 158, 30);
+		g.drawString(number(camera.getPositionDouble().x) + "/" + number(camera.getPositionDouble().y) + "/" + number(camera.getPositionDouble().z), 158, 30);
 		g.drawString("Roll/Pitch/Yaw", 308, 15);
 		g.drawString(number(camera.getRoll() * 180 / Math.PI) + "/" + number(camera.getPitch() * 180 / Math.PI) + "/" + number(camera.getYaw() * 180 / Math.PI), 308, 30);
 		//g.drawString("Roll/Pitch/YAW: \t" + (int) (dRoll * 180 / Math.PI) + "/" + (int) (dPitch * 180 / Math.PI) + "/" + (int) (dYaw * 180 / Math.PI), 8, 64);
@@ -491,7 +491,7 @@ public class CameraViewport {
 		if (animObject != camera) {
 			g.drawString(animObject.getName(), 9, H - 25);
 			g.drawString("Position", 158, H - 25);
-			g.drawString(number(animObject.getPosition().x) + "/" + number(animObject.getPosition().y) + "/" + number(animObject.getPosition().z), 158, H - 10);
+			g.drawString(number(animObject.getPositionDouble().x) + "/" + number(animObject.getPositionDouble().y) + "/" + number(animObject.getPositionDouble().z), 158, H - 10);
 			g.drawString("Roll/Pitch/Yaw", 308, H - 25);
 			g.drawString(number(animObject.getRoll() * 180 / Math.PI) + "/" + number(animObject.getPitch() * 180 / Math.PI) + "/" + number(animObject.getYaw() * 180 / Math.PI), 308, H - 10);
 			g.drawString("Scale", 458, H - 25);

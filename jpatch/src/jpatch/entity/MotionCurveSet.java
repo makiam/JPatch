@@ -26,7 +26,7 @@ public class MotionCurveSet {
 	private MotionCurveSet(AnimObject animObject) {
 		this.animObject = animObject;
 		float pos = 0; // FIXME;
-		position = MotionCurve2.createPositionCurve(new MotionKey2.Point3d(pos, animObject.getPosition()));
+		position = MotionCurve2.createPositionCurve(new MotionKey2.Point3d(pos, animObject.getPositionDouble()));
 		orientation = MotionCurve2.createOrientationCurve(new MotionKey2.Quat4f(pos, animObject.getOrientation()));
 		//MotionCurveSet.this.populateList();
 	}
@@ -37,7 +37,7 @@ public class MotionCurveSet {
 	}
 	
 	public void updateCurves(float pos) {
-		if (!position.getPoint3dAt(pos).equals(animObject.getPosition())) position.setPoint3dAt(pos, animObject.getPosition());
+		if (!position.getPoint3dAt(pos).equals(animObject.getPositionDouble())) position.setPoint3dAt(pos, animObject.getPositionDouble());
 		if (!orientation.getQuat4fAt(pos).equals(animObject.getOrientation())) orientation.setQuat4fAt(pos, animObject.getOrientation());
 	}
 	
@@ -175,7 +175,7 @@ public class MotionCurveSet {
 			for (Iterator itBone = ((AnimModel) animObject).getModel().getBoneSet().iterator(); itBone.hasNext(); ) {
 				for (Iterator itDof = ((Bone) itBone.next()).getDofs().iterator(); itDof.hasNext(); ) {
 					RotationDof dof = (RotationDof) itDof.next();
-					dof.setValue(morph(dof).getFloatAt(pos));
+					dof.presetValue(morph(dof).getFloatAt(pos));
 				}
 			}
 		}

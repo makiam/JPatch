@@ -35,9 +35,9 @@ public class AnimObjectEditor extends BDialog{
 		animObject = object;
 		BTabbedPane tabbedPane = null;
 		textName = new BTextField(animObject.getName(), 20);
-		textPosX = new BTextField("" + animObject.getPosition().x, 20);
-		textPosY = new BTextField("" + animObject.getPosition().y, 20);
-		textPosZ = new BTextField("" + animObject.getPosition().z, 20);
+		textPosX = new BTextField("" + animObject.getPositionDouble().x, 20);
+		textPosY = new BTextField("" + animObject.getPositionDouble().y, 20);
+		textPosZ = new BTextField("" + animObject.getPositionDouble().z, 20);
 		textRoll = new BTextField("" + animObject.getRoll() * 180 / Math.PI, 20);
 		textPitch = new BTextField("" + animObject.getPitch() * 180 / Math.PI, 20);
 		textYaw = new BTextField("" + animObject.getYaw() * 180 / Math.PI, 20);
