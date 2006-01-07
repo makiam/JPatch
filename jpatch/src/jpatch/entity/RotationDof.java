@@ -40,7 +40,8 @@ public class RotationDof extends Morph {
 	private int iMode = SOFT;
 //	private Morph morph;
 	
-	public RotationDof(Bone bone, int axis) {
+	public RotationDof(Bone bone, int axis, Model model) {
+		this.model = model;
 		this.bone = bone;
 //		v3ReferenceAxis = new Vector3f(0,0,1);
 //		v3Axis = new Vector3f();

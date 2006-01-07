@@ -18,6 +18,7 @@ import buoy.event.KeyPressedEvent;
 import jpatch.*;
 import jpatch.entity.*;
 import jpatch.boundary.settings.Settings;
+import jpatch.boundary.sidebar.SideBar;
 import jpatch.boundary.tools.*;
 //	import jpatch.boundary.mouse.*;		//remove
 import jpatch.control.*;
@@ -37,7 +38,7 @@ public final class MainFrame extends JFrame {
 	private int iMode = MESH;
 	
 	private Model model;
-	private Anim animation;
+	private Animation animation;
 	private JPatchScreen jpatchScreen;
 	private static MainFrame INSTANCE;
 //	private MainToolBar mainToolBar;
@@ -60,6 +61,8 @@ public final class MainFrame extends JFrame {
 	private MutableTreeNode treenodeRoot;
 //	private MutableTreeNode treenodeModel;
 	private MorphTarget editedMorph;
+	private JDialog vcrDialog;
+	private VcrControls vcrControls;
 	
 //	private javax.swing.Timer defaultToolTimer = new javax.swing.Timer(0, new ActionListener() {
 //		public void actionPerformed(ActionEvent event) {
@@ -418,7 +421,7 @@ public final class MainFrame extends JFrame {
 		return model;
 	}
 	
-	public Anim getAnimation() {
+	public Animation getAnimation() {
 		return animation;
 	}
 	
@@ -430,16 +433,33 @@ public final class MainFrame extends JFrame {
 		initTree(model);
 		sideBar.setTree(tree);
 		validate();
+		if (vcrControls != null)
+			vcrControls.stop();
+		if (vcrDialog != null) {
+			vcrDialog.dispose();
+			vcrDialog = null;
+		}
 	}
 	
 	public void newAnimation() {
 		model = null;
-		animation = new Anim();
+		animation = new Animation();
 		setSelection(null);
 		undoManager.clear();
 		initTree(animation);
 		sideBar.setTree(tree);
 		validate();
+		if (vcrControls != null)
+			vcrControls.stop();
+		vcrControls = new VcrControls();
+		vcrDialog = new JDialog(this, false);
+		vcrDialog.setTitle("JPatch Animation Controls");
+		vcrDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		vcrDialog.setResizable(false);
+		vcrDialog.add(vcrControls);
+		vcrDialog.pack();
+		vcrDialog.setAlwaysOnTop(true);
+		vcrDialog.setVisible(true);
 	}
 	
 	public static MainFrame getInstance() {

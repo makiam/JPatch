@@ -193,10 +193,10 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 			edit.addEdit(new AtomicChangeTool(new DefaultTool()));
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
 //			MainFrame.getInstance().getMeshToolBar().reset();
-			
-			MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(bone, 1), bone, 0);
-			MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(bone, 2), bone, 1);
-			MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(bone, 4), bone, 2);
+			Model model = MainFrame.getInstance().getModel();
+			MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(bone, 1, model), bone, 0);
+			MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(bone, 2, model), bone, 1);
+			MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(bone, 4, model), bone, 2);
 			bone.addDofAxis(7);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 //			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);

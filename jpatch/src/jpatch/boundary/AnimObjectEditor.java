@@ -31,7 +31,7 @@ public class AnimObjectEditor extends BDialog{
 	private BTextArea textPov;
 	
 	public AnimObjectEditor(AnimObject object, WindowWidget parent) {
-		super(parent, "Edit " + object.getName() + " at frame " + (Animator.getInstance().getPosition() + 1), true);
+		super(parent, "Edit " + object.getName() + " at frame " + (MainFrame.getInstance().getAnimation().getPosition() + 1), true);
 		animObject = object;
 		BTabbedPane tabbedPane = null;
 		textName = new BTextField(animObject.getName(), 20);
@@ -205,9 +205,10 @@ public class AnimObjectEditor extends BDialog{
 				animLight.setRenderString("povray", "", textPov.getText());
 				animLight.setRenderString("renderman", "", textRib.getText());
 			}
-			Animator.getInstance().updateCurvesFor(animObject);
+//			Animator.getInstance().updateCurvesFor(animObject);
+			MainFrame.getInstance().getAnimation().getCurvesetFor(animObject).updateCurves(MainFrame.getInstance().getAnimation().getPosition());
 			dispose();
-			Animator.getInstance().rerenderViewports();
+//			Animator.getInstance().rerenderViewports();
 		} catch (Exception exception) {
 			;
 		}

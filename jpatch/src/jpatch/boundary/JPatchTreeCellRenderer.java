@@ -49,7 +49,7 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 		
 		if (value instanceof Model)
 			setIcon(iconModel);
-		else if (value instanceof Anim)
+		else if (value instanceof Animation)
 			setIcon(iconAnimation);
 		else if (MainFrame.getInstance().getModel() != null && value == MainFrame.getInstance().getModel().getTreenodeSelections())
 			setIcon(iconSelections);

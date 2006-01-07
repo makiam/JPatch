@@ -331,7 +331,7 @@ public class CompoundAutoMirror extends AbstractClone {
 					int i = 0;
 					for (Iterator itDof = bone.getDofs().iterator(); itDof.hasNext(); ) {
 						RotationDof dof = (RotationDof) itDof.next();
-						RotationDof newDof = new RotationDof(newBone, dof.getType());
+						RotationDof newDof = new RotationDof(newBone, dof.getType(), dof.getModel());
 						newDof.setFlipped(dof.isFlipped());
 						newBone.insert(newDof, i++);
 						Vector3f ax1 = dof.getAxis();
