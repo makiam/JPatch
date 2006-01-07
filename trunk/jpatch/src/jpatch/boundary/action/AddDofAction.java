@@ -27,7 +27,7 @@ public final class AddDofAction extends AbstractAction {
 //			return;
 		if ((bone.getDofMask() & axis) != 0)
 			return;
-		RotationDof dof = new RotationDof(bone, axis);
+		RotationDof dof = new RotationDof(bone, axis, MainFrame.getInstance().getModel());
 //		dof.addTarget(new MorphTarget(dof.getMin()));
 //		dof.addTarget(new MorphTarget(0));
 //		dof.addTarget(new MorphTarget(dof.getMax()));

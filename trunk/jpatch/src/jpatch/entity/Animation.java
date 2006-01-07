@@ -1,12 +1,18 @@
 package jpatch.entity;
 
 import java.util.*;
+
 import javax.swing.tree.*;
 
 import jpatch.boundary.*;
 
-public class Anim implements MutableTreeNode {
+public class Animation implements MutableTreeNode {
 
+	private float fStart = 0;
+	private float fEnd = 240;
+	private float fPosition = 0;
+	private float fFramerate = 24;
+	
 	private ArrayList<AnimModel> listModels = new ArrayList<AnimModel>();
 	private ArrayList<AnimLight> listLights = new ArrayList<AnimLight>();
 	private ArrayList<Camera> listCameras = new ArrayList<Camera>();
@@ -18,23 +24,67 @@ public class Anim implements MutableTreeNode {
 	private boolean bInserted;
 	private String strName = "New Animation";
 	
-	public Anim() {
+	public Animation() {
 		addCamera(new Camera("Camera 1"), null);
 	}
 	
+	public float getEnd() {
+		return fEnd;
+	}
+
+	public void setEnd(float end) {
+		fEnd = end;
+	}
+
+	public float getFramerate() {
+		return fFramerate;
+	}
+
+	public void setFramerate(float framerate) {
+		fFramerate = framerate;
+	}
+
+	public float getPosition() {
+		return fPosition;
+	}
+
+	public void setPosition(float position) {
+		fPosition = position;
+		System.out.println("position = " + position);
+		for (AnimModel animModel:listModels) {
+			mapMotionCurves.get(animModel).setPosition(position);
+			animModel.getModel().applyMorphs();
+			animModel.getModel().setPose();
+		}
+		for (AnimLight animLight:listLights) {
+			mapMotionCurves.get(animLight).setPosition(position);
+		}
+		for (Camera camera:listCameras) {
+			mapMotionCurves.get(camera).setPosition(position);
+		}
+	}
+
+	public float getStart() {
+		return fStart;
+	}
+
+	public void setStart(float start) {
+		fStart = start;
+	}	
+	
 	public void addModel(AnimModel animModel, MotionCurveSet mcs) {
 		MainFrame.getInstance().getTreeModel().insertNodeInto(animModel, treenodeModels, listModels.size());
-		setMotionCurveFor(animModel, mcs);
+		setCurvesetFor(animModel, mcs);
 	}
 	
 	public void addLight(AnimLight animLight, MotionCurveSet mcs) {
 		MainFrame.getInstance().getTreeModel().insertNodeInto(animLight, treenodeLights, listLights.size());
-		setMotionCurveFor(animLight, mcs);
+		setCurvesetFor(animLight, mcs);
 	}
 	
 	public void addCamera(Camera camera, MotionCurveSet mcs) {
 		MainFrame.getInstance().getTreeModel().insertNodeInto(camera, treenodeCameras, listCameras.size());
-		setMotionCurveFor(camera, mcs);
+		setCurvesetFor(camera, mcs);
 	}
 	
 	public void removeModel(AnimModel animModel) {
@@ -77,7 +127,11 @@ public class Anim implements MutableTreeNode {
 		return strName;
 	}
 	
-	private void setMotionCurveFor(AnimObject animObject, MotionCurveSet mcs) {
+	public MotionCurveSet getCurvesetFor(AnimObject animObject) {
+		return mapMotionCurves.get(animObject);
+	}
+	
+	private void setCurvesetFor(AnimObject animObject, MotionCurveSet mcs) {
 		if (mcs == null)
 			mcs = MotionCurveSet.createMotionCurveSetFor(animObject);
 		mapMotionCurves.put(animObject, mcs);
@@ -179,7 +233,7 @@ public class Anim implements MutableTreeNode {
 		}
 
 		public TreeNode getParent() {
-			return Anim.this;
+			return Animation.this;
 		}
 
 		public boolean getAllowsChildren() {
@@ -218,5 +272,5 @@ public class Anim implements MutableTreeNode {
 		public Enumeration children() {
 			return Collections.enumeration(list);
 		}
-	}	
+	}
 }

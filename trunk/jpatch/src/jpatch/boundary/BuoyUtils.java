@@ -76,6 +76,7 @@ public class BuoyUtils {
 			this.color = color;
 			this.parent = parent;
 			getComponent().setBackground(color);
+			((JComponent) getComponent()).setBorder(BorderFactory.createLineBorder(color, 3));
 			addEventLink(CommandEvent.class, this, "selectColor");
 		}
 		
