@@ -151,6 +151,8 @@ public class Selection extends JPatchTreeLeaf {
 	}
 
 	public Matrix3f getOrientation() {
+		if (hotObject instanceof AnimObject)
+			m3Orientation.set(((AnimObject) hotObject).getOrientation());
 		return m3Orientation;
 	}
 	
@@ -167,6 +169,11 @@ public class Selection extends JPatchTreeLeaf {
 	}
 	
 	public boolean isSingle() {
+		System.out.println("Selection isSingle()");
+		System.out.println("map=" + mapObjects);
+		System.out.println("hot=" + hotObject);
+		if (hotObject instanceof AnimObject)
+			return false;
 		return mapObjects.size() == 1;
 	}
 	
@@ -179,6 +186,11 @@ public class Selection extends JPatchTreeLeaf {
 	}
 	
 	public void getBounds(Point3f p0, Point3f p1) {
+		if (hotObject instanceof AnimObject) {
+			System.out.println("hot");
+			((AnimObject) hotObject).getBounds(p0, p1);
+			return;
+		}
 		float xMax = -Float.MAX_VALUE;
 		float xMin = Float.MAX_VALUE;
 		float yMax = -Float.MAX_VALUE;
@@ -203,6 +215,8 @@ public class Selection extends JPatchTreeLeaf {
 	}
 	
 	public Point3f getCenter() {
+		if (hotObject instanceof AnimObject)
+			return ((AnimObject) hotObject).getPosition();
 		Bone bone = null;
 		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext(); ) {
 			Object object = it.next();
@@ -265,6 +279,10 @@ public class Selection extends JPatchTreeLeaf {
 	public void arm(int mask) {
 //		System.out.println("Selection.arm(" + mask + ")");
 		mapTransformables.clear();
+		if (hotObject instanceof AnimObject) {
+			mapTransformables.put(hotObject, 1.0f);
+			return;
+		}
 		if (((mask & CONTROLPOINTS) != 0) || ((mask & BONES) != 0)) {
 			boolean cps = (mask & CONTROLPOINTS) != 0;
 			boolean bones = (mask & BONES) != 0;

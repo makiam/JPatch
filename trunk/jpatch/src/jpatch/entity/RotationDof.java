@@ -262,6 +262,10 @@ public class RotationDof extends Morph {
 		
 	}
 
+	public void presetValue(float value) {
+		fValue = value;
+	}
+	
 	public void setValue(float value) {
 		fValue = value;
 		invalidate();

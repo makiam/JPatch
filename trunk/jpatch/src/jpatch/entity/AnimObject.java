@@ -1,15 +1,23 @@
 package jpatch.entity;
 
+import java.awt.Polygon;
 import java.util.Enumeration;
 
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.vecmath.*;
 
-public abstract class AnimObject implements MutableTreeNode{
+import jpatch.boundary.MainFrame;
+import jpatch.boundary.Selection;
+import jpatch.control.edit.AtomicChangeAnimObjectTransform;
+import jpatch.control.edit.JPatchUndoableEdit;
+
+public abstract class AnimObject implements MutableTreeNode, Transformable {
 	static final double MIN_ROLL = 0.0000001;
 	
 	protected Matrix4d m4Transform = new Matrix4d();
+	protected Matrix4d m4BackupTransform = new Matrix4d();
+	
 	protected String strName = "(new object)";
 	
 	public AnimObject() {
@@ -62,7 +70,7 @@ public abstract class AnimObject implements MutableTreeNode{
 		return m4Transform;
 	}
 	
-	public Point3d getPosition() {
+	public Point3d getPositionDouble() {
 		Vector3d translation = new Vector3d();
 		m4Transform.get(translation);
 		return new Point3d(translation);
@@ -102,6 +110,10 @@ public abstract class AnimObject implements MutableTreeNode{
 	public String toString() {
 		return strName;
 	}
+	
+	public abstract void getBounds(Point3f p3A, Point3f p3B);
+	
+	
 	
 	/*
 	 * Mutable treenode interface implementation
@@ -144,5 +156,41 @@ public abstract class AnimObject implements MutableTreeNode{
 
 	public Enumeration children() {
 		return null;
+	}
+	
+	/*
+	 * Transformable interface implementation
+	 */
+	
+	public Point3f getPosition() {
+		Vector3d translation = new Vector3d();
+		m4Transform.get(translation);
+		return new Point3f(translation);
+	}
+	
+	public void beginTransform() {
+		m4BackupTransform.set(m4Transform);
+	}
+
+	public void translate(Vector3f v) {
+		m4Transform.set(m4BackupTransform);
+		m4Transform.m03 += v.x;
+		m4Transform.m13 += v.y;
+		m4Transform.m23 += v.z;
+	}
+
+	public void rotate(AxisAngle4f a, Point3f pivot) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void transform(Matrix3f m, Point3f pivot) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public JPatchUndoableEdit endTransform() {
+		MainFrame.getInstance().getAnimation().getCurvesetFor(this).updateCurves(MainFrame.getInstance().getAnimation().getPosition());
+		return new AtomicChangeAnimObjectTransform(this, m4BackupTransform);
 	}
 }

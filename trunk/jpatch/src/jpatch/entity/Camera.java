@@ -2,6 +2,7 @@ package jpatch.entity;
 
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
+import javax.vecmath.Point3f;
 
 import jpatch.boundary.MainFrame;
 
@@ -197,6 +198,10 @@ public class Camera extends AnimObject {
 		return bMotionBlur;
 	}
 	
+	public void getBounds(Point3f p3A, Point3f p3B) {
+		// FIXME
+	}
+
 	public void removeFromParent() {
 		MainFrame.getInstance().getAnimation().removeCamera(this);
 	}

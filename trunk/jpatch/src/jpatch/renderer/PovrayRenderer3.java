@@ -231,7 +231,7 @@ public class PovrayRenderer3 {
 	public static String light(AnimLight light) {
 		String s = light.getRenderString("povray", "");
 		s = AbstractRenderer.light(light, s);
-		s = s.replaceAll("\\$position",toPovVector(light.getPosition()));
+		s = s.replaceAll("\\$position",toPovVector(light.getPositionDouble()));
 		s = s.replaceAll("\\$color",toPovVector(light.getColor()));
 		return s;
 	}
