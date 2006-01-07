@@ -1,4 +1,4 @@
-package jpatch.boundary;
+package jpatch.boundary.sidebar;
 
 import java.awt.*;
 import java.util.*;
@@ -7,6 +7,9 @@ import javax.swing.event.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
+import jpatch.boundary.JPatchTree;
+import jpatch.boundary.MainFrame;
+import jpatch.boundary.Selection;
 import jpatch.boundary.sidebar.*;
 import jpatch.entity.*;
 import jpatch.control.edit.*;
@@ -226,6 +229,12 @@ implements TreeSelectionListener {
 			replacePanel(new LightsPanel());
 		} else if (anim && selectedNode == MainFrame.getInstance().getAnimation().getTreenodeModels()) {
 			replacePanel(new AnimModelsPanel());
+		} else if (anim && selectedNode instanceof Camera) {
+			replacePanel(new CameraPanel((Camera) selectedNode));
+		} else if (anim && selectedNode instanceof AnimLight) {
+			replacePanel(new LightPanel((AnimLight) selectedNode));
+		} else if (anim && selectedNode instanceof AnimModel) {
+			replacePanel(new AnimModelPanel((AnimModel) selectedNode));
 		} else {
 			replacePanel(new SidePanel());
 		}

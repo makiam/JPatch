@@ -240,11 +240,11 @@ implements ModelImporter {
 						String value = attributes.getValue(index);
 						if (name.equals("type")) {
 							if (value.equals("yaw"))
-								dof = new RotationDof(bone, RotationDof.ORTHO_1);
+								dof = new RotationDof(bone, RotationDof.ORTHO_1, model);
 							else if (value.equals("pitch"))
-								dof = new RotationDof(bone, RotationDof.ORTHO_2);
+								dof = new RotationDof(bone, RotationDof.ORTHO_2, model);
 							else if (value.equals("roll"))
-								dof = new RotationDof(bone, RotationDof.RADIAL);
+								dof = new RotationDof(bone, RotationDof.RADIAL, model);
 						} else if (name.equals("assignment")) {
 							if (value.equals("rigid"))
 								dof.setMode(RotationDof.RIGID);

@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.44 2006/01/06 18:34:45 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.45 2006/01/07 13:47:01 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -113,8 +113,9 @@ public class Viewport2 {
 	}
 	
 	public void setModelMatrix(Matrix4d matrix) {
-		m4View.set(matrix);
-		m4View.mul(viewDef.getMatrix());
+		Matrix4f m = new Matrix4f(matrix);
+		m4View.set(viewDef.getMatrix());
+		m4View.mul(m);
 	}
 	
 	public void prepare() {
@@ -156,6 +157,9 @@ public class Viewport2 {
 		for (int i = 0, y = 16; i < info.length; drawable.drawString(info[i++], 4, y += 16));
 		if (MainFrame.getInstance().getEditedMorph() != null)
 			drawable.drawString("!!!EDIT MORPH MODE!!!", (int) viewDef.getWidth() - 140, 16);
+		if (MainFrame.getInstance().getAnimation() != null)
+			drawable.drawString("Frame " + MainFrame.getInstance().getAnimation().getPosition(), 200, 16);
+			
 	}
 	
 	public void drawActiveBorder() {
@@ -207,7 +211,7 @@ public class Viewport2 {
 		}
 	}
 	
-	public void drawAnimFrame(Anim animation) {
+	public void drawAnimFrame(Animation animation) {
 		for (AnimModel animModel:animation.getModels()) {
 			setModelMatrix(animModel.getTransform());
 			drawModel(animModel.getModel());

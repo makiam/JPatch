@@ -21,6 +21,7 @@ public class Morph implements MutableTreeNode {
 	public Morph(String name, Model model) {
 		strName = name;
 		this.model = model;
+//		System.out.println("new Modph(" + name + ", " + model + ")");
 	}
 	
 	public String getName() {
