@@ -5,7 +5,7 @@ import javax.swing.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.*;
 import jpatch.boundary.tools.*;
-
+import jpatch.entity.*;
 
 public final class RotateAction extends AbstractAction {
 	/**
@@ -27,7 +27,7 @@ public final class RotateAction extends AbstractAction {
 			MainFrame.getInstance().getJPatchScreen().addMouseListeners(new RotateMouseAdapter(rotateDialog, compoundEdit));
 			*/
 			Selection selection = MainFrame.getInstance().getSelection();
-			if (selection != null && selection.getMap().size() > 1) {
+			if (selection != null && (selection.getMap().size() > 1 || selection.getHotObject() instanceof AnimObject)) {
 				//MainFrame.getInstance().getJPatchScreen().setTool(new RotateTool());
 				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(new RotateTool()));
 //				MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.ROTATE);
