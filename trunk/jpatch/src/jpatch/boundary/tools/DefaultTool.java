@@ -470,7 +470,7 @@ public class DefaultTool extends JPatchTool {
 				if (hitAnimObject != null) {
 					selection = new Selection(hitAnimObject);
 					edit.addEdit(new AtomicChangeSelection(selection));
-					
+					repaint = true;
 				}
 				/* if a point was hit... */
 				else if (cpHot != null) {
@@ -728,17 +728,17 @@ public class DefaultTool extends JPatchTool {
 							iMouseX = x;
 							iMouseY = y;
 						} else {
-							System.out.println("**");
-							System.out.println(selection);
-							if (selection != null) {
-								System.out.println(selection.isSingle());
-								System.out.println(isHit(x,y,viewDef.getScreenMatrix()));
-							}
+//							System.out.println("**");
+//							System.out.println(selection);
+//							if (selection != null) {
+//								System.out.println(selection.isSingle());
+//								System.out.println(isHit(x,y,viewDef.getScreenMatrix()));
+//							}
 							/* neither shift nor control are down */
 							
 							/* check if selection box was hit and set state*/
 							if (selection != null && !selection.isSingle() && isHit(x,y,viewDef.getScreenMatrix())) {
-								System.out.println("move group");
+//								System.out.println("move group");
 								/* selection box was hit, set state*/
 								iState = MOVE_GROUP;
 	//							compoundEdit.addEdit(new NewMoveControlPointsEdit(ps.getControlPointArray()));

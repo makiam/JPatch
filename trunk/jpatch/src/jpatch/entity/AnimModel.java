@@ -7,9 +7,7 @@ import jpatch.boundary.*;
 
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Point3f;
+import javax.vecmath.*;
 
 public class AnimModel extends AnimObject {
 	private boolean bParent = false;
@@ -91,9 +89,36 @@ public class AnimModel extends AnimObject {
 		}
 		p0.set(xMin,yMin,zMin);
 		p1.set(xMax,yMax,zMax);
-		m4Transform.transform(p0);
-		m4Transform.transform(p1);
+		Vector3f v = new Vector3f((float) m4Transform.m03, (float) m4Transform.m13, (float) m4Transform.m23);
+		Matrix3f m = new Matrix3f();
+		m4Transform.getRotationScale(m);
+		float s = m.getScale();
+		p0.scale(s);
+		p1.scale(s);
+		m.invert();
+		m.transform(v);
+		v.scale(s);
+		p0.add(v);
+		p1.add(v);
+		
+//		m4Transform.transform(p0);
+//		m4Transform.transform(p1);
 		System.out.println("AnimObject.getBounds() = " + p0 + " " + p1);
+	}
+	
+	public float getRadius() {
+		float ds = 0;
+		for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
+			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				if (!cp.isHead())
+					continue;
+				Point3f p3 = cp.getPosition();
+				float f = p3.x * p3.x + p3.y * p3.y + p3.z * p3.z;
+				if (f > ds)
+					ds = f;
+			}
+		}
+		return (float) Math.sqrt(ds);
 	}
 	
 	public boolean isHit(int x, int y, Matrix4f m4View) {
