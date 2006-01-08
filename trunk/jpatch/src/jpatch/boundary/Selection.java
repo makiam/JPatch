@@ -189,7 +189,6 @@ public class Selection extends JPatchTreeLeaf {
 	
 	public void getBounds(Point3f p0, Point3f p1) {
 		if (hotObject instanceof AnimObject) {
-			System.out.println("hot");
 			((AnimObject) hotObject).getBounds(p0, p1);
 			return;
 		}
@@ -271,6 +270,10 @@ public class Selection extends JPatchTreeLeaf {
 //	}
 	
 	public Point3f getPivot() {
+		if (hotObject instanceof AnimObject) {
+			Matrix4d m = ((AnimObject) hotObject).getTransform();
+			return new Point3f((float) m.m03, (float) m.m13, (float) m.m23);
+		}
 		return p3Pivot;
 	}
 	

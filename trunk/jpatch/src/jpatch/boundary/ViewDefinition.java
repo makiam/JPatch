@@ -42,6 +42,7 @@ implements ComponentListener {
 //	private Vector4f v4ScreenOffset = new Vector4f();
 	private Matrix4f m4View = new Matrix4f();
 	private RealtimeLighting lighting;
+	private Camera camera;
 	
 //	private float fWidth;
 //	private float fHeight;
@@ -111,6 +112,10 @@ implements ComponentListener {
 	}
 	
 	public final Matrix4f getMatrix() {
+		if (camera != null) {
+			m4View.set(camera.getTransform());
+			m4View.invert();
+		}
 		return m4View;
 	}
 	
@@ -132,7 +137,7 @@ implements ComponentListener {
 //		m4Screen.setColumn(3,v4Screen);
 //		return m4Screen;
 		
-		Matrix4f m4Screen = new Matrix4f(m4View);
+		Matrix4f m4Screen = new Matrix4f(getMatrix());
 		m4Screen.m03 += drawable.getComponent().getWidth() / 2;
 		m4Screen.m10 = -m4Screen.m10;
 		m4Screen.m11 = -m4Screen.m11;
@@ -205,6 +210,8 @@ implements ComponentListener {
 	}
 	
 	public final String getViewName() {
+		if (camera != null)
+			return camera.getName();
 		return aViewName[iView];
 	}
 	
@@ -374,6 +381,8 @@ implements ComponentListener {
 	}
 
 	public final void setView(int view) {
+		camera = null;
+		drawable.setProjection(JPatchDrawable2.ORTHOGONAL);
 		iView = view;
 		switch(iView) {
 			case FRONT:
@@ -408,6 +417,15 @@ implements ComponentListener {
 		p3Lock = null;
 		computeMatrix();
 //		setGridPlane();
+	}
+	
+	public final void setCamera(Camera camera) {
+		this.camera = camera;
+		drawable.setProjection(JPatchDrawable2.PERSPECTIVE);
+	}
+	
+	public final Camera getCamera() {
+		return camera;
 	}
 	
 	public final void moveView(float x, float y) {

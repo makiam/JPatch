@@ -13,182 +13,182 @@
 		</material>
 		<mesh>
 			<curve>
+				<cp attach="5" mode="peak"/>
+				<cp attach="61" mode="peak"/>
+			</curve>
+			<curve>
+				<cp attach="56" mode="peak"/>
+				<cp attach="21" mode="peak"/>
+			</curve>
+			<curve>
+				<cp attach="13" mode="peak"/>
+				<cp x="-5.012999" y="-6.6969967" z="5.0" mode="peak"/>
+			</curve>
+			<curve>
+				<cp attach="42" mode="peak"/>
 				<cp attach="44" mode="peak"/>
-				<cp attach="23" mode="peak"/>
 			</curve>
 			<curve>
-				<cp attach="24" mode="peak"/>
-				<cp attach="45" mode="peak"/>
+				<cp attach="53" mode="peak"/>
+				<cp x="5.012998" y="6.6709995" z="5.0" mode="peak"/>
 			</curve>
 			<curve>
-				<cp attach="59" mode="peak"/>
-				<cp attach="3" mode="peak"/>
-			</curve>
-			<curve>
-				<cp attach="16" mode="peak"/>
-				<cp attach="32" mode="peak"/>
+				<cp attach="15" mode="peak"/>
+				<cp attach="25" mode="peak"/>
 			</curve>
 			<curve>
 				<cp attach="58" mode="peak"/>
-				<cp attach="2" mode="peak"/>
+				<cp attach="10" mode="peak"/>
 			</curve>
 			<curve>
-				<cp attach="60" mode="peak"/>
-				<cp x="5.0" y="-6.6969967" z="-5.0129986" mode="peak"/>
+				<cp x="-4.0" y="4.0" z="-1.7881393E-7" mode="peak"/>
+				<cp x="-4.0" y="-4.0" z="-1.7881393E-7" mode="peak"/>
 			</curve>
 			<curve>
-				<cp attach="51" mode="peak"/>
-				<cp x="5.0" y="6.6709995" z="-5.0129986" mode="peak"/>
+				<cp x="-3.9999995" y="4.0" z="-11.236723" mode="peak"/>
+				<cp x="-3.9999995" y="-4.0" z="-11.236723" mode="peak"/>
 			</curve>
 			<curve>
-				<cp attach="12" mode="peak"/>
-				<cp x="5.0" y="5.0" z="-6.683998" mode="peak"/>
+				<cp attach="4" mode="peak"/>
+				<cp x="-6.6839986" y="-5.025997" z="4.9999995" mode="peak"/>
 			</curve>
 			<curve>
-				<cp x="-11.236723" y="4.0" z="4.0" mode="peak"/>
-				<cp x="-11.236723" y="-4.0" z="4.0" mode="peak"/>
-			</curve>
-			<curve>
-				<cp attach="10"/>
-				<cp attach="57"/>
-				<cp x="0.0" y="0.0" z="0.0"/>
-				<cp attach="55"/>
-				<cp attach="29"/>
-			</curve>
-			<curve>
-				<cp x="0.0" y="4.0" z="4.0" mode="peak"/>
-				<cp x="0.0" y="-4.0" z="4.0" mode="peak"/>
-			</curve>
-			<curve>
-				<cp attach="33" mode="peak"/>
-				<cp x="5.0" y="-5.025997" z="6.683998" mode="peak"/>
-			</curve>
-			<curve>
-				<cp attach="49" mode="peak"/>
-				<cp x="5.0" y="6.6709995" z="5.0129986" mode="peak"/>
-			</curve>
-			<curve>
-				<cp attach="27" mode="peak"/>
-				<cp x="5.0" y="5.0" z="6.683998" mode="peak"/>
-			</curve>
-			<curve>
-				<cp x="-11.236723" y="-4.0" z="-4.0" mode="peak"/>
-				<cp x="-11.236723" y="4.0" z="-4.0" mode="peak"/>
-			</curve>
-			<curve>
-				<cp attach="9" mode="peak"/>
-				<cp x="5.0" y="-6.6969967" z="5.0129986" mode="peak"/>
+				<cp attach="24" mode="peak"/>
+				<cp attach="14" mode="peak"/>
 			</curve>
 			<curve>
 				<cp attach="30" mode="peak"/>
-				<cp attach="26" mode="peak"/>
+				<cp x="-6.6839986" y="5.0" z="4.9999995" mode="peak"/>
 			</curve>
 			<curve>
-				<cp attach="61" mode="peak"/>
-				<cp attach="15" mode="peak"/>
-			</curve>
-			<curve>
-				<cp attach="14"/>
-				<cp attach="54"/>
-				<cp attach="20"/>
-				<cp attach="56"/>
-				<cp attach="25"/>
-			</curve>
-			<curve>
-				<cp x="0.0" y="4.0" z="-4.0" mode="peak"/>
-				<cp x="0.0" y="-4.0" z="-4.0" mode="peak"/>
-			</curve>
-			<curve>
-				<cp attach="28" mode="peak"/>
-				<cp attach="13" mode="peak"/>
-			</curve>
-			<curve>
-				<cp attach="6" mode="peak"/>
-				<cp attach="1" mode="peak"/>
-			</curve>
-			<curve>
-				<cp attach="7" mode="peak"/>
-				<cp attach="0" mode="peak"/>
-			</curve>
-			<curve>
-				<cp attach="34" mode="peak"/>
-				<cp attach="11" mode="peak"/>
+				<cp x="4.0" y="4.0" z="1.7881393E-7" mode="peak"/>
+				<cp x="4.0" y="-4.0" z="1.7881393E-7" mode="peak"/>
 			</curve>
 			<curve closed="true">
-				<cp x="0.0" y="2.5092766" z="-2.5092766" magnitude="1.643475"/>
-				<cp x="0.0" y="2.5092764" z="2.5092766" magnitude="1.643475"/>
-				<cp x="0.0" y="-2.5092766" z="2.5092764" magnitude="1.643475"/>
-				<cp x="0.0" y="-2.5092766" z="-2.5092766" magnitude="1.643475"/>
+				<cp x="2.5092766" y="2.5092766" z="1.1920929E-7" magnitude="1.643475"/>
+				<cp x="-2.5092766" y="2.5092764" z="-1.1920929E-7" magnitude="1.643475"/>
+				<cp x="-2.5092764" y="-2.5092766" z="-1.1920929E-7" magnitude="1.643475"/>
+				<cp x="2.5092766" y="-2.5092766" z="1.1920929E-7" magnitude="1.643475"/>
+			</curve>
+			<curve>
+				<cp attach="3" mode="peak"/>
+				<cp x="-5.012999" y="6.6709995" z="5.0" mode="peak"/>
+			</curve>
+			<curve>
+				<cp attach="31" mode="peak"/>
+				<cp attach="9" mode="peak"/>
+			</curve>
+			<curve>
+				<cp attach="43"/>
+				<cp attach="26"/>
+				<cp attach="47"/>
+				<cp attach="28"/>
+				<cp attach="18"/>
+			</curve>
+			<curve>
+				<cp attach="23" mode="peak"/>
+				<cp attach="19" mode="peak"/>
+			</curve>
+			<curve>
+				<cp attach="51" mode="peak"/>
+				<cp x="6.6839976" y="-5.025997" z="5.0000005" mode="peak"/>
+			</curve>
+			<curve>
+				<cp attach="8" mode="peak"/>
+				<cp x="6.6839976" y="5.0" z="5.0000005" mode="peak"/>
+			</curve>
+			<curve>
+				<cp attach="60"/>
+				<cp attach="29"/>
+				<cp x="0.0" y="0.0" z="0.0"/>
+				<cp attach="27"/>
+				<cp attach="22"/>
+			</curve>
+			<curve>
+				<cp attach="59" mode="peak"/>
+				<cp attach="11" mode="peak"/>
+			</curve>
+			<curve>
+				<cp attach="57" mode="peak"/>
+				<cp attach="20" mode="peak"/>
+			</curve>
+			<curve>
+				<cp x="4.0000005" y="-4.0" z="-11.236723" mode="peak"/>
+				<cp x="4.0000005" y="4.0" z="-11.236723" mode="peak"/>
+			</curve>
+			<curve>
+				<cp attach="16" mode="peak"/>
+				<cp attach="55" mode="peak"/>
 			</curve>
 			<curve>
 				<cp attach="17" mode="peak"/>
-				<cp attach="31" mode="peak"/>
+				<cp attach="54" mode="peak"/>
 			</curve>
 			<curve>
-				<cp attach="5" mode="peak"/>
-				<cp x="5.0" y="-5.025997" z="-6.683998" mode="peak"/>
+				<cp attach="41" mode="peak"/>
+				<cp x="5.012998" y="-6.6969967" z="5.0" mode="peak"/>
 			</curve>
+			<patch material="0">
+				<points>34,35,26,29,46,45,25,24</points>
+			</patch>
+			<patch material="0">
+				<points>32,33,9,8,20,21,30,31</points>
+			</patch>
+			<patch material="0">
+				<points>59,58,17,16,56,57,55,54</points>
+			</patch>
+			<patch material="1">
+				<points>36,37,28,29,46,47</points>
+			</patch>
+			<patch material="0">
+				<points>5,4,10,11,60,61,1,0</points>
+			</patch>
+			<patch material="1">
+				<points>47,46,29,26,35,36</points>
+			</patch>
+			<patch material="0">
+				<points>15,14,3,2,16,17,12,13</points>
+			</patch>
+			<patch material="0">
+				<points>23,22,14,15,18,19,40,39</points>
+			</patch>
+			<patch material="1">
+				<points>47,48,27,28,37,36</points>
+			</patch>
+			<patch material="0">
+				<points>7,6,42,41,25,24,43,44</points>
+			</patch>
+			<patch material="0">
+				<points>21,20,53,52,57,56,2,3</points>
+			</patch>
+			<patch material="0">
+				<points>49,48,27,26,35,34,20,21</points>
+			</patch>
+			<patch material="0">
+				<points>14,15,38,37,28,27,48,49</points>
+			</patch>
+			<patch material="0">
+				<points>13,12,58,59,50,51,11,10</points>
+			</patch>
+			<patch material="1">
+				<points>36,35,26,27,48,47</points>
+			</patch>
+			<patch material="0">
+				<points>10,11,45,46,29,28,37,38</points>
+			</patch>
+			<patch material="0">
+				<points>54,55,52,53,24,25,51,50</points>
+			</patch>
 			<patch material="-1">
-				<points>24,23,1,0,44,45,3,2</points>
-			</patch>
-			<patch material="0">
-				<points>1,0,51,50,7,6,48,49</points>
-			</patch>
-			<patch material="0">
-				<points>30,29,23,24,25,26,36,35</points>
-			</patch>
-			<patch material="1">
-				<points>20,19,57,54,40,41</points>
-			</patch>
-			<patch material="0">
-				<points>39,40,54,57,19,18,45,44</points>
-			</patch>
-			<patch material="0">
-				<points>23,24,43,42,56,55,21,22</points>
-			</patch>
-			<patch material="1">
-				<points>20,21,55,56,42,41</points>
-			</patch>
-			<patch material="0">
-				<points>31,32,50,51,44,45,5,4</points>
-			</patch>
-			<patch material="0">
-				<points>46,47,13,12,0,1,27,28</points>
-			</patch>
-			<patch material="1">
-				<points>41,42,56,57,19,20</points>
-			</patch>
-			<patch material="0">
-				<points>59,58,17,16,6,7,32,31</points>
-			</patch>
-			<patch material="1">
-				<points>41,40,54,55,21,20</points>
-			</patch>
-			<patch material="0">
-				<points>22,21,55,54,40,39,0,1</points>
-			</patch>
-			<patch material="0">
-				<points>9,8,58,59,4,5,3,2</points>
-			</patch>
-			<patch material="0">
-				<points>24,23,49,48,16,17,8,9</points>
-			</patch>
-			<patch material="0">
-				<points>2,3,18,19,57,56,42,43</points>
-			</patch>
-			<patch material="0">
-				<points>38,37,61,60,45,44,14,15</points>
-			</patch>
-			<patch material="0">
-				<points>34,33,2,3,10,11,53,52</points>
+				<points>15,14,21,20,24,25,11,10</points>
 			</patch>
 		</mesh>
 		<selection name="*extruded points #12">
-			<points>31,32</points>
+			<points>54,55</points>
 			<pointweights>1.0,1.0</pointweights>
 		</selection>
 		<selection name="*extruded points #13">
-			<points>45,44,24,23</points>
+			<points>25,24,15,14</points>
 			<pointweights>1.0,1.0,1.0,1.0</pointweights>
 		</selection>
 		<skeleton>
