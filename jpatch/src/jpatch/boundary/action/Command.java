@@ -96,7 +96,7 @@ public final class Command implements KeyListener {
 	}
 	
 	public static void setViewDefinition(ViewDefinition viewDef) {
-		((JMenuItem) INSTANCE.commandMenuItemMap.get(viewDef.getViewName())).setSelected(true);
+//		((JMenuItem) INSTANCE.commandMenuItemMap.get(viewDef.getViewName())).setSelected(true);
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("show points")).setSelected(viewDef.renderPoints());
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("show curves")).setSelected(viewDef.renderCurves());
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("show patches")).setSelected(viewDef.renderPatches());

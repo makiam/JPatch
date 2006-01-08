@@ -89,25 +89,46 @@ public class RotateTool extends JPatchTool {
 		Color3f colorY = settings.colors.yAxis;
 		Color3f colorZ = settings.colors.zAxis;
 		pivotHandle = new PivotHandle(this, cSelect);
-		aHandle = new Handle[] {
-			new RotateHandle(new Point3f( 0, S, S), this, colorX, v3AxisX, m3X),
-			new RotateHandle(new Point3f( 0,-S, S), this, colorX, v3AxisX, m3X),
-			new RotateHandle(new Point3f( 0,-S,-S), this, colorX, v3AxisX, m3X),
-			new RotateHandle(new Point3f( 0, S,-S), this, colorX, v3AxisX, m3X),
-			new RotateHandle(new Point3f( S, 0, S), this, colorY, v3AxisY, m3Y),
-			new RotateHandle(new Point3f(-S, 0, S), this, colorY, v3AxisY, m3Y),
-			new RotateHandle(new Point3f(-S, 0,-S), this, colorY, v3AxisY, m3Y),
-			new RotateHandle(new Point3f( S, 0,-S), this, colorY, v3AxisY, m3Y),
-			new RotateHandle(new Point3f( S, S, 0), this, colorZ, v3AxisZ, m3Z),
-			new RotateHandle(new Point3f(-S, S, 0), this, colorZ, v3AxisZ, m3Z),
-			new RotateHandle(new Point3f(-S,-S, 0), this, colorZ, v3AxisZ, m3Z),
-			new RotateHandle(new Point3f( S,-S, 0), this, colorZ, v3AxisZ, m3Z),
-			new RotateHandleS(new Point3f( 0, 1, 0), this, cSelect),
-			new RotateHandleS(new Point3f( 1, 0, 0), this, cSelect),
-			new RotateHandleS(new Point3f( 0,-1, 0), this, cSelect),
-			new RotateHandleS(new Point3f(-1, 0, 0), this, cSelect),
-			pivotHandle
-		};
+		if (MainFrame.getInstance().getSelection().getHotObject() instanceof AnimObject) {
+			aHandle = new Handle[] {
+					new RotateHandle(new Point3f( 0, S, S), this, colorX, v3AxisX, m3X),
+					new RotateHandle(new Point3f( 0,-S, S), this, colorX, v3AxisX, m3X),
+					new RotateHandle(new Point3f( 0,-S,-S), this, colorX, v3AxisX, m3X),
+					new RotateHandle(new Point3f( 0, S,-S), this, colorX, v3AxisX, m3X),
+					new RotateHandle(new Point3f( S, 0, S), this, colorY, v3AxisY, m3Y),
+					new RotateHandle(new Point3f(-S, 0, S), this, colorY, v3AxisY, m3Y),
+					new RotateHandle(new Point3f(-S, 0,-S), this, colorY, v3AxisY, m3Y),
+					new RotateHandle(new Point3f( S, 0,-S), this, colorY, v3AxisY, m3Y),
+					new RotateHandle(new Point3f( S, S, 0), this, colorZ, v3AxisZ, m3Z),
+					new RotateHandle(new Point3f(-S, S, 0), this, colorZ, v3AxisZ, m3Z),
+					new RotateHandle(new Point3f(-S,-S, 0), this, colorZ, v3AxisZ, m3Z),
+					new RotateHandle(new Point3f( S,-S, 0), this, colorZ, v3AxisZ, m3Z),
+					new RotateHandleS(new Point3f( 0, 1, 0), this, cSelect),
+					new RotateHandleS(new Point3f( 1, 0, 0), this, cSelect),
+					new RotateHandleS(new Point3f( 0,-1, 0), this, cSelect),
+					new RotateHandleS(new Point3f(-1, 0, 0), this, cSelect),
+			};
+		} else {
+			aHandle = new Handle[] {
+					new RotateHandle(new Point3f( 0, S, S), this, colorX, v3AxisX, m3X),
+					new RotateHandle(new Point3f( 0,-S, S), this, colorX, v3AxisX, m3X),
+					new RotateHandle(new Point3f( 0,-S,-S), this, colorX, v3AxisX, m3X),
+					new RotateHandle(new Point3f( 0, S,-S), this, colorX, v3AxisX, m3X),
+					new RotateHandle(new Point3f( S, 0, S), this, colorY, v3AxisY, m3Y),
+					new RotateHandle(new Point3f(-S, 0, S), this, colorY, v3AxisY, m3Y),
+					new RotateHandle(new Point3f(-S, 0,-S), this, colorY, v3AxisY, m3Y),
+					new RotateHandle(new Point3f( S, 0,-S), this, colorY, v3AxisY, m3Y),
+					new RotateHandle(new Point3f( S, S, 0), this, colorZ, v3AxisZ, m3Z),
+					new RotateHandle(new Point3f(-S, S, 0), this, colorZ, v3AxisZ, m3Z),
+					new RotateHandle(new Point3f(-S,-S, 0), this, colorZ, v3AxisZ, m3Z),
+					new RotateHandle(new Point3f( S,-S, 0), this, colorZ, v3AxisZ, m3Z),
+					new RotateHandleS(new Point3f( 0, 1, 0), this, cSelect),
+					new RotateHandleS(new Point3f( 1, 0, 0), this, cSelect),
+					new RotateHandleS(new Point3f( 0,-1, 0), this, cSelect),
+					new RotateHandleS(new Point3f(-1, 0, 0), this, cSelect),
+					pivotHandle
+			};
+		}
 		MainFrame.getInstance().setHelpText("Click and drag handles to rotate or move pivot. Click and drag inside sphere to rotate freely. Doubleclick to reset coordinate system or pivot.");
 	}
 	

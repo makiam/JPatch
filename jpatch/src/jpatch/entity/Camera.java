@@ -5,9 +5,16 @@ import javax.swing.tree.TreeNode;
 import javax.vecmath.Point3f;
 
 import jpatch.boundary.MainFrame;
+import jpatch.control.importer.JPatchImport;
 
 public class Camera extends AnimObject {
+	
+	private static final Model cameraModel = new Model();
 	private boolean bParent;
+	
+	static {
+		new JPatchImport().importModel(cameraModel, ClassLoader.getSystemResource("jpatch/models/camera.jpt").toString());
+	}
 	
 	/* the focal lenghth of the lense */
 	protected float fFocalLength = 50.0f;
@@ -198,12 +205,8 @@ public class Camera extends AnimObject {
 		return bMotionBlur;
 	}
 	
-	public void getBounds(Point3f p3A, Point3f p3B) {
-		// FIXME
-	}
-
-	public float getRadius() {
-		return 0; // FIXME
+	public Model getModel() {
+		return cameraModel;
 	}
 	
 	public void removeFromParent() {

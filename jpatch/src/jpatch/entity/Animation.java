@@ -115,6 +115,31 @@ public class Animation implements MutableTreeNode {
 		return treenodeModels;
 	}
 	
+	public Iterable<AnimObject> getObjects() {
+		return new Iterable<AnimObject>() {
+			public Iterator<AnimObject> iterator() {
+				final Iterator<AnimModel> itModels = listModels.iterator();
+				final Iterator<AnimLight> itLights = listLights.iterator();
+				final Iterator<Camera> itCameras = listCameras.iterator();
+				return new Iterator<AnimObject>() {
+					public boolean hasNext() {
+						return itCameras.hasNext();
+					}
+					public AnimObject next() {
+						if (itModels.hasNext())
+							return itModels.next();
+						if (itLights.hasNext())
+							return itLights.next();
+						return itCameras.next();
+					}
+					public void remove() {
+						throw new UnsupportedOperationException();
+					}
+				};
+			}
+		};
+	}
+	
 	public AnimTreeNode getTreenodeLights() {
 		return treenodeLights;
 	}

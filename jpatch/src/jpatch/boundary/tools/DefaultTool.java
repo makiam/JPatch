@@ -452,9 +452,9 @@ public class DefaultTool extends JPatchTool {
 				AnimObject hitAnimObject = null;
 				if (anim) {
 					Animation animation = MainFrame.getInstance().getAnimation();
-					for (AnimModel animModel:animation.getModels()) {
-						if (animModel.isHit(x, y, viewDef.getScreenMatrix())) {
-							hitAnimObject = animModel;
+					for (AnimObject animObject:animation.getObjects()) {
+						if (animObject.isHit(x, y, viewDef.getScreenMatrix())) {
+							hitAnimObject = animObject;
 						}
 					}
 				}
@@ -471,6 +471,13 @@ public class DefaultTool extends JPatchTool {
 					selection = new Selection(hitAnimObject);
 					edit.addEdit(new AtomicChangeSelection(selection));
 					repaint = true;
+					iState = MOVE_GROUP;
+					beginTransform();
+					iMouseX = x;
+					iMouseY = y;
+					/* add motionlistener */
+					((Component)mouseEvent.getSource()).addMouseMotionListener(this);
+					bMoveZ = mouseEvent.isAltDown();
 				}
 				/* if a point was hit... */
 				else if (cpHot != null) {
