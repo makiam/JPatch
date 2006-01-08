@@ -113,7 +113,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 	
 	public abstract void getBounds(Point3f p3A, Point3f p3B);
 	
-	
+	public abstract float getRadius();
 	
 	/*
 	 * Mutable treenode interface implementation
@@ -180,13 +180,24 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 	}
 
 	public void rotate(AxisAngle4f a, Point3f pivot) {
-		// TODO Auto-generated method stub
-		
+		Matrix3f m = new Matrix3f();
+		m.set(a);
+		transform(m, pivot);
 	}
 
+	private static final Matrix3f m1 = new Matrix3f();
+	private static final Matrix3f m2 = new Matrix3f();
 	public void transform(Matrix3f m, Point3f pivot) {
-		// TODO Auto-generated method stub
-		
+//		m4BackupTransform.getRotationScale(m1);
+//		m4BackupTransform.getRotationScale(m2);
+//		m2.invert();
+//		m1.mul(m);
+//		m1.mul(m2);
+//		m4Transform.setRotationScale(m1);
+		m4BackupTransform.getRotationScale(m1);
+		m2.set(m);
+		m2.mul(m1);
+		m4Transform.setRotationScale(m2);
 	}
 
 	public JPatchUndoableEdit endTransform() {

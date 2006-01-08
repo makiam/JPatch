@@ -116,6 +116,10 @@ public class RotateTool extends JPatchTool {
 	}
 	
 	public void setRadius() {
+		if (selection.getHotObject() instanceof AnimObject) {
+			fRadius = ((AnimObject) selection.getHotObject()).getRadius();
+			return;
+		}
 //		PointSelection ps = MainFrame.getInstance().getPointSelection();
 		float r = 0;
 		float ds = 0;

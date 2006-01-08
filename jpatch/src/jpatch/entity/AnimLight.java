@@ -81,6 +81,10 @@ public class AnimLight extends AnimObject {
 		// FIXME
 	}
 	
+	public float getRadius() {
+		return 0; // FIXME
+	}
+	
 	public void removeFromParent() {
 		MainFrame.getInstance().getAnimation().removeLight(this);
 	}

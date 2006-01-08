@@ -151,8 +151,10 @@ public class Selection extends JPatchTreeLeaf {
 	}
 
 	public Matrix3f getOrientation() {
-		if (hotObject instanceof AnimObject)
-			m3Orientation.set(((AnimObject) hotObject).getOrientation());
+		if (hotObject instanceof AnimObject) {
+			((AnimObject) hotObject).getTransform().getRotationScale(m3Orientation);
+			m3Orientation.setScale(1);
+		}
 		return m3Orientation;
 	}
 	
