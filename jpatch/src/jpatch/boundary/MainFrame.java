@@ -92,9 +92,9 @@ public final class MainFrame extends JFrame {
 		
 		
 		if (VersionInfo.release) {
-			setTitle("JPatch Modeler " + VersionInfo.version);
+			setTitle("JPatch " + VersionInfo.version);
 		} else {
-			setTitle("JPatch Modeler " + VersionInfo.version + " compiled " + VersionInfo.compileTime);
+			setTitle("JPatch " + VersionInfo.version + " compiled " + VersionInfo.compileTime);
 		}
 		this.model = model;
 		if (INSTANCE == null) {
@@ -296,6 +296,8 @@ public final class MainFrame extends JFrame {
 			setVisible(true);
 			jpatchScreen.setTool(new DefaultTool());
 			if (!VersionInfo.release) {
+				if (SplashScreen.instance != null)
+					SplashScreen.instance.clearSplash();
 				String warning = "This is a development version of JPatch.\n" +
 						 "It has not been tested and may contain severe bugs!\n" +
 						 "You can download a more stable release of JPatch\n" +
@@ -460,6 +462,7 @@ public final class MainFrame extends JFrame {
 		vcrDialog.pack();
 		vcrDialog.setAlwaysOnTop(true);
 		vcrDialog.setVisible(true);
+		jpatchScreen.getActiveViewport().getViewDefinition().setCamera(animation.getCameras().get(0));
 	}
 	
 	public static MainFrame getInstance() {

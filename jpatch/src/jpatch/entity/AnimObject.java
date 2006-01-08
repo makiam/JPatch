@@ -2,6 +2,7 @@ package jpatch.entity;
 
 import java.awt.Polygon;
 import java.util.Enumeration;
+import java.util.Iterator;
 
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -111,9 +112,78 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		return strName;
 	}
 	
-	public abstract void getBounds(Point3f p3A, Point3f p3B);
+	public void getBounds(Point3f p0, Point3f p1) {
+		float xMax = -Float.MAX_VALUE;
+		float xMin = Float.MAX_VALUE;
+		float yMax = -Float.MAX_VALUE;
+		float yMin = Float.MAX_VALUE;
+		float zMax = -Float.MAX_VALUE;
+		float zMin = Float.MAX_VALUE;
+		for (Iterator it = getModel().getCurveSet().iterator(); it.hasNext(); ) {
+			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				if (!cp.isHead())
+					continue;
+				Point3f p3 = cp.getPosition();
+				if (p3.x > xMax) xMax = p3.x;
+				if (p3.x < xMin) xMin = p3.x;
+				if (p3.y > yMax) yMax = p3.y;
+				if (p3.y < yMin) yMin = p3.y;
+				if (p3.z > zMax) zMax = p3.z;
+				if (p3.z < zMin) zMin = p3.z;
+			}
+		}
+		p0.set(xMin,yMin,zMin);
+		p1.set(xMax,yMax,zMax);
+		Vector3f v = new Vector3f((float) m4Transform.m03, (float) m4Transform.m13, (float) m4Transform.m23);
+		Matrix3f m = new Matrix3f();
+		m4Transform.getRotationScale(m);
+		float s = m.getScale();
+		p0.scale(s);
+		p1.scale(s);
+		m.invert();
+		m.transform(v);
+		v.scale(s);
+		p0.add(v);
+		p1.add(v);
+	}
 	
-	public abstract float getRadius();
+	public float getRadius() {
+		float ds = 0;
+		for (Iterator it = getModel().getCurveSet().iterator(); it.hasNext(); ) {
+			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				if (!cp.isHead())
+					continue;
+				Point3f p3 = cp.getPosition();
+				float f = p3.x * p3.x + p3.y * p3.y + p3.z * p3.z;
+				if (f > ds)
+					ds = f;
+			}
+		}
+		return (float) Math.sqrt(ds);
+	}
+	
+	public abstract Model getModel();
+	
+	public boolean isHit(int x, int y, Matrix4f m4View) {
+		Matrix4f mt = new Matrix4f(m4Transform);
+		Matrix4f m = new Matrix4f(m4View);
+		m.mul(mt);
+//		m.invert();
+		Point3f p3Hit = new Point3f(x, y, 0);
+		Point3f p3 = new Point3f();
+		for (Iterator it = getModel().getCurveSet().iterator(); it.hasNext(); ) {
+			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				if (!cp.isHead())
+					continue;
+				p3.set(cp.getPosition());
+				m.transform(p3);
+				p3.z = 0;
+				if (p3.distanceSquared(p3Hit) < 64)
+					return true;
+			}
+		}
+		return false;		
+	}
 	
 	/*
 	 * Mutable treenode interface implementation

@@ -13,7 +13,7 @@ public final class Launcher {
 	private static BFrame frame;
 	/* private static GlTest gltest; */
 	public static void main(String[] args) {
-		if (false) {
+		if (true) {
 			try {
 				UIManager.setLookAndFeel(Settings.getInstance().lookAndFeelClassname);
 			} catch (Exception e) { }

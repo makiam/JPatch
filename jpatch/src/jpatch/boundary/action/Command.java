@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.17 2006/01/06 18:34:45 sascha_l Exp $
+ * $Id: Command.java,v 1.18 2006/01/08 21:17:29 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -96,7 +96,7 @@ public final class Command implements KeyListener {
 	}
 	
 	public static void setViewDefinition(ViewDefinition viewDef) {
-		((JMenuItem) INSTANCE.commandMenuItemMap.get(viewDef.getViewName())).setSelected(true);
+//		((JMenuItem) INSTANCE.commandMenuItemMap.get(viewDef.getViewName())).setSelected(true);
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("show points")).setSelected(viewDef.renderPoints());
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("show curves")).setSelected(viewDef.renderCurves());
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("show patches")).setSelected(viewDef.renderPatches());

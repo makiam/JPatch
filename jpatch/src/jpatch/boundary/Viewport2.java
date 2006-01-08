@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.46 2006/01/07 21:34:09 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.47 2006/01/08 21:17:29 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -158,7 +158,7 @@ public class Viewport2 {
 		if (MainFrame.getInstance().getEditedMorph() != null)
 			drawable.drawString("!!!EDIT MORPH MODE!!!", (int) viewDef.getWidth() - 140, 16);
 		if (MainFrame.getInstance().getAnimation() != null)
-			drawable.drawString("Frame " + MainFrame.getInstance().getAnimation().getPosition(), 200, 16);
+			drawable.drawString("Frame " + ((int) MainFrame.getInstance().getAnimation().getPosition() + 1), 200, 16);
 			
 	}
 	
@@ -194,6 +194,9 @@ public class Viewport2 {
 	}
 	
 	public void drawTool(JPatchTool tool) {
+		Selection selection = MainFrame.getInstance().getSelection();
+		if (selection != null && selection.getHotObject() == viewDef.getCamera())
+			return;
 		drawable.setGhostRenderingEnabled(true);
 		tool.paint(viewDef);
 		drawable.setGhostRenderingEnabled(false);
@@ -212,9 +215,11 @@ public class Viewport2 {
 	}
 	
 	public void drawAnimFrame(Animation animation) {
-		for (AnimModel animModel:animation.getModels()) {
-			setModelMatrix(animModel.getTransform());
-			drawModel(animModel.getModel());
+		for (AnimObject animObject:animation.getObjects()) {
+			if (animObject == viewDef.getCamera())
+				continue;
+			setModelMatrix(animObject.getTransform());
+			drawModel(animObject.getModel());
 		}
 	}
 	
@@ -566,7 +571,7 @@ public class Viewport2 {
 	
 	private void drawSelection(Selection selection) {
 //		System.out.println(selection.getHotObject());
-		if (selection.getHotObject() == null)
+		if (selection.getHotObject() == null || selection.getHotObject() instanceof AnimObject)
 			return;
 		Transformable transformable = (Transformable) selection.getHotObject();
 //		ControlPoint cp = null;
@@ -577,6 +582,7 @@ public class Viewport2 {
 		drawable.setColor(settings.colors.hotObject); // FIXME
 		drawable.setPointSize(5);
 		drawable.drawPoint(p);
+		
 		int direction = selection.getDirection();
 		if (direction == 0)
 			return;

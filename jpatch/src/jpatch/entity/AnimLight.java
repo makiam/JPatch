@@ -4,12 +4,19 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.vecmath.*;
 
+import jpatch.control.importer.*;
 import jpatch.boundary.MainFrame;
-import jpatch.control.edit.JPatchUndoableEdit;
 
 public class AnimLight extends AnimObject {
 	
+	private static final Model lightModel = new Model();
+	private static final Model spotModel = new Model();
 	private boolean bParent;
+	
+	static {
+		new JPatchImport().importModel(lightModel, ClassLoader.getSystemResource("jpatch/models/light.jpt").toString());
+		new JPatchImport().importModel(spotModel, ClassLoader.getSystemResource("jpatch/models/spot.jpt").toString());
+	}
 	
 	protected RenderExtension re = new RenderExtension(new String[] {
 		"povray", "light_source {\n\t$position color rgb $color * $intensity\n\tparallel\n\t#if ($size > 0)\n\t\tarea_light <$size,0,0>,<0,$size,0>,10,10 adaptive 1 jitter circular orient\n\t#end\n}\n",
@@ -77,12 +84,8 @@ public class AnimLight extends AnimObject {
 		return re.xml(prefix);
 	}
 	
-	public void getBounds(Point3f p3A, Point3f p3B) {
-		// FIXME
-	}
-	
-	public float getRadius() {
-		return 0; // FIXME
+	public Model getModel() {
+		return lightModel;
 	}
 	
 	public void removeFromParent() {

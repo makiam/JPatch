@@ -68,6 +68,7 @@ implements ModelImporter {
 //	}
 	
 	public final String importModel(Model model, String filename) {
+		System.out.println("loading " + filename);
 		this.model = model;
 		XMLReader xmlReader = null;
 		try {
@@ -111,6 +112,7 @@ implements ModelImporter {
 	**/
 	
 	public void startElement(String namespaceURI, String localName, String qName, Attributes attributes) {
+		System.out.println(localName);
 		switch(iState) {
 			case NULL:
 				if (localName.equals("model")) {

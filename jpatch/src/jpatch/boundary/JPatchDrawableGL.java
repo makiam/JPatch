@@ -23,7 +23,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	private Color4f color = new Color4f();
 	private Color3f backfaceColor;
 	
-	private boolean bPointAsQuad = true;
+	private boolean bPointAsQuad = false;
 	private boolean bPerspective = false;
 	private float fFocalLength = 50;
 	private Matrix4f m4Transform = new Matrix4f();
@@ -447,17 +447,20 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 //					m4Transform.m02, m4Transform.m12, m4Transform.m22, m4Transform.m32,
 //					m4Transform.m03, m4Transform.m13, m4Transform.m23, m4Transform.m33,
 //			});
+			float Z = bPerspective ? -1 : 1;
 			gl.glLoadMatrixf(new float[] {
 					1, 0, 0, 0,
 					0, 1, 0, 0,
-					0, 0, 1, 0,
+					0, 0, Z, 0,
 					0, 0, 0, 1
 			});
 			if (bPerspective) {
 				float a = 35f / fFocalLength;
 				float b = a * h / w;
+				gl.glDepthFunc(GL.GL_GEQUAL);
 				gl.glFrustum(-a, a, -b, b, 1, Short.MAX_VALUE);
 			} else {
+				gl.glDepthFunc(GL.GL_LEQUAL);
 				gl.glOrtho(-w, w, -h, h, Short.MAX_VALUE, -Short.MAX_VALUE);
 			}
 			gl.glMatrixMode(GL.GL_MODELVIEW);
@@ -465,7 +468,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			gl.glLoadMatrixf(new float[] {
 					1, 0, 0, 0,
 					0, 1, 0, 0,
-					0, 0, 1, 0,
+					0, 0, Z, 0,
 					0, 0, 0, 1
 			});
 			gl.glDisable(GL.GL_LIGHTING);
@@ -664,7 +667,10 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		if ((mode & COLOR_BUFFER) > 0) bits |= GL.GL_COLOR_BUFFER_BIT;
 		if ((mode & DEPTH_BUFFER) > 0) bits |= GL.GL_DEPTH_BUFFER_BIT;
 		gl.glClearColor(color.x, color.y, color.z, 0);
-		gl.glClearDepth(Short.MAX_VALUE);
+		if (bPerspective)
+			gl.glClearDepth(-Short.MAX_VALUE);
+		else
+			gl.glClearDepth(Short.MAX_VALUE);
 		gl.glClear(bits);
 		gl.glFlush();
 	}
@@ -986,7 +992,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 				iGlMode = GL.GL_POINTS;
 				gl.glBegin(iGlMode);
 			}
-			gl.glVertex3f(p.x, p.y, p.z - 1);
+			gl.glVertex3f(p.x, p.y, p.z);
 		}
 	}
 	
@@ -1024,9 +1030,9 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			iGlMode = GL.GL_TRIANGLES;
 			gl.glBegin(iGlMode);
 		}
-		gl.glVertex3f(p0.x, p0.y, p0.z + 1);
-		gl.glVertex3f(p1.x, p1.y, p1.z + 1);
-		gl.glVertex3f(p2.x, p2.y, p2.z + 1);
+		gl.glVertex3f(p0.x, p0.y, p0.z + 0);
+		gl.glVertex3f(p1.x, p1.y, p1.z + 0);
+		gl.glVertex3f(p2.x, p2.y, p2.z + 0);
 		if (backface)
 			gl.glColor4f(color.x, color.y, color.z, color.w);
 	}
@@ -1041,11 +1047,11 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		}
 		
 		gl.glColor3f(c0.x, c0.y, c0.z);
-		gl.glVertex3f(p0.x, p0.y, p0.z + 1);
+		gl.glVertex3f(p0.x, p0.y, p0.z + 0);
 		gl.glColor3f(c1.x, c1.y, c1.z);
-		gl.glVertex3f(p1.x, p1.y, p1.z + 1);
+		gl.glVertex3f(p1.x, p1.y, p1.z + 0);
 		gl.glColor3f(c2.x, c2.y, c2.z);
-		gl.glVertex3f(p2.x, p2.y, p2.z + 1);
+		gl.glVertex3f(p2.x, p2.y, p2.z + 0);
 	}
 	
 	public void drawTriangle(Point3f p0, Color4f c0, Point3f p1, Color4f c1, Point3f p2, Color4f c2) {
@@ -1056,11 +1062,11 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			gl.glBegin(iGlMode);
 		}
 		gl.glColor4f(c0.x, c0.y, c0.z, c0.w);
-		gl.glVertex3f(p0.x, p0.y, p0.z + 1);
+		gl.glVertex3f(p0.x, p0.y, p0.z + 0);
 		gl.glColor4f(c1.x, c1.y, c1.z, c1.w);
-		gl.glVertex3f(p1.x, p1.y, p1.z + 1);
+		gl.glVertex3f(p1.x, p1.y, p1.z + 0);
 		gl.glColor4f(c2.x, c2.y, c2.z, c2.w);
-		gl.glVertex3f(p2.x, p2.y, p2.z + 1);
+		gl.glVertex3f(p2.x, p2.y, p2.z + 0);
 	}
 	
 	public void drawTriangle(Point3f p0, Vector3f n0, Point3f p1, Vector3f n1, Point3f p2, Vector3f n2) {
@@ -1071,11 +1077,11 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			gl.glBegin(iGlMode);
 		}
 		gl.glNormal3f(-n0.x, -n0.y, -n0.z);
-		gl.glVertex3f(p0.x, p0.y, p0.z + 1);
+		gl.glVertex3f(p0.x, p0.y, p0.z + 0);
 		gl.glNormal3f(-n1.x, -n1.y, -n1.z);
-		gl.glVertex3f(p1.x, p1.y, p1.z + 1);
+		gl.glVertex3f(p1.x, p1.y, p1.z + 0);
 		gl.glNormal3f(-n2.x, -n2.y, -n2.z);
-		gl.glVertex3f(p2.x, p2.y, p2.z + 1);
+		gl.glVertex3f(p2.x, p2.y, p2.z + 0);
 	}
 	
 	public boolean isDepthBufferSupported() {

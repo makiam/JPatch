@@ -2,6 +2,9 @@ package jpatch.boundary;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
@@ -62,13 +65,28 @@ public class VcrControls extends JPanel {
 		add(new JSeparator());
 		add(buttonAdd);
 		add(buttonDelete);
-		
+		textTime.setEditable(false);
 		textTime.setFont(new Font("Monospaced", Font.PLAIN, 12));
 		textFrame.setFont(new Font("Monospaced", Font.PLAIN, 12));
-		textTime.setEditable(false);
-		textFrame.setEditable(false);
-		textTime.setBackground(Color.WHITE);
-		textFrame.setBackground(Color.WHITE);
+		
+		textFrame.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent event) {
+				float p = MainFrame.getInstance().getAnimation().getPosition();
+				try {
+					int i = Integer.parseInt(textFrame.getText().trim());
+					System.out.println(i);
+					float f = i - 1;
+					if (f >= MainFrame.getInstance().getAnimation().getStart() && f <= MainFrame.getInstance().getAnimation().getEnd())
+						p = f;
+				} catch (NumberFormatException e) { }
+				System.out.println(p);
+				setPosition(p);
+			}
+		});
+//		textTime.setEditable(true);
+//		textFrame.setEditable(true);
+//		textTime.setBackground(Color.WHITE);
+//		textFrame.setBackground(Color.WHITE);
 		
 	}
 	
