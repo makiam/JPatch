@@ -34,7 +34,8 @@ import javax.swing.event.ChangeListener;
 
 import jpatch.boundary.*;
 import jpatch.boundary.laf.*;
-import jpatch.boundary.settings.Settings;
+import jpatch.boundary.settings.*;
+import jpatch.entity.*;
 
 public final class Command implements KeyListener {
 	private static final boolean DEBUG = false;

@@ -228,12 +228,20 @@ public class DefaultTool extends JPatchTool {
 	}
 	
 	public void paint(ViewDefinition viewDef) {
+//		System.out.println("defaulttool paint");
 		//drawable.clearZBuffer();
 		JPatchDrawable2 drawable = viewDef.getDrawable();
 		Selection selection = MainFrame.getInstance().getSelection();
 		
 //		if (MainFrame.getInstance().getJPatchScreen().showTangents() && tangentTool != null) tangentTool.paint(viewport, drawable); // FIXME
+//		System.out.println(selection);
+//		if (selection != null) {
+//			System.out.println(selection.isSingle());
+//			System.out.println(selection.getMap());
+//			System.out.println(selection.getMap().size());
+//		}
 		if (selection != null && !selection.isSingle()) {
+//			System.out.println("drawing selection box");
 			Matrix4f m4View = viewDef.getMatrix();
 			Point3f p3A = new Point3f();
 			Point3f p3B = new Point3f();

@@ -268,34 +268,34 @@ public class JPatchUndoManager {
 //		}
 //	}
 
-//	/**
-//	 * a dump method used by the test-code
-//	 */
-//	public void dump() {
-//		System.out.println();
-//		for (int e = 0; e < iDepth; e++) {
-//			String prefix = (e == iStop) ? "#" : " ";
-//			if (e == iPos) {
-//				prefix += "-->";
-//			} else {
-//				prefix += "   ";
-//			}
-//			prefix += e + " ";
-//			if (e < lstEdits.size()) {
-//				JPatchAbstractUndoableEdit edit = (JPatchAbstractUndoableEdit)lstEdits.get(e);
-//				//System.out.println(edit.name() + " (" + edit.getClass().getName() + ")");
-//				edit.dump(prefix);
-//			} else {
-//				System.out.println("open = " + bOpen);
-//				return;
-//			}
-//		}
-//		if (iPos == iDepth) {
-//			if (iStop == iPos) {
-//				System.out.println("#-->");
-//			} else {
-//				System.out.println(" -->");
-//			}
-//		}
-//	}
+	/**
+	 * a dump method used by the test-code
+	 */
+	public void dump() {
+		System.out.println();
+		for (int e = 0; e < iDepth; e++) {
+			String prefix = (e == iStop) ? "#" : " ";
+			if (e == iPos) {
+				prefix += "-->";
+			} else {
+				prefix += "   ";
+			}
+			prefix += e + " ";
+			if (e < listEdits.size()) {
+				JPatchRootEdit edit = (JPatchRootEdit) listEdits.get(e);
+				//System.out.println(edit.name() + " (" + edit.getClass().getName() + ")");
+				System.out.println(edit.getName());
+			} else {
+				System.out.println("open = " + bOpen);
+				return;
+			}
+		}
+		if (iPos == iDepth) {
+			if (iStop == iPos) {
+				System.out.println("#-->");
+			} else {
+				System.out.println(" -->");
+			}
+		}
+	}
 }

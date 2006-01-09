@@ -969,6 +969,8 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void setPointSize(int size) {
+		gl.glEnd();
+		iGlMode = -1;
 		gl.glPointSize(size);
 		fPointSize = (float) size / 2;
 	}
@@ -987,12 +989,15 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 			gl.glVertex3f(p.x - fPointSize, p.y + fPointSize, p.z - 1);
 			gl.glEnd();
 		} else {
-			if (iGlMode != GL.GL_POINTS) {
+			if (iGlMode != GL.GL_POINT) {
 				gl.glEnd();
-				iGlMode = GL.GL_POINTS;
-				gl.glBegin(iGlMode);
+//				iGlMode = GL.GL_POINT;
+//				gl.glBegin(iGlMode);
 			}
+			gl.glBegin(GL.GL_POINTS);
 			gl.glVertex3f(p.x, p.y, p.z);
+			gl.glEnd();
+			iGlMode = -1;
 		}
 	}
 	

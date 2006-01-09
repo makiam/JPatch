@@ -42,6 +42,7 @@ public class UIFactory extends DefaultHandler {
 	private JToolBar toolBar;
 	private JMenuBar menuBar = new JMenuBar();
 	private JPopupMenu popupMenu = new JPopupMenu();
+	private JMenu viewMenu;
 	private Map mapObjects = new HashMap();
 	private Map mapLayout = new HashMap();
 	private Icon emptyIcon = new Icon() {
@@ -75,6 +76,7 @@ public class UIFactory extends DefaultHandler {
 		}
 		mapObjects.put("menubar", menuBar);
 		mapObjects.put("viewport popup", popupMenu);
+		mapObjects.put("view menu", viewMenu);
 	}
 	
 	
@@ -142,6 +144,8 @@ public class UIFactory extends DefaultHandler {
 //							menu.setIcon(emptyIcon);
 						getMenu().add(menu);
 						listMenu.add(menu);
+						if (attributes.getValue(i).toLowerCase().equals("view"))
+							viewMenu = menu;
 					} else {
 						if (attributes.getValue(i).equals("menubar"))
 							listMenu.add(menuBar);

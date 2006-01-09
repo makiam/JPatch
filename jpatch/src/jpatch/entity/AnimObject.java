@@ -10,8 +10,11 @@ import javax.vecmath.*;
 
 import jpatch.boundary.MainFrame;
 import jpatch.boundary.Selection;
+import jpatch.control.edit.AtomicChangeAnimObjectScale;
 import jpatch.control.edit.AtomicChangeAnimObjectTransform;
+import jpatch.control.edit.AtomicModifyMotionCurve;
 import jpatch.control.edit.JPatchUndoableEdit;
+import jpatch.control.edit.ModifyAnimObject;
 
 public abstract class AnimObject implements MutableTreeNode, Transformable {
 	static final double MIN_ROLL = 0.0000001;
@@ -271,7 +274,26 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 	}
 
 	public JPatchUndoableEdit endTransform() {
-		MainFrame.getInstance().getAnimation().getCurvesetFor(this).updateCurves(MainFrame.getInstance().getAnimation().getPosition());
-		return new AtomicChangeAnimObjectTransform(this, m4BackupTransform);
+		Animation animation = MainFrame.getInstance().getAnimation();
+		MotionCurveSet mcs = animation.getCurvesetFor(this);
+		float position = animation.getPosition();
+		ModifyAnimObject edit = new ModifyAnimObject(this);
+		Point3d newPosition = getPositionDouble();
+		Quat4f newOrientation = getOrientation();
+		float newScale = getScale();
+		m4Transform.set(m4BackupTransform);
+		if (!newPosition.equals(getPositionDouble()))
+			edit.addEdit(new AtomicModifyMotionCurve.Point3d(mcs.position, position, newPosition));
+		if (!newOrientation.equals(getOrientation()))
+			edit.addEdit(new AtomicModifyMotionCurve.Quat4f(mcs.orientation, position, newOrientation));
+		if (newScale != getScale()) {
+			if (this instanceof AnimModel) {
+				edit.addEdit(new AtomicModifyMotionCurve.Float(((MotionCurveSet.Model) mcs).scale, position, newScale));
+			} else {
+				edit.addEdit(new AtomicChangeAnimObjectScale(this, newScale));
+			}
+		}
+		mcs.setPosition(position);
+		return edit;	
 	}
 }
