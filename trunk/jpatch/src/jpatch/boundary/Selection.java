@@ -171,9 +171,9 @@ public class Selection extends JPatchTreeLeaf {
 	}
 	
 	public boolean isSingle() {
-		System.out.println("Selection isSingle()");
-		System.out.println("map=" + mapObjects);
-		System.out.println("hot=" + hotObject);
+//		System.out.println("Selection isSingle()");
+//		System.out.println("map=" + mapObjects);
+//		System.out.println("hot=" + hotObject);
 		if (hotObject instanceof AnimObject)
 			return false;
 		return mapObjects.size() == 1;
