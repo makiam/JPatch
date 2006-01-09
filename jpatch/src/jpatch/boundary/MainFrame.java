@@ -63,6 +63,7 @@ public final class MainFrame extends JFrame {
 	private MorphTarget editedMorph;
 	private JDialog vcrDialog;
 	private VcrControls vcrControls;
+	private JMenu viewMenu;
 	
 //	private javax.swing.Timer defaultToolTimer = new javax.swing.Timer(0, new ActionListener() {
 //		public void actionPerformed(ActionEvent event) {
@@ -175,7 +176,7 @@ public final class MainFrame extends JFrame {
 			setJMenuBar((JMenuBar) uiFactory.getComponent("menubar"));
 			
 			jpatchScreen.setPopupMenu((JPopupMenu) uiFactory.getComponent("viewport popup"));
-			
+			viewMenu = (JMenu) uiFactory.getComponent("view menu");
 //			mainToolBar = new MainToolBar(bgAction);
 			//mainToolBar.setOrientation(SwingConstants.HORIZONTAL);
 //			getContentPane().add(mainToolBar,BorderLayout.NORTH);
@@ -332,6 +333,10 @@ public final class MainFrame extends JFrame {
 		}
 	}
 	
+	public JMenu getViewMenu() {
+		return viewMenu;
+	}
+	
 //	public javax.swing.Timer getDefaultToolTimer() {
 //		return defaultToolTimer;
 //	}
@@ -462,7 +467,7 @@ public final class MainFrame extends JFrame {
 		vcrDialog.pack();
 		vcrDialog.setAlwaysOnTop(true);
 		vcrDialog.setVisible(true);
-		jpatchScreen.getActiveViewport().getViewDefinition().setCamera(animation.getCameras().get(0));
+//		jpatchScreen.getActiveViewport().getViewDefinition().setCamera(animation.getCameras().get(0));
 	}
 	
 	public static MainFrame getInstance() {

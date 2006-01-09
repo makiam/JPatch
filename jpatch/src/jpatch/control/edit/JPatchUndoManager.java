@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchUndoManager.java,v 1.8 2005/12/15 16:47:26 sascha_l Exp $
+ * $Id: JPatchUndoManager.java,v 1.9 2006/01/09 21:33:54 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -28,7 +28,7 @@ import java.util.*;
  * The JPatchUndoManager stores JPatchUndoableEdits in a list and provides methods to add, redo and undo edits.<br>
  * It keeps track of the position in the position inside the list
  *
- * @version	$Revision: 1.8 $
+ * @version	$Revision: 1.9 $
  * @author	Sascha Ledinsky
  */
 public class JPatchUndoManager {
@@ -268,34 +268,34 @@ public class JPatchUndoManager {
 //		}
 //	}
 
-//	/**
-//	 * a dump method used by the test-code
-//	 */
-//	public void dump() {
-//		System.out.println();
-//		for (int e = 0; e < iDepth; e++) {
-//			String prefix = (e == iStop) ? "#" : " ";
-//			if (e == iPos) {
-//				prefix += "-->";
-//			} else {
-//				prefix += "   ";
-//			}
-//			prefix += e + " ";
-//			if (e < lstEdits.size()) {
-//				JPatchAbstractUndoableEdit edit = (JPatchAbstractUndoableEdit)lstEdits.get(e);
-//				//System.out.println(edit.name() + " (" + edit.getClass().getName() + ")");
-//				edit.dump(prefix);
-//			} else {
-//				System.out.println("open = " + bOpen);
-//				return;
-//			}
-//		}
-//		if (iPos == iDepth) {
-//			if (iStop == iPos) {
-//				System.out.println("#-->");
-//			} else {
-//				System.out.println(" -->");
-//			}
-//		}
-//	}
+	/**
+	 * a dump method used by the test-code
+	 */
+	public void dump() {
+		System.out.println();
+		for (int e = 0; e < iDepth; e++) {
+			String prefix = (e == iStop) ? "#" : " ";
+			if (e == iPos) {
+				prefix += "-->";
+			} else {
+				prefix += "   ";
+			}
+			prefix += e + " ";
+			if (e < listEdits.size()) {
+				JPatchRootEdit edit = (JPatchRootEdit) listEdits.get(e);
+				//System.out.println(edit.name() + " (" + edit.getClass().getName() + ")");
+				System.out.println(edit.getName());
+			} else {
+				System.out.println("open = " + bOpen);
+				return;
+			}
+		}
+		if (iPos == iDepth) {
+			if (iStop == iPos) {
+				System.out.println("#-->");
+			} else {
+				System.out.println(" -->");
+			}
+		}
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.18 2006/01/08 21:17:29 sascha_l Exp $
+ * $Id: Command.java,v 1.19 2006/01/09 21:33:55 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -34,7 +34,8 @@ import javax.swing.event.ChangeListener;
 
 import jpatch.boundary.*;
 import jpatch.boundary.laf.*;
-import jpatch.boundary.settings.Settings;
+import jpatch.boundary.settings.*;
+import jpatch.entity.*;
 
 public final class Command implements KeyListener {
 	private static final boolean DEBUG = false;

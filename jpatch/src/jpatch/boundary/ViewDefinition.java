@@ -4,8 +4,11 @@ import javax.vecmath.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 import jpatch.entity.*;
+import jpatch.boundary.settings.*;
 
 public final class ViewDefinition
 implements ComponentListener {
@@ -44,6 +47,7 @@ implements ComponentListener {
 	private RealtimeLighting lighting;
 	private Camera camera;
 	
+	private DecimalFormat decimalFormat = new DecimalFormat("0.0");
 //	private float fWidth;
 //	private float fHeight;
 //	private boolean bVisible;
@@ -213,6 +217,13 @@ implements ComponentListener {
 		if (camera != null)
 			return camera.getName();
 		return aViewName[iView];
+	}
+	
+	public String getViewDescription() {
+		if (camera != null)
+			return camera.getName() + " Focal-Length: " + decimalFormat.format(camera.getFocalLength()) + "mm";
+		else
+			return aViewName[iView] + (isLocked() ? " (locked)" : "");
 	}
 	
 	public final boolean alwaysUseZBuffer() {
@@ -433,6 +444,28 @@ implements ComponentListener {
 	}
 		
 	public final void moveView(float x, float y, boolean repaint) {
+		if (camera != null) {
+			int W = (int) getWidth();
+			int H = (int) getHeight();
+			int hh, ww;
+			float ar = Settings.getInstance().export.aspectWidth / Settings.getInstance().export.aspectHeight;
+			if (W / ar < H) {
+				ww = (int) (W / Viewport2.OVERSCAN);
+				hh = (int) (ww / ar);
+			} else {
+				hh = (int) (H / Viewport2.OVERSCAN);
+				ww = (int) (hh * ar);
+			}
+			double roll = camera.getRoll();
+			double pitch = camera.getPitch();
+			double yaw = camera.getYaw();
+			pitch += Math.atan(y / ww * 4 * 35 / camera.getFocalLength() * Viewport2.OVERSCAN) * 180 / Math.PI;
+			yaw -= Math.atan(x / ww * 4 * 35 / camera.getFocalLength() * Viewport2.OVERSCAN) * 180 / Math.PI;
+			camera.setOrientation(roll, pitch, yaw);
+			if (repaint)
+				MainFrame.getInstance().getJPatchScreen().single_update(drawable.getComponent());
+			return;
+		}
 		fTranslateX += x/fScale;
 		fTranslateY -= y/fScale;
 		computeMatrix();
@@ -441,6 +474,15 @@ implements ComponentListener {
 	}
 	
 	public final void rotateView(float x, float y) {
+		if (camera != null) {
+			double roll = camera.getRoll();
+			double pitch = camera.getPitch();
+			double yaw = camera.getYaw();
+			roll += x * 0.5;
+			camera.setOrientation(roll, pitch, yaw);
+			MainFrame.getInstance().getJPatchScreen().single_update(drawable.getComponent());
+			return;
+		}
 		iView = BIRDS_EYE;
 		fRotateX -= y;
 		fRotateY -= x;
@@ -465,8 +507,16 @@ implements ComponentListener {
 //		((JPatchCanvas)viewport).clearBackground();
 		drawable.display();
 	}
-	
+		
 	public final void scaleView(float scale) {
+		if (camera != null) {
+			float focalLength = camera.getFocalLength();
+			focalLength *= scale;
+			camera.setFocalLength(focalLength);
+			drawable.setFocalLength(focalLength);
+			drawable.display();
+			return;
+		}
 		fScale *= scale;
 		computeMatrix();
 //		((JPatchCanvas)viewport).clearBackground();

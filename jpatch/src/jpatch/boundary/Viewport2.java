@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.47 2006/01/08 21:17:29 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.48 2006/01/09 21:33:55 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -21,6 +21,7 @@
  */
 package jpatch.boundary;
 
+import java.awt.Graphics2D;
 import java.util.*;
 
 import javax.vecmath.*;
@@ -49,6 +50,8 @@ public class Viewport2 {
 	private static Point3f p1 = new Point3f();
 	private static Point3f p2 = new Point3f();
 	private static Point3f p3 = new Point3f();
+	
+	public static final float OVERSCAN = 1.2f;
 	
 	private JPatchDrawable2 drawable;
 	private ViewDefinition viewDef;
@@ -153,13 +156,31 @@ public class Viewport2 {
 	public void drawInfo() {
 		String[] info = drawable.getInfo().split("\n");
 		drawable.setColor(settings.colors.text);
-		drawable.drawString(viewDef.getViewName()  + (viewDef.isLocked() ? " (locked)" : ""), 4, 16);
+		drawable.drawString(viewDef.getViewDescription(), 4, 16);
 		for (int i = 0, y = 16; i < info.length; drawable.drawString(info[i++], 4, y += 16));
 		if (MainFrame.getInstance().getEditedMorph() != null)
 			drawable.drawString("!!!EDIT MORPH MODE!!!", (int) viewDef.getWidth() - 140, 16);
 		if (MainFrame.getInstance().getAnimation() != null)
-			drawable.drawString("Frame " + ((int) MainFrame.getInstance().getAnimation().getPosition() + 1), 200, 16);
-			
+			drawable.drawString("Frame " + ((int) MainFrame.getInstance().getAnimation().getPosition() + 1), 4, (int) viewDef.getHeight() - 4);
+		if (viewDef.getCamera() != null) {
+			int W = (int) viewDef.getWidth();
+			int H = (int) viewDef.getHeight();
+//			float w;
+			int hh, ww;
+			float ar = settings.export.aspectWidth / settings.export.aspectHeight;
+			if (W / ar < H) {
+				ww = (int) (W / OVERSCAN);
+				hh = (int) (ww / ar);
+//				w = (float) viewDef.getCamera().getFocalLength() * (float) W / OVERSCAN / (float) viewDef.getCamera().getFilmSize();
+			} else {
+				hh = (int) (H / OVERSCAN);
+				ww = (int) (hh * ar);
+//				w = (float) viewDef.getCamera().getFocalLength() * (float) H / OVERSCAN / (float) (viewDef.getCamera().getFilmSize() / ar);
+			}
+			drawable.setColor(settings.colors.majorGrid);
+			drawable.drawRect((W - ww) >> 1, (H - hh) >> 1, ww, hh);
+			drawable.drawRect(((W - ww) >> 1) - 1, ((H - hh) >> 1) - 1, ww + 2, hh + 2);
+		}
 	}
 	
 	public void drawActiveBorder() {
@@ -195,7 +216,7 @@ public class Viewport2 {
 	
 	public void drawTool(JPatchTool tool) {
 		Selection selection = MainFrame.getInstance().getSelection();
-		if (selection != null && selection.getHotObject() == viewDef.getCamera())
+		if (selection != null && selection.getHotObject() != null && selection.getHotObject() == viewDef.getCamera())
 			return;
 		drawable.setGhostRenderingEnabled(true);
 		tool.paint(viewDef);

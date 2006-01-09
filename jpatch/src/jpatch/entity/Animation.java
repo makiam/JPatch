@@ -1,7 +1,13 @@
 package jpatch.entity;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.*;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.tree.*;
 
 import jpatch.boundary.*;
@@ -82,8 +88,15 @@ public class Animation implements MutableTreeNode {
 		setCurvesetFor(animLight, mcs);
 	}
 	
-	public void addCamera(Camera camera, MotionCurveSet mcs) {
+	public void addCamera(final Camera camera, MotionCurveSet mcs) {
 		MainFrame.getInstance().getTreeModel().insertNodeInto(camera, treenodeCameras, listCameras.size());
+		JMenuItem menuItem = new JRadioButtonMenuItem(camera.getName().toLowerCase());
+		menuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().setCamera(camera);
+			}
+		});
+		MainFrame.getInstance().getViewMenu().add(menuItem);
 		setCurvesetFor(camera, mcs);
 	}
 	

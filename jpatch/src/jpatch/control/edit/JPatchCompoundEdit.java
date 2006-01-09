@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchCompoundEdit.java,v 1.6 2005/09/19 12:40:15 sascha_l Exp $
+ * $Id: JPatchCompoundEdit.java,v 1.7 2006/01/09 21:33:54 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -29,7 +29,7 @@ import java.util.*;
  * It's undo() method simply calls the undo() methods of all child
  * edits (in reverse order). It's redo method calls the redo() methods of all child edits.
  *
- * @version	$Revision: 1.6 $
+ * @version	$Revision: 1.7 $
  * @author	Sascha Ledinsky
  */
 public abstract class JPatchCompoundEdit implements JPatchUndoableEdit {
@@ -47,12 +47,16 @@ public abstract class JPatchCompoundEdit implements JPatchUndoableEdit {
 		if (edit.isAtomic() || ((JPatchCompoundEdit) edit).isValid()) {
 			listEdits.add(edit);
 		}
+//		if (edit.isAtomic())
+//			listEdits.add(edit);
+//		else
+//			listEdits.addAll(((JPatchCompoundEdit) edit).listEdits);
 	}
 	
 	/**
 	 * undoes all child edits in reverse order
 	 */
-	public final void undo() {
+	public void undo() {
 		//System.out.println("undo " + strName);
 		if (listEdits.size() == 0) {
 			throw new IllegalStateException(this + " is empty!");
@@ -65,7 +69,7 @@ public abstract class JPatchCompoundEdit implements JPatchUndoableEdit {
 	/**
 	 * redoes all child edits
 	 */
-	public final void redo() {
+	public void redo() {
 		//System.out.println("redo " + strName);
 		if (listEdits.size() == 0) {
 			throw new IllegalStateException("CompoundEdit " + hashCode() + " is empty!");
@@ -90,7 +94,7 @@ public abstract class JPatchCompoundEdit implements JPatchUndoableEdit {
 		return (listEdits.size() > 0);
 	}
 	
-	public final int sizeOf() {
+	public int sizeOf() {
 		int size = 8 + 4 + (8 + 4 + 4 + 4);
 		for (Iterator it = listEdits.iterator(); it.hasNext(); ) {
 			size += (4 + ((JPatchUndoableEdit) it.next()).sizeOf());

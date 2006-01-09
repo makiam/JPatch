@@ -7,3 +7,6 @@ TODO:
 ? enable/disable actions correctly
 ? trigger screen-updates
 ? automatically select items in tree (e.g. after delete dof)
+
+* motion-controlled camera zoom doesn't update viewport
+
