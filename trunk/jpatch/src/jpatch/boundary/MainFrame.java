@@ -24,6 +24,7 @@ import jpatch.boundary.tools.*;
 import jpatch.control.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.laf.*;
+import jpatch.boundary.mouse.TreeMouseAdapter;
 import jpatch.boundary.action.*;
 
 public final class MainFrame extends JFrame {
@@ -747,10 +748,13 @@ public final class MainFrame extends JFrame {
 		((DefaultTreeModel) tree.getModel()).insertNodeInto(rootNode, treenodeRoot, 0);
 		((DefaultTreeModel) tree.getModel()).reload();
 		tree.setCellRenderer(new JPatchTreeCellRenderer());
+//		tree.setCellEditor(new DefaultCellEditor(new JTextField()));
+//		tree.setEditable(true);
 		tree.setRootVisible(false);
 		tree.setShowsRootHandles(true);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.expandRow(0);
+		tree.addMouseListener(new TreeMouseAdapter());
 		//tree.makeVisible(treenodeMaterials.getTreePath());
 		//tree.setDragEnabled(true);
 	}

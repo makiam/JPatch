@@ -1,5 +1,6 @@
 package jpatch.entity;
 
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 
@@ -80,41 +81,38 @@ public class AnimModel extends AnimObject {
 	}
 	
 	public TreeNode getChildAt(int childIndex) {
-		switch(childIndex) {
-		case 0:
-			return model.getTreenodeExpressions();
-		case 1:
-			return model.getTreenodeBones();
-		}
-		throw new ArrayIndexOutOfBoundsException();
+//		switch(childIndex) {
+//		case 0:
+//			return model.getTreenodeExpressions();
+//		case 1:
+//			return model.getTreenodeBones();
+//		}
+//		throw new ArrayIndexOutOfBoundsException();
+		return (TreeNode) model.getMorphList().get(childIndex);
 	}
 
 	public int getChildCount() {
-		return 2;
+		return model.getMorphList().size();
+//		return 0;
 	}
 
 	public int getIndex(TreeNode node) {
-		return -1;
+		return model.getMorphList().indexOf(node);
+//		return -1;
 	}
 
 	public boolean getAllowsChildren() {
 		return true;
+//		return false;
 	}
 
 	public boolean isLeaf() {
 		return false;
+//		return true;
 	}
 
 	public Enumeration children() {
-		return new Enumeration() {
-			private int i = 0;
-			public boolean hasMoreElements() {
-				return i < 2;
-			}
-
-			public Object nextElement() {
-				return getChildAt(i++);
-			}
-		};
+		return Collections.enumeration(model.getMorphList());
+//		return null;
 	}
 }
