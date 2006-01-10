@@ -12,6 +12,7 @@ public class AlignOptions extends JDialog implements ActionListener {
 	public static final int XPLANE = 1;
 	public static final int YPLANE = 2;
 	public static final int ZPLANE = 3;
+	public static final int YAXIS = 4;
 	/**
 	 * 
 	 */
@@ -37,6 +38,7 @@ public class AlignOptions extends JDialog implements ActionListener {
 		comboPlane.addItem("X");
 		comboPlane.addItem("Y");
 		comboPlane.addItem("Z");
+		comboPlane.addItem("X/Z");
 		
 		optionsPanel.setLayout(layout);
 
@@ -85,6 +87,10 @@ public class AlignOptions extends JDialog implements ActionListener {
 						p3.y = value;
 						break;
 					case ZPLANE:
+						p3.z = value;
+						break;
+					case YAXIS:
+						p3.x = value;
 						p3.z = value;
 						break;
 				}
