@@ -81,19 +81,20 @@ public class AnimModel extends AnimObject {
 	}
 	
 	public TreeNode getChildAt(int childIndex) {
-//		switch(childIndex) {
-//		case 0:
-//			return model.getTreenodeExpressions();
-//		case 1:
-//			return model.getTreenodeBones();
-//		}
-//		throw new ArrayIndexOutOfBoundsException();
-		return (TreeNode) model.getMorphList().get(childIndex);
+		switch(childIndex) {
+		case 0:
+			return model.getTreenodeExpressions();
+		case 1:
+			return model.getTreenodeBones();
+		}
+		throw new ArrayIndexOutOfBoundsException();
+//		return (TreeNode) model.getMorphList().get(childIndex);
 	}
 
 	public int getChildCount() {
-		return model.getMorphList().size();
+//		return model.getMorphList().size();
 //		return 0;
+		return 2;
 	}
 
 	public int getIndex(TreeNode node) {
@@ -112,7 +113,17 @@ public class AnimModel extends AnimObject {
 	}
 
 	public Enumeration children() {
-		return Collections.enumeration(model.getMorphList());
+//		return Collections.enumeration(model.getMorphList());
 //		return null;
+		return new Enumeration() {
+			private int i = 0;
+			public boolean hasMoreElements() {
+				return i < 2;
+			}
+
+			public Object nextElement() {
+				return getChildAt(i++);
+			}
+		};
 	}
 }

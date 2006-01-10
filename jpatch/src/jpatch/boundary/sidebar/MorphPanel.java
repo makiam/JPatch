@@ -8,7 +8,7 @@ import jpatch.boundary.*;
 import jpatch.entity.*;
 
 public class MorphPanel extends SidePanel
-implements ChangeListener {
+implements ChangeListener, Morph.MorphListener {
 	
 	/**
 	 * 
@@ -60,7 +60,7 @@ implements ChangeListener {
 		inputMax.addChangeListener(this);
 		inputCurrent.addChangeListener(this);
 		slider.addChangeListener(this);
-		
+		morph.addMorphListener(this);
 //		if (morph == editedMorph) {
 //			editButton.setSelected(true);
 //			deleteButton.setEnabled(false);
@@ -85,6 +85,7 @@ implements ChangeListener {
 				morph.setValue(inputMin.getFloatValue());
 //				morph.apply();
 				MainFrame.getInstance().getJPatchScreen().update_all();
+				MainFrame.getInstance().getTree().repaint();
 			}
 			slider.setValue(morph.getSliderValue());
 		} else if (changeEvent.getSource() == inputMax) {
@@ -94,6 +95,7 @@ implements ChangeListener {
 				morph.setValue(inputMax.getFloatValue());
 //				morph.apply();
 				MainFrame.getInstance().getJPatchScreen().update_all();
+				MainFrame.getInstance().getTree().repaint();
 			}
 			slider.setValue(morph.getSliderValue());
 		} else if (changeEvent.getSource() == inputCurrent) {
@@ -108,6 +110,9 @@ implements ChangeListener {
 				MainFrame.getInstance().getJPatchScreen().update_all();
 				slider.setValue(morph.getSliderValue());
 				addTargetButton.setEnabled(!morph.isTarget());
+				MainFrame.getInstance().getTree().repaint();
+				if (MainFrame.getInstance().getAnimation() != null)
+					morph.updateCurve();
 			}
 		} else if (changeEvent.getSource() == slider) {
 			if (slider.getValueIsAdjusting()) {
@@ -120,6 +125,15 @@ implements ChangeListener {
 			} else {
 			}
 		}
+	}
+
+	public void removeNotify() {
+		super.removeNotify();
+		morph.removeMorphListener(this);
+	}
+	
+	public void valueChanged(Morph morph) {
+		inputCurrent.setValue(morph.getValue());
 	}
 	
 //	public void editMorph() {

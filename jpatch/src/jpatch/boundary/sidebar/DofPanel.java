@@ -14,10 +14,12 @@ import jpatch.boundary.action.DeleteMaterialAction;
 import jpatch.boundary.action.EditMorphTargetAction;
 import jpatch.boundary.action.NewMorphTargetAction;
 import jpatch.boundary.action.UseDofMorphAction;
+import jpatch.control.edit.AtomicModifyMotionCurve;
+import jpatch.control.edit.ModifyAnimObject;
 import jpatch.entity.*;
 
 public class DofPanel extends SidePanel
-implements ChangeListener, ActionListener {
+implements ChangeListener, ActionListener, Morph.MorphListener {
 	
 	/**
 	 * 
@@ -82,15 +84,17 @@ implements ChangeListener, ActionListener {
 		detailPanel.add(inputCurrent);
 		slider = new JSlider(JSlider.HORIZONTAL,0,100,dof.getSliderValue());
 		slider.setFocusable(false);
-		detailPanel.add(slider);
+//		detailPanel.add(slider);
 		detailPanel.repaint();
 		inputName.addChangeListener(this);
+		inputCurrent.addChangeListener(this);
 		inputMin.addChangeListener(this);
 		inputMax.addChangeListener(this);
 		slider.addChangeListener(this);
 		combo.addActionListener(this);
 		cbFlip.setSelected(dof.isFlipped());
 		cbFlip.addActionListener(this);
+		dof.addMorphListener(this);
 		
 		JButton buttonUp = new JButton("up");
 		buttonUp.addActionListener(new ActionListener() {
@@ -144,12 +148,14 @@ implements ChangeListener, ActionListener {
 				dof.setValue(dof.getValue());
 			}
 			slider.setValue(dof.getSliderValue());
+			MainFrame.getInstance().getTree().repaint();
 		} else if (changeEvent.getSource() == inputMax) {
 			dof.setMax(inputMax.getFloatValue());
 			if (dof.getMax() < dof.getValue()) {
 				dof.setValue(dof.getMax());
 				}
 			slider.setValue(dof.getSliderValue());
+			MainFrame.getInstance().getTree().repaint();
 		} else if (changeEvent.getSource() == inputCurrent) {
 			float v = inputCurrent.getFloatValue();
 //			if (v < morph.getMin())
@@ -162,6 +168,9 @@ implements ChangeListener, ActionListener {
 				MainFrame.getInstance().getJPatchScreen().update_all();
 				addTargetButton.setEnabled(dof.getChildCount() > 0 && !dof.isTarget());
 				slider.setValue(dof.getSliderValue());
+				MainFrame.getInstance().getTree().repaint();
+				if (MainFrame.getInstance().getAnimation() != null)
+					dof.updateCurve();
 			}
 		} else if (changeEvent.getSource() == slider) {
 			if (slider.getValueIsAdjusting()) {
@@ -184,6 +193,16 @@ implements ChangeListener, ActionListener {
 			MainFrame.getInstance().getModel().setPose();
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
+	}
+	
+	public void removeNotify() {
+		super.removeNotify();
+		dof.removeMorphListener(this);
+	}
+	
+	public void valueChanged(Morph morph) {
+//		System.out.println("value changed " + morph.getValue());
+		inputCurrent.setValue(morph.getValue());
 	}
 	
 //	public void editMorph() {

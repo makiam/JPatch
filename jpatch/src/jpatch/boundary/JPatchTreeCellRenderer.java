@@ -2,9 +2,7 @@ package jpatch.boundary;
 
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.geom.Area;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
 
 import javax.swing.*;
 
@@ -76,29 +74,29 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 				RotationDof rdof = (RotationDof) value;
 				if (rdof.getBone().getIndex(rdof) == 0) {
 					if (rdof.getType() == 1)
-						setIcon(iconRdofRed1);
+						return new MorphSlider(iconRdofRed1, 1, 0, 0, tree,value,sel,expanded,leaf,row,hasFocus);
 					else if (rdof.getType() == 2)
-						setIcon(iconRdofRed2);
+						return new MorphSlider(iconRdofRed2, 1, 0, 0, tree,value,sel,expanded,leaf,row,hasFocus);
 					else if (rdof.getType() == 4)
-						setIcon(iconRdofRed3);
+						return new MorphSlider(iconRdofRed3, 1, 0, 0, tree,value,sel,expanded,leaf,row,hasFocus);
 				} else if (rdof.getBone().getIndex(rdof) == 1) {
 					if (rdof.getType() == 1)
-						setIcon(iconRdofGreen1);
+						return new MorphSlider(iconRdofGreen1, 0, 0.75f, 0, tree,value,sel,expanded,leaf,row,hasFocus);
 					else if (rdof.getType() == 2)
-						setIcon(iconRdofGreen2);
+						return new MorphSlider(iconRdofGreen2, 0, 0.75f, 0, tree,value,sel,expanded,leaf,row,hasFocus);
 					else if (rdof.getType() == 4)
-						setIcon(iconRdofGreen3);
+						return new MorphSlider(iconRdofGreen3, 0, 0.75f, 0, tree,value,sel,expanded,leaf,row,hasFocus);
 				} else if (rdof.getBone().getIndex(rdof) == 2) {
 					if (rdof.getType() == 1)
-						setIcon(iconRdofBlue1);
+						return new MorphSlider(iconRdofBlue1, 0, 0, 1, tree,value,sel,expanded,leaf,row,hasFocus);
 					else if (rdof.getType() == 2)
-						setIcon(iconRdofBlue2);
+						return new MorphSlider(iconRdofBlue2, 0, 0, 1, tree,value,sel,expanded,leaf,row,hasFocus);
 					else if (rdof.getType() == 4)
-						setIcon(iconRdofBlue3);
+						return new MorphSlider(iconRdofBlue3, 0, 0, 1, tree,value,sel,expanded,leaf,row,hasFocus);
 				}
 			} else {
 //				setIcon(iconMorph);
-				return new MorphSlider(tree,value,sel,expanded,leaf,row,hasFocus);
+				return new MorphSlider(iconMorph, 0.25f, 0.25f, 0.25f, tree,value,sel,expanded,leaf,row,hasFocus);
 			}
 		}
 		else if (value instanceof MorphTarget) {
@@ -120,15 +118,21 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 	public static class MorphSlider extends DefaultTreeCellRenderer {
 		private Morph morph;
 		private JTree tree;
-		public MorphSlider(JTree tree,Object value,boolean sel,boolean expanded,boolean leaf,int row,boolean hasFocus) {
-			super.getTreeCellRendererComponent(tree,value,sel,expanded,leaf,row,hasFocus);
+		private boolean selected;
+		private float r, gr, b;
+		
+		public MorphSlider(Icon icon, float r, float g, float b, JTree tree,Object value,boolean sel,boolean expanded,boolean leaf,int row,boolean hasFocus) {
+			super.getTreeCellRendererComponent(tree,value,false,expanded,leaf,row,hasFocus);
+			this.selected = sel;
 			this.morph = (Morph) value;
 			this.tree = tree;
-			setIcon(iconMorph);
+			this.r = r;
+			this.gr = g;
+			this.b = b;
+			setIcon(icon);
 			Dimension dim = getPreferredSize();
 			if (dim.width < 120)
 				dim.width = 120;
-			System.out.println(dim);
 			setMinimumSize(dim);
 			setPreferredSize(dim);
 //			setMaximumSize(dim);
@@ -136,28 +140,57 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 		
 		public void paint(Graphics g) {
 			super.paint(g);
-			g.setColor(new Color(1.0f, 0.0f, 0.0f, 0.24f));
-			float w = morph.getSliderValue();
-			float h = w / 10;
+			float min = morph.getMin();
+			float max = morph.getMax();
+			float absMax = Math.max(Math.abs(min), Math.abs(max));
+			float hmin = min / absMax * 6;
+			float hmax = max / absMax * 6;
+			float v = morph.getValue();
+			float w1 = morph.getSliderValue() - 2;
+			float w2 = morph.getSliderValue() + 2;
+			float h1 = w1 / 10;
+			float h2 = w2 / 10;
 			float left = 20;
 			float right = left + 100;
-			float bottom = getHeight() - 2;
+			float bottom = getHeight() - 8;
+			g.setColor(new Color(r, gr, b, 0.12f));
 			GeneralPath path = new GeneralPath();
-			path.moveTo(left, bottom);
-			path.lineTo(left + w, bottom);
-			path.lineTo(left + w, bottom - h);
+			path.moveTo(left, bottom - hmin);
+			path.lineTo(left, bottom);
+			path.lineTo(right + 1, bottom);
+			path.lineTo(right + 1, bottom - hmax);
 			path.closePath();
 			((Graphics2D) g).fill(path);
-			g.setColor(new Color(1.0f, 0.0f, 0.0f, 0.08f));
-			path = new GeneralPath();
-			path.moveTo(right, bottom);
-			path.lineTo(left + w, bottom);
-			path.lineTo(left + w, bottom - h);
-			path.lineTo(right, bottom - 10);
-			path.closePath();
-			((Graphics2D) g).fill(path);
-			g.setColor(new Color(1.0f, 0.0f, 0.0f, 0.48f));
-			((Graphics2D) g).fill(new Rectangle2D.Float(left + w - 1, 1, 2, 14));
+//			((Graphics2D) g).draw(path);
+			((Graphics2D) g).draw(new Line2D.Float(left, bottom, right, bottom));
+//			if (w2 > 3) {
+//				g.setColor(new Color(r, gr, b, 0.24f));
+//				GeneralPath path = new GeneralPath();
+//				path.moveTo(left, bottom);
+//				path.lineTo(left + w1, bottom);
+//				path.lineTo(left + w1, bottom - h1);
+//				path.closePath();
+//				((Graphics2D) g).fill(path);
+//			}
+//			if (w1 < 97) {
+//				g.setColor(new Color(r, gr, b, 0.08f));
+//				GeneralPath path = new GeneralPath();
+//				path.moveTo(right, bottom);
+//				path.lineTo(left + w2, bottom);
+//				path.lineTo(left + w2, bottom - h2);
+//				path.lineTo(right, bottom - 10);
+//				path.closePath();
+//				((Graphics2D) g).fill(path);
+//			}
+			g.setColor(new Color(r, gr, b, 0.24f));
+//			((Graphics2D) g).draw(new Line2D.Float(left, bottom, right, bottom));
+//			g.fill3DRect((int) (left + w - 2), 1, 4, 14, true);
+			((Graphics2D) g).fill(new Rectangle2D.Float(left + w1, 1, 4, 13));
+			((Graphics2D) g).draw(new Rectangle2D.Float(left + w1, 1, 3, 12));
+			if (selected) {
+				g.setColor(UIManager.getColor("Tree.selectionBackground"));
+				g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+			}
 		}
 	}
 }
