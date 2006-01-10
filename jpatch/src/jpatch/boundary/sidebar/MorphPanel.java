@@ -53,7 +53,7 @@ implements ChangeListener {
 //		detailPanel.add(panelMinMax);
 		slider = new JSlider(JSlider.HORIZONTAL,0,100,morph.getSliderValue());
 		slider.setFocusable(false);
-		detailPanel.add(slider);
+//		detailPanel.add(slider);
 		detailPanel.repaint();
 		inputName.addChangeListener(this);
 		inputMin.addChangeListener(this);

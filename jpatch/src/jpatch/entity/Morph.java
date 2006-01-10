@@ -1,6 +1,8 @@
 package jpatch.entity;
 
 import java.util.*;
+
+import javax.swing.event.*;
 import javax.swing.tree.*;
 import javax.vecmath.*;
 
@@ -15,8 +17,8 @@ public class Morph implements MutableTreeNode {
 	float fValue = 0;
 	Map mapMorph = new HashMap();
 	Model model;
-	
 	Morph() { }
+	EventListenerList eventListeners = new EventListenerList();
 	
 	public Morph(String name, Model model) {
 		strName = name;
@@ -64,8 +66,10 @@ public class Morph implements MutableTreeNode {
 		fValue = value;
 		setMorphMap();
 //		System.out.println("value = " + value + " " + mapMorph);
-		MainFrame.getInstance().getModel().applyMorphs();
-		MainFrame.getInstance().getModel().setMorphPose();
+		model.applyMorphs();
+		model.setMorphPose();
+		if (listener != null)
+			listener.valueChanged(getSliderValue());
 	}
 	
 	public boolean isTarget() {
@@ -281,6 +285,10 @@ public class Morph implements MutableTreeNode {
 	 * end of TreeNode interface implementation
 	 */
 
+	public void setMorphListener(MorphListener listener) {
+		this.listener = listener;
+		listener.valueChanged(getSliderValue());
+	}
 	/*
 	 * start of MutableTreeNode interface implementation
 	 */
@@ -313,4 +321,8 @@ public class Morph implements MutableTreeNode {
 	/*
 	 * end of MutableTreeNode interface implementation
 	 */
+	
+	public interface MorphListener {
+		public void valueChanged(int value);
+	}
 }
