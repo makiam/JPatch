@@ -7,6 +7,7 @@ import javax.swing.tree.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
+import jpatch.control.edit.*;
 
 public class Morph implements MutableTreeNode {
 	boolean bInserted = false;
@@ -68,8 +69,24 @@ public class Morph implements MutableTreeNode {
 //		System.out.println("value = " + value + " " + mapMorph);
 		model.applyMorphs();
 		model.setMorphPose();
-		if (listener != null)
-			listener.valueChanged(getSliderValue());
+//		if (listener != null)
+//			listener.valueChanged(getSliderValue());
+		for (MorphListener listener:eventListeners.getListeners(MorphListener.class)) {
+			listener.valueChanged(this);
+		}
+	}
+	
+	public void updateCurve() {
+		Animation animation = MainFrame.getInstance().getAnimation();
+		for (AnimModel animModel:animation.getModels()) {
+			if (animModel.getModel() == model) {
+				MotionCurveSet.Model mcs = (MotionCurveSet.Model) animation.getCurvesetFor(animModel);
+				ModifyAnimObject edit = new ModifyAnimObject(animModel);
+				edit.addEdit(new AtomicModifyMotionCurve.Float(mcs.morph(this), animation.getPosition(), fValue));
+				MainFrame.getInstance().getUndoManager().addEdit(edit);
+				return;
+			}
+		}
 	}
 	
 	public boolean isTarget() {
@@ -285,10 +302,19 @@ public class Morph implements MutableTreeNode {
 	 * end of TreeNode interface implementation
 	 */
 
-	public void setMorphListener(MorphListener listener) {
-		this.listener = listener;
-		listener.valueChanged(getSliderValue());
+//	public void setMorphListener(MorphListener listener) {
+//		this.listener = listener;
+//		listener.valueChanged(getSliderValue());
+//	}
+	
+	public void addMorphListener(MorphListener morphListener) {
+		eventListeners.add(MorphListener.class, morphListener);
 	}
+	
+	public void removeMorphListener(MorphListener morphListener) {
+		eventListeners.remove(MorphListener.class, morphListener);
+	}
+	
 	/*
 	 * start of MutableTreeNode interface implementation
 	 */
@@ -322,7 +348,7 @@ public class Morph implements MutableTreeNode {
 	 * end of MutableTreeNode interface implementation
 	 */
 	
-	public interface MorphListener {
-		public void valueChanged(int value);
+	public interface MorphListener extends EventListener {
+		public void valueChanged(Morph morph);
 	}
 }

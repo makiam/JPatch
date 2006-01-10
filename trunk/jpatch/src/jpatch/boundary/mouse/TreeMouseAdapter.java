@@ -52,6 +52,10 @@ public class TreeMouseAdapter extends JPatchMouseAdapter {
 		int row = tree.getRowForLocation(event.getX(), event.getY());
 		if (element instanceof Morph) {
 			morph = (Morph) element;
+			if (event.getClickCount() == 2) {
+				morph.setValue(0);
+				return;
+			}
 			bounds = tree.getRowBounds(row);
 			dx = bounds.x + 20;
 			int x = event.getX() - dx;
@@ -64,12 +68,22 @@ public class TreeMouseAdapter extends JPatchMouseAdapter {
 	public void mouseReleased(MouseEvent event) {
 		JTree tree = (JTree) event.getSource();
 		tree.removeMouseMotionListener(this);
+		if (morph != null && MainFrame.getInstance().getAnimation() != null)
+			morph.updateCurve();
+		morph = null;
 	}
 	
 	public void mouseDragged(MouseEvent event) {
 		JTree tree = (JTree) event.getSource();
-		morph.setSliderValue(event.getX() - dx);
-		tree.repaint(bounds);
-		MainFrame.getInstance().getJPatchScreen().update_all();
+		int v = event.getX() - dx;
+		if (v < 0)
+			v = 0;
+		else if (v > 100)
+			v = 100;
+		if (morph.getSliderValue() != v) {
+			morph.setSliderValue(v);
+			tree.repaint(bounds);
+			MainFrame.getInstance().getJPatchScreen().update_all();
+		}
 	}
 }

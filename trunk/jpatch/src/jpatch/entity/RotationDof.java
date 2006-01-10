@@ -10,6 +10,7 @@ import jpatch.auxilary.Utils3D;
 import jpatch.auxilary.XMLutils;
 import jpatch.boundary.JPatchTreeLeaf;
 import jpatch.boundary.MainFrame;
+import jpatch.entity.Morph.MorphListener;
 /**
  * Rotation Degree of freedom (Dof) for joints
  * @author sascha
@@ -273,6 +274,9 @@ public class RotationDof extends Morph {
 		getModel().applyMorphs();
 		getModel().setPose();
 //		setMorphValues();
+		for (MorphListener listener:eventListeners.getListeners(MorphListener.class)) {
+			listener.valueChanged(this);
+		}
 	}
 
 //	public float getDefaultAngle() {
