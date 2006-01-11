@@ -213,6 +213,7 @@ public final class MainFrame extends JFrame {
 			splitPane.setContinuousLayout(true);
 			splitPane.setResizeWeight(1);
 			splitPane.setDividerSize(4);
+			splitPane.setDividerLocation(getWidth() - 310);
 			getContentPane().add(splitPane, BorderLayout.CENTER);
 			
 			helpPanel.setLayout(new FlowLayout(FlowLayout.LEFT));

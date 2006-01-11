@@ -37,6 +37,7 @@ public class Model implements MutableTreeNode {
 	
 	//private JPatchMaterial[] aJPMaterial = new JPatchMaterial[32];
 	
+	private AnimModel animModel;
 	private List listMaterials = new ArrayList();
 	private List listSelections = new ArrayList();
 	private List listMorphs = new ArrayList();
@@ -193,6 +194,14 @@ public class Model implements MutableTreeNode {
 		material.setNumber(n);
 	}
 	*/
+	
+	public AnimModel getAnimModel() {
+		return animModel;
+	}
+
+	public void setAnimModel(AnimModel animModel) {
+		this.animModel = animModel;
+	}
 	
 	public String getName() {
 		return strName;

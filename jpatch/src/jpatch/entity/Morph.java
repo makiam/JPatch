@@ -76,17 +76,22 @@ public class Morph implements MutableTreeNode {
 		}
 	}
 	
+	public void presetValue(float value) {
+		fValue = value;
+		setMorphMap(); // FIXME is this necessary?
+	}
+	
 	public void updateCurve() {
 		Animation animation = MainFrame.getInstance().getAnimation();
-		for (AnimModel animModel:animation.getModels()) {
-			if (animModel.getModel() == model) {
-				MotionCurveSet.Model mcs = (MotionCurveSet.Model) animation.getCurvesetFor(animModel);
-				ModifyAnimObject edit = new ModifyAnimObject(animModel);
+//		for (AnimModel animModel:animation.getModels()) {
+//			if (animModel.getModel() == model) {
+				MotionCurveSet.Model mcs = (MotionCurveSet.Model) animation.getCurvesetFor(model.getAnimModel());
+				ModifyAnimObject edit = new ModifyAnimObject(model.getAnimModel());
 				edit.addEdit(new AtomicModifyMotionCurve.Float(mcs.morph(this), animation.getPosition(), fValue));
 				MainFrame.getInstance().getUndoManager().addEdit(edit);
 				return;
-			}
-		}
+//			}
+//		}
 	}
 	
 	public boolean isTarget() {
@@ -240,7 +245,7 @@ public class Morph implements MutableTreeNode {
 	}
 
 	public TreeNode getParent() {
-		return bInserted ? MainFrame.getInstance().getModel().getTreenodeExpressions() : null;
+		return bInserted ? model.getTreenodeExpressions() : null;
 	}
 
 	public int getIndex(TreeNode node) {
