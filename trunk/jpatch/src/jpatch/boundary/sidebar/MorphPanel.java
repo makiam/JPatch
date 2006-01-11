@@ -30,8 +30,7 @@ implements ChangeListener, Morph.MorphListener {
 		deleteButton = new JPatchButton(new DeleteMorphAction(morph));
 		addTargetButton = new JPatchButton(new NewMorphTargetAction(morph));
 		
-		add(deleteButton);
-		add(addTargetButton);
+		
 		
 		addTargetButton.setEnabled(!morph.isTarget());
 		//JPatchSlider.setDimensions(0,150,50,20);
@@ -46,10 +45,7 @@ implements ChangeListener, Morph.MorphListener {
 //		panelMinMax.add(inputMin);
 //		panelMinMax.add(inputMax);
 		detailPanel.removeAll();
-		detailPanel.add(inputName);
-		detailPanel.add(inputMin);
-		detailPanel.add(inputMax);
-		detailPanel.add(inputCurrent);
+		
 //		detailPanel.add(panelMinMax);
 		slider = new JSlider(JSlider.HORIZONTAL,0,100,morph.getSliderValue());
 		slider.setFocusable(false);
@@ -68,6 +64,21 @@ implements ChangeListener, Morph.MorphListener {
 //		} else if (editedMorph != null) {
 //			editButton.setEnabled(false);
 //		}
+		
+		
+		if (MainFrame.getInstance().getAnimation() != null) {
+			inputName.setEnabled(false);
+			inputMin.setEnabled(false);
+			inputMax.setEnabled(false);
+		} else {
+			add(deleteButton);
+			add(addTargetButton);
+			detailPanel.add(inputName);
+		}
+		detailPanel.add(inputMin);
+		detailPanel.add(inputMax);
+		detailPanel.add(inputCurrent);
+		
 	}
 	
 //	public void edit() {
@@ -134,6 +145,7 @@ implements ChangeListener, Morph.MorphListener {
 	
 	public void valueChanged(Morph morph) {
 		inputCurrent.setValue(morph.getValue());
+		addTargetButton.setEnabled(!morph.isTarget());
 	}
 	
 //	public void editMorph() {
