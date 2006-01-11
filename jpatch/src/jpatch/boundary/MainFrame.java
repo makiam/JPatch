@@ -445,9 +445,25 @@ public final class MainFrame extends JFrame {
 		if (vcrControls != null)
 			vcrControls.stop();
 		if (vcrDialog != null) {
+			vcrDialog.setVisible(false);
 			vcrDialog.dispose();
 			vcrDialog = null;
 		}
+		Command.getInstance().enableCommand("open", true);
+		Command.getInstance().enableCommand("append", true);
+		Command.getInstance().enableCommand("save", true);
+		Command.getInstance().enableCommand("save as", true);
+		
+		Command.getInstance().enableCommand("add curve segment", true);
+		Command.getInstance().enableCommand("add bone", true);
+		Command.getInstance().enableCommand("weight selection tool", true);
+		Command.getInstance().enableCommand("rotoscope tool", true);
+		Command.getInstance().enableCommand("detach", true);
+		Command.getInstance().enableCommand("tangent tool", true);
+		Command.getInstance().enableCommand("peak tangents", true);
+		Command.getInstance().enableCommand("round tangents", true);
+		Command.getInstance().enableCommand("lathe editor", true);
+		Command.getInstance().enableCommand("compute patches", true);
 	}
 	
 	public void newAnimation() {
@@ -469,6 +485,21 @@ public final class MainFrame extends JFrame {
 		vcrDialog.pack();
 		vcrDialog.setAlwaysOnTop(true);
 		vcrDialog.setVisible(true);
+		Command.getInstance().enableCommand("open", false);
+		Command.getInstance().enableCommand("append", false);
+		Command.getInstance().enableCommand("save", false);
+		Command.getInstance().enableCommand("save as", false);
+		
+		Command.getInstance().enableCommand("add curve segment", false);
+		Command.getInstance().enableCommand("add bone", false);
+		Command.getInstance().enableCommand("weight selection tool", false);
+		Command.getInstance().enableCommand("rotoscope tool", false);
+		Command.getInstance().enableCommand("detach", false);
+		Command.getInstance().enableCommand("tangent tool", false);
+		Command.getInstance().enableCommand("peak tangents", false);
+		Command.getInstance().enableCommand("round tangents", false);
+		Command.getInstance().enableCommand("lathe editor", false);
+		Command.getInstance().enableCommand("compute patches", false);
 //		jpatchScreen.getActiveViewport().getViewDefinition().setCamera(animation.getCameras().get(0));
 	}
 	
