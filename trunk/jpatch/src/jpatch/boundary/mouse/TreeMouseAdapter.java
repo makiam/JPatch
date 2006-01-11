@@ -52,11 +52,15 @@ public class TreeMouseAdapter extends JPatchMouseAdapter {
 		int row = tree.getRowForLocation(event.getX(), event.getY());
 		if (element instanceof Morph) {
 			morph = (Morph) element;
+			bounds = tree.getRowBounds(row);
 			if (event.getClickCount() == 2) {
 				morph.setValue(0);
+				tree.repaint(bounds);
+				MainFrame.getInstance().getJPatchScreen().update_all();
+				if (MainFrame.getInstance().getAnimation() != null)
+					morph.updateCurve();
 				return;
 			}
-			bounds = tree.getRowBounds(row);
 			dx = bounds.x + 20;
 			int x = event.getX() - dx;
 			int s = morph.getSliderValue();

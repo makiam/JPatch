@@ -36,6 +36,7 @@ implements TreeSelectionListener {
 		//setPreferredSize
 		//scrollPane = new JScrollPane(tree,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		setDividerSize(4);
+		setDividerLocation(MainFrame.getInstance().getHeight() - 300);
 		setContinuousLayout(true);
 		scrollPane = new JScrollPane(tree);
 		//Dimension dim = new Dimension(248,400);
