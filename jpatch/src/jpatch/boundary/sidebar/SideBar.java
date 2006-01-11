@@ -238,6 +238,7 @@ implements TreeSelectionListener {
 			replacePanel(new AnimModelPanel((AnimModel) selectedNode));
 		} else {
 			replacePanel(new SidePanel());
+			detailPanel.removeAll();
 		}
 		validate();
 	}

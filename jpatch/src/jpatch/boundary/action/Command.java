@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.19 2006/01/09 21:33:55 sascha_l Exp $
+ * $Id: Command.java,v 1.20 2006/01/11 21:00:09 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -162,7 +162,7 @@ public final class Command implements KeyListener {
 		put("add bone",					new AddBoneAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("rotate tool",				new RotateAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("weight selection tool",	new WeightSelectionAction(), 	new JRadioButtonMenuItem(),	new JPatchToggleButton());
-		put("detatch",					new DetachControlPointsAction(),new JMenuItem(),			new JPatchButton());
+		put("detach",					new DetachControlPointsAction(),new JMenuItem(),			new JPatchButton());
 		put("rotoscope tool",			new RotoscopeAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("tangent tool",				new TangentAction(), 			new JCheckBoxMenuItem(),	new JPatchToggleButton());
 		put("peak tangents",			new PeakAction(), 				new JCheckBoxMenuItem(),	new JPatchToggleButton());

@@ -237,10 +237,14 @@ public class Morph implements MutableTreeNode {
 	 * start of TreeNode interface implementation
 	 */
 	public TreeNode getChildAt(int childIndex) {
+		if (MainFrame.getInstance().getAnimation() != null)
+			return null;
 		return (MorphTarget) listTargets.get(childIndex);
 	}
 
 	public int getChildCount() {
+		if (MainFrame.getInstance().getAnimation() != null)
+			return 0;
 		return listTargets.size();
 	}
 
@@ -253,14 +257,16 @@ public class Morph implements MutableTreeNode {
 	}
 
 	public boolean getAllowsChildren() {
-		return true;
+		return MainFrame.getInstance().getAnimation() == null;
 	}
 
 	public boolean isLeaf() {
-		return listTargets.size() == 0;
+		return listTargets.size() == 0 || MainFrame.getInstance().getAnimation() != null;
 	}
 
 	public Enumeration children() {
+		if (MainFrame.getInstance().getAnimation() != null)
+			return null;
 		return Collections.enumeration(listTargets);
 	}
 	

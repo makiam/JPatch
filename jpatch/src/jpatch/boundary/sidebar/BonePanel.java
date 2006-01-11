@@ -24,11 +24,13 @@ implements ChangeListener {
 	Bone bone;
 	
 	public BonePanel(final Bone bone) {
+		JPanel detailPanel = MainFrame.getInstance().getSideBar().getDetailPanel();
+		detailPanel.removeAll();
+		if (MainFrame.getInstance().getAnimation() != null)
+			return;
 		this.bone = bone;
 		JPatchInput.setDimensions(50,150,20);
 		inputName = new JPatchInput("Name:",bone.getName());
-		JPanel detailPanel = MainFrame.getInstance().getSideBar().getDetailPanel();
-		detailPanel.removeAll();
 		detailPanel.add(inputName);
 		detailPanel.add(new JLabel("Joint rotation:"));
 		inputName.addChangeListener(this);

@@ -50,14 +50,12 @@ implements ChangeListener, ActionListener, Morph.MorphListener {
 //		editButton = new JPatchToggleButton(new EditMorphAction(morph, this));
 //		add(editButton);
 //		add(deleteButton);
-		add(new JPatchButton(new DeleteDofAction(dof)));
+		
 		useMorphButton = new JPatchButton(new UseDofMorphAction(dof, true));
 		discardMorphButton = new JPatchButton(new UseDofMorphAction(dof, false));
 		addTargetButton = new JPatchButton(new NewMorphTargetAction(dof));
 		
-		add(useMorphButton);
-		add(discardMorphButton);
-		add(addTargetButton);
+		
 		
 		useMorphButton.setEnabled(dof.getChildCount() == 0);
 		discardMorphButton.setEnabled(dof.getChildCount() > 0);
@@ -77,11 +75,7 @@ implements ChangeListener, ActionListener, Morph.MorphListener {
 //		panelMinMax.add(inputMax);
 		detailPanel.removeAll();
 //		detailPanel.add(inputName);
-		detailPanel.add(combo);
-		detailPanel.add(cbFlip);
-		detailPanel.add(inputMin);
-		detailPanel.add(inputMax);
-		detailPanel.add(inputCurrent);
+		
 		slider = new JSlider(JSlider.HORIZONTAL,0,100,dof.getSliderValue());
 		slider.setFocusable(false);
 //		detailPanel.add(slider);
@@ -122,9 +116,27 @@ implements ChangeListener, ActionListener, Morph.MorphListener {
 			}
 		});
 		
-		add(buttonUp);
-		add(buttonDown);
 		
+		
+		if (MainFrame.getInstance().getAnimation() != null) {
+			combo.setEnabled(false);
+			cbFlip.setEnabled(false);
+			inputName.setEnabled(false);
+			inputMin.setEnabled(false);
+			inputMax.setEnabled(false);
+		} else {
+			add(new JPatchButton(new DeleteDofAction(dof)));
+			add(useMorphButton);
+			add(discardMorphButton);
+			add(addTargetButton);
+			add(buttonUp);
+			add(buttonDown);
+			detailPanel.add(combo);
+			detailPanel.add(cbFlip);
+		}
+		detailPanel.add(inputMin);
+		detailPanel.add(inputMax);
+		detailPanel.add(inputCurrent);
 //		if (morph == editedMorph) {
 //			editButton.setSelected(true);
 //			deleteButton.setEnabled(false);
