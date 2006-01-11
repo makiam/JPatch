@@ -22,6 +22,7 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 		
 		public Color3f(MotionCurve2.Color3f motionCurve, float position, javax.vecmath.Color3f color) {
 			this.motionCurve = motionCurve;
+			this.position = position;
 			this.color = color;
 			swap();
 		}
@@ -44,6 +45,7 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 		
 		public Float(MotionCurve2.Float motionCurve, float position, float value) {
 			this.motionCurve = motionCurve;
+			this.position = position;
 			this.value = value;
 			swap();
 		}
@@ -66,6 +68,7 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 		
 		public Point3d(MotionCurve2.Point3d motionCurve, float position, javax.vecmath.Point3d point) {
 			this.motionCurve = motionCurve;
+			this.position = position;
 			this.point = point;
 			swap();
 		}
@@ -89,6 +92,7 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 		
 		public Quat4f(MotionCurve2.Quat4f motionCurve, float position, javax.vecmath.Quat4f quat) {
 			this.motionCurve = motionCurve;
+			this.position = position;
 			this.quat = quat;
 			swap();
 		}

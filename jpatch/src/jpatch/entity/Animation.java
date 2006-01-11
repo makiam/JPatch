@@ -175,6 +175,17 @@ public class Animation implements MutableTreeNode {
 		mapMotionCurves.put(animObject, mcs);
 	}
 	
+	public void dump() {
+		System.out.println("Current position:" + getPosition());
+		for (AnimObject animObject:getObjects()) {
+			System.out.println("animObject: " + animObject.getName());
+			MotionCurveSet mcs = getCurvesetFor(animObject);
+			StringBuffer sb = new StringBuffer();
+			mcs.xml(sb, "    ");
+			System.out.println(sb);
+		}
+	}
+	
 /* MutableTreeNode interface implementation */
 	
 	public void insert(MutableTreeNode child, int index) {

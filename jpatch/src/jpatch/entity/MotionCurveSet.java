@@ -169,7 +169,7 @@ public class MotionCurveSet {
 			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
 				Morph morph = (Morph) it.next();
 //				morph.unapply();
-				morph.setValue(morph(morph).getFloatAt(pos));
+				morph.presetValue(morph(morph).getFloatAt(pos));
 //				morph.apply();
 			}
 			for (Iterator itBone = ((AnimModel) animObject).getModel().getBoneSet().iterator(); itBone.hasNext(); ) {
@@ -178,6 +178,8 @@ public class MotionCurveSet {
 					dof.presetValue(morph(dof).getFloatAt(pos));
 				}
 			}
+			((AnimModel) animObject).getModel().applyMorphs();
+			((AnimModel) animObject).getModel().setPose();
 		}
 		
 		public void updateCurves(float pos) {
@@ -189,8 +191,13 @@ public class MotionCurveSet {
 			super.xml(sb, prefix);
 			scale.xml(sb, prefix, "type=\"scale\" subtype=\"uniform\"");
 			int m = 0;
-			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
-				((MotionCurve2.Float) map.get(it.next())).xml(sb, prefix, "type=\"morph\" morph=\"" + m++ + "\"");
+//			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
+//				((MotionCurve2.Float) map.get(it.next())).xml(sb, prefix, "type=\"morph\" morph=\"" + m++ + "\"");
+//			}
+			for (Iterator it = map.keySet().iterator(); it.hasNext(); ) {
+				Object key = it.next();
+				sb.append("  " + key + "\n");
+				((MotionCurve2.Float) map.get(key)).xml(sb, prefix, "type=\"morph\" morph=\"" + m++ + "\"");
 			}
 		}
 		

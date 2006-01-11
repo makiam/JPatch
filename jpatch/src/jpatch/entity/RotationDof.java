@@ -262,10 +262,6 @@ public class RotationDof extends Morph {
 	public void setPointTransform(Matrix4f m) {
 		
 	}
-
-	public void presetValue(float value) {
-		fValue = value;
-	}
 	
 	public void setValue(float value) {
 		fValue = value;
@@ -279,6 +275,11 @@ public class RotationDof extends Morph {
 		}
 	}
 
+	public void presetValue(float value) {
+		super.presetValue(value);
+		invalidate();
+	}
+	
 //	public float getDefaultAngle() {
 //		return fDefaultAngle;
 //	}

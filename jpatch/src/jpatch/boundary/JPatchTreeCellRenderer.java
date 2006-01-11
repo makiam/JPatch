@@ -46,18 +46,24 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 	
 	public Component getTreeCellRendererComponent(JTree tree,Object value,boolean sel,boolean expanded,boolean leaf,int row,boolean hasFocus) {
 		super.getTreeCellRendererComponent(tree,value,sel,expanded,leaf,row,hasFocus);
-		
+//		System.out.println(value + " " + ((TreeNode) value).getParent());
+		TreeNode parent = ((TreeNode) value).getParent();
+		Model model = MainFrame.getInstance().getModel();
+		if (MainFrame.getInstance().getAnimation() != null)
+			if (parent instanceof Model)
+				model = (Model) parent;
+//		System.out.println(value + " " + model + " " + model.getTreenodeBones());
 		if (value instanceof Model)
 			setIcon(iconModel);
 		else if (value instanceof Animation)
 			setIcon(iconAnimation);
-		else if (MainFrame.getInstance().getModel() != null && value == MainFrame.getInstance().getModel().getTreenodeSelections())
+		else if (model != null && value == model.getTreenodeSelections())
 			setIcon(iconSelections);
-		else if (MainFrame.getInstance().getModel() != null && value == MainFrame.getInstance().getModel().getTreenodeMaterials())
+		else if (model != null && value == model.getTreenodeMaterials())
 			setIcon(iconMaterials);
-		else if (MainFrame.getInstance().getModel() != null && value == MainFrame.getInstance().getModel().getTreenodeExpressions())
+		else if (model != null && value == model.getTreenodeExpressions())
 			setIcon(iconExpressions);
-		else if (MainFrame.getInstance().getModel() != null && value == MainFrame.getInstance().getModel().getTreenodeBones())
+		else if (model != null && value == model.getTreenodeBones())
 			setIcon(iconBones);
 		else if (MainFrame.getInstance().getAnimation() != null && value == MainFrame.getInstance().getAnimation().getTreenodeModels())
 			setIcon(iconModels);

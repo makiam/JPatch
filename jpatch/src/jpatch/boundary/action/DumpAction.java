@@ -13,6 +13,10 @@ public final class DumpAction extends AbstractAction {
 		super("Dump");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
+		if (MainFrame.getInstance().getAnimation() != null) {
+			MainFrame.getInstance().getAnimation().dump();
+			return;
+		}
 		MainFrame.getInstance().getModel().dump();
 	}
 }

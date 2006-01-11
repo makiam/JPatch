@@ -25,11 +25,13 @@ public class AnimModel extends AnimObject {
 	public AnimModel(Model model) {
 		strName = model.getName();
 		this.model = model;
+		model.setAnimModel(this);
 	}
 	
 	public AnimModel(String name, Model model) {
 		strName = name;
 		this.model = model;
+		model.setAnimModel(this);
 	}
 	
 	public Model getModel() {
