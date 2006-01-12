@@ -26,6 +26,9 @@ implements ChangeListener {
 		this.model = model;
 		add(new JPatchButton(new EditAnimObjectAction(model)));
 		add(new JPatchButton(new DeleteModelAction(model)));
+		add(new JPatchButton(new CopyPoseAction(model.getModel())));
+		add(new JPatchButton(new PastePoseAction(model.getModel())));
+		
 		JPatchInput.setDimensions(50,150,20);
 		inputName = new JPatchInput("Name:",model.getName());
 		JPanel detailPanel = MainFrame.getInstance().getSideBar().getDetailPanel();

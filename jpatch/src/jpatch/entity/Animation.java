@@ -19,14 +19,15 @@ public class Animation implements MutableTreeNode {
 	private float fPosition = 0;
 	private float fFramerate = 24;
 	
-	private ArrayList<AnimModel> listModels = new ArrayList<AnimModel>();
-	private ArrayList<AnimLight> listLights = new ArrayList<AnimLight>();
-	private ArrayList<Camera> listCameras = new ArrayList<Camera>();
-	private HashMap<AnimObject, MotionCurveSet> mapMotionCurves = new HashMap<AnimObject, MotionCurveSet>();
+	private List<AnimModel> listModels = new ArrayList<AnimModel>();
+	private List<AnimLight> listLights = new ArrayList<AnimLight>();
+	private List<Camera> listCameras = new ArrayList<Camera>();
+	private Map<AnimObject, MotionCurveSet> mapMotionCurves = new HashMap<AnimObject, MotionCurveSet>();
 	private AnimTreeNode treenodeModels = new AnimTreeNode("Models", listModels);
 	private AnimTreeNode treenodeLights = new AnimTreeNode("Lights", listLights);
 	private AnimTreeNode treenodeCameras = new AnimTreeNode("Cameras", listCameras);
-
+	private Map<Model, Pose> mapClipboardPose = new HashMap<Model, Pose>();
+	
 	private boolean bInserted;
 	private String strName = "New Animation";
 	
@@ -54,6 +55,15 @@ public class Animation implements MutableTreeNode {
 		return fPosition;
 	}
 
+	public Pose getClipboardPose(Model model) {
+		Pose pose = mapClipboardPose.get(model);
+		if (pose == null) {
+			pose = new Pose(model);
+			mapClipboardPose.put(model, pose);
+		}
+		return pose;
+	}
+	
 	public void setPosition(float position) {
 		fPosition = position;
 //		System.out.println("position = " + position);
