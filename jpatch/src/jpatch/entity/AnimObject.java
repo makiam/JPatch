@@ -188,6 +188,8 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		return false;		
 	}
 	
+	public abstract void xml(StringBuffer sb, String prefix);
+	
 	/*
 	 * Mutable treenode interface implementation
 	 */

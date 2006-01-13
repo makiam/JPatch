@@ -14,10 +14,7 @@ public abstract class MotionCurve2 {
 
 	public static MotionCurve2.Float createMorphCurve(Morph morph) {
 		MotionCurve2.Float mc = new MotionCurve2.Float();
-		if (morph instanceof RotationDof)
-			mc.name = ((RotationDof) morph).getBone().getName() + " " + morph.getName();
-		else
-			mc.name = morph.getName();
+		mc.name = morph.getId();
 		mc.fMin = morph.getMin();
 		mc.fMax = morph.getMax();
 		return mc;

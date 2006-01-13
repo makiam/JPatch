@@ -84,6 +84,16 @@ public class AnimLight extends AnimObject {
 		return re.xml(prefix);
 	}
 	
+	public void xml(StringBuffer sb, String prefix) {
+		sb.append(prefix).append("<lightsource>\n");
+		sb.append(prefix).append("\t<name>" + getName() + "</name>\n");
+		if (!isActive())
+			sb.append(prefix).append("\t<inactive/>").append("\n");
+		sb.append(prefix).append(renderStrings("\t")).append("\n");
+		MainFrame.getInstance().getAnimation().getCurvesetFor(this).xml(sb, prefix + "\t");
+		sb.append(prefix).append("</lightsource>").append("\n");
+	}
+	
 	public Model getModel() {
 		return lightModel;
 	}

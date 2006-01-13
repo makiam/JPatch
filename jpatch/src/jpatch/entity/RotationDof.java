@@ -56,6 +56,10 @@ public class RotationDof extends Morph {
 		return bone;
 	}
 	
+	public String getId() {
+		return bone.getName() + " " + strName;
+	}
+	
 	public boolean isFlipped() {
 		return bFlipped;
 	}

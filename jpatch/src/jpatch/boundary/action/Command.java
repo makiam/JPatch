@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.20 2006/01/11 21:00:09 sascha_l Exp $
+ * $Id: Command.java,v 1.21 2006/01/13 15:10:13 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -197,6 +197,9 @@ public final class Command implements KeyListener {
 		put("crossplatform lookandfeel",	new SwitchLookAndFeelAction("Metal", crossplatform),	new JRadioButtonMenuItem());
 		put("system lookandfeel",			new SwitchLookAndFeelAction("System", system),			new JRadioButtonMenuItem());
 		put("phoneme morph mapping", 		new EditPhonemesAction(),		new JMenuItem());
+		
+		// Window
+		put("show anim controls", 		new AnimControlsAction(),		new JMenuItem());
 		
 		// Test
 		put("dump",						new DumpAction(),					new JMenuItem());

@@ -85,7 +85,7 @@ public class AnimatorMainMenu extends BMenuBar {
 			String filename = fileChooser.getSelectedFile().getName();
 			Model model = new Model();
 			(new JPatchImport()).importModel(model, fileChooser.getSelectedFile().getPath());
-			AnimObject newObject = new AnimModel(model);
+			AnimObject newObject = new AnimModel(model, "");
 			Animator.getInstance().addObject(newObject, filename);
 			Animator.getInstance().setActiveObject(newObject);
 		}

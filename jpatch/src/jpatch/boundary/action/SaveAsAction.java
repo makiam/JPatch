@@ -86,7 +86,11 @@ public final class SaveAsAction extends AbstractAction {
 	private boolean write(String filename) {
 		try {
 			// create xml representation
-			StringBuffer xml = MainFrame.getInstance().getModel().xml("\t");
+			StringBuffer xml;
+			if (MainFrame.getInstance().getAnimation() != null)
+				xml = MainFrame.getInstance().getAnimation().xml("\t");
+			else
+				xml = MainFrame.getInstance().getModel().xml("\t");
 			
 			File file = new File(filename);
 			// make backup

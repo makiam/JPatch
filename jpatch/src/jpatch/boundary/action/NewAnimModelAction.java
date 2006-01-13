@@ -26,7 +26,7 @@ public final class NewAnimModelAction extends AbstractAction {
 			String filename = fileChooser.getSelectedFile().getName();
 			Model model = new Model();
 			(new JPatchImport()).importModel(model, fileChooser.getSelectedFile().getPath());
-			MainFrame.getInstance().getAnimation().addModel(new AnimModel(model), null);
+			MainFrame.getInstance().getAnimation().addModel(new AnimModel(model, filename), null);
 		}
 	}
 }

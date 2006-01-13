@@ -28,6 +28,11 @@ public class Animation implements MutableTreeNode {
 	private AnimTreeNode treenodeCameras = new AnimTreeNode("Cameras", listCameras);
 	private Map<Model, Pose> mapClipboardPose = new HashMap<Model, Pose>();
 	
+	private RenderExtension re = new RenderExtension(new String[] {
+			"povray", "",
+			"renderman", ""
+	});
+	
 	private boolean bInserted;
 	private String strName = "New Animation";
 	
@@ -185,17 +190,44 @@ public class Animation implements MutableTreeNode {
 		mapMotionCurves.put(animObject, mcs);
 	}
 	
-	public void dump() {
-		System.out.println("Current position:" + getPosition());
-		for (AnimObject animObject:getObjects()) {
-			System.out.println("animObject: " + animObject.getName());
-			MotionCurveSet mcs = getCurvesetFor(animObject);
-			StringBuffer sb = new StringBuffer();
-			mcs.xml(sb, "    ");
-			System.out.println(sb);
-		}
+	public void setRenderString(String format, String version, String renderString) {
+		re.setRenderString(format, version, renderString);
 	}
 	
+	public String getRenderString(String format, String version) {
+		return re.getRenderString(format, version);
+	}
+	
+	public StringBuffer renderStrings(String prefix) {
+		return re.xml(prefix);
+	}
+	
+	public void dump() {
+		System.out.println("Current position:" + getPosition());
+//		for (AnimObject animObject:getObjects()) {
+//			System.out.println("animObject: " + animObject.getName());
+//			MotionCurveSet mcs = getCurvesetFor(animObject);
+//			StringBuffer sb = new StringBuffer();
+//			mcs.xml(sb, "    ");
+//			System.out.println(sb);
+//		}
+		System.out.println(xml("\t"));
+	}
+	
+	public StringBuffer xml(String prefix) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(prefix).append("<choreography>\n");
+		sb.append(prefix).append("\t<name>" + strName + "</name>\n");
+		sb.append(prefix).append("\t<start>" + fStart + "</start>\n");
+		sb.append(prefix).append("\t<end>" + fEnd + "</end>\n");
+		sb.append(prefix).append("\t<framerate>" + fFramerate + "</framerate>\n");
+//		sb.append(prefix).append("\t<prefix>" + strPrefix + "</prefix>").append("\n");
+		sb.append(prefix).append(renderStrings("\t")).append("\n");
+		for (AnimObject animObject:getObjects())
+			animObject.xml(sb, prefix + "\t");
+		sb.append(prefix).append("</choreography>\n");
+		return sb;
+	}
 /* MutableTreeNode interface implementation */
 	
 	public void insert(MutableTreeNode child, int index) {

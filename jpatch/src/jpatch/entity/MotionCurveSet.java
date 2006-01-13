@@ -196,8 +196,8 @@ public class MotionCurveSet {
 //			}
 			for (Iterator it = map.keySet().iterator(); it.hasNext(); ) {
 				Object key = it.next();
-				sb.append("  " + key + "\n");
-				((MotionCurve2.Float) map.get(key)).xml(sb, prefix, "type=\"morph\" morph=\"" + m++ + "\"");
+				MotionCurve2.Float mc = (MotionCurve2.Float) map.get(key);
+				mc.xml(sb, prefix, "type=\"avar\" id=\"" + mc.getName() + "\"");
 			}
 		}
 		

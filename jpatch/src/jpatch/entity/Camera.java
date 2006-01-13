@@ -209,6 +209,13 @@ public class Camera extends AnimObject {
 		return cameraModel;
 	}
 	
+	public void xml(StringBuffer sb, String prefix) {
+		sb.append(prefix).append("<camera>\n");
+		sb.append(prefix).append("\t<name>" + getName() + "</name>\n");
+		MainFrame.getInstance().getAnimation().getCurvesetFor(this).xml(sb, prefix + "\t");
+		sb.append(prefix).append("</camera>").append("\n");
+	}
+	
 	public void removeFromParent() {
 		MainFrame.getInstance().getAnimation().removeCamera(this);
 	}
