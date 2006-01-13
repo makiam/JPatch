@@ -12,6 +12,7 @@ import javax.vecmath.*;
 
 public class AnimModel extends AnimObject {
 	private boolean bParent = false;
+	private String strFileName;
 	
 	protected RenderExtension re = new RenderExtension(new String[] {
 		"povray", "",
@@ -22,17 +23,18 @@ public class AnimModel extends AnimObject {
 	
 	public AnimModel() { }
 	
-	public AnimModel(Model model) {
+	public AnimModel(Model model, String filename) {
 		strName = model.getName();
+		strFileName = filename;
 		this.model = model;
 		model.setAnimModel(this);
 	}
 	
-	public AnimModel(String name, Model model) {
-		strName = name;
-		this.model = model;
-		model.setAnimModel(this);
-	}
+//	public AnimModel(String name, Model model) {
+//		strName = name;
+//		this.model = model;
+//		model.setAnimModel(this);
+//	}
 	
 	public Model getModel() {
 		return model;
@@ -68,6 +70,17 @@ public class AnimModel extends AnimObject {
 	
 	public StringBuffer renderStrings(String prefix) {
 		return re.xml(prefix);
+	}
+	
+	public void xml(StringBuffer sb, String prefix) {
+		sb.append(prefix).append("<model>\n");
+		sb.append(prefix).append("\t<name>" + getName() + "</name>\n");
+		sb.append(prefix).append("\t<filename>" + strFileName + "</filename>\n");
+		if (iSubdivisionOffset != 0)
+			sb.append("\t\t<subdivisionoffset>" + iSubdivisionOffset + "</subdivisionoffset>").append("\n");
+		sb.append(prefix).append(renderStrings("\t")).append("\n");
+		MainFrame.getInstance().getAnimation().getCurvesetFor(this).xml(sb, prefix + "\t");
+		sb.append(prefix).append("</model>").append("\n");
 	}
 	
 	public void removeFromParent() {

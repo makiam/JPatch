@@ -95,6 +95,9 @@
 			</menu>
 			<item command="phoneme morph mapping"/>
 		</menu>
+		<menu name="Window">
+			<item command="show anim controls"/>
+		</menu>
 		<menu name="Debug">
 			<item command="dump"/>
 			<item command="dump xml"/>
