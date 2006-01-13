@@ -207,6 +207,10 @@ public abstract class MotionCurve2 {
 		this.interpolationMethod = interpolationMethod;
 	}
 	
+	public void clear() {
+		list.clear();
+	}
+	
 	int binarySearch(float position) {
 		if (list.size() == 0) return 0;
 		if (position < ((MotionKey2) list.get(0)).getPosition()) return 0;

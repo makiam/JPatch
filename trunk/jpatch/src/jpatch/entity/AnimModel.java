@@ -52,6 +52,10 @@ public class AnimModel extends AnimObject {
 		strName = name;
 	}
 	
+	public void setFilename(String filename) {
+		strFileName = filename;
+	}
+	
 	public void setSubdivisionOffset(int offset) {
 		iSubdivisionOffset = offset;
 	}

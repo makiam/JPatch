@@ -22,7 +22,7 @@ public class ChangeViewMouseListener extends MouseAdapter {
 	public static final int ZOOM = 2;
 	public static final int ROTATE = 3;
 	
-	private float fCameraScale;
+	private float fFocalLength;
 	private Quat4f q4CameraOrient = new Quat4f();
 	
 	protected int iButton;
@@ -64,7 +64,7 @@ public class ChangeViewMouseListener extends MouseAdapter {
 			((Component)mouseEvent.getSource()).addMouseMotionListener(mouseMotionListener);
 			ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 			if (viewDef.getCamera() != null) {
-				fCameraScale = viewDef.getCamera().getScale();
+				fFocalLength = viewDef.getCamera().getFocalLength();
 				q4CameraOrient.set(viewDef.getCamera().getOrientation());
 			}
 		} else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
@@ -83,15 +83,16 @@ public class ChangeViewMouseListener extends MouseAdapter {
 				Camera camera = viewDef.getCamera();
 				ModifyAnimObject edit = new ModifyAnimObject(camera);
 				Quat4f newOrientation = camera.getOrientation();
-				float newScale = camera.getScale();
+				float newFocalLength = camera.getFocalLength();
 				camera.setOrientation(q4CameraOrient);
-				camera.setScale(fCameraScale);
-				MotionCurveSet mcs = MainFrame.getInstance().getAnimation().getCurvesetFor(camera);
+				camera.setFocalLength(fFocalLength);
+				MotionCurveSet.Camera mcs = (MotionCurveSet.Camera) MainFrame.getInstance().getAnimation().getCurvesetFor(camera);
 				float position = MainFrame.getInstance().getAnimation().getPosition();
 				if (!newOrientation.equals(q4CameraOrient))
 					edit.addEdit(new AtomicModifyMotionCurve.Quat4f(mcs.orientation, position, newOrientation));
-				if (newScale != fCameraScale) {
-					edit.addEdit(new AtomicChangeAnimObjectScale(camera, newScale));
+				if (newFocalLength != fFocalLength) {
+					edit.addEdit(new AtomicModifyMotionCurve.Float(mcs.focalLength, position, newFocalLength));
+//					edit.addEdit(new AtomicChangeAnimObjectScale(camera, newScale));
 				}
 				mcs.setPosition(position);
 				MainFrame.getInstance().getUndoManager().addEdit(edit);

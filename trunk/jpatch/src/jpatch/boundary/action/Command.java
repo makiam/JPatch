@@ -179,6 +179,7 @@ public final class Command implements KeyListener {
 		 */
 		
 		// File
+		put("open animation",			new ImportJPatchAnimationAction(),	new JMenuItem());
 		put("append",					new ImportJPatchAction(false),		new JMenuItem());
 		put("save as",					new SaveAsAction(true),				new JMenuItem());
 		put("import spatch",			new ImportSPatchAction(),			new JMenuItem());

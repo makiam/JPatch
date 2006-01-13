@@ -454,8 +454,8 @@ public final class MainFrame extends JFrame {
 		}
 		Command.getInstance().enableCommand("open", true);
 		Command.getInstance().enableCommand("append", true);
-		Command.getInstance().enableCommand("save", true);
-		Command.getInstance().enableCommand("save as", true);
+//		Command.getInstance().enableCommand("save", true);
+//		Command.getInstance().enableCommand("save as", true);
 		
 		Command.getInstance().enableCommand("add curve segment", true);
 		Command.getInstance().enableCommand("add bone", true);
@@ -497,8 +497,8 @@ public final class MainFrame extends JFrame {
 		vcrDialog.setVisible(true);
 		Command.getInstance().enableCommand("open", false);
 		Command.getInstance().enableCommand("append", false);
-		Command.getInstance().enableCommand("save", false);
-		Command.getInstance().enableCommand("save as", false);
+//		Command.getInstance().enableCommand("save", false);
+//		Command.getInstance().enableCommand("save as", false);
 		
 		Command.getInstance().enableCommand("add curve segment", false);
 		Command.getInstance().enableCommand("add bone", false);
