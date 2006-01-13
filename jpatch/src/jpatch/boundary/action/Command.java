@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.21 2006/01/13 15:10:13 sascha_l Exp $
+ * $Id: Command.java,v 1.22 2006/01/13 22:15:33 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -179,6 +179,7 @@ public final class Command implements KeyListener {
 		 */
 		
 		// File
+		put("open animation",			new ImportJPatchAnimationAction(),	new JMenuItem());
 		put("append",					new ImportJPatchAction(false),		new JMenuItem());
 		put("save as",					new SaveAsAction(true),				new JMenuItem());
 		put("import spatch",			new ImportSPatchAction(),			new JMenuItem());

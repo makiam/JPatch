@@ -1,4 +1,4 @@
-package jpatch.control;
+package jpatch.control.importer;
 
 import java.io.*;
 import javax.vecmath.*;
@@ -13,7 +13,7 @@ import jpatch.boundary.settings.Settings;
 public class AnimationImporter extends DefaultHandler {
 	
 	private static final int IDLE = 0;
-	private static final int SEQUENCE = 1;
+	private static final int CHOREOGRAPHY = 1;
 	private static final int MODEL = 2;
 	private static final int FLOAT_CURVE = 3;
 	private static final int POINT3D_CURVE = 4;
@@ -31,9 +31,12 @@ public class AnimationImporter extends DefaultHandler {
 	private MotionCurveSet motionCurveSet;
 	private String strRendererFormat;
 	
-	private Animator animation = Animator.getInstance();
+	private Animation animation;
 	
 	public void loadAnimation(String filename) {
+		MainFrame.getInstance().newAnimation();
+		animation = MainFrame.getInstance().getAnimation();
+		animation.removeCamera(animation.getCameras().get(0));
 		XMLReader xmlReader = null;
 		try {
 			xmlReader = XMLReaderFactory.createXMLReader();
@@ -56,12 +59,12 @@ public class AnimationImporter extends DefaultHandler {
 	public void startElement(String namespaceURI, String localName, String qName, Attributes attributes) {
 		switch(iState) {
 			case IDLE: {
-				if (localName.equals("sequence")) {
-					iState = SEQUENCE;
+				if (localName.equals("choreography")) {
+					iState = CHOREOGRAPHY;
 				}
 			}
 			break;
-			case SEQUENCE: {
+			case CHOREOGRAPHY: {
 				if (
 					localName.equals("name") ||
 					localName.equals("start") ||
@@ -75,7 +78,7 @@ public class AnimationImporter extends DefaultHandler {
 				}
 				else if (localName.equals("camera")) {
 					iState = CAMERA;
-					animObject = animation.getActiveCamera();;
+					animObject = new Camera("");
 					motionCurveSet = new MotionCurveSet.Camera((Camera) animObject);
 				}
 				else if (localName.equals("lightsource")) {
@@ -129,12 +132,12 @@ public class AnimationImporter extends DefaultHandler {
 	
 	public void endElement(String namespaceURI, String localName, String qName) {
 		switch(iState) {
-			case SEQUENCE: {
-				if (localName.equals("name")) animation.setName(sbChars.toString());
-				else if (localName.equals("start")) animation.setStart(Float.parseFloat(sbChars.toString()));
+			case CHOREOGRAPHY: {
+//				if (localName.equals("name")) animation.setName(sbChars.toString());
+				if (localName.equals("start")) animation.setStart(Float.parseFloat(sbChars.toString()));
 				else if (localName.equals("end")) animation.setEnd(Float.parseFloat(sbChars.toString()));
 				else if (localName.equals("framerate")) animation.setFramerate(Float.parseFloat(sbChars.toString()));
-				else if (localName.equals("prefix")) animation.setPrefix(sbChars.toString());
+//				else if (localName.equals("prefix")) animation.setPrefix(sbChars.toString());
 				else if (localName.equals("sequence")) iState = IDLE;
 				else if (localName.equals("renderer"))
 					animation.setRenderString(strRendererFormat, "", sbChars.toString());
@@ -150,12 +153,14 @@ public class AnimationImporter extends DefaultHandler {
 					Model model = new Model();
 					(new JPatchImport()).importModel(model, Settings.getInstance().export.modelDirectory.getPath() + File.separatorChar + animModelFilename);
 					((AnimModel) animObject).setModel(model);
-					motionCurveSet = new MotionCurveSet.Model((AnimModel) animObject);
+					((AnimModel) animObject).setFilename(animModelFilename);
+//					motionCurveSet = new MotionCurveSet.Model((AnimModel) animObject);
+					motionCurveSet = MotionCurveSet.createMotionCurveSetFor(animObject);
 				}
 				else if (localName.equals("model")) {
-					iState = SEQUENCE;
-					motionCurveSet.populateList();
-					animation.addObject(animObject, animModelFilename, motionCurveSet);
+					iState = CHOREOGRAPHY;
+//					motionCurveSet.populateList();
+					animation.addModel((AnimModel) animObject, motionCurveSet);
 					animObject = null;
 				}
 				else if (localName.equals("renderer"))
@@ -165,9 +170,10 @@ public class AnimationImporter extends DefaultHandler {
 			case CAMERA: {
 				if (localName.equals("name")) animObject.setName(sbChars.toString());
 				else if (localName.equals("camera")) {
-					iState = SEQUENCE;
+					iState = CHOREOGRAPHY;
 					motionCurveSet.populateList();
-					animation.setMotionCurveSetFor(animObject, motionCurveSet);
+					animation.addCamera((Camera) animObject, motionCurveSet);
+//					animation.setMotionCurveSetFor(animObject, motionCurveSet);
 					animObject = null;
 				}
 			}
@@ -175,9 +181,9 @@ public class AnimationImporter extends DefaultHandler {
 			case LIGHT: {
 				if (localName.equals("name")) animObject.setName(sbChars.toString());
 				else if (localName.equals("lightsource")) {
-					iState = SEQUENCE;
+					iState = CHOREOGRAPHY;
 					motionCurveSet.populateList();
-					animation.addObject(animObject, null, motionCurveSet);
+					animation.addLight((AnimLight) animObject, motionCurveSet);
 					animObject = null;
 				}
 				else if (localName.equals("renderer"))
@@ -200,7 +206,7 @@ public class AnimationImporter extends DefaultHandler {
 	
 	private void prepareMotioncurve(Attributes attributes) {
 		
-		final int MORPH = 1;
+		final int AVAR = 1;
 		final int ORIENTATION = 2;
 		final int SCALE = 3;
 		int type = 0;
@@ -209,8 +215,8 @@ public class AnimationImporter extends DefaultHandler {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);
 			if (localName.equals("type")) {
-				if (value.equals("morph")) {
-					type = MORPH;
+				if (value.equals("avar")) {
+					type = AVAR;
 				} else if (value.equals("position")) {
 					motionCurve = MotionCurve2.createPositionCurve();
 					motionCurveSet.position = (MotionCurve2.Point3d) motionCurve;
@@ -250,12 +256,17 @@ public class AnimationImporter extends DefaultHandler {
 						iState = FLOAT_CURVE;
 					}
 				}
-			} else if (type == MORPH && localName.equals("morph")) {
+			} else if (type == AVAR && localName.equals("id")) {
 				//FIXME
+				System.out.println("motionCurveSet = " + motionCurveSet);
+				Morph morph = ((MotionCurveSet.Model) motionCurveSet).getMorphById(value);
+				System.out.println("avar = " + morph);
+				motionCurve = ((MotionCurveSet.Model) motionCurveSet).morph(morph);
+				motionCurve.clear();
 //				MorphTarget morph = (MorphTarget) ((AnimModel) animObject).getModel().getMorphList().get(Integer.parseInt(value));
 //				motionCurve = MotionCurve2.createMorphCurve(morph);
 //				((MotionCurveSet.Model) motionCurveSet).setMorphCurve(morph, (MotionCurve2.Float) motionCurve);
-//				iState = FLOAT_CURVE;
+				iState = FLOAT_CURVE;
 			} else if (localName.equals("interpolation")) {
 				if (value.equals("linear")) motionCurve.setInterpolationMethod(MotionCurve2.LINEAR);
 				else if (value.equals("cubic")) motionCurve.setInterpolationMethod(MotionCurve2.CUBIC);

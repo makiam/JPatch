@@ -132,16 +132,20 @@ public class MotionCurveSet {
 	
 	public static class Model extends MotionCurveSet {
 		public MotionCurve2.Float scale;
-		private HashMap map = new HashMap();
+		private Map<Morph, MotionCurve2.Float> map = new HashMap<Morph, MotionCurve2.Float>();
+		private Map<String, Morph> idMap = new HashMap<String, Morph>();
 		
 		public Model(AnimModel animModel) {
 			super(animModel);
+			System.out.println("Model:");
+			animModel.getModel().dump();
 			float pos = 0; // FIXME;
 			scale = MotionCurve2.createScaleCurve(new MotionKey2.Float(pos, animModel.getScale()));
 			for (Iterator it = animModel.getModel().getMorphList().iterator(); it.hasNext(); ) {
 				Morph morph = (Morph) it.next();
 				MotionCurve2.Float morphCurve = MotionCurve2.createMorphCurve(morph, new MotionKey2.Float(pos, morph.getValue()));
 				map.put(morph, morphCurve);
+				idMap.put(morph.getId(), morph);
 			}
 			Set rootBoneSet = new HashSet();
 			for (Iterator itBone = animModel.getModel().getBoneSet().iterator(); itBone.hasNext(); ) {
@@ -153,6 +157,7 @@ public class MotionCurveSet {
 				}
 			}
 			populateList();
+			System.out.println("new motioncurveset for " + animModel + " created. map = " + map);
 		}
 		
 		public MotionCurve2.Float morph(Morph morph) {
@@ -187,6 +192,10 @@ public class MotionCurveSet {
 			if (scale.getFloatAt(pos) != ((AnimModel) animObject).getScale()) scale.setFloatAt(pos, ((AnimModel) animObject).getScale());
 		}
 		
+		public Morph getMorphById(String id) {
+			return idMap.get(id);
+		}
+		
 		public void xml(StringBuffer sb, String prefix) {
 			super.xml(sb, prefix);
 			scale.xml(sb, prefix, "type=\"scale\" subtype=\"uniform\"");
@@ -218,6 +227,10 @@ public class MotionCurveSet {
 			}
 		}
 		
+		public String toString() {
+			return map.toString();
+		}
+		
 		private void recursiveAddBoneDofs(Bone bone, Map map, float pos) {
 			System.out.println("\trecursiveAddBoneDofs bone=" + bone);
 			for (Iterator itDofs = bone.getDofs().iterator(); itDofs.hasNext(); ) {
@@ -225,6 +238,7 @@ public class MotionCurveSet {
 				System.out.println("\t\tdof=" + dof);
 				MotionCurve2.Float morphCurve = MotionCurve2.createMorphCurve(dof, new MotionKey2.Float(pos, dof.getValue()));
 				map.put(dof, morphCurve);
+				idMap.put(dof.getId(), dof);
 			}
 			for (Iterator itBones = bone.getChildBones().iterator(); itBones.hasNext(); ) {
 				recursiveAddBoneDofs((Bone) itBones.next(), map, pos);
