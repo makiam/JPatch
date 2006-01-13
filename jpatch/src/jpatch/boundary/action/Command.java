@@ -198,6 +198,9 @@ public final class Command implements KeyListener {
 		put("system lookandfeel",			new SwitchLookAndFeelAction("System", system),			new JRadioButtonMenuItem());
 		put("phoneme morph mapping", 		new EditPhonemesAction(),		new JMenuItem());
 		
+		// Window
+		put("show anim controls", 		new AnimControlsAction(),		new JMenuItem());
+		
 		// Test
 		put("dump",						new DumpAction(),					new JMenuItem());
 		put("dump xml",					new XmlDumpAction(),				new JMenuItem());

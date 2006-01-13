@@ -64,6 +64,8 @@ public final class MainFrame extends JFrame {
 	private MorphTarget editedMorph;
 	private JDialog vcrDialog;
 	private VcrControls vcrControls;
+	private MotionCurveDisplay motionCurveDisplay;
+	
 	private JMenu viewMenu;
 	
 //	private javax.swing.Timer defaultToolTimer = new javax.swing.Timer(0, new ActionListener() {
@@ -296,6 +298,7 @@ public final class MainFrame extends JFrame {
 			//jpatchScreen.setMouseListeners(new ChangeViewListener(MouseEvent.BUTTON2,ChangeViewListener.ZOOM));
 			//jpatchScreen.setMouseListeners(new ChangeViewListener(MouseEvent.BUTTON3,ChangeViewListener.MOVE));
 			setSelection(null);
+			newModel();
 			setVisible(true);
 			jpatchScreen.setTool(new DefaultTool());
 			if (!VersionInfo.release) {
@@ -464,6 +467,8 @@ public final class MainFrame extends JFrame {
 		Command.getInstance().enableCommand("round tangents", true);
 		Command.getInstance().enableCommand("lathe editor", true);
 		Command.getInstance().enableCommand("compute patches", true);
+		
+		Command.getInstance().enableCommand("show anim controls", false);
 	}
 	
 	public void newAnimation() {
@@ -479,11 +484,16 @@ public final class MainFrame extends JFrame {
 		vcrControls = new VcrControls();
 		vcrDialog = new JDialog(this, false);
 		vcrDialog.setTitle("JPatch Animation Controls");
-		vcrDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-		vcrDialog.setResizable(false);
-		vcrDialog.add(vcrControls);
-		vcrDialog.pack();
-		vcrDialog.setAlwaysOnTop(true);
+		vcrDialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+		vcrDialog.setLayout(new BorderLayout());
+		JPanel panel = new JPanel();
+		panel.add(vcrControls);
+		vcrDialog.add(panel, BorderLayout.SOUTH);
+		SmartScrollPane smartScrollPane = new SmartScrollPane();
+		motionCurveDisplay = new MotionCurveDisplay(smartScrollPane);
+		smartScrollPane.setVirtualCanvas(motionCurveDisplay);
+		vcrDialog.add(smartScrollPane, BorderLayout.CENTER);
+		vcrDialog.setSize(800, 600);
 		vcrDialog.setVisible(true);
 		Command.getInstance().enableCommand("open", false);
 		Command.getInstance().enableCommand("append", false);
@@ -500,7 +510,14 @@ public final class MainFrame extends JFrame {
 		Command.getInstance().enableCommand("round tangents", false);
 		Command.getInstance().enableCommand("lathe editor", false);
 		Command.getInstance().enableCommand("compute patches", false);
+		
+		Command.getInstance().enableCommand("show anim controls", true);
 //		jpatchScreen.getActiveViewport().getViewDefinition().setCamera(animation.getCameras().get(0));
+	}
+	
+	public void showAnimControls() {
+		if (vcrDialog != null)
+			vcrDialog.setVisible(true);
 	}
 	
 	public static MainFrame getInstance() {

@@ -14,17 +14,18 @@ public class MotionCurveDisplay extends VirtualCanvas {
 	}
 	
 	public void init() {
-		width = viewWidth = Animator.getInstance().getEnd() - Animator.getInstance().getStart() + 1;
-		animObject = Animator.getInstance().getActiveObject();
+		width = viewWidth = MainFrame.getInstance().getAnimation().getEnd() - MainFrame.getInstance().getAnimation().getStart() + 1;
+		if (MainFrame.getInstance().getSelection() != null && MainFrame.getInstance().getSelection().getHotObject() instanceof AnimObject)
+			animObject = (AnimObject) MainFrame.getInstance().getSelection().getHotObject();
 		height = viewHeight = 1;
 		if (animObject != null) {
-			MotionCurveSet motionCurveSet = Animator.getInstance().getMotionCurveSetFor(animObject);
+			MotionCurveSet motionCurveSet = MainFrame.getInstance().getAnimation().getCurvesetFor(animObject);
 			height = motionCurveSet.motionCurveList.size();
 			viewHeight = Math.min(3, height);
 		}
 		//if (animObject != null && animObject instanceof AnimModel) height = viewHeight = ((AnimModel) animObject).getModel().getMorphList().size();
 		top = viewTop = 0;
-		left = viewLeft = Animator.getInstance().getStart() - 0.5f;
+		left = viewLeft = MainFrame.getInstance().getAnimation().getStart() - 0.5f;
 	}
 	
 	public void paint(Graphics g) {
@@ -35,7 +36,7 @@ public class MotionCurveDisplay extends VirtualCanvas {
 		g.fillRect(0, 0, pixelWidth, pixelHeight);
 		g.setColor(Color.WHITE);
 		
-		float pos = Animator.getInstance().getPosition();
+		float pos = MainFrame.getInstance().getAnimation().getPosition();
 		
 		//MotionCurve.RotationCurve mrc = Animator.getInstance().tempCamCurve;
 		//for (int i = 0; i < 50000; i+= 500) {
@@ -103,7 +104,7 @@ public class MotionCurveDisplay extends VirtualCanvas {
 		//		g.drawString("Camera", 4, yy + 3 * h - 8);
 		//		y++;
 		//	}
-		MotionCurveSet motionCurveSet = Animator.getInstance().getMotionCurveSetFor(animObject);
+		MotionCurveSet motionCurveSet = MainFrame.getInstance().getAnimation().getCurvesetFor(animObject);
 		
 		float y = top;
 		if (motionCurveSet != null) {
@@ -112,8 +113,10 @@ public class MotionCurveDisplay extends VirtualCanvas {
 				int yy = (int) (pixelHeight * ((y - viewTop) / viewHeight) + (double) pixelHeight / viewHeight * 0.05);
 				int h = (int) ((double) pixelHeight / viewHeight * 0.9);
 				if (yy > -h && yy < pixelHeight + h) {
-					if (motionCurve == Animator.getInstance().getActiveCurve()) g.setColor(new Color(0x007700));
-					else g.setColor(new Color(0x0000cc));
+					if (false)
+						g.setColor(new Color(0x007700));
+					else
+						g.setColor(new Color(0x0000cc));
 					g.fillRect(0, yy, pixelWidth, h);
 				}
 				y++;
@@ -133,7 +136,7 @@ public class MotionCurveDisplay extends VirtualCanvas {
 		}
 		
 		y = top;
-		MotionKey2 selectedKey = Animator.getInstance().getActiveKey();
+		MotionKey2 selectedKey = null;//Animator.getInstance().getActiveKey();
 		if (motionCurveSet != null) {
 			for (int c = 0, nc = motionCurveSet.motionCurveList.size(); c < nc; c++) {
 				MotionCurve2 motionCurve = (MotionCurve2) motionCurveSet.motionCurveList.get(c);
@@ -145,7 +148,7 @@ public class MotionCurveDisplay extends VirtualCanvas {
 					
 					
 					if (motionCurve instanceof MotionCurve2.Float) {
-						if (motionCurve == Animator.getInstance().getActiveCurve()) g.setColor(new Color(0x33cc33));
+						if (false) g.setColor(new Color(0x33cc33));
 						else g.setColor(new Color(0x7777ff));
 						for (int x = 0; x < pixelWidth; x++) {
 							float t = viewLeft + (float) x * viewWidth / (float) pixelWidth;
@@ -303,17 +306,17 @@ public class MotionCurveDisplay extends VirtualCanvas {
 		//Animator.getInstance().setPosition(t);
 		//parent.repaint();
 		////System.out.println(MotionCurve.MotionKey.positionString(t));
-		Animator.getInstance().stop();
+		//Animator.getInstance().stop();
 		
 		if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
-			MotionCurveSet motionCurveSet = Animator.getInstance().getMotionCurveSetFor(animObject);
+			MotionCurveSet motionCurveSet = MainFrame.getInstance().getAnimation().getCurvesetFor(animObject);
 			
 			int pixelHeight = parent.getCanvasHeight();
 			int pixelWidth = parent.getCanvasWidth();
 			float t = Math.round(viewLeft + (float) mouseEvent.getX() * viewWidth / (float) parent.getCanvasWidth());
 			
-			Animator.getInstance().setActiveKey(null);
-			Animator.getInstance().setActiveCurve(null);
+//			Animator.getInstance().setActiveKey(null);
+//			Animator.getInstance().setActiveCurve(null);
 			float y = top;
 			loop:
 			if (motionCurveSet != null) {
@@ -337,21 +340,21 @@ public class MotionCurveDisplay extends VirtualCanvas {
 							
 							if (mouseEvent.getX() > x - 6 && mouseEvent.getX() < x + 6 && mouseEvent.getY() > ym - 6 && mouseEvent.getY() < ym + 6) {
 								t = mk.getPosition();
-								Animator.getInstance().setActiveKey(mk);
-								Animator.getInstance().setActiveCurve(motionCurve);
+//								Animator.getInstance().setActiveKey(mk);
+//								Animator.getInstance().setActiveCurve(motionCurve);
 								break loop;
 							}
 						}
-						if (mouseEvent.getY() >= yy && mouseEvent.getY() <= yy + h) Animator.getInstance().setActiveCurve(motionCurve);
+//						if (mouseEvent.getY() >= yy && mouseEvent.getY() <= yy + h) Animator.getInstance().setActiveCurve(motionCurve);
 					}
 					y++;
 				}
 				
 			}
-			Animator.getInstance().setPosition(t);
+//			Animator.getInstance().setPosition(t);
 		}
 		else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
-			MotionCurveSet motionCurveSet = Animator.getInstance().getMotionCurveSetFor(animObject);
+			MotionCurveSet motionCurveSet = MainFrame.getInstance().getAnimation().getCurvesetFor(animObject);
 			int pixelHeight = parent.getCanvasHeight();
 			float y = top;
 			if (motionCurveSet != null) {

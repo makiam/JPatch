@@ -31,6 +31,10 @@ public class Morph implements MutableTreeNode {
 		return strName;
 	}
 	
+	public String getId() {
+		return strName;
+	}
+	
 	public Model getModel() {
 		return model;
 	}
