@@ -68,6 +68,7 @@
 			<item command="new animation"/>
 			<item command="open"/>
 			<item command="append"/>
+			<item command="open animation"/>
 			<item command="save"/>
 			<item command="save as"/>
 			<separator/>
