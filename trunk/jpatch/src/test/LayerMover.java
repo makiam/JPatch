@@ -16,8 +16,8 @@ import java.text.*;
 import javax.imageio.*;
 import javax.swing.*;
 
-import jpatch.entity.MotionCurve2;
-import jpatch.entity.MotionKey2;
+import jpatch.entity.MotionCurve;
+import jpatch.entity.MotionKey;
 
 public class LayerMover {
 	private int width = 384;
@@ -61,12 +61,12 @@ public class LayerMover {
 		int[] green = new int[img.length];
 		int[] blue = new int[img.length];
 		double theta;
-		MotionCurve2.Float mc = MotionCurve2.createSizeCurve();
-		mc.addKey(new MotionKey2.Float(200 * blur, (float) Math.PI));
-		mc.addKey(new MotionKey2.Float(240 * blur, -10.0f / 180.0f * (float) Math.PI));
-		mc.addKey(new MotionKey2.Float(248 * blur, -10.0f / 180.0f * (float) Math.PI));
-		mc.addKey(new MotionKey2.Float(258 * blur, 5.0f / 180.0f * (float) Math.PI));
-		mc.addKey(new MotionKey2.Float(264 * blur, 0));
+		MotionCurve.Float mc = MotionCurve.createSizeCurve();
+		mc.addKey(new MotionKey.Float(200 * blur, (float) Math.PI));
+		mc.addKey(new MotionKey.Float(240 * blur, -10.0f / 180.0f * (float) Math.PI));
+		mc.addKey(new MotionKey.Float(248 * blur, -10.0f / 180.0f * (float) Math.PI));
+		mc.addKey(new MotionKey.Float(258 * blur, 5.0f / 180.0f * (float) Math.PI));
+		mc.addKey(new MotionKey.Float(264 * blur, 0));
 		
 		for (int i = 0 * blur; i < 350 * blur; i++) {
 			float s = 1.0f / blur;

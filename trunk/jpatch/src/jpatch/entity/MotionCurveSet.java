@@ -6,8 +6,8 @@ import java.util.*;
 
 public class MotionCurveSet {
 	public List motionCurveList = new ArrayList();
-	public MotionCurve2.Point3d position;
-	public MotionCurve2.Quat4f orientation;
+	public MotionCurve.Point3d position;
+	public MotionCurve.Quat4f orientation;
 	AnimObject animObject;
 	
 	public static MotionCurveSet createMotionCurveSetFor(AnimObject animObject) {
@@ -26,8 +26,8 @@ public class MotionCurveSet {
 	private MotionCurveSet(AnimObject animObject) {
 		this.animObject = animObject;
 		float pos = 0; // FIXME;
-		position = MotionCurve2.createPositionCurve(new MotionKey2.Point3d(pos, animObject.getPositionDouble()));
-		orientation = MotionCurve2.createOrientationCurve(new MotionKey2.Quat4f(pos, animObject.getOrientation()));
+		position = MotionCurve.createPositionCurve(new MotionKey.Point3d(pos, animObject.getPositionDouble()));
+		orientation = MotionCurve.createOrientationCurve(new MotionKey.Quat4f(pos, animObject.getOrientation()));
 		//MotionCurveSet.this.populateList();
 	}
 	
@@ -53,12 +53,12 @@ public class MotionCurveSet {
 	}
 	
 	public static class Camera extends MotionCurveSet {
-		public MotionCurve2.Float focalLength;
+		public MotionCurve.Float focalLength;
 		
 		public Camera(jpatch.entity.Camera camera) {
 			super(camera);
 			float pos = 0; // FIXME;
-			focalLength = MotionCurve2.createFocalLengthCurve(new MotionKey2.Float(pos, camera.getFocalLength()));
+			focalLength = MotionCurve.createFocalLengthCurve(new MotionKey.Float(pos, camera.getFocalLength()));
 			populateList();
 		}
 		
@@ -84,16 +84,16 @@ public class MotionCurveSet {
 	}
 	
 	public static class Light extends MotionCurveSet {
-		public MotionCurve2.Float size;
-		public MotionCurve2.Float intensity;
-		public MotionCurve2.Color3f color;
+		public MotionCurve.Float size;
+		public MotionCurve.Float intensity;
+		public MotionCurve.Color3f color;
 		
 		public Light(AnimLight light) {
 			super(light);
 			float pos = 0; // FIXME;
-			size = MotionCurve2.createSizeCurve(new MotionKey2.Float(pos, light.getSize()));
-			intensity = MotionCurve2.createIntensityCurve(new MotionKey2.Float(pos, light.getIntensity()));
-			color = MotionCurve2.createColorCurve(new MotionKey2.Color3f(pos, light.getColor()));
+			size = MotionCurve.createSizeCurve(new MotionKey.Float(pos, light.getSize()));
+			intensity = MotionCurve.createIntensityCurve(new MotionKey.Float(pos, light.getIntensity()));
+			color = MotionCurve.createColorCurve(new MotionKey.Color3f(pos, light.getColor()));
 			populateList();
 		}
 		
@@ -131,8 +131,8 @@ public class MotionCurveSet {
 	}
 	
 	public static class Model extends MotionCurveSet {
-		public MotionCurve2.Float scale;
-		private Map<Morph, MotionCurve2.Float> map = new HashMap<Morph, MotionCurve2.Float>();
+		public MotionCurve.Float scale;
+		private Map<Morph, MotionCurve.Float> map = new HashMap<Morph, MotionCurve.Float>();
 		private Map<String, Morph> idMap = new HashMap<String, Morph>();
 		
 		public Model(AnimModel animModel) {
@@ -140,10 +140,10 @@ public class MotionCurveSet {
 			System.out.println("Model:");
 			animModel.getModel().dump();
 			float pos = 0; // FIXME;
-			scale = MotionCurve2.createScaleCurve(new MotionKey2.Float(pos, animModel.getScale()));
+			scale = MotionCurve.createScaleCurve(new MotionKey.Float(pos, animModel.getScale()));
 			for (Iterator it = animModel.getModel().getMorphList().iterator(); it.hasNext(); ) {
 				Morph morph = (Morph) it.next();
-				MotionCurve2.Float morphCurve = MotionCurve2.createMorphCurve(morph, new MotionKey2.Float(pos, morph.getValue()));
+				MotionCurve.Float morphCurve = MotionCurve.createMorphCurve(morph, new MotionKey.Float(pos, morph.getValue()));
 				map.put(morph, morphCurve);
 				idMap.put(morph.getId(), morph);
 			}
@@ -160,11 +160,11 @@ public class MotionCurveSet {
 			System.out.println("new motioncurveset for " + animModel + " created. map = " + map);
 		}
 		
-		public MotionCurve2.Float morph(Morph morph) {
-			return (MotionCurve2.Float) map.get(morph);
+		public MotionCurve.Float morph(Morph morph) {
+			return (MotionCurve.Float) map.get(morph);
 		}
 		
-		public void setMorphCurve(Morph morph, MotionCurve2.Float curve) {
+		public void setMorphCurve(Morph morph, MotionCurve.Float curve) {
 			map.put(morph, curve);
 		}
 		
@@ -205,7 +205,7 @@ public class MotionCurveSet {
 //			}
 			for (Iterator it = map.keySet().iterator(); it.hasNext(); ) {
 				Object key = it.next();
-				MotionCurve2.Float mc = (MotionCurve2.Float) map.get(key);
+				MotionCurve.Float mc = (MotionCurve.Float) map.get(key);
 				mc.xml(sb, prefix, "type=\"avar\" id=\"" + mc.getName() + "\"");
 			}
 		}
@@ -236,7 +236,7 @@ public class MotionCurveSet {
 			for (Iterator itDofs = bone.getDofs().iterator(); itDofs.hasNext(); ) {
 				RotationDof dof = (RotationDof) itDofs.next();
 				System.out.println("\t\tdof=" + dof);
-				MotionCurve2.Float morphCurve = MotionCurve2.createMorphCurve(dof, new MotionKey2.Float(pos, dof.getValue()));
+				MotionCurve.Float morphCurve = MotionCurve.createMorphCurve(dof, new MotionKey.Float(pos, dof.getValue()));
 				map.put(dof, morphCurve);
 				idMap.put(dof.getId(), dof);
 			}
