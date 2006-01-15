@@ -3,7 +3,7 @@ package jpatch.entity;
 import java.util.*;
 import jpatch.auxilary.*;
 
-public abstract class MotionCurve2 {
+public abstract class MotionCurve {
 	
 	public final static InterpolationMethod LINEAR = new InterpolationMethod("linear");
 	public final static InterpolationMethod CUBIC = new InterpolationMethod("cubic");
@@ -12,108 +12,108 @@ public abstract class MotionCurve2 {
 	String name = "*";
 	ArrayList list = new ArrayList();
 
-	public static MotionCurve2.Float createMorphCurve(Morph morph) {
-		MotionCurve2.Float mc = new MotionCurve2.Float();
+	public static MotionCurve.Float createMorphCurve(Morph morph) {
+		MotionCurve.Float mc = new MotionCurve.Float();
 		mc.name = morph.getId();
 		mc.fMin = morph.getMin();
 		mc.fMax = morph.getMax();
 		return mc;
 	}
 	
-	public static MotionCurve2.Float createMorphCurve(Morph morph, MotionKey2.Float key) {
-		MotionCurve2.Float mc = createMorphCurve(morph);
+	public static MotionCurve.Float createMorphCurve(Morph morph, MotionKey.Float key) {
+		MotionCurve.Float mc = createMorphCurve(morph);
 		mc.addKey(key);
 		return mc;
 	}
 	
-	public static MotionCurve2.Float createScaleCurve() {
-		MotionCurve2.Float mc = new MotionCurve2.Float();
+	public static MotionCurve.Float createScaleCurve() {
+		MotionCurve.Float mc = new MotionCurve.Float();
 		mc.name = "Scale";
 		mc.fMin = -10;
 		mc.fMax = 10;
 		return mc;
 	}
 	
-	public static MotionCurve2.Float createScaleCurve(MotionKey2.Float key) {
-		MotionCurve2.Float mc = createScaleCurve();
+	public static MotionCurve.Float createScaleCurve(MotionKey.Float key) {
+		MotionCurve.Float mc = createScaleCurve();
 		mc.addKey(key);
 		return mc;
 	}
 		
-	public static MotionCurve2.Float createSizeCurve() {
-		MotionCurve2.Float mc = new MotionCurve2.Float();
+	public static MotionCurve.Float createSizeCurve() {
+		MotionCurve.Float mc = new MotionCurve.Float();
 		mc.name = "Size";
 		mc.fMin = 0;
 		mc.fMax = 100;
 		return mc;
 	}
 	
-	public static MotionCurve2.Float createSizeCurve(MotionKey2.Float key) {
-		MotionCurve2.Float mc = createSizeCurve();
+	public static MotionCurve.Float createSizeCurve(MotionKey.Float key) {
+		MotionCurve.Float mc = createSizeCurve();
 		mc.addKey(key);
 		return mc;
 	}
 	
-	public static MotionCurve2.Float createIntensityCurve() {
-		MotionCurve2.Float mc = new MotionCurve2.Float();
+	public static MotionCurve.Float createIntensityCurve() {
+		MotionCurve.Float mc = new MotionCurve.Float();
 		mc.name = "Intensity";
 		mc.fMin = 0;
 		mc.fMax = 100;
 		return mc;
 	}
 	
-	public static MotionCurve2.Float createIntensityCurve(MotionKey2.Float key) {
-		MotionCurve2.Float mc = createIntensityCurve();
+	public static MotionCurve.Float createIntensityCurve(MotionKey.Float key) {
+		MotionCurve.Float mc = createIntensityCurve();
 		mc.addKey(key);
 		return mc;
 	}
 	
-	public static MotionCurve2.Float createFocalLengthCurve() {
-		MotionCurve2.Float mc = new MotionCurve2.Float();
+	public static MotionCurve.Float createFocalLengthCurve() {
+		MotionCurve.Float mc = new MotionCurve.Float();
 		mc.name = "Focal length";
 		mc.fMin = 20;
 		mc.fMax = 500;
 		return mc;
 	}
 	
-	public static MotionCurve2.Float createFocalLengthCurve(MotionKey2.Float key) {
-		MotionCurve2.Float mc = createFocalLengthCurve();
+	public static MotionCurve.Float createFocalLengthCurve(MotionKey.Float key) {
+		MotionCurve.Float mc = createFocalLengthCurve();
 		mc.addKey(key);
 		return mc;
 	}
 	
-	public static MotionCurve2.Point3d createPositionCurve() {
-		MotionCurve2.Point3d mc = new MotionCurve2.Point3d();
+	public static MotionCurve.Point3d createPositionCurve() {
+		MotionCurve.Point3d mc = new MotionCurve.Point3d();
 		mc.name = "Position";
 		return mc;
 	}
 	
-	public static MotionCurve2.Point3d createPositionCurve(MotionKey2.Point3d key) {
-		MotionCurve2.Point3d mc = createPositionCurve();
+	public static MotionCurve.Point3d createPositionCurve(MotionKey.Point3d key) {
+		MotionCurve.Point3d mc = createPositionCurve();
 		mc.addKey(key);
 		return mc;
 	}
 	
-	public static MotionCurve2.Color3f createColorCurve() {
-		MotionCurve2.Color3f mc = new MotionCurve2.Color3f();
+	public static MotionCurve.Color3f createColorCurve() {
+		MotionCurve.Color3f mc = new MotionCurve.Color3f();
 		mc.name = "Color";
 		return mc;
 	}
 	
-	public static MotionCurve2.Color3f createColorCurve(MotionKey2.Color3f key) {
-		MotionCurve2.Color3f mc = createColorCurve();
+	public static MotionCurve.Color3f createColorCurve(MotionKey.Color3f key) {
+		MotionCurve.Color3f mc = createColorCurve();
 		mc.addKey(key);
 		return mc;
 	}
 	
-	public static MotionCurve2.Quat4f createOrientationCurve() {
-		MotionCurve2.Quat4f mc = new MotionCurve2.Quat4f();
+	public static MotionCurve.Quat4f createOrientationCurve() {
+		MotionCurve.Quat4f mc = new MotionCurve.Quat4f();
 		mc.name = "Orientation";
 		return mc;
 	}
 	
-	public static MotionCurve2.Quat4f createOrientationCurve(MotionKey2.Quat4f key) {
-		MotionCurve2.Quat4f mc = createOrientationCurve();
+	public static MotionCurve.Quat4f createOrientationCurve(MotionKey.Quat4f key) {
+		MotionCurve.Quat4f mc = createOrientationCurve();
 		mc.addKey(key);
 		return mc;
 	}
@@ -127,17 +127,17 @@ public abstract class MotionCurve2 {
 		return name;
 	}
 	
-	public void addKey(MotionKey2 key) {
+	public void addKey(MotionKey key) {
 		list.add(binarySearch(key.getPosition()), key);
 	}
 	
-	public abstract MotionKey2 insertKeyAt(float position);
+	public abstract MotionKey insertKeyAt(float position);
 	
-	public void removeKey(MotionKey2 key) {
+	public void removeKey(MotionKey key) {
 		if (list.size() > 1) list.remove(key);
 	}
 	
-	public void moveKey(MotionKey2 key, float position) {
+	public void moveKey(MotionKey key, float position) {
 		list.remove(key);
 		list.add(binarySearch(key.getPosition()), key);
 	}
@@ -146,23 +146,23 @@ public abstract class MotionCurve2 {
 		return list.size();
 	}
 	
-	public MotionKey2 getKey(int number) {
-		return (MotionKey2) list.get(number);
+	public MotionKey getKey(int number) {
+		return (MotionKey) list.get(number);
 	}
 	
 	public float getStart() {
-		return ((MotionKey2) list.get(0)).getPosition();
+		return ((MotionKey) list.get(0)).getPosition();
 	}
 	
 	public float getEnd() {
-		return ((MotionKey2) list.get(list.size() - 1)).getPosition();
+		return ((MotionKey) list.get(list.size() - 1)).getPosition();
 	}
 	
-	public MotionKey2 getKeyAt(float position) {
-		if (position == ((MotionKey2) list.get(list.size() - 1)).getPosition()) return (MotionKey2) list.get(list.size() - 1);
+	public MotionKey getKeyAt(float position) {
+		if (position == ((MotionKey) list.get(list.size() - 1)).getPosition()) return (MotionKey) list.get(list.size() - 1);
 		int index = binarySearch(position) - 1;
 		if (index >= 0) {
-			MotionKey2 mk = (MotionKey2) list.get(index);
+			MotionKey mk = (MotionKey) list.get(index);
 			if (mk != null && mk.getPosition() == position) return mk;
 			else return null;
 		} else return null;
@@ -176,27 +176,27 @@ public abstract class MotionCurve2 {
 		sb.append(prefix).append("</motioncurve>").append("\n");
 	}
 	
-	public MotionKey2 getPrevKey(float position) {
+	public MotionKey getPrevKey(float position) {
 		int index = binarySearch(position) - 1;
 		if (index >= 0) {
-			MotionKey2 key = (MotionKey2) list.get(index);
+			MotionKey key = (MotionKey) list.get(index);
 			if (key.getPosition() < position) return key;
 			else if (index == 0) return key;
-			else return (MotionKey2) list.get(index - 1);
+			else return (MotionKey) list.get(index - 1);
 		}
-		return (MotionKey2) list.get(0);
+		return (MotionKey) list.get(0);
 	}
 	
 
-	public MotionKey2 getNextKey(float position) {
+	public MotionKey getNextKey(float position) {
 		int index = binarySearch(position) - 1;
 		if (index < list.size() && index >= 0) {
-			MotionKey2 key = (MotionKey2) list.get(index);
+			MotionKey key = (MotionKey) list.get(index);
 			if (key.getPosition() > position) return key;
 			else if (index == list.size() - 1) return key;
-			else return (MotionKey2) list.get(index + 1);
+			else return (MotionKey) list.get(index + 1);
 		}
-		return (MotionKey2) list.get(list.size() - 1);
+		return (MotionKey) list.get(list.size() - 1);
 	}
 	
 	public InterpolationMethod getInterpolationMethod() {
@@ -213,13 +213,13 @@ public abstract class MotionCurve2 {
 	
 	int binarySearch(float position) {
 		if (list.size() == 0) return 0;
-		if (position < ((MotionKey2) list.get(0)).getPosition()) return 0;
-		if (position > ((MotionKey2) list.get(list.size() - 1)).getPosition()) return list.size();
+		if (position < ((MotionKey) list.get(0)).getPosition()) return 0;
+		if (position > ((MotionKey) list.get(list.size() - 1)).getPosition()) return list.size();
 		int min = 0;
 		int max = list.size() - 1;
 		int i = max >> 1;
 		while (max > min + 1) {
-			if (((MotionKey2) list.get(i)).getPosition() > position) {
+			if (((MotionKey) list.get(i)).getPosition() > position) {
 				max = i;
 				i -= ((i - min) >> 1);
 			} else {
@@ -260,20 +260,20 @@ public abstract class MotionCurve2 {
 		return H0 * p0 + H1 * m0 + H2 * p1 + H3 * m1;
 	}
 	
-	public static class Float extends MotionCurve2 {
+	public static class Float extends MotionCurve {
 		float fMin, fMax;
 		
 		private Float() { }
 		
 		public float getFloatAt(float position) {
 			boolean limitOvershoot = true;
-			if (position <= getStart()) return ((MotionKey2.Float) list.get(0)).getFloat();
-			if (position >= getEnd()) return ((MotionKey2.Float) list.get(list.size() - 1)).getFloat();
+			if (position <= getStart()) return ((MotionKey.Float) list.get(0)).getFloat();
+			if (position >= getEnd()) return ((MotionKey.Float) list.get(list.size() - 1)).getFloat();
 			Object[] key = getInterpolationKeysFor(position);
-			MotionKey2.Float key0 = (MotionKey2.Float) key[0];
-			MotionKey2.Float key1 = (MotionKey2.Float) key[1];
-			MotionKey2.Float key2 = (MotionKey2.Float) key[2];
-			MotionKey2.Float key3 = (MotionKey2.Float) key[3];
+			MotionKey.Float key0 = (MotionKey.Float) key[0];
+			MotionKey.Float key1 = (MotionKey.Float) key[1];
+			MotionKey.Float key2 = (MotionKey.Float) key[2];
+			MotionKey.Float key3 = (MotionKey.Float) key[3];
 			float l = key2.getPosition() - key1.getPosition();
 			float t = (position - key1.getPosition()) / l;
 			float p0 = key1.getFloat();
@@ -299,17 +299,17 @@ public abstract class MotionCurve2 {
 			}
 		}
 		
-		public MotionKey2.Float setFloatAt(float position, float f) {
-			MotionKey2.Float mk = (MotionKey2.Float) getKeyAt(position);
+		public MotionKey.Float setFloatAt(float position, float f) {
+			MotionKey.Float mk = (MotionKey.Float) getKeyAt(position);
 			if (mk == null) {
-				mk = new MotionKey2.Float(position, f);
+				mk = new MotionKey.Float(position, f);
 				addKey(mk);
 			}
 			else mk.setFloat(f);
 			return mk;
 		}
 		
-		public MotionKey2 insertKeyAt(float position) {
+		public MotionKey insertKeyAt(float position) {
 			if (!(getKeyAt(position) != null)) setFloatAt(position, getFloatAt(position));
 			return getKeyAt(position);
 		}
@@ -328,18 +328,18 @@ public abstract class MotionCurve2 {
 		}
 	}
 	
-	public static class Point3d extends MotionCurve2 {
+	public static class Point3d extends MotionCurve {
 		
 		private Point3d() { }
 		
 		public javax.vecmath.Point3d getPoint3dAt(float position) {
-			if (position <= getStart()) return ((MotionKey2.Point3d) list.get(0)).getPoint3d();
-			if (position >= getEnd()) return ((MotionKey2.Point3d) list.get(list.size() - 1)).getPoint3d();
+			if (position <= getStart()) return ((MotionKey.Point3d) list.get(0)).getPoint3d();
+			if (position >= getEnd()) return ((MotionKey.Point3d) list.get(list.size() - 1)).getPoint3d();
 			Object[] key = getInterpolationKeysFor(position);
-			MotionKey2.Point3d key0 = (MotionKey2.Point3d) key[0];
-			MotionKey2.Point3d key1 = (MotionKey2.Point3d) key[1];
-			MotionKey2.Point3d key2 = (MotionKey2.Point3d) key[2];
-			MotionKey2.Point3d key3 = (MotionKey2.Point3d) key[3];
+			MotionKey.Point3d key0 = (MotionKey.Point3d) key[0];
+			MotionKey.Point3d key1 = (MotionKey.Point3d) key[1];
+			MotionKey.Point3d key2 = (MotionKey.Point3d) key[2];
+			MotionKey.Point3d key3 = (MotionKey.Point3d) key[3];
 			float l = key2.getPosition() - key1.getPosition();
 			float t = (position - key1.getPosition()) / l;
 			javax.vecmath.Point3d p0 = key1.getPoint3d();
@@ -378,34 +378,34 @@ public abstract class MotionCurve2 {
 			}
 		}
 		
-		public MotionKey2.Point3d setPoint3dAt(float position, javax.vecmath.Point3d p) {
-			MotionKey2.Point3d mk = (MotionKey2.Point3d) getKeyAt(position);
+		public MotionKey.Point3d setPoint3dAt(float position, javax.vecmath.Point3d p) {
+			MotionKey.Point3d mk = (MotionKey.Point3d) getKeyAt(position);
 			if (mk == null) {
-				mk = new MotionKey2.Point3d(position, p);
+				mk = new MotionKey.Point3d(position, p);
 				addKey(mk);
 			}
 			else mk.setPoint3d(p);
 			return mk;
 		}
 		
-		public MotionKey2 insertKeyAt(float position) {
+		public MotionKey insertKeyAt(float position) {
 			if (!(getKeyAt(position) != null)) setPoint3dAt(position, getPoint3dAt(position));
 			return getKeyAt(position);
 		}
 	}
 	
-	public static class Color3f extends MotionCurve2 {
+	public static class Color3f extends MotionCurve {
 		
 		private Color3f() { }
 		
 		public javax.vecmath.Color3f getColor3fAt(float position) {
-			if (position <= getStart()) return ((MotionKey2.Color3f) list.get(0)).getColor3f();
-			if (position >= getEnd()) return ((MotionKey2.Color3f) list.get(list.size() - 1)).getColor3f();
+			if (position <= getStart()) return ((MotionKey.Color3f) list.get(0)).getColor3f();
+			if (position >= getEnd()) return ((MotionKey.Color3f) list.get(list.size() - 1)).getColor3f();
 			Object[] key = getInterpolationKeysFor(position);
-			MotionKey2.Color3f key0 = (MotionKey2.Color3f) key[0];
-			MotionKey2.Color3f key1 = (MotionKey2.Color3f) key[1];
-			MotionKey2.Color3f key2 = (MotionKey2.Color3f) key[2];
-			MotionKey2.Color3f key3 = (MotionKey2.Color3f) key[3];
+			MotionKey.Color3f key0 = (MotionKey.Color3f) key[0];
+			MotionKey.Color3f key1 = (MotionKey.Color3f) key[1];
+			MotionKey.Color3f key2 = (MotionKey.Color3f) key[2];
+			MotionKey.Color3f key3 = (MotionKey.Color3f) key[3];
 			float l = key2.getPosition() - key1.getPosition();
 			float t = (position - key1.getPosition()) / l;
 			javax.vecmath.Color3f p0 = key1.getColor3f();
@@ -435,34 +435,34 @@ public abstract class MotionCurve2 {
 			}
 		}
 		
-		public MotionKey2.Color3f setColor3fAt(float position, javax.vecmath.Color3f c) {
-			MotionKey2.Color3f mk = (MotionKey2.Color3f) getKeyAt(position);
+		public MotionKey.Color3f setColor3fAt(float position, javax.vecmath.Color3f c) {
+			MotionKey.Color3f mk = (MotionKey.Color3f) getKeyAt(position);
 			if (mk == null) {
-				mk = new MotionKey2.Color3f(position, c);
+				mk = new MotionKey.Color3f(position, c);
 				addKey(mk);
 			}
 			else mk.setColor3f(c);
 			return mk;
 		}
 		
-		public MotionKey2 insertKeyAt(float position) {
+		public MotionKey insertKeyAt(float position) {
 			if (!(getKeyAt(position) != null)) setColor3fAt(position, getColor3fAt(position));
 			return getKeyAt(position);
 		}
 	}
 	
-	public static class Quat4f extends MotionCurve2 {
+	public static class Quat4f extends MotionCurve {
 		
 		private Quat4f() { }
 		
 		public javax.vecmath.Quat4f getQuat4fAt(float position) {
-			if (position <= getStart()) return ((MotionKey2.Quat4f) list.get(0)).getQuat4f();
-			if (position >= getEnd()) return ((MotionKey2.Quat4f) list.get(list.size() - 1)).getQuat4f();
+			if (position <= getStart()) return ((MotionKey.Quat4f) list.get(0)).getQuat4f();
+			if (position >= getEnd()) return ((MotionKey.Quat4f) list.get(list.size() - 1)).getQuat4f();
 			Object[] key = getInterpolationKeysFor(position);
-			MotionKey2.Quat4f key0 = (MotionKey2.Quat4f) key[0];
-			MotionKey2.Quat4f key1 = (MotionKey2.Quat4f) key[1];
-			MotionKey2.Quat4f key2 = (MotionKey2.Quat4f) key[2];
-			MotionKey2.Quat4f key3 = (MotionKey2.Quat4f) key[3];
+			MotionKey.Quat4f key0 = (MotionKey.Quat4f) key[0];
+			MotionKey.Quat4f key1 = (MotionKey.Quat4f) key[1];
+			MotionKey.Quat4f key2 = (MotionKey.Quat4f) key[2];
+			MotionKey.Quat4f key3 = (MotionKey.Quat4f) key[3];
 			
 			/* invert quaternions if necessary to get shortest path */
 			if (key0 != null) shortenQuaternionPath(key0.getQuat4f(), key1.getQuat4f());
@@ -504,17 +504,17 @@ public abstract class MotionCurve2 {
 			}
 		}
 		
-		public MotionKey2.Quat4f setQuat4fAt(float position, javax.vecmath.Quat4f q) {
-			MotionKey2.Quat4f mk = (MotionKey2.Quat4f) getKeyAt(position);
+		public MotionKey.Quat4f setQuat4fAt(float position, javax.vecmath.Quat4f q) {
+			MotionKey.Quat4f mk = (MotionKey.Quat4f) getKeyAt(position);
 			if (mk == null) {
-				mk = new MotionKey2.Quat4f(position, q);
+				mk = new MotionKey.Quat4f(position, q);
 				addKey(mk);
 			}
 			else mk.setQuat4f(q);
 			return mk;
 		}
 		
-		public MotionKey2 insertKeyAt(float position) {
+		public MotionKey insertKeyAt(float position) {
 			if (!(getKeyAt(position) != null)) setQuat4fAt(position, getQuat4fAt(position));
 			return getKeyAt(position);
 		}

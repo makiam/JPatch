@@ -599,9 +599,9 @@ public class MotionCurveEditor extends BorderContainer {
 		}
 		public void actionPerformed(ActionEvent e) {
 			if (iState != STOP) buttonPause.doClick();
-			MotionCurve2 curve = Animator.getInstance().getActiveCurve();
+			MotionCurve curve = Animator.getInstance().getActiveCurve();
 			if (curve != null) {
-				MotionKey2 key = curve.getPrevKey(Animator.getInstance().getPosition());
+				MotionKey key = curve.getPrevKey(Animator.getInstance().getPosition());
 				Animator.getInstance().setActiveKey(key);
 				Animator.getInstance().setPosition(key.getPosition());
 				//curve.insertKeyAt(Animator.getInstance().getPosition());
@@ -622,9 +622,9 @@ public class MotionCurveEditor extends BorderContainer {
 		}
 		public void actionPerformed(ActionEvent e) {
 			if (iState != STOP) buttonPause.doClick();
-			MotionCurve2 curve = Animator.getInstance().getActiveCurve();
+			MotionCurve curve = Animator.getInstance().getActiveCurve();
 			if (curve != null) {
-				MotionKey2 key = curve.getNextKey(Animator.getInstance().getPosition());
+				MotionKey key = curve.getNextKey(Animator.getInstance().getPosition());
 				Animator.getInstance().setActiveKey(key);
 				Animator.getInstance().setPosition(key.getPosition());
 				//curve.insertKeyAt(Animator.getInstance().getPosition());
@@ -645,9 +645,9 @@ public class MotionCurveEditor extends BorderContainer {
 		}
 		public void actionPerformed(ActionEvent e) {
 			if (iState != STOP) buttonPause.doClick();
-			MotionCurve2 curve = Animator.getInstance().getActiveCurve();
+			MotionCurve curve = Animator.getInstance().getActiveCurve();
 			if (curve != null) {
-				MotionKey2 key = curve.insertKeyAt(Animator.getInstance().getPosition());
+				MotionKey key = curve.insertKeyAt(Animator.getInstance().getPosition());
 				Animator.getInstance().setActiveKey(key);
 				smartScrollPane.repaint();
 				Animator.getInstance().rerenderViewports();
@@ -666,7 +666,7 @@ public class MotionCurveEditor extends BorderContainer {
 		}
 		public void actionPerformed(ActionEvent e) {
 			if (iState != STOP) buttonPause.doClick();
-			MotionKey2 key = Animator.getInstance().getActiveKey();
+			MotionKey key = Animator.getInstance().getActiveKey();
 			if (key != null) {
 				Animator.getInstance().getActiveCurve().removeKey(key);
 				smartScrollPane.repaint();

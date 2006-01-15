@@ -11,7 +11,7 @@ public class SmoothScrollBarUI extends MetalScrollBarUI {
     }
 
     public void paint(Graphics g, JComponent c) {
-        SmoothUtilities.configureGraphics(g);
+//        SmoothUtilities.configureGraphics(g);
         super.paint(g, c);
     }
 }

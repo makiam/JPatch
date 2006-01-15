@@ -16,11 +16,11 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 	abstract void swap();
 	
 	public static class Color3f extends AtomicModifyMotionCurve {
-		private MotionCurve2.Color3f motionCurve;
+		private MotionCurve.Color3f motionCurve;
 		private javax.vecmath.Color3f color;
 		private float position;
 		
-		public Color3f(MotionCurve2.Color3f motionCurve, float position, javax.vecmath.Color3f color) {
+		public Color3f(MotionCurve.Color3f motionCurve, float position, javax.vecmath.Color3f color) {
 			this.motionCurve = motionCurve;
 			this.position = position;
 			this.color = color;
@@ -39,11 +39,11 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 	}
 	
 	public static class Float extends AtomicModifyMotionCurve {
-		private MotionCurve2.Float motionCurve;
+		private MotionCurve.Float motionCurve;
 		private float value;
 		private float position;
 		
-		public Float(MotionCurve2.Float motionCurve, float position, float value) {
+		public Float(MotionCurve.Float motionCurve, float position, float value) {
 			this.motionCurve = motionCurve;
 			this.position = position;
 			this.value = value;
@@ -62,11 +62,11 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 	}
 	
 	public static class Point3d extends AtomicModifyMotionCurve {
-		private MotionCurve2.Point3d motionCurve;
+		private MotionCurve.Point3d motionCurve;
 		private javax.vecmath.Point3d point;
 		private float position;
 		
-		public Point3d(MotionCurve2.Point3d motionCurve, float position, javax.vecmath.Point3d point) {
+		public Point3d(MotionCurve.Point3d motionCurve, float position, javax.vecmath.Point3d point) {
 			this.motionCurve = motionCurve;
 			this.position = position;
 			this.point = point;
@@ -86,11 +86,11 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 	}
 	
 	public static class Quat4f extends AtomicModifyMotionCurve {
-		private MotionCurve2.Quat4f motionCurve;
+		private MotionCurve.Quat4f motionCurve;
 		private javax.vecmath.Quat4f quat;
 		private float position;
 		
-		public Quat4f(MotionCurve2.Quat4f motionCurve, float position, javax.vecmath.Quat4f quat) {
+		public Quat4f(MotionCurve.Quat4f motionCurve, float position, javax.vecmath.Quat4f quat) {
 			this.motionCurve = motionCurve;
 			this.position = position;
 			this.quat = quat;

@@ -1,9 +1,9 @@
 package jpatch.entity;
 
-public abstract class MotionKey2 {
+public abstract class MotionKey {
 	float fPosition;
 	
-	private MotionKey2(float position) {
+	private MotionKey(float position) {
 		fPosition = position;
 	}
 	
@@ -15,7 +15,7 @@ public abstract class MotionKey2 {
 		fPosition = position;
 	}
 	
-	public static class Float extends MotionKey2 {
+	public static class Float extends MotionKey {
 		private float f;
 		
 		public Float(float position, float f) {
@@ -36,7 +36,7 @@ public abstract class MotionKey2 {
 		}
 	}
 	
-	public static class Point3d extends MotionKey2 {
+	public static class Point3d extends MotionKey {
 		private javax.vecmath.Point3d p;
 		
 		public Point3d(float position, javax.vecmath.Point3d p) {
@@ -86,7 +86,7 @@ public abstract class MotionKey2 {
 	//	}
 	//}
 	
-	public static class Color3f extends MotionKey2 {
+	public static class Color3f extends MotionKey {
 		private javax.vecmath.Color3f c;
 		
 		public Color3f(float position, javax.vecmath.Color3f c) {
@@ -111,7 +111,7 @@ public abstract class MotionKey2 {
 		}
 	}
 	
-	public static class Quat4f extends MotionKey2 {
+	public static class Quat4f extends MotionKey {
 		private javax.vecmath.Quat4f q;
 		
 		public Quat4f(float position, javax.vecmath.Quat4f q) {

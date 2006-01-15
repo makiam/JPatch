@@ -12,7 +12,7 @@ public class SmoothPanelUI extends BasicPanelUI {
     }
 
     public void paint(Graphics g, JComponent c) {
-        SmoothUtilities.configureGraphics(g);
+//        SmoothUtilities.configureGraphics(g);
         super.paint(g, c);
     }
 }
