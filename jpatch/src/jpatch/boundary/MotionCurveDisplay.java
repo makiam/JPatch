@@ -109,7 +109,7 @@ public class MotionCurveDisplay extends VirtualCanvas {
 		float y = top;
 		if (motionCurveSet != null) {
 			for (int c = 0, nc = motionCurveSet.motionCurveList.size(); c < nc; c++) {
-				MotionCurve2 motionCurve = (MotionCurve2) motionCurveSet.motionCurveList.get(c);
+				MotionCurve motionCurve = (MotionCurve) motionCurveSet.motionCurveList.get(c);
 				int yy = (int) (pixelHeight * ((y - viewTop) / viewHeight) + (double) pixelHeight / viewHeight * 0.05);
 				int h = (int) ((double) pixelHeight / viewHeight * 0.9);
 				if (yy > -h && yy < pixelHeight + h) {
@@ -136,10 +136,10 @@ public class MotionCurveDisplay extends VirtualCanvas {
 		}
 		
 		y = top;
-		MotionKey2 selectedKey = null;//Animator.getInstance().getActiveKey();
+		MotionKey selectedKey = null;//Animator.getInstance().getActiveKey();
 		if (motionCurveSet != null) {
 			for (int c = 0, nc = motionCurveSet.motionCurveList.size(); c < nc; c++) {
-				MotionCurve2 motionCurve = (MotionCurve2) motionCurveSet.motionCurveList.get(c);
+				MotionCurve motionCurve = (MotionCurve) motionCurveSet.motionCurveList.get(c);
 				int yy = (int) (pixelHeight * ((y - viewTop) / viewHeight) + (double) pixelHeight / viewHeight * 0.05);
 				int h = (int) ((double) pixelHeight / viewHeight * 0.9);
 				
@@ -147,14 +147,14 @@ public class MotionCurveDisplay extends VirtualCanvas {
 					
 					
 					
-					if (motionCurve instanceof MotionCurve2.Float) {
+					if (motionCurve instanceof MotionCurve.Float) {
 						if (false) g.setColor(new Color(0x33cc33));
 						else g.setColor(new Color(0x7777ff));
 						for (int x = 0; x < pixelWidth; x++) {
 							float t = viewLeft + (float) x * viewWidth / (float) pixelWidth;
-							float min = ((MotionCurve2.Float) motionCurve).getMin();
-							float max = ((MotionCurve2.Float) motionCurve).getMax();
-							float value = ((MotionCurve2.Float) motionCurve).getFloatAt(t);
+							float min = ((MotionCurve.Float) motionCurve).getMin();
+							float max = ((MotionCurve.Float) motionCurve).getMax();
+							float value = ((MotionCurve.Float) motionCurve).getFloatAt(t);
 							value = clamp(value, min, max);
 							int yv = yy + (int) (h * (1.0 - ((value - min) / (max - min))));
 							int y0 = yy + (int) (h * (1.0 - ((0.0 - min) / (max - min))));
@@ -164,12 +164,12 @@ public class MotionCurveDisplay extends VirtualCanvas {
 					}
 					
 					for (int k = 0, nk = motionCurve.getKeyCount(); k < nk; k++) {
-						MotionKey2 mk = motionCurve.getKey(k);
+						MotionKey mk = motionCurve.getKey(k);
 						int x = (int) ((mk.getPosition() - viewLeft) * (float) pixelWidth / (float) viewWidth);
-						if (mk instanceof MotionKey2.Float) {
-							float value = ((MotionKey2.Float) mk).getFloat();
-							float min = ((MotionCurve2.Float) motionCurve).getMin();
-							float max = ((MotionCurve2.Float) motionCurve).getMax();
+						if (mk instanceof MotionKey.Float) {
+							float value = ((MotionKey.Float) mk).getFloat();
+							float min = ((MotionCurve.Float) motionCurve).getMin();
+							float max = ((MotionCurve.Float) motionCurve).getMax();
 							value = clamp(value, min, max);
 							int ym = yy + (int) (h * (1.0 - (value - min) / (max - min)));
 							g.setColor((mk.getPosition() == pos) ? Color.WHITE : Color.ORANGE);
@@ -182,8 +182,8 @@ public class MotionCurveDisplay extends VirtualCanvas {
 						}
 						else {
 							int ym = yy + h / 2;
-							if (mk instanceof MotionKey2.Color3f) {
-								g.setColor(((MotionKey2.Color3f) mk).getColor3f().get());
+							if (mk instanceof MotionKey.Color3f) {
+								g.setColor(((MotionKey.Color3f) mk).getColor3f().get());
 								g.fillRect(x - 4, ym - 4, 9, 9);
 								g.setColor(Color.WHITE);
 								g.drawRect(x - 5, ym - 5, 10, 10);
@@ -321,18 +321,18 @@ public class MotionCurveDisplay extends VirtualCanvas {
 			loop:
 			if (motionCurveSet != null) {
 				for (int c = 0, nc = motionCurveSet.motionCurveList.size(); c < nc; c++) {
-					MotionCurve2 motionCurve = (MotionCurve2) motionCurveSet.motionCurveList.get(c);
+					MotionCurve motionCurve = (MotionCurve) motionCurveSet.motionCurveList.get(c);
 					int yy = (int) (pixelHeight * ((y - viewTop) / viewHeight) + (double) pixelHeight / viewHeight * 0.05);
 					int h = (int) ((double) pixelHeight / viewHeight * 0.9);
 					if (yy > -h && yy < pixelHeight + h) {
 						for (int k = 0, nk = motionCurve.getKeyCount(); k < nk; k++) {
-							MotionKey2 mk = motionCurve.getKey(k);
+							MotionKey mk = motionCurve.getKey(k);
 							int x = (int) ((mk.getPosition() - viewLeft) * (float) pixelWidth / (float) viewWidth);
 							int ym;
-							if (mk instanceof MotionKey2.Float) {
-								float value = ((MotionKey2.Float) mk).getFloat();
-								float min = ((MotionCurve2.Float) motionCurve).getMin();
-								float max = ((MotionCurve2.Float) motionCurve).getMax();
+							if (mk instanceof MotionKey.Float) {
+								float value = ((MotionKey.Float) mk).getFloat();
+								float min = ((MotionCurve.Float) motionCurve).getMin();
+								float max = ((MotionCurve.Float) motionCurve).getMax();
 								value = clamp(value, min, max);
 								ym = yy + (int) (h * (1.0 - (value - min) / (max - min)));
 							}
@@ -359,12 +359,12 @@ public class MotionCurveDisplay extends VirtualCanvas {
 			float y = top;
 			if (motionCurveSet != null) {
 				for (int c = 0, nc = motionCurveSet.motionCurveList.size(); c < nc; c++) {
-					MotionCurve2 motionCurve = (MotionCurve2) motionCurveSet.motionCurveList.get(c);
+					MotionCurve motionCurve = (MotionCurve) motionCurveSet.motionCurveList.get(c);
 					int yy = (int) (pixelHeight * ((y - viewTop) / viewHeight) + (double) pixelHeight / viewHeight * 0.05);
 					int h = (int) ((double) pixelHeight / viewHeight * 0.9);
 					if (mouseEvent.getY() >= yy && mouseEvent.getY() <= yy + h) {
-						if (motionCurve.getInterpolationMethod() == MotionCurve2.CUBIC) motionCurve.setInterpolationMethod(MotionCurve2.LINEAR);
-						else if (motionCurve.getInterpolationMethod() == MotionCurve2.LINEAR) motionCurve.setInterpolationMethod(MotionCurve2.CUBIC);
+						if (motionCurve.getInterpolationMethod() == MotionCurve.CUBIC) motionCurve.setInterpolationMethod(MotionCurve.LINEAR);
+						else if (motionCurve.getInterpolationMethod() == MotionCurve.LINEAR) motionCurve.setInterpolationMethod(MotionCurve.CUBIC);
 					}
 					y++;
 				}

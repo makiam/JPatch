@@ -27,7 +27,7 @@ public class AnimationImporter extends DefaultHandler {
 	
 	private AnimObject animObject;
 	private String animModelFilename;
-	private MotionCurve2 motionCurve;
+	private MotionCurve motionCurve;
 	private MotionCurveSet motionCurveSet;
 	private String strRendererFormat;
 	
@@ -218,41 +218,41 @@ public class AnimationImporter extends DefaultHandler {
 				if (value.equals("avar")) {
 					type = AVAR;
 				} else if (value.equals("position")) {
-					motionCurve = MotionCurve2.createPositionCurve();
-					motionCurveSet.position = (MotionCurve2.Point3d) motionCurve;
+					motionCurve = MotionCurve.createPositionCurve();
+					motionCurveSet.position = (MotionCurve.Point3d) motionCurve;
 					iState = POINT3D_CURVE;
 				} else if (value.equals("orientation")) {
 					type = ORIENTATION;
 				} else if (value.equals("scale")) {
 					type = SCALE;
 				} else if (value.equals("focallength")) {
-					motionCurve = MotionCurve2.createFocalLengthCurve();
-					((MotionCurveSet.Camera) motionCurveSet).focalLength = (MotionCurve2.Float) motionCurve;
+					motionCurve = MotionCurve.createFocalLengthCurve();
+					((MotionCurveSet.Camera) motionCurveSet).focalLength = (MotionCurve.Float) motionCurve;
 					iState = FLOAT_CURVE;
 				} else if (value.equals("size")) {
-					motionCurve = MotionCurve2.createSizeCurve();
-					((MotionCurveSet.Light) motionCurveSet).size = (MotionCurve2.Float) motionCurve;
+					motionCurve = MotionCurve.createSizeCurve();
+					((MotionCurveSet.Light) motionCurveSet).size = (MotionCurve.Float) motionCurve;
 					iState = FLOAT_CURVE;
 				} else if (value.equals("intensity")) {
-					motionCurve = MotionCurve2.createIntensityCurve();
-					((MotionCurveSet.Light) motionCurveSet).intensity = (MotionCurve2.Float) motionCurve;
+					motionCurve = MotionCurve.createIntensityCurve();
+					((MotionCurveSet.Light) motionCurveSet).intensity = (MotionCurve.Float) motionCurve;
 					iState = FLOAT_CURVE;
 				} else if (value.equals("color")) {
-					motionCurve = MotionCurve2.createColorCurve();
-					((MotionCurveSet.Light) motionCurveSet).color = (MotionCurve2.Color3f) motionCurve;
+					motionCurve = MotionCurve.createColorCurve();
+					((MotionCurveSet.Light) motionCurveSet).color = (MotionCurve.Color3f) motionCurve;
 					iState = COLOR3F_CURVE;
 				}
 			} else if (localName.equals("subtype")) {
 				if (type == ORIENTATION) {
 					if (value.equals("quaternion")) {
-						motionCurve = MotionCurve2.createOrientationCurve();
-						motionCurveSet.orientation = (MotionCurve2.Quat4f) motionCurve;
+						motionCurve = MotionCurve.createOrientationCurve();
+						motionCurveSet.orientation = (MotionCurve.Quat4f) motionCurve;
 						iState = QUAT4F_CURVE;
 					}
 				} else if (type == SCALE) {
 					if (value.equals("uniform")) {
-						motionCurve = MotionCurve2.createScaleCurve();
-						((MotionCurveSet.Model) motionCurveSet).scale = (MotionCurve2.Float) motionCurve;
+						motionCurve = MotionCurve.createScaleCurve();
+						((MotionCurveSet.Model) motionCurveSet).scale = (MotionCurve.Float) motionCurve;
 						iState = FLOAT_CURVE;
 					}
 				}
@@ -268,8 +268,8 @@ public class AnimationImporter extends DefaultHandler {
 //				((MotionCurveSet.Model) motionCurveSet).setMorphCurve(morph, (MotionCurve2.Float) motionCurve);
 				iState = FLOAT_CURVE;
 			} else if (localName.equals("interpolation")) {
-				if (value.equals("linear")) motionCurve.setInterpolationMethod(MotionCurve2.LINEAR);
-				else if (value.equals("cubic")) motionCurve.setInterpolationMethod(MotionCurve2.CUBIC);
+				if (value.equals("linear")) motionCurve.setInterpolationMethod(MotionCurve.LINEAR);
+				else if (value.equals("cubic")) motionCurve.setInterpolationMethod(MotionCurve.CUBIC);
 			}
 		}
 	}
@@ -297,22 +297,22 @@ public class AnimationImporter extends DefaultHandler {
 		}
 		switch (iState) {
 			case FLOAT_CURVE: {
-				motionCurve.addKey(new MotionKey2.Float(frame, (float) x));
+				motionCurve.addKey(new MotionKey.Float(frame, (float) x));
 			}
 			break;
 			
 			case POINT3D_CURVE: {
-				motionCurve.addKey(new MotionKey2.Point3d(frame, new Point3d(x, y, z)));
+				motionCurve.addKey(new MotionKey.Point3d(frame, new Point3d(x, y, z)));
 			}
 			break;
 			
 			case QUAT4F_CURVE: {
-				motionCurve.addKey(new MotionKey2.Quat4f(frame, new Quat4f((float) x, (float) y, (float) z, (float) w)));
+				motionCurve.addKey(new MotionKey.Quat4f(frame, new Quat4f((float) x, (float) y, (float) z, (float) w)));
 			}
 			break;
 			
 			case COLOR3F_CURVE: {
-				motionCurve.addKey(new MotionKey2.Color3f(frame, new Color3f((float) x, (float) y, (float) z)));
+				motionCurve.addKey(new MotionKey.Color3f(frame, new Color3f((float) x, (float) y, (float) z)));
 			}
 			break;
 			default: throw new IllegalStateException();

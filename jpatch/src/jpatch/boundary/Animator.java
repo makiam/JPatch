@@ -53,8 +53,8 @@ public final class Animator extends BFrame {
 	
 	private HashMap mapFilenames = new HashMap();
 	
-	private MotionKey2 activeKey;
-	private MotionCurve2 activeCurve;
+	private MotionKey activeKey;
+	private MotionCurve activeCurve;
 	
 	private RenderExtension re = new RenderExtension(new String[] {
 		"povray", "",
@@ -175,19 +175,19 @@ public final class Animator extends BFrame {
 		motionCurveEditor.stop();
 	}
 	
-	public MotionKey2 getActiveKey() {
+	public MotionKey getActiveKey() {
 		return activeKey;
 	}
 	
-	public MotionCurve2 getActiveCurve() {
+	public MotionCurve getActiveCurve() {
 		return activeCurve;
 	}
 	
-	public void setActiveKey(MotionKey2 key) {
+	public void setActiveKey(MotionKey key) {
 		activeKey = key;
 	}
 	
-	public void setActiveCurve(MotionCurve2 curve) {
+	public void setActiveCurve(MotionCurve curve) {
 		activeCurve = curve;
 	}
 	
@@ -247,7 +247,7 @@ public final class Animator extends BFrame {
 	}
 	
 	public void setMorphValue(AnimModel animModel, Morph morph) {
-		MotionCurve2.Float mc =  ((MotionCurveSet.Model) mapMotionCurves.get(animModel)).morph(morph);
+		MotionCurve.Float mc =  ((MotionCurveSet.Model) mapMotionCurves.get(animModel)).morph(morph);
 		activeCurve = mc;
 		activeKey = mc.setFloatAt(fPosition, morph.getValue());
 		motionCurveEditor.repaint();
@@ -439,7 +439,7 @@ public final class Animator extends BFrame {
 					if (morph != null) {
 						for (Iterator it = model.getPhonemeMorphSet().iterator(); it.hasNext(); ) {
 							Morph m = (Morph) it.next();
-							MotionCurve2.Float mc =  mcs.morph(m);
+							MotionCurve.Float mc =  mcs.morph(m);
 							mc.setFloatAt((float) (frame - 1), (m == morph) ? 1 : 0);
 						}
 					}
