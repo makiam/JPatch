@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.1 2006/01/17 21:06:39 sascha_l Exp $
+ * $Id: Header.java,v 1.2 2006/01/17 21:45:52 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -75,22 +75,41 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 //				g.drawLine(x + start, clip.y, x + start, clip.y + clip.height);
 //			}
 			
+//			g.setColor(getBackground().darker());
+//			g.drawLine(width - 5, clip.y, width - 5, clip.y + clip.height - 1);
+//			g.drawLine(width - 1, clip.y, width - 1, clip.y + clip.height - 1);
+			
 			int y = 0;
 			for (Track track : timeLineEditor.getTracks()) {
-				
-				g.setColor(Color.WHITE);
-				g.drawLine(clip.x, y + track.getHeight() - 1, clip.x + clip.width, y + track.getHeight() - 1);
 				g.setColor(Color.BLACK);
 				g.drawString(((AvarTrack) track).getName(), 8, y + 12);
+				if (track.isExpanded()) {
+					g.setColor(getBackground().darker());
+					g.drawLine(width - 5, y, width - 5, y + track.getHeight() - 5);
+					g.drawLine(width - 1, y, width - 1, y + track.getHeight() - 5);
+					g.drawLine(clip.x, y + track.getHeight() - 5, clip.x + clip.width - 1, y + track.getHeight() - 5);
+					g.drawLine(clip.x, y + track.getHeight() - 1, clip.x + clip.width - 1, y + track.getHeight() - 1);
+					g.setColor(getBackground());
+					g.fillRect(width - 4, y, 3, track.getHeight());
+				} else {
+					g.setColor(getBackground());
+					g.fillRect(width - 5, y, 5, track.getHeight());
+					g.setColor(getBackground().darker());
+					g.drawLine(width - 5, y, width - 5, y + track.getHeight() - 1);
+					g.drawLine(width - 1, y, width - 1, y + track.getHeight() - 1);
+					g.drawLine(clip.x, y + track.getHeight() - 1, clip.x + clip.width - 5, y + track.getHeight() - 1);
+				}
 				y += track.getHeight();
 			}
+			g.setColor(getBackground().darker());
+			g.drawLine(width - 5, y, width - 5, getHeight() - 1);
+			g.drawLine(width - 1, y, width - 1, getHeight() - 1);
 //			if (bResizing)
 //				g.setColor(getBackground().darker());
 //			if (bResizeCursor)
 //				g.setColor(getBackground().brighter());
 //			else
-				g.setColor(getBackground());
-			g.fill3DRect(width - 6, 0, 6, dim.height, true);
+			
 //			g.setColor(Color.BLACK);
 //			g.drawLine(x + 1, clip.y, x + 1, clip.height);
 		}
