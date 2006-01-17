@@ -63,7 +63,7 @@ public class AvarTrack extends Track {
 			int fw = timelineEditor.getFrameWidth();
 			int start = clip.x - clip.x % fw + fw / 2;
 			int frame = start / fw - 1;
-			g.setColor(SEPARATOR);
+			g.setColor(timelineEditor.getBackground().darker());
 			g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
 			if (bExpanded) {
 				float scale = motionCurve.getMax() - motionCurve.getMin();
@@ -107,6 +107,8 @@ public class AvarTrack extends Track {
 					frame++;
 				}
 				g.setClip(clip);
+				g.setColor(timelineEditor.getBackground().darker());
+				g.drawLine(clip.x, y + getHeight() - 5, clip.x + clip.width, y + getHeight() - 5);
 				return;
 			}
 //			g.setColor(TRACK.darker());
