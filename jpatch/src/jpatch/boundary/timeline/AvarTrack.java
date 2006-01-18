@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.3 2006/01/18 16:05:02 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.4 2006/01/18 20:13:06 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -33,7 +33,7 @@ public class AvarTrack extends Track {
 		 * 
 		 */
 		private final TimelineEditor timelineEditor;
-		private static final int EXPANDED_HEIGHT = 300;
+		private static final int EXPANDED_HEIGHT = 128;
 		private static final Color SEPARATOR = new Color(255, 255, 255);
 		private static final Color TRACK = new Color(208, 216, 200);
 		private static final Color KEY = new Color(136, 128, 144);

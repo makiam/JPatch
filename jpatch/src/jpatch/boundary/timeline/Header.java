@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.3 2006/01/18 16:05:02 sascha_l Exp $
+ * $Id: Header.java,v 1.4 2006/01/18 20:13:06 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -39,46 +39,33 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		private boolean bResizing = false;
 		private static final Icon[] iconDownArrow = new Icon[] {createIcon(0, Color.BLACK), createIcon(1, Color.LIGHT_GRAY), createIcon(0, UIManager.getColor("Button.focus")) };
 		private static final Icon[] iconUpArrow = new Icon[] {createIcon(1, Color.BLACK), createIcon(1, Color.LIGHT_GRAY), createIcon(1, UIManager.getColor("Button.focus")) };
-		private JButton[] downButton;
-		private JButton[] upButton;
+		private JToggleButton[] expandButton;
 		
 		public Header(TimelineEditor tle) {
 			timeLineEditor = tle;
 			addMouseListener(this);
 			addMouseMotionListener(this);
 			setLayout(null);
-			downButton = new JButton[timeLineEditor.getTracks().size()];
-			upButton = new JButton[timeLineEditor.getTracks().size()];
+			expandButton = new JToggleButton[timeLineEditor.getTracks().size()];
 			for (int i = 0; i < timeLineEditor.getTracks().size(); i++) {
 				final Track track = timeLineEditor.getTracks().get(i);
-				downButton[i] = new JButton(iconDownArrow[0]);
-				downButton[i].setDisabledIcon(iconDownArrow[1]);
-				downButton[i].setRolloverIcon(iconDownArrow[2]);
-				downButton[i].setBorderPainted(false);
-				downButton[i].setContentAreaFilled(false);
-				downButton[i].setFocusable(false);
-				downButton[i].setOpaque(false);
-				downButton[i].setToolTipText("expand track");
-				downButton[i].addActionListener(new ActionListener() {
+				expandButton[i] = new JToggleButton(iconDownArrow[0]);
+				expandButton[i].setRolloverIcon(iconDownArrow[2]);
+				expandButton[i].setSelectedIcon(iconUpArrow[0]);
+				expandButton[i].setRolloverSelectedIcon(iconUpArrow[2]);
+				expandButton[i].setBorderPainted(false);
+				expandButton[i].setContentAreaFilled(false);
+				expandButton[i].setFocusable(false);
+				expandButton[i].setOpaque(false);
+				expandButton[i].setToolTipText("expand track");
+				expandButton[i].addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						expandTrack(track, true);
+						boolean expanded = !track.isExpanded();
+						expandTrack(track, expanded);
+						((JToggleButton) e.getSource()).setToolTipText(expanded ? "collapse track" : "expand track");
 					}
 				});
-				upButton[i] = new JButton(iconUpArrow[0]);
-				upButton[i].setDisabledIcon(iconUpArrow[1]);
-				upButton[i].setRolloverIcon(iconUpArrow[2]);
-				upButton[i].setBorderPainted(false);
-				upButton[i].setContentAreaFilled(false);
-				upButton[i].setFocusable(false);
-				upButton[i].setOpaque(false);
-				upButton[i].setToolTipText("collapse track");
-				upButton[i].addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						expandTrack(track, false);
-					}
-				});
-				add(downButton[i]);
-				add(upButton[i]);
+				add(expandButton[i]);
 			}
 		}
 		
@@ -92,15 +79,15 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 			
 			for (int i = 0; i < timeLineEditor.getTracks().size(); i++) {
 				Track track = timeLineEditor.getTracks().get(i);
-				if (track.isExpanded()) {
-					upButton[i].setVisible(true);
-					downButton[i].setVisible(false);
-					upButton[i].setBounds(width - 16, y + 3, 11, 6);
-				} else {
-					upButton[i].setVisible(false);
-					downButton[i].setVisible(true);
-					downButton[i].setBounds(width - 16, y + 3, 11, 6);
-				}
+				//if (track.isExpanded()) {
+				//	upButton[i].setVisible(true);
+				//	downButton[i].setVisible(false);
+				//	upButton[i].setBounds(width - 26, y + 3, 11, 6);
+				//} else {
+				//	upButton[i].setVisible(false);
+				//	downButton[i].setVisible(true);
+					expandButton[i].setBounds(width - 16, y + 3, 11, 6);
+				//}
 				y += track.getHeight();
 			}
 		}

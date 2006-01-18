@@ -21,7 +21,7 @@ public class TimelineEditor extends JScrollPane {
 	private final MotionCurve.Float[] curves = new MotionCurve.Float[20];
 	private List<Track> listTracks = new ArrayList<Track>();
 	private int iCurrentFrame = 49;
-	private int iFrameWidth = 32;
+	private int iFrameWidth = 8;
 	
 	public TimelineEditor() {
 //		super(VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_ALWAYS);
