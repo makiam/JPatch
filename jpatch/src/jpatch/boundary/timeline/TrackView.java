@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.1 2006/01/17 21:06:39 sascha_l Exp $
+ * $Id: TrackView.java,v 1.2 2006/01/18 16:05:02 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -62,7 +62,7 @@ class TrackView extends JComponent implements Scrollable {
 		}
 		
 		public Dimension getPreferredSize() {
-			dim.setSize(timelineEditor.getFrameWidth() * 200, timelineEditor.getTracksHeight()); // FIXME: use animation length
+			dim.setSize(timelineEditor.getFrameWidth() * 200 + 1, timelineEditor.getTracksHeight() + 4); // FIXME: use animation length
 			return dim;
 		}
 		
@@ -92,6 +92,8 @@ class TrackView extends JComponent implements Scrollable {
 			int x = timelineEditor.getCurrentFrame() * fw + fw / 2;
 			g.setColor(Color.BLACK);
 			g.drawLine(x, clip.y, x, clip.y + clip.height);
+			g.fillPolygon(new int[] { x - 5, x + 6, x }, new int[] { getHeight() - 0, getHeight() - 0, getHeight() - 6}, 3);
+//			
 //			g.setColor(Color.BLACK);
 //			g.drawLine(x + 1, clip.y, x + 1, clip.height);
 		}

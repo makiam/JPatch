@@ -21,7 +21,7 @@ public class TimelineEditor extends JScrollPane {
 	private final MotionCurve.Float[] curves = new MotionCurve.Float[20];
 	private List<Track> listTracks = new ArrayList<Track>();
 	private int iCurrentFrame = 49;
-	private int iFrameWidth = 6;
+	private int iFrameWidth = 32;
 	
 	public TimelineEditor() {
 //		super(VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -94,10 +94,13 @@ public class TimelineEditor extends JScrollPane {
 			morph.setMin(-1);
 			morph.setMax(1);
 			curves[i] = MotionCurve.createMorphCurve(morph);
-			for (int j = 0; j < 200; j++) {
+			for (int j = 3; j < 200; j++) {
 				if (rnd.nextInt(5) == 0)
 					curves[i].addKey(new MotionKey.Float(j, curves[i].getMin() + rnd.nextFloat() * (curves[i].getMax() - curves[i].getMin())));
 			}
+			curves[i].addKey(new MotionKey.Float(0, 0));
+			curves[i].addKey(new MotionKey.Float(1, -1));
+			curves[i].addKey(new MotionKey.Float(2, 1));
 			listTracks.add(new AvarTrack(this, morph, curves[i]));
 		}
 			

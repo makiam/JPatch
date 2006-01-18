@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.2 2006/01/17 21:45:52 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.3 2006/01/18 16:05:02 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -33,11 +33,13 @@ public class AvarTrack extends Track {
 		 * 
 		 */
 		private final TimelineEditor timelineEditor;
-		private static final int EXPANDED_HEIGHT = 64;
+		private static final int EXPANDED_HEIGHT = 300;
 		private static final Color SEPARATOR = new Color(255, 255, 255);
 		private static final Color TRACK = new Color(208, 216, 200);
 		private static final Color KEY = new Color(136, 128, 144);
 		private static final Color TICK = new Color(200, 192, 186);
+		private static final Color ZERO = new Color(186, 178, 170);
+		private static final Color CURVE = new Color(0, 0, 0);
 		
 		private Morph morph;
 		private MotionCurve.Float motionCurve;
@@ -67,23 +69,23 @@ public class AvarTrack extends Track {
 			g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
 			if (bExpanded) {
 				float scale = motionCurve.getMax() - motionCurve.getMin();
-				int size = 50;
-				int off = 64 - 8 + (int) (size * motionCurve.getMin() / scale);
+				int size = EXPANDED_HEIGHT - 15;
+				int off = EXPANDED_HEIGHT - 11 + (int) (size * motionCurve.getMin() / scale);
 				g.setColor(TRACK);
-				g.fillRect(clip.x, y + 6, clip.width, size);
+				g.fillRect(clip.x, y + 5, clip.width, size);
 //				g.setColor(TRACK.darker());
 //				g.drawLine(clip.x, y + 1, clip.x + clip.width, y + 1);
 //				g.setColor(TRACK.brighter());
 //				g.drawLine(clip.x, y + 61, clip.x + clip.width, y + 61);
 				g.setColor(TICK);
 				for (int x = -fw ; x <= clip.width + fw; x += fw) {
-					g.drawLine(x + start, y + 6, x + start, y + 55);
+					g.drawLine(x + start, y + 5, x + start, y + EXPANDED_HEIGHT - 11);
 				}
-				g.setColor(Color.BLACK);
+				g.setColor(ZERO);
 				g.drawLine(clip.x, y + off, clip.x + clip.width, y + off);
-				g.setClip(clip.intersection(new Rectangle(clip.x, y + 4, clip.width, 56)));
+				g.setClip(clip.intersection(new Rectangle(clip.x, y + 2, clip.width, size + 6)));
 				int vPrev = off - (int) (size / scale * motionCurve.getFloatAt(frame));
-				g.setColor(KEY);
+				g.setColor(CURVE);
 				for (int x = -fw ; x <= clip.width + fw; x ++) {
 					float f = (float) (start + x - fw / 2) / fw;
 					int vThis = off - (int) (size / scale * motionCurve.getFloatAt(f));

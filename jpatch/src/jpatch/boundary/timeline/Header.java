@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.2 2006/01/17 21:45:52 sascha_l Exp $
+ * $Id: Header.java,v 1.3 2006/01/18 16:05:02 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -24,7 +24,7 @@ package jpatch.boundary.timeline;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.JComponent;
+import javax.swing.*;
 
 public class Header extends JComponent implements MouseListener, MouseMotionListener {
 		/**
@@ -37,11 +37,72 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		private Cursor resizeCursor = Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR);
 		private boolean bResizeCursor = false;
 		private boolean bResizing = false;
+		private static final Icon[] iconDownArrow = new Icon[] {createIcon(0, Color.BLACK), createIcon(1, Color.LIGHT_GRAY), createIcon(0, UIManager.getColor("Button.focus")) };
+		private static final Icon[] iconUpArrow = new Icon[] {createIcon(1, Color.BLACK), createIcon(1, Color.LIGHT_GRAY), createIcon(1, UIManager.getColor("Button.focus")) };
+		private JButton[] downButton;
+		private JButton[] upButton;
 		
 		public Header(TimelineEditor tle) {
 			timeLineEditor = tle;
 			addMouseListener(this);
-			addMouseMotionListener(this);	
+			addMouseMotionListener(this);
+			setLayout(null);
+			downButton = new JButton[timeLineEditor.getTracks().size()];
+			upButton = new JButton[timeLineEditor.getTracks().size()];
+			for (int i = 0; i < timeLineEditor.getTracks().size(); i++) {
+				final Track track = timeLineEditor.getTracks().get(i);
+				downButton[i] = new JButton(iconDownArrow[0]);
+				downButton[i].setDisabledIcon(iconDownArrow[1]);
+				downButton[i].setRolloverIcon(iconDownArrow[2]);
+				downButton[i].setBorderPainted(false);
+				downButton[i].setContentAreaFilled(false);
+				downButton[i].setFocusable(false);
+				downButton[i].setOpaque(false);
+				downButton[i].setToolTipText("expand track");
+				downButton[i].addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						expandTrack(track, true);
+					}
+				});
+				upButton[i] = new JButton(iconUpArrow[0]);
+				upButton[i].setDisabledIcon(iconUpArrow[1]);
+				upButton[i].setRolloverIcon(iconUpArrow[2]);
+				upButton[i].setBorderPainted(false);
+				upButton[i].setContentAreaFilled(false);
+				upButton[i].setFocusable(false);
+				upButton[i].setOpaque(false);
+				upButton[i].setToolTipText("collapse track");
+				upButton[i].addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						expandTrack(track, false);
+					}
+				});
+				add(downButton[i]);
+				add(upButton[i]);
+			}
+		}
+		
+		public void doLayout() {
+			super.doLayout();
+			layoutButtons();
+		}
+		
+		private void layoutButtons() {
+			int y = 0;
+			
+			for (int i = 0; i < timeLineEditor.getTracks().size(); i++) {
+				Track track = timeLineEditor.getTracks().get(i);
+				if (track.isExpanded()) {
+					upButton[i].setVisible(true);
+					downButton[i].setVisible(false);
+					upButton[i].setBounds(width - 16, y + 3, 11, 6);
+				} else {
+					upButton[i].setVisible(false);
+					downButton[i].setVisible(true);
+					downButton[i].setBounds(width - 16, y + 3, 11, 6);
+				}
+				y += track.getHeight();
+			}
 		}
 		
 		private void setResizeCursor(boolean enable) {
@@ -114,6 +175,41 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 //			g.drawLine(x + 1, clip.y, x + 1, clip.height);
 		}
 		
+		private void expandTrack(Track track, boolean expand) {
+			if (track.isExpanded() == expand)
+				return;
+			track.expand(expand);
+			timeLineEditor.revalidate();
+			((JComponent) timeLineEditor.getRowHeader().getView()).revalidate();
+			((JComponent) timeLineEditor.getViewport().getView()).revalidate();
+			timeLineEditor.repaint();
+			return;
+		}
+		
+		private static Icon createIcon(final int type, final Color color) {
+			return new Icon() {
+				public void paintIcon(Component c, Graphics g, int x, int y) {
+					g.setColor(color);
+					switch (type) {
+					case 0:
+						g.fillPolygon(new int[] { 0, 9, 4 }, new int[] { 1, 1, 6}, 3);
+						break;
+					case 1:
+						g.fillPolygon(new int[] { -1, 9, 4 }, new int[] { 5, 5, -1}, 3);
+						break;
+					}
+				}
+
+				public int getIconWidth() {
+					return 6;
+				}
+
+				public int getIconHeight() {
+					return 4;
+				}
+			};
+		}
+		
 		public void mouseMoved(MouseEvent e) {
 			setResizeCursor(e.getX() > width - 5);
 		}
@@ -143,10 +239,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 				int y = 0;
 				for (Track track : timeLineEditor.getTracks()) {
 					if (e.getY() > y && e.getY() < y + track.getHeight()) {
-						track.expand(!track.isExpanded());
-						timeLineEditor.revalidate();
-						((JComponent) timeLineEditor.getRowHeader().getView()).revalidate();
-						timeLineEditor.repaint();
+						expandTrack(track, !track.isExpanded());
 						return;
 					}
 					y += track.getHeight();
@@ -168,5 +261,4 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		public void mouseClicked(MouseEvent e) { }
 
 		public void mouseEntered(MouseEvent e) { }
-		
 	}
