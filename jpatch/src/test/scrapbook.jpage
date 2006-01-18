@@ -65,3 +65,13 @@ Object o2 = null;
 System.out.println(null == null); (No explicit return value)
 
 javax.swing.JViewport
+
+
+
+	try {
+		return true;
+	} finally {
+		return false;
+	}
+	
+	87876l      
