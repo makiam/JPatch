@@ -46,7 +46,7 @@ class Ruler extends JComponent {
 		private Font font = new Font("Monospaced", Font.PLAIN, 10);
 		
 		public Dimension getPreferredSize() {
-			dim.setSize(timelineEditor.getFrameWidth() * 200, 16); // FIXME: use animation length
+			dim.setSize(timelineEditor.getFrameWidth() * 24 * 60, 16); // FIXME: use animation length
 			return dim;
 		}
 		

@@ -47,6 +47,7 @@ public class TimelineEditor extends JScrollPane {
 //		setCorner(UPPER_RIGHT_CORNER, new Corner());
 //		setCorner(UPPER_LEFT_CORNER, new Corner());
 //		setCorner(LOWER_LEFT_CORNER, new Corner());
+//		setAutoscrolls(true);
 	}
 	
 	public int getFrameWidth() {
@@ -94,8 +95,8 @@ public class TimelineEditor extends JScrollPane {
 			morph.setMin(-1);
 			morph.setMax(1);
 			curves[i] = MotionCurve.createMorphCurve(morph);
-			for (int j = 3; j < 200; j++) {
-				if (rnd.nextInt(5) == 0)
+			for (int j = 3; j < 24 * 60; j++) {
+				if (rnd.nextInt(20) == 0)
 					curves[i].addKey(new MotionKey.Float(j, curves[i].getMin() + rnd.nextFloat() * (curves[i].getMax() - curves[i].getMin())));
 			}
 			curves[i].addKey(new MotionKey.Float(0, 0));
