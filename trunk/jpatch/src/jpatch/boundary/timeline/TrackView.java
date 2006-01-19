@@ -62,7 +62,7 @@ class TrackView extends JComponent implements Scrollable {
 		}
 		
 		public Dimension getPreferredSize() {
-			dim.setSize(timelineEditor.getFrameWidth() * 200 + 1, timelineEditor.getTracksHeight() + 4); // FIXME: use animation length
+			dim.setSize(timelineEditor.getFrameWidth() * 24 * 60 + 1, timelineEditor.getTracksHeight() + 4); // FIXME: use animation length
 			return dim;
 		}
 		
