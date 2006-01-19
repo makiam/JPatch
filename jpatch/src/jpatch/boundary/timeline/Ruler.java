@@ -1,5 +1,5 @@
 /*
- * $Id: Ruler.java,v 1.1 2006/01/17 21:06:39 sascha_l Exp $
+ * $Id: Ruler.java,v 1.2 2006/01/19 16:26:29 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -46,7 +46,7 @@ class Ruler extends JComponent {
 		private Font font = new Font("Monospaced", Font.PLAIN, 10);
 		
 		public Dimension getPreferredSize() {
-			dim.setSize(timelineEditor.getFrameWidth() * 200, 16); // FIXME: use animation length
+			dim.setSize(timelineEditor.getFrameWidth() * 24 * 60, 16); // FIXME: use animation length
 			return dim;
 		}
 		

@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.2 2006/01/18 16:05:02 sascha_l Exp $
+ * $Id: TrackView.java,v 1.3 2006/01/19 16:26:29 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -62,7 +62,7 @@ class TrackView extends JComponent implements Scrollable {
 		}
 		
 		public Dimension getPreferredSize() {
-			dim.setSize(timelineEditor.getFrameWidth() * 200 + 1, timelineEditor.getTracksHeight() + 4); // FIXME: use animation length
+			dim.setSize(timelineEditor.getFrameWidth() * 24 * 60 + 1, timelineEditor.getTracksHeight() + 4); // FIXME: use animation length
 			return dim;
 		}
 		

@@ -285,6 +285,8 @@ public abstract class MotionCurve {
 			else {
 				float m0 = 0;
 				float m1 = 0;
+				float d0 = 0;
+				float d1 = 0;
 				if (key0 != null) {
 					float v0 = key0.getFloat();
 					if (limitOvershoot && (p0 == v0 || p0 == p1 || (p0 > v0 && p0 > p1) || (p0 < v0 && p0 < p1))) m0 = 0;
@@ -295,6 +297,18 @@ public abstract class MotionCurve {
 					if (limitOvershoot && (p1 == p0 || p1 == v1 || (p1 > v1 && p1 > p0) || (p1 < v1 && p1 < p0))) m1 = 0;
 					else m1 = (v1 - p0) / (key3.getPosition() - key1.getPosition()) * l;
 				}
+//				if (key0 != null && key1 != null) {
+////				if (key0 != null)
+//					d0 = (key1.getFloat() - key0.getFloat()) / (key1.getPosition() - key0.getPosition());
+////				if (key3 != null)
+//					d1 = (key3.getFloat() - key2.getFloat()) / (key3.getPosition() - key2.getPosition());
+//				float s0 = (key1.getPosition()  - key0.getPosition()) / (key2.getPosition() - key0.getPosition());
+//				float s1 = (key2.getPosition()  - key1.getPosition()) / (key3.getPosition() - key1.getPosition());
+//				m0 = (1 - s0) * d0 + s0 * d1;
+//				m1 = (1 - s1) * d0 + s1 * d1;
+//				m0 *= l;
+//				m1 *= l;
+//				}
 				return cubicInterpolate(p0, m0, p1, m1, t);
 			}
 		}

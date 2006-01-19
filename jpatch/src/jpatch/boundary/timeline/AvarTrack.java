@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.4 2006/01/18 20:13:06 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.5 2006/01/19 16:26:29 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -43,10 +43,18 @@ public class AvarTrack extends Track {
 		
 		private Morph morph;
 		private MotionCurve.Float motionCurve;
-		
+		private int iExpandedHeight = EXPANDED_HEIGHT;
 		
 		public int getHeight() {
-			return bExpanded ? EXPANDED_HEIGHT : TRACK_HEIGHT;
+			return bExpanded ? iExpandedHeight : TRACK_HEIGHT;
+		}
+		
+		public void setExpandedHeight(int height) {
+			iExpandedHeight = height;
+		}
+		
+		public void setDefaultExpandedHeight() {
+			iExpandedHeight = EXPANDED_HEIGHT;
 		}
 		
 		public String getName() {
@@ -69,26 +77,26 @@ public class AvarTrack extends Track {
 			g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
 			if (bExpanded) {
 				float scale = motionCurve.getMax() - motionCurve.getMin();
-				int size = EXPANDED_HEIGHT - 15;
-				int off = EXPANDED_HEIGHT - 11 + (int) (size * motionCurve.getMin() / scale);
+				int size = iExpandedHeight - 17;
+				int off = iExpandedHeight - 12 + (int) Math.round(size * motionCurve.getMin() / scale);
 				g.setColor(TRACK);
-				g.fillRect(clip.x, y + 5, clip.width, size);
+				g.fillRect(clip.x, y + 5, clip.width, size + 1);
 //				g.setColor(TRACK.darker());
 //				g.drawLine(clip.x, y + 1, clip.x + clip.width, y + 1);
 //				g.setColor(TRACK.brighter());
 //				g.drawLine(clip.x, y + 61, clip.x + clip.width, y + 61);
 				g.setColor(TICK);
 				for (int x = -fw ; x <= clip.width + fw; x += fw) {
-					g.drawLine(x + start, y + 5, x + start, y + EXPANDED_HEIGHT - 11);
+					g.drawLine(x + start, y + 5, x + start, y + iExpandedHeight - 12);
 				}
 				g.setColor(ZERO);
 				g.drawLine(clip.x, y + off, clip.x + clip.width, y + off);
-				g.setClip(clip.intersection(new Rectangle(clip.x, y + 2, clip.width, size + 6)));
-				int vPrev = off - (int) (size / scale * motionCurve.getFloatAt(frame));
+				g.setClip(clip.intersection(new Rectangle(clip.x, y + 2, clip.width, size + 7)));
+				int vPrev = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
 				g.setColor(CURVE);
 				for (int x = -fw ; x <= clip.width + fw; x ++) {
 					float f = (float) (start + x - fw / 2) / fw;
-					int vThis = off - (int) (size / scale * motionCurve.getFloatAt(f));
+					int vThis = off - (int) Math.round(size / scale * motionCurve.getFloatAt(f));
 //					g.setColor(Color.BLACK);
 					g.drawLine(x + start - 1, y + vPrev, x + start, y + vThis);
 					frame++;
@@ -97,7 +105,7 @@ public class AvarTrack extends Track {
 				g.setColor(KEY);
 				frame = start / fw - 1;
 				for (int x = -fw ; x <= clip.width + fw; x += fw) {
-					int vThis = off - (int) (size / scale * motionCurve.getFloatAt(frame));
+					int vThis = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
 					if (motionCurve.getKeyAt(frame) != null) {
 						g.fillOval(x + start - 3, y + vThis - 3, 6, 6);
 						g.setColor(Color.BLACK);
