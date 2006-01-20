@@ -41,6 +41,7 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 			addMouseMotionListener(this);
 			addMouseWheelListener(this);
 			setCursor(TimelineEditor.horizontalResizeCursor);
+			setBackground(new Color(255, 240, 128));
 		}
 
 		private Dimension dim = new Dimension();
@@ -64,12 +65,13 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 			super.paintComponent(g);
 			g.setFont(font);
 			Rectangle clip = g.getClipBounds();
+			
 			int fw = timelineEditor.getFrameWidth();
 			int start = clip.x - clip.x % fw + fw / 2;
 			int frame = start / fw - 1;
-//			((Graphics2D) g).setPaint(new GradientPaint(0, 0, getBackground(), 0, 20, getBackground().brighter()));
-//			((Graphics2D) g).fill(clip);
-//			g.fillRect(clip.x, clip.y, clip.width, clip.height);
+			((Graphics2D) g).setPaint(new GradientPaint(0, 0, new Color(232, 224, 216), 0, 16, new Color(255, 252, 248)));
+			((Graphics2D) g).fill(clip);
+			g.fillRect(clip.x, clip.y, clip.width, clip.height);
 			g.setColor(Color.BLACK);
 			g.drawLine(clip.x, 15, clip.x + clip.width, 15);
 			for (int x = -fw ; x <= clip.width + fw; x += fw) {
