@@ -6,6 +6,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.plaf.ScrollBarUI;
+import javax.swing.plaf.metal.MetalScrollBarUI;
 
 import jpatch.entity.*;
 
@@ -17,6 +19,12 @@ public class TimelineEditor extends JScrollPane {
 //	private JButton buttonZoomOutH = new JButton(ZOOM_OUT);
 //	private JButton buttonZoomInV = new JButton(ZOOM_IN);
 //	private JButton buttonZoomOutV = new JButton(ZOOM_OUT);
+	
+	public static Cursor defaultCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+	public static Cursor horizontalResizeCursor = Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR);
+	public static Cursor verticalResizeCursor = Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR);
+	public static Cursor cornerResizeCursor = Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR);
+	private Cursor currentCursor = defaultCursor;
 	
 	private final MotionCurve.Float[] curves = new MotionCurve.Float[20];
 	private List<Track> listTracks = new ArrayList<Track>();
@@ -48,6 +56,41 @@ public class TimelineEditor extends JScrollPane {
 //		setCorner(UPPER_LEFT_CORNER, new Corner());
 //		setCorner(LOWER_LEFT_CORNER, new Corner());
 //		setAutoscrolls(true);
+	}
+	
+	public void setCursor(Cursor cursor) {
+		if (currentCursor != cursor) {
+			currentCursor = cursor;
+			super.setCursor(cursor);
+		}
+	}
+	
+	void expandTrack(Track track, boolean expand) {
+		if (track.isExpanded() == expand)
+			return;
+		track.expand(expand);
+		revalidate();
+		((JComponent) getViewport().getView()).revalidate();
+		((JComponent) getRowHeader().getView()).revalidate();
+		repaint();
+	}
+	
+	void expandAll(boolean expand) {
+		for (Track track : listTracks)
+			track.expand(expand);
+		revalidate();
+		((JComponent) getViewport().getView()).revalidate();
+		((JComponent) getRowHeader().getView()).revalidate();
+		repaint();
+	}
+	
+	void resetTracks() {
+		for (Track track : listTracks)
+			((AvarTrack) track).setExpandedHeight(AvarTrack.EXPANDED_HEIGHT);
+		revalidate();
+		((JComponent) getViewport().getView()).revalidate();
+		((JComponent) getRowHeader().getView()).revalidate();
+		repaint();
 	}
 	
 	public int getFrameWidth() {
@@ -116,6 +159,40 @@ public class TimelineEditor extends JScrollPane {
 		System.out.println(tle.getColumnHeader());
 		JComponent rowHeader = new Header(tle);
 		tle.setRowHeaderView(rowHeader);
+		tle.setCorner(UPPER_LEFT_CORNER, new Corner(tle));
+		JComponent corner = new JComponent() {
+			public void paint(Graphics g) {
+				super.paint(g);
+				g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+				g.drawLine(0, 0, getWidth() - 1, 0);
+				g.setColor(UIManager.getColor("ScrollBar.shadow"));
+				g.drawLine(0, 1, getWidth() - 1, 1);
+			}
+		};
+		tle.setCorner(LOWER_LEFT_CORNER, corner);
+		corner = new JComponent() {
+			public void paint(Graphics g) {
+				super.paint(g);
+				g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+				g.drawLine(0, 0, 0, getHeight() - 1);
+				g.setColor(UIManager.getColor("ScrollBar.shadow"));
+				g.drawLine(1, 0, 1, getHeight() - 1);
+			}
+		};
+		tle.setCorner(UPPER_RIGHT_CORNER, corner);
+		corner = new JComponent() {
+			public void paint(Graphics g) {
+				super.paint(g);
+				g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+				g.drawLine(0, 0, getWidth() - 1, 0);
+				g.drawLine(0, 0, 0, getHeight() - 1);
+				g.setColor(UIManager.getColor("ScrollBar.shadow"));
+				g.drawLine(1, 1, getWidth() - 1, 1);
+				g.drawLine(1, 1, 1, getHeight() - 1);
+			}
+		};
+		tle.setCorner(LOWER_RIGHT_CORNER, corner);
+		//tle.getHorizontalScrollBar().get  setBackground(getBackground().darker());
 		frame.add(tle);
 		frame.setSize(640, 480);
 		frame.setVisible(true);
@@ -135,4 +212,6 @@ public class TimelineEditor extends JScrollPane {
 			h += track.getHeight();
 		return h;
 	}
+	
+	
 }
