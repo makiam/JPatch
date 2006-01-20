@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.5 2006/01/19 16:26:29 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.6 2006/01/20 14:30:14 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -25,6 +25,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
+import javax.swing.UIManager;
+
 import jpatch.entity.Morph;
 import jpatch.entity.MotionCurve;
 
@@ -33,12 +35,12 @@ public class AvarTrack extends Track {
 		 * 
 		 */
 		private final TimelineEditor timelineEditor;
-		private static final int EXPANDED_HEIGHT = 128;
+		public static final int EXPANDED_HEIGHT = 128;
 		private static final Color SEPARATOR = new Color(255, 255, 255);
 		private static final Color TRACK = new Color(208, 216, 200);
 		private static final Color KEY = new Color(136, 128, 144);
 		private static final Color TICK = new Color(200, 192, 186);
-		private static final Color ZERO = new Color(186, 178, 170);
+		private static final Color ZERO = new Color(178, 170, 162);
 		private static final Color CURVE = new Color(0, 0, 0);
 		
 		private Morph morph;
@@ -73,9 +75,13 @@ public class AvarTrack extends Track {
 			int fw = timelineEditor.getFrameWidth();
 			int start = clip.x - clip.x % fw + fw / 2;
 			int frame = start / fw - 1;
-			g.setColor(timelineEditor.getBackground().darker());
-			g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
+			
 			if (bExpanded) {
+				g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+				g.drawLine(clip.x, y + getHeight() - 2, clip.x + clip.width, y + getHeight() - 2);
+				g.drawLine(clip.x, y + getHeight() - 6, clip.x + clip.width, y + getHeight() - 6);
+				g.setColor(UIManager.getColor("ScrollBar.shadow"));
+				g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
 				float scale = motionCurve.getMax() - motionCurve.getMin();
 				int size = iExpandedHeight - 17;
 				int off = iExpandedHeight - 12 + (int) Math.round(size * motionCurve.getMin() / scale);
@@ -85,15 +91,24 @@ public class AvarTrack extends Track {
 //				g.drawLine(clip.x, y + 1, clip.x + clip.width, y + 1);
 //				g.setColor(TRACK.brighter());
 //				g.drawLine(clip.x, y + 61, clip.x + clip.width, y + 61);
+				frame = start / fw - 1;
 				g.setColor(TICK);
 				for (int x = -fw ; x <= clip.width + fw; x += fw) {
-					g.drawLine(x + start, y + 5, x + start, y + iExpandedHeight - 12);
+					if (frame % 6 == 0) {
+						g.setColor(ZERO);
+						g.drawLine(x + start, y + 5, x + start, y + iExpandedHeight - 12);
+						g.setColor(TICK);
+					} else {
+						g.drawLine(x + start, y + 5, x + start, y + iExpandedHeight - 12);
+					}
+					frame++;
 				}
 				g.setColor(ZERO);
 				g.drawLine(clip.x, y + off, clip.x + clip.width, y + off);
 				g.setClip(clip.intersection(new Rectangle(clip.x, y + 2, clip.width, size + 7)));
 				int vPrev = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
 				g.setColor(CURVE);
+				frame = start / fw - 1;
 				for (int x = -fw ; x <= clip.width + fw; x ++) {
 					float f = (float) (start + x - fw / 2) / fw;
 					int vThis = off - (int) Math.round(size / scale * motionCurve.getFloatAt(f));
@@ -117,10 +132,10 @@ public class AvarTrack extends Track {
 					frame++;
 				}
 				g.setClip(clip);
-				g.setColor(timelineEditor.getBackground().darker());
-				g.drawLine(clip.x, y + getHeight() - 5, clip.x + clip.width, y + getHeight() - 5);
 				return;
 			}
+			g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+			g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
 //			g.setColor(TRACK.darker());
 //			g.drawLine(clip.x, y + 5, clip.x + clip.width, y + 5);
 //			g.setColor(TRACK.brighter());
@@ -138,8 +153,13 @@ public class AvarTrack extends Track {
 					g.drawOval(x + start - 3, y + 4, 6, 6);
 					
 				} else {
-					g.setColor(TICK);
-					g.drawLine(x + start, y + 5, x + start, y + 9);
+					if (frame % 6 == 0) {
+						g.setColor(ZERO);
+						g.drawLine(x + start, y + 5, x + start, y + 9);
+					} else {
+						g.setColor(TICK);
+						g.drawLine(x + start, y + 5, x + start, y + 9);
+					}
 				}
 				frame++;
 			}

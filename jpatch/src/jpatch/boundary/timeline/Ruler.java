@@ -1,5 +1,5 @@
 /*
- * $Id: Ruler.java,v 1.2 2006/01/19 16:26:29 sascha_l Exp $
+ * $Id: Ruler.java,v 1.3 2006/01/20 14:30:14 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -21,15 +21,12 @@
  */
 package jpatch.boundary.timeline;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Rectangle;
+import java.awt.*;
+import java.awt.event.*;
 
 import javax.swing.JComponent;
 
-class Ruler extends JComponent {
+class Ruler extends JComponent implements MouseListener, MouseMotionListener, MouseWheelListener {
 		/**
 		 * 
 		 */
@@ -40,10 +37,15 @@ class Ruler extends JComponent {
 		 */
 		Ruler(TimelineEditor timelineEditor) {
 			this.timelineEditor = timelineEditor;
+			addMouseListener(this);
+			addMouseMotionListener(this);
+			addMouseWheelListener(this);
+			setCursor(TimelineEditor.horizontalResizeCursor);
 		}
 
 		private Dimension dim = new Dimension();
 		private Font font = new Font("Monospaced", Font.PLAIN, 10);
+		private int mouseX;
 		
 		public Dimension getPreferredSize() {
 			dim.setSize(timelineEditor.getFrameWidth() * 24 * 60, 16); // FIXME: use animation length
@@ -95,4 +97,46 @@ class Ruler extends JComponent {
 //			g.draw3DRect(clip.x, clip.y, clip.width - 1, clip.height - 1, false);
 //			g.draw3DRect(clip.x + 1, clip.y + 1, clip.width - 3, clip.height - 3, true);
 		}
+
+		public void mouseWheelMoved(MouseWheelEvent e) {
+			setFrameWidth(timelineEditor.getFrameWidth() - e.getWheelRotation());
+		}
+		
+		private void setFrameWidth(int newWidth) {
+			if (newWidth < 6)
+				newWidth = 6;
+			if (newWidth > 32)
+				newWidth = 32;
+			Rectangle r = timelineEditor.getViewport().getViewRect();
+			r.x = r.x * newWidth / timelineEditor.getFrameWidth();
+			timelineEditor.setFrameWidth(newWidth);
+			timelineEditor.getHorizontalScrollBar().setValue(r.x);
+			revalidate();
+			((JComponent) timelineEditor.getViewport().getView()).revalidate();
+			((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
+		}
+		
+		public void mousePressed(MouseEvent e) {
+			mouseX = (e.getX() - timelineEditor.getViewport().getViewRect().x) / timelineEditor.getFrameWidth();
+		}
+		
+		public void mouseDragged(MouseEvent e) {
+			if (mouseX == 0)
+				return;
+			int x = e.getX() - timelineEditor.getViewport().getViewRect().x;
+			int nf = x / mouseX;
+			setFrameWidth(nf);
+		}
+
+		public void mouseClicked(MouseEvent e) { }
+
+		public void mouseReleased(MouseEvent e) { }
+
+		public void mouseEntered(MouseEvent e) { }
+
+		public void mouseExited(MouseEvent e) { }
+
+		public void mouseMoved(MouseEvent e) { }
+		
+		
 	}

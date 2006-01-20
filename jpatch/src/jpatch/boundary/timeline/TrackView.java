@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.3 2006/01/19 16:26:29 sascha_l Exp $
+ * $Id: TrackView.java,v 1.4 2006/01/20 14:30:14 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -21,44 +21,24 @@
  */
 package jpatch.boundary.timeline;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 
-import javax.swing.JComponent;
-import javax.swing.Scrollable;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 
 @SuppressWarnings("serial")
-class TrackView extends JComponent implements Scrollable {
+class TrackView extends JComponent implements Scrollable, MouseListener, MouseMotionListener {
 		/**
 		 * 
 		 */
 		private final TimelineEditor timelineEditor;
 		private Dimension dim = new Dimension();
+		private int iVerticalResize = -1;
 		
 		public TrackView(TimelineEditor tle) {
 			timelineEditor = tle;
-			addMouseListener(new MouseAdapter() {
-				public void mousePressed(MouseEvent event) {
-					if (event.getClickCount() == 2) {
-						int y = 0;
-						for (Track track : timelineEditor.getTracks()) {
-							if (event.getY() > y && event.getY() < y + track.getHeight()) {
-								track.expand(!track.isExpanded());
-								revalidate();
-								((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
-								timelineEditor.repaint();
-								return;
-							}
-							y += track.getHeight();
-						}
-					}
-				}
-			});
+			addMouseListener(this);
+			addMouseMotionListener(this);
 		}
 		
 		public Dimension getPreferredSize() {
@@ -89,6 +69,13 @@ class TrackView extends JComponent implements Scrollable {
 				track.paint(g, y);
 				y += track.getHeight();
 			}
+			if (timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
+				y -= 1;
+			g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+			g.drawLine(clip.x, y - 1, clip.x + clip.width - 1, y - 1);
+			g.setColor(UIManager.getColor("ScrollBar.shadow"));
+			g.drawLine(clip.x, y, clip.x + clip.width - 1, y);
+			
 			int x = timelineEditor.getCurrentFrame() * fw + fw / 2;
 			g.setColor(Color.BLACK);
 			g.drawLine(x, clip.y, x, clip.y + clip.height);
@@ -136,5 +123,79 @@ class TrackView extends JComponent implements Scrollable {
 
 		public boolean getScrollableTracksViewportHeight() {
 			return false;
+		}
+		
+		public void mousePressed(MouseEvent e) {
+			int y = 0;
+			for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
+			Track track = timelineEditor.getTracks().get(i);
+				if (e.getClickCount() == 2 && e.getY() > y && e.getY() < y + track.getHeight() - 6) {
+					timelineEditor.expandTrack(track, !track.isExpanded());
+					return;
+				} else if (track.isExpanded() && e.getY() > y + track.getHeight() - 6 && e.getY() <= y + track.getHeight()) {
+					if (e.getClickCount() == 2) {
+						((AvarTrack) track).setDefaultExpandedHeight();
+						timelineEditor.revalidate();
+						revalidate();
+						((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
+						timelineEditor.repaint();
+//						setVerticalResizeCursor(e.getY() > y + track.getHeight() - 5 && e.getY() <= y + track.getHeight());
+					} else {
+						iVerticalResize = i;
+					}
+				}
+				y += track.getHeight();
+			}
+		}
+
+		public void mouseClicked(MouseEvent e) {
+		}
+
+		public void mouseReleased(MouseEvent e) {
+			if (iVerticalResize > -1)
+				iVerticalResize = -1;
+		}
+
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		public void mouseExited(MouseEvent e) {
+			if (iVerticalResize < 0)
+				timelineEditor.setCursor(TimelineEditor.defaultCursor);
+		}
+
+		public void mouseDragged(MouseEvent e) {
+			if (iVerticalResize > -1) {
+				int y = 0;
+				for (int i = 0; i < iVerticalResize; i++)
+					y += timelineEditor.getTracks().get(i).getHeight();
+				int h = e.getY() - y + 3;
+				if (h < 32)
+					h = 32;
+				if (h > 512)
+					h = 512;
+				((AvarTrack) timelineEditor.getTracks().get(iVerticalResize)).setExpandedHeight(h);
+				timelineEditor.revalidate();
+				revalidate();
+				((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
+				timelineEditor.repaint();
+			}
+		}
+
+		public void mouseMoved(MouseEvent e) {
+			boolean vResize = false;
+			int y = 0;
+			for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
+			Track track = timelineEditor.getTracks().get(i);
+				if (track.isExpanded() && e.getY() > y + track.getHeight() - 6 && e.getY() <= y + track.getHeight()) {
+					vResize = true;
+					break;
+				}
+				y += track.getHeight();
+			}
+			if (vResize)
+				timelineEditor.setCursor(TimelineEditor.verticalResizeCursor);
+			else 
+				timelineEditor.setCursor(TimelineEditor.defaultCursor);
 		}
 	}
