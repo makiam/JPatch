@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.4 2006/01/20 14:30:14 sascha_l Exp $
+ * $Id: TrackView.java,v 1.5 2006/01/20 20:28:23 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -55,6 +55,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		}
 		
 		public void paintComponent(Graphics g) {
+			long t = System.currentTimeMillis();
 			super.paintComponent(g);
 			Rectangle clip = g.getClipBounds();
 			int fw = timelineEditor.getFrameWidth();
@@ -66,7 +67,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //			}
 			int y = 0;
 			for (Track track : timelineEditor.getTracks()) {
-				track.paint(g, y);
+				if (y + track.getHeight() > clip.y && y < clip.y + clip.height)
+					track.paint(g, y);
 				y += track.getHeight();
 			}
 			if (timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
@@ -83,6 +85,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //			
 //			g.setColor(Color.BLACK);
 //			g.drawLine(x + 1, clip.y, x + 1, clip.height);
+			System.out.println((System.currentTimeMillis() - t) + " ms");
 		}
 		
 		public Dimension getPreferredScrollableViewportSize() {
@@ -172,8 +175,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				int h = e.getY() - y + 3;
 				if (h < 32)
 					h = 32;
-				if (h > 512)
-					h = 512;
+				if (h > 256)
+					h = 256;
 				((AvarTrack) timelineEditor.getTracks().get(iVerticalResize)).setExpandedHeight(h);
 				timelineEditor.revalidate();
 				revalidate();

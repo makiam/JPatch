@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.6 2006/01/20 14:30:14 sascha_l Exp $
+ * $Id: Header.java,v 1.7 2006/01/20 20:28:23 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -178,6 +178,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		private static Icon createIcon(final int type, final Color color) {
 			return new Icon() {
 				public void paintIcon(Component c, Graphics g, int x, int y) {
+					((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 					g.setColor(color);
 					switch (type) {
 					case 0:
@@ -238,8 +239,8 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 				int h = e.getY() - y + 3;
 				if (h < 32)
 					h = 32;
-				if (h > 512)
-					h = 512;
+				if (h > 256)
+					h = 256;
 				((AvarTrack) timelineEditor.getTracks().get(iVerticalResize)).setExpandedHeight(h);
 				timelineEditor.revalidate();
 				revalidate();

@@ -31,6 +31,8 @@ public class SmoothBorders extends MetalBorders {
     	public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
     		SmoothUtilities.configureGraphics(g);
     		AbstractButton button = (AbstractButton) c;
+    		if (!button.isBorderPainted())
+    			return;
     		ButtonModel model = button.getModel();
     		if (model.isRollover()) {
     			g.setColor(Theme.rolloverBorderColor);

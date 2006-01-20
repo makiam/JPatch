@@ -19,6 +19,7 @@ import jpatch.*;
 import jpatch.entity.*;
 import jpatch.boundary.settings.Settings;
 import jpatch.boundary.sidebar.SideBar;
+import jpatch.boundary.timeline.TimelineEditor;
 import jpatch.boundary.tools.*;
 //	import jpatch.boundary.mouse.*;		//remove
 import jpatch.control.*;
@@ -64,7 +65,7 @@ public final class MainFrame extends JFrame {
 	private MorphTarget editedMorph;
 	private JDialog vcrDialog;
 	private VcrControls vcrControls;
-	private MotionCurveDisplay motionCurveDisplay;
+	private TimelineEditor timelineEditor;
 	
 	private JMenu viewMenu;
 	
@@ -489,10 +490,12 @@ public final class MainFrame extends JFrame {
 		JPanel panel = new JPanel();
 		panel.add(vcrControls);
 		vcrDialog.add(panel, BorderLayout.SOUTH);
-		SmartScrollPane smartScrollPane = new SmartScrollPane();
-		motionCurveDisplay = new MotionCurveDisplay(smartScrollPane);
-		smartScrollPane.setVirtualCanvas(motionCurveDisplay);
-		vcrDialog.add(smartScrollPane, BorderLayout.CENTER);
+//		SmartScrollPane smartScrollPane = new SmartScrollPane();
+		//motionCurveDisplay = new MotionCurveDisplay(smartScrollPane);
+		//smartScrollPane.setVirtualCanvas(motionCurveDisplay);
+		timelineEditor = new TimelineEditor();
+		timelineEditor.test();
+		vcrDialog.add(timelineEditor, BorderLayout.CENTER);
 		vcrDialog.setSize(800, 600);
 		vcrDialog.setVisible(true);
 		Command.getInstance().enableCommand("open", false);
