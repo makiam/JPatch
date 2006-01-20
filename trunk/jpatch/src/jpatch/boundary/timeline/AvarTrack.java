@@ -35,7 +35,7 @@ public class AvarTrack extends Track {
 		 * 
 		 */
 		private final TimelineEditor timelineEditor;
-		public static final int EXPANDED_HEIGHT = 128;
+		public static final int EXPANDED_HEIGHT = 92;
 		private static final Color SEPARATOR = new Color(255, 255, 255);
 		private static final Color TRACK = new Color(208, 216, 200);
 		private static final Color KEY = new Color(136, 128, 144);
