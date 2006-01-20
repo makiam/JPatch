@@ -26,7 +26,7 @@ public class TimelineEditor extends JScrollPane {
 	public static Cursor cornerResizeCursor = Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR);
 	private Cursor currentCursor = defaultCursor;
 	
-	private final MotionCurve.Float[] curves = new MotionCurve.Float[20];
+	private final MotionCurve.Float[] curves = new MotionCurve.Float[200];
 	private List<Track> listTracks = new ArrayList<Track>();
 	private int iCurrentFrame = 49;
 	private int iFrameWidth = 8;
@@ -108,12 +108,17 @@ public class TimelineEditor extends JScrollPane {
 	}
 	
 	public static void main(String[] args) {
-		new TimelineEditor().test();
+		TimelineEditor tle = new TimelineEditor();
+		tle.test();
+		JFrame frame = new JFrame("Timeline Editor");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(tle);
+		frame.setSize(640, 480);
+		frame.setVisible(true);
 	}
 	
 	public void test() {
-		JFrame frame = new JFrame("Timeline Editor");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 //		frame.setLayout(new BorderLayout());
 ////		table.getColumnModel().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 ////		table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -135,7 +140,7 @@ public class TimelineEditor extends JScrollPane {
 //		final MotionCurve2.Float curve = MotionCurve2.createMorphCurve(morph);
 		
 		Random rnd = new Random();
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 200; i++) {
 			Morph morph = new Morph("test" + i, model);
 			morph.setMin(-1);
 			morph.setMax(1);
@@ -195,9 +200,7 @@ public class TimelineEditor extends JScrollPane {
 		};
 		tle.setCorner(LOWER_RIGHT_CORNER, corner);
 		//tle.getHorizontalScrollBar().get  setBackground(getBackground().darker());
-		frame.add(tle);
-		frame.setSize(640, 480);
-		frame.setVisible(true);
+		
 	}
 
 	public List<Track> getTracks() {

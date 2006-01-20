@@ -24,6 +24,8 @@ package jpatch.boundary.timeline;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -114,6 +116,7 @@ public class Corner extends JComponent {
 	private static Icon createIcon(final int type, final Color color) {
 		return new Icon() {
 			public void paintIcon(Component c, Graphics g, int x, int y) {
+				((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 				g.setColor(color);
 				switch (type) {
 				case 0:

@@ -26,7 +26,8 @@ public class SmoothButtonUI extends BasicButtonUI {
 		AbstractButton button = (AbstractButton) c;
 		ButtonModel model = button.getModel();
 		Graphics2D g2 = (Graphics2D) g;
-		Theme.paintButtonBackground(button, g2);
+		if (button.isContentAreaFilled())
+			Theme.paintButtonBackground(button, g2);
 		//g.setColor(c.getBackground());
 		//g.fillRect(0, 0, c.getWidth(), c.getHeight());
 		
