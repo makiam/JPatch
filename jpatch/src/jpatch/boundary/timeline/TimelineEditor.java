@@ -56,6 +56,8 @@ public class TimelineEditor extends JScrollPane {
 //		setCorner(UPPER_LEFT_CORNER, new Corner());
 //		setCorner(LOWER_LEFT_CORNER, new Corner());
 //		setAutoscrolls(true);
+		
+		this.setWheelScrollingEnabled(false);
 	}
 	
 	public void setCursor(Cursor cursor) {
