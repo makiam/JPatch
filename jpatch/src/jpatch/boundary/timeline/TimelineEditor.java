@@ -27,7 +27,6 @@ public class TimelineEditor extends JScrollPane {
 	public static Cursor cornerResizeCursor = Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR);
 	private Cursor currentCursor = defaultCursor;
 	
-	private final MotionCurve.Float[] curves = new MotionCurve.Float[200];
 	private List<Track> listTracks = new ArrayList<Track>();
 	private int iCurrentFrame = 49;
 	private int iFrameWidth = 8;
@@ -101,7 +100,7 @@ public class TimelineEditor extends JScrollPane {
 	
 	void resetTracks() {
 		for (Track track : listTracks)
-			((AvarTrack) track).setExpandedHeight(AvarTrack.EXPANDED_HEIGHT);
+			track.setExpandedHeight(AvarTrack.EXPANDED_HEIGHT);
 		revalidate();
 		((JComponent) getViewport().getView()).revalidate();
 		((JComponent) getRowHeader().getView()).revalidate();
@@ -112,8 +111,25 @@ public class TimelineEditor extends JScrollPane {
 		listTracks.clear();
 		MotionCurveSet mcs = MainFrame.getInstance().getAnimation().getCurvesetFor(animObject);
 		for (MotionCurve curve : mcs.motionCurveList) {
-			if (curve instanceof MotionCurve.Float) {
-				listTracks.add(new AvarTrack(this, null, (MotionCurve.Float) curve));
+			if (curve instanceof MotionCurve.Float)
+				listTracks.add(new AvarTrack(this, (MotionCurve.Float) curve));
+			else if (curve instanceof MotionCurve.Color3f)
+				listTracks.add(new ColorTrack(this, (MotionCurve.Color3f) curve));
+			else 
+				listTracks.add(new Track(this, curve));
+		}
+		if (animObject instanceof AnimModel) {
+			if (((AnimModel) animObject).getModel().getMorphList().size() > 0)
+				listTracks.add(new HeaderTrack(this, "MORPHS"));
+			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
+				listTracks.add(new AvarTrack(this, ((MotionCurveSet.Model) mcs).morph((Morph) it.next())));
+			}
+			if (((AnimModel) animObject).getModel().getBoneSet().size() > 0)
+				listTracks.add(new HeaderTrack(this, "BONES"));
+			for (Iterator it = ((AnimModel) animObject).getModel().getBoneSet().iterator(); it.hasNext(); ) {
+				Bone bone = (Bone) it.next();
+				if (bone.getParentBone() == null)
+					recursiveAddBoneDofs(bone, 0, (MotionCurveSet.Model) mcs);
 			}
 		}
 		header.createButtons();
@@ -121,6 +137,17 @@ public class TimelineEditor extends JScrollPane {
 		((JComponent) getViewport().getView()).revalidate();
 		((JComponent) getRowHeader().getView()).revalidate();
 		repaint();
+	}
+	
+	private void recursiveAddBoneDofs(Bone bone, int level, MotionCurveSet.Model mcs) {
+		int n = bone.getDofs().size();
+		MotionCurve.Float[] curves = new MotionCurve.Float[n];
+		for (int i = 0; i < n; i++)
+			curves[i] = mcs.morph((Morph) bone.getDofs().get(i));
+		listTracks.add(new BoneTrack(this, curves, bone, level));
+		for (Iterator itBones = bone.getChildBones().iterator(); itBones.hasNext(); ) {
+			recursiveAddBoneDofs((Bone) itBones.next(), level + 1, mcs);
+		}
 	}
 	
 	public int getFrameWidth() {
@@ -135,60 +162,60 @@ public class TimelineEditor extends JScrollPane {
 		super.setViewportView(c);
 	}
 	
-	public static void main(String[] args) {
-		TimelineEditor tle = new TimelineEditor();
-		tle.test();
-		JFrame frame = new JFrame("Timeline Editor");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(tle);
-		frame.setSize(640, 480);
-		frame.setVisible(true);
-	}
+//	public static void main(String[] args) {
+//		TimelineEditor tle = new TimelineEditor();
+//		tle.test();
+//		JFrame frame = new JFrame("Timeline Editor");
+//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		frame.add(tle);
+//		frame.setSize(640, 480);
+//		frame.setVisible(true);
+//	}
 	
-	public void test() {
-		
-//		frame.setLayout(new BorderLayout());
-////		table.getColumnModel().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-////		table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-////		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-//		table.setColumnSelectionAllowed(true);
-//		table.setRowSelectionAllowed(true);
-//		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//		table.getTableHeader().setReorderingAllowed(false);
-//		table.setDragEnabled(true);
+//	public void test() {
 //		
-//		for (int i = 0; i < table.getColumnCount(); i++) {
-//			table.getColumnModel().getColumn(i).setPreferredWidth(5);
-//			table.getColumnModel().getColumn(i).setMinWidth(5);
-//			table.getColumnModel().getColumn(i).setMaxWidth(5);
-//			table.getColumnModel().getColumn(i).setResizable(false);
+////		frame.setLayout(new BorderLayout());
+//////		table.getColumnModel().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//////		table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//////		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+////		table.setColumnSelectionAllowed(true);
+////		table.setRowSelectionAllowed(true);
+////		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+////		table.getTableHeader().setReorderingAllowed(false);
+////		table.setDragEnabled(true);
+////		
+////		for (int i = 0; i < table.getColumnCount(); i++) {
+////			table.getColumnModel().getColumn(i).setPreferredWidth(5);
+////			table.getColumnModel().getColumn(i).setMinWidth(5);
+////			table.getColumnModel().getColumn(i).setMaxWidth(5);
+////			table.getColumnModel().getColumn(i).setResizable(false);
+////		
 //		
-		
-		Model model = new Model();
-//		final MotionCurve2.Float curve = MotionCurve2.createMorphCurve(morph);
-		
-		Random rnd = new Random();
-		for (int i = 0; i < 200; i++) {
-			Morph morph = new Morph("test" + i, model);
-			morph.setMin(-1);
-			morph.setMax(1);
-			curves[i] = MotionCurve.createMorphCurve(morph);
-			for (int j = 3; j < 24 * 60; j++) {
-				if (rnd.nextInt(20) == 0)
-					curves[i].addKey(new MotionKey.Float(j, curves[i].getMin() + rnd.nextFloat() * (curves[i].getMax() - curves[i].getMin())));
-			}
-			curves[i].addKey(new MotionKey.Float(0, 0));
-			curves[i].addKey(new MotionKey.Float(1, -1));
-			curves[i].addKey(new MotionKey.Float(2, 1));
-			listTracks.add(new AvarTrack(this, morph, curves[i]));
-		}
-			
-		final TimelineEditor tle = this;
-		
-		
-		//tle.getHorizontalScrollBar().get  setBackground(getBackground().darker());
-		
-	}
+//		Model model = new Model();
+////		final MotionCurve2.Float curve = MotionCurve2.createMorphCurve(morph);
+//		
+//		Random rnd = new Random();
+//		for (int i = 0; i < 200; i++) {
+//			Morph morph = new Morph("test" + i, model);
+//			morph.setMin(-1);
+//			morph.setMax(1);
+//			curves[i] = MotionCurve.createMorphCurve(morph);
+//			for (int j = 3; j < 24 * 60; j++) {
+//				if (rnd.nextInt(20) == 0)
+//					curves[i].addKey(new MotionKey.Float(j, curves[i].getMin() + rnd.nextFloat() * (curves[i].getMax() - curves[i].getMin())));
+//			}
+//			curves[i].addKey(new MotionKey.Float(0, 0));
+//			curves[i].addKey(new MotionKey.Float(1, -1));
+//			curves[i].addKey(new MotionKey.Float(2, 1));
+//			listTracks.add(new AvarTrack(this, morph, curves[i]));
+//		}
+//			
+//		final TimelineEditor tle = this;
+//		
+//		
+//		//tle.getHorizontalScrollBar().get  setBackground(getBackground().darker());
+//		
+//	}
 
 	public List<Track> getTracks() {
 		return listTracks;

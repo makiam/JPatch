@@ -158,6 +158,10 @@ public abstract class MotionCurve {
 		return ((MotionKey) list.get(list.size() - 1)).getPosition();
 	}
 	
+	public boolean hasKeyAt(float position) {
+		return getKeyAt(position) != null;
+	}
+	
 	public MotionKey getKeyAt(float position) {
 		if (position == ((MotionKey) list.get(list.size() - 1)).getPosition()) return (MotionKey) list.get(list.size() - 1);
 		int index = binarySearch(position) - 1;

@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.1 2006/01/17 21:06:39 sascha_l Exp $
+ * $Id: Track.java,v 1.2 2006/01/21 15:15:55 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -21,25 +21,98 @@
  */
 package jpatch.boundary.timeline;
 
-import java.awt.Graphics;
+import java.awt.*;
 
-public abstract class Track {
-	public final static int TRACK_HEIGHT = 16;
-	boolean bExpanded = false;
+import javax.swing.UIManager;
+
+import jpatch.entity.*;
+
+public class Track<M extends MotionCurve> {
 	
-	public int getHeight() {
-		return TRACK_HEIGHT;
+	static final Color SEPARATOR = new Color(255, 255, 255);
+	static final Color TRACK = new Color(208, 216, 200);
+	static final Color KEY = new Color(136, 128, 144);
+	static final Color TICK = new Color(200, 192, 186);
+	static final Color ZERO = new Color(178, 170, 162);
+	static final Color CURVE = new Color(0, 0, 0);
+	
+	static final int TRACK_HEIGHT = 16;
+	static final int EXPANDED_HEIGHT = 92;
+	
+	int iExpandedHeight = EXPANDED_HEIGHT;
+	boolean bExpanded = false;
+	boolean bExpandable = false;
+	TimelineEditor timelineEditor;
+	M motionCurve;
+	
+	public Track(TimelineEditor timelineEditor, M motionCurve) {
+		this.timelineEditor = timelineEditor;
+		this.motionCurve = motionCurve;
 	}
 	
-	public abstract void paint(Graphics g, int y);
+	public int getHeight() {
+		return bExpanded ? iExpandedHeight : TRACK_HEIGHT;
+	}
 	
-	public abstract String getName();
+	public String getName() {
+		return motionCurve.getName();
+	}
+	
+	public int getInlay() {
+		return 0;
+	}
 	
 	public void expand(boolean expand) {
-		bExpanded = expand;
+		if (bExpandable)
+			bExpanded = expand;
+	}
+	
+	public boolean isExpandable() {
+		return bExpandable;
+	}
+	
+	public void setExpandedHeight(int height) {
+		iExpandedHeight = height;
+	}
+	
+	public void setDefaultExpandedHeight() {
+		iExpandedHeight = EXPANDED_HEIGHT;
 	}
 	
 	public boolean isExpanded() {
 		return bExpanded;
+	}
+	
+	public void paint(Graphics g, int y) {	
+		Rectangle clip = g.getClipBounds();
+		int fw = timelineEditor.getFrameWidth();
+		int start = clip.x - clip.x % fw + fw / 2;
+		int frame = start / fw - 1;
+		
+		g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+		g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
+		g.setColor(TRACK);
+		g.fillRect(clip.x, y + 5, clip.width, 5);
+		
+		g.setColor(KEY);
+		for (int x = -fw ; x <= clip.width + fw; x += fw) {
+			if (motionCurve.hasKeyAt(frame)) {
+				//g.fill3DRect(x + start - iFrameWidth / 2, y + 2, iFrameWidth, 11, true);
+				g.setColor(KEY);
+				g.fillOval(x + start - 3, y + 4, 6, 6);
+				g.setColor(Color.BLACK);
+				g.drawOval(x + start - 3, y + 4, 6, 6);
+				
+			} else {
+				if (frame % 6 == 0) {
+					g.setColor(ZERO);
+					g.drawLine(x + start, y + 5, x + start, y + 9);
+				} else {
+					g.setColor(TICK);
+					g.drawLine(x + start, y + 5, x + start, y + 9);
+				}
+			}
+			frame++;
+		}
 	}
 }

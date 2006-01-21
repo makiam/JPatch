@@ -147,7 +147,7 @@ public class MotionCurveSet {
 				MotionCurve.Float morphCurve = MotionCurve.createMorphCurve(morph, new MotionKey.Float(pos, morph.getValue()));
 				map.put(morph, morphCurve);
 				idMap.put(morph.getId(), morph);
-				motionCurveList.add(morphCurve);
+//				motionCurveList.add(morphCurve);
 			}
 			Set rootBoneSet = new HashSet();
 			for (Iterator itBone = animModel.getModel().getBoneSet().iterator(); itBone.hasNext(); ) {
@@ -242,7 +242,7 @@ public class MotionCurveSet {
 				MotionCurve.Float morphCurve = MotionCurve.createMorphCurve(dof, new MotionKey.Float(pos, dof.getValue()));
 				map.put(dof, morphCurve);
 				idMap.put(dof.getId(), dof);
-				motionCurveList.add(morphCurve);
+//				motionCurveList.add(morphCurve);
 			}
 			for (Iterator itBones = bone.getChildBones().iterator(); itBones.hasNext(); ) {
 				recursiveAddBoneDofs((Bone) itBones.next(), map, pos);
