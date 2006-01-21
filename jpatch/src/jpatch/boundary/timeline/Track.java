@@ -58,7 +58,7 @@ public class Track<M extends MotionCurve> {
 		return motionCurve.getName();
 	}
 	
-	public int getInlay() {
+	public int getIndent() {
 		return 0;
 	}
 	
