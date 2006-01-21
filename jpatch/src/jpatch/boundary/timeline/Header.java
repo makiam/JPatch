@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.7 2006/01/20 20:28:23 sascha_l Exp $
+ * $Id: Header.java,v 1.8 2006/01/21 10:04:00 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -40,13 +40,19 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		private int iVerticalResize = -1;
 		private static final Icon[] iconDownArrow = new Icon[] {createIcon(0, Color.BLACK), createIcon(0, Color.WHITE), createIcon(0, UIManager.getColor("Button.focus")) };
 		private static final Icon[] iconUpArrow = new Icon[] {createIcon(1, Color.BLACK), createIcon(1, Color.WHITE), createIcon(1, UIManager.getColor("Button.focus")) };
-		private JToggleButton[] expandButton;
+		private JToggleButton[] expandButton = new JToggleButton[0];
 		
 		public Header(TimelineEditor tle) {
 			timelineEditor = tle;
 			addMouseListener(this);
 			addMouseMotionListener(this);
 			setLayout(null);
+			createButtons();
+		}
+		
+		public void createButtons() {
+			for (AbstractButton button : expandButton)
+				remove(button);
 			expandButton = new JToggleButton[timelineEditor.getTracks().size()];
 			for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
 				final Track track = timelineEditor.getTracks().get(i);
@@ -152,7 +158,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 				}
 				y += track.getHeight();
 			}
-			if (timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
+			if (timelineEditor.getTracks().size() > 0 && timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
 				y -= 1;
 			g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
 			g.drawLine(0, y - 1, width - 1, y - 1);

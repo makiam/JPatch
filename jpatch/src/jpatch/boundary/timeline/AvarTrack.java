@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.7 2006/01/20 20:28:23 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.8 2006/01/21 10:04:00 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -43,7 +43,7 @@ public class AvarTrack extends Track {
 		private static final Color ZERO = new Color(178, 170, 162);
 		private static final Color CURVE = new Color(0, 0, 0);
 		
-		private Morph morph;
+//		private Morph morph;
 		private MotionCurve.Float motionCurve;
 		private int iExpandedHeight = EXPANDED_HEIGHT;
 		
@@ -60,12 +60,13 @@ public class AvarTrack extends Track {
 		}
 		
 		public String getName() {
-			return morph.getId();
+//			return morph.getId();
+			return motionCurve.getName();
 		}
 		
 		public AvarTrack(TimelineEditor timelineEditor, Morph morph, MotionCurve.Float motionCurve) {
 			this.timelineEditor = timelineEditor;
-			this.morph = morph;
+//			this.morph = morph;
 			this.motionCurve = motionCurve;
 		}
 		
