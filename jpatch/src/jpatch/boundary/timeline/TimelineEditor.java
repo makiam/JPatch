@@ -10,6 +10,7 @@ import javax.swing.plaf.ScrollBarUI;
 import javax.swing.plaf.metal.MetalScrollBarUI;
 
 import jpatch.entity.*;
+import jpatch.boundary.*;
 
 public class TimelineEditor extends JScrollPane {
 
@@ -31,33 +32,45 @@ public class TimelineEditor extends JScrollPane {
 	private int iCurrentFrame = 49;
 	private int iFrameWidth = 8;
 	
+	private Header header = new Header(this);
+	
 	public TimelineEditor() {
-//		super(VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_ALWAYS);
-//		Dimension dim = new Dimension(ZOOM_IN.getIconWidth() + 1, ZOOM_IN.getIconHeight() + 1);
-//		buttonZoomInH.setPreferredSize(dim);
-//		buttonZoomOutH.setPreferredSize(dim);
-//		buttonZoomInV.setPreferredSize(dim);
-//		buttonZoomOutV.setPreferredSize(dim);
-//		buttonZoomInH.setFocusable(false);
-//		buttonZoomOutH.setFocusable(false);
-//		buttonZoomInV.setFocusable(false);
-//		buttonZoomOutV.setFocusable(false);
-//		Box corner = Box.createVerticalBox();
-//		corner.add(buttonZoomInV);
-//		corner.add(buttonZoomOutV);
-//		corner.setPreferredSize(new Dimension(15, 30));
-//		setCorner(UPPER_RIGHT_CORNER, corner);
-//		corner = Box.createHorizontalBox();
-//		corner.add(buttonZoomInH);
-//		corner.add(buttonZoomOutH);
-//		corner.setPreferredSize(new Dimension(30, 15));
-//		setCorner(LOWER_LEFT_CORNER, corner);
-//		setCorner(UPPER_RIGHT_CORNER, new Corner());
-//		setCorner(UPPER_LEFT_CORNER, new Corner());
-//		setCorner(LOWER_LEFT_CORNER, new Corner());
-//		setAutoscrolls(true);
-		
-		this.setWheelScrollingEnabled(false);
+		setWheelScrollingEnabled(false);
+		TrackView trackView = new TrackView(this);
+		trackView.setOpaque(false);
+		setViewportView(trackView);
+		setColumnHeaderView(new Ruler(this));
+		setRowHeaderView(header);
+		setCorner(UPPER_LEFT_CORNER, new Corner(this));
+		setCorner(LOWER_LEFT_CORNER, new JComponent() {
+			public void paint(Graphics g) {
+				super.paint(g);
+				g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+				g.drawLine(0, 0, getWidth() - 1, 0);
+				g.setColor(UIManager.getColor("ScrollBar.shadow"));
+				g.drawLine(0, 1, getWidth() - 1, 1);
+			}
+		});
+		setCorner(UPPER_RIGHT_CORNER, new JComponent() {
+			public void paint(Graphics g) {
+				super.paint(g);
+				g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+				g.drawLine(0, 0, 0, getHeight() - 1);
+				g.setColor(UIManager.getColor("ScrollBar.shadow"));
+				g.drawLine(1, 0, 1, getHeight() - 1);
+			}
+		});
+		setCorner(LOWER_RIGHT_CORNER, new JComponent() {
+			public void paint(Graphics g) {
+				super.paint(g);
+				g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+				g.drawLine(0, 0, getWidth() - 1, 0);
+				g.drawLine(0, 0, 0, getHeight() - 1);
+				g.setColor(UIManager.getColor("ScrollBar.shadow"));
+				g.drawLine(1, 1, getWidth() - 1, 1);
+				g.drawLine(1, 1, 1, getHeight() - 1);
+			}
+		});
 	}
 	
 	public void setCursor(Cursor cursor) {
@@ -89,6 +102,21 @@ public class TimelineEditor extends JScrollPane {
 	void resetTracks() {
 		for (Track track : listTracks)
 			((AvarTrack) track).setExpandedHeight(AvarTrack.EXPANDED_HEIGHT);
+		revalidate();
+		((JComponent) getViewport().getView()).revalidate();
+		((JComponent) getRowHeader().getView()).revalidate();
+		repaint();
+	}
+	
+	public void setAnimObject(AnimObject animObject) {
+		listTracks.clear();
+		MotionCurveSet mcs = MainFrame.getInstance().getAnimation().getCurvesetFor(animObject);
+		for (MotionCurve curve : mcs.motionCurveList) {
+			if (curve instanceof MotionCurve.Float) {
+				listTracks.add(new AvarTrack(this, null, (MotionCurve.Float) curve));
+			}
+		}
+		header.createButtons();
 		revalidate();
 		((JComponent) getViewport().getView()).revalidate();
 		((JComponent) getRowHeader().getView()).revalidate();
@@ -157,48 +185,7 @@ public class TimelineEditor extends JScrollPane {
 			
 		final TimelineEditor tle = this;
 		
-		TrackView display = new TrackView(tle);
-		display.setOpaque(false);
-		tle.setViewportView(display);
 		
-		JComponent columnHeader = new Ruler(tle);
-		tle.setColumnHeaderView(columnHeader);
-		System.out.println(tle.getColumnHeader());
-		JComponent rowHeader = new Header(tle);
-		tle.setRowHeaderView(rowHeader);
-		tle.setCorner(UPPER_LEFT_CORNER, new Corner(tle));
-		JComponent corner = new JComponent() {
-			public void paint(Graphics g) {
-				super.paint(g);
-				g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-				g.drawLine(0, 0, getWidth() - 1, 0);
-				g.setColor(UIManager.getColor("ScrollBar.shadow"));
-				g.drawLine(0, 1, getWidth() - 1, 1);
-			}
-		};
-		tle.setCorner(LOWER_LEFT_CORNER, corner);
-		corner = new JComponent() {
-			public void paint(Graphics g) {
-				super.paint(g);
-				g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-				g.drawLine(0, 0, 0, getHeight() - 1);
-				g.setColor(UIManager.getColor("ScrollBar.shadow"));
-				g.drawLine(1, 0, 1, getHeight() - 1);
-			}
-		};
-		tle.setCorner(UPPER_RIGHT_CORNER, corner);
-		corner = new JComponent() {
-			public void paint(Graphics g) {
-				super.paint(g);
-				g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-				g.drawLine(0, 0, getWidth() - 1, 0);
-				g.drawLine(0, 0, 0, getHeight() - 1);
-				g.setColor(UIManager.getColor("ScrollBar.shadow"));
-				g.drawLine(1, 1, getWidth() - 1, 1);
-				g.drawLine(1, 1, 1, getHeight() - 1);
-			}
-		};
-		tle.setCorner(LOWER_RIGHT_CORNER, corner);
 		//tle.getHorizontalScrollBar().get  setBackground(getBackground().darker());
 		
 	}

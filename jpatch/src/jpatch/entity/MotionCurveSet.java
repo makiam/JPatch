@@ -5,7 +5,7 @@ import jpatch.boundary.*;
 import java.util.*;
 
 public class MotionCurveSet {
-	public List motionCurveList = new ArrayList();
+	public List<MotionCurve> motionCurveList = new ArrayList<MotionCurve>();
 	public MotionCurve.Point3d position;
 	public MotionCurve.Quat4f orientation;
 	AnimObject animObject;
@@ -140,12 +140,14 @@ public class MotionCurveSet {
 			System.out.println("Model:");
 			animModel.getModel().dump();
 			float pos = 0; // FIXME;
+			super.populateList();
 			scale = MotionCurve.createScaleCurve(new MotionKey.Float(pos, animModel.getScale()));
 			for (Iterator it = animModel.getModel().getMorphList().iterator(); it.hasNext(); ) {
 				Morph morph = (Morph) it.next();
 				MotionCurve.Float morphCurve = MotionCurve.createMorphCurve(morph, new MotionKey.Float(pos, morph.getValue()));
 				map.put(morph, morphCurve);
 				idMap.put(morph.getId(), morph);
+				motionCurveList.add(morphCurve);
 			}
 			Set rootBoneSet = new HashSet();
 			for (Iterator itBone = animModel.getModel().getBoneSet().iterator(); itBone.hasNext(); ) {
@@ -156,7 +158,8 @@ public class MotionCurveSet {
 					recursiveAddBoneDofs(bone, map, pos);
 				}
 			}
-			populateList();
+			System.out.println(motionCurveList);
+			//populateList();
 			System.out.println("new motioncurveset for " + animModel + " created. map = " + map);
 		}
 		
@@ -239,6 +242,7 @@ public class MotionCurveSet {
 				MotionCurve.Float morphCurve = MotionCurve.createMorphCurve(dof, new MotionKey.Float(pos, dof.getValue()));
 				map.put(dof, morphCurve);
 				idMap.put(dof.getId(), dof);
+				motionCurveList.add(morphCurve);
 			}
 			for (Iterator itBones = bone.getChildBones().iterator(); itBones.hasNext(); ) {
 				recursiveAddBoneDofs((Bone) itBones.next(), map, pos);
