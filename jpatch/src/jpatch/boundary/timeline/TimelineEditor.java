@@ -36,7 +36,7 @@ public class TimelineEditor extends JScrollPane {
 	public TimelineEditor() {
 		setWheelScrollingEnabled(false);
 		TrackView trackView = new TrackView(this);
-		trackView.setOpaque(false);
+//		trackView.setOpaque(true);
 		setViewportView(trackView);
 		setColumnHeaderView(new Ruler(this));
 		setRowHeaderView(header);
@@ -109,6 +109,7 @@ public class TimelineEditor extends JScrollPane {
 	
 	public void setAnimObject(AnimObject animObject) {
 		listTracks.clear();
+		listTracks.add(new HeaderTrack(this, animObject.getName(), -12));
 		MotionCurveSet mcs = MainFrame.getInstance().getAnimation().getCurvesetFor(animObject);
 		for (MotionCurve curve : mcs.motionCurveList) {
 			if (curve instanceof MotionCurve.Float)
@@ -120,12 +121,12 @@ public class TimelineEditor extends JScrollPane {
 		}
 		if (animObject instanceof AnimModel) {
 			if (((AnimModel) animObject).getModel().getMorphList().size() > 0)
-				listTracks.add(new HeaderTrack(this, "MORPHS"));
+				listTracks.add(new HeaderTrack(this, "Morphs", -4));
 			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
 				listTracks.add(new AvarTrack(this, ((MotionCurveSet.Model) mcs).morph((Morph) it.next())));
 			}
 			if (((AnimModel) animObject).getModel().getBoneSet().size() > 0)
-				listTracks.add(new HeaderTrack(this, "BONES"));
+				listTracks.add(new HeaderTrack(this, "Bones", -4));
 			for (Iterator it = ((AnimModel) animObject).getModel().getBoneSet().iterator(); it.hasNext(); ) {
 				Bone bone = (Bone) it.next();
 				if (bone.getParentBone() == null)

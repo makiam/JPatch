@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.6 2006/01/21 10:04:00 sascha_l Exp $
+ * $Id: TrackView.java,v 1.7 2006/01/21 21:43:22 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -39,10 +39,11 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			timelineEditor = tle;
 			addMouseListener(this);
 			addMouseMotionListener(this);
+			setBackground(Color.BLACK);
 		}
 		
 		public Dimension getPreferredSize() {
-			dim.setSize(timelineEditor.getFrameWidth() * 24 * 60 + 1, timelineEditor.getTracksHeight() + 4); // FIXME: use animation length
+			dim.setSize(timelineEditor.getFrameWidth() * 24 * 60 + 1, timelineEditor.getTracksHeight() + 5); // FIXME: use animation length
 			return dim;
 		}
 		
@@ -58,6 +59,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			long t = System.currentTimeMillis();
 			super.paintComponent(g);
 			Rectangle clip = g.getClipBounds();
+			System.out.println(clip);
 			int fw = timelineEditor.getFrameWidth();
 			int start = clip.x - clip.x % fw;
 			//int frame = start / TimelineEditor.this.iFrameWidth - 1;
@@ -77,11 +79,14 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			g.drawLine(clip.x, y - 1, clip.x + clip.width - 1, y - 1);
 			g.setColor(UIManager.getColor("ScrollBar.shadow"));
 			g.drawLine(clip.x, y, clip.x + clip.width - 1, y);
-			
+			//timelineEditor.getHeight();
+//			if (timelineEditor.getViewport().getHeight() > clip.height)
+//				g.setClip(clip.x, clip.y, clip.width, timelineEditor.getViewport().getHeight());
+//			g.fillRect(clip.x, y, clip.x + clip.width - 1, timelineEditor.getHeight() - y);
 			int x = timelineEditor.getCurrentFrame() * fw + fw / 2;
 			g.setColor(Color.BLACK);
-			g.drawLine(x, clip.y, x, clip.y + clip.height);
-			g.fillPolygon(new int[] { x - 5, x + 6, x }, new int[] { getHeight() - 0, getHeight() - 0, getHeight() - 6}, 3);
+			g.drawLine(x, clip.y, x, clip.y + clip.height - 1);
+			g.fillPolygon(new int[] { x - 6, x + 6, x }, new int[] { getHeight() - 0, getHeight() - 0, getHeight() - 7}, 3);
 //			
 //			g.setColor(Color.BLACK);
 //			g.drawLine(x + 1, clip.y, x + 1, clip.height);

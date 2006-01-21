@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.9 2006/01/21 15:15:55 sascha_l Exp $
+ * $Id: Header.java,v 1.10 2006/01/21 21:43:22 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -104,7 +104,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		}
 		
 		public Dimension getPreferredSize() {
-			dim.setSize(width, timelineEditor.getTracksHeight() + 4);
+			dim.setSize(width, timelineEditor.getTracksHeight() + 5);
 			return dim;
 		}
 		
@@ -133,17 +133,18 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 			for (Track track : timelineEditor.getTracks()) {
 				g.setColor(Color.BLACK);
 				if (track instanceof HeaderTrack) {
-					g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-					//g.fillRect(clip.x, y, clip.width, track.getHeight() - 1);
+					g.setColor(UIManager.getColor("ScrollBar.shadow"));
+					g.fillRect(clip.x, y, clip.width, track.getHeight() - 1);
 					g.setFont(bold);
-					g.drawString(track.getName(), 8, y + 10);
+					g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+					g.drawString(track.getName(), 16 + track.getIndent(), y + 10);
 				} else {
 					g.setFont(plain);
-					g.drawString(track.getName(), 16 + track.getInlay(), y + 12);
+					g.drawString(track.getName(), 16 + track.getIndent(), y + 12);
 				}
 			
 				g.setColor(Color.GRAY);
-				for (int i = 0; i < track.getInlay(); i += 4) {
+				for (int i = 0; i < track.getIndent(); i += 4) {
 					g.fillRect(16 + i, y + 7, 2, 2);
 				}
 				

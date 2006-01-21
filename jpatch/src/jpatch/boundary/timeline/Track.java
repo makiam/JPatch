@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.2 2006/01/21 15:15:55 sascha_l Exp $
+ * $Id: Track.java,v 1.3 2006/01/21 21:43:22 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -58,7 +58,7 @@ public class Track<M extends MotionCurve> {
 		return motionCurve.getName();
 	}
 	
-	public int getInlay() {
+	public int getIndent() {
 		return 0;
 	}
 	
