@@ -71,7 +71,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 					track.paint(g, y);
 				y += track.getHeight();
 			}
-			if (timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
+			if (timelineEditor.getTracks().size() > 0 && timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
 				y -= 1;
 			g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
 			g.drawLine(clip.x, y - 1, clip.x + clip.width - 1, y - 1);

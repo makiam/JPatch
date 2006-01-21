@@ -494,7 +494,7 @@ public final class MainFrame extends JFrame {
 		//motionCurveDisplay = new MotionCurveDisplay(smartScrollPane);
 		//smartScrollPane.setVirtualCanvas(motionCurveDisplay);
 		timelineEditor = new TimelineEditor();
-		timelineEditor.test();
+//		timelineEditor.test();
 		vcrDialog.add(timelineEditor, BorderLayout.CENTER);
 		vcrDialog.setSize(800, 600);
 		vcrDialog.setVisible(true);
@@ -684,6 +684,9 @@ public final class MainFrame extends JFrame {
 		Command.getInstance().enableCommand("lathe", moreThanOnePoint);
 		Command.getInstance().enableCommand("clone", moreThanOnePoint);
 		Command.getInstance().enableCommand("assign controlpoints to bones", bonesAndPoints);
+		if (selection != null && selection.getHotObject() instanceof AnimObject) {
+			timelineEditor.setAnimObject((AnimObject) selection.getHotObject());
+		}
 	}
 	
 	public java.util.List getSelectionsContaining(ControlPoint cp) {
