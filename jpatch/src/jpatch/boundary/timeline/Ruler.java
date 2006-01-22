@@ -61,6 +61,7 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 		}
 		
 		public void paintComponent(Graphics g) {
+			((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			super.paintComponent(g);
 			g.setFont(font);
 			Rectangle clip = g.getClipBounds();

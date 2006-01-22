@@ -27,6 +27,10 @@ public class TimelineEditor extends JScrollPane {
 	public static Cursor cornerResizeCursor = Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR);
 	private Cursor currentCursor = defaultCursor;
 	
+	public static Color SHADOW = UIManager.getColor("Label.background").darker();
+	public static Color HIGHLIGHT = UIManager.getColor("Label.background").brighter();
+	public static Color TICK = new Color(192, 192, 255);
+	
 	private List<Track> listTracks = new ArrayList<Track>();
 	private int iCurrentFrame = 49;
 	private int iFrameWidth = 8;

@@ -24,19 +24,15 @@ public class HeaderTrack extends Track {
 		return iIndent;
 	}
 	
-	public int getHeight() {
-		return 12;
-	}
-	
 	public void paint(Graphics g, int y) {	
-		Rectangle clip = g.getClipBounds();
-		int fw = timelineEditor.getFrameWidth();
-		int start = clip.x - clip.x % fw + fw / 2;
-		int frame = start / fw - 1;
-		
-		g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-		g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
-		g.setColor(UIManager.getColor("ScrollBar.shadow"));
-		g.fillRect(clip.x, y, clip.width, getHeight() - 1);
+//		Rectangle clip = g.getClipBounds();
+//		int fw = timelineEditor.getFrameWidth();
+//		int start = clip.x - clip.x % fw + fw / 2;
+//		int frame = start / fw - 1;
+//		
+//		g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+//		g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
+//		g.setColor(UIManager.getColor("ScrollBar.shadow"));
+//		g.fillRect(clip.x, y, clip.width, getHeight() - 1);
 	}
 }
