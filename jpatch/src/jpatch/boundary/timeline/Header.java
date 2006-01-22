@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.10 2006/01/21 21:43:22 sascha_l Exp $
+ * $Id: Header.java,v 1.11 2006/01/22 21:14:45 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -96,7 +96,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 			for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
 				Track track = timelineEditor.getTracks().get(i);
 				if (track.isExpandable()) {
-					expandButton[i].setBounds(3, y + 4, 11, 6);
+					expandButton[i].setBounds(3, y + 2, 11, 6);
 					expandButton[i].setSelected(track.isExpanded());
 				}
 				y += track.getHeight();
@@ -119,67 +119,87 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 			Rectangle clip = g.getClipBounds();
+			((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			//int frame = start / TimelineEditor.this.iFrameWidth - 1;
 //			g.setColor(Color.WHITE);
 //			for (int x = -TimelineEditor.this.iFrameWidth ; x <= clip.width + TimelineEditor.this.iFrameWidth; x += TimelineEditor.this.iFrameWidth) {
 //				g.drawLine(x + start, clip.y, x + start, clip.y + clip.height);
 //			}
 			
-//			g.setColor(getBackground().darker());
-//			g.drawLine(width - 5, clip.y, width - 5, clip.y + clip.height - 1);
-//			g.drawLine(width - 1, clip.y, width - 1, clip.y + clip.height - 1);
-			
+			g.setColor(TimelineEditor.HIGHLIGHT);
+			g.drawLine(width - 5, clip.y, width - 5, clip.y + timelineEditor.getTracksHeight() + 5);
+			g.setColor(TimelineEditor.SHADOW);
+			g.drawLine(width - 1, clip.y, width - 1, clip.y + timelineEditor.getTracksHeight() + 5);
+			g.setColor(getBackground());
+			g.fillRect(width - 4, clip.y, 3, clip.height);
+			clip.width -= 5;
+			g.setClip(clip);
 			int y = 0;
 			for (Track track : timelineEditor.getTracks()) {
+				int bottom = track.getHeight() - 4;
 				g.setColor(Color.BLACK);
 				if (track instanceof HeaderTrack) {
-					g.setColor(UIManager.getColor("ScrollBar.shadow"));
-					g.fillRect(clip.x, y, clip.width, track.getHeight() - 1);
+//					g.setColor(UIManager.getColor("ScrollBar.shadow"));
+//					g.fillRect(clip.x, y, clip.width, track.getHeight() - 1);
 					g.setFont(bold);
 					g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-					g.drawString(track.getName(), 16 + track.getIndent(), y + 10);
+					g.drawString(track.getName(), 16 + track.getIndent(), y + 11);
 				} else {
 					g.setFont(plain);
-					g.drawString(track.getName(), 16 + track.getIndent(), y + 12);
+					g.drawString(track.getName(), 16 + track.getIndent(), y + 11);
 				}
 			
 				g.setColor(Color.GRAY);
 				for (int i = 0; i < track.getIndent(); i += 4) {
-					g.fillRect(16 + i, y + 7, 2, 2);
+					g.fillRect(16 + i, y + 5, 2, 2);
 				}
 				
 				g.setColor(Color.BLACK);
 				if (track.isExpanded()) {
-					g.setColor(UIManager.getColor("ScrollBar.shadow"));
-					g.drawLine(width - 1, y, width - 1, y + track.getHeight() - 5);
-					g.drawLine(0, y + track.getHeight() - 1, width - 1, y + track.getHeight() - 1);
-					g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-					g.drawLine(width - 6, y, width - 6, y + track.getHeight() - 1);
-					g.drawLine(width - 2, y, width - 2, y + track.getHeight() - 1);
-					g.drawLine(0, y + track.getHeight() - 6, width - 1, y + track.getHeight() - 6);
-					g.drawLine(0, y + track.getHeight() - 2, width - 1, y + track.getHeight() - 2);
+//					g.setColor(UIManager.getColor("ScrollBar.shadow"));
+//					g.drawLine(width - 1, y, width - 1, y + track.getHeight() - 5);
+//					g.drawLine(0, y + track.getHeight() - 1, width - 1, y + track.getHeight() - 1);
+//					g.setColor(Track.SEPARATOR);
+//					g.drawLine(width - 6, y, width - 6, y + track.getHeight() - 1);
+//					g.drawLine(width - 2, y, width - 2, y + track.getHeight() - 1);
+//					g.drawLine(0, y + track.getHeight() - 6, width - 1, y + track.getHeight() - 6);
+//					g.drawLine(0, y + track.getHeight() - 2, width - 1, y + track.getHeight() - 2);
 					
+//					g.setColor(getBackground());
+//					g.fillRect(width - 3, y, 3, track.getHeight());
+//					g.fillRect(0, y + track.getHeight() - 3, width, 3);
+					g.setColor(TimelineEditor.SHADOW);
+					g.drawLine(0, y, clip.x + width - 6, y);
+//					g.drawLine(width - 1, y, width - 1, y + bottom - 1);
+					g.setColor(TimelineEditor.HIGHLIGHT);
+					g.drawLine(0, y + bottom, width - 5, y + bottom);
+//					g.drawLine(width - 5, y + 1, width - 5, y + bottom);
 					g.setColor(getBackground());
-					g.fillRect(width - 5, y, 3, track.getHeight());
-					g.fillRect(0, y + track.getHeight() - 5, width, 3);
+					g.fillRect(0, y + bottom + 1, width, 3);
+//					g.fillRect(width - 4, y, 3, track.getHeight());
 				} else {
-					g.setColor(UIManager.getColor("ScrollBar.shadow"));
-					g.drawLine(width - 1, y, width - 1, y + track.getHeight() - 1);
-					g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-					g.drawLine(width - 6, y, width - 6, y + track.getHeight() - 1);
-					g.drawLine(width - 2, y, width - 2, y + track.getHeight() - 1);
-					g.drawLine(0, y + track.getHeight() - 1, width - 1, y + track.getHeight() - 1);
-					g.setColor(getBackground());
-					g.fillRect(width - 5, y, 3, track.getHeight());
+//					g.setColor(UIManager.getColor("ScrollBar.shadow"));
+//					g.drawLine(width - 1, y, width - 1, y + track.getHeight() - 1);
+//					g.setColor(TimelineEditor.SHADOW);
+//					g.drawLine(width - 1, y - 3, width - 1, y + bottom);
+//					g.setColor(TimelineEditor.HIGHLIGHT);
+//					g.drawLine(width - 5, y - 3, width - 5, y + bottom);
+//					g.setColor(getBackground());
+//					g.fillRect(width - 4, y, 3, track.getHeight());
+//					g.drawLine(width - 6, y, width - 6, y + track.getHeight() - 1);
+//					g.drawLine(width - 2, y, width - 2, y + track.getHeight() - 1);
+//					g.drawLine(0, y + track.getHeight() - 1, width - 1, y + track.getHeight() - 1);
+//					g.setColor(getBackground());
+//					g.fillRect(width - 3, y, 3, track.getHeight());
 				}
 				y += track.getHeight();
 			}
 			if (timelineEditor.getTracks().size() > 0 && timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
 				y -= 1;
-			g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-			g.drawLine(0, y - 1, width - 1, y - 1);
-			g.setColor(UIManager.getColor("ScrollBar.shadow"));
-			g.drawLine(0, y, width - 1, y);
+//			g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+//			g.drawLine(0, y - 1, width - 1, y - 1);
+//			g.setColor(UIManager.getColor("ScrollBar.shadow"));
+//			g.drawLine(0, y, width - 1, y);
 //			g.setColor(getBackground().darker());
 //			g.drawLine(width - 5, 0, width - 5, y - 1);
 //			g.drawLine(width - 1, 0, width - 1, y - 1);

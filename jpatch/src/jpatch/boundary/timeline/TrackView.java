@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.7 2006/01/21 21:43:22 sascha_l Exp $
+ * $Id: TrackView.java,v 1.8 2006/01/22 21:14:45 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -39,7 +39,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			timelineEditor = tle;
 			addMouseListener(this);
 			addMouseMotionListener(this);
-			setBackground(Color.BLACK);
+//		setBackground(Color.BLACK);
 		}
 		
 		public Dimension getPreferredSize() {
@@ -61,24 +61,38 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			Rectangle clip = g.getClipBounds();
 			System.out.println(clip);
 			int fw = timelineEditor.getFrameWidth();
-			int start = clip.x - clip.x % fw;
+			int start = clip.x - clip.x % fw + fw / 2;
 			//int frame = start / TimelineEditor.this.iFrameWidth - 1;
 //			g.setColor(Color.WHITE);
 //			for (int x = -TimelineEditor.this.iFrameWidth ; x <= clip.width + TimelineEditor.this.iFrameWidth; x += TimelineEditor.this.iFrameWidth) {
 //				g.drawLine(x + start, clip.y, x + start, clip.y + clip.height);
 //			}
+			int frame = start / fw - 1;
+			Color c = UIManager.getColor("ScrollBar.shadow");
+			for (int x = -fw ; x <= clip.width + fw; x += fw) {
+				if (frame % 6 == 0) {
+					g.setColor(c);
+					g.drawLine(x + start, clip.y, x + start, clip.y + clip.height);
+					g.setColor(Color.WHITE);
+					g.drawLine(x + start + 1, clip.y, x + start + 1, clip.y + clip.height);
+				} else {
+//					g.drawLine(x + start, y + 3, x + start, y + iExpandedHeight - 3);
+				}
+				frame++;
+			}
+			
 			int y = 0;
 			for (Track track : timelineEditor.getTracks()) {
 				if (y + track.getHeight() > clip.y && y < clip.y + clip.height)
 					track.paint(g, y);
 				y += track.getHeight();
 			}
-			if (timelineEditor.getTracks().size() > 0 && timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
-				y -= 1;
-			g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-			g.drawLine(clip.x, y - 1, clip.x + clip.width - 1, y - 1);
-			g.setColor(UIManager.getColor("ScrollBar.shadow"));
-			g.drawLine(clip.x, y, clip.x + clip.width - 1, y);
+//			if (timelineEditor.getTracks().size() > 0 && timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
+//				y -= 1;
+//			g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+//			g.drawLine(clip.x, y - 1, clip.x + clip.width - 1, y - 1);
+//			g.setColor(UIManager.getColor("ScrollBar.shadow"));
+//			g.drawLine(clip.x, y, clip.x + clip.width - 1, y);
 			//timelineEditor.getHeight();
 //			if (timelineEditor.getViewport().getHeight() > clip.height)
 //				g.setClip(clip.x, clip.y, clip.width, timelineEditor.getViewport().getHeight());
@@ -182,7 +196,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 					h = 32;
 				if (h > 256)
 					h = 256;
-				((AvarTrack) timelineEditor.getTracks().get(iVerticalResize)).setExpandedHeight(h);
+				timelineEditor.getTracks().get(iVerticalResize).setExpandedHeight(h);
 				timelineEditor.revalidate();
 				revalidate();
 				((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
