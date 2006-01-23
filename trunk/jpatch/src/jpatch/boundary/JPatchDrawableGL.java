@@ -402,9 +402,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 					envMap[p++] = (byte) (i & 0xff);	
 				}
 				
-				
-				
-				
+				gl.glEnable( GL.GL_POLYGON_OFFSET_FILL );
 			}
 			
 			public void reshape(GLDrawable glDrawable, int x, int y, int width, int height) {
@@ -492,7 +490,10 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 					gl.glMaterialfv(GL.GL_BACK, GL.GL_SHININESS, new float[] { 0.0f } );
 					} break;
 			}
-			
+			if (bPerspective)
+				gl.glPolygonOffset( -2.5f, -2.5f );
+			else
+				gl.glPolygonOffset( 2.5f, 2.5f );
 		} else {
 			//Dimension dim = glDrawable.getSize();
 			int w = dim.width;
@@ -505,7 +506,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		    gl.glLoadIdentity();
 		    gl.glDisable(GL.GL_LIGHTING);
 			gl.glDisable(GL.GL_DEPTH_TEST);
-			gl.glShadeModel(GL.GL_FLAT);		
+			gl.glShadeModel(GL.GL_FLAT);
 		} 
 	}
 	
