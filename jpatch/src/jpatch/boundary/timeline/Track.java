@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.4 2006/01/22 21:14:45 sascha_l Exp $
+ * $Id: Track.java,v 1.5 2006/01/23 16:59:35 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -29,12 +29,12 @@ import jpatch.entity.*;
 
 public class Track<M extends MotionCurve> {
 	
-	static final Color SEPARATOR = new Color(164, 164, 164);
-	static final Color TRACK = new Color(208, 216, 200);
-	static final Color KEY = new Color(136, 128, 144);
-	static final Color TICK = new Color(200, 192, 186);
-	static final Color ZERO = new Color(178, 170, 162);
-	static final Color CURVE = new Color(0, 0, 0);
+//	static final Color SEPARATOR = new Color(164, 164, 164);
+//	static final Color TRACK = new Color(208, 216, 200);
+	static final Color KEY = new Color(128, 128, 128);
+//	static final Color TICK = new Color(200, 192, 186);
+//	static final Color ZERO = new Color(178, 170, 162);
+//	static final Color CURVE = new Color(0, 0, 0);
 	
 	static final int TRACK_HEIGHT = 13;
 	static final int EXPANDED_HEIGHT = 92;
@@ -94,15 +94,20 @@ public class Track<M extends MotionCurve> {
 //		g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
 //		g.setColor(TRACK);
 //		g.fillRect(clip.x, y + 3, clip.width, 5);
-		g.setColor(timelineEditor.getBackground());
+		g.setColor(TimelineEditor.BACKGROUND);
+		g.drawLine(clip.x, y + TOP - 2, clip.x + clip.width, y + TOP - 2);
+		g.drawLine(clip.x, y + TOP - 1, clip.x + clip.width, y + TOP - 1);
 		g.drawLine(clip.x, y + TOP + 0, clip.x + clip.width, y + TOP + 0);
+		g.drawLine(clip.x, y + TOP + 4, clip.x + clip.width, y + TOP + 4);
+		g.drawLine(clip.x, y + TOP + 5, clip.x + clip.width, y + TOP + 5);
+		g.drawLine(clip.x, y + TOP + 6, clip.x + clip.width, y + TOP + 6);
+		g.setColor(TimelineEditor.LIGHT_SHADOW);
+		g.drawLine(clip.x, y + TOP + 1, clip.x + clip.width, y + TOP + 1);
+//		g.setColor(TimelineEditor.SHADOW);
+//		g.drawLine(clip.x, y + TOP + 4, clip.x + clip.width, y + TOP + 4);
+//		g.setColor(TimelineEditor.SHADOW);
 		g.drawLine(clip.x, y + TOP + 2, clip.x + clip.width, y + TOP + 2);
 		g.drawLine(clip.x, y + TOP + 3, clip.x + clip.width, y + TOP + 3);
-		g.drawLine(clip.x, y + TOP + 5, clip.x + clip.width, y + TOP + 5);
-		g.setColor(timelineEditor.getBackground().darker());
-		g.drawLine(clip.x, y + TOP + 1, clip.x + clip.width, y + TOP + 1);
-		g.setColor(timelineEditor.getBackground().brighter());
-		g.drawLine(clip.x, y + TOP + 4, clip.x + clip.width, y + TOP + 4);
 		for (int x = -fw ; x <= clip.width + fw; x += fw) {
 			if (motionCurve.hasKeyAt(frame)) {
 				//g.fill3DRect(x + start - iFrameWidth / 2, y + 2, iFrameWidth, 11, true);

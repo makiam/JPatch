@@ -27,15 +27,32 @@ public class TimelineEditor extends JScrollPane {
 	public static Cursor cornerResizeCursor = Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR);
 	private Cursor currentCursor = defaultCursor;
 	
-	public static Color SHADOW = UIManager.getColor("Label.background").darker();
-	public static Color HIGHLIGHT = UIManager.getColor("Label.background").brighter();
-	public static Color TICK = new Color(192, 192, 255);
+	public static Color BACKGROUND = UIManager.getColor("ScrollPane.background");
+	public static Color SHADOW = derivedColor(BACKGROUND, -96, -96, -96);
+	public static Color LIGHT_SHADOW = derivedColor(BACKGROUND, -48, -48, -48);
+	public static Color HIGHLIGHT = Color.WHITE;
+	public static Color TICK = derivedColor(BACKGROUND, -32, -32, -32);
+	public static Color DARK_TICK = derivedColor(BACKGROUND, -48, -48, -48);
+	public static Color TRACK = derivedColor(BACKGROUND, -16, -16, -16);
 	
 	private List<Track> listTracks = new ArrayList<Track>();
 	private int iCurrentFrame = 49;
 	private int iFrameWidth = 8;
 	
 	private Header header = new Header(this);
+	
+	private static Color derivedColor(Color c, int r, int g, int b) {
+		r += c.getRed();
+		g += c.getGreen();
+		b += c.getBlue();
+		if (r < 0) r = 0;
+		if (g < 0) g = 0;
+		if (b < 0) b = 0;
+		if (r > 255) r = 255;
+		if (g > 255) g = 255;
+		if (b > 255) b = 255;
+		return new Color(r, g, b);
+	}
 	
 	public TimelineEditor() {
 		setWheelScrollingEnabled(false);

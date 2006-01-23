@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.11 2006/01/22 21:14:45 sascha_l Exp $
+ * $Id: Header.java,v 1.12 2006/01/23 16:59:35 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -96,7 +96,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 			for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
 				Track track = timelineEditor.getTracks().get(i);
 				if (track.isExpandable()) {
-					expandButton[i].setBounds(3, y + 2, 11, 6);
+					expandButton[i].setBounds(3, y + 3, 11, 6);
 					expandButton[i].setSelected(track.isExpanded());
 				}
 				y += track.getHeight();
@@ -126,23 +126,22 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 //				g.drawLine(x + start, clip.y, x + start, clip.y + clip.height);
 //			}
 			
-			g.setColor(TimelineEditor.HIGHLIGHT);
-			g.drawLine(width - 5, clip.y, width - 5, clip.y + timelineEditor.getTracksHeight() + 5);
-			g.setColor(TimelineEditor.SHADOW);
-			g.drawLine(width - 1, clip.y, width - 1, clip.y + timelineEditor.getTracksHeight() + 5);
-			g.setColor(getBackground());
-			g.fillRect(width - 4, clip.y, 3, clip.height);
-			clip.width -= 5;
-			g.setClip(clip);
+			
+//			g.setColor(TimelineEditor.BACKGROUND);
+//			g.fillRect(width - 4, clip.y, 3, clip.height);
+//			clip.width -= 5;
+//			g.setClip(clip);
 			int y = 0;
+			Track prev = null;
 			for (Track track : timelineEditor.getTracks()) {
+				int height = track.getHeight();
 				int bottom = track.getHeight() - 4;
 				g.setColor(Color.BLACK);
 				if (track instanceof HeaderTrack) {
 //					g.setColor(UIManager.getColor("ScrollBar.shadow"));
 //					g.fillRect(clip.x, y, clip.width, track.getHeight() - 1);
 					g.setFont(bold);
-					g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
+					g.setColor(TimelineEditor.SHADOW);
 					g.drawString(track.getName(), 16 + track.getIndent(), y + 11);
 				} else {
 					g.setFont(plain);
@@ -151,11 +150,18 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 			
 				g.setColor(Color.GRAY);
 				for (int i = 0; i < track.getIndent(); i += 4) {
-					g.fillRect(16 + i, y + 5, 2, 2);
+					g.fillRect(16 + i, y + 6, 2, 2);
 				}
 				
 				g.setColor(Color.BLACK);
 				if (track.isExpanded()) {
+					g.setColor(TimelineEditor.SHADOW);
+					g.drawLine(width - 6, y, width - 6, y + height - 1);
+					g.drawLine(width - 2, y, width - 2, y + height - 1);
+					g.setColor(TimelineEditor.LIGHT_SHADOW);
+					g.drawLine(width - 1, y, width - 1, y + height - 1);
+//					g.setColor(TimelineEditor.BACKGROUND);
+//					g.fillRect(width - 4, y, 2, y + bottom);
 //					g.setColor(UIManager.getColor("ScrollBar.shadow"));
 //					g.drawLine(width - 1, y, width - 1, y + track.getHeight() - 5);
 //					g.drawLine(0, y + track.getHeight() - 1, width - 1, y + track.getHeight() - 1);
@@ -168,16 +174,32 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 //					g.setColor(getBackground());
 //					g.fillRect(width - 3, y, 3, track.getHeight());
 //					g.fillRect(0, y + track.getHeight() - 3, width, 3);
-					g.setColor(TimelineEditor.SHADOW);
-					g.drawLine(0, y, clip.x + width - 6, y);
+					if (prev != null && prev.isExpanded()) {
+						g.setColor(TimelineEditor.SHADOW);
+						g.drawLine(0, y, width - 1, y);
+						g.setColor(TimelineEditor.LIGHT_SHADOW);
+						g.drawLine(0, y + 1, width - 7, y + 1);
+						g.setColor(TimelineEditor.BACKGROUND);
+						g.fillRect(0, y - 3, width, 3);
+					} else {
+						g.setColor(TimelineEditor.SHADOW);
+						g.drawLine(width - 2, y, width - 1, y);
+					}
 //					g.drawLine(width - 1, y, width - 1, y + bottom - 1);
-					g.setColor(TimelineEditor.HIGHLIGHT);
-					g.drawLine(0, y + bottom, width - 5, y + bottom);
+					g.setColor(TimelineEditor.SHADOW);
+					g.drawLine(0, y + bottom, width - 1, y + bottom);
 //					g.drawLine(width - 5, y + 1, width - 5, y + bottom);
-					g.setColor(getBackground());
-					g.fillRect(0, y + bottom + 1, width, 3);
+					
+//					g.fillRect(width - 5, y, 4, bottom + );
 //					g.fillRect(width - 4, y, 3, track.getHeight());
 				} else {
+					g.setColor(TimelineEditor.SHADOW);
+					g.drawLine(width - 6, y, width - 6, y + height - 1);
+					g.drawLine(width - 2, y, width - 2, y + height - 1);
+					g.setColor(TimelineEditor.LIGHT_SHADOW);
+					g.drawLine(width - 1, y, width - 1, y + height - 1);
+//					g.setColor(TimelineEditor.BACKGROUND);
+//					g.fillRect(width - 4, y, 2, y + height);
 //					g.setColor(UIManager.getColor("ScrollBar.shadow"));
 //					g.drawLine(width - 1, y, width - 1, y + track.getHeight() - 1);
 //					g.setColor(TimelineEditor.SHADOW);
@@ -193,9 +215,12 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 //					g.fillRect(width - 3, y, 3, track.getHeight());
 				}
 				y += track.getHeight();
+				prev = track;
 			}
-			if (timelineEditor.getTracks().size() > 0 && timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
-				y -= 1;
+			g.setColor(TimelineEditor.BACKGROUND);
+			g.fillRect(width - 5, clip.y, 3, clip.height);
+//			if (timelineEditor.getTracks().size() > 0 && timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
+//				y -= 1;
 //			g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
 //			g.drawLine(0, y - 1, width - 1, y - 1);
 //			g.setColor(UIManager.getColor("ScrollBar.shadow"));

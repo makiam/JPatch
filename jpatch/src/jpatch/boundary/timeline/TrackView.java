@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.8 2006/01/22 21:14:45 sascha_l Exp $
+ * $Id: TrackView.java,v 1.9 2006/01/23 16:59:35 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -67,14 +67,14 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //			for (int x = -TimelineEditor.this.iFrameWidth ; x <= clip.width + TimelineEditor.this.iFrameWidth; x += TimelineEditor.this.iFrameWidth) {
 //				g.drawLine(x + start, clip.y, x + start, clip.y + clip.height);
 //			}
+			g.setColor(TimelineEditor.TICK);
 			int frame = start / fw - 1;
-			Color c = UIManager.getColor("ScrollBar.shadow");
 			for (int x = -fw ; x <= clip.width + fw; x += fw) {
 				if (frame % 6 == 0) {
-					g.setColor(c);
+//					g.setColor(TimelineEditor.TICK);
 					g.drawLine(x + start, clip.y, x + start, clip.y + clip.height);
-					g.setColor(Color.WHITE);
-					g.drawLine(x + start + 1, clip.y, x + start + 1, clip.y + clip.height);
+//					g.setColor(TimelineEditor.HIGHLIGHT);
+//					g.drawLine(x + start + 1, clip.y, x + start + 1, clip.y + clip.height);
 				} else {
 //					g.drawLine(x + start, y + 3, x + start, y + iExpandedHeight - 3);
 				}

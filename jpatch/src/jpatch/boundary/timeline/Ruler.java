@@ -1,5 +1,5 @@
 /*
- * $Id: Ruler.java,v 1.6 2006/01/22 21:14:45 sascha_l Exp $
+ * $Id: Ruler.java,v 1.7 2006/01/23 16:59:35 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -70,7 +70,7 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 			int start = clip.x - clip.x % fw + fw / 2;
 			int frame = start / fw - 1;
 			//((Graphics2D) g).setPaint(new GradientPaint(0, 0, new Color(255, 255, 128), 0, 16, getBackground().brighter()));
-			g.setColor(new Color(255, 255, 224));
+			g.setColor(Color.WHITE);
 			((Graphics2D) g).fill(clip);
 			g.fillRect(clip.x, clip.y, clip.width, clip.height);
 			g.setColor(Color.BLACK);
