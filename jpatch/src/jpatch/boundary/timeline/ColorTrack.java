@@ -1,7 +1,9 @@
 package jpatch.boundary.timeline;
 
 import java.awt.*;
+
 import javax.swing.*;
+import javax.vecmath.Color3f;
 
 import jpatch.entity.*;
 
@@ -13,37 +15,43 @@ public class ColorTrack extends Track<MotionCurve.Color3f> {
 
 	public void paint(Graphics g, int y) {	
 		Rectangle clip = g.getClipBounds();
+		int height = getHeight();
+		
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
 		int frame = start / fw - 1;
 		
-		g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-		g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
-		
+		g.setColor(TimelineEditor.BACKGROUND);
+		g.fillRect(clip.x, y + 0, clip.width, 3);
+		g.fillRect(clip.x, y + height - 1, clip.width, 3);
+		g.setColor(TimelineEditor.SHADOW);
+		g.drawLine(clip.x, y + 3, clip.x + clip.width, y + 3);
+		g.drawLine(clip.x, y + height - 2, clip.x + clip.width, y + height - 2);
+
 		frame = start / fw - 1;
 		for (int x = -fw ; x <= clip.width + fw; x ++) {
 			float f = (float) (start + x - fw / 2) / fw;
-			g.setColor(motionCurve.getColor3fAt(f).get());
-			g.drawLine(x + start, y + 5, x + start, y + 9);
+			Color3f color = motionCurve.getColor3fAt(f);
+			color.clamp(0, 1);
+			g.setColor(color.get());
+			g.drawLine(x + start, y + TOP, x + start, y + TOP + 6);
 		}
+		
+		g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.25f));
+		g.drawLine(clip.x, y + 4, clip.x + clip.width, y + 4);
 		
 		for (int x = -fw ; x <= clip.width + fw; x += fw) {
 			MotionKey.Color3f colorKey = (MotionKey.Color3f) motionCurve.getKeyAt(frame);
 			if (colorKey != null) {
 				//g.fill3DRect(x + start - iFrameWidth / 2, y + 2, iFrameWidth, 11, true);
-				g.setColor(colorKey.getColor3f().get());
+				Color3f color = colorKey.getColor3f();
+				color.clamp(0, 1);
+				Color c = (color.x + color.y + color.z > 1.5f) ? Color.BLACK : Color.WHITE;
+				g.setColor(color.get());
 				g.fillOval(x + start - 3, y + 4, 6, 6);
-				g.setColor(Color.BLACK);
+				g.setColor(c);
 				g.drawOval(x + start - 3, y + 4, 6, 6);
 				
-			} else {
-				if (frame % 6 == 0) {
-					g.setColor(ZERO);
-					g.drawLine(x + start, y + 5, x + start, y + 9);
-				} else {
-					g.setColor(TICK);
-					g.drawLine(x + start, y + 5, x + start, y + 9);
-				}
 			}
 			frame++;
 		}

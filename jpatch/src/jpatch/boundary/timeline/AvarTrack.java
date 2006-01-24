@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.9 2006/01/21 15:15:55 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.10 2006/01/24 16:20:41 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -38,63 +38,62 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 	}
 	
 	public void paint(Graphics g, int y) {	
+		int bottom = getHeight() - 4;
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
 		int frame = start / fw - 1;
 		
 		if (bExpanded) {
-			g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-			g.drawLine(clip.x, y + getHeight() - 2, clip.x + clip.width, y + getHeight() - 2);
-			g.drawLine(clip.x, y + getHeight() - 6, clip.x + clip.width, y + getHeight() - 6);
-			g.setColor(UIManager.getColor("ScrollBar.shadow"));
-			g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
-			float scale = motionCurve.getMax() - motionCurve.getMin();
-			int size = iExpandedHeight - 17;
-			int off = iExpandedHeight - 12 + (int) Math.round(size * motionCurve.getMin() / scale);
-			g.setColor(TRACK);
-			g.fillRect(clip.x, y + 5, clip.width, size + 1);
-//			g.setColor(TRACK.darker());
-//			g.drawLine(clip.x, y + 1, clip.x + clip.width, y + 1);
-//			g.setColor(TRACK.brighter());
-//			g.drawLine(clip.x, y + 61, clip.x + clip.width, y + 61);
+			float min = motionCurve.getMin();
+			float max = motionCurve.getMax();
+			
+			float scale = max - min;
+			int size = iExpandedHeight - 4;
+			int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
+			g.setColor(TimelineEditor.TRACK);
+			g.fillRect(clip.x, y + 1, clip.width, size);
+
 			frame = start / fw - 1;
-			g.setColor(TICK);
+			g.setColor(TimelineEditor.BACKGROUND);
+			g.fillRect(clip.x, y - 3, clip.width, 3);
+			g.fillRect(clip.x, y + bottom + 1, clip.width, 3);
+			g.setColor(TimelineEditor.SHADOW);
+			g.drawLine(clip.x, y, clip.x + clip.width, y);
+			g.drawLine(clip.x, y + bottom, clip.x + clip.width, y + bottom);
+			g.setColor(TimelineEditor.LIGHT_SHADOW);
+			g.drawLine(clip.x, y + 1, clip.x + clip.width, y + 1);
+			g.setClip(clip.intersection(new Rectangle(clip.x, y + 1, clip.width, bottom - 1)));
+			g.setColor(TimelineEditor.DARK_TICK);
 			for (int x = -fw ; x <= clip.width + fw; x += fw) {
-				if (frame % 6 == 0) {
-					g.setColor(ZERO);
-					g.drawLine(x + start, y + 5, x + start, y + iExpandedHeight - 12);
-					g.setColor(TICK);
-				} else {
-					g.drawLine(x + start, y + 5, x + start, y + iExpandedHeight - 12);
-				}
+				if (frame % 6 == 0)
+					g.drawLine(x + start, y + 2, x + start, y + size - 1);
+				else
+					g.drawLine(x + start, y + off - 5, x + start, y + off + 5);
 				frame++;
 			}
-			g.setColor(ZERO);
 			g.drawLine(clip.x, y + off, clip.x + clip.width, y + off);
-			g.setClip(clip.intersection(new Rectangle(clip.x, y + 2, clip.width, size + 7)));
-			int vPrev = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
-			g.setColor(CURVE);
+
 			frame = start / fw - 1;
-			for (int x = -fw ; x <= clip.width + fw; x ++) {
+			
+			int vPrev = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
+			g.setColor(Color.BLACK);
+			for (int x = -fw ; x <= clip.width + fw; x++) {
 				float f = (float) (start + x - fw / 2) / fw;
 				int vThis = off - (int) Math.round(size / scale * motionCurve.getFloatAt(f));
-//				g.setColor(Color.BLACK);
 				g.drawLine(x + start - 1, y + vPrev, x + start, y + vThis);
 				frame++;
 				vPrev = vThis;
 			}
-			g.setColor(KEY);
+			
 			frame = start / fw - 1;
 			for (int x = -fw ; x <= clip.width + fw; x += fw) {
 				int vThis = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
 				if (motionCurve.hasKeyAt(frame)) {
+					g.setColor(Color.GRAY);
 					g.fillOval(x + start - 3, y + vThis - 3, 6, 6);
 					g.setColor(Color.BLACK);
 					g.drawOval(x + start - 3, y + vThis - 3, 6, 6);
-					g.setColor(KEY);
-				} else {
-//					g.fillRect(x + start - 1, y + vThis - 1, 3, 3);
 				}
 				frame++;
 			}

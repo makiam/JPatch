@@ -142,6 +142,7 @@ public class MotionCurveSet {
 			float pos = 0; // FIXME;
 			super.populateList();
 			scale = MotionCurve.createScaleCurve(new MotionKey.Float(pos, animModel.getScale()));
+			motionCurveList.add(scale);
 			for (Iterator it = animModel.getModel().getMorphList().iterator(); it.hasNext(); ) {
 				Morph morph = (Morph) it.next();
 				MotionCurve.Float morphCurve = MotionCurve.createMorphCurve(morph, new MotionKey.Float(pos, morph.getValue()));
