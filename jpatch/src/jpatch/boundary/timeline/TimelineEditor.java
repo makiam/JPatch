@@ -38,6 +38,8 @@ public class TimelineEditor extends JScrollPane {
 	private List<Track> listTracks = new ArrayList<Track>();
 	private int iCurrentFrame = 49;
 	private int iFrameWidth = 8;
+	private int mouseX, mouseY;
+	private boolean bMove;
 	
 	private Header header = new Header(this);
 	
@@ -61,6 +63,8 @@ public class TimelineEditor extends JScrollPane {
 		setViewportView(trackView);
 		setColumnHeaderView(new Ruler(this));
 		setRowHeaderView(header);
+//		getColumnHeader().setBackground(Color.GRAY);
+//		getViewport().setBackground(Color.GRAY);
 		setCorner(UPPER_LEFT_CORNER, new Corner(this));
 		setCorner(LOWER_LEFT_CORNER, new JComponent() {
 			public void paint(Graphics g) {
@@ -252,7 +256,5 @@ public class TimelineEditor extends JScrollPane {
 		for (Track track: listTracks)
 			h += track.getHeight();
 		return h;
-	}
-	
-	
+	}	
 }

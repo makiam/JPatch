@@ -63,9 +63,10 @@ public final class MainFrame extends JFrame {
 	private MutableTreeNode treenodeRoot;
 //	private MutableTreeNode treenodeModel;
 	private MorphTarget editedMorph;
-	private JDialog vcrDialog;
+	private JPanel animPanel;
 	private VcrControls vcrControls;
 	private TimelineEditor timelineEditor;
+	private JSplitPane splitPaneV;
 	
 	private JMenu viewMenu;
 	
@@ -205,19 +206,26 @@ public final class MainFrame extends JFrame {
 			
 			getContentPane().add(helpPanel,BorderLayout.SOUTH);
 			
+			splitPaneV = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+			splitPaneV.add(jpatchScreen);
+			splitPaneV.setOneTouchExpandable(false);
+			splitPaneV.setContinuousLayout(true);
+			splitPaneV.setResizeWeight(1);
+			splitPaneV.setDividerSize(4);
+			splitPaneV.setDividerLocation(getHeight() - 200);
 			
-			JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+			JSplitPane splitPaneH = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 //			JPanel panel = new JPanel();
 //			panel.setLayout(new BorderLayout());
 //			panel.add(jpatchScreen, BorderLayout.CENTER);
-			splitPane.add(jpatchScreen);
-			splitPane.add(sideBar);
-			splitPane.setOneTouchExpandable(false);
-			splitPane.setContinuousLayout(true);
-			splitPane.setResizeWeight(1);
-			splitPane.setDividerSize(4);
-			splitPane.setDividerLocation(getWidth() - 310);
-			getContentPane().add(splitPane, BorderLayout.CENTER);
+			splitPaneH.add(splitPaneV);
+			splitPaneH.add(sideBar);
+			splitPaneH.setOneTouchExpandable(false);
+			splitPaneH.setContinuousLayout(true);
+			splitPaneH.setResizeWeight(1);
+			splitPaneH.setDividerSize(4);
+			splitPaneH.setDividerLocation(getWidth() - 310);
+			getContentPane().add(splitPaneH, BorderLayout.CENTER);
 			
 			helpPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 			helpPanel.add(helpLabel);
@@ -448,10 +456,8 @@ public final class MainFrame extends JFrame {
 		validate();
 		if (vcrControls != null)
 			vcrControls.stop();
-		if (vcrDialog != null) {
-			vcrDialog.setVisible(false);
-			vcrDialog.dispose();
-			vcrDialog = null;
+		if (animPanel != null) {
+			splitPaneV.remove(animPanel);
 		}
 		Command.getInstance().enableCommand("open", true);
 		Command.getInstance().enableCommand("append", true);
@@ -483,21 +489,22 @@ public final class MainFrame extends JFrame {
 		if (vcrControls != null)
 			vcrControls.stop();
 		vcrControls = new VcrControls();
-		vcrDialog = new JDialog(this, false);
-		vcrDialog.setTitle("JPatch Animation Controls");
-		vcrDialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-		vcrDialog.setLayout(new BorderLayout());
+		if (animPanel != null)
+			splitPaneV.remove(animPanel);
+		animPanel = new JPanel();
+		animPanel.setLayout(new BorderLayout());
 		JPanel panel = new JPanel();
 		panel.add(vcrControls);
-		vcrDialog.add(panel, BorderLayout.SOUTH);
+		animPanel.add(panel, BorderLayout.SOUTH);
 //		SmartScrollPane smartScrollPane = new SmartScrollPane();
 		//motionCurveDisplay = new MotionCurveDisplay(smartScrollPane);
 		//smartScrollPane.setVirtualCanvas(motionCurveDisplay);
 		timelineEditor = new TimelineEditor();
 //		timelineEditor.test();
-		vcrDialog.add(timelineEditor, BorderLayout.CENTER);
-		vcrDialog.setSize(800, 600);
-		vcrDialog.setVisible(true);
+		animPanel.add(timelineEditor, BorderLayout.CENTER);
+		splitPaneV.add(animPanel);
+//		vcrDialog.setSize(800, 600);
+//		vcrDialog.setVisible(true);
 		Command.getInstance().enableCommand("open", false);
 		Command.getInstance().enableCommand("append", false);
 //		Command.getInstance().enableCommand("save", false);
@@ -519,8 +526,8 @@ public final class MainFrame extends JFrame {
 	}
 	
 	public void showAnimControls() {
-		if (vcrDialog != null)
-			vcrDialog.setVisible(true);
+//		if (vcrDialog != null)
+//			vcrDialog.setVisible(true);
 	}
 	
 	public static MainFrame getInstance() {
