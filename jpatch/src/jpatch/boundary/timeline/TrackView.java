@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.9 2006/01/23 16:59:35 sascha_l Exp $
+ * $Id: TrackView.java,v 1.10 2006/01/25 16:56:29 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -34,16 +34,16 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		private final TimelineEditor timelineEditor;
 		private Dimension dim = new Dimension();
 		private int iVerticalResize = -1;
+		private int mx, my;
 		
 		public TrackView(TimelineEditor tle) {
 			timelineEditor = tle;
 			addMouseListener(this);
 			addMouseMotionListener(this);
-//		setBackground(Color.BLACK);
 		}
 		
 		public Dimension getPreferredSize() {
-			dim.setSize(timelineEditor.getFrameWidth() * 24 * 60 + 1, timelineEditor.getTracksHeight() + 5); // FIXME: use animation length
+			dim.setSize(timelineEditor.getFrameWidth() * 24 * 60 + 1, timelineEditor.getTracksHeight() + 7); // FIXME: use animation length
 			return dim;
 		}
 		
@@ -56,10 +56,10 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		}
 		
 		public void paintComponent(Graphics g) {
-			long t = System.currentTimeMillis();
+//			long t = System.currentTimeMillis();
 			super.paintComponent(g);
 			Rectangle clip = g.getClipBounds();
-			System.out.println(clip);
+//			System.out.println(clip);
 			int fw = timelineEditor.getFrameWidth();
 			int start = clip.x - clip.x % fw + fw / 2;
 			//int frame = start / TimelineEditor.this.iFrameWidth - 1;
@@ -97,14 +97,18 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //			if (timelineEditor.getViewport().getHeight() > clip.height)
 //				g.setClip(clip.x, clip.y, clip.width, timelineEditor.getViewport().getHeight());
 //			g.fillRect(clip.x, y, clip.x + clip.width - 1, timelineEditor.getHeight() - y);
+			
 			int x = timelineEditor.getCurrentFrame() * fw + fw / 2;
 			g.setColor(Color.BLACK);
 			g.drawLine(x, clip.y, x, clip.y + clip.height - 1);
-			g.fillPolygon(new int[] { x - 6, x + 6, x }, new int[] { getHeight() - 0, getHeight() - 0, getHeight() - 7}, 3);
+			g.fillPolygon(new int[] { x - 6, x + 6, x }, new int[] { getHeight() - 1, getHeight() - 1, getHeight() - 8}, 3);
+			
+			g.setColor(Color.BLACK);
+			g.drawLine(clip.x, y + 6, clip.x + clip.width - 1, y + 6);
 //			
 //			g.setColor(Color.BLACK);
 //			g.drawLine(x + 1, clip.y, x + 1, clip.height);
-			System.out.println((System.currentTimeMillis() - t) + " ms");
+//			System.out.println((System.currentTimeMillis() - t) + " ms");
 		}
 		
 		public Dimension getPreferredScrollableViewportSize() {
@@ -148,25 +152,31 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		}
 		
 		public void mousePressed(MouseEvent e) {
-			int y = 0;
-			for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
-			Track track = timelineEditor.getTracks().get(i);
-				if (e.getClickCount() == 2 && e.getY() > y && e.getY() < y + track.getHeight() - 6) {
-					timelineEditor.expandTrack(track, !track.isExpanded());
-					return;
-				} else if (track.isExpanded() && e.getY() > y + track.getHeight() - 6 && e.getY() <= y + track.getHeight()) {
-					if (e.getClickCount() == 2) {
-						((AvarTrack) track).setDefaultExpandedHeight();
-						timelineEditor.revalidate();
-						revalidate();
-						((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
-						timelineEditor.repaint();
-//						setVerticalResizeCursor(e.getY() > y + track.getHeight() - 5 && e.getY() <= y + track.getHeight());
-					} else {
-						iVerticalResize = i;
+			if (e.getButton() == MouseEvent.BUTTON1) {
+				int y = 0;
+				for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
+				Track track = timelineEditor.getTracks().get(i);
+					if (e.getClickCount() == 2 && e.getY() > y && e.getY() < y + track.getHeight() - 6) {
+						timelineEditor.expandTrack(track, !track.isExpanded());
+						return;
+					} else if (track.isExpanded() && e.getY() > y + track.getHeight() - 6 && e.getY() <= y + track.getHeight()) {
+						if (e.getClickCount() == 2) {
+							((AvarTrack) track).setDefaultExpandedHeight();
+							timelineEditor.revalidate();
+							revalidate();
+							((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
+							timelineEditor.repaint();
+	//						setVerticalResizeCursor(e.getY() > y + track.getHeight() - 5 && e.getY() <= y + track.getHeight());
+						} else {
+							iVerticalResize = i;
+						}
 					}
+					y += track.getHeight();
 				}
-				y += track.getHeight();
+			} else if (e.getButton() == MouseEvent.BUTTON2) {
+				mx = e.getX();
+				my = e.getY();
+				System.out.println(mx);
 			}
 		}
 
@@ -187,6 +197,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		}
 
 		public void mouseDragged(MouseEvent e) {
+			System.out.println(e.getButton());
 			if (iVerticalResize > -1) {
 				int y = 0;
 				for (int i = 0; i < iVerticalResize; i++)
@@ -201,6 +212,26 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				revalidate();
 				((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
 				timelineEditor.repaint();
+			}
+			else {
+//				int x = timelineEditor.getHorizontalScrollBar().getValue();
+//				int y = timelineEditor.getVerticalScrollBar().getValue();
+				JScrollBar hsb = timelineEditor.getHorizontalScrollBar();
+				JScrollBar vsb = timelineEditor.getVerticalScrollBar();
+				int sbx = hsb.getValue();
+				int sby = vsb.getValue();
+				int dx = e.getX() - mx;
+				int dy = e.getY() - my;
+				mx = (sbx == 0 || sbx == hsb.getMaximum() - hsb.getVisibleAmount()) ? e.getX() : e.getX() - dx;
+				my = (sby == 0 || sby == vsb.getMaximum() - vsb.getVisibleAmount()) ? e.getY() : e.getY() - dy;
+//				System.out.println("y=" + e.getY() + "\tmy=" + my + " \tdy=" + dy + " \tsby=" + sby + " max=" + (vsb.getMaximum() - vsb.getVisibleAmount()));
+				timelineEditor.getHorizontalScrollBar().setValue(sbx - dx);
+				timelineEditor.getVerticalScrollBar().setValue(sby - dy);
+//				dx = e.getX() - sbx;
+//				dy = e.getY() - sby;
+//				revalidate();
+//				timelineEditor.revalidate();
+//				((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
 			}
 		}
 

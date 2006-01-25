@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.12 2006/01/23 16:59:35 sascha_l Exp $
+ * $Id: Header.java,v 1.13 2006/01/25 16:56:29 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -104,7 +104,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		}
 		
 		public Dimension getPreferredSize() {
-			dim.setSize(width, timelineEditor.getTracksHeight() + 5);
+			dim.setSize(width, timelineEditor.getTracksHeight() + 7);
 			return dim;
 		}
 		
@@ -219,6 +219,16 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 			}
 			g.setColor(TimelineEditor.BACKGROUND);
 			g.fillRect(width - 5, clip.y, 3, clip.height);
+			
+			g.setColor(TimelineEditor.SHADOW);
+			g.drawLine(width - 6, y, width - 6, y + 5);
+			g.drawLine(width - 2, y, width - 2, y + 5);
+			g.setColor(TimelineEditor.LIGHT_SHADOW);
+			g.drawLine(width - 1, y, width - 1, y + 5);
+			g.setColor(Color.BLACK);
+			g.drawLine(0, y + 6, width - 1, y + 6);
+			
+			
 //			if (timelineEditor.getTracks().size() > 0 && timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
 //				y -= 1;
 //			g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
