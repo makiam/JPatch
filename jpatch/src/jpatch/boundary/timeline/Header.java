@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.13 2006/01/25 16:56:29 sascha_l Exp $
+ * $Id: Header.java,v 1.14 2006/01/25 20:15:12 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -227,7 +227,8 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 			g.drawLine(width - 1, y, width - 1, y + 5);
 			g.setColor(Color.BLACK);
 			g.drawLine(0, y + 6, width - 1, y + 6);
-			
+			g.setColor(TimelineEditor.SHADOW);
+			g.fillRect(0, y + 7, width, clip.height - y - 7);
 			
 //			if (timelineEditor.getTracks().size() > 0 && timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
 //				y -= 1;

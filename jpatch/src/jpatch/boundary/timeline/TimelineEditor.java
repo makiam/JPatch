@@ -64,7 +64,7 @@ public class TimelineEditor extends JScrollPane {
 		setColumnHeaderView(new Ruler(this));
 		setRowHeaderView(header);
 //		getColumnHeader().setBackground(Color.GRAY);
-//		getViewport().setBackground(Color.GRAY);
+		getViewport().setBackground(SHADOW);
 		setCorner(UPPER_LEFT_CORNER, new Corner(this));
 		setCorner(LOWER_LEFT_CORNER, new JComponent() {
 			public void paint(Graphics g) {

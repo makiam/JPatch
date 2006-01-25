@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.10 2006/01/25 16:56:29 sascha_l Exp $
+ * $Id: TrackView.java,v 1.11 2006/01/25 20:15:12 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -67,6 +67,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //			for (int x = -TimelineEditor.this.iFrameWidth ; x <= clip.width + TimelineEditor.this.iFrameWidth; x += TimelineEditor.this.iFrameWidth) {
 //				g.drawLine(x + start, clip.y, x + start, clip.y + clip.height);
 //			}
+			g.setColor(TimelineEditor.BACKGROUND);
+			g.fillRect(clip.x, clip.y, clip.width, clip.height);
 			g.setColor(TimelineEditor.TICK);
 			int frame = start / fw - 1;
 			for (int x = -fw ; x <= clip.width + fw; x += fw) {
@@ -101,7 +103,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			int x = timelineEditor.getCurrentFrame() * fw + fw / 2;
 			g.setColor(Color.BLACK);
 			g.drawLine(x, clip.y, x, clip.y + clip.height - 1);
-			g.fillPolygon(new int[] { x - 6, x + 6, x }, new int[] { getHeight() - 1, getHeight() - 1, getHeight() - 8}, 3);
+			g.fillPolygon(new int[] { x - 6, x + 6, x }, new int[] { getHeight() - 0, getHeight() - 0, getHeight() - 7}, 3);
 			
 			g.setColor(Color.BLACK);
 			g.drawLine(clip.x, y + 6, clip.x + clip.width - 1, y + 6);

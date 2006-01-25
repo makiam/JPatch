@@ -1,5 +1,5 @@
 /*
- * $Id: Settings.java,v 1.2 2005/12/30 13:00:36 sascha_l Exp $
+ * $Id: Settings.java,v 1.3 2006/01/25 20:15:12 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -29,6 +29,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.vecmath.*;
+
+import jpatch.boundary.*;
 
 
 /**
@@ -80,6 +82,9 @@ public class Settings extends AbstractSettings {
 		
 		if (JOptionPane.showConfirmDialog(parent, splitPane, toString(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null) == JOptionPane.OK_OPTION) {
 			System.out.println("OK");
+			MainFrame mf = MainFrame.getInstance();
+			if (screenWidth != mf.getWidth() || screenHeight != mf.getHeight() || screenPositionX != mf.getX() || screenPositionY != mf.getY())
+				mf.setBounds(screenPositionX, screenPositionY, screenWidth, screenHeight);
 			save();
 		} else {
 			System.out.println("Cancel");

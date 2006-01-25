@@ -492,6 +492,7 @@ public final class MainFrame extends JFrame {
 		if (animPanel != null)
 			splitPaneV.remove(animPanel);
 		animPanel = new JPanel();
+		animPanel.setMinimumSize(new Dimension(320, 80));
 		animPanel.setLayout(new BorderLayout());
 		JPanel panel = new JPanel();
 		panel.add(vcrControls);
