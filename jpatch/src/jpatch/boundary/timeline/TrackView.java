@@ -23,6 +23,7 @@ package jpatch.boundary.timeline;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Set;
 
 import javax.swing.*;
 
@@ -69,6 +70,17 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //			}
 			g.setColor(TimelineEditor.BACKGROUND);
 			g.fillRect(clip.x, clip.y, clip.width, clip.height);
+			
+			int y = 0;
+			Set<Track> selectedTracks = timelineEditor.getHeader().getSelectedTracks();
+			g.setColor(TimelineEditor.SELECTED_BACKGROUND);
+			for (Track track : timelineEditor.getTracks()) {
+				if (y + track.getHeight() > clip.y && y < clip.y + clip.height)
+					if (selectedTracks.contains(track))
+						g.fillRect(clip.x, y, clip.width, track.getHeight());
+				y += track.getHeight();
+			}
+			
 			g.setColor(TimelineEditor.TICK);
 			int frame = start / fw - 1;
 			for (int x = -fw ; x <= clip.width + fw; x += fw) {
@@ -83,7 +95,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				frame++;
 			}
 			
-			int y = 0;
+			y = 0;
 			for (Track track : timelineEditor.getTracks()) {
 				if (y + track.getHeight() > clip.y && y < clip.y + clip.height)
 					track.paint(g, y);
