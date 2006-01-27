@@ -51,12 +51,15 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 			float scale = max - min;
 			int size = iExpandedHeight - 4;
 			int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
-			g.setColor(TimelineEditor.TRACK);
+			if (timelineEditor.getHeader().getSelectedTracks().contains(this)) 
+				g.setColor(TimelineEditor.SELECTED_BACKGROUND);
+			else
+				g.setColor(TimelineEditor.TRACK);
 			g.fillRect(clip.x, y + 1, clip.width, size);
 
 			frame = start / fw - 1;
 			g.setColor(TimelineEditor.BACKGROUND);
-			g.fillRect(clip.x, y - 3, clip.width, 3);
+//			g.fillRect(clip.x, y - 3, clip.width, 3);
 			g.fillRect(clip.x, y + bottom + 1, clip.width, 3);
 			g.setColor(TimelineEditor.SHADOW);
 			g.drawLine(clip.x, y, clip.x + clip.width, y);
