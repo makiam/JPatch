@@ -14,9 +14,9 @@ public final class Launcher {
 	/* private static GlTest gltest; */
 	public static void main(String[] args) {
 		if (true) {
-			try {
-				UIManager.setLookAndFeel(Settings.getInstance().lookAndFeelClassname);
-			} catch (Exception e) { }
+//			try {
+//				UIManager.setLookAndFeel(Settings.getInstance().lookAndFeelClassname);
+//			} catch (Exception e) { }
 			SplashScreen splash = new SplashScreen();
 			splash.showSplash(true);
 			try {
