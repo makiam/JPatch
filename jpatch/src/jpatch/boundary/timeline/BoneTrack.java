@@ -58,12 +58,15 @@ public class BoneTrack extends Track {
 			float scale = max - min;
 			int size = iExpandedHeight - 4;
 			int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
-			g.setColor(TimelineEditor.TRACK);
+			if (timelineEditor.getHeader().getSelectedTracks().contains(this)) 
+				g.setColor(TimelineEditor.SELECTED_BACKGROUND);
+			else
+				g.setColor(TimelineEditor.TRACK);
 			g.fillRect(clip.x, y + 1, clip.width, size);
 
 			frame = start / fw - 1;
 			g.setColor(TimelineEditor.BACKGROUND);
-			g.fillRect(clip.x, y - 3, clip.width, 3);
+//			g.fillRect(clip.x, y - 3, clip.width, 3);
 			g.fillRect(clip.x, y + bottom + 1, clip.width, 3);
 			g.setColor(TimelineEditor.SHADOW);
 			g.drawLine(clip.x, y, clip.x + clip.width, y);
@@ -109,10 +112,18 @@ public class BoneTrack extends Track {
 			g.setClip(clip);
 			return;
 		}
-		g.setColor(TimelineEditor.BACKGROUND);
+		Color background, track;
+		if (timelineEditor.getHeader().getSelectedTracks().contains(this)) {
+			background = TimelineEditor.SELECTED_BACKGROUND;
+			track = TimelineEditor.SHADOW;
+		} else {
+			background = TimelineEditor.BACKGROUND;
+			track = TimelineEditor.LIGHT_SHADOW;
+		}
+		g.setColor(background);
 		g.fillRect(clip.x, y + TOP - 2, clip.width, 3);
 		g.fillRect(clip.x, y + TOP + 4, clip.width, 3);
-		g.setColor(TimelineEditor.LIGHT_SHADOW);
+		g.setColor(track);
 		g.fillRect(clip.x, y + TOP + 1, clip.width, 3);
 	
 		g.setColor(KEY);

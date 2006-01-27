@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.5 2006/01/23 16:59:35 sascha_l Exp $
+ * $Id: Track.java,v 1.6 2006/01/27 16:37:17 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -89,19 +89,26 @@ public class Track<M extends MotionCurve> {
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
 		int frame = start / fw - 1;
-		
+		Color background, track;
+		if (timelineEditor.getHeader().getSelectedTracks().contains(this)) {
+			background = TimelineEditor.SELECTED_BACKGROUND;
+			track = TimelineEditor.SHADOW;
+		} else {
+			background = TimelineEditor.BACKGROUND;
+			track = TimelineEditor.LIGHT_SHADOW;
+		}
 //		g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
 //		g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
 //		g.setColor(TRACK);
 //		g.fillRect(clip.x, y + 3, clip.width, 5);
-		g.setColor(TimelineEditor.BACKGROUND);
+		g.setColor(background);
 		g.drawLine(clip.x, y + TOP - 2, clip.x + clip.width, y + TOP - 2);
 		g.drawLine(clip.x, y + TOP - 1, clip.x + clip.width, y + TOP - 1);
 		g.drawLine(clip.x, y + TOP + 0, clip.x + clip.width, y + TOP + 0);
 		g.drawLine(clip.x, y + TOP + 4, clip.x + clip.width, y + TOP + 4);
 		g.drawLine(clip.x, y + TOP + 5, clip.x + clip.width, y + TOP + 5);
 		g.drawLine(clip.x, y + TOP + 6, clip.x + clip.width, y + TOP + 6);
-		g.setColor(TimelineEditor.LIGHT_SHADOW);
+		g.setColor(track);
 		g.drawLine(clip.x, y + TOP + 1, clip.x + clip.width, y + TOP + 1);
 //		g.setColor(TimelineEditor.SHADOW);
 //		g.drawLine(clip.x, y + TOP + 4, clip.x + clip.width, y + TOP + 4);

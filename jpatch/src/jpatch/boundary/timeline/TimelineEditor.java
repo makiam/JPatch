@@ -27,12 +27,13 @@ public class TimelineEditor extends JScrollPane {
 	public static Cursor cornerResizeCursor = Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR);
 	private Cursor currentCursor = defaultCursor;
 	
+	public static Color SELECTED_BACKGROUND = new Color(192, 192, 255);
 	public static Color BACKGROUND = UIManager.getColor("ScrollPane.background");
 	public static Color SHADOW = derivedColor(BACKGROUND, -96, -96, -96);
 	public static Color LIGHT_SHADOW = derivedColor(BACKGROUND, -48, -48, -48);
 	public static Color HIGHLIGHT = Color.WHITE;
-	public static Color TICK = derivedColor(BACKGROUND, -32, -32, -32);
-	public static Color DARK_TICK = derivedColor(BACKGROUND, -48, -48, -48);
+	public static Color TICK = derivedColor(BACKGROUND, -64, -64, -32);
+	public static Color DARK_TICK = derivedColor(BACKGROUND, -96, -96, -64);
 	public static Color TRACK = derivedColor(BACKGROUND, -16, -16, -16);
 	
 	private List<Track> listTracks = new ArrayList<Track>();
@@ -102,6 +103,10 @@ public class TimelineEditor extends JScrollPane {
 			currentCursor = cursor;
 			super.setCursor(cursor);
 		}
+	}
+	
+	public Header getHeader() {
+		return header;
 	}
 	
 	void expandTrack(Track track, boolean expand) {

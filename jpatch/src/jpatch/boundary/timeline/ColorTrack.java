@@ -21,10 +21,19 @@ public class ColorTrack extends Track<MotionCurve.Color3f> {
 		int start = clip.x - clip.x % fw + fw / 2;
 		int frame = start / fw - 1;
 		
-		g.setColor(TimelineEditor.BACKGROUND);
+		Color background, track;
+		if (timelineEditor.getHeader().getSelectedTracks().contains(this)) {
+			background = TimelineEditor.SELECTED_BACKGROUND;
+			track = TimelineEditor.SHADOW;
+		} else {
+			background = TimelineEditor.BACKGROUND;
+			track = TimelineEditor.LIGHT_SHADOW;
+		}
+		
+		g.setColor(background);
 		g.fillRect(clip.x, y + 0, clip.width, 3);
-		g.fillRect(clip.x, y + height - 1, clip.width, 3);
-		g.setColor(TimelineEditor.SHADOW);
+		g.fillRect(clip.x, y + height - 1, clip.width, 2);
+		g.setColor(track);
 		g.drawLine(clip.x, y + 3, clip.x + clip.width, y + 3);
 		g.drawLine(clip.x, y + height - 2, clip.x + clip.width, y + height - 2);
 
