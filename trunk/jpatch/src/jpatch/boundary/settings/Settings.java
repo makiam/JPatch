@@ -58,7 +58,7 @@ public class Settings extends AbstractSettings {
 	public void showDialog(Component parent) {
 		load();
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		initTree();
+//		initTree();
 		final JTable table = getTable();
 		table.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -95,6 +95,7 @@ public class Settings extends AbstractSettings {
 	private Settings() {
 		storeDefaults();
 		load();
+		initTree();
 		INSTANCE = this;
 	}
 	
