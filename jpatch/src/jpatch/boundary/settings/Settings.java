@@ -1,5 +1,5 @@
 /*
- * $Id: Settings.java,v 1.3 2006/01/25 20:15:12 sascha_l Exp $
+ * $Id: Settings.java,v 1.4 2006/01/27 22:19:03 lois Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -58,7 +58,7 @@ public class Settings extends AbstractSettings {
 	public void showDialog(Component parent) {
 		load();
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		initTree();
+//		initTree();
 		final JTable table = getTable();
 		table.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -95,6 +95,7 @@ public class Settings extends AbstractSettings {
 	private Settings() {
 		storeDefaults();
 		load();
+		initTree();
 		INSTANCE = this;
 	}
 	
