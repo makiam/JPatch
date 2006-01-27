@@ -190,7 +190,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			} else if (e.getButton() == MouseEvent.BUTTON2) {
 				mx = e.getX();
 				my = e.getY();
-				System.out.println(mx);
+//				System.out.println(mx);
 			}
 		}
 
@@ -211,7 +211,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		}
 
 		public void mouseDragged(MouseEvent e) {
-			System.out.println(e.getButton());
+//			System.out.println(e.getButton());
 			if (iVerticalResize > -1) {
 				int y = 0;
 				for (int i = 0; i < iVerticalResize; i++)
