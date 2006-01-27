@@ -1,5 +1,5 @@
 /*
- * $Id: Ruler.java,v 1.7 2006/01/23 16:59:35 sascha_l Exp $
+ * $Id: Ruler.java,v 1.8 2006/01/27 20:25:59 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -32,6 +32,8 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 		 */
 		private final TimelineEditor timelineEditor;
 		
+		private int iStart = 20;
+		private int iEnd = 30;
 		/**
 		 * @param editor
 		 */
@@ -71,10 +73,16 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 			int frame = start / fw - 1;
 			//((Graphics2D) g).setPaint(new GradientPaint(0, 0, new Color(255, 255, 128), 0, 16, getBackground().brighter()));
 			g.setColor(Color.WHITE);
-			((Graphics2D) g).fill(clip);
 			g.fillRect(clip.x, clip.y, clip.width, clip.height);
+			g.setColor(TimelineEditor.SELECTED_BACKGROUND);
+			for (int x = -fw ; x <= clip.width + fw; x += fw) {
+				if (frame >= iStart && frame <= iEnd)
+					g.fillRect(x + start - fw/2, 0, fw, getHeight() - 1);
+				frame++;
+			}
 			g.setColor(Color.BLACK);
 			g.drawLine(clip.x, 15, clip.x + clip.width, 15);
+			frame = start / fw - 1;
 			for (int x = -fw ; x <= clip.width + fw; x += fw) {
 				if (frame % 6 == 0)
 					g.drawLine(x + start, getHeight() - 6, x + start, getHeight() - 1);
@@ -95,7 +103,11 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 				}
 				frame++;
 			}
-			
+			int x = timelineEditor.getColumnHeader().getViewPosition().x;
+			g.setColor(new Color(1, 0.5f, 0, 0.33f));
+			g.fillRect(x, 0, 10 * fw - 2, 6);
+			g.setColor(new Color(1, 0.5f, 0));
+			g.fill3DRect(x + 10 * fw - 2, 0, 4, 6, true);
 //			g.setColor(Color.WHITE);
 //			g.draw3DRect(clip.x, clip.y, clip.width - 1, clip.height - 1, false);
 //			g.draw3DRect(clip.x + 1, clip.y + 1, clip.width - 3, clip.height - 3, true);
