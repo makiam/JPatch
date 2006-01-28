@@ -331,7 +331,7 @@ public class Viewport2 {
 			}
 		}
 		if (viewDef.renderPatches() && (drawable.isShadingSupported() || drawable.isLightingSupported())) {
-			drawable.setColor(Settings.getInstance().colors.backfacingPatches);
+//			drawable.setColor(Settings.getInstance().colors.backfacingPatches);
 			int passes = (drawable instanceof JPatchDrawableGL) ? 3 : 2;
 			Vector3f[] normals = new Vector3f[] {new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f()};
 			if (drawable.isLightingSupported())

@@ -47,7 +47,7 @@ public class Grid {
 	public void paint(ViewDefinition viewDef) {
 		JPatchDrawable2 drawable = viewDef.getDrawable();
 		Matrix4f m4View = viewDef.getScreenMatrix();
-		if (viewDef.getView() != ViewDefinition.BIRDS_EYE) {
+		if (viewDef.getView() != ViewDefinition.BIRDS_EYE && viewDef.getCamera() == null) {
 			drawPlanarGrid(drawable, m4View, (int) viewDef.getWidth(), (int) viewDef.getHeight());
 		} else {
 			//drawBirdsEyeGrid(drawable, m4View);

@@ -112,11 +112,11 @@ public final class JPatchScreen extends JPanel {
 					if (MainFrame.getInstance().getModel() != null)
 						aViewport[I].drawRotoscope();
 					aViewport[I].drawGrid();
+					aViewport[I].drawOrigin();
 					if (MainFrame.getInstance().getModel() != null)
 						aViewport[I].drawModel(MainFrame.getInstance().getModel());
 					if (MainFrame.getInstance().getAnimation() != null)
 						aViewport[I].drawAnimFrame(MainFrame.getInstance().getAnimation());
-					aViewport[I].drawOrigin();
 					if (tool != null)
 						aViewport[I].drawTool(tool);
 					if (bShowTangents)

@@ -764,6 +764,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void setMaterial(MaterialProperties mp) {
+		enableRasterMode(false);
 		int side = (Settings.getInstance().realtimeRenderer.backfacingPatches == RealtimeRendererSettings.Backface.RENDER) ? GL.GL_FRONT_AND_BACK : GL.GL_FRONT;
 		switch (iTransparentMode) {
 			case OFF: {
@@ -825,11 +826,12 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void setLighting(RealtimeLighting lighting) {
+		enableRasterMode(false);
 		if (lighting == null) {
 			//gl.glDisable(GL.GL_LIGHTING);
 			return;
 		}
-		//gl.glEnable(GL.GL_LIGHTING);
+//		gl.glEnable(GL.GL_LIGHTING);
 		Color3f ambient = lighting.getAmbientColor();
 		gl.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, new float[] { ambient.x, ambient.y, ambient.z, 1 });
 		for (int i = 0; i < iMaxLights; i++) {

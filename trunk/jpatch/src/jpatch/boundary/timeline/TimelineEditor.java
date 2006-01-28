@@ -41,7 +41,7 @@ public class TimelineEditor extends JScrollPane {
 	private int iFrameWidth = 8;
 	private int mouseX, mouseY;
 	private boolean bMove;
-	
+	private String strText = "";
 	private Header header = new Header(this);
 	
 	private static Color derivedColor(Color c, int r, int g, int b) {
@@ -68,12 +68,17 @@ public class TimelineEditor extends JScrollPane {
 		getViewport().setBackground(SHADOW);
 		setCorner(UPPER_LEFT_CORNER, new Corner(this));
 		setCorner(LOWER_LEFT_CORNER, new JComponent() {
+			private Font font = new Font("Sans-Serif", Font.PLAIN, 10);
 			public void paint(Graphics g) {
 				super.paint(g);
 				g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
 				g.drawLine(0, 0, getWidth() - 1, 0);
 				g.setColor(UIManager.getColor("ScrollBar.shadow"));
 				g.drawLine(0, 1, getWidth() - 1, 1);
+				((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+				g.setFont(font);
+				g.setColor(Color.BLACK);
+				g.drawString(strText, 4, 12);
 			}
 		});
 		setCorner(UPPER_RIGHT_CORNER, new JComponent() {
@@ -103,6 +108,11 @@ public class TimelineEditor extends JScrollPane {
 			currentCursor = cursor;
 			super.setCursor(cursor);
 		}
+	}
+	
+	public void setCornerText(String text) {
+		strText = text;
+		getCorner(LOWER_LEFT_CORNER).repaint();
 	}
 	
 	public Header getHeader() {
@@ -139,7 +149,8 @@ public class TimelineEditor extends JScrollPane {
 	
 	public void setAnimObject(AnimObject animObject) {
 		listTracks.clear();
-		listTracks.add(new HeaderTrack(this, animObject.getName(), -12));
+		listTracks.add(new HeaderTrack(this, animObject.getName(), -12, true));
+		listTracks.add(new HeaderTrack(this, "Common tracks", -4, false));
 		MotionCurveSet mcs = MainFrame.getInstance().getAnimation().getCurvesetFor(animObject);
 		for (MotionCurve curve : mcs.motionCurveList) {
 			if (curve instanceof MotionCurve.Float)
@@ -151,12 +162,12 @@ public class TimelineEditor extends JScrollPane {
 		}
 		if (animObject instanceof AnimModel) {
 			if (((AnimModel) animObject).getModel().getMorphList().size() > 0)
-				listTracks.add(new HeaderTrack(this, "Morphs", -4));
+				listTracks.add(new HeaderTrack(this, "Morphs", -4, false));
 			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
 				listTracks.add(new AvarTrack(this, ((MotionCurveSet.Model) mcs).morph((Morph) it.next())));
 			}
 			if (((AnimModel) animObject).getModel().getBoneSet().size() > 0)
-				listTracks.add(new HeaderTrack(this, "Bones", -4));
+				listTracks.add(new HeaderTrack(this, "Bones", -4, false));
 			for (Iterator it = ((AnimModel) animObject).getModel().getBoneSet().iterator(); it.hasNext(); ) {
 				Bone bone = (Bone) it.next();
 				if (bone.getParentBone() == null)
@@ -256,6 +267,29 @@ public class TimelineEditor extends JScrollPane {
 		return iCurrentFrame;
 	}
 	
+	public void setCurrentFrame(int frame) {
+		MainFrame.getInstance().getAnimation().setPosition(frame);
+		MainFrame.getInstance().getJPatchScreen().update_all();
+		int x = frame * iFrameWidth + iFrameWidth / 2;
+		Rectangle r = getViewport().getViewRect();
+		if (x > r.x + r.width - 1 * iFrameWidth) {
+			getHorizontalScrollBar().setValue(x - 2 * iFrameWidth);
+			iCurrentFrame = frame;
+			return;
+		}
+		if (x < r.x + 0 * iFrameWidth) {
+			getHorizontalScrollBar().setValue(x - r.width + 2 * iFrameWidth);
+			iCurrentFrame = frame;
+			return;
+		}
+		x = iCurrentFrame * iFrameWidth + iFrameWidth / 2;
+		iCurrentFrame = frame;
+		getViewport().getView().repaint(x - 5, 0, 11, getViewport().getView().getHeight());
+		getColumnHeader().getView().repaint(x - 5, 0, 11, getColumnHeader().getView().getHeight());
+		x = iCurrentFrame * iFrameWidth + iFrameWidth / 2;
+		getViewport().getView().repaint(x - 5, 0, 11, getViewport().getView().getHeight());
+		getColumnHeader().getView().repaint(x - 5, 0, 11, getColumnHeader().getView().getHeight());
+	}
 	public int getTracksHeight() {
 		int h = 0;
 		for (Track track: listTracks)
