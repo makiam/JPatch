@@ -41,6 +41,7 @@ public class Track<M extends MotionCurve> {
 	static final int TOP = 4;
 	
 	int iExpandedHeight = EXPANDED_HEIGHT;
+	boolean bHidden = false;
 	boolean bExpanded = false;
 	boolean bExpandable = false;
 	TimelineEditor timelineEditor;
@@ -52,7 +53,9 @@ public class Track<M extends MotionCurve> {
 	}
 	
 	public int getHeight() {
-		return bExpanded ? iExpandedHeight : TRACK_HEIGHT;
+		if (isHidden())
+			return 0;
+		return isExpanded() ? iExpandedHeight : TRACK_HEIGHT;
 	}
 	
 	public String getName() {
@@ -82,6 +85,14 @@ public class Track<M extends MotionCurve> {
 	
 	public boolean isExpanded() {
 		return bExpanded;
+	}
+	
+	public boolean isHidden() {
+		return bHidden;
+	}
+	
+	public void setHidden(boolean hidden) {
+		bHidden = hidden;
 	}
 	
 	public void paint(Graphics g, int y) {	

@@ -9,13 +9,19 @@ import jpatch.entity.MotionCurve;
 public class HeaderTrack extends Track {
 	private String name;
 	private int iIndent;
+	private boolean bDontHide = false;
 	
-	public HeaderTrack(TimelineEditor timelineEditor, String name, int indent) {
+	public HeaderTrack(TimelineEditor timelineEditor, String name, int indent, boolean showAlways) {
 		super(timelineEditor, null);
 		this.name = name;
 		iIndent = indent;
+		bDontHide = showAlways;
 	}
 
+	public boolean isHidden() {
+		return bDontHide ? false : super.isHidden();
+	}
+	
 	public String getName() {
 		return name;
 	}
