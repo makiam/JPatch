@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.13 2006/01/27 20:25:59 sascha_l Exp $
+ * $Id: TrackView.java,v 1.14 2006/01/28 22:55:09 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -28,7 +28,7 @@ import java.util.Set;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-class TrackView extends JComponent implements Scrollable, MouseListener, MouseMotionListener {
+class TrackView extends JComponent implements Scrollable, MouseListener, MouseMotionListener, MouseWheelListener {
 		/**
 		 * 
 		 */
@@ -41,10 +41,11 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			timelineEditor = tle;
 			addMouseListener(this);
 			addMouseMotionListener(this);
+			addMouseWheelListener(this);
 		}
 		
 		public Dimension getPreferredSize() {
-			dim.setSize(timelineEditor.getFrameWidth() * 24 * 60 + 1, timelineEditor.getTracksHeight() + 7); // FIXME: use animation length
+			dim.setSize(timelineEditor.getFrameWidth() * 24 * 10 + timelineEditor.getFrameWidth(), timelineEditor.getTracksHeight() + 7); // FIXME: use animation length
 			return dim;
 		}
 		
@@ -75,6 +76,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			Set<Track> selectedTracks = timelineEditor.getHeader().getSelectedTracks();
 			g.setColor(TimelineEditor.SELECTED_BACKGROUND);
 			for (Track track : timelineEditor.getTracks()) {
+				if (track.isHidden())
+					continue;
 				if (y + track.getHeight() > clip.y && y < clip.y + clip.height)
 					if (selectedTracks.contains(track))
 						g.fillRect(clip.x, y, clip.width, track.getHeight());
@@ -97,6 +100,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			
 			y = 0;
 			for (Track track : timelineEditor.getTracks()) {
+				if (track.isHidden())
+					continue;
 				if (y + track.getHeight() > clip.y && y < clip.y + clip.height)
 					track.paint(g, y);
 				y += track.getHeight();
@@ -169,7 +174,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				int y = 0;
 				for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
-				Track track = timelineEditor.getTracks().get(i);
+					Track track = timelineEditor.getTracks().get(i);
+					if (track.isHidden())
+						continue;
 					if (e.getClickCount() == 2 && e.getY() > y && e.getY() < y + track.getHeight() - 6) {
 						timelineEditor.expandTrack(track, !track.isExpanded());
 						return;
@@ -264,5 +271,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				timelineEditor.setCursor(TimelineEditor.verticalResizeCursor);
 			else 
 				timelineEditor.setCursor(TimelineEditor.defaultCursor);
+		}
+
+		public void mouseWheelMoved(MouseWheelEvent e) {
+			timelineEditor.setCurrentFrame(timelineEditor.getCurrentFrame() + e.getWheelRotation());
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.48 2006/01/09 21:33:55 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.49 2006/01/28 22:55:10 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -331,7 +331,7 @@ public class Viewport2 {
 			}
 		}
 		if (viewDef.renderPatches() && (drawable.isShadingSupported() || drawable.isLightingSupported())) {
-			drawable.setColor(Settings.getInstance().colors.backfacingPatches);
+//			drawable.setColor(Settings.getInstance().colors.backfacingPatches);
 			int passes = (drawable instanceof JPatchDrawableGL) ? 3 : 2;
 			Vector3f[] normals = new Vector3f[] {new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f()};
 			if (drawable.isLightingSupported())
