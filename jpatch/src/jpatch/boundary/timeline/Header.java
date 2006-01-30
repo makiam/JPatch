@@ -444,6 +444,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 						iSelectedTrack = i;
 					}
 					timelineEditor.repaint();
+					return;
 				} if (track.isExpanded() && e.getY() > y + track.getHeight() - 6 && e.getY() <= y + track.getHeight()) {
 					if (e.getClickCount() == 2) {
 						track.setDefaultExpandedHeight();
@@ -455,9 +456,13 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 					} else {
 						iVerticalResize = i;
 					}
+					return;
 				}
 				y += track.getHeight();
 			}
+			setSelectedTracks.clear();
+			timelineEditor.repaint();
+			return;
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
 			showPopup(e);
 		} else if (e.getButton() == MouseEvent.BUTTON2) {
