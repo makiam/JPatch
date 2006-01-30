@@ -1,6 +1,6 @@
 package jpatch.entity;
 
-public abstract class MotionKey {
+public abstract class MotionKey implements Comparable {
 	float fPosition;
 	
 	private MotionKey(float position) {
@@ -13,6 +13,17 @@ public abstract class MotionKey {
 	
 	public void setPosition(float position) {
 		fPosition = position;
+	}
+	
+	public boolean equals(Object object) {
+		if (!(object instanceof MotionKey))
+			return false;
+		return fPosition == ((MotionKey) object).fPosition;
+	}
+	
+	public int compareTo(Object object) {
+		MotionKey other = (MotionKey) object;
+		return java.lang.Float.compare(fPosition, other.fPosition);
 	}
 	
 	public static class Float extends MotionKey {
