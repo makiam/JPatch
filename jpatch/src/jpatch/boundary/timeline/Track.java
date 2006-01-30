@@ -79,9 +79,9 @@ public class Track<M extends MotionCurve> {
 		iExpandedHeight = height;
 	}
 	
-	public void setDefaultExpandedHeight() {
-		iExpandedHeight = EXPANDED_HEIGHT;
-	}
+//	public void setDefaultExpandedHeight() {
+//		iExpandedHeight = EXPANDED_HEIGHT;
+//	}
 	
 	public boolean isExpanded() {
 		return bExpanded;
