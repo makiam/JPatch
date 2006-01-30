@@ -37,6 +37,10 @@ public class TimelineEditor extends JScrollPane {
 	public static Color TRACK = derivedColor(BACKGROUND, -16, -16, -16);
 	
 	private List<Track> listTracks = new ArrayList<Track>();
+	private int[] aiTrackBottom;
+	private boolean bTrackHeightsValid;
+	private int iTracksHeight;
+	
 	private int iCurrentFrame = 49;
 	private int iFrameWidth = 8;
 	private int mouseX, mouseY;
@@ -123,6 +127,7 @@ public class TimelineEditor extends JScrollPane {
 		if (track.isExpanded() == expand)
 			return;
 		track.expand(expand);
+		bTrackHeightsValid = false;
 		revalidate();
 		((JComponent) getViewport().getView()).revalidate();
 		((JComponent) getRowHeader().getView()).revalidate();
@@ -132,6 +137,7 @@ public class TimelineEditor extends JScrollPane {
 	void expandAll(boolean expand) {
 		for (Track track : listTracks)
 			track.expand(expand);
+		bTrackHeightsValid = false;
 		revalidate();
 		((JComponent) getViewport().getView()).revalidate();
 		((JComponent) getRowHeader().getView()).revalidate();
@@ -141,10 +147,21 @@ public class TimelineEditor extends JScrollPane {
 	void resetTracks() {
 		for (Track track : listTracks)
 			track.setExpandedHeight(AvarTrack.EXPANDED_HEIGHT);
+		bTrackHeightsValid = false;
 		revalidate();
 		((JComponent) getViewport().getView()).revalidate();
 		((JComponent) getRowHeader().getView()).revalidate();
 		repaint();
+	}
+	
+	public void setTrackHeight(int trackNo, int height) {
+		listTracks.get(trackNo).setExpandedHeight(height);
+		bTrackHeightsValid = false;
+	}
+	
+	public void hideTrack(Track track, boolean hide) {
+		track.setHidden(hide);
+		bTrackHeightsValid = false;
 	}
 	
 	public void setAnimObject(AnimObject animObject) {
@@ -175,6 +192,8 @@ public class TimelineEditor extends JScrollPane {
 			}
 		}
 		header.createButtons();
+		aiTrackBottom = new int[listTracks.size()];
+		computeHeights();
 		revalidate();
 		((JComponent) getViewport().getView()).revalidate();
 		((JComponent) getRowHeader().getView()).revalidate();
@@ -267,22 +286,25 @@ public class TimelineEditor extends JScrollPane {
 		return iCurrentFrame;
 	}
 	
-	public void setCurrentFrame(int frame) {
-		MainFrame.getInstance().getAnimation().setPosition(frame);
-		MainFrame.getInstance().getJPatchScreen().update_all();
-		int x = frame * iFrameWidth + iFrameWidth / 2;
+	public void showCurrentFrame() {
+		int x = iCurrentFrame * iFrameWidth + iFrameWidth / 2;
 		Rectangle r = getViewport().getViewRect();
 		if (x > r.x + r.width - 1 * iFrameWidth) {
 			getHorizontalScrollBar().setValue(x - 2 * iFrameWidth);
-			iCurrentFrame = frame;
+			iCurrentFrame = iCurrentFrame;
 			return;
 		}
 		if (x < r.x + 0 * iFrameWidth) {
 			getHorizontalScrollBar().setValue(x - r.width + 2 * iFrameWidth);
-			iCurrentFrame = frame;
+			iCurrentFrame = iCurrentFrame;
 			return;
 		}
-		x = iCurrentFrame * iFrameWidth + iFrameWidth / 2;
+	}
+	
+	public void setCurrentFrame(int frame) {
+		MainFrame.getInstance().getAnimation().setPosition(frame);
+		MainFrame.getInstance().getJPatchScreen().update_all();
+		int x = iCurrentFrame * iFrameWidth + iFrameWidth / 2;
 		iCurrentFrame = frame;
 		getViewport().getView().repaint(x - 5, 0, 11, getViewport().getView().getHeight());
 		getColumnHeader().getView().repaint(x - 5, 0, 11, getColumnHeader().getView().getHeight());
@@ -290,10 +312,34 @@ public class TimelineEditor extends JScrollPane {
 		getViewport().getView().repaint(x - 5, 0, 11, getViewport().getView().getHeight());
 		getColumnHeader().getView().repaint(x - 5, 0, 11, getColumnHeader().getView().getHeight());
 	}
+	
+	private void computeHeights() {
+		iTracksHeight = 0;
+		for (int i = 0; i < listTracks.size(); i++) {
+			Track track = listTracks.get(i);
+			iTracksHeight += track.getHeight();
+			aiTrackBottom[i] = iTracksHeight;
+		}
+		bTrackHeightsValid = true;
+	}
+	
 	public int getTracksHeight() {
-		int h = 0;
-		for (Track track: listTracks)
-			h += track.getHeight();
-		return h;
+		if (!bTrackHeightsValid)
+			computeHeights();
+		return iTracksHeight;
 	}	
+	
+	public int getTrackBottom(int i) {
+		if (!bTrackHeightsValid)
+			computeHeights();
+		return aiTrackBottom[i];
+	}
+	
+	public int getTrackTop(int i) {
+		if (i == 0)
+			return 0;
+		if (!bTrackHeightsValid)
+			computeHeights();
+		return aiTrackBottom[i - 1];
+	}
 }

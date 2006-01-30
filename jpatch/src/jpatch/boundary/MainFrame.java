@@ -5,10 +5,13 @@ import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.IndexColorModel;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.*;
 //import java.beans.*;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.*;
@@ -27,6 +30,7 @@ import jpatch.control.edit.*;
 import jpatch.boundary.laf.*;
 import jpatch.boundary.mouse.TreeMouseAdapter;
 import jpatch.boundary.action.*;
+import sun.security.provider.certpath.IndexedCollectionCertStore;
 
 public final class MainFrame extends JFrame {
 	/**
@@ -95,7 +99,15 @@ public final class MainFrame extends JFrame {
 //			}
 //		};
 //		timerMonitor.start();
-		
+		try {
+			//IndexColorModel icm = new IndexColorModel(8, 3, new byte[] {0, -127, 0}, new byte[] {0, -127, 0}, new byte[] {0, -127, 0}, 2);
+			//BufferedImage im = new BufferedImage(16, 16, BufferedImage.TYPE_BYTE_INDEXED);
+			
+			Image im = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("jpatch/images/logo.gif"));
+		//	BufferedImage im2 = ImageIO.read(ClassLoader.getSystemResource("jpatch/images/logo.gif"));
+			//im.createGraphics().drawImage(im2, 0, 0, null);
+			setIconImage(im);
+		} catch (Exception e) { }
 		
 		if (VersionInfo.release) {
 			setTitle("JPatch " + VersionInfo.version);

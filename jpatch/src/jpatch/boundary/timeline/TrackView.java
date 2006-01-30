@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.14 2006/01/28 22:55:09 sascha_l Exp $
+ * $Id: TrackView.java,v 1.15 2006/01/30 19:42:01 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -32,6 +32,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		/**
 		 * 
 		 */
+	private static enum State { IDLE, RESIZE, SCROLL };
+	private State state = State.IDLE;
 		private final TimelineEditor timelineEditor;
 		private Dimension dim = new Dimension();
 		private int iVerticalResize = -1;
@@ -182,7 +184,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 						return;
 					} else if (track.isExpanded() && e.getY() > y + track.getHeight() - 6 && e.getY() <= y + track.getHeight()) {
 						if (e.getClickCount() == 2) {
-							((AvarTrack) track).setDefaultExpandedHeight();
+							timelineEditor.setTrackHeight(i, Track.EXPANDED_HEIGHT);
 							timelineEditor.revalidate();
 							revalidate();
 							((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
@@ -190,6 +192,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	//						setVerticalResizeCursor(e.getY() > y + track.getHeight() - 5 && e.getY() <= y + track.getHeight());
 						} else {
 							iVerticalResize = i;
+							state = State.RESIZE;
 						}
 					}
 					y += track.getHeight();
@@ -197,6 +200,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			} else if (e.getButton() == MouseEvent.BUTTON2) {
 				mx = e.getX();
 				my = e.getY();
+				state = State.SCROLL;
 //				System.out.println(mx);
 			}
 		}
@@ -205,8 +209,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		}
 
 		public void mouseReleased(MouseEvent e) {
-			if (iVerticalResize > -1)
-				iVerticalResize = -1;
+			state = State.IDLE;
 		}
 
 		public void mouseEntered(MouseEvent e) {
@@ -219,7 +222,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 
 		public void mouseDragged(MouseEvent e) {
 //			System.out.println(e.getButton());
-			if (iVerticalResize > -1) {
+			switch (state) {
+			
+			case RESIZE:
 				int y = 0;
 				for (int i = 0; i < iVerticalResize; i++)
 					y += timelineEditor.getTracks().get(i).getHeight();
@@ -228,13 +233,13 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 					h = 32;
 				if (h > 256)
 					h = 256;
-				timelineEditor.getTracks().get(iVerticalResize).setExpandedHeight(h);
+				timelineEditor.setTrackHeight(iVerticalResize, h);
 				timelineEditor.revalidate();
 				revalidate();
 				((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
 				timelineEditor.repaint();
-			}
-			else {
+				break;
+			case SCROLL:
 //				int x = timelineEditor.getHorizontalScrollBar().getValue();
 //				int y = timelineEditor.getVerticalScrollBar().getValue();
 				JScrollBar hsb = timelineEditor.getHorizontalScrollBar();
@@ -253,6 +258,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //				revalidate();
 //				timelineEditor.revalidate();
 //				((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
+				break;
 			}
 		}
 
@@ -271,6 +277,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				timelineEditor.setCursor(TimelineEditor.verticalResizeCursor);
 			else 
 				timelineEditor.setCursor(TimelineEditor.defaultCursor);
+			int frame = e.getX() / timelineEditor.getFrameWidth();
+			timelineEditor.setCornerText("Frame " + frame);
 		}
 
 		public void mouseWheelMoved(MouseWheelEvent e) {

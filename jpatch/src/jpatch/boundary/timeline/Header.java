@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.18 2006/01/30 10:47:19 sascha_l Exp $
+ * $Id: Header.java,v 1.19 2006/01/30 19:43:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -352,7 +352,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 				h = 32;
 			if (h > 256)
 				h = 256;
-			timelineEditor.getTracks().get(iVerticalResize).setExpandedHeight(h);
+			timelineEditor.setTrackHeight(iVerticalResize, h);
 			timelineEditor.revalidate();
 			revalidate();
 			((JComponent) timelineEditor.getViewport().getView()).revalidate();
@@ -447,7 +447,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 					return;
 				} if (track.isExpanded() && e.getY() > y + track.getHeight() - 6 && e.getY() <= y + track.getHeight()) {
 					if (e.getClickCount() == 2) {
-						track.setDefaultExpandedHeight();
+						timelineEditor.setTrackHeight(i, track.EXPANDED_HEIGHT);
 						timelineEditor.revalidate();
 						revalidate();
 						((JComponent) timelineEditor.getViewport().getView()).revalidate();
@@ -563,6 +563,10 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 	private void showPopup(MouseEvent e) {
 		JPopupMenu popup = new JPopupMenu();
 		JMenuItem mi;
+		
+		/*
+		 * select all (not hidden) tracks
+		 */
 		mi = new JMenuItem("select all (not hidden) tracks");
 		mi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
@@ -571,6 +575,10 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 			}
 		});
 		popup.add(mi);
+		
+		/*
+		 * unselect all tracks
+		 */
 		mi = new JMenuItem("unselect all tracks");
 		mi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
@@ -581,6 +589,10 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		if (setSelectedTracks.size() == 0)
 			mi.setEnabled(false);
 		popup.add(mi);
+		
+		/*
+		 * invert selection
+		 */
 		mi = new JMenuItem("invert selection");
 		mi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
@@ -595,12 +607,17 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 			}
 		});
 		popup.add(mi);
+		
 		popup.add(new JSeparator());
+		
+		/*
+		 * show only selected tracks
+		 */
 		mi = new JMenuItem("show only selected tracks");
 		mi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				for (Track track : timelineEditor.getTracks())
-					track.setHidden(!setSelectedTracks.contains(track));
+					timelineEditor.hideTrack(track, !setSelectedTracks.contains(track));
 				showHideHeaderTracks();
 				timelineEditor.revalidate();
 				revalidate();
@@ -611,11 +628,15 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		if (setSelectedTracks.size() == 0)
 			mi.setEnabled(false);
 		popup.add(mi);
+		
+		/*
+		 * hide selected tracks
+		 */
 		mi = new JMenuItem("hide selected tracks");
 		mi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				for (Track track : setSelectedTracks)
-					track.setHidden(true);
+					timelineEditor.hideTrack(track, true);
 				setSelectedTracks.clear();
 				showHideHeaderTracks();
 				timelineEditor.revalidate();
@@ -627,6 +648,10 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		if (setSelectedTracks.size() == 0)
 			mi.setEnabled(false);
 		popup.add(mi);
+		
+		/*
+		 * show all tracks
+		 */
 		mi = new JMenuItem("show all tracks");
 		mi.setEnabled(false);
 		for (Track track : timelineEditor.getTracks()) {
@@ -638,7 +663,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		mi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				for (Track track : timelineEditor.getTracks())
-					track.setHidden(false);
+					timelineEditor.hideTrack(track, false);
 				timelineEditor.revalidate();
 				revalidate();
 				((JComponent) timelineEditor.getViewport().getView()).revalidate();
@@ -646,14 +671,14 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 			}
 		});
 		popup.add(mi);
-		mi = new JMenuItem("dump selected tracks");
-		mi.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				for (Track track : setSelectedTracks)
-					System.out.println(track.getName());
-			}
-		});
-		popup.add(mi);
+//		mi = new JMenuItem("dump selected tracks");
+//		mi.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent event) {
+//				for (Track track : setSelectedTracks)
+//					System.out.println(track.getName());
+//			}
+//		});
+//		popup.add(mi);
 		popup.show((Component) e.getSource(), e.getX(), e.getY());
 	}
 	
@@ -662,10 +687,10 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		for (Track track : timelineEditor.getTracks()) {
 			if (track instanceof HeaderTrack) {
 				header = track;
-				header.setHidden(true);
+				timelineEditor.hideTrack(header, true);
 			} else {
 				if (!track.isHidden() && header != null)
-					header.setHidden(false);
+					timelineEditor.hideTrack(header, false);
 			}
 		}
 	}

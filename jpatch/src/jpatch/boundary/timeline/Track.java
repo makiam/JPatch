@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.7 2006/01/28 22:55:10 sascha_l Exp $
+ * $Id: Track.java,v 1.8 2006/01/30 19:42:01 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -79,9 +79,9 @@ public class Track<M extends MotionCurve> {
 		iExpandedHeight = height;
 	}
 	
-	public void setDefaultExpandedHeight() {
-		iExpandedHeight = EXPANDED_HEIGHT;
-	}
+//	public void setDefaultExpandedHeight() {
+//		iExpandedHeight = EXPANDED_HEIGHT;
+//	}
 	
 	public boolean isExpanded() {
 		return bExpanded;

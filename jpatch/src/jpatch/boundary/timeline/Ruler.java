@@ -1,5 +1,5 @@
 /*
- * $Id: Ruler.java,v 1.9 2006/01/28 22:55:09 sascha_l Exp $
+ * $Id: Ruler.java,v 1.10 2006/01/30 19:42:01 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -31,13 +31,14 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 	/**
 	 * 
 	 */
-	private static enum State { IDLE, RESIZE, MOVE }
+	private static enum State { IDLE, RESIZE, MOVE, FRAME }
 	
 	private final TimelineEditor timelineEditor;
 	
 	private int mx, my;
-	private int iStart = 20;
-	private int iEnd = 30;
+	private int iStart, iEnd;
+	private boolean bSelection;
+	
 	private State state = State.IDLE;
 	/**
 	 * @param editor
@@ -138,12 +139,25 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 	public void mousePressed(MouseEvent e) {
 		int fw = timelineEditor.getFrameWidth();
 		int x = e.getX() - timelineEditor.getViewport().getViewPosition().x;
-		if (e.getButton() == MouseEvent.BUTTON1 && x > 10 * fw - 4 && x < 10 * fw + 4 && e.getY() < 8) {
-			state = State.RESIZE;
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			
+			/*
+			 * Left Mousebutton pressed
+			 */
+			
+			if (x > 10 * fw - 4 && x < 10 * fw + 4 && e.getY() < 8) {
+				state = State.RESIZE;
+			} else if (x > timelineEditor.getCurrentFrame() * fw - 5 && x < timelineEditor.getCurrentFrame() * fw + 11) {
+				state = State.FRAME;
+			}
 		} else if (e.getButton() == MouseEvent.BUTTON2) {
+			
+			/*
+			 * Middle Mousebutton pressed
+			 */
+			
 			mx = e.getX();
 			state = State.MOVE;
-//			my = e.getY();
 		}
 	}
 	
@@ -168,6 +182,10 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 			timelineEditor.getHorizontalScrollBar().setValue(sbx - dx);
 //			timelineEditor.getVerticalScrollBar().setValue(sby - dy);
 			break;
+		case FRAME:
+			int frame = e.getX() / timelineEditor.getFrameWidth();
+			timelineEditor.setCornerText("Frame " + frame);
+			timelineEditor.setCurrentFrame(frame);
 		}
 	}
 	
