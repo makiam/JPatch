@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.17 2006/01/28 22:55:09 sascha_l Exp $
+ * $Id: Header.java,v 1.18 2006/01/30 10:47:19 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -444,6 +444,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 						iSelectedTrack = i;
 					}
 					timelineEditor.repaint();
+					return;
 				} if (track.isExpanded() && e.getY() > y + track.getHeight() - 6 && e.getY() <= y + track.getHeight()) {
 					if (e.getClickCount() == 2) {
 						track.setDefaultExpandedHeight();
@@ -455,9 +456,13 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 					} else {
 						iVerticalResize = i;
 					}
+					return;
 				}
 				y += track.getHeight();
 			}
+			setSelectedTracks.clear();
+			timelineEditor.repaint();
+			return;
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
 			showPopup(e);
 		} else if (e.getButton() == MouseEvent.BUTTON2) {
