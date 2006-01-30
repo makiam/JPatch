@@ -37,6 +37,7 @@ public class TimelineEditor extends JScrollPane {
 	public static Color TRACK = derivedColor(BACKGROUND, -16, -16, -16);
 	
 	private List<Track> listTracks = new ArrayList<Track>();
+	private List<SortedSet<MotionKey>> listSelections = new ArrayList<SortedSet<MotionKey>>();
 	private int[] aiTrackBottom;
 	private boolean bTrackHeightsValid;
 	private int iTracksHeight;
@@ -191,6 +192,9 @@ public class TimelineEditor extends JScrollPane {
 					recursiveAddBoneDofs(bone, 0, (MotionCurveSet.Model) mcs);
 			}
 		}
+		listSelections.clear();
+		for (Track track : listTracks)
+			listSelections.add(new TreeSet<MotionKey>());
 		header.createButtons();
 		aiTrackBottom = new int[listTracks.size()];
 		computeHeights();
