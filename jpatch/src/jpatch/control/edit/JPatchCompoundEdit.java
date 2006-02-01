@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchCompoundEdit.java,v 1.7 2006/01/09 21:33:54 sascha_l Exp $
+ * $Id: JPatchCompoundEdit.java,v 1.8 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -29,7 +29,7 @@ import java.util.*;
  * It's undo() method simply calls the undo() methods of all child
  * edits (in reverse order). It's redo method calls the redo() methods of all child edits.
  *
- * @version	$Revision: 1.7 $
+ * @version	$Revision: 1.8 $
  * @author	Sascha Ledinsky
  */
 public abstract class JPatchCompoundEdit implements JPatchUndoableEdit {

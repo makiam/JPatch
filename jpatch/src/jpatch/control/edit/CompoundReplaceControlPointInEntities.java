@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundReplaceControlPointInEntities.java,v 1.3 2005/09/29 15:12:12 sascha_l Exp $
+ * $Id: CompoundReplaceControlPointInEntities.java,v 1.4 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

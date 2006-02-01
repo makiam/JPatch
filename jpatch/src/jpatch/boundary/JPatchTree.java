@@ -1,5 +1,5 @@
 /**
- * $Id: JPatchTree.java,v 1.5 2005/10/24 16:31:31 sascha_l Exp $
+ * $Id: JPatchTree.java,v 1.6 2006/02/01 21:11:28 sascha_l Exp $
  */
 package jpatch.boundary;
 

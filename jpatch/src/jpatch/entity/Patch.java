@@ -1,5 +1,5 @@
 /*
- * $Id: Patch.java,v 1.7 2006/01/06 18:34:46 sascha_l Exp $
+ * $Id: Patch.java,v 1.8 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -30,7 +30,7 @@ import jpatch.auxilary.*;
  * A Patch. Currently 3-, 4- and 5-point patches are supported
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.7 $
+ * @version    $Revision: 1.8 $
  * @see		jpatch.entity.Curve
  * @see		jpatch.entity.ControlPoint
  */

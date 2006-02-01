@@ -1,5 +1,5 @@
 /*
- * $Id: DeleteDefaultSelectionsAction.java,v 1.4 2005/09/28 14:02:12 sascha_l Exp $
+ * $Id: DeleteDefaultSelectionsAction.java,v 1.5 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -34,7 +34,7 @@ import jpatch.control.edit.*;
  * @author lois
  * modified by sascha
  * This Action removes all selections starting with a "*" character
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public final class DeleteDefaultSelectionsAction extends AbstractAction {
 	

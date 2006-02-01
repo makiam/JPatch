@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.22 2006/01/13 22:15:33 sascha_l Exp $
+ * $Id: Command.java,v 1.23 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

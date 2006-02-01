@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchFileSelector.java,v 1.1 2005/08/10 12:57:20 sascha_l Exp $
+ * $Id: JPatchFileSelector.java,v 1.2 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -32,7 +32,7 @@ import java.io.File;
 /**
  * A fileselector component containing a textfiled and a browse button.
  * @author sascha
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class JPatchFileSelector extends JPanel {
 

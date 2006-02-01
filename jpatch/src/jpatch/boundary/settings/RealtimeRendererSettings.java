@@ -1,5 +1,5 @@
 /*
- * $Id: RealtimeRendererSettings.java,v 1.2 2005/12/30 13:00:36 sascha_l Exp $
+ * $Id: RealtimeRendererSettings.java,v 1.3 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

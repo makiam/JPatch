@@ -1,5 +1,5 @@
 /*
- * $Id: InstallJoglAction.java,v 1.1 2005/10/10 15:45:07 sascha_l Exp $
+ * $Id: InstallJoglAction.java,v 1.2 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

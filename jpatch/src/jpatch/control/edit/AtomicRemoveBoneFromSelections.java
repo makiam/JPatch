@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicRemoveBoneFromSelections.java,v 1.2 2005/12/08 08:58:11 sascha_l Exp $
+ * $Id: AtomicRemoveBoneFromSelections.java,v 1.3 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

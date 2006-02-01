@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchMaterial.java,v 1.3 2005/10/24 16:31:30 sascha_l Exp $
+ * $Id: JPatchMaterial.java,v 1.4 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -57,7 +57,7 @@ import jpatch.auxilary.*;
  * </table>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.3 $
+ * @version    $Revision: 1.4 $
  * @see		jpatch.entity.MaterialProperties
  */
 

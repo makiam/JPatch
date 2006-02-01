@@ -1,5 +1,5 @@
 /*
- * $Id: JoglInstall.java,v 1.2 2005/10/14 13:12:31 sascha_l Exp $
+ * $Id: JoglInstall.java,v 1.3 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

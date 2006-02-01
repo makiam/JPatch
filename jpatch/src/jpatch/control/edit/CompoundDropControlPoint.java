@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundDropControlPoint.java,v 1.6 2005/12/12 16:51:34 sascha_l Exp $
+ * $Id: CompoundDropControlPoint.java,v 1.7 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

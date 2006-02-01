@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchUndoableEdit.java,v 1.10 2005/12/15 16:47:26 sascha_l Exp $
+ * $Id: JPatchUndoableEdit.java,v 1.11 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -25,7 +25,7 @@ package jpatch.control.edit;
 /**
  * A basic interface all edits must implement
  *
- * @version	$Revision: 1.10 $
+ * @version	$Revision: 1.11 $
  * @author	Sascha Ledinsky
  */
 public interface JPatchUndoableEdit {

@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPointBrowser.java,v 1.6 2005/12/13 15:45:33 sascha_l Exp $
+ * $Id: ControlPointBrowser.java,v 1.7 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: SplashScreen.java,v 1.5 2005/10/26 09:55:10 sascha_l Exp $
+ * $Id: SplashScreen.java,v 1.6 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

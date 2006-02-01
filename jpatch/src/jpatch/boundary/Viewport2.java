@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.49 2006/01/28 22:55:10 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.50 2006/02/01 21:11:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
