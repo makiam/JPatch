@@ -833,4 +833,8 @@ public final class MainFrame extends JFrame {
 		//tree.makeVisible(treenodeMaterials.getTreePath());
 		//tree.setDragEnabled(true);
 	}
+
+	public TimelineEditor getTimelineEditor() {
+		return timelineEditor;
+	}
 }

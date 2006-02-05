@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.11 2006/01/27 16:37:17 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.12 2006/02/05 21:11:07 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -27,8 +27,7 @@ import java.awt.Rectangle;
 
 import javax.swing.UIManager;
 
-import jpatch.entity.Morph;
-import jpatch.entity.MotionCurve;
+import jpatch.entity.*;
 
 public class AvarTrack extends Track<MotionCurve.Float> {
 	
@@ -104,5 +103,36 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 			return;
 		}
 		super.paint(g, y);
+	}
+	
+	public MotionKey.Float getKeyAt(int mx, int my) {
+		int frame = mx / timelineEditor.getFrameWidth();
+		MotionKey.Float key = (MotionKey.Float) motionCurve.getKeyAt(frame);
+		if (key == null)
+			return null;
+		float min = motionCurve.getMin();
+		float max = motionCurve.getMax();
+		float scale = max - min;
+		int size = iExpandedHeight - 4;
+		int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
+		int ky = off - (int) Math.round(size / scale * key.getFloat());
+		if (my > ky - 5 && my < ky + 5)
+			return key;
+		return null;
+	}
+	
+	public void moveKey(Object object, int y) {
+		MotionKey.Float key = (MotionKey.Float) object;
+		float min = motionCurve.getMin();
+		float max = motionCurve.getMax();
+		float scale = max - min;
+		int size = iExpandedHeight - 4;
+		int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
+		float f = (off - y) * scale / size;
+		if (f < min)
+			f = min;
+		if (f > max)
+			f = max;
+		key.setFloat(f);
 	}
 }

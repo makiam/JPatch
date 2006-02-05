@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.8 2006/01/30 19:42:01 sascha_l Exp $
+ * $Id: Track.java,v 1.9 2006/02/05 21:11:07 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -25,6 +25,8 @@ import java.awt.*;
 
 import javax.swing.UIManager;
 
+import jpatch.control.edit.AtomicModifyMotionCurve;
+import jpatch.control.edit.JPatchUndoableEdit;
 import jpatch.entity.*;
 
 public class Track<M extends MotionCurve> {
@@ -93,6 +95,33 @@ public class Track<M extends MotionCurve> {
 	
 	public void setHidden(boolean hidden) {
 		bHidden = hidden;
+	}
+	
+	public Object getKeyAt(int x, int y) {
+		throw new UnsupportedOperationException(getClass().getName() + " doesn't support this method");
+	}
+	
+	public void moveKey(Object key, int y) {
+		throw new UnsupportedOperationException(getClass().getName() + " doesn't support this method");
+	}
+	
+	public JPatchUndoableEdit insertKeyAt(int frame) {
+		if (motionCurve.hasKeyAt(frame))
+			return null;
+		if (motionCurve instanceof MotionCurve.Float) {
+			return new AtomicModifyMotionCurve.Float((MotionCurve.Float) motionCurve, frame, ((MotionCurve.Float) motionCurve).getFloatAt(frame));
+		}
+		if (motionCurve instanceof MotionCurve.Point3d) {
+			return new AtomicModifyMotionCurve.Point3d((MotionCurve.Point3d) motionCurve, frame, ((MotionCurve.Point3d) motionCurve).getPoint3dAt(frame));
+		}
+		if (motionCurve instanceof MotionCurve.Quat4f) {
+			return new AtomicModifyMotionCurve.Quat4f((MotionCurve.Quat4f) motionCurve, frame, ((MotionCurve.Quat4f) motionCurve).getQuat4fAt(frame));
+			}
+		if (motionCurve instanceof MotionCurve.Color3f) {
+			return new AtomicModifyMotionCurve.Color3f((MotionCurve.Color3f) motionCurve, frame, ((MotionCurve.Color3f) motionCurve).getColor3fAt(frame));
+		}
+		// can't handle this case - needs subclassing
+		throw new UnsupportedOperationException();
 	}
 	
 	public void paint(Graphics g, int y) {	

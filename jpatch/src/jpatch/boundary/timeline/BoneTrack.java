@@ -3,8 +3,7 @@ package jpatch.boundary.timeline;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import javax.swing.UIManager;
 
@@ -33,6 +32,10 @@ public class BoneTrack extends Track {
 	
 	public String getName() {
 		return bone.getName();
+	}
+	
+	public Bone getBone() {
+		return bone;
 	}
 	
 	public int getIndent() {
@@ -85,7 +88,7 @@ public class BoneTrack extends Track {
 			g.drawLine(clip.x, y + off, clip.x + clip.width, y + off);
 
 			frame = start / fw - 1;
-			for (int i = 0; i < motionCurves.length; i++) {
+			for (int i = motionCurves.length - 1; i >= 0; i--) {
 				MotionCurve.Float motionCurve = motionCurves[i];
 				int vPrev = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
 				g.setColor(col[i]);
@@ -143,4 +146,76 @@ public class BoneTrack extends Track {
 			frame++;
 		}
 	}
+	
+	public Object getKeyAt(int mx, int my) {
+		int frame = mx / timelineEditor.getFrameWidth();
+		float min = 0, max = 0;
+		for (MotionCurve.Float motionCurve : motionCurves) {
+			if (motionCurve.getMin() < min)
+				min = motionCurve.getMin();
+			if (motionCurve.getMax() > max)
+				max = motionCurve.getMax();
+		}
+		for (MotionCurve.Float motionCurve : motionCurves) {
+			MotionKey.Float key = (MotionKey.Float) motionCurve.getKeyAt(frame);
+			if (key == null)
+				return null;
+			float scale = max - min;
+			int size = iExpandedHeight - 4;
+			int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
+			int ky = off - (int) Math.round(size / scale * key.getFloat());
+			if (my > ky - 5 && my < ky + 5) {
+				reorder(motionCurve);
+				return key;
+			}
+		}
+		return null;
+	}
+	
+	public void moveKey(Object object, int y) {
+		MotionKey.Float key = (MotionKey.Float) object;
+		float min = 0, max = 0;
+		for (MotionCurve.Float motionCurve : motionCurves) {
+			if (motionCurve.getMin() < min)
+				min = motionCurve.getMin();
+			if (motionCurve.getMax() > max)
+				max = motionCurve.getMax();
+		}
+		float scale = max - min;
+		int size = iExpandedHeight - 4;
+		int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
+		float f = (off - y) * scale / size;
+		if (f < min)
+			f = min;
+		if (f > max)
+			f = max;
+		key.setFloat(f);
+	}
+	
+	private void reorder(MotionCurve.Float motionCurve) {
+		MotionCurve.Float[] newCurves = new MotionCurve.Float[motionCurves.length];
+		Color[] newColors = new Color[motionCurves.length];
+		newCurves[0] = motionCurve;
+		int j = 0;
+		for (int i = 1; i < newCurves.length; i++) {
+			if (motionCurves[j] == motionCurve) {
+				newColors[0] = col[j];
+				j++;
+			}
+			newCurves[i] = motionCurves[j];
+			newColors[i] = col[j++];
+		}
+		if (newColors[0] == null)
+			newColors[0] = col[j--];
+		motionCurves = newCurves;
+		col = newColors;
+	}
+//	private class KeyCurve {
+//		private MotionKey.Float key;
+//		private MotionCurve.Float curve;
+//		private KeyCurve(MotionKey.Float key, MotionCurve.Float curve) {
+//			this.key = key;
+//			this.curve = curve;
+//		}
+//	}
 }
