@@ -27,8 +27,7 @@ import java.awt.Rectangle;
 
 import javax.swing.UIManager;
 
-import jpatch.entity.Morph;
-import jpatch.entity.MotionCurve;
+import jpatch.entity.*;
 
 public class AvarTrack extends Track<MotionCurve.Float> {
 	
@@ -104,5 +103,36 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 			return;
 		}
 		super.paint(g, y);
+	}
+	
+	public MotionKey.Float getKeyAt(int mx, int my) {
+		int frame = mx / timelineEditor.getFrameWidth();
+		MotionKey.Float key = (MotionKey.Float) motionCurve.getKeyAt(frame);
+		if (key == null)
+			return null;
+		float min = motionCurve.getMin();
+		float max = motionCurve.getMax();
+		float scale = max - min;
+		int size = iExpandedHeight - 4;
+		int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
+		int ky = off - (int) Math.round(size / scale * key.getFloat());
+		if (my > ky - 5 && my < ky + 5)
+			return key;
+		return null;
+	}
+	
+	public void moveKey(Object object, int y) {
+		MotionKey.Float key = (MotionKey.Float) object;
+		float min = motionCurve.getMin();
+		float max = motionCurve.getMax();
+		float scale = max - min;
+		int size = iExpandedHeight - 4;
+		int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
+		float f = (off - y) * scale / size;
+		if (f < min)
+			f = min;
+		if (f > max)
+			f = max;
+		key.setFloat(f);
 	}
 }

@@ -4,16 +4,23 @@ import jpatch.entity.*;
 import javax.vecmath.*;
 
 public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
-
+	boolean bNewKey;
+	
 	public void undo() {
+		System.out.println(getClass().getName() + " undo()");
 		swap();
+		if (bNewKey)
+			removeKey();
 	}
 
 	public void redo() {
+		System.out.println(getClass().getName() + " redo()");
 		swap();
 	}
 
 	abstract void swap();
+	
+	abstract void removeKey();
 	
 	public static class Color3f extends AtomicModifyMotionCurve {
 		private MotionCurve.Color3f motionCurve;
@@ -24,6 +31,7 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 			this.motionCurve = motionCurve;
 			this.position = position;
 			this.color = color;
+			bNewKey = !motionCurve.hasKeyAt(position);
 			swap();
 		}
 		
@@ -33,6 +41,10 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 			color = dummy;
 		}
 
+		void removeKey() {
+			motionCurve.removeKey(motionCurve.getKeyAt(position));
+		}
+		
 		public int sizeOf() {
 			return 8 + 4 + 4 + 4 + 8 + 4 + 4 + 4;
 		}
@@ -47,6 +59,7 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 			this.motionCurve = motionCurve;
 			this.position = position;
 			this.value = value;
+			bNewKey = !motionCurve.hasKeyAt(position);
 			swap();
 		}
 		
@@ -56,6 +69,10 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 			value = dummy;
 		}
 
+		void removeKey() {
+			motionCurve.removeKey(motionCurve.getKeyAt(position));
+		}
+		
 		public int sizeOf() {
 			return 8 + 4 + 4 + 4;
 		}
@@ -70,6 +87,7 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 			this.motionCurve = motionCurve;
 			this.position = position;
 			this.point = point;
+			bNewKey = !motionCurve.hasKeyAt(position);
 			swap();
 		}
 		
@@ -80,6 +98,10 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 			point = dummy;
 		}
 
+		void removeKey() {
+			motionCurve.removeKey(motionCurve.getKeyAt(position));
+		}
+		
 		public int sizeOf() {
 			return 8 + 4 + 4 + 4 + 8 + 4 + 4 + 4;
 		}
@@ -94,6 +116,7 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 			this.motionCurve = motionCurve;
 			this.position = position;
 			this.quat = quat;
+			bNewKey = !motionCurve.hasKeyAt(position);
 			swap();
 		}
 		
@@ -104,6 +127,10 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 			quat = dummy;
 		}
 
+		void removeKey() {
+			motionCurve.removeKey(motionCurve.getKeyAt(position));
+		}
+		
 		public int sizeOf() {
 			return 8 + 4 + 4 + 4 + 8 + 4 + 4 + 4 + 4;
 		}
