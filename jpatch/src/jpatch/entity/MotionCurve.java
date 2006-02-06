@@ -139,6 +139,7 @@ public abstract class MotionCurve {
 	
 	public void moveKey(MotionKey key, float position) {
 		list.remove(key);
+		key.setPosition(position);
 		list.add(binarySearch(key.getPosition()), key);
 	}
 	

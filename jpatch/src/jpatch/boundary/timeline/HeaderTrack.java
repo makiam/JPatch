@@ -30,7 +30,7 @@ public class HeaderTrack extends Track {
 		return iIndent;
 	}
 	
-	public void paint(Graphics g, int y) {	
+	public void paint(Graphics g, int y, Object selectedKey) {	
 //		Rectangle clip = g.getClipBounds();
 //		int fw = timelineEditor.getFrameWidth();
 //		int start = clip.x - clip.x % fw + fw / 2;
