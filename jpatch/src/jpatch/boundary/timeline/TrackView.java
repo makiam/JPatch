@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.swing.*;
 
 import jpatch.control.edit.*;
+import jpatch.entity.Animation;
 import jpatch.entity.MotionKey;
 import jpatch.boundary.*;
 
@@ -53,7 +54,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	}
 	
 	public Dimension getPreferredSize() {
-		dim.setSize(timelineEditor.getFrameWidth() * 24 * 10 + timelineEditor.getFrameWidth(), timelineEditor.getTracksHeight() + 7); // FIXME: use animation length
+		dim.setSize(timelineEditor.getFrameWidth() * MainFrame.getInstance().getAnimation().getEnd(), timelineEditor.getTracksHeight() + 7); // FIXME: use animation length
 		return dim;
 	}
 	
@@ -308,6 +309,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			selectedTrack.shiftKey(selectedKey, frame);
 			repaint();
 			timelineEditor.setCornerText("Frame " + frame);
+			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 	}
 	
@@ -331,7 +333,10 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	}
 	
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		timelineEditor.setCurrentFrame(timelineEditor.getCurrentFrame() + e.getWheelRotation());
+//		timelineEditor.setCurrentFrame(timelineEditor.getCurrentFrame() + e.getWheelRotation());
+		Animation anim = MainFrame.getInstance().getAnimation();
+		anim.setPosition(anim.getPosition() + e.getWheelRotation());
+		MainFrame.getInstance().getJPatchScreen().update_all();
 	}
 	
 	private void showPopup(MouseEvent e, final Track track) {

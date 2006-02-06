@@ -1,5 +1,5 @@
 #Fat Jar Configuration File
-#Wed Jan 11 22:01:58 CET 2006
+#Mon Feb 06 20:48:06 CET 2006
 onejar.license.required=true
 manifest.classpath=
 onejar.checkbox=false
@@ -9,5 +9,5 @@ manifest.mainclass=jpatch.Launcher
 manifest.file=<createnew>
 jarname.isextern=false
 onejar.expand=
-excludes=<jar|xerces.jar>
+excludes=<po|jpatch>~test/;<po|jpatch>~objects/
 includes=
