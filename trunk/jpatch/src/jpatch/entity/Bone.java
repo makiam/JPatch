@@ -42,7 +42,7 @@ public class Bone implements MutableTreeNode {
 //	private Bone boneNext;
 //	private Bone bonePrev;
 	private ArrayList listChildBones = new ArrayList();
-	private ArrayList listDofs = new ArrayList();
+	private ArrayList<RotationDof> listDofs = new ArrayList<RotationDof>();
 	
 	private boolean bSelected = false;
 	private BoneTransformable boneStart = new BoneTransformable(p3Start);
@@ -145,7 +145,7 @@ public class Bone implements MutableTreeNode {
 		return listChildBones;
 	}
 	
-	public List getDofs() {
+	public List<RotationDof> getDofs() {
 		return listDofs;
 	}
 	
@@ -210,7 +210,7 @@ public class Bone implements MutableTreeNode {
 	public void insert(MutableTreeNode child, int index) {
 //		System.out.println("insert at " + index + "/" + listChildBones.size() + "/" + listDofs.size() + "/" + getChildCount());
 		if (child instanceof RotationDof)
-			listDofs.add(index, child);
+			listDofs.add(index, (RotationDof) child);
 		else if (child instanceof Bone)
 			listChildBones.add(index - listDofs.size(), child);
 		child.setParent(this);

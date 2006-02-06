@@ -25,7 +25,7 @@ public class Model implements MutableTreeNode {
 	 *  Description of the Field
 	 */
 	private HashSet setCurves = new HashSet();
-	private HashSet setBones = new HashSet();
+	private HashSet<Bone> setBones = new HashSet<Bone>();
 	private HashMap mapPatches = new HashMap();
 
 	private MutableTreeNode treenodeSelections;
@@ -1031,7 +1031,7 @@ public class Model implements MutableTreeNode {
 		return mapPatches.keySet();
 	}
 	
-	public Set getBoneSet() {
+	public Set<Bone> getBoneSet() {
 		return setBones;
 	}
 	

@@ -11,7 +11,7 @@ import jpatch.control.edit.*;
 
 public class Morph implements MutableTreeNode {
 	boolean bInserted = false;
-	List listTargets = new ArrayList();
+	List<MorphTarget> listTargets = new ArrayList<MorphTarget>();
 	String strName;
 	float fMin = 0;
 	float fMax = 100;
@@ -227,7 +227,7 @@ public class Morph implements MutableTreeNode {
 		return max;
 	}
 	
-	public List getTargets() {
+	public List<MorphTarget> getTargets() {
 		return listTargets;
 	}
 	
@@ -334,7 +334,7 @@ public class Morph implements MutableTreeNode {
 	 * start of MutableTreeNode interface implementation
 	 */
 	public void insert(MutableTreeNode child, int index) {
-		listTargets.add(index, child);
+		listTargets.add(index, (MorphTarget) child);
 		child.setParent(this);
 	}
 
