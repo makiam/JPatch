@@ -3,14 +3,13 @@ package jpatch.boundary.timeline;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.util.*;
 
 import javax.swing.UIManager;
 
-import jpatch.entity.Bone;
-import jpatch.entity.MotionCurve;
-import jpatch.entity.MotionKey;
-import jpatch.entity.RotationDof;
+import jpatch.control.edit.*;
+import jpatch.entity.*;
 
 public class BoneTrack extends Track {
 	
@@ -42,7 +41,7 @@ public class BoneTrack extends Track {
 		return level * 4;
 	}
 	
-	public void paint(Graphics g, int y) {
+	public void paint(Graphics g, int y, Object selectedKey) {
 		int bottom = getHeight() - 4;
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
@@ -99,15 +98,18 @@ public class BoneTrack extends Track {
 					frame++;
 					vPrev = vThis;
 				}
-				g.setColor(col[i]);
 				frame = start / fw - 1;
 				for (int x = -fw ; x <= clip.width + fw; x += fw) {
 					int vThis = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
-					if (motionCurve.hasKeyAt(frame)) {
+					MotionKey key = motionCurve.getKeyAt(frame);
+					if (key != null) {
+						if (key == selectedKey)
+							g.setColor(TimelineEditor.SELECTED_KEY);
+						else
+							g.setColor(col[i]);
 						g.fillOval(x + start - 3, y + vThis - 3, 6, 6);
 						g.setColor(Color.BLACK);
 						g.drawOval(x + start - 3, y + vThis - 3, 6, 6);
-						g.setColor(col[i]);
 					}
 					frame++;
 				}
@@ -159,7 +161,7 @@ public class BoneTrack extends Track {
 		for (MotionCurve.Float motionCurve : motionCurves) {
 			MotionKey.Float key = (MotionKey.Float) motionCurve.getKeyAt(frame);
 			if (key == null)
-				return null;
+				continue;
 			float scale = max - min;
 			int size = iExpandedHeight - 4;
 			int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
@@ -192,6 +194,23 @@ public class BoneTrack extends Track {
 		key.setFloat(f);
 	}
 	
+	public void shiftKey(Object object, int frame) {
+		MotionKey.Float key = (MotionKey.Float) object;
+		for (MotionCurve.Float motionCurve : motionCurves) {
+			if (motionCurve.getKeyAt(key.getPosition()) == key) {
+				motionCurve.moveKey(key, frame);
+				return;
+			}
+		}
+	}
+	
+	public JPatchUndoableEdit insertKeyAt(int frame) {
+		JPatchActionEdit edit = new JPatchActionEdit("insert keys");
+		for (MotionCurve motionCurve : motionCurves)
+			edit.addEdit(new AtomicModifyMotionCurve.Float((MotionCurve.Float) motionCurve, frame, ((MotionCurve.Float) motionCurve).getFloatAt(frame)));
+		return edit;
+	}	
+		
 	private void reorder(MotionCurve.Float motionCurve) {
 		MotionCurve.Float[] newCurves = new MotionCurve.Float[motionCurves.length];
 		Color[] newColors = new Color[motionCurves.length];

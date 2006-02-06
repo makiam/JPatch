@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.12 2006/02/05 21:11:07 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.13 2006/02/06 16:40:41 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -36,7 +36,7 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 		bExpandable = true;
 	}
 	
-	public void paint(Graphics g, int y) {	
+	public void paint(Graphics g, int y, Object selectedKey) {	
 		int bottom = getHeight() - 4;
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
@@ -91,8 +91,12 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 			frame = start / fw - 1;
 			for (int x = -fw ; x <= clip.width + fw; x += fw) {
 				int vThis = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
-				if (motionCurve.hasKeyAt(frame)) {
-					g.setColor(Color.GRAY);
+				MotionKey key = motionCurve.getKeyAt(frame);
+				if (key != null) {
+					if (key == selectedKey)
+						g.setColor(TimelineEditor.SELECTED_KEY);
+					else
+						g.setColor(Color.GRAY);
 					g.fillOval(x + start - 3, y + vThis - 3, 6, 6);
 					g.setColor(Color.BLACK);
 					g.drawOval(x + start - 3, y + vThis - 3, 6, 6);
@@ -102,10 +106,12 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 			g.setClip(clip);
 			return;
 		}
-		super.paint(g, y);
+		super.paint(g, y, selectedKey);
 	}
 	
-	public MotionKey.Float getKeyAt(int mx, int my) {
+	public Object getKeyAt(int mx, int my) {
+		if (!bExpanded)
+			return super.getKeyAt(mx, my);
 		int frame = mx / timelineEditor.getFrameWidth();
 		MotionKey.Float key = (MotionKey.Float) motionCurve.getKeyAt(frame);
 		if (key == null)

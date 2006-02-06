@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.9 2006/02/05 21:11:07 sascha_l Exp $
+ * $Id: Track.java,v 1.10 2006/02/06 16:40:41 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -97,12 +97,18 @@ public class Track<M extends MotionCurve> {
 		bHidden = hidden;
 	}
 	
-	public Object getKeyAt(int x, int y) {
-		throw new UnsupportedOperationException(getClass().getName() + " doesn't support this method");
+	public Object getKeyAt(int mx, int my) {
+		System.out.println("*");
+		int frame = mx / timelineEditor.getFrameWidth();
+		return motionCurve.getKeyAt(frame);
 	}
 	
 	public void moveKey(Object key, int y) {
-		throw new UnsupportedOperationException(getClass().getName() + " doesn't support this method");
+//		throw new UnsupportedOperationException(getClass().getName() + " doesn't support this method");
+	}
+	
+	public void shiftKey(Object key, int frame) {
+		motionCurve.moveKey((MotionKey) key, frame);
 	}
 	
 	public JPatchUndoableEdit insertKeyAt(int frame) {
@@ -124,7 +130,7 @@ public class Track<M extends MotionCurve> {
 		throw new UnsupportedOperationException();
 	}
 	
-	public void paint(Graphics g, int y) {	
+	public void paint(Graphics g, int y, Object selectedKey) {	
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
@@ -156,14 +162,18 @@ public class Track<M extends MotionCurve> {
 		g.drawLine(clip.x, y + TOP + 2, clip.x + clip.width, y + TOP + 2);
 		g.drawLine(clip.x, y + TOP + 3, clip.x + clip.width, y + TOP + 3);
 		for (int x = -fw ; x <= clip.width + fw; x += fw) {
-			if (motionCurve.hasKeyAt(frame)) {
-				//g.fill3DRect(x + start - iFrameWidth / 2, y + 2, iFrameWidth, 11, true);
-				g.setColor(KEY);
+			MotionKey key = motionCurve.getKeyAt(frame);
+			if (key != null) {
+				if (key == selectedKey)
+					g.setColor(TimelineEditor.SELECTED_KEY);
+				else
+					g.setColor(Color.GRAY);
 				g.fillOval(x + start - 3, y + TOP - 1, 6, 6);
 				g.setColor(Color.BLACK);
 				g.drawOval(x + start - 3, y + TOP - 1, 6, 6);
-				
-			} else {
+			}
+			
+//			else {
 //				if (frame % 6 == 0) {
 //					g.setColor(ZERO);
 //					g.drawLine(x + start, y + 3, x + start, y + 6);
@@ -171,7 +181,7 @@ public class Track<M extends MotionCurve> {
 //					g.setColor(TICK);
 //					g.drawLine(x + start, y + 3, x + start, y + 6);
 //				}
-			}
+//			}
 			frame++;
 		}
 	}

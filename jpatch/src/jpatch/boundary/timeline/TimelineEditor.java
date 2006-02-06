@@ -35,6 +35,7 @@ public class TimelineEditor extends JScrollPane {
 	public static Color TICK = derivedColor(BACKGROUND, -64, -64, -32);
 	public static Color DARK_TICK = derivedColor(BACKGROUND, -96, -96, -64);
 	public static Color TRACK = derivedColor(BACKGROUND, -16, -16, -16);
+	public static Color SELECTED_KEY = new Color(255, 255, 0);
 	
 	private List<Track> listTracks = new ArrayList<Track>();
 	private List<SortedSet<MotionKey>> listSelections = new ArrayList<SortedSet<MotionKey>>();
