@@ -58,13 +58,13 @@ public class VcrControls extends JPanel {
 		add(textTime);
 		add(textFrame);
 		add(new JSeparator());
-		add(buttonPrevKey);
+//		add(buttonPrevKey);
 		add(buttonPrevFrame);
 		add(buttonNextFrame);
-		add(buttonNextKey);
-		add(new JSeparator());
-		add(buttonAdd);
-		add(buttonDelete);
+//		add(buttonNextKey);
+//		add(new JSeparator());
+//		add(buttonAdd);
+//		add(buttonDelete);
 		textTime.setEditable(false);
 		textTime.setFont(new Font("Monospaced", Font.PLAIN, 12));
 		textFrame.setFont(new Font("Monospaced", Font.PLAIN, 12));

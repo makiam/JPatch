@@ -83,6 +83,7 @@ public class Animation implements MutableTreeNode {
 		for (Camera camera:listCameras) {
 			mapMotionCurves.get(camera).setPosition(position);
 		}
+		MainFrame.getInstance().getTimelineEditor().setCurrentFrame((int) position);
 	}
 
 	public float getStart() {

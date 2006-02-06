@@ -43,7 +43,7 @@ public class TimelineEditor extends JScrollPane {
 	private boolean bTrackHeightsValid;
 	private int iTracksHeight;
 	
-	private int iCurrentFrame = 49;
+	private int iCurrentFrame = (int) MainFrame.getInstance().getAnimation().getPosition();
 	private int iFrameWidth = 8;
 	private int mouseX, mouseY;
 	private boolean bMove;
@@ -307,8 +307,8 @@ public class TimelineEditor extends JScrollPane {
 	}
 	
 	public void setCurrentFrame(int frame) {
-		MainFrame.getInstance().getAnimation().setPosition(frame);
-		MainFrame.getInstance().getJPatchScreen().update_all();
+//		MainFrame.getInstance().getAnimation().setPosition(frame);
+//		MainFrame.getInstance().getJPatchScreen().update_all();
 		int x = iCurrentFrame * iFrameWidth + iFrameWidth / 2;
 		iCurrentFrame = frame;
 		getViewport().getView().repaint(x - 5, 0, 11, getViewport().getView().getHeight());

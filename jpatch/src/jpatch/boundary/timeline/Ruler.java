@@ -1,5 +1,5 @@
 /*
- * $Id: Ruler.java,v 1.10 2006/01/30 19:42:01 sascha_l Exp $
+ * $Id: Ruler.java,v 1.11 2006/02/06 19:44:06 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -26,6 +26,9 @@ import java.awt.event.*;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollBar;
+
+import jpatch.boundary.MainFrame;
+import jpatch.entity.Animation;
 
 class Ruler extends JComponent implements MouseListener, MouseMotionListener, MouseWheelListener {
 	/**
@@ -55,7 +58,7 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 	private int mouseX;
 	
 	public Dimension getPreferredSize() {
-		dim.setSize(timelineEditor.getFrameWidth() * 24 * 60, 16); // FIXME: use animation length
+		dim.setSize(timelineEditor.getFrameWidth() * MainFrame.getInstance().getAnimation().getEnd(), 16); // FIXME: use animation length
 		return dim;
 	}
 	
@@ -185,7 +188,9 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 		case FRAME:
 			int frame = e.getX() / timelineEditor.getFrameWidth();
 			timelineEditor.setCornerText("Frame " + frame);
-			timelineEditor.setCurrentFrame(frame);
+			Animation anim = MainFrame.getInstance().getAnimation();
+			anim.setPosition(frame);
+			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 	}
 	
