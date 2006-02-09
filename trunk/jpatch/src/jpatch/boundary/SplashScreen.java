@@ -139,7 +139,8 @@ public class SplashScreen {
 	public void clearSplash() {
 		window.setVisible(false);
 		window.dispose();
-		MainFrame.getInstance().setEnabled(true);
+		if (MainFrame.getInstance() != null)
+			MainFrame.getInstance().setEnabled(true);
 		instance = null;
 	}
 }
