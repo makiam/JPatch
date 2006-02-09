@@ -1,5 +1,5 @@
 /*
- * $Id: SplashScreen.java,v 1.6 2006/02/01 21:11:28 sascha_l Exp $
+ * $Id: SplashScreen.java,v 1.7 2006/02/09 16:16:03 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -139,7 +139,8 @@ public class SplashScreen {
 	public void clearSplash() {
 		window.setVisible(false);
 		window.dispose();
-		MainFrame.getInstance().setEnabled(true);
+		if (MainFrame.getInstance() != null)
+			MainFrame.getInstance().setEnabled(true);
 		instance = null;
 	}
 }
