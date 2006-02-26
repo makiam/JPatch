@@ -699,6 +699,7 @@ public final class MainFrame extends JFrame {
 		Command.getInstance().enableCommand("remove stubs", moreThanOnePoint);
 		Command.getInstance().enableCommand("make patch", MakeFivePointPatchAction.checkSelection() != null);
 		Command.getInstance().enableCommand("weight selection tool", moreThanOnePoint);
+		Command.getInstance().enableCommand("knife tool", moreThanOnePoint);
 		Command.getInstance().enableCommand("rotate tool", moreThanOnePoint || (selection != null && selection.getHotObject() instanceof AnimObject));
 		Command.getInstance().enableCommand("extrude", moreThanOnePoint);
 		Command.getInstance().enableCommand("lathe", moreThanOnePoint);

@@ -162,6 +162,7 @@ public final class Command implements KeyListener {
 		put("add bone",					new AddBoneAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("rotate tool",				new RotateAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("weight selection tool",	new WeightSelectionAction(), 	new JRadioButtonMenuItem(),	new JPatchToggleButton());
+		put("knife tool",						new KnifeAction(),			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("detach",					new DetachControlPointsAction(),new JMenuItem(),			new JPatchButton());
 		put("rotoscope tool",			new RotoscopeAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("tangent tool",				new TangentAction(), 			new JCheckBoxMenuItem(),	new JPatchToggleButton());
@@ -170,7 +171,7 @@ public final class Command implements KeyListener {
 		put("clone",					new CloneAction(), 				new JMenuItem(),			new JPatchButton());
 		put("extrude",					new ExtrudeAction(), 			new JMenuItem(),			new JPatchButton());
 		put("lathe",					new LatheAction(), 				new JMenuItem(),			new JPatchButton());
-		put("lathe editor",				new LatheEditorAction(), 		new JMenuItem(),			new JPatchButton());
+		put("lathe editor",				new LatheEditorAction(), 		new JMenuItem(),			new JPatchButton());					
 		put("make patch",				new MakeFivePointPatchAction(), new JMenuItem(),			new JPatchButton());
 		put("compute patches",			new ComputePatchesAction(), 	new JMenuItem(),			new JPatchButton());
 		
@@ -287,7 +288,8 @@ public final class Command implements KeyListener {
 				"rotoscope tool",
 				"rotate view",
 				"move view",
-				"zoom view"
+				"zoom view",
+				"knife tool"
 		}, 0);
 		
 		createGroup(new String[] {

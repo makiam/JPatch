@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/Buoy.jar"/>
-	<classpathentry kind="lib" path="lib/vecmath.jar"/>
+	<classpathentry sourcepath="lib/vecmath.jar" kind="lib" path="lib/vecmath.jar"/>
 	<classpathentry kind="lib" path="lib/bsh-core-2.0b4.jar"/>
 	<classpathentry kind="lib" path="lib/jogl.jar">
 		<attributes>
