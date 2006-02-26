@@ -42,6 +42,7 @@
 		<button command="add bone"/>
 		<button command="rotate tool"/>
 		<button command="weight selection tool"/>
+		<button command="knife tool" />
 		<separator/>
 		<button command="detach"/>
 		<separator/>
@@ -176,6 +177,7 @@
 		<shortcut key="R" command="rotate tool"/>
 		<shortcut key="A" command="add curve segment"/>
 		<shortcut key="B" command="add bone"/>
+		<shortcut key="K" command="knife tool" />
 		<shortcut key="BACK_SPACE" command="remove"/>
 		<shortcut key="DELETE" command="delete"/>
 		<shortcut key="INSERT" command="insert point"/>
