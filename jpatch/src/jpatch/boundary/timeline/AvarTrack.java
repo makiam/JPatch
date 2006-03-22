@@ -109,7 +109,7 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 		super.paint(g, y, selectedKey);
 	}
 	
-	public Object getKeyAt(int mx, int my) {
+	public MotionKey getKeyAt(int mx, int my) {
 		if (!bExpanded)
 			return super.getKeyAt(mx, my);
 		int frame = mx / timelineEditor.getFrameWidth();
