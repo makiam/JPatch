@@ -150,7 +150,7 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 			
 			if (x > 10 * fw - 4 && x < 10 * fw + 4 && e.getY() < 8) {
 				state = State.RESIZE;
-			} else if (x > timelineEditor.getCurrentFrame() * fw - 5 && x < timelineEditor.getCurrentFrame() * fw + 11) {
+			} else if (e.getX() > timelineEditor.getCurrentFrame() * fw - 5 && e.getX() < timelineEditor.getCurrentFrame() * fw + 11) {
 				state = State.FRAME;
 			}
 		} else if (e.getButton() == MouseEvent.BUTTON2) {

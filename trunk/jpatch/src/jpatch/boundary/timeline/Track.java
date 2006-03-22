@@ -26,6 +26,7 @@ import java.awt.*;
 import javax.swing.UIManager;
 
 import jpatch.control.edit.AtomicModifyMotionCurve;
+import jpatch.control.edit.AtomicMoveMotionKey;
 import jpatch.control.edit.JPatchUndoableEdit;
 import jpatch.entity.*;
 
@@ -97,10 +98,14 @@ public class Track<M extends MotionCurve> {
 		bHidden = hidden;
 	}
 	
-	public Object getKeyAt(int mx, int my) {
+	public MotionKey getKeyAt(int mx, int my) {
 		System.out.println("*");
 		int frame = mx / timelineEditor.getFrameWidth();
 		return motionCurve.getKeyAt(frame);
+	}
+	
+	public MotionCurve getMotionCurve(MotionKey key) {
+		return motionCurve;
 	}
 	
 	public void moveKey(Object key, int y) {

@@ -4,7 +4,10 @@ import java.awt.*;
 
 import javax.swing.UIManager;
 
+import jpatch.control.edit.AtomicModifyMotionCurve;
+import jpatch.control.edit.JPatchUndoableEdit;
 import jpatch.entity.MotionCurve;
+import jpatch.entity.MotionKey;
 
 public class HeaderTrack extends Track {
 	private String name;
@@ -28,6 +31,18 @@ public class HeaderTrack extends Track {
 	
 	public int getIndent() {
 		return iIndent;
+	}
+	
+	public MotionKey getKeyAt(int mx, int my) {
+		return null;
+	}
+	
+	public void moveKey(Object key, int y) { }
+	
+	public void shiftKey(Object key, int frame) { }
+	
+	public JPatchUndoableEdit insertKeyAt(int frame) {
+		return null;
 	}
 	
 	public void paint(Graphics g, int y, Object selectedKey) {	
