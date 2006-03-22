@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.18 2006/02/06 19:44:06 sascha_l Exp $
+ * $Id: TrackView.java,v 1.19 2006/03/22 20:04:16 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -28,8 +28,7 @@ import java.util.Set;
 import javax.swing.*;
 
 import jpatch.control.edit.*;
-import jpatch.entity.Animation;
-import jpatch.entity.MotionKey;
+import jpatch.entity.*;
 import jpatch.boundary.*;
 
 @SuppressWarnings("serial")
@@ -43,8 +42,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	private Dimension dim = new Dimension();
 	private int iVerticalResize = -1;
 	private int mx, my, trackTop;
-	private Object selectedKey;
+	private MotionKey selectedKey;
 	private Track selectedTrack;
+	private float position, value;
 	
 	public TrackView(TimelineEditor tle) {
 		timelineEditor = tle;
@@ -213,6 +213,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 								state = State.MOVE_KEY;
 								selectedTrack = track;
 								trackTop = y;
+								position = selectedKey.getPosition();
+								if (selectedKey instanceof MotionKey.Float)
+									value = ((MotionKey.Float) selectedKey).getFloat();
 							}
 							repaint();
 						}
@@ -230,8 +233,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				y += track.getHeight();
 			}
 		} else if (e.getButton() == MouseEvent.BUTTON2) {
-			mx = e.getX();
-			my = e.getY();
+			this.mx = e.getX();
+			this.my = e.getY();
 			state = State.SCROLL;
 //			System.out.println(mx);
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
@@ -252,6 +255,22 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	}
 	
 	public void mouseReleased(MouseEvent e) {
+		if (state == State.MOVE_KEY) {
+			JPatchActionEdit edit = new JPatchActionEdit("move key");
+			float newPosition = selectedKey.getPosition();
+			selectedKey.setPosition(position);
+			if (newPosition != position)
+				edit.addEdit(new AtomicMoveMotionKey(selectedTrack.getMotionCurve(selectedKey), selectedKey, newPosition));
+			if (selectedKey instanceof MotionKey.Float) {
+				MotionKey.Float key = (MotionKey.Float) selectedKey;
+				float newValue = key.getFloat();
+				key.setFloat(value);
+				if (newValue != value)
+					edit.addEdit(new AtomicModifyMotionCurve.Float((MotionCurve.Float) selectedTrack.getMotionCurve(selectedKey), newPosition, newValue));
+			}
+			if (edit.isValid())
+				MainFrame.getInstance().getUndoManager().addEdit(edit);
+		}
 		state = State.IDLE;
 	}
 	

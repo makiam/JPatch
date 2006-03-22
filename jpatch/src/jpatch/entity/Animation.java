@@ -15,7 +15,7 @@ import jpatch.boundary.*;
 public class Animation implements MutableTreeNode {
 
 	private float fStart = 0;
-	private float fEnd = 240;
+	private float fEnd = 200;
 	private float fPosition = 0;
 	private float fFramerate = 24;
 	
@@ -70,6 +70,10 @@ public class Animation implements MutableTreeNode {
 	}
 	
 	public void setPosition(float position) {
+		if (position < fStart)
+			position = fStart;
+		else if (position > fEnd)
+			position = fEnd;
 		fPosition = position;
 //		System.out.println("position = " + position);
 		for (AnimModel animModel:listModels) {

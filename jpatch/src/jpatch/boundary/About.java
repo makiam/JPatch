@@ -41,7 +41,7 @@ public class About extends JDialog implements ActionListener {
 //			"compiled " + VersionInfo.compileTime + "<br>" +
 			"<br>" +
 			"written by Sascha Ledinsky<br>" +
-			"Copyright &copy; 2002-2005<br>"+ 
+			"Copyright &copy; 2002-2006<br>"+ 
 			"</div><p>" +
 			"<i>This program is free software; you can redistribute it and/or modify " +
 			"it under the terms of the GNU General Public License as published by " +

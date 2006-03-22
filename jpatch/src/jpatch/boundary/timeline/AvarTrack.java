@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.13 2006/02/06 16:40:41 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.14 2006/03/22 20:04:16 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -109,7 +109,7 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 		super.paint(g, y, selectedKey);
 	}
 	
-	public Object getKeyAt(int mx, int my) {
+	public MotionKey getKeyAt(int mx, int my) {
 		if (!bExpanded)
 			return super.getKeyAt(mx, my);
 		int frame = mx / timelineEditor.getFrameWidth();

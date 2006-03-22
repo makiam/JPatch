@@ -19,6 +19,8 @@ public final class RedoAction extends AbstractAction {
 		if (undoManager.canRedo()) {
 			undoManager.redo();
 			MainFrame.getInstance().getJPatchScreen().update_all();
+			if (MainFrame.getInstance().getTimelineEditor() != null)
+				MainFrame.getInstance().getTimelineEditor().repaint();
 		}
 	}
 }

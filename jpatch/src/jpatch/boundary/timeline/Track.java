@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.10 2006/02/06 16:40:41 sascha_l Exp $
+ * $Id: Track.java,v 1.11 2006/03/22 20:04:16 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -26,6 +26,7 @@ import java.awt.*;
 import javax.swing.UIManager;
 
 import jpatch.control.edit.AtomicModifyMotionCurve;
+import jpatch.control.edit.AtomicMoveMotionKey;
 import jpatch.control.edit.JPatchUndoableEdit;
 import jpatch.entity.*;
 
@@ -97,10 +98,14 @@ public class Track<M extends MotionCurve> {
 		bHidden = hidden;
 	}
 	
-	public Object getKeyAt(int mx, int my) {
+	public MotionKey getKeyAt(int mx, int my) {
 		System.out.println("*");
 		int frame = mx / timelineEditor.getFrameWidth();
 		return motionCurve.getKeyAt(frame);
+	}
+	
+	public MotionCurve getMotionCurve(MotionKey key) {
+		return motionCurve;
 	}
 	
 	public void moveKey(Object key, int y) {

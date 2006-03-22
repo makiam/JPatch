@@ -1,5 +1,5 @@
 /*
- * $Id: SplashScreen.java,v 1.7 2006/02/09 16:16:03 sascha_l Exp $
+ * $Id: SplashScreen.java,v 1.8 2006/03/22 20:04:16 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -110,7 +110,7 @@ public class SplashScreen {
 		progress.setBorderPainted(false);
 		progress.setBackground(Color.GRAY);
 		foreground.add(logo, BorderLayout.NORTH);
-		JLabel label = new JLabel("<html><center><font size='+1' color='red'><b>DEVELOPMENT VERSION</b></font><br><br>written by Sascha Ledinsky<br>Copyright &copy; 2002-2005<br><br>" +
+		JLabel label = new JLabel("<html><center><font size='+1' color='red'><b>DEVELOPMENT VERSION</b></font><br><br>written by Sascha Ledinsky<br>Copyright &copy; 2002-2006<br><br>" +
 				"<font size = '-2'>This program is free software.<br>You can redistribute it and/or modify" +
 				"it under the terms of the<br>GNU General Public License as published by" +
 				"the Free Software Foundation.<br><br></font>" +

@@ -149,7 +149,7 @@ public class BoneTrack extends Track {
 		}
 	}
 	
-	public Object getKeyAt(int mx, int my) {
+	public MotionKey getKeyAt(int mx, int my) {
 		int frame = mx / timelineEditor.getFrameWidth();
 		float min = 0, max = 0;
 		for (MotionCurve.Float motionCurve : motionCurves) {
@@ -170,6 +170,14 @@ public class BoneTrack extends Track {
 				reorder(motionCurve);
 				return key;
 			}
+		}
+		return null;
+	}
+	
+	public MotionCurve getMotionCurve(MotionKey key) {
+		for (MotionCurve.Float motionCurve : motionCurves) {
+			if (motionCurve.getKeyAt(key.getPosition()) == key)
+				return motionCurve;
 		}
 		return null;
 	}

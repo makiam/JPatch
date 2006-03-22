@@ -1,5 +1,5 @@
 /*
- * $Id: Ruler.java,v 1.11 2006/02/06 19:44:06 sascha_l Exp $
+ * $Id: Ruler.java,v 1.12 2006/03/22 20:04:16 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -150,7 +150,7 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 			
 			if (x > 10 * fw - 4 && x < 10 * fw + 4 && e.getY() < 8) {
 				state = State.RESIZE;
-			} else if (x > timelineEditor.getCurrentFrame() * fw - 5 && x < timelineEditor.getCurrentFrame() * fw + 11) {
+			} else if (e.getX() > timelineEditor.getCurrentFrame() * fw - 5 && e.getX() < timelineEditor.getCurrentFrame() * fw + 11) {
 				state = State.FRAME;
 			}
 		} else if (e.getButton() == MouseEvent.BUTTON2) {
