@@ -1,5 +1,5 @@
 /*
- * $Id: UIFactory.java,v 1.8 2006/02/01 21:11:28 sascha_l Exp $
+ * $Id: UIFactory.java,v 1.9 2006/03/25 23:22:45 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -31,6 +31,7 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
 import jpatch.boundary.action.*;
+import jpatch.boundary.settings.*;
 
 /**
  * @author sascha
@@ -79,8 +80,30 @@ public class UIFactory extends DefaultHandler {
 		mapObjects.put("view menu", viewMenu);
 	}
 	
-	
 	public JComponent getComponent(String key) {
+		/*
+		 * if the main toolbar was requested, set the
+		 * viewport button's selection state
+		 */
+		if (key.equals("main toolbar")) {
+			switch (Settings.getInstance().viewports.viewportMode) {
+			case SINGLE:
+				Command.getButtonFor("single view").setSelected(true);
+				break;
+			case HORIZONTAL_SPLIT:
+				Command.getButtonFor("horizontally split view").setSelected(true);
+				break;
+			case VERTICAL_SPLIT:
+				Command.getButtonFor("vertically split view").setSelected(true);
+				break;
+			case QUAD:
+				Command.getButtonFor("quad view").setSelected(true);
+				break;
+			}
+		}
+		/*
+		 * return the requested component
+		 */
 		return (JComponent) mapObjects.get(key);
 	}
 	

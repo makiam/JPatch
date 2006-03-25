@@ -197,6 +197,7 @@ public final class MainFrame extends JFrame {
 //			mainToolBar = new MainToolBar(bgAction);
 			//mainToolBar.setOrientation(SwingConstants.HORIZONTAL);
 //			getContentPane().add(mainToolBar,BorderLayout.NORTH);
+			
 			getContentPane().add(uiFactory.getComponent("main toolbar"), uiFactory.getLayout("main toolbar"));
 			
 //			boneToolBar = new BoneToolBar(bgAction);
@@ -563,10 +564,10 @@ public final class MainFrame extends JFrame {
 			mode = 4;
 			break;
 		}
-		if (jpatchScreen != null) {
-			getContentPane().remove(jpatchScreen);
-			mode = jpatchScreen.getMode();
-		}
+//		if (jpatchScreen != null) {
+//			getContentPane().remove(jpatchScreen);
+//			mode = jpatchScreen.getMode();
+//		}
 		jpatchScreen = new JPatchScreen(model,mode,aViewDef);
 		//getContentPane().add(jpatchScreen);
 		//jpatchScreen.enablePopupMenu(true);
@@ -837,5 +838,9 @@ public final class MainFrame extends JFrame {
 
 	public TimelineEditor getTimelineEditor() {
 		return timelineEditor;
+	}
+	
+	public VcrControls getVcrControls() {
+		return vcrControls;
 	}
 }

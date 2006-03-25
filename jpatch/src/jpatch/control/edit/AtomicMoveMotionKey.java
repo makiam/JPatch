@@ -3,7 +3,6 @@ package jpatch.control.edit;
 import jpatch.entity.*;
 
 public class AtomicMoveMotionKey extends JPatchAtomicEdit {
-
 	private MotionCurve motionCurve;
 	private MotionKey motionKey;
 	private float position;
@@ -26,14 +25,13 @@ public class AtomicMoveMotionKey extends JPatchAtomicEdit {
 	}
 	
 	private void swap() {
+		System.out.println("moving key " + motionKey + " from " + motionKey.getPosition() + " tp " + position);
 		float dummy = motionKey.getPosition();
 		motionCurve.moveKey(motionKey, position);
-		System.out.println("swapping " + motionKey + " from " + dummy + " to " + position);
 		position = dummy;
 	}
 	
 	public int sizeOf() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 8 + 4 + 4 + 4;
 	}
 }

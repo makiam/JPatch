@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.50 2006/02/01 21:11:28 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.51 2006/03/25 23:22:45 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -161,7 +161,7 @@ public class Viewport2 {
 		if (MainFrame.getInstance().getEditedMorph() != null)
 			drawable.drawString("!!!EDIT MORPH MODE!!!", (int) viewDef.getWidth() - 140, 16);
 		if (MainFrame.getInstance().getAnimation() != null)
-			drawable.drawString("Frame " + ((int) MainFrame.getInstance().getAnimation().getPosition() + 1), 4, (int) viewDef.getHeight() - 4);
+			drawable.drawString("Frame " + (int) MainFrame.getInstance().getAnimation().getPosition(), 4, (int) viewDef.getHeight() - 4);
 		if (viewDef.getCamera() != null) {
 			int W = (int) viewDef.getWidth();
 			int H = (int) viewDef.getHeight();

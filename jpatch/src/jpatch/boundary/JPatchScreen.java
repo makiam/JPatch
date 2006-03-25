@@ -578,16 +578,16 @@ public final class JPatchScreen extends JPanel {
 		}
 		
 		switch (iMode) {
-		case 0:
+		case 1:
 			Settings.getInstance().viewports.viewportMode = ViewportSettings.ScreenMode.SINGLE;
 			break;
-		case 1:
+		case 2:
 			Settings.getInstance().viewports.viewportMode = ViewportSettings.ScreenMode.HORIZONTAL_SPLIT;
 			break;
-		case 2:
+		case 3:
 			Settings.getInstance().viewports.viewportMode = ViewportSettings.ScreenMode.VERTICAL_SPLIT;
 			break;
-		case 3:
+		case 4:
 			Settings.getInstance().viewports.viewportMode = ViewportSettings.ScreenMode.QUAD;
 			break;
 		}

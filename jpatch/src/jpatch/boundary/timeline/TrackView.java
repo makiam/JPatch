@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.19 2006/03/22 20:04:16 sascha_l Exp $
+ * $Id: TrackView.java,v 1.20 2006/03/25 23:22:45 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -216,6 +216,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 								position = selectedKey.getPosition();
 								if (selectedKey instanceof MotionKey.Float)
 									value = ((MotionKey.Float) selectedKey).getFloat();
+//								System.out.println("key selected: " + selectedKey + " position=" + position);
 							}
 							repaint();
 						}
@@ -226,6 +227,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 						if (selectedKey != null) {
 							state = State.MOVE_KEY;
 							selectedTrack = track;
+							position = selectedKey.getPosition();
 						}
 						repaint();
 					}
@@ -257,6 +259,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	public void mouseReleased(MouseEvent e) {
 		if (state == State.MOVE_KEY) {
 			JPatchActionEdit edit = new JPatchActionEdit("move key");
+			System.out.println("moving key " + selectedKey + " position=" + position);
 			float newPosition = selectedKey.getPosition();
 			selectedKey.setPosition(position);
 			if (newPosition != position)
@@ -266,7 +269,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				float newValue = key.getFloat();
 				key.setFloat(value);
 				if (newValue != value)
-					edit.addEdit(new AtomicModifyMotionCurve.Float((MotionCurve.Float) selectedTrack.getMotionCurve(selectedKey), newPosition, newValue));
+//					edit.addEdit(new AtomicModifyMotionCurve.Float((MotionCurve.Float) selectedTrack.getMotionCurve(selectedKey), newPosition, newValue));
+//					edit.addEdit(new AtomicMoveMotionKey(selectedTrack.getMotionCurve(selectedKey), selectedKey, newPosition));
+					edit.addEdit(new AtomicChangeMotionKeyValue(key, newValue));
 			}
 			if (edit.isValid())
 				MainFrame.getInstance().getUndoManager().addEdit(edit);
@@ -325,7 +330,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			int frame = e.getX() / timelineEditor.getFrameWidth();
 			if (selectedTrack.isExpanded())
 				selectedTrack.moveKey(selectedKey, e.getY() - trackTop);
-			selectedTrack.shiftKey(selectedKey, frame);
+			if (selectedTrack.getMotionCurve(selectedKey) != null && !selectedTrack.getMotionCurve(selectedKey).hasKeyAt(frame))
+				selectedTrack.shiftKey(selectedKey, frame);
 			repaint();
 			timelineEditor.setCornerText("Frame " + frame);
 			MainFrame.getInstance().getJPatchScreen().update_all();
@@ -366,6 +372,22 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //		popup.add(new JLabel(track.getName()));
 		
 		/*
+		 * go to this frame
+		 */
+		mi = new JMenuItem("go to this frame");
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				timelineEditor.setCurrentFrame(frame);
+				MainFrame.getInstance().getAnimation().setPosition(frame);
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			}
+		});
+		popup.add(mi);
+		mi.setEnabled(frame != MainFrame.getInstance().getAnimation().getPosition());
+		
+		popup.add(new JSeparator());
+		
+		/*
 		 * insert key (on this track)
 		 */
 		mi = new JMenuItem("insert key (on this track)");
@@ -378,11 +400,11 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				addKeysEdit.addEdit(edit);
 				MainFrame.getInstance().getUndoManager().addEdit(addKeysEdit);
 				TrackView.this.repaint();
+				MainFrame.getInstance().getAnimation().rethink();
+				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
 		});
 		popup.add(mi);
-		
-		popup.add(new JSeparator());
 		
 		/*
 		 * insert key (on selected tracks)
@@ -399,6 +421,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				if (addKeysEdit.isValid()) {
 					MainFrame.getInstance().getUndoManager().addEdit(addKeysEdit);
 					TrackView.this.repaint();
+					MainFrame.getInstance().getAnimation().rethink();
+					MainFrame.getInstance().getJPatchScreen().update_all();
 				}
 			}
 		});
@@ -421,6 +445,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				if (addKeysEdit.isValid()) {
 					MainFrame.getInstance().getUndoManager().addEdit(addKeysEdit);
 					TrackView.this.repaint();
+					MainFrame.getInstance().getAnimation().rethink();
+					MainFrame.getInstance().getJPatchScreen().update_all();
 				}
 			}
 		});
@@ -447,6 +473,25 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //		popup.add(mi);
 		
 		popup.add(new JSeparator());
+		
+		/*
+		 * delete key
+		 */
+		mi = new JMenuItem("delete selected key");
+		final MotionCurve motionCurve = selectedTrack == null ? null : selectedTrack.getMotionCurve(selectedKey);
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				JPatchRootEdit edit = new AtomicDeleteMotionKey(motionCurve, selectedKey);
+				MainFrame.getInstance().getUndoManager().addEdit(edit);
+				selectedKey = null;
+				selectedTrack = null;
+				TrackView.this.repaint();
+				MainFrame.getInstance().getAnimation().rethink();
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			}
+		});
+		mi.setEnabled(selectedKey != null && motionCurve != null && motionCurve.getKeyCount() > 1);
+		popup.add(mi);
 		
 		popup.show((Component) e.getSource(), e.getX(), e.getY());
 	}

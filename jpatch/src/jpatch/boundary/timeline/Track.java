@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.11 2006/03/22 20:04:16 sascha_l Exp $
+ * $Id: Track.java,v 1.12 2006/03/25 23:22:45 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -25,6 +25,7 @@ import java.awt.*;
 
 import javax.swing.UIManager;
 
+import jpatch.control.edit.AtomicAddMotionKey;
 import jpatch.control.edit.AtomicModifyMotionCurve;
 import jpatch.control.edit.AtomicMoveMotionKey;
 import jpatch.control.edit.JPatchUndoableEdit;
@@ -120,16 +121,20 @@ public class Track<M extends MotionCurve> {
 		if (motionCurve.hasKeyAt(frame))
 			return null;
 		if (motionCurve instanceof MotionCurve.Float) {
-			return new AtomicModifyMotionCurve.Float((MotionCurve.Float) motionCurve, frame, ((MotionCurve.Float) motionCurve).getFloatAt(frame));
+			return new AtomicAddMotionKey(motionCurve, new MotionKey.Float(frame, ((MotionCurve.Float) motionCurve).getFloatAt(frame)));
+//			return new AtomicModifyMotionCurve.Float((MotionCurve.Float) motionCurve, frame, ((MotionCurve.Float) motionCurve).getFloatAt(frame));
 		}
 		if (motionCurve instanceof MotionCurve.Point3d) {
-			return new AtomicModifyMotionCurve.Point3d((MotionCurve.Point3d) motionCurve, frame, ((MotionCurve.Point3d) motionCurve).getPoint3dAt(frame));
+			return new AtomicAddMotionKey(motionCurve, new MotionKey.Point3d(frame, ((MotionCurve.Point3d) motionCurve).getPoint3dAt(frame)));
+//			return new AtomicModifyMotionCurve.Point3d((MotionCurve.Point3d) motionCurve, frame, ((MotionCurve.Point3d) motionCurve).getPoint3dAt(frame));
 		}
 		if (motionCurve instanceof MotionCurve.Quat4f) {
-			return new AtomicModifyMotionCurve.Quat4f((MotionCurve.Quat4f) motionCurve, frame, ((MotionCurve.Quat4f) motionCurve).getQuat4fAt(frame));
+			return new AtomicAddMotionKey(motionCurve, new MotionKey.Quat4f(frame, ((MotionCurve.Quat4f) motionCurve).getQuat4fAt(frame)));
+//			return new AtomicModifyMotionCurve.Quat4f((MotionCurve.Quat4f) motionCurve, frame, ((MotionCurve.Quat4f) motionCurve).getQuat4fAt(frame));
 			}
 		if (motionCurve instanceof MotionCurve.Color3f) {
-			return new AtomicModifyMotionCurve.Color3f((MotionCurve.Color3f) motionCurve, frame, ((MotionCurve.Color3f) motionCurve).getColor3fAt(frame));
+			return new AtomicAddMotionKey(motionCurve, new MotionKey.Color3f(frame, ((MotionCurve.Color3f) motionCurve).getColor3fAt(frame)));
+//			return new AtomicModifyMotionCurve.Color3f((MotionCurve.Color3f) motionCurve, frame, ((MotionCurve.Color3f) motionCurve).getColor3fAt(frame));
 		}
 		// can't handle this case - needs subclassing
 		throw new UnsupportedOperationException();

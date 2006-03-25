@@ -88,8 +88,13 @@ public class Animation implements MutableTreeNode {
 			mapMotionCurves.get(camera).setPosition(position);
 		}
 		MainFrame.getInstance().getTimelineEditor().setCurrentFrame((int) position);
+		MainFrame.getInstance().getVcrControls().setPosition((int) position);
 	}
 
+	public void rethink() {
+		setPosition(fPosition);
+	}
+	
 	public float getStart() {
 		return fStart;
 	}

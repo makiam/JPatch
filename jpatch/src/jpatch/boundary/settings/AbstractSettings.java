@@ -1,5 +1,5 @@
 /*
- * $Id: AbstractSettings.java,v 1.3 2006/02/01 21:11:28 sascha_l Exp $
+ * $Id: AbstractSettings.java,v 1.4 2006/03/25 23:22:45 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -470,7 +470,7 @@ public abstract class AbstractSettings implements TreeNode {
 	}
 	
 	public void save() {
-		System.out.println("saving settings...");
+//		System.out.println("saving settings...");
 		save(JPATCH_ROOT_NODE);
 	}
 	
@@ -488,7 +488,7 @@ public abstract class AbstractSettings implements TreeNode {
 	}
 	
 	void load(Preferences node) {
-		System.out.println("load " + node);
+//		System.out.println("load " + node);
 		try {
 			for (Field field:getClass().getFields())
 				readField(node, field);

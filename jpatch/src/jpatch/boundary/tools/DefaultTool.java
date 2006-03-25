@@ -1219,6 +1219,8 @@ public class DefaultTool extends JPatchTool {
 		Selection selection = MainFrame.getInstance().getSelection();
 		edit.addEdit(selection.endTransform());
 		MainFrame.getInstance().getUndoManager().addEdit(edit);
+		if (MainFrame.getInstance().getTimelineEditor() != null)
+			MainFrame.getInstance().getTimelineEditor().repaint();
 	}
 	
 //	protected void transformTemporarily() {

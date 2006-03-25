@@ -39,7 +39,7 @@ public class VcrControls extends JPanel {
 	private JToggleButton buttonNextFrame = createToggleButton(new NextFrameAction(), vcrGroup);
 	
 	private static JTextField textTime = new JTextField(" 00:00:00.00", 13);
-	private static JTextField textFrame = new JTextField("      1", 8);
+	private static JTextField textFrame = new JTextField("      0", 8);
 	
 	private PlayThread playThread;
 	
@@ -75,7 +75,7 @@ public class VcrControls extends JPanel {
 				try {
 					int i = Integer.parseInt(textFrame.getText().trim());
 					System.out.println(i);
-					float f = i - 1;
+					float f = i;
 					if (f >= MainFrame.getInstance().getAnimation().getStart() && f <= MainFrame.getInstance().getAnimation().getEnd())
 						p = f;
 				} catch (NumberFormatException e) { }
@@ -95,7 +95,7 @@ public class VcrControls extends JPanel {
 		buttonPause.doClick();
 	}
 	
-	private void setPosition(float position) {
+	public void setPosition(float position) {
 		//tcd.setTimecode(position);
 		//tcd.paint(tcd.getGraphics());
 		Animation animation = MainFrame.getInstance().getAnimation();
@@ -114,9 +114,9 @@ public class VcrControls extends JPanel {
 		else timecode.append(' ');
 		timecode.append(pad("" + h, '0', 2)).append(':').append(pad("" + m, '0', 2)).append(':').append(pad("" + s, '0', 2)).append('.').append(pad("" + t, '0', 2));
 		textTime.setText(timecode.toString());
-		textFrame.setText(pad("" + (int) (position - animation.getStart() + 1), ' ', 7));
-		MainFrame.getInstance().getAnimation().setPosition(position);
-		MainFrame.getInstance().getJPatchScreen().update_all();
+		textFrame.setText(pad("" + (int) (position - animation.getStart()), ' ', 7));
+//		MainFrame.getInstance().getAnimation().setPosition(position);
+//		MainFrame.getInstance().getJPatchScreen().update_all();
 	}
 	
 	private String pad(String string, char paddingCharacter, int length) {
@@ -156,17 +156,22 @@ public class VcrControls extends JPanel {
 				float frame = Math.round(((float) (System.currentTimeMillis() - time)) / 1000 * rate + start);
 				if (frame <= animation.getEnd() && frame >= animation.getStart()) {
 					if (frame != oldFrame) {
-						setPosition(frame);
+						animation.setPosition(frame);
+						MainFrame.getInstance().getJPatchScreen().update_all();
 						oldFrame = frame;
 					}
 				}
 				else {
 					stop = true;
 					buttonPause.doClick();
-					if (frame > animation.getEnd())
-						setPosition(animation.getEnd());
-					if (frame < animation.getStart())
-						setPosition(animation.getStart());
+					if (frame > animation.getEnd()) {
+						animation.setPosition(animation.getEnd());
+						MainFrame.getInstance().getJPatchScreen().update_all();
+					}
+					if (frame < animation.getStart()) {
+						animation.setPosition(animation.getStart());
+						MainFrame.getInstance().getJPatchScreen().update_all();
+					}
 				}
 			}
 //			smartScrollPane.repaint();
@@ -345,8 +350,10 @@ public class VcrControls extends JPanel {
 //			if (clip != null && clip.isRunning()) clip.stop();
 			if (playThread != null) playThread.stop = true;
 			float frame = Math.round(animation.getPosition());
-			if (frame >= animation.getStart() + 1)
-				setPosition(animation.getPosition() - 1);
+			if (frame >= animation.getStart() + 1) {
+				animation.setPosition(animation.getPosition() - 1);
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			}
 			buttonPause.doClick();
 //			smartScrollPane.repaint();
 		}
@@ -368,8 +375,10 @@ public class VcrControls extends JPanel {
 //			if (clip != null && clip.isRunning()) clip.stop();
 			if (playThread != null) playThread.stop = true;
 			float frame = Math.round(animation.getPosition());
-			if (frame <= animation.getEnd() - 1)
-				setPosition(animation.getPosition() + 1);
+			if (frame <= animation.getEnd() - 1) {
+				animation.setPosition(animation.getPosition() + 1);
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			}
 			buttonPause.doClick();
 //			smartScrollPane.repaint();
 		}
@@ -476,7 +485,8 @@ public class VcrControls extends JPanel {
 //			Clip clip = Animator.getInstance().getClip();
 //			if (clip != null && clip.isRunning()) clip.stop();
 			buttonPause.doClick();
-			setPosition(MainFrame.getInstance().getAnimation().getStart());
+			MainFrame.getInstance().getAnimation().setPosition(MainFrame.getInstance().getAnimation().getStart());
+			MainFrame.getInstance().getJPatchScreen().update_all();
 //			smartScrollPane.repaint();
 //			Animator.getInstance().rerenderViewports();
 		}
@@ -497,7 +507,8 @@ public class VcrControls extends JPanel {
 //			if (clip != null && clip.isRunning()) clip.stop();
 //			Animator.getInstance().setPosition(Animator.getInstance().getEnd());
 			buttonPause.doClick();
-			setPosition(MainFrame.getInstance().getAnimation().getEnd());
+			MainFrame.getInstance().getAnimation().setPosition(MainFrame.getInstance().getAnimation().getEnd());
+			MainFrame.getInstance().getJPatchScreen().update_all();
 //			smartScrollPane.repaint();
 //			Animator.getInstance().rerenderViewports();
 		}

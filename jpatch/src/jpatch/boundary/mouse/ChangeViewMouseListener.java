@@ -8,14 +8,8 @@ import javax.vecmath.Quat4f;
 
 import jpatch.boundary.*;
 import jpatch.boundary.tools.*;
-import jpatch.control.edit.AtomicChangeAnimObjectScale;
-import jpatch.control.edit.AtomicModifyMotionCurve;
-import jpatch.control.edit.JPatchRootEdit;
-import jpatch.control.edit.ModifyAnimObject;
-import jpatch.entity.AnimModel;
-import jpatch.entity.Animation;
-import jpatch.entity.Camera;
-import jpatch.entity.MotionCurveSet;
+import jpatch.control.edit.*;
+import jpatch.entity.*;
 
 public class ChangeViewMouseListener extends MouseAdapter {
 	public static final int MOVE = 1;

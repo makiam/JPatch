@@ -200,7 +200,7 @@ public final class MainToolBar extends JToolBar implements JPatchUndoManager.Und
 		buttonHorizontal.setSelected(false);
 		buttonVertical.setSelected(false);
 		buttonQuad.setSelected(false);
-		
+		System.out.println(screen.getMode());
 		switch (screen.getMode()) {
 			case JPatchScreen.SINGLE:
 				buttonSingle.setSelected(true);
