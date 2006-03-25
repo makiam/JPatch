@@ -528,6 +528,8 @@ public class RotateTool extends JPatchTool {
 						}
 						MainFrame.getInstance().getUndoManager().addEdit(edit);
 						MainFrame.getInstance().getJPatchScreen().full_update();
+						if (MainFrame.getInstance().getTimelineEditor() != null)
+							MainFrame.getInstance().getTimelineEditor().repaint();
 					}
 					//System.out.println("fAlpha = " + fAlpha);
 				//} else {

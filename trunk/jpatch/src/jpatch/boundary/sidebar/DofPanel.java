@@ -8,14 +8,8 @@ import javax.swing.tree.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
-import jpatch.boundary.action.AddMultiControlPointAction;
-import jpatch.boundary.action.DeleteDofAction;
-import jpatch.boundary.action.DeleteMaterialAction;
-import jpatch.boundary.action.EditMorphTargetAction;
-import jpatch.boundary.action.NewMorphTargetAction;
-import jpatch.boundary.action.UseDofMorphAction;
-import jpatch.control.edit.AtomicModifyMotionCurve;
-import jpatch.control.edit.ModifyAnimObject;
+import jpatch.boundary.action.*;
+import jpatch.control.edit.*;
 import jpatch.entity.*;
 
 public class DofPanel extends SidePanel

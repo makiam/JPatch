@@ -161,7 +161,7 @@ public class Viewport2 {
 		if (MainFrame.getInstance().getEditedMorph() != null)
 			drawable.drawString("!!!EDIT MORPH MODE!!!", (int) viewDef.getWidth() - 140, 16);
 		if (MainFrame.getInstance().getAnimation() != null)
-			drawable.drawString("Frame " + ((int) MainFrame.getInstance().getAnimation().getPosition() + 1), 4, (int) viewDef.getHeight() - 4);
+			drawable.drawString("Frame " + (int) MainFrame.getInstance().getAnimation().getPosition(), 4, (int) viewDef.getHeight() - 4);
 		if (viewDef.getCamera() != null) {
 			int W = (int) viewDef.getWidth();
 			int H = (int) viewDef.getHeight();
