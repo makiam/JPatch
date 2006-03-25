@@ -13,7 +13,7 @@ public class ColorTrack extends Track<MotionCurve.Color3f> {
 		super(timelineEditor, motionCurve);
 	}
 
-	public void paint(Graphics g, int y) {	
+	public void paint(Graphics g, int y, Object selectedKey) {
 		Rectangle clip = g.getClipBounds();
 		int height = getHeight();
 		
@@ -27,7 +27,7 @@ public class ColorTrack extends Track<MotionCurve.Color3f> {
 			track = TimelineEditor.SHADOW;
 		} else {
 			background = TimelineEditor.BACKGROUND;
-			track = TimelineEditor.LIGHT_SHADOW;
+			track = TimelineEditor.SHADOW;
 		}
 		
 		g.setColor(background);

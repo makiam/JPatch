@@ -207,6 +207,8 @@ public class AnimObjectEditor extends BDialog{
 			}
 //			Animator.getInstance().updateCurvesFor(animObject);
 			MainFrame.getInstance().getAnimation().getCurvesetFor(animObject).updateCurves(MainFrame.getInstance().getAnimation().getPosition());
+			MainFrame.getInstance().getJPatchScreen().update_all();
+			MainFrame.getInstance().getTimelineEditor().repaint();
 			dispose();
 //			Animator.getInstance().rerenderViewports();
 		} catch (Exception exception) {

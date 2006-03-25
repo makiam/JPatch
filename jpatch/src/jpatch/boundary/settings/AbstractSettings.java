@@ -470,7 +470,7 @@ public abstract class AbstractSettings implements TreeNode {
 	}
 	
 	public void save() {
-		System.out.println("saving settings...");
+//		System.out.println("saving settings...");
 		save(JPATCH_ROOT_NODE);
 	}
 	
@@ -488,7 +488,7 @@ public abstract class AbstractSettings implements TreeNode {
 	}
 	
 	void load(Preferences node) {
-		System.out.println("load " + node);
+//		System.out.println("load " + node);
 		try {
 			for (Field field:getClass().getFields())
 				readField(node, field);

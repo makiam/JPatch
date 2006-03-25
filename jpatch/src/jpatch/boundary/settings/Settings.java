@@ -81,7 +81,6 @@ public class Settings extends AbstractSettings {
 		splitPane.add(new JScrollPane(getTable()));
 		
 		if (JOptionPane.showConfirmDialog(parent, splitPane, toString(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null) == JOptionPane.OK_OPTION) {
-			System.out.println("OK");
 			MainFrame mf = MainFrame.getInstance();
 			if (screenWidth != mf.getWidth() || screenHeight != mf.getHeight() || screenPositionX != mf.getX() || screenPositionY != mf.getY())
 				mf.setBounds(screenPositionX, screenPositionY, screenWidth, screenHeight);

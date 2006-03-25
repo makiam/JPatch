@@ -18,6 +18,8 @@ public final class UndoAction extends AbstractAction {
 		JPatchUndoManager undoManager = MainFrame.getInstance().getUndoManager();
 		if (undoManager.canUndo()) {
 			undoManager.undo();
+			if (MainFrame.getInstance().getAnimation() != null)
+				MainFrame.getInstance().getAnimation().rethink();
 			MainFrame.getInstance().getJPatchScreen().update_all();
 			if (MainFrame.getInstance().getTimelineEditor() != null)
 				MainFrame.getInstance().getTimelineEditor().repaint();
