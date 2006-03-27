@@ -244,28 +244,32 @@ public final class MainFrame extends JFrame {
 			helpPanel.add(helpLabel);
 			jpatchScreen.enablePopupMenu(true);
 			jpatchScreen.addMMBListener();
+			
+			Command.getInstance().mapKeys(jpatchScreen.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW), jpatchScreen.getActionMap());
+			
 			//keyEventDispatcher = new JPatchKeyEventDispatcher();
 			//KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyEventDispatcher);
 //			addKeyListener(keyAdapter);
-			KeyEventDispatcher keyEventDispatcher = new KeyEventDispatcher() {
-				public boolean dispatchKeyEvent(KeyEvent e) {
-					Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-					if (focusOwner instanceof JTextComponent)
-						return false;
-					switch (e.getID()) {
-					case KeyEvent.KEY_PRESSED:
-			            Command.getInstance().keyPressed(e);
-			          break;
-			          case KeyEvent.KEY_RELEASED:
-			        	  //
-			          break;
-			          case KeyEvent.KEY_TYPED:
-			        	  //Command.getInstance().keyTyped(e);
-			          break;
-					}
-					return true;
-				}
-			};
+
+//			KeyEventDispatcher keyEventDispatcher = new KeyEventDispatcher() {
+//				public boolean dispatchKeyEvent(KeyEvent e) {
+//					Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+//					if (focusOwner instanceof JTextComponent)
+//						return false;
+//					switch (e.getID()) {
+//					case KeyEvent.KEY_PRESSED:
+//			            Command.getInstance().keyPressed(e);
+//			          break;
+//			          case KeyEvent.KEY_RELEASED:
+//			        	  //
+//			          break;
+//			          case KeyEvent.KEY_TYPED:
+//			        	  //Command.getInstance().keyTyped(e);
+//			          break;
+//					}
+//					return true;
+//				}
+//			};
 			
 //			try {
 //				final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("/home/sascha/jpatch.out"));
@@ -289,7 +293,7 @@ public final class MainFrame extends JFrame {
 //				e.printStackTrace();
 //			}
 			
-			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyEventDispatcher);
+//			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyEventDispatcher);
 			//mainMenu.setFocusable(false);
 			//mainToolBar.setFocusable(false);
 			//meshToolBar.setFocusable(false);
