@@ -10,8 +10,11 @@ public final class NextCurveAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public NextCurveAction() {
-		super(KeyMapping.getDescription("next curve"));
+	private int dir;
+	
+	public NextCurveAction(int dir) {
+		super(dir == 1 ? "next curve" : "prev curve");
+		this.dir = dir;
 		//putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("add point"));
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}
@@ -29,22 +32,39 @@ public final class NextCurveAction extends AbstractAction {
 		if (!(object instanceof ControlPoint))
 			return;
 		ControlPoint cp = (ControlPoint) object;
+
 		switch (selection.getDirection()) {
 			case 0: {
-				selection.setDirection(1);
+				selection.setDirection(dir);
 			} break;
 			case 1: {
-				selection.setDirection(-1);
+				if (dir == 1) {
+					selection.setDirection(-1);
+				} else {
+					if (cp.getNextAttached() != null) {
+						selection.setDirection(-1);
+						selection.getMap().remove(cp);
+						selection.getMap().put(cp.getNextAttached(), new Float(1.0f));
+					} else {
+						selection.setDirection(0);
+						selection.getMap().remove(cp);
+						selection.getMap().put(cp.getTail(), new Float(1.0f));
+					}
+				}
 			} break;
 			case -1: {
-				if (cp.getPrevAttached() != null) {
-					selection.setDirection(1);
-					selection.getMap().remove(cp);
-					selection.getMap().put(cp.getPrevAttached(), new Float(1.0f));
+				if (dir == 1) {
+					if (cp.getPrevAttached() != null) {
+						selection.setDirection(1);
+						selection.getMap().remove(cp);
+						selection.getMap().put(cp.getPrevAttached(), new Float(1.0f));
+					} else {
+						selection.setDirection(0);
+						selection.getMap().remove(cp);
+						selection.getMap().put(cp.getHead(), new Float(1.0f));
+					}
 				} else {
-					selection.setDirection(0);
-					selection.getMap().remove(cp);
-					selection.getMap().put(cp.getHead(), new Float(1.0f));
+					selection.setDirection(1);
 				}
 			}
 		}
