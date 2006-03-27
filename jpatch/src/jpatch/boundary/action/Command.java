@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.24 2006/02/26 19:02:02 sascha_l Exp $
+ * $Id: Command.java,v 1.25 2006/03/27 20:44:16 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -37,14 +37,16 @@ import jpatch.boundary.laf.*;
 import jpatch.boundary.settings.*;
 import jpatch.entity.*;
 
-public final class Command implements KeyListener {
+public final class Command {
 	private static final boolean DEBUG = false;
 	private static final Command INSTANCE = new Command();
 	private Map commandActionMap = new HashMap();
 	private Map commandButtonMap = new HashMap();
 	private Map commandMenuItemMap = new HashMap();
 	private Map commandKeyMap = new HashMap();
-	private Map keyCommandMap = new HashMap();
+//	private Map keyCommandMap = new HashMap();
+	private Map<KeyStroke, String> keyCommandMap = new HashMap<KeyStroke, String>();
+//	private ActionMap actionMap = new ActionMap();
 	
 	public static Command getInstance() {
 		return INSTANCE;
@@ -124,7 +126,8 @@ public final class Command implements KeyListener {
 		put("delete",		new DeleteControlPointAction(),	new JMenuItem());
 		put("remove",		new RemoveControlPointAction(),	new JMenuItem());
 		put("insert point",	new InsertControlPointAction(),	new JMenuItem());
-		put("next curve",	new NextCurveAction(), new JMenuItem());
+		put("next curve",	new NextCurveAction(1), new JMenuItem());
+		put("prev curve",	new NextCurveAction(-1), new JMenuItem());
 		
 		/*
 		 * Main toolbar buttons
@@ -397,31 +400,31 @@ public final class Command implements KeyListener {
 		return ((Action) commandActionMap.get(command)).isEnabled();
 	}
 	
-	/*
-	 * KeyListener interface implementation start
-	 */
-	
-	public void keyTyped(KeyEvent e) {
-		String command = (String) keyCommandMap.get(KeyStroke.getKeyStrokeForEvent(e));
-		if (DEBUG)
-			System.out.println(KeyStroke.getKeyStrokeForEvent(e) + ": Command = " + command);
-	}
-
-
-	public void keyPressed(KeyEvent e) {
-		String command = (String) keyCommandMap.get(KeyStroke.getKeyStrokeForEvent(e));
-		if (DEBUG)
-			System.out.println(KeyStroke.getKeyStrokeForEvent(e) + ": Command = " + command);
-		if (command != null) {
-			executeCommand(command);
-		}
-	}
-
-	public void keyReleased(KeyEvent e) { }
-	
-	/*
-	 * KeyListener interface implementation end
-	 */
+//	/*
+//	 * KeyListener interface implementation start
+//	 */
+//	
+//	public void keyTyped(KeyEvent e) {
+//		String command = (String) inputMap.get(KeyStroke.getKeyStrokeForEvent(e));
+//		if (DEBUG)
+//			System.out.println(KeyStroke.getKeyStrokeForEvent(e) + ": Command = " + command);
+//	}
+//
+//
+//	public void keyPressed(KeyEvent e) {
+//		String command = (String) inputMap.get(KeyStroke.getKeyStrokeForEvent(e));
+//		if (DEBUG)
+//			System.out.println(KeyStroke.getKeyStrokeForEvent(e) + ": Command = " + command);
+//		if (command != null) {
+//			executeCommand(command);
+//		}
+//	}
+//
+//	public void keyReleased(KeyEvent e) { }
+//	
+//	/*
+//	 * KeyListener interface implementation end
+//	 */
 	
 	private void put(String command, Action action, JMenuItem menuItem) {
 		put(command, action, menuItem, null);
@@ -443,6 +446,7 @@ public final class Command implements KeyListener {
 			if (menuItem.getText() == null)
 				menuItem.setText(command);
 		}
+//		actionMap.put(command, new CommandAction(command));
 //		String keyString = (String) JPatchSettings.getInstance().commandKeyMap.get(command);
 //		if (keyString != null) {
 //			keyCommandMap.put(KeyStroke.getKeyStroke(keyString), command);
@@ -452,7 +456,7 @@ public final class Command implements KeyListener {
 	
 	public void setKeyBinding(String key, String command) {
 		keyCommandMap.put(KeyStroke.getKeyStroke(key), command);
-		commandKeyMap.put(command, key);
+//		commandKeyMap.put(command, key);
 	}
 	
 	private void createGroup(String[] commands, int selectedIndex) {
@@ -467,5 +471,31 @@ public final class Command implements KeyListener {
 	private void checkCommand(String command) {
 		if (!commandActionMap.containsKey(command))
 			throw new IllegalArgumentException("unknown command: " + command);
+	}
+	
+//	public Map<KeyStroke, String> getInputMapping() {
+//		return inputMapping;
+//	}
+//	
+//	public ActionMap getActionMap() {
+//		return actionMap;
+//	}
+	
+	public void mapKeys(InputMap inputMap, ActionMap actionMap) {
+		for (KeyStroke keyStroke : keyCommandMap.keySet()) {
+			String command = keyCommandMap.get(keyStroke);
+			inputMap.put(keyStroke, command);
+			actionMap.put(command, new CommandAction(command));
+		}
+	}
+	private static class CommandAction extends AbstractAction {
+		private String command;
+		public CommandAction(String command) {
+			this.command = command;
+		}
+		public void actionPerformed(ActionEvent e) {
+			System.out.println(command);
+			INSTANCE.executeCommand(command);
+		}
 	}
 }

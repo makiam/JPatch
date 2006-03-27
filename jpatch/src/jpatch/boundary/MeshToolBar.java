@@ -125,7 +125,7 @@ public final class MeshToolBar extends JToolBar {
 	}
 	
 	public void addKeyBindings() {
-		MainFrame.getInstance().getKeyAdapter().addKey(KeyMapping.getKey("next curve"), new NextCurveAction());
+		MainFrame.getInstance().getKeyAdapter().addKey(KeyMapping.getKey("next curve"), new NextCurveAction(1));
 		MainFrame.getInstance().getKeyAdapter().addKey(KeyMapping.getKey("extend selection"), new ExtendSelectionAction());
 		MainFrame.getInstance().getKeyAdapter().addKey(KeyMapping.getKey("insert point"), new InsertControlPointAction());
 		
