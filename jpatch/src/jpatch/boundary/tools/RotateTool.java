@@ -463,6 +463,10 @@ public class RotateTool extends JPatchTool {
 					System.out.println("resetting coordinate system");
 					MainFrame.getInstance().getUndoManager().addEdit(new AtomicModifySelection.Orientation(selection,mi));
 				}
+				reInit(selection);
+				isTransforming = false;
+				MainFrame.getInstance().getJPatchScreen().single_update((Component)mouseEvent.getSource());
+				return;
 			}
 			
 			setPassive();
@@ -642,6 +646,7 @@ public class RotateTool extends JPatchTool {
 	}
 	
 	protected void beginTransform() {
+		System.out.println("beginTrasform");
 //		PointSelection ps = MainFrame.getInstance().getPointSelection();
 //		ArrayList list = ps.getTransformables();
 //		for (int i = 0, n = list.size(); i < n; i++) {
@@ -660,6 +665,7 @@ public class RotateTool extends JPatchTool {
 	}
 	
 	protected void endTransform() {
+		System.out.println("endTrasform");
 ////		m4ConstrainedTransform.set(m4Transform);
 ////		MainFrame.getInstance().getConstraints().constrainMatrix(m4ConstrainedTransform);
 //		PointSelection ps = MainFrame.getInstance().getPointSelection();
