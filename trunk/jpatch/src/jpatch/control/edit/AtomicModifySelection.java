@@ -185,7 +185,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 		private void swap() {
 			Matrix3f dummy = new Matrix3f(m3Orient);
 			m3Orient.set(selection.getOrientation());
-			selection.getOrientation().set(dummy);
+			selection.setOrientation(dummy);
 		}
 		
 		public void undo() {
