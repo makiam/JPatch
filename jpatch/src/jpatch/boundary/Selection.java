@@ -152,10 +152,19 @@ public class Selection extends JPatchTreeLeaf {
 
 	public Matrix3f getOrientation() {
 		if (hotObject instanceof AnimObject) {
+			m3Orientation.setIdentity();
 			((AnimObject) hotObject).getTransform().getRotationScale(m3Orientation);
 			m3Orientation.setScale(1);
 		}
 		return m3Orientation;
+	}
+	
+	public void setOrientation(Matrix3f orientation) {
+		if (hotObject instanceof AnimObject)
+			((AnimObject) hotObject).getTransform().setRotation(orientation);
+		else
+			m3Orientation.set(orientation);
+		System.out.println("Selection.setOrientation()");
 	}
 	
 	public boolean contains(Object object) {
@@ -339,6 +348,7 @@ public class Selection extends JPatchTreeLeaf {
 			float weight = ((Float) mapTransformables.get(transformable)).floatValue();
 			aa.angle = a.angle * weight;
 			transformable.rotate(aa, pivot);
+			System.out.println("transformable " + transformable + " rotate...");
 		}
 //		pivotTransformable.rotate(a, pivot);
 	}
