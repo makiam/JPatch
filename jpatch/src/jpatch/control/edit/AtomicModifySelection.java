@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicModifySelection.java,v 1.10 2006/02/01 21:11:28 sascha_l Exp $
+ * $Id: AtomicModifySelection.java,v 1.11 2006/03/28 19:47:52 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -185,7 +185,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 		private void swap() {
 			Matrix3f dummy = new Matrix3f(m3Orient);
 			m3Orient.set(selection.getOrientation());
-			selection.getOrientation().set(dummy);
+			selection.setOrientation(dummy);
 		}
 		
 		public void undo() {

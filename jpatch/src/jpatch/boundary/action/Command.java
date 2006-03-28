@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.25 2006/03/27 20:44:16 sascha_l Exp $
+ * $Id: Command.java,v 1.26 2006/03/28 19:47:52 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -29,21 +29,18 @@ package jpatch.boundary.action;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import jpatch.boundary.*;
 import jpatch.boundary.laf.*;
 import jpatch.boundary.settings.*;
-import jpatch.entity.*;
 
 public final class Command {
-	private static final boolean DEBUG = false;
+//	private static final boolean DEBUG = false;
 	private static final Command INSTANCE = new Command();
-	private Map commandActionMap = new HashMap();
-	private Map commandButtonMap = new HashMap();
-	private Map commandMenuItemMap = new HashMap();
-	private Map commandKeyMap = new HashMap();
+	private Map<String, Action> commandActionMap = new HashMap<String, Action>();
+	private Map<String, AbstractButton> commandButtonMap = new HashMap<String, AbstractButton>();
+	private Map<String, JMenuItem> commandMenuItemMap = new HashMap<String, JMenuItem>();
+	private Map<String, KeyStroke> commandKeyMap = new HashMap<String, KeyStroke>();
 //	private Map keyCommandMap = new HashMap();
 	private Map<KeyStroke, String> keyCommandMap = new HashMap<KeyStroke, String>();
 //	private ActionMap actionMap = new ActionMap();
@@ -66,9 +63,11 @@ public final class Command {
 		String toolTipText = (String) ((Action) INSTANCE.commandActionMap.get(command)).getValue(Action.SHORT_DESCRIPTION);
 		if (toolTipText == null)
 			toolTipText = command;
-		String key = (String) INSTANCE.commandKeyMap.get(command);
-		if (key != null)
+		KeyStroke keyStroke = INSTANCE.commandKeyMap.get(command);
+		if (keyStroke != null) {
+			String key = keyStroke.toString().replaceAll("(typed|pressed|released)", "");
 			toolTipText = toolTipText + " [" + key + "]";
+		}
 		newButton.setToolTipText(toolTipText);
 		return newButton;
 	}
@@ -83,10 +82,11 @@ public final class Command {
 		else
 			newItem = new JMenuItem();//menuItem.getAction());
 		String itemText = menuItem.getText();
-		String key = (String) INSTANCE.commandKeyMap.get(command);
-//		System.out.println(command + " " + key);
-		if (key != null)
+		KeyStroke keyStroke = INSTANCE.commandKeyMap.get(command);
+		if (keyStroke != null) {
+			String key = keyStroke.toString().replaceAll("(typed|pressed|released)", "");
 			itemText = itemText + " [" + key + "]";
+		}
 		newItem.setText(itemText);
 		newItem.setIcon(menuItem.getIcon());
 		newItem.setModel(menuItem.getModel());
@@ -165,7 +165,7 @@ public final class Command {
 		put("add bone",					new AddBoneAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("rotate tool",				new RotateAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("weight selection tool",	new WeightSelectionAction(), 	new JRadioButtonMenuItem(),	new JPatchToggleButton());
-		put("knife tool",						new KnifeAction(),			new JRadioButtonMenuItem(),	new JPatchToggleButton());
+		put("knife tool",				new KnifeAction(),				new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("detach",					new DetachControlPointsAction(),new JMenuItem(),			new JPatchButton());
 		put("rotoscope tool",			new RotoscopeAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("tangent tool",				new TangentAction(), 			new JCheckBoxMenuItem(),	new JPatchToggleButton());
@@ -194,17 +194,17 @@ public final class Command {
 		put("quit",						new QuitAction(),					new JMenuItem());
 		
 		// Options
-		put("synchronize viewports", 		new SyncScreensAction(),		new JCheckBoxMenuItem());
-		put("settings", 					new EditSettingsAction(),			new JMenuItem());
-		put("grid spacing settings", 		new SetGridSpacingAction(),		new JMenuItem());
-		put("install jogl", 				new InstallJoglAction(),		new JMenuItem());
+		put("synchronize viewports", 		new SyncScreensAction(),								new JCheckBoxMenuItem());
+		put("settings", 					new EditSettingsAction(),								new JMenuItem());
+		put("grid spacing settings", 		new SetGridSpacingAction(),								new JMenuItem());
+		put("install jogl", 				new InstallJoglAction(),								new JMenuItem());
 		put("jpatch lookandfeel",			new SwitchLookAndFeelAction("JPatch", jpatch), 			new JRadioButtonMenuItem());
 		put("crossplatform lookandfeel",	new SwitchLookAndFeelAction("Metal", crossplatform),	new JRadioButtonMenuItem());
 		put("system lookandfeel",			new SwitchLookAndFeelAction("System", system),			new JRadioButtonMenuItem());
-		put("phoneme morph mapping", 		new EditPhonemesAction(),		new JMenuItem());
+		put("phoneme morph mapping", 		new EditPhonemesAction(),								new JMenuItem());
 		
 		// Window
-		put("show anim controls", 		new AnimControlsAction(),		new JMenuItem());
+		put("show anim controls", 		new AnimControlsAction(),			new JMenuItem());
 		
 		// Test
 		put("dump",						new DumpAction(),					new JMenuItem());
@@ -238,33 +238,33 @@ public final class Command {
 		put("bird's eye view",			new ViewAction(ViewDefinition.BIRDS_EYE),	new JRadioButtonMenuItem());
 		
 		// Rotoscope
-		put("set rotoscope image",		new SetRotoscopeAction(),	new JMenuItem());
-		put("clear rotoscope image",	new ClearRotoscopeAction(),	new JMenuItem());
+		put("set rotoscope image",		new SetRotoscopeAction(),		new JMenuItem());
+		put("clear rotoscope image",	new ClearRotoscopeAction(),		new JMenuItem());
 		
 		// Lock view
 		put("lock view",				new SetViewLockAction(true),	new JCheckBoxMenuItem());
 		put("unlock view",				new SetViewLockAction(false),	new JMenuItem());
 		
 		// Selection
-		put("select none",				new SelectNoneAction(),		new JMenuItem());
-		put("select all",				new SelectAllAction(),		new JMenuItem());
-		put("invert selection",			new InvertSelectionAction(),new JMenuItem());
-		put("expand selection",			new ExtendSelectionAction(),new JMenuItem());
+		put("select none",				new SelectNoneAction(),			new JMenuItem());
+		put("select all",				new SelectAllAction(),			new JMenuItem());
+		put("invert selection",			new InvertSelectionAction(),	new JMenuItem());
+		put("expand selection",			new ExtendSelectionAction(),	new JMenuItem());
 		
 		// Tools
-		put("flip x",							new FlipAction(FlipAction.X),	new JMenuItem());
-		put("flip y",							new FlipAction(FlipAction.Y),	new JMenuItem());
-		put("flip z",							new FlipAction(FlipAction.Z),	new JMenuItem());
-		put("flip patches",						new FlipPatchesAction(),		new JMenuItem());
-		put("align patches",					new AlignPatchesAction(),		new JMenuItem());
-		put("align controlpoints",				new AlignAction(),				new JMenuItem());
-		put("automirror",						new AutoMirrorAction(),			new JMenuItem());
-		put("add stubs",						new AddStubsAction(),			new JMenuItem());
-		put("remove stubs",						new RemoveStubsAction(),		new JMenuItem());
+		put("flip x",							new FlipAction(FlipAction.X),									new JMenuItem());
+		put("flip y",							new FlipAction(FlipAction.Y),									new JMenuItem());
+		put("flip z",							new FlipAction(FlipAction.Z),									new JMenuItem());
+		put("flip patches",						new FlipPatchesAction(),										new JMenuItem());
+		put("align patches",					new AlignPatchesAction(),										new JMenuItem());
+		put("align controlpoints",				new AlignAction(),												new JMenuItem());
+		put("automirror",						new AutoMirrorAction(),											new JMenuItem());
+		put("add stubs",						new AddStubsAction(),											new JMenuItem());
+		put("remove stubs",						new RemoveStubsAction(),										new JMenuItem());
 		put("change tangents: round",			new ChangeTangentModeAction(ChangeTangentModeAction.JPATCH),	new JMenuItem());
 		put("change tangents: peak",			new ChangeTangentModeAction(ChangeTangentModeAction.PEAK),		new JMenuItem());
 		put("change tangents: spatch",			new ChangeTangentModeAction(ChangeTangentModeAction.SPATCH),	new JMenuItem());
-		put("assign controlpoints to bones",	new AssignPointsToBonesAction(),	new JMenuItem());
+		put("assign controlpoints to bones",	new AssignPointsToBonesAction(),								new JMenuItem());
 		
 		/*
 		 * Pressed icons
@@ -488,13 +488,15 @@ public final class Command {
 			actionMap.put(command, new CommandAction(command));
 		}
 	}
+	
+	@SuppressWarnings("serial")
 	private static class CommandAction extends AbstractAction {
 		private String command;
 		public CommandAction(String command) {
 			this.command = command;
 		}
 		public void actionPerformed(ActionEvent e) {
-			System.out.println(command);
+//			System.out.println(command);
 			INSTANCE.executeCommand(command);
 		}
 	}

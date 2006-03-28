@@ -30,8 +30,8 @@ public class RotateTool extends JPatchTool {
 	private float fAlpha;
 	private float fBeta = 0;
 	private float fRadius = 0;
-	private Point3f p3Pivot;
-	private Matrix3f m3InitialRotation;// = new Matrix3f();
+//	private Point3f selection.getPivot();
+	private Matrix3f m3InitialRotation = new Matrix3f();
 	//private Matrix3f m3Rotation = new Matrix3f();
 	private AxisAngle4f aaRotation = new AxisAngle4f();
 	private Vector3f v3AxisX = new Vector3f(1,0,0);
@@ -53,6 +53,7 @@ public class RotateTool extends JPatchTool {
 	private float fRotX = 0;
 	private float fRotY = 0;
 	private boolean bChange;
+	private boolean isTransforming = false;
 	
 	private Selection selection;
 	
@@ -71,7 +72,7 @@ public class RotateTool extends JPatchTool {
 		
 		//fRadius = 2;
 //		NewSelection selection = MainFrame.getInstance().getSelection();
-//		p3Pivot = selection.getPivot();
+//		selection.getPivot() = selection.getPivot();
 //		m3Rot = selection.getOrientation();
 //		m3RotA.set(m3Rot);
 //		
@@ -148,11 +149,11 @@ public class RotateTool extends JPatchTool {
 //		acp = selection.getControlPointArray();
 //		ControlPoint[] acp = selection.getControlPointArray();
 		for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
-			ds = p3Pivot.distanceSquared(((Transformable) it.next()).getPosition());
+			ds = selection.getPivot().distanceSquared(((Transformable) it.next()).getPosition());
 			if (ds > r) r = ds;
 		}
 //		for (int i = 0; i < ap3.length; i++) {
-//			ds = p3Pivot.distanceSquared(ap3[i]);
+//			ds = selection.getPivot().distanceSquared(ap3[i]);
 //			if (ds > r) r = ds;
 //		}
 		fRadius = (float)Math.sqrt(r);
@@ -175,7 +176,11 @@ public class RotateTool extends JPatchTool {
 	}
 	
 	public Matrix3f getInitialRotation() {
-		return m3InitialRotation;
+//		return m3InitialRotation;
+		if (isTransforming && selection.getHotObject() instanceof AnimObject)
+			return m3InitialRotation;
+		else
+			return selection.getOrientation();
 	}
 	
 	public AxisAngle4f getRotation() {
@@ -183,7 +188,7 @@ public class RotateTool extends JPatchTool {
 	}
 	
 	public Point3f getPivot() {
-		return p3Pivot;
+		return selection.getPivot();
 	}
 	
 	public void paint(ViewDefinition viewDef) {
@@ -213,21 +218,21 @@ public class RotateTool extends JPatchTool {
 		
 		Matrix3f m = new Matrix3f();
 		m.set(aaRotation);
-		m.mul(m3InitialRotation);
-		Point3f p3TransformedPivot = new Point3f(p3Pivot);
+		m.mul(getInitialRotation());
+		Point3f p3TransformedPivot = new Point3f(selection.getPivot());
 		m4View.transform(p3TransformedPivot);
 		float fInvRadius = 1 / (fRadius * viewDef.getScale() * viewDef.getWidth());// * 0.5f;
 		//System.out.println("fradius = " + fTransformedRadius);
 		p3a.set(0,fRadius * COS[SUBDIV - 1],fRadius * SIN[SUBDIV - 1]);
 		m.transform(p3a);
-		p3a.add(p3Pivot);
+		p3a.add(selection.getPivot());
 		m4View.transform(p3a);
 		c3a.set(settings.colors.xAxis);
 		float f;
 		for (int s = 0; s < SUBDIV; s++) {
 			p3b.set(0, fRadius * COS[s], fRadius * SIN[s]);
 			m.transform(p3b);
-			p3b.add(p3Pivot);
+			p3b.add(selection.getPivot());
 			m4View.transform(p3b);
 			f = (p3a.z - p3TransformedPivot.z) * fInvRadius + 0.3f;
 			c3.interpolate(c3a,c3b,f);
@@ -245,10 +250,10 @@ public class RotateTool extends JPatchTool {
 		}
 		p3a.set(-fRadius, 0, 0);
 		m.transform(p3a);
-		p3a.add(p3Pivot);
+		p3a.add(selection.getPivot());
 		p3b.set(fRadius, 0, 0);
 		m.transform(p3b);
-		p3b.add(p3Pivot);
+		p3b.add(selection.getPivot());
 		m4View.transform(p3a);
 		m4View.transform(p3b);
 		
@@ -275,13 +280,13 @@ public class RotateTool extends JPatchTool {
 		//drawable.setColor(settings.cY);
 		p3a.set(fRadius * COS[SUBDIV - 1], 0, fRadius * SIN[SUBDIV - 1]);
 		m.transform(p3a);
-		p3a.add(p3Pivot);
+		p3a.add(selection.getPivot());
 		m4View.transform(p3a);
 		c3a.set(settings.colors.yAxis);
 		for (int s = 0; s < SUBDIV; s++) {
 			p3b.set(fRadius * COS[s], 0, fRadius * SIN[s]);
 			m.transform(p3b);
-			p3b.add(p3Pivot);
+			p3b.add(selection.getPivot());
 			m4View.transform(p3b);
 			//if (p3a.z < p3TransformedPivot.z) {
 			//	drawable.setColor(settings.cY);
@@ -298,10 +303,10 @@ public class RotateTool extends JPatchTool {
 		}
 		p3a.set(0, -fRadius, 0);
 		m.transform(p3a);
-		p3a.add(p3Pivot);
+		p3a.add(selection.getPivot());
 		p3b.set(0, fRadius, 0);
 		m.transform(p3b);
-		p3b.add(p3Pivot);
+		p3b.add(selection.getPivot());
 		m4View.transform(p3a);
 		m4View.transform(p3b);
 		
@@ -329,13 +334,13 @@ public class RotateTool extends JPatchTool {
 		//drawable.setColor(settings.cZ);
 		p3a.set(fRadius * COS[SUBDIV - 1],fRadius * SIN[SUBDIV - 1], 0);
 		m.transform(p3a);
-		p3a.add(p3Pivot);
+		p3a.add(selection.getPivot());
 		m4View.transform(p3a);
 		c3a.set(settings.colors.zAxis);
 		for (int s = 0; s < SUBDIV; s++) {
 			p3b.set(fRadius * COS[s], fRadius * SIN[s], 0);
 			m.transform(p3b);
-			p3b.add(p3Pivot);
+			p3b.add(selection.getPivot());
 			m4View.transform(p3b);
 			//if (p3a.z < p3TransformedPivot.z) {
 			//	drawable.setColor(settings.cZ);
@@ -352,10 +357,10 @@ public class RotateTool extends JPatchTool {
 		}
 		p3a.set(0, 0, -fRadius);
 		m.transform(p3a);
-		p3a.add(p3Pivot);
+		p3a.add(selection.getPivot());
 		p3b.set(0, 0, fRadius);
 		m.transform(p3b);
-		p3b.add(p3Pivot);
+		p3b.add(selection.getPivot());
 		m4View.transform(p3a);
 		m4View.transform(p3b);
 		
@@ -387,13 +392,13 @@ public class RotateTool extends JPatchTool {
 		m4View.get(m3);
 		m3.invert();
 		m3.transform(p3a);
-		p3a.add(p3Pivot);
+		p3a.add(selection.getPivot());
 		m4View.transform(p3a);
 		for (int s = 0; s < SUBDIV; s++) {
 			p3b.set(fRadius * COS[s] * 1.0f, fRadius * SIN[s] * 1.0f, 0);
 			//m3RotA.transform(p3b);
 			m3.transform(p3b);
-			p3b.add(p3Pivot);
+			p3b.add(selection.getPivot());
 			m4View.transform(p3b);
 			drawable.drawLine(p3a, p3b);
 			//else zBufferRenderer.draw3DLine(p3a, p3b, settings.iSelection);
@@ -441,11 +446,11 @@ public class RotateTool extends JPatchTool {
 			}
 			if (activeHandle != null && mouseEvent.getClickCount() == 2 && !bChange) {
 				if (activeHandle == pivotHandle) {
-//					p3OldPivot.set(p3Pivot);
+//					p3OldPivot.set(selection.getPivot());
 //					selection.setPivot(selection.getCenter());
-//					p3Pivot.set(selection.getPivot());
+//					selection.getPivot().set(selection.getPivot());
 					MainFrame.getInstance().getUndoManager().addEdit(new AtomicModifySelection.Pivot(selection, selection.getCenter(), true));
-					p3Pivot.set(selection.getPivot());
+					selection.getPivot().set(selection.getPivot());
 					setRadius();
 				} else {
 					//Matrix3f m3Dummy = new Matrix3f(m3RotA);
@@ -455,6 +460,7 @@ public class RotateTool extends JPatchTool {
 					//m3Rotation.setIdentity();
 					Matrix3f mi = new Matrix3f();
 					mi.setIdentity();
+					System.out.println("resetting coordinate system");
 					MainFrame.getInstance().getUndoManager().addEdit(new AtomicModifySelection.Orientation(selection,mi));
 				}
 			}
@@ -470,7 +476,7 @@ public class RotateTool extends JPatchTool {
 				repaint = true;
 				if (activeHandle == pivotHandle) {
 					iState = PIVOT;
-					p3OldPivot.set(p3Pivot);
+					p3OldPivot.set(selection.getPivot());
 				} else {
 					iState = ROTATE;
 					beginTransform();
@@ -478,7 +484,7 @@ public class RotateTool extends JPatchTool {
 					edit.addEdit(new AtomicMoveControlPoints(selection.getControlPointArray()));
 				}
 			} else {
-				Point3f p3 = new Point3f(p3Pivot);
+				Point3f p3 = new Point3f(selection.getPivot());
 				m4View.transform(p3);
 				float r = m4View.getScale() * getRadius(m4View.getScale());
 				//System.out.println(p3 + " " + x + " " + y + " " + r);
@@ -606,7 +612,9 @@ public class RotateTool extends JPatchTool {
 
 	
 	public void reset() {
-		m3InitialRotation.setIdentity();
+		Matrix3f m3 = new Matrix3f();
+		m3.setIdentity();
+		selection.setOrientation(m3);
 		aaRotation.angle = 0;
 		setPassive();
 		//MainFrame.getInstance().getJPatchScreen().update_all();
@@ -614,8 +622,8 @@ public class RotateTool extends JPatchTool {
 	
 	public void reInit(Selection selection) {
 		this.selection = selection;
-		m3InitialRotation = selection.getOrientation();
-		p3Pivot = selection.getPivot();
+		m3InitialRotation.set(selection.getOrientation());
+//		selection.getPivot() = selection.getPivot();
 		aaRotation.angle = 0;
 //		acp = selection.getControlPointArray();
 //		ap3 = new Point3f[acp.length];
@@ -647,6 +655,8 @@ public class RotateTool extends JPatchTool {
 			mask = Selection.CONTROLPOINTS | Selection.MORPHS | Selection.BONES;
 		selection.arm(mask);
 		selection.beginTransform();
+		m3InitialRotation.set(selection.getOrientation());
+		isTransforming = true;
 	}
 	
 	protected void endTransform() {
@@ -664,18 +674,21 @@ public class RotateTool extends JPatchTool {
 		Matrix3f rotation = new Matrix3f();
 		rotation.set(aaRotation);
 		rotation.mul(m3InitialRotation);
+//		selection.setOrientation(m3InitialRotation);
 		edit.addEdit(new AtomicModifySelection.Orientation(selection, rotation));
 		m3InitialRotation.set(rotation);
 		aaRotation.angle = 0;
 //		MainFrame.getInstance().getUndoManager().addEdit(edit);
+		isTransforming = false;
 	}
 	
 	public void rotate() {
 //		Point3f point = new Point3f();
-//		Vector3f cv = new Vector3f(p3Pivot);
+//		Vector3f cv = new Vector3f(selection.getPivot());
 //		Quat4f q = new Quat4f();
 //		q.set(m3Rotation);
-		selection.rotate(aaRotation, p3Pivot);
+		System.out.println(aaRotation);
+		selection.rotate(aaRotation, selection.getPivot());
 		
 //		for (int p = 0; p < acp.length; p++) {
 //			ControlPoint cp = acp[p];
