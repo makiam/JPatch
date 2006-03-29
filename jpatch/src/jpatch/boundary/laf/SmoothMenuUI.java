@@ -12,6 +12,8 @@ public class SmoothMenuUI extends BasicMenuUI {
 
     public void paint(Graphics g, JComponent c) {
         SmoothUtilities.configureGraphics(g);
-        super.paint(g, c);
+        paintMenuItem(g, c, checkIcon, arrowIcon,
+                selectionBackground, selectionForeground,
+                1);
     }
 }
