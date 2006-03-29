@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.26 2006/03/28 19:47:52 sascha_l Exp $
+ * $Id: Command.java,v 1.27 2006/03/29 13:57:45 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -25,6 +25,8 @@ package jpatch.boundary.action;
  * @author sascha
  */
 
+
+import de.javasoft.plaf.synthetica.*;
 
 import java.awt.event.*;
 import java.util.*;
@@ -111,11 +113,15 @@ public final class Command {
 	}
 	
 	public Command() {
-		LookAndFeel jpatch = null, crossplatform = null, system = null;
+		LookAndFeel jpatch = null, crossplatform = null, system = null, synthetica = null;
 		try {
 			jpatch = new SmoothLookAndFeel();
 			crossplatform = (LookAndFeel) Class.forName(UIManager.getCrossPlatformLookAndFeelClassName()).newInstance();
 			system = (LookAndFeel) Class.forName(UIManager.getSystemLookAndFeelClassName()).newInstance();
+			SyntheticaLookAndFeel.setAntiAliasEnabled(true);
+			SyntheticaLookAndFeel.setWindowsDecorated(false);
+			
+			synthetica = new SyntheticaStandardLookAndFeel();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -194,11 +200,12 @@ public final class Command {
 		put("quit",						new QuitAction(),					new JMenuItem());
 		
 		// Options
-		put("synchronize viewports", 		new SyncScreensAction(),								new JCheckBoxMenuItem());
-		put("settings", 					new EditSettingsAction(),								new JMenuItem());
-		put("grid spacing settings", 		new SetGridSpacingAction(),								new JMenuItem());
-		put("install jogl", 				new InstallJoglAction(),								new JMenuItem());
-		put("jpatch lookandfeel",			new SwitchLookAndFeelAction("JPatch", jpatch), 			new JRadioButtonMenuItem());
+		put("synchronize viewports", 		new SyncScreensAction(),		new JCheckBoxMenuItem());
+		put("settings", 					new EditSettingsAction(),			new JMenuItem());
+		put("grid spacing settings", 		new SetGridSpacingAction(),		new JMenuItem());
+		put("install jogl", 				new InstallJoglAction(),		new JMenuItem());
+		put("synthetica lookandfeel",			new SwitchLookAndFeelAction("Synthetica", synthetica), 			new JRadioButtonMenuItem());
+
 		put("crossplatform lookandfeel",	new SwitchLookAndFeelAction("Metal", crossplatform),	new JRadioButtonMenuItem());
 		put("system lookandfeel",			new SwitchLookAndFeelAction("System", system),			new JRadioButtonMenuItem());
 		put("phoneme morph mapping", 		new EditPhonemesAction(),								new JMenuItem());
@@ -319,7 +326,7 @@ public final class Command {
 		else if (laf.equals(UIManager.getSystemLookAndFeelClassName()))
 			i = 2;
 		createGroup(new String[] {
-				"jpatch lookandfeel",
+				"synthetica lookandfeel",
 				"crossplatform lookandfeel",
 				"system lookandfeel"
 		}, i);

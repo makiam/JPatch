@@ -28,7 +28,7 @@ public class TimelineEditor extends JScrollPane {
 	private Cursor currentCursor = defaultCursor;
 	
 	public static Color SELECTED_BACKGROUND = new Color(192, 192, 255);
-	public static Color BACKGROUND = UIManager.getColor("ScrollPane.background");
+	public static Color BACKGROUND = UIManager.getColor("Panel.background");
 	public static Color SHADOW = derivedColor(BACKGROUND, -96, -96, -96);
 	public static Color LIGHT_SHADOW = derivedColor(BACKGROUND, -48, -48, -48);
 	public static Color HIGHLIGHT = Color.WHITE;
