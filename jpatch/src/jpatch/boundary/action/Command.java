@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.27 2006/03/29 13:57:45 sascha_l Exp $
+ * $Id: Command.java,v 1.28 2006/03/29 20:42:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -25,9 +25,9 @@ package jpatch.boundary.action;
  * @author sascha
  */
 
-
-import de.javasoft.plaf.synthetica.*;
-
+import java.awt.CheckboxMenuItem;
+import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
@@ -67,15 +67,39 @@ public final class Command {
 			toolTipText = command;
 		KeyStroke keyStroke = INSTANCE.commandKeyMap.get(command);
 		if (keyStroke != null) {
-			String key = keyStroke.toString().replaceAll("(typed|pressed|released)", "");
-			toolTipText = toolTipText + " [" + key + "]";
+			String acceleratorText = "";
+	        if (keyStroke != null) {
+	        	String ks = keyStroke.toString();
+	        	ks = ks.replaceAll("(typed|released|pressed)", "").trim();
+	        	if (ks.matches("[A-Z]"))
+	        		ks = "shift " + ks;
+	        	else if (ks.matches("[a-z]"))
+	        		ks = ks.toUpperCase();
+	        	KeyStroke accelerator = KeyStroke.getKeyStroke(ks);
+	        	
+	            int modifiers = accelerator.getModifiers();
+	            if (modifiers > 0) {
+	                acceleratorText = KeyEvent.getKeyModifiersText(modifiers);
+	                acceleratorText += "-";
+//	                acceleratorText += acceleratorDelimiter;
+	            }
+
+	            int keyCode = accelerator.getKeyCode();
+	            if (keyCode != 0) {
+	                acceleratorText += KeyEvent.getKeyText(keyCode);
+	            } else {
+	                acceleratorText += accelerator.getKeyChar();
+	            }
+	        }
+	        toolTipText = "<html>&nbsp;" + toolTipText + "&nbsp;&nbsp;&nbsp;<font color='gray'>" + acceleratorText + "</font>&nbsp;</html>";
+			
 		}
 		newButton.setToolTipText(toolTipText);
 		return newButton;
 	}
 	
 	public static JMenuItem getMenuItemFor(String command) {
-		JMenuItem menuItem = (JMenuItem) INSTANCE.commandMenuItemMap.get(command);
+		JMenuItem menuItem = INSTANCE.commandMenuItemMap.get(command);
 		JMenuItem newItem;
 		if (menuItem instanceof JRadioButtonMenuItem)
 			newItem = new JRadioButtonMenuItem();//menuItem.getAction());
@@ -86,8 +110,16 @@ public final class Command {
 		String itemText = menuItem.getText();
 		KeyStroke keyStroke = INSTANCE.commandKeyMap.get(command);
 		if (keyStroke != null) {
-			String key = keyStroke.toString().replaceAll("(typed|pressed|released)", "");
-			itemText = itemText + " [" + key + "]";
+			//String key = keyStroke.toString().replaceAll("(typed|pressed|released)", "");
+			//itemText = itemText + " [" + key + "]";
+			String ks = keyStroke.toString();
+        	ks = ks.replaceAll("(typed|released|pressed)", "").trim();
+        	if (ks.matches("[A-Z]"))
+        		ks = "shift " + ks;
+        	else if (ks.matches("[a-z]"))
+        		ks = ks.toUpperCase();
+        	KeyStroke accelerator = KeyStroke.getKeyStroke(ks);
+			newItem.setAccelerator(accelerator);
 		}
 		newItem.setText(itemText);
 		newItem.setIcon(menuItem.getIcon());
@@ -113,15 +145,11 @@ public final class Command {
 	}
 	
 	public Command() {
-		LookAndFeel jpatch = null, crossplatform = null, system = null, synthetica = null;
+		LookAndFeel jpatch = null, crossplatform = null, system = null;
 		try {
 			jpatch = new SmoothLookAndFeel();
 			crossplatform = (LookAndFeel) Class.forName(UIManager.getCrossPlatformLookAndFeelClassName()).newInstance();
 			system = (LookAndFeel) Class.forName(UIManager.getSystemLookAndFeelClassName()).newInstance();
-			SyntheticaLookAndFeel.setAntiAliasEnabled(true);
-			SyntheticaLookAndFeel.setWindowsDecorated(false);
-			
-			synthetica = new SyntheticaStandardLookAndFeel();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -204,8 +232,7 @@ public final class Command {
 		put("settings", 					new EditSettingsAction(),			new JMenuItem());
 		put("grid spacing settings", 		new SetGridSpacingAction(),		new JMenuItem());
 		put("install jogl", 				new InstallJoglAction(),		new JMenuItem());
-		put("synthetica lookandfeel",			new SwitchLookAndFeelAction("Synthetica", synthetica), 			new JRadioButtonMenuItem());
-
+		put("jpatch lookandfeel",			new SwitchLookAndFeelAction("JPatch", jpatch), 			new JRadioButtonMenuItem());
 		put("crossplatform lookandfeel",	new SwitchLookAndFeelAction("Metal", crossplatform),	new JRadioButtonMenuItem());
 		put("system lookandfeel",			new SwitchLookAndFeelAction("System", system),			new JRadioButtonMenuItem());
 		put("phoneme morph mapping", 		new EditPhonemesAction(),								new JMenuItem());
@@ -326,7 +353,7 @@ public final class Command {
 		else if (laf.equals(UIManager.getSystemLookAndFeelClassName()))
 			i = 2;
 		createGroup(new String[] {
-				"synthetica lookandfeel",
+				"jpatch lookandfeel",
 				"crossplatform lookandfeel",
 				"system lookandfeel"
 		}, i);
@@ -448,6 +475,25 @@ public final class Command {
 		}
 		if (menuItem != null) {
 			menuItem.setAction(action);
+			if (menuItem.getIcon() == null && !(menuItem instanceof JCheckBoxMenuItem) && !(menuItem instanceof JRadioButtonMenuItem))
+			menuItem.setIcon(new Icon() {
+
+				public void paintIcon(Component c, Graphics g, int x, int y) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				public int getIconWidth() {
+					// TODO Auto-generated method stub
+					return 15;
+				}
+
+				public int getIconHeight() {
+					// TODO Auto-generated method stub
+					return 1;
+				}
+				
+			});
 			commandMenuItemMap.put(command, menuItem);
 			menuItem.setText((String) action.getValue(Action.SHORT_DESCRIPTION));
 			if (menuItem.getText() == null)
@@ -463,7 +509,10 @@ public final class Command {
 	
 	public void setKeyBinding(String key, String command) {
 		keyCommandMap.put(KeyStroke.getKeyStroke(key), command);
-//		commandKeyMap.put(command, key);
+		commandKeyMap.put(command, KeyStroke.getKeyStroke(key));
+//		JMenuItem mi = INSTANCE.commandMenuItemMap.get(command);
+//		if (mi != null)
+//			mi.setText(mi.getText() + "\t" + key);
 	}
 	
 	private void createGroup(String[] commands, int selectedIndex) {

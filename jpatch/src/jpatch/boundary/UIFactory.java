@@ -1,5 +1,5 @@
 /*
- * $Id: UIFactory.java,v 1.10 2006/03/29 13:57:45 sascha_l Exp $
+ * $Id: UIFactory.java,v 1.11 2006/03/29 20:42:19 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -112,10 +112,10 @@ public class UIFactory extends DefaultHandler {
 	}
 	
 	public void startElement(String namespaceURI, String localName, String qName, Attributes attributes) {	
-		System.out.print("<" + localName);
-		for (int i = 0; i < attributes.getLength(); i++)
-			System.out.print(" " + attributes.getLocalName(i) + "=\"" + attributes.getValue(i) + "\"");
-		System.out.println(">");
+//		System.out.print("<" + localName);
+//		for (int i = 0; i < attributes.getLength(); i++)
+//			System.out.print(" " + attributes.getLocalName(i) + "=\"" + attributes.getValue(i) + "\"");
+//		System.out.println(">");
 		if (localName.equals("toolbar")) {
 			toolBar = new JToolBar();
 			toolBar.setFloatable(false);
@@ -163,8 +163,9 @@ public class UIFactory extends DefaultHandler {
 				if (attributes.getLocalName(i).equals("name")) {
 					if (getMenu() != null) {
 						JMenu menu = new JMenu(attributes.getValue(i));
-//						if (listMenu.size() > 1)
-//							menu.setIcon(emptyIcon);
+//						System.out.println(((JMenu) getMenu()).getText() + " " + menu.getText());
+						if (!(getMenu() instanceof JMenuBar))
+							menu.setIcon(emptyIcon);
 						getMenu().add(menu);
 						listMenu.add(menu);
 						if (attributes.getValue(i).toLowerCase().equals("view"))
