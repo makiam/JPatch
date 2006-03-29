@@ -91,7 +91,7 @@
 			<item command="grid spacing settings"/>
 			<item command="install jogl"/>
 			<menu name="Look and feel">
-				<item command="jpatch lookandfeel"/>
+				<item command="synthetica lookandfeel"/>
 				<item command="crossplatform lookandfeel"/>
 				<item command="system lookandfeel"/>
 			</menu>
