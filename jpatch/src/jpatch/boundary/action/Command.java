@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.28 2006/03/29 20:42:20 sascha_l Exp $
+ * $Id: Command.java,v 1.29 2006/04/03 15:55:31 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -53,6 +53,8 @@ public final class Command {
 	
 	public static AbstractButton getButtonFor(String command) {
 		AbstractButton button = (AbstractButton) INSTANCE.commandButtonMap.get(command);
+		if (true)
+			return button;
 		AbstractButton newButton;
 		if (button instanceof JPatchToggleButton)
 			newButton = new JPatchToggleButton();//button.getAction());
@@ -174,9 +176,9 @@ public final class Command {
 		put("horizontally split view",	new ViewSplitHorizontalAction(),new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("vertically split view",	new ViewSplitVerticalAction(), 	new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("quad view",				new ViewQuadAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
-		put("rotate view",				new ViewRotateAction(), 		new JRadioButtonMenuItem(),	new JPatchToggleButton());
-		put("move view",				new ViewMoveAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
-		put("zoom view",				new ViewZoomAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
+		put("rotate view",				new ViewRotateAction(), 		new JRadioButtonMenuItem(),	new LockingToggleButton());
+		put("move view",				new ViewMoveAction(), 			new JRadioButtonMenuItem(),	new LockingToggleButton());
+		put("zoom view",				new ViewZoomAction(), 			new JRadioButtonMenuItem(),	new LockingToggleButton());
 		put("zoom to fit",				new ZoomToFitAction(), 			new JMenuItem(),			new JPatchButton());
 		put("undo",						new UndoAction(), 				new JMenuItem(),			new JPatchButton());
 		put("redo",						new RedoAction(), 				new JMenuItem(),			new JPatchButton());
@@ -195,8 +197,8 @@ public final class Command {
 		 * Edit toolbar buttons
 		 */
 		put("default tool",				new SelectMoveAction(), 		new JRadioButtonMenuItem(),	new JPatchToggleButton());
-		put("add curve segment",		new AddControlPointAction(), 	new JRadioButtonMenuItem(),	new JPatchToggleButton());
-		put("add bone",					new AddBoneAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
+		put("add curve segment",		new AddControlPointAction(), 	new JRadioButtonMenuItem(),	new LockingToggleButton());
+		put("add bone",					new AddBoneAction(), 			new JRadioButtonMenuItem(),	new LockingToggleButton());
 		put("rotate tool",				new RotateAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("weight selection tool",	new WeightSelectionAction(), 	new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("knife tool",				new KnifeAction(),				new JRadioButtonMenuItem(),	new JPatchToggleButton());
@@ -313,10 +315,17 @@ public final class Command {
 		((AbstractButton) commandButtonMap.get("lock points")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/cp_locked.png")));
 		((AbstractButton) commandButtonMap.get("lock bones")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/bone_locked.png")));	
 		
+		((LockingToggleButton) commandButtonMap.get("add curve segment")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
+		((LockingToggleButton) commandButtonMap.get("add bone")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
+		((LockingToggleButton) commandButtonMap.get("move view")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
+		((LockingToggleButton) commandButtonMap.get("zoom view")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
+		((LockingToggleButton) commandButtonMap.get("rotate view")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
+		
 		/*
 		 * ButtonGroups
 		 */
-		createGroup(new String[] {
+		LockingButtonGroup toolButtonGroup = new LockingButtonGroup();
+		addToButtonGroup(toolButtonGroup, new String[] {
 				"default tool",
 				"add curve segment",
 				"add bone",
@@ -328,15 +337,16 @@ public final class Command {
 				"zoom view",
 				"knife tool"
 		}, 0);
+		toolButtonGroup.setDefaultButton(commandButtonMap.get("default tool"));
 		
-		createGroup(new String[] {
+		addToButtonGroup(new ButtonGroup(), new String[] {
 				"single view",
 				"horizontally split view",
 				"vertically split view",
 				"quad view"
 		}, Settings.getInstance().viewports.viewportMode.ordinal());
 		
-		createGroup(new String[] {
+		addToButtonGroup(new ButtonGroup(), new String[] {
 				"front view",
 				"rear view",
 				"top view",
@@ -352,7 +362,7 @@ public final class Command {
 			i = 1;
 		else if (laf.equals(UIManager.getSystemLookAndFeelClassName()))
 			i = 2;
-		createGroup(new String[] {
+		addToButtonGroup(new ButtonGroup(), new String[] {
 				"jpatch lookandfeel",
 				"crossplatform lookandfeel",
 				"system lookandfeel"
@@ -470,7 +480,8 @@ public final class Command {
 //			button.setAction(action);
 //			button.setText((String) action.getValue(Action.SHORT_DESCRIPTION));
 			button.setIcon((Icon) action.getValue(Action.SMALL_ICON));
-			button.setModel(menuItem.getModel());
+//			button.setModel(menuItem.getModel());
+			menuItem.setModel(button.getModel());
 			commandButtonMap.put(command, button);
 		}
 		if (menuItem != null) {
@@ -515,13 +526,12 @@ public final class Command {
 //			mi.setText(mi.getText() + "\t" + key);
 	}
 	
-	private void createGroup(String[] commands, int selectedIndex) {
-		ButtonGroup items = new ButtonGroup();
+	private void addToButtonGroup(ButtonGroup bg, String[] commands, int selectedIndex) {
 		for (int i = 0; i < commands.length; i++) {
 			checkCommand(commands[i]);
-			items.add((JMenuItem) commandMenuItemMap.get(commands[i]));
+			bg.add((JMenuItem) commandMenuItemMap.get(commands[i]));
 		}
-		items.setSelected(((JMenuItem) commandMenuItemMap.get(commands[selectedIndex])).getModel(), true);
+		bg.setSelected(((JMenuItem) commandMenuItemMap.get(commands[selectedIndex])).getModel(), true);
 	}
 	
 	private void checkCommand(String command) {

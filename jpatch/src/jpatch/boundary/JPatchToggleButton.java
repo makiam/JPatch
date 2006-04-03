@@ -25,7 +25,7 @@ implements MouseListener, ItemListener {
 	}
 	
 	private void init() {
-		setFocusable(false);
+//		setFocusable(false);
 		setMargin(insets);
 		//setOpaque(false);
 //		setBorderPainted(false);
