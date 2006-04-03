@@ -426,6 +426,8 @@ public final class JPatchScreen extends JPanel {
 		update_all();
 		if (tool instanceof DefaultTool)
 			Command.getMenuItemFor("default tool").setSelected(true);
+		if (tool instanceof RotateTool)
+			Command.getMenuItemFor("rotate tool").setSelected(true);
 	}
 	
 	public JPatchTool getTool() {
