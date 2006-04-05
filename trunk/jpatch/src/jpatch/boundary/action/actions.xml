@@ -44,6 +44,7 @@
 	<action name="open" model="default">
 		<constructor>new ImportJPatchAction()</constructor>
 		<property key="MenuText" value="Open"/>
+		<property key="Mnemonic" value="o"/>
 		<property key="ToolTipText" value="Open"/>
 		<property key="Icon" value="jpatch/images/open.png"/>
 	</action>

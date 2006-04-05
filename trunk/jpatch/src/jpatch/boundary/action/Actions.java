@@ -132,7 +132,7 @@ public class Actions extends DefaultHandler {
 					actionDescriptor.menuItem = new JRadioButtonMenuItem();
 			}
 			else if (actionDescriptor.buttonModel instanceof DefaultButtonModel)
-				actionDescriptor.menuItem = new JMenuItem();
+				actionDescriptor.menuItem = new JPatchMenuItem();
 			actionDescriptor.menuItem.setModel(actionDescriptor.buttonModel);
 			actionDescriptor.menuItem.setAction(actionDescriptor.action);
 		}
