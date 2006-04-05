@@ -104,7 +104,7 @@
 	<sidebar position="east"/>
 	
 	<menu name="menubar">
-		<menu name="File">
+		<menu name="File" mnemonic="f">
 			<item command="new model"/>
 			<item command="new animation"/>
 			<item command="open"/>
@@ -113,11 +113,11 @@
 			<item command="save"/>
 			<item command="save as"/>
 			<separator/>
-			<menu name="Import">
+			<menu name="Import" mnemonic="i">
 				<item command="import spatch"/>
 				<item command="import animationmaster"/>
 			</menu>
-			<menu name="Export">
+			<menu name="Export" mnemonic="e">
 				<item command="export aliaswavefront"/>
 				<item command="export povray"/>
 				<item command="export renderman"/>
@@ -125,26 +125,26 @@
 			<separator/>
 			<item command="quit"/>
 		</menu>
-		<menu name="Options">
+		<menu name="Options" mnemonic="o">
 			<item command="synchronize viewports"/>
 			<item command="settings"/>
 			<item command="grid spacing settings"/>
 			<item command="install jogl"/>
-			<menu name="Look and feel">
+			<menu name="Look and feel" mnemonic="l">
 				<item command="jpatch lookandfeel"/>
 				<item command="crossplatform lookandfeel"/>
 				<item command="system lookandfeel"/>
 			</menu>
 			<item command="phoneme morph mapping"/>
 		</menu>
-		<menu name="Debug">
+		<menu name="Debug" mnemonic="d">
 			<item command="dump"/>
 			<item command="dump xml"/>
 			<item command="dump undo stack"/>
 			<item command="check model"/>
 			<item command="controlpoint browser"/>
 		</menu>
-		<menu name="Help">
+		<menu name="Help" mnemonic="h">
 			<item command="show about"/>
 			<item command="show splashscreen"/>
 		</menu>

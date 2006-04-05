@@ -2,6 +2,7 @@ package jpatch.boundary.laf;
 
 import javax.swing.plaf.*;
 import javax.swing.plaf.basic.*;
+
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 
@@ -67,6 +68,36 @@ public class SmoothButtonUI extends BasicButtonUI {
 //        g.drawRect(0, 0, button.getWidth(), button.getHeight());
         super.paint(g, c);
     }
+    
+    protected void paintFocus(Graphics g, AbstractButton b,
+			Rectangle viewRect, Rectangle textRect, Rectangle iconRect){
+		
+		Rectangle focusRect = new Rectangle();
+		String text = b.getText();
+		boolean isIcon = b.getIcon() != null;
+		
+		// If there is text
+		if ( text != null && !text.equals( "" ) ) {
+			if ( !isIcon ) {
+				focusRect.setBounds( textRect );
+			}
+			else {
+				focusRect.setBounds( iconRect.union( textRect ) );
+			}
+		}
+		// If there is an icon and no text
+		else if ( isIcon ) {
+			focusRect.setBounds( iconRect );
+		}
+		
+		g.setColor(Color.BLACK);
+		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+		BasicStroke basicStroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, new float[] { 1 }, 0.5f);
+		((Graphics2D) g).setStroke(basicStroke);
+		g.drawRect((focusRect.x-2), (focusRect.y-2),
+				focusRect.width+3, focusRect.height+3);
+		
+	}
     
     // DefaultButtonModel
 }

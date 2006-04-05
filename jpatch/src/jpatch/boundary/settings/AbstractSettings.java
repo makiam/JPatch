@@ -1,5 +1,5 @@
 /*
- * $Id: AbstractSettings.java,v 1.4 2006/03/25 23:22:45 sascha_l Exp $
+ * $Id: AbstractSettings.java,v 1.5 2006/04/05 15:29:10 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -137,7 +137,7 @@ public abstract class AbstractSettings implements TreeNode {
 //			label.setText(getText());
 //			label.setFont(getFont())
 			if (column == 0) {
-				setFocusable(false);
+//				setFocusable(false);
 //				setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
 //				setText(getText() + ": ");
 			} else {

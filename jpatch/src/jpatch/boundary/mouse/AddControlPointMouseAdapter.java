@@ -219,10 +219,10 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 	private void setIdleState() {
 		if (iState == ACTIVE) {
 			iState = IDLE;
-			if (!((LockingToggleButton) Command.getInstance().getButtonFor("add curve segment")).isLocked()) {
-				compSource.removeMouseMotionListener(this);
-				edit.addEdit(new AtomicChangeTool(new DefaultTool()));
-			}
+//			if (!((LockingToggleButton) Command.getInstance().getButtonFor("add curve segment")).isLocked()) {
+//				compSource.removeMouseMotionListener(this);
+//				edit.addEdit(new AtomicChangeTool(new DefaultTool()));
+//			}
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
 //			if (!((LockingToggleButton) Command.getInstance().getButtonFor("add curve segment")).isLocked())
 //				Command.getInstance().getButtonFor("default tool").doClick();

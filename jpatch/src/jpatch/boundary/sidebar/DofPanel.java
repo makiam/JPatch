@@ -11,6 +11,7 @@ import jpatch.boundary.*;
 import jpatch.boundary.action.*;
 import jpatch.control.edit.*;
 import jpatch.entity.*;
+import jpatch.boundary.ui.*;
 
 public class DofPanel extends SidePanel
 implements ChangeListener, ActionListener, Morph.MorphListener {
@@ -71,7 +72,7 @@ implements ChangeListener, ActionListener, Morph.MorphListener {
 //		detailPanel.add(inputName);
 		
 		slider = new JSlider(JSlider.HORIZONTAL,0,100,dof.getSliderValue());
-		slider.setFocusable(false);
+//		slider.setFocusable(false);
 //		detailPanel.add(slider);
 		detailPanel.repaint();
 		inputName.addChangeListener(this);

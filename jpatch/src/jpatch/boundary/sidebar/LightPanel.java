@@ -6,6 +6,7 @@ import javax.swing.tree.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
 import jpatch.boundary.action.*;
+import jpatch.boundary.ui.*;
 
 public class LightPanel extends SidePanel
 implements ChangeListener {

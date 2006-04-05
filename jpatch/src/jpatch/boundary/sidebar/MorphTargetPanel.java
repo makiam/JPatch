@@ -6,6 +6,7 @@ import javax.swing.tree.*;
 import jpatch.boundary.action.*;
 import jpatch.boundary.*;
 import jpatch.entity.*;
+import jpatch.boundary.ui.*;
 
 public class MorphTargetPanel extends SidePanel
 implements ChangeListener {

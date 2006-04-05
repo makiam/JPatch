@@ -7,6 +7,7 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Quat4f;
 
 import jpatch.boundary.*;
+import jpatch.boundary.action.*;
 import jpatch.boundary.tools.*;
 import jpatch.control.edit.*;
 import jpatch.entity.*;
@@ -70,7 +71,8 @@ public class ChangeViewMouseListener extends MouseAdapter {
 		if (mouseEvent.getButton() == iButton) {
 			((Component)mouseEvent.getSource()).removeMouseMotionListener(mouseMotionListener);
 //			MainFrame.getInstance().getDefaultToolTimer().restart();
-			MainFrame.getInstance().getJPatchScreen().setTool(new DefaultTool());
+//			MainFrame.getInstance().getJPatchScreen().setTool(new DefaultTool());
+			((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone();
 			ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 			if (viewDef.getCamera() != null) {
 				System.out.println("*");

@@ -56,7 +56,7 @@ public class MotionCurveEditor extends BorderContainer {
 	private static JToggleButton createToggleButton(Action action, ButtonGroup bg) {
 		JToggleButton button = new JToggleButton(action);
 		button.setPreferredSize(new Dimension(27, 19));
-		button.setFocusable(false);
+//		button.setFocusable(false);
 		bg.add(button);
 		return button;
 	}
@@ -64,7 +64,7 @@ public class MotionCurveEditor extends BorderContainer {
 	private static JButton createButton(Action action) {
 		JButton button = new JButton(action);
 		button.setPreferredSize(new Dimension(27, 19));
-		button.setFocusable(false);
+//		button.setFocusable(false);
 		return button;
 	}
 	

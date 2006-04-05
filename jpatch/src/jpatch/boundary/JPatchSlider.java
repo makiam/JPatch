@@ -65,7 +65,7 @@ implements ChangeListener, ActionListener, FocusListener {
 		
 		label = new JLabel(strLabel);
 		slider = new JSlider(0,SLIDER);
-		slider.setFocusable(false);
+//		slider.setFocusable(false);
 		textField = new JTextField();
 		
 		springLayout.putConstraint(SpringLayout.WEST,label,0,SpringLayout.WEST,this);

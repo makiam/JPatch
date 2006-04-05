@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.29 2006/04/03 15:55:31 sascha_l Exp $
+ * $Id: Command.java,v 1.30 2006/04/05 15:29:10 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -35,6 +35,8 @@ import javax.swing.*;
 import jpatch.boundary.*;
 import jpatch.boundary.laf.*;
 import jpatch.boundary.settings.*;
+import jpatch.boundary.ui.*;
+
 
 public final class Command {
 //	private static final boolean DEBUG = false;
@@ -47,11 +49,11 @@ public final class Command {
 	private Map<KeyStroke, String> keyCommandMap = new HashMap<KeyStroke, String>();
 //	private ActionMap actionMap = new ActionMap();
 	
-	public static Command getInstance() {
+	private static Command getInstance() {
 		return INSTANCE;
 	}
 	
-	public static AbstractButton getButtonFor(String command) {
+	private static AbstractButton getButtonFor(String command) {
 		AbstractButton button = (AbstractButton) INSTANCE.commandButtonMap.get(command);
 		if (true)
 			return button;
@@ -100,7 +102,7 @@ public final class Command {
 		return newButton;
 	}
 	
-	public static JMenuItem getMenuItemFor(String command) {
+	private static JMenuItem getMenuItemFor(String command) {
 		JMenuItem menuItem = INSTANCE.commandMenuItemMap.get(command);
 		JMenuItem newItem;
 		if (menuItem instanceof JRadioButtonMenuItem)
@@ -130,11 +132,11 @@ public final class Command {
 //		return (JMenuItem) INSTANCE.commandMenuItemMap.get(command);
 	}
 	
-	public static Action getActionFor(String command) {
+	private static Action getActionFor(String command) {
 		return (Action) INSTANCE.commandActionMap.get(command);
 	}
 	
-	public static void setViewDefinition(ViewDefinition viewDef) {
+	private static void setViewDefinition(ViewDefinition viewDef) {
 //		((JMenuItem) INSTANCE.commandMenuItemMap.get(viewDef.getViewName())).setSelected(true);
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("show points")).setSelected(viewDef.renderPoints());
 		((JMenuItem) INSTANCE.commandMenuItemMap.get("show curves")).setSelected(viewDef.renderCurves());
@@ -146,7 +148,7 @@ public final class Command {
 		INSTANCE.enableCommand("clear rotoscope image", MainFrame.getInstance().getModel() != null && MainFrame.getInstance().getModel().getRotoscope(viewDef.getView()) != null);
 	}
 	
-	public Command() {
+	private Command() {
 		LookAndFeel jpatch = null, crossplatform = null, system = null;
 		try {
 			jpatch = new SmoothLookAndFeel();
@@ -234,9 +236,9 @@ public final class Command {
 		put("settings", 					new EditSettingsAction(),			new JMenuItem());
 		put("grid spacing settings", 		new SetGridSpacingAction(),		new JMenuItem());
 		put("install jogl", 				new InstallJoglAction(),		new JMenuItem());
-		put("jpatch lookandfeel",			new SwitchLookAndFeelAction("JPatch", jpatch), 			new JRadioButtonMenuItem());
-		put("crossplatform lookandfeel",	new SwitchLookAndFeelAction("Metal", crossplatform),	new JRadioButtonMenuItem());
-		put("system lookandfeel",			new SwitchLookAndFeelAction("System", system),			new JRadioButtonMenuItem());
+//		put("jpatch lookandfeel",			new SwitchLookAndFeelAction("JPatch", jpatch), 			new JRadioButtonMenuItem());
+//		put("crossplatform lookandfeel",	new SwitchLookAndFeelAction("Metal", crossplatform),	new JRadioButtonMenuItem());
+//		put("system lookandfeel",			new SwitchLookAndFeelAction("System", system),			new JRadioButtonMenuItem());
 		put("phoneme morph mapping", 		new EditPhonemesAction(),								new JMenuItem());
 		
 		// Window
@@ -315,11 +317,11 @@ public final class Command {
 		((AbstractButton) commandButtonMap.get("lock points")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/cp_locked.png")));
 		((AbstractButton) commandButtonMap.get("lock bones")).setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/bone_locked.png")));	
 		
-		((LockingToggleButton) commandButtonMap.get("add curve segment")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
-		((LockingToggleButton) commandButtonMap.get("add bone")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
-		((LockingToggleButton) commandButtonMap.get("move view")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
-		((LockingToggleButton) commandButtonMap.get("zoom view")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
-		((LockingToggleButton) commandButtonMap.get("rotate view")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
+//		((LockingToggleButton) commandButtonMap.get("add curve segment")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
+//		((LockingToggleButton) commandButtonMap.get("add bone")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
+//		((LockingToggleButton) commandButtonMap.get("move view")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
+//		((LockingToggleButton) commandButtonMap.get("zoom view")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
+//		((LockingToggleButton) commandButtonMap.get("rotate view")).createLockedIcons(ImageIconFactory.Position.BOTTOM_RIGHT);
 		
 		/*
 		 * ButtonGroups
@@ -337,7 +339,7 @@ public final class Command {
 				"zoom view",
 				"knife tool"
 		}, 0);
-		toolButtonGroup.setDefaultButton(commandButtonMap.get("default tool"));
+//		toolButtonGroup.setDefaultButton(commandButtonMap.get("default tool"));
 		
 		addToButtonGroup(new ButtonGroup(), new String[] {
 				"single view",
@@ -416,7 +418,7 @@ public final class Command {
 		});
 	}
 	
-	public void executeCommand(String command) {
+	private void executeCommand(String command) {
 		checkCommand(command);
 		AbstractButton button = (AbstractButton) commandButtonMap.get(command);
 		if (button != null) {
@@ -429,17 +431,17 @@ public final class Command {
 		}
 	}
 	
-	public void enableCommand(String command, boolean enable) {
+	private void enableCommand(String command, boolean enable) {
 		checkCommand(command);
 		((Action) commandActionMap.get(command)).setEnabled(enable);
 	}
 	
-	public void enableCommands(String[] commands, boolean enable) {
+	private void enableCommands(String[] commands, boolean enable) {
 		for (int i = 0; i < commands.length; i++)
 			enableCommand(commands[i], enable);
 	}
 	
-	public boolean isCommandEnabled(String command) {
+	private boolean isCommandEnabled(String command) {
 		checkCommand(command);
 		return ((Action) commandActionMap.get(command)).isEnabled();
 	}
@@ -477,7 +479,7 @@ public final class Command {
 	private void put(String command, Action action, JMenuItem menuItem, AbstractButton button) {
 		commandActionMap.put(command, action);
 		if (button != null) {
-//			button.setAction(action);
+			button.setAction(action);
 //			button.setText((String) action.getValue(Action.SHORT_DESCRIPTION));
 			button.setIcon((Icon) action.getValue(Action.SMALL_ICON));
 //			button.setModel(menuItem.getModel());
@@ -518,7 +520,7 @@ public final class Command {
 //		}
 	}
 	
-	public void setKeyBinding(String key, String command) {
+	private void setKeyBinding(String key, String command) {
 		keyCommandMap.put(KeyStroke.getKeyStroke(key), command);
 		commandKeyMap.put(command, KeyStroke.getKeyStroke(key));
 //		JMenuItem mi = INSTANCE.commandMenuItemMap.get(command);
@@ -547,7 +549,7 @@ public final class Command {
 //		return actionMap;
 //	}
 	
-	public void mapKeys(InputMap inputMap, ActionMap actionMap) {
+	private void mapKeys(InputMap inputMap, ActionMap actionMap) {
 		for (KeyStroke keyStroke : keyCommandMap.keySet()) {
 			String command = keyCommandMap.get(keyStroke);
 			inputMap.put(keyStroke, command);

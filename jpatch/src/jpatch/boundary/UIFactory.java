@@ -1,5 +1,5 @@
 /*
- * $Id: UIFactory.java,v 1.11 2006/03/29 20:42:19 sascha_l Exp $
+ * $Id: UIFactory.java,v 1.12 2006/04/05 15:29:10 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -88,16 +88,16 @@ public class UIFactory extends DefaultHandler {
 		if (key.equals("main toolbar")) {
 			switch (Settings.getInstance().viewports.viewportMode) {
 			case SINGLE:
-				Command.getButtonFor("single view").setSelected(true);
+				Actions.getInstance().getButton("single view").setSelected(true);
 				break;
 			case HORIZONTAL_SPLIT:
-				Command.getButtonFor("horizontally split view").setSelected(true);
+				Actions.getInstance().getButton("horizontally split view").setSelected(true);
 				break;
 			case VERTICAL_SPLIT:
-				Command.getButtonFor("vertically split view").setSelected(true);
+				Actions.getInstance().getButton("vertically split view").setSelected(true);
 				break;
 			case QUAD:
-				Command.getButtonFor("quad view").setSelected(true);
+				Actions.getInstance().getButton("quad view").setSelected(true);
 				break;
 			}
 		}
@@ -156,7 +156,7 @@ public class UIFactory extends DefaultHandler {
 		} else if (localName.equals("button")) {
 			for (int i = 0; i < attributes.getLength(); i++) {
 				if (attributes.getLocalName(i).equals("command"))
-					toolBar.add(Command.getButtonFor(attributes.getValue(i)));
+					toolBar.add(Actions.getInstance().getButton(attributes.getValue(i)));
 			}
 		} else if (localName.equals("menu")) {
 			for (int i = 0; i < attributes.getLength(); i++) {
@@ -179,11 +179,14 @@ public class UIFactory extends DefaultHandler {
 							throw new IllegalArgumentException("invalid root menu");
 					}
 				}
+				if (attributes.getLocalName(i).equals("mnemonic")) {
+					((JMenu) getMenu()).setMnemonic(attributes.getValue(i).charAt(0));
+				}
 			}							
 		} else if (localName.equals("item")) {
 			for (int i = 0; i < attributes.getLength(); i++) {
 				if (attributes.getLocalName(i).equals("command")) {
-					getMenu().add(Command.getMenuItemFor(attributes.getValue(i)));
+					getMenu().add(Actions.getInstance().getMenuItem(attributes.getValue(i)));
 				}
 			}
 		} else if (localName.equals("shortcut")) {
@@ -195,7 +198,7 @@ public class UIFactory extends DefaultHandler {
 				else if (attributes.getLocalName(i).equals("command"))
 					command = attributes.getValue(i);
 			}
-			Command.getInstance().setKeyBinding(key, command);
+//			Actions.getInstance().getInstance().setKeyBinding(key, command);
 		}
 	}
 	

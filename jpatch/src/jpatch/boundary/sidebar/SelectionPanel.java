@@ -5,6 +5,7 @@ import javax.swing.event.*;
 import javax.swing.tree.*;
 import jpatch.boundary.*;
 import jpatch.boundary.action.*;
+import jpatch.boundary.ui.*;
 
 public class SelectionPanel extends SidePanel
 implements ChangeListener {

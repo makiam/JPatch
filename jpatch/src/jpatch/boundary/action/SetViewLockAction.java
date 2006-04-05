@@ -26,7 +26,7 @@ public final class SetViewLockAction extends AbstractAction {
 		} else {
 			viewDef.setLock(null);
 		}
-		Command.setViewDefinition(viewDef);
+//		Command.setViewDefinition(viewDef);
 		viewDef.repaint();
 		//((JPatchCanvas)viewDefinition.getViewport()).updateImage();
 		//viewDefinition.reset();

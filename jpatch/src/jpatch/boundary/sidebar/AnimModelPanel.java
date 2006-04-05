@@ -13,6 +13,7 @@ import javax.swing.tree.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
 import jpatch.boundary.action.*;
+import jpatch.boundary.ui.*;
 
 public class AnimModelPanel extends SidePanel
 implements ChangeListener {
