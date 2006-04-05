@@ -35,7 +35,7 @@ implements ChangeListener {
 		detailPanel.add(new JLabel("Joint rotation:"));
 		inputName.addChangeListener(this);
 		slider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (bone.getJointRotation() / 3.6f));
-		slider.setFocusable(false);
+//		slider.setFocusable(false);
 		detailPanel.add(slider);
 		detailPanel.repaint();
 		slider.addChangeListener(this);

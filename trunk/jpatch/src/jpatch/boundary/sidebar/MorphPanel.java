@@ -6,6 +6,7 @@ import javax.swing.tree.*;
 import jpatch.boundary.action.*;
 import jpatch.boundary.*;
 import jpatch.entity.*;
+import jpatch.boundary.ui.*;
 
 public class MorphPanel extends SidePanel
 implements ChangeListener, Morph.MorphListener {
@@ -48,7 +49,7 @@ implements ChangeListener, Morph.MorphListener {
 		
 //		detailPanel.add(panelMinMax);
 		slider = new JSlider(JSlider.HORIZONTAL,0,100,morph.getSliderValue());
-		slider.setFocusable(false);
+//		slider.setFocusable(false);
 //		detailPanel.add(slider);
 		detailPanel.repaint();
 		inputName.addChangeListener(this);

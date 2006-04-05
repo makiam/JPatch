@@ -137,7 +137,7 @@ public abstract class AbstractSettings implements TreeNode {
 //			label.setText(getText());
 //			label.setFont(getFont())
 			if (column == 0) {
-				setFocusable(false);
+//				setFocusable(false);
 //				setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
 //				setText(getText() + ": ");
 			} else {

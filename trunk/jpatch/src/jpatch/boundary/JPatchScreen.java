@@ -88,7 +88,7 @@ public final class JPatchScreen extends JPanel {
 		aViewDef = viewDefinitions;
 		setLightingMode(iLightMode);
 		initScreen();
-		setFocusable(false);
+//		setFocusable(false);
 		setMode(mode);
 		
 		enablePopupMenu(true);
@@ -141,7 +141,7 @@ public final class JPatchScreen extends JPanel {
 			aViewDef[i].setDrawable(aDrawable[i]);
 			//aComponent[i] = new JPatchCanvas(model,aViewDef[i]);
 			add(aDrawable[i].getComponent());
-			aDrawable[i].getComponent().setFocusable(false);
+//			aDrawable[i].getComponent().setFocusable(false);
 			//aViewDef[i].setLighting(RealtimeLighting.createThreepointLight()); // FIXME
 			activeViewport = aViewport[0];
 		}
@@ -180,7 +180,7 @@ public final class JPatchScreen extends JPanel {
 	
 	public void setActiveViewport(Component component) {
 		setActiveViewport(getViewport(component));
-		Command.setViewDefinition(activeViewport.getViewDefinition());
+//		Command.setViewDefinition(activeViewport.getViewDefinition());
 	}
 	
 	public void setActiveViewport(Viewport2 viewport) {
@@ -424,10 +424,10 @@ public final class JPatchScreen extends JPanel {
 			aViewport[i].setTool(tool);
 		}
 		update_all();
-		if (tool instanceof DefaultTool)
-			Command.getMenuItemFor("default tool").setSelected(true);
-		if (tool instanceof RotateTool)
-			Command.getMenuItemFor("rotate tool").setSelected(true);
+//		if (tool instanceof DefaultTool)
+//			Command.getMenuItemFor("default tool").setSelected(true);
+//		if (tool instanceof RotateTool)
+//			Command.getMenuItemFor("rotate tool").setSelected(true);
 	}
 	
 	public JPatchTool getTool() {

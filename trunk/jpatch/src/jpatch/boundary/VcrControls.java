@@ -131,7 +131,7 @@ public class VcrControls extends JPanel {
 	private static JToggleButton createToggleButton(Action action, ButtonGroup bg) {
 		JToggleButton button = new JToggleButton(action);
 		button.setPreferredSize(new Dimension(23, 23));
-		button.setFocusable(false);
+//		button.setFocusable(false);
 		bg.add(button);
 		return button;
 	}
@@ -139,7 +139,7 @@ public class VcrControls extends JPanel {
 	private static JButton createButton(Action action) {
 		JButton button = new JButton(action);
 		button.setPreferredSize(new Dimension(23, 23));
-		button.setFocusable(false);
+//		button.setFocusable(false);
 		return button;
 	}
 	

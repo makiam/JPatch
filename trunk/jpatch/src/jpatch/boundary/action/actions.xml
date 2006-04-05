@@ -1,0 +1,515 @@
+<actions>
+	<buttongroup type="locking" name="mode"/>
+	<buttongroup type="standard" name="layout"/>
+	<buttongroup type="standard" name="view"/>
+	<action name="delete" model="default">
+		<constructor>new DeleteControlPointAction()</constructor>
+		<property key="MenuText" value="Delete"/>
+		<property key="ToolTipText" value="Delete"/>
+		<property key="AcceleratorKey" value="DELETE"/>
+	</action>
+	<action name="remove" model="default">
+		<constructor>new RemoveControlPointAction()</constructor>
+		<property key="MenuText" value="Remove"/>
+		<property key="ToolTipText" value="Remove"/>
+		<property key="AcceleratorKey" value="BACK_SPACE"/>
+	</action>
+	<action name="insert point" model="locking radio" group="mode">
+		<constructor>new InsertControlPointAction()</constructor>
+		<property key="MenuText" value="Insert"/>
+		<property key="AcceleratorKey" value="INSERT"/>
+	</action>
+	<action name="next curve" model="default">
+		<constructor>new NextCurveAction(1)</constructor>
+		<property key="MenuText" value="Next curve"/>
+		<property key="AcceleratorKey" value="TAB"/>
+	</action>
+	<action name="prev curve" model="default">
+		<constructor>new NextCurveAction(-1)</constructor>
+		<property key="MenuText" value="Previous curve"/>
+		<property key="AcceleratorKey" value="shift TAB"/>
+	</action>
+	<action name="new model" model="default">
+		<constructor>new NewModelAction()</constructor>
+		<property key="MenuText" value="New model"/>
+		<property key="ToolTipText" value="New model"/>
+		<property key="Icon" value="jpatch/images/new.png"/>
+	</action>
+	<action name="new animation" model="default">
+		<constructor>new NewAnimAction()</constructor>
+		<property key="MenuText" value="New choreography"/>
+		<property key="ToolTipText" value="New choreography"/>
+		<property key="Icon" value="jpatch/images/new.png"/>
+	</action>
+	<action name="open" model="default">
+		<constructor>new ImportJPatchAction()</constructor>
+		<property key="MenuText" value="Open"/>
+		<property key="ToolTipText" value="Open"/>
+		<property key="Icon" value="jpatch/images/open.png"/>
+	</action>
+	<action name="save" model="default">
+		<constructor>new SaveAsAction(false)</constructor>
+		<property key="MenuText" value="Save"/>
+		<property key="ToolTipText" value="Save"/>
+		<property key="Icon" value="jpatch/images/save.png"/>
+	</action>
+	<action name="single view" model="radio" group="layout">
+		<constructor>new ViewSingleAction()</constructor>
+		<property key="MenuText" value="Single"/>
+		<property key="AcceleratorKey" value="typed 1"/>
+		<property key="Icon" value="jpatch/images/single.png"/>
+	</action>
+	<action name="horizontally split view" model="radio" group="layout">
+		<constructor>new ViewSplitHorizontalAction()</constructor>
+		<property key="MenuText" value="Split horizontally"/>
+		<property key="AcceleratorKey" value="typed 2"/>
+		<property key="Icon" value="jpatch/images/horizontal.png"/>
+	</action>
+	<action name="vertically split view" model="radio" group="layout">
+		<constructor>new ViewSplitVerticalAction()</constructor>
+		<property key="MenuText" value="Split vertically"/>
+		<property key="AcceleratorKey" value="typed 3"/>
+		<property key="Icon" value="jpatch/images/vertical.png"/>
+	</action>
+	<action name="quad view" model="radio" group="layout">
+		<constructor>new ViewQuadAction()</constructor>
+		<property key="MenuText" value="Quad"/>
+		<property key="AcceleratorKey" value="typed 4"/>
+		<property key="Icon" value="jpatch/images/quad.png"/>
+	</action>
+	<action name="rotate view" model="locking radio" group="mode">
+		<constructor>new ViewRotateAction()</constructor>
+		<property key="MenuText" value="Rotate view"/>
+		<property key="ToolTipText" value="Rotate view"/>
+		<property key="AcceleratorKey" value="typed R"/>
+		<property key="Icon" value="jpatch/images/rotate.png"/>
+	</action>
+	<action name="move view" model="locking radio" group="mode">
+		<constructor>new ViewMoveAction()</constructor>
+		<property key="MenuText" value="Move view"/>
+		<property key="ToolTipText" value="Move view"/>
+		<property key="AcceleratorKey" value="typed M"/>
+		<property key="Icon" value="jpatch/images/move.png"/>
+	</action>
+	<action name="zoom view" model="locking radio" group="mode">
+		<constructor>new ViewZoomAction()</constructor>
+		<property key="MenuText" value="Zoom view"/>
+		<property key="ToolTipText" value="Zoom view"/>
+		<property key="AcceleratorKey" value="typed Z"/>
+		<property key="Icon" value="jpatch/images/zoom.png"/>
+	</action>
+	<action name="zoom to fit" model="default">
+		<constructor>new ZoomToFitAction()</constructor>
+		<property key="MenuText" value="Zoom to fit"/>
+		<property key="Icon" value="jpatch/images/zoomtofit.png"/>
+	</action>
+	<action name="undo" model="default">
+		<constructor>new UndoAction()</constructor>
+		<property key="MenuText" value="Undo"/>
+		<property key="AcceleratorKey" value="control z"/>
+		<property key="Icon" value="jpatch/images/undo.png"/>
+	</action>
+	<action name="redo" model="default">
+		<constructor>new RedoAction()</constructor>
+		<property key="MenuText" value="Redo"/>
+		<property key="AcceleratorKey" value="control y"/>
+		<property key="Icon" value="jpatch/images/redo.png"/>
+	</action>
+	<action name="lock x" model="check">
+		<constructor>new XLockAction()</constructor>
+		<property key="MenuText" value="Lock x-axis"/>
+		<property key="AcceleratorKey" value="typed x"/>
+		<property key="Icon" value="jpatch/images/xunlocked.png"/>
+		<property key="SelectedIcon" value="jpatch/images/xlocked.png"/>
+	</action>
+	<action name="lock y" model="check">
+		<constructor>new YLockAction()</constructor>
+		<property key="MenuText" value="Lock y-axis"/>
+		<property key="AcceleratorKey" value="typed y"/>
+		<property key="Icon" value="jpatch/images/yunlocked.png"/>
+		<property key="SelectedIcon" value="jpatch/images/ylocked.png"/>
+
+	</action>
+	<action name="lock z" model="check">
+		<constructor>new ZLockAction()</constructor>
+		<property key="MenuText" value="Lock z-axis"/>
+		<property key="AcceleratorKey" value="typed z"/>
+		<property key="Icon" value="jpatch/images/zunlocked.png"/>
+		<property key="SelectedIcon" value="jpatch/images/zlocked.png"/>
+
+	</action>
+	<action name="snap to grid" model="check">
+		<constructor>new GridSnapAction()</constructor>
+		<property key="MenuText" value="Snap to grid"/>
+		<property key="AcceleratorKey" value="typed g"/>
+		<property key="Icon" value="jpatch/images/grid_no_snap.png"/>
+		<property key="SelectedIcon" value="jpatch/images/grid_snap.png"/>
+	</action>
+	<action name="hide" model="check">
+		<constructor>new HideAction()</constructor>
+		<property key="MenuText" value="Hide unselected parts"/>
+		<property key="AcceleratorKey" value="typed h"/>
+		<property key="Icon" value="jpatch/images/hide.png"/>
+		<property key="SelectedIcon" value="jpatch/images/hide2.png"/>
+	</action>
+	<action name="stop edit morph" model="default">
+		<constructor>new StopEditMorphAction()</constructor>
+		<property key="MenuText" value="Stop morph editing"/>
+		<property key="SelectedIcon" value="jpatch/images/stop.png"/>
+	</action>
+	<action name="select points" model="check">
+		<constructor>new SelectPointsAction()</constructor>
+		<property key="MenuText" value="Select points"/>
+		<property key="Icon" value="jpatch/images/cp_unselected.png"/>
+		<property key="SelectedIcon" value="jpatch/images/cp_selected.png"/>
+	</action>
+	<action name="select bones" model="check">
+		<constructor>new SelectBonesAction()</constructor>
+		<property key="MenuText" value="Select bones"/>
+		<property key="Icon" value="jpatch/images/bone_unselected.png"/>
+		<property key="SelectedIcon" value="jpatch/images/bone_selected.png"/>
+	</action>
+	<action name="lock points" model="check">
+		<constructor>new LockPointsAction()</constructor>
+		<property key="MenuText" value="Lock points"/>
+		<property key="Icon" value="jpatch/images/cp_unlocked.png"/>
+		<property key="SelectedIcon" value="jpatch/images/cp_locked.png"/>
+	</action>
+	<action name="lock bones" model="check">
+		<constructor>new LockBonesAction()</constructor>
+		<property key="MenuText" value="Lock bones"/>
+		<property key="Icon" value="jpatch/images/bone_unlocked.png"/>
+		<property key="SelectedIcon" value="jpatch/images/bone_locked.png"/>
+	</action>
+	<action name="default tool" model="radio" group="mode" default="true">
+		<constructor>new SelectMoveAction()</constructor>
+		<property key="MenuText" value="Default tool"/>
+		<property key="AcceleratorKey" value="ESCAPE"/>
+		<property key="Icon" value="jpatch/images/default.png"/>
+	</action>
+	<action name="add curve segment" model="locking radio" group="mode">
+		<constructor>new AddControlPointAction()</constructor>
+		<property key="MenuText" value="Add curve segment"/>
+		<property key="AcceleratorKey" value="typed a"/>
+		<property key="Icon" value="jpatch/images/add.png"/>
+	</action>
+	<action name="add bone" model="locking radio" group="mode">
+		<constructor>new AddBoneAction()</constructor>
+		<property key="MenuText" value="Add bone"/>
+		<property key="AcceleratorKey" value="typed b"/>
+		<property key="Icon" value="jpatch/images/addbone.png"/>
+	</action>
+	<action name="rotate tool" model="radio" group="mode">
+		<constructor>new RotateAction()</constructor>
+		<property key="MenuText" value="Rotate tool"/>
+		<property key="AcceleratorKey" value="typed r"/>
+		<property key="Icon" value="jpatch/images/rot.png"/>
+	</action>
+	<action name="weight selection tool" model="radio" group="mode">
+		<constructor>new WeightSelectionAction()</constructor>
+		<property key="MenuText" value="Weight selection tool"/>
+		<property key="Icon" value="jpatch/images/weight.png"/>
+	</action>
+	<action name="knife tool" model="radio" group="mode">
+		<constructor>new KnifeAction()</constructor>
+		<property key="MenuText" value="Knife tool"/>
+		<property key="Icon" value="jpatch/images/knife.png"/>
+	</action>
+	<action name="detach" model="default">
+		<constructor>new DetachControlPointsAction()</constructor>
+		<property key="MenuText" value="Detach"/>
+		<property key="Icon" value="jpatch/images/detach.png"/>
+	</action>
+	<action name="rotoscope tool" model="radio" group="mode">
+		<constructor>new RotoscopeAction()</constructor>
+		<property key="MenuText" value="Rotoscope tool"/>
+		<property key="Icon" value="jpatch/images/roto.png"/>
+	</action>
+	<action name="tangent tool" model="radio" group="mode">
+		<constructor>new TangentAction()</constructor>
+		<property key="MenuText" value="Show tangents"/>
+		<property key="Icon" value="jpatch/images/magnitude.png"/>
+	</action>
+	<action name="peak tangents" model="check">
+		<constructor>new PeakAction()</constructor>
+		<property key="MenuText" value="Peak tangents"/>
+		<property key="Icon" value="jpatch/images/peak.png"/>
+	</action>
+	<action name="round tangents" model="check">
+		<constructor>new RoundAction()</constructor>
+		<property key="MenuText" value="Round tanents"/>
+		<property key="Icon" value="jpatch/images/round.png"/>
+	</action>
+	<action name="clone" model="default">
+		<constructor>new CloneAction()</constructor>
+		<property key="MenuText" value="Clone"/>
+		<property key="AcceleratorKey" value="control c"/>
+		<property key="Icon" value="jpatch/images/clone.png"/>
+	</action>
+	<action name="extrude" model="default">
+		<constructor>new ExtrudeAction()</constructor>
+		<property key="MenuText" value="Extrude"/>
+		<property key="AcceleratorKey" value="typed e"/>
+		<property key="Icon" value="jpatch/images/extrude.png"/>
+	</action>
+	<action name="lathe" model="default">
+		<constructor>new LatheAction()</constructor>
+		<property key="MenuText" value="Lathe"/>
+		<property key="AcceleratorKey" value="typed l"/>
+		<property key="Icon" value="jpatch/images/lathe.png"/>
+	</action>
+	<action name="lathe editor" model="default">
+		<constructor>new LatheEditorAction()</constructor>
+		<property key="MenuText" value="Advanced lathe"/>
+		<property key="AcceleratorKey" value="typed L"/>
+		<property key="Icon" value="jpatch/images/sphere.png"/>
+	</action>
+	<action name="make patch" model="default">
+		<constructor>new MakeFivePointPatchAction()</constructor>
+		<property key="MenuText" value="Make 5-point patch"/>
+		<property key="AcceleratorKey" value="typed 5"/>
+		<property key="Icon" value="jpatch/images/fivepointpatch.png"/>
+	</action>
+	<action name="compute patches" model="default">
+		<constructor>new ComputePatchesAction()</constructor>
+		<property key="MenuText" value="Compute patches"/>
+		<property key="AcceleratorKey" value="F5"/>
+		<property key="Icon" value="jpatch/images/computepatches.png"/>
+	</action>
+	<action name="open animation" model="default">
+		<constructor>new ImportJPatchAnimationAction()</constructor>
+		<property key="MenuText" value="Open choreography"/>
+		<property key="Icon" value="jpatch/images/open.png"/>
+	</action>
+	<action name="append" model="default">
+		<constructor>new ImportJPatchAction(false)</constructor>
+		<property key="MenuText" value="Append model"/>
+		<property key="Icon" value="jpatch/images/open.png"/>
+	</action>
+	<action name="save as" model="default">
+		<constructor>new SaveAsAction(true)</constructor>
+		<property key="MenuText" value="Save as"/>
+		<property key="Icon" value="jpatch/images/save.png"/>
+	</action>
+	<action name="import spatch" model="default">
+		<constructor>new ImportSPatchAction()</constructor>
+		<property key="MenuText" value="Import sPatch [.spt]"/>
+		<property key="Icon" value="jpatch/images/open.png"/>
+	</action>
+	<action name="import animationmaster" model="default">
+		<constructor>new ImportAnimationMasterAction()</constructor>
+		<property key="MenuText" value="Import Animation:Master [.mdl]"/>
+		<property key="Icon" value="jpatch/images/open.png"/>
+	</action>
+	<action name="export aliaswavefront" model="default">
+		<constructor>new ExportWavefrontAction()</constructor>
+		<property key="MenuText" value="Export Alias|Wavefront [.obj]"/>
+		<property key="Icon" value="jpatch/images/prefs/obj.png"/>
+	</action>
+	<action name="export povray" model="default">
+		<constructor>new ExportPovrayAction()</constructor>
+		<property key="MenuText" value="Export Pov-Ray [.pov|.inc]"/>
+		<property key="Icon" value="jpatch/images/prefs/povray.png"/>
+	</action>
+	<action name="export renderman" model="default">
+		<constructor>new ExportRibAction()</constructor>
+		<property key="MenuText" value="Export Render-Man [.rib]"/>
+		<property key="Icon" value="jpatch/images/prefs/renderman.png"/>
+	</action>
+	<action name="quit" model="default">
+		<constructor>new QuitAction()</constructor>
+		<property key="MenuText" value="Quit"/>
+	</action>
+	<action name="synchronize viewports" model="check">
+		<constructor>new SyncScreensAction()</constructor>
+		<property key="MenuText" value="Synchronize viewports"/>
+	</action>
+	<action name="settings" model="default">
+		<constructor>new EditSettingsAction()</constructor>
+		<property key="MenuText" value="Settings"/>
+	</action>
+	<action name="grid spacing settings" model="default">
+		<constructor>new SetGridSpacingAction()</constructor>
+		<property key="MenuText" value="Grid spacing"/>
+	</action>
+	<action name="install jogl" model="default">
+		<constructor>new InstallJoglAction()</constructor>
+		<property key="MenuText" value="Install OpenGL support libraries (JOGL)"/>
+	</action>
+	<action name="jpatch lookandfeel" model="default">
+		<constructor>new SwitchLookAndFeelAction("jpatch.boundary.laf.SmoothLookAndFeel")</constructor>
+		<property key="MenuText" value="JPatch look-and-feel"/>
+	</action>
+	<action name="crossplatform lookandfeel" model="default">
+		<constructor>new SwitchLookAndFeelAction(UIManager.getCrossPlatformLookAndFeelClassName())</constructor>
+		<property key="MenuText" value="Crossplatform look-and-feel"/>
+	</action>
+	<action name="system lookandfeel" model="default">
+		<constructor>new SwitchLookAndFeelAction(UIManager.getSystemLookAndFeelClassName())</constructor>
+		<property key="MenuText" value="System look-and-feel"/>
+	</action>
+	<action name="phoneme morph mapping" model="default">
+		<constructor>new EditPhonemesAction()</constructor>
+		<property key="MenuText" value="Edit phoneme morph mapping"/>
+	</action>
+	<action name="dump" model="default">
+		<constructor>new DumpAction()</constructor>
+		<property key="MenuText" value="Dump"/>
+	</action>
+	<action name="dump xml" model="default">
+		<constructor>new XmlDumpAction()</constructor>
+		<property key="MenuText" value="Dump xml"/>
+	</action>
+	<action name="dump undo stack" model="default">
+		<constructor>new DumpUndoStackAction()</constructor>
+		<property key="MenuText" value="Dump undo stack"/>
+	</action>
+	<action name="check model" model="default">
+		<constructor>new CheckModelAction()</constructor>
+		<property key="MenuText" value="Check model"/>
+	</action>
+	<action name="controlpoint browser" model="default">
+		<constructor>new ControlPointBrowserAction()</constructor>
+		<property key="MenuText" value="Controlpoint browser"/>
+	</action>
+	<action name="show reference" model="default">
+		<constructor>new ShowReferenceAction()</constructor>
+		<property key="MenuText" value="Show reference geometry"/>
+	</action>
+	<action name="show about" model="default">
+		<constructor>new AboutAction()</constructor>
+		<property key="MenuText" value="Show about"/>
+	</action>
+	<action name="show splashscreen" model="default">
+		<constructor>new ShowSplashAction()</constructor>
+		<property key="MenuText" value="Show splashscreen"/>
+	</action>
+	<action name="show points" model="check">
+		<constructor>new ShowPointsAction()</constructor>
+		<property key="MenuText" value="Show points"/>
+	</action>
+	<action name="show curves" model="check">
+		<constructor>new ShowCurvesAction()</constructor>
+		<property key="MenuText" value="Show curves"/>
+	</action>
+	<action name="show patches" model="check">
+		<constructor>new ShowPatchesAction()</constructor>
+		<property key="MenuText" value="Show patches"/>
+	</action>
+	<action name="show rotoscope" model="check">
+		<constructor>new ShowRotoscopeAction()</constructor>
+		<property key="MenuText" value="Show rotoscope"/>
+	</action>
+	<action name="front view" model="radio" group="view">
+		<constructor>new ViewAction(ViewDefinition.FRONT)</constructor>
+		<property key="MenuText" value="Front view"/>
+	</action>
+	<action name="rear view" model="radio" group="view">
+		<constructor>new ViewAction(ViewDefinition.REAR)</constructor>
+		<property key="MenuText" value="Rear view"/>
+	</action>
+	<action name="top view" model="radio" group="view">
+		<constructor>new ViewAction(ViewDefinition.TOP)</constructor>
+		<property key="MenuText" value="Top view"/>
+	</action>
+	<action name="bottom view" model="radio" group="view">
+		<constructor>new ViewAction(ViewDefinition.BOTTOM)</constructor>
+		<property key="MenuText" value="Bottom view"/>
+	</action>
+	<action name="left view" model="radio" group="view">
+		<constructor>new ViewAction(ViewDefinition.LEFT)</constructor>
+		<property key="MenuText" value="Left view"/>
+	</action>
+	<action name="right view" model="radio" group="view">
+		<constructor>new ViewAction(ViewDefinition.RIGHT)</constructor>
+		<property key="MenuText" value="Right view"/>
+	</action>
+	<action name="bird's eye view" model="radio" group="view">
+		<constructor>new ViewAction(ViewDefinition.BIRDS_EYE)</constructor>
+		<property key="MenuText" value="Bird's eye view"/>
+	</action>
+	<action name="set rotoscope image" model="default">
+		<constructor>new SetRotoscopeAction()</constructor>
+		<property key="MenuText" value="Set rotoscope image"/>
+	</action>
+	<action name="clear rotoscope image" model="default">
+		<constructor>new ClearRotoscopeAction()</constructor>
+		<property key="MenuText" value="Clear rotoscope image"/>
+	</action>
+	<action name="lock view" model="check">
+		<constructor>new SetViewLockAction(true)</constructor>
+		<property key="MenuText" value="Lock view"/>
+	</action>
+	<action name="unlock view" model="default">
+		<constructor>new SetViewLockAction(false)</constructor>
+		<property key="MenuText" value="Unlock view"/>
+	</action>
+	<action name="select none" model="default">
+		<constructor>new SelectNoneAction()</constructor>
+		<property key="MenuText" value="Select none"/>
+	</action>
+	<action name="select all" model="default">
+		<constructor>new SelectAllAction()</constructor>
+		<property key="MenuText" value="Select all"/>
+	</action>
+	<action name="invert selection" model="default">
+		<constructor>new InvertSelectionAction()</constructor>
+		<property key="MenuText" value="Invert selection"/>
+	</action>
+	<action name="expand selection" model="default">
+		<constructor>new ExtendSelectionAction()</constructor>
+		<property key="MenuText" value="Expand selection"/>
+	</action>
+	<action name="flip x" model="default">
+		<constructor>new FlipAction(FlipAction.X)</constructor>
+		<property key="MenuText" value="Flip x"/>
+	</action>
+	<action name="flip y" model="default">
+		<constructor>new FlipAction(FlipAction.Y)</constructor>
+		<property key="MenuText" value="Flip y"/>
+	</action>
+	<action name="flip z" model="default">
+		<constructor>new FlipAction(FlipAction.Z)</constructor>
+		<property key="MenuText" value="Flip z"/>
+	</action>
+	<action name="flip patches" model="default">
+		<constructor>new FlipPatchesAction()</constructor>
+		<property key="MenuText" value="Flip patches"/>
+	</action>
+	<action name="align patches" model="default">
+		<constructor>new AlignPatchesAction()</constructor>
+		<property key="MenuText" value="Align patches"/>
+	</action>
+	<action name="align controlpoints" model="default">
+		<constructor>new AlignAction()</constructor>
+		<property key="MenuText" value="Align controlpoints"/>
+	</action>
+	<action name="automirror" model="default">
+		<constructor>new AutoMirrorAction()</constructor>
+		<property key="MenuText" value="Mirror"/>
+	</action>
+	<action name="add stubs" model="default">
+		<constructor>new AddStubsAction()</constructor>
+		<property key="MenuText" value="Add stubs"/>
+	</action>
+	<action name="remove stubs" model="default">
+		<constructor>new RemoveStubsAction()</constructor>
+		<property key="MenuText" value="Remove stubs"/>
+	</action>
+	<action name="change tangents: round" model="default">
+		<constructor>new ChangeTangentModeAction(ChangeTangentModeAction.JPATCH)</constructor>
+		<property key="MenuText" value="Round tangents"/>
+	</action>
+	<action name="change tangents: peak" model="default">
+		<constructor>new ChangeTangentModeAction(ChangeTangentModeAction.PEAK)</constructor>
+		<property key="MenuText" value="Peak tangents"/>
+	</action>
+	<action name="change tangents: spatch" model="default">
+		<constructor>new ChangeTangentModeAction(ChangeTangentModeAction.SPATCH)</constructor>
+		<property key="MenuText" value="sPatch tangents"/>
+	</action>
+	<action name="assign controlpoints to bones" model="default">
+		<constructor>new AssignPointsToBonesAction()</constructor>
+		<property key="MenuText" value="Assign controlpoints to bones"/>
+	</action>
+</actions>
