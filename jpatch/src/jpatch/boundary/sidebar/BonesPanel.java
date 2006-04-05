@@ -3,6 +3,7 @@ package jpatch.boundary.sidebar;
 import jpatch.boundary.*;
 import jpatch.boundary.action.*;
 import jpatch.entity.*;
+import jpatch.boundary.ui.*;
 
 public class BonesPanel extends SidePanel {
 	/**

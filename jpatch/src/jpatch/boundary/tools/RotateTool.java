@@ -133,9 +133,9 @@ public class RotateTool extends JPatchTool {
 		MainFrame.getInstance().setHelpText("Click and drag handles to rotate or move pivot. Click and drag inside sphere to rotate freely. Doubleclick to reset coordinate system or pivot.");
 	}
 	
-	public int getButton() {
-		return MeshToolBar.ROTATE;
-	}
+//	public int getButton() {
+//		return MeshToolBar.ROTATE;
+//	}
 	
 	public void setRadius() {
 		if (selection.getHotObject() instanceof AnimObject) {

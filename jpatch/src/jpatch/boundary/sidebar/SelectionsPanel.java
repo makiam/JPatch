@@ -14,14 +14,14 @@ public class SelectionsPanel extends SidePanel {
 
 	public SelectionsPanel(Model model) {
 		JButton buttonAddSelection = new JButton(new NewSelectionAction(model));
-		buttonAddSelection.setFocusable(false);
+//		buttonAddSelection.setFocusable(false);
 		add(buttonAddSelection);
 
 		JButton buttonSortSelection = new JButton(new SortSelectionAction());
-		buttonSortSelection.setFocusable(false);
+//		buttonSortSelection.setFocusable(false);
 		add(buttonSortSelection);
 		JButton buttonDelDefSelection = new JButton(new DeleteDefaultSelectionsAction());
-		buttonSortSelection.setFocusable(false);
+//		buttonSortSelection.setFocusable(false);
 		add(buttonDelDefSelection);
 		
 		MainFrame.getInstance().getSideBar().clearDetailPanel();		

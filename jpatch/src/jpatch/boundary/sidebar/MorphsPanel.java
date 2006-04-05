@@ -4,6 +4,7 @@ import javax.swing.tree.MutableTreeNode;
 
 import jpatch.boundary.action.*;
 import jpatch.boundary.*;
+import jpatch.boundary.ui.*;
 
 public class MorphsPanel extends SidePanel {
 	/**

@@ -15,9 +15,12 @@ public class SwitchLookAndFeelAction extends AbstractAction {
 	private static final long serialVersionUID = -8098202792221617869L;
 	LookAndFeel lookAndFeel;
 	
-	public SwitchLookAndFeelAction(String name, Object lookAndFeel) {
-		super(name);
-		this.lookAndFeel = (LookAndFeel) lookAndFeel;
+	public SwitchLookAndFeelAction(String className) {
+		try {
+			lookAndFeel = (LookAndFeel) Class.forName(className).newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {

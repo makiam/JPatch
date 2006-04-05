@@ -2,6 +2,7 @@ package jpatch.boundary.sidebar;
 
 import jpatch.boundary.*;
 import jpatch.boundary.action.*;
+import jpatch.boundary.ui.*;
 
 public class CamerasPanel extends SidePanel {
 

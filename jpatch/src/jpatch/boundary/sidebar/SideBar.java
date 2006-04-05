@@ -57,7 +57,7 @@ implements TreeSelectionListener {
 		sidePanel.setBorder(BorderFactory.createEtchedBorder());
 		//detailPanel.add(new JLabel("test"));
 		box.add(box2, BorderLayout.CENTER);
-		tree.setFocusable(false);
+//		tree.setFocusable(false);
 		tree.addTreeSelectionListener(this);
 		//detailPanel.setLayout(new GridLayout(10,1));
 //		dim = new Dimension(248,1000);
@@ -90,7 +90,7 @@ implements TreeSelectionListener {
 //		scrollPane.setPreferredSize(dim);
 //		scrollPane.setMinimumSize(dim);
 //		scrollPane.setMaximumSize(dim);
-		tree.setFocusable(false);
+//		tree.setFocusable(false);
 		tree.addTreeSelectionListener(this);
 		add(scrollPane,0);
 		validate();

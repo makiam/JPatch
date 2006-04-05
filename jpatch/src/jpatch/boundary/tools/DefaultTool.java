@@ -116,9 +116,9 @@ public class DefaultTool extends JPatchTool {
 	//	//fBeta = 0;
 	//}
 	
-	public int getButton() {
-		return MeshToolBar.DEFAULT;
-	}
+//	public int getButton() {
+//		return MeshToolBar.DEFAULT;
+//	}
 	
 	private void setActiveHelpText() {
 		switch (iState) {
