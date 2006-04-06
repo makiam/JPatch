@@ -326,7 +326,7 @@ public final class MainFrame extends JFrame {
 			setSelection(null);
 			newModel();
 			setVisible(true);
-			jpatchScreen.setTool(new DefaultTool());
+			jpatchScreen.setTool(Tools.defaultTool);
 			if (!VersionInfo.release) {
 				if (SplashScreen.instance != null)
 					SplashScreen.instance.clearSplash();

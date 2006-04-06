@@ -23,7 +23,7 @@ public final class ScaleAction extends AbstractAction {
 		MainFrame.getInstance().setDialog(scaleDialog);
 		MainFrame.getInstance().getJPatchScreen().addMouseListeners(new ScaleMouseAdapter(scaleDialog, compoundEdit));
 		*/
-		MainFrame.getInstance().getJPatchScreen().setTool(new DefaultTool());
+		MainFrame.getInstance().getJPatchScreen().setTool(Tools.defaultTool);
 	}
 }
 
