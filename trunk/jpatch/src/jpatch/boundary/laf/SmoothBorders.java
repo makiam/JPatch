@@ -34,7 +34,7 @@ public class SmoothBorders extends MetalBorders {
     		if (!button.isBorderPainted())
     			return;
     		ButtonModel model = button.getModel();
-    		if (model.isRollover()) {
+    		if (model.isRollover() || model.isArmed()) {
     			g.setColor(Theme.rolloverBorderColor);
     			g.drawRoundRect(x + 1, y + 1, w - 3, h - 3, 7, 7);
     			g.setColor(new Color(0, 0, 0, 0.5f));
