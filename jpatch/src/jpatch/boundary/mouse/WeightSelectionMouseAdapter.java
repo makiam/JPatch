@@ -6,8 +6,8 @@ import java.util.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
-import jpatch.boundary.settings.Settings;
-import jpatch.boundary.tools.DefaultTool;
+import jpatch.boundary.settings.*;
+import jpatch.boundary.tools.*;
 import jpatch.entity.*;
 
 //import jpatch.control.edit.*;
@@ -51,7 +51,7 @@ public class WeightSelectionMouseAdapter extends JPatchMouseAdapter {
 		((Component) mouseEvent.getSource()).removeMouseMotionListener(this);
 		drawLine(g2);
 //		MainFrame.getInstance().getMeshToolBar().reset();
-		MainFrame.getInstance().getJPatchScreen().setTool(new DefaultTool());
+		MainFrame.getInstance().getJPatchScreen().setTool(Tools.defaultTool);
 		Selection selection = MainFrame.getInstance().getSelection();
 		Point3f p = new Point3f();
 		float dx = iEndX - iStartX;

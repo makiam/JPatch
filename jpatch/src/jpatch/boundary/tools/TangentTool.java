@@ -15,6 +15,8 @@ public class TangentTool extends JPatchTool {
 	
 	//private PointSelection ps;
 
+	TangentTool() { }
+	
 	public TangentHandle isHit(ViewDefinition viewDef, int x, int y) {
 		Point3f p3 = new Point3f();
 		Selection selection = MainFrame.getInstance().getSelection();

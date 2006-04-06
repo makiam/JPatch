@@ -59,7 +59,7 @@ public class DefaultTool extends JPatchTool {
 	private SelectMouseMotionListener selectMouseMotionListener;
 	//private Viewport viewport;
 	private boolean bMoveZ;
-	private TangentTool tangentTool = MainFrame.getInstance().getJPatchScreen().getTangentTool();
+	private TangentTool tangentTool = Tools.tangentTool;
 	private TangentHandle tangentHandle;
 	private float fMagnitude;
 	private Vector3f v3Translate = new Vector3f();
@@ -70,7 +70,7 @@ public class DefaultTool extends JPatchTool {
 	
 //	private Point3f p3Pivot = new Point3f();
 	
-	public DefaultTool() {
+	DefaultTool() {
 		//m3Rot.setIdentity();
 		//m3RotA.setIdentity();
 		
@@ -93,13 +93,13 @@ public class DefaultTool extends JPatchTool {
 			new DefaultHandle(this, new Point3f(), color),
 //			pivotHandle
 		};
-		if (MainFrame.getInstance().getSelection() == null) {
-			MainFrame.getInstance().setHelpText("Drag to move or select points. Use ALT to move perpendicular to screen plane.");
-		} else if (MainFrame.getInstance().getSelection().isSingle()) {
-			MainFrame.getInstance().setHelpText("Use SHIFT or CTRL to modify selection. Use ALT to move perpendicular to screen plane. Press TAB to cycle through curve segments.");
-		} else {
-			MainFrame.getInstance().setHelpText("Drag inside box to move selection. Drag handles to scale. Use SHIFT or CTRL to modify selection, ALT to move perpendiclar. Doubleclick pivot to reset.");
-		}
+//		if (MainFrame.getInstance().getSelection() == null) {
+//			MainFrame.getInstance().setHelpText("Drag to move or select points. Use ALT to move perpendicular to screen plane.");
+//		} else if (MainFrame.getInstance().getSelection().isSingle()) {
+//			MainFrame.getInstance().setHelpText("Use SHIFT or CTRL to modify selection. Use ALT to move perpendicular to screen plane. Press TAB to cycle through curve segments.");
+//		} else {
+//			MainFrame.getInstance().setHelpText("Drag inside box to move selection. Drag handles to scale. Use SHIFT or CTRL to modify selection, ALT to move perpendiclar. Doubleclick pivot to reset.");
+//		}
 	}
 	/*
 	public Matrix3f getRot() {

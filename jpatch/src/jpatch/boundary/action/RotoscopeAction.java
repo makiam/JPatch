@@ -18,7 +18,7 @@ public final class RotoscopeAction extends AbstractAction {
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
 //		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.ROTOSCOPE) {
-			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(new RotoscopeTool()));
+			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(Tools.rotoscopeTool));
 //			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.ROTOSCOPE);
 //		} else {
 //			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(new DefaultTool()));

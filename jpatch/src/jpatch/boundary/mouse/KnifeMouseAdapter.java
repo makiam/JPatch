@@ -17,7 +17,7 @@ import jpatch.boundary.MainFrame;
 import jpatch.boundary.Selection;
 import jpatch.boundary.ViewDefinition;
 import jpatch.boundary.settings.Settings;
-import jpatch.boundary.tools.DefaultTool;
+import jpatch.boundary.tools.Tools;
 import jpatch.control.edit.AtomicInsertControlPoint;
 import jpatch.control.edit.JPatchActionEdit;
 import jpatch.entity.ControlPoint;
@@ -320,7 +320,7 @@ public class KnifeMouseAdapter extends JPatchMouseAdapter {
 	private void cleanUp(Component component) {
 		component.removeMouseMotionListener(this);
 		MainFrame.getInstance().setHelpText("");
-		MainFrame.getInstance().getJPatchScreen().setTool(new DefaultTool());
+		MainFrame.getInstance().getJPatchScreen().setTool(Tools.defaultTool);
 		MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
 		MainFrame.getInstance().getJPatchScreen().update_all();
 	}

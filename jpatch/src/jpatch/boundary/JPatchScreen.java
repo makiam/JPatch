@@ -80,7 +80,7 @@ public final class JPatchScreen extends JPanel {
 	private boolean bPopupEnabled;
 	private ActiveViewportMouseAdapter activeViewportMouseAdapter = new ActiveViewportMouseAdapter();
 	private boolean bShowTangents = false;
-	private TangentTool tangentTool = new TangentTool();
+	private TangentTool tangentTool = Tools.tangentTool;
 	private Grid grid = new Grid();
 	private JPopupMenu popupMenu;
 	
@@ -418,6 +418,14 @@ public final class JPatchScreen extends JPanel {
 	
 	public void setTool(JPatchTool tool) {
 		this.tool = tool;
+		if (tool == Tools.defaultTool) {
+			Actions.getInstance().getButtonModel("default tool").setSelected(true);
+		} else if (tool == Tools.rotateTool) {
+			Tools.rotateTool.reInit(MainFrame.getInstance().getSelection());
+			Actions.getInstance().getButtonModel("rotate tool").setSelected(true);
+		} else if (tool == Tools.rotoscopeTool) {
+			Actions.getInstance().getButtonModel("rotoscope tool").setSelected(true);
+		}
 		removeAllMouseListeners();
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 //			((JPatchCanvas)aComponent[i]).setTool(tool);

@@ -41,6 +41,9 @@ public class SmoothLookAndFeel extends MetalLookAndFeel {
 //    }
     
     protected void initComponentDefaults(UIDefaults uidefaults) {
+    	for (Object key : uidefaults.keySet()) {
+    		System.out.println(key);
+    	};
         super.initComponentDefaults(uidefaults);
 
         // first line doesn't work, second does, third is a workaround

@@ -23,7 +23,7 @@ public final class SelectMoveAction extends AbstractAction {
 		*/
 		//MainFrame.getInstance().getJPatchScreen().setTool(new DefaultTool());
 //		if (!(MainFrame.getInstance().getJPatchScreen().getTool() instanceof DefaultTool))
-			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(new DefaultTool()));
+			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(Tools.defaultTool));
 //		MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.DEFAULT);
 	}
 }

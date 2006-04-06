@@ -32,9 +32,7 @@ public final class RotoscopeTool extends JPatchTool {
 	//	//this.rotoscope = rotoscope;
 	//}
 	
-	public RotoscopeTool() {
-		MainFrame.getInstance().setHelpText("Drag rotoscope to move. Drag handles to scale. Move slider to change opacity.");
-	}
+	RotoscopeTool() { }
 	
 //	public int getButton() {
 //		return MeshToolBar.ROTOSCOPE;
