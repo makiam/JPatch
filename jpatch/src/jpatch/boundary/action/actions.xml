@@ -6,28 +6,28 @@
 		<constructor>new DeleteControlPointAction()</constructor>
 		<property key="MenuText" value="Delete"/>
 		<property key="ToolTipText" value="Delete"/>
-		<property key="AcceleratorKey" value="DELETE"/>
+		<property key="Accelerator" value="DELETE"/>
 	</action>
 	<action name="remove" model="default">
 		<constructor>new RemoveControlPointAction()</constructor>
 		<property key="MenuText" value="Remove"/>
 		<property key="ToolTipText" value="Remove"/>
-		<property key="AcceleratorKey" value="BACK_SPACE"/>
+		<property key="Accelerator" value="BACK_SPACE"/>
 	</action>
 	<action name="insert point" model="locking radio" group="mode">
 		<constructor>new InsertControlPointAction()</constructor>
 		<property key="MenuText" value="Insert"/>
-		<property key="AcceleratorKey" value="INSERT"/>
+		<property key="Accelerator" value="INSERT"/>
 	</action>
 	<action name="next curve" model="default">
 		<constructor>new NextCurveAction(1)</constructor>
 		<property key="MenuText" value="Next curve"/>
-		<property key="AcceleratorKey" value="TAB"/>
+		<property key="Accelerator" value="TAB"/>
 	</action>
 	<action name="prev curve" model="default">
 		<constructor>new NextCurveAction(-1)</constructor>
 		<property key="MenuText" value="Previous curve"/>
-		<property key="AcceleratorKey" value="shift TAB"/>
+		<property key="Accelerator" value="shift TAB"/>
 	</action>
 	<action name="new model" model="default">
 		<constructor>new NewModelAction()</constructor>
@@ -57,46 +57,46 @@
 	<action name="single view" model="radio" group="layout">
 		<constructor>new ViewSingleAction()</constructor>
 		<property key="MenuText" value="Single"/>
-		<property key="AcceleratorKey" value="typed 1"/>
+		<property key="Accelerator" value="typed 1"/>
 		<property key="Icon" value="jpatch/images/single.png"/>
 	</action>
 	<action name="horizontally split view" model="radio" group="layout">
 		<constructor>new ViewSplitHorizontalAction()</constructor>
 		<property key="MenuText" value="Split horizontally"/>
-		<property key="AcceleratorKey" value="typed 2"/>
+		<property key="Accelerator" value="typed 2"/>
 		<property key="Icon" value="jpatch/images/horizontal.png"/>
 	</action>
 	<action name="vertically split view" model="radio" group="layout">
 		<constructor>new ViewSplitVerticalAction()</constructor>
 		<property key="MenuText" value="Split vertically"/>
-		<property key="AcceleratorKey" value="typed 3"/>
+		<property key="Accelerator" value="typed 3"/>
 		<property key="Icon" value="jpatch/images/vertical.png"/>
 	</action>
 	<action name="quad view" model="radio" group="layout">
 		<constructor>new ViewQuadAction()</constructor>
 		<property key="MenuText" value="Quad"/>
-		<property key="AcceleratorKey" value="typed 4"/>
+		<property key="Accelerator" value="typed 4"/>
 		<property key="Icon" value="jpatch/images/quad.png"/>
 	</action>
 	<action name="rotate view" model="locking radio" group="mode">
 		<constructor>new ViewRotateAction()</constructor>
 		<property key="MenuText" value="Rotate view"/>
 		<property key="ToolTipText" value="Rotate view"/>
-		<property key="AcceleratorKey" value="typed R"/>
+		<property key="Accelerator" value="typed R"/>
 		<property key="Icon" value="jpatch/images/rotate.png"/>
 	</action>
 	<action name="move view" model="locking radio" group="mode">
 		<constructor>new ViewMoveAction()</constructor>
 		<property key="MenuText" value="Move view"/>
 		<property key="ToolTipText" value="Move view"/>
-		<property key="AcceleratorKey" value="typed M"/>
+		<property key="Accelerator" value="typed M"/>
 		<property key="Icon" value="jpatch/images/move.png"/>
 	</action>
 	<action name="zoom view" model="locking radio" group="mode">
 		<constructor>new ViewZoomAction()</constructor>
 		<property key="MenuText" value="Zoom view"/>
 		<property key="ToolTipText" value="Zoom view"/>
-		<property key="AcceleratorKey" value="typed Z"/>
+		<property key="Accelerator" value="typed Z"/>
 		<property key="Icon" value="jpatch/images/zoom.png"/>
 	</action>
 	<action name="zoom to fit" model="default">
@@ -107,26 +107,26 @@
 	<action name="undo" model="default">
 		<constructor>new UndoAction()</constructor>
 		<property key="MenuText" value="Undo"/>
-		<property key="AcceleratorKey" value="control z"/>
+		<property key="Accelerator" value="control z"/>
 		<property key="Icon" value="jpatch/images/undo.png"/>
 	</action>
 	<action name="redo" model="default">
 		<constructor>new RedoAction()</constructor>
 		<property key="MenuText" value="Redo"/>
-		<property key="AcceleratorKey" value="control y"/>
+		<property key="Accelerator" value="control y"/>
 		<property key="Icon" value="jpatch/images/redo.png"/>
 	</action>
 	<action name="lock x" model="check">
 		<constructor>new XLockAction()</constructor>
 		<property key="MenuText" value="Lock x-axis"/>
-		<property key="AcceleratorKey" value="typed x"/>
+		<property key="Accelerator" value="typed x"/>
 		<property key="Icon" value="jpatch/images/xunlocked.png"/>
 		<property key="SelectedIcon" value="jpatch/images/xlocked.png"/>
 	</action>
 	<action name="lock y" model="check">
 		<constructor>new YLockAction()</constructor>
 		<property key="MenuText" value="Lock y-axis"/>
-		<property key="AcceleratorKey" value="typed y"/>
+		<property key="Accelerator" value="typed y"/>
 		<property key="Icon" value="jpatch/images/yunlocked.png"/>
 		<property key="SelectedIcon" value="jpatch/images/ylocked.png"/>
 
@@ -134,7 +134,7 @@
 	<action name="lock z" model="check">
 		<constructor>new ZLockAction()</constructor>
 		<property key="MenuText" value="Lock z-axis"/>
-		<property key="AcceleratorKey" value="typed z"/>
+		<property key="Accelerator" value="typed z"/>
 		<property key="Icon" value="jpatch/images/zunlocked.png"/>
 		<property key="SelectedIcon" value="jpatch/images/zlocked.png"/>
 
@@ -142,14 +142,14 @@
 	<action name="snap to grid" model="check">
 		<constructor>new GridSnapAction()</constructor>
 		<property key="MenuText" value="Snap to grid"/>
-		<property key="AcceleratorKey" value="typed g"/>
+		<property key="Accelerator" value="typed g"/>
 		<property key="Icon" value="jpatch/images/grid_no_snap.png"/>
 		<property key="SelectedIcon" value="jpatch/images/grid_snap.png"/>
 	</action>
 	<action name="hide" model="check">
 		<constructor>new HideAction()</constructor>
 		<property key="MenuText" value="Hide unselected parts"/>
-		<property key="AcceleratorKey" value="typed h"/>
+		<property key="Accelerator" value="typed h"/>
 		<property key="Icon" value="jpatch/images/hide.png"/>
 		<property key="SelectedIcon" value="jpatch/images/hide2.png"/>
 	</action>
@@ -185,25 +185,25 @@
 	<action name="default tool" model="radio" group="mode" default="true">
 		<constructor>new SelectMoveAction()</constructor>
 		<property key="MenuText" value="Default tool"/>
-		<property key="AcceleratorKey" value="ESCAPE"/>
+		<property key="Accelerator" value="ESCAPE"/>
 		<property key="Icon" value="jpatch/images/default.png"/>
 	</action>
 	<action name="add curve segment" model="locking radio" group="mode">
 		<constructor>new AddControlPointAction()</constructor>
 		<property key="MenuText" value="Add curve segment"/>
-		<property key="AcceleratorKey" value="typed a"/>
+		<property key="Accelerator" value="typed a"/>
 		<property key="Icon" value="jpatch/images/add.png"/>
 	</action>
 	<action name="add bone" model="locking radio" group="mode">
 		<constructor>new AddBoneAction()</constructor>
 		<property key="MenuText" value="Add bone"/>
-		<property key="AcceleratorKey" value="typed b"/>
+		<property key="Accelerator" value="typed b"/>
 		<property key="Icon" value="jpatch/images/addbone.png"/>
 	</action>
 	<action name="rotate tool" model="radio" group="mode">
 		<constructor>new RotateAction()</constructor>
 		<property key="MenuText" value="Rotate tool"/>
-		<property key="AcceleratorKey" value="typed r"/>
+		<property key="Accelerator" value="typed r"/>
 		<property key="Icon" value="jpatch/images/rot.png"/>
 	</action>
 	<action name="weight selection tool" model="radio" group="mode">
@@ -244,37 +244,37 @@
 	<action name="clone" model="default">
 		<constructor>new CloneAction()</constructor>
 		<property key="MenuText" value="Clone"/>
-		<property key="AcceleratorKey" value="control c"/>
+		<property key="Accelerator" value="control c"/>
 		<property key="Icon" value="jpatch/images/clone.png"/>
 	</action>
 	<action name="extrude" model="default">
 		<constructor>new ExtrudeAction()</constructor>
 		<property key="MenuText" value="Extrude"/>
-		<property key="AcceleratorKey" value="typed e"/>
+		<property key="Accelerator" value="typed e"/>
 		<property key="Icon" value="jpatch/images/extrude.png"/>
 	</action>
 	<action name="lathe" model="default">
 		<constructor>new LatheAction()</constructor>
 		<property key="MenuText" value="Lathe"/>
-		<property key="AcceleratorKey" value="typed l"/>
+		<property key="Accelerator" value="typed l"/>
 		<property key="Icon" value="jpatch/images/lathe.png"/>
 	</action>
 	<action name="lathe editor" model="default">
 		<constructor>new LatheEditorAction()</constructor>
 		<property key="MenuText" value="Advanced lathe"/>
-		<property key="AcceleratorKey" value="typed L"/>
+		<property key="Accelerator" value="typed L"/>
 		<property key="Icon" value="jpatch/images/sphere.png"/>
 	</action>
 	<action name="make patch" model="default">
 		<constructor>new MakeFivePointPatchAction()</constructor>
 		<property key="MenuText" value="Make 5-point patch"/>
-		<property key="AcceleratorKey" value="typed 5"/>
+		<property key="Accelerator" value="typed 5"/>
 		<property key="Icon" value="jpatch/images/fivepointpatch.png"/>
 	</action>
 	<action name="compute patches" model="default">
 		<constructor>new ComputePatchesAction()</constructor>
 		<property key="MenuText" value="Compute patches"/>
-		<property key="AcceleratorKey" value="F5"/>
+		<property key="Accelerator" value="F5"/>
 		<property key="Icon" value="jpatch/images/computepatches.png"/>
 	</action>
 	<action name="open animation" model="default">

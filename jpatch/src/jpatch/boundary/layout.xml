@@ -144,6 +144,14 @@
 			<item command="check model"/>
 			<item command="controlpoint browser"/>
 		</menu>
+		<menu name="Test" mnemonic="d">
+			<item command="default tool"/>
+			<item command="add curve segment"/>
+			<item command="add bone"/>
+			<item command="rotate tool"/>
+			<item command="weight selection tool"/>
+			<item command="knife tool" />
+		</menu>	
 		<menu name="Help" mnemonic="h">
 			<item command="show about"/>
 			<item command="show splashscreen"/>
