@@ -5,6 +5,9 @@ import java.awt.EventQueue;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.peer.KeyboardFocusManagerPeer;
 import java.net.URL;
 
 import javax.swing.*;
@@ -20,7 +23,7 @@ import jpatch.boundary.*;
  * @author sascha
  *
  */
-public class JPatchLockingToggleButton extends JPatchToggleButton {
+public class JPatchLockingToggleButton extends JPatchToggleButton implements KeyBindingHelper.CallBack {
 	public final static int LOCKED = 1 << 5;
 	
 	private boolean oldLocked;

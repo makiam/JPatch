@@ -5,7 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-public class JPatchToggleButtonModel extends JToggleButton.ToggleButtonModel implements ChangeListener, ItemListener {
+public class JPatchToggleButtonModel extends JToggleButton.ToggleButtonModel implements ChangeListener, ItemListener, ActionListener {
 
 	private JToggleButton.ToggleButtonModel underlyingButtonModel;
 	
@@ -13,6 +13,7 @@ public class JPatchToggleButtonModel extends JToggleButton.ToggleButtonModel imp
 		this.underlyingButtonModel = underlyingButtonModel;
 		underlyingButtonModel.addChangeListener(this);
 		underlyingButtonModel.addItemListener(this);
+		underlyingButtonModel.addActionListener(this);
 	}
 	
 //	@Override
@@ -35,11 +36,6 @@ public class JPatchToggleButtonModel extends JToggleButton.ToggleButtonModel imp
 		underlyingButtonModel.setSelected(b);
 	}
 
-//	@Override
-//	protected void fireActionPerformed(ActionEvent e) {
-//		underlyingButtonModel.fireActionPerformed(e);
-//	}
-
 	public void stateChanged(ChangeEvent e) {
 		fireStateChanged();
 	}
@@ -47,5 +43,8 @@ public class JPatchToggleButtonModel extends JToggleButton.ToggleButtonModel imp
 	public void itemStateChanged(ItemEvent e) {
 		fireItemStateChanged(new ItemEvent(this, e.getID(), this, e.getStateChange()));
 	}
-	
+
+	public void actionPerformed(ActionEvent e) {
+		fireActionPerformed(e);
+	}
 }

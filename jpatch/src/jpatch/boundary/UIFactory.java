@@ -182,6 +182,9 @@ public class UIFactory extends DefaultHandler {
 				if (attributes.getLocalName(i).equals("mnemonic")) {
 					((JMenu) getMenu()).setMnemonic(attributes.getValue(i).charAt(0));
 				}
+				if (attributes.getLocalName(i).equals("icon")) {
+					((JMenu) getMenu()).setIcon(new ImageIcon(ClassLoader.getSystemResource(attributes.getValue(i))));
+				}
 			}							
 		} else if (localName.equals("item")) {
 			for (int i = 0; i < attributes.getLength(); i++) {

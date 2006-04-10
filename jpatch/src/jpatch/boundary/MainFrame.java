@@ -128,10 +128,12 @@ public final class MainFrame extends JFrame {
 				else
 					UIManager.setLookAndFeel(plaf);
 				
-				
+					
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			
+			UIManager.put("ToolTip.hideAccelerator", true);
 			
 			helpPanel = new JPanel();
 			helpLabel = new JLabel("press right mousebutton (RMB) for popup-menu, click and drag with middle mousebutton (MMB) to move view, use mousewheel to zoom");

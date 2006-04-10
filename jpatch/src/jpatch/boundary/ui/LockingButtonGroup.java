@@ -1,4 +1,4 @@
-package jpatch.boundary;
+package jpatch.boundary.ui;
 
 import java.awt.Rectangle;
 import javax.swing.*;
@@ -37,7 +37,6 @@ public class LockingButtonGroup extends ButtonGroup {
 	 * select the default button
 	 */
 	public void actionDone(boolean abort) {
-		System.out.println("action Done");
 		ButtonModel selectedButtonModel = getSelection();
 		if (!abort && selectedButtonModel instanceof JPatchLockingToggleButtonModel.UnderlyingModel) {
 			if (((JPatchLockingToggleButtonModel.UnderlyingModel) selectedButtonModel).isLocked())
@@ -48,7 +47,6 @@ public class LockingButtonGroup extends ButtonGroup {
 			defaultButtonModel.setPressed(true);
 			defaultButtonModel.setPressed(false);
 			defaultButtonModel.setArmed(false);
-//			defaultButtonModel.setSelected(true);
 		}
 	}
 }

@@ -20,8 +20,9 @@ public class SmoothMenuItemUI extends BasicMenuItemUI {
     
     public void paint(Graphics g, JComponent c) {
     	SmoothUtilities.configureGraphics(g);
-        paintMenuItem(g, c, checkIcon, arrowIcon,
-                      selectionBackground, selectionForeground,
-                      1);
+    	super.paint(g, c);
+//        paintMenuItem(g, c, checkIcon, arrowIcon,
+//                      selectionBackground, selectionForeground,
+//                      1);
     }
 }

@@ -18,8 +18,8 @@ implements ChangeListener {
 	Camera camera;
 	public CameraPanel(Camera camera) {
 		this.camera = camera;
-		add(new JPatchButton(new EditAnimObjectAction(camera)));
-		add(new JPatchButton(new DeleteCameraAction(camera)));
+		add(new JButton(new EditAnimObjectAction(camera)));
+		add(new JButton(new DeleteCameraAction(camera)));
 		JPatchInput.setDimensions(50,150,20);
 		inputName = new JPatchInput("Name:",camera.getName());
 		JPanel detailPanel = MainFrame.getInstance().getSideBar().getDetailPanel();
