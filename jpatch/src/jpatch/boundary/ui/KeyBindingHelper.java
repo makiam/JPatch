@@ -21,7 +21,10 @@
  */
 package jpatch.boundary.ui;
 
+import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
+import java.util.List;
 import javax.swing.*;
 
 /**
@@ -30,13 +33,54 @@ import javax.swing.*;
  * @see JPatchRadioButtonMenuItem
  * @author sascha
  */
-class KeyBindingHelper {
+public class KeyBindingHelper {
 	/* KeyStroke */
 	static KeyStroke ks;
 	/* KeyEvent */
 	static KeyEvent e;
 	/* condition (can be either JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, JComponent.WHEN_FOCUSED or JComponent.WHEN_IN_FOCUSED_WINDOW) */
-	static int condition;
+//	static int condition;
 	/* pressed */
 	static boolean pressed;
+	
+	static List<Listener> listeners = new ArrayList<Listener>();
+	
+	static {
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(new KeyEventPostProcessor() {
+			public boolean postProcessKeyEvent(KeyEvent e) {
+				if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+					/* if it has a character assigned, store it */
+					KeyBindingHelper.ks = KeyStroke.getKeyStrokeForEvent(e);
+					KeyBindingHelper.e = e;
+//					KeyBindingHelper.condition = condition;
+					KeyBindingHelper.pressed = e.getID() == KeyEvent.KEY_PRESSED;
+				} else if (e.getID() == KeyEvent.KEY_TYPED && KeyBindingHelper.e != null && e.getKeyChar() == KeyBindingHelper.e.getKeyChar() && !e.isConsumed()) {
+					for (Listener listener : listeners) {
+						if (listener.callBack.reprocessKeyBinding(KeyBindingHelper.ks, KeyBindingHelper.e, listener.condition, KeyBindingHelper.pressed))
+							break;								
+					}
+					listeners.clear();
+				}
+				return false;
+			}
+		});
+	}
+	
+	static void registerCallback(CallBack callBack, int condition) {
+		listeners.add(new Listener(callBack, condition));
+	}
+	
+	static interface CallBack {
+		boolean reprocessKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed);
+	}
+	
+	static class Listener {
+		CallBack callBack;
+		int condition;
+		
+		Listener(CallBack callBack, int condition) {
+			this.callBack = callBack;
+			this.condition = condition;
+		}
+	}
 }

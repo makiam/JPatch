@@ -3,7 +3,7 @@ package jpatch.boundary.sidebar;
 import jpatch.boundary.*;
 import jpatch.boundary.action.*;
 import jpatch.entity.*;
-import jpatch.boundary.ui.*;
+import javax.swing.*;
 
 public class BonesPanel extends SidePanel {
 	/**
@@ -12,7 +12,7 @@ public class BonesPanel extends SidePanel {
 	private static final long serialVersionUID = 1969415873406407853L;
 
 	public BonesPanel(Model model) {
-		add(new JPatchButton(new ResetPoseAction(model)));
+		add(new JButton(new ResetPoseAction(model)));
 		//add(new JPatchButton(new ApplyMaterialAction()));
 		MainFrame.getInstance().getSideBar().clearDetailPanel();
 		//add(new JButton("test2"));

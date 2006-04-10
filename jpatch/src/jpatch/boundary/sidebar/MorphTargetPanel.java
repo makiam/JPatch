@@ -23,8 +23,8 @@ implements ChangeListener {
 	public MorphTargetPanel(MorphTarget morphTarget) {
 		this.morphTarget = morphTarget;
 		MorphTarget editedMorph = MainFrame.getInstance().getEditedMorph();
-		deleteButton = new JPatchButton(new DeleteMorphTargetAction(morphTarget));
-		editButton = new JPatchToggleButton(new EditMorphTargetAction(morphTarget));
+		deleteButton = new JButton(new DeleteMorphTargetAction(morphTarget));
+		editButton = new JButton(new EditMorphTargetAction(morphTarget));
 		add(editButton);
 		add(deleteButton);
 		

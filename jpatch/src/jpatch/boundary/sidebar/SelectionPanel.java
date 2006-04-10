@@ -19,7 +19,7 @@ implements ChangeListener {
 		this.selection = selection;
 		//add(new JPatchButton(new EditMaterialAction(material)));
 		//add(new JPatchButton(new CloneMaterialAction(material)));
-		add(new JPatchButton(new DeleteSelectionAction(selection)));
+		add(new JButton(new DeleteSelectionAction(selection)));
 		//add(new JPatchButton(new ApplyMaterialAction(material)));
 		JPatchInput.setDimensions(50,150,20);
 		inputName = new JPatchInput("Name:",selection.getName());

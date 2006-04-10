@@ -1,5 +1,5 @@
 /*
- * $Id: UIFactory.java,v 1.12 2006/04/05 15:29:10 sascha_l Exp $
+ * $Id: UIFactory.java,v 1.13 2006/04/10 22:51:33 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -181,6 +181,9 @@ public class UIFactory extends DefaultHandler {
 				}
 				if (attributes.getLocalName(i).equals("mnemonic")) {
 					((JMenu) getMenu()).setMnemonic(attributes.getValue(i).charAt(0));
+				}
+				if (attributes.getLocalName(i).equals("icon")) {
+					((JMenu) getMenu()).setIcon(new ImageIcon(ClassLoader.getSystemResource(attributes.getValue(i))));
 				}
 			}							
 		} else if (localName.equals("item")) {

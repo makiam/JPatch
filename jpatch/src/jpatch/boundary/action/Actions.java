@@ -28,6 +28,7 @@ import javax.swing.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 import jpatch.boundary.*;
+import jpatch.boundary.settings.*;
 import jpatch.boundary.ui.*;
 
 
@@ -67,6 +68,19 @@ public class Actions extends DefaultHandler {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 		}
+		
+		/*
+		 * Disable commands
+		 */
+		enableAction("clear rotoscope image", false);
+		enableAction("stop edit morph", false);
+		
+		/*
+		 * Set toggle button states
+		 */
+		actionMap.get("select points").buttonModel.setSelected(true);
+		actionMap.get("select bones").buttonModel.setSelected(true);
+		actionMap.get("snap to grid").buttonModel.setSelected(Settings.getInstance().viewports.snapToGrid);		
 	}
 	
 	public void enableAction(String key, boolean enable) {
@@ -76,6 +90,18 @@ public class Actions extends DefaultHandler {
 	public void enableActions(String[] keys, boolean enable) {
 		for (int i = 0; i < keys.length; i++)
 			enableAction(keys[i], enable);
+	}
+	
+	public void setViewDefinition(ViewDefinition viewDef) {
+		actionMap.get(viewDef.getViewName()).buttonModel.setSelected(true);
+		actionMap.get("show points").buttonModel.setSelected(viewDef.renderPoints());
+		actionMap.get("show curves").buttonModel.setSelected(viewDef.renderCurves());
+		actionMap.get("show patches").buttonModel.setSelected(viewDef.renderPatches());
+		actionMap.get("show rotoscope").buttonModel.setSelected(viewDef.showRotoscope());
+		actionMap.get("lock view").buttonModel.setSelected(viewDef.isLocked());
+		enableAction("unlock view", viewDef.isLocked());
+		enableAction("show patches", viewDef.getDrawable().isShadingSupported());
+		enableAction("clear rotoscope image", MainFrame.getInstance().getModel() != null && MainFrame.getInstance().getModel().getRotoscope(viewDef.getView()) != null);
 	}
 	
 	public ButtonGroup getButtonGroup(String key) {

@@ -1,35 +1,26 @@
 package jpatch.boundary.ui;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.*;
 
-public class JPatchButton extends JButton {
+public class JPatchButton extends JButton implements KeyBindingHelper.CallBack {
 	private static final Insets INSETS = new Insets(2, 2, 2, 2);
 	
 	public JPatchButton(DefaultButtonModel buttonModel) {
 		super();
 		setModel(new JPatchButtonModel(buttonModel));
+		getActionMap().put("doClick", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				doClick();
+			}
+		});
+		getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "doClick");
+		getInputMap().put(KeyStroke.getKeyStroke("SPACE"), "doClick");
 	}
 
-//	public JPatchButton(Icon icon) {
-//		super(icon);
-//	}
-//
-//	public JPatchButton(String text) {
-//		super(text);
-//	}
-//
-//	public JPatchButton(Action a) {
-//		super(a);
-////		setAction(a);
-//	}
-//
-//	public JPatchButton(String text, Icon icon) {
-//		super(text, icon);
-//	}
-//
 	public Insets getMargin() {
 		return INSETS;
 	}
@@ -78,21 +69,33 @@ public class JPatchButton extends JButton {
             } else {
                 acceleratorText += ks.getKeyChar();
             }
-            acceleratorText += "&nbsp;</font>";
-            System.out.println(acceleratorText);
+            acceleratorText += "</font>&nbsp;";
         }
 		if (toolTipText != null) {
 			if (acceleratorText != null)
-				setToolTipText("<html>" + toolTipText + acceleratorText + "</html>");
+				setToolTipText("<html>&nbsp;" + toolTipText + acceleratorText + "&nbsp;</html>");
 			else
 				setToolTipText(toolTipText);
 		} else if (shortDescription != null) {
-			System.out.println("*");
-			if (acceleratorText != null) {
-				setToolTipText("<html>" + shortDescription + acceleratorText + "</html>");
-				System.out.println("**" + getToolTipText());
-			} else
+			if (acceleratorText != null)
+				setToolTipText("<html>&nbsp;" + shortDescription + acceleratorText + "&nbsp;</html>");
+			else
 				setToolTipText(shortDescription);
 		}
+		if (accelerator != null) {
+			KeyStroke ks = KeyStroke.getKeyStroke(accelerator);
+			getInputMap(WHEN_IN_FOCUSED_WINDOW).put(ks, "doClick");
+		}
+	}
+	
+	protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+		if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+			KeyBindingHelper.registerCallback(this, condition);
+		}
+		return false;
+	}
+
+	public boolean reprocessKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+		return super.processKeyBinding(ks, e, condition, pressed);
 	}
 }

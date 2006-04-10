@@ -25,10 +25,10 @@ implements ChangeListener {
 	AnimModel model;
 	public AnimModelPanel(AnimModel model) {
 		this.model = model;
-		add(new JPatchButton(new EditAnimObjectAction(model)));
-		add(new JPatchButton(new DeleteModelAction(model)));
-		add(new JPatchButton(new CopyPoseAction(model.getModel())));
-		add(new JPatchButton(new PastePoseAction(model.getModel())));
+		add(new JButton(new EditAnimObjectAction(model)));
+		add(new JButton(new DeleteModelAction(model)));
+		add(new JButton(new CopyPoseAction(model.getModel())));
+		add(new JButton(new PastePoseAction(model.getModel())));
 		
 		JPatchInput.setDimensions(50,150,20);
 		inputName = new JPatchInput("Name:",model.getName());

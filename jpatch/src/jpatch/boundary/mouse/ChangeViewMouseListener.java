@@ -9,6 +9,7 @@ import javax.vecmath.Quat4f;
 import jpatch.boundary.*;
 import jpatch.boundary.action.*;
 import jpatch.boundary.tools.*;
+import jpatch.boundary.ui.LockingButtonGroup;
 import jpatch.control.edit.*;
 import jpatch.entity.*;
 

@@ -2,14 +2,14 @@ package jpatch.boundary.sidebar;
 
 import jpatch.boundary.*;
 import jpatch.boundary.action.*;
-import jpatch.boundary.ui.*;
+import javax.swing.*;
 
 public class LightsPanel extends SidePanel {
 
 	private static final long serialVersionUID = 1L;
 
 	public LightsPanel() {
-		add(new JPatchButton(new NewLightAction()));
+		add(new JButton(new NewLightAction()));
 		MainFrame.getInstance().getSideBar().clearDetailPanel();
 	}
 }

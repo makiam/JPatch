@@ -34,10 +34,10 @@ public class JPatchRadioButtonMenuItem extends JRadioButtonMenuItem {
 			/* KEY_PRESSED */
 			if (e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
 				/* if it has a character assigned, store it */
-				KeyBindingHelper.ks = ks;
-				KeyBindingHelper.e = e;
-				KeyBindingHelper.condition = condition;
-				KeyBindingHelper.pressed = pressed;
+//				KeyBindingHelper.ks = ks;
+//				KeyBindingHelper.e = e;
+//				KeyBindingHelper.condition = condition;
+//				KeyBindingHelper.pressed = pressed;
 				/* and return "false" */
 				return false;
 			} else {
@@ -51,7 +51,7 @@ public class JPatchRadioButtonMenuItem extends JRadioButtonMenuItem {
 				 * (i.e. it has the same character) and has not been consumed
 				 * process the stored (KEY_PRESSED) event.
 				 */
-				if (super.processKeyBinding(KeyBindingHelper.ks, KeyBindingHelper.e, KeyBindingHelper.condition, KeyBindingHelper.pressed))
+				if (super.processKeyBinding(KeyBindingHelper.ks, KeyBindingHelper.e, condition, KeyBindingHelper.pressed))
 					return true;
 				/* if processing the stored event didn't return true, continue processing this (KEY_TYPED) event */
 				return super.processKeyBinding(ks, e, condition, pressed);

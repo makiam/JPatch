@@ -18,12 +18,12 @@ implements ChangeListener {
 	JPatchMaterial material;
 	public MaterialPanel(JPatchMaterial material) {
 		this.material = material;
-		add(new JPatchButton(new EditMaterialAction(material)));
+		add(new JButton(new EditMaterialAction(material)));
 		//add(new JPatchButton(new CloneMaterialAction(material)));
-		add(new JPatchButton(new DeleteMaterialAction(material)));
-		add(new JPatchButton(new ApplyMaterialAction(material)));
-		add(new JPatchButton(new SelectMaterialAction(material)));
-		add(new JPatchButton(new ApplyMaterialAction()));
+		add(new JButton(new DeleteMaterialAction(material)));
+		add(new JButton(new ApplyMaterialAction(material)));
+		add(new JButton(new SelectMaterialAction(material)));
+		add(new JButton(new ApplyMaterialAction()));
 		JPatchInput.setDimensions(50,150,20);
 		inputName = new JPatchInput("Name:",material.getName());
 		JPanel detailPanel = MainFrame.getInstance().getSideBar().getDetailPanel();

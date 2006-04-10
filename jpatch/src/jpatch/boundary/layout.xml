@@ -1,48 +1,10 @@
 <layout>
-<shortcuts>
-		<shortcut key="typed 1" command="single view"/>
-		<shortcut key="typed 2" command="horizontally split view"/>
-		<shortcut key="typed 3" command="vertically split view"/>
-		<shortcut key="typed 4" command="quad view"/>
-		<shortcut key="typed R" command="rotate view"/>
-		<shortcut key="typed M" command="move view"/>
-		<shortcut key="typed Z" command="zoom view"/>
-		<shortcut key="control Z" command="undo"/>
-		<shortcut key="control Y" command="redo"/>
-		<shortcut key="typed x" command="lock x"/>
-		<shortcut key="typed y" command="lock y"/>
-		<shortcut key="typed z" command="lock z"/>
-		<shortcut key="ESCAPE" command="default tool"/>
-		<shortcut key="typed r" command="rotate tool"/>
-		<shortcut key="typed a" command="add curve segment"/>
-		<shortcut key="typed b" command="add bone"/>
-		<shortcut key="typed k" command="knife tool" />
-		<shortcut key="BACK_SPACE" command="remove"/>
-		<shortcut key="DELETE" command="delete"/>
-		<shortcut key="INSERT" command="insert point"/>
-		<shortcut key="F5" command="compute patches"/>
-		<shortcut key="ctrl c" command="clone"/>
-		<shortcut key="typed e" command="extrude"/>
-		<shortcut key="typed l" command="lathe"/>
-		<shortcut key="ENTER" command="expand selection"/>
-		<shortcut key="TAB" command="next curve"/>
-		<shortcut key="shift TAB" command="prev curve"/>
-		<shortcut key="RIGHT" command="next point"/>
-		<shortcut key="LEFT" command="prev point"/>
-		<shortcut key="NUMPAD0" command="bottom view"/>
-		<shortcut key="NUMPAD5" command="top view"/>
-		<shortcut key="NUMPAD2" command="front view"/>
-		<shortcut key="NUMPAD8" command="rear view"/>
-		<shortcut key="NUMPAD4" command="left view"/>
-		<shortcut key="NUMPAD6" command="right view"/>
-		<shortcut key="NUMPAD7" command="bird's eye view"/>
-		<shortcut key="typed g" command="snap to grid"/>
-		<shortcut key="typed h" command="hide"/>
-	</shortcuts>
 	<toolbar name="main toolbar" position="north">
+<!--
 		<button command="new model"/>
 		<button command="new animation"/>
 		<button command="open"/>
+-->
 		<button command="save"/>
 		<separator/>
 		<button command="single view"/>
@@ -105,11 +67,11 @@
 	
 	<menu name="menubar">
 		<menu name="File" mnemonic="f">
-			<menu name="New" mnemonic="f">
+			<menu name="New" mnemonic="n" icon="jpatch/images/new.png">
 				<item command="new model"/>
 				<item command="new animation"/>
 			</menu>
-			<menu name="Open" mnemonic="f">
+			<menu name="Open" mnemonic="o" icon="jpatch/images/open.png">
 				<item command="open"/>
 				<item command="append"/>
 				<item command="open animation"/>
@@ -147,6 +109,7 @@
 			<separator/>
 			<item command="quit"/>
 		</menu>
+
 		<menu name="Edit" mnemonic="e">
 			<item command="undo"/>
 			<item command="redo"/>
@@ -254,7 +217,6 @@
 			<item command="grid spacing settings"/>
 			<item command="hide"/>
 		</menu>
-		
 		
 		<menu name="Help" mnemonic="h">
 			<item command="show about"/>

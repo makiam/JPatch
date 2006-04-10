@@ -180,7 +180,7 @@ public final class JPatchScreen extends JPanel {
 	
 	public void setActiveViewport(Component component) {
 		setActiveViewport(getViewport(component));
-//		Command.setViewDefinition(activeViewport.getViewDefinition());
+		Actions.getInstance().setViewDefinition(activeViewport.getViewDefinition());
 	}
 	
 	public void setActiveViewport(Viewport2 viewport) {

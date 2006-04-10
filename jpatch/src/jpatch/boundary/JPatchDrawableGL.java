@@ -23,7 +23,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	private Color4f color = new Color4f();
 	private Color3f backfaceColor;
 	
-	private boolean bPointAsQuad = false;
+	private boolean bPointAsQuad = true;
 	private boolean bPerspective = false;
 	private float fFocalLength = 50;
 	private Matrix4f m4Transform = new Matrix4f();
