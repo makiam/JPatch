@@ -28,7 +28,7 @@ public class UiTest {
 		JToolBar toolBar1 = new JToolBar(JToolBar.HORIZONTAL);
 		JToolBar toolBar2 = new JToolBar(JToolBar.VERTICAL);
 		
-		AbstractButton button1a = new JPatchToggleButton("1a");
+		AbstractButton button1a = new JToggleButton("1a");
 		AbstractButton button1b = new JToggleButton("1b");
 		AbstractButton button1c = new JToggleButton("1c");
 		AbstractButton button1d = new JToggleButton("1d");
@@ -37,10 +37,10 @@ public class UiTest {
 		AbstractButton button2c = new JToggleButton("2c");
 		AbstractButton button2d = new JToggleButton("2d");
 		
-		final UnderlyingToggleButtonModel buttonModel1 = new UnderlyingToggleButtonModel();
-		final UnderlyingToggleButtonModel buttonModel2 = new UnderlyingToggleButtonModel();
-		final UnderlyingToggleButtonModel buttonModel3 = new UnderlyingToggleButtonModel();
-		final UnderlyingToggleButtonModel buttonModel4 = new UnderlyingToggleButtonModel();
+//		final UnderlyingToggleButtonModel buttonModel1 = new UnderlyingToggleButtonModel();
+//		final UnderlyingToggleButtonModel buttonModel2 = new UnderlyingToggleButtonModel();
+//		final UnderlyingToggleButtonModel buttonModel3 = new UnderlyingToggleButtonModel();
+//		final UnderlyingToggleButtonModel buttonModel4 = new UnderlyingToggleButtonModel();
 		
 //		ActionListener actionListener = new ActionListener() {
 //			public void actionPerformed(ActionEvent e) {
@@ -49,24 +49,24 @@ public class UiTest {
 //			}
 //		};
 		
-		final ActionListener actionListener1 = new MyActionListener("1", buttonModel1);
-		ActionListener actionListener2 = new MyActionListener("2", buttonModel2);
-		ActionListener actionListener3 = new MyActionListener("3", buttonModel3);
-		ActionListener actionListener4 = new MyActionListener("4", buttonModel4);
-		
-		buttonModel1.addActionListener(actionListener1);
-		buttonModel2.addActionListener(actionListener2);
-		buttonModel3.addActionListener(actionListener3);
-		buttonModel4.addActionListener(actionListener4);
-		
-		button1a.setModel(new JPatchToggleButtonModel(buttonModel1));
-		button1b.setModel(new JPatchToggleButtonModel(buttonModel2));
-		button1c.setModel(new JPatchToggleButtonModel(buttonModel3));
-		button1d.setModel(new JPatchToggleButtonModel(buttonModel4));
-		button2a.setModel(new JPatchToggleButtonModel(buttonModel1));
-		button2b.setModel(new JPatchToggleButtonModel(buttonModel2));
-		button2c.setModel(new JPatchToggleButtonModel(buttonModel3));
-		button2d.setModel(new JPatchToggleButtonModel(buttonModel4));
+//		final ActionListener actionListener1 = new MyActionListener("1", buttonModel1);
+//		ActionListener actionListener2 = new MyActionListener("2", buttonModel2);
+//		ActionListener actionListener3 = new MyActionListener("3", buttonModel3);
+//		ActionListener actionListener4 = new MyActionListener("4", buttonModel4);
+//		
+//		buttonModel1.addActionListener(actionListener1);
+//		buttonModel2.addActionListener(actionListener2);
+//		buttonModel3.addActionListener(actionListener3);
+//		buttonModel4.addActionListener(actionListener4);
+//		
+//		button1a.setModel(new JPatchToggleButtonModel(buttonModel1));
+//		button1b.setModel(new JPatchToggleButtonModel(buttonModel2));
+//		button1c.setModel(new JPatchToggleButtonModel(buttonModel3));
+//		button1d.setModel(new JPatchToggleButtonModel(buttonModel4));
+//		button2a.setModel(new JPatchToggleButtonModel(buttonModel1));
+//		button2b.setModel(new JPatchToggleButtonModel(buttonModel2));
+//		button2c.setModel(new JPatchToggleButtonModel(buttonModel3));
+//		button2d.setModel(new JPatchToggleButtonModel(buttonModel4));
 		
 		toolBar1.add(button1a);
 		toolBar1.add(button1b);
@@ -86,27 +86,27 @@ public class UiTest {
 		
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("Menu");
-		JPatchRadioButtonMenuItem menuItem1 = new JPatchRadioButtonMenuItem("item 1");
-		JPatchRadioButtonMenuItem menuItem2 = new JPatchRadioButtonMenuItem("item 2");
-		JPatchRadioButtonMenuItem menuItem3 = new JPatchRadioButtonMenuItem("item 3");
-		JPatchRadioButtonMenuItem menuItem4 = new JPatchRadioButtonMenuItem("item 4");
-		menuItem1.setModel(new JPatchToggleButtonModel(buttonModel1));
-		menuItem2.setModel(new JPatchToggleButtonModel(buttonModel2));
-		menuItem3.setModel(new JPatchToggleButtonModel(buttonModel3));
-		menuItem4.setModel(new JPatchToggleButtonModel(buttonModel4));
-		menu.add(menuItem1);
-		menu.add(menuItem2);
-		menu.add(menuItem3);
-		menu.add(menuItem4);
+//		JPatchRadioButtonMenuItem menuItem1 = new JPatchRadioButtonMenuItem("item 1");
+//		JPatchRadioButtonMenuItem menuItem2 = new JPatchRadioButtonMenuItem("item 2");
+//		JPatchRadioButtonMenuItem menuItem3 = new JPatchRadioButtonMenuItem("item 3");
+//		JPatchRadioButtonMenuItem menuItem4 = new JPatchRadioButtonMenuItem("item 4");
+//		menuItem1.setModel(new JPatchToggleButtonModel(buttonModel1));
+//		menuItem2.setModel(new JPatchToggleButtonModel(buttonModel2));
+//		menuItem3.setModel(new JPatchToggleButtonModel(buttonModel3));
+//		menuItem4.setModel(new JPatchToggleButtonModel(buttonModel4));
+//		menu.add(menuItem1);
+//		menu.add(menuItem2);
+//		menu.add(menuItem3);
+//		menu.add(menuItem4);
 //		menuItem1.setAccelerator(KeyStroke.getKeyStroke("typed a"));
 //		menuItem1.getInputMap().put(KeyStroke.getKeyStroke('a'), "doClick");
 //		menuItem2.setAccelerator(KeyStroke.getKeyStroke("shift A"));
 //		menuItem3.setAccelerator(KeyStroke.getKeyStroke("control A"));
-		menuItem4.setAccelerator(KeyStroke.getKeyStroke("ENTER"));
-		menuItem1.setToolTipText("1st. Tool Tip Text");
-		menuItem2.setToolTipText("2nd.Tool Tip Text");
-		menuItem3.setToolTipText("3rd.Tool Tip Text");
-		menuItem4.setToolTipText("4th.Tool Tip Text");
+//		menuItem4.setAccelerator(KeyStroke.getKeyStroke("ENTER"));
+//		menuItem1.setToolTipText("1st. Tool Tip Text");
+//		menuItem2.setToolTipText("2nd.Tool Tip Text");
+//		menuItem3.setToolTipText("3rd.Tool Tip Text");
+//		menuItem4.setToolTipText("4th.Tool Tip Text");
 		
 		button1b.setToolTipText("<html>ToolTip <font face='Dialog' style='color: blue; font-size: 80%;'>SHIFT-X</font></html>");
 //		SwingUtilities.replaceUIInputMap(menuItem1, JComponent.WHEN_IN_FOCUSED_WINDOW, null);

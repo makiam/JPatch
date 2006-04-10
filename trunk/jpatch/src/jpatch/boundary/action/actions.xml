@@ -5,13 +5,11 @@
 	<action name="delete" model="default">
 		<constructor>new DeleteControlPointAction()</constructor>
 		<property key="ShortDescription" value="Delete"/>
-		<property key="ButtonToolTip" value="Delete"/>
 		<property key="Accelerator" value="DELETE"/>
 	</action>
 	<action name="remove" model="default">
 		<constructor>new RemoveControlPointAction()</constructor>
 		<property key="ShortDescription" value="Remove"/>
-		<property key="ButtonToolTip" value="Remove"/>
 		<property key="Accelerator" value="BACK_SPACE"/>
 	</action>
 	<action name="insert point" model="locking radio" group="mode">
@@ -32,26 +30,29 @@
 	<action name="new model" model="default">
 		<constructor>new NewModelAction()</constructor>
 		<property key="ShortDescription" value="New model"/>
-		<property key="ButtonToolTip" value="New model"/>
-		<property key="Icon" value="jpatch/images/new.png"/>
+		<property key="MenuText" value="Model"/>
+		<property key="Mnemonic" value="m"/>
+		<property key="Icon" value="jpatch/images/tree/model.png"/>
 	</action>
 	<action name="new animation" model="default">
 		<constructor>new NewAnimAction()</constructor>
 		<property key="ShortDescription" value="New choreography"/>
-		<property key="ButtonToolTip" value="New choreography"/>
-		<property key="Icon" value="jpatch/images/new.png"/>
+		<property key="MenuText" value="Choreography"/>
+		<property key="Mnemonic" value="c"/>
+		<property key="Icon" value="jpatch/images/tree/animation.png"/>
 	</action>
 	<action name="open" model="default">
 		<constructor>new ImportJPatchAction()</constructor>
 		<property key="ShortDescription" value="Open"/>
+		<property key="MenuText" value="Model"/>
 		<property key="Mnemonic" value="o"/>
-		<property key="ButtonToolTip" value="Open"/>
-		<property key="Icon" value="jpatch/images/open.png"/>
+		<property key="Icon" value="jpatch/images/tree/model.png"/>
 	</action>
 	<action name="save" model="default">
 		<constructor>new SaveAsAction(false)</constructor>
 		<property key="ShortDescription" value="Save"/>
-		<property key="ButtonToolTip" value="Save"/>
+		<property key="Mnemonic" value="s"/>
+		<property key="Accelerator" value="control S"/>
 		<property key="Icon" value="jpatch/images/save.png"/>
 	</action>
 	<action name="single view" model="radio" group="layout">
@@ -81,21 +82,18 @@
 	<action name="rotate view" model="locking radio" group="mode">
 		<constructor>new ViewRotateAction()</constructor>
 		<property key="ShortDescription" value="Rotate view"/>
-		<property key="ButtonToolTip" value="Rotate view"/>
 		<property key="Accelerator" value="shift R"/>
 		<property key="Icon" value="jpatch/images/rotate.png"/>
 	</action>
 	<action name="move view" model="locking radio" group="mode">
 		<constructor>new ViewMoveAction()</constructor>
 		<property key="ShortDescription" value="Move view"/>
-		<property key="ButtonToolTip" value="Move view"/>
 		<property key="Accelerator" value="shift M"/>
 		<property key="Icon" value="jpatch/images/move.png"/>
 	</action>
 	<action name="zoom view" model="locking radio" group="mode">
 		<constructor>new ViewZoomAction()</constructor>
 		<property key="ShortDescription" value="Zoom view"/>
-		<property key="ButtonToolTip" value="Zoom view"/>
 		<property key="Accelerator" value="shift Z"/>
 		<property key="Icon" value="jpatch/images/zoom.png"/>
 	</action>
@@ -108,12 +106,14 @@
 		<constructor>new UndoAction()</constructor>
 		<property key="ShortDescription" value="Undo"/>
 		<property key="Accelerator" value="control Z"/>
+		<property key="Mnemonic" value="u"/>
 		<property key="Icon" value="jpatch/images/undo.png"/>
 	</action>
 	<action name="redo" model="default">
 		<constructor>new RedoAction()</constructor>
 		<property key="ShortDescription" value="Redo"/>
 		<property key="Accelerator" value="control Y"/>
+		<property key="Mnemonic" value="r"/>
 		<property key="Icon" value="jpatch/images/redo.png"/>
 	</action>
 	<action name="lock x" model="check">
@@ -280,46 +280,64 @@
 	<action name="open animation" model="default">
 		<constructor>new ImportJPatchAnimationAction()</constructor>
 		<property key="ShortDescription" value="Open choreography"/>
-		<property key="Icon" value="jpatch/images/open.png"/>
+		<property key="MenuText" value="Choreography"/>
+		<property key="Mnemonic" value="c"/>
+		<property key="Icon" value="jpatch/images/tree/animation.png"/>
 	</action>
 	<action name="append" model="default">
 		<constructor>new ImportJPatchAction(false)</constructor>
 		<property key="ShortDescription" value="Append model"/>
-		<property key="Icon" value="jpatch/images/open.png"/>
+		<property key="MenuText" value="Model (append)"/>
+		<property key="Mnemonic" value="a"/>
+		<property key="Icon" value="jpatch/images/tree/models.png"/>
 	</action>
 	<action name="save as" model="default">
 		<constructor>new SaveAsAction(true)</constructor>
-		<property key="ShortDescription" value="Save as"/>
+		<property key="ShortDescription" value="Save as..."/>
+		<property key="Mnemonic" value="a"/>
+		<property key="Accelerator" value="control shift S"/>
 		<property key="Icon" value="jpatch/images/save.png"/>
 	</action>
 	<action name="import spatch" model="default">
 		<constructor>new ImportSPatchAction()</constructor>
 		<property key="ShortDescription" value="Import sPatch [.spt]"/>
-		<property key="Icon" value="jpatch/images/open.png"/>
+		<property key="MenuText" value="sPatch [.spt]"/>
+		<property key="Mnemonic" value="s"/>
+		<property key="Icon" value="jpatch/images/spatch.png"/>
 	</action>
 	<action name="import animationmaster" model="default">
 		<constructor>new ImportAnimationMasterAction()</constructor>
 		<property key="ShortDescription" value="Import Animation:Master [.mdl]"/>
-		<property key="Icon" value="jpatch/images/open.png"/>
+		<property key="MenuText" value="Animation:Master [.mdl]"/>
+		<property key="Mnemonic" value="a"/>
+		<property key="Icon" value="jpatch/images/animationmaster.png"/>
 	</action>
 	<action name="export aliaswavefront" model="default">
 		<constructor>new ExportWavefrontAction()</constructor>
 		<property key="ShortDescription" value="Export Alias|Wavefront [.obj]"/>
+		<property key="MenuText" value="Alias|Wavefront [.obj]"/>
+		<property key="Mnemonic" value="a"/>
 		<property key="Icon" value="jpatch/images/prefs/obj.png"/>
 	</action>
 	<action name="export povray" model="default">
 		<constructor>new ExportPovrayAction()</constructor>
 		<property key="ShortDescription" value="Export Pov-Ray [.pov|.inc]"/>
+		<property key="MenuText" value="Pov-Ray [.pov|.inc]"/>
+		<property key="Mnemonic" value="p"/>
 		<property key="Icon" value="jpatch/images/prefs/povray.png"/>
 	</action>
 	<action name="export renderman" model="default">
 		<constructor>new ExportRibAction()</constructor>
 		<property key="ShortDescription" value="Export Render-Man [.rib]"/>
+		<property key="MenuText" value="Render-Man [.rib]"/>
+		<property key="Mnemonic" value="r"/>
 		<property key="Icon" value="jpatch/images/prefs/renderman.png"/>
 	</action>
 	<action name="quit" model="default">
 		<constructor>new QuitAction()</constructor>
 		<property key="ShortDescription" value="Quit"/>
+		<property key="Accelerator" value="control Q"/>
+		<property key="Mnemonic" value="q"/>
 	</action>
 	<action name="synchronize viewports" model="check">
 		<constructor>new SyncScreensAction()</constructor>
@@ -327,7 +345,9 @@
 	</action>
 	<action name="settings" model="default">
 		<constructor>new EditSettingsAction()</constructor>
-		<property key="ShortDescription" value="Settings"/>
+		<property key="ShortDescription" value="Preferences..."/>
+		<property key="Mnemonic" value="p"/>
+		<property key="Icon" value="jpatch/images/prefs/settings.png"/>
 	</action>
 	<action name="grid spacing settings" model="default">
 		<constructor>new SetGridSpacingAction()</constructor>

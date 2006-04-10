@@ -5,7 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-public class JPatchButtonModel extends DefaultButtonModel implements ChangeListener, ItemListener {
+public class JPatchButtonModel extends DefaultButtonModel implements ChangeListener, ItemListener, ActionListener {
 
 	private DefaultButtonModel underlyingButtonModel;
 	
@@ -13,17 +13,8 @@ public class JPatchButtonModel extends DefaultButtonModel implements ChangeListe
 		this.underlyingButtonModel = underlyingButtonModel;
 		underlyingButtonModel.addChangeListener(this);
 		underlyingButtonModel.addItemListener(this);
+		underlyingButtonModel.addActionListener(this);
 	}
-	
-//	@Override
-//	public ButtonGroup getGroup() {
-//		return underlyingButtonModel.getGroup();
-//	}
-//
-//	@Override
-//	public void setGroup(ButtonGroup group) {
-//		underlyingButtonModel.setGroup(group);
-//	}
 
 	@Override
 	public boolean isSelected() {
@@ -43,4 +34,7 @@ public class JPatchButtonModel extends DefaultButtonModel implements ChangeListe
 		fireItemStateChanged(new ItemEvent(this, e.getID(), this, e.getStateChange()));
 	}
 	
+	public void actionPerformed(ActionEvent e) {
+		fireActionPerformed(e);
+	}
 }

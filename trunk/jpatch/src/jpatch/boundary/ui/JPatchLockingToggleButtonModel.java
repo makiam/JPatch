@@ -27,13 +27,12 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import jpatch.boundary.LockingButtonGroup;
 
 /**
  * @author sascha
  *
  */
-public class JPatchLockingToggleButtonModel extends DefaultButtonModel implements ChangeListener, ItemListener {
+public class JPatchLockingToggleButtonModel extends DefaultButtonModel implements ChangeListener, ItemListener, ActionListener {
 	private UnderlyingModel underlyingButtonModel;
 	public static final int DOUBLECLICK_THRESHOLD = 650;
 	private long lastClick;
@@ -42,6 +41,7 @@ public class JPatchLockingToggleButtonModel extends DefaultButtonModel implement
 		this.underlyingButtonModel = underlyingButtonModel;
 		underlyingButtonModel.addChangeListener(this);
 		underlyingButtonModel.addItemListener(this);
+		underlyingButtonModel.addActionListener(this);
 	}
 	
 //	@Override
@@ -73,7 +73,9 @@ public class JPatchLockingToggleButtonModel extends DefaultButtonModel implement
 		fireItemStateChanged(new ItemEvent(this, e.getID(), this, e.getStateChange()));
 	}
 	
-	
+	public void actionPerformed(ActionEvent e) {
+		fireActionPerformed(e);
+	}
 	
 	public boolean isLocked() {
 		return underlyingButtonModel.isLocked();
@@ -84,8 +86,6 @@ public class JPatchLockingToggleButtonModel extends DefaultButtonModel implement
 	}
 	
 	public void setPressed(boolean b) {
-		System.out.println(this + ".setPressed(" + b + ")");
-		
 		boolean performAction = false;
 		
 		if ((isPressed() == b) || !isEnabled()) {
@@ -99,7 +99,6 @@ public class JPatchLockingToggleButtonModel extends DefaultButtonModel implement
 				performAction = true;
 //              setLocked(false);
 			} else {
-				System.out.println("1");
 				if (time < lastClick + DOUBLECLICK_THRESHOLD) {
 					setLocked(true);
 				} else {
@@ -160,8 +159,6 @@ public class JPatchLockingToggleButtonModel extends DefaultButtonModel implement
 		}
 		
 		public void setPressed(boolean b) {
-			System.out.println(this + ".setPressed(" + b + ")");
-			
 			boolean performAction = false;
 			
 			if ((isPressed() == b) || !isEnabled()) {
@@ -175,7 +172,6 @@ public class JPatchLockingToggleButtonModel extends DefaultButtonModel implement
 					performAction = true;
 //	              setLocked(false);
 				} else {
-					System.out.println("1");
 					if (time < lastClick + DOUBLECLICK_THRESHOLD) {
 						setLocked(true);
 					} else {
@@ -223,9 +219,4 @@ public class JPatchLockingToggleButtonModel extends DefaultButtonModel implement
 		
 		
 	}
-//	public void setSelected(boolean b) {
-////		System.out.println(this + ".setSelected(" + b + ")");
-//		super.setSelected(b);
-//		setLocked(false);
-//	}
 }

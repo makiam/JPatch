@@ -46,9 +46,9 @@ implements ChangeListener, ActionListener, Morph.MorphListener {
 //		add(editButton);
 //		add(deleteButton);
 		
-		useMorphButton = new JPatchButton(new UseDofMorphAction(dof, true));
-		discardMorphButton = new JPatchButton(new UseDofMorphAction(dof, false));
-		addTargetButton = new JPatchButton(new NewMorphTargetAction(dof));
+		useMorphButton = new JButton(new UseDofMorphAction(dof, true));
+		discardMorphButton = new JButton(new UseDofMorphAction(dof, false));
+		addTargetButton = new JButton(new NewMorphTargetAction(dof));
 		
 		
 		
@@ -120,7 +120,7 @@ implements ChangeListener, ActionListener, Morph.MorphListener {
 			inputMin.setEnabled(false);
 			inputMax.setEnabled(false);
 		} else {
-			add(new JPatchButton(new DeleteDofAction(dof)));
+			add(new JButton(new DeleteDofAction(dof)));
 			add(useMorphButton);
 			add(discardMorphButton);
 			add(addTargetButton);
