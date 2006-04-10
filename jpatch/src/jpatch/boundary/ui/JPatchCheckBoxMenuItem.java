@@ -5,13 +5,9 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.*;;
 
-public class JPatchRadioButtonMenuItem extends JRadioButtonMenuItem {
+public class JPatchCheckBoxMenuItem extends JCheckBoxMenuItem {
 	
-	JPatchRadioButtonMenuItem() {
-		super();
-	}
-	
-	public JPatchRadioButtonMenuItem(JToggleButton.ToggleButtonModel buttonModel) {
+	public JPatchCheckBoxMenuItem(JToggleButton.ToggleButtonModel buttonModel) {
 		super();
 		setModel(new JPatchToggleButtonModel(buttonModel));
 	}
@@ -74,14 +70,24 @@ public class JPatchRadioButtonMenuItem extends JRadioButtonMenuItem {
 		String accelerator = (String) a.getValue("Accelerator");
 		String mnemonic = (String) a.getValue("Mnemonic");
 		String icon = (String) a.getValue("Icon");
+		String selectedIcon = (String) a.getValue("SelectedIcon");
+		String disabledIcon = (String) a.getValue("DisabledIcon");
+		String disabledSelectedIcon = (String) a.getValue("DisabledSelectedIconResoure");
 		String toolTipText = (String) a.getValue("MenuToolTip");
 		if (icon != null)
 			setIcon(new ImageIcon(ClassLoader.getSystemResource(icon)));
+		if (selectedIcon != null)
+			setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource(selectedIcon)));
+		if (disabledIcon != null)
+			setDisabledIcon(new ImageIcon(ClassLoader.getSystemResource(disabledIcon)));
+		if (disabledSelectedIcon != null)
+			setDisabledSelectedIcon(new ImageIcon(ClassLoader.getSystemResource(disabledSelectedIcon)));
 		if (text != null)
 			setText(text);
 		else if (shortDescription != null)
 			setText(shortDescription);
-		setToolTipText(toolTipText);
+		if (toolTipText != null)
+			setToolTipText(toolTipText);
 		if (accelerator != null)
 			setAccelerator(KeyStroke.getKeyStroke(accelerator));
 		if (mnemonic != null)

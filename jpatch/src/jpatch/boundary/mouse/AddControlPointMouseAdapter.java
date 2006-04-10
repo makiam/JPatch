@@ -10,8 +10,9 @@ import javax.swing.*;
 import javax.vecmath.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
-import jpatch.boundary.action.Command;
-import jpatch.boundary.tools.DefaultTool;
+import jpatch.boundary.action.*;
+import jpatch.boundary.tools.*;
+import jpatch.boundary.ui.*;
 
 import jpatch.control.edit.*;
 
@@ -164,6 +165,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 			} else if (iState == IDLE) {
 				// Right MouseButton pressed in IDLE state
 //				MainFrame.getInstance().getMeshToolBar().reset();
+				((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(true);
 			}
 		}  
 	}
@@ -224,8 +226,9 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 //				edit.addEdit(new AtomicChangeTool(new DefaultTool()));
 //			}
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
-//			if (!((LockingToggleButton) Command.getInstance().getButtonFor("add curve segment")).isLocked())
-//				Command.getInstance().getButtonFor("default tool").doClick();
+			
+			if (!((JPatchLockingToggleButton) Actions.getInstance().getButton("add curve segment")).isLocked())
+				((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(false);
 //			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
 //			MainFrame.getInstance().getMeshToolBar().reset();
 			

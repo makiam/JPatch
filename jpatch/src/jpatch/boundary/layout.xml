@@ -105,11 +105,16 @@
 	
 	<menu name="menubar">
 		<menu name="File" mnemonic="f">
-			<item command="new model"/>
-			<item command="new animation"/>
-			<item command="open"/>
-			<item command="append"/>
-			<item command="open animation"/>
+			<menu name="New" mnemonic="f">
+				<item command="new model"/>
+				<item command="new animation"/>
+			</menu>
+			<menu name="Open" mnemonic="f">
+				<item command="open"/>
+				<item command="append"/>
+				<item command="open animation"/>
+			</menu>
+			<separator/>
 			<item command="save"/>
 			<item command="save as"/>
 			<separator/>
@@ -122,36 +127,135 @@
 				<item command="export povray"/>
 				<item command="export renderman"/>
 			</menu>
-			<separator/>
-			<item command="quit"/>
-		</menu>
-		<menu name="Options" mnemonic="o">
-			<item command="synchronize viewports"/>
-			<item command="settings"/>
-			<item command="grid spacing settings"/>
-			<item command="install jogl"/>
+		<separator/>
+		<menu name="Extras" mnemonic="x">
 			<menu name="Look and feel" mnemonic="l">
 				<item command="jpatch lookandfeel"/>
 				<item command="crossplatform lookandfeel"/>
 				<item command="system lookandfeel"/>
 			</menu>
-			<item command="phoneme morph mapping"/>
+			<menu name="Debug" mnemonic="d">
+				<item command="dump"/>
+				<item command="dump xml"/>
+				<item command="dump undo stack"/>
+				<item command="check model"/>
+				<item command="controlpoint browser"/>
+			</menu>
+			<item command="install jogl"/>
 		</menu>
-		<menu name="Debug" mnemonic="d">
-			<item command="dump"/>
-			<item command="dump xml"/>
-			<item command="dump undo stack"/>
-			<item command="check model"/>
-			<item command="controlpoint browser"/>
+			<item command="settings"/>
+			<separator/>
+			<item command="quit"/>
 		</menu>
-		<menu name="Test" mnemonic="d">
-			<item command="default tool"/>
-			<item command="add curve segment"/>
-			<item command="add bone"/>
-			<item command="rotate tool"/>
-			<item command="weight selection tool"/>
-			<item command="knife tool" />
-		</menu>	
+		<menu name="Edit" mnemonic="e">
+			<item command="undo"/>
+			<item command="redo"/>
+			<separator/>
+			<menu name="Tools" mnemonic="t">
+				<item command="default tool"/>
+				<item command="add curve segment"/>
+				<item command="add bone"/>
+				<item command="rotate tool"/>
+				<item command="weight selection tool"/>
+				<item command="knife tool"/>
+				<item command="rotoscope tool"/>
+				<separator/>
+				<item command="detach"/>
+				<separator/>
+				<item command="tangent tool"/>
+				<item command="peak tangents"/>
+				<item command="round tangents"/>
+				<separator/>
+				<item command="clone"/>
+				<item command="extrude"/>
+				<item command="lathe"/>
+				<item command="lathe editor"/>
+				<separator/>
+				<item command="make patch"/>
+				<item command="compute patches"/>
+				<separator/>
+				<menu name="flip">
+					<item command="flip x"/>
+					<item command="flip y"/>
+					<item command="flip z"/>
+				</menu>
+				<item command="flip patches"/>
+				<item command="align patches"/>
+				<item command="align controlpoints"/>
+				<item command="automirror"/>
+				<item command="add stubs"/>
+				<item command="remove stubs"/>
+				<menu name="tangents">
+					<item command="change tangents: peak"/>
+					<item command="change tangents: round"/>
+					<item command="change tangents: spatch"/>
+				</menu>
+				<item command="assign controlpoints to bones"/>
+				<item command="phoneme morph mapping"/>
+			</menu>
+			<menu name="Lock" mnemonic="l">
+				<item command="lock x"/>
+				<item command="lock y"/>
+				<item command="lock z"/>
+				<separator/>
+				<item command="lock points"/>
+				<item command="lock bones"/>
+			</menu>
+			<menu name="Select" mnemonic="s">
+				<item command="select none"/>
+				<item command="select all"/>
+				<item command="invert selection"/>
+				<item command="expand selection"/>
+				<separator/>
+				<item command="select points"/>
+				<item command="select bones"/>
+			</menu>
+			<separator/>
+			<item command="stop edit morph"/>
+		</menu>
+		<menu name="View" mnemonic="v">
+			<item command="synchronize viewports"/>
+			<menu name="Active viewport" mnemonic="v">
+				<menu name="show">
+					<item command="show points"/>
+					<item command="show curves"/>
+					<item command="show patches"/>
+					<item command="show rotoscope"/>
+					<item command="show reference"/>
+				</menu>
+				<menu name="view">
+					<item command="front view"/>
+					<item command="rear view"/>
+					<item command="top view"/>
+					<item command="bottom view"/>
+					<item command="left view"/>
+					<item command="right view"/>
+					<item command="bird's eye view"/>
+				</menu>
+				<menu name="rotoscope">
+					<item command="set rotoscope image"/>
+					<item command="clear rotoscope image"/>
+				</menu>
+				<item command="lock view"/>
+				<item command="unlock view"/>
+			</menu>
+			<separator/>
+			<item command="single view"/>
+			<item command="horizontally split view"/>
+			<item command="vertically split view"/>
+			<item command="quad view"/>
+			<separator/>
+			<item command="move view"/>
+			<item command="rotate view"/>
+			<item command="zoom view"/>
+			<item command="zoom to fit"/>
+			<separator/>
+			<item command="snap to grid"/>
+			<item command="grid spacing settings"/>
+			<item command="hide"/>
+		</menu>
+		
+		
 		<menu name="Help" mnemonic="h">
 			<item command="show about"/>
 			<item command="show splashscreen"/>

@@ -72,7 +72,7 @@ public class ChangeViewMouseListener extends MouseAdapter {
 			((Component)mouseEvent.getSource()).removeMouseMotionListener(mouseMotionListener);
 //			MainFrame.getInstance().getDefaultToolTimer().restart();
 //			MainFrame.getInstance().getJPatchScreen().setTool(new DefaultTool());
-			((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone();
+			((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(false);
 			ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 			if (viewDef.getCamera() != null) {
 				System.out.println("*");

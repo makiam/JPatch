@@ -15,15 +15,15 @@ public class JPatchButtonModel extends DefaultButtonModel implements ChangeListe
 		underlyingButtonModel.addItemListener(this);
 	}
 	
-	@Override
-	public ButtonGroup getGroup() {
-		return underlyingButtonModel.getGroup();
-	}
-
-	@Override
-	public void setGroup(ButtonGroup group) {
-		underlyingButtonModel.setGroup(group);
-	}
+//	@Override
+//	public ButtonGroup getGroup() {
+//		return underlyingButtonModel.getGroup();
+//	}
+//
+//	@Override
+//	public void setGroup(ButtonGroup group) {
+//		underlyingButtonModel.setGroup(group);
+//	}
 
 	@Override
 	public boolean isSelected() {

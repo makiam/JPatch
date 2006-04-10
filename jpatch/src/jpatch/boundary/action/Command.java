@@ -1,5 +1,5 @@
 /*
- * $Id: Command.java,v 1.30 2006/04/05 15:29:10 sascha_l Exp $
+ * $Id: Command.java,v 1.31 2006/04/10 16:01:44 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -178,9 +178,9 @@ public final class Command {
 		put("horizontally split view",	new ViewSplitHorizontalAction(),new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("vertically split view",	new ViewSplitVerticalAction(), 	new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("quad view",				new ViewQuadAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
-		put("rotate view",				new ViewRotateAction(), 		new JRadioButtonMenuItem(),	new LockingToggleButton());
-		put("move view",				new ViewMoveAction(), 			new JRadioButtonMenuItem(),	new LockingToggleButton());
-		put("zoom view",				new ViewZoomAction(), 			new JRadioButtonMenuItem(),	new LockingToggleButton());
+		put("rotate view",				new ViewRotateAction(), 		new JRadioButtonMenuItem(),	new JPatchLockingToggleButton());
+		put("move view",				new ViewMoveAction(), 			new JRadioButtonMenuItem(),	new JPatchLockingToggleButton());
+		put("zoom view",				new ViewZoomAction(), 			new JRadioButtonMenuItem(),	new JPatchLockingToggleButton());
 		put("zoom to fit",				new ZoomToFitAction(), 			new JMenuItem(),			new JPatchButton());
 		put("undo",						new UndoAction(), 				new JMenuItem(),			new JPatchButton());
 		put("redo",						new RedoAction(), 				new JMenuItem(),			new JPatchButton());
@@ -199,8 +199,8 @@ public final class Command {
 		 * Edit toolbar buttons
 		 */
 		put("default tool",				new SelectMoveAction(), 		new JRadioButtonMenuItem(),	new JPatchToggleButton());
-		put("add curve segment",		new AddControlPointAction(), 	new JRadioButtonMenuItem(),	new LockingToggleButton());
-		put("add bone",					new AddBoneAction(), 			new JRadioButtonMenuItem(),	new LockingToggleButton());
+		put("add curve segment",		new AddControlPointAction(), 	new JRadioButtonMenuItem(),	new JPatchLockingToggleButton());
+		put("add bone",					new AddBoneAction(), 			new JRadioButtonMenuItem(),	new JPatchLockingToggleButton());
 		put("rotate tool",				new RotateAction(), 			new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("weight selection tool",	new WeightSelectionAction(), 	new JRadioButtonMenuItem(),	new JPatchToggleButton());
 		put("knife tool",				new KnifeAction(),				new JRadioButtonMenuItem(),	new JPatchToggleButton());

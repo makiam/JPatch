@@ -104,39 +104,38 @@ public class Actions extends DefaultHandler {
 	}
 	
 	public AbstractButton getButton(String key) {
+		System.out.println("getButton(" + key + ")");
 		ActionDescriptor actionDescriptor = actionMap.get(key);
 		if (actionDescriptor == null)
 			throw new IllegalArgumentException("Action for key " + key + " not found!");
-		if (actionDescriptor.button == null) {
-			if (actionDescriptor.buttonModel instanceof LockingToggleButton.LockingToggleButtonModel)
-				actionDescriptor.button = new LockingToggleButton();
-			else if (actionDescriptor.buttonModel instanceof JToggleButton.ToggleButtonModel)
-				actionDescriptor.button = new JPatchToggleButton();
-			else if (actionDescriptor.buttonModel instanceof DefaultButtonModel)
-				actionDescriptor.button = new JPatchButton();
-			actionDescriptor.button.setModel(actionDescriptor.buttonModel);
-			actionDescriptor.button.setAction(actionDescriptor.action);
-		}
-		return actionDescriptor.button;
+		System.out.println(actionDescriptor + " " + actionDescriptor.buttonModel);
+		AbstractButton button = null;
+		if (actionDescriptor.buttonModel instanceof JPatchLockingToggleButtonModel.UnderlyingModel)
+			button = new JPatchLockingToggleButton((JPatchLockingToggleButtonModel.UnderlyingModel) actionDescriptor.buttonModel);
+		else if (actionDescriptor.buttonModel instanceof JToggleButton.ToggleButtonModel)
+			button = new JPatchToggleButton((JPatchToggleButton.ToggleButtonModel) actionDescriptor.buttonModel);
+		else if (actionDescriptor.buttonModel instanceof DefaultButtonModel)
+			button = new JPatchButton(actionDescriptor.buttonModel);
+		button.setAction(actionDescriptor.action);
+		return button;
 	}
 	
 	public JMenuItem getMenuItem(String key) {
 		ActionDescriptor actionDescriptor = actionMap.get(key);
 		if (actionDescriptor == null)
 			throw new IllegalArgumentException("Action for key " + key + " not found!");
-		if (actionDescriptor.menuItem == null) {
-			if (actionDescriptor.buttonModel instanceof JToggleButton.ToggleButtonModel) {
-				if (actionDescriptor.buttonModel.getGroup() == null)
-					actionDescriptor.menuItem = new JCheckBoxMenuItem();
-				else
-					actionDescriptor.menuItem = new JRadioButtonMenuItem();
-			}
-			else if (actionDescriptor.buttonModel instanceof DefaultButtonModel)
-				actionDescriptor.menuItem = new JPatchMenuItem();
-			actionDescriptor.menuItem.setModel(actionDescriptor.buttonModel);
-			actionDescriptor.menuItem.setAction(actionDescriptor.action);
+		JMenuItem menuItem = null;
+		if (actionDescriptor.buttonModel instanceof JToggleButton.ToggleButtonModel) {
+			if (actionDescriptor.buttonModel.getGroup() == null)
+				menuItem = new JPatchCheckBoxMenuItem((JToggleButton.ToggleButtonModel) actionDescriptor.buttonModel);
+			else
+				menuItem = new JPatchRadioButtonMenuItem((JToggleButton.ToggleButtonModel) actionDescriptor.buttonModel);
+		} else if (actionDescriptor.buttonModel instanceof DefaultButtonModel) {
+			menuItem = new JPatchMenuItem((DefaultButtonModel) actionDescriptor.buttonModel);
 		}
-		return actionDescriptor.menuItem;
+		menuItem.setModel(actionDescriptor.buttonModel);
+		menuItem.setAction(actionDescriptor.action);
+		return menuItem;
 	}
 
 	@Override
@@ -154,16 +153,15 @@ public class Actions extends DefaultHandler {
 			actionDescriptor = actionMap.get(attributes.getValue("name"));
 			if (actionDescriptor == null)
 				throw new IllegalArgumentException("No actionDescriptor for key " + attributes.getValue("name") + "!");
-			Action action = actionDescriptor.action;
 			String model = attributes.getValue("model");
 			if (model.equals("default"))
 				actionDescriptor.buttonModel = new DefaultButtonModel();
 			else if (model.equals("radio")) {
 				actionDescriptor.buttonModel = new JToggleButton.ToggleButtonModel();
-				getButtonGroup(attributes.getValue("group")).add(getButton(attributes.getValue("name")));
+				getButtonGroup(attributes.getValue("group")).add(new JPatchDummyButton(actionDescriptor.buttonModel));
 			} else if (model.equals("locking radio")) {
-				actionDescriptor.buttonModel = new LockingToggleButton.LockingToggleButtonModel();
-				getButtonGroup(attributes.getValue("group")).add(getButton(attributes.getValue("name")));
+				actionDescriptor.buttonModel = new JPatchLockingToggleButtonModel.UnderlyingModel(); // FIXME
+				getButtonGroup(attributes.getValue("group")).add(new JPatchDummyButton(actionDescriptor.buttonModel));
 			} else if (model.equals("check")) {
 				actionDescriptor.buttonModel = new JToggleButton.ToggleButtonModel();
 			}
@@ -178,13 +176,13 @@ public class Actions extends DefaultHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		if (localName.equals("action")) {
-			if (actionDescriptor.button != null) {
-				System.out.println("*** button != null, setting action ***");
-				actionDescriptor.button.setAction(null);
-				actionDescriptor.button.setAction(actionDescriptor.action);
-			}
-			if (actionDescriptor.menuItem != null)
-				actionDescriptor.menuItem.setAction(actionDescriptor.action);
+//			if (actionDescriptor.button != null) {
+//				System.out.println("*** button != null, setting action ***");
+//				actionDescriptor.button.setAction(null);
+//				actionDescriptor.button.setAction(actionDescriptor.action);
+//			}
+//			if (actionDescriptor.menuItem != null)
+//				actionDescriptor.menuItem.setAction(actionDescriptor.action);
 			actionDescriptor = null;
 		}
 	}
@@ -308,8 +306,6 @@ public class Actions extends DefaultHandler {
 	static class ActionDescriptor {
 		Action action;
 		DefaultButtonModel buttonModel;
-		AbstractButton button;
-		JMenuItem menuItem;
 		
 		ActionDescriptor(Action action) {
 			this.action = action;
