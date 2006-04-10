@@ -7,23 +7,23 @@ import javax.swing.event.*;
 
 public class JPatchToggleButtonModel extends JToggleButton.ToggleButtonModel implements ChangeListener, ItemListener {
 
-	private UnderlyingToggleButtonModel underlyingButtonModel;
+	private JToggleButton.ToggleButtonModel underlyingButtonModel;
 	
-	public JPatchToggleButtonModel(UnderlyingToggleButtonModel underlyingButtonModel) {
+	public JPatchToggleButtonModel(JToggleButton.ToggleButtonModel underlyingButtonModel) {
 		this.underlyingButtonModel = underlyingButtonModel;
 		underlyingButtonModel.addChangeListener(this);
 		underlyingButtonModel.addItemListener(this);
 	}
 	
-	@Override
-	public ButtonGroup getGroup() {
-		return underlyingButtonModel.getGroup();
-	}
-
-	@Override
-	public void setGroup(ButtonGroup group) {
-		underlyingButtonModel.setGroup(group);
-	}
+//	@Override
+//	public ButtonGroup getGroup() {
+//		return underlyingButtonModel.getGroup();
+//	}
+//
+//	@Override
+//	public void setGroup(ButtonGroup group) {
+//		underlyingButtonModel.setGroup(group);
+//	}
 
 	@Override
 	public boolean isSelected() {
@@ -35,10 +35,10 @@ public class JPatchToggleButtonModel extends JToggleButton.ToggleButtonModel imp
 		underlyingButtonModel.setSelected(b);
 	}
 
-	@Override
-	protected void fireActionPerformed(ActionEvent e) {
-		underlyingButtonModel.fireActionPerformed(e);
-	}
+//	@Override
+//	protected void fireActionPerformed(ActionEvent e) {
+//		underlyingButtonModel.fireActionPerformed(e);
+//	}
 
 	public void stateChanged(ChangeEvent e) {
 		fireStateChanged();

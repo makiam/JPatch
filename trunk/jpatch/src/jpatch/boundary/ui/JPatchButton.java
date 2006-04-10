@@ -1,32 +1,35 @@
 package jpatch.boundary.ui;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
+
 import javax.swing.*;
 
 public class JPatchButton extends JButton {
 	private static final Insets INSETS = new Insets(2, 2, 2, 2);
 	
-	public JPatchButton() {
+	public JPatchButton(DefaultButtonModel buttonModel) {
 		super();
+		setModel(new JPatchButtonModel(buttonModel));
 	}
 
-	public JPatchButton(Icon icon) {
-		super(icon);
-	}
-
-	public JPatchButton(String text) {
-		super(text);
-	}
-
-	public JPatchButton(Action a) {
-		super(a);
-//		setAction(a);
-	}
-
-	public JPatchButton(String text, Icon icon) {
-		super(text, icon);
-	}
-
+//	public JPatchButton(Icon icon) {
+//		super(icon);
+//	}
+//
+//	public JPatchButton(String text) {
+//		super(text);
+//	}
+//
+//	public JPatchButton(Action a) {
+//		super(a);
+////		setAction(a);
+//	}
+//
+//	public JPatchButton(String text, Icon icon) {
+//		super(text, icon);
+//	}
+//
 	public Insets getMargin() {
 		return INSETS;
 	}
@@ -41,7 +44,9 @@ public class JPatchButton extends JButton {
 		String rolloverSelectedIcon = (String) a.getValue("RolloverSelectedIcon");
 		String disabledIcon = (String) a.getValue("DisabledIcon");
 		String disabledSelectedIcon = (String) a.getValue("DisabledSelectedIconResoure");
-		String toolTipText = (String) a.getValue("ToolTipText");
+		String shortDescription = (String) a.getValue("ShortDescription");
+		String toolTipText = (String) a.getValue("ButtonToolTip");
+		String accelerator = (String) a.getValue("Accelerator");
 		if (icon != null)
 			setIcon(new ImageIcon(ClassLoader.getSystemResource(icon)));
 		if (selectedIcon != null)
@@ -54,6 +59,40 @@ public class JPatchButton extends JButton {
 			setDisabledIcon(new ImageIcon(ClassLoader.getSystemResource(disabledIcon)));
 		if (disabledSelectedIcon != null)
 			setDisabledSelectedIcon(new ImageIcon(ClassLoader.getSystemResource(disabledSelectedIcon)));
-		setToolTipText(toolTipText);
+		String acceleratorText = null;
+		if (accelerator != null) {
+			String acceleratorDelimiter = UIManager.getString("MenuItem.acceleratorDelimiter");
+			if (acceleratorDelimiter == null)
+				acceleratorDelimiter = "+";
+			KeyStroke ks =  KeyStroke.getKeyStroke(accelerator);
+			int color = UIManager.getColor("ToolTip.foregroundInactive").getRGB() & 0xffffff;
+			acceleratorText = "&nbsp;&nbsp;&nbsp;<font style='font-size: 90%; color: #" + Integer.toHexString(color) + "'>";
+			int modifiers = ks.getModifiers();
+            if (modifiers > 0) {
+                acceleratorText += KeyEvent.getKeyModifiersText(modifiers);
+                acceleratorText += acceleratorDelimiter;
+            }
+            int keyCode = ks.getKeyCode();
+            if (keyCode != 0) {
+                acceleratorText += KeyEvent.getKeyText(keyCode);
+            } else {
+                acceleratorText += ks.getKeyChar();
+            }
+            acceleratorText += "&nbsp;</font>";
+            System.out.println(acceleratorText);
+        }
+		if (toolTipText != null) {
+			if (acceleratorText != null)
+				setToolTipText("<html>" + toolTipText + acceleratorText + "</html>");
+			else
+				setToolTipText(toolTipText);
+		} else if (shortDescription != null) {
+			System.out.println("*");
+			if (acceleratorText != null) {
+				setToolTipText("<html>" + shortDescription + acceleratorText + "</html>");
+				System.out.println("**" + getToolTipText());
+			} else
+				setToolTipText(shortDescription);
+		}
 	}
 }
