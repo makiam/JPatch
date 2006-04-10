@@ -21,13 +21,14 @@ public class UiTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		Locale.setDefault(Locale.GERMANY);
 		JFrame frame = new JFrame("UI-Test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JToolBar toolBar1 = new JToolBar(JToolBar.HORIZONTAL);
 		JToolBar toolBar2 = new JToolBar(JToolBar.VERTICAL);
 		
-		AbstractButton button1a = new JToggleButton("1a");
+		AbstractButton button1a = new JPatchToggleButton("1a");
 		AbstractButton button1b = new JToggleButton("1b");
 		AbstractButton button1c = new JToggleButton("1c");
 		AbstractButton button1d = new JToggleButton("1d");
@@ -48,7 +49,7 @@ public class UiTest {
 //			}
 //		};
 		
-		ActionListener actionListener1 = new MyActionListener("1", buttonModel1);
+		final ActionListener actionListener1 = new MyActionListener("1", buttonModel1);
 		ActionListener actionListener2 = new MyActionListener("2", buttonModel2);
 		ActionListener actionListener3 = new MyActionListener("3", buttonModel3);
 		ActionListener actionListener4 = new MyActionListener("4", buttonModel4);
@@ -97,11 +98,17 @@ public class UiTest {
 		menu.add(menuItem2);
 		menu.add(menuItem3);
 		menu.add(menuItem4);
-		menuItem1.setAccelerator(KeyStroke.getKeyStroke("pressed A"));
-		menuItem1.getInputMap().put(KeyStroke.getKeyStroke('a'), "doClick");
-		menuItem2.setAccelerator(KeyStroke.getKeyStroke("shift A"));
-		menuItem3.setAccelerator(KeyStroke.getKeyStroke("control A"));
-		menuItem4.setAccelerator(KeyStroke.getKeyStroke("control shift A"));
+//		menuItem1.setAccelerator(KeyStroke.getKeyStroke("typed a"));
+//		menuItem1.getInputMap().put(KeyStroke.getKeyStroke('a'), "doClick");
+//		menuItem2.setAccelerator(KeyStroke.getKeyStroke("shift A"));
+//		menuItem3.setAccelerator(KeyStroke.getKeyStroke("control A"));
+		menuItem4.setAccelerator(KeyStroke.getKeyStroke("ENTER"));
+		menuItem1.setToolTipText("1st. Tool Tip Text");
+		menuItem2.setToolTipText("2nd.Tool Tip Text");
+		menuItem3.setToolTipText("3rd.Tool Tip Text");
+		menuItem4.setToolTipText("4th.Tool Tip Text");
+		
+		button1b.setToolTipText("<html>ToolTip <font face='Dialog' style='color: blue; font-size: 80%;'>SHIFT-X</font></html>");
 //		SwingUtilities.replaceUIInputMap(menuItem1, JComponent.WHEN_IN_FOCUSED_WINDOW, null);
 //		SwingUtilities.replaceUIActionMap(menuItem1, null);
 //		SwingUtilities.replaceUIInputMap(menuItem2, JComponent.WHEN_IN_FOCUSED_WINDOW, null);
@@ -148,7 +155,8 @@ public class UiTest {
 		
 		frame.setSize(800, 600);
 		frame.setVisible(true);
-		
+		System.out.println(UIManager.getFont("MenuItem.acceleratorFont"));
+		new JFileChooser().showSaveDialog(frame);
 //		KeyEventDispatcher keyEventDispatcher = new KeyEventDispatcher() {
 //			public boolean dispatchKeyEvent(KeyEvent e) {
 //				//System.out.println(e);
@@ -194,7 +202,7 @@ public class UiTest {
 //		kepp.addKeyBinding(KeyStroke.getKeyStroke("shift A"), actionListener2);
 //		kepp.addKeyBinding(KeyStroke.getKeyStroke("control A"), actionListener3);
 //		kepp.addKeyBinding(KeyStroke.getKeyStroke("control shift A"), actionListener4);
-//		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(kepp);
+//		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(JPatchKeyEventPostProcessor.getInstance());
 		
 	}
 	

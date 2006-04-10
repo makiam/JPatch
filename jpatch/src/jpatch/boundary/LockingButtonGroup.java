@@ -36,10 +36,11 @@ public class LockingButtonGroup extends ButtonGroup {
 	/*
 	 * select the default button
 	 */
-	public void actionDone() {
+	public void actionDone(boolean abort) {
+		System.out.println("action Done");
 		ButtonModel selectedButtonModel = getSelection();
-		if (selectedButtonModel instanceof LockingToggleButton.LockingToggleButtonModel) {
-			if (((LockingToggleButton.LockingToggleButtonModel) selectedButtonModel).isLocked())
+		if (!abort && selectedButtonModel instanceof JPatchLockingToggleButtonModel.UnderlyingModel) {
+			if (((JPatchLockingToggleButtonModel.UnderlyingModel) selectedButtonModel).isLocked())
 				return;
 		}
 		if (defaultButtonModel != null && defaultButtonModel != selectedButtonModel) {
@@ -47,6 +48,7 @@ public class LockingButtonGroup extends ButtonGroup {
 			defaultButtonModel.setPressed(true);
 			defaultButtonModel.setPressed(false);
 			defaultButtonModel.setArmed(false);
+//			defaultButtonModel.setSelected(true);
 		}
 	}
 }
