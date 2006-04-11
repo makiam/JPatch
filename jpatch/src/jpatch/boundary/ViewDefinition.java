@@ -264,26 +264,32 @@ implements ComponentListener {
 	
 	public final void renderPoints(boolean enable) {
 		bRenderPoints = enable;
+		repaint();
 	}
 	
 	public final void renderCurves(boolean enable) {
 		bRenderCurves = enable;
+		repaint();
 	}
 	
 	public final void renderPatches(boolean enable) {
 		bRenderPatches = enable;
+		repaint();
 	}
 	
 	public final void renderBezierCPs(boolean enable) {
 		bRenderBezierCPs = enable;
+		repaint();
 	}
 	
 	public final void renderReference(boolean enable) {
 		bRenderReference = enable;
+		repaint();
 	}
 	
 	public final void showRotoscope(boolean enable) {
 		bShowRotoscope = enable;
+		repaint();
 	}
 	
 	public final void setTangentHandles(ControlPoint cp) {
