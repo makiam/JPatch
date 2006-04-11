@@ -45,7 +45,7 @@
 		<constructor>new ImportJPatchAction()</constructor>
 		<property key="ShortDescription" value="Open"/>
 		<property key="MenuText" value="Model"/>
-		<property key="Mnemonic" value="o"/>
+		<property key="Mnemonic" value="m"/>
 		<property key="Icon" value="jpatch/images/tree/model.png"/>
 	</action>
 	<action name="save" model="default">
@@ -120,6 +120,7 @@
 		<constructor>new XLockAction()</constructor>
 		<property key="ShortDescription" value="Lock x-axis"/>
 		<property key="Accelerator" value="pressed X"/>
+		<property key="Mnemonic" value="x"/>
 		<property key="Icon" value="jpatch/images/xunlocked.png"/>
 		<property key="SelectedIcon" value="jpatch/images/xlocked.png"/>
 	</action>
@@ -127,6 +128,7 @@
 		<constructor>new YLockAction()</constructor>
 		<property key="ShortDescription" value="Lock y-axis"/>
 		<property key="Accelerator" value="pressed Y"/>
+		<property key="Mnemonic" value="y"/>
 		<property key="Icon" value="jpatch/images/yunlocked.png"/>
 		<property key="SelectedIcon" value="jpatch/images/ylocked.png"/>
 
@@ -135,6 +137,7 @@
 		<constructor>new ZLockAction()</constructor>
 		<property key="ShortDescription" value="Lock z-axis"/>
 		<property key="Accelerator" value="pressed Z"/>
+		<property key="Mnemonic" value="z"/>
 		<property key="Icon" value="jpatch/images/zunlocked.png"/>
 		<property key="SelectedIcon" value="jpatch/images/zlocked.png"/>
 
@@ -173,12 +176,14 @@
 	<action name="lock points" model="check">
 		<constructor>new LockPointsAction()</constructor>
 		<property key="ShortDescription" value="Lock points"/>
+		<property key="Mnemonic" value="p"/>
 		<property key="Icon" value="jpatch/images/cp_unlocked.png"/>
 		<property key="SelectedIcon" value="jpatch/images/cp_locked.png"/>
 	</action>
 	<action name="lock bones" model="check">
 		<constructor>new LockBonesAction()</constructor>
 		<property key="ShortDescription" value="Lock bones"/>
+		<property key="Mnemonic" value="b"/>
 		<property key="Icon" value="jpatch/images/bone_unlocked.png"/>
 		<property key="SelectedIcon" value="jpatch/images/bone_locked.png"/>
 	</action>
@@ -393,17 +398,21 @@
 		<constructor>new ControlPointBrowserAction()</constructor>
 		<property key="ShortDescription" value="Controlpoint browser"/>
 	</action>
+<!--	
 	<action name="show reference" model="default">
 		<constructor>new ShowReferenceAction()</constructor>
 		<property key="ShortDescription" value="Show reference geometry"/>
 	</action>
+-->
 	<action name="show about" model="default">
 		<constructor>new AboutAction()</constructor>
 		<property key="ShortDescription" value="Show about"/>
+		<property key="Mnemonic" value="a"/>
 	</action>
 	<action name="show splashscreen" model="default">
 		<constructor>new ShowSplashAction()</constructor>
 		<property key="ShortDescription" value="Show splashscreen"/>
+		<property key="Mnemonic" value="s"/>
 	</action>
 	<action name="show points" model="check">
 		<constructor>new ShowPointsAction()</constructor>
@@ -465,21 +474,29 @@
 		<constructor>new SetViewLockAction(false)</constructor>
 		<property key="ShortDescription" value="Unlock view"/>
 	</action>
-	<action name="select none" model="default">
-		<constructor>new SelectNoneAction()</constructor>
-		<property key="ShortDescription" value="Select none"/>
-	</action>
 	<action name="select all" model="default">
 		<constructor>new SelectAllAction()</constructor>
 		<property key="ShortDescription" value="Select all"/>
+		<property key="Accelerator" value="control A"/>
+		<property key="Mnemonic" value="a"/>
+	</action>
+	<action name="select none" model="default">
+		<constructor>new SelectNoneAction()</constructor>
+		<property key="ShortDescription" value="Select none"/>
+		<property key="Accelerator" value="control shift A"/>
+		<property key="Mnemonic" value="n"/>
 	</action>
 	<action name="invert selection" model="default">
 		<constructor>new InvertSelectionAction()</constructor>
 		<property key="ShortDescription" value="Invert selection"/>
+		<property key="Accelerator" value="control I"/>
+		<property key="Mnemonic" value="i"/>
 	</action>
 	<action name="expand selection" model="default">
 		<constructor>new ExtendSelectionAction()</constructor>
 		<property key="ShortDescription" value="Expand selection"/>
+		<property key="Accelerator" value="typed +"/>
+		<property key="Mnemonic" value="e"/>
 	</action>
 	<action name="flip x" model="default">
 		<constructor>new FlipAction(FlipAction.X)</constructor>
