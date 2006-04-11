@@ -229,10 +229,10 @@ public class Actions extends DefaultHandler {
 		actionMap.put("new animation", new ActionDescriptor(new NewAnimAction()));
 		actionMap.put("open", new ActionDescriptor(new ImportJPatchAction()));
 		actionMap.put("save", new ActionDescriptor(new SaveAsAction(false)));
-		actionMap.put("single view", new ActionDescriptor(new ViewSingleAction()));
-		actionMap.put("horizontally split view", new ActionDescriptor(new ViewSplitHorizontalAction()));
-		actionMap.put("vertically split view", new ActionDescriptor(new ViewSplitVerticalAction()));
-		actionMap.put("quad view", new ActionDescriptor(new ViewQuadAction()));
+		actionMap.put("single view", new ActionDescriptor(new ViewportModeAction(ViewportModeAction.Mode.SINGLE)));
+		actionMap.put("horizontally split view", new ActionDescriptor(new ViewportModeAction(ViewportModeAction.Mode.HORIZONTAL_SPLIT)));
+		actionMap.put("vertically split view", new ActionDescriptor(new ViewportModeAction(ViewportModeAction.Mode.VERTICAL_SPLIT)));
+		actionMap.put("quad view", new ActionDescriptor(new ViewportModeAction(ViewportModeAction.Mode.QUAD)));
 		actionMap.put("rotate view", new ActionDescriptor(new ViewRotateAction()));
 		actionMap.put("move view", new ActionDescriptor(new ViewMoveAction()));
 		actionMap.put("zoom view", new ActionDescriptor(new ViewZoomAction()));
@@ -242,7 +242,7 @@ public class Actions extends DefaultHandler {
 		actionMap.put("lock x", new ActionDescriptor(new ToggleAction(ToggleAction.Type.LOCK_X)));
 		actionMap.put("lock y", new ActionDescriptor(new ToggleAction(ToggleAction.Type.LOCK_Y)));
 		actionMap.put("lock z", new ActionDescriptor(new ToggleAction(ToggleAction.Type.LOCK_Z)));
-		actionMap.put("snap to grid", new ActionDescriptor(new GridSnapAction()));
+		actionMap.put("snap to grid", new ActionDescriptor(new ToggleAction(ToggleAction.Type.SNAP_TO_GRID)));
 		actionMap.put("hide", new ActionDescriptor(new HideAction()));
 		actionMap.put("stop edit morph", new ActionDescriptor(new StopEditMorphAction()));
 		actionMap.put("select points", new ActionDescriptor(new ToggleAction(ToggleAction.Type.SELECT_POINTS)));

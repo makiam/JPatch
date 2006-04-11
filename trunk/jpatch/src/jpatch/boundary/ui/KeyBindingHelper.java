@@ -38,8 +38,6 @@ public class KeyBindingHelper {
 	static KeyStroke ks;
 	/* KeyEvent */
 	static KeyEvent e;
-	/* condition (can be either JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, JComponent.WHEN_FOCUSED or JComponent.WHEN_IN_FOCUSED_WINDOW) */
-//	static int condition;
 	/* pressed */
 	static boolean pressed;
 	
