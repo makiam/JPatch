@@ -38,7 +38,8 @@ public class ToggleAction extends AbstractAction {
 		LOCK_X, LOCK_Y, LOCK_Z,
 		LOCK_POINTS, LOCK_BONES,
 		SELECT_POINTS, SELECT_BONES,
-		SNAP_TO_GRID
+		SNAP_TO_GRID,
+		SHOW_POINTS, SHOW_CURVES, SHOW_PATCHES, SHOW_ROTOSCOPE
 	}
 	private final Type type;
 	
@@ -74,6 +75,18 @@ public class ToggleAction extends AbstractAction {
 			break;
 		case SNAP_TO_GRID:
 			MainFrame.getInstance().getJPatchScreen().snapToGrid(Actions.getInstance().getButtonModel("snap to grid").isSelected());
+			break;
+		case SHOW_POINTS:
+			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().renderPoints(Actions.getInstance().getButtonModel("show points").isSelected());
+			break;
+		case SHOW_CURVES:
+			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().renderCurves(Actions.getInstance().getButtonModel("show curves").isSelected());
+			break;
+		case SHOW_PATCHES:
+			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().renderPatches(Actions.getInstance().getButtonModel("show patches").isSelected());
+			break;
+		case SHOW_ROTOSCOPE:
+			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().showRotoscope(Actions.getInstance().getButtonModel("show rotoscope").isSelected());
 			break;
 		}
 	}

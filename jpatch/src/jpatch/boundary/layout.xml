@@ -165,8 +165,8 @@
 				<item command="lock bones"/>
 			</menu>
 			<menu name="Select" mnemonic="s">
-				<item command="select none"/>
 				<item command="select all"/>
+				<item command="select none"/>
 				<item command="invert selection"/>
 				<item command="expand selection"/>
 				<separator/>
@@ -184,7 +184,7 @@
 					<item command="show curves"/>
 					<item command="show patches"/>
 					<item command="show rotoscope"/>
-					<item command="show reference"/>
+<!--				<item command="show reference"/>	-->
 				</menu>
 				<menu name="view">
 					<item command="front view"/>
@@ -225,14 +225,14 @@
 	</menu>
 
 	<menu name="viewport popup">
-		<menu name="show">
+		<menu name="Show" mnemonic="s">
 			<item command="show points"/>
 			<item command="show curves"/>
 			<item command="show patches"/>
 			<item command="show rotoscope"/>
-			<item command="show reference"/>
+<!--		<item command="show reference"/>	-->
 		</menu>
-		<menu name="view">
+		<menu name="View" mnemonic="v">
 			<item command="front view"/>
 			<item command="rear view"/>
 			<item command="top view"/>
@@ -241,21 +241,21 @@
 			<item command="right view"/>
 			<item command="bird's eye view"/>
 		</menu>
-		<menu name="rotoscope">
+		<menu name="Rotoscope" mnemonic="r">
 			<item command="set rotoscope image"/>
 			<item command="clear rotoscope image"/>
 		</menu>
 		<item command="lock view"/>
 		<item command="unlock view"/>
 		<separator/>
-		<menu name="selection">
-			<item command="select none"/>
+		<menu name="Selection" mnemonic="e">
 			<item command="select all"/>
+			<item command="select none"/>
 			<item command="invert selection"/>
 			<item command="expand selection"/>
 		</menu>
-		<menu name="tools">
-			<menu name="flip">
+		<menu name="Tools" mnemonic="t">
+			<menu name="Flip" mnemonic="f">
 				<item command="flip x"/>
 				<item command="flip y"/>
 				<item command="flip z"/>
@@ -266,7 +266,7 @@
 			<item command="automirror"/>
 			<item command="add stubs"/>
 			<item command="remove stubs"/>
-			<menu name="tangents">
+			<menu name="Tangents" mnemonic="t">
 				<item command="change tangents: peak"/>
 				<item command="change tangents: round"/>
 				<item command="change tangents: spatch"/>

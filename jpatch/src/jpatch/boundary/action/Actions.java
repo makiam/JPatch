@@ -288,13 +288,13 @@ public class Actions extends DefaultHandler {
 		actionMap.put("dump undo stack", new ActionDescriptor(new DumpUndoStackAction()));
 		actionMap.put("check model", new ActionDescriptor(new CheckModelAction()));
 		actionMap.put("controlpoint browser", new ActionDescriptor(new ControlPointBrowserAction()));
-		actionMap.put("show reference", new ActionDescriptor(new ShowReferenceAction()));
+//		actionMap.put("show reference", new ActionDescriptor(new ShowReferenceAction()));
 		actionMap.put("show about", new ActionDescriptor(new AboutAction()));
 		actionMap.put("show splashscreen", new ActionDescriptor(new ShowSplashAction()));
-		actionMap.put("show points", new ActionDescriptor(new ShowPointsAction()));
-		actionMap.put("show curves", new ActionDescriptor(new ShowCurvesAction()));
-		actionMap.put("show patches", new ActionDescriptor(new ShowPatchesAction()));
-		actionMap.put("show rotoscope", new ActionDescriptor(new ShowRotoscopeAction()));
+		actionMap.put("show points", new ActionDescriptor(new ToggleAction(ToggleAction.Type.SHOW_POINTS)));
+		actionMap.put("show curves", new ActionDescriptor(new ToggleAction(ToggleAction.Type.SHOW_CURVES)));
+		actionMap.put("show patches", new ActionDescriptor(new ToggleAction(ToggleAction.Type.SHOW_PATCHES)));
+		actionMap.put("show rotoscope", new ActionDescriptor(new ToggleAction(ToggleAction.Type.SHOW_ROTOSCOPE)));
 		actionMap.put("front view", new ActionDescriptor(new ViewAction(ViewDefinition.FRONT)));
 		actionMap.put("rear view", new ActionDescriptor(new ViewAction(ViewDefinition.REAR)));
 		actionMap.put("top view", new ActionDescriptor(new ViewAction(ViewDefinition.TOP)));
