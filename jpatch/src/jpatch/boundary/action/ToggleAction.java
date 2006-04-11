@@ -37,7 +37,8 @@ public class ToggleAction extends AbstractAction {
 	public static enum Type {
 		LOCK_X, LOCK_Y, LOCK_Z,
 		LOCK_POINTS, LOCK_BONES,
-		SELECT_POINTS, SELECT_BONES
+		SELECT_POINTS, SELECT_BONES,
+		SNAP_TO_GRID
 	}
 	private final Type type;
 	
@@ -70,6 +71,9 @@ public class ToggleAction extends AbstractAction {
 			break;
 		case SELECT_BONES:
 			MainFrame.getInstance().getJPatchScreen().setSelectBones(Actions.getInstance().getButtonModel("select bones").isSelected());
+			break;
+		case SNAP_TO_GRID:
+			MainFrame.getInstance().getJPatchScreen().snapToGrid(Actions.getInstance().getButtonModel("snap to grid").isSelected());
 			break;
 		}
 	}

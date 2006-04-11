@@ -69,7 +69,7 @@ public class JPatchButton extends JButton implements KeyBindingHelper.CallBack {
             } else {
                 acceleratorText += ks.getKeyChar();
             }
-            acceleratorText += "</font>&nbsp;";
+            acceleratorText += "</font>";
         }
 		if (toolTipText != null) {
 			if (acceleratorText != null)
