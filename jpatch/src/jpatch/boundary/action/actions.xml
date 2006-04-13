@@ -27,6 +27,13 @@
 		<property key="ShortDescription" value="Previous curve"/>
 		<property key="Accelerator" value="shift TAB"/>
 	</action>
+	<action name="new" model="menu">
+		<constructor>new DummyAction()</constructor>
+		<property key="ShortDescription" value="New"/>
+		<property key="MenuText" value="New"/>
+		<property key="Mnemonic" value="n"/>
+		<property key="Icon" value="jpatch/images/new.png"/>
+	</action>
 	<action name="new model" model="default">
 		<constructor>new NewModelAction()</constructor>
 		<property key="ShortDescription" value="New model"/>
@@ -41,10 +48,15 @@
 		<property key="Mnemonic" value="c"/>
 		<property key="Icon" value="jpatch/images/tree/animation.png"/>
 	</action>
-	<action name="open" model="default">
-		<constructor>new ImportJPatchAction()</constructor>
+	<action name="open" model="menu">
+		<constructor>new DummyAction()</constructor>
 		<property key="ShortDescription" value="Open"/>
-		<property key="MenuText" value="Model"/>
+		<property key="Icon" value="jpatch/images/open.png"/>
+	</action>
+	<action name="open model" model="default">
+		<constructor>new ImportJPatchAction()</constructor>
+		<property key="ShortDescription" value="Open model..."/>
+		<property key="MenuText" value="Model..."/>
 		<property key="Mnemonic" value="m"/>
 		<property key="Icon" value="jpatch/images/tree/model.png"/>
 	</action>
@@ -117,7 +129,7 @@
 		<property key="Icon" value="jpatch/images/redo.png"/>
 	</action>
 	<action name="lock x" model="check">
-		<constructor>new XLockAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.LOCK_X)</constructor>
 		<property key="ShortDescription" value="Lock x-axis"/>
 		<property key="Accelerator" value="pressed X"/>
 		<property key="Mnemonic" value="x"/>
@@ -125,7 +137,7 @@
 		<property key="SelectedIcon" value="jpatch/images/xlocked.png"/>
 	</action>
 	<action name="lock y" model="check">
-		<constructor>new YLockAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.LOCK_Y)</constructor>
 		<property key="ShortDescription" value="Lock y-axis"/>
 		<property key="Accelerator" value="pressed Y"/>
 		<property key="Mnemonic" value="y"/>
@@ -134,7 +146,7 @@
 
 	</action>
 	<action name="lock z" model="check">
-		<constructor>new ZLockAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.LOCK_Z)</constructor>
 		<property key="ShortDescription" value="Lock z-axis"/>
 		<property key="Accelerator" value="pressed Z"/>
 		<property key="Mnemonic" value="z"/>
@@ -162,26 +174,26 @@
 		<property key="SelectedIcon" value="jpatch/images/stop.png"/>
 	</action>
 	<action name="select points" model="check">
-		<constructor>new SelectPointsAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.SELECT_POINTS)</constructor>
 		<property key="ShortDescription" value="Select points"/>
 		<property key="Icon" value="jpatch/images/cp_unselected.png"/>
 		<property key="SelectedIcon" value="jpatch/images/cp_selected.png"/>
 	</action>
 	<action name="select bones" model="check">
-		<constructor>new SelectBonesAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.SELECT_BONES)</constructor>
 		<property key="ShortDescription" value="Select bones"/>
 		<property key="Icon" value="jpatch/images/bone_unselected.png"/>
 		<property key="SelectedIcon" value="jpatch/images/bone_selected.png"/>
 	</action>
 	<action name="lock points" model="check">
-		<constructor>new LockPointsAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.LOCK_POINTS)</constructor>
 		<property key="ShortDescription" value="Lock points"/>
 		<property key="Mnemonic" value="p"/>
 		<property key="Icon" value="jpatch/images/cp_unlocked.png"/>
 		<property key="SelectedIcon" value="jpatch/images/cp_locked.png"/>
 	</action>
 	<action name="lock bones" model="check">
-		<constructor>new LockBonesAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.LOCK_BONES)</constructor>
 		<property key="ShortDescription" value="Lock bones"/>
 		<property key="Mnemonic" value="b"/>
 		<property key="Icon" value="jpatch/images/bone_unlocked.png"/>
@@ -285,14 +297,14 @@
 	<action name="open animation" model="default">
 		<constructor>new ImportJPatchAnimationAction()</constructor>
 		<property key="ShortDescription" value="Open choreography"/>
-		<property key="MenuText" value="Choreography"/>
+		<property key="MenuText" value="Choreography..."/>
 		<property key="Mnemonic" value="c"/>
 		<property key="Icon" value="jpatch/images/tree/animation.png"/>
 	</action>
 	<action name="append" model="default">
 		<constructor>new ImportJPatchAction(false)</constructor>
 		<property key="ShortDescription" value="Append model"/>
-		<property key="MenuText" value="Model (append)"/>
+		<property key="MenuText" value="Model (append)..."/>
 		<property key="Mnemonic" value="a"/>
 		<property key="Icon" value="jpatch/images/tree/models.png"/>
 	</action>

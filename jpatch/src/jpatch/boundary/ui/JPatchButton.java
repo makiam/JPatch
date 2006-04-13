@@ -89,6 +89,7 @@ public class JPatchButton extends JButton implements KeyBindingHelper.CallBack {
 	}
 	
 	protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+		System.out.println(getClass().getName() + " processKeyBinding " + e.isConsumed());
 		if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
 			KeyBindingHelper.registerCallback(this, condition);
 		}
@@ -96,6 +97,10 @@ public class JPatchButton extends JButton implements KeyBindingHelper.CallBack {
 	}
 
 	public boolean reprocessKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
-		return super.processKeyBinding(ks, e, condition, pressed);
+		System.out.println(getClass().getName() + " reprocessKeyBinding " + e.isConsumed());
+		boolean consumed = super.processKeyBinding(ks, e, condition, pressed);
+		if (consumed)
+			e.consume();
+		return consumed;
 	}
 }

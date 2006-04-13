@@ -541,7 +541,7 @@ public final class MainFrame extends JFrame {
 		Actions.getInstance().enableAction("lathe editor", false);
 		Actions.getInstance().enableAction("compute patches", false);
 		
-		Actions.getInstance().enableAction("show anim controls", true);
+//		Actions.getInstance().enableAction("show anim controls", true);
 //		jpatchScreen.getActiveViewport().getViewDefinition().setCamera(animation.getCameras().get(0));
 	}
 	

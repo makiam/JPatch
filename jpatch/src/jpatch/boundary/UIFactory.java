@@ -1,5 +1,5 @@
 /*
- * $Id: UIFactory.java,v 1.13 2006/04/10 22:51:33 sascha_l Exp $
+ * $Id: UIFactory.java,v 1.14 2006/04/13 16:03:23 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -32,6 +32,7 @@ import org.xml.sax.helpers.*;
 
 import jpatch.boundary.action.*;
 import jpatch.boundary.settings.*;
+import jpatch.boundary.ui.*;
 
 /**
  * @author sascha
@@ -155,8 +156,15 @@ public class UIFactory extends DefaultHandler {
 			}
 		} else if (localName.equals("button")) {
 			for (int i = 0; i < attributes.getLength(); i++) {
-				if (attributes.getLocalName(i).equals("command"))
-					toolBar.add(Actions.getInstance().getButton(attributes.getValue(i)));
+				if (attributes.getLocalName(i).equals("command")) {
+					AbstractButton button = Actions.getInstance().getButton(attributes.getValue(i));
+					toolBar.add(button);
+					if (button instanceof JPatchMenuButton) {
+						JPopupMenu popupMenu = new JPopupMenu();
+						listMenu.add(popupMenu);
+						((JPatchMenuButton) button).setPopupMenu(popupMenu);
+					}
+				}
 			}
 		} else if (localName.equals("menu")) {
 			for (int i = 0; i < attributes.getLength(); i++) {
@@ -187,6 +195,7 @@ public class UIFactory extends DefaultHandler {
 				}
 			}							
 		} else if (localName.equals("item")) {
+//			System.out.println(getMenu() + " item " + attributes.getValue("command"));
 			for (int i = 0; i < attributes.getLength(); i++) {
 				if (attributes.getLocalName(i).equals("command")) {
 					getMenu().add(Actions.getInstance().getMenuItem(attributes.getValue(i)));
@@ -209,7 +218,10 @@ public class UIFactory extends DefaultHandler {
 //		System.out.println("</" + localName + ">");
 		if (localName.equals("menu")) {
 			listMenu.remove((listMenu.size() - 1));
-		} else if (localName.equals("toolbar")) {
+		} else if (localName.equals("button")) {
+			if (listMenu.size() > 0)
+				listMenu.remove((listMenu.size() - 1));
+		}else if (localName.equals("toolbar")) {
 			toolBar = null;
 		}
 	}

@@ -98,6 +98,24 @@ public class SmoothButtonUI extends BasicButtonUI {
 				focusRect.width+3, focusRect.height+3);
 		
 	}
+
+	@Override
+	public Dimension getMaximumSize(JComponent c) {
+		// TODO Auto-generated method stub
+		return super.getMaximumSize(c);
+	}
+
+	@Override
+	public Dimension getMinimumSize(JComponent c) {
+		// TODO Auto-generated method stub
+		return super.getMinimumSize(c);
+	}
+
+	@Override
+	public Dimension getPreferredSize(JComponent c) {
+		// TODO Auto-generated method stub
+		return super.getPreferredSize(c);
+	}
     
     // DefaultButtonModel
 }

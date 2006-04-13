@@ -5,6 +5,15 @@
 		<button command="new animation"/>
 		<button command="open"/>
 -->
+		<button command="new">
+			<item command="new model"/>
+			<item command="new animation"/>
+		</button>
+		<button command="open">
+			<item command="open model"/>
+			<item command="append"/>
+			<item command="open animation"/>
+		</button>
 		<button command="save"/>
 		<separator/>
 		<button command="single view"/>
@@ -56,7 +65,10 @@
 		<separator/>
 		<button command="clone"/>
 		<button command="extrude"/>
+<!--
 		<button command="lathe"/>
+		<button command="lathe"/>
+-->
 		<button command="lathe editor"/>
 		<separator/>
 		<button command="make patch"/>
@@ -72,7 +84,7 @@
 				<item command="new animation"/>
 			</menu>
 			<menu name="Open" mnemonic="o" icon="jpatch/images/open.png">
-				<item command="open"/>
+				<item command="open model"/>
 				<item command="append"/>
 				<item command="open animation"/>
 			</menu>
@@ -103,7 +115,9 @@
 				<item command="check model"/>
 				<item command="controlpoint browser"/>
 			</menu>
-			<item command="install jogl"/>
+			<menu name="OpenGL" mnemonic="o">
+				<item command="install jogl"/>
+			</menu>
 		</menu>
 			<item command="settings"/>
 			<separator/>
@@ -131,6 +145,7 @@
 				<separator/>
 				<item command="clone"/>
 				<item command="extrude"/>
+				<item command="lathe"/>
 				<item command="lathe"/>
 				<item command="lathe editor"/>
 				<separator/>

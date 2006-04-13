@@ -1,17 +1,28 @@
 package jpatch.boundary.ui;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 
 import javax.swing.*;;
 
 public class JPatchMenuItem extends JMenuItem {
-	
+	private DefaultButtonModel dbm;
 	public JPatchMenuItem(DefaultButtonModel buttonModel) {
 		super();
 		setModel(new JPatchButtonModel(buttonModel));
+		dbm = buttonModel;
 	}
 	
+	@Override
+	protected void fireActionPerformed(ActionEvent e) {
+		System.out.println(getClass().getSimpleName() + " " + getText() + " fireActionPerformed(" + e.getSource() + ")");
+		System.out.println("underlying model = " + dbm);
+		System.out.println("model = " + getModel());
+//		for (StackTraceElement ste : Thread.currentThread().getStackTrace())
+//			System.out.println(ste);
+//		super.fireActionPerformed(e);
+	}
+
 	@Override
 	/**
 	 * Overrides proccessKeyBinding.
@@ -25,6 +36,12 @@ public class JPatchMenuItem extends JMenuItem {
 	 * being fired if a corresponding KEY_TYPED event has already been consumed (e.g. by a text component).
 	 */
 	protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+		if (!getText().equals("Lathe"))
+			return false;
+		for (ActionListener al : getActionListeners())
+			System.out.println(al);
+		System.out.println("\tprocessKeyBinding " + ks + " " + e.isConsumed() + " " + getText());
+		boolean consumed;
 		/* Check if event is a KEY_PRESSED or KEY_TYPED event */
 		if (e.getID() == KeyEvent.KEY_PRESSED) {
 			/* KEY_PRESSED */
@@ -38,26 +55,46 @@ public class JPatchMenuItem extends JMenuItem {
 				return false;
 			} else {
 				/* if not, process it */
-				return super.processKeyBinding(ks, e, condition, pressed);
+				consumed = super.processKeyBinding(ks, e, condition, pressed);
+				if (consumed)
+					e.consume();
+				System.out.println("char undefined, consumed=" + e.isConsumed());
+				return consumed;
 			}
 		} else if (e.getID() == KeyEvent.KEY_TYPED) {
 			/* KEY_TYPED */
-			if (KeyBindingHelper.e != null && e.getKeyChar() == KeyBindingHelper.e.getKeyChar() && !e.isConsumed()) {
+			if (KeyBindingHelper.e != null && e.getKeyChar() == KeyBindingHelper.e.getKeyChar()) {
+				if (e.isConsumed() || KeyBindingHelper.e.isConsumed())
+					return true;
 				/* if the KEY_TYPED event corresponds to the stored KEY_PRESSED event
 				 * (i.e. it has the same character) and has not been consumed
 				 * process the stored (KEY_PRESSED) event.
 				 */
-				if (super.processKeyBinding(KeyBindingHelper.ks, KeyBindingHelper.e, condition, KeyBindingHelper.pressed))
+				System.out.println("calling super...");
+				if (super.processKeyBinding(KeyBindingHelper.ks, KeyBindingHelper.e, condition, KeyBindingHelper.pressed)) {
+					KeyBindingHelper.e.consume();
+					e.consume();
+					System.out.println("key typed 1 " + e.isConsumed());
 					return true;
+				}
 				/* if processing the stored event didn't return true, continue processing this (KEY_TYPED) event */
-				return super.processKeyBinding(ks, e, condition, pressed);
+				consumed = super.processKeyBinding(ks, e, condition, pressed);
+				if (consumed)
+					e.consume();
+				return consumed;
 			} else {
 				/* else, process the KEY_TYPED event */
-				return super.processKeyBinding(ks, e, condition, pressed);
+				consumed = super.processKeyBinding(ks, e, condition, pressed);
+				if (consumed)
+					e.consume();
+				return consumed;
 			}
 		} else {
 			/* let superclass process the event */
-			return super.processKeyBinding(ks, e, condition, pressed);
+			consumed = super.processKeyBinding(ks, e, condition, pressed);
+			if (consumed)
+				e.consume();
+			return consumed;
 		}
 	}
 	
