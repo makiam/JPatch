@@ -5,7 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-public class JPatchButtonModel extends DefaultButtonModel implements ChangeListener, ItemListener {
+public class JPatchButtonModel extends DefaultButtonModel implements ChangeListener, ItemListener, ActionListener {
 
 	private DefaultButtonModel underlyingButtonModel;
 	
@@ -13,7 +13,7 @@ public class JPatchButtonModel extends DefaultButtonModel implements ChangeListe
 		this.underlyingButtonModel = underlyingButtonModel;
 		underlyingButtonModel.addChangeListener(this);
 		underlyingButtonModel.addItemListener(this);
-//		underlyingButtonModel.addActionListener(this);
+		underlyingButtonModel.addActionListener(this);
 	}
 
 	@Override
@@ -40,9 +40,9 @@ public class JPatchButtonModel extends DefaultButtonModel implements ChangeListe
 		super.fireActionPerformed(e);
 	}
 	
-//	public void actionPerformed(ActionEvent e) {
-//		fireActionPerformed(e);
-//	}
+	public void actionPerformed(ActionEvent e) {
+		fireActionPerformed(e);
+	}
 	
 	public String toString() {
 		return getClass().getName() + "@" + hashCode() + " underlying model=" + underlyingButtonModel;
