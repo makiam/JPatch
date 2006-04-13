@@ -17,6 +17,9 @@ public final class LatheAction extends AbstractAction {
 		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("lathe"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
+		System.out.println("Lathe..." + actionEvent.hashCode() + " " + actionEvent.getSource().hashCode());
+//		for (StackTraceElement ste : Thread.currentThread().getStackTrace())
+//			System.out.println(ste);
 		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && !selection.isSingle()) {
 			if (AbstractClone.checkForHooks(selection.getControlPointArray())) {
