@@ -1,10 +1,5 @@
 <layout>
 	<toolbar name="main toolbar" position="north">
-<!--
-		<button command="new model"/>
-		<button command="new animation"/>
-		<button command="open"/>
--->
 		<button command="new">
 			<item command="new model"/>
 			<item command="new animation"/>
@@ -65,10 +60,10 @@
 		<separator/>
 		<button command="clone"/>
 		<button command="extrude"/>
-<!--
+
 		<button command="lathe"/>
 		<button command="lathe"/>
--->
+
 		<button command="lathe editor"/>
 		<separator/>
 		<button command="make patch"/>

@@ -20,7 +20,7 @@ public class JPatchMenuItem extends JMenuItem {
 		System.out.println("model = " + getModel());
 //		for (StackTraceElement ste : Thread.currentThread().getStackTrace())
 //			System.out.println(ste);
-//		super.fireActionPerformed(e);
+		super.fireActionPerformed(e);
 	}
 
 	@Override

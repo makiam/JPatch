@@ -32,7 +32,7 @@ import javax.swing.event.*;
  * @author sascha
  *
  */
-public class JPatchLockingToggleButtonModel extends DefaultButtonModel implements ChangeListener, ItemListener {
+public class JPatchLockingToggleButtonModel extends DefaultButtonModel implements ChangeListener, ItemListener, ActionListener {
 	private UnderlyingModel underlyingButtonModel;
 	public static final int DOUBLECLICK_THRESHOLD = 650;
 	private long lastClick;
@@ -41,7 +41,7 @@ public class JPatchLockingToggleButtonModel extends DefaultButtonModel implement
 		this.underlyingButtonModel = underlyingButtonModel;
 		underlyingButtonModel.addChangeListener(this);
 		underlyingButtonModel.addItemListener(this);
-//		underlyingButtonModel.addActionListener(this);
+		underlyingButtonModel.addActionListener(this);
 	}
 	
 //	@Override
@@ -73,9 +73,9 @@ public class JPatchLockingToggleButtonModel extends DefaultButtonModel implement
 		fireItemStateChanged(new ItemEvent(this, e.getID(), this, e.getStateChange()));
 	}
 	
-//	public void actionPerformed(ActionEvent e) {
-//		fireActionPerformed(e);
-//	}
+	public void actionPerformed(ActionEvent e) {
+		fireActionPerformed(e);
+	}
 	
 	public boolean isLocked() {
 		return underlyingButtonModel.isLocked();
