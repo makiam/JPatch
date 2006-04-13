@@ -33,7 +33,7 @@ implements ComponentListener {
 	private float fZ = 0;
 	private boolean bRenderPoints = true;
 	private boolean bRenderCurves = true;
-	private boolean bRenderPatches = false;
+	private boolean bRenderPatches = true;
 	private boolean bRenderBezierCPs = false;
 	private boolean bShowRotoscope = true;
 	private boolean bAlwaysUseZBuffer = false;

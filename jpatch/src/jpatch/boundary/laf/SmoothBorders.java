@@ -27,7 +27,7 @@ public class SmoothBorders extends MetalBorders {
 //    }
 
     public static class ButtonBorder extends MetalBorders.ButtonBorder {
-    	protected static Insets borderInsets = new Insets( 2, 2, 2, 2 );
+    	protected static Insets borderInsets = new Insets( 3, 3, 3, 3 );
     	public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
     		SmoothUtilities.configureGraphics(g);
     		AbstractButton button = (AbstractButton) c;
@@ -36,15 +36,15 @@ public class SmoothBorders extends MetalBorders {
     		ButtonModel model = button.getModel();
     		if (model.isRollover() || model.isArmed()) {
     			g.setColor(Theme.rolloverBorderColor);
-    			g.drawRoundRect(x + 1, y + 1, w - 3, h - 3, 7, 7);
+    			g.drawRoundRect(x + 2, y + 2, w - 5, h - 5, 7, 7);
     			g.setColor(new Color(0, 0, 0, 0.5f));
-    			g.drawRoundRect(x, y, w - 1, h - 1, 9, 9);
+    			g.drawRoundRect(x + 1, y + 1, w - 3, h - 3, 9, 9);
     		} else if (model.isSelected() || model.isPressed()){
     			g.setColor(new Color(0, 0, 0, 0.5f));
-    			g.drawRoundRect(x, y, w - 1, h - 1, 9, 9);
+    			g.drawRoundRect(x + 1, y + 1, w - 3, h - 3, 9, 9);
     		} else if (!(c.getParent() instanceof JToolBar)) {
     			g.setColor(new Color(0, 0, 0, 0.25f));
-    			g.drawRoundRect(x, y, w - 1, h - 1, 9, 9);
+    			g.drawRoundRect(x + 1, y + 1, w - 3, h - 3, 9, 9);
     		}
     	}
     	

@@ -128,6 +128,15 @@ public class UiTest {
 		panel.add(new JTextField(30));
 		panel.add(new JTextField(30));
 		
+		JPopupMenu popup = new JPopupMenu();
+		popup.add(new JMenuItem("item 1"));
+		popup.add(new JMenuItem("item 2"));
+		popup.add(new JMenuItem("item 3"));
+		popup.add(new JMenuItem("item 4"));
+		JPatchMenuButton menuButton = new JPatchMenuButton(new JPatchMenuButton.MenuButtonModel());
+		menuButton.setPopupMenu(popup);
+		toolBar1.add(menuButton);
+		
 		final JPanel panel2 = new JPanel() {
 			
 		};

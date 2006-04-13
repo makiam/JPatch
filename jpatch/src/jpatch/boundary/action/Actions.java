@@ -21,6 +21,7 @@
  */
 package jpatch.boundary.action;
 
+import java.awt.event.ActionEvent;
 import java.net.*;
 import java.util.*;
 import javax.swing.*;
@@ -130,14 +131,14 @@ public class Actions extends DefaultHandler {
 	}
 	
 	public AbstractButton getButton(String key) {
-		System.out.println("getButton(" + key + ")");
 		ActionDescriptor actionDescriptor = actionMap.get(key);
 		if (actionDescriptor == null)
 			throw new IllegalArgumentException("Action for key " + key + " not found!");
-		System.out.println(actionDescriptor + " " + actionDescriptor.buttonModel);
 		AbstractButton button = null;
 		if (actionDescriptor.buttonModel instanceof JPatchLockingToggleButtonModel.UnderlyingModel)
 			button = new JPatchLockingToggleButton((JPatchLockingToggleButtonModel.UnderlyingModel) actionDescriptor.buttonModel);
+		else if (actionDescriptor.buttonModel instanceof JPatchMenuButton.MenuButtonModel)
+			button = new JPatchMenuButton((JPatchMenuButton.MenuButtonModel) actionDescriptor.buttonModel);
 		else if (actionDescriptor.buttonModel instanceof JToggleButton.ToggleButtonModel)
 			button = new JPatchToggleButton((JPatchToggleButton.ToggleButtonModel) actionDescriptor.buttonModel);
 		else if (actionDescriptor.buttonModel instanceof DefaultButtonModel)
@@ -159,17 +160,17 @@ public class Actions extends DefaultHandler {
 		} else if (actionDescriptor.buttonModel instanceof DefaultButtonModel) {
 			menuItem = new JPatchMenuItem((DefaultButtonModel) actionDescriptor.buttonModel);
 		}
-		menuItem.setModel(actionDescriptor.buttonModel);
+//		menuItem.setModel(actionDescriptor.buttonModel);
 		menuItem.setAction(actionDescriptor.action);
 		return menuItem;
 	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		System.out.print("<" + localName);
-		for (int i = 0, n = attributes.getLength(); i < n; i++)
-			System.out.print(" " + attributes.getLocalName(i) + "=\"" + attributes.getValue(i) + "\"");
-		System.out.println(">");
+//		System.out.print("<" + localName);
+//		for (int i = 0, n = attributes.getLength(); i < n; i++)
+//			System.out.print(" " + attributes.getLocalName(i) + "=\"" + attributes.getValue(i) + "\"");
+//		System.out.println(">");
 		if (localName.equals("buttongroup")) {
 			if (attributes.getValue("type").equals("standard"))
 				buttonGroupMap.put(attributes.getValue("name"), new ButtonGroup());
@@ -190,6 +191,8 @@ public class Actions extends DefaultHandler {
 				getButtonGroup(attributes.getValue("group")).add(new JPatchDummyButton(actionDescriptor.buttonModel));
 			} else if (model.equals("check")) {
 				actionDescriptor.buttonModel = new JToggleButton.ToggleButtonModel();
+			} else if (model.equals("menu")) {
+				actionDescriptor.buttonModel = new JPatchMenuButton.MenuButtonModel();
 			}
 			String isDefault = attributes.getValue("default");
 			if (isDefault != null && isDefault.equals("true"))
@@ -214,6 +217,7 @@ public class Actions extends DefaultHandler {
 	}
 	
 	private void addActions(Map<String, ActionDescriptor> map) {
+		
 		/*
 		 * BEGIN OF AUTO-GENERATED CODE - DO NOT MODIFY
 		 * The following lines have been generated with utilities.Actions
@@ -225,9 +229,11 @@ public class Actions extends DefaultHandler {
 		actionMap.put("insert point", new ActionDescriptor(new InsertControlPointAction()));
 		actionMap.put("next curve", new ActionDescriptor(new NextCurveAction(1)));
 		actionMap.put("prev curve", new ActionDescriptor(new NextCurveAction(-1)));
+		actionMap.put("new", new ActionDescriptor(new DummyAction()));
 		actionMap.put("new model", new ActionDescriptor(new NewModelAction()));
 		actionMap.put("new animation", new ActionDescriptor(new NewAnimAction()));
-		actionMap.put("open", new ActionDescriptor(new ImportJPatchAction()));
+		actionMap.put("open", new ActionDescriptor(new DummyAction()));
+		actionMap.put("open model", new ActionDescriptor(new ImportJPatchAction()));
 		actionMap.put("save", new ActionDescriptor(new SaveAsAction(false)));
 		actionMap.put("single view", new ActionDescriptor(new ViewportModeAction(ViewportModeAction.Mode.SINGLE)));
 		actionMap.put("horizontally split view", new ActionDescriptor(new ViewportModeAction(ViewportModeAction.Mode.HORIZONTAL_SPLIT)));
@@ -327,6 +333,7 @@ public class Actions extends DefaultHandler {
 		/*
 		 * END OF AUTO-GENERATED CODE
 		 */
+
 	}
 	
 	static class ActionDescriptor {
@@ -336,5 +343,9 @@ public class Actions extends DefaultHandler {
 		ActionDescriptor(Action action) {
 			this.action = action;
 		}
+	}
+	
+	static class DummyAction extends AbstractAction {
+		public void actionPerformed(ActionEvent e) { } // do nothing
 	}
 }
