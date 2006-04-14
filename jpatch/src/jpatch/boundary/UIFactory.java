@@ -79,6 +79,23 @@ public class UIFactory extends DefaultHandler {
 		mapObjects.put("menubar", menuBar);
 		mapObjects.put("viewport popup", popupMenu);
 		mapObjects.put("view menu", viewMenu);
+		
+		/*
+		 * Bind unbound actions to JPatchScreen
+		 */
+		Set<Action> unboundActions = Actions.getInstance().getUnboundActions();
+		if (unboundActions.size() > 0) {
+			InputMap inputMap = MainFrame.getInstance().getJPatchScreen().getInputMap(JComponent.WHEN_FOCUSED);
+			ActionMap actionMap = MainFrame.getInstance().getJPatchScreen().getActionMap();
+			for (Action action : unboundActions) {
+				String accelerator = (String) action.getValue(JPatchAction.ACCELERATOR);
+				if (accelerator == null)
+					throw new IllegalArgumentException("Action " + action + " is not bound to a menu or button, yet has no keyboard accelerator");
+				KeyStroke ks = KeyStroke.getKeyStroke(accelerator);
+				inputMap.put(ks, action);
+				actionMap.put(action, action);
+			}
+		}
 	}
 	
 	public JComponent getComponent(String key) {
@@ -170,7 +187,7 @@ public class UIFactory extends DefaultHandler {
 			for (int i = 0; i < attributes.getLength(); i++) {
 				if (attributes.getLocalName(i).equals("name")) {
 					if (getMenu() != null) {
-						JMenu menu = new JMenu(attributes.getValue(i));
+						JMenu menu = new JPatchMenu(attributes.getValue(i));
 //						System.out.println(((JMenu) getMenu()).getText() + " " + menu.getText());
 						if (!(getMenu() instanceof JMenuBar))
 							menu.setIcon(emptyIcon);

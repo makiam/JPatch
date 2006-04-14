@@ -686,6 +686,7 @@ public final class MainFrame extends JFrame {
 			}
 			bonesAndPoints = (points > 0 && bones > 1);
 			moreThanOnePoint = (points > 1);
+			jpatchScreen.setFocusTraversalKeysEnabled(!(selection.isSingle() && selection.getHotObject() instanceof ControlPoint));
 		}
 		Actions.getInstance().enableAction("select none", selection != null);
 		Actions.getInstance().enableAction("invert selection", selection != null);
@@ -714,6 +715,9 @@ public final class MainFrame extends JFrame {
 		Actions.getInstance().enableAction("assign controlpoints to bones", bonesAndPoints);
 		if (selection != null && selection.getHotObject() instanceof AnimObject) {
 			timelineEditor.setAnimObject((AnimObject) selection.getHotObject());
+		}
+		if (selection == null) {
+			jpatchScreen.setFocusTraversalKeysEnabled(true);
 		}
 	}
 	

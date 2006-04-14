@@ -34,8 +34,8 @@ public class KnifeAction extends AbstractAction {
 			MainFrame.getInstance().setHelpText("Click and drag mouse to draw a cutting line. Release mouse button to cut. Press right mouse button to cancel.");
 			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(false);
 			MainFrame.getInstance().getJPatchScreen().setTool(null);	// remove other tools
-			MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners(); //Remove other mouselisteners
-			MainFrame.getInstance().getJPatchScreen().addMouseListeners(new KnifeMouseAdapter()); //Activate knife tool
+//			MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners(); //Remove other mouselisteners
+			MainFrame.getInstance().getJPatchScreen().setMouseListener(new KnifeMouseAdapter()); //Activate knife tool
 		}
 	}
 

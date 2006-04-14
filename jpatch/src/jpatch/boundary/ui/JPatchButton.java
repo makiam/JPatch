@@ -3,8 +3,12 @@ package jpatch.boundary.ui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
+
+import jpatch.boundary.action.JPatchAction;
 
 public class JPatchButton extends JButton implements KeyBindingHelper.CallBack {
 	private static final Insets INSETS = new Insets(2, 2, 2, 2);
@@ -103,4 +107,20 @@ public class JPatchButton extends JButton implements KeyBindingHelper.CallBack {
 			e.consume();
 		return consumed;
 	}
+	
+//	@Override
+//	protected PropertyChangeListener createActionPropertyChangeListener(final Action a) {
+//        return new PropertyChangeListener() {
+//			public void propertyChange(PropertyChangeEvent e) {
+//				if (e.getPropertyName().equals("enabled"))
+//					setEnabled((Boolean) e.getNewValue());
+//				else if (e.getPropertyName().equals(JPatchAction.SHORT_DESCRIPTION) && a.getValue(JPatchAction.BUTTON_TOOLTIP) == null) {
+//					setToolTipText((String) e.getNewValue());
+//					if (getModel().isRollover())
+//						
+//				} else if (e.getPropertyName().equals(JPatchAction.BUTTON_TEXT))
+//					setText((String) e.getNewValue());
+//			}
+//        };
+//    }
 }

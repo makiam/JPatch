@@ -144,6 +144,7 @@ public final class JPatchScreen extends JPanel {
 //			aDrawable[i].getComponent().setFocusable(false);
 			//aViewDef[i].setLighting(RealtimeLighting.createThreepointLight()); // FIXME
 			activeViewport = aViewport[0];
+			aDrawable[i].getComponent().setFocusable(false);
 		}
 		setMode(mode);
 	}
@@ -179,14 +180,15 @@ public final class JPatchScreen extends JPanel {
 	}
 	
 	public void setActiveViewport(Component component) {
+		requestFocusInWindow();
 		setActiveViewport(getViewport(component));
-		Actions.getInstance().setViewDefinition(activeViewport.getViewDefinition());
 	}
 	
 	public void setActiveViewport(Viewport2 viewport) {
 		if (viewport != activeViewport) {
 			Viewport2 old = activeViewport;
 			activeViewport = viewport;
+			Actions.getInstance().setViewDefinition(activeViewport.getViewDefinition());
 			old.getDrawable().display();
 			viewport.getDrawable().display();
 		}
@@ -409,10 +411,12 @@ public final class JPatchScreen extends JPanel {
 	//	return cpCursor;
 	//}
 	
-	public void addMouseListeners(MouseListener mouseAdapter) {
+	public void setMouseListener(MouseListener mouseAdapter) {
+		removeAllMouseListeners();
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 			aDrawable[i].getComponent().addMouseListener(mouseAdapter);
 		}
+		addMMBListener();
 //		MainFrame.getInstance().getDefaultToolTimer().stop();
 	}
 	
@@ -431,6 +435,7 @@ public final class JPatchScreen extends JPanel {
 //			((JPatchCanvas)aComponent[i]).setTool(tool);
 			aViewport[i].setTool(tool);
 		}
+		addMMBListener();
 		update_all();
 //		if (tool instanceof DefaultTool)
 //			Command.getMenuItemFor("default tool").setSelected(true);
@@ -442,7 +447,7 @@ public final class JPatchScreen extends JPanel {
 		return tool;
 	}
 	
-	public void removeAllMouseListeners() {
+	private void removeAllMouseListeners() {
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 			MouseListener[] aMouseListener = aDrawable[i].getComponent().getMouseListeners();
 			MouseMotionListener[] aMouseMotionListener = aDrawable[i].getComponent().getMouseMotionListeners();
@@ -459,7 +464,6 @@ public final class JPatchScreen extends JPanel {
 		}
 		enablePopupMenu(false);
 		enablePopupMenu(true);
-		addMMBListener();
 	}
 	/*
 	public void rerender() {

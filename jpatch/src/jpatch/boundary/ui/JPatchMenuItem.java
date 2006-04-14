@@ -2,25 +2,17 @@ package jpatch.boundary.ui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.*;
 
-import javax.swing.*;;
+import javax.swing.*;
+
+import jpatch.boundary.action.*;
 
 public class JPatchMenuItem extends JMenuItem {
-	private DefaultButtonModel dbm;
+	
 	public JPatchMenuItem(DefaultButtonModel buttonModel) {
 		super();
 		setModel(new JPatchButtonModel(buttonModel));
-		dbm = buttonModel;
-	}
-	
-	@Override
-	protected void fireActionPerformed(ActionEvent e) {
-		System.out.println(getClass().getSimpleName() + " " + getText() + " fireActionPerformed(" + e.getSource() + ")");
-		System.out.println("underlying model = " + dbm);
-		System.out.println("model = " + getModel());
-//		for (StackTraceElement ste : Thread.currentThread().getStackTrace())
-//			System.out.println(ste);
-		super.fireActionPerformed(e);
 	}
 
 	@Override
@@ -36,78 +28,51 @@ public class JPatchMenuItem extends JMenuItem {
 	 * being fired if a corresponding KEY_TYPED event has already been consumed (e.g. by a text component).
 	 */
 	protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
-		if (!getText().equals("Lathe"))
-			return false;
-		for (ActionListener al : getActionListeners())
-			System.out.println(al);
-		System.out.println("\tprocessKeyBinding " + ks + " " + e.isConsumed() + " " + getText());
-		boolean consumed;
 		/* Check if event is a KEY_PRESSED or KEY_TYPED event */
 		if (e.getID() == KeyEvent.KEY_PRESSED) {
 			/* KEY_PRESSED */
 			if (e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
-				/* if it has a character assigned, store it */
-//				KeyBindingHelper.ks = ks;
-//				KeyBindingHelper.e = e;
-//				KeyBindingHelper.condition = condition;
-//				KeyBindingHelper.pressed = pressed;
-				/* and return "false" */
+				/* 
+				 * if it has a character assigned, return "false"
+				 * (KeyBindingHelper will store this event!)
+				 */
 				return false;
 			} else {
 				/* if not, process it */
-				consumed = super.processKeyBinding(ks, e, condition, pressed);
-				if (consumed)
-					e.consume();
-				System.out.println("char undefined, consumed=" + e.isConsumed());
-				return consumed;
+				return super.processKeyBinding(ks, e, condition, pressed);
 			}
 		} else if (e.getID() == KeyEvent.KEY_TYPED) {
 			/* KEY_TYPED */
-			if (KeyBindingHelper.e != null && e.getKeyChar() == KeyBindingHelper.e.getKeyChar()) {
-				if (e.isConsumed() || KeyBindingHelper.e.isConsumed())
-					return true;
+			if (KeyBindingHelper.e != null && e.getKeyChar() == KeyBindingHelper.e.getKeyChar() && !e.isConsumed()) {
 				/* if the KEY_TYPED event corresponds to the stored KEY_PRESSED event
 				 * (i.e. it has the same character) and has not been consumed
 				 * process the stored (KEY_PRESSED) event.
 				 */
-				System.out.println("calling super...");
-				if (super.processKeyBinding(KeyBindingHelper.ks, KeyBindingHelper.e, condition, KeyBindingHelper.pressed)) {
-					KeyBindingHelper.e.consume();
-					e.consume();
-					System.out.println("key typed 1 " + e.isConsumed());
+				if (super.processKeyBinding(KeyBindingHelper.ks, KeyBindingHelper.e, condition, KeyBindingHelper.pressed))
 					return true;
-				}
 				/* if processing the stored event didn't return true, continue processing this (KEY_TYPED) event */
-				consumed = super.processKeyBinding(ks, e, condition, pressed);
-				if (consumed)
-					e.consume();
-				return consumed;
+				return super.processKeyBinding(ks, e, condition, pressed);
 			} else {
 				/* else, process the KEY_TYPED event */
-				consumed = super.processKeyBinding(ks, e, condition, pressed);
-				if (consumed)
-					e.consume();
-				return consumed;
+				return super.processKeyBinding(ks, e, condition, pressed);
 			}
 		} else {
 			/* let superclass process the event */
-			consumed = super.processKeyBinding(ks, e, condition, pressed);
-			if (consumed)
-				e.consume();
-			return consumed;
+			return super.processKeyBinding(ks, e, condition, pressed);
 		}
 	}
 	
+	@Override
 	protected void configurePropertiesFromAction(Action a) {
 		super.configurePropertiesFromAction(a);
 		if (a == null)
 			return;
-		String text = (String) a.getValue("MenuText");
-		String shortDescription = (String) a.getValue("ShortDescription");
-		String accelerator = (String) a.getValue("Accelerator");
-		String mnemonic = (String) a.getValue("Mnemonic");
-		String icon = (String) a.getValue("Icon");
-		String toolTipText = (String) a.getValue("MenuToolTip");
+		String text = (String) a.getValue(JPatchAction.MENU_TEXT);
+		String shortDescription = (String) a.getValue(JPatchAction.SHORT_DESCRIPTION);
+		String accelerator = (String) a.getValue(JPatchAction.ACCELERATOR);
+		String mnemonic = (String) a.getValue(JPatchAction.MNEMONIC);
+		String icon = (String) a.getValue(JPatchAction.ICON);
+		String toolTipText = (String) a.getValue(JPatchAction.MENU_TOOLTIP);
 		if (icon != null)
 			setIcon(new ImageIcon(ClassLoader.getSystemResource(icon)));
 		if (text != null)
@@ -120,4 +85,18 @@ public class JPatchMenuItem extends JMenuItem {
 		if (mnemonic != null)
 			setMnemonic(mnemonic.charAt(0));
 	}
+	
+	@Override
+	protected PropertyChangeListener createActionPropertyChangeListener(final Action a) {
+        return new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent e) {
+				if (e.getPropertyName().equals("enabled"))
+					setEnabled((Boolean) e.getNewValue());
+				else if (e.getPropertyName().equals(JPatchAction.SHORT_DESCRIPTION) && a.getValue(JPatchAction.MENU_TEXT) == null)
+					setText((String) e.getNewValue());
+				else if (e.getPropertyName().equals(JPatchAction.MENU_TEXT))
+					setText((String) e.getNewValue());
+			}
+        };
+    }
 }
