@@ -2,6 +2,7 @@
 	<buttongroup type="locking" name="mode"/>
 	<buttongroup type="standard" name="layout"/>
 	<buttongroup type="standard" name="view"/>
+	<buttongroup type="standard" name="tangent mode"/>
 	<action name="delete" model="default">
 		<constructor>new DeleteControlPointAction()</constructor>
 		<property key="ShortDescription" value="Delete"/>
@@ -36,15 +37,15 @@
 	</action>
 	<action name="new model" model="default">
 		<constructor>new NewModelAction()</constructor>
-		<property key="ShortDescription" value="New model"/>
-		<property key="MenuText" value="Model"/>
+		<property key="ShortDescription" value="New model..."/>
+		<property key="MenuText" value="Model..."/>
 		<property key="Mnemonic" value="m"/>
 		<property key="Icon" value="jpatch/images/tree/model.png"/>
 	</action>
 	<action name="new animation" model="default">
 		<constructor>new NewAnimAction()</constructor>
-		<property key="ShortDescription" value="New choreography"/>
-		<property key="MenuText" value="Choreography"/>
+		<property key="ShortDescription" value="New choreography..."/>
+		<property key="MenuText" value="Choreography..."/>
 		<property key="Mnemonic" value="c"/>
 		<property key="Icon" value="jpatch/images/tree/animation.png"/>
 	</action>
@@ -68,25 +69,25 @@
 		<property key="Icon" value="jpatch/images/save.png"/>
 	</action>
 	<action name="single view" model="radio" group="layout">
-		<constructor>new ViewSingleAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.VIEWPORTS_SINGLE)</constructor>
 		<property key="ShortDescription" value="Single"/>
 		<property key="Accelerator" value="pressed 1"/>
 		<property key="Icon" value="jpatch/images/single.png"/>
 	</action>
 	<action name="horizontally split view" model="radio" group="layout">
-		<constructor>new ViewSplitHorizontalAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.VIEWPORTS_HORIZONTAL_SPLIT)</constructor>
 		<property key="ShortDescription" value="Split horizontally"/>
 		<property key="Accelerator" value="pressed 2"/>
 		<property key="Icon" value="jpatch/images/horizontal.png"/>
 	</action>
 	<action name="vertically split view" model="radio" group="layout">
-		<constructor>new ViewSplitVerticalAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.VIEWPORTS_VERTICAL_SPLIT)</constructor>
 		<property key="ShortDescription" value="Split vertically"/>
 		<property key="Accelerator" value="pressed 3"/>
 		<property key="Icon" value="jpatch/images/vertical.png"/>
 	</action>
 	<action name="quad view" model="radio" group="layout">
-		<constructor>new ViewQuadAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.VIEWPORTS_QUAD)</constructor>
 		<property key="ShortDescription" value="Quad"/>
 		<property key="Accelerator" value="pressed 4"/>
 		<property key="Icon" value="jpatch/images/quad.png"/>
@@ -130,7 +131,8 @@
 	</action>
 	<action name="lock x" model="check">
 		<constructor>new ToggleAction(ToggleAction.Type.LOCK_X)</constructor>
-		<property key="ShortDescription" value="Lock x-axis"/>
+		<property key="ShortDescription" value="Lock x axis"/>
+		<property key="MenuText" value="X axis"/>
 		<property key="Accelerator" value="pressed X"/>
 		<property key="Mnemonic" value="x"/>
 		<property key="Icon" value="jpatch/images/xunlocked.png"/>
@@ -138,7 +140,8 @@
 	</action>
 	<action name="lock y" model="check">
 		<constructor>new ToggleAction(ToggleAction.Type.LOCK_Y)</constructor>
-		<property key="ShortDescription" value="Lock y-axis"/>
+		<property key="ShortDescription" value="Lock y axis"/>
+		<property key="MenuText" value="Y axis"/>
 		<property key="Accelerator" value="pressed Y"/>
 		<property key="Mnemonic" value="y"/>
 		<property key="Icon" value="jpatch/images/yunlocked.png"/>
@@ -147,7 +150,8 @@
 	</action>
 	<action name="lock z" model="check">
 		<constructor>new ToggleAction(ToggleAction.Type.LOCK_Z)</constructor>
-		<property key="ShortDescription" value="Lock z-axis"/>
+		<property key="ShortDescription" value="Lock z axis"/>
+		<property key="MenuText" value="Z axis"/>
 		<property key="Accelerator" value="pressed Z"/>
 		<property key="Mnemonic" value="z"/>
 		<property key="Icon" value="jpatch/images/zunlocked.png"/>
@@ -155,7 +159,7 @@
 
 	</action>
 	<action name="snap to grid" model="check">
-		<constructor>new GridSnapAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.SNAP_TO_GRID)</constructor>
 		<property key="ShortDescription" value="Snap to grid"/>
 		<property key="Accelerator" value="pressed G"/>
 		<property key="Icon" value="jpatch/images/grid_no_snap.png"/>
@@ -176,18 +180,21 @@
 	<action name="select points" model="check">
 		<constructor>new ToggleAction(ToggleAction.Type.SELECT_POINTS)</constructor>
 		<property key="ShortDescription" value="Select points"/>
+		<property key="MenuText" value="Points"/>
 		<property key="Icon" value="jpatch/images/cp_unselected.png"/>
 		<property key="SelectedIcon" value="jpatch/images/cp_selected.png"/>
 	</action>
 	<action name="select bones" model="check">
 		<constructor>new ToggleAction(ToggleAction.Type.SELECT_BONES)</constructor>
 		<property key="ShortDescription" value="Select bones"/>
+		<property key="MenuText" value="Bones"/>
 		<property key="Icon" value="jpatch/images/bone_unselected.png"/>
 		<property key="SelectedIcon" value="jpatch/images/bone_selected.png"/>
 	</action>
 	<action name="lock points" model="check">
 		<constructor>new ToggleAction(ToggleAction.Type.LOCK_POINTS)</constructor>
 		<property key="ShortDescription" value="Lock points"/>
+		<property key="MenuText" value="Points"/>
 		<property key="Mnemonic" value="p"/>
 		<property key="Icon" value="jpatch/images/cp_unlocked.png"/>
 		<property key="SelectedIcon" value="jpatch/images/cp_locked.png"/>
@@ -195,6 +202,7 @@
 	<action name="lock bones" model="check">
 		<constructor>new ToggleAction(ToggleAction.Type.LOCK_BONES)</constructor>
 		<property key="ShortDescription" value="Lock bones"/>
+		<property key="MenuText" value="Bones"/>
 		<property key="Mnemonic" value="b"/>
 		<property key="Icon" value="jpatch/images/bone_unlocked.png"/>
 		<property key="SelectedIcon" value="jpatch/images/bone_locked.png"/>
@@ -203,95 +211,112 @@
 		<constructor>new SelectMoveAction()</constructor>
 		<property key="ShortDescription" value="Default tool"/>
 		<property key="Accelerator" value="ESCAPE"/>
+		<property key="Mnemonic" value="d"/>
 		<property key="Icon" value="jpatch/images/default.png"/>
 	</action>
 	<action name="add curve segment" model="locking radio" group="mode">
 		<constructor>new AddControlPointAction()</constructor>
-		<property key="ShortDescription" value="Add curve segment"/>
+		<property key="ShortDescription" value="Add curve segment(s)"/>
 		<property key="Accelerator" value="pressed A"/>
+		<property key="Mnemonic" value="a"/>
 		<property key="Icon" value="jpatch/images/add.png"/>
 	</action>
 	<action name="add bone" model="locking radio" group="mode">
 		<constructor>new AddBoneAction()</constructor>
-		<property key="ShortDescription" value="Add bone"/>
+		<property key="ShortDescription" value="Add bone(s)"/>
 		<property key="Accelerator" value="pressed B"/>
+		<property key="Mnemonic" value="b"/>
 		<property key="Icon" value="jpatch/images/addbone.png"/>
 	</action>
 	<action name="rotate tool" model="radio" group="mode">
 		<constructor>new RotateAction()</constructor>
 		<property key="ShortDescription" value="Rotate tool"/>
 		<property key="Accelerator" value="pressed R"/>
+		<property key="Mnemonic" value="r"/>
 		<property key="Icon" value="jpatch/images/rot.png"/>
 	</action>
 	<action name="weight selection tool" model="radio" group="mode">
 		<constructor>new WeightSelectionAction()</constructor>
 		<property key="ShortDescription" value="Weight selection tool"/>
+		<property key="Mnemonic" value="w"/>
 		<property key="Icon" value="jpatch/images/weight.png"/>
 	</action>
 	<action name="knife tool" model="radio" group="mode">
 		<constructor>new KnifeAction()</constructor>
 		<property key="ShortDescription" value="Knife tool"/>
+		<property key="Mnemonic" value="k"/>
 		<property key="Icon" value="jpatch/images/knife.png"/>
 	</action>
 	<action name="detach" model="default">
 		<constructor>new DetachControlPointsAction()</constructor>
 		<property key="ShortDescription" value="Detach"/>
 		<property key="Icon" value="jpatch/images/detach.png"/>
+		<property key="Mnemonic" value="e"/>
 	</action>
 	<action name="rotoscope tool" model="radio" group="mode">
 		<constructor>new RotoscopeAction()</constructor>
 		<property key="ShortDescription" value="Rotoscope tool"/>
 		<property key="Icon" value="jpatch/images/roto.png"/>
+		<property key="Mnemonic" value="o"/>
 	</action>
-	<action name="tangent tool" model="radio" group="mode">
+	<action name="tangent tool" model="check" group="mode">
 		<constructor>new TangentAction()</constructor>
 		<property key="ShortDescription" value="Show tangents"/>
+		<property key="Mnemonic" value="t"/>
 		<property key="Icon" value="jpatch/images/magnitude.png"/>
 	</action>
-	<action name="peak tangents" model="check">
-		<constructor>new PeakAction()</constructor>
-		<property key="ShortDescription" value="Peak tangents"/>
+	<action name="peak tangents" model="radio" group="tangent mode">
+		<constructor>new ToggleAction(ToggleAction.Type.TANGENTS_PEAK)</constructor>
+		<property key="ShortDescription" value="Peak"/>
+		<property key="Mnemonic" value="p"/>
 		<property key="Icon" value="jpatch/images/peak.png"/>
 	</action>
-	<action name="round tangents" model="check">
-		<constructor>new RoundAction()</constructor>
-		<property key="ShortDescription" value="Round tanents"/>
+	<action name="round tangents" model="radio" group="tangent mode">
+		<constructor>new ToggleAction(ToggleAction.Type.TANGENTS_ROUND)</constructor>
+		<property key="ShortDescription" value="Round"/>
+		<property key="Mnemonic" value="r"/>
 		<property key="Icon" value="jpatch/images/round.png"/>
 	</action>
 	<action name="clone" model="default">
 		<constructor>new CloneAction()</constructor>
 		<property key="ShortDescription" value="Clone"/>
 		<property key="Accelerator" value="control C"/>
+		<property key="Mnemonic" value="c"/>
 		<property key="Icon" value="jpatch/images/clone.png"/>
 	</action>
 	<action name="extrude" model="default">
 		<constructor>new ExtrudeAction()</constructor>
 		<property key="ShortDescription" value="Extrude"/>
 		<property key="Accelerator" value="pressed E"/>
+		<property key="Mnemonic" value="e"/>
 		<property key="Icon" value="jpatch/images/extrude.png"/>
 	</action>
 	<action name="lathe" model="default">
 		<constructor>new LatheAction()</constructor>
 		<property key="ShortDescription" value="Lathe"/>
 		<property key="Accelerator" value="pressed L"/>
+		<property key="Mnemonic" value="l"/>
 		<property key="Icon" value="jpatch/images/lathe.png"/>
 	</action>
 	<action name="lathe editor" model="default">
 		<constructor>new LatheEditorAction()</constructor>
-		<property key="ShortDescription" value="Advanced lathe"/>
+		<property key="ShortDescription" value="Lathe tool..."/>
 		<property key="Accelerator" value="shift L"/>
+		<property key="Mnemonic" value="h"/>
 		<property key="Icon" value="jpatch/images/sphere.png"/>
 	</action>
 	<action name="make patch" model="default">
 		<constructor>new MakeFivePointPatchAction()</constructor>
 		<property key="ShortDescription" value="Make 5-point patch"/>
 		<property key="Accelerator" value="pressed 5"/>
+		<property key="Mnemonic" value="5"/>
 		<property key="Icon" value="jpatch/images/fivepointpatch.png"/>
 	</action>
 	<action name="compute patches" model="default">
 		<constructor>new ComputePatchesAction()</constructor>
 		<property key="ShortDescription" value="Compute patches"/>
 		<property key="Accelerator" value="F5"/>
+		<property key="Mnemonic" value="m"/>
 		<property key="Icon" value="jpatch/images/computepatches.png"/>
 	</action>
 	<action name="open animation" model="default">
@@ -303,7 +328,7 @@
 	</action>
 	<action name="append" model="default">
 		<constructor>new ImportJPatchAction(false)</constructor>
-		<property key="ShortDescription" value="Append model"/>
+		<property key="ShortDescription" value="Append model..."/>
 		<property key="MenuText" value="Model (append)..."/>
 		<property key="Mnemonic" value="a"/>
 		<property key="Icon" value="jpatch/images/tree/models.png"/>
@@ -317,36 +342,36 @@
 	</action>
 	<action name="import spatch" model="default">
 		<constructor>new ImportSPatchAction()</constructor>
-		<property key="ShortDescription" value="Import sPatch [.spt]"/>
-		<property key="MenuText" value="sPatch [.spt]"/>
+		<property key="ShortDescription" value="Import sPatch [.spt]..."/>
+		<property key="MenuText" value="sPatch [.spt]..."/>
 		<property key="Mnemonic" value="s"/>
 		<property key="Icon" value="jpatch/images/spatch.png"/>
 	</action>
 	<action name="import animationmaster" model="default">
 		<constructor>new ImportAnimationMasterAction()</constructor>
-		<property key="ShortDescription" value="Import Animation:Master [.mdl]"/>
-		<property key="MenuText" value="Animation:Master [.mdl]"/>
+		<property key="ShortDescription" value="Import Animation:Master [.mdl]..."/>
+		<property key="MenuText" value="Animation:Master [.mdl]..."/>
 		<property key="Mnemonic" value="a"/>
 		<property key="Icon" value="jpatch/images/animationmaster.png"/>
 	</action>
 	<action name="export aliaswavefront" model="default">
 		<constructor>new ExportWavefrontAction()</constructor>
-		<property key="ShortDescription" value="Export Alias|Wavefront [.obj]"/>
-		<property key="MenuText" value="Alias|Wavefront [.obj]"/>
+		<property key="ShortDescription" value="Export Alias|Wavefront [.obj]..."/>
+		<property key="MenuText" value="Alias|Wavefront [.obj]..."/>
 		<property key="Mnemonic" value="a"/>
 		<property key="Icon" value="jpatch/images/prefs/obj.png"/>
 	</action>
 	<action name="export povray" model="default">
 		<constructor>new ExportPovrayAction()</constructor>
-		<property key="ShortDescription" value="Export Pov-Ray [.pov|.inc]"/>
-		<property key="MenuText" value="Pov-Ray [.pov|.inc]"/>
+		<property key="ShortDescription" value="Export Pov-Ray [.pov|.inc]..."/>
+		<property key="MenuText" value="Pov-Ray [.pov|.inc]..."/>
 		<property key="Mnemonic" value="p"/>
 		<property key="Icon" value="jpatch/images/prefs/povray.png"/>
 	</action>
 	<action name="export renderman" model="default">
 		<constructor>new ExportRibAction()</constructor>
-		<property key="ShortDescription" value="Export Render-Man [.rib]"/>
-		<property key="MenuText" value="Render-Man [.rib]"/>
+		<property key="ShortDescription" value="Export Render-Man [.rib]..."/>
+		<property key="MenuText" value="Render-Man [.rib]..."/>
 		<property key="Mnemonic" value="r"/>
 		<property key="Icon" value="jpatch/images/prefs/renderman.png"/>
 	</action>
@@ -355,6 +380,7 @@
 		<property key="ShortDescription" value="Quit"/>
 		<property key="Accelerator" value="control Q"/>
 		<property key="Mnemonic" value="q"/>
+		<property key="Icon" value="jpatch/images/quit.png"/>
 	</action>
 	<action name="synchronize viewports" model="check">
 		<constructor>new SyncScreensAction()</constructor>
@@ -372,19 +398,23 @@
 	</action>
 	<action name="install jogl" model="default">
 		<constructor>new InstallJoglAction()</constructor>
-		<property key="ShortDescription" value="Install OpenGL support libraries (JOGL)"/>
+		<property key="ShortDescription" value="Install OpenGL support libraries (JOGL)..."/>
+		<property key="Mnemonic" value="i"/>
 	</action>
 	<action name="jpatch lookandfeel" model="default">
 		<constructor>new SwitchLookAndFeelAction("jpatch.boundary.laf.SmoothLookAndFeel")</constructor>
 		<property key="ShortDescription" value="JPatch look-and-feel"/>
+		<property key="Mnemonic" value="j"/>
 	</action>
 	<action name="crossplatform lookandfeel" model="default">
 		<constructor>new SwitchLookAndFeelAction(UIManager.getCrossPlatformLookAndFeelClassName())</constructor>
 		<property key="ShortDescription" value="Crossplatform look-and-feel"/>
+		<property key="Mnemonic" value="c"/>
 	</action>
 	<action name="system lookandfeel" model="default">
 		<constructor>new SwitchLookAndFeelAction(UIManager.getSystemLookAndFeelClassName())</constructor>
 		<property key="ShortDescription" value="System look-and-feel"/>
+		<property key="Mnemonic" value="s"/>
 	</action>
 	<action name="phoneme morph mapping" model="default">
 		<constructor>new EditPhonemesAction()</constructor>
@@ -412,7 +442,7 @@
 	</action>
 <!--	
 	<action name="show reference" model="default">
-		<constructor>new ShowReferenceAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.SHOW_REFERENCE)</constructor>
 		<property key="ShortDescription" value="Show reference geometry"/>
 	</action>
 -->
@@ -427,48 +457,82 @@
 		<property key="Mnemonic" value="s"/>
 	</action>
 	<action name="show points" model="check">
-		<constructor>new ShowPointsAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.SHOW_POINTS)</constructor>
 		<property key="ShortDescription" value="Show points"/>
+		<property key="MenuText" value="Points"/>
+		<property key="Accelerator" value="shift P"/>
+		<property key="Mnemonic" value="p"/>
 	</action>
 	<action name="show curves" model="check">
-		<constructor>new ShowCurvesAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.SHOW_CURVES)</constructor>
 		<property key="ShortDescription" value="Show curves"/>
+		<property key="MenuText" value="Curves"/>
+		<property key="Accelerator" value="shift C"/>
+		<property key="Mnemonic" value="c"/>
+		
 	</action>
 	<action name="show patches" model="check">
-		<constructor>new ShowPatchesAction()</constructor>
-		<property key="ShortDescription" value="Show patches"/>
+		<constructor>new ToggleAction(ToggleAction.Type.SHOW_PATCHES)</constructor>
+		<property key="ShortDescription" value="Show surfaces"/>
+		<property key="MenuText" value="Surfaces"/>
+		<property key="Accelerator" value="shift S"/>
+		<property key="Mnemonic" value="s"/>
 	</action>
 	<action name="show rotoscope" model="check">
-		<constructor>new ShowRotoscopeAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.SHOW_ROTOSCOPE)</constructor>
 		<property key="ShortDescription" value="Show rotoscope"/>
+		<property key="MenuText" value="Rotoscope"/>
+		<property key="Accelerator" value="control shift R"/>
+		<property key="Mnemonic" value="r"/>
 	</action>
 	<action name="front view" model="radio" group="view">
 		<constructor>new ViewAction(ViewDefinition.FRONT)</constructor>
 		<property key="ShortDescription" value="Front view"/>
+		<property key="MenuText" value="Front"/>
+		<property key="Accelerator" value="NUMPAD5"/>
+		<property key="Mnemonic" value="f"/>
 	</action>
 	<action name="rear view" model="radio" group="view">
 		<constructor>new ViewAction(ViewDefinition.REAR)</constructor>
 		<property key="ShortDescription" value="Rear view"/>
+		<property key="MenuText" value="Rear"/>
+		<property key="Accelerator" value="NUMPAD0"/>
+		<property key="Mnemonic" value="r"/>
 	</action>
 	<action name="top view" model="radio" group="view">
 		<constructor>new ViewAction(ViewDefinition.TOP)</constructor>
 		<property key="ShortDescription" value="Top view"/>
+		<property key="MenuText" value="Top"/>
+		<property key="Accelerator" value="NUMPAD8"/>
+		<property key="Mnemonic" value="t"/>
 	</action>
 	<action name="bottom view" model="radio" group="view">
 		<constructor>new ViewAction(ViewDefinition.BOTTOM)</constructor>
 		<property key="ShortDescription" value="Bottom view"/>
+		<property key="MenuText" value="Bottom"/>
+		<property key="Accelerator" value="NUMPAD2"/>
+		<property key="Mnemonic" value="b"/>
 	</action>
 	<action name="left view" model="radio" group="view">
 		<constructor>new ViewAction(ViewDefinition.LEFT)</constructor>
 		<property key="ShortDescription" value="Left view"/>
+		<property key="MenuText" value="Left"/>
+		<property key="Accelerator" value="NUMPAD4"/>
+		<property key="Mnemonic" value="l"/>
 	</action>
 	<action name="right view" model="radio" group="view">
 		<constructor>new ViewAction(ViewDefinition.RIGHT)</constructor>
 		<property key="ShortDescription" value="Right view"/>
+		<property key="MenuText" value="Right"/>
+		<property key="Accelerator" value="NUMPAD6"/>
+		<property key="Mnemonic" value="r"/>
 	</action>
 	<action name="bird's eye view" model="radio" group="view">
 		<constructor>new ViewAction(ViewDefinition.BIRDS_EYE)</constructor>
 		<property key="ShortDescription" value="Bird's eye view"/>
+		<property key="MenuText" value="Bird's eye"/>
+		<property key="Accelerator" value="NUMPAD7"/>
+		<property key="Mnemonic" value="e"/>
 	</action>
 	<action name="set rotoscope image" model="default">
 		<constructor>new SetRotoscopeAction()</constructor>
@@ -481,6 +545,7 @@
 	<action name="lock view" model="check">
 		<constructor>new SetViewLockAction(true)</constructor>
 		<property key="ShortDescription" value="Lock view"/>
+		<property key="Accelerator" value="control L"/>
 	</action>
 	<action name="unlock view" model="default">
 		<constructor>new SetViewLockAction(false)</constructor>
@@ -489,12 +554,14 @@
 	<action name="select all" model="default">
 		<constructor>new SelectAllAction()</constructor>
 		<property key="ShortDescription" value="Select all"/>
+		<property key="MenuText" value="All"/>
 		<property key="Accelerator" value="control A"/>
 		<property key="Mnemonic" value="a"/>
 	</action>
 	<action name="select none" model="default">
 		<constructor>new SelectNoneAction()</constructor>
 		<property key="ShortDescription" value="Select none"/>
+		<property key="MenuText" value="None"/>
 		<property key="Accelerator" value="control shift A"/>
 		<property key="Mnemonic" value="n"/>
 	</action>
@@ -513,18 +580,25 @@
 	<action name="flip x" model="default">
 		<constructor>new FlipAction(FlipAction.X)</constructor>
 		<property key="ShortDescription" value="Flip x"/>
+		<property key="MenuText" value="X axis"/>
+		<property key="Mnemonic" value="x"/>
 	</action>
 	<action name="flip y" model="default">
 		<constructor>new FlipAction(FlipAction.Y)</constructor>
 		<property key="ShortDescription" value="Flip y"/>
+		<property key="MenuText" value="Y axis"/>
+		<property key="Mnemonic" value="y"/>
 	</action>
 	<action name="flip z" model="default">
 		<constructor>new FlipAction(FlipAction.Z)</constructor>
 		<property key="ShortDescription" value="Flip z"/>
+		<property key="MenuText" value="Z axis"/>
+		<property key="Mnemonic" value="z"/>
 	</action>
 	<action name="flip patches" model="default">
 		<constructor>new FlipPatchesAction()</constructor>
 		<property key="ShortDescription" value="Flip patches"/>
+		<property key="Accelerator" value="F"/>
 	</action>
 	<action name="align patches" model="default">
 		<constructor>new AlignPatchesAction()</constructor>
@@ -532,11 +606,12 @@
 	</action>
 	<action name="align controlpoints" model="default">
 		<constructor>new AlignAction()</constructor>
-		<property key="ShortDescription" value="Align controlpoints"/>
+		<property key="ShortDescription" value="Align controlpoints..."/>
 	</action>
 	<action name="automirror" model="default">
 		<constructor>new AutoMirrorAction()</constructor>
 		<property key="ShortDescription" value="Mirror"/>
+		<property key="Icon" value="jpatch/images/mirror.png"/>
 	</action>
 	<action name="add stubs" model="default">
 		<constructor>new AddStubsAction()</constructor>
@@ -548,15 +623,18 @@
 	</action>
 	<action name="change tangents: round" model="default">
 		<constructor>new ChangeTangentModeAction(ChangeTangentModeAction.JPATCH)</constructor>
-		<property key="ShortDescription" value="Round tangents"/>
+		<property key="ShortDescription" value="Round"/>
+		<property key="Mnemonic" value="r"/>
 	</action>
 	<action name="change tangents: peak" model="default">
 		<constructor>new ChangeTangentModeAction(ChangeTangentModeAction.PEAK)</constructor>
-		<property key="ShortDescription" value="Peak tangents"/>
+		<property key="ShortDescription" value="Peak"/>
+		<property key="Mnemonic" value="p"/>
 	</action>
 	<action name="change tangents: spatch" model="default">
 		<constructor>new ChangeTangentModeAction(ChangeTangentModeAction.SPATCH)</constructor>
-		<property key="ShortDescription" value="sPatch tangents"/>
+		<property key="ShortDescription" value="Round (sPatch)"/>
+		<property key="Mnemonic" value="s"/>
 	</action>
 	<action name="assign controlpoints to bones" model="default">
 		<constructor>new AssignPointsToBonesAction()</constructor>

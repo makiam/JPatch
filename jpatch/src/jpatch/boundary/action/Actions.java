@@ -81,7 +81,8 @@ public class Actions extends DefaultHandler {
 		 */
 		actionMap.get("select points").buttonModel.setSelected(true);
 		actionMap.get("select bones").buttonModel.setSelected(true);
-		actionMap.get("snap to grid").buttonModel.setSelected(Settings.getInstance().viewports.snapToGrid);		
+		actionMap.get("snap to grid").buttonModel.setSelected(Settings.getInstance().viewports.snapToGrid);	
+		actionMap.get("round tangents").buttonModel.setSelected(true);
 	}
 	
 	public void enableAction(String key, boolean enable) {
@@ -144,6 +145,7 @@ public class Actions extends DefaultHandler {
 		else if (actionDescriptor.buttonModel instanceof DefaultButtonModel)
 			button = new JPatchButton(actionDescriptor.buttonModel);
 		button.setAction(actionDescriptor.action);
+		actionDescriptor.bound = true;
 		return button;
 	}
 	
@@ -152,7 +154,12 @@ public class Actions extends DefaultHandler {
 		if (actionDescriptor == null)
 			throw new IllegalArgumentException("Action for key " + key + " not found!");
 		JMenuItem menuItem = null;
-		if (actionDescriptor.buttonModel instanceof JToggleButton.ToggleButtonModel) {
+		if (actionDescriptor.buttonModel instanceof JPatchLockingToggleButtonModel.UnderlyingModel) {
+			if (actionDescriptor.buttonModel.getGroup() == null)
+				throw new IllegalArgumentException("LockingToggleButton is not part of a buttongroup!");
+			else
+				menuItem = new JPatchLockingRadioButtonMenuItem((JPatchLockingToggleButtonModel.UnderlyingModel) actionDescriptor.buttonModel);
+		} else if (actionDescriptor.buttonModel instanceof JToggleButton.ToggleButtonModel) {
 			if (actionDescriptor.buttonModel.getGroup() == null)
 				menuItem = new JPatchCheckBoxMenuItem((JToggleButton.ToggleButtonModel) actionDescriptor.buttonModel);
 			else
@@ -162,9 +169,20 @@ public class Actions extends DefaultHandler {
 		}
 //		menuItem.setModel(actionDescriptor.buttonModel);
 		menuItem.setAction(actionDescriptor.action);
+		actionDescriptor.bound = true;
 		return menuItem;
 	}
 
+	public Set<Action> getUnboundActions() {
+		Set<Action> unboundActions = new HashSet<Action>();
+		for (String key : actionMap.keySet()) {
+			ActionDescriptor actionDescriptor = actionMap.get(key);
+			if (!actionDescriptor.bound)
+				unboundActions.add(actionDescriptor.action);
+		}
+		return unboundActions;
+	}
+	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 //		System.out.print("<" + localName);
@@ -217,7 +235,6 @@ public class Actions extends DefaultHandler {
 	}
 	
 	private void addActions(Map<String, ActionDescriptor> map) {
-		
 		/*
 		 * BEGIN OF AUTO-GENERATED CODE - DO NOT MODIFY
 		 * The following lines have been generated with utilities.Actions
@@ -235,10 +252,10 @@ public class Actions extends DefaultHandler {
 		actionMap.put("open", new ActionDescriptor(new DummyAction()));
 		actionMap.put("open model", new ActionDescriptor(new ImportJPatchAction()));
 		actionMap.put("save", new ActionDescriptor(new SaveAsAction(false)));
-		actionMap.put("single view", new ActionDescriptor(new ViewportModeAction(ViewportModeAction.Mode.SINGLE)));
-		actionMap.put("horizontally split view", new ActionDescriptor(new ViewportModeAction(ViewportModeAction.Mode.HORIZONTAL_SPLIT)));
-		actionMap.put("vertically split view", new ActionDescriptor(new ViewportModeAction(ViewportModeAction.Mode.VERTICAL_SPLIT)));
-		actionMap.put("quad view", new ActionDescriptor(new ViewportModeAction(ViewportModeAction.Mode.QUAD)));
+		actionMap.put("single view", new ActionDescriptor(new ToggleAction(ToggleAction.Type.VIEWPORTS_SINGLE)));
+		actionMap.put("horizontally split view", new ActionDescriptor(new ToggleAction(ToggleAction.Type.VIEWPORTS_HORIZONTAL_SPLIT)));
+		actionMap.put("vertically split view", new ActionDescriptor(new ToggleAction(ToggleAction.Type.VIEWPORTS_VERTICAL_SPLIT)));
+		actionMap.put("quad view", new ActionDescriptor(new ToggleAction(ToggleAction.Type.VIEWPORTS_QUAD)));
 		actionMap.put("rotate view", new ActionDescriptor(new ViewRotateAction()));
 		actionMap.put("move view", new ActionDescriptor(new ViewMoveAction()));
 		actionMap.put("zoom view", new ActionDescriptor(new ViewZoomAction()));
@@ -264,8 +281,8 @@ public class Actions extends DefaultHandler {
 		actionMap.put("detach", new ActionDescriptor(new DetachControlPointsAction()));
 		actionMap.put("rotoscope tool", new ActionDescriptor(new RotoscopeAction()));
 		actionMap.put("tangent tool", new ActionDescriptor(new TangentAction()));
-		actionMap.put("peak tangents", new ActionDescriptor(new PeakAction()));
-		actionMap.put("round tangents", new ActionDescriptor(new RoundAction()));
+		actionMap.put("peak tangents", new ActionDescriptor(new ToggleAction(ToggleAction.Type.TANGENTS_PEAK)));
+		actionMap.put("round tangents", new ActionDescriptor(new ToggleAction(ToggleAction.Type.TANGENTS_ROUND)));
 		actionMap.put("clone", new ActionDescriptor(new CloneAction()));
 		actionMap.put("extrude", new ActionDescriptor(new ExtrudeAction()));
 		actionMap.put("lathe", new ActionDescriptor(new LatheAction()));
@@ -294,7 +311,6 @@ public class Actions extends DefaultHandler {
 		actionMap.put("dump undo stack", new ActionDescriptor(new DumpUndoStackAction()));
 		actionMap.put("check model", new ActionDescriptor(new CheckModelAction()));
 		actionMap.put("controlpoint browser", new ActionDescriptor(new ControlPointBrowserAction()));
-//		actionMap.put("show reference", new ActionDescriptor(new ShowReferenceAction()));
 		actionMap.put("show about", new ActionDescriptor(new AboutAction()));
 		actionMap.put("show splashscreen", new ActionDescriptor(new ShowSplashAction()));
 		actionMap.put("show points", new ActionDescriptor(new ToggleAction(ToggleAction.Type.SHOW_POINTS)));
@@ -312,8 +328,8 @@ public class Actions extends DefaultHandler {
 		actionMap.put("clear rotoscope image", new ActionDescriptor(new ClearRotoscopeAction()));
 		actionMap.put("lock view", new ActionDescriptor(new SetViewLockAction(true)));
 		actionMap.put("unlock view", new ActionDescriptor(new SetViewLockAction(false)));
-		actionMap.put("select none", new ActionDescriptor(new SelectNoneAction()));
 		actionMap.put("select all", new ActionDescriptor(new SelectAllAction()));
+		actionMap.put("select none", new ActionDescriptor(new SelectNoneAction()));
 		actionMap.put("invert selection", new ActionDescriptor(new InvertSelectionAction()));
 		actionMap.put("expand selection", new ActionDescriptor(new ExtendSelectionAction()));
 		actionMap.put("flip x", new ActionDescriptor(new FlipAction(FlipAction.X)));
@@ -333,12 +349,12 @@ public class Actions extends DefaultHandler {
 		/*
 		 * END OF AUTO-GENERATED CODE
 		 */
-
 	}
 	
 	static class ActionDescriptor {
 		Action action;
 		DefaultButtonModel buttonModel;
+		boolean bound;
 		
 		ActionDescriptor(Action action) {
 			this.action = action;

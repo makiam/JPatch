@@ -24,6 +24,7 @@ package jpatch.boundary.action;
 import java.awt.event.*;
 import javax.swing.*;
 import jpatch.boundary.*;
+import jpatch.entity.ControlPoint;
 
 /**
  * This action is used to toggle states in respones to clicks
@@ -39,7 +40,9 @@ public class ToggleAction extends AbstractAction {
 		LOCK_POINTS, LOCK_BONES,
 		SELECT_POINTS, SELECT_BONES,
 		SNAP_TO_GRID,
-		SHOW_POINTS, SHOW_CURVES, SHOW_PATCHES, SHOW_ROTOSCOPE
+		SHOW_POINTS, SHOW_CURVES, SHOW_PATCHES, SHOW_ROTOSCOPE,
+		TANGENTS_PEAK, TANGENTS_ROUND,
+		VIEWPORTS_SINGLE, VIEWPORTS_VERTICAL_SPLIT, VIEWPORTS_HORIZONTAL_SPLIT, VIEWPORTS_QUAD
 	}
 	private final Type type;
 	
@@ -87,6 +90,24 @@ public class ToggleAction extends AbstractAction {
 			break;
 		case SHOW_ROTOSCOPE:
 			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().showRotoscope(Actions.getInstance().getButtonModel("show rotoscope").isSelected());
+			break;
+		case TANGENTS_PEAK:
+			ControlPoint.setDefaultMode(ControlPoint.PEAK);
+			break;
+		case TANGENTS_ROUND:
+			ControlPoint.setDefaultMode(ControlPoint.JPATCH_G1);
+			break;
+		case VIEWPORTS_SINGLE:
+			MainFrame.getInstance().getJPatchScreen().resetMode(JPatchScreen.SINGLE);
+			break;
+		case VIEWPORTS_VERTICAL_SPLIT:
+			MainFrame.getInstance().getJPatchScreen().resetMode(JPatchScreen.VERTICAL_SPLIT);
+			break;
+		case VIEWPORTS_HORIZONTAL_SPLIT:
+			MainFrame.getInstance().getJPatchScreen().resetMode(JPatchScreen.HORIZONTAL_SPLIT);
+			break;
+		case VIEWPORTS_QUAD:
+			MainFrame.getInstance().getJPatchScreen().resetMode(JPatchScreen.QUAD);
 			break;
 		}
 	}

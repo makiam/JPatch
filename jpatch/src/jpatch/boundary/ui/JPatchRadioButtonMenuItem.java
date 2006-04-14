@@ -3,7 +3,9 @@ package jpatch.boundary.ui;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-import javax.swing.*;;
+import javax.swing.*;
+import jpatch.boundary.action.JPatchAction;
+;
 
 public class JPatchRadioButtonMenuItem extends JRadioButtonMenuItem {
 	
@@ -33,12 +35,10 @@ public class JPatchRadioButtonMenuItem extends JRadioButtonMenuItem {
 		if (e.getID() == KeyEvent.KEY_PRESSED) {
 			/* KEY_PRESSED */
 			if (e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
-				/* if it has a character assigned, store it */
-//				KeyBindingHelper.ks = ks;
-//				KeyBindingHelper.e = e;
-//				KeyBindingHelper.condition = condition;
-//				KeyBindingHelper.pressed = pressed;
-				/* and return "false" */
+				/* 
+				 * if it has a character assigned, return "false"
+				 * (KeyBindingHelper will store this event!)
+				 */
 				return false;
 			} else {
 				/* if not, process it */
@@ -65,16 +65,26 @@ public class JPatchRadioButtonMenuItem extends JRadioButtonMenuItem {
 		}
 	}
 	
+	@Override
+	/**
+	 * Overrides configurePropertiesFromAction.
+	 * After configuring this MenuItem from the action using the superclass implementation
+	 * of this method, this implementation looks for properties defined in JPatchAction
+	 * and configures the MenuItem accordingly. Note that these properties come directly
+	 * from xml configuration files, so all values are strings!
+	 * 
+	 * @see jpatch.boundary.action.JPatchAction
+	 */
 	protected void configurePropertiesFromAction(Action a) {
 		super.configurePropertiesFromAction(a);
 		if (a == null)
 			return;
-		String text = (String) a.getValue("MenuText");
-		String shortDescription = (String) a.getValue("ShortDescription");
-		String accelerator = (String) a.getValue("Accelerator");
-		String mnemonic = (String) a.getValue("Mnemonic");
-		String icon = (String) a.getValue("Icon");
-		String toolTipText = (String) a.getValue("MenuToolTip");
+		String text = (String) a.getValue(JPatchAction.MENU_TEXT);
+		String shortDescription = (String) a.getValue(JPatchAction.SHORT_DESCRIPTION);
+		String accelerator = (String) a.getValue(JPatchAction.ACCELERATOR);
+		String mnemonic = (String) a.getValue(JPatchAction.MNEMONIC);
+		String icon = (String) a.getValue(JPatchAction.ICON);
+		String toolTipText = (String) a.getValue(JPatchAction.MENU_TOOLTIP);
 		if (icon != null)
 			setIcon(new ImageIcon(ClassLoader.getSystemResource(icon)));
 		if (text != null)

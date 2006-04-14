@@ -59,7 +59,7 @@ public class DefaultTool extends JPatchTool {
 	private SelectMouseMotionListener selectMouseMotionListener;
 	//private Viewport viewport;
 	private boolean bMoveZ;
-	private TangentTool tangentTool = Tools.tangentTool;
+//	private TangentTool tangentTool = Tools.tangentTool;
 	private TangentHandle tangentHandle;
 	private float fMagnitude;
 	private Vector3f v3Translate = new Vector3f();
@@ -336,7 +336,7 @@ public class DefaultTool extends JPatchTool {
 			//viewport = (Viewport)mouseEvent.getSource();
 			
 			if (MainFrame.getInstance().getJPatchScreen().showTangents()) {
-				tangentHandle = tangentTool.isHit(viewDef, x, y);
+				tangentHandle = Tools.tangentTool.isHit(viewDef, x, y);
 				if (tangentHandle != null) {
 					if (mouseEvent.getClickCount() == 2) {
 						fMagnitude = tangentHandle.getMagnitude();

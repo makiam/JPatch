@@ -60,10 +60,7 @@
 		<separator/>
 		<button command="clone"/>
 		<button command="extrude"/>
-
 		<button command="lathe"/>
-		<button command="lathe"/>
-
 		<button command="lathe editor"/>
 		<separator/>
 		<button command="make patch"/>
@@ -87,11 +84,11 @@
 			<item command="save"/>
 			<item command="save as"/>
 			<separator/>
-			<menu name="Import" mnemonic="i">
+			<menu name="Import" mnemonic="i" icon="jpatch/images/prefs/import.png">
 				<item command="import spatch"/>
 				<item command="import animationmaster"/>
 			</menu>
-			<menu name="Export" mnemonic="e">
+			<menu name="Export" mnemonic="e" icon="jpatch/images/prefs/export.png">
 				<item command="export aliaswavefront"/>
 				<item command="export povray"/>
 				<item command="export renderman"/>
@@ -123,7 +120,7 @@
 			<item command="undo"/>
 			<item command="redo"/>
 			<separator/>
-			<menu name="Tools" mnemonic="t">
+			<menu name="Tools" mnemonic="t" icon="jpatch/images/prefs/settings.png">
 				<item command="default tool"/>
 				<item command="add curve segment"/>
 				<item command="add bone"/>
@@ -135,38 +132,42 @@
 				<item command="detach"/>
 				<separator/>
 				<item command="tangent tool"/>
-				<item command="peak tangents"/>
-				<item command="round tangents"/>
+				<menu name="New tangents" mnemonic="n">
+					<item command="peak tangents"/>
+					<item command="round tangents"/>
+				</menu>
+				<menu name="Change tangents" mnemonic="c">
+					<item command="change tangents: peak"/>
+					<item command="change tangents: round"/>
+					<item command="change tangents: spatch"/>
+				</menu>
 				<separator/>
 				<item command="clone"/>
 				<item command="extrude"/>
-				<item command="lathe"/>
 				<item command="lathe"/>
 				<item command="lathe editor"/>
 				<separator/>
 				<item command="make patch"/>
 				<item command="compute patches"/>
 				<separator/>
-				<menu name="flip">
+				<item command="align controlpoints"/>
+				<menu name="Flip" mnemonic="f">
 					<item command="flip x"/>
 					<item command="flip y"/>
 					<item command="flip z"/>
 				</menu>
+				<item command="automirror"/>
+				<separator/>
 				<item command="flip patches"/>
 				<item command="align patches"/>
-				<item command="align controlpoints"/>
-				<item command="automirror"/>
+				<separator/>
 				<item command="add stubs"/>
 				<item command="remove stubs"/>
-				<menu name="tangents">
-					<item command="change tangents: peak"/>
-					<item command="change tangents: round"/>
-					<item command="change tangents: spatch"/>
-				</menu>
+				<separator/>
 				<item command="assign controlpoints to bones"/>
 				<item command="phoneme morph mapping"/>
 			</menu>
-			<menu name="Lock" mnemonic="l">
+			<menu name="Lock" mnemonic="l" icon="jpatch/images/locks.png">
 				<item command="lock x"/>
 				<item command="lock y"/>
 				<item command="lock z"/>
@@ -174,7 +175,7 @@
 				<item command="lock points"/>
 				<item command="lock bones"/>
 			</menu>
-			<menu name="Select" mnemonic="s">
+			<menu name="Select" mnemonic="s" icon="jpatch/images/select.png">
 				<item command="select all"/>
 				<item command="select none"/>
 				<item command="invert selection"/>
@@ -265,22 +266,20 @@
 			<item command="expand selection"/>
 		</menu>
 		<menu name="Tools" mnemonic="t">
+			<item command="align controlpoints"/>
 			<menu name="Flip" mnemonic="f">
 				<item command="flip x"/>
 				<item command="flip y"/>
 				<item command="flip z"/>
 			</menu>
+			<item command="automirror"/>
+			<separator/>
 			<item command="flip patches"/>
 			<item command="align patches"/>
-			<item command="align controlpoints"/>
-			<item command="automirror"/>
+			<separator/>
 			<item command="add stubs"/>
 			<item command="remove stubs"/>
-			<menu name="Tangents" mnemonic="t">
-				<item command="change tangents: peak"/>
-				<item command="change tangents: round"/>
-				<item command="change tangents: spatch"/>
-			</menu>
+			<separator/>
 			<item command="assign controlpoints to bones"/>
 		</menu>
 	</menu>

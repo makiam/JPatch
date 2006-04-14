@@ -29,21 +29,16 @@ public class JPatchButtonModel extends DefaultButtonModel implements ChangeListe
 	public void stateChanged(ChangeEvent e) {
 		fireStateChanged();
 	}
-
+	
 	public void itemStateChanged(ItemEvent e) {
 		fireItemStateChanged(new ItemEvent(this, e.getID(), this, e.getStateChange()));
-	}
-
-	@Override
-	protected void fireActionPerformed(ActionEvent e) {
-		System.out.println(getClass().getName() + ".fireActionPerformed(" + e.hashCode() + ")");
-		super.fireActionPerformed(e);
 	}
 	
 	public void actionPerformed(ActionEvent e) {
 		fireActionPerformed(e);
 	}
 	
+	@Override
 	public String toString() {
 		return getClass().getName() + "@" + hashCode() + " underlying model=" + underlyingButtonModel;
 	}

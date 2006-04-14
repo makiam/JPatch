@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchUndoManager.java,v 1.10 2006/02/01 21:11:28 sascha_l Exp $
+ * $Id: JPatchUndoManager.java,v 1.11 2006/04/14 14:43:26 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -22,13 +22,16 @@
 
 package jpatch.control.edit;
 
+import jpatch.boundary.action.*;
 import java.util.*;
+
+import javax.swing.Action;
 
 /**
  * The JPatchUndoManager stores JPatchUndoableEdits in a list and provides methods to add, redo and undo edits.<br>
  * It keeps track of the position in the position inside the list
  *
- * @version	$Revision: 1.10 $
+ * @version	$Revision: 1.11 $
  * @author	Sascha Ledinsky
  */
 public class JPatchUndoManager {
@@ -62,25 +65,25 @@ public class JPatchUndoManager {
 		listEdits.clear();
 		iPos = 0;
 		bOpen = false;
-		fireUndoStateChanged();
+		configureActions();
 	}
 	
 	public void setStop() {
 		iStop = iPos;
-		fireUndoStateChanged();
+		configureActions();
 		bStopOpen = bOpen;
 	}
 	
 	public void clearStop() {
 		iStop = 0;
-		fireUndoStateChanged();
+		configureActions();
 	}
 	
 	public void rewind() {
 		iPos = iStop;
 		iStop = 0;
 		bOpen = bStopOpen;
-		fireUndoStateChanged();
+		configureActions();
 	}
 	
 	public void addEdit(JPatchRootEdit edit) {
@@ -103,6 +106,7 @@ public class JPatchUndoManager {
 		}
 		bOpen = open;
 		add(edit);
+		configureActions();
 	}
 
 	private void add(JPatchRootEdit edit) {
@@ -124,7 +128,7 @@ public class JPatchUndoManager {
 			}
 			bChange = true;
 		}
-		fireUndoStateChanged();
+		configureActions();
 //		System.out.println("UndoManager.add():");
 //		edit.debug("    ");
 	}
@@ -151,7 +155,8 @@ public class JPatchUndoManager {
 	
 	public void setEnabled(boolean enable) {
 		bEnabled = enable;
-		fireUndoStateChanged();
+//		fireUndoStateChanged();
+		configureActions();
 	}
 	
 	/**
@@ -162,7 +167,7 @@ public class JPatchUndoManager {
 			((JPatchUndoableEdit)listEdits.get(--iPos)).undo();
 		}
 		bOpen = false;
-		fireUndoStateChanged();
+		configureActions();
 	}
 	
 	/**
@@ -172,7 +177,7 @@ public class JPatchUndoManager {
 		if (iPos < listEdits.size()) {
 			((JPatchUndoableEdit)listEdits.get(iPos++)).redo();
 		}
-		fireUndoStateChanged();
+		configureActions();
 	}
 	
 	/**
@@ -191,46 +196,47 @@ public class JPatchUndoManager {
 		return (iPos < listEdits.size());
 	}
 	
-	/**
-	 * Returns the name of the next edit which can be undone
-	 * @return name of the next edit which can be undone or "" othewise
-	 */
-	public String undoName() {
+	private String undoName() {
 		if (canUndo()) {
-			return ((JPatchRootEdit)listEdits.get(iPos - 1)).getName();
+			return "Undo \"" + ((JPatchRootEdit)listEdits.get(iPos - 1)).getName() + "\"";
 		} else {
-			return "";
+			return "Can't undo";
 		}
 	}
 	
-	/**
-	 * Returns the name of the next edit which can be redone
-	 * @return name of the next edit which can be redone "" otherwise
-	 */
-	public String redoName() {
+	private String redoName() {
 		if (canRedo()) {
-			return ((JPatchRootEdit)listEdits.get(iPos)).getName();
+			return "Redo \"" + ((JPatchRootEdit)listEdits.get(iPos)).getName() + "\"";
 		} else {
-			return "";
+			return "Can't redo";
 		}
 	}
 	
-	public void addUndoListener(UndoListener listener) {
-		listListeners.add(listener);
+	private void configureActions() {
+		Action undoAction = Actions.getInstance().getAction("undo");
+		Action redoAction = Actions.getInstance().getAction("redo");
+		undoAction.setEnabled(canUndo());
+		redoAction.setEnabled(canRedo());
+		undoAction.putValue(JPatchAction.SHORT_DESCRIPTION, undoName());
+		redoAction.putValue(JPatchAction.SHORT_DESCRIPTION, redoName());
 	}
 	
-	public void removeUndoListener(UndoListener listener) {
-		listListeners.remove(listener);
-	}
-	
-	private void fireUndoStateChanged() {
-		for (int i = listListeners.size() - 1; i >= 0; i--) {
-			((UndoListener) listListeners.get(i)).undoStateChanged(this);
-		}
-	}
-	public static interface UndoListener {
-		public void undoStateChanged(JPatchUndoManager undoManager);
-	}
+//	public void addUndoListener(UndoListener listener) {
+//		listListeners.add(listener);
+//	}
+//	
+//	public void removeUndoListener(UndoListener listener) {
+//		listListeners.remove(listener);
+//	}
+//	
+//	private void fireUndoStateChanged() {
+//		for (int i = listListeners.size() - 1; i >= 0; i--) {
+//			((UndoListener) listListeners.get(i)).undoStateChanged(this);
+//		}
+//	}
+//	public static interface UndoListener {
+//		public void undoStateChanged(JPatchUndoManager undoManager);
+//	}
 	
 //	/**
 //	 * A main method to test the undoManager
