@@ -32,7 +32,7 @@ import javax.swing.event.*;
  * @author sascha
  *
  */
-public class JPatchLockingToggleButtonModel extends DefaultButtonModel implements ChangeListener, ItemListener, ActionListener {
+public class JPatchLockingToggleButtonModel extends JToggleButton.ToggleButtonModel implements ChangeListener, ItemListener, ActionListener {
 	private UnderlyingModel underlyingButtonModel;
 	public static final int DOUBLECLICK_THRESHOLD = 650;
 	private long lastClick;
@@ -62,7 +62,7 @@ public class JPatchLockingToggleButtonModel extends DefaultButtonModel implement
 	@Override
 	public void setSelected(boolean b) {
 		underlyingButtonModel.setSelected(b);
-		setLocked(false);
+		underlyingButtonModel.setLocked(false);
 	}
 
 	public void stateChanged(ChangeEvent e) {
@@ -81,17 +81,15 @@ public class JPatchLockingToggleButtonModel extends DefaultButtonModel implement
 		return underlyingButtonModel.isLocked();
 	}
 	
-	public void setLocked(boolean b) {
-		underlyingButtonModel.setLocked(b);
-	}
+//	public void setLocked(boolean b) {
+//		underlyingButtonModel.setLocked(b);
+//	}
 	
 	public void setPressed(boolean b) {
 		boolean performAction = false;
-		
 		if ((isPressed() == b) || !isEnabled()) {
 			return;
 		}
-		
 		if (b == false && isArmed()) {
 			long time = System.currentTimeMillis();
 			if (!isSelected()) {
@@ -100,9 +98,9 @@ public class JPatchLockingToggleButtonModel extends DefaultButtonModel implement
 //              setLocked(false);
 			} else {
 				if (time < lastClick + DOUBLECLICK_THRESHOLD) {
-					setLocked(true);
+					underlyingButtonModel.setLocked(true);
 				} else {
-					setLocked(false);
+					underlyingButtonModel.setLocked(false);
 					ButtonGroup group = underlyingButtonModel.getGroup();
 					if (group != null && group instanceof LockingButtonGroup)
 						((LockingButtonGroup) group).actionDone(false);
@@ -138,7 +136,6 @@ public class JPatchLockingToggleButtonModel extends DefaultButtonModel implement
 	
 	public static class UnderlyingModel extends JToggleButton.ToggleButtonModel {
 		public final static int LOCKED = 1 << 5;
-		private long lastClick;
 		
 		public boolean isLocked() {
 			return (stateMask & LOCKED) != 0;
@@ -156,57 +153,6 @@ public class JPatchLockingToggleButtonModel extends DefaultButtonModel implement
 			}
 			
 			fireStateChanged();
-		}
-		
-		public void setPressed(boolean b) {
-			boolean performAction = false;
-			
-			if ((isPressed() == b) || !isEnabled()) {
-				return;
-			}
-			
-			if (b == false && isArmed()) {
-				long time = System.currentTimeMillis();
-				if (!isSelected()) {
-					setSelected(!this.isSelected());
-					performAction = true;
-//	              setLocked(false);
-				} else {
-					if (time < lastClick + DOUBLECLICK_THRESHOLD) {
-						setLocked(true);
-					} else {
-						setLocked(false);
-						ButtonGroup group = getGroup();
-						if (group != null && group instanceof LockingButtonGroup)
-							((LockingButtonGroup) group).actionDone(false);
-						setRollover(false);
-					}
-				}
-				lastClick = time;
-			} 
-			
-			if (b) {
-				stateMask |= PRESSED;
-			} else {
-				stateMask &= ~PRESSED;
-			}
-			
-			fireStateChanged();
-			
-			if(!isPressed() && isArmed() && performAction) {
-				int modifiers = 0;
-				AWTEvent currentEvent = EventQueue.getCurrentEvent();
-				if (currentEvent instanceof InputEvent) {
-					modifiers = ((InputEvent)currentEvent).getModifiers();
-				} else if (currentEvent instanceof ActionEvent) {
-					modifiers = ((ActionEvent)currentEvent).getModifiers();
-				}
-				fireActionPerformed(
-						new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
-								getActionCommand(),
-								EventQueue.getMostRecentEventTime(),
-								modifiers));
-			}
 		}
 
 		@Override
