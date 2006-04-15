@@ -29,7 +29,7 @@
 		<property key="Accelerator" value="shift TAB"/>
 	</action>
 	<action name="new" model="menu">
-		<constructor>new DummyAction()</constructor>
+		<constructor>new NewAction()</constructor>
 		<property key="ShortDescription" value="New"/>
 		<property key="MenuText" value="New"/>
 		<property key="Mnemonic" value="n"/>
@@ -50,7 +50,7 @@
 		<property key="Icon" value="jpatch/images/tree/animation.png"/>
 	</action>
 	<action name="open" model="menu">
-		<constructor>new DummyAction()</constructor>
+		<constructor>new OpenAction()</constructor>
 		<property key="ShortDescription" value="Open"/>
 		<property key="Icon" value="jpatch/images/open.png"/>
 	</action>

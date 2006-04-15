@@ -246,10 +246,10 @@ public class Actions extends DefaultHandler {
 		actionMap.put("insert point", new ActionDescriptor(new InsertControlPointAction()));
 		actionMap.put("next curve", new ActionDescriptor(new NextCurveAction(1)));
 		actionMap.put("prev curve", new ActionDescriptor(new NextCurveAction(-1)));
-		actionMap.put("new", new ActionDescriptor(new DummyAction()));
+		actionMap.put("new", new ActionDescriptor(new NewAction()));
 		actionMap.put("new model", new ActionDescriptor(new NewModelAction()));
 		actionMap.put("new animation", new ActionDescriptor(new NewAnimAction()));
-		actionMap.put("open", new ActionDescriptor(new DummyAction()));
+		actionMap.put("open", new ActionDescriptor(new OpenAction()));
 		actionMap.put("open model", new ActionDescriptor(new ImportJPatchAction()));
 		actionMap.put("save", new ActionDescriptor(new SaveAsAction(false)));
 		actionMap.put("single view", new ActionDescriptor(new ToggleAction(ToggleAction.Type.VIEWPORTS_SINGLE)));
@@ -349,6 +349,7 @@ public class Actions extends DefaultHandler {
 		/*
 		 * END OF AUTO-GENERATED CODE
 		 */
+
 	}
 	
 	static class ActionDescriptor {
