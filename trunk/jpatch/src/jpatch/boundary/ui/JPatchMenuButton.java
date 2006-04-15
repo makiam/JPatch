@@ -35,38 +35,85 @@ import javax.swing.event.*;
 public class JPatchMenuButton extends JPatchToggleButton implements ActionListener, PopupMenuListener {
 	private JPopupMenu popupMenu;
 	private long hideTime;
+	private Icon icon;
+	private Icon pulldownRolloverIcon;
+	private boolean pulldown = false;
+	private Action action;
 	
 	/**
 	 * @param buttonModel
 	 */
 	public JPatchMenuButton(MenuButtonModel buttonModel) {
 		super(buttonModel);
+		addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				if (pulldown && e.getX() < getWidth() - 13) {
+					pulldown = false;
+					setIcon(icon);
+					repaint();
+				} else if (!pulldown && e.getX() >= getWidth() -13) {
+					pulldown = true;
+					setIcon(pulldownRolloverIcon);
+					repaint();
+				}
+			}
+		});
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				if (!pulldown && e.getX() >= getWidth() -13) {
+					pulldown = true;
+					setIcon(pulldownRolloverIcon);
+					repaint();
+				}
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				if (pulldown) {
+					pulldown = false;
+					setIcon(icon);
+					repaint();
+				}
+			}
+			
+		});
+		addActionListener(this);
 	}
 
 	public void setPopupMenu(JPopupMenu popupMenu) {
 		this.popupMenu = popupMenu;
 		popupMenu.addPopupMenuListener(this);
 	}
+
 	
+	@Override
+	public void setAction(Action a) {
+		super.setAction(a);
+		listenerList.remove(ActionListener.class, a);
+	}
+
 	@Override
 	protected void configurePropertiesFromAction(Action a) {
 		super.configurePropertiesFromAction(a);
-//		for (ActionListener actionListener : getActionListeners())
-//			removeActionListener(actionListener);
-		addActionListener(this);
 		setIcons();
+		action = a;
 	}
 
 	/* (non-Javadoc)
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent e) {
-		if (!isSelected())
-			popupMenu.setVisible(false);
-		else if (System.currentTimeMillis() > hideTime + 250)	// FIXME: This is a quick'n'dirty hack and should be corrected
-			popupMenu.show(this, 0, getHeight());
-		else
+		if (System.currentTimeMillis() > hideTime + 150) {	// FIXME: this is a little dirty
+			if (pulldown) {
+				popupMenu.show(this, 0, getHeight());
+			} else {
+				action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, e.getActionCommand(), e.getWhen(), e.getModifiers()));
+				setSelected(false);
+			}
+		} else {
 			setSelected(false);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -74,6 +121,7 @@ public class JPatchMenuButton extends JPatchToggleButton implements ActionListen
 	 */
 	public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 		setSelected(true);
+		removeActionListener(this);
 	}
 
 	/* (non-Javadoc)
@@ -82,6 +130,7 @@ public class JPatchMenuButton extends JPatchToggleButton implements ActionListen
 	public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
 		setSelected(false);
 		hideTime = System.currentTimeMillis();
+		addActionListener(this);
 	}
 
 	/* (non-Javadoc)
@@ -90,21 +139,12 @@ public class JPatchMenuButton extends JPatchToggleButton implements ActionListen
 	public void popupMenuCanceled(PopupMenuEvent e) { }
 	
 	private void setIcons() {
-		if (getIcon() != null)
-			setIcon(pulldownIcon(getIcon()));
-		if (getSelectedIcon() != null && getSelectedIcon() != getIcon())
-			setSelectedIcon(pulldownIcon(getSelectedIcon()));
-//		if (getRolloverIcon() != null)
-//			setRolloverIcon(pulldownIcon(getRolloverIcon()));
-//		if (getRolloverSelectedIcon() != null)
-//			setRolloverSelectedIcon(pulldownIcon(getRolloverSelectedIcon()));
-//		if (getDisabledIcon() != null)
-//			setDisabledIcon(pulldownIcon(getDisabledIcon()));
-//		if (getDisabledSelectedIcon() != null)
-//			setDisabledSelectedIcon(pulldownIcon(getDisabledSelectedIcon()));	
+		icon = pulldownIcon(getIcon(), false);
+		pulldownRolloverIcon = pulldownIcon(getIcon(), true);
+		setIcon(icon);
 	}
 	
-	private ImageIcon pulldownIcon(Icon icon) {
+	private ImageIcon pulldownIcon(Icon icon, boolean highlight) {
 		Image i;
 		if (icon instanceof ImageIcon) {
 			i = ((ImageIcon) icon).getImage();
@@ -114,12 +154,18 @@ public class JPatchMenuButton extends JPatchToggleButton implements ActionListen
 		}
 		int w = i.getWidth(null);
 		int h = i.getHeight(null);
-		BufferedImage image = new BufferedImage(w + 9, h, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage image = new BufferedImage(w + 11, h, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2 = image.createGraphics();
 		g2.drawImage(i, 0, 0, null);
-//		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setColor(Color.BLACK);
-		g2.fillPolygon(new int[] { w + 1, w + 8, w + 4 }, new int[] { h/2 - 2, h/2 - 2, h/2 + 2}, 3);
+		if (highlight) {
+			g2.setColor(Color.WHITE);
+			g2.fillPolygon(new int[] { w + 3, w + 10, w + 6 }, new int[] { h/2 - 2, h/2 - 2, h/2 + 2}, 3);
+			g2.setColor(Color.BLACK);
+			g2.drawPolygon(new int[] { w + 3, w + 9, w + 6 }, new int[] { h/2 - 2, h/2 - 2, h/2 + 1}, 3);
+		} else {
+			g2.setColor(Color.BLACK);
+			g2.fillPolygon(new int[] { w + 3, w + 10, w + 6 }, new int[] { h/2 - 2, h/2 - 2, h/2 + 2}, 3);
+		}
 		return new ImageIcon(image);
 	}
 	
