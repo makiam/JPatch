@@ -8,16 +8,7 @@ import jpatch.boundary.*;
 import jpatch.entity.*;
 
 public final class HideAction extends AbstractAction {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	private boolean bActive = false;
-	
-	public HideAction() {
-		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/hide.png")));
-		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("hide"));
-	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		if (!bActive) {
 			Selection selection = MainFrame.getInstance().getSelection();

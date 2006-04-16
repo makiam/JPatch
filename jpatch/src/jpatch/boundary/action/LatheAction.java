@@ -7,15 +7,6 @@ import jpatch.boundary.*;
 
 
 public final class LatheAction extends AbstractAction {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	public LatheAction() {
-		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/lathe.png")));
-		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("lathe"));
-	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		System.out.println("Lathe..." + actionEvent.hashCode() + " " + actionEvent.getSource().hashCode());
 //		for (StackTraceElement ste : Thread.currentThread().getStackTrace())

@@ -23,6 +23,7 @@ package jpatch.boundary.ui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.concurrent.locks.Lock;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -80,6 +81,11 @@ public class JPatchLockingToggleButtonModel extends JToggleButton.ToggleButtonMo
 	public boolean isLocked() {
 		return underlyingButtonModel.isLocked();
 	}
+	
+//	public void setLocked(boolean locked) {
+//		System.out.println("setLocked(" + locked + ")");
+//		underlyingButtonModel.setLocked(locked);
+//	}
 	
 //	public void setLocked(boolean b) {
 //		underlyingButtonModel.setLocked(b);
@@ -152,6 +158,8 @@ public class JPatchLockingToggleButtonModel extends JToggleButton.ToggleButtonMo
 				stateMask &= ~LOCKED;
 			}
 			
+			if (b && getGroup() instanceof LockingButtonGroup)
+				((LockingButtonGroup) getGroup()).switchBack();
 			fireStateChanged();
 		}
 
