@@ -28,11 +28,11 @@ public class JPatchLockingToggleButton extends JPatchToggleButton implements Key
 	
 	private boolean oldLocked;
 	private Icon lockedIcon;
-	private Icon rolloverLockedIcon;
-	private Icon disabledLockedIcon;
+//	private Icon rolloverLockedIcon;
+//	private Icon disabledLockedIcon;
 	private Icon defaultSelectedIcon;
-	private Icon defaultRolloverSelectedIcon;
-	private Icon defaultDisabledSelectedIcon;
+//	private Icon defaultRolloverSelectedIcon;
+//	private Icon defaultDisabledSelectedIcon;
 	
 	public JPatchLockingToggleButton(JPatchLockingToggleButtonModel.UnderlyingModel buttonModel) {
 		super();
@@ -43,67 +43,66 @@ public class JPatchLockingToggleButton extends JPatchToggleButton implements Key
 		super.configurePropertiesFromAction(a);
 		if (a == null)
 			return;
-		String lockedIcon = (String) a.getValue("LockedIcon");
-		String rolloverLockedIcon = (String) a.getValue("RolloverLockedIcon");
-		String disabledLockedIcon = (String) a.getValue("DisabledLockedIcon");
-		if (lockedIcon != null)
-			setLockedIcon(new ImageIcon(ClassLoader.getSystemResource(lockedIcon)));
-		if (rolloverLockedIcon != null)
-			setRolloverLockedIcon(new ImageIcon(ClassLoader.getSystemResource(rolloverLockedIcon)));
-		if (disabledLockedIcon != null)
-			setDisabledLockedIcon(new ImageIcon(ClassLoader.getSystemResource(disabledLockedIcon)));
-		getLockedIcon();
-		getRolloverLockedIcon();
-		getDisabledLockedIcon();
+//		String lockedIcon = (String) a.getValue("LockedIcon");
+//		String rolloverLockedIcon = (String) a.getValue("RolloverLockedIcon");
+//		String disabledLockedIcon = (String) a.getValue("DisabledLockedIcon");
+//		if (lockedIcon != null)
+//			setLockedIcon(new ImageIcon(ClassLoader.getSystemResource(lockedIcon)));
+//		if (rolloverLockedIcon != null)
+//			setRolloverLockedIcon(new ImageIcon(ClassLoader.getSystemResource(rolloverLockedIcon)));
+//		if (disabledLockedIcon != null)
+//			setDisabledLockedIcon(new ImageIcon(ClassLoader.getSystemResource(disabledLockedIcon)));
+		lockedIcon = getLockedIcon(false);
+		setRolloverIcon(getLockedIcon(false));
+//		getRolloverLockedIcon();
+//		getDisabledLockedIcon();
 	}
 
 	public boolean isLocked() {
 		return ((JPatchLockingToggleButtonModel) model).isLocked();
 	}
 	
-	public void setSelectedIcon(Icon selectedIcon) {
-		lockedIcon = null;
-		super.setSelectedIcon(selectedIcon);
-	}
+//	public void setSelectedIcon(Icon selectedIcon) {
+//		lockedIcon = null;
+//		super.setSelectedIcon(selectedIcon);
+//	}
 	
-	public void setRolloverIcon(Icon rolloverIcon) {
-		rolloverLockedIcon = null;
-		super.setRolloverIcon(rolloverIcon);
-	}
+//	public void setRolloverIcon(Icon rolloverIcon) {
+//		rolloverLockedIcon = null;
+//		super.setRolloverIcon(rolloverIcon);
+//	}
 	
 	public void setLockedIcon(Icon lockedIcon) {
 		this.lockedIcon = lockedIcon;
 	}
 	
-	public void setRolloverLockedIcon(Icon rolloverLockedIcon) {
-		this.rolloverLockedIcon = rolloverLockedIcon;
+//	public void setRolloverLockedIcon(Icon rolloverLockedIcon) {
+//		this.rolloverLockedIcon = rolloverLockedIcon;
+//	}
+//	
+//	public void setDisabledLockedIcon(Icon disabledLockedIcon) {
+//		this.disabledLockedIcon = disabledLockedIcon;
+//	}
+	
+	public Icon getLockedIcon(boolean transparent) {
+		if (getSelectedIcon() != null)
+			return ImageIconFactory.createLockedIcon(getSelectedIcon(), ImageIconFactory.Position.TOP_LEFT, transparent);
+		else if (getIcon() != null)
+			return ImageIconFactory.createLockedIcon(getIcon(), ImageIconFactory.Position.TOP_LEFT, transparent);
+		throw new IllegalStateException("can't create locked icon - no icon is set!");
 	}
 	
-	public void setDisabledLockedIcon(Icon disabledLockedIcon) {
-		this.disabledLockedIcon = disabledLockedIcon;
-	}
-	
-	public Icon getLockedIcon() {
-		if (lockedIcon == null) {
-			if (getSelectedIcon() != null)
-				lockedIcon = ImageIconFactory.createLockedIcon(getSelectedIcon(), ImageIconFactory.Position.TOP_LEFT);
-			else if (getIcon() != null)
-				lockedIcon = ImageIconFactory.createLockedIcon(getIcon(), ImageIconFactory.Position.TOP_LEFT);
-		}
-		return lockedIcon;
-	}
-	
-	public Icon getRolloverLockedIcon() {
-		if (rolloverLockedIcon == null && getRolloverIcon() != null)
-			rolloverLockedIcon = ImageIconFactory.createLockedIcon(getRolloverIcon(), ImageIconFactory.Position.TOP_LEFT);
-		return rolloverLockedIcon;
-	}
-	
-	public Icon getDisabledLockedIcon() {
-		if (disabledLockedIcon == null)
-			disabledLockedIcon = UIManager.getLookAndFeel().getDisabledIcon(this, getLockedIcon());
-		return disabledLockedIcon;
-	}
+//	public Icon getRolloverLockedIcon() {
+//		if (rolloverLockedIcon == null && getRolloverIcon() != null)
+//			rolloverLockedIcon = ImageIconFactory.createLockedIcon(getRolloverIcon(), ImageIconFactory.Position.TOP_LEFT);
+//		return rolloverLockedIcon;
+//	}
+//	
+//	public Icon getDisabledLockedIcon() {
+//		if (disabledLockedIcon == null)
+//			disabledLockedIcon = UIManager.getLookAndFeel().getDisabledIcon(this, getLockedIcon());
+//		return disabledLockedIcon;
+//	}
 	
 	protected void fireStateChanged() {
 		boolean locked = isLocked();
@@ -111,18 +110,18 @@ public class JPatchLockingToggleButton extends JPatchToggleButton implements Key
 			oldLocked = locked;
 			if (locked) {
 				defaultSelectedIcon = getSelectedIcon();
-				defaultRolloverSelectedIcon = getRolloverSelectedIcon();
-				defaultDisabledSelectedIcon = getDisabledSelectedIcon();
-				if (getLockedIcon() != null)
+//				defaultRolloverSelectedIcon = getRolloverSelectedIcon();
+//				defaultDisabledSelectedIcon = getDisabledSelectedIcon();
+				if (lockedIcon != null)
 					setSelectedIcon(lockedIcon);
-				if (getRolloverLockedIcon() != null)
-					setRolloverSelectedIcon(rolloverLockedIcon);
-				if (getDisabledLockedIcon() != null)
-					setDisabledSelectedIcon(disabledLockedIcon);
+//				if (getRolloverLockedIcon() != null)
+//					setRolloverSelectedIcon(rolloverLockedIcon);
+//				if (getDisabledLockedIcon() != null)
+//					setDisabledSelectedIcon(disabledLockedIcon);
 			} else {
 				setSelectedIcon(defaultSelectedIcon);
-				setRolloverSelectedIcon(defaultRolloverSelectedIcon);
-				setDisabledSelectedIcon(defaultDisabledSelectedIcon);
+//				setRolloverSelectedIcon(defaultRolloverSelectedIcon);
+//				setDisabledSelectedIcon(defaultDisabledSelectedIcon);
 			}
 		}
 		super.fireStateChanged();

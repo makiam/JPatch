@@ -228,7 +228,7 @@
 		<property key="Mnemonic" value="b"/>
 		<property key="Icon" value="jpatch/images/addbone.png"/>
 	</action>
-	<action name="rotate tool" model="radio" group="mode">
+	<action name="rotate tool" model="locking radio" group="mode">
 		<constructor>new RotateAction()</constructor>
 		<property key="ShortDescription" value="Rotate tool"/>
 		<property key="Accelerator" value="pressed R"/>

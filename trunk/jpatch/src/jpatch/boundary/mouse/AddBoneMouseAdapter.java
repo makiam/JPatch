@@ -8,7 +8,10 @@ import javax.vecmath.*;
 
 import jpatch.entity.*;
 import jpatch.boundary.*;
+import jpatch.boundary.action.Actions;
 import jpatch.boundary.tools.*;
+import jpatch.boundary.ui.JPatchLockingToggleButton;
+import jpatch.boundary.ui.LockingButtonGroup;
 import jpatch.control.edit.*;
 
 
@@ -180,6 +183,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 				}
 			} else {
 //				MainFrame.getInstance().getMeshToolBar().reset();
+				((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(true);
 			}
 		}
 		
@@ -190,8 +194,12 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 			compSource.removeMouseMotionListener(this);
 			if (MainFrame.getInstance().getSelection() != null)
 				edit.addEdit(new AtomicChangeSelection(null));
-			edit.addEdit(new AtomicChangeTool(Tools.defaultTool));
+//			edit.addEdit(new AtomicChangeTool(Tools.defaultTool));
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
+			
+//			if (!((JPatchLockingToggleButton) Actions.getInstance().getButton("add curve segment")).isLocked())
+			((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(false);
+			
 //			MainFrame.getInstance().getMeshToolBar().reset();
 			Model model = MainFrame.getInstance().getModel();
 			MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(bone, 1, model), bone, 0);

@@ -227,7 +227,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 //			}
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
 			
-			if (!((JPatchLockingToggleButton) Actions.getInstance().getButton("add curve segment")).isLocked())
+//			if (!((JPatchLockingToggleButton) Actions.getInstance().getButton("add curve segment")).isLocked())
 				((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(false);
 //			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
 //			MainFrame.getInstance().getMeshToolBar().reset();

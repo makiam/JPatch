@@ -5,19 +5,11 @@ import javax.swing.*;
 import jpatch.boundary.*;
 import jpatch.boundary.mouse.*;
 import jpatch.boundary.tools.*;
+import jpatch.boundary.ui.LockingButtonGroup;
 import jpatch.control.edit.*;
 
 public final class AddControlPointAction extends AbstractAction {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5180146108807944799L;
-	public AddControlPointAction() {
-		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/add.png")));
-		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("add point"));
-		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
-	}
-	public void actionPerformed(ActionEvent actionEvent) {
+	 public void actionPerformed(ActionEvent actionEvent) {
 		//MainFrame.getInstance().getJPatchScreen().setTool(null);
 		
 //		if (MainFrame.getInstance().getMeshToolBar().getMode() != MeshToolBar.ADD) {
@@ -32,6 +24,7 @@ public final class AddControlPointAction extends AbstractAction {
 			MainFrame.getInstance().getJPatchScreen().setMouseListener(new AddControlPointMouseAdapter());
 			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(false);
 			MainFrame.getInstance().clearDialog();
+			((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).beginTemporaryAction();
 //			MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.ADD);
 //		} else {
 //			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(new DefaultTool()), true);

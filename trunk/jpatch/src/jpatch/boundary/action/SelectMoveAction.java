@@ -7,14 +7,6 @@ import jpatch.boundary.tools.*;
 import jpatch.control.edit.*;
 
 public final class SelectMoveAction extends AbstractAction {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	public SelectMoveAction() {
-		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/default.png")));
-		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("default tool"));
-	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		/*
 		MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();

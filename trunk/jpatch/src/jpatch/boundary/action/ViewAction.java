@@ -6,15 +6,11 @@ import jpatch.boundary.*;
 import jpatch.entity.*;
 
 public final class ViewAction extends AbstractAction {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	private int iDirection;
 	private Camera camera;
 	
 	public ViewAction(int direction) {
-		super(KeyMapping.getDescription(ViewDefinition.aViewName[direction]));
+		super(ViewDefinition.aViewName[direction]);
 		iDirection = direction;
 		camera = null;
 	}
