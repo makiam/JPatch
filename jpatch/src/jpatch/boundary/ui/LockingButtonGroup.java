@@ -18,7 +18,9 @@ public class LockingButtonGroup extends ButtonGroup {
 	 * The default button of the LockingButtonGroup
 	 */
 	private ButtonModel defaultButtonModel;
-
+	private ButtonModel temporaryButtonModel;
+	private boolean switchback;
+	
 	/*
 	 * sets the Default Button 
 	 */
@@ -34,6 +36,19 @@ public class LockingButtonGroup extends ButtonGroup {
 	}
 	
 	/*
+	 * begins a new temporary action
+	 * (sets temportayButtonModel to the currently selected one)
+	 */
+	public void beginTemporaryAction() {
+		temporaryButtonModel = getSelection();	
+	}
+	
+	public void switchBack() {
+		if (temporaryButtonModel == getSelection())
+			switchback = true;
+	}
+	
+	/*
 	 * select the default button
 	 */
 	public void actionDone(boolean abort) {
@@ -42,11 +57,21 @@ public class LockingButtonGroup extends ButtonGroup {
 			if (((JPatchLockingToggleButtonModel.UnderlyingModel) selectedButtonModel).isLocked())
 				return;
 		}
-		if (defaultButtonModel != null && defaultButtonModel != selectedButtonModel) {
-			defaultButtonModel.setArmed(true);
-			defaultButtonModel.setPressed(true);
-			defaultButtonModel.setPressed(false);
-			defaultButtonModel.setArmed(false);
+		if (switchback && temporaryButtonModel != null && temporaryButtonModel != selectedButtonModel) {
+			doClick(temporaryButtonModel);
+			if (temporaryButtonModel instanceof JPatchLockingToggleButtonModel.UnderlyingModel)
+				((JPatchLockingToggleButtonModel.UnderlyingModel) temporaryButtonModel).setLocked(true);
+			temporaryButtonModel = null;
+			switchback = false;
+		} else if (defaultButtonModel != null && defaultButtonModel != selectedButtonModel) {
+			doClick(defaultButtonModel);
 		}
+	}
+	
+	private void doClick(ButtonModel buttonModel) {
+		buttonModel.setArmed(true);
+		buttonModel.setPressed(true);
+		buttonModel.setPressed(false);
+		buttonModel.setArmed(false);
 	}
 }

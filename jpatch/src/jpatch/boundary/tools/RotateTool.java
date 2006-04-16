@@ -6,6 +6,8 @@ import java.awt.event.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
+import jpatch.boundary.action.Actions;
+import jpatch.boundary.ui.LockingButtonGroup;
 
 import jpatch.control.edit.*;
 import jpatch.entity.*;
@@ -58,6 +60,7 @@ public class RotateTool extends JPatchTool {
 	private Selection selection;
 	
 	private JPatchActionEdit edit;
+	
 	
 	static {
 		for (int s = 0; s < SUBDIV; s++) {
@@ -514,9 +517,12 @@ public class RotateTool extends JPatchTool {
 	}
 	
 	public void mouseReleased(MouseEvent mouseEvent) {
+		boolean quit = false;
 		if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
 			//System.out.println("mouseReleased() state = " + iState + " change = " + bChange);
 			if (bChange && iState != IDLE) {
+				if (isTransforming)
+					quit = true;
 			//System.out.println("mouseReleased()" + mouseEvent.getClickCount());
 			//if (mouseEvent.getClickCount() != 2) {
 				//if (!mouseEvent.isAltDown() || mouseEvent.isControlDown()) {
@@ -561,6 +567,8 @@ public class RotateTool extends JPatchTool {
 			((Component) mouseEvent.getSource()).removeMouseMotionListener(activeHandle);
 			((Component) mouseEvent.getSource()).removeMouseMotionListener(this);
 			MainFrame.getInstance().setHelpText("Click and drag handles to rotate or move pivot. Click and drag inside sphere to rotate freely. Doubleclick to reset coordinate system or pivot.");
+			if (quit)
+				((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(false);
 		}
 	}
 	

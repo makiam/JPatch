@@ -9,16 +9,6 @@ import jpatch.boundary.*;
 import jpatch.entity.*;
 
 public final class DeleteControlPointAction extends AbstractAction {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	public DeleteControlPointAction() {
-		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/deletepoint.png")));
-		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("delete points"));
-	}
-	
 	public void actionPerformed(ActionEvent actionEvent) {
 		JPatchActionEdit edit = null;
 		Selection selection = MainFrame.getInstance().getSelection();

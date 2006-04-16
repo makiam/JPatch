@@ -9,15 +9,6 @@ import jpatch.entity.ControlPoint;
 import jpatch.boundary.*;
 
 public final class RemoveControlPointAction extends AbstractAction {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	public RemoveControlPointAction() {
-		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/removepoint.png")));
-		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("remove points"));
-	}
-	
 	public void actionPerformed(ActionEvent actionEvent) {
 		
 	JPatchActionEdit edit = null;

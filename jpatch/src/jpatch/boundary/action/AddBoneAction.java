@@ -4,6 +4,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import jpatch.boundary.*;
 import jpatch.boundary.mouse.*;
+import jpatch.boundary.ui.LockingButtonGroup;
 
 public final class AddBoneAction extends AbstractAction {
 	/**
@@ -20,6 +21,7 @@ public final class AddBoneAction extends AbstractAction {
 		MainFrame.getInstance().getJPatchScreen().setMouseListener(new AddBoneMouseAdapter());
 		MainFrame.getInstance().getJPatchScreen().enablePopupMenu(false);
 		MainFrame.getInstance().clearDialog();
+		((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).beginTemporaryAction();
 	}
 }
 

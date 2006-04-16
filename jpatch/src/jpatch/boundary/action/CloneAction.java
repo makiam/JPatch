@@ -7,14 +7,7 @@ import jpatch.boundary.*;
 
 
 public final class CloneAction extends AbstractAction {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	public CloneAction() {
-		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/clone.png")));
-		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("clone"));
-	}
+
 	public void actionPerformed(ActionEvent actionEvent) {
 		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && !selection.isSingle()) {

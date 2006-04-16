@@ -7,14 +7,6 @@ import jpatch.boundary.*;
 import jpatch.entity.*;
 
 public final class ExtrudeAction extends AbstractAction {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	public ExtrudeAction() {
-		super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/extrude.png")));
-		putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("extrude"));
-	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		Selection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && !selection.isSingle()) {
