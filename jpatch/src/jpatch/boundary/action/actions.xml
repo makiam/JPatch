@@ -640,4 +640,9 @@
 		<constructor>new AssignPointsToBonesAction()</constructor>
 		<property key="ShortDescription" value="Assign controlpoints to bones"/>
 	</action>
+	<action name="edit keyboard mapping" model="default">
+		<constructor>new KeyMappingAction()</constructor>
+		<property key="ShortDescription" value="Edit keyboard shortcuts..."/>
+		<property key="Mnemonic" value="k"/>
+	</action>
 </actions>

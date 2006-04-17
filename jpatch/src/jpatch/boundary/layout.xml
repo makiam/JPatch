@@ -111,7 +111,10 @@
 				<item command="install jogl"/>
 			</menu>
 		</menu>
-			<item command="settings"/>
+			<menu name="Settings" mnemonic="s">
+				<item command="settings"/>
+				<item command="edit keyboard mapping"/>
+			</menu>
 			<separator/>
 			<item command="quit"/>
 		</menu>
