@@ -131,6 +131,14 @@ public class Actions extends DefaultHandler {
 		return actionDescriptor.buttonModel;
 	}
 	
+	public Map<String, KeyStroke> getKeyMapping() {
+		Map map = new HashMap<String, String>();
+		int i = 0;
+		for (String key : actionMap.keySet())
+			map.put(key, actionMap.get(key).action.getValue(JPatchAction.ACCELERATOR));
+		return map;
+	}
+	
 	public AbstractButton getButton(String key) {
 		ActionDescriptor actionDescriptor = actionMap.get(key);
 		if (actionDescriptor == null)
@@ -345,11 +353,11 @@ public class Actions extends DefaultHandler {
 		actionMap.put("change tangents: peak", new ActionDescriptor(new ChangeTangentModeAction(ChangeTangentModeAction.PEAK)));
 		actionMap.put("change tangents: spatch", new ActionDescriptor(new ChangeTangentModeAction(ChangeTangentModeAction.SPATCH)));
 		actionMap.put("assign controlpoints to bones", new ActionDescriptor(new AssignPointsToBonesAction()));
+		actionMap.put("edit keyboard mapping", new ActionDescriptor(new KeyMappingAction()));
 
 		/*
 		 * END OF AUTO-GENERATED CODE
 		 */
-
 	}
 	
 	static class ActionDescriptor {

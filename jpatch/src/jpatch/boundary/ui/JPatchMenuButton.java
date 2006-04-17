@@ -161,7 +161,7 @@ public class JPatchMenuButton extends JPatchToggleButton implements ActionListen
 			g2.setColor(Color.WHITE);
 			g2.fillPolygon(new int[] { w + 3, w + 10, w + 6 }, new int[] { h/2 - 2, h/2 - 2, h/2 + 2}, 3);
 			g2.setColor(Color.BLACK);
-			g2.drawPolygon(new int[] { w + 3, w + 9, w + 6 }, new int[] { h/2 - 2, h/2 - 2, h/2 + 1}, 3);
+			g2.drawPolygon(new int[] { w + 2, w + 10, w + 6 }, new int[] { h/2 - 2, h/2 - 2, h/2 + 2}, 3);
 		} else {
 			g2.setColor(Color.BLACK);
 			g2.fillPolygon(new int[] { w + 3, w + 10, w + 6 }, new int[] { h/2 - 2, h/2 - 2, h/2 + 2}, 3);
