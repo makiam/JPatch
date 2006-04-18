@@ -17,6 +17,7 @@ public final class Launcher {
 //			try {
 //				UIManager.setLookAndFeel(Settings.getInstance().lookAndFeelClassname);
 //			} catch (Exception e) { }
+			System.out.println("Stating JPatch...");
 			SplashScreen splash = new SplashScreen();
 			splash.showSplash(true);
 			try {

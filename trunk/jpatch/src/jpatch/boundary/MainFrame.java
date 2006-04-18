@@ -330,6 +330,7 @@ public final class MainFrame extends JFrame {
 			setVisible(true);
 			jpatchScreen.setTool(Tools.defaultTool);
 			if (!VersionInfo.release) {
+				System.out.println("Displaying warning message...");
 				if (SplashScreen.instance != null)
 					SplashScreen.instance.clearSplash();
 				String warning = "This is a development version of JPatch.\n" +
@@ -338,6 +339,7 @@ public final class MainFrame extends JFrame {
 						 "from the JPatch homepage at http://www.jpatch.com";
 				JOptionPane.showMessageDialog(this, warning, "WARNING", JOptionPane.WARNING_MESSAGE);
 			}
+			System.out.println("JPatch is ready.");
 		} else {
 			throw new IllegalStateException("There can be only one instance of MainFrame");
 		}

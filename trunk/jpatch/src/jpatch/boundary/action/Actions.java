@@ -24,6 +24,8 @@ package jpatch.boundary.action;
 import java.awt.event.ActionEvent;
 import java.net.*;
 import java.util.*;
+import java.util.prefs.Preferences;
+
 import javax.swing.*;
 
 import org.xml.sax.*;
@@ -64,11 +66,17 @@ public class Actions extends DefaultHandler {
 		}
 		try {
 			xmlReader.setContentHandler(this);
+			System.out.println("Loading actions...");
 			xmlReader.parse(new InputSource(url.toString()));
+			
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 		}
+		
+		System.out.println("Loading key bindings...");
+		loadKeySettings();
+		
 		
 		/*
 		 * Disable commands
@@ -132,12 +140,20 @@ public class Actions extends DefaultHandler {
 	}
 	
 	public Map<String, KeyStroke> getKeyMapping() {
-		Map map = new HashMap<String, String>();
-		int i = 0;
-		for (String key : actionMap.keySet())
-			map.put(key, actionMap.get(key).action.getValue(JPatchAction.ACCELERATOR));
+		Map<String, KeyStroke> map = new HashMap<String, KeyStroke>();
+		for (String key : actionMap.keySet()) {
+			map.put(key, KeyStroke.getKeyStroke((String) actionMap.get(key).action.getValue(JPatchAction.ACCELERATOR)));
+		}
 		return map;
 	}
+	
+	public KeyStroke getDefaultKeyStroke(String key) {
+		return actionMap.get(key).defaultAccelerator;
+	}
+	
+//	public Set<String> getKeys() {
+//		return actionMap.keySet();
+//	}
 	
 	public AbstractButton getButton(String key) {
 		ActionDescriptor actionDescriptor = actionMap.get(key);
@@ -225,6 +241,8 @@ public class Actions extends DefaultHandler {
 				((LockingButtonGroup) getButtonGroup(attributes.getValue("group"))).setDefaultButtonModel(actionDescriptor.buttonModel);
 		} else if (localName.equals("property")) {
 			actionDescriptor.action.putValue(attributes.getValue("key"), attributes.getValue("value"));
+			if (attributes.getValue("key").equals(JPatchAction.ACCELERATOR))
+				actionDescriptor.defaultAccelerator = KeyStroke.getKeyStroke(attributes.getValue("value"));
 		}
 	}
 	
@@ -239,6 +257,29 @@ public class Actions extends DefaultHandler {
 //			if (actionDescriptor.menuItem != null)
 //				actionDescriptor.menuItem.setAction(actionDescriptor.action);
 			actionDescriptor = null;
+		}
+	}
+	
+	public void saveKeySettings() {
+		Preferences node = Preferences.userRoot().node("/JPatch/KeyBindings");
+		for (String key : actionMap.keySet()) {
+			String accelerator = (String) actionMap.get(key).action.getValue(JPatchAction.ACCELERATOR);
+			if (accelerator == null)
+				accelerator = "null";
+			node.put(key, accelerator);
+		}
+	}
+	
+	private void loadKeySettings() {
+		Preferences node = Settings.getInstance().getRootNode().node("keyBindings");
+		for (String key : actionMap.keySet()) {
+			Action action = actionMap.get(key).action;
+			KeyStroke ks = getDefaultKeyStroke(key);
+			String defaultAccelerator = ks == null ? "null" : ks.toString();
+			String accelerator = node.get(key, defaultAccelerator);
+			if (accelerator.equals("null"))
+				accelerator = null;
+			action.putValue(JPatchAction.ACCELERATOR, accelerator);
 		}
 	}
 	
@@ -363,10 +404,12 @@ public class Actions extends DefaultHandler {
 	static class ActionDescriptor {
 		Action action;
 		DefaultButtonModel buttonModel;
+		KeyStroke defaultAccelerator;
 		boolean bound;
 		
 		ActionDescriptor(Action action) {
 			this.action = action;
+			defaultAccelerator = KeyStroke.getKeyStroke((String) action.getValue(JPatchAction.ACCELERATOR));
 		}
 	}
 	

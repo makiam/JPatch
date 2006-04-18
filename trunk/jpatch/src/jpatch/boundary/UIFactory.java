@@ -59,6 +59,7 @@ public class UIFactory extends DefaultHandler {
 		}
 	};
 	public void parseLayout(URL url) {
+		
 		XMLReader xmlReader = null;
 		try {
 			xmlReader = XMLReaderFactory.createXMLReader();
@@ -71,11 +72,15 @@ public class UIFactory extends DefaultHandler {
 		}
 		try {
 			xmlReader.setContentHandler(this);
+			System.out.println("Building menues and toolbars...");
 			xmlReader.parse(new InputSource(url.toString()));
+			
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 		}
+		
+		
 		mapObjects.put("menubar", menuBar);
 		mapObjects.put("viewport popup", popupMenu);
 		mapObjects.put("view menu", viewMenu);
