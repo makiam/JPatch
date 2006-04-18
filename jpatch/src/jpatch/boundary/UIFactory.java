@@ -1,5 +1,5 @@
 /*
- * $Id: UIFactory.java,v 1.15 2006/04/14 14:43:26 sascha_l Exp $
+ * $Id: UIFactory.java,v 1.16 2006/04/18 22:32:14 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -59,6 +59,7 @@ public class UIFactory extends DefaultHandler {
 		}
 	};
 	public void parseLayout(URL url) {
+		
 		XMLReader xmlReader = null;
 		try {
 			xmlReader = XMLReaderFactory.createXMLReader();
@@ -71,11 +72,15 @@ public class UIFactory extends DefaultHandler {
 		}
 		try {
 			xmlReader.setContentHandler(this);
+			System.out.println("Building menues and toolbars...");
 			xmlReader.parse(new InputSource(url.toString()));
+			
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 		}
+		
+		
 		mapObjects.put("menubar", menuBar);
 		mapObjects.put("viewport popup", popupMenu);
 		mapObjects.put("view menu", viewMenu);

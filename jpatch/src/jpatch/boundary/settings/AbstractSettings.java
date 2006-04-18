@@ -1,5 +1,5 @@
 /*
- * $Id: AbstractSettings.java,v 1.5 2006/04/05 15:29:10 sascha_l Exp $
+ * $Id: AbstractSettings.java,v 1.6 2006/04/18 22:32:14 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -118,6 +118,10 @@ public abstract class AbstractSettings implements TreeNode {
 	};
 	
 	private JTable table = new JTable();
+	
+	public  Preferences getRootNode() {
+		return JPATCH_ROOT_NODE;
+	}
 	
 	private TreeCellRenderer treeCellRenderer = new DefaultTreeCellRenderer() {
 		public Component getTreeCellRendererComponent(JTree tree,Object value,boolean sel,boolean expanded,boolean leaf,int row,boolean hasFocus) {

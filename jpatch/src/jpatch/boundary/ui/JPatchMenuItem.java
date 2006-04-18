@@ -96,6 +96,8 @@ public class JPatchMenuItem extends JMenuItem {
 					setText((String) e.getNewValue());
 				else if (e.getPropertyName().equals(JPatchAction.MENU_TEXT))
 					setText((String) e.getNewValue());
+				else if (e.getPropertyName().equals(JPatchAction.ACCELERATOR))
+					setAccelerator(KeyStroke.getKeyStroke((String) e.getNewValue()));
 			}
         };
     }

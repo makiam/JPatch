@@ -110,4 +110,28 @@ public class JPatchButton extends JButton implements KeyBindingHelper.CallBack {
 			e.consume();
 		return consumed;
 	}
+	
+	@Override
+	protected PropertyChangeListener createActionPropertyChangeListener(final Action a) {
+        return new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent e) {
+				if (e.getPropertyName().equals("enabled"))
+					setEnabled((Boolean) e.getNewValue());
+				else if (e.getPropertyName().equals(JPatchAction.SHORT_DESCRIPTION) && a.getValue(JPatchAction.MENU_TEXT) == null)
+					setToolTipText((String) e.getNewValue());
+				else if (e.getPropertyName().equals(JPatchAction.BUTTON_TEXT))
+					setText((String) e.getNewValue());
+				else if (e.getPropertyName().equals(JPatchAction.ACCELERATOR)) {
+					KeyStroke newKs = KeyStroke.getKeyStroke((String) e.getNewValue());
+					KeyStroke oldKs = KeyStroke.getKeyStroke((String) e.getOldValue());
+					if (oldKs != null)
+						getInputMap(WHEN_IN_FOCUSED_WINDOW).put(oldKs, null);
+					if (newKs != null)
+						getInputMap(WHEN_IN_FOCUSED_WINDOW).put(newKs, "doClick");
+					
+				}
+			}
+        };
+    }
+	
 }

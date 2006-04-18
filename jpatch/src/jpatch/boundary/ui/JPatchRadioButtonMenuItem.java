@@ -2,8 +2,11 @@ package jpatch.boundary.ui;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
+
 import jpatch.boundary.action.JPatchAction;
 ;
 
@@ -97,4 +100,20 @@ public class JPatchRadioButtonMenuItem extends JRadioButtonMenuItem {
 		if (mnemonic != null)
 			setMnemonic(mnemonic.charAt(0));
 	}
+	
+	@Override
+	protected PropertyChangeListener createActionPropertyChangeListener(final Action a) {
+        return new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent e) {
+				if (e.getPropertyName().equals("enabled"))
+					setEnabled((Boolean) e.getNewValue());
+				else if (e.getPropertyName().equals(JPatchAction.SHORT_DESCRIPTION) && a.getValue(JPatchAction.MENU_TEXT) == null)
+					setText((String) e.getNewValue());
+				else if (e.getPropertyName().equals(JPatchAction.MENU_TEXT))
+					setText((String) e.getNewValue());
+				else if (e.getPropertyName().equals(JPatchAction.ACCELERATOR))
+					setAccelerator(KeyStroke.getKeyStroke((String) e.getNewValue()));
+			}
+        };
+    }
 }
