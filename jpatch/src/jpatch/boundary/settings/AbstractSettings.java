@@ -119,6 +119,10 @@ public abstract class AbstractSettings implements TreeNode {
 	
 	private JTable table = new JTable();
 	
+	public  Preferences getRootNode() {
+		return JPATCH_ROOT_NODE;
+	}
+	
 	private TreeCellRenderer treeCellRenderer = new DefaultTreeCellRenderer() {
 		public Component getTreeCellRendererComponent(JTree tree,Object value,boolean sel,boolean expanded,boolean leaf,int row,boolean hasFocus) {
 			super.getTreeCellRendererComponent(tree,value,sel,expanded,leaf,row,hasFocus);

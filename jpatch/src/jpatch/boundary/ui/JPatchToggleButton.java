@@ -2,8 +2,12 @@ package jpatch.boundary.ui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
+
+import jpatch.boundary.action.JPatchAction;
 
 public class JPatchToggleButton extends JToggleButton implements KeyBindingHelper.CallBack {
 
@@ -143,4 +147,27 @@ public class JPatchToggleButton extends JToggleButton implements KeyBindingHelpe
 	public boolean reprocessKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
 		return super.processKeyBinding(ks, e, condition, pressed);
 	}
+	
+	@Override
+	protected PropertyChangeListener createActionPropertyChangeListener(final Action a) {
+        return new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent e) {
+				if (e.getPropertyName().equals("enabled"))
+					setEnabled((Boolean) e.getNewValue());
+				else if (e.getPropertyName().equals(JPatchAction.SHORT_DESCRIPTION) && a.getValue(JPatchAction.MENU_TEXT) == null)
+					setToolTipText((String) e.getNewValue());
+				else if (e.getPropertyName().equals(JPatchAction.BUTTON_TEXT))
+					setText((String) e.getNewValue());
+				else if (e.getPropertyName().equals(JPatchAction.ACCELERATOR)) {
+					KeyStroke newKs = KeyStroke.getKeyStroke((String) e.getNewValue());
+					KeyStroke oldKs = KeyStroke.getKeyStroke((String) e.getOldValue());
+					if (oldKs != null)
+						getInputMap(WHEN_IN_FOCUSED_WINDOW).put(oldKs, null);
+					if (newKs != null)
+						getInputMap(WHEN_IN_FOCUSED_WINDOW).put(newKs, "doClick");
+					
+				}
+			}
+        };
+    }
 }
