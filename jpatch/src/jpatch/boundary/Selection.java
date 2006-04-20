@@ -16,7 +16,7 @@ public class Selection extends JPatchTreeLeaf {
 	public static final int MORPHTARGET = 8;
 	public static int NUM = 0;
 	
-	private final Map mapObjects = new HashMap();
+	private final Map<Object, Float> mapObjects = new HashMap<Object, Float>();
 	private Map mapTransformables = new HashMap();
 	private Object hotObject;
 	private int iDirection;
@@ -47,16 +47,23 @@ public class Selection extends JPatchTreeLeaf {
 		if ((mask & BONES) != 0 && MainFrame.getInstance().getJPatchScreen().isSelectBones()) {
 			for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
 				Bone bone = (Bone) it.next();
+				int p = 0;
 				if (bone.getParentBone() == null) {
 					bone.getStart(p3);
 					transformationMatrix.transform(p3);
-					if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by)
-						selection.mapObjects.put(bone.getBoneStart(), new Float(1.0f));
+					if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by) {
+						selection.mapObjects.put(bone.getBoneStart(), 1.0f);
+						p++;
+					}
 				}
 				bone.getEnd(p3);
 				transformationMatrix.transform(p3);
-				if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by)
-					selection.mapObjects.put(bone.getBoneEnd(), new Float(1.0f));
+				if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by) {
+					selection.mapObjects.put(bone.getBoneEnd(), 1.0f);
+					p++;
+				}
+				if (p == 2)
+					selection.mapObjects.put(bone, 1.0f);
 			}
 		}
 		selection.p3Pivot.set(selection.getCenter());
@@ -211,7 +218,10 @@ public class Selection extends JPatchTreeLeaf {
 		Matrix3f m3 = new Matrix3f(m3Orientation);
 		m3.invert();
 		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext(); ) {
-			p3.set(((Transformable) it.next()).getPosition());
+			Point3f p = ((Transformable) it.next()).getPosition();
+			if (p == null)
+				continue;
+			p3.set(p);
 			m3.transform(p3);
 			if (p3.x > xMax) xMax = p3.x;
 			if (p3.x < xMin) xMin = p3.x;
@@ -305,6 +315,8 @@ public class Selection extends JPatchTreeLeaf {
 				if (cps && key instanceof ControlPoint)
 					mapTransformables.put(key, mapObjects.get(key));
 				if (bones && key instanceof Bone.BoneTransformable)
+					mapTransformables.put(key, mapObjects.get(key));
+				if (bones && key instanceof Bone)
 					mapTransformables.put(key, mapObjects.get(key));
 			}
 		}

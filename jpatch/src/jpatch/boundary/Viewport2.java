@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.51 2006/03/25 23:22:45 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.52 2006/04/20 13:06:24 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -4046,6 +4046,10 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 			if (bone.getLastDof() != null)
 				bone.getLastDof().getInvTransform().transform(v3Extent);
 			Vector3f v3X = Utils3D.perpendicularVector(v3Extent);
+			AxisAngle4f aaa = new AxisAngle4f(v3Extent, bone.getJointRotation() / 180 * (float) Math.PI);
+			Matrix3f mmm = new Matrix3f();
+			mmm.set(aaa);
+			mmm.transform(v3X);
 			Vector3f v3Z = new Vector3f();
 			v3Z.cross(v3X, v3Extent);
 			if (bone.getLastDof() != null) {
