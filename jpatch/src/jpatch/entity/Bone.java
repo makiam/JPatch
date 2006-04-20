@@ -10,10 +10,10 @@ import jpatch.boundary.*;
 import jpatch.control.edit.*;
 //import jpatch.auxilary.*;
 //
-public class Bone implements MutableTreeNode {
+public class Bone implements MutableTreeNode, Transformable {
 //	public static final BoneTransformableType START = new BoneTransformableType();
 //	public static final BoneTransformableType END = new BoneTransformableType();
-	private static final float DEFAULT_INFLUENCE = 0.33f; 
+//	private static final float DEFAULT_INFLUENCE = 0.33f; 
 	private static int NUM = 0;
 	private static Map mapBones;
 //	private static final Bone[] emptyBoneArray = new Bone[0];
@@ -36,8 +36,8 @@ public class Bone implements MutableTreeNode {
 //	private final Point3f p3ReferenceEnd = new Point3f();
 //	private Vector3f v3TempExtent = new Vector3f();
 //	private final Point3f p3End = new Point3f();
-	private float fStartRadius = DEFAULT_INFLUENCE;
-	private float fEndRadius = DEFAULT_INFLUENCE;
+//	private float fStartRadius = DEFAULT_INFLUENCE;
+//	private float fEndRadius = DEFAULT_INFLUENCE;
 	private MutableTreeNode parent;
 //	private Bone boneNext;
 //	private Bone bonePrev;
@@ -347,6 +347,13 @@ public class Bone implements MutableTreeNode {
 		return end;
 	}
 	
+	public void getAxis(Vector3f axis, int type) {
+		axis.sub(getEnd(null), getStart(null));
+		switch (type) {
+		case RotationDof.YAW:
+			
+		}
+	}
 	public void setEnd(Point3f end) {
 		p3End.set(end);
 		lastDofInvTransform(p3End);
@@ -391,13 +398,13 @@ public class Bone implements MutableTreeNode {
 		this.color.set(color);
 	}
 	
-	public void setStartInfluence(float influence) {
-		fStartRadius = influence;
-	}
-	
-	public void setEndInfluence(float influence) {
-		fEndRadius = influence;
-	}
+//	public void setStartInfluence(float influence) {
+//		fStartRadius = influence;
+//	}
+//	
+//	public void setEndInfluence(float influence) {
+//		fEndRadius = influence;
+//	}
 	
 	public BoneTransformable getBoneStart() {
 		return (getParentBone() == null) ? boneStart : null;
@@ -478,10 +485,10 @@ public class Bone implements MutableTreeNode {
 		sb.append(prefix).append("\t<color r=").append(XMLutils.quote(color.x));
 		sb.append(" g=").append(XMLutils.quote(color.y));
 		sb.append(" b=").append(XMLutils.quote(color.z)).append("/>\n");
-		if (fStartRadius != DEFAULT_INFLUENCE || fEndRadius != DEFAULT_INFLUENCE) {
-			sb.append(prefix).append("\t<influence start=").append(XMLutils.quote(fStartRadius));
-			sb.append(" end=").append(XMLutils.quote(fEndRadius)).append("/>\n");
-		}
+//		if (fStartRadius != DEFAULT_INFLUENCE || fEndRadius != DEFAULT_INFLUENCE) {
+//			sb.append(prefix).append("\t<influence start=").append(XMLutils.quote(fStartRadius));
+//			sb.append(" end=").append(XMLutils.quote(fEndRadius)).append("/>\n");
+//		}
 		sb.append(prefix).append("\t<joint rotation=\"" + fJointRotation + "\"/>\n");
 		for (Iterator it = listDofs.iterator(); it.hasNext(); )
 			sb.append(((RotationDof) it.next()).xml(prefix + "\t"));
@@ -698,6 +705,43 @@ public class Bone implements MutableTreeNode {
 		this.strName = name;
 	}
 
+	
+	/*
+	 * Begin of Transformable implementation
+	 */
+	
+	private float jointRotation;
+	private Vector3f v3 = new Vector3f();
+	public Point3f getPosition() {
+		return null;
+	}
+
+	public void beginTransform() {
+		jointRotation = fJointRotation;
+		v3.sub(getEnd(null), getStart(null));
+		v3.normalize();
+	}
+
+	public void translate(Vector3f v) { }
+
+	public void rotate(AxisAngle4f a, Point3f pivot) {
+		Vector3f v3a = new Vector3f();
+		v3a.set(a.x, a.y, a.z);
+		v3a.normalize();
+		float dot = v3a.dot(v3);
+		setJointRotation(jointRotation + dot * a.angle);
+		System.out.println(getJointRotation());
+	}
+
+	public void transform(Matrix3f m, Point3f pivot) { }
+
+	public JPatchUndoableEdit endTransform() {
+		return null;
+	}
+
+	/*
+	 * End of Transformable implementation
+	 */
 
 	
 //	public static final class BoneTransformableType { }

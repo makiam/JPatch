@@ -136,4 +136,19 @@ public class Utils3D {
 				(balength * yca - calength * yba) * crossBC.x) * denominator;
 		return new Point3f(x + A.x, y + A.y, z + A.z);
 	}
+	
+	/**
+	 * Transform (rotate) a Tuple3f using the rotation specified in a unit quaternion
+	 * @param t The tuple to be transformed
+	 * @param q The qunit uaternion representing the rotation
+	 */
+	public static void transform(Tuple3f t, Quat4f q) {
+		float x = q.y * t.z - t.y * q.z + q.w * t.x;
+		float y = q.z * t.x - t.z * q.x + q.w * t.y;
+		float z = q.x * t.y - t.x * q.y + q.w * t.z;
+		float w = -q.x * t.x - q.y * t.y - q.z * t.z;
+		t.x = -y * q.z + q.y * z - w * q.x + q.w * x;
+		t.y = -z * q.x + q.z * x - w * q.y + q.w * y;
+		t.z = -x * q.y + q.x * y - w * q.z + q.w * z;
+	}
 }

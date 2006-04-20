@@ -16,9 +16,9 @@ import jpatch.entity.Morph.MorphListener;
  * @author sascha
  */
 public class RotationDof extends Morph {
-	public static final int ORTHO_1 = 1;
-	public static final int ORTHO_2 = 2;
-	public static final int RADIAL = 4;
+	public static final int YAW = 1;
+	public static final int PITCH = 2;
+	public static final int ROLL = 4;
 	
 	public static final int RIGID = 0;
 	public static final int SOFT = 1;
@@ -103,17 +103,17 @@ public class RotationDof extends Morph {
 		Vector3f v = new Vector3f(bone.getReferenceEnd());
 		v.sub(bone.getReferenceStart());
 		switch (iAxis) {
-			case ORTHO_1: {
+			case YAW: {
 				axis = Utils3D.perpendicularVector(v);
 			}
 			break;
-			case ORTHO_2: {
+			case PITCH: {
 				Vector3f vv = Utils3D.perpendicularVector(v);
 				axis = new Vector3f();
 				axis.cross(v, vv);
 			}
 			break;
-			case RADIAL: {
+			case ROLL: {
 				axis = v;
 			}
 			break;
