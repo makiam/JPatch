@@ -4046,6 +4046,10 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 			if (bone.getLastDof() != null)
 				bone.getLastDof().getInvTransform().transform(v3Extent);
 			Vector3f v3X = Utils3D.perpendicularVector(v3Extent);
+			AxisAngle4f aaa = new AxisAngle4f(v3Extent, bone.getJointRotation() / 180 * (float) Math.PI);
+			Matrix3f mmm = new Matrix3f();
+			mmm.set(aaa);
+			mmm.transform(v3X);
 			Vector3f v3Z = new Vector3f();
 			v3Z.cross(v3X, v3Extent);
 			if (bone.getLastDof() != null) {

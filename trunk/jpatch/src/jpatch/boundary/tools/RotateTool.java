@@ -152,7 +152,10 @@ public class RotateTool extends JPatchTool {
 //		acp = selection.getControlPointArray();
 //		ControlPoint[] acp = selection.getControlPointArray();
 		for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
-			ds = selection.getPivot().distanceSquared(((Transformable) it.next()).getPosition());
+			Point3f p = ((Transformable) it.next()).getPosition();
+			if (p == null)
+				continue;
+			ds = selection.getPivot().distanceSquared(p);
 			if (ds > r) r = ds;
 		}
 //		for (int i = 0; i < ap3.length; i++) {

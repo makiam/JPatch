@@ -656,6 +656,7 @@ public final class MainFrame extends JFrame {
 //		getModel().removeSelection(this.selection);
 		boolean bonesAndPoints = false;
 		boolean moreThanOnePoint = false;
+		boolean bone = false;
 		this.selection = selection;
 //		meshToolBar.getWeightButton().setEnabled(selection != null && !selection.isSingle());
 		/* unhide new selection */
@@ -686,8 +687,9 @@ public final class MainFrame extends JFrame {
 				else if (o instanceof Bone.BoneTransformable)
 					bones++;
 			}
-			bonesAndPoints = (points > 0 && bones > 1);
+			bonesAndPoints = (points > 0 && bones > 0);
 			moreThanOnePoint = (points > 1);
+			bone = (bones > 0);
 			jpatchScreen.setFocusTraversalKeysEnabled(!(selection.isSingle() && selection.getHotObject() instanceof ControlPoint));
 		}
 		Actions.getInstance().enableAction("select none", selection != null);
@@ -710,7 +712,7 @@ public final class MainFrame extends JFrame {
 		Actions.getInstance().enableAction("make patch", MakeFivePointPatchAction.checkSelection() != null);
 		Actions.getInstance().enableAction("weight selection tool", moreThanOnePoint);
 		Actions.getInstance().enableAction("knife tool", moreThanOnePoint);
-		Actions.getInstance().enableAction("rotate tool", moreThanOnePoint || (selection != null && selection.getHotObject() instanceof AnimObject));
+		Actions.getInstance().enableAction("rotate tool", moreThanOnePoint || bone || (selection != null && selection.getHotObject() instanceof AnimObject));
 		Actions.getInstance().enableAction("extrude", moreThanOnePoint);
 		Actions.getInstance().enableAction("lathe", moreThanOnePoint);
 		Actions.getInstance().enableAction("clone", moreThanOnePoint);
