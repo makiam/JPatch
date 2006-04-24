@@ -217,6 +217,11 @@ public final class MainFrame extends JFrame {
 			
 			initTree(model);
 			sideBar = new SideBar(tree);
+//			JPanel panel2 = new JPanel();
+//			panel2.setLayout(new BorderLayout());
+//			panel2.add(sideBar, BorderLayout.CENTER);
+//			panel2.add(new MemoryMonitor(), BorderLayout.SOUTH);
+			
 //			getContentPane().add(sideBar,BorderLayout.EAST);
 			
 			getContentPane().add(helpPanel,BorderLayout.SOUTH);
@@ -242,8 +247,9 @@ public final class MainFrame extends JFrame {
 			splitPaneH.setDividerLocation(getWidth() - 310);
 			getContentPane().add(splitPaneH, BorderLayout.CENTER);
 			
-			helpPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-			helpPanel.add(helpLabel);
+			helpPanel.setLayout(new BorderLayout());
+			helpPanel.add(helpLabel, BorderLayout.WEST);
+			helpPanel.add(new MemoryMonitor(), BorderLayout.EAST);
 			jpatchScreen.enablePopupMenu(true);
 			jpatchScreen.addMMBListener();
 			

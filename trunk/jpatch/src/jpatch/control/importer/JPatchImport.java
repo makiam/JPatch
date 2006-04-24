@@ -229,13 +229,13 @@ implements ModelImporter {
 					bone.setEnd(createPoint(attributes));
 				} else if (localName.equals("color")) {
 					bone.setColor(createColor(attributes));
-				} else if (localName.equals("influence")) {
-					for (int index = 0; index < attributes.getLength(); index++) {
-						if (attributes.getLocalName(index).equals("start"))
-							bone.setStartInfluence(Float.parseFloat(attributes.getValue(index)));
-						else if (attributes.getLocalName(index).equals("end"))
-							bone.setEndInfluence(Float.parseFloat(attributes.getValue(index)));
-					}
+//				} else if (localName.equals("influence")) {
+//					for (int index = 0; index < attributes.getLength(); index++) {
+//						if (attributes.getLocalName(index).equals("start"))
+//							bone.setStartInfluence(Float.parseFloat(attributes.getValue(index)));
+//						else if (attributes.getLocalName(index).equals("end"))
+//							bone.setEndInfluence(Float.parseFloat(attributes.getValue(index)));
+//					}
 				} else if (localName.equals("dof")) {
 					for (int index = 0; index < attributes.getLength(); index++) {
 						String name = attributes.getLocalName(index);
