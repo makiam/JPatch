@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchUndoManager.java,v 1.11 2006/04/14 14:43:26 sascha_l Exp $
+ * $Id: JPatchUndoManager.java,v 1.12 2006/04/24 14:42:26 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -23,6 +23,7 @@
 package jpatch.control.edit;
 
 import jpatch.boundary.action.*;
+import jpatch.boundary.settings.*;
 import java.util.*;
 
 import javax.swing.Action;
@@ -31,7 +32,7 @@ import javax.swing.Action;
  * The JPatchUndoManager stores JPatchUndoableEdits in a list and provides methods to add, redo and undo edits.<br>
  * It keeps track of the position in the position inside the list
  *
- * @version	$Revision: 1.11 $
+ * @version	$Revision: 1.12 $
  * @author	Sascha Ledinsky
  */
 public class JPatchUndoManager {
@@ -113,12 +114,12 @@ public class JPatchUndoManager {
 		if (bEnabled) {
 			if (iPos == listEdits.size()) {			// check if we are at the end of the list
 				listEdits.add(edit);
-				if (listEdits.size() > iDepth) {
-					listEdits.remove(0);		// remove first item if list is full
-					if (iStop > 0) iStop--;		// move back stop marker
-				} else {
+//				if (listEdits.size() > iDepth) {
+//					listEdits.remove(0);		// remove first item if list is full
+//					if (iStop > 0) iStop--;		// move back stop marker
+//				} else {
 					iPos++;				// increase pointer
-				}
+//				}
 			} else {
 				while (iPos < listEdits.size()) {	// remove all edits after current one
 					listEdits.remove(iPos);
@@ -127,6 +128,23 @@ public class JPatchUndoManager {
 				iPos++;					// increase pointer
 			}
 			bChange = true;
+			/*
+			 * The following lines are experimental.
+			 * Their purpose is to drop edits from the list
+			 * if (and only if) we're using too much memory
+			 */
+			Runtime r = Runtime.getRuntime();
+			if (r.totalMemory() - r.freeMemory() > Settings.getInstance().undoMaxMem << 20) {
+				r.gc();						// run garbage collection;
+				while (listEdits.size() > 1 && r.totalMemory() - r.freeMemory() > Settings.getInstance().undoMinMem << 20) {
+					System.out.println("UndoManager: removing edit " + (r.totalMemory() - r.freeMemory()) + " " + Settings.getInstance().undoMaxMem);
+					listEdits.remove(0);		// remove first item if list is full
+					iPos--;
+					if (iStop > 0)
+						iStop--;				// move back stop marker
+					r.gc();						// run garbage collection;
+				}
+			}
 		}
 		configureActions();
 //		System.out.println("UndoManager.add():");

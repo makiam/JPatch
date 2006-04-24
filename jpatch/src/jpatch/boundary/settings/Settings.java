@@ -1,5 +1,5 @@
 /*
- * $Id: Settings.java,v 1.5 2006/03/25 23:22:45 sascha_l Exp $
+ * $Id: Settings.java,v 1.6 2006/04/24 14:42:26 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -48,7 +48,8 @@ public class Settings extends AbstractSettings {
 	public int screenHeight = 768;
 	public boolean saveScreenDimensionsOnExit = true;
 	public String lookAndFeelClassname = "javax.swing.plaf.metal.MetalLookAndFeel";
-	
+	public long undoMaxMem = 128;
+	public long undoMinMem = 120;
 	public final DirectorySettings directories = new DirectorySettings();
 	public final ViewportSettings viewports = new ViewportSettings();
 	public final ColorSettings colors = new ColorSettings();
