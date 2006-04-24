@@ -47,17 +47,17 @@ public class UIFactory extends DefaultHandler {
 	private JMenu viewMenu;
 	private Map mapObjects = new HashMap();
 	private Map mapLayout = new HashMap();
-	private Icon emptyIcon = new Icon() {
-		public void paintIcon(Component c, Graphics g, int x, int y) { }
-
-		public int getIconWidth() {
-			return 15;
-		}
-
-		public int getIconHeight() {
-			return 15;
-		}
-	};
+//	private Icon emptyIcon = new Icon() {
+//		public void paintIcon(Component c, Graphics g, int x, int y) { }
+//
+//		public int getIconWidth() {
+//			return 15;
+//		}
+//
+//		public int getIconHeight() {
+//			return 15;
+//		}
+//	};
 	public void parseLayout(URL url) {
 		
 		XMLReader xmlReader = null;
@@ -194,8 +194,8 @@ public class UIFactory extends DefaultHandler {
 					if (getMenu() != null) {
 						JMenu menu = new JPatchMenu(attributes.getValue(i));
 //						System.out.println(((JMenu) getMenu()).getText() + " " + menu.getText());
-						if (!(getMenu() instanceof JMenuBar))
-							menu.setIcon(emptyIcon);
+//						if (!(getMenu() instanceof JMenuBar))
+//							menu.setIcon(emptyIcon);
 						getMenu().add(menu);
 						listMenu.add(menu);
 						if (attributes.getValue(i).toLowerCase().equals("view"))

@@ -80,16 +80,16 @@ public class SmoothLookAndFeel extends MetalLookAndFeel {
                     "ToolTip.borderInactive", new BorderUIResource(new LineBorder(new Color(0.3f, 0.3f, 0.3f))),
                 };
         uidefaults.putDefaults(classMap);
-        ArrayList list = Collections.list(uidefaults.keys());
-		for(Iterator it = list.iterator(); it.hasNext(); ) {
-			String key = (String) it.next();
-			if (key.endsWith(".font")) {
-				FontUIResource f = (FontUIResource) uidefaults.get(key);
-				uidefaults.put(key, new FontUIResource("Sans-Serif", Font.PLAIN, f.getSize()));
-				//fontUIResource.setStyle(FontUIResource.PLAIN);
-				//System.out.println(key +" " + def.get(key));
-			}
-		}
+//        ArrayList list = Collections.list(uidefaults.keys());
+//		for(Iterator it = list.iterator(); it.hasNext(); ) {
+//			String key = (String) it.next();
+//			if (key.endsWith(".font")) {
+//				FontUIResource f = (FontUIResource) uidefaults.get(key);
+//				uidefaults.put(key, new FontUIResource("Sans-Serif", Font.PLAIN, f.getSize()));
+//				//fontUIResource.setStyle(FontUIResource.PLAIN);
+//				//System.out.println(key +" " + def.get(key));
+//			}
+//		}
 		uidefaults.put("ToggleButton.rollover", new Boolean(true));
 		uidefaults.put("Button.rollover", new Boolean(true));
 		uidefaults.put("ToolBarButton.rollover", new Boolean(true));

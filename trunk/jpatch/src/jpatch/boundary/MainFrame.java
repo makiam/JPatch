@@ -118,6 +118,7 @@ public final class MainFrame extends JFrame {
 		if (INSTANCE == null) {
 			INSTANCE = this;
 			
+			UIManager.put("swing.boldMetal", false);
 			try {
 				String plaf = Settings.getInstance().lookAndFeelClassname;
 				if (plaf.equals("jpatch.boundary.laf.SmoothLookAndFeel"))
