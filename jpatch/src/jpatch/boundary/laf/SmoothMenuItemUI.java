@@ -8,9 +8,7 @@ import javax.swing.*;
 
 public class SmoothMenuItemUI extends BasicMenuItemUI {
     public static ComponentUI createUI(JComponent jcomponent) {
-    	SmoothMenuItemUI smoothMenuItemUI = new SmoothMenuItemUI();
-    	smoothMenuItemUI.defaultTextIconGap = 10;
-        return smoothMenuItemUI;
+        return new SmoothMenuItemUI();
     }
 
 //    public void paint(Graphics g, JComponent c) {
