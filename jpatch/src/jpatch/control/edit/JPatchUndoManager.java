@@ -23,6 +23,7 @@
 package jpatch.control.edit;
 
 import jpatch.boundary.action.*;
+import jpatch.boundary.settings.*;
 import java.util.*;
 
 import javax.swing.Action;
@@ -113,12 +114,12 @@ public class JPatchUndoManager {
 		if (bEnabled) {
 			if (iPos == listEdits.size()) {			// check if we are at the end of the list
 				listEdits.add(edit);
-				if (listEdits.size() > iDepth) {
-					listEdits.remove(0);		// remove first item if list is full
-					if (iStop > 0) iStop--;		// move back stop marker
-				} else {
+//				if (listEdits.size() > iDepth) {
+//					listEdits.remove(0);		// remove first item if list is full
+//					if (iStop > 0) iStop--;		// move back stop marker
+//				} else {
 					iPos++;				// increase pointer
-				}
+//				}
 			} else {
 				while (iPos < listEdits.size()) {	// remove all edits after current one
 					listEdits.remove(iPos);
@@ -127,6 +128,23 @@ public class JPatchUndoManager {
 				iPos++;					// increase pointer
 			}
 			bChange = true;
+			/*
+			 * The following lines are experimental.
+			 * Their purpose is to drop edits from the list
+			 * if (and only if) we're using too much memory
+			 */
+			Runtime r = Runtime.getRuntime();
+			if (r.totalMemory() - r.freeMemory() > Settings.getInstance().undoMaxMem << 20) {
+				r.gc();						// run garbage collection;
+				while (listEdits.size() > 1 && r.totalMemory() - r.freeMemory() > Settings.getInstance().undoMinMem << 20) {
+					System.out.println("UndoManager: removing edit " + (r.totalMemory() - r.freeMemory()) + " " + Settings.getInstance().undoMaxMem);
+					listEdits.remove(0);		// remove first item if list is full
+					iPos--;
+					if (iStop > 0)
+						iStop--;				// move back stop marker
+					r.gc();						// run garbage collection;
+				}
+			}
 		}
 		configureActions();
 //		System.out.println("UndoManager.add():");

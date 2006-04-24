@@ -48,7 +48,8 @@ public class Settings extends AbstractSettings {
 	public int screenHeight = 768;
 	public boolean saveScreenDimensionsOnExit = true;
 	public String lookAndFeelClassname = "javax.swing.plaf.metal.MetalLookAndFeel";
-	
+	public long undoMaxMem = 128;
+	public long undoMinMem = 120;
 	public final DirectorySettings directories = new DirectorySettings();
 	public final ViewportSettings viewports = new ViewportSettings();
 	public final ColorSettings colors = new ColorSettings();
