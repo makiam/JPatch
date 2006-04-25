@@ -73,6 +73,8 @@ public class UIFactory extends DefaultHandler {
 		try {
 			xmlReader.setContentHandler(this);
 			System.out.println("Building menues and toolbars...");
+			if (SplashScreen.instance != null)
+				SplashScreen.instance.setText("Building menues and toolbars");
 			xmlReader.parse(new InputSource(url.toString()));
 			
 		} catch (Exception e) {

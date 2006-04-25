@@ -10,6 +10,7 @@ import java.awt.image.IndexColorModel;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.*;
+import java.util.Timer;
 //import java.beans.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -216,6 +217,8 @@ public final class MainFrame extends JFrame {
 			//mainToolBar.setFloatable(false);
 			//meshToolBar.setFloatable(false);
 			
+			SplashScreen.instance.setText("Initializing...");
+			
 			initTree(model);
 			sideBar = new SideBar(tree);
 //			JPanel panel2 = new JPanel();
@@ -336,10 +339,23 @@ public final class MainFrame extends JFrame {
 			newModel();
 			setVisible(true);
 			jpatchScreen.setTool(Tools.defaultTool);
+			if (SplashScreen.instance != null) {
+				Timer timer = new Timer();
+				timer.schedule(new TimerTask() {
+					public void run() {
+						EventQueue.invokeLater(new Runnable() {
+							public void run() {
+								if (SplashScreen.instance != null)
+									SplashScreen.instance.clearSplash();
+							}
+						});
+					}
+				}, 500);
+			}
 			if (!VersionInfo.release) {
 				System.out.println("Displaying warning message...");
-				if (SplashScreen.instance != null)
-					SplashScreen.instance.clearSplash();
+				
+					
 				String warning = "This is a development version of JPatch.\n" +
 						 "It has not been tested and may contain severe bugs!\n" +
 						 "You can download a more stable release of JPatch\n" +

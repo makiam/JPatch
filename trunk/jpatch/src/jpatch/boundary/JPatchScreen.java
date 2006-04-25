@@ -124,6 +124,9 @@ public final class JPatchScreen extends JPanel {
 					aViewport[I].drawInfo();
 					if (aViewport[I] == activeViewport)
 						aViewport[I].drawActiveBorder();
+
+					
+//					aViewport[I].drawTest();
 				}
 			};
 			switch (Settings.getInstance().realtimeRenderer.realtimeRenderer) {

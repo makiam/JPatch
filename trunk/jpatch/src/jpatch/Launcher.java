@@ -20,14 +20,8 @@ public final class Launcher {
 			System.out.println("Stating JPatch...");
 			SplashScreen splash = new SplashScreen();
 			splash.showSplash(true);
-			try {
-				Thread.sleep(100);
-			} catch (Exception e) { }
+//			splash.setText("Starting JPatch...");
 			launchModeler();
-			try {
-				Thread.sleep(900);
-			} catch (Exception e) { }
-			splash.clearSplash();
 			return;
 		}
 		if (args.length >=1) {
