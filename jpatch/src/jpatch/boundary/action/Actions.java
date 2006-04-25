@@ -67,6 +67,8 @@ public class Actions extends DefaultHandler {
 		try {
 			xmlReader.setContentHandler(this);
 			System.out.println("Loading actions...");
+			if (SplashScreen.instance != null)
+				SplashScreen.instance.setText("Loading actions");
 			xmlReader.parse(new InputSource(url.toString()));
 			
 		} catch (Exception e) {
@@ -75,6 +77,8 @@ public class Actions extends DefaultHandler {
 		}
 		
 		System.out.println("Loading key bindings...");
+		if (SplashScreen.instance != null)
+			SplashScreen.instance.setText("Loading key bindings");
 		loadKeySettings();
 		
 		

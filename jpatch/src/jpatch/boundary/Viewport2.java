@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.53 2006/04/25 16:23:04 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.54 2006/04/25 20:24:26 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -182,6 +182,62 @@ public class Viewport2 {
 			drawable.drawRect(((W - ww) >> 1) - 1, ((H - hh) >> 1) - 1, ww + 2, hh + 2);
 		}
 		drawable.drawString(Long.toString(System.currentTimeMillis()), 8, 48);
+		
+		
+	}
+	
+	public void drawTest() {
+		/*
+		 * test
+		 */
+		
+		Matrix3f m3 = new Matrix3f();
+		Matrix3f m = new Matrix3f();
+		Point3f offset = new Point3f();
+		m3.setIdentity();
+//		drawTest(m3, 10);
+		float alpha = (float) Math.PI / 4;
+		m.rotX(alpha);
+		m3.mul(m);
+		offset.set(100,0,0);
+		drawTest(m3, 10, offset);
+		m.rotY(alpha);
+		m3.mul(m);
+		offset.set(200,0,0);
+		drawTest(m3, 10, offset);
+		m.rotZ(alpha);
+		m3.mul(m);
+		offset.set(300,0,0);
+		drawTest(m3, 10, offset);
+	}
+	
+	private void drawTest(Matrix3f mm, float s, Point3f offset) {
+		Point3f p30 = new Point3f(0,0,0);
+		Point3f p3x = new Point3f(s,0,0);
+		Point3f p3y = new Point3f(0,s,0);
+		Point3f p3z = new Point3f(0,0,s);
+		mm.transform(p30);
+		mm.transform(p3x);
+		mm.transform(p3y);
+		mm.transform(p3z);
+		viewDef.getMatrix().transform(p30);
+		viewDef.getMatrix().transform(p3x);
+		viewDef.getMatrix().transform(p3y);
+		viewDef.getMatrix().transform(p3z);
+		p30.add(offset);
+		p3x.add(offset);
+		p3y.add(offset);
+		p3z.add(offset);
+		
+		drawable.setColor(settings.colors.xAxis);
+		drawable.drawLine(p30, p3x);
+		drawable.setColor(settings.colors.yAxis);
+		drawable.drawLine(p30, p3y);
+		drawable.setColor(settings.colors.zAxis);
+		drawable.drawLine(p30, p3z);
+
+		
+
 	}
 	
 	public void drawActiveBorder() {

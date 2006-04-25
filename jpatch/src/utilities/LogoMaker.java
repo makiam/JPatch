@@ -21,11 +21,17 @@
  */
 package utilities;
 
+import com.sun.org.apache.bcel.internal.util.ClassLoader;
+
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.image.*;
+import java.io.*;
+
+import javax.imageio.*;
 import javax.swing.*;
 
 import jpatch.VersionInfo;
@@ -35,7 +41,7 @@ import jpatch.VersionInfo;
  *
  */
 public class LogoMaker {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		JFrame frame = new JFrame();
 		frame.setUndecorated(true);
 		final BufferedImage image = createSpashImage();
@@ -54,6 +60,7 @@ public class LogoMaker {
 		frame.pack();
 		frame.setLocation(200, 200);
 		frame.setVisible(true);
+		ImageIO.write(image, "png", new File("src/jpatch/images/title.png"));
 	}
 	
 	public static BufferedImage createSpashImage() {
@@ -63,11 +70,35 @@ public class LogoMaker {
 		g2.setPaint(new GradientPaint(0, 0, new Color(0x6688ff), 50, 299, new Color(0x0000cc)));
 		g2.fillRect(0, 0, 400, 300);
 		
-		g2.setPaint(new GradientPaint(0, 50, new Color(0x11cccccc, true), 399, 0, new Color(0x88cccccc, true)));
+		g2.setPaint(new GradientPaint(0, 50, new Color(0x11cccccc, true), 399, 0, new Color(0x55cccccc, true)));
 		g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		for (int i = 0; i < 800; i+=16)
 			g2.drawLine(i - 400, 300, i - 100, 0);
 		
+		GeneralPath path;
+		path = new GeneralPath();
+		path.moveTo(0, 200);
+		path.curveTo(150, 220, 250, 120, 399, 100);
+		path.lineTo(399, 299);
+		path.lineTo(0, 299);
+		path.closePath();
+		g2.setPaint(new GradientPaint(0, 0, new Color(0x40ffffff, true), 0, 299, new Color(0x00ffffff, true)));
+		g2.fill(path);
+		
+		path = new GeneralPath();
+		path.moveTo(100, 299);
+		path.curveTo(150, 100, 250, 100, 300, 0);
+		path.lineTo(399, 0);
+		path.lineTo(399, 299);
+		path.closePath();
+		g2.setPaint(new GradientPaint(0, 0, new Color(0x00000000, true), 399, 0, new Color(0x20000000, true)));
+		g2.fill(path);
+		
+		g2.setPaint(new GradientPaint(0, 0, new Color(0x80ffffff, true), 100, 100, new Color(0x00ffffff, true)));
+		g2.fillRoundRect(8, 8, 384, 284, 64, 64);
+		
+//		g2.setPaint(new GradientPaint(399, 299, new Color(0x40ffffff, true), 300, 200, new Color(0x00ffffff, true)));
+//		g2.fillRoundRect(10, 10, 380, 280, 100, 100);
 		
 		/*
 		 * JPatch
@@ -86,20 +117,20 @@ public class LogoMaker {
 //			System.out.println(f.getFontName());
 		
 		AffineTransform at;
-		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2 + 2, bounds.height + 20 + 4);
+		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2 + 2, bounds.height + 10 + 4);
 		g2.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		g2.setColor(new Color(0x33000000, true));
 		shape = at.createTransformedShape(gv.getOutline());
 		g2.draw(shape);
 		g2.fill(shape);
 		
-		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2 + 1, bounds.height + 20 + 2);
+		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2 + 1, bounds.height + 10 + 2);
 		g2.setColor(new Color(0x33000000, true));
 		shape = at.createTransformedShape(gv.getOutline());
 		g2.draw(shape);
 		g2.fill(shape);
 		
-		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 20);
+		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 10);
 		g2.setPaint(new GradientPaint(0, 50, new Color(0xffffff), 0, 100, new Color(0xcccccc), true));
 		shape = at.createTransformedShape(gv.getOutline());
 		g2.fill(shape);
@@ -117,19 +148,19 @@ public class LogoMaker {
 		gv = font.createGlyphVector(frc, "Version " + VersionInfo.ver);
 		shape = gv.getOutline();
 		bounds = shape.getBounds();
-		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 120);
-		g2.setColor(new Color(0xffffff));
+		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 110);
+		g2.setColor(new Color(0xffff00));
 		shape = at.createTransformedShape(gv.getOutline());
 		g2.fill(shape);
 		
 		/*
 		 * Written by Sascha Ledinsky
 		 */
-		font = new Font("Sans Serif", Font.PLAIN, 16);
+		font = new Font("Sans Serif", Font.PLAIN, 14);
 		gv = font.createGlyphVector(frc, "written by Sascha Ledinsky");
 		shape = gv.getOutline();
 		bounds = shape.getBounds();
-		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 155);
+		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 140);
 		g2.setColor(new Color(0xffffff));
 		shape = at.createTransformedShape(gv.getOutline());
 		g2.fill(shape);
@@ -137,14 +168,28 @@ public class LogoMaker {
 		/*
 		 * Copyright
 		 */
-		font = new Font("Sans Serif", Font.PLAIN, 16);
+		font = new Font("Sans Serif", Font.PLAIN, 12);
 		gv = font.createGlyphVector(frc, "© Copyright 2002-2006");
 		shape = gv.getOutline();
 		bounds = shape.getBounds();
-		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 175);
+		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 160);
 		g2.setColor(new Color(0xffffff));
 		shape = at.createTransformedShape(gv.getOutline());
 		g2.fill(shape);
+		
+		
+		/*
+		 * Copyright
+		 */
+		font = new Font("Sans Serif", Font.PLAIN, 12);
+		gv = font.createGlyphVector(frc, "http://www.jpatch.com");
+		shape = gv.getOutline();
+		bounds = shape.getBounds();
+		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 180);
+		g2.setColor(new Color(0xcccccc));
+		shape = at.createTransformedShape(gv.getOutline());
+		g2.fill(shape);
+		
 		
 		g2.setColor(new Color(0xcccccc));
 //		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -214,56 +259,75 @@ public class LogoMaker {
 //		g2.fill(shape);
 		
 		
-		/*
-		 * Development Version
-		 */
-		font = new Font("FreeMono", Font.BOLD, 60);
-		gv = font.createGlyphVector(frc, "DEVELOPMENT");
-		shape = gv.getOutline();
-		bounds = shape.getBounds();
-		double s = Math.sin(33.0 / 180.0 * Math.PI);
-		double c = Math.cos(33.0 / 180.0 * Math.PI);
-		System.out.println(s + " " + c);
-		at = new AffineTransform(c, -s, s, c, (400 - bounds.width) / 2 + 40 + 1, bounds.height + 230 + 2);
-		g2.setColor(new Color(0x33000000, true));
-		g2.setStroke(new BasicStroke(3.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-		shape = at.createTransformedShape(gv.getOutline());
-		g2.draw(shape);
-		gv = font.createGlyphVector(frc, "VERSION");
-		shape = gv.getOutline();
-		bounds = shape.getBounds();
-		at = new AffineTransform(c, -s, s, c, (400 - bounds.width) / 2 + 40 + 10 * c + 1, bounds.height + 230 + 10 * s + 2);
-		shape = at.createTransformedShape(gv.getOutline());
-		g2.draw(shape);
 		
-		gv = font.createGlyphVector(frc, "DEVELOPMENT");
-		shape = gv.getOutline();
-		bounds = shape.getBounds();
-		System.out.println(s + " " + c);
-		at = new AffineTransform(c, -s, s, c, (400 - bounds.width) / 2 + 40, bounds.height + 230);
-		g2.setColor(new Color(0xbbffff00, true));
-		g2.setStroke(new BasicStroke(3.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-		shape = at.createTransformedShape(gv.getOutline());
-		g2.draw(shape);
-		gv = font.createGlyphVector(frc, "VERSION");
-		shape = gv.getOutline();
-		bounds = shape.getBounds();
-		at = new AffineTransform(c, -s, s, c, (400 - bounds.width) / 2 + 40 + 10 * c, bounds.height + 230 + 10 * s);
-		shape = at.createTransformedShape(gv.getOutline());
-		g2.draw(shape);
+		if (!VersionInfo.release) {
+			/*
+			 * Development Version
+			 */
+			font = new Font("FreeMono", Font.BOLD, 60);
+			gv = font.createGlyphVector(frc, "DEVELOPMENT");
+			shape = gv.getOutline();
+			bounds = shape.getBounds();
+			double s = Math.sin(33.0 / 180.0 * Math.PI);
+			double c = Math.cos(33.0 / 180.0 * Math.PI);
+			System.out.println(s + " " + c);
+			at = new AffineTransform(c, -s, s, c, (400 - bounds.width) / 2 + 40 + 1, bounds.height + 230 + 1);
+			g2.setColor(new Color(0x66000000, true));
+			g2.setStroke(new BasicStroke(3.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			shape = at.createTransformedShape(gv.getOutline());
+			g2.draw(shape);
+			gv = font.createGlyphVector(frc, "VERSION");
+			shape = gv.getOutline();
+			bounds = shape.getBounds();
+			at = new AffineTransform(c, -s, s, c, (400 - bounds.width) / 2 + 40 + 10 * c + 1, bounds.height + 230 + 10 * s + 1);
+			shape = at.createTransformedShape(gv.getOutline());
+			g2.draw(shape);
+			
+			gv = font.createGlyphVector(frc, "DEVELOPMENT");
+			shape = gv.getOutline();
+			bounds = shape.getBounds();
+			System.out.println(s + " " + c);
+			at = new AffineTransform(c, -s, s, c, (400 - bounds.width) / 2 + 40 - 1, bounds.height + 230 - 1);
+			g2.setColor(new Color(0x66ffffff, true));
+			g2.setStroke(new BasicStroke(3.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			shape = at.createTransformedShape(gv.getOutline());
+			g2.draw(shape);
+			gv = font.createGlyphVector(frc, "VERSION");
+			shape = gv.getOutline();
+			bounds = shape.getBounds();
+			at = new AffineTransform(c, -s, s, c, (400 - bounds.width) / 2 + 40 + 10 * c - 1, bounds.height + 230 + 10 * s - 1);
+			shape = at.createTransformedShape(gv.getOutline());
+			g2.draw(shape);
+			
+			gv = font.createGlyphVector(frc, "DEVELOPMENT");
+			shape = gv.getOutline();
+			bounds = shape.getBounds();
+			System.out.println(s + " " + c);
+			at = new AffineTransform(c, -s, s, c, (400 - bounds.width) / 2 + 40, bounds.height + 230);
+			g2.setColor(new Color(0x66ff0000, true));
+			g2.setStroke(new BasicStroke(3.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			shape = at.createTransformedShape(gv.getOutline());
+			g2.draw(shape);
+			gv = font.createGlyphVector(frc, "VERSION");
+			shape = gv.getOutline();
+			bounds = shape.getBounds();
+			at = new AffineTransform(c, -s, s, c, (400 - bounds.width) / 2 + 40 + 10 * c, bounds.height + 230 + 10 * s);
+			shape = at.createTransformedShape(gv.getOutline());
+			g2.draw(shape);
+		}
 		
 		
-		
-		g2.setPaint(new GradientPaint(0, 0, new Color(0xbbbbbb), 0, 299, new Color(0x999999)));
+		g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		g2.setPaint(new GradientPaint(0, 0, new Color(0xbbccdd), 0, 299, new Color(0x99aabb)));
 		g2.drawLine(0, 0, 399, 0);
 		g2.drawLine(0, 0, 0, 299);
-		g2.setPaint(new GradientPaint(0, 0, new Color(0xcccccc), 0, 299, new Color(0xaaaaaa)));
+		g2.setPaint(new GradientPaint(0, 0, new Color(0xccddee), 0, 299, new Color(0xaabbcc)));
 		g2.drawLine(1, 1, 398, 1);
 		g2.drawLine(1, 1, 1, 298);
-		g2.setPaint(new GradientPaint(0, 0, new Color(0x999999), 0, 299, new Color(0x777777)));
+		g2.setPaint(new GradientPaint(0, 0, new Color(0x99aabb), 0, 299, new Color(0x778899)));
 		g2.drawLine(0, 299, 399, 299);
 		g2.drawLine(399, 0, 399, 299);
-		g2.setPaint(new GradientPaint(0, 0, new Color(0xaaaaaa), 0, 299, new Color(0x888888)));
+		g2.setPaint(new GradientPaint(0, 0, new Color(0xaabbcc), 0, 299, new Color(0x8899aa)));
 		g2.drawLine(1, 298, 398, 298);
 		g2.drawLine(398, 1, 398, 298);
 		return image;

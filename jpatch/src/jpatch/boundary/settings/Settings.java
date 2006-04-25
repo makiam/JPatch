@@ -1,5 +1,5 @@
 /*
- * $Id: Settings.java,v 1.7 2006/04/25 16:23:04 sascha_l Exp $
+ * $Id: Settings.java,v 1.8 2006/04/25 20:24:26 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -93,6 +93,9 @@ public class Settings extends AbstractSettings {
 	}
 	
 	private Settings() {
+		if (SplashScreen.instance != null)
+			SplashScreen.instance.setText("Loading preferences");
+		System.out.println("Loading preferences...");
 		storeDefaults();
 		load();
 		initTree();

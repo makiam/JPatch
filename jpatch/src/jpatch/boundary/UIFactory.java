@@ -1,5 +1,5 @@
 /*
- * $Id: UIFactory.java,v 1.18 2006/04/25 16:23:04 sascha_l Exp $
+ * $Id: UIFactory.java,v 1.19 2006/04/25 20:24:26 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -73,6 +73,8 @@ public class UIFactory extends DefaultHandler {
 		try {
 			xmlReader.setContentHandler(this);
 			System.out.println("Building menues and toolbars...");
+			if (SplashScreen.instance != null)
+				SplashScreen.instance.setText("Building menues and toolbars");
 			xmlReader.parse(new InputSource(url.toString()));
 			
 		} catch (Exception e) {
