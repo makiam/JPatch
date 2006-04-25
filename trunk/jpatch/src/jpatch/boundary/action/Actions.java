@@ -261,7 +261,7 @@ public class Actions extends DefaultHandler {
 	}
 	
 	public void saveKeySettings() {
-		Preferences node = Preferences.userRoot().node("/JPatch/KeyBindings");
+		Preferences node = Preferences.userRoot().node("/JPatch/settings/keyBindings");
 		for (String key : actionMap.keySet()) {
 			String accelerator = (String) actionMap.get(key).action.getValue(JPatchAction.ACCELERATOR);
 			if (accelerator == null)

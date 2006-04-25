@@ -181,6 +181,7 @@ public class Viewport2 {
 			drawable.drawRect((W - ww) >> 1, (H - hh) >> 1, ww, hh);
 			drawable.drawRect(((W - ww) >> 1) - 1, ((H - hh) >> 1) - 1, ww + 2, hh + 2);
 		}
+		drawable.drawString(Long.toString(System.currentTimeMillis()), 8, 48);
 	}
 	
 	public void drawActiveBorder() {

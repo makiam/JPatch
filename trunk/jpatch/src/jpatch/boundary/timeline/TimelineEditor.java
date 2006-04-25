@@ -49,6 +49,7 @@ public class TimelineEditor extends JScrollPane {
 	private boolean bMove;
 	private String strText = "";
 	private Header header = new Header(this);
+	private AnimObject animObject;
 	
 	private static Color derivedColor(Color c, int r, int g, int b) {
 		r += c.getRed();
@@ -166,7 +167,12 @@ public class TimelineEditor extends JScrollPane {
 		bTrackHeightsValid = false;
 	}
 	
+	public AnimObject getAnimObject() {
+		return animObject;
+	}
+	
 	public void setAnimObject(AnimObject animObject) {
+		this.animObject = animObject;
 		listTracks.clear();
 		listTracks.add(new HeaderTrack(this, animObject.getName(), -12, true));
 		listTracks.add(new HeaderTrack(this, "Common tracks", -4, false));

@@ -175,6 +175,8 @@ public class BoneTrack extends Track {
 	}
 	
 	public MotionCurve getMotionCurve(MotionKey key) {
+		if (key == null)
+			return null;
 		for (MotionCurve.Float motionCurve : motionCurves) {
 			if (motionCurve.getKeyAt(key.getPosition()) == key)
 				return motionCurve;
