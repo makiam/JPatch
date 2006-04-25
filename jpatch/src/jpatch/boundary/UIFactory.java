@@ -95,7 +95,7 @@ public class UIFactory extends DefaultHandler {
 			for (Action action : unboundActions) {
 				String accelerator = (String) action.getValue(JPatchAction.ACCELERATOR);
 				if (accelerator == null)
-					throw new IllegalArgumentException("Action " + action + " is not bound to a menu or button, yet has no keyboard accelerator");
+					System.err.println("Action " + action + " is not bound to a menu or button, yet has no keyboard accelerator");
 				KeyStroke ks = KeyStroke.getKeyStroke(accelerator);
 				inputMap.put(ks, action);
 				actionMap.put(action, action);

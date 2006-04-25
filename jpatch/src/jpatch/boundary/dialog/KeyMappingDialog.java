@@ -1,39 +1,28 @@
 package jpatch.boundary.dialog;
 
-import com.sun.java_cup.internal.shift_action;
-
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
+import javax.swing.border.*;
+import javax.swing.event.*;
+import javax.swing.table.*;
 
 import jpatch.boundary.*;
 import jpatch.boundary.action.*;
-import jpatch.boundary.ui.JPatchButton;
 
+@SuppressWarnings("serial")
 public class KeyMappingDialog extends JDialog {
 	private Font font1 = new Font("Sans Serif", Font.PLAIN, 12);
 	private Font font2 = new Font("Monospaced", Font.PLAIN, 12);
 	private Font font3 = new Font("Monospaced", Font.BOLD, 12);
 
-	Map<String, KeyStroke> keyMap = Actions.getInstance().getKeyMapping();
-	List<String> keyList = new ArrayList<String>(keyMap.keySet());
-	String editingKey;
+	private Map<String, KeyStroke> keyMap = Actions.getInstance().getKeyMapping();
+	private List<String> keyList = new ArrayList<String>(keyMap.keySet());
+	private String editingKey;
+	private JTable table;
+	private JButton buttonOk;
 	
 	public KeyMappingDialog() {
 		super(MainFrame.getInstance(), "Keyboard mapping", true);
@@ -63,12 +52,12 @@ public class KeyMappingDialog extends JDialog {
 			}
 		};
 		
-		final JTable table = new JTable(tableModel);
-		final JButton[] buttons = new JButton[keyList.size()];
-		for (int i = 0; i < buttons.length; i++) {
-			buttons[i] = new JButton("set...");
-			buttons[i].setPreferredSize(new Dimension(50, 20));
-		}
+		table = new JTable(tableModel);
+//		final JButton[] buttons = new JButton[keyList.size()];
+//		for (int i = 0; i < buttons.length; i++) {
+//			buttons[i] = new JButton("set...");
+//			buttons[i].setPreferredSize(new Dimension(50, 20));
+//		}
 		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 				super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -78,9 +67,17 @@ public class KeyMappingDialog extends JDialog {
 					setFont(font1);
 				break;
 				case 1:
-					setBackground(Color.WHITE);
+					int n = 0;
+					KeyStroke ks = keyMap.get(keyList.get(row));
+					if (ks != null) {
+						for (String key : keyMap.keySet()) {
+							if (ks.equals(keyMap.get(key)))
+								n++;
+						}
+					}
+					setBackground(n > 1 ? Color.YELLOW : Color.WHITE);
 					setFont(font2);
-					setToolTipText("Doubleclick to edit");
+					setToolTipText("Click to edit");
 				break;
 				}
 				return this;
@@ -104,7 +101,7 @@ public class KeyMappingDialog extends JDialog {
 				return component;
 			}
 		});
-		
+		((DefaultCellEditor) table.getDefaultEditor(Object.class)).setClickCountToStart(1);
 		table.setBackground(getBackground());
 		table.getColumnModel().getColumn(0).setHeaderValue("Action");
 		table.getColumnModel().getColumn(0).setMaxWidth(200);
@@ -152,6 +149,7 @@ public class KeyMappingDialog extends JDialog {
 						if (dialog.okOption())
 							keyMap.put(key, dialog.keyStroke());
 						table.repaint();
+						checkTable();
 					}
 				});
 				
@@ -159,6 +157,7 @@ public class KeyMappingDialog extends JDialog {
 					public void actionPerformed(ActionEvent e) {
 						keyMap.put(key, null);
 						table.repaint();
+						checkTable();
 					}
 				});
 				
@@ -166,6 +165,7 @@ public class KeyMappingDialog extends JDialog {
 					public void actionPerformed(ActionEvent e) {
 						keyMap.put(key, KeyStroke.getKeyStroke((String) Actions.getInstance().getAction(key).getValue(JPatchAction.ACCELERATOR)));
 						table.repaint();
+						checkTable();
 					}
 				});
 				
@@ -173,6 +173,7 @@ public class KeyMappingDialog extends JDialog {
 					public void actionPerformed(ActionEvent e) {
 						keyMap.put(key, Actions.getInstance().getDefaultKeyStroke(key));
 						table.repaint();
+						checkTable();
 					}
 				});
 				
@@ -187,7 +188,7 @@ public class KeyMappingDialog extends JDialog {
 		
 		JPanel buttonPanel = new JPanel();
 		JButton buttonReset = new JButton("Reset");
-		JButton buttonOk = new JButton("OK");
+		buttonOk = new JButton("OK");
 		JButton buttonCancel = new JButton("Cancel");
 		buttonPanel.add(buttonReset);
 		JPanel separator = new JPanel();
@@ -218,13 +219,44 @@ public class KeyMappingDialog extends JDialog {
 						keyMap.put(key, Actions.getInstance().getDefaultKeyStroke(key));
 					}
 					table.repaint();
+					checkTable();
 				}
 			}
 		});
 		add(buttonPanel, BorderLayout.SOUTH);
+		checkTable();
 		setSize(500, 400);
 		setLocationRelativeTo(MainFrame.getInstance());
+		setModal(false);
 		setVisible(true);
+		buttonCancel.requestFocusInWindow();
+		setModal(true);
+	}
+	
+	/**
+	 * Checks for duplicate keybindings
+	 */
+	private void checkTable() {
+		for (String key : keyMap.keySet()) {
+			int n = 0;
+			KeyStroke ks = keyMap.get(key);
+			if (ks == null)
+				continue;
+			for (String key2 : keyMap.keySet()) {
+				if (ks.equals(keyMap.get(key2))) {
+					n++;
+					if (n > 1) {
+						// If a keybinding is duplicate, disable OK button
+						if (buttonOk.isEnabled())
+							buttonOk.setEnabled(false);
+						return;
+					}
+				}
+			}
+		}
+		// No duplicates, enable OK button
+		if (!buttonOk.isEnabled())
+			buttonOk.setEnabled(true);
 	}
 	
 	class EditorTextField extends JTextField implements KeyListener {
@@ -248,15 +280,17 @@ public class KeyMappingDialog extends JDialog {
 			ks = KeyStroke.getKeyStrokeForEvent(e);
 			setText(ks.toString());
 //			setBackground(Color.WHITE);
-			repaint();
+			table.repaint();
 		}
 
 		public void keyReleased(KeyEvent e) {
 			e.consume();
 			setBackground(Color.WHITE);
-			repaint();
+			table.repaint();
+			((DefaultCellEditor) table.getDefaultEditor(Object.class)).stopCellEditing();
 			transferFocus();
 			keyMap.put(editingKey, ks);
+			checkTable();
 		}
 	}
 	
