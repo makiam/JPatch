@@ -1,5 +1,5 @@
 /*
- * $Id: Ruler.java,v 1.12 2006/03/22 20:04:16 sascha_l Exp $
+ * $Id: Ruler.java,v 1.13 2006/04/25 16:23:04 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -189,8 +189,10 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 			int frame = e.getX() / timelineEditor.getFrameWidth();
 			timelineEditor.setCornerText("Frame " + frame);
 			Animation anim = MainFrame.getInstance().getAnimation();
-			anim.setPosition(frame);
-			MainFrame.getInstance().getJPatchScreen().update_all();
+			if (anim.getPosition() != frame) {
+				anim.setPosition(frame);
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			}
 		}
 	}
 	

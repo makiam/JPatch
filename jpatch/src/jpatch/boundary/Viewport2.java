@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.52 2006/04/20 13:06:24 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.53 2006/04/25 16:23:04 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -181,6 +181,7 @@ public class Viewport2 {
 			drawable.drawRect((W - ww) >> 1, (H - hh) >> 1, ww, hh);
 			drawable.drawRect(((W - ww) >> 1) - 1, ((H - hh) >> 1) - 1, ww + 2, hh + 2);
 		}
+		drawable.drawString(Long.toString(System.currentTimeMillis()), 8, 48);
 	}
 	
 	public void drawActiveBorder() {

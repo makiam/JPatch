@@ -1,5 +1,5 @@
 /*
- * $Id: AbstractSettings.java,v 1.6 2006/04/18 22:32:14 sascha_l Exp $
+ * $Id: AbstractSettings.java,v 1.7 2006/04/25 16:23:04 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -44,12 +44,12 @@ import jpatch.entity.Model;
  *
  */
 public abstract class AbstractSettings implements TreeNode {
-	private static final Preferences JPATCH_ROOT_NODE = Preferences.userRoot().node("/JPatch/Preferences");
+	private static final Preferences JPATCH_ROOT_NODE = Preferences.userRoot().node("/JPatch/settings/preferences");
 	private Map mapDefaults = new HashMap();
 	private List<Field> fields = new ArrayList<Field>();
 	private List<TreeNode> children = new ArrayList<TreeNode>();
 	private TreeNode parent = null;
-	private String nodeName = "settings";
+	private String nodeName = "preferences";
 	private Icon icon = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/prefs/settings.png"));
 	private TableModel tableModel = new AbstractTableModel() {
 		public int getRowCount() {
@@ -183,7 +183,7 @@ public abstract class AbstractSettings implements TreeNode {
 					setOpaque(true);
 					if (!isSelected)
 						setBackground(Color.WHITE);
-					setToolTipText("doubleclick to edit");
+					setToolTipText("Click to edit");
 				} else {
 					setOpaque(false);
 //					setBackground(new JPanel().getBackground());
@@ -405,7 +405,7 @@ public abstract class AbstractSettings implements TreeNode {
 		table.getColumnModel().getColumn(1).setHeaderValue("Value");
 		table.setDefaultEditor(Object.class, tableCellEditor);
 		table.setDefaultRenderer(Object.class, tableCellRenderer);
-//		tableCellEditor.setClickCountToStart(1);
+		tableCellEditor.setClickCountToStart(1);
 	}
 	
 	public void setNodeName(String nodeName) {

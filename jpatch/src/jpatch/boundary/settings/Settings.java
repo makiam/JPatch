@@ -1,5 +1,5 @@
 /*
- * $Id: Settings.java,v 1.6 2006/04/24 14:42:26 sascha_l Exp $
+ * $Id: Settings.java,v 1.7 2006/04/25 16:23:04 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -81,7 +81,7 @@ public class Settings extends AbstractSettings {
 		splitPane.add(new JScrollPane(tree));
 		splitPane.add(new JScrollPane(getTable()));
 		
-		if (JOptionPane.showConfirmDialog(parent, splitPane, toString(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null) == JOptionPane.OK_OPTION) {
+		if (JOptionPane.showConfirmDialog(parent, splitPane, "Preferences", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null) == JOptionPane.OK_OPTION) {
 			MainFrame mf = MainFrame.getInstance();
 			if (screenWidth != mf.getWidth() || screenHeight != mf.getHeight() || screenPositionX != mf.getX() || screenPositionY != mf.getY())
 				mf.setBounds(screenPositionX, screenPositionY, screenWidth, screenHeight);

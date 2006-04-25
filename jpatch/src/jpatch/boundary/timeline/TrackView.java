@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.20 2006/03/25 23:22:45 sascha_l Exp $
+ * $Id: TrackView.java,v 1.21 2006/04/25 16:23:04 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -214,6 +214,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 								selectedTrack = track;
 								trackTop = y;
 								position = selectedKey.getPosition();
+								MainFrame.getInstance().getAnimation().setPosition(position);
+								MainFrame.getInstance().getJPatchScreen().update_all();
+								timelineEditor.setCurrentFrame((int) position);
 								if (selectedKey instanceof MotionKey.Float)
 									value = ((MotionKey.Float) selectedKey).getFloat();
 //								System.out.println("key selected: " + selectedKey + " position=" + position);
@@ -228,6 +231,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 							state = State.MOVE_KEY;
 							selectedTrack = track;
 							position = selectedKey.getPosition();
+//							MainFrame.getInstance().getAnimation().setPosition(position);
+//							timelineEditor.setCurrentFrame((int) position);
 						}
 						repaint();
 					}
@@ -328,12 +333,17 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			break;
 		case MOVE_KEY:
 			int frame = e.getX() / timelineEditor.getFrameWidth();
-			if (selectedTrack.isExpanded())
+			if (selectedTrack.isExpanded()) {
 				selectedTrack.moveKey(selectedKey, e.getY() - trackTop);
+			}
 			if (selectedTrack.getMotionCurve(selectedKey) != null && !selectedTrack.getMotionCurve(selectedKey).hasKeyAt(frame))
 				selectedTrack.shiftKey(selectedKey, frame);
 			repaint();
-			timelineEditor.setCornerText("Frame " + frame);
+//			timelineEditor.setCornerText("Frame " + frame);
+//			if (timelineEditor.getAnimObject() instanceof AnimModel) {
+//			MainFrame.getInstance().getAnimation().getCurvesetFor(timelineEditor.getAnimObject()).setPosition(position);
+			MainFrame.getInstance().getAnimation().setPosition(frame);
+			timelineEditor.setCurrentFrame(frame);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 	}
