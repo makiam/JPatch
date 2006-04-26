@@ -13,6 +13,7 @@ import javax.vecmath.*;
 
 import jpatch.boundary.*;
 import jpatch.boundary.mouse.*;
+import jpatch.boundary.settings.Settings;
 import jpatch.entity.*;
 import jpatch.entity.Bone.BoneTransformable;
 import jpatch.control.edit.*;
@@ -1242,7 +1243,7 @@ public class DefaultTool extends JPatchTool {
 			else
 				return;
 		}
-		if (MainFrame.getInstance().getJPatchScreen().snapToGrid()) {
+		if (Settings.getInstance().viewports.snapToGrid) {
 			if (p3Hot != null)
 				vv.add(p3Hot);
 			MainFrame.getInstance().getJPatchScreen().getGrid().correctVector(vv, viewDef.getGridPlane());

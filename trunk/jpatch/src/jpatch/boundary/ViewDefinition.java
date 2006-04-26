@@ -182,6 +182,7 @@ implements ComponentListener {
 	
 	public void setScale(float scale) {
 		fScale = scale;
+		computeMatrix();
 	}
 	
 	public void setLock(Point3f lock) {

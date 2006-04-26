@@ -25,7 +25,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import jpatch.boundary.*;
 import jpatch.entity.ControlPoint;
-
+import jpatch.boundary.settings.*;
 /**
  * This action is used to toggle states in respones to clicks
  * on togglebuttons. Undo/redo support is not needed, so the
@@ -77,7 +77,7 @@ public class ToggleAction extends AbstractAction {
 			MainFrame.getInstance().getJPatchScreen().setSelectBones(Actions.getInstance().getButtonModel("select bones").isSelected());
 			break;
 		case SNAP_TO_GRID:
-			MainFrame.getInstance().getJPatchScreen().snapToGrid(Actions.getInstance().getButtonModel("snap to grid").isSelected());
+			Settings.getInstance().viewports.snapToGrid = Actions.getInstance().getButtonModel("snap to grid").isSelected();
 			break;
 		case SHOW_POINTS:
 			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().renderPoints(Actions.getInstance().getButtonModel("show points").isSelected());

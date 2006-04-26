@@ -394,7 +394,7 @@
 	</action>
 	<action name="grid spacing settings" model="default">
 		<constructor>new SetGridSpacingAction()</constructor>
-		<property key="ShortDescription" value="Grid spacing"/>
+		<property key="ShortDescription" value="Grid spacing..."/>
 	</action>
 	<action name="install jogl" model="default">
 		<constructor>new InstallJoglAction()</constructor>

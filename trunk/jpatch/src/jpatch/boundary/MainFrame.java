@@ -16,6 +16,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.*;
+import javax.vecmath.*;
 
 import buoy.event.KeyPressedEvent;
 
@@ -482,6 +483,8 @@ public final class MainFrame extends JFrame {
 	public void newModel() {
 		model = new Model();
 		animation = null;
+		for (ViewDefinition viewDef : aViewDef)
+			viewDef.setScale(0.03f);
 		setSelection(null);
 		undoManager.clear();
 		initTree(model);
@@ -492,6 +495,7 @@ public final class MainFrame extends JFrame {
 		if (animPanel != null) {
 			splitPaneV.remove(animPanel);
 		}
+		
 		Actions.getInstance().enableAction("open", true);
 		Actions.getInstance().enableAction("append", true);
 //		Actions.getInstance().enableAction("save", true);
@@ -509,12 +513,16 @@ public final class MainFrame extends JFrame {
 		Actions.getInstance().enableAction("compute patches", true);
 		
 		Settings.getInstance().startup = Settings.Startup.MODELER;
+		
+		jpatchScreen.update_all();
 //		Actions.getInstance().enableAction("show anim controls", false);
 	}
 	
 	public void newAnimation() {
 		model = null;
 		animation = new Animation();
+		for (ViewDefinition viewDef : aViewDef)
+			viewDef.setScale(0.003f);
 		setSelection(null);
 		undoManager.clear();
 		initTree(animation);
@@ -540,7 +548,12 @@ public final class MainFrame extends JFrame {
 		splitPaneV.add(animPanel);
 //		vcrDialog.setSize(800, 600);
 //		vcrDialog.setVisible(true);
-		animation.addCamera(new Camera("Camera 1"), null);
+		Camera camera = new Camera("Camera 1");
+		camera.setPosition(new Point3d(0, 150, -300));
+		camera.setOrientation(0, Math.atan2(-150, 300), 0);
+		animation.addCamera(camera, null);
+		
+		
 		
 		Actions.getInstance().enableAction("open", false);
 		Actions.getInstance().enableAction("append", false);
@@ -559,6 +572,8 @@ public final class MainFrame extends JFrame {
 		Actions.getInstance().enableAction("compute patches", false);
 		
 		Settings.getInstance().startup = Settings.Startup.ANIMATOR;
+		
+		jpatchScreen.update_all();
 //		Actions.getInstance().enableAction("show anim controls", true);
 //		jpatchScreen.getActiveViewport().getViewDefinition().setCamera(animation.getCameras().get(0));
 	}
