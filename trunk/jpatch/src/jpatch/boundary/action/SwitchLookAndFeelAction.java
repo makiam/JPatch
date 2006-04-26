@@ -13,26 +13,26 @@ public class SwitchLookAndFeelAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = -8098202792221617869L;
-	LookAndFeel lookAndFeel;
+	Settings.Plaf plaf;
 	
-	public SwitchLookAndFeelAction(String className) {
-		try {
-			lookAndFeel = (LookAndFeel) Class.forName(className).newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public SwitchLookAndFeelAction(Settings.Plaf plaf) {
+		this.plaf = plaf;
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
 		try {
-			if (lookAndFeel instanceof jpatch.boundary.laf.SmoothLookAndFeel)
-				if (jpatch.auxilary.JPatchUtils.isJvmVersionGreaterOrEqual(1, 5))
-					UIManager.setLookAndFeel(lookAndFeel);
-				else
-					UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-			else
-				UIManager.setLookAndFeel(lookAndFeel);
-			Settings.getInstance().lookAndFeelClassname = lookAndFeel.getClass().getName();
+			switch (plaf) {
+			case CROSS_PLATFORM:
+				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+				break;
+			case SYSTEM:
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				break;
+			case JPATCH:
+				UIManager.setLookAndFeel(new SmoothLookAndFeel());
+				break;
+			}
+			Settings.getInstance().lookAndFeel = plaf;
 			SwingUtilities.updateComponentTreeUI(MainFrame.getInstance());
 		} catch (Exception e) {
 			e.printStackTrace();

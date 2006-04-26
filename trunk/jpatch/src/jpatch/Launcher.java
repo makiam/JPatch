@@ -1,29 +1,40 @@
 package jpatch;
 
 import java.awt.*;
-import buoy.widget.*;
-import buoy.event.*;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import javax.swing.*;
 
 import jpatch.boundary.*;
-import jpatch.boundary.settings.Settings;
+import jpatch.boundary.laf.*;
+import jpatch.boundary.settings.*;
 import jpatch.entity.*;
 
 public final class Launcher {
-	private static BFrame frame;
-	/* private static GlTest gltest; */
 	public static void main(String[] args) {
-		if (true) {
-//			try {
-//				UIManager.setLookAndFeel(Settings.getInstance().lookAndFeelClassname);
-//			} catch (Exception e) { }
-			System.out.println("Stating JPatch...");
-			SplashScreen splash = new SplashScreen();
-			splash.showSplash(true);
-//			splash.setText("Starting JPatch...");
-			launchModeler();
-			return;
+		System.out.println("Stating JPatch...");
+		SplashScreen splash = new SplashScreen();
+		splash.showSplash(true);
+		try {
+			switch (Settings.getInstance().lookAndFeel) {
+			case CROSS_PLATFORM:
+				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+				UIManager.put("swing.boldMetal", false);
+				break;
+			case SYSTEM:
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				break;
+			case JPATCH:
+				UIManager.setLookAndFeel(new SmoothLookAndFeel());
+				UIManager.put("swing.boldMetal", false);
+				break;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		
+		
 		if (args.length >=1) {
 			if (args[0].equals("-animator")) launchAnimator();
 			else if (args[0].equals("-modeler")) launchModeler();
@@ -31,48 +42,45 @@ public final class Launcher {
 			else System.out.println("usage java -jpatch.jar [-animator | -modeler | -settings]");
 		}
 		else {
-			try {
-				UIManager.setLookAndFeel(Settings.getInstance().lookAndFeelClassname);
-			} catch (Exception e) {
+			switch (Settings.getInstance().startup) {
+			case ANIMATOR:
+				launchAnimator();
+				break;
+			case MODELER:
+				launchModeler();
+				break;
 			}
-			frame = new BFrame("JPatch Launcher");
-			frame.addEventLink(WindowClosingEvent.class, frame, "dispose");
-			ColumnContainer container = new ColumnContainer();
-			BButton buttonModeler = new BButton("Start JPatch Modeler");
-			BButton buttonAnimator = new BButton("Start JPatch Animator");
-			BButton buttonSettings = new BButton("Edit settings");
-			buttonModeler.addEventLink(CommandEvent.class, new Launcher(), "launchModeler");
-			buttonAnimator.addEventLink(CommandEvent.class, new Launcher(), "launchAnimator");
-			buttonSettings.addEventLink(CommandEvent.class, new Launcher(), "settings");
-			BLabel labelInfo1 = new BLabel("You can start the modeler\n or animator directly by");
-			BLabel labelInfo2 = new BLabel("using the -modeler or -animator commandline options");
-			container.add(buttonModeler);
-//			container.add(buttonAnimator);
-			container.add(buttonSettings);
-			container.add(labelInfo1);
-			container.add(labelInfo2);
-			frame.setContent(container);
-			frame.pack();
-			((java.awt.Window) frame.getComponent()).setLocationRelativeTo(null);
-			frame.setVisible(true);
-			frame.layoutChildren();
+		}
+		if (SplashScreen.instance != null) {
+			Timer timer = new Timer();
+			timer.schedule(new TimerTask() {
+				public void run() {
+					EventQueue.invokeLater(new Runnable() {
+						public void run() {
+							if (SplashScreen.instance != null)
+								SplashScreen.instance.clearSplash();
+						}
+					});
+				}
+			}, 500);
 		}
 	}
 	
 	private static void launchAnimator() {
-		Animator.getInstance();
-		if (frame != null) frame.dispose();
+		new MainFrame();
+		if (SplashScreen.instance != null)
+			SplashScreen.instance.setText("Setting up new animation");
+		MainFrame.getInstance().newAnimation();
 	}
 	
 	private static void launchModeler() {
-		Model model = new Model();
-		new MainFrame(model);
-		if (frame != null) frame.dispose();
+		new MainFrame();
+		if (SplashScreen.instance != null)
+			SplashScreen.instance.setText("Setting up new model");
+		MainFrame.getInstance().newModel();
 	}
 	
 	private static void settings() {
-		Component parent = (frame != null) ? frame.getComponent() : null;
-		Settings.getInstance().showDialog(parent);
-		if (frame != null) frame.dispose();
+		Settings.getInstance().showDialog(null);
 	}
 }
