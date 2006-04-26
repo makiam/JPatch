@@ -12,9 +12,8 @@ public class Grid {
 	public static final int YZ = 3;
 	
 	private int iPlane = XZ;
-	private float fSpacing = Settings.getInstance().viewports.gridSpacing;
 //	private int iSize = 25;
-	private boolean bSnap = true;
+//	private boolean bSnap = true;
 	private Settings settings = Settings.getInstance();
 	
 	public Grid() {
@@ -24,24 +23,24 @@ public class Grid {
 		iPlane = plane;
 	}
 	
-	public boolean snap() {
-		return bSnap;
-	}
+//	public boolean snap() {
+//		return bSnap;
+//	}
+//	
+//	public void snap(boolean enable) {
+//		bSnap = enable;
+//	}
 	
-	public void snap(boolean enable) {
-		bSnap = enable;
-	}
-	
-	public float getSpacing() {
-		return fSpacing;
-	}
-	
-	public void setSpacing(float spacing) {
-		fSpacing = spacing;
-	}
+//	public float getSpacing() {
+//		return fSpacing;
+//	}
+//	
+//	public void setSpacing(float spacing) {
+//		fSpacing = spacing;
+//	}
 	
 	public boolean isSnapping() {
-		return bSnap && (iPlane != NONE);
+		return settings.viewports.snapToGrid && (iPlane != NONE);
 	}
 	
 	public void paint(ViewDefinition viewDef) {
@@ -49,13 +48,17 @@ public class Grid {
 		Matrix4f m4View = viewDef.getScreenMatrix();
 		if (viewDef.getView() != ViewDefinition.BIRDS_EYE && viewDef.getCamera() == null) {
 			drawPlanarGrid(drawable, m4View, (int) viewDef.getWidth(), (int) viewDef.getHeight());
-		} else {
-			//drawBirdsEyeGrid(drawable, m4View);
+		} else if (settings.viewports.showGroundPlaneInModeler && MainFrame.getInstance().getModel() != null || settings.viewports.showGroundPlaneInAnimator && MainFrame.getInstance().getAnimation() != null) {
+			drawBirdsEyeGrid(drawable, viewDef.getMatrix());
 		}
 	}
 
 	private void drawPlanarGrid(JPatchDrawable2 drawable, Matrix4f m4View, int width, int height) {
-		float gridScreenSpacing = fSpacing * m4View.getScale();
+		float gridScreenSpacing;
+		if (MainFrame.getInstance().getModel() != null)
+			gridScreenSpacing = settings.viewports.modelerGridSpacing * m4View.getScale();
+		else
+			gridScreenSpacing = settings.viewports.animatorGridSpacing * m4View.getScale();
 		float dx = width / 2;
 		float dy = height / 2;
 		float xcenter = m4View.m03;
@@ -90,112 +93,138 @@ public class Grid {
 	}
 	
 	
-//	private void drawBirdsEyeGrid(JPatchDrawable drawable, Matrix4f m4View) {
-//		float max = fSpacing * iSize;
-//		float f;
-//		Point3f a = new Point3f();
-//		Point3f b = new Point3f();
-//		for (int n = -iSize; n <= iSize; n++) {
-//			f = fSpacing * n;
-//			if (n % 5 == 0) {
-//				drawable.setColor(settings.cGrid);
-//			} else {
-//				drawable.setColor(settings.cGridMin);
-//			}
-//			switch(iPlane) {
-//				case XZ:
-//					a.set(-max,0,f);
-//					b.set(max,0,f);
-//					break;
-//				case XY:
-//					a.set(-max,f,0);
-//					b.set(max,f,0);
-//					break;
-//				case YZ:
-//					a.set(0,-max,f);
-//					b.set(0,max,f);
-//			}
-//			m4View.transform(a);
-//			m4View.transform(b);
-//			drawable.drawLine3D(a,b);
-//			switch(iPlane) {
-//				case XZ:
-//					a.set(f,0,-max);
-//					b.set(f,0,max);
-//					break;
-//				case XY:
-//					a.set(f,-max,0);
-//					b.set(f,max,0);
-//					break;
-//				case YZ:
-//					a.set(0,f,-max);
-//					b.set(0,f,max);
-//			}
-//			m4View.transform(a);
-//			m4View.transform(b);
-//			drawable.drawLine3D(a,b);
-//		}
-//	}
+	private void drawBirdsEyeGrid(JPatchDrawable2 drawable, Matrix4f m4View) {
+		int iSize = settings.viewports.groundPlaneSize;
+		float fSpacing = settings.viewports.groundPlaneSpacing;
+		float max = fSpacing * iSize;
+		float f;
+		Point3f a = new Point3f();
+		Point3f b = new Point3f();
+		for (int n = -iSize; n <= iSize; n++) {
+			f = fSpacing * n;
+			if (n % 5 == 0) {
+				drawable.setColor(settings.colors.majorGrid);
+			} else {
+				drawable.setColor(settings.colors.minorGrid);
+			}
+			switch(iPlane) {
+				case XZ:
+					a.set(-max,0,f);
+					b.set(max,0,f);
+					break;
+				case XY:
+					a.set(-max,f,0);
+					b.set(max,f,0);
+					break;
+				case YZ:
+					a.set(0,-max,f);
+					b.set(0,max,f);
+			}
+			m4View.transform(a);
+			m4View.transform(b);
+			drawable.drawLine(a,b);
+			switch(iPlane) {
+				case XZ:
+					a.set(f,0,-max);
+					b.set(f,0,max);
+					break;
+				case XY:
+					a.set(f,-max,0);
+					b.set(f,max,0);
+					break;
+				case YZ:
+					a.set(0,f,-max);
+					b.set(0,f,max);
+			}
+			m4View.transform(a);
+			m4View.transform(b);
+			drawable.drawLine(a,b);
+		}
+	}
 	
 	public boolean correctPosition(Tuple3f from, Tuple3f to) {
-		//System.out.println("correctPosition");
-		if (bSnap && iPlane != NONE) {
-			to.x = (iPlane == YZ) ? from.x : Math.round(to.x / fSpacing) * fSpacing;
-			to.y = (iPlane == XZ) ? from.y : Math.round(to.y / fSpacing) * fSpacing;
-			to.z = (iPlane == XY) ? from.z : Math.round(to.z / fSpacing) * fSpacing;
+		float gridSpacing;
+		if (MainFrame.getInstance().getModel() != null)
+			gridSpacing = settings.viewports.modelerGridSpacing;
+		else
+			gridSpacing = settings.viewports.animatorGridSpacing;
+		if (settings.viewports.snapToGrid && iPlane != NONE) {
+			to.x = (iPlane == YZ) ? from.x : Math.round(to.x / gridSpacing) * gridSpacing;
+			to.y = (iPlane == XZ) ? from.y : Math.round(to.y / gridSpacing) * gridSpacing;
+			to.z = (iPlane == XY) ? from.z : Math.round(to.z / gridSpacing) * gridSpacing;
 		}
 		return (!from.equals(to));
 	}
 	
 	public boolean correctZPosition(Tuple3f from, Tuple3f to) {
-		//System.out.println("correctZPosition");
-		if (bSnap && iPlane != NONE) {
-			to.x = (iPlane != YZ) ? from.x : Math.round(to.x / fSpacing) * fSpacing;
-			to.y = (iPlane != XZ) ? from.y : Math.round(to.y / fSpacing) * fSpacing;
-			to.z = (iPlane != XY) ? from.z : Math.round(to.z / fSpacing) * fSpacing;
+		float gridSpacing;
+		if (MainFrame.getInstance().getModel() != null)
+			gridSpacing = settings.viewports.modelerGridSpacing;
+		else
+			gridSpacing = settings.viewports.animatorGridSpacing;
+		if (settings.viewports.snapToGrid && iPlane != NONE) {
+			to.x = (iPlane != YZ) ? from.x : Math.round(to.x / gridSpacing) * gridSpacing;
+			to.y = (iPlane != XZ) ? from.y : Math.round(to.y / gridSpacing) * gridSpacing;
+			to.z = (iPlane != XY) ? from.z : Math.round(to.z / gridSpacing) * gridSpacing;
 		}
 		return (!from.equals(to));
 	}
 	
 	public void correctVector(Tuple3f t, int plane) {
-		//System.out.println("correctVector");
+		float gridSpacing;
+		if (MainFrame.getInstance().getModel() != null)
+			gridSpacing = settings.viewports.modelerGridSpacing;
+		else
+			gridSpacing = settings.viewports.animatorGridSpacing;
 		if (plane != NONE) {
-			t.x = (plane == YZ) ? t.x : Math.round(t.x / fSpacing) * fSpacing;
-			t.y = (plane == XZ) ? t.y : Math.round(t.y / fSpacing) * fSpacing;
-			t.z = (plane == XY) ? t.z : Math.round(t.z / fSpacing) * fSpacing;
+			t.x = (plane == YZ) ? t.x : Math.round(t.x / gridSpacing) * gridSpacing;
+			t.y = (plane == XZ) ? t.y : Math.round(t.y / gridSpacing) * gridSpacing;
+			t.z = (plane == XY) ? t.z : Math.round(t.z / gridSpacing) * gridSpacing;
 		}
 	}
 	
 	public void correctZVector(Tuple3f t) {
-		//System.out.println("correctZVector");
-		if (bSnap && iPlane != NONE) {
-			t.x = (iPlane != YZ) ? 0 : Math.round(t.x / fSpacing) * fSpacing;
-			t.y = (iPlane != XZ) ? 0 : Math.round(t.y / fSpacing) * fSpacing;
-			t.z = (iPlane != XY) ? 0 : Math.round(t.z / fSpacing) * fSpacing;
+		float gridSpacing;
+		if (MainFrame.getInstance().getModel() != null)
+			gridSpacing = settings.viewports.modelerGridSpacing;
+		else
+			gridSpacing = settings.viewports.animatorGridSpacing;
+		if (settings.viewports.snapToGrid && iPlane != NONE) {
+			t.x = (iPlane != YZ) ? 0 : Math.round(t.x / gridSpacing) * gridSpacing;
+			t.y = (iPlane != XZ) ? 0 : Math.round(t.y / gridSpacing) * gridSpacing;
+			t.z = (iPlane != XY) ? 0 : Math.round(t.z / gridSpacing) * gridSpacing;
 		}
 	}
 	
 	public Vector3f getCorrectionVector(Tuple3f t3) {
-		//System.out.println("getCorrectionVector");
+		float gridSpacing;
+		if (MainFrame.getInstance().getModel() != null)
+			gridSpacing = settings.viewports.modelerGridSpacing;
+		else
+			gridSpacing = settings.viewports.animatorGridSpacing;
 		Vector3f v3 = new Vector3f();
-		if (bSnap && iPlane != NONE) {
+		if (settings.viewports.snapToGrid && iPlane != NONE) {
 			v3.set(t3);
-			v3.x = (iPlane == YZ) ? v3.x : Math.round(v3.x / fSpacing) * fSpacing;
-			v3.y = (iPlane == XZ) ? v3.y : Math.round(v3.y / fSpacing) * fSpacing;
-			v3.z = (iPlane == XY) ? v3.z : Math.round(v3.z / fSpacing) * fSpacing;
+			v3.x = (iPlane == YZ) ? v3.x : Math.round(v3.x / gridSpacing) * gridSpacing;
+			v3.y = (iPlane == XZ) ? v3.y : Math.round(v3.y / gridSpacing) * gridSpacing;
+			v3.z = (iPlane == XY) ? v3.z : Math.round(v3.z / gridSpacing) * gridSpacing;
 			v3.sub(t3);
 		}
 		return v3;
 	}
 	
 	public Vector3f getZCorrectionVector(Tuple3f t3) {
-		//System.out.println("getZCorrectionVector");
+		float gridSpacing;
+		if (MainFrame.getInstance().getModel() != null)
+			gridSpacing = settings.viewports.modelerGridSpacing;
+		else
+			gridSpacing = settings.viewports.animatorGridSpacing;
 		Vector3f v3 = new Vector3f();
-		if (bSnap && iPlane != NONE) {
+		if (settings.viewports.snapToGrid && iPlane != NONE) {
 			v3.set(t3);
-			v3.x = (iPlane != YZ) ? v3.x : Math.round(v3.x / fSpacing) * fSpacing;
-			v3.y = (iPlane != XZ) ? v3.y : Math.round(v3.y / fSpacing) * fSpacing;
-			v3.z = (iPlane != XY) ? v3.z : Math.round(v3.z / fSpacing) * fSpacing;
+			v3.x = (iPlane != YZ) ? v3.x : Math.round(v3.x / gridSpacing) * gridSpacing;
+			v3.y = (iPlane != XZ) ? v3.y : Math.round(v3.y / gridSpacing) * gridSpacing;
+			v3.z = (iPlane != XY) ? v3.z : Math.round(v3.z / gridSpacing) * gridSpacing;
 			v3.sub(t3);
 		}
 		return v3;

@@ -15,13 +15,18 @@ public class GridDialog extends JDialog implements ActionListener {
 
 	private JLabel labelSpacing = new JLabel("Spacing:");
 
-	private JTextField textSpacing = new JTextField("" + MainFrame.getInstance().getJPatchScreen().getGrid().getSpacing());
+	private JTextField textSpacing = new JTextField();
 
 	private JButton buttonOK = new JButton("OK",new ImageIcon(getClass().getClassLoader().getResource("jpatch/images/ok.png")));
 	private JButton buttonCancel = new JButton("Cancel",new ImageIcon(getClass().getClassLoader().getResource("jpatch/images/cancel.png")));
 	
 	public GridDialog(Frame owner) {
 		super(owner,"Grid settings",true);
+		
+		if (MainFrame.getInstance().getModel() != null)
+			textSpacing.setText(Float.toString(Settings.getInstance().viewports.modelerGridSpacing));
+		else
+			textSpacing.setText(Float.toString(Settings.getInstance().viewports.animatorGridSpacing));
 		
 		GridLayout layout = new GridLayout(2,2);
 		layout.setHgap(10);
@@ -50,8 +55,13 @@ public class GridDialog extends JDialog implements ActionListener {
 		} else if (actionEvent.getSource() == buttonOK) {
 			setVisible(false);
 			dispose();
-			MainFrame.getInstance().getJPatchScreen().setGridSpacing(new Float(textSpacing.getText()).floatValue());
-			Settings.getInstance().viewports.gridSpacing = new Float(textSpacing.getText()).floatValue();
+//			MainFrame.getInstance().getJPatchScreen().setGridSpacing(new Float(textSpacing.getText()).floatValue());
+			if (MainFrame.getInstance().getModel() != null)
+				Settings.getInstance().viewports.modelerGridSpacing = new Float(textSpacing.getText()).floatValue();
+			else
+				Settings.getInstance().viewports.animatorGridSpacing = new Float(textSpacing.getText()).floatValue();
+			
+			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
 	}
 }

@@ -43,8 +43,8 @@ public final class JPatchScreen extends JPanel {
 	private ViewDefinition[] aViewDef;
 	private Viewport2[] aViewport = new Viewport2[NUMBER_OF_VIEWPORTS];
 	
-	private boolean bSnapToGrid = Settings.getInstance().viewports.snapToGrid;
-	private float fGridSpacing = Settings.getInstance().viewports.gridSpacing;
+//	private boolean bSnapToGrid = Settings.getInstance().viewports.snapToGrid;
+//	private float fGridSpacing = Settings.getInstance().viewports.gridSpacing;
 	
 	private boolean bSelectPoints = true;
 	private boolean bSelectBones = true;
@@ -56,10 +56,11 @@ public final class JPatchScreen extends JPanel {
 	
 	private boolean bBackfaceNormalFlip = false;
 	private int iBackfaceCulling = 0;
-	private boolean bSynchronized = Settings.getInstance().viewports.synchronizeViewports;
+//	private boolean bSynchronized = Settings.getInstance().viewports.synchronizeViewports;
 	private LightingMode iLightMode = Settings.getInstance().realtimeRenderer.lightingMode;
 	private boolean bStickyLight = Settings.getInstance().realtimeRenderer.lightFollowsCamera;
 	private JPatchTool tool;
+	private final Settings settings = Settings.getInstance();
 	
 	private MouseListener popupMouseListener = new MouseAdapter() {
 		public void mousePressed(MouseEvent mouseEvent) {
@@ -93,7 +94,7 @@ public final class JPatchScreen extends JPanel {
 		
 		enablePopupMenu(true);
 //		activeViewport = aDrawable[0];
-		snapToGrid(bSnapToGrid);
+//		snapToGrid(bSnapToGrid);
 	}
 	
 	public void initScreen() {
@@ -146,7 +147,7 @@ public final class JPatchScreen extends JPanel {
 			add(aDrawable[i].getComponent());
 //			aDrawable[i].getComponent().setFocusable(false);
 			//aViewDef[i].setLighting(RealtimeLighting.createThreepointLight()); // FIXME
-			activeViewport = aViewport[0];
+			setActiveViewport(aViewport[0]);
 			aDrawable[i].getComponent().setFocusable(false);
 		}
 		setMode(mode);
@@ -192,7 +193,8 @@ public final class JPatchScreen extends JPanel {
 			Viewport2 old = activeViewport;
 			activeViewport = viewport;
 			Actions.getInstance().setViewDefinition(activeViewport.getViewDefinition());
-			old.getDrawable().display();
+			if (old != null)
+				old.getDrawable().display();
 			viewport.getDrawable().display();
 		}
 	}
@@ -201,9 +203,9 @@ public final class JPatchScreen extends JPanel {
 		return grid;
 	}
 	
-	public boolean isSynchronized() {
-		return bSynchronized;
-	}
+//	public boolean isSynchronized() {
+//		return bSynchronized;
+//	}
 	
 	public boolean flipBackfacingNormals() {
 		return bBackfaceNormalFlip;
@@ -230,9 +232,9 @@ public final class JPatchScreen extends JPanel {
 //		}
 	}
 	
-	public void synchronize(boolean sync) {
-		bSynchronized = sync;
-	}
+//	public void synchronize(boolean sync) {
+//		bSynchronized = sync;
+//	}
 	
 	public boolean showTangents() {
 		return bShowTangents;
@@ -293,38 +295,38 @@ public final class JPatchScreen extends JPanel {
 //		update_all();
 	}
 	
-	public boolean snapToGrid() {
-		return bSnapToGrid;
-	}
-	
-	public void snapToGrid(boolean enable) {
-		bSnapToGrid = enable;
-		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-//			aComponent[i].getGrid().snap(enable);
-		}
-		update_all();
-		Settings.getInstance().viewports.snapToGrid = enable;
-	}
+//	public boolean snapToGrid() {
+//		return bSnapToGrid;
+//	}
+//	
+//	public void snapToGrid(boolean enable) {
+//		bSnapToGrid = enable;
+//		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+////			aComponent[i].getGrid().snap(enable);
+//		}
+//		update_all();
+//		Settings.getInstance().viewports.snapToGrid = enable;
+//	}
 	
 //	public float getGridSpacing() {
 //		return fGridSpacing;
 //	}
 	
-	public void setGridSpacing(float gridSpacing) {
-		grid.setSpacing(gridSpacing);
-//		fGridSpacing = gridSpacing;
-//		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-////			aComponent[i].getGrid().setSpacing(gridSpacing);
-//		}
-		update_all();
-	}
+//	public void setGridSpacing(float gridSpacing) {
+//		grid.setSpacing(gridSpacing);
+////		fGridSpacing = gridSpacing;
+////		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+//////			aComponent[i].getGrid().setSpacing(gridSpacing);
+////		}
+//		update_all();
+//	}
 	
 	public boolean isStickyLight() {
 		return bStickyLight;
 	}
 	
 	public void single_update(Component component) {
-		if (bSynchronized) {
+		if (settings.viewports.synchronizeViewports) {
 			update_all();
 		} else {
 			getViewDefinition(component).getDrawable().display();
@@ -333,7 +335,7 @@ public final class JPatchScreen extends JPanel {
 	
 	public void full_update() {
 		//System.out.println("full_update()");
-		if (!bSynchronized) {
+		if (!settings.viewports.synchronizeViewports) {
 			update_all();
 		}
 	}
