@@ -148,7 +148,7 @@ public class LogoMaker {
 		gv = font.createGlyphVector(frc, "Version " + VersionInfo.ver);
 		shape = gv.getOutline();
 		bounds = shape.getBounds();
-		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 110);
+		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 105);
 		g2.setColor(new Color(0xffff00));
 		shape = at.createTransformedShape(gv.getOutline());
 		g2.fill(shape);
@@ -160,7 +160,7 @@ public class LogoMaker {
 		gv = font.createGlyphVector(frc, "written by Sascha Ledinsky");
 		shape = gv.getOutline();
 		bounds = shape.getBounds();
-		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 140);
+		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 135);
 		g2.setColor(new Color(0xffffff));
 		shape = at.createTransformedShape(gv.getOutline());
 		g2.fill(shape);
@@ -172,36 +172,36 @@ public class LogoMaker {
 		gv = font.createGlyphVector(frc, "© Copyright 2002-2006");
 		shape = gv.getOutline();
 		bounds = shape.getBounds();
-		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 160);
+		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 155);
 		g2.setColor(new Color(0xffffff));
 		shape = at.createTransformedShape(gv.getOutline());
 		g2.fill(shape);
 		
 		
 		/*
-		 * Copyright
+		 * url
 		 */
-		font = new Font("Sans Serif", Font.PLAIN, 12);
+		font = new Font("Sans Serif", Font.BOLD, 12);
 		gv = font.createGlyphVector(frc, "http://www.jpatch.com");
 		shape = gv.getOutline();
 		bounds = shape.getBounds();
-		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 180);
+		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 175);
 		g2.setColor(new Color(0xcccccc));
 		shape = at.createTransformedShape(gv.getOutline());
 		g2.fill(shape);
 		
-		
+		int y = -20;
 		g2.setColor(new Color(0xcccccc));
 //		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 		g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
 		g2.setFont(new Font("Sans Serif", Font.PLAIN, 10));
-		g2.drawString("This program is free software. You can redistribute it and/or modify it under the", 5, 230);
-		g2.drawString("terms of the GNU General Public License as published by the Free Software", 20, 240);
-		g2.drawString("Foundation; either version 2 of the License, or (at your option) any later version.", 9, 250);
-		g2.drawString("This program is distributed in the hope that it will be useful, but WITHOUT ANY", 8, 264);
-		g2.drawString("WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS", 7, 274);
-		g2.drawString("FOR A PARTICULAR PURPOSE. See the GNU General Public License for more", 20, 284);
-		g2.drawString("details.", 180, 294);
+		drawCenteredString(g2, "This program is free software. You can redistribute it and/or modify it under the", 230 + y);
+		drawCenteredString(g2, "terms of the GNU General Public License as published by the Free Software", 240 + y);
+		drawCenteredString(g2, "Foundation; either version 2 of the License, or (at your option) any later version.", 250 + y);
+		drawCenteredString(g2, "This program is distributed in the hope that it will be useful, but WITHOUT ANY", 264 + y);
+		drawCenteredString(g2, "WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS", 274 + y);
+		drawCenteredString(g2, "FOR A PARTICULAR PURPOSE. See the GNU General Public License for more", 284 + y);
+		drawCenteredString(g2, "details.", 294 + y);
 //		/*
 //		 * Copyright
 //		 */
@@ -316,6 +316,8 @@ public class LogoMaker {
 			g2.draw(shape);
 		}
 		
+		g2.setPaint(new GradientPaint(0, 0, new Color(0x11000000, true), 399, 0, new Color(0x33000000, true)));
+		g2.fillRect(0, 280, 400, 20);
 		
 		g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		g2.setPaint(new GradientPaint(0, 0, new Color(0xbbccdd), 0, 299, new Color(0x99aabb)));
@@ -331,5 +333,10 @@ public class LogoMaker {
 		g2.drawLine(1, 298, 398, 298);
 		g2.drawLine(398, 1, 398, 298);
 		return image;
+	}
+	
+	private static void drawCenteredString(Graphics2D g2, String text, int y) {
+		int w = g2.getFontMetrics().charsWidth(text.toCharArray(), 0, text.length()) >> 1;
+		g2.drawString(text, 200 - w, y);
 	}
 }
