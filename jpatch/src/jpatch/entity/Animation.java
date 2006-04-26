@@ -36,9 +36,9 @@ public class Animation implements MutableTreeNode {
 	private boolean bInserted;
 	private String strName = "New Animation";
 	
-	public Animation() {
-		addCamera(new Camera("Camera 1"), null);
-	}
+//	public Animation() {
+//		addCamera(new Camera("Camera 1"), null);
+//	}
 	
 	public float getEnd() {
 		return fEnd;
@@ -114,7 +114,8 @@ public class Animation implements MutableTreeNode {
 	}
 	
 	public void addCamera(final Camera camera, MotionCurveSet mcs) {
-		MainFrame.getInstance().getTreeModel().insertNodeInto(camera, treenodeCameras, listCameras.size());
+//		if (MainFrame.getInstance().getAnimation() != null)
+			MainFrame.getInstance().getTreeModel().insertNodeInto(camera, treenodeCameras, listCameras.size());
 		JMenuItem menuItem = new JRadioButtonMenuItem(camera.getName().toLowerCase());
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

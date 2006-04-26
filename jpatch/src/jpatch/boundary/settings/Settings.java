@@ -40,6 +40,9 @@ import jpatch.boundary.*;
 public class Settings extends AbstractSettings {
 	private static Settings INSTANCE;
 	
+	public static enum Startup { MODELER, ANIMATOR };
+	public static enum Plaf { CROSS_PLATFORM, SYSTEM, JPATCH };
+	public Startup startup = Startup.MODELER;
 	public boolean newInstallation = true;
 	public boolean cleanExit = false;
 	public int screenPositionX = 0;
@@ -47,7 +50,7 @@ public class Settings extends AbstractSettings {
 	public int screenWidth = 1024;
 	public int screenHeight = 768;
 	public boolean saveScreenDimensionsOnExit = true;
-	public String lookAndFeelClassname = "javax.swing.plaf.metal.MetalLookAndFeel";
+	public Plaf lookAndFeel = Plaf.CROSS_PLATFORM;
 	public long undoMaxMem = 128;
 	public long undoMinMem = 120;
 	public final DirectorySettings directories = new DirectorySettings();

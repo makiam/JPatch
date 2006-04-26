@@ -28,7 +28,7 @@ implements TreeSelectionListener {
 	private JPanel box2;
 	//private TransformPanel transformPanel = new TransformPanel();
 	
-	public SideBar(JPatchTree tree) {
+	public SideBar() {
 		super(VERTICAL_SPLIT);
 		//setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		
@@ -38,7 +38,7 @@ implements TreeSelectionListener {
 		setDividerSize(4);
 		setDividerLocation(MainFrame.getInstance().getHeight() - 300);
 		setContinuousLayout(true);
-		scrollPane = new JScrollPane(tree);
+		scrollPane = new JScrollPane();
 		//Dimension dim = new Dimension(248,400);
 		//scrollPane.setPreferredSize(dim);
 		//scrollPane.setMinimumSize(dim);
@@ -58,7 +58,7 @@ implements TreeSelectionListener {
 		//detailPanel.add(new JLabel("test"));
 		box.add(box2, BorderLayout.CENTER);
 //		tree.setFocusable(false);
-		tree.addTreeSelectionListener(this);
+//		tree.addTreeSelectionListener(this);
 		//detailPanel.setLayout(new GridLayout(10,1));
 //		dim = new Dimension(248,1000);
 //		detailPanel.setPreferredSize(dim);
@@ -85,7 +85,7 @@ implements TreeSelectionListener {
 //		scrollPane.remove(scrollPane.getComponent(0));
 //		scrollPane.add(tree);
 		remove(scrollPane);
-		scrollPane = new JScrollPane(tree);
+		scrollPane.setViewportView(tree);
 //		Dimension dim = new Dimension(198,300);
 //		scrollPane.setPreferredSize(dim);
 //		scrollPane.setMinimumSize(dim);

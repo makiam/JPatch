@@ -82,7 +82,7 @@ public final class MainFrame extends JFrame {
 //		}
 //	});
 	
-	public MainFrame(Model model) {
+	public MainFrame() {
 //		Thread timerMonitor = new Thread() {
 //			public void run() {
 //				try {
@@ -115,25 +115,25 @@ public final class MainFrame extends JFrame {
 		} else {
 			setTitle("JPatch " + VersionInfo.version + " compiled " + VersionInfo.compileTime);
 		}
-		this.model = model;
+//		this.model = model;
 		if (INSTANCE == null) {
 			INSTANCE = this;
 			
-			UIManager.put("swing.boldMetal", false);
-			try {
-				String plaf = Settings.getInstance().lookAndFeelClassname;
-				if (plaf.equals("jpatch.boundary.laf.SmoothLookAndFeel"))
-					if (jpatch.auxilary.JPatchUtils.isJvmVersionGreaterOrEqual(1, 5))
-						UIManager.setLookAndFeel(new SmoothLookAndFeel());
-					else
-						UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-				else
-					UIManager.setLookAndFeel(plaf);
-				
-					
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			
+//			try {
+//				String plaf = Settings.getInstance().lookAndFeelClassname;
+//				if (plaf.equals("jpatch.boundary.laf.SmoothLookAndFeel"))
+//					if (jpatch.auxilary.JPatchUtils.isJvmVersionGreaterOrEqual(1, 5))
+//						UIManager.setLookAndFeel(new SmoothLookAndFeel());
+//					else
+//						UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+//				else
+//					UIManager.setLookAndFeel(plaf);
+//				
+//					
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
 			
 			UIManager.put("ToolTip.hideAccelerator", true);
 			
@@ -220,8 +220,8 @@ public final class MainFrame extends JFrame {
 			if (SplashScreen.instance != null)
 				SplashScreen.instance.setText("Initializing");
 			
-			initTree(model);
-			sideBar = new SideBar(tree);
+//			initTree(model);
+			sideBar = new SideBar();
 //			JPanel panel2 = new JPanel();
 //			panel2.setLayout(new BorderLayout());
 //			panel2.add(sideBar, BorderLayout.CENTER);
@@ -337,32 +337,20 @@ public final class MainFrame extends JFrame {
 			//jpatchScreen.setMouseListeners(new ChangeViewListener(MouseEvent.BUTTON2,ChangeViewListener.ZOOM));
 			//jpatchScreen.setMouseListeners(new ChangeViewListener(MouseEvent.BUTTON3,ChangeViewListener.MOVE));
 			setSelection(null);
-			newModel();
+//			newModel();
 			setVisible(true);
 			jpatchScreen.setTool(Tools.defaultTool);
-			if (SplashScreen.instance != null) {
-				Timer timer = new Timer();
-				timer.schedule(new TimerTask() {
-					public void run() {
-						EventQueue.invokeLater(new Runnable() {
-							public void run() {
-								if (SplashScreen.instance != null)
-									SplashScreen.instance.clearSplash();
-							}
-						});
-					}
-				}, 500);
-			}
-			if (!VersionInfo.release) {
-				System.out.println("Displaying warning message...");
-				
-					
-				String warning = "This is a development version of JPatch.\n" +
-						 "It has not been tested and may contain severe bugs!\n" +
-						 "You can download a more stable release of JPatch\n" +
-						 "from the JPatch homepage at http://www.jpatch.com";
-				JOptionPane.showMessageDialog(this, warning, "WARNING", JOptionPane.WARNING_MESSAGE);
-			}
+			
+//			if (!VersionInfo.release) {
+//				System.out.println("Displaying warning message...");
+//				
+//					
+//				String warning = "This is a development version of JPatch.\n" +
+//						 "It has not been tested and may contain severe bugs!\n" +
+//						 "You can download a more stable release of JPatch\n" +
+//						 "from the JPatch homepage at http://www.jpatch.com";
+//				JOptionPane.showMessageDialog(this, warning, "WARNING", JOptionPane.WARNING_MESSAGE);
+//			}
 			System.out.println("JPatch is ready.");
 		} else {
 			throw new IllegalStateException("There can be only one instance of MainFrame");
@@ -520,6 +508,7 @@ public final class MainFrame extends JFrame {
 		Actions.getInstance().enableAction("lathe editor", true);
 		Actions.getInstance().enableAction("compute patches", true);
 		
+		Settings.getInstance().startup = Settings.Startup.MODELER;
 //		Actions.getInstance().enableAction("show anim controls", false);
 	}
 	
@@ -551,6 +540,8 @@ public final class MainFrame extends JFrame {
 		splitPaneV.add(animPanel);
 //		vcrDialog.setSize(800, 600);
 //		vcrDialog.setVisible(true);
+		animation.addCamera(new Camera("Camera 1"), null);
+		
 		Actions.getInstance().enableAction("open", false);
 		Actions.getInstance().enableAction("append", false);
 //		Actions.getInstance().enableAction("save", false);
@@ -567,6 +558,7 @@ public final class MainFrame extends JFrame {
 		Actions.getInstance().enableAction("lathe editor", false);
 		Actions.getInstance().enableAction("compute patches", false);
 		
+		Settings.getInstance().startup = Settings.Startup.ANIMATOR;
 //		Actions.getInstance().enableAction("show anim controls", true);
 //		jpatchScreen.getActiveViewport().getViewDefinition().setCamera(animation.getCameras().get(0));
 	}
