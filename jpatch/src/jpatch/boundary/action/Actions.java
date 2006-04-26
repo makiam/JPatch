@@ -95,6 +95,7 @@ public class Actions extends DefaultHandler {
 		actionMap.get("select bones").buttonModel.setSelected(true);
 		actionMap.get("snap to grid").buttonModel.setSelected(Settings.getInstance().viewports.snapToGrid);	
 		actionMap.get("round tangents").buttonModel.setSelected(true);
+		actionMap.get("synchronize viewports").buttonModel.setSelected(Settings.getInstance().viewports.synchronizeViewports);
 	}
 	
 	public void enableAction(String key, boolean enable) {
@@ -107,6 +108,7 @@ public class Actions extends DefaultHandler {
 	}
 	
 	public void setViewDefinition(ViewDefinition viewDef) {
+		System.out.println("setViewDefinition");
 		actionMap.get(viewDef.getViewName()).buttonModel.setSelected(true);
 		actionMap.get("show points").buttonModel.setSelected(viewDef.renderPoints());
 		actionMap.get("show curves").buttonModel.setSelected(viewDef.renderCurves());

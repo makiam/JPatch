@@ -17,9 +17,7 @@ public final class SyncScreensAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		JPatchScreen screen = MainFrame.getInstance().getJPatchScreen();
-		screen.synchronize(!screen.isSynchronized());
-		Settings.getInstance().viewports.synchronizeViewports = screen.isSynchronized();
+		Settings.getInstance().viewports.synchronizeViewports = !Settings.getInstance().viewports.synchronizeViewports;
 	}
 }
 

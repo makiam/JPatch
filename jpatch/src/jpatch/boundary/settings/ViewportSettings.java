@@ -33,5 +33,10 @@ public class ViewportSettings extends AbstractSettings {
 	public ViewportSettings.ScreenMode viewportMode = ScreenMode.SINGLE;
 	public boolean synchronizeViewports = false;
 	public boolean snapToGrid = false;
-	public float gridSpacing = 1.0f;
+	public float modelerGridSpacing = 1.0f;
+	public float animatorGridSpacing = 10.0f;
+	public boolean showGroundPlaneInModeler = false;
+	public boolean showGroundPlaneInAnimator = true;
+	public float groundPlaneSpacing = 10.0f;
+	public int groundPlaneSize = 20;
 }
