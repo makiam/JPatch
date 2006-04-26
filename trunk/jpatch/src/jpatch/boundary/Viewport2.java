@@ -139,6 +139,8 @@ public class Viewport2 {
 			}
 			drawable.setLighting(rtl);
 		}
+		if (viewDef.getCamera() != null)
+			drawable.setFocalLength(viewDef.getCamera().getFocalLength());
 	}
 	
 	public ViewDefinition getViewDefinition() {
