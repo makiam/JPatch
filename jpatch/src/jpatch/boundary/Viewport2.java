@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.54 2006/04/25 20:24:26 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.55 2006/04/26 19:13:27 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -139,6 +139,8 @@ public class Viewport2 {
 			}
 			drawable.setLighting(rtl);
 		}
+		if (viewDef.getCamera() != null)
+			drawable.setFocalLength(viewDef.getCamera().getFocalLength());
 	}
 	
 	public ViewDefinition getViewDefinition() {
