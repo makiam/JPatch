@@ -218,7 +218,7 @@ public final class MainFrame extends JFrame {
 			//meshToolBar.setFloatable(false);
 			
 			if (SplashScreen.instance != null)
-				SplashScreen.instance.setText("Initializing...");
+				SplashScreen.instance.setText("Initializing");
 			
 			initTree(model);
 			sideBar = new SideBar(tree);
