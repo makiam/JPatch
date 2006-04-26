@@ -1,5 +1,5 @@
 /*
- * $Id: SplashScreen.java,v 1.11 2006/04/26 08:40:50 sascha_l Exp $
+ * $Id: SplashScreen.java,v 1.12 2006/04/26 14:42:11 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -141,11 +141,11 @@ public class SplashScreen {
 		System.out.println("Showing splash screen...");
 		if (instance != null)
 			return;
-		if (!progressBar) {
-			MainFrame.getInstance().setVisible(false);
-		}
+//		if (!progressBar) {
+//			MainFrame.getInstance().setVisible(false);
+//		}
 		try {
-			final Image image = ImageIO.read(ClassLoader.getSystemResource("jpatch/images/title.png"));
+			final Image image = ImageIO.read(ClassLoader.getSystemResource("jpatch/images/title.jpg"));
 			window = new JWindow() {
 				@Override
 				public void paint(Graphics g) {
@@ -194,9 +194,9 @@ public class SplashScreen {
 		window.setVisible(false);
 		window.dispose();
 		window = null;
-		if (MainFrame.getInstance() != null) {
-			MainFrame.getInstance().setVisible(true);
-		}
+//		if (MainFrame.getInstance() != null) {
+//			MainFrame.getInstance().setVisible(true);
+//		}
 		instance = null;
 	}
 }

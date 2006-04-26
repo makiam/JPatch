@@ -285,7 +285,8 @@ public class Model implements MutableTreeNode {
 		//} else {
 		//	return false;
 		//}
-		MainFrame.getInstance().getTreeModel().insertNodeInto(selection, treenodeSelections, treenodeSelections.getChildCount());
+		if (MainFrame.getInstance().getModel() != null)
+			MainFrame.getInstance().getTreeModel().insertNodeInto(selection, treenodeSelections, treenodeSelections.getChildCount());
 	}
 
 	public void addSelection(int index, Selection selection) {

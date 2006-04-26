@@ -355,9 +355,9 @@ public class Actions extends DefaultHandler {
 		actionMap.put("settings", new ActionDescriptor(new EditSettingsAction()));
 		actionMap.put("grid spacing settings", new ActionDescriptor(new SetGridSpacingAction()));
 		actionMap.put("install jogl", new ActionDescriptor(new InstallJoglAction()));
-		actionMap.put("jpatch lookandfeel", new ActionDescriptor(new SwitchLookAndFeelAction("jpatch.boundary.laf.SmoothLookAndFeel")));
-		actionMap.put("crossplatform lookandfeel", new ActionDescriptor(new SwitchLookAndFeelAction(UIManager.getCrossPlatformLookAndFeelClassName())));
-		actionMap.put("system lookandfeel", new ActionDescriptor(new SwitchLookAndFeelAction(UIManager.getSystemLookAndFeelClassName())));
+		actionMap.put("jpatch lookandfeel", new ActionDescriptor(new SwitchLookAndFeelAction(Settings.Plaf.JPATCH)));
+		actionMap.put("crossplatform lookandfeel", new ActionDescriptor(new SwitchLookAndFeelAction(Settings.Plaf.CROSS_PLATFORM)));
+		actionMap.put("system lookandfeel", new ActionDescriptor(new SwitchLookAndFeelAction(Settings.Plaf.SYSTEM)));
 		actionMap.put("phoneme morph mapping", new ActionDescriptor(new EditPhonemesAction()));
 		actionMap.put("dump", new ActionDescriptor(new DumpAction()));
 		actionMap.put("dump xml", new ActionDescriptor(new XmlDumpAction()));

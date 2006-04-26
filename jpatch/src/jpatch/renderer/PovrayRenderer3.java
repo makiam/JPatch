@@ -30,7 +30,7 @@ public class PovrayRenderer3 {
 		file.write("/*\n");
 		file.write(" * Frame number\n");
 		file.write(" */\n");
-		file.write("#declare jpatchFrame = " + Animator.getInstance().getPosition() + ";\n\n");
+		file.write("#declare jpatchFrame = " + MainFrame.getInstance().getAnimation().getPosition() + ";\n\n");
 		
 		file.write("/*\n");
 		file.write(" * Include block\n");

@@ -1,5 +1,5 @@
 /*
- * $Id: Settings.java,v 1.8 2006/04/25 20:24:26 sascha_l Exp $
+ * $Id: Settings.java,v 1.9 2006/04/26 14:42:12 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -40,6 +40,9 @@ import jpatch.boundary.*;
 public class Settings extends AbstractSettings {
 	private static Settings INSTANCE;
 	
+	public static enum Startup { MODELER, ANIMATOR };
+	public static enum Plaf { CROSS_PLATFORM, SYSTEM, JPATCH };
+	public Startup startup = Startup.MODELER;
 	public boolean newInstallation = true;
 	public boolean cleanExit = false;
 	public int screenPositionX = 0;
@@ -47,7 +50,7 @@ public class Settings extends AbstractSettings {
 	public int screenWidth = 1024;
 	public int screenHeight = 768;
 	public boolean saveScreenDimensionsOnExit = true;
-	public String lookAndFeelClassname = "javax.swing.plaf.metal.MetalLookAndFeel";
+	public Plaf lookAndFeel = Plaf.CROSS_PLATFORM;
 	public long undoMaxMem = 128;
 	public long undoMinMem = 120;
 	public final DirectorySettings directories = new DirectorySettings();
