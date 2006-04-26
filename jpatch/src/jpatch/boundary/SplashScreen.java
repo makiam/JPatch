@@ -154,7 +154,7 @@ public class SplashScreen {
 //						((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 						int i = g.getFontMetrics().charsWidth(text.toCharArray(), 0, text.length()) >> 1;
 						int h = g.getFontMetrics().getHeight();
-						int y = 292;
+						int y = 293;
 //						g.setColor(new Color(0x66444400, true));
 //						g.fillRect(200 - i - 8, y - h, 2 * i + 16, h + 6);
 						g.setColor(Color.LIGHT_GRAY);

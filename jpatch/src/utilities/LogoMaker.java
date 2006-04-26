@@ -67,7 +67,8 @@ public class LogoMaker {
 		BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2 = image.createGraphics();
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setPaint(new GradientPaint(0, 0, new Color(0x6688ff), 50, 299, new Color(0x0000cc)));
+//		g2.setPaint(new GradientPaint(0, 0, new Color(0x6688ff), 50, 299, new Color(0x0000cc)));
+		g2.setPaint(new GradientPaint(0, 0, new Color(0xaaccbb), 50, 299, new Color(0x668877)));
 		g2.fillRect(0, 0, 400, 300);
 		
 		g2.setPaint(new GradientPaint(0, 50, new Color(0x11cccccc, true), 399, 0, new Color(0x55cccccc, true)));
@@ -131,10 +132,41 @@ public class LogoMaker {
 		g2.fill(shape);
 		
 		at = new AffineTransform(1, 0, 0, 1, (400 - bounds.width) / 2, bounds.height + 10);
-		g2.setPaint(new GradientPaint(0, 50, new Color(0xffffff), 0, 100, new Color(0xcccccc), true));
+		g2.setPaint(new GradientPaint(0, 45, new Color(0xffffff), 0, 100, new Color(0xcccce4), true));
 		shape = at.createTransformedShape(gv.getOutline());
 		g2.fill(shape);
-		g2.setPaint(new GradientPaint(0, 20, new Color(0xffffff), 0, 80, new Color(0xccccff)));
+		
+//		g2.setPaint(new GradientPaint(0, 50, new Color(0x44ffffff, true), 1, 55, new Color(0x00ffffff, true), true));
+//		g2.fill(shape);
+		
+		g2.setPaint(new GradientPaint(1, 50, new Color(0x04000000, true), 0.95f, 51, new Color(0x00000000, true), true));
+		g2.fill(shape);
+		g2.setPaint(new GradientPaint(1, 50, new Color(0x04000000, true), 0.9f, 50.6f, new Color(0x00000000, true), true));
+		g2.fill(shape);
+		g2.setPaint(new GradientPaint(1, 50, new Color(0x04000000, true), 1.1f, 51.1f, new Color(0x00000000, true), true));
+		g2.fill(shape);
+		g2.setPaint(new GradientPaint(1, 50, new Color(0x04000000, true), 1.12f, 51.3f, new Color(0x00000000, true), true));
+		g2.fill(shape);
+		g2.setPaint(new GradientPaint(1, 50, new Color(0x04000000, true), 1.05f, 52.2f, new Color(0x00000000, true), true));
+		g2.fill(shape);
+		g2.setPaint(new GradientPaint(1, 50, new Color(0x04000000, true), 1.03f, 53.5f, new Color(0x00000000, true), true));
+		g2.fill(shape);
+		
+		g2.setPaint(new GradientPaint(0.6f, 50, new Color(0x08ffffff, true), 0.7f, 52, new Color(0x00ffffff, true), true));
+		g2.fill(shape);
+		g2.setPaint(new GradientPaint(0.6f, 50, new Color(0x08ffffff, true), 0.8f, 51.4f, new Color(0x00ffffff, true), true));
+		g2.fill(shape);
+		g2.setPaint(new GradientPaint(0.6f, 50, new Color(0x08ffffff, true), 0.4f, 52.1f, new Color(0x00ffffff, true), true));
+		g2.fill(shape);
+		g2.setPaint(new GradientPaint(0.6f, 50, new Color(0x08ffffff, true), 0.5f, 52.3f, new Color(0x00ffffff, true), true));
+		g2.fill(shape);
+		g2.setPaint(new GradientPaint(0.6f, 50, new Color(0x08ffffff, true), 0.45f, 53.7f, new Color(0x00ffffff, true), true));
+		g2.fill(shape);
+		g2.setPaint(new GradientPaint(0.6f, 50, new Color(0x08ffffff, true), 0.55f, 54.6f, new Color(0x00ffffff, true), true));
+		g2.fill(shape);
+		
+		
+		g2.setPaint(new GradientPaint(0, 20, new Color(0xffffff), 0, 80, new Color(0xbbbbc0)));
 		g2.draw(shape);
 		
 		
@@ -320,16 +352,16 @@ public class LogoMaker {
 		g2.fillRect(0, 280, 400, 20);
 		
 		g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-		g2.setPaint(new GradientPaint(0, 0, new Color(0xbbccdd), 0, 299, new Color(0x99aabb)));
+		g2.setPaint(new GradientPaint(0, 0, new Color(0xcceedd), 0, 299, new Color(0xaaccbb)));
 		g2.drawLine(0, 0, 399, 0);
 		g2.drawLine(0, 0, 0, 299);
-		g2.setPaint(new GradientPaint(0, 0, new Color(0xccddee), 0, 299, new Color(0xaabbcc)));
+		g2.setPaint(new GradientPaint(0, 0, new Color(0xddffee), 0, 299, new Color(0xbbeecc)));
 		g2.drawLine(1, 1, 398, 1);
 		g2.drawLine(1, 1, 1, 298);
-		g2.setPaint(new GradientPaint(0, 0, new Color(0x99aabb), 0, 299, new Color(0x778899)));
+		g2.setPaint(new GradientPaint(0, 0, new Color(0x446655), 0, 299, new Color(0x224433)));
 		g2.drawLine(0, 299, 399, 299);
 		g2.drawLine(399, 0, 399, 299);
-		g2.setPaint(new GradientPaint(0, 0, new Color(0xaabbcc), 0, 299, new Color(0x8899aa)));
+		g2.setPaint(new GradientPaint(0, 0, new Color(0x557766), 0, 299, new Color(0x335544)));
 		g2.drawLine(1, 298, 398, 298);
 		g2.drawLine(398, 1, 398, 298);
 		return image;
