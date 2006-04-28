@@ -5,7 +5,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import jpatch.auxilary.*;
 import jpatch.boundary.*;
-import jpatch.boundary.filefilters.*;
 import jpatch.boundary.settings.Settings;
 import jpatch.control.*;
 import jpatch.control.importer.*;
@@ -40,7 +39,7 @@ public final class ImportAnimationMasterAction extends AbstractAction {
 		
 	private void load() {
 		JFileChooser fileChooser = new JFileChooser(Settings.getInstance().directories.animationmasterFiles);
-		fileChooser.addChoosableFileFilter(new AMFilter());
+		fileChooser.addChoosableFileFilter(FileFilters.AM_MODELS);
 		if (fileChooser.showOpenDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
 			String filename = file.getPath();

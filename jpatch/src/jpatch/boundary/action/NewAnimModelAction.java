@@ -2,10 +2,11 @@ package jpatch.boundary.action;
 
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 
 import jpatch.entity.*;
+import jpatch.auxilary.FileFilters;
 import jpatch.boundary.*;
-import jpatch.boundary.filefilters.JPatchFilter;
 import jpatch.boundary.settings.Settings;
 import jpatch.control.importer.JPatchImport;
 
@@ -20,8 +21,7 @@ public final class NewAnimModelAction extends AbstractAction {
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		JFileChooser fileChooser = new JFileChooser(Settings.getInstance().export.modelDirectory);
-		javax.swing.filechooser.FileFilter defaultFileFilter = new JPatchFilter();
-		fileChooser.setFileFilter(defaultFileFilter);
+		fileChooser.setFileFilter(FileFilters.JPATCH);
 		if (fileChooser.showOpenDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			String filename = fileChooser.getSelectedFile().getName();
 			Model model = new Model();

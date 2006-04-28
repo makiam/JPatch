@@ -7,7 +7,6 @@ import java.io.*;
 import jpatch.VersionInfo;
 import jpatch.auxilary.*;
 import jpatch.boundary.*;
-import jpatch.boundary.filefilters.*;
 import jpatch.boundary.settings.Settings;
 
 public final class SaveAsAction extends AbstractAction {
@@ -56,13 +55,13 @@ public final class SaveAsAction extends AbstractAction {
 	
 	public boolean saveAs() {
 		JFileChooser fileChooser = new JFileChooser(Settings.getInstance().directories.jpatchFiles);
-		fileChooser.addChoosableFileFilter(new JPatchFilter());
+		fileChooser.addChoosableFileFilter(FileFilters.JPATCH);
 		if (fileChooser.showSaveDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
 			String filename = file.getPath();
 			//System.out.println(filename + " " + JPatchUtils.getFileExtension(file.getName()));
-			if (JPatchUtils.getFileExtension(file.getName()).equals("")) {
-				filename += ".jpt";
+			if (FileFilters.getExtension(file).equals("")) {
+				filename = filename + ".jpt";
 			}
 			if (write(filename)) {
 //				JPatchUserSettings.getInstance().strJPatchFile = filename;
