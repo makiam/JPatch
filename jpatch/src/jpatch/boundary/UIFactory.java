@@ -59,7 +59,6 @@ public class UIFactory extends DefaultHandler {
 //		}
 //	};
 	public void parseLayout(URL url) {
-		
 		XMLReader xmlReader = null;
 		try {
 			xmlReader = XMLReaderFactory.createXMLReader();

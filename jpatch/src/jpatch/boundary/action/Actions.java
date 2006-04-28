@@ -30,6 +30,7 @@ import javax.swing.*;
 
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
+import jpatch.auxilary.KeyStrokeUtils;
 import jpatch.boundary.*;
 import jpatch.boundary.settings.*;
 import jpatch.boundary.ui.*;
@@ -108,7 +109,6 @@ public class Actions extends DefaultHandler {
 	}
 	
 	public void setViewDefinition(ViewDefinition viewDef) {
-		System.out.println("setViewDefinition");
 		actionMap.get(viewDef.getViewName()).buttonModel.setSelected(true);
 		actionMap.get("show points").buttonModel.setSelected(viewDef.renderPoints());
 		actionMap.get("show curves").buttonModel.setSelected(viewDef.renderCurves());
@@ -281,7 +281,7 @@ public class Actions extends DefaultHandler {
 		for (String key : actionMap.keySet()) {
 			Action action = actionMap.get(key).action;
 			KeyStroke ks = getDefaultKeyStroke(key);
-			String defaultAccelerator = ks == null ? "null" : ks.toString();
+			String defaultAccelerator = ks == null ? "null" : KeyStrokeUtils.keyStrokeToString(ks);
 			String accelerator = node.get(key, defaultAccelerator);
 			if (accelerator.equals("null"))
 				accelerator = null;
@@ -415,7 +415,11 @@ public class Actions extends DefaultHandler {
 		
 		ActionDescriptor(Action action) {
 			this.action = action;
-			defaultAccelerator = KeyStroke.getKeyStroke((String) action.getValue(JPatchAction.ACCELERATOR));
+//			defaultAccelerator = KeyStroke.getKeyStroke((String) action.getValue(JPatchAction.ACCELERATOR));
+		}
+		
+		public String toString() {
+			return getClass().getName() + "@" + hashCode() + "\naction=" + action + "\nbuttonModel=" + buttonModel + "\nkeyStroke=" + defaultAccelerator + "\nbound=" + bound;
 		}
 	}
 	

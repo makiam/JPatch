@@ -9,6 +9,7 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
+import jpatch.auxilary.*;
 import jpatch.boundary.*;
 import jpatch.boundary.action.*;
 
@@ -27,7 +28,7 @@ public class KeyMappingDialog extends JDialog {
 	public KeyMappingDialog() {
 		super(MainFrame.getInstance(), "Keyboard mapping", true);
 		
-		setLayout(new BorderLayout());
+		getContentPane().setLayout(new BorderLayout());
 		Collections.sort(keyList);
 		TableModel tableModel = new AbstractTableModel() {
 			public int getRowCount() {
@@ -41,7 +42,7 @@ public class KeyMappingDialog extends JDialog {
 				case 0:
 					return keyList.get(row);
 				case 1:
-					return keyMap.get(keyList.get(row));
+					return KeyStrokeUtils.keyStrokeToString(keyMap.get(keyList.get(row)));
 				case 2:
 					return new JButton("...");
 				}
@@ -184,7 +185,7 @@ public class KeyMappingDialog extends JDialog {
 				popupMenu.show(table, e.getX(), e.getY());
 			}
 		});
-		add(new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
+		getContentPane().add(new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
 		
 		JPanel buttonPanel = new JPanel();
 		JButton buttonReset = new JButton("Reset");
@@ -201,7 +202,7 @@ public class KeyMappingDialog extends JDialog {
 				dispose();
 				for (String key : keyMap.keySet()) {
 					KeyStroke ks = keyMap.get(key);
-					String accelerator = ks == null ? null : ks.toString();
+					String accelerator = ks == null ? null : KeyStrokeUtils.keyStrokeToString(ks);
 					Actions.getInstance().getAction(key).putValue(JPatchAction.ACCELERATOR, accelerator);
 				}
 				Actions.getInstance().saveKeySettings();
@@ -223,7 +224,7 @@ public class KeyMappingDialog extends JDialog {
 				}
 			}
 		});
-		add(buttonPanel, BorderLayout.SOUTH);
+		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 		checkTable();
 		setSize(500, 400);
 		setLocationRelativeTo(MainFrame.getInstance());
@@ -278,7 +279,7 @@ public class KeyMappingDialog extends JDialog {
 		public void keyPressed(KeyEvent e) {
 			e.consume();
 			ks = KeyStroke.getKeyStrokeForEvent(e);
-			setText(ks.toString());
+			setText(KeyStrokeUtils.keyStrokeToString(ks));
 //			setBackground(Color.WHITE);
 			table.repaint();
 		}
@@ -344,7 +345,7 @@ public class KeyMappingDialog extends JDialog {
 			KeyStrokeTextField(KeyStroke ks) {
 				super(20);
 				if (ks != null) {
-					setText(ks.toString());
+					setText(KeyStrokeUtils.keyStrokeToString(ks));
 					ok.setEnabled(true);
 				} else {
 					setBackground(Color.YELLOW);

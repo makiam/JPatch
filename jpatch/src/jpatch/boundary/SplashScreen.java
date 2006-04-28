@@ -21,8 +21,6 @@
  */
 package jpatch.boundary;
 
-import com.sun.org.apache.bcel.internal.util.ClassLoader;
-
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.event.*;
