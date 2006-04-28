@@ -1,5 +1,5 @@
 /*
- * $Id: UIFactory.java,v 1.19 2006/04/25 20:24:26 sascha_l Exp $
+ * $Id: UIFactory.java,v 1.20 2006/04/28 13:08:58 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -59,7 +59,6 @@ public class UIFactory extends DefaultHandler {
 //		}
 //	};
 	public void parseLayout(URL url) {
-		
 		XMLReader xmlReader = null;
 		try {
 			xmlReader = XMLReaderFactory.createXMLReader();

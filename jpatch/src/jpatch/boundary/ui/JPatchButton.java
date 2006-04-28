@@ -59,24 +59,28 @@ public class JPatchButton extends JButton implements KeyBindingHelper.CallBack {
 			setDisabledSelectedIcon(new ImageIcon(ClassLoader.getSystemResource(disabledSelectedIcon)));
 		String acceleratorText = null;
 		if (accelerator != null) {
-			String acceleratorDelimiter = UIManager.getString("MenuItem.acceleratorDelimiter");
-			if (acceleratorDelimiter == null)
-				acceleratorDelimiter = "+";
 			KeyStroke ks =  KeyStroke.getKeyStroke(accelerator);
-			int color = UIManager.getColor("ToolTip.foregroundInactive").getRGB() & 0xffffff;
-			acceleratorText = "&nbsp;&nbsp;&nbsp;<font style='font-size: 90%; color: #" + Integer.toHexString(color) + "'>";
-			int modifiers = ks.getModifiers();
-            if (modifiers > 0) {
-                acceleratorText += KeyEvent.getKeyModifiersText(modifiers);
-                acceleratorText += acceleratorDelimiter;
-            }
-            int keyCode = ks.getKeyCode();
-            if (keyCode != 0) {
-                acceleratorText += KeyEvent.getKeyText(keyCode);
-            } else {
-                acceleratorText += ks.getKeyChar();
-            }
-            acceleratorText += "</font>";
+			if (ks != null) {
+				String acceleratorDelimiter = UIManager.getString("MenuItem.acceleratorDelimiter");
+				if (acceleratorDelimiter == null)
+					acceleratorDelimiter = "+";
+				int color = UIManager.getColor("ToolTip.foregroundInactive").getRGB() & 0xffffff;
+				acceleratorText = "&nbsp;&nbsp;&nbsp;<font style='font-size: 90%; color: #" + Integer.toHexString(color) + "'>";
+				int modifiers = ks.getModifiers();
+	            if (modifiers > 0) {
+	                acceleratorText += KeyEvent.getKeyModifiersText(modifiers);
+	                acceleratorText += acceleratorDelimiter;
+	            }
+	            int keyCode = ks.getKeyCode();
+	            if (keyCode != 0) {
+	                acceleratorText += KeyEvent.getKeyText(keyCode);
+	            } else {
+	                acceleratorText += ks.getKeyChar();
+	            }
+	            acceleratorText += "</font>";
+			} else {
+				System.out.println("No Keystroke: " + accelerator);
+			}
         }
 		if (toolTipText != null) {
 			if (acceleratorText != null)

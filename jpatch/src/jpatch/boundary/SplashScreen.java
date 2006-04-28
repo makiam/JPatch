@@ -1,5 +1,5 @@
 /*
- * $Id: SplashScreen.java,v 1.12 2006/04/26 14:42:11 sascha_l Exp $
+ * $Id: SplashScreen.java,v 1.13 2006/04/28 13:08:58 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -20,8 +20,6 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 package jpatch.boundary;
-
-import com.sun.org.apache.bcel.internal.util.ClassLoader;
 
 import java.awt.*;
 import java.awt.geom.*;
