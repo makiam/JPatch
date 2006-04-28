@@ -8,7 +8,6 @@ import javax.swing.tree.*;
 import jpatch.auxilary.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
-import jpatch.boundary.filefilters.*;
 import jpatch.boundary.settings.Settings;
 import jpatch.control.*;
 import jpatch.control.importer.*;
@@ -52,17 +51,16 @@ public final class ImportJPatchAction extends AbstractAction {
 	
 	private void load() {
 		JFileChooser fileChooser = new JFileChooser(Settings.getInstance().directories.jpatchFiles);
-		javax.swing.filechooser.FileFilter defaultFileFilter = new JPatchFilter();
-		fileChooser.addChoosableFileFilter(defaultFileFilter);
-		fileChooser.addChoosableFileFilter(new AMFilter());
-		fileChooser.addChoosableFileFilter(new SPatchFilter());
-		fileChooser.setFileFilter(defaultFileFilter);
+		fileChooser.addChoosableFileFilter(FileFilters.JPATCH);
+		fileChooser.addChoosableFileFilter(FileFilters.AM_MODELS);
+		fileChooser.addChoosableFileFilter(FileFilters.SPATCH);
+		fileChooser.setFileFilter(FileFilters.JPATCH);
 		if (fileChooser.showOpenDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
 			String filename = file.getPath();
 			if (bNewModel) MainFrame.getInstance().newModel();
 			ModelImporter modelImporter;
-			String extension = JPatchUtils.getFileExtension(filename);
+			String extension = FileFilters.getExtension(file);
 			//System.out.println(extension);
 			if (extension.equals("spt")) {
 				modelImporter = new SPatchImport();
