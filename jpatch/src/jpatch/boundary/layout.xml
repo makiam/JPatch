@@ -84,6 +84,8 @@
 			<item command="save"/>
 			<item command="save as"/>
 			<separator/>
+			<item command="render animation"/>
+			<separator/>
 			<menu name="Import" mnemonic="i" icon="jpatch/images/prefs/import.png">
 				<item command="import spatch"/>
 				<item command="import animationmaster"/>

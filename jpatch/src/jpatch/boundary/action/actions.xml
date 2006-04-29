@@ -402,17 +402,17 @@
 		<property key="Mnemonic" value="i"/>
 	</action>
 	<action name="jpatch lookandfeel" model="default">
-		<constructor>new SwitchLookAndFeelAction("jpatch.boundary.laf.SmoothLookAndFeel")</constructor>
+		<constructor>new SwitchLookAndFeelAction(Settings.Plaf.JPATCH)</constructor>
 		<property key="ShortDescription" value="JPatch look-and-feel"/>
 		<property key="Mnemonic" value="j"/>
 	</action>
 	<action name="crossplatform lookandfeel" model="default">
-		<constructor>new SwitchLookAndFeelAction(UIManager.getCrossPlatformLookAndFeelClassName())</constructor>
+		<constructor>new SwitchLookAndFeelAction(Settings.Plaf.CROSS_PLATFORM)</constructor>
 		<property key="ShortDescription" value="Crossplatform look-and-feel"/>
 		<property key="Mnemonic" value="c"/>
 	</action>
 	<action name="system lookandfeel" model="default">
-		<constructor>new SwitchLookAndFeelAction(UIManager.getSystemLookAndFeelClassName())</constructor>
+		<constructor>new SwitchLookAndFeelAction(Settings.Plaf.SYSTEM)</constructor>
 		<property key="ShortDescription" value="System look-and-feel"/>
 		<property key="Mnemonic" value="s"/>
 	</action>
@@ -645,5 +645,9 @@
 		<property key="ShortDescription" value="Edit keyboard shortcuts..."/>
 		<property key="Mnemonic" value="k"/>
 		<property key="Icon" value="jpatch/images/keys.png"/>
+	</action>
+	<action name="render animation" model="default">
+		<constructor>new RenderAnimationAction()</constructor>
+		<property key="ShortDescription" value="Render animation"/>
 	</action>
 </actions>
