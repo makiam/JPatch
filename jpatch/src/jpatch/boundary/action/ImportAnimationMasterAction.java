@@ -48,6 +48,7 @@ public final class ImportAnimationMasterAction extends AbstractAction {
 			modelImporter.importModel(MainFrame.getInstance().getModel(),filename);
 			//MainFrame.getInstance().getModel().computePatches();
 			Settings.getInstance().directories.animationmasterFiles = file.getParentFile();
+			MainFrame.getInstance().setFilename(file.getName());
 		}
 		MainFrame.getInstance().getJPatchScreen().zoomToFit_all();
 	}

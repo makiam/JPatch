@@ -58,12 +58,11 @@ public final class SaveAsAction extends AbstractAction {
 		fileChooser.addChoosableFileFilter(FileFilters.JPATCH);
 		if (fileChooser.showSaveDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
-			String filename = file.getPath();
 			//System.out.println(filename + " " + JPatchUtils.getFileExtension(file.getName()));
 			if (FileFilters.getExtension(file).equals("")) {
-				filename = filename + ".jpt";
+				file = new File(file.getPath() +  ".jpt");
 			}
-			if (write(filename)) {
+			if (write(file)) {
 //				JPatchUserSettings.getInstance().strJPatchFile = filename;
 				return true;
 			}
@@ -73,25 +72,27 @@ public final class SaveAsAction extends AbstractAction {
 		
 		
 	public boolean save() {
-		return saveAs();
-//		String filename = JPatchUserSettings.getInstance().strJPatchFile;
-//		if (filename.equals("")) {
-//			return saveAs();
-//		} else {
-//			return write(filename);
-//		}
+		File file;
+		if (MainFrame.getInstance().getAnimation() != null)
+			file = MainFrame.getInstance().getAnimation().getFile();
+		else
+			file = MainFrame.getInstance().getModel().getFile();
+		if (file != null)
+			return write(file);
+		else
+			return saveAs();
 	}
 	
-	private boolean write(String filename) {
+	private boolean write(File file) {
+		String filename = file.getPath();
 		try {
 			// create xml representation
 			StringBuffer xml;
-			if (MainFrame.getInstance().getAnimation() != null)
+			if (MainFrame.getInstance().getAnimation() != null) {
 				xml = MainFrame.getInstance().getAnimation().xml("\t");
-			else
+			} else {
 				xml = MainFrame.getInstance().getModel().xml("\t");
-			
-			File file = new File(filename);
+			}
 			// make backup
 			if (file.exists()) {
 				BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -112,6 +113,11 @@ public final class SaveAsAction extends AbstractAction {
 			writer.close();
 			MainFrame.getInstance().getUndoManager().setChange(false);
 			//System.out.println("file " + filename + " written.");
+			if (MainFrame.getInstance().getAnimation() != null)
+				MainFrame.getInstance().getAnimation().setFile(file);
+			else
+				MainFrame.getInstance().getModel().setFile(file);
+			MainFrame.getInstance().setFilename(file.getName());
 			return true;
 		} catch (IOException ioException) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(),"Unable to save file \"" + filename + "\"\n" + ioException, "Error", JOptionPane.ERROR_MESSAGE);

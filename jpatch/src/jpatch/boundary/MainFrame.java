@@ -109,11 +109,8 @@ public final class MainFrame extends JFrame {
 			setIconImage(im);
 		} catch (Exception e) { }
 		
-		if (VersionInfo.release) {
-			setTitle("JPatch " + VersionInfo.version);
-		} else {
-			setTitle("JPatch " + VersionInfo.version + " compiled " + VersionInfo.compileTime);
-		}
+//		setTitle("JPatch " + VersionInfo.version);
+		
 //		this.model = model;
 		if (INSTANCE == null) {
 			INSTANCE = this;
@@ -514,6 +511,14 @@ public final class MainFrame extends JFrame {
 		
 		jpatchScreen.update_all();
 //		Actions.getInstance().enableAction("show anim controls", false);
+		setFilename("");
+	}
+	
+	public void setFilename(String filename) {
+		if (!filename.equals(""))
+			setTitle(filename + " - " + "JPatch " + VersionInfo.version);
+		else
+			setTitle("JPatch " + VersionInfo.version);
 	}
 	
 	public void newAnimation() {
@@ -574,6 +579,7 @@ public final class MainFrame extends JFrame {
 		jpatchScreen.update_all();
 //		Actions.getInstance().enableAction("show anim controls", true);
 //		jpatchScreen.getActiveViewport().getViewDefinition().setCamera(animation.getCameras().get(0));
+		setFilename("");
 	}
 	
 	public void showAnimControls() {

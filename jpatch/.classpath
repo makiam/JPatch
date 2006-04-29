@@ -8,7 +8,11 @@
 			<attribute value="jpatch/lib/native/linux_x86" name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<accessrules>
+			<accessrule kind="nonaccessible" pattern="com/sun"/>
+		</accessrules>
+	</classpathentry>
 	<classpathentry kind="lib" path="lib/retroweaver-rt-1.2.3.jar"/>
 	<classpathentry kind="lib" path="lib/xerces.jar"/>
 	<classpathentry kind="output" path="bin"/>

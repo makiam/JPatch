@@ -2,6 +2,7 @@ package jpatch.entity;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.*;
 
 import javax.swing.AbstractAction;
@@ -27,6 +28,7 @@ public class Animation implements MutableTreeNode {
 	private AnimTreeNode treenodeLights = new AnimTreeNode("Lights", listLights);
 	private AnimTreeNode treenodeCameras = new AnimTreeNode("Cameras", listCameras);
 	private Map<Model, Pose> mapClipboardPose = new HashMap<Model, Pose>();
+	private File file;
 	
 	private RenderExtension re = new RenderExtension(new String[] {
 			"povray", "",
@@ -374,5 +376,13 @@ public class Animation implements MutableTreeNode {
 		public Enumeration children() {
 			return Collections.enumeration(list);
 		}
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
 	}
 }

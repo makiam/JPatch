@@ -54,6 +54,9 @@ public class AnimationImporter extends DefaultHandler {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 		}
+		File file = new File(filename);
+		animation.setFile(file);
+		MainFrame.getInstance().setFilename(file.getName());
 	}
 	
 	public void startElement(String namespaceURI, String localName, String qName, Attributes attributes) {

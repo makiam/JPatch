@@ -49,6 +49,7 @@ public final class ImportSPatchAction extends AbstractAction {
 			modelImporter.importModel(MainFrame.getInstance().getModel(),filename);
 			//MainFrame.getInstance().getModel().computePatches();
 			Settings.getInstance().directories.spatchFiles = file.getParentFile();
+			MainFrame.getInstance().setFilename(file.getName());
 		}
 		MainFrame.getInstance().getJPatchScreen().zoomToFit_all();
 	}
