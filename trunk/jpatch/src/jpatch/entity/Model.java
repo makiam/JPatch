@@ -1,6 +1,7 @@
 package jpatch.entity;
 
 
+import java.io.File;
 import java.util.*;
 
 import javax.swing.ListModel;
@@ -46,6 +47,7 @@ public class Model implements MutableTreeNode {
 	private String strName;
 	private Rotoscope[] aRotoscope = new Rotoscope[6];
 	private boolean bInserted = false;
+	private File file;
 	//private ArrayList listeners = new ArrayList();
 	
 	public Model() {
@@ -1248,6 +1250,14 @@ public class Model implements MutableTreeNode {
 		public Enumeration children() {
 			return Collections.enumeration(list);
 		}
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
 	}
 }
 
