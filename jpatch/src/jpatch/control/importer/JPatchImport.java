@@ -1,7 +1,7 @@
 package jpatch.control.importer;
 
 import java.util.*;
-
+import java.io.*;
 
 import javax.vecmath.*;
 
@@ -104,6 +104,9 @@ implements ModelImporter {
 		}
 		model.addCandidateFivePointPatchList(listCandidateFivePointPatch);
 		model.computePatches();
+		File file = new File(filename);
+		model.setFile(file);
+		MainFrame.getInstance().setFilename(file.getName());
 		return "";
 	}
 	
