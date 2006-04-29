@@ -13,7 +13,7 @@ public final class EditPhonemesAction extends AbstractAction {
 		super("Edit phoneme-morph-mapping...");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		new PhonemeMappingEditor();
+//		new PhonemeMappingEditor();
 	}
 }
 

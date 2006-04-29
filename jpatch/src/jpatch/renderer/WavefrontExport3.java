@@ -4,12 +4,13 @@ import java.io.*;
 import java.util.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
+import jpatch.boundary.settings.AliasWavefrontSettings;
 
 public class WavefrontExport3 {
 	public static final int TRIANGLES = 0;
 	public static final int QUADS = 1;
 	
-	public void writeToFile(File objfile, File mtlfile, int subdiv, boolean exportNormals, int mode) {
+	public void writeToFile(File objfile, File mtlfile, int subdiv, boolean exportNormals, AliasWavefrontSettings.Mode mode) {
 		
 		BufferedWriter file;
 		Model model = MainFrame.getInstance().getModel();
@@ -100,7 +101,7 @@ public class WavefrontExport3 {
 							else file.write("f " + (triangle[i][0] + 1) + " " + (triangle[i][1] + 1) + " " + (triangle[i][2] + 1) + "\n");
 						}
 					} break;
-					case QUADS: {
+					case QUADRILATERALS: {
 						int[][] quad = patchTesselator.getMaterialQuadArray(material);
 						for (int i = 0; i < quad.length; i++) {
 							if (quad[i].length == 3) {

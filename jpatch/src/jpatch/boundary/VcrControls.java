@@ -9,10 +9,6 @@ import java.beans.VetoableChangeListener;
 import javax.sound.sampled.*;
 import javax.swing.*;
 
-import buoy.event.MouseClickedEvent;
-import buoy.widget.AWTWidget;
-import buoy.widget.BTextField;
-
 import jpatch.entity.*;
 
 

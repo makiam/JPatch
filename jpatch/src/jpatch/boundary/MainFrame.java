@@ -18,8 +18,6 @@ import javax.swing.text.JTextComponent;
 import javax.swing.tree.*;
 import javax.vecmath.*;
 
-import buoy.event.KeyPressedEvent;
-
 import jpatch.*;
 import jpatch.entity.*;
 import jpatch.boundary.settings.Settings;

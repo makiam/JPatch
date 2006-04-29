@@ -24,8 +24,7 @@ public final class ExportPovrayAction extends AbstractAction {
 				Settings.getInstance().directories.povrayFiles = file.getParentFile();
 			try {
 				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-				PovrayRenderer3 povrayExport = new PovrayRenderer3();
-				povrayExport.writeModel(MainFrame.getInstance().getModel(), null, "", 0, writer);
+				new PovrayRenderer3().writeModel(MainFrame.getInstance().getModel(), null, "", 0, writer);
 				writer.close();
 			} catch (IOException exception) {
 				exception.printStackTrace();

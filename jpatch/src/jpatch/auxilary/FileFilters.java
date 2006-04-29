@@ -121,6 +121,23 @@ public class FileFilters {
 	};
 	
 	/**
+	 * FileFilter for Alias|Wavefront (*.obj) files
+	 */
+	public static final FileFilter OBJ = new FileFilter() {
+		@Override
+		public String getDescription() {
+			return "Alias|Wavefront (*.obj)";
+		}
+		@Override
+		public boolean accept(File f) {
+			if (f.isDirectory())
+				return true;
+			String ext = getExtension(f);
+			return ext.equals("obj");
+		}		
+	};
+	
+	/**
 	 * FileFilter for image files (all formats supported by javax.imageIO.ImageIO)
 	 */
 	public static final FileFilter IMAGES = new FileFilter() {

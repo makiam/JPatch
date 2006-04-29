@@ -3,9 +3,6 @@ package jpatch.boundary.action;
 import java.awt.event.*;
 import javax.swing.*;
 
-import buoy.widget.AWTWidget;
-import buoy.widget.BFrame;
-import buoy.widget.WindowWidget;
 import jpatch.entity.*;
 import jpatch.boundary.*;
 
@@ -23,6 +20,6 @@ public final class EditAnimObjectAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		new AnimObjectEditor(animObject, new BFrame());
+//		new AnimObjectEditor(animObject, new BFrame());
 	}
 }
