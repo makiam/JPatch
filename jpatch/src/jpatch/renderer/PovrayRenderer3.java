@@ -16,6 +16,7 @@ public class PovrayRenderer3 {
 	public void writeFrame(List animModels, Camera camera, List lights, String include, BufferedWriter file) throws IOException {
 		Settings settings = Settings.getInstance();
 
+		System.out.println("writing to " + file);
 		/* Header */
 		
 		file.write("/*\n");
@@ -47,8 +48,7 @@ public class PovrayRenderer3 {
 		file.write(" */\n");
 		file.write("\n");
 		file.write("background {\n");
-		float[] rgb = settings.export.backgroundColor.get().getRGBColorComponents(new float[3]);
-		file.write("\tcolor rgb <" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ">\n");
+		file.write("\tcolor rgb " + toPovVector(settings.export.backgroundColor) + "\n");
 		file.write("}\n\n");
 		
 		/* Camera */

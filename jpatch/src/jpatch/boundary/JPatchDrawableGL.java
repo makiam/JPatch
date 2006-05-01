@@ -453,7 +453,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 					0, 0, 0, 1
 			});
 			if (bPerspective) {
-				float a = 35f / fFocalLength;
+				float a = 35f / fFocalLength / 2;
 				float b = a * h / w;
 				gl.glDepthFunc(GL.GL_GEQUAL);
 				gl.glFrustum(-a, a, -b, b, 1, Short.MAX_VALUE);

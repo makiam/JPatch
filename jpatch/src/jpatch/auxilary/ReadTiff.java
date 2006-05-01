@@ -137,7 +137,7 @@ public final class ReadTiff {
 	//		
 	//}
 
-	public Image loadImage(File file) throws Exception {
+	public BufferedImage loadImage(File file) throws Exception {
 		readFileToBuffer(file);
 		readHeader();
 		readDirEntries();
@@ -146,7 +146,7 @@ public final class ReadTiff {
 		return createImage();
 	}
 	
-	private Image createImage() {
+	private BufferedImage createImage() {
 	
 		// create an RGB buffer to hold the image
 	    BufferedImage image = new BufferedImage(imageWidth, imageLength, BufferedImage.TYPE_INT_RGB);

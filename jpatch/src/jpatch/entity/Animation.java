@@ -62,6 +62,10 @@ public class Animation implements MutableTreeNode {
 		return fPosition;
 	}
 
+	public Camera getActiveCamera() {
+		return listCameras.get(0);
+	}
+	
 	public Pose getClipboardPose(Model model) {
 		Pose pose = mapClipboardPose.get(model);
 		if (pose == null) {

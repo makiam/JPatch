@@ -125,7 +125,9 @@ public class InyoRenderer3 {
 			 * Tell JPatch about the rendering progress
 			 * @param progress 0.0 means rendering just started, 0.5 means half way done, 1.0 means rendering finished.
 			 */
-			public void progress(double progress) { }
+			public void progress(double progress) {
+				System.out.println("progress: " + progress);
+			}
 			
 			/**
 			 * Pass the rendered image back to JPatch
