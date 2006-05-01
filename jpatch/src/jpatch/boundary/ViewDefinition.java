@@ -520,7 +520,7 @@ implements ComponentListener {
 			float focalLength = camera.getFocalLength();
 			focalLength *= scale;
 			camera.setFocalLength(focalLength);
-			drawable.setFocalLength(focalLength);
+			drawable.setFocalLength(focalLength / Viewport2.OVERSCAN);
 			drawable.display();
 			return;
 		}
