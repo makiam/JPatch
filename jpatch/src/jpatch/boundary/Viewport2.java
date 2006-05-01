@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.56 2006/05/01 19:27:44 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.57 2006/05/01 19:48:39 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -164,26 +164,36 @@ public class Viewport2 {
 			drawable.drawString("!!!EDIT MORPH MODE!!!", (int) viewDef.getWidth() - 140, 16);
 		if (MainFrame.getInstance().getAnimation() != null)
 			drawable.drawString("Frame " + (int) MainFrame.getInstance().getAnimation().getPosition(), 4, (int) viewDef.getHeight() - 4);
+		drawable.drawString(Long.toString(System.currentTimeMillis()), 8, 48);
 		if (viewDef.getCamera() != null) {
 			int W = (int) viewDef.getWidth();
 			int H = (int) viewDef.getHeight();
 //			float w;
 			int hh, ww;
 			float ar = settings.export.aspectWidth / settings.export.aspectHeight;
-			if (W / ar < H) {
+//			if (W / ar < H) {
 				ww = (int) (W / OVERSCAN);
 				hh = (int) (ww / ar);
 //				w = (float) viewDef.getCamera().getFocalLength() * (float) W / OVERSCAN / (float) viewDef.getCamera().getFilmSize();
-			} else {
-				hh = (int) (H / OVERSCAN);
-				ww = (int) (hh * ar);
+//			} else {
+//				hh = (int) (H / OVERSCAN);
+//				ww = (int) (hh * ar);
 //				w = (float) viewDef.getCamera().getFocalLength() * (float) H / OVERSCAN / (float) (viewDef.getCamera().getFilmSize() / ar);
-			}
+//			}
 			drawable.setColor(settings.colors.majorGrid);
-			drawable.drawRect((W - ww) >> 1, (H - hh) >> 1, ww, hh);
-			drawable.drawRect(((W - ww) >> 1) - 1, ((H - hh) >> 1) - 1, ww + 2, hh + 2);
+			int left = (W - ww) >> 1;
+			int top = (H - hh) >> 1;
+			drawable.drawRect(left, top, ww, hh);
+			drawable.drawRect(left - 1, top - 1, ww + 2, hh + 2);
+			drawable.setColor(settings.colors.minorGrid);
+			drawable.drawLine(left + ww / 3, top + 1, left + ww / 3, top + hh);
+			drawable.drawLine(left + ww / 2, top + 1, left + ww / 2, top + hh);
+			drawable.drawLine(left + ww * 2 / 3, top + 1, left + ww * 2 / 3, top + hh);
+			drawable.drawLine(left + 1, top + hh / 3, left + ww, top + hh / 3);
+			drawable.drawLine(left + 1, top + hh / 2, left + ww, top + hh / 2);
+			drawable.drawLine(left + 1, top + hh * 2/ 3, left + ww, top + hh * 2 / 3);
 		}
-		drawable.drawString(Long.toString(System.currentTimeMillis()), 8, 48);
+		
 		
 		
 	}
