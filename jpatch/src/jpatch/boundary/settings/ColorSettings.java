@@ -1,5 +1,5 @@
 /*
- * $Id: ColorSettings.java,v 1.2 2006/02/01 21:11:28 sascha_l Exp $
+ * $Id: ColorSettings.java,v 1.3 2006/05/02 19:27:47 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -25,7 +25,7 @@ import java.awt.Color;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.vecmath.Color3f;
+import javax.vecmath.*;
 
 public class ColorSettings extends AbstractSettings {
 	Icon icon = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/prefs/colors.png"));
@@ -49,5 +49,7 @@ public class ColorSettings extends AbstractSettings {
 	public Color3f zAxis = new Color3f(new Color(128,128,255));
 	public Color3f grey = new Color3f(new Color(0x50,0x60,0x70));
 	public Color3f backfacingPatches = new Color3f(new Color(255,0,0));
+	public Color3f passiveCamera = new Color3f(new Color(0x38,0x48,0x58));
+	public Color3f activeCamera = new Color3f(new Color(0x58,0x68,0x78));
 	public float ghostFactor = 0.33f;
 }

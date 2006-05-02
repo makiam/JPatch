@@ -236,6 +236,8 @@ implements TreeSelectionListener {
 			replacePanel(new LightPanel((AnimLight) selectedNode));
 		} else if (anim && selectedNode instanceof AnimModel) {
 			replacePanel(new AnimModelPanel((AnimModel) selectedNode));
+		} else if (anim && selectedNode instanceof Animation) {
+			replacePanel(new AnimationPanel(MainFrame.getInstance().getAnimation()));
 		} else {
 			replacePanel(new SidePanel());
 			detailPanel.removeAll();

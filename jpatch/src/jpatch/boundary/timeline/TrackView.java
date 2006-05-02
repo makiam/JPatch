@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.21 2006/04/25 16:23:04 sascha_l Exp $
+ * $Id: TrackView.java,v 1.22 2006/05/02 19:27:47 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -54,7 +54,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	}
 	
 	public Dimension getPreferredSize() {
-		dim.setSize(timelineEditor.getFrameWidth() * MainFrame.getInstance().getAnimation().getEnd(), timelineEditor.getTracksHeight() + 7); // FIXME: use animation length
+		Animation anim = MainFrame.getInstance().getAnimation();
+		dim.setSize(timelineEditor.getFrameWidth() * (anim.getEnd() - anim.getStart()), timelineEditor.getTracksHeight() + 7);
 		return dim;
 	}
 	
@@ -94,9 +95,15 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		}
 		
 		g.setColor(TimelineEditor.TICK);
-		int frame = start / fw - 1;
+		int frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
+		int minor;
+		if (MainFrame.getInstance().getAnimation().getFramerate() == 24) {
+			minor = 6;
+		} else {
+			minor = 5;
+		}
 		for (int x = -fw ; x <= clip.width + fw; x += fw) {
-			if (frame % 6 == 0) {
+			if (frame % minor == 0) {
 //				g.setColor(TimelineEditor.TICK);
 				g.drawLine(x + start, clip.y, x + start, clip.y + clip.height);
 //				g.setColor(TimelineEditor.HIGHLIGHT);
@@ -126,10 +133,10 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //		g.setClip(clip.x, clip.y, clip.width, timelineEditor.getViewport().getHeight());
 //		g.fillRect(clip.x, y, clip.x + clip.width - 1, timelineEditor.getHeight() - y);
 		
-		int x = timelineEditor.getCurrentFrame() * fw + fw / 2;
+		int x = (timelineEditor.getCurrentFrame() - (int) MainFrame.getInstance().getAnimation().getStart()) * fw + fw / 2;
 		g.setColor(Color.BLACK);
 		g.drawLine(x, clip.y, x, clip.y + clip.height - 1);
-		g.fillPolygon(new int[] { x - 6, x + 6, x }, new int[] { getHeight() - 0, getHeight() - 0, getHeight() - 7}, 3);
+//		g.fillPolygon(new int[] { x - 6, x + 6, x }, new int[] { getHeight() - 0, getHeight() - 0, getHeight() - 7}, 3);
 		
 		g.setColor(Color.BLACK);
 		g.drawLine(clip.x, y + 6, clip.x + clip.width - 1, y + 6);
@@ -363,7 +370,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			timelineEditor.setCursor(TimelineEditor.verticalResizeCursor);
 		else 
 			timelineEditor.setCursor(TimelineEditor.defaultCursor);
-		int frame = e.getX() / timelineEditor.getFrameWidth();
+		int frame = e.getX() / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
 		timelineEditor.setCornerText("Frame " + frame);
 	}
 	
@@ -378,13 +385,27 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		JPopupMenu popup = new JPopupMenu();
 		JMenuItem mi;
 		
-		final int frame = e.getX() / timelineEditor.getFrameWidth();
+		boolean selected = timelineEditor.getHeader().getSelectedTracks().size() == 1;
+		boolean multiSelection = timelineEditor.getHeader().getSelectedTracks().size() > 1;
+		String selectedTrackName = null;
+		if (selected && !multiSelection)
+			for (Track t : timelineEditor.getHeader().getSelectedTracks())
+				selectedTrackName = t.getName();
+		boolean hidden = false;
+		for (Track t : timelineEditor.getTracks()) {
+			if (t.isHidden()) {
+				hidden = true;
+				break;
+			}
+		}
+		
+		final int frame = e.getX() / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
 //		popup.add(new JLabel(track.getName()));
 		
 		/*
 		 * go to this frame
 		 */
-		mi = new JMenuItem("go to this frame");
+		mi = new JMenuItem("go to this frame (" + frame + ")");
 		mi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				timelineEditor.setCurrentFrame(frame);
@@ -398,9 +419,14 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		popup.add(new JSeparator());
 		
 		/*
-		 * insert key (on this track)
+		 * quick insert (insert key on this track)
 		 */
-		mi = new JMenuItem("insert key (on this track)");
+		if (!(track instanceof HeaderTrack)) {
+			mi = new JMenuItem("quick insert key");
+		} else {
+			mi = new JMenuItem("quick insert key");
+			mi.setEnabled(false);
+		}
 		mi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				JPatchUndoableEdit edit = track.insertKeyAt(frame);
@@ -416,10 +442,42 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		});
 		popup.add(mi);
 		
+		JMenu menu = new JMenu("Insert key on this frame (" + frame + ")");
+		popup.add(menu);
+		/*
+		 * insert key (on this track)
+		 */
+		if (!(track instanceof HeaderTrack)) {
+			mi = new JMenuItem("on this track (" + track.getName() + ")");
+		} else {
+			mi = new JMenuItem("on this track");
+			mi.setEnabled(false);
+		}
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				JPatchUndoableEdit edit = track.insertKeyAt(frame);
+				if (edit == null)
+					return;
+				CompoundAddKeys addKeysEdit = new CompoundAddKeys();
+				addKeysEdit.addEdit(edit);
+				MainFrame.getInstance().getUndoManager().addEdit(addKeysEdit);
+				TrackView.this.repaint();
+				MainFrame.getInstance().getAnimation().rethink();
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			}
+		});
+		menu.add(mi);
+		
 		/*
 		 * insert key (on selected tracks)
 		 */
-		mi = new JMenuItem("insert keys (on selected tracks)");
+		if (selected) {
+			mi = new JMenuItem("on selected track (" + selectedTrackName + ")");
+		} else {
+			mi = new JMenuItem("on selected tracks");
+			if (!multiSelection)
+				mi.setEnabled(false);
+		}
 		mi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				CompoundAddKeys addKeysEdit = new CompoundAddKeys();
@@ -436,12 +494,15 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				}
 			}
 		});
-		popup.add(mi);
+		menu.add(mi);
 		
 		/*
 		 * insert key (on all not hidden tracks)
 		 */
-		mi = new JMenuItem("insert keys (on all not hidden tracks)");
+		if (hidden)
+			mi = new JMenuItem("on all not hidden tracks");
+		else
+			mi = new JMenuItem("on all tracks");
 		mi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				CompoundAddKeys addKeysEdit = new CompoundAddKeys();
@@ -460,7 +521,90 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				}
 			}
 		});
-		popup.add(mi);
+		menu.add(mi);
+		
+		final int currentframe = timelineEditor.getCurrentFrame();
+		
+		menu = new JMenu("Insert key on current frame (" + currentframe + ")");
+		popup.add(menu);
+		/*
+		 * insert key (on this track)
+		 */
+		if (!(track instanceof HeaderTrack)) {
+			mi = new JMenuItem("on this track (" + track.getName() + ")");
+		} else {
+			mi = new JMenuItem("on this track");
+			mi.setEnabled(false);
+		}
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				JPatchUndoableEdit edit = track.insertKeyAt(currentframe);
+				if (edit == null)
+					return;
+				CompoundAddKeys addKeysEdit = new CompoundAddKeys();
+				addKeysEdit.addEdit(edit);
+				MainFrame.getInstance().getUndoManager().addEdit(addKeysEdit);
+				TrackView.this.repaint();
+				MainFrame.getInstance().getAnimation().rethink();
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			}
+		});
+		menu.add(mi);
+		
+		/*
+		 * insert key (on selected tracks)
+		 */
+		if (selected) {
+			mi = new JMenuItem("on selected track (" + selectedTrackName + ")");
+		} else {
+			mi = new JMenuItem("on selected tracks");
+			if (!multiSelection)
+				mi.setEnabled(false);
+		}
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				CompoundAddKeys addKeysEdit = new CompoundAddKeys();
+				for (Track track : timelineEditor.getHeader().getSelectedTracks()) {
+					JPatchUndoableEdit edit = track.insertKeyAt(currentframe);
+					if (edit != null)
+						addKeysEdit.addEdit(edit);
+				}
+				if (addKeysEdit.isValid()) {
+					MainFrame.getInstance().getUndoManager().addEdit(addKeysEdit);
+					TrackView.this.repaint();
+					MainFrame.getInstance().getAnimation().rethink();
+					MainFrame.getInstance().getJPatchScreen().update_all();
+				}
+			}
+		});
+		menu.add(mi);
+		
+		/*
+		 * insert key (on all not hidden tracks)
+		 */
+		if (hidden)
+			mi = new JMenuItem("on all not hidden tracks");
+		else
+			mi = new JMenuItem("on all tracks");
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				CompoundAddKeys addKeysEdit = new CompoundAddKeys();
+				for (Track track : timelineEditor.getTracks()) {
+					if (track.isHidden())
+						continue;
+					JPatchUndoableEdit edit = track.insertKeyAt(currentframe);
+					if (edit != null)
+						addKeysEdit.addEdit(edit);
+				}
+				if (addKeysEdit.isValid()) {
+					MainFrame.getInstance().getUndoManager().addEdit(addKeysEdit);
+					TrackView.this.repaint();
+					MainFrame.getInstance().getAnimation().rethink();
+					MainFrame.getInstance().getJPatchScreen().update_all();
+				}
+			}
+		});
+		menu.add(mi);
 		
 //		/*
 //		 * insert key (on all tracks)

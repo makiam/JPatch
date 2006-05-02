@@ -315,11 +315,12 @@ public class TimelineEditor extends JScrollPane {
 	public void setCurrentFrame(int frame) {
 //		MainFrame.getInstance().getAnimation().setPosition(frame);
 //		MainFrame.getInstance().getJPatchScreen().update_all();
-		int x = iCurrentFrame * iFrameWidth + iFrameWidth / 2;
+//		int start = (int) MainFrame.getInstance().getAnimation().getStart();
+		int x = (iCurrentFrame - (int) MainFrame.getInstance().getAnimation().getStart()) * iFrameWidth + iFrameWidth / 2;
 		iCurrentFrame = frame;
 		getViewport().getView().repaint(x - 5, 0, 11, getViewport().getView().getHeight());
 		getColumnHeader().getView().repaint(x - 5, 0, 11, getColumnHeader().getView().getHeight());
-		x = iCurrentFrame * iFrameWidth + iFrameWidth / 2;
+		x = (iCurrentFrame - (int) MainFrame.getInstance().getAnimation().getStart()) * iFrameWidth + iFrameWidth / 2;
 		getViewport().getView().repaint(x - 5, 0, 11, getViewport().getView().getHeight());
 		getColumnHeader().getView().repaint(x - 5, 0, 11, getColumnHeader().getView().getHeight());
 	}

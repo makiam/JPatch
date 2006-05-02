@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.14 2006/03/22 20:04:16 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.15 2006/05/02 19:27:46 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -27,6 +27,7 @@ import java.awt.Rectangle;
 
 import javax.swing.UIManager;
 
+import jpatch.boundary.MainFrame;
 import jpatch.entity.*;
 
 public class AvarTrack extends Track<MotionCurve.Float> {
@@ -41,7 +42,7 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
-		int frame = start / fw - 1;
+		int frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
 		
 		if (bExpanded) {
 			float min = motionCurve.getMin();
@@ -56,7 +57,7 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 				g.setColor(TimelineEditor.TRACK);
 			g.fillRect(clip.x, y + 1, clip.width, size);
 
-			frame = start / fw - 1;
+			frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
 			g.setColor(TimelineEditor.BACKGROUND);
 //			g.fillRect(clip.x, y - 3, clip.width, 3);
 			g.fillRect(clip.x, y + bottom + 1, clip.width, 3);
@@ -76,7 +77,7 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 			}
 			g.drawLine(clip.x, y + off, clip.x + clip.width, y + off);
 
-			frame = start / fw - 1;
+			frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
 			
 			int vPrev = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
 			g.setColor(Color.BLACK);
@@ -88,7 +89,7 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 				vPrev = vThis;
 			}
 			
-			frame = start / fw - 1;
+			frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
 			for (int x = -fw ; x <= clip.width + fw; x += fw) {
 				int vThis = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
 				MotionKey key = motionCurve.getKeyAt(frame);

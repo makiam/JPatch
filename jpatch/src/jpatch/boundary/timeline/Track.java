@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.12 2006/03/25 23:22:45 sascha_l Exp $
+ * $Id: Track.java,v 1.13 2006/05/02 19:27:47 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -25,6 +25,7 @@ import java.awt.*;
 
 import javax.swing.UIManager;
 
+import jpatch.boundary.MainFrame;
 import jpatch.control.edit.AtomicAddMotionKey;
 import jpatch.control.edit.AtomicModifyMotionCurve;
 import jpatch.control.edit.AtomicMoveMotionKey;
@@ -144,7 +145,7 @@ public class Track<M extends MotionCurve> {
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
-		int frame = start / fw - 1;
+		int frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
 		Color background, track;
 		if (timelineEditor.getHeader().getSelectedTracks().contains(this)) {
 			background = TimelineEditor.SELECTED_BACKGROUND;

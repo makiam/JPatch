@@ -1,5 +1,5 @@
 /*
- * $Id: Ruler.java,v 1.13 2006/04/25 16:23:04 sascha_l Exp $
+ * $Id: Ruler.java,v 1.14 2006/05/02 19:27:47 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -57,19 +57,24 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 	private Font font = new Font("Monospaced", Font.PLAIN, 10);
 	private int mouseX;
 	
+	@Override
 	public Dimension getPreferredSize() {
-		dim.setSize(timelineEditor.getFrameWidth() * MainFrame.getInstance().getAnimation().getEnd(), 16); // FIXME: use animation length
+		Animation anim = MainFrame.getInstance().getAnimation();
+		dim.setSize(timelineEditor.getFrameWidth() * (anim.getEnd() - anim.getStart()), 16); // FIXME: use animation length
 		return dim;
 	}
 	
+	@Override
 	public Dimension getMinimumSize() {
 		return getPreferredSize();
 	}
 	
+	@Override
 	public Dimension getMaximumSize() {
 		return getPreferredSize();
 	}
 	
+	@Override
 	public void paintComponent(Graphics g) {
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		super.paintComponent(g);
@@ -78,7 +83,7 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 		
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
-		int frame = start / fw - 1;
+		int frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
 		//((Graphics2D) g).setPaint(new GradientPaint(0, 0, new Color(255, 255, 128), 0, 16, getBackground().brighter()));
 		g.setColor(Color.WHITE);
 		g.fillRect(clip.x, clip.y, clip.width, clip.height);
@@ -90,14 +95,24 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 		}
 		g.setColor(Color.BLACK);
 		g.drawLine(clip.x, 15, clip.x + clip.width, 15);
-		frame = start / fw - 1;
+		frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
+		int minor, major, tick;
+		if (MainFrame.getInstance().getAnimation().getFramerate() == 24) {
+			minor = 6;
+			major = 12;
+			tick = 24;
+		} else {
+			minor = 5;
+			major = 10;
+			tick = 25;
+		}
 		for (int x = -fw ; x <= clip.width + fw; x += fw) {
-			if (frame % 6 == 0)
+			if (frame % minor == 0)
 				g.drawLine(x + start, getHeight() - 6, x + start, getHeight() - 1);
 			else
 				g.drawLine(x + start, getHeight() - 4, x + start, getHeight() - 3);
-			if (frame % 12 == 0) {
-				if (fw > 2 || frame % 24 == 0) {
+			if (frame % major == 0) {
+				if (fw > 2 || frame % tick == 0) {
 					String num = String.valueOf(frame);
 					g.drawString(num, x + start - num.length() * 3 + 1, 9);
 				}
@@ -150,7 +165,7 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 			
 			if (x > 10 * fw - 4 && x < 10 * fw + 4 && e.getY() < 8) {
 				state = State.RESIZE;
-			} else if (e.getX() > timelineEditor.getCurrentFrame() * fw - 5 && e.getX() < timelineEditor.getCurrentFrame() * fw + 11) {
+			} else if (e.getX() > (timelineEditor.getCurrentFrame() - (int) MainFrame.getInstance().getAnimation().getStart()) * fw - 5 && e.getX() < (timelineEditor.getCurrentFrame() - (int) MainFrame.getInstance().getAnimation().getStart()) * fw + 11) {
 				state = State.FRAME;
 			}
 		} else if (e.getButton() == MouseEvent.BUTTON2) {
@@ -186,7 +201,7 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 //			timelineEditor.getVerticalScrollBar().setValue(sby - dy);
 			break;
 		case FRAME:
-			int frame = e.getX() / timelineEditor.getFrameWidth();
+			int frame = e.getX() / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
 			timelineEditor.setCornerText("Frame " + frame);
 			Animation anim = MainFrame.getInstance().getAnimation();
 			if (anim.getPosition() != frame) {
@@ -216,7 +231,7 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 			setCursor(TimelineEditor.defaultCursor);
 			setToolTipText("");
 		}
-		int frame = e.getX() / fw;
+		int frame = e.getX() / fw + (int) MainFrame.getInstance().getAnimation().getStart();
 		timelineEditor.setCornerText("Frame " + frame);
 	}
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.57 2006/05/01 19:48:39 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.58 2006/05/02 19:27:46 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -180,12 +180,14 @@ public class Viewport2 {
 //				ww = (int) (hh * ar);
 //				w = (float) viewDef.getCamera().getFocalLength() * (float) H / OVERSCAN / (float) (viewDef.getCamera().getFilmSize() / ar);
 //			}
-			drawable.setColor(settings.colors.majorGrid);
+			
+			drawable.setColor(settings.colors.activeCamera);
 			int left = (W - ww) >> 1;
 			int top = (H - hh) >> 1;
 			drawable.drawRect(left, top, ww, hh);
 			drawable.drawRect(left - 1, top - 1, ww + 2, hh + 2);
-			drawable.setColor(settings.colors.minorGrid);
+			
+//			drawable.setColor(settings.colors.minorGrid);
 			drawable.drawLine(left + ww / 3, top + 1, left + ww / 3, top + hh);
 			drawable.drawLine(left + ww / 2, top + 1, left + ww / 2, top + hh);
 			drawable.drawLine(left + ww * 2 / 3, top + 1, left + ww * 2 / 3, top + hh);

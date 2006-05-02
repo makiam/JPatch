@@ -150,7 +150,8 @@ implements ActionListener, FocusListener {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		float old = fValue;
+		float fOld = fValue;
+		int iOld = iValue;
 		try {
 			switch (iType) {
 				case FLOAT:
@@ -168,7 +169,7 @@ implements ActionListener, FocusListener {
 		}
 		//clampValue();
 		updateTextField();
-		bChanged = fValue != old;
+		bChanged = fValue != fOld || iValue != iOld;
 		if (bChanged || iType == STRING)
 			fireStateChanged();
 	}
