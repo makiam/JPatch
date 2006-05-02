@@ -8,6 +8,7 @@ import java.util.*;
 
 import javax.swing.UIManager;
 
+import jpatch.boundary.MainFrame;
 import jpatch.control.edit.*;
 import jpatch.entity.*;
 
@@ -46,7 +47,7 @@ public class BoneTrack extends Track {
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
-		int frame = start / fw - 1;
+		int frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
 		
 		if (bExpanded) {
 			float min = 0, max = 0;
@@ -66,7 +67,7 @@ public class BoneTrack extends Track {
 				g.setColor(TimelineEditor.TRACK);
 			g.fillRect(clip.x, y + 1, clip.width, size);
 
-			frame = start / fw - 1;
+			frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
 			g.setColor(TimelineEditor.BACKGROUND);
 //			g.fillRect(clip.x, y - 3, clip.width, 3);
 			g.fillRect(clip.x, y + bottom + 1, clip.width, 3);
@@ -86,7 +87,7 @@ public class BoneTrack extends Track {
 			}
 			g.drawLine(clip.x, y + off, clip.x + clip.width, y + off);
 
-			frame = start / fw - 1;
+			frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
 			for (int i = motionCurves.length - 1; i >= 0; i--) {
 				MotionCurve.Float motionCurve = motionCurves[i];
 				int vPrev = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));

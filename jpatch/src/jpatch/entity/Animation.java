@@ -193,8 +193,17 @@ public class Animation implements MutableTreeNode {
 		return treenodeCameras;
 	}
 	
+	@Override
 	public String toString() {
 		return strName;
+	}
+	
+	public String getName() {
+		return strName;
+	}
+	
+	public void setName(String name) {
+		strName = name;
 	}
 	
 	public MotionCurveSet getCurvesetFor(AnimObject animObject) {

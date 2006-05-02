@@ -32,15 +32,14 @@ public class AnimationRenderer {
 			progressDisplay = new ProgressDisplay((int) anim.getStart(), (int) anim.getEnd());
 			/* synchronize to create memory barrier in EventDispatching thread */
 			synchronized(this) {
-				new Thread() {
-					@Override
+				new Thread(new Runnable() {
 					public void run() {
 						/* synchronize to create memory barrier in rendering thread */
 						synchronized(this) {
 							renderFrame("FRAME");
 						}
 					}
-				}.start();
+				}).start();
 			}
 			progressDisplay.setVisible(true);
 		} catch (IOException e) {

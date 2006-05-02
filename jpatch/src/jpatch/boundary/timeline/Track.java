@@ -25,6 +25,7 @@ import java.awt.*;
 
 import javax.swing.UIManager;
 
+import jpatch.boundary.MainFrame;
 import jpatch.control.edit.AtomicAddMotionKey;
 import jpatch.control.edit.AtomicModifyMotionCurve;
 import jpatch.control.edit.AtomicMoveMotionKey;
@@ -144,7 +145,7 @@ public class Track<M extends MotionCurve> {
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
-		int frame = start / fw - 1;
+		int frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
 		Color background, track;
 		if (timelineEditor.getHeader().getSelectedTracks().contains(this)) {
 			background = TimelineEditor.SELECTED_BACKGROUND;
