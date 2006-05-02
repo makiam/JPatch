@@ -5,6 +5,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.vecmath.Color3f;
 
+import jpatch.boundary.MainFrame;
 import jpatch.entity.*;
 
 public class ColorTrack extends Track<MotionCurve.Color3f> {
@@ -19,7 +20,7 @@ public class ColorTrack extends Track<MotionCurve.Color3f> {
 		
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
-		int frame = start / fw - 1;
+		int frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
 		
 		Color background, track;
 		if (timelineEditor.getHeader().getSelectedTracks().contains(this)) {
@@ -37,7 +38,7 @@ public class ColorTrack extends Track<MotionCurve.Color3f> {
 		g.drawLine(clip.x, y + 3, clip.x + clip.width, y + 3);
 		g.drawLine(clip.x, y + height - 2, clip.x + clip.width, y + height - 2);
 
-		frame = start / fw - 1;
+		frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
 		for (int x = -fw ; x <= clip.width + fw; x ++) {
 			float f = (float) (start + x - fw / 2) / fw;
 			Color3f color = motionCurve.getColor3fAt(f);
