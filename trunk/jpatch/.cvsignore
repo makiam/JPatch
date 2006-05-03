@@ -2,3 +2,4 @@ bin
 javadoc.xml
 .classpath
 doc
+.fatjar
