@@ -401,11 +401,13 @@ public class Actions extends DefaultHandler {
 		actionMap.put("change tangents: spatch", new ActionDescriptor(new ChangeTangentModeAction(ChangeTangentModeAction.SPATCH)));
 		actionMap.put("assign controlpoints to bones", new ActionDescriptor(new AssignPointsToBonesAction()));
 		actionMap.put("edit keyboard mapping", new ActionDescriptor(new KeyMappingAction()));
-		actionMap.put("render animation", new ActionDescriptor(new RenderAnimationAction()));
+		actionMap.put("render animation", new ActionDescriptor(new RenderAnimationAction(false)));
+		actionMap.put("render current frame", new ActionDescriptor(new RenderAnimationAction(true)));
 
 		/*
 		 * END OF AUTO-GENERATED CODE
 		 */
+
 	}
 	
 	static class ActionDescriptor {

@@ -647,7 +647,11 @@
 		<property key="Icon" value="jpatch/images/keys.png"/>
 	</action>
 	<action name="render animation" model="default">
-		<constructor>new RenderAnimationAction()</constructor>
+		<constructor>new RenderAnimationAction(false)</constructor>
 		<property key="ShortDescription" value="Render animation"/>
+	</action>
+	<action name="render current frame" model="default">
+		<constructor>new RenderAnimationAction(true)</constructor>
+		<property key="ShortDescription" value="Render current frame"/>
 	</action>
 </actions>

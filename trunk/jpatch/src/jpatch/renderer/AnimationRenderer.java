@@ -3,6 +3,10 @@ package jpatch.renderer;
 import inyo.RtInterface;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
@@ -21,12 +25,17 @@ public class AnimationRenderer {
 	
 	private Console console;
 	private ProgressDisplay progressDisplay;
+	private volatile Renderer renderer;
+	private volatile Process process;
 	private RenderExtension re = new RenderExtension(new String[] {
 			"povray", "",
 			"renderman", ""
 	});
-			
-	public void testShowDisplay() {
+	private volatile boolean abort = false;
+	private volatile boolean finished = false;
+	private JButton buttonAbort = new JButton("Abort");
+	
+	public void testShowDisplay(final int first, final int last) {
 		try {
 			Animation anim = MainFrame.getInstance().getAnimation();
 			progressDisplay = new ProgressDisplay((int) anim.getStart(), (int) anim.getEnd());
@@ -36,11 +45,18 @@ public class AnimationRenderer {
 					public void run() {
 						/* synchronize to create memory barrier in rendering thread */
 						synchronized(this) {
-							renderFrame("FRAME");
+							renderFrame(first, "FRAME");
+							finished = true;
+							EventQueue.invokeLater(new Runnable() {
+								public void run() {
+									buttonAbort.setText("Close");
+								}
+							});
 						}
 					}
 				}).start();
 			}
+			progressDisplay.setLocationRelativeTo(MainFrame.getInstance());
 			progressDisplay.setVisible(true);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -66,12 +82,33 @@ public class AnimationRenderer {
 					g.drawImage(image, (getWidth() - image.getWidth()) >> 1, (getHeight() - image.getHeight()) >> 1, null);
 			}
 		};
-		private JButton buttonAbort = new JButton("Abort");
+		
+		private ActionListener abortActionListener = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (finished) {
+					ProgressDisplay.this.dispose();
+				} else if (JOptionPane.showConfirmDialog(ProgressDisplay.this, "Abort rendering?", "Abort", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+					abort();
+					ProgressDisplay.this.dispose();
+				}
+			}
+		};
 		
 		ProgressDisplay(int start, int end) throws IOException {
 			super(MainFrame.getInstance(), true);
 			console = new Console();
-			
+			buttonAbort.addActionListener(abortActionListener);
+			addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent e) {
+					if (finished) {
+						ProgressDisplay.this.dispose();
+					} else if (JOptionPane.showConfirmDialog(ProgressDisplay.this, "Abort rendering?", "Abort", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+						abort();
+						ProgressDisplay.this.dispose();
+					}
+				}
+			});
 			progressBar = new JProgressBar(start, end);
 //			progressBar.setBorder(new TitledBorder("Progress"));
 //			imagePanel.setBorder(new TitledBorder("Output image"));
@@ -105,6 +142,8 @@ public class AnimationRenderer {
 	
 	
 	void loadImage(File imageFile) {
+		if (abort)
+			return;
 		if (imageFile.exists()) {
 			BufferedImage image;
 			try {
@@ -139,13 +178,14 @@ public class AnimationRenderer {
 		}
 	}
 		
-	public void renderFrame(String frameName) {
-		
+	public void renderFrame(int position, String frameName) {
 		Settings settings = Settings.getInstance();
 		//progressDisplay.clearText();
 		//progressDisplay.show();
 		/* output geometry to temporary file */
 		Animation anim = MainFrame.getInstance().getAnimation();
+		anim.setPosition(position);
+		MainFrame.getInstance().getTimelineEditor().setCurrentFrame(position);
 		System.out.println("renderFrame " + frameName + " with " + settings.export.rendererToUse);
 		switch (settings.export.rendererToUse) {
 			case INYO: {
@@ -154,8 +194,8 @@ public class AnimationRenderer {
 				console.append("Working directory is \"" + settings.export.workingDirectory + "\".\n");
 				console.append("Invoking Inyo.\n");
 				TextureParser.setTexturePath(settings.export.inyo.textureDirectory.getPath());
-				InyoRenderer3 renderer = new InyoRenderer3(anim.getModels(), anim.getActiveCamera(), anim.getLights());
-				Image image = renderer.render(new RtInterface());
+				renderer = new InyoRenderer3(anim.getModels(), anim.getActiveCamera(), anim.getLights());
+				Image image = ((InyoRenderer3) renderer).render(new RtInterface());
 				if (image != null) {
 					File imageFile = new File(settings.export.workingDirectory, frameName + ".png");
 					console.append("Done. Saving file \"" + imageFile.getName() + "\".\n");
@@ -175,7 +215,7 @@ public class AnimationRenderer {
 			}
 			break;	
 			case RENDERMAN: {
-				RibRenderer4 renderer = new RibRenderer4();
+				renderer = new RibRenderer4();
 				
 				//models, Animator.getInstance().getActiveCamera(), lights);
 				File ribFile = new File(settings.export.workingDirectory, frameName + ".rib");
@@ -186,7 +226,7 @@ public class AnimationRenderer {
 				console.append("Writing geometry file \"" + ribFile.getName() + "\"...");
 				try {
 					BufferedWriter writer = new BufferedWriter(new FileWriter(ribFile));
-					renderer.writeToFile(anim.getModels(), anim.getActiveCamera(), anim.getLights(), writer, frameName + ".tif");
+					((RibRenderer4) renderer).writeToFile(anim.getModels(), anim.getActiveCamera(), anim.getLights(), writer, frameName + ".tif");
 					writer.close();
 				} catch (Exception exception) {
 					exception.printStackTrace();
@@ -213,10 +253,10 @@ public class AnimationRenderer {
 					sb.append("\n>>>>>>>>>> Begin of renderer output >>>>>>>>>>\n");
 					console.append(sb.toString());
 				try {
-					Process rib = Runtime.getRuntime().exec(ribCmd, ribEnv, settings.export.workingDirectory);
-					console.addInputStream(rib.getInputStream());
-					console.addInputStream(rib.getErrorStream());
-					rib.waitFor();
+					process = Runtime.getRuntime().exec(ribCmd, ribEnv, settings.export.workingDirectory);
+					console.addInputStream(process.getInputStream());
+					console.addInputStream(process.getErrorStream());
+					process.waitFor();
 					console.waitFor();
 					console.append("<<<<<<<<<<  End of renderer output  <<<<<<<<<<\n\n");
 					if (settings.export.deletePerFrameFilesAfterRendering) {
@@ -241,7 +281,8 @@ public class AnimationRenderer {
 				console.append("Writing geometry file \"" + povrayFile.getName() + "\"...");
 				try {
 					BufferedWriter writer = new BufferedWriter(new FileWriter(povrayFile));
-					new PovrayRenderer3().writeFrame(anim.getModels(), anim.getActiveCamera(), anim.getLights(), re.getRenderString("povray", ""), writer);
+					renderer = new PovrayRenderer3();
+					((PovrayRenderer3) renderer).writeFrame(anim.getModels(), anim.getActiveCamera(), anim.getLights(), re.getRenderString("povray", ""), writer);
 					writer.close();
 
 				} catch (IOException e) {
@@ -306,10 +347,10 @@ public class AnimationRenderer {
 					File imageFile = new File(settings.export.workingDirectory, frameName + ".png");
 					if (imageFile.exists()) imageFile.delete();
 					try {
-						Process pov = Runtime.getRuntime().exec(povCmd, povEnv, settings.export.workingDirectory);
-						console.addInputStream(pov.getInputStream());
-						console.addInputStream(pov.getErrorStream());
-						pov.waitFor();		// wait for process to finish;
+						process = Runtime.getRuntime().exec(povCmd, povEnv, settings.export.workingDirectory);
+						console.addInputStream(process.getInputStream());
+						console.addInputStream(process.getErrorStream());
+						process.waitFor();		// wait for process to finish;
 						console.waitFor();	// wait for console output;
 						console.append("<<<<<<<<<<  End of POV-Ray output  <<<<<<<<<<\n\n");
 						if (settings.export.deletePerFrameFilesAfterRendering) {
@@ -362,6 +403,21 @@ public class AnimationRenderer {
 				//	exception.printStackTrace();
 				//}
 			}
+		}
+	}
+	
+	public synchronized void abort() {
+		abort = true;
+		if (renderer != null)
+			renderer.abort();
+		if (process != null) {
+			try {
+				process.getInputStream().close();
+				process.getErrorStream().close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			process.destroy();
 		}
 	}
 }
