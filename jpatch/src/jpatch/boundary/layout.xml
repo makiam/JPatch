@@ -84,8 +84,6 @@
 			<item command="save"/>
 			<item command="save as"/>
 			<separator/>
-			<item command="render animation"/>
-			<separator/>
 			<menu name="Import" mnemonic="i" icon="jpatch/images/prefs/import.png">
 				<item command="import spatch"/>
 				<item command="import animationmaster"/>
@@ -121,6 +119,11 @@
 			<item command="quit"/>
 		</menu>
 
+		<menu name="Render" mnemonic="r">
+			<item command="render animation"/>
+			<item command="render current frame"/>
+		</menu>
+		
 		<menu name="Edit" mnemonic="e">
 			<item command="undo"/>
 			<item command="redo"/>
