@@ -62,7 +62,7 @@ public final class Launcher {
 						}
 					});
 				}
-			}, 500);
+			}, 250);
 		}
 	}
 	

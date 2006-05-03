@@ -12,7 +12,7 @@ import javax.swing.*;
 import jpatch.entity.*;
 
 
-public class VcrControls extends JPanel {
+public class VcrControls extends JToolBar {
 	private static enum State { STOP, PLAY, FAST_FWD, SLOW_FWD, FAST_BWD, SLOW_BWD, PLAY_BWD };
 	private State state = State.STOP;
 	
@@ -40,7 +40,10 @@ public class VcrControls extends JPanel {
 	private PlayThread playThread;
 	
 	public VcrControls() {
-		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		setFloatable(false);
+		setOpaque(false);
+		setBorder(null);
+//		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		add(buttonToStart);
 		add(buttonFastRev);
 		add(buttonPlayRev);
