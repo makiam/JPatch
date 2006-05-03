@@ -28,6 +28,15 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 	private int iVertexNumber;
 	private static boolean bExportNormals;
 	
+	private volatile boolean abort = false;
+	
+	/**
+	 * Stops tesselation
+	 */
+	public synchronized void abort() {
+		abort = true;
+	}
+	
 	public void tesselate(Model model, int subdiv, Matrix4d matrix, boolean exportNormals) {
 		bExportNormals = exportNormals;
 		this.matrix = matrix;
@@ -74,6 +83,8 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 			
 			for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
 				Patch patch = (Patch) it.next();
+				if (abort)
+					return;
 				if (patch.getMaterial() == material) {
 					
 					Point3f[] hashPatch = patch.coonsPatch();

@@ -10,23 +10,26 @@ import jpatch.boundary.settings.Settings;
 
 import inyo.*;
 
-public class InyoRenderer3 {
+public class InyoRenderer3 implements Renderer {
 	
 	private Image image;
 	private List models;
 	private List lights;
 	private Camera camera;
 	private PatchTesselator3 patchTesselator = new PatchTesselator3();
+	private JPatchInyoInterface inyo;
+	private volatile boolean abort = false;
+	
 	public InyoRenderer3(List models, Camera camera, List lights) {
 		this.models = models;
 		this.camera = camera;
 		this.lights = lights;
 	}
 	
-	public Image render(JPatchInyoInterface inyo) {
+	public Image render(final JPatchInyoInterface inyo) {
 		//Model model = MainFrame.getInstance().getModel();
 		//model.computePatches();
-		
+		this.inyo = inyo;
 		Settings settings = Settings.getInstance();
 		
 		inyo.setImageSize(settings.export.imageHeight, settings.export.imageWidth, 1);
@@ -60,6 +63,8 @@ public class InyoRenderer3 {
 		 * lightsources
 		 */
 		for (Iterator it = lights.iterator(); it.hasNext(); ) {
+			if (abort)
+				return null;
 			AnimLight light = (AnimLight) it.next();
 			if (light.isActive()) {
 				Point3d p = light.getPositionDouble();
@@ -82,6 +87,8 @@ public class InyoRenderer3 {
 			
 			
 			for (Iterator iterator = model.getMaterialList().iterator(); iterator.hasNext();) {
+				if (abort)
+					return null;
 				JPatchMaterial material = (JPatchMaterial)iterator.next();
 				PatchTesselator3.Vertex[] vtx = patchTesselator.getPerMaterialVertexArray(material);
 				int[][] triangles = patchTesselator.getPerMaterialTriangleArray();
@@ -104,11 +111,15 @@ public class InyoRenderer3 {
 					inyo.setMaterialConserveEnergy(mp.conserveEnergy);
 					inyo.setMaterialTexture(material.getRenderString("inyo",""));
 					for (int i = 0; i < vtx.length; i++) {
+						if (abort)
+							return null;
 						PatchTesselator3.Vertex v = vtx[i];
 						inyo.addVertex(v.p.x, v.p.y, v.p.z, v.r.x, v.r.y, v.r.z, v.n.x, v.n.y, v.n.z);
 					}
 					
 					for (int i = 0; i < triangles.length; i++) {
+						if (abort)
+							return null;
 						inyo.addTriangle(triangles[i][0], triangles[i][1], triangles[i][2]);
 					}
 					
@@ -120,33 +131,45 @@ public class InyoRenderer3 {
 			
 		}
 		
-		inyo.startRendering(new InyoJPatchInterface() {
-			/**
-			 * Tell JPatch about the rendering progress
-			 * @param progress 0.0 means rendering just started, 0.5 means half way done, 1.0 means rendering finished.
-			 */
-			public void progress(double progress) {
-				System.out.println("progress: " + progress);
+		System.out.println("INYO START");
+		Thread renderer = new Thread() {
+			public void run() {
+				inyo.startRendering(new InyoJPatchInterface() {
+					/**
+					 * Tell JPatch about the rendering progress
+					 * @param progress 0.0 means rendering just started, 0.5 means half way done, 1.0 means rendering finished.
+					 */
+					public void progress(double progress) {
+						System.out.println("progress: " + progress);
+						// TODO: looks like Inyo doesn't talk to us :/
+					}
+					
+					/**
+					 * Pass the rendered image back to JPatch
+					 * @param image the final image
+					 */
+					public void renderingDone(java.awt.Image image) {
+						InyoRenderer3.this.image = image;
+					}
+				});
 			}
-			
-			/**
-			 * Pass the rendered image back to JPatch
-			 * @param image the final image
-			 */
-			public void renderingDone(java.awt.Image image) {
-				InyoRenderer3.this.image = image;
-			}
-		});
+		};
+		renderer.start();
 		try {
-			/*
-			 * ugly while loop to wait until the image is ready
-			 */
-			while (image == null) {
-				Thread.sleep(100);
+			while (renderer.isAlive()) {
+				double progress = inyo.getProgress();
+				// TODO: doesn't help - progress seems to be always 1.0 :-/
+//				System.out.println("PROGRESS = " + progress);
+				renderer.join(250);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return image;
+	}
+	
+	public synchronized void abort() {
+		abort = true;
+		inyo.stopRendering();
 	}
 }

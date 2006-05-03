@@ -9,7 +9,8 @@ import jpatch.boundary.*;
 import jpatch.boundary.settings.RendermanSettings;
 import jpatch.boundary.settings.Settings;
 
-public class RibRenderer4 {
+public class RibRenderer4 implements Renderer {
+	private volatile boolean abort = false;
 	
 	//private BufferedWriter file;
 	//
@@ -70,12 +71,16 @@ public class RibRenderer4 {
 			file.write("WorldBegin\n");
 			file.write("\n");
 			for (int i = 0, n = lights.size(); i < n; i++) {
+				if (abort)
+					return;
 				AnimLight light = (AnimLight) lights.get(i);
 				if (light.isActive()) file.write(light(light));
 			}
 			file.write("\n");
 			
 			for (Iterator it = animModels.iterator(); it.hasNext(); ) {
+				if (abort)
+					return;
 				AnimModel animModel = (AnimModel) it.next();
 				Model model = animModel.getModel();
 				
@@ -106,6 +111,8 @@ public class RibRenderer4 {
 			patchTesselator.tesselate(model, subdiv, null, Settings.getInstance().export.renderman.outputMode != RendermanSettings.Mode.CATMULL_CLARK_SUBDIVISION_SURFACE);
 			
 			for (Iterator itMat = model.getMaterialList().iterator(); itMat.hasNext(); ) {
+				if (abort)
+					return;
 				JPatchMaterial material = (JPatchMaterial) itMat.next();
 				
 				PatchTesselator3.Vertex[] vtx = patchTesselator.getPerMaterialVertexArray(material);
@@ -174,6 +181,8 @@ public class RibRenderer4 {
 		else {
 			file.write("Basis \"bezier\" 3 \"bezier\" 3\n");
 			for (Iterator itMat = model.getMaterialList().iterator(); itMat.hasNext(); ) {
+				if (abort)
+					return;
 				JPatchMaterial material = (JPatchMaterial) itMat.next();
 				boolean active = false;
 				for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
@@ -238,5 +247,10 @@ public class RibRenderer4 {
 		s = s.replaceAll("\\$position",toRibVector(light.getPositionDouble()));
 		s = s.replaceAll("\\$color",toRibVector(light.getColor()));
 		return s;
+	}
+
+	public synchronized void abort() {
+		abort = true;
+		patchTesselator.abort();
 	}
 }

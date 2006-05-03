@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.58 2006/05/02 19:27:46 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.59 2006/05/03 18:46:19 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -181,7 +181,8 @@ public class Viewport2 {
 //				w = (float) viewDef.getCamera().getFocalLength() * (float) H / OVERSCAN / (float) (viewDef.getCamera().getFilmSize() / ar);
 //			}
 			
-			drawable.setColor(settings.colors.activeCamera);
+			drawable.setTransparentRenderingMode(JPatchDrawable2.TRANSPARENT);
+			drawable.setColor(new Color4f(1, 1, 1, 0.25f));
 			int left = (W - ww) >> 1;
 			int top = (H - hh) >> 1;
 			drawable.drawRect(left, top, ww, hh);
@@ -194,6 +195,7 @@ public class Viewport2 {
 			drawable.drawLine(left + 1, top + hh / 3, left + ww, top + hh / 3);
 			drawable.drawLine(left + 1, top + hh / 2, left + ww, top + hh / 2);
 			drawable.drawLine(left + 1, top + hh * 2/ 3, left + ww, top + hh * 2 / 3);
+			drawable.setTransparentRenderingMode(JPatchDrawable2.OFF);
 		}
 		
 		

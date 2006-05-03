@@ -9,9 +9,10 @@ import jpatch.boundary.*;
 import jpatch.boundary.settings.PovraySettings;
 import jpatch.boundary.settings.Settings;
 
-public class PovrayRenderer3 {
+public class PovrayRenderer3 implements Renderer {
 	
 	private PatchTesselator3 patchTesselator = new PatchTesselator3();
+	private volatile boolean abort = false;
 	
 	public void writeFrame(List animModels, Camera camera, List lights, String include, BufferedWriter file) throws IOException {
 		Settings settings = Settings.getInstance();
@@ -73,6 +74,8 @@ public class PovrayRenderer3 {
 		/* Light sources */
 		
 		for (int i = 0, n = lights.size(); i < n; i++) {
+			if (abort)
+				return;
 			AnimLight light = (AnimLight) lights.get(i);
 			if (light.isActive()) {
 				file.write("/*\n");
@@ -86,6 +89,8 @@ public class PovrayRenderer3 {
 		/* Models */
 		
 		for (Iterator it = animModels.iterator(); it.hasNext(); ) {
+			if (abort)
+				return;
 			AnimModel animModel = (AnimModel) it.next();
 			Model model = animModel.getModel();
 			
@@ -102,12 +107,16 @@ public class PovrayRenderer3 {
 		file.write("union {\n");
 		file.write("\t" + renderString + "\n");
 		if (Settings.getInstance().export.povray.outputMode == PovraySettings.Mode.TRIANGLES) {
+			if (abort)
+				return;
 			int subdiv = Settings.getInstance().export.povray.subdivisionLevel + subdivOffset;
 			if (subdiv < 1) subdiv = 1;
 			if (subdiv > 5) subdiv = 5;
 			patchTesselator.tesselate(model, subdiv, null, true);
 		}
 		for (Iterator itMat = model.getMaterialList().iterator(); itMat.hasNext(); ) {
+			if (abort)
+				return;
 			JPatchMaterial material = (JPatchMaterial) itMat.next();
 			switch (Settings.getInstance().export.povray.outputMode) {
 				
@@ -234,5 +243,10 @@ public class PovrayRenderer3 {
 		s = s.replaceAll("\\$position",toPovVector(light.getPositionDouble()));
 		s = s.replaceAll("\\$color",toPovVector(light.getColor()));
 		return s;
+	}
+
+	public synchronized void abort() {
+		abort = true;
+		patchTesselator.abort();
 	}
 }

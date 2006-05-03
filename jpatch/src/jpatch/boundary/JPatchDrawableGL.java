@@ -639,7 +639,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		gl.glVertex2i(x + width, y);
 		gl.glVertex2i(x + width, y + height);
 		gl.glVertex2i(x, y + height);
-		gl.glVertex2i(x, y);
+		gl.glVertex2i(x, y + 1);
 	}
 	
 	public void fillRect(int x, int y, int width, int height) {
