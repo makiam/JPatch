@@ -43,7 +43,7 @@ public class Model implements MutableTreeNode {
 	private List listSelections = new ArrayList();
 	private List listMorphs = new ArrayList();
 //	private List lstBoneShapes = new ArrayList();
-	private HashMap mapPhonemes = new HashMap();
+	private Map<String, Morph> mapPhonemes = new HashMap<String, Morph>();
 	private String strName;
 	private Rotoscope[] aRotoscope = new Rotoscope[6];
 	private boolean bInserted = false;
@@ -164,7 +164,7 @@ public class Model implements MutableTreeNode {
 		StringBuffer lipSyncMap = new StringBuffer();
 		for (Iterator it = mapPhonemes.keySet().iterator(); it.hasNext(); ) {
 			String phoneme = (String) it.next();
-			MorphTarget morph = (MorphTarget) mapPhonemes.get(phoneme);
+			Morph morph = mapPhonemes.get(phoneme);
 			if (morph != null) lipSyncMap.append(prefix).append("\t\t<map phoneme=\"" + phoneme + "\" morph=\"" + listMorphs.indexOf(morph) + "\"/>").append("\n");
 		}
 		if (lipSyncMap.length() > 0) {
@@ -213,7 +213,7 @@ public class Model implements MutableTreeNode {
 		strName = name;
 	}
 	
-	public void setMorphFor(String phoneme, MorphTarget morph) {
+	public void setMorphFor(String phoneme, Morph morph) {
 		mapPhonemes.put(phoneme, morph);
 	}
 	
