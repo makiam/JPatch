@@ -547,7 +547,7 @@ implements ModelImporter {
 			if (localName.equals("phoneme")) phoneme = value;
 			else if (localName.equals("morph")) morphIndex = Integer.parseInt(value);
 		}
-		model.setMorphFor(phoneme, (MorphTarget) model.getMorphList().get(morphIndex));
+		model.setMorphFor(phoneme, (Morph) model.getMorphList().get(morphIndex));
 	}
 	
 	private void parseMorphVector(Attributes attributes, MorphTarget morph) {
