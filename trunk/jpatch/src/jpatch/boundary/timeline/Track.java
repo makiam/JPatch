@@ -102,7 +102,7 @@ public class Track<M extends MotionCurve> {
 	
 	public MotionKey getKeyAt(int mx, int my) {
 		System.out.println("*");
-		int frame = mx / timelineEditor.getFrameWidth();
+		int frame = mx / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
 		return motionCurve.getKeyAt(frame);
 	}
 	

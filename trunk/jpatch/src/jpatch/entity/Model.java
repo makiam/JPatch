@@ -25,9 +25,9 @@ public class Model implements MutableTreeNode {
 	/**
 	 *  Description of the Field
 	 */
-	private HashSet setCurves = new HashSet();
-	private HashSet<Bone> setBones = new HashSet<Bone>();
-	private HashMap mapPatches = new HashMap();
+	private Set<ControlPoint> setCurves = new HashSet<ControlPoint>();
+	private Set<Bone> setBones = new HashSet<Bone>();
+	private Map<Patch, Patch> mapPatches = new HashMap<Patch, Patch>();
 
 	private MutableTreeNode treenodeSelections;
 	private MutableTreeNode treenodeMaterials;
@@ -1026,11 +1026,11 @@ public class Model implements MutableTreeNode {
 	//	System.out.println("...stop");
 	}
 
-	public Set getCurveSet() {
+	public Set<ControlPoint> getCurveSet() {
 		return setCurves;
 	}
 	
-	public Set getPatchSet() {
+	public Set<Patch> getPatchSet() {
 		return mapPatches.keySet();
 	}
 	
