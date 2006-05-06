@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.13 2006/05/02 19:27:47 sascha_l Exp $
+ * $Id: Track.java,v 1.14 2006/05/06 09:52:15 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -102,7 +102,7 @@ public class Track<M extends MotionCurve> {
 	
 	public MotionKey getKeyAt(int mx, int my) {
 		System.out.println("*");
-		int frame = mx / timelineEditor.getFrameWidth();
+		int frame = mx / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
 		return motionCurve.getKeyAt(frame);
 	}
 	

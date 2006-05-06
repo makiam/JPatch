@@ -33,7 +33,7 @@ public class RenderAnimationAction extends AbstractAction {
 			form.setBorder(new TitledBorder("Frames to render"));
 			
 			if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), form, "Render animation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-				new AnimationRenderer().testShowDisplay(Integer.parseInt(textStart.getText()), Integer.parseInt(textEnd.getText()));
+				new AnimationRenderer().renderFrames(MainFrame.getInstance().getAnimation().getName(), Integer.parseInt(textStart.getText()), Integer.parseInt(textEnd.getText()));
 			}
 			
 		} else {
@@ -41,7 +41,7 @@ public class RenderAnimationAction extends AbstractAction {
 			 * render current frame
 			 */
 			int frame = (int) MainFrame.getInstance().getAnimation().getPosition();
-			new AnimationRenderer().testShowDisplay(frame, frame);
+			new AnimationRenderer().renderFrames(MainFrame.getInstance().getAnimation().getName(), frame, frame);
 		}
 		
 	}

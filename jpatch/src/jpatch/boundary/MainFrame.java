@@ -554,7 +554,12 @@ public final class MainFrame extends JFrame {
 		Camera camera = new Camera("Camera 1");
 		camera.setPosition(new Point3d(0, 150, -300));
 		camera.setOrientation(0, Math.atan2(-150, 300), 0);
+		AnimLight light = new AnimLight();
+		light.setName("Light 1");
+		light.setPosition(new Point3d(-300, 200, -300));
+		
 		animation.addCamera(camera, null);
+		animation.addLight(light, null);
 		
 		
 		

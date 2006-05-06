@@ -9,7 +9,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.*;
 import java.io.*;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
+import java.util.regex.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -35,17 +38,32 @@ public class AnimationRenderer {
 	private volatile boolean finished = false;
 	private JButton buttonAbort = new JButton("Abort");
 	
-	public void testShowDisplay(final int first, final int last) {
+	public void renderFrames(final String prefix, final int first, final int last) {
 		try {
 			Animation anim = MainFrame.getInstance().getAnimation();
-			progressDisplay = new ProgressDisplay((int) anim.getStart(), (int) anim.getEnd());
+			progressDisplay = new ProgressDisplay(first, last);
+			final NumberFormat numberFormat = new DecimalFormat("000000");
 			/* synchronize to create memory barrier in EventDispatching thread */
+			
 			synchronized(this) {
 				new Thread(new Runnable() {
 					public void run() {
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 						/* synchronize to create memory barrier in rendering thread */
 						synchronized(this) {
-							renderFrame(first, "FRAME");
+							for (int frame = first; frame <= last; frame++) {
+								if (abort)
+									return;
+								progressDisplay.setProgress(frame);
+								progressDisplay.setTitle("Rendering frame " + frame + ", going to " + last + " (" + (last - frame) + " frames to go)");
+								renderFrame(frame, prefix + numberFormat.format(frame));
+							};
+							progressDisplay.setTitle("Finished, " + (last - first + 1) + " frames rendered.");
+							progressDisplay.setProgress(last + 1);
 							finished = true;
 							EventQueue.invokeLater(new Runnable() {
 								public void run() {
@@ -56,8 +74,10 @@ public class AnimationRenderer {
 					}
 				}).start();
 			}
+			
 			progressDisplay.setLocationRelativeTo(MainFrame.getInstance());
 			progressDisplay.setVisible(true);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -109,7 +129,7 @@ public class AnimationRenderer {
 					}
 				}
 			});
-			progressBar = new JProgressBar(start, end);
+			progressBar = new JProgressBar(start, end + 1);
 //			progressBar.setBorder(new TitledBorder("Progress"));
 //			imagePanel.setBorder(new TitledBorder("Output image"));
 			getContentPane().setLayout(new BorderLayout());
@@ -129,8 +149,11 @@ public class AnimationRenderer {
 			getContentPane().add(splitPane, BorderLayout.CENTER);
 			getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 			setSize(750, 550);
-			splitPane.setDividerLocation(300);
-			
+			splitPane.setDividerLocation(300);	
+		}
+		
+		private void setProgress(int frame) {
+			progressBar.setValue(frame);
 		}
 		
 		private void setImage(BufferedImage image) {
@@ -189,8 +212,8 @@ public class AnimationRenderer {
 		System.out.println("renderFrame " + frameName + " with " + settings.export.rendererToUse);
 		switch (settings.export.rendererToUse) {
 			case INYO: {
-				console.clearText();
-				console.append("Rendering " + frameName + " Inyo.\n");
+//				console.clearText();
+				console.append("Rendering " + frameName + " using Inyo.\n");
 				console.append("Working directory is \"" + settings.export.workingDirectory + "\".\n");
 				console.append("Invoking Inyo.\n");
 				TextureParser.setTexturePath(settings.export.inyo.textureDirectory.getPath());
@@ -220,20 +243,14 @@ public class AnimationRenderer {
 				//models, Animator.getInstance().getActiveCamera(), lights);
 				File ribFile = new File(settings.export.workingDirectory, frameName + ".rib");
 				
-				console.clearText();
+//				console.clearText();
 				console.append("Rendering " + frameName + " using RenderMAN.\n");
 				console.append("Working directory is \"" + settings.export.workingDirectory + "\".\n");
-				console.append("Writing geometry file \"" + ribFile.getName() + "\"...");
-				try {
-					BufferedWriter writer = new BufferedWriter(new FileWriter(ribFile));
-					((RibRenderer4) renderer).writeToFile(anim.getModels(), anim.getActiveCamera(), anim.getLights(), writer, frameName + ".tif");
-					writer.close();
-				} catch (Exception exception) {
-					exception.printStackTrace();
-				}
-				console.append("done.\n\n");
+//				console.append("Writing geometry file \"" + ribFile.getName() + "\"...");
 				
-				String[] ribCmd = { settings.export.renderman.executable.getPath(), frameName + ".rib" };
+//				console.append("done.\n\n");
+				
+				String[] ribCmd = { settings.export.renderman.executable.getPath(), "--verbose=2" };
 				String[] ribEnv = settings.export.renderman.environmentVariables.split(";");
 				
 				
@@ -256,6 +273,10 @@ public class AnimationRenderer {
 					process = Runtime.getRuntime().exec(ribCmd, ribEnv, settings.export.workingDirectory);
 					console.addInputStream(process.getInputStream());
 					console.addInputStream(process.getErrorStream());
+					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+					((RibRenderer4) renderer).writeToFile(anim.getModels(), anim.getActiveCamera(), anim.getLights(), writer, frameName + ".tif");
+					writer.close();
+					
 					process.waitFor();
 					console.waitFor();
 					console.append("<<<<<<<<<<  End of renderer output  <<<<<<<<<<\n\n");
@@ -275,31 +296,23 @@ public class AnimationRenderer {
 			case POVRAY: {
 				File povrayFile = new File(settings.export.workingDirectory, frameName + ".pov");
 				
-				console.clearText();
+//				console.clearText();
 				console.append("Rendering " + frameName + " using POV-Ray.\n");
 				console.append("Working directory is \"" + settings.export.workingDirectory + "\".\n");
-				console.append("Writing geometry file \"" + povrayFile.getName() + "\"...");
-				try {
-					BufferedWriter writer = new BufferedWriter(new FileWriter(povrayFile));
-					renderer = new PovrayRenderer3();
-					((PovrayRenderer3) renderer).writeFrame(anim.getModels(), anim.getActiveCamera(), anim.getLights(), re.getRenderString("povray", ""), writer);
-					writer.close();
-
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				console.append("done.\n\n");
+//				console.append("Writing geometry file \"" + povrayFile.getName() + "\"...");
+				
+//				console.append("done.\n\n");
 				
 				ArrayList<String> listCmd = new ArrayList<String>();
 				listCmd.add(settings.export.povray.executable.getPath());
 				if (settings.export.povray.version == PovraySettings.Version.UNIX) {
-					listCmd.add("+I" + povrayFile.getName());
+					listCmd.add("+I-");
 				} else {
-					listCmd.add("/RENDER");
-					listCmd.add(povrayFile.getName());
+//					listCmd.add("/RENDER");
+					listCmd.add("/NORESTORE");
 					listCmd.add("/EXIT");
 				}
-				listCmd.add("+O" + frameName + ".png");
+				listCmd.add("+O" + quote(frameName) + ".png");
 				listCmd.add("+W" + settings.export.imageWidth);
 				listCmd.add("+H" + settings.export.imageHeight);
 				listCmd.add("-D");
@@ -344,22 +357,28 @@ public class AnimationRenderer {
 				console.append(sb.toString());
 				
 				//try {
-					File imageFile = new File(settings.export.workingDirectory, frameName + ".png");
+					File imageFile = new File(settings.export.workingDirectory, quote(frameName) + ".png");
 					if (imageFile.exists()) imageFile.delete();
 					try {
 						process = Runtime.getRuntime().exec(povCmd, povEnv, settings.export.workingDirectory);
 						console.addInputStream(process.getInputStream());
 						console.addInputStream(process.getErrorStream());
+						
+						BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+						renderer = new PovrayRenderer3();
+						((PovrayRenderer3) renderer).writeFrame(anim.getModels(), anim.getActiveCamera(), anim.getLights(), re.getRenderString("povray", ""), writer);
+						writer.close();
+						
 						process.waitFor();		// wait for process to finish;
 						console.waitFor();	// wait for console output;
 						console.append("<<<<<<<<<<  End of POV-Ray output  <<<<<<<<<<\n\n");
-						if (settings.export.deletePerFrameFilesAfterRendering) {
-							
-							console.append("Deleting \"" + povrayFile + "\".\n");
-							console.setCaretPosition(console.getDocument().getLength());
-							System.out.println("***");
-							povrayFile.delete();
-						}
+//						if (settings.export.deletePerFrameFilesAfterRendering) {
+//							
+//							console.append("Deleting \"" + povrayFile + "\".\n");
+//							console.setCaretPosition(console.getDocument().getLength());
+//							System.out.println("***");
+//							povrayFile.delete();
+//						}
 						loadImage(imageFile);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -404,6 +423,10 @@ public class AnimationRenderer {
 				//}
 			}
 		}
+	}
+	
+	private String quote(String s) {
+		return s.replace(' ', '_');
 	}
 	
 	public synchronized void abort() {

@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.20 2006/02/05 21:11:07 sascha_l Exp $
+ * $Id: Header.java,v 1.21 2006/05/06 09:52:15 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -97,6 +97,13 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 				}
 			});
 			add(expandButton[i]);
+		}
+	}
+	
+	public void setAllExpanded(boolean expanded) {
+		for (JToggleButton button : expandButton) {
+			button.setToolTipText(expanded ? "collapse track" : "expand track");
+			button.setPressedIcon(expanded ? iconUpArrow[1] : iconDownArrow[1]);
 		}
 	}
 	

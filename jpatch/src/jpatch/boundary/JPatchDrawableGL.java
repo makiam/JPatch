@@ -1,5 +1,8 @@
 package jpatch.boundary;
 
+import com.sun.org.apache.bcel.internal.generic.FMUL;
+import com.sun.org.apache.bcel.internal.generic.IXOR;
+
 import java.awt.*;
 import java.awt.image.*;
 //import java.awt.event.*;
@@ -23,13 +26,14 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	private Color4f color = new Color4f();
 	private Color3f backfaceColor;
 	
-	private boolean bPointAsQuad = true;
+	private static final boolean POINT_AS_QUAD = true;
 	private boolean bPerspective = false;
 	private float fFocalLength = 50;
 	private Matrix4f m4Transform = new Matrix4f();
 	
 	/** used to check if the last drawn image is stored in a display list */
 	private float fPointSize = 1;
+	private float fW;
 	
 	private int iMaxLights, iMaxTextureSize;
 	private boolean bRasterMode = false;
@@ -976,31 +980,48 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		iGlMode = -1;
 		gl.glPointSize(size);
 		fPointSize = (float) size / 2;
+		fW = fPointSize / fFocalLength / glDrawable.getSize().width * 35f;
 	}
 	
 	public void drawPoint(Point3f p) {
 		enableRasterMode(false);
-		if (bPointAsQuad) {				// FIXME
+		if (POINT_AS_QUAD) {
+			/*
+			 * Works around a bug - Some ATI cards under MESA don't render GL_POINTS,
+			 * or at least don't take the glPointSize attribute into account.
+			 * The following lines render points as quads.
+			 */
 			if (iGlMode != -1) {
 				gl.glEnd();
+//				gl.glBegin(GL.GL_QUADS);
 				iGlMode = -1;
 			}
 			gl.glBegin(GL.GL_QUADS);
-			gl.glVertex3f(p.x - fPointSize, p.y - fPointSize, p.z - 1);
-			gl.glVertex3f(p.x + fPointSize, p.y - fPointSize, p.z - 1);
-			gl.glVertex3f(p.x + fPointSize, p.y + fPointSize, p.z - 1);
-			gl.glVertex3f(p.x - fPointSize, p.y + fPointSize, p.z - 1);
+			if (bPerspective) {
+				if (p.z > 1) {
+					float ps = fW * p.z;
+					gl.glVertex3f(p.x - ps, p.y - ps, p.z);
+					gl.glVertex3f(p.x + ps, p.y - ps, p.z);
+					gl.glVertex3f(p.x + ps, p.y + ps, p.z);
+					gl.glVertex3f(p.x - ps, p.y + ps, p.z);
+				}
+			} else {
+				gl.glVertex3f(p.x - fPointSize, p.y - fPointSize, p.z - 1);
+				gl.glVertex3f(p.x + fPointSize, p.y - fPointSize, p.z - 1);
+				gl.glVertex3f(p.x + fPointSize, p.y + fPointSize, p.z - 1);
+				gl.glVertex3f(p.x - fPointSize, p.y + fPointSize, p.z - 1);
+			}
 			gl.glEnd();
 		} else {
-			if (iGlMode != GL.GL_POINT) {
+			if (iGlMode != GL.GL_POINTS) {
 				gl.glEnd();
 //				iGlMode = GL.GL_POINT;
 //				gl.glBegin(iGlMode);
 			}
+			
 			gl.glBegin(GL.GL_POINTS);
+			iGlMode = GL.GL_POINTS;
 			gl.glVertex3f(p.x, p.y, p.z);
-			gl.glEnd();
-			iGlMode = -1;
 		}
 	}
 	

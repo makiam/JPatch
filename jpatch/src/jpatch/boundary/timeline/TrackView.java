@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.22 2006/05/02 19:27:47 sascha_l Exp $
+ * $Id: TrackView.java,v 1.23 2006/05/06 09:52:15 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -30,18 +30,21 @@ import javax.swing.*;
 import jpatch.control.edit.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
+import jpatch.boundary.settings.Settings;
 
 @SuppressWarnings("serial")
 class TrackView extends JComponent implements Scrollable, MouseListener, MouseMotionListener, MouseWheelListener {
 	/**
 	 * 
 	 */
-	private static enum State { IDLE, RESIZE, SCROLL, MOVE_KEY };
+	private static enum State { IDLE, RESIZE, SCROLL, MOVE_KEY, LASSO };
 	private State state = State.IDLE;
 	private final TimelineEditor timelineEditor;
 	private Dimension dim = new Dimension();
 	private int iVerticalResize = -1;
 	private int mx, my, trackTop;
+	private int cornerX, cornerY, deltaX, deltaY;
+	
 	private MotionKey selectedKey;
 	private Track selectedTrack;
 	private float position, value;
@@ -187,8 +190,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	}
 	
 	public void mousePressed(MouseEvent e) {
-		int my = e.getY();
-		int mx = e.getX();
+		my = e.getY();
+		mx = e.getX();
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			int y = 0;
 			for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
@@ -227,6 +230,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 								if (selectedKey instanceof MotionKey.Float)
 									value = ((MotionKey.Float) selectedKey).getFloat();
 //								System.out.println("key selected: " + selectedKey + " position=" + position);
+							} else {
+								/* enter lasso select mode */
+								state = State.LASSO;
 							}
 							repaint();
 						}
@@ -240,6 +246,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 							position = selectedKey.getPosition();
 //							MainFrame.getInstance().getAnimation().setPosition(position);
 //							timelineEditor.setCurrentFrame((int) position);
+						} else {
+							/* enter lasso select mode */
+							state = State.LASSO;
 						}
 						repaint();
 					}
@@ -269,7 +278,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	}
 	
 	public void mouseReleased(MouseEvent e) {
-		if (state == State.MOVE_KEY) {
+		switch (state) {
+		case MOVE_KEY:
 			JPatchActionEdit edit = new JPatchActionEdit("move key");
 			System.out.println("moving key " + selectedKey + " position=" + position);
 			float newPosition = selectedKey.getPosition();
@@ -287,6 +297,24 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			}
 			if (edit.isValid())
 				MainFrame.getInstance().getUndoManager().addEdit(edit);
+			break;
+		case LASSO:
+			int y = 0;
+			Set<Track> selectedTracks = timelineEditor.getHeader().getSelectedTracks();
+			for (Track track : timelineEditor.getTracks()) {
+				if (track.isHidden())
+					continue;
+				int top = y;
+				int bottom = y + track.getHeight();
+				
+				
+				y = bottom;
+			}
+			
+			repaint();
+			cornerX = cornerY = -1;
+			deltaX = deltaY = 0;
+			break;
 		}
 		state = State.IDLE;
 	}
@@ -339,7 +367,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //			((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
 			break;
 		case MOVE_KEY:
-			int frame = e.getX() / timelineEditor.getFrameWidth();
+			int frame = e.getX() / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
+			
 			if (selectedTrack.isExpanded()) {
 				selectedTrack.moveKey(selectedKey, e.getY() - trackTop);
 			}
@@ -352,6 +381,44 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			MainFrame.getInstance().getAnimation().setPosition(frame);
 			timelineEditor.setCurrentFrame(frame);
 			MainFrame.getInstance().getJPatchScreen().update_all();
+			break;
+		case LASSO:
+			Graphics2D g2 = (Graphics2D) ((Component) e.getSource()).getGraphics();
+			g2.setXORMode(new Color(((Component) e.getSource()).getBackground().getRGB() ^ 0x00000000));
+			g2.setStroke(new BasicStroke(2.0f,BasicStroke.CAP_SQUARE,BasicStroke.JOIN_BEVEL,0.0f,new float[] { 5.0f, 5.0f }, 0.0f));
+			int eventX = e.getX();
+			int eventY = e.getY();
+			drawSelectionRectangle(g2, cornerX, cornerY, deltaX, deltaY);
+			deltaX = Math.abs(mx - eventX);
+			deltaY = Math.abs(my - eventY);
+			cornerX = (mx < eventX) ? mx : eventX;
+			cornerY = (my < eventY) ? my : eventY;
+			y = 0;
+			Set<Track> selectedTracks = timelineEditor.getHeader().getSelectedTracks();
+			for (Track track : timelineEditor.getTracks()) {
+				if (track.isHidden())
+					continue;
+				int top = y;
+				int bottom = y + track.getHeight();
+				if (cornerY > top && cornerY < bottom) {
+					deltaY += (cornerY - top);
+					cornerY = top;
+				} if ((cornerY + deltaY) > top && (cornerY + deltaY) < bottom)
+					deltaY = bottom - cornerY;
+				y = bottom;
+			}
+			if ((cornerY + deltaY) >= y)
+				deltaY = y - cornerY;
+			if (cornerY < 0) {
+				deltaY += cornerY;
+				cornerY = 0;
+			}
+			int frameA = cornerX / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
+			int frameB = (cornerX + deltaX) / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
+			cornerX = (frameA - (int) MainFrame.getInstance().getAnimation().getStart()) * timelineEditor.getFrameWidth();
+			deltaX = (frameB - (int) MainFrame.getInstance().getAnimation().getStart()) * timelineEditor.getFrameWidth() - cornerX;
+			drawSelectionRectangle(g2, cornerX, cornerY, deltaX, deltaY);
+			break;
 		}
 	}
 	
@@ -648,5 +715,12 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		popup.add(mi);
 		
 		popup.show((Component) e.getSource(), e.getX(), e.getY());
+	}
+	
+	private static void drawSelectionRectangle(Graphics g, int iCornerX, int iCornerY, int iDeltaX, int iDeltaY) {
+		g.drawLine(iCornerX,iCornerY,iCornerX + iDeltaX,iCornerY);
+		g.drawLine(iCornerX + iDeltaX,iCornerY,iCornerX + iDeltaX,iCornerY + iDeltaY);
+		g.drawLine(iCornerX,iCornerY + iDeltaY,iCornerX + iDeltaX,iCornerY + iDeltaY);
+		g.drawLine(iCornerX,iCornerY,iCornerX,iCornerY + iDeltaY);
 	}
 }
