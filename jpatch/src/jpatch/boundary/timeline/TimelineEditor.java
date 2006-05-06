@@ -142,6 +142,7 @@ public class TimelineEditor extends JScrollPane {
 			track.expand(expand);
 		bTrackHeightsValid = false;
 		revalidate();
+		((Header) getRowHeader().getView()).setAllExpanded(expand);
 		((JComponent) getViewport().getView()).revalidate();
 		((JComponent) getRowHeader().getView()).revalidate();
 		repaint();

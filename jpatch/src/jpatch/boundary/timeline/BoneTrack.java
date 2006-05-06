@@ -151,7 +151,7 @@ public class BoneTrack extends Track {
 	}
 	
 	public MotionKey getKeyAt(int mx, int my) {
-		int frame = mx / timelineEditor.getFrameWidth();
+		int frame = mx / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
 		float min = 0, max = 0;
 		for (MotionCurve.Float motionCurve : motionCurves) {
 			if (motionCurve.getMin() < min)

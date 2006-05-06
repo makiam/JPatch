@@ -100,6 +100,13 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		}
 	}
 	
+	public void setAllExpanded(boolean expanded) {
+		for (JToggleButton button : expandButton) {
+			button.setToolTipText(expanded ? "collapse track" : "expand track");
+			button.setPressedIcon(expanded ? iconUpArrow[1] : iconDownArrow[1]);
+		}
+	}
+	
 	public void doLayout() {
 		super.doLayout();
 		layoutButtons();
