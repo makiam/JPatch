@@ -153,7 +153,7 @@ public class Track<M extends MotionCurve> {
 		throw new UnsupportedOperationException();
 	}
 	
-	public void paint(Graphics g, int y, Map<MotionKey, Track> selection, MotionKey[] hitKeys) {	
+	public void paint(Graphics g, int y, Map<MotionKey, TrackView.KeyData> selection, MotionKey[] hitKeys) {	
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
