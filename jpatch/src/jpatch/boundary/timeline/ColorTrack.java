@@ -1,6 +1,7 @@
 package jpatch.boundary.timeline;
 
 import java.awt.*;
+import java.util.Map;
 
 import javax.swing.*;
 import javax.vecmath.Color3f;
@@ -14,7 +15,8 @@ public class ColorTrack extends Track<MotionCurve.Color3f> {
 		super(timelineEditor, motionCurve);
 	}
 
-	public void paint(Graphics g, int y, Object selectedKey) {
+	@Override
+	public void paint(Graphics g, int y, Map<MotionKey, TrackView.KeyData> selection, MotionKey[] hitKeys) {
 		Rectangle clip = g.getClipBounds();
 		int height = getHeight();
 		
@@ -54,10 +56,17 @@ public class ColorTrack extends Track<MotionCurve.Color3f> {
 			MotionKey.Color3f colorKey = (MotionKey.Color3f) motionCurve.getKeyAt(frame);
 			if (colorKey != null) {
 				//g.fill3DRect(x + start - iFrameWidth / 2, y + 2, iFrameWidth, 11, true);
-				Color3f color = colorKey.getColor3f();
-				color.clamp(0, 1);
-				Color c = (color.x + color.y + color.z > 1.5f) ? Color.BLACK : Color.WHITE;
-				g.setColor(color.get());
+				Color c = Color.BLACK;
+				if (keyHit(colorKey, hitKeys))
+					g.setColor(TimelineEditor.HIT_KEY);
+				else if (selection.containsKey(colorKey))
+					g.setColor(TimelineEditor.SELECTED_KEY);
+				else {
+					Color3f color = colorKey.getColor3f();
+					color.clamp(0, 1);
+					c = (color.x + color.y + color.z > 1.5f) ? Color.BLACK : Color.WHITE;
+					g.setColor(color.get());
+				}
 				g.fillOval(x + start - 3, y + 4, 6, 6);
 				g.setColor(c);
 				g.drawOval(x + start - 3, y + 4, 6, 6);

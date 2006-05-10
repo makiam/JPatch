@@ -13,7 +13,10 @@ public final class XmlDumpAction extends AbstractAction {
 		super("XML dump");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		System.out.println(MainFrame.getInstance().getModel().xml(""));
+		if (MainFrame.getInstance().getModel() != null)
+			System.out.println(MainFrame.getInstance().getModel().xml(""));
+		else
+			System.out.println(MainFrame.getInstance().getAnimation().xml(""));
 	}
 }
 

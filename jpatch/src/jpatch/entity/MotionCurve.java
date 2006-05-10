@@ -128,16 +128,19 @@ public abstract class MotionCurve {
 	}
 	
 	public void addKey(MotionKey key) {
+		System.out.println("addKey " + key.hashCode() + " pos " + key.getPosition());
 		list.add(binarySearch(key.getPosition()), key);
 	}
 	
 	public abstract MotionKey insertKeyAt(float position);
 	
 	public void removeKey(MotionKey key) {
+		System.out.println("removeKey " + key.hashCode() + " pos " + key.getPosition());
 		if (list.size() > 1) list.remove(key);
 	}
 	
 	public void moveKey(MotionKey key, float position) {
+		System.out.println("movekey " + key.hashCode() + " from " + key.getPosition() + " to " + position);
 		list.remove(key);
 		key.setPosition(position);
 		list.add(binarySearch(key.getPosition()), key);
@@ -223,7 +226,7 @@ public abstract class MotionCurve {
 	int binarySearch(float position) {
 		if (list.size() == 0) return 0;
 		if (position < ((MotionKey) list.get(0)).getPosition()) return 0;
-		if (position > ((MotionKey) list.get(list.size() - 1)).getPosition()) return list.size();
+		if (position >= ((MotionKey) list.get(list.size() - 1)).getPosition()) return list.size();
 		int min = 0;
 		int max = list.size() - 1;
 		int i = max >> 1;
