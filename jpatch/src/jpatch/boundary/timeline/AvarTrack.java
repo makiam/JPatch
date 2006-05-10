@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.17 2006/05/10 09:50:59 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.18 2006/05/10 11:31:59 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -39,7 +39,7 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 	}
 	
 	@Override
-	public void paint(Graphics g, int y, Map<MotionKey, Track> selection, MotionKey[] hitKeys) {
+	public void paint(Graphics g, int y, Map<MotionKey, TrackView.KeyData> selection, MotionKey[] hitKeys) {
 		int bottom = getHeight() - 4;
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();

@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.24 2006/05/10 09:50:59 sascha_l Exp $
+ * $Id: TrackView.java,v 1.25 2006/05/10 11:31:59 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -49,12 +49,13 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //	private int trackA, trackB;
 	private float value;
 	private int trackTop;
-	private int frame, delta;
+	private int frame, delta, firstFrame, lastFrame;
 	private Track hitTrack;
 	private MotionKey[] hitKeys;
-	private Map<MotionKey, Track> selection = new HashMap<MotionKey, Track>();
+	private Map<MotionKey, KeyData> selection = new HashMap<MotionKey, KeyData>();
 	private Range range;
 	private Rectangle rect;
+	private boolean moveSelection;
 	
 	public TrackView(TimelineEditor tle) {
 		timelineEditor = tle;
@@ -231,10 +232,12 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		}
 		
 		if (e.getButton() == MouseEvent.BUTTON1) {
-			boolean boxHit = false;
 			if (range != null && trackNumber >= range.firstTrack && trackNumber <=range.lastTrack && frame >= range.firstFrame && frame <= range.lastFrame) {
-				boxHit = true;
+				moveSelection = true;
+				firstFrame = range.firstFrame;
+				lastFrame = range.lastFrame;
 			} else {
+				moveSelection = false;
 				selection.clear();
 				range = null;
 				rect = null;
@@ -295,10 +298,16 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //							MainFrame.getInstance().getAnimation().setPosition(position);
 //							timelineEditor.setCurrentFrame((int) position);
 						} else {
-							/* enter lasso select mode */
-							state = State.LASSO;
-							range = new Range();
-							rect = new Rectangle(mx, my, 0, 0);
+							if (moveSelection) {
+								state = State.MOVE_KEY;
+								hitTrack = null;
+								hitKeys = null;
+							} else {
+								/* enter lasso select mode */
+								state = State.LASSO;
+								range = new Range();
+								rect = new Rectangle(mx, my, 0, 0);
+							}
 						}
 						repaint();
 					}
@@ -379,7 +388,10 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 					System.out.println("index " + startIndex + " to " + endIndex);
 					for (int j = startIndex; j < endIndex; j++) {
 						MotionKey key = motionCurve.getKey(j);
-						selection.put(key, track);
+						if (key instanceof MotionKey.Float)
+							selection.put(key, new KeyData(track, key.getPosition(), ((MotionKey.Float) key).getFloat()));
+						else
+							selection.put(key, new KeyData(track, key.getPosition()));
 						int p = (int) key.getPosition();
 						if (p < newRange.firstFrame)
 							newRange.firstFrame = p;
@@ -457,10 +469,19 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //			}
 //			if (selectedTrack.getMotionCurve(selectedKey) != null && !selectedTrack.getMotionCurve(selectedKey).hasKeyAt(frame))
 //				selectedTrack.shiftKey(selectedKey, frame);
-			for (MotionKey key : hitKeys) {
-				if (hitTrack.isExpanded())
-					hitTrack.moveKey(key, e.getY() - trackTop);
-				hitTrack.shiftKey(key, frame + delta);
+			if (moveSelection) {
+				for (MotionKey key: selection.keySet()) {
+					KeyData keyData = selection.get(key);
+					keyData.track.shiftKey(key, (int) keyData.position + delta);
+				}
+				range.firstFrame = firstFrame + delta;
+				range.lastFrame = lastFrame + delta;
+			} else {
+				for (MotionKey key : hitKeys) {
+					if (hitTrack.isExpanded())
+						hitTrack.moveKey(key, e.getY() - trackTop);
+					hitTrack.shiftKey(key, frame + delta);
+				}
 			}
 //				if (!(object instanceof MotionKey))
 //				return false;
@@ -832,5 +853,21 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		g.drawLine(rect.x, rect.y + rect.height, rect.x + rect.width, rect.y + rect.height);
 		g.drawLine(rect.x, rect.y, rect.x, rect.y + rect.height);
 		g.drawLine(rect.x + rect.width, rect.y, rect.x + rect.width, rect.y + rect.height);
+	}
+	
+	static class KeyData {
+		Track track;
+		float position;
+		float value;
+		
+		KeyData(Track track, float position, float value) {
+			this.track = track;
+			this.position = position;
+			this.value = value;
+		}
+		
+		KeyData(Track track, float position) {
+			this(track, position, 0);
+		}
 	}
 }

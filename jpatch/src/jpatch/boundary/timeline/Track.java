@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.15 2006/05/10 09:50:59 sascha_l Exp $
+ * $Id: Track.java,v 1.16 2006/05/10 11:31:59 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -153,7 +153,7 @@ public class Track<M extends MotionCurve> {
 		throw new UnsupportedOperationException();
 	}
 	
-	public void paint(Graphics g, int y, Map<MotionKey, Track> selection, MotionKey[] hitKeys) {	
+	public void paint(Graphics g, int y, Map<MotionKey, TrackView.KeyData> selection, MotionKey[] hitKeys) {	
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
