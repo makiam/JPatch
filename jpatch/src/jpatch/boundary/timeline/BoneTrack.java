@@ -43,7 +43,7 @@ public class BoneTrack extends Track {
 	}
 	
 
-	public void paint(Graphics g, int y, Map<MotionKey, Track> selection, MotionKey[] hitKeys) {
+	public void paint(Graphics g, int y, Map<MotionKey, TrackView.KeyData> selection, MotionKey[] hitKeys) {
 		int bottom = getHeight() - 4;
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
