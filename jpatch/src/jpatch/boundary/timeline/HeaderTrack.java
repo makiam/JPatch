@@ -1,7 +1,7 @@
 package jpatch.boundary.timeline;
 
 import java.awt.*;
-
+import java.util.*;
 import javax.swing.UIManager;
 
 import jpatch.control.edit.AtomicModifyMotionCurve;
@@ -33,7 +33,7 @@ public class HeaderTrack extends Track {
 		return iIndent;
 	}
 	
-	public MotionKey getKeyAt(int mx, int my) {
+	public MotionKey[] getKeysAt(int mx, int my) {
 		return null;
 	}
 	
@@ -45,7 +45,12 @@ public class HeaderTrack extends Track {
 		return null;
 	}
 	
-	public void paint(Graphics g, int y, Object selectedKey) {	
+	@Override
+	public MotionCurve[] getMotionCurves() {
+		return new MotionCurve[0];
+	}
+	
+	public void paint(Graphics g, int y, Map<MotionKey, Track> selection, MotionKey[] hitKeys) {	
 //		Rectangle clip = g.getClipBounds();
 //		int fw = timelineEditor.getFrameWidth();
 //		int start = clip.x - clip.x % fw + fw / 2;

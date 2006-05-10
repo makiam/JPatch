@@ -42,7 +42,8 @@ public class BoneTrack extends Track {
 		return level * 4;
 	}
 	
-	public void paint(Graphics g, int y, Object selectedKey) {
+
+	public void paint(Graphics g, int y, Map<MotionKey, Track> selection, MotionKey[] hitKeys) {
 		int bottom = getHeight() - 4;
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
@@ -104,7 +105,9 @@ public class BoneTrack extends Track {
 					int vThis = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
 					MotionKey key = motionCurve.getKeyAt(frame);
 					if (key != null) {
-						if (key == selectedKey)
+						if (keyHit(key, hitKeys))
+							g.setColor(TimelineEditor.HIT_KEY);
+						else if (selection.containsKey(key))
 							g.setColor(TimelineEditor.SELECTED_KEY);
 						else
 							g.setColor(col[i]);
@@ -132,16 +135,31 @@ public class BoneTrack extends Track {
 		g.setColor(track);
 		g.fillRect(clip.x, y + TOP + 1, clip.width, 3);
 	
-		g.setColor(KEY);
+		
 		for (int x = -fw ; x <= clip.width + fw; x += fw) {
-			boolean key = false;
-			for (MotionCurve m : motionCurves)
-				if (m.hasKeyAt(frame)) {
-					key = true;
-					break;
+			MotionKey key;
+			boolean selected = false;
+			boolean hit = false;
+			boolean draw = false;
+			for (MotionCurve m : motionCurves) {
+				key = m.getKeyAt(frame);
+				if (key != null) {
+					draw = true;
+					if (keyHit(key, hitKeys)) {
+						hit = true;
+						break;
+					}
+					if (selection.containsKey(key))
+						selected = true;
 				}
-			if (key) {
-				g.setColor(KEY);
+			}
+			if (draw) {
+				if (hit)
+					g.setColor(TimelineEditor.HIT_KEY);
+				else if (selected)
+					g.setColor(TimelineEditor.SELECTED_KEY);
+				else
+					g.setColor(Color.GRAY);
 				g.fillOval(x + start - 3, y + TOP - 1, 6, 6);
 				g.setColor(Color.BLACK);
 				g.drawOval(x + start - 3, y + TOP - 1, 6, 6);
@@ -150,29 +168,44 @@ public class BoneTrack extends Track {
 		}
 	}
 	
-	public MotionKey getKeyAt(int mx, int my) {
+	public MotionKey[] getKeysAt(int mx, int my) {
 		int frame = mx / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
 		float min = 0, max = 0;
+		MotionKey[] result = new MotionKey[motionCurves.length];
 		for (MotionCurve.Float motionCurve : motionCurves) {
 			if (motionCurve.getMin() < min)
 				min = motionCurve.getMin();
 			if (motionCurve.getMax() > max)
 				max = motionCurve.getMax();
 		}
+		int i = 0;
 		for (MotionCurve.Float motionCurve : motionCurves) {
 			MotionKey.Float key = (MotionKey.Float) motionCurve.getKeyAt(frame);
 			if (key == null)
 				continue;
-			float scale = max - min;
-			int size = iExpandedHeight - 4;
-			int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
-			int ky = off - (int) Math.round(size / scale * key.getFloat());
-			if (my > ky - 5 && my < ky + 5) {
-				reorder(motionCurve);
-				return key;
+			if (isExpanded()) {
+				float scale = max - min;
+				int size = iExpandedHeight - 4;
+				int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
+				int ky = off - (int) Math.round(size / scale * key.getFloat());
+				if (my > ky - 5 && my < ky + 5) {
+					reorder(motionCurve);
+					return new MotionKey[] { key };
+				}
+			} else {
+				result[i++] = key;
 			}
 		}
-		return null;
+		if (i == 0)
+			return null;
+		MotionKey[] ret = new MotionKey[i];
+		for (int j = 0; j < i; j++)
+			ret[j] = result[j];
+		return ret;
+	}
+	
+	public MotionCurve[] getMotionCurves() {
+		return motionCurves;
 	}
 	
 	public MotionCurve getMotionCurve(MotionKey key) {

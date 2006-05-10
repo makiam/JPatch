@@ -1,6 +1,6 @@
 package jpatch.entity;
 
-public abstract class MotionKey implements Comparable {
+public abstract class MotionKey {
 	float fPosition;
 	
 	private MotionKey(float position) {
@@ -15,16 +15,34 @@ public abstract class MotionKey implements Comparable {
 		fPosition = position;
 	}
 	
-	public boolean equals(Object object) {
-		if (!(object instanceof MotionKey))
-			return false;
-		return fPosition == ((MotionKey) object).fPosition;
-	}
+//	public boolean equals(Object object) {
+//		if (!(object instanceof MotionKey))
+//			return false;
+//		return fPosition == ((MotionKey) object).fPosition;
+//	}
+//	
+//	public int compareTo(Object object) {
+//		MotionKey other = (MotionKey) object;
+//		return java.lang.Float.compare(fPosition, other.fPosition);
+//	}
 	
-	public int compareTo(Object object) {
-		MotionKey other = (MotionKey) object;
-		return java.lang.Float.compare(fPosition, other.fPosition);
-	}
+//	public static class Compound extends MotionKey {
+//		private MotionKey[] keys;
+//		
+//		public Compound(MotionKey[] keys) {
+//			super(keys[0].fPosition);
+//			for (int i = 1; i < keys.length; i++)
+//				if (keys[i].fPosition != fPosition)
+//					throw new IllegalArgumentException("Compound Key can only hold keys at the same position!!!");
+//		}
+//		
+//		@Override
+//		public void setPosition(float position) {
+//			for (MotionKey key : keys)
+//				key.setPosition(position);
+//		}
+//		
+//	}
 	
 	public static class Float extends MotionKey {
 		private float f;

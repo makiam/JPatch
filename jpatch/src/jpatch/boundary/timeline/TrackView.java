@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.23 2006/05/06 09:52:15 sascha_l Exp $
+ * $Id: TrackView.java,v 1.24 2006/05/10 09:50:59 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -23,7 +23,8 @@ package jpatch.boundary.timeline;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -42,12 +43,18 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	private final TimelineEditor timelineEditor;
 	private Dimension dim = new Dimension();
 	private int iVerticalResize = -1;
-	private int mx, my, trackTop;
-	private int cornerX, cornerY, deltaX, deltaY;
-	
-	private MotionKey selectedKey;
-	private Track selectedTrack;
-	private float position, value;
+	private int mx, my;
+//	private int cornerX, cornerY, deltaX, deltaY;
+//	private int frame, delta, frameA, frameB;
+//	private int trackA, trackB;
+	private float value;
+	private int trackTop;
+	private int frame, delta;
+	private Track hitTrack;
+	private MotionKey[] hitKeys;
+	private Map<MotionKey, Track> selection = new HashMap<MotionKey, Track>();
+	private Range range;
+	private Rectangle rect;
 	
 	public TrackView(TimelineEditor tle) {
 		timelineEditor = tle;
@@ -88,15 +95,26 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		int y = 0;
 		Set<Track> selectedTracks = timelineEditor.getHeader().getSelectedTracks();
 		g.setColor(TimelineEditor.SELECTED_BACKGROUND);
-		for (Track track : timelineEditor.getTracks()) {
-			if (track.isHidden())
+		for (int i = 0, n = timelineEditor.getTracks().size(); i < n; i++) {
+			Track track = timelineEditor.getTracks().get(i);
+			if (track.isHidden()) 
 				continue;
 			if (y + track.getHeight() > clip.y && y < clip.y + clip.height)
 				if (selectedTracks.contains(track))
 					g.fillRect(clip.x, y, clip.width, track.getHeight());
+			if (range != null) {
+				if (i == range.firstTrack)
+					rect.y = y;
+				if (i == range.lastTrack)
+					rect.height = y + track.getHeight() - rect.y;
+			}
 			y += track.getHeight();
 		}
 		
+		if (range != null) {
+			rect.x = (range.firstFrame - (int) MainFrame.getInstance().getAnimation().getStart()) * fw;
+			rect.width = (range.lastFrame - range.firstFrame + 1) * fw;
+		}
 		g.setColor(TimelineEditor.TICK);
 		int frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
 		int minor;
@@ -122,7 +140,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			if (track.isHidden())
 				continue;
 			if (y + track.getHeight() > clip.y && y < clip.y + clip.height)
-				track.paint(g, y, selectedKey);
+				track.paint(g, y, selection, hitKeys);
 			y += track.getHeight();
 		}
 //		if (timelineEditor.getTracks().size() > 0 && timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
@@ -147,6 +165,12 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //		g.setColor(Color.BLACK);
 //		g.drawLine(x + 1, clip.y, x + 1, clip.height);
 //		System.out.println((System.currentTimeMillis() - t) + " ms");
+		if (state != State.LASSO && range != null && rect != null) {
+			g.setColor(Color.BLACK);
+			g.drawRect(rect.x - 1, rect.y - 1, rect.width + 2, rect.height + 2);
+			g.drawRect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
+			g.drawRect(rect.x, rect.y, rect.width, rect.height);
+		}
 	}
 	
 	public Dimension getPreferredScrollableViewportSize() {
@@ -192,8 +216,31 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	public void mousePressed(MouseEvent e) {
 		my = e.getY();
 		mx = e.getX();
+		frame = mx / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
+		int trackNumber = -1;
+		int y = 0;
+		for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
+			Track track = timelineEditor.getTracks().get(i);
+			if (track.isHidden())
+				continue;
+			if (my > y && my < y + track.getHeight()) {
+				trackNumber = i;
+				break;
+			}
+			y += track.getHeight();
+		}
+		
 		if (e.getButton() == MouseEvent.BUTTON1) {
-			int y = 0;
+			boolean boxHit = false;
+			if (range != null && trackNumber >= range.firstTrack && trackNumber <=range.lastTrack && frame >= range.firstFrame && frame <= range.lastFrame) {
+				boxHit = true;
+			} else {
+				selection.clear();
+				range = null;
+				rect = null;
+				repaint();
+			}
+			y = 0;
 			for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
 				Track track = timelineEditor.getTracks().get(i);
 				if (track.isHidden())
@@ -218,37 +265,40 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 						} else {
 							// no - so the track area was hit - let's see if a key was hit...
 							
-							selectedKey = track.getKeyAt(mx, my - y);
-							if (selectedKey != null) {
-								state = State.MOVE_KEY;
-								selectedTrack = track;
+							hitKeys = track.getKeysAt(mx, my - y);
+							if (hitKeys != null) {
+								hitTrack = track;
 								trackTop = y;
-								position = selectedKey.getPosition();
-								MainFrame.getInstance().getAnimation().setPosition(position);
+								state = State.MOVE_KEY;
+								MainFrame.getInstance().getAnimation().setPosition(frame);
 								MainFrame.getInstance().getJPatchScreen().update_all();
-								timelineEditor.setCurrentFrame((int) position);
-								if (selectedKey instanceof MotionKey.Float)
-									value = ((MotionKey.Float) selectedKey).getFloat();
+								timelineEditor.setCurrentFrame((int) frame);
+								if (hitKeys[0] instanceof MotionKey.Float)
+									value = ((MotionKey.Float) hitKeys[0]).getFloat();
 //								System.out.println("key selected: " + selectedKey + " position=" + position);
 							} else {
 								/* enter lasso select mode */
 								state = State.LASSO;
+								range = new Range();
+								rect = new Rectangle(mx, my, 0, 0);
 							}
 							repaint();
 						}
 					}
 				} else {
 					if (my > y && my <= y + track.getHeight()) {
-						selectedKey = track.getKeyAt(mx, my - y);
-						if (selectedKey != null) {
+						hitKeys =  track.getKeysAt(mx, my - y);
+						if (hitKeys != null) {
+							hitTrack = track;
 							state = State.MOVE_KEY;
-							selectedTrack = track;
-							position = selectedKey.getPosition();
+//							position = getSelectedKey().getPosition();
 //							MainFrame.getInstance().getAnimation().setPosition(position);
 //							timelineEditor.setCurrentFrame((int) position);
 						} else {
 							/* enter lasso select mode */
 							state = State.LASSO;
+							range = new Range();
+							rect = new Rectangle(mx, my, 0, 0);
 						}
 						repaint();
 					}
@@ -261,7 +311,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			state = State.SCROLL;
 //			System.out.println(mx);
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
-			int y = 0;
+			y = 0;
 			for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
 				Track track = timelineEditor.getTracks().get(i);
 				if (track.isHidden())
@@ -277,43 +327,75 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	public void mouseClicked(MouseEvent e) {
 	}
 	
+//	public MotionKey getSelectedKey() {
+//		for (MotionKey key : selection.keySet())
+//			return key;
+//		return null;
+//	}
+//	
+//	public Track getSelectedTrack() {
+//		return selection.get(getSelectedKey());
+//	}
+	
 	public void mouseReleased(MouseEvent e) {
 		switch (state) {
 		case MOVE_KEY:
-			JPatchActionEdit edit = new JPatchActionEdit("move key");
-			System.out.println("moving key " + selectedKey + " position=" + position);
-			float newPosition = selectedKey.getPosition();
-			selectedKey.setPosition(position);
-			if (newPosition != position)
-				edit.addEdit(new AtomicMoveMotionKey(selectedTrack.getMotionCurve(selectedKey), selectedKey, newPosition));
-			if (selectedKey instanceof MotionKey.Float) {
-				MotionKey.Float key = (MotionKey.Float) selectedKey;
-				float newValue = key.getFloat();
-				key.setFloat(value);
-				if (newValue != value)
-//					edit.addEdit(new AtomicModifyMotionCurve.Float((MotionCurve.Float) selectedTrack.getMotionCurve(selectedKey), newPosition, newValue));
-//					edit.addEdit(new AtomicMoveMotionKey(selectedTrack.getMotionCurve(selectedKey), selectedKey, newPosition));
-					edit.addEdit(new AtomicChangeMotionKeyValue(key, newValue));
+			if (delta != 0) {
+				JPatchActionEdit edit = new JPatchActionEdit("move key");
+	//			System.out.println("moving key " + selectedKey + " position=" + position);
+	//			float newPosition = getSelectedKey().getPosition();
+				for (MotionKey selectedKey : hitKeys) {
+					selectedKey.setPosition((int) selectedKey.getPosition() - delta);
+					edit.addEdit(new AtomicMoveMotionKey(hitTrack.getMotionCurve(selectedKey), selectedKey, (int) selectedKey.getPosition() + delta));
+					if (selectedKey instanceof MotionKey.Float) {
+						MotionKey.Float key = (MotionKey.Float) selectedKey;
+						float newValue = key.getFloat();
+						key.setFloat(value);
+						if (newValue != value)
+		//					edit.addEdit(new AtomicModifyMotionCurve.Float((MotionCurve.Float) selectedTrack.getMotionCurve(selectedKey), newPosition, newValue));
+		//					edit.addEdit(new AtomicMoveMotionKey(selectedTrack.getMotionCurve(selectedKey), selectedKey, newPosition));
+							edit.addEdit(new AtomicChangeMotionKeyValue(key, newValue));
+					}
+				}
+				if (edit.isValid())
+					MainFrame.getInstance().getUndoManager().addEdit(edit);
 			}
-			if (edit.isValid())
-				MainFrame.getInstance().getUndoManager().addEdit(edit);
 			break;
 		case LASSO:
-			int y = 0;
-			Set<Track> selectedTracks = timelineEditor.getHeader().getSelectedTracks();
-			for (Track track : timelineEditor.getTracks()) {
-				if (track.isHidden())
-					continue;
-				int top = y;
-				int bottom = y + track.getHeight();
-				
-				
-				y = bottom;
+			selection.clear();
+			Range newRange = new Range();
+			boolean selectionValid = false;
+			for (int i = range.firstTrack; i <= range.lastTrack;i++) {
+				Track track = timelineEditor.getTracks().get(i);
+				for (MotionCurve motionCurve : track.getMotionCurves()) {
+					int startIndex = motionCurve.getIndexAt(range.firstFrame);
+					int endIndex = motionCurve.getIndexAt(range.lastFrame);
+					if (startIndex != endIndex){
+						if (i < newRange.firstTrack)
+							newRange.firstTrack = i;
+						if (i > newRange.lastTrack)
+							newRange.lastTrack = i;
+					}
+					System.out.println("index " + startIndex + " to " + endIndex);
+					for (int j = startIndex; j < endIndex; j++) {
+						MotionKey key = motionCurve.getKey(j);
+						selection.put(key, track);
+						int p = (int) key.getPosition();
+						if (p < newRange.firstFrame)
+							newRange.firstFrame = p;
+						if (p > newRange.lastFrame)
+							newRange.lastFrame = p;
+						selectionValid = true;
+					}
+				}
 			}
-			
+			if (selectionValid)
+				range = newRange;
+			else {
+				range = null;
+				rect = null;
+			}
 			repaint();
-			cornerX = cornerY = -1;
-			deltaX = deltaY = 0;
 			break;
 		}
 		state = State.IDLE;
@@ -328,7 +410,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	}
 	
 	public void mouseDragged(MouseEvent e) {
-//		System.out.println(e.getButton());
+		System.out.println("frame " + frame + " delta " + delta + " state " + state);
+		System.out.println(Arrays.toString(hitKeys));
 		switch (state) {
 		
 		case RESIZE:
@@ -367,57 +450,84 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //			((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
 			break;
 		case MOVE_KEY:
-			int frame = e.getX() / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
+			delta = e.getX() / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart() - frame;
 			
-			if (selectedTrack.isExpanded()) {
-				selectedTrack.moveKey(selectedKey, e.getY() - trackTop);
+//			if (selectedTrack.isExpanded()) {
+//				selectedTrack.moveKey(selectedKey, e.getY() - trackTop);
+//			}
+//			if (selectedTrack.getMotionCurve(selectedKey) != null && !selectedTrack.getMotionCurve(selectedKey).hasKeyAt(frame))
+//				selectedTrack.shiftKey(selectedKey, frame);
+			for (MotionKey key : hitKeys) {
+				if (hitTrack.isExpanded())
+					hitTrack.moveKey(key, e.getY() - trackTop);
+				hitTrack.shiftKey(key, frame + delta);
 			}
-			if (selectedTrack.getMotionCurve(selectedKey) != null && !selectedTrack.getMotionCurve(selectedKey).hasKeyAt(frame))
-				selectedTrack.shiftKey(selectedKey, frame);
+//				if (!(object instanceof MotionKey))
+//				return false;
+//			return fPosition == ((MotionKey) object).fPosition;
+//		}public boolean equals(Object object) {
+//				if (!(object instanceof MotionKey))
+//				return false;
+//			return fPosition == ((MotionKey) object).fPosition;
+//		}
+//		
+//		public int compareTo(Object object) {
+//			MotionKey other = (MotionKey) object;
+//			return java.lang.Float.compare(fPosition, other.fPosition);
+//		}
+//		
+//		public int compareTo(Object object) {
+//			MotionKey other = (MotionKey) object;
+//			return java.lang.Float.compare(fPosition, other.fPosition);
+//		}
 			repaint();
 //			timelineEditor.setCornerText("Frame " + frame);
 //			if (timelineEditor.getAnimObject() instanceof AnimModel) {
 //			MainFrame.getInstance().getAnimation().getCurvesetFor(timelineEditor.getAnimObject()).setPosition(position);
-			MainFrame.getInstance().getAnimation().setPosition(frame);
-			timelineEditor.setCurrentFrame(frame);
+			MainFrame.getInstance().getAnimation().setPosition(frame + delta);
+			timelineEditor.setCurrentFrame(frame + delta);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 			break;
 		case LASSO:
 			Graphics2D g2 = (Graphics2D) ((Component) e.getSource()).getGraphics();
 			g2.setXORMode(new Color(((Component) e.getSource()).getBackground().getRGB() ^ 0x00000000));
-			g2.setStroke(new BasicStroke(2.0f,BasicStroke.CAP_SQUARE,BasicStroke.JOIN_BEVEL,0.0f,new float[] { 5.0f, 5.0f }, 0.0f));
+			g2.setStroke(new BasicStroke(2.0f,BasicStroke.CAP_SQUARE,BasicStroke.JOIN_BEVEL,0.0f,new float[] { 4.0f, 4.0f }, 0.0f));
 			int eventX = e.getX();
 			int eventY = e.getY();
-			drawSelectionRectangle(g2, cornerX, cornerY, deltaX, deltaY);
-			deltaX = Math.abs(mx - eventX);
-			deltaY = Math.abs(my - eventY);
-			cornerX = (mx < eventX) ? mx : eventX;
-			cornerY = (my < eventY) ? my : eventY;
+			drawSelectionRectangle(g2);
+			rect.width = Math.abs(mx - eventX);
+			rect.height = Math.abs(my - eventY);
+			rect.x = (mx < eventX) ? mx : eventX;
+			rect.y = (my < eventY) ? my : eventY;
 			y = 0;
-			Set<Track> selectedTracks = timelineEditor.getHeader().getSelectedTracks();
-			for (Track track : timelineEditor.getTracks()) {
+			List<Track> list = timelineEditor.getTracks();
+			for (int i = 0, n = list.size(); i < n; i++) {
+				Track track = list.get(i);
 				if (track.isHidden())
 					continue;
 				int top = y;
 				int bottom = y + track.getHeight();
-				if (cornerY > top && cornerY < bottom) {
-					deltaY += (cornerY - top);
-					cornerY = top;
-				} if ((cornerY + deltaY) > top && (cornerY + deltaY) < bottom)
-					deltaY = bottom - cornerY;
+				if (rect.y > top && rect.y < bottom) {
+					rect.height += (rect.y - top);
+					rect.y = top;
+					range.firstTrack = i;
+				} if ((rect.y + rect.height) > top && (rect.y + rect.height) < bottom) {
+					rect.height = bottom - rect.y;
+					range.lastTrack = i;
+				}
 				y = bottom;
 			}
-			if ((cornerY + deltaY) >= y)
-				deltaY = y - cornerY;
-			if (cornerY < 0) {
-				deltaY += cornerY;
-				cornerY = 0;
+			if ((rect.y + rect.height) >= y)
+				rect.height = y - rect.y;
+			if (rect.y < 0) {
+				rect.height += rect.y;
+				rect.y = 0;
 			}
-			int frameA = cornerX / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
-			int frameB = (cornerX + deltaX) / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
-			cornerX = (frameA - (int) MainFrame.getInstance().getAnimation().getStart()) * timelineEditor.getFrameWidth();
-			deltaX = (frameB - (int) MainFrame.getInstance().getAnimation().getStart()) * timelineEditor.getFrameWidth() - cornerX;
-			drawSelectionRectangle(g2, cornerX, cornerY, deltaX, deltaY);
+			range.firstFrame = rect.x / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
+			range.lastFrame = (rect.x + rect.width) / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
+			rect.x = (range.firstFrame - (int) MainFrame.getInstance().getAnimation().getStart()) * timelineEditor.getFrameWidth();
+			rect.width = (range.lastFrame - (int) MainFrame.getInstance().getAnimation().getStart()) * timelineEditor.getFrameWidth() - rect.x;
+			drawSelectionRectangle(g2);
 			break;
 		}
 	}
@@ -699,28 +809,28 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		 * delete key
 		 */
 		mi = new JMenuItem("delete selected key");
-		final MotionCurve motionCurve = selectedTrack == null ? null : selectedTrack.getMotionCurve(selectedKey);
-		mi.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				JPatchRootEdit edit = new AtomicDeleteMotionKey(motionCurve, selectedKey);
-				MainFrame.getInstance().getUndoManager().addEdit(edit);
-				selectedKey = null;
-				selectedTrack = null;
-				TrackView.this.repaint();
-				MainFrame.getInstance().getAnimation().rethink();
-				MainFrame.getInstance().getJPatchScreen().update_all();
-			}
-		});
-		mi.setEnabled(selectedKey != null && motionCurve != null && motionCurve.getKeyCount() > 1);
+//		final MotionCurve motionCurve = selectedTrack == null ? null : selectedTrack.getMotionCurve(selectedKey);
+//		mi.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent event) {
+//				JPatchRootEdit edit = new AtomicDeleteMotionKey(motionCurve, selectedKey);
+//				MainFrame.getInstance().getUndoManager().addEdit(edit);
+//				selectedKey = null;
+//				selectedTrack = null;
+//				TrackView.this.repaint();
+//				MainFrame.getInstance().getAnimation().rethink();
+//				MainFrame.getInstance().getJPatchScreen().update_all();
+//			}
+//		});
+//		mi.setEnabled(selectedKey != null && motionCurve != null && motionCurve.getKeyCount() > 1);
 		popup.add(mi);
 		
 		popup.show((Component) e.getSource(), e.getX(), e.getY());
 	}
 	
-	private static void drawSelectionRectangle(Graphics g, int iCornerX, int iCornerY, int iDeltaX, int iDeltaY) {
-		g.drawLine(iCornerX,iCornerY,iCornerX + iDeltaX,iCornerY);
-		g.drawLine(iCornerX + iDeltaX,iCornerY,iCornerX + iDeltaX,iCornerY + iDeltaY);
-		g.drawLine(iCornerX,iCornerY + iDeltaY,iCornerX + iDeltaX,iCornerY + iDeltaY);
-		g.drawLine(iCornerX,iCornerY,iCornerX,iCornerY + iDeltaY);
+	private void drawSelectionRectangle(Graphics g) {
+		g.drawLine(rect.x, rect.y, rect.x + rect.width, rect.y);
+		g.drawLine(rect.x, rect.y + rect.height, rect.x + rect.width, rect.y + rect.height);
+		g.drawLine(rect.x, rect.y, rect.x, rect.y + rect.height);
+		g.drawLine(rect.x + rect.width, rect.y, rect.x + rect.width, rect.y + rect.height);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.14 2006/05/06 09:52:15 sascha_l Exp $
+ * $Id: Track.java,v 1.15 2006/05/10 09:50:59 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -22,6 +22,8 @@
 package jpatch.boundary.timeline;
 
 import java.awt.*;
+import java.util.Arrays;
+import java.util.Map;
 
 import javax.swing.UIManager;
 
@@ -100,14 +102,24 @@ public class Track<M extends MotionCurve> {
 		bHidden = hidden;
 	}
 	
-	public MotionKey getKeyAt(int mx, int my) {
+	public MotionKey[] getKeysAt(int mx, int my) {
 		System.out.println("*");
 		int frame = mx / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
-		return motionCurve.getKeyAt(frame);
+		MotionKey key = motionCurve.getKeyAt(frame);
+//		boolean contains = selection.containsKey(key);
+		if (key != null)
+			return new MotionKey[] { key };
+		else
+			return null;
+//		return contains;
 	}
 	
 	public MotionCurve getMotionCurve(MotionKey key) {
 		return motionCurve;
+	}
+	
+	public MotionCurve[] getMotionCurves() {
+		return new MotionCurve[] { motionCurve };
 	}
 	
 	public void moveKey(Object key, int y) {
@@ -141,7 +153,7 @@ public class Track<M extends MotionCurve> {
 		throw new UnsupportedOperationException();
 	}
 	
-	public void paint(Graphics g, int y, Object selectedKey) {	
+	public void paint(Graphics g, int y, Map<MotionKey, Track> selection, MotionKey[] hitKeys) {	
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
@@ -175,7 +187,9 @@ public class Track<M extends MotionCurve> {
 		for (int x = -fw ; x <= clip.width + fw; x += fw) {
 			MotionKey key = motionCurve.getKeyAt(frame);
 			if (key != null) {
-				if (key == selectedKey)
+				if (keyHit(key, hitKeys))
+					g.setColor(TimelineEditor.HIT_KEY);
+				else if (selection.containsKey(key))
 					g.setColor(TimelineEditor.SELECTED_KEY);
 				else
 					g.setColor(Color.GRAY);
@@ -195,5 +209,14 @@ public class Track<M extends MotionCurve> {
 //			}
 			frame++;
 		}
+	}
+	
+	boolean keyHit(MotionKey key, MotionKey[] hitKeys) {
+		if (hitKeys == null)
+			return false;
+		for (MotionKey hitKey : hitKeys)
+			if (key.equals(hitKey))
+				return true;
+		return false;
 	}
 }

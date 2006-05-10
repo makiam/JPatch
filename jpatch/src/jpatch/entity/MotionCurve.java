@@ -216,6 +216,10 @@ public abstract class MotionCurve {
 		list.clear();
 	}
 	
+	public int getIndexAt(float position) {
+		return binarySearch(position);
+	}
+	
 	int binarySearch(float position) {
 		if (list.size() == 0) return 0;
 		if (position < ((MotionKey) list.get(0)).getPosition()) return 0;

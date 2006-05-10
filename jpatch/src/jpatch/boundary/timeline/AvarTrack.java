@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.16 2006/05/06 09:52:15 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.17 2006/05/10 09:50:59 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -24,6 +24,7 @@ package jpatch.boundary.timeline;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.util.Map;
 
 import javax.swing.UIManager;
 
@@ -37,7 +38,8 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 		bExpandable = true;
 	}
 	
-	public void paint(Graphics g, int y, Object selectedKey) {	
+	@Override
+	public void paint(Graphics g, int y, Map<MotionKey, Track> selection, MotionKey[] hitKeys) {
 		int bottom = getHeight() - 4;
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
@@ -94,7 +96,9 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 				int vThis = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
 				MotionKey key = motionCurve.getKeyAt(frame);
 				if (key != null) {
-					if (key == selectedKey)
+					if (keyHit(key, hitKeys))
+						g.setColor(TimelineEditor.HIT_KEY);
+					else if (selection.containsKey(key))
 						g.setColor(TimelineEditor.SELECTED_KEY);
 					else
 						g.setColor(Color.GRAY);
@@ -107,12 +111,14 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 			g.setClip(clip);
 			return;
 		}
-		super.paint(g, y, selectedKey);
+		super.paint(g, y, selection, hitKeys);
 	}
 	
-	public MotionKey getKeyAt(int mx, int my) {
-		if (!bExpanded)
-			return super.getKeyAt(mx, my);
+	@Override
+	public MotionKey[] getKeysAt(int mx, int my) {
+		if (!bExpanded) {
+			return super.getKeysAt(mx, my);
+		}
 		int frame = mx / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
 		MotionKey.Float key = (MotionKey.Float) motionCurve.getKeyAt(frame);
 		if (key == null)
@@ -124,7 +130,7 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 		int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
 		int ky = off - (int) Math.round(size / scale * key.getFloat());
 		if (my > ky - 5 && my < ky + 5)
-			return key;
+			return new MotionKey[] { key };
 		return null;
 	}
 	
