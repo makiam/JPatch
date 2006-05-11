@@ -15,6 +15,7 @@ public abstract class MotionKey {
 		fPosition = position;
 	}
 	
+	public abstract MotionKey copy();
 //	public boolean equals(Object object) {
 //		if (!(object instanceof MotionKey))
 //			return false;
@@ -63,6 +64,10 @@ public abstract class MotionKey {
 		public String toString() {
 			return ("<key frame=\"" + fPosition + "\" value=\"" + f + "\"/>");
 		}
+		
+		public MotionKey.Float copy() {
+			return new MotionKey.Float(fPosition, f);
+		}
 	}
 	
 	public static class Point3d extends MotionKey {
@@ -87,6 +92,10 @@ public abstract class MotionKey {
 		
 		public String toString() {
 			return ("<key frame=\"" + fPosition + "\" x=\"" + p.x + "\" y=\"" + p.y + "\" z=\"" + p.z + "\"/>");
+		}
+		
+		public MotionKey.Point3d copy() {
+			return new MotionKey.Point3d(fPosition, p);
 		}
 	}
 	
@@ -138,6 +147,10 @@ public abstract class MotionKey {
 		public String toString() {
 			return ("<key frame=\"" + fPosition + "\" r=\"" + c.x + "\" g=\"" + c.y + "\" b=\"" + c.z + "\"/>");
 		}
+		
+		public MotionKey.Color3f copy() {
+			return new MotionKey.Color3f(fPosition, c);
+		}
 	}
 	
 	public static class Quat4f extends MotionKey {
@@ -162,6 +175,9 @@ public abstract class MotionKey {
 		
 		public String toString() {
 			return ("<key frame=\"" + fPosition + "\" x=\"" + q.x + "\" y=\"" + q.y + "\" z=\"" + q.z + "\" w=\"" + q.w + "\"/>");
+		}
+		public MotionKey.Quat4f copy() {
+			return new MotionKey.Quat4f(fPosition, q);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.26 2006/05/10 16:00:49 sascha_l Exp $
+ * $Id: TrackView.java,v 1.27 2006/05/11 19:10:08 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -58,12 +58,61 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	private boolean moveSelection;
 	private boolean[] trackHasKeys;
 	private Map<MotionKey, MotionCurve> suspendedKeys = new HashMap<MotionKey, MotionCurve>();
+	private Map<MotionKey, MotionCurve> clipboard = new HashMap<MotionKey, MotionCurve>();
+	private Range clipRange;
+	private boolean[] clipTrackHasKeys;
+	
+	private Action deleteAction = new AbstractAction() {
+		public void actionPerformed(ActionEvent event) {
+			System.out.println("delete");
+			delete("delete keys");
+			TrackView.this.repaint();
+			MainFrame.getInstance().getAnimation().rethink();
+			MainFrame.getInstance().getJPatchScreen().update_all();
+		}
+	};
+	
+	private Action cutAction = new AbstractAction() {
+		public void actionPerformed(ActionEvent event) {
+			System.out.println("cut");
+			copy();
+			delete("cut");
+			TrackView.this.repaint();
+			MainFrame.getInstance().getAnimation().rethink();
+			MainFrame.getInstance().getJPatchScreen().update_all();
+		}
+	};
+	
+	private Action copyAction = new AbstractAction() {
+		public void actionPerformed(ActionEvent event) {
+			System.out.println("copy");
+			copy();
+		}
+	};
+	
+	private Action pasteAction = new AbstractAction() {
+		public void actionPerformed(ActionEvent event) {
+			System.out.println("paste");
+			paste(timelineEditor.getCurrentFrame());
+			TrackView.this.repaint();
+			MainFrame.getInstance().getAnimation().rethink();
+			MainFrame.getInstance().getJPatchScreen().update_all();
+		}
+	};
 	
 	public TrackView(TimelineEditor tle) {
 		timelineEditor = tle;
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
+		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), "delete");
+		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control X"), "cut");
+		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control C"), "copy");
+		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control V"), "paste");
+		getActionMap().put("delete", deleteAction);
+		getActionMap().put("cut", cutAction);
+		getActionMap().put("copy", copyAction);
+		getActionMap().put("paste", pasteAction);
 	}
 	
 	public Dimension getPreferredSize() {
@@ -217,6 +266,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	}
 	
 	public void mousePressed(MouseEvent e) {
+		requestFocusInWindow();
 		my = e.getY();
 		mx = e.getX();
 		frame = mx / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
@@ -919,20 +969,10 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		/*
 		 * delete key
 		 */
-		mi = new JMenuItem("delete selected key");
+		mi = new JMenuItem("delete selected keys");
 //		final MotionCurve motionCurve = selectedTrack == null ? null : selectedTrack.getMotionCurve(selectedKey);
-//		mi.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent event) {
-//				JPatchRootEdit edit = new AtomicDeleteMotionKey(motionCurve, selectedKey);
-//				MainFrame.getInstance().getUndoManager().addEdit(edit);
-//				selectedKey = null;
-//				selectedTrack = null;
-//				TrackView.this.repaint();
-//				MainFrame.getInstance().getAnimation().rethink();
-//				MainFrame.getInstance().getJPatchScreen().update_all();
-//			}
-//		});
-//		mi.setEnabled(selectedKey != null && motionCurve != null && motionCurve.getKeyCount() > 1);
+		mi.addActionListener(deleteAction);
+		mi.setEnabled(hitKeys != null || selection.size() > 0);
 		popup.add(mi);
 		
 		popup.show((Component) e.getSource(), e.getX(), e.getY());
@@ -943,6 +983,78 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		g.drawLine(rect.x, rect.y + rect.height, rect.x + rect.width, rect.y + rect.height);
 		g.drawLine(rect.x, rect.y, rect.x, rect.y + rect.height);
 		g.drawLine(rect.x + rect.width, rect.y, rect.x + rect.width, rect.y + rect.height);
+	}
+	
+	private void delete(String editName) {
+		JPatchActionEdit edit = new JPatchActionEdit(editName);
+		if (hitKeys != null) {
+			for (MotionKey key : hitKeys)
+				edit.addEdit(new AtomicDeleteMotionKey(hitTrack.getMotionCurve(key), key));
+		} else {
+			for (MotionKey key : selection.keySet()) {
+				edit.addEdit(new AtomicDeleteMotionKey(selection.get(key).track.getMotionCurve(key), key));
+			}
+		}
+		MainFrame.getInstance().getUndoManager().addEdit(edit);
+		hitKeys = null;
+		selection.clear();
+		range = null;
+		rect = null;
+	}
+	
+	private void copy() {
+		clipboard.clear();
+//		if (hitKeys != null) {
+//			for (MotionKey key : hitKeys) {
+//				MotionKey copy = key.copy();
+//				copy.setPosition(0);
+//				clipboard.put(copy, hitTrack.getMotionCurve(key));
+//			}
+//		} else {
+			for (MotionKey key : selection.keySet()) {
+				MotionKey copy = key.copy();
+				copy.setPosition(copy.getPosition() - range.firstFrame);
+				clipboard.put(copy, selection.get(key).track.getMotionCurve(key));
+			}
+			clipRange = new Range(range);
+			clipTrackHasKeys = new boolean[trackHasKeys.length];
+			System.arraycopy(trackHasKeys, 0, clipTrackHasKeys, 0, trackHasKeys.length);
+//		}
+	}
+	
+	private void paste(int frame) {
+		JPatchActionEdit edit = new JPatchActionEdit("paste");
+		
+		/*
+		 * delete keys
+		 */
+		for (int i = clipRange.firstTrack; i <= clipRange.lastTrack; i++) {
+			Track track = timelineEditor.getTracks().get(i);
+//			System.out.println(track.getName() + " " + trackHasKeys[i - range.firstTrack]);
+			if (!clipTrackHasKeys[i - clipRange.firstTrack])
+				continue;
+			for (MotionCurve motionCurve : track.getMotionCurves()) {
+				int startIndex = motionCurve.getIndexAt(frame - 1);
+				int endIndex = motionCurve.getIndexAt(frame - clipRange.firstFrame + clipRange.lastFrame);
+				Set<MotionKey> keysToRemove = new HashSet<MotionKey>();
+				for (int j = startIndex; j < endIndex; j++) {
+					keysToRemove.add(motionCurve.getKey(j));
+				}
+				for (MotionKey key : keysToRemove)
+					edit.addEdit(new AtomicDeleteMotionKey(track.getMotionCurve(key), key));
+			}
+		}
+		
+		/*
+		 * paste
+		 */
+		
+		for (MotionKey key : clipboard.keySet()) {
+			MotionKey copy = key.copy();
+			copy.setPosition(copy.getPosition() + frame);
+			edit.addEdit(new AtomicAddMotionKey(clipboard.get(key), copy));
+		}
+		MainFrame.getInstance().getUndoManager().addEdit(edit);
 	}
 	
 	static class KeyData {
