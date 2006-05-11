@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.27 2006/05/11 19:10:08 sascha_l Exp $
+ * $Id: TrackView.java,v 1.28 2006/05/11 20:02:35 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -64,7 +64,6 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	
 	private Action deleteAction = new AbstractAction() {
 		public void actionPerformed(ActionEvent event) {
-			System.out.println("delete");
 			delete("delete keys");
 			TrackView.this.repaint();
 			MainFrame.getInstance().getAnimation().rethink();
@@ -74,7 +73,6 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	
 	private Action cutAction = new AbstractAction() {
 		public void actionPerformed(ActionEvent event) {
-			System.out.println("cut");
 			copy();
 			delete("cut");
 			TrackView.this.repaint();
@@ -85,14 +83,12 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	
 	private Action copyAction = new AbstractAction() {
 		public void actionPerformed(ActionEvent event) {
-			System.out.println("copy");
 			copy();
 		}
 	};
 	
 	private Action pasteAction = new AbstractAction() {
 		public void actionPerformed(ActionEvent event) {
-			System.out.println("paste");
 			paste(timelineEditor.getCurrentFrame());
 			TrackView.this.repaint();
 			MainFrame.getInstance().getAnimation().rethink();
@@ -113,6 +109,10 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		getActionMap().put("cut", cutAction);
 		getActionMap().put("copy", copyAction);
 		getActionMap().put("paste", pasteAction);
+	}
+	
+	public void reset() {
+		clipboard.clear();
 	}
 	
 	public Dimension getPreferredSize() {
@@ -972,7 +972,50 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		mi = new JMenuItem("delete selected keys");
 //		final MotionCurve motionCurve = selectedTrack == null ? null : selectedTrack.getMotionCurve(selectedKey);
 		mi.addActionListener(deleteAction);
-		mi.setEnabled(hitKeys != null || selection.size() > 0);
+		mi.setAccelerator(KeyStroke.getKeyStroke("DELETE"));
+		mi.setEnabled(hitKeys != null || !selection.isEmpty());
+		popup.add(mi);
+		
+		/*
+		 * cut
+		 */
+		mi = new JMenuItem("cut");
+		mi.addActionListener(cutAction);
+		mi.setAccelerator(KeyStroke.getKeyStroke("control X"));
+		mi.setEnabled(!selection.isEmpty());
+		popup.add(mi);
+		
+		/*
+		 * copy
+		 */
+		mi = new JMenuItem("copy");
+		mi.addActionListener(copyAction);
+		mi.setAccelerator(KeyStroke.getKeyStroke("control C"));
+		mi.setEnabled(!selection.isEmpty());
+		popup.add(mi);
+		
+		/*
+		 * paste
+		 */
+		mi = new JMenuItem("paste at current frame (" + currentframe + ")");
+		mi.addActionListener(pasteAction);
+		mi.setAccelerator(KeyStroke.getKeyStroke("control V"));
+		mi.setEnabled(!clipboard.isEmpty());
+		popup.add(mi);
+		
+		/*
+		 * paste
+		 */
+		mi = new JMenuItem("paste at this frame (" + frame + ")");
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				paste(frame);
+				TrackView.this.repaint();
+				MainFrame.getInstance().getAnimation().rethink();
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			}
+		});
+		mi.setEnabled(!clipboard.isEmpty());
 		popup.add(mi);
 		
 		popup.show((Component) e.getSource(), e.getX(), e.getY());
@@ -1048,7 +1091,6 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		/*
 		 * paste
 		 */
-		
 		for (MotionKey key : clipboard.keySet()) {
 			MotionKey copy = key.copy();
 			copy.setPosition(copy.getPosition() + frame);
