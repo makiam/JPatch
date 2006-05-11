@@ -208,6 +208,7 @@ public class TimelineEditor extends JScrollPane {
 		aiTrackBottom = new int[listTracks.size()];
 		computeHeights();
 		revalidate();
+		((TrackView) getViewport().getView()).reset();
 		((JComponent) getViewport().getView()).revalidate();
 		((JComponent) getRowHeader().getView()).revalidate();
 		repaint();
@@ -232,9 +233,9 @@ public class TimelineEditor extends JScrollPane {
 		iFrameWidth = frameWidth;
 	}
 	
-	public void setViewportView(Component c) {
-		super.setViewportView(c);
-	}
+//	public void setViewportView(Component c) {
+//		super.setViewportView(c);
+//	}
 	
 //	public static void main(String[] args) {
 //		TimelineEditor tle = new TimelineEditor();
