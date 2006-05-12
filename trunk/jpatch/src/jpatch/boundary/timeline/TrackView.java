@@ -455,8 +455,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			for (int i = range.firstTrack; i <= range.lastTrack;i++) {
 				Track track = timelineEditor.getTracks().get(i);
 				for (MotionCurve motionCurve : track.getMotionCurves()) {
-					int startIndex = motionCurve.getIndexAt(range.firstFrame);
-					int endIndex = motionCurve.getIndexAt(range.lastFrame);
+					int startIndex = motionCurve.getIndexAt(range.firstFrame - 1);
+					int endIndex = motionCurve.getIndexAt(range.lastFrame - 1);
+					System.out.println(startIndex + " " + endIndex);
 					if (startIndex != endIndex){
 						if (i < newRange.firstTrack)
 							newRange.firstTrack = i;
