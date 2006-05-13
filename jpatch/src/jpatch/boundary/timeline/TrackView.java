@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.29 2006/05/12 18:59:40 sascha_l Exp $
+ * $Id: TrackView.java,v 1.30 2006/05/13 20:51:00 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -38,7 +38,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	/**
 	 * 
 	 */
-	private static enum State { IDLE, RESIZE, SCROLL, MOVE_KEY, LASSO };
+	private static enum State { IDLE, RESIZE, SCROLL, MOVE_KEY, LASSO, RETIME_LEFT, RETIME_RIGHT };
 	private State state = State.IDLE;
 	private final TimelineEditor timelineEditor;
 	private Dimension dim = new Dimension();
@@ -55,6 +55,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	private Map<MotionKey, KeyData> selection = new HashMap<MotionKey, KeyData>();
 	private Range range;
 	private Rectangle rect;
+	private Range retimeRange;
 	private boolean moveSelection;
 	private boolean[] trackHasKeys;
 	private Map<MotionKey, MotionCurve> suspendedKeys = new HashMap<MotionKey, MotionCurve>();
@@ -284,6 +285,18 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		}
 		
 		if (e.getButton() == MouseEvent.BUTTON1) {
+			if (range != null && range.lastFrame > range.firstFrame) {
+				if (e.getX() < rect.x + 4 && e.getX() > rect.x - 4) {
+					state = State.RETIME_LEFT;
+					retimeRange = new Range(range);
+					return;
+				} else if (e.getX() < rect.x + rect.width + 4 && e.getX() > rect.x + rect.width - 4) {
+					state = State.RETIME_RIGHT;
+					retimeRange = new Range(range);
+					return;
+				}
+			}
+			
 			if (range != null && trackNumber >= range.firstTrack && trackNumber <=range.lastTrack && frame >= range.firstFrame && frame <= range.lastFrame) {
 				moveSelection = true;
 				suspendedKeys.clear();
@@ -320,6 +333,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 							}
 						} else {
 							// no - so the track area was hit - let's see if a key was hit...
+							
+							
 							
 							hitKeys = track.getKeysAt(mx, my - y);
 							if (hitKeys != null) {
@@ -435,7 +450,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 					}
 				}
 				/*
-				 * deleta all suspended keys
+				 * delete all suspended keys
 				 */
 				for (MotionKey key : suspendedKeys.keySet()) {
 					suspendedKeys.get(key).addKey(key);
@@ -454,6 +469,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			int first = range.firstTrack;
 			for (int i = range.firstTrack; i <= range.lastTrack;i++) {
 				Track track = timelineEditor.getTracks().get(i);
+				if (track.isHidden())
+					continue;
 				for (MotionCurve motionCurve : track.getMotionCurves()) {
 					int startIndex = motionCurve.getIndexAt(range.firstFrame - 1);
 					int endIndex = motionCurve.getIndexAt(range.lastFrame - 1);
@@ -491,6 +508,28 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				rect = null;
 			}
 			repaint();
+			break;
+		case RETIME_LEFT:
+		case RETIME_RIGHT:	// fallthrough is intended!
+			JPatchActionEdit edit = new JPatchActionEdit("move key");
+			/*
+			 * move all selected keys
+			 */
+			for (MotionKey selectedKey : selection.keySet()) {
+				KeyData keyData = selection.get(selectedKey);
+				edit.addEdit(new AtomicMoveMotionKey(keyData.track.getMotionCurve(selectedKey), selectedKey, (int) keyData.position));
+			}
+			/*
+			 * delete all suspended keys
+			 */
+			for (MotionKey key : suspendedKeys.keySet()) {
+				suspendedKeys.get(key).addKey(key);
+				edit.addEdit(new AtomicDeleteMotionKey(suspendedKeys.get(key), key));
+			}
+			suspendedKeys.clear();
+			if (edit.isValid())
+				MainFrame.getInstance().getUndoManager().addEdit(edit);
+			
 			break;
 		}
 		state = State.IDLE;
@@ -577,7 +616,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				 */
 				for (int i = range.firstTrack; i <= range.lastTrack; i++) {
 					Track track = timelineEditor.getTracks().get(i);
-					System.out.println(track.getName() + " " + trackHasKeys[i - range.firstTrack]);
+					if (track.isHidden())
+						continue;
 					if (!trackHasKeys[i - range.firstTrack])
 						continue;
 					for (MotionCurve motionCurve : track.getMotionCurves()) {
@@ -691,11 +731,155 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			rect.width = (range.lastFrame - (int) MainFrame.getInstance().getAnimation().getStart()) * timelineEditor.getFrameWidth() - rect.x;
 			drawSelectionRectangle(g2);
 			break;
+		case RETIME_RIGHT:
+			int f = (e.getX() - timelineEditor.getFrameWidth() / 2) / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
+			int lastFrame = range.lastFrame;
+			if (f == lastFrame)
+				return;
+			range.lastFrame = f;
+			if (range.lastFrame < range.firstFrame)
+				range.lastFrame = range.firstFrame;
+			/*
+			 * unsuspend keys
+			 */
+			for (MotionKey key : new HashSet<MotionKey>(suspendedKeys.keySet())) {
+				if (key.getPosition() > range.lastFrame) {
+					suspendedKeys.get(key).addKey(key);
+					suspendedKeys.remove(key);
+				}
+			}
+			
+			/*
+			 * suspend keys
+			 */
+			if (range.lastFrame > retimeRange.lastFrame) {
+				for (int i = range.firstTrack; i <= range.lastTrack; i++) {
+					Track track = timelineEditor.getTracks().get(i);
+					if (!trackHasKeys[i - range.firstTrack])
+						continue;
+					for (MotionCurve motionCurve : track.getMotionCurves()) {
+						int startIndex = motionCurve.getIndexAt(retimeRange.lastFrame);
+						int endIndex = motionCurve.getIndexAt(range.lastFrame);
+						Set<MotionKey> keysToRemove = new HashSet<MotionKey>();
+						for (int j = startIndex; j < endIndex; j++) {
+							MotionKey key = motionCurve.getKey(j);
+							if (!selection.containsKey(key)) {
+								suspendedKeys.put(key, motionCurve);
+								keysToRemove.add(key);
+							}
+						}
+						for (MotionKey key : keysToRemove)
+							motionCurve.removeKey(key);
+					}
+				}
+			}
+			
+			/*
+			 * retime
+			 */
+			for (int i = range.firstTrack; i <= range.lastTrack; i++) {
+				Track track = timelineEditor.getTracks().get(i);
+				if (!trackHasKeys[i - range.firstTrack])
+					continue;
+				for (MotionCurve motionCurve : track.getMotionCurves()) {
+					int startIndex = motionCurve.getIndexAt(range.firstFrame - 1);
+					int endIndex = motionCurve.getIndexAt(lastFrame);
+					Set<Integer> frames = new HashSet<Integer>();
+					for (int j = startIndex; j < endIndex; j++) {
+						MotionKey key = motionCurve.getKey(j);
+						if (selection.containsKey(key)) {
+							int dNew = range.lastFrame - range.firstFrame;
+							int dOld = retimeRange.lastFrame - retimeRange.firstFrame;
+							int newPos = Math.round(range.firstFrame + ((int) selection.get(key).position - range.firstFrame) * dNew / dOld);
+							while (frames.contains(newPos))
+								newPos++;
+							frames.add(newPos);
+							key.setPosition(newPos);
+						}
+					}
+				}
+			}
+			
+			repaint();
+			break;
+		case RETIME_LEFT:
+			f = (e.getX() - timelineEditor.getFrameWidth() / 2) / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
+			int firstFrame = range.firstFrame;
+			if (f == firstFrame)
+				return;
+			range.firstFrame = f;
+			if (range.firstFrame > range.lastFrame)
+				range.firstFrame = range.lastFrame;
+			/*
+			 * unsuspend keys
+			 */
+			for (MotionKey key : new HashSet<MotionKey>(suspendedKeys.keySet())) {
+				if (key.getPosition() < range.firstFrame) {
+					suspendedKeys.get(key).addKey(key);
+					suspendedKeys.remove(key);
+				}
+			}
+			
+			/*
+			 * suspend keys
+			 */
+			if (range.firstFrame < retimeRange.firstFrame) {
+				for (int i = range.firstTrack; i <= range.lastTrack; i++) {
+					Track track = timelineEditor.getTracks().get(i);
+					if (!trackHasKeys[i - range.firstTrack])
+						continue;
+					for (MotionCurve motionCurve : track.getMotionCurves()) {
+						int startIndex = motionCurve.getIndexAt(range.firstFrame - 1);
+						int endIndex = motionCurve.getIndexAt(retimeRange.firstFrame);
+						Set<MotionKey> keysToRemove = new HashSet<MotionKey>();
+						for (int j = startIndex; j < endIndex; j++) {
+							MotionKey key = motionCurve.getKey(j);
+							if (!selection.containsKey(key)) {
+								suspendedKeys.put(key, motionCurve);
+								keysToRemove.add(key);
+							}
+						}
+						for (MotionKey key : keysToRemove)
+							motionCurve.removeKey(key);
+					}
+				}
+			}
+			
+			/*
+			 * retime
+			 */
+			for (int i = range.firstTrack; i <= range.lastTrack; i++) {
+				Track track = timelineEditor.getTracks().get(i);
+				if (!trackHasKeys[i - range.firstTrack])
+					continue;
+				for (MotionCurve motionCurve : track.getMotionCurves()) {
+					int startIndex = motionCurve.getIndexAt(firstFrame - 1);
+					int endIndex = motionCurve.getIndexAt(range.lastFrame);
+					Set<Integer> frames = new HashSet<Integer>();
+					for (int j = startIndex; j < endIndex; j++) {
+						MotionKey key = motionCurve.getKey(j);
+						if (selection.containsKey(key)) {
+							int dNew = range.lastFrame - range.firstFrame;
+							int dOld = retimeRange.lastFrame - retimeRange.firstFrame;
+							int newPos = Math.round(range.lastFrame - (range.lastFrame - (int) selection.get(key).position) * dNew / dOld);
+							while (frames.contains(newPos))
+								newPos++;
+							frames.add(newPos);
+							key.setPosition(newPos);
+						}
+					}
+				}
+			}
+			
+			repaint();
+			break;	
 		}
 	}
 	
 	public void mouseMoved(MouseEvent e) {
 		boolean vResize = false;
+		boolean retimeLeft = false;
+		boolean retimeRight = false;
 		int y = 0;
 		for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
 			Track track = timelineEditor.getTracks().get(i);
@@ -705,9 +889,20 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			}
 			y += track.getHeight();
 		}
-		if (vResize)
+		if (range != null && range.lastFrame > range.firstFrame) {
+			if (e.getX() < rect.x + 4 && e.getX() > rect.x - 4)
+				retimeLeft = true;
+			else if (e.getX() < rect.x + rect.width + 4 && e.getX() > rect.x + rect.width - 4)
+				retimeRight = true;
+		}
+		
+		if (retimeLeft)
+			timelineEditor.setCursor(TimelineEditor.westResizeCursor);
+		else if (retimeRight)
+			timelineEditor.setCursor(TimelineEditor.eastResizeCursor);
+		else if (vResize)
 			timelineEditor.setCursor(TimelineEditor.verticalResizeCursor);
-		else 
+		else
 			timelineEditor.setCursor(TimelineEditor.defaultCursor);
 		int frame = e.getX() / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
 		timelineEditor.setCornerText("Frame " + frame);

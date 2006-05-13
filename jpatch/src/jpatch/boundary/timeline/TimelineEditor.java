@@ -23,6 +23,8 @@ public class TimelineEditor extends JScrollPane {
 	
 	public static Cursor defaultCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
 	public static Cursor horizontalResizeCursor = Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR);
+	public static Cursor eastResizeCursor = Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR);
+	public static Cursor westResizeCursor = Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR);
 	public static Cursor verticalResizeCursor = Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR);
 	public static Cursor cornerResizeCursor = Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR);
 	private Cursor currentCursor = defaultCursor;
