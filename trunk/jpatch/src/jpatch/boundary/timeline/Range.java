@@ -14,4 +14,8 @@ public class Range {
 		this.firstFrame = range.firstFrame;
 		this.lastFrame = range.lastFrame;
 	}
+	
+	public String toString() {
+		return ("Range tracks:" + firstTrack + ".." + lastTrack + " frames:" + firstFrame + ".." + lastFrame);
+	}
 }
