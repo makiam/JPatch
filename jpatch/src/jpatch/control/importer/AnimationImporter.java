@@ -156,6 +156,7 @@ public class AnimationImporter extends DefaultHandler {
 					Model model = new Model();
 					(new JPatchImport()).importModel(model, Settings.getInstance().export.modelDirectory.getPath() + File.separatorChar + animModelFilename);
 					((AnimModel) animObject).setModel(model);
+					model.setAnimModel((AnimModel) animObject);
 					((AnimModel) animObject).setFilename(animModelFilename);
 //					motionCurveSet = new MotionCurveSet.Model((AnimModel) animObject);
 					motionCurveSet = MotionCurveSet.createMotionCurveSetFor(animObject);
