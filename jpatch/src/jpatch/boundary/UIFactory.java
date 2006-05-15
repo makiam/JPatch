@@ -1,5 +1,5 @@
 /*
- * $Id: UIFactory.java,v 1.20 2006/04/28 13:08:58 sascha_l Exp $
+ * $Id: UIFactory.java,v 1.21 2006/05/15 16:20:54 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -44,7 +44,7 @@ public class UIFactory extends DefaultHandler {
 	private JToolBar toolBar;
 	private JMenuBar menuBar = new JMenuBar();
 	private JPopupMenu popupMenu = new JPopupMenu();
-	private JMenu viewMenu;
+	private JMenu viewCameraMenu = new JMenu("view from camera");
 	private Map mapObjects = new HashMap();
 	private Map mapLayout = new HashMap();
 //	private Icon emptyIcon = new Icon() {
@@ -84,7 +84,7 @@ public class UIFactory extends DefaultHandler {
 		
 		mapObjects.put("menubar", menuBar);
 		mapObjects.put("viewport popup", popupMenu);
-		mapObjects.put("view menu", viewMenu);
+		mapObjects.put("view camera menu", viewCameraMenu);
 		
 		/*
 		 * Bind unbound actions to JPatchScreen
@@ -193,14 +193,18 @@ public class UIFactory extends DefaultHandler {
 			for (int i = 0; i < attributes.getLength(); i++) {
 				if (attributes.getLocalName(i).equals("name")) {
 					if (getMenu() != null) {
-						JMenu menu = new JPatchMenu(attributes.getValue(i));
+						JMenu menu;
+						if (attributes.getValue(i).toLowerCase().equals("view camera"))
+							menu = viewCameraMenu;
+						else
+							menu = new JPatchMenu(attributes.getValue(i));
 //						System.out.println(((JMenu) getMenu()).getText() + " " + menu.getText());
 //						if (!(getMenu() instanceof JMenuBar))
 //							menu.setIcon(emptyIcon);
 						getMenu().add(menu);
 						listMenu.add(menu);
-						if (attributes.getValue(i).toLowerCase().equals("view"))
-							viewMenu = menu;
+						if (attributes.getValue(i).toLowerCase().equals("view camera"))
+							viewCameraMenu = menu;
 					} else {
 						if (attributes.getValue(i).equals("menubar"))
 							listMenu.add(menuBar);

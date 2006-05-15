@@ -34,6 +34,7 @@ import jpatch.auxilary.KeyStrokeUtils;
 import jpatch.boundary.*;
 import jpatch.boundary.settings.*;
 import jpatch.boundary.ui.*;
+import jpatch.entity.Camera;
 
 
 /**
@@ -109,7 +110,11 @@ public class Actions extends DefaultHandler {
 	}
 	
 	public void setViewDefinition(ViewDefinition viewDef) {
-		actionMap.get(viewDef.getViewName()).buttonModel.setSelected(true);
+		Camera camera = viewDef.getCamera();
+		if (camera != null)
+			actionMap.get("camera" + camera.hashCode()).buttonModel.setSelected(true);
+		else
+			actionMap.get(viewDef.getViewName()).buttonModel.setSelected(true);
 		actionMap.get("show points").buttonModel.setSelected(viewDef.renderPoints());
 		actionMap.get("show curves").buttonModel.setSelected(viewDef.renderCurves());
 		actionMap.get("show patches").buttonModel.setSelected(viewDef.renderPatches());
@@ -134,6 +139,16 @@ public class Actions extends DefaultHandler {
 		if (actionDescriptor.action == null)
 			throw new RuntimeException("no Action for key " + key + "!");
 		return actionDescriptor.action;
+	}
+	
+	public void addAction(String key, Action action, DefaultButtonModel buttonModel) {
+		ActionDescriptor actionDescriptor = new ActionDescriptor(action);
+		actionDescriptor.buttonModel = buttonModel;
+		actionMap.put(key, actionDescriptor);
+	}
+	
+	public void removeAction(String key) {
+		actionMap.remove(key);
 	}
 	
 	public ButtonModel getButtonModel(String key) {

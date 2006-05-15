@@ -72,7 +72,7 @@ public final class MainFrame extends JFrame {
 	private TimelineEditor timelineEditor;
 	private JSplitPane splitPaneV;
 	
-	private JMenu viewMenu;
+	private JMenu viewCameraMenu;
 	
 //	private javax.swing.Timer defaultToolTimer = new javax.swing.Timer(0, new ActionListener() {
 //		public void actionPerformed(ActionEvent event) {
@@ -193,7 +193,7 @@ public final class MainFrame extends JFrame {
 			setJMenuBar((JMenuBar) uiFactory.getComponent("menubar"));
 			
 			jpatchScreen.setPopupMenu((JPopupMenu) uiFactory.getComponent("viewport popup"));
-			viewMenu = (JMenu) uiFactory.getComponent("view menu");
+			viewCameraMenu = (JMenu) uiFactory.getComponent("view camera menu");
 //			mainToolBar = new MainToolBar(bgAction);
 			//mainToolBar.setOrientation(SwingConstants.HORIZONTAL);
 //			getContentPane().add(mainToolBar,BorderLayout.NORTH);
@@ -376,8 +376,8 @@ public final class MainFrame extends JFrame {
 		}
 	}
 	
-	public JMenu getViewMenu() {
-		return viewMenu;
+	public JMenu getViewCameraMenu() {
+		return viewCameraMenu;
 	}
 	
 //	public javax.swing.Timer getDefaultToolTimer() {
