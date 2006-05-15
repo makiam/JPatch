@@ -7,11 +7,17 @@ import java.util.*;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ButtonModel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JToggleButton;
 import javax.swing.tree.*;
 
 import jpatch.boundary.*;
+import jpatch.boundary.action.*;
+import jpatch.boundary.ui.JPatchDummyButton;
+import jpatch.boundary.ui.JPatchRadioButtonMenuItem;
 
 public class Animation implements MutableTreeNode {
 
@@ -23,6 +29,7 @@ public class Animation implements MutableTreeNode {
 	private List<AnimModel> listModels = new ArrayList<AnimModel>();
 	private List<AnimLight> listLights = new ArrayList<AnimLight>();
 	private List<Camera> listCameras = new ArrayList<Camera>();
+	private List<JPatchDummyButton> dummyButtonList = new ArrayList<JPatchDummyButton>();
 	private Map<AnimObject, MotionCurveSet> mapMotionCurves = new HashMap<AnimObject, MotionCurveSet>();
 	private AnimTreeNode treenodeModels = new AnimTreeNode("Models", listModels);
 	private AnimTreeNode treenodeLights = new AnimTreeNode("Lights", listLights);
@@ -121,14 +128,9 @@ public class Animation implements MutableTreeNode {
 	
 	public void addCamera(final Camera camera, MotionCurveSet mcs) {
 //		if (MainFrame.getInstance().getAnimation() != null)
-			MainFrame.getInstance().getTreeModel().insertNodeInto(camera, treenodeCameras, listCameras.size());
-		JMenuItem menuItem = new JRadioButtonMenuItem(camera.getName().toLowerCase());
-		menuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().setCamera(camera);
-			}
-		});
-		MainFrame.getInstance().getViewMenu().add(menuItem);
+		MainFrame.getInstance().getTreeModel().insertNodeInto(camera, treenodeCameras, listCameras.size());
+		Actions.getInstance().addAction("camera" + camera.hashCode(), new ViewCameraAction(camera), new JToggleButton.ToggleButtonModel());
+		setupViewCameraMenu();
 		setCurvesetFor(camera, mcs);
 	}
 	
@@ -142,6 +144,8 @@ public class Animation implements MutableTreeNode {
 	
 	public void removeCamera(Camera camera) {
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(camera);
+		Actions.getInstance().removeAction("camera" + camera.hashCode());
+		setupViewCameraMenu();
 	}
 	
 	public List<AnimModel> getModels() {
@@ -323,6 +327,29 @@ public class Animation implements MutableTreeNode {
 				return getChildAt(i++);
 			}
 		};
+	}
+	
+	private void setupViewCameraMenu() {
+		JMenu viewCameraMenu = MainFrame.getInstance().getViewCameraMenu();
+		viewCameraMenu.removeAll();
+		for (JPatchDummyButton button : dummyButtonList)
+			Actions.getInstance().getButtonGroup("view").remove(button);
+		dummyButtonList.clear();
+		
+		for (final Camera cam : listCameras) {
+			JToggleButton.ToggleButtonModel buttonModel = (JToggleButton.ToggleButtonModel) Actions.getInstance().getButtonModel("camera" + cam.hashCode());
+			JPatchRadioButtonMenuItem menuItem = new JPatchRadioButtonMenuItem(buttonModel) {
+				@Override
+				public String getText() {
+					return cam.getName();
+				}
+			};
+			JPatchDummyButton dummyButton = new JPatchDummyButton(buttonModel);
+			dummyButtonList.add(dummyButton);
+			Actions.getInstance().getButtonGroup("view").add(dummyButton);
+			menuItem.addActionListener(Actions.getInstance().getAction("camera" + cam.hashCode()));
+			viewCameraMenu.add(menuItem);
+		}
 	}
 	
 	private class AnimTreeNode implements MutableTreeNode {
