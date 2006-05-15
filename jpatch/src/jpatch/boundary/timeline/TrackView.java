@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.30 2006/05/13 20:51:00 sascha_l Exp $
+ * $Id: TrackView.java,v 1.31 2006/05/15 13:20:12 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -277,7 +277,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			Track track = timelineEditor.getTracks().get(i);
 			if (track.isHidden())
 				continue;
-			if (my > y && my < y + track.getHeight()) {
+			if (my >= y && my < y + track.getHeight()) {
 				trackNumber = i;
 				break;
 			}
@@ -460,6 +460,19 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				if (edit.isValid())
 					MainFrame.getInstance().getUndoManager().addEdit(edit);
 			}
+			if (moveSelection) {
+				/*
+				 * Update selection
+				 */
+				for (MotionKey key : selection.keySet()) {
+					selection.get(key).position = key.getPosition();
+				}
+				/*
+				 * Repaint viewports
+				 */
+				MainFrame.getInstance().getAnimation().rethink();
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			}
 			break;
 		case LASSO:
 			selection.clear();
@@ -474,14 +487,14 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				for (MotionCurve motionCurve : track.getMotionCurves()) {
 					int startIndex = motionCurve.getIndexAt(range.firstFrame - 1);
 					int endIndex = motionCurve.getIndexAt(range.lastFrame - 1);
-					System.out.println(startIndex + " " + endIndex);
+//					System.out.println(startIndex + " " + endIndex);
 					if (startIndex != endIndex){
 						if (i < newRange.firstTrack)
 							newRange.firstTrack = i;
 						if (i > newRange.lastTrack)
 							newRange.lastTrack = i;
 					}
-					System.out.println("index " + startIndex + " to " + endIndex);
+//					System.out.println("index " + startIndex + " to " + endIndex);
 					for (int j = startIndex; j < endIndex; j++) {
 						hasKeys[i - range.firstTrack] = true;
 						MotionKey key = motionCurve.getKey(j);
@@ -500,6 +513,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			}
 			if (selectionValid) {
 				range = newRange;
+				System.out.println(range);
 				trackHasKeys = new boolean[range.lastTrack - range.firstTrack + 1];
 				for (int i = 0; i < trackHasKeys.length; i++)
 					trackHasKeys[i] = hasKeys[i + range.firstTrack - first];
@@ -527,9 +541,24 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				edit.addEdit(new AtomicDeleteMotionKey(suspendedKeys.get(key), key));
 			}
 			suspendedKeys.clear();
+			/*
+			 * Add edit
+			 */
 			if (edit.isValid())
 				MainFrame.getInstance().getUndoManager().addEdit(edit);
 			
+			/*
+			 * Update selection
+			 */
+			for (MotionKey key : selection.keySet()) {
+				selection.get(key).position = key.getPosition();
+			}
+			
+			/*
+			 * repaint viewports
+			 */
+			MainFrame.getInstance().getAnimation().rethink();
+			MainFrame.getInstance().getJPatchScreen().update_all();
 			break;
 		}
 		state = State.IDLE;
@@ -686,9 +715,11 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //			timelineEditor.setCornerText("Frame " + frame);
 //			if (timelineEditor.getAnimObject() instanceof AnimModel) {
 //			MainFrame.getInstance().getAnimation().getCurvesetFor(timelineEditor.getAnimObject()).setPosition(position);
-			MainFrame.getInstance().getAnimation().setPosition(frame + delta);
-			timelineEditor.setCurrentFrame(frame + delta);
-			MainFrame.getInstance().getJPatchScreen().update_all();
+			if (!moveSelection) {
+				MainFrame.getInstance().getAnimation().setPosition(frame + delta);
+				timelineEditor.setCurrentFrame(frame + delta);
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			}
 			break;
 		case LASSO:
 			Graphics2D g2 = (Graphics2D) ((Component) e.getSource()).getGraphics();
@@ -709,7 +740,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 					continue;
 				int top = y;
 				int bottom = y + track.getHeight();
-				if (rect.y > top && rect.y < bottom) {
+				if (rect.y >= top && rect.y < bottom) {
 					rect.height += (rect.y - top);
 					rect.y = top;
 					range.firstTrack = i;
@@ -729,6 +760,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			range.lastFrame = (rect.x + rect.width) / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
 			rect.x = (range.firstFrame - (int) MainFrame.getInstance().getAnimation().getStart()) * timelineEditor.getFrameWidth();
 			rect.width = (range.lastFrame - (int) MainFrame.getInstance().getAnimation().getStart()) * timelineEditor.getFrameWidth() - rect.x;
+//			System.out.println(range);
 			drawSelectionRectangle(g2);
 			break;
 		case RETIME_RIGHT:
@@ -739,15 +771,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			range.lastFrame = f;
 			if (range.lastFrame < range.firstFrame)
 				range.lastFrame = range.firstFrame;
-			/*
-			 * unsuspend keys
-			 */
-			for (MotionKey key : new HashSet<MotionKey>(suspendedKeys.keySet())) {
-				if (key.getPosition() > range.lastFrame) {
-					suspendedKeys.get(key).addKey(key);
-					suspendedKeys.remove(key);
-				}
-			}
+			
 			
 			/*
 			 * suspend keys
@@ -800,6 +824,16 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				}
 			}
 			
+			/*
+			 * unsuspend keys
+			 */
+			for (MotionKey key : new HashSet<MotionKey>(suspendedKeys.keySet())) {
+				if (key.getPosition() > range.lastFrame) {
+					suspendedKeys.get(key).addKey(key);
+					suspendedKeys.remove(key);
+				}
+			}
+			
 			repaint();
 			break;
 		case RETIME_LEFT:
@@ -810,15 +844,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			range.firstFrame = f;
 			if (range.firstFrame > range.lastFrame)
 				range.firstFrame = range.lastFrame;
-			/*
-			 * unsuspend keys
-			 */
-			for (MotionKey key : new HashSet<MotionKey>(suspendedKeys.keySet())) {
-				if (key.getPosition() < range.firstFrame) {
-					suspendedKeys.get(key).addKey(key);
-					suspendedKeys.remove(key);
-				}
-			}
+			
 			
 			/*
 			 * suspend keys
@@ -868,6 +894,16 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 							key.setPosition(newPos);
 						}
 					}
+				}
+			}
+			
+			/*
+			 * unsuspend keys
+			 */
+			for (MotionKey key : new HashSet<MotionKey>(suspendedKeys.keySet())) {
+				if (key.getPosition() < range.firstFrame) {
+					suspendedKeys.get(key).addKey(key);
+					suspendedKeys.remove(key);
 				}
 			}
 			
