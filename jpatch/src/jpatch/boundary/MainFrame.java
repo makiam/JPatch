@@ -491,7 +491,7 @@ public final class MainFrame extends JFrame {
 			splitPaneV.remove(animPanel);
 		}
 		
-		Actions.getInstance().enableAction("open", true);
+//		Actions.getInstance().enableAction("open", true);
 		Actions.getInstance().enableAction("append", true);
 //		Actions.getInstance().enableAction("save", true);
 //		Actions.getInstance().enableAction("save as", true);
@@ -563,7 +563,7 @@ public final class MainFrame extends JFrame {
 		
 		
 		
-		Actions.getInstance().enableAction("open", false);
+//		Actions.getInstance().enableAction("open", false);
 		Actions.getInstance().enableAction("append", false);
 //		Actions.getInstance().enableAction("save", false);
 //		Actions.getInstance().enableAction("save as", false);

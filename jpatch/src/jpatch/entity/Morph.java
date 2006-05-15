@@ -91,6 +91,7 @@ public class Morph implements MutableTreeNode {
 //			if (animModel.getModel() == model) {
 				MotionCurveSet.Model mcs = (MotionCurveSet.Model) animation.getCurvesetFor(model.getAnimModel());
 				ModifyAnimObject edit = new ModifyAnimObject(model.getAnimModel());
+				System.out.println(mcs + " " + model.getAnimModel());
 				edit.addEdit(new AtomicModifyMotionCurve.Float(mcs.morph(this), animation.getPosition(), fValue));
 				MainFrame.getInstance().getUndoManager().addEdit(edit);
 				return;
