@@ -213,6 +213,8 @@
 					<item command="left view"/>
 					<item command="right view"/>
 					<item command="bird's eye view"/>
+					<separator/>
+					<menu name="view camera"/>
 				</menu>
 				<menu name="rotoscope">
 					<item command="set rotoscope image"/>
@@ -242,7 +244,7 @@
 			<item command="show splashscreen"/>
 		</menu>
 	</menu>
-
+	
 	<menu name="viewport popup">
 		<menu name="Show" mnemonic="s">
 			<item command="show points"/>
@@ -259,6 +261,8 @@
 			<item command="left view"/>
 			<item command="right view"/>
 			<item command="bird's eye view"/>
+			<separator/>
+			<menu name="view camera"/>
 		</menu>
 		<menu name="Rotoscope" mnemonic="r">
 			<item command="set rotoscope image"/>
