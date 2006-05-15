@@ -167,7 +167,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	
 	public void setFocalLength(float focalLength) {
 		fFocalLength = focalLength;
-		fW = fFocalLength * iXoff / 35f;
+		fW = fFocalLength * iXoff / 35f * 2;
 	}
 	
 	public void setGhostRenderingEnabled(boolean enable) {
