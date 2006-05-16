@@ -19,7 +19,7 @@ implements ChangeListener {
 	public LightPanel(AnimLight light) {
 		this.light = light;
 		add(new JButton(new EditAnimObjectAction(light)));
-		add(new JButton(new DeleteLightAction(light)));
+		add(new JButton(new DeleteAnimObjectAction(light)));
 		JPatchInput.setDimensions(50,150,20);
 		inputName = new JPatchInput("Name:",light.getName());
 		JPanel detailPanel = MainFrame.getInstance().getSideBar().getDetailPanel();

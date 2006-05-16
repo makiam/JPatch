@@ -4,6 +4,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import jpatch.entity.*;
 import jpatch.boundary.*;
+import jpatch.control.edit.*;
 
 public final class NewCameraAction extends AbstractAction {
 	/**
@@ -14,8 +15,11 @@ public final class NewCameraAction extends AbstractAction {
 	public NewCameraAction() {
 		super("New Camera");
 	}
+	
 	public void actionPerformed(ActionEvent actionEvent) {
-		MainFrame.getInstance().getAnimation().addCamera(new Camera("New Camera"), null);
+		AnimObject animObject = new Camera("New Camera");
+		JPatchRootEdit edit = new AtomicAddRemoveAnimObject(animObject, false);
+		MainFrame.getInstance().getUndoManager().addEdit(edit);
 	}
 }
 
