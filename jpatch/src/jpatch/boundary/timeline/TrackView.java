@@ -672,24 +672,36 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 					if (hitTrack.isExpanded())
 						hitTrack.moveKey(key, e.getY() - trackTop);
 					if (shift) {
+						hitTrack.shiftKey(key, frame + delta);
 						/*
 						 * unsuspend keys
 						 */
 						for (MotionKey sKey : new HashSet<MotionKey>(suspendedKeys.keySet())) {
-							suspendedKeys.get(sKey).addKey(sKey);
-							suspendedKeys.remove(sKey);
+							if (sKey.getPosition() != frame + delta) {
+								suspendedKeys.get(sKey).addKey(sKey);
+								suspendedKeys.remove(sKey);
+							}
 						}
 						/*
 						 * suspend old keys
 						 */
-						for (MotionCurve mc : hitTrack.getMotionCurves()) {
-							MotionKey sKey = mc.getKeyAt(frame + delta);
-							if (sKey != null) {
+						MotionCurve mc = hitTrack.getMotionCurve(key);
+						MotionKey sKey = mc.getKeyAt(frame + delta);
+						if (sKey != null) {
+							boolean selected = false;
+							for (MotionKey test : hitKeys) {
+								if (test == sKey) {
+									selected = true;
+									break;
+								}
+							}
+							if (!selected) {
 								suspendedKeys.put(sKey, mc);
 								mc.removeKey(sKey);
 							}
 						}
-						hitTrack.shiftKey(key, frame + delta);
+						
+//						hitTrack.shiftKey(key, frame + delta);
 					}
 				}
 			}

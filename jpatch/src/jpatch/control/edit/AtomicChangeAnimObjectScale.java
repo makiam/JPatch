@@ -7,10 +7,9 @@ public class AtomicChangeAnimObjectScale extends JPatchAtomicEdit {
 	private AnimObject animObject;
 	private float scale;
 	
-	public AtomicChangeAnimObjectScale(AnimObject animObject, float scale) {
+	public AtomicChangeAnimObjectScale(AnimObject animObject, float oldScale) {
 		this.animObject = animObject;
-		this.scale = scale;
-		swap();
+		this.scale = oldScale;
 	}
 	
 	public void undo() {

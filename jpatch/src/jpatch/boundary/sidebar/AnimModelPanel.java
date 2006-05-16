@@ -26,7 +26,7 @@ implements ChangeListener {
 	public AnimModelPanel(AnimModel model) {
 		this.model = model;
 		add(new JButton(new EditAnimObjectAction(model)));
-		add(new JButton(new DeleteModelAction(model)));
+		add(new JButton(new DeleteAnimObjectAction(model)));
 		add(new JButton(new CopyPoseAction(model.getModel())));
 		add(new JButton(new PastePoseAction(model.getModel())));
 		
