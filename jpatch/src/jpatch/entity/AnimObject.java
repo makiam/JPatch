@@ -20,20 +20,28 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 	static final double MIN_ROLL = 0.0000001;
 	
 	protected Matrix4d m4Transform = new Matrix4d();
+	protected Matrix4d m4ScaledTransform = new Matrix4d();
 	protected Matrix4d m4BackupTransform = new Matrix4d();
+	
+	protected float fBackupScale;
+	protected float fScale = 1.0f;
 	
 	protected String strName = "(new object)";
 	
 	public AnimObject() {
 		m4Transform.setIdentity();
+		m4ScaledTransform.set(m4Transform);
 	}
 	
 	public void setTransform(Matrix4d transform) {
 		m4Transform.set(transform);
+		m4ScaledTransform.set(m4Transform);
 	}
 	
 	public void setPosition(Point3d position) {
 		m4Transform.setTranslation(new Vector3d(position));
+		m4ScaledTransform.set(m4Transform);
+		m4ScaledTransform.setScale(fScale);
 	}
 	
 	public void setOrientation(Quat4f orient) {
@@ -44,6 +52,8 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 	
 	public void setOrientation(Quat4d orient) {
 		m4Transform.setRotation(orient);
+		m4ScaledTransform.set(m4Transform);
+		m4ScaledTransform.setScale(fScale);
 	}
 	
 	public void setOrientation(double roll, double pitch, double yaw) {
@@ -60,10 +70,14 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 			m4Transform.m21 = Math.cos(-roll) * Math.sin(-pitch) * Math.cos(yaw) + Math.sin(-roll) * Math.sin(yaw);
 			m4Transform.m22 = Math.cos(-pitch) * Math.cos(yaw);
 		}
+		m4ScaledTransform.set(m4Transform);
+		m4ScaledTransform.setScale(fScale);
 	}
 		
 	public void setScale(float scale) {
-		m4Transform.setScale(scale);
+		fScale = scale;
+		m4ScaledTransform.set(m4Transform);
+		m4ScaledTransform.setScale(fScale);
 	}
 	
 	public void setName(String name) {
@@ -71,7 +85,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 	}
 	
 	public Matrix4d getTransform() {
-		return m4Transform;
+		return m4ScaledTransform;
 	}
 	
 	public Point3d getPositionDouble() {
@@ -104,7 +118,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 	}
 	
 	public float getScale() {
-		return (float) m4Transform.getScale();
+		return fScale;
 	}
 	
 	public String getName() {
@@ -139,13 +153,15 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		p1.set(xMax,yMax,zMax);
 		Vector3f v = new Vector3f((float) m4Transform.m03, (float) m4Transform.m13, (float) m4Transform.m23);
 		Matrix3f m = new Matrix3f();
-		m4Transform.getRotationScale(m);
+		m4ScaledTransform.getRotationScale(m);
 		float s = m.getScale();
 		p0.scale(s);
 		p1.scale(s);
 		m.invert();
 		m.transform(v);
 		v.scale(s);
+//		p0.scale(fScale);
+//		p1.scale(fScale);
 		p0.add(v);
 		p1.add(v);
 	}
@@ -168,7 +184,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 	public abstract Model getModel();
 	
 	public boolean isHit(int x, int y, Matrix4f m4View) {
-		Matrix4f mt = new Matrix4f(m4Transform);
+		Matrix4f mt = new Matrix4f(m4ScaledTransform);
 		Matrix4f m = new Matrix4f(m4View);
 		m.mul(mt);
 //		m.invert();
@@ -245,6 +261,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 	
 	public void beginTransform() {
 		m4BackupTransform.set(m4Transform);
+		fBackupScale = fScale;
 	}
 
 	public void translate(Vector3f v) {
@@ -252,6 +269,8 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		m4Transform.m03 += v.x;
 		m4Transform.m13 += v.y;
 		m4Transform.m23 += v.z;
+		m4ScaledTransform.set(m4Transform);
+		m4ScaledTransform.setScale(fScale);
 	}
 
 	public void rotate(AxisAngle4f a, Point3f pivot) {
@@ -260,19 +279,22 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		transform(m, pivot);
 	}
 
-	private static final Matrix3f m1 = new Matrix3f();
-	private static final Matrix3f m2 = new Matrix3f();
+//	private static final Matrix3f m1 = new Matrix3f();
+//	private static final Matrix3f m2 = new Matrix3f();
 	public void transform(Matrix3f m, Point3f pivot) {
+		setScale(m.getScale());
 //		m4BackupTransform.getRotationScale(m1);
 //		m4BackupTransform.getRotationScale(m2);
 //		m2.invert();
 //		m1.mul(m);
 //		m1.mul(m2);
 //		m4Transform.setRotationScale(m1);
-		m4BackupTransform.getRotationScale(m1);
-		m2.set(m);
-		m2.mul(m1);
-		m4Transform.setRotationScale(m2);
+//		m4BackupTransform.getRotationScale(m1);
+//		m2.set(m);
+//		m2.mul(m1);
+//		m4Transform.setRotationScale(m2);
+//		m4ScaledTransform.set(m4Transform);
+//		m4ScaledTransform.setScale(fScale);
 	}
 
 	public JPatchUndoableEdit endTransform() {
@@ -282,17 +304,18 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		ModifyAnimObject edit = new ModifyAnimObject(this);
 		Point3d newPosition = getPositionDouble();
 		Quat4f newOrientation = getOrientation();
-		float newScale = getScale();
 		m4Transform.set(m4BackupTransform);
+		m4ScaledTransform.set(m4Transform);
+		m4ScaledTransform.setScale(fScale);
 		if (!newPosition.equals(getPositionDouble()))
 			edit.addEdit(new AtomicModifyMotionCurve.Point3d(mcs.position, position, newPosition));
 		if (!newOrientation.equals(getOrientation()))
 			edit.addEdit(new AtomicModifyMotionCurve.Quat4f(mcs.orientation, position, newOrientation));
-		if (newScale != getScale()) {
+		if (fScale != fBackupScale) {
 			if (this instanceof AnimModel) {
-				edit.addEdit(new AtomicModifyMotionCurve.Float(((MotionCurveSet.Model) mcs).scale, position, newScale));
+				edit.addEdit(new AtomicModifyMotionCurve.Float(((MotionCurveSet.Model) mcs).scale, position, fScale));
 			} else {
-				edit.addEdit(new AtomicChangeAnimObjectScale(this, newScale));
+				edit.addEdit(new AtomicChangeAnimObjectScale(this, fBackupScale));
 			}
 		}
 		mcs.setPosition(position);

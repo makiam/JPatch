@@ -8,6 +8,8 @@ import jpatch.entity.*;
 import jpatch.auxilary.FileFilters;
 import jpatch.boundary.*;
 import jpatch.boundary.settings.Settings;
+import jpatch.control.edit.AtomicAddRemoveAnimObject;
+import jpatch.control.edit.JPatchRootEdit;
 import jpatch.control.importer.JPatchImport;
 
 public final class NewAnimModelAction extends AbstractAction {
@@ -26,7 +28,11 @@ public final class NewAnimModelAction extends AbstractAction {
 			String filename = fileChooser.getSelectedFile().getName();
 			Model model = new Model();
 			(new JPatchImport()).importModel(model, fileChooser.getSelectedFile().getPath());
-			MainFrame.getInstance().getAnimation().addModel(new AnimModel(model, filename), null);
+			
+			AnimObject animObject = new AnimModel(model, filename);
+			JPatchRootEdit edit = new AtomicAddRemoveAnimObject(animObject, false);
+			MainFrame.getInstance().getUndoManager().addEdit(edit);
+			
 		}
 	}
 }

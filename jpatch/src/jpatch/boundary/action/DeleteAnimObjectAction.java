@@ -7,18 +7,23 @@ import jpatch.boundary.*;
 import jpatch.control.edit.AtomicAddRemoveAnimObject;
 import jpatch.control.edit.JPatchRootEdit;
 
-public final class NewLightAction extends AbstractAction {
+public final class DeleteAnimObjectAction extends AbstractAction {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public NewLightAction() {
-		super("New Lightsource");
+	private AnimObject animObject;
+	
+	public DeleteAnimObjectAction(AnimObject animObject) {
+		super("delete");
+		this.animObject = animObject;
 	}
+	
 	public void actionPerformed(ActionEvent actionEvent) {
-		AnimObject animObject = new AnimLight();
-		JPatchRootEdit edit = new AtomicAddRemoveAnimObject(animObject, false);
+		JPatchRootEdit edit = new AtomicAddRemoveAnimObject(animObject, true);
 		MainFrame.getInstance().getUndoManager().addEdit(edit);
 	}
 }
+
+
