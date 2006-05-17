@@ -136,7 +136,8 @@ public abstract class MotionCurve {
 	
 	public void removeKey(MotionKey key) {
 		System.out.println("removeKey " + key.hashCode() + " pos " + key.getPosition());
-		if (list.size() > 1) list.remove(key);
+//		if (list.size() > 1) list.remove(key);
+		list.remove(key);
 	}
 	
 	public void moveKey(MotionKey key, float position) {

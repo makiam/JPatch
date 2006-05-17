@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.32 2006/05/16 19:57:36 sascha_l Exp $
+ * $Id: TrackView.java,v 1.33 2006/05/17 15:50:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -57,11 +57,13 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	private Rectangle rect;
 	private Range retimeRange;
 	private boolean moveSelection;
-	private boolean[] trackHasKeys;
+//	private boolean[] trackHasKeys;
+	private Set<MotionCurve> curveWithKeys = new HashSet<MotionCurve>();
 	private Map<MotionKey, MotionCurve> suspendedKeys = new HashMap<MotionKey, MotionCurve>();
 	private Map<MotionKey, MotionCurve> clipboard = new HashMap<MotionKey, MotionCurve>();
 	private Range clipRange;
-	private boolean[] clipTrackHasKeys;
+	private Set<MotionCurve> clipCurveWithKeys = new HashSet<MotionCurve>();
+//	private boolean[] clipTrackHasKeys;
 	
 	private Action deleteAction = new AbstractAction() {
 		public void actionPerformed(ActionEvent event) {
@@ -480,10 +482,12 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			boolean selectionValid = false;
 			boolean[] hasKeys = new boolean[range.lastTrack - range.firstTrack + 1];
 			int first = range.firstTrack;
+			curveWithKeys.clear();
 			for (int i = range.firstTrack; i <= range.lastTrack;i++) {
 				Track track = timelineEditor.getTracks().get(i);
 				if (track.isHidden())
 					continue;
+				
 				for (MotionCurve motionCurve : track.getMotionCurves()) {
 					int startIndex = motionCurve.getIndexAt(range.firstFrame - 1);
 					int endIndex = motionCurve.getIndexAt(range.lastFrame - 1);
@@ -496,7 +500,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 					}
 //					System.out.println("index " + startIndex + " to " + endIndex);
 					for (int j = startIndex; j < endIndex; j++) {
-						hasKeys[i - range.firstTrack] = true;
+						curveWithKeys.add(motionCurve);
 						MotionKey key = motionCurve.getKey(j);
 						if (key instanceof MotionKey.Float)
 							selection.put(key, new KeyData(track, key.getPosition(), ((MotionKey.Float) key).getFloat()));
@@ -514,12 +518,10 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			if (selectionValid) {
 				range = newRange;
 				System.out.println(range);
-				trackHasKeys = new boolean[range.lastTrack - range.firstTrack + 1];
-				for (int i = 0; i < trackHasKeys.length; i++)
-					trackHasKeys[i] = hasKeys[i + range.firstTrack - first];
 			} else {
 				range = null;
 				rect = null;
+				curveWithKeys.clear();
 			}
 			repaint();
 			break;
@@ -643,13 +645,15 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				/*
 				 * suspend old keys
 				 */
-				for (int i = range.firstTrack; i <= range.lastTrack; i++) {
-					Track track = timelineEditor.getTracks().get(i);
-					if (track.isHidden())
-						continue;
-					if (!trackHasKeys[i - range.firstTrack])
-						continue;
-					for (MotionCurve motionCurve : track.getMotionCurves()) {
+//				for (int i = range.firstTrack; i <= range.lastTrack; i++) {
+//					Track track = timelineEditor.getTracks().get(i);
+//					if (track.isHidden())
+//						continue;
+//					if (!trackHasKeys[i - range.firstTrack])
+//						continue;
+//					for (MotionCurve motionCurve : track.getMotionCurves()) {
+				System.out.println(curveWithKeys);	
+				for (MotionCurve motionCurve : curveWithKeys) {
 						int startIndex = motionCurve.getIndexAt(range.firstFrame - 1);
 						int endIndex = motionCurve.getIndexAt(range.lastFrame);
 						System.out.print("start\t" + range.firstFrame + "\tend\t" + range.lastFrame + "\tindex\t" + startIndex + "\tindex\t" + endIndex);
@@ -665,43 +669,56 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 						for (MotionKey key : keysToRemove)
 							motionCurve.removeKey(key);
 						System.out.println();
-					}
+//					}
 				}
 			} else {
-				for (MotionKey key : hitKeys) {
-					if (hitTrack.isExpanded())
+				
+				if (hitTrack.isExpanded())
+					for (MotionKey key : hitKeys)
 						hitTrack.moveKey(key, e.getY() - trackTop);
-					if (shift) {
-						hitTrack.shiftKey(key, frame + delta);
-						/*
-						 * unsuspend keys
-						 */
-						for (MotionKey sKey : new HashSet<MotionKey>(suspendedKeys.keySet())) {
-							if (sKey.getPosition() != frame + delta) {
-								suspendedKeys.get(sKey).addKey(sKey);
-								suspendedKeys.remove(sKey);
-							}
-						}
-						/*
-						 * suspend old keys
-						 */
+				if (shift) {
+					
+					for (MotionKey key : hitKeys) {
 						MotionCurve mc = hitTrack.getMotionCurve(key);
+						mc.removeKey(key);
+						
+					
+					
+					/*
+					 * suspend old keys
+					 */
+					
 						MotionKey sKey = mc.getKeyAt(frame + delta);
+						System.out.println("sKey=" + sKey);
 						if (sKey != null) {
-							boolean selected = false;
-							for (MotionKey test : hitKeys) {
-								if (test == sKey) {
-									selected = true;
-									break;
-								}
-							}
-							if (!selected) {
+//							boolean selected = false;
+//							for (MotionKey test : hitKeys) {
+//								if (test == sKey) {
+//									selected = true;
+//									break;
+//								}
+//							}
+//							System.out.println(selected);
+//							if (!selected) {
 								suspendedKeys.put(sKey, mc);
 								mc.removeKey(sKey);
-							}
+//							}
 						}
-						
+					
+					
+						key.setPosition(frame + delta);
+						mc.addKey(key);
+					}
 //						hitTrack.shiftKey(key, frame + delta);
+					
+				}
+				/*
+				 * unsuspend keys
+				 */
+				for (MotionKey sKey : new HashSet<MotionKey>(suspendedKeys.keySet())) {
+					if (sKey.getPosition() != frame + delta) {
+						suspendedKeys.get(sKey).addKey(sKey);
+						suspendedKeys.remove(sKey);
 					}
 				}
 			}
@@ -789,11 +806,12 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			 * suspend keys
 			 */
 			if (range.lastFrame > retimeRange.lastFrame) {
-				for (int i = range.firstTrack; i <= range.lastTrack; i++) {
-					Track track = timelineEditor.getTracks().get(i);
-					if (!trackHasKeys[i - range.firstTrack])
-						continue;
-					for (MotionCurve motionCurve : track.getMotionCurves()) {
+//				for (int i = range.firstTrack; i <= range.lastTrack; i++) {
+//					Track track = timelineEditor.getTracks().get(i);
+//					if (!trackHasKeys[i - range.firstTrack])
+//						continue;
+//					for (MotionCurve motionCurve : track.getMotionCurves()) {
+				for (MotionCurve motionCurve : curveWithKeys) {
 						int startIndex = motionCurve.getIndexAt(retimeRange.lastFrame);
 						int endIndex = motionCurve.getIndexAt(range.lastFrame);
 						Set<MotionKey> keysToRemove = new HashSet<MotionKey>();
@@ -806,18 +824,19 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 						}
 						for (MotionKey key : keysToRemove)
 							motionCurve.removeKey(key);
-					}
+//					}
 				}
 			}
 			
 			/*
 			 * retime
 			 */
-			for (int i = range.firstTrack; i <= range.lastTrack; i++) {
-				Track track = timelineEditor.getTracks().get(i);
-				if (!trackHasKeys[i - range.firstTrack])
-					continue;
-				for (MotionCurve motionCurve : track.getMotionCurves()) {
+//			for (int i = range.firstTrack; i <= range.lastTrack; i++) {
+//				Track track = timelineEditor.getTracks().get(i);
+//				if (!trackHasKeys[i - range.firstTrack])
+//					continue;
+//				for (MotionCurve motionCurve : track.getMotionCurves()) {
+			for (MotionCurve motionCurve : curveWithKeys) {
 					int startIndex = motionCurve.getIndexAt(range.firstFrame - 1);
 					int endIndex = motionCurve.getIndexAt(lastFrame);
 					Set<Integer> frames = new HashSet<Integer>();
@@ -833,7 +852,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 							key.setPosition(newPos);
 						}
 					}
-				}
+//				}
 			}
 			
 			/*
@@ -862,11 +881,12 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			 * suspend keys
 			 */
 			if (range.firstFrame < retimeRange.firstFrame) {
-				for (int i = range.firstTrack; i <= range.lastTrack; i++) {
-					Track track = timelineEditor.getTracks().get(i);
-					if (!trackHasKeys[i - range.firstTrack])
-						continue;
-					for (MotionCurve motionCurve : track.getMotionCurves()) {
+//				for (int i = range.firstTrack; i <= range.lastTrack; i++) {
+//					Track track = timelineEditor.getTracks().get(i);
+//					if (!trackHasKeys[i - range.firstTrack])
+//						continue;
+//					for (MotionCurve motionCurve : track.getMotionCurves()) {
+				for (MotionCurve motionCurve : curveWithKeys) {
 						int startIndex = motionCurve.getIndexAt(range.firstFrame - 1);
 						int endIndex = motionCurve.getIndexAt(retimeRange.firstFrame);
 						Set<MotionKey> keysToRemove = new HashSet<MotionKey>();
@@ -880,17 +900,18 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 						for (MotionKey key : keysToRemove)
 							motionCurve.removeKey(key);
 					}
-				}
+//				}
 			}
 			
 			/*
 			 * retime
 			 */
-			for (int i = range.firstTrack; i <= range.lastTrack; i++) {
-				Track track = timelineEditor.getTracks().get(i);
-				if (!trackHasKeys[i - range.firstTrack])
-					continue;
-				for (MotionCurve motionCurve : track.getMotionCurves()) {
+//			for (int i = range.firstTrack; i <= range.lastTrack; i++) {
+//				Track track = timelineEditor.getTracks().get(i);
+//				if (!trackHasKeys[i - range.firstTrack])
+//					continue;
+//				for (MotionCurve motionCurve : track.getMotionCurves()) {
+			for (MotionCurve motionCurve : curveWithKeys) {
 					int startIndex = motionCurve.getIndexAt(firstFrame - 1);
 					int endIndex = motionCurve.getIndexAt(range.lastFrame);
 					Set<Integer> frames = new HashSet<Integer>();
@@ -906,7 +927,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 							key.setPosition(newPos);
 						}
 					}
-				}
+//				}
 			}
 			
 			/*
@@ -1304,8 +1325,10 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				clipboard.put(copy, selection.get(key).track.getMotionCurve(key));
 			}
 			clipRange = new Range(range);
-			clipTrackHasKeys = new boolean[trackHasKeys.length];
-			System.arraycopy(trackHasKeys, 0, clipTrackHasKeys, 0, trackHasKeys.length);
+//			clipTrackHasKeys = new boolean[trackHasKeys.length];
+//			System.arraycopy(trackHasKeys, 0, clipTrackHasKeys, 0, trackHasKeys.length);
+			clipCurveWithKeys.clear();
+			clipCurveWithKeys.addAll(curveWithKeys);
 //		}
 	}
 	
@@ -1315,12 +1338,13 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		/*
 		 * delete keys
 		 */
-		for (int i = clipRange.firstTrack; i <= clipRange.lastTrack; i++) {
-			Track track = timelineEditor.getTracks().get(i);
-//			System.out.println(track.getName() + " " + trackHasKeys[i - range.firstTrack]);
-			if (!clipTrackHasKeys[i - clipRange.firstTrack])
-				continue;
-			for (MotionCurve motionCurve : track.getMotionCurves()) {
+//		for (int i = clipRange.firstTrack; i <= clipRange.lastTrack; i++) {
+//			Track track = timelineEditor.getTracks().get(i);
+////			System.out.println(track.getName() + " " + trackHasKeys[i - range.firstTrack]);
+//			if (!clipTrackHasKeys[i - clipRange.firstTrack])
+//				continue;
+//			for (MotionCurve motionCurve : track.getMotionCurves()) {
+		for (MotionCurve motionCurve : clipCurveWithKeys) {
 				int startIndex = motionCurve.getIndexAt(frame - 1);
 				int endIndex = motionCurve.getIndexAt(frame - clipRange.firstFrame + clipRange.lastFrame);
 				Set<MotionKey> keysToRemove = new HashSet<MotionKey>();
@@ -1328,8 +1352,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 					keysToRemove.add(motionCurve.getKey(j));
 				}
 				for (MotionKey key : keysToRemove)
-					edit.addEdit(new AtomicDeleteMotionKey(track.getMotionCurve(key), key));
-			}
+					edit.addEdit(new AtomicDeleteMotionKey(motionCurve, key));
+//			}
 		}
 		
 		/*
