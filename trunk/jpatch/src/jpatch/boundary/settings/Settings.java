@@ -86,7 +86,7 @@ public class Settings extends AbstractSettings {
 		
 		if (JOptionPane.showConfirmDialog(parent, splitPane, "Preferences", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null) == JOptionPane.OK_OPTION) {
 			MainFrame mf = MainFrame.getInstance();
-			if (screenWidth != mf.getWidth() || screenHeight != mf.getHeight() || screenPositionX != mf.getX() || screenPositionY != mf.getY())
+			if (mf != null && (screenWidth != mf.getWidth() || screenHeight != mf.getHeight() || screenPositionX != mf.getX() || screenPositionY != mf.getY()))
 				mf.setBounds(screenPositionX, screenPositionY, screenWidth, screenHeight);
 			save();
 		} else {
