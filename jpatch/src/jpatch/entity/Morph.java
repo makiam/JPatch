@@ -94,6 +94,7 @@ public class Morph implements MutableTreeNode {
 				System.out.println(mcs + " " + model.getAnimModel());
 				edit.addEdit(new AtomicModifyMotionCurve.Float(mcs.morph(this), animation.getPosition(), fValue));
 				MainFrame.getInstance().getUndoManager().addEdit(edit);
+				MainFrame.getInstance().getTimelineEditor().repaint();
 				return;
 //			}
 //		}

@@ -55,15 +55,16 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 		private float value;
 		private float position;
 		
-		public Float(MotionCurve.Float motionCurve, float position, float value) {
+		public Float(MotionCurve.Float motionCurve, float position, float newValue) {
 			this.motionCurve = motionCurve;
 			this.position = position;
-			this.value = value;
+			this.value = newValue;
 			bNewKey = !motionCurve.hasKeyAt(position);
 			swap();
 		}
 		
 		void swap() {
+			System.out.println(hashCode() + " swap " + motionCurve.getFloatAt(position) + " " + value);
 			float dummy = motionCurve.getFloatAt(position);
 			motionCurve.setFloatAt(position, value);
 			value = dummy;
