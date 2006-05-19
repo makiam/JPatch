@@ -134,10 +134,19 @@ public abstract class MotionCurve {
 	
 	public abstract MotionKey insertKeyAt(float position);
 	
-	public void removeKey(MotionKey key) {
+	public void forceRemoveKey(MotionKey key) {
 		System.out.println("removeKey " + key.hashCode() + " pos " + key.getPosition());
-//		if (list.size() > 1) list.remove(key);
 		list.remove(key);
+	}
+	
+	public MotionKey removeKey(MotionKey key) {
+		System.out.println("removeKey " + key.hashCode() + " pos " + key.getPosition());
+		if (list.size() > 1) {
+			list.remove(key);
+			return key;
+		} else {
+			return null;
+		}
 	}
 	
 	public void moveKey(MotionKey key, float position) {
@@ -168,6 +177,8 @@ public abstract class MotionCurve {
 	}
 	
 	public MotionKey getKeyAt(float position) {
+		if (list.size() == 0)
+			return null;
 		if (position == ((MotionKey) list.get(list.size() - 1)).getPosition()) return (MotionKey) list.get(list.size() - 1);
 		int index = binarySearch(position) - 1;
 		if (index >= 0) {

@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.33 2006/05/17 15:50:20 sascha_l Exp $
+ * $Id: TrackView.java,v 1.34 2006/05/19 11:05:02 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -469,12 +469,12 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				for (MotionKey key : selection.keySet()) {
 					selection.get(key).position = key.getPosition();
 				}
-				/*
-				 * Repaint viewports
-				 */
-				MainFrame.getInstance().getAnimation().rethink();
-				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
+			/*
+			 * Repaint viewports
+			 */
+			MainFrame.getInstance().getAnimation().rethink();
+			MainFrame.getInstance().getJPatchScreen().update_all();
 			break;
 		case LASSO:
 			selection.clear();
@@ -680,7 +680,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 					
 					for (MotionKey key : hitKeys) {
 						MotionCurve mc = hitTrack.getMotionCurve(key);
-						mc.removeKey(key);
+						mc.forceRemoveKey(key);
 						
 					
 					
@@ -701,7 +701,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //							System.out.println(selected);
 //							if (!selected) {
 								suspendedKeys.put(sKey, mc);
-								mc.removeKey(sKey);
+								mc.forceRemoveKey(sKey);
 //							}
 						}
 					
@@ -744,11 +744,13 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //			timelineEditor.setCornerText("Frame " + frame);
 //			if (timelineEditor.getAnimObject() instanceof AnimModel) {
 //			MainFrame.getInstance().getAnimation().getCurvesetFor(timelineEditor.getAnimObject()).setPosition(position);
-			if (!moveSelection) {
-				MainFrame.getInstance().getAnimation().setPosition(frame + delta);
-				timelineEditor.setCurrentFrame(frame + delta);
-				MainFrame.getInstance().getJPatchScreen().update_all();
-			}
+			
+//			if (!moveSelection) {
+//				MainFrame.getInstance().getAnimation().setPosition(frame + delta);
+//				timelineEditor.setCurrentFrame(frame + delta);
+//				MainFrame.getInstance().getJPatchScreen().update_all();
+//			}
+			
 			break;
 		case LASSO:
 			Graphics2D g2 = (Graphics2D) ((Component) e.getSource()).getGraphics();

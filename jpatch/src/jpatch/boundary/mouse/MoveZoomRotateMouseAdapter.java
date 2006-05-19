@@ -8,6 +8,8 @@ import javax.vecmath.Quat4f;
 import jpatch.boundary.*;
 import jpatch.control.edit.AtomicChangeAnimObjectScale;
 import jpatch.control.edit.AtomicModifyMotionCurve;
+import jpatch.control.edit.JPatchActionEdit;
+import jpatch.control.edit.JPatchRootEdit;
 import jpatch.control.edit.ModifyAnimObject;
 import jpatch.entity.Camera;
 import jpatch.entity.MotionCurveSet;
@@ -21,8 +23,10 @@ public class MoveZoomRotateMouseAdapter extends JPatchMouseAdapter {
 	private float fMin;
 	private int iState;
 	
-	private float fCameraScale;
+	private float fFocalLength;
 	private Quat4f q4CameraOrient = new Quat4f();
+	private long timestamp;
+	private float pos;
 	
 	public void mousePressed(MouseEvent mouseEvent) {
 		if (mouseEvent.getButton() == MouseEvent.BUTTON2) {
@@ -39,7 +43,7 @@ public class MoveZoomRotateMouseAdapter extends JPatchMouseAdapter {
 //			}
 			iState = (mouseEvent.isControlDown() || viewDef.isLocked()) ? ROTATE : MOVE;
 			if (viewDef.getCamera() != null) {
-				fCameraScale = viewDef.getCamera().getScale();
+				fFocalLength = viewDef.getCamera().getFocalLength();
 				q4CameraOrient.set(viewDef.getCamera().getOrientation());
 			}
 		}
@@ -54,18 +58,18 @@ public class MoveZoomRotateMouseAdapter extends JPatchMouseAdapter {
 				Camera camera = viewDef.getCamera();
 				ModifyAnimObject edit = new ModifyAnimObject(camera);
 				Quat4f newOrientation = camera.getOrientation();
-				float newScale = camera.getScale();
+				float newFocalLength = camera.getFocalLength();
 				camera.setOrientation(q4CameraOrient);
-				camera.setScale(fCameraScale);
-				MotionCurveSet mcs = MainFrame.getInstance().getAnimation().getCurvesetFor(camera);
+				MotionCurveSet.Camera mcs = (MotionCurveSet.Camera) MainFrame.getInstance().getAnimation().getCurvesetFor(camera);
 				float position = MainFrame.getInstance().getAnimation().getPosition();
 				if (!newOrientation.equals(q4CameraOrient))
 					edit.addEdit(new AtomicModifyMotionCurve.Quat4f(mcs.orientation, position, newOrientation));
-				if (newScale != fCameraScale) {
-					edit.addEdit(new AtomicChangeAnimObjectScale(camera, newScale));
-				}
+//				if (fFocalLength != newFocalLength) {
+//					edit.addEdit(new AtomicModifyMotionCurve.Float(mcs.focalLength, position, fFocalLength));
+//				}
 				mcs.setPosition(position);
 				MainFrame.getInstance().getUndoManager().addEdit(edit);
+				MainFrame.getInstance().getTimelineEditor().repaint();
 			}
 		}
 	}
@@ -92,14 +96,40 @@ public class MoveZoomRotateMouseAdapter extends JPatchMouseAdapter {
 	
 	public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {
 		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseWheelEvent.getSource());
-		if (viewDef.getCamera() != null) {
-			fCameraScale = viewDef.getCamera().getScale();
-		}
+//		if (viewDef.getCamera() != null) {
+//			fFocalLength = viewDef.getCamera().getFocalLength();
+//		}
 		int wheelClicks = mouseWheelEvent.getWheelRotation();
 		float scale = (1-((float)wheelClicks)/10);
 		if (scale < 0.2) scale = (float)0.2;
 		if (scale > 5) scale = (float)5;
+		if (viewDef.getCamera() != null)
+			fFocalLength = viewDef.getCamera().getFocalLength();
 		viewDef.scaleView(scale);
+		long currentTime = System.currentTimeMillis();
+		if (viewDef.getCamera() != null) {
+			if (currentTime > timestamp + 1000 || pos != MainFrame.getInstance().getAnimation().getPosition()) {
+				timestamp = currentTime;
+				Camera camera = viewDef.getCamera();
+				ModifyAnimObject edit = new ModifyAnimObject(camera);
+				MotionCurveSet.Camera mcs = (MotionCurveSet.Camera) MainFrame.getInstance().getAnimation().getCurvesetFor(camera);
+				float position = MainFrame.getInstance().getAnimation().getPosition();
+				float newFocalLength = camera.getFocalLength();
+				camera.setFocalLength(fFocalLength);
+				edit.addEdit(new AtomicModifyMotionCurve.Float(mcs.focalLength, position, newFocalLength));
+				fFocalLength = camera.getFocalLength();
+				mcs.setPosition(position);
+				MainFrame.getInstance().getUndoManager().addEdit(edit);
+				MainFrame.getInstance().getTimelineEditor().repaint();
+				pos = position;
+			} else {
+				Camera camera = viewDef.getCamera();
+				MotionCurveSet.Camera mcs = (MotionCurveSet.Camera) MainFrame.getInstance().getAnimation().getCurvesetFor(camera);
+				float position = MainFrame.getInstance().getAnimation().getPosition();
+				mcs.focalLength.setFloatAt(position, camera.getFocalLength());
+				MainFrame.getInstance().getTimelineEditor().repaint();
+			}
+		}
 //		if (viewDef.getCamera() != null) {
 //			System.out.println("*");
 //			Camera camera = viewDef.getCamera();

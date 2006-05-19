@@ -93,6 +93,7 @@ public class ChangeViewMouseListener extends MouseAdapter {
 				}
 				mcs.setPosition(position);
 				MainFrame.getInstance().getUndoManager().addEdit(edit);
+				MainFrame.getInstance().getTimelineEditor().repaint();
 			}
 		}
 	}

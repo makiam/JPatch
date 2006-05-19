@@ -13,6 +13,14 @@ import jpatch.entity.*;
 
 public final class Launcher {
 	public static void main(String[] args) {
+		if (args.length >=1) {
+			if (args[0].equals("-settings")) {
+				settings();
+			} else if (!args[0].equals("-animator") && !args[0].equals("-modeler")) {
+				System.out.println("usage java -jpatch.jar [-animator | -modeler | -settings]");
+				System.exit(0);
+			}
+		}
 		System.out.println("Stating JPatch...");
 		SplashScreen splash = new SplashScreen();
 		splash.showSplash(true);
@@ -34,14 +42,12 @@ public final class Launcher {
 			e.printStackTrace();
 		}
 		
-		
 		if (args.length >=1) {
-			if (args[0].equals("-animator")) launchAnimator();
-			else if (args[0].equals("-modeler")) launchModeler();
-			else if (args[0].equals("-settings")) settings();
-			else System.out.println("usage java -jpatch.jar [-animator | -modeler | -settings]");
-		}
-		else {
+			if (args[0].equals("-animator"))
+				launchAnimator();
+			else if (args[0].equals("-modeler"))
+				launchModeler();
+		} else {
 			switch (Settings.getInstance().startup) {
 			case ANIMATOR:
 				launchAnimator();
@@ -82,5 +88,6 @@ public final class Launcher {
 	
 	private static void settings() {
 		Settings.getInstance().showDialog(null);
+		System.exit(0);
 	}
 }
