@@ -178,7 +178,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 					ds = f;
 			}
 		}
-		return (float) Math.sqrt(ds);
+		return (float) Math.sqrt(ds) * fScale;
 	}
 	
 	public abstract Model getModel();
@@ -273,16 +273,25 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		m4ScaledTransform.setScale(fScale);
 	}
 
+	private static final Matrix3f m1 = new Matrix3f();
+	private static final Matrix3f m2 = new Matrix3f();
 	public void rotate(AxisAngle4f a, Point3f pivot) {
 		Matrix3f m = new Matrix3f();
 		m.set(a);
-		transform(m, pivot);
+		
+		m4BackupTransform.getRotationScale(m1);
+		m2.set(m);
+		m2.mul(m1);
+		m4Transform.setRotationScale(m2);
+		m4ScaledTransform.set(m4Transform);
+		m4ScaledTransform.setScale(fScale);
+//		transform(m, pivot);
 	}
 
 //	private static final Matrix3f m1 = new Matrix3f();
 //	private static final Matrix3f m2 = new Matrix3f();
 	public void transform(Matrix3f m, Point3f pivot) {
-		setScale(m.getScale());
+		setScale(fBackupScale * m.getScale());
 //		m4BackupTransform.getRotationScale(m1);
 //		m4BackupTransform.getRotationScale(m2);
 //		m2.invert();

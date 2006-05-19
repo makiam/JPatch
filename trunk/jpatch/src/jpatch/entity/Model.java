@@ -471,12 +471,14 @@ public class Model implements MutableTreeNode {
 //		treeModel.reload(bone.getParent());
 //		if (bone.getParentBone() == null)
 //			treenodeBones.add(bone);
+		setPose();
 	}
 
 	public void removeBone(Bone bone) {
 //		System.out.println("remove bone from " + bone.getParent());
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(bone);
 		setBones.remove(bone);
+		setPose();
 	}
 	
 //	public void addDof(RotationDof dof) {
