@@ -1,5 +1,5 @@
 /*
- * $Id: Settings.java,v 1.9 2006/04/26 14:42:12 sascha_l Exp $
+ * $Id: Settings.java,v 1.10 2006/05/19 18:53:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -86,7 +86,7 @@ public class Settings extends AbstractSettings {
 		
 		if (JOptionPane.showConfirmDialog(parent, splitPane, "Preferences", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null) == JOptionPane.OK_OPTION) {
 			MainFrame mf = MainFrame.getInstance();
-			if (screenWidth != mf.getWidth() || screenHeight != mf.getHeight() || screenPositionX != mf.getX() || screenPositionY != mf.getY())
+			if (mf != null && (screenWidth != mf.getWidth() || screenHeight != mf.getHeight() || screenPositionX != mf.getX() || screenPositionY != mf.getY()))
 				mf.setBounds(screenPositionX, screenPositionY, screenWidth, screenHeight);
 			save();
 		} else {
