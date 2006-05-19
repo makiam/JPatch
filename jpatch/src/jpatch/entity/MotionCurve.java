@@ -29,7 +29,7 @@ public abstract class MotionCurve {
 	public static MotionCurve.Float createScaleCurve() {
 		MotionCurve.Float mc = new MotionCurve.Float();
 		mc.name = "Scale";
-		mc.fMin = -10;
+		mc.fMin = 0;
 		mc.fMax = 10;
 		return mc;
 	}
