@@ -9,9 +9,12 @@ public class AtomicDeleteMotionKey extends JPatchAtomicEdit implements JPatchRoo
 	public AtomicDeleteMotionKey(MotionCurve motionCurve, MotionKey motionKey) {
 		this.motionCurve = motionCurve;
 		this.motionKey = motionKey;
+		/*
+		 * check if the key really is on the curve, throw exception if it isn't.
+		 */
 		if (motionCurve.getKeyAt(motionKey.getPosition()) != motionKey)
 			throw new IllegalArgumentException("MotionKey " + motionKey + " is not on curve " + motionCurve);
-		redo();
+		redo();		// remove the key
 	}
 	
 	public String getName() {
@@ -19,11 +22,15 @@ public class AtomicDeleteMotionKey extends JPatchAtomicEdit implements JPatchRoo
 	}
 	
 	public void undo() {
-		motionCurve.addKey(motionKey);
+		if (motionKey != null)							// only remove if we have a valid key
+			motionCurve.addKey(motionKey);
 	}
 
 	public void redo() {
-		motionCurve.removeKey(motionKey);
+		motionKey = motionCurve.removeKey(motionKey);	// if the key can't be removed (because it's the only
+														// one on the curve) this method returns null (to
+														// prevent a subsequent undo() call to add a key that
+														// hasn't been removed).
 	}
 	
 	public int sizeOf() {

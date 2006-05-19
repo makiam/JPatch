@@ -399,6 +399,10 @@ implements ModelImporter {
 					} else {
 						HashMap pointMap = new HashMap();
 						for (int i = 0; i < aiList.length; i++) {
+							if (aiList[i] == -1) {
+								System.err.println("illegal point id -1 in selection \"" + selectionName + "\"");
+								continue;
+							}
 							pointMap.put(listCp.get(aiList[i]), new Float(afList[i]));
 						}
 						selection = new Selection(pointMap);
