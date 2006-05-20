@@ -97,7 +97,10 @@ public class JPatchToggleButton extends JToggleButton implements KeyBindingHelpe
 				String acceleratorDelimiter = UIManager.getString("MenuItem.acceleratorDelimiter");
 				if (acceleratorDelimiter == null)
 					acceleratorDelimiter = "+";
-				int color = UIManager.getColor("ToolTip.foregroundInactive").getRGB() & 0xffffff;
+				Color c = UIManager.getColor("ToolTip.foregroundInactive");
+				if (c == null)
+					c = Color.GRAY;
+				int color = c.getRGB() & 0xffffff;
 				acceleratorText = "&nbsp;&nbsp;&nbsp;<font style='font-size: 90%; color: #" + Integer.toHexString(color) + "'>";
 				int modifiers = ks.getModifiers();
 	            if (modifiers > 0) {

@@ -17,14 +17,14 @@ implements ChangeListener {
 	private static final long serialVersionUID = 1319926408036866674L;
 	JPatchInput inputPosition;
 	MorphTarget morphTarget;
-	AbstractButton editButton;
+	JToggleButton editButton;
 	AbstractButton deleteButton;
 	
 	public MorphTargetPanel(MorphTarget morphTarget) {
 		this.morphTarget = morphTarget;
 		MorphTarget editedMorph = MainFrame.getInstance().getEditedMorph();
 		deleteButton = new JButton(new DeleteMorphTargetAction(morphTarget));
-		editButton = new JButton(new EditMorphTargetAction(morphTarget));
+		editButton = new JToggleButton(new EditMorphTargetAction(morphTarget));
 		add(editButton);
 		add(deleteButton);
 		
@@ -63,6 +63,10 @@ implements ChangeListener {
 			morphTarget.getMorph().changeTargetPosition(morphTarget, inputPosition.getFloatValue());
 			MainFrame.getInstance().selectTreeNode(morphTarget);
 		}
+	}
+	
+	public JToggleButton getEditButton() {
+		return editButton;
 	}
 	
 //	public void editMorph() {

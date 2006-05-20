@@ -157,6 +157,11 @@ public final class JPatchScreen extends JPanel {
 		this.popupMenu = popupMenu;
 	}
 	
+	public JPopupMenu getPopupMenu() {
+		return popupMenu;
+	}
+	
+	
 //	public void switchRenderer(int renderer) {
 //		JPatchUserSettings.getInstance().iRealtimeRenderer = renderer;
 //		initScreen();

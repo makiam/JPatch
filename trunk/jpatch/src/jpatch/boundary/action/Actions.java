@@ -369,13 +369,10 @@ public class Actions extends DefaultHandler {
 		actionMap.put("export povray", new ActionDescriptor(new ExportPovrayAction()));
 		actionMap.put("export renderman", new ActionDescriptor(new ExportRibAction()));
 		actionMap.put("quit", new ActionDescriptor(new QuitAction()));
-		actionMap.put("synchronize viewports", new ActionDescriptor(new SyncScreensAction()));
+		actionMap.put("synchronize viewports", new ActionDescriptor(new ToggleAction(ToggleAction.Type.SYNCHRONIZE_VIEWPORTS)));
 		actionMap.put("settings", new ActionDescriptor(new EditSettingsAction()));
 		actionMap.put("grid spacing settings", new ActionDescriptor(new SetGridSpacingAction()));
 		actionMap.put("install jogl", new ActionDescriptor(new InstallJoglAction()));
-		actionMap.put("jpatch lookandfeel", new ActionDescriptor(new SwitchLookAndFeelAction(Settings.Plaf.JPATCH)));
-		actionMap.put("crossplatform lookandfeel", new ActionDescriptor(new SwitchLookAndFeelAction(Settings.Plaf.CROSS_PLATFORM)));
-		actionMap.put("system lookandfeel", new ActionDescriptor(new SwitchLookAndFeelAction(Settings.Plaf.SYSTEM)));
 		actionMap.put("phoneme morph mapping", new ActionDescriptor(new EditPhonemesAction()));
 		actionMap.put("dump", new ActionDescriptor(new DumpAction()));
 		actionMap.put("dump xml", new ActionDescriptor(new XmlDumpAction()));
