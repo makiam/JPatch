@@ -81,6 +81,11 @@ implements TreeSelectionListener {
 		sidePanel.repaint();
 	}
 	
+	public void updatePanel() {
+		if (sidePanel instanceof AnimObjectPanel)
+			((AnimObjectPanel) sidePanel).updateFields();
+	}
+	
 	public void setTree(JPatchTree tree) {
 //		scrollPane.remove(scrollPane.getComponent(0));
 //		scrollPane.add(tree);
@@ -230,12 +235,14 @@ implements TreeSelectionListener {
 			replacePanel(new LightsPanel());
 		} else if (anim && selectedNode == MainFrame.getInstance().getAnimation().getTreenodeModels()) {
 			replacePanel(new AnimModelsPanel());
-		} else if (anim && selectedNode instanceof Camera) {
-			replacePanel(new CameraPanel((Camera) selectedNode));
-		} else if (anim && selectedNode instanceof AnimLight) {
-			replacePanel(new LightPanel((AnimLight) selectedNode));
-		} else if (anim && selectedNode instanceof AnimModel) {
-			replacePanel(new AnimModelPanel((AnimModel) selectedNode));
+//		} else if (anim && selectedNode instanceof Camera) {
+//			replacePanel(new CameraPanel((Camera) selectedNode));
+//		} else if (anim && selectedNode instanceof AnimLight) {
+//			replacePanel(new LightPanel((AnimLight) selectedNode));
+//		} else if (anim && selectedNode instanceof AnimModel) {
+//			replacePanel(new AnimModelPanel((AnimModel) selectedNode));
+		} else if (anim && selectedNode instanceof AnimObject) {
+			replacePanel(new AnimObjectPanel((AnimObject) selectedNode));
 		} else if (anim && selectedNode instanceof Animation) {
 			replacePanel(new AnimationPanel(MainFrame.getInstance().getAnimation()));
 		} else {

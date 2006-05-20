@@ -312,6 +312,9 @@ public class Viewport2 {
 		for (AnimObject animObject:animation.getObjects()) {
 			if (animObject == viewDef.getCamera())
 				continue;
+			if (animObject instanceof AnimLight) {
+				animObject.getModel().getMaterial(0).setColor(((AnimLight) animObject).getColor());
+			}
 			setModelMatrix(animObject.getTransform());
 			drawModel(animObject.getModel());
 		}
