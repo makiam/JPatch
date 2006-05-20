@@ -18,10 +18,6 @@ public class AnimLight extends AnimObject {
 		new JPatchImport().importModel(spotModel, ClassLoader.getSystemResource("jpatch/models/spot.jpt").toString());
 	}
 	
-	protected RenderExtension re = new RenderExtension(new String[] {
-		"povray", "light_source {\n\t$position color rgb $color * $intensity\n\tparallel\n\t#if ($size > 0)\n\t\tarea_light <$size,0,0>,<0,$size,0>,10,10 adaptive 1 jitter circular orient\n\t#end\n}\n",
-		"renderman", "Attribute \"light\" \"shadows\" \"on\"\nLightSource \"distantlight\" $number \"from\" $position \"intensity\" $intensity \"lightcolor\" $color\n"
-	});
 	protected Color3f color = new Color3f(1,1,1);
 	protected float fIntensity = 1;
 	protected float fSize = 0;
@@ -30,6 +26,8 @@ public class AnimLight extends AnimObject {
 	
 	public AnimLight() {
 		strName = "New Lightsource";
+		setRenderString("povray", "", "light_source {\n\t$position color rgb $color * $intensity\n\tparallel\n\t#if ($size > 0)\n\t\tarea_light <$size,0,0>,<0,$size,0>,10,10 adaptive 1 jitter circular orient\n\t#end\n}\n");
+		setRenderString("renderman", "", "Attribute \"light\" \"shadows\" \"on\"\nLightSource \"distantlight\" $number \"from\" $position \"intensity\" $intensity \"lightcolor\" $color\n");
 	}
 
 	public Color3f getColor() {

@@ -28,9 +28,22 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 	
 	protected String strName = "(new object)";
 	
+	protected RenderExtension re = new RenderExtension(new String[] {
+			"povray", "",
+			"renderman", ""
+		});
+	
 	public AnimObject() {
 		m4Transform.setIdentity();
 		m4ScaledTransform.set(m4Transform);
+	}
+	
+	public void setRenderString(String format, String version, String renderString) {
+		re.setRenderString(format, version, renderString);
+	}
+	
+	public String getRenderString(String format, String version) {
+		return re.getRenderString(format, version);
 	}
 	
 	public void setTransform(Matrix4d transform) {
@@ -271,6 +284,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		m4Transform.m23 += v.z;
 		m4ScaledTransform.set(m4Transform);
 		m4ScaledTransform.setScale(fScale);
+		MainFrame.getInstance().getSideBar().updatePanel();
 	}
 
 	private static final Matrix3f m1 = new Matrix3f();
@@ -286,6 +300,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		m4ScaledTransform.set(m4Transform);
 		m4ScaledTransform.setScale(fScale);
 //		transform(m, pivot);
+		MainFrame.getInstance().getSideBar().updatePanel();
 	}
 
 //	private static final Matrix3f m1 = new Matrix3f();
@@ -304,6 +319,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 //		m4Transform.setRotationScale(m2);
 //		m4ScaledTransform.set(m4Transform);
 //		m4ScaledTransform.setScale(fScale);
+		MainFrame.getInstance().getSideBar().updatePanel();
 	}
 
 	public JPatchUndoableEdit endTransform() {

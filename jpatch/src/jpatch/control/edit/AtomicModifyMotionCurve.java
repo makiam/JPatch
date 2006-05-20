@@ -22,7 +22,7 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 	
 	abstract void removeKey();
 	
-	public static class Color3f extends AtomicModifyMotionCurve {
+	public static class Color3f extends AtomicModifyMotionCurve implements JPatchRootEdit {
 		private MotionCurve.Color3f motionCurve;
 		private javax.vecmath.Color3f color;
 		private float position;
@@ -47,6 +47,10 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 		
 		public int sizeOf() {
 			return 8 + 4 + 4 + 4 + 8 + 4 + 4 + 4;
+		}
+
+		public String getName() {
+			return "change color";
 		}
 	}
 	
@@ -79,7 +83,7 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 		}
 	}
 	
-	public static class Point3d extends AtomicModifyMotionCurve {
+	public static class Point3d extends AtomicModifyMotionCurve implements JPatchRootEdit {
 		private MotionCurve.Point3d motionCurve;
 		private javax.vecmath.Point3d point;
 		private float position;
@@ -106,9 +110,13 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 		public int sizeOf() {
 			return 8 + 4 + 4 + 4 + 8 + 4 + 4 + 4;
 		}
+
+		public String getName() {
+			return "change position";
+		}
 	}
 	
-	public static class Quat4f extends AtomicModifyMotionCurve {
+	public static class Quat4f extends AtomicModifyMotionCurve implements JPatchRootEdit {
 		private MotionCurve.Quat4f motionCurve;
 		private javax.vecmath.Quat4f quat;
 		private float position;
@@ -134,6 +142,10 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 		
 		public int sizeOf() {
 			return 8 + 4 + 4 + 4 + 8 + 4 + 4 + 4 + 4;
+		}
+
+		public String getName() {
+			return "change orientation";
 		}
 	}
 }
