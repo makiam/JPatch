@@ -21,7 +21,7 @@ public class GridDialog extends JDialog implements ActionListener {
 	private JButton buttonCancel = new JButton("Cancel",new ImageIcon(getClass().getClassLoader().getResource("jpatch/images/cancel.png")));
 	
 	public GridDialog(Frame owner) {
-		super(owner,"Grid settings",true);
+		super(owner,"oOoOoOo Grid settings",true);
 		
 		if (MainFrame.getInstance().getModel() != null)
 			textSpacing.setText(Float.toString(Settings.getInstance().viewports.modelerGridSpacing));
@@ -62,6 +62,8 @@ public class GridDialog extends JDialog implements ActionListener {
 				Settings.getInstance().viewports.animatorGridSpacing = new Float(textSpacing.getText()).floatValue();
 			
 			MainFrame.getInstance().getJPatchScreen().update_all();
+			
+			System.out.println(textSpacing.getText() + " " + Settings.getInstance().viewports.modelerGridSpacing);
 		}
 	}
 }

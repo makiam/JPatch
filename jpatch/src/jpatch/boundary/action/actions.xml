@@ -383,7 +383,7 @@
 		<property key="Icon" value="jpatch/images/quit.png"/>
 	</action>
 	<action name="synchronize viewports" model="check">
-		<constructor>new SyncScreensAction()</constructor>
+		<constructor>new ToggleAction(ToggleAction.Type.SYNCHRONIZE_VIEWPORTS)</constructor>
 		<property key="ShortDescription" value="Synchronize viewports"/>
 	</action>
 	<action name="settings" model="default">
@@ -400,21 +400,6 @@
 		<constructor>new InstallJoglAction()</constructor>
 		<property key="ShortDescription" value="Install OpenGL support libraries (JOGL)..."/>
 		<property key="Mnemonic" value="i"/>
-	</action>
-	<action name="jpatch lookandfeel" model="default">
-		<constructor>new SwitchLookAndFeelAction(Settings.Plaf.JPATCH)</constructor>
-		<property key="ShortDescription" value="JPatch look-and-feel"/>
-		<property key="Mnemonic" value="j"/>
-	</action>
-	<action name="crossplatform lookandfeel" model="default">
-		<constructor>new SwitchLookAndFeelAction(Settings.Plaf.CROSS_PLATFORM)</constructor>
-		<property key="ShortDescription" value="Crossplatform look-and-feel"/>
-		<property key="Mnemonic" value="c"/>
-	</action>
-	<action name="system lookandfeel" model="default">
-		<constructor>new SwitchLookAndFeelAction(Settings.Plaf.SYSTEM)</constructor>
-		<property key="ShortDescription" value="System look-and-feel"/>
-		<property key="Mnemonic" value="s"/>
 	</action>
 	<action name="phoneme morph mapping" model="default">
 		<constructor>new EditPhonemesAction()</constructor>

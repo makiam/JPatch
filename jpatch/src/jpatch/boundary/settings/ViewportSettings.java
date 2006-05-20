@@ -1,5 +1,5 @@
 /*
- * $Id: ViewportSettings.java,v 1.3 2006/04/26 19:01:28 sascha_l Exp $
+ * $Id: ViewportSettings.java,v 1.4 2006/05/20 17:58:02 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -30,9 +30,9 @@ public class ViewportSettings extends AbstractSettings {
 	}
 	public static enum ScreenMode { SINGLE, HORIZONTAL_SPLIT, VERTICAL_SPLIT, QUAD };
 	
-	public ViewportSettings.ScreenMode viewportMode = ScreenMode.SINGLE;
-	public boolean synchronizeViewports = false;
-	public boolean snapToGrid = false;
+	public transient ViewportSettings.ScreenMode viewportMode = ScreenMode.SINGLE;
+	public transient boolean synchronizeViewports = false;
+	public transient boolean snapToGrid = false;
 	public float modelerGridSpacing = 1.0f;
 	public float animatorGridSpacing = 10.0f;
 	public boolean showGroundPlaneInModeler = false;

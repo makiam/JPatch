@@ -1,5 +1,5 @@
 /*
- * $Id: Settings.java,v 1.10 2006/05/19 18:53:20 sascha_l Exp $
+ * $Id: Settings.java,v 1.11 2006/05/20 17:58:02 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -31,6 +31,8 @@ import javax.swing.table.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
+import jpatch.boundary.action.Actions;
+import jpatch.boundary.laf.SmoothLookAndFeel;
 
 
 /**
@@ -43,8 +45,8 @@ public class Settings extends AbstractSettings {
 	public static enum Startup { MODELER, ANIMATOR };
 	public static enum Plaf { CROSS_PLATFORM, SYSTEM, JPATCH };
 	public Startup startup = Startup.MODELER;
-	public boolean newInstallation = true;
-	public boolean cleanExit = false;
+	public transient boolean newInstallation = true;
+	public transient boolean cleanExit = false;
 	public int screenPositionX = 0;
 	public int screenPositionY = 0;
 	public int screenWidth = 1024;
@@ -84,11 +86,40 @@ public class Settings extends AbstractSettings {
 		splitPane.add(new JScrollPane(tree));
 		splitPane.add(new JScrollPane(getTable()));
 		
+		MainFrame mf = MainFrame.getInstance();
+		if (mf != null) {
+			screenPositionX = mf.getX();
+			screenPositionY = mf.getY();
+			screenWidth = mf.getWidth();
+			screenHeight = mf.getHeight();
+		}
 		if (JOptionPane.showConfirmDialog(parent, splitPane, "Preferences", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null) == JOptionPane.OK_OPTION) {
-			MainFrame mf = MainFrame.getInstance();
 			if (mf != null && (screenWidth != mf.getWidth() || screenHeight != mf.getHeight() || screenPositionX != mf.getX() || screenPositionY != mf.getY()))
 				mf.setBounds(screenPositionX, screenPositionY, screenWidth, screenHeight);
 			save();
+			
+			try {
+				switch (lookAndFeel) {
+				case CROSS_PLATFORM:
+					UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+					UIManager.put("swing.boldMetal", false);
+					break;
+				case SYSTEM:
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+					break;
+				case JPATCH:
+					UIManager.setLookAndFeel(new SmoothLookAndFeel());
+					UIManager.put("swing.boldMetal", false);
+					break;
+				}
+				if (mf != null) {
+					SwingUtilities.updateComponentTreeUI(mf);
+					SwingUtilities.updateComponentTreeUI(mf.getJPatchScreen().getPopupMenu());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 		} else {
 			System.out.println("Cancel");
 			load();

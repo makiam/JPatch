@@ -109,11 +109,13 @@
 			<menu name="Settings" mnemonic="s">
 				<item command="settings"/>
 				<item command="edit keyboard mapping"/>
+<!--
 				<menu name="Look and feel" mnemonic="l">
 					<item command="jpatch lookandfeel"/>
 					<item command="crossplatform lookandfeel"/>
 					<item command="system lookandfeel"/>
 				</menu>
+-->
 			</menu>
 			<separator/>
 			<item command="quit"/>

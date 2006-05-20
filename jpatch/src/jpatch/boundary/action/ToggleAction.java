@@ -42,7 +42,8 @@ public class ToggleAction extends AbstractAction {
 		SNAP_TO_GRID,
 		SHOW_POINTS, SHOW_CURVES, SHOW_PATCHES, SHOW_ROTOSCOPE, SHOW_BONES,
 		TANGENTS_PEAK, TANGENTS_ROUND,
-		VIEWPORTS_SINGLE, VIEWPORTS_VERTICAL_SPLIT, VIEWPORTS_HORIZONTAL_SPLIT, VIEWPORTS_QUAD
+		VIEWPORTS_SINGLE, VIEWPORTS_VERTICAL_SPLIT, VIEWPORTS_HORIZONTAL_SPLIT, VIEWPORTS_QUAD,
+		SYNCHRONIZE_VIEWPORTS
 	}
 	private final Type type;
 	
@@ -111,6 +112,9 @@ public class ToggleAction extends AbstractAction {
 			break;
 		case VIEWPORTS_QUAD:
 			MainFrame.getInstance().getJPatchScreen().resetMode(JPatchScreen.QUAD);
+			break;
+		case SYNCHRONIZE_VIEWPORTS:
+			Settings.getInstance().viewports.synchronizeViewports = Actions.getInstance().getButtonModel("synchronize viewports").isSelected();
 			break;
 		}
 	}

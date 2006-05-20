@@ -1,5 +1,5 @@
 /*
- * $Id: AbstractSettings.java,v 1.7 2006/04/25 16:23:04 sascha_l Exp $
+ * $Id: AbstractSettings.java,v 1.8 2006/05/20 17:58:02 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -40,8 +40,12 @@ import javax.vecmath.*;
 import jpatch.entity.Model;
 
 /**
+ * This class provides publically accessible settings (preferences)
+ * They are stored in the system backing store (see java.util.Preferences) and
+ * can be edited via a nice included GUI frontend. All public fields that are
+ * not marked as "transient" can be edited via the GUI.
+ * 
  * @author sascha
- *
  */
 public abstract class AbstractSettings implements TreeNode {
 	private static final Preferences JPATCH_ROOT_NODE = Preferences.userRoot().node("/JPatch/settings/preferences");
@@ -442,7 +446,8 @@ public abstract class AbstractSettings implements TreeNode {
 					childNode.setNodeName(field.getName());
 					children.add(childNode);
 				} else {
-					fields.add(field);
+					if (!Modifier.isTransient(field.getModifiers()))
+							fields.add(field);
 				}
 			}
 //			Collections.sort(children, new Comparator<TreeNode>() {
