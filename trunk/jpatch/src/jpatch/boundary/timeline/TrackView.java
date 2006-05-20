@@ -917,14 +917,14 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 					int startIndex = motionCurve.getIndexAt(firstFrame - 1);
 					int endIndex = motionCurve.getIndexAt(range.lastFrame);
 					Set<Integer> frames = new HashSet<Integer>();
-					for (int j = startIndex; j < endIndex; j++) {
+					for (int j = endIndex - 1; j >= startIndex; j--) {
 						MotionKey key = motionCurve.getKey(j);
 						if (selection.containsKey(key)) {
 							int dNew = range.lastFrame - range.firstFrame;
 							int dOld = retimeRange.lastFrame - retimeRange.firstFrame;
 							int newPos = Math.round(range.lastFrame - (range.lastFrame - (int) selection.get(key).position) * dNew / dOld);
 							while (frames.contains(newPos))
-								newPos++;
+								newPos--;
 							frames.add(newPos);
 							key.setPosition(newPos);
 						}

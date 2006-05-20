@@ -16,6 +16,7 @@ import javax.swing.tree.*;
 
 import jpatch.boundary.*;
 import jpatch.boundary.action.*;
+import jpatch.boundary.sidebar.SidePanel;
 import jpatch.boundary.ui.JPatchDummyButton;
 import jpatch.boundary.ui.JPatchRadioButtonMenuItem;
 
@@ -130,23 +131,41 @@ public class Animation implements MutableTreeNode {
 	public void addCamera(final Camera camera, MotionCurveSet mcs) {
 //		if (MainFrame.getInstance().getAnimation() != null)
 		MainFrame.getInstance().getTreeModel().insertNodeInto(camera, treenodeCameras, listCameras.size());
-		Actions.getInstance().addAction("camera" + camera.hashCode(), new ViewCameraAction(camera), new JToggleButton.ToggleButtonModel());
+		Actions.getInstance().addAction("camera" + camera.hashCode(), new ViewAction(camera), new JToggleButton.ToggleButtonModel());
 		setupViewCameraMenu();
 		setCurvesetFor(camera, mcs);
 	}
 	
+	private void removeAnimObject(AnimObject animObject) {
+		if (animObject instanceof Camera)
+			MainFrame.getInstance().getJPatchScreen().checkCameraViewports((Camera) animObject);
+		if (MainFrame.getInstance().getTimelineEditor().getAnimObject() == animObject) {
+			MainFrame.getInstance().getTimelineEditor().setAnimObject(null);
+			MainFrame.getInstance().getTimelineEditor().repaint();
+		}
+		Selection selection = MainFrame.getInstance().getSelection();
+		if (selection != null && selection.getHotObject() == animObject) {
+			MainFrame.getInstance().setSelection(null);
+		}
+		MainFrame.getInstance().getSideBar().clearSidePanels();
+	}
+	
+	
 	public void removeModel(AnimModel animModel) {
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(animModel);
+		removeAnimObject(animModel);
 	}
 	
 	public void removeLight(AnimLight animLight) {
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(animLight);
+		removeAnimObject(animLight);
 	}
 	
 	public void removeCamera(Camera camera) {
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(camera);
 		Actions.getInstance().removeAction("camera" + camera.hashCode());
 		setupViewCameraMenu();
+		removeAnimObject(camera);
 	}
 	
 	public List<AnimModel> getModels() {

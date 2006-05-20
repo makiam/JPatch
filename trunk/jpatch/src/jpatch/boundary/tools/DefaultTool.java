@@ -160,7 +160,7 @@ public class DefaultTool extends JPatchTool {
 	}
 	
 	protected boolean isHit(int x, int y, Matrix4f m4View, Point3f p3A, Point3f p3B, Matrix3f orientation) {
-		System.out.println("isHit(" + p3A + ", " + p3B + ")");
+		System.out.println("DefaultTool isHit(" + p3A + ", " + p3B + ")");
 		float scale = 12f / m4View.getScale();
 		Vector3f v3Margin = new Vector3f(scale,scale,scale);
 		p3A.sub(v3Margin);
