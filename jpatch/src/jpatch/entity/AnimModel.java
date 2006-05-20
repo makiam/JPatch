@@ -14,10 +14,6 @@ public class AnimModel extends AnimObject {
 	private boolean bParent = false;
 	private String strFileName;
 	
-	protected RenderExtension re = new RenderExtension(new String[] {
-		"povray", "",
-		"renderman", "Attribute \"visibility\" \"string transmission\" [\"shader\"]\n"
-	});
 	protected Model model;
 	protected int iSubdivisionOffset = 0;
 	
@@ -28,6 +24,7 @@ public class AnimModel extends AnimObject {
 		strFileName = filename;
 		this.model = model;
 		model.setAnimModel(this);
+		setRenderString("renderman", "", "Attribute \"visibility\" \"string transmission\" [\"shader\"]\n");
 	}
 	
 //	public AnimModel(String name, Model model) {
@@ -62,14 +59,6 @@ public class AnimModel extends AnimObject {
 	
 	public int getSubdivisionOffset() {
 		return iSubdivisionOffset;
-	}
-	
-	public void setRenderString(String format, String version, String renderString) {
-		re.setRenderString(format, version, renderString);
-	}
-	
-	public String getRenderString(String format, String version) {
-		return re.getRenderString(format, version);
 	}
 	
 	public StringBuffer renderStrings(String prefix) {

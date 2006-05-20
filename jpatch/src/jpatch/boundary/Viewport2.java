@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.59 2006/05/03 18:46:19 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.60 2006/05/20 10:15:44 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -312,6 +312,9 @@ public class Viewport2 {
 		for (AnimObject animObject:animation.getObjects()) {
 			if (animObject == viewDef.getCamera())
 				continue;
+			if (animObject instanceof AnimLight) {
+				animObject.getModel().getMaterial(0).setColor(((AnimLight) animObject).getColor());
+			}
 			setModelMatrix(animObject.getTransform());
 			drawModel(animObject.getModel());
 		}

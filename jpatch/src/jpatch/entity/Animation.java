@@ -102,6 +102,7 @@ public class Animation implements MutableTreeNode {
 		}
 		MainFrame.getInstance().getTimelineEditor().setCurrentFrame((int) position);
 		MainFrame.getInstance().getVcrControls().setPosition((int) position);
+		MainFrame.getInstance().getSideBar().updatePanel();
 	}
 
 	public void rethink() {

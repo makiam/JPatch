@@ -19,6 +19,7 @@ implements ActionListener, FocusListener {
 	public static final int STRING = 1;
 	public static final int FLOAT = 2;
 	public static final int INTEGER = 3;
+	public static final int DOUBLE = 4;
 	
 	private static int LABEL = 100;
 	private static int HEIGHT = 20;
@@ -33,6 +34,7 @@ implements ActionListener, FocusListener {
 	private int iType;
 	
 	private float fValue;
+	private double dValue;
 	private int iValue;
 	private boolean bChanged = false;
 	
@@ -43,6 +45,14 @@ implements ActionListener, FocusListener {
 		iType = FLOAT;
 		numberFormat = new DecimalFormat("##0.00");
 		fValue = value;
+		updateTextField();
+	}
+	
+	public JPatchInput(String name, double value) {
+		this(name,"");
+		iType = DOUBLE;
+		numberFormat = new DecimalFormat("##0.00000");
+		dValue = value;
 		updateTextField();
 	}
 	
@@ -107,6 +117,10 @@ implements ActionListener, FocusListener {
 		return fValue;
 	}
 	
+	public double getDoubleValue() {
+		return dValue;
+	}
+	
 	public int getIntValue() {
 		return iValue;
 	}
@@ -121,6 +135,15 @@ implements ActionListener, FocusListener {
 		updateTextField();
 	}
 	
+	public void setValue(double d) {
+		dValue = d;
+		updateTextField();
+	}
+	
+	public void setValue(String s) {
+		textField.setText(s);
+	}
+	
 	public String getStringValue() {
 		return textField.getText();
 	}
@@ -132,6 +155,9 @@ implements ActionListener, FocusListener {
 				break;
 			case INTEGER:
 				textField.setText(numberFormat.format(iValue));
+				break;
+			case DOUBLE:
+				textField.setText(numberFormat.format(dValue));
 				break;
 		}
 		//textField.setText(new Float(fValue).toString());
@@ -152,6 +178,7 @@ implements ActionListener, FocusListener {
 	public void actionPerformed(ActionEvent actionEvent) {
 		float fOld = fValue;
 		int iOld = iValue;
+		double dOld = dValue;
 		try {
 			switch (iType) {
 				case FLOAT:
@@ -159,6 +186,9 @@ implements ActionListener, FocusListener {
 					break;
 				case INTEGER:
 					iValue = numberFormat.parse(textField.getText()).intValue();
+					break;
+				case DOUBLE:
+					dValue = numberFormat.parse(textField.getText()).doubleValue();
 					break;
 			}
 			textField.setBackground(WHITE);
@@ -169,7 +199,7 @@ implements ActionListener, FocusListener {
 		}
 		//clampValue();
 		updateTextField();
-		bChanged = fValue != fOld || iValue != iOld;
+		bChanged = fValue != fOld || iValue != iOld || dValue != dOld;
 		if (bChanged || iType == STRING)
 			fireStateChanged();
 	}
