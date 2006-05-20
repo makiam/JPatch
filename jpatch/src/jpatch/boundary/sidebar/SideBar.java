@@ -119,6 +119,11 @@ implements TreeSelectionListener {
 		bListener = enable;
 	}
 	
+	public void clearSidePanels() {
+		replacePanel(new SidePanel());
+		detailPanel.removeAll();
+	}
+	
 	public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
 		if (!bListener)
 			return;
@@ -235,19 +240,15 @@ implements TreeSelectionListener {
 			replacePanel(new LightsPanel());
 		} else if (anim && selectedNode == MainFrame.getInstance().getAnimation().getTreenodeModels()) {
 			replacePanel(new AnimModelsPanel());
-//		} else if (anim && selectedNode instanceof Camera) {
-//			replacePanel(new CameraPanel((Camera) selectedNode));
-//		} else if (anim && selectedNode instanceof AnimLight) {
-//			replacePanel(new LightPanel((AnimLight) selectedNode));
-//		} else if (anim && selectedNode instanceof AnimModel) {
-//			replacePanel(new AnimModelPanel((AnimModel) selectedNode));
 		} else if (anim && selectedNode instanceof AnimObject) {
 			replacePanel(new AnimObjectPanel((AnimObject) selectedNode));
+			AtomicChangeSelection edit = new AtomicChangeSelection(new Selection(selectedNode));
+			MainFrame.getInstance().getUndoManager().addEdit(edit);
+			MainFrame.getInstance().getJPatchScreen().update_all();
 		} else if (anim && selectedNode instanceof Animation) {
 			replacePanel(new AnimationPanel(MainFrame.getInstance().getAnimation()));
 		} else {
-			replacePanel(new SidePanel());
-			detailPanel.removeAll();
+			clearSidePanels();
 		}
 		validate();
 	}

@@ -19,7 +19,7 @@ public final class NewAnimModelAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
 	
 	public NewAnimModelAction() {
-		super("New Model");
+		super("Load new model...");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		JFileChooser fileChooser = new JFileChooser(Settings.getInstance().export.modelDirectory);
@@ -32,7 +32,8 @@ public final class NewAnimModelAction extends AbstractAction {
 			AnimObject animObject = new AnimModel(model, filename);
 			JPatchRootEdit edit = new AtomicAddRemoveAnimObject(animObject, false);
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
-			
+			MainFrame.getInstance().getJPatchScreen().update_all();
+			MainFrame.getInstance().getTimelineEditor().repaint();
 		}
 	}
 }

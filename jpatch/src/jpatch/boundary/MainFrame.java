@@ -416,7 +416,9 @@ public final class MainFrame extends JFrame {
 					"remove stubs",
 					"change tangents: round",
 					"change tangents: peak",
-					"change tangents: spatch"
+					"change tangents: spatch",
+					"save",
+					"save as"
 			}, false);
 			Actions.getInstance().enableAction("stop edit morph", true);
 			if (selection != null)
@@ -441,7 +443,9 @@ public final class MainFrame extends JFrame {
 					"remove stubs",
 					"change tangents: round",
 					"change tangents: peak",
-					"change tangents: spatch"
+					"change tangents: spatch",
+					"save",
+					"save as"
 			}, true);
 			Actions.getInstance().enableAction("stop edit morph", false);
 		}
@@ -478,6 +482,7 @@ public final class MainFrame extends JFrame {
 	public void newModel() {
 		model = new Model();
 		animation = null;
+		setEditedMorph(null);
 		for (ViewDefinition viewDef : aViewDef)
 			viewDef.setScale(0.03f);
 		setSelection(null);
@@ -506,6 +511,12 @@ public final class MainFrame extends JFrame {
 		Actions.getInstance().enableAction("round tangents", true);
 		Actions.getInstance().enableAction("lathe editor", true);
 		Actions.getInstance().enableAction("compute patches", true);
+		Actions.getInstance().enableAction("zoom to fit", true);
+		Actions.getInstance().enableAction("select points", true);
+		Actions.getInstance().enableAction("select bones", true);
+		Actions.getInstance().enableAction("lock points", true);
+		Actions.getInstance().enableAction("lock bones", true);
+		Actions.getInstance().enableAction("hide", true);
 		
 		Settings.getInstance().startup = Settings.Startup.MODELER;
 		
@@ -524,6 +535,7 @@ public final class MainFrame extends JFrame {
 	public void newAnimation() {
 		model = null;
 		animation = new Animation();
+		setEditedMorph(null);
 		for (ViewDefinition viewDef : aViewDef)
 			viewDef.setScale(0.003f);
 		setSelection(null);
@@ -578,6 +590,13 @@ public final class MainFrame extends JFrame {
 		Actions.getInstance().enableAction("round tangents", false);
 		Actions.getInstance().enableAction("lathe editor", false);
 		Actions.getInstance().enableAction("compute patches", false);
+		Actions.getInstance().enableAction("zoom to fit", false);
+		Actions.getInstance().enableAction("select points", false);
+		Actions.getInstance().enableAction("select bones", false);
+		Actions.getInstance().enableAction("lock points", false);
+		Actions.getInstance().enableAction("lock bones", false);
+		Actions.getInstance().enableAction("hide", false);
+		Actions.getInstance().enableAction("stop edit morph", false);
 		
 		Settings.getInstance().startup = Settings.Startup.ANIMATOR;
 		
@@ -759,6 +778,7 @@ public final class MainFrame extends JFrame {
 		Actions.getInstance().enableAction("assign controlpoints to bones", bonesAndPoints);
 		if (selection != null && selection.getHotObject() instanceof AnimObject) {
 			timelineEditor.setAnimObject((AnimObject) selection.getHotObject());
+			selectTreeNode((AnimObject) selection.getHotObject());
 		}
 		if (selection == null) {
 			jpatchScreen.setFocusTraversalKeysEnabled(true);

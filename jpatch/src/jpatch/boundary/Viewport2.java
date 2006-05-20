@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.60 2006/05/20 10:15:44 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.61 2006/05/20 15:23:27 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -261,11 +261,11 @@ public class Viewport2 {
 		drawable.drawRect(0, 0, (int) viewDef.getWidth() - 1, (int) viewDef.getHeight() - 1);
 	}
 	
-	public void setTool(JPatchTool tool) {
-//		this.tool = tool;
-		if (tool != null)
-			drawable.getComponent().addMouseListener(tool);
-	}
+//	public void setTool(JPatchTool tool) {
+////		this.tool = tool;
+//		if (tool != null && viewDef.getCamera() == null)
+//			drawable.getComponent().addMouseListener(tool);
+//	}
 	
 	private void setFogColor(float z, Color3f colorIn, Color3f colorOut) {
 		if (settings.realtimeRenderer.wireframeFogEffect) {
@@ -363,6 +363,7 @@ public class Viewport2 {
 		Color3f cBlack = new Color3f(0,0,0);
 		if (viewDef.renderPoints()) {
 			drawable.setPointSize(3);
+			boolean renderBones = viewDef.renderBones();
 			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
 				for(ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 					if (cp.isHead()) {
@@ -379,7 +380,7 @@ public class Viewport2 {
 							drawable.setColor(color);
 							drawable.drawPoint(p0);
 						} else if (!cp.isHook() && ! cp.isHidden()){
-							if (cp.getBone() != null) {
+							if (cp.getBone() != null && renderBones) {
 								drawable.setColor(cp.getBone().getColor());
 								drawable.drawPoint(p0);
 							} else if (cp.isSingle()) {
@@ -633,12 +634,13 @@ public class Viewport2 {
 		if (selection != null)
 			drawSelection(selection);
 		
-		drawable.setGhostRenderingEnabled(true);
-		drawBones(model);
-		drawable.setGhostRenderingEnabled(false);
-		if (drawable instanceof JPatchDrawableGL)
+		if (viewDef.renderBones()) {
+			drawable.setGhostRenderingEnabled(true);
 			drawBones(model);
-		
+			drawable.setGhostRenderingEnabled(false);
+			if (drawable instanceof JPatchDrawableGL)
+				drawBones(model);
+		}
 		if (drawable.isLightingSupported())
 			drawable.setLightingEnabled(false);
 //		System.out.println();

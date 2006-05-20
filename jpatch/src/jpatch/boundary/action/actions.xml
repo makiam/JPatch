@@ -485,6 +485,13 @@
 		<property key="Accelerator" value="control shift R"/>
 		<property key="Mnemonic" value="r"/>
 	</action>
+	<action name="show bones" model="check">
+		<constructor>new ToggleAction(ToggleAction.Type.SHOW_BONES)</constructor>
+		<property key="ShortDescription" value="Show bones"/>
+		<property key="MenuText" value="Bones"/>
+		<property key="Accelerator" value="shift B"/>
+		<property key="Mnemonic" value="b"/>
+	</action>
 	<action name="front view" model="radio" group="view">
 		<constructor>new ViewAction(ViewDefinition.FRONT)</constructor>
 		<property key="ShortDescription" value="Front view"/>

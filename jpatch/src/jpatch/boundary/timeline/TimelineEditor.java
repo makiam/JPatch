@@ -178,29 +178,31 @@ public class TimelineEditor extends JScrollPane {
 	public void setAnimObject(AnimObject animObject) {
 		this.animObject = animObject;
 		listTracks.clear();
-		listTracks.add(new HeaderTrack(this, animObject.getName(), -12, true));
-		listTracks.add(new HeaderTrack(this, "Common tracks", -4, false));
-		MotionCurveSet mcs = MainFrame.getInstance().getAnimation().getCurvesetFor(animObject);
-		for (MotionCurve curve : mcs.motionCurveList) {
-			if (curve instanceof MotionCurve.Float)
-				listTracks.add(new AvarTrack(this, (MotionCurve.Float) curve));
-			else if (curve instanceof MotionCurve.Color3f)
-				listTracks.add(new ColorTrack(this, (MotionCurve.Color3f) curve));
-			else 
-				listTracks.add(new Track(this, curve));
-		}
-		if (animObject instanceof AnimModel) {
-			if (((AnimModel) animObject).getModel().getMorphList().size() > 0)
-				listTracks.add(new HeaderTrack(this, "Morphs", -4, false));
-			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
-				listTracks.add(new AvarTrack(this, ((MotionCurveSet.Model) mcs).morph((Morph) it.next())));
+		if (animObject != null) {
+			listTracks.add(new HeaderTrack(this, animObject.getName(), -12, true));
+			listTracks.add(new HeaderTrack(this, "Common tracks", -4, false));
+			MotionCurveSet mcs = MainFrame.getInstance().getAnimation().getCurvesetFor(animObject);
+			for (MotionCurve curve : mcs.motionCurveList) {
+				if (curve instanceof MotionCurve.Float)
+					listTracks.add(new AvarTrack(this, (MotionCurve.Float) curve));
+				else if (curve instanceof MotionCurve.Color3f)
+					listTracks.add(new ColorTrack(this, (MotionCurve.Color3f) curve));
+				else 
+					listTracks.add(new Track(this, curve));
 			}
-			if (((AnimModel) animObject).getModel().getBoneSet().size() > 0)
-				listTracks.add(new HeaderTrack(this, "Bones", -4, false));
-			for (Iterator it = ((AnimModel) animObject).getModel().getBoneSet().iterator(); it.hasNext(); ) {
-				Bone bone = (Bone) it.next();
-				if (bone.getParentBone() == null)
-					recursiveAddBoneDofs(bone, 0, (MotionCurveSet.Model) mcs);
+			if (animObject instanceof AnimModel) {
+				if (((AnimModel) animObject).getModel().getMorphList().size() > 0)
+					listTracks.add(new HeaderTrack(this, "Morphs", -4, false));
+				for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
+					listTracks.add(new AvarTrack(this, ((MotionCurveSet.Model) mcs).morph((Morph) it.next())));
+				}
+				if (((AnimModel) animObject).getModel().getBoneSet().size() > 0)
+					listTracks.add(new HeaderTrack(this, "Bones", -4, false));
+				for (Iterator it = ((AnimModel) animObject).getModel().getBoneSet().iterator(); it.hasNext(); ) {
+					Bone bone = (Bone) it.next();
+					if (bone.getParentBone() == null)
+						recursiveAddBoneDofs(bone, 0, (MotionCurveSet.Model) mcs);
+				}
 			}
 		}
 		listSelections.clear();

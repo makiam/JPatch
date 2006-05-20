@@ -25,6 +25,7 @@ public final class ViewAction extends AbstractAction {
 			viewDef.setCamera(camera);
 		else
 			viewDef.setView(iDirection);
+		MainFrame.getInstance().getJPatchScreen().setTool(MainFrame.getInstance().getJPatchScreen().getTool());
 		viewDef.repaint();
 	}
 }

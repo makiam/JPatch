@@ -40,7 +40,7 @@ public class ToggleAction extends AbstractAction {
 		LOCK_POINTS, LOCK_BONES,
 		SELECT_POINTS, SELECT_BONES,
 		SNAP_TO_GRID,
-		SHOW_POINTS, SHOW_CURVES, SHOW_PATCHES, SHOW_ROTOSCOPE,
+		SHOW_POINTS, SHOW_CURVES, SHOW_PATCHES, SHOW_ROTOSCOPE, SHOW_BONES,
 		TANGENTS_PEAK, TANGENTS_ROUND,
 		VIEWPORTS_SINGLE, VIEWPORTS_VERTICAL_SPLIT, VIEWPORTS_HORIZONTAL_SPLIT, VIEWPORTS_QUAD
 	}
@@ -90,6 +90,9 @@ public class ToggleAction extends AbstractAction {
 			break;
 		case SHOW_ROTOSCOPE:
 			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().showRotoscope(Actions.getInstance().getButtonModel("show rotoscope").isSelected());
+			break;
+		case SHOW_BONES:
+			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().renderBones(Actions.getInstance().getButtonModel("show bones").isSelected());
 			break;
 		case TANGENTS_PEAK:
 			ControlPoint.setDefaultMode(ControlPoint.PEAK);
