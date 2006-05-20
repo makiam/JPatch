@@ -34,6 +34,7 @@ implements ComponentListener {
 	private boolean bRenderPoints = true;
 	private boolean bRenderCurves = true;
 	private boolean bRenderPatches = true;
+	private boolean bRenderBones = true;
 	private boolean bRenderBezierCPs = false;
 	private boolean bShowRotoscope = true;
 	private boolean bAlwaysUseZBuffer = false;
@@ -247,6 +248,10 @@ implements ComponentListener {
 		return bRenderPatches;
 	}
 	
+	public final boolean renderBones() {
+		return bRenderBones;
+	}
+	
 	public final boolean renderBezierCPs() {
 		return bRenderBezierCPs;
 	}
@@ -280,6 +285,11 @@ implements ComponentListener {
 	
 	public final void renderBezierCPs(boolean enable) {
 		bRenderBezierCPs = enable;
+		repaint();
+	}
+	
+	public final void renderBones(boolean enable) {
+		bRenderBones = enable;
 		repaint();
 	}
 	

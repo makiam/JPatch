@@ -118,6 +118,7 @@ public class Actions extends DefaultHandler {
 		actionMap.get("show points").buttonModel.setSelected(viewDef.renderPoints());
 		actionMap.get("show curves").buttonModel.setSelected(viewDef.renderCurves());
 		actionMap.get("show patches").buttonModel.setSelected(viewDef.renderPatches());
+		actionMap.get("show bones").buttonModel.setSelected(viewDef.renderBones());
 		actionMap.get("show rotoscope").buttonModel.setSelected(viewDef.showRotoscope());
 		actionMap.get("lock view").buttonModel.setSelected(viewDef.isLocked());
 		enableAction("unlock view", viewDef.isLocked());
@@ -387,6 +388,7 @@ public class Actions extends DefaultHandler {
 		actionMap.put("show curves", new ActionDescriptor(new ToggleAction(ToggleAction.Type.SHOW_CURVES)));
 		actionMap.put("show patches", new ActionDescriptor(new ToggleAction(ToggleAction.Type.SHOW_PATCHES)));
 		actionMap.put("show rotoscope", new ActionDescriptor(new ToggleAction(ToggleAction.Type.SHOW_ROTOSCOPE)));
+		actionMap.put("show bones", new ActionDescriptor(new ToggleAction(ToggleAction.Type.SHOW_BONES)));
 		actionMap.put("front view", new ActionDescriptor(new ViewAction(ViewDefinition.FRONT)));
 		actionMap.put("rear view", new ActionDescriptor(new ViewAction(ViewDefinition.REAR)));
 		actionMap.put("top view", new ActionDescriptor(new ViewAction(ViewDefinition.TOP)));
@@ -422,7 +424,6 @@ public class Actions extends DefaultHandler {
 		/*
 		 * END OF AUTO-GENERATED CODE
 		 */
-
 	}
 	
 	static class ActionDescriptor {

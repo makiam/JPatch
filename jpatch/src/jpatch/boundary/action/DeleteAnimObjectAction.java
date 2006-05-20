@@ -23,6 +23,7 @@ public final class DeleteAnimObjectAction extends AbstractAction {
 	public void actionPerformed(ActionEvent actionEvent) {
 		JPatchRootEdit edit = new AtomicAddRemoveAnimObject(animObject, true);
 		MainFrame.getInstance().getUndoManager().addEdit(edit);
+		MainFrame.getInstance().getJPatchScreen().update_all();
 	}
 }
 

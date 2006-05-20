@@ -118,7 +118,7 @@ public final class JPatchScreen extends JPanel {
 						aViewport[I].drawModel(MainFrame.getInstance().getModel());
 					if (MainFrame.getInstance().getAnimation() != null)
 						aViewport[I].drawAnimFrame(MainFrame.getInstance().getAnimation());
-					if (tool != null)
+					if (tool != null && aViewport[I].getViewDefinition().getCamera() == null)
 						aViewport[I].drawTool(tool);
 					if (bShowTangents)
 						aViewport[I].drawTool(tangentTool);
@@ -267,6 +267,14 @@ public final class JPatchScreen extends JPanel {
 			}
 		}
 		update_all();
+	}
+	
+	public void checkCameraViewports(Camera camera) {
+		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+			if (aViewDef[i].getCamera() == camera)
+				aViewDef[i].setView(ViewDefinition.BIRDS_EYE);
+		}
+		setTool(tool);
 	}
 	
 	public LightingMode getLightingMode() {
@@ -438,7 +446,8 @@ public final class JPatchScreen extends JPanel {
 		removeAllMouseListeners();
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 //			((JPatchCanvas)aComponent[i]).setTool(tool);
-			aViewport[i].setTool(tool);
+			if (aViewport[i].getViewDefinition().getCamera() == null && tool != null)
+				aViewport[i].getDrawable().getComponent().addMouseListener(tool);
 		}
 		addMMBListener();
 		update_all();
