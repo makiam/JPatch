@@ -221,9 +221,12 @@ public class TimelineEditor extends JScrollPane {
 	private void recursiveAddBoneDofs(Bone bone, int level, MotionCurveSet.Model mcs) {
 		int n = bone.getDofs().size();
 		MotionCurve.Float[] curves = new MotionCurve.Float[n];
-		for (int i = 0; i < n; i++)
-			curves[i] = mcs.morph((Morph) bone.getDofs().get(i));
-		listTracks.add(new BoneTrack(this, curves, bone, level));
+		RotationDof[] dofs = new RotationDof[n];
+		for (int i = 0; i < n; i++) {
+			dofs[i] = bone.getDof(i);
+			curves[i] = mcs.morph(dofs[i]);
+		}
+		listTracks.add(new BoneTrack(this, dofs, curves, bone, level));
 		for (Iterator itBones = bone.getChildBones().iterator(); itBones.hasNext(); ) {
 			recursiveAddBoneDofs((Bone) itBones.next(), level + 1, mcs);
 		}

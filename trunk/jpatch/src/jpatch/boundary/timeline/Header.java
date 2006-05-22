@@ -470,6 +470,16 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 						}
 						iSelectedTrack = i;
 					}
+					/*
+					 * if a dof-name on a bonetrack header was clicked,
+					 * bring the corresponding curve to front
+					 */
+					if (track instanceof BoneTrack) {
+						List<RotationDof> dofList = ((BoneTrack) track).getBone().getDofs();
+						int dofNumber = (e.getY() - y - 12) / 14;
+						if (dofNumber >= 0 && dofNumber < dofList.size())
+							((BoneTrack) track).reorder(dofList.get(dofNumber));
+					}
 					timelineEditor.repaint();
 					return;
 				} if (track.isExpanded() && e.getY() > y + track.getHeight() - 6 && e.getY() <= y + track.getHeight()) {

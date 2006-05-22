@@ -132,6 +132,7 @@ public class MotionCurveSet {
 	
 	public static class Model extends MotionCurveSet {
 		public MotionCurve.Float scale;
+		public MotionCurve.Object anchor;
 		private Map<Morph, MotionCurve.Float> map = new HashMap<Morph, MotionCurve.Float>();
 		private Map<String, Morph> idMap = new HashMap<String, Morph>();
 		
@@ -142,7 +143,9 @@ public class MotionCurveSet {
 			float pos = 0; // FIXME;
 			super.populateList();
 			scale = MotionCurve.createScaleCurve(new MotionKey.Float(pos, animModel.getScale()));
+			anchor = MotionCurve.createAnchorCurve(new MotionKey.Object(pos, null));
 			motionCurveList.add(scale);
+			motionCurveList.add(anchor);
 			for (Iterator it = animModel.getModel().getMorphList().iterator(); it.hasNext(); ) {
 				Morph morph = (Morph) it.next();
 				MotionCurve.Float morphCurve = MotionCurve.createMorphCurve(morph, new MotionKey.Float(pos, morph.getValue()));
@@ -175,6 +178,7 @@ public class MotionCurveSet {
 		public void setPosition(float pos) {
 			super.setPosition(pos);
 			((AnimModel) animObject).setScale(scale.getFloatAt(pos));
+			((AnimModel) animObject).setAnchor((Transformable) anchor.getObjectAt(pos));
 			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
 				Morph morph = (Morph) it.next();
 //				morph.unapply();
@@ -203,6 +207,7 @@ public class MotionCurveSet {
 		public void xml(StringBuffer sb, String prefix) {
 			super.xml(sb, prefix);
 			scale.xml(sb, prefix, "type=\"scale\" subtype=\"uniform\"");
+			anchor.xml(sb, prefix, "anchor");
 			int m = 0;
 //			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
 //				((MotionCurve2.Float) map.get(it.next())).xml(sb, prefix, "type=\"morph\" morph=\"" + m++ + "\"");

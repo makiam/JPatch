@@ -49,6 +49,7 @@
 		<button command="rotate tool"/>
 		<button command="weight selection tool"/>
 		<button command="knife tool" />
+		<button command="anchor tool" />
 		<separator/>
 		<button command="detach"/>
 		<separator/>
@@ -137,6 +138,7 @@
 				<item command="rotate tool"/>
 				<item command="weight selection tool"/>
 				<item command="knife tool"/>
+				<item command="anchor tool"/>
 				<item command="rotoscope tool"/>
 				<separator/>
 				<item command="detach"/>
