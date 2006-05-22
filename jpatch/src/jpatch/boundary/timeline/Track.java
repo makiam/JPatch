@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.16 2006/05/10 11:31:59 sascha_l Exp $
+ * $Id: Track.java,v 1.17 2006/05/22 10:46:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -148,6 +148,9 @@ public class Track<M extends MotionCurve> {
 		if (motionCurve instanceof MotionCurve.Color3f) {
 			return new AtomicAddMotionKey(motionCurve, new MotionKey.Color3f(frame, ((MotionCurve.Color3f) motionCurve).getColor3fAt(frame)));
 //			return new AtomicModifyMotionCurve.Color3f((MotionCurve.Color3f) motionCurve, frame, ((MotionCurve.Color3f) motionCurve).getColor3fAt(frame));
+		}
+		if (motionCurve instanceof MotionCurve.Object) {
+			return null;
 		}
 		// can't handle this case - needs subclassing
 		throw new UnsupportedOperationException();

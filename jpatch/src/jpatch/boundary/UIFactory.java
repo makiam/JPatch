@@ -1,5 +1,5 @@
 /*
- * $Id: UIFactory.java,v 1.21 2006/05/15 16:20:54 sascha_l Exp $
+ * $Id: UIFactory.java,v 1.22 2006/05/22 10:46:19 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

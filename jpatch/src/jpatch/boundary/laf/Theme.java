@@ -1,5 +1,5 @@
 /*
- * $Id: Theme.java,v 1.8 2006/04/13 16:03:24 sascha_l Exp $
+ * $Id: Theme.java,v 1.9 2006/05/22 10:46:19 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

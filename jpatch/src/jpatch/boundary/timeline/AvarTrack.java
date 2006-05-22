@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.18 2006/05/10 11:31:59 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.19 2006/05/22 10:46:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

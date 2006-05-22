@@ -148,4 +148,33 @@ public abstract class AtomicModifyMotionCurve extends JPatchAtomicEdit {
 			return "change orientation";
 		}
 	}
+	
+	public static class Object extends AtomicModifyMotionCurve {
+		private MotionCurve.Object motionCurve;
+		private java.lang.Object object;
+		private float position;
+		
+		public Object(MotionCurve.Object motionCurve, float position, java.lang.Object object) {
+			this.motionCurve = motionCurve;
+			this.position = position;
+			this.object = object;
+			bNewKey = !motionCurve.hasKeyAt(position);
+			swap();
+		}
+		
+		void swap() {
+//			System.out.println("swap " + motionCurve.getQuat4fAt(position) + " " + quat);
+			java.lang.Object dummy = motionCurve.getObjectAt(position);
+			motionCurve.setObjectAt(position, object);
+			object = dummy;
+		}
+
+		void removeKey() {
+			motionCurve.removeKey(motionCurve.getKeyAt(position));
+		}
+		
+		public int sizeOf() {
+			return 8 + 4 + 4 + 4 + 8 + 4 + 4 + 4 + 4;
+		}
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchForm.java,v 1.2 2006/02/01 21:11:28 sascha_l Exp $
+ * $Id: JPatchForm.java,v 1.3 2006/05/22 10:46:19 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -34,7 +34,7 @@ import java.util.*;
  * A component that lays out its children like in a form. It uses a customized GridBag layout.
  * Add entries using the addEntry(String label, Component component) method and call populate() when finished.
  * @author sascha
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class JPatchForm extends JPanel {
 

@@ -272,8 +272,12 @@ public class AnimationImporter extends DefaultHandler {
 //				((MotionCurveSet.Model) motionCurveSet).setMorphCurve(morph, (MotionCurve2.Float) motionCurve);
 				iState = FLOAT_CURVE;
 			} else if (localName.equals("interpolation")) {
-				if (value.equals("linear")) motionCurve.setInterpolationMethod(MotionCurve.LINEAR);
-				else if (value.equals("cubic")) motionCurve.setInterpolationMethod(MotionCurve.CUBIC);
+				if (value.toLowerCase().equals("discrete"))
+					motionCurve.setInterpolationMethod(MotionCurve.InterpolationMethod.DISCRETE);
+				else if (value.toLowerCase().equals("linear"))
+					motionCurve.setInterpolationMethod(MotionCurve.InterpolationMethod.LINEAR);
+				else if (value.toLowerCase().equals("cubic"))
+					motionCurve.setInterpolationMethod(MotionCurve.InterpolationMethod.CUBIC);
 			}
 		}
 	}

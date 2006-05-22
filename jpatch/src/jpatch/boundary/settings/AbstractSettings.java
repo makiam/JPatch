@@ -1,5 +1,5 @@
 /*
- * $Id: AbstractSettings.java,v 1.8 2006/05/20 17:58:02 sascha_l Exp $
+ * $Id: AbstractSettings.java,v 1.9 2006/05/22 10:48:57 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

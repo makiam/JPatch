@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.61 2006/05/20 15:23:27 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.62 2006/05/22 10:48:57 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -317,6 +317,23 @@ public class Viewport2 {
 			}
 			setModelMatrix(animObject.getTransform());
 			drawModel(animObject.getModel());
+			if (animObject instanceof AnimModel) {
+				Transformable anchor = ((AnimModel) animObject).getAnchor();
+				if (anchor == null)
+					continue;
+				Point3f p3 = new Point3f(((AnimModel) animObject).getAnchor().getPosition());
+				m4View.transform(p3);
+				drawable.setColor(new Color3f(1, 1, 1));
+				drawable.setPointSize(7);
+				
+				drawable.setGhostRenderingEnabled(true);
+				drawable.drawPoint(p3);
+				drawable.setGhostRenderingEnabled(false);
+				if (drawable instanceof JPatchDrawableGL)
+					drawable.drawPoint(p3);
+				
+				
+			}
 		}
 	}
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundDelete.java,v 1.11 2006/02/01 21:11:28 sascha_l Exp $
+ * $Id: CompoundDelete.java,v 1.12 2006/05/22 10:46:19 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

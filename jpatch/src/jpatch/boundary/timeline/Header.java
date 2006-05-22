@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.21 2006/05/06 09:52:15 sascha_l Exp $
+ * $Id: Header.java,v 1.22 2006/05/22 10:46:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -469,6 +469,16 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 							backupTracks.addAll(setSelectedTracks);
 						}
 						iSelectedTrack = i;
+					}
+					/*
+					 * if a dof-name on a bonetrack header was clicked,
+					 * bring the corresponding curve to front
+					 */
+					if (track instanceof BoneTrack) {
+						List<RotationDof> dofList = ((BoneTrack) track).getBone().getDofs();
+						int dofNumber = (e.getY() - y - 12) / 14;
+						if (dofNumber >= 0 && dofNumber < dofList.size())
+							((BoneTrack) track).reorder(dofList.get(dofNumber));
 					}
 					timelineEditor.repaint();
 					return;

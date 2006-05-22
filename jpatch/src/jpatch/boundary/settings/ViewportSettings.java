@@ -1,5 +1,5 @@
 /*
- * $Id: ViewportSettings.java,v 1.4 2006/05/20 17:58:02 sascha_l Exp $
+ * $Id: ViewportSettings.java,v 1.5 2006/05/22 10:48:57 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

@@ -5,7 +5,7 @@
 	<classpathentry kind="lib" path="lib/Buoy.jar"/>
 	<classpathentry kind="lib" path="lib/jogl.jar">
 		<attributes>
-			<attribute value="jpatch/lib/native/windows" name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY"/>
+			<attribute value="jpatch/lib/native/linux_x86" name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/vecmath.jar"/>

@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicRemoveControlPointFromMorphs.java,v 1.6 2006/02/06 16:40:41 sascha_l Exp $
+ * $Id: AtomicRemoveControlPointFromMorphs.java,v 1.7 2006/05/22 10:46:19 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

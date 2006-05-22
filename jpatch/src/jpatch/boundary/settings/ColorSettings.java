@@ -1,5 +1,5 @@
 /*
- * $Id: ColorSettings.java,v 1.3 2006/05/02 19:27:47 sascha_l Exp $
+ * $Id: ColorSettings.java,v 1.4 2006/05/22 10:46:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

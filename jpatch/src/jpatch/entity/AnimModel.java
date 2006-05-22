@@ -17,6 +17,9 @@ public class AnimModel extends AnimObject {
 	protected Model model;
 	protected int iSubdivisionOffset = 0;
 	
+	private Transformable anchor;
+	private Matrix4d m4AnchoredTransform = new Matrix4d();
+	
 	public AnimModel() { }
 	
 	public AnimModel(Model model, String filename) {
@@ -32,6 +35,27 @@ public class AnimModel extends AnimObject {
 //		this.model = model;
 //		model.setAnimModel(this);
 //	}
+	
+	@Override
+	public Matrix4d getTransform() {
+		if (anchor == null)
+			return super.getTransform();
+		m4AnchoredTransform.set(super.getTransform());
+		Vector4f v = new Vector4f(anchor.getPosition());
+		m4AnchoredTransform.transform(v);
+		m4AnchoredTransform.m03 -= v.x;
+		m4AnchoredTransform.m13 -= v.y;
+		m4AnchoredTransform.m23 -= v.z;
+		return m4AnchoredTransform;
+	}
+	
+	public Transformable getAnchor() {
+		return anchor;
+	}
+	
+	public void setAnchor(Transformable anchor) {
+		this.anchor = anchor;
+	}
 	
 	public Model getModel() {
 		return model;

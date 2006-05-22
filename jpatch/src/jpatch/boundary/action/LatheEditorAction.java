@@ -1,5 +1,5 @@
 /*
- * $Id: LatheEditorAction.java,v 1.3 2006/04/16 13:45:02 sascha_l Exp $
+ * $Id: LatheEditorAction.java,v 1.4 2006/05/22 10:46:19 sascha_l Exp $
  */
 package jpatch.boundary.action;
 
@@ -12,7 +12,7 @@ import jpatch.boundary.dialog.*;
 /**
  * 
  * @author lois
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  *
  */
 public final class LatheEditorAction extends AbstractAction {

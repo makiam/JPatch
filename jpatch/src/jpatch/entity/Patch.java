@@ -1,5 +1,5 @@
 /*
- * $Id: Patch.java,v 1.8 2006/02/01 21:11:28 sascha_l Exp $
+ * $Id: Patch.java,v 1.9 2006/05/22 10:46:20 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -30,7 +30,7 @@ import jpatch.auxilary.*;
  * A Patch. Currently 3-, 4- and 5-point patches are supported
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.8 $
+ * @version    $Revision: 1.9 $
  * @see		jpatch.entity.Curve
  * @see		jpatch.entity.ControlPoint
  */
@@ -213,7 +213,7 @@ public final class Patch {
 		//int size = getType();
 		//int p = 0;
 		for (int i = 0; i < acpPoint.length; i++) {
-			sb.append(acpPoint[i].getXmlNumber());
+			sb.append(acpPoint[i].getId());
 			if (i < acpPoint.length - 1) {
 				sb.append(",");
 			}

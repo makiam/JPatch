@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicModifySelection.java,v 1.11 2006/03/28 19:47:52 sascha_l Exp $
+ * $Id: AtomicModifySelection.java,v 1.12 2006/05/22 10:46:19 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

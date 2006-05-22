@@ -1,14 +1,16 @@
 package jpatch.entity;
 
 import java.util.*;
+
+import javax.vecmath.Quat4f;
+
 import jpatch.auxilary.*;
 
 public abstract class MotionCurve {
 	
-	public final static InterpolationMethod LINEAR = new InterpolationMethod("linear");
-	public final static InterpolationMethod CUBIC = new InterpolationMethod("cubic");
+	public static enum InterpolationMethod { DISCRETE, LINEAR, CUBIC };
 	
-	InterpolationMethod interpolationMethod = CUBIC;
+	InterpolationMethod interpolationMethod = InterpolationMethod.CUBIC;
 	String name = "*";
 	ArrayList list = new ArrayList();
 
@@ -118,6 +120,17 @@ public abstract class MotionCurve {
 		return mc;
 	}
 	
+	public static MotionCurve.Object createAnchorCurve() {
+		MotionCurve.Object mc = new MotionCurve.Object();
+		mc.name = "Anchor";
+		return mc;
+	}
+	
+	public static MotionCurve.Object createAnchorCurve(MotionKey.Object key) {
+		MotionCurve.Object mc = createAnchorCurve();
+		mc.addKey(key);
+		return mc;
+	}
 	
 	public void setName(String name) {
 		this.name = name;
@@ -191,7 +204,7 @@ public abstract class MotionCurve {
 	public void xml(StringBuffer sb, String prefix, String type) {
 //		StringBuffer indent = XMLutils.indent(tab);
 //		StringBuffer indent2 = XMLutils.indent(tab + 1);
-		sb.append(prefix).append("<motioncurve " + type + " interpolation=\"" + interpolationMethod.toString() + "\">\n");
+		sb.append(prefix).append("<motioncurve " + type + " interpolation=\"" + interpolationMethod + "\">\n");
 		for (Iterator it = list.iterator(); it.hasNext(); sb.append(prefix + "\t").append(it.next().toString()).append("\n"));
 		sb.append(prefix).append("</motioncurve>").append("\n");
 	}
@@ -254,9 +267,9 @@ public abstract class MotionCurve {
 		return max;
 	}
 	
-	Object[] getInterpolationKeysFor(float position) {
+	java.lang.Object[] getInterpolationKeysFor(float position) {
 		int index = binarySearch(position) - 1;
-		return new Object[] {
+		return new java.lang.Object[] {
 			(index > 0) ? list.get(index - 1) : null,
 			list.get(index),
 			list.get(index + 1),
@@ -293,7 +306,7 @@ public abstract class MotionCurve {
 			boolean limitOvershoot = true;
 			if (position <= getStart()) return ((MotionKey.Float) list.get(0)).getFloat();
 			if (position >= getEnd()) return ((MotionKey.Float) list.get(list.size() - 1)).getFloat();
-			Object[] key = getInterpolationKeysFor(position);
+			java.lang.Object[] key = getInterpolationKeysFor(position);
 			MotionKey.Float key0 = (MotionKey.Float) key[0];
 			MotionKey.Float key1 = (MotionKey.Float) key[1];
 			MotionKey.Float key2 = (MotionKey.Float) key[2];
@@ -303,10 +316,12 @@ public abstract class MotionCurve {
 			float p0 = key1.getFloat();
 			float p1 = key2.getFloat();
 			
-			if (interpolationMethod == LINEAR) {
+			switch (interpolationMethod) {
+			case DISCRETE:
+				return p0;
+			case LINEAR:
 				return (p0 * (1 - t) + p1 * t);
-			}
-			else {
+			case CUBIC:
 				float m0 = 0;
 				float m1 = 0;
 				float d0 = 0;
@@ -335,6 +350,7 @@ public abstract class MotionCurve {
 //				}
 				return cubicInterpolate(p0, m0, p1, m1, t);
 			}
+			throw new IllegalStateException();
 		}
 		
 		public MotionKey.Float setFloatAt(float position, float f) {
@@ -373,7 +389,7 @@ public abstract class MotionCurve {
 		public javax.vecmath.Point3d getPoint3dAt(float position) {
 			if (position <= getStart()) return ((MotionKey.Point3d) list.get(0)).getPoint3d();
 			if (position >= getEnd()) return ((MotionKey.Point3d) list.get(list.size() - 1)).getPoint3d();
-			Object[] key = getInterpolationKeysFor(position);
+			java.lang.Object[] key = getInterpolationKeysFor(position);
 			MotionKey.Point3d key0 = (MotionKey.Point3d) key[0];
 			MotionKey.Point3d key1 = (MotionKey.Point3d) key[1];
 			MotionKey.Point3d key2 = (MotionKey.Point3d) key[2];
@@ -383,12 +399,14 @@ public abstract class MotionCurve {
 			javax.vecmath.Point3d p0 = key1.getPoint3d();
 			javax.vecmath.Point3d p1 = key2.getPoint3d();
 			
-			if (interpolationMethod == LINEAR) {
+			switch (interpolationMethod) {
+			case DISCRETE:
+				return new javax.vecmath.Point3d(p0);
+			case LINEAR:
 				javax.vecmath.Point3d p = new javax.vecmath.Point3d();
 				p.interpolate(p0, p1, t);
 				return p;
-			}
-			else {
+			case CUBIC:
 				javax.vecmath.Vector3d m0 = new javax.vecmath.Vector3d();
 				if (key0 != null && !key0.getPoint3d().equals(key1.getPoint3d()) && !key1.getPoint3d().equals(key2.getPoint3d())) {
 					m0.sub(p1, key0.getPoint3d());
@@ -414,6 +432,7 @@ public abstract class MotionCurve {
 					cubicInterpolate(p0.z, m0.z, p1.z, m1.z, t)
 				);
 			}
+			throw new IllegalStateException();
 		}
 		
 		public MotionKey.Point3d setPoint3dAt(float position, javax.vecmath.Point3d p) {
@@ -439,7 +458,7 @@ public abstract class MotionCurve {
 		public javax.vecmath.Color3f getColor3fAt(float position) {
 			if (position <= getStart()) return ((MotionKey.Color3f) list.get(0)).getColor3f();
 			if (position >= getEnd()) return ((MotionKey.Color3f) list.get(list.size() - 1)).getColor3f();
-			Object[] key = getInterpolationKeysFor(position);
+			java.lang.Object[] key = getInterpolationKeysFor(position);
 			MotionKey.Color3f key0 = (MotionKey.Color3f) key[0];
 			MotionKey.Color3f key1 = (MotionKey.Color3f) key[1];
 			MotionKey.Color3f key2 = (MotionKey.Color3f) key[2];
@@ -448,13 +467,15 @@ public abstract class MotionCurve {
 			float t = (position - key1.getPosition()) / l;
 			javax.vecmath.Color3f p0 = key1.getColor3f();
 			javax.vecmath.Color3f p1 = key2.getColor3f();
-				
-			if (interpolationMethod == LINEAR) {
+			
+			switch (interpolationMethod) {
+			case DISCRETE:
+				return new javax.vecmath.Color3f(p0);
+			case LINEAR:
 				javax.vecmath.Color3f c = new javax.vecmath.Color3f();
 				c.interpolate(p0, p1, t);
 				return c;
-			}
-			else {
+			case CUBIC:
 				javax.vecmath.Vector3f m0 = new javax.vecmath.Vector3f();
 				if (key0 != null) {
 					m0.sub(p1, key0.getColor3f());
@@ -471,6 +492,7 @@ public abstract class MotionCurve {
 					cubicInterpolate(p0.z, m0.z, p1.z, m1.z, t)
 				);
 			}
+			throw new IllegalStateException();
 		}
 		
 		public MotionKey.Color3f setColor3fAt(float position, javax.vecmath.Color3f c) {
@@ -496,7 +518,7 @@ public abstract class MotionCurve {
 		public javax.vecmath.Quat4f getQuat4fAt(float position) {
 			if (position <= getStart()) return ((MotionKey.Quat4f) list.get(0)).getQuat4f();
 			if (position >= getEnd()) return ((MotionKey.Quat4f) list.get(list.size() - 1)).getQuat4f();
-			Object[] key = getInterpolationKeysFor(position);
+			java.lang.Object[] key = getInterpolationKeysFor(position);
 			MotionKey.Quat4f key0 = (MotionKey.Quat4f) key[0];
 			MotionKey.Quat4f key1 = (MotionKey.Quat4f) key[1];
 			MotionKey.Quat4f key2 = (MotionKey.Quat4f) key[2];
@@ -515,10 +537,12 @@ public abstract class MotionCurve {
 			q1 = key1.getQuat4f();
 			q2 = key2.getQuat4f();
 			
-			if (interpolationMethod == LINEAR) {
+			switch (interpolationMethod) {
+			case DISCRETE:
+				return new javax.vecmath.Quat4f(q1);
+			case LINEAR:
 				return slerp(q1, q2, t);
-			}
-			else {
+			case CUBIC:
 				if (key0 != null) {
 					q0 = key0.getQuat4f();
 					qa = slerp(q0, q1, 2.0f);
@@ -540,6 +564,7 @@ public abstract class MotionCurve {
 				qe = slerp(qb, qc, t);
 				return slerp(qd, qe, t);
 			}
+			throw new IllegalStateException();
 		}
 		
 		public MotionKey.Quat4f setQuat4fAt(float position, javax.vecmath.Quat4f q) {
@@ -588,15 +613,32 @@ public abstract class MotionCurve {
 		}
 	}
 	
-	public static final class InterpolationMethod {
-		private String name;
+	public static class Object extends MotionCurve {
 		
-		private InterpolationMethod(String name) {
-			this.name = name;
+		private Object() { }
+
+		public java.lang.Object getObjectAt(float position) {
+			if (position <= getStart()) return ((MotionKey.Object) list.get(0)).getObject();
+			if (position >= getEnd()) return ((MotionKey.Object) list.get(list.size() - 1)).getObject();
+			java.lang.Object[] key = getInterpolationKeysFor(position);
+			return ((MotionKey.Object) key[1]).getObject();
 		}
 		
-		public String toString() {
-			return name;
+		public MotionKey.Object setObjectAt(float position, java.lang.Object o) {
+			MotionKey.Object mk = (MotionKey.Object) getKeyAt(position);
+			if (mk == null) {
+				mk = new MotionKey.Object(position, o);
+				addKey(mk);
+			}
+			else mk.setObject(o);
+			return mk;
+		}
+		
+		@Override
+		public MotionKey insertKeyAt(float position) {
+			if (!(getKeyAt(position) != null))
+				setObjectAt(position, getObjectAt(position));
+			return getKeyAt(position);
 		}
 	}
 }

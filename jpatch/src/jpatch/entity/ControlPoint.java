@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.23 2006/02/01 21:11:28 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.24 2006/05/22 10:46:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -38,7 +38,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.23 $
+ * @version    $Revision: 1.24 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -2216,7 +2216,7 @@ public class ControlPoint implements Comparable, Transformable {
 //		//bCurveSegmentValid = false;
 //	}
 	
-	public int getXmlNumber() {
+	public int getId() {
 		Integer i = (Integer) mapCp.get(this);
 		return (i == null) ? -1 : i.intValue();
 	}

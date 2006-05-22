@@ -1,5 +1,5 @@
 /**
- * $Id: CompoundLatheEditor.java,v 1.2 2006/02/01 21:11:28 sascha_l Exp $
+ * $Id: CompoundLatheEditor.java,v 1.3 2006/05/22 10:46:19 sascha_l Exp $
  */
 package jpatch.control.edit;
 
@@ -10,7 +10,7 @@ import jpatch.boundary.*;
 /**
  * 
  * @author lois
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * 
  */
 

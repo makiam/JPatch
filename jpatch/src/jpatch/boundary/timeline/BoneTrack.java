@@ -15,6 +15,7 @@ import jpatch.entity.*;
 public class BoneTrack extends Track {
 	
 	private MotionCurve.Float[] motionCurves;
+	private RotationDof[] dofs;
 	private Bone bone;
 	private int level;
 	private Color[] col = new Color[] {
@@ -22,8 +23,9 @@ public class BoneTrack extends Track {
 			new Color(0, 128, 0),
 			new Color(0, 0, 255)
 	};
-	public BoneTrack(TimelineEditor timelineEditor, MotionCurve.Float[] motionCurves, Bone bone, int level) {
+	public BoneTrack(TimelineEditor timelineEditor, RotationDof[] dofs, MotionCurve.Float[] motionCurves, Bone bone, int level) {
 		super(timelineEditor, null);
+		this.dofs = dofs;
 		this.motionCurves = motionCurves;
 		this.bone = bone;
 		this.level = level;
@@ -257,24 +259,40 @@ public class BoneTrack extends Track {
 		return edit;
 	}	
 		
+	public void reorder(RotationDof dof) {
+		for (int i = 0; i < dofs.length; i++) {
+			if (dof == dofs[i])
+				reorder(motionCurves[i]);
+		}
+	}
+	
 	private void reorder(MotionCurve.Float motionCurve) {
 		MotionCurve.Float[] newCurves = new MotionCurve.Float[motionCurves.length];
 		Color[] newColors = new Color[motionCurves.length];
+		RotationDof[] newDofs = new RotationDof[motionCurves.length];
+		
 		newCurves[0] = motionCurve;
 		int j = 0;
 		for (int i = 1; i < newCurves.length; i++) {
 			if (motionCurves[j] == motionCurve) {
 				newColors[0] = col[j];
+				newDofs[0] = dofs[j];
 				j++;
 			}
 			newCurves[i] = motionCurves[j];
-			newColors[i] = col[j++];
+			newColors[i] = col[j];
+			newDofs[i] = dofs[j++];
 		}
-		if (newColors[0] == null)
-			newColors[0] = col[j--];
+		if (newColors[0] == null) {
+			newColors[0] = col[j];
+			newDofs[0] = dofs[j];
+		}
 		motionCurves = newCurves;
 		col = newColors;
+		dofs = newDofs;
 	}
+	
+	
 //	private class KeyCurve {
 //		private MotionKey.Float key;
 //		private MotionCurve.Float curve;

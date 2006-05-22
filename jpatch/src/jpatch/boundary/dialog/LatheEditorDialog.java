@@ -1,5 +1,5 @@
 /*
- * $Id: LatheEditorDialog.java,v 1.4 2006/02/01 21:11:28 sascha_l Exp $ 
+ * $Id: LatheEditorDialog.java,v 1.5 2006/05/22 10:46:20 sascha_l Exp $ 
  */
 package jpatch.boundary.dialog;
 
@@ -12,7 +12,7 @@ import jpatch.control.edit.*;
 /**
  * 
  * @author lois
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  *
  */
 public class LatheEditorDialog extends JDialog implements ActionListener, ChangeListener {

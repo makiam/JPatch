@@ -1,5 +1,5 @@
 /*
- * $Id: AtomicAttachBone.java,v 1.3 2005/10/26 09:55:10 sascha_l Exp $
+ * $Id: AtomicAttachBone.java,v 1.4 2006/05/22 10:46:18 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *

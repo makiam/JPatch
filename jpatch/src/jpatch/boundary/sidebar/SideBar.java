@@ -196,8 +196,10 @@ implements TreeSelectionListener {
 				Bone bone = dof.getBone();
 				map.put(bone.getBoneEnd(), new Float(1));
 				map.put(bone.getParentBone() == null ? bone.getBoneStart() : bone.getParentBone().getBoneEnd(), new Float(1));
-				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new Selection(map)));
-				MainFrame.getInstance().getJPatchScreen().update_all();
+				if (!anim) {
+					MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new Selection(map)));
+					MainFrame.getInstance().getJPatchScreen().update_all();
+				}
 			} else {	
 				replacePanel(new MorphPanel((Morph) selectedNode));
 			}
@@ -230,8 +232,10 @@ implements TreeSelectionListener {
 			map.put(bone.getParentBone() == null ? bone.getBoneStart() : bone.getParentBone().getBoneEnd(), new Float(1));
 			if (bone.getDofs().size() > 0)
 				MainFrame.getInstance().getTree().expandPath(treeSelectionEvent.getPath());
-			MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new Selection(map)));
-			MainFrame.getInstance().getJPatchScreen().update_all();
+			if (!anim) {
+				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new Selection(map)));
+				MainFrame.getInstance().getJPatchScreen().update_all();
+			}
 		} else if (selectedNode instanceof Model) {
 			replacePanel(new ModelPanel((Model) selectedNode));
 		} else if (anim && selectedNode == MainFrame.getInstance().getAnimation().getTreenodeCameras()) {

@@ -1,5 +1,5 @@
 /*
- * $Id: Ruler.java,v 1.14 2006/05/02 19:27:47 sascha_l Exp $
+ * $Id: Ruler.java,v 1.15 2006/05/22 10:46:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
