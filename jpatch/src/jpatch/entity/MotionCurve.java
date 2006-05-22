@@ -201,12 +201,12 @@ public abstract class MotionCurve {
 		} else return null;
 	}
 	
-	public void xml(StringBuffer sb, String prefix, String type, Model model) {
+	public void xml(StringBuffer sb, String prefix, String type) {
 //		StringBuffer indent = XMLutils.indent(tab);
 //		StringBuffer indent2 = XMLutils.indent(tab + 1);
 		sb.append(prefix).append("<motioncurve " + type + " interpolation=\"" + interpolationMethod + "\">\n");
 		for (MotionKey key : list)
-			sb.append(prefix).append("\t").append(key.toXmlString(model)).append("\n");
+			sb.append(prefix).append("\t").append(key.toXmlString()).append("\n");
 		sb.append(prefix).append("</motioncurve>").append("\n");
 	}
 	

@@ -33,10 +33,19 @@ implements ModelImporter {
 	private static final int DOF_TARGET = 13;
 	
 	private int iState = NULL;
-	private ArrayList listCp = new ArrayList();
-	private ArrayList listAttach = new ArrayList();
-	private ArrayList listHook = new ArrayList();
-	private HashMap mapBones = new HashMap();
+//	private ArrayList listCp = new ArrayList();
+//	private ArrayList listAttach = new ArrayList();
+//	private ArrayList listHook = new ArrayList();
+//	private HashMap mapBones = new HashMap();
+	
+	private Map<Integer, ControlPoint> cpIdMap = new HashMap<Integer, ControlPoint>();
+	private Map<ControlPoint, Integer> cpAttachMap = new HashMap<ControlPoint, Integer>();
+	private Map<ControlPoint, Integer> cpHookMap = new HashMap<ControlPoint, Integer>();
+	private Map<ControlPoint, String> cpBoneMap = new HashMap<ControlPoint, String>();
+	private Map<String, Bone> boneNameMap = new HashMap<String, Bone>();
+	private Map<Bone, String> boneParentMap = new HashMap<Bone, String>();
+	private Map<Integer, Bone> boneIdMap = new HashMap<Integer, Bone>();
+	private Map<ControlPoint, Boolean> cpParentBoneMap = new HashMap<ControlPoint, Boolean>();
 	
 	private boolean bCurveClosed;
 	private ControlPoint cpFirst;
@@ -51,12 +60,14 @@ implements ModelImporter {
 	private Morph morph;
 	private MorphTarget morphTarget;
 	private List listMaterials = new ArrayList();
-	private List listBones = new ArrayList();
-	private Map mapCpParentBone = new HashMap();
-	private Map mapBoneParents = new HashMap();
+//	private List listBones = new ArrayList();
+//	private Map mapCpParentBone = new HashMap();
+//	private Map mapBoneParents = new HashMap();
 	private ArrayList listCandidateFivePointPatch = new ArrayList();
 	private String strRendererFormat;
 	private String strRendererVersion;
+	private int cpSequence = 0;
+	private int boneSequence = 0;
 	
 //	private CharReader charReader = new CharReader();
 	private StringBuffer sbChars = new StringBuffer();
@@ -88,10 +99,13 @@ implements ModelImporter {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 		}
-		for (Iterator it = mapBones.keySet().iterator(); it.hasNext(); ) {
-			ControlPoint cp = (ControlPoint) it.next();
-			int i = ((Integer) mapBones.get(cp)).intValue();
-			Bone bone = (Bone) listBones.get(i);
+		//for (Iterator it = mapBones.keySet().iterator(); it.hasNext(); ) {
+		for (ControlPoint cp : cpBoneMap.keySet()) {
+			Bone bone = boneNameMap.get(cpBoneMap.get(cp));
+			if (bone == null)
+				bone = boneIdMap.get(Integer.valueOf(cpBoneMap.get(cp)));
+//			int i = ((Integer) mapBones.get(cp)).intValue();
+//			Bone bone = (Bone) listBones.get(i);
 			Point3f p = cp.getReferencePosition();
 			Point3f p0 = bone.getReferenceStart();
 			Point3f p1 = bone.getReferenceEnd();
@@ -100,14 +114,16 @@ implements ModelImporter {
 			Point3f pBone = new Point3f();
 			pBone.interpolate(p0, p1, posOnLine);
 			float distToLine = pBone.distance(p) / l;
-			cp.setBone(bone, posOnLine, distToLine, Boolean.TRUE.equals(mapCpParentBone.get(cp)));
+			System.out.println(cp + " " + bone + " " + posOnLine + " " + distToLine + " " + cpParentBoneMap.get(cp));
+			Boolean b = cpParentBoneMap.get(cp);
+			cp.setBone(bone, posOnLine, distToLine, b != null && b.booleanValue());
 		}
 		model.addCandidateFivePointPatchList(listCandidateFivePointPatch);
 		model.computePatches();
 		File file = new File(filename);
 		model.setFile(file);
-		model.setCpMap(listCp);
-		model.setBoneMap(listBones);
+//		model.setCpMap(listCp);
+//		model.setBoneMap(listBones);
 		MainFrame.getInstance().setFilename(file.getName());
 		return "";
 	}
@@ -159,7 +175,7 @@ implements ModelImporter {
 					cpFirst = null;
 				} else if (localName.equals("cp")) {
 					cp = createCp(attributes);
-					listCp.add(cp);
+//					listCp.add(cp);
 					if (cpFirst == null) {
 						cpFirst = cp;
 					}
@@ -225,8 +241,9 @@ implements ModelImporter {
 			case BONE:
 				if (localName.equals("parent")) {
 					for (int index = 0; index < attributes.getLength(); index++) {
-						if (attributes.getLocalName(index).equals("id"))
-							mapBoneParents.put(bone, new Integer(attributes.getValue(index)));
+						if (attributes.getLocalName(index).equals("id") || attributes.getLocalName(index).equals("name"))
+							boneParentMap.put(bone, attributes.getValue(index));
+//							mapBoneParents.put(bone, new Integer(attributes.getValue(index)));
 					}
 				} else if (localName.equals("start")) {
 					bone.setStart(createPoint(attributes));
@@ -363,7 +380,8 @@ implements ModelImporter {
 					int[] aiPoint = splitIntoIntArray(sbChars.toString());
 					ControlPoint[] acp = new ControlPoint[aiPoint.length];
 					for (int i = 0; i < acp.length; i++) {
-						acp[i] = (ControlPoint) listCp.get(aiPoint[i]);
+//						acp[i] = (ControlPoint) listCp.get(aiPoint[i]);
+						acp[i] = cpIdMap.get(aiPoint[i]);
 					}
 					Patch patch = new Patch(acp);
 					patch.setMaterial(material);
@@ -395,7 +413,8 @@ implements ModelImporter {
 						int[] aiPoint = splitIntoIntArray(sbChars.toString());
 						HashSet pointSet = new HashSet();
 						for (int i = 0; i < aiPoint.length; i++) {
-							pointSet.add(listCp.get(aiPoint[i]));
+//							pointSet.add(listCp.get(aiPoint[i]));
+							pointSet.add(cpIdMap.get(aiPoint[i]));
 						}
 						selection = new Selection(pointSet);
 					} else {
@@ -405,7 +424,7 @@ implements ModelImporter {
 								System.err.println("illegal point id -1 in selection \"" + selectionName + "\"");
 								continue;
 							}
-							pointMap.put(listCp.get(aiList[i]), new Float(afList[i]));
+							pointMap.put(cpIdMap.get(aiList[i]), new Float(afList[i]));
 						}
 						selection = new Selection(pointMap);
 					}
@@ -462,22 +481,32 @@ implements ModelImporter {
 				break;
 			case BONE:
 				if (localName.equals("bone")) {
-					listBones.add(bone);
+//					listBones.add(bone);
+					boneNameMap.put(bone.getName(), bone);
 					iState = SKELETON;
 				}
 				break;
 			case SKELETON:
 				if (localName.equals("skeleton")) {
-					for (Iterator it = listBones.iterator(); it.hasNext(); ) {
-						Bone bone = (Bone) it.next();
-//						System.out.println(bone.getName());
-						if (mapBoneParents.containsKey(bone)) {
-							Bone parent = (Bone) listBones.get(((Integer) mapBoneParents.get(bone)).intValue());
-//							parent.insert(bone, parent.getChildCount());
-							bone.setParent(parent);
-						} 
-						model.addBone(bone);					
+					for (Bone bone : boneParentMap.keySet()) {
+						Bone parent = boneNameMap.get(boneParentMap.get(bone));
+						if (parent == null)
+							parent = boneIdMap.get(Integer.valueOf(boneParentMap.get(bone)));
+						bone.setParent(parent);
 					}
+					for (String name : boneNameMap.keySet())
+						model.addBone(boneNameMap.get(name));
+					
+//					for (Iterator it = listBones.iterator(); it.hasNext(); ) {
+//						Bone bone = (Bone) it.next();
+////						System.out.println(bone.getName());
+//						if (mapBoneParents.containsKey(bone)) {
+//							Bone parent = (Bone) listBones.get(((Integer) mapBoneParents.get(bone)).intValue());
+////							parent.insert(bone, parent.getChildCount());
+//							bone.setParent(parent);
+//						} 
+//						model.addBone(bone);					
+//					}
 					iState = MODEL;
 				}
 				break;
@@ -562,8 +591,9 @@ implements ModelImporter {
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);
-			if (localName.equals("nr")) {
-				cp = (ControlPoint) listCp.get((new Integer(value)).intValue());
+			if (localName.equals("nr") || localName.equals("id")) {
+				cp = cpIdMap.get(Integer.valueOf(value));
+//				cp = (ControlPoint) listCp.get((new Integer(value)).intValue());
 			} else if (localName.equals("x")) {
 				vector.x = (new Float(value)).floatValue();
 			} else if (localName.equals("y")) {
@@ -623,11 +653,13 @@ implements ModelImporter {
 	}
 	
 	private Bone createBone(Attributes attributes) {
-		Bone bone = new Bone(model, new Point3f(), new Vector3f());
+		Bone bone = new Bone(new Point3f(), new Vector3f());
 		for (int index = 0; index < attributes.getLength(); index++) {
 			if (attributes.getLocalName(index).equals("name"))
 				bone.setName(attributes.getValue(index));
 		}
+		boneNameMap.put(bone.getName(), bone);
+		boneIdMap.put(boneSequence++, bone);
 		return bone;
 	}
 	
@@ -663,22 +695,26 @@ implements ModelImporter {
 		ControlPoint controlPoint = new ControlPoint();
 		controlPoint.setMode(ControlPoint.JPATCH_G1);
 		Point3f p3 = controlPoint.getPosition();
+		int id = -1;
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);
-			if (localName.equals("x")) {
+			if (localName.equals("id")) {
+				id = Integer.valueOf(value);
+			} else if (localName.equals("x")) {
 				p3.x = (new Float(value)).floatValue();
 			} else if (localName.equals("y")) {
 				p3.y = (new Float(value)).floatValue();
 			} else if (localName.equals("z")) {
 				p3.z = (new Float(value)).floatValue();
 			} else if (localName.equals("attach")) {
-				listAttach.add(controlPoint);
-				listAttach.add(new Integer(value));
+				cpAttachMap.put(controlPoint, Integer.valueOf(value));
 			} else if (localName.equals("hook")) {
+				cpHookMap.put(controlPoint, Integer.valueOf(value));
 				//if (fHookPos > -1) {
-					listHook.add(controlPoint);
-					listHook.add(new Integer(value));
+//					listHook.add(controlPoint);
+				
+//					listHook.add(new Integer(value));
 				//	listHook.add(new Float(fHookPos));
 				//	iHookTo = -1;
 				//	fHookPos = -1;
@@ -729,12 +765,20 @@ implements ModelImporter {
 				//	controlPoint.setMode(ControlPoint.JPATCH_C1);
 				//}
 			} else if (localName.equals("bone")) {
-				mapBones.put(controlPoint, new Integer(value));
+				cpBoneMap.put(controlPoint, value);
+//				mapBones.put(controlPoint, new Integer(value));
 			} else if (localName.equals("parent")) {
-				mapCpParentBone.put(controlPoint, new Boolean(value));
+				cpParentBoneMap.put(controlPoint, new Boolean(value));
+//				mapCpParentBone.put(controlPoint, new Boolean(value));
 			}
 		}
 		controlPoint.setPosition(p3);
+		if (id < 0)
+			controlPoint.setId(cpSequence++);
+		else
+			controlPoint.setId(id);
+		cpIdMap.put(controlPoint.getId(), controlPoint);
+//		System.out.println(id + " " + controlPoint);
 		return controlPoint;
 	}
 	
@@ -849,21 +893,31 @@ implements ModelImporter {
 	}
 	
 	private void hook() {
-		for (int i = 0; i < listHook.size();) {
-			//((ControlPoint)listHook.get(i++)).hookTo((ControlPoint)listCp.get(((Integer)listHook.get(i++)).intValue()),((Float)listHook.get(i)).floatValue());
-			ControlPoint cp = (ControlPoint) listHook.get(i++);
-			ControlPoint parentHook = (ControlPoint) listCp.get(((Integer) listHook.get(i++)).intValue());
+		for (ControlPoint cp : cpHookMap.keySet()) {
+			ControlPoint parentHook = cpIdMap.get(cpHookMap.get(cp));
 			cp.setParentHook(parentHook);
-			if (cp.getHookPos() == 0) {
+			if (cp.getHookPos() == 0)
 				parentHook.setChildHook(cp);
-			}
 		}
+		
+//		for (int i = 0; i < listHook.size();) {
+//			//((ControlPoint)listHook.get(i++)).hookTo((ControlPoint)listCp.get(((Integer)listHook.get(i++)).intValue()),((Float)listHook.get(i)).floatValue());
+//			ControlPoint cp = (ControlPoint) listHook.get(i++);
+//			ControlPoint parentHook = (ControlPoint) listCp.get(((Integer) listHook.get(i++)).intValue());
+//			cp.setParentHook(parentHook);
+//			if (cp.getHookPos() == 0) {
+//				parentHook.setChildHook(cp);
+//			}
+//		}
 	}
 	
 	private void attach() {
-		for (int i = 0; i < listAttach.size(); i++) {
-			((ControlPoint)listAttach.get(i++)).attachTo((ControlPoint)listCp.get(((Integer)listAttach.get(i)).intValue()));
+		for (ControlPoint cp : cpAttachMap.keySet()) {
+			cp.attachTo(cpIdMap.get(cpAttachMap.get(cp)));
 		}
+//		for (int i = 0; i < listAttach.size(); i++) {
+//			((ControlPoint)listAttach.get(i++)).attachTo((ControlPoint)listCp.get(((Integer)listAttach.get(i)).intValue()));
+//		}
 	}
 	
 	private ControlPoint trueHead(ControlPoint cp) {

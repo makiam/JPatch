@@ -1,5 +1,5 @@
 /*
- * $Id: Patch.java,v 1.10 2006/05/22 12:06:07 sascha_l Exp $
+ * $Id: Patch.java,v 1.11 2006/05/22 22:05:53 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -30,7 +30,7 @@ import jpatch.auxilary.*;
  * A Patch. Currently 3-, 4- and 5-point patches are supported
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.10 $
+ * @version    $Revision: 1.11 $
  * @see		jpatch.entity.Curve
  * @see		jpatch.entity.ControlPoint
  */
@@ -205,7 +205,7 @@ public final class Patch {
 	 *
 	 * @return A StringBuffer containing an XML representation of this curve
 	 */
-	public StringBuffer xml(String prefix, Model model) {
+	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
 		int materialNumber = (material != null) ? material.getXmlNumber() : -1;
 		sb.append(prefix).append("<patch material=\"" + materialNumber + "\">").append("\n");
@@ -213,7 +213,7 @@ public final class Patch {
 		//int size = getType();
 		//int p = 0;
 		for (int i = 0; i < acpPoint.length; i++) {
-			sb.append(model.getObjectId(acpPoint[i]));
+			sb.append(acpPoint[i].getId());
 			if (i < acpPoint.length - 1) {
 				sb.append(",");
 			}

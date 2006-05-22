@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.25 2006/05/22 12:06:07 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.26 2006/05/22 22:05:53 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -38,7 +38,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.25 $
+ * @version    $Revision: 1.26 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -66,9 +66,9 @@ public class ControlPoint implements Comparable, Transformable {
 	private static int iDefaultMode = JPATCH_G1;
 	/** default curvature */
 	private static float fDefaultMagnitude = 1f;
-	private static int iSequence = 0;
+	private static int nextId = 0;
 	
-	private int iNumber;
+	private int id;
 	
 	/** position of this ConrolPoint */
 	private Point3f p3ReferencePosition = new Point3f();
@@ -140,7 +140,9 @@ public class ControlPoint implements Comparable, Transformable {
 	 * Constructor
 	 */
 	public ControlPoint() {
-		iNumber = iSequence++;
+		if (nextId < 0)
+			throw new IllegalStateException();
+		id = nextId++;
 		setBonePose();
 		setMorphPose();
 	}
@@ -259,11 +261,18 @@ public class ControlPoint implements Comparable, Transformable {
 		fDefaultMagnitude = defaultMagnitude;
 	}
 
-	public int number() {
-		return iNumber;
+	public static void setNextId(int nextId) {
+		ControlPoint.nextId = nextId;
 	}
 	
-
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
 //	public void setReference() {
 //		p3RefPosition.set(getPosition());
 //		if (cpPrev != null) p3RefInTangent.set(getInTangent());
@@ -1287,7 +1296,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 * @return    The objects hashCode as a String
 	 */
 	public String toString() {
-		return "cp_" + iNumber;
+		return "cp_" + id;
 	}
 
 	/**
@@ -2210,9 +2219,9 @@ public class ControlPoint implements Comparable, Transformable {
 	/**
 	 *
 	 */
-	public StringBuffer xml(String prefix, Model model) {
+	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(prefix).append("<cp");
+		sb.append(prefix).append("<cp id=\"").append(id).append("\"");
 		//if (cpNextAttached == null) {
 		//	//
 		//	//
@@ -2236,23 +2245,21 @@ public class ControlPoint implements Comparable, Transformable {
 		//	}
 		//}
 		if (cpNextAttached != null) {
-			int attach = model.getObjectId(cpNextAttached);
-			sb.append(" attach=").append(XMLutils.quote(attach));
+			sb.append(" attach=\"").append(cpNextAttached.id).append("\"");
 		} else if (cpParentHook != null) {
-			int phook = model.getObjectId(cpParentHook);
-			sb.append(" hook=").append(XMLutils.quote(phook));
-			sb.append(" hookpos=").append(XMLutils.quote(fHookPos));
+			sb.append(" hook=\"").append(cpParentHook.id).append("\"");
+			sb.append(" hookpos=\"").append(fHookPos).append("\"");
 		} else if (fHookPos > 0 && fHookPos < 1) {
-			sb.append(" hookpos=").append(XMLutils.quote(fHookPos));
+			sb.append(" hookpos=\"").append(fHookPos).append("\"");
 		} else {
 			//
 			// remove !!!!!!!!!!!!!!!!!!
 			//
 			//fixPosition();
 			//
-			sb.append(" x=").append(XMLutils.quote(p3ReferencePosition.x));
-			sb.append(" y=").append(XMLutils.quote(p3ReferencePosition.y));
-			sb.append(" z=").append(XMLutils.quote(p3ReferencePosition.z));
+			sb.append(" x=").append(p3ReferencePosition.x).append("\"");
+			sb.append(" y=").append(p3ReferencePosition.y).append("\"");
+			sb.append(" z=").append(p3ReferencePosition.z).append("\"");
 			//if (cpChildHook != null) {
 			//	int chook = ((Integer)mapCp.get(cpChildHook)).intValue();
 			//	sb.append(" chook=").append(XMLutils.quote(chook));
@@ -2264,10 +2271,10 @@ public class ControlPoint implements Comparable, Transformable {
 			sb.append(" mode=\"spatch\"");
 		}
 		if (fInMagnitude != fDefaultMagnitude) {
-			sb.append(" magnitude=").append(XMLutils.quote(fInMagnitude));
+			sb.append(" magnitude=\"").append(fInMagnitude).append("\"");
 		}
 		if (bone != null) {
-			sb.append(" bone=\"" + model.getObjectId(bone) + "\" parent=\"" + bParentBone + "\"");// pos=\"" + fBonePosition + "\" dist=\"" + fDistanceToLine + "\"");
+			sb.append(" bone=\"" + bone.getName() + "\" parent=\"" + bParentBone + "\"");// pos=\"" + fBonePosition + "\" dist=\"" + fDistanceToLine + "\"");
 		}
 		sb.append("/>").append("\n");
 		return sb;

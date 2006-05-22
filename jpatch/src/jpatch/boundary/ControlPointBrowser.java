@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPointBrowser.java,v 1.8 2006/05/22 10:46:20 sascha_l Exp $
+ * $Id: ControlPointBrowser.java,v 1.9 2006/05/22 22:05:54 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -127,7 +127,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 					int num = Integer.parseInt(textGoto.getText());
 					for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
 						for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
-							if (cp.number() == num) {
+							if (cp.getId() == num) {
 								setCp(cp);
 								MainFrame.getInstance().setSelection(new Selection(cp));
 								MainFrame.getInstance().getJPatchScreen().update_all();
