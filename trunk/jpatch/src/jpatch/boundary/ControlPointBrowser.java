@@ -127,7 +127,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 					int num = Integer.parseInt(textGoto.getText());
 					for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
 						for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
-							if (cp.number() == num) {
+							if (cp.getId() == num) {
 								setCp(cp);
 								MainFrame.getInstance().setSelection(new Selection(cp));
 								MainFrame.getInstance().getJPatchScreen().update_all();

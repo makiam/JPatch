@@ -1,7 +1,5 @@
 package jpatch.entity;
 
-import jpatch.entity.Bone.BoneTransformable;
-
 public abstract class MotionKey {
 	float fPosition;
 	
@@ -19,7 +17,7 @@ public abstract class MotionKey {
 	
 	public abstract MotionKey copy();
 	
-	public abstract String toXmlString(Model model);
+	public abstract String toXmlString();
 	
 //	public boolean equals(Object object) {
 //		if (!(object instanceof MotionKey))
@@ -66,10 +64,12 @@ public abstract class MotionKey {
 			this.f = f;
 		}
 		
-		public String toXmlString(Model model) {
+		@Override
+		public String toXmlString() {
 			return ("<key frame=\"" + fPosition + "\" value=\"" + f + "\"/>");
 		}
 		
+		@Override
 		public MotionKey.Float copy() {
 			return new MotionKey.Float(fPosition, f);
 		}
@@ -95,10 +95,12 @@ public abstract class MotionKey {
 			this.p.set(x, y, z);
 		}
 		
-		public String toXmlString(Model model) {
+		@Override
+		public String toXmlString() {
 			return ("<key frame=\"" + fPosition + "\" x=\"" + p.x + "\" y=\"" + p.y + "\" z=\"" + p.z + "\"/>");
 		}
 		
+		@Override
 		public MotionKey.Point3d copy() {
 			return new MotionKey.Point3d(fPosition, p);
 		}
@@ -149,10 +151,12 @@ public abstract class MotionKey {
 			this.c.set(r, g, b);
 		}
 		
-		public String toXmlString(Model model) {
+		@Override
+		public String toXmlString() {
 			return ("<key frame=\"" + fPosition + "\" r=\"" + c.x + "\" g=\"" + c.y + "\" b=\"" + c.z + "\"/>");
 		}
 		
+		@Override
 		public MotionKey.Color3f copy() {
 			return new MotionKey.Color3f(fPosition, c);
 		}
@@ -178,10 +182,12 @@ public abstract class MotionKey {
 			this.q.set(x, y, z, w);
 		}
 		
-		public String toXmlString(Model model) {
+		@Override
+		public String toXmlString() {
 			return ("<key frame=\"" + fPosition + "\" x=\"" + q.x + "\" y=\"" + q.y + "\" z=\"" + q.z + "\" w=\"" + q.w + "\"/>");
 		}
 		
+		@Override
 		public MotionKey.Quat4f copy() {
 			return new MotionKey.Quat4f(fPosition, q);
 		}
@@ -203,16 +209,18 @@ public abstract class MotionKey {
 			this.o = o;
 		}
 		
-		public String toXmlString(Model model) {
+		@Override
+		public String toXmlString() {
 			if (o == null)
 				return ("<key frame=\"" + fPosition + "\" null=\"null\"/>");
 			else if (o instanceof ControlPoint)
-				return ("<key frame=\"" + fPosition + "\" cp=\"" + model.getObjectId(o) + "\"/>");
+				return ("<key frame=\"" + fPosition + "\" cp=\"" + ((ControlPoint) o).getId() + "\"/>");
 			else if (o instanceof Bone.BoneTransformable)
-				return ("<key frame=\"" + fPosition + "\" bone=\"" + model.getObjectId(((Bone.BoneTransformable) o).getBone()) + "\"/>");
+				return ("<key frame=\"" + fPosition + "\" bone=\"" + ((Bone.BoneTransformable) o).getBone().getName() + "\"/>");
 			throw new IllegalStateException("Object key of unknown type " + o);
 		}
 		
+		@Override
 		public MotionKey.Object copy() {
 			return new MotionKey.Object(fPosition, o);
 		}

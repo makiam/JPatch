@@ -325,7 +325,7 @@ public class CompoundAutoMirror extends AbstractClone {
 //					System.out.println("mirror " + bone);
 					Vector3f v3Extent = new Vector3f(p3End);
 					v3Extent.sub(p3Start);
-					Bone newBone = new Bone(null, new Point3f(-p3Start.x, p3Start.y, p3Start.z), new Vector3f(-v3Extent.x, v3Extent.y, v3Extent.z));
+					Bone newBone = new Bone(new Point3f(-p3Start.x, p3Start.y, p3Start.z), new Vector3f(-v3Extent.x, v3Extent.y, v3Extent.z));
 					newBone.setName(mirrorName(bone.getName()));
 					//newBone.setEnd(new Point3f(-p3End.x, p3End.y, p3End.z));
 					int i = 0;

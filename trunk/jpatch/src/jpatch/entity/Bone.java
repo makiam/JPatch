@@ -14,7 +14,7 @@ public class Bone implements MutableTreeNode, Transformable {
 //	public static final BoneTransformableType START = new BoneTransformableType();
 //	public static final BoneTransformableType END = new BoneTransformableType();
 //	private static final float DEFAULT_INFLUENCE = 0.33f; 
-	private static int NUM = 0;
+	private static int num = 0;
 //	private static final Bone[] emptyBoneArray = new Bone[0];
 	private static int col = 0;
 	private static final Color3f[] COLORS = new Color3f[] {
@@ -26,7 +26,7 @@ public class Bone implements MutableTreeNode, Transformable {
 		new Color3f(0, 1, 1),
 	};
 	private Color3f color = nextColor();
-	private Model model;
+//	private Model model;
 	private final Point3f p3Start = new Point3f();
 	private final Point3f p3End = new Point3f();
 	private final Point3f p3TempEnd = new Point3f();
@@ -52,15 +52,20 @@ public class Bone implements MutableTreeNode, Transformable {
 	private float fJointRotation = 0;
 //	private int iNum = NUM++;
 //	
-	public Bone(Model model, Point3f start, Vector3f extent) {
-		this.model = model;
+//	private int id;
+	
+	public Bone(Point3f start, Vector3f extent) {
+//		if (nextId < 0)
+//			throw new IllegalStateException();
+//		id = nextId++;
+//		this.model = model;
 		p3Start.set(start);
 		p3End.set(start);
 		p3End.add(extent);
 //		v3Extent = extent;
 //		boneStart = new BoneTransformable(START);
 //		boneEnd = new BoneTransformable(END);
-		strName = "new bone #" + NUM++;
+		strName = "new bone #" + num++;
 		//MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(this, 1), this, 0);
 		//MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(this, 2), this, 1);
 		//MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(this, 4), this, 2);
@@ -92,6 +97,18 @@ public class Bone implements MutableTreeNode, Transformable {
 		return new Color3f(color);
 	}
 
+//	public static void setNextId(int nextId) {
+//		Bone.nextId = nextId;
+//	}
+//	
+//	public void setId(int id) {
+//		this.id = id;
+//	}
+//	
+//	public int getId() {
+//		return id;
+//	}
+	
 	public void addDofAxis(int axis) {
 		iDofAxis |= axis;
 	}
@@ -455,12 +472,11 @@ public class Bone implements MutableTreeNode, Transformable {
 			dof.getInvTransform().transform(v);
 	}
 	
-	public StringBuffer xml(String prefix, Model model) {
+	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(prefix).append("<bone name=").append(XMLutils.quote(strName)).append(">\n");
 		if (getParentBone() != null) {
-			int parent = model.getObjectId(getParentBone());
-			sb.append(prefix).append("\t<parent id=").append(XMLutils.quote(parent)).append("/>\n");
+			sb.append(prefix).append("\t<parent name=\"").append(getParentBone().getName()).append("\"/>\n");
 		} else {
 			sb.append(prefix).append("\t<start x=").append(XMLutils.quote(p3Start.x));
 			sb.append(" y=").append(XMLutils.quote(p3Start.y));
@@ -478,7 +494,7 @@ public class Bone implements MutableTreeNode, Transformable {
 //		}
 		sb.append(prefix).append("\t<joint rotation=\"" + fJointRotation + "\"/>\n");
 		for (Iterator it = listDofs.iterator(); it.hasNext(); )
-			sb.append(((RotationDof) it.next()).xml(prefix + "\t", model));
+			sb.append(((RotationDof) it.next()).xml(prefix + "\t"));
 		sb.append(prefix).append("</bone>\n");
 		return sb;
 	}
