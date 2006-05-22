@@ -349,6 +349,7 @@ public class Actions extends DefaultHandler {
 		actionMap.put("rotate tool", new ActionDescriptor(new RotateAction()));
 		actionMap.put("weight selection tool", new ActionDescriptor(new WeightSelectionAction()));
 		actionMap.put("knife tool", new ActionDescriptor(new KnifeAction()));
+		actionMap.put("anchor tool", new ActionDescriptor(new AnchorAction()));
 		actionMap.put("detach", new ActionDescriptor(new DetachControlPointsAction()));
 		actionMap.put("rotoscope tool", new ActionDescriptor(new RotoscopeAction()));
 		actionMap.put("tangent tool", new ActionDescriptor(new TangentAction()));

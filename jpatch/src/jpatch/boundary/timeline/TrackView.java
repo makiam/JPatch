@@ -1285,6 +1285,43 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		mi.setEnabled(!clipboard.isEmpty());
 		popup.add(mi);
 		
+		popup.add(new JSeparator());
+		
+		menu = new JMenu("Interpolation method (" + track.getName() + ")");
+		mi = new JRadioButtonMenuItem("discrete");
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				for (MotionCurve mc : track.getMotionCurves())
+					mc.setInterpolationMethod(MotionCurve.InterpolationMethod.DISCRETE);
+				TrackView.this.repaint();
+			}
+		});
+		mi.setSelected(track.getMotionCurves().length > 0 && track.getMotionCurves()[0].getInterpolationMethod() == MotionCurve.InterpolationMethod.DISCRETE);
+		menu.add(mi);
+		mi = new JRadioButtonMenuItem("linear");
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				for (MotionCurve mc : track.getMotionCurves())
+					mc.setInterpolationMethod(MotionCurve.InterpolationMethod.LINEAR);
+				TrackView.this.repaint();
+			}
+		});
+		mi.setSelected(track.getMotionCurves().length > 0 && track.getMotionCurves()[0].getInterpolationMethod() == MotionCurve.InterpolationMethod.LINEAR);
+		menu.add(mi);
+		mi = new JRadioButtonMenuItem("cubic");
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				for (MotionCurve mc : track.getMotionCurves())
+					mc.setInterpolationMethod(MotionCurve.InterpolationMethod.CUBIC);
+				TrackView.this.repaint();
+			}
+		});
+		mi.setSelected(track.getMotionCurves().length > 0 && track.getMotionCurves()[0].getInterpolationMethod() == MotionCurve.InterpolationMethod.CUBIC);
+		menu.add(mi);
+		
+		menu.setEnabled(!(track instanceof HeaderTrack));
+		popup.add(menu);
+		
 		popup.show((Component) e.getSource(), e.getX(), e.getY());
 	}
 	

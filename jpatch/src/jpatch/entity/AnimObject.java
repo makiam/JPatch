@@ -210,8 +210,12 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 				p3.set(cp.getPosition());
 				m.transform(p3);
 				p3.z = 0;
-				if (p3.distanceSquared(p3Hit) < 64)
+				if (p3.distanceSquared(p3Hit) < 64) {
+//					if (this instanceof AnimModel) {
+//						((AnimModel) this).setAnchor(cp);
+//					}
 					return true;
+				}
 			}
 		}
 		return false;		
@@ -278,10 +282,12 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 	}
 
 	public void translate(Vector3f v) {
+		Vector3f vv = new Vector3f(v);
+		MainFrame.getInstance().getConstraints().constrainVector(vv);
 		m4Transform.set(m4BackupTransform);
-		m4Transform.m03 += v.x;
-		m4Transform.m13 += v.y;
-		m4Transform.m23 += v.z;
+		m4Transform.m03 += vv.x;
+		m4Transform.m13 += vv.y;
+		m4Transform.m23 += vv.z;
 		m4ScaledTransform.set(m4Transform);
 		m4ScaledTransform.setScale(fScale);
 		MainFrame.getInstance().getSideBar().updatePanel();

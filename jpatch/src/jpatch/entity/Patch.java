@@ -213,7 +213,7 @@ public final class Patch {
 		//int size = getType();
 		//int p = 0;
 		for (int i = 0; i < acpPoint.length; i++) {
-			sb.append(acpPoint[i].getXmlNumber());
+			sb.append(acpPoint[i].getId());
 			if (i < acpPoint.length - 1) {
 				sb.append(",");
 			}

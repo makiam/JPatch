@@ -317,6 +317,23 @@ public class Viewport2 {
 			}
 			setModelMatrix(animObject.getTransform());
 			drawModel(animObject.getModel());
+			if (animObject instanceof AnimModel) {
+				Transformable anchor = ((AnimModel) animObject).getAnchor();
+				if (anchor == null)
+					continue;
+				Point3f p3 = new Point3f(((AnimModel) animObject).getAnchor().getPosition());
+				m4View.transform(p3);
+				drawable.setColor(new Color3f(1, 1, 1));
+				drawable.setPointSize(7);
+				
+				drawable.setGhostRenderingEnabled(true);
+				drawable.drawPoint(p3);
+				drawable.setGhostRenderingEnabled(false);
+				if (drawable instanceof JPatchDrawableGL)
+					drawable.drawPoint(p3);
+				
+				
+			}
 		}
 	}
 	

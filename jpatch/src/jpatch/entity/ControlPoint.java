@@ -2216,7 +2216,7 @@ public class ControlPoint implements Comparable, Transformable {
 //		//bCurveSegmentValid = false;
 //	}
 	
-	public int getXmlNumber() {
+	public int getId() {
 		Integer i = (Integer) mapCp.get(this);
 		return (i == null) ? -1 : i.intValue();
 	}

@@ -459,7 +459,7 @@ public class Selection extends JPatchTreeLeaf {
 			Object object = it.next();
 			if (object instanceof ControlPoint) {
 				ControlPoint cp = (ControlPoint) object;
-				cpList.append(cp.getXmlNumber()).append(",");
+				cpList.append(cp.getId()).append(",");
 				cpWeightList.append(mapObjects.get(cp).toString()).append(",");
 			}			
 		}

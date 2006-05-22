@@ -1,5 +1,7 @@
 package jpatch.entity;
 
+import jpatch.entity.Bone.BoneTransformable;
+
 public abstract class MotionKey {
 	float fPosition;
 	
@@ -176,8 +178,40 @@ public abstract class MotionKey {
 		public String toString() {
 			return ("<key frame=\"" + fPosition + "\" x=\"" + q.x + "\" y=\"" + q.y + "\" z=\"" + q.z + "\" w=\"" + q.w + "\"/>");
 		}
+		
 		public MotionKey.Quat4f copy() {
 			return new MotionKey.Quat4f(fPosition, q);
+		}
+	}
+	
+	public static class Object extends MotionKey {
+		private java.lang.Object o;
+		
+		public Object(float position, java.lang.Object o) {
+			super(position);
+			this.o = o;
+		}
+		
+		public java.lang.Object getObject() {
+			return o;
+		}
+		
+		public void setObject(java.lang.Object o) {
+			this.o = o;
+		}
+		
+		public String toString() {
+			if (o == null)
+				return ("<key frame=\"" + fPosition + "\" null=\"null\"/>");
+			else if (o instanceof ControlPoint)
+				return ("<key frame=\"" + fPosition + "\" cp=\"" + ((ControlPoint) o).getId() + "\"/>");
+			else if (o instanceof Bone.BoneTransformable)
+				return ("<key frame=\"" + fPosition + "\" bone=\"" + ((Bone.BoneTransformable) o).getBone().getId() + "\"/>");
+			throw new IllegalStateException("Object key of unknown type " + o);
+		}
+		
+		public MotionKey.Object copy() {
+			return new MotionKey.Object(fPosition, o);
 		}
 	}
 }

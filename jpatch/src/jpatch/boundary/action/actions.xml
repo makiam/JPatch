@@ -247,6 +247,12 @@
 		<property key="Mnemonic" value="k"/>
 		<property key="Icon" value="jpatch/images/knife.png"/>
 	</action>
+	<action name="anchor tool" model="radio" group="mode">
+		<constructor>new AnchorAction()</constructor>
+		<property key="ShortDescription" value="Anchor tool"/>
+		<property key="Mnemonic" value="n"/>
+		<property key="Icon" value="jpatch/images/anchor.png"/>
+	</action>
 	<action name="detach" model="default">
 		<constructor>new DetachControlPointsAction()</constructor>
 		<property key="ShortDescription" value="Detach"/>

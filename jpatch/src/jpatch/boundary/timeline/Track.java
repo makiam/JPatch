@@ -149,6 +149,9 @@ public class Track<M extends MotionCurve> {
 			return new AtomicAddMotionKey(motionCurve, new MotionKey.Color3f(frame, ((MotionCurve.Color3f) motionCurve).getColor3fAt(frame)));
 //			return new AtomicModifyMotionCurve.Color3f((MotionCurve.Color3f) motionCurve, frame, ((MotionCurve.Color3f) motionCurve).getColor3fAt(frame));
 		}
+		if (motionCurve instanceof MotionCurve.Object) {
+			return null;
+		}
 		// can't handle this case - needs subclassing
 		throw new UnsupportedOperationException();
 	}
