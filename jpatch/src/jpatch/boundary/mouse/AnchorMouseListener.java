@@ -64,7 +64,7 @@ public class AnchorMouseListener extends MouseAdapter {
 		if (anchor != animModel.getAnchor()) {
 			Transformable oldAnchor = animModel.getAnchor();
 			Point3f p0 = oldAnchor == null ? new Point3f() : oldAnchor.getPosition();
-			Point3f p1 = anchor.getPosition();
+			Point3f p1 = (anchor == null) ? new Point3f() : anchor.getPosition();
 			Vector3d v = new Vector3d(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z);
 			animModel.getTransform().transform(v);
 			Point3d p = animModel.getPositionDouble();

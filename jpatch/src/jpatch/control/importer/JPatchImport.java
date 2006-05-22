@@ -106,6 +106,8 @@ implements ModelImporter {
 		model.computePatches();
 		File file = new File(filename);
 		model.setFile(file);
+		model.setCpMap(listCp);
+		model.setBoneMap(listBones);
 		MainFrame.getInstance().setFilename(file.getName());
 		return "";
 	}
