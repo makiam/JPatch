@@ -42,8 +42,8 @@ public class MotionCurveSet {
 	}
 	
 	public void xml(StringBuffer sb, String prefix) {
-		position.xml(sb, prefix, "type=\"position\"", null);
-		orientation.xml(sb, prefix, "type=\"orientation\" subtype=\"quaternion\"", null);
+		position.xml(sb, prefix, "type=\"position\"");
+		orientation.xml(sb, prefix, "type=\"orientation\" subtype=\"quaternion\"");
 	}
 	
 	public void populateList() {
@@ -74,7 +74,7 @@ public class MotionCurveSet {
 		
 		public void xml(StringBuffer sb, String prefix) {
 			super.xml(sb, prefix);
-			focalLength.xml(sb, prefix, "type=\"focallength\"", null);
+			focalLength.xml(sb, prefix, "type=\"focallength\"");
 		}
 		
 		public void populateList() {
@@ -117,9 +117,9 @@ public class MotionCurveSet {
 		
 		public void xml(StringBuffer sb, String prefix) {
 			super.xml(sb, prefix);
-			size.xml(sb, prefix, "type=\"size\"", null);
-			intensity.xml(sb, prefix, "type=\"intensity\"", null);
-			color.xml(sb, prefix, "type=\"color\"", null);
+			size.xml(sb, prefix, "type=\"size\"");
+			intensity.xml(sb, prefix, "type=\"intensity\"");
+			color.xml(sb, prefix, "type=\"color\"");
 		}
 		
 		public void populateList() {
@@ -206,9 +206,8 @@ public class MotionCurveSet {
 		
 		public void xml(StringBuffer sb, String prefix) {
 			super.xml(sb, prefix);
-			jpatch.entity.Model model = ((AnimModel) animObject).getModel();
-			scale.xml(sb, prefix, "type=\"scale\" subtype=\"uniform\"", null);
-			anchor.xml(sb, prefix, "anchor", model);
+			scale.xml(sb, prefix, "type=\"scale\" subtype=\"uniform\"");
+			anchor.xml(sb, prefix, "anchor");
 			int m = 0;
 //			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
 //				((MotionCurve2.Float) map.get(it.next())).xml(sb, prefix, "type=\"morph\" morph=\"" + m++ + "\"");
@@ -216,7 +215,7 @@ public class MotionCurveSet {
 			for (Iterator it = map.keySet().iterator(); it.hasNext(); ) {
 				Object key = it.next();
 				MotionCurve.Float mc = (MotionCurve.Float) map.get(key);
-				mc.xml(sb, prefix, "type=\"avar\" id=\"" + mc.getName() + "\"", model);
+				mc.xml(sb, prefix, "type=\"avar\" id=\"" + mc.getName() + "\"");
 			}
 		}
 		
