@@ -49,6 +49,17 @@ public class AnimModel extends AnimObject {
 		return m4AnchoredTransform;
 	}
 	
+//	@Override
+//	public void getBounds(Point3f p0, Point3f p1) {
+//		super.getBounds(p0, p1);
+//		if (anchor != null) {
+//			Vector3f v = new Vector3f(anchor.getPosition());
+//			m4ScaledTransform.transform(v);
+//			p0.sub(v);
+//			p1.sub(v);
+//		}
+//	}
+	
 	public Transformable getAnchor() {
 		return anchor;
 	}

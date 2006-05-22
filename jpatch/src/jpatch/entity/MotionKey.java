@@ -18,6 +18,9 @@ public abstract class MotionKey {
 	}
 	
 	public abstract MotionKey copy();
+	
+	public abstract String toXmlString(Model model);
+	
 //	public boolean equals(Object object) {
 //		if (!(object instanceof MotionKey))
 //			return false;
@@ -63,7 +66,7 @@ public abstract class MotionKey {
 			this.f = f;
 		}
 		
-		public String toString() {
+		public String toXmlString(Model model) {
 			return ("<key frame=\"" + fPosition + "\" value=\"" + f + "\"/>");
 		}
 		
@@ -92,7 +95,7 @@ public abstract class MotionKey {
 			this.p.set(x, y, z);
 		}
 		
-		public String toString() {
+		public String toXmlString(Model model) {
 			return ("<key frame=\"" + fPosition + "\" x=\"" + p.x + "\" y=\"" + p.y + "\" z=\"" + p.z + "\"/>");
 		}
 		
@@ -146,7 +149,7 @@ public abstract class MotionKey {
 			this.c.set(r, g, b);
 		}
 		
-		public String toString() {
+		public String toXmlString(Model model) {
 			return ("<key frame=\"" + fPosition + "\" r=\"" + c.x + "\" g=\"" + c.y + "\" b=\"" + c.z + "\"/>");
 		}
 		
@@ -175,7 +178,7 @@ public abstract class MotionKey {
 			this.q.set(x, y, z, w);
 		}
 		
-		public String toString() {
+		public String toXmlString(Model model) {
 			return ("<key frame=\"" + fPosition + "\" x=\"" + q.x + "\" y=\"" + q.y + "\" z=\"" + q.z + "\" w=\"" + q.w + "\"/>");
 		}
 		
@@ -200,13 +203,13 @@ public abstract class MotionKey {
 			this.o = o;
 		}
 		
-		public String toString() {
+		public String toXmlString(Model model) {
 			if (o == null)
 				return ("<key frame=\"" + fPosition + "\" null=\"null\"/>");
 			else if (o instanceof ControlPoint)
-				return ("<key frame=\"" + fPosition + "\" cp=\"" + ((ControlPoint) o).getId() + "\"/>");
+				return ("<key frame=\"" + fPosition + "\" cp=\"" + model.getObjectId(o) + "\"/>");
 			else if (o instanceof Bone.BoneTransformable)
-				return ("<key frame=\"" + fPosition + "\" bone=\"" + ((Bone.BoneTransformable) o).getBone().getId() + "\"/>");
+				return ("<key frame=\"" + fPosition + "\" bone=\"" + model.getObjectId(((Bone.BoneTransformable) o).getBone()) + "\"/>");
 			throw new IllegalStateException("Object key of unknown type " + o);
 		}
 		

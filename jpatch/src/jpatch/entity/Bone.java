@@ -15,7 +15,6 @@ public class Bone implements MutableTreeNode, Transformable {
 //	public static final BoneTransformableType END = new BoneTransformableType();
 //	private static final float DEFAULT_INFLUENCE = 0.33f; 
 	private static int NUM = 0;
-	private static Map mapBones;
 //	private static final Bone[] emptyBoneArray = new Bone[0];
 	private static int col = 0;
 	private static final Color3f[] COLORS = new Color3f[] {
@@ -93,10 +92,6 @@ public class Bone implements MutableTreeNode, Transformable {
 		return new Color3f(color);
 	}
 
-	public static void setMap(Map map) {
-		mapBones = map;
-	}
-	
 	public void addDofAxis(int axis) {
 		iDofAxis |= axis;
 	}
@@ -135,10 +130,6 @@ public class Bone implements MutableTreeNode, Transformable {
 //	}
 	public int getDofMask() {
 		return iDofAxis;
-	}
-	
-	public int getXmlNumber() {
-		return ((Integer) mapBones.get(this)).intValue();
 	}
 	
 	public List getChildBones() {
@@ -464,15 +455,11 @@ public class Bone implements MutableTreeNode, Transformable {
 			dof.getInvTransform().transform(v);
 	}
 	
-	public int getId() {
-		return ((Integer) mapBones.get(this)).intValue();
-	}
-	
-	public StringBuffer xml(String prefix) {
+	public StringBuffer xml(String prefix, Model model) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(prefix).append("<bone name=").append(XMLutils.quote(strName)).append(">\n");
 		if (getParentBone() != null) {
-			int parent = ((Integer) mapBones.get(getParentBone())).intValue();
+			int parent = model.getObjectId(getParentBone());
 			sb.append(prefix).append("\t<parent id=").append(XMLutils.quote(parent)).append("/>\n");
 		} else {
 			sb.append(prefix).append("\t<start x=").append(XMLutils.quote(p3Start.x));
@@ -491,7 +478,7 @@ public class Bone implements MutableTreeNode, Transformable {
 //		}
 		sb.append(prefix).append("\t<joint rotation=\"" + fJointRotation + "\"/>\n");
 		for (Iterator it = listDofs.iterator(); it.hasNext(); )
-			sb.append(((RotationDof) it.next()).xml(prefix + "\t"));
+			sb.append(((RotationDof) it.next()).xml(prefix + "\t", model));
 		sb.append(prefix).append("</bone>\n");
 		return sb;
 	}

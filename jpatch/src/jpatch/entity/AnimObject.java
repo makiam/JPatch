@@ -165,6 +165,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		p0.set(xMin,yMin,zMin);
 		p1.set(xMax,yMax,zMax);
 		Vector3f v = new Vector3f((float) m4Transform.m03, (float) m4Transform.m13, (float) m4Transform.m23);
+		
 		Matrix3f m = new Matrix3f();
 		m4ScaledTransform.getRotationScale(m);
 		float s = m.getScale();
@@ -172,6 +173,8 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		p1.scale(s);
 		m.invert();
 		m.transform(v);
+		if (this instanceof AnimModel && ((AnimModel) this).getAnchor() != null)
+			v.sub(((AnimModel) this).getAnchor().getPosition());
 		v.scale(s);
 //		p0.scale(fScale);
 //		p1.scale(fScale);
@@ -181,12 +184,18 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 	
 	public float getRadius() {
 		float ds = 0;
+		Point3f pivot = new Point3f();
+		if (this instanceof AnimModel) {
+			Transformable anchor = ((AnimModel) this).getAnchor();
+			if (anchor != null)
+				pivot.set(anchor.getPosition());
+		}
 		for (Iterator it = getModel().getCurveSet().iterator(); it.hasNext(); ) {
 			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				if (!cp.isHead())
 					continue;
 				Point3f p3 = cp.getPosition();
-				float f = p3.x * p3.x + p3.y * p3.y + p3.z * p3.z;
+				float f = pivot.distanceSquared(p3);
 				if (f > ds)
 					ds = f;
 			}

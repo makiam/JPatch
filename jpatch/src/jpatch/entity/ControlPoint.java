@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.24 2006/05/22 10:46:20 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.25 2006/05/22 12:06:07 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -38,7 +38,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.24 $
+ * @version    $Revision: 1.25 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -62,8 +62,6 @@ public class ControlPoint implements Comparable, Transformable {
 	private static final float[] HOOK_B2 = new float[] { 0.140625f, 0.375f, 0.421875f };
 	private static final float[] HOOK_B3 = new float[] { 0.015625f, 0.125f, 0.421875f };
 	
-	/** XXX ??? */
-	private static HashMap mapCp;
 	/** default tangent mode */
 	private static int iDefaultMode = JPATCH_G1;
 	/** default curvature */
@@ -250,13 +248,6 @@ public class ControlPoint implements Comparable, Transformable {
 	 */
 	public static void setDefaultMode(int defaultMode) {
 		iDefaultMode = defaultMode;
-	}
-
-	/**
-	 * XXX
-	 */
-	public static void setMap(HashMap map) {
-		mapCp = map;
 	}
 	
 	/**
@@ -2216,14 +2207,10 @@ public class ControlPoint implements Comparable, Transformable {
 //		//bCurveSegmentValid = false;
 //	}
 	
-	public int getId() {
-		Integer i = (Integer) mapCp.get(this);
-		return (i == null) ? -1 : i.intValue();
-	}
 	/**
 	 *
 	 */
-	public StringBuffer xml(String prefix) {
+	public StringBuffer xml(String prefix, Model model) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(prefix).append("<cp");
 		//if (cpNextAttached == null) {
@@ -2249,10 +2236,10 @@ public class ControlPoint implements Comparable, Transformable {
 		//	}
 		//}
 		if (cpNextAttached != null) {
-			int attach = ((Integer)mapCp.get(cpNextAttached)).intValue();
+			int attach = model.getObjectId(cpNextAttached);
 			sb.append(" attach=").append(XMLutils.quote(attach));
 		} else if (cpParentHook != null) {
-			int phook = ((Integer)mapCp.get(cpParentHook)).intValue();
+			int phook = model.getObjectId(cpParentHook);
 			sb.append(" hook=").append(XMLutils.quote(phook));
 			sb.append(" hookpos=").append(XMLutils.quote(fHookPos));
 		} else if (fHookPos > 0 && fHookPos < 1) {
@@ -2280,7 +2267,7 @@ public class ControlPoint implements Comparable, Transformable {
 			sb.append(" magnitude=").append(XMLutils.quote(fInMagnitude));
 		}
 		if (bone != null) {
-			sb.append(" bone=\"" + bone.getId() + "\" parent=\"" + bParentBone + "\"");// pos=\"" + fBonePosition + "\" dist=\"" + fDistanceToLine + "\"");
+			sb.append(" bone=\"" + model.getObjectId(bone) + "\" parent=\"" + bParentBone + "\"");// pos=\"" + fBonePosition + "\" dist=\"" + fDistanceToLine + "\"");
 		}
 		sb.append("/>").append("\n");
 		return sb;

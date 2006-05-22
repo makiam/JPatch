@@ -276,7 +276,7 @@ public class Morph implements MutableTreeNode {
 		return Collections.enumeration(listTargets);
 	}
 	
-	public StringBuffer xml(String prefix) {
+	public StringBuffer xml(String prefix, Model model) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(prefix).append("<morph name=\"").append(strName).append("\" ");
 		sb.append("min=\"").append(fMin).append("\" ");
@@ -284,7 +284,7 @@ public class Morph implements MutableTreeNode {
 		sb.append("value=\"").append(fValue).append("\">\n");
 		String prefix2 = prefix + "\t";
 		for (Iterator it = listTargets.iterator(); it.hasNext(); ) {
-			sb.append(((MorphTarget) it.next()).xml(prefix2));
+			sb.append(((MorphTarget) it.next()).xml(prefix2, model));
 		}
 		sb.append(prefix).append("</morph>").append("\n");
 		return sb;

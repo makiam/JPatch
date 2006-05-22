@@ -48,6 +48,10 @@ public class Model implements MutableTreeNode {
 	private Rotoscope[] aRotoscope = new Rotoscope[6];
 	private boolean bInserted = false;
 	private File file;
+//	private Map<ControlPoint, Integer> cpIdMap = new HashMap<ControlPoint, Integer>();
+//	private Map<Bone, Integer> boneIdMap = new HashMap<Bone, Integer>();
+	private Map<Object, Integer> objectIdMap = new HashMap<Object, Integer>();
+	
 	//private ArrayList listeners = new ArrayList();
 	
 	public Model() {
@@ -83,7 +87,33 @@ public class Model implements MutableTreeNode {
 		}
 	}
 	
+	public void setObjectId(Object object, int id) {
+		objectIdMap.put(object, id);
+	}
 	
+	public int getObjectId(Object object) {
+		return objectIdMap.get(object);
+	}
+	
+//	public void setObjectId(Object object, int id) {
+//		if (object instanceof ControlPoint)
+//			cpIdMap.put((ControlPoint) object, id);
+//		else if (object instanceof Bone)
+//			boneIdMap.put((Bone) object, id);
+//		else
+//			throw new IllegalArgumentException();
+//	}
+//	
+//	public int getObjectId(Object object) {
+//		if (object instanceof ControlPoint)
+//			cpIdMap.put((ControlPoint) object, id);
+//		else if (object instanceof Bone)
+//			boneIdMap.put((Bone) object, id);
+//		else
+//			throw new IllegalArgumentException();
+//		
+//		return objectIdMap.get(object);
+//	}
 	
 	//public StringBuffer xmlRotoscopes(int tabs) {
 	//	StringBuffer sb = new StringBuffer();
@@ -131,6 +161,7 @@ public class Model implements MutableTreeNode {
 			sb.append(mat.xml(prefix2));
 		}
 		
+		objectIdMap.clear();
 		ArrayList curveList = new ArrayList(setCurves);
 		setCpMap(curveList);
 		ArrayList boneList = new ArrayList(setBones);
@@ -142,16 +173,16 @@ public class Model implements MutableTreeNode {
 			sb.append(start.getLoop() ? "<curve closed=\"true\">" : "<curve>");
 			sb.append("\n");
 			for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop())
-				sb.append(cp.xml(prefix4));
+				sb.append(cp.xml(prefix4, this));
 			
 			sb.append(prefix3).append("</curve>").append("\n");
 		}
 		for (Iterator it = mapPatches.keySet().iterator(); it.hasNext(); ) {
-			sb.append(((Patch) it.next()).xml(prefix3));
+			sb.append(((Patch) it.next()).xml(prefix3, this));
 		}
 		for (Iterator it = listMorphs.iterator(); it.hasNext(); ) {
 			Morph morph = (Morph) it.next();
-			sb.append(morph.xml(prefix3));
+			sb.append(morph.xml(prefix3, this));
 		}
 //		for (Iterator itBones = setBones.iterator(); itBones.hasNext(); ) {
 //			for (Iterator itDofs = ((Bone) itBones.next()).getDofs().iterator(); itDofs.hasNext(); ) {
@@ -175,12 +206,12 @@ public class Model implements MutableTreeNode {
 		sb.append(prefix2).append("</mesh>").append("\n");
 		for (Iterator it = listSelections.iterator(); it.hasNext();) {
 			Selection selection = (Selection) it.next();
-			sb.append(selection.xml(prefix2));
+			sb.append(selection.xml(prefix2, this));
 		}
 		
 		sb.append(prefix2).append("<skeleton>\n");
 		for (Iterator it = boneList.iterator(); it.hasNext(); ) {
-			sb.append(((Bone) it.next()).xml(prefix3));
+			sb.append(((Bone) it.next()).xml(prefix3, this));
 		}
 		sb.append(prefix2).append("</skeleton>\n");
 		sb.append(prefix).append("</model>").append("\n");
@@ -1092,21 +1123,18 @@ public class Model implements MutableTreeNode {
 		System.out.println("\n\n----------- end -------------");
 	}
 	
-	private void setCpMap(List list) {
-		HashMap map = new HashMap();
+	public void setCpMap(List list) {
 		int i = 0;
 		for (Iterator it = list.iterator(); it.hasNext(); )
 			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop())
-				map.put(cp,new Integer(i++));
-		ControlPoint.setMap(map);
+				objectIdMap.put(cp, i++);
 	}
 	
-	private void setBoneMap(List list) {
-		HashMap map = new HashMap();
+	public void setBoneMap(List list) {
 		int i = 0;
 		for (Iterator it = list.iterator(); it.hasNext(); )
-			map.put(it.next(), new Integer(i++));
-		Bone.setMap(map);
+			objectIdMap.put(it.next(), i++);
+			
 //		System.out.println(map);
 	}
 	
