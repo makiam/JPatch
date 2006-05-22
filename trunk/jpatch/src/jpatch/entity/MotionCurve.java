@@ -12,7 +12,7 @@ public abstract class MotionCurve {
 	
 	InterpolationMethod interpolationMethod = InterpolationMethod.CUBIC;
 	String name = "*";
-	ArrayList list = new ArrayList();
+	List<MotionKey> list = new ArrayList<MotionKey>();
 
 	public static MotionCurve.Float createMorphCurve(Morph morph) {
 		MotionCurve.Float mc = new MotionCurve.Float();
@@ -201,11 +201,12 @@ public abstract class MotionCurve {
 		} else return null;
 	}
 	
-	public void xml(StringBuffer sb, String prefix, String type) {
+	public void xml(StringBuffer sb, String prefix, String type, Model model) {
 //		StringBuffer indent = XMLutils.indent(tab);
 //		StringBuffer indent2 = XMLutils.indent(tab + 1);
 		sb.append(prefix).append("<motioncurve " + type + " interpolation=\"" + interpolationMethod + "\">\n");
-		for (Iterator it = list.iterator(); it.hasNext(); sb.append(prefix + "\t").append(it.next().toString()).append("\n"));
+		for (MotionKey key : list)
+			sb.append(prefix).append("\t").append(key.toXmlString(model)).append("\n");
 		sb.append(prefix).append("</motioncurve>").append("\n");
 	}
 	

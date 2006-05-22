@@ -290,8 +290,17 @@ public class Selection extends JPatchTreeLeaf {
 	
 	public Point3f getPivot() {
 		if (hotObject instanceof AnimObject) {
+			Transformable anchor = null;
+			if (hotObject instanceof AnimModel)
+				anchor = ((AnimModel) hotObject).getAnchor();
 			Matrix4d m = ((AnimObject) hotObject).getTransform();
-			return new Point3f((float) m.m03, (float) m.m13, (float) m.m23);
+			Point3f p = new Point3f((float) m.m03, (float) m.m13, (float) m.m23);
+			if (anchor != null) {
+				Vector3f v = new Vector3f(anchor.getPosition());
+				m.transform(v);
+				p.add(v);
+			}
+			return p;
 		}
 		return p3Pivot;
 	}
@@ -448,7 +457,7 @@ public class Selection extends JPatchTreeLeaf {
 		return strName;
 	}
 	
-	public StringBuffer xml(String prefix) {
+	public StringBuffer xml(String prefix, Model model) {
 		StringBuffer sb = new StringBuffer();
 		StringBuffer cpList = new StringBuffer();
 		StringBuffer cpWeightList = new StringBuffer();
@@ -459,7 +468,7 @@ public class Selection extends JPatchTreeLeaf {
 			Object object = it.next();
 			if (object instanceof ControlPoint) {
 				ControlPoint cp = (ControlPoint) object;
-				cpList.append(cp.getId()).append(",");
+				cpList.append(model.getObjectId(cp)).append(",");
 				cpWeightList.append(mapObjects.get(cp).toString()).append(",");
 			}			
 		}

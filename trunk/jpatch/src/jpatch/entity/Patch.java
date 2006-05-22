@@ -205,7 +205,7 @@ public final class Patch {
 	 *
 	 * @return A StringBuffer containing an XML representation of this curve
 	 */
-	public StringBuffer xml(String prefix) {
+	public StringBuffer xml(String prefix, Model model) {
 		StringBuffer sb = new StringBuffer();
 		int materialNumber = (material != null) ? material.getXmlNumber() : -1;
 		sb.append(prefix).append("<patch material=\"" + materialNumber + "\">").append("\n");
@@ -213,7 +213,7 @@ public final class Patch {
 		//int size = getType();
 		//int p = 0;
 		for (int i = 0; i < acpPoint.length; i++) {
-			sb.append(acpPoint[i].getId());
+			sb.append(model.getObjectId(acpPoint[i]));
 			if (i < acpPoint.length - 1) {
 				sb.append(",");
 			}

@@ -427,7 +427,7 @@ public class MorphTarget implements MutableTreeNode {
 //		return xml(prefix, null, null);
 //	}
 			
-	public StringBuffer xml(String prefix) {
+	public StringBuffer xml(String prefix, Model model) {
 		StringBuffer sb = new StringBuffer();
 		if (fPosition == 0)
 			return sb;
@@ -460,7 +460,7 @@ public class MorphTarget implements MutableTreeNode {
 			ControlPoint cp = (ControlPoint) it.next();
 			Vector3f v3 = (Vector3f) mapMorph.get(cp);
 			sb.append(prefix);
-			sb.append("\t<point nr=\"").append(cp.getId()).append("\" ");
+			sb.append("\t<point nr=\"").append(model.getObjectId(cp)).append("\" ");
 			sb.append("x=\"").append(v3.x).append("\" " );
 			sb.append("y=\"").append(v3.y).append("\" " );
 			sb.append("z=\"").append(v3.z).append("\"/>");
