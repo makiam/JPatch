@@ -119,6 +119,7 @@ public class Animation implements MutableTreeNode {
 	}	
 	
 	public void addModel(AnimModel animModel, MotionCurveSet mcs) {
+		System.out.println(this.getName() + " add model " + animModel.getModel().xml(""));
 		MainFrame.getInstance().getTreeModel().insertNodeInto(animModel, treenodeModels, listModels.size());
 		setCurvesetFor(animModel, mcs);
 	}

@@ -46,6 +46,7 @@ implements ModelImporter {
 	private Map<Bone, String> boneParentMap = new HashMap<Bone, String>();
 	private Map<Integer, Bone> boneIdMap = new HashMap<Integer, Bone>();
 	private Map<ControlPoint, Boolean> cpParentBoneMap = new HashMap<ControlPoint, Boolean>();
+	private Map<String, JPatchMaterial> materialNameMap = new HashMap<String, JPatchMaterial>();
 	
 	private boolean bCurveClosed;
 	private ControlPoint cpFirst;
@@ -77,6 +78,14 @@ implements ModelImporter {
 //		protected void string(String srt) {
 //		}
 //	}
+	
+	public Map<Integer, ControlPoint> getCpIdMap() {
+		return cpIdMap;
+	}
+	
+	public Map<String, Bone> getBoneNameMap() {
+		return boneNameMap;
+	}
 	
 	public final String importModel(Model model, String filename) {
 		System.out.println("loading " + filename);
@@ -142,7 +151,6 @@ implements ModelImporter {
 				break;
 			case MODEL:
 				if (localName.equals("name")) {
-//					charReader = new ModelNameCharReader(model);
 					sbChars.setLength(0);
 				} else if (localName.equals("material")) {
 					iState = MATERIAL;
@@ -151,8 +159,6 @@ implements ModelImporter {
 					iState = MESH;
 				} else if (localName.equals("selection")) {
 					iState = SELECTION;
-//					charReader = new ArrayCharReader();
-					sbChars.setLength(0);
 					aiList = null;
 					afList = null;
 					createSelection(attributes);
@@ -162,6 +168,9 @@ implements ModelImporter {
 				} else if (localName.equals("skeleton")) {
 					iState = SKELETON;
 				}
+				break;
+			case SELECTION:
+				sbChars.setLength(0);
 				break;
 			case SKELETON:
 				if (localName.equals("bone")) {
@@ -239,7 +248,9 @@ implements ModelImporter {
 				}
 				break;
 			case BONE:
-				if (localName.equals("parent")) {
+				if (localName.equals("name")) {
+					sbChars.setLength(0);
+				} else if (localName.equals("parent")) {
 					for (int index = 0; index < attributes.getLength(); index++) {
 						if (attributes.getLocalName(index).equals("id") || attributes.getLocalName(index).equals("name"))
 							boneParentMap.put(bone, attributes.getValue(index));
@@ -346,8 +357,13 @@ implements ModelImporter {
 					listMaterials.add(material);
 					iState = MODEL;
 				} else if (localName.equals("name")) {
-//					charReader = new CharReader();
-					material.setName(sbChars.toString());
+					String name = sbChars.toString();
+					String name1 = name;
+					int n = 1;
+					while (materialNameMap.keySet().contains(name1))
+						name1 = name + n++;
+					material.setName(name1);
+					materialNameMap.put(material.getName(), material);
 				} else if (localName.equals("renderer")) {
 					material.setRenderString(strRendererFormat, strRendererVersion, sbChars.toString());
 				}
@@ -437,6 +453,8 @@ implements ModelImporter {
 					afList = splitIntoFloatArray(sbChars.toString());
 					sbChars.setLength(0);
 //					for (int i = 0; i < afList.length; System.out.println(afList[i++]));
+				} else if (localName.equals("name")) {
+					selectionName = sbChars.toString();
 				}
 				break;
 			case ROTOSCOPE:
@@ -483,7 +501,10 @@ implements ModelImporter {
 				if (localName.equals("bone")) {
 //					listBones.add(bone);
 					boneNameMap.put(bone.getName(), bone);
+					boneIdMap.put(boneSequence++, bone);
 					iState = SKELETON;
+				} else if (localName.equals("name")) {
+					bone.setName(sbChars.toString());
 				}
 				break;
 			case SKELETON:
@@ -630,6 +651,9 @@ implements ModelImporter {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);
 			if (localName.equals("material")) {
+				JPatchMaterial material = materialNameMap.get(value);
+				if (material != null)
+					return material;
 				int number = Integer.parseInt(value);
 				if (number == -1) return null;
 				return (JPatchMaterial) listMaterials.get(number);
@@ -658,8 +682,6 @@ implements ModelImporter {
 			if (attributes.getLocalName(index).equals("name"))
 				bone.setName(attributes.getValue(index));
 		}
-		boneNameMap.put(bone.getName(), bone);
-		boneIdMap.put(boneSequence++, bone);
 		return bone;
 	}
 	

@@ -207,15 +207,15 @@ public final class Patch {
 	 */
 	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
-		int materialNumber = (material != null) ? material.getXmlNumber() : -1;
-		sb.append(prefix).append("<patch material=\"" + materialNumber + "\">").append("\n");
+//		int materialNumber = (material != null) ? material.getXmlNumber() : -1;
+		sb.append(prefix).append("<patch material=\"" + material.getName() + "\">").append("\n");
 		sb.append(prefix).append("\t<points>");
 		//int size = getType();
 		//int p = 0;
 		for (int i = 0; i < acpPoint.length; i++) {
 			sb.append(acpPoint[i].getId());
 			if (i < acpPoint.length - 1) {
-				sb.append(",");
+				sb.append(" ");
 			}
 		}
 		sb.append("</points>").append("\n");

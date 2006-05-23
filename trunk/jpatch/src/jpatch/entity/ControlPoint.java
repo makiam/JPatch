@@ -2257,9 +2257,9 @@ public class ControlPoint implements Comparable, Transformable {
 			//
 			//fixPosition();
 			//
-			sb.append(" x=").append(p3ReferencePosition.x).append("\"");
-			sb.append(" y=").append(p3ReferencePosition.y).append("\"");
-			sb.append(" z=").append(p3ReferencePosition.z).append("\"");
+			sb.append(" x=\"").append(p3ReferencePosition.x).append("\"");
+			sb.append(" y=\"").append(p3ReferencePosition.y).append("\"");
+			sb.append(" z=\"").append(p3ReferencePosition.z).append("\"");
 			//if (cpChildHook != null) {
 			//	int chook = ((Integer)mapCp.get(cpChildHook)).intValue();
 			//	sb.append(" chook=").append(XMLutils.quote(chook));

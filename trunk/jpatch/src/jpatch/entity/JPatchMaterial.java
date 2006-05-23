@@ -72,11 +72,13 @@ public class JPatchMaterial extends JPatchTreeLeaf {
 	
 	private int iXmlNumber;
 	
+	private static int num = 1;
+	
 	/**
 	 * Default Constructor
 	 */
 	public JPatchMaterial() {
-		strName = "New Material";
+		strName = "New Material #" + num++;
 	}
 
 	/**

@@ -474,7 +474,9 @@ public class Bone implements MutableTreeNode, Transformable {
 	
 	public StringBuffer xml(String prefix) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(prefix).append("<bone name=").append(XMLutils.quote(strName)).append(">\n");
+//		sb.append(prefix).append("<bone name=").append(XMLutils.quote(strName)).append(">\n");
+		sb.append(prefix).append("<bone>\n");
+		sb.append(prefix).append("\t<name>").append(strName).append("</name>\n");
 		if (getParentBone() != null) {
 			sb.append(prefix).append("\t<parent name=\"").append(getParentBone().getName()).append("\"/>\n");
 		} else {
