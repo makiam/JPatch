@@ -459,15 +459,19 @@ public class DefaultTool extends JPatchTool {
 				btHot = anim ? null : viewDef.getClosestBoneEnd(p2, null, true, true);
 				Bone hitBone = anim ? null : viewDef.getClosestBone(p2);
 				AnimObject hitAnimObject = null;
+				Bone xBone = null;
 				if (anim) {
 					Animation animation = MainFrame.getInstance().getAnimation();
+					Bone[] bone = new Bone[1];
 					for (AnimObject animObject:animation.getObjects()) {
-						if (animObject.isHit(x, y, viewDef.getScreenMatrix())) {
+						if (animObject.isHit(x, y, viewDef.getScreenMatrix(), bone)) {
 							hitAnimObject = animObject;
+							xBone = bone[0];
 						}
 					}
 				}
-				if (!MainFrame.getInstance().getJPatchScreen().isSelectBones()) {
+				System.out.println("xBone=" + xBone);
+				if (!anim && !MainFrame.getInstance().getJPatchScreen().isSelectBones()) {
 					btHot = null;
 					hitBone = null;
 				}
@@ -479,6 +483,8 @@ public class DefaultTool extends JPatchTool {
 				if (hitAnimObject != null) {
 					selection = new Selection(hitAnimObject);
 					edit.addEdit(new AtomicChangeSelection(selection));
+					if (xBone != null)
+						MainFrame.getInstance().selectTreeNode(xBone);
 					repaint = true;
 					iState = MOVE_GROUP;
 					beginTransform();
