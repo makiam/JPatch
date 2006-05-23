@@ -176,6 +176,8 @@ public class TimelineEditor extends JScrollPane {
 	}
 	
 	public void setAnimObject(AnimObject animObject) {
+		if (this.animObject == animObject)
+			return;
 		this.animObject = animObject;
 		listTracks.clear();
 		if (animObject != null) {

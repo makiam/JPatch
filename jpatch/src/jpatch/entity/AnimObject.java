@@ -218,12 +218,17 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		float minDist = 64;
 		Line2D.Float line = new Line2D.Float();
 		hitBone[0] = null;
+		Vector3f a = new Vector3f();
+		if (this instanceof AnimModel && ((AnimModel) this).getAnchor() != null)
+			a.set(((AnimModel) this).getAnchor().getPosition());
 		for (Bone bone : getModel().getBoneSet()) {
 			bone.getStart(p3);
+			p3.sub(a);
 			m.transform(p3);
 			line.x1 = p3.x;
 			line.y1 = p3.y;
 			bone.getEnd(p3);
+			p3.sub(a);
 			m.transform(p3);
 			line.x2 = p3.x;
 			line.y2 = p3.y;
