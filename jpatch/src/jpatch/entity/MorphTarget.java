@@ -460,7 +460,7 @@ public class MorphTarget implements MutableTreeNode {
 			ControlPoint cp = (ControlPoint) it.next();
 			Vector3f v3 = (Vector3f) mapMorph.get(cp);
 			sb.append(prefix);
-			sb.append("\t<point nr=\"").append(cp.getId()).append("\" ");
+			sb.append("\t<point id=\"").append(cp.getId()).append("\" ");
 			sb.append("x=\"").append(v3.x).append("\" " );
 			sb.append("y=\"").append(v3.y).append("\" " );
 			sb.append("z=\"").append(v3.z).append("\"/>");
