@@ -39,9 +39,9 @@ public class Model implements MutableTreeNode {
 	//private JPatchMaterial[] aJPMaterial = new JPatchMaterial[32];
 	
 	private AnimModel animModel;
-	private List listMaterials = new ArrayList();
+	private List<JPatchMaterial> listMaterials = new ArrayList<JPatchMaterial>();
 	private List listSelections = new ArrayList();
-	private List listMorphs = new ArrayList();
+	private List<Morph> listMorphs = new ArrayList<Morph>();
 //	private List lstBoneShapes = new ArrayList();
 	private Map<String, Morph> mapPhonemes = new HashMap<String, Morph>();
 	private String strName;
@@ -86,6 +86,23 @@ public class Model implements MutableTreeNode {
 			return null;
 		}
 	}
+	
+//	public Map<Integer, ControlPoint> getControlPointIds() {
+//		Map<Integer, ControlPoint> map = new HashMap<Integer, ControlPoint>();
+//		for (ControlPoint cp : setCurves) {
+//			for(; cp != null; cp = cp.getNextCheckNextLoop())
+//				map.put(cp.getId(), cp);
+//		}
+//		return map;
+//	}
+//	
+//	public Map<String, Bone> getBoneNames() {
+//		Map<String, Bone> map = new HashMap<String, Bone>();
+//		for (Bone bone : setBones) {
+//			map.put(bone.getName(), bone);
+//		}
+//		return map;
+//	}
 	
 //	public void setObjectId(Object object, int id) {
 //		objectIdMap.put(object, id);
@@ -203,14 +220,16 @@ public class Model implements MutableTreeNode {
 			sb.append(prefix).append("\t</lipsync>").append("\n");
 		}
 		sb.append(prefix2).append("</mesh>").append("\n");
+		sb.append(prefix2).append("<selections>\n");
 		for (Iterator it = listSelections.iterator(); it.hasNext();) {
 			Selection selection = (Selection) it.next();
-			sb.append(selection.xml(prefix2, this));
+			sb.append(selection.xml(prefix3, this));
 		}
+		sb.append(prefix2).append("</selections>\n");
 		
 		sb.append(prefix2).append("<skeleton>\n");
 		for (Bone bone : setBones) {
-			bone.xml(prefix3);
+			sb.append(bone.xml(prefix3));
 		}
 		sb.append(prefix2).append("</skeleton>\n");
 		sb.append(prefix).append("</model>").append("\n");
@@ -426,7 +445,7 @@ public class Model implements MutableTreeNode {
 		return listMorphs.iterator();
 	}
 	
-	public List getMorphList() {
+	public List<Morph> getMorphList() {
 		return listMorphs;
 	}
 	
@@ -469,7 +488,7 @@ public class Model implements MutableTreeNode {
 		return (JPatchMaterial)listMaterials.get(m);
 	}
 	
-	public List getMaterialList() {
+	public List<JPatchMaterial> getMaterialList() {
 		return listMaterials;
 	}
 	

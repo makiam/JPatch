@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchMaterial.java,v 1.5 2006/05/22 10:46:20 sascha_l Exp $
+ * $Id: JPatchMaterial.java,v 1.6 2006/05/23 13:18:48 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -57,7 +57,7 @@ import jpatch.auxilary.*;
  * </table>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.5 $
+ * @version    $Revision: 1.6 $
  * @see		jpatch.entity.MaterialProperties
  */
 
@@ -72,11 +72,13 @@ public class JPatchMaterial extends JPatchTreeLeaf {
 	
 	private int iXmlNumber;
 	
+	private static int num = 1;
+	
 	/**
 	 * Default Constructor
 	 */
 	public JPatchMaterial() {
-		strName = "New Material";
+		strName = "New Material #" + num++;
 	}
 
 	/**

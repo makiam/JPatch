@@ -1,6 +1,9 @@
 package jpatch.control.importer;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.vecmath.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
@@ -19,8 +22,9 @@ public class AnimationImporter extends DefaultHandler {
 	private static final int POINT3D_CURVE = 4;
 	private static final int COLOR3F_CURVE = 5;
 	private static final int QUAT4F_CURVE = 6;
-	private static final int CAMERA =7;
-	private static final int LIGHT = 8;
+	private static final int OBJECT_CURVE = 7;
+	private static final int CAMERA =8;
+	private static final int LIGHT = 9;
 	
 	private int iState = IDLE, iPrevState = IDLE;
 	private StringBuffer sbChars;
@@ -31,12 +35,16 @@ public class AnimationImporter extends DefaultHandler {
 	private MotionCurveSet motionCurveSet;
 	private String strRendererFormat;
 	
+	private Map<Integer, ControlPoint> cpIdMap = new HashMap<Integer, ControlPoint>();
+	private Map<String, Bone> boneNameMap = new HashMap<String, Bone>();
+	
 	private Animation animation;
 	
 	public void loadAnimation(String filename) {
 		MainFrame.getInstance().newAnimation();
 		animation = MainFrame.getInstance().getAnimation();
 		animation.removeCamera(animation.getCameras().get(0));
+		animation.removeLight(animation.getLights().get(0));
 		XMLReader xmlReader = null;
 		try {
 			xmlReader = XMLReaderFactory.createXMLReader();
@@ -60,9 +68,10 @@ public class AnimationImporter extends DefaultHandler {
 	}
 	
 	public void startElement(String namespaceURI, String localName, String qName, Attributes attributes) {
+		System.out.println(localName + " " + iState);
 		switch(iState) {
 			case IDLE: {
-				if (localName.equals("choreography")) {
+				if (localName.equals("choreography") || localName.equals("sequence")) {
 					iState = CHOREOGRAPHY;
 				}
 			}
@@ -126,7 +135,8 @@ public class AnimationImporter extends DefaultHandler {
 			case FLOAT_CURVE:
 			case POINT3D_CURVE:
 			case QUAT4F_CURVE:
-			case COLOR3F_CURVE: {
+			case COLOR3F_CURVE:
+			case OBJECT_CURVE: {
 				if (localName.equals("key")) parseKey(attributes);
 			}
 			break;
@@ -154,16 +164,19 @@ public class AnimationImporter extends DefaultHandler {
 				else if (localName.equals("filename")) {
 					animModelFilename = sbChars.toString();
 					Model model = new Model();
-					(new JPatchImport()).importModel(model, Settings.getInstance().export.modelDirectory.getPath() + File.separatorChar + animModelFilename);
+					JPatchImport jpatchImport = new JPatchImport();
+					jpatchImport.importModel(model, Settings.getInstance().export.modelDirectory.getPath() + File.separatorChar + animModelFilename);
 					((AnimModel) animObject).setModel(model);
 					model.setAnimModel((AnimModel) animObject);
 					((AnimModel) animObject).setFilename(animModelFilename);
+					cpIdMap = jpatchImport.getCpIdMap();
+					boneNameMap = jpatchImport.getBoneNameMap();
 //					motionCurveSet = new MotionCurveSet.Model((AnimModel) animObject);
 					motionCurveSet = MotionCurveSet.createMotionCurveSetFor(animObject);
 				}
 				else if (localName.equals("model")) {
 					iState = CHOREOGRAPHY;
-//					motionCurveSet.populateList();
+					motionCurveSet.populateList();
 					animation.addModel((AnimModel) animObject, motionCurveSet);
 					animObject = null;
 				}
@@ -197,7 +210,8 @@ public class AnimationImporter extends DefaultHandler {
 			case FLOAT_CURVE:
 			case POINT3D_CURVE:
 			case QUAT4F_CURVE:
-			case COLOR3F_CURVE: {
+			case COLOR3F_CURVE:
+			case OBJECT_CURVE: {
 				if (localName.equals("motioncurve")) iState = iPrevState;
 			}
 			break;
@@ -245,6 +259,10 @@ public class AnimationImporter extends DefaultHandler {
 					motionCurve = MotionCurve.createColorCurve();
 					((MotionCurveSet.Light) motionCurveSet).color = (MotionCurve.Color3f) motionCurve;
 					iState = COLOR3F_CURVE;
+				} else if (value.equals("anchor")) {
+					motionCurve = MotionCurve.createAnchorCurve();
+					((MotionCurveSet.Model) motionCurveSet).anchor = (MotionCurve.Object) motionCurve;
+					iState = OBJECT_CURVE;
 				}
 			} else if (localName.equals("subtype")) {
 				if (type == ORIENTATION) {
@@ -260,7 +278,7 @@ public class AnimationImporter extends DefaultHandler {
 						iState = FLOAT_CURVE;
 					}
 				}
-			} else if (type == AVAR && localName.equals("id")) {
+			} else if (type == AVAR &&(localName.equals("id") || localName.equals("name"))) {
 				//FIXME
 				System.out.println("motionCurveSet = " + motionCurveSet);
 				Morph morph = ((MotionCurveSet.Model) motionCurveSet).getMorphById(value);
@@ -294,14 +312,26 @@ public class AnimationImporter extends DefaultHandler {
 	private void parseKey(Attributes attributes) {
 		float frame = 0;
 		double x = 0, y = 0, z = 0, w = 0;
+		Object o = null;
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);
-			if (localName.equals("frame")) frame = Float.parseFloat(value);
-			else if (localName.equals("value") || localName.equals("x") || localName.equals("r")) x = Double.parseDouble(value);
-			else if (localName.equals("y") || localName.equals("g")) y = Double.parseDouble(value);
-			else if (localName.equals("z") || localName.equals("b")) z = Double.parseDouble(value);
-			else if (localName.equals("w")) w = Double.parseDouble(value);
+			if (localName.equals("frame"))
+				frame = Float.parseFloat(value);
+			else if (localName.equals("value") || localName.equals("x") || localName.equals("r"))
+				x = Double.parseDouble(value);
+			else if (localName.equals("y") || localName.equals("g"))
+				y = Double.parseDouble(value);
+			else if (localName.equals("z") || localName.equals("b"))
+				z = Double.parseDouble(value);
+			else if (localName.equals("w"))
+				w = Double.parseDouble(value);
+			else if (localName.equals("null"))
+				o = null;
+			else if (localName.equals("cp"))
+				o = cpIdMap.get(Integer.valueOf(value));
+			else if (localName.equals("bone"))
+				o = ((Bone) boneNameMap.get(value)).getBoneEnd();
 		}
 		switch (iState) {
 			case FLOAT_CURVE: {
@@ -323,6 +353,10 @@ public class AnimationImporter extends DefaultHandler {
 				motionCurve.addKey(new MotionKey.Color3f(frame, new Color3f((float) x, (float) y, (float) z)));
 			}
 			break;
+			
+			case OBJECT_CURVE:
+				motionCurve.addKey(new MotionKey.Object(frame, o));
+				break;
 			default: throw new IllegalStateException();
 		}
 	}

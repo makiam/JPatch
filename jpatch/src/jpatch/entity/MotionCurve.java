@@ -204,7 +204,7 @@ public abstract class MotionCurve {
 	public void xml(StringBuffer sb, String prefix, String type) {
 //		StringBuffer indent = XMLutils.indent(tab);
 //		StringBuffer indent2 = XMLutils.indent(tab + 1);
-		sb.append(prefix).append("<motioncurve " + type + " interpolation=\"" + interpolationMethod + "\">\n");
+		sb.append(prefix).append("<motioncurve " + type + " interpolation=\"" + getInterpolationMethod().toString().toLowerCase() + "\">\n");
 		for (MotionKey key : list)
 			sb.append(prefix).append("\t").append(key.toXmlString()).append("\n");
 		sb.append(prefix).append("</motioncurve>").append("\n");
@@ -640,6 +640,11 @@ public abstract class MotionCurve {
 			if (!(getKeyAt(position) != null))
 				setObjectAt(position, getObjectAt(position));
 			return getKeyAt(position);
+		}
+		
+		@Override
+		public InterpolationMethod getInterpolationMethod() {
+			return InterpolationMethod.DISCRETE;
 		}
 	}
 }

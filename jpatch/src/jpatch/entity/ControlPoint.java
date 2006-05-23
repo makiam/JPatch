@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.26 2006/05/22 22:05:53 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.27 2006/05/23 13:18:48 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -38,7 +38,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.26 $
+ * @version    $Revision: 1.27 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -2257,9 +2257,9 @@ public class ControlPoint implements Comparable, Transformable {
 			//
 			//fixPosition();
 			//
-			sb.append(" x=").append(p3ReferencePosition.x).append("\"");
-			sb.append(" y=").append(p3ReferencePosition.y).append("\"");
-			sb.append(" z=").append(p3ReferencePosition.z).append("\"");
+			sb.append(" x=\"").append(p3ReferencePosition.x).append("\"");
+			sb.append(" y=\"").append(p3ReferencePosition.y).append("\"");
+			sb.append(" z=\"").append(p3ReferencePosition.z).append("\"");
 			//if (cpChildHook != null) {
 			//	int chook = ((Integer)mapCp.get(cpChildHook)).intValue();
 			//	sb.append(" chook=").append(XMLutils.quote(chook));

@@ -141,11 +141,8 @@ public class MotionCurveSet {
 			System.out.println("Model:");
 			animModel.getModel().dump();
 			float pos = 0; // FIXME;
-			super.populateList();
 			scale = MotionCurve.createScaleCurve(new MotionKey.Float(pos, animModel.getScale()));
 			anchor = MotionCurve.createAnchorCurve(new MotionKey.Object(pos, null));
-			motionCurveList.add(scale);
-			motionCurveList.add(anchor);
 			for (Iterator it = animModel.getModel().getMorphList().iterator(); it.hasNext(); ) {
 				Morph morph = (Morph) it.next();
 				MotionCurve.Float morphCurve = MotionCurve.createMorphCurve(morph, new MotionKey.Float(pos, morph.getValue()));
@@ -162,6 +159,7 @@ public class MotionCurveSet {
 					recursiveAddBoneDofs(bone, map, pos);
 				}
 			}
+			populateList();
 			System.out.println(motionCurveList);
 			//populateList();
 			System.out.println("new motioncurveset for " + animModel + " created. map = " + map);
@@ -207,7 +205,7 @@ public class MotionCurveSet {
 		public void xml(StringBuffer sb, String prefix) {
 			super.xml(sb, prefix);
 			scale.xml(sb, prefix, "type=\"scale\" subtype=\"uniform\"");
-			anchor.xml(sb, prefix, "anchor");
+			anchor.xml(sb, prefix, "type=\"anchor\"");
 			int m = 0;
 //			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
 //				((MotionCurve2.Float) map.get(it.next())).xml(sb, prefix, "type=\"morph\" morph=\"" + m++ + "\"");
@@ -215,25 +213,26 @@ public class MotionCurveSet {
 			for (Iterator it = map.keySet().iterator(); it.hasNext(); ) {
 				Object key = it.next();
 				MotionCurve.Float mc = (MotionCurve.Float) map.get(key);
-				mc.xml(sb, prefix, "type=\"avar\" id=\"" + mc.getName() + "\"");
+				mc.xml(sb, prefix, "type=\"avar\" name=\"" + mc.getName() + "\"");
 			}
 		}
 		
 		public void populateList() {
 			super.populateList();
+			motionCurveList.add(anchor);
 			motionCurveList.add(scale);
-			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
-				Morph morph = (Morph) it.next();
-				System.out.println("populateList morph=" + morph);
-				motionCurveList.add(map.get(morph));
-			}
-			for (Iterator itBone = ((AnimModel) animObject).getModel().getBoneSet().iterator(); itBone.hasNext(); ) {
-				for (Iterator itDof = ((Bone) itBone.next()).getDofs().iterator(); itDof.hasNext(); ) {
-					RotationDof dof = (RotationDof) itDof.next();
-					System.out.println("populateList dof=" + dof);
-					motionCurveList.add(map.get(dof));
-				}
-			}
+//			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
+//				Morph morph = (Morph) it.next();
+//				System.out.println("populateList morph=" + morph);
+//				motionCurveList.add(map.get(morph));
+//			}
+//			for (Iterator itBone = ((AnimModel) animObject).getModel().getBoneSet().iterator(); itBone.hasNext(); ) {
+//				for (Iterator itDof = ((Bone) itBone.next()).getDofs().iterator(); itDof.hasNext(); ) {
+//					RotationDof dof = (RotationDof) itDof.next();
+//					System.out.println("populateList dof=" + dof);
+//					motionCurveList.add(map.get(dof));
+//				}
+//			}
 		}
 		
 		public String toString() {

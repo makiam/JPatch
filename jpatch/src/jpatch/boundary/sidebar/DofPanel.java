@@ -147,7 +147,15 @@ implements ChangeListener, ActionListener, Morph.MorphListener {
 	
 	public void stateChanged(ChangeEvent changeEvent) {
 		if (changeEvent.getSource() == inputName) {
-			dof.setName(inputName.getStringValue());
+			String newName = inputName.getStringValue();
+			for (RotationDof d : dof.getBone().getDofs()) {
+				if (d != dof && d.getName().equals(newName)) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "DOF names must be unique within each bone");
+					inputName.setText(dof.getName());
+					return;
+				}
+			}
+			dof.setName(newName);
 			((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodeChanged(dof);
 		} else if (changeEvent.getSource() == inputMin) {
 			dof.setMin(inputMin.getFloatValue());

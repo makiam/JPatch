@@ -461,7 +461,8 @@ public class Selection extends JPatchTreeLeaf {
 		StringBuffer sb = new StringBuffer();
 		StringBuffer cpList = new StringBuffer();
 		StringBuffer cpWeightList = new StringBuffer();
-		sb.append(prefix).append("<selection name=\"" + strName + "\">\n");
+		sb.append(prefix).append("<selection>\n");
+		sb.append(prefix).append("\t<name>").append(strName).append("</name>\n");
 		//int size = getType();
 		//int p = 0;
 		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext();) {

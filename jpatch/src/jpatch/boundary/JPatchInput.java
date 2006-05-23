@@ -88,6 +88,10 @@ implements ActionListener, FocusListener {
 		//numberFormat.getDecimalFormatSymbols().setDecimalSeparator('.');
 	}
 
+	public void setText(String text) {
+		textField.setText(text);
+	}
+	
 	public static void setDimensions(int label, int text, int height) {
 		LABEL = label;
 		TEXT = text;
