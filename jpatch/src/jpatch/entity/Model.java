@@ -1259,6 +1259,8 @@ public class Model implements MutableTreeNode {
 		}
 
 		public TreeNode getParent() {
+			if (animModel != null)
+				return animModel;
 			return Model.this;
 		}
 

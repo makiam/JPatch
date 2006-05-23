@@ -1,6 +1,8 @@
 package jpatch.entity;
 
 import java.awt.Polygon;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.util.Enumeration;
 import java.util.Iterator;
 
@@ -205,13 +207,35 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 	
 	public abstract Model getModel();
 	
-	public boolean isHit(int x, int y, Matrix4f m4View) {
+	public boolean isHit(int x, int y, Matrix4f m4View, Bone[] hitBone) {
 		Matrix4f mt = new Matrix4f(m4ScaledTransform);
 		Matrix4f m = new Matrix4f(m4View);
 		m.mul(mt);
 //		m.invert();
 		Point3f p3Hit = new Point3f(x, y, 0);
+		Point2D.Float p2Hit = new Point2D.Float(x, y);
 		Point3f p3 = new Point3f();
+		float minDist = 64;
+		Line2D.Float line = new Line2D.Float();
+		hitBone[0] = null;
+		for (Bone bone : getModel().getBoneSet()) {
+			bone.getStart(p3);
+			m.transform(p3);
+			line.x1 = p3.x;
+			line.y1 = p3.y;
+			bone.getEnd(p3);
+			m.transform(p3);
+			line.x2 = p3.x;
+			line.y2 = p3.y;
+			float dist = (float) line.ptSegDistSq(p2Hit);
+			if (dist < minDist) {
+				minDist = dist;
+				hitBone[0] = bone;
+			}
+		}
+		if (hitBone[0] != null) {
+			return true;
+		}
 		for (Iterator it = getModel().getCurveSet().iterator(); it.hasNext(); ) {
 			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				if (!cp.isHead())
@@ -219,15 +243,14 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 				p3.set(cp.getPosition());
 				m.transform(p3);
 				p3.z = 0;
-				if (p3.distanceSquared(p3Hit) < 64) {
-//					if (this instanceof AnimModel) {
-//						((AnimModel) this).setAnchor(cp);
-//					}
+				float dist = p3.distanceSquared(p3Hit);
+				if (dist < minDist) {
 					return true;
 				}
 			}
 		}
-		return false;		
+		
+		return false;
 	}
 	
 	public abstract void xml(StringBuffer sb, String prefix);
