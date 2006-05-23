@@ -71,7 +71,7 @@ implements ChangeListener {
 				MainFrame.getInstance().getTimelineEditor().repaint();
 			}
 		} else if (changeEvent.getSource() == inputEnd) {
-			anim.setStart(inputEnd.getIntValue());
+			anim.setEnd(inputEnd.getIntValue());
 			if (anim.getPosition() > anim.getEnd())
 				anim.setPosition(anim.getEnd());
 			else {

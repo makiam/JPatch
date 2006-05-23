@@ -217,7 +217,10 @@ implements ModelImporter {
 				} else if (localName.equals("refraction")) {
 					parseMaterialRefraction(attributes,material.getMaterialProperties());
 				} else if (localName.equals("renderer")) {
-					parseMaterialRenderer(attributes, strRendererFormat, strRendererVersion);
+					String[] renderFormat = new String[2];
+					parseMaterialRenderer(attributes, renderFormat);
+					strRendererFormat = renderFormat[0];
+					strRendererVersion = renderFormat[1];
 //					charReader = new RenderStringCharReader(format.toString(),version.toString());
 					sbChars.setLength(0);
 				}
@@ -892,14 +895,14 @@ implements ModelImporter {
 		}
 	}
 	
-	private void parseMaterialRenderer(Attributes attributes, String format, String version) {
+	private void parseMaterialRenderer(Attributes attributes, String[] formatVersion) {
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);
 			if (localName.equals("format"))
-				format = value;
+				formatVersion[0] = value;
 			else if (localName.equals("version"))
-				version = value;
+				formatVersion[1] = value;
 		}
 	}
 	
