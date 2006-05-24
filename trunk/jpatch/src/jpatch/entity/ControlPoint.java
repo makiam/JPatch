@@ -25,7 +25,6 @@ package jpatch.entity;
 import java.util.*;
 import javax.vecmath.*;
 
-import sun.misc.FpUtils;
 import jpatch.auxilary.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.*;
