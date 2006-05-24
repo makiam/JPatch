@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.27 2006/05/23 13:18:48 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.28 2006/05/24 20:08:14 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -25,7 +25,6 @@ package jpatch.entity;
 import java.util.*;
 import javax.vecmath.*;
 
-import sun.misc.FpUtils;
 import jpatch.auxilary.*;
 import jpatch.control.edit.*;
 import jpatch.boundary.*;
@@ -38,7 +37,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.27 $
+ * @version    $Revision: 1.28 $
  */
 
 public class ControlPoint implements Comparable, Transformable {

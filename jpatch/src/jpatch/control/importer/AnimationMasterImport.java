@@ -313,7 +313,7 @@ public class AnimationMasterImport implements ModelImporter {
 			model.addSelection(selection);
 			JPatchMaterial material = (JPatchMaterial) mapGroupMaterials.get(new Integer(group + 1));
 			if (material != null) {
-				for (Iterator it = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {
+				for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
 					Patch patch = (Patch) it.next();
 					if (patch.isSelected(selection))
 						patch.setMaterial(material);
