@@ -865,7 +865,8 @@ public final class MainFrame extends JFrame {
 	public void selectTreeNode(TreeNode treeNode) {
 		TreePath treePath = new TreePath(getTreeModel().getPathToRoot(treeNode));
 		tree.setSelectionPath(treePath);
-		tree.makeVisible(treePath);
+		MainFrame.getInstance().requestFocusInWindow();
+//		tree.makeVisible(treePath);
 	}
 	
 	public MutableTreeNode getRootTreenode() {

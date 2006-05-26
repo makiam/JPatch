@@ -12,7 +12,7 @@ public final class NewSelectionAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static int iNum = 1;
+	
 	//private Model model;
 
 	public NewSelectionAction(Model model) {
@@ -53,13 +53,12 @@ public final class NewSelectionAction extends AbstractAction {
 		if (selection != null) {
 			selection = selection.cloneSelection();
 			if (MainFrame.getInstance().getModel().checkSelection(selection)) {
-				selection.setName("new selection #" + iNum++);
-				MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddSelection(selection));
+				MainFrame.getInstance().getUndoManager().addEdit(new AtomicAddSelection(selection), true);
 			}
-			MainFrame.getInstance().getSideBar().enableTreeSelectionListener(false);
+//			MainFrame.getInstance().getSideBar().enableTreeSelectionListener(false);
 			MainFrame.getInstance().selectTreeNode(selection);
 //			MainFrame.getInstance().getTree().setSelectionPath(MainFrame.getInstance().getModel().getSelection(selection).getTreePath());
-			MainFrame.getInstance().getSideBar().enableTreeSelectionListener(true);
+//			MainFrame.getInstance().getSideBar().enableTreeSelectionListener(true);
 		}
 	}
 }

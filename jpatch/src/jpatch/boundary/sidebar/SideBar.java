@@ -218,7 +218,7 @@ implements TreeSelectionListener {
 		} else if (selectedNode instanceof Selection) {
 			replacePanel(new SelectionPanel((Selection) selectedNode));
 			if (!selectedNode.equals(MainFrame.getInstance().getSelection())) {
-				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(((Selection) selectedNode).cloneSelection()));
+				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(((Selection) selectedNode).cloneSelection(true)));
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
 		} else if (!anim && selectedNode == MainFrame.getInstance().getModel().getTreenodeBones()) {

@@ -262,6 +262,7 @@ public class ControlPoint implements Comparable, Transformable {
 
 	public static void setNextId(int nextId) {
 		ControlPoint.nextId = nextId;
+		System.out.println("ControlPoint.setNextId(" + nextId + ")");
 	}
 	
 	public void setId(int id) {
