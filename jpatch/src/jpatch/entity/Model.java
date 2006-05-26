@@ -52,6 +52,10 @@ public class Model implements MutableTreeNode {
 //	private Map<Bone, Integer> boneIdMap = new HashMap<Bone, Integer>();
 //	private Map<Object, Integer> objectIdMap = new HashMap<Object, Integer>();
 	
+	private Set<String> boneNameSet = new HashSet<String>();
+	private Set<String> materialNameSet = new HashSet<String>();
+	private Set<String> selectionNameSet = new HashSet<String>();
+	private Set<String> morphNameSet = new HashSet<String>();
 	//private ArrayList listeners = new ArrayList();
 	
 	public Model() {
@@ -63,6 +67,8 @@ public class Model implements MutableTreeNode {
 		JPatchMaterial material = new JPatchMaterial(new Color3f(1,1,1));
 		material.setName("Default Material");
 		listMaterials.add(material);
+		materialNameSet.add(material.getName());
+		JPatchMaterial.setNextNumber(1);
 //		treenodeMaterials.insert(material, 0);
 		
 //		addBone(new Bone(this, new Point3f(0, 0, 0), new Vector3f(1, 0, 0)));
@@ -174,7 +180,7 @@ public class Model implements MutableTreeNode {
 		int n = 0;
 		for (Iterator it = listMaterials.iterator(); it.hasNext();) {
 			JPatchMaterial mat = (JPatchMaterial) it.next();
-			mat.setXmlNumber(n++);
+//			mat.setXmlNumber(n++);
 			sb.append(mat.xml(prefix2));
 		}
 		
@@ -290,6 +296,15 @@ public class Model implements MutableTreeNode {
 		}
 		return false;
 		*/
+		System.out.println(material.getName() + " " + materialNameSet);
+		int n = 1;
+		String name = material.getName();
+		String name1 = name;
+		while (materialNameSet.contains(name1))
+			name1 = name + "(" + n++ + ")";
+		material.setName(name1);
+		materialNameSet.add(name1);
+		
 		MainFrame.getInstance().getTreeModel().insertNodeInto(material, treenodeMaterials, treenodeMaterials.getChildCount());
 //		MainFrame.getInstance().getTreeModel().nodeStructureChanged(treenodeMaterials);
 //		treenodeMaterials.insert(material, 0);
@@ -337,12 +352,20 @@ public class Model implements MutableTreeNode {
 		//	return false;
 		//}
 		if (MainFrame.getInstance().getModel() != null)
-			MainFrame.getInstance().getTreeModel().insertNodeInto(selection, treenodeSelections, treenodeSelections.getChildCount());
+			addSelection(treenodeSelections.getChildCount(), selection);
 	}
 
 	public void addSelection(int index, Selection selection) {
 //			treenodeSelections.insert(selection, index);
 //			lstSelections.add(index, selection);
+		int n = 1;
+		String name = selection.getName();
+		String name1 = name;
+		while (selectionNameSet.contains(name1))
+			name1 = name + "(" + n++ + ")";
+		selection.setName(name1);
+		selectionNameSet.add(name1);
+		
 		MainFrame.getInstance().getTreeModel().insertNodeInto(selection, treenodeSelections, index);
 	}
 	
@@ -367,6 +390,13 @@ public class Model implements MutableTreeNode {
 	public void addExpression(Morph morph) {
 //		treenodeExpressions.insert(morph, 0);
 //		lstMorphs.add(morph);
+		int n = 1;
+		String name = morph.getName();
+		String name1 = name;
+		while (morphNameSet.contains(name1))
+			name1 = name + "(" + n++ + ")";
+		morph.setName(name1);
+		morphNameSet.add(name1);
 		MainFrame.getInstance().getTreeModel().insertNodeInto(morph, treenodeMorphs, treenodeMorphs.getChildCount());
 	}
 	
@@ -453,7 +483,44 @@ public class Model implements MutableTreeNode {
 //		return lstBoneShapes;
 //	}
 	
+	public String renameBone(Bone bone, String name) {
+		if (boneNameSet.contains(name))
+			return bone.getName();
+		boneNameSet.remove(bone.getName());
+		boneNameSet.add(name);
+		bone.setName(name);
+		return name;
+	}
+	
+	public String renameExpression(Morph morph, String name) {
+		if (morphNameSet.contains(name))
+			return morph.getName();
+		morphNameSet.remove(morph.getName());
+		morphNameSet.add(name);
+		morph.setName(name);
+		return name;
+	}
+	
+	public String renameMaterial(JPatchMaterial material, String name) {
+		if (materialNameSet.contains(name))
+			return material.getName();
+		materialNameSet.remove(material.getName());
+		materialNameSet.add(name);
+		material.setName(name);
+		return name;
+	}
+	
+	public String renameSelection(Selection selection, String name) {
+		if (selectionNameSet.contains(name))
+			return selection.getName();
+		selectionNameSet.remove(selection.getName());
+		selectionNameSet.add(name);
+		selection.setName(name);
+		return name;
+	}
+	
 	public void removeSelection(Selection selection) {
+		selectionNameSet.remove(selection.getName());
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(selection);
 	}
 	
@@ -471,10 +538,12 @@ public class Model implements MutableTreeNode {
 	}
 	
 	public void removeMaterial(JPatchMaterial material) {
+		materialNameSet.remove(material.getName());
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(material);
 	}
 	
 	public void removeExpression(Morph morph) {
+		morphNameSet.remove(morph.getName());
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(morph);
 	}
 	
@@ -507,7 +576,14 @@ public class Model implements MutableTreeNode {
 		setCurves.remove(start);
 	}
 
-	public void addBone(Bone bone) {
+	public String addBone(Bone bone) {
+		int n = 1;
+		String name = bone.getName();
+		String name1 = name;
+		while (boneNameSet.contains(name1))
+			name1 = name + "(" + n++ + ")";
+		bone.setName(name1);
+		boneNameSet.add(name1);
 		setBones.add(bone);
 //		System.out.println("addBone() called");
 //		System.out.println("parent = " + bone.getParent());
@@ -521,14 +597,17 @@ public class Model implements MutableTreeNode {
 //		if (bone.getParentBone() == null)
 //			treenodeBones.add(bone);
 		setPose();
+		return name1;
 	}
 
 	public void removeBone(Bone bone) {
 //		System.out.println("remove bone from " + bone.getParent());
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(bone);
 		setBones.remove(bone);
+		boneNameSet.remove(bone.getName());
 		setPose();
 	}
+	
 	
 //	public void addDof(RotationDof dof) {
 //		dof.getBone().addDof(dof);

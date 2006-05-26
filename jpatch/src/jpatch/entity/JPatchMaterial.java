@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchMaterial.java,v 1.6 2006/05/23 13:18:48 sascha_l Exp $
+ * $Id: JPatchMaterial.java,v 1.7 2006/05/26 15:09:20 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -23,6 +23,8 @@
 package jpatch.entity;
 
 import java.util.*;
+import java.util.regex.*;
+
 import javax.vecmath.*;
 import jpatch.boundary.*;
 import jpatch.auxilary.*;
@@ -57,7 +59,7 @@ import jpatch.auxilary.*;
  * </table>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.6 $
+ * @version    $Revision: 1.7 $
  * @see		jpatch.entity.MaterialProperties
  */
 
@@ -73,14 +75,24 @@ public class JPatchMaterial extends JPatchTreeLeaf {
 	private int iXmlNumber;
 	
 	private static int num = 1;
+	private static final Pattern pattern = Pattern.compile("New material #(\\d+)");
+	
+	public static void setNextNumber(int n) {
+		num = n;
+	}
 	
 	/**
 	 * Default Constructor
 	 */
 	public JPatchMaterial() {
-		strName = "New Material #" + num++;
+		this(false);
 	}
 
+	public JPatchMaterial(boolean noAutoName) {
+		if (!noAutoName)
+			strName = "New material #" + num++;
+	}
+	
 	/**
 	 * Constructor
 	 *
@@ -93,6 +105,17 @@ public class JPatchMaterial extends JPatchTreeLeaf {
 		materialProperties.blue = color.z;
 	}
 
+	@Override
+	public void setName(String name) {
+		super.setName(name);
+		Matcher matcher = pattern.matcher(name);
+		System.out.println(name + " " + matcher.matches());
+		if (matcher.matches()) {
+			int n = Integer.parseInt(matcher.group(1)) + 1;
+			if (n > num)
+				num = n;
+		}
+	}
 	
 	/**
 	 * sets the color of the material
@@ -105,13 +128,13 @@ public class JPatchMaterial extends JPatchTreeLeaf {
 		materialProperties.blue = color.z;
 	}
 
-	public void setXmlNumber(int n) {
-		iXmlNumber = n;
-	}
-	
-	public int getXmlNumber() {
-		return iXmlNumber;
-	}
+//	public void setXmlNumber(int n) {
+//		iXmlNumber = n;
+//	}
+//	
+//	public int getXmlNumber() {
+//		return iXmlNumber;
+//	}
 	
 	public void setRenderString(String format, String version, String renderString) {
 		re.setRenderString(format, version, renderString);

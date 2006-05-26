@@ -28,12 +28,14 @@ implements ChangeListener {
 		detailPanel.add(inputName);
 		detailPanel.repaint();
 		inputName.addChangeListener(this);
-		
+		MainFrame.getInstance().requestFocus();
 		
 	}
 	
 	public void stateChanged(ChangeEvent changeEvent) {
-		selection.setName(inputName.getStringValue());
+		String newName = inputName.getStringValue();
+		MainFrame.getInstance().getModel().renameSelection(selection, newName);
+		inputName.setText(selection.getName());
 		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodeChanged(selection);
 		MainFrame.getInstance().requestFocus();
 	}

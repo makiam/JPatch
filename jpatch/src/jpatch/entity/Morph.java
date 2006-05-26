@@ -1,6 +1,8 @@
 package jpatch.entity;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.event.*;
 import javax.swing.tree.*;
@@ -21,8 +23,16 @@ public class Morph implements MutableTreeNode {
 	Morph() { }
 	EventListenerList eventListeners = new EventListenerList();
 	
-	public Morph(String name, Model model) {
-		strName = name;
+	private static final Pattern pattern = Pattern.compile("New morph #(\\d+)");
+	private static int num = 1;
+	
+	public Morph(Model model) {
+		this (model, false);
+	}
+			
+	public Morph(Model model, boolean noAutoName) {
+		if (!noAutoName)
+			strName = "New morph #" + num++;
 		this.model = model;
 //		System.out.println("new Modph(" + name + ", " + model + ")");
 	}
@@ -45,6 +55,13 @@ public class Morph implements MutableTreeNode {
 	
 	public void setName(String name) {
 		strName = name;
+		Matcher matcher = pattern.matcher(name);
+		System.out.println(name + " " + matcher.matches());
+		if (matcher.matches()) {
+			int n = Integer.parseInt(matcher.group(1)) + 1;
+			if (n > num)
+				num = n;
+		}
 	}
 	
 	public void setMin(float min) {

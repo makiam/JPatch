@@ -80,7 +80,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 					else
 						edit.addEdit(new AtomicAttachControlPoints(cpA.getHead(),cp.getTail()));
 				}
-				Selection selection = new Selection(cpB);
+				Selection selection = new Selection(cpB, true);
 //				MainFrame.getInstance().setSelection(selection);
 				edit.addEdit(new AtomicChangeSelection(selection));
 				MainFrame.getInstance().getJPatchScreen().single_update(compSource);

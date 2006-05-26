@@ -1,6 +1,8 @@
 package jpatch.boundary;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.vecmath.*;
 
@@ -26,9 +28,12 @@ public class Selection extends JPatchTreeLeaf {
 	private float fPivotWeight = 1;
 //	private int iNum = NUM++;
 	private boolean bActive = false;
+	private static int num = 1;
+	
+	private static final Pattern pattern = Pattern.compile("New selection #(\\d+)");
 	
 	public static Selection createRectangularPointSelection(int ax, int ay, int bx, int by, Matrix4f transformationMatrix, Model model, int mask) {
-		Selection selection = new Selection();
+		Selection selection = new Selection(true);
 		Point3f p3 = new Point3f();
 		if ((mask & CONTROLPOINTS) != 0 && MainFrame.getInstance().getJPatchScreen().isSelectPoints()) {
 			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
@@ -70,30 +75,44 @@ public class Selection extends JPatchTreeLeaf {
 		return (selection.mapObjects.size() > 0) ? selection : null;
 	}
 	
-	private Selection() {
-		this("NEW SELECTION");
+	private Selection(boolean noAutoName) {
+		if (!noAutoName) {
+			setName("New selection #" + num++);
+		}
 		m3Orientation = new Matrix3f();
 		m3Orientation.setIdentity();
 	}
 	
-	public Selection(String name) {
-		super(name);
+	public Selection() {
+		this(false);
 	}
 	
 	public Selection(Object object) {
-		this();
+		this(object, false);
+	}
+	
+	public Selection(Object object, boolean noAutoName) {
+		this(noAutoName);
 		mapObjects.put(object, new Float(1.0f));
 		hotObject = object;
 	}
 	
 	public Selection(Map objectWeightMap) {
-		this();
+		this(objectWeightMap, false);
+	}
+
+	public Selection(Collection objects) {
+		this(objects, false);
+	}
+	
+	public Selection(Map objectWeightMap, boolean noAutoName) {
+		this(noAutoName);
 		mapObjects.putAll(objectWeightMap);
 		p3Pivot.set(getCenter());
 	}
 
-	public Selection(Collection objects) {
-		this();
+	public Selection(Collection objects, boolean noAutoName) {
+		this(noAutoName);
 		for (Iterator it = objects.iterator(); it.hasNext(); )
 			mapObjects.put(it.next(), new Float(1.0f));
 		p3Pivot.set(getCenter());
@@ -203,6 +222,16 @@ public class Selection extends JPatchTreeLeaf {
 		bActive = active;
 	}
 	
+	@Override
+	public void setName(String name) {
+		super.setName(name);
+		Matcher matcher = pattern.matcher(name);
+		if (matcher.matches()) {
+			int n = Integer.parseInt(matcher.group(1)) + 1;
+			if (n > num)
+				num = n;
+		}
+	}
 	public void getBounds(Point3f p0, Point3f p1) {
 		if (hotObject instanceof AnimObject) {
 			((AnimObject) hotObject).getBounds(p0, p1);
@@ -410,7 +439,11 @@ public class Selection extends JPatchTreeLeaf {
 	}
 	
 	public Selection cloneSelection() {
-		Selection selection = new Selection(mapObjects);
+		return cloneSelection(false);
+	}
+	
+	public Selection cloneSelection(boolean noAutoName) {
+		Selection selection = new Selection(mapObjects, noAutoName);
 		selection.mapObjects.remove(pivotTransformable);
 		selection.p3Pivot.set(p3Pivot);
 		selection.m3Orientation.set(m3Orientation);

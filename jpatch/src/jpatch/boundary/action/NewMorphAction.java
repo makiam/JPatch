@@ -11,14 +11,12 @@ import jpatch.control.edit.*;
 @SuppressWarnings("serial")
 public final class NewMorphAction extends AbstractAction {
 	
-	private static int iNum = 1;
-	
 	public NewMorphAction() {
 		super("New Morph");
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		Morph morph = new Morph("new morph #" + iNum++, MainFrame.getInstance().getModel());
+		Morph morph = new Morph(MainFrame.getInstance().getModel());
 		morph.addTarget(new MorphTarget(0));
 		MorphTarget target = new MorphTarget(morph.getMax());
 		morph.addTarget(target);

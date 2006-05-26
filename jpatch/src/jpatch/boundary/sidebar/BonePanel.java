@@ -60,14 +60,8 @@ implements ChangeListener {
 	public void stateChanged(ChangeEvent changeEvent) {
 		if (changeEvent.getSource() == inputName) {
 			String newName = inputName.getStringValue();
-			for (Bone b : MainFrame.getInstance().getModel().getBoneSet()) {
-				if (b != bone && b.getName().equals(newName)) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Bone names must be unique");
-					inputName.setText(bone.getName());
-					return;
-				}
-			}
-			bone.setName(newName);
+			MainFrame.getInstance().getModel().renameBone(bone, newName);
+			inputName.setText(bone.getName());
 			((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodeChanged(bone);
 			MainFrame.getInstance().requestFocus();
 		} else if (changeEvent.getSource() == slider) {

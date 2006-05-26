@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.36 2006/05/22 10:48:57 sascha_l Exp $
+ * $Id: TrackView.java,v 1.37 2006/05/26 15:09:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -27,6 +27,9 @@ import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
+import javax.vecmath.Point3d;
+import javax.vecmath.Point3f;
+import javax.vecmath.Vector3d;
 
 import jpatch.control.edit.*;
 import jpatch.entity.*;
@@ -1321,6 +1324,51 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		
 		menu.setEnabled(!(track instanceof HeaderTrack));
 		popup.add(menu);
+		
+		mi = new JMenuItem("revalidate anchor positions");
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				AnimModel animModel = (AnimModel) timelineEditor.getAnimObject();
+				MotionCurveSet.Model mcs = (MotionCurveSet.Model) MainFrame.getInstance().getAnimation().getCurvesetFor(animModel);
+				JPatchActionEdit edit = new JPatchActionEdit("revalidate anchor position");
+				MotionKey.Object[] anchorKeys = new MotionKey.Object[mcs.anchor.getKeyCount()];
+				for (int i = 0, n = mcs.anchor.getKeyCount(); i < n; i++) {
+					anchorKeys[i] = (MotionKey.Object) mcs.anchor.getKey(i);
+					if (i == 0)
+						continue;
+					MotionKey positionKey = mcs.position.getKeyAt(anchorKeys[i].getPosition());
+					if (positionKey != null)
+						edit.addEdit(new AtomicDeleteMotionKey(mcs.position, positionKey));
+				}
+				for (int i = 1; i < anchorKeys.length; i++) {
+					edit.addEdit(new AtomicDeleteMotionKey(mcs.anchor, anchorKeys[i]));
+				}
+				for (int i = 1; i < anchorKeys.length; i++) {
+					float frame = anchorKeys[i].getPosition();
+					Transformable oldAnchor = (Transformable) anchorKeys[i - 1].getObject();
+					Transformable newAnchor = (Transformable) anchorKeys[i].getObject();
+					MainFrame.getInstance().getAnimation().setPosition(frame);
+					
+					Point3f p0 = oldAnchor == null ? new Point3f() : oldAnchor.getPosition();
+					Point3f p1 = (newAnchor == null) ? new Point3f() : newAnchor.getPosition();
+					Vector3d v = new Vector3d(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z);
+					
+					animModel.getTransform().transform(v);
+					Point3d p = animModel.getPositionDouble();
+					p.add(v);
+					edit.addEdit(new AtomicModifyMotionCurve.Object(mcs.anchor, frame, newAnchor));
+					edit.addEdit(new AtomicModifyMotionCurve.Point3d(mcs.position, frame, p));
+				}
+				MainFrame.getInstance().getUndoManager().addEdit(edit);
+				MainFrame.getInstance().getAnimation().setPosition(MainFrame.getInstance().getAnimation().getStart());
+				MainFrame.getInstance().getJPatchScreen().update_all();
+				TrackView.this.repaint();
+			}
+		});
+		
+		mi.setEnabled(timelineEditor.getAnimObject() instanceof AnimModel);
+		popup.add(new JSeparator());
+		popup.add(mi);
 		
 		popup.show((Component) e.getSource(), e.getX(), e.getY());
 	}

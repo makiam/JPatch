@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.28 2006/05/24 20:08:14 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.29 2006/05/26 15:09:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -37,7 +37,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.28 $
+ * @version    $Revision: 1.29 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -262,6 +262,7 @@ public class ControlPoint implements Comparable, Transformable {
 
 	public static void setNextId(int nextId) {
 		ControlPoint.nextId = nextId;
+		System.out.println("ControlPoint.setNextId(" + nextId + ")");
 	}
 	
 	public void setId(int id) {

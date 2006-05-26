@@ -1,5 +1,5 @@
 /*
- * $Id: JPatchUndoManager.java,v 1.13 2006/05/22 10:46:19 sascha_l Exp $
+ * $Id: JPatchUndoManager.java,v 1.14 2006/05/26 15:09:20 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -32,7 +32,7 @@ import javax.swing.Action;
  * The JPatchUndoManager stores JPatchUndoableEdits in a list and provides methods to add, redo and undo edits.<br>
  * It keeps track of the position in the position inside the list
  *
- * @version	$Revision: 1.13 $
+ * @version	$Revision: 1.14 $
  * @author	Sascha Ledinsky
  */
 public class JPatchUndoManager {
@@ -53,6 +53,8 @@ public class JPatchUndoManager {
 	private int iStop = 0;
 	
 	private List listListeners = new ArrayList();
+	
+	private boolean inProgress = false;
 	
 	/**
 	 * Constructor
@@ -99,6 +101,18 @@ public class JPatchUndoManager {
 	 * @param edit The edit to add
 	 */
 	public void addEdit(JPatchRootEdit edit, boolean open) {
+		if (inProgress) {
+			System.out.println("WARNING: attempting to add an edit while undo/redo is in progress");
+			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+	        for (int i=0; i < trace.length; i++)
+	            System.out.println("\tat " + trace[i]);
+			return;
+		}
+//		StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+//        for (int i=0; i < trace.length; i++)
+//            System.out.println("\tat " + trace[i]);
+        
+		System.out.println("undoManager adding " + edit.getName() + " open = " + open);
 //		System.out.println(edit.sizeOf() + "\t" + edit.getClass().getName() + "\t" + edit.getName());
 //		System.out.println(Runtime.getRuntime().freeMemory());
 		if (bOpen) {
@@ -111,6 +125,7 @@ public class JPatchUndoManager {
 	}
 
 	private void add(JPatchRootEdit edit) {
+		System.out.println("add");
 		if (bEnabled) {
 			if (iPos == listEdits.size()) {			// check if we are at the end of the list
 				listEdits.add(edit);
@@ -152,13 +167,25 @@ public class JPatchUndoManager {
 	}
 	
 	public void appendEdit(JPatchRootEdit edit, boolean open) {
+		if (inProgress) {
+			System.out.println("WARNING: attempting to append an edit while undo/redo is in progress");
+			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+	        for (int i=0; i < trace.length; i++)
+	            System.out.println("\tat " + trace[i]);
+			return;
+		}
+		System.out.println("undomanager append " + edit.getName() + " open = " + open);
 		bOpen = open;
 		JPatchRootEdit oldEdit = (JPatchRootEdit) listEdits.get(--iPos);
-		listEdits.remove(iPos);
-		JPatchActionEdit newEdit = new JPatchActionEdit(edit.getName());
-		newEdit.addEdit(oldEdit);
-		newEdit.addEdit(edit);
-		add(newEdit);
+//		listEdits.remove(iPos);
+		if (oldEdit instanceof JPatchCompoundEdit) {
+			((JPatchCompoundEdit) oldEdit).addEdit(edit);
+		} else {
+			JPatchActionEdit newEdit = new JPatchActionEdit(oldEdit.getName());
+			newEdit.addEdit(oldEdit);
+			newEdit.addEdit(edit);
+			add(newEdit);
+		}
 //		System.out.println("UndoManager.append():");
 //		newEdit.debug("    ");
 	}
@@ -181,8 +208,12 @@ public class JPatchUndoManager {
 	 * undoes an edit
 	 */
 	public void undo() {
+		
 		if (iPos > iStop) {
+			System.out.println("undo " + (iPos - 1) + " " + ((JPatchUndoableEdit)listEdits.get(iPos - 1)));
+			inProgress = true;
 			((JPatchUndoableEdit)listEdits.get(--iPos)).undo();
+			inProgress = false;
 		}
 		bOpen = false;
 		configureActions();
@@ -192,8 +223,11 @@ public class JPatchUndoManager {
 	 * redoes an edit
 	 */
 	public void redo() {
+		System.out.println("redo" + iPos);
 		if (iPos < listEdits.size()) {
+			inProgress = true;
 			((JPatchUndoableEdit)listEdits.get(iPos++)).redo();
+			inProgress = false;
 		}
 		configureActions();
 	}
@@ -308,9 +342,10 @@ public class JPatchUndoManager {
 			if (e < listEdits.size()) {
 				JPatchRootEdit edit = (JPatchRootEdit) listEdits.get(e);
 				//System.out.println(edit.name() + " (" + edit.getClass().getName() + ")");
-				System.out.println(edit.getName());
+				System.out.println(e + " " + edit.getName());
 			} else {
 				System.out.println("open = " + bOpen);
+				System.out.println("pos = " + iPos);
 				return;
 			}
 		}

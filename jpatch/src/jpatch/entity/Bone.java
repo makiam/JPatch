@@ -1,6 +1,8 @@
 package jpatch.entity;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.tree.*;
 import javax.vecmath.*;
@@ -14,7 +16,7 @@ public class Bone implements MutableTreeNode, Transformable {
 //	public static final BoneTransformableType START = new BoneTransformableType();
 //	public static final BoneTransformableType END = new BoneTransformableType();
 //	private static final float DEFAULT_INFLUENCE = 0.33f; 
-	private static int num = 0;
+	private static int num = 1;
 //	private static final Bone[] emptyBoneArray = new Bone[0];
 	private static int col = 0;
 	private static final Color3f[] COLORS = new Color3f[] {
@@ -50,11 +52,18 @@ public class Bone implements MutableTreeNode, Transformable {
 	private String strName;
 	private int iDofAxis = 0;
 	private float fJointRotation = 0;
+	
+	private static final Pattern pattern = Pattern.compile("New bone #(\\d+)");
+	
 //	private int iNum = NUM++;
 //	
 //	private int id;
 	
 	public Bone(Point3f start, Vector3f extent) {
+		this(start, extent, false);
+	}
+	
+	public Bone(Point3f start, Vector3f extent, boolean noAutoName) {
 //		if (nextId < 0)
 //			throw new IllegalStateException();
 //		id = nextId++;
@@ -65,7 +74,8 @@ public class Bone implements MutableTreeNode, Transformable {
 //		v3Extent = extent;
 //		boneStart = new BoneTransformable(START);
 //		boneEnd = new BoneTransformable(END);
-		strName = "new bone #" + num++;
+		if (!noAutoName)
+			strName = "New bone #" + num++;
 		//MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(this, 1), this, 0);
 		//MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(this, 2), this, 1);
 		//MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(this, 4), this, 2);
@@ -97,6 +107,8 @@ public class Bone implements MutableTreeNode, Transformable {
 		return new Color3f(color);
 	}
 
+	
+	
 //	public static void setNextId(int nextId) {
 //		Bone.nextId = nextId;
 //	}
@@ -708,6 +720,12 @@ public class Bone implements MutableTreeNode, Transformable {
 
 	public void setName(String name) {
 		this.strName = name;
+		Matcher matcher = pattern.matcher(name);
+		if (matcher.matches()) {
+			int n = Integer.parseInt(matcher.group(1)) + 1;
+			if (n > num)
+				num = n;
+		}
 	}
 
 	

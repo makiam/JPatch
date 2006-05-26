@@ -90,14 +90,8 @@ implements ChangeListener, Morph.MorphListener {
 		if (changeEvent.getSource() == inputName) {
 			
 			String newName = inputName.getStringValue();
-			for (Morph m : MainFrame.getInstance().getModel().getMorphList()) {
-				if (m != morph && m.getName().equals(newName)) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Morph names must be unique");
-					inputName.setText(morph.getName());
-					return;
-				}
-			}
-			morph.setName(newName);
+			MainFrame.getInstance().getModel().renameExpression(morph, newName);
+			inputName.setText(morph.getName());
 			((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodeChanged(morph);
 		} else if (changeEvent.getSource() == inputMin) {
 			morph.setMin(inputMin.getFloatValue());
