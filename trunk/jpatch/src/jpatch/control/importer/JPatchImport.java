@@ -69,6 +69,7 @@ implements ModelImporter {
 	private String strRendererVersion;
 	private int cpSequence = 0;
 	private int boneSequence = 0;
+	private int cpHighId = -1;
 	
 //	private CharReader charReader = new CharReader();
 	private StringBuffer sbChars = new StringBuffer();
@@ -134,6 +135,7 @@ implements ModelImporter {
 //		model.setCpMap(listCp);
 //		model.setBoneMap(listBones);
 		MainFrame.getInstance().setFilename(file.getName());
+		ControlPoint.setNextId(cpHighId + 1);
 		return "";
 	}
 	
@@ -356,17 +358,19 @@ implements ModelImporter {
 						material = mat;
 					} else {
 						model.addMaterial(material);
+						materialNameMap.put(material.getName(), material);
 					}
 					listMaterials.add(material);
 					iState = MODEL;
 				} else if (localName.equals("name")) {
-					String name = sbChars.toString();
-					String name1 = name;
-					int n = 1;
-					while (materialNameMap.keySet().contains(name1))
-						name1 = name + n++;
-					material.setName(name1);
-					materialNameMap.put(material.getName(), material);
+//					String name = sbChars.toString();
+//					String name1 = name;
+//					int n = 1;
+//					while (materialNameMap.keySet().contains(name1))
+//						name1 = name + n++;
+//					material.setName(name1);
+//					materialNameMap.put(material.getName(), material);
+					material.setName(sbChars.toString());
 				} else if (localName.equals("renderer")) {
 					material.setRenderString(strRendererFormat, strRendererVersion, sbChars.toString());
 				}
@@ -435,7 +439,7 @@ implements ModelImporter {
 //							pointSet.add(listCp.get(aiPoint[i]));
 							pointSet.add(cpIdMap.get(aiPoint[i]));
 						}
-						selection = new Selection(pointSet);
+						selection = new Selection(pointSet, true);
 					} else {
 						HashMap pointMap = new HashMap();
 						for (int i = 0; i < aiList.length; i++) {
@@ -445,7 +449,7 @@ implements ModelImporter {
 							}
 							pointMap.put(cpIdMap.get(aiList[i]), new Float(afList[i]));
 						}
-						selection = new Selection(pointMap);
+						selection = new Selection(pointMap, true);
 					}
 					selection.setName(selectionName);
 					model.addSelection(selection);
@@ -567,7 +571,7 @@ implements ModelImporter {
 	}
 	
 	private Morph createMorph(Attributes attributes) {
-		Morph morph = new Morph("", model);
+		Morph morph = new Morph(model, true);
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);
@@ -666,7 +670,7 @@ implements ModelImporter {
 	}
 				
 	private JPatchMaterial createMaterial(Attributes attributes) {
-		JPatchMaterial material = new JPatchMaterial();
+		JPatchMaterial material = new JPatchMaterial(true);
 		//iMaterialNumber = 0;
 		//for (int index = 0; index < attributes.getLength(); index++) {
 		//	String localName = attributes.getLocalName(index);
@@ -680,7 +684,7 @@ implements ModelImporter {
 	}
 	
 	private Bone createBone(Attributes attributes) {
-		Bone bone = new Bone(new Point3f(), new Vector3f());
+		Bone bone = new Bone(new Point3f(), new Vector3f(), true);
 		for (int index = 0; index < attributes.getLength(); index++) {
 			if (attributes.getLocalName(index).equals("name"))
 				bone.setName(attributes.getValue(index));
@@ -803,6 +807,8 @@ implements ModelImporter {
 		else
 			controlPoint.setId(id);
 		cpIdMap.put(controlPoint.getId(), controlPoint);
+		if (controlPoint.getId() > cpHighId)
+			cpHighId = controlPoint.getId();
 //		System.out.println(id + " " + controlPoint);
 		return controlPoint;
 	}

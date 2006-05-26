@@ -37,14 +37,8 @@ implements ChangeListener {
 	
 	public void stateChanged(ChangeEvent changeEvent) {
 		String newName = inputName.getStringValue();
-		for (JPatchMaterial mat : MainFrame.getInstance().getModel().getMaterialList()) {
-			if (mat != material && mat.getName().equals(newName)) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Material names must be unique");
-				inputName.setText(material.getName());
-				return;
-			}
-		}
-		material.setName(newName);
+		MainFrame.getInstance().getModel().renameMaterial(material, newName);
+		inputName.setText(material.getName());
 		((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodeChanged(material);
 		MainFrame.getInstance().requestFocus();
 	}
