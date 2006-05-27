@@ -1,5 +1,5 @@
 /*
- * $Id: CompoundDelete.java,v 1.12 2006/05/22 10:46:19 sascha_l Exp $
+ * $Id: CompoundDelete.java,v 1.13 2006/05/27 13:46:52 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -85,19 +85,20 @@ public class CompoundDelete extends JPatchCompoundEdit {
 		// drop bones
 		for (Iterator it = boneSet.iterator(); it.hasNext(); ) {
 			Bone bone = (Bone) it.next();
-			for (Iterator jt = (new ArrayList(bone.getChildBones())).iterator(); jt.hasNext(); ) {
-				Bone child = (Bone) jt.next();
-				addEdit(new AtomicDetachBone(child));
-			}
-			addEdit(new AtomicDropBone(bone));
-			addEdit(new AtomicRemoveBoneFromSelections(bone));
-			for (Iterator jt = MainFrame.getInstance().getModel().getCurveSet().iterator(); jt.hasNext(); ) {
-				ControlPoint start = (ControlPoint) jt.next();
-				for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
-					if (cp.getBone() == bone)
-						addEdit(new AtomicChangeControlPoint.Bone(cp, null));
-				}
-			}
+			addEdit(new CompoundDeleteBone(bone));
+//			for (Iterator jt = (new ArrayList(bone.getChildBones())).iterator(); jt.hasNext(); ) {
+//				Bone child = (Bone) jt.next();
+//				addEdit(new AtomicDetachBone(child));
+//			}
+//			addEdit(new AtomicDropBone(bone));
+//			addEdit(new AtomicRemoveBoneFromSelections(bone));
+//			for (Iterator jt = MainFrame.getInstance().getModel().getCurveSet().iterator(); jt.hasNext(); ) {
+//				ControlPoint start = (ControlPoint) jt.next();
+//				for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
+//					if (cp.getBone() == bone)
+//						addEdit(new AtomicChangeControlPoint.Bone(cp, null));
+//				}
+//			}
 		}
 		
 		

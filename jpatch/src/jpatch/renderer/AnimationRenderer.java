@@ -211,6 +211,25 @@ public class AnimationRenderer {
 		MainFrame.getInstance().getTimelineEditor().setCurrentFrame(position);
 		System.out.println("renderFrame " + frameName + " with " + settings.export.rendererToUse);
 		switch (settings.export.rendererToUse) {
+			case PREVIZ: {
+				console.append("Rendering " + frameName + " using Pre-viz renderer.\n");
+				console.append("Working directory is \"" + settings.export.workingDirectory + "\".\n");
+				renderer = new PreVizRenderer(anim.getModels(), anim.getActiveCamera(), anim.getLights());
+				Image image = ((PreVizRenderer) renderer).render();
+				if (image != null) {
+					File imageFile = new File(settings.export.workingDirectory, frameName + ".png");
+					console.append("Done. Saving file \"" + imageFile.getName() + "\".\n");
+					try {
+						ImageIO.write((BufferedImage) image, "png", imageFile);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					progressDisplay.setImage((BufferedImage) image);
+				} else {
+					console.append("Unable to render image.\n");
+				}
+			}
+			break;
 			case INYO: {
 //				console.clearText();
 				console.append("Rendering " + frameName + " using Inyo.\n");

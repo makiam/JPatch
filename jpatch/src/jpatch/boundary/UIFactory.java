@@ -1,5 +1,5 @@
 /*
- * $Id: UIFactory.java,v 1.22 2006/05/22 10:46:19 sascha_l Exp $
+ * $Id: UIFactory.java,v 1.23 2006/05/27 13:46:53 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -91,7 +91,7 @@ public class UIFactory extends DefaultHandler {
 		 */
 		Set<Action> unboundActions = Actions.getInstance().getUnboundActions();
 		if (unboundActions.size() > 0) {
-			InputMap inputMap = MainFrame.getInstance().getJPatchScreen().getInputMap(JComponent.WHEN_FOCUSED);
+			InputMap inputMap = MainFrame.getInstance().getJPatchScreen().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 			ActionMap actionMap = MainFrame.getInstance().getJPatchScreen().getActionMap();
 			for (Action action : unboundActions) {
 				String accelerator = (String) action.getValue(JPatchAction.ACCELERATOR);
