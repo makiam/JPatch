@@ -56,19 +56,25 @@ public class Selection extends JPatchTreeLeaf {
 				if (bone.getParentBone() == null) {
 					bone.getStart(p3);
 					transformationMatrix.transform(p3);
+					System.out.println("start " + p3 + " " + ax + " " + bx + " " + ay + " " + by);
 					if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by) {
 						selection.mapObjects.put(bone.getBoneStart(), 1.0f);
+						System.out.println("start:" + selection.mapObjects);
 						p++;
 					}
 				}
 				bone.getEnd(p3);
 				transformationMatrix.transform(p3);
+				System.out.println("end " + p3 + " " + ax + " " + bx + " " + ay + " " + by);
 				if (p3.x >= ax && p3.x <= bx && p3.y >= ay && p3.y <= by) {
 					selection.mapObjects.put(bone.getBoneEnd(), 1.0f);
+					System.out.println("end:" + selection.mapObjects);
 					p++;
 				}
-				if (p == 2)
+				if (p == 2) {
 					selection.mapObjects.put(bone, 1.0f);
+					System.out.println(selection.mapObjects);
+				}
 			}
 		}
 		selection.p3Pivot.set(selection.getCenter());

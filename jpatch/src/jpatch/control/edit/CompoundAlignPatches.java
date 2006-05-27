@@ -4,8 +4,13 @@ import jpatch.boundary.*;
 import jpatch.entity.*;
 import java.util.*;
 
+/*
+ * FIXME: this is inefficient and slow, and needs to be reworked for the new hook implementation anyway...
+ */
+
 public class CompoundAlignPatches extends JPatchCompoundEdit implements JPatchRootEdit {
 	private Set<Patch> patches;
+	private Set<Patch> removedPatches = new HashSet();
 	
 	public CompoundAlignPatches() {
 		this(MainFrame.getInstance().getModel().getPatchSet());
@@ -13,9 +18,11 @@ public class CompoundAlignPatches extends JPatchCompoundEdit implements JPatchRo
 	
 	public CompoundAlignPatches(Collection<Patch> patches) {
 		this.patches = new HashSet<Patch>(patches);
-		for (Patch patch : new HashSet<Patch>(patches)) {
-			if (patches.contains(patch)) processPatch(patch);
+		for (Patch patch : patches) {
+			if (!removedPatches.contains(patch)) processPatch(patch);
 		}
+		patches = null;
+		removedPatches = null;
 	}
 	
 	public String getName() {
@@ -23,9 +30,9 @@ public class CompoundAlignPatches extends JPatchCompoundEdit implements JPatchRo
 	}
 	
 	private void processPatch(Patch patch) {
-		patches.remove(patch);
-		for (Patch p : new HashSet<Patch>(patches)) {
-			if (patches.contains(p)) {
+		removedPatches.add(patch);
+		for (Patch p : patches) {
+			if (!removedPatches.contains(p)) {
 				int r = comparePatches(patch, p);
 				if (r < 0) {
 					addEdit(new AtomicFlipPatch(p));
@@ -33,8 +40,8 @@ public class CompoundAlignPatches extends JPatchCompoundEdit implements JPatchRo
 				} else if (r > 0) processPatch(p);
 			}
 		}
-		for (Patch p : new HashSet<Patch>(patches)) {
-			if (patches.contains(p)) {
+		for (Patch p : patches) {
+			if (!removedPatches.contains(p)) {
 				int r = comparePatches2(patch, p);
 				if (r < 0) {
 					addEdit(new AtomicFlipPatch(p));

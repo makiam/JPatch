@@ -31,7 +31,7 @@ public class RendererSettings extends AbstractSettings {
 	public Icon getIcon() {
 		return icon;
 	}
-	public static enum Renderer { POVRAY, RENDERMAN, INYO };
+	public static enum Renderer { POVRAY, RENDERMAN, INYO, PREVIZ };
 	
 	public RendererSettings.Renderer rendererToUse = Renderer.INYO;
 	public int imageWidth = 640;
@@ -46,4 +46,5 @@ public class RendererSettings extends AbstractSettings {
 	public final RendermanSettings renderman = new RendermanSettings();
 	public final InyoSettings inyo = new InyoSettings();
 	public final AliasWavefrontSettings aliaswavefront = new AliasWavefrontSettings();
+	public final PreVizSettings previz = new PreVizSettings();
 }

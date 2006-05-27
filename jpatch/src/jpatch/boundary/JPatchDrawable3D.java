@@ -30,7 +30,7 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	
 	private float fFocalLength = 50;
 	private float fW;
-	private float fNearClip = 1;
+	private float fNearClip = 10;
 	private int iPointSize = 3;
 	private int iXoff = 0;
 	private int iYoff = 0;
@@ -56,6 +56,19 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	private Color4f C4ab = new Color4f();
 	private Color4f C4bc = new Color4f();
 	private Color4f C4ca = new Color4f();
+	
+	public JPatchDrawable3D(int width, int height) {
+		iWidth = width;
+		iHeight = height;
+		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		aiColorBuffer = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+		aiDepthBuffer = new int[aiColorBuffer.length];
+		g = image.createGraphics();
+		iWidth = image.getWidth();
+		iHeight = image.getHeight();
+		iXoff = iWidth >> 1;
+		iYoff = iHeight >> 1;
+	}
 	
 	public JPatchDrawable3D(final JPatchDrawableEventListener listener, boolean lightweight) {
 		this.listener = listener;
@@ -104,6 +117,10 @@ public final class JPatchDrawable3D implements JPatchDrawable2 {
 	
 	public String getInfo() {
 		return "JPatch software renderer";
+	}
+	
+	public BufferedImage getImage() {
+		return image;
 	}
 	
 	private void updateImage() {
