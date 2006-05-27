@@ -97,12 +97,13 @@ public class RealtimeLighting {
 		return rtl;
 	}
 	
-	public static RealtimeLighting createAnimLight(AnimLight[] lights) {
+	public static RealtimeLighting createAnimLight(AnimLight[] lights, Matrix4d matrix) {
 		RealtimeLighting rtl = new RealtimeLighting(lights.length);
 		Point3f pos = new Point3f();
 		Color3f color = new Color3f();
 		for (int i = 0; i < lights.length; i++) {
 			pos.set(lights[i].getPositionDouble());
+			matrix.transform(pos);
 			color.set(lights[i].getColor());
 			color.scale(lights[i].getIntensity());
 			rtl.add(rtl.new PointLight(color, true, true, pos, 0, 1));

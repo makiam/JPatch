@@ -171,7 +171,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 		} else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
 			if (bActive == true) {
 				Bone.BoneTransformable bt = viewDef.getClosestBoneEnd(new Point2D.Float(mouseEvent.getX(), mouseEvent.getY()), null, true, false);
-				if (bt != null) {
+				if (bt != null && bt.getBone() != bone) {
 					bone.setEnd(bt.getBone().getStart(null));
 					edit.addEdit(new AtomicAttachBone(bt.getBone(), bone));
 					edit.addEdit(new AtomicChangeSelection(null));
@@ -195,8 +195,14 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 			compSource.removeMouseMotionListener(this);
 			if (MainFrame.getInstance().getSelection() != null)
 				edit.addEdit(new AtomicChangeSelection(null));
+			
+			
 //			edit.addEdit(new AtomicChangeTool(Tools.defaultTool));
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
+			if (bone.getLength() == 0) {
+				MainFrame.getInstance().getUndoManager().undo();
+				MainFrame.getInstance().setSelection(null);
+			}
 			
 //			if (!((JPatchLockingToggleButton) Actions.getInstance().getButton("add curve segment")).isLocked())
 			((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(false);
@@ -211,6 +217,9 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 //			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(true);
 			bActive = false;
 //			MainFrame.getInstance().getDefaultToolTimer().restart();
+			
+			
+			
 		} 
 		/*
 		if (iState == ACTIVE && mouseEvent.getButton() == MouseEvent.BUTTON1) {
