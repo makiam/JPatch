@@ -358,8 +358,8 @@ implements ModelImporter {
 						material = mat;
 					} else {
 						model.addMaterial(material);
-						materialNameMap.put(material.getName(), material);
 					}
+					materialNameMap.put(material.getName(), material);
 					listMaterials.add(material);
 					iState = MODEL;
 				} else if (localName.equals("name")) {
