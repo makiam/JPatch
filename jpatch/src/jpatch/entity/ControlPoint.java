@@ -407,13 +407,13 @@ public class ControlPoint implements Comparable, Transformable {
 	 * @param  hookPos  The hook position (between 0..1)
 	 * @return          The hook. Attach your "target hook" to this ControlPoint.
 	 */
-	public ControlPoint addHook(float hookPos) {
+	public ControlPoint addHook(float hookPos, Model model) {
 		
 		ControlPoint cp;
 		ControlPoint cpHook;
 		if (cpChildHook == null) {
 			cpChildHook = createEmptyHookCurve();
-			MainFrame.getInstance().getModel().addCurve(cpChildHook);
+			model.addCurve(cpChildHook);
 		}
 		cp = cpChildHook;
 		while (cp.cpNext != null && cp.cpNext.fHookPos < hookPos) {
@@ -451,8 +451,8 @@ public class ControlPoint implements Comparable, Transformable {
 	 * Hooks this ControlPoint ControlPoint cpHookTo at hookposition hookPos
 	 * Creates a new hook (for cpHookTo) and attaches this ControlPoint to the resulting hook
 	 */
-	public void hookTo(ControlPoint cpHookTo, float hookPos) {
-		attachTo(cpHookTo.addHook(hookPos));
+	public void hookTo(ControlPoint cpHookTo, float hookPos, Model model) {
+		attachTo(cpHookTo.addHook(hookPos, model));
 		/*
 		ControlPoint cp;
 		if (cpHookTo.cpChildHook == null) {

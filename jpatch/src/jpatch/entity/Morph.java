@@ -203,7 +203,8 @@ public class Morph implements MutableTreeNode {
 	public void addTarget(MorphTarget target) {
 		for (Iterator it = target.getMorphMap().keySet().iterator(); it.hasNext(); )
 			mapMorph.put(it.next(), new Vector3f());
-		MainFrame.getInstance().getTreeModel().insertNodeInto(target, this, binarySearch(target.getPosition()));
+		if (MainFrame.getInstance() != null)
+			MainFrame.getInstance().getTreeModel().insertNodeInto(target, this, binarySearch(target.getPosition()));
 		setMorphMap();
 	}
 	

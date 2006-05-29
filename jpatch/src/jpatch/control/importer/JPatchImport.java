@@ -134,7 +134,8 @@ implements ModelImporter {
 		model.setFile(file);
 //		model.setCpMap(listCp);
 //		model.setBoneMap(listBones);
-		MainFrame.getInstance().setFilename(file.getName());
+		if (MainFrame.getInstance() != null)
+			MainFrame.getInstance().setFilename(file.getName());
 		ControlPoint.setNextId(cpHighId + 1);
 		return "";
 	}
@@ -303,7 +304,8 @@ implements ModelImporter {
 							dof.setFlipped(value.equals("true"));
 						}
 					}
-					MainFrame.getInstance().getTreeModel().insertNodeInto(dof, bone, bone.getDofs().size());
+					if (MainFrame.getInstance() != null)
+						MainFrame.getInstance().getTreeModel().insertNodeInto(dof, bone, bone.getDofs().size());
 					iState = DOF;
 //					bone.insert(dof, bone.getChildCount());
 				}
