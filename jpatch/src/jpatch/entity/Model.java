@@ -305,7 +305,8 @@ public class Model implements MutableTreeNode {
 		material.setName(name1);
 		materialNameSet.add(name1);
 		
-		MainFrame.getInstance().getTreeModel().insertNodeInto(material, treenodeMaterials, treenodeMaterials.getChildCount());
+		if (MainFrame.getInstance() != null)
+			MainFrame.getInstance().getTreeModel().insertNodeInto(material, treenodeMaterials, treenodeMaterials.getChildCount());
 //		MainFrame.getInstance().getTreeModel().nodeStructureChanged(treenodeMaterials);
 //		treenodeMaterials.insert(material, 0);
 //		lstMaterials.add(material);
@@ -351,7 +352,7 @@ public class Model implements MutableTreeNode {
 		//} else {
 		//	return false;
 		//}
-		if (MainFrame.getInstance().getModel() != null)
+		if (MainFrame.getInstance() != null && MainFrame.getInstance().getModel() != null)
 			addSelection(treenodeSelections.getChildCount(), selection);
 	}
 
@@ -366,7 +367,8 @@ public class Model implements MutableTreeNode {
 		selection.setName(name1);
 		selectionNameSet.add(name1);
 		
-		MainFrame.getInstance().getTreeModel().insertNodeInto(selection, treenodeSelections, index);
+		if (MainFrame.getInstance() != null)
+			MainFrame.getInstance().getTreeModel().insertNodeInto(selection, treenodeSelections, index);
 	}
 	
 	public void getBounds(Point3f min, Point3f max) {
@@ -591,7 +593,8 @@ public class Model implements MutableTreeNode {
 //		System.out.println(bone + " " + node);
 		if (node == null)
 			node = treenodeBones;
-		MainFrame.getInstance().getTreeModel().insertNodeInto(bone, node, node.getChildCount());	
+		if (MainFrame.getInstance() != null)
+			MainFrame.getInstance().getTreeModel().insertNodeInto(bone, node, node.getChildCount());	
 //		DefaultTreeModel treeModel = (DefaultTreeModel) MainFrame.getInstance().getTree().getModel();
 //		treeModel.reload(bone.getParent());
 //		if (bone.getParentBone() == null)
@@ -623,7 +626,10 @@ public class Model implements MutableTreeNode {
 	 * @param  patch  The feature to be added to the Patch attribute
 	 */
 	public void addPatch(ControlPoint[] acp, JPatchActionEdit edit) {
-		addPatch(new Patch(acp), edit);
+		Patch patch = new Patch(acp);
+		if (patch.getMaterial() == null)
+			patch.setMaterial(listMaterials.get(0));
+		addPatch(patch, edit);
 	}
 
 	public void addPatch(Patch patch, JPatchActionEdit edit) {

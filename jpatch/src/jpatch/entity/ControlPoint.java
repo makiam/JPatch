@@ -1,5 +1,5 @@
 /*
- * $Id: ControlPoint.java,v 1.29 2006/05/26 15:09:20 sascha_l Exp $
+ * $Id: ControlPoint.java,v 1.30 2006/05/29 14:39:45 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -37,7 +37,7 @@ import jpatch.boundary.*;
  *  <a href="http://jpatch.sourceforge.net/developer/new_model/controlPoint/">here</a>
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.29 $
+ * @version    $Revision: 1.30 $
  */
 
 public class ControlPoint implements Comparable, Transformable {
@@ -407,13 +407,13 @@ public class ControlPoint implements Comparable, Transformable {
 	 * @param  hookPos  The hook position (between 0..1)
 	 * @return          The hook. Attach your "target hook" to this ControlPoint.
 	 */
-	public ControlPoint addHook(float hookPos) {
+	public ControlPoint addHook(float hookPos, Model model) {
 		
 		ControlPoint cp;
 		ControlPoint cpHook;
 		if (cpChildHook == null) {
 			cpChildHook = createEmptyHookCurve();
-			MainFrame.getInstance().getModel().addCurve(cpChildHook);
+			model.addCurve(cpChildHook);
 		}
 		cp = cpChildHook;
 		while (cp.cpNext != null && cp.cpNext.fHookPos < hookPos) {
@@ -451,8 +451,8 @@ public class ControlPoint implements Comparable, Transformable {
 	 * Hooks this ControlPoint ControlPoint cpHookTo at hookposition hookPos
 	 * Creates a new hook (for cpHookTo) and attaches this ControlPoint to the resulting hook
 	 */
-	public void hookTo(ControlPoint cpHookTo, float hookPos) {
-		attachTo(cpHookTo.addHook(hookPos));
+	public void hookTo(ControlPoint cpHookTo, float hookPos, Model model) {
+		attachTo(cpHookTo.addHook(hookPos, model));
 		/*
 		ControlPoint cp;
 		if (cpHookTo.cpChildHook == null) {

@@ -207,6 +207,7 @@ public class AnimationMasterImport implements ModelImporter {
 			}
 		}
 		catch(Exception e) {
+			e.printStackTrace();
 			return "error while importing Animation:Master model: " + e.getMessage();
 		}
 		
@@ -252,7 +253,7 @@ public class AnimationMasterImport implements ModelImporter {
 				cp.setOutMagnitude(hashCp.getOutMagnitude());
 				if (hashCp.isHook()) {
 					key = new Integer(getHookEndKey(hashCp.getNum()));
-					ControlPoint hook = ((ControlPoint)mapControlPoint.get(key)).addHook(hashCp.getHookPos());
+					ControlPoint hook = ((ControlPoint)mapControlPoint.get(key)).addHook(hashCp.getHookPos(), model);
 					cp.attachTo(hook);
 				}
 				if (hashCp.isSmooth()) {

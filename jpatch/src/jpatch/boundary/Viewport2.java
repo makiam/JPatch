@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.62 2006/05/22 10:48:57 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.63 2006/05/29 14:39:45 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -132,7 +132,7 @@ public class Viewport2 {
 			if (rtl != null) {
 				Matrix4f identity = new Matrix4f();
 				identity.setIdentity();
-				if (!MainFrame.getInstance().getJPatchScreen().isStickyLight())
+				if (!settings.realtimeRenderer.lightFollowsCamera)
 					rtl.transform(viewDef.getMatrix());
 				else
 					rtl.transform(identity);
@@ -160,10 +160,12 @@ public class Viewport2 {
 		drawable.setColor(settings.colors.text);
 		drawable.drawString(viewDef.getViewDescription(), 4, 16);
 		for (int i = 0, y = 16; i < info.length; drawable.drawString(info[i++], 4, y += 16));
-		if (MainFrame.getInstance().getEditedMorph() != null)
-			drawable.drawString("!!!EDIT MORPH MODE!!!", (int) viewDef.getWidth() - 140, 16);
-		if (MainFrame.getInstance().getAnimation() != null)
-			drawable.drawString("Frame " + (int) MainFrame.getInstance().getAnimation().getPosition(), 4, (int) viewDef.getHeight() - 4);
+		if (MainFrame.getInstance() != null) {
+			if (MainFrame.getInstance().getEditedMorph() != null)
+				drawable.drawString("!!!EDIT MORPH MODE!!!", (int) viewDef.getWidth() - 140, 16);
+			if (MainFrame.getInstance().getAnimation() != null)
+				drawable.drawString("Frame " + (int) MainFrame.getInstance().getAnimation().getPosition(), 4, (int) viewDef.getHeight() - 4);
+		}
 		drawable.drawString(Long.toString(System.currentTimeMillis()), 8, 48);
 		if (viewDef.getCamera() != null) {
 			int W = (int) viewDef.getWidth();
@@ -283,8 +285,8 @@ public class Viewport2 {
 		}
 	}
 	
-	public void drawGrid() {
-		MainFrame.getInstance().getJPatchScreen().getGrid().paint(viewDef);
+	public void drawGrid(Grid grid) {
+		grid.paint(viewDef);
 	}
 	
 	public void drawTool(JPatchTool tool) {
@@ -316,7 +318,7 @@ public class Viewport2 {
 				animObject.getModel().getMaterial(0).setColor(((AnimLight) animObject).getColor());
 			}
 			setModelMatrix(animObject.getTransform());
-			drawModel(animObject.getModel());
+			drawModel(animObject.getModel(), MainFrame.getInstance().getSelection());
 			if (animObject instanceof AnimModel) {
 				Transformable anchor = ((AnimModel) animObject).getAnchor();
 				if (anchor == null)
@@ -337,7 +339,7 @@ public class Viewport2 {
 		}
 	}
 	
-	public void drawModel(Model model) {
+	public void drawModel(Model model, Selection selection) {
 //		System.out.println(this + " drawModel");
 		/*
 		 * get max and min z-values (for fog effect)
@@ -360,8 +362,6 @@ public class Viewport2 {
 		fDeltaZ -= fMinZ;
 		fDeltaZ += 50;
 		//fMinZ -= 1;
-		
-		Selection selection = MainFrame.getInstance().getSelection();
 		
 		if (viewDef.renderCurves()) {
 			drawable.setColor(settings.colors.curves); // FIXME
@@ -4128,7 +4128,7 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 		}
 		
 		public void drawBone(JPatchDrawable2 drawable, ViewDefinition viewDef, Bone bone) {
-			Selection selection = MainFrame.getInstance().getSelection();
+			Selection selection = MainFrame.getInstance() == null ? null : MainFrame.getInstance().getSelection();
 			boolean selected = selection != null && selection.containsBone(bone);
 //			System.out.println("drawBone bone=" + bone);
 			reset();

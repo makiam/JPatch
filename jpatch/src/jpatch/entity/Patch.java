@@ -1,5 +1,5 @@
 /*
- * $Id: Patch.java,v 1.12 2006/05/23 13:18:48 sascha_l Exp $
+ * $Id: Patch.java,v 1.13 2006/05/29 14:39:45 sascha_l Exp $
  *
  * Copyright (c) 2004 Sascha Ledinsky
  *
@@ -30,7 +30,7 @@ import jpatch.auxilary.*;
  * A Patch. Currently 3-, 4- and 5-point patches are supported
  *
  * @author     Sascha Ledinsky
- * @version    $Revision: 1.12 $
+ * @version    $Revision: 1.13 $
  * @see		jpatch.entity.Curve
  * @see		jpatch.entity.ControlPoint
  */
@@ -56,7 +56,8 @@ public final class Patch {
 	
 	public Patch(ControlPoint[] controlPoints) {
 		acpPoint = controlPoints;
-		if (MainFrame.getInstance().getModel() != null) material = MainFrame.getInstance().getModel().getMaterial(0);
+		if (MainFrame.getInstance() != null && MainFrame.getInstance().getModel() != null)
+			material = MainFrame.getInstance().getModel().getMaterial(0);
 		//setGroup();
 		//reset();
 		//for (int i = 0; i < acpPoint.length; i++) {
