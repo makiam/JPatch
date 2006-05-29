@@ -99,7 +99,8 @@ public class ModelLoader {
 		frame.setVisible(true);
 		
 		/*
-		 * start swing timer to slowly rotate the model
+		 * start swing timer to slowly rotate the model. All rendering must be done on
+		 * the event-dispaching thread, so if not using a javax.swing.Timer, be careful!
 		 */
 		Timer t = new Timer(10, new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
@@ -107,6 +108,5 @@ public class ModelLoader {
 			}
 		});
 		t.start();
-		
 	}
 }
