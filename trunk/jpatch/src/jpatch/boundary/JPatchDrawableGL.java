@@ -24,7 +24,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	private int iTransparentMode = OFF;
 	
 	private Color4f color = new Color4f();
-	private Color3f backfaceColor;
+	private Color3f backfaceColor = new Color3f(1, 1, 0);
 	
 	private static final boolean POINT_AS_QUAD = true;
 	private boolean bPerspective = false;
