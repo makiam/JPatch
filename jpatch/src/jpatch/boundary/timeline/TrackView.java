@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.38 2006/05/30 14:20:22 sascha_l Exp $
+ * $Id: TrackView.java,v 1.39 2006/05/30 18:16:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -135,21 +135,22 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		return getPreferredSize();
 	}
 	
+	/*
+	 * Paint the tracks
+	 */
 	public void paintComponent(Graphics g) {
-//		long t = System.currentTimeMillis();
-		super.paintComponent(g);
+		/*
+		 * get clip bounds, calculate start frame, fill background
+		 */
 		Rectangle clip = g.getClipBounds();
-//		System.out.println(clip);
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
-		//int frame = start / TimelineEditor.this.iFrameWidth - 1;
-//		g.setColor(Color.WHITE);
-//		for (int x = -TimelineEditor.this.iFrameWidth ; x <= clip.width + TimelineEditor.this.iFrameWidth; x += TimelineEditor.this.iFrameWidth) {
-//		g.drawLine(x + start, clip.y, x + start, clip.y + clip.height);
-//		}
 		g.setColor(TimelineEditor.BACKGROUND);
 		g.fillRect(clip.x, clip.y, clip.width, clip.height);
 		
+		/*
+		 * loop over tracks, paint track background, set up selection rectangle
+		 */
 		int y = 0;
 		Set<Track> selectedTracks = timelineEditor.getHeader().getSelectedTracks();
 		g.setColor(TimelineEditor.SELECTED_BACKGROUND);
@@ -173,6 +174,10 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			rect.x = (range.firstFrame - (int) MainFrame.getInstance().getAnimation().getStart()) * fw;
 			rect.width = (range.lastFrame - range.firstFrame + 1) * fw;
 		}
+		
+		/*
+		 * paint ticks
+		 */
 		g.setColor(TimelineEditor.TICK);
 		int frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
 		int minor;
@@ -182,17 +187,14 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			minor = 5;
 		}
 		for (int x = -fw ; x <= clip.width + fw; x += fw) {
-			if (frame % minor == 0) {
-//				g.setColor(TimelineEditor.TICK);
+			if (frame % minor == 0)
 				g.drawLine(x + start, clip.y, x + start, clip.y + clip.height);
-//				g.setColor(TimelineEditor.HIGHLIGHT);
-//				g.drawLine(x + start + 1, clip.y, x + start + 1, clip.y + clip.height);
-			} else {
-//				g.drawLine(x + start, y + 3, x + start, y + iExpandedHeight - 3);
-			}
 			frame++;
 		}
 		
+		/*
+		 * paint individual tracks
+		 */
 		y = 0;
 		for (Track track : timelineEditor.getTracks()) {
 			if (track.isHidden())
@@ -201,28 +203,20 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				track.paint(g, y, selection, hitKeys);
 			y += track.getHeight();
 		}
-//		if (timelineEditor.getTracks().size() > 0 && timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
-//		y -= 1;
-//		g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-//		g.drawLine(clip.x, y - 1, clip.x + clip.width - 1, y - 1);
-//		g.setColor(UIManager.getColor("ScrollBar.shadow"));
-//		g.drawLine(clip.x, y, clip.x + clip.width - 1, y);
-		//timelineEditor.getHeight();
-//		if (timelineEditor.getViewport().getHeight() > clip.height)
-//		g.setClip(clip.x, clip.y, clip.width, timelineEditor.getViewport().getHeight());
-//		g.fillRect(clip.x, y, clip.x + clip.width - 1, timelineEditor.getHeight() - y);
 		
+		/*
+		 * draw frame marker and bottom
+		 */
 		int x = (timelineEditor.getCurrentFrame() - (int) MainFrame.getInstance().getAnimation().getStart()) * fw + fw / 2;
 		g.setColor(Color.BLACK);
 		g.drawLine(x, clip.y, x, clip.y + clip.height - 1);
-//		g.fillPolygon(new int[] { x - 6, x + 6, x }, new int[] { getHeight() - 0, getHeight() - 0, getHeight() - 7}, 3);
 		
 		g.setColor(Color.BLACK);
 		g.drawLine(clip.x, y + 6, clip.x + clip.width - 1, y + 6);
-//		
-//		g.setColor(Color.BLACK);
-//		g.drawLine(x + 1, clip.y, x + 1, clip.height);
-//		System.out.println((System.currentTimeMillis() - t) + " ms");
+
+		/*
+		 * draw selection rectangle
+		 */
 		if (state != State.LASSO && range != null && rect != null) {
 			g.setColor(Color.BLACK);
 			g.drawRect(rect.x - 1, rect.y - 1, rect.width + 2, rect.height + 2);

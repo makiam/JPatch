@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.18 2006/05/30 14:20:22 sascha_l Exp $
+ * $Id: Track.java,v 1.19 2006/05/30 18:16:28 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -35,14 +35,7 @@ import jpatch.control.edit.JPatchUndoableEdit;
 import jpatch.entity.*;
 
 public class Track<M extends MotionCurve> {
-	
-//	static final Color SEPARATOR = new Color(164, 164, 164);
-//	static final Color TRACK = new Color(208, 216, 200);
-	static final Color KEY = new Color(128, 128, 128);
-//	static final Color TICK = new Color(200, 192, 186);
-//	static final Color ZERO = new Color(178, 170, 162);
-//	static final Color CURVE = new Color(0, 0, 0);
-	
+		
 	static final int TRACK_HEIGHT = 13;
 	static final int EXPANDED_HEIGHT = 92;
 	static final int TOP = 4;
@@ -85,10 +78,6 @@ public class Track<M extends MotionCurve> {
 	public void setExpandedHeight(int height) {
 		iExpandedHeight = height;
 	}
-	
-//	public void setDefaultExpandedHeight() {
-//		iExpandedHeight = EXPANDED_HEIGHT;
-//	}
 	
 	public boolean isExpanded() {
 		return bExpanded;
@@ -135,32 +124,37 @@ public class Track<M extends MotionCurve> {
 			return null;
 		if (motionCurve instanceof MotionCurve.Float) {
 			return new AtomicAddMotionKey(motionCurve, new MotionKey.Float(frame, ((MotionCurve.Float) motionCurve).getFloatAt(frame)));
-//			return new AtomicModifyMotionCurve.Float((MotionCurve.Float) motionCurve, frame, ((MotionCurve.Float) motionCurve).getFloatAt(frame));
 		}
 		if (motionCurve instanceof MotionCurve.Point3d) {
 			return new AtomicAddMotionKey(motionCurve, new MotionKey.Point3d(frame, ((MotionCurve.Point3d) motionCurve).getPoint3dAt(frame)));
-//			return new AtomicModifyMotionCurve.Point3d((MotionCurve.Point3d) motionCurve, frame, ((MotionCurve.Point3d) motionCurve).getPoint3dAt(frame));
 		}
 		if (motionCurve instanceof MotionCurve.Quat4f) {
 			return new AtomicAddMotionKey(motionCurve, new MotionKey.Quat4f(frame, ((MotionCurve.Quat4f) motionCurve).getQuat4fAt(frame)));
-//			return new AtomicModifyMotionCurve.Quat4f((MotionCurve.Quat4f) motionCurve, frame, ((MotionCurve.Quat4f) motionCurve).getQuat4fAt(frame));
 			}
 		if (motionCurve instanceof MotionCurve.Color3f) {
 			return new AtomicAddMotionKey(motionCurve, new MotionKey.Color3f(frame, ((MotionCurve.Color3f) motionCurve).getColor3fAt(frame)));
-//			return new AtomicModifyMotionCurve.Color3f((MotionCurve.Color3f) motionCurve, frame, ((MotionCurve.Color3f) motionCurve).getColor3fAt(frame));
 		}
 		if (motionCurve instanceof MotionCurve.Object) {
 			return null;
 		}
-		// can't handle this case - needs subclassing
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException(); // can't handle this case - needs subclassing
 	}
 	
+	/*
+	 * paint the track
+	 */
 	public void paint(Graphics g, int y, Map<MotionKey, TrackView.KeyData> selection, MotionKey[] hitKeys) {	
+		/*
+		 * get clip bounds, compute start frame.
+		 */
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;
 		int frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
+		
+		/*
+		 * setup colors
+		 */
 		Color background, track;
 		if (timelineEditor.getHeader().getSelectedTracks().contains(this)) {
 			background = TimelineEditor.SELECTED_BACKGROUND;
@@ -169,10 +163,10 @@ public class Track<M extends MotionCurve> {
 			background = TimelineEditor.BACKGROUND;
 			track = TimelineEditor.LIGHT_SHADOW;
 		}
-//		g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-//		g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
-//		g.setColor(TRACK);
-//		g.fillRect(clip.x, y + 3, clip.width, 5);
+		
+		/*
+		 * paint the track
+		 */
 		g.setColor(background);
 		g.drawLine(clip.x, y + TOP - 2, clip.x + clip.width, y + TOP - 2);
 		g.drawLine(clip.x, y + TOP - 1, clip.x + clip.width, y + TOP - 1);
@@ -182,11 +176,12 @@ public class Track<M extends MotionCurve> {
 		g.drawLine(clip.x, y + TOP + 6, clip.x + clip.width, y + TOP + 6);
 		g.setColor(track);
 		g.drawLine(clip.x, y + TOP + 1, clip.x + clip.width, y + TOP + 1);
-//		g.setColor(TimelineEditor.SHADOW);
-//		g.drawLine(clip.x, y + TOP + 4, clip.x + clip.width, y + TOP + 4);
-//		g.setColor(TimelineEditor.SHADOW);
 		g.drawLine(clip.x, y + TOP + 2, clip.x + clip.width, y + TOP + 2);
 		g.drawLine(clip.x, y + TOP + 3, clip.x + clip.width, y + TOP + 3);
+		
+		/*
+		 * draw the motion-keys
+		 */
 		for (int x = -fw ; x <= clip.width + fw; x += fw) {
 			MotionKey key = motionCurve.getKeyAt(frame);
 			if (key != null) {
@@ -198,20 +193,7 @@ public class Track<M extends MotionCurve> {
 				else
 					fillColor = Color.GRAY;
 				drawKey(g, key, x + start - 3, y + TOP - 1, fillColor, Color.BLACK);
-//				g.fillOval(x + start - 3, y + TOP - 1, 6, 6);
-//				g.setColor(Color.BLACK);
-//				g.drawOval(x + start - 3, y + TOP - 1, 6, 6);
 			}
-			
-//			else {
-//				if (frame % 6 == 0) {
-//					g.setColor(ZERO);
-//					g.drawLine(x + start, y + 3, x + start, y + 6);
-//				} else {
-//					g.setColor(TICK);
-//					g.drawLine(x + start, y + 3, x + start, y + 6);
-//				}
-//			}
 			frame++;
 		}
 	}
