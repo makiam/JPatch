@@ -47,18 +47,10 @@ public class HeaderTrack extends Track {
 	
 	@Override
 	public MotionCurve[] getMotionCurves() {
-		return new MotionCurve[0];
+		return new MotionCurve[0];	// return empty array
 	}
 	
 	public void paint(Graphics g, int y, Map<MotionKey, TrackView.KeyData> selection, MotionKey[] hitKeys) {	
-//		Rectangle clip = g.getClipBounds();
-//		int fw = timelineEditor.getFrameWidth();
-//		int start = clip.x - clip.x % fw + fw / 2;
-//		int frame = start / fw - 1;
-//		
-//		g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-//		g.drawLine(clip.x, y + getHeight() - 1, clip.x + clip.width, y + getHeight() - 1);
-//		g.setColor(UIManager.getColor("ScrollBar.shadow"));
-//		g.fillRect(clip.x, y, clip.width, getHeight() - 1);
+		// don't paint anything
 	}
 }
