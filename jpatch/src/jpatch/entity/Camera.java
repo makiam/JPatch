@@ -1,5 +1,7 @@
 package jpatch.entity;
 
+import java.io.PrintStream;
+
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.vecmath.Point3f;
@@ -209,11 +211,11 @@ public class Camera extends AnimObject {
 		return cameraModel;
 	}
 	
-	public void xml(StringBuffer sb, String prefix) {
-		sb.append(prefix).append("<camera>\n");
-		sb.append(prefix).append("\t<name>" + getName() + "</name>\n");
-		MainFrame.getInstance().getAnimation().getCurvesetFor(this).xml(sb, prefix + "\t");
-		sb.append(prefix).append("</camera>").append("\n");
+	public void xml(PrintStream out, String prefix) {
+		out.append(prefix).append("<camera>\n");
+		out.append(prefix).append("\t<name>" + getName() + "</name>\n");
+		MainFrame.getInstance().getAnimation().getCurvesetFor(this).xml(out, prefix + "\t");
+		out.append(prefix).append("</camera>").append("\n");
 	}
 	
 	public void removeFromParent() {

@@ -3,6 +3,7 @@ package jpatch.entity;
 import java.awt.Polygon;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.io.PrintStream;
 import java.util.Enumeration;
 import java.util.Iterator;
 
@@ -258,7 +259,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		return false;
 	}
 	
-	public abstract void xml(StringBuffer sb, String prefix);
+	public abstract void xml(PrintStream out, String prefix);
 	
 	/*
 	 * Mutable treenode interface implementation

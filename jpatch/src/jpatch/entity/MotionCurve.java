@@ -1,5 +1,6 @@
 package jpatch.entity;
 
+import java.io.PrintStream;
 import java.util.*;
 
 import javax.vecmath.Quat4f;
@@ -8,9 +9,9 @@ import jpatch.auxilary.*;
 
 public abstract class MotionCurve {
 	
-	public static enum InterpolationMethod { DISCRETE, LINEAR, CUBIC };
-	
-	InterpolationMethod interpolationMethod = InterpolationMethod.CUBIC;
+//	public static enum InterpolationMethod { DISCRETE, LINEAR, CUBIC };
+//	
+//	InterpolationMethod interpolationMethod = InterpolationMethod.CUBIC;
 	String name = "*";
 	List<MotionKey> list = new ArrayList<MotionKey>();
 
@@ -201,13 +202,15 @@ public abstract class MotionCurve {
 		} else return null;
 	}
 	
-	public void xml(StringBuffer sb, String prefix, String type) {
+	public void xml(PrintStream out, String prefix, String type) {
 //		StringBuffer indent = XMLutils.indent(tab);
 //		StringBuffer indent2 = XMLutils.indent(tab + 1);
-		sb.append(prefix).append("<motioncurve " + type + " interpolation=\"" + getInterpolationMethod().toString().toLowerCase() + "\">\n");
-		for (MotionKey key : list)
-			sb.append(prefix).append("\t").append(key.toXmlString()).append("\n");
-		sb.append(prefix).append("</motioncurve>").append("\n");
+		out.append(prefix).append("<motioncurve " + type + ">\n");
+		for (MotionKey key : list) {
+			out.append(prefix).append("\t");
+			key.xml(out);
+		}
+		out.append(prefix).append("</motioncurve>").append("\n");
 	}
 	
 	public MotionKey getPrevKey(float position) {
@@ -233,13 +236,13 @@ public abstract class MotionCurve {
 		return (MotionKey) list.get(list.size() - 1);
 	}
 	
-	public InterpolationMethod getInterpolationMethod() {
-		return interpolationMethod;
-	}
-	
-	public void setInterpolationMethod(InterpolationMethod interpolationMethod) {
-		this.interpolationMethod = interpolationMethod;
-	}
+//	public InterpolationMethod getInterpolationMethod() {
+//		return interpolationMethod;
+//	}
+//	
+//	public void setInterpolationMethod(InterpolationMethod interpolationMethod) {
+//		this.interpolationMethod = interpolationMethod;
+//	}
 	
 	public void clear() {
 		list.clear();
@@ -317,7 +320,7 @@ public abstract class MotionCurve {
 			float p0 = key1.getFloat();
 			float p1 = key2.getFloat();
 			
-			switch (interpolationMethod) {
+			switch (key1.getInterpolation()) {
 			case DISCRETE:
 				return p0;
 			case LINEAR:
@@ -400,7 +403,7 @@ public abstract class MotionCurve {
 			javax.vecmath.Point3d p0 = key1.getPoint3d();
 			javax.vecmath.Point3d p1 = key2.getPoint3d();
 			
-			switch (interpolationMethod) {
+			switch (key1.getInterpolation()) {
 			case DISCRETE:
 				return new javax.vecmath.Point3d(p0);
 			case LINEAR:
@@ -469,7 +472,7 @@ public abstract class MotionCurve {
 			javax.vecmath.Color3f p0 = key1.getColor3f();
 			javax.vecmath.Color3f p1 = key2.getColor3f();
 			
-			switch (interpolationMethod) {
+			switch (key1.getInterpolation()) {
 			case DISCRETE:
 				return new javax.vecmath.Color3f(p0);
 			case LINEAR:
@@ -538,7 +541,7 @@ public abstract class MotionCurve {
 			q1 = key1.getQuat4f();
 			q2 = key2.getQuat4f();
 			
-			switch (interpolationMethod) {
+			switch (key1.getInterpolation()) {
 			case DISCRETE:
 				return new javax.vecmath.Quat4f(q1);
 			case LINEAR:
@@ -642,10 +645,10 @@ public abstract class MotionCurve {
 			return getKeyAt(position);
 		}
 		
-		@Override
-		public InterpolationMethod getInterpolationMethod() {
-			return InterpolationMethod.DISCRETE;
-		}
+//		@Override
+//		public InterpolationMethod getInterpolationMethod() {
+//			return InterpolationMethod.DISCRETE;
+//		}
 	}
 }
 

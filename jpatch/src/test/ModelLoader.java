@@ -84,8 +84,8 @@ public class ModelLoader {
 		 */
 		viewport = new Viewport2(drawable, viewDef);
 		viewDef.setDrawable(drawable);
-		viewDef.renderPoints(true);
-		viewDef.renderCurves(true);
+		viewDef.renderPoints(false);
+		viewDef.renderCurves(false);
 		viewDef.renderPatches(true);
 		viewDef.renderBones(false);
 		viewDef.setLighting(RealtimeLighting.createThreepointLight());
