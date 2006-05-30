@@ -1,59 +1,67 @@
 package jpatch.entity;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+import javax.vecmath.Point3d;
+
 public abstract class MotionKey {
-	float fPosition;
+	public static enum Interpolation { DISCRETE, LINEAR, CUBIC };
+	public static enum TangentMode { AUTO, OVERSHOOT, MANUAL };
+	
+	Interpolation interpolation = Interpolation.CUBIC;
+	TangentMode tangentMode;
+	boolean smooth = true;
+	float position;
 	
 	private MotionKey(float position) {
-		fPosition = position;
+		this.position = position;
 	}
 	
 	public float getPosition() {
-		return fPosition;
+		return position;
 	}
 	
 	public void setPosition(float position) {
-		fPosition = position;
+		this.position = position;
+	}
+	
+	public Interpolation getInterpolation() {
+		return interpolation;
+	}
+
+	public void setInterpolation(Interpolation interpolation) {
+		this.interpolation = interpolation;
+	}
+
+	public boolean isSmooth() {
+		return smooth;
+	}
+
+	public void setSmooth(boolean smooth) {
+		this.smooth = smooth;
+	}
+
+	public TangentMode getTangentMode() {
+		return tangentMode;
+	}
+
+	public void setTangentMode(TangentMode tangentMode) {
+		this.tangentMode = tangentMode;
 	}
 	
 	public abstract MotionKey copy();
-	
-	public abstract String toXmlString();
-	
-//	public boolean equals(Object object) {
-//		if (!(object instanceof MotionKey))
-//			return false;
-//		return fPosition == ((MotionKey) object).fPosition;
-//	}
-//	
-//	public int compareTo(Object object) {
-//		MotionKey other = (MotionKey) object;
-//		return java.lang.Float.compare(fPosition, other.fPosition);
-//	}
-	
-//	public static class Compound extends MotionKey {
-//		private MotionKey[] keys;
-//		
-//		public Compound(MotionKey[] keys) {
-//			super(keys[0].fPosition);
-//			for (int i = 1; i < keys.length; i++)
-//				if (keys[i].fPosition != fPosition)
-//					throw new IllegalArgumentException("Compound Key can only hold keys at the same position!!!");
-//		}
-//		
-//		@Override
-//		public void setPosition(float position) {
-//			for (MotionKey key : keys)
-//				key.setPosition(position);
-//		}
-//		
-//	}
-	
+	public abstract void xml(PrintStream out);
+
 	public static class Float extends MotionKey {
 		private float f;
+		private float dfIn;
+		private float dfOut;
 		
 		public Float(float position, float f) {
 			super(position);
 			this.f = f;
+			tangentMode = TangentMode.OVERSHOOT;
 		}
 		
 		public float getFloat() {
@@ -64,19 +72,59 @@ public abstract class MotionKey {
 			this.f = f;
 		}
 		
+		public float getDfIn() {
+			return dfIn;
+		}
+		
+		public void setDfIn(float dfIn) {
+			this.dfIn = dfIn;
+		}
+		
+		public float getDfOut() {
+			return dfOut;
+		}
+		
+		public void setDfOut(float dfOut) {
+			this.dfOut = dfOut;
+				
+		}
+		
 		@Override
-		public String toXmlString() {
-			return ("<key frame=\"" + fPosition + "\" value=\"" + f + "\"/>");
+		public void xml(PrintStream out) {
+			out.append("<key frame=\"").append(java.lang.Float.toString(position)).append("\"");
+			out.append(" value=\"").append(java.lang.Float.toString(f)).append("\"");
+			out.append(" interpolation=\"").append(interpolation.toString().toLowerCase()).append("\"");
+			if (interpolation == Interpolation.DISCRETE) {
+				out.append(" tangentMode=\"").append(tangentMode.toString().toLowerCase()).append("\"");
+				if (tangentMode == TangentMode.MANUAL) {
+					if (smooth) {
+						out.append(" delta=\"").append(java.lang.Float.toString(dfIn)).append("\"");
+					} else {
+						out.append(" deltaIn=\"").append(java.lang.Float.toString(dfIn)).append("\"");
+						out.append(" deltaOut=\"").append(java.lang.Float.toString(dfOut)).append("\"");
+					}
+				}
+			}
+			out.append("/>");
+			out.println();
 		}
 		
 		@Override
 		public MotionKey.Float copy() {
-			return new MotionKey.Float(fPosition, f);
+			MotionKey.Float copy = new MotionKey.Float(position, f);
+			copy.interpolation = interpolation;
+			copy.tangentMode = tangentMode;
+			copy.smooth = smooth;
+			copy.dfIn = dfIn;
+			copy.dfOut = dfOut;
+			return copy;
 		}
 	}
 	
 	public static class Point3d extends MotionKey {
 		private javax.vecmath.Point3d p;
+		private javax.vecmath.Point3d dpIn = new javax.vecmath.Point3d();
+		private javax.vecmath.Point3d dpOut = new javax.vecmath.Point3d();
 		
 		public Point3d(float position, javax.vecmath.Point3d p) {
 			super(position);
@@ -95,14 +143,52 @@ public abstract class MotionKey {
 			this.p.set(x, y, z);
 		}
 		
+		public javax.vecmath.Point3d getDpIn() {
+			return dpIn;
+		}
+		
+		public void setDpIn(javax.vecmath.Point3d dpIn) {
+			this.dpIn.set(dpIn);
+		}
+		
+		public javax.vecmath.Point3d getDpOut() {
+			return dpOut;
+		}
+		
+		public void setDpOut(javax.vecmath.Point3d dpOut) {
+			this.dpOut.set(dpOut);
+				
+		}
+		
 		@Override
-		public String toXmlString() {
-			return ("<key frame=\"" + fPosition + "\" x=\"" + p.x + "\" y=\"" + p.y + "\" z=\"" + p.z + "\"/>");
+		public void xml(PrintStream out) {
+			out.append("<key frame=\"").append(java.lang.Float.toString(position)).append("\"");
+			out.append(toXml("", p));
+			out.append(" interpolation=\"").append(interpolation.toString().toLowerCase()).append("\"");
+			if (interpolation == Interpolation.DISCRETE) {
+				out.append(" tangentMode=\"").append(tangentMode.toString().toLowerCase()).append("\"");
+				if (tangentMode == TangentMode.MANUAL) {
+					if (smooth) {
+						out.append(" delta=\"").append(toXml("d", dpIn)).append("\"");
+					} else {
+						out.append(" deltaIn=\"").append(toXml("dIn", dpIn)).append("\"");
+						out.append(" deltaOut=\"").append(toXml("dOut", dpOut)).append("\"");
+					}
+				}
+			}
+			out.append("/>");
+			out.println();
 		}
 		
 		@Override
 		public MotionKey.Point3d copy() {
-			return new MotionKey.Point3d(fPosition, p);
+			MotionKey.Point3d copy = new MotionKey.Point3d(position, p);
+			copy.interpolation = interpolation;
+			copy.tangentMode = tangentMode;
+			copy.smooth = smooth;
+			copy.dpIn = dpIn;
+			copy.dpOut = dpOut;
+			return copy;
 		}
 	}
 	
@@ -133,6 +219,8 @@ public abstract class MotionKey {
 	
 	public static class Color3f extends MotionKey {
 		private javax.vecmath.Color3f c;
+		private javax.vecmath.Color3f dcIn;
+		private javax.vecmath.Color3f dcOut;
 		
 		public Color3f(float position, javax.vecmath.Color3f c) {
 			super(position);
@@ -151,19 +239,58 @@ public abstract class MotionKey {
 			this.c.set(r, g, b);
 		}
 		
+		public javax.vecmath.Color3f getDcIn() {
+			return dcIn;
+		}
+		
+		public void setDcIn(javax.vecmath.Color3f dcIn) {
+			this.dcIn.set(dcIn);
+		}
+		
+		public javax.vecmath.Color3f getDcOut() {
+			return dcOut;
+		}
+		
+		public void setDcOut(javax.vecmath.Color3f dcOut) {
+			this.dcOut.set(dcOut);
+		}
+		
 		@Override
-		public String toXmlString() {
-			return ("<key frame=\"" + fPosition + "\" r=\"" + c.x + "\" g=\"" + c.y + "\" b=\"" + c.z + "\"/>");
+		public void xml(PrintStream out) {
+			out.append("<key frame=\"").append(java.lang.Float.toString(position)).append("\"");
+			out.append(toXml("", c));
+			out.append(" interpolation=\"").append(interpolation.toString().toLowerCase()).append("\"");
+			if (interpolation == Interpolation.DISCRETE) {
+				out.append(" tangentMode=\"").append(tangentMode.toString().toLowerCase()).append("\"");
+				if (tangentMode == TangentMode.MANUAL) {
+					if (smooth) {
+						out.append(" delta=\"").append(toXml("d", dcIn)).append("\"");
+					} else {
+						out.append(" deltaIn=\"").append(toXml("dIn", dcIn)).append("\"");
+						out.append(" deltaOut=\"").append(toXml("dOut", dcOut)).append("\"");
+					}
+				}
+			}
+			out.append("/>");
+			out.println();
 		}
 		
 		@Override
 		public MotionKey.Color3f copy() {
-			return new MotionKey.Color3f(fPosition, c);
+			MotionKey.Color3f copy = new MotionKey.Color3f(position, c);
+			copy.interpolation = interpolation;
+			copy.tangentMode = tangentMode;
+			copy.smooth = smooth;
+			copy.dcIn = dcIn;
+			copy.dcOut = dcOut;
+			return copy;
 		}
 	}
 	
 	public static class Quat4f extends MotionKey {
 		private javax.vecmath.Quat4f q;
+		private javax.vecmath.Quat4f dqIn;
+		private javax.vecmath.Quat4f dqOut;
 		
 		public Quat4f(float position, javax.vecmath.Quat4f q) {
 			super(position);
@@ -182,14 +309,52 @@ public abstract class MotionKey {
 			this.q.set(x, y, z, w);
 		}
 		
+		public javax.vecmath.Quat4f getDqIn() {
+			return dqIn;
+		}
+		
+		public void setDqIn(javax.vecmath.Quat4f dqIn) {
+			this.dqIn.set(dqIn);
+		}
+		
+		public javax.vecmath.Quat4f getDqOut() {
+			return dqOut;
+		}
+		
+		public void setDqOut(javax.vecmath.Quat4f dqOut) {
+			this.dqOut.set(dqOut);
+				
+		}
+		
 		@Override
-		public String toXmlString() {
-			return ("<key frame=\"" + fPosition + "\" x=\"" + q.x + "\" y=\"" + q.y + "\" z=\"" + q.z + "\" w=\"" + q.w + "\"/>");
+		public void xml(PrintStream out) {
+			out.append("<key frame=\"").append(java.lang.Float.toString(position)).append("\"");
+			out.append(toXml("", q));
+			out.append(" interpolation=\"").append(interpolation.toString().toLowerCase()).append("\"");
+			if (interpolation == Interpolation.DISCRETE) {
+				out.append(" tangentMode=\"").append(tangentMode.toString().toLowerCase()).append("\"");
+				if (tangentMode == TangentMode.MANUAL) {
+					if (smooth) {
+						out.append(" delta=\"").append(toXml("d", dqIn)).append("\"");
+					} else {
+						out.append(" deltaIn=\"").append(toXml("dIn", dqIn)).append("\"");
+						out.append(" deltaOut=\"").append(toXml("dOut", dqOut)).append("\"");
+					}
+				}
+			}
+			out.append("/>");
+			out.println();
 		}
 		
 		@Override
 		public MotionKey.Quat4f copy() {
-			return new MotionKey.Quat4f(fPosition, q);
+			MotionKey.Quat4f copy = new MotionKey.Quat4f(position, q);
+			copy.interpolation = interpolation;
+			copy.tangentMode = tangentMode;
+			copy.smooth = smooth;
+			copy.dqIn = dqIn;
+			copy.dqOut = dqOut;
+			return copy;
 		}
 	}
 	
@@ -210,19 +375,55 @@ public abstract class MotionKey {
 		}
 		
 		@Override
-		public String toXmlString() {
+		public Interpolation getInterpolation() {
+			return Interpolation.DISCRETE;
+		}
+
+		@Override
+		public void setInterpolation(Interpolation interpolation) {
+			// do nothing
+		}
+		
+		@Override
+		public void xml(PrintStream out) {
 			if (o == null)
-				return ("<key frame=\"" + fPosition + "\" null=\"null\"/>");
+				out.println("<key frame=\"" + position + "\" null=\"null\"/>");
 			else if (o instanceof ControlPoint)
-				return ("<key frame=\"" + fPosition + "\" cp=\"" + ((ControlPoint) o).getId() + "\"/>");
+				out.println("<key frame=\"" + position + "\" cp=\"" + ((ControlPoint) o).getId() + "\"/>");
 			else if (o instanceof Bone.BoneTransformable)
-				return ("<key frame=\"" + fPosition + "\" bone=\"" + ((Bone.BoneTransformable) o).getBone().getName() + "\"/>");
-			throw new IllegalStateException("Object key of unknown type " + o);
+				out.println("<key frame=\"" + position + "\" bone=\"" + ((Bone.BoneTransformable) o).getBone().getName() + "\"/>");
+			else
+				throw new IllegalStateException("Object key of unknown type " + o);
 		}
 		
 		@Override
 		public MotionKey.Object copy() {
-			return new MotionKey.Object(fPosition, o);
+			return new MotionKey.Object(position, o);
 		}
+	}
+	
+	private static String toXml(String prefix, javax.vecmath.Point3d p) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(" ").append(prefix).append("x=\"").append(java.lang.Double.toString(p.x)).append("\"");
+		sb.append(" ").append(prefix).append("y=\"").append(java.lang.Double.toString(p.y)).append("\"");
+		sb.append(" ").append(prefix).append("z=\"").append(java.lang.Double.toString(p.z)).append("\"");
+		return sb.toString();
+	}
+	
+	private static String toXml(String prefix, javax.vecmath.Quat4f q) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(" ").append(prefix).append("x=\"").append(java.lang.Double.toString(q.x)).append("\"");
+		sb.append(" ").append(prefix).append("y=\"").append(java.lang.Double.toString(q.y)).append("\"");
+		sb.append(" ").append(prefix).append("z=\"").append(java.lang.Double.toString(q.z)).append("\"");
+		sb.append(" ").append(prefix).append("w=\"").append(java.lang.Double.toString(q.z)).append("\"");
+		return sb.toString();
+	}
+	
+	private static String toXml(String prefix, javax.vecmath.Color3f c) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(" ").append(prefix).append("r=\"").append(java.lang.Double.toString(c.x)).append("\"");
+		sb.append(" ").append(prefix).append("g=\"").append(java.lang.Double.toString(c.y)).append("\"");
+		sb.append(" ").append(prefix).append("b=\"").append(java.lang.Double.toString(c.z)).append("\"");
+		return sb.toString();
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.37 2006/05/26 15:09:20 sascha_l Exp $
+ * $Id: TrackView.java,v 1.38 2006/05/30 14:20:22 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -55,7 +55,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	private int frame, delta, firstFrame, lastFrame;
 	private Track hitTrack;
 	private MotionKey[] hitKeys;
-	private Map<MotionKey, KeyData> selection = new HashMap<MotionKey, KeyData>();
+	private final Map<MotionKey, KeyData> selection = new HashMap<MotionKey, KeyData>();
 	private Range range;
 	private Rectangle rect;
 	private Range retimeRange;
@@ -1290,40 +1290,58 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		
 		popup.add(new JSeparator());
 		
-		menu = new JMenu("Interpolation method (" + track.getName() + ")");
-		mi = new JRadioButtonMenuItem("discrete");
-		mi.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				for (MotionCurve mc : track.getMotionCurves())
-					mc.setInterpolationMethod(MotionCurve.InterpolationMethod.DISCRETE);
-				TrackView.this.repaint();
-			}
-		});
-		mi.setSelected(track.getMotionCurves().length > 0 && track.getMotionCurves()[0].getInterpolationMethod() == MotionCurve.InterpolationMethod.DISCRETE);
-		menu.add(mi);
-		mi = new JRadioButtonMenuItem("linear");
-		mi.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				for (MotionCurve mc : track.getMotionCurves())
-					mc.setInterpolationMethod(MotionCurve.InterpolationMethod.LINEAR);
-				TrackView.this.repaint();
-			}
-		});
-		mi.setSelected(track.getMotionCurves().length > 0 && track.getMotionCurves()[0].getInterpolationMethod() == MotionCurve.InterpolationMethod.LINEAR);
-		menu.add(mi);
-		mi = new JRadioButtonMenuItem("cubic");
-		mi.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				for (MotionCurve mc : track.getMotionCurves())
-					mc.setInterpolationMethod(MotionCurve.InterpolationMethod.CUBIC);
-				TrackView.this.repaint();
-			}
-		});
-		mi.setSelected(track.getMotionCurves().length > 0 && track.getMotionCurves()[0].getInterpolationMethod() == MotionCurve.InterpolationMethod.CUBIC);
-		menu.add(mi);
+		menu = new JMenu("modify selected keys");
+		JMenu subMenu;
 		
-		menu.setEnabled(!(track instanceof HeaderTrack));
+		subMenu = new JMenu("set interpolation method to");
+		for (final MotionKey.Interpolation interpolation : MotionKey.Interpolation.values()) {
+			mi = new JMenuItem(interpolation.toString().toLowerCase());
+			mi.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent event) {
+					setInterpolation(interpolation);
+					TrackView.this.repaint();
+				}
+			});
+			subMenu.add(mi);
+		}
+		menu.add(subMenu);
+		
+		subMenu = new JMenu("set tangent mode to");
+		for (final MotionKey.TangentMode tangentMode : MotionKey.TangentMode.values()) {
+			mi = new JMenuItem(tangentMode.toString().toLowerCase());
+			mi.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent event) {
+					setTangentMode(tangentMode);
+					TrackView.this.repaint();
+				}
+			});
+			subMenu.add(mi);
+		}
+		menu.add(subMenu);
+		
+		subMenu = new JMenu("set tangent continuity to");
+		mi = new JMenuItem("smooth");
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				setTangentSmooth(true);
+				TrackView.this.repaint();
+			}
+		});
+		subMenu.add(mi);
+		mi = new JMenuItem("independend");
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				setTangentSmooth(false);
+				TrackView.this.repaint();
+			}
+		});
+		subMenu.add(mi);
+		menu.add(subMenu);
+		
+		menu.setEnabled(!selection.isEmpty() || hitKeys != null);
 		popup.add(menu);
+		
+		
 		
 		mi = new JMenuItem("revalidate anchor positions");
 		mi.addActionListener(new ActionListener() {
@@ -1373,6 +1391,45 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		popup.show((Component) e.getSource(), e.getX(), e.getY());
 	}
 	
+	private void setInterpolation(MotionKey.Interpolation interpolation) {
+		JPatchActionEdit edit = new JPatchActionEdit("change interpolation");
+		for (MotionKey key : selection.keySet()) {
+			edit.addEdit(new AtomicChangeMotionKey.Interpolation(key, interpolation));
+		}
+		if (hitKeys != null) {
+			for (MotionKey key : hitKeys) {
+				edit.addEdit(new AtomicChangeMotionKey.Interpolation(key, interpolation));
+			}
+		}
+		if (edit.isValid())
+			MainFrame.getInstance().getUndoManager().addEdit(edit);
+	}
+	
+	private void setTangentMode(MotionKey.TangentMode tangentMode) {
+//		for (MotionKey key : selection.keySet()) {
+//			key.setInterpolation(interpolation); // FIXME not undoable!!
+//		}
+//		if (hitKeys != null) {
+//			for (MotionKey key : hitKeys) {
+//				key.setInterpolation(interpolation); // FIXME not undoable!!
+//			}
+//		}
+	}
+	
+	private void changeTangentMode(JPatchActionEdit edit, MotionKey key, MotionKey.TangentMode tangentMode) {
+		
+	}
+	
+	private void setTangentSmooth(boolean smooth) {
+//		for (MotionKey key : selection.keySet()) {
+//			key.setInterpolation(interpolation); // FIXME not undoable!!
+//		}
+//		if (hitKeys != null) {
+//			for (MotionKey key : hitKeys) {
+//				key.setInterpolation(interpolation); // FIXME not undoable!!
+//			}
+//		}
+	}
 	private void drawSelectionRectangle(Graphics g) {
 		g.drawLine(rect.x, rect.y, rect.x + rect.width, rect.y);
 		g.drawLine(rect.x, rect.y + rect.height, rect.x + rect.width, rect.y + rect.height);
@@ -1407,7 +1464,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //			}
 //		} else {
 			for (MotionKey key : selection.keySet()) {
-				MotionKey copy = key.copy();
+				MotionKey copy = (MotionKey) key.copy();
 				copy.setPosition(copy.getPosition() - range.firstFrame);
 				clipboard.put(copy, selection.get(key).track.getMotionCurve(key));
 			}

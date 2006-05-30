@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.19 2006/05/22 10:46:20 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.20 2006/05/30 14:20:22 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -96,15 +96,23 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 				int vThis = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
 				MotionKey key = motionCurve.getKeyAt(frame);
 				if (key != null) {
+//					if (keyHit(key, hitKeys))
+//						g.setColor(TimelineEditor.HIT_KEY);
+//					else if (selection.containsKey(key))
+//						g.setColor(TimelineEditor.SELECTED_KEY);
+//					else
+//						g.setColor(Color.GRAY);
+//					g.fillOval(x + start - 3, y + vThis - 3, 6, 6);
+//					g.setColor(Color.BLACK);
+//					g.drawOval(x + start - 3, y + vThis - 3, 6, 6);
+					Color fillColor;
 					if (keyHit(key, hitKeys))
-						g.setColor(TimelineEditor.HIT_KEY);
+						fillColor = TimelineEditor.HIT_KEY;
 					else if (selection.containsKey(key))
-						g.setColor(TimelineEditor.SELECTED_KEY);
+						fillColor = TimelineEditor.SELECTED_KEY;
 					else
-						g.setColor(Color.GRAY);
-					g.fillOval(x + start - 3, y + vThis - 3, 6, 6);
-					g.setColor(Color.BLACK);
-					g.drawOval(x + start - 3, y + vThis - 3, 6, 6);
+						fillColor = Color.GRAY;
+					drawKey(g, key, x + start - 3, y + vThis - 3, fillColor, Color.BLACK);
 				}
 				frame++;
 			}

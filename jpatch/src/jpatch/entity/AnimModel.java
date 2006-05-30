@@ -1,5 +1,6 @@
 package jpatch.entity;
 
+import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -100,15 +101,15 @@ public class AnimModel extends AnimObject {
 		return re.xml(prefix);
 	}
 	
-	public void xml(StringBuffer sb, String prefix) {
-		sb.append(prefix).append("<model>\n");
-		sb.append(prefix).append("\t<name>" + getName() + "</name>\n");
-		sb.append(prefix).append("\t<filename>" + strFileName + "</filename>\n");
+	public void xml(PrintStream out, String prefix) {
+		out.append(prefix).append("<model>\n");
+		out.append(prefix).append("\t<name>" + getName() + "</name>\n");
+		out.append(prefix).append("\t<filename>" + strFileName + "</filename>\n");
 		if (iSubdivisionOffset != 0)
-			sb.append("\t\t<subdivisionoffset>" + iSubdivisionOffset + "</subdivisionoffset>").append("\n");
-		sb.append(prefix).append(renderStrings("\t")).append("\n");
-		MainFrame.getInstance().getAnimation().getCurvesetFor(this).xml(sb, prefix + "\t");
-		sb.append(prefix).append("</model>").append("\n");
+			out.append("\t\t<subdivisionoffset>" + iSubdivisionOffset + "</subdivisionoffset>").append("\n");
+		out.append(prefix).append(renderStrings("\t")).append("\n");
+		MainFrame.getInstance().getAnimation().getCurvesetFor(this).xml(out, prefix + "\t");
+		out.append(prefix).append("</model>").append("\n");
 	}
 	
 	public void removeFromParent() {

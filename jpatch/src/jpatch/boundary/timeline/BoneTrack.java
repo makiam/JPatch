@@ -107,15 +107,23 @@ public class BoneTrack extends Track {
 					int vThis = off - (int) Math.round(size / scale * motionCurve.getFloatAt(frame));
 					MotionKey key = motionCurve.getKeyAt(frame);
 					if (key != null) {
+//						if (keyHit(key, hitKeys))
+//							g.setColor(TimelineEditor.HIT_KEY);
+//						else if (selection.containsKey(key))
+//							g.setColor(TimelineEditor.SELECTED_KEY);
+//						else
+//							g.setColor(col[i]);
+//						g.fillOval(x + start - 3, y + vThis - 3, 6, 6);
+//						g.setColor(Color.BLACK);
+//						g.drawOval(x + start - 3, y + vThis - 3, 6, 6);
+						Color fillColor;
 						if (keyHit(key, hitKeys))
-							g.setColor(TimelineEditor.HIT_KEY);
+							fillColor = TimelineEditor.HIT_KEY;
 						else if (selection.containsKey(key))
-							g.setColor(TimelineEditor.SELECTED_KEY);
+							fillColor = TimelineEditor.SELECTED_KEY;
 						else
-							g.setColor(col[i]);
-						g.fillOval(x + start - 3, y + vThis - 3, 6, 6);
-						g.setColor(Color.BLACK);
-						g.drawOval(x + start - 3, y + vThis - 3, 6, 6);
+							fillColor = col[i];
+						drawKey(g, key, x + start - 3, y + vThis - 1, fillColor, Color.BLACK);
 					}
 					frame++;
 				}
@@ -139,14 +147,14 @@ public class BoneTrack extends Track {
 	
 		
 		for (int x = -fw ; x <= clip.width + fw; x += fw) {
-			MotionKey key;
+			MotionKey key = null;
 			boolean selected = false;
 			boolean hit = false;
-			boolean draw = false;
+			MotionKey draw = null;
 			for (MotionCurve m : motionCurves) {
 				key = m.getKeyAt(frame);
 				if (key != null) {
-					draw = true;
+					draw = key;
 					if (keyHit(key, hitKeys)) {
 						hit = true;
 						break;
@@ -155,16 +163,24 @@ public class BoneTrack extends Track {
 						selected = true;
 				}
 			}
-			if (draw) {
+			if (draw != null) {
+//				if (hit)
+//					g.setColor(TimelineEditor.HIT_KEY);
+//				else if (selected)
+//					g.setColor(TimelineEditor.SELECTED_KEY);
+//				else
+//					g.setColor(Color.GRAY);
+//				g.fillOval(x + start - 3, y + TOP - 1, 6, 6);
+//				g.setColor(Color.BLACK);
+//				g.drawOval(x + start - 3, y + TOP - 1, 6, 6);
+				Color fillColor;
 				if (hit)
-					g.setColor(TimelineEditor.HIT_KEY);
+					fillColor = TimelineEditor.HIT_KEY;
 				else if (selected)
-					g.setColor(TimelineEditor.SELECTED_KEY);
+					fillColor = TimelineEditor.SELECTED_KEY;
 				else
-					g.setColor(Color.GRAY);
-				g.fillOval(x + start - 3, y + TOP - 1, 6, 6);
-				g.setColor(Color.BLACK);
-				g.drawOval(x + start - 3, y + TOP - 1, 6, 6);
+					fillColor = Color.GRAY;
+				drawKey(g, draw, x + start - 3, y + TOP - 1, fillColor, Color.BLACK);
 			} 
 			frame++;
 		}

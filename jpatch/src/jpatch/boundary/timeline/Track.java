@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.17 2006/05/22 10:46:20 sascha_l Exp $
+ * $Id: Track.java,v 1.18 2006/05/30 14:20:22 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -190,15 +190,17 @@ public class Track<M extends MotionCurve> {
 		for (int x = -fw ; x <= clip.width + fw; x += fw) {
 			MotionKey key = motionCurve.getKeyAt(frame);
 			if (key != null) {
+				Color fillColor;
 				if (keyHit(key, hitKeys))
-					g.setColor(TimelineEditor.HIT_KEY);
+					fillColor = TimelineEditor.HIT_KEY;
 				else if (selection.containsKey(key))
-					g.setColor(TimelineEditor.SELECTED_KEY);
+					fillColor = TimelineEditor.SELECTED_KEY;
 				else
-					g.setColor(Color.GRAY);
-				g.fillOval(x + start - 3, y + TOP - 1, 6, 6);
-				g.setColor(Color.BLACK);
-				g.drawOval(x + start - 3, y + TOP - 1, 6, 6);
+					fillColor = Color.GRAY;
+				drawKey(g, key, x + start - 3, y + TOP - 1, fillColor, Color.BLACK);
+//				g.fillOval(x + start - 3, y + TOP - 1, 6, 6);
+//				g.setColor(Color.BLACK);
+//				g.drawOval(x + start - 3, y + TOP - 1, 6, 6);
 			}
 			
 //			else {
@@ -221,5 +223,29 @@ public class Track<M extends MotionCurve> {
 			if (key.equals(hitKey))
 				return true;
 		return false;
+	}
+	
+	void drawKey(Graphics g, MotionKey key, int x, int y, Color fill, Color outline) {
+		switch (key.getInterpolation()) {
+		case CUBIC:
+			g.setColor(fill);
+			g.fillOval(x, y, 6, 6);
+			g.setColor(outline);
+			g.drawOval(x, y, 6, 6);
+			break;
+		case LINEAR:
+			Polygon polygon = new Polygon(new int[] { x + 3, x + 6, x + 3, x }, new int[] { y, y + 3, y + 6, y + 3 }, 4);
+			g.setColor(fill);
+			g.fillPolygon(polygon);
+			g.setColor(outline);
+			g.drawPolygon(polygon);
+			break;
+		case DISCRETE:
+			g.setColor(fill);
+			g.fillRect(x, y, 6, 6);
+			g.setColor(outline);
+			g.drawRect(x, y, 6, 6);
+			break;
+		}
 	}
 }
