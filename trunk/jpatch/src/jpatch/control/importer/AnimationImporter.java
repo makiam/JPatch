@@ -39,6 +39,7 @@ public class AnimationImporter extends DefaultHandler {
 	private Map<String, Bone> boneNameMap = new HashMap<String, Bone>();
 	
 	private Animation animation;
+	private MotionKey.Interpolation interpolation;
 	
 	public void loadAnimation(String filename) {
 		MainFrame.getInstance().newAnimation();
@@ -228,6 +229,7 @@ public class AnimationImporter extends DefaultHandler {
 		final int ORIENTATION = 2;
 		final int SCALE = 3;
 		int type = 0;
+		interpolation = null;
 		
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
@@ -291,11 +293,11 @@ public class AnimationImporter extends DefaultHandler {
 				iState = FLOAT_CURVE;
 			} else if (localName.equals("interpolation")) {
 				if (value.toLowerCase().equals("discrete"))
-					motionCurve.setInterpolationMethod(MotionCurve.InterpolationMethod.DISCRETE);
+					interpolation = MotionKey.Interpolation.DISCRETE;
 				else if (value.toLowerCase().equals("linear"))
-					motionCurve.setInterpolationMethod(MotionCurve.InterpolationMethod.LINEAR);
+					interpolation = MotionKey.Interpolation.LINEAR;
 				else if (value.toLowerCase().equals("cubic"))
-					motionCurve.setInterpolationMethod(MotionCurve.InterpolationMethod.CUBIC);
+					interpolation = MotionKey.Interpolation.CUBIC;
 			}
 		}
 	}
@@ -333,31 +335,40 @@ public class AnimationImporter extends DefaultHandler {
 			else if (localName.equals("bone"))
 				o = ((Bone) boneNameMap.get(value)).getBoneEnd();
 		}
+		MotionKey key;
 		switch (iState) {
-			case FLOAT_CURVE: {
-				motionCurve.addKey(new MotionKey.Float(frame, (float) x));
-			}
+		case FLOAT_CURVE:
+			key = new MotionKey.Float(frame, (float) x);
+			if (interpolation != null)
+				key.setInterpolation(interpolation);
+			motionCurve.addKey(key);
 			break;
-			
-			case POINT3D_CURVE: {
-				motionCurve.addKey(new MotionKey.Point3d(frame, new Point3d(x, y, z)));
-			}
+		case POINT3D_CURVE:
+			key = new MotionKey.Point3d(frame, new Point3d(x, y, z));
+			if (interpolation != null)
+				key.setInterpolation(interpolation);
+			motionCurve.addKey(key);
 			break;
-			
-			case QUAT4F_CURVE: {
-				motionCurve.addKey(new MotionKey.Quat4f(frame, new Quat4f((float) x, (float) y, (float) z, (float) w)));
-			}
+		case QUAT4F_CURVE:
+			key = new MotionKey.Quat4f(frame, new Quat4f((float) x, (float) y, (float) z, (float) w));
+			if (interpolation != null)
+				key.setInterpolation(interpolation);
+			motionCurve.addKey(key);
 			break;
-			
-			case COLOR3F_CURVE: {
-				motionCurve.addKey(new MotionKey.Color3f(frame, new Color3f((float) x, (float) y, (float) z)));
-			}
+		case COLOR3F_CURVE:
+			key = new MotionKey.Color3f(frame, new Color3f((float) x, (float) y, (float) z));
+			if (interpolation != null)
+				key.setInterpolation(interpolation);
+			motionCurve.addKey(key);
 			break;
-			
-			case OBJECT_CURVE:
-				motionCurve.addKey(new MotionKey.Object(frame, o));
-				break;
-			default: throw new IllegalStateException();
+		case OBJECT_CURVE:
+			key = new MotionKey.Object(frame, o);
+			if (interpolation != null)
+				key.setInterpolation(interpolation);
+			motionCurve.addKey(key);
+			break;
+		default:
+			throw new IllegalStateException();
 		}
 	}
 }

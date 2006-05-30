@@ -57,20 +57,21 @@ public class ColorTrack extends Track<MotionCurve.Color3f> {
 			if (colorKey != null) {
 				//g.fill3DRect(x + start - iFrameWidth / 2, y + 2, iFrameWidth, 11, true);
 				Color c = Color.BLACK;
+				Color fillColor;
 				if (keyHit(colorKey, hitKeys))
-					g.setColor(TimelineEditor.HIT_KEY);
+					fillColor = TimelineEditor.HIT_KEY;
 				else if (selection.containsKey(colorKey))
-					g.setColor(TimelineEditor.SELECTED_KEY);
+					fillColor = TimelineEditor.SELECTED_KEY;
 				else {
 					Color3f color = colorKey.getColor3f();
 					color.clamp(0, 1);
 					c = (color.x + color.y + color.z > 1.5f) ? Color.BLACK : Color.WHITE;
-					g.setColor(color.get());
+					fillColor = color.get();
 				}
-				g.fillOval(x + start - 3, y + 4, 6, 6);
-				g.setColor(c);
-				g.drawOval(x + start - 3, y + 4, 6, 6);
-				
+//				g.fillOval(x + start - 3, y + 4, 6, 6);
+//				g.setColor(c);
+//				g.drawOval(x + start - 3, y + 4, 6, 6);
+				drawKey(g, colorKey, x + start - 3, y + 4, fillColor, c);
 			}
 			frame++;
 		}

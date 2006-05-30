@@ -3,6 +3,7 @@ package jpatch.entity;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.PrintStream;
 import java.util.*;
 
 import javax.swing.AbstractAction;
@@ -255,30 +256,21 @@ public class Animation implements MutableTreeNode {
 	
 	public void dump() {
 		System.out.println("Current position:" + getPosition());
-//		for (AnimObject animObject:getObjects()) {
-//			System.out.println("animObject: " + animObject.getName());
-//			MotionCurveSet mcs = getCurvesetFor(animObject);
-//			StringBuffer sb = new StringBuffer();
-//			mcs.xml(sb, "    ");
-//			System.out.println(sb);
-//		}
-		System.out.println(xml("\t"));
+		xml(System.out, "\t");
 	}
 	
-	public StringBuffer xml(String prefix) {
-		StringBuffer sb = new StringBuffer();
-		sb.append(prefix).append("<choreography>\n");
-		sb.append(prefix).append("\t<name>" + strName + "</name>\n");
-		sb.append(prefix).append("\t<start>" + fStart + "</start>\n");
-		sb.append(prefix).append("\t<end>" + fEnd + "</end>\n");
-		sb.append(prefix).append("\t<framerate>" + fFramerate + "</framerate>\n");
-//		sb.append(prefix).append("\t<prefix>" + strPrefix + "</prefix>").append("\n");
-		sb.append(prefix).append(renderStrings("\t")).append("\n");
+	public void xml(PrintStream out, String prefix) {
+		out.append(prefix).append("<choreography>\n");
+		out.append(prefix).append("\t<name>" + strName + "</name>\n");
+		out.append(prefix).append("\t<start>" + fStart + "</start>\n");
+		out.append(prefix).append("\t<end>" + fEnd + "</end>\n");
+		out.append(prefix).append("\t<framerate>" + fFramerate + "</framerate>\n");
+		out.append(prefix).append(renderStrings("\t")).append("\n");
 		for (AnimObject animObject:getObjects())
-			animObject.xml(sb, prefix + "\t");
-		sb.append(prefix).append("</choreography>\n");
-		return sb;
+			animObject.xml(out, prefix + "\t");
+		out.append(prefix).append("</choreography>\n");
 	}
+	
 /* MutableTreeNode interface implementation */
 	
 	public void insert(MutableTreeNode child, int index) {

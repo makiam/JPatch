@@ -16,7 +16,7 @@ public final class XmlDumpAction extends AbstractAction {
 		if (MainFrame.getInstance().getModel() != null)
 			System.out.println(MainFrame.getInstance().getModel().xml(""));
 		else
-			System.out.println(MainFrame.getInstance().getAnimation().xml(""));
+			MainFrame.getInstance().getAnimation().xml(System.out, "");
 	}
 }
 

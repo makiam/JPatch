@@ -85,11 +85,15 @@ public final class SaveAsAction extends AbstractAction {
 	
 	private boolean write(File file) {
 		String filename = file.getPath();
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		PrintStream out = new PrintStream(byteArrayOutputStream);
+		
+		
 		try {
 			// create xml representation
-			StringBuffer xml;
+			StringBuffer xml = null;
 			if (MainFrame.getInstance().getAnimation() != null) {
-				xml = MainFrame.getInstance().getAnimation().xml("\t");
+				MainFrame.getInstance().getAnimation().xml(out, "\t");
 			} else {
 				xml = MainFrame.getInstance().getModel().xml("\t");
 			}
@@ -108,7 +112,10 @@ public final class SaveAsAction extends AbstractAction {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
 			writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 			writer.write("<jpatch version=\"" + VersionInfo.ver + "\">\n");
-			writer.write(xml.toString());
+			if (xml != null)
+				writer.write(xml.toString());
+			else
+				writer.write(byteArrayOutputStream.toString());
 			writer.write("</jpatch>\n");
 			writer.close();
 			MainFrame.getInstance().getUndoManager().setChange(false);
