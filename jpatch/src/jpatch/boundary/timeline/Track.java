@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.19 2006/05/30 18:16:28 sascha_l Exp $
+ * $Id: Track.java,v 1.20 2006/06/03 20:08:59 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -92,7 +92,7 @@ public class Track<M extends MotionCurve> {
 	}
 	
 	public MotionKey[] getKeysAt(int mx, int my) {
-		System.out.println("*");
+//		System.out.println("*");
 		int frame = mx / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
 		MotionKey key = motionCurve.getKeyAt(frame);
 //		boolean contains = selection.containsKey(key);

@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.39 2006/05/30 18:16:28 sascha_l Exp $
+ * $Id: TrackView.java,v 1.40 2006/06/03 20:08:59 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -41,7 +41,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	/**
 	 * 
 	 */
-	private static enum State { IDLE, RESIZE, SCROLL, MOVE_KEY, LASSO, RETIME_LEFT, RETIME_RIGHT };
+	private static enum State { IDLE, RESIZE, SCROLL, MOVE_KEY, LASSO, RETIME_LEFT, RETIME_RIGHT, TANGENT };
 	private State state = State.IDLE;
 	private final TimelineEditor timelineEditor;
 	private Dimension dim = new Dimension();
@@ -67,6 +67,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	private Range clipRange;
 	private Set<MotionCurve> clipCurveWithKeys = new HashSet<MotionCurve>();
 //	private boolean[] clipTrackHasKeys;
+	private TangentHandle tangentHandle;
 	
 	private Action deleteAction = new AbstractAction() {
 		public void actionPerformed(ActionEvent event) {
@@ -336,6 +337,11 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 							
 							
 							hitKeys = track.getKeysAt(mx, my - y);
+							if (track instanceof AvarTrack)
+								tangentHandle = ((AvarTrack) track).getTangentHandleAt(mx, my - y);
+							else
+								tangentHandle = null;
+							System.out.println("tangentHandle = " + tangentHandle);
 							if (hitKeys != null) {
 								hitTrack = track;
 								trackTop = y;
@@ -347,6 +353,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 								if (hitKeys[0] instanceof MotionKey.Float)
 									value = ((MotionKey.Float) hitKeys[0]).getFloat();
 //								System.out.println("key selected: " + selectedKey + " position=" + position);
+							} else if (tangentHandle != null) {
+								state = State.TANGENT;
+								tangentHandle.prepare();
 							} else {
 								if (moveSelection) {
 									state = State.MOVE_KEY;
@@ -355,9 +364,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 									hitKeys = null;
 								} else {
 									/* enter lasso select mode */
-									state = State.LASSO;
-									range = new Range();
+									range = null;
 									rect = new Rectangle(mx, my, 0, 0);
+									state = State.LASSO;
 								}
 							}
 							repaint();
@@ -381,9 +390,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 								hitKeys = null;
 							} else {
 								/* enter lasso select mode */
-								state = State.LASSO;
-								range = new Range();
+								range = null;
 								rect = new Rectangle(mx, my, 0, 0);
+								state = State.LASSO;
 							}
 						}
 						repaint();
@@ -424,10 +433,21 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //	}
 	
 	public void mouseReleased(MouseEvent e) {
+		JPatchActionEdit edit;
 		switch (state) {
+		case TANGENT:
+			edit = new JPatchActionEdit("modify tangent");
+			edit.addEdit(tangentHandle.end());
+			MainFrame.getInstance().getUndoManager().addEdit(edit);
+			/*
+			 * Repaint viewports
+			 */
+			MainFrame.getInstance().getAnimation().rethink();
+			MainFrame.getInstance().getJPatchScreen().update_all();
+			break;
 		case MOVE_KEY:
 			if (delta != 0) {
-				JPatchActionEdit edit = new JPatchActionEdit("move key");
+				edit = new JPatchActionEdit("move key");
 				if (!moveSelection) {
 					for (MotionKey selectedKey : hitKeys) {
 						edit.addEdit(new AtomicMoveMotionKey(hitTrack.getMotionCurve(selectedKey), selectedKey, (int) selectedKey.getPosition() - delta));
@@ -474,6 +494,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			MainFrame.getInstance().getJPatchScreen().update_all();
 			break;
 		case LASSO:
+			if (range == null)
+				range = new Range();
 			selection.clear();
 			Range newRange = new Range();
 			boolean selectionValid = false;
@@ -522,9 +544,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			}
 			repaint();
 			break;
-		case RETIME_LEFT:
-		case RETIME_RIGHT:	// fallthrough is intended!
-			JPatchActionEdit edit = new JPatchActionEdit("move key");
+		case RETIME_LEFT:	// fallthrough is intended!!!
+		case RETIME_RIGHT:	// fallthrough is intended!!!
+			edit = new JPatchActionEdit("move key");
 			/*
 			 * move all selected keys
 			 */
@@ -610,6 +632,10 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //			revalidate();
 //			timelineEditor.revalidate();
 //			((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
+			break;
+		case TANGENT:
+			hitTrack.moveKey(tangentHandle, e.getY() - trackTop);
+			timelineEditor.repaint();
 			break;
 		case MOVE_KEY:
 			int d = e.getX() / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart() - frame;
@@ -750,6 +776,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			
 			break;
 		case LASSO:
+			if (range == null)
+				range = new Range();
 			Graphics2D g2 = (Graphics2D) ((Component) e.getSource()).getGraphics();
 			g2.setXORMode(new Color(((Component) e.getSource()).getBackground().getRGB() ^ 0x00000000));
 			g2.setStroke(new BasicStroke(2.0f,BasicStroke.CAP_SQUARE,BasicStroke.JOIN_BEVEL,0.0f,new float[] { 4.0f, 4.0f }, 0.0f));
@@ -1388,11 +1416,13 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	private void setInterpolation(MotionKey.Interpolation interpolation) {
 		JPatchActionEdit edit = new JPatchActionEdit("change interpolation");
 		for (MotionKey key : selection.keySet()) {
-			edit.addEdit(new AtomicChangeMotionKey.Interpolation(key, interpolation));
+			if (key.getInterpolation() != interpolation)
+				edit.addEdit(new AtomicChangeMotionKey.Interpolation(key, interpolation));
 		}
 		if (hitKeys != null) {
 			for (MotionKey key : hitKeys) {
-				edit.addEdit(new AtomicChangeMotionKey.Interpolation(key, interpolation));
+				if (key.getInterpolation() != interpolation)
+					edit.addEdit(new AtomicChangeMotionKey.Interpolation(key, interpolation));
 			}
 		}
 		if (edit.isValid())
@@ -1400,31 +1430,38 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	}
 	
 	private void setTangentMode(MotionKey.TangentMode tangentMode) {
-//		for (MotionKey key : selection.keySet()) {
-//			key.setInterpolation(interpolation); // FIXME not undoable!!
-//		}
-//		if (hitKeys != null) {
-//			for (MotionKey key : hitKeys) {
-//				key.setInterpolation(interpolation); // FIXME not undoable!!
-//			}
-//		}
-	}
-	
-	private void changeTangentMode(JPatchActionEdit edit, MotionKey key, MotionKey.TangentMode tangentMode) {
-		
+		JPatchActionEdit edit = new JPatchActionEdit("change tangent mode");
+		for (MotionKey key : selection.keySet()) {
+			if (key.getTangentMode() != tangentMode)
+				edit.addEdit(new AtomicChangeMotionKey.TangentMode(key, tangentMode));
+		}
+		if (hitKeys != null) {
+			for (MotionKey key : hitKeys) {
+				if (key.getTangentMode() != tangentMode)
+					edit.addEdit(new AtomicChangeMotionKey.TangentMode(key, tangentMode));
+			}
+		}
+		if (edit.isValid())
+			MainFrame.getInstance().getUndoManager().addEdit(edit);
 	}
 	
 	private void setTangentSmooth(boolean smooth) {
-//		for (MotionKey key : selection.keySet()) {
-//			key.setInterpolation(interpolation); // FIXME not undoable!!
-//		}
-//		if (hitKeys != null) {
-//			for (MotionKey key : hitKeys) {
-//				key.setInterpolation(interpolation); // FIXME not undoable!!
-//			}
-//		}
+		JPatchActionEdit edit = new JPatchActionEdit("change tangent mode");
+		for (MotionKey key : selection.keySet()) {
+			if (key.isSmooth() != smooth)
+				edit.addEdit(new AtomicChangeMotionKey.Smooth(key, smooth));
+		}
+		if (hitKeys != null) {
+			for (MotionKey key : hitKeys) {
+				if (key.isSmooth() != smooth)
+					edit.addEdit(new AtomicChangeMotionKey.Smooth(key, smooth));
+			}
+		}
+		if (edit.isValid())
+			MainFrame.getInstance().getUndoManager().addEdit(edit);
 	}
 	private void drawSelectionRectangle(Graphics g) {
+		System.out.println("rect = " + rect.x + " " + rect.y + " " + rect.width + " " + rect.height);
 		g.drawLine(rect.x, rect.y, rect.x + rect.width, rect.y);
 		g.drawLine(rect.x, rect.y + rect.height, rect.x + rect.width, rect.y + rect.height);
 		g.drawLine(rect.x, rect.y, rect.x, rect.y + rect.height);

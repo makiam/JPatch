@@ -1,5 +1,5 @@
 /*
- * $Id: Ruler.java,v 1.15 2006/05/22 10:46:20 sascha_l Exp $
+ * $Id: Ruler.java,v 1.16 2006/06/03 20:08:59 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -143,8 +143,8 @@ class Ruler extends JComponent implements MouseListener, MouseMotionListener, Mo
 	private void setFrameWidth(int newWidth) {
 		if (newWidth < 6)
 			newWidth = 6;
-		if (newWidth > 32)
-			newWidth = 32;
+		if (newWidth > 64)
+			newWidth = 64;
 		Rectangle r = timelineEditor.getViewport().getViewRect();
 		r.x = r.x * newWidth / timelineEditor.getFrameWidth();
 		timelineEditor.setFrameWidth(newWidth);
