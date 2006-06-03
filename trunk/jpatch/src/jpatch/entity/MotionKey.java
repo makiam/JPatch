@@ -78,6 +78,7 @@ public abstract class MotionKey {
 		
 		public void setDfIn(float dfIn) {
 			this.dfIn = dfIn;
+			System.out.println(this + ".setDfIn(" + dfOut + ")");
 		}
 		
 		public float getDfOut() {
@@ -86,7 +87,7 @@ public abstract class MotionKey {
 		
 		public void setDfOut(float dfOut) {
 			this.dfOut = dfOut;
-				
+			System.out.println(this + ".setDfOut(" + dfOut + ")");
 		}
 		
 		@Override
@@ -94,7 +95,7 @@ public abstract class MotionKey {
 			out.append("<key frame=\"").append(java.lang.Float.toString(position)).append("\"");
 			out.append(" value=\"").append(java.lang.Float.toString(f)).append("\"");
 			out.append(" interpolation=\"").append(interpolation.toString().toLowerCase()).append("\"");
-			if (interpolation == Interpolation.DISCRETE) {
+			if (interpolation == Interpolation.CUBIC) {
 				out.append(" tangentMode=\"").append(tangentMode.toString().toLowerCase()).append("\"");
 				if (tangentMode == TangentMode.MANUAL) {
 					if (smooth) {
