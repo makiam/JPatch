@@ -6,6 +6,7 @@ import java.util.*;
 import javax.vecmath.Quat4f;
 
 import jpatch.auxilary.*;
+import jpatch.entity.MotionKey.TangentMode;
 
 public abstract class MotionCurve {
 	
@@ -133,26 +134,42 @@ public abstract class MotionCurve {
 		return mc;
 	}
 	
+	/**
+	 * Sets the name of this curve
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 	
+	/**
+	 * Returns the name of this curve
+	 */
 	public String getName() {
 		return name;
 	}
 	
+	/**
+	 * Adds a MotionKey to this curve. Note that the position (where the key will be added)
+	 * is already specified in the passed MotionKey object.
+	 * @param key The key to add
+	 */
 	public void addKey(MotionKey key) {
 		System.out.println("addKey " + key.hashCode() + " pos " + key.getPosition());
 		list.add(binarySearch(key.getPosition()), key);
 	}
 	
+	/**
+	 * Inserts a new key at the given position and returns that key.
+	 * @param position The position to insert the new key.
+	 * @return The newly inserted key.
+	 */
 	public abstract MotionKey insertKeyAt(float position);
 	
-	public void forceRemoveKey(MotionKey key) {
-		System.out.println("removeKey " + key.hashCode() + " pos " + key.getPosition());
-		list.remove(key);
-	}
-	
+	/**
+	 * Removes a key from this curve only if it was not the last key on the curve
+	 * @param The key to remove
+	 * @return The key if it has been removed (if it wasn't the last on the curve), null otherwise
+	 */
 	public MotionKey removeKey(MotionKey key) {
 		System.out.println("removeKey " + key.hashCode() + " pos " + key.getPosition());
 		if (list.size() > 1) {
@@ -163,6 +180,20 @@ public abstract class MotionCurve {
 		}
 	}
 	
+	/**
+	 * Removes a key from this curve, even if it is the last key and the curve will be empty then.
+	 * @param key The key to remove
+	 */
+	public void forceRemoveKey(MotionKey key) {
+		System.out.println("removeKey " + key.hashCode() + " pos " + key.getPosition());
+		list.remove(key);
+	}
+	
+	/**
+	 * Moves a key on this curve to a new position
+	 * @param key The key to move
+	 * @param position The new position
+	 */
 	public void moveKey(MotionKey key, float position) {
 		System.out.println("movekey " + key.hashCode() + " from " + key.getPosition() + " to " + position);
 		list.remove(key);
@@ -170,6 +201,10 @@ public abstract class MotionCurve {
 		list.add(binarySearch(key.getPosition()), key);
 	}
 	
+	/**
+	 * Returns the number of keys on this curve.
+	 * @return The number of keys on this curve.
+	 */
 	public int getKeyCount() {
 		return list.size();
 	}
@@ -306,8 +341,63 @@ public abstract class MotionCurve {
 		
 		private Float() { }
 		
+		public void getDerivatives(int keyIndex, float[] d, boolean premultiply) {
+			MotionKey.Float key = (MotionKey.Float) list.get(keyIndex);
+			MotionKey.TangentMode tangentMode = key.getTangentMode();
+			
+			/*
+			 * for the first and last key, return 0 tangent
+			 */
+			if ((keyIndex == 0) || (keyIndex == list.size() - 1)) {
+				d[0] = 0;
+				d[1] = 0;
+				return;
+			}
+			
+			MotionKey.Float prevKey = (MotionKey.Float) list.get(keyIndex - 1);
+			MotionKey.Float nextKey = (MotionKey.Float) list.get(keyIndex + 1);
+			float fp = prevKey.getFloat();
+			float f = key.getFloat();
+			float fn = nextKey.getFloat();
+			
+			/*
+			 * if tangentMode is manual, return the manually set tangent
+			 */
+			if (tangentMode == TangentMode.MANUAL) {
+				d[0] = key.getDfIn();
+				if (key.isSmooth())
+					d[1] = d[0];
+				else
+					d[1] = key.getDfOut();
+				if (premultiply) {
+					d[0] *= (key.getPosition() - prevKey.getPosition());
+					d[1] *= (nextKey.getPosition() - key.getPosition());
+				}
+				return;
+			}
+			
+			/*
+			 * compute tangent
+			 */
+			
+			/* apply overshoot limitation */
+			if ((tangentMode == TangentMode.OVERSHOOT) && (f == fp || f == fn || (fp > f && fn > f) || (fp < f && fn < f))) {
+				d[0] = 0;
+				d[1] = 0;
+				return;
+			}
+			
+			d[0] = (fn - fp) / (nextKey.getPosition() - prevKey.getPosition());
+			d[1] = d[0];
+			if (premultiply) {
+				d[0] *= (key.getPosition() - prevKey.getPosition());
+				d[1] *= (nextKey.getPosition() - key.getPosition());
+			}
+			return;
+		}
+		
 		public float getFloatAt(float position) {
-			boolean limitOvershoot = true;
+			
 			if (position <= getStart()) return ((MotionKey.Float) list.get(0)).getFloat();
 			if (position >= getEnd()) return ((MotionKey.Float) list.get(list.size() - 1)).getFloat();
 			java.lang.Object[] key = getInterpolationKeysFor(position);
@@ -326,20 +416,26 @@ public abstract class MotionCurve {
 			case LINEAR:
 				return (p0 * (1 - t) + p1 * t);
 			case CUBIC:
-				float m0 = 0;
-				float m1 = 0;
-				float d0 = 0;
-				float d1 = 0;
-				if (key0 != null) {
-					float v0 = key0.getFloat();
-					if (limitOvershoot && (p0 == v0 || p0 == p1 || (p0 > v0 && p0 > p1) || (p0 < v0 && p0 < p1))) m0 = 0;
-					else m0 = (p1 - v0) / (key2.getPosition() - key0.getPosition()) * l;
-				}
-				if (key3 != null) {
-					float v1 = key3.getFloat();
-					if (limitOvershoot && (p1 == p0 || p1 == v1 || (p1 > v1 && p1 > p0) || (p1 < v1 && p1 < p0))) m1 = 0;
-					else m1 = (v1 - p0) / (key3.getPosition() - key1.getPosition()) * l;
-				}
+				float[] d = new float[2];
+				getDerivatives(binarySearch(position) - 1, d, true);
+				float m0 = d[1];
+				getDerivatives(binarySearch(position), d, true);
+				float m1 = d[0];
+//				boolean limitOvershoot = (key1.getTangentMode() == MotionKey.TangentMode.OVERSHOOT);
+//				float m0 = 0;
+//				float m1 = 0;
+//				float d0 = 0;
+//				float d1 = 0;
+//				if (key0 != null) {
+//					float v0 = key0.getFloat();
+//					if (limitOvershoot && (p0 == v0 || p0 == p1 || (p0 > v0 && p0 > p1) || (p0 < v0 && p0 < p1))) m0 = 0;
+//					else m0 = (p1 - v0) / (key2.getPosition() - key0.getPosition()) * l;
+//				}
+//				if (key3 != null) {
+//					float v1 = key3.getFloat();
+//					if (limitOvershoot && (p1 == p0 || p1 == v1 || (p1 > v1 && p1 > p0) || (p1 < v1 && p1 < p0))) m1 = 0;
+//					else m1 = (v1 - p0) / (key3.getPosition() - key1.getPosition()) * l;
+//				}
 //				if (key0 != null && key1 != null) {
 ////				if (key0 != null)
 //					d0 = (key1.getFloat() - key0.getFloat()) / (key1.getPosition() - key0.getPosition());

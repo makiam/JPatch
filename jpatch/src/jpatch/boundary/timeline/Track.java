@@ -92,7 +92,7 @@ public class Track<M extends MotionCurve> {
 	}
 	
 	public MotionKey[] getKeysAt(int mx, int my) {
-		System.out.println("*");
+//		System.out.println("*");
 		int frame = mx / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
 		MotionKey key = motionCurve.getKeyAt(frame);
 //		boolean contains = selection.containsKey(key);
