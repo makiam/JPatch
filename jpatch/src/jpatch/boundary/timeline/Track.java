@@ -103,9 +103,9 @@ public class Track<M extends MotionCurve> {
 //		return contains;
 	}
 	
-	public MotionCurve getMotionCurve(MotionKey key) {
-		return motionCurve;
-	}
+//	public MotionCurve getMotionCurve(MotionKey key) {
+//		return motionCurve;
+//	}
 	
 	public MotionCurve[] getMotionCurves() {
 		return new MotionCurve[] { motionCurve };

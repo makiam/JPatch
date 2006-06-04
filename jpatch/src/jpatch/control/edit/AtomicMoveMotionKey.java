@@ -7,8 +7,8 @@ public class AtomicMoveMotionKey extends JPatchAtomicEdit {
 	private MotionKey motionKey;
 	private float position;
 	
-	public AtomicMoveMotionKey(MotionCurve motionCurve, MotionKey motionKey, float oldPosition) {
-		this.motionCurve = motionCurve;
+	public AtomicMoveMotionKey(MotionKey motionKey, float oldPosition) {
+		this.motionCurve = motionKey.getMotionCurve();
 		this.motionKey = motionKey;
 		this.position = oldPosition;
 		if (motionCurve.getKeyAt(motionKey.getPosition()) != motionKey)
