@@ -156,6 +156,7 @@ public abstract class MotionCurve {
 	public void addKey(MotionKey key) {
 		System.out.println("addKey " + key.hashCode() + " pos " + key.getPosition());
 		list.add(binarySearch(key.getPosition()), key);
+		key.setMotionCurve(this);
 	}
 	
 	/**
@@ -199,6 +200,7 @@ public abstract class MotionCurve {
 		list.remove(key);
 		key.setPosition(position);
 		list.add(binarySearch(key.getPosition()), key);
+		key.computeDerivatives();
 	}
 	
 	/**
@@ -235,6 +237,10 @@ public abstract class MotionCurve {
 			if (mk != null && mk.getPosition() == position) return mk;
 			else return null;
 		} else return null;
+	}
+	
+	void computeDerivatives(MotionKey k) {
+		;
 	}
 	
 	public void xml(PrintStream out, String prefix, String type) {
@@ -341,16 +347,26 @@ public abstract class MotionCurve {
 		
 		private Float() { }
 		
-		public void getDerivatives(int keyIndex, float[] d, boolean premultiply) {
-			MotionKey.Float key = (MotionKey.Float) list.get(keyIndex);
+		@Override
+		void computeDerivatives(MotionKey k) {
+			System.out.println("setDerivatives called");
+			MotionKey.Float key = (MotionKey.Float) k;
 			MotionKey.TangentMode tangentMode = key.getTangentMode();
+			
+			/*
+			 * if tangent mode is manual, do nothing and return
+			 */
+			if (tangentMode == MotionKey.TangentMode.MANUAL)
+				return;
+			
+			int keyIndex = key.getIndex();
 			
 			/*
 			 * for the first and last key, return 0 tangent
 			 */
 			if ((keyIndex == 0) || (keyIndex == list.size() - 1)) {
-				d[0] = 0;
-				d[1] = 0;
+				key.setDfIn(0);
+				key.setDfOut(0);
 				return;
 			}
 			
@@ -360,21 +376,21 @@ public abstract class MotionCurve {
 			float f = key.getFloat();
 			float fn = nextKey.getFloat();
 			
-			/*
-			 * if tangentMode is manual, return the manually set tangent
-			 */
-			if (tangentMode == TangentMode.MANUAL) {
-				d[0] = key.getDfIn();
-				if (key.isSmooth())
-					d[1] = d[0];
-				else
-					d[1] = key.getDfOut();
-				if (premultiply) {
-					d[0] *= (key.getPosition() - prevKey.getPosition());
-					d[1] *= (nextKey.getPosition() - key.getPosition());
-				}
-				return;
-			}
+//			/*
+//			 * if tangentMode is manual, return the manually set tangent
+//			 */
+//			if (tangentMode == TangentMode.MANUAL) {
+//				d[0] = key.getDfIn();
+//				if (key.isSmooth())
+//					d[1] = d[0];
+//				else
+//					d[1] = key.getDfOut();
+//				if (premultiply) {
+//					d[0] *= (key.getPosition() - prevKey.getPosition());
+//					d[1] *= (nextKey.getPosition() - key.getPosition());
+//				}
+//				return;
+//			}
 			
 			/*
 			 * compute tangent
@@ -382,17 +398,28 @@ public abstract class MotionCurve {
 			
 			/* apply overshoot limitation */
 			if ((tangentMode == TangentMode.OVERSHOOT) && (f == fp || f == fn || (fp > f && fn > f) || (fp < f && fn < f))) {
-				d[0] = 0;
-				d[1] = 0;
+				key.setDfIn(0);
+				key.setDfOut(0);
 				return;
 			}
 			
-			d[0] = (fn - fp) / (nextKey.getPosition() - prevKey.getPosition());
-			d[1] = d[0];
-			if (premultiply) {
-				d[0] *= (key.getPosition() - prevKey.getPosition());
-				d[1] *= (nextKey.getPosition() - key.getPosition());
-			}
+			float d = 0;
+			if (prevKey.interpolation == MotionKey.Interpolation.DISCRETE)
+				d = 0;
+			else if (prevKey.interpolation == MotionKey.Interpolation.LINEAR)
+				d = (f - fp) / (key.getPosition() - prevKey.getPosition());
+			else if (key.interpolation == MotionKey.Interpolation.DISCRETE)
+				d = 0;
+			else if (key.interpolation == MotionKey.Interpolation.LINEAR)
+				d = (fn - f) / (nextKey.getPosition() - key.getPosition());
+			else
+				d = (fn - fp) / (nextKey.getPosition() - prevKey.getPosition());
+			key.setDfIn(d);
+			key.setDfOut(d);
+//			if (premultiply) {
+//				d[0] *= (key.getPosition() - prevKey.getPosition());
+//				d[1] *= (nextKey.getPosition() - key.getPosition());
+//			}
 			return;
 		}
 		
@@ -416,11 +443,14 @@ public abstract class MotionCurve {
 			case LINEAR:
 				return (p0 * (1 - t) + p1 * t);
 			case CUBIC:
-				float[] d = new float[2];
-				getDerivatives(binarySearch(position) - 1, d, true);
-				float m0 = d[1];
-				getDerivatives(binarySearch(position), d, true);
-				float m1 = d[0];
+//				float[] d = new float[2];
+//				getDerivatives(binarySearch(position) - 1, d, true);
+//				float m0 = d[1];
+//				getDerivatives(binarySearch(position), d, true);
+//				float m1 = d[0];
+				
+				float m0 = key1.getDfOut() * (key2.getPosition() - key1.getPosition());
+				float m1 = key2.getDfIn() * (key2.getPosition() - key1.getPosition());
 //				boolean limitOvershoot = (key1.getTangentMode() == MotionKey.TangentMode.OVERSHOOT);
 //				float m0 = 0;
 //				float m1 = 0;

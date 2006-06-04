@@ -13,6 +13,19 @@ public abstract class MotionKey {
 	TangentMode tangentMode;
 	boolean smooth = true;
 	float position;
+	MotionCurve motionCurve;
+	
+	public int getIndex() {
+		return motionCurve.getIndexAt(position) - 1;
+	}
+
+	public MotionCurve getMotionCurve() {
+		return motionCurve;
+	}
+
+	void setMotionCurve(MotionCurve motionCurve) {
+		this.motionCurve = motionCurve;
+	}
 	
 	private MotionKey(float position) {
 		this.position = position;
@@ -32,6 +45,7 @@ public abstract class MotionKey {
 
 	public void setInterpolation(Interpolation interpolation) {
 		this.interpolation = interpolation;
+		computeDerivatives();
 	}
 
 	public boolean isSmooth() {
@@ -48,11 +62,30 @@ public abstract class MotionKey {
 
 	public void setTangentMode(TangentMode tangentMode) {
 		this.tangentMode = tangentMode;
+		computeDerivatives();
+	}
+	
+	public void computeDerivatives() {
+		if (motionCurve == null)
+			return;
+//		if (motionCurve == null) {
+//			System.err.println("computeDerivatives() called but motionCurve = null!");
+//			for (StackTraceElement ste : Thread.currentThread().getStackTrace())
+//				System.out.println("\t" + ste);
+//			return;
+//		}
+		motionCurve.computeDerivatives(this);
+		int index = getIndex();
+		if (index > 0)
+			motionCurve.computeDerivatives(motionCurve.getKey(index - 1));
+		if (index < motionCurve.getKeyCount() - 1)
+			motionCurve.computeDerivatives(motionCurve.getKey(index + 1));
 	}
 	
 	public abstract MotionKey copy();
+	
 	public abstract void xml(PrintStream out);
-
+	
 	public static class Float extends MotionKey {
 		private float f;
 		private float dfIn;
@@ -70,6 +103,7 @@ public abstract class MotionKey {
 		
 		public void setFloat(float f) {
 			this.f = f;
+			computeDerivatives();
 		}
 		
 		public float getDfIn() {
@@ -82,6 +116,8 @@ public abstract class MotionKey {
 		}
 		
 		public float getDfOut() {
+			if (smooth)
+				return dfIn;
 			return dfOut;
 		}
 		
