@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.20 2006/06/03 20:08:59 sascha_l Exp $
+ * $Id: Track.java,v 1.21 2006/06/04 15:05:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -103,9 +103,9 @@ public class Track<M extends MotionCurve> {
 //		return contains;
 	}
 	
-	public MotionCurve getMotionCurve(MotionKey key) {
-		return motionCurve;
-	}
+//	public MotionCurve getMotionCurve(MotionKey key) {
+//		return motionCurve;
+//	}
 	
 	public MotionCurve[] getMotionCurves() {
 		return new MotionCurve[] { motionCurve };

@@ -6,8 +6,8 @@ public class AtomicDeleteMotionKey extends JPatchAtomicEdit implements JPatchRoo
 	private MotionCurve motionCurve;
 	private MotionKey motionKey;
 	
-	public AtomicDeleteMotionKey(MotionCurve motionCurve, MotionKey motionKey) {
-		this.motionCurve = motionCurve;
+	public AtomicDeleteMotionKey(MotionKey motionKey) {
+		this.motionCurve = motionKey.getMotionCurve();
 		this.motionKey = motionKey;
 		/*
 		 * check if the key really is on the curve, throw exception if it isn't.

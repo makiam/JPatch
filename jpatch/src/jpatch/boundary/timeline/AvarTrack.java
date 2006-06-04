@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.21 2006/06/03 20:08:59 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.22 2006/06/04 15:05:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -93,7 +93,12 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 			for (int x = -fw ; x <= clip.width + fw; x++) {
 				float f = (float) (start + x - fw / 2) / fw;
 				int vThis = off - (int) Math.round(size / scale * motionCurve.getFloatAt(f));
-				g.drawLine(x + start - 1, y + vPrev, x + start, y + vThis);
+//				g.drawLine(x + start - 1, y + vPrev, x + start, y + vThis);
+				if (vPrev < vThis)
+					vPrev++;
+				else if (vPrev > vThis)
+					vPrev--;
+				g.drawLine(x + start, y + vThis, x + start, y + vPrev);
 				frame++;
 				vPrev = vThis;
 			}
@@ -103,25 +108,37 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 			int end = frame + clip.width / fw + 1;
 			float[] d = new float[] { 0, 0 };
 			int offset = (int) MainFrame.getInstance().getAnimation().getStart() * fw + fw / 2;
+			TangentHandle.Float inTangent;
+			TangentHandle.Float outTangent;
 			for (int n = motionCurve.getKeyCount(); index < n; index++) {
 				MotionKey.Float key = (MotionKey.Float) motionCurve.getKey(index);
 				frame = (int) key.getPosition();
 				if (frame > end)
 					break;
 				int vThis = off - Math.round(size / scale * key.getFloat());
-				motionCurve.getDerivatives(index, d, false);
-				int vPref = off - (int) Math.round(size / scale * (key.getFloat() - d[0] * TANGENT_LENGTH));
-				int vNext = off - (int) Math.round(size / scale * (key.getFloat() + d[1] * TANGENT_LENGTH));
+//				motionCurve.getDerivatives(index, d, false);
+				int vPref = off - Math.round(size / scale * (key.getFloat() - key.getDfIn() * TANGENT_LENGTH));
+				int vNext = off - Math.round(size / scale * (key.getFloat() + key.getDfOut() * TANGENT_LENGTH));
+				
+				inTangent = getInTangent(index, frame);
+				if (key.getTangentMode() == MotionKey.TangentMode.MANUAL && inTangent != null)
+					vPrev = off - Math.round(size / scale * inTangent.getValue());
+				
+				outTangent = getOutTangent(index, frame);
+				if (key.getTangentMode() == MotionKey.TangentMode.MANUAL && outTangent != null)
+					vNext = off - Math.round(size / scale * outTangent.getValue());
 				
 				/* draw tangents */
 				g.setColor(Color.GRAY);
 				int x = frame * fw + offset;
 				if (key.getTangentMode() != MotionKey.TangentMode.MANUAL)
 					((Graphics2D) g).setStroke(dashedStroke);
-				g.drawLine(x - fw * TANGENT_LENGTH, y + vPref, x, y + vThis);
-				if (key.isSmooth())
-					((Graphics2D) g).setStroke(dashedStroke);
-				g.drawLine(x, y + vThis, x + fw * TANGENT_LENGTH, y + vNext);
+				if (inTangent != null)
+					g.drawLine(x - fw * TANGENT_LENGTH, y + vPref, x, y + vThis);
+//				if (key.isSmooth())
+//					((Graphics2D) g).setStroke(dashedStroke);
+				if (outTangent != null)
+					g.drawLine(x, y + vThis, x + fw * TANGENT_LENGTH, y + vNext);
 				((Graphics2D) g).setStroke(normalStroke);
 				
 				/* draw key */
@@ -135,10 +152,44 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 				drawKey(g, key, x - 3, y + vThis - 3, fillColor, Color.BLACK);
 				
 				/* draw tangent handles */
-				g.setColor(Color.GRAY);
-				if (key.getTangentMode() == MotionKey.TangentMode.MANUAL) {
-					g.fillRect(x - fw * TANGENT_LENGTH - 2, y + vPref - 2, 5, 5);
-					g.fillRect(x + fw * TANGENT_LENGTH - 2, y + vNext - 2, 5, 5);
+				if (key.getTangentMode() == MotionKey.TangentMode.MANUAL)
+					g.setColor(Color.BLACK);
+				else
+					g.setColor(Color.GRAY);
+				int xIn = x - fw * TANGENT_LENGTH;
+				int xOut = x + fw * TANGENT_LENGTH;
+				if (key.getTangentMode() == MotionKey.TangentMode.OVERSHOOT) {
+					if (inTangent != null) {
+						g.fillRect(xIn - 2, y + vPref - 2, 5, 5);
+					} if (outTangent != null) {
+						g.fillRect(xOut - 2, y + vNext - 2, 5, 5);
+					}
+				} else if (key.getTangentMode() == MotionKey.TangentMode.AUTO) {
+					if (inTangent != null) {
+						g.drawOval(xIn - 2, y + vPref - 2, 4, 4);
+						g.fillOval(xIn - 2, y + vPref - 2, 4, 4);
+					} if (outTangent != null) {
+						g.drawOval(xOut - 2, y + vNext - 2, 4, 4);
+						g.fillOval(xOut - 2, y + vNext - 2, 4, 4);
+					}
+				} else {
+					if (key.isSmooth()) {
+						if (inTangent != null) {
+							g.drawOval(xIn - 2, y + vPref - 2, 4, 4);
+							g.fillOval(xIn - 2, y + vPref - 2, 4, 4);
+						} if (outTangent != null) {
+							g.drawOval(xOut - 2, y + vNext - 2, 4, 4);
+							g.fillOval(xOut - 2, y + vNext - 2, 4, 4);
+						}
+					} else {
+						if (inTangent != null) {
+							g.drawPolygon(new int[] { xIn - 3, xIn + 3, xIn + 0 }, new int[] { y + vPrev + 2, y + vPref + 2, y + vPrev - 4 }, 3 );
+							g.fillPolygon(new int[] { xIn - 3, xIn + 3, xIn + 0 }, new int[] { y + vPrev + 2, y + vPref + 2, y + vPrev - 4 }, 3 );
+						} if (outTangent != null) {
+							g.drawPolygon(new int[] { xOut - 3, xOut + 3, xOut + 0 }, new int[] { y + vNext + 2, y + vNext + 2, y + vNext - 4 }, 3 );
+							g.fillPolygon(new int[] { xOut - 3, xOut + 3, xOut + 0 }, new int[] { y + vNext + 2, y + vNext + 2, y + vNext - 4 }, 3 );
+						}
+					}
 				}
 			}
 			
@@ -184,6 +235,34 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 		super.paint(g, y, selection, hitKeys);
 	}
 	
+	private TangentHandle.Float getInTangent(int index, int frame) {
+		/* check index range */
+		if (index < 0 || index >= motionCurve.getKeyCount())
+			return null;
+		MotionKey.Float keyIn = (MotionKey.Float) motionCurve.getKey(index);
+		/* check if the key is exactly on given frame */
+		if (keyIn.getPosition() != frame)
+			return null;
+		/* check if the previous key is cubic */
+		if (index > 0 && motionCurve.getKey(index - 1).getInterpolation() == MotionKey.Interpolation.CUBIC) 
+			return new TangentHandle.Float(keyIn, TangentHandle.Side.IN);
+		return null;
+	}
+	
+	private TangentHandle.Float getOutTangent(int index, int frame) {
+		/* check index range */
+		if (index < 0 || index >= motionCurve.getKeyCount())
+			return null;
+		MotionKey.Float keyOut = (MotionKey.Float) motionCurve.getKey(index);
+		/* check if the key is exactly on given frame */
+		if (keyOut.getPosition() != frame)
+			return null;
+		/* check if this key is cubic */
+		if (keyOut.getInterpolation() == MotionKey.Interpolation.CUBIC)	
+			return new TangentHandle.Float(keyOut, TangentHandle.Side.OUT);
+		return null;
+	}
+	
 	public TangentHandle getTangentHandleAt(int mx, int my) {
 		System.out.println("getTangentHandleAt(" + mx + ", " + my + ") called");
 		if (!bExpanded)
@@ -196,25 +275,24 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 		int off = iExpandedHeight - 4 + Math.round(size * min / scale);
 		
 		int frame = mx / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
+		int index = 0;
 		int hyIn = 0;
 		int hyOut = 0;
+		
 		TangentHandle.Float handleIn = null;
 		TangentHandle.Float handleOut = null;
 		
 		System.out.println("frame = " + frame);
-		MotionKey.Float keyIn = (MotionKey.Float) motionCurve.getKeyAt(frame + TANGENT_LENGTH);
-		if (keyIn != null) {
-			handleIn = new TangentHandle.Float(keyIn, TangentHandle.Side.IN);
-			hyIn = off - Math.round(size / scale * handleIn.getValue());
-			System.out.println("hyIn = " + hyIn);
-		}
 		
-		MotionKey.Float keyOut = (MotionKey.Float) motionCurve.getKeyAt(frame - TANGENT_LENGTH);
-		if (keyOut != null) {
-			handleOut = new TangentHandle.Float(keyOut, TangentHandle.Side.OUT);
+		index = motionCurve.getIndexAt(frame + TANGENT_LENGTH) - 1;
+		handleIn = getInTangent(index, frame + TANGENT_LENGTH);
+		if (handleIn != null)
+			hyIn = off - Math.round(size / scale * handleIn.getValue());
+		
+		index = motionCurve.getIndexAt(frame - TANGENT_LENGTH) - 1;
+		handleOut = getOutTangent(index, frame - TANGENT_LENGTH);
+		if (handleOut != null)
 			hyOut = off - Math.round(size / scale * handleOut.getValue());
-			System.out.println("hyOut = " + hyOut);
-		}
 		
 		int dyIn = Math.abs(my - hyIn);
 		int dyOut = Math.abs(my - hyOut);

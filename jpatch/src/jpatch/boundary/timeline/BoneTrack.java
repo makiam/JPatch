@@ -226,17 +226,17 @@ public class BoneTrack extends Track {
 		return motionCurves;
 	}
 	
-	@Override
-	public MotionCurve getMotionCurve(MotionKey key) {
-		System.out.println("*");
-		if (key == null)
-			return null;
-		for (MotionCurve.Float motionCurve : motionCurves) {
-			if (motionCurve.getKeyAt(key.getPosition()) == key)
-				return motionCurve;
-		}
-		return null;
-	}
+//	@Override
+//	public MotionCurve getMotionCurve(MotionKey key) {
+//		System.out.println("*");
+//		if (key == null)
+//			return null;
+//		for (MotionCurve.Float motionCurve : motionCurves) {
+//			if (motionCurve.getKeyAt(key.getPosition()) == key)
+//				return motionCurve;
+//		}
+//		return null;
+//	}
 	
 	public void moveKey(Object object, int y) {
 		MotionKey.Float key = (MotionKey.Float) object;

@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.40 2006/06/03 20:08:59 sascha_l Exp $
+ * $Id: TrackView.java,v 1.41 2006/06/04 15:05:20 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -68,6 +68,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	private Set<MotionCurve> clipCurveWithKeys = new HashSet<MotionCurve>();
 //	private boolean[] clipTrackHasKeys;
 	private TangentHandle tangentHandle;
+	private JPatchActionEdit edit;
 	
 	private Action deleteAction = new AbstractAction() {
 		public void actionPerformed(ActionEvent event) {
@@ -356,6 +357,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 							} else if (tangentHandle != null) {
 								state = State.TANGENT;
 								tangentHandle.prepare();
+								edit = new JPatchActionEdit("modify tangent");
 							} else {
 								if (moveSelection) {
 									state = State.MOVE_KEY;
@@ -433,10 +435,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //	}
 	
 	public void mouseReleased(MouseEvent e) {
-		JPatchActionEdit edit;
 		switch (state) {
 		case TANGENT:
-			edit = new JPatchActionEdit("modify tangent");
 			edit.addEdit(tangentHandle.end());
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
 			/*
@@ -450,7 +450,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				edit = new JPatchActionEdit("move key");
 				if (!moveSelection) {
 					for (MotionKey selectedKey : hitKeys) {
-						edit.addEdit(new AtomicMoveMotionKey(hitTrack.getMotionCurve(selectedKey), selectedKey, (int) selectedKey.getPosition() - delta));
+						edit.addEdit(new AtomicMoveMotionKey(selectedKey, (int) selectedKey.getPosition() - delta));
 						if (selectedKey instanceof MotionKey.Float) {
 							MotionKey.Float key = (MotionKey.Float) selectedKey;
 							float newValue = key.getFloat();
@@ -465,7 +465,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 					 */
 					for (MotionKey selectedKey : selection.keySet()) {
 						KeyData keyData = selection.get(selectedKey);
-						edit.addEdit(new AtomicMoveMotionKey(keyData.track.getMotionCurve(selectedKey), selectedKey, (int) keyData.position));
+						edit.addEdit(new AtomicMoveMotionKey(selectedKey, (int) keyData.position));
 					}
 				}
 				/*
@@ -473,7 +473,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				 */
 				for (MotionKey key : suspendedKeys.keySet()) {
 					suspendedKeys.get(key).addKey(key);
-					edit.addEdit(new AtomicDeleteMotionKey(suspendedKeys.get(key), key));
+					edit.addEdit(new AtomicDeleteMotionKey(key));
 				}
 				suspendedKeys.clear();
 				if (edit.isValid())
@@ -552,14 +552,14 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			 */
 			for (MotionKey selectedKey : selection.keySet()) {
 				KeyData keyData = selection.get(selectedKey);
-				edit.addEdit(new AtomicMoveMotionKey(keyData.track.getMotionCurve(selectedKey), selectedKey, (int) keyData.position));
+				edit.addEdit(new AtomicMoveMotionKey(selectedKey, (int) keyData.position));
 			}
 			/*
 			 * delete all suspended keys
 			 */
 			for (MotionKey key : suspendedKeys.keySet()) {
 				suspendedKeys.get(key).addKey(key);
-				edit.addEdit(new AtomicDeleteMotionKey(suspendedKeys.get(key), key));
+				edit.addEdit(new AtomicDeleteMotionKey(key));
 			}
 			suspendedKeys.clear();
 			/*
@@ -634,6 +634,9 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //			((JComponent) timelineEditor.getRowHeader().getView()).revalidate();
 			break;
 		case TANGENT:
+			if (tangentHandle.getMotionKey().getTangentMode() != MotionKey.TangentMode.MANUAL) {
+				edit.addEdit(new AtomicChangeMotionKey.TangentMode(tangentHandle.getMotionKey(), MotionKey.TangentMode.MANUAL));
+			}
 			hitTrack.moveKey(tangentHandle, e.getY() - trackTop);
 			timelineEditor.repaint();
 			break;
@@ -702,7 +705,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 				if (shift) {
 					
 					for (MotionKey key : hitKeys) {
-						MotionCurve mc = hitTrack.getMotionCurve(key);
+						MotionCurve mc = key.getMotionCurve();
 						mc.forceRemoveKey(key);
 						
 					
@@ -1378,10 +1381,10 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 						continue;
 					MotionKey positionKey = mcs.position.getKeyAt(anchorKeys[i].getPosition());
 					if (positionKey != null)
-						edit.addEdit(new AtomicDeleteMotionKey(mcs.position, positionKey));
+						edit.addEdit(new AtomicDeleteMotionKey(positionKey));
 				}
 				for (int i = 1; i < anchorKeys.length; i++) {
-					edit.addEdit(new AtomicDeleteMotionKey(mcs.anchor, anchorKeys[i]));
+					edit.addEdit(new AtomicDeleteMotionKey(anchorKeys[i]));
 				}
 				for (int i = 1; i < anchorKeys.length; i++) {
 					float frame = anchorKeys[i].getPosition();
@@ -1472,10 +1475,10 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		JPatchActionEdit edit = new JPatchActionEdit(editName);
 		if (hitKeys != null) {
 			for (MotionKey key : hitKeys)
-				edit.addEdit(new AtomicDeleteMotionKey(hitTrack.getMotionCurve(key), key));
+				edit.addEdit(new AtomicDeleteMotionKey(key));
 		} else {
 			for (MotionKey key : selection.keySet()) {
-				edit.addEdit(new AtomicDeleteMotionKey(selection.get(key).track.getMotionCurve(key), key));
+				edit.addEdit(new AtomicDeleteMotionKey(key));
 			}
 		}
 		MainFrame.getInstance().getUndoManager().addEdit(edit);
@@ -1497,7 +1500,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			for (MotionKey key : selection.keySet()) {
 				MotionKey copy = (MotionKey) key.copy();
 				copy.setPosition(copy.getPosition() - range.firstFrame);
-				clipboard.put(copy, selection.get(key).track.getMotionCurve(key));
+				clipboard.put(copy, key.getMotionCurve());
 			}
 			clipRange = new Range(range);
 //			clipTrackHasKeys = new boolean[trackHasKeys.length];
@@ -1527,7 +1530,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 					keysToRemove.add(motionCurve.getKey(j));
 				}
 				for (MotionKey key : keysToRemove)
-					edit.addEdit(new AtomicDeleteMotionKey(motionCurve, key));
+					edit.addEdit(new AtomicDeleteMotionKey(key));
 //			}
 		}
 		
