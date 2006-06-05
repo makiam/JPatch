@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.41 2006/06/04 15:05:20 sascha_l Exp $
+ * $Id: TrackView.java,v 1.42 2006/06/05 07:31:19 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -635,7 +635,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 			break;
 		case TANGENT:
 			if (tangentHandle.getMotionKey().getTangentMode() != MotionKey.TangentMode.MANUAL) {
-				edit.addEdit(new AtomicChangeMotionKey.TangentMode(tangentHandle.getMotionKey(), MotionKey.TangentMode.MANUAL));
+				edit.addEdit(new CompoundChangeTangentMode(tangentHandle.getMotionKey(), MotionKey.TangentMode.MANUAL));
 			}
 			hitTrack.moveKey(tangentHandle, e.getY() - trackTop);
 			timelineEditor.repaint();
@@ -1436,12 +1436,12 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		JPatchActionEdit edit = new JPatchActionEdit("change tangent mode");
 		for (MotionKey key : selection.keySet()) {
 			if (key.getTangentMode() != tangentMode)
-				edit.addEdit(new AtomicChangeMotionKey.TangentMode(key, tangentMode));
+				edit.addEdit(new CompoundChangeTangentMode(key, tangentMode));
 		}
 		if (hitKeys != null) {
 			for (MotionKey key : hitKeys) {
 				if (key.getTangentMode() != tangentMode)
-					edit.addEdit(new AtomicChangeMotionKey.TangentMode(key, tangentMode));
+					edit.addEdit(new CompoundChangeTangentMode(key, tangentMode));
 			}
 		}
 		if (edit.isValid())

@@ -64,12 +64,14 @@ public abstract class AtomicChangeMotionKey extends JPatchAtomicEdit {
 	public static final class TangentMode extends AtomicChangeMotionKey {
 		private MotionKey.TangentMode tangentMode;
 		
-		public TangentMode(MotionKey motionKey, MotionKey.TangentMode tangentMode) {
+		public TangentMode(MotionKey motionKey, MotionKey.TangentMode tangentMode, boolean applyNow) {
 			this.motionKey = motionKey;
 			this.tangentMode = tangentMode;
-			swap();
+			if (applyNow)
+				swap();
 		}
 		
+		@Override
 		void swap() {
 			MotionKey.TangentMode dummy = motionKey.getTangentMode();
 			motionKey.setTangentMode(tangentMode);
@@ -96,14 +98,16 @@ public abstract class AtomicChangeMotionKey extends JPatchAtomicEdit {
 	public static final class DfIn extends AtomicChangeMotionKey {
 		private float dfIn;
 		
-		public DfIn(MotionKey motionKey, float dfIn) {
+		public DfIn(MotionKey motionKey, float dfIn, boolean applyNow) {
 			if (!(motionKey instanceof MotionKey.Float))
 				throw new IllegalArgumentException("MotionKey must be of type MotionKey.Float, but is " + motionKey.getClass().getName());
 			this.motionKey = motionKey;
 			this.dfIn = dfIn;
-			swap();
+			if (applyNow)
+				swap();
 		}
 		
+		@Override
 		void swap() {
 			float dummy = ((MotionKey.Float) motionKey).getDfIn();
 			((MotionKey.Float) motionKey).setDfIn(dfIn);
@@ -114,14 +118,16 @@ public abstract class AtomicChangeMotionKey extends JPatchAtomicEdit {
 	public static final class DfOut extends AtomicChangeMotionKey {
 		private float dfOut;
 		
-		public DfOut(MotionKey motionKey, float dfOut) {
+		public DfOut(MotionKey motionKey, float dfOut, boolean applyNow) {
 			if (!(motionKey instanceof MotionKey.Float))
 				throw new IllegalArgumentException("MotionKey must be of type MotionKey.Float, but is " + motionKey.getClass().getName());
 			this.motionKey = motionKey;
 			this.dfOut = dfOut;
-			swap();
+			if (applyNow)
+				swap();
 		}
 		
+		@Override
 		void swap() {
 			float dummy = ((MotionKey.Float) motionKey).getDfOut();
 			((MotionKey.Float) motionKey).setDfOut(dfOut);
