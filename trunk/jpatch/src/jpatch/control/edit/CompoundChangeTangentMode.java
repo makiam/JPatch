@@ -18,7 +18,7 @@ public class CompoundChangeTangentMode extends JPatchCompoundEdit implements JPa
 		if (key instanceof MotionKey.Float) {
 			MotionKey.Float fKey = (MotionKey.Float) key;
 			addEdit(new AtomicChangeMotionKey.DfIn(key, fKey.getDfIn(), false));
-			addEdit(new AtomicChangeMotionKey.DfIn(key, fKey.getDfOut(), false));
+			addEdit(new AtomicChangeMotionKey.DfOut(key, fKey.getDfOut(), false));
 			addEdit(new AtomicChangeMotionKey.TangentMode(key, tangentMode, true));
 		}
 	}
