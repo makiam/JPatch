@@ -135,43 +135,23 @@ public abstract class TangentHandle {
 		
 		@Override
 		public AtomicChangeMotionKey end() {
-			float dummy;	// used to store current value
-			
 			/* treat IN and OUT tangents differently */
 			switch (side) {
 			case IN:
 				
-				/* store current value */
-				dummy = ((MotionKey.Float) motionKey).getDfIn();
-				
-				/* reset tangent to start value before applying the edit */
-				((MotionKey.Float) motionKey).setDfIn(dfStart);
-				
-				/* apply edit */
-				return new AtomicChangeMotionKey.DfIn(motionKey, dummy);
+				/* return edit */
+				return new AtomicChangeMotionKey.DfIn(motionKey, dfStart, false);
 			case OUT:
 				
 				/* if continuity is smooth, dfIn is used for IN and OUT tangents */
 				if (motionKey.isSmooth()) {
 					
-					/* store current value */
-					dummy = ((MotionKey.Float) motionKey).getDfIn();
-					
-					/* reset tangent to start value before applying the edit */
-					((MotionKey.Float) motionKey).setDfIn(dfStart);
-					
-					/* apply edit */
-					return new AtomicChangeMotionKey.DfIn(motionKey, dummy);
+					/* return edit */
+					return new AtomicChangeMotionKey.DfIn(motionKey, dfStart, false);
 				} else {
 					
-					/* store current value */
-					dummy = ((MotionKey.Float) motionKey).getDfOut();
-					
-					/* reset tangent to start value before applying the edit */
-					((MotionKey.Float) motionKey).setDfOut(dfStart - ((MotionKey.Float) motionKey).getFloat());
-					
-					/* apply edit */
-					return new AtomicChangeMotionKey.DfOut(motionKey, dummy);
+					/* return edit */
+					return new AtomicChangeMotionKey.DfOut(motionKey, dfStart, false);
 				}
 			}
 			throw new IllegalStateException();
