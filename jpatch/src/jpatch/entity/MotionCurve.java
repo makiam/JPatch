@@ -157,6 +157,7 @@ public abstract class MotionCurve {
 		System.out.println("addKey " + key.hashCode() + " pos " + key.getPosition());
 		list.add(binarySearch(key.getPosition()), key);
 		key.setMotionCurve(this);
+		key.computeDerivatives();
 	}
 	
 	/**
@@ -404,6 +405,9 @@ public abstract class MotionCurve {
 			}
 			
 			float d = 0;
+			float p = key.getPosition();
+			float pn = nextKey.getPosition();
+			float pp = prevKey.getPosition();
 			if (prevKey.interpolation == MotionKey.Interpolation.DISCRETE)
 				d = 0;
 			else if (prevKey.interpolation == MotionKey.Interpolation.LINEAR)
@@ -411,9 +415,26 @@ public abstract class MotionCurve {
 			else if (key.interpolation == MotionKey.Interpolation.DISCRETE)
 				d = 0;
 			else if (key.interpolation == MotionKey.Interpolation.LINEAR)
-				d = (fn - f) / (nextKey.getPosition() - key.getPosition());
+				d = (fn - f) / (pn - p);
 			else
-				d = (fn - fp) / (nextKey.getPosition() - prevKey.getPosition());
+				d = (fn - fp) / (pn - pp);
+			
+//			float mul = (pn - pp) / Math.min(p - pp, pn - p);
+//			System.out.println(mul);
+//			d *= mul;
+			if (tangentMode == TangentMode.OVERSHOOT) {
+				if (d > 0) {
+					if (d * (pn - p) / 3 > (fn - f))
+						d = (fn - f) / (pn - p) * 3;
+					if (d * (p - pp) / 3 > (f - fp))
+						d = (f - fp) / (p - pp) * 3;
+				} else if (d < 0) {
+					if (d * (pn - p) / 3 < (fn - f))
+						d = (fn - f) / (pn - p) * 3;
+					if (d * (p - pp) / 3 < (f - fp))
+						d = (f - fp) / (p - pp) * 3;
+				}
+			}
 			key.setDfIn(d);
 			key.setDfOut(d);
 //			if (premultiply) {
@@ -494,7 +515,8 @@ public abstract class MotionCurve {
 		}
 		
 		public MotionKey insertKeyAt(float position) {
-			if (!(getKeyAt(position) != null)) setFloatAt(position, getFloatAt(position));
+			if (!(getKeyAt(position) != null))
+				setFloatAt(position, getFloatAt(position));
 			return getKeyAt(position);
 		}
 		
