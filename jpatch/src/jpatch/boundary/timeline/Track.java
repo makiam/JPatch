@@ -1,5 +1,5 @@
 /*
- * $Id: Track.java,v 1.21 2006/06/04 15:05:20 sascha_l Exp $
+ * $Id: Track.java,v 1.22 2006/06/07 20:07:44 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -46,6 +46,8 @@ public class Track<M extends MotionCurve> {
 	boolean bExpandable = false;
 	TimelineEditor timelineEditor;
 	M motionCurve;
+	
+	Track() { }
 	
 	public Track(TimelineEditor timelineEditor, M motionCurve) {
 		this.timelineEditor = timelineEditor;
