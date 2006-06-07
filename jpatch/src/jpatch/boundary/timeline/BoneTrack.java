@@ -12,7 +12,7 @@ import jpatch.boundary.MainFrame;
 import jpatch.control.edit.*;
 import jpatch.entity.*;
 
-public class BoneTrack extends Track {
+public class BoneTrack extends AvarTrack {
 	
 	private MotionCurve.Float[] motionCurves;
 	private RotationDof[] dofs;
@@ -23,13 +23,16 @@ public class BoneTrack extends Track {
 			new Color(0, 128, 0),
 			new Color(0, 0, 255)
 	};
+	
 	public BoneTrack(TimelineEditor timelineEditor, RotationDof[] dofs, MotionCurve.Float[] motionCurves, Bone bone, int level) {
-		super(timelineEditor, null);
+		this.timelineEditor = timelineEditor;
 		this.dofs = dofs;
 		this.motionCurves = motionCurves;
 		this.bone = bone;
 		this.level = level;
 		bExpandable = true;
+		motionCurve = motionCurves[0];
+		setExpandedHeight(iExpandedHeight);
 	}
 	
 	public String getName() {
@@ -45,7 +48,104 @@ public class BoneTrack extends Track {
 	}
 	
 
+	@Override
+	public void setExpandedHeight(int height) {
+		iExpandedHeight = height;
+		float min = 0, max = 0;
+		for (MotionCurve.Float motionCurve : motionCurves) {
+			if (motionCurve.getMin() < min)
+				min = motionCurve.getMin();
+			if (motionCurve.getMax() > max)
+				max = motionCurve.getMax();
+		}
+		int size = iExpandedHeight - 4;
+		scale = (size - 2) / (max - min);
+		offset = size + Math.round(min * scale) - 1;
+	}
+	
+	
+	@Override
 	public void paint(Graphics g, int y, Map<MotionKey, TrackView.KeyData> selection, MotionKey[] hitKeys) {
+		int bottom = getHeight() - 4;
+		Rectangle clip = g.getClipBounds();
+		int fw = timelineEditor.getFrameWidth();
+		int start = clip.x - clip.x % fw + fw / 2;
+		int frame = start / fw - 1 + (int) MainFrame.getInstance().getAnimation().getStart();
+		if (!bExpanded) {
+			Color background, track;
+			if (timelineEditor.getHeader().getSelectedTracks().contains(this)) {
+				background = TimelineEditor.SELECTED_BACKGROUND;
+				track = TimelineEditor.SHADOW;
+			} else {
+				background = TimelineEditor.BACKGROUND;
+				track = TimelineEditor.LIGHT_SHADOW;
+			}
+			g.setColor(background);
+			g.fillRect(clip.x, y + TOP - 2, clip.width, 3);
+			g.fillRect(clip.x, y + TOP + 4, clip.width, 3);
+			g.setColor(track);
+			g.fillRect(clip.x, y + TOP + 1, clip.width, 3);
+		
+			
+			for (int x = -fw ; x <= clip.width + fw; x += fw) {
+				MotionKey key = null;
+				boolean selected = false;
+				boolean hit = false;
+				MotionKey draw = null;
+				for (MotionCurve m : motionCurves) {
+					key = m.getKeyAt(frame);
+					if (key != null) {
+						draw = key;
+						if (keyHit(key, hitKeys)) {
+							hit = true;
+							break;
+						}
+						if (selection.containsKey(key))
+							selected = true;
+					}
+				}
+				if (draw != null) {
+					Color fillColor;
+					if (hit)
+						fillColor = TimelineEditor.HIT_KEY;
+					else if (selected)
+						fillColor = TimelineEditor.SELECTED_KEY;
+					else
+						fillColor = Color.GRAY;
+					drawKey(g, draw, x + start - 3, y + TOP - 1, fillColor, Color.BLACK);
+				} 
+				frame++;
+			}
+			return;
+		}
+		float min = 0, max = 0;
+		for (MotionCurve.Float motionCurve : motionCurves) {
+			if (motionCurve.getMin() < min)
+				min = motionCurve.getMin();
+			if (motionCurve.getMax() > max)
+				max = motionCurve.getMax();
+		}
+		
+		float scale = max - min;
+		int size = iExpandedHeight - 4;
+		int off = iExpandedHeight - 4 + Math.round(size * min / scale);
+		
+		/*
+		 * draw track
+		 */
+		drawTrack(g, y, off);
+		
+		/*
+		 * draw curve
+		 */
+		for (int i = motionCurves.length - 1; i >= 0; i--) {
+			drawCurve(g, motionCurves[i] == motionCurve, y, col[i], col[i], motionCurves[i], selection, hitKeys);
+		}
+		
+		g.setClip(clip);
+	}
+	
+	public void paint_old(Graphics g, int y, Map<MotionKey, TrackView.KeyData> selection, MotionKey[] hitKeys) {
 		int bottom = getHeight() - 4;
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
@@ -131,59 +231,7 @@ public class BoneTrack extends Track {
 			g.setClip(clip);
 			return;
 		}
-		Color background, track;
-		if (timelineEditor.getHeader().getSelectedTracks().contains(this)) {
-			background = TimelineEditor.SELECTED_BACKGROUND;
-			track = TimelineEditor.SHADOW;
-		} else {
-			background = TimelineEditor.BACKGROUND;
-			track = TimelineEditor.LIGHT_SHADOW;
-		}
-		g.setColor(background);
-		g.fillRect(clip.x, y + TOP - 2, clip.width, 3);
-		g.fillRect(clip.x, y + TOP + 4, clip.width, 3);
-		g.setColor(track);
-		g.fillRect(clip.x, y + TOP + 1, clip.width, 3);
-	
 		
-		for (int x = -fw ; x <= clip.width + fw; x += fw) {
-			MotionKey key = null;
-			boolean selected = false;
-			boolean hit = false;
-			MotionKey draw = null;
-			for (MotionCurve m : motionCurves) {
-				key = m.getKeyAt(frame);
-				if (key != null) {
-					draw = key;
-					if (keyHit(key, hitKeys)) {
-						hit = true;
-						break;
-					}
-					if (selection.containsKey(key))
-						selected = true;
-				}
-			}
-			if (draw != null) {
-//				if (hit)
-//					g.setColor(TimelineEditor.HIT_KEY);
-//				else if (selected)
-//					g.setColor(TimelineEditor.SELECTED_KEY);
-//				else
-//					g.setColor(Color.GRAY);
-//				g.fillOval(x + start - 3, y + TOP - 1, 6, 6);
-//				g.setColor(Color.BLACK);
-//				g.drawOval(x + start - 3, y + TOP - 1, 6, 6);
-				Color fillColor;
-				if (hit)
-					fillColor = TimelineEditor.HIT_KEY;
-				else if (selected)
-					fillColor = TimelineEditor.SELECTED_KEY;
-				else
-					fillColor = Color.GRAY;
-				drawKey(g, draw, x + start - 3, y + TOP - 1, fillColor, Color.BLACK);
-			} 
-			frame++;
-		}
 	}
 	
 	public MotionKey[] getKeysAt(int mx, int my) {
@@ -238,8 +286,9 @@ public class BoneTrack extends Track {
 //		return null;
 //	}
 	
+	
+	@Override
 	public void moveKey(Object object, int y) {
-		MotionKey.Float key = (MotionKey.Float) object;
 		float min = 0, max = 0;
 		for (MotionCurve.Float motionCurve : motionCurves) {
 			if (motionCurve.getMin() < min)
@@ -249,14 +298,38 @@ public class BoneTrack extends Track {
 		}
 		float scale = max - min;
 		int size = iExpandedHeight - 4;
-		int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
+		int off = iExpandedHeight - 4 + Math.round(size * min / scale);
 		float f = (off - y) * scale / size;
-		if (f < min)
-			f = min;
-		if (f > max)
-			f = max;
-		key.setFloat(f);
+		if (object instanceof MotionKey.Float) {
+			if (f < min)
+				f = min;
+			if (f > max)
+				f = max;
+			((MotionKey.Float) object).setFloat(f);
+		} else if (object instanceof TangentHandle.Float) {
+			((TangentHandle.Float) object).setValue(f);
+		}
 	}
+	
+//	public void moveKey(Object object, int y) {
+//		MotionKey.Float key = (MotionKey.Float) object;
+//		float min = 0, max = 0;
+//		for (MotionCurve.Float motionCurve : motionCurves) {
+//			if (motionCurve.getMin() < min)
+//				min = motionCurve.getMin();
+//			if (motionCurve.getMax() > max)
+//				max = motionCurve.getMax();
+//		}
+//		float scale = max - min;
+//		int size = iExpandedHeight - 4;
+//		int off = iExpandedHeight - 4 + (int) Math.round(size * min / scale);
+//		float f = (off - y) * scale / size;
+//		if (f < min)
+//			f = min;
+//		if (f > max)
+//			f = max;
+//		key.setFloat(f);
+//	}
 	
 	public void shiftKey(Object object, int frame) {
 		MotionKey.Float key = (MotionKey.Float) object;
@@ -282,15 +355,15 @@ public class BoneTrack extends Track {
 		}
 	}
 	
-	private void reorder(MotionCurve.Float motionCurve) {
+	private void reorder(MotionCurve.Float mc) {
 		MotionCurve.Float[] newCurves = new MotionCurve.Float[motionCurves.length];
 		Color[] newColors = new Color[motionCurves.length];
 		RotationDof[] newDofs = new RotationDof[motionCurves.length];
 		
-		newCurves[0] = motionCurve;
+		newCurves[0] = mc;
 		int j = 0;
 		for (int i = 1; i < newCurves.length; i++) {
-			if (motionCurves[j] == motionCurve) {
+			if (motionCurves[j] == mc) {
 				newColors[0] = col[j];
 				newDofs[0] = dofs[j];
 				j++;
@@ -306,6 +379,8 @@ public class BoneTrack extends Track {
 		motionCurves = newCurves;
 		col = newColors;
 		dofs = newDofs;
+		
+		super.motionCurve = motionCurves[0];
 	}
 	
 	

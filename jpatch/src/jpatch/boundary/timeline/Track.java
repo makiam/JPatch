@@ -47,6 +47,8 @@ public class Track<M extends MotionCurve> {
 	TimelineEditor timelineEditor;
 	M motionCurve;
 	
+	Track() { }
+	
 	public Track(TimelineEditor timelineEditor, M motionCurve) {
 		this.timelineEditor = timelineEditor;
 		this.motionCurve = motionCurve;
