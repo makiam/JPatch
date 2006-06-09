@@ -27,6 +27,8 @@ public abstract class MotionKey {
 		this.motionCurve = motionCurve;
 	}
 	
+	private MotionKey() { }
+	
 	private MotionKey(float position) {
 		this.position = position;
 	}
@@ -90,6 +92,8 @@ public abstract class MotionKey {
 		private float f;
 		private float dfIn;
 		private float dfOut;
+		
+		private Float() { }
 		
 		public Float(float position, float f) {
 			super(position);
@@ -155,6 +159,43 @@ public abstract class MotionKey {
 			copy.dfIn = dfIn;
 			copy.dfOut = dfOut;
 			return copy;
+		}
+	}
+	
+	public static class Point3dProxy extends Float {
+		public static enum Type { X_AXIS, Y_AXIS, Z_AXIS };
+		
+		private MotionKey.Point3d key;
+		private Type type;
+		
+		public Point3dProxy(MotionKey.Point3d key, Type type) {
+			this.key = key;
+			this.type = type;
+		}
+		
+		@Override
+		public float getFloat() {
+			switch (type) {
+			case X_AXIS:
+				return (float) key.getPoint3d().x;
+			case Y_AXIS:
+				return (float) key.getPoint3d().y;
+			case Z_AXIS:
+				return (float) key.getPoint3d().z;
+			}
+			throw new IllegalStateException();
+		}
+		
+		@Override
+		public void setFloat(float f) {
+			switch (type) {
+			case X_AXIS:
+				key.getPoint3d().x = f;
+			case Y_AXIS:
+				key.getPoint3d().y = f;
+			case Z_AXIS:
+				key.getPoint3d().z = f;
+			}
 		}
 	}
 	
