@@ -277,11 +277,11 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 		if (!bExpanded)
 			return null;
 		
-		float min = motionCurve.getMin();
-		float max = motionCurve.getMax();
-		float scale = max - min;
-		int size = iExpandedHeight - 4;
-		int off = iExpandedHeight - 4 + Math.round(size * min / scale);
+//		float min = motionCurve.getMin();
+//		float max = motionCurve.getMax();
+//		float scale = max - min;
+//		int size = iExpandedHeight - 4;
+//		int off = iExpandedHeight - 4 + Math.round(size * min / scale);
 		
 		int frame = mx / timelineEditor.getFrameWidth() + (int) MainFrame.getInstance().getAnimation().getStart();
 		int hyIn = 0;
@@ -296,13 +296,13 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 		key = motionCurve.getKeyAt(frame + TANGENT_LENGTH);
 		if (key != null) {
 			handleIn = getInTangent(key);
-			hyIn = off - Math.round(size / scale * handleIn.getValue());
+			hyIn = offset - Math.round(scale * handleIn.getValue());
 		}
 		
 		key = motionCurve.getKeyAt(frame - TANGENT_LENGTH);
 		if (key != null) {
 			handleOut = getOutTangent(key);
-			hyOut = off - Math.round(size / scale * handleOut.getValue());
+			hyOut = offset - Math.round(scale * handleOut.getValue());
 		}
 		
 		int dyIn = Math.abs(my - hyIn);
