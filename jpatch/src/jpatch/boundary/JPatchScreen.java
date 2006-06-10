@@ -93,6 +93,7 @@ public final class JPatchScreen extends JPanel {
 		setMode(mode);
 		
 		enablePopupMenu(true);
+		setBackground(settings.colors.background.get());
 //		activeViewport = aDrawable[0];
 //		snapToGrid(bSnapToGrid);
 	}
@@ -123,9 +124,8 @@ public final class JPatchScreen extends JPanel {
 					if (bShowTangents)
 						aViewport[I].drawTool(tangentTool);
 					aViewport[I].drawInfo();
-					if (aViewport[I] == activeViewport)
-						aViewport[I].drawActiveBorder();
-
+					aViewport[I].drawBorder(aViewport[I] == activeViewport);
+					
 					
 //					aViewport[I].drawTest();
 				}
@@ -570,40 +570,47 @@ public final class JPatchScreen extends JPanel {
 //					activeViewport = aComponent[0];
 					aDrawable[0].getComponent().setBounds(0,0,w,h);
 					aDrawable[0].getComponent().setVisible(true);
+					aDrawable[1].getComponent().setBounds(0,0,0,0);
 					aDrawable[1].getComponent().setVisible(false);
+					aDrawable[2].getComponent().setBounds(0,0,0,0);
 					aDrawable[2].getComponent().setVisible(false);
+					aDrawable[3].getComponent().setBounds(0,0,0,0);
 					aDrawable[3].getComponent().setVisible(false);
 				break;
 				case HORIZONTAL_SPLIT:
 //					if (activeViewport != aComponent[0] && activeViewport != aComponent[1]) {
 //						activeViewport = aComponent[0];
 //					}
-					aDrawable[0].getComponent().setBounds(0,0,w2 - 1,h);
+					aDrawable[0].getComponent().setBounds(0,0,w2,h);
 					aDrawable[0].getComponent().setVisible(true);
-					aDrawable[1].getComponent().setBounds(w2 + 1,0,w2 - 1,h);
+					aDrawable[1].getComponent().setBounds(w2,0,w2,h);
 					aDrawable[1].getComponent().setVisible(true);
+					aDrawable[2].getComponent().setBounds(0,0,0,0);
 					aDrawable[2].getComponent().setVisible(false);
+					aDrawable[3].getComponent().setBounds(0,0,0,0);
 					aDrawable[3].getComponent().setVisible(false);
 				break;
 				case VERTICAL_SPLIT:
 //					if (activeViewport != aComponent[0] && activeViewport != aComponent[2]) {
 //						activeViewport = aComponent[0];
 //					}
-					aDrawable[0].getComponent().setBounds(0,0,w,h2 - 1);
+					aDrawable[0].getComponent().setBounds(0,0,w,h2);
 					aDrawable[0].getComponent().setVisible(true);
+					aDrawable[1].getComponent().setBounds(0,0,0,0);
 					aDrawable[1].getComponent().setVisible(false);
-					aDrawable[2].getComponent().setBounds(0,h2 + 1,w,h2 - 1);
+					aDrawable[2].getComponent().setBounds(0,h2,w,h2);
 					aDrawable[2].getComponent().setVisible(true);
+					aDrawable[3].getComponent().setBounds(0,0,0,0);
 					aDrawable[3].getComponent().setVisible(false);
 				break;
 				case QUAD:
-					aDrawable[0].getComponent().setBounds(0,0,w2 - 1,h2 - 1);
+					aDrawable[0].getComponent().setBounds(0,0,w2,h2);
 					aDrawable[0].getComponent().setVisible(true);
-					aDrawable[1].getComponent().setBounds(w2 + 1,0,w2 - 1,h2 - 1);
+					aDrawable[1].getComponent().setBounds(w2,0,w2,h2);
 					aDrawable[1].getComponent().setVisible(true);
-					aDrawable[2].getComponent().setBounds(0,h2 + 1,w2 - 1,h2 - 1);
+					aDrawable[2].getComponent().setBounds(0,h2,w2,h2);
 					aDrawable[2].getComponent().setVisible(true);
-					aDrawable[3].getComponent().setBounds(w2 + 1,h2 + 1,w2 - 1,h2 - 1);
+					aDrawable[3].getComponent().setBounds(w2,h2,w2,h2);
 					aDrawable[3].getComponent().setVisible(true);
 
 				break;
@@ -658,7 +665,7 @@ public final class JPatchScreen extends JPanel {
 	}
 	
 	public void doLayout() {
-		super.doLayout();
+//		super.doLayout();
 		setMode(iMode);
 	}
 	

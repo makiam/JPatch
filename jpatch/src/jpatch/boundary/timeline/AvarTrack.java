@@ -1,5 +1,5 @@
 /*
- * $Id: AvarTrack.java,v 1.25 2006/06/09 16:15:06 sascha_l Exp $
+ * $Id: AvarTrack.java,v 1.26 2006/06/10 18:50:17 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -41,6 +41,7 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 	
 	float scale;
 	int offset;
+	int level;
 	
 	AvarTrack() { }
 	
@@ -48,6 +49,16 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 		super(timelineEditor, motionCurve);
 		bExpandable = true;
 		setExpandedHeight(iExpandedHeight);
+	}
+	
+	public AvarTrack(TimelineEditor timelineEditor, MotionCurve.Float motionCurve, int level) {
+		this(timelineEditor, motionCurve);
+		this.level = level;
+	}
+	
+	@Override
+	public int getIndent() {
+		return level * 4;
 	}
 	
 	@Override
@@ -60,7 +71,15 @@ public class AvarTrack extends Track<MotionCurve.Float> {
 		offset = size + Math.round(min * scale) - 1;
 	}
 	
-	void drawCurve(Graphics g, boolean drawTangents, int y, Color curveColor, Color keyColor, MotionCurve.Float motionCurve, Map<MotionKey, TrackView.KeyData> selection, MotionKey[] hitKeys) {
+	public void setOffset(int offset) {
+		this.offset = offset;
+	}
+	
+	public void setScale(float scale) {
+		this.scale = scale;
+	}
+	
+	public void drawCurve(Graphics g, boolean drawTangents, int y, Color curveColor, Color keyColor, MotionCurve.Float motionCurve, Map<MotionKey, TrackView.KeyData> selection, MotionKey[] hitKeys) {
 		Rectangle clip = g.getClipBounds();
 		int fw = timelineEditor.getFrameWidth();
 		int start = clip.x - clip.x % fw + fw / 2;

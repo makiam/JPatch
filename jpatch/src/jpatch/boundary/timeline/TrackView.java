@@ -1,5 +1,5 @@
 /*
- * $Id: TrackView.java,v 1.42 2006/06/05 07:31:19 sascha_l Exp $
+ * $Id: TrackView.java,v 1.43 2006/06/10 18:50:17 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -33,6 +33,7 @@ import javax.vecmath.Vector3d;
 
 import jpatch.control.edit.*;
 import jpatch.entity.*;
+import jpatch.entity.MotionCurve.Float;
 import jpatch.boundary.*;
 import jpatch.boundary.settings.Settings;
 
@@ -125,7 +126,11 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	
 	public Dimension getPreferredSize() {
 		Animation anim = MainFrame.getInstance().getAnimation();
-		dim.setSize(timelineEditor.getFrameWidth() * (anim.getEnd() - anim.getStart()), timelineEditor.getTracksHeight() + 7);
+		int x = (int) (timelineEditor.getFrameWidth() * (anim.getEnd() - anim.getStart()));
+		int y = timelineEditor.getTracksHeight() + 7;
+		
+		y = (int) timelineEditor.getViewport().getViewRect().getHeight();
+		dim.setSize(x, y);
 		return dim;
 	}
 	
@@ -137,10 +142,34 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		return getPreferredSize();
 	}
 	
-	/*
-	 * Paint the tracks
-	 */
+	
 	public void paintComponent(Graphics g) {
+		paintCombinedTrack(g);
+	}
+	
+	private void paintCombinedTrack(Graphics g) {
+		/*
+		 * paint individual tracks
+		 */
+		Rectangle clip = g.getClipBounds();
+		for (Track track : timelineEditor.getTracks()) {
+			if (track.isHidden())
+				continue;
+			if (track instanceof AvarTrack) {
+				AvarTrack avarTrack = (AvarTrack) track;
+//				track.setExpandedHeight((int) timelineEditor.getViewport().getViewRect().getHeight());
+				avarTrack.setOffset((int) timelineEditor.getViewport().getViewRect().getHeight() / 2);
+				avarTrack.setScale(1);
+				avarTrack.drawCurve(g, false, 0, Color.BLACK, Color.GRAY, (Float) track.getMotionCurves()[0], selection, hitKeys);
+			}
+		}
+	}
+	
+	
+	/*
+	 * Paint multi-track view
+	 */
+	private void paintMultiTrack(Graphics g) {
 		/*
 		 * get clip bounds, calculate start frame, fill background
 		 */
@@ -356,6 +385,8 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 //								System.out.println("key selected: " + selectedKey + " position=" + position);
 							} else if (tangentHandle != null) {
 								state = State.TANGENT;
+								hitTrack = track;
+								trackTop = y;
 								tangentHandle.prepare();
 								edit = new JPatchActionEdit("modify tangent");
 							} else {

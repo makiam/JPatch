@@ -1,5 +1,5 @@
 /*
- * $Id: Viewport2.java,v 1.63 2006/05/29 14:39:45 sascha_l Exp $
+ * $Id: Viewport2.java,v 1.64 2006/06/10 18:50:18 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -258,8 +258,11 @@ public class Viewport2 {
 
 	}
 	
-	public void drawActiveBorder() {
-		drawable.setColor(new Color3f(settings.colors.selection));
+	public void drawBorder(boolean active) {
+		if (active)
+			drawable.setColor(settings.colors.selection);
+		else
+			drawable.setColor(settings.colors.text);
 		drawable.drawRect(0, 0, (int) viewDef.getWidth() - 1, (int) viewDef.getHeight() - 1);
 	}
 	

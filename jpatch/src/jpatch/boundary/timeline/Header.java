@@ -1,5 +1,5 @@
 /*
- * $Id: Header.java,v 1.22 2006/05/22 10:46:20 sascha_l Exp $
+ * $Id: Header.java,v 1.23 2006/06/10 18:50:17 sascha_l Exp $
  *
  * Copyright (c) 2005 Sascha Ledinsky
  *
@@ -81,7 +81,6 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 			expandButton[i].setRolloverIcon(iconDownArrow[2]);
 			expandButton[i].setPressedIcon(iconDownArrow[1]);
 			expandButton[i].setSelectedIcon(iconUpArrow[0]);
-			//expandButton[i].set(iconDownArrow[1]);
 			expandButton[i].setRolloverSelectedIcon(iconUpArrow[2]);
 			expandButton[i].setBorderPainted(false);
 			expandButton[i].setContentAreaFilled(false);
@@ -145,17 +144,6 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		super.paintComponent(g);
 		Rectangle clip = g.getClipBounds();
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		//int frame = start / TimelineEditor.this.iFrameWidth - 1;
-//		g.setColor(Color.WHITE);
-//		for (int x = -TimelineEditor.this.iFrameWidth ; x <= clip.width + TimelineEditor.this.iFrameWidth; x += TimelineEditor.this.iFrameWidth) {
-//		g.drawLine(x + start, clip.y, x + start, clip.y + clip.height);
-//		}
-		
-		
-//		g.setColor(TimelineEditor.BACKGROUND);
-//		g.fillRect(width - 4, clip.y, 3, clip.height);
-//		clip.width -= 5;
-//		g.setClip(clip);
 		int y = 0;
 		Track prev = null;
 		for (Track track : timelineEditor.getTracks()) {
@@ -173,20 +161,10 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 				}
 				g.setColor(Color.BLACK);
 				if (track instanceof HeaderTrack) {
-//					g.setColor(UIManager.getColor("ScrollBar.shadow"));
-//					g.fillRect(clip.x, y, clip.width, track.getHeight() - 1);
-					//g.setFont(bold);
 					g.setColor(TimelineEditor.HIGHLIGHT);
 					g.drawString(track.getName(), 16 + track.getIndent(), y + 11);
 					g.setColor(TimelineEditor.SHADOW);
-					//g.drawString(track.getName(), 16 + track.getIndent(), y + 10);
-					g.drawString(track.getName(), 15 + track.getIndent(), y + 10);
-					//g.drawString(track.getName(), 15 + track.getIndent(), y + 11);
-					//g.setColor(TimelineEditor.HIGHLIGHT);
-					//g.drawString(track.getName(), 16 + track.getIndent(), y + 12);
-					//g.drawString(track.getName(), 17 + track.getIndent(), y + 12);
-					//g.drawString(track.getName(), 17 + track.getIndent(), y + 11);
-					
+					g.drawString(track.getName(), 15 + track.getIndent(), y + 10);					
 				} else {
 					g.setFont(plain);
 					g.drawString(track.getName(), 16 + track.getIndent(), y + 11);
@@ -216,20 +194,6 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 					g.drawLine(width - 2, y, width - 2, y + height - 1);
 					g.setColor(TimelineEditor.LIGHT_SHADOW);
 					g.drawLine(width - 1, y, width - 1, y + height - 1);
-//					g.setColor(TimelineEditor.BACKGROUND);
-//					g.fillRect(width - 4, y, 2, y + bottom);
-//					g.setColor(UIManager.getColor("ScrollBar.shadow"));
-//					g.drawLine(width - 1, y, width - 1, y + track.getHeight() - 5);
-//					g.drawLine(0, y + track.getHeight() - 1, width - 1, y + track.getHeight() - 1);
-//					g.setColor(Track.SEPARATOR);
-//					g.drawLine(width - 6, y, width - 6, y + track.getHeight() - 1);
-//					g.drawLine(width - 2, y, width - 2, y + track.getHeight() - 1);
-//					g.drawLine(0, y + track.getHeight() - 6, width - 1, y + track.getHeight() - 6);
-//					g.drawLine(0, y + track.getHeight() - 2, width - 1, y + track.getHeight() - 2);
-					
-//					g.setColor(getBackground());
-//					g.fillRect(width - 3, y, 3, track.getHeight());
-//					g.fillRect(0, y + track.getHeight() - 3, width, 3);
 					if (prev != null && prev.isExpanded()) {
 						g.setColor(TimelineEditor.SHADOW);
 						g.drawLine(0, y, width - 1, y);
@@ -241,34 +205,14 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 						g.setColor(TimelineEditor.SHADOW);
 						g.drawLine(width - 2, y, width - 1, y);
 					}
-//					g.drawLine(width - 1, y, width - 1, y + bottom - 1);
 					g.setColor(TimelineEditor.SHADOW);
 					g.drawLine(0, y + bottom, width - 1, y + bottom);
-//					g.drawLine(width - 5, y + 1, width - 5, y + bottom);
-					
-//					g.fillRect(width - 5, y, 4, bottom + );
-//					g.fillRect(width - 4, y, 3, track.getHeight());
 				} else {
 					g.setColor(TimelineEditor.SHADOW);
 					g.drawLine(width - 6, y, width - 6, y + height - 1);
 					g.drawLine(width - 2, y, width - 2, y + height - 1);
 					g.setColor(TimelineEditor.LIGHT_SHADOW);
 					g.drawLine(width - 1, y, width - 1, y + height - 1);
-//					g.setColor(TimelineEditor.BACKGROUND);
-//					g.fillRect(width - 4, y, 2, y + height);
-//					g.setColor(UIManager.getColor("ScrollBar.shadow"));
-//					g.drawLine(width - 1, y, width - 1, y + track.getHeight() - 1);
-//					g.setColor(TimelineEditor.SHADOW);
-//					g.drawLine(width - 1, y - 3, width - 1, y + bottom);
-//					g.setColor(TimelineEditor.HIGHLIGHT);
-//					g.drawLine(width - 5, y - 3, width - 5, y + bottom);
-//					g.setColor(getBackground());
-//					g.fillRect(width - 4, y, 3, track.getHeight());
-//					g.drawLine(width - 6, y, width - 6, y + track.getHeight() - 1);
-//					g.drawLine(width - 2, y, width - 2, y + track.getHeight() - 1);
-//					g.drawLine(0, y + track.getHeight() - 1, width - 1, y + track.getHeight() - 1);
-//					g.setColor(getBackground());
-//					g.fillRect(width - 3, y, 3, track.getHeight());
 				}
 			}
 			y += track.getHeight();
@@ -288,28 +232,6 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		g.setColor(TimelineEditor.SHADOW);
 		Rectangle r = timelineEditor.getRowHeader().getViewRect();
 		g.fillRect(0, y + 7, width, r.height);
-		
-//		if (timelineEditor.getTracks().size() > 0 && timelineEditor.getTracks().get(timelineEditor.getTracks().size() - 1).isExpanded())
-//		y -= 1;
-//		g.setColor(UIManager.getColor("ScrollBar.darkShadow"));
-//		g.drawLine(0, y - 1, width - 1, y - 1);
-//		g.setColor(UIManager.getColor("ScrollBar.shadow"));
-//		g.drawLine(0, y, width - 1, y);
-//		g.setColor(getBackground().darker());
-//		g.drawLine(width - 5, 0, width - 5, y - 1);
-//		g.drawLine(width - 1, 0, width - 1, y - 1);
-//		g.drawLine(width - 5, 0, width - 1, 0);
-//		g.drawLine(width - 5, y - 1, width - 1, y - 1);
-//		g.setColor(getBackground().darker().darker());
-//		g.fillRect(0, y, width, clip.height - y);
-//		if (bResizing)
-//		g.setColor(getBackground().darker());
-//		if (bResizeCursor)
-//		g.setColor(getBackground().brighter());
-//		else
-		
-//		g.setColor(Color.BLACK);
-//		g.drawLine(x + 1, clip.y, x + 1, clip.height);
 	}
 	
 	private static Icon createIcon(final int type, final Color color) {
@@ -429,19 +351,16 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 				width = 128;
 				setSize(getPreferredSize());
 				timelineEditor.doLayout();
-//				setHorizontalResizeCursor(e.getX() > width - 5);
 				return;
 			}
 			bHorizontalResize = e.getX() > width - 6;
 			iVerticalResize = -1;
-			//setHorizontalResizeCursor(bHorizontalResize);
 			
 			int y = 0;
 			for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
 				Track track = timelineEditor.getTracks().get(i);
 				int h2 = track.isExpanded() ? track.getHeight() - 6 : track.getHeight();
 				if (e.getClickCount() == 1 && e.getY() > y && e.getY() < y + h2) {
-//					timelineEditor.expandTrack(track, !track.isExpanded());
 					
 					if (e.isShiftDown()) {
 						setSelectedTracks.clear();
@@ -489,7 +408,6 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 						revalidate();
 						((JComponent) timelineEditor.getViewport().getView()).revalidate();
 						timelineEditor.repaint();
-//						setVerticalResizeCursor(e.getY() > y + track.getHeight() - 5 && e.getY() <= y + track.getHeight());
 					} else {
 						iVerticalResize = i;
 					}
@@ -505,7 +423,6 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		} else if (e.getButton() == MouseEvent.BUTTON2) {
 			my = e.getY();
 		}
-//		repaint();
 	}
 	
 	private void selectRange(int track, boolean selectGroups) {
@@ -575,18 +492,6 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 			iVerticalResize = -1;
 		selectionMode = SelectionMode.OFF;
 		my = -1;
-//		setHorizontalResizeCursor(e.getX() > width - 5);
-//		int y = 0;
-//		boolean vResize = false;
-//		for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
-//		Track track = timelineEditor.getTracks().get(i);
-//		if (!bHorizontalResize && track.isExpanded() && e.getY() > y + track.getHeight() - 5 && e.getY() <= y + track.getHeight()) {
-//		vResize = true;
-//		break;
-//		}
-//		y += track.getHeight();
-//		}
-//		setVerticalResizeCursor(vResize);
 	}
 	
 	public void mouseExited(MouseEvent e) {
@@ -708,14 +613,18 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 			}
 		});
 		popup.add(mi);
-//		mi = new JMenuItem("dump selected tracks");
-//		mi.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent event) {
-//				for (Track track : setSelectedTracks)
-//					System.out.println(track.getName());
-//			}
-//		});
-//		popup.add(mi);
+		
+		popup.add(new JSeparator());
+		
+		mi = new JCheckBoxMenuItem("one track per DOF");
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				timelineEditor.setCollapseBoneTracks(!timelineEditor.isCollapseBoneTracks());
+			}
+		});
+		mi.setSelected(!timelineEditor.isCollapseBoneTracks());
+		popup.add(mi);
+		
 		popup.show((Component) e.getSource(), e.getX(), e.getY());
 	}
 	

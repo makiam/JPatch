@@ -234,7 +234,7 @@ public final class MainFrame extends JFrame {
 			splitPaneV.setResizeWeight(1);
 			splitPaneV.setDividerSize(4);
 			splitPaneV.setDividerLocation(getHeight() - 200);
-			
+			splitPaneV.setBackground(settings.colors.background.get());
 			JSplitPane splitPaneH = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 //			JPanel panel = new JPanel();
 //			panel.setLayout(new BorderLayout());
@@ -246,6 +246,7 @@ public final class MainFrame extends JFrame {
 			splitPaneH.setResizeWeight(1);
 			splitPaneH.setDividerSize(4);
 			splitPaneH.setDividerLocation(getWidth() - 310);
+			splitPaneV.setBackground(settings.colors.background.get());
 			getContentPane().add(splitPaneH, BorderLayout.CENTER);
 			
 			helpPanel.setLayout(new BorderLayout());

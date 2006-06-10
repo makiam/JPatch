@@ -54,6 +54,8 @@ public class TimelineEditor extends JScrollPane {
 	private Header header = new Header(this);
 	private AnimObject animObject;
 	
+	private boolean collapseBoneTracks = true;
+	
 	private static Color derivedColor(Color c, int r, int g, int b) {
 		r += c.getRed();
 		g += c.getGreen();
@@ -175,10 +177,23 @@ public class TimelineEditor extends JScrollPane {
 		return animObject;
 	}
 	
+	public void setCollapseBoneTracks(boolean collapse) {
+		collapseBoneTracks = collapse;
+		rethinkTracks();
+	}
+	
+	public boolean isCollapseBoneTracks() {
+		return collapseBoneTracks;
+	}
+	
 	public void setAnimObject(AnimObject animObject) {
 		if (this.animObject == animObject)
 			return;
 		this.animObject = animObject;
+		rethinkTracks();
+	}
+	
+	private void rethinkTracks() {
 		listTracks.clear();
 		if (animObject != null) {
 			listTracks.add(new HeaderTrack(this, animObject.getName(), -12, true));
@@ -228,7 +243,14 @@ public class TimelineEditor extends JScrollPane {
 			dofs[i] = bone.getDof(i);
 			curves[i] = mcs.morph(dofs[i]);
 		}
-		listTracks.add(new BoneTrack(this, dofs, curves, bone, level));
+		
+		if (collapseBoneTracks) {
+			listTracks.add(new BoneTrack(this, dofs, curves, bone, level));
+		} else {
+			for (MotionCurve.Float curve : curves)
+				listTracks.add(new AvarTrack(this, curve, level));
+		}
+		
 		for (Iterator itBones = bone.getChildBones().iterator(); itBones.hasNext(); ) {
 			recursiveAddBoneDofs((Bone) itBones.next(), level + 1, mcs);
 		}
