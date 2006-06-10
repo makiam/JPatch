@@ -258,8 +258,11 @@ public class Viewport2 {
 
 	}
 	
-	public void drawActiveBorder() {
-		drawable.setColor(new Color3f(settings.colors.selection));
+	public void drawBorder(boolean active) {
+		if (active)
+			drawable.setColor(settings.colors.selection);
+		else
+			drawable.setColor(settings.colors.text);
 		drawable.drawRect(0, 0, (int) viewDef.getWidth() - 1, (int) viewDef.getHeight() - 1);
 	}
 	
