@@ -38,9 +38,9 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 	 */
 	private static enum SelectionMode { OFF, ADD, REMOVE, RANGE }
 
-	private final TimelineEditor timelineEditor;
+	final TimelineEditor timelineEditor;
 	int width = 128;
-	private Dimension dim = new Dimension(width, 16 * 20);
+	Dimension dim = new Dimension(width, 16 * 20);
 	
 	private boolean bHorizontalResize = false;
 	private int iVerticalResize = -1;
@@ -48,15 +48,19 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 	private static final Icon[] iconUpArrow = new Icon[] {createIcon(1, Color.BLACK), createIcon(1, Color.WHITE), createIcon(1, UIManager.getColor("Button.focus")) };
 	private JToggleButton[] expandButton = new JToggleButton[0];
 	
-	private Font plain = new Font("Sans-Serif", Font.PLAIN, 12);
-	private Font bold = new Font("Sans-Serif", Font.BOLD, 12);
+	Font plain = new Font("Sans-Serif", Font.PLAIN, 12);
+	Font bold = new Font("Sans-Serif", Font.BOLD, 12);
 	
-	private Set<Track> setSelectedTracks = new HashSet<Track>();
+	Set<Track> setSelectedTracks = new HashSet<Track>();
 	private Set<Track> backupTracks = new HashSet<Track>();
 	private int iSelectedTrack;
 	private SelectionMode selectionMode = SelectionMode.OFF;
 	
 	private int my = -1;
+	
+	Header(TimelineEditor tle, boolean x) { 	// FIXME: needed for subclass, this is REALLY ugly!
+		timelineEditor = tle;
+	}
 	
 	public Header(TimelineEditor tle) {
 		timelineEditor = tle;
@@ -111,7 +115,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 		layoutButtons();
 	}
 	
-	private void layoutButtons() {
+	void layoutButtons() {
 		int y = 0;
 		
 		for (int i = 0; i < timelineEditor.getTracks().size(); i++) {
@@ -141,7 +145,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 	}
 	
 	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
+//		super.paintComponent(g);
 		Rectangle clip = g.getClipBounds();
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		int y = 0;
