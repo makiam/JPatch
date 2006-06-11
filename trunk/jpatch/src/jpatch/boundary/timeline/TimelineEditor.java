@@ -51,7 +51,7 @@ public class TimelineEditor extends JScrollPane {
 	private int mouseX, mouseY;
 	private boolean bMove;
 	private String strText = "";
-	private Header header = new Header(this);
+	private Header header = new Header2(this);
 	private AnimObject animObject;
 	
 	private boolean collapseBoneTracks = true;
