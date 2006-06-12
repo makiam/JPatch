@@ -240,9 +240,7 @@ public abstract class MotionCurve {
 		} else return null;
 	}
 	
-	void computeDerivatives(MotionKey k) {
-		;
-	}
+	abstract void computeDerivatives(MotionKey k);
 	
 	public void xml(PrintStream out, String prefix, String type) {
 //		StringBuffer indent = XMLutils.indent(tab);
@@ -354,17 +352,13 @@ public abstract class MotionCurve {
 			MotionKey.Float key = (MotionKey.Float) k;
 			MotionKey.TangentMode tangentMode = key.getTangentMode();
 			
-			/*
-			 * if tangent mode is manual, do nothing and return
-			 */
+			/* if tangent mode is manual, do nothing and return */
 			if (tangentMode == MotionKey.TangentMode.MANUAL)
 				return;
 			
 			int keyIndex = key.getIndex();
 			
-			/*
-			 * for the first and last key, return 0 tangent
-			 */
+			/* for the first and last key, return 0 tangent */
 			if ((keyIndex == 0) || (keyIndex == list.size() - 1)) {
 				key.setDfIn(0);
 				key.setDfOut(0);
@@ -377,33 +371,7 @@ public abstract class MotionCurve {
 			float f = key.getFloat();
 			float fn = nextKey.getFloat();
 			
-//			/*
-//			 * if tangentMode is manual, return the manually set tangent
-//			 */
-//			if (tangentMode == TangentMode.MANUAL) {
-//				d[0] = key.getDfIn();
-//				if (key.isSmooth())
-//					d[1] = d[0];
-//				else
-//					d[1] = key.getDfOut();
-//				if (premultiply) {
-//					d[0] *= (key.getPosition() - prevKey.getPosition());
-//					d[1] *= (nextKey.getPosition() - key.getPosition());
-//				}
-//				return;
-//			}
-			
-			/*
-			 * compute tangent
-			 */
-			
-			/* apply overshoot limitation */
-			if ((tangentMode == TangentMode.OVERSHOOT) && (f == fp || f == fn || (fp > f && fn > f) || (fp < f && fn < f))) {
-				key.setDfIn(0);
-				key.setDfOut(0);
-				return;
-			}
-			
+			/* compute tangent */
 			float d = 0;
 			float p = key.getPosition();
 			float pn = nextKey.getPosition();
@@ -419,9 +387,7 @@ public abstract class MotionCurve {
 			else
 				d = (fn - fp) / (pn - pp);
 			
-//			float mul = (pn - pp) / Math.min(p - pp, pn - p);
-//			System.out.println(mul);
-//			d *= mul;
+			/* apply overshoot limitation */
 			if (tangentMode == TangentMode.OVERSHOOT) {
 				if (d > 0) {
 					if (d * (pn - p) / 3 > (fn - f))
@@ -437,69 +403,36 @@ public abstract class MotionCurve {
 			}
 			key.setDfIn(d);
 			key.setDfOut(d);
-//			if (premultiply) {
-//				d[0] *= (key.getPosition() - prevKey.getPosition());
-//				d[1] *= (nextKey.getPosition() - key.getPosition());
-//			}
 			return;
 		}
 		
 		public float getFloatAt(float position) {
 			
+			/* if outside of range, return value of first or last key, respectively */
 			if (position <= getStart()) return ((MotionKey.Float) list.get(0)).getFloat();
 			if (position >= getEnd()) return ((MotionKey.Float) list.get(list.size() - 1)).getFloat();
-			java.lang.Object[] key = getInterpolationKeysFor(position);
-			MotionKey.Float key0 = (MotionKey.Float) key[0];
-			MotionKey.Float key1 = (MotionKey.Float) key[1];
-			MotionKey.Float key2 = (MotionKey.Float) key[2];
-			MotionKey.Float key3 = (MotionKey.Float) key[3];
-			float l = key2.getPosition() - key1.getPosition();
-			float t = (position - key1.getPosition()) / l;
-			float p0 = key1.getFloat();
-			float p1 = key2.getFloat();
 			
-			switch (key1.getInterpolation()) {
+			/* binary search for keys */
+			int index = getIndexAt(position);
+			MotionKey.Float k0 = (MotionKey.Float) list.get(index);		// the key before position
+			MotionKey.Float k1 = (MotionKey.Float) list.get(index + 1);	// the key after position
+			
+			/* compute some values needed for interpolation */
+			float l = k1.getPosition() - k0.getPosition();	// the distance (in frames) between the two keys
+			float t = (position - k0.getPosition()) / l;	// relative position: 0 = at k0, 1 = at k1, 0..1 inbetween
+			float p0 = k0.getFloat();						// value at k0
+			float p1 = k1.getFloat();						// value at k1
+			
+			/* switch by interpolation method */
+			switch (k0.getInterpolation()) {
 			case DISCRETE:
-				return p0;
+				return p0;									// return k0's value
 			case LINEAR:
-				return (p0 * (1 - t) + p1 * t);
+				return (p0 * (1 - t) + p1 * t);				// return linear interpolation
 			case CUBIC:
-//				float[] d = new float[2];
-//				getDerivatives(binarySearch(position) - 1, d, true);
-//				float m0 = d[1];
-//				getDerivatives(binarySearch(position), d, true);
-//				float m1 = d[0];
-				
-				float m0 = key1.getDfOut() * (key2.getPosition() - key1.getPosition());
-				float m1 = key2.getDfIn() * (key2.getPosition() - key1.getPosition());
-//				boolean limitOvershoot = (key1.getTangentMode() == MotionKey.TangentMode.OVERSHOOT);
-//				float m0 = 0;
-//				float m1 = 0;
-//				float d0 = 0;
-//				float d1 = 0;
-//				if (key0 != null) {
-//					float v0 = key0.getFloat();
-//					if (limitOvershoot && (p0 == v0 || p0 == p1 || (p0 > v0 && p0 > p1) || (p0 < v0 && p0 < p1))) m0 = 0;
-//					else m0 = (p1 - v0) / (key2.getPosition() - key0.getPosition()) * l;
-//				}
-//				if (key3 != null) {
-//					float v1 = key3.getFloat();
-//					if (limitOvershoot && (p1 == p0 || p1 == v1 || (p1 > v1 && p1 > p0) || (p1 < v1 && p1 < p0))) m1 = 0;
-//					else m1 = (v1 - p0) / (key3.getPosition() - key1.getPosition()) * l;
-//				}
-//				if (key0 != null && key1 != null) {
-////				if (key0 != null)
-//					d0 = (key1.getFloat() - key0.getFloat()) / (key1.getPosition() - key0.getPosition());
-////				if (key3 != null)
-//					d1 = (key3.getFloat() - key2.getFloat()) / (key3.getPosition() - key2.getPosition());
-//				float s0 = (key1.getPosition()  - key0.getPosition()) / (key2.getPosition() - key0.getPosition());
-//				float s1 = (key2.getPosition()  - key1.getPosition()) / (key3.getPosition() - key1.getPosition());
-//				m0 = (1 - s0) * d0 + s0 * d1;
-//				m1 = (1 - s1) * d0 + s1 * d1;
-//				m0 *= l;
-//				m1 *= l;
-//				}
-				return cubicInterpolate(p0, m0, p1, m1, t);
+				float m0 = k0.getDfOut() * l;				// get derivative at k0
+				float m1 = k1.getDfIn() * l;				// get derivative at 01
+				return cubicInterpolate(p0, m0, p1, m1, t);	// return cubic interpolation
 			}
 			throw new IllegalStateException();
 		}
@@ -534,9 +467,73 @@ public abstract class MotionCurve {
 		}
 	}
 	
+	public static class Point3dProxy extends MotionCurve.Float {
+		
+	}
+	
 	public static class Point3d extends MotionCurve {
 		
 		private Point3d() { }
+		
+		@Override
+		void computeDerivatives(MotionKey k) {
+			System.out.println("setDerivatives called");
+			MotionKey.Float key = (MotionKey.Float) k;
+			MotionKey.TangentMode tangentMode = key.getTangentMode();
+			
+			/* if tangent mode is manual, do nothing and return */
+			if (tangentMode == MotionKey.TangentMode.MANUAL)
+				return;
+			
+			int keyIndex = key.getIndex();
+			
+			/* for the first and last key, return 0 tangent */
+			if ((keyIndex == 0) || (keyIndex == list.size() - 1)) {
+				key.setDfIn(0);
+				key.setDfOut(0);
+				return;
+			}
+			
+			MotionKey.Float prevKey = (MotionKey.Float) list.get(keyIndex - 1);
+			MotionKey.Float nextKey = (MotionKey.Float) list.get(keyIndex + 1);
+			float fp = prevKey.getFloat();
+			float f = key.getFloat();
+			float fn = nextKey.getFloat();
+			
+			/* compute tangent */
+			float d = 0;
+			float p = key.getPosition();
+			float pn = nextKey.getPosition();
+			float pp = prevKey.getPosition();
+			if (prevKey.interpolation == MotionKey.Interpolation.DISCRETE)
+				d = 0;
+			else if (prevKey.interpolation == MotionKey.Interpolation.LINEAR)
+				d = (f - fp) / (key.getPosition() - prevKey.getPosition());
+			else if (key.interpolation == MotionKey.Interpolation.DISCRETE)
+				d = 0;
+			else if (key.interpolation == MotionKey.Interpolation.LINEAR)
+				d = (fn - f) / (pn - p);
+			else
+				d = (fn - fp) / (pn - pp);
+			
+			/* apply overshoot limitation */
+			if (tangentMode == TangentMode.OVERSHOOT) {
+				if (d > 0) {
+					if (d * (pn - p) / 3 > (fn - f))
+						d = (fn - f) / (pn - p) * 3;
+					if (d * (p - pp) / 3 > (f - fp))
+						d = (f - fp) / (p - pp) * 3;
+				} else if (d < 0) {
+					if (d * (pn - p) / 3 < (fn - f))
+						d = (fn - f) / (pn - p) * 3;
+					if (d * (p - pp) / 3 < (f - fp))
+						d = (f - fp) / (p - pp) * 3;
+				}
+			}
+			key.setDfIn(d);
+			key.setDfOut(d);
+			return;
+		}
 		
 		public javax.vecmath.Point3d getPoint3dAt(float position) {
 			if (position <= getStart()) return ((MotionKey.Point3d) list.get(0)).getPoint3d();
