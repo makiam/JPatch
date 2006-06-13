@@ -348,12 +348,10 @@ public abstract class MotionCurve {
 		
 		@Override
 		void computeDerivatives(MotionKey k) {
-			System.out.println("setDerivatives called");
 			MotionKey.Float key = (MotionKey.Float) k;
-			MotionKey.TangentMode tangentMode = key.getTangentMode();
 			
 			/* if tangent mode is manual, do nothing and return */
-			if (tangentMode == MotionKey.TangentMode.MANUAL)
+			if (key.getTangentMode() == MotionKey.TangentMode.MANUAL)
 				return;
 			
 			int keyIndex = key.getIndex();
@@ -388,7 +386,7 @@ public abstract class MotionCurve {
 				d = (fn - fp) / (pn - pp);
 			
 			/* apply overshoot limitation */
-			if (tangentMode == TangentMode.OVERSHOOT) {
+			if (key.getTangentMode() == TangentMode.OVERSHOOT) {
 				if (d > 0) {
 					if (d * (pn - p) / 3 > (fn - f))
 						d = (fn - f) / (pn - p) * 3;
@@ -414,8 +412,8 @@ public abstract class MotionCurve {
 			
 			/* binary search for keys */
 			int index = getIndexAt(position);
-			MotionKey.Float k0 = (MotionKey.Float) list.get(index);		// the key before position
-			MotionKey.Float k1 = (MotionKey.Float) list.get(index + 1);	// the key after position
+			MotionKey.Float k0 = (MotionKey.Float) list.get(index - 1);	// the key before position
+			MotionKey.Float k1 = (MotionKey.Float) list.get(index);		// the key after position
 			
 			/* compute some values needed for interpolation */
 			float l = k1.getPosition() - k0.getPosition();	// the distance (in frames) between the two keys
@@ -431,7 +429,7 @@ public abstract class MotionCurve {
 				return (p0 * (1 - t) + p1 * t);				// return linear interpolation
 			case CUBIC:
 				float m0 = k0.getDfOut() * l;				// get derivative at k0
-				float m1 = k1.getDfIn() * l;				// get derivative at 01
+				float m1 = k1.getDfIn() * l;				// get derivative at k1
 				return cubicInterpolate(p0, m0, p1, m1, t);	// return cubic interpolation
 			}
 			throw new IllegalStateException();
@@ -477,109 +475,86 @@ public abstract class MotionCurve {
 		
 		@Override
 		void computeDerivatives(MotionKey k) {
-			System.out.println("setDerivatives called");
-			MotionKey.Float key = (MotionKey.Float) k;
-			MotionKey.TangentMode tangentMode = key.getTangentMode();
+			MotionKey.Point3d key = (MotionKey.Point3d) k;
 			
 			/* if tangent mode is manual, do nothing and return */
-			if (tangentMode == MotionKey.TangentMode.MANUAL)
+			if (key.getTangentMode() == MotionKey.TangentMode.MANUAL)
 				return;
 			
 			int keyIndex = key.getIndex();
 			
 			/* for the first and last key, return 0 tangent */
 			if ((keyIndex == 0) || (keyIndex == list.size() - 1)) {
-				key.setDfIn(0);
-				key.setDfOut(0);
+				key.setDpIn(0, 0, 0);
+				key.setDpOut(0, 0, 0);
 				return;
 			}
 			
-			MotionKey.Float prevKey = (MotionKey.Float) list.get(keyIndex - 1);
-			MotionKey.Float nextKey = (MotionKey.Float) list.get(keyIndex + 1);
-			float fp = prevKey.getFloat();
-			float f = key.getFloat();
-			float fn = nextKey.getFloat();
+			MotionKey.Point3d prevKey = (MotionKey.Point3d) list.get(keyIndex - 1);
+			MotionKey.Point3d nextKey = (MotionKey.Point3d) list.get(keyIndex + 1);
+			javax.vecmath.Point3d p3p = prevKey.getPoint3d();
+			javax.vecmath.Point3d p3 = key.getPoint3d();
+			javax.vecmath.Point3d p3n = nextKey.getPoint3d();
 			
 			/* compute tangent */
-			float d = 0;
+			javax.vecmath.Vector3d d = new javax.vecmath.Vector3d();
 			float p = key.getPosition();
 			float pn = nextKey.getPosition();
 			float pp = prevKey.getPosition();
-			if (prevKey.interpolation == MotionKey.Interpolation.DISCRETE)
-				d = 0;
-			else if (prevKey.interpolation == MotionKey.Interpolation.LINEAR)
-				d = (f - fp) / (key.getPosition() - prevKey.getPosition());
-			else if (key.interpolation == MotionKey.Interpolation.DISCRETE)
-				d = 0;
-			else if (key.interpolation == MotionKey.Interpolation.LINEAR)
-				d = (fn - f) / (pn - p);
-			else
-				d = (fn - fp) / (pn - pp);
-			
-			/* apply overshoot limitation */
-			if (tangentMode == TangentMode.OVERSHOOT) {
-				if (d > 0) {
-					if (d * (pn - p) / 3 > (fn - f))
-						d = (fn - f) / (pn - p) * 3;
-					if (d * (p - pp) / 3 > (f - fp))
-						d = (f - fp) / (p - pp) * 3;
-				} else if (d < 0) {
-					if (d * (pn - p) / 3 < (fn - f))
-						d = (fn - f) / (pn - p) * 3;
-					if (d * (p - pp) / 3 < (f - fp))
-						d = (f - fp) / (p - pp) * 3;
-				}
+			if (prevKey.interpolation == MotionKey.Interpolation.DISCRETE) {
+				d.set(0, 0, 0);
+			} else if (prevKey.interpolation == MotionKey.Interpolation.LINEAR) {
+				d.sub(p3, p3p);
+				d.scale(1.0 / (p - pp));
+			} else if (key.interpolation == MotionKey.Interpolation.DISCRETE) {
+				d.set(0, 0, 0);
+			} else if (key.interpolation == MotionKey.Interpolation.LINEAR) {
+				d.sub(p3n, p3);
+				d.scale(1.0 / (pn - p));
+			} else {
+				d.sub(p3n, p3p);
+				d.scale(1.0 / pn - pp);
 			}
-			key.setDfIn(d);
-			key.setDfOut(d);
+			key.setDpIn(d);
+			key.setDpOut(d);
 			return;
 		}
 		
 		public javax.vecmath.Point3d getPoint3dAt(float position) {
+			
+			/* if outside of range, return value of first or last key, respectively */
 			if (position <= getStart()) return ((MotionKey.Point3d) list.get(0)).getPoint3d();
 			if (position >= getEnd()) return ((MotionKey.Point3d) list.get(list.size() - 1)).getPoint3d();
-			java.lang.Object[] key = getInterpolationKeysFor(position);
-			MotionKey.Point3d key0 = (MotionKey.Point3d) key[0];
-			MotionKey.Point3d key1 = (MotionKey.Point3d) key[1];
-			MotionKey.Point3d key2 = (MotionKey.Point3d) key[2];
-			MotionKey.Point3d key3 = (MotionKey.Point3d) key[3];
-			float l = key2.getPosition() - key1.getPosition();
-			float t = (position - key1.getPosition()) / l;
-			javax.vecmath.Point3d p0 = key1.getPoint3d();
-			javax.vecmath.Point3d p1 = key2.getPoint3d();
 			
-			switch (key1.getInterpolation()) {
+			/* binary search for keys */
+			int index = getIndexAt(position);
+			MotionKey.Point3d k0 = (MotionKey.Point3d) list.get(index - 1);	// the key before position
+			MotionKey.Point3d k1 = (MotionKey.Point3d) list.get(index);		// the key after position
+			
+			/* compute some values needed for interpolation */
+			float l = k1.getPosition() - k0.getPosition();	// the distance (in frames) between the two keys
+			float t = (position - k0.getPosition()) / l;	// relative position: 0 = at k0, 1 = at k1, 0..1 inbetween
+			javax.vecmath.Point3d p0 = k0.getPoint3d();		// value at k0
+			javax.vecmath.Point3d p1 = k1.getPoint3d();		// value at k1
+			
+			/* switch by interpolation method */
+			javax.vecmath.Point3d p;
+			switch (k0.getInterpolation()) {
 			case DISCRETE:
-				return new javax.vecmath.Point3d(p0);
+				return p0;									// return k0's value
 			case LINEAR:
-				javax.vecmath.Point3d p = new javax.vecmath.Point3d();
-				p.interpolate(p0, p1, t);
+				p = new javax.vecmath.Point3d(p0);
+				p.interpolate(p1, (double) t);				// return linear interpolation
 				return p;
 			case CUBIC:
-				javax.vecmath.Vector3d m0 = new javax.vecmath.Vector3d();
-				if (key0 != null && !key0.getPoint3d().equals(key1.getPoint3d()) && !key1.getPoint3d().equals(key2.getPoint3d())) {
-					m0.sub(p1, key0.getPoint3d());
-					m0.scale(l / (key2.getPosition() - key0.getPosition()));
-				}
-				javax.vecmath.Vector3d m1 = new javax.vecmath.Vector3d();
-				if (key3 != null && !key3.getPoint3d().equals(key2.getPoint3d()) && !key2.getPoint3d().equals(key1.getPoint3d())) {
-					m1.sub(key3.getPoint3d(), p0);
-					m1.scale(l / (key3.getPosition() - key1.getPosition()));
-				}
-				//System.out.println(key0.getPoint3d());
-				//System.out.println(key1.getPoint3d());
-				//System.out.println(key2.getPoint3d());
-				//System.out.println(key3.getPoint3d());
-				//System.out.println(key0.getPoint3d().equals(key1.getPoint3d()));
-				//System.out.println(key0.getPoint3d().equals(key1.getPoint3d()));
-				//System.out.println(m0);
-				//System.out.println(m1);
-				//System.out.println();
-				return new javax.vecmath.Point3d(
-					cubicInterpolate(p0.x, m0.x, p1.x, m1.x, t),
-					cubicInterpolate(p0.y, m0.y, p1.y, m1.y, t),
-					cubicInterpolate(p0.z, m0.z, p1.z, m1.z, t)
+				javax.vecmath.Point3d m0 = k0.getDpOut(); // get derivative at k0
+				javax.vecmath.Point3d m1 = k1.getDpIn();  // get derivative at k1
+				p = new javax.vecmath.Point3d(
+						cubicInterpolate(p0.x, m0.x * l, p1.x, m1.x * l, t),
+						cubicInterpolate(p0.x, m0.x * l, p1.x, m1.x * l, t),
+						cubicInterpolate(p0.x, m0.x * l, p1.x, m1.x * l, t)
 				);
+				return p;	// return cubic interpolation
 			}
 			throw new IllegalStateException();
 		}
@@ -604,42 +579,88 @@ public abstract class MotionCurve {
 		
 		private Color3f() { }
 		
+		@Override
+		void computeDerivatives(MotionKey k) {
+			MotionKey.Color3f key = (MotionKey.Color3f) k;
+			
+			/* if tangent mode is manual, do nothing and return */
+			if (key.getTangentMode() == MotionKey.TangentMode.MANUAL)
+				return;
+			
+			int keyIndex = key.getIndex();
+			
+			/* for the first and last key, return 0 tangent */
+			if ((keyIndex == 0) || (keyIndex == list.size() - 1)) {
+				key.setDcIn(0, 0, 0);
+				key.setDcOut(0, 0, 0);
+				return;
+			}
+			
+			MotionKey.Color3f prevKey = (MotionKey.Color3f) list.get(keyIndex - 1);
+			MotionKey.Color3f nextKey = (MotionKey.Color3f) list.get(keyIndex + 1);
+			javax.vecmath.Color3f c3p = prevKey.getColor3f();
+			javax.vecmath.Color3f c3 = key.getColor3f();
+			javax.vecmath.Color3f c3n = nextKey.getColor3f();
+			
+			/* compute tangent */
+			javax.vecmath.Color3f d = new javax.vecmath.Color3f();
+			float p = key.getPosition();
+			float pn = nextKey.getPosition();
+			float pp = prevKey.getPosition();
+			if (prevKey.interpolation == MotionKey.Interpolation.DISCRETE) {
+				d.set(0, 0, 0);
+			} else if (prevKey.interpolation == MotionKey.Interpolation.LINEAR) {
+				d.sub(c3, c3p);
+				d.scale(1.0f / (p - pp));
+			} else if (key.interpolation == MotionKey.Interpolation.DISCRETE) {
+				d.set(0, 0, 0);
+			} else if (key.interpolation == MotionKey.Interpolation.LINEAR) {
+				d.sub(c3n, c3);
+				d.scale(1.0f / (pn - p));
+			} else {
+				d.sub(c3n, c3p);
+				d.scale(1.0f / pn - pp);
+			}
+			key.setDcIn(d);
+			key.setDcOut(d);
+			return;
+		}
+		
 		public javax.vecmath.Color3f getColor3fAt(float position) {
+			
+			/* if outside of range, return value of first or last key, respectively */
 			if (position <= getStart()) return ((MotionKey.Color3f) list.get(0)).getColor3f();
 			if (position >= getEnd()) return ((MotionKey.Color3f) list.get(list.size() - 1)).getColor3f();
-			java.lang.Object[] key = getInterpolationKeysFor(position);
-			MotionKey.Color3f key0 = (MotionKey.Color3f) key[0];
-			MotionKey.Color3f key1 = (MotionKey.Color3f) key[1];
-			MotionKey.Color3f key2 = (MotionKey.Color3f) key[2];
-			MotionKey.Color3f key3 = (MotionKey.Color3f) key[3];
-			float l = key2.getPosition() - key1.getPosition();
-			float t = (position - key1.getPosition()) / l;
-			javax.vecmath.Color3f p0 = key1.getColor3f();
-			javax.vecmath.Color3f p1 = key2.getColor3f();
 			
-			switch (key1.getInterpolation()) {
+			/* binary search for keys */
+			int index = getIndexAt(position);
+			MotionKey.Color3f k0 = (MotionKey.Color3f) list.get(index - 1);	// the key before position
+			MotionKey.Color3f k1 = (MotionKey.Color3f) list.get(index);		// the key after position
+			
+			/* compute some values needed for interpolation */
+			float l = k1.getPosition() - k0.getPosition();	// the distance (in frames) between the two keys
+			float t = (position - k0.getPosition()) / l;	// relative position: 0 = at k0, 1 = at k1, 0..1 inbetween
+			javax.vecmath.Color3f c0 = k0.getColor3f();		// value at k0
+			javax.vecmath.Color3f c1 = k1.getColor3f();		// value at k1
+			
+			/* switch by interpolation method */
+			javax.vecmath.Color3f c;
+			switch (k0.getInterpolation()) {
 			case DISCRETE:
-				return new javax.vecmath.Color3f(p0);
+				return c0;									// return k0's value
 			case LINEAR:
-				javax.vecmath.Color3f c = new javax.vecmath.Color3f();
-				c.interpolate(p0, p1, t);
+				c = new javax.vecmath.Color3f(c0);
+				c.interpolate(c1, t);				// return linear interpolation
 				return c;
 			case CUBIC:
-				javax.vecmath.Vector3f m0 = new javax.vecmath.Vector3f();
-				if (key0 != null) {
-					m0.sub(p1, key0.getColor3f());
-					m0.scale(l / (key2.getPosition() - key0.getPosition()));
-				}
-				javax.vecmath.Vector3f m1 = new javax.vecmath.Vector3f();
-				if (key3 != null) {
-					m1.sub(key3.getColor3f(), p0);
-					m1.scale(l / (key3.getPosition() - key1.getPosition()));
-				}
-				return new javax.vecmath.Color3f(
-					cubicInterpolate(p0.x, m0.x, p1.x, m1.x, t),
-					cubicInterpolate(p0.y, m0.y, p1.y, m1.y, t),
-					cubicInterpolate(p0.z, m0.z, p1.z, m1.z, t)
+				javax.vecmath.Color3f m0 = k0.getDcOut(); // get derivative at k0
+				javax.vecmath.Color3f m1 = k1.getDcIn();  // get derivative at k1
+				c = new javax.vecmath.Color3f(
+						cubicInterpolate(c0.x, m0.x * l, c1.x, m1.x * l, t),
+						cubicInterpolate(c0.x, m0.x * l, c1.x, m1.x * l, t),
+						cubicInterpolate(c0.x, m0.x * l, c1.x, m1.x * l, t)
 				);
+				return c;	// return cubic interpolation
 			}
 			throw new IllegalStateException();
 		}
@@ -661,10 +682,107 @@ public abstract class MotionCurve {
 	}
 	
 	public static class Quat4f extends MotionCurve {
+		private static javax.vecmath.Quat4f qa = new javax.vecmath.Quat4f();
+		private static javax.vecmath.Quat4f qb = new javax.vecmath.Quat4f();
+		private static javax.vecmath.Quat4f qc = new javax.vecmath.Quat4f();
+		private static javax.vecmath.Quat4f qd = new javax.vecmath.Quat4f();
+		private static javax.vecmath.Quat4f qe = new javax.vecmath.Quat4f();
 		
 		private Quat4f() { }
 		
+		@Override
+		void computeDerivatives(MotionKey k) {
+			MotionKey.Quat4f key = (MotionKey.Quat4f) k;
+			
+			/* if tangent mode is manual, do nothing and return */
+			if (key.getTangentMode() == MotionKey.TangentMode.MANUAL)
+				return;
+			
+			int keyIndex = key.getIndex();
+			
+			/* for the first and last key, return 0 tangent */
+			if ((keyIndex == 0) || (keyIndex == list.size() - 1)) {
+				key.setDqIn(key.getQuat4f());
+				key.setDqOut(key.getQuat4f());
+				return;
+			}
+			
+			MotionKey.Quat4f prevKey = (MotionKey.Quat4f) list.get(keyIndex - 1);
+			MotionKey.Quat4f nextKey = (MotionKey.Quat4f) list.get(keyIndex + 1);
+			javax.vecmath.Quat4f q4p = prevKey.getQuat4f();
+			javax.vecmath.Quat4f q4 = key.getQuat4f();
+			javax.vecmath.Quat4f q4n = nextKey.getQuat4f();
+			
+			/* invert quaternions if necessary to get shortest path */
+			shortenQuaternionPath(q4p, q4);
+			shortenQuaternionPath(q4, q4n);
+			
+			/* compute tangent */
+			javax.vecmath.Quat4f d = new javax.vecmath.Quat4f();
+			float p = key.getPosition();
+			float pn = nextKey.getPosition();
+			float pp = prevKey.getPosition();
+			if (prevKey.interpolation == MotionKey.Interpolation.DISCRETE) {
+				d.set(q4);
+			} else if (prevKey.interpolation == MotionKey.Interpolation.LINEAR) {
+				d.interpolate(q4p, q4, 1.0 / (p - pp));
+			} else if (key.interpolation == MotionKey.Interpolation.DISCRETE) {
+				d.set(q4);
+			} else if (key.interpolation == MotionKey.Interpolation.LINEAR) {
+				d.interpolate(q4, q4n, 1.0 / (pn - p));
+			} else {
+				qa.interpolate(q4p, q4, 2.0);
+				qb.interpolate(q4p, q4n, 2.0);
+				qc.interpolate(qa, qb, 0.5);
+				d.interpolate(q4, qc, (pn - p) / (pn - pp) / 3.0);
+			}
+			key.setDqIn(d);
+			key.setDqOut(d);
+			return;
+		}
+		
 		public javax.vecmath.Quat4f getQuat4fAt(float position) {
+			
+			/* if outside of range, return value of first or last key, respectively */
+			if (position <= getStart()) return ((MotionKey.Quat4f) list.get(0)).getQuat4f();
+			if (position >= getEnd()) return ((MotionKey.Quat4f) list.get(list.size() - 1)).getQuat4f();
+			
+			/* binary search for keys */
+			int index = getIndexAt(position);
+			MotionKey.Quat4f k0 = (MotionKey.Quat4f) list.get(index - 1);	// the key before position
+			MotionKey.Quat4f k1 = (MotionKey.Quat4f) list.get(index);		// the key after position
+			
+			/* compute some values needed for interpolation */
+			float l = k1.getPosition() - k0.getPosition();	// the distance (in frames) between the two keys
+			double t = (position - k0.getPosition()) / l;	// relative position: 0 = at k0, 1 = at k1, 0..1 inbetween
+			javax.vecmath.Quat4f q0 = k0.getQuat4f();		// value at k0
+			javax.vecmath.Quat4f q1 = k1.getQuat4f();		// value at k1
+			
+			/* switch by interpolation method */
+			javax.vecmath.Quat4f q;
+			switch (k0.getInterpolation()) {
+			case DISCRETE:
+				return q0;									// return k0's value
+			case LINEAR:
+				q = new javax.vecmath.Quat4f(q0);
+				q.interpolate(q1, t);				// return linear interpolation
+				return q;
+			case CUBIC:
+				javax.vecmath.Quat4f m0 = k0.getDqOut(); // get derivative at k0
+				javax.vecmath.Quat4f m1 = k1.getDqIn();  // get derivative at k1
+				q = new javax.vecmath.Quat4f();
+				qa.interpolate(q0, m0, t);
+				qb.interpolate(m0, m1, t);
+				qc.interpolate(m1, q1, t);
+				qd.interpolate(qa, qb, t);
+				qe.interpolate(qb, qc, t);
+				q.interpolate(qd, qe, t);
+				return q;	// return cubic interpolation
+			}
+			throw new IllegalStateException();
+		}
+
+		public javax.vecmath.Quat4f getQuat4fAt_OLD(float position) {
 			if (position <= getStart()) return ((MotionKey.Quat4f) list.get(0)).getQuat4f();
 			if (position >= getEnd()) return ((MotionKey.Quat4f) list.get(list.size() - 1)).getQuat4f();
 			java.lang.Object[] key = getInterpolationKeysFor(position);
@@ -766,6 +884,11 @@ public abstract class MotionCurve {
 		
 		private Object() { }
 
+		@Override
+		void computeDerivatives(MotionKey k) {
+			;	// do nothing
+		}
+		
 		public java.lang.Object getObjectAt(float position) {
 			if (position <= getStart()) return ((MotionKey.Object) list.get(0)).getObject();
 			if (position >= getEnd()) return ((MotionKey.Object) list.get(list.size() - 1)).getObject();
