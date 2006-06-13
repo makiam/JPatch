@@ -51,7 +51,7 @@ public class TimelineEditor extends JScrollPane {
 	private int mouseX, mouseY;
 	private boolean bMove;
 	private String strText = "";
-	private Header header = new Header2(this);
+	private Header header = new Header(this);
 	private AnimObject animObject;
 	
 	private boolean collapseBoneTracks = true;
@@ -204,9 +204,9 @@ public class TimelineEditor extends JScrollPane {
 					listTracks.add(new AvarTrack(this, (MotionCurve.Float) curve));
 				else if (curve instanceof MotionCurve.Color3f)
 					listTracks.add(new ColorTrack(this, (MotionCurve.Color3f) curve));
-				else if (curve instanceof MotionCurve.Point3d) {
-					lestTracks.add(new AvarTrack(this, new MotionCurve.Float()));
-				} else
+//				else if (curve instanceof MotionCurve.Point3d) {
+//					listTracks.add(new AvarTrack(this, new MotionCurve.Float()));
+				else
 					listTracks.add(new Track(this, curve));
 			}
 			if (animObject instanceof AnimModel) {

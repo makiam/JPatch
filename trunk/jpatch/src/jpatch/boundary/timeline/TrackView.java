@@ -144,7 +144,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 	
 	
 	public void paintComponent(Graphics g) {
-		paintCombinedTrack(g);
+		paintMultiTrack(g);
 	}
 	
 	private void paintCombinedTrack(Graphics g) {

@@ -225,17 +225,24 @@ public abstract class MotionKey {
 			return dpIn;
 		}
 		
-		public void setDpIn(javax.vecmath.Point3d dpIn) {
-			this.dpIn.set(dpIn);
+		public void setDpIn(javax.vecmath.Tuple3d t) {
+			this.dpIn.set(t);
+		}
+		
+		public void setDpIn(double x, double y, double z) {
+			this.dpIn.set(x, y, z);
 		}
 		
 		public javax.vecmath.Point3d getDpOut() {
 			return dpOut;
 		}
 		
-		public void setDpOut(javax.vecmath.Point3d dpOut) {
-			this.dpOut.set(dpOut);
-				
+		public void setDpOut(javax.vecmath.Tuple3d t) {
+			this.dpOut.set(t);
+		}
+		
+		public void setDpOut(double x, double y, double z) {
+			this.dpOut.set(x, y, z);
 		}
 		
 		@Override
@@ -297,8 +304,8 @@ public abstract class MotionKey {
 	
 	public static class Color3f extends MotionKey {
 		private javax.vecmath.Color3f c;
-		private javax.vecmath.Color3f dcIn;
-		private javax.vecmath.Color3f dcOut;
+		private javax.vecmath.Color3f dcIn = new javax.vecmath.Color3f();
+		private javax.vecmath.Color3f dcOut = new javax.vecmath.Color3f();
 		
 		public Color3f(float position, javax.vecmath.Color3f c) {
 			super(position);
@@ -325,12 +332,20 @@ public abstract class MotionKey {
 			this.dcIn.set(dcIn);
 		}
 		
+		public void setDcIn(float r, float g, float b) {
+			this.dcIn.set(r, g, b);
+		}
+		
 		public javax.vecmath.Color3f getDcOut() {
 			return dcOut;
 		}
 		
 		public void setDcOut(javax.vecmath.Color3f dcOut) {
 			this.dcOut.set(dcOut);
+		}
+		
+		public void setDcOut(float r, float g, float b) {
+			this.dcOut.set(r, g, b);
 		}
 		
 		@Override
@@ -367,8 +382,8 @@ public abstract class MotionKey {
 	
 	public static class Quat4f extends MotionKey {
 		private javax.vecmath.Quat4f q;
-		private javax.vecmath.Quat4f dqIn;
-		private javax.vecmath.Quat4f dqOut;
+		private javax.vecmath.Quat4f dqIn = new javax.vecmath.Quat4f();
+		private javax.vecmath.Quat4f dqOut = new javax.vecmath.Quat4f();
 		
 		public Quat4f(float position, javax.vecmath.Quat4f q) {
 			super(position);
@@ -391,6 +406,10 @@ public abstract class MotionKey {
 			return dqIn;
 		}
 		
+		public void setDqIn(float x, float y, float z, float w) {
+			this.dqIn.set(x, y, z, w);
+		}
+		
 		public void setDqIn(javax.vecmath.Quat4f dqIn) {
 			this.dqIn.set(dqIn);
 		}
@@ -399,9 +418,12 @@ public abstract class MotionKey {
 			return dqOut;
 		}
 		
+		public void setDqOut(float x, float y, float z, float w) {
+			this.dqOut.set(x, y, z, w);
+		}
+		
 		public void setDqOut(javax.vecmath.Quat4f dqOut) {
-			this.dqOut.set(dqOut);
-				
+			this.dqOut.set(dqOut);		
 		}
 		
 		@Override
