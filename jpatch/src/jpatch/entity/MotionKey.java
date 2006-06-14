@@ -1,11 +1,9 @@
 package jpatch.entity;
 
-import java.io.OutputStream;
 import java.io.PrintStream;
 
-import javax.vecmath.Point3d;
-
 public abstract class MotionKey {
+	public static enum Axis { X, Y, Z, W };
 	public static enum Interpolation { DISCRETE, LINEAR, CUBIC };
 	public static enum TangentMode { AUTO, OVERSHOOT, MANUAL };
 	
@@ -84,6 +82,11 @@ public abstract class MotionKey {
 			motionCurve.computeDerivatives(motionCurve.getKey(index + 1));
 	}
 	
+	@Override
+	public String toString() {
+		return getClass().getName() + " position=" + position;
+	}
+	
 	public abstract MotionKey copy();
 	
 	public abstract void xml(PrintStream out);
@@ -151,7 +154,7 @@ public abstract class MotionKey {
 		}
 		
 		@Override
-		public MotionKey.Float copy() {
+		public MotionKey copy() {
 			MotionKey.Float copy = new MotionKey.Float(position, f);
 			copy.interpolation = interpolation;
 			copy.tangentMode = tangentMode;
@@ -160,46 +163,121 @@ public abstract class MotionKey {
 			copy.dfOut = dfOut;
 			return copy;
 		}
+		
+		@Override
+		public String toString() {
+			return super.toString() + " (" + f + ")";
+		}
 	}
 	
-	public static class Point3dProxy extends Float {
-		public static enum Type { X_AXIS, Y_AXIS, Z_AXIS };
+	public static class Proxy extends Float {
+		private ProxyAccessible key;
+		private Axis axis;
 		
-		private MotionKey.Point3d key;
-		private Type type;
+		public Proxy(Axis axis) {
+			this.axis = axis;
+		}
 		
-		public Point3dProxy(MotionKey.Point3d key, Type type) {
+		public void setKey(ProxyAccessible key) {
 			this.key = key;
-			this.type = type;
+		}
+		
+		public Axis getAxis() {
+			return axis;
 		}
 		
 		@Override
 		public float getFloat() {
-			switch (type) {
-			case X_AXIS:
-				return (float) key.getPoint3d().x;
-			case Y_AXIS:
-				return (float) key.getPoint3d().y;
-			case Z_AXIS:
-				return (float) key.getPoint3d().z;
-			}
-			throw new IllegalStateException();
+			return key.proxyGet(axis);
+		}
+		
+		@Override
+		public float getDfIn() {
+			return key.proxyGetDin(axis);
+		}
+		
+		@Override
+		public float getDfOut() {
+			return key.proxyGetDout(axis);
 		}
 		
 		@Override
 		public void setFloat(float f) {
-			switch (type) {
-			case X_AXIS:
-				key.getPoint3d().x = f;
-			case Y_AXIS:
-				key.getPoint3d().y = f;
-			case Z_AXIS:
-				key.getPoint3d().z = f;
-			}
+			key.proxySet(axis, f);
+		}
+		
+		@Override
+		public void setDfIn(float f) {
+			key.proxySetDin(axis, f);
+		}
+		
+		@Override
+		public void setDfOut(float f) {
+			key.proxySetDout(axis, f);
+		}
+		
+		@Override
+		public int getIndex() {
+			return key.getIndex();
+		}
+		
+		@Override
+		public float getPosition() {
+			return key.getPosition();
+		}
+		
+		@Override
+		public void setPosition(float position) {
+			key.setPosition(position);
+		}
+		
+		@Override
+		public Interpolation getInterpolation() {
+			return key.getInterpolation();
+		}
+
+		@Override
+		public void setInterpolation(Interpolation interpolation) {
+			key.setInterpolation(interpolation);
+		}
+
+		@Override
+		public boolean isSmooth() {
+			return key.isSmooth();
+		}
+
+		@Override
+		public void setSmooth(boolean smooth) {
+			key.setSmooth(smooth);
+		}
+
+		@Override
+		public TangentMode getTangentMode() {
+			return key.getTangentMode();
+		}
+
+		@Override
+		public void setTangentMode(TangentMode tangentMode) {
+			key.setTangentMode(tangentMode);
+		}
+		
+		@Override
+		public void computeDerivatives() {
+			key.computeDerivatives();
+		}
+		
+		@Override
+		public MotionKey copy() {
+			return key.copy();
+		}
+		
+		@Override
+		public String toString() {
+			return super.toString() + " (" + getFloat() + ")";
 		}
 	}
 	
-	public static class Point3d extends MotionKey {
+	public static class Point3d extends MotionKey implements ProxyAccessible {
 		private javax.vecmath.Point3d p;
 		private javax.vecmath.Point3d dpIn = new javax.vecmath.Point3d();
 		private javax.vecmath.Point3d dpOut = new javax.vecmath.Point3d();
@@ -215,10 +293,12 @@ public abstract class MotionKey {
 		
 		public void setPoint3d(javax.vecmath.Point3d p) {
 			this.p.set(p);
+			computeDerivatives();
 		}
 		
 		public void setPoint3d(float x, float y, float z) {
 			this.p.set(x, y, z);
+			computeDerivatives();
 		}
 		
 		public javax.vecmath.Point3d getDpIn() {
@@ -243,6 +323,73 @@ public abstract class MotionKey {
 		
 		public void setDpOut(double x, double y, double z) {
 			this.dpOut.set(x, y, z);
+		}
+		
+		/*
+		 * ProxyAccessible implementation
+		 */
+		public float proxyGet(Axis axis) {
+			return proxyGet(axis, p);
+		}
+		
+		public float proxyGetDin(Axis axis) {
+			return proxyGet(axis, dpIn);
+		}
+		
+		public float proxyGetDout(Axis axis) {
+			return proxyGet(axis, dpOut);
+		}
+		
+		public void proxySet(Axis axis, float value) {
+			proxySet(axis, value, p);
+		}
+		
+		public void proxySetDin(Axis axis, float value) {
+			proxySet(axis, value, dpIn);
+		}
+		
+		public void proxySetDout(Axis axis, float value) {
+			proxySet(axis, value, dpOut);
+		}
+		/*
+		 * End of ProxyAccessible implementation
+		 */
+		
+		/**
+		 * A Helper method for ProxyAccessible.
+		 * @return The selected axis of the passed javax.vecmath.Point3d object.
+		 */
+		private float proxyGet(Axis axis, javax.vecmath.Point3d point) {
+			switch(axis) {
+			case X:
+				return (float) point.x;
+			case Y:
+				return (float) point.y;
+			case Z:
+				return (float) point.z;
+			}
+			throw new IllegalArgumentException("axis=" + axis);
+		}
+		
+		/**
+		 * A Helper method for ProxyAccessible.
+		 * It sets the selected axis of the passed javax.vecmath.Point3d object to the passed float value.
+		 */
+		private void proxySet(Axis axis, float value, javax.vecmath.Point3d point) {
+			switch(axis) {
+			case X:
+				point.x = value;
+				break;
+			case Y:
+				point.y = value;
+				break;
+			case Z:
+				point.z = value;
+				break;
+			default:
+				throw new IllegalArgumentException("axis=" + axis);
+			}
+			computeDerivatives();
 		}
 		
 		@Override
@@ -275,6 +422,11 @@ public abstract class MotionKey {
 			copy.dpOut = dpOut;
 			return copy;
 		}
+		
+		@Override
+		public String toString() {
+			return super.toString() + " " + p;
+		}
 	}
 	
 	//public static class Rotation3f extends MotionKey2 {
@@ -302,7 +454,7 @@ public abstract class MotionKey {
 	//	}
 	//}
 	
-	public static class Color3f extends MotionKey {
+	public static class Color3f extends MotionKey implements ProxyAccessible {
 		private javax.vecmath.Color3f c;
 		private javax.vecmath.Color3f dcIn = new javax.vecmath.Color3f();
 		private javax.vecmath.Color3f dcOut = new javax.vecmath.Color3f();
@@ -348,6 +500,73 @@ public abstract class MotionKey {
 			this.dcOut.set(r, g, b);
 		}
 		
+		/*
+		 * ProxyAccessible implementation
+		 */
+		public float proxyGet(Axis axis) {
+			return proxyGet(axis, c);
+		}
+		
+		public float proxyGetDin(Axis axis) {
+			return proxyGet(axis, dcIn) - proxyGet(axis, c);
+		}
+		
+		public float proxyGetDout(Axis axis) {
+			return proxyGet(axis, dcOut);
+		}
+		
+		public void proxySet(Axis axis, float value) {
+			proxySet(axis, value, c);
+		}
+		
+		public void proxySetDin(Axis axis, float value) {
+			proxySet(axis, proxyGet(axis, c) - value, dcIn);
+		}
+		
+		public void proxySetDout(Axis axis, float value) {
+			proxySet(axis, proxyGet(axis, c) + value, dcOut);
+		}
+		/*
+		 * End of ProxyAccessible implementation
+		 */
+		
+		/**
+		 * A Helper method for ProxyAccessible.
+		 * @return The selected axis of the passed javax.vecmath.Color3f object.
+		 */
+		private float proxyGet(Axis axis, javax.vecmath.Color3f color) {
+			switch(axis) {
+			case X:
+				return (float) color.x;
+			case Y:
+				return (float) color.y;
+			case Z:
+				return (float) color.z;
+			}
+			throw new IllegalArgumentException("axis=" + axis);
+		}
+		
+		/**
+		 * A Helper method for ProxyAccessible.
+		 * It sets the selected axis of the passed javax.vecmath.Color3f object to the passed float value.
+		 */
+		private void proxySet(Axis axis, float value, javax.vecmath.Color3f color) {
+			switch(axis) {
+			case X:
+				color.x = value;
+				break;
+			case Y:
+				color.y = value;
+				break;
+			case Z:
+				color.z = value;
+				break;
+			default:
+				throw new IllegalArgumentException("axis=" + axis);
+			}
+			computeDerivatives();
+		}
+		
 		@Override
 		public void xml(PrintStream out) {
 			out.append("<key frame=\"").append(java.lang.Float.toString(position)).append("\"");
@@ -378,9 +597,14 @@ public abstract class MotionKey {
 			copy.dcOut = dcOut;
 			return copy;
 		}
+		
+		@Override
+		public String toString() {
+			return super.toString() + " " + c;
+		}
 	}
 	
-	public static class Quat4f extends MotionKey {
+	public static class Quat4f extends MotionKey implements ProxyAccessible {
 		private javax.vecmath.Quat4f q;
 		private javax.vecmath.Quat4f dqIn = new javax.vecmath.Quat4f();
 		private javax.vecmath.Quat4f dqOut = new javax.vecmath.Quat4f();
@@ -426,6 +650,78 @@ public abstract class MotionKey {
 			this.dqOut.set(dqOut);		
 		}
 		
+		/*
+		 * ProxyAccessible implementation
+		 */
+		public float proxyGet(Axis axis) {
+			return proxyGet(axis, q);
+		}
+		
+		public float proxyGetDin(Axis axis) {
+			return proxyGet(axis, dqIn);
+		}
+		
+		public float proxyGetDout(Axis axis) {
+			return proxyGet(axis, dqOut);
+		}
+		
+		public void proxySet(Axis axis, float value) {
+			proxySet(axis, value, q);
+		}
+		
+		public void proxySetDin(Axis axis, float value) {
+			proxySet(axis, value, dqIn);
+		}
+		
+		public void proxySetDout(Axis axis, float value) {
+			proxySet(axis, value, dqOut);
+		}
+		/*
+		 * End of ProxyAccessible implementation
+		 */
+		
+		/**
+		 * A Helper method for ProxyAccessible.
+		 * @return The selected axis of the passed javax.vecmath.Quat4f object.
+		 */
+		private float proxyGet(Axis axis, javax.vecmath.Quat4f quat) {
+			switch(axis) {
+			case X:
+				return (float) quat.x;
+			case Y:
+				return (float) quat.y;
+			case Z:
+				return (float) quat.z;
+			case W:
+				return (float) quat.w;
+			}
+			throw new IllegalArgumentException("axis=" + axis);
+		}
+		
+		/**
+		 * A Helper method for ProxyAccessible.
+		 * It sets the selected axis of the passed javax.vecmath.Quat4f object to the passed float value.
+		 */
+		private void proxySet(Axis axis, float value, javax.vecmath.Quat4f quat) {
+			switch(axis) {
+			case X:
+				quat.x = value;
+				break;
+			case Y:
+				quat.y = value;
+				break;
+			case Z:
+				quat.z = value;
+				break;
+			case W:
+				quat.w = value;
+				break;
+			default:
+				throw new IllegalArgumentException("axis=" + axis);
+			}
+			computeDerivatives();
+		}
+		
 		@Override
 		public void xml(PrintStream out) {
 			out.append("<key frame=\"").append(java.lang.Float.toString(position)).append("\"");
@@ -455,6 +751,11 @@ public abstract class MotionKey {
 			copy.dqIn = dqIn;
 			copy.dqOut = dqOut;
 			return copy;
+		}
+		
+		@Override
+		public String toString() {
+			return super.toString() + " " + q;
 		}
 	}
 	
@@ -500,6 +801,32 @@ public abstract class MotionKey {
 		public MotionKey.Object copy() {
 			return new MotionKey.Object(position, o);
 		}
+		
+		@Override
+		public String toString() {
+			return super.toString() + " (" + o + ")";
+		}
+	}
+	
+	public static interface ProxyAccessible {
+		float proxyGet(Axis axis);
+		float proxyGetDin(Axis axis);
+		float proxyGetDout(Axis axis);
+		void proxySet(Axis axis, float value);
+		void proxySetDin(Axis axis, float value);
+		void proxySetDout(Axis axis, float value);
+		
+		int getIndex();
+		float getPosition();
+		void setPosition(float position);
+		Interpolation getInterpolation();
+		void setInterpolation(Interpolation interpolation);
+		boolean isSmooth();
+		void setSmooth(boolean smooth);
+		TangentMode getTangentMode();
+		void setTangentMode(TangentMode tangentMode);
+		void computeDerivatives();
+		MotionKey copy();
 	}
 	
 	private static String toXml(String prefix, javax.vecmath.Point3d p) {

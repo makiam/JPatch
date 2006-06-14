@@ -128,8 +128,7 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		Animation anim = MainFrame.getInstance().getAnimation();
 		int x = (int) (timelineEditor.getFrameWidth() * (anim.getEnd() - anim.getStart()));
 		int y = timelineEditor.getTracksHeight() + 7;
-		
-		y = (int) timelineEditor.getViewport().getViewRect().getHeight();
+//		y = (int) timelineEditor.getViewport().getViewRect().getHeight();
 		dim.setSize(x, y);
 		return dim;
 	}
@@ -1442,6 +1441,18 @@ class TrackView extends JComponent implements Scrollable, MouseListener, MouseMo
 		
 		mi.setEnabled(timelineEditor.getAnimObject() instanceof AnimModel);
 		popup.add(new JSeparator());
+		popup.add(mi);
+		
+		popup.add(new JSeparator());
+		mi = new JMenuItem("dump track curves");
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				for (MotionCurve mc : track.getMotionCurves()) {
+					System.out.println("=== " + mc.getName() + " ===");
+					mc.dump();
+				}
+			}
+		});
 		popup.add(mi);
 		
 		popup.show((Component) e.getSource(), e.getX(), e.getY());
