@@ -395,7 +395,9 @@ public abstract class MotionCurve {
 			
 			/* apply overshoot limitation */
 			if (key.getTangentMode() == TangentMode.OVERSHOOT) {
-				if (d > 0) {
+				if (( f < fp && f < fn) || (f > fp && f > fn)) {
+					d = 0;
+				} else if (d > 0) {
 					if (d * (pn - p) / 3 > (fn - f))
 						d = (fn - f) / (pn - p) * 3;
 					if (d * (p - pp) / 3 > (f - fp))
@@ -475,18 +477,19 @@ public abstract class MotionCurve {
 	
 	public static class Proxy extends MotionCurve.Float {
 		private MotionCurve motionCurve;
-		private MotionKey.Proxy proxyKey;
+//		private MotionKey.Proxy proxyKey;
+		private MotionKey.Axis axis;
 		
 		public Proxy(MotionCurve motionCurve, MotionKey.Axis axis) {
 			this.motionCurve = motionCurve;
-			this.proxyKey = new MotionKey.Proxy(axis);
-			proxyKey.setMotionCurve(this);
+			this.axis = axis;
+//			proxyKey.setMotionCurve(this);
 		}
 		
 		public float getFloatAt(float position) {
 			if (motionCurve instanceof MotionCurve.Color3f) {
 				javax.vecmath.Color3f color = ((MotionCurve.Color3f) motionCurve).getColor3fAt(position);
-				switch (proxyKey.getAxis()) {
+				switch (axis) {
 				case X:
 					return color.x;
 				case Y:
@@ -496,7 +499,7 @@ public abstract class MotionCurve {
 				}
 			} else if (motionCurve instanceof MotionCurve.Point3d) {
 				javax.vecmath.Point3d point = ((MotionCurve.Point3d) motionCurve).getPoint3dAt(position);
-				switch (proxyKey.getAxis()) {
+				switch (axis) {
 				case X:
 					return (float) point.x;
 				case Y:
@@ -506,7 +509,7 @@ public abstract class MotionCurve {
 				}
 			} else if (motionCurve instanceof MotionCurve.Quat4f) {
 				javax.vecmath.Quat4f quat = ((MotionCurve.Quat4f) motionCurve).getQuat4fAt(position);
-				switch (proxyKey.getAxis()) {
+				switch (axis) {
 				case X:
 					return quat.x;
 				case Y:
@@ -525,9 +528,10 @@ public abstract class MotionCurve {
 			if (mk == null) {
 				mk = motionCurve.insertKeyAt(position);
 			}
-			proxyKey.setKey((MotionKey.ProxyAccessible) mk);
-			proxyKey.setFloat(f);
-			return proxyKey;
+			MotionKey.Proxy key = new MotionKey.Proxy(this, axis);
+			key.setKey((MotionKey.ProxyAccessible) mk);
+			key.setFloat(f);
+			return key;
 		}
 		
 		public float getMin() {
@@ -540,7 +544,7 @@ public abstract class MotionCurve {
 		
 		@Override
 		public String getName() {
-			return motionCurve.getName() + " " + proxyKey.getAxis();
+			return motionCurve.getName() + " " + axis;
 		}
 		
 		@Override
@@ -575,8 +579,9 @@ public abstract class MotionCurve {
 		
 		@Override
 		public MotionKey getKey(int number) {
-			proxyKey.setKey((MotionKey.ProxyAccessible) motionCurve.getKey(number));
-			return proxyKey;
+			MotionKey.Proxy key = new MotionKey.Proxy(this, axis);
+			key.setKey((MotionKey.ProxyAccessible) motionCurve.getKey(number));
+			return key;
 		}
 		
 		@Override
@@ -599,6 +604,7 @@ public abstract class MotionCurve {
 			MotionKey.ProxyAccessible key = (MotionKey.ProxyAccessible) motionCurve.getKeyAt(position);
 			if (key == null)
 				return null;
+			MotionKey.Proxy proxyKey = new MotionKey.Proxy(this, axis);
 			proxyKey.setKey(key);
 			return proxyKey;
 		}
@@ -656,6 +662,11 @@ public abstract class MotionCurve {
 			javax.vecmath.Point3d p3 = key.getPoint3d();
 			javax.vecmath.Point3d p3n = nextKey.getPoint3d();
 			
+			System.out.println("Compute derivatives:");
+			System.out.println("prev = " + p3p);
+			System.out.println("this = " + p3);
+			System.out.println("next = " + p3n);
+			
 			/* compute tangent */
 			javax.vecmath.Vector3d d = new javax.vecmath.Vector3d();
 			float p = key.getPosition();
@@ -673,8 +684,11 @@ public abstract class MotionCurve {
 				d.scale(1.0 / (pn - p));
 			} else {
 				d.sub(p3n, p3p);
-				d.scale(1.0 / pn - pp);
+				d.scale(1.0 / (pn - pp));
 			}
+			
+			System.out.println("deriv = " + d);
+			
 			key.setDpIn(d);
 			key.setDpOut(d);
 			return;
@@ -779,7 +793,7 @@ public abstract class MotionCurve {
 				d.scale(1.0f / (pn - p));
 			} else {
 				d.sub(c3n, c3p);
-				d.scale(1.0f / pn - pp);
+				d.scale(1.0f / (pn - pp));
 			}
 			key.setDcIn(d);
 			key.setDcOut(d);
