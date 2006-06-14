@@ -166,7 +166,7 @@ public abstract class MotionKey {
 		
 		@Override
 		public String toString() {
-			return super.toString() + " (" + f + ")";
+			return super.toString() + " (" + f + ")" + " (" + dfIn + ")" + " (" + dfOut + ")";
 		}
 	}
 	
@@ -174,8 +174,9 @@ public abstract class MotionKey {
 		private ProxyAccessible key;
 		private Axis axis;
 		
-		public Proxy(Axis axis) {
+		public Proxy(MotionCurve motionCurve, Axis axis) {
 			this.axis = axis;
+			this.motionCurve = motionCurve;
 		}
 		
 		public void setKey(ProxyAccessible key) {
@@ -273,7 +274,7 @@ public abstract class MotionKey {
 		
 		@Override
 		public String toString() {
-			return super.toString() + " (" + getFloat() + ")";
+			return super.toString() + " (" + getFloat() + ")" + " (" + getDfIn() + ")" + " (" + getDfOut() + ")";
 		}
 	}
 	
@@ -425,7 +426,7 @@ public abstract class MotionKey {
 		
 		@Override
 		public String toString() {
-			return super.toString() + " " + p;
+			return super.toString() + " " + p + " " + dpIn + " " + dpOut;
 		}
 	}
 	
@@ -508,7 +509,7 @@ public abstract class MotionKey {
 		}
 		
 		public float proxyGetDin(Axis axis) {
-			return proxyGet(axis, dcIn) - proxyGet(axis, c);
+			return proxyGet(axis, dcIn);
 		}
 		
 		public float proxyGetDout(Axis axis) {
