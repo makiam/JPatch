@@ -204,9 +204,12 @@ public class TimelineEditor extends JScrollPane {
 					listTracks.add(new AvarTrack(this, (MotionCurve.Float) curve));
 				else if (curve instanceof MotionCurve.Color3f)
 					listTracks.add(new ColorTrack(this, (MotionCurve.Color3f) curve));
-//				else if (curve instanceof MotionCurve.Point3d) {
-//					listTracks.add(new AvarTrack(this, new MotionCurve.Float()));
-				else
+				else if (curve instanceof MotionCurve.Point3d) {
+					listTracks.add(new Track(this, curve));
+					listTracks.add(new AvarTrack(this, MotionCurve.createProxyCurve(curve, MotionKey.Axis.X)));
+					listTracks.add(new AvarTrack(this, MotionCurve.createProxyCurve(curve, MotionKey.Axis.Y)));
+					listTracks.add(new AvarTrack(this, MotionCurve.createProxyCurve(curve, MotionKey.Axis.Z)));
+				} else
 					listTracks.add(new Track(this, curve));
 			}
 			if (animObject instanceof AnimModel) {

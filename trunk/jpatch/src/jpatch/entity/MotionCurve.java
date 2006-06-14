@@ -134,6 +134,11 @@ public abstract class MotionCurve {
 		return mc;
 	}
 	
+	public static MotionCurve.Proxy createProxyCurve(MotionCurve motionCurve, MotionKey.Axis axis) {
+		MotionCurve.Proxy mc = new MotionCurve.Proxy(motionCurve, axis);
+		return mc;
+	}
+	
 	/**
 	 * Sets the name of this curve
 	 */
@@ -243,8 +248,6 @@ public abstract class MotionCurve {
 	abstract void computeDerivatives(MotionKey k);
 	
 	public void xml(PrintStream out, String prefix, String type) {
-//		StringBuffer indent = XMLutils.indent(tab);
-//		StringBuffer indent2 = XMLutils.indent(tab + 1);
 		out.append(prefix).append("<motioncurve " + type + ">\n");
 		for (MotionKey key : list) {
 			out.append(prefix).append("\t");
@@ -253,28 +256,33 @@ public abstract class MotionCurve {
 		out.append(prefix).append("</motioncurve>").append("\n");
 	}
 	
-	public MotionKey getPrevKey(float position) {
-		int index = binarySearch(position) - 1;
-		if (index >= 0) {
-			MotionKey key = (MotionKey) list.get(index);
-			if (key.getPosition() < position) return key;
-			else if (index == 0) return key;
-			else return (MotionKey) list.get(index - 1);
+	public void dump() {
+		for (MotionKey key : list) {
+			System.out.println("\t" + key);
 		}
-		return (MotionKey) list.get(0);
 	}
+//	public MotionKey getPrevKey(float position) {
+//		int index = binarySearch(position) - 1;
+//		if (index >= 0) {
+//			MotionKey key = (MotionKey) list.get(index);
+//			if (key.getPosition() < position) return key;
+//			else if (index == 0) return key;
+//			else return (MotionKey) list.get(index - 1);
+//		}
+//		return (MotionKey) list.get(0);
+//	}
 	
 
-	public MotionKey getNextKey(float position) {
-		int index = binarySearch(position) - 1;
-		if (index < list.size() && index >= 0) {
-			MotionKey key = (MotionKey) list.get(index);
-			if (key.getPosition() > position) return key;
-			else if (index == list.size() - 1) return key;
-			else return (MotionKey) list.get(index + 1);
-		}
-		return (MotionKey) list.get(list.size() - 1);
-	}
+//	public MotionKey getNextKey(float position) {
+//		int index = binarySearch(position) - 1;
+//		if (index < list.size() && index >= 0) {
+//			MotionKey key = (MotionKey) list.get(index);
+//			if (key.getPosition() > position) return key;
+//			else if (index == list.size() - 1) return key;
+//			else return (MotionKey) list.get(index + 1);
+//		}
+//		return (MotionKey) list.get(list.size() - 1);
+//	}
 	
 //	public InterpolationMethod getInterpolationMethod() {
 //		return interpolationMethod;
@@ -311,17 +319,17 @@ public abstract class MotionCurve {
 		return max;
 	}
 	
-	java.lang.Object[] getInterpolationKeysFor(float position) {
-		int index = binarySearch(position) - 1;
-		return new java.lang.Object[] {
-			(index > 0) ? list.get(index - 1) : null,
-			list.get(index),
-			list.get(index + 1),
-			(index < list.size() - 2) ? list.get(index + 2) : null
-		};
-	}
+//	java.lang.Object[] getInterpolationKeysFor(float position) {
+//		int index = binarySearch(position) - 1;
+//		return new java.lang.Object[] {
+//			(index > 0) ? list.get(index - 1) : null,
+//			list.get(index),
+//			list.get(index + 1),
+//			(index < list.size() - 2) ? list.get(index + 2) : null
+//		};
+//	}
 	
-	float cubicInterpolate(float p0, float m0, float p1, float m1, float t) {
+	static float cubicInterpolate(float p0, float m0, float p1, float m1, float t) {
 		float t2 = t * t;
 		float t3 = t * t2;
 		float H0 = 2 * t3 - 3 * t2 + 1;
@@ -331,7 +339,7 @@ public abstract class MotionCurve {
 		return H0 * p0 + H1 * m0 + H2 * p1 + H3 * m1;
 	}
 	
-	double cubicInterpolate(double p0, double m0, double p1, double m1, float t) {
+	static double cubicInterpolate(double p0, double m0, double p1, double m1, float t) {
 		float t2 = t * t;
 		float t3 = t * t2;
 		float H0 = 2 * t3 - 3 * t2 + 1;
@@ -465,8 +473,160 @@ public abstract class MotionCurve {
 		}
 	}
 	
-	public static class Point3dProxy extends MotionCurve.Float {
+	public static class Proxy extends MotionCurve.Float {
+		private MotionCurve motionCurve;
+		private MotionKey.Proxy proxyKey;
 		
+		public Proxy(MotionCurve motionCurve, MotionKey.Axis axis) {
+			this.motionCurve = motionCurve;
+			this.proxyKey = new MotionKey.Proxy(axis);
+			proxyKey.setMotionCurve(this);
+		}
+		
+		public float getFloatAt(float position) {
+			if (motionCurve instanceof MotionCurve.Color3f) {
+				javax.vecmath.Color3f color = ((MotionCurve.Color3f) motionCurve).getColor3fAt(position);
+				switch (proxyKey.getAxis()) {
+				case X:
+					return color.x;
+				case Y:
+					return color.y;
+				case Z:
+					return color.z;
+				}
+			} else if (motionCurve instanceof MotionCurve.Point3d) {
+				javax.vecmath.Point3d point = ((MotionCurve.Point3d) motionCurve).getPoint3dAt(position);
+				switch (proxyKey.getAxis()) {
+				case X:
+					return (float) point.x;
+				case Y:
+					return (float) point.y;
+				case Z:
+					return (float) point.z;
+				}
+			} else if (motionCurve instanceof MotionCurve.Quat4f) {
+				javax.vecmath.Quat4f quat = ((MotionCurve.Quat4f) motionCurve).getQuat4fAt(position);
+				switch (proxyKey.getAxis()) {
+				case X:
+					return quat.x;
+				case Y:
+					return quat.y;
+				case Z:
+					return quat.z;
+				case W:
+					return quat.w;
+				}
+			}
+			throw new IllegalStateException();
+		}
+		
+		public MotionKey.Float setFloatAt(float position, float f) {
+			MotionKey mk = motionCurve.getKeyAt(position);
+			if (mk == null) {
+				mk = motionCurve.insertKeyAt(position);
+			}
+			proxyKey.setKey((MotionKey.ProxyAccessible) mk);
+			proxyKey.setFloat(f);
+			return proxyKey;
+		}
+		
+		public float getMin() {
+			return -200;
+		}
+		
+		public float getMax() {
+			return 200;
+		}
+		
+		@Override
+		public String getName() {
+			return motionCurve.getName() + " " + proxyKey.getAxis();
+		}
+		
+		@Override
+		public void addKey(MotionKey key) {
+			motionCurve.addKey(key);
+		}
+		
+		@Override
+		public MotionKey insertKeyAt(float position) {
+			return motionCurve.insertKeyAt(position);
+		}
+		
+		@Override
+		public MotionKey removeKey(MotionKey key) {
+			return motionCurve.removeKey(key);
+		}
+		
+		@Override
+		public void forceRemoveKey(MotionKey key) {
+			motionCurve.forceRemoveKey(key);
+		}
+		
+		@Override
+		public void moveKey(MotionKey key, float position) {
+			motionCurve.moveKey(key, position);
+		}
+		
+		@Override
+		public int getKeyCount() {
+			return motionCurve.getKeyCount();
+		}
+		
+		@Override
+		public MotionKey getKey(int number) {
+			proxyKey.setKey((MotionKey.ProxyAccessible) motionCurve.getKey(number));
+			return proxyKey;
+		}
+		
+		@Override
+		public float getStart() {
+			return motionCurve.getStart();
+		}
+		
+		@Override
+		public float getEnd() {
+			return motionCurve.getEnd();
+		}
+		
+		@Override
+		public boolean hasKeyAt(float position) {
+			return motionCurve.hasKeyAt(position);
+		}
+		
+		@Override
+		public MotionKey getKeyAt(float position) {
+			MotionKey.ProxyAccessible key = (MotionKey.ProxyAccessible) motionCurve.getKeyAt(position);
+			if (key == null)
+				return null;
+			proxyKey.setKey(key);
+			return proxyKey;
+		}
+		
+		@Override
+		void computeDerivatives(MotionKey k) {
+			motionCurve.computeDerivatives(k);
+		}
+		
+		@Override
+		public void xml(PrintStream out, String prefix, String type) {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void clear() {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public int getIndexAt(float position) {
+			return motionCurve.binarySearch(position);
+		}
+		
+		@Override
+		int binarySearch(float position) {
+			throw new UnsupportedOperationException();
+		}
 	}
 	
 	public static class Point3d extends MotionCurve {
@@ -551,8 +711,8 @@ public abstract class MotionCurve {
 				javax.vecmath.Point3d m1 = k1.getDpIn();  // get derivative at k1
 				p = new javax.vecmath.Point3d(
 						cubicInterpolate(p0.x, m0.x * l, p1.x, m1.x * l, t),
-						cubicInterpolate(p0.x, m0.x * l, p1.x, m1.x * l, t),
-						cubicInterpolate(p0.x, m0.x * l, p1.x, m1.x * l, t)
+						cubicInterpolate(p0.y, m0.y * l, p1.y, m1.y * l, t),
+						cubicInterpolate(p0.z, m0.z * l, p1.z, m1.z * l, t)
 				);
 				return p;	// return cubic interpolation
 			}
@@ -657,8 +817,8 @@ public abstract class MotionCurve {
 				javax.vecmath.Color3f m1 = k1.getDcIn();  // get derivative at k1
 				c = new javax.vecmath.Color3f(
 						cubicInterpolate(c0.x, m0.x * l, c1.x, m1.x * l, t),
-						cubicInterpolate(c0.x, m0.x * l, c1.x, m1.x * l, t),
-						cubicInterpolate(c0.x, m0.x * l, c1.x, m1.x * l, t)
+						cubicInterpolate(c0.y, m0.y * l, c1.y, m1.y * l, t),
+						cubicInterpolate(c0.z, m0.z * l, c1.z, m1.z * l, t)
 				);
 				return c;	// return cubic interpolation
 			}
@@ -782,57 +942,57 @@ public abstract class MotionCurve {
 			throw new IllegalStateException();
 		}
 
-		public javax.vecmath.Quat4f getQuat4fAt_OLD(float position) {
-			if (position <= getStart()) return ((MotionKey.Quat4f) list.get(0)).getQuat4f();
-			if (position >= getEnd()) return ((MotionKey.Quat4f) list.get(list.size() - 1)).getQuat4f();
-			java.lang.Object[] key = getInterpolationKeysFor(position);
-			MotionKey.Quat4f key0 = (MotionKey.Quat4f) key[0];
-			MotionKey.Quat4f key1 = (MotionKey.Quat4f) key[1];
-			MotionKey.Quat4f key2 = (MotionKey.Quat4f) key[2];
-			MotionKey.Quat4f key3 = (MotionKey.Quat4f) key[3];
-			
-			/* invert quaternions if necessary to get shortest path */
-			if (key0 != null) shortenQuaternionPath(key0.getQuat4f(), key1.getQuat4f());
-			shortenQuaternionPath(key1.getQuat4f(), key2.getQuat4f());
-			if (key3 != null) shortenQuaternionPath(key2.getQuat4f(), key3.getQuat4f());
-			
-			float l = key2.getPosition() - key1.getPosition();
-			float t = (position - key1.getPosition()) / l;
-			
-			javax.vecmath.Quat4f qa, qb, qc, qd, qe, q0, q1, q2, q3, m1, m2;
-			
-			q1 = key1.getQuat4f();
-			q2 = key2.getQuat4f();
-			
-			switch (key1.getInterpolation()) {
-			case DISCRETE:
-				return new javax.vecmath.Quat4f(q1);
-			case LINEAR:
-				return slerp(q1, q2, t);
-			case CUBIC:
-				if (key0 != null) {
-					q0 = key0.getQuat4f();
-					qa = slerp(q0, q1, 2.0f);
-					qb = slerp(q0, q2, 2.0f);
-					qc = slerp(qa, qb, 0.5f);
-					m1 = slerp(q1, qc, 0.333f * l / (key2.getPosition() - key0.getPosition()));
-				} else m1 = new javax.vecmath.Quat4f(q1);
-				if (key3 != null) {
-					q3 = key3.getQuat4f();
-					qa = slerp(q3, q2, 2.0f);
-					qb = slerp(q3, q1, 2.0f);
-					qc = slerp(qb, qa, 0.5f);
-					m2 = slerp(q2, qc, 0.333f * l / (key3.getPosition() - key1.getPosition()));
-				} else m2 = new javax.vecmath.Quat4f(q2);
-				qa = slerp(q1, m1, t);
-				qb = slerp(m1, m2, t);
-				qc = slerp(m2, q2, t);
-				qd = slerp(qa, qb, t);
-				qe = slerp(qb, qc, t);
-				return slerp(qd, qe, t);
-			}
-			throw new IllegalStateException();
-		}
+//		public javax.vecmath.Quat4f getQuat4fAt_OLD(float position) {
+//			if (position <= getStart()) return ((MotionKey.Quat4f) list.get(0)).getQuat4f();
+//			if (position >= getEnd()) return ((MotionKey.Quat4f) list.get(list.size() - 1)).getQuat4f();
+//			java.lang.Object[] key = getInterpolationKeysFor(position);
+//			MotionKey.Quat4f key0 = (MotionKey.Quat4f) key[0];
+//			MotionKey.Quat4f key1 = (MotionKey.Quat4f) key[1];
+//			MotionKey.Quat4f key2 = (MotionKey.Quat4f) key[2];
+//			MotionKey.Quat4f key3 = (MotionKey.Quat4f) key[3];
+//			
+//			/* invert quaternions if necessary to get shortest path */
+//			if (key0 != null) shortenQuaternionPath(key0.getQuat4f(), key1.getQuat4f());
+//			shortenQuaternionPath(key1.getQuat4f(), key2.getQuat4f());
+//			if (key3 != null) shortenQuaternionPath(key2.getQuat4f(), key3.getQuat4f());
+//			
+//			float l = key2.getPosition() - key1.getPosition();
+//			float t = (position - key1.getPosition()) / l;
+//			
+//			javax.vecmath.Quat4f qa, qb, qc, qd, qe, q0, q1, q2, q3, m1, m2;
+//			
+//			q1 = key1.getQuat4f();
+//			q2 = key2.getQuat4f();
+//			
+//			switch (key1.getInterpolation()) {
+//			case DISCRETE:
+//				return new javax.vecmath.Quat4f(q1);
+//			case LINEAR:
+//				return slerp(q1, q2, t);
+//			case CUBIC:
+//				if (key0 != null) {
+//					q0 = key0.getQuat4f();
+//					qa = slerp(q0, q1, 2.0f);
+//					qb = slerp(q0, q2, 2.0f);
+//					qc = slerp(qa, qb, 0.5f);
+//					m1 = slerp(q1, qc, 0.333f * l / (key2.getPosition() - key0.getPosition()));
+//				} else m1 = new javax.vecmath.Quat4f(q1);
+//				if (key3 != null) {
+//					q3 = key3.getQuat4f();
+//					qa = slerp(q3, q2, 2.0f);
+//					qb = slerp(q3, q1, 2.0f);
+//					qc = slerp(qb, qa, 0.5f);
+//					m2 = slerp(q2, qc, 0.333f * l / (key3.getPosition() - key1.getPosition()));
+//				} else m2 = new javax.vecmath.Quat4f(q2);
+//				qa = slerp(q1, m1, t);
+//				qb = slerp(m1, m2, t);
+//				qc = slerp(m2, q2, t);
+//				qd = slerp(qa, qb, t);
+//				qe = slerp(qb, qc, t);
+//				return slerp(qd, qe, t);
+//			}
+//			throw new IllegalStateException();
+//		}
 		
 		public MotionKey.Quat4f setQuat4fAt(float position, javax.vecmath.Quat4f q) {
 			MotionKey.Quat4f mk = (MotionKey.Quat4f) getKeyAt(position);
@@ -892,8 +1052,7 @@ public abstract class MotionCurve {
 		public java.lang.Object getObjectAt(float position) {
 			if (position <= getStart()) return ((MotionKey.Object) list.get(0)).getObject();
 			if (position >= getEnd()) return ((MotionKey.Object) list.get(list.size() - 1)).getObject();
-			java.lang.Object[] key = getInterpolationKeysFor(position);
-			return ((MotionKey.Object) key[1]).getObject();
+			return ((MotionKey.Object) getKeyAt(position)).getObject();
 		}
 		
 		public MotionKey.Object setObjectAt(float position, java.lang.Object o) {
