@@ -53,7 +53,7 @@ public class Camera extends AnimObject {
 	/* enable motionblur flag */
 	protected boolean bMotionBlur = false;
 	
-	//protected Rotation3f rotation = new Rotation3f();
+	//protected Rotation3d rotation = new Rotation3d();
 	
 	public Camera(String name) {
 		strName = name;
@@ -122,7 +122,7 @@ public class Camera extends AnimObject {
 	}
 	
 	
-	//public void setRotation(Rotation3f r) {
+	//public void setRotation(Rotation3d r) {
 	//	//rotation.set(
 	//	//	(r.x > 0) ? r.x % (2 * Math.PI) : 2 * Math.PI + (r.x % (2 * Math.PI)),
 	//	//	(r.y > 0) ? r.y % (2 * Math.PI) : 2 * Math.PI + (r.y % (2 * Math.PI)),
