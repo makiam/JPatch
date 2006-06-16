@@ -430,10 +430,10 @@ public abstract class MotionKey {
 		}
 	}
 	
-	//public static class Rotation3f extends MotionKey2 {
+	//public static class Rotation3d extends MotionKey2 {
 	//	private jpatch.auxilary.Rotation3f r;
 	//	
-	//	public Rotation3f(float position, jpatch.auxilary.Rotation3f r) {
+	//	public Rotation3d(float position, jpatch.auxilary.Rotation3f r) {
 	//		super(position);
 	//		this.r = new jpatch.auxilary.Rotation3f(r);
 	//	}
