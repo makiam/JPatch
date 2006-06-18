@@ -27,129 +27,97 @@ package jpatch.entity;
  */
 
 import java.util.*;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.tree.MutableTreeNode;
 import javax.vecmath.*;
 import jpatch.auxilary.*;
 
-public class TransformNode implements Animatable {
-	private final static String[] CHANNELS = new String[] {
-		"VISIBILITY",
-		"TRANSLATE_X",
-		"TRANSLATE_Y",
-		"TRANSLATE_Z",
-		"ROTATE_X",
-		"ROTATE_Y",
-		"ROTATE_Z",
-		"SCALE_X",
-		"SCALE_Y",
-		"SCALE_Z"
+public class TransformNode implements JPatchObject {
+	private Attribute<Boolean> visibility = new Attribute<Boolean>("Visibility", true);
+	private Attribute<Double> translationX = new Attribute<Double>("Position X", 0.0);
+	private Attribute<Double> translationY = new Attribute<Double>("Position Y", 0.0);
+	private Attribute<Double> translationZ = new Attribute<Double>("Position Z", 0.0);
+	private Attribute<Double> rotationX = new Attribute<Double>("Rotation X", 0.0);
+	private Attribute<Double> rotationY = new Attribute<Double>("Rotation Y", 0.0);
+	private Attribute<Double> rotationZ = new Attribute<Double>("Rotation Z", 0.0);
+	private Attribute<Double> scaleX = new Attribute<Double>("Scale X", 1.0);
+	private Attribute<Double> scaleY = new Attribute<Double>("Scale Y", 1.0);
+	private Attribute<Double> scaleZ = new Attribute<Double>("Scale Z", 1.0);
+	private Attribute<Double> pivotX = new Attribute<Double>("Pivot X", 0.0);
+	private Attribute<Double> pivotY = new Attribute<Double>("Pivot Y", 0.0);
+	private Attribute<Double> pivotZ = new Attribute<Double>("Pivot Z", 0.0);
+	private Attribute[] attributes = new Attribute[] {
+			pivotX,
+			pivotY,
+			pivotZ
 	};
-	private MotionCurveNew[] motionCurves = new MotionCurveNew[CHANNELS.length];
+	private Attribute[] channels = new Attribute[] {
+			visibility,
+			translationX,
+			translationY,
+			translationZ,
+			rotationX,
+			rotationY,
+			rotationZ,
+			scaleX,
+			scaleY,
+			scaleZ
+	};
+	private TransformNodeTreeNode treeNode = new TransformNodeTreeNode(this);
+	private JPatchObject object;
 	private TransformNode parent;
-	private List<TransformNode> children = new ArrayList<TransformNode>();
+	private List<TransformNode> children = new ArrayList<TransformNode>(1);
 	private Matrix4d matrix = new Matrix4d();
 	private Matrix3d rotationMatrix = new Matrix3d();
 	private Matrix3d scaleMatrix = new Matrix3d();
-	private boolean visible;
 	private Vector3d translation = new Vector3d();
 	private Rotation3d rotation = new Rotation3d();
 	private Scale3d scale = new Scale3d();
+	private Point3d pivot = new Point3d();
 	private String name;
 	
-	public TransformNode() {
+	public TransformNode(JPatchObject object) {
+		this.object = object;
 		matrix.setIdentity();
+		addAttributeChangeListeners();
 	}
 	
 	public String getId() {
 		return name;
 	}
 	
-	public String[] getChannels() {
-		return CHANNELS;
-	}
-	
-	public double getChannel(int n) {
-		switch (n) {
-		case 0:
-			return visible ? 1 : 0;
-		case 1:
-			return translation.x;
-		case 2:
-			return translation.y;
-		case 3:
-			return translation.z;
-		case 4:
-			return rotation.x;
-		case 5:
-			return rotation.y;
-		case 6:
-			return rotation.z;
-		case 7:
-			return scale.x;
-		case 8:
-			return scale.y;
-		case 9:
-			return scale.z;
-		}
-		throw new ArrayIndexOutOfBoundsException(n);
-	}
-	
-	public void setChannel(int n, double value) {
-		switch (n) {
-		case 0:
-			visible = value > 0.5;
-		case 1:
-			translation.x = value;
-			break;
-		case 2:
-			translation.y = value;
-			break;
-		case 3:
-			translation.z = value;
-			break;
-		case 4:
-			rotation.x = value;
-			break;
-		case 5:
-			rotation.y = value;
-			break;
-		case 6:
-			rotation.z = value;
-			break;
-		case 7:
-			scale.x = value;
-			break;
-		case 8:
-			scale.y = value;
-			break;
-		case 9:
-			scale.z = value;
-			break;
-		}
-	}
-	
-	public void setMotionCurveForChannel(int channelNumber, MotionCurveNew motionCurve) {
-		motionCurves[channelNumber] = motionCurve;
-	}
-	
-	public MotionCurveNew getMotionCurveForChannel(int channelNumber) {
-		return motionCurves[channelNumber];
-	}
-	
-	public void update(double position) {
-		for (int i = 0; i < CHANNELS.length; i++)
-			setChannel(i, motionCurves[i].getValueAt(position));
-	}
-	
-	public int getChannelNumberByName(String name) {
-		for (int i = 0; i < CHANNELS.length; i++) {
-			if (name.equals(CHANNELS[i]))
-				return i;
-		}
-		return -1;
+	public boolean isVisible() {
+		return visibility.getValue();
 	}
 	
 	public Matrix4d getMatrix() {
 		return matrix;
+	}
+	
+	public List<TransformNode> getChildren() {
+		return children;
+	}
+	
+	public JPatchObject getObject() {
+		return object;
+	}
+	
+	public void setObject(JPatchObject object) {
+		this.object = object;
+	}
+	
+	public void setParent(TransformNode parent) {
+		this.parent = parent;
+	}
+	
+	public TransformNode getParent() {
+		return parent;
+	}
+	
+	public TransformNodeTreeNode getTreeNode() {
+		return treeNode;
 	}
 	
 	public void computeBranch() {
@@ -166,5 +134,68 @@ public class TransformNode implements Animatable {
 		matrix.setTranslation(translation);
 		if (parent != null)
 			matrix.mul(parent.getMatrix());
+	}
+	
+	private void addAttributeChangeListeners() {
+		translationX.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				translation.x = translationX.getValue();
+			}
+		});
+		translationY.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				translation.y = translationY.getValue();
+			}
+		});
+		translationZ.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				translation.z = translationZ.getValue();
+			}
+		});
+		rotationX.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				rotation.x = rotationX.getValue();
+			}
+		});
+		rotationY.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				rotation.y = rotationY.getValue();
+			}
+		});
+		rotationZ.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				rotation.z = rotationZ.getValue();
+			}
+		});
+		scaleX.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				scale.x = scaleX.getValue();
+			}
+		});
+		scaleY.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				scale.y = scaleY.getValue();
+			}
+		});
+		scaleZ.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				scale.z = scaleZ.getValue();
+			}
+		});
+		pivotX.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				pivot.x = pivotX.getValue();
+			}
+		});
+		pivotY.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				pivot.y = pivotY.getValue();
+			}
+		});
+		pivotZ.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				pivot.z = pivotZ.getValue();
+			}
+		});
 	}
 }
