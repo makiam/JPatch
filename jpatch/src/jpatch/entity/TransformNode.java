@@ -28,47 +28,32 @@ package jpatch.entity;
 
 import java.util.*;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.tree.MutableTreeNode;
+import javax.swing.event.*;
 import javax.vecmath.*;
 import jpatch.auxilary.*;
 
 public class TransformNode implements JPatchObject {
-	private Attribute<Boolean> visibility = new Attribute<Boolean>("Visibility", true);
-	private Attribute<Double> translationX = new Attribute<Double>("Position X", 0.0);
-	private Attribute<Double> translationY = new Attribute<Double>("Position Y", 0.0);
-	private Attribute<Double> translationZ = new Attribute<Double>("Position Z", 0.0);
-	private Attribute<Double> rotationX = new Attribute<Double>("Rotation X", 0.0);
-	private Attribute<Double> rotationY = new Attribute<Double>("Rotation Y", 0.0);
-	private Attribute<Double> rotationZ = new Attribute<Double>("Rotation Z", 0.0);
-	private Attribute<Double> scaleX = new Attribute<Double>("Scale X", 1.0);
-	private Attribute<Double> scaleY = new Attribute<Double>("Scale Y", 1.0);
-	private Attribute<Double> scaleZ = new Attribute<Double>("Scale Z", 1.0);
-	private Attribute<Double> pivotX = new Attribute<Double>("Pivot X", 0.0);
-	private Attribute<Double> pivotY = new Attribute<Double>("Pivot Y", 0.0);
-	private Attribute<Double> pivotZ = new Attribute<Double>("Pivot Z", 0.0);
 	private Attribute[] attributes = new Attribute[] {
-			pivotX,
-			pivotY,
-			pivotZ
+			new Attribute<String>("Name", ""),
+			new Attribute<Boolean>("Visibility", true),
+			new Attribute<Double>("Translation X", 0.0),
+			new Attribute<Double>("Translation Y", 0.0),
+			new Attribute<Double>("Translation Z", 0.0),
+			new Attribute<Double>("Rotation X", 0.0),
+			new Attribute<Double>("Rotation Y", 0.0),
+			new Attribute<Double>("Rotation Z", 0.0),
+			new Attribute<Double>("Scale X", 0.0),
+			new Attribute<Double>("Scale Y", 0.0),
+			new Attribute<Double>("Scale Z", 0.0),
+			new Attribute<Double>("Pivot X", 0.0),
+			new Attribute<Double>("Pivot Y", 0.0),
+			new Attribute<Double>("Pivot Z", 0.0),
 	};
-	private Attribute[] channels = new Attribute[] {
-			visibility,
-			translationX,
-			translationY,
-			translationZ,
-			rotationX,
-			rotationY,
-			rotationZ,
-			scaleX,
-			scaleY,
-			scaleZ
-	};
-	private TransformNodeTreeNode treeNode = new TransformNodeTreeNode(this);
-	private JPatchObject object;
 	private TransformNode parent;
-	private List<TransformNode> children = new ArrayList<TransformNode>(1);
+	private List<AnimObject> animObjects = new ArrayList<AnimObject>(1);
+	private List<AnimObject> unmodifiableAnimObjects = Collections.unmodifiableList(animObjects);
+	private List<TransformNode> childTransformNodes = new ArrayList<TransformNode>(1);
+	private List<TransformNode> unmodifiableChildTransformNodes = Collections.unmodifiableList(childTransformNodes);
 	private Matrix4d matrix = new Matrix4d();
 	private Matrix3d rotationMatrix = new Matrix3d();
 	private Matrix3d scaleMatrix = new Matrix3d();
@@ -76,36 +61,34 @@ public class TransformNode implements JPatchObject {
 	private Rotation3d rotation = new Rotation3d();
 	private Scale3d scale = new Scale3d();
 	private Point3d pivot = new Point3d();
-	private String name;
 	
-	public TransformNode(JPatchObject object) {
-		this.object = object;
+	public TransformNode() {
 		matrix.setIdentity();
 		addAttributeChangeListeners();
 	}
 	
-	public String getId() {
-		return name;
+	@SuppressWarnings("unchecked")
+	public Attribute getAttribute(String name) {
+		for (Attribute attribute : attributes)
+			if (name.equals(attribute.getName()))
+				return attribute;
+		return null;
 	}
 	
-	public boolean isVisible() {
-		return visibility.getValue();
+	public Attribute[] getAttributes() {
+		return attributes;
 	}
 	
 	public Matrix4d getMatrix() {
 		return matrix;
 	}
 	
-	public List<TransformNode> getChildren() {
-		return children;
+	public List<TransformNode> getChildTransformNodes() {
+		return unmodifiableChildTransformNodes;
 	}
 	
-	public JPatchObject getObject() {
-		return object;
-	}
-	
-	public void setObject(JPatchObject object) {
-		this.object = object;
+	public List<AnimObject> getAnimObjects() {
+		return unmodifiableAnimObjects;
 	}
 	
 	public void setParent(TransformNode parent) {
@@ -116,13 +99,9 @@ public class TransformNode implements JPatchObject {
 		return parent;
 	}
 	
-	public TransformNodeTreeNode getTreeNode() {
-		return treeNode;
-	}
-	
 	public void computeBranch() {
 		computeMatrix();
-		for (TransformNode child : children)
+		for (TransformNode child : childTransformNodes)
 			child.computeBranch();
 	}
 	
@@ -136,7 +115,20 @@ public class TransformNode implements JPatchObject {
 			matrix.mul(parent.getMatrix());
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void addAttributeChangeListeners() {
+		final Attribute<Double> translationX = (Attribute<Double>) getAttribute("Translation X");
+		final Attribute<Double> translationY = (Attribute<Double>) getAttribute("Translation Y");
+		final Attribute<Double> translationZ = (Attribute<Double>) getAttribute("Translation Z");
+		final Attribute<Double> rotationX = (Attribute<Double>) getAttribute("Rotation X");
+		final Attribute<Double> rotationY = (Attribute<Double>) getAttribute("Rotation X");
+		final Attribute<Double> rotationZ = (Attribute<Double>) getAttribute("Rotation X");
+		final Attribute<Double> scaleX = (Attribute<Double>) getAttribute("Scale X");
+		final Attribute<Double> scaleY = (Attribute<Double>) getAttribute("Scale X");
+		final Attribute<Double> scaleZ = (Attribute<Double>) getAttribute("Scale X");
+		final Attribute<Double> pivotX = (Attribute<Double>) getAttribute("Pivot X");
+		final Attribute<Double> pivotY = (Attribute<Double>) getAttribute("Pivot X");
+		final Attribute<Double> pivotZ = (Attribute<Double>) getAttribute("Pivot X");
 		translationX.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				translation.x = translationX.getValue();
