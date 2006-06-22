@@ -15,11 +15,11 @@ public class AttributeUiHelper {
 	private static final DecimalFormat FLOAT_FORMAT = new DecimalFormat("0.000");
 	private static final int COLUMNS = 8;
 	
-	static JLabel getLabelFor(Attribute attribute) {
+	static JLabel getLabelFor(AttributeOld attribute) {
 		return new JLabel(attribute.getName());
 	}
 	
-	public static JSlider getSliderFor(final Attribute attribute) {
+	public static JSlider getSliderFor(final AttributeOld attribute) {
 		final JSlider slider;
 		switch(attribute.getType()) {
 		case BYTE:		// fallthrough intended
@@ -85,7 +85,7 @@ public class AttributeUiHelper {
 		
 		return slider;
 	}
-	public static JTextField getTextFieldFor(final Attribute attribute) {
+	public static JTextField getTextFieldFor(final AttributeOld attribute) {
 		final JTextField textField;
 		
 		switch(attribute.getType()) {
@@ -156,7 +156,7 @@ public class AttributeUiHelper {
 		return textField;
 	}
 	
-	private static void setSliderValue(JSlider slider, Attribute attribute) {
+	private static void setSliderValue(JSlider slider, AttributeOld attribute) {
 		switch (attribute.getType()) {
 		case BYTE:		// fallthrough intended
 		case SHORT:		// fallthrough intended
@@ -177,7 +177,7 @@ public class AttributeUiHelper {
 		}
 	}
 	
-	private static void setTextFieldValue(JTextField textField, Attribute attribute) {
+	private static void setTextFieldValue(JTextField textField, AttributeOld attribute) {
 		switch (attribute.getType()) {
 		case BYTE:		// fallthrough intended
 		case SHORT:		// fallthrough intended
@@ -194,7 +194,7 @@ public class AttributeUiHelper {
 		}
 	}
 	
-	private static boolean verifyTextField(JTextField textField, Attribute attribute) {
+	private static boolean verifyTextField(JTextField textField, AttributeOld attribute) {
 		Object min = attribute.getMinimum();
 		Object max = attribute.getMaximum();
 		try {

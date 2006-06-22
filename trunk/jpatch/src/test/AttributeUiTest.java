@@ -20,7 +20,7 @@ public class AttributeUiTest {
 		final JFrame frame = new JFrame(getClass().getCanonicalName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		final Attribute<Double> attribute = new Attribute<Double>("test", 0.0, -1.0, 1.0);
+		final AttributeOld<Double> attribute = new AttributeOld<Double>("test", 0.0, -1.0, 1.0);
 		final JPanel panel = new JPanel();
 		final JTextField tf = AttributeUiHelper.getTextFieldFor(attribute);
 		panel.add(tf);
