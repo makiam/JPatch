@@ -16,7 +16,7 @@ public class JPatchTreeNode extends DefaultMutableTreeNode implements ChangeList
 	
 	private JPatchTreeModel treeModel;
 	
-	private Attribute<String> name;
+	private AttributeOld<String> name;
 	
 	public JPatchTreeNode() { }
 	

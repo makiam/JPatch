@@ -1,6 +1,6 @@
 package jpatch.entity;
 
 public interface JPatchObject {
-	Attribute getAttribute(String name);
-	Attribute[] getAttributes();
+	AttributeOld getAttribute(String name);
+	AttributeOld[] getAttributes();
 }

@@ -2,7 +2,7 @@ package jpatch.entity;
 
 import javax.swing.event.*;
 
-public class Attribute<T> {
+public class AttributeOld<T> {
 	public static enum Type { BYTE, SHORT, INTEGER, LONG, FLOAT, DOUBLE, BOOLEAN, ENUM, OBJECT };
 	private final String name;
 	private final ChangeEvent changeEvent = new ChangeEvent(this);
@@ -13,17 +13,17 @@ public class Attribute<T> {
 	private ChangeListener[] changeListeners = new ChangeListener[0];
 	private MotionCurveNew motionCurve;
 	
-	public Attribute(String name) {
+	public AttributeOld(String name) {
 		this.name = name;
 	}
 	
-	public Attribute(String name, T value) {
+	public AttributeOld(String name, T value) {
 		this(name);
 		this.value = value;
 		this.oldValue = value;
 	}
 	
-	public Attribute(String name, T value, T minimum, T maximum) {
+	public AttributeOld(String name, T value, T minimum, T maximum) {
 		this(name, value);
 		this.minimum = minimum;
 		this.maximum = maximum;

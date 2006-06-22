@@ -28,11 +28,11 @@ import jpatch.entity.MotionKey.TangentMode;
 
 public class MotionCurveNew {
 	private List<MotionKeyNew> list = new ArrayList<MotionKeyNew>();
-	private Attribute target;
+	private AttributeOld target;
 	private int channel;
 	private MotionKeyNew searchKey = new MotionKeyNew();
 	
-	public MotionCurveNew(Attribute target, int channel) {
+	public MotionCurveNew(AttributeOld target, int channel) {
 		this.target = target;
 		this.channel = channel;
 		searchKey.setMotionCurve(this);
