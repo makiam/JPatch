@@ -12,29 +12,22 @@ import jpatch.entity.*;
 
 public class AttributeUiHelper {
 	private static final DecimalFormat INT_FORMAT = new DecimalFormat("0");
-	private static final DecimalFormat FLOAT_FORMAT = new DecimalFormat("0.000");
+	private static final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("0.000");
 	private static final int COLUMNS = 8;
 	
-	static JLabel getLabelFor(AttributeOld attribute) {
+	static JLabel getLabelFor(Attribute attribute) {
 		return new JLabel(attribute.getName());
 	}
 	
-	public static JSlider getSliderFor(final AttributeOld attribute) {
+	public static JSlider getSliderFor(final Attribute attribute) {
 		final JSlider slider;
-		switch(attribute.getType()) {
-		case BYTE:		// fallthrough intended
-		case SHORT:		// fallthrough intended
-		case INTEGER:	// fallthrough intended
-		case LONG:
-			slider = new JSlider((Integer) attribute.getMinimum(), (Integer) attribute.getMaximum());
+		if (attribute instanceof Attribute.BoundedInteger) {
+			slider = new JSlider(((Attribute.BoundedInteger) attribute).getMin(), ((Attribute.BoundedInteger) attribute).getMax());
 			slider.setMinorTickSpacing(1);
 			slider.setSnapToTicks(true);
-			break;
-		case FLOAT:		// fallthrough intended
-		case DOUBLE:
+		} else if (attribute instanceof Attribute.BoundedDouble) {
 			slider = new JSlider(0, 100000);
-			break;
-		default:
+		} else {
 			throw new IllegalStateException();
 		}
 		
@@ -42,31 +35,24 @@ public class AttributeUiHelper {
 		
 		slider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				switch(attribute.getType()) {
-				case BYTE:		// fallthrough intended
-				case SHORT:		// fallthrough intended
-				case INTEGER:	// fallthrough intended
-				case LONG:
-					attribute.setValue(slider.getValue());
-					break;
-				case FLOAT:		// fallthrough intended
-				case DOUBLE:
-					double min = (Double) attribute.getMinimum(); 
-					double max = (Double) attribute.getMaximum();
-					double value = (Double) attribute.getValue();
-					attribute.setValue(min + slider.getValue() * (max - min) / (slider.getMaximum() - slider.getMinimum()));
-					break;
-				default:
+				if (attribute instanceof Attribute.BoundedInteger) {
+					((Attribute.BoundedInteger) attribute).set(slider.getValue());
+				} else if (attribute instanceof Attribute.BoundedDouble) {
+					Attribute.BoundedDouble bdAttr = ((Attribute.BoundedDouble) attribute);
+					double min = bdAttr.getMin().getValue();
+					double max = bdAttr.getMax().getValue();
+					bdAttr.set(min + slider.getValue() * (max - min) / (slider.getMaximum() - slider.getMinimum()));
+				} else {
 					throw new IllegalStateException();
 				}
-				if (!slider.getModel().getValueIsAdjusting())
-					attribute.commitModification();
+//				if (!slider.getModel().getValueIsAdjusting())
+//					attribute.commitModification();
 			}
 		});
 		
 		/* create a ChangeListener to update the slider if the attribute changes */
-		final ChangeListener changeListener = new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
+		final AttributeListener attributeListener = new AttributeListener() {
+			public void attributeChanged(Attribute a) {
 				setSliderValue(slider, attribute);
 			}
 		};
@@ -75,40 +61,45 @@ public class AttributeUiHelper {
 		slider.addHierarchyListener(new HierarchyListener() {
 			public void hierarchyChanged(HierarchyEvent e) {
 				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-					if (slider.isShowing())
-						attribute.addChangeListener(changeListener);
-					else
-						attribute.removeChangeListener(changeListener);
+					if (attribute instanceof Attribute.BoundedDouble) {
+						Attribute.BoundedDouble bdAttr = ((Attribute.BoundedDouble) attribute);
+						if (slider.isShowing()) {
+							bdAttr.addAttributeListener(attributeListener);
+							bdAttr.getMin().addAttributeListener(attributeListener);
+							bdAttr.getMax().addAttributeListener(attributeListener);
+						} else {
+							bdAttr.removeAttributeListener(attributeListener);
+							bdAttr.getMin().removeAttributeListener(attributeListener);
+							bdAttr.getMax().removeAttributeListener(attributeListener);
+						}
+					} else {
+						if (slider.isShowing())
+							attribute.addAttributeListener(attributeListener);
+						else
+							attribute.removeAttributeListener(attributeListener);
+					}
 				}
 			}
 		});
 		
 		return slider;
 	}
-	public static JTextField getTextFieldFor(final AttributeOld attribute) {
+	public static JTextField getTextFieldFor(final Attribute attribute) {
 		final JTextField textField;
 		
-		switch(attribute.getType()) {
-		case BYTE:		// fallthrough intended
-		case SHORT:		// fallthrough intended
-		case INTEGER:	// fallthrough intended
-		case LONG:
+		if (attribute instanceof Attribute.Integer) {
 			textField = new JTextField(COLUMNS);
-			textField.setText(INT_FORMAT.format(attribute.getValue()));
+			textField.setText(INT_FORMAT.format(((Attribute.Integer) attribute).get()));
 			textField.setHorizontalAlignment(SwingConstants.RIGHT);
-			break;
-		case FLOAT:		// fallthrough intended
-		case DOUBLE:
+		} else if (attribute instanceof Attribute.Double) {
 			textField = new JTextField(COLUMNS);
-			textField.setText(FLOAT_FORMAT.format(attribute.getValue()));
+			textField.setText(DOUBLE_FORMAT.format(((Attribute.Double) attribute).get()));
 			textField.setHorizontalAlignment(SwingConstants.RIGHT);
-			break;
-		case OBJECT:
+		} else if (attribute instanceof Attribute.String) {
 			textField = new JTextField(COLUMNS);
-			textField.setText(attribute.getValue().toString());
+			textField.setText(((Attribute.String) attribute).get());
 			textField.setEditable(false);
-			break;
-		default:
+		} else {
 			throw new IllegalStateException();
 		}
 		
@@ -120,7 +111,7 @@ public class AttributeUiHelper {
 					setTextFieldValue(textField, attribute);
 				}
 				textField.setBackground(Color.WHITE);
-				attribute.commitModification();
+//				attribute.commitModification();
 			}
 		});
 		
@@ -135,9 +126,9 @@ public class AttributeUiHelper {
 			}
 		});
 		
-		/* create a ChangeListener to update the textField if the attribute changes */
-		final ChangeListener changeListener = new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
+		/* create a AttributeListener to update the textField if the attribute changes */
+		final AttributeListener attributeListener = new AttributeListener() {
+			public void attributeChanged(Attribute a) {
 				setTextFieldValue(textField, attribute);
 			}
 		};
@@ -146,106 +137,66 @@ public class AttributeUiHelper {
 		textField.addHierarchyListener(new HierarchyListener() {
 			public void hierarchyChanged(HierarchyEvent e) {
 				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-					if (textField.isShowing())
-						attribute.addChangeListener(changeListener);
-					else
-						attribute.removeChangeListener(changeListener);
+					if (textField.isShowing()) {
+						attribute.addAttributeListener(attributeListener);
+					} else {
+						attribute.removeAttributeListener(attributeListener);
+					}
 				}
 			}
 		});
 		return textField;
 	}
 	
-	private static void setSliderValue(JSlider slider, AttributeOld attribute) {
-		switch (attribute.getType()) {
-		case BYTE:		// fallthrough intended
-		case SHORT:		// fallthrough intended
-		case INTEGER:	// fallthrough intended
-		case LONG:
-			slider.setValue((Integer) attribute.getValue());
-			break;
-		case FLOAT:		// fallthrough intended
-		case DOUBLE:
-			double min = (Double) attribute.getMinimum(); 
-			double max = (Double) attribute.getMaximum();
-			double value = (Double) attribute.getValue();
-			
+	private static void setSliderValue(JSlider slider, Attribute attribute) {
+		if (attribute instanceof Attribute.BoundedInteger) {
+			slider.setValue(((Attribute.Integer) attribute).get());
+		} else if (attribute instanceof Attribute.BoundedDouble) {
+			Attribute.BoundedDouble bdAttr = (Attribute.BoundedDouble) attribute;
+			double min = bdAttr.getMin().getValue();
+			double max = bdAttr.getMax().getValue();
+			double value = bdAttr.get();
 			slider.setValue((int) ((value - min) / (max - min) * (slider.getMaximum() - slider.getMinimum())));
-			break;
-		default:
+		} else {
 			throw new IllegalStateException();
 		}
 	}
 	
-	private static void setTextFieldValue(JTextField textField, AttributeOld attribute) {
-		switch (attribute.getType()) {
-		case BYTE:		// fallthrough intended
-		case SHORT:		// fallthrough intended
-		case INTEGER:	// fallthrough intended
-		case LONG:
-			textField.setText(INT_FORMAT.format(attribute.getValue()));
-			break;
-		case FLOAT:		// fallthrough intended
-		case DOUBLE:
-			textField.setText(FLOAT_FORMAT.format(attribute.getValue()));
-			break;
-		default:
-			textField.setText(attribute.getValue().toString());
+	private static void setTextFieldValue(JTextField textField, Attribute attribute) {
+		if (attribute instanceof Attribute.BoundedInteger) {
+			textField.setText(INT_FORMAT.format(((Attribute.Integer) attribute).get()));
+		} else if (attribute instanceof Attribute.BoundedDouble) {
+			textField.setText(INT_FORMAT.format(((Attribute.Double) attribute).get()));
+		} else if (attribute instanceof Attribute.String) {
+			textField.setText(((Attribute.String) attribute).get());
+		} else {
+			throw new IllegalArgumentException();
 		}
 	}
 	
-	private static boolean verifyTextField(JTextField textField, AttributeOld attribute) {
-		Object min = attribute.getMinimum();
-		Object max = attribute.getMaximum();
+	private static boolean verifyTextField(JTextField textField, Attribute attribute) {
 		try {
-			switch (attribute.getType()) {
-			case BYTE:
-				byte b = Byte.parseByte(textField.getText());
-				if (min != null && b < (Byte) min)
-					return false;
-				if (max != null && b > (Byte) max)
-					return false;
-				attribute.setValue(b);
-				return true;
-			case SHORT:
-				short s = Short.parseShort(textField.getText());
-				if (min != null && s < (Short) min)
-					return false;
-				if (max != null && s > (Short) max)
-					return false;
-				attribute.setValue(s);
-				return true;
-			case INTEGER:
+			if (attribute instanceof Attribute.Integer) {
 				int i = Integer.parseInt(textField.getText());
-				if (min != null && i < (Integer) min)
-					return false;
-				if (max != null && i > (Integer) max)
-					return false;
-				attribute.setValue(i);
+				if (attribute instanceof Attribute.BoundedInteger) {
+					if (i < ((Attribute.BoundedInteger) attribute).getMin())
+						return false;
+					if (i > ((Attribute.BoundedInteger) attribute).getMax())
+						return false;
+				}
+				((Attribute.Integer) attribute).set(i);
 				return true;
-			case LONG:
-				long l = Long.parseLong(textField.getText());
-				if (min != null && l < (Long) min)
-					return false;
-				if (max != null && l > (Long) max)
-					return false;
-				attribute.setValue(l);
-				return true;
-			case FLOAT:
-				float f = Float.parseFloat(textField.getText());
-				if (min != null && f < (Float) min)
-					return false;
-				if (max != null && f > (Float) max)
-					return false;
-				attribute.setValue(f);
-				return true;
-			case DOUBLE:
+			} else if (attribute instanceof Attribute.Double) {
 				double d = Double.parseDouble(textField.getText());
-				if (min != null && d < (Double) min)
-					return false;
-				if (max != null && d > (Double) max)
-					return false;
-				attribute.setValue(d);
+				if (attribute instanceof Attribute.BoundedDouble) {
+					Attribute.Limit min = ((Attribute.BoundedDouble) attribute).getMin();
+					Attribute.Limit max = ((Attribute.BoundedDouble) attribute).getMax();
+					if (min.isEnabled() && d < min.getValue())
+						return false;
+					if (max.isEnabled() && d > max.getValue())
+						return false;
+				}
+				((Attribute.Double) attribute).set(d);
 				return true;
 			}
 		} catch (NumberFormatException e) {
