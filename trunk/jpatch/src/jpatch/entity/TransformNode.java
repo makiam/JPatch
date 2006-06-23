@@ -33,22 +33,23 @@ import javax.vecmath.*;
 import jpatch.auxilary.*;
 
 public class TransformNode implements JPatchObject {
-	private AttributeOld[] attributes = new AttributeOld[] {
-			new AttributeOld<String>("Name", ""),
-			new AttributeOld<Boolean>("Visibility", true),
-			new AttributeOld<Double>("Translation X", 0.0),
-			new AttributeOld<Double>("Translation Y", 0.0),
-			new AttributeOld<Double>("Translation Z", 0.0),
-			new AttributeOld<Double>("Rotation X", 0.0),
-			new AttributeOld<Double>("Rotation Y", 0.0),
-			new AttributeOld<Double>("Rotation Z", 0.0),
-			new AttributeOld<Double>("Scale X", 0.0),
-			new AttributeOld<Double>("Scale Y", 0.0),
-			new AttributeOld<Double>("Scale Z", 0.0),
-			new AttributeOld<Double>("Pivot X", 0.0),
-			new AttributeOld<Double>("Pivot Y", 0.0),
-			new AttributeOld<Double>("Pivot Z", 0.0),
+	private Attribute[] attributes = new Attribute[] {
+			new Attribute.String("Name"),
+			new Attribute.KeyedBoolean("Visibility", true),
+			new Attribute.BoundedDouble("Translation X", 0.0),
+			new Attribute.BoundedDouble("Translation Y", 0.0),
+			new Attribute.BoundedDouble("Translation Z", 0.0),
+			new Attribute.BoundedDouble("Rotation X", 0.0),
+			new Attribute.BoundedDouble("Rotation Y", 0.0),
+			new Attribute.BoundedDouble("Rotation Z", 0.0),
+			new Attribute.BoundedDouble("Scale X", 0.0),
+			new Attribute.BoundedDouble("Scale Y", 0.0),
+			new Attribute.BoundedDouble("Scale Z", 0.0),
+			new Attribute.BoundedDouble("Pivot X", 0.0),
+			new Attribute.BoundedDouble("Pivot Y", 0.0),
+			new Attribute.BoundedDouble("Pivot Z", 0.0),
 	};
+	
 	private TransformNode parent;
 	private List<AnimObject> animObjects = new ArrayList<AnimObject>(1);
 	private List<AnimObject> unmodifiableAnimObjects = Collections.unmodifiableList(animObjects);
@@ -68,14 +69,14 @@ public class TransformNode implements JPatchObject {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public AttributeOld getAttribute(String name) {
-		for (AttributeOld attribute : attributes)
+	public Attribute getAttribute(String name) {
+		for (Attribute attribute : attributes)
 			if (name.equals(attribute.getName()))
 				return attribute;
 		return null;
 	}
 	
-	public AttributeOld[] getAttributes() {
+	public Attribute[] getAttributes() {
 		return attributes;
 	}
 	
@@ -117,76 +118,76 @@ public class TransformNode implements JPatchObject {
 	
 	@SuppressWarnings("unchecked")
 	private void addAttributeChangeListeners() {
-		final AttributeOld<Double> translationX = (AttributeOld<Double>) getAttribute("Translation X");
-		final AttributeOld<Double> translationY = (AttributeOld<Double>) getAttribute("Translation Y");
-		final AttributeOld<Double> translationZ = (AttributeOld<Double>) getAttribute("Translation Z");
-		final AttributeOld<Double> rotationX = (AttributeOld<Double>) getAttribute("Rotation X");
-		final AttributeOld<Double> rotationY = (AttributeOld<Double>) getAttribute("Rotation X");
-		final AttributeOld<Double> rotationZ = (AttributeOld<Double>) getAttribute("Rotation X");
-		final AttributeOld<Double> scaleX = (AttributeOld<Double>) getAttribute("Scale X");
-		final AttributeOld<Double> scaleY = (AttributeOld<Double>) getAttribute("Scale X");
-		final AttributeOld<Double> scaleZ = (AttributeOld<Double>) getAttribute("Scale X");
-		final AttributeOld<Double> pivotX = (AttributeOld<Double>) getAttribute("Pivot X");
-		final AttributeOld<Double> pivotY = (AttributeOld<Double>) getAttribute("Pivot X");
-		final AttributeOld<Double> pivotZ = (AttributeOld<Double>) getAttribute("Pivot X");
-		translationX.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				translation.x = translationX.getValue();
+		final Attribute.Double translationX = (Attribute.Double) getAttribute("Translation X");
+		final Attribute.Double translationY = (Attribute.Double) getAttribute("Translation Y");
+		final Attribute.Double translationZ = (Attribute.Double) getAttribute("Translation Z");
+		final Attribute.Double rotationX = (Attribute.Double) getAttribute("Rotation X");
+		final Attribute.Double rotationY = (Attribute.Double) getAttribute("Rotation X");
+		final Attribute.Double rotationZ = (Attribute.Double) getAttribute("Rotation X");
+		final Attribute.Double scaleX = (Attribute.Double) getAttribute("Scale X");
+		final Attribute.Double scaleY = (Attribute.Double) getAttribute("Scale X");
+		final Attribute.Double scaleZ = (Attribute.Double) getAttribute("Scale X");
+		final Attribute.Double pivotX = (Attribute.Double) getAttribute("Pivot X");
+		final Attribute.Double pivotY = (Attribute.Double) getAttribute("Pivot X");
+		final Attribute.Double pivotZ = (Attribute.Double) getAttribute("Pivot X");
+		translationX.addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				translation.x = translationX.get();
 			}
 		});
-		translationY.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				translation.y = translationY.getValue();
+		translationY.addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				translation.y = translationY.get();
 			}
 		});
-		translationZ.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				translation.z = translationZ.getValue();
+		translationZ.addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				translation.z = translationZ.get();
 			}
 		});
-		rotationX.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				rotation.x = rotationX.getValue();
+		rotationX.addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				rotation.x = rotationX.get();
 			}
 		});
-		rotationY.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				rotation.y = rotationY.getValue();
+		rotationY.addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				rotation.y = rotationY.get();
 			}
 		});
-		rotationZ.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				rotation.z = rotationZ.getValue();
+		rotationZ.addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				rotation.z = rotationZ.get();
 			}
 		});
-		scaleX.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				scale.x = scaleX.getValue();
+		scaleX.addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				scale.x = scaleX.get();
 			}
 		});
-		scaleY.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				scale.y = scaleY.getValue();
+		scaleY.addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				scale.y = scaleY.get();
 			}
 		});
-		scaleZ.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				scale.z = scaleZ.getValue();
+		scaleZ.addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				scale.z = scaleZ.get();
 			}
 		});
-		pivotX.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				pivot.x = pivotX.getValue();
+		pivotX.addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				pivot.x = pivotX.get();
 			}
 		});
-		pivotY.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				pivot.y = pivotY.getValue();
+		pivotY.addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				pivot.y = pivotY.get();
 			}
 		});
-		pivotZ.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				pivot.z = pivotZ.getValue();
+		pivotZ.addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				pivot.z = pivotZ.get();
 			}
 		});
 	}
