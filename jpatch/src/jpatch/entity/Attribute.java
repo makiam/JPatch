@@ -30,6 +30,7 @@ import javax.swing.event.*;
 public abstract class Attribute {
 	private final java.lang.String name;
 	private AttributeListener[] attributeListeners = new AttributeListener[0];
+	boolean valueAdjusting;
 	
 	Attribute(java.lang.String name) {
 		this.name = name;
@@ -37,6 +38,22 @@ public abstract class Attribute {
 	
 	public java.lang.String getName() {
 		return name;
+	}
+	
+	public boolean isValueAdjusting() {
+		return valueAdjusting;
+	}
+	
+	public void setValueAdjusting(boolean b) {
+		this.valueAdjusting = b;
+	}
+	
+	public boolean isKeyable() {
+		return false;
+	}
+	
+	public boolean isKeyed() {
+		return false;
 	}
 	
 	/**
@@ -93,9 +110,11 @@ public abstract class Attribute {
      * @see EventListenerList
      */
     protected void fireAttributeChanged() {
-        for (int i = attributeListeners.length - 1; i >= 0; i--) {
-        	attributeListeners[i].attributeChanged(this);
-        }
+    	valueAdjusting = true;
+	    for (int i = attributeListeners.length - 1; i >= 0; i--) {
+	      	attributeListeners[i].attributeChanged(this);
+	    }
+	    valueAdjusting = false;
     }   
     
 	public static class String extends Attribute {
@@ -111,7 +130,10 @@ public abstract class Attribute {
 		}
 		
 		public void set(java.lang.String string) {
-			this.string = string;
+			if (!this.string.equals(string) && !valueAdjusting) {
+				this.string = string;
+				fireAttributeChanged();
+			}
 		}
 		
 		public boolean isUseTextArea() {
@@ -131,7 +153,10 @@ public abstract class Attribute {
 		}
 		
 		public void set(java.lang.Enum enumValue) {
-			this.enumValue = enumValue;
+			if (!this.enumValue.equals(enumValue) && !valueAdjusting) {
+				this.enumValue = enumValue;
+				fireAttributeChanged();
+			}
 		}
 	}
 	
@@ -143,7 +168,7 @@ public abstract class Attribute {
 		}
 		
 		public void set(int newValue) {
-			if (newValue != value) {
+			if (newValue != value && !valueAdjusting) {
 				value = newValue;
 				fireAttributeChanged();
 			}
@@ -206,9 +231,11 @@ public abstract class Attribute {
 			return value;
 		}
 
-		public void setValue(double value) {
-			this.value = value;
-			fireAttributeChanged();
+		public void setValue(double newValue) {
+			if (value != newValue && !valueAdjusting) {
+				value = newValue;
+				fireAttributeChanged();
+			}
 		}
 		
 	}
@@ -221,7 +248,7 @@ public abstract class Attribute {
 		}
 		
 		public void set(double newValue) {
-			if (newValue != value) {
+			if (value != newValue && !valueAdjusting) {
 				value = newValue;
 				fireAttributeChanged();
 			}
@@ -247,6 +274,7 @@ public abstract class Attribute {
 			set(value);
 		}
 		
+		@Override
 		public void set(double newValue) {
 			if (min.enabled && newValue < min.value)
 				newValue = min.value;
@@ -271,6 +299,12 @@ public abstract class Attribute {
 			this.motionCurve = motionCurve;
 		}
 		
+		@Override
+		public boolean isKeyable() {
+			return true;
+		}
+		
+		@Override
 		public boolean isKeyed() {
 			return motionCurve != null;
 		}
@@ -291,9 +325,11 @@ public abstract class Attribute {
 			super(name);
 		}
 		
-		public void set(boolean value) {
-			this.value = value;
-			fireAttributeChanged();
+		public void set(boolean newValue) {
+			if (value != newValue && !valueAdjusting) {
+				value = newValue;
+				fireAttributeChanged();
+			}
 		}
 		
 		public boolean get() {
@@ -326,6 +362,12 @@ public abstract class Attribute {
 			doubleAttribute.motionCurve = motionCurve;
 		}
 		
+		@Override
+		public boolean isKeyable() {
+			return true;
+		}
+		
+		@Override
 		public boolean isKeyed() {
 			return doubleAttribute.motionCurve != null;
 		}
