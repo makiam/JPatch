@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.*;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -11,9 +13,9 @@ import javax.swing.event.*;
 import jpatch.entity.*;
 
 public class AttributeUiHelper {
-	private static final DecimalFormat INT_FORMAT = new DecimalFormat("0");
-	private static final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("0.000");
-	private static final int COLUMNS = 7;
+	private static final DecimalFormat INT_FORMAT = new DecimalFormat("0", new DecimalFormatSymbols(Locale.ENGLISH));
+	private static final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("0.000", new DecimalFormatSymbols(Locale.ENGLISH));
+	private static final int COLUMNS = 6;
 	
 	static JLabel getLabelFor(Attribute attribute) {
 		return new JLabel(attribute.getName());
@@ -25,6 +27,7 @@ public class AttributeUiHelper {
 			slider = new JSlider(((Attribute.BoundedInteger) attribute).getMin(), ((Attribute.BoundedInteger) attribute).getMax());
 			slider.setMinorTickSpacing(1);
 			slider.setSnapToTicks(true);
+			slider.setToolTipText(attribute.getName());
 		} else if (attribute instanceof Attribute.BoundedDouble) {
 			slider = new JSlider(0, 100000);
 		} else {
@@ -79,6 +82,7 @@ public class AttributeUiHelper {
 		/* create checkBox and set selection state */
 		final JCheckBox checkBox = new JCheckBox();
 		checkBox.setSelected(attrBool.get());
+		checkBox.setToolTipText(attribute.getName());
 		
 		/* create a ChangeListener to update the attribute if the slider was changed */
 		checkBox.addActionListener(new ActionListener() {
@@ -111,6 +115,7 @@ public class AttributeUiHelper {
 	
 	public static JTextField createTextFieldFor(final Attribute attribute) {
 		final JTextField textField = new JTextField(COLUMNS);
+		textField.setToolTipText(attribute.getName());
 		
 		if (attribute instanceof Attribute.Integer) {
 			textField.setText(INT_FORMAT.format(((Attribute.Integer) attribute).get()));
@@ -201,23 +206,6 @@ public class AttributeUiHelper {
 		});
 		
 		return comboBox;
-	}
-	
-	public static Box createLimitBox(final Attribute attribute) {
-		final Attribute.Limit attrLimit = (Attribute.Limit) attribute;
-		Box box = Box.createHorizontalBox();
-		JCheckBox checkBox = createCheckBoxFor(attrLimit.getEnableAttribute());
-		final JTextField textField = createTextFieldFor(attrLimit);
-		box.add(checkBox);
-		box.add(textField);
-		
-		textField.setEnabled(attrLimit.getEnableAttribute().get());
-		attrLimit.getEnableAttribute().addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				textField.setEnabled(attrLimit.getEnableAttribute().get());
-			}
-		});
-		return box;
 	}
 	
 	private static void setSliderValue(JSlider slider, Attribute attribute) {

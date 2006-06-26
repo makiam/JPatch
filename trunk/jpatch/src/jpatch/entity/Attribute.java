@@ -22,6 +22,9 @@
 package jpatch.entity;
 
 import javax.swing.event.*;
+import javax.vecmath.Tuple3d;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 /**
  * @author sascha
@@ -29,7 +32,7 @@ import javax.swing.event.*;
  */
 public abstract class Attribute {
 	private final java.lang.String name;
-	private AttributeListener[] attributeListeners = new AttributeListener[0];
+	AttributeListener[] attributeListeners = new AttributeListener[0];
 	boolean valueAdjusting;
 	
 	Attribute(java.lang.String name) {
@@ -147,8 +150,9 @@ public abstract class Attribute {
 	public static class Enum extends Attribute {
 		private java.lang.Enum enumValue;
 		
-		public Enum(java.lang.String name) {
+		public Enum(java.lang.String name, java.lang.Enum enumValue) {
 			super(name);
+			this.enumValue = enumValue;
 		}
 		
 		public java.lang.Enum get() {
@@ -213,7 +217,7 @@ public abstract class Attribute {
 	}
 	
 	public static class Limit extends Attribute.Double {
-		private Attribute.Boolean enabled;
+		public Attribute.Boolean enabled;
 		
 		Limit(Attribute.BoundedDouble attribute, java.lang.String suffix) {
 			super(attribute.getName() + " " + suffix);
@@ -224,6 +228,10 @@ public abstract class Attribute {
 
 		public Attribute.Boolean getEnableAttribute() {
 			return enabled;
+		}
+		
+		public Attribute.BoundedDouble getTarget() {
+			return (Attribute.BoundedDouble) attributeListeners[0];
 		}
 	}
 	
@@ -247,13 +255,15 @@ public abstract class Attribute {
 	}
 	
 	public static class BoundedDouble extends Double implements AttributeListener {
-		private Limit min, max;
+		public Limit min, max;
+		public Boolean keyed;
 		private MotionCurveNew motionCurve;
 
 		public BoundedDouble(java.lang.String name) {
 			super(name);
-			min = new Limit(this, "min");
-			max = new Limit(this, "max");
+			min = new Limit(this, "lower limit");
+			max = new Limit(this, "upper limit");
+			keyed = new Boolean(name + " keyed");
 		}
 		
 		public BoundedDouble(java.lang.String name, double value) {
@@ -305,6 +315,55 @@ public abstract class Attribute {
 		}
 	}
 
+	public static class Tuple<T extends Tuple3d> extends Attribute implements AttributeListener {
+		public BoundedDouble x, y, z;
+		private T tuple;
+		private boolean keyable;
+		
+		public Tuple(java.lang.String name, T tuple, boolean keyable) {
+			super(name);
+			x = new BoundedDouble(name + ".X");
+			y = new BoundedDouble(name + ".Y");
+			z = new BoundedDouble(name + ".Z");
+			x.addAttributeListener(this);
+			y.addAttributeListener(this);
+			z.addAttributeListener(this);
+			this.tuple = tuple;
+			this.keyable = keyable;
+			if (keyable) {
+				x.keyed.set(true);
+				y.keyed.set(true);
+				z.keyed.set(true);
+			}
+		}
+		
+		public T get() {
+			return tuple;
+		}
+		
+		public void set(Tuple3d v) {
+			set(v.x, v.y, v.z);
+		}
+		
+		public void set(double x, double y, double z) {
+			this.x.set(x);
+			this.y.set(y);
+			this.z.set(z);
+		}
+
+		@Override
+		public boolean isKeyable() {
+			return keyable;
+		}
+		
+		public void attributeChanged(Attribute attribute) {
+			if (tuple.x != x.get() || tuple.y != y.get() || tuple.z != z.get()) {
+				tuple.set(x.get(), y.get(), z.get());
+				fireAttributeChanged();
+			}
+		}
+	}
+	
 	public static class Boolean extends Attribute {
 		private boolean value;
 		
