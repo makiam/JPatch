@@ -64,6 +64,7 @@ public abstract class Attribute {
      * @see #removeAttributeListener
      */
     public void addAttributeListener(AttributeListener l) {
+//    	System.out.println(this + " add listener " + l);
     	for (AttributeListener al : attributeListeners)
     		if (al == l)
     			throw new IllegalArgumentException("AttributeListener " + l + " has already been added to " + this);
@@ -83,6 +84,7 @@ public abstract class Attribute {
      * @see #addAttributeListener
      */
     public void removeAttributeListener(AttributeListener l) {
+    	System.out.println(this + " remove listener " + l);
     	int index = -1;
     	for (int i = 0; i < attributeListeners.length; i++) {
     	    if (attributeListeners[i] == l) {
@@ -113,6 +115,7 @@ public abstract class Attribute {
     	valueAdjusting = true;
 	    for (int i = attributeListeners.length - 1; i >= 0; i--) {
 	      	attributeListeners[i].attributeChanged(this);
+	      	System.out.println(this + " " + i + " " + attributeListeners[i]);
 	    }
 	    valueAdjusting = false;
     }   
@@ -209,35 +212,19 @@ public abstract class Attribute {
 		}
 	}
 	
-	public static class Limit extends Attribute {
-		private double value;
-		private boolean enabled;
+	public static class Limit extends Attribute.Double {
+		private Attribute.Boolean enabled;
 		
 		Limit(Attribute.BoundedDouble attribute, java.lang.String suffix) {
 			super(attribute.getName() + " " + suffix);
+			enabled = new Attribute.Boolean(attribute.getName() + " " + suffix + " enabled");
 			addAttributeListener(attribute);
+			enabled.addAttributeListener(attribute);
 		}
 
-		public boolean isEnabled() {
+		public Attribute.Boolean getEnableAttribute() {
 			return enabled;
 		}
-
-		public void setEnabled(boolean enabled) {
-			this.enabled = enabled;
-			fireAttributeChanged();
-		}
-
-		public double getValue() {
-			return value;
-		}
-
-		public void setValue(double newValue) {
-			if (value != newValue && !valueAdjusting) {
-				value = newValue;
-				fireAttributeChanged();
-			}
-		}
-		
 	}
 	
 	public static class Double extends Attribute {
@@ -276,10 +263,10 @@ public abstract class Attribute {
 		
 		@Override
 		public void set(double newValue) {
-			if (min.enabled && newValue < min.value)
-				newValue = min.value;
-			if (max.enabled && newValue > max.value)
-				newValue = max.value;
+			if (min.enabled.get() && newValue < min.get())
+				newValue = min.get();
+			if (max.enabled.get() && newValue > max.get())
+				newValue = max.get();
 			super.set(newValue);
 		}
 	
@@ -343,10 +330,10 @@ public abstract class Attribute {
 		public KeyedBoolean(java.lang.String name) {
 			super(name);
 			doubleAttribute = new Attribute.BoundedDouble(name);
-			doubleAttribute.getMin().setEnabled(true);
-			doubleAttribute.getMin().setValue(0);
-			doubleAttribute.getMax().setEnabled(true);
-			doubleAttribute.getMax().setValue(1);
+			doubleAttribute.getMin().enabled.set(true);
+			doubleAttribute.getMin().set(0);
+			doubleAttribute.getMax().enabled.set(true);
+			doubleAttribute.getMax().set(1);
 		}
 		
 		public KeyedBoolean(java.lang.String name, boolean value) {

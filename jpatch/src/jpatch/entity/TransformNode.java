@@ -31,28 +31,27 @@ import javax.vecmath.*;
 import jpatch.auxilary.*;
 
 public class TransformNode implements JPatchObject {
-	public static final int ATTRIBUTE_COUNT = 20;
-	
-	public static final int NAME = 0;
-	public static final int VISIBILITY = 1;
-	public static final int POSITION_X = 2;
-	public static final int POSITION_Y = 3;
-	public static final int POSITION_Z = 4;
-	public static final int TRANSLATION_X = 5;
-	public static final int TRANSLATION_Y = 6;
-	public static final int TRANSLATION_Z = 7;
-	public static final int ROTATION_X = 8;
-	public static final int ROTATION_Y = 9;
-	public static final int ROTATION_Z = 10;
-	public static final int SCALE_X = 11;
-	public static final int SCALE_Y = 12;
-	public static final int SCALE_Z = 13;
-	public static final int PIVOT_POSITION_X = 14;
-	public static final int PIVOT_POSITION_Y = 15;
-	public static final int PIVOT_POSITION_Z = 16;
-	public static final int PIVOT_TRANSLATION_X = 17;
-	public static final int PIVOT_TRANSLATION_Y = 18;
-	public static final int PIVOT_TRANSLATION_Z = 19;
+	public static enum AttributeName {
+			NAME,
+			VISIBILITY,
+			POSITION_X, POSITION_Y, POSITION_Z,
+			TRANSLATION_X, TRANSLATION_Y, TRANSLATION_Z,
+			ORIENTATION_X, ORIENTATION_Y, ORIENTATION_Z,
+			ROTATION_X, ROTATION_Y, ROTATION_Z,
+			SCALE_X, SCALE_Y, SCALE_Z,
+			PIVOT_POSITION_X, PIVOT_POSITION_Y, PIVOT_POSITION_Z,
+			PIVOT_TRANSLATION_X, PIVOT_TRANSLATION_Y, PIVOT_TRANSLATION_Z,
+			TRANSLATION_X_MIN, TRANSLATION_X_MAX,
+			TRANSLATION_Y_MIN, TRANSLATION_Y_MAX,
+			TRANSLATION_Z_MIN, TRANSLATION_Z_MAX,
+			ROTATION_X_MIN, ROTATION_X_MAX,
+			ROTATION_Y_MIN, ROTATION_Y_MAX,
+			ROTATION_Z_MIN, ROTATION_Z_MAX,
+			SCALE_X_MIN, SCALE_X_MAX,
+			SCALE_Y_MIN, SCALE_Y_MAX,
+			SCALE_Z_MIN, SCALE_Z_MAX,
+	};
+	public static final int ATTRIBUTE_COUNT = AttributeName.values().length;
 	
 	private Attribute.String name = new Attribute.String("Name");
 	private Attribute.KeyedBoolean visibility = new Attribute.KeyedBoolean("Visibility", true);
@@ -62,6 +61,9 @@ public class TransformNode implements JPatchObject {
 	private Attribute.BoundedDouble translationX = new Attribute.BoundedDouble("Translation X", 0.0);
 	private Attribute.BoundedDouble translationY = new Attribute.BoundedDouble("Translation Y", 0.0);
 	private Attribute.BoundedDouble translationZ = new Attribute.BoundedDouble("Translation Z", 0.0);
+	private Attribute.BoundedDouble orientationX = new Attribute.BoundedDouble("Orientation X", 0.0);
+	private Attribute.BoundedDouble orientationY = new Attribute.BoundedDouble("Orientation Y", 0.0);
+	private Attribute.BoundedDouble orientationZ = new Attribute.BoundedDouble("Orientation Z", 0.0);
 	private Attribute.BoundedDouble rotationX = new Attribute.BoundedDouble("Rotation X", 0.0);
 	private Attribute.BoundedDouble rotationY = new Attribute.BoundedDouble("Rotation Y", 0.0);
 	private Attribute.BoundedDouble rotationZ = new Attribute.BoundedDouble("Rotation Z", 0.0);
@@ -115,7 +117,15 @@ public class TransformNode implements JPatchObject {
 	}
 	
 	public Attribute getAttribute(int index) {
-		switch (index) {
+		return getAttribute(AttributeName.values()[index]);
+	}
+	
+	public Attribute getAttribute(String name) {
+		return getAttribute(AttributeName.valueOf(name));
+	}
+	
+	public Attribute getAttribute(AttributeName attributeName) {
+		switch (attributeName) {
 		case NAME:
 			return name;
 		case VISIBILITY:
@@ -132,6 +142,12 @@ public class TransformNode implements JPatchObject {
 			return translationY;
 		case TRANSLATION_Z:
 			return translationZ;
+		case ORIENTATION_X:
+			return orientationX;
+		case ORIENTATION_Y:
+			return orientationY;
+		case ORIENTATION_Z:
+			return orientationZ;
 		case ROTATION_X:
 			return rotationX;
 		case ROTATION_Y:
@@ -156,6 +172,42 @@ public class TransformNode implements JPatchObject {
 			return pivotTranslationY;
 		case PIVOT_TRANSLATION_Z:
 			return pivotTranslationZ;
+		case TRANSLATION_X_MIN:
+			return translationX.getMin();
+		case TRANSLATION_X_MAX:
+			return translationX.getMax();
+		case TRANSLATION_Y_MIN:
+			return translationY.getMin();
+		case TRANSLATION_Y_MAX:
+			return translationY.getMax();
+		case TRANSLATION_Z_MIN:
+			return translationZ.getMin();
+		case TRANSLATION_Z_MAX:
+			return translationZ.getMax();
+		case ROTATION_X_MIN:
+			return translationX.getMin();
+		case ROTATION_X_MAX:
+			return translationX.getMax();
+		case ROTATION_Y_MIN:
+			return translationY.getMin();
+		case ROTATION_Y_MAX:
+			return translationY.getMax();
+		case ROTATION_Z_MIN:
+			return translationZ.getMin();
+		case ROTATION_Z_MAX:
+			return translationZ.getMax();
+		case SCALE_X_MIN:
+			return translationX.getMin();
+		case SCALE_X_MAX:
+			return translationX.getMax();
+		case SCALE_Y_MIN:
+			return translationY.getMin();
+		case SCALE_Y_MAX:
+			return translationY.getMax();
+		case SCALE_Z_MIN:
+			return translationZ.getMin();
+		case SCALE_Z_MAX:
+			return translationZ.getMax();
 		default:
 			return null;
 		}
