@@ -18,13 +18,21 @@ public class AttributeUiTest {
 	}
 	
 	public AttributeUiTest() {
-		final JFrame frame = new JFrame(getClass().getCanonicalName());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		TransformNode tn = new TransformNode();
-		TransformNodeAttributeEditor tnae = new TransformNodeAttributeEditor(tn);
-		frame.add(tnae);
-		frame.pack();
-		frame.setVisible(true);
+		UIManager.put("swing.boldMetal", false);
+		final JFrame frame1 = new JFrame(getClass().getCanonicalName() + " 1");
+		final JFrame frame2 = new JFrame(getClass().getCanonicalName() + " 2");
+		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		TransformNode tn1 = new TransformNode();
+		TransformNode tn2 = new TransformNode();
+		TransformNodeAttributeEditor tnae1 = new TransformNodeAttributeEditor(tn1);
+		TransformNodeAttributeEditor tnae2 = new TransformNodeAttributeEditor(tn2);
+		tn1.addChild(tn2);
+		frame1.add(new JScrollPane(tnae1));
+		frame2.add(tnae2);
+		frame1.pack();
+		frame2.pack();
+		frame1.setVisible(true);
+		frame2.setVisible(true);
 	}
 }

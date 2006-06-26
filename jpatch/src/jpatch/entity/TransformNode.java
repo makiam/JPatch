@@ -26,56 +26,26 @@ package jpatch.entity;
  *
  */
 
+import java.lang.reflect.Field;
 import java.util.*;
 import javax.vecmath.*;
 import jpatch.auxilary.*;
 
 public class TransformNode implements JPatchObject {
-	public static enum AttributeName {
-			NAME,
-			VISIBILITY,
-			POSITION_X, POSITION_Y, POSITION_Z,
-			TRANSLATION_X, TRANSLATION_Y, TRANSLATION_Z,
-			ORIENTATION_X, ORIENTATION_Y, ORIENTATION_Z,
-			ROTATION_X, ROTATION_Y, ROTATION_Z,
-			SCALE_X, SCALE_Y, SCALE_Z,
-			PIVOT_POSITION_X, PIVOT_POSITION_Y, PIVOT_POSITION_Z,
-			PIVOT_TRANSLATION_X, PIVOT_TRANSLATION_Y, PIVOT_TRANSLATION_Z,
-			TRANSLATION_X_MIN, TRANSLATION_X_MAX,
-			TRANSLATION_Y_MIN, TRANSLATION_Y_MAX,
-			TRANSLATION_Z_MIN, TRANSLATION_Z_MAX,
-			ROTATION_X_MIN, ROTATION_X_MAX,
-			ROTATION_Y_MIN, ROTATION_Y_MAX,
-			ROTATION_Z_MIN, ROTATION_Z_MAX,
-			SCALE_X_MIN, SCALE_X_MAX,
-			SCALE_Y_MIN, SCALE_Y_MAX,
-			SCALE_Z_MIN, SCALE_Z_MAX,
-	};
-	public static final int ATTRIBUTE_COUNT = AttributeName.values().length;
 	
-	private Attribute.String name = new Attribute.String("Name");
-	private Attribute.KeyedBoolean visibility = new Attribute.KeyedBoolean("Visibility", true);
-	private Attribute.BoundedDouble positionX = new Attribute.BoundedDouble("Position X", 0.0);
-	private Attribute.BoundedDouble positionY = new Attribute.BoundedDouble("Position Y", 0.0);
-	private Attribute.BoundedDouble positionZ = new Attribute.BoundedDouble("Position Z", 0.0);
-	private Attribute.BoundedDouble translationX = new Attribute.BoundedDouble("Translation X", 0.0);
-	private Attribute.BoundedDouble translationY = new Attribute.BoundedDouble("Translation Y", 0.0);
-	private Attribute.BoundedDouble translationZ = new Attribute.BoundedDouble("Translation Z", 0.0);
-	private Attribute.BoundedDouble orientationX = new Attribute.BoundedDouble("Orientation X", 0.0);
-	private Attribute.BoundedDouble orientationY = new Attribute.BoundedDouble("Orientation Y", 0.0);
-	private Attribute.BoundedDouble orientationZ = new Attribute.BoundedDouble("Orientation Z", 0.0);
-	private Attribute.BoundedDouble rotationX = new Attribute.BoundedDouble("Rotation X", 0.0);
-	private Attribute.BoundedDouble rotationY = new Attribute.BoundedDouble("Rotation Y", 0.0);
-	private Attribute.BoundedDouble rotationZ = new Attribute.BoundedDouble("Rotation Z", 0.0);
-	private Attribute.BoundedDouble scaleX = new Attribute.BoundedDouble("Scale X", 1.0);
-	private Attribute.BoundedDouble scaleY = new Attribute.BoundedDouble("Scale Y", 1.0);
-	private Attribute.BoundedDouble scaleZ = new Attribute.BoundedDouble("Scale Z", 1.0);
-	private Attribute.BoundedDouble pivotPositionX = new Attribute.BoundedDouble("Pivot Position X", 0.0);
-	private Attribute.BoundedDouble pivotPositionY = new Attribute.BoundedDouble("Pivot Position Y", 0.0);
-	private Attribute.BoundedDouble pivotPositionZ = new Attribute.BoundedDouble("Pivot Position Z", 0.0);
-	private Attribute.BoundedDouble pivotTranslationX = new Attribute.BoundedDouble("Pivot Translation X", 0.0);
-	private Attribute.BoundedDouble pivotTranslationY = new Attribute.BoundedDouble("Pivot Translation Y", 0.0);
-	private Attribute.BoundedDouble pivotTranslationZ = new Attribute.BoundedDouble("Pivot Translation Z", 0.0);
+	
+	public Attribute.String name = new Attribute.String("Name");
+	public Attribute.KeyedBoolean visibility = new Attribute.KeyedBoolean("Visibility", true);
+	public Attribute.Tuple<Point3d> position = new Attribute.Tuple<Point3d>("Position", new Point3d(0, 0, 0), false);
+	public Attribute.Tuple<Vector3d> translation = new Attribute.Tuple<Vector3d>("Translation", new Vector3d(0, 0, 0), true);
+	public Attribute.Tuple<Rotation3d> orientation = new Attribute.Tuple<Rotation3d>("Orientation", new Rotation3d(0, 0, 0), false);
+	public Attribute.Tuple<Rotation3d> rotation = new Attribute.Tuple<Rotation3d>("Rotation", new Rotation3d(0, 0, 0), true);
+	public Attribute.Enum rotationOrder = new Attribute.Enum("Rotation Order", rotation.get().order);
+	public Attribute.Tuple<Scale3d> scale = new Attribute.Tuple<Scale3d>("Scale", new Scale3d(1, 1, 1), true);
+	public Attribute.Tuple<Point3d> scalePivotPosition = new Attribute.Tuple<Point3d>("ScalePivotPosition", new Point3d(0, 0, 0), false);
+	public Attribute.Tuple<Vector3d> scalePivotTranslation = new Attribute.Tuple<Vector3d>("ScalePivotTranslation", new Vector3d(0, 0, 0), false);
+	public Attribute.Tuple<Point3d> rotatePivotPosition = new Attribute.Tuple<Point3d>("RotatePivotPosition", new Point3d(0, 0, 0), false);
+	public Attribute.Tuple<Vector3d> rotatePivotTranslation = new Attribute.Tuple<Vector3d>("RotatePivotTranslation", new Vector3d(0, 0, 0), false);
 	
 	private TransformNode parent;
 	private List<AnimObject> animObjects = new ArrayList<AnimObject>(1);
@@ -86,10 +56,10 @@ public class TransformNode implements JPatchObject {
 	private Matrix4d inverseMatrix = new Matrix4d();
 	private Matrix3d rotationMatrix = new Matrix3d();
 	private Matrix3d scaleMatrix = new Matrix3d();
-	private Vector3d translation = new Vector3d();
-	private Rotation3d rotation = new Rotation3d();
-	private Scale3d scale = new Scale3d();
-	private Point3d pivot = new Point3d();
+//	private Vector3d translation = new Vector3d();
+//	private Rotation3d rotation = new Rotation3d();
+//	private Scale3d scale = new Scale3d();
+//	private Point3d pivot = new Point3d();
 	
 	private Iterable<Attribute> attributes = new Iterable<Attribute>() {
 		public Iterator<Attribute> iterator() {
@@ -117,100 +87,21 @@ public class TransformNode implements JPatchObject {
 	}
 	
 	public Attribute getAttribute(int index) {
-		return getAttribute(AttributeName.values()[index]);
-	}
-	
-	public Attribute getAttribute(String name) {
-		return getAttribute(AttributeName.valueOf(name));
-	}
-	
-	public Attribute getAttribute(AttributeName attributeName) {
-		switch (attributeName) {
-		case NAME:
-			return name;
-		case VISIBILITY:
-			return visibility;
-		case POSITION_X:
-			return positionX;
-		case POSITION_Y:
-			return positionY;
-		case POSITION_Z:
-			return positionZ;
-		case TRANSLATION_X:
-			return translationX;
-		case TRANSLATION_Y:
-			return translationY;
-		case TRANSLATION_Z:
-			return translationZ;
-		case ORIENTATION_X:
-			return orientationX;
-		case ORIENTATION_Y:
-			return orientationY;
-		case ORIENTATION_Z:
-			return orientationZ;
-		case ROTATION_X:
-			return rotationX;
-		case ROTATION_Y:
-			return rotationY;
-		case ROTATION_Z:
-			return rotationZ;
-		case SCALE_X:
-			return scaleX;
-		case SCALE_Y:
-			return scaleY;
-		case SCALE_Z:
-			return scaleZ;
-		case PIVOT_POSITION_X:
-			return pivotPositionX;
-		case PIVOT_POSITION_Y:
-			return pivotPositionY;
-		case PIVOT_POSITION_Z:
-			return pivotPositionZ;
-		case PIVOT_TRANSLATION_X:
-			return pivotTranslationX;
-		case PIVOT_TRANSLATION_Y:
-			return pivotTranslationY;
-		case PIVOT_TRANSLATION_Z:
-			return pivotTranslationZ;
-		case TRANSLATION_X_MIN:
-			return translationX.getMin();
-		case TRANSLATION_X_MAX:
-			return translationX.getMax();
-		case TRANSLATION_Y_MIN:
-			return translationY.getMin();
-		case TRANSLATION_Y_MAX:
-			return translationY.getMax();
-		case TRANSLATION_Z_MIN:
-			return translationZ.getMin();
-		case TRANSLATION_Z_MAX:
-			return translationZ.getMax();
-		case ROTATION_X_MIN:
-			return translationX.getMin();
-		case ROTATION_X_MAX:
-			return translationX.getMax();
-		case ROTATION_Y_MIN:
-			return translationY.getMin();
-		case ROTATION_Y_MAX:
-			return translationY.getMax();
-		case ROTATION_Z_MIN:
-			return translationZ.getMin();
-		case ROTATION_Z_MAX:
-			return translationZ.getMax();
-		case SCALE_X_MIN:
-			return translationX.getMin();
-		case SCALE_X_MAX:
-			return translationX.getMax();
-		case SCALE_Y_MIN:
-			return translationY.getMin();
-		case SCALE_Y_MAX:
-			return translationY.getMax();
-		case SCALE_Z_MIN:
-			return translationZ.getMin();
-		case SCALE_Z_MAX:
-			return translationZ.getMax();
-		default:
-			return null;
+		int i = 0;
+		for (Field field : getClass().getFields()) {
+			Object o = null;
+			try {
+				field.get(o);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			if (o instanceof Attribute) {
+				if (i == index)
+					return (Attribute) o;
+				i++;
+			}
 		}
+		return null;
 	}
 	
 	private Iterator<Attribute> createAttributeIterator() {
@@ -218,7 +109,7 @@ public class TransformNode implements JPatchObject {
 			private int index = 0;
 			
 			public boolean hasNext() {
-				return index < ATTRIBUTE_COUNT;
+				return getAttribute(index + 1) != null;
 			}
 
 			public Attribute next() {
@@ -236,7 +127,7 @@ public class TransformNode implements JPatchObject {
 			private int index = searchNextChannel();
 			
 			public boolean hasNext() {
-				return index < ATTRIBUTE_COUNT;
+				return getAttribute(index + 1) != null;
 			}
 
 			public Attribute next() {
@@ -250,10 +141,11 @@ public class TransformNode implements JPatchObject {
 			}
 			
 			private int searchNextChannel() {
-				for (; index < ATTRIBUTE_COUNT; index++)
-					if (getAttribute(index).isKeyed())
+				Attribute a;
+				for (a = getAttribute(index); a != null; index++)
+					if (a.isKeyed())
 						break;
-				if (index < ATTRIBUTE_COUNT)
+				if (a != null)
 					index--;
 				return index;
 			}
@@ -272,6 +164,11 @@ public class TransformNode implements JPatchObject {
 		return unmodifiableAnimObjects;
 	}
 	
+	public void addChild(TransformNode child) {
+		childTransformNodes.add(child);
+		child.setParent(this);
+	}
+	
 	public void setParent(TransformNode parent) {
 		this.parent = parent;
 	}
@@ -288,178 +185,73 @@ public class TransformNode implements JPatchObject {
 	}
 	
 	private void computeMatrix() {
-		scale.setMatrixScale(scaleMatrix);
-		rotation.setMatrixRotation(rotationMatrix);
+		scale.get().setMatrixScale(scaleMatrix);
+		rotation.get().setMatrixRotation(rotationMatrix);
 		scaleMatrix.mul(rotationMatrix);
 		matrix.setRotationScale(scaleMatrix);
-		matrix.setTranslation(translation);
+		matrix.setTranslation(translation.get());
 		if (parent != null)
 			matrix.mul(parent.getMatrix());
 		inverseMatrix.invert(matrix);
 	}
 	
 	private void computeDerivedAttributes() {
-		translationChanged();
-		pivotChanged();
+		translationChanged(translation, position);
+		translationChanged(scalePivotTranslation, scalePivotPosition);
+		translationChanged(rotatePivotTranslation, rotatePivotPosition);
 	}
 	
 	@SuppressWarnings("unchecked")
 	private void addAttributeChangeListeners() {
-		positionX.addAttributeListener(new AttributeListener() {
+		position.addAttributeListener(new AttributeListener() {
 			public void attributeChanged(Attribute attribute) {
-				positionChanged();
+				positionChanged(position, translation);
+				computeBranch();
 			}
 		});
-		positionY.addAttributeListener(new AttributeListener() {
+		translation.addAttributeListener(new AttributeListener() {
 			public void attributeChanged(Attribute attribute) {
-				positionChanged();
+				translationChanged(translation, position);
+				computeBranch();
 			}
 		});
-		positionZ.addAttributeListener(new AttributeListener() {
+		scalePivotPosition.addAttributeListener(new AttributeListener() {
 			public void attributeChanged(Attribute attribute) {
-				positionChanged();
+				positionChanged(scalePivotPosition, scalePivotTranslation);
 			}
 		});
-		translationX.addAttributeListener(new AttributeListener() {
+		scalePivotTranslation.addAttributeListener(new AttributeListener() {
 			public void attributeChanged(Attribute attribute) {
-				translation.x = translationX.get();
-				translationChanged();
+				translationChanged(scalePivotTranslation, scalePivotPosition);
 			}
 		});
-		translationY.addAttributeListener(new AttributeListener() {
+		rotatePivotPosition.addAttributeListener(new AttributeListener() {
 			public void attributeChanged(Attribute attribute) {
-				translation.y = translationY.get();
-				translationChanged();
+				positionChanged(rotatePivotPosition, rotatePivotTranslation);
 			}
 		});
-		translationZ.addAttributeListener(new AttributeListener() {
+		rotatePivotTranslation.addAttributeListener(new AttributeListener() {
 			public void attributeChanged(Attribute attribute) {
-				translation.z = translationZ.get();
-				translationChanged();
-			}
-		});
-		rotationX.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				rotation.x = rotationX.get();
-			}
-		});
-		rotationY.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				rotation.y = rotationY.get();
-			}
-		});
-		rotationZ.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				rotation.z = rotationZ.get();
-			}
-		});
-		scaleX.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				scale.x = scaleX.get();
-			}
-		});
-		scaleY.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				scale.y = scaleY.get();
-			}
-		});
-		scaleZ.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				scale.z = scaleZ.get();
-			}
-		});
-		pivotPositionX.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				worldPivotChanged();
-			}
-		});
-		pivotPositionY.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				worldPivotChanged();
-			}
-		});
-		pivotPositionZ.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				worldPivotChanged();
-			}
-		});
-		pivotTranslationX.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				pivot.x = pivotTranslationX.get();
-				pivotChanged();
-			}
-		});
-		pivotTranslationY.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				pivot.y = pivotTranslationY.get();
-				pivotChanged();
-			}
-		});
-		pivotTranslationZ.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				pivot.z = pivotTranslationZ.get();
-				pivotChanged();
+				translationChanged(rotatePivotTranslation, rotatePivotPosition);
 			}
 		});
 	}
 	
-	private void positionChanged() {
-		Point3d tmp = new Point3d(positionX.get(), positionY.get(), positionZ.get());
+	private void positionChanged(Attribute.Tuple<Point3d> position, Attribute.Tuple<Vector3d> translation) {
+		Point3d tmp = new Point3d(position.get());
 		if (parent != null)
 			parent.inverseMatrix.transform(tmp);
-		positionX.setValueAdjusting(true);
-		positionY.setValueAdjusting(true);
-		positionZ.setValueAdjusting(true);
-		translationX.set(tmp.x);
-		translationY.set(tmp.y);
-		translationZ.set(tmp.z);
-		positionX.setValueAdjusting(false);
-		positionY.setValueAdjusting(false);
-		positionZ.setValueAdjusting(false);
+//		position.setValueAdjusting(true);
+		translation.set(tmp);
+//		position.setValueAdjusting(false);
 	}
 	
-	private void translationChanged() {
-		Point3d tmp = new Point3d(translation);
+	private void translationChanged(Attribute.Tuple<Vector3d> translation, Attribute.Tuple<Point3d> position) {
+		Point3d tmp = new Point3d(translation.get());
 		if (parent != null)
 			parent.matrix.transform(tmp);
-		translationX.setValueAdjusting(true);
-		translationY.setValueAdjusting(true);
-		translationZ.setValueAdjusting(true);
-		positionX.set(tmp.x);
-		positionY.set(tmp.y);
-		positionZ.set(tmp.z);
-		translationX.setValueAdjusting(false);
-		translationY.setValueAdjusting(false);
-		translationZ.setValueAdjusting(false);
-	}
-	
-	private void worldPivotChanged() {
-		Point3d tmp = new Point3d(pivotPositionX.get(), pivotPositionY.get(), pivotPositionZ.get());
-		if (parent != null)
-			parent.inverseMatrix.transform(tmp);
-		pivotPositionX.setValueAdjusting(true);
-		pivotPositionY.setValueAdjusting(true);
-		pivotPositionZ.setValueAdjusting(true);
-		pivotTranslationX.set(tmp.x);
-		pivotTranslationY.set(tmp.y);
-		pivotTranslationZ.set(tmp.z);
-		pivotPositionX.setValueAdjusting(false);
-		pivotPositionY.setValueAdjusting(false);
-		pivotPositionZ.setValueAdjusting(false);
-	}
-	
-	private void pivotChanged() {
-		Point3d tmp = new Point3d(pivot);
-		if (parent != null)
-			parent.matrix.transform(tmp);
-		pivotTranslationX.setValueAdjusting(true);
-		pivotTranslationY.setValueAdjusting(true);
-		pivotTranslationZ.setValueAdjusting(true);
-		pivotPositionX.set(tmp.x);
-		pivotPositionY.set(tmp.y);
-		pivotPositionZ.set(tmp.z);
-		pivotTranslationX.setValueAdjusting(false);
-		pivotTranslationY.setValueAdjusting(false);
-		pivotTranslationZ.setValueAdjusting(false);
+//		translation.setValueAdjusting(true);
+		position.set(tmp);
+//		translation.setValueAdjusting(false);
 	}
 }
