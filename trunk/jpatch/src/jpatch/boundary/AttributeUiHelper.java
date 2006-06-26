@@ -13,13 +13,13 @@ import jpatch.entity.*;
 public class AttributeUiHelper {
 	private static final DecimalFormat INT_FORMAT = new DecimalFormat("0");
 	private static final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("0.000");
-	private static final int COLUMNS = 8;
+	private static final int COLUMNS = 7;
 	
 	static JLabel getLabelFor(Attribute attribute) {
 		return new JLabel(attribute.getName());
 	}
 	
-	public static JSlider getSliderFor(final Attribute attribute) {
+	public static JSlider createSliderFor(final Attribute attribute) {
 		final JSlider slider;
 		if (attribute instanceof Attribute.BoundedInteger) {
 			slider = new JSlider(((Attribute.BoundedInteger) attribute).getMin(), ((Attribute.BoundedInteger) attribute).getMax());
@@ -33,14 +33,15 @@ public class AttributeUiHelper {
 		
 		setSliderValue(slider, attribute);
 		
+		/* create a ChangeListener to update the attribute if the slider was changed */
 		slider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (attribute instanceof Attribute.BoundedInteger) {
 					((Attribute.BoundedInteger) attribute).set(slider.getValue());
 				} else if (attribute instanceof Attribute.BoundedDouble) {
 					Attribute.BoundedDouble bdAttr = ((Attribute.BoundedDouble) attribute);
-					double min = bdAttr.getMin().getValue();
-					double max = bdAttr.getMax().getValue();
+					double min = bdAttr.getMin().get();
+					double max = bdAttr.getMax().get();
 					bdAttr.set(min + slider.getValue() * (max - min) / (slider.getMaximum() - slider.getMinimum()));
 				} else {
 					throw new IllegalStateException();
@@ -61,44 +62,64 @@ public class AttributeUiHelper {
 		slider.addHierarchyListener(new HierarchyListener() {
 			public void hierarchyChanged(HierarchyEvent e) {
 				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-					if (attribute instanceof Attribute.BoundedDouble) {
-						Attribute.BoundedDouble bdAttr = ((Attribute.BoundedDouble) attribute);
-						if (slider.isShowing()) {
-							bdAttr.addAttributeListener(attributeListener);
-							bdAttr.getMin().addAttributeListener(attributeListener);
-							bdAttr.getMax().addAttributeListener(attributeListener);
-						} else {
-							bdAttr.removeAttributeListener(attributeListener);
-							bdAttr.getMin().removeAttributeListener(attributeListener);
-							bdAttr.getMax().removeAttributeListener(attributeListener);
-						}
-					} else {
-						if (slider.isShowing())
-							attribute.addAttributeListener(attributeListener);
-						else
-							attribute.removeAttributeListener(attributeListener);
-					}
+					if (slider.isShowing())
+						attribute.addAttributeListener(attributeListener);
+					else
+						attribute.removeAttributeListener(attributeListener);
+				}
+			}
+		});
+
+		return slider;
+	}
+	
+	public static JCheckBox createCheckBoxFor(final Attribute attribute) {
+		final Attribute.Boolean attrBool = (Attribute.Boolean) attribute;
+		
+		/* create checkBox and set selection state */
+		final JCheckBox checkBox = new JCheckBox();
+		checkBox.setSelected(attrBool.get());
+		
+		/* create a ChangeListener to update the attribute if the slider was changed */
+		checkBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				attrBool.set(checkBox.isSelected());
+			}
+		});
+		
+		/* create a AttributeListener to update the CheckBox if the attribute changes */
+		final AttributeListener attributeListener = new AttributeListener() {
+			public void attributeChanged(Attribute a) {
+				checkBox.setSelected(attrBool.get());
+			}
+		};
+		
+		/* add a HierarchyListener to add/remove the attributelistener if the component becomes showing */
+		checkBox.addHierarchyListener(new HierarchyListener() {
+			public void hierarchyChanged(HierarchyEvent e) {
+				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+					if (checkBox.isShowing())
+						attribute.addAttributeListener(attributeListener);
+					else
+						attribute.removeAttributeListener(attributeListener);
 				}
 			}
 		});
 		
-		return slider;
+		return checkBox;
 	}
-	public static JTextField getTextFieldFor(final Attribute attribute) {
-		final JTextField textField;
+	
+	public static JTextField createTextFieldFor(final Attribute attribute) {
+		final JTextField textField = new JTextField(COLUMNS);
 		
 		if (attribute instanceof Attribute.Integer) {
-			textField = new JTextField(COLUMNS);
 			textField.setText(INT_FORMAT.format(((Attribute.Integer) attribute).get()));
 			textField.setHorizontalAlignment(SwingConstants.RIGHT);
 		} else if (attribute instanceof Attribute.Double) {
-			textField = new JTextField(COLUMNS);
 			textField.setText(DOUBLE_FORMAT.format(((Attribute.Double) attribute).get()));
 			textField.setHorizontalAlignment(SwingConstants.RIGHT);
 		} else if (attribute instanceof Attribute.String) {
-			textField = new JTextField(COLUMNS);
 			textField.setText(((Attribute.String) attribute).get());
-			textField.setEditable(false);
 		} else {
 			throw new IllegalStateException();
 		}
@@ -148,13 +169,64 @@ public class AttributeUiHelper {
 		return textField;
 	}
 	
+	public static JComboBox createComboBoxFor(final Attribute attribute) {
+		final Attribute.Enum attrEnum = (Attribute.Enum) attribute;
+		final JComboBox comboBox = new JComboBox(attrEnum.get().getDeclaringClass().getEnumConstants());
+		comboBox.setSelectedIndex(attrEnum.get().ordinal());
+		
+		/* create a ChangeListener to update the attribute if the slider was changed */
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				attrEnum.set((Enum) attrEnum.get().getDeclaringClass().getEnumConstants()[comboBox.getSelectedIndex()]);
+			}
+		});
+		
+		/* create a AttributeListener to update the CheckBox if the attribute changes */
+		final AttributeListener attributeListener = new AttributeListener() {
+			public void attributeChanged(Attribute a) {
+				comboBox.setSelectedIndex(attrEnum.get().ordinal());
+			}
+		};
+		
+		/* add a HierarchyListener to add/remove the attributelistener if the component becomes showing */
+		comboBox.addHierarchyListener(new HierarchyListener() {
+			public void hierarchyChanged(HierarchyEvent e) {
+				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+					if (comboBox.isShowing())
+						attribute.addAttributeListener(attributeListener);
+					else
+						attribute.removeAttributeListener(attributeListener);
+				}
+			}
+		});
+		
+		return comboBox;
+	}
+	
+	public static Box createLimitBox(final Attribute attribute) {
+		final Attribute.Limit attrLimit = (Attribute.Limit) attribute;
+		Box box = Box.createHorizontalBox();
+		JCheckBox checkBox = createCheckBoxFor(attrLimit.getEnableAttribute());
+		final JTextField textField = createTextFieldFor(attrLimit);
+		box.add(checkBox);
+		box.add(textField);
+		
+		textField.setEnabled(attrLimit.getEnableAttribute().get());
+		attrLimit.getEnableAttribute().addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				textField.setEnabled(attrLimit.getEnableAttribute().get());
+			}
+		});
+		return box;
+	}
+	
 	private static void setSliderValue(JSlider slider, Attribute attribute) {
 		if (attribute instanceof Attribute.BoundedInteger) {
 			slider.setValue(((Attribute.Integer) attribute).get());
 		} else if (attribute instanceof Attribute.BoundedDouble) {
 			Attribute.BoundedDouble bdAttr = (Attribute.BoundedDouble) attribute;
-			double min = bdAttr.getMin().getValue();
-			double max = bdAttr.getMax().getValue();
+			double min = bdAttr.getMin().get();
+			double max = bdAttr.getMax().get();
 			double value = bdAttr.get();
 			slider.setValue((int) ((value - min) / (max - min) * (slider.getMaximum() - slider.getMinimum())));
 		} else {
@@ -163,10 +235,10 @@ public class AttributeUiHelper {
 	}
 	
 	private static void setTextFieldValue(JTextField textField, Attribute attribute) {
-		if (attribute instanceof Attribute.BoundedInteger) {
+		if (attribute instanceof Attribute.Integer) {
 			textField.setText(INT_FORMAT.format(((Attribute.Integer) attribute).get()));
-		} else if (attribute instanceof Attribute.BoundedDouble) {
-			textField.setText(INT_FORMAT.format(((Attribute.Double) attribute).get()));
+		} else if (attribute instanceof Attribute.Double) {
+			textField.setText(DOUBLE_FORMAT.format(((Attribute.Double) attribute).get()));
 		} else if (attribute instanceof Attribute.String) {
 			textField.setText(((Attribute.String) attribute).get());
 		} else {
@@ -175,6 +247,8 @@ public class AttributeUiHelper {
 	}
 	
 	private static boolean verifyTextField(JTextField textField, Attribute attribute) {
+		if (attribute instanceof Attribute.String)
+			return true;
 		try {
 			if (attribute instanceof Attribute.Integer) {
 				int i = Integer.parseInt(textField.getText());
@@ -191,9 +265,9 @@ public class AttributeUiHelper {
 				if (attribute instanceof Attribute.BoundedDouble) {
 					Attribute.Limit min = ((Attribute.BoundedDouble) attribute).getMin();
 					Attribute.Limit max = ((Attribute.BoundedDouble) attribute).getMax();
-					if (min.isEnabled() && d < min.getValue())
+					if (min.getEnableAttribute().get() && d < min.get())
 						return false;
-					if (max.isEnabled() && d > max.getValue())
+					if (max.getEnableAttribute().get() && d > max.get())
 						return false;
 				}
 				((Attribute.Double) attribute).set(d);
