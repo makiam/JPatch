@@ -14,12 +14,12 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 	 */
 	private static final long serialVersionUID = 1L;
 //	private ImageIcon iconRoot = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/root.png"));
-	private static ImageIcon iconModel = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/model.png"));
+	private static ImageIcon iconModel = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/model.png"));
 	private static ImageIcon iconMaterials = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/materials.png"));
 	private static ImageIcon iconExpressions = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/morphs.png"));
 	private static ImageIcon iconBones = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/bones.png"));
 //	private ImageIcon iconGroup = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/group.png"));
-	private static ImageIcon iconBone = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/bone.png"));
+	private static ImageIcon iconBone = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/bone.png"));
 	private static ImageIcon iconRdofRed1 = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/rdof_red_1.png"));
 	private static ImageIcon iconRdofRed2 = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/rdof_red_2.png"));
 	private static ImageIcon iconRdofRed3 = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/rdof_red_3.png"));
@@ -31,18 +31,18 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 	private static ImageIcon iconRdofBlue3 = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/rdof_blue_3.png"));
 //	private ImageIcon iconTransDof = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/trans_dof.png"));
 //	private ImageIcon iconMuscle = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/muscle.png"));
-	private static ImageIcon iconMaterial = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/material.png"));
-	private static ImageIcon iconMorph = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/morph.png"));
+	private static ImageIcon iconMaterial = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/material.png"));
+	private static ImageIcon iconMorph = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/morph.png"));
 	private static ImageIcon iconSelections = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/selections.png"));
-	private static ImageIcon iconSelection = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/selection.png"));
+	private static ImageIcon iconSelection = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/selection.png"));
 	private static ImageIcon iconTarget = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/target.png"));
 	
 	private static ImageIcon iconAnimation = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/animation.png"));
 	private static ImageIcon iconModels = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/models.png"));
-	private static ImageIcon iconCameras = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/camera.png"));
-	private static ImageIcon iconLights = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/light.png"));
-	private static ImageIcon iconCamera = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/camera.png"));
-	private static ImageIcon iconLight = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/tree/light.png"));
+	private static ImageIcon iconCameras = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/camera.png"));
+	private static ImageIcon iconLights = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/spotLight.png"));
+	private static ImageIcon iconCamera = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/camera.png"));
+	private static ImageIcon iconLight = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/distantLight.png"));
 	
 	public Component getTreeCellRendererComponent(JTree tree,Object value,boolean sel,boolean expanded,boolean leaf,int row,boolean hasFocus) {
 		super.getTreeCellRendererComponent(tree,value,sel,expanded,leaf,row,hasFocus);

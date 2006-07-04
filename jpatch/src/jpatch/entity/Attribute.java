@@ -34,6 +34,7 @@ public abstract class Attribute {
 	private final java.lang.String name;
 	AttributeListener[] attributeListeners = new AttributeListener[0];
 	boolean valueAdjusting;
+	boolean locked;
 	
 	Attribute(java.lang.String name) {
 		this.name = name;
@@ -57,6 +58,14 @@ public abstract class Attribute {
 	
 	public boolean isKeyed() {
 		return false;
+	}
+	
+	public boolean isLocked() {
+		return locked;
+	}
+	
+	public void setLocked(boolean lock) {
+		locked = lock;
 	}
 	
 	/**
@@ -337,6 +346,10 @@ public abstract class Attribute {
 			}
 		}
 		
+		public Class<? extends javax.vecmath.Tuple3d> getTupleClass() {
+			return tuple.getClass();
+		}
+		
 		public T get() {
 			return tuple;
 		}
@@ -361,6 +374,19 @@ public abstract class Attribute {
 				tuple.set(x.get(), y.get(), z.get());
 				fireAttributeChanged();
 			}
+		}
+	}
+	
+	public static class Rotation extends Tuple<jpatch.auxilary.Rotation3d> {
+		public Attribute.Enum order = new Attribute.Enum("Rotation Order", get().order);
+		
+		public Rotation(java.lang.String name, jpatch.auxilary.Rotation3d rotation, boolean keyable) {
+			super(name, rotation, keyable);
+			order.addAttributeListener(new AttributeListener() {
+				public void attributeChanged(Attribute attribute) {
+					fireAttributeChanged();
+				}
+			});
 		}
 	}
 	
