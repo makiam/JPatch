@@ -40,18 +40,22 @@ public class VcrControls extends JToolBar {
 	private PlayThread playThread;
 	
 	public VcrControls() {
+		buttonPause.setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_22x22/animation-stop-selected.png")));
+		buttonPlay.setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_22x22/animation-play-selected.png")));
+		buttonPlayRev.setSelectedIcon(new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_22x22/animation-play-backward-selected.png")));
+		
 		setFloatable(false);
 		setOpaque(false);
 		setBorder(null);
 //		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		add(buttonToStart);
-		add(buttonFastRev);
+//		add(buttonFastRev);
 		add(buttonPlayRev);
-		add(buttonSlowBack);
+//		add(buttonSlowBack);
 		add(buttonPause);
-		add(buttonSlowForward);
+//		add(buttonSlowForward);
 		add(buttonPlay);
-		add(buttonFastForward);
+//		add(buttonFastForward);
 		add(buttonToEnd);
 		add(new JSeparator());
 		add(textTime);
@@ -129,7 +133,7 @@ public class VcrControls extends JToolBar {
 	
 	private static JToggleButton createToggleButton(Action action, ButtonGroup bg) {
 		JToggleButton button = new JToggleButton(action);
-		button.setPreferredSize(new Dimension(23, 23));
+		button.setPreferredSize(new Dimension(26, 26));
 //		button.setFocusable(false);
 		bg.add(button);
 		return button;
@@ -137,7 +141,7 @@ public class VcrControls extends JToolBar {
 	
 	private static JButton createButton(Action action) {
 		JButton button = new JButton(action);
-		button.setPreferredSize(new Dimension(23, 23));
+		button.setPreferredSize(new Dimension(26, 26));
 //		button.setFocusable(false);
 		return button;
 	}
@@ -184,7 +188,7 @@ public class VcrControls extends JToolBar {
 		 */
 		private static final long serialVersionUID = 1L;
 		PlayAction() {
-			super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/anim/play.png")));
+			super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_22x22/animation-play.png")));
 			putValue(Action.SHORT_DESCRIPTION,"Play");
 		}
 		public void actionPerformed(ActionEvent e) {
@@ -207,7 +211,7 @@ public class VcrControls extends JToolBar {
 		 */
 		private static final long serialVersionUID = 1L;
 		PlayBackwardAction() {
-			super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/anim/play_rev.png")));
+			super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_22x22/animation-play-backward.png")));
 			putValue(Action.SHORT_DESCRIPTION,"Play reverse");
 		}
 		public void actionPerformed(ActionEvent e) {
@@ -322,7 +326,7 @@ public class VcrControls extends JToolBar {
 		 */
 		private static final long serialVersionUID = 7458944508970534077L;
 		StopAction() {
-			super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/anim/pause.png")));
+			super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_22x22/animation-stop.png")));
 			putValue(Action.SHORT_DESCRIPTION,"Stop");
 		}
 		public void actionPerformed(ActionEvent e) {
@@ -339,7 +343,7 @@ public class VcrControls extends JToolBar {
 		 */
 		private static final long serialVersionUID = 1L;
 		PrevFrameAction() {
-			super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/anim/prev_frame.png")));
+			super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_22x22/animation-previous-frame.png")));
 			putValue(Action.SHORT_DESCRIPTION,"Go to previous frame");
 		}
 		public void actionPerformed(ActionEvent e) {
@@ -364,7 +368,7 @@ public class VcrControls extends JToolBar {
 		 */
 		private static final long serialVersionUID = 1L;
 		NextFrameAction() {
-			super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/anim/next_frame.png")));
+			super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_22x22/animation-next-frame.png")));
 			putValue(Action.SHORT_DESCRIPTION,"Go to next frame");
 		}
 		public void actionPerformed(ActionEvent e) {
@@ -476,7 +480,7 @@ public class VcrControls extends JToolBar {
 		 */
 		private static final long serialVersionUID = 1L;
 		ToStartAction() {
-			super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/anim/to_start.png")));
+			super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_22x22/animation-to-start.png")));
 			putValue(Action.SHORT_DESCRIPTION,"Go to start");
 		}
 		public void actionPerformed(ActionEvent e) {
@@ -497,7 +501,7 @@ public class VcrControls extends JToolBar {
 		 */
 		private static final long serialVersionUID = 1L;
 		ToEndAction() {
-			super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/anim/to_end.png")));
+			super("",new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_22x22/animation-to-end.png")));
 			putValue(Action.SHORT_DESCRIPTION,"Go to end");
 		}
 		public void actionPerformed(ActionEvent e) {

@@ -38,9 +38,8 @@ public class TransformNode implements JPatchObject {
 	public Attribute.KeyedBoolean visibility = new Attribute.KeyedBoolean("Visibility", true);
 	public Attribute.Tuple<Point3d> position = new Attribute.Tuple<Point3d>("Position", new Point3d(0, 0, 0), false);
 	public Attribute.Tuple<Vector3d> translation = new Attribute.Tuple<Vector3d>("Translation", new Vector3d(0, 0, 0), true);
-	public Attribute.Tuple<Rotation3d> orientation = new Attribute.Tuple<Rotation3d>("Orientation", new Rotation3d(0, 0, 0), false);
-	public Attribute.Tuple<Rotation3d> rotation = new Attribute.Tuple<Rotation3d>("Rotation", new Rotation3d(0, 0, 0), true);
-	public Attribute.Enum rotationOrder = new Attribute.Enum("Rotation Order", rotation.get().order);
+	public Attribute.Rotation orientation = new Attribute.Rotation("Orientation", new Rotation3d(0, 0, 0), false);
+	public Attribute.Rotation rotation = new Attribute.Rotation("Rotation", new Rotation3d(0, 0, 0), true);
 	public Attribute.Tuple<Scale3d> scale = new Attribute.Tuple<Scale3d>("Scale", new Scale3d(1, 1, 1), true);
 	public Attribute.Tuple<Point3d> scalePivotPosition = new Attribute.Tuple<Point3d>("ScalePivotPosition", new Point3d(0, 0, 0), false);
 	public Attribute.Tuple<Vector3d> scalePivotTranslation = new Attribute.Tuple<Vector3d>("ScalePivotTranslation", new Vector3d(0, 0, 0), false);
@@ -203,6 +202,12 @@ public class TransformNode implements JPatchObject {
 	
 	@SuppressWarnings("unchecked")
 	private void addAttributeChangeListeners() {
+		rotation.order.addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				orientation.order.set(rotation.order.get());
+			}
+		});
+		
 		position.addAttributeListener(new AttributeListener() {
 			public void attributeChanged(Attribute attribute) {
 				positionChanged(position, translation);

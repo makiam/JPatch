@@ -57,7 +57,7 @@ public class TransformNodeAttributeEditor extends JPanel {
 		addTuple(transformNode.translation);
 		addTuple(transformNode.orientation);
 		addTuple(transformNode.rotation);
-		addScalar(transformNode.rotationOrder);
+		addScalar(transformNode.rotation.order);
 		addTuple(transformNode.scale);
 		addTuple(transformNode.rotatePivotPosition);
 		addTuple(transformNode.rotatePivotTranslation);
