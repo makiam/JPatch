@@ -83,6 +83,7 @@ public class AttributeUiHelper {
 		final JCheckBox checkBox = new JCheckBox();
 		checkBox.setSelected(attrBool.get());
 		checkBox.setToolTipText(attribute.getName());
+		checkBox.setOpaque(false);
 		
 		/* create a ChangeListener to update the attribute if the slider was changed */
 		checkBox.addActionListener(new ActionListener() {

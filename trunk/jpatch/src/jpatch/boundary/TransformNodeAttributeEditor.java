@@ -24,6 +24,7 @@ package jpatch.boundary;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -57,7 +58,7 @@ public class TransformNodeAttributeEditor extends JPanel {
 		addTuple(transformNode.translation);
 		addTuple(transformNode.orientation);
 		addTuple(transformNode.rotation);
-		addScalar(transformNode.rotation.order);
+//		addScalar(transformNode.rotation.order);
 		addTuple(transformNode.scale);
 		addTuple(transformNode.rotatePivotPosition);
 		addTuple(transformNode.rotatePivotTranslation);
@@ -73,6 +74,12 @@ public class TransformNodeAttributeEditor extends JPanel {
 		addLimit(transformNode.scale.y);
 		addLimit(transformNode.scale.z);
 	}
+	
+	public void paintComponent(Graphics g) {
+		Graphics2D g2 = (Graphics2D) g;
+		g2.setPaint(new GradientPaint(0, 0, new Color(0xeeeeee), 0, getHeight(), new Color(0xcccccc)));
+		g2.fill(g.getClip());
+	};
 	
 	private void addScalar(Attribute a) {
 		gbc.anchor = GridBagConstraints.EAST;
@@ -96,7 +103,7 @@ public class TransformNodeAttributeEditor extends JPanel {
 		gbc.gridy++;
 	}
 	
-	private void addTuple(Attribute.Tuple a) {
+	private void addTuple(Attribute.Tuple3d a) {
 		JComponent component;
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.gridx = 0;
@@ -110,11 +117,11 @@ public class TransformNodeAttributeEditor extends JPanel {
 		keyX.setEnabled(a.isKeyable());
 		keyY.setEnabled(a.isKeyable());
 		keyZ.setEnabled(a.isKeyable());
-		box.add(keyX);
+//		box.add(keyX);
 		box.add(AttributeUiHelper.createTextFieldFor(a.x));
-		box.add(keyY);
+//		box.add(keyY);
 		box.add(AttributeUiHelper.createTextFieldFor(a.y));
-		box.add(keyZ);
+//		box.add(keyZ);
 		box.add(AttributeUiHelper.createTextFieldFor(a.z));
 		add(box, gbc);
 		gbc.fill = GridBagConstraints.NONE;
