@@ -22,9 +22,6 @@
 package jpatch.entity;
 
 import javax.swing.event.*;
-import javax.vecmath.Tuple3d;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
 
 /**
  * @author sascha
@@ -123,11 +120,11 @@ public abstract class Attribute {
      * @see #addChangeListener
      * @see EventListenerList
      */
-    protected void fireAttributeChanged() {
+    final void fireAttributeChanged() {
     	valueAdjusting = true;
 	    for (int i = attributeListeners.length - 1; i >= 0; i--) {
 	      	attributeListeners[i].attributeChanged(this);
-	      	System.out.println(this + " " + i + " " + attributeListeners[i]);
+	      	System.out.println("fire " + this + " " + i + " " + attributeListeners[i]);
 	    }
 	    valueAdjusting = false;
     }   
@@ -324,20 +321,19 @@ public abstract class Attribute {
 		}
 	}
 
-	public static class Tuple<T extends Tuple3d> extends Attribute implements AttributeListener {
+	public static abstract class Tuple3d extends Attribute implements AttributeListener {
 		public BoundedDouble x, y, z;
-		private T tuple;
 		private boolean keyable;
 		
-		public Tuple(java.lang.String name, T tuple, boolean keyable) {
+		public Tuple3d(java.lang.String name, javax.vecmath.Tuple3d tuple, boolean keyable) {
 			super(name);
 			x = new BoundedDouble(name + ".X");
 			y = new BoundedDouble(name + ".Y");
 			z = new BoundedDouble(name + ".Z");
+			set(tuple);
 			x.addAttributeListener(this);
 			y.addAttributeListener(this);
 			z.addAttributeListener(this);
-			this.tuple = tuple;
 			this.keyable = keyable;
 			if (keyable) {
 				x.keyed.set(true);
@@ -346,22 +342,24 @@ public abstract class Attribute {
 			}
 		}
 		
-		public Class<? extends javax.vecmath.Tuple3d> getTupleClass() {
-			return tuple.getClass();
+		public void get(javax.vecmath.Tuple3d tuple) {
+			tuple.x = x.get();
+			tuple.y = y.get();
+			tuple.z = z.get();
 		}
 		
-		public T get() {
-			return tuple;
-		}
-		
-		public void set(Tuple3d v) {
-			set(v.x, v.y, v.z);
+		public void set(javax.vecmath.Tuple3d tuple) {
+			set(tuple.x, tuple.y, tuple.z);
 		}
 		
 		public void set(double x, double y, double z) {
-			this.x.set(x);
-			this.y.set(y);
-			this.z.set(z);
+			if (!valueAdjusting) {
+				valueAdjusting = true;
+				this.x.set(x);
+				this.y.set(y);
+				this.z.set(z);
+				fireAttributeChanged();
+			}
 		}
 
 		@Override
@@ -370,23 +368,64 @@ public abstract class Attribute {
 		}
 		
 		public void attributeChanged(Attribute attribute) {
-			if (tuple.x != x.get() || tuple.y != y.get() || tuple.z != z.get()) {
-				tuple.set(x.get(), y.get(), z.get());
+			if (!valueAdjusting)
 				fireAttributeChanged();
-			}
 		}
 	}
 	
-	public static class Rotation extends Tuple<jpatch.auxilary.Rotation3d> {
-		public Attribute.Enum order = new Attribute.Enum("Rotation Order", get().order);
+	public static class Point3d extends Tuple3d {
+		public Point3d(java.lang.String name, javax.vecmath.Point3d point, boolean keyable) {
+			super(name, point, keyable);
+		}
 		
-		public Rotation(java.lang.String name, jpatch.auxilary.Rotation3d rotation, boolean keyable) {
+		public void get(javax.vecmath.Point3d point) {
+			super.get(point);
+		}
+		
+		public void set(javax.vecmath.Point3d point) {
+			super.set(point.x, point.y, point.z);
+		}
+	}
+	
+	public static class Vector3d extends Tuple3d {
+		public Vector3d(java.lang.String name, javax.vecmath.Vector3d vector, boolean keyable) {
+			super(name, vector, keyable);
+		}
+		
+		public void get(javax.vecmath.Vector3d vector) {
+			super.get(vector);
+		}
+		
+		public void set(javax.vecmath.Vector3d vector) {
+			super.set(vector.x, vector.y, vector.z);
+		}
+	}
+	
+	public static class Rotation3d extends Tuple3d {
+		public Rotation3d(java.lang.String name, jpatch.auxilary.Rotation3d rotation, boolean keyable) {
 			super(name, rotation, keyable);
-			order.addAttributeListener(new AttributeListener() {
-				public void attributeChanged(Attribute attribute) {
-					fireAttributeChanged();
-				}
-			});
+		}
+		
+		public void get(jpatch.auxilary.Rotation3d rotation) {
+			super.get(rotation);
+		}
+		
+		public void set(jpatch.auxilary.Rotation3d rotation) {
+			super.set(rotation.x, rotation.y, rotation.z);
+		}
+	}
+	
+	public static class Scale3d extends Tuple3d {
+		public Scale3d(java.lang.String name, jpatch.auxilary.Scale3d scale, boolean keyable) {
+			super(name, scale, keyable);
+		}
+		
+		public void get(jpatch.auxilary.Scale3d scale) {
+			super.get(scale);
+		}
+		
+		public void set(jpatch.auxilary.Scale3d scale) {
+			super.set(scale.x, scale.y, scale.z);
 		}
 	}
 	
