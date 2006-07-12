@@ -2,6 +2,7 @@ package jpatch.boundary;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.*;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -16,6 +17,8 @@ public class AttributeUiHelper {
 	private static final DecimalFormat INT_FORMAT = new DecimalFormat("0", new DecimalFormatSymbols(Locale.ENGLISH));
 	private static final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("0.000", new DecimalFormatSymbols(Locale.ENGLISH));
 	private static final int COLUMNS = 6;
+	private static final Font staticFont = new JTextField().getFont();
+	private static final Font keyedFont = staticFont.deriveFont(Font.BOLD);
 	
 	static JLabel getLabelFor(Attribute attribute) {
 		return new JLabel(attribute.getName());
@@ -43,8 +46,8 @@ public class AttributeUiHelper {
 					((Attribute.BoundedInteger) attribute).set(slider.getValue());
 				} else if (attribute instanceof Attribute.BoundedDouble) {
 					Attribute.BoundedDouble bdAttr = ((Attribute.BoundedDouble) attribute);
-					double min = bdAttr.getMin().get();
-					double max = bdAttr.getMax().get();
+					double min = bdAttr.min.get();
+					double max = bdAttr.max.get();
 					bdAttr.set(min + slider.getValue() * (max - min) / (slider.getMaximum() - slider.getMinimum()));
 				} else {
 					throw new IllegalStateException();
@@ -115,7 +118,10 @@ public class AttributeUiHelper {
 	}
 	
 	public static JTextField createTextFieldFor(final Attribute attribute) {
-		final JTextField textField = new JTextField(COLUMNS);
+		final JTextField textField = new JTextField();
+		Dimension dim = textField.getPreferredSize();
+		dim.width = 70;
+		textField.setPreferredSize(dim);
 		textField.setToolTipText(attribute.getName());
 		
 		if (attribute instanceof Attribute.Integer) {
@@ -130,14 +136,36 @@ public class AttributeUiHelper {
 			throw new IllegalStateException();
 		}
 		
+		if (attribute instanceof Attribute.Limit) {
+			textField.setEditable(((Attribute.Limit) attribute).enabled.get());
+			((Attribute.Limit) attribute).enabled.addAttributeListener(new AttributeListener() {
+				public void attributeChanged(Attribute attribute) {
+					textField.setEditable(((Attribute.Boolean) attribute).get());
+				}
+			});
+		} else if (attribute instanceof Attribute.BoundedDouble) {
+			textField.setEditable(!((Attribute.BoundedDouble) attribute).locked.get());
+			((Attribute.BoundedDouble) attribute).locked.addAttributeListener(new AttributeListener() {
+				public void attributeChanged(Attribute attribute) {
+					textField.setEditable(!((Attribute.Boolean) attribute).get());
+				}
+			});
+			textField.setFont(((Attribute.BoundedDouble) attribute).keyed.get() ? keyedFont : staticFont);
+			((Attribute.BoundedDouble) attribute).keyed.addAttributeListener(new AttributeListener() {
+				public void attributeChanged(Attribute attribute) {
+					textField.setFont(((Attribute.Boolean) attribute).get() ? keyedFont : staticFont);
+				}
+			});
+		}
+		
 		/* add a FocusListener to verify the text and update the attribute or revert back to the old value */
 		textField.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				if (!verifyTextField(textField, attribute)) {
-					setTextFieldValue(textField, attribute);
-				}
-				textField.setBackground(Color.WHITE);
+				verifyTextField(textField, attribute);
+				setTextFieldValue(textField, attribute);
+//				}
+//				textField.setBackground(Color.WHITE);
 //				attribute.commitModification();
 			}
 		});
@@ -147,7 +175,8 @@ public class AttributeUiHelper {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("action");
 				if (!verifyTextField(textField, attribute))
-					textField.setBackground(Color.YELLOW);
+					;
+//					textField.setBackground(Color.YELLOW);
 				else
 					((JComponent) e.getSource()).transferFocus();
 			}
@@ -214,8 +243,8 @@ public class AttributeUiHelper {
 			slider.setValue(((Attribute.Integer) attribute).get());
 		} else if (attribute instanceof Attribute.BoundedDouble) {
 			Attribute.BoundedDouble bdAttr = (Attribute.BoundedDouble) attribute;
-			double min = bdAttr.getMin().get();
-			double max = bdAttr.getMax().get();
+			double min = bdAttr.min.get();
+			double max = bdAttr.max.get();
 			double value = bdAttr.get();
 			slider.setValue((int) ((value - min) / (max - min) * (slider.getMaximum() - slider.getMinimum())));
 		} else {
@@ -252,8 +281,8 @@ public class AttributeUiHelper {
 			} else if (attribute instanceof Attribute.Double) {
 				double d = Double.parseDouble(textField.getText());
 				if (attribute instanceof Attribute.BoundedDouble) {
-					Attribute.Limit min = ((Attribute.BoundedDouble) attribute).getMin();
-					Attribute.Limit max = ((Attribute.BoundedDouble) attribute).getMax();
+					Attribute.Limit min = ((Attribute.BoundedDouble) attribute).min;
+					Attribute.Limit max = ((Attribute.BoundedDouble) attribute).max;
 					if (min.getEnableAttribute().get() && d < min.get())
 						return false;
 					if (max.getEnableAttribute().get() && d > max.get())

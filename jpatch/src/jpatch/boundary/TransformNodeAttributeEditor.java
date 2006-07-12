@@ -23,12 +23,14 @@ package jpatch.boundary;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
@@ -36,58 +38,68 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
+import jpatch.boundary.ui.ExpandableForm;
+import jpatch.boundary.ui.ExpandableFormContainer;
+import jpatch.boundary.ui.ExpandableFormRow;
 import jpatch.entity.*;
 /**
  * @author sascha
  *
  */
-public class TransformNodeAttributeEditor extends JPanel {
+public class TransformNodeAttributeEditor extends ExpandableFormContainer {
 	private TransformNode transformNode;
-	private GridBagConstraints gbc = new GridBagConstraints();
 	
 	public TransformNodeAttributeEditor(TransformNode transformNode) {
 		this.transformNode = transformNode;
-		setLayout(new GridBagLayout());
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.ipadx = 5;
+		ExpandableForm defaultForm = new ExpandableForm(true);
+		ExpandableForm translationForm = new ExpandableForm();
+		ExpandableForm positionForm = new ExpandableForm();
+		ExpandableForm rotationForm = new ExpandableForm();
+		ExpandableForm orientationForm = new ExpandableForm();
+		ExpandableForm scaleForm = new ExpandableForm();
+		ExpandableForm shearForm = new ExpandableForm();
 		
-		addScalar(transformNode.name);
-		addScalar(transformNode.visibility);
-		addTuple(transformNode.position);
-		addTuple(transformNode.translation);
-		addTuple(transformNode.orientation);
-		addTuple(transformNode.rotation);
+		addScalar(defaultForm, transformNode.name);
+		addScalar(defaultForm, transformNode.visibility);
+		addTuple(translationForm, transformNode.translation);
+		addLimit(translationForm, transformNode.translation);
+		addTuple(positionForm, transformNode.position);
+		addTuple(rotationForm, transformNode.rotation);
+		addTuple(orientationForm, transformNode.orientation);
+		
 //		addScalar(transformNode.rotation.order);
-		addTuple(transformNode.scale);
-		addTuple(transformNode.rotatePivotPosition);
-		addTuple(transformNode.rotatePivotTranslation);
-		addTuple(transformNode.scalePivotPosition);
-		addTuple(transformNode.scalePivotTranslation);
-		addLimit(transformNode.translation.x);
-		addLimit(transformNode.translation.y);
-		addLimit(transformNode.translation.z);
-		addLimit(transformNode.rotation.x);
-		addLimit(transformNode.rotation.y);
-		addLimit(transformNode.rotation.z);
-		addLimit(transformNode.scale.x);
-		addLimit(transformNode.scale.y);
-		addLimit(transformNode.scale.z);
+		addTuple(scaleForm, transformNode.scale);
+//		addTuple(shear, transformNode.scale);
+//		addTuple(transformNode.rotatePivotPosition);
+//		addTuple(transformNode.rotatePivotTranslation);
+//		addTuple(transformNode.scalePivotPosition);
+//		addTuple(transformNode.scalePivotTranslation);
+//		addLimit(transformNode.translation.x);
+//		addLimit(transformNode.translation.y);
+//		addLimit(transformNode.translation.z);
+//		addLimit(transformNode.rotation.x);
+//		addLimit(transformNode.rotation.y);
+//		addLimit(transformNode.rotation.z);
+//		addLimit(transformNode.scale.x);
+//		addLimit(transformNode.scale.y);
+//		addLimit(transformNode.scale.z);
+		
+		add(defaultForm);
+		add(translationForm);
+		add(positionForm);
+		add(rotationForm);
+		add(orientationForm);
+		add(scaleForm);
 	}
 	
-	public void paintComponent(Graphics g) {
-		Graphics2D g2 = (Graphics2D) g;
-		g2.setPaint(new GradientPaint(0, 0, new Color(0xeeeeee), 0, getHeight(), new Color(0xcccccc)));
-		g2.fill(g.getClip());
-	};
+//	public void paintComponent(Graphics g) {
+//		Graphics2D g2 = (Graphics2D) g;
+//		g2.setPaint(new GradientPaint(0, 0, new Color(0xeeeeee), 0, getHeight(), new Color(0xcccccc)));
+//		g2.fill(g.getClip());
+//	};
 	
-	private void addScalar(Attribute a) {
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.gridx = 0;
-		add(new JLabel(a.getName()), gbc);
-		gbc.anchor = GridBagConstraints.WEST;
-		
-		gbc.gridx = 1;
+	private void addScalar(Container c, Attribute a) {
+		c.add(new JLabel(a.getName()));
 		Box box = Box.createHorizontalBox();
 		if (a instanceof Attribute.Boolean) {
 			box.add(AttributeUiHelper.createCheckBoxFor(a));
@@ -95,93 +107,158 @@ public class TransformNodeAttributeEditor extends JPanel {
 			box.add(AttributeUiHelper.createComboBoxFor(a));
 		} else {
 			box.add(AttributeUiHelper.createTextFieldFor(a));
-			gbc.fill = GridBagConstraints.HORIZONTAL;
 		}
-		add(box, gbc);
-		gbc.gridwidth = 1;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.gridy++;
+		c.add(box);
 	}
 	
-	private void addTuple(Attribute.Tuple3d a) {
+	private void addTuple(Container c, Attribute.Tuple3d a) {
 		JComponent component;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.gridx = 0;
-		add(new JLabel(a.getName()), gbc);
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.gridx = 1;
-		Box box = Box.createHorizontalBox();
+		c.add(new JLabel(a.getName()));
+		JComponent box = new ExpandableFormRow();
+		box.setOpaque(false);
 		JCheckBox keyX = AttributeUiHelper.createCheckBoxFor(a.x.keyed);
 		JCheckBox keyY = AttributeUiHelper.createCheckBoxFor(a.y.keyed);
 		JCheckBox keyZ = AttributeUiHelper.createCheckBoxFor(a.z.keyed);
+		JCheckBox lockX = AttributeUiHelper.createCheckBoxFor(a.x.locked);
+		JCheckBox lockY = AttributeUiHelper.createCheckBoxFor(a.y.locked);
+		JCheckBox lockZ = AttributeUiHelper.createCheckBoxFor(a.z.locked);
 		keyX.setEnabled(a.isKeyable());
 		keyY.setEnabled(a.isKeyable());
 		keyZ.setEnabled(a.isKeyable());
-//		box.add(keyX);
+
 		box.add(AttributeUiHelper.createTextFieldFor(a.x));
-//		box.add(keyY);
 		box.add(AttributeUiHelper.createTextFieldFor(a.y));
-//		box.add(keyZ);
 		box.add(AttributeUiHelper.createTextFieldFor(a.z));
-		add(box, gbc);
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.gridy++;
+		c.add(box);
+
+		if (!a.isKeyable())
+			return;
+		
+		c.add(new JLabel("keyed"));
+		box = new ExpandableFormRow();
+		box.setOpaque(false);
+		box.add(keyX);
+		box.add(keyY);
+		box.add(keyZ);
+		c.add(box);
+		
+		c.add(new JLabel("locked"));
+		box = new ExpandableFormRow();
+		box.setOpaque(false);
+		box.add(lockX);
+		box.add(lockY);
+		box.add(lockZ);
+		c.add(box);
 	}
 	
-	private void addLimit(final Attribute.BoundedDouble a) {
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.gridx = 0;
-		add(new JLabel(a.getName() + " Limits"), gbc);
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridx = 1;
-		Box box = Box.createHorizontalBox();
-		JButton toMinButton = new JButton(createIcon(1, Color.BLACK));
-		toMinButton.setRolloverIcon(createIcon(1, Color.LIGHT_GRAY));
-		toMinButton.setPressedIcon(createIcon(1, Color.BLACK));
-		toMinButton.setContentAreaFilled(false);
-		toMinButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		toMinButton.setToolTipText("Copy current value to lower limit");
-		JButton toMaxButton = new JButton(createIcon(0, Color.BLACK));
-		toMaxButton.setRolloverIcon(createIcon(0, Color.LIGHT_GRAY));
-		toMaxButton.setPressedIcon(createIcon(0, Color.BLACK));
-		toMaxButton.setContentAreaFilled(false);
-		toMaxButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		toMaxButton.setToolTipText("Copy current value to upper limit");
-		final JTextField minTextField = AttributeUiHelper.createTextFieldFor(a.min);
-		final JTextField maxTextField = AttributeUiHelper.createTextFieldFor(a.max);
-		minTextField.setEnabled(a.min.enabled.get());
-		maxTextField.setEnabled(a.max.enabled.get());
-		toMinButton.addActionListener(new ActionListener() {
+	private void addLimit(Container c, final Attribute.Tuple3d a) {
+		c.add(new JLabel("Minimum"));
+		JComponent box = new ExpandableFormRow();
+		box.setOpaque(false);
+		JTextField minX = AttributeUiHelper.createTextFieldFor(a.x.min);
+		JTextField minY = AttributeUiHelper.createTextFieldFor(a.y.min);
+		JTextField minZ = AttributeUiHelper.createTextFieldFor(a.z.min);
+		JTextField maxX = AttributeUiHelper.createTextFieldFor(a.x.max);
+		JTextField maxY = AttributeUiHelper.createTextFieldFor(a.y.max);
+		JTextField maxZ = AttributeUiHelper.createTextFieldFor(a.z.max);
+		
+		box.add(minX);
+		box.add(minY);
+		box.add(minZ);
+		c.add(box);
+		
+		c.add(new JLabel("Enable min"));
+		box = new ExpandableFormRow();
+		box.setOpaque(false);
+		box.add(AttributeUiHelper.createCheckBoxFor(a.x.min.enabled));
+		box.add(AttributeUiHelper.createCheckBoxFor(a.y.min.enabled));
+		box.add(AttributeUiHelper.createCheckBoxFor(a.z.min.enabled));
+		c.add(box);
+		
+		c.add(new JLabel("Set min"));
+		box = new ExpandableFormRow();
+		box.setOpaque(false);
+		JButton button;
+		
+		Insets insets = new Insets(0, 4, 0, 4);
+		button = new JButton("set");
+		button.setMargin(insets);
+		button.setToolTipText("Set x.min to current x value");
+		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				a.min.set(a.get());
+				a.x.min.set(a.x.get());
 			}
 		});
-		toMaxButton.addActionListener(new ActionListener() {
+		box.add(button);
+		button = new JButton("set");
+		button.setMargin(insets);
+		button.setToolTipText("Set y.min to current y value");
+		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				a.max.set(a.get());
+				a.y.min.set(a.y.get());
 			}
 		});
-		a.min.enabled.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				minTextField.setEnabled(a.min.enabled.get());
+		box.add(button);
+		button = new JButton("set");
+		button.setMargin(insets);
+		button.setToolTipText("Set z.min to current z value");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				a.z.min.set(a.z.get());
 			}
 		});
-		a.max.enabled.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
-				maxTextField.setEnabled(a.max.enabled.get());
+		box.add(button);
+		c.add(box);
+		
+		c.add(new JLabel("Maximum"));
+		box = new ExpandableFormRow();
+		box.setOpaque(false);
+		box.add(AttributeUiHelper.createTextFieldFor(a.x.max));
+		box.add(AttributeUiHelper.createTextFieldFor(a.y.max));
+		box.add(AttributeUiHelper.createTextFieldFor(a.z.max));
+		c.add(box);
+		
+		c.add(new JLabel("Enable max"));
+		box = new ExpandableFormRow();
+		box.setOpaque(false);
+		box.add(AttributeUiHelper.createCheckBoxFor(a.x.max.enabled));
+		box.add(AttributeUiHelper.createCheckBoxFor(a.y.max.enabled));
+		box.add(AttributeUiHelper.createCheckBoxFor(a.z.max.enabled));
+		c.add(box);
+		
+		c.add(new JLabel("Set max"));
+		box = new ExpandableFormRow();
+		box.setOpaque(false);
+		
+		button = new JButton("set");
+		button.setMargin(insets);
+		button.setToolTipText("Set x.min to current x value");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				a.x.max.set(a.x.get());
 			}
 		});
-		box.add(AttributeUiHelper.createCheckBoxFor(a.min.enabled));
-		box.add(minTextField);
-		box.add(toMinButton);
-		box.add(AttributeUiHelper.createTextFieldFor(a));
-		box.add(toMaxButton);
-		box.add(maxTextField);
-		box.add(AttributeUiHelper.createCheckBoxFor(a.max.enabled));
-		add(box, gbc);
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.gridy++;
+		box.add(button);
+		button = new JButton("set");
+		button.setMargin(insets);
+		button.setToolTipText("Set y.min to current y value");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				a.y.max.set(a.y.get());
+			}
+		});
+		box.add(button);
+		button = new JButton("set");
+		button.setMargin(insets);
+		button.setToolTipText("Set z.min to current z value");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				a.z.max.set(a.z.get());
+			}
+		});
+		box.add(button);
+		c.add(box);
+		
 	}
 //	private void addLimitLine(String name, Attribute x, Attribute y, Attribute z) {
 //		gbc.anchor = GridBagConstraints.EAST;
