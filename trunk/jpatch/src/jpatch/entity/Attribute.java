@@ -263,6 +263,7 @@ public abstract class Attribute {
 	public static class BoundedDouble extends Double implements AttributeListener {
 		public Limit min, max;
 		public Boolean keyed;
+		public Boolean locked;
 		private MotionCurveNew motionCurve;
 
 		public BoundedDouble(java.lang.String name) {
@@ -270,6 +271,7 @@ public abstract class Attribute {
 			min = new Limit(this, "lower limit");
 			max = new Limit(this, "upper limit");
 			keyed = new Boolean(name + " keyed");
+			locked = new Boolean(name + " locked");
 		}
 		
 		public BoundedDouble(java.lang.String name, double value) {
@@ -284,14 +286,6 @@ public abstract class Attribute {
 			if (max.enabled.get() && newValue > max.get())
 				newValue = max.get();
 			super.set(newValue);
-		}
-	
-		public Limit getMin() {
-			return min;
-		}
-		
-		public Limit getMax() {
-			return max;
 		}
 		
 		public MotionCurveNew getMotionCurve() {
@@ -454,10 +448,10 @@ public abstract class Attribute {
 		public KeyedBoolean(java.lang.String name) {
 			super(name);
 			doubleAttribute = new Attribute.BoundedDouble(name);
-			doubleAttribute.getMin().enabled.set(true);
-			doubleAttribute.getMin().set(0);
-			doubleAttribute.getMax().enabled.set(true);
-			doubleAttribute.getMax().set(1);
+			doubleAttribute.min.enabled.set(true);
+			doubleAttribute.max.set(0);
+			doubleAttribute.min.enabled.set(true);
+			doubleAttribute.max.set(1);
 		}
 		
 		public KeyedBoolean(java.lang.String name, boolean value) {
