@@ -27,11 +27,14 @@ public class AttributeUiTest {
 		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		TransformNode tn1 = new TransformNode();
+		tn1.name.set("Transformnode 1");
 		TransformNode tn2 = new TransformNode();
 		TransformNodeAttributeEditor tnae1 = new TransformNodeAttributeEditor(tn1);
 		TransformNodeAttributeEditor tnae2 = new TransformNodeAttributeEditor(tn2);
 		tn1.addChild(tn2);
-		frame1.add(new JScrollPane(tnae1, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
+		JScrollPane scrollPane = new JScrollPane(tnae1, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setBorder(BorderFactory.createTitledBorder("Attribute Editor"));
+		frame1.add(scrollPane);
 		frame2.add(new JScrollPane(tnae2));
 		frame1.pack();
 		frame2.pack();

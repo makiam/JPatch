@@ -19,6 +19,7 @@ public class AttributeUiHelper {
 	private static final int COLUMNS = 6;
 	private static final Font staticFont = new JTextField().getFont();
 	private static final Font keyedFont = staticFont.deriveFont(Font.BOLD);
+	private static final String[] OFF_ON = new String[] { "on", "off" };
 	
 	static JLabel getLabelFor(Attribute attribute) {
 		return new JLabel(attribute.getName());
@@ -77,6 +78,49 @@ public class AttributeUiHelper {
 		});
 
 		return slider;
+	}
+	
+	public static JComponent createBooleanComboFor(final Attribute attribute) {
+		final Attribute.KeyedBoolean attrkb = (Attribute.KeyedBoolean) attribute;
+		Box box = Box.createHorizontalBox();
+		
+		final JComboBox comboBox = new JComboBox(OFF_ON);
+		comboBox.setSelectedIndex(attrkb.get() ? 1 : 0);
+		
+		/* create a ChangeListener to update the attribute if the slider was changed */
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				attrkb.set(comboBox.getSelectedIndex() == 1);
+			}
+		});
+		
+		/* create a AttributeListener to update the CheckBox if the attribute changes */
+		final AttributeListener attributeListener = new AttributeListener() {
+			public void attributeChanged(Attribute a) {
+				comboBox.setSelectedIndex(attrkb.get() ? 1 : 0);
+			}
+		};
+		
+		/* add a HierarchyListener to add/remove the attributelistener if the component becomes showing */
+		comboBox.addHierarchyListener(new HierarchyListener() {
+			public void hierarchyChanged(HierarchyEvent e) {
+				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+					if (comboBox.isShowing())
+						attribute.addAttributeListener(attributeListener);
+					else
+						attribute.removeAttributeListener(attributeListener);
+				}
+			}
+		});
+		
+		box.add(comboBox);
+		box.add(Box.createHorizontalGlue());
+		box.add(new JLabel("keyed:"));
+		box.add(createCheckBoxFor(attrkb.keyed));
+		box.add(Box.createHorizontalGlue());
+		box.add(new JLabel("locked:"));
+		box.add(createCheckBoxFor(attrkb.locked));
+		return box;
 	}
 	
 	public static JCheckBox createCheckBoxFor(final Attribute attribute) {

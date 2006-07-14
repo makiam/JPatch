@@ -61,14 +61,24 @@ public class TransformNodeAttributeEditor extends ExpandableFormContainer {
 		
 		addScalar(defaultForm, transformNode.name);
 		addScalar(defaultForm, transformNode.visibility);
+		addScalar(defaultForm, transformNode.rotationOrder);
 		addTuple(translationForm, transformNode.translation);
 		addLimit(translationForm, transformNode.translation);
 		addTuple(positionForm, transformNode.position);
 		addTuple(rotationForm, transformNode.rotation);
+		addLimit(rotationForm, transformNode.rotation);
+		addTuple(rotationForm, transformNode.rotatePivotTranslation);
+		addTuple(rotationForm, transformNode.rotatePivotPosition);
+		
 		addTuple(orientationForm, transformNode.orientation);
 		
 //		addScalar(transformNode.rotation.order);
 		addTuple(scaleForm, transformNode.scale);
+//		addLimit(scaleForm, transformNode.scale);
+		addTuple(scaleForm, transformNode.scalePivotTranslation);
+		addTuple(scaleForm, transformNode.scalePivotPosition);
+		addTuple(shearForm, transformNode.shear);
+		
 //		addTuple(shear, transformNode.scale);
 //		addTuple(transformNode.rotatePivotPosition);
 //		addTuple(transformNode.rotatePivotTranslation);
@@ -90,6 +100,7 @@ public class TransformNodeAttributeEditor extends ExpandableFormContainer {
 		add(rotationForm);
 		add(orientationForm);
 		add(scaleForm);
+		add(shearForm);
 	}
 	
 //	public void paintComponent(Graphics g) {
@@ -101,7 +112,9 @@ public class TransformNodeAttributeEditor extends ExpandableFormContainer {
 	private void addScalar(Container c, Attribute a) {
 		c.add(new JLabel(a.getName()));
 		Box box = Box.createHorizontalBox();
-		if (a instanceof Attribute.Boolean) {
+		if (a instanceof Attribute.KeyedBoolean) {
+			box.add(AttributeUiHelper.createBooleanComboFor(a));
+		} else if (a instanceof Attribute.Boolean) {
 			box.add(AttributeUiHelper.createCheckBoxFor(a));
 		} else if (a instanceof Attribute.Enum) {
 			box.add(AttributeUiHelper.createComboBoxFor(a));
