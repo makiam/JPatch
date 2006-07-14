@@ -45,7 +45,8 @@ public class ExpandableForm extends JComponent {
 	private Dimension layoutSize = new Dimension();
 	private boolean expanded;
 	private boolean alwaysExpanded;
-	private Insets borderInsets = new Insets(6, 6, 6, 6);
+	private static Insets borderInsets = new Insets(2, 0, 3, 0);
+	private static Insets noBorderInsets = new Insets(2, 0, 0, 0);
 	
 	public ExpandableForm() {
 		this(false);
@@ -97,14 +98,14 @@ public class ExpandableForm extends JComponent {
 					component.setVisible(expanded || alwaysExpanded || y == insets.top || component == button);
 					Dimension size = component.getPreferredSize();
 					if (component instanceof JLabel) {
-						component.setBounds(insets.left + labelWidth - size.width, y + 2, size.width, size.height);
+						component.setBounds(labelWidth - size.width, y + 2, size.width, size.height);
 					} else if (component != button) {
-						component.setBounds(insets.left + labelWidth + 5, y, width - labelWidth - 26 - insets.left - insets.right, size.height);
+						component.setBounds(labelWidth + 5, y, fieldWidth, size.height);
 						if (expanded || alwaysExpanded || y == insets.top)
 							y += size.height;
 					}
 				}
-				button.setBounds(width - 18 - insets.right, insets.top, 16, 16);
+				button.setBounds(width - 18 - insets.right, insets.top + 1, 16, 16);
 				button.setVisible(parent.getComponentCount() > 3 && !alwaysExpanded);
 			}
 
@@ -141,25 +142,35 @@ public class ExpandableForm extends JComponent {
 				}
 				Insets insets = parent.getInsets();
 				layoutSize.height = y + insets.top + insets.bottom;
-				layoutSize.width = labelWidth + fieldWidth + 24 + insets.left + insets.right;
+				layoutSize.width = labelWidth + fieldWidth + 22;
 				return layoutSize;
 			}
 		});
 		
 		setBorder(new Border() {
 			public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-				Color topColor = modifiedColor(c.getBackground(), 16, 16, 16);
-				Color bottomColor = modifiedColor(c.getBackground(), -8, -8, -8);
-				Graphics2D g2 = (Graphics2D) g.create();
-				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				g2.setPaint(new GradientPaint(0, y + 2, topColor, 0, y + 20, bottomColor));
-				g2.fillRoundRect(x + 2, y + 2, width - 5, height - 5, 12, 12);
-				g2.setColor(c.getBackground().darker().darker());
-				g2.drawRoundRect(x + 2, y + 2, width - 5, height - 5, 12, 12);	
+//				Graphics2D g2 = (Graphics2D) g.create();
+//				Color topColor = c.getBackground();
+//				Color bottomColor = modifiedColor(topColor, -64, -64, -16);
+				
+				
+//				g2.fillRoundRect(x + 2, y + 2, width - 5, height - 5, 12, 12);
+				if (expanded) {
+					Graphics2D g2 = (Graphics2D) g.create();
+					g2.setPaint(new GradientPaint(x, y + 16, c.getBackground(), x, y + height, c.getBackground().darker().darker()));
+					g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//					g2.setColor(c.getBackground().darker());
+//					g2.fillRect(x + width - 18, y, 18, height);
+					g2.drawLine(x, y + height - 1, x + width - 13, y + height - 1);
+					
+//					g2.drawRoundRect(x + 1, y + 1, width - 3, height - 3, 8, 8);
+					g2.setClip(x + width - 13, y + 16, 13, height - 16);
+					g2.fillRoundRect(width - 26, y, 20, height, 12, 12);
+				}
 			}
 
 			public Insets getBorderInsets(Component c) {
-				return borderInsets;
+				return expanded ? borderInsets : noBorderInsets;
 			}
 
 			public boolean isBorderOpaque() {
