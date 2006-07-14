@@ -110,7 +110,7 @@ public class ExpandableFormContainer extends JComponent {
 						y += component.getPreferredSize().height;
 					}
 				}
-				layoutSize.width = labelWidth + fieldWidth + 36;
+				layoutSize.width = labelWidth + fieldWidth + 22;
 				layoutSize.height = y;
 				return layoutSize;
 			}
