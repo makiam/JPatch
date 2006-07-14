@@ -130,7 +130,7 @@ public abstract class Attribute {
     }   
     
 	public static class String extends Attribute {
-		private java.lang.String string;
+		private java.lang.String string = "";
 		private final boolean useTextArea = false;
 		
 		public String(java.lang.String name) {
@@ -262,8 +262,8 @@ public abstract class Attribute {
 	
 	public static class BoundedDouble extends Double implements AttributeListener {
 		public Limit min, max;
-		public Boolean keyed;
-		public Boolean locked;
+		public Attribute.Boolean keyed;
+		public Attribute.Boolean locked;
 		private MotionCurveNew motionCurve;
 
 		public BoundedDouble(java.lang.String name) {
@@ -444,7 +444,8 @@ public abstract class Attribute {
 	
 	public static class KeyedBoolean extends Boolean {
 		private final Attribute.BoundedDouble doubleAttribute;
-		
+		public Attribute.Boolean keyed;
+		public Attribute.Boolean locked;
 		public KeyedBoolean(java.lang.String name) {
 			super(name);
 			doubleAttribute = new Attribute.BoundedDouble(name);
@@ -452,6 +453,8 @@ public abstract class Attribute {
 			doubleAttribute.max.set(0);
 			doubleAttribute.min.enabled.set(true);
 			doubleAttribute.max.set(1);
+			keyed = doubleAttribute.keyed;
+			locked = doubleAttribute.locked;
 		}
 		
 		public KeyedBoolean(java.lang.String name, boolean value) {
