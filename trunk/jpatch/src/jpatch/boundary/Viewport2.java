@@ -306,7 +306,7 @@ public class Viewport2 {
 	private Color3f solidColor = new Color3f();
 	private Color4f solidColor4 = new Color4f();
 	
-	private void drawBones(Model model) {
+	private void drawBones(OLDModel model) {
 		for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
 			Bone bone = (Bone) it.next();
 			boneRenderer.drawBone(drawable, viewDef, bone);
@@ -342,7 +342,7 @@ public class Viewport2 {
 		}
 	}
 	
-	public void drawModel(Model model, Selection selection) {
+	public void drawModel(OLDModel model, Selection selection) {
 //		System.out.println(this + " drawModel");
 		/*
 		 * get max and min z-values (for fog effect)

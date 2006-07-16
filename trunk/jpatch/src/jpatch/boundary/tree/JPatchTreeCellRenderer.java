@@ -21,10 +21,12 @@
  */
 package jpatch.boundary.tree;
 
-import java.awt.Component;
+import java.awt.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.tree.*;
 
-import javax.swing.JTree;
-import javax.swing.tree.DefaultTreeCellRenderer;
+import jpatch.entity.*;
 
 /**
  * @author sascha
@@ -32,18 +34,26 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  */
 @SuppressWarnings("serial")
 public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
-
+	private static final Map<Class, Icon> iconMap = new HashMap<Class, Icon>();
 	
-	public JPatchTreeCellRenderer() {
-		super();
+	/*
+	 * initialize iconMap
+	 */
+	static {
+		iconMap.put(TransformNode.class, new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/transformNode.png")));
+		iconMap.put(Model.class, new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/model.png")));
 	}
-
+	
 	@Override
 	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+		/* initialze label by calling superclass method */
 		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-		this.setText(((JPatchTreeNode) value).getName());
+		
+		JPatchTreeNode node = (JPatchTreeNode) value;		// node needs to be a JPatchTreeNode
+		Object userObject = node.getUserObject();
+		setText(node.getName());							// set the label text
+		if (userObject != null)
+			setIcon(iconMap.get(userObject.getClass()));	// if we have a userObject, set the icon
 		return this;
 	}
-
-	
 }

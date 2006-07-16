@@ -15,7 +15,7 @@ import org.xml.sax.helpers.*;
 
 public class JPatchImport extends DefaultHandler
 implements ModelImporter {
-	private Model model;
+	private OLDModel model;
 	
 	private static final int NULL = 0;
 	private static final int MODEL = 1;
@@ -88,7 +88,7 @@ implements ModelImporter {
 		return boneNameMap;
 	}
 	
-	public final String importModel(Model model, String filename) {
+	public final String importModel(OLDModel model, String filename) {
 		System.out.println("loading " + filename);
 		this.model = model;
 		XMLReader xmlReader = null;

@@ -37,7 +37,7 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 		abort = true;
 	}
 	
-	public void tesselate(Model model, int subdiv, Matrix4d matrix, boolean exportNormals) {
+	public void tesselate(OLDModel model, int subdiv, Matrix4d matrix, boolean exportNormals) {
 		bExportNormals = exportNormals;
 		this.matrix = matrix;
 		hashPatchSubdivision = new HashPatchSubdivision(0.0f, subdiv, this);

@@ -13,7 +13,7 @@ public class WavefrontExport3 {
 	public void writeToFile(File objfile, File mtlfile, int subdiv, boolean exportNormals, AliasWavefrontSettings.Mode mode) {
 		
 		BufferedWriter file;
-		Model model = MainFrame.getInstance().getModel();
+		OLDModel model = MainFrame.getInstance().getModel();
 		
 		/* write materials file */
 		try {

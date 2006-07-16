@@ -1,5 +1,7 @@
 package test;
 
+import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.text.*;
@@ -17,11 +19,18 @@ public class AttributeUiTest {
 		new AttributeUiTest();
 	}
 	
+	
 	public AttributeUiTest() {
 		System.setProperty("swing.boldMetal", "false");
 		System.setProperty("swing.aatext", "true");
 //		UIManager.put("swing.aatext", true);
 //		UIManager.put("swing.boldMetal", false);
+		
+//		try {
+//			UIManager.setLookAndFeel(laf);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		final JFrame frame1 = new JFrame(getClass().getCanonicalName() + " 1");
 		final JFrame frame2 = new JFrame(getClass().getCanonicalName() + " 2");
 		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

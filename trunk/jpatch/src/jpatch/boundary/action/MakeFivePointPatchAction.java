@@ -23,7 +23,7 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 		Patch patch = checkSelection();
 		if (patch == null)
 			return;
-		Model model = MainFrame.getInstance().getModel();
+		OLDModel model = MainFrame.getInstance().getModel();
 		ControlPoint[] acp = patch.getControlPoints();
 		ControlPoint[] acp5 = new ControlPoint[] {
 				acp[0].trueHead(),
@@ -44,7 +44,7 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 	
 	public static Patch checkSelection() {
 		Selection selection = MainFrame.getInstance().getSelection();
-		Model model = MainFrame.getInstance().getModel();
+		OLDModel model = MainFrame.getInstance().getModel();
 		ArrayList points = new ArrayList();
 		if (selection == null || MainFrame.getInstance().getAnimation() != null)
 			return null;

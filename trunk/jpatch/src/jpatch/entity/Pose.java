@@ -29,10 +29,10 @@ import jpatch.boundary.*;
  *
  */
 public class Pose {
-	private Model model;
+	private OLDModel model;
 	private Map<Morph, Float> poseMap = new HashMap<Morph, Float>();
 	
-	public Pose(Model model) {
+	public Pose(OLDModel model) {
 		this.model = model;
 		setPose();
 	}

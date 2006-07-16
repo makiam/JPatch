@@ -43,7 +43,7 @@ public final class MainFrame extends JFrame {
 	
 	private int iMode = MESH;
 	
-	private Model model;
+	private OLDModel model;
 	private Animation animation;
 	private JPatchScreen jpatchScreen;
 	private static MainFrame INSTANCE;
@@ -472,7 +472,7 @@ public final class MainFrame extends JFrame {
 	//	return displayFactory;
 	//}
 	
-	public Model getModel() {
+	public OLDModel getModel() {
 		return model;
 	}
 	
@@ -481,7 +481,7 @@ public final class MainFrame extends JFrame {
 	}
 	
 	public void newModel() {
-		model = new Model();
+		model = new OLDModel();
 		animation = null;
 		setEditedMorph(null);
 		for (ViewDefinition viewDef : aViewDef)
@@ -902,7 +902,7 @@ public final class MainFrame extends JFrame {
 		tree = new JPatchTree(treenodeRoot);
 		((DefaultTreeModel) tree.getModel()).insertNodeInto(rootNode, treenodeRoot, 0);
 		((DefaultTreeModel) tree.getModel()).reload();
-		tree.setCellRenderer(new JPatchTreeCellRenderer());
+		tree.setCellRenderer(new OLDJPatchTreeCellRenderer());
 //		tree.setCellEditor(new DefaultCellEditor(new JTextField()));
 //		tree.setEditable(true);
 		tree.setRootVisible(false);

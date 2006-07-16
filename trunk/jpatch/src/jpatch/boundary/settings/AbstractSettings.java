@@ -37,7 +37,7 @@ import javax.swing.table.*;
 import javax.swing.tree.*;
 import javax.vecmath.*;
 
-import jpatch.entity.Model;
+import jpatch.entity.OLDModel;
 
 /**
  * This class provides publically accessible settings (preferences)

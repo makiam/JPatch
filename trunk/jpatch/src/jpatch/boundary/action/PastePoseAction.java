@@ -31,9 +31,9 @@ import jpatch.entity.*;
  *
  */
 public class PastePoseAction extends AbstractAction {
-	private Model model;
+	private OLDModel model;
 	
-	public PastePoseAction(Model model) {
+	public PastePoseAction(OLDModel model) {
 		super("paste pose");
 		this.model = model;
 	}

@@ -65,7 +65,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 			Point2D.Float p2Mouse = new Point2D.Float(iMouseX,iMouseY);
 			Bone.BoneTransformable boneEnd = viewDef.getClosestBoneEnd(p2Mouse, null, false, true);
 			Bone boneParent = (boneEnd == null) ? null : boneEnd.getBone();
-			Model model = MainFrame.getInstance().getModel();
+			OLDModel model = MainFrame.getInstance().getModel();
 //			Bone boneParent = viewDef.getClosestBoneEnd(p2Mouse, null);
 //			Model model = MainFrame.getInstance().getModel();
 //			for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
@@ -208,7 +208,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 			((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(false);
 			
 //			MainFrame.getInstance().getMeshToolBar().reset();
-			Model model = MainFrame.getInstance().getModel();
+			OLDModel model = MainFrame.getInstance().getModel();
 			MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(bone, 1, model), bone, 0);
 			MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(bone, 2, model), bone, 1);
 			MainFrame.getInstance().getTreeModel().insertNodeInto(new RotationDof(bone, 4, model), bone, 2);

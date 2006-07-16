@@ -8,7 +8,7 @@ import javax.swing.*;
 
 import jpatch.entity.*;
 
-public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
+public class OLDJPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 	/**
 	 * 
 	 */
@@ -48,12 +48,12 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 		super.getTreeCellRendererComponent(tree,value,sel,expanded,leaf,row,hasFocus);
 //		System.out.println(value + " " + ((TreeNode) value).getParent());
 		TreeNode parent = ((TreeNode) value).getParent();
-		Model model = MainFrame.getInstance().getModel();
+		OLDModel model = MainFrame.getInstance().getModel();
 		if (MainFrame.getInstance().getAnimation() != null)
-			if (parent instanceof Model)
-				model = (Model) parent;
+			if (parent instanceof OLDModel)
+				model = (OLDModel) parent;
 //		System.out.println(value + " " + model + " " + model.getTreenodeBones());
-		if (value instanceof Model)
+		if (value instanceof OLDModel)
 			setIcon(iconModel);
 		else if (value instanceof Animation)
 			setIcon(iconAnimation);

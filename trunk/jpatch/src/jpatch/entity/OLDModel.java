@@ -20,7 +20,7 @@ import jpatch.boundary.*;
  * @author     aledinsk
  * @created    02. Mai 2003
  */
-public class Model implements MutableTreeNode {
+public class OLDModel implements MutableTreeNode {
 
 	/**
 	 *  Description of the Field
@@ -58,7 +58,7 @@ public class Model implements MutableTreeNode {
 	private Set<String> morphNameSet = new HashSet<String>();
 	//private ArrayList listeners = new ArrayList();
 	
-	public Model() {
+	public OLDModel() {
 		strName = "New Model";
 		treenodeSelections = new ModelTreeNode("Selections", listSelections);
 		treenodeMaterials = new ModelTreeNode("Materials", listMaterials);
@@ -1346,7 +1346,7 @@ public class Model implements MutableTreeNode {
 		public TreeNode getParent() {
 			if (animModel != null)
 				return animModel;
-			return Model.this;
+			return OLDModel.this;
 		}
 
 		public boolean getAllowsChildren() {

@@ -13,7 +13,7 @@ public final class NewMaterialAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
 //	private Model model;
 	
-	public NewMaterialAction(Model model) {
+	public NewMaterialAction(OLDModel model) {
 		super("New Material");
 //		this.model = model;
 		//putValue(Action.SHORT_DESCRIPTION,"Add Controlpoint [A]");

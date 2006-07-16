@@ -16,7 +16,7 @@ public final class CheckModelAction extends AbstractAction {
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		System.out.println("Testing model integrity...");
-		Model model = MainFrame.getInstance().getModel();
+		OLDModel model = MainFrame.getInstance().getModel();
 		ModelTester modelTester = new ModelTester();
 		if (modelTester.test(model)) {
 			System.out.println("The test completed successfuly");

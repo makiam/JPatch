@@ -27,7 +27,7 @@ public class AnimationMasterImport implements ModelImporter {
 	private int iGroup = 0;
 	// public methods
 	
-	public final String importModel(Model model, String filename) {
+	public final String importModel(OLDModel model, String filename) {
 		ArrayList lstHashMesh = new ArrayList();	// list to store all splines
 		BufferedReader brFile;
 		String strLine;

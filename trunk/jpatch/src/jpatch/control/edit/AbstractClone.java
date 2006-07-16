@@ -235,7 +235,7 @@ public abstract class AbstractClone extends JPatchCompoundEdit {
 	
 	protected void clonePatches(List mirror) {
 		List list = new ArrayList();
-		Model model = MainFrame.getInstance().getModel();
+		OLDModel model = MainFrame.getInstance().getModel();
 		for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
 			Patch patch = (Patch) it.next();
 			ControlPoint[] acpOriginalPatch = patch.getControlPoints();

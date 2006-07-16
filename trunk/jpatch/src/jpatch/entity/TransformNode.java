@@ -26,21 +26,18 @@ package jpatch.entity;
  *
  */
 
-import java.lang.reflect.Field;
 import java.util.*;
 import javax.vecmath.*;
 import jpatch.auxilary.*;
 
-public class TransformNode implements JPatchObject {
+public class TransformNode extends AbstractJPatchObject {
 	
-	
-	public Attribute.String name = new Attribute.String("Name");
 	public Attribute.KeyedBoolean visibility = new Attribute.KeyedBoolean("Visibility", true);
-	public Attribute.Enum rotationOrder = new Attribute.Enum("Rotation order", Rotation3d.Order.XYZ);
-	public Attribute.Point3d position = new Attribute.Point3d("Position (world)", new Point3d(0, 0, 0), false);
-	public Attribute.Vector3d translation = new Attribute.Vector3d("Translation (local)", new Vector3d(0, 0, 0), true);
-	public Attribute.Rotation3d orientation = new Attribute.Rotation3d("Orientation (world)", new Rotation3d(0, 0, 0), false);
-	public Attribute.Rotation3d rotation = new Attribute.Rotation3d("Rotation (local)", new Rotation3d(0, 0, 0), true);
+	public Attribute.Enum rotationOrder = new Attribute.Enum("Order", Rotation3d.Order.XYZ);
+	public Attribute.Point3d position = new Attribute.Point3d("Position", new Point3d(0, 0, 0), false);
+	public Attribute.Vector3d translation = new Attribute.Vector3d("Translation", new Vector3d(0, 0, 0), true);
+	public Attribute.Rotation3d orientation = new Attribute.Rotation3d("Orientation", new Rotation3d(0, 0, 0), false);
+	public Attribute.Rotation3d rotation = new Attribute.Rotation3d("Rotation", new Rotation3d(0, 0, 0), true);
 	public Attribute.Scale3d scale = new Attribute.Scale3d("Scale", new Scale3d(1, 1, 1), true);
 	public Attribute.Point3d scalePivotPosition = new Attribute.Point3d("Pivot (world)", new Point3d(0, 0, 0), false);
 	public Attribute.Vector3d scalePivotTranslation = new Attribute.Vector3d("Pivot (local)", new Vector3d(0, 0, 0), false);
@@ -62,95 +59,11 @@ public class TransformNode implements JPatchObject {
 	private Scale3d scaleTuple = new Scale3d();
 	private Point3d pivot = new Point3d();
 	
-	private Iterable<Attribute> attributes = new Iterable<Attribute>() {
-		public Iterator<Attribute> iterator() {
-			return createAttributeIterator();
-		}
-	};
 	
-	private Iterable<Attribute> channels = new Iterable<Attribute>() {
-		public Iterator<Attribute> iterator() {
-			return createChannelIterator();
-		}
-	};
 	
 	public TransformNode() {
 		matrix.setIdentity();
 		addAttributeChangeListeners();
-	}
-	
-	public Iterable<Attribute> getAttributes() {
-		return attributes;
-	}
-	
-	public Iterable<Attribute> getChannels() {
-		return channels;
-	}
-	
-	public Attribute getAttribute(int index) {
-		int i = 0;
-		for (Field field : getClass().getFields()) {
-			Object o = null;
-			try {
-				field.get(o);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			if (o instanceof Attribute) {
-				if (i == index)
-					return (Attribute) o;
-				i++;
-			}
-		}
-		return null;
-	}
-	
-	private Iterator<Attribute> createAttributeIterator() {
-		return new Iterator<Attribute>() {
-			private int index = 0;
-			
-			public boolean hasNext() {
-				return getAttribute(index + 1) != null;
-			}
-
-			public Attribute next() {
-				return getAttribute(index++);
-			}
-			
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-		};
-	}
-	
-	private Iterator<Attribute> createChannelIterator() {
-		return new Iterator<Attribute>() {
-			private int index = searchNextChannel();
-			
-			public boolean hasNext() {
-				return getAttribute(index + 1) != null;
-			}
-
-			public Attribute next() {
-				Attribute a = getAttribute(index++);
-				searchNextChannel();
-				return a;
-			}
-			
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-			
-			private int searchNextChannel() {
-				Attribute a;
-				for (a = getAttribute(index); a != null; index++)
-					if (a.isKeyed())
-						break;
-				if (a != null)
-					index--;
-				return index;
-			}
-		};
 	}
 	
 	public Matrix4d getMatrix() {

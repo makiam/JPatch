@@ -1,6 +1,9 @@
 package jpatch.entity;
 
 public interface JPatchObject {
-	AttributeOld getAttribute(String name);
-	AttributeOld[] getAttributes();
+	String getName();
+	Iterable<Attribute> getAttributes();
+	Iterable<Attribute> getChannels();
+	Attribute getAttribute(String name);
+	Attribute getAttribute(int index);
 }

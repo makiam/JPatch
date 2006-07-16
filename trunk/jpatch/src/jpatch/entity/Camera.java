@@ -11,7 +11,7 @@ import jpatch.control.importer.JPatchImport;
 
 public class Camera extends AnimObject {
 	
-	private static final Model cameraModel = new Model();
+	private static final OLDModel cameraModel = new OLDModel();
 	private boolean bParent;
 	
 	static {
@@ -207,7 +207,7 @@ public class Camera extends AnimObject {
 		return bMotionBlur;
 	}
 	
-	public Model getModel() {
+	public OLDModel getModel() {
 		return cameraModel;
 	}
 	
