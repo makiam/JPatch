@@ -606,7 +606,7 @@ implements ComponentListener {
 		Point2D.Float p2 = new Point2D.Float();
 		float fMinDistance = 64;
 		float fDistance;
-		Model model = MainFrame.getInstance().getModel();
+		OLDModel model = MainFrame.getInstance().getModel();
 		Bone.BoneTransformable closest = null;
 		for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
 			Bone bone = (Bone) it.next();
@@ -670,7 +670,7 @@ implements ComponentListener {
 		ControlPoint cp;
 		float fHookPos = -1;
 		ControlPoint cpExcept = (except != null) ? except.getHead() : null;
-		Model model = MainFrame.getInstance().getModel();
+		OLDModel model = MainFrame.getInstance().getModel();
 		Matrix4f m4Screen = getScreenMatrix();
 		Point3f p3 = new Point3f();
 		Point2D.Float p2 = new Point2D.Float();

@@ -27,7 +27,7 @@ import javax.swing.event.*;
  * @author sascha
  *
  */
-public abstract class Attribute {
+public class Attribute {
 	private final java.lang.String name;
 	AttributeListener[] attributeListeners = new AttributeListener[0];
 	boolean valueAdjusting;

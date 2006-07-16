@@ -15,7 +15,7 @@ public class AnimModel extends AnimObject {
 	private boolean bParent = false;
 	private String strFileName;
 	
-	protected Model model;
+	protected OLDModel model;
 	protected int iSubdivisionOffset = 0;
 	
 	private Transformable anchor;
@@ -23,7 +23,7 @@ public class AnimModel extends AnimObject {
 	
 	public AnimModel() { }
 	
-	public AnimModel(Model model, String filename) {
+	public AnimModel(OLDModel model, String filename) {
 		strName = model.getName();
 		strFileName = filename;
 		this.model = model;
@@ -69,7 +69,7 @@ public class AnimModel extends AnimObject {
 		this.anchor = anchor;
 	}
 	
-	public Model getModel() {
+	public OLDModel getModel() {
 		return model;
 	}
 	
@@ -77,7 +77,7 @@ public class AnimModel extends AnimObject {
 		return strName;
 	}
 	
-	public void setModel(Model model) {
+	public void setModel(OLDModel model) {
 		this.model = model;
 	}
 	

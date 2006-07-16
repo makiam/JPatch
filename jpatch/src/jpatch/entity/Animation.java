@@ -36,7 +36,7 @@ public class Animation implements MutableTreeNode {
 	private AnimTreeNode treenodeModels = new AnimTreeNode("Models", listModels);
 	private AnimTreeNode treenodeLights = new AnimTreeNode("Lights", listLights);
 	private AnimTreeNode treenodeCameras = new AnimTreeNode("Cameras", listCameras);
-	private Map<Model, Pose> mapClipboardPose = new HashMap<Model, Pose>();
+	private Map<OLDModel, Pose> mapClipboardPose = new HashMap<OLDModel, Pose>();
 	private File file;
 	
 	private RenderExtension re = new RenderExtension(new String[] {
@@ -75,7 +75,7 @@ public class Animation implements MutableTreeNode {
 		return listCameras.get(0);
 	}
 	
-	public Pose getClipboardPose(Model model) {
+	public Pose getClipboardPose(OLDModel model) {
 		Pose pose = mapClipboardPose.get(model);
 		if (pose == null) {
 			pose = new Pose(model);

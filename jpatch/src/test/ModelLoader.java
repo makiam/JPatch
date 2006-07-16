@@ -56,7 +56,7 @@ public class ModelLoader {
 		/*
 		 * Create a new model, animationMasterImporter, and load the model
 		 */
-		final Model model = new Model();
+		final OLDModel model = new OLDModel();
 		AnimationMasterImport importer = new AnimationMasterImport();
 		System.out.println(importer.importModel(model, "/home/sascha/CartoonRabbit.mdl"));
 		

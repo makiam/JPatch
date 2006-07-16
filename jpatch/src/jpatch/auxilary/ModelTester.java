@@ -11,7 +11,7 @@ public class ModelTester {
 	private ArrayList listControlPoints;
 	private boolean bSuccess;
 	
-	public boolean test(Model model) {
+	public boolean test(OLDModel model) {
 		
 		bSuccess = true;
 		/*

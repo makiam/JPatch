@@ -11,8 +11,8 @@ import jpatch.boundary.MainFrame;
 
 public class AnimLight extends AnimObject {
 	
-	private static final Model lightModel = new Model();
-	private static final Model spotModel = new Model();
+	private static final OLDModel lightModel = new OLDModel();
+	private static final OLDModel spotModel = new OLDModel();
 	private boolean bParent;
 	
 	static {
@@ -94,7 +94,7 @@ public class AnimLight extends AnimObject {
 		out.append(prefix).append("</lightsource>").append("\n");
 	}
 	
-	public Model getModel() {
+	public OLDModel getModel() {
 		return lightModel;
 	}
 	

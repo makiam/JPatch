@@ -31,9 +31,9 @@ import jpatch.entity.*;
  *
  */
 public class CopyPoseAction extends AbstractAction {
-	private Model model;
+	private OLDModel model;
 	
-	public CopyPoseAction(Model model) {
+	public CopyPoseAction(OLDModel model) {
 		super("copy pose");
 		this.model = model;
 	}

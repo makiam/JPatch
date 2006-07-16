@@ -78,7 +78,7 @@ public class InyoRenderer3 implements Renderer {
 		
 		for (Iterator it = models.iterator(); it.hasNext(); ) {
 			AnimModel animModel = (AnimModel) it.next();
-			Model model = animModel.getModel();
+			OLDModel model = animModel.getModel();
 			int subdiv = Settings.getInstance().export.inyo.subdivisionLevel + animModel.getSubdivisionOffset();
 			if (subdiv < 2) subdiv = 2;
 			if (subdiv > 5) subdiv = 5;

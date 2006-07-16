@@ -206,7 +206,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		return (float) Math.sqrt(ds) * fScale;
 	}
 	
-	public abstract Model getModel();
+	public abstract OLDModel getModel();
 	
 	public boolean isHit(int x, int y, Matrix4f m4View, Bone[] hitBone) {
 		Matrix4f mt = new Matrix4f(m4ScaledTransform);

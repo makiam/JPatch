@@ -12,7 +12,7 @@ public class SelectionsPanel extends SidePanel {
 	 */
 	private static final long serialVersionUID = -3589871917606717466L;
 
-	public SelectionsPanel(Model model) {
+	public SelectionsPanel(OLDModel model) {
 		JButton buttonAddSelection = new JButton(new NewSelectionAction(model));
 //		buttonAddSelection.setFocusable(false);
 		add(buttonAddSelection);

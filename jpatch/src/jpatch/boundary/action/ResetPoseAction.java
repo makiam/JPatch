@@ -10,10 +10,10 @@ public final class ResetPoseAction extends AbstractAction {
 	/**
 	 * 
 	 */
-	Model model;
+	OLDModel model;
 	
 	private static final long serialVersionUID = -2818638231423442181L;
-	public ResetPoseAction(Model model) {
+	public ResetPoseAction(OLDModel model) {
 		super("reset pose");
 		this.model = model;
 		//putValue(Action.SHORT_DESCRIPTION,"Add Bone");

@@ -164,7 +164,7 @@ public class AnimationImporter extends DefaultHandler {
 				}
 				else if (localName.equals("filename")) {
 					animModelFilename = sbChars.toString();
-					Model model = new Model();
+					OLDModel model = new OLDModel();
 					JPatchImport jpatchImport = new JPatchImport();
 					jpatchImport.importModel(model, Settings.getInstance().export.modelDirectory.getPath() + File.separatorChar + animModelFilename);
 					((AnimModel) animObject).setModel(model);

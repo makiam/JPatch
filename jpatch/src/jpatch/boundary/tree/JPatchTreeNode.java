@@ -7,30 +7,33 @@ import javax.swing.tree.*;
 import jpatch.entity.*;
 
 @SuppressWarnings("serial")
-public class JPatchTreeNode extends DefaultMutableTreeNode implements ChangeListener {
-	private static Comparator<JPatchTreeNode> nodeNameComparator = new Comparator<JPatchTreeNode>() {
-		public int compare(JPatchTreeNode node1, JPatchTreeNode node2) {
-			return node1.getName().compareTo(node2.getName());
-		}
-	};
+public class JPatchTreeNode extends DefaultMutableTreeNode implements Comparable, AttributeListener {
+	private static final Map<Class, Integer> classOrder = new HashMap<Class, Integer>();
+	
+	/*
+	 * initialize classOrder
+	 */
+	static {
+		classOrder.put(Model.class, 1);
+		classOrder.put(TransformNode.class, 99);
+	}
 	
 	private JPatchTreeModel treeModel;
-	
-	private AttributeOld<String> name;
+	private Attribute.String name;
 	
 	public JPatchTreeNode() { }
 	
-	@SuppressWarnings("unchecked")
 	public JPatchTreeNode(JPatchObject jpatchObject) {
 		setUserObject(jpatchObject);
-		name = jpatchObject.getAttribute("Name");
-		name.addChangeListener(this);
+		name = (Attribute.String) jpatchObject.getAttribute("Name");
+		name.addAttributeListener(this);
 	}
 
 	public String getName() {
-		if (name == null)
+		if (name != null)
+			return name.get();
+		else
 			return "ROOT";
-		return name.getValue();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -39,8 +42,8 @@ public class JPatchTreeNode extends DefaultMutableTreeNode implements ChangeList
 			insert(node, 0);
 		else {
 			System.out.println(children);
-			System.out.println(Collections.binarySearch(children, node, nodeNameComparator));
-			insert(node, -1 - Collections.binarySearch(children, node, nodeNameComparator));
+			System.out.println(Collections.binarySearch(children, node));
+			insert(node, -1 - Collections.binarySearch(children, node));
 		}
 	}
 	
@@ -57,14 +60,24 @@ public class JPatchTreeNode extends DefaultMutableTreeNode implements ChangeList
 		treeModel.nodesWereRemoved(this, new int[] { childIndex }, removedChildren);
 	}
 	
-	public void stateChanged(ChangeEvent e) {
+	public void setTreeModel(JPatchTreeModel treeModel) {
+		System.out.println(hashCode() + " setTreeModel");
+		this.treeModel = treeModel;
+	}
+
+	public void attributeChanged(Attribute attribute) {
 		JPatchTreeNode parent = (JPatchTreeNode) getParent();
 		removeFromParent();
 		parent.add(this);
 	}
-	
-	public void setTreeModel(JPatchTreeModel treeModel) {
-		System.out.println(hashCode() + " setTreeModel");
-		this.treeModel = treeModel;
+
+	public int compareTo(Object o) {
+		JPatchTreeNode node = (JPatchTreeNode) o;
+		int result = 0;
+		if (userObject != null && node.userObject != null)
+			result = classOrder.get(userObject.getClass()).compareTo(classOrder.get(node.userObject.getClass()));
+		if (result == 0)
+			result = getName().compareTo(node.getName());
+		return result;
 	}
 }

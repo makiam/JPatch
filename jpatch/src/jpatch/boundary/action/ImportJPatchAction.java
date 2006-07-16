@@ -74,7 +74,7 @@ public final class ImportJPatchAction extends AbstractAction {
 //				JPatchUserSettings.getInstance().strJPatchFile = filename;
 			}
 			if (!bNewModel) {
-				Model model = MainFrame.getInstance().getModel();
+				OLDModel model = MainFrame.getInstance().getModel();
 				String name = model.getName();
 				ArrayList headsBeforeImport = model.allHeads();
 				modelImporter.importModel(model,filename);

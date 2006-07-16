@@ -26,7 +26,7 @@ public final class NewAnimModelAction extends AbstractAction {
 		fileChooser.setFileFilter(FileFilters.JPATCH);
 		if (fileChooser.showOpenDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 			String filename = fileChooser.getSelectedFile().getName();
-			Model model = new Model();
+			OLDModel model = new OLDModel();
 			(new JPatchImport()).importModel(model, fileChooser.getSelectedFile().getPath());
 			
 			AnimObject animObject = new AnimModel(model, filename);

@@ -15,9 +15,9 @@ implements ChangeListener {
 	 */
 	private static final long serialVersionUID = 7041600166377802101L;
 	JPatchInput inputName;
-	Model model;
+	OLDModel model;
 	
-	public ModelPanel(Model model) {
+	public ModelPanel(OLDModel model) {
 		this.model = model;
 		JPatchInput.setDimensions(50,150,20);
 		inputName = new JPatchInput("Name:",model.getName());

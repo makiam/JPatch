@@ -61,11 +61,11 @@ public class TransformNodeAttributeEditor extends ExpandableFormContainer {
 		
 		addScalar(defaultForm, transformNode.name);
 		addScalar(defaultForm, transformNode.visibility);
-		addScalar(defaultForm, transformNode.rotationOrder);
 		addTuple(translationForm, transformNode.translation);
 		addLimit(translationForm, transformNode.translation);
 		addTuple(positionForm, transformNode.position);
 		addTuple(rotationForm, transformNode.rotation);
+		addScalar(rotationForm, transformNode.rotationOrder);
 		addLimit(rotationForm, transformNode.rotation);
 		addTuple(rotationForm, transformNode.rotatePivotTranslation);
 		addTuple(rotationForm, transformNode.rotatePivotPosition);

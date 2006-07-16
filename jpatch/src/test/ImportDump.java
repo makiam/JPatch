@@ -15,7 +15,7 @@ public class ImportDump {
 		String line;
 		Map<String, ControlPoint> map = new HashMap<String, ControlPoint>();
 		boolean newCurve = true;
-		Model model = new Model();
+		OLDModel model = new OLDModel();
 		while ((line = reader.readLine()) != null) {
 			if (line.equals("------------- patches -------------"))
 				break;

@@ -11,7 +11,7 @@ public class BonesPanel extends SidePanel {
 	 */
 	private static final long serialVersionUID = 1969415873406407853L;
 
-	public BonesPanel(Model model) {
+	public BonesPanel(OLDModel model) {
 		add(new JButton(new ResetPoseAction(model)));
 		//add(new JPatchButton(new ApplyMaterialAction()));
 		MainFrame.getInstance().getSideBar().clearDetailPanel();

@@ -407,7 +407,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 * @param  hookPos  The hook position (between 0..1)
 	 * @return          The hook. Attach your "target hook" to this ControlPoint.
 	 */
-	public ControlPoint addHook(float hookPos, Model model) {
+	public ControlPoint addHook(float hookPos, OLDModel model) {
 		
 		ControlPoint cp;
 		ControlPoint cpHook;
@@ -451,7 +451,7 @@ public class ControlPoint implements Comparable, Transformable {
 	 * Hooks this ControlPoint ControlPoint cpHookTo at hookposition hookPos
 	 * Creates a new hook (for cpHookTo) and attaches this ControlPoint to the resulting hook
 	 */
-	public void hookTo(ControlPoint cpHookTo, float hookPos, Model model) {
+	public void hookTo(ControlPoint cpHookTo, float hookPos, OLDModel model) {
 		attachTo(cpHookTo.addHook(hookPos, model));
 		/*
 		ControlPoint cp;

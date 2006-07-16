@@ -92,7 +92,7 @@ public class PovrayRenderer3 implements Renderer {
 			if (abort)
 				return;
 			AnimModel animModel = (AnimModel) it.next();
-			Model model = animModel.getModel();
+			OLDModel model = animModel.getModel();
 			
 			file.write("/*\n");
 			file.write(" * Model " + model.getName() + "\n");
@@ -103,7 +103,7 @@ public class PovrayRenderer3 implements Renderer {
 		}
 	}
 
-	public void writeModel(Model model, Matrix4d m, String renderString, int subdivOffset, BufferedWriter file) throws IOException {
+	public void writeModel(OLDModel model, Matrix4d m, String renderString, int subdivOffset, BufferedWriter file) throws IOException {
 		file.write("union {\n");
 		file.write("\t" + renderString + "\n");
 		if (Settings.getInstance().export.povray.outputMode == PovraySettings.Mode.TRIANGLES) {

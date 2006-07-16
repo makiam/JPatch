@@ -55,7 +55,7 @@ public class PreVizRenderer implements Renderer {
 		 */
 		for (AnimModel animModel : models) {
 			
-			Model model = animModel.getModel();
+			OLDModel model = animModel.getModel();
 			cameraTransform = new Matrix4d(camera.getTransform());
 			cameraTransform.invert();
 			Matrix4d modelTransform = new Matrix4d(animModel.getTransform());

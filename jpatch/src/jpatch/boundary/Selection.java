@@ -32,7 +32,7 @@ public class Selection extends JPatchTreeLeaf {
 	
 	private static final Pattern pattern = Pattern.compile("New selection #(\\d+)");
 	
-	public static Selection createRectangularPointSelection(int ax, int ay, int bx, int by, Matrix4f transformationMatrix, Model model, int mask) {
+	public static Selection createRectangularPointSelection(int ax, int ay, int bx, int by, Matrix4f transformationMatrix, OLDModel model, int mask) {
 		Selection selection = new Selection(true);
 		Point3f p3 = new Point3f();
 		if ((mask & CONTROLPOINTS) != 0 && MainFrame.getInstance().getJPatchScreen().isSelectPoints()) {
@@ -496,7 +496,7 @@ public class Selection extends JPatchTreeLeaf {
 		return strName;
 	}
 	
-	public StringBuffer xml(String prefix, Model model) {
+	public StringBuffer xml(String prefix, OLDModel model) {
 		StringBuffer sb = new StringBuffer();
 		StringBuffer cpList = new StringBuffer();
 		StringBuffer cpWeightList = new StringBuffer();

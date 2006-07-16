@@ -19,7 +19,7 @@ public class AttributeUiHelper {
 	private static final int COLUMNS = 6;
 	private static final Font staticFont = new JTextField().getFont();
 	private static final Font keyedFont = staticFont.deriveFont(Font.BOLD);
-	private static final String[] OFF_ON = new String[] { "on", "off" };
+	private static final String[] OFF_ON = new String[] { "off", "on" };
 	
 	static JLabel getLabelFor(Attribute attribute) {
 		return new JLabel(attribute.getName());
@@ -84,20 +84,20 @@ public class AttributeUiHelper {
 		final Attribute.KeyedBoolean attrkb = (Attribute.KeyedBoolean) attribute;
 		Box box = Box.createHorizontalBox();
 		
-		final JComboBox comboBox = new JComboBox(OFF_ON);
-		comboBox.setSelectedIndex(attrkb.get() ? 1 : 0);
+		final JSpinner comboBox = new JSpinner(new SpinnerListModel(OFF_ON));
+		comboBox.setValue(attrkb.get() ? OFF_ON[1] : OFF_ON[0]);
 		
 		/* create a ChangeListener to update the attribute if the slider was changed */
-		comboBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				attrkb.set(comboBox.getSelectedIndex() == 1);
+		comboBox.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				attrkb.set(comboBox.getValue() == OFF_ON[1]);
 			}
 		});
 		
 		/* create a AttributeListener to update the CheckBox if the attribute changes */
 		final AttributeListener attributeListener = new AttributeListener() {
 			public void attributeChanged(Attribute a) {
-				comboBox.setSelectedIndex(attrkb.get() ? 1 : 0);
+				comboBox.setValue(attrkb.get() ? OFF_ON[1] : OFF_ON[0]);
 			}
 		};
 		

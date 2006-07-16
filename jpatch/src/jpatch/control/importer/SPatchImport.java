@@ -11,7 +11,7 @@ import jpatch.entity.*;
 public class SPatchImport implements ModelImporter {
 	private static final int MAX_LAYERS = 8;
 	
-	public final String importModel(Model model, String filename) {
+	public final String importModel(OLDModel model, String filename) {
 		BufferedReader brFile;
 		String strLine;
 		String[] astrPart;

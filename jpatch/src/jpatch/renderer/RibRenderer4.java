@@ -82,7 +82,7 @@ public class RibRenderer4 implements Renderer {
 				if (abort)
 					return;
 				AnimModel animModel = (AnimModel) it.next();
-				Model model = animModel.getModel();
+				OLDModel model = animModel.getModel();
 				
 				Matrix4d m = animModel.getTransform();
 				file.write("TransformBegin\n");
@@ -103,7 +103,7 @@ public class RibRenderer4 implements Renderer {
 		}
 	}
 	
-	public void writeModel(Model model, Matrix4d m, String renderString, int subdivOffset, BufferedWriter file) throws IOException {
+	public void writeModel(OLDModel model, Matrix4d m, String renderString, int subdivOffset, BufferedWriter file) throws IOException {
 		if (Settings.getInstance().export.renderman.outputMode != RendermanSettings.Mode.BICUBIC_PATCHES) {
 			int subdiv = Settings.getInstance().export.renderman.subdivisionLevel + subdivOffset;
 			if (subdiv < 1) subdiv = 1;

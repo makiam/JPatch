@@ -85,7 +85,7 @@ public final class JPatchScreen extends JPanel {
 	private Grid grid = new Grid();
 	private JPopupMenu popupMenu;
 	
-	public JPatchScreen(Model model,int mode,ViewDefinition[] viewDefinitions) {
+	public JPatchScreen(OLDModel model,int mode,ViewDefinition[] viewDefinitions) {
 		aViewDef = viewDefinitions;
 		setLightingMode(iLightMode);
 		initScreen();

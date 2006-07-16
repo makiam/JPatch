@@ -15,7 +15,7 @@ public final class NewSelectionAction extends AbstractAction {
 	
 	//private Model model;
 
-	public NewSelectionAction(Model model) {
+	public NewSelectionAction(OLDModel model) {
 		super("Add Current Selection");
 		//this.model = model;
 		//putValue(Action.SHORT_DESCRIPTION,"Add Controlpoint [A]");

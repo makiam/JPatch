@@ -19,18 +19,18 @@ public class Morph implements MutableTreeNode {
 	float fMax = 100;
 	float fValue = 0;
 	Map mapMorph = new HashMap();
-	Model model;
+	OLDModel model;
 	Morph() { }
 	EventListenerList eventListeners = new EventListenerList();
 	
 	private static final Pattern pattern = Pattern.compile("New morph #(\\d+)");
 	private static int num = 1;
 	
-	public Morph(Model model) {
+	public Morph(OLDModel model) {
 		this (model, false);
 	}
 			
-	public Morph(Model model, boolean noAutoName) {
+	public Morph(OLDModel model, boolean noAutoName) {
 		if (!noAutoName)
 			strName = "New morph #" + num++;
 		this.model = model;
@@ -45,7 +45,7 @@ public class Morph implements MutableTreeNode {
 		return strName;
 	}
 	
-	public Model getModel() {
+	public OLDModel getModel() {
 		return model;
 	}
 	
