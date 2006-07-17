@@ -2,6 +2,26 @@ package test;
 
 
 
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
 import javax.swing.*;
 import javax.swing.tree.*;
 
@@ -10,6 +30,8 @@ import jpatch.entity.*;
 
 public class NewTreeTest2 {
 
+	private static final DataFlavor[] DATA_FLAVORS = new DataFlavor[] { new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType, "TreeNode") };
+	
 	/**
 	 * @param args
 	 */
@@ -21,9 +43,12 @@ public class NewTreeTest2 {
 		JFrame frame = new JFrame("tree test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		JTree tree = new JTree(new JPatchTreeModel());
+		JTree tree = new JPatchTree();
 //		tree.setRootVisible(false);
-		tree.setCellRenderer(new JPatchTreeCellRenderer());
+//		tree.setCellRenderer(new JPatchTreeCellRenderer());
+//		tree.setDragEnabled(true);
+//		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		
 		
 		TransformNode n1 = new TransformNode();
 		TransformNode n2 = new TransformNode();
