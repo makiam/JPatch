@@ -17,16 +17,17 @@ public final class QuitAction extends AbstractAction {
 	public void actionPerformed(ActionEvent actionEvent) {
 		if (MainFrame.getInstance().getUndoManager().hasChanged()) {
 			int option = JPatchUtils.showSaveDialog();
+			System.out.println(option);
 			switch (option) {
 				
-				case JOptionPane.YES_OPTION:
+				case 2:
 					SaveAsAction saveAsAction = new SaveAsAction(false);
 					if (saveAsAction.save()) {
 						close();
 					}
 					break;
 				
-				case JOptionPane.NO_OPTION:
+				case 0:
 					close();
 			}
 		} else {
