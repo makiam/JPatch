@@ -1,8 +1,11 @@
 package jpatch.auxilary;
 
+import java.io.File;
+
 import javax.swing.*;
 
 import jpatch.boundary.*;
+import jpatch.boundary.ui.JPatchDialog;
 
 public final class JPatchUtils {
 	
@@ -23,7 +26,18 @@ public final class JPatchUtils {
 	
 	public static int showSaveDialog() {
 		//return JOptionPane.showConfirmDialog(MainFrame.getInstance(),"The model has been changed, and all changes will be lost. Do you like to save?", "Save changes?", JOptionPane.YES_NO_CANCEL_OPTION, );
-		return JOptionPane.showOptionDialog(MainFrame.getInstance(), "Do you want to save changes?", "Save changes?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] { "Save", "Don't save", "Cancel" }, "Save");
+//		return JOptionPane.showOptionDialog(MainFrame.getInstance(), "Do you want to save changes?", "Save changes?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] { "Save", "Don't save", "Cancel" }, "Save");
+		File file = null;
+		if (MainFrame.getInstance().getModel() != null) {
+			file = MainFrame.getInstance().getModel().getFile();
+		} else {
+			file = MainFrame.getInstance().getAnimation().getFile();
+		}
+		String filename = "New File";
+		if (file != null)
+			filename = file.getName();
+		
+		return JPatchDialog.showDialog(MainFrame.getInstance(), filename, JPatchDialog.WARNING, "<b>Do you want to save changes to this file before closing it?</b><p>If you don't save, your changes will be lost.", new String[] { "Don't Save", null, "Cancel", "Save" }, 2);
 	}
 	
 	public static int[] getJvmVersion() {
