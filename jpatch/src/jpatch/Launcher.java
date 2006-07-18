@@ -3,6 +3,7 @@ package jpatch;
 import java.awt.*;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.prefs.Preferences;
 
 import javax.swing.*;
 
@@ -13,6 +14,10 @@ import jpatch.entity.*;
 
 public final class Launcher {
 	public static void main(String[] args) {
+		System.setProperty("swing.boldMetal", Settings.JPATCH_ROOT_NODE.get("metalBoldText", "false"));
+		System.setProperty("swing.aatext", Settings.JPATCH_ROOT_NODE.get("fontSmoothing", "true"));
+		System.out.println(System.getProperty("swing.boldMetal"));
+		System.out.println(System.getProperty("swing.aatext"));
 		if (args.length >=1) {
 			if (args[0].equals("-settings")) {
 				settings();
@@ -28,14 +33,12 @@ public final class Launcher {
 			switch (Settings.getInstance().lookAndFeel) {
 			case CROSS_PLATFORM:
 				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-				UIManager.put("swing.boldMetal", false);
 				break;
 			case SYSTEM:
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 				break;
 			case JPATCH:
 				UIManager.setLookAndFeel(new SmoothLookAndFeel());
-				UIManager.put("swing.boldMetal", false);
 				break;
 			}
 		} catch (Exception e) {
