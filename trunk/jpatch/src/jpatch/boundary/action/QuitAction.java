@@ -14,6 +14,7 @@ public final class QuitAction extends AbstractAction {
 	public QuitAction() {
 		super("Quit");
 	}
+	
 	public void actionPerformed(ActionEvent actionEvent) {
 		if (MainFrame.getInstance().getUndoManager().hasChanged()) {
 			int option = JPatchUtils.showSaveDialog();
@@ -36,8 +37,7 @@ public final class QuitAction extends AbstractAction {
 	}
 	
 	private void close() {
-		JPatchWindowAdapter jpatchWindowAdapter = new JPatchWindowAdapter();
-		jpatchWindowAdapter.quit(MainFrame.getInstance());
+		JPatchWindowAdapter.quit(MainFrame.getInstance());
 	}
 }
 

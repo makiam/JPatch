@@ -47,12 +47,15 @@ public class Settings extends AbstractSettings {
 	public Startup startup = Startup.MODELER;
 	public transient boolean newInstallation = true;
 	public transient boolean cleanExit = false;
+	public transient boolean startupFinished = false;
 	public int screenPositionX = 0;
 	public int screenPositionY = 0;
 	public int screenWidth = 1024;
 	public int screenHeight = 768;
 	public boolean saveScreenDimensionsOnExit = true;
 	public Plaf lookAndFeel = Plaf.CROSS_PLATFORM;
+	public boolean metalBoldText = false;
+	public boolean fontSmoothing = true;
 	public long undoMaxMem = 128;
 	public long undoMinMem = 120;
 	public final DirectorySettings directories = new DirectorySettings();

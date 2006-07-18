@@ -47,7 +47,7 @@ public class JPatchDialog extends JDialog {
 	public final static Icon QUESTION = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_64x64/dialog-question.png"));
 	
 	private int selectedOption = -1;
-	private Font font = new Font("SansSerif", Font.PLAIN, 13);
+	private Font font = new Font("SansSerif", Font.PLAIN, 12);
 	
 	private JPatchDialog(Frame owner, String title, boolean modal, Icon icon, String message, String[] options, int focus) {
 		super(owner, title, modal);
@@ -60,9 +60,8 @@ public class JPatchDialog extends JDialog {
 		}
 		Box textBox = Box.createVerticalBox();
 		
-		final JEditorPane text = new JEditorPane("text/html", "<div width='350'>" + message + "</div>");
+		final JEditorPane text = new JEditorPane("text/html", "<div width='320'>" + message + "</div>");
 		text.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
-		System.out.println("+" + PlainDocument.lineLimitAttribute);
 		text.getDocument().putProperty(PlainDocument.lineLimitAttribute, 20);
 		text.setFont(font);
 		text.setEditable(false);

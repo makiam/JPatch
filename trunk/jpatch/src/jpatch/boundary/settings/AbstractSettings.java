@@ -48,7 +48,7 @@ import jpatch.entity.OLDModel;
  * @author sascha
  */
 public abstract class AbstractSettings implements TreeNode {
-	private static final Preferences JPATCH_ROOT_NODE = Preferences.userRoot().node("/JPatch/settings/preferences");
+	public static final Preferences JPATCH_ROOT_NODE = Preferences.userRoot().node("/JPatch/settings/preferences");
 	private Map mapDefaults = new HashMap();
 	private List<Field> fields = new ArrayList<Field>();
 	private List<TreeNode> children = new ArrayList<TreeNode>();
@@ -446,7 +446,7 @@ public abstract class AbstractSettings implements TreeNode {
 					childNode.setNodeName(field.getName());
 					children.add(childNode);
 				} else {
-					if (!Modifier.isTransient(field.getModifiers()))
+					if (!Modifier.isTransient(field.getModifiers()) && !Modifier.isStatic(field.getModifiers()))
 							fields.add(field);
 				}
 			}
@@ -490,7 +490,8 @@ public abstract class AbstractSettings implements TreeNode {
 	void save(Preferences node) {
 		try {
 			for (Field field:getClass().getFields())
-				writeField(node, field);
+				if (!Modifier.isStatic(field.getModifiers()))
+					writeField(node, field);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -500,7 +501,8 @@ public abstract class AbstractSettings implements TreeNode {
 //		System.out.println("load " + node);
 		try {
 			for (Field field:getClass().getFields())
-				readField(node, field);
+				if (!Modifier.isStatic(field.getModifiers()))
+					readField(node, field);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -14,27 +14,27 @@ import jpatch.boundary.settings.Settings;
  */
 public class JPatchWindowAdapter extends WindowAdapter {	
 	public void windowClosing(WindowEvent windowEvent) {
-		
-		if (MainFrame.getInstance().getUndoManager().hasChanged()) {
-			int option = JPatchUtils.showSaveDialog();
-			switch (option) {
-				
-				case JOptionPane.YES_OPTION:
-					SaveAsAction saveAsAction = new SaveAsAction(false);
-					if (saveAsAction.save()) {
-						quit(windowEvent.getWindow());
-					}
-					break;
-				
-				case JOptionPane.NO_OPTION:
-					quit(windowEvent.getWindow());
-			}
-		} else {
-			quit(windowEvent.getWindow());
-		}
+		Actions.getInstance().getAction("quit").actionPerformed(null);
+//		if (MainFrame.getInstance().getUndoManager().hasChanged()) {
+//			int option = JPatchUtils.showSaveDialog();
+//			switch (option) {
+//				
+//				case JOptionPane.YES_OPTION:
+//					SaveAsAction saveAsAction = new SaveAsAction(false);
+//					if (saveAsAction.save()) {
+//						quit(windowEvent.getWindow());
+//					}
+//					break;
+//				
+//				case JOptionPane.NO_OPTION:
+//					quit(windowEvent.getWindow());
+//			}
+//		} else {
+//			quit(windowEvent.getWindow());
+//		}
 	}
 	
-	public void quit(Window window) {
+	public static void quit(Window window) {
 		Settings settings = Settings.getInstance();
 		settings.screenPositionX = MainFrame.getInstance().getX();
 		settings.screenPositionY = MainFrame.getInstance().getY();
