@@ -57,8 +57,10 @@ public class JPatchTreeModel extends DefaultTreeModel {
 	@Override
 	public void nodesWereRemoved(TreeNode node, int[] childIndices, Object[] removedChildren) {
 		super.nodesWereRemoved(node, childIndices, removedChildren);
-		for (JPatchTreeNode child : (JPatchTreeNode[]) removedChildren)
-			child.setTreeModel(null);
+//		for (Object object : removedChildren)
+//			System.out.println("removedChild: " + object);
+		for (Object child : removedChildren)
+			((JPatchTreeNode) child).setTreeModel(null);
 	}
 	
 	

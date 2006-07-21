@@ -25,6 +25,8 @@ import java.io.IOException;
 import javax.swing.*;
 import javax.swing.tree.*;
 
+import jpatch.boundary.MainFrame;
+import jpatch.boundary.action.*;
 import jpatch.boundary.tree.*;
 import jpatch.entity.*;
 
@@ -95,9 +97,13 @@ public class NewTreeTest2 {
 		tn4.add(tm3);
 		tn4.add(tm4);
 		tn4.add(tm5);
-		
-		
-		frame.add(new JScrollPane(tree));
+		new MainFrame();
+		frame.setLayout(new BorderLayout());
+		frame.add(new JScrollPane(tree), BorderLayout.CENTER);
+		JToolBar toolBar = new JToolBar();
+		toolBar.add(Actions.getInstance().getButton("undo"));
+		toolBar.add(Actions.getInstance().getButton("redo"));
+		frame.add(toolBar, BorderLayout.NORTH);
 		frame.pack();
 		frame.setVisible(true);
 	}
