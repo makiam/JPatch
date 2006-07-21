@@ -31,10 +31,10 @@ import jpatch.entity.*;
  *
  */
 public class AtomicAttachBone extends JPatchAtomicEdit implements JPatchRootEdit {
-	private Bone boneChild;
-	private Bone boneParent;
+	private OLDBone boneChild;
+	private OLDBone boneParent;
 	
-	public AtomicAttachBone(Bone child, Bone parent) {
+	public AtomicAttachBone(OLDBone child, OLDBone parent) {
 		boneChild = child;
 		boneParent = parent;
 		redo();

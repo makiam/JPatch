@@ -11,10 +11,10 @@ import jpatch.control.edit.*;
 public final class AddDofAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
 	
-	private Bone bone;
+	private OLDBone bone;
 	private int axis;
 	
-	public AddDofAction(Bone bone, int axis, String name) {
+	public AddDofAction(OLDBone bone, int axis, String name) {
 		super(name);
 		this.bone = bone;
 		this.axis = axis;

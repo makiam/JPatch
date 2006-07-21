@@ -3,12 +3,12 @@ package jpatch.control.edit;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import jpatch.entity.Bone;
+import jpatch.entity.OLDBone;
 
 public class CompoundRemoveBone extends JPatchCompoundEdit{
-	public CompoundRemoveBone(Bone bone) {
+	public CompoundRemoveBone(OLDBone bone) {
 		for (Iterator jt = (new ArrayList(bone.getChildBones())).iterator(); jt.hasNext(); ) {
-			Bone child = (Bone) jt.next();
+			OLDBone child = (OLDBone) jt.next();
 			addEdit(new AtomicDetachBone(child));
 			if (bone.getParentBone() != null)
 				addEdit(new AtomicAttachBone(child, bone.getParentBone()));

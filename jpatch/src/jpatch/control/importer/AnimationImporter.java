@@ -36,7 +36,7 @@ public class AnimationImporter extends DefaultHandler {
 	private String strRendererFormat;
 	
 	private Map<Integer, ControlPoint> cpIdMap = new HashMap<Integer, ControlPoint>();
-	private Map<String, Bone> boneNameMap = new HashMap<String, Bone>();
+	private Map<String, OLDBone> boneNameMap = new HashMap<String, OLDBone>();
 	
 	private Animation animation;
 	private MotionKey.Interpolation interpolation;
@@ -333,7 +333,7 @@ public class AnimationImporter extends DefaultHandler {
 			else if (localName.equals("cp"))
 				o = cpIdMap.get(Integer.valueOf(value));
 			else if (localName.equals("bone"))
-				o = ((Bone) boneNameMap.get(value)).getBoneEnd();
+				o = ((OLDBone) boneNameMap.get(value)).getBoneEnd();
 		}
 		MotionKey key;
 		switch (iState) {

@@ -48,7 +48,7 @@ public class CompoundRemove extends JPatchCompoundEdit {
 				for (ControlPoint cp = head; cp != null; cp = cp.getPrevAttached()) {
 					controlPointSet.add(cp);
 				}
-			} else if (object instanceof Bone.BoneTransformable) {
+			} else if (object instanceof OLDBone.BoneTransformable) {
 				btSet.add(object);
 			}
 		}
@@ -74,14 +74,14 @@ public class CompoundRemove extends JPatchCompoundEdit {
 		Set boneSet = new HashSet();
 		// create set of bones to be deleted
 		for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {
-			Bone bone = (Bone) it.next();
-			Bone.BoneTransformable start = (bone.getParentBone() == null) ? bone.getBoneStart() : bone.getParentBone().getBoneEnd();
+			OLDBone bone = (OLDBone) it.next();
+			OLDBone.BoneTransformable start = (bone.getParentBone() == null) ? bone.getBoneStart() : bone.getParentBone().getBoneEnd();
 			if (btSet.contains(bone.getBoneEnd()) && btSet.contains(start))
 				boneSet.add(bone);
 		}
 		// drop bones
 		for (Iterator it = boneSet.iterator(); it.hasNext(); ) {
-			Bone bone = (Bone) it.next();
+			OLDBone bone = (OLDBone) it.next();
 			addEdit(new CompoundRemoveBone(bone));
 //			for (Iterator jt = (new ArrayList(bone.getChildBones())).iterator(); jt.hasNext(); ) {
 //				Bone child = (Bone) jt.next();

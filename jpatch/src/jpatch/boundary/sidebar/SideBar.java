@@ -193,7 +193,7 @@ implements TreeSelectionListener {
 				RotationDof dof = (RotationDof) selectedNode;
 				replacePanel(new DofPanel(dof));
 				Map map = new HashMap();
-				Bone bone = dof.getBone();
+				OLDBone bone = dof.getBone();
 				map.put(bone.getBoneEnd(), new Float(1));
 				map.put(bone.getParentBone() == null ? bone.getBoneStart() : bone.getParentBone().getBoneEnd(), new Float(1));
 				if (!anim) {
@@ -224,8 +224,8 @@ implements TreeSelectionListener {
 		} else if (!anim && selectedNode == MainFrame.getInstance().getModel().getTreenodeBones()) {
 			replacePanel(new BonesPanel(MainFrame.getInstance().getModel()));
 			MainFrame.getInstance().getSideBar().clearDetailPanel();
-		} else if (selectedNode instanceof Bone) {
-			Bone bone = (Bone) selectedNode;
+		} else if (selectedNode instanceof OLDBone) {
+			OLDBone bone = (OLDBone) selectedNode;
 			replacePanel(new BonePanel(bone));
 			Map map = new HashMap();
 			map.put(bone.getBoneEnd(), new Float(1));

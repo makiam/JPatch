@@ -42,9 +42,9 @@ implements ModelImporter {
 	private Map<ControlPoint, Integer> cpAttachMap = new HashMap<ControlPoint, Integer>();
 	private Map<ControlPoint, Integer> cpHookMap = new HashMap<ControlPoint, Integer>();
 	private Map<ControlPoint, String> cpBoneMap = new HashMap<ControlPoint, String>();
-	private Map<String, Bone> boneNameMap = new HashMap<String, Bone>();
-	private Map<Bone, String> boneParentMap = new HashMap<Bone, String>();
-	private Map<Integer, Bone> boneIdMap = new HashMap<Integer, Bone>();
+	private Map<String, OLDBone> boneNameMap = new HashMap<String, OLDBone>();
+	private Map<OLDBone, String> boneParentMap = new HashMap<OLDBone, String>();
+	private Map<Integer, OLDBone> boneIdMap = new HashMap<Integer, OLDBone>();
 	private Map<ControlPoint, Boolean> cpParentBoneMap = new HashMap<ControlPoint, Boolean>();
 	private Map<String, JPatchMaterial> materialNameMap = new HashMap<String, JPatchMaterial>();
 	
@@ -53,7 +53,7 @@ implements ModelImporter {
 	private ControlPoint cp;
 	private ControlPoint cpPrev;
 	private Rotoscope rotoscope;
-	private Bone bone;
+	private OLDBone bone;
 	private RotationDof dof;
 	private int iRotoscopeView;
 	private JPatchMaterial material;
@@ -84,7 +84,7 @@ implements ModelImporter {
 		return cpIdMap;
 	}
 	
-	public Map<String, Bone> getBoneNameMap() {
+	public Map<String, OLDBone> getBoneNameMap() {
 		return boneNameMap;
 	}
 	
@@ -111,7 +111,7 @@ implements ModelImporter {
 		}
 		//for (Iterator it = mapBones.keySet().iterator(); it.hasNext(); ) {
 		for (ControlPoint cp : cpBoneMap.keySet()) {
-			Bone bone = boneNameMap.get(cpBoneMap.get(cp));
+			OLDBone bone = boneNameMap.get(cpBoneMap.get(cp));
 			if (bone == null)
 				bone = boneIdMap.get(Integer.valueOf(cpBoneMap.get(cp)));
 //			int i = ((Integer) mapBones.get(cp)).intValue();
@@ -518,8 +518,8 @@ implements ModelImporter {
 				break;
 			case SKELETON:
 				if (localName.equals("skeleton")) {
-					for (Bone bone : boneParentMap.keySet()) {
-						Bone parent = boneNameMap.get(boneParentMap.get(bone));
+					for (OLDBone bone : boneParentMap.keySet()) {
+						OLDBone parent = boneNameMap.get(boneParentMap.get(bone));
 						if (parent == null)
 							parent = boneIdMap.get(Integer.valueOf(boneParentMap.get(bone)));
 						bone.setParent(parent);
@@ -685,8 +685,8 @@ implements ModelImporter {
 		return material;
 	}
 	
-	private Bone createBone(Attributes attributes) {
-		Bone bone = new Bone(new Point3f(), new Vector3f(), true);
+	private OLDBone createBone(Attributes attributes) {
+		OLDBone bone = new OLDBone(new Point3f(), new Vector3f(), true);
 		for (int index = 0; index < attributes.getLength(); index++) {
 			if (attributes.getLocalName(index).equals("name"))
 				bone.setName(attributes.getValue(index));

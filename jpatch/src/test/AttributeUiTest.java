@@ -11,6 +11,7 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 
 import jpatch.boundary.AttributeUiHelper;
+import jpatch.boundary.BoneAttributeEditor;
 import jpatch.boundary.TransformNodeAttributeEditor;
 import jpatch.entity.*;
 
@@ -37,17 +38,18 @@ public class AttributeUiTest {
 		frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		TransformNode tn1 = new TransformNode();
 		tn1.name.set("Transformnode 1");
-		TransformNode tn2 = new TransformNode();
+		Bone bone = new Bone();
+		bone.name.set("Bone 1");
 		TransformNodeAttributeEditor tnae1 = new TransformNodeAttributeEditor(tn1);
-		TransformNodeAttributeEditor tnae2 = new TransformNodeAttributeEditor(tn2);
-		tn1.addChild(tn2);
-		JScrollPane scrollPane = new JScrollPane(tnae1, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		BoneAttributeEditor bae = new BoneAttributeEditor(bone);
+//		tn1.addChild(tn2);
+		
 //		scrollPane.setBorder(BorderFactory.createTitledBorder("Attribute Editor"));
-		frame1.add(scrollPane);
-		frame2.add(new JScrollPane(tnae2));
+		frame1.add(new JScrollPane(tnae1, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
+		frame2.add(new JScrollPane(bae, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
 		frame1.pack();
 		frame2.pack();
 		frame1.setVisible(true);
-//		frame2.setVisible(true);
+		frame2.setVisible(true);
 	}
 }

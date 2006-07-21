@@ -30,9 +30,9 @@ import jpatch.entity.*;
  */
 public class AtomicAddBone extends JPatchAtomicEdit {
 
-	private Bone bone;
+	private OLDBone bone;
 	
-	public AtomicAddBone(Bone bone) {
+	public AtomicAddBone(OLDBone bone) {
 		this.bone = bone;
 		redo();
 	}

@@ -173,7 +173,7 @@ public class Header extends JComponent implements MouseListener, MouseMotionList
 					g.setFont(plain);
 					g.drawString(track.getName(), 16 + track.getIndent(), y + 11);
 					if (track instanceof BoneTrack) {
-						Bone bone = ((BoneTrack) track).getBone();
+						OLDBone bone = ((BoneTrack) track).getBone();
 						Color[] col = new Color[] {
 								new Color(255, 0, 0),
 								new Color(0, 128, 0),

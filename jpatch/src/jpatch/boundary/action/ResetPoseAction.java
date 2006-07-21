@@ -21,7 +21,7 @@ public final class ResetPoseAction extends AbstractAction {
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
 		for (Iterator itB = model.getBoneSet().iterator(); itB.hasNext(); ) {
-			Bone bone = (Bone) itB.next();
+			OLDBone bone = (OLDBone) itB.next();
 			for (Iterator itD = bone.getDofs().iterator(); itD.hasNext(); ) {
 				((RotationDof) itD.next()).setValue(0);
 			}

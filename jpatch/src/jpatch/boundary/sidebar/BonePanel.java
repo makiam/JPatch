@@ -22,9 +22,9 @@ implements ChangeListener {
 	private static final long serialVersionUID = 7041600166377802101L;
 	JPatchInput inputName;
 	JSlider slider;
-	Bone bone;
+	OLDBone bone;
 	
-	public BonePanel(final Bone bone) {
+	public BonePanel(final OLDBone bone) {
 		JPanel detailPanel = MainFrame.getInstance().getSideBar().getDetailPanel();
 		detailPanel.removeAll();
 		if (MainFrame.getInstance().getAnimation() != null)

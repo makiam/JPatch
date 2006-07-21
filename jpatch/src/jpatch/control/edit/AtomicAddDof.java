@@ -9,9 +9,9 @@ import jpatch.entity.*;
 public class AtomicAddDof extends JPatchAtomicEdit implements JPatchRootEdit {
 
 	private RotationDof dof;
-	private Bone bone;
+	private OLDBone bone;
 
-	public AtomicAddDof(RotationDof dof, Bone bone) {
+	public AtomicAddDof(RotationDof dof, OLDBone bone) {
 		this.dof = dof;
 		this.bone = bone;
 		redo();

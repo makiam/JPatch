@@ -221,7 +221,7 @@ public class TimelineEditor extends JScrollPane {
 				if (((AnimModel) animObject).getModel().getBoneSet().size() > 0)
 					listTracks.add(new HeaderTrack(this, "Bones", -4, false));
 				for (Iterator it = ((AnimModel) animObject).getModel().getBoneSet().iterator(); it.hasNext(); ) {
-					Bone bone = (Bone) it.next();
+					OLDBone bone = (OLDBone) it.next();
 					if (bone.getParentBone() == null)
 						recursiveAddBoneDofs(bone, 0, (MotionCurveSet.Model) mcs);
 				}
@@ -240,7 +240,7 @@ public class TimelineEditor extends JScrollPane {
 		repaint();
 	}
 	
-	private void recursiveAddBoneDofs(Bone bone, int level, MotionCurveSet.Model mcs) {
+	private void recursiveAddBoneDofs(OLDBone bone, int level, MotionCurveSet.Model mcs) {
 		int n = bone.getDofs().size();
 		MotionCurve.Float[] curves = new MotionCurve.Float[n];
 		RotationDof[] dofs = new RotationDof[n];
@@ -257,7 +257,7 @@ public class TimelineEditor extends JScrollPane {
 		}
 		
 		for (Iterator itBones = bone.getChildBones().iterator(); itBones.hasNext(); ) {
-			recursiveAddBoneDofs((Bone) itBones.next(), level + 1, mcs);
+			recursiveAddBoneDofs((OLDBone) itBones.next(), level + 1, mcs);
 		}
 	}
 	

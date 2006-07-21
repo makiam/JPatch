@@ -8,7 +8,7 @@ import jpatch.entity.*;
  */
 
 public abstract class AtomicChangeBone extends JPatchAtomicEdit {
-	Bone bone;
+	OLDBone bone;
 	
 	private AtomicChangeBone() { }
 	
@@ -26,7 +26,7 @@ public abstract class AtomicChangeBone extends JPatchAtomicEdit {
 		private Point3f p3New = new Point3f();
 		private Point3f p3Point;
 		
-		public Point(Bone bone, Point3f newValue, Point3f point) {
+		public Point(OLDBone bone, Point3f newValue, Point3f point) {
 			this.bone = bone;
 			p3New.set(newValue);
 			p3Point = point;

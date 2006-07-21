@@ -22,7 +22,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 	
 	private int iMouseX;
 	private int iMouseY;
-	private Bone bone;
+	private OLDBone bone;
 	
 	private Point3f p3Start;
 	private JPatchActionEdit edit;
@@ -63,8 +63,8 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 //			Point3f p3End = new Point3f();
 //			Point2D.Float p2End = new Point2D.Float();
 			Point2D.Float p2Mouse = new Point2D.Float(iMouseX,iMouseY);
-			Bone.BoneTransformable boneEnd = viewDef.getClosestBoneEnd(p2Mouse, null, false, true);
-			Bone boneParent = (boneEnd == null) ? null : boneEnd.getBone();
+			OLDBone.BoneTransformable boneEnd = viewDef.getClosestBoneEnd(p2Mouse, null, false, true);
+			OLDBone boneParent = (boneEnd == null) ? null : boneEnd.getBone();
 			OLDModel model = MainFrame.getInstance().getModel();
 //			Bone boneParent = viewDef.getClosestBoneEnd(p2Mouse, null);
 //			Model model = MainFrame.getInstance().getModel();
@@ -81,12 +81,12 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 //				}
 //			}
 			if (boneParent != null) {
-				bone = new Bone(boneParent.getEnd(null), new Vector3f());
+				bone = new OLDBone(boneParent.getEnd(null), new Vector3f());
 				bone.setParent(boneParent);
 				//edit.addEdit(new AtomicAttachBone(bone, boneParent));
 				edit.addEdit(new AtomicAddBone(bone));
 			} else {
-				bone = new Bone(p3Start, new Vector3f());
+				bone = new OLDBone(p3Start, new Vector3f());
 				edit.addEdit(new AtomicAddBone(bone));
 			}
 			MainFrame.getInstance().selectTreeNode(bone);
@@ -170,7 +170,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 		*/
 		} else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
 			if (bActive == true) {
-				Bone.BoneTransformable bt = viewDef.getClosestBoneEnd(new Point2D.Float(mouseEvent.getX(), mouseEvent.getY()), null, true, false);
+				OLDBone.BoneTransformable bt = viewDef.getClosestBoneEnd(new Point2D.Float(mouseEvent.getX(), mouseEvent.getY()), null, true, false);
 				if (bt != null && bt.getBone() != bone) {
 					bone.setEnd(bt.getBone().getStart(null));
 					edit.addEdit(new AtomicAttachBone(bt.getBone(), bone));

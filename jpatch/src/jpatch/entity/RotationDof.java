@@ -26,7 +26,7 @@ public class RotationDof extends Morph {
 	
 	public static final String[] MODES = new String[] { "rigid", "soft", "smooth" };
 	
-	private Bone bone;
+	private OLDBone bone;
 	private int iAxis;
 	private boolean bFlipped;
 //	private Vector3f v3ReferenceAxis;
@@ -41,7 +41,7 @@ public class RotationDof extends Morph {
 	private int iMode = SOFT;
 //	private Morph morph;
 	
-	public RotationDof(Bone bone, int axis, OLDModel model) {
+	public RotationDof(OLDBone bone, int axis, OLDModel model) {
 		this.model = model;
 		this.bone = bone;
 //		v3ReferenceAxis = new Vector3f(0,0,1);
@@ -52,7 +52,7 @@ public class RotationDof extends Morph {
 		strName = getAxisName();
 	}
 	
-	public Bone getBone() {
+	public OLDBone getBone() {
 		return bone;
 	}
 	
@@ -72,7 +72,7 @@ public class RotationDof extends Morph {
 		int index = bone.getDofIndex(this);
 		if (index > 0)
 			return bone.getDof(index - 1);
-		Bone b = bone.getParentBone();
+		OLDBone b = bone.getParentBone();
 		while (b != null) {
 			RotationDof d = b.getDof(-1);
 			if (d != null)
@@ -160,9 +160,9 @@ public class RotationDof extends Morph {
 //		bValid = false;
 	}
 	
-	public static void invalidate(Bone bone) {
+	public static void invalidate(OLDBone bone) {
 		for (Iterator it = bone.getChildBones().iterator(); it.hasNext(); ) {
-			Bone b = (Bone) it.next();
+			OLDBone b = (OLDBone) it.next();
 			for (Iterator jt = b.getDofs().iterator(); jt.hasNext(); )
 				((RotationDof) jt.next()).bValid = false;
 			invalidate(b);

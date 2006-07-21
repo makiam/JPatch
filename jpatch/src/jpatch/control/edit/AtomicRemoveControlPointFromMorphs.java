@@ -49,7 +49,7 @@ public final class AtomicRemoveControlPointFromMorphs extends JPatchAtomicEdit {
 				}
 			}
 		}
-		for (Bone bone : MainFrame.getInstance().getModel().getBoneSet()) {
+		for (OLDBone bone : MainFrame.getInstance().getModel().getBoneSet()) {
 			for (Morph morph : bone.getDofs()) {
 				for (MorphTarget target : morph.getTargets()) {
 					Object vector = target.getVectorFor(cp);

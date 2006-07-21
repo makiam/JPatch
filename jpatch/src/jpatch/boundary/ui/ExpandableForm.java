@@ -171,7 +171,7 @@ public class ExpandableForm extends JComponent {
 //					g2.fillRoundRect(width - 26, y, 20, height, 12, 12);
 					g2.setColor(modifiedColor(c.getBackground(), -48, -48, -32));
 					g2.fillRoundRect(x + 1, y + 1, width - 2, height - 2, 8, 8);
-					g2.setColor(modifiedColor(c.getBackground(), -12, -12, -8));
+					g2.setColor(modifiedColor(c.getBackground(), 4, 4, 6));
 					int h = ((Container) c).getComponent(0).getPreferredSize().height;
 					g2.fillRoundRect(x + 3, y + h - 4, width - 6, height - h + 1, 4, 4); 
 				}
