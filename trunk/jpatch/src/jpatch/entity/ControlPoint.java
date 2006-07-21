@@ -125,7 +125,7 @@ public class ControlPoint implements Comparable, Transformable {
 	private boolean bHidden = false;
 	private boolean bDeleted = false;
 	
-	private Bone bone;
+	private OLDBone bone;
 	private float fBonePosition;
 	private float fDistanceToLine;
 	private boolean bParentBone;
@@ -279,18 +279,18 @@ public class ControlPoint implements Comparable, Transformable {
 //		if (cpNext != null) p3RefOutTangent.set(getOutTangent());
 //	}
 	
-	public void setBone(Bone bone) {
+	public void setBone(OLDBone bone) {
 		this.bone = bone;
 	}
 	
-	public void setBone(Bone bone, float position, float distanceToLine, boolean parent) {
+	public void setBone(OLDBone bone, float position, float distanceToLine, boolean parent) {
 		this.bone = bone;
 		this.fBonePosition = position;
 		this.fDistanceToLine = distanceToLine;
 		this.bParentBone = parent;
 	}
 	
-	public Bone getBone() {
+	public OLDBone getBone() {
 		return bone;
 	}
 	

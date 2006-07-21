@@ -31,10 +31,10 @@ import jpatch.entity.*;
  *
  */
 public class AtomicDetachBone extends JPatchAtomicEdit implements JPatchRootEdit {
-	private Bone boneChild;
-	private Bone boneParent;
+	private OLDBone boneChild;
+	private OLDBone boneParent;
 	
-	public AtomicDetachBone(Bone child) {
+	public AtomicDetachBone(OLDBone child) {
 		boneChild = child;
 		boneParent = child.getParentBone();
 		redo();

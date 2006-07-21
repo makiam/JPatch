@@ -11,7 +11,7 @@ import jpatch.boundary.ui.LockingButtonGroup;
 
 import jpatch.control.edit.*;
 import jpatch.entity.*;
-import jpatch.entity.Bone.BoneTransformable;
+import jpatch.entity.OLDBone.BoneTransformable;
 
 public class RotateTool extends JPatchTool {
 //	private static final int GHOST_FACTOR = JPatchUserSettings.getInstance().iGhost;

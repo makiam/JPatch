@@ -9,7 +9,7 @@ import javax.vecmath.*;
 import jpatch.auxilary.Utils3D;
 import jpatch.control.edit.*;
 import jpatch.entity.*;
-import jpatch.entity.Bone.BoneTransformable;
+import jpatch.entity.OLDBone.BoneTransformable;
 
 public class Selection extends JPatchTreeLeaf {
 	public static final int CONTROLPOINTS = 1;
@@ -51,7 +51,7 @@ public class Selection extends JPatchTreeLeaf {
 		}
 		if ((mask & BONES) != 0 && MainFrame.getInstance().getJPatchScreen().isSelectBones()) {
 			for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
-				Bone bone = (Bone) it.next();
+				OLDBone bone = (OLDBone) it.next();
 				int p = 0;
 				if (bone.getParentBone() == null) {
 					bone.getStart(p3);
@@ -139,7 +139,7 @@ public class Selection extends JPatchTreeLeaf {
 			Object key = it.next();
 			if (!cps && key instanceof ControlPoint)
 				mapObjects.remove(key);
-			if (!bones && key instanceof Bone.BoneTransformable)
+			if (!bones && key instanceof OLDBone.BoneTransformable)
 				mapObjects.remove(key);
 		}
 	}
@@ -203,8 +203,8 @@ public class Selection extends JPatchTreeLeaf {
 		return mapObjects.containsKey(object);
 	}
 	
-	public boolean containsBone(Bone bone) {
-		Bone parent = bone.getParentBone();
+	public boolean containsBone(OLDBone bone) {
+		OLDBone parent = bone.getParentBone();
 		if (parent != null)
 			return (mapObjects.containsKey(parent.getBoneEnd()) && mapObjects.containsKey(bone.getBoneEnd()));
 		else
@@ -272,7 +272,7 @@ public class Selection extends JPatchTreeLeaf {
 	public Point3f getCenter() {
 		if (hotObject instanceof AnimObject)
 			return ((AnimObject) hotObject).getPosition();
-		Bone bone = null;
+		OLDBone bone = null;
 		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext(); ) {
 			Object object = it.next();
 			if (object instanceof BoneTransformable) {
@@ -358,9 +358,9 @@ public class Selection extends JPatchTreeLeaf {
 				Object key = it.next();
 				if (cps && key instanceof ControlPoint)
 					mapTransformables.put(key, mapObjects.get(key));
-				if (bones && key instanceof Bone.BoneTransformable)
+				if (bones && key instanceof OLDBone.BoneTransformable)
 					mapTransformables.put(key, mapObjects.get(key));
-				if (bones && key instanceof Bone)
+				if (bones && key instanceof OLDBone)
 					mapTransformables.put(key, mapObjects.get(key));
 			}
 		}

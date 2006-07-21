@@ -32,38 +32,48 @@ import jpatch.entity.*;
  * @author sascha
  *
  */
-public class TransformNodeAttributeEditor extends AbstractAttributeEditor {
-	private TransformNode transformNode;
+public class BoneAttributeEditor extends AbstractAttributeEditor {
+	private Bone bone;
 	
-	public TransformNodeAttributeEditor(TransformNode transformNode) {
-		this.transformNode = transformNode;
+	public BoneAttributeEditor(Bone bone) {
+		this.bone = bone;
 		ExpandableForm defaultForm = new ExpandableForm(true);
 		ExpandableForm translationForm = new ExpandableForm();
 		ExpandableForm positionForm = new ExpandableForm();
+		ExpandableForm axisRotationForm = new ExpandableForm();
 		ExpandableForm rotationForm = new ExpandableForm();
 		ExpandableForm orientationForm = new ExpandableForm();
+		ExpandableForm extentForm = new ExpandableForm();
 		ExpandableForm scaleForm = new ExpandableForm();
-		ExpandableForm shearForm = new ExpandableForm();
 		
-		addScalar(defaultForm, transformNode.name);
-		addScalar(defaultForm, transformNode.visibility);
-		addTuple(translationForm, transformNode.translation);
-		addLimit(translationForm, transformNode.translation);
-		addTuple(positionForm, transformNode.position);
-		addTuple(rotationForm, transformNode.rotation);
-		addScalar(rotationForm, transformNode.rotationOrder);
-		addLimit(rotationForm, transformNode.rotation);
-		addTuple(rotationForm, transformNode.rotatePivotTranslation);
-		addTuple(rotationForm, transformNode.rotatePivotPosition);
+		addScalar(defaultForm, bone.name);
+		addTuple(axisRotationForm, bone.axisRotation);
+		addScalar(axisRotationForm, bone.axisRotationOrder);
+		addTuple(translationForm, bone.translation);
+		addTuple(positionForm, bone.position);
+		addTuple(extentForm, bone.extent);
+		addTuple(extentForm, bone.up);
+		addTuple(rotationForm, bone.rotation);
+		addScalar(rotationForm, bone.rotationOrder);
 		
-		addTuple(orientationForm, transformNode.orientation);
+		rotationForm.add(new JLabel("Weighting"));
+		JComponent box = new ExpandableFormRow();
+		box.setOpaque(false);
+		box.add(AttributeUiHelper.createComboBoxFor(bone.weightingX));
+		box.add(AttributeUiHelper.createComboBoxFor(bone.weightingX));
+		box.add(AttributeUiHelper.createComboBoxFor(bone.weightingX));
+		rotationForm.add(box);
+		addLimit(rotationForm, bone.rotation);
 		
-//		addScalar(transformNode.rotation.order);
-		addTuple(scaleForm, transformNode.scale);
-//		addLimit(scaleForm, transformNode.scale);
-		addTuple(scaleForm, transformNode.scalePivotTranslation);
-		addTuple(scaleForm, transformNode.scalePivotPosition);
-		addTuple(shearForm, transformNode.shear);
+		addTuple(orientationForm, bone.orientation);
+		
+		
+		addTuple(scaleForm, bone.scale);
+		addLimit(scaleForm, bone.scale);
+//		addLimit(rotationForm, transformNode.rotation);
+//		addTuple(rotationForm, transformNode.rotatePivotTranslation);
+//		addTuple(rotationForm, transformNode.rotatePivotPosition);
+		
 		
 //		addTuple(shear, transformNode.scale);
 //		addTuple(transformNode.rotatePivotPosition);
@@ -83,13 +93,10 @@ public class TransformNodeAttributeEditor extends AbstractAttributeEditor {
 		add(defaultForm);
 		add(translationForm);
 		add(positionForm);
+		add(extentForm);
+		add(axisRotationForm);
 		add(rotationForm);
 		add(orientationForm);
 		add(scaleForm);
-		add(shearForm);
 	}
-	
-
-	
-	
 }

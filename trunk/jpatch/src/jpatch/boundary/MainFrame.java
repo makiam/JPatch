@@ -744,7 +744,7 @@ public final class MainFrame extends JFrame {
 				Object o = it.next();
 				if (o instanceof ControlPoint)
 					points++;
-				else if (o instanceof Bone.BoneTransformable)
+				else if (o instanceof OLDBone.BoneTransformable)
 					bones++;
 			}
 			bonesAndPoints = (points > 0 && bones > 0);

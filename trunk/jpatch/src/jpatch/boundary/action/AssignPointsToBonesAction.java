@@ -21,12 +21,12 @@ public final class AssignPointsToBonesAction extends AbstractAction {
 		ArrayList cpList = new ArrayList();
 		for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
 			Object object = it.next();
-			if (object instanceof Bone.BoneTransformable) {
-				Bone.BoneTransformable bt = (Bone.BoneTransformable) object;
-				Bone bone = bt.getBone();
+			if (object instanceof OLDBone.BoneTransformable) {
+				OLDBone.BoneTransformable bt = (OLDBone.BoneTransformable) object;
+				OLDBone bone = bt.getBone();
 				if (bone.getDofs().size() == 0)
 					continue;
-				Bone parent = bone.getParentBone();
+				OLDBone parent = bone.getParentBone();
 				if (bt.isEnd()) {
 					if (parent == null) {
 						if (selection.contains(bone.getBoneStart())) {
@@ -51,11 +51,11 @@ public final class AssignPointsToBonesAction extends AbstractAction {
 			float minDist = Float.MAX_VALUE;
 			float closestPosOnLine = 0;
 			float closestDistToLine = 0;
-			Bone closestBone = null;
+			OLDBone closestBone = null;
 			for (int j = 0, m = boneList.size(); j < m; j++) {
-				Bone bone = (Bone) boneList.get(j);
+				OLDBone bone = (OLDBone) boneList.get(j);
 //				Bone parent = (bone.getParentBone() != null && bone.getParentBone().getChildBones().size() == 1) ? bone.getParentBone() : null;
-				Bone child = bone.getChildBones().size() == 1 ? (Bone) bone.getChildBones().get(0) : null;
+				OLDBone child = bone.getChildBones().size() == 1 ? (OLDBone) bone.getChildBones().get(0) : null;
 				if (!boneList.contains(child))
 					child = null;
 				Point3f p0 = bone.getReferenceStart();

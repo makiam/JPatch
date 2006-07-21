@@ -110,7 +110,7 @@ public class OLDJPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 			if (((MorphTarget) value).getPosition() == 0)
 				setEnabled(false);
 		}
-		else if (value instanceof Bone)
+		else if (value instanceof OLDBone)
 			setIcon(iconBone);
 		else if (value instanceof Camera)
 			setIcon(iconCamera);

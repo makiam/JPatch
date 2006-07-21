@@ -15,7 +15,7 @@ import jpatch.boundary.*;
 import jpatch.boundary.mouse.*;
 import jpatch.boundary.settings.Settings;
 import jpatch.entity.*;
-import jpatch.entity.Bone.BoneTransformable;
+import jpatch.entity.OLDBone.BoneTransformable;
 import jpatch.control.edit.*;
 
 public class DefaultTool extends JPatchTool {
@@ -49,7 +49,7 @@ public class DefaultTool extends JPatchTool {
 //	private Point3f[] ap3;
 //	private PivotHandle2 pivotHandle;
 	private ControlPoint cpHot;
-	private Bone.BoneTransformable btHot;
+	private OLDBone.BoneTransformable btHot;
 	//private int iMode;
 	private JPatchActionEdit edit;
 //	private Point3f p3Pivot = new Point3f();
@@ -457,12 +457,12 @@ public class DefaultTool extends JPatchTool {
 				Point2D.Float p2 = new Point2D.Float(x,y);
 				cpHot = anim ? null : viewDef.getClosestControlPoint(p2, null, null, true, false, cpHot);
 				btHot = anim ? null : viewDef.getClosestBoneEnd(p2, null, true, true);
-				Bone hitBone = anim ? null : viewDef.getClosestBone(p2);
+				OLDBone hitBone = anim ? null : viewDef.getClosestBone(p2);
 				AnimObject hitAnimObject = null;
-				Bone xBone = null;
+				OLDBone xBone = null;
 				if (anim) {
 					Animation animation = MainFrame.getInstance().getAnimation();
-					Bone[] bone = new Bone[1];
+					OLDBone[] bone = new OLDBone[1];
 					for (AnimObject animObject:animation.getObjects()) {
 						if (animObject.isHit(x, y, viewDef.getScreenMatrix(), bone)) {
 							hitAnimObject = animObject;
@@ -866,13 +866,13 @@ public class DefaultTool extends JPatchTool {
 			if (iState == MOVE_SINGLE_BONENED || (btHot != null && iState == MOVE_GROUP)) {
 				boolean weld = false;
 				if (btHot.isStart()) {
-					Bone.BoneTransformable bt = viewDef.getClosestBoneEnd(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()), btHot, false, true);
+					OLDBone.BoneTransformable bt = viewDef.getClosestBoneEnd(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()), btHot, false, true);
 					if (bt != null) {
 						edit.addEdit(new AtomicAttachBone(btHot.getBone(), bt.getBone()));
 						weld = true;
 					}
 				} else if (btHot.isEnd()) {
-					Bone.BoneTransformable bt = viewDef.getClosestBoneEnd(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()), btHot, true, false);
+					OLDBone.BoneTransformable bt = viewDef.getClosestBoneEnd(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()), btHot, true, false);
 					if (bt != null) {
 						btHot.getBone().setEnd(bt.getBone().getStart(null));
 						edit.addEdit(new AtomicAttachBone(bt.getBone(), btHot.getBone()));

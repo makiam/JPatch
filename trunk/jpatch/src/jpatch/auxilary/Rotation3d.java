@@ -31,7 +31,13 @@ import javax.vecmath.*;
 public class Rotation3d extends Tuple3d {
 	
 	public static enum Order { //X, Y, Z, XY, XZ, YX, YZ, ZX, ZY, 
-		XYZ, XZY, YXZ, YZX, ZXY, ZYX };
+		XYZ, XZY, YXZ, YZX, ZXY, ZYX;
+		@Override
+		public String toString() {
+			return name().toLowerCase();
+		}
+	};
+	
 	public Order order = Order.XYZ;
 	
 	/* suplerclass constructor */

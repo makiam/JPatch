@@ -208,7 +208,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 	
 	public abstract OLDModel getModel();
 	
-	public boolean isHit(int x, int y, Matrix4f m4View, Bone[] hitBone) {
+	public boolean isHit(int x, int y, Matrix4f m4View, OLDBone[] hitBone) {
 		Matrix4f mt = new Matrix4f(m4ScaledTransform);
 		Matrix4f m = new Matrix4f(m4View);
 		m.mul(mt);
@@ -222,7 +222,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		Vector3f a = new Vector3f();
 		if (this instanceof AnimModel && ((AnimModel) this).getAnchor() != null)
 			a.set(((AnimModel) this).getAnchor().getPosition());
-		for (Bone bone : getModel().getBoneSet()) {
+		for (OLDBone bone : getModel().getBoneSet()) {
 			bone.getStart(p3);
 			p3.sub(a);
 			m.transform(p3);

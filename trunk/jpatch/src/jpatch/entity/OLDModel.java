@@ -26,7 +26,7 @@ public class OLDModel {
 	 *  Description of the Field
 	 */
 	private Set<ControlPoint> setCurves = new HashSet<ControlPoint>();
-	private Set<Bone> setBones = new HashSet<Bone>();
+	private Set<OLDBone> setBones = new HashSet<OLDBone>();
 	private Map<Patch, Patch> mapPatches = new HashMap<Patch, Patch>();
 
 	private MutableTreeNode treenodeSelections;
@@ -234,7 +234,7 @@ public class OLDModel {
 		sb.append(prefix2).append("</selections>\n");
 		
 		sb.append(prefix2).append("<skeleton>\n");
-		for (Bone bone : setBones) {
+		for (OLDBone bone : setBones) {
 			sb.append(bone.xml(prefix3));
 		}
 		sb.append(prefix2).append("</skeleton>\n");
@@ -437,7 +437,7 @@ public class OLDModel {
 			}
 		}
 		for (Iterator itBones = setBones.iterator(); itBones.hasNext(); ) {
-			for (Iterator itDofs = ((Bone) itBones.next()).getDofs().iterator(); itDofs.hasNext(); ) {
+			for (Iterator itDofs = ((OLDBone) itBones.next()).getDofs().iterator(); itDofs.hasNext(); ) {
 				Morph morph = (Morph) itDofs.next();
 				Map morphMap = morph.getMorphMap();
 				for (Iterator itCps = morphMap.keySet().iterator(); itCps.hasNext(); ) {
@@ -485,7 +485,7 @@ public class OLDModel {
 //		return lstBoneShapes;
 //	}
 	
-	public String renameBone(Bone bone, String name) {
+	public String renameBone(OLDBone bone, String name) {
 		if (boneNameSet.contains(name))
 			return bone.getName();
 		boneNameSet.remove(bone.getName());
@@ -578,7 +578,7 @@ public class OLDModel {
 		setCurves.remove(start);
 	}
 
-	public String addBone(Bone bone) {
+	public String addBone(OLDBone bone) {
 		int n = 1;
 		String name = bone.getName();
 		String name1 = name;
@@ -603,7 +603,7 @@ public class OLDModel {
 		return name1;
 	}
 
-	public void removeBone(Bone bone) {
+	public void removeBone(OLDBone bone) {
 //		System.out.println("remove bone from " + bone.getParent());
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(bone);
 		setBones.remove(bone);
@@ -1170,7 +1170,7 @@ public class OLDModel {
 		return mapPatches.keySet();
 	}
 	
-	public Set<Bone> getBoneSet() {
+	public Set<OLDBone> getBoneSet() {
 		return setBones;
 	}
 	
@@ -1217,7 +1217,7 @@ public class OLDModel {
 		
 		System.out.println("\n\n----------- bones -------------");
 		for (Iterator itBones = setBones.iterator(); itBones.hasNext(); ) {
-			Bone bone = (Bone) itBones.next();
+			OLDBone bone = (OLDBone) itBones.next();
 			System.out.println(bone + " \t" + bone.getParentBone());
 			for (Iterator itDofs = bone.getDofs().iterator(); itDofs.hasNext(); )
 				((RotationDof) itDofs.next()).dump();

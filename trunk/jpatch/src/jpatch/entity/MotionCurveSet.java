@@ -153,7 +153,7 @@ public class MotionCurveSet {
 			}
 			Set rootBoneSet = new HashSet();
 			for (Iterator itBone = animModel.getModel().getBoneSet().iterator(); itBone.hasNext(); ) {
-				Bone bone = ((Bone) itBone.next()).getRoot();
+				OLDBone bone = ((OLDBone) itBone.next()).getRoot();
 				System.out.println("**:" + bone);
 				if (!rootBoneSet.contains(bone)) {
 					rootBoneSet.add(bone);
@@ -185,7 +185,7 @@ public class MotionCurveSet {
 //				morph.apply();
 			}
 			for (Iterator itBone = ((AnimModel) animObject).getModel().getBoneSet().iterator(); itBone.hasNext(); ) {
-				for (Iterator itDof = ((Bone) itBone.next()).getDofs().iterator(); itDof.hasNext(); ) {
+				for (Iterator itDof = ((OLDBone) itBone.next()).getDofs().iterator(); itDof.hasNext(); ) {
 					RotationDof dof = (RotationDof) itDof.next();
 					dof.presetValue(morph(dof).getFloatAt(pos));
 				}
@@ -240,7 +240,7 @@ public class MotionCurveSet {
 			return map.toString();
 		}
 		
-		private void recursiveAddBoneDofs(Bone bone, Map map, float pos) {
+		private void recursiveAddBoneDofs(OLDBone bone, Map map, float pos) {
 			System.out.println("\trecursiveAddBoneDofs bone=" + bone);
 			for (Iterator itDofs = bone.getDofs().iterator(); itDofs.hasNext(); ) {
 				RotationDof dof = (RotationDof) itDofs.next();
@@ -251,7 +251,7 @@ public class MotionCurveSet {
 //				motionCurveList.add(morphCurve);
 			}
 			for (Iterator itBones = bone.getChildBones().iterator(); itBones.hasNext(); ) {
-				recursiveAddBoneDofs((Bone) itBones.next(), map, pos);
+				recursiveAddBoneDofs((OLDBone) itBones.next(), map, pos);
 			}
 		}
 	}

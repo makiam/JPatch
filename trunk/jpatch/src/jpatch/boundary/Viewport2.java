@@ -30,7 +30,7 @@ import jpatch.auxilary.*;
 import jpatch.boundary.settings.Settings;
 import jpatch.boundary.tools.*;
 import jpatch.entity.*;
-import jpatch.entity.Bone.BoneTransformable;
+import jpatch.entity.OLDBone.BoneTransformable;
 
 /**
  * @author sascha
@@ -308,7 +308,7 @@ public class Viewport2 {
 	
 	private void drawBones(OLDModel model) {
 		for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
-			Bone bone = (Bone) it.next();
+			OLDBone bone = (OLDBone) it.next();
 			boneRenderer.drawBone(drawable, viewDef, bone);
 		}
 	}
@@ -4130,7 +4130,7 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 //			av3Normals[7].set(-B,-R, 0);
 		}
 		
-		public void drawBone(JPatchDrawable2 drawable, ViewDefinition viewDef, Bone bone) {
+		public void drawBone(JPatchDrawable2 drawable, ViewDefinition viewDef, OLDBone bone) {
 			Selection selection = MainFrame.getInstance() == null ? null : MainFrame.getInstance().getSelection();
 			boolean selected = selection != null && selection.containsBone(bone);
 //			System.out.println("drawBone bone=" + bone);

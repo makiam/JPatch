@@ -50,7 +50,7 @@ public class AnchorMouseListener extends MouseAdapter {
 				}
 			}
 		}
-		for (Bone bone : animModel.getModel().getBoneSet()) {
+		for (OLDBone bone : animModel.getModel().getBoneSet()) {
 			p3.set(bone.getBoneEnd().getPosition());
 			m.transform(p3);
 			p3.z = 0;

@@ -43,7 +43,7 @@ public class TransformNode extends AbstractJPatchObject {
 	public Attribute.Vector3d scalePivotTranslation = new Attribute.Vector3d("Pivot (local)", new Vector3d(0, 0, 0), false);
 	public Attribute.Point3d rotatePivotPosition = new Attribute.Point3d("Pivot (world)", new Point3d(0, 0, 0), false);
 	public Attribute.Vector3d rotatePivotTranslation = new Attribute.Vector3d("Pivot (local)", new Vector3d(0, 0, 0), false);
-	public Attribute.Scale3d shear = new Attribute.Scale3d("Shear", new Scale3d(1, 1, 1), true);
+	public Attribute.Scale3d shear = new Attribute.Scale3d("Shear", new Scale3d(0, 0, 0), true);
 	
 	private TransformNode parent;
 	private List<AnimObject> animObjects = new ArrayList<AnimObject>(1);

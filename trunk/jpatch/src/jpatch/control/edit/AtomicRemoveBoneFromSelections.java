@@ -31,12 +31,12 @@ import jpatch.boundary.*;
  *
  */
 public final class AtomicRemoveBoneFromSelections extends JPatchAtomicEdit {
-	private final Bone.BoneTransformable boneStart;
-	private final Bone.BoneTransformable boneEnd;
+	private final OLDBone.BoneTransformable boneStart;
+	private final OLDBone.BoneTransformable boneEnd;
 	private final HashMap mapSelectionsStart = new HashMap();
 	private final HashMap mapSelectionsEnd = new HashMap();
 	
-	public AtomicRemoveBoneFromSelections(Bone bone) {
+	public AtomicRemoveBoneFromSelections(OLDBone bone) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + bone + ")");
 		boneStart = bone.getParentBone() == null ? bone.getBoneStart() : bone.getParentBone().getBoneEnd();

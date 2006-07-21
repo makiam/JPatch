@@ -574,15 +574,15 @@ implements ComponentListener {
 		return p3;
 	}
 	
-	public Bone getClosestBone(Point2D.Float target) {
+	public OLDBone getClosestBone(Point2D.Float target) {
 		Matrix4f m4Screen = getScreenMatrix();
 		Point3f p3 = new Point3f();
 		Line2D.Float line = new Line2D.Float();
 		float fMinDistance = 256;
 		float fDistance;
-		Bone closest = null;
+		OLDBone closest = null;
 		for (Iterator it = MainFrame.getInstance().getModel().getBoneSet().iterator(); it.hasNext(); ) {
-			Bone bone = (Bone) it.next();
+			OLDBone bone = (OLDBone) it.next();
 			bone.getStart(p3);
 			m4Screen.transform(p3);
 			line.x1 = p3.x;
@@ -600,17 +600,17 @@ implements ComponentListener {
 		return closest;
 	}
 	
-	public Bone.BoneTransformable getClosestBoneEnd(Point2D.Float target, Bone.BoneTransformable except, boolean includeStarts, boolean includeEnds) {
+	public OLDBone.BoneTransformable getClosestBoneEnd(Point2D.Float target, OLDBone.BoneTransformable except, boolean includeStarts, boolean includeEnds) {
 		Matrix4f m4Screen = getScreenMatrix();
 		Point3f p3 = new Point3f();
 		Point2D.Float p2 = new Point2D.Float();
 		float fMinDistance = 64;
 		float fDistance;
 		OLDModel model = MainFrame.getInstance().getModel();
-		Bone.BoneTransformable closest = null;
+		OLDBone.BoneTransformable closest = null;
 		for (Iterator it = model.getBoneSet().iterator(); it.hasNext(); ) {
-			Bone bone = (Bone) it.next();
-			Bone.BoneTransformable bt;
+			OLDBone bone = (OLDBone) it.next();
+			OLDBone.BoneTransformable bt;
 			if (includeEnds) {
 				bt = bone.getBoneEnd();
 				p3.set(bt.getPosition());

@@ -12,7 +12,7 @@ import jpatch.boundary.*;
 import jpatch.control.edit.*;
 //import jpatch.auxilary.*;
 //
-public class Bone implements MutableTreeNode, Transformable {
+public class OLDBone implements MutableTreeNode, Transformable {
 //	public static final BoneTransformableType START = new BoneTransformableType();
 //	public static final BoneTransformableType END = new BoneTransformableType();
 //	private static final float DEFAULT_INFLUENCE = 0.33f; 
@@ -59,11 +59,11 @@ public class Bone implements MutableTreeNode, Transformable {
 //	
 //	private int id;
 	
-	public Bone(Point3f start, Vector3f extent) {
+	public OLDBone(Point3f start, Vector3f extent) {
 		this(start, extent, false);
 	}
 	
-	public Bone(Point3f start, Vector3f extent, boolean noAutoName) {
+	public OLDBone(Point3f start, Vector3f extent, boolean noAutoName) {
 //		if (nextId < 0)
 //			throw new IllegalStateException();
 //		id = nextId++;
@@ -231,7 +231,7 @@ public class Bone implements MutableTreeNode, Transformable {
 //		System.out.println("insert at " + index + "/" + listChildBones.size() + "/" + listDofs.size() + "/" + getChildCount());
 		if (child instanceof RotationDof)
 			listDofs.add(index, (RotationDof) child);
-		else if (child instanceof Bone)
+		else if (child instanceof OLDBone)
 			listChildBones.add(index - listDofs.size(), child);
 		child.setParent(this);
 	}
@@ -244,7 +244,7 @@ public class Bone implements MutableTreeNode, Transformable {
 	}
 
 	public void remove(MutableTreeNode node) {
-		if (node instanceof Bone)
+		if (node instanceof OLDBone)
 			listChildBones.remove(node);
 		else if (node instanceof RotationDof)
 			listDofs.remove(node);
@@ -294,8 +294,8 @@ public class Bone implements MutableTreeNode, Transformable {
 //		boneParent = null;
 //	}
 	
-	public Bone getParentBone() {
-		return parent instanceof Bone ? (Bone) parent : null;
+	public OLDBone getParentBone() {
+		return parent instanceof OLDBone ? (OLDBone) parent : null;
 	}
 	
 //	public void setParentBone(Bone parent) {
@@ -315,9 +315,9 @@ public class Bone implements MutableTreeNode, Transformable {
 	/**
 	* return root bone
 	**/
-	public Bone getRoot() {
+	public OLDBone getRoot() {
 		/* recursively search root bone */
-		Bone parentBone = getParentBone();
+		OLDBone parentBone = getParentBone();
 		return parentBone == null ? this : parentBone.getRoot();
 	}
 
@@ -545,9 +545,9 @@ public class Bone implements MutableTreeNode, Transformable {
 //		setExtent();
 //	}
 	
-	private static void applyCorrection(Bone bone, boolean inverse) {
+	private static void applyCorrection(OLDBone bone, boolean inverse) {
 		for (Iterator it = bone.listChildBones.iterator(); it.hasNext(); ) {
-			Bone child = (Bone) it.next();
+			OLDBone child = (OLDBone) it.next();
 			if (inverse) {
 				child.lastDofInvTransform(child.p3TempEnd);
 				child.p3End.set(child.p3TempEnd);
@@ -591,8 +591,8 @@ public class Bone implements MutableTreeNode, Transformable {
 			return p3 == p3End;
 		}
 		
-		public Bone getBone() {
-			return Bone.this;
+		public OLDBone getBone() {
+			return OLDBone.this;
 		}
 		
 		public Point3f getPosition() {
@@ -622,10 +622,10 @@ public class Bone implements MutableTreeNode, Transformable {
 				p3.set(p3Dummy);
 			} else {
 				
-				Bone.applyCorrection(Bone.this, false);
+				OLDBone.applyCorrection(OLDBone.this, false);
 				lastDofInvTransform(p3Dummy);
 				p3.set(p3Dummy);
-				Bone.applyCorrection(Bone.this, true);
+				OLDBone.applyCorrection(OLDBone.this, true);
 //				System.out.println(p3Dummy);
 //				int children = listChildBones.size();
 //				//if (children > 0) {
@@ -696,7 +696,7 @@ public class Bone implements MutableTreeNode, Transformable {
 		public JPatchUndoableEdit endTransform() {
 			if (MainFrame.getInstance().getJPatchScreen().isLockBones())
 				return null;
-			return new AtomicChangeBone.Point(Bone.this, p3Temp, p3);
+			return new AtomicChangeBone.Point(OLDBone.this, p3Temp, p3);
 		}
 		
 //		public String toString() {

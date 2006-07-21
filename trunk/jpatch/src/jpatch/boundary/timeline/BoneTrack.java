@@ -16,7 +16,7 @@ public class BoneTrack extends AvarTrack {
 	
 	private MotionCurve.Float[] motionCurves;
 	private RotationDof[] dofs;
-	private Bone bone;
+	private OLDBone bone;
 	private int level;
 	private Color[] col = new Color[] {
 			new Color(255, 0, 0),
@@ -24,7 +24,7 @@ public class BoneTrack extends AvarTrack {
 			new Color(0, 0, 255)
 	};
 	
-	public BoneTrack(TimelineEditor timelineEditor, RotationDof[] dofs, MotionCurve.Float[] motionCurves, Bone bone, int level) {
+	public BoneTrack(TimelineEditor timelineEditor, RotationDof[] dofs, MotionCurve.Float[] motionCurves, OLDBone bone, int level) {
 		this.timelineEditor = timelineEditor;
 		this.dofs = dofs;
 		this.motionCurves = motionCurves;
@@ -39,7 +39,7 @@ public class BoneTrack extends AvarTrack {
 		return bone.getName();
 	}
 	
-	public Bone getBone() {
+	public OLDBone getBone() {
 		return bone;
 	}
 	

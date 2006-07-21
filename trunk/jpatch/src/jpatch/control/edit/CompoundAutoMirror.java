@@ -313,7 +313,7 @@ public class CompoundAutoMirror extends AbstractClone {
 			 */
 			Map mapBoneClones = new HashMap();
 			for (Iterator itBone = new ArrayList(MainFrame.getInstance().getModel().getBoneSet()).iterator(); itBone.hasNext(); ) {
-				Bone bone = (Bone) itBone.next();
+				OLDBone bone = (OLDBone) itBone.next();
 				if (!selection.containsBone(bone))
 					continue;
 				Point3f p3Start = bone.getReferenceStart();
@@ -326,7 +326,7 @@ public class CompoundAutoMirror extends AbstractClone {
 //					System.out.println("mirror " + bone);
 					Vector3f v3Extent = new Vector3f(p3End);
 					v3Extent.sub(p3Start);
-					Bone newBone = new Bone(new Point3f(-p3Start.x, p3Start.y, p3Start.z), new Vector3f(-v3Extent.x, v3Extent.y, v3Extent.z));
+					OLDBone newBone = new OLDBone(new Point3f(-p3Start.x, p3Start.y, p3Start.z), new Vector3f(-v3Extent.x, v3Extent.y, v3Extent.z));
 					newBone.setName(mirrorName(bone.getName()));
 					//newBone.setEnd(new Point3f(-p3End.x, p3End.y, p3End.z));
 					int i = 0;
@@ -431,12 +431,12 @@ public class CompoundAutoMirror extends AbstractClone {
 			}
 			
 			for (Iterator it = mapBoneClones.keySet().iterator(); it.hasNext(); ) {
-				Bone bone = (Bone) it.next();
-				Bone clone = (Bone) mapBoneClones.get(bone);
+				OLDBone bone = (OLDBone) it.next();
+				OLDBone clone = (OLDBone) mapBoneClones.get(bone);
 				if (bone != clone) {
-					Bone parent = bone.getParentBone();
+					OLDBone parent = bone.getParentBone();
 					if (parent != null) {
-						Bone parentClone = (Bone) mapBoneClones.get(bone.getParentBone());
+						OLDBone parentClone = (OLDBone) mapBoneClones.get(bone.getParentBone());
 						clone.setParent(parentClone);
 //						parentClone.insert(clone, parentClone.getChildCount());
 					}
@@ -448,7 +448,7 @@ public class CompoundAutoMirror extends AbstractClone {
 				ControlPoint clone = (ControlPoint) mapClones.get(cp);
 				if (cp == clone)
 					continue;
-				clone.setBone((Bone) mapBoneClones.get(cp.getBone()), cp.getBonePosition(), cp.getBoneDistance(), cp.isParentBone());
+				clone.setBone((OLDBone) mapBoneClones.get(cp.getBone()), cp.getBonePosition(), cp.getBoneDistance(), cp.isParentBone());
 			}
 			
 			/*

@@ -43,7 +43,7 @@ public class Pose {
 			poseMap.put(morph, morph.getValue());
 		}
 		for (Iterator itBone = model.getBoneSet().iterator(); itBone.hasNext(); ) {
-			for (Iterator itDof = ((Bone) itBone.next()).getDofs().iterator(); itDof.hasNext(); ) {
+			for (Iterator itDof = ((OLDBone) itBone.next()).getDofs().iterator(); itDof.hasNext(); ) {
 				RotationDof dof = (RotationDof) itDof.next();
 				poseMap.put(dof, dof.getValue());
 			}
