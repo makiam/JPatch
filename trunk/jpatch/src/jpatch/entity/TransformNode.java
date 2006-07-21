@@ -83,8 +83,8 @@ public class TransformNode extends AbstractJPatchObject {
 		child.setParent(this);
 	}
 	
-	public void setParent(TransformNode parent) {
-		this.parent = parent;
+	public void setParent(JPatchObject parent) {
+		this.parent = (TransformNode) parent;
 	}
 	
 	public TransformNode getParent() {

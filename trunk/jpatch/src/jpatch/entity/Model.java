@@ -7,4 +7,7 @@ public class Model extends AbstractJPatchObject {
 		name.set("Model");
 	}
 
+	public void setParent(JPatchObject parent) {
+		
+	}
 }

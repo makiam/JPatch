@@ -28,7 +28,7 @@ public class JPatchTreeNode extends DefaultMutableTreeNode implements Comparable
 		name = (Attribute.String) jpatchObject.getAttribute("Name");
 		name.addAttributeListener(this);
 	}
-
+	
 	public String getName() {
 		if (name != null)
 			return name.get();
@@ -60,6 +60,19 @@ public class JPatchTreeNode extends DefaultMutableTreeNode implements Comparable
 		treeModel.nodesWereRemoved(this, new int[] { childIndex }, removedChildren);
 	}
 	
+	
+	@Override
+	public void setParent(MutableTreeNode newParent) {
+		super.setParent(newParent);
+		JPatchObject userParent = newParent == null ? null : ((JPatchTreeNode) newParent).getUserObject();
+		getUserObject().setParent(userParent); 
+	}
+
+	@Override
+	public JPatchObject getUserObject() {
+		return (JPatchObject) userObject;
+	}
+	
 	public void setTreeModel(JPatchTreeModel treeModel) {
 		System.out.println(hashCode() + " setTreeModel");
 		this.treeModel = treeModel;
@@ -79,5 +92,20 @@ public class JPatchTreeNode extends DefaultMutableTreeNode implements Comparable
 		if (result == 0)
 			result = getName().compareTo(node.getName());
 		return result;
+	}
+	
+	@Override
+	public String toString() {
+		return "JPatchTreenode@" + hashCode() + "(" + userObject + ")";
+	}
+	
+	public void dump(String prefix) {
+		System.out.println(prefix + this);
+		prefix += "  ";
+		if (children != null) {
+			for (Object child : children) {
+				((JPatchTreeNode) child).dump(prefix);
+			}
+		}
 	}
 }

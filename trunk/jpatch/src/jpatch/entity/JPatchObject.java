@@ -6,4 +6,5 @@ public interface JPatchObject {
 	Iterable<Attribute> getChannels();
 	Attribute getAttribute(String name);
 	Attribute getAttribute(int index);
+	void setParent(JPatchObject parent);
 }
