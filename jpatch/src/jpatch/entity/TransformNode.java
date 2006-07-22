@@ -30,7 +30,7 @@ import java.util.*;
 import javax.vecmath.*;
 import jpatch.auxilary.*;
 
-public class TransformNode extends AbstractJPatchObject {
+public class TransformNode extends AbstractTransform {
 	
 	public Attribute.KeyedBoolean visibility = new Attribute.KeyedBoolean("Visibility", true);
 	public Attribute.Enum rotationOrder = new Attribute.Enum("Order", Rotation3d.Order.XYZ);
@@ -48,10 +48,7 @@ public class TransformNode extends AbstractJPatchObject {
 	private TransformNode parent;
 	private List<AnimObject> animObjects = new ArrayList<AnimObject>(1);
 	private List<AnimObject> unmodifiableAnimObjects = Collections.unmodifiableList(animObjects);
-	private List<TransformNode> childTransformNodes = new ArrayList<TransformNode>(1);
-	private List<TransformNode> unmodifiableChildTransformNodes = Collections.unmodifiableList(childTransformNodes);
-	private Matrix4d matrix = new Matrix4d();
-	private Matrix4d inverseMatrix = new Matrix4d();
+	
 	private Matrix3d rotationMatrix = new Matrix3d();
 	private Matrix3d scaleMatrix = new Matrix3d();
 	private Vector3d translationTuple = new Vector3d();
@@ -62,43 +59,15 @@ public class TransformNode extends AbstractJPatchObject {
 	
 	
 	public TransformNode() {
-		matrix.setIdentity();
 		addAttributeChangeListeners();
-	}
-	
-	public Matrix4d getMatrix() {
-		return matrix;
-	}
-	
-	public List<TransformNode> getChildTransformNodes() {
-		return unmodifiableChildTransformNodes;
 	}
 	
 	public List<AnimObject> getAnimObjects() {
 		return unmodifiableAnimObjects;
 	}
 	
-	public void addChild(TransformNode child) {
-		childTransformNodes.add(child);
-		child.setParent(this);
-	}
-	
-	public void setParent(JPatchObject parent) {
-		this.parent = (TransformNode) parent;
-	}
-	
-	public TransformNode getParent() {
-		return parent;
-	}
-	
-	public void computeBranch() {
-		computeMatrix();
-		computeDerivedAttributes();
-		for (TransformNode child : childTransformNodes)
-			child.computeBranch();
-	}
-	
-	private void computeMatrix() {
+	@Override
+	protected void computeMatrix() {
 		scale.get(scaleTuple);
 		scaleTuple.setMatrixScale(scaleMatrix);
 		rotation.get(rotationTuple);
@@ -108,11 +77,12 @@ public class TransformNode extends AbstractJPatchObject {
 		translation.get(translationTuple);
 		matrix.setTranslation(translationTuple);
 		if (parent != null)
-			matrix.mul(parent.getMatrix());
-		inverseMatrix.invert(matrix);
+			parent.multiply(matrix);
+		inverseInvalid = true;
 	}
 	
-	private void computeDerivedAttributes() {
+	@Override
+	protected void computeDerivedAttributes() {
 		translationChanged(translation, position);
 		translationChanged(scalePivotTranslation, scalePivotPosition);
 		translationChanged(rotatePivotTranslation, rotatePivotPosition);
@@ -160,23 +130,5 @@ public class TransformNode extends AbstractJPatchObject {
 		});
 	}
 	
-	private void positionChanged(Attribute.Point3d position, Attribute.Vector3d translation) {
-		Point3d tmp = new Point3d();
-		position.get(tmp);
-		if (parent != null)
-			parent.inverseMatrix.transform(tmp);
-//		position.setValueAdjusting(true);
-		translation.set(tmp);
-//		position.setValueAdjusting(false);
-	}
 	
-	private void translationChanged(Attribute.Vector3d translation, Attribute.Point3d position) {
-		Point3d tmp = new Point3d();
-		translation.get(tmp);
-		if (parent != null)
-			parent.matrix.transform(tmp);
-//		translation.setValueAdjusting(true);
-		position.set(tmp);
-//		translation.setValueAdjusting(false);
-	}
 }

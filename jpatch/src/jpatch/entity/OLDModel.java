@@ -20,7 +20,7 @@ import jpatch.boundary.*;
  * @author     aledinsk
  * @created    02. Mai 2003
  */
-public class OLDModel {
+public class OLDModel implements MutableTreeNode {
 
 	/**
 	 *  Description of the Field

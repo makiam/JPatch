@@ -78,6 +78,7 @@ public class Viewport2 {
 	
 //	private Grid grid = new Grid();
 	private BoneRenderer boneRenderer = new BoneRenderer();
+	private NewBoneRenderer boneRenderer2 = new NewBoneRenderer();
 	
 	private float fMinZ, fDeltaZ;
 	
@@ -311,6 +312,8 @@ public class Viewport2 {
 			OLDBone bone = (OLDBone) it.next();
 			boneRenderer.drawBone(drawable, viewDef, bone);
 		}
+		Bone b = new Bone();
+		boneRenderer2.drawBone(drawable, viewDef, b);
 	}
 	
 	public void drawAnimFrame(Animation animation) {
@@ -4031,6 +4034,89 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 		p2.set((p1.x + pn0.x) * 0.5f, (p1.y + pn0.y) * 0.5f, (p1.z + pn0.z) * 0.5f);
 		p3.set((p2.x + pn1.x) * 0.5f, (p2.y + pn1.y) * 0.5f, (p2.z + pn1.z) * 0.5f);
 		pn0.set(p3);
+	}
+	
+	
+	private static class NewBoneRenderer {
+		private static final int[] LINES = new int[] {
+			0, 2,
+			0, 3,
+			0, 4,
+			0, 5,
+			2, 1,
+			3, 1,
+			4, 1,
+			5, 1,
+			2, 3,
+			3, 4,
+			4, 5,
+			5, 2
+		};
+		private static final int[] TRIANGLES = new int[] {
+			1, 2, 3,
+			1, 3, 4,
+			1, 4, 5,
+			1, 5, 2,
+			0, 3, 2,
+			0, 4, 3,
+			0, 5, 4,
+			0, 2, 5
+		};
+		private static final double A = 0.1;
+		private final Point3d[] points = new Point3d[6];
+		private final Vector3d[] normals = new Vector3d[6];
+		private final Vector3d extent = new Vector3d();
+		private final Vector3d up = new Vector3d();
+		private final Vector3d v = new Vector3d();
+		private final Matrix4d m = new Matrix4d();
+		private final Point3f p0 = new Point3f();
+		private final Point3f p1 = new Point3f();
+		
+		NewBoneRenderer() {
+			for (int i = 0; i < points.length; i++) {
+				points[i] = new Point3d();
+			}
+		}
+		
+		public void drawBone(JPatchDrawable2 drawable, ViewDefinition viewDef, Bone bone) {
+			bone.extent.get(extent);
+			bone.up.get(up);
+		
+			double length = extent.length();
+			
+			/*
+			 * set up points
+			 */
+			points[0].set(0, 0, 0);
+			points[1].set(extent);
+			v.cross(extent, up);
+			v.normalize();
+			v.scale(A * length);
+			points[2].set(v);
+			points[4].set(-v.x, -v.y, -v.z);
+			v.cross(extent, v);
+			v.normalize();
+			v.scale(A * length);
+			points[3].set(v);
+			points[5].set(-v.x, -v.y, -v.z);
+			extent.scale(A);
+			points[2].add(extent);
+			points[3].add(extent);
+			points[4].add(extent);
+			points[5].add(extent);
+			
+			m.set(viewDef.getMatrix());
+			bone.multiply(m);
+			for (Point3d p : points) {
+				m.transform(p);
+			}
+			drawable.setColor(new Color3f(1, 1, 1));
+			for (int i = 0; i < LINES.length; i += 2) {
+				p0.set(points[LINES[i]]);
+				p1.set(points[LINES[i + 1]]);
+				drawable.drawLine(p0, p1);		// FIXME: rewrite all vecmath calls to double!
+			}
+		}
 	}
 	
 	private class BoneRenderer {
