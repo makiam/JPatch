@@ -6,7 +6,7 @@ import jpatch.auxilary.*;
 
 import jpatch.auxilary.Rotation3d;
 
-public class Bone extends AbstractJPatchObject {
+public class Bone extends AbstractTransform {
 	public static enum WeightingMode {
 		RIGID, SOFT, SMOOTH;
 		@Override
@@ -29,7 +29,6 @@ public class Bone extends AbstractJPatchObject {
 	public Attribute.Enum weightingZ = new Attribute.Enum("Weighting Z", WeightingMode.RIGID);
 	public Attribute.Scale3d scale = new Attribute.Scale3d("Scale", new Scale3d(1, 1, 1), true);
 	
-	private Bone parent;
 	private Rotation3d axisRotationTuple = new Rotation3d();
 	private Vector3d translationTuple = new Vector3d();
 	private Rotation3d rotationTuple = new Rotation3d();
@@ -37,15 +36,12 @@ public class Bone extends AbstractJPatchObject {
 	private Scale3d scaleTuple = new Scale3d();
 	private Matrix3d rotationMatrix = new Matrix3d();
 	private Matrix3d scaleMatrix = new Matrix3d();
-	private Matrix4d matrix = new Matrix4d();
-	private Matrix4d inverseMatrix = new Matrix4d();
-	private boolean inverseValid = false;
 	
 	public void setParent(JPatchObject parent) {
 		parent = (Bone) parent;
 	}
 
-	private void computeMatrix() {
+	protected void computeMatrix() {
 		scale.get(scaleTuple);
 		scaleTuple.setMatrixScale(scaleMatrix);
 		rotation.get(rotationTuple);
@@ -54,12 +50,9 @@ public class Bone extends AbstractJPatchObject {
 		matrix.setRotationScale(scaleMatrix);
 		translation.get(translationTuple);
 		matrix.setTranslation(translationTuple);
-		if (parent != null)
-			matrix.mul(parent.getMatrix());
-//		inverseMatrix.invert(matrix);
-	}
-	
-	public Matrix4d getMatrix() {
-		return matrix;
-	}
+		if (parent != null) {
+			parent.multiply(matrix);
+		}
+		inverseInvalid = true;
+	}	
 }
