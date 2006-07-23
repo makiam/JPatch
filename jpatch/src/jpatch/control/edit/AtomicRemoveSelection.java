@@ -4,6 +4,7 @@ import javax.swing.tree.*;
 
 import jpatch.boundary.sidebar.*;
 import jpatch.boundary.*;
+import jpatch.entity.Selection;
 
 public class AtomicRemoveSelection extends JPatchAtomicEdit implements JPatchRootEdit {
 	

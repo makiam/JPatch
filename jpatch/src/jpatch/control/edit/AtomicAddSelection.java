@@ -2,6 +2,7 @@ package jpatch.control.edit;
 
 import javax.swing.tree.*;
 import jpatch.boundary.*;
+import jpatch.entity.Selection;
 
 public class AtomicAddSelection extends JPatchAtomicEdit implements JPatchRootEdit {
 	

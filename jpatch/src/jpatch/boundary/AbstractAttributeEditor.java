@@ -49,7 +49,7 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		c.add(box);
 	}
 	
-	protected void addTuple(Container c, Attribute.Tuple3d a) {
+	protected void addTuple(Container c, Attribute.Tuple a) {
 		c.add(new JLabel(a.getName()));
 		JComponent box = new ExpandableFormRow();
 		box.setOpaque(false);
@@ -88,7 +88,7 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		c.add(box);
 	}
 	
-	protected void addLimit(Container c, final Attribute.Tuple3d a) {
+	protected void addLimit(Container c, final Attribute.Tuple a) {
 		c.add(new JLabel("Minimum"));
 		JComponent box = new ExpandableFormRow();
 		box.setOpaque(false);

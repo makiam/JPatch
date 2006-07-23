@@ -12,7 +12,6 @@ import javax.swing.tree.TreeNode;
 import javax.vecmath.*;
 
 import jpatch.boundary.MainFrame;
-import jpatch.boundary.Selection;
 import jpatch.control.edit.AtomicChangeAnimObjectScale;
 import jpatch.control.edit.AtomicChangeAnimObjectTransform;
 import jpatch.control.edit.AtomicModifyMotionCurve;

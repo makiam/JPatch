@@ -1,6 +1,7 @@
 package jpatch.control.edit;
 
 import jpatch.boundary.*;
+import jpatch.entity.Selection;
 
 public abstract class JPatchAtomicEdit implements JPatchUndoableEdit {
 	

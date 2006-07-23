@@ -25,6 +25,7 @@ import java.util.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
+import jpatch.entity.Selection;
 
 /**
  * @author sascha

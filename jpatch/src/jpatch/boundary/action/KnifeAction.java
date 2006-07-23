@@ -7,8 +7,8 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 
 import jpatch.boundary.MainFrame;
-import jpatch.boundary.Selection;
 import jpatch.boundary.mouse.KnifeMouseAdapter;
+import jpatch.entity.Selection;
 
 
 /**

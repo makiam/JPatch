@@ -4053,68 +4053,98 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 			5, 2
 		};
 		private static final int[] TRIANGLES = new int[] {
-			1, 2, 3,
-			1, 3, 4,
-			1, 4, 5,
-			1, 5, 2,
-			0, 3, 2,
-			0, 4, 3,
-			0, 5, 4,
-			0, 2, 5
+			3, 2, 1,
+			4, 3, 1,
+			5, 4, 1,
+			2, 5, 1,
+			2, 3, 0,
+			3, 4, 0,
+			4, 5, 0,
+			5, 2, 0
 		};
-		private static final double A = 0.1;
-		private final Point3d[] points = new Point3d[6];
-		private final Vector3d[] normals = new Vector3d[6];
-		private final Vector3d extent = new Vector3d();
-		private final Vector3d up = new Vector3d();
-		private final Vector3d v = new Vector3d();
+		private static final float A = 0.1f;
+		private final Point3f[] points = new Point3f[6];
+		private final Vector3f v0 = new Vector3f();
+		private final Vector3f v1 = new Vector3f();
+		private final Vector3f v2 = new Vector3f();
 		private final Matrix4d m = new Matrix4d();
-		private final Point3f p0 = new Point3f();
-		private final Point3f p1 = new Point3f();
+		private final Color3f c = new Color3f();
+		private MaterialProperties mp = new MaterialProperties();
 		
 		NewBoneRenderer() {
 			for (int i = 0; i < points.length; i++) {
-				points[i] = new Point3d();
+				points[i] = new Point3f();
 			}
 		}
 		
 		public void drawBone(JPatchDrawable2 drawable, ViewDefinition viewDef, Bone bone) {
-			bone.extent.get(extent);
-			bone.up.get(up);
+			bone.extent.get(v0);
+			bone.up.get(v1);
 		
-			double length = extent.length();
+			float length = v0.length();
 			
 			/*
-			 * set up points
+			 * set up points for bone-model
 			 */
 			points[0].set(0, 0, 0);
-			points[1].set(extent);
-			v.cross(extent, up);
-			v.normalize();
-			v.scale(A * length);
-			points[2].set(v);
-			points[4].set(-v.x, -v.y, -v.z);
-			v.cross(extent, v);
-			v.normalize();
-			v.scale(A * length);
-			points[3].set(v);
-			points[5].set(-v.x, -v.y, -v.z);
-			extent.scale(A);
-			points[2].add(extent);
-			points[3].add(extent);
-			points[4].add(extent);
-			points[5].add(extent);
+			points[1].set(v0);
+			v2.cross(v0, v1);
+			v2.normalize();
+			v2.scale(A * length);
+			points[2].set(v2);
+			points[4].set(-v2.x, -v2.y, -v2.z);
+			v2.cross(v0, v2);
+			v2.normalize();
+			v2.scale(A * length);
+			points[3].set(v2);
+			points[5].set(-v2.x, -v2.y, -v2.z);
+			v0.scale(A);
+			points[2].add(v0);
+			points[3].add(v0);
+			points[4].add(v0);
+			points[5].add(v0);
 			
+			/*
+			 * apply transformation
+			 */
 			m.set(viewDef.getMatrix());
 			bone.multiply(m);
-			for (Point3d p : points) {
+			for (Point3f p : points) {
 				m.transform(p);
 			}
+			
+			/*
+			 * draw wireframe model
+			 */
 			drawable.setColor(new Color3f(1, 1, 1));
 			for (int i = 0; i < LINES.length; i += 2) {
-				p0.set(points[LINES[i]]);
-				p1.set(points[LINES[i + 1]]);
-				drawable.drawLine(p0, p1);		// FIXME: rewrite all vecmath calls to double!
+				drawable.drawLine(points[LINES[i]], points[LINES[i + 1]]);
+			}
+			
+			/*
+			 * if supported, draw shaded model
+			 */
+			if (drawable.isShadingSupported()) {
+				for (int i = 0; i < TRIANGLES.length; i += 3) {
+					/* compute normal */
+					v0.sub(points[TRIANGLES[i + 1]], points[TRIANGLES[i]]);
+					v1.sub(points[TRIANGLES[i + 2]], points[TRIANGLES[i]]);
+					v2.cross(v1, v0);		
+					v2.normalize();			// store normalized normal in v2
+					bone.color.get(c);
+					mp.red = c.x;
+					mp.green = c.y;
+					mp.blue = c.z;
+					if (drawable.isLightingSupported()) {
+						drawable.setLightingEnabled(true);
+						drawable.setMaterial(mp);
+						drawable.drawTriangle(points[TRIANGLES[i]], v2, points[TRIANGLES[i + 1]], v2, points[TRIANGLES[i + 2]], v2);
+					} else {
+						viewDef.getLighting().shade(points[TRIANGLES[i]], v2, mp, c);
+						drawable.setColor(c);
+						drawable.drawTriangle(points[TRIANGLES[i]], points[TRIANGLES[i + 1]], points[TRIANGLES[i + 2]]);
+					}
+				}
 			}
 		}
 	}

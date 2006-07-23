@@ -24,7 +24,6 @@ package jpatch.control.edit;
 import java.util.*;
 
 import jpatch.boundary.MainFrame;
-import jpatch.boundary.Selection;
 import jpatch.entity.*;
 
 /**

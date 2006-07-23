@@ -37,7 +37,7 @@ public class BoneAttributeEditor extends AbstractAttributeEditor {
 	
 	public BoneAttributeEditor(Bone bone) {
 		this.bone = bone;
-		ExpandableForm defaultForm = new ExpandableForm(true);
+		ExpandableForm defaultForm = new ExpandableForm();
 		ExpandableForm translationForm = new ExpandableForm();
 		ExpandableForm positionForm = new ExpandableForm();
 		ExpandableForm axisRotationForm = new ExpandableForm();
@@ -47,6 +47,7 @@ public class BoneAttributeEditor extends AbstractAttributeEditor {
 		ExpandableForm scaleForm = new ExpandableForm();
 		
 		addScalar(defaultForm, bone.name);
+		addTuple(defaultForm, bone.color);
 		addTuple(axisRotationForm, bone.axisRotation);
 		addScalar(axisRotationForm, bone.axisRotationOrder);
 		addTuple(translationForm, bone.translation);

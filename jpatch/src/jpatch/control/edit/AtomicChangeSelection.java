@@ -1,6 +1,7 @@
 package jpatch.control.edit;
 
 import jpatch.boundary.*;
+import jpatch.entity.Selection;
 
 /**
  * Use this class for changing selections (with the default tool)

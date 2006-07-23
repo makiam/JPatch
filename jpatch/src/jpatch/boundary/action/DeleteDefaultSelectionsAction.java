@@ -29,6 +29,7 @@ import javax.swing.*;
 import jpatch.boundary.*;
 
 import jpatch.control.edit.*;
+import jpatch.entity.Selection;
 
 /**
  * @author lois
