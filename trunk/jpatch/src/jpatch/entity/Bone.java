@@ -7,6 +7,16 @@ import jpatch.auxilary.*;
 import jpatch.auxilary.Rotation3d;
 
 public class Bone extends AbstractTransform {
+	private static int col = 0;
+	private static final Color3f[] COLORS = new Color3f[] {
+		new Color3f(1, 0, 0),
+		new Color3f(0, 1, 0),
+		new Color3f(0, 0, 1),
+		new Color3f(1, 1, 0),
+		new Color3f(1, 0, 1),
+		new Color3f(0, 1, 1),
+	};
+	
 	public static enum WeightingMode {
 		RIGID, SOFT, SMOOTH;
 		@Override
@@ -15,19 +25,20 @@ public class Bone extends AbstractTransform {
 		}
 	};
 	
+	public Attribute.Tuple color = new Attribute.Tuple("Color", COLORS[col++ % COLORS.length], false);
 	public Attribute.Enum rotationOrder = new Attribute.Enum("Order", Rotation3d.Order.XYZ);
 	public Attribute.Enum axisRotationOrder = new Attribute.Enum("Order", Rotation3d.Order.XYZ);
-	public Attribute.Vector3d extent = new Attribute.Vector3d("Extent", new Vector3d(0, 0, 1), false);
-	public Attribute.Vector3d up = new Attribute.Vector3d("Up", new Vector3d(0, 1, 0), false);
-	public Attribute.Rotation3d axisRotation = new Attribute.Rotation3d("Axis Rotation", new Rotation3d(), false);
-	public Attribute.Vector3d translation = new Attribute.Vector3d("Translation", new Vector3d(), false);
-	public Attribute.Vector3d position = new Attribute.Vector3d("Position", new Vector3d(), false);
-	public Attribute.Rotation3d rotation = new Attribute.Rotation3d("Rotation", new Rotation3d(), true);
-	public Attribute.Rotation3d orientation = new Attribute.Rotation3d("Orientation", new Rotation3d(), false);
+	public Attribute.Tuple extent = new Attribute.Tuple("Extent", 0, 0, 1, false);
+	public Attribute.Tuple up = new Attribute.Tuple("Up", 0, 1, 0, false);
+	public Attribute.Tuple axisRotation = new Attribute.Tuple("Axis Rotation", 0, 0, 0, false);
+	public Attribute.Tuple translation = new Attribute.Tuple("Translation", 0, 0, 0, false);
+	public Attribute.Tuple position = new Attribute.Tuple("Position", 0, 0, 0, false);
+	public Attribute.Tuple rotation = new Attribute.Tuple("Rotation", 0, 0, 0, true);
+	public Attribute.Tuple orientation = new Attribute.Tuple("Orientation", 0, 0, 0, false);
 	public Attribute.Enum weightingX = new Attribute.Enum("Weighting X", WeightingMode.RIGID);
 	public Attribute.Enum weightingY = new Attribute.Enum("Weighting Y", WeightingMode.RIGID);
 	public Attribute.Enum weightingZ = new Attribute.Enum("Weighting Z", WeightingMode.RIGID);
-	public Attribute.Scale3d scale = new Attribute.Scale3d("Scale", new Scale3d(1, 1, 1), true);
+	public Attribute.Tuple scale = new Attribute.Tuple("Scale", 1, 1, 1, true);
 	
 	private Rotation3d axisRotationTuple = new Rotation3d();
 	private Vector3d translationTuple = new Vector3d();

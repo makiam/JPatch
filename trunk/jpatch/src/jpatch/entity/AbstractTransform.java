@@ -66,7 +66,7 @@ public abstract class AbstractTransform extends AbstractJPatchObject {
 	
 	protected void evaluateConstraints() { }
 	
-	protected void positionChanged(Attribute.Point3d position, Attribute.Vector3d translation) {
+	protected void positionChanged(Attribute.Tuple position, Attribute.Tuple translation) {
 		Point3d tmp = new Point3d();
 		position.get(tmp);
 		if (parent != null)
@@ -76,7 +76,7 @@ public abstract class AbstractTransform extends AbstractJPatchObject {
 //		position.setValueAdjusting(false);
 	}
 	
-	protected void translationChanged(Attribute.Vector3d translation, Attribute.Point3d position) {
+	protected void translationChanged(Attribute.Tuple translation, Attribute.Tuple position) {
 		Point3d tmp = new Point3d();
 		translation.get(tmp);
 		if (parent != null)

@@ -3,6 +3,7 @@ package jpatch.boundary.action;
 import java.awt.event.*;
 import javax.swing.*;
 import jpatch.control.edit.*;
+import jpatch.entity.Selection;
 import jpatch.boundary.*;
 
 

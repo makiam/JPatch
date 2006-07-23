@@ -4,6 +4,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.vecmath.*;
 import jpatch.boundary.*;
+import jpatch.entity.Selection;
 
 
 public final class SetViewLockAction extends AbstractAction {

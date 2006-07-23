@@ -1,4 +1,4 @@
-package jpatch.boundary;
+package jpatch.entity;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -7,9 +7,10 @@ import java.util.regex.Pattern;
 import javax.vecmath.*;
 
 import jpatch.auxilary.Utils3D;
+import jpatch.boundary.JPatchTreeLeaf;
+import jpatch.boundary.MainFrame;
 import jpatch.control.edit.*;
 import jpatch.entity.*;
-import jpatch.entity.OLDBone.BoneTransformable;
 
 public class Selection extends JPatchTreeLeaf {
 	public static final int CONTROLPOINTS = 1;

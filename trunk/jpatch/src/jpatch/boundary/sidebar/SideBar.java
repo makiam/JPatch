@@ -9,7 +9,6 @@ import javax.swing.tree.MutableTreeNode;
 
 import jpatch.boundary.JPatchTree;
 import jpatch.boundary.MainFrame;
-import jpatch.boundary.Selection;
 import jpatch.boundary.sidebar.*;
 import jpatch.entity.*;
 import jpatch.control.edit.*;

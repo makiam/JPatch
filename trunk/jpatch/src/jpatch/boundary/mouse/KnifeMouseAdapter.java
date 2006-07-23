@@ -14,13 +14,13 @@ import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import jpatch.boundary.MainFrame;
-import jpatch.boundary.Selection;
 import jpatch.boundary.ViewDefinition;
 import jpatch.boundary.settings.Settings;
 import jpatch.boundary.tools.Tools;
 import jpatch.control.edit.AtomicInsertControlPoint;
 import jpatch.control.edit.JPatchActionEdit;
 import jpatch.entity.ControlPoint;
+import jpatch.entity.Selection;
 
 /**
  * implements the knife tool.

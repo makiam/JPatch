@@ -34,16 +34,16 @@ public class TransformNode extends AbstractTransform {
 	
 	public Attribute.KeyedBoolean visibility = new Attribute.KeyedBoolean("Visibility", true);
 	public Attribute.Enum rotationOrder = new Attribute.Enum("Order", Rotation3d.Order.XYZ);
-	public Attribute.Point3d position = new Attribute.Point3d("Position", new Point3d(0, 0, 0), false);
-	public Attribute.Vector3d translation = new Attribute.Vector3d("Translation", new Vector3d(0, 0, 0), true);
-	public Attribute.Rotation3d orientation = new Attribute.Rotation3d("Orientation", new Rotation3d(0, 0, 0), false);
-	public Attribute.Rotation3d rotation = new Attribute.Rotation3d("Rotation", new Rotation3d(0, 0, 0), true);
-	public Attribute.Scale3d scale = new Attribute.Scale3d("Scale", new Scale3d(1, 1, 1), true);
-	public Attribute.Point3d scalePivotPosition = new Attribute.Point3d("Pivot (world)", new Point3d(0, 0, 0), false);
-	public Attribute.Vector3d scalePivotTranslation = new Attribute.Vector3d("Pivot (local)", new Vector3d(0, 0, 0), false);
-	public Attribute.Point3d rotatePivotPosition = new Attribute.Point3d("Pivot (world)", new Point3d(0, 0, 0), false);
-	public Attribute.Vector3d rotatePivotTranslation = new Attribute.Vector3d("Pivot (local)", new Vector3d(0, 0, 0), false);
-	public Attribute.Scale3d shear = new Attribute.Scale3d("Shear", new Scale3d(0, 0, 0), true);
+	public Attribute.Tuple position = new Attribute.Tuple("Position", 0, 0, 0, false);
+	public Attribute.Tuple translation = new Attribute.Tuple("Translation", 0, 0, 0, true);
+	public Attribute.Tuple orientation = new Attribute.Tuple("Orientation", 0, 0, 0, false);
+	public Attribute.Tuple rotation = new Attribute.Tuple("Rotation", 0, 0, 0, true);
+	public Attribute.Tuple scale = new Attribute.Tuple("Scale", 1, 1, 1, true);
+	public Attribute.Tuple scalePivotPosition = new Attribute.Tuple("Pivot (world)", 0, 0, 0, false);
+	public Attribute.Tuple scalePivotTranslation = new Attribute.Tuple("Pivot (local)", 0, 0, 0, false);
+	public Attribute.Tuple rotatePivotPosition = new Attribute.Tuple("Pivot (world)", 0, 0, 0, false);
+	public Attribute.Tuple rotatePivotTranslation = new Attribute.Tuple("Pivot (local)", 0, 0, 0, false);
+	public Attribute.Tuple shear = new Attribute.Tuple("Shear", 0, 0, 0, true);
 	
 	private TransformNode parent;
 	private List<AnimObject> animObjects = new ArrayList<AnimObject>(1);

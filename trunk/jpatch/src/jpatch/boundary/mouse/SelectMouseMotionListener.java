@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import jpatch.boundary.*;
 import jpatch.boundary.settings.Settings;
+import jpatch.entity.Selection;
 
 //import jpatch.control.edit.*;
 
