@@ -14,7 +14,11 @@ public class ObjectRegistry implements AttributeListener {
 	 * @param object
 	 */
 	public void add(JPatchObject object) {
+		if (object.getObjectRegistry() != null) {
+			throw new IllegalStateException();
+		}
 		insert(object);
+		object.setObjectRegistry(this);
 		Attribute.String nameAttribute = (Attribute.String) object.getAttribute("Name");
 		attributeMap.put(nameAttribute, object);
 		nameAttribute.addAttributeListener(this);
@@ -27,6 +31,7 @@ public class ObjectRegistry implements AttributeListener {
 	 */
 	public void remove(JPatchObject object) {
 		removeFromMap(object);
+		object.setObjectRegistry(null);
 		Attribute.String nameAttribute = (Attribute.String) object.getAttribute("Name");
 		nameAttribute.removeAttributeListener(this);
 		attributeMap.remove(nameAttribute);

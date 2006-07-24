@@ -4,7 +4,8 @@ import java.lang.reflect.Field;
 import java.util.Iterator;
 
 public abstract class AbstractJPatchObject implements JPatchObject {
-	public Attribute.String name = new Attribute.String("Name");
+	private ObjectRegistry objectRegistry;
+	public Attribute.String name = new Attribute.String(this, "Name");
 	
 	private Iterable<Attribute> attributes = new Iterable<Attribute>() {
 		public Iterator<Attribute> iterator() {
@@ -17,6 +18,14 @@ public abstract class AbstractJPatchObject implements JPatchObject {
 			return createChannelIterator();
 		}
 	};
+	
+	public ObjectRegistry getObjectRegistry() {
+		return objectRegistry;
+	}
+
+	public void setObjectRegistry(ObjectRegistry objectRegistry) {
+		this.objectRegistry = objectRegistry;
+	}
 	
 	public String getName() {
 		return name.get();

@@ -309,8 +309,13 @@ public class AttributeUiHelper {
 	}
 	
 	private static boolean verifyTextField(JTextField textField, Attribute attribute) {
-		if (attribute instanceof Attribute.String)
-			return true;
+		if (attribute instanceof Attribute.String) {
+			if (((Attribute.String) attribute).isNameAttribute()) {
+				return true;
+			}
+			JPatchObject object = attribute.getObject();
+			return (object.getObjectRegistry().getObject(object.getClass(), textField.getText()) == null);
+		}
 		try {
 			if (attribute instanceof Attribute.Integer) {
 				int i = Integer.parseInt(textField.getText());
