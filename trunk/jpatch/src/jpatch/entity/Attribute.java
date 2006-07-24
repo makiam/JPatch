@@ -22,7 +22,6 @@
 package jpatch.entity;
 
 import javax.swing.event.*;
-import javax.vecmath.Color3f;
 
 /**
  * @author sascha
@@ -30,16 +29,22 @@ import javax.vecmath.Color3f;
  */
 public class Attribute {
 	private final java.lang.String name;
+	private final JPatchObject object;
 	AttributeListener[] attributeListeners = new AttributeListener[0];
 	boolean valueAdjusting;
 	boolean locked;
 	
-	Attribute(java.lang.String name) {
+	Attribute(JPatchObject object, java.lang.String name) {
+		this.object = object;
 		this.name = name;
 	}
 	
 	public java.lang.String getName() {
 		return name;
+	}
+	
+	public JPatchObject getObject() {
+		return object;
 	}
 	
 	public boolean isValueAdjusting() {
@@ -133,13 +138,19 @@ public class Attribute {
 	public static class String extends Attribute {
 		private java.lang.String string = "";
 		private final boolean useTextArea = false;
+		private final boolean nameAttribute;
 		
-		public String(java.lang.String name) {
-			super(name);
+		public String(JPatchObject object, java.lang.String name) {
+			super(object, name);
+			nameAttribute = name.equals("Name");
 		}
 		
 		public java.lang.String get() {
 			return string;
+		}
+		
+		public boolean isNameAttribute() {
+			return nameAttribute;
 		}
 		
 		public void set(java.lang.String string) {
@@ -157,8 +168,8 @@ public class Attribute {
 	public static class Enum extends Attribute {
 		private java.lang.Enum enumValue;
 		
-		public Enum(java.lang.String name, java.lang.Enum enumValue) {
-			super(name);
+		public Enum(JPatchObject object, java.lang.String name, java.lang.Enum enumValue) {
+			super(object, name);
 			this.enumValue = enumValue;
 		}
 		
@@ -177,8 +188,8 @@ public class Attribute {
 	public static class Integer extends Attribute {
 		private int value;
 		
-		public Integer(java.lang.String name) {
-			super(name);
+		public Integer(JPatchObject object, java.lang.String name) {
+			super(object, name);
 		}
 		
 		public void set(int newValue) {
@@ -197,8 +208,8 @@ public class Attribute {
 		private final int min;
 		private final int max;
 		
-		public BoundedInteger(java.lang.String name, int min, int max) {
-			super(name);
+		public BoundedInteger(JPatchObject object, java.lang.String name, int min, int max) {
+			super(object, name);
 			if (min > max)
 				throw new IllegalArgumentException("min " + min + " > max " + max);
 			this.min = min;
@@ -226,9 +237,9 @@ public class Attribute {
 	public static class Limit extends Attribute.Double {
 		public Attribute.Boolean enabled;
 		
-		Limit(Attribute.BoundedDouble attribute, java.lang.String suffix) {
-			super(attribute.getName() + " " + suffix);
-			enabled = new Attribute.Boolean(attribute.getName() + " " + suffix + " enabled");
+		Limit(JPatchObject object, Attribute.BoundedDouble attribute, java.lang.String suffix) {
+			super(object, attribute.getName() + " " + suffix);
+			enabled = new Attribute.Boolean(object, attribute.getName() + " " + suffix + " enabled");
 			addAttributeListener(attribute);
 			enabled.addAttributeListener(attribute);
 		}
@@ -245,8 +256,8 @@ public class Attribute {
 	public static class Double extends Attribute {
 		private double value;
 		
-		public Double(java.lang.String name) {
-			super(name);
+		public Double(JPatchObject object, java.lang.String name) {
+			super(object, name);
 		}
 		
 		public void set(double newValue) {
@@ -267,16 +278,16 @@ public class Attribute {
 		public Attribute.Boolean locked;
 		private MotionCurveNew motionCurve;
 
-		public BoundedDouble(java.lang.String name) {
-			super(name);
-			min = new Limit(this, "lower limit");
-			max = new Limit(this, "upper limit");
-			keyed = new Boolean(name + " keyed");
-			locked = new Boolean(name + " locked");
+		public BoundedDouble(JPatchObject object, java.lang.String name) {
+			super(object, name);
+			min = new Limit(object, this, "lower limit");
+			max = new Limit(object, this, "upper limit");
+			keyed = new Boolean(object, name + " keyed");
+			locked = new Boolean(object, name + " locked");
 		}
 		
-		public BoundedDouble(java.lang.String name, double value) {
-			this(name);
+		public BoundedDouble(JPatchObject object, java.lang.String name, double value) {
+			this(object, name);
 			set(value);
 		}
 		
@@ -320,19 +331,19 @@ public class Attribute {
 		public BoundedDouble x, y, z;
 		private boolean keyable;
 		
-		public Tuple(java.lang.String name, javax.vecmath.Tuple3d tuple, boolean keyable) {
-			this(name, tuple.x, tuple.y, tuple.z, keyable);
+		public Tuple(JPatchObject object, java.lang.String name, javax.vecmath.Tuple3d tuple, boolean keyable) {
+			this(object, name, tuple.x, tuple.y, tuple.z, keyable);
 		}
 		
-		public Tuple(java.lang.String name, javax.vecmath.Tuple3f tuple, boolean keyable) {
-			this(name, tuple.x, tuple.y, tuple.z, keyable);
+		public Tuple(JPatchObject object, java.lang.String name, javax.vecmath.Tuple3f tuple, boolean keyable) {
+			this(object, name, tuple.x, tuple.y, tuple.z, keyable);
 		}
 		
-		public Tuple(java.lang.String name, double x, double y, double z, boolean keyable) {
-			super(name);
-			this.x = new BoundedDouble(name + ".X");
-			this.y = new BoundedDouble(name + ".Y");
-			this.z = new BoundedDouble(name + ".Z");
+		public Tuple(JPatchObject object, java.lang.String name, double x, double y, double z, boolean keyable) {
+			super(object, name);
+			this.x = new BoundedDouble(object, name + ".X");
+			this.y = new BoundedDouble(object, name + ".Y");
+			this.z = new BoundedDouble(object, name + ".Z");
 			set(x, y, z);
 			this.x.addAttributeListener(this);
 			this.y.addAttributeListener(this);
@@ -445,8 +456,8 @@ public class Attribute {
 	public static class Boolean extends Attribute {
 		private boolean value;
 		
-		public Boolean(java.lang.String name) {
-			super(name);
+		public Boolean(JPatchObject object, java.lang.String name) {
+			super(object, name);
 		}
 		
 		public void set(boolean newValue) {
@@ -465,9 +476,9 @@ public class Attribute {
 		private final Attribute.BoundedDouble doubleAttribute;
 		public Attribute.Boolean keyed;
 		public Attribute.Boolean locked;
-		public KeyedBoolean(java.lang.String name) {
-			super(name);
-			doubleAttribute = new Attribute.BoundedDouble(name);
+		public KeyedBoolean(JPatchObject object, java.lang.String name) {
+			super(object, name);
+			doubleAttribute = new Attribute.BoundedDouble(object, name);
 			doubleAttribute.min.enabled.set(true);
 			doubleAttribute.max.set(0);
 			doubleAttribute.min.enabled.set(true);
@@ -476,8 +487,8 @@ public class Attribute {
 			locked = doubleAttribute.locked;
 		}
 		
-		public KeyedBoolean(java.lang.String name, boolean value) {
-			this(name);
+		public KeyedBoolean(JPatchObject object, java.lang.String name, boolean value) {
+			this(object, name);
 			set(value);
 		}
 		

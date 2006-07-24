@@ -7,4 +7,6 @@ public interface JPatchObject {
 	Attribute getAttribute(String name);
 	Attribute getAttribute(int index);
 	void setParent(JPatchObject parent);
+	void setObjectRegistry(ObjectRegistry objectRegistry);
+	ObjectRegistry getObjectRegistry();
 }
