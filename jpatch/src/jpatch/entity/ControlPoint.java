@@ -8,7 +8,7 @@ import javax.vecmath.*;
  * A ControlPoint is a point on a curve.
  * @author sascha
  */
-public class ControlPoint extends AbstractJPatchObject {
+public class ControlPoint extends AbstractJPatchXObject {
 	public static enum TangentMode { DEFAULT, SPATCH };
 	
 	public Attribute.Tuple3 referencePosition = new Attribute.Tuple3(null, 0, 0, 0, false);
