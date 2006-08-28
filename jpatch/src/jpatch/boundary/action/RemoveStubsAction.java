@@ -18,12 +18,12 @@ public class RemoveStubsAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		Selection selection = MainFrame.getInstance().getSelection();
-		ControlPoint[] acp = selection.getControlPointArray();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
+		OLDControlPoint[] acp = selection.getControlPointArray();
 		JPatchActionEdit edit = new JPatchActionEdit("remove curve stubs");
 		ArrayList list = new ArrayList();
 		for (int i = 0; i < acp.length; i++) {
-			for (ControlPoint cp = acp[i].getHead(); cp != null; cp = cp.getPrevAttached()) {
+			for (OLDControlPoint cp = acp[i].getHead(); cp != null; cp = cp.getPrevAttached()) {
 				if (!cp.isHook() && cp.isSingle())
 					if (cp.getNext() == null || cp.getPrev() == null)
 						list.add(cp);
@@ -32,7 +32,7 @@ public class RemoveStubsAction extends AbstractAction {
 					
 		if (list.size() > 0) {
 			for (Iterator it = list.iterator(); it.hasNext(); )
-				edit.addEdit(new CompoundDeleteControlPoint((ControlPoint) it.next()));
+				edit.addEdit(new CompoundDeleteControlPoint((OLDControlPoint) it.next()));
 //			edit.addEdit(new RemoveControlPointsFromSelectionEdit(ps, list));
 //			acp = ps.getControlPointArray();
 //			for (int i = 0; i < acp.length; i++) {

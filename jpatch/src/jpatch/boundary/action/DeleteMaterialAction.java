@@ -14,9 +14,9 @@ public final class DeleteMaterialAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JPatchMaterial material;
+	private OLDMaterial material;
 	
-	public DeleteMaterialAction(JPatchMaterial material) {
+	public DeleteMaterialAction(OLDMaterial material) {
 		super("Delete");
 		this.material = material;
 		//putValue(Action.SHORT_DESCRIPTION,"Add Controlpoint [A]");
@@ -26,7 +26,7 @@ public final class DeleteMaterialAction extends AbstractAction {
 		//MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
 		//MainFrame.getInstance().getJPatchScreen().addMouseListeners(new AddControlPointMouseAdapter());
 		//MainFrame.getInstance().clearDialog();
-		JPatchMaterial defaultMaterial = (JPatchMaterial) MainFrame.getInstance().getModel().getMaterialList().get(0);
+		OLDMaterial defaultMaterial = (OLDMaterial) MainFrame.getInstance().getModel().getMaterialList().get(0);
 		if (material != defaultMaterial) {
 			JPatchActionEdit edit = new JPatchActionEdit("delete material");
 			for (Iterator it = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {

@@ -24,7 +24,7 @@ package jpatch.boundary.action;
 import java.awt.event.*;
 import javax.swing.*;
 import jpatch.boundary.*;
-import jpatch.entity.ControlPoint;
+import jpatch.entity.OLDControlPoint;
 import jpatch.boundary.settings.*;
 /**
  * This action is used to toggle states in respones to clicks
@@ -96,10 +96,10 @@ public class ToggleAction extends AbstractAction {
 			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().renderBones(Actions.getInstance().getButtonModel("show bones").isSelected());
 			break;
 		case TANGENTS_PEAK:
-			ControlPoint.setDefaultMode(ControlPoint.PEAK);
+			OLDControlPoint.setDefaultMode(OLDControlPoint.PEAK);
 			break;
 		case TANGENTS_ROUND:
-			ControlPoint.setDefaultMode(ControlPoint.JPATCH_G1);
+			OLDControlPoint.setDefaultMode(OLDControlPoint.JPATCH_G1);
 			break;
 		case VIEWPORTS_SINGLE:
 			MainFrame.getInstance().getJPatchScreen().resetMode(JPatchScreen.SINGLE);

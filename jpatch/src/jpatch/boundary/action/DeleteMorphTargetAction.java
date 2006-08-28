@@ -23,7 +23,7 @@ public final class DeleteMorphTargetAction extends AbstractAction {
 		this.morphTarget = morphTarget;
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		Morph morph = morphTarget.getMorph();
+		OLDMorph morph = morphTarget.getMorph();
 		if (morph.getChildCount() > 1) {
 			MainFrame.getInstance().getUndoManager().addEdit(new AtomicMorphTarget.Remove(morph, morphTarget));
 //			if (morph.getValue() < morph.getMin())

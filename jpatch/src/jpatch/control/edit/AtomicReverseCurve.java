@@ -11,9 +11,9 @@ import jpatch.entity.*;
  */
 public final class AtomicReverseCurve extends JPatchAtomicEdit {
 
-	private ControlPoint cpStart;
+	private OLDControlPoint cpStart;
 	
-	public AtomicReverseCurve(ControlPoint cp) {
+	public AtomicReverseCurve(OLDControlPoint cp) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + cp + ")");
 		cpStart = cp.getStart();
@@ -30,8 +30,8 @@ public final class AtomicReverseCurve extends JPatchAtomicEdit {
 		reverseCurve(cpStart);
 	}
 
-	private void reverseCurve(ControlPoint start) {
-		for (ControlPoint cp = start.getEnd(); cp != null; cp = cp.getNext()) {
+	private void reverseCurve(OLDControlPoint start) {
+		for (OLDControlPoint cp = start.getEnd(); cp != null; cp = cp.getNext()) {
 			/*
 			 * if it's on a hook curve, reverse the hookPos
 			 */
@@ -52,7 +52,7 @@ public final class AtomicReverseCurve extends JPatchAtomicEdit {
 			/*
 			 * swap cpNext <-> cpPrev
 			 */
-			ControlPoint cpDummy = cp.getNext();
+			OLDControlPoint cpDummy = cp.getNext();
 			cp.setNext(cp.getPrev());
 			cp.setPrev(cpDummy);
 //			cp.setTangentsValid(false);

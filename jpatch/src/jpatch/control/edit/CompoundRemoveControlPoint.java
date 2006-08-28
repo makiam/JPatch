@@ -29,9 +29,9 @@ import jpatch.entity.*;
  */
 public class CompoundRemoveControlPoint extends JPatchCompoundEdit {
 
-	public CompoundRemoveControlPoint(ControlPoint cp) {
+	public CompoundRemoveControlPoint(OLDControlPoint cp) {
 		//is curve closed and length == 3?
-		ControlPoint start = cp.getStart();
+		OLDControlPoint start = cp.getStart();
 		if (start.getLoop() && start.getLength() == 3) {
 			// YES
 			// delete cp

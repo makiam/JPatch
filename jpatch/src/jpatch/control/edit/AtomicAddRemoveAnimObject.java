@@ -47,7 +47,7 @@ public final class AtomicAddRemoveAnimObject extends JPatchAtomicEdit implements
 	}
 	
 	public String getName() {
-		if (animObject instanceof Camera)
+		if (animObject instanceof OLDCamera)
 			return "add camera";
 		else if (animObject instanceof AnimLight)
 			return "add lightsoure";
@@ -79,8 +79,8 @@ public final class AtomicAddRemoveAnimObject extends JPatchAtomicEdit implements
 	 * removes the AnimObject from the Animation
 	 */
 	private void remove() {
-		if (animObject instanceof Camera)
-			MainFrame.getInstance().getAnimation().removeCamera((Camera) animObject);
+		if (animObject instanceof OLDCamera)
+			MainFrame.getInstance().getAnimation().removeCamera((OLDCamera) animObject);
 		else if (animObject instanceof AnimLight)
 			MainFrame.getInstance().getAnimation().removeLight((AnimLight) animObject);
 		else if (animObject instanceof AnimModel)
@@ -93,8 +93,8 @@ public final class AtomicAddRemoveAnimObject extends JPatchAtomicEdit implements
 	 * adds the AnimObject from the Animation
 	 */
 	private void add() {
-		if (animObject instanceof Camera)
-			MainFrame.getInstance().getAnimation().addCamera((Camera) animObject, motionCurveSet);
+		if (animObject instanceof OLDCamera)
+			MainFrame.getInstance().getAnimation().addCamera((OLDCamera) animObject, motionCurveSet);
 		else if (animObject instanceof AnimLight)
 			MainFrame.getInstance().getAnimation().addLight((AnimLight) animObject, motionCurveSet);
 		else if (animObject instanceof AnimModel)

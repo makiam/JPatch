@@ -5,9 +5,9 @@ import jpatch.entity.*;
 
 public class AtomicRemoveCurve extends JPatchAtomicEdit {
 	
-	private ControlPoint cpStart;
+	private OLDControlPoint cpStart;
 	
-	public AtomicRemoveCurve(ControlPoint start) {
+	public AtomicRemoveCurve(OLDControlPoint start) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + start + ")");
 		cpStart = start;

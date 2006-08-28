@@ -4,7 +4,7 @@ import jpatch.entity.*;
 
 public class CompoundAppendControlPoints extends JPatchCompoundEdit {
 	
-	public CompoundAppendControlPoints(ControlPoint cpA, ControlPoint cpB) {
+	public CompoundAppendControlPoints(OLDControlPoint cpA, OLDControlPoint cpB) {
 		// cpA and cpB on the same curve?
 		if(cpA.getStart() == cpB.getStart()) {
 			// YES

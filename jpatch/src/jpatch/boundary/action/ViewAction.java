@@ -7,7 +7,7 @@ import jpatch.entity.*;
 
 public final class ViewAction extends AbstractAction {
 	private int iDirection;
-	private Camera camera;
+	private OLDCamera camera;
 	
 	public ViewAction(int direction) {
 		super(ViewDefinition.aViewName[direction]);
@@ -15,7 +15,7 @@ public final class ViewAction extends AbstractAction {
 		camera = null;
 	}
 	
-	public ViewAction(Camera camera) {
+	public ViewAction(OLDCamera camera) {
 		this.camera = camera;
 	}
 	

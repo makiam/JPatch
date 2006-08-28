@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import jpatch.boundary.*;
 import jpatch.boundary.settings.Settings;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDSelection;
 
 //import jpatch.control.edit.*;
 
@@ -51,13 +51,13 @@ public class SelectMouseMotionListener implements MouseMotionListener {
 		}
 	}
 	
-	public Selection getSelection(ViewDefinition viewDefinition) {
+	public OLDSelection getSelection(ViewDefinition viewDefinition) {
 		switch(iMode) {
 			case RECTANGLE:
-				int mask = Selection.CONTROLPOINTS;
+				int mask = OLDSelection.CONTROLPOINTS;
 				if (MainFrame.getInstance().getEditedMorph() == null)
-					mask |= Selection.BONES;
-				return Selection.createRectangularPointSelection(iCornerX,iCornerY,iCornerX + iDeltaX, iCornerY + iDeltaY, viewDefinition.getScreenMatrix(), MainFrame.getInstance().getModel(), mask);
+					mask |= OLDSelection.BONES;
+				return OLDSelection.createRectangularPointSelection(iCornerX,iCornerY,iCornerX + iDeltaX, iCornerY + iDeltaY, viewDefinition.getScreenMatrix(), MainFrame.getInstance().getModel(), mask);
 		}
 		return null;
 	}

@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.vecmath.*;
 
-public abstract class AbstractTransform extends AbstractJPatchObject {
+public abstract class AbstractTransform extends AbstractNamedObject {
 	protected AbstractTransform parent;
 	protected Matrix4d matrix = new Matrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); // identity matrix
 	protected Matrix4d inverseMatrix = new Matrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); // identity matrix
@@ -66,7 +66,7 @@ public abstract class AbstractTransform extends AbstractJPatchObject {
 	
 	protected void evaluateConstraints() { }
 	
-	protected void positionChanged(Attribute.Tuple position, Attribute.Tuple translation) {
+	protected void positionChanged(Attribute.Tuple3 position, Attribute.Tuple3 translation) {
 		Point3d tmp = new Point3d();
 		position.get(tmp);
 		if (parent != null)
@@ -76,7 +76,7 @@ public abstract class AbstractTransform extends AbstractJPatchObject {
 //		position.setValueAdjusting(false);
 	}
 	
-	protected void translationChanged(Attribute.Tuple translation, Attribute.Tuple position) {
+	protected void translationChanged(Attribute.Tuple3 translation, Attribute.Tuple3 position) {
 		Point3d tmp = new Point3d();
 		translation.get(tmp);
 		if (parent != null)

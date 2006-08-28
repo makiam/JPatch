@@ -21,10 +21,10 @@ public class AttributeXmlWriter {
 		if (attribute instanceof Attribute.BoundedDouble) {
 			writeAttribute(out, prefix + "\t", ((Attribute.BoundedDouble) attribute).min);
 			writeAttribute(out, prefix + "\t", ((Attribute.BoundedDouble) attribute).max);
-		} else if (attribute instanceof Attribute.Tuple) {
-			writeAttribute(out, prefix + "\t", ((Attribute.Tuple) attribute).x);
-			writeAttribute(out, prefix + "\t", ((Attribute.Tuple) attribute).y);
-			writeAttribute(out, prefix + "\t", ((Attribute.Tuple) attribute).z);
+		} else if (attribute instanceof Attribute.Tuple3) {
+			writeAttribute(out, prefix + "\t", ((Attribute.Tuple3) attribute).x);
+			writeAttribute(out, prefix + "\t", ((Attribute.Tuple3) attribute).y);
+			writeAttribute(out, prefix + "\t", ((Attribute.Tuple3) attribute).z);
 			if (attribute instanceof Attribute.Rotation) {
 				writeAttribute(out, prefix + "\t", ((Attribute.Rotation) attribute).order);
 			}
@@ -82,7 +82,7 @@ public class AttributeXmlWriter {
 			out.append("type=\"string\"");
 	}
 	
-	private void writeAttributeTag(PrintStream out, Attribute.Tuple attribute) {
+	private void writeAttributeTag(PrintStream out, Attribute.Tuple3 attribute) {
 		if (attribute.getTupleClass().equals(javax.vecmath.Point3d.class))
 			out.append("type=\"point\"");
 		if (attribute.getTupleClass().equals(Vector3d.class))

@@ -31,9 +31,9 @@ import jpatch.boundary.*;
  *
  */
 public final class AtomicReplaceControlPointInSelections extends JPatchAtomicEdit {
-	private ControlPoint cpOld, cpNew;
+	private OLDControlPoint cpOld, cpNew;
 	
-	public AtomicReplaceControlPointInSelections(ControlPoint cpOld, ControlPoint cpNew) {
+	public AtomicReplaceControlPointInSelections(OLDControlPoint cpOld, OLDControlPoint cpNew) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + cpOld + ", " + cpNew + ")");
 		this.cpOld = cpOld;
@@ -43,7 +43,7 @@ public final class AtomicReplaceControlPointInSelections extends JPatchAtomicEdi
 	
 	private void swap() {
 		for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
-			Selection selection = (Selection) it.next();
+			OLDSelection selection = (OLDSelection) it.next();
 			if (selection.contains(cpOld)) {
 				Object weight = selection.getMap().get(cpOld);
 				selection.getMap().remove(cpOld);
@@ -52,7 +52,7 @@ public final class AtomicReplaceControlPointInSelections extends JPatchAtomicEdi
 					selection.setHotObject(cpNew);
 			}
 		}
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && selection.contains(cpOld)) {
 			Object weight = selection.getMap().get(cpOld);
 			selection.getMap().remove(cpOld);
@@ -60,7 +60,7 @@ public final class AtomicReplaceControlPointInSelections extends JPatchAtomicEdi
 			if (selection.getHotObject() == cpOld)
 				selection.setHotObject(cpNew);
 		}
-		ControlPoint dummy = cpOld;
+		OLDControlPoint dummy = cpOld;
 		cpOld = cpNew;
 		cpNew = dummy;
 	}

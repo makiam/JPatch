@@ -18,7 +18,7 @@ public final class RotateAction extends AbstractAction {
 			MainFrame.getInstance().setDialog(rotateDialog);
 			MainFrame.getInstance().getJPatchScreen().addMouseListeners(new RotateMouseAdapter(rotateDialog, compoundEdit));
 			*/
-			Selection selection = MainFrame.getInstance().getSelection();
+			OLDSelection selection = MainFrame.getInstance().getSelection();
 			if (selection != null && (selection.getMap().size() > 1 || selection.getHotObject() instanceof AnimObject)) {
 				//MainFrame.getInstance().getJPatchScreen().setTool(new RotateTool());
 				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(Tools.rotateTool));

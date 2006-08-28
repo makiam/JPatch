@@ -7,8 +7,8 @@ import jpatch.entity.*;
 
 public class CompoundRemoveCurveSegment extends JPatchCompoundEdit {
 	
-	public CompoundRemoveCurveSegment(ControlPoint cp) {
-		ControlPoint cpNext = cp.getNext();
+	public CompoundRemoveCurveSegment(OLDControlPoint cp) {
+		OLDControlPoint cpNext = cp.getNext();
 		/* remove hooks... */
 		if (cp.getChildHook() != null)
 			addEdit(new CompoundDropCurve(cp.getChildHook()));

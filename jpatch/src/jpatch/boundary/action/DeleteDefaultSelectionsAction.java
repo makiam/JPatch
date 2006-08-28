@@ -29,7 +29,7 @@ import javax.swing.*;
 import jpatch.boundary.*;
 
 import jpatch.control.edit.*;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDSelection;
 
 /**
  * @author lois
@@ -54,7 +54,7 @@ public final class DeleteDefaultSelectionsAction extends AbstractAction {
 		
 		/* cycle through list and add RemoveSelectionEdits if the name starts with an "*" */
 		for (Iterator it = list.iterator(); it.hasNext(); ) {
-			Selection selection = (Selection) it.next();
+			OLDSelection selection = (OLDSelection) it.next();
 			if (selection.toString().startsWith("*"))
 				edit.addEdit(new AtomicRemoveSelection(selection));		
 		}

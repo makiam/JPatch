@@ -125,7 +125,7 @@ public class AnimationMasterImport implements ModelImporter {
 									lstSpline.add(hashCp);						// add it to the spline
 									Integer key = new Integer(iNum);
 									mapHashCp.put(key,hashCp);					// add it to the map
-									mapControlPoint.put(key,new ControlPoint(p3Position)); 		// add a new ControlPoint to the map
+									mapControlPoint.put(key,new OLDControlPoint(p3Position)); 		// add a new ControlPoint to the map
 								}
 							}
 							lstHashMesh.add(lstSpline);
@@ -149,11 +149,11 @@ public class AnimationMasterImport implements ModelImporter {
 							//strLine = brFile.readLine();
 							astrPart = strLine.split("\\s");						// 5pp looks like cp cp cp cp cp ? ? ? ? ? 0
 							if (astrPart.length == 11) {
-								ControlPoint[] acp5pp = new ControlPoint[5];
+								OLDControlPoint[] acp5pp = new OLDControlPoint[5];
 								for (int cp = 0; cp < 5; cp++) {
 									int hcp = (new Integer(astrPart[cp])).intValue();
 									Integer key = new Integer(getHeadKey(hcp));
-									acp5pp[cp] = (ControlPoint)mapControlPoint.get(key);
+									acp5pp[cp] = (OLDControlPoint)mapControlPoint.get(key);
 								}
 								lstCandidateFivePointPatch.add(acp5pp);
 							}
@@ -185,7 +185,7 @@ public class AnimationMasterImport implements ModelImporter {
 							g = G / 256;
 							b = R / 256;
 						}
-						JPatchMaterial material = new JPatchMaterial();
+						OLDMaterial material = new OLDMaterial();
 						material.setColor(new Color3f(r,g,b));
 						mapGroupMaterials.put(new Integer(iGroup),material);
 						model.addMaterial(material);
@@ -218,12 +218,12 @@ public class AnimationMasterImport implements ModelImporter {
 		for (int s = 0; s < lstHashMesh.size(); s++) {
 			//System.out.println("s = " + s);
 			ArrayList lstSpline = (ArrayList)lstHashMesh.get(s);
-			ControlPoint cpLast = null;
+			OLDControlPoint cpLast = null;
 			for (int c = 0; c < lstSpline.size(); c++) {
 				//System.out.println("c = " + c);
 				HashCp hashCp = (HashCp)lstSpline.get(c);
 				Integer key = new Integer(hashCp.getNum());
-				ControlPoint cp = (ControlPoint)mapControlPoint.get(key);
+				OLDControlPoint cp = (OLDControlPoint)mapControlPoint.get(key);
 				if (c == 0) {
 					//System.out.println("addCurve");
 					model.addCurve(cp);
@@ -232,10 +232,10 @@ public class AnimationMasterImport implements ModelImporter {
 				}
 				if (hashCp.isWeld() && !hashCp.isHook()) {
 					key = new Integer(getHeadKey(hashCp.getNum()));
-					cp.attachTo((ControlPoint)mapControlPoint.get(key));
+					cp.attachTo((OLDControlPoint)mapControlPoint.get(key));
 				}
 				if (hashCp.isLoop()) {
-					ControlPoint start = cp.getStart();
+					OLDControlPoint start = cp.getStart();
 					cp.setNext(start);
 					start.setPrev(cp);
 					start.setLoop(true);
@@ -248,18 +248,18 @@ public class AnimationMasterImport implements ModelImporter {
 			for (int c = 0; c < lstSpline.size(); c++) {
 				HashCp hashCp = (HashCp)lstSpline.get(c);
 				Integer key = new Integer(hashCp.getNum());
-				ControlPoint cp = (ControlPoint)mapControlPoint.get(key);
+				OLDControlPoint cp = (OLDControlPoint)mapControlPoint.get(key);
 				cp.setInMagnitude(hashCp.getInMagnitude());
 				cp.setOutMagnitude(hashCp.getOutMagnitude());
 				if (hashCp.isHook()) {
 					key = new Integer(getHookEndKey(hashCp.getNum()));
-					ControlPoint hook = ((ControlPoint)mapControlPoint.get(key)).addHook(hashCp.getHookPos(), model);
+					OLDControlPoint hook = ((OLDControlPoint)mapControlPoint.get(key)).addHook(hashCp.getHookPos(), model);
 					cp.attachTo(hook);
 				}
 				if (hashCp.isSmooth()) {
-					cp.setMode(ControlPoint.AM_SMOOTH);
+					cp.setMode(OLDControlPoint.AM_SMOOTH);
 				} else {
-					cp.setMode(ControlPoint.PEAK);
+					cp.setMode(OLDControlPoint.PEAK);
 				}
 			}
 		}
@@ -303,16 +303,16 @@ public class AnimationMasterImport implements ModelImporter {
 			
 			for (int p = 0; p < aiPoints.length; p++) {
 				Integer key = new Integer(aiPoints[p]);
-				ControlPoint cp = (ControlPoint)mapControlPoint.get(key);
+				OLDControlPoint cp = (OLDControlPoint)mapControlPoint.get(key);
 				//if (cp.isHead() || cp.isTargetHook()) {
 				pointList.add(cp.getHead());
 				//}
 				//cp.getHead().addToGroup(group + 1);
 			}
-			Selection selection = new Selection(pointList);
+			OLDSelection selection = new OLDSelection(pointList);
 			selection.setName((String) lstGroupName.get(group));
 			model.addSelection(selection);
-			JPatchMaterial material = (JPatchMaterial) mapGroupMaterials.get(new Integer(group + 1));
+			OLDMaterial material = (OLDMaterial) mapGroupMaterials.get(new Integer(group + 1));
 			if (material != null) {
 				for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
 					Patch patch = (Patch) it.next();

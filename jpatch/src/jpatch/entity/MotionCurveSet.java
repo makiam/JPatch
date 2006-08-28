@@ -16,8 +16,8 @@ public class MotionCurveSet {
 			return new MotionCurveSet.Model((AnimModel) animObject);
 		else if (animObject instanceof AnimLight)
 			return new MotionCurveSet.Light((AnimLight) animObject);
-		else if (animObject instanceof jpatch.entity.Camera)
-			return new MotionCurveSet.Camera((jpatch.entity.Camera) animObject);
+		else if (animObject instanceof jpatch.entity.OLDCamera)
+			return new MotionCurveSet.Camera((jpatch.entity.OLDCamera) animObject);
 		else
 			throw new IllegalArgumentException();
 	}
@@ -56,7 +56,7 @@ public class MotionCurveSet {
 	public static class Camera extends MotionCurveSet {
 		public MotionCurve.Float focalLength;
 		
-		public Camera(jpatch.entity.Camera camera) {
+		public Camera(jpatch.entity.OLDCamera camera) {
 			super(camera);
 			float pos = 0; // FIXME;
 			focalLength = MotionCurve.createFocalLengthCurve(new MotionKey.Float(pos, camera.getFocalLength()));
@@ -65,12 +65,12 @@ public class MotionCurveSet {
 		
 		public void setPosition(float pos) {
 			super.setPosition(pos);
-			((jpatch.entity.Camera) animObject).setFocalLength(focalLength.getFloatAt(pos));
+			((jpatch.entity.OLDCamera) animObject).setFocalLength(focalLength.getFloatAt(pos));
 		}
 		
 		public void updateCurves(float pos) {
 			super.updateCurves(pos);
-			if (focalLength.getFloatAt(pos) != ((jpatch.entity.Camera) animObject).getFocalLength()) focalLength.setFloatAt(pos, ((jpatch.entity.Camera) animObject).getFocalLength());
+			if (focalLength.getFloatAt(pos) != ((jpatch.entity.OLDCamera) animObject).getFocalLength()) focalLength.setFloatAt(pos, ((jpatch.entity.OLDCamera) animObject).getFocalLength());
 		}
 		
 		public void xml(PrintStream out, String prefix) {
@@ -134,8 +134,8 @@ public class MotionCurveSet {
 	public static class Model extends MotionCurveSet {
 		public MotionCurve.Float scale;
 		public MotionCurve.Object anchor;
-		private Map<Morph, MotionCurve.Float> map = new HashMap<Morph, MotionCurve.Float>();
-		private Map<String, Morph> idMap = new HashMap<String, Morph>();
+		private Map<OLDMorph, MotionCurve.Float> map = new HashMap<OLDMorph, MotionCurve.Float>();
+		private Map<String, OLDMorph> idMap = new HashMap<String, OLDMorph>();
 		
 		public Model(AnimModel animModel) {
 			super(animModel);
@@ -145,7 +145,7 @@ public class MotionCurveSet {
 			scale = MotionCurve.createScaleCurve(new MotionKey.Float(pos, animModel.getScale()));
 			anchor = MotionCurve.createAnchorCurve(new MotionKey.Object(pos, null));
 			for (Iterator it = animModel.getModel().getMorphList().iterator(); it.hasNext(); ) {
-				Morph morph = (Morph) it.next();
+				OLDMorph morph = (OLDMorph) it.next();
 				MotionCurve.Float morphCurve = MotionCurve.createMorphCurve(morph, new MotionKey.Float(pos, morph.getValue()));
 				map.put(morph, morphCurve);
 				idMap.put(morph.getId(), morph);
@@ -166,11 +166,11 @@ public class MotionCurveSet {
 			System.out.println("new motioncurveset for " + animModel + " created. map = " + map);
 		}
 		
-		public MotionCurve.Float morph(Morph morph) {
+		public MotionCurve.Float morph(OLDMorph morph) {
 			return (MotionCurve.Float) map.get(morph);
 		}
 		
-		public void setMorphCurve(Morph morph, MotionCurve.Float curve) {
+		public void setMorphCurve(OLDMorph morph, MotionCurve.Float curve) {
 			map.put(morph, curve);
 		}
 		
@@ -179,7 +179,7 @@ public class MotionCurveSet {
 			((AnimModel) animObject).setScale(scale.getFloatAt(pos));
 			((AnimModel) animObject).setAnchor((Transformable) anchor.getObjectAt(pos));
 			for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
-				Morph morph = (Morph) it.next();
+				OLDMorph morph = (OLDMorph) it.next();
 //				morph.unapply();
 				morph.presetValue(morph(morph).getFloatAt(pos));
 //				morph.apply();
@@ -199,7 +199,7 @@ public class MotionCurveSet {
 			if (scale.getFloatAt(pos) != ((AnimModel) animObject).getScale()) scale.setFloatAt(pos, ((AnimModel) animObject).getScale());
 		}
 		
-		public Morph getMorphById(String id) {
+		public OLDMorph getMorphById(String id) {
 			return idMap.get(id);
 		}
 		

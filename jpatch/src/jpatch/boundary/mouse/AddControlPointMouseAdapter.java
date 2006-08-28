@@ -25,7 +25,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 	private int iMouseY;
 	
 	private JPatchActionEdit edit;
-	private ControlPoint cpHot;
+	private OLDControlPoint cpHot;
 	private int iState = IDLE;
 //	private boolean bMulti = false;
 	
@@ -52,7 +52,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 			iMouseX = mouseEvent.getX();
 			iMouseY = mouseEvent.getY();
 			edit = new JPatchActionEdit("add curve segment");
-			ControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(iMouseX,iMouseY),null,null,false,true);
+			OLDControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(iMouseX,iMouseY),null,null,false,true);
 //			System.out.println(cp);
 			if (cp != null)
 //				System.out.println(cp.getLooseEnd());
@@ -69,8 +69,8 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 				if (Settings.getInstance().viewports.snapToGrid)
 					MainFrame.getInstance().getJPatchScreen().getGrid().correctVector(pos, viewDef.getGridPlane());
 //				viewport.getGrid().correctVector(pos);
-				ControlPoint cpA = new ControlPoint(pos);
-				ControlPoint cpB = new ControlPoint(pos);
+				OLDControlPoint cpA = new OLDControlPoint(pos);
+				OLDControlPoint cpB = new OLDControlPoint(pos);
 				cpA.setNext(cpB);
 				cpB.setPrev(cpA);
 				edit.addEdit(new AtomicAddCurve(cpA));
@@ -80,7 +80,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 					else
 						edit.addEdit(new AtomicAttachControlPoints(cpA.getHead(),cp.getTail()));
 				}
-				Selection selection = new Selection(cpB, true);
+				OLDSelection selection = new OLDSelection(cpB, true);
 //				MainFrame.getInstance().setSelection(selection);
 				edit.addEdit(new AtomicChangeSelection(selection));
 				MainFrame.getInstance().getJPatchScreen().single_update(compSource);
@@ -130,7 +130,7 @@ public class AddControlPointMouseAdapter extends JPatchMouseAdapter {
 				int iMouseX = mouseEvent.getX();
 				int iMouseY = mouseEvent.getY();
 				float[] hookPos = new float[1];
-				ControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(iMouseX,iMouseY),cpHot,hookPos,false,true);
+				OLDControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(iMouseX,iMouseY),cpHot,hookPos,false,true);
 				if (cp != null && cp != cpHot.getPrev()) {
 					if (hookPos[0] == -1) {
 						if (!mouseEvent.isControlDown())

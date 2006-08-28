@@ -28,11 +28,11 @@ public final class SelectAllAction extends AbstractAction {
 		//	boolean selectCurveOnly = (ps.isSingle() && (ps.isCurve() || ps.getControlPoint().getPrevAttached() == null));
 		ArrayList list = new ArrayList();
 		for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
-			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+			for (OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				if (cp.isHead() && !cp.isHidden() && !cp.isStartHook() && !cp.isEndHook()) list.add(cp);
 			}
 		}
-		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new Selection(list)));
+		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new OLDSelection(list)));
 		MainFrame.getInstance().getJPatchScreen().update_all();
 		//}
 	}

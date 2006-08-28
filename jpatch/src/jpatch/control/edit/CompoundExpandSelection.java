@@ -9,12 +9,12 @@ import jpatch.entity.*;
  */
 public class CompoundExpandSelection extends JPatchCompoundEdit implements JPatchRootEdit {
 	
-	public CompoundExpandSelection(Selection selection) {
+	public CompoundExpandSelection(OLDSelection selection) {
 		Map pointsToAdd = new HashMap();
 		Map pointsToRemove = new HashMap();
 		if (selection.getDirection() != 0) {
-			ControlPoint cpa = (ControlPoint) selection.getHotObject();
-			for (ControlPoint cp = cpa.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
+			OLDControlPoint cpa = (OLDControlPoint) selection.getHotObject();
+			for (OLDControlPoint cp = cpa.getStart(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				pointsToAdd.put(cp.getHead(), new Float(1));
 			}
 			if (!cpa.isHead()) {
@@ -22,7 +22,7 @@ public class CompoundExpandSelection extends JPatchCompoundEdit implements JPatc
 			}
 		} else {
 			HashMap mapPoints = new HashMap();
-			ControlPoint[] acp = selection.getControlPointArray();
+			OLDControlPoint[] acp = selection.getControlPointArray();
 			for (int i = 0; i < acp.length; i++)
 				selectPoint(acp[i], mapPoints);
 			pointsToAdd.putAll(mapPoints);
@@ -39,12 +39,12 @@ public class CompoundExpandSelection extends JPatchCompoundEdit implements JPatc
 		return "extend selection";
 	}
 	
-	private void selectPoint(ControlPoint cp, HashMap mapPoints) {
+	private void selectPoint(OLDControlPoint cp, HashMap mapPoints) {
 		if (cp != null) {
 			cp = cp.getHead();
 			if (!mapPoints.keySet().contains(cp)) {
 				mapPoints.put(cp, new Float(1));
-				ControlPoint[] stack = cp.getStack();
+				OLDControlPoint[] stack = cp.getStack();
 				for (int i = 0; i < stack.length; i++) {
 					selectPoint(stack[i].getNext(), mapPoints);
 					selectPoint(stack[i].getPrev(), mapPoints);

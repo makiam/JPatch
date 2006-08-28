@@ -14,8 +14,8 @@ public final class ApplyMaterialAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = -869947425548126658L;
-	private JPatchMaterial material;
-	public ApplyMaterialAction(JPatchMaterial material) {
+	private OLDMaterial material;
+	public ApplyMaterialAction(OLDMaterial material) {
 		super("Apply");
 		this.material = material;
 		//putValue(Action.SHORT_DESCRIPTION,"Add Controlpoint [A]");
@@ -41,7 +41,7 @@ public final class ApplyMaterialAction extends AbstractAction {
 		//MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
 		//MainFrame.getInstance().getJPatchScreen().addMouseListeners(new AddControlPointMouseAdapter());
 		//MainFrame.getInstance().clearDialog();
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null) {
 			//ps.applyMaterial(material);
 			JPatchActionEdit edit = new JPatchActionEdit("change material");

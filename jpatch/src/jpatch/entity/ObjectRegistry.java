@@ -3,9 +3,9 @@ package jpatch.entity;
 import java.util.*;
 
 public class ObjectRegistry implements AttributeListener {
-	private Map<Class, Map<String, JPatchObject>> classNameMap = new HashMap<Class, Map<String, JPatchObject>>();
-	private Map<Class, Map<JPatchObject, String>> classObjectMap = new HashMap<Class, Map<JPatchObject, String>>();
-	private Map<Attribute.String, JPatchObject> attributeMap = new HashMap<Attribute.String, JPatchObject>();
+	private Map<Class, Map<String, AbstractNamedObject>> classNameMap = new HashMap<Class, Map<String, AbstractNamedObject>>();
+	private Map<Class, Map<AbstractNamedObject, String>> classObjectMap = new HashMap<Class, Map<AbstractNamedObject, String>>();
+	private Map<Attribute.String, AbstractNamedObject> attributeMap = new HashMap<Attribute.String, AbstractNamedObject>();
 	
 	/**
 	 * Adds a JPatchObject to the maps. This method also adds an AttributeListener to
@@ -13,13 +13,12 @@ public class ObjectRegistry implements AttributeListener {
 	 * an IllegalArgumentException is thrown.
 	 * @param object
 	 */
-	public void add(JPatchObject object) {
+	public void add(AbstractNamedObject object) {
 		if (object.getObjectRegistry() != null) {
 			throw new IllegalStateException();
 		}
 		insert(object);
-		object.setObjectRegistry(this);
-		Attribute.String nameAttribute = (Attribute.String) object.getAttribute("Name");
+		Attribute.String nameAttribute = object.name;
 		attributeMap.put(nameAttribute, object);
 		nameAttribute.addAttributeListener(this);
 	}
@@ -29,10 +28,9 @@ public class ObjectRegistry implements AttributeListener {
 	 * the object's name attribute.
 	 * @param object
 	 */
-	public void remove(JPatchObject object) {
+	public void remove(AbstractNamedObject object) {
 		removeFromMap(object);
-		object.setObjectRegistry(null);
-		Attribute.String nameAttribute = (Attribute.String) object.getAttribute("Name");
+		Attribute.String nameAttribute = object.name;
 		nameAttribute.removeAttributeListener(this);
 		attributeMap.remove(nameAttribute);
 	}
@@ -44,7 +42,7 @@ public class ObjectRegistry implements AttributeListener {
 	 * @return the object with the passed class and name, or null if it was not found
 	 */
 	public Object getObject(Class objectClass, String name) {
-		Map<String, JPatchObject> nameMap = classNameMap.get(objectClass);
+		Map<String, AbstractNamedObject> nameMap = classNameMap.get(objectClass);
 		if (nameMap == null) {
 			return null;
 		}
@@ -60,7 +58,7 @@ public class ObjectRegistry implements AttributeListener {
 	 * @return an unoccupied name for the specified class
 	 */
 	public String getNextName(Class objectClass, String newName) {
-		Map<String, JPatchObject> nameMap = classNameMap.get(objectClass);
+		Map<String, AbstractNamedObject> nameMap = classNameMap.get(objectClass);
 		if (nameMap == null) {
 			return newName + "#1";
 		}
@@ -77,7 +75,7 @@ public class ObjectRegistry implements AttributeListener {
 	 * @see jpatch.entity.AttributeListener#attributeChanged(jpatch.entity.Attribute)
 	 */
 	public void attributeChanged(Attribute attribute) {
-		JPatchObject object = attributeMap.get(attribute);
+		AbstractNamedObject object = attributeMap.get(attribute);
 		removeFromMap(object);
 		insert(object);
 	}
@@ -87,12 +85,12 @@ public class ObjectRegistry implements AttributeListener {
 	 * If no maps for the class exist, create them.
 	 * Throws an IllegalArgumentException if the name is already occupied.
 	 */
-	private void insert(JPatchObject object) {
-		Map<String, JPatchObject> nameMap = classNameMap.get(object.getClass());
-		Map<JPatchObject, String> objectMap = classObjectMap.get(object.getClass());
+	private void insert(AbstractNamedObject object) {
+		Map<String, AbstractNamedObject> nameMap = classNameMap.get(object.getClass());
+		Map<AbstractNamedObject, String> objectMap = classObjectMap.get(object.getClass());
 		if (nameMap == null) {
-			nameMap = new HashMap<String, JPatchObject>();
-			objectMap = new HashMap<JPatchObject, String>();
+			nameMap = new HashMap<String, AbstractNamedObject>();
+			objectMap = new HashMap<AbstractNamedObject, String>();
 			classNameMap.put(object.getClass(), nameMap);
 			classObjectMap.put(object.getClass(), objectMap);
 		}
@@ -107,9 +105,9 @@ public class ObjectRegistry implements AttributeListener {
 	/*
 	 * Removes the object from all maps
 	 */
-	private void removeFromMap(JPatchObject object) {
-		Map<String, JPatchObject> nameMap = classNameMap.get(object.getClass());
-		Map<JPatchObject, String> objectMap = classObjectMap.get(object.getClass());
+	private void removeFromMap(AbstractNamedObject object) {
+		Map<String, AbstractNamedObject> nameMap = classNameMap.get(object.getClass());
+		Map<AbstractNamedObject, String> objectMap = classObjectMap.get(object.getClass());
 		nameMap.remove(objectMap.get(object));
 		objectMap.remove(object);
 	}

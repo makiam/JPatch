@@ -14,7 +14,7 @@ import jpatch.entity.*;
 import jpatch.boundary.ui.*;
 
 public class DofPanel extends SidePanel
-implements ChangeListener, ActionListener, Morph.MorphListener {
+implements ChangeListener, ActionListener, OLDMorph.MorphListener {
 	
 	/**
 	 * 
@@ -215,7 +215,7 @@ implements ChangeListener, ActionListener, Morph.MorphListener {
 		dof.removeMorphListener(this);
 	}
 	
-	public void valueChanged(Morph morph) {
+	public void valueChanged(OLDMorph morph) {
 //		System.out.println("value changed " + morph.getValue());
 		inputCurrent.setValue(morph.getValue());
 	}

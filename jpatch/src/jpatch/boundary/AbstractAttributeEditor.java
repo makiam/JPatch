@@ -34,8 +34,8 @@ import jpatch.entity.*;
  */
 public class AbstractAttributeEditor extends ExpandableFormContainer {
 	
-	protected void addScalar(Container c, Attribute a) {
-		c.add(new JLabel(a.getName()));
+	protected void addScalar(Container c, String name, Attribute a) {
+		c.add(new JLabel(name));
 		Box box = Box.createHorizontalBox();
 		if (a instanceof Attribute.KeyedBoolean) {
 			box.add(AttributeUiHelper.createBooleanComboFor(a));
@@ -49,20 +49,46 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		c.add(box);
 	}
 	
-	protected void addTuple(Container c, Attribute.Tuple a) {
-		c.add(new JLabel(a.getName()));
+	protected void addTuple(Container c, String name, Attribute.Tuple2 a) {
+		c.add(new JLabel(name));
 		JComponent box = new ExpandableFormRow();
 		box.setOpaque(false);
-		JCheckBox keyX = AttributeUiHelper.createCheckBoxFor(a.x.keyed);
-		JCheckBox keyY = AttributeUiHelper.createCheckBoxFor(a.y.keyed);
-		JCheckBox keyZ = AttributeUiHelper.createCheckBoxFor(a.z.keyed);
+		
+		box.add(AttributeUiHelper.createTextFieldFor(a.x));
+		box.add(AttributeUiHelper.createTextFieldFor(a.y));
+		c.add(box);
+
+		if (!a.isKeyable())
+			return;
+		
+		c.add(new JLabel("keyed"));
+		box = new ExpandableFormRow();
+		box.setOpaque(false);
+		if (a.isKeyable()) {
+			JCheckBox keyX = AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.x).keyed);
+			JCheckBox keyY = AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.y).keyed);
+			keyX.setEnabled(a.isKeyable());
+			keyY.setEnabled(a.isKeyable());
+			box.add(keyX);
+			box.add(keyY);
+		}
+		c.add(box);
+		
+		c.add(new JLabel("locked"));
+		box = new ExpandableFormRow();
+		box.setOpaque(false);
 		JCheckBox lockX = AttributeUiHelper.createCheckBoxFor(a.x.locked);
 		JCheckBox lockY = AttributeUiHelper.createCheckBoxFor(a.y.locked);
-		JCheckBox lockZ = AttributeUiHelper.createCheckBoxFor(a.z.locked);
-		keyX.setEnabled(a.isKeyable());
-		keyY.setEnabled(a.isKeyable());
-		keyZ.setEnabled(a.isKeyable());
-
+		box.add(lockX);
+		box.add(lockY);
+		c.add(box);
+	}
+	
+	protected void addTuple(Container c, String name, Attribute.Tuple3 a) {
+		c.add(new JLabel(name));
+		JComponent box = new ExpandableFormRow();
+		box.setOpaque(false);
+		
 		box.add(AttributeUiHelper.createTextFieldFor(a.x));
 		box.add(AttributeUiHelper.createTextFieldFor(a.y));
 		box.add(AttributeUiHelper.createTextFieldFor(a.z));
@@ -74,36 +100,47 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		c.add(new JLabel("keyed"));
 		box = new ExpandableFormRow();
 		box.setOpaque(false);
-		box.add(keyX);
-		box.add(keyY);
-		box.add(keyZ);
+		if (a.isKeyable()) {
+			JCheckBox keyX = AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.x).keyed);
+			JCheckBox keyY = AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.y).keyed);
+			JCheckBox keyZ = AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.z).keyed);
+			keyX.setEnabled(a.isKeyable());
+			keyY.setEnabled(a.isKeyable());
+			keyZ.setEnabled(a.isKeyable());
+			box.add(keyX);
+			box.add(keyY);
+			box.add(keyZ);
+		}
 		c.add(box);
 		
 		c.add(new JLabel("locked"));
 		box = new ExpandableFormRow();
 		box.setOpaque(false);
+		JCheckBox lockX = AttributeUiHelper.createCheckBoxFor(a.x.locked);
+		JCheckBox lockY = AttributeUiHelper.createCheckBoxFor(a.y.locked);
+		JCheckBox lockZ = AttributeUiHelper.createCheckBoxFor(a.z.locked);
 		box.add(lockX);
 		box.add(lockY);
 		box.add(lockZ);
 		c.add(box);
 	}
 	
-	protected void addLimit(Container c, final Attribute.Tuple a) {
+	protected void addLimit(Container c, final Attribute.Tuple3 a) {
 		c.add(new JLabel("Minimum"));
 		JComponent box = new ExpandableFormRow();
 		box.setOpaque(false);
 		
-		box.add(AttributeUiHelper.createTextFieldFor(a.x.min));
-		box.add(AttributeUiHelper.createTextFieldFor(a.y.min));
-		box.add(AttributeUiHelper.createTextFieldFor(a.z.min));
+		box.add(AttributeUiHelper.createTextFieldFor(((Attribute.BoundedDouble) a.x).min));
+		box.add(AttributeUiHelper.createTextFieldFor(((Attribute.BoundedDouble) a.y).min));
+		box.add(AttributeUiHelper.createTextFieldFor(((Attribute.BoundedDouble) a.z).min));
 		c.add(box);
 		
 		c.add(new JLabel("Enable min"));
 		box = new ExpandableFormRow();
 		box.setOpaque(false);
-		box.add(AttributeUiHelper.createCheckBoxFor(a.x.min.enabled));
-		box.add(AttributeUiHelper.createCheckBoxFor(a.y.min.enabled));
-		box.add(AttributeUiHelper.createCheckBoxFor(a.z.min.enabled));
+		box.add(AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.x).min.enabled));
+		box.add(AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.y).min.enabled));
+		box.add(AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.z).min.enabled));
 		c.add(box);
 		
 		c.add(new JLabel("Set min"));
@@ -117,7 +154,7 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		button.setToolTipText("Set x.min to current x value");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				a.x.min.set(a.x.get());
+				((Attribute.BoundedDouble) a.x).min.set(a.x.get());
 			}
 		});
 		box.add(button);
@@ -126,7 +163,7 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		button.setToolTipText("Set y.min to current y value");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				a.y.min.set(a.y.get());
+				((Attribute.BoundedDouble) a.y).min.set(a.y.get());
 			}
 		});
 		box.add(button);
@@ -135,7 +172,7 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		button.setToolTipText("Set z.min to current z value");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				a.z.min.set(a.z.get());
+				((Attribute.BoundedDouble) a.z).min.set(a.z.get());
 			}
 		});
 		box.add(button);
@@ -144,17 +181,17 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		c.add(new JLabel("Maximum"));
 		box = new ExpandableFormRow();
 		box.setOpaque(false);
-		box.add(AttributeUiHelper.createTextFieldFor(a.x.max));
-		box.add(AttributeUiHelper.createTextFieldFor(a.y.max));
-		box.add(AttributeUiHelper.createTextFieldFor(a.z.max));
+		box.add(AttributeUiHelper.createTextFieldFor(((Attribute.BoundedDouble) a.x).max));
+		box.add(AttributeUiHelper.createTextFieldFor(((Attribute.BoundedDouble) a.y).max));
+		box.add(AttributeUiHelper.createTextFieldFor(((Attribute.BoundedDouble) a.z).max));
 		c.add(box);
 		
 		c.add(new JLabel("Enable max"));
 		box = new ExpandableFormRow();
 		box.setOpaque(false);
-		box.add(AttributeUiHelper.createCheckBoxFor(a.x.max.enabled));
-		box.add(AttributeUiHelper.createCheckBoxFor(a.y.max.enabled));
-		box.add(AttributeUiHelper.createCheckBoxFor(a.z.max.enabled));
+		box.add(AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.x).max.enabled));
+		box.add(AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.y).max.enabled));
+		box.add(AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.z).max.enabled));
 		c.add(box);
 		
 		c.add(new JLabel("Set max"));
@@ -166,7 +203,7 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		button.setToolTipText("Set x.min to current x value");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				a.x.max.set(a.x.get());
+				((Attribute.BoundedDouble) a.x).max.set(a.x.get());
 			}
 		});
 		box.add(button);
@@ -175,7 +212,7 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		button.setToolTipText("Set y.min to current y value");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				a.y.max.set(a.y.get());
+				((Attribute.BoundedDouble) a.y).max.set(a.y.get());
 			}
 		});
 		box.add(button);
@@ -184,7 +221,7 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		button.setToolTipText("Set z.min to current z value");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				a.z.max.set(a.z.get());
+				((Attribute.BoundedDouble) a.z).max.set(a.z.get());
 			}
 		});
 		box.add(button);

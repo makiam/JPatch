@@ -63,7 +63,7 @@ import jpatch.auxilary.*;
  * @see		jpatch.entity.MaterialProperties
  */
 
-public class JPatchMaterial extends JPatchTreeLeaf {
+public class OLDMaterial extends JPatchTreeLeaf {
 	private RenderExtension re = new RenderExtension(new String[] {
 		"povray", "pigment {\n\tcolor rgbft <$r,$g,$b,$filter,$transmit>\n}\nfinish {\n\tambient $ambient\n\tdiffuse $diffuse brilliance $brilliance\n\tspecular $specular roughness $roughness metallic $metallic\n\t#if ($conserve_energy) conserve_energy #end\n\treflection {\n\t\t$reflection_min,$reflection_max\n\t\tfalloff $reflection_falloff\n\t\tmetallic $metallic\n\t}\n}\ninterior {\n\tior $refraction\n}\n",
 		"renderman", "Color [$r $g $b]\nOpacity [$opacity]\nSurface \"plastic\" \"Ka\" [$ambient] \"Kd\" [$diffuse] \"Ks\" [$specular] \"roughness\" [$roughness]\n",
@@ -84,11 +84,11 @@ public class JPatchMaterial extends JPatchTreeLeaf {
 	/**
 	 * Default Constructor
 	 */
-	public JPatchMaterial() {
+	public OLDMaterial() {
 		this(false);
 	}
 
-	public JPatchMaterial(boolean noAutoName) {
+	public OLDMaterial(boolean noAutoName) {
 		if (!noAutoName)
 			strName = "New material #" + num++;
 	}
@@ -98,7 +98,7 @@ public class JPatchMaterial extends JPatchTreeLeaf {
 	 *
 	 * @param color	The color of the material
 	 */
-	public JPatchMaterial(Color3f color) {
+	public OLDMaterial(Color3f color) {
 		this();
 		materialProperties.red = color.x;
 		materialProperties.green = color.y;

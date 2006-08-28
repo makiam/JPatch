@@ -8,9 +8,9 @@ import jpatch.entity.*;
 public class AtomicChangePatchMaterial extends JPatchAtomicEdit {
 
 	private Patch patch;
-	private JPatchMaterial material;
+	private OLDMaterial material;
 	
-	public AtomicChangePatchMaterial(Patch patch, JPatchMaterial material) {
+	public AtomicChangePatchMaterial(Patch patch, OLDMaterial material) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + patch + ", " + material + ")");
 		this.patch = patch;
@@ -27,7 +27,7 @@ public class AtomicChangePatchMaterial extends JPatchAtomicEdit {
 	}
 	
 	private void swap() {
-		JPatchMaterial dummy = material;
+		OLDMaterial dummy = material;
 		material = patch.getMaterial();
 		patch.setMaterial(dummy);
 	}

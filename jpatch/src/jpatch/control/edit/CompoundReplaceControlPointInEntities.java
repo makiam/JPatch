@@ -29,7 +29,7 @@ import jpatch.entity.*;
  */
 public final class CompoundReplaceControlPointInEntities extends JPatchCompoundEdit {
 	
-	public CompoundReplaceControlPointInEntities(ControlPoint cpOld, ControlPoint cpNew) {
+	public CompoundReplaceControlPointInEntities(OLDControlPoint cpOld, OLDControlPoint cpNew) {
 		System.out.println("*");
 		addEdit(new AtomicReplaceControlPointInSelections(cpOld, cpNew));
 		addEdit(new AtomicReplaceControlPointInPatches(cpOld, cpNew));

@@ -16,7 +16,7 @@ public final class AssignPointsToBonesAction extends AbstractAction {
 		super("autoassign controlpoints");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		ArrayList boneList = new ArrayList();
 		ArrayList cpList = new ArrayList();
 		for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
@@ -38,7 +38,7 @@ public final class AssignPointsToBonesAction extends AbstractAction {
 						}
 					}
 				}
-			} else if (object instanceof ControlPoint) {
+			} else if (object instanceof OLDControlPoint) {
 				cpList.add(object);
 			}
 		}
@@ -46,7 +46,7 @@ public final class AssignPointsToBonesAction extends AbstractAction {
 		System.out.println("Autoassigning " + cpList.size() + " controlpoints to " + boneList.size() + " bones.");
 		
 		for (int i = 0, n = cpList.size(); i < n; i++) {
-			ControlPoint cp = (ControlPoint) cpList.get(i);
+			OLDControlPoint cp = (OLDControlPoint) cpList.get(i);
 			Point3f p = cp.getReferencePosition();
 			float minDist = Float.MAX_VALUE;
 			float closestPosOnLine = 0;

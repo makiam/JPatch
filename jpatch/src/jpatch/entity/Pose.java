@@ -30,7 +30,7 @@ import jpatch.boundary.*;
  */
 public class Pose {
 	private OLDModel model;
-	private Map<Morph, Float> poseMap = new HashMap<Morph, Float>();
+	private Map<OLDMorph, Float> poseMap = new HashMap<OLDMorph, Float>();
 	
 	public Pose(OLDModel model) {
 		this.model = model;
@@ -39,7 +39,7 @@ public class Pose {
 	
 	public void setPose() {
 		for (Iterator it = model.getMorphList().iterator(); it.hasNext(); ) {
-			Morph morph = (Morph) it.next();
+			OLDMorph morph = (OLDMorph) it.next();
 			poseMap.put(morph, morph.getValue());
 		}
 		for (Iterator itBone = model.getBoneSet().iterator(); itBone.hasNext(); ) {
@@ -51,7 +51,7 @@ public class Pose {
 	}
 	
 	public void applyPose() {
-		for (Morph morph:poseMap.keySet()) {
+		for (OLDMorph morph:poseMap.keySet()) {
 			morph.setValue(poseMap.get(morph));
 			if (MainFrame.getInstance().getAnimation() != null)
 				morph.updateCurve();

@@ -4,9 +4,9 @@ import jpatch.boundary.*;
 import jpatch.entity.*;
 
 public class AtomicAddCurve extends JPatchAtomicEdit {
-	private ControlPoint cpStart;
+	private OLDControlPoint cpStart;
 	
-	public AtomicAddCurve(ControlPoint start) {
+	public AtomicAddCurve(OLDControlPoint start) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + start + ")");
 		cpStart = start;

@@ -32,7 +32,7 @@ import jpatch.boundary.*;
  */
 public final class CompoundRemoveControlPointFromEntities extends JPatchCompoundEdit {
 	
-	public CompoundRemoveControlPointFromEntities(ControlPoint cp) {
+	public CompoundRemoveControlPointFromEntities(OLDControlPoint cp) {
 		// Remove cp from selections
 		addEdit(new AtomicRemoveControlPointFromSelections(cp));
 		// Remove patches containing cp

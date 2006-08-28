@@ -4,9 +4,9 @@ import jpatch.boundary.*;
 import jpatch.entity.*;
 
 public class AtomicAddMorph extends JPatchAtomicEdit implements JPatchRootEdit {
-	private Morph morph;
+	private OLDMorph morph;
 	
-	public AtomicAddMorph(Morph morph) {
+	public AtomicAddMorph(OLDMorph morph) {
 		this.morph = morph;
 		redo();
 	}

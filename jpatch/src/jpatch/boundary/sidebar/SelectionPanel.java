@@ -6,7 +6,7 @@ import javax.swing.tree.*;
 import jpatch.boundary.*;
 import jpatch.boundary.action.*;
 import jpatch.boundary.ui.*;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDSelection;
 
 public class SelectionPanel extends SidePanel
 implements ChangeListener {
@@ -15,8 +15,8 @@ implements ChangeListener {
 	 */
 	private static final long serialVersionUID = -820847916109947399L;
 	JPatchInput inputName;
-	Selection selection;
-	public SelectionPanel(Selection selection) {
+	OLDSelection selection;
+	public SelectionPanel(OLDSelection selection) {
 		this.selection = selection;
 		//add(new JPatchButton(new EditMaterialAction(material)));
 		//add(new JPatchButton(new CloneMaterialAction(material)));

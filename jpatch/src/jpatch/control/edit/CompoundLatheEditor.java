@@ -26,7 +26,7 @@ public class CompoundLatheEditor extends JPatchCompoundEdit implements JPatchRoo
 		float epsilon = 3f / MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().getMatrix().getScale();
 		
 		// calculate control points
-		ControlPoint[] cpts = new ControlPoint[iSegments/2 + (bCloseTop ? 1 : 0) + (bCloseBottom ? 1: 0) + 1];
+		OLDControlPoint[] cpts = new OLDControlPoint[iSegments/2 + (bCloseTop ? 1 : 0) + (bCloseBottom ? 1: 0) + 1];
 
 		double dyr = 0;
 		boolean first = true;
@@ -51,12 +51,12 @@ public class CompoundLatheEditor extends JPatchCompoundEdit implements JPatchRoo
 			// close first control point
 			if (first && bCloseTop) {
 				first = false;
-				cpts[cpidx++] = new ControlPoint(0f, (float)dyr, 0f);
-				cpts[0].setMode(ControlPoint.PEAK);
+				cpts[cpidx++] = new OLDControlPoint(0f, (float)dyr, 0f);
+				cpts[0].setMode(OLDControlPoint.PEAK);
 			}
 			
 			// add controlpoint
-			cpts[cpidx] = new ControlPoint(0f, (float)dyr, (float)dxr);
+			cpts[cpidx] = new OLDControlPoint(0f, (float)dyr, (float)dxr);
 			if (iFill == 50 || iFill == 0) // correct spere & torus curvature
 				cpts[cpidx].setMagnitude(Functions.optimumCurvature(iFill == 0 ? iSegments/2 : iSegments));
 			if (cpidx > 0) 
@@ -68,16 +68,16 @@ public class CompoundLatheEditor extends JPatchCompoundEdit implements JPatchRoo
 					cpts[cpidx].appendTo(cpts[cpidx-1]);
 			
 			if (bCloseTop && cpidx == 1)
-				cpts[1].setMode(ControlPoint.PEAK);
+				cpts[1].setMode(OLDControlPoint.PEAK);
 			
 			cpidx++;
 		}
 		
 		// close last cp
 		if (bCloseBottom) {
-			cpts[cpidx] = new ControlPoint(0f, (float)dyr, 0f);
-			cpts[cpidx].setMode(ControlPoint.PEAK);
-			cpts[cpidx-1].setMode(ControlPoint.PEAK);
+			cpts[cpidx] = new OLDControlPoint(0f, (float)dyr, 0f);
+			cpts[cpidx].setMode(OLDControlPoint.PEAK);
+			cpts[cpidx-1].setMode(OLDControlPoint.PEAK);
 			cpts[cpidx].appendTo(cpts[cpidx-1]);
 		}
 

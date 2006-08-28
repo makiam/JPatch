@@ -7,7 +7,7 @@ import jpatch.entity.*;
 public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 	
 	private HashPatchSubdivision hashPatchSubdivision;
-	private JPatchMaterial material;
+	private OLDMaterial material;
 	private ArrayList matTriangleList = new ArrayList();
 	private ArrayList matQuadList = new ArrayList();
 	private ArrayList listAveragedNormals = new ArrayList();
@@ -79,7 +79,7 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 		iVertexNumber = 0;
 		
 		for (Iterator iterator = model.getMaterialList().iterator(); iterator.hasNext();) {
-			material = (JPatchMaterial)iterator.next();
+			material = (OLDMaterial)iterator.next();
 			
 			for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
 				Patch patch = (Patch) it.next();
@@ -95,7 +95,7 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 					//	referencePatch = new Point3f[hashPatch.length];
 					//	for (int i = 0; i < hashPatch.length; referencePatch[i] = new Point3f(hashPatch[i++]));
 					//}
-					ControlPoint[] acp = patch.getControlPoints();
+					OLDControlPoint[] acp = patch.getControlPoints();
                
 					//if (hashPatch.length == 9) {
 					//	int apex = -1;
@@ -122,8 +122,8 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 						
 							
 						int i2 = i * 2;
-						ControlPoint targetHook = null;
-						ControlPoint hookCurveStart = acp[i2].getStart().getParentHook();
+						OLDControlPoint targetHook = null;
+						OLDControlPoint hookCurveStart = acp[i2].getStart().getParentHook();
 						if (hookCurveStart != null) {
 							if (acp[(i2 + cn -1) % cn].isTargetHook()) {
 								targetHook = acp[(i2 + cn - 1) % cn];
@@ -138,8 +138,8 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 							Vector3f v3Start = new Vector3f(v3Dir);
 							Vector3f v3End = new Vector3f(v3Dir);
 							targetHook.computeReferenceTargetHookBorderTangents(v3Dir, v3Start, v3End);
-							ControlPoint cpStart = targetHook.getHead().getStart().getParentHook();
-							ControlPoint cpEnd = cpStart.getNext();
+							OLDControlPoint cpStart = targetHook.getHead().getStart().getParentHook();
+							OLDControlPoint cpEnd = cpStart.getNext();
 							Point3f p0 = new Point3f(cpStart.getPosition());
 							Point3f p1 = new Point3f(cpStart.getOutTangent());
 							Point3f p2 = new Point3f(cpEnd.getInTangent());
@@ -165,7 +165,7 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 							n2.cross(v, v3End);
 							n2.normalize();
 							
-							ControlPoint hook = targetHook.getHead();
+							OLDControlPoint hook = targetHook.getHead();
 							loop:
 							for (int ii = 0; ii < acp.length; ii++) {
 								if (acp[ii] == hook) {
@@ -211,7 +211,7 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 							normals[i].normalize();
 						}
 						else {
-							ControlPoint hook = targetHook.getHead();
+							OLDControlPoint hook = targetHook.getHead();
 							loop:
 							for (int ii = 0; ii < acp.length; ii++) {
 								if (acp[ii] == hook) {
@@ -229,8 +229,8 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 							Vector3f v3Start = new Vector3f(v3Dir);
 							Vector3f v3End = new Vector3f(v3Dir);
 							targetHook.computeReferenceTargetHookBorderTangents(v3Dir, v3Start, v3End);
-							ControlPoint cpStart = targetHook.getHead().getStart().getParentHook();
-							ControlPoint cpEnd = cpStart.getNext();
+							OLDControlPoint cpStart = targetHook.getHead().getStart().getParentHook();
+							OLDControlPoint cpEnd = cpStart.getNext();
 							Point3f r0 = cpStart.getReferencePosition();
 							Point3f r1 = cpStart.getReferenceOutTangent();
 							Point3f r2 = cpEnd.getReferenceInTangent();
@@ -331,7 +331,7 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 		return (Vertex[]) listVertices.toArray(new Vertex[0]);
 	}
 	
-	public Vertex[] getPerMaterialVertexArray(JPatchMaterial material) {
+	public Vertex[] getPerMaterialVertexArray(OLDMaterial material) {
 	//	Vertex[] vertices = getVertexArray();
 		int[] map = new int[listVertices.size()];
 		for (int m = 0; m < map.length; map[m++] = -1);
@@ -380,7 +380,7 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 		return (int[][]) matQuadList.toArray(new int[0][0]);
 	}
 	
-	public int[][] getMaterialTriangleArray(JPatchMaterial material) {
+	public int[][] getMaterialTriangleArray(OLDMaterial material) {
 		ArrayList triangleList = new ArrayList();
 		for (Iterator it = listQuads.iterator(); it.hasNext(); ) {
 			Quad quad = (Quad) it.next();
@@ -394,7 +394,7 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 		return (int[][]) triangleList.toArray(new int[0][0]);
 	}
 	
-	public int[][] getMaterialQuadArray(JPatchMaterial material) {
+	public int[][] getMaterialQuadArray(OLDMaterial material) {
 		ArrayList quadList = new ArrayList();
 		for (Iterator it = listQuads.iterator(); it.hasNext(); ) {
 			Quad quad = (Quad) it.next();
@@ -700,8 +700,8 @@ public class PatchTesselator3 implements HashPatchSubdivision.QuadDrain {
 	
 	public static class Quad {
 		public int i0, i1, i2, i3;
-		public JPatchMaterial material;
-		public Quad(int i0, int i1, int i2, int i3, JPatchMaterial material) {
+		public OLDMaterial material;
+		public Quad(int i0, int i1, int i2, int i3, OLDMaterial material) {
 			this.i0 = i3;
 			this.i1 = i2;
 			this.i2 = i1;

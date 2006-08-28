@@ -12,7 +12,7 @@ import jpatch.boundary.MainFrame;
 import jpatch.control.edit.*;
 import jpatch.entity.*;
 
-public class Selection extends JPatchTreeLeaf {
+public class OLDSelection extends JPatchTreeLeaf {
 	public static final int CONTROLPOINTS = 1;
 	public static final int MORPHS = 2;
 	public static final int BONES = 4;
@@ -33,12 +33,12 @@ public class Selection extends JPatchTreeLeaf {
 	
 	private static final Pattern pattern = Pattern.compile("New selection #(\\d+)");
 	
-	public static Selection createRectangularPointSelection(int ax, int ay, int bx, int by, Matrix4f transformationMatrix, OLDModel model, int mask) {
-		Selection selection = new Selection(true);
+	public static OLDSelection createRectangularPointSelection(int ax, int ay, int bx, int by, Matrix4f transformationMatrix, OLDModel model, int mask) {
+		OLDSelection selection = new OLDSelection(true);
 		Point3f p3 = new Point3f();
 		if ((mask & CONTROLPOINTS) != 0 && MainFrame.getInstance().getJPatchScreen().isSelectPoints()) {
 			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
-				for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				for (OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 					if (cp.isHead() && !cp.isHidden() && !cp.isStartHook() && !cp.isEndHook()) {
 					//if (cp.isHead() && !cp.isHidden()) {
 						p3.set(cp.getPosition());
@@ -82,7 +82,7 @@ public class Selection extends JPatchTreeLeaf {
 		return (selection.mapObjects.size() > 0) ? selection : null;
 	}
 	
-	private Selection(boolean noAutoName) {
+	private OLDSelection(boolean noAutoName) {
 		if (!noAutoName) {
 			setName("New selection #" + num++);
 		}
@@ -90,35 +90,35 @@ public class Selection extends JPatchTreeLeaf {
 		m3Orientation.setIdentity();
 	}
 	
-	public Selection() {
+	public OLDSelection() {
 		this(false);
 	}
 	
-	public Selection(Object object) {
+	public OLDSelection(Object object) {
 		this(object, false);
 	}
 	
-	public Selection(Object object, boolean noAutoName) {
+	public OLDSelection(Object object, boolean noAutoName) {
 		this(noAutoName);
 		mapObjects.put(object, new Float(1.0f));
 		hotObject = object;
 	}
 	
-	public Selection(Map objectWeightMap) {
+	public OLDSelection(Map objectWeightMap) {
 		this(objectWeightMap, false);
 	}
 
-	public Selection(Collection objects) {
+	public OLDSelection(Collection objects) {
 		this(objects, false);
 	}
 	
-	public Selection(Map objectWeightMap, boolean noAutoName) {
+	public OLDSelection(Map objectWeightMap, boolean noAutoName) {
 		this(noAutoName);
 		mapObjects.putAll(objectWeightMap);
 		p3Pivot.set(getCenter());
 	}
 
-	public Selection(Collection objects, boolean noAutoName) {
+	public OLDSelection(Collection objects, boolean noAutoName) {
 		this(noAutoName);
 		for (Iterator it = objects.iterator(); it.hasNext(); )
 			mapObjects.put(it.next(), new Float(1.0f));
@@ -138,7 +138,7 @@ public class Selection extends JPatchTreeLeaf {
 		boolean bones = (mask & BONES) != 0;
 		for (Iterator it = new HashSet(mapObjects.keySet()).iterator(); it.hasNext(); ) {
 			Object key = it.next();
-			if (!cps && key instanceof ControlPoint)
+			if (!cps && key instanceof OLDControlPoint)
 				mapObjects.remove(key);
 			if (!bones && key instanceof OLDBone.BoneTransformable)
 				mapObjects.remove(key);
@@ -164,15 +164,15 @@ public class Selection extends JPatchTreeLeaf {
 		return hotObject;
 	}
 
-	public ControlPoint[] getControlPointArray() {
+	public OLDControlPoint[] getControlPointArray() {
 		ArrayList points = new ArrayList();
 		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext(); ) {
 			Object object = it.next();
-			if (object instanceof ControlPoint)
+			if (object instanceof OLDControlPoint)
 				points.add(object);
 		}
-		ControlPoint[] array = new ControlPoint[points.size()];
-		return (ControlPoint[]) points.toArray(array);
+		OLDControlPoint[] array = new OLDControlPoint[points.size()];
+		return (OLDControlPoint[]) points.toArray(array);
 	}
 	
 	public int getDirection() {
@@ -276,8 +276,8 @@ public class Selection extends JPatchTreeLeaf {
 		OLDBone bone = null;
 		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext(); ) {
 			Object object = it.next();
-			if (object instanceof BoneTransformable) {
-				bone = ((BoneTransformable) object).getBone();
+			if (object instanceof OLDBone.BoneTransformable) {
+				bone = ((OLDBone.BoneTransformable) object).getBone();
 				break;
 			}
 		}
@@ -357,7 +357,7 @@ public class Selection extends JPatchTreeLeaf {
 			boolean bones = (mask & BONES) != 0;
 			for (Iterator it = mapObjects.keySet().iterator(); it.hasNext();) {
 				Object key = it.next();
-				if (cps && key instanceof ControlPoint)
+				if (cps && key instanceof OLDControlPoint)
 					mapTransformables.put(key, mapObjects.get(key));
 				if (bones && key instanceof OLDBone.BoneTransformable)
 					mapTransformables.put(key, mapObjects.get(key));
@@ -367,7 +367,7 @@ public class Selection extends JPatchTreeLeaf {
 		}
 		if ((mask & MORPHS) != 0) {
 			for (Iterator itMorphs = MainFrame.getInstance().getModel().getMorphIterator(); itMorphs.hasNext(); ) {
-				Morph moprh = (Morph) itMorphs.next();
+				OLDMorph moprh = (OLDMorph) itMorphs.next();
 				for (Iterator itTargets = moprh.getTargets().iterator(); itTargets.hasNext(); ) {
 					Transformable transformable = ((MorphTarget) itTargets.next()).getTransformable(mapObjects, false);
 					if (transformable != null)
@@ -445,12 +445,12 @@ public class Selection extends JPatchTreeLeaf {
 		return edit;
 	}
 	
-	public Selection cloneSelection() {
+	public OLDSelection cloneSelection() {
 		return cloneSelection(false);
 	}
 	
-	public Selection cloneSelection(boolean noAutoName) {
-		Selection selection = new Selection(mapObjects, noAutoName);
+	public OLDSelection cloneSelection(boolean noAutoName) {
+		OLDSelection selection = new OLDSelection(mapObjects, noAutoName);
 		selection.mapObjects.remove(pivotTransformable);
 		selection.p3Pivot.set(p3Pivot);
 		selection.m3Orientation.set(m3Orientation);
@@ -507,8 +507,8 @@ public class Selection extends JPatchTreeLeaf {
 		//int p = 0;
 		for (Iterator it = mapObjects.keySet().iterator(); it.hasNext();) {
 			Object object = it.next();
-			if (object instanceof ControlPoint) {
-				ControlPoint cp = (ControlPoint) object;
+			if (object instanceof OLDControlPoint) {
+				OLDControlPoint cp = (OLDControlPoint) object;
 				cpList.append(cp.getId()).append(" ");
 				cpWeightList.append(mapObjects.get(cp).toString()).append(" ");
 			}			
@@ -547,7 +547,7 @@ public class Selection extends JPatchTreeLeaf {
 		}
 
 		public JPatchUndoableEdit endTransform() {
-			return new AtomicModifySelection.Pivot(Selection.this, p3Temp);
+			return new AtomicModifySelection.Pivot(OLDSelection.this, p3Temp);
 		}
 	}
 }

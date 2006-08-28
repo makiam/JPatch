@@ -15,8 +15,8 @@ implements ChangeListener {
 	 */
 	private static final long serialVersionUID = 6771633567920818871L;
 	JPatchInput inputName;
-	JPatchMaterial material;
-	public MaterialPanel(JPatchMaterial material) {
+	OLDMaterial material;
+	public MaterialPanel(OLDMaterial material) {
 		this.material = material;
 		add(new JButton(new EditMaterialAction(material)));
 		//add(new JPatchButton(new CloneMaterialAction(material)));

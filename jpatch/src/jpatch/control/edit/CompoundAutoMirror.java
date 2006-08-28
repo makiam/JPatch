@@ -13,7 +13,7 @@ public class CompoundAutoMirror extends AbstractClone {
 	
 	protected List mirrorList = new ArrayList();
 	
-	public CompoundAutoMirror(Selection selection) {
+	public CompoundAutoMirror(OLDSelection selection) {
 		super(selection.getControlPointArray());
 		
 		//System.out.println("automirror");
@@ -42,11 +42,11 @@ public class CompoundAutoMirror extends AbstractClone {
 			/* convert all hooks on boundary curves to regular controlpoints... */
 			for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
 //			for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
-				ControlPoint start = (ControlPoint) it.next();
+				OLDControlPoint start = (OLDControlPoint) it.next();
 				/* check if this is a boundary curve */
 				boolean boundary = true;
 				loop:
-				for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
+				for (OLDControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
 					if (cp.getPosition().x != 0) {
 						boundary = false;
 						break loop;
@@ -54,20 +54,20 @@ public class CompoundAutoMirror extends AbstractClone {
 				}
 				
 				if (boundary) {
-					for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
+					for (OLDControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
 					
 						/* check if we are start of a hook curve, and if both, start and end are on the boundary */
 						if (selection.contains(cp.getHead()) && cp.getChildHook() != null && cp.getNext() != null && selection.contains(cp.getNext().getHead())) { //&& cp.getPosition().x == 0 && cp.getNext().getPosition().x == 0) {
 							
 							/* convert hooks... */
-							ControlPoint startHook = cp.getChildHook();
-							ControlPoint endHook = startHook.getEnd();
-							ControlPoint cpToAppend = cp;
-							ControlPoint cpEnd = cp.getNext();
+							OLDControlPoint startHook = cp.getChildHook();
+							OLDControlPoint endHook = startHook.getEnd();
+							OLDControlPoint cpToAppend = cp;
+							OLDControlPoint cpEnd = cp.getNext();
 //							Curve hookCurve = cp.getChildHook().getCurve();
-							for (ControlPoint hook = cp.getChildHook().getNext(); hook.getHookPos() < 1;) {
+							for (OLDControlPoint hook = cp.getChildHook().getNext(); hook.getHookPos() < 1;) {
 								Point3f position = hook.getPosition();
-								ControlPoint next = hook.getNext();
+								OLDControlPoint next = hook.getNext();
 								//System.out.println(hook);
 								/* remove hook from hook curve */
 								addEdit(new AtomicRemoveControlPointFromCurve(hook));
@@ -104,7 +104,7 @@ public class CompoundAutoMirror extends AbstractClone {
 								mapRemove.put(startHook, new Float(1));
 								mapRemove.put(endHook, new Float(1));
 								for (Iterator it2 = MainFrame.getInstance().getModel().getSelections().iterator(); it2.hasNext(); ) {
-									Selection loopSelection = (Selection) it2.next();
+									OLDSelection loopSelection = (OLDSelection) it2.next();
 									if (loopSelection.contains(cpEnd) && loopSelection.contains(cpEnd.getPrev())) {
 										addEdit(new AtomicModifySelection.AddObjects(loopSelection, mapAdd));
 									}
@@ -128,7 +128,7 @@ public class CompoundAutoMirror extends AbstractClone {
 							for (Iterator it2 = MainFrame.getInstance().getModel().getPatchSet().iterator(); it2.hasNext(); ) {
 								Patch patch = (Patch) it2.next();
 								if (patch.contains(startHook)) {
-									ControlPoint[] patchCPs = patch.getControlPoints();
+									OLDControlPoint[] patchCPs = patch.getControlPoints();
 									for (int i = 0; i < patchCPs.length; i++) {
 										if (patchCPs[i] == startHook) {
 											patchCPs[i] = cp;
@@ -140,7 +140,7 @@ public class CompoundAutoMirror extends AbstractClone {
 							for (Iterator it2 = MainFrame.getInstance().getModel().getPatchSet().iterator(); it2.hasNext(); ) {
 								Patch patch = (Patch) it2.next();
 								if (patch.contains(endHook)) {
-									ControlPoint[] patchCPs = patch.getControlPoints();
+									OLDControlPoint[] patchCPs = patch.getControlPoints();
 									for (int i = 0; i < patchCPs.length; i++) {
 										if (patchCPs[i] == endHook) {
 											patchCPs[i] = cpEnd;
@@ -161,10 +161,10 @@ public class CompoundAutoMirror extends AbstractClone {
 			cloneCurves();
 			
 			for (Iterator it = mapOriginals.keySet().iterator(); it.hasNext(); ) {
-				ControlPoint cpClone = (ControlPoint) it.next();
-				ControlPoint cpOriginal = getOriginal(cpClone);
+				OLDControlPoint cpClone = (OLDControlPoint) it.next();
+				OLDControlPoint cpOriginal = getOriginal(cpClone);
 				if (cpClone == cpOriginal) {
-					ControlPoint cp = cpClone;
+					OLDControlPoint cp = cpClone;
 					if (cp.getNext() == null) {
 						addEdit(new AtomicChangeControlPoint.Next(cp,getClone(cp.getPrev())));
 					} else {
@@ -179,7 +179,7 @@ public class CompoundAutoMirror extends AbstractClone {
 			
 			
 			for (Iterator it = mapOriginals.keySet().iterator(); it.hasNext(); ) {
-				ControlPoint cpClone = (ControlPoint) it.next();
+				OLDControlPoint cpClone = (OLDControlPoint) it.next();
 				if (cpClone.getPosition().x == 0 && cpClone.getNext() != null && cpClone.getNext().getPosition().x == 0) {
 					//System.out.println("something went wrong in automirror!");
 				} else if (cpClone.isHead()) {
@@ -203,9 +203,9 @@ public class CompoundAutoMirror extends AbstractClone {
 			/* add loop flags */
 //			for (Curve curve = MainFrame.getInstance().getModel().getFirstCurve(); curve != null; curve = curve.getNext()) {
 			for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
-				ControlPoint cp = (ControlPoint) it.next();
+				OLDControlPoint cp = (OLDControlPoint) it.next();
 				if (!cp.getLoop()) {
-					ControlPoint cpStart = cp;
+					OLDControlPoint cpStart = cp;
 					cp = cp.getNext();
 					while (cp != null && cp != cpStart) cp = cp.getNext();
 					if (cp == cpStart && !cp.getLoop()) {
@@ -216,7 +216,7 @@ public class CompoundAutoMirror extends AbstractClone {
 			
 			/* remove dead curves */
 			for (Iterator it = new ArrayList(MainFrame.getInstance().getModel().getCurveSet()).iterator(); it.hasNext(); ) {
-				ControlPoint cp = (ControlPoint) it.next();
+				OLDControlPoint cp = (OLDControlPoint) it.next();
 				if (cp.getPrev() != null && !cp.getLoop()) {
 					System.out.println(cp);
 					addEdit(new AtomicRemoveCurve(cp));
@@ -240,12 +240,12 @@ public class CompoundAutoMirror extends AbstractClone {
 		
 			ArrayList newMorphList = new ArrayList();
 			for (Iterator itMorph = MainFrame.getInstance().getModel().getMorphList().iterator(); itMorph.hasNext(); ) {
-				Morph morph = (Morph) itMorph.next();
+				OLDMorph morph = (OLDMorph) itMorph.next();
 				
 				boolean expand = false;
 				boolean mirror = true;
 				for (Iterator it = morph.getMorphMap().keySet().iterator(); it.hasNext(); ) {
-					ControlPoint cp = (ControlPoint) it.next();
+					OLDControlPoint cp = (OLDControlPoint) it.next();
 					if (!mapClones.containsKey(cp) && !mirrorList.contains(cp))
 						mirror = false;
 					else if (mapClones.get(cp) == cp || mirrorList.contains(cp))
@@ -265,8 +265,8 @@ public class CompoundAutoMirror extends AbstractClone {
 //							ArrayList newVectorList = new ArrayList();
 							Map newMap = new HashMap();
 							for (Iterator it = morphMap.keySet().iterator(); it.hasNext(); ) {
-								ControlPoint cp = (ControlPoint) it.next();
-								ControlPoint clone = (ControlPoint) mapClones.get(cp);
+								OLDControlPoint cp = (OLDControlPoint) it.next();
+								OLDControlPoint clone = (OLDControlPoint) mapClones.get(cp);
 								if (cp != clone && !mirrorList.contains(cp)) {
 									Vector3f vector = new Vector3f((Vector3f) morphMap.get(cp));
 									vector.x = -vector.x;
@@ -281,7 +281,7 @@ public class CompoundAutoMirror extends AbstractClone {
 					} else {
 						
 						
-						Morph newMorph = new Morph(morph.getModel(), false);
+						OLDMorph newMorph = new OLDMorph(morph.getModel(), false);
 						newMorph.setName(mirrorName(morph.getName()));
 						newMorph.setMax(morph.getMax());
 						newMorph.setMin(morph.getMin());
@@ -291,8 +291,8 @@ public class CompoundAutoMirror extends AbstractClone {
 							Map morphMap = target.getMorphMap();
 							MorphTarget newTarget = new MorphTarget(target.getPosition());
 							for (Iterator it = morphMap.keySet().iterator(); it.hasNext(); ) {
-								ControlPoint cp = (ControlPoint) it.next();
-								ControlPoint clone = (ControlPoint) mapClones.get(cp);
+								OLDControlPoint cp = (OLDControlPoint) it.next();
+								OLDControlPoint clone = (OLDControlPoint) mapClones.get(cp);
 								if (clone == null)
 									continue;
 								Vector3f vector = new Vector3f((Vector3f) morphMap.get(cp));
@@ -306,7 +306,7 @@ public class CompoundAutoMirror extends AbstractClone {
 					}
 				}
 			}
-			for (Iterator it = newMorphList.iterator(); it.hasNext(); addEdit(new AtomicAddMorph((Morph) it.next())));
+			for (Iterator it = newMorphList.iterator(); it.hasNext(); addEdit(new AtomicAddMorph((OLDMorph) it.next())));
 			
 			/*
 			 * mirror bones
@@ -372,7 +372,7 @@ public class CompoundAutoMirror extends AbstractClone {
 						boolean expand = false;
 						boolean mirror = true;
 						for (Iterator it = dof.getMorphMap().keySet().iterator(); it.hasNext(); ) {
-							ControlPoint cp = (ControlPoint) it.next();
+							OLDControlPoint cp = (OLDControlPoint) it.next();
 							if (!mapClones.containsKey(cp) && !mirrorList.contains(cp))
 								mirror = false;
 							else if (mapClones.get(cp) == cp || mirrorList.contains(cp))
@@ -391,8 +391,8 @@ public class CompoundAutoMirror extends AbstractClone {
 		//							ArrayList newVectorList = new ArrayList();
 									Map newMap = new HashMap();
 									for (Iterator it = morphMap.keySet().iterator(); it.hasNext(); ) {
-										ControlPoint cp = (ControlPoint) it.next();
-										ControlPoint cpClone = (ControlPoint) mapClones.get(cp);
+										OLDControlPoint cp = (OLDControlPoint) it.next();
+										OLDControlPoint cpClone = (OLDControlPoint) mapClones.get(cp);
 										if (cp != cpClone && !mirrorList.contains(cp)) {
 											Vector3f vector = new Vector3f((Vector3f) morphMap.get(cp));
 											vector.x = -vector.x;
@@ -410,8 +410,8 @@ public class CompoundAutoMirror extends AbstractClone {
 									Map morphMap = target.getMorphMap();
 									MorphTarget newTarget = new MorphTarget(target.getPosition());
 									for (Iterator it = morphMap.keySet().iterator(); it.hasNext(); ) {
-										ControlPoint cp = (ControlPoint) it.next();
-										ControlPoint cpClone = (ControlPoint) mapClones.get(cp);
+										OLDControlPoint cp = (OLDControlPoint) it.next();
+										OLDControlPoint cpClone = (OLDControlPoint) mapClones.get(cp);
 										if (cpClone == null)
 											continue;
 										Vector3f vector = new Vector3f((Vector3f) morphMap.get(cp));
@@ -444,8 +444,8 @@ public class CompoundAutoMirror extends AbstractClone {
 				}
 			}
 			for (Iterator it = mapClones.keySet().iterator(); it.hasNext(); ) {
-				ControlPoint cp = (ControlPoint) it.next();
-				ControlPoint clone = (ControlPoint) mapClones.get(cp);
+				OLDControlPoint cp = (OLDControlPoint) it.next();
+				OLDControlPoint clone = (OLDControlPoint) mapClones.get(cp);
 				if (cp == clone)
 					continue;
 				clone.setBone((OLDBone) mapBoneClones.get(cp.getBone()), cp.getBonePosition(), cp.getBoneDistance(), cp.isParentBone());
@@ -460,9 +460,9 @@ public class CompoundAutoMirror extends AbstractClone {
 //			System.out.println("mirrorList=" + mirrorList);
 			ArrayList newSelections = new ArrayList();
 			for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
-				Selection sel = (Selection) it.next();
+				OLDSelection sel = (OLDSelection) it.next();
 //				System.out.println("selection " + sel.getName() + "=" + sel.getMap());
-				ControlPoint[] acp = sel.getControlPointArray();
+				OLDControlPoint[] acp = sel.getControlPointArray();
 				boolean mirror = true;
 				boolean expand = false;
 				for (int c = 0; c < acp.length; c++) {
@@ -495,7 +495,7 @@ public class CompoundAutoMirror extends AbstractClone {
 						for (int c = 0; c < acp.length; c++) {
 							points.put(mapClones.get(acp[c]), sel.getMap().get(acp[c]));
 						}
-						Selection newSelection = new Selection(points);
+						OLDSelection newSelection = new OLDSelection(points);
 						if (sel.getName().startsWith("*"))
 							newSelection.setName("*" + mirrorName(sel.getName().substring(1)));
 						else
@@ -505,7 +505,7 @@ public class CompoundAutoMirror extends AbstractClone {
 				}
 			}
 			for (Iterator it = newSelections.iterator(); it.hasNext(); ) {
-				addEdit(new AtomicAddSelection((Selection) it.next()));
+				addEdit(new AtomicAddSelection((OLDSelection) it.next()));
 			}
 			
 			MainFrame.getInstance().getModel().setPose();
@@ -556,9 +556,9 @@ public class CompoundAutoMirror extends AbstractClone {
 	**/
 	protected void buildCloneMap(boolean hooks) {
 		for (int i = 0; i < acp.length; i++) {
-			ControlPoint[] acpStack = acp[i].getStack();
+			OLDControlPoint[] acpStack = acp[i].getStack();
 			for (int s = 0; s < acpStack.length; s++) {
-				ControlPoint cp = acpStack[s];
+				OLDControlPoint cp = acpStack[s];
         
 				/*
 				* check if a hook-curve should be added
@@ -589,7 +589,7 @@ public class CompoundAutoMirror extends AbstractClone {
 								//System.put.println(cp + " + prev attched curve");
 								boolean onMirror = true;
 								loop:
-								for (ControlPoint c = cp.getPrevAttached().getStart(); c != null; c = c.getNextCheckNextLoop()) {
+								for (OLDControlPoint c = cp.getPrevAttached().getStart(); c != null; c = c.getNextCheckNextLoop()) {
 									if (c.getPosition().x != 0) {
 										onMirror = false;
 										break loop;
@@ -605,7 +605,7 @@ public class CompoundAutoMirror extends AbstractClone {
 								//System.put.println(cp + " next attached curve");
 								boolean onMirror = true;
 								loop:
-								for (ControlPoint c = cp.getNextAttached().getStart(); c != null; c = c.getNextCheckNextLoop()) {
+								for (OLDControlPoint c = cp.getNextAttached().getStart(); c != null; c = c.getNextCheckNextLoop()) {
 									if (c.getPosition().x != 0) {
 										onMirror = false;
 										break loop;
@@ -625,7 +625,7 @@ public class CompoundAutoMirror extends AbstractClone {
 						} else {
 							boolean onMirror = true;
 							loop:
-							for (ControlPoint c = cp.getStart(); c != null; c = c.getNextCheckNextLoop()) {
+							for (OLDControlPoint c = cp.getStart(); c != null; c = c.getNextCheckNextLoop()) {
 								if (c.getPosition().x != 0) {
 									onMirror = false;
 									break loop;

@@ -16,7 +16,7 @@ public class MorphTarget implements MutableTreeNode {
 //	private float fValue = 0;
 //	private float fMin = 0;
 //	private float fMax = 1;
-	private Morph morph;
+	private OLDMorph morph;
 	private float fPosition;
 	private Map mapMorph = new HashMap();
 	private Map mapPositions = new HashMap();
@@ -29,7 +29,7 @@ public class MorphTarget implements MutableTreeNode {
 		return "Target " + fPosition;
 	}
 	
-	public Morph getMorph() {
+	public OLDMorph getMorph() {
 		return morph;
 	}
 	
@@ -65,9 +65,9 @@ public class MorphTarget implements MutableTreeNode {
 					Map newPointsMap = new HashMap();
 					for (Iterator it = selectedPoints.keySet().iterator(); it.hasNext(); ) {
 						Object o = it.next();
-						if (!(o instanceof ControlPoint))
+						if (!(o instanceof OLDControlPoint))
 							continue;
-						ControlPoint cp = (ControlPoint) o;
+						OLDControlPoint cp = (OLDControlPoint) o;
 						Vector3f morphVector = (Vector3f) mapMorph.get(cp);
 						if (morphVector == null) {
 							morphVector = new Vector3f();
@@ -82,7 +82,7 @@ public class MorphTarget implements MutableTreeNode {
 				public void translate(Vector3f v) {
 					Vector3f vv = new Vector3f();
 					for (Iterator it = initMap.keySet().iterator(); it.hasNext(); ) {
-						ControlPoint cp = (ControlPoint) it.next();
+						OLDControlPoint cp = (OLDControlPoint) it.next();
 						Vector3f vector = (Vector3f) mapMorph.get(cp);
 						vector.set((Vector3f) initMap.get(cp));
 						float weight = ((Float) selectedPoints.get(cp)).floatValue();
@@ -104,7 +104,7 @@ public class MorphTarget implements MutableTreeNode {
 					Matrix3f rot = new Matrix3f();
 					AxisAngle4f aa = new AxisAngle4f();
 					for (Iterator it = initMap.keySet().iterator(); it.hasNext(); ) {
-						ControlPoint cp = (ControlPoint) it.next();
+						OLDControlPoint cp = (OLDControlPoint) it.next();
 						Vector3f vector = (Vector3f) mapMorph.get(cp);
 						vector.set((Vector3f) initMap.get(cp));
 					}
@@ -112,7 +112,7 @@ public class MorphTarget implements MutableTreeNode {
 					MainFrame.getInstance().getModel().applyMorphs();
 					MainFrame.getInstance().getModel().setMorphPose();
 					for (Iterator it = initMap.keySet().iterator(); it.hasNext(); ) {
-						ControlPoint cp = (ControlPoint) it.next();
+						OLDControlPoint cp = (OLDControlPoint) it.next();
 						Vector3f vector = (Vector3f) mapMorph.get(cp);
 						p0.set(cp.getPosition());
 						p1.set(p0);
@@ -140,7 +140,7 @@ public class MorphTarget implements MutableTreeNode {
 					Matrix3f mm = new Matrix3f();
 					AxisAngle4f aa = new AxisAngle4f();
 					for (Iterator it = initMap.keySet().iterator(); it.hasNext(); ) {
-						ControlPoint cp = (ControlPoint) it.next();
+						OLDControlPoint cp = (OLDControlPoint) it.next();
 						Vector3f vector = (Vector3f) mapMorph.get(cp);
 						vector.set((Vector3f) initMap.get(cp));
 					}
@@ -148,7 +148,7 @@ public class MorphTarget implements MutableTreeNode {
 					MainFrame.getInstance().getModel().applyMorphs();
 					MainFrame.getInstance().getModel().setMorphPose();
 					for (Iterator it = initMap.keySet().iterator(); it.hasNext(); ) {
-						ControlPoint cp = (ControlPoint) it.next();
+						OLDControlPoint cp = (OLDControlPoint) it.next();
 						Vector3f vector = (Vector3f) mapMorph.get(cp);
 						p0.set(cp.getPosition());
 						p1.set(p0);
@@ -198,7 +198,7 @@ public class MorphTarget implements MutableTreeNode {
 					Matrix3f m2 = new Matrix3f();
 					Matrix3f m3 = new Matrix3f();
 					for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
-						ControlPoint cp = (ControlPoint) it.next();
+						OLDControlPoint cp = (OLDControlPoint) it.next();
 						Vector3f v = (Vector3f) changeMap.get(cp);
 						v.set((Vector3f) mapMorph.get(cp));
 						float weight = ((Float) selectedPoints.get(cp)).floatValue();
@@ -219,7 +219,7 @@ public class MorphTarget implements MutableTreeNode {
 					Matrix3f m2 = new Matrix3f();
 					Matrix3f m3 = new Matrix3f();
 					for (Iterator it = changeMap.keySet().iterator(); it.hasNext(); ) {
-						ControlPoint cp = (ControlPoint) it.next();
+						OLDControlPoint cp = (OLDControlPoint) it.next();
 						Vector3f v = (Vector3f) changeMap.get(cp);
 						v.set((Vector3f) mapMorph.get(cp));
 						float weight = ((Float) selectedPoints.get(cp)).floatValue();
@@ -290,7 +290,7 @@ public class MorphTarget implements MutableTreeNode {
 		mapMorph.putAll(map);
 	}
 	
-	public boolean contains(ControlPoint cp) {
+	public boolean contains(OLDControlPoint cp) {
 		return mapMorph.keySet().contains(cp);
 	}
 	
@@ -334,11 +334,11 @@ public class MorphTarget implements MutableTreeNode {
 //		fValue = -fValue;
 //	}
 	
-	public Vector3f getVectorFor(ControlPoint cp) {
+	public Vector3f getVectorFor(OLDControlPoint cp) {
 		return (Vector3f) mapMorph.get(cp);
 	}
 	
-	public void addPoint(ControlPoint cp, Vector3f vector) {
+	public void addPoint(OLDControlPoint cp, Vector3f vector) {
 //		listPoints.add(cp);
 //		listVectors.add(vector);
 		mapMorph.put(cp, vector);
@@ -348,7 +348,7 @@ public class MorphTarget implements MutableTreeNode {
 		return mapMorph.size();
 	}
 	
-	public Vector3f removePoint(ControlPoint cp) {
+	public Vector3f removePoint(OLDControlPoint cp) {
 		Vector3f v = (Vector3f) mapPositions.get(cp);
 		mapMorph.remove(cp);
 		return v;
@@ -418,7 +418,7 @@ public class MorphTarget implements MutableTreeNode {
 //			System.out.println("\tcp " + cp + "\t" + v3);
 //		}
 		for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
-			ControlPoint cp = (ControlPoint) it.next();
+			OLDControlPoint cp = (OLDControlPoint) it.next();
 			System.out.println("\tcp " + cp + "\t" + (Vector3f) mapMorph.get(cp));
 		}
 	}
@@ -457,7 +457,7 @@ public class MorphTarget implements MutableTreeNode {
 //		sb.append(prefix).append("</morph>").append("\n");
 		sb.append(prefix).append("<target value=\"" + fPosition + "\">\n");
 		for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
-			ControlPoint cp = (ControlPoint) it.next();
+			OLDControlPoint cp = (OLDControlPoint) it.next();
 			Vector3f v3 = (Vector3f) mapMorph.get(cp);
 			sb.append(prefix);
 			sb.append("\t<point id=\"").append(cp.getId()).append("\" ");
@@ -497,7 +497,7 @@ public class MorphTarget implements MutableTreeNode {
 	}
 
 	public void setParent(MutableTreeNode newParent) {
-		morph = (Morph) newParent;
+		morph = (OLDMorph) newParent;
 	}
 
 	public TreeNode getChildAt(int childIndex) {

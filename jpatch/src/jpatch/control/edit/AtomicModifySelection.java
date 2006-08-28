@@ -25,14 +25,14 @@ import java.util.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDSelection;
 
 /**
  * @author sascha
  *
  */
 public abstract class AtomicModifySelection extends JPatchAtomicEdit {
-	Selection selection;
+	OLDSelection selection;
 	
 	private AtomicModifySelection() { }
 	
@@ -49,7 +49,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 
 	public static final class AddObjects extends AtomicModifySelection {
 		private final Map mapObjects;
-		public AddObjects(Selection selection, Map objects) {
+		public AddObjects(OLDSelection selection, Map objects) {
 //			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + selection + ", " + objects + ")");
 			this.selection = selection;
@@ -75,7 +75,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	
 	public static final class RemoveObjects extends AtomicModifySelection {
 		private final Map mapObjects;
-		public RemoveObjects(Selection selection, Map objects) {
+		public RemoveObjects(OLDSelection selection, Map objects) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + selection + ", " + objects + ")");
 			this.selection = selection;
@@ -101,11 +101,11 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	
 	public static final class Pivot extends AtomicModifySelection implements JPatchRootEdit {
 		private float x, y, z;
-		public Pivot(Selection selection, Point3f pivot) {
+		public Pivot(OLDSelection selection, Point3f pivot) {
 			this (selection, pivot, false);
 		}
 		
-		public Pivot(Selection selection, Point3f pivot, boolean performNow) {
+		public Pivot(OLDSelection selection, Point3f pivot, boolean performNow) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + selection + ", " + pivot + ")");
 			this.selection = selection;
@@ -146,7 +146,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	
 	public static final class HotObject extends AtomicModifySelection {
 		private Object hot;
-		public HotObject(Selection selection, Object hot) {
+		public HotObject(OLDSelection selection, Object hot) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + selection + ", " + hot + ")");
 			this.selection = selection;
@@ -175,7 +175,7 @@ public abstract class AtomicModifySelection extends JPatchAtomicEdit {
 	
 	public static final class Orientation extends AtomicModifySelection implements JPatchRootEdit {
 		private final Matrix3f m3Orient = new Matrix3f();
-		public Orientation(Selection selection, Matrix3f orientation) {
+		public Orientation(OLDSelection selection, Matrix3f orientation) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + selection + ", " + orientation + ")");
 			this.selection = selection;

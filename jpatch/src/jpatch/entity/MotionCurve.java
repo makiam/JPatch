@@ -16,7 +16,7 @@ public abstract class MotionCurve {
 	String name = "*";
 	List<MotionKey> list = new ArrayList<MotionKey>();
 
-	public static MotionCurve.Float createMorphCurve(Morph morph) {
+	public static MotionCurve.Float createMorphCurve(OLDMorph morph) {
 		MotionCurve.Float mc = new MotionCurve.Float();
 		mc.name = morph.getId();
 		mc.fMin = morph.getMin();
@@ -24,7 +24,7 @@ public abstract class MotionCurve {
 		return mc;
 	}
 	
-	public static MotionCurve.Float createMorphCurve(Morph morph, MotionKey.Float key) {
+	public static MotionCurve.Float createMorphCurve(OLDMorph morph, MotionKey.Float key) {
 		MotionCurve.Float mc = createMorphCurve(morph);
 		mc.addKey(key);
 		return mc;

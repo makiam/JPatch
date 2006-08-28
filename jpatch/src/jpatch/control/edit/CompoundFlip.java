@@ -8,7 +8,7 @@ public class CompoundFlip extends JPatchCompoundEdit implements JPatchRootEdit {
 	public static final int Y = 1;
 	public static final int Z = 2;
 	
-	public CompoundFlip(ControlPoint[] acp, Point3f p3pivot, int axis, boolean pivot, boolean local) {
+	public CompoundFlip(OLDControlPoint[] acp, Point3f p3pivot, int axis, boolean pivot, boolean local) {
 		addEdit(new AtomicMoveControlPoints(acp));
 		for (int c = 0; c < acp.length; c++) {
 			Point3f position = acp[c].getPosition();

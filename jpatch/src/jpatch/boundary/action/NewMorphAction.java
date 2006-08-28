@@ -16,7 +16,7 @@ public final class NewMorphAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		Morph morph = new Morph(MainFrame.getInstance().getModel());
+		OLDMorph morph = new OLDMorph(MainFrame.getInstance().getModel());
 		morph.addTarget(new MorphTarget(0));
 		MorphTarget target = new MorphTarget(morph.getMax());
 		morph.addTarget(target);

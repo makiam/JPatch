@@ -4,7 +4,7 @@ import jpatch.entity.*;
 
 public class CompoundDropCurve extends JPatchCompoundEdit {
 	
-	public CompoundDropCurve(ControlPoint start) {
+	public CompoundDropCurve(OLDControlPoint start) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + start + ")");
 		boolean hook = (start.getHookPos() == 0.0f);
@@ -12,7 +12,7 @@ public class CompoundDropCurve extends JPatchCompoundEdit {
 		if (hook)
 			addEdit(new AtomicChangeControlPoint.ChildHook(start.getParentHook(), null));
 		// loop over all points on the curve
-		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
+		for (OLDControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
 			// drop the cp
 			if (hook && cp.getPrevAttached() != null)
 				addEdit(new CompoundDeleteControlPoint(cp.getPrevAttached()));

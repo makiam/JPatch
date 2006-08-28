@@ -11,9 +11,9 @@ public class ControlPointBrowserAction extends AbstractAction{
 		super("Controlpoint Browser");
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		Selection selection = MainFrame.getInstance().getSelection();
-		if (selection != null && selection.isSingle() && (selection.getHotObject() instanceof ControlPoint)) {
-			new ControlPointBrowser((ControlPoint) selection.getHotObject());
+		OLDSelection selection = MainFrame.getInstance().getSelection();
+		if (selection != null && selection.isSingle() && (selection.getHotObject() instanceof OLDControlPoint)) {
+			new ControlPointBrowser((OLDControlPoint) selection.getHotObject());
 		}
 	}
 }

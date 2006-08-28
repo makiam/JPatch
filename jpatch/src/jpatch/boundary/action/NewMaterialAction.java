@@ -20,7 +20,7 @@ public final class NewMaterialAction extends AbstractAction {
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		JPatchMaterial material = new JPatchMaterial();
+		OLDMaterial material = new OLDMaterial();
 		MainFrame.getInstance().getModel().addMaterial(material);
 //			int[] aiIndex = new int[] { material.getParent().getIndex(material) };
 //			((DefaultTreeModel)MainFrame.getInstance().getTree().getModel()).nodesWereInserted(material.getParent(),aiIndex);

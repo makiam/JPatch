@@ -10,12 +10,12 @@ import jpatch.auxilary.Utils3D;
 import jpatch.auxilary.XMLutils;
 import jpatch.boundary.JPatchTreeLeaf;
 import jpatch.boundary.MainFrame;
-import jpatch.entity.Morph.MorphListener;
+import jpatch.entity.OLDMorph.MorphListener;
 /**
  * Rotation Degree of freedom (Dof) for joints
  * @author sascha
  */
-public class RotationDof extends Morph {
+public class RotationDof extends OLDMorph {
 	public static final int YAW = 1;
 	public static final int PITCH = 2;
 	public static final int ROLL = 4;

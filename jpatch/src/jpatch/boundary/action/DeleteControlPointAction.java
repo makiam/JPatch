@@ -11,11 +11,11 @@ import jpatch.entity.*;
 public final class DeleteControlPointAction extends AbstractAction {
 	public void actionPerformed(ActionEvent actionEvent) {
 		JPatchActionEdit edit = null;
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection == null)
 			return;
 		if (selection.getDirection() != 0) {
-			ControlPoint cp = (ControlPoint) selection.getHotObject();
+			OLDControlPoint cp = (OLDControlPoint) selection.getHotObject();
 			if (selection.getDirection() == -1)
 				cp = cp.getPrev();
 			edit = new JPatchActionEdit("remove curve segment");

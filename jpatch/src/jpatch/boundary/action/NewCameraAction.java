@@ -17,7 +17,7 @@ public final class NewCameraAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		AnimObject animObject = new Camera("New Camera");
+		AnimObject animObject = new OLDCamera("New Camera");
 		JPatchRootEdit edit = new AtomicAddRemoveAnimObject(animObject, false);
 		MainFrame.getInstance().getUndoManager().addEdit(edit);
 		MainFrame.getInstance().getJPatchScreen().update_all();

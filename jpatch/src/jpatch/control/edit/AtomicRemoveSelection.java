@@ -4,14 +4,14 @@ import javax.swing.tree.*;
 
 import jpatch.boundary.sidebar.*;
 import jpatch.boundary.*;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDSelection;
 
 public class AtomicRemoveSelection extends JPatchAtomicEdit implements JPatchRootEdit {
 	
-	private Selection selection;
+	private OLDSelection selection;
 	private int index = -1;
 	
-	public AtomicRemoveSelection(Selection selection) {
+	public AtomicRemoveSelection(OLDSelection selection) {
 		this.selection = selection;
 		redo();
 	}

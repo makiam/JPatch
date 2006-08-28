@@ -18,7 +18,7 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 	* @param  A  ControlPoint A
 	* @param  B  ControlPoint B
 	*/
-	public CompoundLathe(ControlPoint[] acp, int iSegments, float epsilon) {
+	public CompoundLathe(OLDControlPoint[] acp, int iSegments, float epsilon) {
 		super(acp);
 		/*
 		 * create set of points to clone
@@ -31,7 +31,7 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 		
 		Set setCPs = new HashSet();
 		for (int i = 0; i < acp.length; i++) {
-			ControlPoint[] stack = acp[i].getStack();
+			OLDControlPoint[] stack = acp[i].getStack();
 			for (int s = 0; s < stack.length; s++) {
 				if (stack[s].isHook()) {
 					//boolean add = true;
@@ -69,10 +69,10 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 		
 		/* store all the points in an array */
 				
-		ControlPoint[][] cpLathe = new ControlPoint[setCPs.size()][iSegments];
+		OLDControlPoint[][] cpLathe = new OLDControlPoint[setCPs.size()][iSegments];
 		int i = 0;
 		for (Iterator it = setCPs.iterator(); it.hasNext(); ) {
-				cpLathe[i++][0] = (ControlPoint) it.next();
+				cpLathe[i++][0] = (OLDControlPoint) it.next();
 		}
 		
 		/* create cloned controlPoints */
@@ -81,36 +81,36 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 		for (int s = 1; s < iSegments; s++) {
 			mapCPs.clear();
 			for (Iterator it = setCPs.iterator(); it.hasNext(); ) {
-				ControlPoint cpToClone = (ControlPoint) it.next();
+				OLDControlPoint cpToClone = (OLDControlPoint) it.next();
 //				if (cpToClone.isStart() || cpToClone.isEnd()) {
 //					float x = cpToClone.getReferencePosition().x;
 //					float z = cpToClone.getReferencePosition().z;
 //					if (x * x + z * z == 0)
 //						continue;
 //				}
-				ControlPoint cpClone = new ControlPoint(cpToClone);
+				OLDControlPoint cpClone = new OLDControlPoint(cpToClone);
 				mapCPs.put(cpToClone, cpClone);
 			}
 			
 			/* connect cloned controlPoints */
 			for (Iterator it = setCPs.iterator(); it.hasNext(); ) {
-				ControlPoint cpToClone = (ControlPoint) it.next();
-				ControlPoint cpClone = (ControlPoint) mapCPs.get(cpToClone);
+				OLDControlPoint cpToClone = (OLDControlPoint) it.next();
+				OLDControlPoint cpClone = (OLDControlPoint) mapCPs.get(cpToClone);
 				if (cpClone == null)
 					continue;
-				cpClone.setNext((ControlPoint) mapCPs.get(cpToClone.getNext()));
-				cpClone.setPrev((ControlPoint) mapCPs.get(cpToClone.getPrev()));
-				cpClone.setNextAttached((ControlPoint) mapCPs.get(cpToClone.getNextAttached()));
-				cpClone.setPrevAttached((ControlPoint) mapCPs.get(cpToClone.getPrevAttached()));
-				cpClone.setParentHook((ControlPoint) mapCPs.get(cpToClone.getParentHook()));
-				cpClone.setChildHook((ControlPoint) mapCPs.get(cpToClone.getChildHook()));
+				cpClone.setNext((OLDControlPoint) mapCPs.get(cpToClone.getNext()));
+				cpClone.setPrev((OLDControlPoint) mapCPs.get(cpToClone.getPrev()));
+				cpClone.setNextAttached((OLDControlPoint) mapCPs.get(cpToClone.getNextAttached()));
+				cpClone.setPrevAttached((OLDControlPoint) mapCPs.get(cpToClone.getPrevAttached()));
+				cpClone.setParentHook((OLDControlPoint) mapCPs.get(cpToClone.getParentHook()));
+				cpClone.setChildHook((OLDControlPoint) mapCPs.get(cpToClone.getChildHook()));
 				cpClone.setHookPos(cpToClone.getHookPos());
 			}
 			
 			/* check for loops, add curves to model*/
 			for (Iterator it = setCPs.iterator(); it.hasNext(); ) {
-				ControlPoint cpToClone = (ControlPoint) it.next();
-				ControlPoint cpClone = (ControlPoint) mapCPs.get(cpToClone);
+				OLDControlPoint cpToClone = (OLDControlPoint) it.next();
+				OLDControlPoint cpClone = (OLDControlPoint) mapCPs.get(cpToClone);
 				
 				if (cpClone == null)
 					continue;
@@ -119,7 +119,7 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 				if (cpToClone.getLoop()) {
 					boolean bLoop = false;
 					loop:
-					for (ControlPoint cp = cpClone.getNext(); cp != null; cp = cp.getNext()) {
+					for (OLDControlPoint cp = cpClone.getNext(); cp != null; cp = cp.getNext()) {
 						if (cp == cpClone) {
 							bLoop = true;
 							break loop;
@@ -155,8 +155,8 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			m3Rotation.rotY(2f * (float) Math.PI * (float) s / iSegments);
 			Point3f pos = new Point3f();
 			for (Iterator it = setCPs.iterator(); it.hasNext(); ) {
-				ControlPoint cpToClone = (ControlPoint) it.next();
-				ControlPoint cpClone = (ControlPoint) mapCPs.get(cpToClone);
+				OLDControlPoint cpToClone = (OLDControlPoint) it.next();
+				OLDControlPoint cpClone = (OLDControlPoint) mapCPs.get(cpToClone);
 				
 				if (cpClone == null)
 					continue;
@@ -176,8 +176,8 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			
 			i = 0;
 			for (Iterator it = setCPs.iterator(); it.hasNext(); ) {
-				ControlPoint cpToClone = (ControlPoint) it.next();
-				ControlPoint cpClone = (ControlPoint) mapCPs.get(cpToClone);
+				OLDControlPoint cpToClone = (OLDControlPoint) it.next();
+				OLDControlPoint cpClone = (OLDControlPoint) mapCPs.get(cpToClone);
 				
 				if (cpClone == null)
 					continue;
@@ -304,11 +304,11 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 		
 			/* create lathe curves */
 		int n = setCPs.size();
-		ControlPoint[] newCp = new ControlPoint[iSegments];
+		OLDControlPoint[] newCp = new OLDControlPoint[iSegments];
 		boolean[] addCircle = new boolean[n];
 		boolean[] hookCurve = new boolean[n];
 		for (int p = 0; p < n; p++) {
-			ControlPoint cp = cpLathe[p][0]; // was ...=cpLath[p][1] !?
+			OLDControlPoint cp = cpLathe[p][0]; // was ...=cpLath[p][1] !?
 			//if (cp != null) {
 			if (cp != null && cp.isHead()) {
 				addCircle[p] = true;
@@ -343,12 +343,12 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			}
 		}
 		for (int p = 0; p < n; p++) {
-			ControlPoint cp = cpLathe[p][0]; // was ...=cpLath[p][1] !?
+			OLDControlPoint cp = cpLathe[p][0]; // was ...=cpLath[p][1] !?
 			//if (cp != null) {
 			if (cp != null && cp.isHead()) {
 				if (addCircle[p]) {
 					for (int s = 0; s < iSegments; s++) {
-						newCp[s] = new ControlPoint();
+						newCp[s] = new OLDControlPoint();
 						//newCp[s].setMode(ControlPoint.JPATCH_G3);
 						addEdit(new AtomicAttachControlPoints(newCp[s],cpLathe[p][s].getTail()));
 						pointList.add(newCp[s].getHead());
@@ -392,12 +392,12 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 					}
 				} else {
 					for (int s = 0; s < iSegments; s += iSegments / 4) {
-						newCp[s] = new ControlPoint();
+						newCp[s] = new OLDControlPoint();
 						//newCp[s].setMode(ControlPoint.JPATCH_G3);
 						addEdit(new AtomicAttachControlPoints(newCp[s],cpLathe[p][s].getTail()));
 						pointList.add(newCp[s].getHead());
 					}
-					ControlPoint startHook = null;
+					OLDControlPoint startHook = null;
 					for (int s = 0; s < iSegments; s ++) {
 						int sm = s % (iSegments / 4);
 						System.out.println("#####" + sm);
@@ -426,7 +426,7 @@ public class CompoundLathe extends AbstractClone implements JPatchRootEdit {
 			}
 		}
 		/* add selection */
-		Selection selection = new Selection(pointList);
+		OLDSelection selection = new OLDSelection(pointList);
 		selection.setName("*lathe #" + iNum++);
 		if (selection.getMap().size() > 0) {
 			addEdit(new AtomicChangeSelection(selection.cloneSelection()));

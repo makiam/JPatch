@@ -16,10 +16,10 @@ import jpatch.entity.*;
 **/
 public class AtomicAttachControlPoints extends JPatchAtomicEdit {
 
-	private ControlPoint cpA;
-	private ControlPoint cpAnextAttached;
-	private ControlPoint cpB;
-	private ControlPoint cpBprevAttached;
+	private OLDControlPoint cpA;
+	private OLDControlPoint cpAnextAttached;
+	private OLDControlPoint cpB;
+	private OLDControlPoint cpBprevAttached;
 
 
 	/**
@@ -27,7 +27,7 @@ public class AtomicAttachControlPoints extends JPatchAtomicEdit {
 	* @param  A  ControlPoint A
 	* @param  B  ControlPoint B
 	*/
-	public AtomicAttachControlPoints(ControlPoint A, ControlPoint B) {
+	public AtomicAttachControlPoints(OLDControlPoint A, OLDControlPoint B) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + A + ", " + B + ")");
 		cpA = A;

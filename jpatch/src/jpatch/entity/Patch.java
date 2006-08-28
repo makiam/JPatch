@@ -32,13 +32,13 @@ import jpatch.auxilary.*;
  * @author     Sascha Ledinsky
  * @version    $Revision$
  * @see		jpatch.entity.Curve
- * @see		jpatch.entity.ControlPoint
+ * @see		jpatch.entity.OLDControlPoint
  */
 public final class Patch {
-	private ControlPoint[] acpPoint;
+	private OLDControlPoint[] acpPoint;
 	//private boolean bReTriangulize = true;
 	//private TriangulizedPatch triangulizedPatch;
-	private JPatchMaterial material;
+	private OLDMaterial material;
 	private boolean bDynamic = false;
 	private boolean bValid = true;
 	//private Point3f[] ap3ReferenceCoonsPatch;
@@ -54,7 +54,7 @@ public final class Patch {
 		for (int i = 0; i < 16; aap3Patches1[0][i++] = new Point3f());
 	}
 	
-	public Patch(ControlPoint[] controlPoints) {
+	public Patch(OLDControlPoint[] controlPoints) {
 		acpPoint = controlPoints;
 		if (MainFrame.getInstance() != null && MainFrame.getInstance().getModel() != null)
 			material = MainFrame.getInstance().getModel().getMaterial(0);
@@ -66,12 +66,12 @@ public final class Patch {
 	}
 	
 	public void flip() {
-		ControlPoint[] old = acpPoint;
-		acpPoint = new ControlPoint[old.length];
+		OLDControlPoint[] old = acpPoint;
+		acpPoint = new OLDControlPoint[old.length];
 		for (int i = 0, n = old.length - 1; i <= n; acpPoint[i] = old[n - i++]);
 	}
 	
-	public final boolean contains(ControlPoint cp) {
+	public final boolean contains(OLDControlPoint cp) {
 		for (int n = 0; n < acpPoint.length; n++) {
 			if (cp == acpPoint[n]) return true;
 		}
@@ -87,7 +87,7 @@ public final class Patch {
 		return false;
 	}
 	
-	public ControlPoint[] getControlPoints() {
+	public OLDControlPoint[] getControlPoints() {
 		return acpPoint;
 	}
 	
@@ -100,7 +100,7 @@ public final class Patch {
 	}
 	
 	public final boolean equals(Object o) {
-		ControlPoint[] acp = ((Patch) o).acpPoint;
+		OLDControlPoint[] acp = ((Patch) o).acpPoint;
 		/*
 		 * check for equal size
 		 */
@@ -147,7 +147,7 @@ public final class Patch {
 //		}
 //	}
 	
-	public final boolean isSelected(Selection selection) {
+	public final boolean isSelected(OLDSelection selection) {
 		for (int i = 0; i < acpPoint.length; i++) {
 			if (!selection.contains(acpPoint[i].getHead())) {
 				if (!acpPoint[i].isTargetHook() && !acpPoint[i].isChildHook()) return false;
@@ -290,11 +290,11 @@ public final class Patch {
 		}
 	}
 	
-	public void setMaterial(JPatchMaterial material) {
+	public void setMaterial(OLDMaterial material) {
 		this.material = material;
 	}
 	
-	public JPatchMaterial getMaterial() {
+	public OLDMaterial getMaterial() {
 		return material;
 	}
 

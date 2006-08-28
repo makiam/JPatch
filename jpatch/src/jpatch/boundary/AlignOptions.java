@@ -75,7 +75,7 @@ public class AlignOptions extends JDialog implements ActionListener {
 			int plane = comboPlane.getSelectedIndex() + 1;
 			
 			JPatchActionEdit edit = new JPatchActionEdit("align controlpoints");
-			ControlPoint[] acp = MainFrame.getInstance().getSelection().getControlPointArray();
+			OLDControlPoint[] acp = MainFrame.getInstance().getSelection().getControlPointArray();
 			edit.addEdit(new AtomicMoveControlPoints(acp));
 			for (int i = 0; i < acp.length; i++) {
 				Point3f p3 = acp[i].getPosition();

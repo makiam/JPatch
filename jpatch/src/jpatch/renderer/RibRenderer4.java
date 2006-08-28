@@ -26,7 +26,7 @@ public class RibRenderer4 implements Renderer {
 	//}
 	
 	
-	public void writeToFile(List animModels, Camera camera, List lights, BufferedWriter file, String frameName) {
+	public void writeToFile(List animModels, OLDCamera camera, List lights, BufferedWriter file, String frameName) {
 		Settings settings = Settings.getInstance();
 		
 		try {
@@ -113,7 +113,7 @@ public class RibRenderer4 implements Renderer {
 			for (Iterator itMat = model.getMaterialList().iterator(); itMat.hasNext(); ) {
 				if (abort)
 					return;
-				JPatchMaterial material = (JPatchMaterial) itMat.next();
+				OLDMaterial material = (OLDMaterial) itMat.next();
 				
 				PatchTesselator3.Vertex[] vtx = patchTesselator.getPerMaterialVertexArray(material);
 				if (vtx.length > 0) {
@@ -183,7 +183,7 @@ public class RibRenderer4 implements Renderer {
 			for (Iterator itMat = model.getMaterialList().iterator(); itMat.hasNext(); ) {
 				if (abort)
 					return;
-				JPatchMaterial material = (JPatchMaterial) itMat.next();
+				OLDMaterial material = (OLDMaterial) itMat.next();
 				boolean active = false;
 				for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
 					Patch patch = (Patch) it.next();

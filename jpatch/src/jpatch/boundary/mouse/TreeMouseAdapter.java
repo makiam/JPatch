@@ -37,7 +37,7 @@ public class TreeMouseAdapter extends JPatchMouseAdapter {
 	
 //	private int x;
 	private int dx;
-	private Morph morph;
+	private OLDMorph morph;
 	private Rectangle bounds;
 	
 	public TreeMouseAdapter() {
@@ -50,8 +50,8 @@ public class TreeMouseAdapter extends JPatchMouseAdapter {
 			return;
 		Object element = path.getLastPathComponent();
 		int row = tree.getRowForLocation(event.getX(), event.getY());
-		if (element instanceof Morph) {
-			morph = (Morph) element;
+		if (element instanceof OLDMorph) {
+			morph = (OLDMorph) element;
 			bounds = tree.getRowBounds(row);
 			if (event.getClickCount() == 2) {
 				morph.setValue(0);

@@ -17,11 +17,11 @@ public class PreVizRenderer implements Renderer {
 
 	private List<AnimModel> models;
 	private List<AnimLight> lights;
-	private Camera camera;
+	private OLDCamera camera;
 	private PatchTesselator3 patchTesselator = new PatchTesselator3();
 	private volatile boolean abort = false;
 	
-	public PreVizRenderer(List<AnimModel> models, Camera camera, List<AnimLight> lights) {
+	public PreVizRenderer(List<AnimModel> models, OLDCamera camera, List<AnimLight> lights) {
 		this.models = models;
 		this.camera = camera;
 		this.lights = lights;
@@ -62,7 +62,7 @@ public class PreVizRenderer implements Renderer {
 			cameraTransform.mul(modelTransform);
 			
 			patchTesselator.tesselate(model, rendererSettings.previz.subdivisionLevel, cameraTransform, true);
-			for (JPatchMaterial material : model.getMaterialList()) {
+			for (OLDMaterial material : model.getMaterialList()) {
 				if (abort)
 					return null;
 				

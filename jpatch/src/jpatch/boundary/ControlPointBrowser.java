@@ -34,8 +34,8 @@ import jpatch.entity.*;
  */
 public class ControlPointBrowser extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 1L;
-	private ControlPoint cp;
-	private ControlPoint cpOld;
+	private OLDControlPoint cp;
+	private OLDControlPoint cpOld;
 	private JButton buttonBack = new JButton();
 	private JButton buttonNext = new JButton();
 	private JButton buttonPrev = new JButton();
@@ -55,7 +55,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 	 * @param cp The initial controlpoint to be shown in the browser
 	 * Creates a new ControlPointBrowser
 	 */
-	public ControlPointBrowser(ControlPoint cp) {
+	public ControlPointBrowser(OLDControlPoint cp) {
 		super(MainFrame.getInstance(), "Controlpoint browser");	// create new JDialog
 		this.cp = cp;
 		
@@ -108,15 +108,15 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		buttonRefresh.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				initFields();
-				MainFrame.getInstance().setSelection(new Selection(getCp()));
+				MainFrame.getInstance().setSelection(new OLDSelection(getCp()));
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
 		});
 		buttonSync.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				Selection selection = MainFrame.getInstance().getSelection();
-				if (selection != null && selection.isSingle() && (selection.getHotObject() instanceof ControlPoint)) {
-					setCp((ControlPoint) selection.getHotObject());
+				OLDSelection selection = MainFrame.getInstance().getSelection();
+				if (selection != null && selection.isSingle() && (selection.getHotObject() instanceof OLDControlPoint)) {
+					setCp((OLDControlPoint) selection.getHotObject());
 				}
 			}
 		});
@@ -126,10 +126,10 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 				try {
 					int num = Integer.parseInt(textGoto.getText());
 					for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
-						for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+						for (OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 							if (cp.getId() == num) {
 								setCp(cp);
-								MainFrame.getInstance().setSelection(new Selection(cp));
+								MainFrame.getInstance().setSelection(new OLDSelection(cp));
 								MainFrame.getInstance().getJPatchScreen().update_all();
 								return;
 							}
@@ -190,7 +190,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 	 * Set the controlpoint to show
 	 * @param cp
 	 */
-	private void setCp(ControlPoint cp) {
+	private void setCp(OLDControlPoint cp) {
 		cpOld = this.cp;
 		this.cp = cp;
 		initFields();
@@ -199,7 +199,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 	/**
 	* @return The currently shown controlpoint
 	 */
-	private ControlPoint getCp() {
+	private OLDControlPoint getCp() {
 		return cp;
 	}
 	
@@ -208,7 +208,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 	 * @param button the button to inizialize
 	 * @param cp to controlpoint to link to
 	 */
-	private void initButton(JButton button, ControlPoint cp) {
+	private void initButton(JButton button, OLDControlPoint cp) {
 		if (cp != null) {
 			button.setText(cp.toString());
 			button.setEnabled(true);
@@ -233,7 +233,7 @@ public class ControlPointBrowser extends JDialog implements ActionListener {
 		else if (event.getSource() == buttonParentHook) setCp(cp.getParentHook());
 		else if (event.getSource() == buttonBack) setCp(cpOld);
 		
-		MainFrame.getInstance().setSelection(new Selection(cp));	// create a new pointselection
+		MainFrame.getInstance().setSelection(new OLDSelection(cp));	// create a new pointselection
 		MainFrame.getInstance().getJPatchScreen().update_all();			// update all viewports
 	}
 }

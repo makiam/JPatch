@@ -1,15 +1,16 @@
 package jpatch.entity;
 
+import java.io.PrintStream;
 import java.util.*;
 
-public class Model extends AbstractJPatchObject {
+public class Model extends AbstractNamedObject {
 
 	private Collection<Selection> selections = new ArrayList<Selection>();
 	private Collection<Selection> unmodifiableSelections = Collections.unmodifiableCollection(selections);
-	private Collection<JPatchMaterial> materials = new ArrayList<JPatchMaterial>();
-	private Collection<JPatchMaterial> unmodifiableMaterials = Collections.unmodifiableCollection(materials);
-	private Collection<Morph> morphs = new ArrayList<Morph>();
-	private Collection<Morph> unmodifiableMorphs = Collections.unmodifiableCollection(morphs);
+	private Collection<OLDMaterial> materials = new ArrayList<OLDMaterial>();
+	private Collection<OLDMaterial> unmodifiableMaterials = Collections.unmodifiableCollection(materials);
+	private Collection<OLDMorph> morphs = new ArrayList<OLDMorph>();
+	private Collection<OLDMorph> unmodifiableMorphs = Collections.unmodifiableCollection(morphs);
 	private Collection<AbstractTransform> transforms = new ArrayList<AbstractTransform>();
 	private Collection<AbstractTransform> unmodifiableTransforms = Collections.unmodifiableCollection(transforms);
 	private Collection<ControlPoint> curves = new ArrayList<ControlPoint>();
@@ -17,6 +18,7 @@ public class Model extends AbstractJPatchObject {
 	private Collection<Patch> patches = new ArrayList<Patch>();
 	private Collection<Patch> unmodifiablePatches = Collections.unmodifiableCollection(patches);
 	private ObjectRegistry objectRegistry = new ObjectRegistry();
+	private int nextCpId;
 	
 	public Model() {
 		super();
@@ -27,27 +29,27 @@ public class Model extends AbstractJPatchObject {
 		
 	}
 
-	public Collection<AbstractTransform> getTransforms() {
+	public Iterable<AbstractTransform> getTransforms() {
 		return unmodifiableTransforms;
 	}
 
-	public Collection<ControlPoint> getCurves() {
+	public Iterable<ControlPoint> getCurves() {
 		return unmodifiableCurves;
 	}
 
-	public Collection<Patch> getPatches() {
+	public Iterable<Patch> getPatches() {
 		return unmodifiablePatches;
 	}
 	
-	public Collection<JPatchMaterial> getMaterials() {
+	public Iterable<OLDMaterial> getMaterials() {
 		return unmodifiableMaterials;
 	}
 
-	public Collection<Morph> getMorphs() {
+	public Iterable<OLDMorph> getMorphs() {
 		return unmodifiableMorphs;
 	}
 
-	public Collection<Selection> getSelections() {
+	public Iterable<Selection> getSelections() {
 		return unmodifiableSelections;
 	}
 	
@@ -59,12 +61,12 @@ public class Model extends AbstractJPatchObject {
 		return (Selection) objectRegistry.getObject(Selection.class, name);
 	}
 	
-	public JPatchMaterial getMaterial(String name) {
-		return (JPatchMaterial) objectRegistry.getObject(JPatchMaterial.class, name);
+	public OLDMaterial getMaterial(String name) {
+		return (OLDMaterial) objectRegistry.getObject(OLDMaterial.class, name);
 	}
 	
-	public Morph getMorph(String name) {
-		return (Morph) objectRegistry.getObject(Morph.class, name);
+	public OLDMorph getMorph(String name) {
+		return (OLDMorph) objectRegistry.getObject(OLDMorph.class, name);
 	}
 	
 	public Bone getBone(String name) {
@@ -72,42 +74,54 @@ public class Model extends AbstractJPatchObject {
 	}
 	
 	public void addSelection(Selection selection) {
+		selection.setParent(this);
 		selections.add(selection);
 	}
 	
 	public void removeSelection(Selection selection) {
 		selections.remove(selection);
+		selection.setParent(null);
 	}
 	
-	public void addMaterial(JPatchMaterial material) {
+	public void addMaterial(OLDMaterial material) {
 		materials.add(material);
+//		objectRegistry.add(material);
 	}
 	
-	public void removeMaterial(JPatchMaterial material) {
+	public void removeMaterial(OLDMaterial material) {
 		materials.remove(material);
+//		objectRegistry.remove(material);
 	}
 	
-	public void addMorph(Morph morph) {
+	public void addMorph(OLDMorph morph) {
 		morphs.add(morph);
+//		objectRegistry.add(morph);
 	}
 	
-	public void removeMorph(Morph morph) {
+	public void removeMorph(OLDMorph morph) {
 		morphs.remove(morph);
+//		objectRegistry.remove(morph);
 	}
 	
 	public void addTransform(AbstractTransform transform) {
 		transforms.add(transform);
+		objectRegistry.add(transform);
 	}
 	
 	public void removeTransform(AbstractTransform transform) {
 		transforms.remove(transform);
+		objectRegistry.remove(transform);
 	}
 	
 	public void addCurve(ControlPoint cp) {
+		assert cp.isStart() : "ControlPoint " + cp + " is not the start of a curve";
+		assert !curves.contains(cp) : "Curve " + cp + " already exists in model " + cp.getModel() + ".";
 		curves.add(cp);
 	}
 	
 	public void removeCurve(ControlPoint cp) {
+		assert cp.isStart() : "ControlPoint " + cp + " is not the start of a curve";
+		assert curves.contains(cp) : "Curve " + cp + " does not exist in model " + cp.getModel() + ".";
 		curves.remove(cp);
 	}
 	
@@ -117,5 +131,49 @@ public class Model extends AbstractJPatchObject {
 	
 	public void removePatch(Patch patch) {
 		patches.remove(patch);
+	}
+	
+	public int getNextCpId() {
+		return nextCpId++;
+	}
+	
+	public void setNextCpId(int nextCpId) {
+		this.nextCpId = nextCpId;
+	}
+	
+	public void initControlPoints() {
+		for (ControlPoint start : curves) {
+			ControlPoint cp = start;
+			do {
+				cp.computeTangents(false);
+				cp = cp.getNextNonHook();
+			} while (cp != null && ! cp.isLoop());
+		}
+	}
+	public void xml(PrintStream out, String indent) {
+		renumberControlPoints();
+		out.append(indent);
+		out.append("<model name=\"").append(name.get()).append("\">");
+		out.println();
+		out.append(indent);
+		out.println("\t<curves>");
+		String indent2 = indent + "\t\t";
+		for (ControlPoint cp : curves) {
+			cp.xml(out, indent2);
+		}
+		out.append(indent);
+		out.println("\t</curves>");
+		out.append(indent);
+		out.println("</model>");
+	}
+	
+	private void renumberControlPoints() {
+		int n = 0;
+		for (ControlPoint cp : curves) {
+			do {
+				cp.setId(n++);
+				cp = cp.getNext();
+			} while (cp != null && !cp.isLoop());
+		}
 	}
 }

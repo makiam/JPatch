@@ -7,9 +7,9 @@ import jpatch.boundary.*;
 
 public class AtomicRemoveMaterial extends JPatchAtomicEdit implements JPatchRootEdit {
 	
-	private JPatchMaterial material;
+	private OLDMaterial material;
 	
-	public AtomicRemoveMaterial(JPatchMaterial material) {
+	public AtomicRemoveMaterial(OLDMaterial material) {
 		this.material = material;
 		redo();
 	}

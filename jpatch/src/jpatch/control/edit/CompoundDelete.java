@@ -43,11 +43,11 @@ public class CompoundDelete extends JPatchCompoundEdit {
 		HashSet btSet = new HashSet();
 		for (Iterator it = objects.iterator(); it.hasNext(); ) {
 			Object object = it.next();
-			if (object instanceof ControlPoint) {
-				ControlPoint head = (ControlPoint) object;
+			if (object instanceof OLDControlPoint) {
+				OLDControlPoint head = (OLDControlPoint) object;
 				if (head.getNextAttached() != null)
 					throw new IllegalArgumentException("selected point " + head + " is not a head!");
-				for (ControlPoint cp = head; cp != null; cp = cp.getPrevAttached()) {
+				for (OLDControlPoint cp = head; cp != null; cp = cp.getPrevAttached()) {
 					if (!cp.isHook())
 						controlPointSet.add(cp);
 				}
@@ -58,15 +58,15 @@ public class CompoundDelete extends JPatchCompoundEdit {
 		if (DEBUG)
 			System.out.println("\t" + controlPointSet);
 		for (Iterator it = (new HashSet(MainFrame.getInstance().getModel().getCurveSet())).iterator(); it.hasNext(); ) {
-			ControlPoint start = (ControlPoint) it.next();
+			OLDControlPoint start = (OLDControlPoint) it.next();
 			if (!start.isDeleted() && !start.isHook() && dropCurve(start, objects)) {
-				for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop())
+				for (OLDControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop())
 					controlPointSet.remove(cp);
 				addEdit(new CompoundDropCurve(start));
 			}
 		}
 		for (Iterator it = controlPointSet.iterator(); it.hasNext(); ) {
-			ControlPoint cp = (ControlPoint) it.next();
+			OLDControlPoint cp = (OLDControlPoint) it.next();
 			if (!cp.isDeleted())
 				addEdit(new CompoundDeleteControlPoint(cp));
 		}
@@ -104,13 +104,13 @@ public class CompoundDelete extends JPatchCompoundEdit {
 		
 //		Remove empty selections
 		for (Iterator it = (new ArrayList(MainFrame.getInstance().getModel().getSelections())).iterator(); it.hasNext(); ) {
-			Selection selection = (Selection) it.next();
+			OLDSelection selection = (OLDSelection) it.next();
 			if (selection.getMap().size() == 0)
 				addEdit(new AtomicRemoveSelection(selection));
 		}
 //		 Remove empty morphs
 		for (Iterator itMorph = (new ArrayList(MainFrame.getInstance().getModel().getMorphList())).iterator(); itMorph.hasNext(); ) {
-			Morph morph = (Morph) itMorph.next();
+			OLDMorph morph = (OLDMorph) itMorph.next();
 			for (Iterator itTarget = new ArrayList(morph.getTargets()).iterator(); itTarget.hasNext(); ) {
 				MorphTarget morphTarget = (MorphTarget) itTarget.next();
 //				if (morphTarget.getNumberOfPoints() == 0)
@@ -150,7 +150,7 @@ public class CompoundDelete extends JPatchCompoundEdit {
 //		}
 //	}
 	
-	private boolean dropCurve(ControlPoint start, Collection objects) {
+	private boolean dropCurve(OLDControlPoint start, Collection objects) {
 //		boolean consecutive = false;
 //		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
 //			if (!objects.contains(cp.getHead())) {

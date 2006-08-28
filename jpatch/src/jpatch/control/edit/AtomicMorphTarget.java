@@ -4,9 +4,9 @@ import jpatch.entity.*;
 
 public abstract class AtomicMorphTarget extends JPatchAtomicEdit implements JPatchRootEdit {
 	MorphTarget morphTarget;
-	Morph morph;
+	OLDMorph morph;
 	
-	public AtomicMorphTarget(Morph morph, MorphTarget morphTarget) {
+	public AtomicMorphTarget(OLDMorph morph, MorphTarget morphTarget) {
 		this.morph = morph;
 		this.morphTarget = morphTarget;
 	}
@@ -24,7 +24,7 @@ public abstract class AtomicMorphTarget extends JPatchAtomicEdit implements JPat
 	}
 	
 	public static class Add extends AtomicMorphTarget {
-		public Add(Morph morph, MorphTarget morphTarget) {
+		public Add(OLDMorph morph, MorphTarget morphTarget) {
 			super(morph, morphTarget);
 			add();
 		}
@@ -43,7 +43,7 @@ public abstract class AtomicMorphTarget extends JPatchAtomicEdit implements JPat
 	}
 	
 	public static class Remove extends AtomicMorphTarget {
-		public Remove(Morph morph, MorphTarget morphTarget) {
+		public Remove(OLDMorph morph, MorphTarget morphTarget) {
 			super(morph, morphTarget);
 			remove();
 		}

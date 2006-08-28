@@ -14,7 +14,7 @@ public class PovrayRenderer3 implements Renderer {
 	private PatchTesselator3 patchTesselator = new PatchTesselator3();
 	private volatile boolean abort = false;
 	
-	public void writeFrame(List animModels, Camera camera, List lights, String include, BufferedWriter file) throws IOException {
+	public void writeFrame(List animModels, OLDCamera camera, List lights, String include, BufferedWriter file) throws IOException {
 		Settings settings = Settings.getInstance();
 
 		System.out.println("writing to " + file);
@@ -117,7 +117,7 @@ public class PovrayRenderer3 implements Renderer {
 		for (Iterator itMat = model.getMaterialList().iterator(); itMat.hasNext(); ) {
 			if (abort)
 				return;
-			JPatchMaterial material = (JPatchMaterial) itMat.next();
+			OLDMaterial material = (OLDMaterial) itMat.next();
 			switch (Settings.getInstance().export.povray.outputMode) {
 				
 				/* Generate tesselated Hash-patch output */

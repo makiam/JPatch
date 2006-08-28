@@ -11,15 +11,15 @@ public final class HideAction extends AbstractAction {
 	private boolean bActive = false;
 	public void actionPerformed(ActionEvent actionEvent) {
 		if (!bActive) {
-			Selection selection = MainFrame.getInstance().getSelection();
+			OLDSelection selection = MainFrame.getInstance().getSelection();
 			if (selection != null) {
 //				ControlPoint[] acp = selection.getControlPointArray();
 				ArrayList selectedPoints = new ArrayList();
 //				for (int i = 0; i < acp.length; i++) {
 				for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
 					Object object = it.next();
-					if (object instanceof ControlPoint) {
-						ControlPoint cp = (ControlPoint) object;
+					if (object instanceof OLDControlPoint) {
+						OLDControlPoint cp = (OLDControlPoint) object;
 						selectedPoints.add(cp.getHead());
 						if (cp.isHook()) {
 							selectedPoints.add(cp.trueHead());
@@ -36,7 +36,7 @@ public final class HideAction extends AbstractAction {
 //					curve = curve.getNext();
 //				}
 				for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
-					for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+					for (OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 						cp.setHidden(!selectedPoints.contains(cp.trueHead()));
 					}
 				}
@@ -51,7 +51,7 @@ public final class HideAction extends AbstractAction {
 //					curve = curve.getNext();
 //				}
 				for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
-					for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+					for (OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 						cp.setHidden(true);
 					}
 				}
@@ -67,7 +67,7 @@ public final class HideAction extends AbstractAction {
 //			curve = curve.getNext();
 //			}
 			for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
-				for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				for (OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 					cp.setHidden(false);
 				}
 			}

@@ -156,9 +156,9 @@ public class MatrixHelp {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
 				if (f2) {
-					System.out.println("\tm.m" + i + j + " = (float) (" + a[i][j] + ");");
+					System.out.println("\tm.m" + i + j + " = (float) (" + a[j][i] + ");");
 				} else {
-					System.out.println("\tm.m" + i + j + " = " + a[i][j] + ";");
+					System.out.println("\tm.m" + i + j + " = " + a[j][i] + ";");
 				}
 			}
 		}

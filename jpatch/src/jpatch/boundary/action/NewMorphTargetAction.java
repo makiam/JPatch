@@ -16,9 +16,9 @@ public final class NewMorphTargetAction extends AbstractAction {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private Morph morph;
+	private OLDMorph morph;
 	
-	public NewMorphTargetAction(Morph morph) {
+	public NewMorphTargetAction(OLDMorph morph) {
 		super("Add target");
 		this.morph = morph;
 	}
@@ -26,7 +26,7 @@ public final class NewMorphTargetAction extends AbstractAction {
 		MorphTarget target = new MorphTarget(morph.getValue());
 		Map map = new HashMap();
 		for (Iterator it = morph.getMorphMap().keySet().iterator(); it.hasNext(); ) {
-			ControlPoint cp = (ControlPoint) it.next();
+			OLDControlPoint cp = (OLDControlPoint) it.next();
 			Vector3f v = (Vector3f) morph.getMorphMap().get(cp);
 			map.put(cp, new Vector3f(v));
 		}

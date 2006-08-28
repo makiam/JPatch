@@ -18,7 +18,7 @@ implements ChangeListener, ActionListener {
 	private MaterialProperties oldMaterialProperties;
 	private String strPovRay;
 	private String strRenderMan;
-	private JPatchMaterial material;
+	private OLDMaterial material;
 	private JButton buttonOk;
 	private JButton buttonCancel;
 	private JButton buttonApply;
@@ -44,7 +44,7 @@ implements ChangeListener, ActionListener {
 	private JCheckBox checkboxConserveEnergy = new JCheckBox("conserve energy",true);
 	JTextArea[] atextArea = new JTextArea[3];
 	
-	public MaterialEditor(Frame owner, JPatchMaterial material) {
+	public MaterialEditor(Frame owner, OLDMaterial material) {
 		super(MainFrame.getInstance(),"JPatch material editor - " + material.getName(),true);
 		//setUndecorated(true);
 		//getRootPane().setWindowDecorationStyle(JRootPane.FRAME);

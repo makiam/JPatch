@@ -34,7 +34,7 @@ import jpatch.auxilary.KeyStrokeUtils;
 import jpatch.boundary.*;
 import jpatch.boundary.settings.*;
 import jpatch.boundary.ui.*;
-import jpatch.entity.Camera;
+import jpatch.entity.OLDCamera;
 
 
 /**
@@ -110,7 +110,7 @@ public class Actions extends DefaultHandler {
 	}
 	
 	public void setViewDefinition(ViewDefinition viewDef) {
-		Camera camera = viewDef.getCamera();
+		OLDCamera camera = viewDef.getCamera();
 		if (camera != null)
 			actionMap.get("camera" + camera.hashCode()).buttonModel.setSelected(true);
 		else

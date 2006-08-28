@@ -9,9 +9,9 @@ import jpatch.entity.*;
  * @created    26. Dezember 2003
  */
 public class AtomicDetatchControlPoint extends JPatchAtomicEdit {
-	private ControlPoint cp;
-	private ControlPoint cpNextAttached;
-	private ControlPoint cpPrevAttached;
+	private OLDControlPoint cp;
+	private OLDControlPoint cpNextAttached;
+	private OLDControlPoint cpPrevAttached;
 
 	/**
 	 * Constructor
@@ -19,7 +19,7 @@ public class AtomicDetatchControlPoint extends JPatchAtomicEdit {
 	 *
 	 * @param  cp  ControlPoint to remove
 	 */
-	public AtomicDetatchControlPoint(ControlPoint cp) {
+	public AtomicDetatchControlPoint(OLDControlPoint cp) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + cp + ")");
 		/*

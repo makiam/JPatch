@@ -17,7 +17,7 @@ public class AnchorMouseListener extends MouseAdapter {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) e.getSource());
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection == null) {
 			((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(false);
 			return;
@@ -37,7 +37,7 @@ public class AnchorMouseListener extends MouseAdapter {
 		float minDist = 64;
 		Transformable anchor = null;
 		for (Iterator it = animModel.getModel().getCurveSet().iterator(); it.hasNext(); ) {
-			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+			for (OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				if (!cp.isHead())
 					continue;
 				p3.set(cp.getPosition());

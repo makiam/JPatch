@@ -19,8 +19,8 @@ import jpatch.boundary.settings.Settings;
 import jpatch.boundary.tools.Tools;
 import jpatch.control.edit.AtomicInsertControlPoint;
 import jpatch.control.edit.JPatchActionEdit;
-import jpatch.entity.ControlPoint;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDControlPoint;
+import jpatch.entity.OLDSelection;
 
 /**
  * implements the knife tool.
@@ -76,7 +76,7 @@ public class KnifeMouseAdapter extends JPatchMouseAdapter {
 	public void mouseReleased(MouseEvent e) {		
 		
 		if (e.getButton() == MouseEvent.BUTTON1) {					
-			Selection selection = MainFrame.getInstance().getSelection();
+			OLDSelection selection = MainFrame.getInstance().getSelection();
 			
 			if (selection==null) {
 				MainFrame.getInstance().getJPatchScreen().update_all();
@@ -115,17 +115,17 @@ public class KnifeMouseAdapter extends JPatchMouseAdapter {
 			//loop through selected control points
 			for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
 				Object key = it.next();
-				if (!(key instanceof ControlPoint)) {
+				if (!(key instanceof OLDControlPoint)) {
 					continue;
 				}
-				ControlPoint cpHead = (ControlPoint) key;
+				OLDControlPoint cpHead = (OLDControlPoint) key;
 				//System.out.println("");				
 				//loop through all attached control points
-				for (ControlPoint cpCurrent=cpHead; cpCurrent!=null; cpCurrent=cpCurrent.getPrevAttached()) {
+				for (OLDControlPoint cpCurrent=cpHead; cpCurrent!=null; cpCurrent=cpCurrent.getPrevAttached()) {
 					
 					//System.out.print("<" + cpCurrent.number() + "> ");
 				
-					ControlPoint cpNext = cpCurrent.getNextCheckNextLoop();
+					OLDControlPoint cpNext = cpCurrent.getNextCheckNextLoop();
 					if (cpNext==null || !selection.contains(cpNext.getHead())) {
 						//System.out.print("n ");
 						continue;
@@ -143,10 +143,10 @@ public class KnifeMouseAdapter extends JPatchMouseAdapter {
 					//System.out.print(intersectionList.size() + " ");
 					
 					//Insert new points												
-					ControlPoint cpLast = cpCurrent;		
+					OLDControlPoint cpLast = cpCurrent;		
 					for (Iterator<Point3f> p3it=intersectionList.iterator(); p3it.hasNext(); ) {
 						Point3f p3Current = p3it.next();
-						ControlPoint cpThis = new ControlPoint(new Point3f(p3Current));					
+						OLDControlPoint cpThis = new OLDControlPoint(new Point3f(p3Current));					
 					
 						//If a intersection found in the step before does not lie on the
 						//cut line drawn by the user do not add it.

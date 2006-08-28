@@ -52,7 +52,7 @@ public class WeightSelectionMouseAdapter extends JPatchMouseAdapter {
 		drawLine(g2);
 //		MainFrame.getInstance().getMeshToolBar().reset();
 		MainFrame.getInstance().getJPatchScreen().setTool(Tools.defaultTool);
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		Point3f p = new Point3f();
 		float dx = iEndX - iStartX;
 		float dy = iEndY - iStartY;

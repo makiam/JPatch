@@ -35,7 +35,7 @@ public class AnimationImporter extends DefaultHandler {
 	private MotionCurveSet motionCurveSet;
 	private String strRendererFormat;
 	
-	private Map<Integer, ControlPoint> cpIdMap = new HashMap<Integer, ControlPoint>();
+	private Map<Integer, OLDControlPoint> cpIdMap = new HashMap<Integer, OLDControlPoint>();
 	private Map<String, OLDBone> boneNameMap = new HashMap<String, OLDBone>();
 	
 	private Animation animation;
@@ -91,8 +91,8 @@ public class AnimationImporter extends DefaultHandler {
 				}
 				else if (localName.equals("camera")) {
 					iState = CAMERA;
-					animObject = new Camera("");
-					motionCurveSet = new MotionCurveSet.Camera((Camera) animObject);
+					animObject = new OLDCamera("");
+					motionCurveSet = new MotionCurveSet.Camera((OLDCamera) animObject);
 				}
 				else if (localName.equals("lightsource")) {
 					iState = LIGHT;
@@ -190,7 +190,7 @@ public class AnimationImporter extends DefaultHandler {
 				else if (localName.equals("camera")) {
 					iState = CHOREOGRAPHY;
 					motionCurveSet.populateList();
-					animation.addCamera((Camera) animObject, motionCurveSet);
+					animation.addCamera((OLDCamera) animObject, motionCurveSet);
 //					animation.setMotionCurveSetFor(animObject, motionCurveSet);
 					animObject = null;
 				}
@@ -283,7 +283,7 @@ public class AnimationImporter extends DefaultHandler {
 			} else if (type == AVAR &&(localName.equals("id") || localName.equals("name"))) {
 				//FIXME
 				System.out.println("motionCurveSet = " + motionCurveSet);
-				Morph morph = ((MotionCurveSet.Model) motionCurveSet).getMorphById(value);
+				OLDMorph morph = ((MotionCurveSet.Model) motionCurveSet).getMorphById(value);
 				System.out.println("avar = " + morph);
 				motionCurve = ((MotionCurveSet.Model) motionCurveSet).morph(morph);
 				motionCurve.clear();

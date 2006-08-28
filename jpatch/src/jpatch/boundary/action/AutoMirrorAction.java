@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import javax.swing.*;
 import jpatch.control.edit.*;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDSelection;
 import jpatch.boundary.*;
 
 
@@ -20,7 +20,7 @@ public final class AutoMirrorAction extends AbstractAction {
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
 	
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && !selection.isSingle()) {
 			//PointSelection newPs = MainFrame.getInstance().getModel().clone(ps.getControlPointArray());
 			//MainFrame.getInstance().setSelection(newPs);

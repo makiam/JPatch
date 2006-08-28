@@ -38,27 +38,27 @@ implements ModelImporter {
 //	private ArrayList listHook = new ArrayList();
 //	private HashMap mapBones = new HashMap();
 	
-	private Map<Integer, ControlPoint> cpIdMap = new HashMap<Integer, ControlPoint>();
-	private Map<ControlPoint, Integer> cpAttachMap = new HashMap<ControlPoint, Integer>();
-	private Map<ControlPoint, Integer> cpHookMap = new HashMap<ControlPoint, Integer>();
-	private Map<ControlPoint, String> cpBoneMap = new HashMap<ControlPoint, String>();
+	private Map<Integer, OLDControlPoint> cpIdMap = new HashMap<Integer, OLDControlPoint>();
+	private Map<OLDControlPoint, Integer> cpAttachMap = new HashMap<OLDControlPoint, Integer>();
+	private Map<OLDControlPoint, Integer> cpHookMap = new HashMap<OLDControlPoint, Integer>();
+	private Map<OLDControlPoint, String> cpBoneMap = new HashMap<OLDControlPoint, String>();
 	private Map<String, OLDBone> boneNameMap = new HashMap<String, OLDBone>();
 	private Map<OLDBone, String> boneParentMap = new HashMap<OLDBone, String>();
 	private Map<Integer, OLDBone> boneIdMap = new HashMap<Integer, OLDBone>();
-	private Map<ControlPoint, Boolean> cpParentBoneMap = new HashMap<ControlPoint, Boolean>();
-	private Map<String, JPatchMaterial> materialNameMap = new HashMap<String, JPatchMaterial>();
+	private Map<OLDControlPoint, Boolean> cpParentBoneMap = new HashMap<OLDControlPoint, Boolean>();
+	private Map<String, OLDMaterial> materialNameMap = new HashMap<String, OLDMaterial>();
 	
 	private boolean bCurveClosed;
-	private ControlPoint cpFirst;
-	private ControlPoint cp;
-	private ControlPoint cpPrev;
+	private OLDControlPoint cpFirst;
+	private OLDControlPoint cp;
+	private OLDControlPoint cpPrev;
 	private Rotoscope rotoscope;
 	private OLDBone bone;
 	private RotationDof dof;
 	private int iRotoscopeView;
-	private JPatchMaterial material;
+	private OLDMaterial material;
 	private String selectionName;
-	private Morph morph;
+	private OLDMorph morph;
 	private MorphTarget morphTarget;
 	private List listMaterials = new ArrayList();
 //	private List listBones = new ArrayList();
@@ -80,7 +80,7 @@ implements ModelImporter {
 //		}
 //	}
 	
-	public Map<Integer, ControlPoint> getCpIdMap() {
+	public Map<Integer, OLDControlPoint> getCpIdMap() {
 		return cpIdMap;
 	}
 	
@@ -110,7 +110,7 @@ implements ModelImporter {
 			e.printStackTrace();
 		}
 		//for (Iterator it = mapBones.keySet().iterator(); it.hasNext(); ) {
-		for (ControlPoint cp : cpBoneMap.keySet()) {
+		for (OLDControlPoint cp : cpBoneMap.keySet()) {
 			OLDBone bone = boneNameMap.get(cpBoneMap.get(cp));
 			if (bone == null)
 				bone = boneIdMap.get(Integer.valueOf(cpBoneMap.get(cp)));
@@ -136,7 +136,7 @@ implements ModelImporter {
 //		model.setBoneMap(listBones);
 		if (MainFrame.getInstance() != null)
 			MainFrame.getInstance().setFilename(file.getName());
-		ControlPoint.setNextId(cpHighId + 1);
+		OLDControlPoint.setNextId(cpHighId + 1);
 		return "";
 	}
 	
@@ -347,10 +347,10 @@ implements ModelImporter {
 					//System.out.println(material.getName());
 					if (material.getName().equals("Default Material")) {
 						List matList = model.getMaterialList();
-						JPatchMaterial mat = null;
+						OLDMaterial mat = null;
 						loop:
 						for (Iterator it = matList.iterator(); it.hasNext(); ) {
-							mat = (JPatchMaterial) it.next();
+							mat = (OLDMaterial) it.next();
 							if (mat.getName().equals("Default Material")) {
 								break loop;
 							}
@@ -403,7 +403,7 @@ implements ModelImporter {
 			case PATCH:
 				if (localName.equals("points")) {
 					int[] aiPoint = splitIntoIntArray(sbChars.toString());
-					ControlPoint[] acp = new ControlPoint[aiPoint.length];
+					OLDControlPoint[] acp = new OLDControlPoint[aiPoint.length];
 					for (int i = 0; i < acp.length; i++) {
 //						acp[i] = (ControlPoint) listCp.get(aiPoint[i]);
 						acp[i] = cpIdMap.get(aiPoint[i]);
@@ -412,7 +412,7 @@ implements ModelImporter {
 					patch.setMaterial(material);
 					model.addPatch(patch,null);
 					if (acp.length == 10) {		// five point patch
-						ControlPoint[] acp5 = new ControlPoint[] {
+						OLDControlPoint[] acp5 = new OLDControlPoint[] {
 							trueHead(acp[0]),
 							trueHead(acp[2]),
 							trueHead(acp[4]),
@@ -433,7 +433,7 @@ implements ModelImporter {
 			case SELECTION:
 				if (localName.equals("selection")) {
 					iState = MODEL;
-					Selection selection;
+					OLDSelection selection;
 					if (aiList == null) {
 						int[] aiPoint = splitIntoIntArray(sbChars.toString());
 						HashSet pointSet = new HashSet();
@@ -441,7 +441,7 @@ implements ModelImporter {
 //							pointSet.add(listCp.get(aiPoint[i]));
 							pointSet.add(cpIdMap.get(aiPoint[i]));
 						}
-						selection = new Selection(pointSet, true);
+						selection = new OLDSelection(pointSet, true);
 					} else {
 						HashMap pointMap = new HashMap();
 						for (int i = 0; i < aiList.length; i++) {
@@ -451,7 +451,7 @@ implements ModelImporter {
 							}
 							pointMap.put(cpIdMap.get(aiList[i]), new Float(afList[i]));
 						}
-						selection = new Selection(pointMap, true);
+						selection = new OLDSelection(pointMap, true);
 					}
 					selection.setName(selectionName);
 					model.addSelection(selection);
@@ -572,8 +572,8 @@ implements ModelImporter {
 		return rotoscope;
 	}
 	
-	private Morph createMorph(Attributes attributes) {
-		Morph morph = new Morph(model, true);
+	private OLDMorph createMorph(Attributes attributes) {
+		OLDMorph morph = new OLDMorph(model, true);
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);
@@ -612,11 +612,11 @@ implements ModelImporter {
 			if (localName.equals("phoneme")) phoneme = value;
 			else if (localName.equals("morph")) morphIndex = Integer.parseInt(value);
 		}
-		model.setMorphFor(phoneme, (Morph) model.getMorphList().get(morphIndex));
+		model.setMorphFor(phoneme, (OLDMorph) model.getMorphList().get(morphIndex));
 	}
 	
 	private void parseMorphVector(Attributes attributes, MorphTarget morph) {
-		ControlPoint cp = null;
+		OLDControlPoint cp = null;
 		Vector3f vector = new Vector3f();
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
@@ -655,24 +655,24 @@ implements ModelImporter {
 		}
 	}
 				
-	private JPatchMaterial getPatchMaterial(Attributes attributes) {
+	private OLDMaterial getPatchMaterial(Attributes attributes) {
 		for (int index = 0; index < attributes.getLength(); index++) {
 			String localName = attributes.getLocalName(index);
 			String value = attributes.getValue(index);
 			if (localName.equals("material")) {
-				JPatchMaterial material = materialNameMap.get(value);
+				OLDMaterial material = materialNameMap.get(value);
 				if (material != null)
 					return material;
 				int number = Integer.parseInt(value);
 				if (number == -1) return null;
-				return (JPatchMaterial) listMaterials.get(number);
+				return (OLDMaterial) listMaterials.get(number);
 			}
 		}
 		return null;
 	}
 				
-	private JPatchMaterial createMaterial(Attributes attributes) {
-		JPatchMaterial material = new JPatchMaterial(true);
+	private OLDMaterial createMaterial(Attributes attributes) {
+		OLDMaterial material = new OLDMaterial(true);
 		//iMaterialNumber = 0;
 		//for (int index = 0; index < attributes.getLength(); index++) {
 		//	String localName = attributes.getLocalName(index);
@@ -722,9 +722,9 @@ implements ModelImporter {
 		return point;
 	}
 	
-	private ControlPoint createCp(Attributes attributes) {
-		ControlPoint controlPoint = new ControlPoint();
-		controlPoint.setMode(ControlPoint.JPATCH_G1);
+	private OLDControlPoint createCp(Attributes attributes) {
+		OLDControlPoint controlPoint = new OLDControlPoint();
+		controlPoint.setMode(OLDControlPoint.JPATCH_G1);
 		Point3f p3 = controlPoint.getPosition();
 		int id = -1;
 		for (int index = 0; index < attributes.getLength(); index++) {
@@ -783,9 +783,9 @@ implements ModelImporter {
 			//	controlPoint.setOutGamma((new Float(value)).floatValue());
 			} else if (localName.equals("mode")) {
 				if (value.equals("peak")) {
-					controlPoint.setMode(ControlPoint.PEAK);
+					controlPoint.setMode(OLDControlPoint.PEAK);
 				} else if (value.equals("spatch")) {
-					controlPoint.setMode(ControlPoint.SPATCH_ROUND);
+					controlPoint.setMode(OLDControlPoint.SPATCH_ROUND);
 				}//else if (value.equals("smooth")) {
 				//	controlPoint.setMode(ControlPoint.AM_SMOOTH);
 				//} else if (value.equals("c0")) {
@@ -926,8 +926,8 @@ implements ModelImporter {
 	}
 	
 	private void hook() {
-		for (ControlPoint cp : cpHookMap.keySet()) {
-			ControlPoint parentHook = cpIdMap.get(cpHookMap.get(cp));
+		for (OLDControlPoint cp : cpHookMap.keySet()) {
+			OLDControlPoint parentHook = cpIdMap.get(cpHookMap.get(cp));
 			cp.setParentHook(parentHook);
 			if (cp.getHookPos() == 0)
 				parentHook.setChildHook(cp);
@@ -945,7 +945,7 @@ implements ModelImporter {
 	}
 	
 	private void attach() {
-		for (ControlPoint cp : cpAttachMap.keySet()) {
+		for (OLDControlPoint cp : cpAttachMap.keySet()) {
 			cp.attachTo(cpIdMap.get(cpAttachMap.get(cp)));
 		}
 //		for (int i = 0; i < listAttach.size(); i++) {
@@ -953,7 +953,7 @@ implements ModelImporter {
 //		}
 	}
 	
-	private ControlPoint trueHead(ControlPoint cp) {
+	private OLDControlPoint trueHead(OLDControlPoint cp) {
 		return (cp.getParentHook() == null) ? cp.getHead() : cp.getParentHook().getHead();
 	}
 	

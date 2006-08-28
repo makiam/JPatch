@@ -4,7 +4,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.vecmath.*;
 import jpatch.boundary.*;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDSelection;
 
 
 public final class SetViewLockAction extends AbstractAction {
@@ -21,7 +21,7 @@ public final class SetViewLockAction extends AbstractAction {
 	
 	public void actionPerformed(ActionEvent actionEvent) {
 		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition();
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (lock && selection != null) {
 			viewDef.setLock(new Point3f(selection.getPivot()));
 		} else {
