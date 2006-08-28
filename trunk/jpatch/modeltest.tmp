@@ -1,0 +1,16 @@
+<model name="Model">
+	<curves>
+		<curve loop="true">
+			<cp id="0" x="0.0" y="0.0" z="0.0" />
+			<cp id="1" hook="0.5" />
+			<cp id="2" x="0.0" y="0.0" z="0.0" />
+			<cp id="3" x="0.0" y="0.0" z="0.0" />
+		</curve>
+		<curve>
+			<cp id="4" x="0.0" y="0.0" z="0.0" />
+			<cp id="5" x="0.0" y="0.0" z="0.0" />
+			<cp id="6" attach="2" />
+			<cp id="7" x="0.0" y="0.0" z="0.0" />
+		</curve>
+	</curves>
+</model>

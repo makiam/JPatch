@@ -3,9 +3,7 @@ package jpatch.entity;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 
-public abstract class AbstractJPatchObject implements JPatchObject {
-	private ObjectRegistry objectRegistry;
-	public Attribute.String name = new Attribute.String(this, "Name");
+public abstract class AbstractJPatchXObject implements JPatchObject {
 	
 	private Iterable<Attribute> attributes = new Iterable<Attribute>() {
 		public Iterator<Attribute> iterator() {
@@ -18,18 +16,6 @@ public abstract class AbstractJPatchObject implements JPatchObject {
 			return createChannelIterator();
 		}
 	};
-	
-	public ObjectRegistry getObjectRegistry() {
-		return objectRegistry;
-	}
-
-	public void setObjectRegistry(ObjectRegistry objectRegistry) {
-		this.objectRegistry = objectRegistry;
-	}
-	
-	public String getName() {
-		return name.get();
-	}
 	
 	public Iterable<Attribute> getAttributes() {
 		return attributes;
@@ -51,23 +37,6 @@ public abstract class AbstractJPatchObject implements JPatchObject {
 					}
 				}
 				i++;
-			}
-		}
-		return null;
-	}
-	
-	public Attribute getAttribute(String name) {
-		int i = 0;
-		for (Field field : getClass().getFields()) {
-			if (Attribute.class.isAssignableFrom(field.getType())) {
-				try {
-					Attribute attribute = (Attribute) field.get(this);
-					if (name.equals(attribute.getName()))
-						return attribute;
-					i++;
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
 			}
 		}
 		return null;

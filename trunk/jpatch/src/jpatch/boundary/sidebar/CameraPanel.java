@@ -15,8 +15,8 @@ implements ChangeListener {
 	 */
 	private static final long serialVersionUID = 6771633567920818871L;
 	JPatchInput inputName;
-	Camera camera;
-	public CameraPanel(Camera camera) {
+	OLDCamera camera;
+	public CameraPanel(OLDCamera camera) {
 		this.camera = camera;
 		add(new JButton(new EditAnimObjectAction(camera)));
 		add(new JButton(new DeleteAnimObjectAction(camera)));

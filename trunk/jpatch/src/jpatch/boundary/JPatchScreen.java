@@ -85,7 +85,7 @@ public final class JPatchScreen extends JPanel {
 	private Grid grid = new Grid();
 	private JPopupMenu popupMenu;
 	
-	public JPatchScreen(OLDModel model,int mode,ViewDefinition[] viewDefinitions) {
+	public JPatchScreen(int mode, ViewDefinition[] viewDefinitions) {
 		aViewDef = viewDefinitions;
 		setLightingMode(iLightMode);
 		initScreen();
@@ -274,7 +274,7 @@ public final class JPatchScreen extends JPanel {
 		update_all();
 	}
 	
-	public void checkCameraViewports(Camera camera) {
+	public void checkCameraViewports(OLDCamera camera) {
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 			if (aViewDef[i].getCamera() == camera)
 				aViewDef[i].setView(ViewDefinition.BIRDS_EYE);

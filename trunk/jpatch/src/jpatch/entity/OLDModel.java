@@ -25,7 +25,7 @@ public class OLDModel implements MutableTreeNode {
 	/**
 	 *  Description of the Field
 	 */
-	private Set<ControlPoint> setCurves = new HashSet<ControlPoint>();
+	private Set<OLDControlPoint> setCurves = new HashSet<OLDControlPoint>();
 	private Set<OLDBone> setBones = new HashSet<OLDBone>();
 	private Map<Patch, Patch> mapPatches = new HashMap<Patch, Patch>();
 
@@ -39,11 +39,11 @@ public class OLDModel implements MutableTreeNode {
 	//private JPatchMaterial[] aJPMaterial = new JPatchMaterial[32];
 	
 	private AnimModel animModel;
-	private List<JPatchMaterial> listMaterials = new ArrayList<JPatchMaterial>();
+	private List<OLDMaterial> listMaterials = new ArrayList<OLDMaterial>();
 	private List listSelections = new ArrayList();
-	private List<Morph> listMorphs = new ArrayList<Morph>();
+	private List<OLDMorph> listMorphs = new ArrayList<OLDMorph>();
 //	private List lstBoneShapes = new ArrayList();
-	private Map<String, Morph> mapPhonemes = new HashMap<String, Morph>();
+	private Map<String, OLDMorph> mapPhonemes = new HashMap<String, OLDMorph>();
 	private String strName;
 	private Rotoscope[] aRotoscope = new Rotoscope[6];
 	private boolean bInserted = false;
@@ -64,11 +64,11 @@ public class OLDModel implements MutableTreeNode {
 		treenodeMaterials = new ModelTreeNode("Materials", listMaterials);
 		treenodeMorphs = new ModelTreeNode("Morphs", listMorphs);
 		treenodeBones = new ModelTreeNode("Bones", new ArrayList());
-		JPatchMaterial material = new JPatchMaterial(new Color3f(1,1,1));
+		OLDMaterial material = new OLDMaterial(new Color3f(1,1,1));
 		material.setName("Default Material");
 		listMaterials.add(material);
 		materialNameSet.add(material.getName());
-		JPatchMaterial.setNextNumber(1);
+		OLDMaterial.setNextNumber(1);
 //		treenodeMaterials.insert(material, 0);
 		
 //		addBone(new Bone(this, new Point3f(0, 0, 0), new Vector3f(1, 0, 0)));
@@ -179,7 +179,7 @@ public class OLDModel implements MutableTreeNode {
 		
 		int n = 0;
 		for (Iterator it = listMaterials.iterator(); it.hasNext();) {
-			JPatchMaterial mat = (JPatchMaterial) it.next();
+			OLDMaterial mat = (OLDMaterial) it.next();
 //			mat.setXmlNumber(n++);
 			sb.append(mat.xml(prefix2));
 		}
@@ -190,11 +190,11 @@ public class OLDModel implements MutableTreeNode {
 //		ArrayList boneList = new ArrayList(setBones);
 //		setBoneMap(boneList);
 		sb.append(prefix2).append("<mesh>\n");
-		for (ControlPoint start : setCurves) {
+		for (OLDControlPoint start : setCurves) {
 			sb.append(prefix3);
 			sb.append(start.getLoop() ? "<curve closed=\"true\">" : "<curve>");
 			sb.append("\n");
-			for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop())
+			for (OLDControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop())
 				sb.append(cp.xml(prefix4));
 			
 			sb.append(prefix3).append("</curve>").append("\n");
@@ -203,7 +203,7 @@ public class OLDModel implements MutableTreeNode {
 			sb.append(((Patch) it.next()).xml(prefix3));
 		}
 		for (Iterator it = listMorphs.iterator(); it.hasNext(); ) {
-			Morph morph = (Morph) it.next();
+			OLDMorph morph = (OLDMorph) it.next();
 			sb.append(morph.xml(prefix3));
 		}
 //		for (Iterator itBones = setBones.iterator(); itBones.hasNext(); ) {
@@ -217,7 +217,7 @@ public class OLDModel implements MutableTreeNode {
 		StringBuffer lipSyncMap = new StringBuffer();
 		for (Iterator it = mapPhonemes.keySet().iterator(); it.hasNext(); ) {
 			String phoneme = (String) it.next();
-			Morph morph = mapPhonemes.get(phoneme);
+			OLDMorph morph = mapPhonemes.get(phoneme);
 			if (morph != null) lipSyncMap.append(prefix).append("\t\t<map phoneme=\"" + phoneme + "\" morph=\"" + listMorphs.indexOf(morph) + "\"/>").append("\n");
 		}
 		if (lipSyncMap.length() > 0) {
@@ -228,7 +228,7 @@ public class OLDModel implements MutableTreeNode {
 		sb.append(prefix2).append("</mesh>").append("\n");
 		sb.append(prefix2).append("<selections>\n");
 		for (Iterator it = listSelections.iterator(); it.hasNext();) {
-			Selection selection = (Selection) it.next();
+			OLDSelection selection = (OLDSelection) it.next();
 			sb.append(selection.xml(prefix3, this));
 		}
 		sb.append(prefix2).append("</selections>\n");
@@ -268,12 +268,12 @@ public class OLDModel implements MutableTreeNode {
 		strName = name;
 	}
 	
-	public void setMorphFor(String phoneme, Morph morph) {
+	public void setMorphFor(String phoneme, OLDMorph morph) {
 		mapPhonemes.put(phoneme, morph);
 	}
 	
-	public Morph getMorphFor(String phoneme) {
-		return (Morph) mapPhonemes.get(phoneme);
+	public OLDMorph getMorphFor(String phoneme) {
+		return (OLDMorph) mapPhonemes.get(phoneme);
 	}
 	
 	public Set getPhonemeMorphSet() {
@@ -284,7 +284,7 @@ public class OLDModel implements MutableTreeNode {
 		return set;
 	}
 	
-	public void addMaterial(JPatchMaterial material) {
+	public void addMaterial(OLDMaterial material) {
 		/*
 		for (int m = 0; m < 32; m++) {
 			if (aJPMaterial[m] == null) {
@@ -314,9 +314,9 @@ public class OLDModel implements MutableTreeNode {
 //		return true;
 	}
 	
-	public boolean checkSelection(Selection selection) {
+	public boolean checkSelection(OLDSelection selection) {
 		for (int i = 0, n = listSelections.size(); i < n; i++) {
-			Selection sel = (Selection) listSelections.get(i);
+			OLDSelection sel = (OLDSelection) listSelections.get(i);
 //			System.out.println(sel + " " + selection + " " + selection.getMap().equals(sel.getMap()));
 			if (selection.getMap().equals(sel.getMap()))
 				return false;
@@ -324,16 +324,16 @@ public class OLDModel implements MutableTreeNode {
 		return true;
 	}
 	
-	public Selection getSelection(Selection selection) {
+	public OLDSelection getSelection(OLDSelection selection) {
 		for (int i = 0, n = listSelections.size(); i < n; i++) {
-			Selection sel = (Selection) listSelections.get(i);
+			OLDSelection sel = (OLDSelection) listSelections.get(i);
 			if (selection.getMap().equals(sel.getMap()))
 				return sel;
 		}
 		return null;
 	}
 	
-	public void addSelection(Selection selection) {
+	public void addSelection(OLDSelection selection) {
 		/*
 		for (int m = 0; m < 32; m++) {
 			if (aJPMaterial[m] == null) {
@@ -356,7 +356,7 @@ public class OLDModel implements MutableTreeNode {
 			addSelection(treenodeSelections.getChildCount(), selection);
 	}
 
-	public void addSelection(int index, Selection selection) {
+	public void addSelection(int index, OLDSelection selection) {
 //			treenodeSelections.insert(selection, index);
 //			lstSelections.add(index, selection);
 		int n = 1;
@@ -376,7 +376,7 @@ public class OLDModel implements MutableTreeNode {
 		max.set(-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
 		for (Iterator it = mapPatches.keySet().iterator(); it.hasNext(); ) {
 			Patch patch = (Patch) it.next();
-			ControlPoint[] acp = patch.getControlPoints();
+			OLDControlPoint[] acp = patch.getControlPoints();
 			for (int i = 0; i < acp.length; i++) {
 				Point3f p = acp[i].getPosition();
 				if (p.x < min.x) min.x = p.x;
@@ -389,7 +389,7 @@ public class OLDModel implements MutableTreeNode {
 		}
 	}
 	
-	public void addExpression(Morph morph) {
+	public void addExpression(OLDMorph morph) {
 //		treenodeExpressions.insert(morph, 0);
 //		lstMorphs.add(morph);
 		int n = 1;
@@ -423,25 +423,25 @@ public class OLDModel implements MutableTreeNode {
 	public void applyMorphs() {
 		/* reset morph vectors */
 		for (Iterator itCurves = setCurves.iterator(); itCurves.hasNext(); ) {
-			for (ControlPoint cp = (ControlPoint) itCurves.next(); cp != null; cp = cp.getNextCheckNextLoop())
+			for (OLDControlPoint cp = (OLDControlPoint) itCurves.next(); cp != null; cp = cp.getNextCheckNextLoop())
 				cp.getMorphVector().set(0, 0, 0);
 		}
 		
 		/* apply morphs */
 		for (Iterator itMorphs = listMorphs.iterator(); itMorphs.hasNext(); ) {
-			Morph morph = (Morph) itMorphs.next();
+			OLDMorph morph = (OLDMorph) itMorphs.next();
 			Map morphMap = morph.getMorphMap();
 			for (Iterator itCps = morphMap.keySet().iterator(); itCps.hasNext(); ) {
-				ControlPoint cp = (ControlPoint) itCps.next();
+				OLDControlPoint cp = (OLDControlPoint) itCps.next();
 				cp.getMorphVector().add((Vector3f) morphMap.get(cp));
 			}
 		}
 		for (Iterator itBones = setBones.iterator(); itBones.hasNext(); ) {
 			for (Iterator itDofs = ((OLDBone) itBones.next()).getDofs().iterator(); itDofs.hasNext(); ) {
-				Morph morph = (Morph) itDofs.next();
+				OLDMorph morph = (OLDMorph) itDofs.next();
 				Map morphMap = morph.getMorphMap();
 				for (Iterator itCps = morphMap.keySet().iterator(); itCps.hasNext(); ) {
-					ControlPoint cp = (ControlPoint) itCps.next();
+					OLDControlPoint cp = (OLDControlPoint) itCps.next();
 					cp.getMorphVector().add((Vector3f) morphMap.get(cp));
 				}
 			}
@@ -451,14 +451,14 @@ public class OLDModel implements MutableTreeNode {
 	public void setMorphPose() {
 		/* apply pose */
 		for (Iterator itCurves = setCurves.iterator(); itCurves.hasNext(); ) {
-			for (ControlPoint cp = (ControlPoint) itCurves.next(); cp != null; cp = cp.getNextCheckNextLoop())
+			for (OLDControlPoint cp = (OLDControlPoint) itCurves.next(); cp != null; cp = cp.getNextCheckNextLoop())
 				cp.setMorphPose();
 		}
 	}
 	
 	public void setPose() {
 		for (Iterator itCurves = setCurves.iterator(); itCurves.hasNext(); ) {
-			for (ControlPoint cp = (ControlPoint) itCurves.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+			for (OLDControlPoint cp = (OLDControlPoint) itCurves.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				cp.setBonePose();
 				cp.setMorphPose();
 			}
@@ -477,7 +477,7 @@ public class OLDModel implements MutableTreeNode {
 		return listMorphs.iterator();
 	}
 	
-	public List<Morph> getMorphList() {
+	public List<OLDMorph> getMorphList() {
 		return listMorphs;
 	}
 	
@@ -494,7 +494,7 @@ public class OLDModel implements MutableTreeNode {
 		return name;
 	}
 	
-	public String renameExpression(Morph morph, String name) {
+	public String renameExpression(OLDMorph morph, String name) {
 		if (morphNameSet.contains(name))
 			return morph.getName();
 		morphNameSet.remove(morph.getName());
@@ -503,7 +503,7 @@ public class OLDModel implements MutableTreeNode {
 		return name;
 	}
 	
-	public String renameMaterial(JPatchMaterial material, String name) {
+	public String renameMaterial(OLDMaterial material, String name) {
 		if (materialNameSet.contains(name))
 			return material.getName();
 		materialNameSet.remove(material.getName());
@@ -512,7 +512,7 @@ public class OLDModel implements MutableTreeNode {
 		return name;
 	}
 	
-	public String renameSelection(Selection selection, String name) {
+	public String renameSelection(OLDSelection selection, String name) {
 		if (selectionNameSet.contains(name))
 			return selection.getName();
 		selectionNameSet.remove(selection.getName());
@@ -521,7 +521,7 @@ public class OLDModel implements MutableTreeNode {
 		return name;
 	}
 	
-	public void removeSelection(Selection selection) {
+	public void removeSelection(OLDSelection selection) {
 		selectionNameSet.remove(selection.getName());
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(selection);
 	}
@@ -539,12 +539,12 @@ public class OLDModel implements MutableTreeNode {
 		return treenodeBones;
 	}
 	
-	public void removeMaterial(JPatchMaterial material) {
+	public void removeMaterial(OLDMaterial material) {
 		materialNameSet.remove(material.getName());
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(material);
 	}
 	
-	public void removeExpression(Morph morph) {
+	public void removeExpression(OLDMorph morph) {
 		morphNameSet.remove(morph.getName());
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(morph);
 	}
@@ -554,12 +554,12 @@ public class OLDModel implements MutableTreeNode {
 		lstCandidateFivePointPatch.addAll(list);
 	}
 	
-	public JPatchMaterial getMaterial(int m) {
+	public OLDMaterial getMaterial(int m) {
 		//if (m > 31) m = 0;
-		return (JPatchMaterial)listMaterials.get(m);
+		return (OLDMaterial)listMaterials.get(m);
 	}
 	
-	public List<JPatchMaterial> getMaterialList() {
+	public List<OLDMaterial> getMaterialList() {
 		return listMaterials;
 	}
 	
@@ -570,11 +570,11 @@ public class OLDModel implements MutableTreeNode {
 //	}
 	
 	
-	public void addCurve(ControlPoint start) {
+	public void addCurve(OLDControlPoint start) {
 		setCurves.add(start);
 	}
 
-	public void removeCurve(ControlPoint start) {
+	public void removeCurve(OLDControlPoint start) {
 		setCurves.remove(start);
 	}
 
@@ -625,7 +625,7 @@ public class OLDModel implements MutableTreeNode {
 	 *
 	 * @param  patch  The feature to be added to the Patch attribute
 	 */
-	public void addPatch(ControlPoint[] acp, JPatchActionEdit edit) {
+	public void addPatch(OLDControlPoint[] acp, JPatchActionEdit edit) {
 		Patch patch = new Patch(acp);
 		if (patch.getMaterial() == null)
 			patch.setMaterial(listMaterials.get(0));
@@ -684,7 +684,7 @@ public class OLDModel implements MutableTreeNode {
 	public ArrayList allHeads() {
 		ArrayList lstHead = new ArrayList();
 		for (Iterator it = setCurves.iterator(); it.hasNext(); )
-			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop())
+			for (OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop())
 				if (cp.isHead() && !cp.isChildHook())
 					lstHead.add(cp);
 		return lstHead;
@@ -874,7 +874,7 @@ public class OLDModel implements MutableTreeNode {
 		ArrayList lstlstNeighbor = new ArrayList();					// a list with lists of neighbors (per head)
 		HashMap mapHeadIndex = new HashMap();						// key = cp, value = index
 		for (int h = 0; h < lstHead.size(); h++) {
-			ControlPoint cp = (ControlPoint)lstHead.get(h);
+			OLDControlPoint cp = (OLDControlPoint)lstHead.get(h);
 			lstlstNeighbor.add(cp.allNeighbors());
 			mapHeadIndex.put(cp,new Integer(h));
 	//		System.out.println(h + "\t" + cp + "\t" + cp.getPosition());
@@ -913,8 +913,8 @@ public class OLDModel implements MutableTreeNode {
 		**/
 		ArrayList candidateFivePointPatchesToRemove = new ArrayList();
 		for (int f = 0; f < lstCandidateFivePointPatch.size(); f++) {
-			ControlPoint[] fpp = new ControlPoint[10];
-			ControlPoint[] acp = (ControlPoint[])lstCandidateFivePointPatch.get(f);
+			OLDControlPoint[] fpp = new OLDControlPoint[10];
+			OLDControlPoint[] acp = (OLDControlPoint[])lstCandidateFivePointPatch.get(f);
 			boolean ok = false;
 			Integer iIndex = (Integer) mapHeadIndex.get(trueHead(acp[0]));
 			int index;
@@ -923,7 +923,7 @@ public class OLDModel implements MutableTreeNode {
 				index = iIndex.intValue();
 				lstNeighbor = (ArrayList)lstlstNeighbor.get(index);
 				for (int n = 0; n <lstNeighbor.size(); n++) {
-					ControlPoint[] acpNeighbor = (ControlPoint[])lstNeighbor.get(n);
+					OLDControlPoint[] acpNeighbor = (OLDControlPoint[])lstNeighbor.get(n);
 					if (acpNeighbor[0] == trueHead(acp[1])) {
 						ok = true;
 						fpp[0] = acpNeighbor[1];
@@ -936,7 +936,7 @@ public class OLDModel implements MutableTreeNode {
 				index = ((Integer)mapHeadIndex.get(trueHead(acp[1]))).intValue();
 				lstNeighbor = (ArrayList)lstlstNeighbor.get(index);
 				for (int n = 0; n <lstNeighbor.size(); n++) {
-					ControlPoint[] acpNeighbor = (ControlPoint[])lstNeighbor.get(n);
+					OLDControlPoint[] acpNeighbor = (OLDControlPoint[])lstNeighbor.get(n);
 					if (acpNeighbor[0] == trueHead(acp[2])) {
 						ok = true;
 						fpp[2] = acpNeighbor[1];
@@ -949,7 +949,7 @@ public class OLDModel implements MutableTreeNode {
 				index = ((Integer)mapHeadIndex.get(trueHead(acp[2]))).intValue();
 				lstNeighbor = (ArrayList)lstlstNeighbor.get(index);
 				for (int n = 0; n <lstNeighbor.size(); n++) {
-					ControlPoint[] acpNeighbor = (ControlPoint[])lstNeighbor.get(n);
+					OLDControlPoint[] acpNeighbor = (OLDControlPoint[])lstNeighbor.get(n);
 					if (acpNeighbor[0] == trueHead(acp[3])) {
 						ok = true;
 						fpp[4] = acpNeighbor[1];
@@ -962,7 +962,7 @@ public class OLDModel implements MutableTreeNode {
 				index = ((Integer)mapHeadIndex.get(trueHead(acp[3]))).intValue();
 				lstNeighbor = (ArrayList)lstlstNeighbor.get(index);
 				for (int n = 0; n <lstNeighbor.size(); n++) {
-					ControlPoint[] acpNeighbor = (ControlPoint[])lstNeighbor.get(n);
+					OLDControlPoint[] acpNeighbor = (OLDControlPoint[])lstNeighbor.get(n);
 					if (acpNeighbor[0] == trueHead(acp[4])) {
 						ok = true;
 						fpp[6] = acpNeighbor[1];
@@ -975,7 +975,7 @@ public class OLDModel implements MutableTreeNode {
 				index = ((Integer)mapHeadIndex.get(trueHead(acp[4]))).intValue();
 				lstNeighbor = (ArrayList)lstlstNeighbor.get(index);
 				for (int n = 0; n <lstNeighbor.size(); n++) {
-					ControlPoint[] acpNeighbor = (ControlPoint[])lstNeighbor.get(n);
+					OLDControlPoint[] acpNeighbor = (OLDControlPoint[])lstNeighbor.get(n);
 					if (acpNeighbor[0] == trueHead(acp[0])) {
 						ok = true;
 						fpp[8] = acpNeighbor[1];
@@ -1006,14 +1006,14 @@ public class OLDModel implements MutableTreeNode {
 		for (int y = 0; y < lstHead.size(); y++) {
 			ArrayList lstNeighbor = (ArrayList)lstlstNeighbor.get(y);
 			for (int x = 0; x < lstNeighbor.size() - 1; x++) {
-				ControlPoint[] acpNeighborX = (ControlPoint[])lstNeighbor.get(x);
-				ControlPoint headX = acpNeighborX[0];
+				OLDControlPoint[] acpNeighborX = (OLDControlPoint[])lstNeighbor.get(x);
+				OLDControlPoint headX = acpNeighborX[0];
 				int indexX = ((Integer)mapHeadIndex.get(headX)).intValue();
 				if (indexX > y) {
 //					System.out.println("\tX=" + indexX);
 					for (int z = x + 1; z < lstNeighbor.size(); z++) {
-						ControlPoint[] acpNeighborZ = (ControlPoint[])lstNeighbor.get(z);
-						ControlPoint headZ = acpNeighborZ[0];
+						OLDControlPoint[] acpNeighborZ = (OLDControlPoint[])lstNeighbor.get(z);
+						OLDControlPoint headZ = acpNeighborZ[0];
 						int indexZ = ((Integer)mapHeadIndex.get(headZ)).intValue();
 						if (indexZ > y) {
 //							System.out.println("\t\tZ=" + indexZ);
@@ -1023,8 +1023,8 @@ public class OLDModel implements MutableTreeNode {
 							// search for 3-point patch...
 							//
 							for (int xx = 0; xx < lstX.size(); xx++) {
-								ControlPoint[] acpNeighborXX = (ControlPoint[])lstX.get(xx);
-								ControlPoint headXX = acpNeighborXX[0];
+								OLDControlPoint[] acpNeighborXX = (OLDControlPoint[])lstX.get(xx);
+								OLDControlPoint headXX = acpNeighborXX[0];
 								if (headXX == headZ) {
 									//Curve c = acpNeighborXX[1].getHookCurve();
 									//if (c != acpNeighborXX[2].getHookCurve() || c != acpNeighborZ[1].getHookCurve() || c != acpNeighborZ[2].getHookCurve() || c != acpNeighborX[1].getHookCurve() || c != acpNeighborX[2].getHookCurve()) {
@@ -1045,7 +1045,7 @@ public class OLDModel implements MutableTreeNode {
 									//	(acpNeighborZ[1].getHookCurve() != acpNeighborXX[2].getHookCurve()) &&
 									//	(acpNeighborXX[1].getHookCurve() != acpNeighborX[2].getHookCurve())
 									//) {
-										ControlPoint[] acpPatch = new ControlPoint[] {
+										OLDControlPoint[] acpPatch = new OLDControlPoint[] {
 											acpNeighborX[1],
 											acpNeighborX[2],
 											acpNeighborXX[1],
@@ -1072,34 +1072,34 @@ public class OLDModel implements MutableTreeNode {
 							//
 							boolean ok = true;
 							for (int xx = 0; xx < lstX.size(); xx++) {
-								ControlPoint[] acpNeighborXX = (ControlPoint[])lstX.get(xx);
-								ControlPoint headXX = acpNeighborXX[0];
+								OLDControlPoint[] acpNeighborXX = (OLDControlPoint[])lstX.get(xx);
+								OLDControlPoint headXX = acpNeighborXX[0];
 								if (headXX == headZ) {
 									ok = false;
 								}
 							}
 							for (int zz = 0; zz < lstZ.size(); zz++) {
-								ControlPoint[] acpNeighborZZ = (ControlPoint[])lstZ.get(zz);
-								ControlPoint headZZ = acpNeighborZZ[0];
+								OLDControlPoint[] acpNeighborZZ = (OLDControlPoint[])lstZ.get(zz);
+								OLDControlPoint headZZ = acpNeighborZZ[0];
 								if (headZZ == headX) {
 									ok = false;
 								}
 							}
 							for (int xx = 0; xx < lstX.size(); xx++) {
-								ControlPoint[] acpNeighborXX = (ControlPoint[])lstX.get(xx);
-								ControlPoint headXX = acpNeighborXX[0];
+								OLDControlPoint[] acpNeighborXX = (OLDControlPoint[])lstX.get(xx);
+								OLDControlPoint headXX = acpNeighborXX[0];
 								int indexXX = ((Integer)mapHeadIndex.get(headXX)).intValue();
 								if (indexXX != y) {
 									for (int zz = 0; zz < lstZ.size(); zz++) {
-										ControlPoint[] acpNeighborZZ = (ControlPoint[])lstZ.get(zz);
-										ControlPoint headZZ = acpNeighborZZ[0];
+										OLDControlPoint[] acpNeighborZZ = (OLDControlPoint[])lstZ.get(zz);
+										OLDControlPoint headZZ = acpNeighborZZ[0];
 										if (headZZ == headXX) {
 											
 											// eliminate if 3pp
 											
 											for (int w = 0; w < lstNeighbor.size(); w++) {
-												ControlPoint[] acpNeighborW = (ControlPoint[])lstNeighbor.get(w);
-												ControlPoint headW = acpNeighborW[0];
+												OLDControlPoint[] acpNeighborW = (OLDControlPoint[])lstNeighbor.get(w);
+												OLDControlPoint headW = acpNeighborW[0];
 												if (headXX == headW) {
 													ok = false;
 												}
@@ -1116,7 +1116,7 @@ public class OLDModel implements MutableTreeNode {
 												acpNeighborZZ[2].trueCp() != acpNeighborXX[2].trueCp() &&
 												acpNeighborZZ[1].trueCp() != acpNeighborZ[2].trueCp()
 											) {
-												ControlPoint[] acpPatch = new ControlPoint[] {
+												OLDControlPoint[] acpPatch = new OLDControlPoint[] {
 													acpNeighborX[1],
 													acpNeighborX[2],
 													acpNeighborXX[1],
@@ -1162,7 +1162,7 @@ public class OLDModel implements MutableTreeNode {
 	//	System.out.println("...stop");
 	}
 
-	public Set<ControlPoint> getCurveSet() {
+	public Set<OLDControlPoint> getCurveSet() {
 		return setCurves;
 	}
 	
@@ -1179,7 +1179,7 @@ public class OLDModel implements MutableTreeNode {
 		System.out.println("------------- curves -------------");
 		System.out.println("\tcp\tnext\tprev\tloop\tna\tpa\tphook\tchook\thpos\tposition\n");
 		for (Iterator it = setCurves.iterator(); it.hasNext(); ) {
-			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+			for (OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				System.out.println("\t" + cp + "\t" + cp.getNext() + "\t" + cp.getPrev() + "\t" + cp.getLoop() + "\t" + cp.getNextAttached() + "\t" + cp.getPrevAttached() + "\t" + cp.getParentHook() + "\t" + cp.getChildHook() + "\t" + cp.getHookPos() + "\t" + cp.getPosition() + "\t" + cp.isDeleted() + "\t" + cp.getBone());
 				
 				//System.out.println("\t" + cp + "\t" + cp.getPosition() + "\t" + cp.getNext() + "\t" + cp.getPrev() + "\t" + cp.getNextAttached() + "\t" + cp.getPrevAttached() + "\t" + cp.getLoop());
@@ -1195,7 +1195,7 @@ public class OLDModel implements MutableTreeNode {
 			System.out.println(it.next());
 		
 		System.out.println("\n\n--------active selection -------");
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null) {
 			System.out.println(selection);
 			System.out.println(selection.getMap());
@@ -1204,7 +1204,7 @@ public class OLDModel implements MutableTreeNode {
 		
 		System.out.println("\n\n----------- selections -------------");
 		for (Iterator it = listSelections.iterator(); it.hasNext(); ) {
-			selection = (Selection) it.next();
+			selection = (OLDSelection) it.next();
 			System.out.println(selection);
 			System.out.println(selection.getMap());
 			System.out.println();
@@ -1212,7 +1212,7 @@ public class OLDModel implements MutableTreeNode {
 		
 		System.out.println("\n\n----------- morphs -------------");
 		for (Iterator it = listMorphs.iterator(); it.hasNext(); ) {
-			((Morph) it.next()).dump();
+			((OLDMorph) it.next()).dump();
 		}
 		
 		System.out.println("\n\n----------- bones -------------");
@@ -1241,7 +1241,7 @@ public class OLDModel implements MutableTreeNode {
 ////		System.out.println(map);
 //	}
 	
-	private ControlPoint trueHead(ControlPoint cp) {
+	private OLDControlPoint trueHead(OLDControlPoint cp) {
 		return (cp.getParentHook() == null) ? cp.getHead() : cp.getParentHook().getHead();
 	}
 

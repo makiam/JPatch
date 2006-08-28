@@ -8,9 +8,9 @@ import jpatch.entity.*;
 
 public final class ExtrudeAction extends AbstractAction {
 	public void actionPerformed(ActionEvent actionEvent) {
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && !selection.isSingle()) {
-			ControlPoint[] acp = selection.getControlPointArray();
+			OLDControlPoint[] acp = selection.getControlPointArray();
 			if (AbstractClone.checkForHooks(acp)) {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Extrude operation can not be performed bacause the selection contains hooks", "Can't extrude", JOptionPane.ERROR_MESSAGE);
 			} else {

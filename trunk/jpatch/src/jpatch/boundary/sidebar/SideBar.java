@@ -183,11 +183,11 @@ implements TreeSelectionListener {
 //		System.out.println("tree hit: selected node = " + selectedNode);
 		if (!anim && selectedNode == MainFrame.getInstance().getModel().getTreenodeMaterials()) {
 			replacePanel(new MaterialsPanel((OLDModel) selectedNode.getParent()));
-		} else if (selectedNode instanceof JPatchMaterial) {
-			replacePanel(new MaterialPanel((JPatchMaterial) selectedNode));
+		} else if (selectedNode instanceof OLDMaterial) {
+			replacePanel(new MaterialPanel((OLDMaterial) selectedNode));
 		} else if (!anim && selectedNode == MainFrame.getInstance().getModel().getTreenodeExpressions()) {
 			replacePanel(new MorphsPanel());
-		} else if (selectedNode instanceof Morph) {
+		} else if (selectedNode instanceof OLDMorph) {
 			if (selectedNode instanceof RotationDof) {
 				RotationDof dof = (RotationDof) selectedNode;
 				replacePanel(new DofPanel(dof));
@@ -196,11 +196,11 @@ implements TreeSelectionListener {
 				map.put(bone.getBoneEnd(), new Float(1));
 				map.put(bone.getParentBone() == null ? bone.getBoneStart() : bone.getParentBone().getBoneEnd(), new Float(1));
 				if (!anim) {
-					MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new Selection(map)));
+					MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new OLDSelection(map)));
 					MainFrame.getInstance().getJPatchScreen().update_all();
 				}
 			} else {	
-				replacePanel(new MorphPanel((Morph) selectedNode));
+				replacePanel(new MorphPanel((OLDMorph) selectedNode));
 			}
 		} else if (selectedNode instanceof MorphTarget) {
 			MorphTarget target = (MorphTarget) selectedNode;
@@ -214,10 +214,10 @@ implements TreeSelectionListener {
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		} else if (!anim && selectedNode == MainFrame.getInstance().getModel().getTreenodeSelections()) {
 			replacePanel(new SelectionsPanel((OLDModel) selectedNode.getParent()));
-		} else if (selectedNode instanceof Selection) {
-			replacePanel(new SelectionPanel((Selection) selectedNode));
+		} else if (selectedNode instanceof OLDSelection) {
+			replacePanel(new SelectionPanel((OLDSelection) selectedNode));
 			if (!selectedNode.equals(MainFrame.getInstance().getSelection())) {
-				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(((Selection) selectedNode).cloneSelection(true)));
+				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(((OLDSelection) selectedNode).cloneSelection(true)));
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
 		} else if (!anim && selectedNode == MainFrame.getInstance().getModel().getTreenodeBones()) {
@@ -232,7 +232,7 @@ implements TreeSelectionListener {
 			if (bone.getDofs().size() > 0)
 				MainFrame.getInstance().getTree().expandPath(treeSelectionEvent.getPath());
 			if (!anim) {
-				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new Selection(map)));
+				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new OLDSelection(map)));
 				MainFrame.getInstance().getJPatchScreen().update_all();
 			}
 		} else if (selectedNode instanceof OLDModel) {
@@ -245,7 +245,7 @@ implements TreeSelectionListener {
 			replacePanel(new AnimModelsPanel());
 		} else if (anim && selectedNode instanceof AnimObject) {
 			replacePanel(new AnimObjectPanel((AnimObject) selectedNode));
-			AtomicChangeSelection edit = new AtomicChangeSelection(new Selection(selectedNode));
+			AtomicChangeSelection edit = new AtomicChangeSelection(new OLDSelection(selectedNode));
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		} else if (anim && selectedNode instanceof Animation) {

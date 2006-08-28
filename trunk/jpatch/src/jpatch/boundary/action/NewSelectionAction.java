@@ -49,7 +49,7 @@ public final class NewSelectionAction extends AbstractAction {
 //			}
 //		}
 		
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null) {
 			selection = selection.cloneSelection();
 			if (MainFrame.getInstance().getModel().checkSelection(selection)) {

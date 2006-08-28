@@ -21,30 +21,21 @@
  */
 package jpatch.entity;
 
+import java.io.PrintStream;
+
 import javax.swing.event.*;
 
 /**
  * @author sascha
  *
  */
-public class Attribute {
-	private final java.lang.String name;
-	private final JPatchObject object;
+public abstract class Attribute {
 	AttributeListener[] attributeListeners = new AttributeListener[0];
 	boolean valueAdjusting;
 	boolean locked;
 	
-	Attribute(JPatchObject object, java.lang.String name) {
-		this.object = object;
-		this.name = name;
-	}
-	
 	public java.lang.String getName() {
-		return name;
-	}
-	
-	public JPatchObject getObject() {
-		return object;
+		return "";
 	}
 	
 	public boolean isValueAdjusting() {
@@ -138,19 +129,9 @@ public class Attribute {
 	public static class String extends Attribute {
 		private java.lang.String string = "";
 		private final boolean useTextArea = false;
-		private final boolean nameAttribute;
-		
-		public String(JPatchObject object, java.lang.String name) {
-			super(object, name);
-			nameAttribute = name.equals("Name");
-		}
 		
 		public java.lang.String get() {
 			return string;
-		}
-		
-		public boolean isNameAttribute() {
-			return nameAttribute;
 		}
 		
 		public void set(java.lang.String string) {
@@ -165,32 +146,31 @@ public class Attribute {
 		}
 	}
 
-	public static class Enum extends Attribute {
-		private java.lang.Enum enumValue;
+	public static class Enum<E extends java.lang.Enum> extends Attribute {
+		private E enumValue;
 		
-		public Enum(JPatchObject object, java.lang.String name, java.lang.Enum enumValue) {
-			super(object, name);
+		public Enum(E enumValue) {
 			this.enumValue = enumValue;
 		}
 		
-		public java.lang.Enum get() {
+		public E get() {
 			return enumValue;
 		}
 		
-		public void set(java.lang.Enum enumValue) {
+		public void set(E enumValue) {
 			if (!this.enumValue.equals(enumValue) && !valueAdjusting) {
 				this.enumValue = enumValue;
 				fireAttributeChanged();
 			}
 		}
+		
+		public void xml(PrintStream out) {
+			out.append("\"").append(enumValue.name().toLowerCase()).append("\"");
+		}
 	}
 	
 	public static class Integer extends Attribute {
 		private int value;
-		
-		public Integer(JPatchObject object, java.lang.String name) {
-			super(object, name);
-		}
 		
 		public void set(int newValue) {
 			if (newValue != value && !valueAdjusting) {
@@ -208,8 +188,7 @@ public class Attribute {
 		private final int min;
 		private final int max;
 		
-		public BoundedInteger(JPatchObject object, java.lang.String name, int min, int max) {
-			super(object, name);
+		public BoundedInteger(int min, int max) {
 			if (min > max)
 				throw new IllegalArgumentException("min " + min + " > max " + max);
 			this.min = min;
@@ -237,9 +216,8 @@ public class Attribute {
 	public static class Limit extends Attribute.Double {
 		public Attribute.Boolean enabled;
 		
-		Limit(JPatchObject object, Attribute.BoundedDouble attribute, java.lang.String suffix) {
-			super(object, attribute.getName() + " " + suffix);
-			enabled = new Attribute.Boolean(object, attribute.getName() + " " + suffix + " enabled");
+		Limit(Attribute.BoundedDouble attribute) {
+			enabled = new Attribute.Boolean();
 			addAttributeListener(attribute);
 			enabled.addAttributeListener(attribute);
 		}
@@ -255,9 +233,12 @@ public class Attribute {
 	
 	public static class Double extends Attribute {
 		private double value;
+		public Attribute.Boolean locked = new Boolean();
 		
-		public Double(JPatchObject object, java.lang.String name) {
-			super(object, name);
+		public Double() { }
+		
+		public Double(double value) {
+			this.value = value;
 		}
 		
 		public void set(double newValue) {
@@ -270,25 +251,31 @@ public class Attribute {
 		public double get() {
 			return value;
 		}
+		
+		public void xml(PrintStream out) {
+			out.append("\"").append(java.lang.Double.toString(value)).append("\"");
+		}
 	}
 	
 	public static class BoundedDouble extends Double implements AttributeListener {
-		public Limit min, max;
-		public Attribute.Boolean keyed;
-		public Attribute.Boolean locked;
+		private final java.lang.String name;
+		public Limit min = new Limit(this);
+		public Limit max = new Limit(this);
+		public Attribute.Boolean keyed = new Boolean();
 		private MotionCurveNew motionCurve;
 
-		public BoundedDouble(JPatchObject object, java.lang.String name) {
-			super(object, name);
-			min = new Limit(object, this, "lower limit");
-			max = new Limit(object, this, "upper limit");
-			keyed = new Boolean(object, name + " keyed");
-			locked = new Boolean(object, name + " locked");
+		public BoundedDouble(java.lang.String name) {
+			this.name = name;
 		}
 		
-		public BoundedDouble(JPatchObject object, java.lang.String name, double value) {
-			this(object, name);
+		public BoundedDouble(java.lang.String name, double value) {
+			this(name);
 			set(value);
+		}
+		
+		@Override
+		public java.lang.String getName() {
+			return name;
 		}
 		
 		@Override
@@ -327,32 +314,112 @@ public class Attribute {
 		}
 	}
 
-	public static class Tuple extends Attribute implements AttributeListener {
-		public BoundedDouble x, y, z;
+	public static class Tuple2 extends Attribute implements AttributeListener {
+		public Double x, y;
 		private boolean keyable;
 		
-		public Tuple(JPatchObject object, java.lang.String name, javax.vecmath.Tuple3d tuple, boolean keyable) {
-			this(object, name, tuple.x, tuple.y, tuple.z, keyable);
+		public Tuple2(java.lang.String name, javax.vecmath.Tuple2d tuple, boolean keyable) {
+			this(name, tuple.x, tuple.y, keyable);
 		}
 		
-		public Tuple(JPatchObject object, java.lang.String name, javax.vecmath.Tuple3f tuple, boolean keyable) {
-			this(object, name, tuple.x, tuple.y, tuple.z, keyable);
+		public Tuple2(java.lang.String name, javax.vecmath.Tuple2f tuple, boolean keyable) {
+			this(name, tuple.x, tuple.y, keyable);
 		}
 		
-		public Tuple(JPatchObject object, java.lang.String name, double x, double y, double z, boolean keyable) {
-			super(object, name);
-			this.x = new BoundedDouble(object, name + ".X");
-			this.y = new BoundedDouble(object, name + ".Y");
-			this.z = new BoundedDouble(object, name + ".Z");
+		public Tuple2(java.lang.String name, double x, double y, boolean keyable) {
+			if (keyable) {
+				this.x = new BoundedDouble(name + ".x");
+				this.y = new BoundedDouble(name + ".y");
+			} else {
+				this.x = new Double();
+				this.y = new Double();
+			}
+			set(x, y);
+			this.x.addAttributeListener(this);
+			this.y.addAttributeListener(this);
+			this.keyable = keyable;
+			if (keyable) {
+				((BoundedDouble) this.x).keyed.set(true);
+				((BoundedDouble) this.y).keyed.set(true);
+			}
+		}
+		
+		public void get(javax.vecmath.Tuple3d tuple) {
+			tuple.x = x.get();
+			tuple.y = y.get();
+		}
+		
+		public void get(javax.vecmath.Tuple3f tuple) {
+			tuple.x = (float) x.get();
+			tuple.y = (float) y.get();
+		}
+		
+		public void set(javax.vecmath.Tuple2d tuple) {
+			set(tuple.x, tuple.y);
+		}
+		
+		public void set(javax.vecmath.Tuple2f tuple) {
+			set(tuple.x, tuple.y);
+		}
+		
+		public void set(double x, double y) {
+			if (!valueAdjusting) {
+				valueAdjusting = true;
+				this.x.set(x);
+				this.y.set(y);
+				fireAttributeChanged();
+			}
+		}
+
+		@Override
+		public boolean isKeyable() {
+			return keyable;
+		}
+		
+		public void attributeChanged(Attribute attribute) {
+			if (!valueAdjusting)
+				fireAttributeChanged();
+		}
+		
+		public void xml(PrintStream out) {
+			out.append("x=");
+			x.xml(out);
+			out.append(" y=");
+			y.xml(out);
+		}
+	}
+	
+	public static class Tuple3 extends Attribute implements AttributeListener {
+		public Double x, y, z;
+		private boolean keyable;
+		
+		public Tuple3(java.lang.String name, javax.vecmath.Tuple3d tuple, boolean keyable) {
+			this(name, tuple.x, tuple.y, tuple.z, keyable);
+		}
+		
+		public Tuple3(java.lang.String name, javax.vecmath.Tuple3f tuple, boolean keyable) {
+			this(name, tuple.x, tuple.y, tuple.z, keyable);
+		}
+		
+		public Tuple3(java.lang.String name, double x, double y, double z, boolean keyable) {
+			if (keyable) {
+				this.x = new BoundedDouble(name + ".x");
+				this.y = new BoundedDouble(name + ".y");
+				this.z = new BoundedDouble(name + ".z");
+			} else {
+				this.x = new Double();
+				this.y = new Double();
+				this.z = new Double();
+			}
 			set(x, y, z);
 			this.x.addAttributeListener(this);
 			this.y.addAttributeListener(this);
 			this.z.addAttributeListener(this);
 			this.keyable = keyable;
 			if (keyable) {
-				this.x.keyed.set(true);
-				this.y.keyed.set(true);
-				this.z.keyed.set(true);
+				((BoundedDouble) this.x).keyed.set(true);
+				((BoundedDouble) this.y).keyed.set(true);
+				((BoundedDouble) this.z).keyed.set(true);
 			}
 		}
 		
@@ -395,69 +462,24 @@ public class Attribute {
 			if (!valueAdjusting)
 				fireAttributeChanged();
 		}
+		
+		public void xml(PrintStream out) {
+			out.append("x=");
+			x.xml(out);
+			out.append(" y=");
+			y.xml(out);
+			out.append(" z=");
+			z.xml(out);
+		}
 	}
-	
-//	public static class Point3d extends Tuple {
-//		public Point3d(java.lang.String name, javax.vecmath.Point3d point, boolean keyable) {
-//			super(name, point, keyable);
-//		}
-//		
-//		public void get(javax.vecmath.Point3d point) {
-//			super.get(point);
-//		}
-//		
-//		public void set(javax.vecmath.Point3d point) {
-//			super.set(point.x, point.y, point.z);
-//		}
-//	}
-//	
-//	public static class Vector3d extends Tuple {
-//		public Vector3d(java.lang.String name, javax.vecmath.Vector3d vector, boolean keyable) {
-//			super(name, vector, keyable);
-//		}
-//		
-//		public void get(javax.vecmath.Vector3d vector) {
-//			super.get(vector);
-//		}
-//		
-//		public void set(javax.vecmath.Vector3d vector) {
-//			super.set(vector.x, vector.y, vector.z);
-//		}
-//	}
-//	
-//	public static class Rotation3d extends Tuple {
-//		public Rotation3d(java.lang.String name, jpatch.auxilary.Rotation3d rotation, boolean keyable) {
-//			super(name, rotation, keyable);
-//		}
-//		
-//		public void get(jpatch.auxilary.Rotation3d rotation) {
-//			super.get(rotation);
-//		}
-//		
-//		public void set(jpatch.auxilary.Rotation3d rotation) {
-//			super.set(rotation.x, rotation.y, rotation.z);
-//		}
-//	}
-//	
-//	public static class Scale3d extends Tuple {
-//		public Scale3d(java.lang.String name, jpatch.auxilary.Scale3d scale, boolean keyable) {
-//			super(name, scale, keyable);
-//		}
-//		
-//		public void get(jpatch.auxilary.Scale3d scale) {
-//			super.get(scale);
-//		}
-//		
-//		public void set(jpatch.auxilary.Scale3d scale) {
-//			super.set(scale.x, scale.y, scale.z);
-//		}
-//	}
 	
 	public static class Boolean extends Attribute {
 		private boolean value;
 		
-		public Boolean(JPatchObject object, java.lang.String name) {
-			super(object, name);
+		public Boolean() { }
+		
+		public Boolean(boolean value) {
+			this.value = value;
 		}
 		
 		public void set(boolean newValue) {
@@ -476,9 +498,8 @@ public class Attribute {
 		private final Attribute.BoundedDouble doubleAttribute;
 		public Attribute.Boolean keyed;
 		public Attribute.Boolean locked;
-		public KeyedBoolean(JPatchObject object, java.lang.String name) {
-			super(object, name);
-			doubleAttribute = new Attribute.BoundedDouble(object, name);
+		public KeyedBoolean(java.lang.String name) {
+			doubleAttribute = new Attribute.BoundedDouble(name);
 			doubleAttribute.min.enabled.set(true);
 			doubleAttribute.max.set(0);
 			doubleAttribute.min.enabled.set(true);
@@ -487,8 +508,8 @@ public class Attribute {
 			locked = doubleAttribute.locked;
 		}
 		
-		public KeyedBoolean(JPatchObject object, java.lang.String name, boolean value) {
-			this(object, name);
+		public KeyedBoolean(java.lang.String name, boolean value) {
+			this(name);
 			set(value);
 		}
 		

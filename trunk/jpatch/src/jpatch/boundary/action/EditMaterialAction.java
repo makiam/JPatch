@@ -10,8 +10,8 @@ public final class EditMaterialAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JPatchMaterial material;
-	public EditMaterialAction(JPatchMaterial material) {
+	private OLDMaterial material;
+	public EditMaterialAction(OLDMaterial material) {
 		super("Edit");
 		this.material = material;
 		//putValue(Action.SHORT_DESCRIPTION,"Add Controlpoint [A]");

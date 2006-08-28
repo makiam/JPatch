@@ -11,7 +11,7 @@ import jpatch.control.edit.AtomicModifyMotionCurve;
 import jpatch.control.edit.JPatchActionEdit;
 import jpatch.control.edit.JPatchRootEdit;
 import jpatch.control.edit.ModifyAnimObject;
-import jpatch.entity.Camera;
+import jpatch.entity.OLDCamera;
 import jpatch.entity.MotionCurveSet;
 
 public class MoveZoomRotateMouseAdapter extends JPatchMouseAdapter {
@@ -55,7 +55,7 @@ public class MoveZoomRotateMouseAdapter extends JPatchMouseAdapter {
 			ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 			if (viewDef.getCamera() != null) {
 				System.out.println("*");
-				Camera camera = viewDef.getCamera();
+				OLDCamera camera = viewDef.getCamera();
 				ModifyAnimObject edit = new ModifyAnimObject(camera);
 				Quat4f newOrientation = camera.getOrientation();
 				float newFocalLength = camera.getFocalLength();
@@ -110,7 +110,7 @@ public class MoveZoomRotateMouseAdapter extends JPatchMouseAdapter {
 		if (viewDef.getCamera() != null) {
 			if (currentTime > timestamp + 1000 || pos != MainFrame.getInstance().getAnimation().getPosition()) {
 				timestamp = currentTime;
-				Camera camera = viewDef.getCamera();
+				OLDCamera camera = viewDef.getCamera();
 				ModifyAnimObject edit = new ModifyAnimObject(camera);
 				MotionCurveSet.Camera mcs = (MotionCurveSet.Camera) MainFrame.getInstance().getAnimation().getCurvesetFor(camera);
 				float position = MainFrame.getInstance().getAnimation().getPosition();
@@ -123,7 +123,7 @@ public class MoveZoomRotateMouseAdapter extends JPatchMouseAdapter {
 				MainFrame.getInstance().getTimelineEditor().repaint();
 				pos = position;
 			} else {
-				Camera camera = viewDef.getCamera();
+				OLDCamera camera = viewDef.getCamera();
 				MotionCurveSet.Camera mcs = (MotionCurveSet.Camera) MainFrame.getInstance().getAnimation().getCurvesetFor(camera);
 				float position = MainFrame.getInstance().getAnimation().getPosition();
 				mcs.focalLength.setFloatAt(position, camera.getFocalLength());

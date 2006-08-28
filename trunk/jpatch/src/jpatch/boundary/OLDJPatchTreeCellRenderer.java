@@ -71,11 +71,11 @@ public class OLDJPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 			setIcon(iconLights);
 		else if (MainFrame.getInstance().getAnimation() != null && value == MainFrame.getInstance().getAnimation().getTreenodeCameras())
 			setIcon(iconCameras);
-		else if (value instanceof Selection)
+		else if (value instanceof OLDSelection)
 			setIcon(iconSelection);
-		else if (value instanceof JPatchMaterial)
+		else if (value instanceof OLDMaterial)
 			setIcon(iconMaterial);
-		else if (value instanceof Morph) {
+		else if (value instanceof OLDMorph) {
 			if (value instanceof RotationDof) {
 				RotationDof rdof = (RotationDof) value;
 				if (rdof.getBone().getIndex(rdof) == 0) {
@@ -112,7 +112,7 @@ public class OLDJPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 		}
 		else if (value instanceof OLDBone)
 			setIcon(iconBone);
-		else if (value instanceof Camera)
+		else if (value instanceof OLDCamera)
 			setIcon(iconCamera);
 		else if (value instanceof AnimLight)
 			setIcon(iconLight);
@@ -122,7 +122,7 @@ public class OLDJPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 	}
 	
 	public static class MorphSlider extends DefaultTreeCellRenderer {
-		private Morph morph;
+		private OLDMorph morph;
 		private JTree tree;
 		private boolean selected;
 		private float r, gr, b;
@@ -130,7 +130,7 @@ public class OLDJPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 		public MorphSlider(Icon icon, float r, float g, float b, JTree tree,Object value,boolean sel,boolean expanded,boolean leaf,int row,boolean hasFocus) {
 			super.getTreeCellRendererComponent(tree,value,false,expanded,leaf,row,hasFocus);
 			this.selected = sel;
-			this.morph = (Morph) value;
+			this.morph = (OLDMorph) value;
 			this.tree = tree;
 			this.r = r;
 			this.gr = g;

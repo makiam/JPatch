@@ -8,13 +8,13 @@ public class CompoundExtrude extends AbstractClone implements JPatchRootEdit {
 	
 	private static int iSequenceNumber = 1;
 	
-	public CompoundExtrude(ControlPoint[] controlPointsToClone) {
+	public CompoundExtrude(OLDControlPoint[] controlPointsToClone) {
 		super(controlPointsToClone);
 		buildCloneMap(false);
 		cloneControlPoints();
 		cloneCurves();
 		extrude();
-		Selection selection = createNewSelection();
+		OLDSelection selection = createNewSelection();
 		if (selection.getMap().size() > 0) {
 			selection.setName("*extruded points #" + iSequenceNumber++);
 			addEdit(new AtomicChangeSelection(selection.cloneSelection()));
@@ -24,16 +24,16 @@ public class CompoundExtrude extends AbstractClone implements JPatchRootEdit {
 	
 	private void extrude() {
 		for (Iterator it = mapOriginals.keySet().iterator(); it.hasNext(); ) {
-			ControlPoint cpClone = (ControlPoint) it.next();
-			ControlPoint cpOriginal = getOriginal(cpClone);
+			OLDControlPoint cpClone = (OLDControlPoint) it.next();
+			OLDControlPoint cpOriginal = getOriginal(cpClone);
 			if (cpClone.isHead() && !cpClone.isHook() && (cpClone.getPrev() != null || cpClone.getNext() != null)) {
-				ControlPoint cpNew = new ControlPoint();
+				OLDControlPoint cpNew = new OLDControlPoint();
 				cpNew.attachTo(cpClone);
 				
 				/* find a good loose end */
-				ControlPoint cpEnd = null;
+				OLDControlPoint cpEnd = null;
 				if (!cpOriginal.isSingle()) {
-					ControlPoint[] acpStack = cpOriginal.getStack();
+					OLDControlPoint[] acpStack = cpOriginal.getStack();
 					loop:
 					for (int i = 0; i < acpStack.length; i++) {
 						if (acpStack[i].getPrev() == null && acpStack[i].getNext() != null && getClone(acpStack[i].getNext()) == null) {
@@ -48,7 +48,7 @@ public class CompoundExtrude extends AbstractClone implements JPatchRootEdit {
 				
 				if (cpEnd == null) {
 					/* if not create a new cp, */
-					cpEnd = new ControlPoint();
+					cpEnd = new OLDControlPoint();
 					
 					/* attach it to the cpToClone */
 					addEdit(new AtomicAttachControlPoints(cpEnd,cpOriginal.getTail()));

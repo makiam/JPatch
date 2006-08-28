@@ -7,14 +7,14 @@ public class CompoundClone extends AbstractClone implements JPatchRootEdit {
 	
 	private static int iSequenceNumber = 1;
 	
-	public CompoundClone(ControlPoint[] controlPointsToClone) {
+	public CompoundClone(OLDControlPoint[] controlPointsToClone) {
 		super(controlPointsToClone);
 		buildCloneMap(true);
 		cloneControlPoints();
 		cloneHooks();
 		cloneCurves();
 		clonePatches();
-		Selection selection = createNewSelection();
+		OLDSelection selection = createNewSelection();
 		if (selection.getMap().size() > 0) {
 			selection.setName("*clone #" + iSequenceNumber++);
 			addEdit(new AtomicChangeSelection(selection.cloneSelection()));

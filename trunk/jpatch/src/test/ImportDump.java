@@ -13,7 +13,7 @@ public class ImportDump {
 	public static void main(String[] args) throws Exception {
 		BufferedReader reader = new BufferedReader(new FileReader(args[0]));
 		String line;
-		Map<String, ControlPoint> map = new HashMap<String, ControlPoint>();
+		Map<String, OLDControlPoint> map = new HashMap<String, OLDControlPoint>();
 		boolean newCurve = true;
 		OLDModel model = new OLDModel();
 		while ((line = reader.readLine()) != null) {
@@ -28,7 +28,7 @@ public class ImportDump {
 			float x = Float.parseFloat(parts[10].substring(1, parts[10].length() - 1));
 			float y = Float.parseFloat(parts[11].substring(0, parts[11].length() - 1));
 			float z = Float.parseFloat(parts[12].substring(0, parts[12].length() - 1));
-			ControlPoint point = new ControlPoint(x, y, z);
+			OLDControlPoint point = new OLDControlPoint(x, y, z);
 			map.put(cp, point);
 			if (newCurve) {
 				model.addCurve(point);
@@ -53,7 +53,7 @@ public class ImportDump {
 			String phook = parts[7];
 			String chook = parts[8];
 			float hpos = Float.parseFloat(parts[9]);
-			ControlPoint point = map.get(cp);
+			OLDControlPoint point = map.get(cp);
 			point.setLoop(loop);
 			point.setNext(map.get(next));
 			point.setPrev(map.get(prev));
@@ -79,7 +79,7 @@ public class ImportDump {
 			for (p = 0; p < parts.length; p++)
 				if (parts[p].startsWith("cp_"))
 					break;
-			ControlPoint[] c = new ControlPoint[parts.length - p];
+			OLDControlPoint[] c = new OLDControlPoint[parts.length - p];
 			for (int i = 0; i < c.length; i++)
 				c[i] = map.get(parts[i + p]);
 			model.addPatch(c, null);

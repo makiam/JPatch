@@ -57,7 +57,7 @@ public class RotateTool extends JPatchTool {
 	private boolean bChange;
 	private boolean isTransforming = false;
 	
-	private Selection selection;
+	private OLDSelection selection;
 	
 	private JPatchActionEdit edit;
 	
@@ -635,7 +635,7 @@ public class RotateTool extends JPatchTool {
 		//MainFrame.getInstance().getJPatchScreen().update_all();
 	}
 	
-	public void reInit(Selection selection) {
+	public void reInit(OLDSelection selection) {
 		this.selection = selection;
 		m3InitialRotation.set(selection.getOrientation());
 //		selection.getPivot() = selection.getPivot();
@@ -663,12 +663,12 @@ public class RotateTool extends JPatchTool {
 //		for (int i = 0, n = list.size(); i < n; i++) {
 //			((Transformable) list.get(i)).beginTransform();
 //		}
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		int mask;
 		if (MainFrame.getInstance().getEditedMorph() != null)
-			mask = Selection.MORPHTARGET;
+			mask = OLDSelection.MORPHTARGET;
 		else
-			mask = Selection.CONTROLPOINTS | Selection.MORPHS | Selection.BONES;
+			mask = OLDSelection.CONTROLPOINTS | OLDSelection.MORPHS | OLDSelection.BONES;
 		selection.arm(mask);
 		selection.beginTransform();
 		m3InitialRotation.set(selection.getOrientation());
@@ -685,7 +685,7 @@ public class RotateTool extends JPatchTool {
 //		for (int i = 0, n = list.size(); i < n; i++) {
 //			compoundEdit.addEdit(((Transformable) list.get(i)).endTransform();
 //		}
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		
 		edit.addEdit(selection.endTransform());
 		Matrix3f rotation = new Matrix3f();

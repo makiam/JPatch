@@ -5,7 +5,7 @@ import javax.swing.*;
 import jpatch.boundary.*;
 
 import jpatch.control.edit.*;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDSelection;
 
 
 public final class FlipPatchesAction extends AbstractAction {
@@ -17,7 +17,7 @@ public final class FlipPatchesAction extends AbstractAction {
 		super("flip patches");
 		}
 	public void actionPerformed(ActionEvent actionEvent) {
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null) {
 			MainFrame.getInstance().getUndoManager().addEdit(new AtomicFlipPatches(selection));
 			MainFrame.getInstance().getJPatchScreen().update_all();

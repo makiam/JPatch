@@ -40,13 +40,13 @@ implements ComponentListener {
 	private boolean bAlwaysUseZBuffer = false;
 	private boolean bRenderReference = false;
 	
-	private ControlPoint cpTangentHandles = null;
+	private OLDControlPoint cpTangentHandles = null;
 	//private Matrix4f m4Screen = new Matrix4f();
 	private Vector4f v4Screen = new Vector4f();
 //	private Vector4f v4ScreenOffset = new Vector4f();
 	private Matrix4f m4View = new Matrix4f();
 	private RealtimeLighting lighting;
-	private Camera camera;
+	private OLDCamera camera;
 	
 	private DecimalFormat decimalFormat = new DecimalFormat("0.0");
 //	private float fWidth;
@@ -303,11 +303,11 @@ implements ComponentListener {
 		repaint();
 	}
 	
-	public final void setTangentHandles(ControlPoint cp) {
+	public final void setTangentHandles(OLDControlPoint cp) {
 		cpTangentHandles = cp;
 	}
 	
-	public final ControlPoint getTangentHandles() {
+	public final OLDControlPoint getTangentHandles() {
 		return cpTangentHandles;
 	}
 	
@@ -447,12 +447,12 @@ implements ComponentListener {
 //		setGridPlane();
 	}
 	
-	public final void setCamera(Camera camera) {
+	public final void setCamera(OLDCamera camera) {
 		this.camera = camera;
 		drawable.setProjection(JPatchDrawable2.PERSPECTIVE);
 	}
 	
-	public final Camera getCamera() {
+	public final OLDCamera getCamera() {
 		return camera;
 	}
 	
@@ -637,23 +637,23 @@ implements ComponentListener {
 		return closest;
 	}
 	
-	public final ControlPoint getClosestControlPoint(Point2D.Float target, ControlPoint except) {
+	public final OLDControlPoint getClosestControlPoint(Point2D.Float target, OLDControlPoint except) {
 		return getClosestControlPoint(target, except, null);
 	}
 	
-	public final ControlPoint getClosestControlPoint(Point2D.Float target, ControlPoint except, float[] hookPos) {
+	public final OLDControlPoint getClosestControlPoint(Point2D.Float target, OLDControlPoint except, float[] hookPos) {
 		return getClosestControlPoint(target, except, hookPos, false);
 	}
 	
-	public final ControlPoint getClosestControlPoint(Point2D.Float target, ControlPoint except, float[] hookPos, boolean selectHooks) {
+	public final OLDControlPoint getClosestControlPoint(Point2D.Float target, OLDControlPoint except, float[] hookPos, boolean selectHooks) {
 		return getClosestControlPoint(target, except, hookPos, selectHooks, false);
 	}
 		
-	public final ControlPoint getClosestControlPoint(Point2D.Float target, ControlPoint except, float[] hookPos, boolean selectHooks, boolean grid) {
+	public final OLDControlPoint getClosestControlPoint(Point2D.Float target, OLDControlPoint except, float[] hookPos, boolean selectHooks, boolean grid) {
 		return getClosestControlPoint(target, except, hookPos, selectHooks, grid, null);
 	}
 		
-	public final ControlPoint getClosestControlPoint(Point2D.Float t, ControlPoint except, float[] hookPos, boolean selectHooks, boolean grid, ControlPoint selected) {
+	public final OLDControlPoint getClosestControlPoint(Point2D.Float t, OLDControlPoint except, float[] hookPos, boolean selectHooks, boolean grid, OLDControlPoint selected) {
 //		System.out.println("getClosestPoint called");
 		Point2D.Float target;
 //		if (grid && viewport.getGrid().snap()) {
@@ -667,9 +667,9 @@ implements ComponentListener {
 //		} else {
 			target = t;
 //		}
-		ControlPoint cp;
+		OLDControlPoint cp;
 		float fHookPos = -1;
-		ControlPoint cpExcept = (except != null) ? except.getHead() : null;
+		OLDControlPoint cpExcept = (except != null) ? except.getHead() : null;
 		OLDModel model = MainFrame.getInstance().getModel();
 		Matrix4f m4Screen = getScreenMatrix();
 		Point3f p3 = new Point3f();
@@ -689,9 +689,9 @@ implements ComponentListener {
 			}
 		}
 		
-		ControlPoint cpClosest = null;
+		OLDControlPoint cpClosest = null;
 		for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
-			cp = (ControlPoint) it.next();
+			cp = (OLDControlPoint) it.next();
 			//if (cp.getHookPos() == -1) {
 				if ((selectHooks && cp.getHookPos() != 0 && cp.getHookPos() != 1) || cp.getHookPos() == -1) {
 				while (cp != null) {
@@ -719,7 +719,7 @@ implements ComponentListener {
 								if (fDistance <= fMinHookDistance && cp != cpExcept) {
 									fMinHookDistance = fDistance;
 									cpClosest = cp;
-									fHookPos = ControlPoint.HOOKPOS[i];
+									fHookPos = OLDControlPoint.HOOKPOS[i];
 								}
 							}
 						}

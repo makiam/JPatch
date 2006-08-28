@@ -9,10 +9,10 @@ import jpatch.entity.*;
  * @created    08. Juni 2003
  */
 public final class AtomicAppendControlPoints extends JPatchAtomicEdit {
-	private ControlPoint cpA;
-	private ControlPoint cpAprev;
-	private ControlPoint cpB;
-	private ControlPoint cpBnext;
+	private OLDControlPoint cpA;
+	private OLDControlPoint cpAprev;
+	private OLDControlPoint cpB;
+	private OLDControlPoint cpBnext;
 	
 	/**
 	 *This Edit will append ControlPoint A to ControlPoint B
@@ -26,7 +26,7 @@ public final class AtomicAppendControlPoints extends JPatchAtomicEdit {
 	 * @param  A  ControlPoint A
 	 * @param  B  ControlPoint B
 	 */
-	public AtomicAppendControlPoints(ControlPoint A, ControlPoint B) {
+	public AtomicAppendControlPoints(OLDControlPoint A, OLDControlPoint B) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + A + ", " + B + ")");
 		cpA = A;

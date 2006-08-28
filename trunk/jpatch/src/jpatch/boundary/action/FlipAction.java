@@ -25,8 +25,8 @@ public final class FlipAction extends AbstractAction {
 		//putValue(Action.SHORT_DESCRIPTION,KeyMapping.getDescription("lathe"));
 	}
 	public void actionPerformed(ActionEvent actionEvent) {
-		Selection selection = MainFrame.getInstance().getSelection();
-		ControlPoint[] acp = selection.getControlPointArray();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
+		OLDControlPoint[] acp = selection.getControlPointArray();
 		if (acp.length > 0) {
 			//PointSelection newPs = MainFrame.getInstance().getModel().clone(ps.getControlPointArray());
 			//MainFrame.getInstance().setSelection(newPs);

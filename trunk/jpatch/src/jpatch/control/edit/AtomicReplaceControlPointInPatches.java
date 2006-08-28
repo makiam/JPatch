@@ -31,10 +31,10 @@ import jpatch.boundary.*;
  *
  */
 public final class AtomicReplaceControlPointInPatches extends JPatchAtomicEdit {
-	private ControlPoint cpOld, cpNew;
+	private OLDControlPoint cpOld, cpNew;
 	private final ArrayList listPatches = new ArrayList();
 	
-	public AtomicReplaceControlPointInPatches(ControlPoint cpOld, ControlPoint cpNew) {
+	public AtomicReplaceControlPointInPatches(OLDControlPoint cpOld, OLDControlPoint cpNew) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + cpOld + ", " + cpNew + ")");
 		this.cpOld = cpOld;
@@ -62,12 +62,12 @@ public final class AtomicReplaceControlPointInPatches extends JPatchAtomicEdit {
 	private void swap() {
 		for (Iterator it = listPatches.iterator(); it.hasNext(); ) {
 			Patch patch = (Patch) it.next();
-			ControlPoint[] acp = patch.getControlPoints();
+			OLDControlPoint[] acp = patch.getControlPoints();
 			for (int i = 0; i < acp.length; i++)
 				if (acp[i] == cpOld)
 					acp[i] = cpNew;
 		}
-		ControlPoint dummy = cpOld;
+		OLDControlPoint dummy = cpOld;
 		cpOld = cpNew;
 		cpNew = dummy;
 	}

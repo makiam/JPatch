@@ -58,15 +58,15 @@ public final class DetachControlPointsAction extends AbstractAction {
 //		}
 //		MainFrame.getInstance().getJPatchScreen().update_all();
 		JPatchActionEdit edit = null;
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection == null || !selection.isSingle())
 			return;
 		Object object = selection.getHotObject();
-		if (object instanceof ControlPoint) {
-			ControlPoint cp = (ControlPoint) object;
+		if (object instanceof OLDControlPoint) {
+			OLDControlPoint cp = (OLDControlPoint) object;
 			if (selection.getDirection() == 0) {
 				edit = new JPatchActionEdit("detach points");
-				ControlPoint[] acp = cp.getStack();
+				OLDControlPoint[] acp = cp.getStack();
 				for (int i = 0; i < acp.length; i++) {
 					edit.addEdit(new AtomicDetatchControlPoint(acp[i]));
 					for (Iterator it = (new HashSet(MainFrame.getInstance().getModel().getPatchSet())).iterator(); it.hasNext(); ) {

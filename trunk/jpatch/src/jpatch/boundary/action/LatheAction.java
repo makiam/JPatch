@@ -3,7 +3,7 @@ package jpatch.boundary.action;
 import java.awt.event.*;
 import javax.swing.*;
 import jpatch.control.edit.*;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDSelection;
 import jpatch.boundary.*;
 
 
@@ -12,7 +12,7 @@ public final class LatheAction extends AbstractAction {
 		System.out.println("Lathe..." + actionEvent.hashCode() + " " + actionEvent.getSource().hashCode());
 //		for (StackTraceElement ste : Thread.currentThread().getStackTrace())
 //			System.out.println(ste);
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && !selection.isSingle()) {
 			if (AbstractClone.checkForHooks(selection.getControlPointArray())) {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Lathe operation can not be performed bacause the selection contains hooks", "Can't lathe", JOptionPane.ERROR_MESSAGE);

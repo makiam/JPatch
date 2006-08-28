@@ -294,7 +294,7 @@ public class Viewport2 {
 	}
 	
 	public void drawTool(JPatchTool tool) {
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && selection.getHotObject() != null && selection.getHotObject() == viewDef.getCamera())
 			return;
 		drawable.setGhostRenderingEnabled(true);
@@ -345,7 +345,7 @@ public class Viewport2 {
 		}
 	}
 	
-	public void drawModel(OLDModel model, Selection selection) {
+	public void drawModel(OLDModel model, OLDSelection selection) {
 //		System.out.println(this + " drawModel");
 		/*
 		 * get max and min z-values (for fog effect)
@@ -354,7 +354,7 @@ public class Viewport2 {
 		fDeltaZ = Short.MIN_VALUE;
 		Point3f pz = new Point3f();
 		for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
-			for(ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+			for(OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				if (cp.isHead() && !cp.isHidden()) {
 					pz.set(cp.getPosition());
 					m4View.transform(pz);
@@ -372,7 +372,7 @@ public class Viewport2 {
 		if (viewDef.renderCurves()) {
 			drawable.setColor(settings.colors.curves); // FIXME
 			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
-				ControlPoint start = (ControlPoint) it.next();
+				OLDControlPoint start = (OLDControlPoint) it.next();
 				if (!start.isStartHook())
 					drawCurve(start);
 			}
@@ -388,7 +388,7 @@ public class Viewport2 {
 			drawable.setPointSize(3);
 			boolean renderBones = viewDef.renderBones();
 			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
-				for(ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+				for(OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 					if (cp.isHead()) {
 						p0.set(cp.getPosition());
 						if (!drawable.isTransformSupported()) 
@@ -458,7 +458,7 @@ public class Viewport2 {
 	//					MaterialProperties materialProperties = patch.getMaterial().getMaterialProperties();
 	//					if ((pass == 0 && !materialProperties.isOpaque()) || pass == 1 && materialProperties.isOpaque()) continue;
 						Point3f[] hashPatch = patch.coonsPatch();
-						ControlPoint[] acp = patch.getControlPoints();
+						OLDControlPoint[] acp = patch.getControlPoints();
 						for (int i = 0; i < hashPatch.length; i++) {
 							m4View.transform(hashPatch[i]);
 						}
@@ -484,7 +484,7 @@ public class Viewport2 {
 							int[] levels = new int[patch.getType()];
 							for (int i = 0; i < patch.getType(); levels[i++] = 0);
 							for (int i = 0, n = patch.getType(), pl = hashPatch.length, cn = n * 2; i < n; i++) {
-								ControlPoint targetHook = null;
+								OLDControlPoint targetHook = null;
 								boolean reversePatch = false;
 								int i2 = i * 2;
 								if (acp[i2].isTargetHook()) {
@@ -515,7 +515,7 @@ public class Viewport2 {
 									//levels[i] = 1;
 								}
 								else {
-									ControlPoint hook = targetHook.getHead();
+									OLDControlPoint hook = targetHook.getHead();
 									loop:
 									for (int ii = 0; ii < acp.length; ii++) {
 										if (acp[ii] == hook) {
@@ -533,8 +533,8 @@ public class Viewport2 {
 									Vector3f v3Start = new Vector3f(v3Dir);
 									Vector3f v3End = new Vector3f(v3Dir);
 									targetHook.computeTargetHookBorderTangents(v3Dir, v3Start, v3End);
-									ControlPoint cpStart = targetHook.getHead().getStart().getParentHook();
-									ControlPoint cpEnd = cpStart.getNext();
+									OLDControlPoint cpStart = targetHook.getHead().getStart().getParentHook();
+									OLDControlPoint cpEnd = cpStart.getNext();
 									Point3f p0 = cpStart.getPosition();
 									Point3f p1 = cpStart.getOutTangent();
 									Point3f p2 = cpEnd.getInTangent();
@@ -691,7 +691,7 @@ public class Viewport2 {
 		}
 	}
 	
-	private void drawSelection(Selection selection) {
+	private void drawSelection(OLDSelection selection) {
 //		System.out.println(selection.getHotObject());
 		if (selection.getHotObject() == null || selection.getHotObject() instanceof AnimObject)
 			return;
@@ -708,7 +708,7 @@ public class Viewport2 {
 		int direction = selection.getDirection();
 		if (direction == 0)
 			return;
-		ControlPoint cp = (ControlPoint) transformable;
+		OLDControlPoint cp = (OLDControlPoint) transformable;
 		if (direction == 1 && cp.getNext() != null) {
 			Point3f p3A = new Point3f(cp.getPosition());
 			Point3f p3B = new Point3f(cp.getOutTangent());
@@ -735,10 +735,10 @@ public class Viewport2 {
 	}
 	
 	private Color3f c3Curve = settings.colors.curves;
-	private void drawCurve(ControlPoint start) {
+	private void drawCurve(OLDControlPoint start) {
 //		System.out.println("drawCurve(" + start + ")");
-		ControlPoint cpNext;
-		for (ControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
+		OLDControlPoint cpNext;
+		for (OLDControlPoint cp = start; cp != null; cp = cp.getNextCheckNextLoop()) {
 			cpNext = cp.getNext();
 			if (cpNext != null && !cp.isHidden() && !cpNext.isHidden()) {
 				if (!drawable.isTransformSupported()) {
@@ -4247,7 +4247,7 @@ private void drawShadedHashPatch4Alpha(Point3f[] ap3, Vector3f[] av3, Color4f[] 
 		}
 		
 		public void drawBone(JPatchDrawable2 drawable, ViewDefinition viewDef, OLDBone bone) {
-			Selection selection = MainFrame.getInstance() == null ? null : MainFrame.getInstance().getSelection();
+			OLDSelection selection = MainFrame.getInstance() == null ? null : MainFrame.getInstance().getSelection();
 			boolean selected = selection != null && selection.containsBone(bone);
 //			System.out.println("drawBone bone=" + bone);
 			reset();

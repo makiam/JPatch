@@ -21,7 +21,7 @@ public class ModelTester {
 		listControlPoints = new ArrayList();
 		
 		for (Iterator it = listCurves.iterator(); it.hasNext(); ) {
-			for(ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+			for(OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				listControlPoints.add(cp);
 			}
 		}
@@ -40,8 +40,8 @@ public class ModelTester {
 //				error("curve " + curve + " model is " + curve.getModel());
 //			}
 			
-			ControlPoint cp = (ControlPoint) it.next();
-			ControlPoint start = cp;
+			OLDControlPoint cp = (OLDControlPoint) it.next();
+			OLDControlPoint start = cp;
 			
 			// check if we have a start
 			if (cp == null) {
@@ -61,7 +61,7 @@ public class ModelTester {
 				break curveLoop;
 			}
 			
-			ControlPoint cpLast = cp.getPrev();
+			OLDControlPoint cpLast = cp.getPrev();
 			
 			// loop over controlPoints
 			while (cp != null) {
@@ -129,7 +129,7 @@ public class ModelTester {
 					//check if we are the start hook
 					if (cp.getHookPos() == 0) {
 						
-						ControlPoint parentHook = cp.getParentHook();
+						OLDControlPoint parentHook = cp.getParentHook();
 						
 						// are we the start of the curve?
 						if (cp.getPrev() != null) {
@@ -207,11 +207,11 @@ public class ModelTester {
 		*/
 		int selections = 0;
 		for (Iterator it = model.getSelections().iterator(); it.hasNext(); ) {
-			Selection selection = (Selection) it.next();
+			OLDSelection selection = (OLDSelection) it.next();
 			for (Iterator it2 = selection.getObjects().iterator(); it2.hasNext(); ) {
 				Object object = it2.next();
-				if (object instanceof ControlPoint) {
-					ControlPoint cp = (ControlPoint) object;
+				if (object instanceof OLDControlPoint) {
+					OLDControlPoint cp = (OLDControlPoint) object;
 					if (!listControlPoints.contains(cp)) {
 						error ("cp " + cp + " of selection " + selection.getName() + " is invalid");
 					}
@@ -230,7 +230,7 @@ public class ModelTester {
 		int patches = 0;
 		for (Iterator it = model.getPatchSet().iterator(); it.hasNext(); ) {
 			Patch patch = (Patch) it.next();
-			ControlPoint[] acp = patch.getControlPoints();
+			OLDControlPoint[] acp = patch.getControlPoints();
 			for (int c = 0; c < acp.length; c++) {
 				if (!listControlPoints.contains(acp[c])) {
 					error ("cp " + acp[c] + " in patch " + patch + " is invalid");
@@ -247,11 +247,11 @@ public class ModelTester {
 		int morphs = 0;
 		
 		for (Iterator itMorph = MainFrame.getInstance().getModel().getMorphList().iterator(); itMorph.hasNext(); ) {
-			Morph morph = (Morph) itMorph.next();
+			OLDMorph morph = (OLDMorph) itMorph.next();
 			for (Iterator itTarget = morph.getTargets().iterator(); itTarget.hasNext(); ) {
 				MorphTarget target = (MorphTarget) itTarget.next();
 				for (Iterator itCp = target.getMorphMap().keySet().iterator(); itCp.hasNext(); ) {
-					ControlPoint cp = (ControlPoint) itCp.next();
+					OLDControlPoint cp = (OLDControlPoint) itCp.next();
 					if (!listControlPoints.contains(cp)) {
 						error ("cp " + cp + " of morph " + morph.getName() + " is invalid");
 					}

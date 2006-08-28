@@ -25,13 +25,13 @@ public final class NextCurveAction extends AbstractAction {
 //			MainFrame.getInstance().getJPatchScreen().update_all();
 //		}
 		
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection == null || !selection.isSingle())
 			return;
 		Object object = selection.getHotObject();
-		if (!(object instanceof ControlPoint))
+		if (!(object instanceof OLDControlPoint))
 			return;
-		ControlPoint cp = (ControlPoint) object;
+		OLDControlPoint cp = (OLDControlPoint) object;
 
 		switch (selection.getDirection()) {
 			case 0: {

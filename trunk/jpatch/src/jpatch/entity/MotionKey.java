@@ -790,8 +790,8 @@ public abstract class MotionKey {
 		public void xml(PrintStream out) {
 			if (o == null)
 				out.println("<key frame=\"" + position + "\" null=\"null\"/>");
-			else if (o instanceof ControlPoint)
-				out.println("<key frame=\"" + position + "\" cp=\"" + ((ControlPoint) o).getId() + "\"/>");
+			else if (o instanceof OLDControlPoint)
+				out.println("<key frame=\"" + position + "\" cp=\"" + ((OLDControlPoint) o).getId() + "\"/>");
 			else if (o instanceof OLDBone.BoneTransformable)
 				out.println("<key frame=\"" + position + "\" bone=\"" + ((OLDBone.BoneTransformable) o).getBone().getName() + "\"/>");
 			else

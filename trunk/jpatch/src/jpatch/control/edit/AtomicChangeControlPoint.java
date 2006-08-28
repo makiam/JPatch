@@ -4,7 +4,7 @@ import jpatch.entity.*;
 import javax.vecmath.*;
 
 public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
-	ControlPoint cp;
+	OLDControlPoint cp;
 	
 	private AtomicChangeControlPoint() { }
 	
@@ -19,16 +19,16 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 	abstract void swap();
 	
 	public static final class NextAttached extends AtomicChangeControlPoint {
-		private ControlPoint cpNextAttached;
+		private OLDControlPoint cpNextAttached;
 		
-		public NextAttached(ControlPoint cp, ControlPoint nextAttached) {
+		public NextAttached(OLDControlPoint cp, OLDControlPoint nextAttached) {
 			this.cp = cp;
 			cpNextAttached = nextAttached;
 			swap();
 		}
 		
 		void swap() {
-			ControlPoint dummy = cp.getNextAttached();
+			OLDControlPoint dummy = cp.getNextAttached();
 			cp.setNextAttached(cpNextAttached);
 			cpNextAttached = dummy;
 		}
@@ -39,16 +39,16 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 	}
 	
 	public static final class PrevAttached extends AtomicChangeControlPoint {
-		private ControlPoint cpPrevAttached;
+		private OLDControlPoint cpPrevAttached;
 		
-		public PrevAttached(ControlPoint cp, ControlPoint prevAttached) {
+		public PrevAttached(OLDControlPoint cp, OLDControlPoint prevAttached) {
 			this.cp = cp;
 			cpPrevAttached = prevAttached;
 			swap();
 		}
 		
 		void swap() {
-			ControlPoint dummy = cp.getPrevAttached();
+			OLDControlPoint dummy = cp.getPrevAttached();
 			cp.setPrevAttached(cpPrevAttached);
 			cpPrevAttached = dummy;
 		}
@@ -59,16 +59,16 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 	}
 	
 	public static final class Next extends AtomicChangeControlPoint {
-		private ControlPoint cpNext;
+		private OLDControlPoint cpNext;
 		
-		public Next(ControlPoint cp, ControlPoint next) {
+		public Next(OLDControlPoint cp, OLDControlPoint next) {
 			this.cp = cp;
 			cpNext = next;
 			swap();
 		}
 		
 		void swap() {
-			ControlPoint dummy = cp.getNext();
+			OLDControlPoint dummy = cp.getNext();
 			cp.setNext(cpNext);
 			cpNext = dummy;
 		}
@@ -79,16 +79,16 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 	}
 	
 	public static final class Prev extends AtomicChangeControlPoint {
-		private ControlPoint cpPrev;
+		private OLDControlPoint cpPrev;
 		
-		public Prev(ControlPoint cp, ControlPoint prev) {
+		public Prev(OLDControlPoint cp, OLDControlPoint prev) {
 			this.cp = cp;
 			cpPrev = prev;
 			swap();
 		}
 		
 		void swap() {
-			ControlPoint dummy = cp.getPrev();
+			OLDControlPoint dummy = cp.getPrev();
 			cp.setPrev(cpPrev);
 			cpPrev = dummy;
 		}
@@ -100,9 +100,9 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 	
 
 	public static final class ParentHook extends AtomicChangeControlPoint {
-		private ControlPoint cpParentHook;
+		private OLDControlPoint cpParentHook;
 		
-		public ParentHook(ControlPoint cp, ControlPoint parentHook) {
+		public ParentHook(OLDControlPoint cp, OLDControlPoint parentHook) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + cp + ", " + parentHook + ")");
 			this.cp = cp;
@@ -111,7 +111,7 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		}
 		
 		void swap() {
-			ControlPoint dummy = cp.getParentHook();
+			OLDControlPoint dummy = cp.getParentHook();
 			cp.setParentHook(cpParentHook);
 			cpParentHook = dummy;
 		}
@@ -122,9 +122,9 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 	}
 	
 	public static final class ChildHook extends AtomicChangeControlPoint {
-		private ControlPoint cpChildHook;
+		private OLDControlPoint cpChildHook;
 		
-		public ChildHook(ControlPoint cp, ControlPoint childHook) {
+		public ChildHook(OLDControlPoint cp, OLDControlPoint childHook) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + cp + ", " + childHook + ")");
 			this.cp = cp;
@@ -133,7 +133,7 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		}
 		
 		void swap() {
-			ControlPoint dummy = cp.getChildHook();
+			OLDControlPoint dummy = cp.getChildHook();
 			cp.setChildHook(cpChildHook);
 			cpChildHook = dummy;
 		}
@@ -144,7 +144,7 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 	}
 	
 	public static final class Loop extends AtomicChangeControlPoint {	
-		public Loop(ControlPoint cp) {
+		public Loop(OLDControlPoint cp) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + cp + ")");
 			this.cp = cp;
@@ -161,7 +161,7 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 	}
 	
 	public static final class Deleted extends AtomicChangeControlPoint {	
-		public Deleted(ControlPoint cp) {
+		public Deleted(OLDControlPoint cp) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + cp + ")");
 			this.cp = cp;
@@ -180,7 +180,7 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 	public static final class HookPos extends AtomicChangeControlPoint {
 		private float fHookPos;
 		
-		public HookPos(ControlPoint cp, float hookPos) {
+		public HookPos(OLDControlPoint cp, float hookPos) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + cp + ", " + hookPos + ")");
 			this.cp = cp;
@@ -202,7 +202,7 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 	public static final class Magnitude extends AtomicChangeControlPoint implements JPatchRootEdit {
 		private float fMagnitude;
 		
-		public Magnitude(ControlPoint cp, float magnitude) {
+		public Magnitude(OLDControlPoint cp, float magnitude) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + cp + ", " + magnitude + ")");
 			this.cp = cp;
@@ -228,7 +228,7 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 	public static final class TangentMode extends AtomicChangeControlPoint implements JPatchRootEdit {
 		private int iTangentMode;
 		
-		public TangentMode(ControlPoint cp, int tangentMode) {
+		public TangentMode(OLDControlPoint cp, int tangentMode) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + cp + ", " + tangentMode + ")");
 			this.cp = cp;
@@ -249,7 +249,7 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 		
 		public String getName() {
 			switch (iTangentMode) {
-				case ControlPoint.PEAK: return "peak tangents";
+				case OLDControlPoint.PEAK: return "peak tangents";
 				default: return "round tangents";
 			}
 		}
@@ -258,7 +258,7 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 	public static final class Position extends AtomicChangeControlPoint {
 		private float x, y, z;
 		
-		public Position(ControlPoint cp, Point3f position) {
+		public Position(OLDControlPoint cp, Point3f position) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + cp + ", " + position + ")");
 			this.cp = cp;
@@ -287,7 +287,7 @@ public abstract class AtomicChangeControlPoint extends JPatchAtomicEdit {
 	public static final class Bone extends AtomicChangeControlPoint {
 		private jpatch.entity.OLDBone bone;
 		
-		public Bone(ControlPoint cp, jpatch.entity.OLDBone bone) {
+		public Bone(OLDControlPoint cp, jpatch.entity.OLDBone bone) {
 			if (DEBUG)
 				System.out.println(getClass().getName() + "(" + cp + ", " + bone + ")");
 			this.cp = cp;

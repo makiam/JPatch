@@ -9,7 +9,7 @@ import jpatch.entity.*;
 import jpatch.boundary.ui.*;
 
 public class MorphPanel extends SidePanel
-implements ChangeListener, Morph.MorphListener {
+implements ChangeListener, OLDMorph.MorphListener {
 	
 	/**
 	 * 
@@ -21,11 +21,11 @@ implements ChangeListener, Morph.MorphListener {
 	JPatchInput inputMax;
 	JPatchInput inputCurrent;
 	JSlider slider;
-	Morph morph;
+	OLDMorph morph;
 	AbstractButton addTargetButton;
 	AbstractButton deleteButton;
 	
-	public MorphPanel(Morph morph) {
+	public MorphPanel(OLDMorph morph) {
 		this.morph = morph;
 		MorphTarget editedMorph = MainFrame.getInstance().getEditedMorph();
 		deleteButton = new JButton(new DeleteMorphAction(morph));
@@ -147,7 +147,7 @@ implements ChangeListener, Morph.MorphListener {
 		morph.removeMorphListener(this);
 	}
 	
-	public void valueChanged(Morph morph) {
+	public void valueChanged(OLDMorph morph) {
 		inputCurrent.setValue(morph.getValue());
 		addTargetButton.setEnabled(!morph.isTarget());
 	}

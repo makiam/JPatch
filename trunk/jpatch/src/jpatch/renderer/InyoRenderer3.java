@@ -15,12 +15,12 @@ public class InyoRenderer3 implements Renderer {
 	private Image image;
 	private List models;
 	private List lights;
-	private Camera camera;
+	private OLDCamera camera;
 	private PatchTesselator3 patchTesselator = new PatchTesselator3();
 	private JPatchInyoInterface inyo;
 	private volatile boolean abort = false;
 	
-	public InyoRenderer3(List models, Camera camera, List lights) {
+	public InyoRenderer3(List models, OLDCamera camera, List lights) {
 		this.models = models;
 		this.camera = camera;
 		this.lights = lights;
@@ -89,7 +89,7 @@ public class InyoRenderer3 implements Renderer {
 			for (Iterator iterator = model.getMaterialList().iterator(); iterator.hasNext();) {
 				if (abort)
 					return null;
-				JPatchMaterial material = (JPatchMaterial)iterator.next();
+				OLDMaterial material = (OLDMaterial)iterator.next();
 				PatchTesselator3.Vertex[] vtx = patchTesselator.getPerMaterialVertexArray(material);
 				int[][] triangles = patchTesselator.getPerMaterialTriangleArray();
 				if (triangles.length > 0) {

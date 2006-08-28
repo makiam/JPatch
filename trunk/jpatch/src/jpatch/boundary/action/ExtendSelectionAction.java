@@ -5,7 +5,7 @@ import javax.swing.*;
 import jpatch.boundary.*;
 
 import jpatch.control.edit.*;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDSelection;
 
 public final class ExtendSelectionAction extends AbstractAction {
 	/**
@@ -18,7 +18,7 @@ public final class ExtendSelectionAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null) {
 //			boolean selectCurveOnly = (ps.isSingle() && (ps.isCurve() || ps.getControlPoint().getPrevAttached() == null));
 			MainFrame.getInstance().getUndoManager().addEdit(new CompoundExpandSelection(selection));

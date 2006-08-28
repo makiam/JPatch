@@ -39,21 +39,21 @@ public final class InsertControlPointAction extends AbstractAction {
 //				MainFrame.getInstance().getJPatchScreen().update_all();
 //			}
 //		}
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		int dir = selection.getDirection();
 		if (dir == 0)
 			return;
 		JPatchActionEdit edit = new JPatchActionEdit("insert point");
-		ControlPoint cpA, cpB, cpNew;
+		OLDControlPoint cpA, cpB, cpNew;
 		if (dir == 1) {
-			cpA = (ControlPoint) selection.getHotObject();
+			cpA = (OLDControlPoint) selection.getHotObject();
 			cpB = cpA.getNext();
 		} else {
 			// dir == -1
-			cpB = (ControlPoint) selection.getHotObject();
+			cpB = (OLDControlPoint) selection.getHotObject();
 			cpA = cpB.getPrev();
 		}
-		cpNew = new ControlPoint(Bezier.evaluate(cpA.getPosition(), cpA.getOutTangent(), cpB.getInTangent(), cpB.getPosition(), 0.5f));
+		cpNew = new OLDControlPoint(Bezier.evaluate(cpA.getPosition(), cpA.getOutTangent(), cpB.getInTangent(), cpB.getPosition(), 0.5f));
 		edit.addEdit(new AtomicInsertControlPoint(cpNew, cpA));
 		for (Iterator it = (new HashSet(MainFrame.getInstance().getModel().getPatchSet())).iterator(); it.hasNext();) {
 			Patch patch = (Patch) it.next();

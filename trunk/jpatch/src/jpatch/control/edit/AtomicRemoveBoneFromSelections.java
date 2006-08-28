@@ -43,7 +43,7 @@ public final class AtomicRemoveBoneFromSelections extends JPatchAtomicEdit {
 		boneEnd = bone.getBoneEnd();
 //		System.out.println("remove bone from selections " + boneStart + " " + boneEnd);
 		for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
-			Selection selection = (Selection) it.next();
+			OLDSelection selection = (OLDSelection) it.next();
 			Object weight = selection.getMap().get(boneStart);
 			if ((weight) != null) {
 				mapSelectionsStart.put(selection, weight);
@@ -55,7 +55,7 @@ public final class AtomicRemoveBoneFromSelections extends JPatchAtomicEdit {
 				selection.getMap().remove(boneEnd);
 			}
 		}
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null) {
 			Object weight = selection.getMap().get(boneStart);
 			if ((weight) != null) {
@@ -72,22 +72,22 @@ public final class AtomicRemoveBoneFromSelections extends JPatchAtomicEdit {
 	
 	public void undo() {
 		for (Iterator it = mapSelectionsStart.keySet().iterator(); it.hasNext(); ) {
-			Selection selection = (Selection) it.next();
+			OLDSelection selection = (OLDSelection) it.next();
 			selection.getMap().put(boneStart, mapSelectionsStart.get(selection)); 
 		}
 		for (Iterator it = mapSelectionsEnd.keySet().iterator(); it.hasNext(); ) {
-			Selection selection = (Selection) it.next();
+			OLDSelection selection = (OLDSelection) it.next();
 			selection.getMap().put(boneEnd, mapSelectionsEnd.get(selection)); 
 		}
 	}
 	
 	public void redo() {
 		for (Iterator it = mapSelectionsStart.keySet().iterator(); it.hasNext(); ) {
-			Selection selection = (Selection) it.next();
+			OLDSelection selection = (OLDSelection) it.next();
 			selection.getMap().remove(boneStart); 
 		}
 		for (Iterator it = mapSelectionsEnd.keySet().iterator(); it.hasNext(); ) {
-			Selection selection = (Selection) it.next();
+			OLDSelection selection = (OLDSelection) it.next();
 			selection.getMap().remove(boneEnd); 
 		}
 	}

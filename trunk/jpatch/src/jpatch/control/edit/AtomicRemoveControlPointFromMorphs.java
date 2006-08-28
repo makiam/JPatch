@@ -32,15 +32,15 @@ import jpatch.boundary.*;
  *
  */
 public final class AtomicRemoveControlPointFromMorphs extends JPatchAtomicEdit {
-	private final ControlPoint cp;
+	private final OLDControlPoint cp;
 	private final HashMap mapMorphTargets = new HashMap();;
 	
-	public AtomicRemoveControlPointFromMorphs(ControlPoint cp) {
+	public AtomicRemoveControlPointFromMorphs(OLDControlPoint cp) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + cp + ")");
 		this.cp = cp;
 		for (Iterator itMorph = MainFrame.getInstance().getModel().getMorphList().iterator(); itMorph.hasNext(); ) {
-			Morph morph = (Morph) itMorph.next();
+			OLDMorph morph = (OLDMorph) itMorph.next();
 			for (MorphTarget target : morph.getTargets()) {
 				Object vector = target.getVectorFor(cp);
 				if (vector != null) {
@@ -50,7 +50,7 @@ public final class AtomicRemoveControlPointFromMorphs extends JPatchAtomicEdit {
 			}
 		}
 		for (OLDBone bone : MainFrame.getInstance().getModel().getBoneSet()) {
-			for (Morph morph : bone.getDofs()) {
+			for (OLDMorph morph : bone.getDofs()) {
 				for (MorphTarget target : morph.getTargets()) {
 					Object vector = target.getVectorFor(cp);
 					if (vector != null) {

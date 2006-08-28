@@ -46,16 +46,16 @@ public class BoneAttributeEditor extends AbstractAttributeEditor {
 		ExpandableForm extentForm = new ExpandableForm();
 		ExpandableForm scaleForm = new ExpandableForm();
 		
-		addScalar(defaultForm, bone.name);
-		addTuple(defaultForm, bone.color);
-		addTuple(axisRotationForm, bone.axisRotation);
-		addScalar(axisRotationForm, bone.axisRotationOrder);
-		addTuple(translationForm, bone.translation);
-		addTuple(positionForm, bone.position);
-		addTuple(extentForm, bone.extent);
-		addTuple(extentForm, bone.up);
-		addTuple(rotationForm, bone.rotation);
-		addScalar(rotationForm, bone.rotationOrder);
+		addScalar(defaultForm, "Name", bone.name);
+		addTuple(defaultForm, "Color", bone.color);
+		addTuple(axisRotationForm, "Axis Rotation", bone.axisRotation);
+		addScalar(axisRotationForm, "Order", bone.axisRotationOrder);
+		addTuple(translationForm, "Translation", bone.translation);
+		addTuple(positionForm, "Position", bone.position);
+		addTuple(extentForm, "Extent", bone.extent);
+		addTuple(extentForm, "Up Vector", bone.up);
+		addTuple(rotationForm, "Rotation", bone.rotation);
+		addScalar(rotationForm, "Order", bone.rotationOrder);
 		
 		rotationForm.add(new JLabel("Weighting"));
 		JComponent box = new ExpandableFormRow();
@@ -64,12 +64,12 @@ public class BoneAttributeEditor extends AbstractAttributeEditor {
 		box.add(AttributeUiHelper.createComboBoxFor(bone.weightingX));
 		box.add(AttributeUiHelper.createComboBoxFor(bone.weightingX));
 		rotationForm.add(box);
+		
 		addLimit(rotationForm, bone.rotation);
 		
-		addTuple(orientationForm, bone.orientation);
+		addTuple(orientationForm, "Orientation", bone.orientation);
 		
-		
-		addTuple(scaleForm, bone.scale);
+		addTuple(scaleForm, "Scale", bone.scale);
 		addLimit(scaleForm, bone.scale);
 //		addLimit(rotationForm, transformNode.rotation);
 //		addTuple(rotationForm, transformNode.rotatePivotTranslation);

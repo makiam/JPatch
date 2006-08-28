@@ -5,10 +5,10 @@ import javax.vecmath.*;
 import jpatch.entity.*;
 
 public class AtomicMoveControlPoints extends JPatchAtomicEdit {
-	private ControlPoint[] acp;
+	private OLDControlPoint[] acp;
 	private Point3f[] ap3Position;
 	
-	public AtomicMoveControlPoints(ControlPoint[] controlPoints) {
+	public AtomicMoveControlPoints(OLDControlPoint[] controlPoints) {
 		this.acp = controlPoints;
 		ap3Position = new Point3f[acp.length];
 		for (int c = 0; c < acp.length; c++)

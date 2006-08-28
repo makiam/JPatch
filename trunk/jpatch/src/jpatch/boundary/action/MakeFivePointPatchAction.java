@@ -24,8 +24,8 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 		if (patch == null)
 			return;
 		OLDModel model = MainFrame.getInstance().getModel();
-		ControlPoint[] acp = patch.getControlPoints();
-		ControlPoint[] acp5 = new ControlPoint[] {
+		OLDControlPoint[] acp = patch.getControlPoints();
+		OLDControlPoint[] acp5 = new OLDControlPoint[] {
 				acp[0].trueHead(),
 				acp[2].trueHead(),
 				acp[4].trueHead(),
@@ -43,14 +43,14 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 	}
 	
 	public static Patch checkSelection() {
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		OLDModel model = MainFrame.getInstance().getModel();
 		ArrayList points = new ArrayList();
 		if (selection == null || MainFrame.getInstance().getAnimation() != null)
 			return null;
 		
 		for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
-			for(ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+			for(OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				if (selection.contains(cp))
 					points.add(cp);
 				else if (cp.getParentHook() != null && selection.contains(cp.getParentHook().getHead())) {
@@ -60,12 +60,12 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 		}
 		//test:
 		
-		ControlPoint[] acp = new ControlPoint[points.size()];
+		OLDControlPoint[] acp = new OLDControlPoint[points.size()];
 		points.toArray(acp);
 		HashMap mapHeadList = new HashMap();
 		HashSet setHeads = new HashSet();
 		for (int i = 0; i < acp.length; i++) {
-			ControlPoint head = acp[i].trueHead();
+			OLDControlPoint head = acp[i].trueHead();
 			setHeads.add(head);
 			if (acp[i].getParentHook() != null) {
 				ArrayList neighbors = (ArrayList) mapHeadList.get(head);
@@ -112,14 +112,14 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 		
 		
 		for (int i = 0; i < acp.length; i++) {
-			ControlPoint head = acp[i].trueHead();
+			OLDControlPoint head = acp[i].trueHead();
 			if (acp[i].getParentHook() == null) {
 				ArrayList neighbors = (ArrayList) mapHeadList.get(head);
 				if (neighbors == null) {
 					neighbors = new ArrayList();
 					mapHeadList.put(head,neighbors);
 				}
-				ControlPoint[] stack = acp[i].getStack();
+				OLDControlPoint[] stack = acp[i].getStack();
 				for (int j = 0; j < stack.length; j++) {
 					if (stack[j].getNext() != null) {
 						neighbors.add(stack[j]);
@@ -144,10 +144,10 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 			//System.out.println();
 			ArrayList fivePointPatch = new ArrayList();
 			ArrayList toGoList = new ArrayList(setHeads);
-			ControlPoint neighborA;
-			ControlPoint neighborB;
-			ControlPoint currentHead = (ControlPoint) toGoList.get(0);
-			ControlPoint first = currentHead;
+			OLDControlPoint neighborA;
+			OLDControlPoint neighborB;
+			OLDControlPoint currentHead = (OLDControlPoint) toGoList.get(0);
+			OLDControlPoint first = currentHead;
 			toGoList.remove(currentHead);
 			for (int i = 0; i < 5; i++) {
 				//System.out.println(currentHead.number());
@@ -158,8 +158,8 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 				boolean found = false;
 				loop:
 					while (neighborIterator.hasNext()) {
-						neighborA = (ControlPoint) neighborIterator.next();
-						neighborB = (ControlPoint) neighborIterator.next();
+						neighborA = (OLDControlPoint) neighborIterator.next();
+						neighborB = (OLDControlPoint) neighborIterator.next();
 						//System.out.println(neighborA.number() + " " + neighborA.trueHead().number() + " " + neighborB.number() + " " + neighborB.trueHead().number());
 						if (toGoList.contains(neighborB.trueHead()) || (toGoList.size() == 0 && neighborB.trueHead() == first)) {
 							fivePointPatch.add(neighborA);
@@ -179,9 +179,9 @@ public final class MakeFivePointPatchAction extends AbstractAction {
 			//	System.out.println(((ControlPoint) it.next()).number());
 			//}
 			if (fivePointPatch.size() == 10) {
-				acp = new ControlPoint[10];
+				acp = new OLDControlPoint[10];
 				for (int i = 0; i < 10; i++) {
-					acp[i] = (ControlPoint) fivePointPatch.get(i);
+					acp[i] = (OLDControlPoint) fivePointPatch.get(i);
 				}
 				if (
 						acp[1].trueCp() != acp[2].trueCp() &&

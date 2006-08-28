@@ -5,19 +5,19 @@ import java.awt.event.*;
 
 import javax.swing.*;
 import jpatch.control.edit.*;
-import jpatch.entity.ControlPoint;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDControlPoint;
+import jpatch.entity.OLDSelection;
 import jpatch.boundary.*;
 
 public final class RemoveControlPointAction extends AbstractAction {
 	public void actionPerformed(ActionEvent actionEvent) {
 		
 	JPatchActionEdit edit = null;
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection == null)
 			return;
 		if (selection.getDirection() != 0) {
-			ControlPoint cp = (ControlPoint) selection.getHotObject();
+			OLDControlPoint cp = (OLDControlPoint) selection.getHotObject();
 			if (selection.getDirection() == -1)
 				cp = cp.getPrev();
 			edit = new JPatchActionEdit("remove curve segment");

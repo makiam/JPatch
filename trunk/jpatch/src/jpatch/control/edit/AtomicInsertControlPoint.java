@@ -11,16 +11,16 @@ import jpatch.entity.*;
 public class AtomicInsertControlPoint extends JPatchAtomicEdit implements JPatchRootEdit {
 
 //	private Curve curve;
-	private ControlPoint cpA;
+	private OLDControlPoint cpA;
 //	private ControlPoint cpAprev;
-	private ControlPoint cpB;
-	private ControlPoint cpBnext;
+	private OLDControlPoint cpB;
+	private OLDControlPoint cpBnext;
 	
 	/**
 	 *This Edit will insert ControlPoint A after ControlPoint B
 	 */
 	
-	public AtomicInsertControlPoint(ControlPoint A, ControlPoint B) {
+	public AtomicInsertControlPoint(OLDControlPoint A, OLDControlPoint B) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + A + ", " + B + ")");
 		cpA = A;

@@ -43,7 +43,7 @@ public final class MainFrame extends JFrame {
 	
 	private int iMode = MESH;
 	
-	private OLDModel model;
+	private Model model;
 	private Animation animation;
 	private JPatchScreen jpatchScreen;
 	private static MainFrame INSTANCE;
@@ -55,8 +55,8 @@ public final class MainFrame extends JFrame {
 	private JLabel helpLabel;
 //	private JMenuBar mainMenu;
 	private ButtonGroup bgAction;
-	private Selection selection;
-	private JPatchUndoManager undoManager = new JPatchUndoManager(50);
+	private OLDSelection selection;
+//	private JPatchUndoManager undoManager = new JPatchUndoManager(50);
 	private JPatchKeyAdapter keyAdapter = new JPatchKeyAdapter();
 	private JDialog dialog;
 	private Point pointDialogLocation = new Point(800,600);
@@ -423,7 +423,7 @@ public final class MainFrame extends JFrame {
 			}, false);
 			Actions.getInstance().enableAction("stop edit morph", true);
 			if (selection != null)
-				selection.applyMask(Selection.CONTROLPOINTS);
+				selection.applyMask(OLDSelection.CONTROLPOINTS);
 		} else {
 //			switchMode(MESH);
 			Actions.getInstance().enableActions(new String[] {
@@ -472,7 +472,7 @@ public final class MainFrame extends JFrame {
 	//	return displayFactory;
 	//}
 	
-	public OLDModel getModel() {
+	public Model getModel() {
 		return model;
 	}
 	
@@ -481,14 +481,14 @@ public final class MainFrame extends JFrame {
 	}
 	
 	public void newModel() {
-		model = new OLDModel();
+		model = new Model();
 		animation = null;
 		setEditedMorph(null);
 		for (ViewDefinition viewDef : aViewDef)
 			viewDef.setScale(0.03f);
 		setSelection(null);
-		undoManager.clear();
-		initTree(model);
+//		undoManager.clear();
+//		initTree(model);
 		sideBar.setTree(tree);
 		validate();
 		if (vcrControls != null)
@@ -540,7 +540,7 @@ public final class MainFrame extends JFrame {
 		for (ViewDefinition viewDef : aViewDef)
 			viewDef.setScale(0.003f);
 		setSelection(null);
-		undoManager.clear();
+//		undoManager.clear();
 		initTree(animation);
 		sideBar.setTree(tree);
 		validate();
@@ -564,7 +564,7 @@ public final class MainFrame extends JFrame {
 		splitPaneV.add(animPanel);
 //		vcrDialog.setSize(800, 600);
 //		vcrDialog.setVisible(true);
-		Camera camera = new Camera("Camera 1");
+		OLDCamera camera = new OLDCamera("Camera 1");
 		camera.setPosition(new Point3d(0, 150, -300));
 		camera.setOrientation(0, Math.atan2(-150, 300), 0);
 		AnimLight light = new AnimLight();
@@ -636,7 +636,7 @@ public final class MainFrame extends JFrame {
 //			getContentPane().remove(jpatchScreen);
 //			mode = jpatchScreen.getMode();
 //		}
-		jpatchScreen = new JPatchScreen(model,mode,aViewDef);
+		jpatchScreen = new JPatchScreen(mode, aViewDef);
 		//getContentPane().add(jpatchScreen);
 		//jpatchScreen.enablePopupMenu(true);
 		//validate();
@@ -678,7 +678,7 @@ public final class MainFrame extends JFrame {
 	}
 	
 	*/
-	public void setTangentDisplay(ControlPoint cp) {
+	public void setTangentDisplay(OLDControlPoint cp) {
 		for (int v = 0; v < 4; v++) {
 			aViewDef[v].setTangentHandles(cp);
 		}
@@ -704,15 +704,15 @@ public final class MainFrame extends JFrame {
 		return bgAction;
 	}
 	
-	public JPatchUndoManager getUndoManager() {
-		return undoManager;
-	}
+//	public JPatchUndoManager getUndoManager() {
+//		return undoManager;
+//	}
 	
-	public Selection getSelection() {
+	public OLDSelection getSelection() {
 		return selection;
 	}
 	
-	public void setSelection(Selection selection) {
+	public void setSelection(OLDSelection selection) {
 //		getModel().removeSelection(this.selection);
 		boolean bonesAndPoints = false;
 		boolean moreThanOnePoint = false;
@@ -726,23 +726,23 @@ public final class MainFrame extends JFrame {
 			selection.setName("ACTIVE SELECTION");
 			for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
 				Object object = it.next();
-				if (object instanceof ControlPoint) {
-					ControlPoint[] stack = ((ControlPoint) object).getStack();
+				if (object instanceof OLDControlPoint) {
+					OLDControlPoint[] stack = ((OLDControlPoint) object).getStack();
 					for (int j = 0; j < stack.length; stack[j++].setHidden(false));
 				}
 			}
 			JPatchTool tool = jpatchScreen.getTool();
 			if (tool != null && tool instanceof RotateTool)
 				((RotateTool) tool).reInit(selection);		
-			int flags = Selection.CONTROLPOINTS;
+			int flags = OLDSelection.CONTROLPOINTS;
 			if (iMode != MORPH)
-				flags |= Selection.MORPHS;
+				flags |= OLDSelection.MORPHS;
 			if (animation == null)
 				selection.arm(flags);
 			int points = 0, bones = 0;
 			for (Iterator it = selection.getObjects().iterator(); it.hasNext(); ) {
 				Object o = it.next();
-				if (o instanceof ControlPoint)
+				if (o instanceof OLDControlPoint)
 					points++;
 				else if (o instanceof OLDBone.BoneTransformable)
 					bones++;
@@ -750,7 +750,7 @@ public final class MainFrame extends JFrame {
 			bonesAndPoints = (points > 0 && bones > 0);
 			moreThanOnePoint = (points > 1);
 			bone = (bones > 0);
-			jpatchScreen.setFocusTraversalKeysEnabled(!(selection.isSingle() && selection.getHotObject() instanceof ControlPoint));
+			jpatchScreen.setFocusTraversalKeysEnabled(!(selection.isSingle() && selection.getHotObject() instanceof OLDControlPoint));
 		}
 		Actions.getInstance().enableAction("select none", selection != null);
 		Actions.getInstance().enableAction("invert selection", selection != null);
@@ -786,10 +786,10 @@ public final class MainFrame extends JFrame {
 		}
 	}
 	
-	public java.util.List getSelectionsContaining(ControlPoint cp) {
+	public java.util.List getSelectionsContaining(OLDControlPoint cp) {
 		ArrayList list = new ArrayList();
 		for (Iterator it = getModel().getSelections().iterator(); it.hasNext(); ) {
-			Selection selection = (Selection) it.next();
+			OLDSelection selection = (OLDSelection) it.next();
 			if (selection.contains(cp)) list.add(selection);
 		}
 		if (getSelection() != null && getSelection().contains(cp))

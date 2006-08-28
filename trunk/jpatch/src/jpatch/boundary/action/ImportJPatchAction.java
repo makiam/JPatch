@@ -81,12 +81,12 @@ public final class ImportJPatchAction extends AbstractAction {
 				
 				HashSet pointSet = new HashSet();
 				for (Iterator it = model.allHeads().iterator(); it.hasNext(); ) {
-					ControlPoint cp = (ControlPoint) it.next();
+					OLDControlPoint cp = (OLDControlPoint) it.next();
 					if (!headsBeforeImport.contains(cp)) {
 						pointSet.add(cp);
 					}
 				}
-				Selection selection = new Selection(pointSet);
+				OLDSelection selection = new OLDSelection(pointSet);
 				selection.setName(file.getName());
 				model.addSelection(selection);
 				model.setName(name);

@@ -19,18 +19,18 @@ public class AddStubsAction extends AbstractAction {
 	}
 	
 	public void actionPerformed(ActionEvent actionEvent) {
-		Selection selection = MainFrame.getInstance().getSelection();
-		ControlPoint[] acp = selection.getControlPointArray();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
+		OLDControlPoint[] acp = selection.getControlPointArray();
 		JPatchActionEdit edit = new JPatchActionEdit("add curve stubs");
 		HashMap map = new HashMap();
 		for (int i = 0; i < acp.length; i++) {
-			for (ControlPoint cp = acp[i].getHead(); cp != null; cp = cp.getPrevAttached()) {
+			for (OLDControlPoint cp = acp[i].getHead(); cp != null; cp = cp.getPrevAttached()) {
 				if (!cp.isHook() && !cp.isTargetHook() && !cp.isSingle()) {
-					ControlPoint cpNext = cp.getNext();
-					ControlPoint cpPrev = cp.getPrev();
+					OLDControlPoint cpNext = cp.getNext();
+					OLDControlPoint cpPrev = cp.getPrev();
 					Vector3f vector = new Vector3f();
 					Point3f pos = new Point3f(cp.getPosition());
-					ControlPoint cpNew = new ControlPoint();
+					OLDControlPoint cpNew = new OLDControlPoint();
 //					cpNew.setCurve(cp.getCurve());
 					if (cpNext == null) {
 						vector.sub(cp.getPosition(), cpPrev.getPosition());

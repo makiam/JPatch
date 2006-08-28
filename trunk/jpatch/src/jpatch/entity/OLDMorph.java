@@ -11,7 +11,7 @@ import javax.vecmath.*;
 import jpatch.boundary.*;
 import jpatch.control.edit.*;
 
-public class Morph implements MutableTreeNode {
+public class OLDMorph implements MutableTreeNode {
 	boolean bInserted = false;
 	List<MorphTarget> listTargets = new ArrayList<MorphTarget>();
 	String strName;
@@ -20,17 +20,17 @@ public class Morph implements MutableTreeNode {
 	float fValue = 0;
 	Map mapMorph = new HashMap();
 	OLDModel model;
-	Morph() { }
+	OLDMorph() { }
 	EventListenerList eventListeners = new EventListenerList();
 	
 	private static final Pattern pattern = Pattern.compile("New morph #(\\d+)");
 	private static int num = 1;
 	
-	public Morph(OLDModel model) {
+	public OLDMorph(OLDModel model) {
 		this (model, false);
 	}
 			
-	public Morph(OLDModel model, boolean noAutoName) {
+	public OLDMorph(OLDModel model, boolean noAutoName) {
 		if (!noAutoName)
 			strName = "New morph #" + num++;
 		this.model = model;
@@ -172,7 +172,7 @@ public class Morph implements MutableTreeNode {
 //		System.out.println("f1 = " + f1);
 		
 		for (Iterator it = mapMorph.keySet().iterator(); it.hasNext(); ) {
-			ControlPoint cp = (ControlPoint) it.next();
+			OLDControlPoint cp = (OLDControlPoint) it.next();
 			Vector3f vector = (Vector3f) mapMorph.get(cp);
 			if (mt0 != null)
 				v0 = (Vector3f) mt0.getMorphMap().get(cp);
@@ -384,6 +384,6 @@ public class Morph implements MutableTreeNode {
 	 */
 	
 	public interface MorphListener extends EventListener {
-		public void valueChanged(Morph morph);
+		public void valueChanged(OLDMorph morph);
 	}
 }

@@ -2,19 +2,19 @@ package jpatch.control.edit;
 
 import javax.swing.tree.*;
 import jpatch.boundary.*;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDSelection;
 
 public class AtomicAddSelection extends JPatchAtomicEdit implements JPatchRootEdit {
 	
-	private Selection selection;
+	private OLDSelection selection;
 	private int index = -1;
 	
-	public AtomicAddSelection(Selection selection) {
+	public AtomicAddSelection(OLDSelection selection) {
 		this.selection = selection;
 		redo();
 	}
 	
-	public AtomicAddSelection(int index, Selection selection) {
+	public AtomicAddSelection(int index, OLDSelection selection) {
 		this.index = index;
 		this.selection = selection;
 		redo();

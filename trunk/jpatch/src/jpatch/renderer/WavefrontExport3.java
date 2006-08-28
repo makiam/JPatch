@@ -21,7 +21,7 @@ public class WavefrontExport3 {
 			file.write("#generated with JPatch (http://www.jpatch.com)");
 			file.newLine();
 			for (Iterator iterator = model.getMaterialList().iterator(); iterator.hasNext();) {
-				JPatchMaterial material = (JPatchMaterial)iterator.next();
+				OLDMaterial material = (OLDMaterial)iterator.next();
 				MaterialProperties mp = material.getMaterialProperties();
 				//System.out.println(material.getName());
 				file.newLine();
@@ -90,7 +90,7 @@ public class WavefrontExport3 {
 			 * output all quads, sorted by material
 			 */
 			for (Iterator iterator = model.getMaterialList().iterator(); iterator.hasNext();) {
-				JPatchMaterial material = (JPatchMaterial)iterator.next();
+				OLDMaterial material = (OLDMaterial)iterator.next();
 				file.write("usemtl " + material.getName().replace(' ','_'));
 				file.newLine();
 				switch (mode) {

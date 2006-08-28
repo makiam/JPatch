@@ -216,7 +216,7 @@ public class TimelineEditor extends JScrollPane {
 				if (((AnimModel) animObject).getModel().getMorphList().size() > 0)
 					listTracks.add(new HeaderTrack(this, "Morphs", -4, false));
 				for (Iterator it = ((AnimModel) animObject).getModel().getMorphList().iterator(); it.hasNext(); ) {
-					listTracks.add(new AvarTrack(this, ((MotionCurveSet.Model) mcs).morph((Morph) it.next())));
+					listTracks.add(new AvarTrack(this, ((MotionCurveSet.Model) mcs).morph((OLDMorph) it.next())));
 				}
 				if (((AnimModel) animObject).getModel().getBoneSet().size() > 0)
 					listTracks.add(new HeaderTrack(this, "Bones", -4, false));

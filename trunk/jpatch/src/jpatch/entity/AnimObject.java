@@ -152,7 +152,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 		float zMax = -Float.MAX_VALUE;
 		float zMin = Float.MAX_VALUE;
 		for (Iterator it = getModel().getCurveSet().iterator(); it.hasNext(); ) {
-			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+			for (OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				if (!cp.isHead())
 					continue;
 				Point3f p3 = cp.getPosition();
@@ -193,7 +193,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 				pivot.set(anchor.getPosition());
 		}
 		for (Iterator it = getModel().getCurveSet().iterator(); it.hasNext(); ) {
-			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+			for (OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				if (!cp.isHead())
 					continue;
 				Point3f p3 = cp.getPosition();
@@ -242,7 +242,7 @@ public abstract class AnimObject implements MutableTreeNode, Transformable {
 			return true;
 		}
 		for (Iterator it = getModel().getCurveSet().iterator(); it.hasNext(); ) {
-			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+			for (OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				if (!cp.isHead())
 					continue;
 				p3.set(cp.getPosition());

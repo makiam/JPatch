@@ -77,7 +77,7 @@ public class ChangeViewMouseListener extends MouseAdapter {
 			ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 			if (viewDef.getCamera() != null) {
 				System.out.println("*");
-				Camera camera = viewDef.getCamera();
+				OLDCamera camera = viewDef.getCamera();
 				ModifyAnimObject edit = new ModifyAnimObject(camera);
 				Quat4f newOrientation = camera.getOrientation();
 				float newFocalLength = camera.getFocalLength();

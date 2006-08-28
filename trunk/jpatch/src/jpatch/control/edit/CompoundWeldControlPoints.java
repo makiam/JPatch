@@ -4,9 +4,9 @@ import jpatch.entity.*;
 
 public class CompoundWeldControlPoints extends JPatchCompoundEdit {
 
-	public CompoundWeldControlPoints(ControlPoint cpA, ControlPoint cpB) {
-		ControlPoint cpLooseEndA = cpA.getLooseEnd();
-		ControlPoint cpLooseEndB = cpB.getLooseEnd();
+	public CompoundWeldControlPoints(OLDControlPoint cpA, OLDControlPoint cpB) {
+		OLDControlPoint cpLooseEndA = cpA.getLooseEnd();
+		OLDControlPoint cpLooseEndB = cpB.getLooseEnd();
 		// do both, cpA and cpB have 
 		if(cpLooseEndA == null || cpLooseEndB == null) {
 			// NO

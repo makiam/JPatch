@@ -13,17 +13,17 @@ public class TangentHandle extends Handle {
 	public static final int OUT = 2;
 	
 	private int iDirection;
-	private ControlPoint cp;
+	private OLDControlPoint cp;
 	private float fFactor = 1;
 	
-	public TangentHandle(Color3f color, ControlPoint cp, int direction) {
+	public TangentHandle(Color3f color, OLDControlPoint cp, int direction) {
 		super(null, color);
 		iDirection = direction;
 		this.cp = cp;
 		//iHitSize = 6;
 	}
 	
-	public void setControlPoint(ControlPoint cp) {
+	public void setControlPoint(OLDControlPoint cp) {
 		this.cp = cp;
 	}
 	
@@ -31,7 +31,7 @@ public class TangentHandle extends Handle {
 		return cp.getInMagnitude();
 	}
 	
-	public ControlPoint getCp() {
+	public OLDControlPoint getCp() {
 		return cp;
 	}
 	

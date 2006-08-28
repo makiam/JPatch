@@ -30,7 +30,7 @@ public class Animation implements MutableTreeNode {
 	
 	private List<AnimModel> listModels = new ArrayList<AnimModel>();
 	private List<AnimLight> listLights = new ArrayList<AnimLight>();
-	private List<Camera> listCameras = new ArrayList<Camera>();
+	private List<OLDCamera> listCameras = new ArrayList<OLDCamera>();
 	private List<JPatchDummyButton> dummyButtonList = new ArrayList<JPatchDummyButton>();
 	private Map<AnimObject, MotionCurveSet> mapMotionCurves = new HashMap<AnimObject, MotionCurveSet>();
 	private AnimTreeNode treenodeModels = new AnimTreeNode("Models", listModels);
@@ -71,7 +71,7 @@ public class Animation implements MutableTreeNode {
 		return fPosition;
 	}
 
-	public Camera getActiveCamera() {
+	public OLDCamera getActiveCamera() {
 		return listCameras.get(0);
 	}
 	
@@ -99,7 +99,7 @@ public class Animation implements MutableTreeNode {
 		for (AnimLight animLight:listLights) {
 			mapMotionCurves.get(animLight).setPosition(position);
 		}
-		for (Camera camera:listCameras) {
+		for (OLDCamera camera:listCameras) {
 			mapMotionCurves.get(camera).setPosition(position);
 		}
 		MainFrame.getInstance().getTimelineEditor().setCurrentFrame((int) position);
@@ -130,7 +130,7 @@ public class Animation implements MutableTreeNode {
 		setCurvesetFor(animLight, mcs);
 	}
 	
-	public void addCamera(final Camera camera, MotionCurveSet mcs) {
+	public void addCamera(final OLDCamera camera, MotionCurveSet mcs) {
 //		if (MainFrame.getInstance().getAnimation() != null)
 		MainFrame.getInstance().getTreeModel().insertNodeInto(camera, treenodeCameras, listCameras.size());
 		Actions.getInstance().addAction("camera" + camera.hashCode(), new ViewAction(camera), new JToggleButton.ToggleButtonModel());
@@ -139,13 +139,13 @@ public class Animation implements MutableTreeNode {
 	}
 	
 	private void removeAnimObject(AnimObject animObject) {
-		if (animObject instanceof Camera)
-			MainFrame.getInstance().getJPatchScreen().checkCameraViewports((Camera) animObject);
+		if (animObject instanceof OLDCamera)
+			MainFrame.getInstance().getJPatchScreen().checkCameraViewports((OLDCamera) animObject);
 		if (MainFrame.getInstance().getTimelineEditor().getAnimObject() == animObject) {
 			MainFrame.getInstance().getTimelineEditor().setAnimObject(null);
 			MainFrame.getInstance().getTimelineEditor().repaint();
 		}
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null && selection.getHotObject() == animObject) {
 			MainFrame.getInstance().setSelection(null);
 		}
@@ -163,7 +163,7 @@ public class Animation implements MutableTreeNode {
 		removeAnimObject(animLight);
 	}
 	
-	public void removeCamera(Camera camera) {
+	public void removeCamera(OLDCamera camera) {
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(camera);
 		Actions.getInstance().removeAction("camera" + camera.hashCode());
 		setupViewCameraMenu();
@@ -178,7 +178,7 @@ public class Animation implements MutableTreeNode {
 		return listLights;
 	}
 	
-	public List<Camera> getCameras() {
+	public List<OLDCamera> getCameras() {
 		return listCameras;
 	}
 	
@@ -191,7 +191,7 @@ public class Animation implements MutableTreeNode {
 			public Iterator<AnimObject> iterator() {
 				final Iterator<AnimModel> itModels = listModels.iterator();
 				final Iterator<AnimLight> itLights = listLights.iterator();
-				final Iterator<Camera> itCameras = listCameras.iterator();
+				final Iterator<OLDCamera> itCameras = listCameras.iterator();
 				return new Iterator<AnimObject>() {
 					public boolean hasNext() {
 						return itCameras.hasNext();
@@ -349,7 +349,7 @@ public class Animation implements MutableTreeNode {
 			Actions.getInstance().getButtonGroup("view").remove(button);
 		dummyButtonList.clear();
 		
-		for (final Camera cam : listCameras) {
+		for (final OLDCamera cam : listCameras) {
 			JToggleButton.ToggleButtonModel buttonModel = (JToggleButton.ToggleButtonModel) Actions.getInstance().getButtonModel("camera" + cam.hashCode());
 			JPatchRadioButtonMenuItem menuItem = new JPatchRadioButtonMenuItem(buttonModel) {
 				@Override

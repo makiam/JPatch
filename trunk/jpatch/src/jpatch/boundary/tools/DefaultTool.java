@@ -48,7 +48,7 @@ public class DefaultTool extends JPatchTool {
 	//private PointSelection ps;
 //	private Point3f[] ap3;
 //	private PivotHandle2 pivotHandle;
-	private ControlPoint cpHot;
+	private OLDControlPoint cpHot;
 	private OLDBone.BoneTransformable btHot;
 	//private int iMode;
 	private JPatchActionEdit edit;
@@ -127,7 +127,7 @@ public class DefaultTool extends JPatchTool {
 				MainFrame.getInstance().setHelpText("Drag to move point. Press right mousebutton to weld to closest point. Hold CTRL and press right mousebutton to attach to closest point.");
 				break;
 			case MOVE_GROUP:
-				if (MainFrame.getInstance().getSelection().getHotObject() instanceof ControlPoint) {
+				if (MainFrame.getInstance().getSelection().getHotObject() instanceof OLDControlPoint) {
 					MainFrame.getInstance().setHelpText("Drag to move selection. Press right mousebutton to weld to closest point");
 				} else {
 					MainFrame.getInstance().setHelpText("Drag to move selection.");
@@ -152,7 +152,7 @@ public class DefaultTool extends JPatchTool {
 	}
 	
 	protected boolean isHit(int x, int y, Matrix4f m4View) {
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		Point3f p3A = new Point3f();
 		Point3f p3B = new Point3f();
 		selection.getBounds(p3A, p3B);
@@ -232,7 +232,7 @@ public class DefaultTool extends JPatchTool {
 //		System.out.println("defaulttool paint");
 		//drawable.clearZBuffer();
 		JPatchDrawable2 drawable = viewDef.getDrawable();
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		
 //		if (MainFrame.getInstance().getJPatchScreen().showTangents() && tangentTool != null) tangentTool.paint(viewport, drawable); // FIXME
 //		System.out.println(selection);
@@ -330,7 +330,7 @@ public class DefaultTool extends JPatchTool {
 			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(false);
 			int x = mouseEvent.getX();
 			int y = mouseEvent.getY();
-			Selection selection = MainFrame.getInstance().getSelection();
+			OLDSelection selection = MainFrame.getInstance().getSelection();
 			
 			
 			//System.out.println ("ps = " + ps);
@@ -481,7 +481,7 @@ public class DefaultTool extends JPatchTool {
 				
 				/* if anim-object was hit... */
 				if (hitAnimObject != null) {
-					selection = new Selection(hitAnimObject);
+					selection = new OLDSelection(hitAnimObject);
 					edit.addEdit(new AtomicChangeSelection(selection));
 					if (xBone != null)
 						MainFrame.getInstance().selectTreeNode(xBone);
@@ -522,7 +522,7 @@ public class DefaultTool extends JPatchTool {
 							 * selection box was not hit
 							 * create a new selection containing only cphot
 							 */
-							edit.addEdit(new AtomicChangeSelection(new Selection(cpHot)));
+							edit.addEdit(new AtomicChangeSelection(new OLDSelection(cpHot)));
 							
 							/* set state */
 							iState = MOVE_SINGLE_POINT;
@@ -598,7 +598,7 @@ public class DefaultTool extends JPatchTool {
 								 * selection box was not hit
 								 * create a new selection containing only cphot
 								 */
-								edit.addEdit(new AtomicChangeSelection(new Selection(btHot)));
+								edit.addEdit(new AtomicChangeSelection(new OLDSelection(btHot)));
 								
 								/* set state */
 								iState = MOVE_SINGLE_BONENED;
@@ -682,7 +682,7 @@ public class DefaultTool extends JPatchTool {
 								Map map = new HashMap();
 								map.put(hitBone.getBoneEnd(), new Float(1));
 								map.put(hitBone.getParentBone() == null ? hitBone.getBoneStart() : hitBone.getParentBone().getBoneEnd(), new Float(1));
-								edit.addEdit(new AtomicChangeSelection(new Selection(map)));
+								edit.addEdit(new AtomicChangeSelection(new OLDSelection(map)));
 								
 								/* set state */
 								iState = MOVE_GROUP;
@@ -880,7 +880,7 @@ public class DefaultTool extends JPatchTool {
 					}
 				}
 				if (weld) {
-					Selection selection = MainFrame.getInstance().getSelection();
+					OLDSelection selection = MainFrame.getInstance().getSelection();
 					if (iState == MOVE_SINGLE_BONENED)
 						edit.addEdit(new AtomicChangeSelection(null));
 					else
@@ -895,7 +895,7 @@ public class DefaultTool extends JPatchTool {
 //				Viewport viewport = (Viewport)mouseEvent.getSource();
 				float[] hookPos = new float[1];
 				boolean singlePoint = (iState == MOVE_SINGLE_POINT);
-				ControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()),cpHot,hookPos,false,true);
+				OLDControlPoint cp = viewDef.getClosestControlPoint(new Point2D.Float(mouseEvent.getX(),mouseEvent.getY()),cpHot,hookPos,false,true);
 //				NewSelection selection = MainFrame.getInstance().getSelection();
 				if (cp != null && cp != cpHot.getPrev() && cp != cpHot.getNext()) {
 					if (hookPos[0] == -1) {
@@ -992,7 +992,7 @@ public class DefaultTool extends JPatchTool {
 		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) mouseEvent.getSource());
 		//Viewport viewport = (Viewport)mouseEvent.getSource();
 		if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
-			Selection selection = MainFrame.getInstance().getSelection();
+			OLDSelection selection = MainFrame.getInstance().getSelection();
 			
 			/* check if Control or Shift was down (on mouse release) and modify state if necessary */
 			if ((iState == DRAW_SELECTION || iState == ADD_MODIFY_SELECTION || iState == XOR_MODIFY_SELECTION) && selection != null) {
@@ -1035,7 +1035,7 @@ public class DefaultTool extends JPatchTool {
 					break;
 //FIXME					
 				case DRAW_SELECTION:
-					Selection sel = selectMouseMotionListener.getSelection(viewDef);
+					OLDSelection sel = selectMouseMotionListener.getSelection(viewDef);
 					if ((selection != null ^ sel != null) || sel != null && !sel.equals(selection)) {
 						MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(sel));
 						selectionChanged(sel);
@@ -1043,7 +1043,7 @@ public class DefaultTool extends JPatchTool {
 					((Component)mouseEvent.getSource()).removeMouseMotionListener(selectMouseMotionListener);
 					break;
 				case ADD_MODIFY_SELECTION: {
-					Selection newSelection = selectMouseMotionListener.getSelection(viewDef);
+					OLDSelection newSelection = selectMouseMotionListener.getSelection(viewDef);
 					if (newSelection != null) {
 						edit.addEdit(new AtomicModifySelection.AddObjects(selection, newSelection.getMap()));
 						edit.setName("add objects to selection");
@@ -1085,7 +1085,7 @@ public class DefaultTool extends JPatchTool {
 //						//compoundEdit.addEdit(new ChangeSelectionPivotEdit(ps,ps.getCenter(),null));
 //						MainFrame.getInstance().getUndoManager().addEdit(compoundEdit);
 //					}
-					Selection newSelection = selectMouseMotionListener.getSelection(viewDef);
+					OLDSelection newSelection = selectMouseMotionListener.getSelection(viewDef);
 					if (newSelection != null) {
 						edit.addEdit(new AtomicModifySelection.RemoveObjects(selection, newSelection.getMap()));
 						if (newSelection.contains(selection.getHotObject()))
@@ -1199,12 +1199,12 @@ public class DefaultTool extends JPatchTool {
 //		for (int i = 0, n = list.size(); i < n; i++) {
 //			((Transformable) list.get(i)).beginTransform();
 //		}
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		int mask;
 		if (MainFrame.getInstance().getEditedMorph() != null)
-			mask = Selection.MORPHTARGET;
+			mask = OLDSelection.MORPHTARGET;
 		else
-			mask = Selection.CONTROLPOINTS | Selection.MORPHS | Selection.BONES;
+			mask = OLDSelection.CONTROLPOINTS | OLDSelection.MORPHS | OLDSelection.BONES;
 //		System.out.println(MainFrame.getInstance().getEditedMorph() + " " + mask);
 		selection.arm(mask);
 		selection.beginTransform();
@@ -1223,7 +1223,7 @@ public class DefaultTool extends JPatchTool {
 //		for (int i = 0, n = list.size(); i < n; i++) {
 //			compoundEdit.addEdit(((Transformable) list.get(i)).endTransform();
 //		}
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		edit.addEdit(selection.endTransform());
 		MainFrame.getInstance().getUndoManager().addEdit(edit);
 		if (MainFrame.getInstance().getTimelineEditor() != null)
@@ -1240,7 +1240,7 @@ public class DefaultTool extends JPatchTool {
 //		}
 //	}
 	protected void translate(Vector3f v, ViewDefinition viewDef) {
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		Vector3f vv = new Vector3f(v);
 		if (selection.getHotObject() != null) {
 			float scale = ((Float) selection.getMap().get(selection.getHotObject())).floatValue();
@@ -1269,7 +1269,7 @@ public class DefaultTool extends JPatchTool {
 	}
 	
 	protected void scale(float scale, ViewDefinition viewDef) {
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		Matrix3f matrix = new Matrix3f(
 				scale, 0, 0,
 				0, scale, 0,
@@ -1363,12 +1363,12 @@ public class DefaultTool extends JPatchTool {
 //		MainFrame.getInstance().getJPatchScreen().single_update(viewDef.getDrawable().getComponent());
 //	}
 	
-	private void selectionChanged(Selection selection) {
+	private void selectionChanged(OLDSelection selection) {
 //		System.out.println("Selection changed: " + selection.getObjects());
 		MutableTreeNode leaf = null;
 		if (MainFrame.getInstance().getTree().getSelectionPath() != null)
 			leaf = (MutableTreeNode) MainFrame.getInstance().getTree().getSelectionPath().getLastPathComponent();
-		if (leaf == null || leaf == MainFrame.getInstance().getModel().getTreenodeSelections() || leaf == MainFrame.getInstance().getModel() || leaf instanceof Selection) {
+		if (leaf == null || leaf == MainFrame.getInstance().getModel().getTreenodeSelections() || leaf == MainFrame.getInstance().getModel() || leaf instanceof OLDSelection) {
 			//MainFrame.getInstance().getSideBar().enableTreeSelectionListener(false);
 			if (selection != null && !MainFrame.getInstance().getModel().checkSelection(selection)) {
 				MainFrame.getInstance().selectTreeNode(MainFrame.getInstance().getModel().getSelection(selection));

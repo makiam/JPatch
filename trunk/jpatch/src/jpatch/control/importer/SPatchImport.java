@@ -17,19 +17,19 @@ public class SPatchImport implements ModelImporter {
 		String[] astrPart;
 		Point3f[] ap3Point = new Point3f[0];
 		int[] aiLayer = new int[0];
-		ControlPoint[] acpHead = new ControlPoint[0];
+		OLDControlPoint[] acpHead = new OLDControlPoint[0];
 		int iVersion = 1;
 		int iHighestLayer = 0;
 		ArrayList[] layers = new ArrayList[MAX_LAYERS];
-		JPatchMaterial[] materials = new JPatchMaterial[MAX_LAYERS];
-		materials[0] = new JPatchMaterial(new Color3f(0.549f, 0.6745f, 0.4667f));
-		materials[1] = new JPatchMaterial(new Color3f(0.4784f, 0.5373f, 0.6706f));
-		materials[2] = new JPatchMaterial(new Color3f(0.6745f, 0.4667f, 0.4667f));
-		materials[3] = new JPatchMaterial(new Color3f(0.6902f, 0.6627f, 0.4509f));
-		materials[4] = new JPatchMaterial(new Color3f(0.6941f, 0.4471f, 0.6549f));
-		materials[5] = new JPatchMaterial(new Color3f(0.549f, 0.6745f, 0.4667f));
-		materials[6] = new JPatchMaterial(new Color3f(0.4784f, 0.5373f, 0.6706f));
-		materials[7] = new JPatchMaterial(new Color3f(0.6745f, 0.4667f, 0.4667f));
+		OLDMaterial[] materials = new OLDMaterial[MAX_LAYERS];
+		materials[0] = new OLDMaterial(new Color3f(0.549f, 0.6745f, 0.4667f));
+		materials[1] = new OLDMaterial(new Color3f(0.4784f, 0.5373f, 0.6706f));
+		materials[2] = new OLDMaterial(new Color3f(0.6745f, 0.4667f, 0.4667f));
+		materials[3] = new OLDMaterial(new Color3f(0.6902f, 0.6627f, 0.4509f));
+		materials[4] = new OLDMaterial(new Color3f(0.6941f, 0.4471f, 0.6549f));
+		materials[5] = new OLDMaterial(new Color3f(0.549f, 0.6745f, 0.4667f));
+		materials[6] = new OLDMaterial(new Color3f(0.4784f, 0.5373f, 0.6706f));
+		materials[7] = new OLDMaterial(new Color3f(0.6745f, 0.4667f, 0.4667f));
 		for (int l = 0; l < MAX_LAYERS; l++) {
 			layers[l] = new ArrayList();
 //			layers[l].setName("sPatch Layer " + l);
@@ -46,7 +46,7 @@ public class SPatchImport implements ModelImporter {
 					int iNumPoints = (new Integer(astrPart[1])).intValue();
 					ap3Point = new Point3f[iNumPoints];
 					aiLayer = new int[iNumPoints];
-					acpHead = new ControlPoint[iNumPoints];
+					acpHead = new OLDControlPoint[iNumPoints];
 					for (int p = 0;p < iNumPoints;p++) {
 						strLine = brFile.readLine().replaceFirst("\\s*","");
 						astrPart = strLine.split("\\s");
@@ -81,13 +81,13 @@ public class SPatchImport implements ModelImporter {
 						//Curve curve = new Curve();
 						//curve.closed = intToBoolean[(new Integer(astrPart[1])).intValue()];
 						int iClosed = (new Integer(astrPart[1])).intValue();
-						ControlPoint cpLast = null;
-						ControlPoint cpFirst = null;
+						OLDControlPoint cpLast = null;
+						OLDControlPoint cpFirst = null;
 						for (int p = 0;p < iPointsOnSpline;p++) {
 							strLine = brFile.readLine().replaceFirst("\\s*","");
 							astrPart = strLine.split("\\s");
 							int iPointID = (new Integer(astrPart[0])).intValue();
-							ControlPoint cp = new ControlPoint(ap3Point[iPointID]);
+							OLDControlPoint cp = new OLDControlPoint(ap3Point[iPointID]);
 							
 							//cp.addToGroup(aiLayer[iPointID]);
 							if (p == 0) {
@@ -96,9 +96,9 @@ public class SPatchImport implements ModelImporter {
 							
 							int iPeak = (new Integer(astrPart[1])).intValue();
 							if (iPeak == 1) {
-								cp.setMode(ControlPoint.SPATCH_ROUND);
+								cp.setMode(OLDControlPoint.SPATCH_ROUND);
 							} else {
-								cp.setMode(ControlPoint.PEAK);
+								cp.setMode(OLDControlPoint.PEAK);
 							}
 							
 							//cp.layer = layers[pointID];
@@ -127,7 +127,7 @@ public class SPatchImport implements ModelImporter {
 			brFile.close();
 			model.computePatches();
 			for (int l = 0; l <= iHighestLayer; l++) {
-				Selection selection = new Selection(layers[l]);
+				OLDSelection selection = new OLDSelection(layers[l]);
 				selection.setName("sPatch layer " + l);
 				model.addSelection(selection);
 				model.addMaterial(materials[l]);

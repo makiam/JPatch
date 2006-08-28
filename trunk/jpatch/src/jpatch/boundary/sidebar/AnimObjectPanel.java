@@ -120,8 +120,8 @@ public class AnimObjectPanel extends SidePanel implements ChangeListener {
 		detailPanel.add(inputPitch);
 		detailPanel.add(inputRoll);
 		detailPanel.add(new JSeparator(JSeparator.HORIZONTAL));
-		if (animObject instanceof Camera) {
-			inputFocalLength = new JPatchInput("Focal length:", ((Camera) animObject).getFocalLength());
+		if (animObject instanceof OLDCamera) {
+			inputFocalLength = new JPatchInput("Focal length:", ((OLDCamera) animObject).getFocalLength());
 			inputFocalLength.addChangeListener(this);
 			detailPanel.add(inputFocalLength);
 		} else if (animObject instanceof AnimModel) {
@@ -146,8 +146,8 @@ public class AnimObjectPanel extends SidePanel implements ChangeListener {
 		inputRoll.setValue(Math.toDegrees(animObject.getRoll()));
 		inputPitch.setValue(Math.toDegrees(animObject.getPitch()));
 		inputYaw.setValue(Math.toDegrees(animObject.getYaw()));
-		if (animObject instanceof Camera) {
-			inputFocalLength.setValue(((Camera) animObject).getFocalLength());
+		if (animObject instanceof OLDCamera) {
+			inputFocalLength.setValue(((OLDCamera) animObject).getFocalLength());
 		} else if (animObject instanceof AnimModel) {
 			inputScale.setValue(((AnimModel) animObject).getScale());
 		} else if (animObject instanceof AnimLight) {
@@ -200,7 +200,7 @@ public class AnimObjectPanel extends SidePanel implements ChangeListener {
 			JPatchActionEdit actionEdit = new JPatchActionEdit("change focal length");
 			actionEdit.addEdit(edit);
 			MainFrame.getInstance().getUndoManager().addEdit(actionEdit);
-			((Camera) animObject).setFocalLength(newFocalLength);
+			((OLDCamera) animObject).setFocalLength(newFocalLength);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 			MainFrame.getInstance().getTimelineEditor().repaint();
 		} else if (e.getSource() == inputSize) {

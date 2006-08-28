@@ -9,9 +9,9 @@ import jpatch.entity.*;
  * @created    26. Dezember 2003
  */
 public class AtomicDeleteControlPointFromCurve extends JPatchAtomicEdit {
-	private ControlPoint cp;
-	private ControlPoint cpNext;
-	private ControlPoint cpPrev;
+	private OLDControlPoint cp;
+	private OLDControlPoint cpNext;
+	private OLDControlPoint cpPrev;
 	
 	/**
 	 * Constructor
@@ -19,7 +19,7 @@ public class AtomicDeleteControlPointFromCurve extends JPatchAtomicEdit {
 	 *
 	 * @param  cp  ControlPoint to remove
 	 */
-	public AtomicDeleteControlPointFromCurve(ControlPoint cp) {
+	public AtomicDeleteControlPointFromCurve(OLDControlPoint cp) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + cp + ")");
 		/*

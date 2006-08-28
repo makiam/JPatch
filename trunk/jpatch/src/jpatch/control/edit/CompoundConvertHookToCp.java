@@ -7,13 +7,13 @@ import jpatch.entity.*;
 
 public class CompoundConvertHookToCp extends JPatchCompoundEdit {
 
-	public CompoundConvertHookToCp(ControlPoint hook) {
+	public CompoundConvertHookToCp(OLDControlPoint hook) {
 //		ControlPoint targetHook = hook.getPrevAttached();
-		ControlPoint startHook = hook.getStart();
-		ControlPoint endHook = hook.getEnd();
-		ControlPoint parentHook = startHook.getParentHook();
-		ControlPoint prevHook = hook.getPrev();
-		ControlPoint nextHook = hook.getNext();
+		OLDControlPoint startHook = hook.getStart();
+		OLDControlPoint endHook = hook.getEnd();
+		OLDControlPoint parentHook = startHook.getParentHook();
+		OLDControlPoint prevHook = hook.getPrev();
+		OLDControlPoint nextHook = hook.getNext();
 		Point3f position = hook.getPosition();
 		float hookPos = hook.getHookPos();
 		
@@ -41,7 +41,7 @@ public class CompoundConvertHookToCp extends JPatchCompoundEdit {
 			addEdit(new AtomicChangeControlPoint.ParentHook(startHook, hook));
 			addEdit(new AtomicChangeControlPoint.ChildHook(parentHook, null));
 			addEdit(new AtomicChangeControlPoint.ChildHook(hook, startHook));
-			for (ControlPoint cp = startHook; cp != null; cp = cp.getNext()) {
+			for (OLDControlPoint cp = startHook; cp != null; cp = cp.getNext()) {
 				float hp = cp.getHookPos();
 				if (hp > 0 && hp < 1)
 					addEdit(new AtomicChangeControlPoint.HookPos(cp, (hp - hookPos) / ( 1 - hookPos)));
@@ -51,7 +51,7 @@ public class CompoundConvertHookToCp extends JPatchCompoundEdit {
 			
 			/* modify hook curve */
 			addEdit(new AtomicChangeControlPoint.ParentHook(endHook, hook));
-			for (ControlPoint cp = startHook; cp != null; cp = cp.getNext()) {
+			for (OLDControlPoint cp = startHook; cp != null; cp = cp.getNext()) {
 				float hp = cp.getHookPos();
 				if (hp > 0 && hp < 1)
 					addEdit(new AtomicChangeControlPoint.HookPos(cp, hp / hookPos));
@@ -60,8 +60,8 @@ public class CompoundConvertHookToCp extends JPatchCompoundEdit {
 		} else {
 			
 			/* add a new hook curve and modify curves */
-			ControlPoint newStartHook = new ControlPoint();
-			ControlPoint newEndHook = new ControlPoint();
+			OLDControlPoint newStartHook = new OLDControlPoint();
+			OLDControlPoint newEndHook = new OLDControlPoint();
 			newEndHook.appendTo(newStartHook);
 			newStartHook.setParentHook(hook);
 			newStartHook.setHookPos(0);
@@ -69,8 +69,8 @@ public class CompoundConvertHookToCp extends JPatchCompoundEdit {
 			newEndHook.setHookPos(1);
 			addEdit(new AtomicChangeControlPoint.ParentHook(endHook, hook));
 			addEdit(new AtomicChangeControlPoint.ChildHook(hook, newStartHook));
-			ControlPoint cpAppend = newStartHook;
-			for (ControlPoint cp = startHook; cp != null; cp = cp.getNext()) {
+			OLDControlPoint cpAppend = newStartHook;
+			for (OLDControlPoint cp = startHook; cp != null; cp = cp.getNext()) {
 				float hp = cp.getHookPos();
 				if (hp > 0 && hp < 1) {
 					if (hp < hookPos) {

@@ -1,7 +1,7 @@
 package jpatch.control.edit;
 
 import jpatch.boundary.*;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDSelection;
 
 public abstract class JPatchAtomicEdit implements JPatchUndoableEdit {
 	
@@ -14,7 +14,7 @@ public abstract class JPatchAtomicEdit implements JPatchUndoableEdit {
 		System.out.println(prefix + name + " " + sizeOf());
 	}
 	
-	static final int selectionSize(Selection selection) {
+	static final int selectionSize(OLDSelection selection) {
 		return selection == null ? 0 : (8 + 4 + 4 + 4 + 4 + 8 * selection.getMap().size() * 2);
 	}
 }

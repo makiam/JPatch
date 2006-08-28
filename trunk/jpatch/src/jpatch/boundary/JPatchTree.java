@@ -27,7 +27,7 @@ public class JPatchTree extends JTree {
 //	private boolean dragStarted = false;
 //	private PointSelection dragSelection = null;
 //	private TreePath currentPath, lastPath = null;
-	private Selection dragSelection;
+	private OLDSelection dragSelection;
 	
 	public JPatchTree (TreeNode treeNode) {
 		super(treeNode);

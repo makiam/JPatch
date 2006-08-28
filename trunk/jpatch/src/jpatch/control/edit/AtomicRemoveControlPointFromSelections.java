@@ -31,22 +31,22 @@ import jpatch.boundary.*;
  *
  */
 public final class AtomicRemoveControlPointFromSelections extends JPatchAtomicEdit {
-	private final ControlPoint cp;
+	private final OLDControlPoint cp;
 	private final HashMap mapSelections = new HashMap();
 	
-	public AtomicRemoveControlPointFromSelections(ControlPoint cp) {
+	public AtomicRemoveControlPointFromSelections(OLDControlPoint cp) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + cp + ")");
 		this.cp = cp;
 		for (Iterator it = MainFrame.getInstance().getModel().getSelections().iterator(); it.hasNext(); ) {
-			Selection selection = (Selection) it.next();
+			OLDSelection selection = (OLDSelection) it.next();
 			Object weight = selection.getMap().get(cp);
 			if ((weight) != null) {
 				mapSelections.put(selection, weight);
 				selection.getMap().remove(cp);
 			}
 		}
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection != null) {
 			Object weight = selection.getMap().get(cp);
 			if ((weight) != null) {
@@ -58,14 +58,14 @@ public final class AtomicRemoveControlPointFromSelections extends JPatchAtomicEd
 	
 	public void undo() {
 		for (Iterator it = mapSelections.keySet().iterator(); it.hasNext(); ) {
-			Selection selection = (Selection) it.next();
+			OLDSelection selection = (OLDSelection) it.next();
 			selection.getMap().put(cp, mapSelections.get(selection)); 
 		}
 	}
 	
 	public void redo() {
 		for (Iterator it = mapSelections.keySet().iterator(); it.hasNext(); ) {
-			Selection selection = (Selection) it.next();
+			OLDSelection selection = (OLDSelection) it.next();
 			selection.getMap().remove(cp); 
 		}
 	}

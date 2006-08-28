@@ -46,7 +46,7 @@ public class XYZLockConstraints {
 		return bZLock;
 	}
 	
-	public void setControlPointPosition(ControlPoint cp, Point3f position) {
+	public void setControlPointPosition(OLDControlPoint cp, Point3f position) {
 		Point3f p3Pos = cp.getPosition();
 		//Point3f p3 = new Point3f();
 		p3Pos.x = bXLock ? p3Pos.x : position.x;

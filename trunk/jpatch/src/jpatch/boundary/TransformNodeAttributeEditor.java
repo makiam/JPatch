@@ -45,25 +45,25 @@ public class TransformNodeAttributeEditor extends AbstractAttributeEditor {
 		ExpandableForm scaleForm = new ExpandableForm();
 		ExpandableForm shearForm = new ExpandableForm();
 		
-		addScalar(defaultForm, transformNode.name);
-		addScalar(defaultForm, transformNode.visibility);
-		addTuple(translationForm, transformNode.translation);
+		addScalar(defaultForm, "Name", transformNode.name);
+		addScalar(defaultForm, "Visibility", transformNode.visibility);
+		addTuple(translationForm, "Translation", transformNode.translation);
 		addLimit(translationForm, transformNode.translation);
-		addTuple(positionForm, transformNode.position);
-		addTuple(rotationForm, transformNode.rotation);
-		addScalar(rotationForm, transformNode.rotationOrder);
+		addTuple(positionForm, "Position", transformNode.position);
+		addTuple(rotationForm, "Rotation", transformNode.rotation);
+		addScalar(rotationForm, "Order", transformNode.rotationOrder);
 		addLimit(rotationForm, transformNode.rotation);
-		addTuple(rotationForm, transformNode.rotatePivotTranslation);
-		addTuple(rotationForm, transformNode.rotatePivotPosition);
+		addTuple(rotationForm, "Pivot Transl.", transformNode.rotatePivotTranslation);
+		addTuple(rotationForm, "Pivot Pos.",transformNode.rotatePivotPosition);
 		
-		addTuple(orientationForm, transformNode.orientation);
+		addTuple(orientationForm, "Orientation", transformNode.orientation);
 		
 //		addScalar(transformNode.rotation.order);
-		addTuple(scaleForm, transformNode.scale);
+		addTuple(scaleForm, "Scale", transformNode.scale);
 //		addLimit(scaleForm, transformNode.scale);
-		addTuple(scaleForm, transformNode.scalePivotTranslation);
-		addTuple(scaleForm, transformNode.scalePivotPosition);
-		addTuple(shearForm, transformNode.shear);
+		addTuple(scaleForm, "Pivot Transl.", transformNode.scalePivotTranslation);
+		addTuple(scaleForm, "Pivot Pos.", transformNode.scalePivotPosition);
+		addTuple(shearForm, "Shear", transformNode.shear);
 		
 //		addTuple(shear, transformNode.scale);
 //		addTuple(transformNode.rotatePivotPosition);

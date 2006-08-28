@@ -28,7 +28,7 @@ import jpatch.entity.*;
  *
  */
 public class CompoundAttachControlPoints extends JPatchCompoundEdit {
-	public CompoundAttachControlPoints(ControlPoint cpA, ControlPoint cpB) {
+	public CompoundAttachControlPoints(OLDControlPoint cpA, OLDControlPoint cpB) {
 		addEdit(new CompoundReplaceControlPointInEntities(cpA, cpB));
 		addEdit(new AtomicAttachControlPoints(cpA, cpB));
 	}

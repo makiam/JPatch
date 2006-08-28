@@ -8,7 +8,7 @@ import javax.swing.ImageIcon;
 
 import jpatch.boundary.MainFrame;
 import jpatch.boundary.mouse.KnifeMouseAdapter;
-import jpatch.entity.Selection;
+import jpatch.entity.OLDSelection;
 
 
 /**
@@ -29,7 +29,7 @@ public class KnifeAction extends AbstractAction {
 	public void actionPerformed(ActionEvent arg0) {
 		//System.out.println("Knife tool activated");
 		
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection!=null && !selection.isSingle()) {
 			MainFrame.getInstance().setHelpText("Click and drag mouse to draw a cutting line. Release mouse button to cut. Press right mouse button to cancel.");
 			MainFrame.getInstance().getJPatchScreen().enablePopupMenu(false);

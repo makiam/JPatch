@@ -32,7 +32,7 @@ import jpatch.entity.*;
  * @author sascha
  */
 public class CompoundDropControlPoint extends JPatchCompoundEdit {
-	public CompoundDropControlPoint(ControlPoint cp) {
+	public CompoundDropControlPoint(OLDControlPoint cp) {
 		if (DEBUG)
 			System.out.println(getClass().getName() + "(" + cp + ")");
 		if (cp.isDeleted())
@@ -61,7 +61,7 @@ public class CompoundDropControlPoint extends JPatchCompoundEdit {
 		if (cp.getNextAttached() != null && cp.getNextAttached().isHook()) {
 			// YES
 			// remove hook from hook-curve
-			ControlPoint na = cp.getNextAttached();
+			OLDControlPoint na = cp.getNextAttached();
 			addEdit(new AtomicDetatchControlPoint(cp));
 			addEdit(new CompoundRemoveControlPoint(na));
 		} else {

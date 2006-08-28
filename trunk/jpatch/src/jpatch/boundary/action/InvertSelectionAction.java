@@ -26,13 +26,13 @@ public final class InvertSelectionAction extends AbstractAction {
 		//if (ps != null) {
 		//	boolean selectCurveOnly = (ps.isSingle() && (ps.isCurve() || ps.getControlPoint().getPrevAttached() == null));
 		ArrayList list = new ArrayList();
-		Selection selection = MainFrame.getInstance().getSelection();
+		OLDSelection selection = MainFrame.getInstance().getSelection();
 		for (Iterator it = MainFrame.getInstance().getModel().getCurveSet().iterator(); it.hasNext(); ) {
-			for (ControlPoint cp = (ControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
+			for (OLDControlPoint cp = (OLDControlPoint) it.next(); cp != null; cp = cp.getNextCheckNextLoop()) {
 				if (!selection.contains(cp) && cp.isHead() && !cp.isHidden() && !cp.isStartHook() && !cp.isEndHook()) list.add(cp);
 			}
 		}
-		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new Selection(list)));
+		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeSelection(new OLDSelection(list)));
 		MainFrame.getInstance().getJPatchScreen().update_all();
 		//}
 	}
