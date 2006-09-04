@@ -7,12 +7,16 @@ import jpatch.entity.Attribute;
 
 public class EditModel {
 
+	private static final boolean DEBUG = true;
 	/**
 	 * Facotory method that creates a new JPatchUndoableEdit which adds a curve to its model.
 	 * The model is derived from the ControlPoint.
 	 * @param curveStart the start ControlPoint of the curve to add.
 	 */
 	public static JPatchUndoableEdit addCurve(ControlPoint curveStart) {
+		if (DEBUG) {
+			System.out.println("EditModel.addCurve(" + curveStart + ")");
+		}
 		return new AddCurve(curveStart);
 	}
 	
@@ -22,10 +26,16 @@ public class EditModel {
 	 * @param curveStart the start ControlPoint of the curve to remove.
 	 */
 	public static JPatchUndoableEdit removeCurve(ControlPoint curveStart) {
+		if (DEBUG) {
+			System.out.println("EditModel.removeCurve(" + curveStart + ")");
+		}
 		return new RemoveCurve(curveStart);
 	}
 	
 	public static void appendControlPoint(List<JPatchUndoableEdit> editList, ControlPoint a, ControlPoint b) {
+		if (DEBUG) {
+			System.out.println("EditModel.appendControlPoint(" + editList + ", " + a + ", " + b + ")");
+		}
 		assert a.isStart() || a.isEnd() : a + " is neither start nor end of curve.";
 		assert b.isStart() || b.isEnd() : b + " is neither start nor end of curve.";
 		assert !a.isLoop() : a + " is looped.";
@@ -60,6 +70,7 @@ public class EditModel {
 			}
 			editList.add(removeCurve(a));							// remove curve A from model
 		}
+		test.GlTest.model.xml(System.out, ">");
 	}
 	
 	/**
@@ -72,12 +83,20 @@ public class EditModel {
 	 * @param b the point a will be appended to (b must be a curve end)
 	 */
 	private static void simpleAppendControlPoint(List<JPatchUndoableEdit> editList, ControlPoint a, ControlPoint b) {
-		assert a.isStart() : a + " is not a curve start";
-		assert !a.isLoop() : a + " is looped";
-		assert b.isEnd() : b + " is not a curve end";
+		if (DEBUG) {
+			System.out.println("EditModel.simpleAppendControlPoint(" + editList + ", " + a + ", " + b + ")");
+		}
+//		assert a.isStart() : a + " is not a curve start";
+//		assert !a.isLoop() : a + " is looped";
+//		assert b.isEnd() : b + " is not a curve end";
 		/* append A to B */
+		System.out.println("before: b=" + b + " b.next=" + b.getNext());
+		System.out.println("        a=" + a + " a.prev=" + a.getPrev());
 		editList.add(EditControlPoint.changeNext(b, a));
 		editList.add(EditControlPoint.changePrev(a, b));
+		System.out.println("after: b=" + b + " b.next=" + b.getNext());
+		System.out.println("        a=" + a + " a.prev=" + a.getPrev());
+		b.getStart().xml(System.out, "\t");
 	}
 	
 	/**
@@ -88,6 +107,9 @@ public class EditModel {
 	 * @param b the point a will be attach to (b must be a tail)
 	 */
 	public static void attachControlPoint(List<JPatchUndoableEdit> editList, ControlPoint a, ControlPoint b) {
+		if (DEBUG) {
+			System.out.println("EditModel.attachControlPoint(" + editList + ", " + a + ", " + b + ")");
+		}
 		assert a.isHead() : a + " is not a head";
 		assert b.isTail() : b + " is not a tail";
 		/* attach A to B */
@@ -104,6 +126,9 @@ public class EditModel {
 	 * @return a new ControlPoint, inserted after prevCp
 	 */
 	public static ControlPoint insertControlPoint(List<JPatchUndoableEdit> editList, ControlPoint prevCp) {
+		if (DEBUG) {
+			System.out.println("EditModel.insertControlPoint(" + editList + ", " + prevCp + ")");
+		}
 		ControlPoint newCp = new ControlPoint(prevCp.getModel());
 		ControlPoint nextCp = prevCp.getNext();
 		newCp.setNext(nextCp);
@@ -126,6 +151,9 @@ public class EditModel {
 	 * @param changeNow true to apply the change now
 	 */
 	public static void detachControlPoint(List<JPatchUndoableEdit> editList, ControlPoint cp) {
+		if (DEBUG) {
+			System.out.println("EditModel.detachControlPoint(" + editList + ", " + cp + ")");
+		}
 		if (cp.getPrevAttached() != null) {
 			/* set nextAttachedCp on prevAttachedCp (if prevAttachedCp != null) */
 			editList.add(EditControlPoint.changeNextAttached(cp.getPrevAttached(), cp.getNextAttached()));
@@ -147,6 +175,9 @@ public class EditModel {
 	 * @param changeNow true to apply the change now
 	 */
 	public static void deleteCurve(List<JPatchUndoableEdit> editList, ControlPoint curveStart, ControlPoint notToDetach) {
+		if (DEBUG) {
+			System.out.println("EditModel.deleteCurve(" + editList + ", " + curveStart + ", " + notToDetach + ")");
+		}
 		assert curveStart.isStart() : curveStart + " is not the start of a curve";
 		ControlPoint cp = curveStart;
 		do {
@@ -171,6 +202,9 @@ public class EditModel {
 	 * @param head the (head) ControlPoint to delete.
 	 */ 
 	public static void deleteHeadPoint(List<JPatchUndoableEdit> editList, ControlPoint head) {
+		if (DEBUG) {
+			System.out.println("EditModel.deleteHeadPoint(" + editList + ", " + head + ")");
+		}
 		assert head.isHead() : head + " is not a head.";
 		for (ControlPoint cp = head; cp != null; cp = cp.getNextAttached()) {
 			deleteSingleControlPointOrCurve(editList, cp, false);
@@ -191,6 +225,9 @@ public class EditModel {
 	 * @param cp the ControlPoint to delete.
 	 */
 	public static void deleteSingleControlPoint(List<JPatchUndoableEdit> editList, ControlPoint cp) {
+		if (DEBUG) {
+			System.out.println("EditModel.deleteHeadPoint(" + editList + ", " + cp + ")");
+		}
 		deleteSingleControlPointOrCurve(editList, cp, true);
 	}
 	
@@ -211,6 +248,9 @@ public class EditModel {
 	 * The former will want to set detach to false, the latter to true.
 	 */
 	private static void deleteSingleControlPointOrCurve(List<JPatchUndoableEdit> editList, ControlPoint cp, boolean detach) {
+		if (DEBUG) {
+			System.out.println("EditModel.deleteHeadPoint(" + editList + ", " + cp + ", " + detach + ")");
+		}
 		/*
 		 * Check if the entire curve needs to be deleted. This is the case if the curve length < 3 or the curve length = 3
 		 * and the curve is a loop or the curve length = 3 and the ControlPoint is the middel ControlPoint.
@@ -257,6 +297,9 @@ public class EditModel {
 	 * @param cp the ControlPoint to delete
 	 */
 	private static void deleteSingleControlPointOnly(List<JPatchUndoableEdit> editList, ControlPoint cp) {
+		if (DEBUG) {
+			System.out.println("EditModel.deleteHeadPoint(" + editList + ", " + cp + ")");
+		}
 		ControlPoint start = cp.getStart();
 		ControlPoint prev = cp.getPrev();
 		ControlPoint next = cp.getNext();
@@ -298,6 +341,9 @@ public class EditModel {
 	 * @param cp the ControlPoint to remove from all entities
 	 */
 	public static void removeControlPointFromEntities(List<JPatchUndoableEdit> editList, ControlPoint cp) {
+		if (DEBUG) {
+			System.out.println("EditModel.removeControlPointFromEntities(" + editList + ", " + cp + ")");
+		}
 		// TODO implement this edit!!!!
 	}
 	
@@ -310,6 +356,9 @@ public class EditModel {
 	 * @param to the replacement
 	 */
 	public static void replaceControlPointInEntities(List<JPatchUndoableEdit> editList, ControlPoint from, ControlPoint to) {
+		if (DEBUG) {
+			System.out.println("EditModel.replaceControlPointInEntities(" + editList + ", " + from + ", " + to + ")");
+		}
 		// TODO implement this edit!!!!
 	}
 	
@@ -322,6 +371,9 @@ public class EditModel {
 	 * @param hook the hook to convert
 	 */
 	public static void convertControlPointToNonHook(List<JPatchUndoableEdit> editList, ControlPoint hook) {
+		if (DEBUG) {
+			System.out.println("EditModel.convertControlPointToNonHook(" + editList + ", " + hook + ")");
+		}
 		assert hook.isHook() : hook + " is not a hook.";
 		double hookPos = hook.hookPos.get();
 		double hookPos1 = 1 - hookPos;
@@ -345,6 +397,9 @@ public class EditModel {
 	 * @param target the ControlPoint cp will be welded to
 	 */
 	public static void weldControlPoint(List<JPatchUndoableEdit> editList, ControlPoint cp, ControlPoint target) {
+		if (DEBUG) {
+			System.out.println("EditModel.weldControlPoint(" + editList + ", " + cp + ", " + target + ")");
+		}
 		Attribute.Tuple3 cpPos = cp.getHead().position;
 		Attribute.Tuple3 targetPos = target.getHead().position;
 		ControlPoint cpEnd = getCurveEnd(cp.getHead(), targetPos.x.get(), targetPos.y.get(), targetPos.z.get());
@@ -352,6 +407,7 @@ public class EditModel {
 		if (cpEnd != null && targetEnd != null && (cpEnd.isUnattached() || targetEnd.isUnattached())) {
 			appendControlPoint(editList, cpEnd, targetEnd);
 		} else {
+			System.out.println("***attach***");
 			attachControlPoint(editList, cp.getHead(), target.getTail());
 		}
 	}
@@ -367,6 +423,9 @@ public class EditModel {
 	 * @param target the ControlPoint cp will be welded to
 	 */
 	public static ControlPoint weldTo(List<JPatchUndoableEdit> editList, ControlPoint target, double x, double y, double z) {
+		if (DEBUG) {
+			System.out.println("EditModel.weldTo(" + editList + ", " + target + ", " + x + ", " + y + ", " + z + ")");
+		}
 		ControlPoint startCp = new ControlPoint(target.getModel());
 		ControlPoint newCp = new ControlPoint(target.getModel());
 		startCp.setNext(newCp);
@@ -374,6 +433,7 @@ public class EditModel {
 		newCp.position.set(x, y, z);
 		editList.add(addCurve(startCp));
 		weldControlPoint(editList, startCp, target);
+		System.out.println("\treturning " + newCp);
 		return newCp;
 	}
 	
@@ -436,6 +496,7 @@ public class EditModel {
 		ControlPoint curveStart;
 		private AddCurve(ControlPoint curveStart) {
 			this.curveStart = curveStart;
+			applied = false;
 			redo();
 		}
 		
@@ -459,6 +520,7 @@ public class EditModel {
 		ControlPoint curveStart;
 		private RemoveCurve(ControlPoint curveStart) {
 			this.curveStart = curveStart;
+			applied = false;
 			redo();
 		}
 		

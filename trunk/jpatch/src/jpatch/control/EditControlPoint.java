@@ -182,8 +182,8 @@ public class EditControlPoint {
 		
 		@Override
 		protected void swap() {
-			ControlPoint tmp = cp.getPrev();
-			cp.setPrev(prevAttached);
+			ControlPoint tmp = cp.getPrevAttached();
+			cp.setPrevAttached(prevAttached);
 			prevAttached = tmp;
 		}
 	}

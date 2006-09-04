@@ -111,7 +111,7 @@ public class ExpandableForm extends JComponent {
 			}
 
 			public void addLayoutComponent(Component comp, Object constraints) {
-				System.out.println("addLayoutComponent(" + comp + ", " + constraints + ")");
+//				System.out.println("addLayoutComponent(" + comp + ", " + constraints + ")");
 				Dimension size = comp.getPreferredSize();
 				if (comp instanceof JLabel) {
 					if (size.width > labelWidth)

@@ -120,7 +120,7 @@ public class Model extends AbstractNamedObject {
 	}
 	
 	public void removeCurve(ControlPoint cp) {
-		assert cp.isStart() : "ControlPoint " + cp + " is not the start of a curve";
+//		assert cp.isStart() : "ControlPoint " + cp + " is not the start of a curve";
 		assert curves.contains(cp) : "Curve " + cp + " does not exist in model " + cp.getModel() + ".";
 		curves.remove(cp);
 	}
@@ -143,12 +143,15 @@ public class Model extends AbstractNamedObject {
 	
 	public void initControlPoints() {
 		for (ControlPoint start : curves) {
-			ControlPoint cp = start;
-			do {
-				cp.computeTangents(false);
-				cp = cp.getNextNonHook();
-			} while (cp != null && ! cp.isLoop());
+			computeCurveTangents(start);
 		}
+	}
+	
+	public void computeCurveTangents(ControlPoint cp) {
+		do {
+			cp.computeTangents(false);
+			cp = cp.getNextNonHook();
+		} while (cp != null && ! cp.isLoop());
 	}
 	
 	public void xml(PrintStream out, String indent) {
