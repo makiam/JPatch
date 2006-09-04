@@ -8,6 +8,8 @@ import jpatch.boundary.settings.*;
 import jpatch.entity.*;
 
 public abstract class Viewport extends AbstractJPatchXObject {
+	public static final double MIN_DIST_SQ = 64;
+	
 	public Attribute.Enum<View> viewType = new Attribute.Enum<View>(View.FRONT);
 	public Attribute.Tuple2 viewRotation = new Attribute.Tuple2("Rotation", 0, 0, false);
 	public Attribute.Tuple2 viewTranslation = new Attribute.Tuple2("Translation", 0, 0, false);
@@ -20,6 +22,8 @@ public abstract class Viewport extends AbstractJPatchXObject {
 	protected final int id;
 	protected Component component;
 	protected Matrix4d matrix = new Matrix4d();
+	protected Matrix4d inverseMatrix = new Matrix4d();
+	protected double zPos;
 	protected double fw;
 	protected Camera camera;
 	protected static final int maxSubdiv = 10;
@@ -161,6 +165,47 @@ public abstract class Viewport extends AbstractJPatchXObject {
 		return component;
 	}
 	
+	public Point3d get3DPosition(float x, float y, Point3d p) {
+		x -= (component.getWidth() >> 1);
+		y = (component.getHeight() >> 1) - y;
+		p.set(x, y, zPos);
+		inverseMatrix.transform(p);
+		return p;
+	}
+	
+	public Point get2DPosition(Point3d p3d, Point p2d) {
+		p0.set(p3d);
+		matrix.transform(p0);
+		p0.x += (component.getWidth() >> 1);
+		p0.y = (component.getHeight() >> 1) - p0.y;
+		p2d.x = (int) p0.x;
+		p2d.y = (int) p0.y;
+		return p2d;
+	}
+	
+	public ControlPoint getControlPointAt(float x, float y, Model model) {
+		x -= (component.getWidth() >> 1);
+		y = (component.getHeight() >> 1) - y;
+		ControlPoint hit = null;
+		for (ControlPoint start : model.getCurves()) {
+			ControlPoint cp = start;
+			double min = MIN_DIST_SQ;
+			do {
+				cp.getPos(p0);
+				matrix.transform(p0);
+				double dx = x - p0.x;
+				double dy = y - p0.y;
+				double distanceSq = dx * dx + dy * dy;
+				if (distanceSq < min) {
+					min = distanceSq;
+					hit = cp;
+				}
+				cp = cp.getNextNonHook();
+			} while (cp != null && ! cp.isLoop());
+		}
+		return hit;
+	}
+	
 	protected void computeMatrices() {
 		double scale = viewScale.get();
 		double x = Math.toRadians(viewRotation.x.get());
@@ -182,6 +227,8 @@ public abstract class Viewport extends AbstractJPatchXObject {
 		matrix.m03 = viewTranslation.x.get() * scale;
 		matrix.m13 = viewTranslation.y.get() * scale;
 		matrix.m23 = 0;
+		
+		inverseMatrix.invert(matrix);
 	}
 	
 	protected abstract void drawGrid();
@@ -193,26 +240,25 @@ public abstract class Viewport extends AbstractJPatchXObject {
 	
 	protected abstract void drawLine(double x0, double y0, double z0, double x1, double y1, double z1);
 	
-	protected void drawCurve(ControlPoint cp) {
-		cp.getPos(p0);
-		cp.getPathSegmentCVs(p1, p2, p3);
+	protected void drawCurve(ControlPoint start) {
+		start.getPos(p0);
+		start.getPathSegmentCVs(p1, p2, p3);
 		matrix.transform(p0);
 		matrix.transform(p1);
 		matrix.transform(p2);
 		matrix.transform(p3);
 		drawCurveSegment(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, p3.x, p3.y, p3.z, false, 0);
-		do {
-			cp = cp.getNextNonHook();
-			if (cp == null) {
+		for (ControlPoint cp = start.getNextNonHook(); cp != null && !cp.isLoop(); cp = cp.getNextNonHook()) {
+			p0.set(p3);
+			if (cp.getPathSegmentCVs(p1, p2, p3)) {
+				matrix.transform(p1);
+				matrix.transform(p2);
+				matrix.transform(p3);
+				drawCurveSegment(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, p3.x, p3.y, p3.z, false, 0);
+			} else {
 				break;
 			}
-			p0.set(p3);
-			cp.getPathSegmentCVs(p1, p2, p3);
-			matrix.transform(p1);
-			matrix.transform(p2);
-			matrix.transform(p3);
-			drawCurveSegment(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, p3.x, p3.y, p3.z, false, 0);
-		} while (!cp.isLoop());
+		}
 	}
 	
 	protected void drawCurveSegment(

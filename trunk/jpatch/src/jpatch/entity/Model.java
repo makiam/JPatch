@@ -150,6 +150,7 @@ public class Model extends AbstractNamedObject {
 			} while (cp != null && ! cp.isLoop());
 		}
 	}
+	
 	public void xml(PrintStream out, String indent) {
 		renumberControlPoints();
 		out.append(indent);
