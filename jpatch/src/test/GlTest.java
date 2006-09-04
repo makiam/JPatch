@@ -6,16 +6,18 @@ import java.util.*;
 import javax.swing.*;
 
 import jpatch.boundary.*;
+import jpatch.boundary.newtools.*;
 import jpatch.entity.*;
 
 public class GlTest {
 
+	public static Model model = new Model();
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		JFrame frame = new JFrame("OpenGL Test");
-		final Model model = new Model();
 		Iterable<Model> models = new Iterable<Model>() {
 			public Iterator<Model> iterator() {
 				return new Iterator<Model>() {
@@ -63,6 +65,9 @@ public class GlTest {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		model.xml(System.out, "");
+		
+		JPatchTool tool = new AddCurveTool();
+		tool.registerListeners(new Viewport[] { viewport } );
 	}
 
 }

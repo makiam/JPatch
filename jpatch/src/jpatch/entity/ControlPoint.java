@@ -146,7 +146,7 @@ public class ControlPoint extends AbstractJPatchXObject {
 	
 	/**
 	 * Sets the next ControlPoint.
-	 * @param nextAttached the next ControlPoint
+	 * @param next the next ControlPoint
 	 */
 	public void setNext(ControlPoint next) {
 		this.nextCp = next;
@@ -263,8 +263,11 @@ public class ControlPoint extends AbstractJPatchXObject {
 	 * @return the next ControlPoint that is not a hook
 	 */
 	public ControlPoint getNextNonHook() {
+		if (nextCp == null) {
+			return null;
+		}
 		ControlPoint cp = nextCp;
-		while (cp != null && cp.isHook()) {
+		while (cp.nextCp != null && cp.isHook()) {
 			cp = cp.nextCp;
 		}
 		return cp;
@@ -275,8 +278,11 @@ public class ControlPoint extends AbstractJPatchXObject {
 	 * @return the previous ControlPoint that is not a hook
 	 */
 	public ControlPoint getPrevNonHook() {
+		if (prevCp == null) {
+			return null;
+		}
 		ControlPoint cp = prevCp;
-		while (cp != null && cp.isHook()) {
+		while (cp.prevCp != null && cp.isHook()) {
 			cp = cp.prevCp;
 		}
 		return cp;
@@ -337,11 +343,15 @@ public class ControlPoint extends AbstractJPatchXObject {
 	 * @param p2 the third Bezier control vertex
 	 * @param p3 the forth Bezier control vertex
 	 */
-	public void getPathSegmentCVs(Tuple3d p1, Tuple3d p2, Tuple3d p3) {
+	public boolean getPathSegmentCVs(Tuple3d p1, Tuple3d p2, Tuple3d p3) {
 		ControlPoint nextNonHook = getNextNonHook();
+		if (nextNonHook == null) {
+			return false;
+		}
 		p1.set(outTangent);
 		p2.set(nextNonHook.inTangent);
 		p3.set(nextNonHook.getHead().pos);
+		return true;
 	}
 	
 	/**

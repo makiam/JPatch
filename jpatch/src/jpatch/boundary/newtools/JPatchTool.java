@@ -1,10 +1,9 @@
 package jpatch.boundary.newtools;
 
-import java.awt.Component;
-import jpatch.boundary.ViewDefinition;
+import jpatch.boundary.*;
 
 public interface JPatchTool {
-	void registerListeners(Component[] components);
-	void unregisterListeners(Component[] components);
-	void draw(ViewDefinition viewDef);
+	void registerListeners(Viewport[] viewports);
+	void unregisterListeners(Viewport[] viewports);
+	void draw(Viewport viewport);
 }

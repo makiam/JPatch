@@ -312,8 +312,8 @@ public class Viewport2 {
 			OLDBone bone = (OLDBone) it.next();
 			boneRenderer.drawBone(drawable, viewDef, bone);
 		}
-		Bone b = new Bone();
-		boneRenderer2.drawBone(drawable, viewDef, b);
+//		Bone b = new Bone();
+//		boneRenderer2.drawBone(drawable, viewDef, b);
 	}
 	
 	public void drawAnimFrame(Animation animation) {
@@ -369,6 +369,9 @@ public class Viewport2 {
 		fDeltaZ += 50;
 		//fMinZ -= 1;
 		
+<<<<<<< .mine
+		
+=======
 		if (viewDef.renderCurves()) {
 			drawable.setColor(settings.colors.curves); // FIXME
 			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
@@ -377,6 +380,7 @@ public class Viewport2 {
 					drawCurve(start);
 			}
 		}
+>>>>>>> .r325
 		Color3f cSelected = settings.colors.selectedPoints;
 		Color3f cPoint = settings.colors.points;
 		Color3f cHeadPoint = settings.colors.headPoints;
@@ -666,6 +670,14 @@ public class Viewport2 {
 		}
 		if (drawable.isLightingSupported())
 			drawable.setLightingEnabled(false);
+		if (viewDef.renderCurves()) {
+			drawable.setColor(settings.colors.curves); // FIXME
+			for (Iterator it = model.getCurveSet().iterator(); it.hasNext(); ) {
+				ControlPoint start = (ControlPoint) it.next();
+				if (!start.isStartHook())
+					drawCurve(start);
+			}
+		}
 //		System.out.println();
 	}
 	

@@ -407,6 +407,11 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 				}
 				
 				gl.glEnable( GL.GL_POLYGON_OFFSET_FILL );
+//				gl.glEnable(GL.GL_POINT_SMOOTH);
+				gl.glEnable(GL.GL_LINE_SMOOTH);
+//				gl.glLineWidth(1.0f);
+				
+				gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 			}
 			
 			public void reshape(GLDrawable glDrawable, int x, int y, int width, int height) {
@@ -511,7 +516,8 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		    gl.glDisable(GL.GL_LIGHTING);
 			gl.glDisable(GL.GL_DEPTH_TEST);
 			gl.glShadeModel(GL.GL_FLAT);
-		} 
+		}
+		//gl.glLineWidth(1.5f);
 	}
 	
 //	private void makeImageList() {
@@ -524,18 +530,18 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 //		gl.glDrawPixels(image.getWidth(), image.getHeight(), GL.GL_BGR, GL.GL_UNSIGNED_BYTE, ((DataBufferByte) dataBuffer).getData());
 //		gl.glEndList();
 //	}
-	
-	public void setReflectionsEnabled(boolean enable) {
-		if (enable) {
-			gl.glEnable(GL.GL_TEXTURE_2D);
-			gl.glTexGeni(GL.GL_S, GL.GL_TEXTURE_GEN_MODE, GL.GL_SPHERE_MAP);
-			gl.glEnable(GL.GL_TEXTURE_GEN_S);
-			gl.glTexGeni(GL.GL_T, GL.GL_TEXTURE_GEN_MODE, GL.GL_SPHERE_MAP);
-			gl.glEnable(GL.GL_TEXTURE_GEN_T);
-		} else {
-			//gl.glDisable(GL.GL_TEXTURE_1D);
-		}
-	}
+//	
+//	public void setReflectionsEnabled(boolean enable) {
+//		if (enable) {
+//			gl.glEnable(GL.GL_TEXTURE_2D);
+//			gl.glTexGeni(GL.GL_S, GL.GL_TEXTURE_GEN_MODE, GL.GL_SPHERE_MAP);
+//			gl.glEnable(GL.GL_TEXTURE_GEN_S);
+//			gl.glTexGeni(GL.GL_T, GL.GL_TEXTURE_GEN_MODE, GL.GL_SPHERE_MAP);
+//			gl.glEnable(GL.GL_TEXTURE_GEN_T);
+//		} else {
+//			//gl.glDisable(GL.GL_TEXTURE_1D);
+//		}
+//	}
 	
 	public void drawImage(BufferedImage image, int x, int y, float scaleX, float scaleY) {
 		throw new UnsupportedOperationException(getClass().getName() + " doesn't suppot drawing images directly");
@@ -702,11 +708,11 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		}
 		if (enable) {
 			gl.glDisable(GL.GL_DEPTH_TEST);
-			gl.glEnable(GL.GL_BLEND);
-			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+//			gl.glEnable(GL.GL_BLEND);
+//			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 		} else {
 			gl.glEnable(GL.GL_DEPTH_TEST);
-			gl.glDisable(GL.GL_BLEND);
+//			gl.glDisable(GL.GL_BLEND);
 		}
 	}
 	
@@ -719,6 +725,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 		switch (mode) {
 			case OFF: {
 				gl.glDisable(GL.GL_BLEND);
+				gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 				gl.glDepthMask(true);		// make depth-buffer readwrite
 				gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1);
 			}
@@ -985,6 +992,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	
 	public void drawPoint(Point3f p) {
 		enableRasterMode(false);
+		setTransparentRenderingMode(iTransparentMode);
 		if (POINT_AS_QUAD) {
 			/*
 			 * Works around a bug - Some ATI cards under MESA don't render GL_POINTS,
@@ -1027,29 +1035,24 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	
 	public void drawLine(Point3f p0, Point3f p1) {
 		enableRasterMode(false);
-		if (iGlMode != GL.GL_LINES) {
-			gl.glEnd();
-			iGlMode = GL.GL_LINES;
-			gl.glBegin(iGlMode);
-		}
+		gl.glBegin(GL.GL_LINES);
 		gl.glVertex3f(p0.x, p0.y, p0.z);
 		gl.glVertex3f(p1.x, p1.y, p1.z);
+		gl.glEnd();
 	}
 	
 	public void drawLine(Point3f p0, Color3f c0, Point3f p1, Color3f c1) {
 		enableRasterMode(false);
-		if (iGlMode != GL.GL_LINES) {
-			gl.glEnd();
-			iGlMode = GL.GL_LINES;
-			gl.glBegin(iGlMode);
-		}
+		gl.glBegin(GL.GL_LINES);
 		gl.glColor3f(c0.x, c0.y, c0.z);
 		gl.glVertex3f(p0.x, p0.y, p0.z);
 		gl.glColor3f(c1.x, c1.y, c1.z);
 		gl.glVertex3f(p1.x, p1.y, p1.z);
+		gl.glEnd();
 	}
 	
 	public void drawTriangle(Point3f p0, Point3f p1, Point3f p2) {
+		setTransparentRenderingMode(iTransparentMode);
 		boolean backface = (settings.realtimeRenderer.backfacingPatches == RealtimeRendererSettings.Backface.HIGHLIGHT && (p1.x - p0.x) * (p2.y - p0.y) - (p1.y - p0.y) * (p2.x - p0.x) < 0);
 		if (backface)
 			gl.glColor3f(backfaceColor.x, backfaceColor.y, backfaceColor.z);
@@ -1067,6 +1070,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void drawTriangle(Point3f p0, Color3f c0, Point3f p1, Color3f c1, Point3f p2, Color3f c2) {
+		setTransparentRenderingMode(iTransparentMode);
 		enableRasterMode(false);
 		if (iGlMode != GL.GL_TRIANGLES) {
 			gl.glEnd();
@@ -1084,6 +1088,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void drawTriangle(Point3f p0, Color4f c0, Point3f p1, Color4f c1, Point3f p2, Color4f c2) {
+		setTransparentRenderingMode(iTransparentMode);
 		enableRasterMode(false);
 		if (iGlMode != GL.GL_TRIANGLES) {
 			gl.glEnd();
@@ -1099,6 +1104,7 @@ public class JPatchDrawableGL implements JPatchDrawable2 {
 	}
 	
 	public void drawTriangle(Point3f p0, Vector3f n0, Point3f p1, Vector3f n1, Point3f p2, Vector3f n2) {
+		setTransparentRenderingMode(iTransparentMode);
 		enableRasterMode(false);
 		if (iGlMode != GL.GL_TRIANGLES) {
 			gl.glEnd();
