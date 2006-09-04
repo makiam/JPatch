@@ -121,7 +121,7 @@ public abstract class Attribute {
     	valueAdjusting = true;
 	    for (int i = attributeListeners.length - 1; i >= 0; i--) {
 	      	attributeListeners[i].attributeChanged(this);
-	      	System.out.println("fire " + this + " " + i + " " + attributeListeners[i]);
+//	      	System.out.println("fire " + this + " " + i + " " + attributeListeners[i]);
 	    }
 	    valueAdjusting = false;
     }   

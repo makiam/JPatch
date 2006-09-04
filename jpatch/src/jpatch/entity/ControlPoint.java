@@ -48,7 +48,7 @@ public class ControlPoint extends AbstractJPatchXObject {
 		id = model.getNextCpId();
 		position.addAttributeListener(new AttributeListener() {
 			public void attributeChanged(Attribute attribute) {
-				System.out.println(ControlPoint.this + " position changed");
+//				System.out.println(ControlPoint.this + " position changed");
 				position.get(pos);
 				refPos.set(pos);
 				if (inverseInvalid) {
@@ -661,9 +661,7 @@ public class ControlPoint extends AbstractJPatchXObject {
 	 * @param indent the indentation
 	 */
 	public void xml(PrintStream out, String indent) {
-		if (!isStart()) {
-			throw new IllegalStateException("xml must be called on the first point of a curve");
-		}
+		assert isStart() : this + " is not the start of a curve.";
 		String indent2 = indent + "\t";
 		out.append(indent);
 		out.append("<curve");

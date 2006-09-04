@@ -100,6 +100,7 @@ public class AddCurveTool implements JPatchTool {
 					Model model = test.GlTest.model; // FIXME
 					JPatchUndoManager.getUndoManagerFor(model).addEdit(EditType.ADD_CURVE_SEGMENT, editList);
 					removeMotionListener();
+					model.xml(System.out, "");
 				}
 			}
 		}
@@ -138,12 +139,18 @@ public class AddCurveTool implements JPatchTool {
 			int my = e.getY();
 			Model model = test.GlTest.model;	// FIXME
 			if (cp == null && (mx != ox || my != my)) {
-				ControlPoint startCp = new ControlPoint(model);
-				cp = new ControlPoint(model);
-				startCp.position.set(viewport.get3DPosition(ox, oy, p));	
-				startCp.setNext(cp);
-				cp.setPrev(startCp);
-				editList.add(EditModel.addCurve(startCp));
+				viewport.get3DPosition(ox, oy, p);
+				ControlPoint startCp;
+				if (weldTo != null) {
+					cp = EditModel.weldTo(editList, weldTo, p.x, p.y, p.z);
+				} else {
+					startCp = new ControlPoint(model);
+					cp = new ControlPoint(model);
+					startCp.position.set(p);	
+					startCp.setNext(cp);
+					cp.setPrev(startCp);
+					editList.add(EditModel.addCurve(startCp));
+				}
 			}
 			if (cp != null) {
 				cp.position.set(viewport.get3DPosition(mx, my, p));
