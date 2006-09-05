@@ -42,7 +42,7 @@ public class EditModel {
 		assert !b.isLoop() : b + " is looped.";
 		assert a.isUnattached() || b.isUnattached() : "both points are attached.";
 		if (!a.isStart()) {
-			editList.add(EditControlPoint.reverse(a));	// ensure A is the start of the curve
+			editList.add(EditControlPoint.reverse(a.getStart()));	// ensure A is the start of the curve
 		}
 		if (!b.isEnd()) {
 			editList.add(EditControlPoint.reverse(b));	// ensure B is the end of the curve
@@ -410,6 +410,9 @@ public class EditModel {
 			System.out.println("***attach***");
 			attachControlPoint(editList, cp.getHead(), target.getTail());
 		}
+		
+		// TODO: add minimum distance when welding a *new* curve
+		// TODO: fix (RBM or SPACE) welding to use correct vector (of next or prev cp)
 	}
 	
 	/**
@@ -447,22 +450,26 @@ public class EditModel {
 	 * @return the curve end (or start), null if none was found
 	 */
 	private static ControlPoint getCurveEnd(ControlPoint head, double matchX, double matchY, double matchZ) {
+		if (DEBUG) {
+			System.out.println("getCurveEnd(" + head + ", " + matchX + ", " + matchY + ", " + matchZ + ")");
+		}
 		assert head.isHead() : head + " is not a head.";
 		Attribute.Tuple3 pos = head.position;
 		double posX = pos.x.get();
 		double posY = pos.y.get();
 		double posZ = pos.z.get();
-		matchX-= posX;
-		matchX-= posY;						// matchX,matchY,matchZ is not the vector pointing from head's position to the
-		matchX-= posZ;						// specified matchX,matchY,matchZ point						
+		matchX -= posX;
+		matchY -= posY;						// matchX,matchY,matchZ is now the vector pointing from head's position to the
+		matchZ -= posZ;						// specified matchX,matchY,matchZ point						
 		double testX, testY, testZ;
 		double len = Math.sqrt(matchX * matchX + matchY * matchY + matchZ * matchZ);
 		double dot;
-		double error = Double.MAX_VALUE;
+		double error = 0;
 		ControlPoint curveEnd = null;
 		matchX /= len;
 		matchY /= len;
 		matchZ /= len;						// normalize matchX,matchY,matchZ
+		System.out.println("match = " + matchX + "," + matchY + "," + matchZ);
 		for (ControlPoint cp = head; cp != null; cp = cp.getNextAttached()) {
 			ControlPoint next = cp.getNext();
 			ControlPoint prev = cp.getPrev();
@@ -479,12 +486,16 @@ public class EditModel {
 			} else {
 				continue;
 			}
+			System.out.println("test = " + testX + "," + testY + "," + testZ);
 			len = Math.sqrt(testX * testX + testY * testY + testZ * testZ);
-			dot = matchX * testX / len + matchY * testY / len + matchZ * testZ / len;	// dot product with norm(testX,testY,testZ)
-			if (dot < error) {
+			dot = Math.abs((matchX * testX + matchY * testY + matchZ * testZ) / len);	// dot product with norm(testX,testY,testZ)
+			System.out.print(cp + " " + dot);
+			if (dot > error) {
 				error = dot;
 				curveEnd = cp;
+				System.out.print(" *");
 			}
+			System.out.println();
 		}
 		return curveEnd;
 	}

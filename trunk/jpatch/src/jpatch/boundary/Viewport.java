@@ -183,7 +183,7 @@ public abstract class Viewport extends AbstractJPatchXObject {
 		return p2d;
 	}
 	
-	public ControlPoint getControlPointAt(float x, float y, Model model) {
+	public ControlPoint getControlPointAt(float x, float y, Model model, ControlPoint exclude) {
 		x -= (component.getWidth() >> 1);
 		y = (component.getHeight() >> 1) - y;
 		ControlPoint hit = null;
@@ -191,6 +191,10 @@ public abstract class Viewport extends AbstractJPatchXObject {
 			ControlPoint cp = start;
 			double min = MIN_DIST_SQ;
 			do {
+				if (cp != null && cp == exclude) {
+					cp = cp.getNextNonHook();
+					continue;
+				}
 				cp.getPos(p0);
 				matrix.transform(p0);
 				double dx = x - p0.x;
