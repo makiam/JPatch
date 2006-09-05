@@ -26,6 +26,8 @@ import java.util.*;
 
 import javax.swing.*;
 
+import jpatch.entity.Project;
+
 /**
  * @author sascha
  *

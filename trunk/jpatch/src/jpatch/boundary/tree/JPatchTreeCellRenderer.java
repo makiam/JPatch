@@ -34,7 +34,7 @@ import jpatch.entity.*;
  */
 @SuppressWarnings("serial")
 public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
-	private static final Map<Class, Icon> iconMap = new HashMap<Class, Icon>();
+	private static final Map<Class<? extends JPatchObject>, Icon> iconMap = new HashMap<Class<? extends JPatchObject>, Icon>();
 	
 	/*
 	 * initialize iconMap

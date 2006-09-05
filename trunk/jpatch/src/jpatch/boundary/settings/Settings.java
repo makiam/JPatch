@@ -56,8 +56,8 @@ public class Settings extends AbstractSettings {
 	public Plaf lookAndFeel = Plaf.CROSS_PLATFORM;
 	public boolean metalBoldText = false;
 	public boolean fontSmoothing = true;
-	public long undoMaxMem = 128;
-	public long undoMinMem = 120;
+	public int undoDepth = 30;
+	public int historyDepth = 10;
 	public final DirectorySettings directories = new DirectorySettings();
 	public final ViewportSettings viewports = new ViewportSettings();
 	public final ColorSettings colors = new ColorSettings();
