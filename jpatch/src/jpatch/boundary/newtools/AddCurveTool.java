@@ -11,6 +11,7 @@ import javax.vecmath.Point3d;
 import jpatch.boundary.*;
 import jpatch.control.*;
 import jpatch.entity.*;
+import test.GlTest;
 
 public class AddCurveTool implements JPatchTool {
 	private MouseListener[] mouseListeners;
@@ -37,7 +38,7 @@ public class AddCurveTool implements JPatchTool {
 
 	private static class AddCurveMouseListener extends MouseAdapter {
 		private Viewport viewport;
-		private MouseMotionListener mml;
+		private AddCurveMouseMotionListener mml;
 		private KeyListener kl;
 		private List<JPatchUndoableEdit> editList;
 		
@@ -47,12 +48,12 @@ public class AddCurveTool implements JPatchTool {
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
-			assert mml == null;
-			assert kl == null;
 			switch(e.getButton()) {
 			case MouseEvent.BUTTON1:
+				assert mml == null;
+				assert kl == null;
 				editList = new ArrayList<JPatchUndoableEdit>();
-				ControlPoint weldTo = viewport.getControlPointAt(e.getX(), e.getY(), test.GlTest.model);
+				ControlPoint weldTo = viewport.getControlPointAt(e.getX(), e.getY(), test.GlTest.model, null);
 				if (weldTo != null) {
 					Point3d p3 = new Point3d();
 					weldTo.getPos(p3);
@@ -77,7 +78,7 @@ public class AddCurveTool implements JPatchTool {
 					public void keyPressed(KeyEvent e) {
 						if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 							e.consume();
-							weld();
+							weld(mml.mx, mml.my, e.isShiftDown());
 						}
 					}
 				};
@@ -87,8 +88,11 @@ public class AddCurveTool implements JPatchTool {
 				break;
 			case MouseEvent.BUTTON3:
 				if (mml != null) {
-					weld();
+					weld(e.getX(), e.getY(), e.isShiftDown());
 				}
+				break;
+			case MouseEvent.BUTTON2:
+				GlTest.model.xml(System.out, ">>>");	// FIXME remove this
 				break;
 			}
 		}
@@ -100,14 +104,26 @@ public class AddCurveTool implements JPatchTool {
 					Model model = test.GlTest.model; // FIXME
 					JPatchUndoManager.getUndoManagerFor(model).addEdit(EditType.ADD_CURVE_SEGMENT, editList);
 					removeMotionListener();
-					model.xml(System.out, "");
+//					model.xml(System.out, "");
 				}
 			}
 		}
 		
-		private void weld() {
-			System.out.println("weld");
-			removeMotionListener();
+		private void weld(int x, int y, boolean attachOnly) {
+			System.out.println("weld " + attachOnly);
+			ControlPoint cp = mml.cp;
+			ControlPoint weldTo = viewport.getControlPointAt(x, y, test.GlTest.model, cp);
+			if (weldTo != null) {
+				if (attachOnly) {
+					EditModel.attachControlPoint(mml.editList, cp, weldTo);
+				} else {
+					EditModel.weldControlPoint(mml.editList, cp, weldTo);
+				}
+				removeMotionListener();
+				cp.getModel().initControlPoints();
+				viewport.getComponent().repaint();	// FIXME for synchronized viewports
+				System.out.println("weld ok");
+			}
 		}
 		
 		private void removeMotionListener() {
@@ -121,6 +137,7 @@ public class AddCurveTool implements JPatchTool {
 	private static class AddCurveMouseMotionListener extends MouseMotionAdapter {
 		private Viewport viewport;
 		private final int ox, oy;
+		private int mx, my;
 		private final Point3d p = new Point3d();
 		private ControlPoint weldTo, cp;
 		private List<JPatchUndoableEdit> editList;
@@ -130,13 +147,15 @@ public class AddCurveTool implements JPatchTool {
 			this.weldTo = weldTo;
 			ox = x;
 			oy = y;
+			mx = x;
+			my = y;
 			this.editList = editList;
 		}
 		
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			int mx = e.getX();
-			int my = e.getY();
+			mx = e.getX();
+			my = e.getY();
 			Model model = test.GlTest.model;	// FIXME
 			if (cp == null && (mx != ox || my != my)) {
 				viewport.get3DPosition(ox, oy, p);
