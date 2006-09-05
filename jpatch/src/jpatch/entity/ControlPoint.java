@@ -84,6 +84,10 @@ public class ControlPoint extends AbstractJPatchXObject {
 		// TODO Auto-generated method stub
 	}
 
+	public ObjectRegistry getObjectRegistry() {
+		throw new UnsupportedOperationException();
+	}
+	
 	/* * * * * * * * * * * *
 	 * Getters and setters
 	 * * * * * * * * * * * */

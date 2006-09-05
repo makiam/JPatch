@@ -310,11 +310,11 @@ public class AttributeUiHelper {
 	
 	private static boolean verifyTextField(JTextField textField, Attribute attribute) {
 		if (attribute instanceof Attribute.String) {
-			if (((Attribute.String) attribute).isNameAttribute()) {
-				return true;
+			if (attribute instanceof Attribute.Name) {
+				JPatchObject object = ((Attribute.Name) attribute).getJPatchObject();
+				return (object.getObjectRegistry().getObject(object.getClass(), textField.getText()) == null);
 			}
-			JPatchObject object = attribute.getObject();
-			return (object.getObjectRegistry().getObject(object.getClass(), textField.getText()) == null);
+			return true;
 		}
 		try {
 			if (attribute instanceof Attribute.Integer) {

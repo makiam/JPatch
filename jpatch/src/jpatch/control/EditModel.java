@@ -49,28 +49,29 @@ public class EditModel {
 		}
 		boolean loop = a.getStart() == b.getStart();	// if both points are on the same curve, a loop will be created
 		assert !loop || a.getCurveLength() > 3 : a + " curve is too short to loop (length = " + a.getCurveLength() + ")";
-				
+		
+		System.out.println("LOOP? " + a.getStart() + " " + b.getStart());
 		if (b.isUnattached()) {
 			editList.add(EditAttribute.changeAttribute(
 					a.position, b.position.x.get(),
 					b.position.y.get(), b.position.z.get(), true));	// change A's position to B's	
-			simpleAppendControlPoint(editList, a, b.getPrev()); 	// append A to B's previous point
-			replaceControlPointInEntities(editList, b, a);			// replace B with A in all entities
 			if (loop) {
+				System.out.println("\n***\nLOOP\n***\n\n");
 				editList.add(EditControlPoint.changeLoop(a, true)); // set loop on A to true
 			} else {
 				editList.add(removeCurve(a));						// remove curve A from model
 			}
+			simpleAppendControlPoint(editList, a, b.getPrev()); 	// append A to B's previous point
+			replaceControlPointInEntities(editList, b, a);			// replace B with A in all entities
 		} else {
-			simpleAppendControlPoint(editList, a.getNext(), b); 	// append A's next point to B
-			replaceControlPointInEntities(editList, a, b);			// replace A with B in all entities
 			if (loop) {
 				editList.add(EditControlPoint.changeLoop(b, true)); // set loop on B to true
 				editList.add(addCurve(b));							// add curve B to model
 			}
 			editList.add(removeCurve(a));							// remove curve A from model
+			simpleAppendControlPoint(editList, a.getNext(), b); 	// append A's next point to B
+			replaceControlPointInEntities(editList, a, b);			// replace A with B in all entities
 		}
-		test.GlTest.model.xml(System.out, ">");
 	}
 	
 	/**
@@ -400,7 +401,7 @@ public class EditModel {
 		if (DEBUG) {
 			System.out.println("EditModel.weldControlPoint(" + editList + ", " + cp + ", " + target + ")");
 		}
-		Attribute.Tuple3 cpPos = cp.getHead().position;
+		Attribute.Tuple3 cpPos = cp.getNext() != null ? cp.getNext().position : cp.getPrev().position;
 		Attribute.Tuple3 targetPos = target.getHead().position;
 		ControlPoint cpEnd = getCurveEnd(cp.getHead(), targetPos.x.get(), targetPos.y.get(), targetPos.z.get());
 		ControlPoint targetEnd = getCurveEnd(target.getHead(), cpPos.x.get(), cpPos.y.get(), cpPos.z.get());
@@ -469,8 +470,9 @@ public class EditModel {
 		matchX /= len;
 		matchY /= len;
 		matchZ /= len;						// normalize matchX,matchY,matchZ
-		System.out.println("match = " + matchX + "," + matchY + "," + matchZ);
+		System.out.println("\tmatch = " + matchX + "," + matchY + "," + matchZ);
 		for (ControlPoint cp = head; cp != null; cp = cp.getNextAttached()) {
+			System.out.print("\t" + cp + " ");
 			ControlPoint next = cp.getNext();
 			ControlPoint prev = cp.getPrev();
 			if (next != null && prev == null) {
@@ -486,14 +488,14 @@ public class EditModel {
 			} else {
 				continue;
 			}
-			System.out.println("test = " + testX + "," + testY + "," + testZ);
+			System.out.println("\ttest = " + testX + "," + testY + "," + testZ);
 			len = Math.sqrt(testX * testX + testY * testY + testZ * testZ);
 			dot = Math.abs((matchX * testX + matchY * testY + matchZ * testZ) / len);	// dot product with norm(testX,testY,testZ)
-			System.out.print(cp + " " + dot);
+			System.out.print("\tdot = " + dot);
 			if (dot > error) {
 				error = dot;
 				curveEnd = cp;
-				System.out.print(" *");
+				System.out.print(" (best)");
 			}
 			System.out.println();
 		}
