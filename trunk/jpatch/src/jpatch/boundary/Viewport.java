@@ -133,6 +133,9 @@ public abstract class Viewport extends AbstractJPatchXObject {
 		
 	}
 
+	public ObjectRegistry getObjectRegistry() {
+		throw new UnsupportedOperationException();
+	}
 
 	public String getInfo() {
 		if (camera == null) {
@@ -330,7 +333,7 @@ public abstract class Viewport extends AbstractJPatchXObject {
 	protected double subdiv(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3, boolean simple) {
 		if (simple) {
 			double dx = x0 - x1 - x2 + x3;
-			double dy = x0 - x1 - x2 + x3;
+			double dy = y0 - y1 - y2 + y3;
 			return (float) (Math.sqrt(dx * dx + dy * dy));
 		} else {
 			double dx0 = 4 * x0 - 6 *  x1 + 2 * x3;

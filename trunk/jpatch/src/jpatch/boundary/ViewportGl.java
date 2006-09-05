@@ -20,6 +20,7 @@ public class ViewportGl extends Viewport {
 	private static final boolean LIGHTWEIGHT = false;
 	private static final double CLEAR_DEPTH = 100000;
 	private static final ColorSettings COLORS = Settings.getInstance().colors;
+	private static final RealtimeRendererSettings RENDERER = Settings.getInstance().realtimeRenderer;
 	
 	private GLAutoDrawable drawable;
 	private GL gl;
@@ -384,33 +385,38 @@ public class ViewportGl extends Viewport {
 
 	@Override
 	protected void drawModel(Model model) {
-//		gl.glEnable(GL.GL_LINE_SMOOTH);
-//		gl.glEnable(GL.GL_BLEND);
-//		gl.glAlphaFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-//		gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
-//		gl.glLineWidth (0.5f);
+		
 		
 //		gl.glFogi(GL.GL_FOG_MODE, GL.GL_LINEAR);
 //		gl.glFogfv(GL.GL_FOG_COLOR, new float[] { COLORS.background.x, COLORS.background.y, COLORS.background.z }, 0);
 //		gl.glFogf(GL.GL_FOG_DENSITY, 1.0f);
-//		gl.glHint(GL.GL_FOG_HINT, GL.GL_DONT_CARE);
 //		gl.glFogf(GL.GL_FOG_START, 0f);
 //		gl.glFogf(GL.GL_FOG_END, 200f);
 //		gl.glEnable(GL.GL_FOG);
 		
 		/* draw curves */
 		if (showCurves.get()) {
+			if (RENDERER.antialiasing) {
+				gl.glEnable(GL.GL_LINE_SMOOTH);
+				gl.glEnable(GL.GL_BLEND);
+				gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+			}
 			gl.glColor3f(COLORS.curves.x, COLORS.curves.y, COLORS.curves.z);
 			gl.glBegin(GL.GL_LINES);
 			for (ControlPoint start : model.getCurves()) {
 				drawCurve(start);
 			}
 			gl.glEnd();
+			if (RENDERER.antialiasing) {
+				gl.glDisable(GL.GL_LINE_SMOOTH);
+				gl.glDisable(GL.GL_BLEND);
+			}
 		}
+		
+		
 		
 		/* draw points */
 		if (showPoints.get()) {
-			gl.glColor3f(COLORS.points.x, COLORS.points.y, COLORS.points.z);
 			gl.glPointSize(3);
 			gl.glBegin(GL.GL_POINTS);
 			for (ControlPoint start : model.getCurves()) {
@@ -419,6 +425,11 @@ public class ViewportGl extends Viewport {
 					if (cp.isHead()) {
 						cp.getPos(p0);
 						matrix.transform(p0);
+						if (cp.isUnattached()) {
+							gl.glColor3f(COLORS.points.x, COLORS.points.y, COLORS.points.z);
+						} else {
+							gl.glColor3f(COLORS.headPoints.x, COLORS.headPoints.y, COLORS.headPoints.z);
+						}
 						gl.glVertex3d(p0.x, p0.y, p0.z);
 					}
 					cp = cp.getNextNonHook();

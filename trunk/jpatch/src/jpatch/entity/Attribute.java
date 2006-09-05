@@ -146,6 +146,18 @@ public abstract class Attribute {
 		}
 	}
 
+	public static class Name extends String {
+		private final JPatchObject jpatchObject;
+		
+		public Name(JPatchObject jpatchObject) {
+			this.jpatchObject = jpatchObject;
+		}
+		
+		public JPatchObject getJPatchObject() {
+			return jpatchObject;
+		}
+	}
+	
 	public static class Enum<E extends java.lang.Enum> extends Attribute {
 		private E enumValue;
 		

@@ -78,7 +78,7 @@ public class AddCurveTool implements JPatchTool {
 					public void keyPressed(KeyEvent e) {
 						if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 							e.consume();
-							weld(mml.mx, mml.my, e.isShiftDown());
+							weld(mml.mx, mml.my, attachOnly(e));
 						}
 					}
 				};
@@ -88,7 +88,7 @@ public class AddCurveTool implements JPatchTool {
 				break;
 			case MouseEvent.BUTTON3:
 				if (mml != null) {
-					weld(e.getX(), e.getY(), e.isShiftDown());
+					weld(e.getX(), e.getY(), attachOnly(e));
 				}
 				break;
 			case MouseEvent.BUTTON2:
@@ -157,12 +157,25 @@ public class AddCurveTool implements JPatchTool {
 			mx = e.getX();
 			my = e.getY();
 			Model model = test.GlTest.model;	// FIXME
-			if (cp == null && (mx != ox || my != my)) {
-				viewport.get3DPosition(ox, oy, p);
+			int dx = mx - ox;
+			int dy = my - oy;
+			int d2 = dx * dx + dy * dy;
+			if (cp == null && d2 > 9) {
 				ControlPoint startCp;
 				if (weldTo != null) {
-					cp = EditModel.weldTo(editList, weldTo, p.x, p.y, p.z);
+					viewport.get3DPosition(mx, my, p);
+					if (attachOnly(e)) {
+						startCp = new ControlPoint(model);
+						cp = new ControlPoint(model);
+						startCp.setNext(cp);
+						cp.setPrev(startCp);
+						EditModel.attachControlPoint(editList, startCp, weldTo);
+						editList.add(EditModel.addCurve(startCp));
+					} else {
+						cp = EditModel.weldTo(editList, weldTo, p.x, p.y, p.z);
+					}
 				} else {
+					viewport.get3DPosition(ox, oy, p);
 					startCp = new ControlPoint(model);
 					cp = new ControlPoint(model);
 					startCp.position.set(p);	
@@ -177,5 +190,9 @@ public class AddCurveTool implements JPatchTool {
 			model.initControlPoints();
 			viewport.getComponent().repaint();	// FIXME for synchronized viewports
 		}
+	}
+	
+	private static boolean attachOnly(InputEvent e) {
+		return e.isShiftDown();
 	}
 }
