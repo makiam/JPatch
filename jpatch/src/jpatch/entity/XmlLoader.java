@@ -34,6 +34,8 @@ public class XmlLoader {
 	/** XmlReader to parse documents */
 	private XMLReader xmlReader = XMLReaderFactory.createXMLReader();
 	
+	private Object parsedObject;
+	
 	/* * * * * * * *
 	 * Constructors
 	 * * * * * * * */
@@ -44,7 +46,8 @@ public class XmlLoader {
 	 * public methods
 	 * * * * * * * * */
 	
-	public void parse(Reader reader) throws IOException, SAXException {
+	public Object parse(Reader reader) throws IOException, SAXException {
+		parsedObject = null;
 		push(new RootParser());
 		xmlReader.setContentHandler(new DefaultHandler() {
 			@Override
@@ -76,6 +79,8 @@ public class XmlLoader {
 			}
 		});
 		xmlReader.parse(new InputSource(reader));
+		reader.close();
+		return parsedObject;
 	}
 	
 	/* * * * * * * * *
@@ -147,8 +152,7 @@ public class XmlLoader {
 					attach.setNextAttached(cp);
 					cp.setPrevAttached(attach);
 				}
-				// FIXME remove following test code
-				model.xml(System.out, ">");
+				parsedObject = model;
 				pop();
 			}
 		}
