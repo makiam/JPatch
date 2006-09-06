@@ -158,6 +158,21 @@ public abstract class Attribute {
 		}
 	}
 	
+	public static class File extends Attribute {
+		private java.io.File file;
+		
+		public java.io.File get() {
+			return file;
+		}
+		
+		public void set(java.io.File file) {
+			if (!this.file.equals(file) && !valueAdjusting) {
+				this.file = file;
+				fireAttributeChanged();
+			}
+		}
+	}
+	
 	public static class Enum<E extends java.lang.Enum> extends Attribute {
 		private E enumValue;
 		

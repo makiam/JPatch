@@ -23,6 +23,7 @@ package jpatch.boundary;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 
 import javax.swing.*;
 
@@ -46,6 +47,32 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		} else {
 			box.add(AttributeUiHelper.createTextFieldFor(a));
 		}
+		c.add(box);
+	}
+	
+	protected void addFileSelector(Container c, String name, final Attribute attribute, int fileSelectionMode, final String approveButtonText) {
+		c.add(new JLabel(name));
+		final JButton button = new JButton("Browse...");
+		final Box box = Box.createHorizontalBox();
+		final JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setFileSelectionMode(fileSelectionMode);
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Component parent;
+				for (parent = box; parent.getParent() != null; parent = parent.getParent());
+				if (fileChooser.showDialog(parent, approveButtonText) == JFileChooser.APPROVE_OPTION) {
+					try {
+						((Attribute.String) attribute).set(fileChooser.getSelectedFile().getCanonicalPath());
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		box.add(AttributeUiHelper.createTextFieldFor(attribute, 200));
+		box.add(Box.createHorizontalStrut(4));
+		box.add(button);
 		c.add(box);
 	}
 	

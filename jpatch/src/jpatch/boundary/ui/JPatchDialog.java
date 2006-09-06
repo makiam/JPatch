@@ -30,6 +30,7 @@ import java.awt.event.WindowAdapter;
 
 import javax.swing.*;
 import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.border.Border;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.PlainDocument;
 import javax.swing.text.StyledEditorKit;
@@ -49,7 +50,7 @@ public class JPatchDialog extends JDialog {
 	private int selectedOption = -1;
 	private Font font = new Font("SansSerif", Font.PLAIN, 12);
 	
-	private JPatchDialog(Frame owner, String title, boolean modal, Icon icon, String message, String[] options, int focus) {
+	private JPatchDialog(Frame owner, String title, boolean modal, Icon icon, String message, Component component, String[] options, int focus, String width) {
 		super(owner, title, modal);
 		setLayout(new BorderLayout());
 		Box buttonBox = Box.createHorizontalBox();
@@ -60,7 +61,7 @@ public class JPatchDialog extends JDialog {
 		}
 		Box textBox = Box.createVerticalBox();
 		
-		final JEditorPane text = new JEditorPane("text/html", "<div width='320'>" + message + "</div>");
+		final JEditorPane text = new JEditorPane("text/html", "<div width='" + width + "'>" + message + "</div>");
 		text.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
 		text.getDocument().putProperty(PlainDocument.lineLimitAttribute, 20);
 		text.setFont(font);
@@ -68,6 +69,22 @@ public class JPatchDialog extends JDialog {
 		text.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
 		text.setOpaque(false);
 		textBox.add(text);
+		if (component != null) {
+//			Box box = Box.createVerticalBox();
+//			box.add(component);
+//			box.setBorder(BorderFactory.createEmptyBorder(0, 16, 16, 16));
+			JPanel panel = new JPanel();
+			panel.setLayout(new BorderLayout());
+			panel.add(component, BorderLayout.CENTER);
+			Border b1 = BorderFactory.createEmptyBorder(8, 8, 8, 8);
+			Border b2 = BorderFactory.createEtchedBorder();
+			Border b3 = BorderFactory.createEmptyBorder(0, 16, 16, 16);
+//			panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createCompoundBorder(b3, b2), b1));
+			panel.setBorder(b3);
+			
+//			panel.s
+			textBox.add(panel);
+		}
 		textBox.add(buttonBox);
 		
 		add(textBox, BorderLayout.CENTER);
@@ -104,9 +121,9 @@ public class JPatchDialog extends JDialog {
 		setVisible(true);
 	}
 
-	public static int showDialog(Frame owner, String title, Icon icon, String message, String[] options, int focus) {
+	public static int showDialog(Frame owner, String title, Icon icon, String message, Component component, String[] options, int focus, String width) {
 		
-		JPatchDialog dialog = new JPatchDialog(owner, title, true, icon, message, options, focus);
+		JPatchDialog dialog = new JPatchDialog(owner, title, true, icon, message, component, options, focus, width);
 		return dialog.selectedOption;
 	}
 	

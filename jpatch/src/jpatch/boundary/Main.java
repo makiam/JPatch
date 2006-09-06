@@ -28,6 +28,8 @@ import javax.swing.*;
 
 import jpatch.entity.Project;
 
+import jpatch.boundary.settings.*;
+
 /**
  * @author sascha
  *
@@ -47,7 +49,7 @@ public class Main {
 	 */
 	private Main() {
 		try {
-			WorkspaceManager workspaceManager = new WorkspaceManager(new File("jpatch_test_workspace"));
+			WorkspaceManager workspaceManager = new WorkspaceManager(Settings.getInstance().workspace);
 			Project project = new Project(workspaceManager, "Test_Project");
 		} catch (IOException e) {
 			e.printStackTrace();
