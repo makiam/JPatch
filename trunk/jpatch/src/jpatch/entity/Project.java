@@ -48,8 +48,8 @@ public class Project extends AbstractJPatchObject {
 	private File shaderDir;
 	private File resourceDir;
 	
-	private File[] modelFiles;
-	private File[] choreographyFiles;
+	private JPatchFile.ModelFile[] modelFiles;
+	private JPatchFile.ChoreographyFile[] choreographyFiles;
 	
 	private Attribute.Name name;
 	
@@ -98,9 +98,18 @@ public class Project extends AbstractJPatchObject {
 		
 	}
 
-	public void scan() {
-		modelFiles = modelDir.listFiles(XML_FILEFILTER);
-		choreographyFiles = choreographyDir.listFiles(XML_FILEFILTER);
+	public void scanDirectories() {
+		File[] files;
+		files = modelDir.listFiles(XML_FILEFILTER);
+		modelFiles = new JPatchFile.ModelFile[files.length];
+		for (int i = 0; i < files.length; i++) {
+			modelFiles[i] = new JPatchFile.ModelFile(files[i]);
+		}
+		files = choreographyDir.listFiles(XML_FILEFILTER);
+		choreographyFiles = new JPatchFile.ChoreographyFile[files.length];
+		for (int i = 0; i < files.length; i++) {
+			choreographyFiles[i] = new JPatchFile.ChoreographyFile(files[i]);
+		}
 	}
 	
 }

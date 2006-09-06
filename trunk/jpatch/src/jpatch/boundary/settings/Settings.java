@@ -42,12 +42,14 @@ import jpatch.boundary.laf.SmoothLookAndFeel;
 public class Settings extends AbstractSettings {
 	private static Settings INSTANCE;
 	
-	public static enum Startup { MODELER, ANIMATOR };
+//	public static enum Startup { MODELER, ANIMATOR };
 	public static enum Plaf { CROSS_PLATFORM, SYSTEM, JPATCH };
-	public Startup startup = Startup.MODELER;
+//	public Startup startup = Startup.MODELER;
 	public transient boolean newInstallation = true;
 	public transient boolean cleanExit = false;
 	public transient boolean startupFinished = false;
+	public transient File workspace = new File(System.getProperty("user.home"), "jpatch_workspace");
+	public boolean promptForWorkspace = true;
 	public int screenPositionX = 0;
 	public int screenPositionY = 0;
 	public int screenWidth = 1024;

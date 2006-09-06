@@ -1,6 +1,7 @@
 package jpatch.boundary;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.*;
@@ -19,7 +20,7 @@ public class AttributeUiHelper {
 	private static final int COLUMNS = 6;
 	private static final Font staticFont = new JTextField().getFont();
 	private static final Font keyedFont = staticFont.deriveFont(Font.BOLD);
-	private static final String[] OFF_ON = new String[] { "off", "on" };
+	private static final String[] OFF_ON = new String[] { "no", "yes" };
 	
 	static JLabel getLabelFor(Attribute attribute) {
 		return new JLabel(attribute.getName());
@@ -162,9 +163,13 @@ public class AttributeUiHelper {
 	}
 	
 	public static JTextField createTextFieldFor(final Attribute attribute) {
+		return createTextFieldFor(attribute, 70);
+	}
+	
+	public static JTextField createTextFieldFor(final Attribute attribute, int width) {
 		final JTextField textField = new JTextField();
 		Dimension dim = textField.getPreferredSize();
-		dim.width = 70;
+		dim.width = width;
 		textField.setPreferredSize(dim);
 		textField.setToolTipText(attribute.getName());
 		
