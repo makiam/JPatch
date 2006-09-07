@@ -58,9 +58,10 @@ public class GlTest {
 		model.addCurve(cp0);
 		model.initControlPoints();
 		Viewport viewport = new ViewportGl(0, Viewport.View.FRONT, models);
-		frame.setLayout(new BorderLayout());
-		frame.add(viewport.getComponent(), BorderLayout.CENTER);
-		frame.add(new ViewportAttributeEditor(viewport), BorderLayout.WEST);
+		frame.setLayout(new GridLayout(2, 2));
+		frame.add(viewport.getComponent());
+		frame.add(new ViewportGl(1, Viewport.View.LEFT, models).getComponent());
+		frame.add(new ViewportAttributeEditor(viewport));
 		frame.setSize(800, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
