@@ -149,7 +149,7 @@ public class SplashScreen {
 				public void paint(Graphics g) {
 					g.drawImage(image, 0, 0, null);
 					if (text != null) {
-//						((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+						((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 						int i = g.getFontMetrics().charsWidth(text.toCharArray(), 0, text.length()) >> 1;
 						int h = g.getFontMetrics().getHeight();
 						int y = 293;

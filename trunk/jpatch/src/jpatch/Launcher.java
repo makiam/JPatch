@@ -51,14 +51,14 @@ public final class Launcher {
 			else if (args[0].equals("-modeler"))
 				launchModeler();
 		} else {
-			switch (Settings.getInstance().startup) {
-			case ANIMATOR:
-				launchAnimator();
-				break;
-			case MODELER:
+//			switch (Settings.getInstance().startup) {
+//			case ANIMATOR:
+//				launchAnimator();
+//				break;
+//			case MODELER:
 				launchModeler();
-				break;
-			}
+//				break;
+//			}
 		}
 		if (SplashScreen.instance != null) {
 			Timer timer = new Timer();
