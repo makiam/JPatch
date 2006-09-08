@@ -36,36 +36,68 @@ import javax.swing.border.*;
  * @author sascha
  */
 @SuppressWarnings("serial")
-public class MemoryMonitor extends JLabel {
-	private static final int DELAY = 500;
+public class MemoryMonitor {
+	private static final int DELAY = 1000;
+	private static final Insets INSETS = new Insets(0, 1, 0, 1);
+	private static final Border BORDER = new Border() {
+		public Insets getBorderInsets(Component c) {
+			return INSETS;
+		}
+		public boolean isBorderOpaque() {
+			return true;
+		}
+		public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+			;
+		}
+	};
+	private JLabel maxLabel = new JLabel();
+	private JLabel totalLabel = new JLabel();
+	private JLabel useLabel = new JLabel();
+
+	private MemoryMonitor() {
+		Color bg = maxLabel.getBackground();
+		Color label = new Color(bg.getRed() - 24, bg.getGreen() - 24, bg.getBlue() - 24);
+		maxLabel.setBorder(BORDER);
+		maxLabel.setBackground(label);
+		maxLabel.setOpaque(true);
+		maxLabel.setToolTipText("Maximum memory the VM may use in MB");
+		totalLabel.setBorder(BORDER);
+		totalLabel.setBackground(label);
+		totalLabel.setOpaque(true);
+		totalLabel.setToolTipText("Total memory reserved for the VM in MB");
+		useLabel.setBorder(BORDER);
+		useLabel.setBackground(label);
+		useLabel.setOpaque(true);
+		useLabel.setToolTipText("Memory used by the VM in MB");
+	}
 	
-	public MemoryMonitor() {
+	public static JComponent createMemoryMonitor() {
+		final MemoryMonitor memMon = new MemoryMonitor();
+		final Box box = Box.createHorizontalBox();
+		box.add(memMon.maxLabel);
+		box.add(Box.createHorizontalStrut(2));
+		box.add(memMon.totalLabel);
+		box.add(Box.createHorizontalStrut(2));
+		box.add(memMon.useLabel);
+		Timer timer = new Timer();
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				updateText();
+				memMon.update();
 			}
 		};
-		setOpaque(true);
-		setToolTipText("Max/total/used VM memory in MB");
-		setBorder(new LineBorder(Color.GRAY));
-		setBackground(new Color(0xcccccc));
-		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(task, DELAY, DELAY);
-		updateText();
+		timer.scheduleAtFixedRate(task, 0, DELAY);
+		return box;
 	}
 	
-	private void updateText() {
+	private void update() {
 		Runtime r = Runtime.getRuntime();
 		long maximum = r.maxMemory();
 		long total = r.totalMemory();
 		long free = r.freeMemory();
 		long used = total - free;
-		float max = (float) ((maximum * 10) >> 20) / 10;
-		float tot = (float) ((total * 10) >> 20) / 10;
-		float use = (float) ((used * 10) >> 20) / 10;
-		String text = " " + max + "/" + tot + "/" + use + " ";
-		if (!text.equals(getText()))
-			setText(" " + max + "/" + tot + "/" + use + " ");
+		maxLabel.setText(Float.toString((float) ((maximum * 10) >> 20) / 10));
+		totalLabel.setText(Float.toString((float) ((total * 10) >> 20) / 10));
+		useLabel.setText(Float.toString((float) ((used * 10) >> 20) / 10));
 	}
 }

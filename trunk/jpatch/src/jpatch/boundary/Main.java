@@ -21,6 +21,7 @@
  */
 package jpatch.boundary;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -52,9 +53,11 @@ public class Main {
 	
 	private Layout layout = Layout.Q1234;
 	
-	private JFrame frame = new JFrame();
+	private JFrame frame;
 	private JToolBar primaryToolBar;
 	private JToolBar secondaryToolBar;
+	private JLabel statusLabel = new JLabel("status");
+	
 	private Viewport[] viewports = new Viewport[4];
 	private Iterable<Model> models = new Iterable<Model>() {
 		public Iterator<Model> iterator() {
@@ -87,7 +90,6 @@ public class Main {
 		public void paintComponent(Graphics g) {
 			for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 				g.setColor(i == 0 ? ACTIVE_VIEWPORT_BORDER_COLOR : VIEWPORT_BORDER_COLOR);
-				
 				Component c = viewports[i].getComponent();
 				g.drawRect(c.getX() - 1, c.getY() - 1, c.getWidth() + 1, c.getHeight() + 1);
 			}
@@ -144,7 +146,7 @@ public class Main {
 				viewports[0].getComponent().setBounds(1, 1, wLeft - 2, hTop - 2);
 				viewports[1].getComponent().setBounds(wLeft + 1, 1, wRight - 2, hTop - 2);
 				viewports[2].getComponent().setBounds(1, hTop + 1, wLeft - 2, hBottom - 2);
-				viewports[3].getComponent().setBounds(wLeft + 1, hTop + 1, wLeft - 2, hBottom - 2);
+				viewports[3].getComponent().setBounds(wLeft + 1, hTop + 1, wRight - 2, hBottom - 2);
 				break;
 			}
 		}
@@ -154,12 +156,17 @@ public class Main {
 //	private Choreograpy activeChoreography;
 	
 	public static void main(String[] args) {
-
+		System.setProperty("swing.boldMetal", "false");
+		System.setProperty("swing.aatext", "true");
 	}
 	/**
 	 * private constructor (singleton pattern)
 	 */
 	private Main() {
+//		System.setProperty("swing.boldMetal", Settings.JPATCH_ROOT_NODE.get("metalBoldText", "false"));
+//		System.setProperty("swing.aatext", Settings.JPATCH_ROOT_NODE.get("fontSmoothing", "true"));
+		System.setProperty("swing.boldMetal", "false");
+		System.setProperty("swing.aatext", "true");
 		try {
 			WorkspaceManager workspaceManager = new WorkspaceManager(Settings.getInstance().workspace);
 			Project project = new Project(workspaceManager, "Test_Project");
@@ -167,6 +174,7 @@ public class Main {
 			e.printStackTrace();
 		}
 //		frame.setTitle("JPatch");
+		frame = new JFrame();
 		frame.setSize(800, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -201,10 +209,20 @@ public class Main {
 		}
 		screen.setLayout(screenLayout);
 		screen.setOpaque(false);
-		frame.setBackground(Settings.getInstance().colors.background.get());
-//		screen.setBackground(Color.BLACK);
-		frame.add(screen);
 		
+		Box statusBar = Box.createHorizontalBox();
+		statusBar.add(statusLabel);
+		statusBar.add(Box.createHorizontalGlue());
+		statusBar.add(MemoryMonitor.createMemoryMonitor(), BorderLayout.EAST);
+		statusBar.add(Box.createHorizontalStrut(16));
+		/*
+		 * initialize frame
+		 */
+		frame.setBackground(Settings.getInstance().colors.background.get());
+		frame.setLayout(new BorderLayout());
+		frame.add(screen, BorderLayout.CENTER);
+		frame.add(statusBar, BorderLayout.SOUTH);
+		frame.add(new JLabel("X"), BorderLayout.WEST);
 		frame.setVisible(true);
 	}
 }
