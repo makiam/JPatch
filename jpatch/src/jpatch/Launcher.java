@@ -18,61 +18,63 @@ public final class Launcher {
 		System.setProperty("swing.aatext", Settings.JPATCH_ROOT_NODE.get("fontSmoothing", "true"));
 		System.out.println(System.getProperty("swing.boldMetal"));
 		System.out.println(System.getProperty("swing.aatext"));
-		if (args.length >=1) {
-			if (args[0].equals("-settings")) {
-				settings();
-			} else if (!args[0].equals("-animator") && !args[0].equals("-modeler")) {
-				System.out.println("usage java -jpatch.jar [-animator | -modeler | -settings]");
-				System.exit(0);
-			}
-		}
-		System.out.println("Stating JPatch...");
-		SplashScreen splash = new SplashScreen();
-		splash.showSplash(true);
-		try {
-			switch (Settings.getInstance().lookAndFeel) {
-			case CROSS_PLATFORM:
-				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-				break;
-			case SYSTEM:
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				break;
-			case JPATCH:
-				UIManager.setLookAndFeel(new SmoothLookAndFeel());
-				break;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		if (args.length >=1) {
-			if (args[0].equals("-animator"))
-				launchAnimator();
-			else if (args[0].equals("-modeler"))
-				launchModeler();
-		} else {
-//			switch (Settings.getInstance().startup) {
-//			case ANIMATOR:
-//				launchAnimator();
+		Main.main(null);
+//		
+//		if (args.length >=1) {
+//			if (args[0].equals("-settings")) {
+//				settings();
+//			} else if (!args[0].equals("-animator") && !args[0].equals("-modeler")) {
+//				System.out.println("usage java -jpatch.jar [-animator | -modeler | -settings]");
+//				System.exit(0);
+//			}
+//		}
+//		System.out.println("Stating JPatch...");
+//		SplashScreen splash = new SplashScreen();
+//		splash.showSplash(true);
+//		try {
+//			switch (Settings.getInstance().lookAndFeel) {
+//			case CROSS_PLATFORM:
+//				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 //				break;
-//			case MODELER:
-				launchModeler();
+//			case SYSTEM:
+//				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//				break;
+//			case JPATCH:
+//				UIManager.setLookAndFeel(new SmoothLookAndFeel());
 //				break;
 //			}
-		}
-		if (SplashScreen.instance != null) {
-			Timer timer = new Timer();
-			timer.schedule(new TimerTask() {
-				public void run() {
-					EventQueue.invokeLater(new Runnable() {
-						public void run() {
-							if (SplashScreen.instance != null)
-								SplashScreen.instance.clearSplash();
-						}
-					});
-				}
-			}, 250);
-		}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		
+//		if (args.length >=1) {
+//			if (args[0].equals("-animator"))
+//				launchAnimator();
+//			else if (args[0].equals("-modeler"))
+//				launchModeler();
+//		} else {
+////			switch (Settings.getInstance().startup) {
+////			case ANIMATOR:
+////				launchAnimator();
+////				break;
+////			case MODELER:
+//				launchModeler();
+////				break;
+////			}
+//		}
+//		if (SplashScreen.instance != null) {
+//			Timer timer = new Timer();
+//			timer.schedule(new TimerTask() {
+//				public void run() {
+//					EventQueue.invokeLater(new Runnable() {
+//						public void run() {
+//							if (SplashScreen.instance != null)
+//								SplashScreen.instance.clearSplash();
+//						}
+//					});
+//				}
+//			}, 250);
+//		}
 	}
 	
 	private static void launchAnimator() {
