@@ -19,7 +19,7 @@
  * along with JPatch; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package jpatch.boundary.action;
+package jpatch.boundary.newaction;
 
 import javax.swing.*;
 
@@ -36,7 +36,7 @@ import javax.swing.*;
  * 		
  * @author sascha
  */
-public interface JPatchAction extends Action {
+public abstract class JPatchAction extends AbstractAction {
 	/** Key for the text displayed in MenuItems */
 	public static final String MENU_TEXT = "MenuText";
 	

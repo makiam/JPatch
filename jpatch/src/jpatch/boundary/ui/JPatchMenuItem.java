@@ -7,6 +7,7 @@ import java.beans.*;
 import javax.swing.*;
 
 import jpatch.boundary.action.*;
+import jpatch.boundary.newaction.JPatchAction;
 
 public class JPatchMenuItem extends JMenuItem {
 	

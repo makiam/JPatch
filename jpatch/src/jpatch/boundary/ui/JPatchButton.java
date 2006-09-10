@@ -11,7 +11,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 
-import jpatch.boundary.action.JPatchAction;
+import jpatch.boundary.newaction.JPatchAction;
 
 public class JPatchButton extends JButton implements KeyBindingHelper.CallBack {
 	private static final Insets INSETS = new Insets(2, 2, 2, 2);

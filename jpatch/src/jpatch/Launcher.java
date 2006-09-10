@@ -18,7 +18,7 @@ public final class Launcher {
 		System.setProperty("swing.aatext", Settings.JPATCH_ROOT_NODE.get("fontSmoothing", "true"));
 		System.out.println(System.getProperty("swing.boldMetal"));
 		System.out.println(System.getProperty("swing.aatext"));
-		Main.main(null);
+		Main.getInstance();
 //		
 //		if (args.length >=1) {
 //			if (args[0].equals("-settings")) {

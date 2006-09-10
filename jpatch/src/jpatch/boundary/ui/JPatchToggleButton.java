@@ -7,7 +7,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 
-import jpatch.boundary.action.JPatchAction;
+import jpatch.boundary.newaction.JPatchAction;
 
 public class JPatchToggleButton extends JToggleButton implements KeyBindingHelper.CallBack {
 

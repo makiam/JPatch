@@ -21,14 +21,7 @@
  */
 package jpatch.boundary;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.LayoutManager2;
+import java.awt.*;
 import java.io.*;
 import java.util.*;
 
@@ -36,27 +29,35 @@ import javax.swing.*;
 
 import jpatch.entity.*;
 
+import jpatch.boundary.newaction.Actions;
+import jpatch.boundary.newtools.*;
 import jpatch.boundary.settings.*;
-import jpatch.boundary.ui.ExpandableForm;
+import jpatch.boundary.ui.JPatchButton;
+
 
 /**
  * @author sascha
  *
  */
 public class Main {
-	public static final Main INSTANCE = new Main();	// singleton pattern
-	public static enum Layout { S1, S2, S3, S4, H12, H34, V13, V24, Q1234 }
+	private static final Main INSTANCE = new Main();	// singleton pattern
+	public static enum Layout { S1, S2, S3, S4, H12, H34, V13, V24, QUAD, SINGLE, H_SPLIT, V_SPLIT }
 	
 	private static final int NUMBER_OF_VIEWPORTS = 4;
 	private static Color VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.text.get();
 	private static Color ACTIVE_VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.selection.get();
 	
-	private Layout layout = Layout.Q1234;
+	private Layout layout = Layout.QUAD;
 	
+	private Robot robot;
 	private JFrame frame;
 	private JToolBar primaryToolBar;
 	private JToolBar secondaryToolBar;
 	private JLabel statusLabel = new JLabel("status");
+	
+	private JPatchTool activeTool;
+	private Model activeModel;
+	private int activeViewport = 0;
 	
 	private Viewport[] viewports = new Viewport[4];
 	private Iterable<Model> models = new Iterable<Model>() {
@@ -71,7 +72,6 @@ public class Main {
 					if (i > 0) {
 						throw new ArrayIndexOutOfBoundsException(i);
 					}
-					System.out.println(i);
 					i++;
 					return activeModel;
 				}
@@ -82,8 +82,7 @@ public class Main {
 			};
 		}
 	};
-	
-	private Model activeModel;
+
 	private JComponent screen = new JComponent() {
 
 		@Override
@@ -142,37 +141,101 @@ public class Main {
 			int wLeft = width >> 1;
 			int wRight = width - wLeft;
 			switch (layout) {
-			case Q1234:
+			case S1:
+				viewports[0].getComponent().setBounds(1, 1, width - 2, height - 2);
+				viewports[0].getComponent().setVisible(true);
+				viewports[1].getComponent().setVisible(false);
+				viewports[2].getComponent().setVisible(false);
+				viewports[3].getComponent().setVisible(false);
+				break;
+			case S2:
+				viewports[1].getComponent().setBounds(1, 1, width - 2, height - 2);
+				viewports[1].getComponent().setVisible(true);
+				viewports[0].getComponent().setVisible(false);
+				viewports[2].getComponent().setVisible(false);
+				viewports[3].getComponent().setVisible(false);
+				break;
+			case S3:
+				viewports[2].getComponent().setBounds(1, 1, width - 2, height - 2);
+				viewports[2].getComponent().setVisible(true);
+				viewports[0].getComponent().setVisible(false);
+				viewports[1].getComponent().setVisible(false);
+				viewports[3].getComponent().setVisible(false);
+				break;
+			case S4:
+				viewports[3].getComponent().setBounds(1, 1, width - 2, height - 2);
+				viewports[3].getComponent().setVisible(true);
+				viewports[0].getComponent().setVisible(false);
+				viewports[1].getComponent().setVisible(false);
+				viewports[2].getComponent().setVisible(false);
+				break;
+			case V13:
+				viewports[0].getComponent().setBounds(1, 1, width - 2, hTop - 2);
+				viewports[2].getComponent().setBounds(1, hTop + 1, width - 2, hBottom - 2);
+				viewports[0].getComponent().setVisible(true);
+				viewports[1].getComponent().setVisible(false);
+				viewports[2].getComponent().setVisible(true);
+				viewports[3].getComponent().setVisible(false);
+				break;
+			case V24:
+				viewports[1].getComponent().setBounds(1, 1, width - 2, hTop - 2);
+				viewports[3].getComponent().setBounds(1, hTop + 1, width - 2, hBottom - 2);
+				viewports[0].getComponent().setVisible(false);
+				viewports[1].getComponent().setVisible(true);
+				viewports[2].getComponent().setVisible(false);
+				viewports[3].getComponent().setVisible(true);
+				break;
+			case H12:
+				viewports[0].getComponent().setBounds(1, 1, wLeft - 2, height - 2);
+				viewports[1].getComponent().setBounds(wLeft + 1, 1, wRight - 2, height - 2);
+				viewports[0].getComponent().setVisible(true);
+				viewports[1].getComponent().setVisible(true);
+				viewports[2].getComponent().setVisible(false);
+				viewports[3].getComponent().setVisible(false);
+				break;
+			case H34:
+				viewports[2].getComponent().setBounds(1, 1, wLeft - 2, height - 2);
+				viewports[3].getComponent().setBounds(wLeft + 1, 1, wRight - 2, height - 2);
+				viewports[0].getComponent().setVisible(false);
+				viewports[1].getComponent().setVisible(false);
+				viewports[2].getComponent().setVisible(true);
+				viewports[3].getComponent().setVisible(true);
+				break;
+			case QUAD:
 				viewports[0].getComponent().setBounds(1, 1, wLeft - 2, hTop - 2);
 				viewports[1].getComponent().setBounds(wLeft + 1, 1, wRight - 2, hTop - 2);
 				viewports[2].getComponent().setBounds(1, hTop + 1, wLeft - 2, hBottom - 2);
 				viewports[3].getComponent().setBounds(wLeft + 1, hTop + 1, wRight - 2, hBottom - 2);
+				viewports[0].getComponent().setVisible(true);
+				viewports[1].getComponent().setVisible(true);
+				viewports[2].getComponent().setVisible(true);
+				viewports[3].getComponent().setVisible(true);
 				break;
 			}
 		}
-
-		
 	};
 //	private Choreograpy activeChoreography;
 	
-	public static void main(String[] args) {
-		System.setProperty("swing.boldMetal", "false");
-		System.setProperty("swing.aatext", "true");
-	}
+	
 	/**
 	 * private constructor (singleton pattern)
 	 */
 	private Main() {
-//		System.setProperty("swing.boldMetal", Settings.JPATCH_ROOT_NODE.get("metalBoldText", "false"));
-//		System.setProperty("swing.aatext", Settings.JPATCH_ROOT_NODE.get("fontSmoothing", "true"));
-		System.setProperty("swing.boldMetal", "false");
-		System.setProperty("swing.aatext", "true");
+		System.out.println("1");
+		WorkspaceManager workspaceManager;
 		try {
-			WorkspaceManager workspaceManager = new WorkspaceManager(Settings.getInstance().workspace);
+			workspaceManager = new WorkspaceManager(Settings.getInstance().workspace);
 			Project project = new Project(workspaceManager, "Test_Project");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		try {
+			robot = new Robot();
+		} catch (AWTException e) {
+			e.printStackTrace();
+		}
+		System.out.println("2");
 //		frame.setTitle("JPatch");
 		frame = new JFrame();
 		frame.setSize(800, 600);
@@ -197,9 +260,9 @@ public class Main {
 		cp1.setPrev(cp0);
 		cp2.setPrev(cp1);
 		cp3.setPrev(cp2);
-//		activeModel.addCurve(cp0);
+		activeModel.addCurve(cp0);
 		activeModel.initControlPoints();
-		
+		System.out.println("3");
 		/*
 		 * initialize viewports
 		 */
@@ -215,6 +278,7 @@ public class Main {
 		statusBar.add(Box.createHorizontalGlue());
 		statusBar.add(MemoryMonitor.createMemoryMonitor(), BorderLayout.EAST);
 		statusBar.add(Box.createHorizontalStrut(16));
+		System.out.println("4");
 		/*
 		 * initialize frame
 		 */
@@ -223,6 +287,99 @@ public class Main {
 		frame.add(screen, BorderLayout.CENTER);
 		frame.add(statusBar, BorderLayout.SOUTH);
 		frame.add(new JLabel("X"), BorderLayout.WEST);
+		
+		UIFactory uiFactory = new UIFactory();
+		uiFactory.parseLayout(this, ClassLoader.getSystemResource("jpatch/boundary/layout2.xml"));
+		
+		secondaryToolBar = (JToolBar) uiFactory.getComponent("edit toolbar");
+//		secondaryToolBar.add(new JButton(Actions.getInstance().getAction("add curve")));
+		frame.add(secondaryToolBar, BorderLayout.EAST);
+		System.out.println("5");
+//		Actions.getInstance();
+		
 		frame.setVisible(true);
+		System.out.println("6");
+	}
+	
+	public static Main getInstance() {
+		System.out.println("INSTANCE = " + INSTANCE);
+		return INSTANCE;
+	}
+	
+	public Robot getRobot() {
+		return robot;
+	}
+	
+	public JComponent getScreen() {
+		return screen;
+	}
+	
+	public Model getActiveModel() {
+		return activeModel;
+	}
+	
+	public void setLayout(Layout layout) {
+		Layout newLayout = null;
+		switch (layout) {
+		case SINGLE:
+			switch (activeViewport) {
+			case 0:
+				newLayout = Layout.S1;
+				break;
+			case 1:
+				newLayout = Layout.S2;
+				break;
+			case 2:
+				newLayout = Layout.S3;
+				break;
+			case 3:
+				newLayout = Layout.S4;
+				break;
+			}
+			break;
+		case H_SPLIT:
+			switch (activeViewport) {
+			case 0:	// fallthrough intended
+			case 1:
+				newLayout = Layout.H12;
+				break;
+			case 2:	// fallthrough intended
+			case 3:
+				newLayout = Layout.H34;
+				break;
+			}
+			break;
+		case V_SPLIT:
+			switch (activeViewport) {
+			case 0:	// fallthrough intended
+			case 2:
+				newLayout = Layout.V13;
+				break;
+			case 1:	// fallthrough intended
+			case 3:
+				newLayout = Layout.V24;
+				break;
+			}
+			break;
+		default:
+			newLayout = layout;
+		}
+		if (newLayout != this.layout) {
+			this.layout = newLayout;
+			screen.validate();
+			screen.repaint();
+		}
+	}
+	
+	public void setTool(JPatchTool tool) {
+		if (activeTool != null) {
+			activeTool.unregisterListeners(viewports);
+		}
+		if (tool != null) {
+			tool.registerListeners(viewports);
+		}
+		if (activeTool != null) {
+			activeTool.unregisterListeners(viewports);
+		}
 	}
 }
