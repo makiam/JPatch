@@ -30,7 +30,8 @@ import javax.swing.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
-import jpatch.boundary.action.*;
+//import jpatch.boundary.action.*;
+import jpatch.boundary.newaction.*;
 import jpatch.boundary.settings.*;
 import jpatch.boundary.ui.*;
 
@@ -58,7 +59,7 @@ public class UIFactory extends DefaultHandler {
 //			return 15;
 //		}
 //	};
-	public void parseLayout(URL url) {
+	public void parseLayout(Main main, URL url) {
 		XMLReader xmlReader = null;
 		try {
 			xmlReader = XMLReaderFactory.createXMLReader();
@@ -91,8 +92,9 @@ public class UIFactory extends DefaultHandler {
 		 */
 		Set<Action> unboundActions = Actions.getInstance().getUnboundActions();
 		if (unboundActions.size() > 0) {
-			InputMap inputMap = MainFrame.getInstance().getJPatchScreen().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-			ActionMap actionMap = MainFrame.getInstance().getJPatchScreen().getActionMap();
+			JComponent screen = main.getScreen();
+			InputMap inputMap = screen.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+			ActionMap actionMap = screen.getActionMap();
 			for (Action action : unboundActions) {
 				String accelerator = (String) action.getValue(JPatchAction.ACCELERATOR);
 				if (accelerator == null)

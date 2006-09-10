@@ -12,6 +12,7 @@ import javax.swing.table.*;
 import jpatch.auxilary.*;
 import jpatch.boundary.*;
 import jpatch.boundary.action.*;
+import jpatch.boundary.newaction.JPatchAction;
 
 @SuppressWarnings("serial")
 public class KeyMappingDialog extends JDialog {

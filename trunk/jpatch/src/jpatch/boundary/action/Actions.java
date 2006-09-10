@@ -32,6 +32,7 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 import jpatch.auxilary.KeyStrokeUtils;
 import jpatch.boundary.*;
+import jpatch.boundary.newaction.JPatchAction;
 import jpatch.boundary.settings.*;
 import jpatch.boundary.ui.*;
 import jpatch.entity.OLDCamera;

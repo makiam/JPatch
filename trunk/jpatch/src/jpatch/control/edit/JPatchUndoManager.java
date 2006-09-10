@@ -23,6 +23,7 @@
 package jpatch.control.edit;
 
 import jpatch.boundary.action.*;
+import jpatch.boundary.newaction.JPatchAction;
 import jpatch.boundary.settings.*;
 import java.util.*;
 
