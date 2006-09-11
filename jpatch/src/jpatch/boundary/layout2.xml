@@ -1,21 +1,23 @@
 <layout>
 	<toolbar name="main toolbar">
-		<combobutton>
-			<button command="single view" />
-			<button command="horizontally split view" />
-			<button command="vertically split view" />
-			<button command="quad view" />
+		<button command="viewport layout">
+<!--
+			<item command="single view" />
+			<item command="horizontally split view" />
+			<item command="vertically split view" />
+			<item command="quad view" />
 			<separator />
-			<button command="viewport 1" />
-			<button command="viewport 2" />
-			<button command="viewport 3" />
-			<button command="viewport 4" />
-			<button command="viewport 1+2" />
-			<button command="viewport 3+4" />
-			<button command="viewport 1+3" />
-			<button command="viewport 2+4" />
-			<button command="viewport 1+2+3+4" />
-		</combobutton>
+-->
+			<item command="viewport 1" />
+			<item command="viewport 2" />
+			<item command="viewport 3" />
+			<item command="viewport 4" />
+			<item command="viewport 12" />
+			<item command="viewport 34" />
+			<item command="viewport 13" />
+			<item command="viewport 24" />
+			<item command="viewport 1234" />
+		</button>
 	</toolbar>
 	<toolbar name="edit toolbar">
 		<separator />

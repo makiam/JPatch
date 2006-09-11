@@ -29,6 +29,7 @@ public class JPatchMenuItem extends JMenuItem {
 	 * being fired if a corresponding KEY_TYPED event has already been consumed (e.g. by a text component).
 	 */
 	protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+		System.out.println("processKeyBinding");
 		/* Check if event is a KEY_PRESSED or KEY_TYPED event */
 		if (e.getID() == KeyEvent.KEY_PRESSED) {
 			/* KEY_PRESSED */

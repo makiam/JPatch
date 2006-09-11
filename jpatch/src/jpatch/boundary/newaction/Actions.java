@@ -183,6 +183,8 @@ public class Actions extends DefaultHandler {
 			button = new JPatchLockingToggleButton((JPatchLockingToggleButtonModel.UnderlyingModel) actionDescriptor.buttonModel);
 		else if (actionDescriptor.buttonModel instanceof JPatchMenuButton.MenuButtonModel)
 			button = new JPatchMenuButton((JPatchMenuButton.MenuButtonModel) actionDescriptor.buttonModel);
+		else if (actionDescriptor.buttonModel instanceof JPatchMenuButton.ComboButtonModel)
+			button = new JPatchMenuButton((JPatchMenuButton.ComboButtonModel) actionDescriptor.buttonModel);
 		else if (actionDescriptor.buttonModel instanceof JToggleButton.ToggleButtonModel)
 			button = new JPatchToggleButton((JPatchToggleButton.ToggleButtonModel) actionDescriptor.buttonModel);
 		else
@@ -192,7 +194,7 @@ public class Actions extends DefaultHandler {
 		return button;
 	}
 	
-	public JMenuItem getMenuItem(String key) {
+	public JMenuItem getMenuItem(String key, boolean bind) {
 		ActionDescriptor actionDescriptor = actionMap.get(key);
 		if (actionDescriptor == null)
 			throw new IllegalArgumentException("Action for key " + key + " not found!");
@@ -212,7 +214,7 @@ public class Actions extends DefaultHandler {
 		}
 //		menuItem.setModel(actionDescriptor.buttonModel);
 		menuItem.setAction(actionDescriptor.action);
-		actionDescriptor.bound = true;
+		actionDescriptor.bound = bind;
 		return menuItem;
 	}
 
@@ -228,14 +230,15 @@ public class Actions extends DefaultHandler {
 	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-//		System.out.print("<" + localName);
-//		for (int i = 0, n = attributes.getLength(); i < n; i++)
-//			System.out.print(" " + attributes.getLocalName(i) + "=\"" + attributes.getValue(i) + "\"");
-//		System.out.println(">");
+		System.out.print("<" + localName);
+		for (int i = 0, n = attributes.getLength(); i < n; i++)
+			System.out.print(" " + attributes.getLocalName(i) + "=\"" + attributes.getValue(i) + "\"");
+		System.out.println(">");
 		if (localName.equals("instantiate")) {
 			try {
 				Class actionClass = Class.forName(attributes.getValue("class"));
 				String methodName = attributes.getValue("method");
+				System.out.println(actionClass + "." + methodName);
 				if (methodName != null) {
 					actionDescriptor.action = (Action) actionClass.getMethod(methodName, (Class[]) null).invoke(null, (Object[]) null);
 				} else {
@@ -267,6 +270,8 @@ public class Actions extends DefaultHandler {
 				actionDescriptor.buttonModel = new JToggleButton.ToggleButtonModel();
 			} else if (model.equals("menu")) {
 				actionDescriptor.buttonModel = new JPatchMenuButton.MenuButtonModel();
+			} else if (model.equals("combo")) {
+				actionDescriptor.buttonModel = new JPatchMenuButton.ComboButtonModel();
 			}
 			String isDefault = attributes.getValue("default");
 			if (isDefault != null && isDefault.equals("true"))

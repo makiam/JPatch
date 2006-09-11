@@ -1,88 +1,98 @@
 <actions>
 	<buttongroup type="standard" name="layout"/>
 	
-	<action name="single view" model="radio" group="layout">
-		<instantiate class="jpatch.boundary.newaction.ChangeViewActoins" method="createViewportSingleAction" />
+	<action name="viewport layout" model="combo">
+		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportLayoutAction" />
+		<property key="Icon" value="jpatch/images/icons_16x16/viewport_1.png"/>
+		<property key="ShortDescription" value="Viewport layout" />
+	</action>
+	
+	<action name="single view" model="default">
+		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportSingleAction" />
 		<property key="ShortDescription" value="Single"/>
 		<property key="Mnemonic" value="s" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_single.png"/>
 	</action>
 	
-	<action name="vertically split view" model="radio" group="layout">
-		<instantiate class="jpatch.boundary.newaction.ChangeViewActoins" method="createViewportSplitVAction" />
+	<action name="vertically split view" model="default">
+		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportSplitVAction" />
 		<property key="ShortDescription" value="Split vertically"/>
 		<property key="Mnemonic" value="v" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_split_v.png"/>
 	</action>
 	
-	<action name="horizontally split view" model="radio" group="layout">
-		<instantiate class="jpatch.boundary.newaction.ChangeViewActoins" method="createViewportSplitHAction" />
+	<action name="horizontally split view" model="default">
+		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportSplitHAction" />
 		<property key="ShortDescription" value="Split horizontally"/>
 		<property key="Mnemonic" value="h" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_split_h.png"/>
 	</action>
 	
-	<action name="quad view" model="radio" group="layout">
-		<instantiate class="jpatch.boundary.newaction.ChangeViewActoins" method="createViewportQuadAction" />
+	<action name="quad view" model="default">
+		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportQuadAction" />
 		<property key="ShortDescription" value="Quad"/>
 		<property key="Mnemonic" value="q" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_quad.png"/>
 	</action>
 	
 	<action name="viewport 1" model="radio" group="layout">
-		<instantiate class="jpatch.boundary.newaction.ChangeViewActoins" method="createViewportS1Action" />
+		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportS1Action" />
 		<property key="ShortDescription" value="Viewport 1"/>
 		<property key="Mnemonic" value="1" />
+		<property key="Accelerator" value="pressed 1" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_1.png"/>
 	</action>
 	
 	<action name="viewport 2" model="radio" group="layout">
-		<instantiate class="jpatch.boundary.newaction.ChangeViewActoins" method="createViewportS2Action" />
+		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportS2Action" />
 		<property key="ShortDescription" value="Viewport 2"/>
 		<property key="Mnemonic" value="2" />
+		<property key="Accelerator" value="pressed 2" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_2.png"/>
 	</action>
 	
 	<action name="viewport 3" model="radio" group="layout">
-		<instantiate class="jpatch.boundary.newaction.ChangeViewActoins" method="createViewportS3Action" />
+		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportS3Action" />
 		<property key="ShortDescription" value="Viewport 3"/>
 		<property key="Mnemonic" value="3" />
+		<property key="Accelerator" value="pressed 3" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_3.png"/>
 	</action>
 	
 	<action name="viewport 4" model="radio" group="layout">
-		<instantiate class="jpatch.boundary.newaction.ChangeViewActoins" method="createViewportS4Action" />
+		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportS4Action" />
 		<property key="ShortDescription" value="Viewport 4"/>
 		<property key="Mnemonic" value="4" />
+		<property key="Accelerator" value="pressed 4" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_4.png"/>
 	</action>
 	
 	<action name="viewport 12" model="radio" group="layout">
-		<instantiate class="jpatch.boundary.newaction.ChangeViewActoins" method="createViewportH12Action" />
+		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportH12Action" />
 		<property key="ShortDescription" value="Viewports 1+2"/>
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_12.png"/>
 	</action>
 	
 	<action name="viewport 34" model="radio" group="layout">
-		<instantiate class="jpatch.boundary.newaction.ChangeViewActoins" method="createViewportH34Action" />
+		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportH34Action" />
 		<property key="ShortDescription" value="Viewports 3+4"/>
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_34.png"/>
 	</action>
 	
 	<action name="viewport 13" model="radio" group="layout">
-		<instantiate class="jpatch.boundary.newaction.ChangeViewActoins" method="createViewportV13Action" />
+		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportV13Action" />
 		<property key="ShortDescription" value="Viewport 1+3"/>
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_13.png"/>
 	</action>
 	
 	<action name="viewport 24" model="radio" group="layout">
-		<instantiate class="jpatch.boundary.newaction.ChangeViewActoins" method="createViewportV24Action" />
+		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportV24Action" />
 		<property key="ShortDescription" value="Viewport 2+4"/>
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_24.png"/>
 	</action>
 	
 	<action name="viewport 1234" model="radio" group="layout">
-		<instantiate class="jpatch.boundary.newaction.ChangeViewActoins" method="createViewportQuadAction" />
+		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportQuadAction" />
 		<property key="ShortDescription" value="Viewport 1+2+3+4"/>
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_1234.png"/>
 	</action>
