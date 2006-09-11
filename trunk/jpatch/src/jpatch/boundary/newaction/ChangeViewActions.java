@@ -6,52 +6,58 @@ import jpatch.boundary.*;
 
 public class ChangeViewActions {
 
-	public JPatchAction createViewportS1Action() {
+	public static JPatchAction createViewportS1Action() {
 		return new ViewportLayoutAction(Main.Layout.S1);
 	}
 	
-	public JPatchAction createViewportS2Action() {
+	public static JPatchAction createViewportS2Action() {
 		return new ViewportLayoutAction(Main.Layout.S2);
 	}
 	
-	public JPatchAction createViewportS3Action() {
+	public static  JPatchAction createViewportS3Action() {
 		return new ViewportLayoutAction(Main.Layout.S3);
 	}
 	
-	public JPatchAction createViewportS4Action() {
+	public static  JPatchAction createViewportS4Action() {
 		return new ViewportLayoutAction(Main.Layout.S4);
 	}
 	
-	public JPatchAction createViewportH12Action() {
+	public static  JPatchAction createViewportH12Action() {
 		return new ViewportLayoutAction(Main.Layout.H12);
 	}
 	
-	public JPatchAction createViewportH34Action() {
+	public static  JPatchAction createViewportH34Action() {
 		return new ViewportLayoutAction(Main.Layout.H34);
 	}
 	
-	public JPatchAction createViewportV13Action() {
+	public static  JPatchAction createViewportV13Action() {
 		return new ViewportLayoutAction(Main.Layout.V13);
 	}
 	
-	public JPatchAction createViewportV24Action() {
+	public static  JPatchAction createViewportV24Action() {
 		return new ViewportLayoutAction(Main.Layout.V24);
 	}
 	
-	public JPatchAction createViewportQuadAction() {
+	public static  JPatchAction createViewportQuadAction() {
 		return new ViewportLayoutAction(Main.Layout.QUAD);
 	}
 	
-	public JPatchAction createViewportSingleAction() {
+	public static  JPatchAction createViewportSingleAction() {
 		return new ViewportLayoutAction(Main.Layout.SINGLE);
 	}
 	
-	public JPatchAction createViewportSplitVAction() {
+	public static  JPatchAction createViewportSplitVAction() {
 		return new ViewportLayoutAction(Main.Layout.V_SPLIT);
 	}
 	
-	public JPatchAction createViewportSplitHAction() {
+	public static  JPatchAction createViewportSplitHAction() {
 		return new ViewportLayoutAction(Main.Layout.H_SPLIT);
+	}
+	
+	public static JPatchAction createViewportLayoutAction() {
+		return new JPatchAction() {
+			public void actionPerformed(ActionEvent e) { }	// does nothing
+		};
 	}
 	
 	private static class ViewportLayoutAction extends JPatchAction {

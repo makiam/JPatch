@@ -22,6 +22,8 @@
 package jpatch.boundary;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.*;
 import java.util.*;
 
@@ -48,6 +50,8 @@ public class UIFactory extends DefaultHandler {
 	private JMenu viewCameraMenu = new JMenu("view from camera");
 	private Map mapObjects = new HashMap();
 	private Map mapLayout = new HashMap();
+	private JPatchMenuButton menuButton;
+	
 //	private Icon emptyIcon = new Icon() {
 //		public void paintIcon(Component c, Graphics g, int x, int y) { }
 //
@@ -138,10 +142,10 @@ public class UIFactory extends DefaultHandler {
 	}
 	
 	public void startElement(String namespaceURI, String localName, String qName, Attributes attributes) {	
-//		System.out.print("<" + localName);
-//		for (int i = 0; i < attributes.getLength(); i++)
-//			System.out.print(" " + attributes.getLocalName(i) + "=\"" + attributes.getValue(i) + "\"");
-//		System.out.println(">");
+		System.out.print("<" + localName);
+		for (int i = 0; i < attributes.getLength(); i++)
+			System.out.print(" " + attributes.getLocalName(i) + "=\"" + attributes.getValue(i) + "\"");
+		System.out.println(">");
 		if (localName.equals("toolbar")) {
 			toolBar = new JToolBar();
 			toolBar.setFloatable(false);
@@ -167,17 +171,17 @@ public class UIFactory extends DefaultHandler {
 			mapObjects.put(toolBar.getName(), toolBar);
 			mapLayout.put(toolBar.getName(), position);
 		} else if (localName.equals("separator")) {
-			if (toolBar != null) {
-				if (toolBar.getOrientation() == JToolBar.HORIZONTAL)
-					toolBar.add(JPatchSeparator.createHorizontalSeparator());
-				else
-					toolBar.add(JPatchSeparator.createVerticalSeparator());
-			} else if (getMenu() != null) {
+			if (getMenu() != null) {
 				JComponent menu = getMenu();
 				if (menu instanceof JMenu)
 					((JMenu) menu).addSeparator();
 				else if (menu instanceof JPopupMenu)
 					((JPopupMenu) menu).addSeparator();
+			} else if (toolBar != null) {
+				if (toolBar.getOrientation() == JToolBar.HORIZONTAL)
+					toolBar.add(JPatchSeparator.createHorizontalSeparator());
+				else
+					toolBar.add(JPatchSeparator.createVerticalSeparator());
 			}
 		} else if (localName.equals("button")) {
 			for (int i = 0; i < attributes.getLength(); i++) {
@@ -188,6 +192,7 @@ public class UIFactory extends DefaultHandler {
 						JPopupMenu popupMenu = new JPopupMenu();
 						listMenu.add(popupMenu);
 						((JPatchMenuButton) button).setPopupMenu(popupMenu);
+						menuButton = (JPatchMenuButton) button;
 					}
 				}
 			}
@@ -227,7 +232,18 @@ public class UIFactory extends DefaultHandler {
 //			System.out.println(getMenu() + " item " + attributes.getValue("command"));
 			for (int i = 0; i < attributes.getLength(); i++) {
 				if (attributes.getLocalName(i).equals("command")) {
-					getMenu().add(Actions.getInstance().getMenuItem(attributes.getValue(i)));
+					final String command = attributes.getValue(i);
+					boolean bind = getMenu() instanceof JMenu;
+					final JMenuItem menuItem = Actions.getInstance().getMenuItem(attributes.getValue(i), bind);
+					getMenu().add(menuItem);
+					if (menuButton != null) {
+						final JPatchMenuButton mb = menuButton;
+						menuItem.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								mb.setXIcon(menuItem.getIcon());
+							}
+						});
+					}
 				}
 			}
 		} else if (localName.equals("shortcut")) {
@@ -248,8 +264,11 @@ public class UIFactory extends DefaultHandler {
 		if (localName.equals("menu")) {
 			listMenu.remove((listMenu.size() - 1));
 		} else if (localName.equals("button")) {
-			if (listMenu.size() > 0)
+			if (listMenu.size() > 0) {
 				listMenu.remove((listMenu.size() - 1));
+				System.out.println("XXX");
+			}
+			menuButton = null;
 		}else if (localName.equals("toolbar")) {
 			toolBar = null;
 		}
@@ -260,6 +279,7 @@ public class UIFactory extends DefaultHandler {
 	}
 	
 	private JComponent getMenu() {
+		System.out.println(">> menuList:" + listMenu);
 		if (listMenu.size() > 0)
 			return (JComponent) listMenu.get(listMenu.size() - 1);
 		return null;

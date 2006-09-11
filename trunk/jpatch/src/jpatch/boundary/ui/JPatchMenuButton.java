@@ -40,44 +40,58 @@ public class JPatchMenuButton extends JPatchToggleButton implements ActionListen
 	private boolean pulldown = false;
 	private Action action;
 	
+	
+	public JPatchMenuButton(MenuButtonModel buttonModel) {
+		this(buttonModel, false);
+	}
+	
+	public JPatchMenuButton(ComboButtonModel buttonModel) {
+		this(buttonModel, true);
+	}
+	
 	/**
 	 * @param buttonModel
 	 */
-	public JPatchMenuButton(MenuButtonModel buttonModel) {
+	private JPatchMenuButton(JToggleButton.ToggleButtonModel buttonModel, boolean alwaysPulldown) {
 		super(buttonModel);
-		addMouseMotionListener(new MouseMotionAdapter() {
-			@Override
-			public void mouseMoved(MouseEvent e) {
-				if (pulldown && e.getX() < getWidth() - 13) {
-					pulldown = false;
-					setIcon(icon);
-					repaint();
-				} else if (!pulldown && e.getX() >= getWidth() -13) {
-					pulldown = true;
-					setIcon(pulldownRolloverIcon);
-					repaint();
+		if (alwaysPulldown) {
+			pulldown = true;
+			setIcon(pulldownRolloverIcon);
+		} else {
+			addMouseMotionListener(new MouseMotionAdapter() {
+				@Override
+				public void mouseMoved(MouseEvent e) {
+					if (pulldown && e.getX() < getWidth() - 13) {
+						pulldown = false;
+						setIcon(icon);
+						repaint();
+					} else if (!pulldown && e.getX() >= getWidth() -13) {
+						pulldown = true;
+						setIcon(pulldownRolloverIcon);
+						repaint();
+					}
 				}
-			}
-		});
-		addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				if (!pulldown && e.getX() >= getWidth() -13) {
-					pulldown = true;
-					setIcon(pulldownRolloverIcon);
-					repaint();
+			});
+			addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					if (!pulldown && e.getX() >= getWidth() -13) {
+						pulldown = true;
+						setIcon(pulldownRolloverIcon);
+						repaint();
+					}
 				}
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				if (pulldown) {
-					pulldown = false;
-					setIcon(icon);
-					repaint();
+				@Override
+				public void mouseExited(MouseEvent e) {
+					if (pulldown) {
+						pulldown = false;
+						setIcon(icon);
+						repaint();
+					}
 				}
-			}
-			
-		});
+				
+			});
+		}
 		addActionListener(this);
 	}
 
@@ -138,6 +152,12 @@ public class JPatchMenuButton extends JPatchToggleButton implements ActionListen
 	 */
 	public void popupMenuCanceled(PopupMenuEvent e) { }
 	
+//	@Override
+	public void setXIcon(Icon icon) {
+		setIcon(icon);
+		setIcons();
+	};
+	
 	private void setIcons() {
 		icon = pulldownIcon(getIcon(), false);
 		pulldownRolloverIcon = pulldownIcon(getIcon(), true);
@@ -170,4 +190,6 @@ public class JPatchMenuButton extends JPatchToggleButton implements ActionListen
 	}
 	
 	public static class MenuButtonModel extends JToggleButton.ToggleButtonModel { }
+	
+	public static class ComboButtonModel extends JToggleButton.ToggleButtonModel { }
 }

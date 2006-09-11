@@ -16,8 +16,8 @@ public final class Launcher {
 	public static void main(String[] args) {
 		System.setProperty("swing.boldMetal", Settings.JPATCH_ROOT_NODE.get("metalBoldText", "false"));
 		System.setProperty("swing.aatext", Settings.JPATCH_ROOT_NODE.get("fontSmoothing", "true"));
-		System.out.println(System.getProperty("swing.boldMetal"));
-		System.out.println(System.getProperty("swing.aatext"));
+		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 		Main.getInstance();
 //		
 //		if (args.length >=1) {

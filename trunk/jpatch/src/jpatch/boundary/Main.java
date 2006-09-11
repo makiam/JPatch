@@ -22,10 +22,12 @@
 package jpatch.boundary;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 
 import jpatch.entity.*;
 
@@ -47,7 +49,7 @@ public class Main {
 	private static Color VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.text.get();
 	private static Color ACTIVE_VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.selection.get();
 	
-	private Layout layout = Layout.QUAD;
+	private Layout layout = Layout.S1;
 	
 	private Robot robot;
 	private JFrame frame;
@@ -83,18 +85,8 @@ public class Main {
 		}
 	};
 
-	private JComponent screen = new JComponent() {
-
-		@Override
-		public void paintComponent(Graphics g) {
-			for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-				g.setColor(i == 0 ? ACTIVE_VIEWPORT_BORDER_COLOR : VIEWPORT_BORDER_COLOR);
-				Component c = viewports[i].getComponent();
-				g.drawRect(c.getX() - 1, c.getY() - 1, c.getWidth() + 1, c.getHeight() + 1);
-			}
-		}
-		
-	};
+	private Screen screen = new Screen();
+	
 	private LayoutManager2 screenLayout = new LayoutManager2() {
 		private Dimension dim = new Dimension();
 		
@@ -269,6 +261,14 @@ public class Main {
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 			viewports[i] = new ViewportGl(i + 1, Viewport.View.FRONT, models);
 			screen.add(viewports[i].getComponent());
+			final int viewportNumber = i;
+			viewports[i].getComponent().addMouseListener(new MouseAdapter() {
+				public void mousePressed(MouseEvent e) {
+					activeViewport = viewportNumber;
+					validateActiveViewport();
+					screen.paintBorder(screen.getGraphics());
+				}
+			});
 		}
 		screen.setLayout(screenLayout);
 		screen.setOpaque(false);
@@ -291,14 +291,27 @@ public class Main {
 		UIFactory uiFactory = new UIFactory();
 		uiFactory.parseLayout(this, ClassLoader.getSystemResource("jpatch/boundary/layout2.xml"));
 		
+		primaryToolBar = (JToolBar) uiFactory.getComponent("main toolbar");
 		secondaryToolBar = (JToolBar) uiFactory.getComponent("edit toolbar");
 //		secondaryToolBar.add(new JButton(Actions.getInstance().getAction("add curve")));
+		frame.add(primaryToolBar, BorderLayout.NORTH);
 		frame.add(secondaryToolBar, BorderLayout.EAST);
 		System.out.println("5");
 //		Actions.getInstance();
 		
 		frame.setVisible(true);
 		System.out.println("6");
+	}
+	
+	private void validateActiveViewport() {
+		if (!viewports[activeViewport].getComponent().isVisible()) {
+			for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+				if (viewports[i].getComponent().isVisible()) {
+					activeViewport = i;
+					break;
+				}
+			}
+		}
 	}
 	
 	public static Main getInstance() {
@@ -366,7 +379,8 @@ public class Main {
 		}
 		if (newLayout != this.layout) {
 			this.layout = newLayout;
-			screen.validate();
+			screen.doLayout();
+			validateActiveViewport();
 			screen.repaint();
 		}
 	}
@@ -381,5 +395,19 @@ public class Main {
 		if (activeTool != null) {
 			activeTool.unregisterListeners(viewports);
 		}
+	}
+	
+	private class Screen extends JComponent {
+		@Override
+		public void paintBorder(Graphics g) {
+			for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+				Component c = viewports[i].getComponent();
+				if (!c.isVisible()) {
+					continue;
+				}
+				g.setColor(i == activeViewport ? ACTIVE_VIEWPORT_BORDER_COLOR : VIEWPORT_BORDER_COLOR);
+				g.drawRect(c.getX() - 1, c.getY() - 1, c.getWidth() + 1, c.getHeight() + 1);
+			}
+		}	
 	}
 }
