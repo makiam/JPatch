@@ -241,7 +241,7 @@ public abstract class Attribute {
 	}
 	
 	public static class Limit extends Attribute.Double {
-		public Attribute.Boolean enabled;
+		public final Attribute.Boolean enabled;
 		
 		Limit(Attribute.BoundedDouble attribute) {
 			enabled = new Attribute.Boolean();
@@ -260,7 +260,7 @@ public abstract class Attribute {
 	
 	public static class Double extends Attribute {
 		private double value;
-		public Attribute.Boolean locked = new Boolean();
+		public final Attribute.Boolean locked = new Boolean();
 		
 		public Double() { }
 		
@@ -286,9 +286,9 @@ public abstract class Attribute {
 	
 	public static class BoundedDouble extends Double implements AttributeListener {
 		private final java.lang.String name;
-		public Limit min = new Limit(this);
-		public Limit max = new Limit(this);
-		public Attribute.Boolean keyed = new Boolean();
+		public final Limit min = new Limit(this);
+		public final Limit max = new Limit(this);
+		public final Attribute.Boolean keyed = new Boolean();
 		private MotionCurveNew motionCurve;
 
 		public BoundedDouble(java.lang.String name) {
@@ -342,7 +342,7 @@ public abstract class Attribute {
 	}
 
 	public static class Tuple2 extends Attribute implements AttributeListener {
-		public Double x, y;
+		public final Double x, y;
 		private boolean keyable;
 		
 		public Tuple2(java.lang.String name, javax.vecmath.Tuple2d tuple, boolean keyable) {
@@ -417,7 +417,7 @@ public abstract class Attribute {
 	}
 	
 	public static class Tuple3 extends Attribute implements AttributeListener {
-		public Double x, y, z;
+		public final Double x, y, z;
 		private boolean keyable;
 		
 		public Tuple3(java.lang.String name, javax.vecmath.Tuple3d tuple, boolean keyable) {
@@ -523,8 +523,8 @@ public abstract class Attribute {
 	
 	public static class KeyedBoolean extends Boolean {
 		private final Attribute.BoundedDouble doubleAttribute;
-		public Attribute.Boolean keyed;
-		public Attribute.Boolean locked;
+		public final Attribute.Boolean keyed;
+		public final Attribute.Boolean locked;
 		public KeyedBoolean(java.lang.String name) {
 			doubleAttribute = new Attribute.BoundedDouble(name);
 			doubleAttribute.min.enabled.set(true);

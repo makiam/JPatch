@@ -1,5 +1,22 @@
 <layout>
-	<toolbar name="main toolbar">
+	<menu name="menubar">
+		<menu name="File" mnemonic="f">
+		</menu>
+		<menu name="View" mnemonic="v">
+			<menu name="Viewport layout">
+				<item command="viewport 1" />
+				<item command="viewport 2" />
+				<item command="viewport 3" />
+				<item command="viewport 4" />
+				<item command="viewport 12" />
+				<item command="viewport 34" />
+				<item command="viewport 13" />
+				<item command="viewport 24" />
+				<item command="viewport 1234" />
+			</menu>
+		</menu>
+	</menu>
+	<toolbar name="main toolbar" position="north">
 		<button command="viewport layout">
 <!--
 			<item command="single view" />
@@ -18,8 +35,12 @@
 			<item command="viewport 24" />
 			<item command="viewport 1234" />
 		</button>
+		<separator />
+		<button command="move view" />
+		<button command="rotate view" />
+		<button command="zoom view" />
 	</toolbar>
-	<toolbar name="edit toolbar">
+	<toolbar name="edit toolbar" position="east">
 		<separator />
 		<button command="add curve segment" />
 	</toolbar>
