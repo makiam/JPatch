@@ -37,7 +37,7 @@ public class JPatchMenuButton extends JPatchToggleButton implements ActionListen
 	private long hideTime;
 	private Icon icon;
 	private Icon pulldownRolloverIcon;
-	private boolean pulldown = false;
+	private boolean pulldown;
 	private Action action;
 	
 	
@@ -52,12 +52,9 @@ public class JPatchMenuButton extends JPatchToggleButton implements ActionListen
 	/**
 	 * @param buttonModel
 	 */
-	private JPatchMenuButton(JToggleButton.ToggleButtonModel buttonModel, boolean alwaysPulldown) {
+	private JPatchMenuButton(JToggleButton.ToggleButtonModel buttonModel, final boolean alwaysPulldown) {
 		super(buttonModel);
-		if (alwaysPulldown) {
-			pulldown = true;
-			setIcon(pulldownRolloverIcon);
-		} else {
+		if (!alwaysPulldown) {
 			addMouseMotionListener(new MouseMotionAdapter() {
 				@Override
 				public void mouseMoved(MouseEvent e) {
@@ -72,26 +69,26 @@ public class JPatchMenuButton extends JPatchToggleButton implements ActionListen
 					}
 				}
 			});
-			addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					if (!pulldown && e.getX() >= getWidth() -13) {
-						pulldown = true;
-						setIcon(pulldownRolloverIcon);
-						repaint();
-					}
-				}
-				@Override
-				public void mouseExited(MouseEvent e) {
-					if (pulldown) {
-						pulldown = false;
-						setIcon(icon);
-						repaint();
-					}
-				}
-				
-			});
 		}
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				if (!pulldown && (alwaysPulldown || e.getX() >= getWidth() -13)) {
+					pulldown = true;
+					setIcon(pulldownRolloverIcon);
+					repaint();
+				}
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				if (pulldown) {
+					pulldown = false;
+					setIcon(icon);
+					repaint();
+				}
+			}
+			
+		});
 		addActionListener(this);
 	}
 
