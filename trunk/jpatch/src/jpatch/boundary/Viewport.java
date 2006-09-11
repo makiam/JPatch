@@ -97,8 +97,8 @@ public abstract class Viewport extends AbstractJPatchXObject {
 					viewRotation.y.set(-90);
 					break;
 				case BIRDS_EYE:
-					viewRotation.x.set(45);
-					viewRotation.y.set(45);
+//					viewRotation.x.set(45);
+//					viewRotation.y.set(45);
 					break;
 				}
 				viewRotation.setValueAdjusting(false);
@@ -223,17 +223,31 @@ public abstract class Viewport extends AbstractJPatchXObject {
 		double cy = Math.cos(y);
 		
 		matrix.m00 = cy * scale;
-		matrix.m01 = sy * sx * scale;
-		matrix.m02 = sy * cx * scale;
-		matrix.m10 = 0;
+		matrix.m01 = 0;
+		matrix.m02 = -sy * scale;
+		matrix.m03 = 0;
+		matrix.m10 = sy * sx * scale;
 		matrix.m11 = cx * scale;
-		matrix.m12 = -sx * scale;
-		matrix.m20 = -sy * scale;
-		matrix.m21 = cy * sx * scale;
+		matrix.m12 = cy * sx * scale;
+		matrix.m20 = sy * cx * scale;
+		matrix.m21 = -sx * scale;
 		matrix.m22 = cy * cx * scale;
 		matrix.m03 = viewTranslation.x.get() * scale;
 		matrix.m13 = viewTranslation.y.get() * scale;
 		matrix.m23 = 0;
+		
+//		matrix.m00 = cy * scale;
+//		matrix.m01 = sy * sx * scale;
+//		matrix.m02 = sy * cx * scale;
+//		matrix.m10 = 0;
+//		matrix.m11 = cx * scale;
+//		matrix.m12 = -sx * scale;
+//		matrix.m20 = -sy * scale;
+//		matrix.m21 = cy * sx * scale;
+//		matrix.m22 = cy * cx * scale;
+//		matrix.m03 = viewTranslation.x.get() * scale;
+//		matrix.m13 = viewTranslation.y.get() * scale;
+//		matrix.m23 = 0;
 		
 		inverseMatrix.invert(matrix);
 	}

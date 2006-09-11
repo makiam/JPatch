@@ -1,5 +1,6 @@
 <actions>
 	<buttongroup type="standard" name="layout"/>
+	<buttongroup type="standard" name="tool"/>
 	
 	<action name="viewport layout" model="combo">
 		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportLayoutAction" />
@@ -69,36 +70,62 @@
 	
 	<action name="viewport 12" model="radio" group="layout">
 		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportH12Action" />
-		<property key="ShortDescription" value="Viewports 1+2"/>
+		<property key="ShortDescription" value="Viewports 1 and 2"/>
+		<property key="Accelerator" value="pressed 5" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_12.png"/>
 	</action>
 	
 	<action name="viewport 34" model="radio" group="layout">
 		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportH34Action" />
-		<property key="ShortDescription" value="Viewports 3+4"/>
+		<property key="ShortDescription" value="Viewports 3 and 4"/>
+		<property key="Accelerator" value="pressed 6" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_34.png"/>
 	</action>
 	
 	<action name="viewport 13" model="radio" group="layout">
 		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportV13Action" />
-		<property key="ShortDescription" value="Viewport 1+3"/>
+		<property key="ShortDescription" value="Viewports 1 and 3"/>
+		<property key="Accelerator" value="pressed 7" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_13.png"/>
 	</action>
 	
 	<action name="viewport 24" model="radio" group="layout">
 		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportV24Action" />
-		<property key="ShortDescription" value="Viewport 2+4"/>
+		<property key="ShortDescription" value="Viewports 2 and 4"/>
+		<property key="Accelerator" value="pressed 8" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_24.png"/>
 	</action>
 	
 	<action name="viewport 1234" model="radio" group="layout">
 		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportQuadAction" />
-		<property key="ShortDescription" value="Viewport 1+2+3+4"/>
+		<property key="ShortDescription" value="Viewports 1, 2, 3 and 4"/>
+		<property key="Accelerator" value="pressed 9" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_1234.png"/>
 	</action>
 	
-	<action name="add curve segment" model="default">
-		<instantiate class="jpatch.boundary.newaction.EditModelActions" method="createAddCurveAction" />
+	<action name="move view" model="locking radio" group="tool">
+		<instantiate class="jpatch.boundary.newaction.ChangeToolActions" method="createMoveViewAction" />
+		<property key="ShortDescription" value="Move view" />
+		<property key="Mnemonic" value="m" />
+		<property key="Icon" value="jpatch/images/move.png" />
+	</action>
+	
+	<action name="rotate view" model="locking radio" group="tool">
+		<instantiate class="jpatch.boundary.newaction.ChangeToolActions" method="createRotateViewAction" />
+		<property key="ShortDescription" value="Rotate view" />
+		<property key="Mnemonic" value="r" />
+		<property key="Icon" value="jpatch/images/rotate.png" />
+	</action>
+	
+	<action name="zoom view" model="locking radio" group="tool">
+		<instantiate class="jpatch.boundary.newaction.ChangeToolActions" method="createZoomViewAction" />
+		<property key="ShortDescription" value="Zoom view" />
+		<property key="Mnemonic" value="r" />
+		<property key="Icon" value="jpatch/images/zoom.png" />
+	</action>
+	
+	<action name="add curve segment" model="locking radio" group="tool">
+		<instantiate class="jpatch.boundary.newaction.ChangeToolActions" method="createAddCurveAction" />
 		<property key="ShortDescription" value="Add curve segment(s)" />
 		<property key="Accelerator" value="pressed A" />
 		<property key="Mnemonic" value="a" />

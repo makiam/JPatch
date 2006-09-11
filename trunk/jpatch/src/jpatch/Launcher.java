@@ -6,6 +6,8 @@ import java.util.TimerTask;
 import java.util.prefs.Preferences;
 
 import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.plaf.*;
 
 import jpatch.boundary.*;
 import jpatch.boundary.laf.*;
@@ -14,11 +16,14 @@ import jpatch.entity.*;
 
 public final class Launcher {
 	public static void main(String[] args) {
-		System.setProperty("swing.boldMetal", Settings.JPATCH_ROOT_NODE.get("metalBoldText", "false"));
-		System.setProperty("swing.aatext", Settings.JPATCH_ROOT_NODE.get("fontSmoothing", "true"));
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
+		UIManager.put("ToolTip.background", new Color(0xff, 0xff, 0xaa));
+		UIManager.put("ToolTip.border", new LineBorder(Color.BLACK));
+		System.setProperty("swing.boldMetal", Settings.JPATCH_ROOT_NODE.get("metalBoldText", "false"));
+		System.setProperty("swing.aatext", Settings.JPATCH_ROOT_NODE.get("fontSmoothing", "true"));
 		Main.getInstance();
+		
 //		
 //		if (args.length >=1) {
 //			if (args[0].equals("-settings")) {

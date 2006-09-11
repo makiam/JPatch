@@ -492,7 +492,7 @@ public class EditModel {
 			len = Math.sqrt(testX * testX + testY * testY + testZ * testZ);
 			dot = Math.abs((matchX * testX + matchY * testY + matchZ * testZ) / len);	// dot product with norm(testX,testY,testZ)
 			System.out.print("\tdot = " + dot);
-			if (dot > error) {
+			if (dot >= error) {
 				error = dot;
 				curveEnd = cp;
 				System.out.print(" (best)");

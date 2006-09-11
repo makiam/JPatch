@@ -53,8 +53,6 @@ public class Main {
 	
 	private Robot robot;
 	private JFrame frame;
-	private JToolBar primaryToolBar;
-	private JToolBar secondaryToolBar;
 	private JLabel statusLabel = new JLabel("status");
 	
 	private JPatchTool activeTool;
@@ -213,7 +211,6 @@ public class Main {
 	 * private constructor (singleton pattern)
 	 */
 	private Main() {
-		System.out.println("1");
 		WorkspaceManager workspaceManager;
 		try {
 			workspaceManager = new WorkspaceManager(Settings.getInstance().workspace);
@@ -227,9 +224,8 @@ public class Main {
 		} catch (AWTException e) {
 			e.printStackTrace();
 		}
-		System.out.println("2");
-//		frame.setTitle("JPatch");
-		frame = new JFrame();
+
+		frame = new JFrame("JPatch");
 		frame.setSize(800, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -254,7 +250,7 @@ public class Main {
 		cp3.setPrev(cp2);
 		activeModel.addCurve(cp0);
 		activeModel.initControlPoints();
-		System.out.println("3");
+
 		/*
 		 * initialize viewports
 		 */
@@ -278,7 +274,7 @@ public class Main {
 		statusBar.add(Box.createHorizontalGlue());
 		statusBar.add(MemoryMonitor.createMemoryMonitor(), BorderLayout.EAST);
 		statusBar.add(Box.createHorizontalStrut(16));
-		System.out.println("4");
+
 		/*
 		 * initialize frame
 		 */
@@ -286,21 +282,16 @@ public class Main {
 		frame.setLayout(new BorderLayout());
 		frame.add(screen, BorderLayout.CENTER);
 		frame.add(statusBar, BorderLayout.SOUTH);
-		frame.add(new JLabel("X"), BorderLayout.WEST);
+		frame.add(new ViewportAttributeEditor(viewports[0]), BorderLayout.WEST);
 		
 		UIFactory uiFactory = new UIFactory();
 		uiFactory.parseLayout(this, ClassLoader.getSystemResource("jpatch/boundary/layout2.xml"));
 		
-		primaryToolBar = (JToolBar) uiFactory.getComponent("main toolbar");
-		secondaryToolBar = (JToolBar) uiFactory.getComponent("edit toolbar");
-//		secondaryToolBar.add(new JButton(Actions.getInstance().getAction("add curve")));
-		frame.add(primaryToolBar, BorderLayout.NORTH);
-		frame.add(secondaryToolBar, BorderLayout.EAST);
-		System.out.println("5");
-//		Actions.getInstance();
 		
+		frame.add(uiFactory.getComponent("main toolbar"), BorderLayout.NORTH);
+		frame.add(uiFactory.getComponent("edit toolbar"), BorderLayout.EAST);
+		frame.setJMenuBar((JMenuBar) uiFactory.getComponent("menubar"));
 		frame.setVisible(true);
-		System.out.println("6");
 	}
 	
 	private void validateActiveViewport() {
@@ -392,9 +383,7 @@ public class Main {
 		if (tool != null) {
 			tool.registerListeners(viewports);
 		}
-		if (activeTool != null) {
-			activeTool.unregisterListeners(viewports);
-		}
+		activeTool = tool;
 	}
 	
 	private class Screen extends JComponent {
