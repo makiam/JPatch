@@ -27,14 +27,11 @@ import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 
 import jpatch.entity.*;
 
-import jpatch.boundary.newaction.Actions;
 import jpatch.boundary.newtools.*;
 import jpatch.boundary.settings.*;
-import jpatch.boundary.ui.JPatchButton;
 
 
 /**
@@ -58,6 +55,10 @@ public class Main {
 	private JPatchTool activeTool;
 	private Model activeModel;
 	private int activeViewport = 0;
+	
+	private Screen screen = new Screen();
+	
+	private Inspector inspector = new Inspector();
 	
 	private Viewport[] viewports = new Viewport[4];
 	private Iterable<Model> models = new Iterable<Model>() {
@@ -83,8 +84,6 @@ public class Main {
 		}
 	};
 
-	private Screen screen = new Screen();
-	
 	private LayoutManager2 screenLayout = new LayoutManager2() {
 		private Dimension dim = new Dimension();
 		
@@ -226,7 +225,7 @@ public class Main {
 		}
 
 		frame = new JFrame("JPatch");
-		frame.setSize(800, 600);
+		frame.setSize(1024, 768);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		activeModel = new Model();
@@ -235,10 +234,10 @@ public class Main {
 		ControlPoint cp1 = new ControlPoint(activeModel);
 		ControlPoint cp2 = new ControlPoint(activeModel);
 		ControlPoint cp3 = new ControlPoint(activeModel);
-		cp0.position.set(-100, 0, 0);
-		cp1.position.set( 0, 100, 0);
-		cp2.position.set( 100, 0, 0);
-		cp3.position.set( 0,-100, 0);
+		cp0.position.set(-5, 0, 0);
+		cp1.position.set( 0, 5, 0);
+		cp2.position.set( 5, 0, 0);
+		cp3.position.set( 0,-5, 0);
 		cp0.setLoop(true);
 		cp0.setNext(cp1);
 		cp1.setNext(cp2);
@@ -263,6 +262,9 @@ public class Main {
 					activeViewport = viewportNumber;
 					validateActiveViewport();
 					screen.paintBorder(screen.getGraphics());
+					if (e.getClickCount() == 2) {
+						inspector.setObject(viewports[activeViewport]);
+					}
 				}
 			});
 		}
@@ -282,12 +284,12 @@ public class Main {
 		frame.setLayout(new BorderLayout());
 		frame.add(screen, BorderLayout.CENTER);
 		frame.add(statusBar, BorderLayout.SOUTH);
-		frame.add(new ViewportAttributeEditor(viewports[0]), BorderLayout.WEST);
+		frame.add(inspector.getComponent(), BorderLayout.WEST);
 		
 		UIFactory uiFactory = new UIFactory();
 		uiFactory.parseLayout(this, ClassLoader.getSystemResource("jpatch/boundary/layout2.xml"));
 		
-		
+		inspector.setObject(viewports[0]);
 		frame.add(uiFactory.getComponent("main toolbar"), BorderLayout.NORTH);
 		frame.add(uiFactory.getComponent("edit toolbar"), BorderLayout.EAST);
 		frame.setJMenuBar((JMenuBar) uiFactory.getComponent("menubar"));
@@ -306,7 +308,6 @@ public class Main {
 	}
 	
 	public static Main getInstance() {
-		System.out.println("INSTANCE = " + INSTANCE);
 		return INSTANCE;
 	}
 	

@@ -7,7 +7,7 @@ import javax.vecmath.*;
 import jpatch.boundary.settings.*;
 import jpatch.entity.*;
 
-public abstract class Viewport extends AbstractJPatchXObject {
+public abstract class Viewport extends AbstractNamedObject {
 	public static final double MIN_DIST_SQ = 64;
 	
 	public Attribute.Enum<View> viewType = new Attribute.Enum<View>(View.FRONT);
@@ -120,12 +120,13 @@ public abstract class Viewport extends AbstractJPatchXObject {
 		viewTranslation.addAttributeListener(updateAttributeListener);
 		viewRotation.addAttributeListener(updateAttributeListener);
 		viewScale.addAttributeListener(updateAttributeListener);
+		name.set("Viewport " + id);
 	}
 
 	
-	public String getName() {
-		return "Viewport " + id;
-	}
+//	public String getName() {
+//		return "Viewport " + id;
+//	}
 
 
 	public void setParent(JPatchObject parent) {
@@ -214,7 +215,8 @@ public abstract class Viewport extends AbstractJPatchXObject {
 	}
 	
 	protected void computeMatrices() {
-		double scale = viewScale.get();
+		double scale = viewScale.get() / 20 * component.getWidth();
+//		double screenScale = 10 / component.getWidth();
 		double x = Math.toRadians(viewRotation.x.get());
 		double y = Math.toRadians(viewRotation.y.get());
 		double sx = Math.sin(x);

@@ -46,7 +46,6 @@ public class KeyBindingHelper {
 	static {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(new KeyEventPostProcessor() {
 			public boolean postProcessKeyEvent(KeyEvent e) {
-				System.out.println("postProcessKeyEvent(" + e + ")");
 				if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
 					/* if it has a character assigned, store it */
 					KeyBindingHelper.ks = KeyStroke.getKeyStrokeForEvent(e);
@@ -66,7 +65,6 @@ public class KeyBindingHelper {
 	}
 	
 	static void registerCallback(CallBack callBack, int condition) {
-		System.out.println("registerCallback(" + callBack + ", " + condition + ")");
 		listeners.add(new Listener(callBack, condition));
 	}
 	

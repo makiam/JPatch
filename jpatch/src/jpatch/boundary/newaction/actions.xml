@@ -39,7 +39,6 @@
 	<action name="viewport 1" model="radio" group="layout">
 		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportS1Action" />
 		<property key="ShortDescription" value="Viewport 1"/>
-		<property key="Mnemonic" value="1" />
 		<property key="Accelerator" value="pressed 1" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_1.png"/>
 	</action>
@@ -47,7 +46,6 @@
 	<action name="viewport 2" model="radio" group="layout">
 		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportS2Action" />
 		<property key="ShortDescription" value="Viewport 2"/>
-		<property key="Mnemonic" value="2" />
 		<property key="Accelerator" value="pressed 2" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_2.png"/>
 	</action>
@@ -55,7 +53,6 @@
 	<action name="viewport 3" model="radio" group="layout">
 		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportS3Action" />
 		<property key="ShortDescription" value="Viewport 3"/>
-		<property key="Mnemonic" value="3" />
 		<property key="Accelerator" value="pressed 3" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_3.png"/>
 	</action>
@@ -63,7 +60,6 @@
 	<action name="viewport 4" model="radio" group="layout">
 		<instantiate class="jpatch.boundary.newaction.ChangeViewActions" method="createViewportS4Action" />
 		<property key="ShortDescription" value="Viewport 4"/>
-		<property key="Mnemonic" value="4" />
 		<property key="Accelerator" value="pressed 4" />
 		<property key="Icon" value="jpatch/images/icons_16x16/viewport_4.png"/>
 	</action>
@@ -126,7 +122,7 @@
 	
 	<action name="add curve segment" model="locking radio" group="tool">
 		<instantiate class="jpatch.boundary.newaction.ChangeToolActions" method="createAddCurveAction" />
-		<property key="ShortDescription" value="Add curve segment(s)" />
+		<property key="ShortDescription" value="Add curve segment" />
 		<property key="Accelerator" value="pressed A" />
 		<property key="Mnemonic" value="a" />
 		<property key="Icon" value="jpatch/images/add.png" />

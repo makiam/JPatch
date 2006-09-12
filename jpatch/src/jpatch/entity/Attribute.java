@@ -90,7 +90,7 @@ public abstract class Attribute {
      * @see #addAttributeListener
      */
     public void removeAttributeListener(AttributeListener l) {
-    	System.out.println(this + " remove listener " + l);
+//    	System.out.println(this + " remove listener " + l);
     	int index = -1;
     	for (int i = 0; i < attributeListeners.length; i++) {
     	    if (attributeListeners[i] == l) {

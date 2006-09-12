@@ -76,7 +76,7 @@ public class JPatchToggleButton extends JToggleButton implements KeyBindingHelpe
 		String disabledIcon = (String) a.getValue("DisabledIcon");
 		String disabledSelectedIcon = (String) a.getValue("DisabledSelectedIconResoure");
 		String shortDescription = (String) a.getValue("ShortDescription");
-		String toolTipText = (String) a.getValue("ButtonToolTip");
+		String toolTipText = getToolTipText(a);
 		String accelerator = (String) a.getValue("Accelerator");
 		if (icon != null)
 			setIcon(new ImageIcon(ClassLoader.getSystemResource(icon)));
@@ -118,18 +118,11 @@ public class JPatchToggleButton extends JToggleButton implements KeyBindingHelpe
 				System.out.println("No Keystroke: " + accelerator);
 			}
         }
-		if (toolTipText != null) {
-			if (acceleratorText != null)
-				setToolTipText("<html>&nbsp;" + toolTipText + acceleratorText + "&nbsp;</html>");
-			else
-				setToolTipText(toolTipText);
-		} else if (shortDescription != null) {
-			if (acceleratorText != null)
-				setToolTipText("<html>&nbsp;" + shortDescription + acceleratorText + "&nbsp;</html>");
-			else
-				setToolTipText(shortDescription);
+		if (acceleratorText != null) {
+			setToolTipText("<html>&nbsp;" + toolTipText + acceleratorText + "&nbsp;</html>");
+		} else {
+			setToolTipText("<html>&nbsp;" + toolTipText + "&nbsp;</html>");
 		}
-		
 		if (accelerator != null) {
 			KeyStroke ks = KeyStroke.getKeyStroke(accelerator);
 			getInputMap(WHEN_IN_FOCUSED_WINDOW).put(ks, "doClick");
@@ -142,6 +135,14 @@ public class JPatchToggleButton extends JToggleButton implements KeyBindingHelpe
 				}
 			});
 		}
+	}
+	
+	protected String getToolTipText(Action a) {
+		String s = (String) a.getValue(JPatchAction.BUTTON_TOOLTIP);
+		if (s != null) {
+			return s;
+		}
+		return (String) a.getValue(JPatchAction.SHORT_DESCRIPTION);
 	}
 	
 	protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
