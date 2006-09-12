@@ -26,6 +26,17 @@ public class AttributeUiHelper {
 		return new JLabel(attribute.getName());
 	}
 	
+//	public static JLabel createLabelFor(final Attribute.Name name) {
+//		final JLabel label = new JLabel();
+//		label.setText(name.get());
+//		name.addAttributeListener(new AttributeListener() {
+//			public void attributeChanged(Attribute attribute) {
+//				label.setText(name.get());
+//			}
+//		});
+//		return label;
+//	}
+	
 	public static JSlider createSliderFor(final Attribute attribute) {
 		final JSlider slider;
 		if (attribute instanceof Attribute.BoundedInteger) {

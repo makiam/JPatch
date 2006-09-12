@@ -97,11 +97,12 @@ public class ChangeViewTool implements JPatchTool {
 			int dy = e.getY() - y;
 			x = e.getX();
 			y = e.getY();
+			double w = viewport.getComponent().getWidth() / 20 * viewport.viewScale.get();
 			viewport.viewType.set(Viewport.View.BIRDS_EYE);
 			switch (mode) {
 			case MOVE:
-				viewport.viewTranslation.x.set(viewport.viewTranslation.x.get() + 0.1 * dx);
-				viewport.viewTranslation.y.set(viewport.viewTranslation.y.get() + 0.1 * dy);
+				viewport.viewTranslation.x.set(viewport.viewTranslation.x.get() + dx / w);
+				viewport.viewTranslation.y.set(viewport.viewTranslation.y.get() - dy / w);
 				break;
 			case ROTATE:
 				viewport.viewRotation.x.set(Math.min(Math.max(viewport.viewRotation.x.get() + 0.5 * dy, -90), 90));

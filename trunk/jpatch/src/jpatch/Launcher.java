@@ -16,12 +16,13 @@ import jpatch.entity.*;
 
 public final class Launcher {
 	public static void main(String[] args) {
+		System.setProperty("swing.boldMetal", Settings.JPATCH_ROOT_NODE.get("metalBoldText", "false"));
+		System.setProperty("swing.aatext", Settings.JPATCH_ROOT_NODE.get("fontSmoothing", "true"));
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 		UIManager.put("ToolTip.background", new Color(0xff, 0xff, 0xaa));
 		UIManager.put("ToolTip.border", new LineBorder(Color.BLACK));
-		System.setProperty("swing.boldMetal", Settings.JPATCH_ROOT_NODE.get("metalBoldText", "false"));
-		System.setProperty("swing.aatext", Settings.JPATCH_ROOT_NODE.get("fontSmoothing", "true"));
+		
 		Main.getInstance();
 		
 //		

@@ -103,7 +103,13 @@ public class JPatchLockingToggleButton extends JPatchToggleButton implements Key
 //			disabledLockedIcon = UIManager.getLookAndFeel().getDisabledIcon(this, getLockedIcon());
 //		return disabledLockedIcon;
 //	}
+
+	@Override
+	protected String getToolTipText(Action a) {
+		return super.getToolTipText(a) + "<i> (doubleclick to lock)</i>";
+	}
 	
+	@Override
 	protected void fireStateChanged() {
 		boolean locked = isLocked();
 		if (oldLocked != locked) {

@@ -32,7 +32,7 @@ import javax.swing.KeyStroke;
 
 
 /**
- * This class is used to create String representations of KeyStrokes
+ * This class is used to create String representations of KeyStrokes.
  * KeyStroke.toString() works pretty well in Java 1.5, but the same
  * method in Java 1.4 returns garbage, so this uses some methods taken
  * from the 1.5 sources to generate "valid" String representations
