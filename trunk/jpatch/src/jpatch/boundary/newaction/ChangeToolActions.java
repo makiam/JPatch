@@ -21,6 +21,10 @@ public final class ChangeToolActions {
 		return new SetToolAction(ChangeViewTool.createZoomViewTool());
 	}
 	
+	public static JPatchAction createTranslateAction() {
+		return new SetToolAction(new TranslateTool());
+	}
+	
 	public static JPatchAction createAddCurveAction() {
 		return new SetToolAction(new AddCurveTool());
 	}

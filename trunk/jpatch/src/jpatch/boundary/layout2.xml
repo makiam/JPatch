@@ -41,6 +41,7 @@
 		<button command="zoom view" />
 	</toolbar>
 	<toolbar name="edit toolbar" position="east">
+		<button command="translate tool" />
 		<separator />
 		<button command="add curve segment" />
 	</toolbar>

@@ -262,8 +262,10 @@ public class Main {
 					activeViewport = viewportNumber;
 					validateActiveViewport();
 					screen.paintBorder(screen.getGraphics());
-					if (e.getClickCount() == 2) {
-						inspector.setObject(viewports[activeViewport]);
+					if (e.getClickCount() == 2 || inspector.getObject() instanceof Viewport) {
+						if (inspector.getObject() != viewports[activeViewport]) {
+							inspector.setObject(viewports[activeViewport]);
+						}
 					}
 				}
 			});
@@ -373,6 +375,11 @@ public class Main {
 			this.layout = newLayout;
 			screen.doLayout();
 			validateActiveViewport();
+			if (inspector.getObject() instanceof Viewport) {
+				if (inspector.getObject() != viewports[activeViewport]) {
+					inspector.setObject(viewports[activeViewport]);
+				}
+			}
 			screen.repaint();
 		}
 	}

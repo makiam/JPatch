@@ -77,7 +77,9 @@ public class Inspector {
 		return panel;
 	}
 	
-	
+	public JPatchObject getObject() {
+		return object;
+	}
 	
 	private void setLabelText(Attribute.Name attribute) {
 		label.setText(attribute.get());

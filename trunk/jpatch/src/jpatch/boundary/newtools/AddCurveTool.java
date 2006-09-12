@@ -47,7 +47,6 @@ public class AddCurveTool implements JPatchTool {
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
-			System.out.println("mouse pressed");
 			switch(e.getButton()) {
 			case MouseEvent.BUTTON1:
 				assert mml == null;

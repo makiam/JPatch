@@ -120,6 +120,14 @@
 		<property key="Icon" value="jpatch/images/zoom.png" />
 	</action>
 	
+	<action name="translate tool" model="locking radio" group="tool">
+		<instantiate class="jpatch.boundary.newaction.ChangeToolActions" method="createTranslateAction" />
+		<property key="ShortDescription" value="Translate tool" />
+		<property key="Accelerator" value="pressed Q" />
+		<property key="Mnemonic" value="t" />
+		<property key="Icon" value="jpatch/images/default.png" />
+	</action>
+	
 	<action name="add curve segment" model="locking radio" group="tool">
 		<instantiate class="jpatch.boundary.newaction.ChangeToolActions" method="createAddCurveAction" />
 		<property key="ShortDescription" value="Add curve segment" />
@@ -127,4 +135,5 @@
 		<property key="Mnemonic" value="a" />
 		<property key="Icon" value="jpatch/images/add.png" />
 	</action>
+	
 </actions>
