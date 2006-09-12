@@ -7,6 +7,8 @@ import javax.media.opengl.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.Viewport.View;
+import jpatch.boundary.newtools.JPatchTool;
+import jpatch.boundary.newtools.Shape;
 import jpatch.boundary.settings.ColorSettings;
 import jpatch.boundary.settings.RealtimeRendererSettings;
 import jpatch.boundary.settings.Settings;
@@ -357,6 +359,29 @@ public class ViewportGl extends Viewport {
 		
 	}
 
+	public GL getGl() {
+		return gl;
+	}
+	
+	public void drawShape(Shape s) {
+//		gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_LINE);
+		gl.glShadeModel(GL.GL_SMOOTH);
+		gl.glBegin(GL.GL_TRIANGLES);
+		Point3f v = new Point3f();
+		Vector3f n = new Vector3f();
+		for (int i = 0, num = s.f.length; i < num; i++) {
+			v.set(s.v[s.f[i]]);
+			n.set(s.n[s.f[i]]);
+			matrix.transform(v);
+			matrix.transform(n);
+			n.normalize();
+//			gl.glNormal3f(n.x, n.y, n.z);
+			gl.glColor3f(n.x * 0.5f + 0.5f, n.y * 0.5f + 0.5f, n.z * 0.5f + 0.5f);
+			gl.glVertex3f(v.x, v.y, v.z);
+		}
+		gl.glEnd();
+	}
+	
 	@Override
 	public void draw() {
 		rasterMode();
@@ -366,6 +391,12 @@ public class ViewportGl extends Viewport {
 		for (Model model : models) {
 			drawModel(model);
 		}
+		JPatchTool tool = Main.getInstance().getTool();
+//		if (tool != null) {
+//			tool.draw(this);
+//		}
+		Shape s = Shape.createCone();
+		drawShape(s);
 		rasterMode();
 		drawInfo();
 		gl.glFlush();

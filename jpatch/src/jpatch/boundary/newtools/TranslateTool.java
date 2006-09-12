@@ -11,6 +11,7 @@ import jpatch.entity.ControlPoint;
 
 public class TranslateTool implements JPatchTool{
 	private MouseListener[] mouseListeners;
+	private Shape cone = Shape.createCone();
 	
 	public void registerListeners(Viewport[] viewports) {
 		mouseListeners = new MouseListener[viewports.length];
@@ -28,8 +29,7 @@ public class TranslateTool implements JPatchTool{
 	}
 
 	public void draw(Viewport viewport) {
-		// TODO Auto-generated method stub
-		
+		viewport.drawShape(cone);
 	}
 
 	private static class TranslateMouseListener extends MouseAdapter {

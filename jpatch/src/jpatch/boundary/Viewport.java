@@ -4,6 +4,7 @@ import java.awt.*;
 
 import javax.vecmath.*;
 
+import jpatch.boundary.newtools.Shape;
 import jpatch.boundary.settings.*;
 import jpatch.entity.*;
 
@@ -35,6 +36,7 @@ public abstract class Viewport extends AbstractNamedObject {
 	protected static final Point3d p2 = new Point3d();
 	protected static final Point3d p3 = new Point3d();
 	protected final Iterable<Model> models;
+	
 	public static enum View {
 		FRONT, BACK, TOP, BOTTOM, LEFT, RIGHT, BIRDS_EYE, CAMERA;
 		@Override
@@ -147,6 +149,8 @@ public abstract class Viewport extends AbstractNamedObject {
 	}
 	
 	public abstract void draw();
+	
+	public abstract void drawShape(Shape s);
 	
 	public void setView(View view) {
 		viewType.set(view);

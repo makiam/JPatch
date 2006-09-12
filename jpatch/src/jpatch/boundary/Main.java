@@ -394,6 +394,10 @@ public class Main {
 		activeTool = tool;
 	}
 	
+	public JPatchTool getTool() {
+		return activeTool;
+	}
+	
 	private class Screen extends JComponent {
 		@Override
 		public void paintBorder(Graphics g) {
