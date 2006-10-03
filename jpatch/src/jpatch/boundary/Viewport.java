@@ -4,7 +4,7 @@ import java.awt.*;
 
 import javax.vecmath.*;
 
-import jpatch.boundary.newtools.Shape;
+import jpatch.boundary.newtools.*;
 import jpatch.boundary.settings.*;
 import jpatch.entity.*;
 
@@ -150,7 +150,7 @@ public abstract class Viewport extends AbstractNamedObject {
 	
 	public abstract void draw();
 	
-	public abstract void drawShape(Shape s);
+	public abstract void drawShape(jpatch.boundary.newtools.Shape s);
 	
 	public void setView(View view) {
 		viewType.set(view);
