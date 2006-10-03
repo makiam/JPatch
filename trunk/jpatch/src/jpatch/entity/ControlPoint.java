@@ -1,7 +1,9 @@
 package jpatch.entity;
 
+import java.io.IOException;
 import java.io.PrintStream;
 
+import jpatch.auxilary.*;
 import javax.vecmath.*;
 
 /**
@@ -663,22 +665,19 @@ public class ControlPoint extends AbstractJPatchXObject {
 	 * throws an IllegalStateException otherwise).
 	 * @param out the PrintStream to print the xml representation to
 	 * @param indent the indentation
+	 * @throws IOException 
 	 */
-	public void xml(PrintStream out, String indent) {
+	public void writeXml(XmlWriter xmlWriter) throws IOException {
 		assert isStart() : this + " is not the start of a curve.";
-		String indent2 = indent + "\t";
-		out.append(indent);
-		out.append("<curve");
+		
+		xmlWriter.startElement("curve");
 		if (loop) {
-			out.append(" loop=\"true\"");
+			xmlWriter.attribute("loop", true);
 		}
-		out.println(">");
-		xmlCp(out, indent2);
 		for (ControlPoint cp = nextCp; cp != null && !cp.loop; cp = cp.nextCp) {
-			cp.xmlCp(out, indent2);
+			cp.xmlCp(xmlWriter);
 		}
-		out.append(indent);
-		out.println("</curve>");
+		xmlWriter.endElement();
 	}
 	
 	/**
@@ -947,33 +946,28 @@ public class ControlPoint extends AbstractJPatchXObject {
 	 * This method is private because it's only called from within the (ControlPoint) xml
 	 * method, which is used to print an entire curve (und thus must be called on the
 	 * start of the curve).
-	 * @param out the PrintStream to print the xml representation to
-	 * @param indent the indentation
-	 * @see xml(PrintStream out, String indent)
+	 * @param xmlWriter the XmlWriter to write to
+	 * @see writeXml(XmlWriter)
 	 */
-	private void xmlCp(PrintStream out, String indent) {
-		out.append(indent);
-		out.append("<cp id=\"").append(Integer.toString(id)).append("\"");
+	private void xmlCp(XmlWriter xmlWriter) throws IOException {
+		xmlWriter.startElement("cp");
+		xmlWriter.attribute("id", id);
 		if (isHead() && !isHook()) {
-			out.append(" ");
-			referencePosition.xml(out);		// print position if this is a head and not a hook
+			referencePosition.writeXml(xmlWriter);
 		} else {
 			if (!isHead()) {
-				out.append(" attach=\"").append(Integer.toString(prevAttachedCp.id)).append("\"");
+				xmlWriter.attribute("attach", prevAttachedCp.id);
 			}
 			if (isHook()) {
-				out.append(" hook=");
-				hookPos.xml(out);
+				xmlWriter.attribute("hook", hookPos);
 			}
 		}
 		if (magnitude.get() != 1) {
-			out.append(" mag=");
-			magnitude.xml(out);
+			xmlWriter.attribute("mag", magnitude);
 		}
 		if (tangentMode.get() != TangentMode.DEFAULT) {
-			out.append(" tangent=");
-			tangentMode.xml(out);
+			xmlWriter.attribute("tangent", tangentMode);
 		}
-		out.println(" />");
+		xmlWriter.endElement();
 	}
 }

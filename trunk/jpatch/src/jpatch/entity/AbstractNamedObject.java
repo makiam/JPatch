@@ -6,4 +6,12 @@ public abstract class AbstractNamedObject extends AbstractJPatchXObject {
 	public String getName() {
 		return name.get();
 	}
+	
+	protected String getXmlName() {
+		return name.get().
+				replaceAll("&","&amp;").
+				replaceAll("\"","&quot;").
+				replaceAll(">","&gt;").
+				replaceAll("<","&lt;");
+	}
 }

@@ -21,7 +21,9 @@
  */
 package jpatch.entity;
 
-import java.io.PrintStream;
+import java.io.IOException;
+
+import jpatch.auxilary.*;
 
 import javax.swing.event.*;
 
@@ -190,10 +192,6 @@ public abstract class Attribute {
 				fireAttributeChanged();
 			}
 		}
-		
-		public void xml(PrintStream out) {
-			out.append("\"").append(enumValue.name().toLowerCase()).append("\"");
-		}
 	}
 	
 	public static class Integer extends Attribute {
@@ -277,10 +275,6 @@ public abstract class Attribute {
 		
 		public double get() {
 			return value;
-		}
-		
-		public void xml(PrintStream out) {
-			out.append("\"").append(java.lang.Double.toString(value)).append("\"");
 		}
 	}
 	
@@ -408,11 +402,9 @@ public abstract class Attribute {
 				fireAttributeChanged();
 		}
 		
-		public void xml(PrintStream out) {
-			out.append("x=");
-			x.xml(out);
-			out.append(" y=");
-			y.xml(out);
+		public void writeXml(XmlWriter xmlWriter) throws IOException {
+			xmlWriter.attribute("x", x);
+			xmlWriter.attribute("y", y);
 		}
 	}
 	
@@ -490,13 +482,10 @@ public abstract class Attribute {
 				fireAttributeChanged();
 		}
 		
-		public void xml(PrintStream out) {
-			out.append("x=");
-			x.xml(out);
-			out.append(" y=");
-			y.xml(out);
-			out.append(" z=");
-			z.xml(out);
+		public void writeXml(XmlWriter xmlWriter) throws IOException {
+			xmlWriter.attribute("x", x);
+			xmlWriter.attribute("y", y);
+			xmlWriter.attribute("z", y);
 		}
 	}
 	

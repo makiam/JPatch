@@ -1,7 +1,10 @@
 package jpatch.entity;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.*;
+
+import jpatch.auxilary.XmlWriter;
 
 public class Model extends AbstractNamedObject {
 
@@ -154,21 +157,17 @@ public class Model extends AbstractNamedObject {
 		} while (cp != null && ! cp.isLoop());
 	}
 	
-	public void xml(PrintStream out, String indent) {
+	public void writeXml(XmlWriter xmlWriter) throws IOException {
 		renumberControlPoints();
-		out.append(indent);
-		out.append("<model name=\"").append(name.get()).append("\">");
-		out.println();
-		out.append(indent);
-		out.println("\t<curves>");
-		String indent2 = indent + "\t\t";
+		xmlWriter.startElement("model");
+		xmlWriter.attribute("name", name);
+		xmlWriter.attribute("type", "patch");
+		xmlWriter.startElement("curves");
 		for (ControlPoint cp : curves) {
-			cp.xml(out, indent2);
+			cp.writeXml(xmlWriter);
 		}
-		out.append(indent);
-		out.println("\t</curves>");
-		out.append(indent);
-		out.println("</model>");
+		xmlWriter.endElement();
+		xmlWriter.endElement();
 	}
 	
 	private void renumberControlPoints() {

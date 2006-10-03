@@ -21,6 +21,8 @@
  */
 package jpatch.boundary;
 
+import sds.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -54,6 +56,8 @@ public class Main {
 	
 	private JPatchTool activeTool;
 	private Model activeModel;
+	private Sds activeSds;
+	
 	private int activeViewport = 0;
 	
 	private Screen screen = new Screen();
@@ -210,6 +214,14 @@ public class Main {
 	 * private constructor (singleton pattern)
 	 */
 	private Main() {
+		try {
+			activeSds = new Sds(new FileInputStream("/home/sascha/off/hammerhead.off"));
+//			activeSds = activeSds.subdivide().subdivide();
+			
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
 		WorkspaceManager workspaceManager;
 		try {
 			workspaceManager = new WorkspaceManager(Settings.getInstance().workspace);
@@ -323,6 +335,10 @@ public class Main {
 	
 	public Model getActiveModel() {
 		return activeModel;
+	}
+	
+	public Sds getActiveSds() {
+		return activeSds;
 	}
 	
 	public void setLayout(Layout layout) {
