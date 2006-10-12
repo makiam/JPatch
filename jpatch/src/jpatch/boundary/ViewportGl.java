@@ -469,8 +469,8 @@ public class ViewportGl extends Viewport {
 			drawModel(model);
 		}
 		
-		setMaterial(new GlMaterial(new Color3f(0.1f, 0.1f, 0.2f), new Color3f(0.2f, 0.2f, 0.8f), new Color3f(1, 1, 1), 100).array);
-		drawSds(Main.getInstance().getActiveSds());
+//		setMaterial(new GlMaterial(new Color3f(0.1f, 0.1f, 0.2f), new Color3f(0.2f, 0.2f, 0.8f), new Color3f(1, 1, 1), 100).array);
+//		drawSds(Main.getInstance().getActiveSds());
 		
 		drawOrigin();
 		JPatchTool tool = Main.getInstance().getTool();

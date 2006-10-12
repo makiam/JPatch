@@ -24,6 +24,8 @@ package jpatch.boundary;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -34,6 +36,53 @@ import jpatch.entity.*;
  *
  */
 public class AbstractAttributeEditor extends ExpandableFormContainer {
+	
+	public static enum Type { ATTRIBUTE, LIMIT }
+	
+	public AbstractAttributeEditor(Object object, Item[][] items) {
+		for (int section = 0; section < items.length; section++) {
+			beginSection();
+			for (int item = 0; item < items[section].length; item++) {
+				try {
+					switch (items[section][item].type) {
+					case ATTRIBUTE:
+						addAttribute(items[section][item].name, items[section][item].field.get(object));
+						break;
+					case LIMIT:
+						addLimit(container, (Attribute.Tuple3) items[section][item].field.get(object));
+						break;
+					}
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			}
+			endSection();
+		}
+	}
+	
+	private Container container;
+	
+	public void beginSection() {
+		assert container == null : "beginSection called within a section.";
+		container = new ExpandableForm();
+	}
+	
+	public void endSection() {
+		assert container != null : "endSection called outside a section.";
+		add(container);
+		container = null;
+	}
+	
+	public void addAttribute(String name, Object attribute) {
+		assert container != null : "addAttribute called outside a section.";
+		if (attribute instanceof Attribute.Tuple3) {
+			addTuple(container, name, (Attribute.Tuple3) attribute);
+		} else if (attribute instanceof Attribute.Tuple2) {
+			addTuple(container, name, (Attribute.Tuple2) attribute);	
+		} else {
+			addScalar(container, name, (Attribute) attribute);
+		}
+	}
 	
 	protected void addScalar(Container c, String name, Attribute a) {
 		c.add(new JLabel(name));
@@ -254,5 +303,16 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		box.add(button);
 		c.add(box);
 		
-	}	
+	}
+	
+	public final static class Item {
+		public final Type type;
+		public final String name;
+		public final Field field;
+		public Item(Type type, String name, Field field) {
+			this.type = type;
+			this.name = name;
+			this.field = field;
+		}
+	}
 }

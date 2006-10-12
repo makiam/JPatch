@@ -214,13 +214,12 @@ public class Main {
 	 * private constructor (singleton pattern)
 	 */
 	private Main() {
-		try {
-			activeSds = new Sds(new FileInputStream("/home/sascha/off/hammerhead.off"));
-//			activeSds = activeSds.subdivide().subdivide();
-			
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+//		try {
+//			activeSds = new Sds(new FileInputStream("/home/sascha/off/hammerhead.off"));
+//			activeSds = activeSds.subdivide().subdivide();		
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//		}
 		
 		WorkspaceManager workspaceManager;
 		try {
