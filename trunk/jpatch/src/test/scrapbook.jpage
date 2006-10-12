@@ -80,3 +80,5 @@ javax.swing.JViewport
 
 AxisAngle4f() aa = new AxisAngle4f(1, 2, 3, 4);
 System.out.println(aa);
+
+System.out.println(new Object().getClass().getSimpleName());

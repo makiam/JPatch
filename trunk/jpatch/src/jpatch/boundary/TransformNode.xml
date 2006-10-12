@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<attributeEditor class="TransformNode">
+	<attribute name="Name" field="name" />
+	<attribute name="Visibility" field="visibility" />
+	<section>
+		<attribute name="Translation" field="translation" />
+		<limits field="translation" />
+	</section>
+	<attribute name="Position" field="position" />
+	<section>
+		<attribute name="Rotation" field="rotation" />
+		<attribute name="Order" field="rotationOrder" />
+		<limits field="rotation" />
+		<attribute name="Pivot Transl." field="rotatePivotTranslation" />
+		<attribute name="Pivot Pos." field="rotatePivotPosition" />
+	</section>
+	<attribute name="Orientation" field="orientation" />
+	<section>
+		<attribute name="Scale" field="scale" />
+		<attribute name="Pivot Transl." field="scalePivotTranslation" />
+		<attribute name="Pivot Pos." field="scalePivotPosition" />
+	</section>
+	<attribute name="Shear" field="shear" />
+</attributeEditor>

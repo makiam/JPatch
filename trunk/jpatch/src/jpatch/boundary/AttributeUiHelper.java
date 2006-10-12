@@ -21,7 +21,17 @@ public class AttributeUiHelper {
 	private static final Font staticFont = new JTextField().getFont();
 	private static final Font keyedFont = staticFont.deriveFont(Font.BOLD);
 	private static final String[] OFF_ON = new String[] { "no", "yes" };
+	private static final JLabel[] LABLES = new JLabel[] { new JLabel(OFF_ON[0]), new JLabel(OFF_ON[1]) };
 	
+	static {
+		Dimension dim = new Dimension(30, 16);
+		LABLES[0].setPreferredSize(dim);
+		LABLES[0].setOpaque(true);
+		LABLES[0].setBackground(Color.WHITE);
+		LABLES[1].setPreferredSize(dim);
+		LABLES[1].setOpaque(true);
+		LABLES[1].setBackground(Color.WHITE);
+	}
 	static JLabel getLabelFor(Attribute attribute) {
 		return new JLabel(attribute.getName());
 	}
@@ -93,10 +103,14 @@ public class AttributeUiHelper {
 	}
 	
 	public static JComponent createBooleanComboFor(final Attribute attribute) {
+		
+		
 		final Attribute.KeyedBoolean attrkb = (Attribute.KeyedBoolean) attribute;
 		Box box = Box.createHorizontalBox();
 		
 		final JSpinner comboBox = new JSpinner(new SpinnerListModel(OFF_ON));
+		comboBox.setEditor(attrkb.get() ? LABLES[1] : LABLES[0]);
+		
 		comboBox.setValue(attrkb.get() ? OFF_ON[1] : OFF_ON[0]);
 		
 		/* create a ChangeListener to update the attribute if the slider was changed */
@@ -110,6 +124,7 @@ public class AttributeUiHelper {
 		final AttributeListener attributeListener = new AttributeListener() {
 			public void attributeChanged(Attribute a) {
 				comboBox.setValue(attrkb.get() ? OFF_ON[1] : OFF_ON[0]);
+				comboBox.setEditor(attrkb.get() ? LABLES[1] : LABLES[0]);
 			}
 		};
 		
