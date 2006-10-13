@@ -279,22 +279,21 @@ public class AttributeUiHelper {
 		return textField;
 	}
 	
-	public static JComboBox createComboBoxFor(final Attribute attribute) {
-		final Attribute.Enum attrEnum = (Attribute.Enum) attribute;
-		final JComboBox comboBox = new JComboBox(attrEnum.get().getDeclaringClass().getEnumConstants());
-		comboBox.setSelectedIndex(attrEnum.get().ordinal());
+	public static JComboBox createComboBoxFor(final Attribute.Enum attribute) {
+		final JComboBox comboBox = new JComboBox(attribute.get().getDeclaringClass().getEnumConstants());
+		comboBox.setSelectedIndex(attribute.get().ordinal());
 		
 		/* create a ChangeListener to update the attribute if the slider was changed */
 		comboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				attrEnum.set((Enum) attrEnum.get().getDeclaringClass().getEnumConstants()[comboBox.getSelectedIndex()]);
+				attribute.set((Enum) attribute.get().getDeclaringClass().getEnumConstants()[comboBox.getSelectedIndex()]);
 			}
 		});
 		
 		/* create a AttributeListener to update the CheckBox if the attribute changes */
 		final AttributeListener attributeListener = new AttributeListener() {
 			public void attributeChanged(Attribute a) {
-				comboBox.setSelectedIndex(attrEnum.get().ordinal());
+				comboBox.setSelectedIndex(attribute.get().ordinal());
 			}
 		};
 		
@@ -309,7 +308,38 @@ public class AttributeUiHelper {
 				}
 			}
 		});
+		return comboBox;
+	}
+	
+	public static JComboBox createComboBoxFor(final Attribute.Array attribute) {
+		final JComboBox comboBox = new JComboBox(attribute.getArray());
+		comboBox.setSelectedIndex(attribute.getIndex());
 		
+		/* create a ChangeListener to update the attribute if the slider was changed */
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				attribute.set(comboBox.getSelectedIndex());
+			}
+		});
+		
+		/* create a AttributeListener to update the CheckBox if the attribute changes */
+		final AttributeListener attributeListener = new AttributeListener() {
+			public void attributeChanged(Attribute a) {
+				comboBox.setSelectedIndex(attribute.getIndex());
+			}
+		};
+		
+		/* add a HierarchyListener to add/remove the attributelistener if the component becomes showing */
+		comboBox.addHierarchyListener(new HierarchyListener() {
+			public void hierarchyChanged(HierarchyEvent e) {
+				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+					if (comboBox.isShowing())
+						attribute.addAttributeListener(attributeListener);
+					else
+						attribute.removeAttributeListener(attributeListener);
+				}
+			}
+		});
 		return comboBox;
 	}
 	

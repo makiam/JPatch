@@ -92,7 +92,9 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		} else if (a instanceof Attribute.Boolean) {
 			box.add(AttributeUiHelper.createCheckBoxFor(a));
 		} else if (a instanceof Attribute.Enum) {
-			box.add(AttributeUiHelper.createComboBoxFor(a));
+			box.add(AttributeUiHelper.createComboBoxFor((Attribute.Enum) a));
+		} else if (a instanceof Attribute.Array) {
+			box.add(AttributeUiHelper.createComboBoxFor((Attribute.Array) a));
 		} else {
 			box.add(AttributeUiHelper.createTextFieldFor(a));
 		}

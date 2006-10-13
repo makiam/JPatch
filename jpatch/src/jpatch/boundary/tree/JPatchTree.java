@@ -207,7 +207,7 @@ public class JPatchTree extends JTree {
 	}
 	
 	private void performDrop(JPatchTreeNode[] sources, JPatchTreeNode target) {
-		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTreenodeParent(sources, target));
+//		MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTreenodeParent(sources, target));
 		for (JPatchTreeNode source : sources) {
 			setExpandedState(new TreePath(target.getPath()), true);
 		}

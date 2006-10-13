@@ -91,13 +91,12 @@ public class EditModel {
 //		assert !a.isLoop() : a + " is looped";
 //		assert b.isEnd() : b + " is not a curve end";
 		/* append A to B */
-		System.out.println("before: b=" + b + " b.next=" + b.getNext());
-		System.out.println("        a=" + a + " a.prev=" + a.getPrev());
+//		System.out.println("before: b=" + b + " b.next=" + b.getNext());
+//		System.out.println("        a=" + a + " a.prev=" + a.getPrev());
 		editList.add(EditControlPoint.changeNext(b, a));
 		editList.add(EditControlPoint.changePrev(a, b));
-		System.out.println("after: b=" + b + " b.next=" + b.getNext());
-		System.out.println("        a=" + a + " a.prev=" + a.getPrev());
-		b.getStart().xml(System.out, "\t");
+//		System.out.println("after: b=" + b + " b.next=" + b.getNext());
+//		System.out.println("        a=" + a + " a.prev=" + a.getPrev());
 	}
 	
 	/**

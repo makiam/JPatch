@@ -32,6 +32,7 @@ import jpatch.entity.*;
  */
 public class Inspector {
 	private static Font FONT = new Font("sans-serif", Font.BOLD, 12);
+	private static Color COLOR = UIManager.getColor("TabbedPane.selected");
 	private final JPanel panel = new JPanel(new BorderLayout());
 	private final JLabel label = new JLabel();
 	private Component component;
@@ -43,8 +44,11 @@ public class Inspector {
 	};
 	
 	public Inspector() {
+		if (COLOR == null) {
+			COLOR = COLOR.black;
+		}
 		label.setFont(FONT);
-		label.setBackground(label.getBackground().darker());
+		label.setBackground(COLOR);
 		label.setOpaque(true);
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		panel.add(label, BorderLayout.NORTH);
@@ -64,7 +68,7 @@ public class Inspector {
 		}
 		component = null;
 		if (jpatchObject instanceof Viewport) {
-			component = new ViewportAttributeEditor((Viewport) jpatchObject);
+			component = AttributeEditorFactory.INSTANCE.createEditorFor(jpatchObject);
 		}
 		
 		

@@ -23,9 +23,9 @@ public class JPatchTreeNode extends DefaultMutableTreeNode implements Comparable
 	
 	public JPatchTreeNode() { }
 	
-	public JPatchTreeNode(JPatchObject jpatchObject) {
+	public JPatchTreeNode(AbstractNamedObject jpatchObject) {
 		setUserObject(jpatchObject);
-		name = (Attribute.String) jpatchObject.getAttribute("Name");
+		name = (Attribute.String) jpatchObject.name;
 		name.addAttributeListener(this);
 	}
 	

@@ -86,7 +86,6 @@ public class AddCurveTool implements JPatchTool {
 				}
 				break;
 			case MouseEvent.BUTTON2:
-				Main.getInstance().getActiveModel().xml(System.out, ">>>");	// FIXME remove this
 				break;
 			}
 		}

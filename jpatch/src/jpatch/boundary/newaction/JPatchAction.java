@@ -81,4 +81,5 @@ public abstract class JPatchAction extends AbstractAction {
 	
 	/** Key for the DisabledLockedIcon Resource */
 	public static final String DISABLED_LOCKED_ICON = "DisabledLockedIcon";
+	
 }

@@ -47,17 +47,20 @@ public class KeyBindingHelper {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(new KeyEventPostProcessor() {
 			public boolean postProcessKeyEvent(KeyEvent e) {
 				if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+//					System.out.println("postProcessKeyEvent, storing " + e.getKeyChar());
 					/* if it has a character assigned, store it */
 					KeyBindingHelper.ks = KeyStroke.getKeyStrokeForEvent(e);
 					KeyBindingHelper.e = e;
-//					KeyBindingHelper.condition = condition;
 					KeyBindingHelper.pressed = e.getID() == KeyEvent.KEY_PRESSED;
 				} else if (e.getID() == KeyEvent.KEY_TYPED && KeyBindingHelper.e != null && e.getKeyChar() == KeyBindingHelper.e.getKeyChar() && !e.isConsumed()) {
+//					System.out.println("postProcessKeyEvent, firing");
 					for (Listener listener : listeners) {
 						if (listener.callBack.reprocessKeyBinding(KeyBindingHelper.ks, KeyBindingHelper.e, listener.condition, KeyBindingHelper.pressed))
 							break;								
 					}
 					listeners.clear();
+//				} else {
+//					System.out.println("eating " + e.getKeyChar() + " " + e.getID());
 				}
 				return false;
 			}
@@ -65,6 +68,7 @@ public class KeyBindingHelper {
 	}
 	
 	static void registerCallback(CallBack callBack, int condition) {
+//		System.out.println("registerCallback(" + callBack + ", " + condition + ")");
 		listeners.add(new Listener(callBack, condition));
 	}
 	

@@ -68,6 +68,8 @@ public class ChangeViewActions {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
+			System.out.println(e);
+			Thread.dumpStack();
 			Main.getInstance().setLayout(layout);
 		}
 	}
