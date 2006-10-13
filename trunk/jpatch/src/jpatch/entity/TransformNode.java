@@ -45,6 +45,7 @@ public class TransformNode extends AbstractTransform {
 	public Attribute.Tuple3 rotatePivotTranslation = new Attribute.Tuple3("Pivot (local)", 0, 0, 0, false);
 	public Attribute.Tuple3 shear = new Attribute.Tuple3("Shear", 0, 0, 0, true);
 	
+	private ObjectRegistry objectRegistry;
 	private TransformNode parent;
 	private List<AnimObject> animObjects = new ArrayList<AnimObject>(1);
 	private List<AnimObject> unmodifiableAnimObjects = Collections.unmodifiableList(animObjects);
@@ -58,7 +59,8 @@ public class TransformNode extends AbstractTransform {
 	
 	
 	
-	public TransformNode() {
+	public TransformNode(ObjectRegistry objectRegistry) {
+		this.objectRegistry = objectRegistry;
 		addAttributeChangeListeners();
 	}
 	
@@ -128,6 +130,10 @@ public class TransformNode extends AbstractTransform {
 				translationChanged(rotatePivotTranslation, rotatePivotPosition);
 			}
 		});
+	}
+
+	public ObjectRegistry getObjectRegistry() {
+		return objectRegistry;
 	}
 	
 	

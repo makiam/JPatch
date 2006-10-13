@@ -62,7 +62,9 @@ public class Main {
 	
 	private Screen screen = new Screen();
 	
-	private Inspector inspector = new Inspector();
+	private Inspector viewInspector = new Inspector();
+	private Inspector toolInspector = new Inspector();
+	private Inspector selectionInspector = new Inspector();
 	
 	private Viewport[] viewports = new Viewport[4];
 	private Iterable<Model> models = new Iterable<Model>() {
@@ -80,7 +82,7 @@ public class Main {
 					i++;
 					return activeModel;
 				}
-
+				
 				public void remove() {
 					throw new UnsupportedOperationException();
 				}
@@ -214,12 +216,15 @@ public class Main {
 	 * private constructor (singleton pattern)
 	 */
 	private Main() {
-//		try {
-//			activeSds = new Sds(new FileInputStream("/home/sascha/off/hammerhead.off"));
-//			activeSds = activeSds.subdivide().subdivide();		
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//		}
+
+		try {
+			activeSds = new Sds(new FileInputStream("/home/sascha/meshlib/meshes/cube.off"));
+//			activeSds = activeSds.subdivide().subdivide();
+			
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
 		
 		WorkspaceManager workspaceManager;
 		try {
@@ -265,7 +270,7 @@ public class Main {
 		 * initialize viewports
 		 */
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			viewports[i] = new ViewportGl(i + 1, Viewport.View.FRONT, models);
+			viewports[i] = new ViewportGl(i + 1, i * 2, models);
 			screen.add(viewports[i].getComponent());
 			final int viewportNumber = i;
 			viewports[i].getComponent().addMouseListener(new MouseAdapter() {
@@ -273,9 +278,9 @@ public class Main {
 					activeViewport = viewportNumber;
 					validateActiveViewport();
 					screen.paintBorder(screen.getGraphics());
-					if (e.getClickCount() == 2 || inspector.getObject() instanceof Viewport) {
-						if (inspector.getObject() != viewports[activeViewport]) {
-							inspector.setObject(viewports[activeViewport]);
+					if (e.getClickCount() == 2 || viewInspector.getObject() instanceof Viewport) {
+						if (viewInspector.getObject() != viewports[activeViewport]) {
+							viewInspector.setObject(viewports[activeViewport]);
 						}
 					}
 				}
@@ -297,12 +302,17 @@ public class Main {
 		frame.setLayout(new BorderLayout());
 		frame.add(screen, BorderLayout.CENTER);
 		frame.add(statusBar, BorderLayout.SOUTH);
-		frame.add(inspector.getComponent(), BorderLayout.WEST);
+		
+		JTabbedPane inspectorPane = new JTabbedPane();
+		inspectorPane.add("View", viewInspector.getComponent());
+		inspectorPane.add("Tool", toolInspector.getComponent());
+		inspectorPane.add("Selection", selectionInspector.getComponent());
+		frame.add(inspectorPane, BorderLayout.WEST);
 		
 		UIFactory uiFactory = new UIFactory();
 		uiFactory.parseLayout(this, ClassLoader.getSystemResource("jpatch/boundary/layout2.xml"));
 		
-		inspector.setObject(viewports[0]);
+		viewInspector.setObject(viewports[0]);
 		frame.add(uiFactory.getComponent("main toolbar"), BorderLayout.NORTH);
 		frame.add(uiFactory.getComponent("edit toolbar"), BorderLayout.EAST);
 		frame.setJMenuBar((JMenuBar) uiFactory.getComponent("menubar"));
@@ -390,10 +400,8 @@ public class Main {
 			this.layout = newLayout;
 			screen.doLayout();
 			validateActiveViewport();
-			if (inspector.getObject() instanceof Viewport) {
-				if (inspector.getObject() != viewports[activeViewport]) {
-					inspector.setObject(viewports[activeViewport]);
-				}
+			if (viewInspector.getObject() != viewports[activeViewport]) {
+				viewInspector.setObject(viewports[activeViewport]);
 			}
 			screen.repaint();
 		}

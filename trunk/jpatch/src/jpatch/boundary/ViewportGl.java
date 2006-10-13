@@ -6,7 +6,6 @@ import java.util.Arrays;
 import javax.media.opengl.*;
 import javax.vecmath.*;
 
-import jpatch.boundary.Viewport.View;
 import jpatch.boundary.newtools.JPatchTool;
 import jpatch.boundary.newtools.Shape;
 import jpatch.boundary.newtools.TriangleMesh;
@@ -315,7 +314,7 @@ public class ViewportGl extends Viewport {
 	
 	private int maxLights, maxTextureSize;
 	
-	public ViewportGl(int id, View view, Iterable<Model> models) {
+	public ViewportGl(int id, int view, Iterable<Model> models) {
 		super(id, view, models);
 		drawable = LIGHTWEIGHT ? new GLJPanel() : new GLCanvas();
 		component = (Component) drawable;
@@ -855,11 +854,11 @@ public class ViewportGl extends Viewport {
 		float h = (float) component.getHeight() / 2;
 		gl.glMatrixMode(GL.GL_PROJECTION);
 		gl.glLoadIdentity();
-		if (camera != null) {
-			float a = 17.5f / (float) camera.focalLength.get(); 	// 35/focallength/2
-			float b = a * h / w;
-			gl.glDepthFunc(GL.GL_LEQUAL);
-			gl.glFrustum(-a, a, -b, b, nearClip, farClip);
+		if (false) {
+//			float a = 17.5f / (float) camera.focalLength.get(); 	// 35/focallength/2
+//			float b = a * h / w;
+//			gl.glDepthFunc(GL.GL_LEQUAL);
+//			gl.glFrustum(-a, a, -b, b, nearClip, farClip);
 		} else {
 			gl.glDepthFunc(GL.GL_LEQUAL);
 			gl.glOrtho(-w, w, -h, h, -farClip, farClip);

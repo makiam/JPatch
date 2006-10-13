@@ -10,8 +10,16 @@ import jpatch.entity.*;
 
 public abstract class Viewport extends AbstractNamedObject {
 	public static final double MIN_DIST_SQ = 64;
-	
-	public Attribute.Enum<View> viewType = new Attribute.Enum<View>(View.FRONT);
+	public ViewDirection[] standardViewDirections = new ViewDirection[] {
+			OrthoViewDirection.FRONT,
+			OrthoViewDirection.BACK,
+			OrthoViewDirection.TOP,
+			OrthoViewDirection.BOTTOM,
+			OrthoViewDirection.LEFT,
+			OrthoViewDirection.RIGHT,
+			new OrthoViewDirection.BirdsEye()
+	};
+	public Attribute.Array<ViewDirection> viewType = new Attribute.Array<ViewDirection>(standardViewDirections);
 	public Attribute.Tuple2 viewRotation = new Attribute.Tuple2("Rotation", 0, 0, false);
 	public Attribute.Tuple2 viewTranslation = new Attribute.Tuple2("Translation", 0, 0, false);
 	public Attribute.Double viewScale = new Attribute.Double(1);
@@ -26,7 +34,6 @@ public abstract class Viewport extends AbstractNamedObject {
 	protected Matrix4d inverseMatrix = new Matrix4d();
 	protected double zPos;
 	protected double fw;
-	protected Camera camera;
 	protected static final int maxSubdiv = 10;
 	protected static final float nearClip = 1;
 	protected static final float farClip = 1 << 15;
@@ -37,34 +44,11 @@ public abstract class Viewport extends AbstractNamedObject {
 	protected static final Point3d p3 = new Point3d();
 	protected final Iterable<Model> models;
 	
-	public static enum View {
-		FRONT, BACK, TOP, BOTTOM, LEFT, RIGHT, BIRDS_EYE, CAMERA;
-		@Override
-		public String toString() {
-			switch(this) {
-			case FRONT:
-				return "Front";
-			case BACK:
-				return "Back";
-			case TOP:
-				return "Top";
-			case BOTTOM:
-				return "Bottom";
-			case LEFT:
-				return "Left";
-			case RIGHT:
-				return "Right";
-			case BIRDS_EYE:
-				return "Bird's eye";
-			case CAMERA:
-				return "Camera";
-			}
-			throw new IllegalStateException();
-		}
-	}
+	protected ViewDirection viewDirection;
+	
 	private AttributeListener focalLengthAttributeListener = new AttributeListener() {
 		public void attributeChanged(Attribute attribute) {
-			fw = (float) camera.focalLength.get() / 35 * component.getWidth();
+//			fw = (float) camera.focalLength.get() / 35 * component.getWidth();
 		}
 	};
 	private AttributeListener updateAttributeListener = new AttributeListener() {
@@ -72,37 +56,10 @@ public abstract class Viewport extends AbstractNamedObject {
 			if (attribute == viewTranslation || attribute == viewRotation || attribute == viewScale) {
 				computeMatrices();
 			} else if (attribute == viewType) {
+				viewDirection.unbind(Viewport.this);
+				viewDirection = viewType.get();
 				viewRotation.setValueAdjusting(true);
-				switch(viewType.get()) {
-				case FRONT:
-					viewRotation.x.set(0);
-					viewRotation.y.set(0);
-					break;
-				case BACK:
-					viewRotation.x.set(0);
-					viewRotation.y.set(180);
-					break;
-				case TOP:
-					viewRotation.x.set(90);
-					viewRotation.y.set(0);
-					break;
-				case BOTTOM:
-					viewRotation.x.set(-90);
-					viewRotation.y.set(0);
-					break;
-				case LEFT:
-					viewRotation.x.set(0);
-					viewRotation.y.set(90);
-					break;
-				case RIGHT:
-					viewRotation.x.set(0);
-					viewRotation.y.set(-90);
-					break;
-				case BIRDS_EYE:
-//					viewRotation.x.set(45);
-//					viewRotation.y.set(45);
-					break;
-				}
+				viewDirection.bindTo(Viewport.this);
 				viewRotation.setValueAdjusting(false);
 				computeMatrices();
 			}
@@ -110,11 +67,14 @@ public abstract class Viewport extends AbstractNamedObject {
 		}
 	};
 	
-	public Viewport(int id, View view, Iterable<Model> models) {
+	public Viewport(int id, int viewDir, Iterable<Model> models) {
 		this.id = id;
-		viewType.set(view);
+		
 		this.models = models;
 		matrix.setIdentity();
+		viewDirection = standardViewDirections[viewDir];
+		viewType.set(viewDirection);
+		viewDirection.bindTo(this);
 		viewType.addAttributeListener(updateAttributeListener);
 		showPoints.addAttributeListener(updateAttributeListener);
 		showCurves.addAttributeListener(updateAttributeListener);
@@ -141,32 +101,33 @@ public abstract class Viewport extends AbstractNamedObject {
 	}
 
 	public String getInfo() {
-		if (camera == null) {
-			return "Viewport " + id + ": " + viewType.get();
-		} else {
-			return "Viewport " + id + ": " + camera.getName() + " " + camera.focalLength.get() + "mm";
-		}
+		return "Viewport " + id + ": " + viewDirection;
 	}
 	
 	public abstract void draw();
 	
 	public abstract void drawShape(jpatch.boundary.newtools.Shape s);
 	
-	public void setView(View view) {
-		viewType.set(view);
-		if (camera != null) {
-			camera.focalLength.removeAttributeListener(focalLengthAttributeListener);
-		}
-		camera = null;
-	}
+//	public void setView(View view) {
+//		viewType.set(view.ordinal());
+//		if (camera != null) {
+//			camera.focalLength.removeAttributeListener(focalLengthAttributeListener);
+//		}
+//		camera = null;
+//	}
 	
-	public void setView(Camera camera) {
-		if (this.camera != null) {
-			this.camera.focalLength.removeAttributeListener(focalLengthAttributeListener);
-		}
-		this.camera = camera;
-		camera.focalLength.addAttributeListener(focalLengthAttributeListener);
-		viewType.set(View.CAMERA);
+//	public void setView(Camera camera) {
+//		if (this.camera != null) {
+//			this.camera.focalLength.removeAttributeListener(focalLengthAttributeListener);
+//		}
+//		this.camera = camera;
+//		camera.focalLength.addAttributeListener(focalLengthAttributeListener);
+//		viewType.set(View.CAMERA);
+//	}
+	
+	public void setBirdsEyeView() {
+		standardViewDirections[6].unbind(this);
+		viewType.set(standardViewDirections[6]);
 	}
 	
 	public Component getComponent() {
@@ -296,7 +257,7 @@ public abstract class Viewport extends AbstractNamedObject {
 			boolean simple, int level
 	) {
 		double error;
-		if (camera == null) {
+		if (true) {
 			/* orthographic projection */
 			error = subdiv(x0, y0, x1, y1, x2, y2, x3, y3, simple);
 		} else {

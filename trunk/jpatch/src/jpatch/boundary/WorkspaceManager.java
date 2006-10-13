@@ -22,14 +22,24 @@
 package jpatch.boundary;
 
 import java.io.*;
+import java.util.*;
+
+import jpatch.entity.*;
 
 /*
  * @author sascha
  *
  */
 public class WorkspaceManager {
+	private static final FileFilter DIR_FILEFILTER = new FileFilter() {
+		public boolean accept(File pathname) {
+			return pathname.isDirectory();
+		}
+	};
+	
 	private File workspaceDir;
 	private File lock;
+	private Project[] projects = new Project[0];
 	
 	public WorkspaceManager(File workspaceDir) throws IOException {
 		this.workspaceDir = workspaceDir;
@@ -55,6 +65,23 @@ public class WorkspaceManager {
 		if (new FileOutputStream(lock).getChannel().tryLock() == null) {
 			throw new IOException("Can't acquire exclusive lock on workspace \"" + workspaceDir.getCanonicalPath() + "\".");
 		}
+	}
+	
+	public void refresh() {
+		List<Project> projectList = new ArrayList<Project>();
+		for (File file : workspaceDir.listFiles(DIR_FILEFILTER)) {
+			try {
+				Project project = new Project(this, file.getName());
+				projectList.add(project);
+			} catch (IOException e) {
+				;
+			}
+		}
+		projects = projectList.toArray(new Project[projectList.size()]);
+	}
+	
+	public Project[] getProjects() {
+		return projects;
 	}
 	
 	public File getDirectory() {

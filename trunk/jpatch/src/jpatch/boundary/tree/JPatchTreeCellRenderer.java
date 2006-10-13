@@ -34,12 +34,13 @@ import jpatch.entity.*;
  */
 @SuppressWarnings("serial")
 public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
-	private static final Map<Class<? extends JPatchObject>, Icon> iconMap = new HashMap<Class<? extends JPatchObject>, Icon>();
+	private static final Map<Object, Icon> iconMap = new HashMap<Object, Icon>();
 	
 	/*
 	 * initialize iconMap
 	 */
 	static {
+		iconMap.put(Object.class, new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/unknown.png")));
 		iconMap.put(TransformNode.class, new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/transformNode.png")));
 		iconMap.put(Model.class, new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/model.png")));
 	}
@@ -52,8 +53,15 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 		JPatchTreeNode node = (JPatchTreeNode) value;		// node needs to be a JPatchTreeNode
 		Object userObject = node.getUserObject();
 		setText(node.getName());							// set the label text
-		if (userObject != null)
-			setIcon(iconMap.get(userObject.getClass()));	// if we have a userObject, set the icon
+		if (userObject != null) {
+			Class objectClass = userObject.getClass();
+			Icon icon = null;
+			while (icon == null) {
+				icon = iconMap.get(objectClass);
+				objectClass = objectClass.getSuperclass();
+			}
+			setIcon(icon);
+		}
 		return this;
 	}
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<attributeEditor class="Viewport">
+	<attribute name="View direction" field="viewType" />
+	<attribute name="Show points" field="showPoints" />
+	<attribute name="Show curves" field="showCurves" />
+	<attribute name="Show surfaces" field="showSurfaces" />
+	<attribute name="Translation" field="viewTranslation" />
+	<attribute name="Rotation" field="viewRotation" />
+	<attribute name="Scale" field="viewScale" />
+</attributeEditor>

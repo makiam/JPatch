@@ -21,7 +21,8 @@
  */
 package jpatch.entity;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
 
 import jpatch.auxilary.*;
 
@@ -109,7 +110,7 @@ public abstract class Attribute {
     	    // shorter than the old list)
     	    if (index < tmp.length)
     	    	System.arraycopy(attributeListeners, index + 1, tmp, index, tmp.length - index);
-    	    // set the listener array to the new array or null
+    	    // set the listener array to the new array
     	    attributeListeners = tmp;
         }
     }
@@ -171,6 +172,51 @@ public abstract class Attribute {
 			if (!this.file.equals(file) && !valueAdjusting) {
 				this.file = file;
 				fireAttributeChanged();
+			}
+		}
+	}
+	
+	public static class Array<T> extends Attribute {
+		private T[] array;
+		private int index;
+		
+		public Array(T[] array) {
+			this.array = array;
+		}
+		
+		public T get() {
+			return array[index];
+		}
+		
+		public int getIndex() {
+			return index;
+		}
+		
+		public void set(T object) {
+			for (int i = 0, n = array.length; i < n; i++) {
+				if (array[i] == object) {
+					set(i);
+					return;
+				}
+			}
+			throw new IllegalArgumentException(object + " is not an element of the array");
+		}
+		
+		public void set(int index) {
+			if (this.index != index && !valueAdjusting) {
+				this.index = index;
+				fireAttributeChanged();
+			}
+		}
+		
+		public T[] getArray() {
+			return array;
+		}
+		
+		public void setArray(T[] array) {
+			this.array = array;
+			if (index > array.length) {
+				index = array.length - 1;
 			}
 		}
 	}

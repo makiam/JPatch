@@ -19,11 +19,23 @@ public class AttributeEditorFactory {
 	public AbstractAttributeEditor createEditorFor(Object object) {
 		Item[][] schema = schemaCache.get(object.getClass());
 		if (schema == null) {
-			URL url = ClassLoader.getSystemResource("jpatch/boundary/" + object.getClass().getSimpleName() + ".xml");
+			URL url = null;
+			Class objectClass = object.getClass();
+			while (url == null) {
+				url = ClassLoader.getSystemResource("jpatch/boundary/" + objectClass.getSimpleName() + ".xml");
+				schema = schemaCache.get(objectClass);
+				if (schema != null) {
+					schemaCache.put(object.getClass(), schema);
+					return new AbstractAttributeEditor(object, schema);
+				}
+				if (url == null) {
+					objectClass = objectClass.getSuperclass();
+				}
+			}
 			try {
 				System.out.println("reading...");
 				XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-				AttributeContentHandler handler = new AttributeContentHandler(object.getClass());
+				AttributeContentHandler handler = new AttributeContentHandler(objectClass);
 				xmlReader.setContentHandler(handler);
 				xmlReader.parse(url.toString());
 				schema = handler.getSchema();

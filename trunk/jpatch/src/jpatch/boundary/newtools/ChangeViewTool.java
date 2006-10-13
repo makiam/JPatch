@@ -98,7 +98,7 @@ public class ChangeViewTool implements JPatchTool {
 			x = e.getX();
 			y = e.getY();
 			double w = viewport.getComponent().getWidth() / 20 * viewport.viewScale.get();
-			viewport.viewType.set(Viewport.View.BIRDS_EYE);
+			viewport.setBirdsEyeView();
 			switch (mode) {
 			case MOVE:
 				viewport.viewTranslation.x.set(viewport.viewTranslation.x.get() + dx / w);
