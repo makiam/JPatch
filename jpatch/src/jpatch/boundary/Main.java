@@ -227,13 +227,22 @@ public class Main {
 	 */
 	private Main() {
 
-//		try {
-//			activeSds = new Sds(new FileInputStream("/home/sascha/meshlib/meshes/cube.off"));
-//			activeSds = activeSds.subdivide().subdivide();
-//			
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//		}
+		try {
+			activeSds = new Sds(new FileInputStream("/home/sascha/off/mushroom.off"));
+			activeSds.dump();
+//			activeSds = activeSds.subdivide();
+//			activeSds = activeSds.subdivide();
+//			activeSds = activeSds.subdivide();
+			for (int i = 0; i < 3; i++) {
+				activeSds.subdivideX();
+			}
+			activeSds.verify();
+//			activeSds.dump();
+			activeSds.smooth();
+//			System.exit(0);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
 		
 		WorkspaceManager workspaceManager;
