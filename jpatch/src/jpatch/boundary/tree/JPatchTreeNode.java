@@ -15,6 +15,7 @@ public class JPatchTreeNode extends DefaultMutableTreeNode implements Comparable
 	 */
 	static {
 		classOrder.put(Model.class, 1);
+		classOrder.put(Project.class, 1);
 		classOrder.put(TransformNode.class, 99);
 	}
 	
@@ -85,6 +86,7 @@ public class JPatchTreeNode extends DefaultMutableTreeNode implements Comparable
 	}
 
 	public int compareTo(Object o) {
+		System.out.println(this + " compareTo " + o);
 		JPatchTreeNode node = (JPatchTreeNode) o;
 		int result = 0;
 		if (userObject != null && node.userObject != null)

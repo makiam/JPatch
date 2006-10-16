@@ -35,11 +35,12 @@ import jpatch.entity.*;
 @SuppressWarnings("serial")
 public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 	private static final Map<Object, Icon> iconMap = new HashMap<Object, Icon>();
-	
+	private static final Icon projectOpenIcon = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/folder_open.png"));
 	/*
 	 * initialize iconMap
 	 */
 	static {
+		iconMap.put(Project.class, new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/folder_closed.png")));
 		iconMap.put(Object.class, new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/unknown.png")));
 		iconMap.put(TransformNode.class, new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/transformNode.png")));
 		iconMap.put(Model.class, new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/model.png")));
@@ -54,13 +55,17 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 		Object userObject = node.getUserObject();
 		setText(node.getName());							// set the label text
 		if (userObject != null) {
-			Class objectClass = userObject.getClass();
-			Icon icon = null;
-			while (icon == null) {
-				icon = iconMap.get(objectClass);
-				objectClass = objectClass.getSuperclass();
+			if (userObject instanceof Project && ((Project) userObject).isOpen()) {
+				setIcon(projectOpenIcon);
+			} else {
+				Class objectClass = userObject.getClass();
+				Icon icon = null;
+				while (icon == null) {
+					icon = iconMap.get(objectClass);
+					objectClass = objectClass.getSuperclass();
+				}
+				setIcon(icon);
 			}
-			setIcon(icon);
 		}
 		return this;
 	}

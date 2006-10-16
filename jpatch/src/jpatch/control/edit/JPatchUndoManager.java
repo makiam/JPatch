@@ -266,8 +266,8 @@ public class JPatchUndoManager {
 	}
 	
 	private void configureActions() {
-		Action undoAction = Actions.getInstance().getAction("undo");
-		Action redoAction = Actions.getInstance().getAction("redo");
+		Action undoAction = OldActions.getInstance().getAction("undo");
+		Action redoAction = OldActions.getInstance().getAction("redo");
 		undoAction.setEnabled(canUndo());
 		redoAction.setEnabled(canRedo());
 		undoAction.putValue(JPatchAction.SHORT_DESCRIPTION, undoName());

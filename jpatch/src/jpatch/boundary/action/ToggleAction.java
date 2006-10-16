@@ -57,43 +57,43 @@ public class ToggleAction extends AbstractAction {
 	public void actionPerformed(ActionEvent e) {
 		switch (type) {
 		case LOCK_X:
-			MainFrame.getInstance().getConstraints().setXLock(Actions.getInstance().getButtonModel("lock x").isSelected());
+			MainFrame.getInstance().getConstraints().setXLock(OldActions.getInstance().getButtonModel("lock x").isSelected());
 			break;
 		case LOCK_Y:
-			MainFrame.getInstance().getConstraints().setYLock(Actions.getInstance().getButtonModel("lock y").isSelected());
+			MainFrame.getInstance().getConstraints().setYLock(OldActions.getInstance().getButtonModel("lock y").isSelected());
 			break;
 		case LOCK_Z:
-			MainFrame.getInstance().getConstraints().setZLock(Actions.getInstance().getButtonModel("lock z").isSelected());
+			MainFrame.getInstance().getConstraints().setZLock(OldActions.getInstance().getButtonModel("lock z").isSelected());
 			break;
 		case LOCK_POINTS:
-			MainFrame.getInstance().getJPatchScreen().setLockPoints(Actions.getInstance().getButtonModel("lock points").isSelected());
+			MainFrame.getInstance().getJPatchScreen().setLockPoints(OldActions.getInstance().getButtonModel("lock points").isSelected());
 			break;
 		case LOCK_BONES:
-			MainFrame.getInstance().getJPatchScreen().setLockBones(Actions.getInstance().getButtonModel("lock bones").isSelected());
+			MainFrame.getInstance().getJPatchScreen().setLockBones(OldActions.getInstance().getButtonModel("lock bones").isSelected());
 			break;
 		case SELECT_POINTS:
-			MainFrame.getInstance().getJPatchScreen().setSelectPoints(Actions.getInstance().getButtonModel("select points").isSelected());
+			MainFrame.getInstance().getJPatchScreen().setSelectPoints(OldActions.getInstance().getButtonModel("select points").isSelected());
 			break;
 		case SELECT_BONES:
-			MainFrame.getInstance().getJPatchScreen().setSelectBones(Actions.getInstance().getButtonModel("select bones").isSelected());
+			MainFrame.getInstance().getJPatchScreen().setSelectBones(OldActions.getInstance().getButtonModel("select bones").isSelected());
 			break;
 		case SNAP_TO_GRID:
-			Settings.getInstance().viewports.snapToGrid = Actions.getInstance().getButtonModel("snap to grid").isSelected();
+			Settings.getInstance().viewports.snapToGrid = OldActions.getInstance().getButtonModel("snap to grid").isSelected();
 			break;
 		case SHOW_POINTS:
-			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().renderPoints(Actions.getInstance().getButtonModel("show points").isSelected());
+			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().renderPoints(OldActions.getInstance().getButtonModel("show points").isSelected());
 			break;
 		case SHOW_CURVES:
-			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().renderCurves(Actions.getInstance().getButtonModel("show curves").isSelected());
+			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().renderCurves(OldActions.getInstance().getButtonModel("show curves").isSelected());
 			break;
 		case SHOW_PATCHES:
-			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().renderPatches(Actions.getInstance().getButtonModel("show patches").isSelected());
+			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().renderPatches(OldActions.getInstance().getButtonModel("show patches").isSelected());
 			break;
 		case SHOW_ROTOSCOPE:
-			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().showRotoscope(Actions.getInstance().getButtonModel("show rotoscope").isSelected());
+			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().showRotoscope(OldActions.getInstance().getButtonModel("show rotoscope").isSelected());
 			break;
 		case SHOW_BONES:
-			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().renderBones(Actions.getInstance().getButtonModel("show bones").isSelected());
+			MainFrame.getInstance().getJPatchScreen().getActiveViewport().getViewDefinition().renderBones(OldActions.getInstance().getButtonModel("show bones").isSelected());
 			break;
 		case TANGENTS_PEAK:
 			OLDControlPoint.setDefaultMode(OLDControlPoint.PEAK);
@@ -114,7 +114,7 @@ public class ToggleAction extends AbstractAction {
 			MainFrame.getInstance().getJPatchScreen().resetMode(JPatchScreen.QUAD);
 			break;
 		case SYNCHRONIZE_VIEWPORTS:
-			Settings.getInstance().viewports.synchronizeViewports = Actions.getInstance().getButtonModel("synchronize viewports").isSelected();
+			Settings.getInstance().viewports.synchronizeViewports = OldActions.getInstance().getButtonModel("synchronize viewports").isSelected();
 			break;
 		}
 	}

@@ -401,7 +401,7 @@ public final class MainFrame extends JFrame {
 		editedMorph = morph;
 		if (morph != null) {
 //			switchMode(MORPH);
-			Actions.getInstance().enableActions(new String[] {
+			OldActions.getInstance().enableActions(new String[] {
 					"add curve segment",
 					"add bone",
 					"tangent tool",
@@ -421,12 +421,12 @@ public final class MainFrame extends JFrame {
 					"save",
 					"save as"
 			}, false);
-			Actions.getInstance().enableAction("stop edit morph", true);
+			OldActions.getInstance().enableAction("stop edit morph", true);
 			if (selection != null)
 				selection.applyMask(OLDSelection.CONTROLPOINTS);
 		} else {
 //			switchMode(MESH);
-			Actions.getInstance().enableActions(new String[] {
+			OldActions.getInstance().enableActions(new String[] {
 					"default tool",
 					"rotate tool",
 					"add curve segment",
@@ -448,7 +448,7 @@ public final class MainFrame extends JFrame {
 					"save",
 					"save as"
 			}, true);
-			Actions.getInstance().enableAction("stop edit morph", false);
+			OldActions.getInstance().enableAction("stop edit morph", false);
 		}
 		jpatchScreen.update_all();
 	}
@@ -498,26 +498,26 @@ public final class MainFrame extends JFrame {
 		}
 		
 //		Actions.getInstance().enableAction("open", true);
-		Actions.getInstance().enableAction("append", true);
+		OldActions.getInstance().enableAction("append", true);
 //		Actions.getInstance().enableAction("save", true);
 //		Actions.getInstance().enableAction("save as", true);
 		
-		Actions.getInstance().enableAction("add curve segment", true);
-		Actions.getInstance().enableAction("add bone", true);
-		Actions.getInstance().enableAction("weight selection tool", true);
-		Actions.getInstance().enableAction("rotoscope tool", true);
-		Actions.getInstance().enableAction("detach", true);
-		Actions.getInstance().enableAction("tangent tool", true);
-		Actions.getInstance().enableAction("peak tangents", true);
-		Actions.getInstance().enableAction("round tangents", true);
-		Actions.getInstance().enableAction("lathe editor", true);
-		Actions.getInstance().enableAction("compute patches", true);
-		Actions.getInstance().enableAction("zoom to fit", true);
-		Actions.getInstance().enableAction("select points", true);
-		Actions.getInstance().enableAction("select bones", true);
-		Actions.getInstance().enableAction("lock points", true);
-		Actions.getInstance().enableAction("lock bones", true);
-		Actions.getInstance().enableAction("hide", true);
+		OldActions.getInstance().enableAction("add curve segment", true);
+		OldActions.getInstance().enableAction("add bone", true);
+		OldActions.getInstance().enableAction("weight selection tool", true);
+		OldActions.getInstance().enableAction("rotoscope tool", true);
+		OldActions.getInstance().enableAction("detach", true);
+		OldActions.getInstance().enableAction("tangent tool", true);
+		OldActions.getInstance().enableAction("peak tangents", true);
+		OldActions.getInstance().enableAction("round tangents", true);
+		OldActions.getInstance().enableAction("lathe editor", true);
+		OldActions.getInstance().enableAction("compute patches", true);
+		OldActions.getInstance().enableAction("zoom to fit", true);
+		OldActions.getInstance().enableAction("select points", true);
+		OldActions.getInstance().enableAction("select bones", true);
+		OldActions.getInstance().enableAction("lock points", true);
+		OldActions.getInstance().enableAction("lock bones", true);
+		OldActions.getInstance().enableAction("hide", true);
 		
 		Settings.getInstance().startup = Settings.Startup.MODELER;
 		
@@ -577,27 +577,27 @@ public final class MainFrame extends JFrame {
 		
 		
 //		Actions.getInstance().enableAction("open", false);
-		Actions.getInstance().enableAction("append", false);
+		OldActions.getInstance().enableAction("append", false);
 //		Actions.getInstance().enableAction("save", false);
 //		Actions.getInstance().enableAction("save as", false);
 		
-		Actions.getInstance().enableAction("add curve segment", false);
-		Actions.getInstance().enableAction("add bone", false);
-		Actions.getInstance().enableAction("weight selection tool", false);
-		Actions.getInstance().enableAction("rotoscope tool", false);
-		Actions.getInstance().enableAction("detach", false);
-		Actions.getInstance().enableAction("tangent tool", false);
-		Actions.getInstance().enableAction("peak tangents", false);
-		Actions.getInstance().enableAction("round tangents", false);
-		Actions.getInstance().enableAction("lathe editor", false);
-		Actions.getInstance().enableAction("compute patches", false);
-		Actions.getInstance().enableAction("zoom to fit", false);
-		Actions.getInstance().enableAction("select points", false);
-		Actions.getInstance().enableAction("select bones", false);
-		Actions.getInstance().enableAction("lock points", false);
-		Actions.getInstance().enableAction("lock bones", false);
-		Actions.getInstance().enableAction("hide", false);
-		Actions.getInstance().enableAction("stop edit morph", false);
+		OldActions.getInstance().enableAction("add curve segment", false);
+		OldActions.getInstance().enableAction("add bone", false);
+		OldActions.getInstance().enableAction("weight selection tool", false);
+		OldActions.getInstance().enableAction("rotoscope tool", false);
+		OldActions.getInstance().enableAction("detach", false);
+		OldActions.getInstance().enableAction("tangent tool", false);
+		OldActions.getInstance().enableAction("peak tangents", false);
+		OldActions.getInstance().enableAction("round tangents", false);
+		OldActions.getInstance().enableAction("lathe editor", false);
+		OldActions.getInstance().enableAction("compute patches", false);
+		OldActions.getInstance().enableAction("zoom to fit", false);
+		OldActions.getInstance().enableAction("select points", false);
+		OldActions.getInstance().enableAction("select bones", false);
+		OldActions.getInstance().enableAction("lock points", false);
+		OldActions.getInstance().enableAction("lock bones", false);
+		OldActions.getInstance().enableAction("hide", false);
+		OldActions.getInstance().enableAction("stop edit morph", false);
 		
 		Settings.getInstance().startup = Settings.Startup.ANIMATOR;
 		
@@ -752,31 +752,31 @@ public final class MainFrame extends JFrame {
 			bone = (bones > 0);
 			jpatchScreen.setFocusTraversalKeysEnabled(!(selection.isSingle() && selection.getHotObject() instanceof OLDControlPoint));
 		}
-		Actions.getInstance().enableAction("select none", selection != null);
-		Actions.getInstance().enableAction("invert selection", selection != null);
-		Actions.getInstance().enableAction("expand selection", selection != null);
-		Actions.getInstance().enableAction("align controlpoints", selection != null);
-		Actions.getInstance().enableAction("change tangents: round", selection != null);
-		Actions.getInstance().enableAction("change tangents: peak", selection != null);
-		Actions.getInstance().enableAction("change tangents: spatch", selection != null);
-		Actions.getInstance().enableAction("automirror", selection != null);
-		Actions.getInstance().enableAction("flip x", moreThanOnePoint);
-		Actions.getInstance().enableAction("flip y", moreThanOnePoint);
-		Actions.getInstance().enableAction("flip z", moreThanOnePoint);
-		Actions.getInstance().enableAction("flip patches", moreThanOnePoint);
-		Actions.getInstance().enableAction("make patch", moreThanOnePoint);
-		Actions.getInstance().enableAction("align patches", moreThanOnePoint);
-		Actions.getInstance().enableAction("make patch", moreThanOnePoint);
-		Actions.getInstance().enableAction("add stubs", moreThanOnePoint);
-		Actions.getInstance().enableAction("remove stubs", moreThanOnePoint);
-		Actions.getInstance().enableAction("make patch", MakeFivePointPatchAction.checkSelection() != null);
-		Actions.getInstance().enableAction("weight selection tool", moreThanOnePoint);
-		Actions.getInstance().enableAction("knife tool", moreThanOnePoint);
-		Actions.getInstance().enableAction("rotate tool", moreThanOnePoint || bone || (selection != null && selection.getHotObject() instanceof AnimObject));
-		Actions.getInstance().enableAction("extrude", moreThanOnePoint);
-		Actions.getInstance().enableAction("lathe", moreThanOnePoint);
-		Actions.getInstance().enableAction("clone", moreThanOnePoint);
-		Actions.getInstance().enableAction("assign controlpoints to bones", bonesAndPoints);
+		OldActions.getInstance().enableAction("select none", selection != null);
+		OldActions.getInstance().enableAction("invert selection", selection != null);
+		OldActions.getInstance().enableAction("expand selection", selection != null);
+		OldActions.getInstance().enableAction("align controlpoints", selection != null);
+		OldActions.getInstance().enableAction("change tangents: round", selection != null);
+		OldActions.getInstance().enableAction("change tangents: peak", selection != null);
+		OldActions.getInstance().enableAction("change tangents: spatch", selection != null);
+		OldActions.getInstance().enableAction("automirror", selection != null);
+		OldActions.getInstance().enableAction("flip x", moreThanOnePoint);
+		OldActions.getInstance().enableAction("flip y", moreThanOnePoint);
+		OldActions.getInstance().enableAction("flip z", moreThanOnePoint);
+		OldActions.getInstance().enableAction("flip patches", moreThanOnePoint);
+		OldActions.getInstance().enableAction("make patch", moreThanOnePoint);
+		OldActions.getInstance().enableAction("align patches", moreThanOnePoint);
+		OldActions.getInstance().enableAction("make patch", moreThanOnePoint);
+		OldActions.getInstance().enableAction("add stubs", moreThanOnePoint);
+		OldActions.getInstance().enableAction("remove stubs", moreThanOnePoint);
+		OldActions.getInstance().enableAction("make patch", MakeFivePointPatchAction.checkSelection() != null);
+		OldActions.getInstance().enableAction("weight selection tool", moreThanOnePoint);
+		OldActions.getInstance().enableAction("knife tool", moreThanOnePoint);
+		OldActions.getInstance().enableAction("rotate tool", moreThanOnePoint || bone || (selection != null && selection.getHotObject() instanceof AnimObject));
+		OldActions.getInstance().enableAction("extrude", moreThanOnePoint);
+		OldActions.getInstance().enableAction("lathe", moreThanOnePoint);
+		OldActions.getInstance().enableAction("clone", moreThanOnePoint);
+		OldActions.getInstance().enableAction("assign controlpoints to bones", bonesAndPoints);
 		if (selection != null && selection.getHotObject() instanceof AnimObject) {
 			timelineEditor.setAnimObject((AnimObject) selection.getHotObject());
 			selectTreeNode((AnimObject) selection.getHotObject());

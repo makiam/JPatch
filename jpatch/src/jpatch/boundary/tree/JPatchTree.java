@@ -153,7 +153,12 @@ public class JPatchTree extends JTree {
 		}
 		setDropTarget(dropTarget);
 		new TreeDragGestureRecognizer(this, dragGestureListener);
+		
 //		new DragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_MOVE, dragGestureListener);
+	}
+	
+	public JPatchTreeNode getRoot() {
+		return (JPatchTreeNode) treeModel.getRoot();
 	}
 	
 	private Transferable createTransferable() {

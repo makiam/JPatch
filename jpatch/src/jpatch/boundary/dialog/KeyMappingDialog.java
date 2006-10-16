@@ -20,7 +20,7 @@ public class KeyMappingDialog extends JDialog {
 	private Font font2 = new Font("Monospaced", Font.PLAIN, 12);
 	private Font font3 = new Font("Monospaced", Font.BOLD, 12);
 
-	private Map<String, KeyStroke> keyMap = Actions.getInstance().getKeyMapping();
+	private Map<String, KeyStroke> keyMap = OldActions.getInstance().getKeyMapping();
 	private List<String> keyList = new ArrayList<String>(keyMap.keySet());
 	private String editingKey;
 	private JTable table;
@@ -165,7 +165,7 @@ public class KeyMappingDialog extends JDialog {
 				
 				itemPrev.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						keyMap.put(key, KeyStroke.getKeyStroke((String) Actions.getInstance().getAction(key).getValue(JPatchAction.ACCELERATOR)));
+						keyMap.put(key, KeyStroke.getKeyStroke((String) OldActions.getInstance().getAction(key).getValue(JPatchAction.ACCELERATOR)));
 						table.repaint();
 						checkTable();
 					}
@@ -173,7 +173,7 @@ public class KeyMappingDialog extends JDialog {
 				
 				itemDefault.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						keyMap.put(key, Actions.getInstance().getDefaultKeyStroke(key));
+						keyMap.put(key, OldActions.getInstance().getDefaultKeyStroke(key));
 						table.repaint();
 						checkTable();
 					}
@@ -204,9 +204,9 @@ public class KeyMappingDialog extends JDialog {
 				for (String key : keyMap.keySet()) {
 					KeyStroke ks = keyMap.get(key);
 					String accelerator = ks == null ? null : KeyStrokeUtils.keyStrokeToString(ks);
-					Actions.getInstance().getAction(key).putValue(JPatchAction.ACCELERATOR, accelerator);
+					OldActions.getInstance().getAction(key).putValue(JPatchAction.ACCELERATOR, accelerator);
 				}
-				Actions.getInstance().saveKeySettings();
+				OldActions.getInstance().saveKeySettings();
 			}
 		});
 		buttonCancel.addActionListener(new ActionListener() {
@@ -218,7 +218,7 @@ public class KeyMappingDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				if (JOptionPane.showConfirmDialog(KeyMappingDialog.this, "This will reset all key-bindings to their default values", "Reset to defaults", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 					for (String key : keyMap.keySet()) {
-						keyMap.put(key, Actions.getInstance().getDefaultKeyStroke(key));
+						keyMap.put(key, OldActions.getInstance().getDefaultKeyStroke(key));
 					}
 					table.repaint();
 					checkTable();

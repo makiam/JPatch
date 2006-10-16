@@ -41,8 +41,9 @@ public class JPatchTreeModel extends DefaultTreeModel {
 	@Override
 	public void setRoot(TreeNode root) {
 		super.setRoot(root);
-		if (root != null)
+		if (root != null) {
 			((JPatchTreeNode) root).setTreeModel(this);
+		}
 	}
 
 

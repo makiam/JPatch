@@ -22,7 +22,7 @@ public final class RotateAction extends AbstractAction {
 			if (selection != null && (selection.getMap().size() > 1 || selection.getHotObject() instanceof AnimObject)) {
 				//MainFrame.getInstance().getJPatchScreen().setTool(new RotateTool());
 				MainFrame.getInstance().getUndoManager().addEdit(new AtomicChangeTool(Tools.rotateTool));
-				((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).beginTemporaryAction();
+				((LockingButtonGroup) OldActions.getInstance().getButtonGroup("mode")).beginTemporaryAction();
 //				MainFrame.getInstance().getMeshToolBar().setMode(MeshToolBar.ROTATE);
 			}
 //			} else {

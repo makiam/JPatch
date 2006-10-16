@@ -136,4 +136,24 @@
 		<property key="Icon" value="jpatch/images/add.png" />
 	</action>
 	
+	<action name="new project" model="default">
+		<instantiate class="jpatch.boundary.newaction.ProjectActions" method="createNewProjectAction" />
+		<property key="ShortDescription" value="New project" />
+	</action>
+	
+	<action name="open project" model="default">
+		<instantiate class="jpatch.boundary.newaction.ProjectActions" method="createOpenProjectAction" />
+		<property key="ShortDescription" value="Open project" />
+	</action>
+	
+	<action name="close project" model="default">
+		<instantiate class="jpatch.boundary.newaction.ProjectActions" method="createCloseProjectAction" />
+		<property key="ShortDescription" value="Close project" />
+	</action>
+	
+	<action name="delete project" model="default">
+		<instantiate class="jpatch.boundary.newaction.ProjectActions" method="createDeleteProjectAction" />
+		<property key="ShortDescription" value="Delete project" />
+	</action>
+	
 </actions>

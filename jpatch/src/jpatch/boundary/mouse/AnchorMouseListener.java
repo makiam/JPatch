@@ -19,12 +19,12 @@ public class AnchorMouseListener extends MouseAdapter {
 		ViewDefinition viewDef = MainFrame.getInstance().getJPatchScreen().getViewDefinition((Component) e.getSource());
 		OLDSelection selection = MainFrame.getInstance().getSelection();
 		if (selection == null) {
-			((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(false);
+			((LockingButtonGroup) OldActions.getInstance().getButtonGroup("mode")).actionDone(false);
 			return;
 		}
 		Object object = selection.getHotObject();
 		if (object == null || !(object instanceof AnimModel)){
-			((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(false);
+			((LockingButtonGroup) OldActions.getInstance().getButtonGroup("mode")).actionDone(false);
 			return;
 		}
 		AnimModel animModel = (AnimModel) object;
@@ -78,6 +78,6 @@ public class AnchorMouseListener extends MouseAdapter {
 			animModel.setPosition(p);
 			MainFrame.getInstance().getJPatchScreen().update_all();
 		}
-		((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(false);
+		((LockingButtonGroup) OldActions.getInstance().getButtonGroup("mode")).actionDone(false);
 	}
 }

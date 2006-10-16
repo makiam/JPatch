@@ -133,7 +133,7 @@ public class Animation implements MutableTreeNode {
 	public void addCamera(final OLDCamera camera, MotionCurveSet mcs) {
 //		if (MainFrame.getInstance().getAnimation() != null)
 		MainFrame.getInstance().getTreeModel().insertNodeInto(camera, treenodeCameras, listCameras.size());
-		Actions.getInstance().addAction("camera" + camera.hashCode(), new ViewAction(camera), new JToggleButton.ToggleButtonModel());
+		OldActions.getInstance().addAction("camera" + camera.hashCode(), new ViewAction(camera), new JToggleButton.ToggleButtonModel());
 		setupViewCameraMenu();
 		setCurvesetFor(camera, mcs);
 	}
@@ -165,7 +165,7 @@ public class Animation implements MutableTreeNode {
 	
 	public void removeCamera(OLDCamera camera) {
 		MainFrame.getInstance().getTreeModel().removeNodeFromParent(camera);
-		Actions.getInstance().removeAction("camera" + camera.hashCode());
+		OldActions.getInstance().removeAction("camera" + camera.hashCode());
 		setupViewCameraMenu();
 		removeAnimObject(camera);
 	}
@@ -346,11 +346,11 @@ public class Animation implements MutableTreeNode {
 		JMenu viewCameraMenu = MainFrame.getInstance().getViewCameraMenu();
 		viewCameraMenu.removeAll();
 		for (JPatchDummyButton button : dummyButtonList)
-			Actions.getInstance().getButtonGroup("view").remove(button);
+			OldActions.getInstance().getButtonGroup("view").remove(button);
 		dummyButtonList.clear();
 		
 		for (final OLDCamera cam : listCameras) {
-			JToggleButton.ToggleButtonModel buttonModel = (JToggleButton.ToggleButtonModel) Actions.getInstance().getButtonModel("camera" + cam.hashCode());
+			JToggleButton.ToggleButtonModel buttonModel = (JToggleButton.ToggleButtonModel) OldActions.getInstance().getButtonModel("camera" + cam.hashCode());
 			JPatchRadioButtonMenuItem menuItem = new JPatchRadioButtonMenuItem(buttonModel) {
 				@Override
 				public String getText() {
@@ -359,8 +359,8 @@ public class Animation implements MutableTreeNode {
 			};
 			JPatchDummyButton dummyButton = new JPatchDummyButton(buttonModel);
 			dummyButtonList.add(dummyButton);
-			Actions.getInstance().getButtonGroup("view").add(dummyButton);
-			menuItem.addActionListener(Actions.getInstance().getAction("camera" + cam.hashCode()));
+			OldActions.getInstance().getButtonGroup("view").add(dummyButton);
+			menuItem.addActionListener(OldActions.getInstance().getAction("camera" + cam.hashCode()));
 			viewCameraMenu.add(menuItem);
 		}
 	}

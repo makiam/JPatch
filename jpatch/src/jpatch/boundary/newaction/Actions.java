@@ -34,6 +34,8 @@ import jpatch.auxilary.KeyStrokeUtils;
 import jpatch.boundary.*;
 import jpatch.boundary.settings.*;
 import jpatch.boundary.ui.*;
+import jpatch.entity.JPatchObject;
+import jpatch.entity.Project;
 
 
 
@@ -341,5 +343,20 @@ public class Actions extends DefaultHandler {
 	
 	static class DummyAction extends AbstractAction {
 		public void actionPerformed(ActionEvent e) { } // do nothing
+	}
+	
+	public void rethinkProjectActions() {
+		enableAction("new project", true);
+		JPatchObject object = Main.getInstance().getSelectedTreeUserObject();
+		if (object instanceof Project) {
+			enableAction("delete project", true);
+			boolean open = ((Project) object).isOpen();
+			enableAction("open project", !open);
+			enableAction("close project", open);
+		} else {
+			enableAction("delete project", false);
+			enableAction("open project", false);
+			enableAction("close project", false);
+		}
 	}
 }

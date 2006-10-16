@@ -42,20 +42,20 @@ import jpatch.entity.OLDCamera;
  * @author sascha
  *
  */
-public class Actions extends DefaultHandler {
+public class OldActions extends DefaultHandler {
 	private static final URL URL = ClassLoader.getSystemResource("jpatch/boundary/action/actions.xml");
-	private static Actions INSTANCE;
+	private static OldActions INSTANCE;
 	private Map<String, ActionDescriptor> actionMap = new HashMap<String, ActionDescriptor>();
 	private Map<String, ButtonGroup> buttonGroupMap = new HashMap<String, ButtonGroup>();
 	private ActionDescriptor actionDescriptor;
 
-	public static Actions getInstance() {
+	public static OldActions getInstance() {
 		if (INSTANCE == null)
-			INSTANCE = new Actions(URL);
+			INSTANCE = new OldActions(URL);
 		return INSTANCE;
 	}
 	
-	private Actions(URL url) {
+	private OldActions(URL url) {
 		addActions(actionMap);
 		XMLReader xmlReader = null;
 		try {

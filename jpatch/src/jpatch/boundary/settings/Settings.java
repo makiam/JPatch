@@ -31,7 +31,7 @@ import javax.swing.table.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
-import jpatch.boundary.action.Actions;
+import jpatch.boundary.action.OldActions;
 import jpatch.boundary.laf.SmoothLookAndFeel;
 
 

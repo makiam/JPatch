@@ -101,8 +101,8 @@ public class NewTreeTest2 {
 		frame.setLayout(new BorderLayout());
 		frame.add(new JScrollPane(tree), BorderLayout.CENTER);
 		JToolBar toolBar = new JToolBar();
-		toolBar.add(Actions.getInstance().getButton("undo"));
-		toolBar.add(Actions.getInstance().getButton("redo"));
+		toolBar.add(OldActions.getInstance().getButton("undo"));
+		toolBar.add(OldActions.getInstance().getButton("redo"));
 		frame.add(toolBar, BorderLayout.NORTH);
 		frame.pack();
 		frame.setVisible(true);

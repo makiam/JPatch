@@ -197,7 +197,7 @@ public final class JPatchScreen extends JPanel {
 		if (viewport != activeViewport) {
 			Viewport2 old = activeViewport;
 			activeViewport = viewport;
-			Actions.getInstance().setViewDefinition(activeViewport.getViewDefinition());
+			OldActions.getInstance().setViewDefinition(activeViewport.getViewDefinition());
 			if (old != null)
 				old.getDrawable().display();
 			viewport.getDrawable().display();
@@ -441,12 +441,12 @@ public final class JPatchScreen extends JPanel {
 	public void setTool(JPatchTool tool) {
 		this.tool = tool;
 		if (tool == Tools.defaultTool) {
-			Actions.getInstance().getButtonModel("default tool").setSelected(true);
+			OldActions.getInstance().getButtonModel("default tool").setSelected(true);
 		} else if (tool == Tools.rotateTool) {
 			Tools.rotateTool.reInit(MainFrame.getInstance().getSelection());
-			Actions.getInstance().getButtonModel("rotate tool").setSelected(true);
+			OldActions.getInstance().getButtonModel("rotate tool").setSelected(true);
 		} else if (tool == Tools.rotoscopeTool) {
-			Actions.getInstance().getButtonModel("rotoscope tool").setSelected(true);
+			OldActions.getInstance().getButtonModel("rotoscope tool").setSelected(true);
 		}
 		removeAllMouseListeners();
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
