@@ -13,15 +13,22 @@ import javax.vecmath.Point3d;
 public class Edge {
 	Vertex vertex0;
 	Vertex vertex1;
+	int level;
 	Edge neighbor;
 	Face face;
 	Edge prev;
 	Edge next;
-	public Vertex edgePoint = new Vertex(0, 0, 0);
-	
+	public Vertex edgePoint;
+	public Point3d midPoint2;
 	public Edge(Vertex vertex0, Vertex vertex1) {
 		this.vertex0 = vertex0;
 		this.vertex1 = vertex1;
+	}
+	
+	public Edge(Vertex vertex0, Vertex vertex1, int level) {
+		this.vertex0 = vertex0;
+		this.vertex1 = vertex1;
+		this.level = level;
 	}
 	
 	public Vertex getVertex0() {
@@ -56,5 +63,9 @@ public class Edge {
 			return vertex0 == e.vertex0 && vertex1 == e.vertex1;
 		}
 		return false;
+	}
+	
+	public String toString() {
+		return isMaster() ? vertex0.num + "+" + vertex1.num : vertex0.num + "-" + vertex1.num;
 	}
 }

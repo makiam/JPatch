@@ -468,8 +468,8 @@ public class ViewportGl extends Viewport {
 			drawModel(model);
 		}
 		
-//		setMaterial(new GlMaterial(new Color3f(0.1f, 0.1f, 0.2f), new Color3f(0.2f, 0.2f, 0.8f), new Color3f(1, 1, 1), 100).array);
-//		drawSds(Main.getInstance().getActiveSds());
+		setMaterial(new GlMaterial(new Color3f(0.1f, 0.1f, 0.2f), new Color3f(0.2f, 0.2f, 0.8f), new Color3f(1, 1, 1), 100).array);
+		drawSds(Main.getInstance().getActiveSds());
 		
 		drawOrigin();
 		JPatchTool tool = Main.getInstance().getTool();
@@ -710,14 +710,15 @@ public class ViewportGl extends Viewport {
 	}
 
 	protected void drawSds(Sds sds) {
-		Sds sds2 = sds.subdivide().subdivide();
+//		Sds sds2 = sds.subdivide().subdivide();
+		
 		gl.glEnable(GL.GL_LIGHTING);
-		for (Face face : sds2.faceList) {
+		for (Face face : sds.faceList) {
 			gl.glColor3f(1, 0, 0);
 			if (face.sides == 3) {
 				gl.glBegin(GL.GL_TRIANGLES);
 			} else {
-				gl.glBegin(GL.GL_QUADS);
+				gl.glBegin(GL.GL_TRIANGLE_FAN);
 			}
 			for (Edge edge : face.getEdges()) {
 				p.set(edge.getVertex0().getPosition());
@@ -731,18 +732,22 @@ public class ViewportGl extends Viewport {
 			gl.glEnd();
 		}
 		gl.glDisable(GL.GL_LIGHTING);
-		gl.glEnable(GL.GL_LINE_SMOOTH);
-		gl.glEnable(GL.GL_BLEND);
-		gl.glColor3f(1, 1, 0);
+		
+//		gl.glEnable(GL.GL_LINE_SMOOTH);
+//		gl.glEnable(GL.GL_BLEND);
+		
+		gl.glColor3f(1, 1, 1);
 		gl.glBegin(GL.GL_LINES);
 		for (Face face : sds.faceList) {
 			for (Edge edge : face.getEdges()) {
-				p.set(edge.getVertex0().getPosition());
-				matrix.transform(p);
-				gl.glVertex3d(p.x, p.y, p.z);
-				p.set(edge.getVertex1().getPosition());
-				matrix.transform(p);
-				gl.glVertex3d(p.x, p.y, p.z);
+				if (edge.isMaster()) {
+					p.set(edge.getVertex0().getPosition());
+					matrix.transform(p);
+					gl.glVertex3d(p.x, p.y, p.z);
+					p.set(edge.getVertex1().getPosition());
+					matrix.transform(p);
+					gl.glVertex3d(p.x, p.y, p.z);
+				}
 			}
 		}
 		
@@ -759,8 +764,10 @@ public class ViewportGl extends Viewport {
 //		}
 		
 		gl.glEnd();
-		gl.glDisable(GL.GL_BLEND);
-		gl.glDisable(GL.GL_LINE_SMOOTH);
+		
+		
+//		gl.glDisable(GL.GL_BLEND);
+//		gl.glDisable(GL.GL_LINE_SMOOTH);
 	}
 	
 	@Override
