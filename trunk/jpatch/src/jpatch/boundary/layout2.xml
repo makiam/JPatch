@@ -16,6 +16,14 @@
 			</menu>
 		</menu>
 	</menu>
+	
+	<popupmenu name="project popup">
+		<item command="open project" />
+		<item command="close project" />
+		<separator />
+		<item command="delete project" />
+	</popupmenu>
+	
 	<toolbar name="main toolbar" position="north">
 		<button command="viewport layout">
 <!--

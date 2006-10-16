@@ -31,7 +31,7 @@ import java.lang.reflect.*;
  * @author sascha
  *
  */
-public class Project extends AbstractJPatchObject {
+public class Project extends AbstractNamedObject {
 	private static final FileFilter XML_FILEFILTER = new FileFilter() {
 		public boolean accept(File pathname) {
 			return pathname.getName().endsWith(".xml");
@@ -48,10 +48,10 @@ public class Project extends AbstractJPatchObject {
 	private File shaderDir;
 	private File resourceDir;
 	
+	private boolean open;
+	
 	private JPatchFile.ModelFile[] modelFiles;
 	private JPatchFile.ChoreographyFile[] choreographyFiles;
-	
-	private Attribute.Name name;
 	
 	public Project(WorkspaceManager workspaceManager, String projectName) throws IOException {
 		name = new Attribute.Name(this);
@@ -90,6 +90,14 @@ public class Project extends AbstractJPatchObject {
 		return name.get();
 	}
 
+	public boolean isOpen() {
+		return open;
+	}
+	
+	public void setOpen(boolean open) {
+		this.open = open;
+	}
+	
 	/* (non-Javadoc)
 	 * @see jpatch.entity.JPatchObject#setParent(jpatch.entity.JPatchObject)
 	 */
@@ -110,6 +118,11 @@ public class Project extends AbstractJPatchObject {
 		for (int i = 0; i < files.length; i++) {
 			choreographyFiles[i] = new JPatchFile.ChoreographyFile(files[i]);
 		}
+	}
+
+	public ObjectRegistry getObjectRegistry() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

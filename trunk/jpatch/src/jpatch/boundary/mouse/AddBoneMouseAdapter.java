@@ -8,7 +8,7 @@ import javax.vecmath.*;
 
 import jpatch.entity.*;
 import jpatch.boundary.*;
-import jpatch.boundary.action.Actions;
+import jpatch.boundary.action.OldActions;
 import jpatch.boundary.settings.Settings;
 import jpatch.boundary.tools.*;
 import jpatch.boundary.ui.JPatchLockingToggleButton;
@@ -184,7 +184,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 				}
 			} else {
 //				MainFrame.getInstance().getMeshToolBar().reset();
-				((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(true);
+				((LockingButtonGroup) OldActions.getInstance().getButtonGroup("mode")).actionDone(true);
 			}
 		}
 		
@@ -205,7 +205,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 			}
 			
 //			if (!((JPatchLockingToggleButton) Actions.getInstance().getButton("add curve segment")).isLocked())
-			((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(false);
+			((LockingButtonGroup) OldActions.getInstance().getButtonGroup("mode")).actionDone(false);
 			
 //			MainFrame.getInstance().getMeshToolBar().reset();
 			OLDModel model = MainFrame.getInstance().getModel();

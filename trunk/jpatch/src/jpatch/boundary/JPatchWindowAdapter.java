@@ -14,7 +14,7 @@ import jpatch.boundary.settings.Settings;
  */
 public class JPatchWindowAdapter extends WindowAdapter {	
 	public void windowClosing(WindowEvent windowEvent) {
-		Actions.getInstance().getAction("quit").actionPerformed(null);
+		OldActions.getInstance().getAction("quit").actionPerformed(null);
 //		if (MainFrame.getInstance().getUndoManager().hasChanged()) {
 //			int option = JPatchUtils.showSaveDialog();
 //			switch (option) {

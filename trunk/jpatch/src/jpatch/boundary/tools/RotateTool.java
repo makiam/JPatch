@@ -6,7 +6,7 @@ import java.awt.event.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.*;
-import jpatch.boundary.action.Actions;
+import jpatch.boundary.action.OldActions;
 import jpatch.boundary.ui.LockingButtonGroup;
 
 import jpatch.control.edit.*;
@@ -571,7 +571,7 @@ public class RotateTool extends JPatchTool {
 			((Component) mouseEvent.getSource()).removeMouseMotionListener(this);
 			MainFrame.getInstance().setHelpText("Click and drag handles to rotate or move pivot. Click and drag inside sphere to rotate freely. Doubleclick to reset coordinate system or pivot.");
 			if (quit)
-				((LockingButtonGroup) Actions.getInstance().getButtonGroup("mode")).actionDone(false);
+				((LockingButtonGroup) OldActions.getInstance().getButtonGroup("mode")).actionDone(false);
 		}
 	}
 	

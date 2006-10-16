@@ -196,29 +196,25 @@ public class UIFactory extends DefaultHandler {
 					}
 				}
 			}
-		} else if (localName.equals("menu")) {
+		} else if (localName.equals("menu") || localName.equals("popupmenu")) {
+			boolean popup = localName.equals("popupmenu");
 			for (int i = 0; i < attributes.getLength(); i++) {
 				if (attributes.getLocalName(i).equals("name")) {
-					if (getMenu() != null) {
-						JMenu menu;
-						if (attributes.getValue(i).toLowerCase().equals("view camera"))
-							menu = viewCameraMenu;
-						else
-							menu = new JPatchMenu(attributes.getValue(i));
-//						System.out.println(((JMenu) getMenu()).getText() + " " + menu.getText());
-//						if (!(getMenu() instanceof JMenuBar))
-//							menu.setIcon(emptyIcon);
-						getMenu().add(menu);
-						listMenu.add(menu);
-						if (attributes.getValue(i).toLowerCase().equals("view camera"))
-							viewCameraMenu = menu;
+					if (!popup) {
+						if (getMenu() != null) {
+							JMenu menu = new JPatchMenu(attributes.getValue(i));
+							getMenu().add(menu);
+							listMenu.add(menu);
+						} else {
+							if (attributes.getValue(i).equals("menubar"))
+								listMenu.add(menuBar);
+							else
+								throw new IllegalArgumentException("invalid root menu");
+						}
 					} else {
-						if (attributes.getValue(i).equals("menubar"))
-							listMenu.add(menuBar);
-						else if (attributes.getValue(i).equals("viewport popup"))
-							listMenu.add(popupMenu);
-						else
-							throw new IllegalArgumentException("invalid root menu");
+						JPopupMenu menu = new JPopupMenu();
+						listMenu.add(menu);
+						mapObjects.put(attributes.getValue(i), menu);
 					}
 				}
 				if (attributes.getLocalName(i).equals("mnemonic")) {

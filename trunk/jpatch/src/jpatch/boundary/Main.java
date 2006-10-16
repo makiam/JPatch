@@ -29,11 +29,18 @@ import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreePath;
 
 import jpatch.entity.*;
 
+import jpatch.boundary.action.OldActions;
+import jpatch.boundary.newaction.Actions;
 import jpatch.boundary.newtools.*;
 import jpatch.boundary.settings.*;
+import jpatch.boundary.tree.JPatchTree;
+import jpatch.boundary.tree.JPatchTreeNode;
 
 
 /**
@@ -57,7 +64,7 @@ public class Main {
 	private JPatchTool activeTool;
 	private Model activeModel;
 	private Sds activeSds;
-	
+
 	private int activeViewport = 0;
 	
 	private Screen screen = new Screen();
@@ -65,6 +72,9 @@ public class Main {
 	private Inspector viewInspector = new Inspector();
 	private Inspector toolInspector = new Inspector();
 	private Inspector selectionInspector = new Inspector();
+	
+	private JPatchTree tree = new JPatchTree();
+	private UIFactory uiFactory = new UIFactory();
 	
 	private Viewport[] viewports = new Viewport[4];
 	private Iterable<Model> models = new Iterable<Model>() {
@@ -217,19 +227,23 @@ public class Main {
 	 */
 	private Main() {
 
-		try {
-			activeSds = new Sds(new FileInputStream("/home/sascha/meshlib/meshes/cube.off"));
+//		try {
+//			activeSds = new Sds(new FileInputStream("/home/sascha/meshlib/meshes/cube.off"));
 //			activeSds = activeSds.subdivide().subdivide();
-			
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+//			
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//		}
 
 		
 		WorkspaceManager workspaceManager;
 		try {
 			workspaceManager = new WorkspaceManager(Settings.getInstance().workspace);
-			Project project = new Project(workspaceManager, "Test_Project");
+			Project project = new Project(workspaceManager, "MyProject");
+			workspaceManager.refresh();
+			for (Project p : workspaceManager.getProjects()) {
+				tree.getRoot().add(new JPatchTreeNode(p));
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -295,21 +309,54 @@ public class Main {
 		statusBar.add(MemoryMonitor.createMemoryMonitor(), BorderLayout.EAST);
 		statusBar.add(Box.createHorizontalStrut(16));
 
+		tree.addMouseListener(new PopupAdapter() {
+			@Override
+			protected void openPopup(MouseEvent e) {
+				TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+				tree.setSelectionPath(path);
+				JPatchTreeNode treeNode = (JPatchTreeNode) path.getLastPathComponent();
+				JPatchObject userObject = treeNode.getUserObject();
+				if (userObject instanceof Project) {
+					Actions.getInstance().rethinkProjectActions();
+					((JPopupMenu) uiFactory.getComponent("project popup")).show(tree, e.getX(), e.getY());
+				}
+			}
+		});
+		
+		tree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+			public void valueChanged(TreeSelectionEvent e) {
+				Actions.getInstance().rethinkProjectActions();
+			}
+		});
 		/*
 		 * initialize frame
 		 */
+		JSplitPane hSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		
 		frame.setBackground(Settings.getInstance().colors.background.get());
 		frame.setLayout(new BorderLayout());
-		frame.add(screen, BorderLayout.CENTER);
 		frame.add(statusBar, BorderLayout.SOUTH);
 		
 		JTabbedPane inspectorPane = new JTabbedPane();
-		inspectorPane.add("View", viewInspector.getComponent());
-		inspectorPane.add("Tool", toolInspector.getComponent());
-		inspectorPane.add("Selection", selectionInspector.getComponent());
-		frame.add(inspectorPane, BorderLayout.WEST);
+		inspectorPane.add("View", new JScrollPane(viewInspector.getComponent()));
+		inspectorPane.add("Tool", new JScrollPane(toolInspector.getComponent()));
+		inspectorPane.add("Selection", new JScrollPane(selectionInspector.getComponent()));
 		
-		UIFactory uiFactory = new UIFactory();
+		JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		vSplit.add(inspectorPane);
+		vSplit.add(new JScrollPane(tree));
+		
+		hSplit.add(vSplit);
+		hSplit.add(screen);
+		hSplit.setContinuousLayout(true);
+		hSplit.setOneTouchExpandable(true);
+		
+		vSplit.setContinuousLayout(true);
+		vSplit.setOneTouchExpandable(true);
+		frame.add(hSplit, BorderLayout.CENTER);
+		vSplit.setDividerLocation(0.5);
+		
+		
 		uiFactory.parseLayout(this, ClassLoader.getSystemResource("jpatch/boundary/layout2.xml"));
 		
 		viewInspector.setObject(viewports[0]);
@@ -317,6 +364,14 @@ public class Main {
 		frame.add(uiFactory.getComponent("edit toolbar"), BorderLayout.EAST);
 		frame.setJMenuBar((JMenuBar) uiFactory.getComponent("menubar"));
 		frame.setVisible(true);
+	}
+	
+	public JPatchObject getSelectedTreeUserObject() {
+		JPatchTreeNode selectedNode  = (JPatchTreeNode) tree.getSelectionPath().getLastPathComponent();
+		if (selectedNode == null) {
+			return null;
+		}
+		return selectedNode.getUserObject();
 	}
 	
 	private void validateActiveViewport() {
@@ -419,6 +474,10 @@ public class Main {
 	
 	public JPatchTool getTool() {
 		return activeTool;
+	}
+	
+	public void repaintTree() {
+		tree.repaint();
 	}
 	
 	private class Screen extends JComponent {
