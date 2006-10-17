@@ -21,8 +21,6 @@
  */
 package jpatch.boundary.ui;
 
-import bsh.This;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
