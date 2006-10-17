@@ -105,8 +105,8 @@ public class ChangeViewTool implements JPatchTool {
 				viewport.viewTranslation.y.set(viewport.viewTranslation.y.get() - dy / w);
 				break;
 			case ROTATE:
-				viewport.viewRotation.x.set(Math.min(Math.max(viewport.viewRotation.x.get() + 0.5 * dy, -90), 90));
-				viewport.viewRotation.y.set((viewport.viewRotation.y.get() + 0.5 * dx + 360) % 360);
+				viewport.viewRotation.x.set(Math.min(Math.max(viewport.viewRotation.x.get() + 0.25 * dy, -90), 90));
+				viewport.viewRotation.y.set((viewport.viewRotation.y.get() + 0.25 * dx + 360) % 360);
 				break;
 			case ZOOM:
 				double factor = Math.min(Math.max(1 + (dx - dy) / 200.0, 0.2), 5);

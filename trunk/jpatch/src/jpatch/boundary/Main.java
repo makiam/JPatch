@@ -228,7 +228,7 @@ public class Main {
 	private Main() {
 
 		try {
-			activeSds = new Sds(new FileInputStream("/home/sascha/off/mushroom.off"));
+			activeSds = new Sds(new FileInputStream("/home/sascha/off/open_cube.off"));
 			activeSds.dump();
 //			activeSds = activeSds.subdivide();
 //			activeSds = activeSds.subdivide();

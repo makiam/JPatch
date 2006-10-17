@@ -8,7 +8,7 @@ import jpatch.boundary.settings.*;
 
 public class LassoSelect {
 	private static final Color XOR_MODE = new Color(Settings.getInstance().colors.background.get().getRGB() ^ Settings.getInstance().colors.selection.get().getRGB());
-	private static final Stroke DASHES = new BasicStroke(1.0f,BasicStroke.CAP_BUTT,BasicStroke.JOIN_BEVEL,0.0f,new float[] { 5.0f, 5.0f }, 0.0f);
+	private static final Stroke DASHES = new BasicStroke(1.0f,BasicStroke.CAP_BUTT,BasicStroke.JOIN_BEVEL,0.0f,new float[] { 1.0f, 1.0f }, 0.0f);
 	
 	public static MouseListener createLassoMouseListener(Viewport viewport, MouseEvent mouseEvent) {
 		return new LassoMouseListener(viewport, mouseEvent);
@@ -55,9 +55,9 @@ public class LassoSelect {
 			g.setXORMode(XOR_MODE);
 			g.setStroke(DASHES);
 			g.drawLine(r.x, r.y, r.x + r.width, r.y);
-			g.drawLine(r.x + r.width, r.y, r.x + r.width, r.y + r.height);
-			g.drawLine(r.x + r.width, r.y + r.height, r.x, r.y + r.height);
-			g.drawLine(r.x, r.y + r.height, r.x, r.y);
+			g.drawLine(r.x + r.width, r.y + 1, r.x + r.width, r.y + r.height);
+			g.drawLine(r.x + 1, r.y + r.height, r.x + r.width, r.y + r.height);
+			g.drawLine(r.x, r.y + 2, r.x, r.y + r.height);
 		}
 	}
 }

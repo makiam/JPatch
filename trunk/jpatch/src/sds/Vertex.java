@@ -14,23 +14,24 @@ import javax.vecmath.*;
  */
 public class Vertex {
 	static int count;
-	int num = count++;
+	final int num = count++;
 	Edge edge;
-	Point3d position;
-	Vector3d normal = new Vector3d();
-	Iterable<Face> faceIterable = new Iterable<Face>() {
+	final Point3d position;
+	final Vector3d normal = new Vector3d();
+	final Iterable<Face> faceIterable = new Iterable<Face>() {
 		public Iterator<Face> iterator() {
 			return new Iterator<Face>() {
-				private Edge e = edge;
-				private boolean end = false;
+				private Edge e = edge.neighbor;
+				boolean hasNext = true;
+				
 				public boolean hasNext() {
-					return !end;
+					return hasNext;
 				}
 				
 				public Face next() {
 					Edge tmp = e;
 					e = e.next.neighbor;
-					end = (e == null || e == edge);
+					hasNext = (e.next != null && e != edge.neighbor);
 					return tmp.face;
 				}
 				
@@ -40,43 +41,26 @@ public class Vertex {
 			};
 		}
 	};
-	Iterable<Edge> edgeIterable = new Iterable<Edge>() {
+	final Iterable<Edge> edgeIterable = new Iterable<Edge>() {
 		public Iterator<Edge> iterator() {
 			return new Iterator<Edge>() {
 				private Edge e = edge;
-//				private boolean unused = true;
-				boolean end = false;
-				boolean end2 = false;
+				boolean hasNext = true;
+				
 				public boolean hasNext() {
-					return !end;
-				}
-
-				private Edge computeNext() {
-					Edge next = e.next;
-					Edge nextNeighbor = next.neighbor;
-					if (nextNeighbor == null) {
-						end = end2;
-						end2 = true;
-						return next;
-					}
-					if (nextNeighbor == edge) {
-						end = true;
-					} else {
-						end = end2;
-					}
-					return nextNeighbor;
+					return hasNext;
 				}
 				
 				public Edge next() {
 					Edge tmp = e;
-					e = computeNext();
+					e = e.neighbor.next;
+					hasNext = (e != null && e != edge);
 					return tmp;
 				}
-
+				
 				public void remove() {
 					throw new UnsupportedOperationException();
 				}
-				
 			};
 		}
 	};
@@ -113,11 +97,8 @@ public class Vertex {
 		normal.set(0, 0, 0);
 		int i = 0;
 		for (Edge edge : getAdjacentEdges()) {
-			if (edge.vertex0 == this) {
-				v1.sub(edge.vertex1.position, position);
-			} else {
-				v1.sub(edge.vertex0.position, position);
-			}
+			assert edge.firstVertex == this;
+			v1.sub(edge.secondVertex.position, position);
 			if (i > 0) {
 				n.cross(v1, v0);
 				n.normalize();
@@ -137,8 +118,8 @@ public class Vertex {
 	void validate() {
 		Edge e = edge;
 //		System.out.println("validating " + num + " edge=" + edge);
-		while (edge.neighbor != null && edge.neighbor.prev != e) {
-			edge = edge.neighbor.prev;
+		while (edge.prev != null && edge.prev.neighbor != e) {
+			edge = edge.prev.neighbor;
 //			System.out.println("    edge=" + edge);
 		}
 //		

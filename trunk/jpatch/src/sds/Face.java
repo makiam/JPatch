@@ -14,7 +14,7 @@ import javax.vecmath.Point3d;
  */
 public class Face {
 	static int count;
-	int num = count++;
+	final int num = count++;
 	public final int sides;
 	public Vertex facePoint;
 	final int level;
@@ -35,7 +35,6 @@ public class Face {
 				public void remove() {
 					throw new UnsupportedOperationException();
 				}
-				
 			};
 		}
 	};
@@ -53,12 +52,12 @@ public class Face {
 			return;
 		}
 		Edge e = edge;
-		Point3d p0 = e.vertex0.position;
+		Point3d p0 = e.firstVertex.position;
 		e = e.next;
-		Point3d p1 = e.vertex0.position;
+		Point3d p1 = e.firstVertex.position;
 		e = e.next;
-		Point3d p2 = e.vertex0.position;
-		Point3d p3 = e.vertex1.position;
+		Point3d p2 = e.firstVertex.position;
+		Point3d p3 = e.secondVertex.position;
 		/*
 		 * error = |p0-p1+p2-p3| + |p2-p0| + |p3-p1|
 		 */
