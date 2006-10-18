@@ -720,10 +720,10 @@ public class ViewportGl extends Viewport {
 			} else {
 				gl.glBegin(GL.GL_TRIANGLE_FAN);
 			}
-			for (Edge edge : face.getEdges()) {
-				p.set(edge.getVertex0().getPosition());
+			for (HalfEdge edge : face.getEdges()) {
+				p.set(edge.getFirstVertex().getPosition());
 				matrix.transform(p);
-				v.set(edge.getVertex0().getNormal());
+				v.set(edge.getFirstVertex().getNormal());
 				matrix.transform(v);
 				v.normalize();
 				gl.glNormal3d(v.x, v.y, v.z);
@@ -739,12 +739,12 @@ public class ViewportGl extends Viewport {
 		gl.glColor3f(1, 1, 1);
 		gl.glBegin(GL.GL_LINES);
 		for (Face face : sds.faceList) {
-			for (Edge edge : face.getEdges()) {
+			for (HalfEdge edge : face.getEdges()) {
 				if (edge.isMaster()) {
-					p.set(edge.getVertex0().getPosition());
+					p.set(edge.getFirstVertex().getPosition());
 					matrix.transform(p);
 					gl.glVertex3d(p.x, p.y, p.z);
-					p.set(edge.getVertex1().getPosition());
+					p.set(edge.getSecondVertex().getPosition());
 					matrix.transform(p);
 					gl.glVertex3d(p.x, p.y, p.z);
 				}
