@@ -14,9 +14,9 @@ import javax.vecmath.*;
  *
  */
 public class Sds {
-	private Map<Edge, Edge> edgeMap = new HashMap<Edge, Edge>();
+	private Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
 	public List<Vertex> vertexList = new ArrayList<Vertex>();
-	public List<Face> faceList = new ArrayList<Face>();
+	public List<Face> faceList = new LinkedList<Face>();
 	private boolean interpolateBoundary = true;
 	
 	public static void main(String[] args) throws IOException {
@@ -64,165 +64,139 @@ public class Sds {
 			}
 			addFace(vertices);
 		}
-		edgeMap = null;
+//		edgeMap = null;
 		offInputStream.close();
 		validateVertices();
 	}
 	
-	public Sds subdivide() {
-		Sds newSds = new Sds();
+//	public Sds subdivide() {
+//		Sds newSds = new Sds();
+//		for (Face face : faceList) {
+//			face.facePoint = new Vertex();
+//			for (HalfEdge edge : face.getEdges()) {
+//				face.facePoint.position.add(edge.vertex.position);
+//				}
+//			face.facePoint.position.scale(1.0 / face.sides);
+//		}
+//		for (Face face : faceList) {
+//			for (HalfEdge edge : face.getEdges()) {
+//				if (!edge.isMaster()) {
+//					continue;
+//				}
+//				edge.edgePoint = new Vertex();
+//				edge.edgePoint.position.set(edge.vertex.position);
+//				edge.edgePoint.position.add(edge.pair.vertex.position);
+//				edge.edgePoint.position.add(edge.face.facePoint.position);
+//				if (edge.pair != null) {
+//					edge.edgePoint.position.add(edge.pair.face.facePoint.position);
+//					edge.edgePoint.position.scale(0.25);
+//				} else {
+//					edge.edgePoint.position.scale(1.0 / 3);
+//				}
+//			}
+//		}
+//		Map<Vertex, Vertex> vertexMap = new HashMap<Vertex, Vertex>();
+//		Set<Vertex> vertexSet = new HashSet<Vertex>();
+//		for (Vertex vertex : vertexList) {
+//			Point3d F = new Point3d();
+//			Point3d R = new Point3d();
+//			
+//			int n = 0;
+//			for (HalfEdge edge : vertex.getAdjacentEdges()) {
+//				F.add(edge.face.facePoint.position);
+//				n++;
+//			}
+//			F.scale(1.0 / n);
+//			int r = 0;
+//			for (HalfEdge edge : vertex.getAdjacentEdges()) {
+//				R.add(edge.vertex.position);
+//				R.add(edge.pair.vertex.position);
+//				r++;
+//			}
+//			R.scale(1.0 / r);
+//			Vertex v = new Vertex(0, 0, 0);
+//			v.position.set(vertex.position);
+//			v.position.scale(n - 3);
+//			v.position.add(R);
+//			v.position.add(F);
+//			v.position.scale(1.0 / n);
+//			vertexMap.put(vertex, v);
+//		}
+//		Vertex[] vertices = new Vertex[4];
+//		for (Face face : faceList) {
+//			for (HalfEdge edge : face.getEdges()) {
+//				vertices[0] = face.facePoint;
+//				vertices[1] = edge.prev.isMaster() ? edge.prev.edgePoint : edge.prev.pair.edgePoint;
+//				vertices[2] = vertexMap.get(edge.vertex);
+//				vertices[3] = edge.isMaster() ? edge.edgePoint : edge.pair.edgePoint;
+//				newSds.addFace(newSds.faceList, vertices, face.level + 1);
+//				for (int i = 0; i < 4; i++) {
+//					vertexSet.add(vertices[i]);
+//				}
+//			}
+//		}
+//		newSds.vertexList.addAll(vertexSet);
+//		newSds.validateVertices();
+//		return newSds;
+//	}
+	
+	
+	public void adaptiveSubdivide() {
 		for (Face face : faceList) {
-			face.facePoint = new Vertex();
-			for (Edge edge : face.getEdges()) {
-				face.facePoint.position.add(edge.firstVertex.position);
-				}
-			face.facePoint.position.scale(1.0 / face.sides);
-		}
-		for (Face face : faceList) {
-			for (Edge edge : face.getEdges()) {
-				if (!edge.isMaster()) {
-					continue;
-				}
-				edge.edgePoint = new Vertex();
-				edge.edgePoint.position.set(edge.firstVertex.position);
-				edge.edgePoint.position.add(edge.secondVertex.position);
-				edge.edgePoint.position.add(edge.face.facePoint.position);
-				if (edge.neighbor != null) {
-					edge.edgePoint.position.add(edge.neighbor.face.facePoint.position);
-					edge.edgePoint.position.scale(0.25);
-				} else {
-					edge.edgePoint.position.scale(1.0 / 3);
-				}
+			if (face.sides != 4) {
+				face.needsSubdivision = true;
+			} else {
+				face.needsSubdivision = face.getScreenSize() > 8;
 			}
 		}
-		Map<Vertex, Vertex> vertexMap = new HashMap<Vertex, Vertex>();
-		Set<Vertex> vertexSet = new HashSet<Vertex>();
-		for (Vertex vertex : vertexList) {
-			Point3d F = new Point3d();
-			Point3d R = new Point3d();
-			
-			int n = 0;
-			for (Edge edge : vertex.getAdjacentEdges()) {
-				F.add(edge.face.facePoint.position);
-				n++;
-			}
-			F.scale(1.0 / n);
-			int r = 0;
-			for (Edge edge : vertex.getAdjacentEdges()) {
-				R.add(edge.firstVertex.position);
-				R.add(edge.secondVertex.position);
-				r++;
-			}
-			R.scale(1.0 / r);
-			Vertex v = new Vertex(0, 0, 0);
-			v.position.set(vertex.position);
-			v.position.scale(n - 3);
-			v.position.add(R);
-			v.position.add(F);
-			v.position.scale(1.0 / n);
-			vertexMap.put(vertex, v);
-		}
-		Vertex[] vertices = new Vertex[4];
-		for (Face face : faceList) {
-			for (Edge edge : face.getEdges()) {
-				vertices[0] = face.facePoint;
-				vertices[1] = edge.prev.isMaster() ? edge.prev.edgePoint : edge.prev.neighbor.edgePoint;
-				vertices[2] = vertexMap.get(edge.firstVertex);
-				vertices[3] = edge.isMaster() ? edge.edgePoint : edge.neighbor.edgePoint;
-				newSds.addFace(newSds.faceList, vertices, face.level + 1);
-				for (int i = 0; i < 4; i++) {
-					vertexSet.add(vertices[i]);
-				}
-			}
-		}
-		newSds.vertexList.addAll(vertexSet);
-		newSds.validateVertices();
-		return newSds;
+		
+		
 	}
 	
-	public void subdivideX() {
-		edgeMap = new HashMap<Edge, Edge>();
+	private void subdivideFace(Face face) {
+		face.facePoint = new Vertex();
+		for (HalfEdge edge : face.getEdges()) {
+			face.facePoint.position.add(edge.vertex.position);
+		}
+		face.facePoint.position.scale(1.0 / face.sides);
+	}
+	
+	public void subdivide() {
+		edgeMap = new HashMap<EdgeKey, HalfEdge>(edgeMap.size() * 4);
 		for (Face face : faceList) {
-			face.facePoint = new Vertex();
-			for (Edge edge : face.getEdges()) {
-				face.facePoint.position.add(edge.firstVertex.position);
-			}
-			face.facePoint.position.scale(1.0 / face.sides);
-//			System.out.println("facepoint " + face + " " + face.facePoint.position);
+			face.computeFacePoint();
 		}
 		for (Face face : faceList) {
-			for (Edge edge : face.getEdges()) {
+			for (HalfEdge edge : face.getEdges()) {
 				if (edge.isMaster()) {
-					edge.edgePoint = new Vertex();
-					edge.midPoint2 = new Point3d(edge.firstVertex.position);
-					edge.midPoint2.add(edge.secondVertex.position);
-					edge.edgePoint.position.set(edge.midPoint2);
-					if (edge.neighbor.face != null ) {
-						edge.edgePoint.position.add(edge.face.facePoint.position);
-						edge.edgePoint.position.add(edge.neighbor.face.facePoint.position);
-						edge.edgePoint.position.scale(0.25);
-					} else {
-						if (interpolateBoundary) {
-							edge.edgePoint.position.scale(1.0 / 2);
-						} else {
-							edge.edgePoint.position.add(edge.face.facePoint.position);
-							edge.edgePoint.position.scale(1.0 / 3);
-						}
-					}
+					edge.computeEdgePoint();
 				}
 			}
 		}
 		for (Vertex vertex : vertexList) {
-//			System.out.println("old vertex " + vertex.num + ":");
-			Point3d F = new Point3d();
-			Point3d R = new Point3d();
-			
-			int f = 0;
-			for (Face face : vertex.getAdjacentFaces()) {
-				F.add(face.facePoint.position);
-				f++;
-			}
-			F.scale(1.0 / f);
-//			System.out.println("    F=" + F + " (avg of " + f + " facepoints)");
-			int n = 0;
-			for (Edge edge : vertex.getAdjacentEdges()) {
-				if (edge.isMaster()) {
-					R.add(edge.midPoint2);
-				} else {
-					R.add(edge.neighbor.midPoint2);
-				}
-				n++;
-			}
-			R.scale(1.0 / n);
-//			System.out.println("    2R=" + R + " (2x avg of " + n + " edge-midpoints)");
-			if (!interpolateBoundary || n == f) {
-				vertex.position.scale(n - 3);
-				vertex.position.add(R);
-				vertex.position.add(F);
-				vertex.position.scale(1.0 / n);
-			}
-//			System.out.println("    result=" + vertex);
+			vertex.moveVertex();
 		}
 		Vertex[] vertices = new Vertex[4];
-		List<Face> newFaceList = new ArrayList<Face>();
-		for (Face face : faceList) {
-			for (Edge edge : face.getEdges()) {
+		List<Face> newFaces = new LinkedList<Face>();
+		for (Iterator<Face> it = faceList.iterator(); it.hasNext(); ) {
+			Face face = it.next();
+			for (HalfEdge edge : face.getEdges()) {
 				vertices[0] = face.facePoint;
-				vertices[1] = edge.prev.isMaster() ? edge.prev.edgePoint : edge.prev.neighbor.edgePoint;
-				vertices[2] = edge.firstVertex;
-				vertices[3] = edge.isMaster() ? edge.edgePoint : edge.neighbor.edgePoint;
-				addFace(newFaceList, vertices, face.level + 1);
-			}
-		}
-		for (Face face : faceList) {
-			vertexList.add(face.facePoint);
-			for (Edge edge : face.getEdges()) {
+				vertices[1] = edge.prev.isMaster() ? edge.prev.edgePoint : edge.prev.pair.edgePoint;
+				vertices[2] = edge.vertex;
 				if (edge.isMaster()) {
+					vertices[3] = edge.edgePoint;
 					vertexList.add(edge.edgePoint);
+				} else {
+					vertices[3] = edge.pair.edgePoint;
 				}
+				newFaces.add(createFace(vertices, face.level + 1));
+				
 			}
+			it.remove();
+			vertexList.add(face.facePoint);
 		}
-		faceList = newFaceList;
+		faceList.addAll(newFaces);
 		validateVertices();
 	}
 	
@@ -242,7 +216,7 @@ public class Sds {
 		System.out.println("Faces:");
 		for (Face face : faceList) {
 			System.out.print(face + ": ");
-			for (Edge edge : face.edgeIterable) {
+			for (HalfEdge edge : face.edgeIterable) {
 				System.out.print(edge + " ");
 			}
 			System.out.println();
@@ -257,12 +231,12 @@ public class Sds {
 		Set<Vertex> vertexSet = new HashSet<Vertex>(vertexList);
 		System.out.println(vertexList.size() + " " + vertexSet.size());
 		for (Face face : faceList) {
-			for (Edge edge : face.getEdges()) {
-				if (!vertexSet.contains(edge.firstVertex)) {
-					System.out.println(edge.firstVertex);
+			for (HalfEdge edge : face.getEdges()) {
+				if (!vertexSet.contains(edge.vertex)) {
+					System.out.println(edge.vertex);
 				}
-				if (!vertexSet.contains(edge.secondVertex)) {
-					System.out.println(edge.secondVertex);
+				if (!vertexSet.contains(edge.pair.vertex)) {
+					System.out.println(edge.pair.vertex);
 				}
 			}
 		}		
@@ -273,11 +247,15 @@ public class Sds {
 		vertexList.add(new Vertex(x, y, z));
 	}
 	
+	public String toString() {
+		return faceList.size() + " faces, " + vertexList.size() + " vertices";
+	}
+	
 	private void addFace(int[] vertices) {
 		Face face = new Face(vertices.length, 0);
-		Edge start = createEdge(face, vertexList.get(vertices[0]), vertexList.get(vertices[1]), 0);
-		Edge prev = start;
-		Edge edge = null;
+		HalfEdge start = createEdge(face, vertexList.get(vertices[0]), vertexList.get(vertices[1]), 0);
+		HalfEdge prev = start;
+		HalfEdge edge = null;
 		for (int i = 1; i < vertices.length; i++) {
 			edge = createEdge(face, vertexList.get(vertices[i]), vertexList.get(vertices[(i + 1) % vertices.length]), 0);
 			prev.next = edge;
@@ -290,11 +268,11 @@ public class Sds {
 		faceList.add(face);
 	}
 	
-	private void addFace(List<Face> faceList, Vertex[] vertices, int level) {
+	private Face createFace(Vertex[] vertices, int level) {
 		Face face = new Face(vertices.length, level);
-		Edge start = createEdge(face, vertices[0], vertices[1], level);
-		Edge prev = start;
-		Edge edge = null;
+		HalfEdge start = createEdge(face, vertices[0], vertices[1], level);
+		HalfEdge prev = start;
+		HalfEdge edge = null;
 		for (int i = 1; i < vertices.length; i++) {
 			edge = createEdge(face, vertices[i], vertices[(i + 1) % vertices.length], level);
 			prev.next = edge;
@@ -304,32 +282,47 @@ public class Sds {
 		edge.next = start;
 		start.prev = edge;
 		face.edge = start;
-		faceList.add(face);
+		return face;
 	}
 	
-	private Edge createEdge(Face face, Vertex vertex0, Vertex vertex1, int level) {
-		Edge tmp = new Edge(vertex0, vertex1, level);
-		Edge edge = edgeMap.get(tmp);
-		if (edge == null) {
-			edge = tmp;
-			edgeMap.put(edge, edge);
+	private HalfEdge createEdge(Face face, Vertex vertex0, Vertex vertex1, int level) {
+		EdgeKey key = new EdgeKey(vertex1, vertex0);
+		HalfEdge neighbor = edgeMap.get(key);
+		HalfEdge edge;
+		if (neighbor == null) {
+			edge = new HalfEdge(vertex0, vertex1, level);
+			edgeMap.put(new EdgeKey(vertex0, vertex1), edge);
 		} else {
+			edge = neighbor.pair;
 			if (edge.face != null) {
 				throw new IllegalArgumentException("Surface is non-manifold.");
 			}
 		}
-		
 		edge.face = face;
-		tmp = new Edge(vertex1, vertex0, edge.level);
-		Edge neighbor = edgeMap.get(tmp);
-		if (neighbor == null) {
-			neighbor = tmp;
-			edgeMap.put(neighbor, neighbor);
-		}
-		edge.neighbor = neighbor;
-		neighbor.neighbor = edge;
-		
 		vertex0.edge = edge;
 		return edge;
+	}
+	
+	private static final class EdgeKey {
+		private final Vertex firstVertex;
+		private final Vertex secondVertex;
+		private final int hashCode;
+		
+		private EdgeKey(Vertex firstVertex, Vertex secondVertex) {
+			this.firstVertex = firstVertex;
+			this.secondVertex = secondVertex;
+			hashCode = (System.identityHashCode(firstVertex) << 1) ^ System.identityHashCode(secondVertex);
+		}
+		
+		@Override
+		public int hashCode() {
+			return hashCode;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			EdgeKey ek = (EdgeKey) o;
+			return firstVertex == ek.firstVertex && secondVertex == ek.secondVertex;
+		}
 	}
 }

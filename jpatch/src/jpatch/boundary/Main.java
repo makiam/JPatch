@@ -228,14 +228,33 @@ public class Main {
 	private Main() {
 
 		try {
-			activeSds = new Sds(new FileInputStream("/home/sascha/off/open_cube.off"));
-			activeSds.dump();
+			int[] ts = new int[7];
+			int n = 0;
+			for (int i = 0; i < 15; i++) {
+				activeSds = new Sds(new FileInputStream("/home/sascha/off/cube.off"));
+//			activeSds.dump();
 //			activeSds = activeSds.subdivide();
 //			activeSds = activeSds.subdivide();
 //			activeSds = activeSds.subdivide();
-			for (int i = 0; i < 3; i++) {
-				activeSds.subdivideX();
+				long t0 = System.currentTimeMillis();
+				for (int j = 0; j < 5; j++) {
+					long t1 = System.currentTimeMillis();
+					activeSds.subdivide();
+					long t = System.currentTimeMillis();
+					if (i >= 5) {
+						ts[j] += (t - t1);
+					}
+					System.out.println(j + ": " + "t=" + (t - t0) + " dt=" + (t - t1) + " v=" + activeSds);
+				}
+				if (i >= 5) {
+					n++;
+				}
+				
 			}
+			for (int i = 1; i < 7; i++) {
+//				System.out.println(i + ": " + ts[i] + "/" + n + "=" + ts[i] / n + " " + ts[i] / ts[i - 1]);
+			}
+//			System.exit(0);
 			activeSds.verify();
 //			activeSds.dump();
 			activeSds.smooth();

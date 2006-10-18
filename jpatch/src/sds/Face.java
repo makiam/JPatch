@@ -1,5 +1,6 @@
 package sds;
 
+import java.awt.Rectangle;
 import java.util.Iterator;
 
 import javax.vecmath.Point3d;
@@ -16,18 +17,20 @@ public class Face {
 	static int count;
 	final int num = count++;
 	public final int sides;
+	private final double recSides;
+	
 	public Vertex facePoint;
 	final int level;
-	final Iterable<Edge> edgeIterable = new Iterable<Edge>() {
-		public Iterator<Edge> iterator() {
-			return new Iterator<Edge>() {
-				private Edge e = edge;
+	final Iterable<HalfEdge> edgeIterable = new Iterable<HalfEdge>() {
+		public Iterator<HalfEdge> iterator() {
+			return new Iterator<HalfEdge>() {
+				private HalfEdge e = edge;
 				private int i;
 				public boolean hasNext() {
 					return i < sides;
 				}
 
-				public Edge next() {
+				public HalfEdge next() {
 					i++;
 					return e = e.next;
 				}
@@ -38,45 +41,65 @@ public class Face {
 			};
 		}
 	};
-	Edge edge;
+	HalfEdge edge;
 	boolean needsSubdivision;
 	
 	Face(int sides, int level) {
 		this.sides = sides;
 		this.level = level;
+		recSides = 1.0 / sides;
 	}
 	
-	void checkError() {
-		if (sides != 4) {
-			needsSubdivision = true;
-			return;
+	void computeFacePoint() {
+		facePoint = new Vertex();
+		for (HalfEdge edge : getEdges()) {
+			facePoint.position.add(edge.vertex.position);
 		}
-		Edge e = edge;
-		Point3d p0 = e.firstVertex.position;
-		e = e.next;
-		Point3d p1 = e.firstVertex.position;
-		e = e.next;
-		Point3d p2 = e.firstVertex.position;
-		Point3d p3 = e.secondVertex.position;
-		/*
-		 * error = |p0-p1+p2-p3| + |p2-p0| + |p3-p1|
-		 */
-		double x = p0.x - p1.x + p2.x -p3.x;
-		double y = p0.y - p1.y + p2.y -p3.y;
-		double z = p0.z - p1.z + p2.z -p3.z;
-		double error = Math.sqrt(x * x + y * y + z * z);
-		x = p2.x - p0.x;
-		y = p2.y - p0.y;
-		z = p2.z - p0.z;
-		error += Math.sqrt(x * x + y * y + z * z);
-		x = p3.x - p1.x;
-		y = p3.y - p1.y;
-		z = p3.z - p1.z;
-		error += Math.sqrt(x * x + y * y + z * z);
-		needsSubdivision = (error > 16);
+		facePoint.position.scale(recSides);
 	}
 	
-	public Iterable<Edge> getEdges() {
+	int getScreenSize() {
+		assert sides == 4;
+		HalfEdge e = edge;
+		Point3d p0 = e.vertex.position;
+		e = e.next;
+		Point3d p1 = e.vertex.position;
+		e = e.next;
+		Point3d p2 = e.vertex.position;
+		Point3d p3 = e.next.vertex.position;
+		
+		// TODO z-devide for perspective viewports
+		
+		int x0 = (int) p0.x;
+		int x1 = (int) p1.x;
+		int x2 = (int) p2.x;
+		int x3 = (int) p3.x;
+		int y0 = (int) p0.y;
+		int y1 = (int) p1.y;
+		int y2 = (int) p2.y;
+		int y3 = (int) p3.y;
+		int xmin = x0;
+		int xmax = x0;
+		int ymin = y0;
+		int ymax = y0;
+		if (x1 < xmin) xmin = x1;
+		if (x2 < xmin) xmin = x2;
+		if (x3 < xmin) xmin = x3;
+		if (x1 > xmax) xmax = x1;
+		if (x2 > xmax) xmax = x2;
+		if (x3 > xmax) xmax = x3;
+		if (y1 < ymin) ymin = y1;
+		if (y2 < ymin) ymin = y2;
+		if (y3 < ymin) ymin = y3;
+		if (y1 > ymax) ymax = y1;
+		if (y2 > ymax) ymax = y2;
+		if (y3 > ymax) ymax = y3;
+		int dx = xmax - xmin;
+		int dy = ymax - ymin;
+		return (dx > dy) ? dx : dy; 
+	}
+	
+	public Iterable<HalfEdge> getEdges() {
 		return edgeIterable;
 	}
 	
