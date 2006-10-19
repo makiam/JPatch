@@ -65,48 +65,44 @@ public class Kernel {
 					boolean even = (i & 1) == 0;
 					if (evenRing) {
 						if (even) {
-							lookupTable[0][index] = VERTEX;						
+							lookupTable[0][index] = VERTEX;
+							lookupTable[1][index] = ring(ringStart, valence, ring + 2, span, i + 0);
+							lookupTable[2][index] = ring(ringStart, valence, ring + 2, span, i + 2);
+							lookupTable[3][index] = ring(ringStart, valence, ring + 2, span, i + 4);
+							lookupTable[4][index] = ring(ringStart, valence, ring + 0, span, i - 2);
+							lookupTable[5][index] = ring(ringStart, valence, ring + 0, span, i + 2);
 						} else {
 							lookupTable[0][index] = EDGE;
 						}
 					} else {
-						int upSpanSize = spanSize + 2;
-						int downSpanSize = spanSize - 2;
-						int upRing = ring + 1;
-						int downRing = ring - 1;
 						if (even) {
 							lookupTable[0][index] = FACE;
-							lookupTable[1][index] = ringStart[upRing] + upSpanSize * span + i;
-							lookupTable[2][index] = ringStart[upRing] + upSpanSize * span + i + 2;
-							if (ring == 1) {
-								lookupTable[3][index] = 0;
-							} else {
-								lookupTable[3][index] = ringStart[downRing] + (downSpanSize * span + i) % (valence * downSpanSize);
-							}
+							lookupTable[1][index] = ring(ringStart, valence, ring + 1, span, i);
+							lookupTable[2][index] = ring(ringStart, valence, ring + 1, span, i + 2);
+							lookupTable[3][index] = ring(ringStart, valence, ring - 1, span, i);
 							if (i == 0) {
-								lookupTable[4][index] = ringStart[upRing] + (upSpanSize * span + valence * upSpanSize - 2) % (valence * upSpanSize);
+								lookupTable[4][index] = ring(ringStart, valence, ring + 1, span, -2);
 							} else {
-								lookupTable[4][index] = ringStart[downRing] + downSpanSize * span + i - 2;
+								lookupTable[4][index] = ring(ringStart, valence, ring - 1, span, i - 2);
 							}
 						} else {
 							lookupTable[0][index] = EDGE;
-							lookupTable[1][index] = ringStart[upRing] + upSpanSize * span + i - 1;
-							lookupTable[2][index] = ringStart[upRing] + upSpanSize * span + i + 1;
-							lookupTable[3][index] = ringStart[upRing] + (upSpanSize * span + i + 3) % (valence * upSpanSize);
+							lookupTable[1][index] = ring(ringStart, valence, ring + 1, span, i - 1);
+							lookupTable[2][index] = ring(ringStart, valence, ring + 1, span, i + 1);
+							lookupTable[3][index] = ring(ringStart, valence, ring + 1, span, i + 3);
+							lookupTable[5][index] = ring(ringStart, valence, ring - 1, span, i - 1);
 							if (ring == 1) {
-								lookupTable[5][index] = 0;
+								lookupTable[4][index] = ring(ringStart, valence, ring + 1, span, i - 3);
+								lookupTable[6][index] = ring(ringStart, valence, ring + 1, span, i + 5);
+							} else if (i == 1) {
+								lookupTable[4][index] = ring(ringStart, valence, ring + 1, span, i - 3);
+								lookupTable[6][index] = ring(ringStart, valence, ring - 1, span, i + 1);
+							} else if (i == spanSize -1) {
+								lookupTable[4][index] = ring(ringStart, valence, ring - 1, span, i - 3);
+								lookupTable[6][index] = ring(ringStart, valence, ring + 1, span, i + 5);
 							} else {
-								lookupTable[5][index] = ringStart[downRing] + (downSpanSize * span + i - 1) % (valence * downSpanSize);
-							}
-							if (i == 1) {
-								lookupTable[4][index] = ringStart[upRing] + (upSpanSize * span + i - 3 + upSpanSize * valence) % (valence * upSpanSize);
-								lookupTable[6][index] = ringStart[downRing] + downSpanSize * span + i + 1;
-							} else if (i == spanSize - 1) {
-								lookupTable[4][index] = ringStart[downRing] + downSpanSize * span + i - 3;
-								lookupTable[6][index] = ringStart[upRing] + (upSpanSize * span + i + 5) % (valence * upSpanSize);
-							} else {
-								lookupTable[4][index] = ringStart[downRing] + downSpanSize * span + i - 3;
-								lookupTable[6][index] = ringStart[downRing] + (downSpanSize * span + i + 1) % (valence * downSpanSize);
+								lookupTable[4][index] = ring(ringStart, valence, ring - 1, span, i - 3);
+								lookupTable[6][index] = ring(ringStart, valence, ring - 1, span, i + 1);
 							}
 						}
 					}
@@ -115,6 +111,14 @@ public class Kernel {
 			}
 		}
 		return lookupTable;
+	}
+	
+	private static int ring(int[] ringStart, int valence, int ring, int span, int offset) {
+		if (ring == 0) {
+			return 0;
+		}
+		int spanSize = ring * 2;
+		return ringStart[ring] + (spanSize * span + offset + valence * spanSize) % (valence * spanSize);	
 	}
 	
 	public static void main(String[] args) {
@@ -135,6 +139,12 @@ public class Kernel {
 //						int y = ycoord[i] * 24 + getHeight() / 2;
 //						g.drawString(String.valueOf(i), x, y);
 //					}
+					g.setColor(Color.WHITE);
+					int o = 0;
+					for (int width = RINGS * 32 * 2 + 32; width > 0; width -= 64) {
+						g.drawRect(o, o, width, width);
+						o += 32;
+					}
 					for (int y = 0; y < RINGS * 2 + 1; y++) {
 						for (int x = 0; x < RINGS * 2 + 1; x++) {
 							int index = pos[x][y];
@@ -173,15 +183,16 @@ public class Kernel {
 						g.drawOval((RINGS + xcoord[lookupTable[5][index]]) * 32, (RINGS + ycoord[lookupTable[5][index]]) * 32, 32, 32);
 						g.drawOval((RINGS + xcoord[lookupTable[6][index]]) * 32, (RINGS + ycoord[lookupTable[6][index]]) * 32, 32, 32);
 						break;
-//					case 3:
-//						g.drawOval((RINGS + xcoord[lookupTable[1][index]]) * 32, (RINGS + ycoord[lookupTable[1][index]]) * 32, 32, 32);
-//						g.drawOval((RINGS + xcoord[lookupTable[2][index]]) * 32, (RINGS + ycoord[lookupTable[2][index]]) * 32, 32, 32);
-//						g.drawOval((RINGS + xcoord[lookupTable[3][index]]) * 32, (RINGS + ycoord[lookupTable[3][index]]) * 32, 32, 32);
-//						g.drawOval((RINGS + xcoord[lookupTable[4][index]]) * 32, (RINGS + ycoord[lookupTable[4][index]]) * 32, 32, 32);
-//						g.drawOval((RINGS + xcoord[lookupTable[5][index]]) * 32, (RINGS + ycoord[lookupTable[2][index]]) * 32, 32, 32);
-//						g.drawOval((RINGS + xcoord[lookupTable[6][index]]) * 32, (RINGS + ycoord[lookupTable[3][index]]) * 32, 32, 32);
-//						g.drawOval((RINGS + xcoord[lookupTable[7][index]]) * 32, (RINGS + ycoord[lookupTable[4][index]]) * 32, 32, 32);
-//						break;
+					case 3:
+						g.drawOval((RINGS + xcoord[lookupTable[1][index]]) * 32, (RINGS + ycoord[lookupTable[1][index]]) * 32, 32, 32);
+						g.drawOval((RINGS + xcoord[lookupTable[2][index]]) * 32, (RINGS + ycoord[lookupTable[2][index]]) * 32, 32, 32);
+						g.drawOval((RINGS + xcoord[lookupTable[3][index]]) * 32, (RINGS + ycoord[lookupTable[3][index]]) * 32, 32, 32);
+						g.drawOval((RINGS + xcoord[lookupTable[4][index]]) * 32, (RINGS + ycoord[lookupTable[4][index]]) * 32, 32, 32);
+						g.drawOval((RINGS + xcoord[lookupTable[5][index]]) * 32, (RINGS + ycoord[lookupTable[5][index]]) * 32, 32, 32);
+						g.drawOval((RINGS + xcoord[lookupTable[6][index]]) * 32, (RINGS + ycoord[lookupTable[6][index]]) * 32, 32, 32);
+						g.drawOval((RINGS + xcoord[lookupTable[7][index]]) * 32, (RINGS + ycoord[lookupTable[7][index]]) * 32, 32, 32);
+						g.drawOval((RINGS + xcoord[lookupTable[8][index]]) * 32, (RINGS + ycoord[lookupTable[8][index]]) * 32, 32, 32);
+						break;
 					}
 				}
 			};
