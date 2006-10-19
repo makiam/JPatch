@@ -82,3 +82,7 @@ AxisAngle4f() aa = new AxisAngle4f(1, 2, 3, 4);
 System.out.println(aa);
 
 System.out.println(new Object().getClass().getSimpleName());
+
+
+int[][] i = new int[5][1000];
+System.out.println(i.length + " " + i[0].length);
