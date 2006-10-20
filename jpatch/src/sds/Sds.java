@@ -17,6 +17,8 @@ public class Sds {
 	private Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
 	public List<Vertex> vertexList = new ArrayList<Vertex>();
 	public List<Face> faceList = new LinkedList<Face>();
+	public final Vertex[] topLevelVertices;
+	
 	private boolean interpolateBoundary = true;
 	
 	public static void main(String[] args) throws IOException {
@@ -24,14 +26,14 @@ public class Sds {
 //		new Test();
 	}
 	
-	public Sds() {
+//	public Sds() {
 //		addVertex(0, 0, 0);
 //		addVertex(1, 1, 1);
 //		new Edge(vertexList.get(0), vertexList.get(1)).hashCode();
 //		new Edge(vertexList.get(1), vertexList.get(0)).hashCode();
 //		new Edge(vertexList.get(0), vertexList.get(1)).hashCode();
 //		new Edge(vertexList.get(1), vertexList.get(0)).hashCode();
-	}
+//	}
 	
 	public Sds(InputStream offInputStream) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(offInputStream));
@@ -49,8 +51,11 @@ public class Sds {
 			line = reader.readLine();
 //			System.out.println(line);
 			tokens = line.trim().split("\\s+");
-			addVertex(Double.parseDouble(tokens[0]), Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
+			Vertex vertex = new Vertex(Double.parseDouble(tokens[0]), Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
+			vertexList.add(vertex);
 		}
+		topLevelVertices = vertexList.toArray(new Vertex[vertexList.size()]);
+		
 		for (int i = 0; i < numFaces; i++) {
 			line = reader.readLine();
 			if (line.equals("")) {
@@ -223,7 +228,7 @@ public class Sds {
 		}
 		System.out.println("Vertices:");
 		for (Vertex vertex : vertexList) {
-			System.out.println(vertex);
+			System.out.println(vertex + "  valence" + vertex.valence());
 		}
 	}
 	
@@ -243,9 +248,7 @@ public class Sds {
 	}
 	
 	
-	private void addVertex(double x, double y, double z) {
-		vertexList.add(new Vertex(x, y, z));
-	}
+	
 	
 	public String toString() {
 		return faceList.size() + " faces, " + vertexList.size() + " vertices";
