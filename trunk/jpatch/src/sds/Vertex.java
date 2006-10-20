@@ -89,6 +89,71 @@ public class Vertex {
 		return faceIterable;
 	}
 	
+	public int valence() {
+		int i = 1; 
+		HalfEdge e = edge.pair;
+		while (e.next != null && e.next != edge) {
+			e = e.next.pair;
+			i++;
+		}
+		return i;
+	}
+	
+	public boolean isBoundary() {
+		return edge.pair.face == null;
+	}
+	
+	public void initFragment(int valence, float[][] buffer) {
+//		System.out.println("initfragment " + edge.vertex.num + "\t" + edge.vertex.position);
+		Point3d p = edge.vertex.position;
+		buffer[0][0] = (float) p.x;
+		buffer[0][1] = (float) p.y;
+		buffer[0][2] = (float) p.z;
+		HalfEdge e = edge.next.next;
+		int j = 1;
+		for (int i = 0; i < valence; i++) {
+//			System.out.println("\t1:" + e.vertex.num + "\t" + e.vertex.position);
+			p = e.vertex.position;
+			buffer[j][0] = (float) p.x;
+			buffer[j][1] = (float) p.y;
+			buffer[j++][2] = (float) p.z;
+			e = e.next.pair.next;
+//			System.out.println("\t1:" + e.vertex.num + "\t" + e.vertex.position);
+			p = e.vertex.position;
+			buffer[j][0] = (float) p.x;
+			buffer[j][1] = (float) p.y;
+			buffer[j++][2] = (float) p.z;
+			e = e.next;
+		}
+		e = edge.next.pair.next.next.next.pair.next.next;
+		for (int i = 0; i < valence; i++) {
+//			System.out.println("\t2:" + e.vertex.num + "\t" + e.vertex.position);
+			p = e.vertex.position;
+			buffer[j][0] = (float) p.x;
+			buffer[j][1] = (float) p.y;
+			buffer[j++][2] = (float) p.z;
+			e = e.next.pair.next;
+//			System.out.println("\t2:" + e.vertex.num + "\t" + e.vertex.position);
+			p = e.vertex.position;
+			buffer[j][0] = (float) p.x;
+			buffer[j][1] = (float) p.y;
+			buffer[j++][2] = (float) p.z;
+			e = e.next.pair.next;
+//			System.out.println("\t2:" + e.vertex.num + "\t" + e.vertex.position);
+			p = e.vertex.position;
+			buffer[j][0] = (float) p.x;
+			buffer[j][1] = (float) p.y;
+			buffer[j++][2] = (float) p.z;
+			e = e.next.pair.next;
+//			System.out.println("\t2:" + e.vertex.num + "\t" + e.vertex.position);
+			p = e.vertex.position;
+			buffer[j][0] = (float) p.x;
+			buffer[j][1] = (float) p.y;
+			buffer[j++][2] = (float) p.z;
+			e = e.next;
+		}
+	}
+	
 	void smooth() {
 		Vector3d va = new Vector3d();
 		Vector3d v0 = new Vector3d();
