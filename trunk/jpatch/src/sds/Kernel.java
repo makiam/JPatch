@@ -427,19 +427,17 @@ public class Kernel {
 				b1 += in[i1][1];
 				b2 += in[i1][2];
 			}
+			float n42 = 4 * valence * valence;
 			a0 *= 6;
 			a1 *= 6;
 			a2 *= 6;
 			a0 += b0;
 			a1 += b1;
 			a2 += b2;
-			a0 /= (4 * valence);
-			a1 /= (4 * valence);
-			a2 /= (4 * valence);
-			float c = valence - 3 + 5.0f / 4.0f;
-			out[0][0] = (c * in[0][0] + a0) / valence;
-			out[0][1] = (c * in[0][1] + a1) / valence;
-			out[0][2] = (c * in[0][2] + a2) / valence;
+			float c = n42 - 7 * valence;
+			out[0][0] = (c * in[0][0] + a0) / n42;
+			out[0][1] = (c * in[0][1] + a1) / n42;
+			out[0][2] = (c * in[0][2] + a2) / n42;
 			int limit = TABLE_SIZES[valence - 3][level];
 			for (int i = 1; i < limit; i++) {
 				int[] l = lookupTable[i];
