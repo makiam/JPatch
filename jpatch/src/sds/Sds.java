@@ -51,7 +51,7 @@ public class Sds {
 			line = reader.readLine();
 //			System.out.println(line);
 			tokens = line.trim().split("\\s+");
-			Vertex vertex = new Vertex(Double.parseDouble(tokens[0]), Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
+			Vertex vertex = new Vertex(Double.parseDouble(tokens[0]) - 1, Double.parseDouble(tokens[1]) - 1, Double.parseDouble(tokens[2]) - 1);
 			vertexList.add(vertex);
 		}
 		topLevelVertices = vertexList.toArray(new Vertex[vertexList.size()]);

@@ -842,7 +842,7 @@ public class ViewportGl extends Viewport {
 	}
 
 	private void drawSds2(Sds sds) {
-		gl.glPointSize(2);
+		gl.glPointSize(8);
 		int i = 0;
 		long total = 0;
 		for (Vertex vertex : sds.topLevelVertices) {
@@ -856,6 +856,7 @@ public class ViewportGl extends Viewport {
 			total += System.currentTimeMillis() - t;
 			drawFragment(kernel.getVertexBuffer(subdivLevel), valence, subdivLevel);
 			i++;
+			break;
 		}
 //		System.out.println(i + " fragments@level " + subdivLevel + " in " + total + "ms");
 	}
