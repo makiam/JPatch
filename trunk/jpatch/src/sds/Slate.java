@@ -186,12 +186,55 @@ public class Slate {
 		}
 	}
 	
-	void subdivide(final int maxLevel, int[] cornerValence) {
+	public int getGridStart() {
+		return GRID_START;
+	}
+	
+	public float[][] getGeo(int level) {
+		return geometryArray[level];
+	}
+	
+	void subdivide(final int maxLevel, final float[][][] boundary) {
+		/*
+		 * initialize top-level geometry array
+		 */
+		float[][] geo = geometryArray[0];
+		for (int corner = 0; corner < 4; corner++) {
+			
+			/*
+			 * initialize 2x2 grid
+			 */
+			final int gc = GRID_START + corner;
+			final float[][] c = boundary[corner];
+			final int n = c.length;
+			geo[gc][0] = c[0][0];
+			geo[gc][1] = c[0][1];
+			geo[gc][2] = c[0][2];
+			final int start = corner * MAX_CORNER_LENGTH;
+			
+			/*
+			 * initialize corner arrays
+			 */
+			for (int i = 1; i < n; i++) {
+				final int index = start + i;
+				geo[index][0] = c[i][0];
+				geo[index][1] = c[i][1];
+				geo[index][2] = c[i][2];
+			}
+		}
+		
+		/*
+		 * subdivide maxLevel times
+		 */
 		for (int level = 1; level < maxLevel; level++) {
 			final int[][] stencil = stencilTable[level];
 			final float[][] out = geometryArray[level];
 			final float[][] in = geometryArray[level - 1];
 			final int n = stencil.length;
+			
+			/*
+			 * apply stencils on rectangular inner grid
+			 */
 			for (int i = 0; i < n; i++) {
 				final int[] s = stencil[i];
 				final int outIndex = GRID_START + i;
@@ -213,8 +256,13 @@ public class Slate {
 					break;
 				}
 			}
+			
+			/*
+			 * apply stencils on corners
+			 */
 			for (int corner = 0; corner < 4; corner++) {
-				final int[][] array = stencilCorner[level][cornerValence[corner] - 5][corner];
+				final int valence = boundary[corner].length / 2 - 1;
+				final int[][] array = stencilCorner[level][valence + 2][corner];
 				final int offset = MAX_CORNER_LENGTH * corner;
 				final int m = array.length;
 				for (int i = 0; i < m; i++) {
@@ -232,14 +280,13 @@ public class Slate {
 						out[outIndex][2] = ((in[s[1]][2] + in[s[3]][2]) + (in[s[2]][2] + in[s[4]][2])) * FACE0;
 						break;
 					case POINT:
-						int k = (s.length - 2) / 2;
 						float a0 = 0;
 						float a1 = 0;
 						float a2 = 0;
 						float b0 = 0;
 						float b1 = 0;
 						float b2 = 0;
-						for (int p = 2; p < k; p++) {
+						for (int p = 2; p < valence; p++) {
 							a0 += in[s[p]][0];
 							a1 += in[s[p]][0];
 							a2 += in[s[p++]][0];
@@ -247,10 +294,10 @@ public class Slate {
 							b1 += in[s[p]][0];
 							b2 += in[s[p]][0];
 						}
-						float ik = 1 / k;
-						float aa = 1.5f * ik;
-						float bb = 0.25f * ik;
-						float cc = k - 1.75f;
+						final float ik = 1 / valence;			// TODO:
+						final float aa = 1.5f * ik;				// precompute these values
+						final float bb = 0.25f * ik;			// for each valence and
+						final float cc = valence - 1.75f;		// use loopup table
 						a0 *= aa;
 						a1 *= aa;
 						a2 *= aa;
