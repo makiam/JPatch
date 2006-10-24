@@ -58,6 +58,39 @@ public class Face {
 		facePoint.position.scale(recSides);
 	}
 	
+	public void subdivide(int maxLevel, Slate slate) {
+		Vertex[] va = new Vertex[10];
+		float[][][] boundary = new float[4][][];
+		int i = 0;
+		for (HalfEdge edge : getEdges()) {
+			int valence = edge.vertex.valence();
+			float[][] corner = new float[valence - 2][3];
+			boundary[i] = corner;
+			Point3d p = edge.vertex.position;
+			corner[0][0] = (float) p.x;
+			corner[0][1] = (float) p.y;
+			corner[0][2] = (float) p.z;
+			int j = 0;
+			int start = -1;
+			for (HalfEdge e : edge.vertex.getAdjacentEdges()) {
+				if (e.face == this) {
+					start = i;
+				}
+				va[j++] = e.getSecondVertex();
+			}
+			for (int k = 0; k < valence - 2; k++) {
+				int index = (start + k) % valence;
+				p = va[k].position;
+				corner[k][0] = (float) p.x;
+				corner[k][1] = (float) p.y;
+				corner[k][2] = (float) p.z;
+//				System.out.println(i + " " + k + " " + p);
+			}
+			i++;
+		}
+		slate.subdivide(maxLevel, boundary);
+	}
+	
 	int getScreenSize() {
 		assert sides == 4;
 		HalfEdge e = edge;
