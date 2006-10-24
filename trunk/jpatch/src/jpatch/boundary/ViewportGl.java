@@ -34,7 +34,8 @@ public class ViewportGl extends Viewport {
 	private final Vector3f v = new Vector3f();
 	
 	private final Kernel kernel = new Kernel();
-	private int subdivLevel = 3;
+	private final Slate slate = new Slate();
+	private int subdivLevel = 2;
 	
 	
 	/**
@@ -487,7 +488,7 @@ public class ViewportGl extends Viewport {
 		setMaterial(new GlMaterial(new Color3f(0.1f, 0.1f, 0.2f), new Color3f(0.2f, 0.2f, 0.8f), new Color3f(1, 1, 1), 100).array);
 		gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_LINE);
 		drawSds(Main.getInstance().getActiveSds());
-		drawSds2(Main.getInstance().getActiveSds());
+		drawSds3(Main.getInstance().getActiveSds());
 		
 		drawOrigin();
 		JPatchTool tool = Main.getInstance().getTool();
@@ -860,6 +861,53 @@ public class ViewportGl extends Viewport {
 		}
 //		System.out.println(i + " fragments@level " + subdivLevel + " in " + total + "ms");
 	}
+	
+	private void drawSds3(Sds sds) {
+		gl.glPointSize(5);
+//		for (Face face : sds.faceList) {
+//			drawFace(face, subdivLevel);
+//		}
+		drawFace(null, subdivLevel);
+//		System.out.println(i + " fragments@level " + subdivLevel + " in " + total + "ms");
+	}
+	
+	private void drawFace(Face face, int maxLevel) {
+//		face.subdivide(maxLevel, slate);
+		slate.subdivide(maxLevel, new float[][][] {
+				{ { -1, -1, 1 }, { -3, -1, 1 }, { -3, -3, 1 }, { -1, -3, 1 } },
+				{ {  1, -1, 1 }, {  1, -3, 1 }, {  3, -3, 1 }, {  3, -1, 1 } },
+				{ {  1,  1, 1 }, {  3,  1, 1 }, {  3,  3, 1 }, {  1,  3, 1 } },
+				{ { -1,  1, 1 }, { -1,  3, 1 }, { -3,  3, 1 }, { -3,  1, 1 } }
+		});
+		float[][] geo = slate.getGeo(maxLevel - 1);
+		int offset = slate.getGridStart();
+		int dim = (1 << (maxLevel - 1)) + 3;
+		int index = offset + dim + 1;
+		Point3f pt = new Point3f();
+		gl.glBegin(GL.GL_POINTS);
+//		for (int y = 1; y < dim - 1; y++) {
+//			for (int x = 1; x < dim - 1; x++) {
+//				pt.set(geo[index]);
+//				System.out.println(index + ": " + pt);
+//				matrix.transform(pt);
+//				gl.glVertex3f(pt.x, pt.y, pt.z);
+//				index++;
+//			}
+//			index += 2;
+//		}
+		index = offset;
+		for (int y = 0; y < dim; y++) {
+			for (int x = 0; x < dim; x++) {
+				pt.set(geo[index]);
+				System.out.println(index + ": " + pt);
+				matrix.transform(pt);
+				gl.glVertex3f(pt.x, pt.y, pt.z);
+				index++;
+			}
+		}
+		gl.glEnd();
+	}
+	
 	private void drawFragment(float[][] v, int valence, int depth) {
 		int rings = (1 << depth) + 1;
 		int prevStart = 0;
