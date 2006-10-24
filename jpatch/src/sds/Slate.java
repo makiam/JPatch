@@ -14,8 +14,8 @@ public class Slate {
 	private static final int FACE = 2;
 	private static final int POINT = 4;
 	
-	private static final int MAX_SUBDIV = 3;
-	private static final int MAX_VALENCE = 4;
+	private static final int MAX_SUBDIV = 4;
+	private static final int MAX_VALENCE = 5;
 	
 	private static final float FACE0 = 1.0f / 4.0f;
 	private static final float EDGE0 = 3.0f / 8.0f;
@@ -45,91 +45,48 @@ public class Slate {
 			 */
 			for (int valence = 3; valence <= MAX_VALENCE; valence++) {
 				for (int corner = 0; corner < 4; corner++) {
-					int[][] array = new int[6 + (valence - 2) * 2][6 + (valence - 2) * 2];
+					int[][] array = new int[cornerStencilLength(valence)][];
 					stencilCorner[level][valence - 3][corner] = array;
 					
-					array[0] = new int[] {
-							EDGE,
-							patchCornerIndex2(corner, level + 1, valence, 0, 3, false),
-							patchCornerIndex(corner, level, valence, 0, 2),
-							patchCornerIndex(corner, level, valence, 1, 2),
-							patchCornerIndex(corner, level, valence, 0, 3),
-							patchCornerIndex(corner, level, valence, 1, 3),
-							patchCornerIndex(corner, level, valence, 0, 1),
-							patchCornerIndex(corner, level, valence, 1, 1)
-					};
+					array[0] = new int[6 + valence * 2];
+					array[0][0] = POINT;
+					array[0][1] = patchCornerIndex(corner, level - 1, 1, 1);		// target!
+					array[0][2] = patchCornerIndex(corner, level, 1, 1);
+					array[0][3] = patchCornerIndex(corner, level, 0, 2);
+					array[0][4] = patchCornerIndex(corner, level, 1, 2);
+					array[0][5] = patchCornerIndex(corner, level, 2, 2);
+					array[0][6] = patchCornerIndex(corner, level, 2, 1);
+					array[0][7] = patchCornerIndex(corner, level, 2, 0);
+					for (int i = 0, n = cornerStencilLength(valence); i < n; i++) {
+						array[0][i + 8] = cornerIndex(corner, valence, (i + 1) % n);
+					}
 					
 					array[1] = new int[] {
-							FACE,
-							patchCornerIndex(corner, level + 1, valence, 0, 2),
-							cornerIndex(corner, valence, -1),
-							patchCornerIndex(corner, level, valence, 0, 2),
-							patchCornerIndex(corner, level, valence, 1, 2),
-							patchCornerIndex(corner, level, valence, 1, 1)
+							EDGE,
+							patchCornerIndex(corner, level, 0, 1),
+							patchCornerIndex(corner, level, 1, 1),
+							patchCornerIndex(corner, level, 0, 2),
+							patchCornerIndex(corner, level, 1, 2),
+							cornerIndex(corner, valence, ),
+							patchCornerIndex(corner, level, 1, 0)
 					};
 					
 					array[2] = new int[] {
 							EDGE,
-							patchCornerIndex(corner, level + 1, valence, 1, 2),
-							patchCornerIndex(corner, level, valence, 1, 1),
-							patchCornerIndex(corner, level, valence, 1, 2),
-							cornerIndex(corner, valence, -1),
-							patchCornerIndex(corner, level, valence, 0, 2),
-							patchCornerIndex(corner, level, valence, 2, 1),
-							patchCornerIndex(corner, level, valence, 2, 2)
-					};
-					
-					array[3] = new int[3 + valence * 2];
-					array[3][0] = POINT;
-					array[3][1] = patchCornerIndex(corner, level + 1, valence, 1, 1);
-					array[3][2] = patchCornerIndex(corner, level, valence, 1, 1);
-					array[3][3] = patchCornerIndex(corner, level, valence, 0, 2);
-					array[3][4] = patchCornerIndex(corner, level, valence, 1, 2);
-					array[3][5] = patchCornerIndex(corner, level, valence, 2, 2);
-					array[3][6] = patchCornerIndex(corner, level, valence, 2, 1);
-					array[3][7] = patchCornerIndex(corner, level, valence, 2, 0);
-					for (int i = 0, n = (valence - 2) * 2 - 1; i < n; i++) {
-						array[3][i + 8] = cornerIndex(corner, valence, i);
-					}
-					
-					array[4] = new int[] {
-							EDGE,
-							patchCornerIndex(corner, level + 1, valence, 2, 1),
-							patchCornerIndex(corner, level, valence, 1, 1),
-							patchCornerIndex(corner, level, valence, 2, 1),
-							patchCornerIndex(corner, level, valence, 1, 2),
-							patchCornerIndex(corner, level, valence, 2, 2),
-							cornerIndex(corner, valence, 0),
-							patchCornerIndex(corner, level, valence, 2, 0)
-					};
-					
-					array[5] = new int[] {
-							FACE,
-							patchCornerIndex(corner, level + 1, valence, 2, 0),
-							cornerIndex(corner, valence, 0),
-							patchCornerIndex(corner, level, valence, 1, 1),
-							patchCornerIndex(corner, level, valence, 2, 1),
-							patchCornerIndex(corner, level, valence, 2, 0)
-					};
-					
-					array[6] = new int[] {
-							EDGE,
-							patchCornerIndex2(corner, level + 1, valence, 3, 0, false),
-							patchCornerIndex(corner, level, valence, 2, 0),
-							patchCornerIndex(corner, level, valence, 2, 1),
-							patchCornerIndex(corner, level, valence, 1, 0),
-							patchCornerIndex(corner, level, valence, 1, 1),
-							patchCornerIndex(corner, level, valence, 3, 0),
-							patchCornerIndex(corner, level, valence, 3, 1)
+							patchCornerIndex(corner, level, 1, 0),
+							patchCornerIndex(corner, level, 1, 1),
+							patchCornerIndex(corner, level, 0, 0),
+							patchCornerIndex(corner, level, 0, 1),
+							patchCornerIndex(corner, level, 2, 0),
+							patchCornerIndex(corner, level, 2, 1)
 					};
 					
 					for (int i = 0, n = (valence - 2) * 2 - 1; i < n; i++) {
 						if ((i & 1) == 0) {			// even -> edge
-							array[i + 7] = new int[] {
+							array[i + 3] = new int[] {
 									EDGE,
-									cornerIndex2(corner, level + 1, valence, i),
 									cornerIndex2(corner, level, valence, i),
-									patchCornerIndex(corner, level, valence, 1, 1),
+									patchCornerIndex(corner, level, 1, 1),
 									cornerIndex2(corner, level, valence, i + 1),
 									cornerIndex2(corner, level, valence, i + 2),
 									cornerIndex2(corner, level, valence, i - 1),
@@ -138,10 +95,9 @@ public class Slate {
 						} else {					// odd -> face
 							array[i + 5] = new int[] {
 									FACE,
-									cornerIndex2(corner, level + 1, valence, i),
 									cornerIndex2(corner, level, valence, i),
 									cornerIndex2(corner, level, valence, i + 1),
-									patchCornerIndex(corner, level, valence, 1, 1),
+									patchCornerIndex(corner, level, 1, 1),
 									cornerIndex2(corner, level, valence, i - 1)
 							};
 						}
@@ -164,23 +120,30 @@ public class Slate {
 					/*
 					 * mask out unused elements (these points are handled in the corner tables)
 					 */
-					if (row == 3 || row == dim - 4) {
-						if (column < 1 || column >= dim - 1) {
-							stencilTable[level][index] = new int[] { UNUSED };
-							continue;
-						}
-					} else if (row == 2 || row == dim - 3) {
-						if (column < 2 || column >= dim - 2) {
-							stencilTable[level][index] = new int[] { UNUSED };
-							continue;
-						}
-					} else if (row == 1 || row == dim - 2) {
-						if (column < 3 || column >= dim - 3) {
-							stencilTable[level][index] = new int[] { UNUSED };
-							continue;
-						}
-					} else if (row == 0 || row == dim - 1) {
-						if (column < 4 || column >= dim - 4) {
+//					if (row == 3 || row == dim - 4) {
+//						if (column < 1 || column >= dim - 1) {
+//							stencilTable[level][index] = new int[] { UNUSED };
+//							continue;
+//						}
+//					} else if (row == 2 || row == dim - 3) {
+//						if (column < 2 || column >= dim - 2) {
+//							stencilTable[level][index] = new int[] { UNUSED };
+//							continue;
+//						}
+//					} else if (row == 1 || row == dim - 2) {
+//						if (column < 3 || column >= dim - 3) {
+//							stencilTable[level][index] = new int[] { UNUSED };
+//							continue;
+//						}
+//					} else if (row == 0 || row == dim - 1) {
+//						if (column < 4 || column >= dim - 4) {
+//							stencilTable[level][index] = new int[] { UNUSED };
+//							continue;
+//						}
+//					} 
+					
+					if (row < 2 || row > dim - 3) {
+						if (column < 2 || column > dim - 3) {
 							stencilTable[level][index] = new int[] { UNUSED };
 							continue;
 						}
@@ -300,7 +263,7 @@ public class Slate {
 			 * initialize corner arrays
 			 */
 			for (int i = 1; i < n; i++) {
-				final int index = start + i - 1;
+				final int index = start + (i % (n - 1));
 				geo[index][0] = c[i][0];
 				geo[index][1] = c[i][1];
 				geo[index][2] = c[i][2];
@@ -365,15 +328,16 @@ public class Slate {
 			 */
 			for (int corner = 0; corner < 4; corner++) {
 				final int valence = boundary[corner].length / 2 + 2;
+				System.out.println("level=" + level + " corner=" + corner + " valence=" + valence);
 				final int[][] array = stencilCorner[level][valence - 3][corner];
 				final int offset = MAX_CORNER_LENGTH * corner;
 				final int m = array.length;
 				System.out.println("arrayLength=" + m + " valence=" + valence);
 				for (int i = 0; i < m; i++) {
 					final int[] s = array[i];
-					final int outIndex = s[1];
 					
-					System.out.print("outIndex " + outIndex + " corner stencil type " + s[0] + ":");
+					
+					System.out.print("corner stencil type " + s[0] + ":");
 					for (int st = 2; st < s.length; st++) {
 						System.out.print(" " + s[st]);
 					}
@@ -381,14 +345,14 @@ public class Slate {
 					
 					switch (s[0]) {
 					case EDGE:
-						out[outIndex][0] = (in[s[2]][0] + in[s[3]][0]) * EDGE0 + ((in[s[4]][0] + in[s[5]][0]) + (in[s[6]][0] + in[s[7]][0])) * EDGE1;
-						out[outIndex][1] = (in[s[2]][1] + in[s[3]][1]) * EDGE0 + ((in[s[4]][1] + in[s[5]][1]) + (in[s[6]][1] + in[s[7]][1])) * EDGE1;
-						out[outIndex][2] = (in[s[2]][2] + in[s[3]][2]) * EDGE0 + ((in[s[4]][2] + in[s[5]][2]) + (in[s[6]][2] + in[s[7]][2])) * EDGE1;
+						out[i][0] = (in[s[2]][0] + in[s[3]][0]) * EDGE0 + ((in[s[4]][0] + in[s[5]][0]) + (in[s[6]][0] + in[s[7]][0])) * EDGE1;
+						out[i][1] = (in[s[2]][1] + in[s[3]][1]) * EDGE0 + ((in[s[4]][1] + in[s[5]][1]) + (in[s[6]][1] + in[s[7]][1])) * EDGE1;
+						out[i][2] = (in[s[2]][2] + in[s[3]][2]) * EDGE0 + ((in[s[4]][2] + in[s[5]][2]) + (in[s[6]][2] + in[s[7]][2])) * EDGE1;
 						break;
 					case FACE:
-						out[outIndex][0] = ((in[s[2]][0] + in[s[4]][0]) + (in[s[3]][0] + in[s[5]][0])) * FACE0;
-						out[outIndex][1] = ((in[s[2]][1] + in[s[4]][1]) + (in[s[3]][1] + in[s[5]][1])) * FACE0;
-						out[outIndex][2] = ((in[s[2]][2] + in[s[4]][2]) + (in[s[3]][2] + in[s[5]][2])) * FACE0;
+						out[i][0] = ((in[s[2]][0] + in[s[4]][0]) + (in[s[3]][0] + in[s[5]][0])) * FACE0;
+						out[i][1] = ((in[s[2]][1] + in[s[4]][1]) + (in[s[3]][1] + in[s[5]][1])) * FACE0;
+						out[i][2] = ((in[s[2]][2] + in[s[4]][2]) + (in[s[3]][2] + in[s[5]][2])) * FACE0;
 						break;
 					case POINT:
 						float a0 = 0;
@@ -415,6 +379,7 @@ public class Slate {
 						b0 *= bb;
 						b1 *= bb;
 						b2 *= bb;
+						final int outIndex = s[1];
 						out[outIndex][0] = (a0 + b0 + in[s[2]][0] * cc) * ik;
 						out[outIndex][1] = (a1 + b1 + in[s[2]][1] * cc) * ik;
 						out[outIndex][2] = (a2 + b2 + in[s[2]][2] * cc) * ik;
@@ -438,9 +403,13 @@ public class Slate {
 		}
 	}
 	
+	private static int cornerStencilLength(int valence) {
+		return valence * 2 - 4;
+	}
+	
 	private static int patchIndex(int level, int row, int column) {
 		int i = patchIndex2(level, row, column);
-//		System.out.println("patchIndex level " + level + " row " + row + " column " + column + " = " + i);
+		System.out.println("patchIndex level " + level + " row " + row + " column " + column + " = " + i);
 		return i;
 	}
 	
@@ -452,96 +421,120 @@ public class Slate {
 		if (column < 0) {
 			column += dim;
 		}
-		if (column == 0) {
-			if (row == 0) {
-				//return patchCornerIndex(0, level, )
+		if (row == 0) {
+			if (column == 1) {
+				return 0 * MAX_CORNER_LENGTH + 0;
+			} else if (column == dim - 2) {
+				return 1 * MAX_CORNER_LENGTH + 1;
+			} else if (column == 0 || column == dim - 1) {
+				throw new IllegalArgumentException("level=" + level + " row=" + row + " column=" + column);
+			}
+		} else if (row == dim - 1) {
+			if (column == 1) {
+				return 3 * MAX_CORNER_LENGTH + 1;
+			} else if (column == dim - 2) {
+				return 2 * MAX_CORNER_LENGTH + 0;
+			} else if (column == 0 || column == dim - 1) {
+				throw new IllegalArgumentException("level=" + level + " row=" + row + " column=" + column);
+			}
+		} else if (column == 0) {
+			if (row == 1) {
+				return 0 * MAX_CORNER_LENGTH + 1;
+			} else if (row == dim - 2) {
+				return 3 * MAX_CORNER_LENGTH + 0;
+			}
+		} else if (column == dim - 1) {
+			if (row == 1) {
+				return 1 * MAX_CORNER_LENGTH + 0;
+			} else if (row == dim - 2) {
+				return 2 * MAX_CORNER_LENGTH + 1;
 			}
 		}
 		return GRID_START + row * dim + column;
 	}
 	
-	private static int patchCornerIndex(int corner, int level, int valence, int row, int column) {
-		int i = patchCornerIndex2(corner, level, valence, row, column, true);
+	private static int patchCornerIndex(int corner, int level, int row, int column) {
+		int i = patchCornerIndex2(corner, level, row, column);
 		System.out.println("patchCornerIndex corner " + corner + " level " + level + " row " + row + " column " + column + " = " + i);
 		return i;
 	}
 	
-	private static int patchCornerIndex2(int corner, int level, int valence, int row, int column, boolean correct) {
+	private static int patchCornerIndex2(int corner, int level, int row, int column) {
 		int dim = (1 << (level - 1)) + 3;	// TODO ???
-		if (level == 1) {
-			if (row == 0 && column == 2) {
-				return (cornerIndex((corner + 1) % 4, valence, 0));
-			} else if (row == 2 && column == 0) {
-				return (cornerIndex((corner + 3) % 4, valence, -1));
-			}
-		}
-		if (correct) {
-			if (row == 0) {
-				if (column == 0) {
-					return cornerIndex(corner, valence, -2);
-				} else if (column == 1) {
-					return cornerIndex(corner, valence, -1);
-				} else if (column == dim - 2) {
-					return cornerIndex((corner + 1) % 4, valence, 0);
-				} else if (column == dim - 1) {
-					return cornerIndex((corner + 1) % 4, valence, 1);
-				}
-			} else if (row == 1) {
-				if (column == dim - 1) {
-					return cornerIndex((corner + 1) % 4, valence, 2);
-				}
-			} else if (column == 0) {
-				if (row == 0) {
-					return cornerIndex(corner, valence, 1);
-				} else if (row == 1) {
-					return cornerIndex(corner, valence, 0);
-				} else if (row == dim - 2) {
-					return cornerIndex((corner + 3) % 4, valence, -1);
-				} else if (row == dim - 1) {
-					return cornerIndex((corner + 3) % 4, valence, -2);
-				}
-			} else if (column == 1) {
-				if (row == dim - 1) {
-					return cornerIndex((corner + 3) % 4, valence, -3);
-				}
-			}
-		}
-		if (row < 0) {
-			row += dim;
-		}
-		if (column < 0) {
-			column += dim;
-		}
-		System.out.println(dim + " " + GRID_START + " " + row + " " + column);
+//		if (level == 1) {
+//			if (row == 0 && column == 2) {
+//				return (cornerIndex((corner + 1) % 4, valence, 0));
+//			} else if (row == 2 && column == 0) {
+//				return (cornerIndex((corner + 3) % 4, valence, -1));
+//			}
+//		}
+//		if (correct) {
+//			if (row == 0) {
+//				if (column == 0) {
+//					return cornerIndex(corner, valence, -2);
+//				} else if (column == 1) {
+//					return cornerIndex(corner, valence, -1);
+//				} else if (column == dim - 2) {
+//					return cornerIndex((corner + 1) % 4, valence, 0);
+//				} else if (column == dim - 1) {
+//					return cornerIndex((corner + 1) % 4, valence, 1);
+//				}
+//			} else if (row == 1) {
+//				if (column == dim - 1) {
+//					return cornerIndex((corner + 1) % 4, valence, 2);
+//				}
+//			} else if (column == 0) {
+//				if (row == 0) {
+//					return cornerIndex(corner, valence, 1);
+//				} else if (row == 1) {
+//					return cornerIndex(corner, valence, 0);
+//				} else if (row == dim - 2) {
+//					return cornerIndex((corner + 3) % 4, valence, -1);
+//				} else if (row == dim - 1) {
+//					return cornerIndex((corner + 3) % 4, valence, -2);
+//				}
+//			} else if (column == 1) {
+//				if (row == dim - 1) {
+//					return cornerIndex((corner + 3) % 4, valence, -3);
+//				}
+//			}
+//		}
+//		if (row < 0) {
+//			row += dim;
+//		}
+//		if (column < 0) {
+//			column += dim;
+//		}
+//		System.out.println(dim + " " + GRID_START + " " + row + " " + column);
 		switch (corner) {
 		case 0:
-			return GRID_START + row * dim + column;
+			return patchIndex(level, row, column);
 		case 1:
-			return GRID_START + column * dim + dim - 1 - row;
+			return patchIndex(level, column, dim - 1 - row);
 		case 2:
-			return GRID_START + (dim - 1 - row) * dim + dim - 1 - column;
+			return patchIndex(level, dim - 1 - row, dim - 1 - column);
 		case 3:
-			return GRID_START + (dim - 1 - column) * dim + row;
+			return patchIndex(level, dim - 1 - column, row);
 		default:
 			throw new IllegalArgumentException("corner > 3 :" + corner);
 		}
 	}
 	
 	private static int cornerIndex(int corner, int valence, int i) {
-		int max = valence * 2 - 5;
+		int max = cornerStencilLength(valence);
 		return i >= 0 ? MAX_CORNER_LENGTH * corner + i : MAX_CORNER_LENGTH * corner + max + i;
 	}
 	
 	private static int cornerIndex2(int corner, int level, int valence, int i) {
-		int max = valence * 2 - 5;
+		int max = cornerStencilLength(valence);
 		if (i == -2) {
-			return patchCornerIndex(corner, level, valence, 2, 1);
+			return patchCornerIndex(corner, level, 2, 1);
 		} else if (i == -1) {
-			return patchCornerIndex(corner, level, valence, 2, 0);
+			return patchCornerIndex(corner, level, 2, 0);
 		} else if (i == max) {
-			return patchCornerIndex(corner, level, valence, 0, 2);
+			return patchCornerIndex(corner, level, 0, 2);
 		} else if (i == max + 1) {
-			return patchCornerIndex(corner, level, valence, 1, 2);
+			return patchCornerIndex(corner, level, 1, 2);
 		} else {
 			return MAX_CORNER_LENGTH * corner + i;
 		}
@@ -565,7 +558,7 @@ public class Slate {
 //						int y = ycoord[i] * 24 + getHeight() / 2;
 //						g.drawString(String.valueOf(i), x, y);
 //					}
-					int level = 1;
+					int level = 2;
 					int[][] table = slate.stencilTable[level];
 					int dim = (1 << level) + 3;
 					for (int row = 0; row < dim; row++) {
@@ -597,7 +590,9 @@ public class Slate {
 							g.drawString(String.valueOf(index), column * 32 + 8 + 400, row * 32 + 24);
 						}
 					}
-					
+					for (int i = 0; i < GRID_START; i++) {
+						g.drawString(String.valueOf(i), i * 32 + 8 + 400, 400);
+					}
 					
 					if (activeX < dim && activeY < dim) {
 						int index = activeY * dim + activeX;
@@ -676,13 +671,25 @@ public class Slate {
 		}
 		
 		private int xcoord(int level, int index) {
+			System.out.println("xcoord level=" + level + " index=" + index);
 			int dim = (1 << level - 1) + 3;
-			return (index - GRID_START) % dim;
+			if (index >= GRID_START) {
+				return (index - GRID_START) % dim;
+			} else {
+				System.out.println(index);
+				return index;
+			}
 		}
 		
 		private int ycoord(int level, int index) {
+			System.out.println("ycoord level=" + level + " index=" + index);
 			int dim = (1 << level - 1) + 3;
-			return (index - GRID_START) / dim;
+			if (index >= GRID_START) {
+				return (index - GRID_START) / dim;
+			} else {
+				System.out.println(400);
+				return 12;
+			}
 		}
 	}
 	
