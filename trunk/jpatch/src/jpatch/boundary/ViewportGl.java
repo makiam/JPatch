@@ -6,6 +6,7 @@ import java.awt.event.MouseWheelListener;
 import java.util.Arrays;
 
 import javax.media.opengl.*;
+import static javax.media.opengl.GL.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.newtools.JPatchTool;
@@ -35,7 +36,7 @@ public class ViewportGl extends Viewport {
 	
 	private final Kernel kernel = new Kernel();
 	private final Slate slate = new Slate();
-	private int subdivLevel = 2;
+	private int subdivLevel = 4;
 	
 	
 	/**
@@ -336,30 +337,30 @@ public class ViewportGl extends Viewport {
 				gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 1);
 				fontOffset = gl.glGenLists(256);
 				for (int i = 0; i < 256; i++) {
-			        gl.glNewList(i + fontOffset, GL.GL_COMPILE);
+			        gl.glNewList(i + fontOffset, GL_COMPILE);
 			            gl.glBitmap(16, 12, 0, 0, fontAdvance[i], 0, fontRaster[i], 0);
 			        gl.glEndList();
 			    }
 				
 				/* retrieve GL_MAX_LIGHTS and GL_MAX_TEXTURE_SIZE */
 				int[] I = new int[1];
-				gl.glGetIntegerv(GL.GL_MAX_LIGHTS, I, 0);
+				gl.glGetIntegerv(GL_MAX_LIGHTS, I, 0);
 				maxLights = I[0];
-				gl.glGetIntegerv(GL.GL_MAX_TEXTURE_SIZE, I, 0);
+				gl.glGetIntegerv(GL_MAX_TEXTURE_SIZE, I, 0);
 				maxTextureSize = I[0];
 				
 				setLighting(RealtimeLighting.createThreepointLight());
 				
-				gl.glCullFace(GL.GL_NONE);
-				gl.glEnable(GL.GL_POLYGON_OFFSET_FILL);
+				gl.glCullFace(GL_NONE);
+				gl.glEnable(GL_POLYGON_OFFSET_FILL);
 				gl.glPolygonOffset(2.5f, 2.5f);
-				gl.glDisable(GL.GL_DEPTH_TEST);
+				gl.glDisable(GL_DEPTH_TEST);
 			}
 
 			public void display(GLAutoDrawable drawable) {
 				gl.glClearColor(COLORS.background.x, COLORS.background.y, COLORS.background.z, 0);	// set background color
 				gl.glClearDepth(CLEAR_DEPTH);									// set initial depth-buffer value
-				gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);	// clear color and depth buffers
+				gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// clear color and depth buffers
 				draw();
 			}
 
@@ -375,8 +376,8 @@ public class ViewportGl extends Viewport {
 		component.addMouseWheelListener(new MouseWheelListener() {
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				subdivLevel += e.getWheelRotation();
-				if (subdivLevel < 0) subdivLevel = 0;
-				if (subdivLevel > Kernel.MAX) subdivLevel = Kernel.MAX;
+				if (subdivLevel < 1) subdivLevel = 1;
+				if (subdivLevel > 6) subdivLevel = 6;
 				component.repaint();
 			}
 		});
@@ -392,30 +393,30 @@ public class ViewportGl extends Viewport {
 	
 	@Override
 	public void drawShape(Shape s) {
-		gl.glShadeModel(GL.GL_SMOOTH);
-		gl.glEnable(GL.GL_LIGHTING);
-		gl.glBegin(GL.GL_TRIANGLES);
+		gl.glShadeModel(GL_SMOOTH);
+		gl.glEnable(GL_LIGHTING);
+		gl.glBegin(GL_TRIANGLES);
 		for (int i = 0, n = s.meshes.length; i < n; i++) {
 			drawTriangleMesh(s.meshes[i]);
 		}
 		gl.glEnd();
-		gl.glDisable(GL.GL_LIGHTING);
-		gl.glEnable(GL.GL_LINE_SMOOTH);
-		gl.glEnable(GL.GL_BLEND);
-		gl.glBegin(GL.GL_LINES);
+		gl.glDisable(GL_LIGHTING);
+		gl.glEnable(GL_LINE_SMOOTH);
+		gl.glEnable(GL_BLEND);
+		gl.glBegin(GL_LINES);
 		for (int i = 0, n = s.wires.length; i < n; i++) {
 			drawWireFrame(s.wires[i]);
 		}
 		gl.glEnd();
-		gl.glDisable(GL.GL_BLEND);
-		gl.glDisable(GL.GL_LINE_SMOOTH);
+		gl.glDisable(GL_BLEND);
+		gl.glDisable(GL_LINE_SMOOTH);
 	}
 	
 	private void setMaterial(float[] array) {
-		gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, array, GlMaterial.AMBIENT);
-		gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, array, GlMaterial.DIFFUSE);
-		gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, array, GlMaterial.SPECULAR);
-		gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, array, GlMaterial.SHININESS);
+		gl.glMaterialfv(GL_FRONT, GL_AMBIENT, array, GlMaterial.AMBIENT);
+		gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, array, GlMaterial.DIFFUSE);
+		gl.glMaterialfv(GL_FRONT, GL_SPECULAR, array, GlMaterial.SPECULAR);
+		gl.glMaterialfv(GL_FRONT, GL_SHININESS, array, GlMaterial.SHININESS);
 	}
 	
 	private void drawTriangleMesh(TriangleMesh t) {
@@ -447,7 +448,7 @@ public class ViewportGl extends Viewport {
 		spatialMode();
 		
 		
-//		gl.glEnable(GL.GL_BLEND);
+//		gl.glEnable(GL_BLEND);
 		Matrix4d m = new Matrix4d();
 		TriangleMesh cx = TriangleMesh.createCone(16, new GlMaterial(new Color3f(0.4f, 0, 0), new Color3f(0.8f, 0, 0), new Color3f(0, 0, 0), 0));
 		TriangleMesh cy = TriangleMesh.createCone(16, new GlMaterial(new Color3f(0, 0.4f, 0), new Color3f(0, 0.8f, 0), new Color3f(0, 0, 0), 0));
@@ -479,15 +480,15 @@ public class ViewportGl extends Viewport {
 		
 		Shape s = new Shape(new TriangleMesh[] { cx, cy, cz }, new WireFrame[] { wx, wy, wz } );
 		
-		drawShape(s);
+//		drawShape(s);
 		
-		for (Model model : models) {
-			drawModel(model);
-		}
+//		for (Model model : models) {
+//			drawModel(model);
+//		}
 		
 		setMaterial(new GlMaterial(new Color3f(0.1f, 0.1f, 0.2f), new Color3f(0.2f, 0.2f, 0.8f), new Color3f(1, 1, 1), 100).array);
-		gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_LINE);
-		drawSds(Main.getInstance().getActiveSds());
+		gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//		drawSds(Main.getInstance().getActiveSds());
 		drawSds3(Main.getInstance().getActiveSds());
 		
 		drawOrigin();
@@ -501,22 +502,22 @@ public class ViewportGl extends Viewport {
 	}
 	
 //	public void setMaterial(Color3f ka) {
-//		gl.glMaterialfv(side, GL.GL_AMBIENT, new float[] { mp.red * mp.ambient, mp.green * mp.ambient, mp.blue * mp.ambient, 1 } );
-//		gl.glMaterialfv(side, GL.GL_DIFFUSE, new float[] { mp.red * mp.diffuse, mp.green * mp.diffuse, mp.blue * mp.diffuse, 1 } );
-//		gl.glMaterialfv(side, GL.GL_SPECULAR, new float[] {
+//		gl.glMaterialfv(side, GL_AMBIENT, new float[] { mp.red * mp.ambient, mp.green * mp.ambient, mp.blue * mp.ambient, 1 } );
+//		gl.glMaterialfv(side, GL_DIFFUSE, new float[] { mp.red * mp.diffuse, mp.green * mp.diffuse, mp.blue * mp.diffuse, 1 } );
+//		gl.glMaterialfv(side, GL_SPECULAR, new float[] {
 //				mp.specular * (1 - mp.metallic + mp.metallic * mp.red),
 //				mp.specular * (1 - mp.metallic + mp.metallic * mp.green),
 //				mp.specular * (1 - mp.metallic + mp.metallic * mp.blue),
 //				1.0f });
-//		gl.glMaterialfv(side, GL.GL_SHININESS, new float[] { 1f / mp.roughness } );
+//		gl.glMaterialfv(side, GL_SHININESS, new float[] { 1f / mp.roughness } );
 //	}
 	
 	public void setLighting(RealtimeLighting lighting) {
 		Color3f ambient = lighting.getAmbientColor();
-		gl.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, new float[] { ambient.x, ambient.y, ambient.z, 1 }, 0);
+		gl.glLightModelfv(GL_LIGHT_MODEL_AMBIENT, new float[] { ambient.x, ambient.y, ambient.z, 1 }, 0);
 		for (int i = 0; i < maxLights; i++) {
 			if (i < lighting.numLights()) {
-				gl.glEnable(GL.GL_LIGHT0 + i);
+				gl.glEnable(GL_LIGHT0 + i);
 				RealtimeLighting.LightSource light = lighting.getLight(i);
 				if (light instanceof RealtimeLighting.DirectionalLight) {
 					RealtimeLighting.DirectionalLight directionalLight = (RealtimeLighting.DirectionalLight) light;
@@ -525,23 +526,23 @@ public class ViewportGl extends Viewport {
 					/*
 					 * set GL light colors
 					 */
-					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_AMBIENT, new float[] { 0, 0, 0, 1 }, 0);
-					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_DIFFUSE, new float[] { color.x, color.y, color.z, 1 }, 0);
+					gl.glLightfv(GL_LIGHT0 + i, GL_AMBIENT, new float[] { 0, 0, 0, 1 }, 0);
+					gl.glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, new float[] { color.x, color.y, color.z, 1 }, 0);
 					if (directionalLight.castsHighlight())
-						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { color.x, color.y, color.z, 1 }, 0);
+						gl.glLightfv(GL_LIGHT0 + i, GL_SPECULAR, new float[] { color.x, color.y, color.z, 1 }, 0);
 					else
-						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { 0, 0, 0, 1 }, 0);
+						gl.glLightfv(GL_LIGHT0 + i, GL_SPECULAR, new float[] { 0, 0, 0, 1 }, 0);
 					Vector3f direction = directionalLight.getTransformedDirection();
 					
 					/*
 					 * set GL light directions (w = 0 for directional light)
 					 */
-					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_POSITION, new float[] { -direction.x, -direction.y, -direction.z, 0 }, 0);
+					gl.glLightfv(GL_LIGHT0 + i, GL_POSITION, new float[] { direction.x, direction.y, direction.z, 0 }, 0);
 					
 					/*
 					 * set GL spot cutoff (180 = no spot)
 					 */
-					gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_SPOT_CUTOFF, 180);
+					gl.glLightf(GL_LIGHT0 + i, GL_SPOT_CUTOFF, 180);
 				} else if (light instanceof RealtimeLighting.PointLight) {
 					RealtimeLighting.PointLight pointLight = (RealtimeLighting.PointLight) light;
 					Color3f color = pointLight.getColor();
@@ -549,44 +550,44 @@ public class ViewportGl extends Viewport {
 					/*
 					 * set GL light colors
 					 */
-					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_AMBIENT, new float[] { 0, 0, 0, 1 }, 0);
-					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_DIFFUSE, new float[] { color.x, color.y, color.z, 1 }, 0);
+					gl.glLightfv(GL_LIGHT0 + i, GL_AMBIENT, new float[] { 0, 0, 0, 1 }, 0);
+					gl.glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, new float[] { color.x, color.y, color.z, 1 }, 0);
 					if (pointLight.castsHighlight())
-						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { color.x, color.y, color.z, 1 }, 0);
+						gl.glLightfv(GL_LIGHT0 + i, GL_SPECULAR, new float[] { color.x, color.y, color.z, 1 }, 0);
 					else
-						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { 0, 0, 0, 1 }, 0);
+						gl.glLightfv(GL_LIGHT0 + i, GL_SPECULAR, new float[] { 0, 0, 0, 1 }, 0);
 					Point3f position = pointLight.getTransformedPosition();
 					
 					/*
 					 * set GL light position (w = 1 for point light)
 					 */
-					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_POSITION, new float[] { position.x, position.y, position.z, 1 }, 0);
+					gl.glLightfv(GL_LIGHT0 + i, GL_POSITION, new float[] { position.x, position.y, position.z, 1 }, 0);
 					
 					/*
 					 * set GL attenuation
 					 */
 					switch (pointLight.getAttenuation()) {
 						case 0: {
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_CONSTANT_ATTENUATION, 1);
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_LINEAR_ATTENUATION, 0);
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_QUADRATIC_ATTENUATION, 0);
+							gl.glLightf(GL_LIGHT0 + i, GL_CONSTANT_ATTENUATION, 1);
+							gl.glLightf(GL_LIGHT0 + i, GL_LINEAR_ATTENUATION, 0);
+							gl.glLightf(GL_LIGHT0 + i, GL_QUADRATIC_ATTENUATION, 0);
 						} break;
 						case 1: {
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_CONSTANT_ATTENUATION, 0);
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_LINEAR_ATTENUATION, 1f / pointLight.getDistance());
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_QUADRATIC_ATTENUATION, 0);
+							gl.glLightf(GL_LIGHT0 + i, GL_CONSTANT_ATTENUATION, 0);
+							gl.glLightf(GL_LIGHT0 + i, GL_LINEAR_ATTENUATION, 1f / pointLight.getDistance());
+							gl.glLightf(GL_LIGHT0 + i, GL_QUADRATIC_ATTENUATION, 0);
 						} break;
 						case 2: {
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_CONSTANT_ATTENUATION, 0);
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_LINEAR_ATTENUATION, 0);
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_QUADRATIC_ATTENUATION, 1f / pointLight.getDistance() / pointLight.getDistance());
+							gl.glLightf(GL_LIGHT0 + i, GL_CONSTANT_ATTENUATION, 0);
+							gl.glLightf(GL_LIGHT0 + i, GL_LINEAR_ATTENUATION, 0);
+							gl.glLightf(GL_LIGHT0 + i, GL_QUADRATIC_ATTENUATION, 1f / pointLight.getDistance() / pointLight.getDistance());
 						} break;
 					}
 					
 					/*
 					 * set GL spot cutoff (180 = no spot)
 					 */
-					gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_SPOT_CUTOFF, 180);
+					gl.glLightf(GL_LIGHT0 + i, GL_SPOT_CUTOFF, 180);
 				} else if (light instanceof RealtimeLighting.SpotLight) {
 					RealtimeLighting.SpotLight spotLight = (RealtimeLighting.SpotLight) light;
 					Color3f color = spotLight.getColor();
@@ -594,37 +595,37 @@ public class ViewportGl extends Viewport {
 					/*
 					 * set GL light colors
 					 */
-					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_AMBIENT, new float[] { 0, 0, 0, 1 }, 0);
-					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_DIFFUSE, new float[] { color.x, color.y, color.z, 1 }, 0);
+					gl.glLightfv(GL_LIGHT0 + i, GL_AMBIENT, new float[] { 0, 0, 0, 1 }, 0);
+					gl.glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, new float[] { color.x, color.y, color.z, 1 }, 0);
 					if (spotLight.castsHighlight())
-						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { color.x, color.y, color.z, 1 }, 0);
+						gl.glLightfv(GL_LIGHT0 + i, GL_SPECULAR, new float[] { color.x, color.y, color.z, 1 }, 0);
 					else
-						gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPECULAR, new float[] { 0, 0, 0, 1 }, 0);
+						gl.glLightfv(GL_LIGHT0 + i, GL_SPECULAR, new float[] { 0, 0, 0, 1 }, 0);
 					Point3f position = spotLight.getTransformedPosition();
 					
 					/*
 					 * set GL light position (w = 1 for point light)
 					 */
-					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_POSITION, new float[] { position.x, position.y, position.z, 1 }, 0);
+					gl.glLightfv(GL_LIGHT0 + i, GL_POSITION, new float[] { position.x, position.y, position.z, 1 }, 0);
 					
 					/*
 					 * set GL attenuation
 					 */
 					switch (spotLight.getAttenuation()) {
 						case 0: {
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_CONSTANT_ATTENUATION, 1);
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_LINEAR_ATTENUATION, 0);
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_QUADRATIC_ATTENUATION, 0);
+							gl.glLightf(GL_LIGHT0 + i, GL_CONSTANT_ATTENUATION, 1);
+							gl.glLightf(GL_LIGHT0 + i, GL_LINEAR_ATTENUATION, 0);
+							gl.glLightf(GL_LIGHT0 + i, GL_QUADRATIC_ATTENUATION, 0);
 						} break;
 						case 1: {
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_CONSTANT_ATTENUATION, 0);
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_LINEAR_ATTENUATION, 1f / spotLight.getDistance());
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_QUADRATIC_ATTENUATION, 0);
+							gl.glLightf(GL_LIGHT0 + i, GL_CONSTANT_ATTENUATION, 0);
+							gl.glLightf(GL_LIGHT0 + i, GL_LINEAR_ATTENUATION, 1f / spotLight.getDistance());
+							gl.glLightf(GL_LIGHT0 + i, GL_QUADRATIC_ATTENUATION, 0);
 						} break;
 						case 2: {
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_CONSTANT_ATTENUATION, 0);
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_LINEAR_ATTENUATION, 0);
-							gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_QUADRATIC_ATTENUATION, 1f / spotLight.getDistance() / spotLight.getDistance());
+							gl.glLightf(GL_LIGHT0 + i, GL_CONSTANT_ATTENUATION, 0);
+							gl.glLightf(GL_LIGHT0 + i, GL_LINEAR_ATTENUATION, 0);
+							gl.glLightf(GL_LIGHT0 + i, GL_QUADRATIC_ATTENUATION, 1f / spotLight.getDistance() / spotLight.getDistance());
 						} break;
 					}
 					
@@ -633,20 +634,20 @@ public class ViewportGl extends Viewport {
 					/*
 					 * set GL spot direction
 					 */
-					gl.glLightfv(GL.GL_LIGHT0 + i, GL.GL_SPOT_DIRECTION, new float[] { direction.x, direction.y, direction.z }, 0);
+					gl.glLightfv(GL_LIGHT0 + i, GL_SPOT_DIRECTION, new float[] { direction.x, direction.y, direction.z }, 0);
 					
 					/*
 					 * set GL spot cutoff
 					 */
-					gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_SPOT_CUTOFF, spotLight.getRadius());
+					gl.glLightf(GL_LIGHT0 + i, GL_SPOT_CUTOFF, spotLight.getRadius());
 					
 					/*
 					 * set GL spot cutoff exponent
 					 */
-					gl.glLightf(GL.GL_LIGHT0 + i, GL.GL_SPOT_EXPONENT, 0);
+					gl.glLightf(GL_LIGHT0 + i, GL_SPOT_EXPONENT, 0);
 				}
 			} else {
-				gl.glDisable(GL.GL_LIGHT0 + i);
+				gl.glDisable(GL_LIGHT0 + i);
 			}
 		}
 	}
@@ -671,8 +672,9 @@ public class ViewportGl extends Viewport {
 		float a;
 //		System.out.println("majorSpacing=" + majorSpacing + " screenSpacing=" + screenSpacing);
 		
-		gl.glEnable(GL.GL_BLEND);
-		gl.glBegin(GL.GL_LINES);
+		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		gl.glEnable(GL_BLEND);
+		gl.glBegin(GL_LINES);
 		
 		double spacing;
 //		System.out.println("screenSpacing=" + screenSpacing);
@@ -719,7 +721,7 @@ public class ViewportGl extends Viewport {
 			}
 		}
 		gl.glEnd();
-		gl.glDisable(GL.GL_BLEND);
+		gl.glDisable(GL_BLEND);
 	}
 
 	@Override
@@ -732,10 +734,10 @@ public class ViewportGl extends Viewport {
 	protected void drawSds(Sds sds) {
 //		Sds sds2 = sds.subdivide().subdivide();
 		
-		gl.glDisable(GL.GL_LIGHTING);
+		gl.glDisable(GL_LIGHTING);
 		for (Face face : sds.faceList) {
 			gl.glColor3f(1, 0, 0);
-			gl.glBegin(GL.GL_LINE_STRIP);
+			gl.glBegin(GL_LINE_STRIP);
 			for (HalfEdge edge : face.getEdges()) {
 				p.set(edge.getFirstVertex().getPosition());
 				matrix.transform(p);
@@ -747,13 +749,13 @@ public class ViewportGl extends Viewport {
 			}
 			gl.glEnd();
 		}
-		gl.glDisable(GL.GL_LIGHTING);
+		gl.glDisable(GL_LIGHTING);
 		
-//		gl.glEnable(GL.GL_LINE_SMOOTH);
-//		gl.glEnable(GL.GL_BLEND);
+//		gl.glEnable(GL_LINE_SMOOTH);
+//		gl.glEnable(GL_BLEND);
 		
 		gl.glColor3f(1, 1, 1);
-		gl.glBegin(GL.GL_LINES);
+		gl.glBegin(GL_LINES);
 		for (Face face : sds.faceList) {
 			for (HalfEdge edge : face.getEdges()) {
 				if (edge.isMaster()) {
@@ -782,37 +784,37 @@ public class ViewportGl extends Viewport {
 		gl.glEnd();
 		
 		
-//		gl.glDisable(GL.GL_BLEND);
-//		gl.glDisable(GL.GL_LINE_SMOOTH);
+//		gl.glDisable(GL_BLEND);
+//		gl.glDisable(GL_LINE_SMOOTH);
 	}
 	
 	@Override
 	protected void drawModel(Model model) {
 		
 		
-//		gl.glFogi(GL.GL_FOG_MODE, GL.GL_LINEAR);
-//		gl.glFogfv(GL.GL_FOG_COLOR, new float[] { COLORS.background.x, COLORS.background.y, COLORS.background.z }, 0);
-//		gl.glFogf(GL.GL_FOG_DENSITY, 1.0f);
-//		gl.glFogf(GL.GL_FOG_START, 0f);
-//		gl.glFogf(GL.GL_FOG_END, 200f);
-//		gl.glEnable(GL.GL_FOG);
+//		gl.glFogi(GL_FOG_MODE, GL_LINEAR);
+//		gl.glFogfv(GL_FOG_COLOR, new float[] { COLORS.background.x, COLORS.background.y, COLORS.background.z }, 0);
+//		gl.glFogf(GL_FOG_DENSITY, 1.0f);
+//		gl.glFogf(GL_FOG_START, 0f);
+//		gl.glFogf(GL_FOG_END, 200f);
+//		gl.glEnable(GL_FOG);
 		
 		/* draw curves */
 		if (showCurves.get()) {
 			if (RENDERER.antialiasing) {
-				gl.glEnable(GL.GL_LINE_SMOOTH);
-				gl.glEnable(GL.GL_BLEND);
-				gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+				gl.glEnable(GL_LINE_SMOOTH);
+				gl.glEnable(GL_BLEND);
+				gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			}
 			gl.glColor3f(COLORS.curves.x, COLORS.curves.y, COLORS.curves.z);
-			gl.glBegin(GL.GL_LINES);
+			gl.glBegin(GL_LINES);
 			for (ControlPoint start : model.getCurves()) {
 				drawCurve(start);
 			}
 			gl.glEnd();
 			if (RENDERER.antialiasing) {
-				gl.glDisable(GL.GL_LINE_SMOOTH);
-				gl.glDisable(GL.GL_BLEND);
+				gl.glDisable(GL_LINE_SMOOTH);
+				gl.glDisable(GL_BLEND);
 			}
 		}
 		
@@ -821,7 +823,7 @@ public class ViewportGl extends Viewport {
 		/* draw points */
 		if (showPoints.get()) {
 			gl.glPointSize(3);
-			gl.glBegin(GL.GL_POINTS);
+			gl.glBegin(GL_POINTS);
 			for (ControlPoint start : model.getCurves()) {
 				ControlPoint cp = start;
 				do {
@@ -864,48 +866,155 @@ public class ViewportGl extends Viewport {
 	
 	private void drawSds3(Sds sds) {
 		gl.glPointSize(5);
-//		for (Face face : sds.faceList) {
-//			drawFace(face, subdivLevel);
-//		}
-		drawFace(null, subdivLevel);
+		gl.glEnable(GL_LIGHTING);
+		for (Face face : sds.faceList) {
+			drawFace(face, subdivLevel);
+//			break;
+		}
+//		drawFace(null, subdivLevel);
 //		System.out.println(i + " fragments@level " + subdivLevel + " in " + total + "ms");
 	}
 	
 	private void drawFace(Face face, int maxLevel) {
-//		face.subdivide(maxLevel, slate);
-		slate.subdivide(maxLevel, new float[][][] {
-				{ { -1, -1, 1 }, { -3, -1, 1 }, { -3, -3, 1 }, { -1, -3, 1 } },
-				{ {  1, -1, 1 }, {  1, -3, 1 }, {  3, -3, 1 }, {  3, -1, 1 } },
-				{ {  1,  1, 1 }, {  3,  1, 1 }, {  3,  3, 1 }, {  1,  3, 1 } },
-				{ { -1,  1, 1 }, { -1,  3, 1 }, { -3,  3, 1 }, { -3,  1, 1 } }
-		});
+		face.subdivide(maxLevel, slate);
+
+//		slate.subdivide(maxLevel, new float[][][] {
+//				{ { -1, -1, 2 }, { -3, -1, 2 }, { -3, -3, 2 }, { -1, -3, 2 } },
+//				{ {  1, -1, 2 }, {  1, -3, 2 }, {  3, -3, 2 }, {  3, -1, 2 } },
+//				{ {  1,  1, 2 }, {  3,  1, 2 }, {  3,  3, 2 }, {  1,  3, 2 } },
+//				{ { -1,  1, 2 }, { -1,  3, 2 }, { -3,  3, 2 }, { -3,  1, 2 } }
+//		});
+				
+//		slate.subdivide(maxLevel, new float[][][] {
+//				{ { -1, -1, 2 }, { -3, -1, 2 }, { -3, -2, 2 }, { -3, -3, 2 }, { -2, -3, 2 }, { -1, -3, 2 } },
+//				{ {  1, -1, 2 }, {  1, -3, 2 }, {  3, -3, 2 }, {  3, -1, 2 } },
+//				{ {  1,  1, 2 }, {  3,  1, 2 }, {  3,  3, 2 }, {  1,  3, 2 } },
+//				{ { -1,  1, 2 }, { -1,  3, 2 }, { -3,  3, 2 }, { -3,  1, 2 } }
+//		});
+
+//		slate.subdivide(maxLevel, new float[][][] {
+//				{ { -1, -1, 2 }, { -3, -1, 2 }, { -3, -2, 2 }, { -3, -3, 2 }, { -2, -3, 2 }, { -1, -3, 2 } },
+//				{ {  1, -1, 2 }, {  1, -3, 2 }, {  3, -3, 2 }, {  3, -1, 2 } },
+//				{ {  1,  1, 2 }, {  3,  1, 2 }, {  3,  3, 2 }, {  1,  3, 2 } },
+//				{ { -1,  1, 2 }, { -3,  3, 2 }, }
+//		});
+				
+//		slate.subdivide(maxLevel, new float[][][] {
+//				{ { -1, -1, 2 }, { -3, -3, 2 }, },
+//				{ {  1, -1, 2 }, {  3, -3, 2 }, },
+//				{ {  1,  1, 2 }, {  3,  3, 2 }, },
+//				{ { -1,  1, 2 }, { -3,  3, 2 }, }
+//		});
+		
+//		slate.subdivide(maxLevel, new float[][][] {
+//				{ { -1, -1, 1 }, { -1, -1, -1 }, },
+//				{ {  1, -1, 1 }, {  1, -1, -1 }, },
+//				{ {  1,  1, 1 }, {  1,  1, -1 }, },
+//				{ { -1,  1, 1 }, { -1,  1, -1 }, }
+//		});
+		
 		float[][] geo = slate.getGeo(maxLevel - 1);
-		int offset = slate.getGridStart();
+		float[][] norm = slate.getNormals(maxLevel - 1);
+		int offset = slate.getGridStart() + 0;
 		int dim = (1 << (maxLevel - 1)) + 3;
-		int index = offset + dim + 1;
-		Point3f pt = new Point3f();
-		gl.glBegin(GL.GL_POINTS);
-//		for (int y = 1; y < dim - 1; y++) {
-//			for (int x = 1; x < dim - 1; x++) {
+		Point3f p0= new Point3f();
+		Point3f p1 = new Point3f();
+		Point3f p2 = new Point3f();
+		Point3f p3 = new Point3f();
+//		Vector3f v0 = new Vector3f();
+//		Vector3f v1 = new Vector3f();
+		Vector3f n0 = new Vector3f();
+		Vector3f n1 = new Vector3f();
+		Vector3f n2 = new Vector3f();
+		Vector3f n3 = new Vector3f();
+		gl.glShadeModel(GL_SMOOTH);
+		gl.glPolygonMode(GL_FRONT, GL_FILL);
+		gl.glEnable(GL_CULL_FACE);
+		gl.glCullFace(GL_BACK);
+		gl.glPointSize(3);
+		gl.glBegin(GL_QUADS);
+		gl.glColor3f(1, 0.5f, 0);
+		for (int y = 1; y < dim - 2; y++) {
+			for (int x = 1; x < dim - 2; x++) {
+				p0.set(geo[offset + y * dim + x]);
+				p1.set(geo[offset + y * dim + x + 1]);
+				p2.set(geo[offset + (y + 1) * dim + x + 1]);
+				p3.set(geo[offset + (y + 1) * dim + x]);
+				n0.set(norm[offset + y * dim + x]);
+				n1.set(norm[offset + y * dim + x + 1]);
+				n2.set(norm[offset + (y + 1) * dim + x + 1]);
+				n3.set(norm[offset + (y + 1) * dim + x]);
+				matrix.transform(p0);
+				matrix.transform(p1);
+				matrix.transform(p2);
+				matrix.transform(p3);
+				matrix.transform(n0);
+				matrix.transform(n1);
+				matrix.transform(n2);
+				matrix.transform(n3);
+				n0.normalize();
+				n1.normalize();
+				n2.normalize();
+				n3.normalize();
+//				n0.scale(-1);
+//				n1.scale(-1);
+//				n2.scale(-1);
+//				n3.scale(-1);
+				
+//				v0.sub(p1, p0);
+//				v1.sub(p3, p0);
+//				n0.cross(v0, v1);
+//				n0.normalize();
+//				v0.sub(p2, p1);
+//				v1.sub(p0, p1);
+//				n1.cross(v0, v1);
+//				n1.normalize();
+//				v0.sub(p3, p2);
+//				v1.sub(p1, p2);
+//				n2.cross(v0, v1);
+//				n2.normalize();
+//				v0.sub(p0, p3);
+//				v1.sub(p2, p3);
+//				n3.cross(v0, v1);
+//				n3.normalize();
+				gl.glNormal3f(n0.x, n0.y, n0.z);
+				gl.glVertex3f(p0.x, p0.y, p0.z);
+				gl.glNormal3f(n1.x, n1.y, n1.z);
+				gl.glVertex3f(p1.x, p1.y, p1.z);
+				gl.glNormal3f(n2.x, n2.y, n2.z);
+				gl.glVertex3f(p2.x, p2.y, p2.z);
+				gl.glNormal3f(n3.x, n3.y, n3.z);
+				gl.glVertex3f(p3.x, p3.y, p3.z);
+				
+			}
+		}
+		gl.glEnd();
+//		gl.glPointSize(5);
+//		gl.glLineWidth(3);
+//		gl.glBegin(GL_POINTS);
+//		gl.glColor3f(1, 1, 1);
+//		for (int i = 0; i < slate.getGridStart(); i++) {
+//			pt.set(geo[i]);
+////			System.out.println(i + ": " + pt);
+//			matrix.transform(pt);
+//			gl.glVertex3f(pt.x, pt.y, pt.z);
+//		}
+//		gl.glEnd();
+//		gl.glLineWidth(1);
+		
+//		index = offset;
+//		gl.glColor3f(0, 1, 0);
+//		for (int y = 0; y < dim; y++) {
+//			for (int x = 0; x < dim; x++) {
 //				pt.set(geo[index]);
 //				System.out.println(index + ": " + pt);
 //				matrix.transform(pt);
 //				gl.glVertex3f(pt.x, pt.y, pt.z);
 //				index++;
 //			}
-//			index += 2;
 //		}
-		index = offset;
-		for (int y = 0; y < dim; y++) {
-			for (int x = 0; x < dim; x++) {
-				pt.set(geo[index]);
-				System.out.println(index + ": " + pt);
-				matrix.transform(pt);
-				gl.glVertex3f(pt.x, pt.y, pt.z);
-				index++;
-			}
-		}
-		gl.glEnd();
+//		gl.glEnd();
+
 	}
 	
 	private void drawFragment(float[][] v, int valence, int depth) {
@@ -914,7 +1023,7 @@ public class ViewportGl extends Viewport {
 		int start = 1;
 		Point3f pt = new Point3f();
 		gl.glColor3f(0.5f, 0.5f, 1.0f);
-		gl.glBegin(GL.GL_POINTS);
+		gl.glBegin(GL_POINTS);
 //		System.out.println(rings + " rings");
 		for (int i = 0; i < Kernel.TABLE_SIZES[valence - 3][depth]; i++) {
 			switch (kernel.lookupTables[valence - 3][i][9]) {
@@ -938,7 +1047,7 @@ public class ViewportGl extends Viewport {
 //			int ringSize = spanSize * valence;
 //			int p = 0;
 //			for (int s = 0; s < valence; s++) {
-//				gl.glBegin(GL.GL_LINE_STRIP);
+//				gl.glBegin(GL_LINE_STRIP);
 //				pt.set(v[start + (p - 1 + ringSize) % ringSize]);
 //				matrix.transform(pt);
 //				gl.glVertex3f(pt.x, pt.y, pt.z);
@@ -993,33 +1102,33 @@ public class ViewportGl extends Viewport {
 	private void spatialMode() {
 		float w = (float) component.getWidth() / 2;
 		float h = (float) component.getHeight() / 2;
-		gl.glMatrixMode(GL.GL_PROJECTION);
+		gl.glMatrixMode(GL_PROJECTION);
 		gl.glLoadIdentity();
 		if (false) {
 //			float a = 17.5f / (float) camera.focalLength.get(); 	// 35/focallength/2
 //			float b = a * h / w;
-//			gl.glDepthFunc(GL.GL_LEQUAL);
+//			gl.glDepthFunc(GL_LEQUAL);
 //			gl.glFrustum(-a, a, -b, b, nearClip, farClip);
 		} else {
-			gl.glDepthFunc(GL.GL_LEQUAL);
+			gl.glDepthFunc(GL_LEQUAL);
 			gl.glOrtho(-w, w, -h, h, -farClip, farClip);
 		}
-		gl.glMatrixMode(GL.GL_MODELVIEW);
+		gl.glMatrixMode(GL_MODELVIEW);
 		gl.glLoadIdentity();
-		gl.glEnable(GL.GL_DEPTH_TEST);
+		gl.glEnable(GL_DEPTH_TEST);
 	}
 	
 	private void rasterMode() {
 		int w = drawable.getWidth();
 		int h = drawable.getHeight();
 		gl.glViewport(0, 0, w - 1, h - 1);
-	    gl.glMatrixMode(GL.GL_PROJECTION);
+	    gl.glMatrixMode(GL_PROJECTION);
 	    gl.glLoadIdentity();
 	    gl.glOrtho(0, w - 1, h - 1, 0, 1, -1);
-	    gl.glMatrixMode(GL.GL_MODELVIEW);
+	    gl.glMatrixMode(GL_MODELVIEW);
 	    gl.glLoadIdentity();
-	    gl.glDisable(GL.GL_LIGHTING);
-		gl.glDisable(GL.GL_DEPTH_TEST);
-		gl.glShadeModel(GL.GL_FLAT);
+	    gl.glDisable(GL_LIGHTING);
+		gl.glDisable(GL_DEPTH_TEST);
+		gl.glShadeModel(GL_FLAT);
 	}
 }
