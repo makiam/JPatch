@@ -255,7 +255,7 @@ public class Main {
 //				System.out.println(i + ": " + ts[i] + "/" + n + "=" + ts[i] / n + " " + ts[i] / ts[i - 1]);
 //			}
 //			System.exit(0);
-			activeSds = new Sds(new FileInputStream("/home/sascha/off/cube.off"));
+			activeSds = new Sds(new FileInputStream("/home/sascha/off/boxcube.off"));
 			activeSds.subdivide();
 			activeSds.verify();
 //			activeSds.dump();

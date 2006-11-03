@@ -11,45 +11,29 @@ import javax.vecmath.Point3d;
  *
  */
 public class HalfEdge {
+	private final double[] WEIGHT = new double[] { 0.25, 0.25, 0.25, 0.25 };
 	final Vertex vertex;
-	final int level;
 	final HalfEdge pair;
 	Face face;
 	HalfEdge prev;
 	HalfEdge next;
 	Vertex edgePoint;
-	Point3d midPoint2;
 	
-	private HalfEdge(Vertex vertex, HalfEdge neighbor, int level) {
+	private HalfEdge(Vertex vertex, HalfEdge neighbor) {
 		this.vertex = vertex;
 		this.pair = neighbor;
-		this.level = level;
 	}
 	
-	public HalfEdge(Vertex firstVertex, Vertex secondVertex, int level) {
-		this.vertex = firstVertex;
-		this.level = level;
-		this.pair = new HalfEdge(secondVertex, this, level);
-	}
-	
-	void computeEdgePoint() {
-		assert isMaster();
+	public HalfEdge(Vertex firstVertex, Vertex secondVertex) {
+		vertex = firstVertex;
 		edgePoint = new Vertex();
-		midPoint2 = new Point3d(vertex.position);
-		midPoint2.add(pair.vertex.position);
-		edgePoint.position.set(midPoint2);
-		if (pair.face != null ) {
-			edgePoint.position.add(face.facePoint.position);
-			edgePoint.position.add(pair.face.facePoint.position);
-			edgePoint.position.scale(0.25);
-		} else {
-//			if (interpolateBoundary) {
-//				edge.edgePoint.position.scale(1.0 / 2);
-//			} else {
-				edgePoint.position.add(face.facePoint.position);
-				edgePoint.position.scale(1.0 / 3);
-//			}
-		}
+		pair = new HalfEdge(secondVertex, this);
+		pair.edgePoint = edgePoint;
+	}
+	
+	void bindEdgePoint() {
+		final Vertex[] stencil = new Vertex[] { vertex, pair.vertex, face.facePoint, pair.face.facePoint };
+		edgePoint.setStencil(stencil, WEIGHT);
 	}
 	
 	public Vertex getFirstVertex() {

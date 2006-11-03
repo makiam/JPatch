@@ -17,7 +17,7 @@ public class Sds {
 	private Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
 	public List<Vertex> vertexList = new ArrayList<Vertex>();
 	public List<Face> faceList = new LinkedList<Face>();
-	public final Vertex[] topLevelVertices;
+//	public final Vertex[] topLevelVertices;
 	
 	private boolean interpolateBoundary = true;
 	
@@ -51,10 +51,9 @@ public class Sds {
 			line = reader.readLine();
 //			System.out.println(line);
 			tokens = line.trim().split("\\s+");
-			Vertex vertex = new Vertex(Double.parseDouble(tokens[0]) - 1, Double.parseDouble(tokens[1]) - 1, Double.parseDouble(tokens[2]) - 1);
+			Vertex vertex = new Vertex(Double.parseDouble(tokens[0]), Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
 			vertexList.add(vertex);
 		}
-		topLevelVertices = vertexList.toArray(new Vertex[vertexList.size()]);
 		
 		for (int i = 0; i < numFaces; i++) {
 			line = reader.readLine();
@@ -146,41 +145,42 @@ public class Sds {
 //	}
 	
 	
-	public void adaptiveSubdivide() {
-		for (Face face : faceList) {
-			if (face.sides != 4) {
-				face.needsSubdivision = true;
-			} else {
-				face.needsSubdivision = face.getScreenSize() > 8;
-			}
-		}
-		
-		
-	}
-	
-	private void subdivideFace(Face face) {
-		face.facePoint = new Vertex();
-		for (HalfEdge edge : face.getEdges()) {
-			face.facePoint.position.add(edge.vertex.position);
-		}
-		face.facePoint.position.scale(1.0 / face.sides);
-	}
+//	public void adaptiveSubdivide() {
+//		for (Face face : faceList) {
+//			if (face.sides != 4) {
+//				face.needsSubdivision = true;
+//			} else {
+//				face.needsSubdivision = face.getScreenSize() > 8;
+//			}
+//		}
+//		
+//		
+//	}
+//	
+//	private void subdivideFace(Face face) {
+//		face.facePoint = new Vertex();
+//		for (HalfEdge edge : face.getEdges()) {
+//			face.facePoint.position.add(edge.vertex.position);
+//		}
+//		face.facePoint.position.scale(1.0 / face.sides);
+//	}
 	
 	public void subdivide() {
 		edgeMap = new HashMap<EdgeKey, HalfEdge>(edgeMap.size() * 4);
 		for (Face face : faceList) {
-			face.computeFacePoint();
+			face.bindFacePoint();
 		}
 		for (Face face : faceList) {
 			for (HalfEdge edge : face.getEdges()) {
 				if (edge.isMaster()) {
-					edge.computeEdgePoint();
+					edge.bindEdgePoint();
 				}
 			}
 		}
 		for (Vertex vertex : vertexList) {
-			vertex.moveVertex();
+			vertex.bindVertexPoint();
 		}
+		
 		Vertex[] vertices = new Vertex[4];
 		List<Face> newFaces = new LinkedList<Face>();
 		for (Iterator<Face> it = faceList.iterator(); it.hasNext(); ) {
@@ -188,7 +188,8 @@ public class Sds {
 			for (HalfEdge edge : face.getEdges()) {
 				vertices[0] = face.facePoint;
 				vertices[1] = edge.prev.isMaster() ? edge.prev.edgePoint : edge.prev.pair.edgePoint;
-				vertices[2] = edge.vertex;
+				vertices[2] = edge.vertex.subVertex;
+				vertices[3] = edge.isMaster() ? edge.edgePoint : edge.pair.edgePoint;
 				if (edge.isMaster()) {
 					vertices[3] = edge.edgePoint;
 					vertexList.add(edge.edgePoint);
