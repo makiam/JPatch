@@ -32,6 +32,7 @@ public abstract class Viewport extends AbstractNamedObject {
 	protected Component component;
 	protected Matrix4d matrix = new Matrix4d();
 	protected Matrix4d inverseMatrix = new Matrix4d();
+	protected Matrix4f modelView = new Matrix4f();
 	protected double zPos;
 	protected double fw;
 	protected static final int maxSubdiv = 10;
@@ -217,6 +218,7 @@ public abstract class Viewport extends AbstractNamedObject {
 //		matrix.m23 = 0;
 		
 		inverseMatrix.invert(matrix);
+		modelView.set(matrix);
 	}
 	
 	protected abstract void drawGrid();
