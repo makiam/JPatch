@@ -1,6 +1,5 @@
 package sds;
 
-import java.awt.Rectangle;
 import java.util.Iterator;
 
 import javax.vecmath.Point3d;
@@ -18,10 +17,9 @@ public class Face {
 	final int num = count++;
 	public final int sides;
 	private final double recSides;
-	
+	private final Slate[] slates;
 	Vertex facePoint = new Vertex();
-	
-	final int level;
+	HalfEdge edge;
 	final Iterable<HalfEdge> edgeIterable = new Iterable<HalfEdge>() {
 		public Iterator<HalfEdge> iterator() {
 			return new Iterator<HalfEdge>() {
@@ -42,13 +40,11 @@ public class Face {
 			};
 		}
 	};
-	HalfEdge edge;
-	boolean needsSubdivision;
 	
-	Face(int sides, int level) {
+	Face(int sides) {
 		this.sides = sides;
-		this.level = level;
 		recSides = 1.0 / sides;
+		slates = new Slate[sides];
 	}
 	
 	void bindFacePoint() {
@@ -63,71 +59,113 @@ public class Face {
 		facePoint.setStencil(stencil, weight);
 	}
 	
-	public void subdivide(int maxLevel, Slate slate) {
-		Vertex[] va = new Vertex[10];
-		float[][][] boundary = new float[4][][];
-		int i = 0;
+	void setupSlates() {
+		Point3d[][] p = new Point3d[4][];
+		int s = 0;
 		for (HalfEdge edge : getEdges()) {
-//			System.out.println("Edge " + edge + " " + edge.vertex);
-			int valence = edge.vertex.valence();
-//			int size = valence - 2;
+			p[0] = new Point3d[sides * 2 - 4];
+			p[0][0] = facePoint.pos;
+			HalfEdge e = edge.next;
+			p[0][1] = e.edgePoint.pos;
+			for (int i = 2; i < p[0].length; ) {
+				e = e.next;
+				p[0][i++] = e.vertex.vertexPoint.pos;
+				p[0][i++] = e.edgePoint.pos;
+			}
+			
+			p[1] = new Point3d[4];
+			e = edge.prev.pair;
+			p[1][0] = e.edgePoint.pos;
+			p[1][1] = e.next.vertex.vertexPoint.pos;
+			p[1][2] = e.next.edgePoint.pos;
+			p[1][3] = e.face.facePoint.pos;
+			
+			p[2] = new Point3d[edge.vertex.valence() * 2 - 4];
+			p[2][0] = edge.vertex.vertexPoint.pos;
+			e = edge.prev.pair.prev.pair;
+			p[2][1] = e.edgePoint.pos;
+			for (int i = 2; i < p[2].length; ) {
+				p[2][i++] = e.face.facePoint.pos;
+				e = e.prev.pair;
+				p[2][i++] = e.edgePoint.pos;
+			}
+			
+			p[3] = new Point3d[4];
+			e = edge.pair;
+			p[3][0] = e.edgePoint.pos;
+			p[3][1] = e.face.facePoint.pos;
+			p[3][2] = e.prev.edgePoint.pos;
+			p[3][3] = e.vertex.vertexPoint.pos;
+			
+			slates[s++] = new Slate(p);
+		}
+	}
+	
+//	public void subdivide(int maxLevel, SlateTesselator slate) {
+//		Vertex[] va = new Vertex[10];
+//		float[][][] boundary = new float[4][][];
+//		int i = 0;
+//		for (HalfEdge edge : getEdges()) {
+////			System.out.println("Edge " + edge + " " + edge.vertex);
+//			int valence = edge.vertex.valence();
+////			int size = valence - 2;
+////			float[][] corner = new float[size][3];
+////			boundary[i] = corner;
+////			Point3d p = edge.vertex.position;
+////			corner[0][0] = (float) p.x;
+////			corner[0][1] = (float) p.y;
+////			corner[0][2] = (float) p.z;
+////			int j = 0;
+////			int start = -1;
+////			for (HalfEdge e : edge.vertex.getAdjacentEdges()) {
+////				if (e.face == this) {
+////					start = j;
+////				}
+////				va[j++] = e.getSecondVertex();
+////			}
+////			for (int k = 0; k < valence - 2; k++) {
+////				int index = (start + k + 2) % valence;
+////				p = va[index].position;
+////				corner[k + 1][0] = (float) p.x;
+////				corner[k + 1][1] = (float) p.y;
+////				corner[k + 1][2] = (float) p.z;
+////			}
+////			i++;
+//			
+//			int size = valence * 2 - 4;
+////			System.out.println("in face: corner=" + i + " valence=" + valence + " size=" + size);
 //			float[][] corner = new float[size][3];
-//			boundary[i] = corner;
-//			Point3d p = edge.vertex.position;
+//			boundary[i++] = corner;
+//			Point3d p = edge.vertex.pos;
+////			System.out.println(edge.vertex);
 //			corner[0][0] = (float) p.x;
 //			corner[0][1] = (float) p.y;
 //			corner[0][2] = (float) p.z;
-//			int j = 0;
-//			int start = -1;
-//			for (HalfEdge e : edge.vertex.getAdjacentEdges()) {
-//				if (e.face == this) {
-//					start = j;
-//				}
-//				va[j++] = e.getSecondVertex();
+//			HalfEdge e = edge.prev.pair.prev.pair.next;
+//			p = e.vertex.pos;
+////			System.out.println(e.vertex);
+//			corner[1][0] = (float) p.x;
+//			corner[1][1] = (float) p.y;
+//			corner[1][2] = (float) p.z;
+//			for (int j = 2; j < size;) {
+////				System.out.println(j);
+//				e = e.next;
+//				p = e.vertex.pos;
+////				System.out.println(j + " " + p);
+//				corner[j][0] = (float) p.x;
+//				corner[j][1] = (float) p.y;
+//				corner[j++][2] = (float) p.z;
+////				System.out.println(j);
+//				e = e.next.pair.next;
+//				p = e.vertex.pos;
+////				System.out.println(j + " " + p);
+//				corner[j][0] = (float) p.x;
+//				corner[j][1] = (float) p.y;
+//				corner[j++][2] = (float) p.z;
 //			}
-//			for (int k = 0; k < valence - 2; k++) {
-//				int index = (start + k + 2) % valence;
-//				p = va[index].position;
-//				corner[k + 1][0] = (float) p.x;
-//				corner[k + 1][1] = (float) p.y;
-//				corner[k + 1][2] = (float) p.z;
-//			}
-//			i++;
-			
-			int size = valence * 2 - 4;
-//			System.out.println("in face: corner=" + i + " valence=" + valence + " size=" + size);
-			float[][] corner = new float[size][3];
-			boundary[i++] = corner;
-			Point3d p = edge.vertex.pos;
-//			System.out.println(edge.vertex);
-			corner[0][0] = (float) p.x;
-			corner[0][1] = (float) p.y;
-			corner[0][2] = (float) p.z;
-			HalfEdge e = edge.prev.pair.prev.pair.next;
-			p = e.vertex.pos;
-//			System.out.println(e.vertex);
-			corner[1][0] = (float) p.x;
-			corner[1][1] = (float) p.y;
-			corner[1][2] = (float) p.z;
-			for (int j = 2; j < size;) {
-//				System.out.println(j);
-				e = e.next;
-				p = e.vertex.pos;
-//				System.out.println(j + " " + p);
-				corner[j][0] = (float) p.x;
-				corner[j][1] = (float) p.y;
-				corner[j++][2] = (float) p.z;
-//				System.out.println(j);
-				e = e.next.pair.next;
-				p = e.vertex.pos;
-//				System.out.println(j + " " + p);
-				corner[j][0] = (float) p.x;
-				corner[j][1] = (float) p.y;
-				corner[j++][2] = (float) p.z;
-			}
-		}
-		slate.subdivide(maxLevel, boundary);
-	}
+//		}
+//		slate.subdivide(maxLevel, boundary);
+//	}
 	
 //	int getScreenSize() {
 //		assert sides == 4;
@@ -169,6 +207,10 @@ public class Face {
 //		int dy = ymax - ymin;
 //		return (dx > dy) ? dx : dy; 
 //	}
+	
+	public Slate[] getSlates() {
+		return slates;
+	}
 	
 	public Iterable<HalfEdge> getEdges() {
 		return edgeIterable;

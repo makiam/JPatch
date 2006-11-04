@@ -10,7 +10,7 @@ import java.io.IOException;
 import javax.swing.*;
 import javax.vecmath.*;
 
-public class Kernel {
+public class FragmentTesselator {
 	public static final int MAX = 5;
 	public static final int MAX_VALENCE = 16;
 	
@@ -41,7 +41,7 @@ public class Kernel {
 	private static int pos[][];
 	private static int label[][];
 	
-	public Kernel() {
+	public FragmentTesselator() {
 		int sum = 0;
 		for (int i = 0; i <= MAX_VALENCE - 3; i++) {
 			int valence = i + 3;
@@ -221,7 +221,7 @@ public class Kernel {
 	
 	private static class Tester2 {
 		Tester2() throws Exception {
-			Kernel kernel = new Kernel();
+			FragmentTesselator kernel = new FragmentTesselator();
 			Sds sds = new Sds(new FileInputStream("/home/sascha/off/cube.off"));
 //			final float[][] vb = kernel.getVertexBuffer(0);
 //			vb[0][0] = 0; vb[0][1] = 0; vb[0][2] = 0;
@@ -319,7 +319,7 @@ public class Kernel {
 		int[][] lookupTable;
 		int activeX, activeY;
 		Tester() {
-			Kernel kernel = new Kernel();
+			FragmentTesselator kernel = new FragmentTesselator();
 			lookupTable = kernel.buildLookupTable(4);
 			JFrame frame = new JFrame();
 			final JPanel panel = new JPanel() {

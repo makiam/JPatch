@@ -7,9 +7,11 @@ import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.vecmath.*;
+
 import static java.lang.Math.*;
 
-public class Slate {
+public class SlateTesselator {
 	private static final int UNUSED = 0;
 	private static final int EDGE = 1;
 	private static final int FACE = 2;
@@ -39,7 +41,7 @@ public class Slate {
 	private final int[][][] patchLimitStencil = new int[MAX_SUBDIV][][];						// [level][index][stencil]
 	private final int[][][][] cornerLimitStencil = new int[MAX_SUBDIV][MAX_VALENCE- 2][4][];			// [level][valence][corner][stencil]
 	
-	public Slate() {
+	public SlateTesselator() {
 //		System.out.println("MAX_CORNER_LENGTH=" + MAX_CORNER_LENGTH);
 		for (int level = 0; level < MAX_SUBDIV; level++) {
 			int dim = ((1 << level)) + 3;
@@ -246,7 +248,7 @@ public class Slate {
 		return GRID_START;
 	}
 	
-	public float[][] getGeo(int level) {
+	public float[][] getVertices(int level) {
 		return limitPoints[level];
 	}
 	
@@ -254,8 +256,10 @@ public class Slate {
 		return limitNormals[level];
 	}
 	
-	public void subdivide(final int maxLevel, final float[][][] boundary) {
-
+	public void tesselate(final Slate slate, Matrix4f matrix, final int maxLevel) {
+		Point3f pt = new Point3f();
+		final Point3d[][] boundary = slate.fans;
+		
 		/*
 		 * initialize top-level geometry array
 		 */
@@ -263,21 +267,32 @@ public class Slate {
 		/*
 		 * initialize 2x2 grid
 		 */
-		geo[GRID_START + 5][0] = boundary[0][0][0];
-		geo[GRID_START + 5][1] = boundary[0][0][1];
-		geo[GRID_START + 5][2] = boundary[0][0][2];
-		geo[GRID_START + 6][0] = boundary[1][0][0];
-		geo[GRID_START + 6][1] = boundary[1][0][1];
-		geo[GRID_START + 6][2] = boundary[1][0][2];
-		geo[GRID_START + 10][0] = boundary[2][0][0];
-		geo[GRID_START + 10][1] = boundary[2][0][1];
-		geo[GRID_START + 10][2] = boundary[2][0][2];
-		geo[GRID_START + 9][0] = boundary[3][0][0];
-		geo[GRID_START + 9][1] = boundary[3][0][1];
-		geo[GRID_START + 9][2] = boundary[3][0][2];
+		pt.set(boundary[0][0]);
+		matrix.transform(pt);
+		geo[GRID_START + 5][0] = pt.x;
+		geo[GRID_START + 5][1] = pt.y;
+		geo[GRID_START + 5][2] = pt.z;
+		
+		pt.set(boundary[1][0]);
+		matrix.transform(pt);
+		geo[GRID_START + 6][0] = pt.x;
+		geo[GRID_START + 6][1] = pt.y;
+		geo[GRID_START + 6][2] = pt.z;
+		
+		pt.set(boundary[2][0]);
+		matrix.transform(pt);
+		geo[GRID_START + 10][0] = pt.x;
+		geo[GRID_START + 10][1] = pt.y;
+		geo[GRID_START + 10][2] = pt.z;
+		
+		pt.set(boundary[3][0]);
+		matrix.transform(pt);
+		geo[GRID_START + 9][0] = pt.x;
+		geo[GRID_START + 9][1] = pt.y;
+		geo[GRID_START + 9][2] = pt.z;
 		
 		for (int corner = 0; corner < 4; corner++) {
-			final float[][] c = boundary[corner];
+			final Point3d[] c = boundary[corner];
 			
 			
 			
@@ -289,14 +304,18 @@ public class Slate {
 			 */
 			for (int i = 1; i < n; i++) {
 				final int index = start + (i % (n - 1));
-				geo[index][0] = c[i][0];
-				geo[index][1] = c[i][1];
-				geo[index][2] = c[i][2];
+				pt.set(c[i]);
+				matrix.transform(pt);
+				geo[index][0] = pt.x;
+				geo[index][1] = pt.y;
+				geo[index][2] = pt.z;
 			}
 			if (n == 2) {
-				geo[start + 1][0] = c[1][0];
-				geo[start + 1][1] = c[1][1];
-				geo[start + 1][2] = c[1][2];
+				pt.set(c[1]);
+				matrix.transform(pt);
+				geo[start + 1][0] = pt.x;
+				geo[start + 1][1] = pt.y;
+				geo[start + 1][2] = pt.z;
 			}
 		}
 		
@@ -403,7 +422,7 @@ public class Slate {
 		final float[][] norm = limitNormals[level];
 		final float[][] in = subdivPoints[level];
 		final int n = stencil.length;
-		float ax, ay, az, bx, by, bz;
+		float ax, ay, az, bx, by, bz, nx, ny, nz, nl;
 		
 		for (int i = 0; i < n; i++) {
 			final int[] s = stencil[i];
@@ -423,9 +442,13 @@ public class Slate {
 			by = (in[s[1]][1] - in[s[3]][1]) * 4 + (in[s[5]][1] - in[s[8]][1]) + (in[s[6]][1] - in[s[7]][1]);
 			bz = (in[s[1]][2] - in[s[3]][2]) * 4 + (in[s[5]][2] - in[s[8]][2]) + (in[s[6]][2] - in[s[7]][2]);
 			
-			norm[outIndex][0] = by * az - bz * ay;		// cross product
-			norm[outIndex][1] = bz * ax - bx * az;
-			norm[outIndex][2] = bx * ay - by * ax;
+			nx = by * az - bz * ay;		// cross product
+			ny = bz * ax - bx * az;
+			nz = bx * ay - by * ax;
+			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
+			norm[outIndex][0] = nx * nl;
+			norm[outIndex][1] = ny * nl;
+			norm[outIndex][2] = nz * nl;
 		}
 		
 		/*
@@ -500,13 +523,15 @@ public class Slate {
 				by += in[cs[c2ei]][1] * ew;
 				bz += in[cs[c2ei]][2] * ew;
 			}
-			norm[outIndex][0] = by * az - bz * ay;		// cross product
-			norm[outIndex][1] = bz * ax - bx * az;
-			norm[outIndex][2] = bx * ay - by * ax;
+			nx = by * az - bz * ay;		// cross product
+			ny = bz * ax - bx * az;
+			nz = bx * ay - by * ax;
+			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
+			norm[outIndex][0] = nx * nl;
+			norm[outIndex][1] = ny * nl;
+			norm[outIndex][2] = nz * nl;
 		}
 	}
-	
-	
 	
 	private static int cornerStencilLength(int valence) {
 		return max(valence * 2 - 5, 2);
@@ -572,7 +597,6 @@ public class Slate {
 		int max = cornerStencilLength(valence);
 		int offset = MAX_CORNER_LENGTH * corner;
 		i--;
-//		System.out.println("max=" + max + " i=" + i);
 		if (i == -1) {
 			return offset;
 		} else if (i < -1) {
@@ -601,193 +625,5 @@ public class Slate {
 				return cornerIndex(corner, valence, i + 1);
 			}
 		}
-	}
-	
-	
-	
-	
-	private static class Tester {
-		int activeX, activeY;
-		final Slate slate;
-		
-		Tester() {
-			slate = new Slate();
-			JFrame frame = new JFrame();
-			final JPanel panel = new JPanel() {
-				public void paint(Graphics g) {
-					super.paint(g);
-//					for (int i = 0; i < table[0].length; i++) {
-//						int x = xcoord[i] * 24 + getWidth() / 2;
-//						int y = ycoord[i] * 24 + getHeight() / 2;
-//						g.drawString(String.valueOf(i), x, y);
-//					}
-					int level = 2;
-					int[][] table = slate.patchStencil[level];
-					int dim = (1 << level) + 3;
-					for (int row = 0; row < dim; row++) {
-						for (int column = 0; column < dim; column++) {
-							int index = row * dim + column;
-							switch(table[index][0]) {
-							case UNUSED:
-								g.setColor(Color.GRAY);
-								break;
-							case EDGE:
-								g.setColor(Color.RED);
-								break;
-							case FACE:
-								g.setColor(Color.GREEN);
-								break;
-							case POINT:
-								g.setColor(Color.BLUE);
-								break;
-							}
-							g.drawString(String.valueOf(GRID_START + index), column * 32 + 8, row * 32 + 24);
-						}
-					}
-					
-					int dim2 = (1 << (level - 1)) + 3;
-					for (int row = 0; row < dim2; row++) {
-						for (int column = 0; column < dim2; column++) {
-							int index = row * dim2 + column;
-							g.setColor(Color.BLACK);
-							g.drawString(String.valueOf(GRID_START + index), column * 32 + 8 + 400, row * 32 + 24);
-						}
-					}
-					for (int i = 0; i < GRID_START; i++) {
-						g.drawString(String.valueOf(i), i * 32 + 8 + 400, 400);
-					}
-					
-					if (activeX < dim && activeY < dim) {
-						int index = activeY * dim + activeX;
-						g.setColor(Color.BLACK);
-						g.drawRect(activeX * 32, activeY * 32, 32, 32);
-						
-						int[] s = table[index];
-						int type = s[0];
-						if (activeX == 1 && activeY == 1) {
-							s = slate.cornerStencil[level][1][0];
-							type = POINT;
-						}
-						
-						switch(type) {
-						case FACE:
-							g.drawOval(400 + (xcoord(level, s[1])) * 32, (ycoord(level, s[1])) * 32, 32, 32);
-							g.drawOval(400 + (xcoord(level, s[2])) * 32, (ycoord(level, s[2])) * 32, 32, 32);
-							g.drawOval(400 + (xcoord(level, s[3])) * 32, (ycoord(level, s[3])) * 32, 32, 32);
-							g.drawOval(400 + (xcoord(level, s[4])) * 32, (ycoord(level, s[4])) * 32, 32, 32);
-							break;
-						case EDGE:
-							g.drawOval(400 + (xcoord(level, s[1])) * 32, (ycoord(level, s[1])) * 32, 32, 32);
-							g.drawOval(400 + (xcoord(level, s[2])) * 32, (ycoord(level, s[2])) * 32, 32, 32);
-							g.drawOval(400 + (xcoord(level, s[3])) * 32 + 4, (ycoord(level, s[3])) * 32 + 4, 24, 24);
-							g.drawOval(400 + (xcoord(level, s[4])) * 32 + 4, (ycoord(level, s[4])) * 32 + 4, 24, 24);
-							g.drawOval(400 + (xcoord(level, s[5])) * 32 + 4, (ycoord(level, s[5])) * 32 + 4, 24, 24);
-							g.drawOval(400 + (xcoord(level, s[6])) * 32 + 4, (ycoord(level, s[6])) * 32 + 4, 24, 24);
-							break;
-						case POINT:
-							g.drawOval(400 + (xcoord(level, s[1])) * 32, (ycoord(level, s[1])) * 32, 32, 32);
-							g.drawOval(400 + (xcoord(level, s[2])) * 32, (ycoord(level, s[2])) * 32, 32, 32);
-							g.drawOval(400 + (xcoord(level, s[3])) * 32, (ycoord(level, s[3])) * 32, 32, 32);
-							g.drawOval(400 + (xcoord(level, s[4])) * 32, (ycoord(level, s[4])) * 32, 32, 32);
-							g.drawOval(400 + (xcoord(level, s[5])) * 32, (ycoord(level, s[5])) * 32, 32, 32);
-							g.drawOval(400 + (xcoord(level, s[6])) * 32 + 4, (ycoord(level, s[6])) * 32 + 4, 24, 24);
-							g.drawOval(400 + (xcoord(level, s[7])) * 32 + 4, (ycoord(level, s[7])) * 32 + 4, 24, 24);
-							g.drawOval(400 + (xcoord(level, s[8])) * 32 + 4, (ycoord(level, s[8])) * 32 + 4, 24, 24);
-							g.drawOval(400 + (xcoord(level, s[9])) * 32 + 4, (ycoord(level, s[9])) * 32 + 4, 24, 24);
-							break;
-						}
-					}
-					
-//					int index = pos[activeX][activeY];
-//					switch(table[index][9]) {
-//					case FACE:
-//						g.drawOval((xcoord[table[index][0]]) * 32, (ycoord[table[index][0]]) * 32, 32, 32);
-//						g.drawOval((xcoord[table[index][1]]) * 32, (ycoord[table[index][1]]) * 32, 32, 32);
-//						g.drawOval((xcoord[table[index][2]]) * 32, (ycoord[table[index][2]]) * 32, 32, 32);
-//						g.drawOval((xcoord[table[index][3]]) * 32, (ycoord[table[index][3]]) * 32, 32, 32);
-//						break;
-//					case EDGE:
-//						g.drawOval((xcoord[table[index][0]]) * 32, (ycoord[table[index][0]]) * 32, 32, 32);
-//						g.drawOval((xcoord[table[index][1]]) * 32, (ycoord[table[index][1]]) * 32, 32, 32);
-//						g.drawOval((xcoord[table[index][2]]) * 32 + 4, (ycoord[table[index][2]]) * 32 + 4, 24, 24);
-//						g.drawOval((xcoord[table[index][3]]) * 32 + 4, (ycoord[table[index][3]]) * 32 + 4, 24, 24);
-//						g.drawOval((xcoord[table[index][4]]) * 32 + 4, (ycoord[table[index][4]]) * 32 + 4, 24, 24);
-//						g.drawOval((xcoord[table[index][5]]) * 32 + 4, (ycoord[table[index][5]]) * 32 + 4, 24, 24);
-//						break;
-//					case VERTEX:
-//						g.drawOval((xcoord[table[index][0]]) * 32, (ycoord[table[index][0]]) * 32, 32, 32);
-//						g.drawOval((xcoord[table[index][1]]) * 32, (ycoord[table[index][1]]) * 32, 32, 32);
-//						g.drawOval((xcoord[table[index][2]]) * 32, (ycoord[table[index][2]]) * 32, 32, 32);
-//						g.drawOval((xcoord[table[index][3]]) * 32, (ycoord[table[index][3]]) * 32, 32, 32);
-//						g.drawOval((xcoord[table[index][4]]) * 32, (ycoord[table[index][4]]) * 32, 32, 32);
-//						g.drawOval((xcoord[table[index][5]]) * 32 + 4, (ycoord[table[index][5]]) * 32 + 4, 24, 24);
-//						g.drawOval((xcoord[table[index][6]]) * 32 + 4, (ycoord[table[index][6]]) * 32 + 4, 24, 24);
-//						g.drawOval((xcoord[table[index][7]]) * 32 + 4, (ycoord[table[index][7]]) * 32 + 4, 24, 24);
-//						g.drawOval((xcoord[table[index][8]]) * 32 + 4, (ycoord[table[index][8]]) * 32 + 4, 24, 24);
-//						break;
-//					}
-				}
-			};
-			panel.addMouseMotionListener(new MouseMotionAdapter() {
-				public void mouseMoved(MouseEvent e) {
-					activeX = e.getX() / 32;
-					activeY = e.getY() / 32;
-					panel.repaint();
-				}
-			});
-			frame.add(panel);
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame.setSize(900, 900);
-			frame.setVisible(true);
-			
-			slate.subdivide(3, new float[][][] {
-					{ { -1, -1, 1 }, { -3, -1, 1 }, { -3, -3, 1 }, { -1, -3, 1 } },
-					{ {  1, -1, 1 }, {  1, -3, 1 }, {  3, -3, 1 }, {  3, -1, 1 } },
-					{ {  1,  1, 1 }, {  3,  1, 1 }, {  3,  3, 1 }, {  1,  3, 1 } },
-					{ { -1,  1, 1 }, { -1,  3, 1 }, { -3,  3, 1 }, { -3,  1, 1 } }
-			});
-		}
-		
-		private int xcoord(int level, int index) {
-			int dim = (1 << level - 1) + 3;
-			if (index >= GRID_START) {
-				return (index - GRID_START) % dim;
-			} else {
-				return index;
-			}
-		}
-		
-		private int ycoord(int level, int index) {
-			int dim = (1 << level - 1) + 3;
-			if (index >= GRID_START) {
-				return (index - GRID_START) / dim;
-			} else {
-				return 12;
-			}
-		}
-	}
-	
-	public static void main(String[] args) {
-//		System.out.println(Slate.cornerIndex(0, 4, 0));
-//		System.out.println(Slate.cornerIndex(0, 4, 1));
-//		System.out.println(Slate.cornerIndex(0, 4, 2));
-//		System.out.println();
-		System.out.println(Slate.cornerIndex2(0, 1, 4, -2));
-		System.out.println(Slate.cornerIndex2(0, 1, 4, -1));
-		System.out.println(Slate.cornerIndex2(0, 1, 4, 0));
-		System.out.println(Slate.cornerIndex2(0, 1, 4, 1));
-		System.out.println(Slate.cornerIndex2(0, 1, 4, 2));
-		System.out.println(Slate.cornerIndex2(0, 1, 4, 3));
-		System.out.println(Slate.cornerIndex2(0, 1, 4, 4));
-		System.out.println();
-		System.out.println(Slate.cornerIndex2(0, 1, 3, -2));
-		System.out.println(Slate.cornerIndex2(0, 1, 3, -1));
-		System.out.println(Slate.cornerIndex2(0, 1, 3, 0));
-		System.out.println(Slate.cornerIndex2(0, 1, 3, 1));
-		System.out.println(Slate.cornerIndex2(0, 1, 3, 2));
-		System.out.println(Slate.cornerIndex2(0, 1, 3, 3));
-		
-//		new Tester();
-
 	}
 }

@@ -34,7 +34,7 @@ public class Vertex {
 	final Point3d pos = new Point3d();
 	final Point3d refPos = new Point3d();
 	
-	private final Vertex vertexPoint = new Vertex();
+	Vertex vertexPoint;
 	
 	final Iterable<Face> faceIterable = new Iterable<Face>() {
 		public Iterator<Face> iterator() {
@@ -244,13 +244,14 @@ public class Vertex {
 //	}
 	
 	void bindVertexPoint() {
+		vertexPoint = new Vertex();
 		final int n = valence();
 		final int stencilSize = n * 2 + 1;
 		final Vertex[] stencil = new Vertex[stencilSize];
 		final double[] weight = new double[stencilSize];
 		final double k = 1.0 / (n * n);
 		stencil[0] = this;
-		weight[0] = (n - 2) / n;
+		weight[0] = (n - 2.0) / n;
 		int i = 1;
 		for (HalfEdge edge : getAdjacentEdges()) {
 			stencil[i] = edge.face.facePoint;
@@ -258,7 +259,9 @@ public class Vertex {
 			i++;
 			stencil[i] = edge.pair.vertex;
 			weight[i] = k;
+			i++;
 		}
+		vertexPoint.setStencil(stencil, weight);
 	}
 	
 	void validate() {
