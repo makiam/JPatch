@@ -869,95 +869,29 @@ public class ViewportGl extends Viewport {
 	private void drawSds3(Sds sds) {
 		gl.glPointSize(5);
 		gl.glEnable(GL_LIGHTING);
-		time = System.currentTimeMillis();
+		gl.glShadeModel(GL_SMOOTH);
+		gl.glPolygonMode(GL_FRONT, GL_FILL);
+		gl.glEnable(GL_CULL_FACE);
+		gl.glCullFace(GL_BACK);
+		gl.glPointSize(3);
+		time = 0;
 		for (Face face : sds.faceList) {
 			drawFace(face, subdivLevel);
 //			break;
 		}
-		System.out.println(System.currentTimeMillis() - time);
+		System.out.println(time);
 //		drawFace(null, subdivLevel);
 //		System.out.println(i + " fragments@level " + subdivLevel + " in " + total + "ms");
 	}
 	
 	private void drawFace(Face face, int maxLevel) {
-//		System.out.println("face = " + face);
-//		for (Slate slate : face.getSlates()) {
-//			System.out.println("\tslate = " + slate);
-//		}
-		
 		for (Slate slate : face.getSlates()) {
-//			long t = System.nanoTime();
 			slateTesselator.tesselate(slate, modelView, maxLevel);
-//			time += (System.nanoTime() - t);
-			
-			float[][] geo = slateTesselator.getVertices(maxLevel - 1);
-			float[][] norm = slateTesselator.getNormals(maxLevel - 1);
-			int offset = slateTesselator.getGridStart() + 0;
-			int dim = (1 << (maxLevel - 1)) + 3;
-//			Point3f p0= new Point3f();
-//			Point3f p1 = new Point3f();
-//			Point3f p2 = new Point3f();
-//			Point3f p3 = new Point3f();
-//	//		Vector3f v0 = new Vector3f();
-//	//		Vector3f v1 = new Vector3f();
-//			Vector3f n0 = new Vector3f();
-//			Vector3f n1 = new Vector3f();
-//			Vector3f n2 = new Vector3f();
-//			Vector3f n3 = new Vector3f();
-			float[] p0 = new float[3];
-			float[] p1 = new float[3];
-			float[] p2 = new float[3];
-			float[] p3 = new float[3];
-			float[] n0 = new float[3];
-			float[] n1 = new float[3];
-			float[] n2 = new float[3];
-			float[] n3 = new float[3];
-			
-			gl.glShadeModel(GL_SMOOTH);
-			gl.glPolygonMode(GL_FRONT, GL_FILL);
-			gl.glEnable(GL_CULL_FACE);
-			gl.glCullFace(GL_BACK);
-			gl.glPointSize(3);
-			
-			
-			int count = (dim - 1) * (dim - 1) * 4;
-			
+			int dim = (1 << (maxLevel - 1));
+			int count = (dim - 0) * (dim - 0) * 4;
 			gl.glInterleavedArrays(GL_N3F_V3F, 0, slateTesselator.getBuffer());
 			gl.glDrawArrays(GL_QUADS, 0, count);
-			
-//			FloatBuffer buffer = slateTesselator.getBuffer();
-//			gl.glBegin(GL_QUADS);
-//			for (int i = 0; i < count * 4; i++) {
-//				gl.glNormal3f(buffer.get(), buffer.get(), buffer.get());
-//				gl.glVertex3f(buffer.get(), buffer.get(), buffer.get());
-//			}
-//			gl.glEnd();
-			
-//			gl.glBegin(GL_QUADS);
-//			for (int y = 1; y < dim - 2; y++) {
-//				int ydim = y * dim;
-//				int ydim1 = (y + 1) * dim;
-//				for (int x = 1; x < dim - 2; x++) {
-//					p0 = geo[offset + ydim + x];
-//					p1 = geo[offset + ydim + x + 1];
-//					p2 = geo[offset + ydim1 + x + 1];
-//					p3 = geo[offset + ydim1 + x];
-//					n0 = norm[offset + ydim + x];
-//					n1 = norm[offset + ydim + x + 1];
-//					n2 = norm[offset + ydim1 + x + 1];
-//					n3 = norm[offset + ydim1 + x];
-//					
-//					gl.glNormal3f(n0[0], n0[1], n0[2]);
-//					gl.glVertex3f(p0[0], p0[1], p0[2]);
-//					gl.glNormal3f(n1[0], n1[1], n1[2]);
-//					gl.glVertex3f(p1[0], p1[1], p1[2]);
-//					gl.glNormal3f(n2[0], n2[1], n2[2]);
-//					gl.glVertex3f(p2[0], p2[1], p2[2]);
-//					gl.glNormal3f(n3[0], n3[1], n3[2]);
-//					gl.glVertex3f(p3[0], p3[1], p3[2]);
-//				}
-//			}
-//			gl.glEnd();
+			time += (count >> 2);
 		}
 	}
 	
