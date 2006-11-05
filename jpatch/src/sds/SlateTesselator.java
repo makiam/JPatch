@@ -1,9 +1,13 @@
 package sds;
 
+import com.sun.opengl.util.BufferUtil;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -40,15 +44,24 @@ public class SlateTesselator {
 	private final int[][][][] cornerStencil = new int[MAX_SUBDIV][MAX_VALENCE- 2][4][];			// [level][valence][corner][stencil]
 	private final int[][][] patchLimitStencil = new int[MAX_SUBDIV][][];						// [level][index][stencil]
 	private final int[][][][] cornerLimitStencil = new int[MAX_SUBDIV][MAX_VALENCE- 2][4][];			// [level][valence][corner][stencil]
+	private final float[] interleavedArray;
+	private final FloatBuffer buffer;
 	
 	public SlateTesselator() {
 //		System.out.println("MAX_CORNER_LENGTH=" + MAX_CORNER_LENGTH);
+		int maxdim = ((1 << (MAX_SUBDIV - 1))) + 3;
+		interleavedArray = new float[(maxdim - 1) * (maxdim - 1) * 4 * 6];
+		System.out.println("ia_length=" + interleavedArray.length);
+		buffer = BufferUtil.newFloatBuffer(interleavedArray.length * 4);
+//		buffer = javax.mediaByteBuffer.allocateDirect(interleavedArray.length * 4).asFloatBuffer();
+		
 		for (int level = 0; level < MAX_SUBDIV; level++) {
 			int dim = ((1 << level)) + 3;
 			
 			subdivPoints[level] = new float[dim * dim + GRID_START][3];
 			limitPoints[level] = new float[dim * dim + GRID_START][3];
 			limitNormals[level] = new float[dim * dim + GRID_START][3];
+			
 //			System.out.println("geometryarray level " + level + " size=" + geometryArray[level].length + " (" + dim + "x" + dim + " + " + GRID_START + ")");
 			if (level == 0) {
 //				continue;
@@ -254,6 +267,11 @@ public class SlateTesselator {
 	
 	public float[][] getNormals(int level) {
 		return limitNormals[level];
+	}
+	
+	public FloatBuffer getBuffer() {
+		buffer.rewind();
+		return buffer;
 	}
 	
 	public void tesselate(final Slate slate, Matrix4f matrix, final int maxLevel) {
@@ -531,6 +549,46 @@ public class SlateTesselator {
 			norm[outIndex][1] = ny * nl;
 			norm[outIndex][2] = nz * nl;
 		}
+		
+		int dim = (1 << (maxLevel - 1)) + 3;
+		int i = 0;
+		float[] ia = interleavedArray;
+		for (int y = 1; y < dim - 2; y++) {
+			int ydim = y * dim;
+			int ydim1 = (y + 1) * dim;
+			for (int x = 1; x < dim - 2; x++) {
+				ia[i++] = norm[GRID_START + ydim + x][0];
+				ia[i++] = norm[GRID_START + ydim + x][1];
+				ia[i++] = norm[GRID_START + ydim + x][2];
+				ia[i++] = out[GRID_START + ydim + x][0];
+				ia[i++] = out[GRID_START + ydim + x][1];
+				ia[i++] = out[GRID_START + ydim + x][2];
+				ia[i++] = norm[GRID_START + ydim + x + 1][0];
+				ia[i++] = norm[GRID_START + ydim + x + 1][1];
+				ia[i++] = norm[GRID_START + ydim + x + 1][2];
+				ia[i++] = out[GRID_START + ydim + x + 1][0];
+				ia[i++] = out[GRID_START + ydim + x + 1][1];
+				ia[i++] = out[GRID_START + ydim + x + 1][2];
+				ia[i++] = norm[GRID_START + ydim1 + x + 1][0];
+				ia[i++] = norm[GRID_START + ydim1 + x + 1][1];
+				ia[i++] = norm[GRID_START + ydim1 + x + 1][2];
+				ia[i++] = out[GRID_START + ydim1 + x + 1][0];
+				ia[i++] = out[GRID_START + ydim1 + x + 1][1];
+				ia[i++] = out[GRID_START + ydim1 + x + 1][2];
+				ia[i++] = norm[GRID_START + ydim1 + x][0];
+				ia[i++] = norm[GRID_START + ydim1 + x][1];
+				ia[i++] = norm[GRID_START + ydim1 + x][2];
+				ia[i++] = out[GRID_START + ydim1 + x][0];
+				ia[i++] = out[GRID_START + ydim1 + x][1];	
+				ia[i++] = out[GRID_START + ydim1 + x][2];
+			}
+		}
+//		int j = 0;
+//		while (j < i) {
+//			System.out.println(ia[j++] + "," + ia[j++] + "," + ia[j++] + "    " + ia[j++] + "," + ia[j++] + "," + ia[j++]);
+//		}
+		buffer.rewind();
+		buffer.put(ia, 0, i);
 	}
 	
 	private static int cornerStencilLength(int valence) {
