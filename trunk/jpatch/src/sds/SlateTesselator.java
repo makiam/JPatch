@@ -274,9 +274,9 @@ public class SlateTesselator {
 		return buffer;
 	}
 	
-	public void tesselate(final Slate slate, Matrix4f matrix, final int maxLevel) {
-		Point3f pt = new Point3f();
-		final Point3d[][] boundary = slate.fans;
+	public void tesselate(final Slate slate) {
+		Point3f pt;
+		final Point3f[][] boundary = slate.screenFans;
 		
 		/*
 		 * initialize top-level geometry array
@@ -285,32 +285,28 @@ public class SlateTesselator {
 		/*
 		 * initialize 2x2 grid
 		 */
-		pt.set(boundary[0][0]);
-		matrix.transform(pt);
+		pt = boundary[0][0];
 		geo[GRID_START + 5][0] = pt.x;
 		geo[GRID_START + 5][1] = pt.y;
 		geo[GRID_START + 5][2] = pt.z;
 		
-		pt.set(boundary[1][0]);
-		matrix.transform(pt);
+		pt = boundary[1][0];
 		geo[GRID_START + 6][0] = pt.x;
 		geo[GRID_START + 6][1] = pt.y;
 		geo[GRID_START + 6][2] = pt.z;
 		
-		pt.set(boundary[2][0]);
-		matrix.transform(pt);
+		pt = boundary[2][0];
 		geo[GRID_START + 10][0] = pt.x;
 		geo[GRID_START + 10][1] = pt.y;
 		geo[GRID_START + 10][2] = pt.z;
 		
-		pt.set(boundary[3][0]);
-		matrix.transform(pt);
+		pt = boundary[3][0];
 		geo[GRID_START + 9][0] = pt.x;
 		geo[GRID_START + 9][1] = pt.y;
 		geo[GRID_START + 9][2] = pt.z;
 		
 		for (int corner = 0; corner < 4; corner++) {
-			final Point3d[] c = boundary[corner];
+			final Point3f[] c = boundary[corner];
 			
 			
 			
@@ -322,15 +318,13 @@ public class SlateTesselator {
 			 */
 			for (int i = 1; i < n; i++) {
 				final int index = start + (i % (n - 1));
-				pt.set(c[i]);
-				matrix.transform(pt);
+				pt = c[i];
 				geo[index][0] = pt.x;
 				geo[index][1] = pt.y;
 				geo[index][2] = pt.z;
 			}
 			if (n == 2) {
-				pt.set(c[1]);
-				matrix.transform(pt);
+				pt = c[1];
 				geo[start + 1][0] = pt.x;
 				geo[start + 1][1] = pt.y;
 				geo[start + 1][2] = pt.z;
@@ -340,7 +334,7 @@ public class SlateTesselator {
 		/*
 		 * subdivide maxLevel times
 		 */
-		for (int level = 1; level < maxLevel; level++) {
+		for (int level = 1; level < slate.subdivLevel; level++) {
 			final int[][] stencil = patchStencil[level];
 			final float[][] out = subdivPoints[level];
 			final float[][] in = subdivPoints[level - 1];
@@ -434,7 +428,7 @@ public class SlateTesselator {
 		/*
 		 * apply limit stencils on rectangular inner grid
 		 */
-		int level = maxLevel - 1;
+		int level = slate.subdivLevel - 1;
 		final int[][] stencil = patchLimitStencil[level];
 		final float[][] out = limitPoints[level];
 		final float[][] norm = limitNormals[level];
@@ -550,7 +544,7 @@ public class SlateTesselator {
 			norm[outIndex][2] = nz * nl;
 		}
 		
-		int dim = (1 << (maxLevel - 1)) + 3;
+		int dim = (1 << (slate.subdivLevel - 1)) + 3;
 		int i = 0;
 		float[] ia = interleavedArray;
 		for (int y = 1; y < dim - 2; y++) {

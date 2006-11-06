@@ -874,24 +874,27 @@ public class ViewportGl extends Viewport {
 		gl.glEnable(GL_CULL_FACE);
 		gl.glCullFace(GL_BACK);
 		gl.glPointSize(3);
-		time = 0;
+//		time = 0;
 		for (Face face : sds.faceList) {
 			drawFace(face, subdivLevel);
 //			break;
 		}
-		System.out.println(time);
+//		System.out.println(time);
 //		drawFace(null, subdivLevel);
 //		System.out.println(i + " fragments@level " + subdivLevel + " in " + total + "ms");
 	}
 	
 	private void drawFace(Face face, int maxLevel) {
 		for (Slate slate : face.getSlates()) {
-			slateTesselator.tesselate(slate, modelView, maxLevel);
-			int dim = (1 << (maxLevel - 1));
+			int level = slate.transform(modelView, component.getWidth() >> 1, component.getHeight() >> 1);
+			if (level < 0) {
+				continue;
+			}
+			slateTesselator.tesselate(slate);
+			int dim = (1 << (level - 1));
 			int count = (dim - 0) * (dim - 0) * 4;
 			gl.glInterleavedArrays(GL_N3F_V3F, 0, slateTesselator.getBuffer());
 			gl.glDrawArrays(GL_QUADS, 0, count);
-			time += (count >> 2);
 		}
 	}
 	
