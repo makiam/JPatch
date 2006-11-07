@@ -357,6 +357,7 @@ public class ViewportGl extends Viewport {
 				gl.glEnable(GL_POLYGON_OFFSET_FILL);
 				gl.glPolygonOffset(2.5f, 2.5f);
 				gl.glDisable(GL_DEPTH_TEST);
+				gl.glEnable(GL_NORMALIZE);
 			}
 
 			public void display(GLAutoDrawable drawable) {
@@ -886,10 +887,12 @@ public class ViewportGl extends Viewport {
 	
 	private void drawFace(Face face, int maxLevel) {
 		for (Slate slate : face.getSlates()) {
-			int level = slate.transform(modelView, component.getWidth() >> 1, component.getHeight() >> 1);
+			slate.transform(modelView);
+			int level = slate.project(component.getWidth() >> 1, component.getHeight() >> 1);
 			if (level < 0) {
 				continue;
 			}
+			
 			slateTesselator.tesselate(slate);
 			int dim = (1 << (level - 1));
 			int count = (dim - 0) * (dim - 0) * 4;
