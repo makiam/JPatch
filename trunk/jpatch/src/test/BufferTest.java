@@ -29,45 +29,56 @@ import java.nio.*;
  */
 public class BufferTest {
 	public static void main(String[] args) {
-		ByteBuffer buffer = ByteBuffer.allocateDirect(4 * 4096);
+		ByteBuffer buffer = ByteBuffer.allocateDirect(4 * 10000);
 		FloatBuffer fb = buffer.asFloatBuffer();
 		float[] fa = new float[fb.capacity()];
 		float[] fa2 = new float[fb.capacity()];
-		for (int i = 0; i < 3; i++) {
-			arrayCopy(fa, fa2);
-			copy(fa, fb);
-		}
+//		for (int i = 0; i < 3; i++) {
+//			arrayCopy(fa, fa2);
+//			copy(fa, fb);
+//		}
 		long t;
+		
+		copy(fa, fb);
+		put(fb);
 		
 		t = System.currentTimeMillis();
 		copy(fa, fb);
 		System.out.println(System.currentTimeMillis() - t);
 		
 		t = System.currentTimeMillis();
-		arrayCopy(fa, fa2);
+		put(fb);
 		System.out.println(System.currentTimeMillis() - t);
+		
+//		t = System.currentTimeMillis();
+//		arrayCopy(fa, fa2);
+//		System.out.println(System.currentTimeMillis() - t);
 		
 	}
 	
 	private static void put(FloatBuffer fb) {
-		for (int i = 0; i < 10000; i++) {
-			for (int j = 0; j < 1000; j++) {
-				fb.put(j, j);
+		for (int i = 0; i < 1000; i++) {
+			fb.rewind();
+			for (int j = 0; j < 10000; j++) {
+				fb.put(j);
 			}
 		}
 	}
 	
-	private static void arrayCopy(float[] fa, float[] fb) {
-		for (int i = 0; i < 1000; i++) {
-			System.arraycopy(fa, 0, fb, 0, fa.length);
-		}
-	}
+//	private static void arrayCopy(float[] fa, float[] fb) {
+//		for (int i = 0; i < 1for (int i = 0; i < 3; i++) {
+//	arrayCopy(fa, fa2);
+//	copy(fa, fb);
+//}000; i++) {
+//			System.arraycopy(fa, 0, fb, 0, fa.length);
+//		}
+//	}
 	
 	private static void copy(float[] fa, FloatBuffer fb) {
 		for (int i = 0; i < 1000; i++) {
-//			for (int j = 0; j < 1000; j++) {
-//				fa[j] = j;
-//			}
+			for (int j = 0; j < 10000; j++) {
+				fa[j] = j;
+			}
 			fb.rewind();
 			fb.put(fa);
 		}

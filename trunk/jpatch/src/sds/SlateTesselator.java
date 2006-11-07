@@ -261,13 +261,6 @@ public class SlateTesselator {
 		return GRID_START;
 	}
 	
-	public float[][] getVertices(int level) {
-		return limitPoints[level];
-	}
-	
-	public float[][] getNormals(int level) {
-		return limitNormals[level];
-	}
 	
 	public FloatBuffer getBuffer() {
 		buffer.rewind();
@@ -457,10 +450,10 @@ public class SlateTesselator {
 			nx = by * az - bz * ay;		// cross product
 			ny = bz * ax - bx * az;
 			nz = bx * ay - by * ax;
-			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
-			norm[outIndex][0] = nx * nl;
-			norm[outIndex][1] = ny * nl;
-			norm[outIndex][2] = nz * nl;
+//			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
+			norm[outIndex][0] = nx;// * nl;
+			norm[outIndex][1] = ny;// * nl;
+			norm[outIndex][2] = nz;// * nl;
 		}
 		
 		/*
@@ -469,34 +462,12 @@ public class SlateTesselator {
 		for (int corner = 0; corner < 4; corner++) {
 			final int valence = boundary[corner].length / 2 + 2;
 			final int[] cs = cornerLimitStencil[level][valence - 3][corner];
-			float f0 = 0;
-			float f1 = 0;
-			float f2 = 0;
-			float e0 = 0;
-			float e1 = 0;
-			float e2 = 0;
-			for (int p = 2; p < cs.length; p++) {
-				f0 += in[cs[p]][0];
-				f1 += in[cs[p]][1];
-				f2 += in[cs[p++]][2];
-				e0 += in[cs[p]][0];
-				e1 += in[cs[p]][1];
-				e2 += in[cs[p]][2];
-			}
-			final float ik = 1.0f / (valence * (valence + 5));			// TODO:
-			final float edgeWeight = 4;										// precompute these values
-			final float faceWeight = 1;										// for each valence and
-			final float pointWeight = valence * valence;						// use loopup table
-			f0 *= faceWeight;
-			f1 *= faceWeight;
-			f2 *= faceWeight;
-			e0 *= edgeWeight;
-			e1 *= edgeWeight;
-			e2 *= edgeWeight;
+			
 			final int outIndex = cs[0];
-			out[outIndex][0] = (e0 + f0 + in[cs[1]][0] * pointWeight) * ik;
-			out[outIndex][1] = (e1 + f1 + in[cs[1]][1] * pointWeight) * ik;
-			out[outIndex][2] = (e2 + f2 + in[cs[1]][2] * pointWeight) * ik;
+			
+			out[outIndex][0] = slate.limitPoints[corner].x;
+			out[outIndex][1] = slate.limitPoints[corner].y;
+			out[outIndex][2] = slate.limitPoints[corner].z;
 			
 			/* normal */
 			float An = (float) (1 + cos(2 * PI / valence) + cos(PI / valence) * sqrt(2 * (9 + cos(2 * PI / valence))));
@@ -538,10 +509,10 @@ public class SlateTesselator {
 			nx = by * az - bz * ay;		// cross product
 			ny = bz * ax - bx * az;
 			nz = bx * ay - by * ax;
-			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
-			norm[outIndex][0] = nx * nl;
-			norm[outIndex][1] = ny * nl;
-			norm[outIndex][2] = nz * nl;
+//			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
+			norm[outIndex][0] = nx;// * nl;
+			norm[outIndex][1] = ny;// * nl;
+			norm[outIndex][2] = nz;// * nl;
 		}
 		
 		int dim = (1 << (slate.subdivLevel - 1)) + 3;
