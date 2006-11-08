@@ -267,7 +267,7 @@ public class SlateTesselator {
 		return buffer;
 	}
 	
-	public void tesselate(final Slate slate) {
+	public void tesselate(final Slate slate, final int depth) {
 		Point3f pt;
 		final Point3f[][] boundary = slate.screenFans;
 		
@@ -327,7 +327,7 @@ public class SlateTesselator {
 		/*
 		 * subdivide maxLevel times
 		 */
-		for (int level = 1; level < slate.subdivLevel; level++) {
+		for (int level = 1; level < depth; level++) {
 			final int[][] stencil = patchStencil[level];
 			final float[][] out = subdivPoints[level];
 			final float[][] in = subdivPoints[level - 1];
@@ -421,7 +421,7 @@ public class SlateTesselator {
 		/*
 		 * apply limit stencils on rectangular inner grid
 		 */
-		int level = slate.subdivLevel - 1;
+		int level = depth - 1;
 		final int[][] stencil = patchLimitStencil[level];
 		final float[][] out = limitPoints[level];
 		final float[][] norm = limitNormals[level];
@@ -515,7 +515,7 @@ public class SlateTesselator {
 			norm[outIndex][2] = nz;// * nl;
 		}
 		
-		int dim = (1 << (slate.subdivLevel - 1)) + 3;
+		int dim = (1 << (depth - 1)) + 3;
 		int i = 0;
 		float[] ia = interleavedArray;
 		for (int y = 1; y < dim - 2; y++) {

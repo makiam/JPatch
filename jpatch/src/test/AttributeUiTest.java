@@ -38,20 +38,20 @@ public class AttributeUiTest {
 		final JFrame frame2 = new JFrame(getClass().getCanonicalName() + " 2");
 		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		TransformNode tn1 = new TransformNode();
+		TransformNode tn1 = new TransformNode(null);
 		tn1.name.set("Transformnode 1");
 		Bone bone = new Bone();
 		bone.name.set("Bone 1");
 		//TransformNodeAttributeEditor tnae1 = new TransformNodeAttributeEditor(tn1);
 		
 		AbstractAttributeEditor aae = null;
-		long t = System.currentTimeMillis();
-		for (int i = 1; i < 100; i++) {
-			aae = AttributeEditorFactory.INSTANCE.createEditorFor(new TransformNode());
-			long d = System.currentTimeMillis();;
-			System.out.println(d - t);
-			t = d;
-		}
+//		long t = System.currentTimeMillis();
+//		for (int i = 1; i < 100; i++) {
+			aae = AttributeEditorFactory.INSTANCE.createEditorFor(new TransformNode(new ObjectRegistry()));
+//			long d = System.currentTimeMillis();;
+//			System.out.println(d - t);
+//			t = d;
+//		}
 		
 //		BoneAttributeEditor bae = new BoneAttributeEditor(bone);
 //		tn1.addChild(tn2);

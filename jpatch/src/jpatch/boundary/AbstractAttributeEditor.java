@@ -311,10 +311,15 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		public final Type type;
 		public final String name;
 		public final Field field;
+		
 		public Item(Type type, String name, Field field) {
 			this.type = type;
 			this.name = name;
 			this.field = field;
+		}
+		
+		public String toString() {
+			return type + " " + name + " " + field;
 		}
 	}
 }
