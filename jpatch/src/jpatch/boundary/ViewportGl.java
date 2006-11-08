@@ -361,40 +361,43 @@ public class ViewportGl extends Viewport {
 				gl.glEnable(GL_POLYGON_OFFSET_FILL);
 				gl.glPolygonOffset(2.5f, 2.5f);
 				gl.glDisable(GL_DEPTH_TEST);
-				gl.glEnable(GL_NORMALIZE);
+//				gl.glEnable(GL_NORMALIZE);
 				
 				
-				
-				int vertexShader = gl.glCreateShader(GL_VERTEX_SHADER);
-				try {
-					loadShader(ClassLoader.getSystemResourceAsStream("glsl/perPixelLight.vs"), gl, vertexShader);
-				} catch (IOException e) {
-					e.printStackTrace();
+				if (gl.isFunctionAvailable("glCreateShader")) {
+					int vertexShader = gl.glCreateShader(GL_VERTEX_SHADER);
+					try {
+						loadShader(ClassLoader.getSystemResourceAsStream("glsl/perPixelLight.vs"), gl, vertexShader);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					gl.glCompileShader(vertexShader);
+					printShaderInfo(gl, vertexShader);
+					
+					int fragmentShader = gl.glCreateShader(GL_FRAGMENT_SHADER);
+					try {
+						loadShader(ClassLoader.getSystemResourceAsStream("glsl/perPixelLight.fs"), gl, fragmentShader);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					gl.glCompileShader(fragmentShader);
+					printShaderInfo(gl, fragmentShader);
+					
+					program = gl.glCreateProgram();
+					gl.glAttachShader(program, vertexShader);
+					gl.glAttachShader(program, fragmentShader);
+					gl.glLinkProgram(program);
+					gl.glUseProgram(program);
+					printProgramInfo(gl, program);
+					gl.glUseProgram(0);
 				}
-				gl.glCompileShader(vertexShader);
-				printShaderInfo(gl, vertexShader);
-				
-				int fragmentShader = gl.glCreateShader(GL_FRAGMENT_SHADER);
-				try {
-					loadShader(ClassLoader.getSystemResourceAsStream("glsl/perPixelLight.fs"), gl, fragmentShader);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				gl.glCompileShader(fragmentShader);
-				printShaderInfo(gl, fragmentShader);
-				
-				program = gl.glCreateProgram();
-				gl.glAttachShader(program, vertexShader);
-				gl.glAttachShader(program, fragmentShader);
-				gl.glLinkProgram(program);
-				gl.glUseProgram(program);
-				printProgramInfo(gl, program);
-				gl.glUseProgram(0);
 			}
 
 			public void display(GLAutoDrawable drawable) {
 				long t = System.currentTimeMillis();
-				gl.glUseProgram(useProgram ? program : 0);
+				if (gl.isFunctionAvailable("glUseProgram")) {
+					gl.glUseProgram(useProgram ? program : 0);
+				}
 				gl.glClearColor(COLORS.background.x, COLORS.background.y, COLORS.background.z, 0);	// set background color
 				gl.glClearDepth(CLEAR_DEPTH);									// set initial depth-buffer value
 				gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// clear color and depth buffers
@@ -930,7 +933,7 @@ public class ViewportGl extends Viewport {
 			if (level < 0) {
 				continue;
 			}
-			level = 4;
+//			level = 4;
 			slateTesselator.tesselate(slate, level);
 			int dim = (1 << (level - 1));
 			int count = (dim - 0) * (dim - 0) * 4;

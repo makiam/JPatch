@@ -450,10 +450,10 @@ public class SlateTesselator {
 			nx = by * az - bz * ay;		// cross product
 			ny = bz * ax - bx * az;
 			nz = bx * ay - by * ax;
-//			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
-			norm[outIndex][0] = nx;// * nl;
-			norm[outIndex][1] = ny;// * nl;
-			norm[outIndex][2] = nz;// * nl;
+			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
+			norm[outIndex][0] = nx * nl;
+			norm[outIndex][1] = ny * nl;
+			norm[outIndex][2] = nz * nl;
 		}
 		
 		/*
@@ -509,10 +509,10 @@ public class SlateTesselator {
 			nx = by * az - bz * ay;		// cross product
 			ny = bz * ax - bx * az;
 			nz = bx * ay - by * ax;
-//			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
-			norm[outIndex][0] = nx;// * nl;
-			norm[outIndex][1] = ny;// * nl;
-			norm[outIndex][2] = nz;// * nl;
+			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
+			norm[outIndex][0] = nx * nl;
+			norm[outIndex][1] = ny * nl;
+			norm[outIndex][2] = nz * nl;
 		}
 		
 		int dim = (1 << (depth - 1)) + 3;
