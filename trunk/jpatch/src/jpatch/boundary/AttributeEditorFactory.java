@@ -71,7 +71,7 @@ public class AttributeEditorFactory {
 				} else if (localName.equals("attribute")) {
 					Item item = new Item(Type.ATTRIBUTE, attributes.getValue("name"), objectClass.getField(attributes.getValue("field")));
 					addItem(item);
-				} else if (localName.equals("limit")) {
+				} else if (localName.equals("limits")) {
 					Item item = new Item(Type.LIMIT, null, objectClass.getField(attributes.getValue("field")));
 					addItem(item);
 				}
