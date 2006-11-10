@@ -101,6 +101,34 @@ public class Face {
 		}
 	}
 	
+	void setupSlateNeighbors() {
+		int s = 0;
+		for (HalfEdge edge : getEdges()) {
+			int splus = (s + 1) % sides;
+			int sminus = (s + sides - 1) % sides;
+			slates[s].adjacentSlates[0] = slates[sminus];
+			slates[s].adjacentSlates[3] = slates[splus];
+			Face f1 = edge.prev.pair.face;
+			int e = 0;
+			for (HalfEdge ee : f1.getEdges()) {
+				if (ee.pair == edge.prev) {
+					break;
+				}
+				e++;
+			}
+			slates[s].adjacentSlates[1] = f1.slates[e];
+			Face f2 = edge.pair.face;
+			e = 0;
+			for (HalfEdge ee : f2.getEdges()) {
+				if (ee.next.pair == edge) {
+					break;
+				}
+				e++;
+			}
+			slates[s].adjacentSlates[2] = f2.slates[e];
+			s++;
+		}
+	}
 //	public void subdivide(int maxLevel, SlateTesselator slate) {
 //		Vertex[] va = new Vertex[10];
 //		float[][][] boundary = new float[4][][];
