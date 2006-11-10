@@ -934,11 +934,90 @@ public class ViewportGl extends Viewport {
 				continue;
 			}
 //			level = 4;
+			if (level < 2) {
+				level = 2;
+			}
 			slateTesselator.tesselate(slate, level);
 			int dim = (1 << (level - 1));
-			int count = (dim - 0) * (dim - 0) * 4;
+			int count = (dim - 2) * (dim - 2) * 4;
+			int offset = slateTesselator.getGridStart();
+			
 			gl.glInterleavedArrays(GL_N3F_V3F, 0, slateTesselator.getBuffer());
-			gl.glDrawArrays(GL_QUADS, 0, count);
+//			gl.glDrawArrays(GL_QUADS, 0, count);
+			float[][] vertices = slateTesselator.getLimitVertices(level - 1);
+			float[][] normals = slateTesselator.getLimitNormals(level - 1);
+			gl.glBegin(GL_TRIANGLES);
+//			for (int i = offset; i < vertices.length; i++) {
+//				System.out.println("i=" + i + "\t" + vertices[i][0] + " " + vertices[i][1] + " " + vertices[i][2]);
+//				gl.glNormal3fv(normals[i], 0);
+//				gl.glVertex3fv(vertices[i], 0);
+//			}
+			
+			dim = (1 << (level - 1)) + 3;
+			for (int s = 0; s < 4; s++) {
+				int step = 0;
+				int start1 = 0;
+				int start2 = 0;
+				switch (s) {
+				case 0:
+					start1 = offset + dim + 1;
+					start2 = start1 + dim;
+					step = 1;
+					break;
+				case 1:
+					start1 = offset + dim + dim - 2;
+					start2 = start1 - 1;
+					step = dim;
+					break;
+				case 2:
+					start1 = offset + dim * dim - dim - 2;
+					start2 = start1 - dim;
+					step = -1;
+					break;
+				case 3:
+					start1 = offset + dim * dim - dim - dim + 1;
+					start2 = start1 + 1;
+					step = -dim;
+					break;
+				}
+				int pairLevel = slate.getAdjacentSlate(s).getSubdivisionLevel();
+				int delta = level - pairLevel;
+				if (delta < 0) {
+					delta = 0;
+				}
+				int stepping = 1 << delta;
+//				for (int y = 1; y < dim - 1; y++) {
+//					for (int x = 1; x < dim - 1; x++) {
+//						int i = offset + y * dim + x;
+////						System.out.print("x=" + x + " y=" + y + " i=" + (y * dim + x) + "\t");
+////						System.out.println(vertices[i][0] + " " + vertices[i][1] + " " + vertices[i][2]);
+//						gl.glNormal3fv(normals[i], 0);
+//						gl.glVertex3fv(vertices[i], 0);
+////						gl.glNormal3fv(normals[y * dim + x + 1], 0);
+////						gl.glVertex3fv(vertices[y * dim + x + 1], 0);
+////						gl.glNormal3fv(normals[y * dim + x + dim], 0);
+////						gl.glVertex3fv(vertices[y * dim + x + dim], 0);
+//					}
+//				}
+				for (int i = 1; i < dim - 2; i+= stepping) {
+					gl.glNormal3fv(normals[start1], 0);
+					gl.glVertex3fv(vertices[start1], 0);
+					gl.glNormal3fv(normals[start1 + stepping * step], 0);
+					gl.glVertex3fv(vertices[start1 + stepping * step], 0);
+					gl.glNormal3fv(normals[start2 + stepping / 2 * step], 0);
+					gl.glVertex3fv(vertices[start2 + stepping / 2 * step], 0);
+					start1 += stepping * step;
+					start2 += stepping * step;
+//					gl.glNormal3fv(normals[offset + dim + i], 0);
+//					gl.glVertex3fv(vertices[offset + dim + i], 0);
+//					gl.glNormal3fv(normals[offset + dim + i + 2], 0);
+//					gl.glVertex3fv(vertices[offset + dim + i + 2], 0);
+//					gl.glNormal3fv(normals[offset + dim + dim + i + 1], 0);
+//					gl.glVertex3fv(vertices[offset + dim + dim + i + 1], 0);
+				}
+			}
+			gl.glEnd();
+			
 		}
 	}
 	

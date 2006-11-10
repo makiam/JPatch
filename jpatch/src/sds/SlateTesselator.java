@@ -50,7 +50,7 @@ public class SlateTesselator {
 	public SlateTesselator() {
 //		System.out.println("MAX_CORNER_LENGTH=" + MAX_CORNER_LENGTH);
 		int maxdim = ((1 << (MAX_SUBDIV - 1))) + 3;
-		interleavedArray = new float[(maxdim - 1) * (maxdim - 1) * 4 * 6];
+		interleavedArray = new float[(maxdim - 3) * (maxdim - 3) * 4 * 6];
 		System.out.println("ia_length=" + interleavedArray.length);
 		buffer = BufferUtil.newFloatBuffer(interleavedArray.length * 4);
 //		buffer = javax.mediaByteBuffer.allocateDirect(interleavedArray.length * 4).asFloatBuffer();
@@ -261,6 +261,13 @@ public class SlateTesselator {
 		return GRID_START;
 	}
 	
+	public float[][] getLimitVertices(int level) {
+		return limitPoints[level];
+	}
+	
+	public float[][] getLimitNormals(int level) {
+		return limitNormals[level];
+	}
 	
 	public FloatBuffer getBuffer() {
 		buffer.rewind();
@@ -518,10 +525,10 @@ public class SlateTesselator {
 		int dim = (1 << (depth - 1)) + 3;
 		int i = 0;
 		float[] ia = interleavedArray;
-		for (int y = 1; y < dim - 2; y++) {
+		for (int y = 2; y < dim - 3; y++) {
 			int ydim = y * dim;
 			int ydim1 = (y + 1) * dim;
-			for (int x = 1; x < dim - 2; x++) {
+			for (int x = 2; x < dim - 3; x++) {
 				ia[i++] = norm[GRID_START + ydim + x][0];
 				ia[i++] = norm[GRID_START + ydim + x][1];
 				ia[i++] = norm[GRID_START + ydim + x][2];

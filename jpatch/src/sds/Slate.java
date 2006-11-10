@@ -13,6 +13,7 @@ public class Slate {
 	final Vector3f[] limitNormals = new Vector3f[4];
 	final Point3f[][] facePoints = new Point3f[4][];
 	final Point3f[][] edgePoints = new Point3f[4][];
+	final Slate[] adjacentSlates = new Slate[4];
 	int subdivLevel = 0;
 	
 	Slate(Point3d[][] fans) {
@@ -65,6 +66,14 @@ public class Slate {
 				matrix.transform(p);
 			}
 		}
+	}
+	
+	public Slate getAdjacentSlate(int side) {
+		return adjacentSlates[side];
+	}
+	
+	public int getSubdivisionLevel() {
+		return subdivLevel;
 	}
 	
 	public int project(int halfWidth, int halfHeight) {
@@ -144,101 +153,5 @@ public class Slate {
 		return subdivLevel;
 	}
 }
-		
-		
-		
-		
-	
-//	public int getSubdivLevel(Matrix4f matrix, int halfWidth, int halfHeight) {
-//		int s = computeScreenSize(matrix, halfWidth, halfHeight);
-//		if (s < 0) {
-//			return -1;
-//		}
-//		s /= 12;
-//		if ((s & 0xffffffe0) > 0) {
-//			return 6;
-//		} else if ((s & 0x10) > 0) {
-//			return 5;
-//		} else if ((s & 0x8) > 0) {
-//			return 4;
-//		} else if ((s & 0x4) > 0) {
-//			return 3;
-//		} else if ((s & 0x2) > 0) {
-//			return 2;
-//		} else {
-//			return 1;
-//		}
-//	}
-	
-//	private int computeScreenSize(Matrix4f matrix, int halfWidth, int halfHeight) {
-//		Point3f p = new Point3f();
-//		p.set(fans[0][0]);
-//		matrix.transform(p);
-//		int xmin = (int) p.x;
-//		int xmax = xmin;
-//		int ymin = (int) p.y;
-//		int ymax = ymin;
-//		for (int i = 1; i < 4; i++) {
-//			p.set(fans[i][0]);
-//			matrix.transform(p);
-//			int x = (int) p.x;
-//			int y = (int) p.y;
-//			if (x < xmin) {
-//				xmin = x;
-//			} else if (x > xmax) {
-//				xmax = x;
-//			}
-//			if (y < ymin) {
-//				ymin = y;
-//			} else if (y > ymax) {
-//				ymax = y;
-//			}
-//		}
-//		if (xmax < -halfWidth || xmin > halfWidth || ymax < -halfHeight || ymin > halfHeight) {
-//			return -1;
-//		}
-//		int dx = xmax - xmin;
-//		int dy = ymax - ymin;
-//		return (dx > dy) ? dx : dy; 
-//	}
-	
-//		assert sides == 4;
-//		HalfEdge e = edge;
-//		Point3d p0 = e.vertex.position;
-//		e = e.next;
-//		Point3d p1 = e.vertex.position;
-//		e = e.next;
-//		Point3d p2 = e.vertex.position;
-//		Point3d p3 = e.next.vertex.position;
-//		
-//		// TODO z-devide for perspective viewports
-//		
-//		int x0 = (int) p0.x;
-//		int x1 = (int) p1.x;
-//		int x2 = (int) p2.x;
-//		int x3 = (int) p3.x;
-//		int y0 = (int) p0.y;
-//		int y1 = (int) p1.y;
-//		int y2 = (int) p2.y;
-//		int y3 = (int) p3.y;
-//		int xmin = x0;
-//		int xmax = x0;
-//		int ymin = y0;
-//		int ymax = y0;
-//		if (x1 < xmin) xmin = x1;
-//		if (x2 < xmin) xmin = x2;
-//		if (x3 < xmin) xmin = x3;
-//		if (x1 > xmax) xmax = x1;
-//		if (x2 > xmax) xmax = x2;
-//		if (x3 > xmax) xmax = x3;
-//		if (y1 < ymin) ymin = y1;
-//		if (y2 < ymin) ymin = y2;
-//		if (y3 < ymin) ymin = y3;
-//		if (y1 > ymax) ymax = y1;
-//		if (y2 > ymax) ymax = y2;
-//		if (y3 > ymax) ymax = y3;
-//		int dx = xmax - xmin;
-//		int dy = ymax - ymin;
-//		return (dx > dy) ? dx : dy; 
-//	}
+
 
