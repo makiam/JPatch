@@ -332,7 +332,7 @@ public class Main {
 			});
 		}
 		screen.setLayout(screenLayout);
-		screen.setOpaque(false);
+//		screen.setOpaque(false);
 		
 		Box statusBar = Box.createHorizontalBox();
 		statusBar.add(statusLabel);
@@ -364,7 +364,7 @@ public class Main {
 		 */
 		JSplitPane hSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		
-		frame.setBackground(Settings.getInstance().colors.background.get());
+//		frame.setBackground(Settings.getInstance().colors.background.get());
 		frame.setLayout(new BorderLayout());
 		frame.add(statusBar, BorderLayout.SOUTH);
 		

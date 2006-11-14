@@ -525,10 +525,10 @@ public class SlateTesselator {
 		int dim = (1 << (depth - 1)) + 3;
 		int i = 0;
 		float[] ia = interleavedArray;
-		for (int y = 2; y < dim - 3; y++) {
+		for (int y = 1; y < dim - 2; y++) {
 			int ydim = y * dim;
 			int ydim1 = (y + 1) * dim;
-			for (int x = 2; x < dim - 3; x++) {
+			for (int x = 1; x < dim - 2; x++) {
 				ia[i++] = norm[GRID_START + ydim + x][0];
 				ia[i++] = norm[GRID_START + ydim + x][1];
 				ia[i++] = norm[GRID_START + ydim + x][2];
