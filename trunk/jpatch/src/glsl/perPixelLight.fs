@@ -1,7 +1,10 @@
 varying vec3 normal;
 
 void main() {
-	vec3 norm = normalize(normal);	
+//	vec3 pert = vec3(sin(normal.x * 100.0), sin(normal.y * 100.0), sin(normal.z * 100.0));
+//	vec3 norm = normalize(normal + 0.1 * pert);
+	
+	vec3 norm = normalize(normal);
 	vec4 color = gl_FrontMaterial.emission + gl_FrontMaterial.ambient * gl_LightModel.ambient;
 	for (int i = 0; i < 3; i++) {
 		color += gl_LightSource[i].ambient * gl_FrontMaterial.ambient;
