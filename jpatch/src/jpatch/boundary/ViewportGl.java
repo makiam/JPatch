@@ -934,13 +934,13 @@ public class ViewportGl extends Viewport {
 			if (level < 0) {
 				continue;
 			}
-			level = 4;
+//			level = 4;
 			if (level < 2) {
 				level = 2;
 			}
 			slateTesselator.tesselate(slate, level);
 			int dim = (1 << (level - 1));
-			int count = (dim - 0) * (dim - 0) * 4;
+			int count = (dim - 2) * (dim - 2) * 4;
 			int offset = slateTesselator.getGridStart();
 			
 			gl.glInterleavedArrays(GL_N3F_V3F, 0, slateTesselator.getBuffer());
@@ -954,6 +954,24 @@ public class ViewportGl extends Viewport {
 //				gl.glVertex3fv(vertices[i], 0);
 //			}
 			
+			gl.glBegin(GL_TRIANGLES);
+			for (int side = 0; side < 4; side++) {
+//				System.out.println("slate=" + slate + " side=" + side + " adjacent slate=" + slate.getAdjacentSlate(side));
+				
+//				Slate adjacentSlate = slate.getAdjacentSlate(side);
+//				int pairSide = (side + 2) % 4;
+//				System.out.println(slate + " " + adjacentSlate + " " + adjacentSlate.getAdjacentSlate(pairSide));
+				int pairLevel = slate.getAdjacentSlate(side).getSubdivisionLevel() - 1;
+				if (pairLevel < 0) {
+					pairLevel = level - 1;
+				}
+				int[] triangleArray = slateTesselator.getRimTriangles(level - 1, side, pairLevel);
+				for (int i = 0; i < triangleArray.length; i++) {
+					gl.glNormal3fv(normals[triangleArray[i]], 0);
+					gl.glVertex3fv(vertices[triangleArray[i]], 0);
+				}
+			}
+			gl.glEnd();
 //			dim = (1 << (level - 1)) + 3;
 //			for (int s = 0; s < 4; s++) {
 //				int step = 0;

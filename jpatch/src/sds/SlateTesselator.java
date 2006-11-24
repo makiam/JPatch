@@ -47,6 +47,10 @@ public class SlateTesselator {
 	private final float[] interleavedArray;
 	private final FloatBuffer buffer;
 	
+	int[][][] rim0 = new int[MAX_SUBDIV][][];								//[level][side][index] outer grid rim
+	int[][][] rim1 = new int[MAX_SUBDIV][][];								//[level][side][index] inner grid rim
+	int[][][][] rimTriangles = new int[MAX_SUBDIV][MAX_SUBDIV][][]; 		// [thisLevel][pairLevel][side][index]
+	
 	public SlateTesselator() {
 //		System.out.println("MAX_CORNER_LENGTH=" + MAX_CORNER_LENGTH);
 		int maxdim = ((1 << (MAX_SUBDIV - 1))) + 3;
@@ -57,6 +61,57 @@ public class SlateTesselator {
 		
 		for (int level = 0; level < MAX_SUBDIV; level++) {
 			int dim = ((1 << level)) + 3;
+			
+			if (level > 0) {
+				/*
+				 * create rim arrays
+				 */
+				rim0[level] = new int[4][dim - 2];
+				for (int i = 0; i < (dim - 2); i++) {
+					rim0[level][0][i] = dim + i + 1;
+					rim0[level][1][i] = dim + dim - 2 + (dim * i);
+					rim0[level][2][i] = dim * dim - dim - 2 - i;
+					rim0[level][3][i] = dim * dim - 2 * dim - (dim * i) + 1;
+				}
+				rim1[level] = new int[4][dim - 4];
+				for (int i = 0; i < (dim - 4); i++) {
+					rim1[level][0][i] = 2 * dim + i + 2;
+					rim1[level][1][i] = 2 * dim + dim - 3 + (dim * i);
+					rim1[level][2][i] = dim * dim - 2 * dim - 3 - i;
+					rim1[level][3][i] = dim * dim - 3 * dim - (dim * i) + 2;
+				}
+				
+				for (int pairLevel = level; pairLevel >= 0; pairLevel--) {
+					rimTriangles[level][pairLevel] = new int[4][];
+					int[] tmp = new int[dim * 6];
+					for (int side = 0; side < 4; side++) {
+						int j = 0;
+						int levelDelta = level - pairLevel;
+						if (levelDelta < 0) {
+							continue;
+						}
+						int step = 1 << levelDelta;
+						int correction = step == 1 ? 0 : -1;
+						for (int i = 0; i < (dim - 2 - 1 * step); i += step) {
+							int ii = i + step / 2 + correction;
+							if (ii >= rim1[level][side].length) {
+								ii = rim1[level][side].length - 1;
+							}
+							tmp[j++] = rim0[level][side][i] + GRID_START;
+							tmp[j++] = rim0[level][side][i + step] + GRID_START;
+							tmp[j++] = rim1[level][side][ii] + GRID_START;
+						}
+						for (int i = 0; i < (dim - 5); i++) {
+							int ii = ((i + (step / 2) + 1) / step) * step;
+							tmp[j++] = rim0[level][side][ii] + GRID_START;
+							tmp[j++] = rim1[level][side][i + 1] + GRID_START;
+							tmp[j++] = rim1[level][side][i] + GRID_START;
+						}
+						rimTriangles[level][pairLevel][side] = new int[j];
+						System.arraycopy(tmp, 0, rimTriangles[level][pairLevel][side], 0, j);
+					}
+				}
+			}
 			
 			subdivPoints[level] = new float[dim * dim + GRID_START][3];
 			limitPoints[level] = new float[dim * dim + GRID_START][3];
@@ -272,6 +327,14 @@ public class SlateTesselator {
 	public FloatBuffer getBuffer() {
 		buffer.rewind();
 		return buffer;
+	}
+	
+	public int[] getRimTriangles(int level, int side, int pairLevel) {
+//		System.out.println("level=" + level + " pairlevel=" + pairLevel);
+		if (pairLevel > level) {
+			pairLevel = level;
+		}
+		return rimTriangles[level][pairLevel][side];
 	}
 	
 	public void tesselate(final Slate slate, final int depth) {
@@ -525,10 +588,10 @@ public class SlateTesselator {
 		int dim = (1 << (depth - 1)) + 3;
 		int i = 0;
 		float[] ia = interleavedArray;
-		for (int y = 1; y < dim - 2; y++) {
+		for (int y = 2; y < dim - 3; y++) {
 			int ydim = y * dim;
 			int ydim1 = (y + 1) * dim;
-			for (int x = 1; x < dim - 2; x++) {
+			for (int x = 2; x < dim - 3; x++) {
 				ia[i++] = norm[GRID_START + ydim + x][0];
 				ia[i++] = norm[GRID_START + ydim + x][1];
 				ia[i++] = norm[GRID_START + ydim + x][2];

@@ -7,6 +7,8 @@ import static java.lang.Math.sqrt;
 import javax.vecmath.*;
 
 public class Slate {
+	private static int count = 0;
+	
 	final Point3d[][] fans = new Point3d[4][];
 	final Point3f[][] screenFans = new Point3f[4][];
 	final Point3f[] limitPoints = new Point3f[4];
@@ -15,6 +17,7 @@ public class Slate {
 	final Point3f[][] edgePoints = new Point3f[4][];
 	final Slate[] adjacentSlates = new Slate[4];
 	int subdivLevel = 0;
+	public final int num = count++;
 	
 	Slate(Point3d[][] fans) {
 		this.fans[0] = fans[0].clone();
@@ -151,6 +154,10 @@ public class Slate {
 			subdivLevel = 1;
 		}
 		return subdivLevel;
+	}
+	
+	public String toString() {
+		return "slate" + num + "(" + subdivLevel + ")";
 	}
 }
 

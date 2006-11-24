@@ -187,7 +187,7 @@ public class Sds {
 		for (Face face : faceList) {
 			face.setupSlateNeighbors();
 		}
-		
+//		System.exit(0);
 		for (Face face : faceList) {
 			face.facePoint.computeDerivedPosition();
 		}
