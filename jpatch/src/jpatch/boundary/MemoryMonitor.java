@@ -79,6 +79,7 @@ public class MemoryMonitor {
 		box.add(memMon.totalLabel);
 		box.add(Box.createHorizontalStrut(2));
 		box.add(memMon.useLabel);
+		box.add(Box.createHorizontalStrut(20));
 		Timer timer = new Timer();
 		TimerTask task = new TimerTask() {
 			@Override

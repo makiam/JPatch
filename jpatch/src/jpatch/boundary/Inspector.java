@@ -32,7 +32,7 @@ import jpatch.entity.*;
  */
 public class Inspector {
 	private static Font FONT = new Font("sans-serif", Font.BOLD, 12);
-	private static Color COLOR = UIManager.getColor("TabbedPane.selected");
+	private static Color COLOR = new Color(0x77aaff);
 	private final JPanel panel = new JPanel(new BorderLayout());
 	private final JLabel label = new JLabel();
 	private Component component;
