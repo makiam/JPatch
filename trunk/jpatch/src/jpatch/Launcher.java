@@ -15,14 +15,17 @@ import jpatch.boundary.settings.*;
 import jpatch.entity.*;
 
 public final class Launcher {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 		System.setProperty("swing.boldMetal", Settings.JPATCH_ROOT_NODE.get("metalBoldText", "false"));
 		System.setProperty("swing.aatext", Settings.JPATCH_ROOT_NODE.get("fontSmoothing", "true"));
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
+//		System.setProperty("apple.awt.brushMetalLook", "true");
+//		System.setProperty("apple.awt.brushMetalRounded", "true");
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 		UIManager.put("ToolTip.background", new Color(0xff, 0xff, 0xaa));
 		UIManager.put("ToolTip.border", new LineBorder(Color.BLACK));
-		
+//		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		Main.getInstance();
 		
 //		
