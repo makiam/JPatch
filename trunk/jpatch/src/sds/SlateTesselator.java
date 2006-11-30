@@ -56,7 +56,12 @@ public class SlateTesselator {
 		int maxdim = ((1 << (MAX_SUBDIV - 1))) + 3;
 		interleavedArray = new float[(maxdim - 3) * (maxdim - 3) * 4 * 6];
 		System.out.println("ia_length=" + interleavedArray.length);
-		buffer = BufferUtil.newFloatBuffer(interleavedArray.length * 4);
+//		buffer = BufferUtil.newFloatBuffer(interleavedArray.length * 4);
+//		buffer = FloatBuffer.allocate(interleavedArray.length * 4);
+		buffer = FloatBuffer.wrap(interleavedArray);
+		System.out.println(buffer.isDirect());
+//		System.exit(0);
+//		buffer = ByteBuffer.allocateDirect(interleavedArray.length * 16).asFloatBuffer();
 //		buffer = javax.mediaByteBuffer.allocateDirect(interleavedArray.length * 4).asFloatBuffer();
 		
 		for (int level = 0; level < MAX_SUBDIV; level++) {
@@ -325,7 +330,7 @@ public class SlateTesselator {
 	}
 	
 	public FloatBuffer getBuffer() {
-		buffer.rewind();
+//		buffer.rewind();
 		return buffer;
 	}
 	
@@ -588,42 +593,44 @@ public class SlateTesselator {
 		int dim = (1 << (depth - 1)) + 3;
 		int i = 0;
 		float[] ia = interleavedArray;
+		int ydim = 2 * dim;
 		for (int y = 2; y < dim - 3; y++) {
-			int ydim = y * dim;
-			int ydim1 = (y + 1) * dim;
+			int gsydim = GRID_START + ydim;
+			int gsydim1 = gsydim + dim;
 			for (int x = 2; x < dim - 3; x++) {
-				ia[i++] = norm[GRID_START + ydim + x][0];
-				ia[i++] = norm[GRID_START + ydim + x][1];
-				ia[i++] = norm[GRID_START + ydim + x][2];
-				ia[i++] = out[GRID_START + ydim + x][0];
-				ia[i++] = out[GRID_START + ydim + x][1];
-				ia[i++] = out[GRID_START + ydim + x][2];
-				ia[i++] = norm[GRID_START + ydim + x + 1][0];
-				ia[i++] = norm[GRID_START + ydim + x + 1][1];
-				ia[i++] = norm[GRID_START + ydim + x + 1][2];
-				ia[i++] = out[GRID_START + ydim + x + 1][0];
-				ia[i++] = out[GRID_START + ydim + x + 1][1];
-				ia[i++] = out[GRID_START + ydim + x + 1][2];
-				ia[i++] = norm[GRID_START + ydim1 + x + 1][0];
-				ia[i++] = norm[GRID_START + ydim1 + x + 1][1];
-				ia[i++] = norm[GRID_START + ydim1 + x + 1][2];
-				ia[i++] = out[GRID_START + ydim1 + x + 1][0];
-				ia[i++] = out[GRID_START + ydim1 + x + 1][1];
-				ia[i++] = out[GRID_START + ydim1 + x + 1][2];
-				ia[i++] = norm[GRID_START + ydim1 + x][0];
-				ia[i++] = norm[GRID_START + ydim1 + x][1];
-				ia[i++] = norm[GRID_START + ydim1 + x][2];
-				ia[i++] = out[GRID_START + ydim1 + x][0];
-				ia[i++] = out[GRID_START + ydim1 + x][1];	
-				ia[i++] = out[GRID_START + ydim1 + x][2];
+				ia[i++] = norm[gsydim + x][0];
+				ia[i++] = norm[gsydim + x][1];
+				ia[i++] = norm[gsydim + x][2];
+				ia[i++] = out[gsydim + x][0];
+				ia[i++] = out[gsydim + x][1];
+				ia[i++] = out[gsydim + x][2];
+				ia[i++] = norm[gsydim + x + 1][0];
+				ia[i++] = norm[gsydim + x + 1][1];
+				ia[i++] = norm[gsydim + x + 1][2];
+				ia[i++] = out[gsydim + x + 1][0];
+				ia[i++] = out[gsydim + x + 1][1];
+				ia[i++] = out[gsydim + x + 1][2];
+				ia[i++] = norm[gsydim1 + x + 1][0];
+				ia[i++] = norm[gsydim1 + x + 1][1];
+				ia[i++] = norm[gsydim1 + x + 1][2];
+				ia[i++] = out[gsydim1 + x + 1][0];
+				ia[i++] = out[gsydim1 + x + 1][1];
+				ia[i++] = out[gsydim1 + x + 1][2];
+				ia[i++] = norm[gsydim1 + x][0];
+				ia[i++] = norm[gsydim1 + x][1];
+				ia[i++] = norm[gsydim1 + x][2];
+				ia[i++] = out[gsydim1 + x][0];
+				ia[i++] = out[gsydim1 + x][1];	
+				ia[i++] = out[gsydim1 + x][2];
 			}
+			ydim += dim;
 		}
 //		int j = 0;
 //		while (j < i) {
 //			System.out.println(ia[j++] + "," + ia[j++] + "," + ia[j++] + "    " + ia[j++] + "," + ia[j++] + "," + ia[j++]);
 //		}
-		buffer.rewind();
-		buffer.put(ia, 0, i);
+//		buffer.rewind();
+//		buffer.put(ia, 0, i);
 	}
 	
 	private static int cornerStencilLength(int valence) {

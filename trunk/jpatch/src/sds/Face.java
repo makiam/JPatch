@@ -128,16 +128,16 @@ public class Face {
 			slates[s].adjacentSlates[2] = f2.slates[e];
 			
 			
-			// check
-			for (int side = 0; side < 4; side++) {
-				if (slates[s].adjacentSlates[side] != null) {
-					Slate shouldBeThisOne = slates[s].adjacentSlates[side].adjacentSlates[3 - side];
-					System.out.println("Slate=" + slates[s] + " side=" + side + " adjacentSlate=" + slates[s].adjacentSlates[side] + " back=" + shouldBeThisOne);
-					if (shouldBeThisOne != null && shouldBeThisOne != slates[s]) {
-						System.err.println("bad slate adjacency");
-					}
-				}
-			}
+//			// check
+//			for (int side = 0; side < 4; side++) {
+//				if (slates[s].adjacentSlates[side] != null) {
+//					Slate shouldBeThisOne = slates[s].adjacentSlates[side].adjacentSlates[3 - side];
+//					System.out.println("Slate=" + slates[s] + " side=" + side + " adjacentSlate=" + slates[s].adjacentSlates[side] + " back=" + shouldBeThisOne);
+//					if (shouldBeThisOne != null && shouldBeThisOne != slates[s]) {
+//						System.err.println("bad slate adjacency");
+//					}
+//				}
+//			}
 			
 			s++;
 		}
