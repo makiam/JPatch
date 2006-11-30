@@ -15,8 +15,8 @@ public class Slate {
 	final Vector3f[] limitNormals = new Vector3f[4];
 	final Point3f[][] facePoints = new Point3f[4][];
 	final Point3f[][] edgePoints = new Point3f[4][];
-	final Slate[] adjacentSlates = new Slate[4];
-	int subdivLevel = 0;
+	public final Slate[] adjacentSlates = new Slate[4];
+	int subdivLevel = -1;
 	public final int num = count++;
 	
 	Slate(Point3d[][] fans) {
@@ -59,6 +59,8 @@ public class Slate {
 			limitPoints[corner] = new Point3f();
 			limitNormals[corner] = new Vector3f();
 		}
+//		subdivLevel = num % 3 + 2;
+//		subdivLevel = 5;
 	}
 	
 	public void transform(Matrix4f matrix) {
@@ -79,7 +81,7 @@ public class Slate {
 		return subdivLevel;
 	}
 	
-	public int project(int halfWidth, int halfHeight) {
+	public void project(int halfWidth, int halfHeight) {
 		int xmin = Integer.MAX_VALUE;
 		int xmax = Integer.MIN_VALUE;
 		int ymin = Integer.MAX_VALUE;
@@ -132,10 +134,13 @@ public class Slate {
 			if (y < ymin) ymin = y;
 			if (y > ymax) ymax = y;
 		}
+//		if (true) return;
 		if (xmax < -halfWidth || xmin > halfWidth || ymax < -halfHeight || ymin > halfHeight) {
 			subdivLevel = -1;
-			return subdivLevel;
+//			subdivLevel = num % 3 + 2;
+			return;
 		}
+//		if (true) return;
 		int dx = xmax - xmin;
 		int dy = ymax - ymin;
 		int s = Math.max(dx, dy);
@@ -151,9 +156,10 @@ public class Slate {
 		} else if ((s & 0x2) > 0) {
 			subdivLevel = 2;
 		} else {
-			subdivLevel = 1;
+			subdivLevel = 2;
 		}
-		return subdivLevel;
+		
+//		return subdivLevel;
 	}
 	
 	public String toString() {
