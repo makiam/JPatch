@@ -927,6 +927,7 @@ public class ViewportGl extends Viewport {
 //			break;
 //		}
 		
+		
 		for (Face face : sds.faceList) {
 			for (Slate slate : face.getSlates()) {
 				slate.transform(modelView);
@@ -937,6 +938,7 @@ public class ViewportGl extends Viewport {
 		}
 //		System.out.println();
 		
+		gl.glInterleavedArrays(GL_N3F_V3F, 0, slateTesselator.getBuffer());
 		for (Face face : sds.faceList) {
 			for (Slate slate : face.getSlates()) {
 //				switch (slate.getSubdivisionLevel()) {
@@ -979,12 +981,14 @@ public class ViewportGl extends Viewport {
 			level = 2;
 		}
 //		System.out.println("Slate=" + slate + " level=" + level);
-		slateTesselator.tesselate(slate, level);
-		int dim = (1 << (level - 1));
-		int count = (dim - 2) * (dim - 2) * 4;
-		int offset = slateTesselator.getGridStart();
+		int count = slateTesselator.tesselate(slate, level);
 		
-		gl.glInterleavedArrays(GL_N3F_V3F, 0, slateTesselator.getBuffer());
+		int dim = (1 << (level - 1));
+//		count = (dim - 1) * (dim - 1);
+		int offset = slateTesselator.getGridStart();
+//		FloatBuffer buffer = slateTesselator.getBuffer();
+//		count = buffer.capacity() / 4;
+//		gl.glInterleavedArrays(GL_N3F_V3F, 0, buffer);
 		gl.glDrawArrays(GL_QUADS, 0, count);
 		
 		if (false) return;

@@ -342,7 +342,7 @@ public class SlateTesselator {
 		return rimTriangles[level][pairLevel][side];
 	}
 	
-	public void tesselate(final Slate slate, final int depth) {
+	public int tesselate(final Slate slate, final int depth) {
 		Point3f pt;
 		final Point3f[][] boundary = slate.screenFans;
 		
@@ -625,12 +625,15 @@ public class SlateTesselator {
 			}
 			ydim += dim;
 		}
+		
 //		int j = 0;
 //		while (j < i) {
 //			System.out.println(ia[j++] + "," + ia[j++] + "," + ia[j++] + "    " + ia[j++] + "," + ia[j++] + "," + ia[j++]);
 //		}
 //		buffer.rewind();
 //		buffer.put(ia, 0, i);
+		
+		return i;
 	}
 	
 	private static int cornerStencilLength(int valence) {
