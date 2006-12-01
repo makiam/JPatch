@@ -342,6 +342,10 @@ public class SlateTesselator {
 		return rimTriangles[level][pairLevel][side];
 	}
 	
+	public int[] getRim(int level, int side) {
+		return rim0[level][side];
+	}
+	
 	public int tesselate(final Slate slate, final int depth) {
 		Point3f pt;
 		final Point3f[][] boundary = slate.screenFans;

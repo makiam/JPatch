@@ -11,7 +11,7 @@ public class Slate {
 	
 	final Point3d[][] fans = new Point3d[4][];
 	final Point3f[][] screenFans = new Point3f[4][];
-	final Point3f[] limitPoints = new Point3f[4];
+	public final Point3f[] limitPoints = new Point3f[4];
 	final Vector3f[] limitNormals = new Vector3f[4];
 	final Point3f[][] facePoints = new Point3f[4][];
 	final Point3f[][] edgePoints = new Point3f[4][];
@@ -158,7 +158,6 @@ public class Slate {
 		} else {
 			subdivLevel = 2;
 		}
-		
 //		return subdivLevel;
 	}
 	

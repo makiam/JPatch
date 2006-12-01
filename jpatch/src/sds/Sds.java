@@ -188,6 +188,21 @@ public class Sds {
 			face.setupSlateNeighbors();
 		}
 //		System.exit(0);
+		rethinkSlates();
+		
+		// test slate neighbors
+		for (Face face: faceList) {
+			for (Slate slate : face.getSlates()) {
+				for (int i = 0; i < 4; i++) {
+					if (slate.adjacentSlates[i].adjacentSlates[3 - i] != slate) {
+						System.err.println("error");
+					}
+				}
+			}
+		}
+	}
+	
+	public void rethinkSlates() {
 		for (Face face : faceList) {
 			face.facePoint.computeDerivedPosition();
 		}
@@ -201,19 +216,7 @@ public class Sds {
 		for (Vertex vertex : vertexList) {
 			vertex.vertexPoint.computeDerivedPosition();
 		}
-		
-		// test slate neighbors
-		for (Face face: faceList) {
-			for (Slate slate : face.getSlates()) {
-				for (int i = 0; i < 4; i++) {
-					if (slate.adjacentSlates[i].adjacentSlates[3 - i] == slate) {
-						System.err.println("error");
-					}
-				}
-			}
-		}
 	}
-	
 //	public void subdivide() {
 //		edgeMap = new HashMap<EdgeKey, HalfEdge>(edgeMap.size() * 4);
 //		for (Face face : faceList) {

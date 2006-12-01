@@ -397,9 +397,7 @@ public class ViewportGl extends Viewport {
 
 			public void display(GLAutoDrawable drawable) {
 				long t = System.currentTimeMillis();
-				if (gl.isFunctionAvailable("glUseProgram")) {
-					gl.glUseProgram(useProgram ? program : 0);
-				}
+				
 				gl.glClearColor(COLORS.background.x, COLORS.background.y, COLORS.background.z, 0);	// set background color
 				gl.glClearDepth(CLEAR_DEPTH);									// set initial depth-buffer value
 				gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// clear color and depth buffers
@@ -919,6 +917,9 @@ public class ViewportGl extends Viewport {
 		gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		gl.glEnable(GL_CULL_FACE);
 		gl.glCullFace(GL_BACK);
+		if (gl.isFunctionAvailable("glUseProgram")) {
+			gl.glUseProgram(useProgram ? program : 0);
+		}
 		gl.glPointSize(3);
 //		time = 0;
 		gl.glEnd();
@@ -937,7 +938,8 @@ public class ViewportGl extends Viewport {
 			}
 		}
 //		System.out.println();
-		
+		Point3f p0 = new Point3f();
+		Point3f p1 = new Point3f();
 		gl.glInterleavedArrays(GL_N3F_V3F, 0, slateTesselator.getBuffer());
 		for (Face face : sds.faceList) {
 			for (Slate slate : face.getSlates()) {
@@ -964,6 +966,114 @@ public class ViewportGl extends Viewport {
 				drawSlate(slate);
 			}
 		}
+		gl.glDisable(GL_LIGHTING);
+		gl.glUseProgram(0);
+		
+		
+//		gl.glColor3f(1, 1, 1);
+//		gl.glBegin(GL_LINES);
+//		for (Face face : sds.faceList) {
+//			for (HalfEdge edge : face.getEdges()) {
+//				if (edge.isMaster()) {
+//					edge.getFirstVertex().referencePosition.get(p0);
+//					edge.getSecondVertex().referencePosition.get(p1);
+//					modelView.transform(p0);
+//					modelView.transform(p1);
+//					gl.glVertex3f(p0.x, p0.y, p0.z);
+//					gl.glVertex3f(p1.x, p1.y, p1.z);
+//				}
+//			}
+//		}
+//		gl.glEnd();
+		
+		
+		gl.glColor3f(1, 1, 1);
+		gl.glBegin(GL_LINES);
+		for (Face face : sds.faceList) {
+			int i = 0;
+			Slate[] slates = face.getSlates();
+			for (HalfEdge edge : face.getEdges()) {
+				edge.getFirstVertex().referencePosition.get(p0);
+				modelView.transform(p0);
+				p1.set(slates[i++].limitPoints[2]);
+				gl.glVertex3f(p0.x, p0.y, p0.z);
+				gl.glVertex3f(p1.x, p1.y, p1.z);
+			}
+		}
+		gl.glEnd();
+		
+		
+		
+		gl.glColor3f(1, 0, 0);
+		gl.glBegin(GL_POINTS);
+		for (Face face : sds.faceList) {
+			for (HalfEdge edge : face.getEdges()) {
+				if (edge.isMaster()) {
+					edge.getFirstVertex().referencePosition.get(p0);
+					modelView.transform(p0);
+					gl.glVertex3f(p0.x, p0.y, p0.z);
+				}
+			}
+		}
+		gl.glEnd();
+		
+		gl.glBegin(GL_POINTS);
+		for (Face face : sds.faceList) {
+			for (HalfEdge edge : face.getEdges()) {
+				edge.getFirstVertex().referencePosition.get(p0);
+				modelView.transform(p0);
+				gl.glVertex3f(p0.x, p0.y, p0.z);
+			}
+		}
+		gl.glEnd();
+		
+		gl.glDisable(GL_DEPTH_TEST);
+		gl.glEnable(GL_BLEND);
+		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		
+//		gl.glColor4f(1, 1, 1, 0.15f);
+//		gl.glBegin(GL_LINES);
+//		for (Face face : sds.faceList) {
+//			for (HalfEdge edge : face.getEdges()) {
+//				if (edge.isMaster()) {
+//					edge.getFirstVertex().referencePosition.get(p0);
+//					edge.getSecondVertex().referencePosition.get(p1);
+//					modelView.transform(p0);
+//					modelView.transform(p1);
+//					gl.glVertex3f(p0.x, p0.y, p0.z);
+//					gl.glVertex3f(p1.x, p1.y, p1.z);
+//				}
+//			}
+//		}
+//		gl.glEnd();
+		
+		gl.glColor4f(1, 1, 1, 0.05f);
+		gl.glBegin(GL_LINES);
+		for (Face face : sds.faceList) {
+			int i = 0;
+			Slate[] slates = face.getSlates();
+			for (HalfEdge edge : face.getEdges()) {
+				edge.getFirstVertex().referencePosition.get(p0);
+				modelView.transform(p0);
+				p1.set(slates[i++].limitPoints[2]);
+				gl.glVertex3f(p0.x, p0.y, p0.z);
+				gl.glVertex3f(p1.x, p1.y, p1.z);
+			}
+		}
+		gl.glEnd();
+		
+		gl.glColor4f(1, 0, 0, 0.15f);
+		gl.glBegin(GL_POINTS);
+		for (Face face : sds.faceList) {
+			for (HalfEdge edge : face.getEdges()) {
+				edge.getFirstVertex().referencePosition.get(p0);
+				modelView.transform(p0);
+				gl.glVertex3f(p0.x, p0.y, p0.z);
+			}
+		}
+		gl.glEnd();
+		gl.glDisable(GL_BLEND);
+		
 		
 //		drawFace(sds.faceList.get(Math.abs(num) % sds.faceList.size()), subdivLevel);
 //		System.out.println(time);
@@ -989,6 +1099,14 @@ public class ViewportGl extends Viewport {
 //		FloatBuffer buffer = slateTesselator.getBuffer();
 //		count = buffer.capacity() / 4;
 //		gl.glInterleavedArrays(GL_N3F_V3F, 0, buffer);
+		
+//		gl.glEnable(GL_LIGHTING);
+		if (gl.isFunctionAvailable("glUseProgram")) {
+			gl.glUseProgram(useProgram ? program : 0);
+		}
+		gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 0, 0.9f }, 0);
+		gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0, 0, 0.2f }, 0);
+		
 		gl.glDrawArrays(GL_QUADS, 0, count);
 		
 		if (false) return;
@@ -1011,6 +1129,33 @@ public class ViewportGl extends Viewport {
 			}
 		}
 		gl.glEnd();
+		
+//		gl.glDisable(GL_LIGHTING);
+//		if (gl.isFunctionAvailable("glUseProgram")) {
+//			gl.glUseProgram(0);
+//		}
+		
+		
+		gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0.5f, 0.5f, 0.5f }, 0);
+		gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0.2f, 0.2f, 0.2f }, 0);
+		
+		if (gl.isFunctionAvailable("glUseProgram")) {
+			gl.glUseProgram(useProgram ? program : 0);
+		}
+		
+		for (int side = 1; side < 3; side++) {
+			int pairLevel = slate.getAdjacentSlate(side).getSubdivisionLevel();
+			if (pairLevel > level) {
+				pairLevel = level;
+			}
+			int[] lineArray = slateTesselator.getRim(level - 1, side);
+			gl.glBegin(GL_LINE_STRIP);
+			for (int i = 0; i < lineArray.length; i++) {
+				gl.glNormal3fv(normals[lineArray[i] + offset], 0);
+				gl.glVertex3fv(vertices[lineArray[i] + offset], 0);
+			}
+			gl.glEnd();
+		}
 	}
 	
 	private void drawFragment(float[][] v, int valence, int depth) {
