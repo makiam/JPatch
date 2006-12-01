@@ -7,6 +7,7 @@ import javax.vecmath.*;
 import jpatch.boundary.newtools.*;
 import jpatch.boundary.settings.*;
 import jpatch.entity.*;
+import sds.*;
 
 public abstract class Viewport extends AbstractNamedObject {
 	public static final double MIN_DIST_SQ = 64;
@@ -109,6 +110,10 @@ public abstract class Viewport extends AbstractNamedObject {
 	
 	public abstract void drawShape(jpatch.boundary.newtools.Shape s);
 	
+	public Matrix4d getMatrix() {
+		return matrix;
+	}
+	
 //	public void setView(View view) {
 //		viewType.set(view.ordinal());
 //		if (camera != null) {
@@ -138,7 +143,8 @@ public abstract class Viewport extends AbstractNamedObject {
 	public Point3d get3DPosition(float x, float y, Point3d p) {
 		x -= (component.getWidth() >> 1);
 		y = (component.getHeight() >> 1) - y;
-		p.set(x, y, zPos);
+		p.x = x;
+		p.y = y;
 		inverseMatrix.transform(p);
 		return p;
 	}
@@ -176,6 +182,28 @@ public abstract class Viewport extends AbstractNamedObject {
 				}
 				cp = cp.getNextNonHook();
 			} while (cp != null && ! cp.isLoop());
+		}
+		return hit;
+	}
+	
+	public Vertex getVertexAt(float x, float y, Sds sds) {
+		x -= (component.getWidth() >> 1);
+		y = (component.getHeight() >> 1) - y;
+		Vertex hit = null;
+		double min = MIN_DIST_SQ;
+		for (Face face : sds.faceList) {
+			for (HalfEdge edge : face.getEdges()) {
+				Vertex vertex = edge.getFirstVertex();
+				vertex.referencePosition.get(p0);
+				matrix.transform(p0);
+				double dx = x - p0.x;
+				double dy = y - p0.y;
+				double distanceSq = dx * dx + dy * dy;
+				if (distanceSq < min) {
+					min = distanceSq;
+					hit = vertex;
+				}
+			}
 		}
 		return hit;
 	}

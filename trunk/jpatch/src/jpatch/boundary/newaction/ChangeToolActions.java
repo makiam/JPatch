@@ -22,7 +22,7 @@ public final class ChangeToolActions {
 	}
 	
 	public static JPatchAction createTranslateAction() {
-		return new SetToolAction(new TranslateTool());
+		return new SetToolAction(new MoveVertexTool());
 	}
 	
 	public static JPatchAction createAddCurveAction() {
