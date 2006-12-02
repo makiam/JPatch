@@ -329,6 +329,10 @@ public class SlateTesselator {
 		return limitNormals[level];
 	}
 	
+	public float[] getInterleavedArray() {
+		return interleavedArray;
+	}
+	
 	public FloatBuffer getBuffer() {
 //		buffer.rewind();
 		return buffer;
