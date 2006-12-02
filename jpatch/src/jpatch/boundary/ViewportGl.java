@@ -967,7 +967,9 @@ public class ViewportGl extends Viewport {
 			}
 		}
 		gl.glDisable(GL_LIGHTING);
-		gl.glUseProgram(0);
+		if (gl.isFunctionAvailable("glUseProgram")) {
+			gl.glUseProgram(0);
+		}
 		
 		
 //		gl.glColor3f(1, 1, 1);
@@ -1107,7 +1109,20 @@ public class ViewportGl extends Viewport {
 		gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 0, 0.9f }, 0);
 		gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0, 0, 0.2f }, 0);
 		
-		gl.glDrawArrays(GL_QUADS, 0, count);
+		
+//		gl.glDrawArrays(GL_QUADS, 0, count);
+//		gl.glFlush();
+//		gl.glFinish();
+		
+		gl.glBegin(GL_QUADS);
+		float[] interleavedArray = slateTesselator.getInterleavedArray();
+		for (int i = 0; i < count; ) {
+			gl.glNormal3fv(interleavedArray, i);
+			i += 3;
+			gl.glVertex3fv(interleavedArray, i);
+			i+= 3;
+		}
+		gl.glEnd();
 		
 		if (false) return;
 		float[][] vertices = slateTesselator.getLimitVertices(level - 1);
