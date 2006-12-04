@@ -34,6 +34,9 @@ public class SlateTesselator {
 	private static final float LIMIT1 = 4.0f / 36.0f;
 	private static final float LIMIT2 = 1.0f / 36.0f;
 	
+	private static final float[][] TANGENT_FACE_WEIGHT = new float[MAX_VALENCE - 2][];			// [valence][index]
+	private static final float[][] TANGENT_EDGE_WEIGHT = new float[MAX_VALENCE - 2][];			// [valence][index]
+
 	private static final int MAX_CORNER_LENGTH = MAX_VALENCE * 2 - 5;
 	private static final int GRID_START = MAX_CORNER_LENGTH * 4;
 	private final float[][][] subdivPoints = new float[MAX_SUBDIV][][];							// [level][index][0=x,1=y,2=z] index = row * dim + column
@@ -50,6 +53,19 @@ public class SlateTesselator {
 	int[][][] rim0 = new int[MAX_SUBDIV][][];								//[level][side][index] outer grid rim
 	int[][][] rim1 = new int[MAX_SUBDIV][][];								//[level][side][index] inner grid rim
 	int[][][][] rimTriangles = new int[MAX_SUBDIV][MAX_SUBDIV][][]; 		// [thisLevel][pairLevel][side][index]
+	
+	static {
+		for (int valence = 3; valence <= MAX_VALENCE; valence++) {
+			int i = valence - 3;
+			TANGENT_FACE_WEIGHT[i] = new float[valence];
+			TANGENT_EDGE_WEIGHT[i] = new float[valence];
+			float An = (float) (1 + cos(2 * PI / valence) + cos(PI / valence) * sqrt(2 * (9 + cos(2 * PI / valence))));
+			for (int j = 0; j < valence; j++) {
+				TANGENT_EDGE_WEIGHT[i][j] = (float) (An * cos(2 * PI  * j / valence));
+				TANGENT_FACE_WEIGHT[i][j] = (float) (cos(2 * PI * j / valence) + cos(2 * PI * (j + 1) / valence));
+			}
+		}
+	}
 	
 	public SlateTesselator() {
 //		System.out.println("MAX_CORNER_LENGTH=" + MAX_CORNER_LENGTH);
@@ -553,7 +569,6 @@ public class SlateTesselator {
 			out[outIndex][2] = slate.limitPoints[corner].z;
 			
 			/* normal */
-			float An = (float) (1 + cos(2 * PI / valence) + cos(PI / valence) * sqrt(2 * (9 + cos(2 * PI / valence))));
 			ax = 0;
 			ay = 0;
 			az = 0;
@@ -574,8 +589,8 @@ public class SlateTesselator {
 				if (c3ei >= cs.length) {
 					c3ei -= cs.length - 2;
 				}
-				float ew = (float) (An * cos(2 * PI  * j / valence));
-				float fw = (float) (cos(2 * PI * j / valence) + cos(2 * PI * (j + 1) / valence));
+				float ew = TANGENT_EDGE_WEIGHT[valence - 3][j];
+				float fw = TANGENT_FACE_WEIGHT[valence - 3][j];
 				ax += in[cs[c3fi]][0] * fw;
 				ay += in[cs[c3fi]][1] * fw;
 				az += in[cs[c3fi]][2] * fw;
