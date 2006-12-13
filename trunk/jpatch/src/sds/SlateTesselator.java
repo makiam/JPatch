@@ -188,6 +188,7 @@ public class SlateTesselator {
 					if (valence == 3) {
 						array[0] = new int[] {
 								EDGE,
+								0,
 								cornerIndex2(corner, level, valence, 0),
 								patchCornerIndex(corner, level, 1, 1),
 								cornerIndex2(corner, level, valence, 2),
@@ -205,6 +206,7 @@ public class SlateTesselator {
 							if ((i & 1) == 0) {			// even -> edge
 								array[index] = new int[] {
 										EDGE,
+										0,
 										cornerIndex2(corner, level, valence, i),
 										patchCornerIndex(corner, level, 1, 1),
 										cornerIndex2(corner, level, valence, i + 1),
@@ -261,6 +263,7 @@ public class SlateTesselator {
 							int r = (row + 1) / 2;
 							patchStencil[level][index] = new int[] {
 									EDGE,
+									0,
 									patchIndex(level, r, c),
 									patchIndex(level, r, c + 1),
 									patchIndex(level, r - 1, c),
@@ -275,6 +278,7 @@ public class SlateTesselator {
 							int r = row / 2;
 							patchStencil[level][index] = new int[] {
 									EDGE,
+									0,
 									patchIndex(level, r, c),
 									patchIndex(level, r + 1, c),
 									patchIndex(level, r, c + 1),
@@ -287,6 +291,7 @@ public class SlateTesselator {
 							int r = (row + 1) / 2;
 							patchStencil[level][index] = new int[] {
 									POINT,
+									0,
 									patchIndex(level, r, c),
 									patchIndex(level, r - 1, c),
 									patchIndex(level, r, c + 1),
@@ -440,14 +445,22 @@ public class SlateTesselator {
 				final int outIndex = GRID_START + i;
 				switch (s[0]) {
 				case EDGE:
-					out[outIndex][0] = (in[s[1]][0] + in[s[2]][0]) * EDGE0 + ((in[s[3]][0] + in[s[4]][0]) + (in[s[5]][0] + in[s[6]][0])) * EDGE1;
-					out[outIndex][1] = (in[s[1]][1] + in[s[2]][1]) * EDGE0 + ((in[s[3]][1] + in[s[4]][1]) + (in[s[5]][1] + in[s[6]][1])) * EDGE1;
-					out[outIndex][2] = (in[s[1]][2] + in[s[2]][2]) * EDGE0 + ((in[s[3]][2] + in[s[4]][2]) + (in[s[5]][2] + in[s[6]][2])) * EDGE1;
+					out[outIndex][0] = (in[s[2]][0] + in[s[3]][0]) * EDGE0 + ((in[s[4]][0] + in[s[5]][0]) + (in[s[6]][0] + in[s[7]][0])) * EDGE1;
+					out[outIndex][1] = (in[s[2]][1] + in[s[3]][1]) * EDGE0 + ((in[s[4]][1] + in[s[5]][1]) + (in[s[6]][1] + in[s[7]][1])) * EDGE1;
+					out[outIndex][2] = (in[s[2]][2] + in[s[3]][2]) * EDGE0 + ((in[s[4]][2] + in[s[5]][2]) + (in[s[6]][2] + in[s[7]][2])) * EDGE1;
 					break;
 				case POINT:
-					out[outIndex][0] = in[s[1]][0] * VERTEX0 + ((in[s[2]][0] + in[s[4]][0]) + (in[s[3]][0] + in[s[5]][0])) * VERTEX1 + ((in[s[6]][0] + in[s[8]][0]) + (in[s[7]][0] + in[s[9]][0])) * VERTEX2;
-					out[outIndex][1] = in[s[1]][1] * VERTEX0 + ((in[s[2]][1] + in[s[4]][1]) + (in[s[3]][1] + in[s[5]][1])) * VERTEX1 + ((in[s[6]][1] + in[s[8]][1]) + (in[s[7]][1] + in[s[9]][1])) * VERTEX2;
-					out[outIndex][2] = in[s[1]][2] * VERTEX0 + ((in[s[2]][2] + in[s[4]][2]) + (in[s[3]][2] + in[s[5]][2])) * VERTEX1 + ((in[s[6]][2] + in[s[8]][2]) + (in[s[7]][2] + in[s[9]][2])) * VERTEX2;
+					if (s[1] > 0) {
+						// corner
+						out[outIndex][0] = in[s[2]][0];
+						out[outIndex][1] = in[s[2]][1];
+						out[outIndex][2] = in[s[2]][2];
+					} else {
+						// smooth
+						out[outIndex][0] = in[s[2]][0] * VERTEX0 + ((in[s[3]][0] + in[s[5]][0]) + (in[s[4]][0] + in[s[6]][0])) * VERTEX1 + ((in[s[7]][0] + in[s[9]][0]) + (in[s[8]][0] + in[s[10]][0])) * VERTEX2;
+						out[outIndex][1] = in[s[2]][1] * VERTEX0 + ((in[s[3]][1] + in[s[5]][1]) + (in[s[4]][1] + in[s[6]][1])) * VERTEX1 + ((in[s[7]][1] + in[s[9]][1]) + (in[s[8]][1] + in[s[10]][1])) * VERTEX2;
+						out[outIndex][2] = in[s[2]][2] * VERTEX0 + ((in[s[3]][2] + in[s[5]][2]) + (in[s[4]][2] + in[s[6]][2])) * VERTEX1 + ((in[s[7]][2] + in[s[9]][2]) + (in[s[8]][2] + in[s[10]][2])) * VERTEX2;
+					}
 					break;
 				case FACE:
 					out[outIndex][0] = ((in[s[1]][0] + in[s[3]][0]) + (in[s[2]][0] + in[s[4]][0])) * FACE0;
@@ -499,9 +512,9 @@ public class SlateTesselator {
 					final int[] s = array[i];
 					switch (s[0]) {
 					case EDGE:
-						out[oi][0] = (in[s[1]][0] + in[s[2]][0]) * EDGE0 + ((in[s[3]][0] + in[s[4]][0]) + (in[s[5]][0] + in[s[6]][0])) * EDGE1;
-						out[oi][1] = (in[s[1]][1] + in[s[2]][1]) * EDGE0 + ((in[s[3]][1] + in[s[4]][1]) + (in[s[5]][1] + in[s[6]][1])) * EDGE1;
-						out[oi][2] = (in[s[1]][2] + in[s[2]][2]) * EDGE0 + ((in[s[3]][2] + in[s[4]][2]) + (in[s[5]][2] + in[s[6]][2])) * EDGE1;
+						out[oi][0] = (in[s[2]][0] + in[s[3]][0]) * EDGE0 + ((in[s[4]][0] + in[s[5]][0]) + (in[s[6]][0] + in[s[7]][0])) * EDGE1;
+						out[oi][1] = (in[s[2]][1] + in[s[3]][1]) * EDGE0 + ((in[s[4]][1] + in[s[5]][1]) + (in[s[6]][1] + in[s[7]][1])) * EDGE1;
+						out[oi][2] = (in[s[2]][2] + in[s[3]][2]) * EDGE0 + ((in[s[4]][2] + in[s[5]][2]) + (in[s[6]][2] + in[s[7]][2])) * EDGE1;
 						break;
 					case FACE:
 						out[oi][0] = ((in[s[1]][0] + in[s[3]][0]) + (in[s[2]][0] + in[s[4]][0])) * FACE0;

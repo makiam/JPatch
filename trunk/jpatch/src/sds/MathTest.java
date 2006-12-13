@@ -1,13 +1,22 @@
 package sds;
 
 public class MathTest {
-	Vertex[] top = new Vertex[9];
+	Vertex[] top;
 	
 	public static void main(String[] args) {
 		new MathTest();
+		int count = 0;
+		for (int i = 3; i <= 16; i++) {
+			int num = i * (i - 1) / 2;
+			count += num;
+			System.out.println(i + ":\t" + num);
+		}
+		System.out.println(count);
 	}
 
 	MathTest() {
+		int valence = 8;
+		top = new Vertex[valence * 2 + 1];
 		Vertex[] current = new Vertex[top.length];
 		Vertex[] next = new Vertex[top.length];
 		for (int i = 0; i < top.length; i++) {
@@ -30,7 +39,7 @@ public class MathTest {
 //			}
 //			next[0] = new Vertex(vv, ww);
 			next[0] = new Vertex(
-					new Vertex[] { current[2], current[0], current[6] },
+					new Vertex[] { current[1], current[0], current[9] },
 					new double[] { 1.0/8.0, 3.0/4.0, 1.0/8.0 }
 			);
 			for (int i = 1; i < top.length; i++) {
@@ -39,20 +48,20 @@ public class MathTest {
 				int nn = ((i + 1) % l) + 1;
 				int p = ((i + l - 2) % l) + 1;
 				int pp = ((i + l - 3) % l) + 1;
-				if (i % 2 == 1) {
-					// odd - face point
+				if (i % 2 == 0) {
+					// even - face point
 					next[i] = new Vertex(
 							new Vertex[] { current[i], current[n], current[0], current[p] },
 							new double[] { 0.25, 0.25, 0.25, 0.25 }
 					);
 				} else {
-					// even - edge point
+					// odd - edge point
 					next[i] = new Vertex(
 							new Vertex[] { current[pp], current[p], current[0], current[i], current[nn], current[n] },
 							new double[] { 1.0/16.0, 1.0/16.0, 3.0/8.0, 3.0/8.0, 1.0/16.0, 1.0/16.0 }
 					);
 				}
-				if (i == 2 || i == 6) {
+				if (i == 1 || i == 9) {
 					next[i] = new Vertex(
 							new Vertex[] { current[i], current[0] },
 							new double[] { 0.5, 0.5 }
@@ -62,10 +71,10 @@ public class MathTest {
 			for (int i = 0; i < top.length; i++) {
 				current[i] = next[i];
 			}
-			double f = Math.pow(2, level);
-			Vertex tangent1 = new Vertex(new Vertex[] { current[2], current[6] }, new double[] { f, -f });
+			double f = Math.pow(1.636363636363636363636363636363, level);
+			Vertex tangent1 = new Vertex(new Vertex[] { current[1], current[9] }, new double[] { f, -f });
 //			Vertex tangent2 = new Vertex(new Vertex[] { current[4], current[8] }, new double[] { f, -f });
-			Vertex tangent2 = new Vertex(new Vertex[] { current[4], current[0] }, new double[] { f, -f });
+			Vertex tangent2 = new Vertex(new Vertex[] { current[5], current[0] }, new double[] { f, -f });
 			System.out.println("\nlevel " + level + ":");
 			System.out.println("limit=" + current[0]);
 			System.out.println("tangent1=" + tangent1);
