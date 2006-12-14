@@ -243,6 +243,12 @@ public abstract class Attribute {
 	public static class Integer extends Attribute {
 		private int value;
 		
+		public Integer() { }
+		
+		public Integer(int value) {
+			this.value = value;
+		}
+		
 		public void set(int newValue) {
 			if (newValue != value && !valueAdjusting) {
 				value = newValue;
