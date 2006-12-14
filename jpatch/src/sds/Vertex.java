@@ -26,6 +26,7 @@ public class Vertex {
 	
 	public final Attribute.Tuple3 referencePosition = new Attribute.Tuple3(null, 0, 0, 0, false);
 	public final Attribute.Tuple3 position = new Attribute.Tuple3(null, 0, 0, 0, false);
+	public final Attribute.Integer sharpness = new Attribute.Integer(0);
 	
 	private final Matrix4d transform = new Matrix4d(Constants.IDENTITY_MATRIX);
 	private final Matrix4d invTransform = new Matrix4d(Constants.IDENTITY_MATRIX);
@@ -112,13 +113,17 @@ public class Vertex {
 	}
 	
 	void computeDerivedPosition() {
-		double x = 0, y = 0, z = 0;
-		for (int i = 0, n = stencil.length; i < n; i++) {
-			x += stencil[i].pos.x * weight[i];
-			y += stencil[i].pos.y * weight[i];
-			z += stencil[i].pos.z * weight[i];
+		if (sharpness.get() > 0) {
+			position.set(stencil[0].pos);
+		} else {
+			double x = 0, y = 0, z = 0;
+			for (int i = 0, n = stencil.length; i < n; i++) {
+				x += stencil[i].pos.x * weight[i];
+				y += stencil[i].pos.y * weight[i];
+				z += stencil[i].pos.z * weight[i];
+			}
+			position.set(x, y, z);
 		}
-		position.set(x, y, z);
 	}
 	
 	public void setStencil(Vertex[] stencil, double[] weight) {
@@ -263,6 +268,7 @@ public class Vertex {
 			i++;
 		}
 		vertexPoint.setStencil(stencil, weight);
+		vertexPoint.sharpness.set(1);
 	}
 	
 	void bindLimitPoint() {

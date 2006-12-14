@@ -148,36 +148,38 @@ public class SlateTesselator {
 			 */
 			for (int valence = 3; valence <= MAX_VALENCE; valence++) {
 				for (int corner = 0; corner < 4; corner++) {
-					cornerStencil[level][valence - 3][corner] = new int[valence * 2 + 2];
-					cornerStencil[level][valence - 3][corner][0] = patchCornerIndex(corner, level + 1, 1, 1);	// target!
-					cornerStencil[level][valence - 3][corner][1] = patchCornerIndex(corner, level, 1, 1);
-					cornerStencil[level][valence - 3][corner][2] = patchCornerIndex(corner, level, 0, 2);
-					cornerStencil[level][valence - 3][corner][3] = patchCornerIndex(corner, level, 1, 2);
-					cornerStencil[level][valence - 3][corner][4] = patchCornerIndex(corner, level, 2, 2);
-					cornerStencil[level][valence - 3][corner][5] = patchCornerIndex(corner, level, 2, 1);
-					cornerStencil[level][valence - 3][corner][6] = patchCornerIndex(corner, level, 2, 0);
+					cornerStencil[level][valence - 3][corner] = new int[valence * 2 + 3];
+					cornerStencil[level][valence - 3][corner][0] = corner == 2 ? 1 : 0;							// sharpness
+					cornerStencil[level][valence - 3][corner][1] = patchCornerIndex(corner, level + 1, 1, 1);	// target!
+					cornerStencil[level][valence - 3][corner][2] = patchCornerIndex(corner, level, 1, 1);
+					cornerStencil[level][valence - 3][corner][3] = patchCornerIndex(corner, level, 0, 2);
+					cornerStencil[level][valence - 3][corner][4] = patchCornerIndex(corner, level, 1, 2);
+					cornerStencil[level][valence - 3][corner][5] = patchCornerIndex(corner, level, 2, 2);
+					cornerStencil[level][valence - 3][corner][6] = patchCornerIndex(corner, level, 2, 1);
+					cornerStencil[level][valence - 3][corner][7] = patchCornerIndex(corner, level, 2, 0);
 					for (int i = 0, n = valence * 2 - 5; i < n; i++) {
 						int index = i + 1;
 						if (index == n) {
 							index = 0;
 						}
-						cornerStencil[level][valence - 3][corner][i + 7] = cornerIndex(corner, valence, index);
+						cornerStencil[level][valence - 3][corner][i + 8] = cornerIndex(corner, valence, index);
 					}
-					
-					cornerLimitStencil[level][valence - 3][corner] = new int[valence * 2 + 2];
-					cornerLimitStencil[level][valence - 3][corner][0] = patchCornerIndex(corner, level + 1, 1, 1);	// target!
-					cornerLimitStencil[level][valence - 3][corner][1] = patchCornerIndex(corner, level + 1, 1, 1);
-					cornerLimitStencil[level][valence - 3][corner][2] = patchCornerIndex(corner, level + 1, 0, 2);
-					cornerLimitStencil[level][valence - 3][corner][3] = patchCornerIndex(corner, level + 1, 1, 2);
-					cornerLimitStencil[level][valence - 3][corner][4] = patchCornerIndex(corner, level + 1, 2, 2);
-					cornerLimitStencil[level][valence - 3][corner][5] = patchCornerIndex(corner, level + 1, 2, 1);
-					cornerLimitStencil[level][valence - 3][corner][6] = patchCornerIndex(corner, level + 1, 2, 0);
+
+					cornerLimitStencil[level][valence - 3][corner] = new int[valence * 2 + 3];
+					cornerLimitStencil[level][valence - 3][corner][0] = 0;											// sharpness
+					cornerLimitStencil[level][valence - 3][corner][1] = patchCornerIndex(corner, level + 1, 1, 1);	// target!
+					cornerLimitStencil[level][valence - 3][corner][2] = patchCornerIndex(corner, level + 1, 1, 1);
+					cornerLimitStencil[level][valence - 3][corner][3] = patchCornerIndex(corner, level + 1, 0, 2);
+					cornerLimitStencil[level][valence - 3][corner][4] = patchCornerIndex(corner, level + 1, 1, 2);
+					cornerLimitStencil[level][valence - 3][corner][5] = patchCornerIndex(corner, level + 1, 2, 2);
+					cornerLimitStencil[level][valence - 3][corner][6] = patchCornerIndex(corner, level + 1, 2, 1);
+					cornerLimitStencil[level][valence - 3][corner][7] = patchCornerIndex(corner, level + 1, 2, 0);
 					for (int i = 0, n = valence * 2 - 5; i < n; i++) {
 						int index = i + 1;
 						if (index == n) {
 							index = 0;
 						}
-						cornerLimitStencil[level][valence - 3][corner][i + 7] = cornerIndex(corner, valence, index);
+						cornerLimitStencil[level][valence - 3][corner][i + 8] = cornerIndex(corner, valence, index);
 					}
 					
 					int[][] array = new int[cornerStencilLength(valence)][];
@@ -476,34 +478,43 @@ public class SlateTesselator {
 			for (int corner = 0; corner < 4; corner++) {
 				final int valence = boundary[corner].length / 2 + 2;
 				final int[] cs = cornerStencil[level][valence - 3][corner];
-				float a0 = 0;
-				float a1 = 0;
-				float a2 = 0;
-				float b0 = 0;
-				float b1 = 0;
-				float b2 = 0;
-				for (int p = 2; p < cs.length; p++) {
-					a0 += in[cs[p]][0];
-					a1 += in[cs[p]][1];
-					a2 += in[cs[p++]][2];
-					b0 += in[cs[p]][0];
-					b1 += in[cs[p]][1];
-					b2 += in[cs[p]][2];
+				final int outIndex = cs[1];
+				if (cs[0] > 0) {	
+					out[outIndex][0] = in[cs[2]][0];
+					out[outIndex][1] = in[cs[2]][1];
+					out[outIndex][2] = in[cs[2]][2];
+				} else {
+					float a0 = 0;
+					float a1 = 0;
+					float a2 = 0;
+					float b0 = 0;
+					float b1 = 0;
+					float b2 = 0;
+					for (int p = 3; p < cs.length; p++) {
+						a0 += in[cs[p]][0];
+						a1 += in[cs[p]][1];
+						a2 += in[cs[p++]][2];
+						b0 += in[cs[p]][0];
+						b1 += in[cs[p]][1];
+						b2 += in[cs[p]][2];
+					}
+					final float ik = 1.0f / valence;			// TODO:
+					final float bb = 1.5f * ik;					// precompute these values
+					final float aa = 0.25f * ik;				// for each valence and
+					final float cc = valence - 1.75f;			// use loopup table
+					a0 *= aa;
+					a1 *= aa;
+					a2 *= aa;
+					b0 *= bb;
+					b1 *= bb;
+					b2 *= bb;
+					
+					out[outIndex][0] = (a0 + b0 + in[cs[2]][0] * cc) * ik;
+					out[outIndex][1] = (a1 + b1 + in[cs[2]][1] * cc) * ik;
+					out[outIndex][2] = (a2 + b2 + in[cs[2]][2] * cc) * ik;
 				}
-				final float ik = 1.0f / valence;			// TODO:
-				final float bb = 1.5f * ik;					// precompute these values
-				final float aa = 0.25f * ik;				// for each valence and
-				final float cc = valence - 1.75f;			// use loopup table
-				a0 *= aa;
-				a1 *= aa;
-				a2 *= aa;
-				b0 *= bb;
-				b1 *= bb;
-				b2 *= bb;
-				final int outIndex = cs[0];
-				out[outIndex][0] = (a0 + b0 + in[cs[1]][0] * cc) * ik;
-				out[outIndex][1] = (a1 + b1 + in[cs[1]][1] * cc) * ik;
-				out[outIndex][2] = (a2 + b2 + in[cs[1]][2] * cc) * ik;
+				
+				
 
 				final int[][] array = fanStencil[level][valence - 3][corner];
 				final int m = array.length;
@@ -575,11 +586,28 @@ public class SlateTesselator {
 			final int valence = boundary[corner].length / 2 + 2;
 			final int[] cs = cornerLimitStencil[level][valence - 3][corner];
 			
-			final int outIndex = cs[0];
+			final int outIndex = cs[1];
 			
-			out[outIndex][0] = slate.limitPoints[corner].x;
-			out[outIndex][1] = slate.limitPoints[corner].y;
-			out[outIndex][2] = slate.limitPoints[corner].z;
+			float f0 = 0;
+			float f1 = 0;
+			float f2 = 0;
+			float e0 = 0;
+			float e1 = 0;
+			float e2 = 0;
+			for (int p = 3; p < cs.length; p++) {
+				f0 += in[cs[p]][0];
+				f1 += in[cs[p]][1];
+				f2 += in[cs[p++]][2];
+				e0 += in[cs[p]][0];
+				e1 += in[cs[p]][1];
+				e2 += in[cs[p]][2];
+			}
+			final float ik = 1.0f / (valence * (valence + 5));			// TODO:
+			final float pointWeight = valence * valence;				// use loopup table?
+			
+			out[outIndex][0] = (e0 * 4 + f0 + in[cs[2]][0] * pointWeight) * ik;
+			out[outIndex][1] = (e1 * 4 + f1 + in[cs[2]][1] * pointWeight) * ik;
+			out[outIndex][2] = (e2 * 4 + f2 + in[cs[2]][2] * pointWeight) * ik;
 			
 			/* normal */
 			ax = 0;
