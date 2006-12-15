@@ -1,6 +1,7 @@
 package sds;
 
 import java.util.Iterator;
+import java.util.Random;
 
 import javax.vecmath.*;
 
@@ -17,12 +18,18 @@ import jpatch.entity.Constants;
  *
  */
 public class Vertex {
+	public static final int POINT = 0;
+	public static final int EDGE = 1;
+	public static final int FACE = 2;
+	
+	
 	static int count;
 	final int num = count++;
 	HalfEdge edge;
 	
 	private Vertex[] stencil;
-	private double[] weight;
+	private int stencilType;
+	private int valence;
 	
 	public final Attribute.Tuple3 referencePosition = new Attribute.Tuple3(null, 0, 0, 0, false);
 	public final Attribute.Tuple3 position = new Attribute.Tuple3(null, 0, 0, 0, false);
@@ -36,7 +43,7 @@ public class Vertex {
 	final Point3d refPos = new Point3d();
 	
 	public Vertex vertexPoint;
-	public Vertex limitPoint;
+//	public Vertex limitPoint;
 	
 	final Iterable<Face> faceIterable = new Iterable<Face>() {
 		public Iterator<Face> iterator() {
@@ -113,22 +120,58 @@ public class Vertex {
 	}
 	
 	void computeDerivedPosition() {
-		if (sharpness.get() > 0) {
-			position.set(stencil[0].pos);
-		} else {
-			double x = 0, y = 0, z = 0;
-			for (int i = 0, n = stencil.length; i < n; i++) {
-				x += stencil[i].pos.x * weight[i];
-				y += stencil[i].pos.y * weight[i];
-				z += stencil[i].pos.z * weight[i];
+		switch (stencilType) {
+		case POINT:
+			if (sharpness.get() > 0) {
+				position.set(stencil[0].pos);
+			} else {
+				final double k = 1.0 / (valence * valence);
+				double w = (valence - 2.0) / valence;
+				double x = stencil[1].pos.x;
+				double y = stencil[1].pos.y;
+				double z = stencil[1].pos.z;
+				for (int i = 2; i < stencil.length; i++) {
+					x += stencil[i].pos.x;
+					y += stencil[i].pos.y;
+					z += stencil[i].pos.z;
+				}
+				position.set(x * k + stencil[0].pos.x * w, y * k + stencil[0].pos.y * w, z * k + stencil[0].pos.z * w);
 			}
-			position.set(x, y, z);
+			break;
+		case EDGE:
+			if (sharpness.get() > 0) {
+				position.set(
+						(stencil[0].pos.x + stencil[1].pos.x) * 0.5,
+						(stencil[0].pos.y + stencil[1].pos.y) * 0.5,
+						(stencil[0].pos.z + stencil[1].pos.z) * 0.5
+				);
+			} else {
+				position.set(
+						(stencil[0].pos.x + stencil[1].pos.x + stencil[2].pos.x + stencil[3].pos.x) * 0.25,
+						(stencil[0].pos.y + stencil[1].pos.y + stencil[2].pos.y + stencil[3].pos.y) * 0.25,
+						(stencil[0].pos.z + stencil[1].pos.z + stencil[2].pos.z + stencil[3].pos.z) * 0.25
+				);
+			}
+			break;
+		case FACE:
+			double k = 1.0 / valence;
+			double x = stencil[0].pos.x;
+			double y = stencil[0].pos.y;
+			double z = stencil[0].pos.z;
+			for (int i = 1; i < stencil.length; i++) {
+				x += stencil[i].pos.x;
+				y += stencil[i].pos.y;
+				z += stencil[i].pos.z;
+			}
+			position.set(x * k, y * k, z * k);
+			break;	
 		}
 	}
 	
-	public void setStencil(Vertex[] stencil, double[] weight) {
+	public void setStencil(int type, int valence, Vertex[] stencil) {
+		this.stencilType = type;
+		this.valence = valence;
 		this.stencil = stencil.clone();
-		this.weight = weight.clone();
 	}
 	
 	public Vertex(double x, double y, double z) {
@@ -254,48 +297,41 @@ public class Vertex {
 		final int n = valence();
 		final int stencilSize = n * 2 + 1;
 		final Vertex[] stencil = new Vertex[stencilSize];
-		final double[] weight = new double[stencilSize];
-		final double k = 1.0 / (n * n);
 		stencil[0] = this;
-		weight[0] = (n - 2.0) / n;
 		int i = 1;
 		for (HalfEdge edge : getAdjacentEdges()) {
-			stencil[i] = edge.face.facePoint;
-			weight[i] = k;
-			i++;
-			stencil[i] = edge.pair.vertex;
-			weight[i] = k;
-			i++;
+			stencil[i++] = edge.face.facePoint;
+			stencil[i++] = edge.pair.vertex;
 		}
-		vertexPoint.setStencil(stencil, weight);
-		vertexPoint.sharpness.set(1);
+		vertexPoint.setStencil(POINT, n, stencil);
+		vertexPoint.sharpness.set(new Random().nextInt(4));
 	}
 	
-	void bindLimitPoint() {
-		limitPoint = new Vertex();
-		final int n = valence();
-		final int stencilSize = n * 2 + 1;
-		final Vertex[] stencil = new Vertex[stencilSize];
-		final double[] weight = new double[stencilSize];
-		final double k = 1.0 / (n * (n + 5));
-		stencil[0] = vertexPoint;
-		weight[0] = (n * n) * k;
-		int i = 1;
-		for (HalfEdge edge : getAdjacentEdges()) {
-			stencil[i] = edge.face.facePoint;
-			weight[i] = 1 * k;
-			i++;
-			stencil[i] = edge.edgePoint;
-			weight[i] = 4 * k;
-			i++;
-		}
-		double test = 0.0;
-		for (double w : weight) {
-			test += w;
-		}
-		System.out.println("valence=" + n + " weight sum=" + test);
-		limitPoint.setStencil(stencil, weight);
-	}
+//	void bindLimitPoint() {
+//		limitPoint = new Vertex();
+//		final int n = valence();
+//		final int stencilSize = n * 2 + 1;
+//		final Vertex[] stencil = new Vertex[stencilSize];
+//		final double[] weight = new double[stencilSize];
+//		final double k = 1.0 / (n * (n + 5));
+//		stencil[0] = vertexPoint;
+//		weight[0] = (n * n) * k;
+//		int i = 1;
+//		for (HalfEdge edge : getAdjacentEdges()) {
+//			stencil[i] = edge.face.facePoint;
+//			weight[i] = 1 * k;
+//			i++;
+//			stencil[i] = edge.edgePoint;
+//			weight[i] = 4 * k;
+//			i++;
+//		}
+//		double test = 0.0;
+//		for (double w : weight) {
+//			test += w;
+//		}
+//		System.out.println("valence=" + n + " weight sum=" + test);
+//		limitPoint.setStencil(stencil, weight);
+//	}
 	
 	void validate() {
 		HalfEdge e = edge;

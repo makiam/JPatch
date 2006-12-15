@@ -149,7 +149,7 @@ public class SlateTesselator {
 			for (int valence = 3; valence <= MAX_VALENCE; valence++) {
 				for (int corner = 0; corner < 4; corner++) {
 					cornerStencil[level][valence - 3][corner] = new int[valence * 2 + 3];
-					cornerStencil[level][valence - 3][corner][0] = corner == 2 ? 1 : 0;							// sharpness
+					cornerStencil[level][valence - 3][corner][0] = 0;							// sharpness
 					cornerStencil[level][valence - 3][corner][1] = patchCornerIndex(corner, level + 1, 1, 1);	// target!
 					cornerStencil[level][valence - 3][corner][2] = patchCornerIndex(corner, level, 1, 1);
 					cornerStencil[level][valence - 3][corner][3] = patchCornerIndex(corner, level, 0, 2);
@@ -404,7 +404,11 @@ public class SlateTesselator {
 		geo[GRID_START + 9][1] = pt.y;
 		geo[GRID_START + 9][2] = pt.z;
 		
+		
 		for (int corner = 0; corner < 4; corner++) {
+			final int valence = boundary[corner].length / 2 + 2;
+			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner].sharpness.get() - 1;
+			
 			final Point3f[] c = boundary[corner];
 			
 			
@@ -476,6 +480,7 @@ public class SlateTesselator {
 			 * apply stencils on corners and fans
 			 */
 			for (int corner = 0; corner < 4; corner++) {
+				
 				final int valence = boundary[corner].length / 2 + 2;
 				final int[] cs = cornerStencil[level][valence - 3][corner];
 				final int outIndex = cs[1];
@@ -514,7 +519,9 @@ public class SlateTesselator {
 					out[outIndex][2] = (a2 + b2 + in[cs[2]][2] * cc) * ik;
 				}
 				
-				
+				if (level < depth - 1) {
+					cornerStencil[level + 1][valence - 3][corner][0] = cornerStencil[level][valence - 3][corner][0] - 1;
+				}
 
 				final int[][] array = fanStencil[level][valence - 3][corner];
 				final int m = array.length;
@@ -617,18 +624,18 @@ public class SlateTesselator {
 			by = 0;
 			bz = 0;
 			for (int j = 0; j < valence; j++) {
-				int c2fi = j * 2 + 2;
-				int c2ei = j * 2 + 1;
-				if (c2ei == 1) {
+				int c2fi = j * 2 + 3;
+				int c2ei = j * 2 + 2;
+				if (c2ei == 2) {
 					c2ei = cs.length - 1;
 				}
 				int c3fi = c2fi + 2;
 				if (c3fi >= cs.length) {
-					c3fi -= cs.length - 2;
+					c3fi -= cs.length - 3;
 				}
 				int c3ei = c2ei + 2;
 				if (c3ei >= cs.length) {
-					c3ei -= cs.length - 2;
+					c3ei -= cs.length - 3;
 				}
 				float ew = TANGENT_EDGE_WEIGHT[valence - 3][j];
 				float fw = TANGENT_FACE_WEIGHT[valence - 3][j];
