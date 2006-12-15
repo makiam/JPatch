@@ -179,9 +179,9 @@ public class Sds {
 		for (Vertex vertex : vertexList) {
 			vertex.bindVertexPoint();
 		}
-		for (Vertex vertex : vertexList) {
-			vertex.bindLimitPoint();
-		}
+//		for (Vertex vertex : vertexList) {
+//			vertex.bindLimitPoint();
+//		}
 		for (Face face : faceList) {
 			face.setupSlates();
 		}
@@ -218,9 +218,9 @@ public class Sds {
 		for (Vertex vertex : vertexList) {
 			vertex.vertexPoint.computeDerivedPosition();
 		}
-		for (Vertex vertex : vertexList) {
-			vertex.limitPoint.computeDerivedPosition();
-		}
+//		for (Vertex vertex : vertexList) {
+//			vertex.limitPoint.computeDerivedPosition();
+//		}
 	}
 //	public void subdivide() {
 //		edgeMap = new HashMap<EdgeKey, HalfEdge>(edgeMap.size() * 4);

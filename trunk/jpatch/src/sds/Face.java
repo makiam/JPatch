@@ -49,20 +49,19 @@ public class Face {
 	
 	void bindFacePoint() {
 		final Vertex[] stencil = new Vertex[sides];
-		final double[] weight = new double[sides];
 		int i = 0;
 		for (HalfEdge edge : getEdges()) {
-			stencil[i] = edge.vertex;
-			weight[i] = recSides;
-			i++;
+			stencil[i++] = edge.vertex;
 		}
-		facePoint.setStencil(stencil, weight);
+		facePoint.setStencil(Vertex.FACE, sides, stencil);
 	}
 	
 	void setupSlates() {
 		Point3d[][] p = new Point3d[4][];
+		Vertex[] v = new Vertex[4];
 		int s = 0;
 		for (HalfEdge edge : getEdges()) {
+			v[0] = facePoint;
 			p[0] = new Point3d[sides * 2 - 4];
 			p[0][0] = facePoint.pos;
 			HalfEdge e = edge.next;
@@ -73,14 +72,17 @@ public class Face {
 				p[0][i++] = e.edgePoint.pos;
 			}
 			
+			
 			p[1] = new Point3d[4];
 			e = edge.prev.pair;
+			v[1] = e.edgePoint;
 			p[1][0] = e.edgePoint.pos;
 			p[1][1] = e.next.vertex.vertexPoint.pos;
 			p[1][2] = e.next.edgePoint.pos;
 			p[1][3] = e.face.facePoint.pos;
 			
 			p[2] = new Point3d[edge.vertex.valence() * 2 - 4];
+			v[2] = edge.vertex.vertexPoint;
 			p[2][0] = edge.vertex.vertexPoint.pos;
 			e = edge.prev.pair.prev.pair;
 			p[2][1] = e.edgePoint.pos;
@@ -92,12 +94,13 @@ public class Face {
 			
 			p[3] = new Point3d[4];
 			e = edge.pair;
+			v[3] = e.edgePoint;
 			p[3][0] = e.edgePoint.pos;
 			p[3][1] = e.face.facePoint.pos;
 			p[3][2] = e.prev.edgePoint.pos;
 			p[3][3] = e.vertex.vertexPoint.pos;
 			
-			slates[s++] = new Slate(p);
+			slates[s++] = new Slate(p, v);
 		}
 	}
 	

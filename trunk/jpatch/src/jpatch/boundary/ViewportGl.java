@@ -1024,7 +1024,7 @@ public class ViewportGl extends Viewport {
 		gl.glBegin(GL_POINTS);
 		for (Face face : sds.faceList) {
 			for (HalfEdge edge : face.getEdges()) {
-				edge.getFirstVertex().limitPoint.position.get(p0);
+				edge.getFirstVertex().position.get(p0);
 				modelView.transform(p0);
 				gl.glVertex3f(p0.x, p0.y, p0.z);
 			}
