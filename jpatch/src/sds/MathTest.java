@@ -5,13 +5,20 @@ public class MathTest {
 	
 	public static void main(String[] args) {
 		new MathTest();
-		int count = 0;
-		for (int i = 3; i <= 16; i++) {
-			int num = i * (i - 1) / 2;
-			count += num;
-			System.out.println(i + ":\t" + num);
-		}
-		System.out.println(count);
+//		int count = 0;
+//		for (int i = 3; i <= 16; i++) {
+//			int num = i * (i - 1) / 2;
+//			count += num;
+//			System.out.println(i + ":\t" + num);
+//		}
+//		System.out.println(count);
+//		int n = 0;
+//		for (int i = 0; i < 16; i++) {
+//			for (int j = i + 1; j < 16; j++) {
+//				int nn = (16 - i) * i / 2;
+//				System.out.println(n++ + " " + nn + ":\t" + i + "\t" + j);
+//			}
+//		}
 	}
 
 	MathTest() {

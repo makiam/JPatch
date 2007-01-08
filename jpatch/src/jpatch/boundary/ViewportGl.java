@@ -36,8 +36,8 @@ public class ViewportGl extends Viewport {
 	private final Point3f p = new Point3f();
 	private final Vector3f v = new Vector3f();
 	
-	private final FragmentTesselator kernel = new FragmentTesselator();
-	private final SlateTesselator slateTesselator = new SlateTesselator();
+//	private final FragmentTesselator kernel = new FragmentTesselator();
+	private static final SlateTesselator slateTesselator = new SlateTesselator();
 	private int subdivLevel = 4;
 	
 	private long time;

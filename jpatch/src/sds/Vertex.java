@@ -22,7 +22,6 @@ public class Vertex {
 	public static final int EDGE = 1;
 	public static final int FACE = 2;
 	
-	
 	static int count;
 	final int num = count++;
 	HalfEdge edge;
@@ -139,7 +138,7 @@ public class Vertex {
 			}
 			break;
 		case EDGE:
-			if (sharpness.get() > 0) {
+			if (valence > 0) {
 				position.set(
 						(stencil[0].pos.x + stencil[1].pos.x) * 0.5,
 						(stencil[0].pos.y + stencil[1].pos.y) * 0.5,
@@ -304,7 +303,7 @@ public class Vertex {
 			stencil[i++] = edge.pair.vertex;
 		}
 		vertexPoint.setStencil(POINT, n, stencil);
-		vertexPoint.sharpness.set(new Random().nextInt(4));
+//		vertexPoint.sharpness.set(Integer.MAX_VALUE);
 	}
 	
 //	void bindLimitPoint() {

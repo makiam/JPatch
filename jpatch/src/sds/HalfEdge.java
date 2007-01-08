@@ -33,7 +33,7 @@ public class HalfEdge {
 	
 	void bindEdgePoint() {
 		final Vertex[] stencil = new Vertex[] { vertex, pair.vertex, face.facePoint, pair.face.facePoint };
-		edgePoint.setStencil(Vertex.EDGE, -1, stencil);
+		edgePoint.setStencil(Vertex.EDGE, 0, stencil);
 	}
 	
 	public Vertex getFirstVertex() {
