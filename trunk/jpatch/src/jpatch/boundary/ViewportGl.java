@@ -37,7 +37,7 @@ public class ViewportGl extends Viewport {
 	private final Vector3f v = new Vector3f();
 	
 //	private final FragmentTesselator kernel = new FragmentTesselator();
-	private static final SlateTesselator slateTesselator = new SlateTesselator();
+	private static final SlateTesselator2 slateTesselator = new SlateTesselator2();
 	private int subdivLevel = 4;
 	
 	private long time;
@@ -936,6 +936,7 @@ public class ViewportGl extends Viewport {
 //				if (slate.getSubdivisionLevel() < 0)
 //					System.out.println(slate);
 			}
+			break;
 		}
 //		System.out.println();
 		Point3f p0 = new Point3f();

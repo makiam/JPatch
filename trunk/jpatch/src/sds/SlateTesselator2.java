@@ -1,14 +1,11 @@
 package sds;
 
-import com.sun.opengl.util.BufferUtil;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import javax.swing.JFrame;
@@ -19,16 +16,17 @@ import static java.lang.Math.*;
 
 public class SlateTesselator2 {
 	private static final int UNUSED = 0;
-	private static final int EDGE_H = 1;
-	private static final int EDGE_V = 2;
-	private static final int FACE = 3;
-	private static final int POINT = 4;
-	private static final int CREASE_4_5 = 5;
-	private static final int CREASE_4_6 = 6;
-	private static final int CREASE_4_7 = 7;
-	private static final int CREASE_5_6 = 8;
-	private static final int CREASE_5_7 = 9;
-	private static final int CREASE_6_7 = 10;
+	private static final int EDGE = 1;
+	private static final int EDGE_H = 2;
+	private static final int EDGE_V = 3;
+	private static final int FACE = 4;
+	private static final int POINT = 5;
+	private static final int CREASE_4_5 = 6;
+	private static final int CREASE_4_6 = 7;
+	private static final int CREASE_4_7 = 8;
+	private static final int CREASE_5_6 = 9;
+	private static final int CREASE_5_7 = 10;
+	private static final int CREASE_6_7 = 11;
 	
 	private static final int MAX_SUBDIV = 6;
 	private static final int MAX_VALENCE = 16;
@@ -52,15 +50,15 @@ public class SlateTesselator2 {
 	private static final float[][] TANGENT_EDGE_WEIGHT = new float[MAX_VALENCE - 2][];			// [valence][index]
 
 	private static final int MAX_CORNER_LENGTH = MAX_VALENCE * 2 - 5;
-	private static final int GRID_START = MAX_CORNER_LENGTH * 4;
+	private static final int GRID_START = MAX_CORNER_LENGTH * 2;
 	private final float[][][] subdivPoints = new float[MAX_SUBDIV][][];							// [level][index][0=x,1=y,2=z] index = row * dim + column
 	private final float[][][] limitPoints = new float[MAX_SUBDIV][][];							// [level][index][0=x,1=y,2=z] index = row * dim + column
 	private final float[][][] limitNormals = new float[MAX_SUBDIV][][];							// [level][index][0=x,1=y,2=z] index = row * dim + column
 	private final int[][][] patchStencil = new int[MAX_SUBDIV][][];								// [level][index][stencil]
-	private final int[][][][][] fanStencil = new int[MAX_SUBDIV][MAX_VALENCE - 2][4][][];		// [level][valence][corner][index][stencil]
-	private final int[][][][] cornerStencil = new int[MAX_SUBDIV][MAX_VALENCE- 2][4][];			// [level][valence][corner][stencil]
+	private final int[][][][][] fanStencil = new int[MAX_SUBDIV][MAX_VALENCE - 2][2][][];		// [level][valence - 3][corner][index][stencil]
+	private final int[][][][] cornerStencil = new int[MAX_SUBDIV][MAX_VALENCE- 2][2][];			// [level][valence - 3][corner][stencil]
 	private final int[][][] patchLimitStencil = new int[MAX_SUBDIV][][];						// [level][index][stencil]
-	private final int[][][][] cornerLimitStencil = new int[MAX_SUBDIV][MAX_VALENCE- 2][4][];			// [level][valence][corner][stencil]
+	private final int[][][][] cornerLimitStencil = new int[MAX_SUBDIV][MAX_VALENCE- 2][2][];			// [level][valence - 3][corner][stencil]
 	private final float[] interleavedArray;
 	private final FloatBuffer buffer;
 	
@@ -167,7 +165,7 @@ public class SlateTesselator2 {
 			 * populate subdivision stencil tables for corners
 			 */
 			for (int valence = 3; valence <= MAX_VALENCE; valence++) {
-				for (int corner = 0; corner < 4; corner += 2) {
+				for (int corner = 0; corner < 2; corner ++) {
 					cornerStencil[level][valence - 3][corner] = new int[valence * 2 + 3];
 					cornerStencil[level][valence - 3][corner][0] = 0;							// sharpness
 					cornerStencil[level][valence - 3][corner][1] = patchCornerIndex(corner, level + 1, 1, 1);	// target!
@@ -209,7 +207,7 @@ public class SlateTesselator2 {
 					
 					if (valence == 3) {
 						array[0] = new int[] {
-								EDGE_H,
+								EDGE,
 								0,
 								cornerIndex2(corner, level, valence, 0),
 								patchCornerIndex(corner, level, 1, 1),
@@ -227,7 +225,7 @@ public class SlateTesselator2 {
 							}
 							if ((i & 1) == 0) {			// even -> edge
 								array[index] = new int[] {
-										EDGE_H,
+										EDGE,
 										0,
 										cornerIndex2(corner, level, valence, i),
 										patchCornerIndex(corner, level, 1, 1),
@@ -446,19 +444,19 @@ public class SlateTesselator2 {
 		geo[GRID_START + 6][2] = pt.z;
 		
 		pt = boundary[1][1];
-		geo[GRID_START + 7][0] = pt.x;
-		geo[GRID_START + 7][1] = pt.y;
-		geo[GRID_START + 7][2] = pt.z;
-		
-		pt = boundary[1][2];
 		geo[GRID_START + 2][0] = pt.x;
 		geo[GRID_START + 2][1] = pt.y;
-		geo[GRID_START + 2][2] = pt.z;
+		geo[GRID_START + 3][2] = pt.z;
 		
-		pt = boundary[1][3];
+		pt = boundary[1][2];
 		geo[GRID_START + 3][0] = pt.x;
 		geo[GRID_START + 3][1] = pt.y;
 		geo[GRID_START + 3][2] = pt.z;
+		
+		pt = boundary[1][3];
+		geo[GRID_START + 7][0] = pt.x;
+		geo[GRID_START + 7][1] = pt.y;
+		geo[GRID_START + 7][2] = pt.z;
 		
 		pt = boundary[2][0];
 		geo[GRID_START + 10][0] = pt.x;
@@ -471,30 +469,30 @@ public class SlateTesselator2 {
 		geo[GRID_START + 9][2] = pt.z;
 		
 		pt = boundary[3][1];
-		geo[GRID_START + 8][0] = pt.x;
-		geo[GRID_START + 8][1] = pt.y;
-		geo[GRID_START + 8][2] = pt.z;
-		
-		pt = boundary[3][2];
 		geo[GRID_START + 13][0] = pt.x;
 		geo[GRID_START + 13][1] = pt.y;
 		geo[GRID_START + 13][2] = pt.z;
 		
-		pt = boundary[3][3];
+		pt = boundary[3][2];
 		geo[GRID_START + 12][0] = pt.x;
 		geo[GRID_START + 12][1] = pt.y;
 		geo[GRID_START + 12][2] = pt.z;
+		
+		pt = boundary[3][3];
+		geo[GRID_START + 8][0] = pt.x;
+		geo[GRID_START + 8][1] = pt.y;
+		geo[GRID_START + 8][2] = pt.z;
 //		// test crease stencils
 //		patchStencil[1][7][1] = 1;
 //		patchStencil[1][11][1] = 1;
 //		patchStencil[1][13][1] = 1;
 //		patchStencil[1][17][1] = 1;
 		
-		for (int corner = 0; corner < 4; corner += 2) {
+		for (int corner = 0; corner < 2; corner ++) {
 			final int valence = boundary[corner].length / 2 + 2;
-//			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner].sharpness.get() - 1;
+			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner].sharpness.get() - 1;
 			
-			final Point3f[] c = boundary[corner];
+			final Point3f[] c = boundary[corner * 2];
 			
 			
 			
@@ -528,7 +526,7 @@ public class SlateTesselator2 {
 		/*
 		 * subdivide maxLevel times
 		 */
-		int[] stencilTypes = new int[11];
+//		int[] stencilTypes = new int[11];
 		for (int level = 1; level < depth; level++) {
 			final int[][] stencil = patchStencil[level];
 			final int[][] nextLevel = patchStencil[level + 1];
@@ -542,7 +540,7 @@ public class SlateTesselator2 {
 			for (int i = 2; i < n; i++) {
 				final int[] s = stencil[i];
 				final int outIndex = GRID_START + i;
-				stencilTypes[s[0]]++;
+//				stencilTypes[s[0]]++;
 				switch (s[0]) {
 				case EDGE_H:
 					if (s[1] > 0) {
@@ -717,7 +715,7 @@ public class SlateTesselator2 {
 			/*
 			 * apply stencils on corners and fans
 			 */
-			for (int corner = 0; corner < 4; corner += 2) {
+			for (int corner = 0; corner < 2; corner++) {
 				
 				final int valence = boundary[corner].length / 2 + 2;
 				final int[] cs = cornerStencil[level][valence - 3][corner];
@@ -766,8 +764,7 @@ public class SlateTesselator2 {
 					final int oi = MAX_CORNER_LENGTH * corner + i;
 					final int[] s = array[i];
 					switch (s[0]) {
-					case EDGE_H:
-					case EDGE_V:	// fallthrough intended!
+					case EDGE:
 						if (s[1] > 0) {
 							// crease
 							out[oi][0] = (in[s[2]][0] + in[s[3]][0]) * 0.5f;
@@ -794,9 +791,9 @@ public class SlateTesselator2 {
 		/*
 		 * project vertices to limit surface
 		 */
-		for (int i = 0; i < 11; i++) {
-			System.out.println("stencil " + i + ": " + stencilTypes[i]);
-		}
+//		for (int i = 0; i < 11; i++) {
+//			System.out.println("stencil " + i + ": " + stencilTypes[i]);
+//		}
 		/*
 		 * apply limit stencils on rectangular inner grid
 		 */
@@ -838,7 +835,7 @@ public class SlateTesselator2 {
 		/*
 		 * apply limit stencils on corners
 		 */
-		for (int corner = 0; corner < 4; corner += 2) {
+		for (int corner = 0; corner < 2; corner ++) {
 			final int valence = boundary[corner].length / 2 + 2;
 			final int[] cps = cornerStencil[level][valence - 3][corner];
 			final int[] cs = cornerLimitStencil[level][valence - 3][corner];
@@ -974,79 +971,99 @@ public class SlateTesselator2 {
 		if (column < 0) {
 			column += dim;
 		}
-		if (row == 0) {
-			if (column == 1) {
-				return 0 * MAX_CORNER_LENGTH + 0;
-//			} else if (column == dim - 2) {
-//				return 1 * MAX_CORNER_LENGTH + 1;
-			} else if (column == 0) {
-				throw new IllegalArgumentException("level=" + level + " row=" + row + " column=" + column);
-			}
-		} else if (row == dim - 1) {
-//			if (column == 1) {
-//				return 3 * MAX_CORNER_LENGTH + 1;
-			if (column == dim - 2) {
-				return 2 * MAX_CORNER_LENGTH + 0;
-			} else if (column == dim - 1) {
-				throw new IllegalArgumentException("level=" + level + " row=" + row + " column=" + column);
-			}
-		} else if (column == 0) {
-			if (row == 1) {
-				return 0 * MAX_CORNER_LENGTH + 1;
-//			} else if (row == dim - 2) {
-//				return 3 * MAX_CORNER_LENGTH + 0;
-			}
-		} else if (column == dim - 1) {
-//			if (row == 1) {
-//				return 1 * MAX_CORNER_LENGTH + 0;
-			if (row == dim - 2) {
-				return 2 * MAX_CORNER_LENGTH + 1;
-			}
+		
+		if ((row == 0 && column == 0) || (row == dim - 1 && column == dim - 1)) {
+			throw new IllegalArgumentException("level=" + level + " row=" + row + " column=" + column);
+		} else if (row == 0 && column == 1) {
+			return 0;
+		} else if (row == 1 && column == 0) {
+			return 1;
+		} else if (row == dim - 1 && column == dim - 2) {
+			return MAX_CORNER_LENGTH;
+		} else if (row == dim - 2 && column == dim - 1) {
+			return MAX_CORNER_LENGTH + 1;
+		} else {
+			return GRID_START + row * dim + column;
 		}
-		return GRID_START + row * dim + column;
+//		if (row == 0) {
+//			if (column == 1) {
+//				return 0 * MAX_CORNER_LENGTH + 0;
+////			} else if (column == dim - 2) {
+////				return 1 * MAX_CORNER_LENGTH + 1;
+//			} else if (column == 0) {
+//				throw new IllegalArgumentException("level=" + level + " row=" + row + " column=" + column);
+//			}
+//		} else if (row == dim - 1) {
+////			if (column == 1) {
+////				return 3 * MAX_CORNER_LENGTH + 1;
+//			if (column == dim - 2) {
+//				return 2 * MAX_CORNER_LENGTH + 0;
+//			} else if (column == dim - 1) {
+//				throw new IllegalArgumentException("level=" + level + " row=" + row + " column=" + column);
+//			}
+//		} else if (column == 0) {
+//			if (row == 1) {
+//				return 0 * MAX_CORNER_LENGTH + 1;
+////			} else if (row == dim - 2) {
+////				return 3 * MAX_CORNER_LENGTH + 0;
+//			}
+//		} else if (column == dim - 1) {
+////			if (row == 1) {
+////				return 1 * MAX_CORNER_LENGTH + 0;
+//			if (row == dim - 2) {
+//				return 2 * MAX_CORNER_LENGTH + 1;
+//			}
+//		}
+//		return GRID_START + row * dim + column;
 	}
 	
+	/**
+	 * Computes the geometry array index for the specified row/column and rotating the specified corner
+	 * to the opper left side.
+	 * @param corner 0 for the upper left (outer) corner, 1 for the lower right (inner) corner
+	 * @param level
+	 * @param row
+	 * @param column
+	 * @return
+	 */
 	private static int patchCornerIndex(int corner, int level, int row, int column) {
-		if (corner == 1 || corner == 3) {
-			throw new IllegalArgumentException("corner = " + corner);
-		}
 		int dim = (1 << (level - 1)) + 3;
 		switch (corner) {
 		case 0:
 			return patchIndex(level, row, column);
 		case 1:
-			return patchIndex(level, column, dim - 1 - row);
-		case 2:
 			return patchIndex(level, dim - 1 - row, dim - 1 - column);
-		case 3:
-			return patchIndex(level, dim - 1 - column, row);
 		default:
-			throw new IllegalArgumentException("corner > 3 :" + corner);
+			throw new IllegalArgumentException("" + corner);
 		}
 	}
 	
+	/**
+	 * Computes the geometry array index for a given corner (fan) element.
+	 */
 	private static int cornerIndex(int corner, int valence, int i) {
-		if (corner == 1 || corner == 3) {
-			throw new IllegalArgumentException("corner = " + corner);
+		if (i < 0 || i >= cornerStencilLength(valence)) {
+			throw new IllegalArgumentException(Integer.toString(i));
 		}
-		int max = cornerStencilLength(valence);
-		int offset = MAX_CORNER_LENGTH * corner;
-		i--;
-		if (i == -1) {
-			return offset;
-		} else if (i < -1) {
-			return offset + max + 1 + i;
-		} else if (i == max - 1) {
-			return offset;
-		} else {
-			return offset + i + 1;
-		}
+		return MAX_CORNER_LENGTH * corner + i;
+		
+//		int max = cornerStencilLength(valence);
+//		int offset = MAX_CORNER_LENGTH * corner;
+		
+		
+//		System.out.println("i=" + i + " " + (i == max));
+//		if (i == 0) {
+//			return offset;
+//		} else if (i < 0) {
+//			return offset + max + i;
+//		} else if (i == max) {
+//			return offset;
+//		} else {
+//			return offset + i;
+//		}
 	}
 	
 	private static int cornerIndex2(int corner, int level, int valence, int i) {
-		if (corner == 1 || corner == 3) {
-			throw new IllegalArgumentException("corner = " + corner);
-		}
 		int max = cornerStencilLength(valence);
 		if (i == -2) {
 			return patchCornerIndex(corner, level, 2, 1);
@@ -1068,37 +1085,80 @@ public class SlateTesselator2 {
 	private class Tester {
 		JFrame frame = new JFrame();
 		int level = 4;
-		int valence = 5;
-		final String[] TYPE = { ".", "Eh", "Ev", "F", "P" };
+		int valence = 3;
+		final String[] TYPE = { ".", "E", "-", "|", "F", "P", "C" };
 		final int SIZE = 300;
 		final int OFF = 250;
 		int sx, sy;
+		int[][][] looktable = new int[99][99][];
+		
 		JPanel panel = new JPanel() {
 			public void paintComponent(Graphics g) {
+//				System.out.println(sx + "/" + sy);
 				super.paintComponent(g);
+				((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 				g.translate(OFF, OFF);
 				g.setFont(new Font("sans serif", Font.PLAIN, 8));
 				int dim = getDimension(level);
 				int dim1 = getDimension(level - 1);
 				Point p = new Point();
 				Point p1 = new Point();
-				int selectedIndex = getIndex(level, sy + 1, sx + 1);
+//				int selectedIndex = getIndex(level, sy + 1, sx + 1);
+				int[] selectedStencil = null;
+				if (sx > -10 && sy > -10) {
+					selectedStencil = looktable[sx + 10][sy + 10];
+				}
+				if (selectedStencil != null) {
+					int stencil = selectedStencil[0];
+					System.out.println(stencil);
+					g.setColor(Color.RED);
+					g.fillRect(sx * SIZE / (dim - 3), sy * SIZE / (dim - 3) - 8, 9, 9);
+					int start = 0; 
+					int end = 0;
+					if (stencil == FACE) {
+						start = 1;
+						end = 5;
+					} else if (stencil == POINT) {
+						start = 3;
+						end = 12;
+					} else if (stencil == EDGE_H || stencil == EDGE_V) {
+						start = 7;
+						end = 13;
+					} else if (stencil == EDGE) {
+						start = 2;
+						end = 8;
+					} else if (stencil == 6) {
+						start = 2;
+						end = valence * 2 + 3;
+					}
+					for (int j = start; j < end; j++) {
+						int idx = selectedStencil[j];
+						g.drawString(Integer.toString(idx), -200, (j - start + 1) * 16);
+						getPos(level - 1, idx, p1);
+						if (p1.x > 0) {
+							if (p1.x < dim1 - 2) {
+								p1.x *= 2;
+							} else {
+								p1.x = dim + p1.x - dim1;
+							}
+						}
+						if (p1.y > 0) {
+							if (p1.y < dim1 - 2) {
+								p1.y *= 2;
+							} else {
+								p1.y = dim + p1.y - dim1;
+							}
+						}
+						g.drawRect(p1.x * SIZE / (dim - 3) - 2, p1.y * SIZE / (dim - 3) - 10, 12, 12);
+//						System.out.println(idx);
+					}
+				}
 				for (int i = 0, n = dim * dim; i < n; i++) {
 					int index = GRID_START + i;
 					getPos(level, index, p);
 					int stencil = patchStencil[level][i][0];
 					
-					if (index == selectedIndex) {
-						g.setColor(Color.RED);
-						g.fillRect(p.x * SIZE / (dim - 3) - 2, p.y * SIZE / (dim - 3) - 10, 12, 12);
-						if (stencil == FACE) {
-							for (int j = 1; j < 5; j++) {
-								int idx = patchStencil[level][i][j];
-								getPos(level - 1, idx, p1);
-								g.drawRect(p1.x * SIZE / (dim1 - 3) - 2, p1.y * SIZE / (dim1 - 3) - 10, 12, 12);
-							}
-						}
-					}
+					
 					
 					boolean hl = (p.x & 1) == 0 && (p.y & 1) == 0;
 					g.setColor(hl ? Color.BLACK : Color.LIGHT_GRAY);
@@ -1108,11 +1168,11 @@ public class SlateTesselator2 {
 					
 					
 				}
-				for (int corner = 0; corner < 2; corner += 2) {
+				for (int corner = 0; corner < 2; corner ++) {
 					for (int i = 0; i < valence * 2 - 5; i++) {
 						getFanPos(level, valence, corner, i, p);
-						int stencil = fanStencil[level][valence][corner][i][0];
-						g.drawString(TYPE[stencil], p.x * SIZE / (dim - 3), p.y * SIZE / (dim - 3));
+						int stencil = fanStencil[level][valence - 3][corner][i][0];
+						g.drawString(TYPE[stencil] + i, p.x * SIZE / (dim - 3), p.y * SIZE / (dim - 3));
 					}
 				}
 //				g.drawString("" + , 0, -230);
@@ -1120,12 +1180,14 @@ public class SlateTesselator2 {
 		};
 		
 		Tester() {
+			fillLooktable();
 			panel.setBackground(Color.WHITE);
 			panel.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseWheelMoved(MouseWheelEvent e) {
 					level += e.getWheelRotation();
 					if (level < 1) level = 1;
 					if (level > 4) level = 4;
+					fillLooktable();
 					panel.repaint();
 				}
 			});
@@ -1133,8 +1195,8 @@ public class SlateTesselator2 {
 				public void mouseMoved(MouseEvent e) {
 					int dim = getDimension(level);
 					int off = SIZE / (dim - 3) / 2;
-					sx = ((e.getX() - OFF + off) * (dim - 3) + SIZE) / SIZE - 1;
-					sy = ((e.getY() - OFF + 10 + off) * (dim - 3) + SIZE) / SIZE - 1;
+					sx = (int) Math.floor(((e.getX() - OFF + off) * (dim - 3.0) + SIZE) / SIZE - 1);
+					sy = (int) Math.floor(((e.getY() - OFF + 10 + off) * (dim - 3.0) + SIZE) / SIZE - 1);
 					panel.repaint();
 				}
 			});
@@ -1144,27 +1206,70 @@ public class SlateTesselator2 {
 			frame.setVisible(true);
 		}
 		
+		private void fillLooktable() {
+			for (int i = 0; i < looktable.length; i++) {
+				for (int j = 0; j < looktable[i].length; j++) {
+					looktable[i][j] = null;
+				}
+			}
+			int dim = getDimension(level);
+			Point p = new Point();
+			
+			for (int i = 0, n = dim * dim; i < n; i++) {
+				int index = GRID_START + i;
+				getPos(level, index, p);
+				if (p.x > -10 && p.y > -10) {
+					looktable[p.x + 10][p.y + 10] = patchStencil[level][i];
+				}
+			}
+			
+			for (int corner = 0; corner < 2; corner++) {
+				for (int i = 0; i < valence * 2 - 5; i++) {
+					getFanPos(level, valence, corner, i, p);
+					looktable[p.x + 10][p.y + 10] = fanStencil[level][valence - 3][corner][i];
+				}
+			}
+			
+			looktable[10][10] = cornerStencil[level][valence - 3][0];
+			looktable[10][10][0] = 6;
+			
+			looktable[dim + 7][dim + 7] = cornerStencil[level][valence - 3][1];
+			looktable[dim + 7][dim + 7][0] = 6;
+		}
+		
 		private void getPos(int level, int index, Point p) {
 			int dim = getDimension(level);
-			int row = (index - GRID_START) / dim;
-			int column = (index - GRID_START) % dim;
-			p.setLocation(column - 1, row - 1);
+			if (index >= GRID_START) {
+				int row = (index - GRID_START) / dim;
+				int column = (index - GRID_START) % dim;
+				p.setLocation(column - 1, row - 1);
+			} else {
+				if (index < MAX_CORNER_LENGTH) {
+					getFanPos(level, valence, 0, index, p);
+				} else {
+					getFanPos(level, valence, 1, index -  MAX_CORNER_LENGTH, p);
+				}
+			}
 		}
 		
 		private void getFanPos(int level, int valence, int corner ,int index, Point p) {
-			int[][] stencil = fanStencil[level][valence][corner];
-			int m = valence - 3;
+			int[][] stencil = fanStencil[level][valence - 3][corner];
+			int m = valence - 2;
+			int dim = getDimension(level);
+			if (index == 0) {
+				index = valence * 2 - 5;
+			}
 			if (corner == 0) {
 				if (index < m) {
 					p.setLocation(-3, -3 + m - index);
 				} else {
 					p.setLocation(-3 - m + index, -3);
 				}
-			} else if (corner == 2) {
+			} else if (corner == 1) {
 				if (index < m) {
-					p.setLocation(-2, -2 + m - index);
+					p.setLocation(dim, dim - m + index);
 				} else {
-					p.setLocation(-2 - m + index, -2);
+					p.setLocation(dim + m - index, dim);
 				}
 			} else {
 				throw new IllegalArgumentException();
