@@ -936,7 +936,7 @@ public class ViewportGl extends Viewport {
 //				if (slate.getSubdivisionLevel() < 0)
 //					System.out.println(slate);
 			}
-			break;
+//			break;
 		}
 //		System.out.println();
 		Point3f p0 = new Point3f();
