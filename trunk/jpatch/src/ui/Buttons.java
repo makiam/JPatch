@@ -146,7 +146,7 @@ public class Buttons {
 		JToggleButton tb4 = new JToggleButton();
 		JToggleButton tb5 = new JToggleButton();
 		JToggleButton tb6 = new JToggleButton();
-		int buttonWidth = 77;
+		int buttonWidth = 57;
 		int buttonHeight = 24;
 		
 		Image icon = createTransparentImage(createTestIcon(), 0.75f);
@@ -159,6 +159,7 @@ public class Buttons {
 		configureButton(tb1, Type.GLASS, Position.LEFT, buttonWidth, buttonHeight, createTransparentImage(createEtchedIcon(createTextImage(font, "New")), 0.75f));
 		configureButton(tb2, Type.GLASS, Position.CENTER, buttonWidth, buttonHeight, createTransparentImage(createEtchedIcon(createTextImage(font, "Open")), 0.75f));
 		configureButton(tb3, Type.GLASS, Position.RIGHT, buttonWidth, buttonHeight, createTransparentImage(createEtchedIcon(createTextImage(font, "Save")), 0.75f));
+		buttonWidth = 27;
 		configureButton(tb4, Type.PLASTIC, Position.LEFT, buttonWidth, buttonHeight, etchedIcon);
 		configureButton(tb5, Type.PLASTIC, Position.CENTER, buttonWidth, buttonHeight, etchedIcon);
 		configureButton(tb6, Type.PLASTIC, Position.RIGHT, buttonWidth, buttonHeight, etchedIcon);

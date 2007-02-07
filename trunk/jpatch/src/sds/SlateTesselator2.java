@@ -446,7 +446,7 @@ public class SlateTesselator2 {
 		pt = boundary[1][1];
 		geo[GRID_START + 2][0] = pt.x;
 		geo[GRID_START + 2][1] = pt.y;
-		geo[GRID_START + 3][2] = pt.z;
+		geo[GRID_START + 2][2] = pt.z;
 		
 		pt = boundary[1][2];
 		geo[GRID_START + 3][0] = pt.x;
@@ -489,10 +489,12 @@ public class SlateTesselator2 {
 //		patchStencil[1][17][1] = 1;
 		
 		for (int corner = 0; corner < 2; corner ++) {
-			final int valence = boundary[corner].length / 2 + 2;
-			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner].sharpness.get() - 1;
-			
 			final Point3f[] c = boundary[corner * 2];
+			final int valence = c.length / 2 + 2;
+//			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner].sharpness.get() - 1;
+			cornerStencil[1][valence - 3][corner][0] = 0;
+			
+			
 			
 			
 			
@@ -543,7 +545,7 @@ public class SlateTesselator2 {
 //				stencilTypes[s[0]]++;
 				switch (s[0]) {
 				case EDGE_H:
-					if (s[1] > 0) {
+					if (false && s[1] > 0) {
 						// crease
 						out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * 0.5f;
 						out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * 0.5f;
@@ -559,16 +561,16 @@ public class SlateTesselator2 {
 						out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * EDGE0 + ((in[s[9]][0] + in[s[10]][0]) + (in[s[11]][0] + in[s[12]][0])) * EDGE1;
 						out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * EDGE0 + ((in[s[9]][1] + in[s[10]][1]) + (in[s[11]][1] + in[s[12]][1])) * EDGE1;
 						out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * EDGE0 + ((in[s[9]][2] + in[s[10]][2]) + (in[s[11]][2] + in[s[12]][2])) * EDGE1;
-						nextLevel[s[2]][1] = 0;
-						nextLevel[s[3]][1] = 0;
-						nextLevel[s[4]][1] = 0;
-						nextLevel[s[5]][1] = 0;
-						nextLevel[s[6]][1] = 0;
-						nextLevel[s[2]][0] = POINT;
+//						nextLevel[s[2]][1] = 0;
+//						nextLevel[s[3]][1] = 0;
+//						nextLevel[s[4]][1] = 0;
+//						nextLevel[s[5]][1] = 0;
+//						nextLevel[s[6]][1] = 0;
+//						nextLevel[s[2]][0] = POINT;
 					}
 					break;
 				case EDGE_V:
-					if (s[1] > 0) {
+					if (false && s[1] > 0) {
 						// crease
 						out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * 0.5f;
 						out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * 0.5f;
@@ -584,16 +586,16 @@ public class SlateTesselator2 {
 						out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * EDGE0 + ((in[s[9]][0] + in[s[10]][0]) + (in[s[11]][0] + in[s[12]][0])) * EDGE1;
 						out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * EDGE0 + ((in[s[9]][1] + in[s[10]][1]) + (in[s[11]][1] + in[s[12]][1])) * EDGE1;
 						out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * EDGE0 + ((in[s[9]][2] + in[s[10]][2]) + (in[s[11]][2] + in[s[12]][2])) * EDGE1;
-						nextLevel[s[2]][1] = 0;
-						nextLevel[s[3]][1] = 0;
-						nextLevel[s[4]][1] = 0;
-						nextLevel[s[5]][1] = 0;
-						nextLevel[s[6]][1] = 0;
-						nextLevel[s[2]][0] = POINT;
+//						nextLevel[s[2]][1] = 0;
+//						nextLevel[s[3]][1] = 0;
+//						nextLevel[s[4]][1] = 0;
+//						nextLevel[s[5]][1] = 0;
+//						nextLevel[s[6]][1] = 0;
+//						nextLevel[s[2]][0] = POINT;
 					}
 					break;
 				case POINT:
-					if (s[1] > 0) {
+					if (false && s[1] > 0) {
 						// corner
 						out[outIndex][0] = in[s[3]][0];
 						out[outIndex][1] = in[s[3]][1];
@@ -604,9 +606,9 @@ public class SlateTesselator2 {
 						out[outIndex][0] = in[s[3]][0] * VERTEX0 + ((in[s[4]][0] + in[s[6]][0]) + (in[s[5]][0] + in[s[7]][0])) * VERTEX1 + ((in[s[8]][0] + in[s[10]][0]) + (in[s[9]][0] + in[s[11]][0])) * VERTEX2;
 						out[outIndex][1] = in[s[3]][1] * VERTEX0 + ((in[s[4]][1] + in[s[6]][1]) + (in[s[5]][1] + in[s[7]][1])) * VERTEX1 + ((in[s[8]][1] + in[s[10]][1]) + (in[s[9]][1] + in[s[11]][1])) * VERTEX2;
 						out[outIndex][2] = in[s[3]][2] * VERTEX0 + ((in[s[4]][2] + in[s[6]][2]) + (in[s[5]][2] + in[s[7]][2])) * VERTEX1 + ((in[s[8]][2] + in[s[10]][2]) + (in[s[9]][2] + in[s[11]][2])) * VERTEX2;
-						nextLevel[s[2]][1] = 0;
+//						nextLevel[s[2]][1] = 0;
 					}
-					nextLevel[s[2]][0] = POINT;
+//					nextLevel[s[2]][0] = POINT;
 					break;
 				case FACE:
 					out[outIndex][0] = ((in[s[1]][0] + in[s[3]][0]) + (in[s[2]][0] + in[s[4]][0])) * FACE0;
@@ -614,6 +616,7 @@ public class SlateTesselator2 {
 					out[outIndex][2] = ((in[s[1]][2] + in[s[3]][2]) + (in[s[2]][2] + in[s[4]][2])) * FACE0;
 					break;
 				case CREASE_4_5:
+					if (true) throw new IllegalArgumentException();
 					if (s[1] > 0) {
 						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[5]][0]) * CREASE1;
 						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[5]][1]) * CREASE1;
@@ -630,6 +633,7 @@ public class SlateTesselator2 {
 					}
 					break;
 				case CREASE_4_6:
+					if (true) throw new IllegalArgumentException();
 					if (s[1] > 0) {
 						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[6]][0]) * CREASE1;
 						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[6]][1]) * CREASE1;
@@ -646,6 +650,7 @@ public class SlateTesselator2 {
 					}
 					break;
 				case CREASE_4_7:
+					if (true) throw new IllegalArgumentException();
 					if (s[1] > 0) {
 						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[7]][0]) * CREASE1;
 						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[7]][1]) * CREASE1;
@@ -662,6 +667,7 @@ public class SlateTesselator2 {
 					}
 					break;
 				case CREASE_5_6:
+					if (true) throw new IllegalArgumentException();
 					if (s[1] > 0) {
 						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[5]][0] + in[s[6]][0]) * CREASE1;
 						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[5]][1] + in[s[6]][1]) * CREASE1;
@@ -678,6 +684,7 @@ public class SlateTesselator2 {
 					}
 					break;
 				case CREASE_5_7:
+					if (true) throw new IllegalArgumentException();
 					if (s[1] > 0) {
 						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[5]][0] + in[s[7]][0]) * CREASE1;
 						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[5]][1] + in[s[7]][1]) * CREASE1;
@@ -694,6 +701,7 @@ public class SlateTesselator2 {
 					}
 					break;
 				case CREASE_6_7:
+					if (true) throw new IllegalArgumentException();
 					if (s[1] > 0) {
 						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[6]][0] + in[s[7]][0]) * CREASE1;
 						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[6]][1] + in[s[7]][1]) * CREASE1;
@@ -717,10 +725,10 @@ public class SlateTesselator2 {
 			 */
 			for (int corner = 0; corner < 2; corner++) {
 				
-				final int valence = boundary[corner].length / 2 + 2;
+				final int valence = boundary[corner * 2].length / 2 + 2;
 				final int[] cs = cornerStencil[level][valence - 3][corner];
 				final int outIndex = cs[1];
-				if (cs[0] > 0) {	
+				if (false && cs[0] > 0) {	
 					out[outIndex][0] = in[cs[2]][0];
 					out[outIndex][1] = in[cs[2]][1];
 					out[outIndex][2] = in[cs[2]][2];
@@ -836,7 +844,7 @@ public class SlateTesselator2 {
 		 * apply limit stencils on corners
 		 */
 		for (int corner = 0; corner < 2; corner ++) {
-			final int valence = boundary[corner].length / 2 + 2;
+			final int valence = boundary[corner * 2].length / 2 + 2;
 			final int[] cps = cornerStencil[level][valence - 3][corner];
 			final int[] cs = cornerLimitStencil[level][valence - 3][corner];
 			
