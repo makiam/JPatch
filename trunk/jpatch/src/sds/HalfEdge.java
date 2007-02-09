@@ -2,6 +2,8 @@ package sds;
 
 import javax.vecmath.Point3d;
 
+import jpatch.entity.Attribute;
+
 /**
  * 
  */
@@ -11,17 +13,18 @@ import javax.vecmath.Point3d;
  *
  */
 public class HalfEdge {
-	private final double[] WEIGHT = new double[] { 0.25, 0.25, 0.25, 0.25 };
 	final Vertex vertex;
 	final HalfEdge pair;
 	Face face;
 	HalfEdge prev;
 	HalfEdge next;
 	Vertex edgePoint;
+	public final Attribute.Integer sharpness;
 	
 	private HalfEdge(Vertex vertex, HalfEdge neighbor) {
 		this.vertex = vertex;
 		this.pair = neighbor;
+		sharpness = isMaster() ? new Attribute.Integer(0) : null;
 	}
 	
 	public HalfEdge(Vertex firstVertex, Vertex secondVertex) {
@@ -29,6 +32,7 @@ public class HalfEdge {
 		edgePoint = new Vertex();
 		pair = new HalfEdge(secondVertex, this);
 		pair.edgePoint = edgePoint;
+		sharpness = isMaster() ? new Attribute.Integer(0) : null;
 	}
 	
 	void bindEdgePoint() {
@@ -54,6 +58,10 @@ public class HalfEdge {
 	
 	public boolean isMaster() {
 		return face != null && (pair.face == null || vertex.hashCode() < pair.vertex.hashCode());
+	}
+	
+	public HalfEdge getMaster() {
+		return isMaster() ? this : pair;
 	}
 	
 	@Override

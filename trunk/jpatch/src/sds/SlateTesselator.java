@@ -40,9 +40,6 @@ public class SlateTesselator {
 	private static final float LIMIT0 = 16.0f / 36.0f;
 	private static final float LIMIT1 = 4.0f / 36.0f;
 	private static final float LIMIT2 = 1.0f / 36.0f;
-//	private static final float LIMIT0 = 1;
-//	private static final float LIMIT1 = 0;
-//	private static final float LIMIT2 = 0f;
 	private static final float CREASE0 = 3.0f / 4.0f;
 	private static final float CREASE1 = 1.0f / 8.0f;
 	

@@ -22,7 +22,8 @@ public class AttributeEditorFactory {
 			URL url = null;
 			Class objectClass = object.getClass();
 			while (url == null) {
-				url = ClassLoader.getSystemResource("jpatch/boundary/" + objectClass.getSimpleName() + ".xml");
+				url = ClassLoader.getSystemResource(objectClass.getName().replace('.', '/') + ".xml");
+				System.out.println("URL=" + url);
 				schema = schemaCache.get(objectClass);
 				if (schema != null) {
 					schemaCache.put(object.getClass(), schema);
@@ -71,9 +72,11 @@ public class AttributeEditorFactory {
 				} else if (localName.equals("attribute")) {
 					Item item = new Item(Type.ATTRIBUTE, attributes.getValue("name"), objectClass.getField(attributes.getValue("field")));
 					addItem(item);
+					System.out.println(item);
 				} else if (localName.equals("limits")) {
 					Item item = new Item(Type.LIMIT, null, objectClass.getField(attributes.getValue("field")));
 					addItem(item);
+					System.out.println(item);
 				}
 			} catch (SecurityException e) {
 				throw new SAXException(e);

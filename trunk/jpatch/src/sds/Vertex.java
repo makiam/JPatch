@@ -121,7 +121,7 @@ public class Vertex {
 	void computeDerivedPosition() {
 		switch (stencilType) {
 		case POINT:
-			if (sharpness.get() > 0) {
+			if (stencil[0].sharpness.get() > 0) {
 				position.set(stencil[0].pos);
 			} else {
 				final double k = 1.0 / (valence * valence);
@@ -303,6 +303,11 @@ public class Vertex {
 			stencil[i++] = edge.pair.vertex;
 		}
 		vertexPoint.setStencil(POINT, n, stencil);
+		sharpness.addAttributeListener(new AttributeListener() {
+			public void attributeChanged(Attribute attribute) {
+				vertexPoint.sharpness.set(Math.max(0, sharpness.get() - 1));
+			}
+		});
 //		vertexPoint.sharpness.set(Integer.MAX_VALUE);
 	}
 	
@@ -351,6 +356,7 @@ public class Vertex {
 	}
 	
 	public String toString() {
+		if (true) return "Vertex";
 		StringBuilder sb = new StringBuilder();
 		sb.append("v").append(num).append(" e=").append(edge).append(" p=").append(position).append(" el:");
 		for (HalfEdge e : edgeIterable) {

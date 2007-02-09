@@ -40,6 +40,14 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 	public static enum Type { ATTRIBUTE, LIMIT }
 	
 	public AbstractAttributeEditor(Object object, Item[][] items) {
+		System.out.println("new AbstractAttributeEditor(" + object + ", " + items);
+		System.out.println("items:");
+		for (int i = 0; i < items.length; i++) {
+			for (int j = 0; j < items[i].length; j++) {
+				System.out.println(items[i][j]);
+			}
+			System.out.println();
+		}
 		for (int section = 0; section < items.length; section++) {
 			beginSection();
 			for (int item = 0; item < items[section].length; item++) {
@@ -75,7 +83,9 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 	
 	public void addAttribute(String name, Object attribute) {
 		assert container != null : "addAttribute called outside a section.";
+		System.out.println("addAttribute(" + name + ", " + attribute + ")");
 		if (attribute instanceof Attribute.Tuple3) {
+			System.out.println("*");
 			addTuple(container, name, (Attribute.Tuple3) attribute);
 		} else if (attribute instanceof Attribute.Tuple2) {
 			addTuple(container, name, (Attribute.Tuple2) attribute);	
@@ -163,6 +173,7 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 	}
 	
 	protected void addTuple(Container c, String name, Attribute.Tuple3 a) {
+		System.out.println("addTuple(" + c + ", " + name + ", " + a);
 		c.add(new JLabel(name));
 		JComponent box = new ExpandableFormRow();
 		box.setOpaque(false);

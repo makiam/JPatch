@@ -11,6 +11,7 @@ import javax.vecmath.Point3d;
 import jpatch.boundary.Main;
 import jpatch.boundary.Viewport;
 import jpatch.entity.ControlPoint;
+import jpatch.entity.TransformNode;
 
 import sds.*;
 
@@ -51,6 +52,9 @@ public class MoveVertexTool implements JPatchTool {
 				if (vertex != null) {
 					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, vertex);
 					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
+					Main.getInstance().setSelectedObject(vertex);
+				} else {
+					Main.getInstance().setSelectedObject(null);
 				}
 			}
 		}
@@ -69,25 +73,23 @@ public class MoveVertexTool implements JPatchTool {
 		private Viewport viewport;
 		private Vertex vertex;
 		Point3d p = new Point3d();
-		Point3d pos = new Point3d();
-		Point3d limit = new Point3d();
+//		Point3d pos = new Point3d();
+//		Point3d limit = new Point3d();
 		
 		MoveVertexMouseMotionListener(Viewport viewport, Vertex vertex) {
 			this.viewport = viewport;
 			this.vertex = vertex;
-			vertex.referencePosition.get(pos);
-			vertex.limitPoint.position.get(limit);
+			vertex.referencePosition.get(p);
 		}
 		
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			vertex.limitPoint.position.get(p);
 			viewport.getMatrix().transform(p);
 			viewport.get3DPosition(e.getX(), e.getY(), p);
-			p.sub(limit);
-			double n = vertex.valence();
-			p.scale((n + 5) / n);
-			p.add(pos);
+//			p.sub(limit);
+//			double n = vertex.valence();
+//			p.scale((n + 5) / n);
+//			p.add(pos);
 			vertex.referencePosition.set(p);
 			Main.getInstance().getActiveSds().rethinkSlates();
 			viewport.getComponent().repaint();	// FIXME for synchronized viewports
