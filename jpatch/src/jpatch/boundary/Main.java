@@ -323,11 +323,11 @@ public class Main {
 					activeViewport = viewportNumber;
 					validateActiveViewport();
 					screen.paintBorder(screen.getGraphics());
-					if (e.getClickCount() == 2 || viewInspector.getObject() instanceof Viewport) {
+//					if (e.getClickCount() == 2 || viewInspector.getObject() instanceof Viewport) {
 						if (viewInspector.getObject() != viewports[activeViewport]) {
 							viewInspector.setObject(viewports[activeViewport]);
 						}
-					}
+//					}
 				}
 			});
 		}
@@ -509,6 +509,10 @@ public class Main {
 	
 	public void repaintTree() {
 		tree.repaint();
+	}
+	
+	public void setSelectedObject(Object object) {
+		selectionInspector.setObject(object);
 	}
 	
 	private class Screen extends JComponent {

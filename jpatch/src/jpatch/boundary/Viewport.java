@@ -194,7 +194,7 @@ public abstract class Viewport extends AbstractNamedObject {
 		for (Face face : sds.faceList) {
 			for (HalfEdge edge : face.getEdges()) {
 				Vertex vertex = edge.getFirstVertex();
-				vertex.limitPoint.position.get(p0);
+				vertex.referencePosition.get(p0);
 				matrix.transform(p0);
 				double dx = x - p0.x;
 				double dy = y - p0.y;
@@ -206,6 +206,11 @@ public abstract class Viewport extends AbstractNamedObject {
 			}
 		}
 		return hit;
+	}
+	
+	@Override
+	public String toString() {
+		return name.get();
 	}
 	
 	protected void computeMatrices() {

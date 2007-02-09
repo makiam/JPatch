@@ -25,6 +25,7 @@ import java.awt.*;
 import javax.swing.*;
 
 import jpatch.entity.*;
+import sun.management.snmp.util.JvmContextFactory;
 
 /**
  * @author sascha
@@ -36,12 +37,12 @@ public class Inspector {
 	private final JPanel panel = new JPanel(new BorderLayout());
 	private final JLabel label = new JLabel();
 	private Component component;
-	private AbstractNamedObject object;
-	private AttributeListener attributeListener = new AttributeListener() {
-		public void attributeChanged(Attribute attribute) {
-			setLabelText((Attribute.Name) attribute);
-		}
-	};
+	private Object object;
+//	private AttributeListener attributeListener = new AttributeListener() {
+//		public void attributeChanged(Attribute attribute) {
+//			setLabelText((Attribute.Name) attribute);
+//		}
+//	};
 	
 	public Inspector() {
 		if (COLOR == null) {
@@ -54,26 +55,23 @@ public class Inspector {
 		panel.add(label, BorderLayout.NORTH);
 	}
 	
-	public void setObject(AbstractNamedObject jpatchObject) {
+	public void setObject(Object object) {
 		if (component != null) {
-			panel.remove(1);
+			panel.remove(component);
 		}
+//		if (object != null) {
+//			object.name.removeAttributeListener(attributeListener);
+//		}
+		this.object = object;
 		if (object != null) {
-			object.name.removeAttributeListener(attributeListener);
-		}
-		object = jpatchObject;
-		if (object != null) {
-			setLabelText(object.name);
-			object.name.addAttributeListener(attributeListener);
-		}
-		component = null;
-		if (jpatchObject instanceof Viewport) {
-			component = AttributeEditorFactory.INSTANCE.createEditorFor(jpatchObject);
-		}
-		
-		
-		if (component != null) {
+//			setLabelText(object.name);
+//			object.name.addAttributeListener(attributeListener);
+			label.setText(object.toString() + object.hashCode());
+			component = AttributeEditorFactory.INSTANCE.createEditorFor(object);
 			panel.add(component, BorderLayout.CENTER);
+		} else {
+			label.setText("");
+			component = null;
 		}
 	}
 	
@@ -81,7 +79,7 @@ public class Inspector {
 		return panel;
 	}
 	
-	public JPatchObject getObject() {
+	public Object getObject() {
 		return object;
 	}
 	

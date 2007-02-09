@@ -911,7 +911,6 @@ public class ViewportGl extends Viewport {
 	}
 	
 	private void drawSds3(Sds sds) {
-		gl.glPointSize(5);
 		gl.glEnable(GL_LIGHTING);
 		gl.glShadeModel(GL_SMOOTH);
 		gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -973,21 +972,21 @@ public class ViewportGl extends Viewport {
 		}
 		
 		
-//		gl.glColor3f(1, 1, 1);
-//		gl.glBegin(GL_LINES);
-//		for (Face face : sds.faceList) {
-//			for (HalfEdge edge : face.getEdges()) {
-//				if (edge.isMaster()) {
-//					edge.getFirstVertex().referencePosition.get(p0);
-//					edge.getSecondVertex().referencePosition.get(p1);
-//					modelView.transform(p0);
-//					modelView.transform(p1);
-//					gl.glVertex3f(p0.x, p0.y, p0.z);
-//					gl.glVertex3f(p1.x, p1.y, p1.z);
-//				}
-//			}
-//		}
-//		gl.glEnd();
+		gl.glColor3f(1, 1, 1);
+		gl.glBegin(GL_LINES);
+		for (Face face : sds.faceList) {
+			for (HalfEdge edge : face.getEdges()) {
+				if (edge.isMaster()) {
+					edge.getFirstVertex().referencePosition.get(p0);
+					edge.getSecondVertex().referencePosition.get(p1);
+					modelView.transform(p0);
+					modelView.transform(p1);
+					gl.glVertex3f(p0.x, p0.y, p0.z);
+					gl.glVertex3f(p1.x, p1.y, p1.z);
+				}
+			}
+		}
+		gl.glEnd();
 		
 		
 //		gl.glColor3f(1, 1, 1);
@@ -1010,27 +1009,30 @@ public class ViewportGl extends Viewport {
 		
 		
 		gl.glColor3f(1, 1, 0);
-//		gl.glBegin(GL_POINTS);
-//		for (Face face : sds.faceList) {
-//			for (HalfEdge edge : face.getEdges()) {
-//				if (edge.isMaster()) {
-//					edge.getFirstVertex().referencePosition.get(p0);
-//					modelView.transform(p0);
-//					gl.glVertex3f(p0.x, p0.y, p0.z);
-//				}
-//			}
-//		}
-//		gl.glEnd();
-		
 		gl.glBegin(GL_POINTS);
 		for (Face face : sds.faceList) {
 			for (HalfEdge edge : face.getEdges()) {
-				edge.getFirstVertex().position.get(p0);
-				modelView.transform(p0);
-				gl.glVertex3f(p0.x, p0.y, p0.z);
+				if (edge.isMaster()) {
+					edge.getFirstVertex().referencePosition.get(p0);
+					modelView.transform(p0);
+					gl.glVertex3f(p0.x, p0.y, p0.z);
+					edge.getSecondVertex().referencePosition.get(p0);
+					modelView.transform(p0);
+					gl.glVertex3f(p0.x, p0.y, p0.z);
+				}
 			}
 		}
 		gl.glEnd();
+		
+//		gl.glBegin(GL_POINTS);
+//		for (Face face : sds.faceList) {
+//			for (HalfEdge edge : face.getEdges()) {
+//				edge.getFirstVertex().position.get(p0);
+//				modelView.transform(p0);
+//				gl.glVertex3f(p0.x, p0.y, p0.z);
+//			}
+//		}
+//		gl.glEnd();
 		
 //		gl.glDisable(GL_DEPTH_TEST);
 //		gl.glEnable(GL_BLEND);
