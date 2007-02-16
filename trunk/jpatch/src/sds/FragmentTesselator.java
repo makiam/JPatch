@@ -251,7 +251,7 @@ public class FragmentTesselator {
 //			vb[23][0] =-2; vb[23][1] = 0; vb[23][2] = 0;
 //			vb[24][0] =-2; vb[24][1] = 1; vb[24][2] = 0;
 			sds.subdivide();
-			Vertex vertex = sds.topLevelVertices[0];
+			TopLevelVertex vertex = sds.topLevelVertices[0];
 			final int valence = vertex.valence();
 			vertex.initFragment(valence, kernel.getVertexBuffer(0));
 			

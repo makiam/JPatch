@@ -15,7 +15,7 @@ import javax.vecmath.*;
  */
 public class Sds {
 	private Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
-	public List<Vertex> vertexList = new ArrayList<Vertex>();
+	public List<TopLevelVertex> vertexList = new ArrayList<TopLevelVertex>();
 	public List<Face> faceList = new LinkedList<Face>();
 //	public final Vertex[] topLevelVertices;
 	
@@ -51,7 +51,7 @@ public class Sds {
 			line = reader.readLine();
 //			System.out.println(line);
 			tokens = line.trim().split("\\s+");
-			Vertex vertex = new Vertex(Double.parseDouble(tokens[0]), Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
+			TopLevelVertex vertex = new TopLevelVertex(Double.parseDouble(tokens[0]), Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
 			vertexList.add(vertex);
 		}
 		
@@ -176,7 +176,7 @@ public class Sds {
 				}
 			}
 		}
-		for (Vertex vertex : vertexList) {
+		for (TopLevelVertex vertex : vertexList) {
 			vertex.bindVertexPoint();
 		}
 //		for (Vertex vertex : vertexList) {
@@ -215,7 +215,7 @@ public class Sds {
 				}
 			}
 		}
-		for (Vertex vertex : vertexList) {
+		for (TopLevelVertex vertex : vertexList) {
 			vertex.vertexPoint.computeDerivedPosition();
 		}
 //		for (Vertex vertex : vertexList) {
@@ -264,7 +264,7 @@ public class Sds {
 //	}
 	
 	private void validateVertices() {
-		for (Vertex vertex : vertexList) {
+		for (TopLevelVertex vertex : vertexList) {
 			vertex.validate();
 		}
 	}
@@ -279,13 +279,13 @@ public class Sds {
 			System.out.println();
 		}
 		System.out.println("Vertices:");
-		for (Vertex vertex : vertexList) {
+		for (TopLevelVertex vertex : vertexList) {
 			System.out.println(vertex + "  valence" + vertex.valence());
 		}
 	}
 	
 	public void verify() {
-		Set<Vertex> vertexSet = new HashSet<Vertex>(vertexList);
+		Set<TopLevelVertex> vertexSet = new HashSet<TopLevelVertex>(vertexList);
 		System.out.println(vertexList.size() + " " + vertexSet.size());
 		for (Face face : faceList) {
 			for (HalfEdge edge : face.getEdges()) {
@@ -323,7 +323,7 @@ public class Sds {
 		faceList.add(face);
 	}
 	
-	private Face createFace(Vertex[] vertices) {
+	private Face createFace(TopLevelVertex[] vertices) {
 		Face face = new Face(vertices.length);
 		HalfEdge start = createEdge(face, vertices[0], vertices[1]);
 		HalfEdge prev = start;
@@ -340,7 +340,7 @@ public class Sds {
 		return face;
 	}
 	
-	private HalfEdge createEdge(Face face, Vertex vertex0, Vertex vertex1) {
+	private HalfEdge createEdge(Face face, TopLevelVertex vertex0, TopLevelVertex vertex1) {
 		EdgeKey key = new EdgeKey(vertex1, vertex0);
 		HalfEdge neighbor = edgeMap.get(key);
 		HalfEdge edge;
@@ -359,11 +359,11 @@ public class Sds {
 	}
 	
 	private static final class EdgeKey {
-		private final Vertex firstVertex;
-		private final Vertex secondVertex;
+		private final TopLevelVertex firstVertex;
+		private final TopLevelVertex secondVertex;
 		private final int hashCode;
 		
-		private EdgeKey(Vertex firstVertex, Vertex secondVertex) {
+		private EdgeKey(TopLevelVertex firstVertex, TopLevelVertex secondVertex) {
 			this.firstVertex = firstVertex;
 			this.secondVertex = secondVertex;
 			hashCode = (System.identityHashCode(firstVertex) << 1) ^ System.identityHashCode(secondVertex);

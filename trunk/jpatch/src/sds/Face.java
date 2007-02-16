@@ -18,7 +18,7 @@ public class Face {
 	public final int sides;
 	private final double recSides;
 	private final Slate[] slates;
-	Vertex facePoint = new Vertex();
+	Level2Vertex facePoint;
 	HalfEdge edge;
 	final Iterable<HalfEdge> edgeIterable = new Iterable<HalfEdge>() {
 		public Iterator<HalfEdge> iterator() {
@@ -48,17 +48,32 @@ public class Face {
 	}
 	
 	void bindFacePoint() {
-		final Vertex[] stencil = new Vertex[sides];
+		final TopLevelVertex[] stencil = new TopLevelVertex[sides];
 		int i = 0;
 		for (HalfEdge edge : getEdges()) {
 			stencil[i++] = edge.vertex;
 		}
-		facePoint.setStencil(Vertex.FACE, sides, stencil);
+		facePoint = new Level2Vertex() {
+			@Override
+			public void computeDerivedPosition() {
+				double k = 1.0 / sides;
+				double x = stencil[0].pos.x;
+				double y = stencil[0].pos.y;
+				double z = stencil[0].pos.z;
+				for (int i = 1; i < stencil.length; i++) {
+					x += stencil[i].pos.x;
+					y += stencil[i].pos.y;
+					z += stencil[i].pos.z;
+				}
+				position.set(x * k, y * k, z * k);
+			}
+			
+		};
 	}
 	
 	void setupSlates() {
 		Point3d[][] p = new Point3d[4][];
-		Vertex[] v = new Vertex[4];
+		AbstractVertex[] v = new AbstractVertex[4];
 		int s = 0;
 		for (HalfEdge edge : getEdges()) {
 			v[0] = facePoint;

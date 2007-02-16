@@ -13,38 +13,55 @@ import jpatch.entity.Attribute;
  *
  */
 public class HalfEdge {
-	final Vertex vertex;
+	final TopLevelVertex vertex;
 	final HalfEdge pair;
 	Face face;
 	HalfEdge prev;
 	HalfEdge next;
-	Vertex edgePoint;
+	Level2Vertex edgePoint;
 	public final Attribute.Integer sharpness;
 	
-	private HalfEdge(Vertex vertex, HalfEdge neighbor) {
+	private HalfEdge(TopLevelVertex vertex, HalfEdge neighbor, Attribute.Integer sharpness) {
 		this.vertex = vertex;
 		this.pair = neighbor;
-		sharpness = isMaster() ? new Attribute.Integer(0) : null;
+		this.sharpness = sharpness;
 	}
 	
-	public HalfEdge(Vertex firstVertex, Vertex secondVertex) {
+	public HalfEdge(TopLevelVertex firstVertex, TopLevelVertex secondVertex) {
+		sharpness = new Attribute.Integer(0);
 		vertex = firstVertex;
-		edgePoint = new Vertex();
-		pair = new HalfEdge(secondVertex, this);
+		pair = new HalfEdge(secondVertex, this, sharpness);
 		pair.edgePoint = edgePoint;
-		sharpness = isMaster() ? new Attribute.Integer(0) : null;
 	}
 	
 	void bindEdgePoint() {
-		final Vertex[] stencil = new Vertex[] { vertex, pair.vertex, face.facePoint, pair.face.facePoint };
-		edgePoint.setStencil(Vertex.EDGE, 0, stencil);
+		final AbstractVertex[] stencil = new AbstractVertex[] { vertex, pair.vertex, face.facePoint, pair.face.facePoint };
+		edgePoint = new Level2Vertex() {
+			@Override
+			public void computeDerivedPosition() {
+				if (HalfEdge.this.sharpness.get() > 0) {
+					position.set(
+							(stencil[0].pos.x + stencil[1].pos.x) * 0.5,
+							(stencil[0].pos.y + stencil[1].pos.y) * 0.5,
+							(stencil[0].pos.z + stencil[1].pos.z) * 0.5
+					);
+				} else {
+					position.set(
+							(stencil[0].pos.x + stencil[1].pos.x + stencil[2].pos.x + stencil[3].pos.x) * 0.25,
+							(stencil[0].pos.y + stencil[1].pos.y + stencil[2].pos.y + stencil[3].pos.y) * 0.25,
+							(stencil[0].pos.z + stencil[1].pos.z + stencil[2].pos.z + stencil[3].pos.z) * 0.25
+					);
+				}
+			}
+		};
+		pair.edgePoint = this.edgePoint;
 	}
 	
-	public Vertex getFirstVertex() {
+	public TopLevelVertex getFirstVertex() {
 		return vertex;
 	}
 	
-	public Vertex getSecondVertex() {
+	public TopLevelVertex getSecondVertex() {
 		return pair.vertex;
 	}
 	
@@ -78,7 +95,7 @@ public class HalfEdge {
 		return false;
 	}
 	
-	public String toString() {
-		return System.identityHashCode(this) + " " + (isMaster() ? vertex.num + "+" + pair.vertex.num : vertex.num + "-" + pair.vertex.num);
-	}
+//	public String toString() {
+//		return System.identityHashCode(this) + " " + (isMaster() ? vertex.num + "+" + pair.vertex.num : vertex.num + "-" + pair.vertex.num + " s=" + sharpness);
+//	}
 }
