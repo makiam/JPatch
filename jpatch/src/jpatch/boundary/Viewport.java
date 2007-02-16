@@ -1,6 +1,7 @@
 package jpatch.boundary;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
 
 import javax.vecmath.*;
 
@@ -182,28 +183,6 @@ public abstract class Viewport extends AbstractNamedObject {
 				}
 				cp = cp.getNextNonHook();
 			} while (cp != null && ! cp.isLoop());
-		}
-		return hit;
-	}
-	
-	public Vertex getVertexAt(float x, float y, Sds sds) {
-		x -= (component.getWidth() >> 1);
-		y = (component.getHeight() >> 1) - y;
-		Vertex hit = null;
-		double min = MIN_DIST_SQ;
-		for (Face face : sds.faceList) {
-			for (HalfEdge edge : face.getEdges()) {
-				Vertex vertex = edge.getFirstVertex();
-				vertex.referencePosition.get(p0);
-				matrix.transform(p0);
-				double dx = x - p0.x;
-				double dy = y - p0.y;
-				double distanceSq = dx * dx + dy * dy;
-				if (distanceSq < min) {
-					min = distanceSq;
-					hit = vertex;
-				}
-			}
 		}
 		return hit;
 	}

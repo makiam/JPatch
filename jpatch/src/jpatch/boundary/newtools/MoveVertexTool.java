@@ -48,11 +48,14 @@ public class MoveVertexTool implements JPatchTool {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON1) {
-				Vertex vertex = viewport.getVertexAt(e.getX(), e.getY(), Main.getInstance().getActiveSds());
+				TopLevelVertex vertex = MouseSelector.getVertexAt(viewport, e.getX(), e.getY(), Main.getInstance().getActiveSds());
+				HalfEdge edge = MouseSelector.getEdgeAt(viewport, e.getX(), e.getY(), Main.getInstance().getActiveSds());
 				if (vertex != null) {
 					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, vertex);
 					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 					Main.getInstance().setSelectedObject(vertex);
+				} else if (edge != null) {
+					Main.getInstance().setSelectedObject(edge);
 				} else {
 					Main.getInstance().setSelectedObject(null);
 				}
@@ -71,12 +74,12 @@ public class MoveVertexTool implements JPatchTool {
 	
 	private static class MoveVertexMouseMotionListener extends MouseMotionAdapter {
 		private Viewport viewport;
-		private Vertex vertex;
+		private TopLevelVertex vertex;
 		Point3d p = new Point3d();
 //		Point3d pos = new Point3d();
 //		Point3d limit = new Point3d();
 		
-		MoveVertexMouseMotionListener(Viewport viewport, Vertex vertex) {
+		MoveVertexMouseMotionListener(Viewport viewport, TopLevelVertex vertex) {
 			this.viewport = viewport;
 			this.vertex = vertex;
 			vertex.referencePosition.get(p);
