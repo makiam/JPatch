@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<attributeEditor class="Vertex">
-	<section>
-		<attribute name="Position" field="position" />
-		<attribute name="Ref.Pos" field="referencePosition" />
-	</section>
-	<attribute name="Corner" field="sharpness" />
-</attributeEditor>
