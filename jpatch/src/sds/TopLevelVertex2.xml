@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<attributeEditor class="TopLevelVertex">
+	<attribute name="Position" field="position" />
+	<attribute name="Ref.Pos" field="referencePosition" />
+	<attribute name="Corner" field="sharpness" />
+</attributeEditor>

@@ -8,7 +8,7 @@ import javax.vecmath.*;
 
 public class Slate {
 	private static int count = 0;
-	final Vertex[] corners;
+	final AbstractVertex[] corners;
 	final Point3d[][] fans = new Point3d[4][];
 	final Point3f[][] screenFans = new Point3f[4][];
 	public final Point3f[] limitPoints = new Point3f[4];
@@ -19,7 +19,7 @@ public class Slate {
 	int subdivLevel = -1;
 	public final int num = count++;
 	
-	Slate(Point3d[][] fans, Vertex[] corners) {
+	Slate(Point3d[][] fans, AbstractVertex[] corners) {
 		this.corners = corners.clone();
 		this.fans[0] = fans[0].clone();
 		this.fans[1] = fans[1].clone();
