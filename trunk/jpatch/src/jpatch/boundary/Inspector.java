@@ -25,6 +25,7 @@ import java.awt.*;
 import javax.swing.*;
 
 import jpatch.entity.*;
+import sds.HalfEdge;
 import sun.management.snmp.util.JvmContextFactory;
 
 /**
@@ -64,11 +65,16 @@ public class Inspector {
 //		}
 		this.object = object;
 		if (object != null) {
+			if (object instanceof HalfEdge) {
+				HalfEdge edge = (HalfEdge) object;
+				System.out.println("EDGE: master=" + edge.isMaster() + " sharpness=" + edge.sharpness);
+			}
 //			setLabelText(object.name);
 //			object.name.addAttributeListener(attributeListener);
 			label.setText(object.toString() + object.hashCode());
 			component = AttributeEditorFactory.INSTANCE.createEditorFor(object);
 			panel.add(component, BorderLayout.CENTER);
+			
 		} else {
 			label.setText("");
 			component = null;

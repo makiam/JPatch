@@ -37,7 +37,7 @@ public class ViewportGl extends Viewport {
 	private final Vector3f v = new Vector3f();
 	
 //	private final FragmentTesselator kernel = new FragmentTesselator();
-	private static final SlateTesselator2 slateTesselator = new SlateTesselator2();
+	private static final Dicer slateTesselator = new Dicer();
 	private int subdivLevel = 4;
 	
 	private long time;
@@ -894,7 +894,7 @@ public class ViewportGl extends Viewport {
 		gl.glPointSize(8);
 		int i = 0;
 		long total = 0;
-		for (Vertex vertex : sds.topLevelVertices) {
+		for (TopLevelVertex vertex : sds.topLevelVertices) {
 			if (vertex.isBoundary()) {
 				continue;
 			}
@@ -1100,7 +1100,7 @@ public class ViewportGl extends Viewport {
 			level = 2;
 		}
 //		System.out.println("Slate=" + slate + " level=" + level);
-		int count = slateTesselator.tesselate(slate, level);
+		int count = slateTesselator.dice(slate, level);
 		
 		int dim = (1 << (level - 1));
 //		count = (dim - 1) * (dim - 1);
