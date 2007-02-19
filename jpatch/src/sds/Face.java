@@ -48,22 +48,16 @@ public class Face {
 	}
 	
 	void bindFacePoint() {
-		final TopLevelVertex[] stencil = new TopLevelVertex[sides];
-		int i = 0;
-		for (HalfEdge edge : getEdges()) {
-			stencil[i++] = edge.vertex;
-		}
 		facePoint = new Level2Vertex() {
 			@Override
 			public void computeDerivedPosition() {
 				double k = 1.0 / sides;
-				double x = stencil[0].pos.x;
-				double y = stencil[0].pos.y;
-				double z = stencil[0].pos.z;
-				for (int i = 1; i < stencil.length; i++) {
-					x += stencil[i].pos.x;
-					y += stencil[i].pos.y;
-					z += stencil[i].pos.z;
+				double x = 0, y = 0, z = 0;
+				for (HalfEdge edge : getEdges()) {
+					Point3d p = edge.vertex.pos;
+					x += p.x;
+					y += p.y;
+					z += p.z;
 				}
 				position.set(x * k, y * k, z * k);
 			}

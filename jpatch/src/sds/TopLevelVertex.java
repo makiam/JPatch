@@ -184,13 +184,13 @@ public class TopLevelVertex extends AbstractVertex {
 	
 	void bindVertexPoint() {
 		final int valence = valence();
-		final int stencilSize = valence * 2;
-		final AbstractVertex[] stencil = new AbstractVertex[stencilSize];
-		int i = 0;
-		for (HalfEdge edge : getAdjacentEdges()) {
-			stencil[i++] = edge.face.facePoint;
-			stencil[i++] = edge.pair.vertex;
-		}
+//		final int stencilSize = valence * 2;
+//		final AbstractVertex[] stencil = new AbstractVertex[stencilSize];
+//		int i = 0;
+//		for (HalfEdge edge : getAdjacentEdges()) {
+//			stencil[i++] = edge.face.facePoint;
+//			stencil[i++] = edge.pair.vertex;
+//		}
 		vertexPoint = new Level2Vertex() {
 			@Override
 			public void computeDerivedPosition() {
@@ -200,14 +200,22 @@ public class TopLevelVertex extends AbstractVertex {
 					} else {
 						final double k = 1.0 / (valence * valence);
 						double w = (valence - 2.0) / valence;
-						double x = stencil[0].pos.x;
-						double y = stencil[0].pos.y;
-						double z = stencil[0].pos.z;
-						for (int i = 1; i < stencil.length; i++) {
-							x += stencil[i].pos.x;
-							y += stencil[i].pos.y;
-							z += stencil[i].pos.z;
+						double x = 0, y = 0, z = 0;
+						for (HalfEdge edge : getAdjacentEdges()) {
+							Point3d p = edge.face.facePoint.pos;
+							x += p.x;
+							y += p.y;
+							z += p.z;
+							p = edge.pair.vertex.pos;
+							x += p.x;
+							y += p.y;
+							z += p.z;
 						}
+//						for (int i = 1; i < stencil.length; i++) {
+//							x += stencil[i].pos.x;
+//							y += stencil[i].pos.y;
+//							z += stencil[i].pos.z;
+//						}
 						position.set(x * k + TopLevelVertex.this.pos.x * w, y * k + TopLevelVertex.this.pos.y * w, z * k + TopLevelVertex.this.pos.z * w);
 					}
 				}
