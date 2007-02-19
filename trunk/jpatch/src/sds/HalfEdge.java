@@ -35,21 +35,24 @@ public class HalfEdge {
 	}
 	
 	void bindEdgePoint() {
-		final AbstractVertex[] stencil = new AbstractVertex[] { vertex, pair.vertex, face.facePoint, pair.face.facePoint };
 		edgePoint = new Level2Vertex() {
 			@Override
 			public void computeDerivedPosition() {
+				Point3d p0 = vertex.pos;
+				Point3d p1 = pair.vertex.pos;
 				if (HalfEdge.this.sharpness.get() > 0) {
 					position.set(
-							(stencil[0].pos.x + stencil[1].pos.x) * 0.5,
-							(stencil[0].pos.y + stencil[1].pos.y) * 0.5,
-							(stencil[0].pos.z + stencil[1].pos.z) * 0.5
+							(p0.x + p1.x) * 0.5,
+							(p0.y + p1.y) * 0.5,
+							(p0.z + p1.z) * 0.5
 					);
 				} else {
+					Point3d p2 = face.facePoint.pos;
+					Point3d p3 = pair.face.facePoint.pos;
 					position.set(
-							(stencil[0].pos.x + stencil[1].pos.x + stencil[2].pos.x + stencil[3].pos.x) * 0.25,
-							(stencil[0].pos.y + stencil[1].pos.y + stencil[2].pos.y + stencil[3].pos.y) * 0.25,
-							(stencil[0].pos.z + stencil[1].pos.z + stencil[2].pos.z + stencil[3].pos.z) * 0.25
+							(p0.x + p1.x + p2.x + p3.x) * 0.25,
+							(p0.y + p1.y + p2.y + p3.y) * 0.25,
+							(p0.z + p1.z + p2.z + p3.z) * 0.25
 					);
 				}
 			}
@@ -74,7 +77,7 @@ public class HalfEdge {
 	}
 	
 	public boolean isMaster() {
-		return face != null && (pair.face == null || vertex.hashCode() < pair.vertex.hashCode());
+		return vertex.hashCode() < pair.vertex.hashCode();
 	}
 	
 	public HalfEdge getMaster() {
