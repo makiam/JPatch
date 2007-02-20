@@ -48,7 +48,7 @@ public class MouseSelector {
 		Line2D.Double line = new Line2D.Double();
 		for (Face face : sds.faceList) {
 			for (HalfEdge edge : face.getEdges()) {
-				if (edge.isMaster()) {
+				if (edge.isPrimary()) {
 					edge.getFirstVertex().referencePosition.get(p0);
 					edge.getSecondVertex().referencePosition.get(p1);
 					matrix.transform(p0);

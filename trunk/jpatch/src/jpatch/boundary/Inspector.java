@@ -67,7 +67,7 @@ public class Inspector {
 		if (object != null) {
 			if (object instanceof HalfEdge) {
 				HalfEdge edge = (HalfEdge) object;
-				System.out.println("EDGE: master=" + edge.isMaster() + " sharpness=" + edge.sharpness);
+				System.out.println("EDGE: master=" + edge.isPrimary() + " sharpness=" + edge.sharpness);
 			}
 //			setLabelText(object.name);
 //			object.name.addAttributeListener(attributeListener);

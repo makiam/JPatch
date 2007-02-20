@@ -20,6 +20,7 @@ import jpatch.boundary.settings.RealtimeRendererSettings;
 import jpatch.boundary.settings.Settings;
 import jpatch.entity.*;
 import sds.*;
+import sds.test.FragmentTesselator;
 
 public class ViewportGl extends Viewport {
 	
@@ -804,7 +805,7 @@ public class ViewportGl extends Viewport {
 		gl.glBegin(GL_LINES);
 		for (Face face : sds.faceList) {
 			for (HalfEdge edge : face.getEdges()) {
-				if (edge.isMaster()) {
+				if (edge.isPrimary()) {
 					p.set(edge.getFirstVertex().getPosition());
 					matrix.transform(p);
 					gl.glVertex3d(p.x, p.y, p.z);
@@ -976,7 +977,7 @@ public class ViewportGl extends Viewport {
 		gl.glBegin(GL_LINES);
 		for (Face face : sds.faceList) {
 			for (HalfEdge edge : face.getEdges()) {
-				if (edge.isMaster()) {
+				if (edge.isPrimary()) {
 					edge.getFirstVertex().referencePosition.get(p0);
 					edge.getSecondVertex().referencePosition.get(p1);
 					modelView.transform(p0);
@@ -1012,7 +1013,7 @@ public class ViewportGl extends Viewport {
 		gl.glBegin(GL_POINTS);
 		for (Face face : sds.faceList) {
 			for (HalfEdge edge : face.getEdges()) {
-				if (edge.isMaster()) {
+				if (edge.isPrimary()) {
 					edge.getFirstVertex().referencePosition.get(p0);
 					modelView.transform(p0);
 					gl.glVertex3f(p0.x, p0.y, p0.z);
