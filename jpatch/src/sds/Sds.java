@@ -171,7 +171,7 @@ public class Sds {
 		}
 		for (Face face : faceList) {
 			for (HalfEdge edge : face.getEdges()) {
-				if (edge.isMaster()) {
+				if (edge.isPrimary()) {
 					edge.bindEdgePoint();
 				}
 			}
@@ -210,7 +210,7 @@ public class Sds {
 		}
 		for (Face face : faceList) {
 			for (HalfEdge edge : face.getEdges()) {
-				if (edge.isMaster()) {
+				if (edge.isPrimary()) {
 					edge.edgePoint.computeDerivedPosition();
 				}
 			}
