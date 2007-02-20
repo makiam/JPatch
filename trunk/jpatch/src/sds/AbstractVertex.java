@@ -18,16 +18,13 @@ public abstract class AbstractVertex {
 	public AbstractVertex() {
 		position.addAttributeListener(new AttributeListener() {
 			public void attributeChanged(Attribute attribute) {
-//				System.out.println(ControlPoint.this + " position changed");
 				position.get(pos);
 				refPos.set(pos);
 				if (inverseInvalid) {
 					computeInverseTransform();
 				}
 				invTransform.transform(refPos);
-//				referencePosition.setValueAdjusting(true);
 				referencePosition.set(refPos);
-//				referencePosition.setValueAdjusting(false);
 			}
 		});
 		referencePosition.addAttributeListener(new AttributeListener() {
@@ -35,9 +32,7 @@ public abstract class AbstractVertex {
 				referencePosition.get(refPos);
 				pos.set(refPos);
 				transform.transform(pos);
-//				position.setValueAdjusting(true);
 				position.set(pos);
-//				position.setValueAdjusting(false);
 			}
 		});
 	}
