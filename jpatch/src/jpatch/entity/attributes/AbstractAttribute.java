@@ -1,8 +1,11 @@
 package jpatch.entity.attributes;
 
-public abstract class AbstractAttribute implements Comparable<AbstractAttribute>, AttributeListener {
+import java.lang.reflect.Array;
+import java.util.*;
+
+public abstract class AbstractAttribute<T extends Constraint> implements AttributeListener {
 	private AttributeListener[] attributeListeners;
-	private Constraint[] constraints;
+	private T[] constraints;
 	
 	/**
      * Adds a AttributeListener to this attribute.
@@ -52,7 +55,7 @@ public abstract class AbstractAttribute implements Comparable<AbstractAttribute>
     	}
     }
     
-    public void addConstraint(Constraint c) {
+    public void addConstraint(T c) {
     	int i = 0;
     	while (i < constraints.length && c.priority.getInt() < constraints[i].priority.getInt()) {
     		if (constraints[i] == c) {
@@ -60,20 +63,21 @@ public abstract class AbstractAttribute implements Comparable<AbstractAttribute>
     		}
     		i++;
     	}
-    	Constraint[] tmp = new Constraint[constraints.length + 1];
+    	T[] tmp = (T[]) Array.newInstance(c.getClass() , constraints.length + 1);
     	System.arraycopy(constraints, 0, tmp, 0, i);
     	tmp[i] = c;
     	System.arraycopy(constraints, i, tmp, i + 1, constraints.length - i);
+    	constraints = tmp;
     	c.priority.addAttributeListener(this);
     }
     
-    public void removeConstraint(Constraint c) {
+    public void removeConstraint(T c) {
     	int i = 0;
     	while (i < constraints.length && constraints[i] != c) {
     		i++;
     	}
     	if (i < constraints.length) {
-    		Constraint[] tmp = new Constraint[constraints.length - 1];
+    		T[] tmp = (T[]) Array.newInstance(c.getClass(), constraints.length - 1);
     	    // Copy the list up to i
     	    System.arraycopy(constraints, 0, tmp, 0, i);
     	    // Copy from one past the index, up to
@@ -88,20 +92,13 @@ public abstract class AbstractAttribute implements Comparable<AbstractAttribute>
     	}
     }
     
-//    final void performChange() {
-////   	valueAdjusting = true;
-//    	for (int i = constraints.length - 1; i >= 0; i--) {
-// 	      	constraints[i].enforceOn(this);
-//// 	      	System.out.println("enforce " + this + " " + i + " " + constraints[i]);
-// 	    }
-//	    for (int i = attributeListeners.length - 1; i >= 0; i--) {
-//	      	attributeListeners[i].attributeChanged(this);
-////	      	System.out.println("fire " + this + " " + i + " " + attributeListeners[i]);
-//	    }
-////	    valueAdjusting = false;
-//    }
+    public void attributeChanged(AbstractAttribute a) {
+    	Arrays.sort(constraints);
+    }
     
-    protected abstract void overrideValue(AbstractAttribute a);
-    
-    public abstract int compareTo(AbstractAttribute a);
+    protected void fireAttributeChanged() {
+    	for (int i = attributeListeners.length - 1; i >= 0; i--) {
+	      	attributeListeners[i].attributeChanged(this);
+	    }
+    }
 }

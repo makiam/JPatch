@@ -16,16 +16,6 @@ public class DoubleAttr extends AbstractAttribute {
 	public void setDouble(double value) {
 		this.value = value;
 	}
-
-	@Override
-	protected void overrideValue(AbstractAttribute a) {
-		value = ((DoubleAttr) a).value;
-	}
-
-	@Override
-	public int compareTo(AbstractAttribute a) {
-		return Double.compare(value, ((DoubleAttr) a).value);
-	}
 	
 	@Override
 	public String toString() {

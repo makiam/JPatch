@@ -86,3 +86,11 @@ System.out.println(new Object().getClass().getSimpleName());
 
 int[][] i = new int[5][1000];
 System.out.println(i.length + " " + i[0].length);
+
+String[] stringArray = new String[10];
+Class c = stringArray.getClass();
+
+Object test = java.lang.reflect.Array.newInstance(c, 10);
+System.out.println(c);
+System.out.println(test.getClass());
+
