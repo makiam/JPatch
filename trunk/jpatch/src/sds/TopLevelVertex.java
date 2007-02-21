@@ -101,10 +101,6 @@ public class TopLevelVertex extends AbstractVertex {
 		return i;
 	}
 	
-	public boolean isBoundary() {
-		return edge.pair.face == null;
-	}
-	
 //	public void initFragment(int valence, float[][] buffer) {
 ////		System.out.println("initfragment " + edge.vertex.num + "\t" + edge.vertex.position);
 //		Point3d p = edge.vertex.position;
