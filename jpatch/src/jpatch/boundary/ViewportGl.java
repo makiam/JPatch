@@ -20,7 +20,6 @@ import jpatch.boundary.settings.RealtimeRendererSettings;
 import jpatch.boundary.settings.Settings;
 import jpatch.entity.*;
 import sds.*;
-import sds.test.FragmentTesselator;
 
 public class ViewportGl extends Viewport {
 	
@@ -931,6 +930,9 @@ public class ViewportGl extends Viewport {
 		
 		for (Face face : sds.faceList) {
 			for (Slate slate : face.getSlates()) {
+				if (slate == null) {
+					continue;
+				}
 				slate.transform(modelView);
 				slate.project(component.getWidth() >> 1, component.getHeight() >> 1);
 //				if (slate.getSubdivisionLevel() < 0)
@@ -964,7 +966,9 @@ public class ViewportGl extends Viewport {
 //					gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 1, 0, 1 }, 0);
 //					break;
 //				}
-				drawSlate(slate);
+				if (slate != null) {
+					drawSlate(slate);
+				}
 			}
 		}
 		gl.glDisable(GL_LIGHTING);
@@ -1137,7 +1141,8 @@ public class ViewportGl extends Viewport {
 		float[][] normals = slateTesselator.getLimitNormals(level - 1);
 		gl.glBegin(GL_TRIANGLES);
 		for (int side = 0; side < 4; side++) {
-			int pairLevel = slate.getAdjacentSlate(side).getSubdivisionLevel();
+			Slate adjacentSlate = slate.getAdjacentSlate(side);
+			int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivisionLevel();
 //			if (pairLevel < 0) {
 //				pairLevel = level - 1;
 //			}
@@ -1167,7 +1172,8 @@ public class ViewportGl extends Viewport {
 		}
 		
 		for (int side = 1; side < 3; side++) {
-			int pairLevel = slate.getAdjacentSlate(side).getSubdivisionLevel();
+			Slate adjacentSlate = slate.getAdjacentSlate(side);
+			int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivisionLevel();
 			if (pairLevel > level) {
 				pairLevel = level;
 			}
