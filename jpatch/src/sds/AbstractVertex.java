@@ -37,6 +37,10 @@ public abstract class AbstractVertex {
 		});
 	}
 	
+	public int getSharpness() {
+		return sharpness.get();
+	}
+	
 	/**
 	 * Computes the inverse transformation matrix and clears
 	 * the inverseInvalid flag.

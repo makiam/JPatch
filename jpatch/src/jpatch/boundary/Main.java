@@ -256,7 +256,7 @@ public class Main {
 //			}
 //			System.exit(0);
 			
-			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/opencube.off"));
+			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/shuttle.off"));
 			activeSds.makeSlates();
 			activeSds.verify();
 //			activeSds.dump();

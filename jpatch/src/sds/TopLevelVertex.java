@@ -191,7 +191,7 @@ public class TopLevelVertex extends AbstractVertex {
 			@Override
 			public void computeDerivedPosition() {
 				if (!overridePosition.get()) {
-					if (TopLevelVertex.this.sharpness.get() > 0) {
+					if (TopLevelVertex.this.getSharpness() > 0) {
 						position.set(TopLevelVertex.this.pos);
 					} else {
 						final double k = 1.0 / (valence * valence);
@@ -216,12 +216,21 @@ public class TopLevelVertex extends AbstractVertex {
 					}
 				}
 				if (!overrideSharpness.get()) {
-					sharpness.set(Math.max(0, TopLevelVertex.this.sharpness.get() - 1));
+					sharpness.set(Math.max(0, TopLevelVertex.this.getSharpness() - 1));
 				}
 			}
 		};
 	}
 	
+	@Override
+	public int getSharpness() {
+		for (HalfEdge edge : getAdjacentEdges()) {
+			if (edge.isBoundary()) {
+				return Integer.MAX_VALUE;
+			}
+		}
+		return super.getSharpness();
+	}
 //	void bindLimitPoint() {
 //		limitPoint = new Vertex();
 //		final int n = valence();
