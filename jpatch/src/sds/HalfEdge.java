@@ -39,7 +39,8 @@ public class HalfEdge {
 			public void computeDerivedPosition() {
 				Point3d p0 = vertex.pos;
 				Point3d p1 = pair.vertex.pos;
-				if (HalfEdge.this.sharpness.get() > 0 || isBoundary()) {
+				int edgeSharpness = getSharpness();
+				if (edgeSharpness > 0) {
 					position.set(
 							(p0.x + p1.x) * 0.5,
 							(p0.y + p1.y) * 0.5,
@@ -54,6 +55,7 @@ public class HalfEdge {
 							(p0.z + p1.z + p2.z + p3.z) * 0.25
 					);
 				}
+				crease = Math.max(0, edgeSharpness - 1);
 			}
 		};
 		pair.edgePoint = this.edgePoint;
@@ -85,6 +87,14 @@ public class HalfEdge {
 	
 	public boolean isBoundary() {
 		return face == null || pair.face == null;
+	}
+	
+	public int getSharpness() {
+		if (isBoundary()) {
+			return Integer.MAX_VALUE;
+		} else {
+			return sharpness.get();
+		}
 	}
 	
 //	@Override

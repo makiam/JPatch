@@ -216,6 +216,7 @@ public class Sds {
 			}
 		}
 		for (TopLevelVertex vertex : vertexList) {
+			vertex.analyzeEdges();
 			vertex.vertexPoint.computeDerivedPosition();
 		}
 //		for (Vertex vertex : vertexList) {
