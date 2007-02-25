@@ -67,48 +67,65 @@ public class Face {
 	
 	void setupSlates() {
 		Point3d[][] p = new Point3d[4][];
-		AbstractVertex[] v = new AbstractVertex[4];
+		BaseVertex[][] v = new BaseVertex[4][];
+		HalfEdge[][] edges = new HalfEdge[4][];
+		
 		int s = 0;
 		try {
 			for (HalfEdge edge : getEdges()) {
-				v[0] = facePoint;
+				v[0] = new BaseVertex[sides * 2 - 4];
+				v[0][0] = facePoint;
 				p[0] = new Point3d[sides * 2 - 4];
-				p[0][0] = facePoint.pos;
+				p[0][0] = v[0][0].pos;
 				HalfEdge e = edge.next;
-				p[0][1] = e.edgePoint.pos;
+				v[0][1] = e.edgePoint;
+				p[0][1] = v[0][1].pos;
 				for (int i = 2; i < p[0].length; ) {
 					e = e.next;
-					p[0][i++] = e.vertex.vertexPoint.pos;
-					p[0][i++] = e.edgePoint.pos;
+					v[0][i] = e.vertex.vertexPoint;
+					p[0][i] = v[0][i++].pos;
+					v[0][i] = e.edgePoint;
+					p[0][i] = v[0][i++].pos;
 				}
 				
-				
+				v[1] = new BaseVertex[4];
 				p[1] = new Point3d[4];
 				e = edge.prev.pair;
-				v[1] = e.edgePoint;
-				p[1][0] = e.edgePoint.pos;
-				p[1][1] = e.next.vertex.vertexPoint.pos;
-				p[1][2] = e.next.edgePoint.pos;
-				p[1][3] = e.face.facePoint.pos;
+				v[1][0] = e.edgePoint;
+				v[1][1] = e.next.vertex.vertexPoint;
+				v[1][2] = e.next.edgePoint;
+				v[1][3] = e.face.facePoint;
+				p[1][0] = v[1][0].pos;
+				p[1][1] = v[1][1].pos;
+				p[1][2] = v[1][2].pos;
+				p[1][3] = v[1][3].pos;
 				
+				v[2] = new BaseVertex[edge.vertex.valence() * 2 - 4];
 				p[2] = new Point3d[edge.vertex.valence() * 2 - 4];
-				v[2] = edge.vertex.vertexPoint;
-				p[2][0] = edge.vertex.vertexPoint.pos;
+				v[2][0] = edge.vertex.vertexPoint;
+				p[2][0] = v[2][0].pos;
 				e = edge.prev.pair.prev.pair;
-				p[2][1] = e.edgePoint.pos;
+				v[2][1] = e.edgePoint;
+				p[2][1] = v[2][1].pos;
 				for (int i = 2; i < p[2].length; ) {
-					p[2][i++] = e.face.facePoint.pos;
+					v[2][i] = e.face.facePoint;
+					p[2][i] = v[2][i++].pos;
 					e = e.prev.pair;
-					p[2][i++] = e.edgePoint.pos;
+					v[2][i] = e.edgePoint;
+					p[2][i] = v[2][i++].pos;
 				}
 				
+				v[3] = new BaseVertex[4];
 				p[3] = new Point3d[4];
 				e = edge.pair;
-				v[3] = e.edgePoint;
-				p[3][0] = e.edgePoint.pos;
-				p[3][1] = e.face.facePoint.pos;
-				p[3][2] = e.prev.edgePoint.pos;
-				p[3][3] = e.vertex.vertexPoint.pos;
+				v[3][0] = e.edgePoint;
+				v[3][1] = e.face.facePoint;
+				v[3][2] = e.prev.edgePoint;
+				v[3][3] = e.vertex.vertexPoint;
+				p[3][0] = v[3][0].pos;
+				p[3][1] = v[3][1].pos;
+				p[3][2] = v[3][2].pos;
+				p[3][3] = v[3][3].pos;
 				
 				slates[s++] = new Slate(p, v);
 			}

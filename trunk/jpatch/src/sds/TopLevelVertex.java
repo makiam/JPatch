@@ -17,9 +17,11 @@ import jpatch.entity.Constants;
  * @author sascha
  *
  */
-public class TopLevelVertex extends AbstractVertex {
-	HalfEdge edge;
+public class TopLevelVertex extends BaseVertex {
+	private static final float CREASE0 = 3.0f / 4.0f;
+	private static final float CREASE1 = 1.0f / 8.0f;
 	
+	HalfEdge edge;
 	public Level2Vertex vertexPoint;
 	
 	final Iterable<Face> faceIterable = new Iterable<Face>() {
@@ -191,8 +193,17 @@ public class TopLevelVertex extends AbstractVertex {
 			@Override
 			public void computeDerivedPosition() {
 				if (!overridePosition.get()) {
-					if (TopLevelVertex.this.getSharpness() > 0) {
+					if (TopLevelVertex.this.corner > 0) {
 						position.set(TopLevelVertex.this.pos);
+					} else if (crease > 0) {
+						Point3d p0 = TopLevelVertex.this.pos;
+						Point3d p1 = TopLevelVertex.this.creaseEdge0.pair.vertex.pos;
+						Point3d p2 = TopLevelVertex.this.creaseEdge1.pair.vertex.pos;
+						position.set(
+								p0.x * CREASE0 + (p1.x + p2.x) * CREASE1,
+								p0.y * CREASE0 + (p1.y + p2.y) * CREASE1,
+								p0.z * CREASE0 + (p1.z + p2.z) * CREASE1
+						);
 					} else {
 						final double k = 1.0 / (valence * valence);
 						double w = (valence - 2.0) / valence;
@@ -218,19 +229,56 @@ public class TopLevelVertex extends AbstractVertex {
 				if (!overrideSharpness.get()) {
 					sharpness.set(Math.max(0, TopLevelVertex.this.getSharpness() - 1));
 				}
+				crease = Math.max(0, TopLevelVertex.this.crease - 1);
+				corner = Math.max(0, TopLevelVertex.this.corner - 1);
+				creaseEdge0 = TopLevelVertex.this.creaseEdge0;
+				creaseEdge1 = TopLevelVertex.this.creaseEdge1;
+				creaseEdgeIndex0 = TopLevelVertex.this.creaseEdgeIndex0;
+				creaseEdgeIndex1 = TopLevelVertex.this.creaseEdgeIndex1;
 			}
 		};
 	}
 	
-	@Override
-	public int getSharpness() {
+	public void analyzeEdges() {
+		int i = 0;
+		int sharpestEdgeValue0 = 0, sharpestEdgeValue1 = 0, sharpestEdgeValue2 = 0;
+		corner = sharpness.get();
+		crease = 0;
 		for (HalfEdge edge : getAdjacentEdges()) {
-			if (edge.isBoundary()) {
-				return Integer.MAX_VALUE;
+			int edgeSharpness = edge.getSharpness();
+			if (edgeSharpness > 0) {
+				if (edgeSharpness > sharpestEdgeValue0) {
+					sharpestEdgeValue2 = sharpestEdgeValue1;
+					sharpestEdgeValue1 = sharpestEdgeValue0;
+					sharpestEdgeValue0 = edgeSharpness;
+					creaseEdgeIndex1 = creaseEdgeIndex0;
+					creaseEdgeIndex0 = i;
+					creaseEdge1 = creaseEdge0;
+					creaseEdge0 = edge;
+				} else if (edgeSharpness > sharpestEdgeValue1) {
+					sharpestEdgeValue2 = sharpestEdgeValue1;
+					sharpestEdgeValue1 = edgeSharpness;
+					creaseEdgeIndex1 = i;
+					creaseEdge1 = edge;
+				} else if (edgeSharpness > sharpestEdgeValue2) {
+					sharpestEdgeValue2 = edgeSharpness;
+				}
 			}
 		}
-		return super.getSharpness();
+		if (sharpestEdgeValue1 > 0) {
+			// there are at least two crease edges, set this
+			// crease value to the crease value of the sharpest edge and
+			// set the creaseEdgeIndexes to the indexes of the two
+			// sharpest edges
+			crease = sharpestEdgeValue0;
+			if (sharpestEdgeValue2 > corner) {
+				// there are more than two crease edges, set this
+				// corner value to at least the crease value of the 3rd sharpest edge
+				corner = sharpestEdgeValue2;
+			}
+		}
 	}
+	
 //	void bindLimitPoint() {
 //		limitPoint = new Vertex();
 //		final int n = valence();

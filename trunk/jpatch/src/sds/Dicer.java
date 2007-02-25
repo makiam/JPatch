@@ -166,38 +166,44 @@ public class Dicer {
 			 */
 			for (int valence = 3; valence <= MAX_VALENCE; valence++) {
 				for (int corner = 0; corner < 2; corner ++) {
-					cornerStencil[level][valence - 3][corner] = new int[valence * 2 + 3];
-					cornerStencil[level][valence - 3][corner][0] = 0;							// sharpness
-					cornerStencil[level][valence - 3][corner][1] = patchCornerIndex(corner, level + 1, 1, 1);	// target!
-					cornerStencil[level][valence - 3][corner][2] = patchCornerIndex(corner, level, 1, 1);
-					cornerStencil[level][valence - 3][corner][3] = patchCornerIndex(corner, level, 0, 2);
-					cornerStencil[level][valence - 3][corner][4] = patchCornerIndex(corner, level, 1, 2);
-					cornerStencil[level][valence - 3][corner][5] = patchCornerIndex(corner, level, 2, 2);
-					cornerStencil[level][valence - 3][corner][6] = patchCornerIndex(corner, level, 2, 1);
-					cornerStencil[level][valence - 3][corner][7] = patchCornerIndex(corner, level, 2, 0);
+					cornerStencil[level][valence - 3][corner] = new int[valence * 2 + 6];
+					cornerStencil[level][valence - 3][corner][0] = 0;							// corner sharpness
+					cornerStencil[level][valence - 3][corner][1] = 0;							// crease sharpness
+					cornerStencil[level][valence - 3][corner][2] = 0;							// index of 1st crease edge
+					cornerStencil[level][valence - 3][corner][3] = 0;							// index of 2nd craase edge
+					cornerStencil[level][valence - 3][corner][4] = patchCornerIndex(corner, level + 1, 1, 1);	// target!
+					cornerStencil[level][valence - 3][corner][5] = patchCornerIndex(corner, level, 1, 1);
+					cornerStencil[level][valence - 3][corner][6] = patchCornerIndex(corner, level, 0, 2);
+					cornerStencil[level][valence - 3][corner][7] = patchCornerIndex(corner, level, 1, 2);
+					cornerStencil[level][valence - 3][corner][8] = patchCornerIndex(corner, level, 2, 2);
+					cornerStencil[level][valence - 3][corner][9] = patchCornerIndex(corner, level, 2, 1);
+					cornerStencil[level][valence - 3][corner][10] = patchCornerIndex(corner, level, 2, 0);
 					for (int i = 0, n = valence * 2 - 5; i < n; i++) {
 						int index = i + 1;
 						if (index == n) {
 							index = 0;
 						}
-						cornerStencil[level][valence - 3][corner][i + 8] = cornerIndex(corner, valence, index);
+						cornerStencil[level][valence - 3][corner][i + 11] = cornerIndex(corner, valence, index);
 					}
 
-					cornerLimitStencil[level][valence - 3][corner] = new int[valence * 2 + 3];
-					cornerLimitStencil[level][valence - 3][corner][0] = 0;											// sharpness
-					cornerLimitStencil[level][valence - 3][corner][1] = patchCornerIndex(corner, level + 1, 1, 1);	// target!
-					cornerLimitStencil[level][valence - 3][corner][2] = patchCornerIndex(corner, level + 1, 1, 1);
-					cornerLimitStencil[level][valence - 3][corner][3] = patchCornerIndex(corner, level + 1, 0, 2);
-					cornerLimitStencil[level][valence - 3][corner][4] = patchCornerIndex(corner, level + 1, 1, 2);
-					cornerLimitStencil[level][valence - 3][corner][5] = patchCornerIndex(corner, level + 1, 2, 2);
-					cornerLimitStencil[level][valence - 3][corner][6] = patchCornerIndex(corner, level + 1, 2, 1);
-					cornerLimitStencil[level][valence - 3][corner][7] = patchCornerIndex(corner, level + 1, 2, 0);
+					cornerLimitStencil[level][valence - 3][corner] = new int[valence * 2 + 6];
+					cornerLimitStencil[level][valence - 3][corner][0] = 0;							// corner sharpness
+					cornerLimitStencil[level][valence - 3][corner][1] = 0;							// crease sharpness
+					cornerLimitStencil[level][valence - 3][corner][2] = 0;							// index of 1st crease edge
+					cornerLimitStencil[level][valence - 3][corner][3] = 0;							// index of 2nd craase edge
+					cornerLimitStencil[level][valence - 3][corner][4] = patchCornerIndex(corner, level + 1, 1, 1);	// target!
+					cornerLimitStencil[level][valence - 3][corner][5] = patchCornerIndex(corner, level + 1, 1, 1);
+					cornerLimitStencil[level][valence - 3][corner][6] = patchCornerIndex(corner, level + 1, 0, 2);
+					cornerLimitStencil[level][valence - 3][corner][7] = patchCornerIndex(corner, level + 1, 1, 2);
+					cornerLimitStencil[level][valence - 3][corner][8] = patchCornerIndex(corner, level + 1, 2, 2);
+					cornerLimitStencil[level][valence - 3][corner][9] = patchCornerIndex(corner, level + 1, 2, 1);
+					cornerLimitStencil[level][valence - 3][corner][10] = patchCornerIndex(corner, level + 1, 2, 0);
 					for (int i = 0, n = valence * 2 - 5; i < n; i++) {
 						int index = i + 1;
 						if (index == n) {
 							index = 0;
 						}
-						cornerLimitStencil[level][valence - 3][corner][i + 8] = cornerIndex(corner, valence, index);
+						cornerLimitStencil[level][valence - 3][corner][i + 11] = cornerIndex(corner, valence, index);
 					}
 					
 					int[][] array = new int[cornerStencilLength(valence)][];
@@ -490,22 +496,22 @@ public class Dicer {
 		
 		
 //		patchStencil[1][6][1] = slate.corners[0].sharpness.get();
-		patchStencil[1][8][1] = slate.corners[1].sharpness.get();
-		patchStencil[1][16][1] = slate.corners[3].sharpness.get();
+		patchStencil[1][8][1] = slate.corners[1].crease;
+		patchStencil[1][16][1] = slate.corners[3].crease;
 //		patchStencil[1][18][1] = slate.corners[3].sharpness.get();
 		
 		for (int corner = 0; corner < 2; corner ++) {
 			final Point3f[] c = boundary[corner * 2];
 			final int valence = c.length / 2 + 2;
-			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner * 2].sharpness.get() - 1;
-//			cornerStencil[1][valence - 3][corner][0] = 0;
-			
-			
-			
-			
-			
 			final int n = c.length;
 			final int start = corner * MAX_CORNER_LENGTH;
+			
+			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner * 2].corner - 1;
+			cornerStencil[1][valence - 3][corner][1] = slate.corners[corner * 2].crease - 1;
+			cornerStencil[1][valence - 3][corner][2] = start + (slate.corners[corner * 2].creaseEdgeIndex0 % (n - 1));
+			cornerStencil[1][valence - 3][corner][3] = start + (slate.corners[corner * 2].creaseEdgeIndex1 % (n - 1));
+//			cornerStencil[1][valence - 3][corner][0] = 0;
+			
 			
 			/*
 			 * initialize corner arrays
@@ -673,20 +679,34 @@ public class Dicer {
 				
 				final int valence = boundary[corner * 2].length / 2 + 2;
 				final int[] cs = cornerStencil[level][valence - 3][corner];
-				final int outIndex = cs[1];
+				final int outIndex = cs[4];
 				if (cs[0] > 0) {
-					out[outIndex][0] = in[cs[2]][0];
-					out[outIndex][1] = in[cs[2]][1];
-					out[outIndex][2] = in[cs[2]][2];
+					//corner//
+					out[outIndex][0] = in[cs[5]][0];
+					out[outIndex][1] = in[cs[5]][1];
+					out[outIndex][2] = in[cs[5]][2];
 					cornerStencil[level + 1][valence - 3][corner][0] = cornerStencil[level][valence - 3][corner][0] - 1;
+					cornerStencil[level + 1][valence - 3][corner][1] = cornerStencil[level][valence - 3][corner][1] - 1;
+					cornerStencil[level + 1][valence - 3][corner][2] = cornerStencil[level][valence - 3][corner][2];
+					cornerStencil[level + 1][valence - 3][corner][3] = cornerStencil[level][valence - 3][corner][3];
+				} else if (cs[1] > 0) {
+					//crease//
+					out[outIndex][0] = in[cs[5]][0] * CREASE0 + (in[cs[2]][0] + in[cs[3]][0]) * CREASE1;
+					out[outIndex][1] = in[cs[5]][0] * CREASE0 + (in[cs[2]][1] + in[cs[3]][1]) * CREASE1;
+					out[outIndex][2] = in[cs[5]][0] * CREASE0 + (in[cs[2]][2] + in[cs[3]][2]) * CREASE1;
+					cornerStencil[level + 1][valence - 3][corner][0] = cornerStencil[level][valence - 3][corner][0] - 1;
+					cornerStencil[level + 1][valence - 3][corner][1] = cornerStencil[level][valence - 3][corner][1] - 1;
+					cornerStencil[level + 1][valence - 3][corner][2] = cornerStencil[level][valence - 3][corner][2];
+					cornerStencil[level + 1][valence - 3][corner][3] = cornerStencil[level][valence - 3][corner][3];
 				} else {
+					//smooth//
 					float a0 = 0;
 					float a1 = 0;
 					float a2 = 0;
 					float b0 = 0;
 					float b1 = 0;
 					float b2 = 0;
-					for (int p = 3; p < cs.length; p++) {
+					for (int p = 6; p < cs.length; p++) {
 						a0 += in[cs[p]][0];
 						a1 += in[cs[p]][1];
 						a2 += in[cs[p++]][2];
@@ -705,10 +725,11 @@ public class Dicer {
 					b1 *= bb;
 					b2 *= bb;
 					
-					out[outIndex][0] = (a0 + b0 + in[cs[2]][0] * cc) * ik;
-					out[outIndex][1] = (a1 + b1 + in[cs[2]][1] * cc) * ik;
-					out[outIndex][2] = (a2 + b2 + in[cs[2]][2] * cc) * ik;
+					out[outIndex][0] = (a0 + b0 + in[cs[5]][0] * cc) * ik;
+					out[outIndex][1] = (a1 + b1 + in[cs[5]][1] * cc) * ik;
+					out[outIndex][2] = (a2 + b2 + in[cs[5]][2] * cc) * ik;
 					cornerStencil[level + 1][valence - 3][corner][0] = 0;
+					cornerStencil[level + 1][valence - 3][corner][1] = 0;
 				}
 
 				final int[][] array = fanStencil[level][valence - 3][corner];
@@ -794,12 +815,12 @@ public class Dicer {
 			final int[] cps = cornerStencil[level][valence - 3][corner];
 			final int[] cs = cornerLimitStencil[level][valence - 3][corner];
 			
-			final int outIndex = cs[1];
+			final int outIndex = cs[4];
 			
 			if (cps[0] > 0) {	
-				out[outIndex][0] = in[cs[2]][0];
-				out[outIndex][1] = in[cs[2]][1];
-				out[outIndex][2] = in[cs[2]][2];
+				out[outIndex][0] = in[cs[5]][0];
+				out[outIndex][1] = in[cs[5]][1];
+				out[outIndex][2] = in[cs[5]][2];
 			} else {
 				float f0 = 0;
 				float f1 = 0;
@@ -807,7 +828,7 @@ public class Dicer {
 				float e0 = 0;
 				float e1 = 0;
 				float e2 = 0;
-				for (int p = 3; p < cs.length; p++) {
+				for (int p = 6; p < cs.length; p++) {
 					f0 += in[cs[p]][0];
 					f1 += in[cs[p]][1];
 					f2 += in[cs[p++]][2];
@@ -818,9 +839,9 @@ public class Dicer {
 				final float ik = 1.0f / (valence * (valence + 5));			// TODO:
 				final float pointWeight = valence * valence;				// use loopup table?
 				
-				out[outIndex][0] = (e0 * 4 + f0 + in[cs[2]][0] * pointWeight) * ik;
-				out[outIndex][1] = (e1 * 4 + f1 + in[cs[2]][1] * pointWeight) * ik;
-				out[outIndex][2] = (e2 * 4 + f2 + in[cs[2]][2] * pointWeight) * ik;
+				out[outIndex][0] = (e0 * 4 + f0 + in[cs[5]][0] * pointWeight) * ik;
+				out[outIndex][1] = (e1 * 4 + f1 + in[cs[5]][1] * pointWeight) * ik;
+				out[outIndex][2] = (e2 * 4 + f2 + in[cs[5]][2] * pointWeight) * ik;
 			}
 			/* normal */
 			ax = 0;
@@ -830,18 +851,18 @@ public class Dicer {
 			by = 0;
 			bz = 0;
 			for (int j = 0; j < valence; j++) {
-				int c2fi = j * 2 + 3;
-				int c2ei = j * 2 + 2;
-				if (c2ei == 2) {
+				int c2fi = j * 2 + 6;
+				int c2ei = j * 2 + 5;
+				if (c2ei == 5) {
 					c2ei = cs.length - 1;
 				}
 				int c3fi = c2fi + 2;
 				if (c3fi >= cs.length) {
-					c3fi -= cs.length - 3;
+					c3fi -= cs.length - 6;
 				}
 				int c3ei = c2ei + 2;
 				if (c3ei >= cs.length) {
-					c3ei -= cs.length - 3;
+					c3ei -= cs.length - 6;
 				}
 				float ew = TANGENT_EDGE_WEIGHT[valence - 3][j];
 				float fw = TANGENT_FACE_WEIGHT[valence - 3][j];
