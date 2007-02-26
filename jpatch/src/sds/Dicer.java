@@ -488,9 +488,11 @@ public class Dicer {
 		
 		for (int corner = 0; corner < 2; corner ++) {
 			final Point3f[] c = boundary[corner * 2];
-			final int valence = c.length / 2 + 2;
-			final int n = c.length;
+			final int valence = c.length / 2;
+			final int n = c.length - 5;
 			final int start = corner * MAX_CORNER_LENGTH;
+			
+//			cornerStencil[1][valence - 3][corner][0] = Integer.MAX_VALUE;
 			
 //			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner * 2].corner - 1;
 //			cornerStencil[1][valence - 3][corner][1] = slate.corners[corner * 2].crease - 1;
@@ -504,13 +506,13 @@ public class Dicer {
 			 */
 			for (int i = 1; i < n; i++) {
 				final int index = start + (i % (n - 1));
-				pt = c[i];
+				pt = c[i + 4];
 				geo[index][0] = pt.x;
 				geo[index][1] = pt.y;
 				geo[index][2] = pt.z;
 			}
 			if (n == 2) {
-				pt = c[1];
+				pt = c[5];
 				geo[start + 1][0] = pt.x;
 				geo[start + 1][1] = pt.y;
 				geo[start + 1][2] = pt.z;
@@ -663,7 +665,7 @@ public class Dicer {
 			 */
 			for (int corner = 0; corner < 2; corner++) {
 				
-				final int valence = boundary[corner * 2].length / 2 + 2;
+				final int valence = boundary[corner * 2].length / 2;
 				final int[] cs = cornerStencil[level][valence - 3][corner];
 				final int outIndex = cs[4];
 				if (cs[0] > 0) {
@@ -797,7 +799,7 @@ public class Dicer {
 		 * apply limit stencils on corners
 		 */
 		for (int corner = 0; corner < 2; corner ++) {
-			final int valence = boundary[corner * 2].length / 2 + 2;
+			final int valence = boundary[corner * 2].length / 2;
 			final int[] cps = cornerStencil[level][valence - 3][corner];
 			final int[] cs = cornerLimitStencil[level][valence - 3][corner];
 			
