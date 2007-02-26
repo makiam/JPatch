@@ -415,6 +415,7 @@ public class Dicer {
 	
 	public int dice(final Slate2 slate, final int depth) {
 		Point3f pt;
+		slate.test();
 		final Point3f[][] boundary = slate.fans;
 		
 		/*

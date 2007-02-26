@@ -16,9 +16,9 @@ public class SlateEdge {
 		this.primary = true;
 	}
 	
-	public SlateEdge(Slate2 slate, Level2Vertex firstVertex, Level2Vertex secondVertex, Face parentFace) {
+	public SlateEdge(Slate2 slate, Slate2 pairSlate, Level2Vertex firstVertex, Level2Vertex secondVertex, Face parentFace) {
 		this.slate = slate;
-		this.pair = new SlateEdge(slate, this, parentFace, secondVertex);
+		this.pair = new SlateEdge(pairSlate, this, parentFace, secondVertex);
 		this.parentFace = parentFace;
 		this.vertex = firstVertex;
 		this.parentEdge = null;
