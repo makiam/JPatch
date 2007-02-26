@@ -17,9 +17,12 @@ public class Face {
 	final int num = count++;
 	public final int sides;
 	private final double recSides;
-	private final Slate[] slates;
-	Level2Vertex facePoint;
-	HalfEdge edge;
+	final Slate2[] slates;
+	
+	final SlateEdge[] slateEdges;
+	
+	final Level2Vertex facePoint;
+	final HalfEdge edge;
 	final Iterable<HalfEdge> edgeIterable = new Iterable<HalfEdge>() {
 		public Iterator<HalfEdge> iterator() {
 			return new Iterator<HalfEdge>() {
@@ -41,17 +44,16 @@ public class Face {
 		}
 	};
 	
-	Face(int sides) {
+	Face(int sides, HalfEdge start) {
 		this.sides = sides;
+		this.edge = start;
+		
 		recSides = 1.0 / sides;
-		slates = new Slate[sides];
-	}
-	
-	void bindFacePoint() {
+		
 		facePoint = new Level2Vertex() {
 			@Override
 			public void computeDerivedPosition() {
-				double k = 1.0 / sides;
+				double k = 1.0 * recSides;
 				double x = 0, y = 0, z = 0;
 				for (HalfEdge edge : getEdges()) {
 					Point3d p = edge.vertex.pos;
@@ -63,123 +65,200 @@ public class Face {
 			}
 			
 		};
+		
+		slates = new Slate2[sides];
+		slateEdges = new SlateEdge[sides];
+		HalfEdge e = edge;
+		for (int i = 0; i < sides; i++) {
+			slates[i] = new Slate2();
+			e.face = this;
+			slateEdges[i] = new SlateEdge(slates[i], facePoint, e.edgePoint, this);
+			e = e.next;
+		}
+		
+	}
+	
+	void prepareSlates() {
+		HalfEdge e = this.edge;
+		for (int n = 0; n < sides; n++) {
+			Face f = e.face;
+			e.slateEdge0.slate = f.slates[f.getEdgeIndex(e)];
+			e.slateEdge1.slate = f.slates[f.getEdgeIndex(e.next)];
+			e = e.next;
+		}
 	}
 	
 	void setupSlates() {
-		Point3d[][] p = new Point3d[4][];
-		BaseVertex[][] v = new BaseVertex[4][];
-		HalfEdge[][] edges = new HalfEdge[4][];
-		
-		int s = 0;
-		try {
-			for (HalfEdge edge : getEdges()) {
-				v[0] = new BaseVertex[sides * 2 - 4];
-				v[0][0] = facePoint;
-				p[0] = new Point3d[sides * 2 - 4];
-				p[0][0] = v[0][0].pos;
-				HalfEdge e = edge.next;
-				v[0][1] = e.edgePoint;
-				p[0][1] = v[0][1].pos;
-				for (int i = 2; i < p[0].length; ) {
-					e = e.next;
-					v[0][i] = e.vertex.vertexPoint;
-					p[0][i] = v[0][i++].pos;
-					v[0][i] = e.edgePoint;
-					p[0][i] = v[0][i++].pos;
-				}
-				
-				v[1] = new BaseVertex[4];
-				p[1] = new Point3d[4];
-				e = edge.prev.pair;
-				v[1][0] = e.edgePoint;
-				v[1][1] = e.next.vertex.vertexPoint;
-				v[1][2] = e.next.edgePoint;
-				v[1][3] = e.face.facePoint;
-				p[1][0] = v[1][0].pos;
-				p[1][1] = v[1][1].pos;
-				p[1][2] = v[1][2].pos;
-				p[1][3] = v[1][3].pos;
-				
-				v[2] = new BaseVertex[edge.vertex.valence() * 2 - 4];
-				p[2] = new Point3d[edge.vertex.valence() * 2 - 4];
-				v[2][0] = edge.vertex.vertexPoint;
-				p[2][0] = v[2][0].pos;
-				e = edge.prev.pair.prev.pair;
-				v[2][1] = e.edgePoint;
-				p[2][1] = v[2][1].pos;
-				for (int i = 2; i < p[2].length; ) {
-					v[2][i] = e.face.facePoint;
-					p[2][i] = v[2][i++].pos;
-					e = e.prev.pair;
-					v[2][i] = e.edgePoint;
-					p[2][i] = v[2][i++].pos;
-				}
-				
-				v[3] = new BaseVertex[4];
-				p[3] = new Point3d[4];
-				e = edge.pair;
-				v[3][0] = e.edgePoint;
-				v[3][1] = e.face.facePoint;
-				v[3][2] = e.prev.edgePoint;
-				v[3][3] = e.vertex.vertexPoint;
-				p[3][0] = v[3][0].pos;
-				p[3][1] = v[3][1].pos;
-				p[3][2] = v[3][2].pos;
-				p[3][3] = v[3][3].pos;
-				
-				slates[s++] = new Slate(p, v);
+		HalfEdge edge = this.edge;
+		for (int n = 0; n < sides; n++) {
+			SlateEdge[][] corners = new SlateEdge[4][];
+			
+			/* create SlateEdges for corner 0 (outer corner) */
+			corners[0] = new SlateEdge[edge.vertex.valence];
+			HalfEdge e = edge;
+			for (int i = 0; i < edge.vertex.valence; i++) {
+				corners[0][i] = e.slateEdge0;
+				System.out.println("corners " + corners + "[0][" + i + "]=" + corners[0][i]);
+				e = e.prev.pair;
 			}
-		} catch (Exception e) {
+			
+			/* create SlateEdges for corner 1 (upper right) */
+			corners[1] = new SlateEdge[4];
+			corners[1][0] = slateEdges[n].pair;
+			corners[1][1] = edge.slateEdge0.pair;
+			corners[1][2] = edge.pair.face.slateEdges[edge.pair.face.getEdgeIndex(edge.pair)].pair;
+			corners[1][3] = edge.slateEdge1;
+			
+			/* create SlateEdges for corner 2 (inner corner) */
+			corners[2] = new SlateEdge[sides];
 			for (int i = 0; i < sides; i++) {
-				slates[i] = null;
+				corners[2][i] = slateEdges[(sides - 1 + n + i) % sides];
 			}
+			
+			/* create SlateEdges for corner 3 (lower left) */
+			corners[3] = new SlateEdge[4];
+			corners[3][0] = edge.prev.slateEdge1;
+			corners[3][1] = slateEdges[(sides + n - 1) % sides].pair;
+			corners[3][2] = edge.prev.slateEdge0.pair;
+			corners[3][3] = edge.prev.pair.face.slateEdges[edge.prev.pair.face.getEdgeIndex(edge.prev.pair)].pair;
+			
+			slates[n].setCorners(corners);
+			edge = edge.next;
 		}
 	}
 	
-	void setupSlateNeighbors() {
-		int s = 0;
-		for (HalfEdge edge : getEdges()) {
-			if (slates[s] == null) {
-				continue;
-			}
-			int splus = (s + 1) % sides;
-			int sminus = (s + sides - 1) % sides;
-			slates[s].adjacentSlates[0] = slates[sminus];
-			slates[s].adjacentSlates[3] = slates[splus];
-			Face f1 = edge.prev.pair.face;
-			int e = 0;
-			for (HalfEdge ee : f1.getEdges()) {
-				if (ee.pair == edge.prev) {
-					break;
-				}
-				e++;
-			}
-			slates[s].adjacentSlates[1] = f1.slates[e];
-			Face f2 = edge.pair.face;
-			e = 0;
-			for (HalfEdge ee : f2.getEdges()) {
-				if (ee.prev.pair == edge) {
-					break;
-				}
-				e++;
-			}
-			slates[s].adjacentSlates[2] = f2.slates[e];
-			
-			
-//			// check
-//			for (int side = 0; side < 4; side++) {
-//				if (slates[s].adjacentSlates[side] != null) {
-//					Slate shouldBeThisOne = slates[s].adjacentSlates[side].adjacentSlates[3 - side];
-//					System.out.println("Slate=" + slates[s] + " side=" + side + " adjacentSlate=" + slates[s].adjacentSlates[side] + " back=" + shouldBeThisOne);
-//					if (shouldBeThisOne != null && shouldBeThisOne != slates[s]) {
-//						System.err.println("bad slate adjacency");
-//					}
-//				}
-//			}
-			
-			s++;
+	public void initFans() {
+		for (Slate2 slate : slates) {
+			slate.initFans();
 		}
 	}
+	
+//	void setupSlates() {
+//		Point3d[][] p = new Point3d[4][];
+//		BaseVertex[][] v = new BaseVertex[4][];
+//		HalfEdge[][] edges = new HalfEdge[4][];
+//		
+//		int s = 0;
+//		try {
+//			for (HalfEdge edge : getEdges()) {
+//				v[0] = new BaseVertex[sides * 2 - 4];
+//				v[0][0] = facePoint;
+//				p[0] = new Point3d[sides * 2 - 4];
+//				p[0][0] = v[0][0].pos;
+//				HalfEdge e = edge.next;
+//				v[0][1] = e.edgePoint;
+//				p[0][1] = v[0][1].pos;
+//				for (int i = 2; i < p[0].length; ) {
+//					e = e.next;
+//					v[0][i] = e.vertex.vertexPoint;
+//					p[0][i] = v[0][i++].pos;
+//					v[0][i] = e.edgePoint;
+//					p[0][i] = v[0][i++].pos;
+//				}
+//				
+//				v[1] = new BaseVertex[4];
+//				p[1] = new Point3d[4];
+//				e = edge.prev.pair;
+//				v[1][0] = e.edgePoint;
+//				v[1][1] = e.next.vertex.vertexPoint;
+//				v[1][2] = e.next.edgePoint;
+//				v[1][3] = e.face.facePoint;
+//				p[1][0] = v[1][0].pos;
+//				p[1][1] = v[1][1].pos;
+//				p[1][2] = v[1][2].pos;
+//				p[1][3] = v[1][3].pos;
+//				
+//				v[2] = new BaseVertex[edge.vertex.valence() * 2 - 4];
+//				p[2] = new Point3d[edge.vertex.valence() * 2 - 4];
+//				v[2][0] = edge.vertex.vertexPoint;
+//				p[2][0] = v[2][0].pos;
+//				e = edge.prev.pair.prev.pair;
+//				v[2][1] = e.edgePoint;
+//				p[2][1] = v[2][1].pos;
+//				for (int i = 2; i < p[2].length; ) {
+//					v[2][i] = e.face.facePoint;
+//					p[2][i] = v[2][i++].pos;
+//					e = e.prev.pair;
+//					v[2][i] = e.edgePoint;
+//					p[2][i] = v[2][i++].pos;
+//				}
+//				
+//				v[3] = new BaseVertex[4];
+//				p[3] = new Point3d[4];
+//				e = edge.pair;
+//				v[3][0] = e.edgePoint;
+//				v[3][1] = e.face.facePoint;
+//				v[3][2] = e.prev.edgePoint;
+//				v[3][3] = e.vertex.vertexPoint;
+//				p[3][0] = v[3][0].pos;
+//				p[3][1] = v[3][1].pos;
+//				p[3][2] = v[3][2].pos;
+//				p[3][3] = v[3][3].pos;
+//				
+//				slates[s++] = new Slate(p, v);
+//			}
+//		} catch (Exception e) {
+//			for (int i = 0; i < sides; i++) {
+//				slates[i] = null;
+//			}
+//		}
+//	}
+	
+	int getEdgeIndex(HalfEdge edge) {
+		HalfEdge e = this.edge;
+		for (int i = 0; i < sides; i++) {
+			if (e == edge) {
+				return i;
+			}
+			e = e.next;
+		}
+		return -1;
+	}
+	
+//	void setupSlateNeighbors() {
+//		int s = 0;
+//		for (HalfEdge edge : getEdges()) {
+//			if (slates[s] == null) {
+//				continue;
+//			}
+//			int splus = (s + 1) % sides;
+//			int sminus = (s + sides - 1) % sides;
+//			slates[s].adjacentSlates[0] = slates[sminus];
+//			slates[s].adjacentSlates[3] = slates[splus];
+//			Face f1 = edge.prev.pair.face;
+//			int e = 0;
+//			for (HalfEdge ee : f1.getEdges()) {
+//				if (ee.pair == edge.prev) {
+//					break;
+//				}
+//				e++;
+//			}
+//			slates[s].adjacentSlates[1] = f1.slates[e];
+//			Face f2 = edge.pair.face;
+//			e = 0;
+//			for (HalfEdge ee : f2.getEdges()) {
+//				if (ee.prev.pair == edge) {
+//					break;
+//				}
+//				e++;
+//			}
+//			slates[s].adjacentSlates[2] = f2.slates[e];
+//			
+//			
+////			// check
+////			for (int side = 0; side < 4; side++) {
+////				if (slates[s].adjacentSlates[side] != null) {
+////					Slate shouldBeThisOne = slates[s].adjacentSlates[side].adjacentSlates[3 - side];
+////					System.out.println("Slate=" + slates[s] + " side=" + side + " adjacentSlate=" + slates[s].adjacentSlates[side] + " back=" + shouldBeThisOne);
+////					if (shouldBeThisOne != null && shouldBeThisOne != slates[s]) {
+////						System.err.println("bad slate adjacency");
+////					}
+////				}
+////			}
+//			
+//			s++;
+//		}
+//	}
 //	public void subdivide(int maxLevel, SlateTesselator slate) {
 //		Vertex[] va = new Vertex[10];
 //		float[][][] boundary = new float[4][][];
@@ -287,7 +366,7 @@ public class Face {
 //		return (dx > dy) ? dx : dy; 
 //	}
 	
-	public Slate[] getSlates() {
+	public Slate2[] getSlates() {
 		return slates;
 	}
 	

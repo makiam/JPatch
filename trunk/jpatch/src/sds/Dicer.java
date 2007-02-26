@@ -1,6 +1,5 @@
 package sds;
 
-
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -13,6 +12,8 @@ import javax.swing.JPanel;
 import javax.vecmath.*;
 
 import static java.lang.Math.*;
+import static sds.SdsConstants.*;
+import static sds.SdsWeights.*;
 
 public class Dicer {
 	private static final int UNUSED = 0;
@@ -28,23 +29,7 @@ public class Dicer {
 	private static final int CREASE_5_7 = 10;
 	private static final int CREASE_6_7 = 11;
 	
-	private static final int MAX_SUBDIV = 6;
-	private static final int MAX_VALENCE = 16;
 	
-	private static final float FACE0 = 1.0f / 4.0f;
-	private static final float EDGE0 = 3.0f / 8.0f;
-	private static final float EDGE1 = 1.0f / 16.0f;
-	private static final float VERTEX0 = 9.0f / 16.0f;
-	private static final float VERTEX1 = 3.0f / 32.0f;
-	private static final float VERTEX2 = 1.0f / 64.0f;
-	private static final float LIMIT0 = 16.0f / 36.0f;
-	private static final float LIMIT1 = 4.0f / 36.0f;
-	private static final float LIMIT2 = 1.0f / 36.0f;
-//	private static final float LIMIT0 = 1;
-//	private static final float LIMIT1 = 0;
-//	private static final float LIMIT2 = 0f;
-	private static final float CREASE0 = 3.0f / 4.0f;
-	private static final float CREASE1 = 1.0f / 8.0f;
 	
 	private static final float[][] TANGENT_FACE_WEIGHT = new float[MAX_VALENCE - 2][];			// [valence][index]
 	private static final float[][] TANGENT_EDGE_WEIGHT = new float[MAX_VALENCE - 2][];			// [valence][index]
@@ -428,9 +413,9 @@ public class Dicer {
 		return rim0[level][side];
 	}
 	
-	public int dice(final Slate slate, final int depth) {
+	public int dice(final Slate2 slate, final int depth) {
 		Point3f pt;
-		final Point3f[][] boundary = slate.screenFans;
+		final Point3f[][] boundary = slate.fans;
 		
 		/*
 		 * initialize top-level geometry array
@@ -449,17 +434,17 @@ public class Dicer {
 		geo[GRID_START + 6][1] = pt.y;
 		geo[GRID_START + 6][2] = pt.z;
 		
-		pt = boundary[1][1];
+		pt = boundary[1][5];
 		geo[GRID_START + 2][0] = pt.x;
 		geo[GRID_START + 2][1] = pt.y;
 		geo[GRID_START + 2][2] = pt.z;
 		
-		pt = boundary[1][2];
+		pt = boundary[1][6];
 		geo[GRID_START + 3][0] = pt.x;
 		geo[GRID_START + 3][1] = pt.y;
 		geo[GRID_START + 3][2] = pt.z;
 		
-		pt = boundary[1][3];
+		pt = boundary[1][7];
 		geo[GRID_START + 7][0] = pt.x;
 		geo[GRID_START + 7][1] = pt.y;
 		geo[GRID_START + 7][2] = pt.z;
@@ -474,17 +459,17 @@ public class Dicer {
 		geo[GRID_START + 9][1] = pt.y;
 		geo[GRID_START + 9][2] = pt.z;
 		
-		pt = boundary[3][1];
+		pt = boundary[3][5];
 		geo[GRID_START + 13][0] = pt.x;
 		geo[GRID_START + 13][1] = pt.y;
 		geo[GRID_START + 13][2] = pt.z;
 		
-		pt = boundary[3][2];
+		pt = boundary[3][6];
 		geo[GRID_START + 12][0] = pt.x;
 		geo[GRID_START + 12][1] = pt.y;
 		geo[GRID_START + 12][2] = pt.z;
 		
-		pt = boundary[3][3];
+		pt = boundary[3][7];
 		geo[GRID_START + 8][0] = pt.x;
 		geo[GRID_START + 8][1] = pt.y;
 		geo[GRID_START + 8][2] = pt.z;
@@ -496,8 +481,8 @@ public class Dicer {
 		
 		
 //		patchStencil[1][6][1] = slate.corners[0].sharpness.get();
-		patchStencil[1][8][1] = slate.corners[1].crease;
-		patchStencil[1][16][1] = slate.corners[3].crease;
+//		patchStencil[1][8][1] = 0;
+//		patchStencil[1][16][1] = 0;
 //		patchStencil[1][18][1] = slate.corners[3].sharpness.get();
 		
 		for (int corner = 0; corner < 2; corner ++) {
@@ -506,10 +491,10 @@ public class Dicer {
 			final int n = c.length;
 			final int start = corner * MAX_CORNER_LENGTH;
 			
-			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner * 2].corner - 1;
-			cornerStencil[1][valence - 3][corner][1] = slate.corners[corner * 2].crease - 1;
-			cornerStencil[1][valence - 3][corner][2] = start + (slate.corners[corner * 2].creaseEdgeIndex0 % (n - 1));
-			cornerStencil[1][valence - 3][corner][3] = start + (slate.corners[corner * 2].creaseEdgeIndex1 % (n - 1));
+//			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner * 2].corner - 1;
+//			cornerStencil[1][valence - 3][corner][1] = slate.corners[corner * 2].crease - 1;
+//			cornerStencil[1][valence - 3][corner][2] = start + (slate.corners[corner * 2].creaseEdgeIndex0 % (n - 1));
+//			cornerStencil[1][valence - 3][corner][3] = start + (slate.corners[corner * 2].creaseEdgeIndex1 % (n - 1));
 //			cornerStencil[1][valence - 3][corner][0] = 0;
 			
 			

@@ -17,28 +17,19 @@ public class HalfEdge {
 	Face face;
 	HalfEdge prev;
 	HalfEdge next;
-	Level2Vertex edgePoint;
+	final Level2Vertex edgePoint;
+	final SlateEdge slateEdge0;
+	final SlateEdge slateEdge1;
 	public final Attribute.Integer sharpness;
 	
 	public HalfEdge(TopLevelVertex firstVertex, TopLevelVertex secondVertex) {
 		sharpness = new Attribute.Integer(0);
 		vertex = firstVertex;
-		pair = new SecondaryEdge(secondVertex, this, sharpness);
-		pair.edgePoint = edgePoint;
-	}
-	
-	private HalfEdge(TopLevelVertex vertex, HalfEdge neighbor, Attribute.Integer sharpness) {
-		this.vertex = vertex;
-		this.pair = neighbor;
-		this.sharpness = sharpness;
-	}
-	
-	final void bindEdgePoint() {
 		edgePoint = new Level2Vertex() {
 			@Override
 			public void computeDerivedPosition() {
-				Point3d p0 = vertex.pos;
-				Point3d p1 = pair.vertex.pos;
+				Point3d p0 = HalfEdge.this.vertex.pos;
+				Point3d p1 = HalfEdge.this.pair.vertex.pos;
 				int edgeSharpness = getSharpness();
 				if (edgeSharpness > 0) {
 					position.set(
@@ -47,8 +38,8 @@ public class HalfEdge {
 							(p0.z + p1.z) * 0.5
 					);
 				} else {
-					Point3d p2 = face.facePoint.pos;
-					Point3d p3 = pair.face.facePoint.pos;
+					Point3d p2 = HalfEdge.this.face.facePoint.pos;
+					Point3d p3 = HalfEdge.this.pair.face.facePoint.pos;
 					position.set(
 							(p0.x + p1.x + p2.x + p3.x) * 0.25,
 							(p0.y + p1.y + p2.y + p3.y) * 0.25,
@@ -58,7 +49,18 @@ public class HalfEdge {
 				crease = Math.max(0, edgeSharpness - 1);
 			}
 		};
-		pair.edgePoint = this.edgePoint;
+		pair = new SecondaryEdge(secondVertex, firstVertex, this, sharpness, edgePoint);
+		slateEdge0 = pair.slateEdge1.pair;
+		slateEdge1 = pair.slateEdge0.pair;
+	}
+	
+	private HalfEdge(TopLevelVertex firstVertex, TopLevelVertex secondVertex, HalfEdge neighbor, Attribute.Integer sharpness, Level2Vertex edgePoint) {
+		this.vertex = firstVertex;
+		this.pair = neighbor;
+		this.sharpness = sharpness;
+		this.edgePoint = edgePoint;
+		slateEdge0 = new SlateEdge(firstVertex.vertexPoint, edgePoint, this, pair);
+		slateEdge1 = new SlateEdge(edgePoint, secondVertex.vertexPoint, this, pair);
 	}
 	
 	final public TopLevelVertex getFirstVertex() {
@@ -112,8 +114,8 @@ public class HalfEdge {
 //	}
 	
 	private static final class SecondaryEdge extends HalfEdge {
-		private SecondaryEdge(TopLevelVertex vertex, HalfEdge neighbor, Attribute.Integer sharpness) {
-			super(vertex, neighbor, sharpness);
+		private SecondaryEdge(TopLevelVertex firstVertex, TopLevelVertex secondVertex, HalfEdge neighbor, Attribute.Integer sharpness, Level2Vertex edgePoint) {
+			super(firstVertex, secondVertex, neighbor, sharpness, edgePoint);
 		}
 		
 		@Override

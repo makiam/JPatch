@@ -14,6 +14,7 @@ public abstract class AbstractVertex {
 	
 	final Point3d pos = new Point3d();
 	final Point3d refPos = new Point3d();
+	final Point3f projectedPos = new Point3f();
 	
 	public AbstractVertex() {
 		position.addAttributeListener(new AttributeListener() {
@@ -39,6 +40,11 @@ public abstract class AbstractVertex {
 	
 	public int getSharpness() {
 		return sharpness.get();
+	}
+	
+	public void project(Matrix4f matrix) {
+		projectedPos.set(pos);
+		matrix.transform(projectedPos);
 	}
 	
 	/**

@@ -17,6 +17,8 @@ public class Sds {
 	private Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
 	public List<TopLevelVertex> vertexList = new ArrayList<TopLevelVertex>();
 	public List<Face> faceList = new LinkedList<Face>();
+	public Level2Vertex[] level2Vertices;
+	
 //	public final Vertex[] topLevelVertices;
 	
 	private boolean interpolateBoundary = true;
@@ -166,29 +168,56 @@ public class Sds {
 //	}
 	
 	public void makeSlates() {
-		for (Face face : faceList) {
-			face.bindFacePoint();
-		}
-		for (Face face : faceList) {
-			for (HalfEdge edge : face.getEdges()) {
-				if (edge.isPrimary()) {
-					edge.bindEdgePoint();
-				}
-			}
-		}
-		for (TopLevelVertex vertex : vertexList) {
-			vertex.bindVertexPoint();
-		}
+//		for (Face face : faceList) {
+//			face.bindFacePoint();
+//		}
+//		for (Face face : faceList) {
+//			for (HalfEdge edge : face.getEdges()) {
+//				if (edge.isPrimary()) {
+//					edge.bindEdgePoint();
+//				}
+//			}
+//		}
+//		for (TopLevelVertex vertex : vertexList) {
+//			vertex.bindVertexPoint();
+//		}
 //		for (Vertex vertex : vertexList) {
 //			vertex.bindLimitPoint();
 //		}
 		for (Face face : faceList) {
-			face.setupSlates();
+			face.prepareSlates();
 		}
 		
 		for (Face face : faceList) {
-			face.setupSlateNeighbors();
+			for (HalfEdge edge : face.getEdges()) {
+				System.out.println(edge.slateEdge0);
+				System.out.println(edge.slateEdge1);
+				System.out.println(edge.pair.slateEdge0);
+				System.out.println(edge.pair.slateEdge1);
+			}
 		}
+		
+		List<Level2Vertex> list = new ArrayList<Level2Vertex>();
+		for (Face face : faceList) {
+			face.setupSlates();
+		}
+		for (Face face : faceList) {
+			face.initFans();
+			list.add(face.facePoint);
+			for (HalfEdge edge : face.getEdges()) {
+				if (edge.isPrimary()) {
+					list.add(edge.edgePoint);
+				}
+			}
+			for (TopLevelVertex vertex : vertexList) {
+				list.add(vertex.vertexPoint);
+			}
+		}
+		level2Vertices = list.toArray(new Level2Vertex[list.size()]);
+		
+//		for (Face face : faceList) {
+//			face.setupSlateNeighbors();
+//		}
 //		System.exit(0);
 		rethinkSlates();
 		
@@ -205,23 +234,21 @@ public class Sds {
 	}
 	
 	public void rethinkSlates() {
-		for (Face face : faceList) {
-			face.facePoint.computeDerivedPosition();
-		}
-		for (Face face : faceList) {
-			for (HalfEdge edge : face.getEdges()) {
-				if (edge.isPrimary()) {
-					edge.edgePoint.computeDerivedPosition();
-				}
-			}
-		}
 		for (TopLevelVertex vertex : vertexList) {
 			vertex.analyzeEdges();
-			vertex.vertexPoint.computeDerivedPosition();
+		}
+		for (Level2Vertex v : level2Vertices) {
+			v.computeDerivedPosition();
 		}
 //		for (Vertex vertex : vertexList) {
 //			vertex.limitPoint.computeDerivedPosition();
 //		}
+	}
+	
+	public void project(Matrix4f matrix) {
+		for (Level2Vertex v : level2Vertices) {
+			v.project(matrix);
+		}
 	}
 //	public void subdivide() {
 //		edgeMap = new HashMap<EdgeKey, HalfEdge>(edgeMap.size() * 4);
@@ -308,40 +335,38 @@ public class Sds {
 	}
 	
 	private void addFace(int[] vertices) {
-		Face face = new Face(vertices.length);
-		HalfEdge start = createEdge(face, vertexList.get(vertices[0]), vertexList.get(vertices[1]));
+		HalfEdge start = createEdge(vertexList.get(vertices[0]), vertexList.get(vertices[1]));
 		HalfEdge prev = start;
 		HalfEdge edge = null;
 		for (int i = 1; i < vertices.length; i++) {
-			edge = createEdge(face, vertexList.get(vertices[i]), vertexList.get(vertices[(i + 1) % vertices.length]));
+			edge = createEdge(vertexList.get(vertices[i]), vertexList.get(vertices[(i + 1) % vertices.length]));
 			prev.next = edge;
 			edge.prev = prev;
 			prev = edge;
 		}
 		edge.next = start;
 		start.prev = edge;
-		face.edge = start;
+		Face face = new Face(vertices.length, start);
 		faceList.add(face);
 	}
 	
-	private Face createFace(TopLevelVertex[] vertices) {
-		Face face = new Face(vertices.length);
-		HalfEdge start = createEdge(face, vertices[0], vertices[1]);
-		HalfEdge prev = start;
-		HalfEdge edge = null;
-		for (int i = 1; i < vertices.length; i++) {
-			edge = createEdge(face, vertices[i], vertices[(i + 1) % vertices.length]);
-			prev.next = edge;
-			edge.prev = prev;
-			prev = edge;
-		}
-		edge.next = start;
-		start.prev = edge;
-		face.edge = start;
-		return face;
-	}
+//	private Face createFace(TopLevelVertex[] vertices) {
+//		HalfEdge start = createEdge(vertices[0], vertices[1]);
+//		HalfEdge prev = start;
+//		HalfEdge edge = null;
+//		for (int i = 1; i < vertices.length; i++) {
+//			edge = createEdge(vertices[i], vertices[(i + 1) % vertices.length]);
+//			prev.next = edge;
+//			edge.prev = prev;
+//			prev = edge;
+//		}
+//		edge.next = start;
+//		start.prev = edge;
+//		Face face = new Face(vertices.length, start);
+//		return face;
+//	}
 	
-	private HalfEdge createEdge(Face face, TopLevelVertex vertex0, TopLevelVertex vertex1) {
+	private HalfEdge createEdge(TopLevelVertex vertex0, TopLevelVertex vertex1) {
 		EdgeKey key = new EdgeKey(vertex1, vertex0);
 		HalfEdge neighbor = edgeMap.get(key);
 		HalfEdge edge;
@@ -354,7 +379,6 @@ public class Sds {
 				throw new IllegalArgumentException("Surface is non-manifold.");
 			}
 		}
-		edge.face = face;
 		vertex0.edge = edge;
 		return edge;
 	}
