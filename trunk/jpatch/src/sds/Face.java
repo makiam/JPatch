@@ -71,8 +71,10 @@ public class Face {
 		HalfEdge e = edge;
 		for (int i = 0; i < sides; i++) {
 			slates[i] = new Slate2();
+		}
+		for (int i = 0; i < sides; i++) {
 			e.face = this;
-			slateEdges[i] = new SlateEdge(slates[i], facePoint, e.edgePoint, this);
+			slateEdges[i] = new SlateEdge(slates[(i + 1) % sides], slates[i], facePoint, e.edgePoint, this);
 			e = e.next;
 		}
 		
@@ -118,7 +120,7 @@ public class Face {
 			/* create SlateEdges for corner 3 (lower left) */
 			corners[3] = new SlateEdge[4];
 			corners[3][0] = edge.prev.slateEdge1;
-			corners[3][1] = slateEdges[(sides + n - 1) % sides].pair;
+			corners[3][1] = slateEdges[(sides - 1 + n) % sides].pair;
 			corners[3][2] = edge.prev.slateEdge0.pair;
 			corners[3][3] = edge.prev.pair.face.slateEdges[edge.prev.pair.face.getEdgeIndex(edge.prev.pair)].pair;
 			
