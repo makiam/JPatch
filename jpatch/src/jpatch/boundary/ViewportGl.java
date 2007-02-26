@@ -37,7 +37,7 @@ public class ViewportGl extends Viewport {
 	private final Vector3f v = new Vector3f();
 	
 //	private final FragmentTesselator kernel = new FragmentTesselator();
-	private static final Dicer slateTesselator = new Dicer();
+	private static final Dicer dicer = new Dicer();
 	private int subdivLevel = 4;
 	
 	private long time;
@@ -927,14 +927,14 @@ public class ViewportGl extends Viewport {
 //			break;
 //		}
 		
+		sds.project(modelView);
 		
 		for (Face face : sds.faceList) {
-			for (Slate slate : face.getSlates()) {
+			for (Slate2 slate : face.getSlates()) {
 				if (slate == null) {
 					continue;
 				}
-				slate.transform(modelView);
-				slate.project(component.getWidth() >> 1, component.getHeight() >> 1);
+				slate.estimateSubdivLevel(component.getWidth() >> 1, component.getHeight() >> 1);
 //				if (slate.getSubdivisionLevel() < 0)
 //					System.out.println(slate);
 			}
@@ -943,9 +943,9 @@ public class ViewportGl extends Viewport {
 //		System.out.println();
 		Point3f p0 = new Point3f();
 		Point3f p1 = new Point3f();
-		gl.glInterleavedArrays(GL_N3F_V3F, 0, slateTesselator.getBuffer());
+		gl.glInterleavedArrays(GL_N3F_V3F, 0, dicer.getBuffer());
 		for (Face face : sds.faceList) {
-			for (Slate slate : face.getSlates()) {
+			for (Slate2 slate : face.getSlates()) {
 //				switch (slate.getSubdivisionLevel()) {
 //				case 1:
 //					gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 1, 0, 0 }, 0);
@@ -1095,9 +1095,9 @@ public class ViewportGl extends Viewport {
 //		System.out.println(i + " fragments@level " + subdivLevel + " in " + total + "ms");
 	}
 	
-	private void drawSlate(Slate slate) {
+	private void drawSlate(Slate2 slate) {
 		
-		int level = slate.getSubdivisionLevel();
+		int level = slate.getSubdivLevel();
 		if (level < 0) {
 			return;
 		}
@@ -1105,11 +1105,11 @@ public class ViewportGl extends Viewport {
 			level = 2;
 		}
 //		System.out.println("Slate=" + slate + " level=" + level);
-		int count = slateTesselator.dice(slate, level);
+		int count = dicer.dice(slate, level);
 		
 		int dim = (1 << (level - 1));
 //		count = (dim - 1) * (dim - 1);
-		int offset = slateTesselator.getGridStart();
+		int offset = dicer.getGridStart();
 //		FloatBuffer buffer = slateTesselator.getBuffer();
 //		count = buffer.capacity() / 4;
 //		gl.glInterleavedArrays(GL_N3F_V3F, 0, buffer);
@@ -1127,7 +1127,7 @@ public class ViewportGl extends Viewport {
 //		gl.glFinish();
 		
 		gl.glBegin(GL_QUADS);
-		float[] interleavedArray = slateTesselator.getInterleavedArray();
+		float[] interleavedArray = dicer.getInterleavedArray();
 		for (int i = 0; i < count; ) {
 			gl.glNormal3fv(interleavedArray, i);
 			i += 3;
@@ -1137,12 +1137,12 @@ public class ViewportGl extends Viewport {
 		gl.glEnd();
 		
 		if (false) return;
-		float[][] vertices = slateTesselator.getLimitVertices(level - 1);
-		float[][] normals = slateTesselator.getLimitNormals(level - 1);
+		float[][] vertices = dicer.getLimitVertices(level - 1);
+		float[][] normals = dicer.getLimitNormals(level - 1);
 		gl.glBegin(GL_TRIANGLES);
 		for (int side = 0; side < 4; side++) {
-			Slate adjacentSlate = slate.getAdjacentSlate(side);
-			int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivisionLevel();
+			Slate2 adjacentSlate = slate.getAdjacentSlate(side);
+			int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivLevel();
 //			if (pairLevel < 0) {
 //				pairLevel = level - 1;
 //			}
@@ -1150,7 +1150,7 @@ public class ViewportGl extends Viewport {
 				pairLevel = 2;
 			}
 			
-			int[] triangleArray = slateTesselator.getRimTriangles(level - 1, side, pairLevel - 1);
+			int[] triangleArray = dicer.getRimTriangles(level - 1, side, pairLevel - 1);
 			for (int i = 0; i < triangleArray.length; i++) {
 				gl.glNormal3fv(normals[triangleArray[i]], 0);
 				gl.glVertex3fv(vertices[triangleArray[i]], 0);
@@ -1172,12 +1172,12 @@ public class ViewportGl extends Viewport {
 		}
 		
 		for (int side = 1; side < 3; side++) {
-			Slate adjacentSlate = slate.getAdjacentSlate(side);
-			int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivisionLevel();
+			Slate2 adjacentSlate = slate.getAdjacentSlate(side);
+			int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivLevel();
 			if (pairLevel > level) {
 				pairLevel = level;
 			}
-			int[] lineArray = slateTesselator.getRim(level - 1, side);
+			int[] lineArray = dicer.getRim(level - 1, side);
 			gl.glBegin(GL_LINE_STRIP);
 			for (int i = 0; i < lineArray.length; i++) {
 				gl.glNormal3fv(normals[lineArray[i] + offset], 0);
