@@ -257,8 +257,8 @@ public class Main {
 //			System.exit(0);
 			
 			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/cube2.off"));
-			activeSds.makeSlates();
-			activeSds.verify();
+//			activeSds.makeSlates();
+//			activeSds.verify();
 //			activeSds.dump();
 //			activeSds.smooth();
 //			System.exit(0);

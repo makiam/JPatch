@@ -53,7 +53,6 @@ public class Face {
 		facePoint = new Level2Vertex() {
 			@Override
 			public void computeDerivedPosition() {
-				double k = 1.0 * recSides;
 				double x = 0, y = 0, z = 0;
 				for (HalfEdge edge : getEdges()) {
 					Point3d p = edge.vertex.pos;
@@ -61,9 +60,8 @@ public class Face {
 					y += p.y;
 					z += p.z;
 				}
-				position.set(x * k, y * k, z * k);
+				position.set(x * recSides, y * recSides, z * recSides);
 			}
-			
 		};
 		
 		slates = new Slate2[sides];
@@ -93,6 +91,7 @@ public class Face {
 	void setupSlates() {
 		HalfEdge edge = this.edge;
 		for (int n = 0; n < sides; n++) {
+			
 			SlateEdge[][] corners = new SlateEdge[4][];
 			
 			/* create SlateEdges for corner 0 (outer corner) */
@@ -125,6 +124,7 @@ public class Face {
 			corners[3][3] = edge.prev.pair.face.slateEdges[edge.prev.pair.face.getEdgeIndex(edge.prev.pair)].pair;
 			
 			slates[n].setCorners(corners);
+			
 			edge = edge.next;
 		}
 	}
