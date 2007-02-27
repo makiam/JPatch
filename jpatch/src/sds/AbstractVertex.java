@@ -47,6 +47,10 @@ public abstract class AbstractVertex {
 		matrix.transform(projectedPos);
 	}
 	
+	public void getProjectedPos(Point3f p) {
+		p.set(projectedPos);
+	}
+	
 	/**
 	 * Computes the inverse transformation matrix and clears
 	 * the inverseInvalid flag.

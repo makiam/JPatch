@@ -46,6 +46,14 @@ public class SlateEdge {
 		return primary ? this : pair;
 	}
 	
+	public int getSharpness() {
+		if (parentEdge != null) {
+			return Math.max(0,parentEdge.getSharpness() - 1);
+		} else {
+			return 0;
+		}
+	}
+	
 	@Override
 	public String toString() {
 		return super.toString() + ":" + slate;

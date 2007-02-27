@@ -927,6 +927,7 @@ public class ViewportGl extends Viewport {
 //			break;
 //		}
 		
+//		sds.computeLevel2Vertices();
 		sds.project(modelView);
 		
 		for (Face face : sds.faceList) {
@@ -1027,6 +1028,12 @@ public class ViewportGl extends Viewport {
 				}
 			}
 		}
+		
+		for (Level2Vertex v : sds.level2Vertices) {
+			v.getProjectedPos(p0);
+			gl.glVertex3f(p0.x, p0.y, p0.z);
+		}
+		
 		gl.glEnd();
 		
 //		gl.glBegin(GL_POINTS);
@@ -1171,7 +1178,9 @@ public class ViewportGl extends Viewport {
 			gl.glUseProgram(useProgram ? program : 0);
 		}
 		
-		for (int side = 1; side < 3; side++) {
+		for (int i = 0; i < 2; i++) {
+			int side = (i + 3) % 4;
+//			int side = i + 1;
 			Slate2 adjacentSlate = slate.getAdjacentSlate(side);
 			int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivLevel();
 			if (pairLevel > level) {
@@ -1179,9 +1188,9 @@ public class ViewportGl extends Viewport {
 			}
 			int[] lineArray = dicer.getRim(level - 1, side);
 			gl.glBegin(GL_LINE_STRIP);
-			for (int i = 0; i < lineArray.length; i++) {
-				gl.glNormal3fv(normals[lineArray[i] + offset], 0);
-				gl.glVertex3fv(vertices[lineArray[i] + offset], 0);
+			for (int j = 0; j < lineArray.length; j++) {
+				gl.glNormal3fv(normals[lineArray[j] + offset], 0);
+				gl.glVertex3fv(vertices[lineArray[j] + offset], 0);
 			}
 			gl.glEnd();
 		}

@@ -73,6 +73,8 @@ public class Sds {
 //		edgeMap = null;
 		offInputStream.close();
 		validateVertices();
+		makeSlates();
+		rethinkSlates();
 	}
 	
 //	public Sds subdivide() {
@@ -219,7 +221,7 @@ public class Sds {
 //			face.setupSlateNeighbors();
 //		}
 //		System.exit(0);
-		rethinkSlates();
+//		rethinkSlates();
 		
 //		// test slate neighbors
 //		for (Face face: faceList) {
@@ -237,12 +239,17 @@ public class Sds {
 		for (TopLevelVertex vertex : vertexList) {
 			vertex.analyzeEdges();
 		}
-		for (Level2Vertex v : level2Vertices) {
-			v.computeDerivedPosition();
-		}
+		computeLevel2Vertices();
+		
 //		for (Vertex vertex : vertexList) {
 //			vertex.limitPoint.computeDerivedPosition();
 //		}
+	}
+	
+	public void computeLevel2Vertices() {
+		for (Level2Vertex v : level2Vertices) {
+			v.computeDerivedPosition();
+		}
 	}
 	
 	public void project(Matrix4f matrix) {

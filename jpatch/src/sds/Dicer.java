@@ -475,16 +475,20 @@ public class Dicer {
 		geo[GRID_START + 8][1] = pt.y;
 		geo[GRID_START + 8][2] = pt.z;
 //		// test crease stencils
-//		patchStencil[1][7][1] = 1;
-//		patchStencil[1][11][1] = 1;
-//		patchStencil[1][13][1] = 1;
-//		patchStencil[1][17][1] = 1;
+		patchStencil[1][7][1] = slate.corners[0][0].getSharpness();
+		patchStencil[1][13][1] = slate.corners[1][0].getSharpness();
+		patchStencil[1][17][1] = slate.corners[2][0].getSharpness();
+		patchStencil[1][11][1] = slate.corners[3][0].getSharpness();
 		
+		patchStencil[1][3][1] = slate.corners[1][2].getSharpness();
+		patchStencil[1][9][1] = slate.corners[1][3].getSharpness();
+		patchStencil[1][21][1] = slate.corners[3][2].getSharpness();
+		patchStencil[1][15][1] = slate.corners[3][3].getSharpness();
 		
-//		patchStencil[1][6][1] = slate.corners[0].sharpness.get();
+//		patchStencil[1][6][1] = slate.corners[0][0].vertex.corner;
 //		patchStencil[1][8][1] = 0;
 //		patchStencil[1][16][1] = 0;
-//		patchStencil[1][18][1] = slate.corners[3].sharpness.get();
+//		patchStencil[1][18][1] = slate.corners[3][0].vertex.corner;
 		
 		for (int corner = 0; corner < 2; corner ++) {
 			final Point3f[] c = boundary[corner * 2];
@@ -494,10 +498,10 @@ public class Dicer {
 			
 //			cornerStencil[1][valence - 3][corner][0] = Integer.MAX_VALUE;
 			
-//			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner * 2].corner - 1;
-//			cornerStencil[1][valence - 3][corner][1] = slate.corners[corner * 2].crease - 1;
-//			cornerStencil[1][valence - 3][corner][2] = start + (slate.corners[corner * 2].creaseEdgeIndex0 % (n - 1));
-//			cornerStencil[1][valence - 3][corner][3] = start + (slate.corners[corner * 2].creaseEdgeIndex1 % (n - 1));
+			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner * 2][0].vertex.corner;
+			cornerStencil[1][valence - 3][corner][1] = slate.corners[corner * 2][0].vertex.crease;
+			cornerStencil[1][valence - 3][corner][2] = start + (slate.corners[corner * 2][0].vertex.creaseEdgeIndex0 % (n - 1));
+			cornerStencil[1][valence - 3][corner][3] = start + (slate.corners[corner * 2][0].vertex.creaseEdgeIndex1 % (n - 1));
 //			cornerStencil[1][valence - 3][corner][0] = 0;
 			
 			
@@ -516,6 +520,14 @@ public class Dicer {
 				geo[start + 1][0] = pt.x;
 				geo[start + 1][1] = pt.y;
 				geo[start + 1][2] = pt.z;
+			}
+			
+			/* 
+			 * initialize fan stencils
+			 */
+			for (int i = 2; i < slate.corners[corner * 2].length; i++) {
+				int index = i == slate.corners[corner * 2].length - 1 ? 0 : i * 2 - 3;
+				fanStencil[1][valence - 3][corner][index][1] = slate.corners[corner * 2][i].getSharpness();
 			}
 			
 			// test crease stencils

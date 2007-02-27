@@ -21,6 +21,7 @@ public class HalfEdge {
 	final SlateEdge slateEdge0;
 	final SlateEdge slateEdge1;
 	public final Attribute.Integer sharpness;
+	final boolean primary;
 	
 	public HalfEdge(TopLevelVertex firstVertex, TopLevelVertex secondVertex) {
 		sharpness = new Attribute.Integer(0);
@@ -30,7 +31,8 @@ public class HalfEdge {
 			public void computeDerivedPosition() {
 				Point3d p0 = HalfEdge.this.vertex.pos;
 				Point3d p1 = HalfEdge.this.pair.vertex.pos;
-				int edgeSharpness = getSharpness();
+				int edgeSharpness = HalfEdge.this.getSharpness();
+				System.out.println("edge sharpness = " + edgeSharpness);
 				if (edgeSharpness > 0) {
 					position.set(
 							(p0.x + p1.x) * 0.5,
@@ -49,9 +51,10 @@ public class HalfEdge {
 				crease = Math.max(0, edgeSharpness - 1);
 			}
 		};
-		pair = new SecondaryEdge(secondVertex, firstVertex, this, sharpness, edgePoint);
+		pair = new HalfEdge(secondVertex, firstVertex, this, sharpness, edgePoint);
 		slateEdge0 = pair.slateEdge1.pair;
 		slateEdge1 = pair.slateEdge0.pair;
+		primary = true;
 	}
 	
 	private HalfEdge(TopLevelVertex firstVertex, TopLevelVertex secondVertex, HalfEdge neighbor, Attribute.Integer sharpness, Level2Vertex edgePoint) {
@@ -61,6 +64,7 @@ public class HalfEdge {
 		this.edgePoint = edgePoint;
 		slateEdge0 = new SlateEdge(firstVertex.vertexPoint, edgePoint, this, pair);
 		slateEdge1 = new SlateEdge(edgePoint, secondVertex.vertexPoint, this, pair);
+		primary = false;
 	}
 	
 	final public TopLevelVertex getFirstVertex() {
@@ -80,11 +84,11 @@ public class HalfEdge {
 	}
 	
 	public boolean isPrimary() {
-		return true;
+		return primary;
 	}
 	
 	public HalfEdge getPrimary() {
-		return this;
+		return primary ? this : pair;
 	}
 	
 	public boolean isBoundary() {
@@ -112,20 +116,4 @@ public class HalfEdge {
 //		}
 //		return false;
 //	}
-	
-	private static final class SecondaryEdge extends HalfEdge {
-		private SecondaryEdge(TopLevelVertex firstVertex, TopLevelVertex secondVertex, HalfEdge neighbor, Attribute.Integer sharpness, Level2Vertex edgePoint) {
-			super(firstVertex, secondVertex, neighbor, sharpness, edgePoint);
-		}
-		
-		@Override
-		public boolean isPrimary() {
-			return false;
-		}
-		
-		@Override
-		public HalfEdge getPrimary() {
-			return pair;
-		}
-	}
 }
