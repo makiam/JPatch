@@ -12,4 +12,6 @@ public class SdsWeights {
 	static final float LIMIT2 = 1.0f / 36.0f;
 	static final float CREASE0 = 3.0f / 4.0f;
 	static final float CREASE1 = 1.0f / 8.0f;
+	static final float CREASE_LIMIT0 = 2.0f / 3.0f;
+	static final float CREASE_LIMIT1 = 1.0f / 6.0f;
 }

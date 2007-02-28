@@ -119,8 +119,8 @@ public class TopLevelVertex extends BaseVertex {
 				corner = Math.max(0, TopLevelVertex.this.corner - 1);
 				creaseEdge0 = TopLevelVertex.this.creaseEdge0;
 				creaseEdge1 = TopLevelVertex.this.creaseEdge1;
-				creaseEdgeIndex0 = TopLevelVertex.this.creaseEdgeIndex0;
-				creaseEdgeIndex1 = TopLevelVertex.this.creaseEdgeIndex1;
+//				creaseEdgeIndex0 = TopLevelVertex.this.creaseEdgeIndex0;
+//				creaseEdgeIndex1 = TopLevelVertex.this.creaseEdgeIndex1;
 			}
 		};
 	}
@@ -165,14 +165,14 @@ public class TopLevelVertex extends BaseVertex {
 					sharpestEdgeValue2 = sharpestEdgeValue1;
 					sharpestEdgeValue1 = sharpestEdgeValue0;
 					sharpestEdgeValue0 = edgeSharpness;
-					creaseEdgeIndex1 = creaseEdgeIndex0;
-					creaseEdgeIndex0 = i;
+//					creaseEdgeIndex1 = creaseEdgeIndex0;
+//					creaseEdgeIndex0 = i;
 					creaseEdge1 = creaseEdge0;
 					creaseEdge0 = edge;
 				} else if (edgeSharpness > sharpestEdgeValue1) {
 					sharpestEdgeValue2 = sharpestEdgeValue1;
 					sharpestEdgeValue1 = edgeSharpness;
-					creaseEdgeIndex1 = i;
+//					creaseEdgeIndex1 = i;
 					creaseEdge1 = edge;
 				} else if (edgeSharpness > sharpestEdgeValue2) {
 					sharpestEdgeValue2 = edgeSharpness;
