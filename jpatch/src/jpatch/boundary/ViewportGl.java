@@ -978,11 +978,16 @@ public class ViewportGl extends Viewport {
 		}
 		
 		
-		gl.glColor3f(1, 1, 1);
+//		gl.glColor3f(1, 1, 1);
 		gl.glBegin(GL_LINES);
 		for (Face face : sds.faceList) {
 			for (HalfEdge edge : face.getEdges()) {
 				if (edge.isPrimary()) {
+					if (edge.getSharpness() > 0) {
+						gl.glColor3f(1, 0, 0);
+					} else {
+						gl.glColor3f(1, 1, 1);
+					}
 					edge.getFirstVertex().referencePosition.get(p0);
 					edge.getSecondVertex().referencePosition.get(p1);
 					modelView.transform(p0);
@@ -1029,10 +1034,10 @@ public class ViewportGl extends Viewport {
 			}
 		}
 		
-		for (Level2Vertex v : sds.level2Vertices) {
-			v.getProjectedPos(p0);
-			gl.glVertex3f(p0.x, p0.y, p0.z);
-		}
+//		for (Level2Vertex v : sds.level2Vertices) {
+//			v.getProjectedPos(p0);
+//			gl.glVertex3f(p0.x, p0.y, p0.z);
+//		}
 		
 		gl.glEnd();
 		
