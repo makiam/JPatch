@@ -485,6 +485,22 @@ public class Dicer {
 		patchStencil[1][21][1] = slate.corners[3][2].getSharpness();
 		patchStencil[1][15][1] = slate.corners[3][3].getSharpness();
 		
+		patchStencil[1][8][1] = slate.corners[1][0].vertex.crease;
+		if (slate.corners[1][0].vertex.crease > 0) {
+			patchStencil[1][8][0] = CREASE_5_7;
+			System.out.println("8 = CREASE_5_7");
+		} else {
+			patchStencil[1][8][0] = POINT;
+		}
+		
+		patchStencil[1][16][1] = slate.corners[3][0].vertex.crease;
+		if (slate.corners[3][0].vertex.crease > 0) {
+			patchStencil[1][16][0] = CREASE_4_6;
+			System.out.println("16 = CREASE_4_6");
+		} else {
+			patchStencil[1][16][0] = POINT;
+		}
+		
 //		patchStencil[1][6][1] = slate.corners[0][0].vertex.corner;
 //		patchStencil[1][8][1] = 0;
 //		patchStencil[1][16][1] = 0;
@@ -500,9 +516,12 @@ public class Dicer {
 			
 			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner * 2][0].vertex.corner;
 			cornerStencil[1][valence - 3][corner][1] = slate.corners[corner * 2][0].vertex.crease;
-			cornerStencil[1][valence - 3][corner][2] = start + (slate.corners[corner * 2][0].vertex.creaseEdgeIndex0 % (n - 1));
-			cornerStencil[1][valence - 3][corner][3] = start + (slate.corners[corner * 2][0].vertex.creaseEdgeIndex1 % (n - 1));
-//			cornerStencil[1][valence - 3][corner][0] = 0;
+			if (slate.corners[corner * 2][0].vertex.crease > 1) {
+				int ci0 = slate.getEdgeIndex(corner * 2, slate.corners[corner * 2][0].vertex.creaseEdge0.slateEdge0);
+				int ci1 = slate.getEdgeIndex(corner * 2, slate.corners[corner * 2][0].vertex.creaseEdge1.slateEdge0);
+				cornerStencil[1][valence - 3][corner][2] = 2 * ci0 + 7;
+				cornerStencil[1][valence - 3][corner][3] = 2 * ci1 + 7;
+			}
 			
 			
 			/*
@@ -691,9 +710,9 @@ public class Dicer {
 					cornerStencil[level + 1][valence - 3][corner][3] = cornerStencil[level][valence - 3][corner][3];
 				} else if (cs[1] > 0) {
 					//crease//
-					out[outIndex][0] = in[cs[5]][0] * CREASE0 + (in[cs[2]][0] + in[cs[3]][0]) * CREASE1;
-					out[outIndex][1] = in[cs[5]][0] * CREASE0 + (in[cs[2]][1] + in[cs[3]][1]) * CREASE1;
-					out[outIndex][2] = in[cs[5]][0] * CREASE0 + (in[cs[2]][2] + in[cs[3]][2]) * CREASE1;
+					out[outIndex][0] = in[cs[5]][0] * CREASE0 + (in[cs[cs[2]]][0] + in[cs[cs[3]]][0]) * CREASE1;
+					out[outIndex][1] = in[cs[5]][1] * CREASE0 + (in[cs[cs[2]]][1] + in[cs[cs[3]]][1]) * CREASE1;
+					out[outIndex][2] = in[cs[5]][2] * CREASE0 + (in[cs[cs[2]]][2] + in[cs[cs[3]]][2]) * CREASE1;
 					cornerStencil[level + 1][valence - 3][corner][0] = cornerStencil[level][valence - 3][corner][0] - 1;
 					cornerStencil[level + 1][valence - 3][corner][1] = cornerStencil[level][valence - 3][corner][1] - 1;
 					cornerStencil[level + 1][valence - 3][corner][2] = cornerStencil[level][valence - 3][corner][2];
@@ -773,30 +792,79 @@ public class Dicer {
 		 * apply limit stencils on rectangular inner grid
 		 */
 		int level = depth - 1;
-		final int[][] stencil = patchLimitStencil[level];
+		final int[][] limitStencil = patchLimitStencil[level];
+		final int[][] stencil = patchStencil[level];
 		final float[][] out = limitPoints[level];
 		final float[][] norm = limitNormals[level];
 		final float[][] in = subdivPoints[level];
-		final int n = stencil.length;
+		final int n = limitStencil.length;
 		float ax, ay, az, bx, by, bz, nx, ny, nz, nl;
 		
 		for (int i = 0; i < n; i++) {
+			final int[] ls = limitStencil[i];
 			final int[] s = stencil[i];
-			if (s == null) {
+			if (ls == null) {
 				continue;
 			}
 			final int outIndex = GRID_START + i;
-			out[outIndex][0] = in[s[0]][0] * LIMIT0 + ((in[s[1]][0] + in[s[3]][0]) + (in[s[2]][0] + in[s[4]][0])) * LIMIT1 + ((in[s[5]][0] + in[s[7]][0]) + (in[s[6]][0] + in[s[8]][0])) * LIMIT2;
-			out[outIndex][1] = in[s[0]][1] * LIMIT0 + ((in[s[1]][1] + in[s[3]][1]) + (in[s[2]][1] + in[s[4]][1])) * LIMIT1 + ((in[s[5]][1] + in[s[7]][1]) + (in[s[6]][1] + in[s[8]][1])) * LIMIT2;
-			out[outIndex][2] = in[s[0]][2] * LIMIT0 + ((in[s[1]][2] + in[s[3]][2]) + (in[s[2]][2] + in[s[4]][2])) * LIMIT1 + ((in[s[5]][2] + in[s[7]][2]) + (in[s[6]][2] + in[s[8]][2])) * LIMIT2;
-		
-			ax = (in[s[2]][0] - in[s[4]][0]) * 4 + (in[s[6]][0] - in[s[5]][0]) + (in[s[7]][0] - in[s[8]][0]);
-			ay = (in[s[2]][1] - in[s[4]][1]) * 4 + (in[s[6]][1] - in[s[5]][1]) + (in[s[7]][1] - in[s[8]][1]);
-			az = (in[s[2]][2] - in[s[4]][2]) * 4 + (in[s[6]][2] - in[s[5]][2]) + (in[s[7]][2] - in[s[8]][2]);
+			if (s[0] == POINT && s[1] > 0) {
+//				System.out.println("LIMIT CORNER");
+				out[outIndex][0] = in[ls[0]][0];
+				out[outIndex][1] = in[ls[0]][1];
+				out[outIndex][2] = in[ls[0]][2];
+			} else if (s[0] == EDGE_H && s[1] > 0) {
+//				System.out.println("LIMIT EDGE_H");
+				out[outIndex][0] = (in[ls[2]][0] + in[ls[4]][0]) * 0.5f;
+				out[outIndex][1] = (in[ls[2]][1] + in[ls[4]][1]) * 0.5f;
+				out[outIndex][2] = (in[ls[2]][2] + in[ls[4]][2]) * 0.5f;
+			} else if (s[0] == EDGE_V && s[1] > 0) {
+//				System.out.println("LIMIT EDGE_V");
+				out[outIndex][0] = (in[ls[1]][0] + in[ls[3]][0]) * 0.5f;
+				out[outIndex][1] = (in[ls[1]][1] + in[ls[3]][1]) * 0.5f;
+				out[outIndex][2] = (in[ls[1]][2] + in[ls[3]][2]) * 0.5f;
+			} else if (s[0] == CREASE_4_5) {
+//				System.out.println("LIMIT CREASE_4_5");
+				out[outIndex][0] = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[1]][0] + in[ls[2]][0]) * CREASE_LIMIT1;
+				out[outIndex][1] = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[1]][1] + in[ls[2]][1]) * CREASE_LIMIT1;
+				out[outIndex][2] = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[1]][2] + in[ls[2]][2]) * CREASE_LIMIT1;
+			} else if (s[0] == CREASE_4_6) {
+//				System.out.println("LIMIT CREASE_4_6");
+				out[outIndex][0] = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[1]][0] + in[ls[3]][0]) * CREASE_LIMIT1;
+				out[outIndex][1] = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[1]][1] + in[ls[3]][1]) * CREASE_LIMIT1;
+				out[outIndex][2] = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[1]][2] + in[ls[3]][2]) * CREASE_LIMIT1;
+			} else if (s[0] == CREASE_4_7) {
+//				System.out.println("LIMIT CREASE_4_7");
+				out[outIndex][0] = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[1]][0] + in[ls[4]][0]) * CREASE_LIMIT1;
+				out[outIndex][1] = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[1]][1] + in[ls[4]][1]) * CREASE_LIMIT1;
+				out[outIndex][2] = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[1]][2] + in[ls[4]][2]) * CREASE_LIMIT1;
+			} else if (s[0] == CREASE_5_6) {
+//				System.out.println("LIMIT CREASE_5_6");
+				out[outIndex][0] = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[2]][0] + in[ls[3]][0]) * CREASE_LIMIT1;
+				out[outIndex][1] = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[2]][1] + in[ls[3]][1]) * CREASE_LIMIT1;
+				out[outIndex][2] = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[2]][2] + in[ls[3]][2]) * CREASE_LIMIT1;
+			} else if (s[0] == CREASE_5_7) {
+//				System.out.println("LIMIT CREASE_5_7");
+				out[outIndex][0] = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[2]][0] + in[ls[4]][0]) * CREASE_LIMIT1;
+				out[outIndex][1] = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[2]][1] + in[ls[4]][1]) * CREASE_LIMIT1;
+				out[outIndex][2] = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[2]][2] + in[ls[4]][2]) * CREASE_LIMIT1;
+			} else if (s[0] == CREASE_6_7) {
+//				System.out.println("LIMIT CREASE_6_7");
+				out[outIndex][0] = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[3]][0] + in[ls[4]][0]) * CREASE_LIMIT1;
+				out[outIndex][1] = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[3]][1] + in[ls[4]][1]) * CREASE_LIMIT1;
+				out[outIndex][2] = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[3]][2] + in[ls[4]][2]) * CREASE_LIMIT1;
+			} else {
+				out[outIndex][0] = in[ls[0]][0] * LIMIT0 + ((in[ls[1]][0] + in[ls[3]][0]) + (in[ls[2]][0] + in[ls[4]][0])) * LIMIT1 + ((in[ls[5]][0] + in[ls[7]][0]) + (in[ls[6]][0] + in[ls[8]][0])) * LIMIT2;
+				out[outIndex][1] = in[ls[0]][1] * LIMIT0 + ((in[ls[1]][1] + in[ls[3]][1]) + (in[ls[2]][1] + in[ls[4]][1])) * LIMIT1 + ((in[ls[5]][1] + in[ls[7]][1]) + (in[ls[6]][1] + in[ls[8]][1])) * LIMIT2;
+				out[outIndex][2] = in[ls[0]][2] * LIMIT0 + ((in[ls[1]][2] + in[ls[3]][2]) + (in[ls[2]][2] + in[ls[4]][2])) * LIMIT1 + ((in[ls[5]][2] + in[ls[7]][2]) + (in[ls[6]][2] + in[ls[8]][2])) * LIMIT2;
+			}
 			
-			bx = (in[s[1]][0] - in[s[3]][0]) * 4 + (in[s[5]][0] - in[s[8]][0]) + (in[s[6]][0] - in[s[7]][0]);
-			by = (in[s[1]][1] - in[s[3]][1]) * 4 + (in[s[5]][1] - in[s[8]][1]) + (in[s[6]][1] - in[s[7]][1]);
-			bz = (in[s[1]][2] - in[s[3]][2]) * 4 + (in[s[5]][2] - in[s[8]][2]) + (in[s[6]][2] - in[s[7]][2]);
+			ax = (in[ls[2]][0] - in[ls[4]][0]) * 4 + (in[ls[6]][0] - in[ls[5]][0]) + (in[ls[7]][0] - in[ls[8]][0]);
+			ay = (in[ls[2]][1] - in[ls[4]][1]) * 4 + (in[ls[6]][1] - in[ls[5]][1]) + (in[ls[7]][1] - in[ls[8]][1]);
+			az = (in[ls[2]][2] - in[ls[4]][2]) * 4 + (in[ls[6]][2] - in[ls[5]][2]) + (in[ls[7]][2] - in[ls[8]][2]);
+			
+			bx = (in[ls[1]][0] - in[ls[3]][0]) * 4 + (in[ls[5]][0] - in[ls[8]][0]) + (in[ls[6]][0] - in[ls[7]][0]);
+			by = (in[ls[1]][1] - in[ls[3]][1]) * 4 + (in[ls[5]][1] - in[ls[8]][1]) + (in[ls[6]][1] - in[ls[7]][1]);
+			bz = (in[ls[1]][2] - in[ls[3]][2]) * 4 + (in[ls[5]][2] - in[ls[8]][2]) + (in[ls[6]][2] - in[ls[7]][2]);
 			
 			nx = by * az - bz * ay;		// cross product
 			ny = bz * ax - bx * az;
@@ -817,10 +885,16 @@ public class Dicer {
 			
 			final int outIndex = cs[4];
 			
-			if (cps[0] > 0) {	
+			if (cps[0] > 0) {
+				// corner
 				out[outIndex][0] = in[cs[5]][0];
 				out[outIndex][1] = in[cs[5]][1];
 				out[outIndex][2] = in[cs[5]][2];
+			} else if (cs[1] > 0) {
+				//crease//
+				out[outIndex][0] = in[cs[5]][0] * CREASE_LIMIT0 + (in[cs[cs[2]]][0] + in[cs[cs[3]]][0]) * CREASE_LIMIT1;
+				out[outIndex][1] = in[cs[5]][1] * CREASE_LIMIT0 + (in[cs[cs[2]]][1] + in[cs[cs[3]]][1]) * CREASE_LIMIT1;
+				out[outIndex][2] = in[cs[5]][2] * CREASE_LIMIT0 + (in[cs[cs[2]]][2] + in[cs[cs[3]]][2]) * CREASE_LIMIT1;
 			} else {
 				float f0 = 0;
 				float f1 = 0;

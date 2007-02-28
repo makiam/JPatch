@@ -60,6 +60,16 @@ public class Slate2 {
 		}
 	}
 	
+	int getEdgeIndex(int corner, SlateEdge edge) {
+		SlateEdge[] c = corners[corner];
+		for (int i = 0, n = c.length; i < n; i++) {
+			if (c[i] == edge) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
 	public void estimateSubdivLevel(int halfWidth, int halfHeight) {
 		int xmin = Integer.MAX_VALUE;
 		int xmax = Integer.MIN_VALUE;
