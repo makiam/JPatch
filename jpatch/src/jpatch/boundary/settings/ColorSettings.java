@@ -32,7 +32,7 @@ public class ColorSettings extends AbstractSettings {
 	public Icon getIcon() {
 		return icon;
 	}
-	public Color3f background = new Color3f(new Color(0x28,0x38,0x48));
+	public Color3f background = new Color3f(new Color(0x38,0x38,0x38));
 	public Color3f curves = new Color3f(new Color(255,255,255));
 	public Color3f points = new Color3f(new Color(255,255,0));
 	public Color3f headPoints = new Color3f(new Color(255,0,0));
@@ -42,8 +42,8 @@ public class ColorSettings extends AbstractSettings {
 	public Color3f tangents = new Color3f(new Color(255,255,0));
 	public Color3f selection = new Color3f(new Color(255,255,0));
 	public Color3f text = new Color3f(new Color(0x80,0x90,0xA0));
-	public Color3f majorGrid = new Color3f(new Color(0x08,0x18,0x28));
-	public Color3f minorGrid = new Color3f(new Color(0x18,0x28,0x38));
+	public Color3f majorGrid = new Color3f(new Color(0x18,0x18,0x18));
+	public Color3f minorGrid = new Color3f(new Color(0x28,0x28,0x28));
 	public Color3f xAxis = new Color3f(new Color(255,64,0));
 	public Color3f yAxis = new Color3f(new Color(0,255,0));
 	public Color3f zAxis = new Color3f(new Color(128,128,255));
