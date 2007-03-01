@@ -384,6 +384,14 @@ public class Dicer {
 		return GRID_START;
 	}
 	
+	public float[][] getSubdivVertices(int level) {
+		return subdivPoints[level];
+	}
+	
+	public int[][] getStencils(int level) {
+		return patchStencil[level];
+	}
+	
 	public float[][] getLimitVertices(int level) {
 		return limitPoints[level];
 	}
@@ -488,7 +496,6 @@ public class Dicer {
 		patchStencil[1][8][1] = slate.corners[1][0].vertex.crease;
 		if (slate.corners[1][0].vertex.crease > 0) {
 			patchStencil[1][8][0] = CREASE_5_7;
-			System.out.println("8 = CREASE_5_7");
 		} else {
 			patchStencil[1][8][0] = POINT;
 		}
@@ -496,7 +503,6 @@ public class Dicer {
 		patchStencil[1][16][1] = slate.corners[3][0].vertex.crease;
 		if (slate.corners[3][0].vertex.crease > 0) {
 			patchStencil[1][16][0] = CREASE_4_6;
-			System.out.println("16 = CREASE_4_6");
 		} else {
 			patchStencil[1][16][0] = POINT;
 		}
@@ -545,8 +551,11 @@ public class Dicer {
 			 * initialize fan stencils
 			 */
 			for (int i = 2; i < slate.corners[corner * 2].length; i++) {
-				int index = i == slate.corners[corner * 2].length - 1 ? 0 : i * 2 - 3;
+				int index = (i == slate.corners[corner * 2].length - 1) ? 0 : i * 2 - 3;
 				fanStencil[1][valence - 3][corner][index][1] = slate.corners[corner * 2][i].getSharpness();
+			}
+			if (n == 2) {
+				fanStencil[1][valence - 3][corner][1][1] = fanStencil[1][valence - 3][corner][0][1];
 			}
 			
 			// test crease stencils
@@ -561,8 +570,9 @@ public class Dicer {
 		 */
 //		int[] stencilTypes = new int[11];
 		for (int level = 1; level < depth; level++) {
+			boolean rewriteStencils = (level < depth - 1 && level < MAX_SUBDIV - 1);
 			final int[][] stencil = patchStencil[level];
-			final int[][] nextLevel = patchStencil[level + 1];
+			final int[][] nextLevel = rewriteStencils ? patchStencil[level + 1] : null;
 			final float[][] out = subdivPoints[level];
 			final float[][] in = subdivPoints[level - 1];
 			final int n = stencil.length - 2;
@@ -570,124 +580,207 @@ public class Dicer {
 			/*
 			 * apply stencils on rectangular inner grid
 			 */
-			for (int i = 2; i < n; i++) {
-				final int[] s = stencil[i];
-				final int outIndex = GRID_START + i;
-//				stencilTypes[s[0]]++;
-				switch (s[0]) {
-				case EDGE_H:
-					if (s[1] > 0) {
-						// crease
-						out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * 0.5f;
-						out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * 0.5f;
-						out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * 0.5f;
-						nextLevel[s[2]][1] = s[1] - 1;
-						nextLevel[s[3]][1] = 0;
-						nextLevel[s[4]][1] = s[1] - 1;
-						nextLevel[s[5]][1] = 0;
-						nextLevel[s[6]][1] = s[1] - 1;
-						nextLevel[s[2]][0] = CREASE_5_7;
-					} else {
-						// smooth
-						out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * EDGE0 + ((in[s[9]][0] + in[s[10]][0]) + (in[s[11]][0] + in[s[12]][0])) * EDGE1;
-						out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * EDGE0 + ((in[s[9]][1] + in[s[10]][1]) + (in[s[11]][1] + in[s[12]][1])) * EDGE1;
-						out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * EDGE0 + ((in[s[9]][2] + in[s[10]][2]) + (in[s[11]][2] + in[s[12]][2])) * EDGE1;
-						nextLevel[s[2]][1] = 0;
-						nextLevel[s[3]][1] = 0;
-						nextLevel[s[4]][1] = 0;
-						nextLevel[s[5]][1] = 0;
-						nextLevel[s[6]][1] = 0;
+			if (rewriteStencils) {
+				for (int i = 2; i < n; i++) {
+					final int[] s = stencil[i];
+					final int outIndex = GRID_START + i;
+	//				stencilTypes[s[0]]++;
+						switch (s[0]) {
+						case EDGE_H:
+						if (s[1] > 0) {
+							// crease
+							out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * 0.5f;
+							out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * 0.5f;
+							out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * 0.5f;
+							nextLevel[s[2]][1] = s[1] - 1;
+							nextLevel[s[3]][1] = 0;
+							nextLevel[s[4]][1] = s[1] - 1;
+							nextLevel[s[5]][1] = 0;
+							nextLevel[s[6]][1] = s[1] - 1;
+							nextLevel[s[2]][0] = CREASE_5_7;
+						} else {
+							// smooth
+							out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * EDGE0 + ((in[s[9]][0] + in[s[10]][0]) + (in[s[11]][0] + in[s[12]][0])) * EDGE1;
+							out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * EDGE0 + ((in[s[9]][1] + in[s[10]][1]) + (in[s[11]][1] + in[s[12]][1])) * EDGE1;
+							out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * EDGE0 + ((in[s[9]][2] + in[s[10]][2]) + (in[s[11]][2] + in[s[12]][2])) * EDGE1;
+							nextLevel[s[2]][1] = 0;
+							nextLevel[s[3]][1] = 0;
+							nextLevel[s[4]][1] = 0;
+							nextLevel[s[5]][1] = 0;
+							nextLevel[s[6]][1] = 0;
+							nextLevel[s[2]][0] = POINT;
+						}
+						break;
+					case EDGE_V:
+						if (s[1] > 0) {
+							// crease
+							out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * 0.5f;
+							out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * 0.5f;
+							out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * 0.5f;
+							nextLevel[s[2]][1] = s[1] - 1;
+							nextLevel[s[3]][1] = s[1] - 1;
+							nextLevel[s[4]][1] = 0;
+							nextLevel[s[5]][1] = s[1] - 1;
+							nextLevel[s[6]][1] = 0;
+							nextLevel[s[2]][0] = CREASE_4_6;
+						} else {
+							// smooth
+							out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * EDGE0 + ((in[s[9]][0] + in[s[10]][0]) + (in[s[11]][0] + in[s[12]][0])) * EDGE1;
+							out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * EDGE0 + ((in[s[9]][1] + in[s[10]][1]) + (in[s[11]][1] + in[s[12]][1])) * EDGE1;
+							out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * EDGE0 + ((in[s[9]][2] + in[s[10]][2]) + (in[s[11]][2] + in[s[12]][2])) * EDGE1;
+							nextLevel[s[2]][1] = 0;
+							nextLevel[s[3]][1] = 0;
+							nextLevel[s[4]][1] = 0;
+							nextLevel[s[5]][1] = 0;
+							nextLevel[s[6]][1] = 0;
+							nextLevel[s[2]][0] = POINT;
+						}
+						break;
+					case POINT:
+						if (s[1] > 0) {
+							// corner
+							out[outIndex][0] = in[s[3]][0];
+							out[outIndex][1] = in[s[3]][1];
+							out[outIndex][2] = in[s[3]][2];
+							nextLevel[s[2]][1] = s[1] - 1;
+						} else {
+							// smooth
+							out[outIndex][0] = in[s[3]][0] * VERTEX0 + ((in[s[4]][0] + in[s[6]][0]) + (in[s[5]][0] + in[s[7]][0])) * VERTEX1 + ((in[s[8]][0] + in[s[10]][0]) + (in[s[9]][0] + in[s[11]][0])) * VERTEX2;
+							out[outIndex][1] = in[s[3]][1] * VERTEX0 + ((in[s[4]][1] + in[s[6]][1]) + (in[s[5]][1] + in[s[7]][1])) * VERTEX1 + ((in[s[8]][1] + in[s[10]][1]) + (in[s[9]][1] + in[s[11]][1])) * VERTEX2;
+							out[outIndex][2] = in[s[3]][2] * VERTEX0 + ((in[s[4]][2] + in[s[6]][2]) + (in[s[5]][2] + in[s[7]][2])) * VERTEX1 + ((in[s[8]][2] + in[s[10]][2]) + (in[s[9]][2] + in[s[11]][2])) * VERTEX2;
+							nextLevel[s[2]][1] = 0;
+						}
 						nextLevel[s[2]][0] = POINT;
-					}
-					break;
-				case EDGE_V:
-					if (s[1] > 0) {
-						// crease
-						out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * 0.5f;
-						out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * 0.5f;
-						out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * 0.5f;
+						break;
+					case FACE:
+						out[outIndex][0] = ((in[s[1]][0] + in[s[3]][0]) + (in[s[2]][0] + in[s[4]][0])) * FACE0;
+						out[outIndex][1] = ((in[s[1]][1] + in[s[3]][1]) + (in[s[2]][1] + in[s[4]][1])) * FACE0;
+						out[outIndex][2] = ((in[s[1]][2] + in[s[3]][2]) + (in[s[2]][2] + in[s[4]][2])) * FACE0;
+						break;
+					case CREASE_4_5:
+						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[5]][0]) * CREASE1;
+						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[5]][1]) * CREASE1;
+						out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[5]][2]) * CREASE1;
 						nextLevel[s[2]][1] = s[1] - 1;
-						nextLevel[s[3]][1] = s[1] - 1;
-						nextLevel[s[4]][1] = 0;
-						nextLevel[s[5]][1] = s[1] - 1;
-						nextLevel[s[6]][1] = 0;
-						nextLevel[s[2]][0] = CREASE_4_6;
-					} else {
-						// smooth
-						out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * EDGE0 + ((in[s[9]][0] + in[s[10]][0]) + (in[s[11]][0] + in[s[12]][0])) * EDGE1;
-						out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * EDGE0 + ((in[s[9]][1] + in[s[10]][1]) + (in[s[11]][1] + in[s[12]][1])) * EDGE1;
-						out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * EDGE0 + ((in[s[9]][2] + in[s[10]][2]) + (in[s[11]][2] + in[s[12]][2])) * EDGE1;
-						nextLevel[s[2]][1] = 0;
-						nextLevel[s[3]][1] = 0;
-						nextLevel[s[4]][1] = 0;
-						nextLevel[s[5]][1] = 0;
-						nextLevel[s[6]][1] = 0;
-						nextLevel[s[2]][0] = POINT;
-					}
-					break;
-				case POINT:
-					if (s[1] > 0) {
-						// corner
-						out[outIndex][0] = in[s[3]][0];
-						out[outIndex][1] = in[s[3]][1];
-						out[outIndex][2] = in[s[3]][2];
+						nextLevel[s[2]][0] = s[1] > 1 ? CREASE_4_5 : POINT;
+						break;
+					case CREASE_4_6:
+						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[6]][0]) * CREASE1;
+						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[6]][1]) * CREASE1;
+						out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[6]][2]) * CREASE1;
 						nextLevel[s[2]][1] = s[1] - 1;
-					} else {
-						// smooth
-						out[outIndex][0] = in[s[3]][0] * VERTEX0 + ((in[s[4]][0] + in[s[6]][0]) + (in[s[5]][0] + in[s[7]][0])) * VERTEX1 + ((in[s[8]][0] + in[s[10]][0]) + (in[s[9]][0] + in[s[11]][0])) * VERTEX2;
-						out[outIndex][1] = in[s[3]][1] * VERTEX0 + ((in[s[4]][1] + in[s[6]][1]) + (in[s[5]][1] + in[s[7]][1])) * VERTEX1 + ((in[s[8]][1] + in[s[10]][1]) + (in[s[9]][1] + in[s[11]][1])) * VERTEX2;
-						out[outIndex][2] = in[s[3]][2] * VERTEX0 + ((in[s[4]][2] + in[s[6]][2]) + (in[s[5]][2] + in[s[7]][2])) * VERTEX1 + ((in[s[8]][2] + in[s[10]][2]) + (in[s[9]][2] + in[s[11]][2])) * VERTEX2;
-						nextLevel[s[2]][1] = 0;
+						nextLevel[s[2]][0] = s[1] > 1 ? CREASE_4_6 : POINT;
+						break;
+					case CREASE_4_7:
+						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[7]][0]) * CREASE1;
+						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[7]][1]) * CREASE1;
+						out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[7]][2]) * CREASE1;
+						nextLevel[s[2]][1] = s[1] - 1;
+						nextLevel[s[2]][0] = s[1] > 1 ? CREASE_4_7 : POINT;
+						break;
+					case CREASE_5_6:
+						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[5]][0] + in[s[6]][0]) * CREASE1;
+						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[5]][1] + in[s[6]][1]) * CREASE1;
+						out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[5]][2] + in[s[6]][2]) * CREASE1;
+						nextLevel[s[2]][1] = s[1] - 1;
+						nextLevel[s[2]][0] = s[1] > 1 ? CREASE_5_6 : POINT;
+						break;
+					case CREASE_5_7:
+						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[5]][0] + in[s[7]][0]) * CREASE1;
+						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[5]][1] + in[s[7]][1]) * CREASE1;
+						out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[5]][2] + in[s[7]][2]) * CREASE1;
+						nextLevel[s[2]][1] = s[1] - 1;
+						nextLevel[s[2]][0] = s[1] > 1 ? CREASE_5_7 : POINT;
+						break;
+					case CREASE_6_7:
+						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[6]][0] + in[s[7]][0]) * CREASE1;
+						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[6]][1] + in[s[7]][1]) * CREASE1;
+						out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[6]][2] + in[s[7]][2]) * CREASE1;
+						nextLevel[s[2]][1] = s[1] - 1;
+						nextLevel[s[2]][0] = s[1] > 1 ? CREASE_6_7 : POINT;
+						break;
 					}
-					nextLevel[s[2]][0] = POINT;
-					break;
-				case FACE:
-					out[outIndex][0] = ((in[s[1]][0] + in[s[3]][0]) + (in[s[2]][0] + in[s[4]][0])) * FACE0;
-					out[outIndex][1] = ((in[s[1]][1] + in[s[3]][1]) + (in[s[2]][1] + in[s[4]][1])) * FACE0;
-					out[outIndex][2] = ((in[s[1]][2] + in[s[3]][2]) + (in[s[2]][2] + in[s[4]][2])) * FACE0;
-					break;
-				case CREASE_4_5:
-					out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[5]][0]) * CREASE1;
-					out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[5]][1]) * CREASE1;
-					out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[5]][2]) * CREASE1;
-					nextLevel[s[2]][1] = s[1] - 1;
-					nextLevel[s[2]][0] = s[1] > 1 ? CREASE_4_5 : POINT;
-					break;
-				case CREASE_4_6:
-					out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[6]][0]) * CREASE1;
-					out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[6]][1]) * CREASE1;
-					out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[6]][2]) * CREASE1;
-					nextLevel[s[2]][1] = s[1] - 1;
-					nextLevel[s[2]][0] = s[1] > 1 ? CREASE_4_6 : POINT;
-					break;
-				case CREASE_4_7:
-					out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[7]][0]) * CREASE1;
-					out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[7]][1]) * CREASE1;
-					out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[7]][2]) * CREASE1;
-					nextLevel[s[2]][1] = s[1] - 1;
-					nextLevel[s[2]][0] = s[1] > 1 ? CREASE_4_7 : POINT;
-					break;
-				case CREASE_5_6:
-					out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[5]][0] + in[s[6]][0]) * CREASE1;
-					out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[5]][1] + in[s[6]][1]) * CREASE1;
-					out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[5]][2] + in[s[6]][2]) * CREASE1;
-					nextLevel[s[2]][1] = s[1] - 1;
-					nextLevel[s[2]][0] = s[1] > 1 ? CREASE_5_6 : POINT;
-					break;
-				case CREASE_5_7:
-					out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[5]][0] + in[s[7]][0]) * CREASE1;
-					out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[5]][1] + in[s[7]][1]) * CREASE1;
-					out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[5]][2] + in[s[7]][2]) * CREASE1;
-					nextLevel[s[2]][1] = s[1] - 1;
-					nextLevel[s[2]][0] = s[1] > 1 ? CREASE_5_7 : POINT;
-					break;
-				case CREASE_6_7:
-					out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[6]][0] + in[s[7]][0]) * CREASE1;
-					out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[6]][1] + in[s[7]][1]) * CREASE1;
-					out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[6]][2] + in[s[7]][2]) * CREASE1;
-					nextLevel[s[2]][1] = s[1] - 1;
-					nextLevel[s[2]][0] = s[1] > 1 ? CREASE_6_7 : POINT;
-					break;
+				}
+			}else {
+				for (int i = 2; i < n; i++) {
+					final int[] s = stencil[i];
+					final int outIndex = GRID_START + i;
+					switch (s[0]) {
+					case EDGE_H:
+						if (s[1] > 0) {
+							// crease
+							out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * 0.5f;
+							out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * 0.5f;
+							out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * 0.5f;
+						} else {
+							// smooth
+							out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * EDGE0 + ((in[s[9]][0] + in[s[10]][0]) + (in[s[11]][0] + in[s[12]][0])) * EDGE1;
+							out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * EDGE0 + ((in[s[9]][1] + in[s[10]][1]) + (in[s[11]][1] + in[s[12]][1])) * EDGE1;
+							out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * EDGE0 + ((in[s[9]][2] + in[s[10]][2]) + (in[s[11]][2] + in[s[12]][2])) * EDGE1;
+						}
+						break;
+					case EDGE_V:
+						if (s[1] > 0) {
+							// crease
+							out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * 0.5f;
+							out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * 0.5f;
+							out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * 0.5f;
+						} else {
+							// smooth
+							out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * EDGE0 + ((in[s[9]][0] + in[s[10]][0]) + (in[s[11]][0] + in[s[12]][0])) * EDGE1;
+							out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * EDGE0 + ((in[s[9]][1] + in[s[10]][1]) + (in[s[11]][1] + in[s[12]][1])) * EDGE1;
+							out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * EDGE0 + ((in[s[9]][2] + in[s[10]][2]) + (in[s[11]][2] + in[s[12]][2])) * EDGE1;
+						}
+						break;
+					case POINT:
+						if (s[1] > 0) {
+							// corner
+							out[outIndex][0] = in[s[3]][0];
+							out[outIndex][1] = in[s[3]][1];
+							out[outIndex][2] = in[s[3]][2];
+						} else {
+							// smooth
+							out[outIndex][0] = in[s[3]][0] * VERTEX0 + ((in[s[4]][0] + in[s[6]][0]) + (in[s[5]][0] + in[s[7]][0])) * VERTEX1 + ((in[s[8]][0] + in[s[10]][0]) + (in[s[9]][0] + in[s[11]][0])) * VERTEX2;
+							out[outIndex][1] = in[s[3]][1] * VERTEX0 + ((in[s[4]][1] + in[s[6]][1]) + (in[s[5]][1] + in[s[7]][1])) * VERTEX1 + ((in[s[8]][1] + in[s[10]][1]) + (in[s[9]][1] + in[s[11]][1])) * VERTEX2;
+							out[outIndex][2] = in[s[3]][2] * VERTEX0 + ((in[s[4]][2] + in[s[6]][2]) + (in[s[5]][2] + in[s[7]][2])) * VERTEX1 + ((in[s[8]][2] + in[s[10]][2]) + (in[s[9]][2] + in[s[11]][2])) * VERTEX2;
+						}
+						break;
+					case FACE:
+						out[outIndex][0] = ((in[s[1]][0] + in[s[3]][0]) + (in[s[2]][0] + in[s[4]][0])) * FACE0;
+						out[outIndex][1] = ((in[s[1]][1] + in[s[3]][1]) + (in[s[2]][1] + in[s[4]][1])) * FACE0;
+						out[outIndex][2] = ((in[s[1]][2] + in[s[3]][2]) + (in[s[2]][2] + in[s[4]][2])) * FACE0;
+						break;
+					case CREASE_4_5:
+						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[5]][0]) * CREASE1;
+						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[5]][1]) * CREASE1;
+						out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[5]][2]) * CREASE1;
+						break;
+					case CREASE_4_6:
+						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[6]][0]) * CREASE1;
+						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[6]][1]) * CREASE1;
+						out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[6]][2]) * CREASE1;
+						break;
+					case CREASE_4_7:
+						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[7]][0]) * CREASE1;
+						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[7]][1]) * CREASE1;
+						out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[7]][2]) * CREASE1;
+						break;
+					case CREASE_5_6:
+						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[5]][0] + in[s[6]][0]) * CREASE1;
+						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[5]][1] + in[s[6]][1]) * CREASE1;
+						out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[5]][2] + in[s[6]][2]) * CREASE1;
+						break;
+					case CREASE_5_7:
+						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[5]][0] + in[s[7]][0]) * CREASE1;
+						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[5]][1] + in[s[7]][1]) * CREASE1;
+						out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[5]][2] + in[s[7]][2]) * CREASE1;
+						break;
+					case CREASE_6_7:
+						out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[6]][0] + in[s[7]][0]) * CREASE1;
+						out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[6]][1] + in[s[7]][1]) * CREASE1;
+						out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[6]][2] + in[s[7]][2]) * CREASE1;
+						break;
+					}
 				}
 			}
 			
@@ -704,19 +797,23 @@ public class Dicer {
 					out[outIndex][0] = in[cs[5]][0];
 					out[outIndex][1] = in[cs[5]][1];
 					out[outIndex][2] = in[cs[5]][2];
-					cornerStencil[level + 1][valence - 3][corner][0] = cornerStencil[level][valence - 3][corner][0] - 1;
-					cornerStencil[level + 1][valence - 3][corner][1] = cornerStencil[level][valence - 3][corner][1] - 1;
-					cornerStencil[level + 1][valence - 3][corner][2] = cornerStencil[level][valence - 3][corner][2];
-					cornerStencil[level + 1][valence - 3][corner][3] = cornerStencil[level][valence - 3][corner][3];
+					if (rewriteStencils) {
+						cornerStencil[level + 1][valence - 3][corner][0] = cornerStencil[level][valence - 3][corner][0] - 1;
+						cornerStencil[level + 1][valence - 3][corner][1] = cornerStencil[level][valence - 3][corner][1] - 1;
+						cornerStencil[level + 1][valence - 3][corner][2] = cornerStencil[level][valence - 3][corner][2];
+						cornerStencil[level + 1][valence - 3][corner][3] = cornerStencil[level][valence - 3][corner][3];
+					}
 				} else if (cs[1] > 0) {
 					//crease//
 					out[outIndex][0] = in[cs[5]][0] * CREASE0 + (in[cs[cs[2]]][0] + in[cs[cs[3]]][0]) * CREASE1;
 					out[outIndex][1] = in[cs[5]][1] * CREASE0 + (in[cs[cs[2]]][1] + in[cs[cs[3]]][1]) * CREASE1;
 					out[outIndex][2] = in[cs[5]][2] * CREASE0 + (in[cs[cs[2]]][2] + in[cs[cs[3]]][2]) * CREASE1;
-					cornerStencil[level + 1][valence - 3][corner][0] = cornerStencil[level][valence - 3][corner][0] - 1;
-					cornerStencil[level + 1][valence - 3][corner][1] = cornerStencil[level][valence - 3][corner][1] - 1;
-					cornerStencil[level + 1][valence - 3][corner][2] = cornerStencil[level][valence - 3][corner][2];
-					cornerStencil[level + 1][valence - 3][corner][3] = cornerStencil[level][valence - 3][corner][3];
+					if (rewriteStencils) {
+						cornerStencil[level + 1][valence - 3][corner][0] = cornerStencil[level][valence - 3][corner][0] - 1;
+						cornerStencil[level + 1][valence - 3][corner][1] = cornerStencil[level][valence - 3][corner][1] - 1;
+						cornerStencil[level + 1][valence - 3][corner][2] = cornerStencil[level][valence - 3][corner][2];
+						cornerStencil[level + 1][valence - 3][corner][3] = cornerStencil[level][valence - 3][corner][3];
+					}
 				} else {
 					//smooth//
 					float a0 = 0;
@@ -747,12 +844,14 @@ public class Dicer {
 					out[outIndex][0] = (a0 + b0 + in[cs[5]][0] * cc) * ik;
 					out[outIndex][1] = (a1 + b1 + in[cs[5]][1] * cc) * ik;
 					out[outIndex][2] = (a2 + b2 + in[cs[5]][2] * cc) * ik;
-					cornerStencil[level + 1][valence - 3][corner][0] = 0;
-					cornerStencil[level + 1][valence - 3][corner][1] = 0;
+					if (rewriteStencils) {
+						cornerStencil[level + 1][valence - 3][corner][0] = 0;
+						cornerStencil[level + 1][valence - 3][corner][1] = 0;
+					}
 				}
 
 				final int[][] array = fanStencil[level][valence - 3][corner];
-				final int[][] nextArray = fanStencil[level + 1][valence - 3][corner];
+				final int[][] nextArray = rewriteStencils ? fanStencil[level + 1][valence - 3][corner] : null;
 				final int m = array.length;
 				for (int i = 0; i < m; i++) {
 					final int oi = MAX_CORNER_LENGTH * corner + i;
@@ -764,12 +863,16 @@ public class Dicer {
 							out[oi][0] = (in[s[2]][0] + in[s[3]][0]) * 0.5f;
 							out[oi][1] = (in[s[2]][1] + in[s[3]][1]) * 0.5f;
 							out[oi][2] = (in[s[2]][2] + in[s[3]][2]) * 0.5f;
-							nextArray[i][1] = s[1] - 1;
+							if (rewriteStencils) {
+								nextArray[i][1] = s[1] - 1;
+							}
 						} else {
 							out[oi][0] = (in[s[2]][0] + in[s[3]][0]) * EDGE0 + ((in[s[4]][0] + in[s[5]][0]) + (in[s[6]][0] + in[s[7]][0])) * EDGE1;
 							out[oi][1] = (in[s[2]][1] + in[s[3]][1]) * EDGE0 + ((in[s[4]][1] + in[s[5]][1]) + (in[s[6]][1] + in[s[7]][1])) * EDGE1;
 							out[oi][2] = (in[s[2]][2] + in[s[3]][2]) * EDGE0 + ((in[s[4]][2] + in[s[5]][2]) + (in[s[6]][2] + in[s[7]][2])) * EDGE1;
-							nextArray[i][1] = 0;
+							if (rewriteStencils) {
+								nextArray[i][1] = 0;
+							}
 						}
 						break;
 					case FACE:
@@ -890,11 +993,11 @@ public class Dicer {
 				out[outIndex][0] = in[cs[5]][0];
 				out[outIndex][1] = in[cs[5]][1];
 				out[outIndex][2] = in[cs[5]][2];
-			} else if (cs[1] > 0) {
+			} else if (cps[1] > 0) {
 				//crease//
-				out[outIndex][0] = in[cs[5]][0] * CREASE_LIMIT0 + (in[cs[cs[2]]][0] + in[cs[cs[3]]][0]) * CREASE_LIMIT1;
-				out[outIndex][1] = in[cs[5]][1] * CREASE_LIMIT0 + (in[cs[cs[2]]][1] + in[cs[cs[3]]][1]) * CREASE_LIMIT1;
-				out[outIndex][2] = in[cs[5]][2] * CREASE_LIMIT0 + (in[cs[cs[2]]][2] + in[cs[cs[3]]][2]) * CREASE_LIMIT1;
+				out[outIndex][0] = in[cs[5]][0] * CREASE_LIMIT0 + (in[cs[cps[2]]][0] + in[cs[cps[3]]][0]) * CREASE_LIMIT1;
+				out[outIndex][1] = in[cs[5]][1] * CREASE_LIMIT0 + (in[cs[cps[2]]][1] + in[cs[cps[3]]][1]) * CREASE_LIMIT1;
+				out[outIndex][2] = in[cs[5]][2] * CREASE_LIMIT0 + (in[cs[cps[2]]][2] + in[cs[cps[3]]][2]) * CREASE_LIMIT1;
 			} else {
 				float f0 = 0;
 				float f1 = 0;

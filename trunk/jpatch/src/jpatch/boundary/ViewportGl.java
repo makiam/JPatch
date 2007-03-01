@@ -417,13 +417,12 @@ public class ViewportGl extends Viewport {
 		
 		component.addMouseWheelListener(new MouseWheelListener() {
 			public void mouseWheelMoved(MouseWheelEvent e) {
-//				subdivLevel += e.getWheelRotation();
-//				if (subdivLevel < 1) subdivLevel = 1;
-//				if (subdivLevel > 6) subdivLevel = 6;
-//				component.repaint();
+				subdivLevel += e.getWheelRotation();
+				if (subdivLevel < 1) subdivLevel = 1;
+				if (subdivLevel > 6) subdivLevel = 6;
 				
-				useProgram = !useProgram;
-//				num += e.getWheelRotation();
+//				useProgram = !useProgram;
+
 				component.repaint();
 			}
 		});
@@ -1130,6 +1129,7 @@ public class ViewportGl extends Viewport {
 		if (gl.isFunctionAvailable("glUseProgram")) {
 			gl.glUseProgram(useProgram ? program : 0);
 		}
+		gl.glEnable(GL_LIGHTING);
 		gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 0, 0.9f }, 0);
 		gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0, 0, 0.2f }, 0);
 		
@@ -1170,6 +1170,8 @@ public class ViewportGl extends Viewport {
 		}
 		gl.glEnd();
 		
+		
+		
 //		gl.glDisable(GL_LIGHTING);
 //		if (gl.isFunctionAvailable("glUseProgram")) {
 //			gl.glUseProgram(0);
@@ -1199,6 +1201,71 @@ public class ViewportGl extends Viewport {
 			}
 			gl.glEnd();
 		}
+		
+		gl.glDisable(GL_LIGHTING);
+		gl.glColor3f(0.5f, 0.5f, 0.5f);
+		vertices = dicer.getSubdivVertices(subdivLevel - 1);
+		dim = ((1 << subdivLevel - 1)) + 3;
+		int start = dicer.getGridStart();
+		for (int i = 1, n = dim - 1; i < n; i++) {
+			gl.glBegin(GL_LINE_STRIP);
+			int index = start + i * dim;
+			for (int j = index + 1, m = index + dim - 1; j < m; j++) {
+				gl.glVertex3fv(vertices[j], 0);
+			}
+			gl.glEnd();
+		}
+//		for (int i = 1, n = dim - 1; i < n; i++) {
+//			gl.glBegin(GL_LINE_STRIP);
+//			int index = start + i;
+//			int max = dim * (dim - 1);
+//			for (int j = index + dim, m = index + max; j < m; j += dim) {
+//				gl.glVertex3fv(vertices[j], 0);
+//			}
+//			gl.glEnd();
+//		}
+		
+		final int EDGE = 1;
+		final int EDGE_H = 2;
+		final int EDGE_V = 3;
+		final int FACE = 4;
+		final int POINT = 5;
+		final int CREASE_4_5 = 6;
+		final int CREASE_4_6 = 7;
+		final int CREASE_4_7 = 8;
+		final int CREASE_5_6 = 9;
+		final int CREASE_5_7 = 10;
+		final int CREASE_6_7 = 11;
+		int[][] stencils = dicer.getStencils(subdivLevel - 1);
+		gl.glPointSize(5);
+		gl.glBegin(GL_POINTS);
+		for (int i = 1, n = dim - 1; i < n; i++) {
+			int index = start + i * dim;
+			for (int j = index + 1, m = index + dim - 1; j < m; j++) {
+//				switch (stencils[j - start][0]) {
+//				case EDGE:
+//				case EDGE_H:
+//				case EDGE_V:
+//					gl.glColor3f(1, 0, 0);
+//					break;
+//				case FACE:
+//					gl.glColor3f(0, 1, 0);
+//					break;
+//				case POINT:
+//					gl.glColor3f(0, 1, 1);
+//					break;
+//				default:
+//					gl.glColor3f(1, 1, 1);
+//				}
+				if (stencils[j - start][0] != FACE && stencils[j - start][1] > 0) {
+					gl.glColor3f(1, 0, 0);
+				} else {
+					gl.glColor3f(0, 1, 0);
+				}
+				gl.glVertex3fv(vertices[j], 0);
+			}
+		}
+		gl.glEnd();
 	}
 	
 	private void drawFragment(float[][] v, int valence, int depth) {
