@@ -527,7 +527,9 @@ public class Dicer {
 			final int start = corner * MAX_CORNER_LENGTH;
 			
 //			cornerStencil[1][valence - 3][corner][0] = Integer.MAX_VALUE;
-			
+			if (valence < 3) {
+				return 0;
+			}
 			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner * 2][0].vertex.corner;
 			cornerStencil[1][valence - 3][corner][1] = slate.corners[corner * 2][0].vertex.crease;
 			if (slate.corners[corner * 2][0].vertex.crease > 1) {
