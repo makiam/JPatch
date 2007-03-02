@@ -100,7 +100,6 @@ public class Face {
 			HalfEdge e = edge;
 			for (int i = 0; i < edge.vertex.valence; i++) {
 				corners[0][i] = e.slateEdge0;
-				System.out.println("corners " + corners + "[0][" + i + "]=" + corners[0][i]);
 				if (e.prev == null) {
 					break;
 				}
