@@ -3,6 +3,8 @@ package sds;
 import javax.vecmath.*;
 
 public class Slate2 {
+	private static final Point3f NULL_POINT = new Point3f();
+	
 	SlateEdge[][] corners;
 	Point3f[][] fans;
 	int subdivLevel;
@@ -30,19 +32,25 @@ public class Slate2 {
 		fans[0][0] = corners[0][0].vertex.projectedPos;
 		int j = 1;
 		for (int i = 0; i < corners[0].length; i++) {
+			if (corners[0][i] == null) {
+				fans[0][j++] = NULL_POINT;
+				fans[0][j++] = NULL_POINT;
+				continue;
+			}
 			fans[0][j++] = corners[0][i].pair.vertex.projectedPos;
-			System.out.println("corners " + corners + "[0][" + i + "].slate=" + corners[0][i].slate);
-			fans[0][j++] = corners[0][i].slate.corners[2][0].vertex.projectedPos;
+//			System.out.println("corners " + corners + "[0][" + i + "].slate=" + corners[0][i].slate);
+			fans[0][j++] = corners[0][i].slate == null ? NULL_POINT : corners[0][i].slate.corners[2][0].vertex.projectedPos;
 		}
 		
 		fans[1] = new Point3f[9];
 		fans[1][0] = corners[1][0].vertex.projectedPos;
 		j = 1;
 		for (int i = 0; i < corners[1].length; i++) {
-			fans[1][j++] = corners[1][i].pair.vertex.projectedPos;
-			fans[1][j++] = corners[1][i++].slate.corners[3][0].vertex.projectedPos;
-			fans[1][j++] = corners[1][i].pair.vertex.projectedPos;
-			fans[1][j++] = corners[1][i].slate.corners[1][0].vertex.projectedPos;
+			fans[1][j++] = corners[1][i] == null ? NULL_POINT : corners[1][i].pair.vertex.projectedPos;
+			fans[1][j++] = corners[1][i] == null || corners[1][i].slate == null ? NULL_POINT : corners[1][i].slate.corners[3][0].vertex.projectedPos;
+			i++;
+			fans[1][j++] = corners[1][i] == null ? NULL_POINT : corners[1][i].pair.vertex.projectedPos;
+			fans[1][j++] = corners[1][i] == null || corners[1][i].slate == null ? NULL_POINT : corners[1][i].slate.corners[1][0].vertex.projectedPos;
 		}
 		
 		fans[2] = new Point3f[2 * corners[2].length + 1];
@@ -57,10 +65,11 @@ public class Slate2 {
 		fans[3][0] = corners[3][0].vertex.projectedPos;
 		j = 1;
 		for (int i = 0; i < corners[3].length; i++) {
-			fans[3][j++] = corners[3][i].pair.vertex.projectedPos;
-			fans[3][j++] = corners[3][i++].slate.corners[1][0].vertex.projectedPos;
-			fans[3][j++] = corners[3][i].pair.vertex.projectedPos;
-			fans[3][j++] = corners[3][i].slate.corners[3][0].vertex.projectedPos;
+			fans[3][j++] = corners[3][i] == null ? NULL_POINT : corners[3][i].pair.vertex.projectedPos;
+			fans[3][j++] = corners[3][i] == null || corners[3][i].slate == null ? NULL_POINT : corners[3][i].slate.corners[1][0].vertex.projectedPos;
+			i++;
+			fans[3][j++] = corners[3][i] == null ? NULL_POINT : corners[3][i].pair.vertex.projectedPos;
+			fans[3][j++] = corners[3][i] == null || corners[3][i].slate == null ? NULL_POINT : corners[3][i].slate.corners[3][0].vertex.projectedPos;
 		}
 	}
 	
@@ -117,8 +126,8 @@ public class Slate2 {
 		}
 		int dx = xmax - xmin;
 		int dy = ymax - ymin;
-		int s = Math.min(dx, dy);
-		s >>= 4;
+		int s = dx + dy;
+		s >>= 5;
 		if ((s & 0xffffff00) > 0) {
 			subdivLevel = 6;
 		} else if ((s & 0xc0) > 0) {

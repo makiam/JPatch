@@ -32,7 +32,7 @@ public class HalfEdge {
 				Point3d p0 = HalfEdge.this.vertex.pos;
 				Point3d p1 = HalfEdge.this.pair.vertex.pos;
 				int edgeSharpness = HalfEdge.this.getSharpness();
-				System.out.println("edge sharpness = " + edgeSharpness);
+//				System.out.println("edge sharpness = " + edgeSharpness);
 				if (edgeSharpness > 0) {
 					position.set(
 							(p0.x + p1.x) * 0.5,
