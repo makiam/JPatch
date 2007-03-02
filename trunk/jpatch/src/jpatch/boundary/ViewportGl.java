@@ -363,7 +363,7 @@ public class ViewportGl extends Viewport {
 				gl.glEnable(GL_POLYGON_OFFSET_FILL);
 				gl.glPolygonOffset(2.5f, 2.5f);
 				gl.glDisable(GL_DEPTH_TEST);
-//				gl.glEnable(GL_NORMALIZE);
+				gl.glEnable(GL_NORMALIZE);
 				
 				
 				if (gl.isFunctionAvailable("glCreateShader")) {
@@ -1194,7 +1194,10 @@ public class ViewportGl extends Viewport {
 				if (pairLevel > level) {
 					pairLevel = level;
 				}
-				int[] lineArray = dicer.getRim(level - 1, side);
+				if (pairLevel < 2) {
+					pairLevel = 2;
+				}
+				int[] lineArray = dicer.getRim(pairLevel - 1, side);
 				gl.glBegin(GL_LINE_STRIP);
 				for (int j = 0; j < lineArray.length; j++) {
 					gl.glNormal3fv(normals[lineArray[j] + offset], 0);

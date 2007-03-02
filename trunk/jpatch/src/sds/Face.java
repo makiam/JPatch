@@ -96,10 +96,14 @@ public class Face {
 			
 			/* create SlateEdges for corner 0 (outer corner) */
 			corners[0] = new SlateEdge[edge.vertex.valence];
+			
 			HalfEdge e = edge;
 			for (int i = 0; i < edge.vertex.valence; i++) {
 				corners[0][i] = e.slateEdge0;
 				System.out.println("corners " + corners + "[0][" + i + "]=" + corners[0][i]);
+				if (e.prev == null) {
+					break;
+				}
 				e = e.prev.pair;
 			}
 			
@@ -107,7 +111,7 @@ public class Face {
 			corners[1] = new SlateEdge[4];
 			corners[1][0] = slateEdges[n].pair;
 			corners[1][1] = edge.slateEdge0.pair;
-			corners[1][2] = edge.pair.face.slateEdges[edge.pair.face.getEdgeIndex(edge.pair)].pair;
+			corners[1][2] = edge.pair.face == null ? null : edge.pair.face.slateEdges[edge.pair.face.getEdgeIndex(edge.pair)].pair;
 			corners[1][3] = edge.slateEdge1;
 			
 			/* create SlateEdges for corner 2 (inner corner) */
@@ -121,7 +125,7 @@ public class Face {
 			corners[3][0] = edge.prev.slateEdge1;
 			corners[3][1] = slateEdges[(sides - 1 + n) % sides].pair;
 			corners[3][2] = edge.prev.slateEdge0.pair;
-			corners[3][3] = edge.prev.pair.face.slateEdges[edge.prev.pair.face.getEdgeIndex(edge.prev.pair)].pair;
+			corners[3][3] = edge.prev.pair.face == null ? null : edge.prev.pair.face.slateEdges[edge.prev.pair.face.getEdgeIndex(edge.prev.pair)].pair;
 			
 			slates[n].setCorners(corners);
 			

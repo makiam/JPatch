@@ -430,7 +430,7 @@ public class Dicer {
 	
 	public int dice(final Slate2 slate, final int depth) {
 		Point3f pt;
-		slate.test();
+//		slate.test();
 		final Point3f[][] boundary = slate.fans;
 		
 		/*
@@ -495,10 +495,10 @@ public class Dicer {
 		patchStencil[1][17][1] = slate.corners[2][0].getSharpness();
 		patchStencil[1][11][1] = slate.corners[3][0].getSharpness();
 		
-		patchStencil[1][3][1] = slate.corners[1][2].getSharpness();
-		patchStencil[1][9][1] = slate.corners[1][3].getSharpness();
-		patchStencil[1][21][1] = slate.corners[3][2].getSharpness();
-		patchStencil[1][15][1] = slate.corners[3][3].getSharpness();
+		patchStencil[1][3][1] = slate.corners[1][2] == null ? 0 : slate.corners[1][2].getSharpness();
+		patchStencil[1][9][1] = slate.corners[1][3] == null ? 0 : slate.corners[1][3].getSharpness();
+		patchStencil[1][21][1] = slate.corners[3][2] == null ? 0 : slate.corners[3][2].getSharpness();
+		patchStencil[1][15][1] = slate.corners[3][3] == null ? 0 : slate.corners[3][3].getSharpness();
 		
 		patchStencil[1][8][1] = slate.corners[1][0].vertex.crease;
 		if (slate.corners[1][0].vertex.crease > 0) {
@@ -560,7 +560,7 @@ public class Dicer {
 			 */
 			for (int i = 2; i < slate.corners[corner * 2].length; i++) {
 				int index = (i == slate.corners[corner * 2].length - 1) ? 0 : i * 2 - 3;
-				fanStencil[1][valence - 3][corner][index][1] = slate.corners[corner * 2][i].getSharpness();
+				fanStencil[1][valence - 3][corner][index][1] = slate.corners[corner * 2][i] == null ? 0 : slate.corners[corner * 2][i].getSharpness();
 			}
 			if (n == 2) {
 				fanStencil[1][valence - 3][corner][1][1] = fanStencil[1][valence - 3][corner][0][1];
@@ -920,7 +920,7 @@ public class Dicer {
 		final float[][] norm = limitNormals[level];
 		final float[][] in = subdivPoints[level];
 		final int n = limitStencil.length;
-		float ax, ay, az, bx, by, bz, nx, ny, nz, nl;
+//		float ax, ay, az, bx, by, bz, nx, ny, nz, nl;
 		
 		for (int i = 0; i < n; i++) {
 			final int[] ls = limitStencil[i];
@@ -980,21 +980,25 @@ public class Dicer {
 				out[outIndex][2] = in[ls[0]][2] * LIMIT0 + ((in[ls[1]][2] + in[ls[3]][2]) + (in[ls[2]][2] + in[ls[4]][2])) * LIMIT1 + ((in[ls[5]][2] + in[ls[7]][2]) + (in[ls[6]][2] + in[ls[8]][2])) * LIMIT2;
 			}
 			
-			ax = (in[ls[2]][0] - in[ls[4]][0]) * 4 + (in[ls[6]][0] - in[ls[5]][0]) + (in[ls[7]][0] - in[ls[8]][0]);
-			ay = (in[ls[2]][1] - in[ls[4]][1]) * 4 + (in[ls[6]][1] - in[ls[5]][1]) + (in[ls[7]][1] - in[ls[8]][1]);
-			az = (in[ls[2]][2] - in[ls[4]][2]) * 4 + (in[ls[6]][2] - in[ls[5]][2]) + (in[ls[7]][2] - in[ls[8]][2]);
+			final float ax = (in[ls[2]][0] - in[ls[4]][0]) * 4 + (in[ls[6]][0] - in[ls[5]][0]) + (in[ls[7]][0] - in[ls[8]][0]);
+			final float ay = (in[ls[2]][1] - in[ls[4]][1]) * 4 + (in[ls[6]][1] - in[ls[5]][1]) + (in[ls[7]][1] - in[ls[8]][1]);
+			final float az = (in[ls[2]][2] - in[ls[4]][2]) * 4 + (in[ls[6]][2] - in[ls[5]][2]) + (in[ls[7]][2] - in[ls[8]][2]);
 			
-			bx = (in[ls[1]][0] - in[ls[3]][0]) * 4 + (in[ls[5]][0] - in[ls[8]][0]) + (in[ls[6]][0] - in[ls[7]][0]);
-			by = (in[ls[1]][1] - in[ls[3]][1]) * 4 + (in[ls[5]][1] - in[ls[8]][1]) + (in[ls[6]][1] - in[ls[7]][1]);
-			bz = (in[ls[1]][2] - in[ls[3]][2]) * 4 + (in[ls[5]][2] - in[ls[8]][2]) + (in[ls[6]][2] - in[ls[7]][2]);
+			final float bx = (in[ls[1]][0] - in[ls[3]][0]) * 4 + (in[ls[5]][0] - in[ls[8]][0]) + (in[ls[6]][0] - in[ls[7]][0]);
+			final float by = (in[ls[1]][1] - in[ls[3]][1]) * 4 + (in[ls[5]][1] - in[ls[8]][1]) + (in[ls[6]][1] - in[ls[7]][1]);
+			final float bz = (in[ls[1]][2] - in[ls[3]][2]) * 4 + (in[ls[5]][2] - in[ls[8]][2]) + (in[ls[6]][2] - in[ls[7]][2]);
 			
-			nx = by * az - bz * ay;		// cross product
-			ny = bz * ax - bx * az;
-			nz = bx * ay - by * ax;
-			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
-			norm[outIndex][0] = nx * nl;
-			norm[outIndex][1] = ny * nl;
-			norm[outIndex][2] = nz * nl;
+//			nx = by * az - bz * ay;		// cross product
+//			ny = bz * ax - bx * az;
+//			nz = bx * ay - by * ax;
+//			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
+//			norm[outIndex][0] = nx * nl;
+//			norm[outIndex][1] = ny * nl;
+//			norm[outIndex][2] = nz * nl;
+			
+			norm[outIndex][0] = by * az - bz * ay;		// cross product
+			norm[outIndex][1] = bz * ax - bx * az;
+			norm[outIndex][2] = bx * ay - by * ax;
 		}
 		
 		/*
@@ -1040,12 +1044,12 @@ public class Dicer {
 				out[outIndex][2] = (e2 * 4 + f2 + in[cs[5]][2] * pointWeight) * ik;
 			}
 			/* normal */
-			ax = 0;
-			ay = 0;
-			az = 0;
-			bx = 0;
-			by = 0;
-			bz = 0;
+			float ax = 0;
+			float ay = 0;
+			float az = 0;
+			float bx = 0;
+			float by = 0;
+			float bz = 0;
 			for (int j = 0; j < valence; j++) {
 				int c2fi = j * 2 + 6;
 				int c2ei = j * 2 + 5;
@@ -1075,13 +1079,17 @@ public class Dicer {
 				by += in[cs[c2ei]][1] * ew;
 				bz += in[cs[c2ei]][2] * ew;
 			}
-			nx = by * az - bz * ay;		// cross product
-			ny = bz * ax - bx * az;
-			nz = bx * ay - by * ax;
-			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
-			norm[outIndex][0] = nx * nl;
-			norm[outIndex][1] = ny * nl;
-			norm[outIndex][2] = nz * nl;
+//			nx = by * az - bz * ay;		// cross product
+//			ny = bz * ax - bx * az;
+//			nz = bx * ay - by * ax;
+//			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
+//			norm[outIndex][0] = nx * nl;
+//			norm[outIndex][1] = ny * nl;
+//			norm[outIndex][2] = nz * nl;
+			
+			norm[outIndex][0] = by * az - bz * ay;		// cross product
+			norm[outIndex][1] = bz * ax - bx * az;
+			norm[outIndex][2] = bx * ay - by * ax;
 		}
 		
 		int dim = (1 << (depth - 1)) + 3;

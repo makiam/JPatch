@@ -81,7 +81,7 @@ public class TopLevelVertex extends BaseVertex {
 				if (!overridePosition.get()) {
 					if (TopLevelVertex.this.corner > 0) {
 						position.set(TopLevelVertex.this.pos);
-					} else if (crease > 0) {
+					} else if (TopLevelVertex.this.crease > 0) {
 						Point3d p0 = TopLevelVertex.this.pos;
 						Point3d p1 = TopLevelVertex.this.creaseEdge0.pair.vertex.pos;
 						Point3d p2 = TopLevelVertex.this.creaseEdge1.pair.vertex.pos;
