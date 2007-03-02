@@ -584,8 +584,7 @@ public class Dicer {
 //				dumpStencil(level);
 //			}
 			
-//			final boolean rewriteStencils = (level < depth - 1 && level < MAX_SUBDIV - 1);
-			final boolean rewriteStencils = false;
+			final boolean rewriteStencils = (level < depth - 1 && level < MAX_SUBDIV - 1);
 			final int[][] stencil = patchStencil[level];
 			final int[][] nextLevel = rewriteStencils ? patchStencil[level + 1] : null;
 			final float[][] out = subdivPoints[level];

@@ -117,15 +117,15 @@ public class Slate2 {
 		}
 		int dx = xmax - xmin;
 		int dy = ymax - ymin;
-		int s = Math.max(dx, dy);
+		int s = Math.min(dx, dy);
 		s >>= 4;
-		if ((s & 0xffffffe0) > 0) {
+		if ((s & 0xffffff00) > 0) {
 			subdivLevel = 6;
-		} else if ((s & 0x10) > 0) {
+		} else if ((s & 0xc0) > 0) {
 			subdivLevel = 5;
-		} else if ((s & 0x8) > 0) {
+		} else if ((s & 0x30) > 0) {
 			subdivLevel = 4;
-		} else if ((s & 0x4) > 0) {
+		} else if ((s & 0xc) > 0) {
 			subdivLevel = 3;
 		} else if ((s & 0x2) > 0) {
 			subdivLevel = 2;
