@@ -20,6 +20,10 @@ public class Slate2 {
 		this.corners = corners;
 	}
 	
+	public SlateEdge[][] getCorners() {
+		return corners;
+	}
+	
 	void initFans() {
 		fans = new Point3f[4][];
 		fans[0] = new Point3f[2 * corners[0].length + 1];

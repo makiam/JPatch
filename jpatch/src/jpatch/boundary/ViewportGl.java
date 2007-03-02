@@ -421,7 +421,7 @@ public class ViewportGl extends Viewport {
 				if (subdivLevel < 1) subdivLevel = 1;
 				if (subdivLevel > 6) subdivLevel = 6;
 				
-//				useProgram = !useProgram;
+				useProgram = !useProgram;
 
 				component.repaint();
 			}
@@ -1187,34 +1187,36 @@ public class ViewportGl extends Viewport {
 		
 		for (int i = 0; i < 2; i++) {
 			int side = (i + 3) % 4;
-//			int side = i + 1;
-			Slate2 adjacentSlate = slate.getAdjacentSlate(side);
-			int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivLevel();
-			if (pairLevel > level) {
-				pairLevel = level;
+			if (slate.getCorners()[side][0].primary) {
+	//			int side = i + 1;
+				Slate2 adjacentSlate = slate.getAdjacentSlate(side);
+				int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivLevel();
+				if (pairLevel > level) {
+					pairLevel = level;
+				}
+				int[] lineArray = dicer.getRim(level - 1, side);
+				gl.glBegin(GL_LINE_STRIP);
+				for (int j = 0; j < lineArray.length; j++) {
+					gl.glNormal3fv(normals[lineArray[j] + offset], 0);
+					gl.glVertex3fv(vertices[lineArray[j] + offset], 0);
+				}
+				gl.glEnd();
 			}
-			int[] lineArray = dicer.getRim(level - 1, side);
-			gl.glBegin(GL_LINE_STRIP);
-			for (int j = 0; j < lineArray.length; j++) {
-				gl.glNormal3fv(normals[lineArray[j] + offset], 0);
-				gl.glVertex3fv(vertices[lineArray[j] + offset], 0);
-			}
-			gl.glEnd();
 		}
 		
-		gl.glDisable(GL_LIGHTING);
-		gl.glColor3f(0.5f, 0.5f, 0.5f);
-		vertices = dicer.getSubdivVertices(subdivLevel - 1);
-		dim = ((1 << subdivLevel - 1)) + 3;
-		int start = dicer.getGridStart();
-		for (int i = 1, n = dim - 1; i < n; i++) {
-			gl.glBegin(GL_LINE_STRIP);
-			int index = start + i * dim;
-			for (int j = index + 1, m = index + dim - 1; j < m; j++) {
-				gl.glVertex3fv(vertices[j], 0);
-			}
-			gl.glEnd();
-		}
+//		gl.glDisable(GL_LIGHTING);
+//		gl.glColor3f(0.5f, 0.5f, 0.5f);
+//		vertices = dicer.getSubdivVertices(subdivLevel - 1);
+//		dim = ((1 << subdivLevel - 1)) + 3;
+//		int start = dicer.getGridStart();
+//		for (int i = 1, n = dim - 1; i < n; i++) {
+//			gl.glBegin(GL_LINE_STRIP);
+//			int index = start + i * dim;
+//			for (int j = index + 1, m = index + dim - 1; j < m; j++) {
+//				gl.glVertex3fv(vertices[j], 0);
+//			}
+//			gl.glEnd();
+//		}
 //		for (int i = 1, n = dim - 1; i < n; i++) {
 //			gl.glBegin(GL_LINE_STRIP);
 //			int index = start + i;
@@ -1225,47 +1227,47 @@ public class ViewportGl extends Viewport {
 //			gl.glEnd();
 //		}
 		
-		final int EDGE = 1;
-		final int EDGE_H = 2;
-		final int EDGE_V = 3;
-		final int FACE = 4;
-		final int POINT = 5;
-		final int CREASE_4_5 = 6;
-		final int CREASE_4_6 = 7;
-		final int CREASE_4_7 = 8;
-		final int CREASE_5_6 = 9;
-		final int CREASE_5_7 = 10;
-		final int CREASE_6_7 = 11;
-		int[][] stencils = dicer.getStencils(subdivLevel - 1);
-		gl.glPointSize(5);
-		gl.glBegin(GL_POINTS);
-		for (int i = 1, n = dim - 1; i < n; i++) {
-			int index = start + i * dim;
-			for (int j = index + 1, m = index + dim - 1; j < m; j++) {
-//				switch (stencils[j - start][0]) {
-//				case EDGE:
-//				case EDGE_H:
-//				case EDGE_V:
+//		final int EDGE = 1;
+//		final int EDGE_H = 2;
+//		final int EDGE_V = 3;
+//		final int FACE = 4;
+//		final int POINT = 5;
+//		final int CREASE_4_5 = 6;
+//		final int CREASE_4_6 = 7;
+//		final int CREASE_4_7 = 8;
+//		final int CREASE_5_6 = 9;
+//		final int CREASE_5_7 = 10;
+//		final int CREASE_6_7 = 11;
+//		int[][] stencils = dicer.getStencils(subdivLevel - 1);
+//		gl.glPointSize(5);
+//		gl.glBegin(GL_POINTS);
+//		for (int i = 1, n = dim - 1; i < n; i++) {
+//			int index = start + i * dim;
+//			for (int j = index + 1, m = index + dim - 1; j < m; j++) {
+////				switch (stencils[j - start][0]) {
+////				case EDGE:
+////				case EDGE_H:
+////				case EDGE_V:
+////					gl.glColor3f(1, 0, 0);
+////					break;
+////				case FACE:
+////					gl.glColor3f(0, 1, 0);
+////					break;
+////				case POINT:
+////					gl.glColor3f(0, 1, 1);
+////					break;
+////				default:
+////					gl.glColor3f(1, 1, 1);
+////				}
+//				if (stencils[j - start][0] != FACE && stencils[j - start][1] > 0) {
 //					gl.glColor3f(1, 0, 0);
-//					break;
-//				case FACE:
+//				} else {
 //					gl.glColor3f(0, 1, 0);
-//					break;
-//				case POINT:
-//					gl.glColor3f(0, 1, 1);
-//					break;
-//				default:
-//					gl.glColor3f(1, 1, 1);
 //				}
-				if (stencils[j - start][0] != FACE && stencils[j - start][1] > 0) {
-					gl.glColor3f(1, 0, 0);
-				} else {
-					gl.glColor3f(0, 1, 0);
-				}
-				gl.glVertex3fv(vertices[j], 0);
-			}
-		}
-		gl.glEnd();
+//				gl.glVertex3fv(vertices[j], 0);
+//			}
+//		}
+//		gl.glEnd();
 	}
 	
 	private void drawFragment(float[][] v, int valence, int depth) {

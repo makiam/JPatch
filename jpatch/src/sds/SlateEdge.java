@@ -5,7 +5,7 @@ public class SlateEdge {
 	final SlateEdge pair;
 	final HalfEdge parentEdge;
 	final Face parentFace;
-	final boolean primary;
+	public final boolean primary;
 	Slate2 slate;
 	
 	public SlateEdge(Level2Vertex firstVertex, Level2Vertex secondVertex, HalfEdge parentEdge0, HalfEdge parentEdge1) {

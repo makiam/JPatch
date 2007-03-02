@@ -247,9 +247,22 @@ public class Dicer {
 				int rowStart = row * dim;
 				for (int column = 0; column < dim; column++) {
 					int index = rowStart + column;
+					
+					/*
+					 * mask out unused elements (these points are handled in the corner and fan tables)
+					 */
+					if ((row < 2 && column < 2) || (row > dim - 3 && column > dim - 3)) {
+						patchStencil[level][index] = new int[] { UNUSED, 0 };
+						continue;
+					} 
+					
 					int nextRow = row * 2 - 1;
 					int nextColumn = column * 2 - 1;
+					
+//					int nextRow = (row == 0) ? 0 : (row == dim - 1) ? dim * 2 - 4 : row * 2 - 1;
+//					int nextColumn = (column == 0) ? 0 : (column == dim - 1) ? dim * 2 - 4 : column * 2 - 1;
 					int nextLevelIndex_0 = getStencilIndex(level + 1, nextRow, nextColumn);
+//					if (nextLevelIndex_0 == 0) throw new IllegalStateException("level=" + level + " dim=" + dim + " row=" + row + " column=" + column + " nextRow=" + nextRow + " nextColumn=" + nextColumn);
 					int nextLevelIndex_1 = getStencilIndex(level + 1, nextRow - 1, nextColumn);
 					int nextLevelIndex_2 = getStencilIndex(level + 1, nextRow, nextColumn + 1);
 					int nextLevelIndex_3 = getStencilIndex(level + 1, nextRow + 1, nextColumn);
@@ -262,13 +275,7 @@ public class Dicer {
 //							nextLevelIndex_4 + " "
 //					);
 					
-					/*
-					 * mask out unused elements (these points are handled in the corner and fan tables)
-					 */
-					if ((row < 2 && column < 2) || (row > dim - 3 && column > dim - 3)) {
-						patchStencil[level][index] = new int[] { UNUSED, 0 };
-						continue;
-					} 
+					
 					
 					if ((column & 1) == 0) {										// column is even
 						if ((row & 1) == 0) {										// column and row are even -> Face
@@ -374,7 +381,7 @@ public class Dicer {
 	
 	private int getStencilIndex(int level, int row, int column) {
 		final int dim = ((1 << level)) + 3;
-		if (row < 0 | row >= dim - 1 | column < 0 | column >= dim -1) {
+		if (row < 0 | row > dim - 1 | column < 0 | column > dim -1) {
 			return 0;
 		}
 		return row * dim + column;
@@ -507,6 +514,7 @@ public class Dicer {
 			patchStencil[1][16][0] = POINT;
 		}
 		
+		
 //		patchStencil[1][6][1] = slate.corners[0][0].vertex.corner;
 //		patchStencil[1][8][1] = 0;
 //		patchStencil[1][16][1] = 0;
@@ -565,18 +573,27 @@ public class Dicer {
 //			}
 		}
 		
+//		boolean dump = dumpStencil(1);
 		/*
 		 * subdivide maxLevel times
 		 */
 //		int[] stencilTypes = new int[11];
 		for (int level = 1; level < depth; level++) {
-			boolean rewriteStencils = (level < depth - 1 && level < MAX_SUBDIV - 1);
+			
+//			if (dump && level > 1) {
+//				dumpStencil(level);
+//			}
+			
+//			final boolean rewriteStencils = (level < depth - 1 && level < MAX_SUBDIV - 1);
+			final boolean rewriteStencils = false;
 			final int[][] stencil = patchStencil[level];
 			final int[][] nextLevel = rewriteStencils ? patchStencil[level + 1] : null;
 			final float[][] out = subdivPoints[level];
 			final float[][] in = subdivPoints[level - 1];
 			final int n = stencil.length - 2;
-					
+				
+			
+			
 			/*
 			 * apply stencils on rectangular inner grid
 			 */
@@ -609,6 +626,7 @@ public class Dicer {
 							nextLevel[s[5]][1] = 0;
 							nextLevel[s[6]][1] = 0;
 							nextLevel[s[2]][0] = POINT;
+//							if (s[2] == 0) throw new IllegalStateException();
 						}
 						break;
 					case EDGE_V:
@@ -634,6 +652,7 @@ public class Dicer {
 							nextLevel[s[5]][1] = 0;
 							nextLevel[s[6]][1] = 0;
 							nextLevel[s[2]][0] = POINT;
+//							if (s[2] == 0) throw new IllegalStateException();
 						}
 						break;
 					case POINT:
@@ -651,6 +670,7 @@ public class Dicer {
 							nextLevel[s[2]][1] = 0;
 						}
 						nextLevel[s[2]][0] = POINT;
+//						if (s[2] == 0) throw new IllegalStateException();
 						break;
 					case FACE:
 						out[outIndex][0] = ((in[s[1]][0] + in[s[3]][0]) + (in[s[2]][0] + in[s[4]][0])) * FACE0;
@@ -1232,6 +1252,35 @@ public class Dicer {
 				return cornerIndex(corner, valence, i + 1);
 			}
 		}
+	}
+	
+	private boolean dumpStencil(int level) {
+		boolean result = false;
+		int dim = (1 << (level)) + 3;
+		System.out.println();
+		for (int i = 0; i < dim; i++) {
+			for (int j = 0; j < dim; j++) {
+				int index = i * dim + j;
+				switch (patchStencil[level][index][0]) {
+				case UNUSED: System.out.print("."); break;
+				case POINT: System.out.print("P"); break;
+				case FACE: System.out.print("F"); break;
+				case EDGE_H: System.out.print("Eh"); break;
+				case EDGE_V: System.out.print("Hv"); break;
+				case CREASE_5_7: System.out.print("Ch"); break;
+				case CREASE_4_6: System.out.print("Cv"); break;
+				}
+				if (patchStencil[level][index][0] != FACE && patchStencil[level][index][0] != UNUSED) {
+					if (patchStencil[level][index][1] > 0) {
+						result = true;
+					}
+					System.out.print(patchStencil[level][index][1]);
+				}
+				System.out.print("\t");
+			}
+			System.out.println();
+		}
+		return result;
 	}
 	
 	private class Tester {
