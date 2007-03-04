@@ -1,7 +1,10 @@
 package jpatch.auxilary;
 
 import java.io.*;
-import java.lang.reflect.Field;
+import java.util.*;
+import java.security.*;
+
+import sun.security.action.GetLongAction;
 
 public class NativeLibraryHelper {
 	public static String NATIVE_LIBS_DIR = "nativelibs/";
@@ -22,22 +25,13 @@ public class NativeLibraryHelper {
 		SPARC
 	}
 	
+	private static String[] nativeLibs = new String[0];
+	private static String dir;
+	
 	public static final Os detectedOs = detectOs();
 	public static final Arch detectedArch = detectArch();
 	
-	public static void extractNativeLibraries() throws NoSuchFieldException, IllegalAccessException, IOException {
-		
-		/*
-		 * Extremely ugly hack to add the temp-dir to the library path.
-		 */
-		Class classloaderClass = ClassLoader.class;
-		Field field = classloaderClass.getDeclaredField("sys_paths");
-		field.setAccessible(true);
-		field.set(classloaderClass, null);
-		String libraryPath = System.getProperty("java.library.path");
-		libraryPath = libraryPath + File.pathSeparator + System.getProperty("java.io.tmpdir");
-		System.setProperty("java.library.path", libraryPath);
-		
+	public static void detectPlatform() {
 		String osDir = null, archDir = null, prefix = null, suffix = null;
 		switch(detectedOs) {
 		case WINDOWS:
@@ -74,15 +68,87 @@ public class NativeLibraryHelper {
 		}
 		
 		if (osDir != null && archDir != null && suffix != null) {
-			String dir = NATIVE_LIBS_DIR + osDir + archDir;
-			extractLib(dir, prefix, "jogl", suffix);
-			extractLib(dir, prefix, "jogl_awt", suffix);
-			extractLib(dir, prefix, "jogl_cg", suffix);
+			dir = NATIVE_LIBS_DIR + osDir + archDir;
+			List<String> libList = new ArrayList<String>();
+			libList.add(prefix + "jogl" + suffix);
+			libList.add(prefix + "jogl_awt" + suffix);
+			libList.add(prefix + "jogl_cg" + suffix);
 			if (detectedOs == Os.LINUX) {
-				extractLib(dir, prefix, "jogl_drihack", suffix);
+				libList.add(prefix + "jogl_drihack" + suffix);
 			}
-			
+			nativeLibs = libList.toArray(new String[libList.size()]);
 		}
+	}
+	
+	private static String getNativeLibsDir(Os os, Arch arch) {
+		String osDir = null, archDir = null, prefix = null, suffix = null;
+		switch(os) {
+		case WINDOWS:
+			osDir = "windows/";
+			break;
+		case LINUX:
+			osDir = "linux/";
+			break;
+		case MAC_OS_X:
+			osDir = "osx/";
+			break;
+		}
+		switch (arch) {
+		case X86:
+			archDir = "x86/";
+			break;
+		case AMD64:
+			archDir = "amd64/";
+			break;
+		case PPC:
+			archDir = "ppc/";
+			break;
+		}
+		
+		/* windows hack */
+		if (detectedOs == Os.WINDOWS) {
+			archDir = "x86/";
+		}
+		
+		if (osDir != null && archDir != null) {
+			return NATIVE_LIBS_DIR + osDir + archDir;
+		}
+		
+		return null;
+	}
+	
+	
+//	String javaLibraryPath = properties.getProperty("java.library.path");
+//	String[] folders = javaLibraryPath.split(properties.getProperty("path.separator"));
+//	String lib = System.mapLibraryName("jogl");
+//	for (int i = 0; i < folders.length; i++) {
+//		File file = new File(folders[i], lib);
+//		if (file.exists()) {
+//			loaded = true;
+//			logger.log("found in " + folders[i] + "\n");
+//		}
+//	}
+	
+	private static String[] getLibraryNames(Os os) {
+		List<String> libList = new ArrayList<String>();
+		libList.add(System.mapLibraryName("jogl"));
+		libList.add(System.mapLibraryName("jogl_cg"));
+		libList.add(System.mapLibraryName("jogl_awt"));
+		if (os == Os.LINUX) {
+			libList.add(System.mapLibraryName("jogl_drihack"));
+		}
+		return libList.toArray(new String[libList.size()]);
+	}
+	
+	private static byte[] digest(InputStream in, String algorithm) throws NoSuchAlgorithmException, IOException {
+		byte[] buffer = new byte[4096];
+		MessageDigest digest = MessageDigest.getInstance(algorithm);
+		int bytes = 0;
+		while ((bytes = in.read(buffer)) > -1) {
+			digest.update(buffer, 0, bytes);
+		}
+		in.close();
+		return digest.digest();
 	}
 	
 	private static void extractLib(String dir, String prefix, String name, String suffix) throws IOException {
@@ -128,5 +194,51 @@ public class NativeLibraryHelper {
 		} else {
 			return Arch.UNKNOWN_OTHER;
 		}
+	}
+	
+	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
+		String algorithm = "SHA-256";
+		Os os = detectOs();
+		Arch arch = detectArch();
+		
+		String dir = getNativeLibsDir(os, arch);
+		String[] libs = getLibraryNames(os);
+		String javaLibraryPath = System.getProperty("java.library.path");
+		String[] folders = javaLibraryPath.split(System.getProperty("path.separator"));
+
+		for (String lib : libs) {
+			System.out.println(dir + ":" + lib);
+			byte[] digest = digest(ClassLoader.getSystemResourceAsStream(dir + lib), algorithm);
+			for (String folder : folders) {
+				System.out.println(folder);
+				File libFile = new File(folder, lib);
+				if (libFile.exists()) {
+					byte[] fileDigest = digest(new FileInputStream(libFile), algorithm);
+					System.out.println(compareDigest(digest, fileDigest));
+				}
+			}
+		}
+	}
+	
+	private static boolean compareDigest(byte[] digest1, byte[] digest2) {
+		if (digest1.length != digest2.length) {
+			return false;
+		}
+		for (int i = 0; i < digest1.length; i++) {
+			if (digest1[i] != digest2[i]) {
+				return false;
+			}
+		}
+		return true;
+	}
+	private static String digestToString(byte[] digest) {
+		StringBuilder sb = new StringBuilder("{");
+		for (int i = 0; i < digest.length - 1; i++) {
+			sb.append(digest[i]);
+			sb.append(", ");
+		}
+		sb.append(digest[digest.length - 1]);
+		sb.append("}");
+		return sb.toString();
 	}
 }
