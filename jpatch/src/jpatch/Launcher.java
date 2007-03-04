@@ -1,6 +1,8 @@
 package jpatch;
 
+import java.lang.reflect.*;
 import java.awt.*;
+import java.io.*;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.prefs.Preferences;
@@ -16,6 +18,15 @@ import jpatch.entity.*;
 
 public final class Launcher {
 	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+		
+		
+		
+		
+		try {
+			jpatch.auxilary.NativeLibraryHelper.extractNativeLibraries();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		System.setProperty("swing.boldMetal", Settings.JPATCH_ROOT_NODE.get("metalBoldText", "false"));
 		System.setProperty("swing.aatext", Settings.JPATCH_ROOT_NODE.get("fontSmoothing", "true"));
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
