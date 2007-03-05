@@ -261,7 +261,7 @@ public class NativeLibraryHelper {
 			} catch (IOException e) {
 				message = "<b>An error occured during the installation of the JOGL native libraries:</b><p>" +
 						"<font color='red'>" + e.getMessage() + "</font>" + 
-						"<p>You possibly need administrator (root) privileges to install files to the specified folder.";
+						"<p>You possibly need administrator (root) privileges to install files in the specified folder.";
 				JPatchDialog.showDialog(owner, "JPatch error", JPatchDialog.ERROR, message, null, new String[] { "OK" }, 0, "300");
 			}
 			return false;
@@ -347,7 +347,7 @@ public class NativeLibraryHelper {
 				} catch (IOException e) {
 					message = "<b>An error occured during the installation of the JOGL native libraries:</b><p>" +
 							"<font color='red'>" + e.getMessage() + "</font>" + 
-							"<p>You possibly need administrator (root) privileges to install files to the specified folder.";
+							"<p>You possibly need administrator (root) privileges to install files in the specified folder.";
 					JPatchDialog.showDialog(owner, "JPatch error", JPatchDialog.ERROR, message, null, new String[] { "OK" }, 0, "300");
 				}
 				return false;
