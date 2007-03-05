@@ -85,25 +85,25 @@ public class DialogTest {
 		frame.setVisible(true);
 	}
 
-	static class WorkspaceChooser extends AbstractAttributeEditor {
-		ExpandableForm defaultForm = new ExpandableForm(true);
-		WorkspaceChooser() {
-			Attribute.String dir = new Attribute.String();
-			try {
-				dir.set(Settings.getInstance().workspace.getCanonicalPath());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			Attribute.Boolean show = new Attribute.Boolean();
-			show.set(Settings.getInstance().promptForWorkspace);
-			addFileSelector(defaultForm, "Workspace", dir, JFileChooser.DIRECTORIES_ONLY, "Select");
-			addScalar(defaultForm, "Ask on startup", show);
-			add(defaultForm);
-		}
-		
-		void showDim() {
-			System.out.println(defaultForm.getSize());
-		}
-	}
+//	static class WorkspaceChooser extends AbstractAttributeEditor {
+//		ExpandableForm defaultForm = new ExpandableForm(true);
+//		WorkspaceChooser() {
+//			Attribute.String dir = new Attribute.String();
+//			try {
+//				dir.set(Settings.getInstance().workspace.getCanonicalPath());
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			Attribute.Boolean show = new Attribute.Boolean();
+//			show.set(Settings.getInstance().promptForWorkspace);
+//			addFileSelector(defaultForm, "Workspace", dir, JFileChooser.DIRECTORIES_ONLY, "Select");
+//			addScalar(defaultForm, "Ask on startup", show);
+//			add(defaultForm);
+//		}
+//		
+//		void showDim() {
+//			System.out.println(defaultForm.getSize());
+//		}
+//	}
 }
