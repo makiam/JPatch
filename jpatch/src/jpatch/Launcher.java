@@ -3,6 +3,7 @@ package jpatch;
 import java.lang.reflect.*;
 import java.awt.*;
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.prefs.Preferences;
@@ -11,9 +12,11 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.plaf.*;
 
+import jpatch.auxilary.NativeLibraryHelper;
 import jpatch.boundary.*;
 import jpatch.boundary.laf.*;
 import jpatch.boundary.settings.*;
+import jpatch.boundary.ui.JPatchDialog;
 import jpatch.entity.*;
 
 public final class Launcher {
@@ -22,11 +25,8 @@ public final class Launcher {
 		
 		
 		
-		try {
-			jpatch.auxilary.NativeLibraryHelper.extractNativeLibraries();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		
+		
 		System.setProperty("swing.boldMetal", Settings.JPATCH_ROOT_NODE.get("metalBoldText", "false"));
 		System.setProperty("swing.aatext", Settings.JPATCH_ROOT_NODE.get("fontSmoothing", "true"));
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -37,6 +37,16 @@ public final class Launcher {
 		UIManager.put("ToolTip.background", new Color(0xff, 0xff, 0xaa));
 		UIManager.put("ToolTip.border", new LineBorder(Color.BLACK));
 //		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		
+		try {
+			while (!new NativeLibraryHelper().checkLibraries(null));
+		} catch (Exception e) {
+			String message = "<b>An error occured while checking the native libraries installation:</b><p>" +
+					"<font color='red'>" + e.getMessage() + "</font><p>JPatch will now exit.";
+			JPatchDialog.showDialog(null, "JOGL native libraries installation", JPatchDialog.WARNING, message, null, new String[] { "Quit" }, 1, "400");
+			System.exit(0);
+		} 
+		
 		Main.getInstance();
 		
 //		
