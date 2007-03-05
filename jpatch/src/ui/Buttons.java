@@ -7,11 +7,16 @@ import java.awt.font.TextLayout;
 import java.awt.geom.*;
 import java.awt.image.*;
 import javax.swing.*;
+import javax.swing.plaf.ButtonUI;
+import javax.swing.plaf.basic.BasicButtonUI;
+import javax.swing.plaf.metal.MetalButtonUI;
 
 import org.apache.batik.ext.awt.LinearGradientPaint;
 import static java.awt.RenderingHints.*;
 
 public class Buttons {
+	private static ButtonUI buttonUI = new BasicButtonUI();
+	
 	public static final int BUTTON_HEIGHT = 21;
 	public static final int BUTTON_WIDTH = 23;
 	public static final int BUTTON_SIDE = 4;
@@ -108,6 +113,44 @@ public class Buttons {
 		g.draw(new RoundRectangle2D.Float(left - 1, 0, right - left + 1, height - 1, arc + 1, arc + 1));
 	}
 	
+	private void drawViewportSwitcher(float[] tint, Graphics2D g, int width, int height) {
+		int w = width - 1;
+		int h = height - 1;
+		int arc = h / 3;
+		int h2 = h / 2 + 1;
+		
+		Color[] colors = tintColors(GLASS_COLORS, tint);
+		
+		RoundRectangle2D roundRect = new RoundRectangle2D.Float(1, 1, w, h, arc, arc);
+		g.setPaint(new GradientPaint(0, 1, colors[0], 0, h2, colors[1]));
+		g.fill(roundRect);
+		g.setPaint(new GradientPaint(0, 1, colors[2], 0, h, colors[3]));
+		GeneralPath path = new GeneralPath();
+		path.moveTo(1, height);
+		path.curveTo(1, h2, 1, h2, 1 + h, h2);
+		path.lineTo(w - h, h2);
+		path.curveTo(w, h2, w, h2, w, 0);
+		path.lineTo(w, h);
+		path.closePath();
+		g.setClip(roundRect);
+		g.fill(path);
+		g.setColor(new Color(0x18000000, true));
+		g.drawLine(1, h - 1, w, h - 1);
+		g.setColor(new Color(0x0a000000, true));
+		g.drawLine(1, h - 2, w, h - 2);
+		
+//		g.setColor(new Color(0x60ffffff, true));
+//		g.drawLine(h2, 1, h2, h - 1);
+//		g.drawLine(1, h2 + 1, w - 1, h2 + 1);
+//		g.setColor(new Color(0x40000000, true));
+//		g.drawLine(h2 - 1, 1, h2 - 1, h - 1);
+//		g.drawLine(1, h2 - 0, w - 1, h2 - 0);
+		
+		g.setClip(null);
+		g.setPaint(new GradientPaint(0, 0, new Color(0x80000000, true), 0, height, new Color(0xc0ffffff, true)));
+		g.draw(new RoundRectangle2D.Float(0, 0, w, h, arc + 1, arc + 1));
+	}
+	
 	private Color[] tintColors(Color[] colors, float[] tint) {
 		Color[] c = new Color[colors.length];
 		float[] cc = new float[3];
@@ -146,7 +189,11 @@ public class Buttons {
 		JToggleButton tb4 = new JToggleButton();
 		JToggleButton tb5 = new JToggleButton();
 		JToggleButton tb6 = new JToggleButton();
+<<<<<<< .mine
+		int buttonWidth = 27;
+=======
 		int buttonWidth = 57;
+>>>>>>> .r394
 		int buttonHeight = 24;
 		
 		Image icon = createTransparentImage(createTestIcon(), 0.75f);
@@ -184,6 +231,16 @@ public class Buttons {
 		toolBar.setBackground(new Color(0xbbbbbb));
 		toolBar.setFloatable(false);
 		frame.add(toolBar, BorderLayout.NORTH);
+		
+		JComponent testComponent = new JComponent() {
+			@Override
+			public void paintComponent(Graphics g) {
+				Graphics2D g2 = (Graphics2D) g;
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				drawViewportSwitcher(null, (Graphics2D) g, 42, 42);
+			}
+		};
+		frame.add(testComponent, BorderLayout.CENTER);
 		
 		frame.setVisible(true);
 	}
@@ -298,7 +355,11 @@ public class Buttons {
 	}
 	
 	private void configureButton(AbstractButton button, Type type, Position position, int width, int height, Image icon) {
+		if (icon.getWidth(null) > width) {
+			width = icon.getWidth(null);
+		}
 		Image disabledIcon = createDisabledImage(icon);
+		button.setUI(buttonUI);
 		button.setBorder(null);
 		button.setContentAreaFilled(false);
 		button.setIcon(new ImageIcon(createGroupButtonImage(type, position, null, width, height, icon)));
