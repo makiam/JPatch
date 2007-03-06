@@ -86,6 +86,7 @@ public class Dicer {
 			final int dim = ((1 << level)) + 3;
 			final int nextDim = ((1 << (level + 1))) + 3;
 			
+			System.out.println("level = " + level + " dim = " + dim);
 			if (level > 0) {
 				/*
 				 * create rim arrays

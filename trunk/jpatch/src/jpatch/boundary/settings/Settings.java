@@ -42,28 +42,65 @@ import jpatch.boundary.laf.SmoothLookAndFeel;
 public class Settings extends AbstractSettings {
 	private static Settings INSTANCE;
 	
-//	public static enum Startup { MODELER, ANIMATOR };
 	public static enum Plaf { CROSS_PLATFORM, SYSTEM, JPATCH };
-//	public Startup startup = Startup.MODELER;
-	public transient boolean newInstallation = true;
-	public transient boolean cleanExit = false;
-	public transient boolean startupFinished = false;
-	public transient File workspace = new File(System.getProperty("user.home"), "jpatch_workspace");
+
+	@Hidden
+	public boolean newInstallation = true;
+	
+	@Hidden
+	public boolean cleanExit = false;
+	
+	@Hidden
+	public boolean startupFinished = false;
+	
+	@Hidden
+	public File workspace = new File(System.getProperty("user.home"), "jpatch_workspace");
+	
+	@DisplayName(value = "Prompt for workspace")
+	@BooleanOptions(trueOption = "yes", falseOption = "no")
 	public boolean promptForWorkspace = true;
+	
+	@DisplayName(value = "Screen position (left)")
 	public int screenPositionX = 0;
+	
+	@DisplayName(value = "Screen position (top)")
 	public int screenPositionY = 0;
+	
+	@DisplayName(value = "Screen width")
 	public int screenWidth = 1024;
+	
+	@DisplayName(value = "Screen height")
 	public int screenHeight = 768;
+	
+	@DisplayName(value = "Screen screen dimensions on exit")
+	@BooleanOptions(trueOption = "yes", falseOption = "no")
 	public boolean saveScreenDimensionsOnExit = true;
+	
+	@DisplayName(value = "Look&Feel")
 	public Plaf lookAndFeel = Plaf.CROSS_PLATFORM;
+	
+	@DisplayName(value = "Bold fonts")
+	@BooleanOptions(trueOption = "on", falseOption = "off")
 	public boolean metalBoldText = false;
+	
+	@DisplayName(value = "Font smoothing")
+	@BooleanOptions(trueOption = "on", falseOption = "off")
 	public boolean fontSmoothing = true;
+	
+	@DisplayName(value = "Undo depth")
 	public int undoDepth = 30;
+	
+	@DisplayName(value = "History depth")
 	public int historyDepth = 10;
+	
 	public final DirectorySettings directories = new DirectorySettings();
+	
 	public final ViewportSettings viewports = new ViewportSettings();
+	
 	public final ColorSettings colors = new ColorSettings();
+	
 	public final RealtimeRendererSettings realtimeRenderer = new RealtimeRendererSettings();
+	
 	public final RendererSettings export = new RendererSettings();
 	
 	public void showDialog(Component parent) {

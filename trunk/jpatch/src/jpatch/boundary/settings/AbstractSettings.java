@@ -27,6 +27,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.lang.reflect.*;
+import java.lang.annotation.*;
 import java.util.*;
 import java.util.List;
 import java.util.prefs.*;
@@ -147,7 +148,11 @@ public abstract class AbstractSettings implements TreeNode {
 			if (column == 0) {
 //				setFocusable(false);
 //				setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-//				setText(getText() + ": ");
+				DisplayName displayName = fields.get(row).getAnnotation(DisplayName.class);
+				if (displayName != null) {
+					setText(displayName.value());
+				}
+				
 			} else {
 				setFocusable(true);
 //				setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -163,6 +168,14 @@ public abstract class AbstractSettings implements TreeNode {
 //					return tableCellEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
 //				if (row < fields.size() && !isDefault(fields.get(row)))
 //					setFont(getFont().deriveFont(Font.BOLD));
+				if (value instanceof Boolean) {
+					BooleanOptions optionValues = fields.get(row).getAnnotation(BooleanOptions.class);
+					if (optionValues != null) {
+						setText((Boolean) value ? optionValues.trueOption() : optionValues.falseOption());
+					} else {
+						setText(value.toString());
+					}
+				}
 				if (value instanceof Color) {
 					Color color = (Color) value;
 					setText(" [" + color.getRed() + " " + color.getBlue() + " " + color.getGreen() + "]");
@@ -208,8 +221,14 @@ public abstract class AbstractSettings implements TreeNode {
 		public Component getTableCellEditorComponent(final JTable table, Object value, boolean isSelected, final int row, int column) {
 			if (value instanceof Boolean) {
 				final JComboBox comboBox = new JComboBox();
-				comboBox.addItem(true);
-				comboBox.addItem(false);
+				BooleanOptions optionValues = fields.get(row).getAnnotation(BooleanOptions.class);
+				if (optionValues != null) {
+					comboBox.addItem(optionValues.trueOption());
+					comboBox.addItem(optionValues.falseOption());
+				} else {
+					comboBox.addItem(true);
+					comboBox.addItem(false);
+				}
 				try {
 					comboBox.setSelectedItem(fields.get(row).get(AbstractSettings.this));
 				} catch (IllegalAccessException e) {
@@ -220,7 +239,7 @@ public abstract class AbstractSettings implements TreeNode {
 //						System.out.println(event);
 //						System.out.println("boolean itemChanged " + comboBox.hashCode() + " " + comboBox.getSelectedItem());
 						try {
-							fields.get(row).set(AbstractSettings.this, comboBox.getSelectedItem());
+							fields.get(row).set(AbstractSettings.this, comboBox.getSelectedIndex() == 1);
 						} catch (IllegalAccessException e) {
 							e.printStackTrace();
 						}
@@ -446,8 +465,9 @@ public abstract class AbstractSettings implements TreeNode {
 					childNode.setNodeName(field.getName());
 					children.add(childNode);
 				} else {
-					if (!Modifier.isTransient(field.getModifiers()) && !Modifier.isStatic(field.getModifiers()))
-							fields.add(field);
+					if (!field.isAnnotationPresent(Hidden.class) && !Modifier.isStatic(field.getModifiers())) {
+						fields.add(field);
+					}
 				}
 			}
 //			Collections.sort(children, new Comparator<TreeNode>() {
