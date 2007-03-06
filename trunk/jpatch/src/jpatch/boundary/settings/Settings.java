@@ -72,7 +72,7 @@ public class Settings extends AbstractSettings {
 	@DisplayName(value = "Screen height")
 	public int screenHeight = 768;
 	
-	@DisplayName(value = "Screen screen dimensions on exit")
+	@DisplayName(value = "Save screen dimensions on exit")
 	@BooleanOptions(trueOption = "yes", falseOption = "no")
 	public boolean saveScreenDimensionsOnExit = true;
 	
@@ -107,7 +107,11 @@ public class Settings extends AbstractSettings {
 		load();
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 //		initTree();
-		final JTable table = getTable();
+		final JTable table = new JTable();
+		table.setShowHorizontalLines(false);
+		table.setShowVerticalLines(false);
+		table.setRowHeight(22);
+		initTable(table, this);
 		table.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
 				table.repaint();
@@ -119,15 +123,14 @@ public class Settings extends AbstractSettings {
 		tree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent e) {
 				AbstractSettings settings = (AbstractSettings) e.getPath().getLastPathComponent();
-				table.setModel((TableModel) settings.getTableModel());
-				table.getColumnModel().getColumn(0).setHeaderValue("Preference Name");
-				table.getColumnModel().getColumn(1).setHeaderValue("Value");
-				table.setDefaultEditor(Object.class, settings.getTableCellEditor());
+				initTable(table, settings);
 			}
 		});
-		splitPane.add(new JScrollPane(tree));
-		splitPane.add(new JScrollPane(getTable()));
 		
+		JScrollPane sp = new JScrollPane(table);
+		sp.getViewport().setBackground(Color.WHITE);
+		splitPane.add(new JScrollPane(tree));
+		splitPane.add(sp);
 		MainFrame mf = MainFrame.getInstance();
 		if (mf != null) {
 			screenPositionX = mf.getX();
@@ -135,6 +138,7 @@ public class Settings extends AbstractSettings {
 			screenWidth = mf.getWidth();
 			screenHeight = mf.getHeight();
 		}
+		
 		if (JOptionPane.showConfirmDialog(parent, splitPane, "Preferences", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null) == JOptionPane.OK_OPTION) {
 			if (mf != null && (screenWidth != mf.getWidth() || screenHeight != mf.getHeight() || screenPositionX != mf.getX() || screenPositionY != mf.getY()))
 				mf.setBounds(screenPositionX, screenPositionY, screenWidth, screenHeight);
@@ -166,6 +170,14 @@ public class Settings extends AbstractSettings {
 			System.out.println("Cancel");
 			load();
 		}
+	}
+	
+	private void initTable(JTable table, AbstractSettings settings) {
+		table.setModel((TableModel) settings.getTableModel());
+		table.setDefaultRenderer(Object.class, settings.getTableCellRenderer());
+		table.getColumnModel().getColumn(0).setHeaderValue("Preference Name");
+		table.getColumnModel().getColumn(1).setHeaderValue("Value");
+		table.setDefaultEditor(Object.class, settings.getTableCellEditor());
 	}
 	
 	private Settings() {

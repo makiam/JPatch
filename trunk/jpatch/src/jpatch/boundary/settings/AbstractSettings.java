@@ -21,6 +21,7 @@
  */
 package jpatch.boundary.settings;
 
+
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
@@ -33,7 +34,10 @@ import java.util.List;
 import java.util.prefs.*;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.*;
+import javax.swing.plaf.basic.BasicCheckBoxUI;
 import javax.swing.table.*;
 import javax.swing.tree.*;
 import javax.vecmath.*;
@@ -49,6 +53,9 @@ import jpatch.entity.OLDModel;
  * @author sascha
  */
 public abstract class AbstractSettings implements TreeNode {
+	private static final Icon checkboxIcon = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/checkbox.png"));
+	private static final Icon selectedCheckboxIcon = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/checkbox_selected.png"));
+	
 	public static final Preferences JPATCH_ROOT_NODE = Preferences.userRoot().node("/JPatch/settings/preferences");
 	private Map mapDefaults = new HashMap();
 	private List<Field> fields = new ArrayList<Field>();
@@ -122,7 +129,7 @@ public abstract class AbstractSettings implements TreeNode {
 		}
 	};
 	
-	private JTable table = new JTable();
+//	private JTable table = new JTable();
 	
 	public  Preferences getRootNode() {
 		return JPATCH_ROOT_NODE;
@@ -139,12 +146,17 @@ public abstract class AbstractSettings implements TreeNode {
 	private TableCellRenderer tableCellRenderer = new DefaultTableCellRenderer() {
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+//			if (row >= fields.size()) {
+//				System.out.println(row + " " + fields.size() + " " + value);
+//				return this;
+//			}
 //			JLabel label = new JLabel();
 //			label.setBackground(getBackground());
 //			label.setForeground(getForeground());
 //			label.setBorder(getBorder());
 //			label.setText(getText());
 //			label.setFont(getFont())
+			setBackground(column == 0 ? row % 2 == 0 ? new Color(0xf0f0f0) : new Color(0xfcfcfc) : row % 2 == 0 ? new Color(0xf6f6f6) : new Color(0xffffff));
 			if (column == 0) {
 //				setFocusable(false);
 //				setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -153,11 +165,16 @@ public abstract class AbstractSettings implements TreeNode {
 					setText(displayName.value());
 				}
 				
+				setOpaque(true);
+				setIcon(null);
+				setBorder(noFocusBorder);
+				setToolTipText(null);
+				return this;
 			} else {
 				setFocusable(true);
 //				setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
 			}
-			
+//			setBorder(BorderFactory.createLineBorder(new Color(0xe7e7e7)));
 //				if (value instanceof Color) {
 //					JLabel label = new JLabel();
 //					label.setBackground((Color) value);
@@ -169,6 +186,9 @@ public abstract class AbstractSettings implements TreeNode {
 //				if (row < fields.size() && !isDefault(fields.get(row)))
 //					setFont(getFont().deriveFont(Font.BOLD));
 				if (value instanceof Boolean) {
+					final JCheckBox checkBox = createCheckBox(value, row);
+					if (true) return checkBox;
+						
 					BooleanOptions optionValues = fields.get(row).getAnnotation(BooleanOptions.class);
 					if (optionValues != null) {
 						setText((Boolean) value ? optionValues.trueOption() : optionValues.falseOption());
@@ -197,17 +217,16 @@ public abstract class AbstractSettings implements TreeNode {
 				}
 //				return new JLabel(value.getClass().getSimpleName() + " " + value);
 				if (column == 1) {
-					setOpaque(true);
+//					setOpaque(true);
 					if (!isSelected)
-						setBackground(Color.WHITE);
+//						setBackground(Color.WHITE);
 					setToolTipText("Click to edit");
 				} else {
-					setOpaque(false);
+//					setOpaque(false);
 //					setBackground(new JPanel().getBackground());
-					setBorder(noFocusBorder);
-					setToolTipText(null);
+					
 				}
-//				setOpaque(true);
+				setOpaque(true);
 				return this;
 			
 		}
@@ -220,6 +239,19 @@ public abstract class AbstractSettings implements TreeNode {
 //		private TableCellEditor comboBoxCellEditor = new DefaultCellEditor(comboBox);
 		public Component getTableCellEditorComponent(final JTable table, Object value, boolean isSelected, final int row, int column) {
 			if (value instanceof Boolean) {
+				final JCheckBox checkBox = createCheckBox(value, row);
+				checkBox.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent event) {
+						try {
+							fields.get(row).set(AbstractSettings.this, checkBox.isSelected());
+						} catch (IllegalAccessException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				if (true) return checkBox;
+				
+				
 				final JComboBox comboBox = new JComboBox();
 				BooleanOptions optionValues = fields.get(row).getAnnotation(BooleanOptions.class);
 				if (optionValues != null) {
@@ -417,17 +449,17 @@ public abstract class AbstractSettings implements TreeNode {
 	};
 	
 	public AbstractSettings() {
-		table.setModel(tableModel);
-		table.setShowGrid(false);
-		table.setBackground(new JPanel().getBackground());
-		table.setShowHorizontalLines(true);
-		table.setGridColor(Color.WHITE);
-		table.setShowVerticalLines(false);
-		table.getColumnModel().getColumn(0).setHeaderValue("Preference Name");
-//		table.getColumnModel().getColumn(1).setHeaderValue("Type");
-		table.getColumnModel().getColumn(1).setHeaderValue("Value");
-		table.setDefaultEditor(Object.class, tableCellEditor);
-		table.setDefaultRenderer(Object.class, tableCellRenderer);
+//		table.setModel(tableModel);
+//		table.setShowGrid(false);
+//		table.setBackground(new JPanel().getBackground());
+//		table.setShowHorizontalLines(true);
+//		table.setGridColor(Color.WHITE);
+//		table.setShowVerticalLines(false);
+//		table.getColumnModel().getColumn(0).setHeaderValue("Preference Name");
+////		table.getColumnModel().getColumn(1).setHeaderValue("Type");
+//		table.getColumnModel().getColumn(1).setHeaderValue("Value");
+//		table.setDefaultEditor(Object.class, tableCellEditor);
+//		table.setDefaultRenderer(Object.class, tableCellRenderer);
 		tableCellEditor.setClickCountToStart(1);
 	}
 	
@@ -447,13 +479,17 @@ public abstract class AbstractSettings implements TreeNode {
 		return treeCellRenderer;
 	}
 	
+	public TableCellRenderer getTableCellRenderer() {
+		return tableCellRenderer;
+	}
+	
 	public TableCellEditor getTableCellEditor() {
 		return tableCellEditor;
 	}
 	
-	public JTable getTable() {
-		return table;
-	}
+//	public JTable getTable() {
+//		return table;
+//	}
 	
 	public void initTree() {
 		try {
@@ -733,9 +769,9 @@ public abstract class AbstractSettings implements TreeNode {
 		
 		public void paintIcon(Component c, Graphics g, int x, int y) {
 			g.setColor(color);
-			g.fillRect(2, 2, 10, 10);
+			g.fillRect(2, 6, 10, 10);
 			g.setColor(Color.BLACK);
-			g.drawRect(2, 2, 10, 10);
+			g.drawRect(2, 6, 10, 10);
 		}
 
 		/* (non-Javadoc)
@@ -754,5 +790,15 @@ public abstract class AbstractSettings implements TreeNode {
 			return 10;
 		}
 		
+	}
+	
+	private static JCheckBox createCheckBox(Object value, int row) {
+		JCheckBox checkBox = new JCheckBox();
+		checkBox.setSelected((Boolean) value);
+		checkBox.setIcon(checkboxIcon);
+		checkBox.setSelectedIcon(selectedCheckboxIcon);
+		checkBox.setOpaque(true);
+		checkBox.setBackground(row % 2 == 0 ? new Color(0xf6f6f6) : new Color(0xffffff));
+		return checkBox;
 	}
 }
