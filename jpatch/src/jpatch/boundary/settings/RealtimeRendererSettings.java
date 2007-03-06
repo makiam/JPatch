@@ -40,4 +40,14 @@ public class RealtimeRendererSettings extends AbstractSettings {
 	public boolean lightFollowsCamera = false;
 	public RealtimeRendererSettings.Backface backfacingPatches = Backface.RENDER;
 	public boolean wireframeFogEffect = true;
+	
+	public boolean adaptive = true;
+	
+	@Conditional(dependsOn = "adaptive", value = "true")
+	public int subdivQuality = 3;
+	
+	@Conditional(dependsOn = "adaptive", value = "false")
+	public int subdivLevel = 2;
+	
+	
 }
