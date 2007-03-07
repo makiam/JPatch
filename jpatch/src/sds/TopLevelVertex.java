@@ -21,25 +21,30 @@ public class TopLevelVertex extends BaseVertex {
 	private static final float CREASE0 = 3.0f / 4.0f;
 	private static final float CREASE1 = 1.0f / 8.0f;
 	
+	static int count;
+	final int num = count++;
+	
 	HalfEdge edge;
 	public final Level2Vertex vertexPoint;
-	int valence;
+	int valence = -1;
 
 	
 	final Iterable<Face> faceIterable = new Iterable<Face>() {
 		public Iterator<Face> iterator() {
 			return new Iterator<Face>() {
-				private HalfEdge e = edge.pair;
-				boolean hasNext = true;
+				private int i = 0;
+				private HalfEdge e = edge;
 				
 				public boolean hasNext() {
-					return hasNext;
+					return i < valence;
 				}
 				
 				public Face next() {
+					i++;
 					HalfEdge tmp = e;
-					e = e.next.pair;
-					hasNext = (e.next != null && e != edge.pair);
+					if (e.prev != null) {
+						e = e.prev.pair;
+					}
 					return tmp.face;
 				}
 				
@@ -52,17 +57,19 @@ public class TopLevelVertex extends BaseVertex {
 	final Iterable<HalfEdge> edgeIterable = new Iterable<HalfEdge>() {
 		public Iterator<HalfEdge> iterator() {
 			return new Iterator<HalfEdge>() {
+				private int i = 0;
 				private HalfEdge e = edge;
-				boolean hasNext = true;
 				
 				public boolean hasNext() {
-					return hasNext;
+					return i < valence;
 				}
 				
 				public HalfEdge next() {
+					i++;
 					HalfEdge tmp = e;
-					e = e.pair.next;
-					hasNext = (e != null && e != edge);
+					if (e.prev != null) {
+						e = e.prev.pair;
+					}
 					return tmp;
 				}
 				
@@ -143,14 +150,37 @@ public class TopLevelVertex extends BaseVertex {
 		return faceIterable;
 	}
 	
-	public int valence() {
-		int i = 1; 
-		HalfEdge e = edge.pair;
-		while (e.next != null && e.next != edge) {
-			e = e.next.pair;
-			i++;
+	public int getValence() {
+		return valence;
+	}
+	
+	int getEdgeIndex(HalfEdge edge) {
+		HalfEdge e = this.edge;
+		for (int i = 0; i < valence; i++) {
+			if (e == edge) {
+				return i;
+			}
+			if (e.prev != null) {
+				e = e.prev.pair;
+			}
 		}
-		return i;
+		System.out.println("vertex=" + this + " edge=" + edge + " edge-pair=" + edge.pair);
+		for (HalfEdge ed : getAdjacentEdges()) {
+			System.out.println("\tedge=" + ed + " vertex=" + ed.vertex);
+		}
+		throw new IllegalArgumentException(edge.toString());
+	}
+	
+	private void computeValence() {
+		valence = 1; 
+		HalfEdge e = edge.prev;
+		while (e.pair != edge) {
+			e = e.pair.prev;
+			valence++;
+			if (e == null) {
+				break;
+			}
+		}
 	}
 	
 	public void analyzeEdges() {
@@ -195,9 +225,13 @@ public class TopLevelVertex extends BaseVertex {
 	
 	void validate() {
 		HalfEdge e = edge;
-		while (edge.prev != null && edge.prev.pair != e) {
-			edge = edge.prev.pair;
+		while (edge.pair.next != null && edge.pair.next != e) {
+			edge = edge.pair.next;
 		}
-		valence = valence();
+		computeValence();
+	}
+	
+	public String toString() {
+		return "v" + num;
 	}
 }

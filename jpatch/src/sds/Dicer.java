@@ -84,7 +84,6 @@ public class Dicer {
 		
 		for (int level = 0; level < MAX_SUBDIV; level++) {
 			final int dim = ((1 << level)) + 3;
-			final int nextDim = ((1 << (level + 1))) + 3;
 			
 			System.out.println("level = " + level + " dim = " + dim);
 			if (level > 0) {
@@ -523,14 +522,12 @@ public class Dicer {
 		
 		for (int corner = 0; corner < 2; corner ++) {
 			final Point3f[] c = boundary[corner * 2];
-			final int valence = c.length / 2;
+			final int valence = Math.max(3, c.length / 2);
 			final int n = c.length - 5;
 			final int start = corner * MAX_CORNER_LENGTH;
 			
 //			cornerStencil[1][valence - 3][corner][0] = Integer.MAX_VALUE;
-			if (valence < 3) {
-				return 0;
-			}
+			
 			cornerStencil[1][valence - 3][corner][0] = slate.corners[corner * 2][0].vertex.corner;
 			cornerStencil[1][valence - 3][corner][1] = slate.corners[corner * 2][0].vertex.crease;
 			if (slate.corners[corner * 2][0].vertex.crease > 1) {
@@ -563,6 +560,7 @@ public class Dicer {
 			 */
 			for (int i = 2; i < slate.corners[corner * 2].length; i++) {
 				int index = (i == slate.corners[corner * 2].length - 1) ? 0 : i * 2 - 3;
+//				System.out.println("corner=" + corner + " length=" + slate.corners[corner * 2].length + " i=" + i + " index=" + index);
 				fanStencil[1][valence - 3][corner][index][1] = slate.corners[corner * 2][i] == null ? 0 : slate.corners[corner * 2][i].getSharpness();
 			}
 			if (n == 2) {
@@ -811,7 +809,7 @@ public class Dicer {
 			 */
 			for (int corner = 0; corner < 2; corner++) {
 				
-				final int valence = boundary[corner * 2].length / 2;
+				final int valence = Math.max(3, boundary[corner * 2].length / 2);
 				final int[] cs = cornerStencil[level][valence - 3][corner];
 				final int outIndex = cs[4];
 				if (cs[0] > 0) {
@@ -1008,7 +1006,7 @@ public class Dicer {
 		 * apply limit stencils on corners
 		 */
 		for (int corner = 0; corner < 2; corner ++) {
-			final int valence = boundary[corner * 2].length / 2;
+			final int valence = Math.max(3, boundary[corner * 2].length / 2);
 			final int[] cps = cornerStencil[level][valence - 3][corner];
 			final int[] cs = cornerLimitStencil[level][valence - 3][corner];
 			

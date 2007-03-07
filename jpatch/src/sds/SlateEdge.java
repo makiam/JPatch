@@ -46,6 +46,10 @@ public class SlateEdge {
 		return primary ? this : pair;
 	}
 	
+	public boolean isToBeDrawn() {
+		return primary || parentEdge.isBoundary();
+	}
+	
 	public int getSharpness() {
 		if (parentEdge != null) {
 			return Math.max(0,parentEdge.getSharpness() - 1);

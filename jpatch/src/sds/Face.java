@@ -34,7 +34,9 @@ public class Face {
 
 				public HalfEdge next() {
 					i++;
-					return e = e.next;
+					HalfEdge tmp = e;
+					e = e.next;
+					return tmp;
 				}
 
 				public void remove() {
@@ -90,21 +92,38 @@ public class Face {
 	
 	void setupSlates() {
 		HalfEdge edge = this.edge;
+		
 		for (int n = 0; n < sides; n++) {
-			
 			SlateEdge[][] corners = new SlateEdge[4][];
 			
 			/* create SlateEdges for corner 0 (outer corner) */
-			corners[0] = new SlateEdge[edge.vertex.valence];
+			final int valence = edge.vertex.valence;
 			
-			HalfEdge e = edge;
-			for (int i = 0; i < edge.vertex.valence; i++) {
-				corners[0][i] = e.slateEdge0;
-				if (e.prev == null) {
-					break;
+			System.out.println("face=" + this + " side=" + n + " valence=" + valence);
+			corners[0] = new SlateEdge[valence];
+			
+			HalfEdge e = edge.vertex.edge;
+			int offset = valence - edge.vertex.getEdgeIndex(edge);
+			
+			for (int i = 0; i < valence; i++) {
+				corners[0][(i + offset) % valence] = e.slateEdge0;
+				if (e.prev != null) {
+					e = e.prev.pair;
 				}
-				e = e.prev.pair;
 			}
+//			for (HalfEdge e : edge.vertex.getAdjacentEdges()) {
+//				corners[0][(i + offset) % valence] = e.slateEdge0;
+//				i++;
+//			}
+			
+//			for (int i = 0; i < edge.vertex.valence; i++) {
+//				corners[0][i] = e.slateEdge0;
+////				if (e.prev.pair == null) {
+////					e = e.pair.next;
+////				} else {
+//					e = e.prev.pair;
+////				}
+//			}
 			
 			/* create SlateEdges for corner 1 (upper right) */
 			corners[1] = new SlateEdge[4];
@@ -130,6 +149,7 @@ public class Face {
 			
 			edge = edge.next;
 		}
+		
 	}
 	
 	public void initFans() {
@@ -217,7 +237,7 @@ public class Face {
 			}
 			e = e.next;
 		}
-		return -1;
+		throw new IllegalArgumentException(edge.toString());
 	}
 	
 //	void setupSlateNeighbors() {
