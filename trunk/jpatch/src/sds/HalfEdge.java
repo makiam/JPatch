@@ -12,6 +12,9 @@ import jpatch.entity.Attribute;
  *
  */
 public class HalfEdge {
+	static int count;
+	final int num = count++;
+	
 	final TopLevelVertex vertex;
 	final HalfEdge pair;
 	Face face;
@@ -116,4 +119,8 @@ public class HalfEdge {
 //		}
 //		return false;
 //	}
+	
+	public String toString() {
+		return "e" + num + "/" + pair.num;
+	}
 }

@@ -156,7 +156,7 @@ public abstract class AbstractSettings implements TreeNode {
 //			label.setBorder(getBorder());
 //			label.setText(getText());
 //			label.setFont(getFont())
-			setBackground(column == 0 ? row % 2 == 0 ? new Color(0xf0f0f0) : new Color(0xfcfcfc) : row % 2 == 0 ? new Color(0xf6f6f6) : new Color(0xffffff));
+			setBackground(row % 2 == 0 ? new Color(0xe7e7e7) : new Color(0xf0f0f0));
 			if (column == 0) {
 //				setFocusable(false);
 //				setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -444,7 +444,9 @@ public abstract class AbstractSettings implements TreeNode {
 //				return textField;
 //			}
 			}
-			return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+			JTextField textField = (JTextField) super.getTableCellEditorComponent(table, value, isSelected, row, column);
+			textField.setBorder(new TestBorder());
+			return textField;
 		}
 	};
 	
@@ -798,7 +800,52 @@ public abstract class AbstractSettings implements TreeNode {
 		checkBox.setIcon(checkboxIcon);
 		checkBox.setSelectedIcon(selectedCheckboxIcon);
 		checkBox.setOpaque(true);
-		checkBox.setBackground(row % 2 == 0 ? new Color(0xf6f6f6) : new Color(0xffffff));
+		checkBox.setBackground(row % 2 == 0 ? new Color(0xe7e7e7) : new Color(0xf0f0f0));
 		return checkBox;
+	}
+	
+	private static class TestBorder extends javax.swing.border.AbstractBorder {
+		private static final int THICKNESS = 1;
+		private static final Color BRIGHT = new Color(0xcccccc);
+		private static final Color DARK = new Color(0x444444);
+		private static final Color SHADOW1 = new Color(0x40000000, true);
+		private static final Color SHADOW2 = new Color(0x20000000, true);
+		private static final Color SHADOW3 = new Color(0x07000000, true);
+		
+		@Override
+		public Insets getBorderInsets(Component c, Insets insets) {
+			insets.top = insets.bottom = insets.left = insets.right = THICKNESS;
+			return insets;
+		}
+
+		@Override
+		public Insets getBorderInsets(Component c) {
+			return new Insets(THICKNESS, THICKNESS, THICKNESS, THICKNESS);
+		}
+
+		@Override
+		public boolean isBorderOpaque() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+			g.setColor(DARK);
+			g.drawLine(x, y, x + width - 1, y);
+			g.drawLine(x, y, x, y + height - 1);
+			g.setColor(BRIGHT);
+			g.drawLine(x, y + height - 1, x + width - 1, y + height - 1);
+			g.drawLine(x + width - 1, y, x + width - 1, y + height - 1);
+			g.setColor(SHADOW1);
+			g.drawLine(x + 1, y + 1, x + width - 2, y + 1);
+			g.drawLine(x + 1, y + 2, x + 1, y + height - 2);
+			g.setColor(SHADOW2);
+			g.drawLine(x + 2, y + 2, x + width - 2, y + 2);
+			g.drawLine(x + 2, y + 3, x + 2, y + height - 2);
+			g.setColor(SHADOW3);
+			g.drawLine(x + 3, y + 3, x + width - 2, y + 3);
+			g.drawLine(x + 3, y + 4, x + 3, y + height - 1);
+		}
 	}
 }

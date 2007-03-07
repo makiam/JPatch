@@ -73,6 +73,7 @@ public class Sds {
 //		edgeMap = null;
 		offInputStream.close();
 		validateVertices();
+		dump();
 		makeSlates();
 		rethinkSlates();
 	}
@@ -190,14 +191,14 @@ public class Sds {
 			face.prepareSlates();
 		}
 		
-		for (Face face : faceList) {
-			for (HalfEdge edge : face.getEdges()) {
-				System.out.println(edge.slateEdge0);
-				System.out.println(edge.slateEdge1);
-				System.out.println(edge.pair.slateEdge0);
-				System.out.println(edge.pair.slateEdge1);
-			}
-		}
+//		for (Face face : faceList) {
+//			for (HalfEdge edge : face.getEdges()) {
+//				System.out.println(edge.slateEdge0);
+//				System.out.println(edge.slateEdge1);
+//				System.out.println(edge.pair.slateEdge0);
+//				System.out.println(edge.pair.slateEdge1);
+//			}
+//		}
 		
 		List<Level2Vertex> list = new ArrayList<Level2Vertex>();
 		for (Face face : faceList) {
@@ -313,9 +314,29 @@ public class Sds {
 			}
 			System.out.println();
 		}
+		List<HalfEdge> edgeList = new ArrayList<HalfEdge>();
+		for (Face face : faceList) {
+			for (HalfEdge edge : face.edgeIterable) {
+				edgeList.add(edge);
+			}
+		}
+		Collections.sort(edgeList, new Comparator<HalfEdge>() {
+			public int compare(HalfEdge o1, HalfEdge o2) {
+				return o1.num < o2.num ? -1 : o2.num < o1.num ? 1 : 0;
+			}
+		});
+		System.out.println("Edges:");
+		for (HalfEdge e : edgeList) {
+			System.out.println(e + ": v1=" + e.vertex + " v2=" + e.pair.vertex + " f=" + e.face + " n=" + e.next + " p=" + e.prev);
+		}
+		
 		System.out.println("Vertices:");
 		for (TopLevelVertex vertex : vertexList) {
-			System.out.println(vertex + "  valence" + vertex.valence());
+			System.out.print(vertex + ": ");
+			for (HalfEdge edge : vertex.edgeIterable) {
+				System.out.print(edge + " ");
+			}
+			System.out.println();
 		}
 	}
 	
@@ -387,6 +408,7 @@ public class Sds {
 			}
 		}
 		vertex0.edge = edge;
+		vertex1.edge = edge.pair;
 		return edge;
 	}
 	

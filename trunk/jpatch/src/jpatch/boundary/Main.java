@@ -256,7 +256,8 @@ public class Main {
 //			}
 //			System.exit(0);
 			
-			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/cube2.off"));
+			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/opencube3.off"));
+//			activeSds = new Sds(new FileInputStream("/home/sascha/teapot2.off"));
 //			activeSds.makeSlates();
 //			activeSds.verify();
 //			activeSds.dump();

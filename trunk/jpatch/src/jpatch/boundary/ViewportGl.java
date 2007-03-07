@@ -1108,13 +1108,14 @@ public class ViewportGl extends Viewport {
 	
 	private void drawSlate(Slate2 slate) {
 		
-		int level = slate.getSubdivLevel();
-		if (level < 0) {
+		int l = slate.getSubdivLevel();
+		if (l < 0) {
 			return;
 		}
-		if (level < 2) {
-			level = 2;
+		if (l < 2) {
+			l = 2;
 		}
+		final int level = l;
 //		System.out.println("Slate=" + slate + " level=" + level);
 		int count = dicer.dice(slate, level);
 		
@@ -1187,17 +1188,16 @@ public class ViewportGl extends Viewport {
 		
 		for (int i = 0; i < 2; i++) {
 			int side = (i + 3) % 4;
-			if (slate.getCorners()[side][0].primary) {
-	//			int side = i + 1;
-				Slate2 adjacentSlate = slate.getAdjacentSlate(side);
-				int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivLevel();
-				if (pairLevel > level) {
-					pairLevel = level;
-				}
-				if (pairLevel < 2) {
-					pairLevel = 2;
-				}
-				int[] lineArray = dicer.getRim(pairLevel - 1, side);
+			if (slate.getCorners()[side][0].isToBeDrawn()) {
+//				Slate2 adjacentSlate = slate.getAdjacentSlate(side);
+//				int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivLevel();
+//				if (pairLevel > level) {
+//					pairLevel = level;
+//				}
+//				if (pairLevel < 2) {
+//					pairLevel = 2;
+//				}
+				int[] lineArray = dicer.getRim(level - 1, side);
 				gl.glBegin(GL_LINE_STRIP);
 				for (int j = 0; j < lineArray.length; j++) {
 					gl.glNormal3fv(normals[lineArray[j] + offset], 0);

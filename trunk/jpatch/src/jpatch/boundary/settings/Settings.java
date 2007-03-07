@@ -108,8 +108,9 @@ public class Settings extends AbstractSettings {
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 //		initTree();
 		final JTable table = new JTable();
-		table.setShowHorizontalLines(false);
-		table.setShowVerticalLines(false);
+		table.setShowHorizontalLines(true);
+		table.setShowVerticalLines(true);
+		table.setGridColor(new Color(0xc0c0c0));
 		table.setRowHeight(22);
 		initTable(table, this);
 		table.addPropertyChangeListener(new PropertyChangeListener() {
