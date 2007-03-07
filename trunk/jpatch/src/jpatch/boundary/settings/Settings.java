@@ -71,7 +71,7 @@ public class Settings extends AbstractSettings {
 	
 	@DisplayName(value = "Screen height")
 	public int screenHeight = 768;
-	
+
 	@DisplayName(value = "Save screen dimensions on exit")
 	@BooleanOptions(trueOption = "yes", falseOption = "no")
 	public boolean saveScreenDimensionsOnExit = true;
