@@ -64,6 +64,11 @@ public class Face {
 				}
 				position.set(x * recSides, y * recSides, z * recSides);
 			}
+			
+			@Override
+			public void computeLimit() {
+				// TODO: implement!!!
+			}
 		};
 		
 		slates = new Slate2[sides];
@@ -102,7 +107,7 @@ public class Face {
 			System.out.println("face=" + this + " side=" + n + " valence=" + valence);
 			corners[0] = new SlateEdge[valence];
 			
-			HalfEdge e = edge.vertex.edge;
+			HalfEdge e = edge.vertex.edges[0];
 			int offset = valence - edge.vertex.getEdgeIndex(edge);
 			
 			for (int i = 0; i < valence; i++) {

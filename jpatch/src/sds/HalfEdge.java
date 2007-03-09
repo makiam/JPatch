@@ -53,6 +53,11 @@ public class HalfEdge {
 				}
 				crease = Math.max(0, edgeSharpness - 1);
 			}
+			
+			@Override
+			public void computeLimit() {
+				// TODO: implement!!!
+			}
 		};
 		pair = new HalfEdge(secondVertex, firstVertex, this, sharpness, edgePoint);
 		slateEdge0 = pair.slateEdge1.pair;

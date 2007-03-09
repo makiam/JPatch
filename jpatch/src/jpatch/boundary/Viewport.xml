@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <attributeEditor class="Viewport">
 	<attribute name="View direction" field="viewType" />
-	<attribute name="Show points" field="showPoints" />
-	<attribute name="Show curves" field="showCurves" />
-	<attribute name="Show surfaces" field="showSurfaces" />
+	<attribute name="Show control mesh" field="showControlMesh" />
+	<attribute name="Show limit surface" field="showLimitSurface" />
+	<attribute name="Show projected mesh" field="showProjectedMesh" />
 	<attribute name="Translation" field="viewTranslation" />
 	<attribute name="Rotation" field="viewRotation" />
 	<attribute name="Scale" field="viewScale" />

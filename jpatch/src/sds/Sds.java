@@ -251,9 +251,13 @@ public class Sds {
 		for (Level2Vertex v : level2Vertices) {
 			v.computeDerivedPosition();
 		}
+		for (Level2Vertex v : level2Vertices) {
+			v.computeLimit();
+		}
 	}
 	
 	public void project(Matrix4f matrix) {
+		System.out.println(faceList.size() + " faces");
 		for (Level2Vertex v : level2Vertices) {
 			v.project(matrix);
 		}
@@ -401,14 +405,14 @@ public class Sds {
 		if (neighbor == null) {
 			edge = new HalfEdge(vertex0, vertex1);
 			edgeMap.put(new EdgeKey(vertex0, vertex1), edge);
+			vertex0.addEdge(edge);
+			vertex1.addEdge(edge.pair);
 		} else {
 			edge = neighbor.pair;
 			if (edge.face != null) {
 				throw new IllegalArgumentException("Surface is non-manifold.");
 			}
 		}
-		vertex0.edge = edge;
-		vertex1.edge = edge.pair;
 		return edge;
 	}
 	

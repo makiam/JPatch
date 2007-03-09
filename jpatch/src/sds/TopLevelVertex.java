@@ -1,13 +1,14 @@
 package sds;
 
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
 
 import javax.vecmath.*;
 
 import jpatch.entity.Attribute;
 import jpatch.entity.AttributeListener;
 import jpatch.entity.Constants;
+
+import static sds.SdsWeights.*;
 
 /**
  * 
@@ -18,13 +19,10 @@ import jpatch.entity.Constants;
  *
  */
 public class TopLevelVertex extends BaseVertex {
-	private static final float CREASE0 = 3.0f / 4.0f;
-	private static final float CREASE1 = 1.0f / 8.0f;
-	
 	static int count;
 	final int num = count++;
 	
-	HalfEdge edge;
+	HalfEdge[] edges = new HalfEdge[0];
 	public final Level2Vertex vertexPoint;
 	int valence = -1;
 
@@ -33,19 +31,13 @@ public class TopLevelVertex extends BaseVertex {
 		public Iterator<Face> iterator() {
 			return new Iterator<Face>() {
 				private int i = 0;
-				private HalfEdge e = edge;
 				
 				public boolean hasNext() {
-					return i < valence;
+					return i < edges.length;
 				}
 				
 				public Face next() {
-					i++;
-					HalfEdge tmp = e;
-					if (e.prev != null) {
-						e = e.prev.pair;
-					}
-					return tmp.face;
+					return edges[i++].face;
 				}
 				
 				public void remove() {
@@ -58,19 +50,13 @@ public class TopLevelVertex extends BaseVertex {
 		public Iterator<HalfEdge> iterator() {
 			return new Iterator<HalfEdge>() {
 				private int i = 0;
-				private HalfEdge e = edge;
 				
 				public boolean hasNext() {
-					return i < valence;
+					return i < edges.length;
 				}
 				
 				public HalfEdge next() {
-					i++;
-					HalfEdge tmp = e;
-					if (e.prev != null) {
-						e = e.prev.pair;
-					}
-					return tmp;
+					return edges[i++];
 				}
 				
 				public void remove() {
@@ -83,6 +69,7 @@ public class TopLevelVertex extends BaseVertex {
 	public TopLevelVertex() {
 		super();
 		vertexPoint = new Level2Vertex() {
+			
 			@Override
 			public void computeDerivedPosition() {
 				if (!overridePosition.get()) {
@@ -101,7 +88,7 @@ public class TopLevelVertex extends BaseVertex {
 						final double k = 1.0 / (valence * valence);
 						double w = (valence - 2.0) / valence;
 						double x = 0, y = 0, z = 0;
-						for (HalfEdge edge : getAdjacentEdges()) {
+						for (HalfEdge edge : edges) {
 							Point3d p = edge.face.facePoint.pos;
 							x += p.x;
 							y += p.y;
@@ -111,11 +98,6 @@ public class TopLevelVertex extends BaseVertex {
 							y += p.y;
 							z += p.z;
 						}
-//						for (int i = 1; i < stencil.length; i++) {
-//							x += stencil[i].pos.x;
-//							y += stencil[i].pos.y;
-//							z += stencil[i].pos.z;
-//						}
 						position.set(x * k + TopLevelVertex.this.pos.x * w, y * k + TopLevelVertex.this.pos.y * w, z * k + TopLevelVertex.this.pos.z * w);
 					}
 				}
@@ -126,8 +108,40 @@ public class TopLevelVertex extends BaseVertex {
 				corner = Math.max(0, TopLevelVertex.this.corner - 1);
 				creaseEdge0 = TopLevelVertex.this.creaseEdge0;
 				creaseEdge1 = TopLevelVertex.this.creaseEdge1;
-//				creaseEdgeIndex0 = TopLevelVertex.this.creaseEdgeIndex0;
-//				creaseEdgeIndex1 = TopLevelVertex.this.creaseEdgeIndex1;
+			}
+			
+			@Override
+			public void computeLimit() {
+				if (TopLevelVertex.this.corner > 0) {
+					limit.set(TopLevelVertex.this.pos);
+				} else if (TopLevelVertex.this.crease > 0) {
+					Point3d p0 = TopLevelVertex.this.pos;
+					Point3d p1 = TopLevelVertex.this.creaseEdge0.edgePoint.pos;
+					Point3d p2 = TopLevelVertex.this.creaseEdge1.edgePoint.pos;
+					limit.set(
+							p0.x * CREASE_LIMIT0 + (p1.x + p2.x) * CREASE_LIMIT1,
+							p0.y * CREASE_LIMIT0 + (p1.y + p2.y) * CREASE_LIMIT1,
+							p0.z * CREASE_LIMIT0 + (p1.z + p2.z) * CREASE_LIMIT1
+					);
+				} else {
+					double fx = 0, fy = 0, fz = 0;
+					double ex = 0, ey = 0, ez = 0;
+					for (HalfEdge edge : edges) {
+						Point3d p = edge.face.facePoint.pos;
+						fx += p.x;
+						fy += p.y;
+						fz += p.z;
+						p = edge.edgePoint.pos;
+						ex += p.x;
+						ey += p.y;
+						ez += p.z;
+					}
+					limit.set(
+							fx * VERTEX_FACE_LIMIT[valence] + ex * VERTEX_EDGE_LIMIT[valence] + pos.x * VERTEX_POINT_LIMIT[valence],
+							fy * VERTEX_FACE_LIMIT[valence] + ey * VERTEX_EDGE_LIMIT[valence] + pos.y * VERTEX_POINT_LIMIT[valence],
+							fz * VERTEX_FACE_LIMIT[valence] + ez * VERTEX_EDGE_LIMIT[valence] + pos.z * VERTEX_POINT_LIMIT[valence]
+					);
+				}
 			}
 		};
 	}
@@ -155,13 +169,9 @@ public class TopLevelVertex extends BaseVertex {
 	}
 	
 	int getEdgeIndex(HalfEdge edge) {
-		HalfEdge e = this.edge;
-		for (int i = 0; i < valence; i++) {
-			if (e == edge) {
+		for (int i = 0; i < edges.length; i++) {
+			if (edge == edges[i]) {
 				return i;
-			}
-			if (e.prev != null) {
-				e = e.prev.pair;
 			}
 		}
 		System.out.println("vertex=" + this + " edge=" + edge + " edge-pair=" + edge.pair);
@@ -171,17 +181,17 @@ public class TopLevelVertex extends BaseVertex {
 		throw new IllegalArgumentException(edge.toString());
 	}
 	
-	private void computeValence() {
-		valence = 1; 
-		HalfEdge e = edge.prev;
-		while (e.pair != edge) {
-			e = e.pair.prev;
-			valence++;
-			if (e == null) {
-				break;
-			}
-		}
-	}
+//	private void computeValence() {
+//		valence = 1; 
+//		HalfEdge e = edge.prev;
+//		while (e.pair != edge) {
+//			e = e.pair.prev;
+//			valence++;
+//			if (e == null) {
+//				break;
+//			}
+//		}
+//	}
 	
 	public void analyzeEdges() {
 		int i = 0;
@@ -223,12 +233,49 @@ public class TopLevelVertex extends BaseVertex {
 		}
 	}
 	
+	private HalfEdge getStartEdge(HalfEdge edge) {
+		HalfEdge e, prev = edge;
+		do {
+			e = prev;
+			prev = e.pair.next;
+		} while (prev != null && prev != edge);
+		return e;
+	}
+	
 	void validate() {
-		HalfEdge e = edge;
-		while (edge.pair.next != null && edge.pair.next != e) {
-			edge = edge.pair.next;
+		final int n = edges.length;
+		final HalfEdge[] tmp = new HalfEdge[n];
+		final Set<HalfEdge> addedEdges = new HashSet<HalfEdge>();
+		int j = 0;
+		for (int i = 0; i < n; i++) {
+			HalfEdge start = getStartEdge(edges[i]);
+			HalfEdge e = null, next = start;
+			do {
+				e = next;
+				next = e.prev == null ? null : e.prev.pair;
+				if (!addedEdges.contains(e)) {
+					addedEdges.add(e);
+					tmp[j++] = e;
+				}
+			} while (next != null && next != start);
 		}
-		computeValence();
+		if (j != n) {
+			throw new IllegalStateException();
+		}
+		edges = tmp;
+		valence = n;
+	}
+	
+	void addEdge(HalfEdge edge) {
+		for (HalfEdge e : edges) {
+			if (edge == e) {
+				throw new IllegalArgumentException(edge + " has already been added to vertex " + this);
+			}
+		}
+		final HalfEdge[] tmp = new HalfEdge[edges.length + 1];
+		System.arraycopy(edges, 0, tmp, 0, edges.length);
+		tmp[edges.length] = edge;
+		edges = tmp;
 	}
 	
 	public String toString() {
