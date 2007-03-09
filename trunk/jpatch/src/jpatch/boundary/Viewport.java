@@ -25,9 +25,9 @@ public abstract class Viewport extends AbstractNamedObject {
 	public Attribute.Tuple2 viewRotation = new Attribute.Tuple2("Rotation", 0, 0, false);
 	public Attribute.Tuple2 viewTranslation = new Attribute.Tuple2("Translation", 0, 0, false);
 	public Attribute.Double viewScale = new Attribute.Double(1);
-	public Attribute.Boolean showPoints = new Attribute.Boolean(true);
-	public Attribute.Boolean showCurves = new Attribute.Boolean(true);
-	public Attribute.Boolean showSurfaces = new Attribute.Boolean(true);
+	public Attribute.Boolean showControlMesh = new Attribute.Boolean(true);
+	public Attribute.Boolean showLimitSurface = new Attribute.Boolean(true);
+	public Attribute.Boolean showProjectedMesh = new Attribute.Boolean(true);
 	
 	
 	protected final int id;
@@ -79,9 +79,9 @@ public abstract class Viewport extends AbstractNamedObject {
 		viewType.set(viewDirection);
 		viewDirection.bindTo(this);
 		viewType.addAttributeListener(updateAttributeListener);
-		showPoints.addAttributeListener(updateAttributeListener);
-		showCurves.addAttributeListener(updateAttributeListener);
-		showSurfaces.addAttributeListener(updateAttributeListener);
+		showControlMesh.addAttributeListener(updateAttributeListener);
+		showLimitSurface.addAttributeListener(updateAttributeListener);
+		showProjectedMesh.addAttributeListener(updateAttributeListener);
 		viewTranslation.addAttributeListener(updateAttributeListener);
 		viewRotation.addAttributeListener(updateAttributeListener);
 		viewScale.addAttributeListener(updateAttributeListener);

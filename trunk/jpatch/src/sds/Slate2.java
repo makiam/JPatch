@@ -91,13 +91,12 @@ public class Slate2 {
 
 		for (int corner = 0; corner < 4; corner++) {
 			int valence = corners[corner].length;
-			float fx = 0;
-			float fy = 0;
-			float ex = 0;
-			float ey = 0;
+			float fx = 0, fy = 0;
+			float ex = 0, ey = 0;
 			for (int i = 1; i < fans[corner].length; i++) {
 				ex += fans[corner][i].x;
-				ey += fans[corner][i++].y;
+				ey += fans[corner][i].y;
+				i++;
 				fx += fans[corner][i].x;
 				fy += fans[corner][i].y;
 			}
@@ -107,6 +106,7 @@ public class Slate2 {
 			
 			int lx = (int) ((ex * 4 + fx + fans[corner][0].x * v2) * ik);
 			int ly = (int) ((ey * 4 + fy + fans[corner][0].y * v2) * ik);
+			
 			if (lx < xmin) xmin = lx;
 			if (lx > xmax) xmax = lx;
 			if (ly < ymin) ymin = ly;
@@ -127,7 +127,7 @@ public class Slate2 {
 		int dx = xmax - xmin;
 		int dy = ymax - ymin;
 		int s = dx + dy;
-		s >>= 4;
+		s >>= 5;
 		if ((s & 0xffffff00) > 0) {
 			subdivLevel = 6;
 		} else if ((s & 0xc0) > 0) {
@@ -139,38 +139,38 @@ public class Slate2 {
 		} else if ((s & 0x2) > 0) {
 			subdivLevel = 2;
 		} else {
-			subdivLevel = 2;
+			subdivLevel = 1;
 		}
 	}
 	
-	public void test() {
-		if (corners[0][0].slate != this) throw new IllegalStateException();
-		if (corners[1][0].slate != this) throw new IllegalStateException();
-		if (corners[2][0].slate != this) throw new IllegalStateException();
-		if (corners[3][0].slate != this) throw new IllegalStateException();
-		
-		if (fans[0][1] != fans[1][0]) throw new IllegalStateException();
-		if (fans[0][2] != fans[2][0]) throw new IllegalStateException();
-		if (fans[0][3] != fans[3][0]) throw new IllegalStateException();
-		if (fans[1][1] != fans[2][0]) throw new IllegalStateException();
-		if (fans[1][2] != fans[3][0]) throw new IllegalStateException();
-		if (fans[1][3] != fans[0][0]) throw new IllegalStateException();
-		if (fans[2][1] != fans[3][0]) throw new IllegalStateException();
-		if (fans[2][2] != fans[0][0]) throw new IllegalStateException();
-		if (fans[2][3] != fans[1][0]) throw new IllegalStateException();
-		if (fans[3][1] != fans[0][0]) throw new IllegalStateException();
-		if (fans[3][2] != fans[1][0]) throw new IllegalStateException();
-		if (fans[3][3] != fans[2][0]) throw new IllegalStateException();
-		
-		if (fans[0][fans[0].length - 2] != fans[1][4]) throw new IllegalStateException();
-		if (fans[0][fans[0].length - 1] != fans[1][5]) throw new IllegalStateException();
-		if (fans[1][fans[1].length - 2] != fans[2][4]) throw new IllegalStateException();
-		if (fans[1][fans[1].length - 1] != fans[2][5]) throw new IllegalStateException();
-		if (fans[2][fans[2].length - 2] != fans[3][4]) throw new IllegalStateException();
-		if (fans[2][fans[2].length - 1] != fans[3][5]) throw new IllegalStateException();
-		if (fans[3][fans[3].length - 2] != fans[0][4]) throw new IllegalStateException();
-		if (fans[3][fans[3].length - 1] != fans[0][5]) throw new IllegalStateException();
-	}
+//	public void test() {
+//		if (corners[0][0].slate != this) throw new IllegalStateException();
+//		if (corners[1][0].slate != this) throw new IllegalStateException();
+//		if (corners[2][0].slate != this) throw new IllegalStateException();
+//		if (corners[3][0].slate != this) throw new IllegalStateException();
+//		
+//		if (fans[0][1] != fans[1][0]) throw new IllegalStateException();
+//		if (fans[0][2] != fans[2][0]) throw new IllegalStateException();
+//		if (fans[0][3] != fans[3][0]) throw new IllegalStateException();
+//		if (fans[1][1] != fans[2][0]) throw new IllegalStateException();
+//		if (fans[1][2] != fans[3][0]) throw new IllegalStateException();
+//		if (fans[1][3] != fans[0][0]) throw new IllegalStateException();
+//		if (fans[2][1] != fans[3][0]) throw new IllegalStateException();
+//		if (fans[2][2] != fans[0][0]) throw new IllegalStateException();
+//		if (fans[2][3] != fans[1][0]) throw new IllegalStateException();
+//		if (fans[3][1] != fans[0][0]) throw new IllegalStateException();
+//		if (fans[3][2] != fans[1][0]) throw new IllegalStateException();
+//		if (fans[3][3] != fans[2][0]) throw new IllegalStateException();
+//		
+//		if (fans[0][fans[0].length - 2] != fans[1][4]) throw new IllegalStateException();
+//		if (fans[0][fans[0].length - 1] != fans[1][5]) throw new IllegalStateException();
+//		if (fans[1][fans[1].length - 2] != fans[2][4]) throw new IllegalStateException();
+//		if (fans[1][fans[1].length - 1] != fans[2][5]) throw new IllegalStateException();
+//		if (fans[2][fans[2].length - 2] != fans[3][4]) throw new IllegalStateException();
+//		if (fans[2][fans[2].length - 1] != fans[3][5]) throw new IllegalStateException();
+//		if (fans[3][fans[3].length - 2] != fans[0][4]) throw new IllegalStateException();
+//		if (fans[3][fans[3].length - 1] != fans[0][5]) throw new IllegalStateException();
+//	}
 	
 	public Slate2 getAdjacentSlate(int side) {
 		return corners[side][0].pair.slate;
