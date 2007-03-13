@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.vecmath.*;
 
+import jpatch.boundary.settings.Settings;
 import jpatch.entity.Attribute;
 import jpatch.entity.AttributeListener;
 import jpatch.entity.Constants;
@@ -19,6 +20,7 @@ import static sds.SdsWeights.*;
  *
  */
 public class TopLevelVertex extends BaseVertex {
+	
 	static int count;
 	final int num = count++;
 	

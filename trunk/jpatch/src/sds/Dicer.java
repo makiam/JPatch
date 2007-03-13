@@ -11,11 +11,16 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.vecmath.*;
 
+import jpatch.boundary.settings.RealtimeRendererSettings;
+import jpatch.boundary.settings.Settings;
+
 import static java.lang.Math.*;
 import static sds.SdsConstants.*;
 import static sds.SdsWeights.*;
 
 public class Dicer {
+	private static RealtimeRendererSettings RENDERER_SETTINGS = Settings.getInstance().realtimeRenderer;
+	
 	private static final int UNUSED = 0;
 	private static final int EDGE = 1;
 	private static final int EDGE_H = 2;
@@ -1010,17 +1015,19 @@ public class Dicer {
 			final float by = (in[ls[1]][1] - in[ls[3]][1]) * 4 + (in[ls[5]][1] - in[ls[8]][1]) + (in[ls[6]][1] - in[ls[7]][1]);
 			final float bz = (in[ls[1]][2] - in[ls[3]][2]) * 4 + (in[ls[5]][2] - in[ls[8]][2]) + (in[ls[6]][2] - in[ls[7]][2]);
 			
-//			nx = by * az - bz * ay;		// cross product
-//			ny = bz * ax - bx * az;
-//			nz = bx * ay - by * ax;
-//			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
-//			norm[outIndex][0] = nx * nl;
-//			norm[outIndex][1] = ny * nl;
-//			norm[outIndex][2] = nz * nl;
-			
-			norm[outIndex][0] = by * az - bz * ay;		// cross product
-			norm[outIndex][1] = bz * ax - bx * az;
-			norm[outIndex][2] = bx * ay - by * ax;
+			if (RENDERER_SETTINGS.softwareNormalize) {
+				float nx = by * az - bz * ay;		// cross product
+				float ny = bz * ax - bx * az;
+				float nz = bx * ay - by * ax;
+				float nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
+				norm[outIndex][0] = nx * nl;
+				norm[outIndex][1] = ny * nl;
+				norm[outIndex][2] = nz * nl;
+			} else {
+				norm[outIndex][0] = by * az - bz * ay;		// cross product
+				norm[outIndex][1] = bz * ax - bx * az;
+				norm[outIndex][2] = bx * ay - by * ax;
+			}
 		}
 		
 		/*
@@ -1094,17 +1101,20 @@ public class Dicer {
 				by += in[cs[c2ei]][1] * ew;
 				bz += in[cs[c2ei]][2] * ew;
 			}
-//			nx = by * az - bz * ay;		// cross product
-//			ny = bz * ax - bx * az;
-//			nz = bx * ay - by * ax;
-//			nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
-//			norm[outIndex][0] = nx * nl;
-//			norm[outIndex][1] = ny * nl;
-//			norm[outIndex][2] = nz * nl;
 			
-			norm[outIndex][0] = by * az - bz * ay;		// cross product
-			norm[outIndex][1] = bz * ax - bx * az;
-			norm[outIndex][2] = bx * ay - by * ax;
+			if (RENDERER_SETTINGS.softwareNormalize) {
+				float nx = by * az - bz * ay;		// cross product
+				float ny = bz * ax - bx * az;
+				float nz = bx * ay - by * ax;
+				float nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
+				norm[outIndex][0] = nx * nl;
+				norm[outIndex][1] = ny * nl;
+				norm[outIndex][2] = nz * nl;
+			} else {
+				norm[outIndex][0] = by * az - bz * ay;		// cross product
+				norm[outIndex][1] = bz * ax - bx * az;
+				norm[outIndex][2] = bx * ay - by * ax;
+			}
 		}
 		
 		

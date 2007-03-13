@@ -2,9 +2,13 @@ package sds;
 
 import javax.vecmath.*;
 
+import jpatch.boundary.settings.RealtimeRendererSettings;
+import jpatch.boundary.settings.Settings;
 import jpatch.entity.*;
 
 public abstract class Level2Vertex extends BaseVertex {
+	private static RealtimeRendererSettings RENDERER_SETTINGS = Settings.getInstance().realtimeRenderer;
+	
 	public final Attribute.Boolean overridePosition = new Attribute.Boolean(false);
 	public final Attribute.Boolean overrideSharpness = new Attribute.Boolean(false);
 	public final Point3d limit = new Point3d();
@@ -25,5 +29,8 @@ public abstract class Level2Vertex extends BaseVertex {
 		matrix.transform(projectedLimit);
 		projectedNormal.set(normal);
 		matrix.transform(projectedNormal);
+		if (RENDERER_SETTINGS.softwareNormalize) {
+			projectedNormal.normalize();
+		}
 	}
 }
