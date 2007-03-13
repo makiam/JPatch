@@ -212,9 +212,10 @@ public class Sds {
 					list.add(edge.edgePoint);
 				}
 			}
-			for (TopLevelVertex vertex : vertexList) {
-				list.add(vertex.vertexPoint);
-			}
+		}
+		for (TopLevelVertex vertex : vertexList) {
+			list.add(vertex.vertexPoint);
+//			System.out.println(list.size());
 		}
 		level2Vertices = list.toArray(new Level2Vertex[list.size()]);
 		
@@ -248,6 +249,7 @@ public class Sds {
 	}
 	
 	public void computeLevel2Vertices() {
+		System.out.println("computeLevel2Vertices " + level2Vertices.length);
 		for (Level2Vertex v : level2Vertices) {
 			v.computeDerivedPosition();
 		}
@@ -257,7 +259,6 @@ public class Sds {
 	}
 	
 	public void project(Matrix4f matrix) {
-		System.out.println(faceList.size() + " faces");
 		for (Level2Vertex v : level2Vertices) {
 			v.project(matrix);
 		}

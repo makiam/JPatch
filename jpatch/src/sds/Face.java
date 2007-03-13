@@ -1,5 +1,11 @@
 package sds;
 
+import static sds.SdsWeights.TANGENT_EDGE_WEIGHT;
+import static sds.SdsWeights.TANGENT_FACE_WEIGHT;
+import static sds.SdsWeights.VERTEX_EDGE_LIMIT;
+import static sds.SdsWeights.VERTEX_FACE_LIMIT;
+import static sds.SdsWeights.VERTEX_POINT_LIMIT;
+
 import java.util.Iterator;
 
 import javax.vecmath.Point3d;
@@ -21,7 +27,7 @@ public class Face {
 	
 	final SlateEdge[] slateEdges;
 	
-	final Level2Vertex facePoint;
+	public final Level2Vertex facePoint;
 	final HalfEdge edge;
 	final Iterable<HalfEdge> edgeIterable = new Iterable<HalfEdge>() {
 		public Iterator<HalfEdge> iterator() {
@@ -67,7 +73,56 @@ public class Face {
 			
 			@Override
 			public void computeLimit() {
-				// TODO: implement!!!
+				double fx = 0, fy = 0, fz = 0;
+				double ex = 0, ey = 0, ez = 0;
+				for (HalfEdge edge : edgeIterable) {
+					Point3d p = edge.vertex.vertexPoint.pos;
+					fx += p.x;
+					fy += p.y;
+					fz += p.z;
+					p = edge.edgePoint.pos;
+					ex += p.x;
+					ey += p.y;
+					ez += p.z;
+				}
+				limit.set(
+						fx * VERTEX_FACE_LIMIT[Face.this.sides] + ex * VERTEX_EDGE_LIMIT[Face.this.sides] + pos.x * VERTEX_POINT_LIMIT[Face.this.sides],
+						fy * VERTEX_FACE_LIMIT[Face.this.sides] + ey * VERTEX_EDGE_LIMIT[Face.this.sides] + pos.y * VERTEX_POINT_LIMIT[Face.this.sides],
+						fz * VERTEX_FACE_LIMIT[Face.this.sides] + ez * VERTEX_EDGE_LIMIT[Face.this.sides] + pos.z * VERTEX_POINT_LIMIT[Face.this.sides]
+				);
+				
+				float ax = 0;
+				float ay = 0;
+				float az = 0;
+				float bx = 0;
+				float by = 0;
+				float bz = 0;
+				int i = 0;
+				for (HalfEdge edge : edgeIterable) {
+					HalfEdge nextEdge = edge.next;
+					Point3d p0f = edge.face.facePoint.pos;
+					Point3d p0e = edge.edgePoint.pos;
+					Point3d p1f = nextEdge.face.facePoint.pos;
+					Point3d p1e = nextEdge.edgePoint.pos;
+					float ew = TANGENT_EDGE_WEIGHT[Face.this.sides][i];
+					float fw = TANGENT_FACE_WEIGHT[Face.this.sides][i];
+					ax += p1f.x * fw;
+					ay += p1f.y * fw;
+					az += p1f.z * fw;
+					ax += p1e.x * ew;
+					ay += p1e.y * ew;
+					az += p1e.z * ew;
+					bx += p0f.x * fw;
+					by += p0f.y * fw;
+					bz += p0f.z * fw;
+					bx += p0e.x * ew;
+					by += p0e.y * ew;
+					bz += p0e.z * ew;
+					i++;
+				}
+				uTangent.set(bx, by, bz);
+				vTangent.set(ax, ay, az);
+				normal.cross(uTangent, vTangent);
 			}
 		};
 		
