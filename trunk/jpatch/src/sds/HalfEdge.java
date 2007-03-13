@@ -1,5 +1,7 @@
 package sds;
 
+import static sds.SdsWeights.*;
+
 import javax.vecmath.Point3d;
 import jpatch.entity.Attribute;
 
@@ -20,7 +22,7 @@ public class HalfEdge {
 	Face face;
 	HalfEdge prev;
 	HalfEdge next;
-	final Level2Vertex edgePoint;
+	public final Level2Vertex edgePoint;
 	final SlateEdge slateEdge0;
 	final SlateEdge slateEdge1;
 	public final Attribute.Integer sharpness;
@@ -56,7 +58,44 @@ public class HalfEdge {
 			
 			@Override
 			public void computeLimit() {
-				// TODO: implement!!!
+				int edgeSharpness = HalfEdge.this.getSharpness();
+				if (edgeSharpness > 0) {
+					Point3d p1 = vertex.vertexPoint.pos;
+					Point3d p2 = pair.vertex.vertexPoint.pos;
+					limit.set(
+							pos.x * CREASE_LIMIT0 + (p1.x + p2.x) * CREASE_LIMIT1,
+							pos.y * CREASE_LIMIT0 + (p1.y + p2.y) * CREASE_LIMIT1,
+							pos.z * CREASE_LIMIT0 + (p1.z + p2.z) * CREASE_LIMIT1
+					);
+				} else {
+					Point3d pf0 = pair.prev.edgePoint.pos;
+					Point3d pf1 = next.edgePoint.pos;
+					Point3d pf2 = prev.edgePoint.pos;
+					Point3d pf3 = pair.next.edgePoint.pos;
+					Point3d pe0 = pair.vertex.vertexPoint.pos;
+					Point3d pe1 = face.facePoint.pos;
+					Point3d pe2 = vertex.vertexPoint.pos;
+					Point3d pe3 = pair.face.facePoint.pos;
+					limit.set(
+							pos.x * LIMIT0 + ((pf0.x + pf2.x) + (pf1.x + pf3.x)) * LIMIT2 + ((pe0.x + pe2.x) + (pe1.x + pe3.x)) * LIMIT1,
+							pos.y * LIMIT0 + ((pf0.y + pf2.y) + (pf1.y + pf3.y)) * LIMIT2 + ((pe0.y + pe2.y) + (pe1.y + pe3.y)) * LIMIT1,
+							pos.z * LIMIT0 + ((pf0.z + pf2.z) + (pf1.z + pf3.z)) * LIMIT2 + ((pe0.z + pe2.z) + (pe1.z + pe3.z)) * LIMIT1
+					);
+					
+					vTangent.set(
+							(pe1.x - pe3.x) * 4 + (pf1.x - pf0.x) + (pf2.x - pf3.x),
+							(pe1.y - pe3.y) * 4 + (pf1.y - pf0.y) + (pf2.y - pf3.y),
+							(pe1.z - pe3.z) * 4 + (pf1.z - pf0.z) + (pf2.z - pf3.z)
+					);
+					
+					uTangent.set(
+							(pe0.x - pe2.x) * 4 + (pf0.x - pf3.x) + (pf1.x - pf2.x),
+							(pe0.y - pe2.y) * 4 + (pf0.y - pf3.y) + (pf1.y - pf2.y),
+							(pe0.z - pe2.z) * 4 + (pf0.z - pf3.z) + (pf1.z - pf2.z)
+					);
+					
+					normal.cross(uTangent, vTangent);
+				}
 			}
 		};
 		pair = new HalfEdge(secondVertex, firstVertex, this, sharpness, edgePoint);

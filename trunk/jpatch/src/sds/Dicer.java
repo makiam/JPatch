@@ -429,6 +429,40 @@ public class Dicer {
 	}
 	
 	public int dice(final Slate2 slate, final int depth) {
+		if (depth == 1) {
+			float[] va = quadVertexArrays[1];
+			float[] na = quadNormalArrays[1];
+			Level2Vertex v0 = slate.corners[0][0].vertex;
+			Level2Vertex v1 = slate.corners[1][0].vertex;
+			Level2Vertex v2 = slate.corners[2][0].vertex;
+			Level2Vertex v3 = slate.corners[3][0].vertex;
+			va[0] = v0.projectedLimit.x;
+			va[1] = v0.projectedLimit.y;
+			va[2] = v0.projectedLimit.z;
+			va[3] = v1.projectedLimit.x;
+			va[4] = v1.projectedLimit.y;
+			va[5] = v1.projectedLimit.z;
+			va[6] = v2.projectedLimit.x;
+			va[7] = v2.projectedLimit.y;
+			va[8] = v2.projectedLimit.z;
+			va[9] = v3.projectedLimit.x;
+			va[10] = v3.projectedLimit.y;
+			va[11] = v3.projectedLimit.z;
+			na[0] = v0.projectedNormal.x;
+			na[1] = v0.projectedNormal.y;
+			na[2] = v0.projectedNormal.z;
+			na[3] = v1.projectedNormal.x;
+			na[4] = v1.projectedNormal.y;
+			na[5] = v1.projectedNormal.z;
+			na[6] = v2.projectedNormal.x;
+			na[7] = v2.projectedNormal.y;
+			na[8] = v2.projectedNormal.z;
+			na[9] = v3.projectedNormal.x;
+			na[10] = v3.projectedNormal.y;
+			na[11] = v3.projectedNormal.z;
+			return 12;
+		}
+		
 //		System.out.println("dicing slate=" + slate + " depth=" + depth);
 		final int dim = (1 << (depth - 1)) + 3;
 		

@@ -115,13 +115,12 @@ public class TopLevelVertex extends BaseVertex {
 				if (TopLevelVertex.this.corner > 0) {
 					limit.set(TopLevelVertex.this.pos);
 				} else if (TopLevelVertex.this.crease > 0) {
-					Point3d p0 = TopLevelVertex.this.pos;
 					Point3d p1 = TopLevelVertex.this.creaseEdge0.edgePoint.pos;
 					Point3d p2 = TopLevelVertex.this.creaseEdge1.edgePoint.pos;
 					limit.set(
-							p0.x * CREASE_LIMIT0 + (p1.x + p2.x) * CREASE_LIMIT1,
-							p0.y * CREASE_LIMIT0 + (p1.y + p2.y) * CREASE_LIMIT1,
-							p0.z * CREASE_LIMIT0 + (p1.z + p2.z) * CREASE_LIMIT1
+							pos.x * CREASE_LIMIT0 + (p1.x + p2.x) * CREASE_LIMIT1,
+							pos.y * CREASE_LIMIT0 + (p1.y + p2.y) * CREASE_LIMIT1,
+							pos.z * CREASE_LIMIT0 + (p1.z + p2.z) * CREASE_LIMIT1
 					);
 				} else {
 					double fx = 0, fy = 0, fz = 0;
@@ -141,6 +140,38 @@ public class TopLevelVertex extends BaseVertex {
 							fy * VERTEX_FACE_LIMIT[valence] + ey * VERTEX_EDGE_LIMIT[valence] + pos.y * VERTEX_POINT_LIMIT[valence],
 							fz * VERTEX_FACE_LIMIT[valence] + ez * VERTEX_EDGE_LIMIT[valence] + pos.z * VERTEX_POINT_LIMIT[valence]
 					);
+				
+				
+					float ax = 0;
+					float ay = 0;
+					float az = 0;
+					float bx = 0;
+					float by = 0;
+					float bz = 0;
+					for (int i = 0; i < edges.length; i++) {
+						int j = (i + 1) % edges.length;
+						Point3d p0f = edges[i].face.facePoint.pos;
+						Point3d p0e = edges[i].edgePoint.pos;
+						Point3d p1f = edges[j].face.facePoint.pos;
+						Point3d p1e = edges[j].edgePoint.pos;
+						float ew = TANGENT_EDGE_WEIGHT[valence][i];
+						float fw = TANGENT_FACE_WEIGHT[valence][i];
+						ax += p1f.x * fw;
+						ay += p1f.y * fw;
+						az += p1f.z * fw;
+						ax += p1e.x * ew;
+						ay += p1e.y * ew;
+						az += p1e.z * ew;
+						bx += p0f.x * fw;
+						by += p0f.y * fw;
+						bz += p0f.z * fw;
+						bx += p0e.x * ew;
+						by += p0e.y * ew;
+						bz += p0e.z * ew;
+					}
+					uTangent.set(bx, by, bz);
+					vTangent.set(ax, ay, az);
+					normal.cross(uTangent, vTangent);
 				}
 			}
 		};

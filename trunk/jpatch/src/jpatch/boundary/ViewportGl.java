@@ -1016,8 +1016,15 @@ public class ViewportGl extends Viewport {
 						p0.set(edge.getSecondVertex().vertexPoint.limit);
 						modelView.transform(p0);
 						gl.glVertex3f(p0.x, p0.y, p0.z);
+						
+						p0.set(edge.edgePoint.limit);
+						modelView.transform(p0);
+						gl.glVertex3f(p0.x, p0.y, p0.z);
 					}
 				}
+				p0.set(face.facePoint.limit);
+				modelView.transform(p0);
+				gl.glVertex3f(p0.x, p0.y, p0.z);
 			}
 			gl.glEnd();
 			
