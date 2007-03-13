@@ -89,6 +89,15 @@ public class Slate2 {
 		int ymin = Integer.MAX_VALUE;
 		int ymax = Integer.MIN_VALUE;
 
+		if (
+				corners[0][0].vertex.projectedNormal.z < 0 &&
+				corners[1][0].vertex.projectedNormal.z < 0 &&
+				corners[2][0].vertex.projectedNormal.z < 0 &&
+				corners[3][0].vertex.projectedNormal.z < 0
+		) {
+			subdivLevel = -1;
+			return;
+		}
 		for (int corner = 0; corner < 4; corner++) {
 			int valence = corners[corner].length;
 			float fx = 0, fy = 0;

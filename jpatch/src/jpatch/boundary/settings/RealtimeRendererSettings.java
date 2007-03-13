@@ -49,5 +49,6 @@ public class RealtimeRendererSettings extends AbstractSettings {
 	@Conditional(dependsOn = "adaptive", value = "false")
 	public int subdivLevel = 2;
 	
+	public boolean softwareNormalize = true;
 	
 }
