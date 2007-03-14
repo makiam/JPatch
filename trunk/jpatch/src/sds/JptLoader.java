@@ -136,7 +136,7 @@ public class JptLoader {
 				}
 				v.scale(-1.0 / vertex.edges.length);
 				v.add(vertex.pos);
-				v.scale(1.0);
+				v.scale(0.75);
 				compensationMap.put(vertex.pos, v);
 			}
 			for (Point3d p : compensationMap.keySet()) {
