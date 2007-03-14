@@ -14,7 +14,7 @@ public abstract class AbstractVertex {
 	
 	final Point3d pos = new Point3d();
 	final Point3d refPos = new Point3d();
-	final Point3f projectedPos = new Point3f();
+	public final Point3f projectedPos = new Point3f();
 	
 	public AbstractVertex() {
 		position.addAttributeListener(new AttributeListener() {

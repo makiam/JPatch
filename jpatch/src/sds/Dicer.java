@@ -40,7 +40,7 @@ public class Dicer {
 //	private static final float[][] TANGENT_EDGE_WEIGHT = new float[MAX_VALENCE - 2][];			// [valence][index]
 
 	private static final int MAX_CORNER_LENGTH = MAX_VALENCE * 2 - 5;
-	private static final int GRID_START = MAX_CORNER_LENGTH * 2;
+	public static final int GRID_START = MAX_CORNER_LENGTH * 2;
 	private final float[][][] subdivPoints = new float[MAX_SUBDIV][][];							// [level][index][0=x,1=y,2=z] index = row * dim + column
 	private final float[][][] limitPoints = new float[MAX_SUBDIV][][];							// [level][index][0=x,1=y,2=z] index = row * dim + column
 	private final float[][][] limitNormals = new float[MAX_SUBDIV][][];							// [level][index][0=x,1=y,2=z] index = row * dim + column
@@ -393,10 +393,6 @@ public class Dicer {
 		return row * dim + column;
 	}
 	
-	public int getGridStart() {
-		return GRID_START;
-	}
-	
 	public float[][] getSubdivVertices(int level) {
 		return subdivPoints[level];
 	}
@@ -437,34 +433,36 @@ public class Dicer {
 		if (depth == 1) {
 			float[] va = quadVertexArrays[1];
 			float[] na = quadNormalArrays[1];
+			float[][] lp = limitPoints[0];
+			float[][] ln = limitNormals[0];
 			Level2Vertex v0 = slate.corners[0][0].vertex;
 			Level2Vertex v1 = slate.corners[1][0].vertex;
 			Level2Vertex v2 = slate.corners[2][0].vertex;
 			Level2Vertex v3 = slate.corners[3][0].vertex;
-			va[0] = v0.projectedLimit.x;
-			va[1] = v0.projectedLimit.y;
-			va[2] = v0.projectedLimit.z;
-			va[3] = v1.projectedLimit.x;
-			va[4] = v1.projectedLimit.y;
-			va[5] = v1.projectedLimit.z;
-			va[6] = v2.projectedLimit.x;
-			va[7] = v2.projectedLimit.y;
-			va[8] = v2.projectedLimit.z;
-			va[9] = v3.projectedLimit.x;
-			va[10] = v3.projectedLimit.y;
-			va[11] = v3.projectedLimit.z;
-			na[0] = v0.projectedNormal.x;
-			na[1] = v0.projectedNormal.y;
-			na[2] = v0.projectedNormal.z;
-			na[3] = v1.projectedNormal.x;
-			na[4] = v1.projectedNormal.y;
-			na[5] = v1.projectedNormal.z;
-			na[6] = v2.projectedNormal.x;
-			na[7] = v2.projectedNormal.y;
-			na[8] = v2.projectedNormal.z;
-			na[9] = v3.projectedNormal.x;
-			na[10] = v3.projectedNormal.y;
-			na[11] = v3.projectedNormal.z;
+			va[0] = lp[5 + GRID_START][0] = v0.projectedLimit.x;
+			va[1] = lp[5 + GRID_START][1] = v0.projectedLimit.y;
+			va[2] = lp[5 + GRID_START][2] = v0.projectedLimit.z;
+			va[3] = lp[6 + GRID_START][0] = v1.projectedLimit.x;
+			va[4] = lp[6 + GRID_START][1] = v1.projectedLimit.y;
+			va[5] = lp[6 + GRID_START][2] = v1.projectedLimit.z;
+			va[6] = lp[10 + GRID_START][0] = v2.projectedLimit.x;
+			va[7] = lp[10 + GRID_START][1] = v2.projectedLimit.y;
+			va[8] = lp[10 + GRID_START][2] = v2.projectedLimit.z;
+			va[9] = lp[9 + GRID_START][0] = v3.projectedLimit.x;
+			va[10] = lp[9 + GRID_START][1] = v3.projectedLimit.y;
+			va[11] = lp[9 + GRID_START][2] = v3.projectedLimit.z;
+			na[0] = ln[5 + GRID_START][0] = v0.projectedNormal.x;
+			na[1] = ln[5 + GRID_START][1] = v0.projectedNormal.y;
+			na[2] = ln[5 + GRID_START][2] = v0.projectedNormal.z;
+			na[3] = ln[6 + GRID_START][0] = v1.projectedNormal.x;
+			na[4] = ln[6 + GRID_START][1] = v1.projectedNormal.y;
+			na[5] = ln[6 + GRID_START][2] = v1.projectedNormal.z;
+			na[6] = ln[10 + GRID_START][0] = v2.projectedNormal.x;
+			na[7] = ln[10 + GRID_START][1] = v2.projectedNormal.y;
+			na[8] = ln[10 + GRID_START][2] = v2.projectedNormal.z;
+			na[9] = ln[9 + GRID_START][0] = v3.projectedNormal.x;
+			na[10] = ln[9 + GRID_START][1] = v3.projectedNormal.y;
+			na[11] = ln[9 + GRID_START][2] = v3.projectedNormal.z;
 			return 12;
 		}
 		

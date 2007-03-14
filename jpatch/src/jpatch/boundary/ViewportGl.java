@@ -44,7 +44,7 @@ public class ViewportGl extends Viewport {
 	
 	private int program;
 	private boolean useProgram;
-	
+	private boolean canUseProgram;
 	private int num;
 	
 	/**
@@ -365,7 +365,7 @@ public class ViewportGl extends Viewport {
 				gl.glDisable(GL_DEPTH_TEST);
 				gl.glEnable(GL_NORMALIZE);
 				
-				
+				canUseProgram = gl.isFunctionAvailable("glUseProgram");
 				if (gl.isFunctionAvailable("glCreateShader")) {
 					int vertexShader = gl.glCreateShader(GL_VERTEX_SHADER);
 					try {
@@ -910,11 +910,12 @@ public class ViewportGl extends Viewport {
 	}
 	
 	private void drawSds3(Sds sds) {
+		useProgram = fragmentShader.get();
 //		gl.glEnable(GL_LIGHTING);
 		gl.glShadeModel(GL_SMOOTH);
 		gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-//		gl.glEnable(GL_CULL_FACE);
-//		gl.glCullFace(GL_BACK);
+		gl.glEnable(GL_CULL_FACE);
+		gl.glCullFace(GL_BACK);
 //		if (gl.isFunctionAvailable("glUseProgram")) {
 //			gl.glUseProgram(useProgram ? program : 0);
 //		}
@@ -935,11 +936,16 @@ public class ViewportGl extends Viewport {
 			}
 		}
 //		System.out.println();
-		Point3f p0 = new Point3f();
-		Point3f p1 = new Point3f();
+//		Point3f p0 = new Point3f();
+//		Point3f p1 = new Point3f();
 //		gl.glInterleavedArrays(GL_N3F_V3F, 0, dicer.getBuffer());
+		gl.glEnable(GL_LIGHTING);
+		
+		if (canUseProgram) {
+			gl.glUseProgram(useProgram ? program : 0);
+		}
+		
 		if (showLimitSurface.get()) {
-			gl.glEnable(GL_LIGHTING);
 			for (Face face : sds.faceList) {
 				for (Slate2 slate : face.getSlates()) {
 	//				switch (slate.getSubdivisionLevel()) {
@@ -968,7 +974,33 @@ public class ViewportGl extends Viewport {
 		}
 		
 		if (showControlMesh.get()) {
+			
+			if (!showLimitSurface.get()) {
+				gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 0, 0.9f }, 0);
+				gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0, 0, 0.2f }, 0);
+				for (Face face : sds.faceList) {
+					gl.glBegin(GL_TRIANGLE_FAN);
+					Point3f p = face.facePoint.projectedPos;
+					Vector3f n = face.facePoint.projectedNormal;
+					gl.glNormal3f(n.x, n.y, n.z);
+					gl.glVertex3f(p.x, p.y, p.z);
+					for (HalfEdge edge : face.getEdges()) {
+						p = edge.getFirstVertex().projectedPos;
+//						n = edge.getFirstVertex().vertexPoint.projectedNormal;
+						gl.glNormal3f(n.x, n.y, n.z);
+						gl.glVertex3f(p.x, p.y, p.z);
+					}
+					p = face.edge.getFirstVertex().projectedPos;
+//					n = face.edge.getFirstVertex().vertexPoint.projectedNormal;
+					gl.glNormal3f(n.x, n.y, n.z);
+					gl.glVertex3f(p.x, p.y, p.z);
+					gl.glEnd();
+				}
+			}
 			gl.glDisable(GL_LIGHTING);
+			if (canUseProgram && useProgram) {
+				gl.glUseProgram(0);
+			}
 	//		if (gl.isFunctionAvailable("glUseProgram")) {
 	//			gl.glUseProgram(0);
 	//		}
@@ -984,10 +1016,12 @@ public class ViewportGl extends Viewport {
 						} else {
 							gl.glColor3f(1, 1, 1);
 						}
-						edge.getFirstVertex().referencePosition.get(p0);
-						edge.getSecondVertex().referencePosition.get(p1);
-						modelView.transform(p0);
-						modelView.transform(p1);
+						Point3f p0 = edge.getFirstVertex().projectedPos;
+						Point3f p1 = edge.getSecondVertex().projectedPos;
+//						edge.getFirstVertex().referencePosition.get(p0);
+//						edge.getSecondVertex().referencePosition.get(p1);
+//						modelView.transform(p0);
+//						modelView.transform(p1);
 						gl.glVertex3f(p0.x, p0.y, p0.z);
 						gl.glVertex3f(p1.x, p1.y, p1.z);
 					}
@@ -1003,28 +1037,29 @@ public class ViewportGl extends Viewport {
 			for (Face face : sds.faceList) {
 				for (HalfEdge edge : face.getEdges()) {
 					if (edge.isPrimary()) {
-						edge.getFirstVertex().referencePosition.get(p0);
-						modelView.transform(p0);
-						gl.glVertex3f(p0.x, p0.y, p0.z);
-						edge.getSecondVertex().referencePosition.get(p0);
-						modelView.transform(p0);
-						gl.glVertex3f(p0.x, p0.y, p0.z);
+						Point3f p = edge.getFirstVertex().projectedPos;
+						gl.glVertex3f(p.x, p.y, p.z);
+						p = edge.getSecondVertex().projectedPos;
+						gl.glVertex3f(p.x, p.y, p.z);
 						
-						p0.set(edge.getFirstVertex().vertexPoint.limit);
-						modelView.transform(p0);
-						gl.glVertex3f(p0.x, p0.y, p0.z);
-						p0.set(edge.getSecondVertex().vertexPoint.limit);
-						modelView.transform(p0);
-						gl.glVertex3f(p0.x, p0.y, p0.z);
 						
-						p0.set(edge.edgePoint.limit);
-						modelView.transform(p0);
-						gl.glVertex3f(p0.x, p0.y, p0.z);
+//						p0.set(edge.getFirstVertex().vertexPoint.limit);
+//						modelView.transform(p0);
+//						gl.glVertex3f(p0.x, p0.y, p0.z);
+//						p0.set(edge.getSecondVertex().vertexPoint.limit);
+//						modelView.transform(p0);
+//						gl.glVertex3f(p0.x, p0.y, p0.z);
+//						
+//						p0.set(edge.edgePoint.limit);
+//						modelView.transform(p0);
+//						gl.glVertex3f(p0.x, p0.y, p0.z);
 					}
 				}
-				p0.set(face.facePoint.limit);
-				modelView.transform(p0);
-				gl.glVertex3f(p0.x, p0.y, p0.z);
+				Point3f p = face.facePoint.projectedPos;
+				gl.glVertex3f(p.x, p.y, p.z);
+//				p0.set(face.facePoint.);
+//				modelView.transform(p0);
+//				gl.glVertex3f(p0.x, p0.y, p0.z);
 			}
 			gl.glEnd();
 			
@@ -1104,20 +1139,18 @@ public class ViewportGl extends Viewport {
 	
 	private void drawSlate(Slate2 slate) {
 		
-		int l = slate.getSubdivLevel();
-		if (l < 0) {
+		final int level = slate.getSubdivLevel();
+		if (level < 0) {
 			return;
 		}
 //		if (l < 2) {
 //			l = 2;
 //		}
-		final int level = l;
 //		System.out.println("Slate=" + slate + " level=" + level);
 		int count = dicer.dice(slate, level);
 		
 		
 //		count = (dim - 1) * (dim - 1);
-		int offset = dicer.getGridStart();
 //		
 		
 //		gl.glEnable(GL_LIGHTING);
@@ -1125,6 +1158,7 @@ public class ViewportGl extends Viewport {
 //			gl.glUseProgram(useProgram ? program : 0);
 //		}
 //		gl.glEnable(GL_LIGHTING);
+		
 		gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 0, 0.9f }, 0);
 		gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0, 0, 0.2f }, 0);
 		
@@ -1136,30 +1170,25 @@ public class ViewportGl extends Viewport {
 //		gl.glFlush();
 //		gl.glFinish();
 		
+		final float[] quadVertices = dicer.getQuadVertexArray(level);
+		final float[] quadNormals = dicer.getQuadNormalArray(level);
 		gl.glBegin(GL_QUADS);
-		float[] quadVertices = dicer.getQuadVertexArray(level);
-		float[] quadNormals = dicer.getQuadNormalArray(level);
 		for (int i = 0; i < count; i += 3) {
 			gl.glNormal3fv(quadNormals, i);
 			gl.glVertex3fv(quadVertices, i);
 		}
 		gl.glEnd();
-		
-		if (false) return;
-		float[][] vertices = dicer.getLimitVertices(level - 1);
-		float[][] normals = dicer.getLimitNormals(level - 1);
+
+		final float[][] vertices = dicer.getLimitVertices(level - 1);
+		final float[][] normals = dicer.getLimitNormals(level - 1);
 		gl.glBegin(GL_TRIANGLES);
 		for (int side = 0; side < 4; side++) {
-			Slate2 adjacentSlate = slate.getAdjacentSlate(side);
+			final Slate2 adjacentSlate = slate.getAdjacentSlate(side);
 			int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivLevel();
 			if (pairLevel < 0) {
 				pairLevel = level;
 			}
-//			if (pairLevel < 2) {
-//				pairLevel = 2;
-//			}
-			
-			int[] triangleArray = dicer.getRimTriangles(level - 1, side, pairLevel - 1);
+			final int[] triangleArray = dicer.getRimTriangles(level - 1, side, pairLevel - 1);
 			for (int i = 0; i < triangleArray.length; i++) {
 				gl.glNormal3fv(normals[triangleArray[i]], 0);
 				gl.glVertex3fv(vertices[triangleArray[i]], 0);
@@ -1181,25 +1210,32 @@ public class ViewportGl extends Viewport {
 //			gl.glUseProgram(useProgram ? program : 0);
 //		}
 		
+		
 		if (showProjectedMesh.get()) {
 			gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0.5f, 0.5f, 0.5f }, 0);
 			gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0.2f, 0.2f, 0.2f }, 0);
 			for (int i = 0; i < 2; i++) {
 				int side = (i + 3) % 4;
-				if (slate.getCorners()[side][0].isToBeDrawn()) {
-	//				Slate2 adjacentSlate = slate.getAdjacentSlate(side);
-	//				int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivLevel();
-	//				if (pairLevel > level) {
-	//					pairLevel = level;
-	//				}
+				if (true || slate.getCorners()[side][0].isToBeDrawn()) {
+					final Slate2 adjacentSlate = slate.getAdjacentSlate(side);
+					int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivLevel();
+					if (pairLevel > level || pairLevel < 1) {
+						pairLevel = level;
+					}
+	//				if (pairLevel < 0)
 	//				if (pairLevel < 2) {
 	//					pairLevel = 2;
 	//				}
-					int[] lineArray = dicer.getRim(level - 1, side);
+	//				pairLevel = level;
+					final int[] lineArray = dicer.getRim(pairLevel - 1, side);
+					final float[][] lineVertices = dicer.getLimitVertices(pairLevel - 1);
+					final float[][] lineNormals = dicer.getLimitNormals(pairLevel - 1);
 					gl.glBegin(GL_LINE_STRIP);
 					for (int j = 0; j < lineArray.length; j++) {
-						gl.glNormal3fv(normals[lineArray[j] + offset], 0);
-						gl.glVertex3fv(vertices[lineArray[j] + offset], 0);
+						if (lineNormals[lineArray[j] + Dicer.GRID_START][2] > 0) {
+							gl.glNormal3fv(lineNormals[lineArray[j] + Dicer.GRID_START], 0);
+							gl.glVertex3fv(lineVertices[lineArray[j] + Dicer.GRID_START], 0);
+						}
 					}
 					gl.glEnd();
 				}
