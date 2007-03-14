@@ -128,7 +128,20 @@ public class JptLoader {
 			xmlReader.parse(new InputSource(inputStream));
 			inputStream.close();
 			sds.validateVertices();
-			sds.dump();
+			Map<Point3d, Vector3d> compensationMap = new HashMap<Point3d, Vector3d>();
+			for (TopLevelVertex vertex : sds.vertexList) {
+				Vector3d v = new Vector3d();
+				for (HalfEdge edge : vertex.edges) {
+					v.add(edge.getSecondVertex().pos);
+				}
+				v.scale(-1.0 / vertex.edges.length);
+				v.add(vertex.pos);
+				v.scale(1.0);
+				compensationMap.put(vertex.pos, v);
+			}
+			for (Point3d p : compensationMap.keySet()) {
+				p.add(compensationMap.get(p));
+			}
 			sds.makeSlates();
 			sds.rethinkSlates();
 			return sds;
