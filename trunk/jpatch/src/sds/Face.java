@@ -28,7 +28,7 @@ public class Face {
 	final SlateEdge[] slateEdges;
 	
 	public final Level2Vertex facePoint;
-	final HalfEdge edge;
+	public final HalfEdge edge;
 	final Iterable<HalfEdge> edgeIterable = new Iterable<HalfEdge>() {
 		public Iterator<HalfEdge> iterator() {
 			return new Iterator<HalfEdge>() {

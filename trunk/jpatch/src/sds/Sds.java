@@ -37,6 +37,8 @@ public class Sds {
 //		new Edge(vertexList.get(1), vertexList.get(0)).hashCode();
 //	}
 	
+	Sds() { }
+	
 	public Sds(InputStream offInputStream) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(offInputStream));
 		String[] tokens;
@@ -259,7 +261,10 @@ public class Sds {
 	}
 	
 	public void project(Matrix4f matrix) {
-		for (Level2Vertex v : level2Vertices) {
+		for (AbstractVertex v : vertexList) {
+			v.project(matrix);
+		}
+		for (AbstractVertex v : level2Vertices) {
 			v.project(matrix);
 		}
 	}
@@ -304,7 +309,7 @@ public class Sds {
 //		validateVertices();
 //	}
 	
-	private void validateVertices() {
+	void validateVertices() {
 		for (TopLevelVertex vertex : vertexList) {
 			vertex.validate();
 		}
@@ -367,12 +372,28 @@ public class Sds {
 		return faceList.size() + " faces, " + vertexList.size() + " vertices";
 	}
 	
-	private void addFace(int[] vertices) {
+	void addFace(int[] vertices) {
 		HalfEdge start = createEdge(vertexList.get(vertices[0]), vertexList.get(vertices[1]));
 		HalfEdge prev = start;
 		HalfEdge edge = null;
 		for (int i = 1; i < vertices.length; i++) {
 			edge = createEdge(vertexList.get(vertices[i]), vertexList.get(vertices[(i + 1) % vertices.length]));
+			prev.next = edge;
+			edge.prev = prev;
+			prev = edge;
+		}
+		edge.next = start;
+		start.prev = edge;
+		Face face = new Face(vertices.length, start);
+		faceList.add(face);
+	}
+	
+	void addFace(TopLevelVertex[] vertices) {
+		HalfEdge start = createEdge(vertices[0], vertices[1]);
+		HalfEdge prev = start;
+		HalfEdge edge = null;
+		for (int i = 1; i < vertices.length; i++) {
+			edge = createEdge(vertices[i], vertices[(i + 1) % vertices.length]);
 			prev.next = edge;
 			edge.prev = prev;
 			prev = edge;

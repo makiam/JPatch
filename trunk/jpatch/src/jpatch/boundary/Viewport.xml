@@ -4,6 +4,7 @@
 	<attribute name="Show control mesh" field="showControlMesh" />
 	<attribute name="Show limit surface" field="showLimitSurface" />
 	<attribute name="Show projected mesh" field="showProjectedMesh" />
+	<attribute name="Per pixel light" field="fragmentShader" />
 	<attribute name="Translation" field="viewTranslation" />
 	<attribute name="Rotation" field="viewRotation" />
 	<attribute name="Scale" field="viewScale" />

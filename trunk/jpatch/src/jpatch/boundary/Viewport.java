@@ -28,7 +28,7 @@ public abstract class Viewport extends AbstractNamedObject {
 	public Attribute.Boolean showControlMesh = new Attribute.Boolean(true);
 	public Attribute.Boolean showLimitSurface = new Attribute.Boolean(true);
 	public Attribute.Boolean showProjectedMesh = new Attribute.Boolean(true);
-	
+	public Attribute.Boolean fragmentShader = new Attribute.Boolean(false);
 	
 	protected final int id;
 	protected Component component;
