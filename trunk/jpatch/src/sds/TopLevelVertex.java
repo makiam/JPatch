@@ -201,6 +201,44 @@ public class TopLevelVertex extends BaseVertex {
 		return valence;
 	}
 	
+	public LinearCombination<TopLevelVertex> getVertexPointLc() {
+		LinearCombination<TopLevelVertex> lc = new LinearCombination<TopLevelVertex>();
+		if (corner > 0) {
+			lc.add(this, 1.0);
+		} else if (crease > 0) {
+			lc.add(this, CREASE0);
+			lc.add(creaseEdge0.pair.vertex, CREASE1);
+			lc.add(creaseEdge1.pair.vertex, CREASE1);
+		} else {
+			double n = edges.length;
+			for (HalfEdge edge : edges) {
+				lc.addScaled(edge.face.getFacePointLc(), 1.0 / n);
+				lc.addScaled(edge.getMidPointLc(), 2.0 / n);
+			}
+			lc.add(this, (n - 3));
+			lc.scale(1.0 / n);
+		}
+		return lc;
+	}
+	
+	public LinearCombination<TopLevelVertex> getLimitLc() {
+		LinearCombination<TopLevelVertex> lc = new LinearCombination<TopLevelVertex>();
+		if (corner > 0) {
+			lc.addScaled(getVertexPointLc(), 1.0);
+		} else if (crease > 0) {
+			lc.addScaled(getVertexPointLc(), CREASE_LIMIT0);
+			lc.addScaled(creaseEdge0.getEdgePointLc(), CREASE_LIMIT1);
+			lc.addScaled(creaseEdge1.getEdgePointLc(), CREASE_LIMIT1);
+		} else {
+			lc.addScaled(getVertexPointLc(), VERTEX_POINT_LIMIT[valence]);
+			for (HalfEdge edge : edges) {
+				lc.addScaled(edge.face.getFacePointLc(), VERTEX_FACE_LIMIT[valence]);
+				lc.addScaled(edge.getEdgePointLc(), VERTEX_EDGE_LIMIT[valence]);
+			}
+		}
+		return lc;
+	}
+	
 	int getEdgeIndex(HalfEdge edge) {
 		for (int i = 0; i < edges.length; i++) {
 			if (edge == edges[i]) {
