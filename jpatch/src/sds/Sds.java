@@ -209,6 +209,8 @@ public class Sds {
 		for (Face face : faceList) {
 			face.initFans();
 			list.add(face.facePoint);
+		}
+		for (Face face : faceList) {
 			for (HalfEdge edge : face.getEdges()) {
 				if (edge.isPrimary()) {
 					list.add(edge.edgePoint);

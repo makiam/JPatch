@@ -140,6 +140,15 @@ public class Face {
 		
 	}
 	
+	public LinearCombination<TopLevelVertex> getFacePointLc() {
+		LinearCombination<TopLevelVertex> lc = new LinearCombination<TopLevelVertex>();
+		double weight = 1.0 / sides;
+		for (HalfEdge edge : getEdges()) {
+			lc.add(edge.vertex, weight);
+		}
+		return lc;
+	}
+	
 	void prepareSlates() {
 		HalfEdge e = this.edge;
 		for (int n = 0; n < sides; n++) {
@@ -159,7 +168,7 @@ public class Face {
 			/* create SlateEdges for corner 0 (outer corner) */
 			final int valence = edge.vertex.valence;
 			
-			System.out.println("face=" + this + " side=" + n + " valence=" + valence);
+//			System.out.println("face=" + this + " side=" + n + " valence=" + valence);
 			corners[0] = new SlateEdge[valence];
 			
 			HalfEdge e = edge.vertex.edges[0];

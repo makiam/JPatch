@@ -114,6 +114,27 @@ public class HalfEdge {
 		primary = false;
 	}
 	
+	public LinearCombination<TopLevelVertex> getEdgePointLc() {
+		LinearCombination<TopLevelVertex> lc = new LinearCombination<TopLevelVertex>();
+		if (getSharpness() > 0) {
+			lc.add(vertex, 0.5);
+			lc.add(pair.vertex, 0.5);
+		} else {
+			lc.add(vertex, 0.25);
+			lc.add(pair.vertex, 0.25);
+			lc.addScaled(face.getFacePointLc(), 0.25);
+			lc.addScaled(pair.face.getFacePointLc(), 0.25);
+		}
+		return lc;
+	}
+	
+	public LinearCombination<TopLevelVertex> getMidPointLc() {
+		LinearCombination<TopLevelVertex> lc = new LinearCombination<TopLevelVertex>();
+		lc.add(vertex, 0.5);
+		lc.add(pair.vertex, 0.5);
+		return lc;
+	}
+	
 	final public TopLevelVertex getFirstVertex() {
 		return vertex;
 	}

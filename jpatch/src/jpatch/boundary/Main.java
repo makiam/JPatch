@@ -258,7 +258,7 @@ public class Main {
 			
 //			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/teapot.off"));
 //			activeSds = new Sds(new FileInputStream("/home/sascha/robot.off"));
-			activeSds = new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt"));
+			activeSds = new JptLoader().importModel(new FileInputStream("/home/sascha/moai1.jpt"));
 //			activeSds.makeSlates();
 //			activeSds.verify();
 //			activeSds.dump();
