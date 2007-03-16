@@ -256,9 +256,9 @@ public class Main {
 //			}
 //			System.exit(0);
 			
-//			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/teapot.off"));
+			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/cube2.off"));
 //			activeSds = new Sds(new FileInputStream("/home/sascha/robot.off"));
-			activeSds = new JptLoader().importModel(new FileInputStream("/home/sascha/moai1.jpt"));
+//			activeSds = new JptLoader().importModel(new FileInputStream("/home/sascha/moai1.jpt"));
 //			activeSds.makeSlates();
 //			activeSds.verify();
 //			activeSds.dump();

@@ -914,8 +914,8 @@ public class ViewportGl extends Viewport {
 //		gl.glEnable(GL_LIGHTING);
 		gl.glShadeModel(GL_SMOOTH);
 		gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		gl.glEnable(GL_CULL_FACE);
-		gl.glCullFace(GL_BACK);
+//		gl.glEnable(GL_CULL_FACE);
+//		gl.glCullFace(GL_BACK);
 //		if (gl.isFunctionAvailable("glUseProgram")) {
 //			gl.glUseProgram(useProgram ? program : 0);
 //		}
