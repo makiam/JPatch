@@ -145,7 +145,7 @@ public class Slate2 {
 			subdivLevel = 4;
 		} else if ((s & 0xc) > 0) {
 			subdivLevel = 3;
-		} else if ((s & 0x4) > 0) {
+		} else if ((s & 0x2) > 0) {
 			subdivLevel = 2;
 		} else {
 			subdivLevel = 1;

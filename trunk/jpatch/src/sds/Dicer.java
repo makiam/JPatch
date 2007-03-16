@@ -7,10 +7,13 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.nio.FloatBuffer;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.vecmath.*;
 
+import jpatch.auxilary.ArrayImage;
+import jpatch.auxilary.ImagePanel;
 import jpatch.boundary.settings.RealtimeRendererSettings;
 import jpatch.boundary.settings.Settings;
 
@@ -52,9 +55,9 @@ public class Dicer {
 	private final float[][] quadVertexArrays = new float[MAX_SUBDIV][];
 	private final float[][] quadNormalArrays = new float[MAX_SUBDIV][];
 	
-	private final float[][][][][][] fastLimitWeights = new float[MAX_SUBDIV][MAX_FAST_VALENCE - 2][MAX_FAST_VALENCE - 2][][][];    // [level][valence0][valence2][index][corner][vertex];
-	private final float[][][][][][] fastTangent0Weights = new float[MAX_SUBDIV][MAX_FAST_VALENCE - 2][MAX_FAST_VALENCE - 2][][][]; // [level][valence0][valence2][index][corner][vertex];
-	private final float[][][][][][] fastTangent1Weights = new float[MAX_SUBDIV][MAX_FAST_VALENCE - 2][MAX_FAST_VALENCE - 2][][][]; // [level][valence0][valence2][index][corner][vertex];
+//	private final float[][][][][][] fastLimitWeights = new float[MAX_SUBDIV][MAX_FAST_VALENCE - 2][MAX_FAST_VALENCE - 2][][][];    // [level][valence0][valence2][index][corner][vertex];
+//	private final float[][][][][][] fastTangent0Weights = new float[MAX_SUBDIV][MAX_FAST_VALENCE - 2][MAX_FAST_VALENCE - 2][][][]; // [level][valence0][valence2][index][corner][vertex];
+//	private final float[][][][][][] fastTangent1Weights = new float[MAX_SUBDIV][MAX_FAST_VALENCE - 2][MAX_FAST_VALENCE - 2][][][]; // [level][valence0][valence2][index][corner][vertex];
 	
 	
 	int[][][] rim0 = new int[MAX_SUBDIV][][];								//[level][side][index] outer grid rim
@@ -388,108 +391,124 @@ public class Dicer {
 			}
 		}
 		
-		/*
-		 * compute fast-weight arrays (basis functions)
-		 */
-		for (int depth = 1; depth <= MAX_SUBDIV; depth++) {
-			System.out.println("creating basisfunction tables for depth " + depth);
-			final int dim = (1 << (depth - 1)) + 3;
-			final int size = dim * dim;
-			for (int valence0 = 3; valence0 < MAX_FAST_VALENCE - 2; valence0++) {
-				for (int valence1 = 3; valence1 < MAX_FAST_VALENCE - 2; valence1++) {
-					final int[] valence = new int[] { valence0, valence1 };
-					
-					for (int corner = 0; corner < 4; corner++) {
-						int val = (corner == 0) ? valence0 : (corner == 2) ? valence1 : 4;
-						final int n = val * 2 - 4;
-						fastLimitWeights[depth - 1][valence0 - 2][valence1 - 2] = new float[size][4][n];
-						fastTangent0Weights[depth - 1][valence0 - 2][valence1 - 2] = new float[size][4][n];
-						fastTangent1Weights[depth - 1][valence0 - 2][valence1 - 2] = new float[size][4][n];
-						for (int vertex = 0; vertex < n; vertex++) {
-							/* clear geometry array (x) */
-							for (int i = 0; i < subdivPoints[0].length; i++) {
-								subdivPoints[0][i][0] = 0;
-							}
-							
-							/* set vertex to 1 and dice */
-							if (vertex == 0) {
-								switch (corner) {
-								case 0:
-									subdivPoints[0][GRID_START + 5][0] = 1;
-									break;
-								case 1:
-									subdivPoints[0][GRID_START + 6][0] = 1;
-									break;
-								case 2:
-									subdivPoints[0][GRID_START + 10][0] = 1;
-									break;
-								case 3:
-									subdivPoints[0][GRID_START + 9][0] = 1;
-									break;
-								}
-							} else {
-								switch (corner) {
-								case 0:
-									subdivPoints[0][vertex - 1][0] = 1;
-									if (n == 2) {
-										subdivPoints[0][vertex][0] = 1;
-									}
-									break;
-								case 1:
-									switch (vertex) {
-									case 1:
-										subdivPoints[0][GRID_START + 2][0] = 1;
-										break;
-									case 2:
-										subdivPoints[0][GRID_START + 3][0] = 1;
-										break;
-									case 3:
-										subdivPoints[0][GRID_START + 7][0] = 1;
-										break;
-									}
-								case 2:
-									subdivPoints[0][MAX_CORNER_LENGTH + vertex - 1][0] = 1;
-									if (n == 2) {
-										subdivPoints[0][MAX_CORNER_LENGTH + vertex][0] = 1;
-									}
-									break;
-								case 3:
-									switch (vertex) {
-									case 1:
-										subdivPoints[0][GRID_START + 13][0] = 1;
-										break;
-									case 2:
-										subdivPoints[0][GRID_START + 12][0] = 1;
-										break;
-									case 3:
-										subdivPoints[0][GRID_START + 8][0] = 1;
-										break;
-									}
-								}
-							}
-							quickDice(valence, depth);
-							
-							if (depth == 3) {
-								System.out.println("\ncorner=" + corner + " vertex=" + vertex);
-							}
-							/* copy result to fast weight tables */
-							for (int i = 0; i < size; i++) {
-								fastLimitWeights[depth - 1][valence0 - 2][valence1 - 2][i][corner][vertex] = limitPoints[depth - 1][i + GRID_START][0];
-								if (depth == 3) {
-									if (i % dim == 0) {
-										System.out.println();
-									}
-									System.out.print(limitPoints[depth - 1][i + GRID_START][0] + " ");
-								}
-								fastTangent0Weights[depth - 1][valence0 - 2][valence1 - 2][i][corner][vertex] = limitPoints[depth - 1][i + GRID_START][1];
-								fastTangent1Weights[depth - 1][valence0 - 2][valence1 - 2][i][corner][vertex] = limitPoints[depth - 1][i + GRID_START][2];
-							}
-						}
-					}
-				}
-			}
-		}
-		System.out.println("done.");
+//		/*
+//		 * compute fast-weight arrays (basis functions)
+//		 */
+//		for (int depth = 0; depth <MAX_SUBDIV; depth++) {
+//			System.out.println("creating basisfunction tables for depth " + depth);
+//			final int dim = (1 << depth) + 3;
+//			final int size = dim * dim;
+//			
+//			for (int valence0 = 3; valence0 <= MAX_FAST_VALENCE; valence0++) {
+//				for (int valence1 = 3; valence1 <= MAX_FAST_VALENCE; valence1++) {
+//					fastLimitWeights[depth][valence0 - 3][valence1 - 3] = new float[size][4][];
+//					fastTangent0Weights[depth][valence0 - 3][valence1 - 3] = new float[size][4][];
+//					fastTangent1Weights[depth][valence0 - 3][valence1 - 3] = new float[size][4][];
+//					for (int i = 0; i < size; i++) {
+//						for (int corner = 0; corner < 4; corner++) {
+//							final int val = (corner == 0) ? valence0 : (corner == 2) ? valence1 : 4;
+//							final int n = val * 2 - 4;
+//							fastLimitWeights[depth][valence0 - 3][valence1 - 3][i][corner] = new float[n];
+//							fastTangent0Weights[depth][valence0 - 3][valence1 - 3][i][corner] = new float[n];
+//							fastTangent1Weights[depth][valence0 - 3][valence1 - 3][i][corner] = new float[n];
+//						}
+//					}
+//				}
+//			}
+//			for (int valence0 = 3; valence0 <= MAX_FAST_VALENCE; valence0++) {
+//				for (int valence1 = 3; valence1 <= MAX_FAST_VALENCE; valence1++) {
+//					final int[] valence = new int[] { valence0, valence1 };
+//					
+//					for (int corner = 0; corner < 4; corner++) {
+//						int val = (corner == 0) ? valence0 : (corner == 2) ? valence1 : 4;
+//						final int n = val * 2 - 4;
+//						for (int vertex = 0; vertex < n; vertex++) {
+//							/* clear geometry array (x) */
+//							for (int i = 0; i < subdivPoints[0].length; i++) {
+//								subdivPoints[0][i][0] = 0;
+//							}
+//							
+//							/* set vertex to 1 and dice */
+//							if (vertex == 0) {
+//								switch (corner) {
+//								case 0:
+//									subdivPoints[0][GRID_START + 5][0] = 1;
+//									break;
+//								case 1:
+//									subdivPoints[0][GRID_START + 6][0] = 1;
+//									break;
+//								case 2:
+//									subdivPoints[0][GRID_START + 10][0] = 1;
+//									break;
+//								case 3:
+//									subdivPoints[0][GRID_START + 9][0] = 1;
+//									break;
+//								}
+//							} else {
+//								switch (corner) {
+//								case 0:
+//									subdivPoints[0][vertex - 1][0] = 1;
+//									if (n == 2) {
+//										subdivPoints[0][vertex][0] = 1;
+//									}
+//									break;
+//								case 1:
+//									switch (vertex) {
+//									case 1:
+//										subdivPoints[0][GRID_START + 2][0] = 1;
+//										break;
+//									case 2:
+//										subdivPoints[0][GRID_START + 3][0] = 1;
+//										break;
+//									case 3:
+//										subdivPoints[0][GRID_START + 7][0] = 1;
+//										break;
+//									}
+//									break;
+//								case 2:
+//									subdivPoints[0][MAX_CORNER_LENGTH + vertex - 1][0] = 1;
+//									if (n == 2) {
+//										subdivPoints[0][MAX_CORNER_LENGTH + vertex][0] = 1;
+//									}
+//									break;
+//								case 3:
+//									switch (vertex) {
+//									case 1:
+//										subdivPoints[0][GRID_START + 13][0] = 1;
+//										break;
+//									case 2:
+//										subdivPoints[0][GRID_START + 12][0] = 1;
+//										break;
+//									case 3:
+//										subdivPoints[0][GRID_START + 8][0] = 1;
+//										break;
+//									}
+//									break;
+//								}
+//							}
+//							quickDice(valence, depth + 1);
+//							
+//							if (depth == 2) {
+//								System.out.println("\ncorner=" + corner + " vertex=" + vertex);
+//							}
+//							/* copy result to fast weight tables */
+//							for (int i = 0; i < size; i++) {
+//								fastLimitWeights[depth][valence0 - 3][valence1 - 3][i][corner][vertex] = limitPoints[depth][i + GRID_START][0];
+//								if (depth == 2) {
+//									if (i % dim == 0) {
+//										System.out.println();
+//									}
+//									System.out.print(limitPoints[depth][i + GRID_START][1] + " ");
+//								}
+//								fastTangent0Weights[depth][valence0 - 3][valence1 - 3][i][corner][vertex] = limitPoints[depth][i + GRID_START][1];
+//								fastTangent1Weights[depth][valence0 - 3][valence1 - 3][i][corner][vertex] = limitPoints[depth][i + GRID_START][2];
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//		System.out.println("done.");
 //		System.exit(0);
 	}
 	
@@ -575,93 +594,80 @@ public class Dicer {
 		}
 		final int dim = (1 << (depth - 1)) + 3;
 		
-		/* test wheter fast evaluation arrays can be used */
-		final int valence0 = slate.corners[0].length;
-		final int valence1 = slate.corners[2].length;
-//		System.out.println(slate.corners[0].length + " " + slate.corners[1].length + " " + slate.corners[2].length + " " + slate.corners[3].length);
-		boolean useFastPath = (valence0 > 2 && valence0 <= MAX_FAST_VALENCE && valence1 > 2 && valence1 <= MAX_FAST_VALENCE);
-		if (useFastPath) {
-			fast_test:
-			for (int corner = 0; corner < 4; corner++) {
-				SlateEdge[] slateEdges = slate.corners[corner];
-				if (slateEdges[0].vertex.corner > 0) {
-					useFastPath = false;
-					break;
-				}
-				for (int i = 0; i < slateEdges.length; i++) {
-					if (slateEdges[i].getSharpness() > 0) {
-						useFastPath = false;
-						break fast_test;
-					}
-				}
-			}
-		}
-		if (useFastPath) {
-			System.out.println("*dicer fast path*");
-			final int level = depth - 2;
-			
-			final float[][] out = limitPoints[level];
-			final float[][] norm = limitNormals[level];
-			System.out.println("valence0=" + valence0 + " valence1=" + valence1);
-			final int size = fastLimitWeights[level][valence0 - 2][valence1 - 2].length;
-			for (int i = 0; i < size; i++) {
-				final float lwa[][] = fastLimitWeights[level][valence0 - 2][valence1 - 2][i];
-				final float uwa[][] = fastTangent0Weights[level][valence0 - 2][valence1 - 2][i];
-				final float vwa[][] = fastTangent1Weights[level][valence0 - 2][valence1 - 2][i];
-				float lx = 0, ly = 0, lz = 0;
-				float ux = 0, uy = 0, uz = 0;
-				float vx = 0, vy = 0, vz = 0;
-				float sum = 0;
-				for (int corner = 0; corner < 4; corner++) {
-					Point3f[] fans = slate.fans[corner];
-//					System.out.println("corner=" + corner + " fan_size=" + fans.length);
-					for (int vertex = 0; vertex < fans.length - 5; vertex++) {
-						int offset = (vertex == 0) ? 0 : 4;
-						final float lw = lwa[corner][vertex];
-						final float uw = uwa[corner][vertex];
-						final float vw = vwa[corner][vertex];
-						final float x = fans[vertex + offset].x;
-						final float y = fans[vertex + offset].y;
-						final float z = fans[vertex + offset].z;
-//						System.out.println(x + "/" + y + "/" + z + "\t" + lw);
-						lx += x * lw;
-						ly += y * lw;
-						lz += z * lw;
-						ux += x * uw;
-						uy += y * uw;
-						uz += z * uw;
-						vx += x * vw;
-						vy += y * vw;
-						vz += z * vw;
-						sum += lw;
-					}
-				}
-				System.out.println("level=" + level + " size=" + size + " index=" + i + " sum=" + sum);
-				final int outIndex = GRID_START + i;
-				out[outIndex][0] = lx;
-				out[outIndex][1] = ly;
-				out[outIndex][2] = lz;
-//				System.out.println(lx + "/" + ly + "/" + lz);
-				if (RENDERER_SETTINGS.softwareNormalize) {
-					float nx = vy * uz - uz * vy;		// cross product
-					float ny = vz * ux - ux * vz;
-					float nz = vx * uy - uy * vx;
-					float nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
-					norm[outIndex][0] = nx * nl;
-					norm[outIndex][1] = ny * nl;
-					norm[outIndex][2] = nz * nl;
-				} else {
-					norm[outIndex][0] = vy * uz - uz * vy;		// cross product
-					norm[outIndex][1] = vz * ux - ux * vz;
-					norm[outIndex][2] = vx * uy - uy * vx;
-				}
-			}
-		} else {
-	//		System.out.println("dicing slate=" + slate + " depth=" + depth);
-			
-			
-			
-	//		slate.test();
+//		/* test wheter fast evaluation arrays can be used */
+//		final int valence0 = slate.corners[0].length;
+//		final int valence1 = slate.corners[2].length;
+//		boolean useFastPath = (valence0 <= MAX_FAST_VALENCE && valence1 <= MAX_FAST_VALENCE);
+//		if (useFastPath) {
+//			fast_test:
+//			for (int corner = 0; corner < 4; corner++) {
+//				SlateEdge[] slateEdges = slate.corners[corner];
+//				if (slateEdges[0].vertex.corner > 0) {
+//					useFastPath = false;
+//					break;
+//				}
+//				for (int i = 0; i < slateEdges.length; i++) {
+//					if (slateEdges[i].getSharpness() > 0) {
+//						useFastPath = false;
+//						break fast_test;
+//					}
+//				}
+//			}
+//		}
+//		if (useFastPath) {
+//			final int level = depth - 1;
+//			final float[][] out = limitPoints[level];
+//			final float[][] norm = limitNormals[level];
+//			final int size = fastLimitWeights[level][valence0 - 3][valence1 - 3].length;
+//			for (int i = 0; i < size; i++) {
+//				final float lwa[][] = fastLimitWeights[level][valence0 - 3][valence1 - 3][i];
+//				final float uwa[][] = fastTangent0Weights[level][valence0 - 3][valence1 - 3][i];
+//				final float vwa[][] = fastTangent1Weights[level][valence0 - 3][valence1 - 3][i];
+//				float lx = 0, ly = 0, lz = 0;
+//				float ux = 0, uy = 0, uz = 0;
+//				float vx = 0, vy = 0, vz = 0;
+//				float sum = 0;
+//				for (int corner = 0; corner < 4; corner++) {
+//					Point3f[] fans = slate.fans[corner];
+//					for (int vertex = 0; vertex < fans.length - 5; vertex++) {
+//						int offset = (vertex == 0) ? 0 : 4;
+//						final float lw = lwa[corner][vertex];
+//						final float uw = uwa[corner][vertex];
+//						final float vw = vwa[corner][vertex];
+//						final float x = fans[vertex + offset].x;
+//						final float y = fans[vertex + offset].y;
+//						final float z = fans[vertex + offset].z;
+//						lx += x * lw;
+//						ly += y * lw;
+//						lz += z * lw;
+//						ux += x * uw;
+//						uy += y * uw;
+//						uz += z * uw;
+//						vx += x * vw;
+//						vy += y * vw;
+//						vz += z * vw;
+//						sum += lw;
+//					}
+//				}
+//				final int outIndex = GRID_START + i;
+//				out[outIndex][0] = lx;
+//				out[outIndex][1] = ly;
+//				out[outIndex][2] = lz;
+//				if (RENDERER_SETTINGS.softwareNormalize) {
+//					float nx = vy * uz - vz * uy;		// cross product
+//					float ny = vz * ux - vx * uz;
+//					float nz = vx * uy - vy * ux;
+//					float nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
+//					norm[outIndex][0] = nx * nl;
+//					norm[outIndex][1] = ny * nl;
+//					norm[outIndex][2] = nz * nl;
+//				} else {
+//					norm[outIndex][0] = vy * uz - vz * uy;		// cross product
+//					norm[outIndex][1] = vz * ux - vx * uz;
+//					norm[outIndex][2] = vx * uy - vy * ux;
+//				}
+//			}
+//		} else {
 			final Point3f[][] boundary = slate.fans;
 			
 			/*
@@ -1305,14 +1311,13 @@ public class Dicer {
 					norm[outIndex][2] = bx * ay - by * ax;
 				}
 			}
-		}	
+//		}	
 		
-		final int level = depth - 1;
+//		final int level = depth - 1;
+//		final float[][] out = limitPoints[level];
+//		final float[][] norm = limitNormals[level];
 		final float[] va = quadVertexArrays[depth];
 		final float[] na = quadNormalArrays[depth];
-		final float[][] out = limitPoints[level];
-		final float[][] norm = limitNormals[level];
-		
 		final int start, end;
 		if (depth < 2) {
 			start = 1;
@@ -1854,4 +1859,38 @@ public class Dicer {
 			return ((1 << level)) + 3;
 		}
 	}
+	
+//	public static void main(String[] args) {
+//		Dicer dicer = new Dicer();
+//		
+//		JFrame frame = new JFrame("Dicer test");
+//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		final int depth = 6;
+//		final int dim = (1 << (depth - 1)) + 3;
+//		final int valence = 4;
+//		frame.setLayout(new GridLayout(4, 16));
+//		for (int corner = 0; corner < 4; corner++) {
+//			final int n = dicer.fastLimitWeights[depth - 1][valence - 3][valence - 3][0][corner].length;
+//			for (int vertex = 0; vertex < n; vertex++) {
+//				ArrayImage arrayImage = new ArrayImage(dim, dim);
+//				int[] buffer = arrayImage.getBuffer();
+//				for (int i = 0; i < dicer.fastLimitWeights[depth - 1][valence - 3][valence - 3].length; i++) {
+//					float weight = dicer.fastTangent1Weights[depth - 1][valence - 3][valence - 3][i][corner][vertex];
+//					System.out.println(weight);
+//					int level = Math.max(0, Math.min(255, (int) (weight * 1000)));
+//					buffer[i] = level | (level << 8) | (level << 16);
+//				}
+//				JComponent component = new ImagePanel(arrayImage.getImage()).getComponent();
+//				frame.add(component);
+//			}
+//			for (int i = n; i < 16; i++) {
+//				frame.add(new JPanel());
+//			}
+//		}
+//		frame.pack();
+//		frame.setVisible(true);
+//		
+//		
+//		
+//	}
 }
