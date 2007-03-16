@@ -211,11 +211,11 @@ public class JptLoader {
 				solver.solve(m, zLimit, zControl);
 				for (int i = 0; i < size; i++) {
 					
-					sds.vertexList.get(i).pos.set(
-							xControl.get(i),
-							yControl.get(i),
-							zControl.get(i)
-					);
+//					sds.vertexList.get(i).pos.set(
+//							xControl.get(i),
+//							yControl.get(i),
+//							zControl.get(i)
+//					);
 					
 					
 				}
