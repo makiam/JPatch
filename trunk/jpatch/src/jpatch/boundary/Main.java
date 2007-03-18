@@ -256,8 +256,8 @@ public class Main {
 //			}
 //			System.exit(0);
 			
-//			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/cube2.off"));
-			activeSds = new JptLoader().importModel(new FileInputStream("/mnt/share/jpatch0.4/models/moai2.jpt"));
+			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/cube2.off"));
+  //			activeSds = new JptLoader().importModel(new FileInputStream("/mnt/share/jpatch0.4/models/moai2.jpt"));
 
 //			activeSds.makeSlates();
 //			activeSds.verify();
