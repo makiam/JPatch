@@ -52,8 +52,8 @@ public class Dicer {
 	private final int[][][][] cornerStencil = new int[MAX_SUBDIV][MAX_VALENCE- 2][2][];			// [level][valence - 3][corner][stencil]
 	private final int[][][] patchLimitStencil = new int[MAX_SUBDIV][][];						// [level][index][stencil]
 	private final int[][][][] cornerLimitStencil = new int[MAX_SUBDIV][MAX_VALENCE- 2][2][];	// [level][valence - 3][corner][stencil]
-	private final float[][] quadVertexArrays = new float[MAX_SUBDIV][];
-	private final float[][] quadNormalArrays = new float[MAX_SUBDIV][];
+//	private final float[][] quadVertexArrays = new float[MAX_SUBDIV][];
+//	private final float[][] quadNormalArrays = new float[MAX_SUBDIV][];
 	
 //	private final float[][][][][][] fastLimitWeights = new float[MAX_SUBDIV][MAX_FAST_VALENCE - 2][MAX_FAST_VALENCE - 2][][][];    // [level][valence0][valence2][index][corner][vertex];
 //	private final float[][][][][][] fastTangent0Weights = new float[MAX_SUBDIV][MAX_FAST_VALENCE - 2][MAX_FAST_VALENCE - 2][][][]; // [level][valence0][valence2][index][corner][vertex];
@@ -95,11 +95,11 @@ public class Dicer {
 				rim0[0][3] = new int[] {9, 5};
 				rim1[0] = new int[0][];
 				rimTriangles[0][0] = new int[4][0];
-				quadVertexArrays[0] = new float[12];
-				quadNormalArrays[0] = new float[12];
+//				quadVertexArrays[0] = new float[15];
+//				quadNormalArrays[0] = new float[15];
 			} else {
-				quadVertexArrays[level] = new float[(dim - 2) * (dim - 2) * 3];
-				quadNormalArrays[level] = new float[(dim - 2) * (dim - 2) * 3];
+//				quadVertexArrays[level] = new float[(dim - 3) * (dim - 3) * 12 + 3];
+//				quadNormalArrays[level] = new float[(dim - 3) * (dim - 3) * 12 + 3];
 				/*
 				 * create rim arrays
 				 */
@@ -152,12 +152,12 @@ public class Dicer {
 			
 			subdivPoints[level] = new float[dim * dim + GRID_START][3];
 			limitPoints[level] = new float[dim * dim + GRID_START][3];
-			limitNormals[level] = new float[dim * dim + GRID_START][3];
+			limitNormals[level] = new float[dim * dim + GRID_START][12];
 			
 //			System.out.println("geometryarray level " + level + " size=" + geometryArray[level].length + " (" + dim + "x" + dim + " + " + GRID_START + ")");
-			if (level == 0) {
+//			if (level == 0) {
 //				continue;
-			}
+//			}
 			
 			/*
 			 * populate subdivision stencil tables for corners
@@ -385,11 +385,64 @@ public class Dicer {
 							patchIndex(level + 1, row - 1, column - 1),
 							patchIndex(level + 1, row - 1, column + 1),
 							patchIndex(level + 1, row + 1, column + 1),
-							patchIndex(level + 1, row + 1, column - 1)
+							patchIndex(level + 1, row + 1, column - 1),
+//							quadNormalArrays[level].length - 3,				// upper left corner in output quad array
+//							quadNormalArrays[level].length - 3,				// upper right corner in output quad array
+//							quadNormalArrays[level].length - 3,				// lower right corner in output quad array
+//							quadNormalArrays[level].length - 3				// lower left corner in output quad array
 					};
 				}
 			}
+		
+		
+//			/*
+//			 * Setup quad-array indexes in patchLimitStencils
+//			 */
+//			final int start = 1;
+//			final int end = dim - 2;
+//			int ydim = start * dim;
+//			System.out.println("level=" + level + " dim=" + dim + " ydim=" + ydim + " size=" + patchLimitStencil[level].length);
+//			int index = 0;
+//			int gsydim = ydim;
+//			for (int y = start; y < end; y++) {
+//				int gsydim1 = gsydim + dim;
+////				System.out.println("gsydim=" + gsydim + " gsydim1=" + gsydim1);
+//				for (int x = start; x < end; x++) {
+//					System.out.println("x=" + x + " y=" + y + " upperLeft=" + (gsydim + x) + " lowerRight=" + (gsydim1 + x + 1));
+//					int ul = gsydim + x;
+//					
+//					int[] upperLeft = patchLimitStencil[level][gsydim + x];
+//					int[] upperRight = patchLimitStencil[level][gsydim + x + 1];
+//					int[] lowerRight = patchLimitStencil[level][gsydim1 + x + 1];
+//					int[] lowerLeft = patchLimitStencil[level][gsydim1 + x];
+//					if (upperLeft != null) {
+//						upperLeft[9] = index;
+//						System.out.print(index + " ");
+//					}
+//					index += 3;
+//					if (upperRight != null) {
+//						upperRight[10] = index;
+//						System.out.print(index + " ");
+//					}
+//					index += 3;
+//					if (lowerRight != null) {
+//						lowerRight[11] = index;
+//						System.out.print(index + " ");
+//					}
+//					index += 3;
+//					if (lowerLeft != null) {
+//						lowerLeft[12] = index;
+//						System.out.print(index + " ");
+//					}
+//					index += 3;
+//					System.out.println();
+//				}
+//				gsydim += dim;
+//			}
+//			System.out.println();
+////			if (level == 1) System.exit(0);
 		}
+		
 		
 //		/*
 //		 * compute fast-weight arrays (basis functions)
@@ -536,13 +589,13 @@ public class Dicer {
 		return limitNormals[level];
 	}
 	
-	public float[] getQuadVertexArray(int level) {
-		return quadVertexArrays[level];
-	}
-	
-	public float[] getQuadNormalArray(int level) {
-		return quadNormalArrays[level];
-	}
+//	public float[] getQuadVertexArray(int level) {
+//		return quadVertexArrays[level];
+//	}
+//	
+//	public float[] getQuadNormalArray(int level) {
+//		return quadNormalArrays[level];
+//	}
 	
 	public int[] getRimTriangles(int level, int side, int pairLevel) {
 //		System.out.println("getRimTriamges level=" + level + " pairlevel=" + pairLevel);
@@ -558,38 +611,40 @@ public class Dicer {
 	
 	public int dice(final Slate2 slate, final int depth) {
 		if (depth == 1) {
-			float[] va = quadVertexArrays[1];
-			float[] na = quadNormalArrays[1];
+//			float[] va = quadVertexArrays[1];
+//			float[] na = quadNormalArrays[1];
 			float[][] lp = limitPoints[0];
 			float[][] ln = limitNormals[0];
 			Level2Vertex v0 = slate.corners[0][0].vertex;
 			Level2Vertex v1 = slate.corners[1][0].vertex;
 			Level2Vertex v2 = slate.corners[2][0].vertex;
 			Level2Vertex v3 = slate.corners[3][0].vertex;
-			va[0] = lp[5 + GRID_START][0] = v0.projectedLimit.x;
-			va[1] = lp[5 + GRID_START][1] = v0.projectedLimit.y;
-			va[2] = lp[5 + GRID_START][2] = v0.projectedLimit.z;
-			va[3] = lp[6 + GRID_START][0] = v1.projectedLimit.x;
-			va[4] = lp[6 + GRID_START][1] = v1.projectedLimit.y;
-			va[5] = lp[6 + GRID_START][2] = v1.projectedLimit.z;
-			va[6] = lp[10 + GRID_START][0] = v2.projectedLimit.x;
-			va[7] = lp[10 + GRID_START][1] = v2.projectedLimit.y;
-			va[8] = lp[10 + GRID_START][2] = v2.projectedLimit.z;
-			va[9] = lp[9 + GRID_START][0] = v3.projectedLimit.x;
-			va[10] = lp[9 + GRID_START][1] = v3.projectedLimit.y;
-			va[11] = lp[9 + GRID_START][2] = v3.projectedLimit.z;
-			na[0] = ln[5 + GRID_START][0] = v0.projectedNormal.x;
-			na[1] = ln[5 + GRID_START][1] = v0.projectedNormal.y;
-			na[2] = ln[5 + GRID_START][2] = v0.projectedNormal.z;
-			na[3] = ln[6 + GRID_START][0] = v1.projectedNormal.x;
-			na[4] = ln[6 + GRID_START][1] = v1.projectedNormal.y;
-			na[5] = ln[6 + GRID_START][2] = v1.projectedNormal.z;
-			na[6] = ln[10 + GRID_START][0] = v2.projectedNormal.x;
-			na[7] = ln[10 + GRID_START][1] = v2.projectedNormal.y;
-			na[8] = ln[10 + GRID_START][2] = v2.projectedNormal.z;
-			na[9] = ln[9 + GRID_START][0] = v3.projectedNormal.x;
-			na[10] = ln[9 + GRID_START][1] = v3.projectedNormal.y;
-			na[11] = ln[9 + GRID_START][2] = v3.projectedNormal.z;
+		
+			
+			lp[5 + GRID_START][0] = v0.projectedLimit.x;
+			lp[5 + GRID_START][1] = v0.projectedLimit.y;
+			lp[5 + GRID_START][2] = v0.projectedLimit.z;
+			lp[6 + GRID_START][0] = v1.projectedLimit.x;
+			lp[6 + GRID_START][1] = v1.projectedLimit.y;
+			lp[6 + GRID_START][2] = v1.projectedLimit.z;
+			lp[10 + GRID_START][0] = v2.projectedLimit.x;
+			lp[10 + GRID_START][1] = v2.projectedLimit.y;
+			lp[10 + GRID_START][2] = v2.projectedLimit.z;
+			lp[9 + GRID_START][0] = v3.projectedLimit.x;
+			lp[9 + GRID_START][1] = v3.projectedLimit.y;
+			lp[9 + GRID_START][2] = v3.projectedLimit.z;
+			ln[5 + GRID_START][0] = ln[5 + GRID_START][3] = ln[5 + GRID_START][6] = ln[5 + GRID_START][9] = v0.projectedNormal.x;
+			ln[5 + GRID_START][1] = ln[5 + GRID_START][4] = ln[5 + GRID_START][7] = ln[5 + GRID_START][10] = v0.projectedNormal.y;
+			ln[5 + GRID_START][2] = ln[5 + GRID_START][5] = ln[5 + GRID_START][8] = ln[5 + GRID_START][11] = v0.projectedNormal.z;
+			ln[6 + GRID_START][0] = ln[6 + GRID_START][3] = ln[6 + GRID_START][6] = ln[6 + GRID_START][9] = v1.projectedNormal.x;
+			ln[6 + GRID_START][1] = ln[6 + GRID_START][4] = ln[6 + GRID_START][7] = ln[6 + GRID_START][10] = v1.projectedNormal.y;
+			ln[6 + GRID_START][2] = ln[6 + GRID_START][5] = ln[6 + GRID_START][8] = ln[6 + GRID_START][11] = v1.projectedNormal.z;
+			ln[10 + GRID_START][0] = ln[10 + GRID_START][3] = ln[10 + GRID_START][6] = ln[10 + GRID_START][9] = v2.projectedNormal.x;
+			ln[10 + GRID_START][1] = ln[10 + GRID_START][4] = ln[10 + GRID_START][7] = ln[10 + GRID_START][10] = v2.projectedNormal.y;
+			ln[10 + GRID_START][2] = ln[10 + GRID_START][5] = ln[10 + GRID_START][8] = ln[10 + GRID_START][11] = v2.projectedNormal.z;
+			ln[9 + GRID_START][0] = ln[9 + GRID_START][3] = ln[9 + GRID_START][6] = ln[9 + GRID_START][9] = v3.projectedNormal.x;
+			ln[9 + GRID_START][1] = ln[9 + GRID_START][4] = ln[9 + GRID_START][7] = ln[9 + GRID_START][10] = v3.projectedNormal.y;
+			ln[9 + GRID_START][2] = ln[9 + GRID_START][5] = ln[9 + GRID_START][8] = ln[9 + GRID_START][11] = v3.projectedNormal.z;
 			return 12;
 		}
 		final int dim = (1 << (depth - 1)) + 3;
@@ -1140,6 +1195,8 @@ public class Dicer {
 			final int[][] stencil = patchStencil[level];
 			final float[][] out = limitPoints[level];
 			final float[][] norm = limitNormals[level];
+			float limitX = 0, limitY = 0, limitZ = 0;
+			float normalX = 0, normalY = 0, normalZ = 0;
 			final float[][] in = subdivPoints[level];
 	//		final int n = limitStencil.length;
 	//		float ax, ay, az, bx, by, bz, nx, ny, nz, nl;
@@ -1147,81 +1204,92 @@ public class Dicer {
 			for (int i = dim + 2, n = limitStencil.length - dim - 2; i < n; i++) {
 				final int[] ls = limitStencil[i];
 				final int[] s = stencil[i];
-				if (ls == null) {
-					continue;
-				}
-				final int outIndex = GRID_START + i;
-				if (s[0] == POINT && s[1] > 0) {
-	//				System.out.println("LIMIT CORNER");
-					out[outIndex][0] = in[ls[0]][0];
-					out[outIndex][1] = in[ls[0]][1];
-					out[outIndex][2] = in[ls[0]][2];
-				} else if (s[0] == EDGE_H && s[1] > 0) {
-	//				System.out.println("LIMIT EDGE_H");
-					out[outIndex][0] = (in[ls[2]][0] + in[ls[4]][0]) * 0.5f;
-					out[outIndex][1] = (in[ls[2]][1] + in[ls[4]][1]) * 0.5f;
-					out[outIndex][2] = (in[ls[2]][2] + in[ls[4]][2]) * 0.5f;
-				} else if (s[0] == EDGE_V && s[1] > 0) {
-	//				System.out.println("LIMIT EDGE_V");
-					out[outIndex][0] = (in[ls[1]][0] + in[ls[3]][0]) * 0.5f;
-					out[outIndex][1] = (in[ls[1]][1] + in[ls[3]][1]) * 0.5f;
-					out[outIndex][2] = (in[ls[1]][2] + in[ls[3]][2]) * 0.5f;
-				} else if (s[0] == CREASE_4_5) {
-	//				System.out.println("LIMIT CREASE_4_5");
-					out[outIndex][0] = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[1]][0] + in[ls[2]][0]) * CREASE_LIMIT1;
-					out[outIndex][1] = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[1]][1] + in[ls[2]][1]) * CREASE_LIMIT1;
-					out[outIndex][2] = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[1]][2] + in[ls[2]][2]) * CREASE_LIMIT1;
-				} else if (s[0] == CREASE_4_6) {
-	//				System.out.println("LIMIT CREASE_4_6");
-					out[outIndex][0] = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[1]][0] + in[ls[3]][0]) * CREASE_LIMIT1;
-					out[outIndex][1] = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[1]][1] + in[ls[3]][1]) * CREASE_LIMIT1;
-					out[outIndex][2] = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[1]][2] + in[ls[3]][2]) * CREASE_LIMIT1;
-				} else if (s[0] == CREASE_4_7) {
-	//				System.out.println("LIMIT CREASE_4_7");
-					out[outIndex][0] = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[1]][0] + in[ls[4]][0]) * CREASE_LIMIT1;
-					out[outIndex][1] = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[1]][1] + in[ls[4]][1]) * CREASE_LIMIT1;
-					out[outIndex][2] = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[1]][2] + in[ls[4]][2]) * CREASE_LIMIT1;
-				} else if (s[0] == CREASE_5_6) {
-	//				System.out.println("LIMIT CREASE_5_6");
-					out[outIndex][0] = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[2]][0] + in[ls[3]][0]) * CREASE_LIMIT1;
-					out[outIndex][1] = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[2]][1] + in[ls[3]][1]) * CREASE_LIMIT1;
-					out[outIndex][2] = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[2]][2] + in[ls[3]][2]) * CREASE_LIMIT1;
-				} else if (s[0] == CREASE_5_7) {
-	//				System.out.println("LIMIT CREASE_5_7");
-					out[outIndex][0] = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[2]][0] + in[ls[4]][0]) * CREASE_LIMIT1;
-					out[outIndex][1] = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[2]][1] + in[ls[4]][1]) * CREASE_LIMIT1;
-					out[outIndex][2] = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[2]][2] + in[ls[4]][2]) * CREASE_LIMIT1;
-				} else if (s[0] == CREASE_6_7) {
-	//				System.out.println("LIMIT CREASE_6_7");
-					out[outIndex][0] = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[3]][0] + in[ls[4]][0]) * CREASE_LIMIT1;
-					out[outIndex][1] = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[3]][1] + in[ls[4]][1]) * CREASE_LIMIT1;
-					out[outIndex][2] = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[3]][2] + in[ls[4]][2]) * CREASE_LIMIT1;
-				} else {
-					out[outIndex][0] = in[ls[0]][0] * LIMIT0 + ((in[ls[1]][0] + in[ls[3]][0]) + (in[ls[2]][0] + in[ls[4]][0])) * LIMIT1 + ((in[ls[5]][0] + in[ls[7]][0]) + (in[ls[6]][0] + in[ls[8]][0])) * LIMIT2;
-					out[outIndex][1] = in[ls[0]][1] * LIMIT0 + ((in[ls[1]][1] + in[ls[3]][1]) + (in[ls[2]][1] + in[ls[4]][1])) * LIMIT1 + ((in[ls[5]][1] + in[ls[7]][1]) + (in[ls[6]][1] + in[ls[8]][1])) * LIMIT2;
-					out[outIndex][2] = in[ls[0]][2] * LIMIT0 + ((in[ls[1]][2] + in[ls[3]][2]) + (in[ls[2]][2] + in[ls[4]][2])) * LIMIT1 + ((in[ls[5]][2] + in[ls[7]][2]) + (in[ls[6]][2] + in[ls[8]][2])) * LIMIT2;
-				}
-				
-				final float ax = (in[ls[2]][0] - in[ls[4]][0]) * 4 + (in[ls[6]][0] - in[ls[5]][0]) + (in[ls[7]][0] - in[ls[8]][0]);
-				final float ay = (in[ls[2]][1] - in[ls[4]][1]) * 4 + (in[ls[6]][1] - in[ls[5]][1]) + (in[ls[7]][1] - in[ls[8]][1]);
-				final float az = (in[ls[2]][2] - in[ls[4]][2]) * 4 + (in[ls[6]][2] - in[ls[5]][2]) + (in[ls[7]][2] - in[ls[8]][2]);
-				
-				final float bx = (in[ls[1]][0] - in[ls[3]][0]) * 4 + (in[ls[5]][0] - in[ls[8]][0]) + (in[ls[6]][0] - in[ls[7]][0]);
-				final float by = (in[ls[1]][1] - in[ls[3]][1]) * 4 + (in[ls[5]][1] - in[ls[8]][1]) + (in[ls[6]][1] - in[ls[7]][1]);
-				final float bz = (in[ls[1]][2] - in[ls[3]][2]) * 4 + (in[ls[5]][2] - in[ls[8]][2]) + (in[ls[6]][2] - in[ls[7]][2]);
-				
-				if (RENDERER_SETTINGS.softwareNormalize) {
-					float nx = by * az - bz * ay;		// cross product
-					float ny = bz * ax - bx * az;
-					float nz = bx * ay - by * ax;
-					float nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
-					norm[outIndex][0] = nx * nl;
-					norm[outIndex][1] = ny * nl;
-					norm[outIndex][2] = nz * nl;
-				} else {
-					norm[outIndex][0] = by * az - bz * ay;		// cross product
-					norm[outIndex][1] = bz * ax - bx * az;
-					norm[outIndex][2] = bx * ay - by * ax;
+				if (ls != null) {
+					final int outIndex = GRID_START + i;
+					if (s[0] == FACE || s[1] == 0) {
+						limitX = in[ls[0]][0] * LIMIT0 + ((in[ls[1]][0] + in[ls[3]][0]) + (in[ls[2]][0] + in[ls[4]][0])) * LIMIT1 + ((in[ls[5]][0] + in[ls[7]][0]) + (in[ls[6]][0] + in[ls[8]][0])) * LIMIT2;
+						limitY = in[ls[0]][1] * LIMIT0 + ((in[ls[1]][1] + in[ls[3]][1]) + (in[ls[2]][1] + in[ls[4]][1])) * LIMIT1 + ((in[ls[5]][1] + in[ls[7]][1]) + (in[ls[6]][1] + in[ls[8]][1])) * LIMIT2;
+						limitZ = in[ls[0]][2] * LIMIT0 + ((in[ls[1]][2] + in[ls[3]][2]) + (in[ls[2]][2] + in[ls[4]][2])) * LIMIT1 + ((in[ls[5]][2] + in[ls[7]][2]) + (in[ls[6]][2] + in[ls[8]][2])) * LIMIT2;
+					} else {
+						switch (s[0]) {
+						case POINT:
+							limitX = in[ls[0]][0];
+							limitY = in[ls[0]][1];
+							limitZ = in[ls[0]][2];
+							break;
+						case EDGE_H:
+							limitX = (in[ls[2]][0] + in[ls[4]][0]) * 0.5f;
+							limitY = (in[ls[2]][1] + in[ls[4]][1]) * 0.5f;
+							limitZ = (in[ls[2]][2] + in[ls[4]][2]) * 0.5f;
+							break;
+						case EDGE_V:
+							limitX = (in[ls[1]][0] + in[ls[3]][0]) * 0.5f;
+							limitY = (in[ls[1]][1] + in[ls[3]][1]) * 0.5f;
+							limitZ = (in[ls[1]][2] + in[ls[3]][2]) * 0.5f;
+							break;
+						case CREASE_4_5:
+							limitX = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[1]][0] + in[ls[2]][0]) * CREASE_LIMIT1;
+							limitY = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[1]][1] + in[ls[2]][1]) * CREASE_LIMIT1;
+							limitZ = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[1]][2] + in[ls[2]][2]) * CREASE_LIMIT1;
+							break;
+						case CREASE_4_6:
+							limitX = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[1]][0] + in[ls[3]][0]) * CREASE_LIMIT1;
+							limitY = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[1]][1] + in[ls[3]][1]) * CREASE_LIMIT1;
+							limitZ = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[1]][2] + in[ls[3]][2]) * CREASE_LIMIT1;
+							break;
+						case CREASE_4_7:
+							limitX = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[1]][0] + in[ls[4]][0]) * CREASE_LIMIT1;
+							limitY = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[1]][1] + in[ls[4]][1]) * CREASE_LIMIT1;
+							limitZ = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[1]][2] + in[ls[4]][2]) * CREASE_LIMIT1;
+							break;
+						case CREASE_5_6:
+							limitX = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[2]][0] + in[ls[3]][0]) * CREASE_LIMIT1;
+							limitY = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[2]][1] + in[ls[3]][1]) * CREASE_LIMIT1;
+							limitZ = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[2]][2] + in[ls[3]][2]) * CREASE_LIMIT1;
+							break;
+						case CREASE_5_7:
+							limitX = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[2]][0] + in[ls[4]][0]) * CREASE_LIMIT1;
+							limitY = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[2]][1] + in[ls[4]][1]) * CREASE_LIMIT1;
+							limitZ = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[2]][2] + in[ls[4]][2]) * CREASE_LIMIT1;
+							break;
+						case CREASE_6_7:
+							limitX = in[ls[0]][0] * CREASE_LIMIT0 + (in[ls[3]][0] + in[ls[4]][0]) * CREASE_LIMIT1;
+							limitY = in[ls[0]][1] * CREASE_LIMIT0 + (in[ls[3]][1] + in[ls[4]][1]) * CREASE_LIMIT1;
+							limitZ = in[ls[0]][2] * CREASE_LIMIT0 + (in[ls[3]][2] + in[ls[4]][2]) * CREASE_LIMIT1;
+							break;
+						}
+					}
+//					System.out.println("depth=" + depth + " ul=" + ls[9] + " ur=" + ls[10] + " lr=" + ls[11] + " ll=" + ls[12]);
+//					quadVertexArrays[depth][ls[9]] = quadVertexArrays[depth][ls[10]] = quadVertexArrays[depth][ls[11]] = quadVertexArrays[depth][ls[12]] = limitX;
+//					quadVertexArrays[depth][ls[9] + 1] = quadVertexArrays[depth][ls[10] + 1] = quadVertexArrays[depth][ls[11] + 1] = quadVertexArrays[depth][ls[12] + 1] = limitY;
+//					quadVertexArrays[depth][ls[9] + 2] = quadVertexArrays[depth][ls[10] + 2] = quadVertexArrays[depth][ls[11] + 2] = quadVertexArrays[depth][ls[12] + 2] = limitZ;
+//					
+					
+					out[outIndex][0] = limitX;
+					out[outIndex][1] = limitY;
+					out[outIndex][2] = limitZ;
+					
+					final float ax = (in[ls[2]][0] - in[ls[4]][0]) * 4 + (in[ls[6]][0] - in[ls[5]][0]) + (in[ls[7]][0] - in[ls[8]][0]);
+					final float ay = (in[ls[2]][1] - in[ls[4]][1]) * 4 + (in[ls[6]][1] - in[ls[5]][1]) + (in[ls[7]][1] - in[ls[8]][1]);
+					final float az = (in[ls[2]][2] - in[ls[4]][2]) * 4 + (in[ls[6]][2] - in[ls[5]][2]) + (in[ls[7]][2] - in[ls[8]][2]);
+					
+					final float bx = (in[ls[1]][0] - in[ls[3]][0]) * 4 + (in[ls[5]][0] - in[ls[8]][0]) + (in[ls[6]][0] - in[ls[7]][0]);
+					final float by = (in[ls[1]][1] - in[ls[3]][1]) * 4 + (in[ls[5]][1] - in[ls[8]][1]) + (in[ls[6]][1] - in[ls[7]][1]);
+					final float bz = (in[ls[1]][2] - in[ls[3]][2]) * 4 + (in[ls[5]][2] - in[ls[8]][2]) + (in[ls[6]][2] - in[ls[7]][2]);
+					
+					if (RENDERER_SETTINGS.softwareNormalize) {
+						float nx = by * az - bz * ay;		// cross product
+						float ny = bz * ax - bx * az;
+						float nz = bx * ay - by * ax;
+						float nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
+						norm[outIndex][0] = norm[outIndex][3] = norm[outIndex][6] = norm[outIndex][9] = nx * nl;
+						norm[outIndex][1] = norm[outIndex][4] = norm[outIndex][7] = norm[outIndex][10] = ny * nl;
+						norm[outIndex][2] = norm[outIndex][5] = norm[outIndex][8] = norm[outIndex][11] = nz * nl;
+					} else {
+						norm[outIndex][0] = norm[outIndex][3] = norm[outIndex][6] = norm[outIndex][9] = by * az - bz * ay;		// cross product
+						norm[outIndex][1] = norm[outIndex][4] = norm[outIndex][7] = norm[outIndex][10] = bz * ax - bx * az;
+						norm[outIndex][2] = norm[outIndex][5] = norm[outIndex][8] = norm[outIndex][11] = bx * ay - by * ax;
+					}
 				}
 			}
 			
@@ -1302,13 +1370,13 @@ public class Dicer {
 					float ny = bz * ax - bx * az;
 					float nz = bx * ay - by * ax;
 					float nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
-					norm[outIndex][0] = nx * nl;
-					norm[outIndex][1] = ny * nl;
-					norm[outIndex][2] = nz * nl;
+					norm[outIndex][0] = norm[outIndex][3] = norm[outIndex][6] = norm[outIndex][9] = nx * nl;
+					norm[outIndex][1] = norm[outIndex][4] = norm[outIndex][7] = norm[outIndex][10] = ny * nl;
+					norm[outIndex][2] = norm[outIndex][5] = norm[outIndex][8] = norm[outIndex][11] = nz * nl;
 				} else {
-					norm[outIndex][0] = by * az - bz * ay;		// cross product
-					norm[outIndex][1] = bz * ax - bx * az;
-					norm[outIndex][2] = bx * ay - by * ax;
+					norm[outIndex][0] = norm[outIndex][3] = norm[outIndex][6] = norm[outIndex][9] = by * az - bz * ay;		// cross product
+					norm[outIndex][1] = norm[outIndex][4] = norm[outIndex][7] = norm[outIndex][10] = bz * ax - bx * az;
+					norm[outIndex][2] = norm[outIndex][5] = norm[outIndex][8] = norm[outIndex][11] = bx * ay - by * ax;
 				}
 			}
 //		}	
@@ -1316,51 +1384,61 @@ public class Dicer {
 //		final int level = depth - 1;
 //		final float[][] out = limitPoints[level];
 //		final float[][] norm = limitNormals[level];
-		final float[] va = quadVertexArrays[depth];
-		final float[] na = quadNormalArrays[depth];
-		final int start, end;
-		if (depth < 2) {
-			start = 1;
-			end = dim - 2;
-		} else {
-			start = 2;
-			end = dim - 3;
-		}
-		int ydim = start * dim;
-		
-		int vi = 0, ni = 0;
-		for (int y = start; y < end; y++) {
-			int gsydim = GRID_START + ydim;
-			int gsydim1 = gsydim + dim;
-			for (int x = start; x < end; x++) {
-				na[ni++] = norm[gsydim + x][0];
-				na[ni++] = norm[gsydim + x][1];
-				na[ni++] = norm[gsydim + x][2];
-				na[ni++] = norm[gsydim + x + 1][0];
-				na[ni++] = norm[gsydim + x + 1][1];
-				na[ni++] = norm[gsydim + x + 1][2];
-				na[ni++] = norm[gsydim1 + x + 1][0];
-				na[ni++] = norm[gsydim1 + x + 1][1];
-				na[ni++] = norm[gsydim1 + x + 1][2];
-				na[ni++] = norm[gsydim1 + x][0];
-				na[ni++] = norm[gsydim1 + x][1];
-				na[ni++] = norm[gsydim1 + x][2];
-				
-				va[vi++] = out[gsydim + x][0];
-				va[vi++] = out[gsydim + x][1];
-				va[vi++] = out[gsydim + x][2];
-				va[vi++] = out[gsydim + x + 1][0];
-				va[vi++] = out[gsydim + x + 1][1];
-				va[vi++] = out[gsydim + x + 1][2];
-				va[vi++] = out[gsydim1 + x + 1][0];
-				va[vi++] = out[gsydim1 + x + 1][1];
-				va[vi++] = out[gsydim1 + x + 1][2];
-				va[vi++] = out[gsydim1 + x][0];
-				va[vi++] = out[gsydim1 + x][1];	
-				va[vi++] = out[gsydim1 + x][2];
-			}
-			ydim += dim;
-		}
+//		final float[] va = quadVertexArrays[depth];
+//		final float[] na = quadNormalArrays[depth];
+//		final int start, end;
+////		if (depth < 2) {
+////			start = 1;
+////			end = dim - 2;
+////		} else {
+//			start = 2;
+//			end = dim - 3;
+////		}
+//		int ydim = start * dim;
+//		
+//		int vi = 0, ni = 0;
+//		for (int y = start; y < end; y++) {
+//			int gsydim = GRID_START + ydim;
+//			int gsydim1 = gsydim + dim;
+//			for (int x = start; x < end; x++) {
+//				na[ni++] = norm[gsydim + x][0];
+//				na[ni++] = norm[gsydim + x][1];
+//				na[ni++] = norm[gsydim + x][2];
+//				na[ni++] = norm[gsydim + x + 1][0];
+//				na[ni++] = norm[gsydim + x + 1][1];
+//				na[ni++] = norm[gsydim + x + 1][2];
+//				na[ni++] = norm[gsydim1 + x + 1][0];
+//				na[ni++] = norm[gsydim1 + x + 1][1];
+//				na[ni++] = norm[gsydim1 + x + 1][2];
+//				na[ni++] = norm[gsydim1 + x][0];
+//				na[ni++] = norm[gsydim1 + x][1];
+//				na[ni++] = norm[gsydim1 + x][2];
+//				
+////				for (int i = vi; i < vi + 12; i++) {
+////					System.out.print(va[i] + " ");
+////				}
+////				System.out.println();
+//				
+////				va[vi++] = out[gsydim + x][0];
+////				va[vi++] = out[gsydim + x][1];
+////				va[vi++] = out[gsydim + x][2];
+////				va[vi++] = out[gsydim + x + 1][0];
+////				va[vi++] = out[gsydim + x + 1][1];
+////				va[vi++] = out[gsydim + x + 1][2];
+////				va[vi++] = out[gsydim1 + x + 1][0];
+////				va[vi++] = out[gsydim1 + x + 1][1];
+////				va[vi++] = out[gsydim1 + x + 1][2];
+////				va[vi++] = out[gsydim1 + x][0];
+////				va[vi++] = out[gsydim1 + x][1];	
+////				va[vi++] = out[gsydim1 + x][2];
+//				
+////				for (int i = vi - 12; i < vi; i++) {
+////					System.out.print(va[i] + " ");
+////				}
+////				System.out.println("\n");
+//			}
+//			ydim += dim;
+//		}
 		
 //		int j = 0;
 //		while (j < i) {
@@ -1368,8 +1446,8 @@ public class Dicer {
 //		}
 //		buffer.rewind();
 //		buffer.put(ia, 0, i);
-		
-		return vi;
+//		System.out.println("*" + vi);
+		return 0;
 	}
 	
 	private void quickDice(int[] valence, int depth) {

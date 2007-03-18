@@ -1170,14 +1170,46 @@ public class ViewportGl extends Viewport {
 //		gl.glFlush();
 //		gl.glFinish();
 		
-		final float[] quadVertices = dicer.getQuadVertexArray(level);
-		final float[] quadNormals = dicer.getQuadNormalArray(level);
+		
+		final int start, end;
+		final int dim = (1 << (level - 1)) + 3;
+		if (level < 2) {
+			start = 1;
+			end = dim - 2;
+		} else {
+			start = 2;
+			end = dim - 3;
+		}
+		int ydim = start * dim;
+		float[][] norm = dicer.getLimitNormals(level - 1);
+		float[][] out = dicer.getLimitVertices(level - 1);
 		gl.glBegin(GL_QUADS);
-		for (int i = 0; i < count; i += 3) {
-			gl.glNormal3fv(quadNormals, i);
-			gl.glVertex3fv(quadVertices, i);
+		for (int y = start; y < end; y++) {
+			int gsydim = Dicer.GRID_START + ydim;
+			int gsydim1 = gsydim + dim;
+			for (int x = start; x < end; x++) {
+				gl.glNormal3fv(norm[gsydim + x], 0);
+				gl.glVertex3fv(out[gsydim + x], 0);
+				gl.glNormal3fv(norm[gsydim + x + 1], 3);
+				gl.glVertex3fv(out[gsydim + x + 1], 0);
+				gl.glNormal3fv(norm[gsydim1 + x + 1], 6);
+				gl.glVertex3fv(out[gsydim1 + x + 1], 0);
+				gl.glNormal3fv(norm[gsydim1 + x], 9);
+				gl.glVertex3fv(out[gsydim1 + x], 0);
+			}
+			ydim += dim;
 		}
 		gl.glEnd();
+
+		
+//		final float[] quadVertices = dicer.getQuadVertexArray(level);
+//		final float[] quadNormals = dicer.getQuadNormalArray(level);
+//		gl.glBegin(GL_QUADS);
+//		for (int i = 0; i < count; i += 3) {
+//			gl.glNormal3fv(quadNormals, i);
+//			gl.glVertex3fv(quadVertices, i);
+//		}
+//		gl.glEnd();
 
 		final float[][] vertices = dicer.getLimitVertices(level - 1);
 		final float[][] normals = dicer.getLimitNormals(level - 1);
