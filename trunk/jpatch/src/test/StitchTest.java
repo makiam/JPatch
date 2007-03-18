@@ -1,6 +1,8 @@
 package test;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
@@ -8,12 +10,14 @@ import javax.swing.*;
 
 public class StitchTest {
 
-	int[] pairLevels = new int[] { 0, 1, 2, 3 };
-	int[][][] rim0 = new int[7][][];					//[level][side][index] outer grid rim
-	int[][][] rim1 = new int[7][][];					//[level][side][index] inner grid rim
-	int[][][][] rimTriangles = new int[7][7][][]; 		// [thisLevel][pairLevel][side][index]
+	int[] pairLevels = new int[] { 2, 2, 2, 2 };
+//	int[][][] rim0 = new int[7][][];					//[level][side][index] outer grid rim
+//	int[][][] rim1 = new int[7][][];					//[level][side][index] inner grid rim
+//	int[][][][] rimTriangles = new int[7][7][][]; 		// [thisLevel][pairLevel][side][index]
 	int level, dim;
 	Point[] coords;
+	sds.Dicer dicer = new sds.Dicer();
+	int mx, my;
 	
 	public static void main(String[] args) {
 		new StitchTest();
@@ -22,7 +26,7 @@ public class StitchTest {
 	private StitchTest() {
 		JFrame frame = new JFrame("StitchTest");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		init();
+//		init();
 		init(3);
 		
 		JPanel panel = new JPanel() {
@@ -93,9 +97,10 @@ public class StitchTest {
 //					}
 					
 					int pairLevel = Math.min(level, pairLevels[side]);
-					int[] triangles = rimTriangles[level][pairLevel][side];
+					int[] triangles = dicer.getRimTriangles(level, side, pairLevel);
+					int[] normals = dicer.getRimTriangleNormals(level, side, pairLevel);
 					for (int i = 0; i < triangles.length; ) {
-						drawTriangle(g, triangles[i++], triangles[i++], triangles[i++], c);
+						drawTriangle(g, normals[i], triangles[i++], normals[i], triangles[i++], normals[i], triangles[i++], c);
 					}
 //					g.setColor(Color.BLUE);
 //					for (int i = 0; i < (dim - 4); i++) {
@@ -114,73 +119,87 @@ public class StitchTest {
 				((JPanel) e.getSource()).repaint();
 			}
 		});
+		panel.addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				mx = e.getX();
+				my = e.getY();
+				((JPanel) e.getSource()).repaint();
+			}
+		});
 		panel.setBackground(Color.WHITE);
 		frame.add(panel);
 		frame.setSize(800, 800);
 		frame.setVisible(true);
 	}
 	
-	private void drawTriangle(Graphics g, int i0, int i1, int i2, Color c) {
-		Point p0 = coords[i0];
-		Point p1 = coords[i1];
-		Point p2 = coords[i2];
+	private void drawTriangle(Graphics g,int n0, int i0, int n1, int i1, int n2, int i2, Color c) {
+		Point p0 = coords[i0 - sds.Dicer.GRID_START];
+		Point p1 = coords[i1 - sds.Dicer.GRID_START];
+		Point p2 = coords[i2 - sds.Dicer.GRID_START];
 		Polygon polygon = new Polygon(new int[] { p0.x, p1.x, p2.x }, new int[] { p0.y, p1.y, p2.y }, 3);
 		g.setColor(c);
 		g.fillPolygon(polygon);
 		g.setColor(Color.DARK_GRAY);
 		g.drawPolygon(polygon);
-	}
-	
-	private void init() {
-		for (int level = 1; level < 7; level++) {
-			dim = ((1 << level)) + 3;
-			rim0[level] = new int[4][dim - 2];
-			for (int i = 0; i < (dim - 2); i++) {
-				rim0[level][0][i] = dim + i + 1;
-				rim0[level][1][i] = dim + dim - 2 + (dim * i);
-				rim0[level][2][i] = dim * dim - dim - 2 - i;
-				rim0[level][3][i] = dim * dim - 2 * dim - (dim * i) + 1;
-			}
-			rim1[level] = new int[4][dim - 4];
-			for (int i = 0; i < (dim - 4); i++) {
-				rim1[level][0][i] = 2 * dim + i + 2;
-				rim1[level][1][i] = 2 * dim + dim - 3 + (dim * i);
-				rim1[level][2][i] = dim * dim - 2 * dim - 3 - i;
-				rim1[level][3][i] = dim * dim - 3 * dim - (dim * i) + 2;
-			}
-			
-			for (int pairLevel = level; pairLevel >= 0; pairLevel--) {
-				rimTriangles[level][pairLevel] = new int[4][];
-				int[] tmp = new int[dim * 6];
-				for (int side = 0; side < 4; side++) {
-					int j = 0;
-					int levelDelta = level - pairLevel;
-					if (levelDelta < 0) {
-						continue;
-					}
-					int step = 1 << levelDelta;
-					int correction = step == 1 ? 0 : -1;
-					for (int i = 0; i < (dim - 2 - 1 * step); i += step) {
-						int ii = i + step / 2 + correction;
-						if (ii >= rim1[level][side].length) {
-							ii = rim1[level][side].length - 1;
-						}
-						tmp[j++] = rim0[level][side][i];
-						tmp[j++] = rim0[level][side][i + step];
-						tmp[j++] = rim1[level][side][ii];
-					}
-					for (int i = 0; i < (dim - 5); i++) {
-						int ii = ((i + (step / 2) + 1) / step) * step;
-						tmp[j++] = rim1[level][side][i];
-						tmp[j++] = rim1[level][side][i + 1];
-						tmp[j++] = rim0[level][side][ii];
-					}
-					rimTriangles[level][pairLevel][side] = new int[j];
-					System.arraycopy(tmp, 0, rimTriangles[level][pairLevel][side], 0, j);
-				}
-			}
+		if (polygon.contains(mx - 200, my - 200)) {
+			g.setColor(Color.BLACK);
+			g.drawString(Integer.toString(n0), p0.x, p0.y);
+			g.drawString(Integer.toString(n1), p1.x, p1.y);
+			g.drawString(Integer.toString(n2), p2.x, p2.y);
 		}
 	}
+	
+//	private void init() {
+//		for (int level = 1; level < 7; level++) {
+//			dim = ((1 << level)) + 3;
+//			rim0[level] = new int[4][dim - 2];
+//			for (int i = 0; i < (dim - 2); i++) {
+//				rim0[level][0][i] = dim + i + 1;
+//				rim0[level][1][i] = dim + dim - 2 + (dim * i);
+//				rim0[level][2][i] = dim * dim - dim - 2 - i;
+//				rim0[level][3][i] = dim * dim - 2 * dim - (dim * i) + 1;
+//			}
+//			rim1[level] = new int[4][dim - 4];
+//			for (int i = 0; i < (dim - 4); i++) {
+//				rim1[level][0][i] = 2 * dim + i + 2;
+//				rim1[level][1][i] = 2 * dim + dim - 3 + (dim * i);
+//				rim1[level][2][i] = dim * dim - 2 * dim - 3 - i;
+//				rim1[level][3][i] = dim * dim - 3 * dim - (dim * i) + 2;
+//			}
+//			
+//			for (int pairLevel = level; pairLevel >= 0; pairLevel--) {
+//				rimTriangles[level][pairLevel] = new int[4][];
+//				int[] tmp = new int[dim * 6];
+//				for (int side = 0; side < 4; side++) {
+//					int j = 0;
+//					int levelDelta = level - pairLevel;
+//					if (levelDelta < 0) {
+//						continue;
+//					}
+//					int step = 1 << levelDelta;
+//					int correction = step == 1 ? 0 : -1;
+//					for (int i = 0; i < (dim - 2 - 1 * step); i += step) {
+//						int ii = i + step / 2 + correction;
+//						if (ii >= rim1[level][side].length) {
+//							ii = rim1[level][side].length - 1;
+//						}
+//						tmp[j++] = rim0[level][side][i];
+//						tmp[j++] = rim0[level][side][i + step];
+//						tmp[j++] = rim1[level][side][ii];
+//					}
+//					for (int i = 0; i < (dim - 5); i++) {
+//						int ii = ((i + (step / 2) + 1) / step) * step;
+//						tmp[j++] = rim1[level][side][i];
+//						tmp[j++] = rim1[level][side][i + 1];
+//						tmp[j++] = rim0[level][side][ii];
+//					}
+//					rimTriangles[level][pairLevel][side] = new int[j];
+//					System.arraycopy(tmp, 0, rimTriangles[level][pairLevel][side], 0, j);
+//				}
+//			}
+//		}
+//	}
 	
 	private void init(int level) {
 		this.level = level;

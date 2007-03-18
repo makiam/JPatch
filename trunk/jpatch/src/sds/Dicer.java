@@ -63,6 +63,7 @@ public class Dicer {
 	int[][][] rim0 = new int[MAX_SUBDIV][][];								//[level][side][index] outer grid rim
 	int[][][] rim1 = new int[MAX_SUBDIV][][];								//[level][side][index] inner grid rim
 	int[][][][] rimTriangles = new int[MAX_SUBDIV][MAX_SUBDIV][][]; 		// [thisLevel][pairLevel][side][index]
+	int[][][][] rimTriangleNormals = new int[MAX_SUBDIV][MAX_SUBDIV][][]; 	// [thisLevel][pairLevel][side][index]
 	
 //	static {
 //		for (int valence = 3; valence <= MAX_VALENCE; valence++) {
@@ -95,6 +96,7 @@ public class Dicer {
 				rim0[0][3] = new int[] {9, 5};
 				rim1[0] = new int[0][];
 				rimTriangles[0][0] = new int[4][0];
+				rimTriangleNormals[0][0] = new int[4][0];
 //				quadVertexArrays[0] = new float[15];
 //				quadNormalArrays[0] = new float[15];
 			} else {
@@ -120,7 +122,9 @@ public class Dicer {
 				
 				for (int pairLevel = level; pairLevel >= 0; pairLevel--) {
 					rimTriangles[level][pairLevel] = new int[4][];
-					int[] tmp = new int[dim * 6];
+					rimTriangleNormals[level][pairLevel] = new int[4][];
+					int[] tmpTriangles = new int[dim * 6];
+					int[] tmpNormals = new int[dim * 6];
 					for (int side = 0; side < 4; side++) {
 						int j = 0;
 						int levelDelta = level - pairLevel;
@@ -131,21 +135,32 @@ public class Dicer {
 						int correction = step == 1 ? 0 : -1;
 						for (int i = 0; i < (dim - 2 - 1 * step); i += step) {
 							int ii = i + step / 2 + correction;
+							int innerNormal = ((side + 2) % 4) * 3;
 							if (ii >= rim1[level][side].length) {
 								ii = rim1[level][side].length - 1;
+								innerNormal = ((side + 3) % 4) * 3;
 							}
-							tmp[j++] = rim0[level][side][i] + GRID_START;
-							tmp[j++] = rim0[level][side][i + step] + GRID_START;
-							tmp[j++] = rim1[level][side][ii] + GRID_START;
+							tmpNormals[j] = side * 3;
+							tmpTriangles[j++] = rim0[level][side][i] + GRID_START;
+							tmpNormals[j] = ((side + 1) % 4) * 3;
+							tmpTriangles[j++] = rim0[level][side][i + step] + GRID_START;
+							tmpNormals[j] = innerNormal;
+							tmpTriangles[j++] = rim1[level][side][ii] + GRID_START;
 						}
 						for (int i = 0; i < (dim - 5); i++) {
 							int ii = ((i + (step / 2) + 1) / step) * step;
-							tmp[j++] = rim0[level][side][ii] + GRID_START;
-							tmp[j++] = rim1[level][side][i + 1] + GRID_START;
-							tmp[j++] = rim1[level][side][i] + GRID_START;
+							int outerNormal = ((i + 1) % step < step / 2) ? side * 3 : ((side + 1) % 4) * 3;
+							tmpNormals[j] = outerNormal;
+							tmpTriangles[j++] = rim0[level][side][ii] + GRID_START;
+							tmpNormals[j] = ((side + 2) % 4) * 3;
+							tmpTriangles[j++] = rim1[level][side][i + 1] + GRID_START;
+							tmpNormals[j] = ((side + 3) % 4) * 3;
+							tmpTriangles[j++] = rim1[level][side][i] + GRID_START;
 						}
 						rimTriangles[level][pairLevel][side] = new int[j];
-						System.arraycopy(tmp, 0, rimTriangles[level][pairLevel][side], 0, j);
+						rimTriangleNormals[level][pairLevel][side] = new int[j];
+						System.arraycopy(tmpTriangles, 0, rimTriangles[level][pairLevel][side], 0, j);
+						System.arraycopy(tmpNormals, 0, rimTriangleNormals[level][pairLevel][side], 0, j);
 					}
 				}
 			}
@@ -598,11 +613,17 @@ public class Dicer {
 //	}
 	
 	public int[] getRimTriangles(int level, int side, int pairLevel) {
-//		System.out.println("getRimTriamges level=" + level + " pairlevel=" + pairLevel);
 		if (pairLevel > level) {
 			pairLevel = level;
 		}
 		return rimTriangles[level][pairLevel][side];
+	}
+	
+	public int[] getRimTriangleNormals(int level, int side, int pairLevel) {
+		if (pairLevel > level) {
+			pairLevel = level;
+		}
+		return rimTriangleNormals[level][pairLevel][side];
 	}
 	
 	public int[] getRim(int level, int side) {
@@ -1268,27 +1289,35 @@ public class Dicer {
 					out[outIndex][0] = limitX;
 					out[outIndex][1] = limitY;
 					out[outIndex][2] = limitZ;
+					float ux = 0, uy = 0, uz = 0, vx = 0, vy = 0, vz = 0;
 					
-					final float ax = (in[ls[2]][0] - in[ls[4]][0]) * 4 + (in[ls[6]][0] - in[ls[5]][0]) + (in[ls[7]][0] - in[ls[8]][0]);
-					final float ay = (in[ls[2]][1] - in[ls[4]][1]) * 4 + (in[ls[6]][1] - in[ls[5]][1]) + (in[ls[7]][1] - in[ls[8]][1]);
-					final float az = (in[ls[2]][2] - in[ls[4]][2]) * 4 + (in[ls[6]][2] - in[ls[5]][2]) + (in[ls[7]][2] - in[ls[8]][2]);
-					
-					final float bx = (in[ls[1]][0] - in[ls[3]][0]) * 4 + (in[ls[5]][0] - in[ls[8]][0]) + (in[ls[6]][0] - in[ls[7]][0]);
-					final float by = (in[ls[1]][1] - in[ls[3]][1]) * 4 + (in[ls[5]][1] - in[ls[8]][1]) + (in[ls[6]][1] - in[ls[7]][1]);
-					final float bz = (in[ls[1]][2] - in[ls[3]][2]) * 4 + (in[ls[5]][2] - in[ls[8]][2]) + (in[ls[6]][2] - in[ls[7]][2]);
-					
+					if (s[0] == CREASE_4_6) {
+//						ux = in[ls[1]][0] - in[ls[3]][0];
+//						ux = in[ls[1]][1] - in[ls[3]][1];
+//						ux = in[ls[1]][2] - in[ls[3]][2];
+//						
+//						vx = in[ls[]]
+					} else {
+						ux = (in[ls[2]][0] - in[ls[4]][0]) * 4 + (in[ls[6]][0] - in[ls[5]][0]) + (in[ls[7]][0] - in[ls[8]][0]);
+						uy = (in[ls[2]][1] - in[ls[4]][1]) * 4 + (in[ls[6]][1] - in[ls[5]][1]) + (in[ls[7]][1] - in[ls[8]][1]);
+						uz = (in[ls[2]][2] - in[ls[4]][2]) * 4 + (in[ls[6]][2] - in[ls[5]][2]) + (in[ls[7]][2] - in[ls[8]][2]);
+						
+						vx = (in[ls[1]][0] - in[ls[3]][0]) * 4 + (in[ls[5]][0] - in[ls[8]][0]) + (in[ls[6]][0] - in[ls[7]][0]);
+						vy = (in[ls[1]][1] - in[ls[3]][1]) * 4 + (in[ls[5]][1] - in[ls[8]][1]) + (in[ls[6]][1] - in[ls[7]][1]);
+						vz = (in[ls[1]][2] - in[ls[3]][2]) * 4 + (in[ls[5]][2] - in[ls[8]][2]) + (in[ls[6]][2] - in[ls[7]][2]);
+					}
 					if (RENDERER_SETTINGS.softwareNormalize) {
-						float nx = by * az - bz * ay;		// cross product
-						float ny = bz * ax - bx * az;
-						float nz = bx * ay - by * ax;
+						float nx = vy * uz - vz * uy;		// cross product
+						float ny = vz * ux - vx * uz;
+						float nz = vx * uy - vy * ux;
 						float nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
 						norm[outIndex][0] = norm[outIndex][3] = norm[outIndex][6] = norm[outIndex][9] = nx * nl;
 						norm[outIndex][1] = norm[outIndex][4] = norm[outIndex][7] = norm[outIndex][10] = ny * nl;
 						norm[outIndex][2] = norm[outIndex][5] = norm[outIndex][8] = norm[outIndex][11] = nz * nl;
 					} else {
-						norm[outIndex][0] = norm[outIndex][3] = norm[outIndex][6] = norm[outIndex][9] = by * az - bz * ay;		// cross product
-						norm[outIndex][1] = norm[outIndex][4] = norm[outIndex][7] = norm[outIndex][10] = bz * ax - bx * az;
-						norm[outIndex][2] = norm[outIndex][5] = norm[outIndex][8] = norm[outIndex][11] = bx * ay - by * ax;
+						norm[outIndex][0] = norm[outIndex][3] = norm[outIndex][6] = norm[outIndex][9] = vy * uz - vz * uy;		// cross product
+						norm[outIndex][1] = norm[outIndex][4] = norm[outIndex][7] = norm[outIndex][10] = vz * ux - vx * uz;
+						norm[outIndex][2] = norm[outIndex][5] = norm[outIndex][8] = norm[outIndex][11] = vx * uy - vy * ux;
 					}
 				}
 			}
@@ -1329,54 +1358,60 @@ public class Dicer {
 					out[outIndex][2] = e2 * VERTEX_EDGE_LIMIT[valence] + f2 * VERTEX_FACE_LIMIT[valence] + in[cs[5]][2] * VERTEX_POINT_LIMIT[valence];
 				}
 				/* normal */
-				float ax = 0;
-				float ay = 0;
-				float az = 0;
-				float bx = 0;
-				float by = 0;
-				float bz = 0;
-				for (int j = 0; j < valence; j++) {
-					int c2fi = j * 2 + 6;
-					int c2ei = j * 2 + 5;
-					if (c2ei == 5) {
-						c2ei = cs.length - 1;
+				float ux = 0, uy = 0, uz = 0, vx = 0, vy = 0, vz = 0;
+				if (cps[0] > 0) {
+					// corner //
+					vx = in[cs[7]][0] - in[cs[5]][0];
+					vy = in[cs[7]][1] - in[cs[5]][1];
+					vz = in[cs[7]][2] - in[cs[5]][2];
+					ux = in[cs[9]][0] - in[cs[5]][0];
+					uy = in[cs[9]][1] - in[cs[5]][1];
+					uz = in[cs[9]][2] - in[cs[5]][2];
+				} else {
+					// TODO: crease normal
+					// smooth //
+					for (int j = 0; j < valence; j++) {
+						int c2fi = j * 2 + 6;
+						int c2ei = j * 2 + 5;
+						if (c2ei == 5) {
+							c2ei = cs.length - 1;
+						}
+						int c3fi = c2fi + 2;
+						if (c3fi >= cs.length) {
+							c3fi -= cs.length - 6;
+						}
+						int c3ei = c2ei + 2;
+						if (c3ei >= cs.length) {
+							c3ei -= cs.length - 6;
+						}
+						float ew = TANGENT_EDGE_WEIGHT[valence][j];
+						float fw = TANGENT_FACE_WEIGHT[valence][j];
+						ux += in[cs[c3fi]][0] * fw;
+						uy += in[cs[c3fi]][1] * fw;
+						uz += in[cs[c3fi]][2] * fw;
+						ux += in[cs[c3ei]][0] * ew;
+						uy += in[cs[c3ei]][1] * ew;
+						uz += in[cs[c3ei]][2] * ew;
+						vx += in[cs[c2fi]][0] * fw;
+						vy += in[cs[c2fi]][1] * fw;
+						vz += in[cs[c2fi]][2] * fw;
+						vx += in[cs[c2ei]][0] * ew;
+						vy += in[cs[c2ei]][1] * ew;
+						vz += in[cs[c2ei]][2] * ew;
 					}
-					int c3fi = c2fi + 2;
-					if (c3fi >= cs.length) {
-						c3fi -= cs.length - 6;
-					}
-					int c3ei = c2ei + 2;
-					if (c3ei >= cs.length) {
-						c3ei -= cs.length - 6;
-					}
-					float ew = TANGENT_EDGE_WEIGHT[valence][j];
-					float fw = TANGENT_FACE_WEIGHT[valence][j];
-					ax += in[cs[c3fi]][0] * fw;
-					ay += in[cs[c3fi]][1] * fw;
-					az += in[cs[c3fi]][2] * fw;
-					ax += in[cs[c3ei]][0] * ew;
-					ay += in[cs[c3ei]][1] * ew;
-					az += in[cs[c3ei]][2] * ew;
-					bx += in[cs[c2fi]][0] * fw;
-					by += in[cs[c2fi]][1] * fw;
-					bz += in[cs[c2fi]][2] * fw;
-					bx += in[cs[c2ei]][0] * ew;
-					by += in[cs[c2ei]][1] * ew;
-					bz += in[cs[c2ei]][2] * ew;
 				}
-				
 				if (RENDERER_SETTINGS.softwareNormalize) {
-					float nx = by * az - bz * ay;		// cross product
-					float ny = bz * ax - bx * az;
-					float nz = bx * ay - by * ax;
+					float nx = vy * uz - vz * uy;		// cross product
+					float ny = vz * ux - vx * uz;
+					float nz = vx * uy - vy * ux;
 					float nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
 					norm[outIndex][0] = norm[outIndex][3] = norm[outIndex][6] = norm[outIndex][9] = nx * nl;
 					norm[outIndex][1] = norm[outIndex][4] = norm[outIndex][7] = norm[outIndex][10] = ny * nl;
 					norm[outIndex][2] = norm[outIndex][5] = norm[outIndex][8] = norm[outIndex][11] = nz * nl;
 				} else {
-					norm[outIndex][0] = norm[outIndex][3] = norm[outIndex][6] = norm[outIndex][9] = by * az - bz * ay;		// cross product
-					norm[outIndex][1] = norm[outIndex][4] = norm[outIndex][7] = norm[outIndex][10] = bz * ax - bx * az;
-					norm[outIndex][2] = norm[outIndex][5] = norm[outIndex][8] = norm[outIndex][11] = bx * ay - by * ax;
+					norm[outIndex][0] = norm[outIndex][3] = norm[outIndex][6] = norm[outIndex][9] = vy * uz - vz * uy;		// cross product
+					norm[outIndex][1] = norm[outIndex][4] = norm[outIndex][7] = norm[outIndex][10] = vz * ux - vx * uz;
+					norm[outIndex][2] = norm[outIndex][5] = norm[outIndex][8] = norm[outIndex][11] = vx * uy - vy * ux;
 				}
 			}
 //		}	

@@ -1181,21 +1181,21 @@ public class ViewportGl extends Viewport {
 			end = dim - 3;
 		}
 		int ydim = start * dim;
-		float[][] norm = dicer.getLimitNormals(level - 1);
-		float[][] out = dicer.getLimitVertices(level - 1);
+		final float[][] normals = dicer.getLimitNormals(level - 1);
+		final float[][] vertices = dicer.getLimitVertices(level - 1);
 		gl.glBegin(GL_QUADS);
 		for (int y = start; y < end; y++) {
 			int gsydim = Dicer.GRID_START + ydim;
 			int gsydim1 = gsydim + dim;
 			for (int x = start; x < end; x++) {
-				gl.glNormal3fv(norm[gsydim + x], 0);
-				gl.glVertex3fv(out[gsydim + x], 0);
-				gl.glNormal3fv(norm[gsydim + x + 1], 3);
-				gl.glVertex3fv(out[gsydim + x + 1], 0);
-				gl.glNormal3fv(norm[gsydim1 + x + 1], 6);
-				gl.glVertex3fv(out[gsydim1 + x + 1], 0);
-				gl.glNormal3fv(norm[gsydim1 + x], 9);
-				gl.glVertex3fv(out[gsydim1 + x], 0);
+				gl.glNormal3fv(normals[gsydim + x], 0);
+				gl.glVertex3fv(vertices[gsydim + x], 0);
+				gl.glNormal3fv(normals[gsydim + x + 1], 3);
+				gl.glVertex3fv(vertices[gsydim + x + 1], 0);
+				gl.glNormal3fv(normals[gsydim1 + x + 1], 6);
+				gl.glVertex3fv(vertices[gsydim1 + x + 1], 0);
+				gl.glNormal3fv(normals[gsydim1 + x], 9);
+				gl.glVertex3fv(vertices[gsydim1 + x], 0);
 			}
 			ydim += dim;
 		}
@@ -1211,8 +1211,6 @@ public class ViewportGl extends Viewport {
 //		}
 //		gl.glEnd();
 
-		final float[][] vertices = dicer.getLimitVertices(level - 1);
-		final float[][] normals = dicer.getLimitNormals(level - 1);
 		gl.glBegin(GL_TRIANGLES);
 		for (int side = 0; side < 4; side++) {
 			final Slate2 adjacentSlate = slate.getAdjacentSlate(side);
@@ -1221,8 +1219,9 @@ public class ViewportGl extends Viewport {
 				pairLevel = level;
 			}
 			final int[] triangleArray = dicer.getRimTriangles(level - 1, side, pairLevel - 1);
+			final int[] triangleArrayNormals = dicer.getRimTriangleNormals(level - 1, side, pairLevel - 1);
 			for (int i = 0; i < triangleArray.length; i++) {
-				gl.glNormal3fv(normals[triangleArray[i]], 0);
+				gl.glNormal3fv(normals[triangleArray[i]], triangleArrayNormals[i]);
 				gl.glVertex3fv(vertices[triangleArray[i]], 0);
 			}
 		}
