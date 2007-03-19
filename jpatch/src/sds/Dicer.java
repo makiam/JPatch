@@ -1289,35 +1289,61 @@ public class Dicer {
 					out[outIndex][0] = limitX;
 					out[outIndex][1] = limitY;
 					out[outIndex][2] = limitZ;
-					float ux = 0, uy = 0, uz = 0, vx = 0, vy = 0, vz = 0;
 					
-					if (s[0] == CREASE_4_6) {
-//						ux = in[ls[1]][0] - in[ls[3]][0];
-//						ux = in[ls[1]][1] - in[ls[3]][1];
-//						ux = in[ls[1]][2] - in[ls[3]][2];
-//						
-//						vx = in[ls[]]
+					if (s[0] == CREASE_4_6 || (s[0] == EDGE_V && s[1] > 0)) {
+						final float ux = in[ls[1]][0] - in[ls[3]][0];
+						final float uy = in[ls[1]][1] - in[ls[3]][1];
+						final float uz = in[ls[1]][2] - in[ls[3]][2];
+						final float vx0 = in[ls[2]][0] - in[ls[0]][0];
+						final float vy0 = in[ls[2]][1] - in[ls[0]][1];
+						final float vz0 = in[ls[2]][2] - in[ls[0]][2];
+						final float vx1 = in[ls[0]][0] - in[ls[4]][0];
+						final float vy1 = in[ls[0]][1] - in[ls[4]][1];
+						final float vz1 = in[ls[0]][2] - in[ls[4]][2];
+						final float[] normal = norm[outIndex];
+						computeNormal(vx0, vy0, vz0, ux, uy, uz, normal, 0);
+						computeNormal(vx1, vy1, vz1, ux, uy, uz, normal, 3);
+//						normal[0] = normal[1] = normal[2] = 0;
+//						normal[3] = normal[4] = normal[5] = 0;
+						normal[9] = normal[0];
+						normal[10] = normal[1];
+						normal[11] = normal[2];
+						normal[6] = normal[3];
+						normal[7] = normal[4];
+						normal[8] = normal[5];
+					} else if (s[0] == CREASE_5_7 || (s[0] == EDGE_H && s[1] > 0)) {
+						final float ux = in[ls[2]][0] - in[ls[4]][0];
+						final float uy = in[ls[2]][1] - in[ls[4]][1];
+						final float uz = in[ls[2]][2] - in[ls[4]][2];
+						final float vx0 = in[ls[3]][0] - in[ls[0]][0];
+						final float vy0 = in[ls[3]][1] - in[ls[0]][1];
+						final float vz0 = in[ls[3]][2] - in[ls[0]][2];
+						final float vx1 = in[ls[0]][0] - in[ls[1]][0];
+						final float vy1 = in[ls[0]][1] - in[ls[1]][1];
+						final float vz1 = in[ls[0]][2] - in[ls[1]][2];
+						final float[] normal = norm[outIndex];
+						computeNormal(vx0, vy0, vz0, ux, uy, uz, normal, 0);
+						computeNormal(vx1, vy1, vz1, ux, uy, uz, normal, 9);
+//						normal[0] = normal[1] = normal[2] = 0;
+//						normal[9] = normal[10] = normal[11] = 0;
+						normal[3] = normal[0];
+						normal[4] = normal[1];
+						normal[5] = normal[2];
+						normal[6] = normal[9];
+						normal[7] = normal[10];
+						normal[8] = normal[11];
 					} else {
-						ux = (in[ls[2]][0] - in[ls[4]][0]) * 4 + (in[ls[6]][0] - in[ls[5]][0]) + (in[ls[7]][0] - in[ls[8]][0]);
-						uy = (in[ls[2]][1] - in[ls[4]][1]) * 4 + (in[ls[6]][1] - in[ls[5]][1]) + (in[ls[7]][1] - in[ls[8]][1]);
-						uz = (in[ls[2]][2] - in[ls[4]][2]) * 4 + (in[ls[6]][2] - in[ls[5]][2]) + (in[ls[7]][2] - in[ls[8]][2]);
-						
-						vx = (in[ls[1]][0] - in[ls[3]][0]) * 4 + (in[ls[5]][0] - in[ls[8]][0]) + (in[ls[6]][0] - in[ls[7]][0]);
-						vy = (in[ls[1]][1] - in[ls[3]][1]) * 4 + (in[ls[5]][1] - in[ls[8]][1]) + (in[ls[6]][1] - in[ls[7]][1]);
-						vz = (in[ls[1]][2] - in[ls[3]][2]) * 4 + (in[ls[5]][2] - in[ls[8]][2]) + (in[ls[6]][2] - in[ls[7]][2]);
-					}
-					if (RENDERER_SETTINGS.softwareNormalize) {
-						float nx = vy * uz - vz * uy;		// cross product
-						float ny = vz * ux - vx * uz;
-						float nz = vx * uy - vy * ux;
-						float nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
-						norm[outIndex][0] = norm[outIndex][3] = norm[outIndex][6] = norm[outIndex][9] = nx * nl;
-						norm[outIndex][1] = norm[outIndex][4] = norm[outIndex][7] = norm[outIndex][10] = ny * nl;
-						norm[outIndex][2] = norm[outIndex][5] = norm[outIndex][8] = norm[outIndex][11] = nz * nl;
-					} else {
-						norm[outIndex][0] = norm[outIndex][3] = norm[outIndex][6] = norm[outIndex][9] = vy * uz - vz * uy;		// cross product
-						norm[outIndex][1] = norm[outIndex][4] = norm[outIndex][7] = norm[outIndex][10] = vz * ux - vx * uz;
-						norm[outIndex][2] = norm[outIndex][5] = norm[outIndex][8] = norm[outIndex][11] = vx * uy - vy * ux;
+						final float ux = (in[ls[2]][0] - in[ls[4]][0]) * 4 + (in[ls[6]][0] - in[ls[5]][0]) + (in[ls[7]][0] - in[ls[8]][0]);
+						final float uy = (in[ls[2]][1] - in[ls[4]][1]) * 4 + (in[ls[6]][1] - in[ls[5]][1]) + (in[ls[7]][1] - in[ls[8]][1]);
+						final float uz = (in[ls[2]][2] - in[ls[4]][2]) * 4 + (in[ls[6]][2] - in[ls[5]][2]) + (in[ls[7]][2] - in[ls[8]][2]);
+						final float vx = (in[ls[1]][0] - in[ls[3]][0]) * 4 + (in[ls[5]][0] - in[ls[8]][0]) + (in[ls[6]][0] - in[ls[7]][0]);
+						final float vy = (in[ls[1]][1] - in[ls[3]][1]) * 4 + (in[ls[5]][1] - in[ls[8]][1]) + (in[ls[6]][1] - in[ls[7]][1]);
+						final float vz = (in[ls[1]][2] - in[ls[3]][2]) * 4 + (in[ls[5]][2] - in[ls[8]][2]) + (in[ls[6]][2] - in[ls[7]][2]);
+						final float[] normal = norm[outIndex];
+						computeNormal(ux, uy, uz, vx, vy, vz, normal, 0);
+						normal[9] = normal[6] = normal[3] = normal[0];
+						normal[10] = normal[7] = normal[4] = normal[1];
+						normal[11] = normal[8] = normal[5] = normal[2];
 					}
 				}
 			}
@@ -1358,18 +1384,41 @@ public class Dicer {
 					out[outIndex][2] = e2 * VERTEX_EDGE_LIMIT[valence] + f2 * VERTEX_FACE_LIMIT[valence] + in[cs[5]][2] * VERTEX_POINT_LIMIT[valence];
 				}
 				/* normal */
-				float ux = 0, uy = 0, uz = 0, vx = 0, vy = 0, vz = 0;
+				
 				if (cps[0] > 0) {
 					// corner //
-					vx = in[cs[7]][0] - in[cs[5]][0];
-					vy = in[cs[7]][1] - in[cs[5]][1];
-					vz = in[cs[7]][2] - in[cs[5]][2];
-					ux = in[cs[9]][0] - in[cs[5]][0];
-					uy = in[cs[9]][1] - in[cs[5]][1];
-					uz = in[cs[9]][2] - in[cs[5]][2];
+					final float vx = in[cs[7]][0] - in[cs[5]][0];
+					final float vy = in[cs[7]][1] - in[cs[5]][1];
+					final float vz = in[cs[7]][2] - in[cs[5]][2];
+					final float ux = in[cs[9]][0] - in[cs[5]][0];
+					final float uy = in[cs[9]][1] - in[cs[5]][1];
+					final float uz = in[cs[9]][2] - in[cs[5]][2];
+					float[] normal = norm[outIndex];
+					computeNormal(ux, uy, uz, vx, vy, vz, normal, 0);
+				} else if (cps[1] > 0) {
+					// crease
+					int v = cps.length - 6;
+					int a = cps[2] - 6;
+					int b = cps[3] - 6;
+					int aMinusB = (a + v - b) % v;
+					int bMinusA = (b + v - a) % v;
+					if (aMinusB < bMinusA) {
+						int tmp = b;
+						b = a;
+						a = tmp;
+					}
+					int next = (a == 1) ? 2 : (b + 2) % v;
+					final float vx = in[cs[a + 6]][0] - in[cs[b + 6]][0];
+					final float vy = in[cs[a + 6]][1] - in[cs[b + 6]][1];
+					final float vz = in[cs[a + 6]][2] - in[cs[b + 6]][2];
+					final float ux = in[cs[next + 6]][0] - in[cs[5]][0];
+					final float uy = in[cs[next + 6]][1] - in[cs[5]][1];
+					final float uz = in[cs[next + 6]][2] - in[cs[5]][2];
+					float[] normal = norm[outIndex];
+					computeNormal(vx, vy, vz, ux, uy, uz, normal, 0);
 				} else {
-					// TODO: crease normal
 					// smooth //
+					float ux = 0, uy = 0, uz = 0, vx = 0, vy = 0, vz = 0;
 					for (int j = 0; j < valence; j++) {
 						int c2fi = j * 2 + 6;
 						int c2ei = j * 2 + 5;
@@ -1398,20 +1447,12 @@ public class Dicer {
 						vx += in[cs[c2ei]][0] * ew;
 						vy += in[cs[c2ei]][1] * ew;
 						vz += in[cs[c2ei]][2] * ew;
+						float[] normal = norm[outIndex];
+						computeNormal(ux, uy, uz, vx, vy, vz, normal, 0);
+						normal[9] = normal[6] = normal[3] = normal[0];
+						normal[10] = normal[7] = normal[4] = normal[1];
+						normal[11] = normal[8] = normal[5] = normal[2];
 					}
-				}
-				if (RENDERER_SETTINGS.softwareNormalize) {
-					float nx = vy * uz - vz * uy;		// cross product
-					float ny = vz * ux - vx * uz;
-					float nz = vx * uy - vy * ux;
-					float nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
-					norm[outIndex][0] = norm[outIndex][3] = norm[outIndex][6] = norm[outIndex][9] = nx * nl;
-					norm[outIndex][1] = norm[outIndex][4] = norm[outIndex][7] = norm[outIndex][10] = ny * nl;
-					norm[outIndex][2] = norm[outIndex][5] = norm[outIndex][8] = norm[outIndex][11] = nz * nl;
-				} else {
-					norm[outIndex][0] = norm[outIndex][3] = norm[outIndex][6] = norm[outIndex][9] = vy * uz - vz * uy;		// cross product
-					norm[outIndex][1] = norm[outIndex][4] = norm[outIndex][7] = norm[outIndex][10] = vz * ux - vx * uz;
-					norm[outIndex][2] = norm[outIndex][5] = norm[outIndex][8] = norm[outIndex][11] = vx * uy - vy * ux;
 				}
 			}
 //		}	
@@ -1483,6 +1524,23 @@ public class Dicer {
 //		buffer.put(ia, 0, i);
 //		System.out.println("*" + vi);
 		return 0;
+	}
+	
+	
+	private void computeNormal(final float ux, final float uy, final float uz, final float vx, final float vy, final float vz, final float[] normal, final int offset) {
+		if (RENDERER_SETTINGS.softwareNormalize) {
+			final float nx = vy * uz - vz * uy;									// cross product
+			final float ny = vz * ux - vx * uz;
+			final float nz = vx * uy - vy * ux;
+			final float nl = 1.0f / (float) sqrt(nx * nx + ny * ny + nz * nz);	// normalize
+			normal[offset] = nx * nl;
+			normal[offset + 1] = ny * nl;
+			normal[offset + 2] = nz * nl;
+		} else {
+			normal[offset] = vy * uz - vz * uy;								// cross product
+			normal[offset + 1] = vz * ux - vx * uz;
+			normal[offset + 2] = vx * uy - vy * ux;
+		}
 	}
 	
 	private void quickDice(int[] valence, int depth) {

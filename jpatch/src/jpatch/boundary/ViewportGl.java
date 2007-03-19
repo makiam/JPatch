@@ -1173,7 +1173,7 @@ public class ViewportGl extends Viewport {
 		
 		final int start, end;
 		final int dim = (1 << (level - 1)) + 3;
-		if (level < 2) {
+		if (true || level < 2) {
 			start = 1;
 			end = dim - 2;
 		} else {
@@ -1211,21 +1211,21 @@ public class ViewportGl extends Viewport {
 //		}
 //		gl.glEnd();
 
-		gl.glBegin(GL_TRIANGLES);
-		for (int side = 0; side < 4; side++) {
-			final Slate2 adjacentSlate = slate.getAdjacentSlate(side);
-			int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivLevel();
-			if (pairLevel < 0) {
-				pairLevel = level;
-			}
-			final int[] triangleArray = dicer.getRimTriangles(level - 1, side, pairLevel - 1);
-			final int[] triangleArrayNormals = dicer.getRimTriangleNormals(level - 1, side, pairLevel - 1);
-			for (int i = 0; i < triangleArray.length; i++) {
-				gl.glNormal3fv(normals[triangleArray[i]], triangleArrayNormals[i]);
-				gl.glVertex3fv(vertices[triangleArray[i]], 0);
-			}
-		}
-		gl.glEnd();
+//		gl.glBegin(GL_TRIANGLES);
+//		for (int side = 0; side < 4; side++) {
+//			final Slate2 adjacentSlate = slate.getAdjacentSlate(side);
+//			int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivLevel();
+//			if (pairLevel < 0) {
+//				pairLevel = level;
+//			}
+//			final int[] triangleArray = dicer.getRimTriangles(level - 1, side, pairLevel - 1);
+//			final int[] triangleArrayNormals = dicer.getRimTriangleNormals(level - 1, side, pairLevel - 1);
+//			for (int i = 0; i < triangleArray.length; i++) {
+//				gl.glNormal3fv(normals[triangleArray[i]], triangleArrayNormals[i]);
+//				gl.glVertex3fv(vertices[triangleArray[i]], 0);
+//			}
+//		}
+//		gl.glEnd();
 		
 		
 		
