@@ -29,7 +29,7 @@ public class HalfEdge {
 	final boolean primary;
 	
 	public HalfEdge(TopLevelVertex firstVertex, TopLevelVertex secondVertex) {
-		sharpness = new Attribute.Integer(0);
+		sharpness = new Attribute.Integer(99);
 		vertex = firstVertex;
 		edgePoint = new Level2Vertex() {
 			@Override
