@@ -47,6 +47,44 @@ public class AttributeUiHelper {
 //		return label;
 //	}
 	
+	public static JSlider createSliderFor(final Attribute.Integer attribute, final int min, final int max) {
+		final JSlider slider;
+		slider = new JSlider(min, max, attribute.get());
+		slider.setMinorTickSpacing(1);
+		slider.setSnapToTicks(true);
+		slider.setToolTipText(attribute.getName());
+		
+		/* create a ChangeListener to update the attribute if the slider was changed */
+		slider.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				attribute.set(slider.getValue());
+				Main.getInstance().getActiveSds().rethinkSlates();
+				Main.getInstance().repaintViewports();
+			}
+		});
+		
+		/* create a ChangeListener to update the slider if the attribute changes */
+		final AttributeListener attributeListener = new AttributeListener() {
+			public void attributeChanged(Attribute a) {
+				slider.setValue(((Attribute.Integer) a).get());
+			}
+		};
+		
+		/* add a HierarchyListener to add/remove the changelistener if the component becomes showing */
+		slider.addHierarchyListener(new HierarchyListener() {
+			public void hierarchyChanged(HierarchyEvent e) {
+				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+					if (slider.isShowing())
+						attribute.addAttributeListener(attributeListener);
+					else
+						attribute.removeAttributeListener(attributeListener);
+				}
+			}
+		});
+
+		return slider;
+	}
+	
 	public static JSlider createSliderFor(final Attribute attribute) {
 		final JSlider slider;
 		if (attribute instanceof Attribute.BoundedInteger) {

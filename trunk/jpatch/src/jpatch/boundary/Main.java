@@ -257,6 +257,8 @@ public class Main {
 //			System.exit(0);
 			
 			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/cube2.off"));
+			new RibExport().export(activeSds, System.out);
+			System.exit(0);
   //			activeSds = new JptLoader().importModel(new FileInputStream("/mnt/share/jpatch0.4/models/moai2.jpt"));
 
 //			activeSds.makeSlates();
@@ -492,6 +494,12 @@ public class Main {
 				viewInspector.setObject(viewports[activeViewport]);
 			}
 			screen.repaint();
+		}
+	}
+	
+	public void repaintViewports() {
+		for (int i = 0; i < viewports.length; i++) {
+			viewports[i].getComponent().repaint();
 		}
 	}
 	

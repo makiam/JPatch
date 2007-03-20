@@ -2,5 +2,5 @@
 <attributeEditor class="TopLevelVertex">
 	<attribute name="Position" field="position" />
 	<attribute name="Ref.Pos" field="referencePosition" />
-	<attribute name="Corner" field="sharpness" />
+	<attribute name="Corner" field="sharpness" widget="slider" min="0" max="9"/>
 </attributeEditor>

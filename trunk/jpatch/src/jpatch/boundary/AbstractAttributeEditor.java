@@ -54,6 +54,9 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 				try {
 					switch (items[section][item].type) {
 					case ATTRIBUTE:
+						if (items[section][item].widget != null && items[section][item].widget.equals("slider")) {
+							addSlider(container, items[section][item].name, (Attribute.Integer) items[section][item].field.get(object), items[section][item].min, items[section][item].max);
+						}
 						addAttribute(items[section][item].name, items[section][item].field.get(object));
 						break;
 					case LIMIT:
@@ -92,6 +95,13 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		} else {
 			addScalar(container, name, (Attribute) attribute);
 		}
+	}
+	
+	protected void addSlider(Container c, String name, Attribute.Integer a, int min, int max) {
+		c.add(new JLabel(name));
+		Box box = Box.createHorizontalBox();
+		box.add(AttributeUiHelper.createSliderFor(a, min, max));
+		c.add(box);
 	}
 	
 	protected void addScalar(Container c, String name, Attribute a) {
@@ -322,11 +332,17 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		public final Type type;
 		public final String name;
 		public final Field field;
+		public final String widget;
+		public final int min;
+		public final int max;
 		
-		public Item(Type type, String name, Field field) {
+		public Item(Type type, String name, Field field, String widget, String min, String max) {
 			this.type = type;
 			this.name = name;
 			this.field = field;
+			this.widget = widget;
+			this.min = (min == null) ? 0 : Integer.parseInt(min);
+			this.max = (min == null) ? 0 : Integer.parseInt(max);
 		}
 		
 		public String toString() {

@@ -235,7 +235,6 @@ public abstract class Viewport extends AbstractNamedObject {
 	
 	protected abstract void drawGrid();
 	protected abstract void drawOrigin();
-	protected abstract void drawModel(Model model);
 	
 	protected abstract void drawPatch(Patch patch);
 	protected abstract void drawInfo();
