@@ -359,9 +359,8 @@ public class ViewportGl extends Viewport {
 				
 				setLighting(RealtimeLighting.createThreepointLight());
 				
-				gl.glCullFace(GL_NONE);
 				gl.glEnable(GL_POLYGON_OFFSET_FILL);
-				gl.glPolygonOffset(2.5f, 2.5f);
+				gl.glPolygonOffset(1.0f, 1.0f);
 				gl.glDisable(GL_DEPTH_TEST);
 				gl.glEnable(GL_NORMALIZE);
 				
@@ -774,140 +773,6 @@ public class ViewportGl extends Viewport {
 		// TODO Auto-generated method stub
 
 	}
-
-	
-	protected void drawSds(Sds sds) {
-//		Sds sds2 = sds.subdivide().subdivide();
-		
-		gl.glDisable(GL_LIGHTING);
-		for (Face face : sds.faceList) {
-			gl.glColor3f(1, 0, 0);
-			gl.glBegin(GL_LINE_STRIP);
-			for (HalfEdge edge : face.getEdges()) {
-				p.set(edge.getFirstVertex().getPosition());
-				matrix.transform(p);
-				v.set(edge.getFirstVertex().getNormal());
-				matrix.transform(v);
-				v.normalize();
-				gl.glNormal3d(v.x, v.y, v.z);
-				gl.glVertex3d(p.x, p.y, p.z);
-			}
-			gl.glEnd();
-		}
-		gl.glDisable(GL_LIGHTING);
-		
-//		gl.glEnable(GL_LINE_SMOOTH);
-//		gl.glEnable(GL_BLEND);
-		
-		gl.glColor3f(1, 1, 1);
-		gl.glBegin(GL_LINES);
-		for (Face face : sds.faceList) {
-			for (HalfEdge edge : face.getEdges()) {
-				if (edge.isPrimary()) {
-					p.set(edge.getFirstVertex().getPosition());
-					matrix.transform(p);
-					gl.glVertex3d(p.x, p.y, p.z);
-					p.set(edge.getSecondVertex().getPosition());
-					matrix.transform(p);
-					gl.glVertex3d(p.x, p.y, p.z);
-				}
-			}
-		}
-		
-//		gl.glColor3f(0.5f, 0.5f, 1.0f);
-//		for (Face face : sds2.faceList) {
-//			for (Edge edge : face.getEdges()) {
-//				p.set(edge.getVertex0().getPosition());
-//				matrix.transform(p);
-//				gl.glVertex3d(p.x, p.y, p.z);
-//				p.set(edge.getVertex1().getPosition());
-//				matrix.transform(p);
-//				gl.glVertex3d(p.x, p.y, p.z);
-//			}
-//		}
-		
-		gl.glEnd();
-		
-		
-//		gl.glDisable(GL_BLEND);
-//		gl.glDisable(GL_LINE_SMOOTH);
-	}
-	
-	@Override
-	protected void drawModel(Model model) {
-		
-		
-//		gl.glFogi(GL_FOG_MODE, GL_LINEAR);
-//		gl.glFogfv(GL_FOG_COLOR, new float[] { COLORS.background.x, COLORS.background.y, COLORS.background.z }, 0);
-//		gl.glFogf(GL_FOG_DENSITY, 1.0f);
-//		gl.glFogf(GL_FOG_START, 0f);
-//		gl.glFogf(GL_FOG_END, 200f);
-//		gl.glEnable(GL_FOG);
-		
-		/* draw curves */
-		if (showCurves.get()) {
-			if (RENDERER.antialiasing) {
-				gl.glEnable(GL_LINE_SMOOTH);
-				gl.glEnable(GL_BLEND);
-				gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			}
-			gl.glColor3f(COLORS.curves.x, COLORS.curves.y, COLORS.curves.z);
-			gl.glBegin(GL_LINES);
-			for (ControlPoint start : model.getCurves()) {
-				drawCurve(start);
-			}
-			gl.glEnd();
-			if (RENDERER.antialiasing) {
-				gl.glDisable(GL_LINE_SMOOTH);
-				gl.glDisable(GL_BLEND);
-			}
-		}
-		
-		
-		
-		/* draw points */
-		if (showPoints.get()) {
-			gl.glPointSize(3);
-			gl.glBegin(GL_POINTS);
-			for (ControlPoint start : model.getCurves()) {
-				ControlPoint cp = start;
-				do {
-					if (cp.isHead()) {
-						cp.getPos(p0);
-						matrix.transform(p0);
-						if (cp.isUnattached()) {
-							gl.glColor3f(COLORS.points.x, COLORS.points.y, COLORS.points.z);
-						} else {
-							gl.glColor3f(COLORS.headPoints.x, COLORS.headPoints.y, COLORS.headPoints.z);
-						}
-						gl.glVertex3d(p0.x, p0.y, p0.z);
-					}
-					cp = cp.getNextNonHook();
-				} while (cp != null && ! cp.isLoop());
-			}
-			gl.glEnd();
-		}
-	}
-
-	private void drawSds2(Sds sds) {
-		gl.glPointSize(8);
-		int i = 0;
-		long total = 0;
-		for (TopLevelVertex vertex : sds.topLevelVertices) {
-			if (vertex.isBoundary()) {
-				continue;
-			}
-			int valence = vertex.valence();
-			vertex.initFragment(valence, kernel.getVertexBuffer(0));
-			long t = System.currentTimeMillis();
-			kernel.subdivideFragment(valence, subdivLevel);
-			total += System.currentTimeMillis() - t;
-			drawFragment(kernel.getVertexBuffer(subdivLevel), valence, subdivLevel);
-			i++;
-			break;
-		}
-//		System.out.println(i + " fragments@level " + subdivLevel + " in " + total + "ms");
-	}
 	
 	private void drawSds3(Sds sds) {
 		useProgram = fragmentShader.get();
@@ -940,6 +805,8 @@ public class ViewportGl extends Viewport {
 //		Point3f p1 = new Point3f();
 //		gl.glInterleavedArrays(GL_N3F_V3F, 0, dicer.getBuffer());
 		gl.glEnable(GL_LIGHTING);
+		gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 0, 0.9f }, 0);
+		gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0, 0, 0.2f }, 0);
 		
 		if (canUseProgram) {
 			gl.glUseProgram(useProgram ? program : 0);
@@ -1157,10 +1024,8 @@ public class ViewportGl extends Viewport {
 //		if (gl.isFunctionAvailable("glUseProgram")) {
 //			gl.glUseProgram(useProgram ? program : 0);
 //		}
-//		gl.glEnable(GL_LIGHTING);
+
 		
-		gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 0, 0.9f }, 0);
-		gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0, 0, 0.2f }, 0);
 		
 		
 //		FloatBuffer buffer = dicer.getBuffer();
@@ -1173,7 +1038,7 @@ public class ViewportGl extends Viewport {
 		
 		final int start, end;
 		final int dim = (1 << (level - 1)) + 3;
-		if (true || level < 2) {
+		if (level < 2) {
 			start = 1;
 			end = dim - 2;
 		} else {
@@ -1211,21 +1076,21 @@ public class ViewportGl extends Viewport {
 //		}
 //		gl.glEnd();
 
-//		gl.glBegin(GL_TRIANGLES);
-//		for (int side = 0; side < 4; side++) {
-//			final Slate2 adjacentSlate = slate.getAdjacentSlate(side);
-//			int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivLevel();
-//			if (pairLevel < 0) {
-//				pairLevel = level;
-//			}
-//			final int[] triangleArray = dicer.getRimTriangles(level - 1, side, pairLevel - 1);
-//			final int[] triangleArrayNormals = dicer.getRimTriangleNormals(level - 1, side, pairLevel - 1);
-//			for (int i = 0; i < triangleArray.length; i++) {
-//				gl.glNormal3fv(normals[triangleArray[i]], triangleArrayNormals[i]);
-//				gl.glVertex3fv(vertices[triangleArray[i]], 0);
-//			}
-//		}
-//		gl.glEnd();
+		gl.glBegin(GL_TRIANGLES);
+		for (int side = 0; side < 4; side++) {
+			final Slate2 adjacentSlate = slate.getAdjacentSlate(side);
+			int pairLevel = adjacentSlate == null ? level : adjacentSlate.getSubdivLevel();
+			if (pairLevel < 0) {
+				pairLevel = level;
+			}
+			final int[] triangleArray = dicer.getRimTriangles(level - 1, side, pairLevel - 1);
+			final int[] triangleArrayNormals = dicer.getRimTriangleNormals(level - 1, side, pairLevel - 1);
+			for (int i = 0; i < triangleArray.length; i++) {
+				gl.glNormal3fv(normals[triangleArray[i]], triangleArrayNormals[i]);
+				gl.glVertex3fv(vertices[triangleArray[i]], 0);
+			}
+		}
+		gl.glEnd();
 		
 		
 		
@@ -1241,10 +1106,9 @@ public class ViewportGl extends Viewport {
 //			gl.glUseProgram(useProgram ? program : 0);
 //		}
 		
-		
 		if (showProjectedMesh.get()) {
-			gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0.5f, 0.5f, 0.5f }, 0);
-			gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0.2f, 0.2f, 0.2f }, 0);
+			gl.glDisable(GL_LIGHTING);
+			gl.glColor3f(0.5f, 0.5f, 0.5f);
 			for (int i = 0; i < 2; i++) {
 				int side = (i + 3) % 4;
 				if (true || slate.getCorners()[side][0].isToBeDrawn()) {
@@ -1260,17 +1124,19 @@ public class ViewportGl extends Viewport {
 	//				pairLevel = level;
 					final int[] lineArray = dicer.getRim(pairLevel - 1, side);
 					final float[][] lineVertices = dicer.getLimitVertices(pairLevel - 1);
-					final float[][] lineNormals = dicer.getLimitNormals(pairLevel - 1);
+//					final float[][] lineNormals = dicer.getLimitNormals(pairLevel - 1);
 					gl.glBegin(GL_LINE_STRIP);
 					for (int j = 0; j < lineArray.length; j++) {
-						if (lineNormals[lineArray[j] + Dicer.GRID_START][2] > 0) {
-							gl.glNormal3fv(lineNormals[lineArray[j] + Dicer.GRID_START], 0);
+//						if (lineNormals[lineArray[j] + Dicer.GRID_START][2] > 0) {
+							int offset = (j > 0 && j < lineArray.length - 1) ? side * 3 : 0;
+//							gl.glNormal3fv(lineNormals[lineArray[j] + Dicer.GRID_START], offset);
 							gl.glVertex3fv(lineVertices[lineArray[j] + Dicer.GRID_START], 0);
-						}
+//						}
 					}
 					gl.glEnd();
 				}
 			}
+			gl.glEnable(GL_LIGHTING);
 		}
 		
 //		gl.glDisable(GL_LIGHTING);
@@ -1337,58 +1203,6 @@ public class ViewportGl extends Viewport {
 //			}
 //		}
 //		gl.glEnd();
-	}
-	
-	private void drawFragment(float[][] v, int valence, int depth) {
-		int rings = (1 << depth) + 1;
-		int prevStart = 0;
-		int start = 1;
-		Point3f pt = new Point3f();
-		gl.glColor3f(0.5f, 0.5f, 1.0f);
-		gl.glBegin(GL_POINTS);
-//		System.out.println(rings + " rings");
-		for (int i = 0; i < FragmentTesselator.TABLE_SIZES[valence - 3][depth]; i++) {
-			switch (kernel.lookupTables[valence - 3][i][9]) {
-			case 1:
-				gl.glColor3f(1, 0, 0);
-				break;
-			case 2:
-				gl.glColor3f(0, 0.75f, 0);
-				break;
-			case 3:
-				gl.glColor3f(0.5f, 0.5f, 1.0f);
-				break;
-			}
-			pt.set(v[i]);
-			matrix.transform(pt);
-			gl.glVertex3f(pt.x, pt.y, pt.z);
-		}
-		gl.glEnd();
-//		for (int r = 1; r < rings; r++) {
-//			int spanSize = r * 2;
-//			int ringSize = spanSize * valence;
-//			int p = 0;
-//			for (int s = 0; s < valence; s++) {
-//				gl.glBegin(GL_LINE_STRIP);
-//				pt.set(v[start + (p - 1 + ringSize) % ringSize]);
-//				matrix.transform(pt);
-//				gl.glVertex3f(pt.x, pt.y, pt.z);
-//				pt.set(v[start + p]);
-//				matrix.transform(pt);
-//				gl.glVertex3f(pt.x, pt.y, pt.z);
-//				for (int i = 0; i < spanSize; i++) {
-//					pt.set(v[prevStart + p++]);
-//					matrix.transform(pt);
-//					gl.glVertex3f(pt.x, pt.y, pt.z);
-//					pt.set(v[start + p]);
-//					matrix.transform(pt);
-//					gl.glVertex3f(pt.x, pt.y, pt.z);
-//				}
-//				gl.glEnd();
-//			}
-//			prevStart = start;
-//			start += p;
-//		}
 	}
 	
 	@Override

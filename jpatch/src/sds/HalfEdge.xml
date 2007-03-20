@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <attributeEditor class="HalfEdge">
-	<attribute name="Crease" field="sharpness" />
+	<attribute name="Crease" field="sharpness" widget="slider" min="0" max="9"/>
 </attributeEditor>

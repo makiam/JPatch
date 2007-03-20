@@ -70,11 +70,18 @@ public class AttributeEditorFactory {
 				if (localName.equals("section")) {
 					section = new ArrayList<Item>();
 				} else if (localName.equals("attribute")) {
-					Item item = new Item(Type.ATTRIBUTE, attributes.getValue("name"), objectClass.getField(attributes.getValue("field")));
+					Item item = new Item(
+							Type.ATTRIBUTE,
+							attributes.getValue("name"),
+							objectClass.getField(attributes.getValue("field")),
+							attributes.getValue("widget"),
+							attributes.getValue("min"),
+							attributes.getValue("max")
+					);
 					addItem(item);
 					System.out.println(item);
 				} else if (localName.equals("limits")) {
-					Item item = new Item(Type.LIMIT, null, objectClass.getField(attributes.getValue("field")));
+					Item item = new Item(Type.LIMIT, null, objectClass.getField(attributes.getValue("field")), null, null, null);
 					addItem(item);
 					System.out.println(item);
 				}
