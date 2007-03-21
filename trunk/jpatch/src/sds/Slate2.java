@@ -136,7 +136,7 @@ public class Slate2 {
 		int dx = xmax - xmin;
 		int dy = ymax - ymin;
 		int s = dx + dy;
-		s >>= 5;
+		s >>= 4;
 		if ((s & 0xffffff00) > 0) {
 			subdivLevel = 6;
 		} else if ((s & 0xc0) > 0) {

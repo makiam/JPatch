@@ -257,8 +257,8 @@ public class Main {
 //			System.exit(0);
 			
 			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/cube2.off"));
-			new RibExport().export(activeSds, System.out);
-			System.exit(0);
+//			new RibExport().export(activeSds, System.out);
+//			System.exit(0);
   //			activeSds = new JptLoader().importModel(new FileInputStream("/mnt/share/jpatch0.4/models/moai2.jpt"));
 
 //			activeSds.makeSlates();

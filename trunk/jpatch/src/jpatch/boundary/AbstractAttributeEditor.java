@@ -55,7 +55,7 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 					switch (items[section][item].type) {
 					case ATTRIBUTE:
 						if (items[section][item].widget != null && items[section][item].widget.equals("slider")) {
-							addSlider(container, items[section][item].name, (Attribute.Integer) items[section][item].field.get(object), items[section][item].min, items[section][item].max);
+							addSlider(container, items[section][item].name, (Attribute.Double) items[section][item].field.get(object), items[section][item].min, items[section][item].max);
 						}
 						addAttribute(items[section][item].name, items[section][item].field.get(object));
 						break;
@@ -97,7 +97,7 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		}
 	}
 	
-	protected void addSlider(Container c, String name, Attribute.Integer a, int min, int max) {
+	protected void addSlider(Container c, String name, Attribute.Double a, double min, double max) {
 		c.add(new JLabel(name));
 		Box box = Box.createHorizontalBox();
 		box.add(AttributeUiHelper.createSliderFor(a, min, max));

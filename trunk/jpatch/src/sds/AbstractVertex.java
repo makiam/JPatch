@@ -6,7 +6,7 @@ import jpatch.entity.*;
 public abstract class AbstractVertex {
 	public final Attribute.Tuple3 referencePosition = new Attribute.Tuple3(null, 0, 0, 0, false);
 	public final Attribute.Tuple3 position = new Attribute.Tuple3(null, 0, 0, 0, false);
-	public final Attribute.Integer sharpness = new Attribute.Integer(0);
+	public final Attribute.Double sharpness = new Attribute.Double(0);
 	
 	private final Matrix4d transform = new Matrix4d(Constants.IDENTITY_MATRIX);
 	private final Matrix4d invTransform = new Matrix4d(Constants.IDENTITY_MATRIX);
@@ -38,7 +38,7 @@ public abstract class AbstractVertex {
 		});
 	}
 	
-	public int getSharpness() {
+	public double getSharpness() {
 		return sharpness.get();
 	}
 	

@@ -86,7 +86,8 @@ public class TopLevelVertex extends BaseVertex {
 								p0.y * CREASE0 + (p1.y + p2.y) * CREASE1,
 								p0.z * CREASE0 + (p1.z + p2.z) * CREASE1
 						);
-					} else {
+					}
+					if (TopLevelVertex.this.corner < 1 && TopLevelVertex.this.crease < 1) {
 						final double k = 1.0 / (valence * valence);
 						double w = (valence - 2.0) / valence;
 						double x = 0, y = 0, z = 0;
@@ -100,7 +101,16 @@ public class TopLevelVertex extends BaseVertex {
 							y += p.y;
 							z += p.z;
 						}
-						position.set(x * k + TopLevelVertex.this.pos.x * w, y * k + TopLevelVertex.this.pos.y * w, z * k + TopLevelVertex.this.pos.z * w);
+						double smoothX = x * k + TopLevelVertex.this.pos.x * w;
+						double smoothY = y * k + TopLevelVertex.this.pos.y * w;
+						double smoothZ = z * k + TopLevelVertex.this.pos.z * w;
+						double t = (TopLevelVertex.this.corner > 0) ? TopLevelVertex.this.corner : TopLevelVertex.this.crease;
+						double t1 = 1 - t;
+						position.set(
+								smoothX * t1 + position.x.get() * t,
+								smoothY * t1 + position.y.get() * t,
+								smoothZ * t1 + position.z.get() * t
+						);
 					}
 				}
 				if (!overrideSharpness.get()) {
