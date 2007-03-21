@@ -227,7 +227,9 @@ public class Dicer {
 					if (valence == 3) {
 						array[0] = new int[] {
 								EDGE,
-								0,
+								0,											// sharpness of previous crease edge
+								0,											// sharpness of this crease edge
+								0,											// sharpness of next crease edge
 								cornerIndex2(corner, level, valence, 0),
 								patchCornerIndex(corner, level, 1, 1),
 								cornerIndex2(corner, level, valence, 2),
@@ -245,7 +247,9 @@ public class Dicer {
 							if ((i & 1) == 0) {			// even -> edge
 								array[index] = new int[] {
 										EDGE,
-										0,
+										0,											// sharpness of previous crease edge
+										0,											// sharpness of this crease edge
+										0,											// sharpness of next crease edge
 										cornerIndex2(corner, level, valence, i),
 										patchCornerIndex(corner, level, 1, 1),
 										cornerIndex2(corner, level, valence, i + 1),
@@ -321,8 +325,10 @@ public class Dicer {
 							int r = (row + 1) / 2;
 							patchStencil[level][index] = new int[] {
 									EDGE_H,
-									0,												// sharpness
-									nextLevelIndex_0,									// next level stencil index
+									0,												// sharpness of previous crease edge
+									0,												// sharpness of this crease edge
+									0,												// sharpness of next crease edge
+									nextLevelIndex_0,								// next level stencil index
 									nextLevelIndex_1,
 									nextLevelIndex_2,
 									nextLevelIndex_3,
@@ -341,8 +347,10 @@ public class Dicer {
 							int r = row / 2;
 							patchStencil[level][index] = new int[] {
 									EDGE_V,
-									0,												// sharpness
-									nextLevelIndex_0,									// next level stencil index
+									0,												// sharpness of previous crease edge
+									0,												// sharpness of this crease edge
+									0,												// sharpness of next crease edge
+									nextLevelIndex_0,								// next level stencil index
 									nextLevelIndex_1,
 									nextLevelIndex_2,
 									nextLevelIndex_3,
@@ -401,10 +409,6 @@ public class Dicer {
 							patchIndex(level + 1, row - 1, column + 1),
 							patchIndex(level + 1, row + 1, column + 1),
 							patchIndex(level + 1, row + 1, column - 1),
-//							quadNormalArrays[level].length - 3,				// upper left corner in output quad array
-//							quadNormalArrays[level].length - 3,				// upper right corner in output quad array
-//							quadNormalArrays[level].length - 3,				// lower right corner in output quad array
-//							quadNormalArrays[level].length - 3				// lower left corner in output quad array
 					};
 				}
 			}
@@ -918,52 +922,52 @@ public class Dicer {
 							case EDGE_H:
 							if (s[1] > 0) {
 								// crease
-								out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * 0.5f;
-								out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * 0.5f;
-								out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * 0.5f;
-								nextLevel[s[2]][1] = s[1] - 1;
-								nextLevel[s[3]][1] = 0;
+								out[outIndex][0] = (in[s[9]][0] + in[s[10]][0]) * 0.5f;
+								out[outIndex][1] = (in[s[9]][1] + in[s[10]][1]) * 0.5f;
+								out[outIndex][2] = (in[s[9]][2] + in[s[10]][2]) * 0.5f;
 								nextLevel[s[4]][1] = s[1] - 1;
 								nextLevel[s[5]][1] = 0;
 								nextLevel[s[6]][1] = s[1] - 1;
-								nextLevel[s[2]][0] = CREASE_5_7;
+								nextLevel[s[7]][1] = 0;
+								nextLevel[s[8]][1] = s[1] - 1;
+								nextLevel[s[4]][0] = CREASE_5_7;
 							} else {
 								// smooth
-								out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * EDGE0 + ((in[s[9]][0] + in[s[10]][0]) + (in[s[11]][0] + in[s[12]][0])) * EDGE1;
-								out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * EDGE0 + ((in[s[9]][1] + in[s[10]][1]) + (in[s[11]][1] + in[s[12]][1])) * EDGE1;
-								out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * EDGE0 + ((in[s[9]][2] + in[s[10]][2]) + (in[s[11]][2] + in[s[12]][2])) * EDGE1;
-								nextLevel[s[2]][1] = 0;
-								nextLevel[s[3]][1] = 0;
+								out[outIndex][0] = (in[s[9]][0] + in[s[10]][0]) * EDGE0 + ((in[s[11]][0] + in[s[12]][0]) + (in[s[13]][0] + in[s[14]][0])) * EDGE1;
+								out[outIndex][1] = (in[s[9]][1] + in[s[10]][1]) * EDGE0 + ((in[s[11]][1] + in[s[12]][1]) + (in[s[13]][1] + in[s[14]][1])) * EDGE1;
+								out[outIndex][2] = (in[s[9]][2] + in[s[10]][2]) * EDGE0 + ((in[s[11]][2] + in[s[12]][2]) + (in[s[13]][2] + in[s[14]][2])) * EDGE1;
 								nextLevel[s[4]][1] = 0;
 								nextLevel[s[5]][1] = 0;
 								nextLevel[s[6]][1] = 0;
-								nextLevel[s[2]][0] = POINT;
+								nextLevel[s[7]][1] = 0;
+								nextLevel[s[8]][1] = 0;
+								nextLevel[s[4]][0] = POINT;
 	//							if (s[2] == 0) throw new IllegalStateException();
 							}
 							break;
 						case EDGE_V:
 							if (s[1] > 0) {
 								// crease
-								out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * 0.5f;
-								out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * 0.5f;
-								out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * 0.5f;
-								nextLevel[s[2]][1] = s[1] - 1;
-								nextLevel[s[3]][1] = s[1] - 1;
-								nextLevel[s[4]][1] = 0;
+								out[outIndex][0] = (in[s[9]][0] + in[s[10]][0]) * 0.5f;
+								out[outIndex][1] = (in[s[9]][1] + in[s[10]][1]) * 0.5f;
+								out[outIndex][2] = (in[s[9]][2] + in[s[10]][2]) * 0.5f;
+								nextLevel[s[4]][1] = s[1] - 1;
 								nextLevel[s[5]][1] = s[1] - 1;
 								nextLevel[s[6]][1] = 0;
-								nextLevel[s[2]][0] = CREASE_4_6;
+								nextLevel[s[7]][1] = s[1] - 1;
+								nextLevel[s[8]][1] = 0;
+								nextLevel[s[4]][0] = CREASE_4_6;
 							} else {
 								// smooth
-								out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * EDGE0 + ((in[s[9]][0] + in[s[10]][0]) + (in[s[11]][0] + in[s[12]][0])) * EDGE1;
-								out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * EDGE0 + ((in[s[9]][1] + in[s[10]][1]) + (in[s[11]][1] + in[s[12]][1])) * EDGE1;
-								out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * EDGE0 + ((in[s[9]][2] + in[s[10]][2]) + (in[s[11]][2] + in[s[12]][2])) * EDGE1;
-								nextLevel[s[2]][1] = 0;
-								nextLevel[s[3]][1] = 0;
+								out[outIndex][0] = (in[s[9]][0] + in[s[10]][0]) * EDGE0 + ((in[s[11]][0] + in[s[12]][0]) + (in[s[13]][0] + in[s[14]][0])) * EDGE1;
+								out[outIndex][1] = (in[s[9]][1] + in[s[10]][1]) * EDGE0 + ((in[s[11]][1] + in[s[12]][1]) + (in[s[13]][1] + in[s[14]][1])) * EDGE1;
+								out[outIndex][2] = (in[s[9]][2] + in[s[10]][2]) * EDGE0 + ((in[s[11]][2] + in[s[12]][2]) + (in[s[13]][2] + in[s[14]][2])) * EDGE1;
 								nextLevel[s[4]][1] = 0;
 								nextLevel[s[5]][1] = 0;
 								nextLevel[s[6]][1] = 0;
-								nextLevel[s[2]][0] = POINT;
+								nextLevel[s[7]][1] = 0;
+								nextLevel[s[8]][1] = 0;
+								nextLevel[s[4]][0] = POINT;
 	//							if (s[2] == 0) throw new IllegalStateException();
 							}
 							break;
@@ -1041,27 +1045,27 @@ public class Dicer {
 						case EDGE_H:
 							if (s[1] > 0) {
 								// crease
-								out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * 0.5f;
-								out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * 0.5f;
-								out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * 0.5f;
+								out[outIndex][0] = (in[s[9]][0] + in[s[10]][0]) * 0.5f;
+								out[outIndex][1] = (in[s[9]][1] + in[s[10]][1]) * 0.5f;
+								out[outIndex][2] = (in[s[9]][2] + in[s[10]][2]) * 0.5f;
 							} else {
 								// smooth
-								out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * EDGE0 + ((in[s[9]][0] + in[s[10]][0]) + (in[s[11]][0] + in[s[12]][0])) * EDGE1;
-								out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * EDGE0 + ((in[s[9]][1] + in[s[10]][1]) + (in[s[11]][1] + in[s[12]][1])) * EDGE1;
-								out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * EDGE0 + ((in[s[9]][2] + in[s[10]][2]) + (in[s[11]][2] + in[s[12]][2])) * EDGE1;
+								out[outIndex][0] = (in[s[9]][0] + in[s[10]][0]) * EDGE0 + ((in[s[11]][0] + in[s[12]][0]) + (in[s[13]][0] + in[s[14]][0])) * EDGE1;
+								out[outIndex][1] = (in[s[9]][1] + in[s[10]][1]) * EDGE0 + ((in[s[11]][1] + in[s[12]][1]) + (in[s[13]][1] + in[s[14]][1])) * EDGE1;
+								out[outIndex][2] = (in[s[9]][2] + in[s[10]][2]) * EDGE0 + ((in[s[11]][2] + in[s[12]][2]) + (in[s[13]][2] + in[s[14]][2])) * EDGE1;
 							}
 							break;
 						case EDGE_V:
 							if (s[1] > 0) {
 								// crease
-								out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * 0.5f;
-								out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * 0.5f;
-								out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * 0.5f;
+								out[outIndex][0] = (in[s[9]][0] + in[s[10]][0]) * 0.5f;
+								out[outIndex][1] = (in[s[9]][1] + in[s[10]][1]) * 0.5f;
+								out[outIndex][2] = (in[s[9]][2] + in[s[10]][2]) * 0.5f;
 							} else {
 								// smooth
-								out[outIndex][0] = (in[s[7]][0] + in[s[8]][0]) * EDGE0 + ((in[s[9]][0] + in[s[10]][0]) + (in[s[11]][0] + in[s[12]][0])) * EDGE1;
-								out[outIndex][1] = (in[s[7]][1] + in[s[8]][1]) * EDGE0 + ((in[s[9]][1] + in[s[10]][1]) + (in[s[11]][1] + in[s[12]][1])) * EDGE1;
-								out[outIndex][2] = (in[s[7]][2] + in[s[8]][2]) * EDGE0 + ((in[s[9]][2] + in[s[10]][2]) + (in[s[11]][2] + in[s[12]][2])) * EDGE1;
+								out[outIndex][0] = (in[s[9]][0] + in[s[10]][0]) * EDGE0 + ((in[s[11]][0] + in[s[12]][0]) + (in[s[13]][0] + in[s[14]][0])) * EDGE1;
+								out[outIndex][1] = (in[s[9]][1] + in[s[10]][1]) * EDGE0 + ((in[s[11]][1] + in[s[12]][1]) + (in[s[13]][1] + in[s[14]][1])) * EDGE1;
+								out[outIndex][2] = (in[s[9]][2] + in[s[10]][2]) * EDGE0 + ((in[s[11]][2] + in[s[12]][2]) + (in[s[13]][2] + in[s[14]][2])) * EDGE1;
 							}
 							break;
 						case POINT:
@@ -1125,7 +1129,6 @@ public class Dicer {
 					final int outIndex = cs[4];
 					float x = 0, y = 0, z = 0;
 					if (cs[0] > 0) {
-						System.out.println("corner");
 						//corner//
 						x = in[cs[5]][0];
 						y = in[cs[5]][1];
@@ -1197,16 +1200,16 @@ public class Dicer {
 						case EDGE:
 							if (s[1] > 0) {
 								// crease
-								out[oi][0] = (in[s[2]][0] + in[s[3]][0]) * 0.5f;
-								out[oi][1] = (in[s[2]][1] + in[s[3]][1]) * 0.5f;
-								out[oi][2] = (in[s[2]][2] + in[s[3]][2]) * 0.5f;
+								out[oi][0] = (in[s[4]][0] + in[s[5]][0]) * 0.5f;
+								out[oi][1] = (in[s[4]][1] + in[s[5]][1]) * 0.5f;
+								out[oi][2] = (in[s[4]][2] + in[s[5]][2]) * 0.5f;
 								if (rewriteStencils) {
 									nextArray[i][1] = s[1] - 1;
 								}
 							} else {
-								out[oi][0] = (in[s[2]][0] + in[s[3]][0]) * EDGE0 + ((in[s[4]][0] + in[s[5]][0]) + (in[s[6]][0] + in[s[7]][0])) * EDGE1;
-								out[oi][1] = (in[s[2]][1] + in[s[3]][1]) * EDGE0 + ((in[s[4]][1] + in[s[5]][1]) + (in[s[6]][1] + in[s[7]][1])) * EDGE1;
-								out[oi][2] = (in[s[2]][2] + in[s[3]][2]) * EDGE0 + ((in[s[4]][2] + in[s[5]][2]) + (in[s[6]][2] + in[s[7]][2])) * EDGE1;
+								out[oi][0] = (in[s[4]][0] + in[s[5]][0]) * EDGE0 + ((in[s[6]][0] + in[s[7]][0]) + (in[s[8]][0] + in[s[9]][0])) * EDGE1;
+								out[oi][1] = (in[s[4]][1] + in[s[5]][1]) * EDGE0 + ((in[s[6]][1] + in[s[7]][1]) + (in[s[8]][1] + in[s[9]][1])) * EDGE1;
+								out[oi][2] = (in[s[4]][2] + in[s[5]][2]) * EDGE0 + ((in[s[6]][2] + in[s[7]][2]) + (in[s[8]][2] + in[s[9]][2])) * EDGE1;
 								if (rewriteStencils) {
 									nextArray[i][1] = 0;
 								}
