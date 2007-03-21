@@ -745,7 +745,7 @@ public class Dicer {
 //			}
 //		} else {
 			final Point3f[][] boundary = slate.fans;
-			
+			final SlateEdge[][] edges = slate.corners;
 			/*
 			 * initialize top-level geometry array
 			 */
@@ -803,8 +803,8 @@ public class Dicer {
 			patchStencil[1][21][1] = slate.corners[3][2] == null ? 0 : slate.corners[3][2].getSharpness();
 			patchStencil[1][15][1] = slate.corners[3][3] == null ? 0 : slate.corners[3][3].getSharpness();
 					
-			patchStencil[1][8][1] = slate.corners[1][0].vertex.crease;
-			patchStencil[0][6][1] = slate.corners[1][0].vertex.crease;
+			patchStencil[1][8][1] = (int) (slate.corners[1][0].vertex.crease * 0x10000);
+			patchStencil[0][6][1] = (int) (slate.corners[1][0].vertex.crease * 0x10000);
 			if (slate.corners[1][0].vertex.crease > 0) {
 				patchStencil[1][8][0] = CREASE_5_7;
 				patchStencil[0][6][0] = CREASE_5_7;
@@ -813,8 +813,8 @@ public class Dicer {
 				patchStencil[0][6][0] = POINT;
 			}
 			
-			patchStencil[1][16][1] = slate.corners[3][0].vertex.crease;
-			patchStencil[0][9][1] = slate.corners[3][0].vertex.crease;
+			patchStencil[1][16][1] = (int) (slate.corners[3][0].vertex.crease * 0x10000);
+			patchStencil[0][9][1] = (int) (slate.corners[3][0].vertex.crease * 0x10000);
 			if (slate.corners[3][0].vertex.crease > 0) {
 				patchStencil[1][16][0] = CREASE_4_6;
 				patchStencil[0][9][0] = CREASE_4_6;
@@ -837,10 +837,10 @@ public class Dicer {
 				
 	//			cornerStencil[1][valence - 3][corner][0] = Integer.MAX_VALUE;
 				
-				cornerStencil[0][valence - 3][corner][0] = slate.corners[corner * 2][0].vertex.corner;
-				cornerStencil[0][valence - 3][corner][1] = slate.corners[corner * 2][0].vertex.crease;
-				cornerStencil[1][valence - 3][corner][0] = slate.corners[corner * 2][0].vertex.corner;
-				cornerStencil[1][valence - 3][corner][1] = slate.corners[corner * 2][0].vertex.crease;
+				cornerStencil[0][valence - 3][corner][0] = (int) (slate.corners[corner * 2][0].vertex.corner * 0x10000);
+				cornerStencil[0][valence - 3][corner][1] = (int) (slate.corners[corner * 2][0].vertex.crease * 0x10000);
+				cornerStencil[1][valence - 3][corner][0] = (int) (slate.corners[corner * 2][0].vertex.corner * 0x10000);
+				cornerStencil[1][valence - 3][corner][1] = (int) (slate.corners[corner * 2][0].vertex.crease * 0x10000);
 				if (slate.corners[corner * 2][0].vertex.crease > 1) {
 					int ci0 = slate.getEdgeIndex(corner * 2, slate.corners[corner * 2][0].vertex.creaseEdge0.slateEdge0);
 					int ci1 = slate.getEdgeIndex(corner * 2, slate.corners[corner * 2][0].vertex.creaseEdge1.slateEdge0);
@@ -1120,32 +1120,39 @@ public class Dicer {
 				 * apply stencils on corners and fans
 				 */
 				for (int corner = 0; corner < 2; corner++) {
-					
 					final int valence = Math.max(3, boundary[corner * 2].length / 2);
 					final int[] cs = cornerStencil[level][valence - 3][corner];
 					final int outIndex = cs[4];
+					float x = 0, y = 0, z = 0;
 					if (cs[0] > 0) {
+						System.out.println("corner");
 						//corner//
-						out[outIndex][0] = in[cs[5]][0];
-						out[outIndex][1] = in[cs[5]][1];
-						out[outIndex][2] = in[cs[5]][2];
+						x = in[cs[5]][0];
+						y = in[cs[5]][1];
+						z = in[cs[5]][2];
 						if (rewriteStencils) {
-							cornerStencil[level + 1][valence - 3][corner][0] = cornerStencil[level][valence - 3][corner][0] - 1;
-							cornerStencil[level + 1][valence - 3][corner][1] = cornerStencil[level][valence - 3][corner][1] - 1;
+							cornerStencil[level + 1][valence - 3][corner][0] = cornerStencil[level][valence - 3][corner][0] - 0x10000;
+							cornerStencil[level + 1][valence - 3][corner][1] = cornerStencil[level][valence - 3][corner][1] - 0x10000;
 							cornerStencil[level + 1][valence - 3][corner][2] = cornerStencil[level][valence - 3][corner][2];
 							cornerStencil[level + 1][valence - 3][corner][3] = cornerStencil[level][valence - 3][corner][3];
 						}
 					} else if (cs[1] > 0) {
 						//crease//
-						out[outIndex][0] = in[cs[5]][0] * CREASE0 + (in[cs[cs[2]]][0] + in[cs[cs[3]]][0]) * CREASE1;
-						out[outIndex][1] = in[cs[5]][1] * CREASE0 + (in[cs[cs[2]]][1] + in[cs[cs[3]]][1]) * CREASE1;
-						out[outIndex][2] = in[cs[5]][2] * CREASE0 + (in[cs[cs[2]]][2] + in[cs[cs[3]]][2]) * CREASE1;
+						x = in[cs[5]][0] * CREASE0 + (in[cs[cs[2]]][0] + in[cs[cs[3]]][0]) * CREASE1;
+						y = in[cs[5]][1] * CREASE0 + (in[cs[cs[2]]][1] + in[cs[cs[3]]][1]) * CREASE1;
+						z = in[cs[5]][2] * CREASE0 + (in[cs[cs[2]]][2] + in[cs[cs[3]]][2]) * CREASE1;
 						if (rewriteStencils) {
-							cornerStencil[level + 1][valence - 3][corner][0] = cornerStencil[level][valence - 3][corner][0] - 1;
-							cornerStencil[level + 1][valence - 3][corner][1] = cornerStencil[level][valence - 3][corner][1] - 1;
+							cornerStencil[level + 1][valence - 3][corner][0] = cornerStencil[level][valence - 3][corner][0] - 0x10000;
+							cornerStencil[level + 1][valence - 3][corner][1] = cornerStencil[level][valence - 3][corner][1] - 0x10000;
 							cornerStencil[level + 1][valence - 3][corner][2] = cornerStencil[level][valence - 3][corner][2];
 							cornerStencil[level + 1][valence - 3][corner][3] = cornerStencil[level][valence - 3][corner][3];
 						}
+					}
+					if (cs[0] > 0x10000 || cs[1] > 0x10000) {
+						// use only corner or crease rules
+						out[outIndex][0] = x;
+						out[outIndex][1] = y;
+						out[outIndex][2] = z;
 					} else {
 						//smooth//
 						float f0 = 0, f1 = 0, f2 = 0;
@@ -1158,12 +1165,25 @@ public class Dicer {
 							e1 += in[cs[p]][1];
 							e2 += in[cs[p]][2];
 						}
-						out[outIndex][0] = f0 * VERTEX_FACE[valence] + e0 * VERTEX_EDGE[valence] + in[cs[5]][0] * VERTEX_POINT[valence];
-						out[outIndex][1] = f1 * VERTEX_FACE[valence] + e1 * VERTEX_EDGE[valence] + in[cs[5]][1] * VERTEX_POINT[valence];
-						out[outIndex][2] = f2 * VERTEX_FACE[valence] + e2 * VERTEX_EDGE[valence] + in[cs[5]][2] * VERTEX_POINT[valence];
+						float smoothX = f0 * VERTEX_FACE[valence] + e0 * VERTEX_EDGE[valence] + in[cs[5]][0] * VERTEX_POINT[valence];
+						float smoothY = f1 * VERTEX_FACE[valence] + e1 * VERTEX_EDGE[valence] + in[cs[5]][1] * VERTEX_POINT[valence];
+						float smoothZ = f2 * VERTEX_FACE[valence] + e2 * VERTEX_EDGE[valence] + in[cs[5]][2] * VERTEX_POINT[valence];
 						if (rewriteStencils) {
 							cornerStencil[level + 1][valence - 3][corner][0] = 0;
 							cornerStencil[level + 1][valence - 3][corner][1] = 0;
+						}
+						if (cs[0] <= 0 && cs[1] <= 0) {
+							// use only smooth rule
+							out[outIndex][0] = smoothX;
+							out[outIndex][1] = smoothY;
+							out[outIndex][2] = smoothZ;
+						} else {
+							//interpolate between smooth and corner/crease rule
+							float t = (cs[0] > 0) ? ((float) cs[0]) / 0x10000 : ((float) cs[1]) / 0x10000;
+							float t1 = 1 - t;
+							out[outIndex][0] = smoothX * t1 + x * t;
+							out[outIndex][1] = smoothY * t1 + y * t;
+							out[outIndex][2] = smoothZ * t1 + z * t;
 						}
 					}
 	

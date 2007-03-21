@@ -47,17 +47,21 @@ public class AttributeUiHelper {
 //		return label;
 //	}
 	
-	public static JSlider createSliderFor(final Attribute.Integer attribute, final int min, final int max) {
+	public static JSlider createSliderFor(final Attribute.Double attribute, final double min, final double max) {
 		final JSlider slider;
-		slider = new JSlider(min, max, attribute.get());
-		slider.setMinorTickSpacing(1);
-		slider.setSnapToTicks(true);
+		slider = new JSlider(0, 0x10000);
+		final int intMax = 0x10000 * 0x10000;
+		
+		slider.setValue((int) (Math.sqrt((attribute.get() - min) / (max - min)) * 0x10000));
+//		slider.setMinorTickSpacing(1);
+//		slider.setSnapToTicks(true);
 		slider.setToolTipText(attribute.getName());
 		
 		/* create a ChangeListener to update the attribute if the slider was changed */
 		slider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				attribute.set(slider.getValue());
+				double t = ((double) slider.getValue()) / 0x10000;
+				attribute.set(t * t * (max - min) + min);
 				Main.getInstance().getActiveSds().rethinkSlates();
 				Main.getInstance().repaintViewports();
 			}
@@ -66,7 +70,7 @@ public class AttributeUiHelper {
 		/* create a ChangeListener to update the slider if the attribute changes */
 		final AttributeListener attributeListener = new AttributeListener() {
 			public void attributeChanged(Attribute a) {
-				slider.setValue(((Attribute.Integer) a).get());
+				slider.setValue((int) (Math.sqrt((attribute.get() - min) / (max - min)) * 0x10000));
 			}
 		};
 		
