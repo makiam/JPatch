@@ -141,14 +141,21 @@ public class JptLoader {
 			for (Cp cp : cpList) {
 				cp.computeG1Tangents();
 			}
+			
+			Point3d p0 = new Point3d();
+			Point3d p1 = new Point3d();
+			Point3d p2 = new Point3d();
 			for (Cp cp : cpList) {
 				if (cp.hookPos != -1) {
 					Cp start, end;
 					for (start = cp; start.prev != null; start = start.prev);
 					for (end = cp; end.next != null; end = end.next);
+					start.getVertex().getPos(p0);
 					Point3d outTangent = cpList.get(start.attach).outTangent;
 					Point3d inTangent = cpList.get(end.attach).inTangent;
-					evaluateBezier(start.getVertex().pos, outTangent, inTangent, end.getVertex().pos, cp.hookPos, cp.getVertex().pos);
+					end.getVertex().getPos(p1);
+					evaluateBezier(p0, outTangent, inTangent, p1, cp.hookPos, p2);
+					cp.getVertex().position.setTuple(p2);
 //					cp.vertex.pos.interpolate(start.getVertex().pos, end.getVertex().pos, cp.hookPos);
 				}
 			}
@@ -184,12 +191,12 @@ public class JptLoader {
 			DenseVector zControl = new DenseVector(size);
 			for (int i = 0; i < sds.vertexList.size(); i++) {
 				TopLevelVertex v = sds.vertexList.get(i);
-				xLimit.set(i, v.pos.x);
-				yLimit.set(i, v.pos.y);
-				zLimit.set(i, v.pos.z);
-				xControl.set(i, v.pos.x);
-				yControl.set(i, v.pos.y);
-				zControl.set(i, v.pos.z);
+				xLimit.set(i, v.position.getX());
+				yLimit.set(i, v.position.getY());
+				zLimit.set(i, v.position.getZ());
+				xControl.set(i, v.position.getX());
+				yControl.set(i, v.position.getY());
+				zControl.set(i, v.position.getZ());
 				LinearCombination<TopLevelVertex> lc = v.getLimitLc();
 				for (int j = 0; j < lc.size(); j++) {
 					int index = vertexIndexMap.get(lc.getEntities().get(j));
@@ -226,9 +233,9 @@ public class JptLoader {
 					LinearCombination<TopLevelVertex> lc = sds.vertexList.get(i).getLimitLc();
 					double x = 0, y = 0, z = 0;
 					for (int j = 0; j < lc.size(); j++) {
-						x += lc.getEntities().get(j).pos.x * lc.getWeights()[j];
-						y += lc.getEntities().get(j).pos.y * lc.getWeights()[j];
-						z += lc.getEntities().get(j).pos.z * lc.getWeights()[j];
+						x += lc.getEntities().get(j).position.getX() * lc.getWeights()[j];
+						y += lc.getEntities().get(j).position.getY() * lc.getWeights()[j];
+						z += lc.getEntities().get(j).position.getZ() * lc.getWeights()[j];
 					}
 					
 					System.out.println("(" + x + ", " + y + ", " + z + ")");
@@ -318,9 +325,12 @@ public class JptLoader {
 			double s;
 			Vector3d v3 = new Vector3d();
 			if (prev != null && next != null) {
-				Point3d A = new Point3d(prev.getVertex().pos);
-				Point3d B = new Point3d(next.getVertex().pos);
-				Point3d C = new Point3d(getVertex().pos);
+				Point3d A = new Point3d();
+				Point3d B = new Point3d();
+				Point3d C = new Point3d();
+				prev.getVertex().position.getTuple(A);
+				next.getVertex().position.getTuple(B);
+				getVertex().position.getTuple(C);
 				
 				double ca = C.distance(A);
 				double cb = C.distance(B);
@@ -363,9 +373,12 @@ public class JptLoader {
 				
 			} else if (prev == null) {
 				if (next != null && next.next != null) {
-					Point3d A = new Point3d(getVertex().pos);
-					Point3d B = new Point3d(next.next.getVertex().pos);
-					Point3d C = new Point3d(next.getVertex().pos);
+					Point3d A = new Point3d();
+					Point3d B = new Point3d();
+					Point3d C = new Point3d();
+					getVertex().position.getTuple(A);
+					next.next.getVertex().position.getTuple(B);
+					next.getVertex().position.getTuple(C);
 					
 					double ca = C.distance(A);
 					double cb = C.distance(B);
@@ -385,13 +398,20 @@ public class JptLoader {
 					double t = a / (a + b);
 					outTangent.interpolate(A,BC,t * magnitude);
 				} else {
-					outTangent.interpolate(getVertex().pos, next.getVertex().pos, magnitude / 3.0);
+					Point3d A = new Point3d();
+					getVertex().position.getTuple(A);
+					Point3d B = new Point3d();
+					next.getVertex().position.getTuple(B);
+					outTangent.interpolate(A, B, magnitude / 3.0);
 				}
 			} else {	//cpNext == null
 				if (prev != null && prev.prev != null) {
-					Point3d A = new Point3d(getVertex().pos);
-					Point3d B = new Point3d(prev.prev.getVertex().pos);
-					Point3d C = new Point3d(prev.getVertex().pos);
+					Point3d A = new Point3d();
+					Point3d B = new Point3d();
+					Point3d C = new Point3d();
+					getVertex().position.getTuple(A);
+					prev.prev.getVertex().position.getTuple(B);
+					prev.getVertex().position.getTuple(C);
 					
 					double ca = C.distance(A);
 					double cb = C.distance(B);
@@ -411,7 +431,11 @@ public class JptLoader {
 					double t = a / (a + b);
 					inTangent.interpolate(A, BC, t * magnitude);
 				} else {
-					inTangent.interpolate(getVertex().pos, prev.getVertex().pos, magnitude / 3.0);
+					Point3d A = new Point3d();
+					Point3d B = new Point3d();
+					getVertex().position.getTuple(A);
+					prev.getVertex().position.getTuple(B);
+					inTangent.interpolate(A, B, magnitude / 3.0);
 				}
 			}		
 		}

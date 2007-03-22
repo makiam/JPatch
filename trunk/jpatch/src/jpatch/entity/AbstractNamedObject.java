@@ -1,14 +1,16 @@
 package jpatch.entity;
 
-public abstract class AbstractNamedObject extends AbstractJPatchXObject {
-	public Attribute.Name name = new Attribute.Name(this);
+import jpatch.entity.attributes2.*;
+
+public abstract class AbstractNamedObject {
+	public StringAttr name = new StringAttr(this.toString());
 	
 	public String getName() {
-		return name.get();
+		return name.getString();
 	}
 	
 	protected String getXmlName() {
-		return name.get().
+		return name.getString().
 				replaceAll("&","&amp;").
 				replaceAll("\"","&quot;").
 				replaceAll(">","&gt;").

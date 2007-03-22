@@ -698,7 +698,7 @@ public class ViewportGl extends Viewport {
 	
 	@Override
 	protected void drawGrid() {
-		double scale = viewScale.get();
+		double scale = viewScale.getDouble();
 		double width = component.getWidth();
 		double height = component.getHeight();
 		double matrixScale = scale / 20 * width;
@@ -775,7 +775,7 @@ public class ViewportGl extends Viewport {
 	}
 	
 	private void drawSds3(Sds sds) {
-		useProgram = fragmentShader.get();
+		useProgram = fragmentShader.getBoolean();
 //		gl.glEnable(GL_LIGHTING);
 		gl.glShadeModel(GL_SMOOTH);
 		gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -812,7 +812,7 @@ public class ViewportGl extends Viewport {
 			gl.glUseProgram(useProgram ? program : 0);
 		}
 		
-		if (showLimitSurface.get()) {
+		if (showLimitSurface.getBoolean()) {
 			for (Face face : sds.faceList) {
 				for (Slate2 slate : face.getSlates()) {
 	//				switch (slate.getSubdivisionLevel()) {
@@ -840,9 +840,9 @@ public class ViewportGl extends Viewport {
 			}
 		}
 		
-		if (showControlMesh.get()) {
+		if (showControlMesh.getBoolean()) {
 			
-			if (!showLimitSurface.get()) {
+			if (!showLimitSurface.getBoolean()) {
 				gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 0, 0.9f }, 0);
 				gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0, 0, 0.2f }, 0);
 				for (Face face : sds.faceList) {
@@ -1106,7 +1106,7 @@ public class ViewportGl extends Viewport {
 //			gl.glUseProgram(useProgram ? program : 0);
 //		}
 		
-		if (showProjectedMesh.get()) {
+		if (showProjectedMesh.getBoolean()) {
 			gl.glDisable(GL_LIGHTING);
 			gl.glColor3f(0.5f, 0.5f, 0.5f);
 			for (int i = 0; i < 2; i++) {

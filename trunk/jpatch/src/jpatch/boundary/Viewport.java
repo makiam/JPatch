@@ -8,6 +8,7 @@ import javax.vecmath.*;
 import jpatch.boundary.newtools.*;
 import jpatch.boundary.settings.*;
 import jpatch.entity.*;
+import jpatch.entity.attributes2.*;
 import sds.*;
 
 public abstract class Viewport extends AbstractNamedObject {
@@ -21,14 +22,14 @@ public abstract class Viewport extends AbstractNamedObject {
 			OrthoViewDirection.RIGHT,
 			new OrthoViewDirection.BirdsEye()
 	};
-	public Attribute.Array<ViewDirection> viewType = new Attribute.Array<ViewDirection>(standardViewDirections);
-	public Attribute.Tuple2 viewRotation = new Attribute.Tuple2("Rotation", 0, 0, false);
-	public Attribute.Tuple2 viewTranslation = new Attribute.Tuple2("Translation", 0, 0, false);
-	public Attribute.Double viewScale = new Attribute.Double(1);
-	public Attribute.Boolean showControlMesh = new Attribute.Boolean(true);
-	public Attribute.Boolean showLimitSurface = new Attribute.Boolean(true);
-	public Attribute.Boolean showProjectedMesh = new Attribute.Boolean(true);
-	public Attribute.Boolean fragmentShader = new Attribute.Boolean(false);
+	public ArrayAttr<ViewDirection> viewType = new ArrayAttr<ViewDirection>(standardViewDirections);
+	public Tuple2 viewRotation = new Tuple2(0, 0);
+	public Tuple2 viewTranslation = new Tuple2(0, 0);
+	public DoubleAttr viewScale = new DoubleAttr(1);
+	public BooleanAttr showControlMesh = new BooleanAttr(true);
+	public BooleanAttr showLimitSurface = new BooleanAttr(true);
+	public BooleanAttr showProjectedMesh = new BooleanAttr(true);
+	public BooleanAttr fragmentShader = new BooleanAttr(false);
 	
 	protected final int id;
 	protected Component component;
@@ -60,10 +61,10 @@ public abstract class Viewport extends AbstractNamedObject {
 				computeMatrices();
 			} else if (attribute == viewType) {
 				viewDirection.unbind(Viewport.this);
-				viewDirection = viewType.get();
-				viewRotation.setValueAdjusting(true);
+				viewDirection = viewType.getObject();
+//				viewRotation.suppressChangeNotification(true);
 				viewDirection.bindTo(Viewport.this);
-				viewRotation.setValueAdjusting(false);
+//				viewRotation.setValueAdjusting(false);
 				computeMatrices();
 			}
 			component.repaint();
@@ -76,22 +77,24 @@ public abstract class Viewport extends AbstractNamedObject {
 		this.models = models;
 		matrix.setIdentity();
 		viewDirection = standardViewDirections[viewDir];
-		viewType.set(viewDirection);
+		viewType.setObject(viewDirection);
 		viewDirection.bindTo(this);
 		viewType.addAttributeListener(updateAttributeListener);
 		showControlMesh.addAttributeListener(updateAttributeListener);
 		showLimitSurface.addAttributeListener(updateAttributeListener);
 		showProjectedMesh.addAttributeListener(updateAttributeListener);
-		viewTranslation.addAttributeListener(updateAttributeListener);
-		viewRotation.addAttributeListener(updateAttributeListener);
+		viewTranslation.getXAttr().addAttributeListener(updateAttributeListener);
+		viewTranslation.getYAttr().addAttributeListener(updateAttributeListener);
+		viewRotation.getXAttr().addAttributeListener(updateAttributeListener);
+		viewRotation.getYAttr().addAttributeListener(updateAttributeListener);
 		viewScale.addAttributeListener(updateAttributeListener);
-		name.set("Viewport " + id);
+//		name.set("Viewport " + id);
 	}
 
 	
-//	public String getName() {
-//		return "Viewport " + id;
-//	}
+	public String getName() {
+		return "Viewport " + id;
+	}
 
 
 	public void setParent(JPatchObject parent) {
@@ -134,7 +137,7 @@ public abstract class Viewport extends AbstractNamedObject {
 	
 	public void setBirdsEyeView() {
 		standardViewDirections[6].unbind(this);
-		viewType.set(standardViewDirections[6]);
+		viewType.setObject(standardViewDirections[6]);
 	}
 	
 	public Component getComponent() {
@@ -189,14 +192,14 @@ public abstract class Viewport extends AbstractNamedObject {
 	
 	@Override
 	public String toString() {
-		return name.get();
+		return getName();
 	}
 	
 	protected void computeMatrices() {
-		double scale = viewScale.get() / 20 * component.getWidth();
+		double scale = viewScale.getDouble() / 20 * component.getWidth();
 //		double screenScale = 10 / component.getWidth();
-		double x = Math.toRadians(viewRotation.x.get());
-		double y = Math.toRadians(viewRotation.y.get());
+		double x = Math.toRadians(viewRotation.getX());
+		double y = Math.toRadians(viewRotation.getY());
 		double sx = Math.sin(x);
 		double cx = Math.cos(x);
 		double sy = Math.sin(y);
@@ -212,8 +215,8 @@ public abstract class Viewport extends AbstractNamedObject {
 		matrix.m20 = sy * cx * scale;
 		matrix.m21 = -sx * scale;
 		matrix.m22 = cy * cx * scale;
-		matrix.m03 = viewTranslation.x.get() * scale;
-		matrix.m13 = viewTranslation.y.get() * scale;
+		matrix.m03 = viewTranslation.getX() * scale;
+		matrix.m13 = viewTranslation.getY() * scale;
 		matrix.m23 = 0;
 		
 //		matrix.m00 = cy * scale;
