@@ -50,11 +50,11 @@ public class RibExport {
 			} else {
 				writer.print(" ");
 			}
-			writer.print(vertex.position.x.get());
+			writer.print(vertex.position.getX());
 			writer.print(" ");
-			writer.print(vertex.position.y.get());
+			writer.print(vertex.position.getY());
 			writer.print(" ");
-			writer.print(vertex.position.z.get());
+			writer.print(vertex.position.getZ());
 		}
 		writer.print("]\n");
 		writer.close();

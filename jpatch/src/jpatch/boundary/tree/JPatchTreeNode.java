@@ -5,6 +5,7 @@ import javax.swing.event.*;
 import javax.swing.tree.*;
 
 import jpatch.entity.*;
+import jpatch.entity.attributes2.*;
 
 @SuppressWarnings("serial")
 public class JPatchTreeNode extends DefaultMutableTreeNode implements Comparable, AttributeListener {
@@ -20,19 +21,19 @@ public class JPatchTreeNode extends DefaultMutableTreeNode implements Comparable
 	}
 	
 	private JPatchTreeModel treeModel;
-	private Attribute.String name;
+	private StringAttr name;
 	
 	public JPatchTreeNode() { }
 	
 	public JPatchTreeNode(AbstractNamedObject jpatchObject) {
 		setUserObject(jpatchObject);
-		name = (Attribute.String) jpatchObject.name;
-		name.addAttributeListener(this);
+//		name = (Attribute.String) jpatchObject.name;
+//		name.addAttributeListener(this);
 	}
 	
 	public String getName() {
 		if (name != null)
-			return name.get();
+			return name.getString();
 		else
 			return "ROOT";
 	}

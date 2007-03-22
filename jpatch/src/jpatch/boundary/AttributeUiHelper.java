@@ -13,6 +13,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import jpatch.entity.*;
+import jpatch.entity.attributes2.Attribute;
 
 public class AttributeUiHelper {
 	private static final DecimalFormat INT_FORMAT = new DecimalFormat("0", new DecimalFormatSymbols(Locale.ENGLISH));

@@ -271,17 +271,17 @@ public class Main {
 		}
 
 		
-		WorkspaceManager workspaceManager;
-		try {
-			workspaceManager = new WorkspaceManager(Settings.getInstance().workspace);
-			Project project = new Project(workspaceManager, "MyProject");
-			workspaceManager.refresh();
-			for (Project p : workspaceManager.getProjects()) {
-				tree.getRoot().add(new JPatchTreeNode(p));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		WorkspaceManager workspaceManager;
+//		try {
+//			workspaceManager = new WorkspaceManager(Settings.getInstance().workspace);
+//			Project project = new Project(workspaceManager, "MyProject");
+//			workspaceManager.refresh();
+//			for (Project p : workspaceManager.getProjects()) {
+//				tree.getRoot().add(new JPatchTreeNode(p));
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		
 		try {
 			robot = new Robot();
@@ -292,28 +292,6 @@ public class Main {
 		frame = new JFrame("JPatch");
 		frame.setSize(1024, 768);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		activeModel = new Model();
-		
-		ControlPoint cp0 = new ControlPoint(activeModel);
-		ControlPoint cp1 = new ControlPoint(activeModel);
-		ControlPoint cp2 = new ControlPoint(activeModel);
-		ControlPoint cp3 = new ControlPoint(activeModel);
-		cp0.position.set(-5, 0, 0);
-		cp1.position.set( 0, 5, 0);
-		cp2.position.set( 5, 0, 0);
-		cp3.position.set( 0,-5, 0);
-		cp0.setLoop(true);
-		cp0.setNext(cp1);
-		cp1.setNext(cp2);
-		cp2.setNext(cp3);
-		cp3.setNext(cp0);
-		cp0.setPrev(cp3);
-		cp1.setPrev(cp0);
-		cp2.setPrev(cp1);
-		cp3.setPrev(cp2);
-		activeModel.addCurve(cp0);
-		activeModel.initControlPoints();
 
 		/*
 		 * initialize viewports

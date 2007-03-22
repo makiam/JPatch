@@ -4,13 +4,13 @@ import javax.vecmath.*;
 
 import jpatch.boundary.settings.RealtimeRendererSettings;
 import jpatch.boundary.settings.Settings;
-import jpatch.entity.*;
+import jpatch.entity.attributes2.*;
 
 public abstract class Level2Vertex extends BaseVertex {
 	private static RealtimeRendererSettings RENDERER_SETTINGS = Settings.getInstance().realtimeRenderer;
 	
-	public final Attribute.Boolean overridePosition = new Attribute.Boolean(false);
-	public final Attribute.Boolean overrideSharpness = new Attribute.Boolean(false);
+	public final BooleanAttr overridePosition = new BooleanAttr(false);
+	public final BooleanAttr overrideSharpness = new BooleanAttr(false);
 	public final Point3d limit = new Point3d();
 	public final Vector3d uTangent = new Vector3d();
 	public final Vector3d vTangent = new Vector3d();

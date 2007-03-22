@@ -31,6 +31,9 @@ import javax.swing.*;
 
 import jpatch.boundary.ui.*;
 import jpatch.entity.*;
+import jpatch.entity.attributes2.*;
+
+
 /**
  * @author sascha
  *
@@ -147,7 +150,7 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		c.add(box);
 	}
 	
-	protected void addTuple(Container c, String name, Attribute.Tuple2 a) {
+	protected void addTuple(Container c, String name, Tuple2 a) {
 		c.add(new JLabel(name));
 		JComponent box = new ExpandableFormRow();
 		box.setOpaque(false);
@@ -156,30 +159,30 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		box.add(AttributeUiHelper.createTextFieldFor(a.y));
 		c.add(box);
 
-		if (!a.isKeyable())
-			return;
-		
-		c.add(new JLabel("keyed"));
-		box = new ExpandableFormRow();
-		box.setOpaque(false);
-		if (a.isKeyable()) {
-			JCheckBox keyX = AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.x).keyed);
-			JCheckBox keyY = AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.y).keyed);
-			keyX.setEnabled(a.isKeyable());
-			keyY.setEnabled(a.isKeyable());
-			box.add(keyX);
-			box.add(keyY);
-		}
-		c.add(box);
-		
-		c.add(new JLabel("locked"));
-		box = new ExpandableFormRow();
-		box.setOpaque(false);
-		JCheckBox lockX = AttributeUiHelper.createCheckBoxFor(a.x.locked);
-		JCheckBox lockY = AttributeUiHelper.createCheckBoxFor(a.y.locked);
-		box.add(lockX);
-		box.add(lockY);
-		c.add(box);
+//		if (!a.isKeyable())
+//			return;
+//		
+//		c.add(new JLabel("keyed"));
+//		box = new ExpandableFormRow();
+//		box.setOpaque(false);
+//		if (a.isKeyable()) {
+//			JCheckBox keyX = AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.x).keyed);
+//			JCheckBox keyY = AttributeUiHelper.createCheckBoxFor(((Attribute.BoundedDouble) a.y).keyed);
+//			keyX.setEnabled(a.isKeyable());
+//			keyY.setEnabled(a.isKeyable());
+//			box.add(keyX);
+//			box.add(keyY);
+//		}
+//		c.add(box);
+//		
+//		c.add(new JLabel("locked"));
+//		box = new ExpandableFormRow();
+//		box.setOpaque(false);
+//		JCheckBox lockX = AttributeUiHelper.createCheckBoxFor(a.x.locked);
+//		JCheckBox lockY = AttributeUiHelper.createCheckBoxFor(a.y.locked);
+//		box.add(lockX);
+//		box.add(lockY);
+//		c.add(box);
 	}
 	
 	protected void addTuple(Container c, String name, Attribute.Tuple3 a) {

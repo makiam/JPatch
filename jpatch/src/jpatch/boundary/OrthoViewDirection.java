@@ -28,8 +28,8 @@ package jpatch.boundary;
 public abstract class OrthoViewDirection implements ViewDirection {
 	public static OrthoViewDirection FRONT = new OrthoViewDirection() {
 		public void bindTo(Viewport viewport) {
-			viewport.viewRotation.x.set(0);
-			viewport.viewRotation.y.set(0);
+			viewport.viewRotation.setX(0);
+			viewport.viewRotation.setY(0);
 		}
 		public String toString() {
 			return "front";
@@ -37,8 +37,8 @@ public abstract class OrthoViewDirection implements ViewDirection {
 	};
 	public static OrthoViewDirection BACK = new OrthoViewDirection() {
 		public void bindTo(Viewport viewport) {
-			viewport.viewRotation.x.set(0);
-			viewport.viewRotation.y.set(180);
+			viewport.viewRotation.setX(0);
+			viewport.viewRotation.setY(180);
 		}
 		public String toString() {
 			return "back";
@@ -46,8 +46,8 @@ public abstract class OrthoViewDirection implements ViewDirection {
 	};
 	public static OrthoViewDirection TOP = new OrthoViewDirection() {
 		public void bindTo(Viewport viewport) {
-			viewport.viewRotation.x.set(90);
-			viewport.viewRotation.y.set(0);
+			viewport.viewRotation.setX(90);
+			viewport.viewRotation.setY(0);
 		}
 		public String toString() {
 			return "top";
@@ -55,8 +55,8 @@ public abstract class OrthoViewDirection implements ViewDirection {
 	};
 	public static OrthoViewDirection BOTTOM = new OrthoViewDirection() {
 		public void bindTo(Viewport viewport) {
-			viewport.viewRotation.x.set(-90);
-			viewport.viewRotation.y.set(0);
+			viewport.viewRotation.setX(-90);
+			viewport.viewRotation.setY(0);
 		}
 		public String toString() {
 			return "bottom";
@@ -64,8 +64,8 @@ public abstract class OrthoViewDirection implements ViewDirection {
 	};
 	public static OrthoViewDirection LEFT = new OrthoViewDirection() {
 		public void bindTo(Viewport viewport) {
-			viewport.viewRotation.x.set(0);
-			viewport.viewRotation.y.set(90);
+			viewport.viewRotation.setX(0);
+			viewport.viewRotation.setY(90);
 		}
 		public String toString() {
 			return "left";
@@ -73,8 +73,8 @@ public abstract class OrthoViewDirection implements ViewDirection {
 	};
 	public static OrthoViewDirection RIGHT = new OrthoViewDirection() {
 		public void bindTo(Viewport viewport) {
-			viewport.viewRotation.x.set(0);
-			viewport.viewRotation.y.set(-90);
+			viewport.viewRotation.setX(0);
+			viewport.viewRotation.setY(-90);
 		}
 		public String toString() {
 			return "right";
@@ -85,12 +85,12 @@ public abstract class OrthoViewDirection implements ViewDirection {
 		private double x = 45;
 		private double y = 45;
 		public void bindTo(Viewport viewport) {
-			viewport.viewRotation.x.set(x);
-			viewport.viewRotation.y.set(y);
+			viewport.viewRotation.setX(x);
+			viewport.viewRotation.setY(y);
 		}
 		public void unbind(Viewport viewport) {
-			x = viewport.viewRotation.x.get();
-			y = viewport.viewRotation.y.get();
+			x = viewport.viewRotation.getX();
+			y = viewport.viewRotation.getY();
 		}
 		public String toString() {
 			return "bird's eye";

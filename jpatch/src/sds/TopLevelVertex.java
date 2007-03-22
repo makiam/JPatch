@@ -5,8 +5,7 @@ import java.util.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.settings.Settings;
-import jpatch.entity.Attribute;
-import jpatch.entity.AttributeListener;
+import jpatch.entity.attributes2.*;
 import jpatch.entity.Constants;
 
 import static sds.SdsWeights.*;
@@ -74,17 +73,17 @@ public class TopLevelVertex extends BaseVertex {
 			
 			@Override
 			public void computeDerivedPosition() {
-				if (!overridePosition.get()) {
+				if (!overridePosition.getBoolean()) {
 					if (TopLevelVertex.this.corner > 0) {
-						position.set(TopLevelVertex.this.pos);
+						position.setTuple(TopLevelVertex.this.position);
 					} else if (TopLevelVertex.this.crease > 0) {
-						Point3d p0 = TopLevelVertex.this.pos;
-						Point3d p1 = TopLevelVertex.this.creaseEdge0.pair.vertex.pos;
-						Point3d p2 = TopLevelVertex.this.creaseEdge1.pair.vertex.pos;
-						position.set(
-								p0.x * CREASE0 + (p1.x + p2.x) * CREASE1,
-								p0.y * CREASE0 + (p1.y + p2.y) * CREASE1,
-								p0.z * CREASE0 + (p1.z + p2.z) * CREASE1
+						Tuple3 p0 = TopLevelVertex.this.position;
+						Tuple3 p1 = TopLevelVertex.this.creaseEdge0.pair.vertex.position;
+						Tuple3 p2 = TopLevelVertex.this.creaseEdge1.pair.vertex.position;
+						position.setTuple(
+								p0.getX() * CREASE0 + (p1.getX() + p2.getX()) * CREASE1,
+								p0.getY() * CREASE0 + (p1.getY() + p2.getY()) * CREASE1,
+								p0.getZ() * CREASE0 + (p1.getZ() + p2.getZ()) * CREASE1
 						);
 					}
 					if (TopLevelVertex.this.corner < 1 && TopLevelVertex.this.crease < 1) {
@@ -92,29 +91,29 @@ public class TopLevelVertex extends BaseVertex {
 						double w = (valence - 2.0) / valence;
 						double x = 0, y = 0, z = 0;
 						for (HalfEdge edge : edges) {
-							Point3d p = edge.face.facePoint.pos;
-							x += p.x;
-							y += p.y;
-							z += p.z;
-							p = edge.pair.vertex.pos;
-							x += p.x;
-							y += p.y;
-							z += p.z;
+							Tuple3 p = edge.face.facePoint.position;
+							x += p.getX();
+							y += p.getY();
+							z += p.getZ();
+							p = edge.pair.vertex.position;
+							x += p.getX();
+							y += p.getY();
+							z += p.getZ();
 						}
-						double smoothX = x * k + TopLevelVertex.this.pos.x * w;
-						double smoothY = y * k + TopLevelVertex.this.pos.y * w;
-						double smoothZ = z * k + TopLevelVertex.this.pos.z * w;
+						double smoothX = x * k + TopLevelVertex.this.position.getX() * w;
+						double smoothY = y * k + TopLevelVertex.this.position.getY() * w;
+						double smoothZ = z * k + TopLevelVertex.this.position.getZ() * w;
 						double t = (TopLevelVertex.this.corner > 0) ? TopLevelVertex.this.corner : TopLevelVertex.this.crease;
 						double t1 = 1 - t;
-						position.set(
-								smoothX * t1 + position.x.get() * t,
-								smoothY * t1 + position.y.get() * t,
-								smoothZ * t1 + position.z.get() * t
+						position.setTuple(
+								smoothX * t1 + position.getX() * t,
+								smoothY * t1 + position.getY() * t,
+								smoothZ * t1 + position.getZ() * t
 						);
 					}
 				}
-				if (!overrideSharpness.get()) {
-					sharpness.set(Math.max(0, TopLevelVertex.this.getSharpness() - 1));
+				if (!overrideSharpness.getBoolean()) {
+					sharpness.setDouble(Math.max(0, TopLevelVertex.this.getSharpness() - 1));
 				}
 				crease = Math.max(0, TopLevelVertex.this.crease - 1);
 				corner = Math.max(0, TopLevelVertex.this.corner - 1);
@@ -125,32 +124,32 @@ public class TopLevelVertex extends BaseVertex {
 			@Override
 			public void computeLimit() {
 				if (TopLevelVertex.this.corner > 0) {
-					limit.set(TopLevelVertex.this.pos);
+					TopLevelVertex.this.position.getTuple(limit);
 				} else if (TopLevelVertex.this.crease > 0) {
-					Point3d p1 = TopLevelVertex.this.creaseEdge0.edgePoint.pos;
-					Point3d p2 = TopLevelVertex.this.creaseEdge1.edgePoint.pos;
+					Tuple3 p1 = TopLevelVertex.this.creaseEdge0.edgePoint.position;
+					Tuple3 p2 = TopLevelVertex.this.creaseEdge1.edgePoint.position;
 					limit.set(
-							pos.x * CREASE_LIMIT0 + (p1.x + p2.x) * CREASE_LIMIT1,
-							pos.y * CREASE_LIMIT0 + (p1.y + p2.y) * CREASE_LIMIT1,
-							pos.z * CREASE_LIMIT0 + (p1.z + p2.z) * CREASE_LIMIT1
+							position.getX() * CREASE_LIMIT0 + (p1.getX() + p2.getX()) * CREASE_LIMIT1,
+							position.getY() * CREASE_LIMIT0 + (p1.getY() + p2.getY()) * CREASE_LIMIT1,
+							position.getZ() * CREASE_LIMIT0 + (p1.getZ() + p2.getZ()) * CREASE_LIMIT1
 					);
 				} else {
 					double fx = 0, fy = 0, fz = 0;
 					double ex = 0, ey = 0, ez = 0;
 					for (HalfEdge edge : edges) {
-						Point3d p = edge.face.facePoint.pos;
-						fx += p.x;
-						fy += p.y;
-						fz += p.z;
-						p = edge.edgePoint.pos;
-						ex += p.x;
-						ey += p.y;
-						ez += p.z;
+						Tuple3 p = edge.face.facePoint.position;
+						fx += p.getX();
+						fy += p.getY();
+						fz += p.getZ();
+						p = edge.edgePoint.position;
+						ex += p.getX();
+						ey += p.getY();
+						ez += p.getZ();
 					}
 					limit.set(
-							fx * VERTEX_FACE_LIMIT[valence] + ex * VERTEX_EDGE_LIMIT[valence] + pos.x * VERTEX_POINT_LIMIT[valence],
-							fy * VERTEX_FACE_LIMIT[valence] + ey * VERTEX_EDGE_LIMIT[valence] + pos.y * VERTEX_POINT_LIMIT[valence],
-							fz * VERTEX_FACE_LIMIT[valence] + ez * VERTEX_EDGE_LIMIT[valence] + pos.z * VERTEX_POINT_LIMIT[valence]
+							fx * VERTEX_FACE_LIMIT[valence] + ex * VERTEX_EDGE_LIMIT[valence] + position.getX() * VERTEX_POINT_LIMIT[valence],
+							fy * VERTEX_FACE_LIMIT[valence] + ey * VERTEX_EDGE_LIMIT[valence] + position.getY() * VERTEX_POINT_LIMIT[valence],
+							fz * VERTEX_FACE_LIMIT[valence] + ez * VERTEX_EDGE_LIMIT[valence] + position.getZ() * VERTEX_POINT_LIMIT[valence]
 					);
 				
 				
@@ -162,24 +161,24 @@ public class TopLevelVertex extends BaseVertex {
 					float bz = 0;
 					for (int i = 0; i < edges.length; i++) {
 						int j = (i + 1) % edges.length;
-						Point3d p0f = edges[i].face.facePoint.pos;
-						Point3d p0e = edges[i].edgePoint.pos;
-						Point3d p1f = edges[j].face.facePoint.pos;
-						Point3d p1e = edges[j].edgePoint.pos;
+						Tuple3 p0f = edges[i].face.facePoint.position;
+						Tuple3 p0e = edges[i].edgePoint.position;
+						Tuple3 p1f = edges[j].face.facePoint.position;
+						Tuple3 p1e = edges[j].edgePoint.position;
 						float ew = TANGENT_EDGE_WEIGHT[valence][i];
 						float fw = TANGENT_FACE_WEIGHT[valence][i];
-						ax += p1f.x * fw;
-						ay += p1f.y * fw;
-						az += p1f.z * fw;
-						ax += p1e.x * ew;
-						ay += p1e.y * ew;
-						az += p1e.z * ew;
-						bx += p0f.x * fw;
-						by += p0f.y * fw;
-						bz += p0f.z * fw;
-						bx += p0e.x * ew;
-						by += p0e.y * ew;
-						bz += p0e.z * ew;
+						ax += p1f.getX() * fw;
+						ay += p1f.getY() * fw;
+						az += p1f.getZ() * fw;
+						ax += p1e.getX() * ew;
+						ay += p1e.getY() * ew;
+						az += p1e.getZ() * ew;
+						bx += p0f.getX() * fw;
+						by += p0f.getY() * fw;
+						bz += p0f.getZ() * fw;
+						bx += p0e.getX() * ew;
+						by += p0e.getY() * ew;
+						bz += p0e.getZ() * ew;
 					}
 					uTangent.set(bx, by, bz);
 					vTangent.set(ax, ay, az);
@@ -191,12 +190,12 @@ public class TopLevelVertex extends BaseVertex {
 	
 	public TopLevelVertex(double x, double y, double z) {
 		this();
-		referencePosition.set(x, y, z);
+		position.getReferenceTuple3().setTuple(x, y, z);
 	}
 	
 	public TopLevelVertex(Point3d p) {
 		this();
-		referencePosition.set(p);
+		position.getReferenceTuple3().setTuple(p);
 	}
 	
 	public Iterable<HalfEdge> getAdjacentEdges() {
@@ -277,7 +276,7 @@ public class TopLevelVertex extends BaseVertex {
 	public void analyzeEdges() {
 		int i = 0;
 		int sharpestEdgeValue0 = 0, sharpestEdgeValue1 = 0, sharpestEdgeValue2 = 0;
-		corner = sharpness.get();
+		corner = sharpness.getDouble();
 		crease = 0;
 		for (HalfEdge edge : getAdjacentEdges()) {
 			int edgeSharpness = edge.getSharpness();
