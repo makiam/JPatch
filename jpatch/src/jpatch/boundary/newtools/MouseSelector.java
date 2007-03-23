@@ -23,7 +23,7 @@ public class MouseSelector {
 		for (Face face : sds.faceList) {
 			for (HalfEdge edge : face.getEdges()) {
 				TopLevelVertex vertex = edge.getFirstVertex();
-				vertex.referencePosition.get(p);
+				vertex.getPos(p);
 				matrix.transform(p);
 				double dx = x - p.x;
 				double dy = y - p.y;
@@ -49,8 +49,8 @@ public class MouseSelector {
 		for (Face face : sds.faceList) {
 			for (HalfEdge edge : face.getEdges()) {
 				if (edge.isPrimary()) {
-					edge.getFirstVertex().referencePosition.get(p0);
-					edge.getSecondVertex().referencePosition.get(p1);
+					edge.getFirstVertex().getPos(p0);
+					edge.getSecondVertex().getPos(p1);
 					matrix.transform(p0);
 					matrix.transform(p1);
 					line.setLine(p0.x, p0.y, p1.x, p1.y);

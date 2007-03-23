@@ -39,4 +39,9 @@ public class DoubleAttr extends AbstractAttribute implements DoubleValue {
 	public void setMappedValue(double mappedValue) {
 		setDouble(mapping.getValue(mappedValue));
 	}
+	
+	@Override
+	public String toString() {
+		return Double.toString(value);
+	}
 }

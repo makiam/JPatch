@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <attributeEditor class="TopLevelVertex">
-	<attribute name="Position" field="position" />
-	<attribute name="Ref.Pos" field="referencePosition" />
-	<attribute name="Corner" field="sharpness" widget="slider" min="0" max="9"/>
+	<attribute name="Position" property="position" />
+	<attribute name="Ref.Pos" property="referencePosition" />
+	<attribute name="Corner" property="sharpness" />
 </attributeEditor>

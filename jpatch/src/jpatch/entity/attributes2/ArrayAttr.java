@@ -42,4 +42,8 @@ public class ArrayAttr<T> extends AbstractAttribute {
 	public T getObject() {
 		return array[index];
 	}
+	
+	public T[] getArray() {
+		return array;
+	}
 }

@@ -82,7 +82,7 @@ public class MoveVertexTool implements JPatchTool {
 		MoveVertexMouseMotionListener(Viewport viewport, TopLevelVertex vertex) {
 			this.viewport = viewport;
 			this.vertex = vertex;
-			vertex.referencePosition.get(p);
+			vertex.getPos(p);
 		}
 		
 		@Override
@@ -93,7 +93,7 @@ public class MoveVertexTool implements JPatchTool {
 //			double n = vertex.valence();
 //			p.scale((n + 5) / n);
 //			p.add(pos);
-			vertex.referencePosition.set(p);
+			vertex.getPosition().setTuple(p);
 			Main.getInstance().getActiveSds().rethinkSlates();
 			viewport.getComponent().repaint();	// FIXME for synchronized viewports
 		}

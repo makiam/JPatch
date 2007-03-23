@@ -40,7 +40,7 @@ public class Tuple2 {
 	}
 	
 	public void setY(double y) {
-		xAttr.setDouble(y);
+		yAttr.setDouble(y);
 	}
 	
 	public void getTuple(Tuple2d tuple) {

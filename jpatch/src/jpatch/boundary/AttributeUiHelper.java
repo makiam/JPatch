@@ -13,7 +13,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import jpatch.entity.*;
-import jpatch.entity.attributes2.Attribute;
+import jpatch.entity.attributes2.*;
 
 public class AttributeUiHelper {
 	private static final DecimalFormat INT_FORMAT = new DecimalFormat("0", new DecimalFormatSymbols(Locale.ENGLISH));
@@ -33,9 +33,7 @@ public class AttributeUiHelper {
 		LABLES[1].setOpaque(true);
 		LABLES[1].setBackground(Color.WHITE);
 	}
-	static JLabel getLabelFor(Attribute attribute) {
-		return new JLabel(attribute.getName());
-	}
+	
 	
 //	public static JLabel createLabelFor(final Attribute.Name name) {
 //		final JLabel label = new JLabel();
@@ -193,26 +191,25 @@ public class AttributeUiHelper {
 		return box;
 	}
 	
-	public static JCheckBox createCheckBoxFor(final Attribute attribute) {
-		final Attribute.Boolean attrBool = (Attribute.Boolean) attribute;
+	public static JCheckBox createCheckBoxFor(String name, final BooleanAttr a) {
 		
 		/* create checkBox and set selection state */
 		final JCheckBox checkBox = new JCheckBox();
-		checkBox.setSelected(attrBool.get());
-		checkBox.setToolTipText(attribute.getName());
+		checkBox.setSelected(a.getBoolean());
+		checkBox.setToolTipText(name);
 		checkBox.setOpaque(false);
 		
 		/* create a ChangeListener to update the attribute if the slider was changed */
 		checkBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				attrBool.set(checkBox.isSelected());
+				a.setBoolean(checkBox.isSelected());
 			}
 		});
 		
 		/* create a AttributeListener to update the CheckBox if the attribute changes */
 		final AttributeListener attributeListener = new AttributeListener() {
-			public void attributeChanged(Attribute a) {
-				checkBox.setSelected(attrBool.get());
+			public void attributeChanged(Attribute attr) {
+				checkBox.setSelected(a.getBoolean());
 			}
 		};
 		
@@ -221,9 +218,9 @@ public class AttributeUiHelper {
 			public void hierarchyChanged(HierarchyEvent e) {
 				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
 					if (checkBox.isShowing())
-						attribute.addAttributeListener(attributeListener);
+						a.addAttributeListener(attributeListener);
 					else
-						attribute.removeAttributeListener(attributeListener);
+						a.removeAttributeListener(attributeListener);
 				}
 			}
 		});
@@ -231,50 +228,50 @@ public class AttributeUiHelper {
 		return checkBox;
 	}
 	
-	public static JTextField createTextFieldFor(final Attribute attribute) {
-		return createTextFieldFor(attribute, 70);
+	public static JTextField createTextFieldFor(String name, Attribute attribute) {
+		return createTextFieldFor(name, attribute, 70);
 	}
 	
-	public static JTextField createTextFieldFor(final Attribute attribute, int width) {
+	public static JTextField createTextFieldFor(String name, final Attribute attribute, int width) {
 		final JTextField textField = new JTextField();
 		Dimension dim = textField.getPreferredSize();
 		dim.width = width;
 		textField.setPreferredSize(dim);
-		textField.setToolTipText(attribute.getName());
+		textField.setToolTipText(name);
 		
-		if (attribute instanceof Attribute.Integer) {
-			textField.setText(INT_FORMAT.format(((Attribute.Integer) attribute).get()));
+		if (attribute instanceof IntAttr) {
+			textField.setText(INT_FORMAT.format(((IntAttr) attribute).getInt()));
 			textField.setHorizontalAlignment(SwingConstants.RIGHT);
-		} else if (attribute instanceof Attribute.Double) {
-			textField.setText(DOUBLE_FORMAT.format(((Attribute.Double) attribute).get()));
+		} else if (attribute instanceof DoubleAttr) {
+			textField.setText(DOUBLE_FORMAT.format(((DoubleAttr) attribute).getDouble()));
 			textField.setHorizontalAlignment(SwingConstants.RIGHT);
-		} else if (attribute instanceof Attribute.String) {
-			textField.setText(((Attribute.String) attribute).get());
+		} else if (attribute instanceof StringAttr) {
+			textField.setText(((StringAttr) attribute).getString());
 		} else {
-			throw new IllegalStateException();
+			throw new IllegalStateException(attribute.toString());
 		}
 		
-		if (attribute instanceof Attribute.Limit) {
-			textField.setEditable(((Attribute.Limit) attribute).enabled.get());
-			((Attribute.Limit) attribute).enabled.addAttributeListener(new AttributeListener() {
-				public void attributeChanged(Attribute attribute) {
-					textField.setEditable(((Attribute.Boolean) attribute).get());
-				}
-			});
-		} else if (attribute instanceof Attribute.BoundedDouble) {
-			textField.setEditable(!((Attribute.BoundedDouble) attribute).locked.get());
-			((Attribute.BoundedDouble) attribute).locked.addAttributeListener(new AttributeListener() {
-				public void attributeChanged(Attribute attribute) {
-					textField.setEditable(!((Attribute.Boolean) attribute).get());
-				}
-			});
-			textField.setFont(((Attribute.BoundedDouble) attribute).keyed.get() ? keyedFont : staticFont);
-			((Attribute.BoundedDouble) attribute).keyed.addAttributeListener(new AttributeListener() {
-				public void attributeChanged(Attribute attribute) {
-					textField.setFont(((Attribute.Boolean) attribute).get() ? keyedFont : staticFont);
-				}
-			});
-		}
+//		if (attribute instanceof Attribute.Limit) {
+//			textField.setEditable(((Attribute.Limit) attribute).enabled.get());
+//			((Attribute.Limit) attribute).enabled.addAttributeListener(new AttributeListener() {
+//				public void attributeChanged(Attribute attribute) {
+//					textField.setEditable(((Attribute.Boolean) attribute).get());
+//				}
+//			});
+//		} else if (attribute instanceof Attribute.BoundedDouble) {
+//			textField.setEditable(!((Attribute.BoundedDouble) attribute).locked.get());
+//			((Attribute.BoundedDouble) attribute).locked.addAttributeListener(new AttributeListener() {
+//				public void attributeChanged(Attribute attribute) {
+//					textField.setEditable(!((Attribute.Boolean) attribute).get());
+//				}
+//			});
+//			textField.setFont(((Attribute.BoundedDouble) attribute).keyed.get() ? keyedFont : staticFont);
+//			((Attribute.BoundedDouble) attribute).keyed.addAttributeListener(new AttributeListener() {
+//				public void attributeChanged(Attribute attribute) {
+//					textField.setFont(((Attribute.Boolean) attribute).get() ? keyedFont : staticFont);
+//				}
+//			});
+//		}
 		
 		/* add a FocusListener to verify the text and update the attribute or revert back to the old value */
 		textField.addFocusListener(new FocusAdapter() {
@@ -354,14 +351,14 @@ public class AttributeUiHelper {
 		return comboBox;
 	}
 	
-	public static JComboBox createComboBoxFor(final Attribute.Array attribute) {
+	public static JComboBox createComboBoxFor(final ArrayAttr attribute) {
 		final JComboBox comboBox = new JComboBox(attribute.getArray());
 		comboBox.setSelectedIndex(attribute.getIndex());
 		
 		/* create a ChangeListener to update the attribute if the slider was changed */
 		comboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				attribute.set(comboBox.getSelectedIndex());
+				attribute.setIndex(comboBox.getSelectedIndex());
 			}
 		});
 		
@@ -401,12 +398,12 @@ public class AttributeUiHelper {
 	}
 	
 	private static void setTextFieldValue(JTextField textField, Attribute attribute) {
-		if (attribute instanceof Attribute.Integer) {
-			textField.setText(INT_FORMAT.format(((Attribute.Integer) attribute).get()));
-		} else if (attribute instanceof Attribute.Double) {
-			textField.setText(DOUBLE_FORMAT.format(((Attribute.Double) attribute).get()));
-		} else if (attribute instanceof Attribute.String) {
-			textField.setText(((Attribute.String) attribute).get());
+		if (attribute instanceof IntAttr) {
+			textField.setText(INT_FORMAT.format(((IntAttr) attribute).getInt()));
+		} else if (attribute instanceof DoubleAttr) {
+			textField.setText(DOUBLE_FORMAT.format(((DoubleAttr) attribute).getDouble()));
+		} else if (attribute instanceof StringAttr) {
+			textField.setText(((StringAttr) attribute).getString());
 		} else {
 			throw new IllegalArgumentException();
 		}

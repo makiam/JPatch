@@ -113,7 +113,7 @@ public class TopLevelVertex extends BaseVertex {
 					}
 				}
 				if (!overrideSharpness.getBoolean()) {
-					sharpness.setDouble(Math.max(0, TopLevelVertex.this.getSharpness() - 1));
+					sharpness.setDouble(Math.max(0, TopLevelVertex.this.sharpness() - 1));
 				}
 				crease = Math.max(0, TopLevelVertex.this.crease - 1);
 				corner = Math.max(0, TopLevelVertex.this.corner - 1);
@@ -190,12 +190,13 @@ public class TopLevelVertex extends BaseVertex {
 	
 	public TopLevelVertex(double x, double y, double z) {
 		this();
+		System.out.println("new TopLevelVertex(" + x + ", " + y + ", " + z + ")");
 		position.getReferenceTuple3().setTuple(x, y, z);
+		System.out.println("p=" + position + " pref=" + position.getReferenceTuple3());
 	}
 	
 	public TopLevelVertex(Point3d p) {
-		this();
-		position.getReferenceTuple3().setTuple(p);
+		this(p.x, p.y, p.z);
 	}
 	
 	public Iterable<HalfEdge> getAdjacentEdges() {

@@ -25,6 +25,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import javax.swing.*;
@@ -57,16 +59,18 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 				try {
 					switch (items[section][item].type) {
 					case ATTRIBUTE:
-						if (items[section][item].widget != null && items[section][item].widget.equals("slider")) {
-							addSlider(container, items[section][item].name, (Attribute.Double) items[section][item].field.get(object), items[section][item].min, items[section][item].max);
-						}
-						addAttribute(items[section][item].name, items[section][item].field.get(object));
+//						if (items[section][item].widget != null && items[section][item].widget.equals("slider")) {
+//							addSlider(container, items[section][item].name, (Attribute.Double) items[section][item].field.get(object), items[section][item].min, items[section][item].max);
+//						}
+						addAttribute(items[section][item].name, items[section][item].method.invoke(object, (Object[]) null));
 						break;
 					case LIMIT:
-						addLimit(container, (Attribute.Tuple3) items[section][item].field.get(object));
+//						addLimit(container, (Attribute.Tuple3) items[section][item].field.get(object));
 						break;
 					}
 				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
 					e.printStackTrace();
 				}
 			}
@@ -87,16 +91,26 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 		container = null;
 	}
 	
-	public void addAttribute(String name, Object attribute) {
+	public void addAttribute(String name, Object object) {
 		assert container != null : "addAttribute called outside a section.";
-		System.out.println("addAttribute(" + name + ", " + attribute + ")");
-		if (attribute instanceof Attribute.Tuple3) {
-			System.out.println("*");
-			addTuple(container, name, (Attribute.Tuple3) attribute);
-		} else if (attribute instanceof Attribute.Tuple2) {
-			addTuple(container, name, (Attribute.Tuple2) attribute);	
+		if (object instanceof Attribute) {
+			addScalar(container, name, (Attribute) object);
 		} else {
-			addScalar(container, name, (Attribute) attribute);
+			container.add(new JLabel(name));
+			JComponent box = new ExpandableFormRow();
+			box.setOpaque(false);
+			try {
+				for (Method method : object.getClass().getMethods()) {
+					if (Attribute.class.isAssignableFrom(method.getReturnType())) {
+						box.add(AttributeUiHelper.createTextFieldFor(name, (Attribute) method.invoke(object, (Object[]) null)));
+					}
+				}
+			} catch (IllegalAccessException e) {
+				throw new IllegalArgumentException(e);
+			} catch (InvocationTargetException e) {
+				throw new IllegalArgumentException(e);
+			}
+			container.add(box);
 		}
 	}
 	
@@ -110,16 +124,18 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 	protected void addScalar(Container c, String name, Attribute a) {
 		c.add(new JLabel(name));
 		Box box = Box.createHorizontalBox();
-		if (a instanceof Attribute.KeyedBoolean) {
-			box.add(AttributeUiHelper.createBooleanComboFor(a));
-		} else if (a instanceof Attribute.Boolean) {
-			box.add(AttributeUiHelper.createCheckBoxFor(a));
-		} else if (a instanceof Attribute.Enum) {
-			box.add(AttributeUiHelper.createComboBoxFor((Attribute.Enum) a));
-		} else if (a instanceof Attribute.Array) {
-			box.add(AttributeUiHelper.createComboBoxFor((Attribute.Array) a));
+//		if (a instanceof Attribute.KeyedBoolean) {
+//			box.add(AttributeUiHelper.createBooleanComboFor(a));
+		if (a instanceof BooleanAttr) {
+			box.add(AttributeUiHelper.createCheckBoxFor(name, (BooleanAttr) a));
+//		} else if (a instanceof Attribute.Enum) {
+//			box.add(AttributeUiHelper.createComboBoxFor((Attribute.Enum) a));
+		} else if (a instanceof ArrayAttr) {
+			box.add(AttributeUiHelper.createComboBoxFor((ArrayAttr) a));
+//		} else {
+//			box.add(AttributeUiHelper.createTextFieldFor(a));
 		} else {
-			box.add(AttributeUiHelper.createTextFieldFor(a));
+			box.add(AttributeUiHelper.createTextFieldFor(name, a));
 		}
 		c.add(box);
 	}
@@ -334,22 +350,16 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 	public final static class Item {
 		public final Type type;
 		public final String name;
-		public final Field field;
-		public final String widget;
-		public final int min;
-		public final int max;
+		public final Method method;
 		
-		public Item(Type type, String name, Field field, String widget, String min, String max) {
+		public Item(Type type, String name, Method method) {
 			this.type = type;
 			this.name = name;
-			this.field = field;
-			this.widget = widget;
-			this.min = (min == null) ? 0 : Integer.parseInt(min);
-			this.max = (min == null) ? 0 : Integer.parseInt(max);
+			this.method = method;
 		}
 		
 		public String toString() {
-			return type + " " + name + " " + field;
+			return type + " " + name + " " + method;
 		}
 	}
 }
