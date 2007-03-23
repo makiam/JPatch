@@ -36,14 +36,9 @@ public class Dicer {
 	private static final int CREASE_5_6 = 9;
 	private static final int CREASE_5_7 = 10;
 	private static final int CREASE_6_7 = 11;
-	
-	
-	
-//	private static final float[][] TANGENT_FACE_WEIGHT = new float[MAX_VALENCE - 2][];			// [valence][index]
-//	private static final float[][] TANGENT_EDGE_WEIGHT = new float[MAX_VALENCE - 2][];			// [valence][index]
 
-	private static final int MAX_CORNER_LENGTH = MAX_VALENCE * 2 - 5;
-	public static final int GRID_START = MAX_CORNER_LENGTH * 2;
+	private static final int MAX_FAN_LENGTH = MAX_VALENCE * 2 - 5;
+	public static final int GRID_START = MAX_FAN_LENGTH * 2;
 	private final float[][][] subdivPoints = new float[MAX_SUBDIV][][];							// [level][index][0=x,1=y,2=z] index = row * dim + column
 	private final float[][][] limitPoints = new float[MAX_SUBDIV][][];							// [level][index][0=x,1=y,2=z] index = row * dim + column
 	private final float[][][] limitNormals = new float[MAX_SUBDIV][][];							// [level][index][0=x,1=y,2=z] index = row * dim + column
@@ -52,37 +47,13 @@ public class Dicer {
 	private final int[][][][] cornerStencil = new int[MAX_SUBDIV][MAX_VALENCE- 2][2][];			// [level][valence - 3][corner][stencil]
 	private final int[][][] patchLimitStencil = new int[MAX_SUBDIV][][];						// [level][index][stencil]
 	private final int[][][][] cornerLimitStencil = new int[MAX_SUBDIV][MAX_VALENCE- 2][2][];	// [level][valence - 3][corner][stencil]
-//	private final float[][] quadVertexArrays = new float[MAX_SUBDIV][];
-//	private final float[][] quadNormalArrays = new float[MAX_SUBDIV][];
-	
-//	private final float[][][][][][] fastLimitWeights = new float[MAX_SUBDIV][MAX_FAST_VALENCE - 2][MAX_FAST_VALENCE - 2][][][];    // [level][valence0][valence2][index][corner][vertex];
-//	private final float[][][][][][] fastTangent0Weights = new float[MAX_SUBDIV][MAX_FAST_VALENCE - 2][MAX_FAST_VALENCE - 2][][][]; // [level][valence0][valence2][index][corner][vertex];
-//	private final float[][][][][][] fastTangent1Weights = new float[MAX_SUBDIV][MAX_FAST_VALENCE - 2][MAX_FAST_VALENCE - 2][][][]; // [level][valence0][valence2][index][corner][vertex];
 	
 	
 	int[][][] rim0 = new int[MAX_SUBDIV][][];								//[level][side][index] outer grid rim
 	int[][][] rim1 = new int[MAX_SUBDIV][][];								//[level][side][index] inner grid rim
 	int[][][][] rimTriangles = new int[MAX_SUBDIV][MAX_SUBDIV][][]; 		// [thisLevel][pairLevel][side][index]
 	int[][][][] rimTriangleNormals = new int[MAX_SUBDIV][MAX_SUBDIV][][]; 	// [thisLevel][pairLevel][side][index]
-	
-//	static {
-//		for (int valence = 3; valence <= MAX_VALENCE; valence++) {
-//			int i = valence - 3;
-//			TANGENT_FACE_WEIGHT[i] = new float[valence];
-//			TANGENT_EDGE_WEIGHT[i] = new float[valence];
-//			float An = (float) (1 + cos(2 * PI / valence) + cos(PI / valence) * sqrt(2 * (9 + cos(2 * PI / valence))));
-//			for (int j = 0; j < valence; j++) {
-//				TANGENT_EDGE_WEIGHT[i][j] = (float) (An * cos(2 * PI  * j / valence));
-//				TANGENT_FACE_WEIGHT[i][j] = (float) (cos(2 * PI * j / valence) + cos(2 * PI * (j + 1) / valence));
-//			}
-//		}
-//	}
-	
-//	public static void main(String[] args) {
-//		Dicer slateTesselator = new Dicer();
-//		slateTesselator.new Tester(); 
-//	}
-	
+		
 	public Dicer() {
 		for (int level = 0; level < MAX_SUBDIV; level++) {
 			final int dim = ((1 << level)) + 3;
@@ -97,11 +68,7 @@ public class Dicer {
 				rim1[0] = new int[0][];
 				rimTriangles[0][0] = new int[4][0];
 				rimTriangleNormals[0][0] = new int[4][0];
-//				quadVertexArrays[0] = new float[15];
-//				quadNormalArrays[0] = new float[15];
 			} else {
-//				quadVertexArrays[level] = new float[(dim - 3) * (dim - 3) * 12 + 3];
-//				quadNormalArrays[level] = new float[(dim - 3) * (dim - 3) * 12 + 3];
 				/*
 				 * create rim arrays
 				 */
@@ -168,11 +135,6 @@ public class Dicer {
 			subdivPoints[level] = new float[dim * dim + GRID_START][3];
 			limitPoints[level] = new float[dim * dim + GRID_START][3];
 			limitNormals[level] = new float[dim * dim + GRID_START][12];
-			
-//			System.out.println("geometryarray level " + level + " size=" + geometryArray[level].length + " (" + dim + "x" + dim + " + " + GRID_START + ")");
-//			if (level == 0) {
-//				continue;
-//			}
 			
 			/*
 			 * populate subdivision stencil tables for corners
@@ -765,17 +727,17 @@ public class Dicer {
 			geo[GRID_START + 6][1] = boundary[1][0].y;
 			geo[GRID_START + 6][2] = boundary[1][0].z;
 			
-			geo[GRID_START + 2][0] = boundary[1][5].x;
-			geo[GRID_START + 2][1] = boundary[1][5].y;
-			geo[GRID_START + 2][2] = boundary[1][5].z;
+			geo[GRID_START + 2][0] = boundary[1][1].x;
+			geo[GRID_START + 2][1] = boundary[1][1].y;
+			geo[GRID_START + 2][2] = boundary[1][1].z;
 			
-			geo[GRID_START + 3][0] = boundary[1][6].x;
-			geo[GRID_START + 3][1] = boundary[1][6].y;
-			geo[GRID_START + 3][2] = boundary[1][6].z;
+			geo[GRID_START + 3][0] = boundary[1][2].x;
+			geo[GRID_START + 3][1] = boundary[1][2].y;
+			geo[GRID_START + 3][2] = boundary[1][2].z;
 			
-			geo[GRID_START + 7][0] = boundary[1][7].x;
-			geo[GRID_START + 7][1] = boundary[1][7].y;
-			geo[GRID_START + 7][2] = boundary[1][7].z;
+			geo[GRID_START + 7][0] = boundary[1][3].x;
+			geo[GRID_START + 7][1] = boundary[1][3].y;
+			geo[GRID_START + 7][2] = boundary[1][3].z;
 			
 			geo[GRID_START + 10][0] = boundary[2][0].x;
 			geo[GRID_START + 10][1] = boundary[2][0].y;
@@ -785,17 +747,17 @@ public class Dicer {
 			geo[GRID_START + 9][1] = boundary[3][0].y;
 			geo[GRID_START + 9][2] = boundary[3][0].z;
 			
-			geo[GRID_START + 13][0] = boundary[3][5].x;
-			geo[GRID_START + 13][1] = boundary[3][5].y;
-			geo[GRID_START + 13][2] = boundary[3][5].z;
+			geo[GRID_START + 13][0] = boundary[3][1].x;
+			geo[GRID_START + 13][1] = boundary[3][1].y;
+			geo[GRID_START + 13][2] = boundary[3][1].z;
 			
-			geo[GRID_START + 12][0] = boundary[3][6].x;
-			geo[GRID_START + 12][1] = boundary[3][6].y;
-			geo[GRID_START + 12][2] = boundary[3][6].z;
+			geo[GRID_START + 12][0] = boundary[3][2].x;
+			geo[GRID_START + 12][1] = boundary[3][2].y;
+			geo[GRID_START + 12][2] = boundary[3][2].z;
 			
-			geo[GRID_START + 8][0] = boundary[3][7].x;
-			geo[GRID_START + 8][1] = boundary[3][7].y;
-			geo[GRID_START + 8][2] = boundary[3][7].z;
+			geo[GRID_START + 8][0] = boundary[3][3].x;
+			geo[GRID_START + 8][1] = boundary[3][3].y;
+			geo[GRID_START + 8][2] = boundary[3][3].z;
 	//		// test crease stencils
 			patchStencil[1][7][1] = slate.corners[0][0].getSharpness();
 			patchStencil[1][13][1] = slate.corners[1][0].getSharpness();
@@ -835,9 +797,9 @@ public class Dicer {
 			
 			for (int corner = 0; corner < 2; corner ++) {
 				final Point3f[] c = boundary[corner * 2];
-				final int valence = Math.max(3, c.length / 2);
-				final int n = c.length - 5;
-				final int start = corner * MAX_CORNER_LENGTH;
+				final int valence = Math.max(3, slate.corners[corner * 2].length);
+				final int n = c.length;
+				final int start = corner * MAX_FAN_LENGTH;
 				
 	//			cornerStencil[1][valence - 3][corner][0] = Integer.MAX_VALUE;
 				
@@ -860,15 +822,15 @@ public class Dicer {
 				 */
 				for (int i = 1; i < n; i++) {
 					final int index = start + (i % (n - 1));
-					final int i4 = i + 4;
-					geo[index][0] = c[i4].x;
-					geo[index][1] = c[i4].y;
-					geo[index][2] = c[i4].z;
+//					final int i4 = i + 4;
+					geo[index][0] = c[i].x;
+					geo[index][1] = c[i].y;
+					geo[index][2] = c[i].z;
 				}
 				if (n == 2) {
-					geo[start + 1][0] = c[5].x;
-					geo[start + 1][1] = c[5].y;
-					geo[start + 1][2] = c[5].z;
+					geo[start + 1][0] = c[1].x;
+					geo[start + 1][1] = c[1].y;
+					geo[start + 1][2] = c[1].z;
 				}
 				
 				/* 
@@ -1194,7 +1156,7 @@ public class Dicer {
 					final int[][] nextArray = rewriteStencils ? fanStencil[level + 1][valence - 3][corner] : null;
 					final int m = array.length;
 					for (int i = 0; i < m; i++) {
-						final int oi = MAX_CORNER_LENGTH * corner + i;
+						final int oi = MAX_FAN_LENGTH * corner + i;
 						final int[] s = array[i];
 						switch (s[0]) {
 						case EDGE:
@@ -1613,7 +1575,7 @@ public class Dicer {
 				final int[][] array = fanStencil[level][val - 3][corner];
 				final int m = array.length;
 				for (int i = 0; i < m; i++) {
-					final int oi = MAX_CORNER_LENGTH * corner + i;
+					final int oi = MAX_FAN_LENGTH * corner + i;
 					final int[] s = array[i];
 					switch (s[0]) {
 					case EDGE:
@@ -1718,9 +1680,9 @@ public class Dicer {
 		} else if (row == 1 && column == 0) {
 			return 1;
 		} else if (row == dim - 1 && column == dim - 2) {
-			return MAX_CORNER_LENGTH;
+			return MAX_FAN_LENGTH;
 		} else if (row == dim - 2 && column == dim - 1) {
-			return MAX_CORNER_LENGTH + 1;
+			return MAX_FAN_LENGTH + 1;
 		} else {
 			return GRID_START + row * dim + column;
 		}
@@ -1784,7 +1746,7 @@ public class Dicer {
 		if (i < 0 || i >= cornerStencilLength(valence)) {
 			throw new IllegalArgumentException(Integer.toString(i));
 		}
-		return MAX_CORNER_LENGTH * corner + i;
+		return MAX_FAN_LENGTH * corner + i;
 		
 //		int max = cornerStencilLength(valence);
 //		int offset = MAX_CORNER_LENGTH * corner;
@@ -2012,10 +1974,10 @@ public class Dicer {
 				int column = (index - GRID_START) % dim;
 				p.setLocation(column - 1, row - 1);
 			} else {
-				if (index < MAX_CORNER_LENGTH) {
+				if (index < MAX_FAN_LENGTH) {
 					getFanPos(level, valence, 0, index, p);
 				} else {
-					getFanPos(level, valence, 1, index -  MAX_CORNER_LENGTH, p);
+					getFanPos(level, valence, 1, index -  MAX_FAN_LENGTH, p);
 				}
 			}
 		}

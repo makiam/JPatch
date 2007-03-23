@@ -69,6 +69,7 @@ public class Face {
 					y += t.getY();
 					z += t.getZ();
 				}
+				System.out.println("FacePoint position=" + position);
 				position.setTuple(x * recSides, y * recSides, z * recSides);
 			}
 			

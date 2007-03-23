@@ -62,7 +62,7 @@ public abstract class TransformedTuple3 extends Tuple3 {
 					}
 				} else {
 					super.setTuple(x, y, z);
-					invTransform();
+					transform();
 				}
 				autoTransform = true;
 			}
@@ -79,13 +79,14 @@ public abstract class TransformedTuple3 extends Tuple3 {
 	public final void setTuple(double x, double y, double z) {
 		autoTransform = false;
 		super.setTuple(x, y, z);
-		transform();
+		invTransform();
 		autoTransform = true;
 	}
 
 	public void setTransform(Matrix4d matrix) {
 		this.matrix.set(matrix);
 		inverseInvalid = true;
+		transform();
 	}
 	
 	public Tuple3 getReferenceTuple3() {

@@ -38,11 +38,11 @@ public class Tuple3 {
 	}
 	
 	public double getY() {
-		return xAttr.getDouble();
+		return yAttr.getDouble();
 	}
 	
 	public double getZ() {
-		return xAttr.getDouble();
+		return zAttr.getDouble();
 	}
 	
 	public void getTuple(Tuple3d tuple) {
@@ -73,5 +73,10 @@ public class Tuple3 {
 		xAttr.setDouble(x);
 		yAttr.setDouble(y);
 		zAttr.setDouble(z);
+	}
+	
+	@Override
+	public String toString() {
+		return "(" + xAttr.getDouble() + ", " + yAttr.getDouble() + ", " + zAttr.getDouble() + ")";
 	}
 }

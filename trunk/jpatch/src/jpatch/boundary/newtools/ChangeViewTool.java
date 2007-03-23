@@ -97,20 +97,20 @@ public class ChangeViewTool implements JPatchTool {
 			int dy = e.getY() - y;
 			x = e.getX();
 			y = e.getY();
-			double w = viewport.getComponent().getWidth() / 20 * viewport.viewScale.get();
+			double w = viewport.getComponent().getWidth() / 20 * viewport.getViewScale().getDouble();
 			viewport.setBirdsEyeView();
 			switch (mode) {
 			case MOVE:
-				viewport.viewTranslation.x.set(viewport.viewTranslation.x.get() + dx / w);
-				viewport.viewTranslation.y.set(viewport.viewTranslation.y.get() - dy / w);
+				viewport.getViewTranslation().setX(viewport.getViewTranslation().getX() + dx / w);
+				viewport.getViewTranslation().setY(viewport.getViewTranslation().getY() - dy / w);
 				break;
 			case ROTATE:
-				viewport.viewRotation.x.set(Math.min(Math.max(viewport.viewRotation.x.get() + 0.25 * dy, -90), 90));
-				viewport.viewRotation.y.set((viewport.viewRotation.y.get() + 0.25 * dx + 360) % 360);
+				viewport.getViewRotation().setX(Math.min(Math.max(viewport.getViewRotation().getX() + 0.25 * dy, -90), 90));
+				viewport.getViewRotation().setY((viewport.getViewRotation().getY() + 0.25 * dx + 360) % 360);
 				break;
 			case ZOOM:
 				double factor = Math.min(Math.max(1 + (dx - dy) / 200.0, 0.2), 5);
-				viewport.viewScale.set(viewport.viewScale.get() * factor);
+				viewport.getViewScale().setDouble(viewport.getViewScale().getDouble() * factor);
 				break;
 			}
 		}

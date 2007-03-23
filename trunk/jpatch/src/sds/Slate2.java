@@ -28,10 +28,10 @@ public class Slate2 {
 	
 	void initFans() {
 		fans = new Point3f[4][];
-		fans[0] = new Point3f[2 * corners[0].length + 1];
+		fans[0] = new Point3f[2 * corners[0].length - 4];
 		fans[0][0] = corners[0][0].vertex.projectedPos;
 		int j = 1;
-		for (int i = 0; i < corners[0].length; i++) {
+		for (int i = 2; i < corners[0].length; i++) {
 			if (corners[0][i] == null) {
 				fans[0][j++] = NULL_POINT;
 				fans[0][j++] = NULL_POINT;
@@ -39,37 +39,45 @@ public class Slate2 {
 			}
 			fans[0][j++] = corners[0][i].pair.vertex.projectedPos;
 //			System.out.println("corners " + corners + "[0][" + i + "].slate=" + corners[0][i].slate);
-			fans[0][j++] = corners[0][i].slate == null ? NULL_POINT : corners[0][i].slate.corners[2][0].vertex.projectedPos;
+			if (i < corners[0].length - 1) {
+				fans[0][j++] = corners[0][i].slate == null ? NULL_POINT : corners[0][i].slate.corners[2][0].vertex.projectedPos;
+			}
 		}
 		
-		fans[1] = new Point3f[9];
+		fans[1] = new Point3f[4];
 		fans[1][0] = corners[1][0].vertex.projectedPos;
 		j = 1;
-		for (int i = 0; i < corners[1].length; i++) {
+		for (int i = 2; i < corners[1].length; i++) {
 			fans[1][j++] = corners[1][i] == null ? NULL_POINT : corners[1][i].pair.vertex.projectedPos;
 			fans[1][j++] = corners[1][i] == null || corners[1][i].slate == null ? NULL_POINT : corners[1][i].slate.corners[3][0].vertex.projectedPos;
 			i++;
 			fans[1][j++] = corners[1][i] == null ? NULL_POINT : corners[1][i].pair.vertex.projectedPos;
-			fans[1][j++] = corners[1][i] == null || corners[1][i].slate == null ? NULL_POINT : corners[1][i].slate.corners[1][0].vertex.projectedPos;
+			if (i < corners[1].length - 1) {
+				fans[1][j++] = corners[1][i] == null || corners[1][i].slate == null ? NULL_POINT : corners[1][i].slate.corners[1][0].vertex.projectedPos;
+			}
 		}
 		
-		fans[2] = new Point3f[2 * corners[2].length + 1];
+		fans[2] = new Point3f[2 * corners[2].length - 4];
 		fans[2][0] = corners[2][0].vertex.projectedPos;
 		j = 1;
-		for (int i = 0; i < corners[2].length; i++) {
+		for (int i = 2; i < corners[2].length; i++) {
 			fans[2][j++] = corners[2][i].pair.vertex.projectedPos;
-			fans[2][j++] = corners[2][i].slate.corners[0][0].vertex.projectedPos;
+			if (i < corners[2].length - 1) {
+				fans[2][j++] = corners[2][i].slate.corners[0][0].vertex.projectedPos;
+			}
 		}
 		
-		fans[3] = new Point3f[9];
+		fans[3] = new Point3f[4];
 		fans[3][0] = corners[3][0].vertex.projectedPos;
 		j = 1;
-		for (int i = 0; i < corners[3].length; i++) {
+		for (int i = 2; i < corners[3].length; i++) {
 			fans[3][j++] = corners[3][i] == null ? NULL_POINT : corners[3][i].pair.vertex.projectedPos;
 			fans[3][j++] = corners[3][i] == null || corners[3][i].slate == null ? NULL_POINT : corners[3][i].slate.corners[1][0].vertex.projectedPos;
 			i++;
 			fans[3][j++] = corners[3][i] == null ? NULL_POINT : corners[3][i].pair.vertex.projectedPos;
-			fans[3][j++] = corners[3][i] == null || corners[3][i].slate == null ? NULL_POINT : corners[3][i].slate.corners[3][0].vertex.projectedPos;
+			if (i < corners[3].length - 1) {
+				fans[3][j++] = corners[3][i] == null || corners[3][i].slate == null ? NULL_POINT : corners[3][i].slate.corners[3][0].vertex.projectedPos;
+			}
 		}
 	}
 	
@@ -99,22 +107,25 @@ public class Slate2 {
 			return;
 		}
 		for (int corner = 0; corner < 4; corner++) {
-			int valence = corners[corner].length;
-			float fx = 0, fy = 0;
-			float ex = 0, ey = 0;
-			for (int i = 1; i < fans[corner].length; i++) {
-				ex += fans[corner][i].x;
-				ey += fans[corner][i].y;
-				i++;
-				fx += fans[corner][i].x;
-				fy += fans[corner][i].y;
-			}
+//			int valence = corners[corner].length;
+//			float fx = 0, fy = 0;
+//			float ex = 0, ey = 0;
+//			for (int i = 1; i < fans[corner].length; i++) {
+//				ex += fans[corner][i].x;
+//				ey += fans[corner][i].y;
+//				i++;
+//				fx += fans[corner][i].x;
+//				fy += fans[corner][i].y;
+//			}
+//			
+//			float v2 = valence * valence;
+//			float ik = 1.0f / (v2 + 5 * valence);
+//			
+//			int lx = (int) ((ex * 4 + fx + fans[corner][0].x * v2) * ik);
+//			int ly = (int) ((ey * 4 + fy + fans[corner][0].y * v2) * ik);
 			
-			float v2 = valence * valence;
-			float ik = 1.0f / (v2 + 5 * valence);
-			
-			int lx = (int) ((ex * 4 + fx + fans[corner][0].x * v2) * ik);
-			int ly = (int) ((ey * 4 + fy + fans[corner][0].y * v2) * ik);
+			int lx = (int) corners[corner][0].vertex.projectedLimit.x;
+			int ly = (int) corners[corner][0].vertex.projectedLimit.y;
 			
 			if (lx < xmin) xmin = lx;
 			if (lx > xmax) xmax = lx;

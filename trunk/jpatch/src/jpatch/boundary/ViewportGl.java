@@ -330,8 +330,8 @@ public class ViewportGl extends Viewport {
 	
 	private int maxLights, maxTextureSize;
 	
-	public ViewportGl(int id, int view, Iterable<Model> models) {
-		super(id, view, models);
+	public ViewportGl(int id, int view) {
+		super(id, view);
 		drawable = LIGHTWEIGHT ? new GLJPanel() : new GLCanvas();
 		component = (Component) drawable;
 		component.setBackground(COLORS.background.get());

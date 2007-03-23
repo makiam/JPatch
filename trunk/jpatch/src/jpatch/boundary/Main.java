@@ -259,11 +259,11 @@ public class Main {
 			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/cube2.off"));
 //			new RibExport().export(activeSds, System.out);
 //			System.exit(0);
-  //			activeSds = new JptLoader().importModel(new FileInputStream("/mnt/share/jpatch0.4/models/moai2.jpt"));
+//			activeSds = new JptLoader().importModel(new FileInputStream("/mnt/share/jpatch0.4/models/moai2.jpt"));
 
 //			activeSds.makeSlates();
 //			activeSds.verify();
-//			activeSds.dump();
+			activeSds.dump();
 //			activeSds.smooth();
 //			System.exit(0);
 		} catch (IOException e1) {
@@ -297,7 +297,7 @@ public class Main {
 		 * initialize viewports
 		 */
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			viewports[i] = new ViewportGl(i + 1, i * 2, models);
+			viewports[i] = new ViewportGl(i + 1, i * 2);
 			screen.add(viewports[i].getComponent());
 			final int viewportNumber = i;
 			viewports[i].getComponent().addMouseListener(new MouseAdapter() {

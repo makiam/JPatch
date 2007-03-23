@@ -73,21 +73,18 @@ public class AttributeEditorFactory {
 					Item item = new Item(
 							Type.ATTRIBUTE,
 							attributes.getValue("name"),
-							objectClass.getField(attributes.getValue("field")),
-							attributes.getValue("widget"),
-							attributes.getValue("min"),
-							attributes.getValue("max")
+							objectClass.getMethod(getterMethod(attributes.getValue("property")))
 					);
 					addItem(item);
 					System.out.println(item);
 				} else if (localName.equals("limits")) {
-					Item item = new Item(Type.LIMIT, null, objectClass.getField(attributes.getValue("field")), null, null, null);
-					addItem(item);
-					System.out.println(item);
+//					Item item = new Item(Type.LIMIT, null, objectClass.getField(attributes.getValue("field")), null, null, null);
+//					addItem(item);
+//					System.out.println(item);
 				}
 			} catch (SecurityException e) {
 				throw new SAXException(e);
-			} catch (NoSuchFieldException e) {
+			} catch (NoSuchMethodException e) {
 				throw new SAXException(e);
 			}
 		}
@@ -112,5 +109,9 @@ public class AttributeEditorFactory {
 		public Item[][] getSchema() {
 			return sections.toArray(new Item[sections.size()][]);
 		}
+	}
+	
+	private static String getterMethod(String property) {
+		return "get" + Character.toUpperCase(property.charAt(0)) + property.substring(1);
 	}
 }

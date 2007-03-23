@@ -9,7 +9,19 @@ public abstract class AbstractVertex {
 	
 	public final Point3f projectedPos = new Point3f();
 	
-	public double getSharpness() {
+	public TransformedPoint3 getPosition() {
+		return position;
+	}
+	
+	public Tuple3 getReferencePosition() {
+		return position.getReferenceTuple3();
+	}
+	
+	public DoubleAttr getSharpness() {
+		return sharpness;
+	}
+	
+	public double sharpness() {
 		return sharpness.getDouble();
 	}
 	

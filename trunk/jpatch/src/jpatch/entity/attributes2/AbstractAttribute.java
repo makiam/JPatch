@@ -1,6 +1,6 @@
 package jpatch.entity.attributes2;
 
-public abstract class AbstractAttribute implements Attribute {
+public abstract class AbstractAttribute implements Attribute{
 	protected AttributeListener[] attributeListeners = new AttributeListener[0];
 	protected boolean fireEvents = true;
 	
@@ -53,8 +53,6 @@ public abstract class AbstractAttribute implements Attribute {
     	} else {
     		if (l == null) {
     			throw new NullPointerException();
-    		} else {
-    			throw new IllegalArgumentException("AttributeListener " + l + " is not bound to " + this);
     		}
     	}
     }
