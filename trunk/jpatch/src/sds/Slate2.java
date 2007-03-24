@@ -8,6 +8,7 @@ public class Slate2 {
 	SlateEdge[][] corners;
 	Point3f[][] fans;
 	int subdivLevel;
+	float normalCone;
 	
 //	Slate2(SlateEdge[][] corners) {
 //		this.corners = corners;
@@ -91,12 +92,36 @@ public class Slate2 {
 		return -1;
 	}
 	
+	void computeNormalCone() {
+		float min  = 1;
+		for (int i = 0; i < 3; i++) {
+			for (int j = i + 1; j < 4; j++) {
+				float dot = (float) corners[i][0].vertex.normal.dot(corners[j][0].vertex.normal);
+				if (dot < min) {
+					min = dot;
+				}
+			}
+		}
+		normalCone = 1.0f - 0.5f * min;
+	}
+	
+	/**
+	 * This implementation computes the subdivision level based on <ul>
+	 * <li>the estimated screen size of the slate in pixels,</li>
+	 * <li>the curvature (normal cone) of the slate,</li>
+	 * <li>whether or not this slate is part of the surface's silhouette and</li>
+	 * <li>whether or not an edge of this slate is part of a crease</li>
+	 * </ul>
+	 * @param halfWidth
+	 * @param halfHeight
+	 */
 	public void estimateSubdivLevel(int halfWidth, int halfHeight) {
 		int xmin = Integer.MAX_VALUE;
 		int xmax = Integer.MIN_VALUE;
 		int ymin = Integer.MAX_VALUE;
 		int ymax = Integer.MIN_VALUE;
-
+		boolean silhouette = true;
+		boolean crease = false;
 		if (
 				corners[0][0].vertex.projectedNormal.z < 0 &&
 				corners[1][0].vertex.projectedNormal.z < 0 &&
@@ -105,6 +130,13 @@ public class Slate2 {
 		) {
 			subdivLevel = -1;
 			return;
+		} else if (
+				corners[0][0].vertex.projectedNormal.z > 0 &&
+				corners[1][0].vertex.projectedNormal.z > 0 &&
+				corners[2][0].vertex.projectedNormal.z > 0 &&
+				corners[3][0].vertex.projectedNormal.z > 0
+		) {
+			silhouette = false;
 		}
 		for (int corner = 0; corner < 4; corner++) {
 //			int valence = corners[corner].length;
@@ -123,6 +155,10 @@ public class Slate2 {
 //			
 //			int lx = (int) ((ex * 4 + fx + fans[corner][0].x * v2) * ik);
 //			int ly = (int) ((ey * 4 + fy + fans[corner][0].y * v2) * ik);
+			
+			if (corners[corner][0].getSharpness() > 0) {
+				crease = true;
+			}
 			
 			int lx = (int) corners[corner][0].vertex.projectedLimit.x;
 			int ly = (int) corners[corner][0].vertex.projectedLimit.y;
@@ -147,7 +183,12 @@ public class Slate2 {
 		int dx = xmax - xmin;
 		int dy = ymax - ymin;
 		int s = dx + dy;
-		s >>= 4;
+		s *= normalCone;
+		if (silhouette || crease) {
+			s >>= 4;
+		} else {
+			s >>= 5;
+		}
 		if ((s & 0xffffff00) > 0) {
 			subdivLevel = 6;
 		} else if ((s & 0xc0) > 0) {

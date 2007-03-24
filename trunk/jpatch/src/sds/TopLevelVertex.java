@@ -183,6 +183,7 @@ public class TopLevelVertex extends BaseVertex {
 					uTangent.set(bx, by, bz);
 					vTangent.set(ax, ay, az);
 					normal.cross(uTangent, vTangent);
+					normal.normalize();
 				}
 			}
 		};

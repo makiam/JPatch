@@ -94,6 +94,7 @@ public class HalfEdge {
 					);
 					
 					normal.cross(uTangent, vTangent);
+					normal.normalize();
 				}
 			}
 		};
