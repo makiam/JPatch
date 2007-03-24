@@ -800,9 +800,6 @@ public class Dicer {
 				final int valence = Math.max(3, slate.corners[corner * 2].length);
 				final int n = c.length;
 				final int start = corner * MAX_FAN_LENGTH;
-				
-	//			cornerStencil[1][valence - 3][corner][0] = Integer.MAX_VALUE;
-				
 				cornerStencil[0][valence - 3][corner][0] = (int) (slate.corners[corner * 2][0].vertex.corner * 0x10000);
 				cornerStencil[0][valence - 3][corner][1] = (int) (slate.corners[corner * 2][0].vertex.crease * 0x10000);
 				cornerStencil[1][valence - 3][corner][0] = (int) (slate.corners[corner * 2][0].vertex.corner * 0x10000);
@@ -1086,7 +1083,7 @@ public class Dicer {
 				 * apply stencils on corners and fans
 				 */
 				for (int corner = 0; corner < 2; corner++) {
-					final int valence = Math.max(3, boundary[corner * 2].length / 2);
+					final int valence = Math.max(3, slate.corners[corner * 2].length);
 					final int[] cs = cornerStencil[level][valence - 3][corner];
 					final int outIndex = cs[4];
 					float x = 0, y = 0, z = 0;
@@ -1337,7 +1334,7 @@ public class Dicer {
 			 * apply limit stencils on corners
 			 */
 			for (int corner = 0; corner < 2; corner ++) {
-				final int valence = Math.max(3, boundary[corner * 2].length / 2);
+				final int valence = Math.max(3, slate.corners[corner * 2].length);
 				final int[] cps = cornerStencil[level][valence - 3][corner];
 				final int[] cs = cornerLimitStencil[level][valence - 3][corner];
 				

@@ -260,6 +260,11 @@ public class Sds {
 		for (Level2Vertex v : level2Vertices) {
 			v.computeLimit();
 		}
+		for (Face face : faceList) {
+			for (Slate2 slate : face.slates) {
+				slate.computeNormalCone();
+			}
+		}
 	}
 	
 	public void project(Matrix4f matrix) {
