@@ -6,6 +6,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 
+import javax.media.opengl.GLCanvas;
 import javax.vecmath.Point3d;
 
 import jpatch.boundary.Main;
@@ -94,8 +95,8 @@ public class MoveVertexTool implements JPatchTool {
 //			p.scale((n + 5) / n);
 //			p.add(pos);
 			vertex.getPosition().setTuple(p);
-			Main.getInstance().getActiveSds().rethinkSlates();
-			viewport.getComponent().repaint();	// FIXME for synchronized viewports
+			Main.getInstance().getActiveSds().computeLevel2Vertices();
+			((GLCanvas) viewport.getComponent()).display();
 		}
 	}
 

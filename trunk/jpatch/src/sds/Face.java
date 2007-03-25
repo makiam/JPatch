@@ -1,15 +1,13 @@
 package sds;
 
-import static sds.SdsWeights.TANGENT_EDGE_WEIGHT;
-import static sds.SdsWeights.TANGENT_FACE_WEIGHT;
-import static sds.SdsWeights.VERTEX_EDGE_LIMIT;
-import static sds.SdsWeights.VERTEX_FACE_LIMIT;
-import static sds.SdsWeights.VERTEX_POINT_LIMIT;
+import static sds.SdsWeights.*;
 
 import java.util.Iterator;
 
-import javax.vecmath.Point3d;
+import jpatch.entity.*;
 import jpatch.entity.attributes2.*;
+
+import javax.vecmath.*;
 
 /**
  * 
@@ -27,6 +25,7 @@ public class Face {
 	final Slate2[] slates;
 	
 	final SlateEdge[] slateEdges;
+	private Material material = new BasicMaterial(new Color3f(1.0f, 1.0f, 1.0f), 0.2f, 0.8f, 1.0f, 0.0f, 0.1f);
 	
 	public final Level2Vertex facePoint;
 	public final HalfEdge edge;
@@ -69,7 +68,6 @@ public class Face {
 					y += t.getY();
 					z += t.getZ();
 				}
-				System.out.println("FacePoint position=" + position);
 				position.setTuple(x * recSides, y * recSides, z * recSides);
 			}
 			
@@ -141,6 +139,14 @@ public class Face {
 			e = e.next;
 		}
 		
+	}
+	
+	public Material getMaterial() {
+		return material;
+	}
+	
+	public void setMaterial(Material material) {
+		this.material = material;
 	}
 	
 	public LinearCombination<TopLevelVertex> getFacePointLc() {

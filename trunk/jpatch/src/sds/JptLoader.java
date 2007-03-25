@@ -10,11 +10,14 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 import javax.vecmath.*;
 
+import jpatch.entity.*;
+
 public class JptLoader {
 	private List<Cp> cpList = new ArrayList<Cp>();
 	private Map<Integer, Cp> childHookIndex = new HashMap<Integer, Cp>();
 	private int cpIndex;
 	private Sds sds;
+	private List<Material> materials = new ArrayList<Material>();
 	
 	public ContentHandler handler = new DefaultHandler() {
 		StringBuilder chars;
@@ -22,7 +25,10 @@ public class JptLoader {
 		Cp prevCp;
 		boolean loop;
 		boolean patch;
-		
+		boolean material;
+		int materialIndex = 0;
+		Color3f color = new Color3f(1.0f, 1.0f, 1.0f);
+	
 		@Override
 		public void characters(char[] ch, int start, int length) throws SAXException {
 			if (chars != null) {
@@ -70,8 +76,29 @@ public class JptLoader {
 						}
 					}
 					System.out.println(vertexList);
-					sds.addFace(vertexList.toArray(new TopLevelVertex[vertexList.size()]));
+					Face face = sds.addFace(vertexList.toArray(new TopLevelVertex[vertexList.size()]));
+					face.setMaterial(materials.get(materialIndex));
 					chars = null;
+				}
+			}
+			if (material) {
+				if (localName.equals("name")) {
+					String name = chars.toString();
+					chars = null;
+					if (name.equals("Default Material")) {
+						materialIndex = 0;
+					} else {
+						materialIndex = materials.size();
+					}
+				}
+				if (localName.equals("material")) {
+					if (materialIndex < materials.size()) {
+						materials.remove(materialIndex);
+						materials.add(materialIndex, new BasicMaterial(color));
+					} else {
+						materials.add(new BasicMaterial(color));
+					}
+					material = false;
 				}
 			}
 		}
@@ -121,10 +148,28 @@ public class JptLoader {
 				chars = new StringBuilder();
 			} else if (localName.equals("patch")) {
 				patch = true;
+				materialIndex = Integer.parseInt(attributes.getValue("material"));
+			} else if (localName.equals("material")) {
+				material = true;
+			} else if (material) {
+				if (localName.equals("name")) {
+					chars = new StringBuilder();
+				}
+				if (localName.equals("color")) {
+					color.set(
+							Float.parseFloat(attributes.getValue("r")),
+							Float.parseFloat(attributes.getValue("g")),
+							Float.parseFloat(attributes.getValue("b"))
+					);
+				}
 			}
 		}
 		
 	};
+	
+	public JptLoader() {
+		materials.add(new BasicMaterial(new Color3f(1.0f, 1.0f, 1.0f)));
+	}
 	
 	public Sds importModel(InputStream inputStream) throws IOException {
 		XMLReader xmlReader;

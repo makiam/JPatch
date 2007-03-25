@@ -410,35 +410,35 @@ public class AttributeUiHelper {
 	}
 	
 	private static boolean verifyTextField(JTextField textField, Attribute attribute) {
-		if (attribute instanceof Attribute.String) {
-			if (attribute instanceof Attribute.Name) {
-				JPatchObject object = ((Attribute.Name) attribute).getJPatchObject();
-				return (object.getObjectRegistry().getObject(object.getClass(), textField.getText()) == null);
-			}
+		if (attribute instanceof StringAttr) {
+//			if (attribute instanceof Attribute.Name) {
+//				JPatchObject object = ((Attribute.Name) attribute).getJPatchObject();
+//				return (object.getObjectRegistry().getObject(object.getClass(), textField.getText()) == null);
+//			}
 			return true;
 		}
 		try {
-			if (attribute instanceof Attribute.Integer) {
+			if (attribute instanceof IntAttr) {
 				int i = Integer.parseInt(textField.getText());
-				if (attribute instanceof Attribute.BoundedInteger) {
-					if (i < ((Attribute.BoundedInteger) attribute).getMin())
-						return false;
-					if (i > ((Attribute.BoundedInteger) attribute).getMax())
-						return false;
-				}
-				((Attribute.Integer) attribute).set(i);
+//				if (attribute instanceof Attribute.BoundedInteger) {
+//					if (i < ((Attribute.BoundedInteger) attribute).getMin())
+//						return false;
+//					if (i > ((Attribute.BoundedInteger) attribute).getMax())
+//						return false;
+//				}
+				((IntAttr) attribute).setInt(i);
 				return true;
-			} else if (attribute instanceof Attribute.Double) {
+			} else if (attribute instanceof DoubleAttr) {
 				double d = Double.parseDouble(textField.getText());
-				if (attribute instanceof Attribute.BoundedDouble) {
-					Attribute.Limit min = ((Attribute.BoundedDouble) attribute).min;
-					Attribute.Limit max = ((Attribute.BoundedDouble) attribute).max;
-					if (min.getEnableAttribute().get() && d < min.get())
-						return false;
-					if (max.getEnableAttribute().get() && d > max.get())
-						return false;
-				}
-				((Attribute.Double) attribute).set(d);
+//				if (attribute instanceof BoundedDoubleValue) {
+//					Attribute.Limit min = ((Attribute.BoundedDouble) attribute).min;
+//					Attribute.Limit max = ((Attribute.BoundedDouble) attribute).max;
+//					if (min.getEnableAttribute().get() && d < min.get())
+//						return false;
+//					if (max.getEnableAttribute().get() && d > max.get())
+//						return false;
+//				}
+				((DoubleAttr) attribute).setDouble(d);
 				return true;
 			}
 		} catch (NumberFormatException e) {

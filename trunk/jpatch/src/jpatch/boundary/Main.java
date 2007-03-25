@@ -256,9 +256,10 @@ public class Main {
 //			}
 //			System.exit(0);
 			
-			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/teapot.off"));
+//			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/teapot.off"));
 //			new RibExport().export(activeSds, System.out);
 //			System.exit(0);
+			activeSds = new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt"));
 //			activeSds = new JptLoader().importModel(new FileInputStream("/mnt/share/jpatch0.4/models/moai2.jpt"));
 
 //			activeSds.makeSlates();

@@ -253,7 +253,7 @@ public class Sds {
 	}
 	
 	public void computeLevel2Vertices() {
-		System.out.println("computeLevel2Vertices " + level2Vertices.length);
+		System.out.println("cumputeLevel2Vertices...");
 		for (Level2Vertex v : level2Vertices) {
 			v.computeDerivedPosition();
 		}
@@ -265,6 +265,7 @@ public class Sds {
 				slate.computeNormalCone();
 			}
 		}
+		System.out.println("cumputeLevel2Vertices done.");
 	}
 	
 	public void project(Matrix4f matrix) {
@@ -395,7 +396,7 @@ public class Sds {
 		faceList.add(face);
 	}
 	
-	void addFace(TopLevelVertex[] vertices) {
+	Face addFace(TopLevelVertex[] vertices) {
 		HalfEdge start = createEdge(vertices[0], vertices[1]);
 		HalfEdge prev = start;
 		HalfEdge edge = null;
@@ -409,6 +410,7 @@ public class Sds {
 		start.prev = edge;
 		Face face = new Face(vertices.length, start);
 		faceList.add(face);
+		return face;
 	}
 	
 //	private Face createFace(TopLevelVertex[] vertices) {

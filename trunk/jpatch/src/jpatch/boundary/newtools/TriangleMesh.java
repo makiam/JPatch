@@ -2,6 +2,7 @@ package jpatch.boundary.newtools;
 
 import javax.vecmath.*;
 import jpatch.boundary.*;
+import jpatch.entity.GlMaterial;
 
 public class TriangleMesh {
 	public static final int AMBIENT = 0;
