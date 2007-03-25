@@ -460,6 +460,7 @@ public class ViewportGl extends Viewport {
 		gl.glMaterialfv(GL_FRONT, GL_AMBIENT, array, GlMaterial.AMBIENT);
 		gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, array, GlMaterial.DIFFUSE);
 		gl.glMaterialfv(GL_FRONT, GL_SPECULAR, array, GlMaterial.SPECULAR);
+		gl.glMaterialfv(GL_FRONT, GL_EMISSION, array, GlMaterial.EMISSION);
 		gl.glMaterialfv(GL_FRONT, GL_SHININESS, array, GlMaterial.SHININESS);
 	}
 	
@@ -487,42 +488,44 @@ public class ViewportGl extends Viewport {
 	
 	@Override
 	public void draw() {
+		gl.glFinish();	// wait for previous gl functions to finish
+		
 //		rasterMode();
 //		drawGrid();
 		spatialMode();
 		
 		
 //		gl.glEnable(GL_BLEND);
-		Matrix4d m = new Matrix4d();
-		TriangleMesh cx = TriangleMesh.createCone(16, new GlMaterial(new Color3f(0.4f, 0, 0), new Color3f(0.8f, 0, 0), new Color3f(0, 0, 0), 0));
-		TriangleMesh cy = TriangleMesh.createCone(16, new GlMaterial(new Color3f(0, 0.4f, 0), new Color3f(0, 0.8f, 0), new Color3f(0, 0, 0), 0));
-		TriangleMesh cz = TriangleMesh.createCone(16, new GlMaterial(new Color3f(0.2f, 0.2f, 0.4f), new Color3f(0.4f, 0.4f, 0.8f), new Color3f(0, 0, 0), 0));
-		m.set(new double[] {
-				0, 0, 0.2, 0.9,
-				0, 0.2, 0, 0,
-				0.2, 0, 0, 0,
-				0, 0, 0, 1
-		});
-		cx.transform(m);
-		m.set(new double[] {
-				0.2, 0, 0, 0,
-				0, 0, 0.2, 0.9,
-				0, 0.2, 0, 0,
-				0, 0, 0, 1
-		});
-		cy.transform(m);
-		m.set(new double[] {
-				0.2, 0, 0, 0,
-				0, 0.2, 0, 0,
-				0, 0, 0.2, 0.9,
-				0, 0, 0, 1
-		});
-		cz.transform(m);
-		WireFrame wx = new WireFrame(new Point3d[] { new Point3d(0, 0, 0), new Point3d(1, 0, 0) }, new int[] { 0, 1 }, new Color3f(1, 0, 0));
-		WireFrame wy = new WireFrame(new Point3d[] { new Point3d(0, 0, 0), new Point3d(0, 1, 0) }, new int[] { 0, 1 }, new Color3f(0, 1, 0));
-		WireFrame wz = new WireFrame(new Point3d[] { new Point3d(0, 0, 0), new Point3d(0, 0, 1) }, new int[] { 0, 1 }, new Color3f(0.5f, 0.5f, 1));
-		
-		Shape s = new Shape(new TriangleMesh[] { cx, cy, cz }, new WireFrame[] { wx, wy, wz } );
+//		Matrix4d m = new Matrix4d();
+//		TriangleMesh cx = TriangleMesh.createCone(16, new GlMaterial(new Color3f(0.4f, 0, 0), new Color3f(0.8f, 0, 0), new Color3f(0, 0, 0), 0));
+//		TriangleMesh cy = TriangleMesh.createCone(16, new GlMaterial(new Color3f(0, 0.4f, 0), new Color3f(0, 0.8f, 0), new Color3f(0, 0, 0), 0));
+//		TriangleMesh cz = TriangleMesh.createCone(16, new GlMaterial(new Color3f(0.2f, 0.2f, 0.4f), new Color3f(0.4f, 0.4f, 0.8f), new Color3f(0, 0, 0), 0));
+//		m.set(new double[] {
+//				0, 0, 0.2, 0.9,
+//				0, 0.2, 0, 0,
+//				0.2, 0, 0, 0,
+//				0, 0, 0, 1
+//		});
+//		cx.transform(m);
+//		m.set(new double[] {
+//				0.2, 0, 0, 0,
+//				0, 0, 0.2, 0.9,
+//				0, 0.2, 0, 0,
+//				0, 0, 0, 1
+//		});
+//		cy.transform(m);
+//		m.set(new double[] {
+//				0.2, 0, 0, 0,
+//				0, 0.2, 0, 0,
+//				0, 0, 0.2, 0.9,
+//				0, 0, 0, 1
+//		});
+//		cz.transform(m);
+//		WireFrame wx = new WireFrame(new Point3d[] { new Point3d(0, 0, 0), new Point3d(1, 0, 0) }, new int[] { 0, 1 }, new Color3f(1, 0, 0));
+//		WireFrame wy = new WireFrame(new Point3d[] { new Point3d(0, 0, 0), new Point3d(0, 1, 0) }, new int[] { 0, 1 }, new Color3f(0, 1, 0));
+//		WireFrame wz = new WireFrame(new Point3d[] { new Point3d(0, 0, 0), new Point3d(0, 0, 1) }, new int[] { 0, 1 }, new Color3f(0.5f, 0.5f, 1));
+//		
+//		Shape s = new Shape(new TriangleMesh[] { cx, cy, cz }, new WireFrame[] { wx, wy, wz } );
 		
 //		drawShape(s);
 		
@@ -530,8 +533,7 @@ public class ViewportGl extends Viewport {
 //			drawModel(model);
 //		}
 		
-		setMaterial(new GlMaterial(new Color3f(0.1f, 0.1f, 0.2f), new Color3f(0.2f, 0.2f, 0.8f), new Color3f(1, 1, 1), 100).array);
-		gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		gl.glPolygonMode(GL_FRONT, GL_FILL);
 //		drawSds(Main.getInstance().getActiveSds());
 		drawSds3(Main.getInstance().getActiveSds());
 		
@@ -542,7 +544,8 @@ public class ViewportGl extends Viewport {
 //		}
 		rasterMode();
 		drawInfo();
-		gl.glFlush();
+		gl.glFlush(); // ensure that everything gets drawn
+//		gl.glFinish();
 	}
 	
 //	public void setMaterial(Color3f ka) {
@@ -805,8 +808,8 @@ public class ViewportGl extends Viewport {
 //		Point3f p1 = new Point3f();
 //		gl.glInterleavedArrays(GL_N3F_V3F, 0, dicer.getBuffer());
 		gl.glEnable(GL_LIGHTING);
-		gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 0, 0.9f }, 0);
-		gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0, 0, 0.2f }, 0);
+//		gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 0, 0.9f }, 0);
+//		gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0, 0, 0.2f }, 0);
 		
 		if (canUseProgram) {
 			gl.glUseProgram(useProgram ? program : 0);
@@ -814,6 +817,7 @@ public class ViewportGl extends Viewport {
 		
 		if (showLimitSurface.getBoolean()) {
 			for (Face face : sds.faceList) {
+				setMaterial(face.getMaterial().getGlMaterial().getArray());
 				for (Slate2 slate : face.getSlates()) {
 	//				switch (slate.getSubdivisionLevel()) {
 	//				case 1:
@@ -843,9 +847,8 @@ public class ViewportGl extends Viewport {
 		if (showControlMesh.getBoolean()) {
 			
 			if (!showLimitSurface.getBoolean()) {
-				gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 0, 0.9f }, 0);
-				gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0, 0, 0.2f }, 0);
 				for (Face face : sds.faceList) {
+					setMaterial(face.getMaterial().getGlMaterial().getArray());
 					gl.glBegin(GL_TRIANGLE_FAN);
 					Point3f p = face.facePoint.projectedPos;
 					Vector3f n = face.facePoint.projectedNormal;
