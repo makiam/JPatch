@@ -14,6 +14,15 @@ import javax.vecmath.*;
  *
  */
 public class Sds {
+	private final static Comparator<Face> faceMaterialComparator = new Comparator<Face>() {
+
+		public int compare(Face f1, Face f2) {
+			int m1 = System.identityHashCode(f1.getMaterial());
+			int m2 = System.identityHashCode(f2.getMaterial());
+			return (m1 < m2) ? -1 : (m1 > m2) ? 1 : 0;
+		}
+		
+	};
 	private Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
 	public List<TopLevelVertex> vertexList = new ArrayList<TopLevelVertex>();
 	public List<Face> faceList = new LinkedList<Face>();
@@ -171,6 +180,10 @@ public class Sds {
 //		}
 //		face.facePoint.position.scale(1.0 / face.sides);
 //	}
+	
+	public void sortFaces() {
+		Collections.sort(faceList, faceMaterialComparator);
+	}
 	
 	public void makeSlates() {
 //		for (Face face : faceList) {

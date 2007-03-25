@@ -204,7 +204,7 @@ public class JptLoader {
 //					cp.vertex.pos.interpolate(start.getVertex().pos, end.getVertex().pos, cp.hookPos);
 				}
 			}
-			
+			sds.sortFaces();
 			sds.validateVertices();
 //			Map<Point3d, Vector3d> compensationMap = new HashMap<Point3d, Vector3d>();
 //			for (TopLevelVertex vertex : sds.vertexList) {
