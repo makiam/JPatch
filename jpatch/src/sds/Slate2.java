@@ -29,7 +29,7 @@ public class Slate2 {
 	
 	void initFans() {
 		fans = new Point3f[4][];
-		fans[0] = new Point3f[2 * corners[0].length - 4];
+		fans[0] = new Point3f[Math.max(1, 2 * corners[0].length - 4)];
 		fans[0][0] = corners[0][0].vertex.projectedPos;
 		int j = 1;
 		for (int i = 2; i < corners[0].length; i++) {
@@ -44,6 +44,7 @@ public class Slate2 {
 				fans[0][j++] = corners[0][i].slate == null ? NULL_POINT : corners[0][i].slate.corners[2][0].vertex.projectedPos;
 			}
 		}
+		
 		
 		fans[1] = new Point3f[4];
 		fans[1][0] = corners[1][0].vertex.projectedPos;
