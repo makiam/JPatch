@@ -21,7 +21,7 @@ public class Buttons {
 	public static final int BUTTON_WIDTH = 23;
 	public static final int BUTTON_SIDE = 4;
 
-	public static enum Type { GLASS, PLASTIC }
+	public static enum Type { GLASS, PLASTIC, ROUND_GLASS, ROUND_PLASTIC }
 	public static enum Position { LEFT, CENTER, RIGHT }
 	public static enum Mode { DEFAULT, DISABLED, SELECTED, ROLLOVER }
 	
@@ -45,9 +45,20 @@ public class Buttons {
 	
 	private Image createGroupButtonImage(Type type, Position position, float[] tint, int width, int height, Image icon) {
 		int w = position == Position.CENTER ? width : width + 2;
-		BufferedImage image = new BufferedImage(w, height + 8, BufferedImage.TYPE_INT_ARGB);
+		int off = 0;
+		int ww = 0;
+		if (type == Type.ROUND_PLASTIC || type == Type.ROUND_GLASS) {
+			if (position == Position.LEFT) {
+				off = 2;
+				ww = 2;
+			} else if (position == Position.RIGHT) {
+				ww = 1;
+				off = 0;
+			}
+		}
+		BufferedImage image = new BufferedImage(w + ww, height + 8, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = image.createGraphics();
-		g.translate(0, 4);
+		g.translate(off, 4);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		drawGroupButton(type, position, tint, g, w - 1, height - 1);
 		switch (position) {
@@ -73,8 +84,15 @@ public class Buttons {
 		int right = position == Position.RIGHT ? w + 2 : w + 2 + h2;
 		
 		Color[] colors = tintColors(GLASS_COLORS, tint);
-		
+		Color[] pColors = tintColors(PLASTIC_COLORS, tint);
 		RoundRectangle2D roundRect = new RoundRectangle2D.Float(left, 1, right - left, h - 1, arc, arc);
+		
+		if (type == Type.ROUND_PLASTIC || type == Type.ROUND_GLASS) {
+			g.setPaint(new GradientPaint(0, 0, new Color(0x40000000, true), 0, height, new Color(0x40ffffff, true)));
+			g.fill(new RoundRectangle2D.Float(left - 3, -3, right - left + 5, height + 7, height + 5, height + 5));
+//			g.setPaint(new GradientPaint(0, 1, new Color(0xbbbbbb), 0, h, new Color(0x888888)));
+//			g.fill(new RoundRectangle2D.Float(left - 2, -2, right - left + 3, height + 5, height + 5, height + 5));
+		}
 		
 		switch (type) {
 		case GLASS:
@@ -99,18 +117,59 @@ public class Buttons {
 			g.setPaint(new LinearGradientPaint(0, 1, 0, h, new float[] { 0.0f, 0.2f, 0.8f, 1.0f }, tintColors(PLASTIC_COLORS, tint)));
 			g.fill(roundRect);
 			break;
+		case ROUND_GLASS:
+			int l = position == Position.LEFT ? 2 : position == Position.CENTER ? 0 : 0;
+			g.setPaint(new GradientPaint(l, 1, colors[2], 0, h, colors[3]));
+			g.fill(new Ellipse2D.Float(l, 0, height, height));
+			g.setPaint(new GradientPaint(l, 1, colors[0], 0, h2, colors[1]));
+			g.setClip(new Ellipse2D.Float(l, 0, height, height));
+			g.fill(new Ellipse2D.Float(l, 0, height, height / 2));
+			g.setClip(null);
+			g.setPaint(new GradientPaint(l, 0, new Color(0xffffffff, true), 0, height, new Color(0x00ffffff, true)));
+			g.setStroke(new BasicStroke(1.5f));
+			g.draw(new Ellipse2D.Float(l, 1, height - 1, height - 3));
+			g.setPaint(new GradientPaint(l, 0, new Color(0x00000000, true), 0, height, new Color(0x28000000, true)));
+			g.draw(new Ellipse2D.Float(l, 1, height - 1, height - 3));
+			g.setPaint(new GradientPaint(l, 0, new Color(0x80000000, true), 0, height, new Color(0xc0ffffff, true)));
+			g.setStroke(new BasicStroke(1));
+			g.draw(new Ellipse2D.Float(l, 0, height - 1, height - 1));
+			break;
+		case ROUND_PLASTIC:
+			l = position == Position.LEFT ? 2 : position == Position.CENTER ? 0 : 0;
+//			g.setClip(new Ellipse2D.Float(l, 0, height, height));
+			g.setPaint(new LinearGradientPaint(0, 1, 0, h, new float[] { 0.0f, 0.2f, 0.8f, 1.0f }, tintColors(PLASTIC_COLORS, tint)));
+			g.fill(new Ellipse2D.Float(l, 0, height, height));
+//			g.setPaint(new GradientPaint(l, 1, pColors[1], 0, h2, pColors[2]));
+//			
+//			g.fill(new Rectangle.Float(l, 0, height, height / 2));
+			g.setClip(null);
+			g.setPaint(new GradientPaint(l, 0, new Color(0xffffffff, true), 0, height, new Color(0x00ffffff, true)));
+			g.setStroke(new BasicStroke(1.0f));
+			g.draw(new Ellipse2D.Float(l, 1, height - 1, height - 3));
+			g.setPaint(new GradientPaint(l, 0, new Color(0x00000000, true), 0, height, new Color(0x40000000, true)));
+//			g.draw(new Ellipse2D.Float(l, 1, height - 1, height - 3));
+			g.setPaint(new GradientPaint(l, 0, new Color(0x80000000, true), 0, height, new Color(0x00000000, true)));
+//			g.setStroke(new BasicStroke(1.0f));
+			g.draw(new Ellipse2D.Float(l, 0, height - 1, height - 1));
+			g.setStroke(new BasicStroke(1.0f));
+			break;
 		}
-		if (position != Position.LEFT) {
-			g.setColor(new Color(0x60ffffff, true));
-			g.drawLine(0, 1, 0, h - 1);
+		if (type == Type.GLASS || type == Type.PLASTIC) {
+			if (position != Position.LEFT) {
+				g.setColor(new Color(0x60ffffff, true));
+				g.drawLine(0, 1, 0, h - 1);
+			}
+			if (position != Position.RIGHT) {
+				g.setColor(new Color(0x40000000, true));
+				g.drawLine(width, 1, width, h - 1);
+			}
+			g.setClip(null);
+			g.setPaint(new GradientPaint(0, 0, new Color(0x40000000, true), 0, height, new Color(0x80ffffff, true)));
+			g.draw(new RoundRectangle2D.Float(left - 1, 0, right - left + 1, height - 1, arc + 1, arc + 1));
+		} else if (type == Type.ROUND_PLASTIC || type == Type.ROUND_GLASS) {
+//			g.setPaint(new GradientPaint(0, 0, new Color(0x40000000, true), 0, height, new Color(0x80ffffff, true)));
+//			g.draw(new RoundRectangle2D.Float(left - 3, -3, right - left + 4, height + 6, height + 0, height + 0));
 		}
-		if (position != Position.RIGHT) {
-			g.setColor(new Color(0x40000000, true));
-			g.drawLine(width, 1, width, h - 1);
-		}
-		g.setClip(null);
-		g.setPaint(new GradientPaint(0, 0, new Color(0x80000000, true), 0, height, new Color(0xc0ffffff, true)));
-		g.draw(new RoundRectangle2D.Float(left - 1, 0, right - left + 1, height - 1, arc + 1, arc + 1));
 	}
 	
 	private void drawViewportSwitcher(float[] tint, Graphics2D g, int width, int height) {
@@ -217,7 +276,13 @@ public class Buttons {
 		JToggleButton tb4 = new JToggleButton();
 		JToggleButton tb5 = new JToggleButton();
 		JToggleButton tb6 = new JToggleButton();
-
+		JButton b1 = new JButton();
+		JButton b2 = new JButton();
+		JButton b3 = new JButton();
+		JButton b4 = new JButton();
+		JButton b5 = new JButton();
+		JButton b6 = new JButton();
+		
 		int buttonWidth = 27;
 		int buttonHeight = 24;
 		
@@ -231,10 +296,16 @@ public class Buttons {
 		configureButton(tb1, Type.GLASS, Position.LEFT, buttonWidth, buttonHeight, createTransparentImage(createEtchedIcon(createTextImage(font, "New")), 0.75f));
 		configureButton(tb2, Type.GLASS, Position.CENTER, buttonWidth, buttonHeight, createTransparentImage(createEtchedIcon(createTextImage(font, "Open")), 0.75f));
 		configureButton(tb3, Type.GLASS, Position.RIGHT, buttonWidth, buttonHeight, createTransparentImage(createEtchedIcon(createTextImage(font, "Save")), 0.75f));
-		buttonWidth = 27;
 		configureButton(tb4, Type.PLASTIC, Position.LEFT, buttonWidth, buttonHeight, etchedIcon);
 		configureButton(tb5, Type.PLASTIC, Position.CENTER, buttonWidth, buttonHeight, etchedIcon);
 		configureButton(tb6, Type.PLASTIC, Position.RIGHT, buttonWidth, buttonHeight, etchedIcon);
+		buttonWidth = 24;
+		configureButton(b1, Type.ROUND_PLASTIC, Position.LEFT, buttonWidth, buttonHeight, etchedIcon);
+		configureButton(b2, Type.ROUND_PLASTIC, Position.RIGHT, buttonWidth, buttonHeight, etchedIcon);
+		configureButton(b3, Type.ROUND_GLASS, Position.LEFT, buttonWidth, buttonHeight, etchedIcon);
+		configureButton(b4, Type.ROUND_GLASS, Position.CENTER, buttonWidth, buttonHeight, etchedIcon);
+		configureButton(b5, Type.ROUND_GLASS, Position.CENTER, buttonWidth, buttonHeight, etchedIcon);
+		configureButton(b6, Type.ROUND_GLASS, Position.RIGHT, buttonWidth, buttonHeight, etchedIcon);
 		ButtonGroup group = new ButtonGroup();
 		group.add(tb1);
 		group.add(tb2);
@@ -252,6 +323,14 @@ public class Buttons {
 		toolBar.add(tb4);
 		toolBar.add(tb5);
 		toolBar.add(tb6);
+		toolBar.add(Box.createHorizontalStrut(8));
+		toolBar.add(b1);
+		toolBar.add(b2);
+		toolBar.add(Box.createHorizontalStrut(8));
+		toolBar.add(b3);
+		toolBar.add(b4);
+		toolBar.add(b5);
+		toolBar.add(b6);
 		toolBar.add(Box.createHorizontalStrut(8));
 		tb1.setEnabled(false);
 		tb6.setEnabled(false);
@@ -374,6 +453,7 @@ public class Buttons {
 		button.setContentAreaFilled(false);
 		button.setIcon(new ImageIcon(createGroupButtonImage(type, position, null, width, height, icon)));
 		button.setRolloverEnabled(true);
+		button.setPressedIcon(new ImageIcon(createGroupButtonImage(type, position, new float[] {0.90f, 0.90f, 0.90f }, width, height, icon)));
 		button.setRolloverIcon(new ImageIcon(createGroupButtonImage(type, position, new float[] {1.05f, 1.05f, 1.05f }, width, height, icon)));
 		button.setRolloverSelectedIcon(new ImageIcon(createGroupButtonImage(type, position, new float[] {0.90f, 0.90f, 0.90f }, width, height, icon)));
 		button.setSelectedIcon(new ImageIcon(createGroupButtonImage(type, position, new float[] {0.85f, 0.85f, 0.85f }, width, height, icon)));
