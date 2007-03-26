@@ -262,11 +262,11 @@ public class JptLoader {
 				solver.solve(m, zLimit, zControl);
 				for (int i = 0; i < size; i++) {
 					
-//					sds.vertexList.get(i).pos.set(
-//							xControl.get(i),
-//							yControl.get(i),
-//							zControl.get(i)
-//					);
+					sds.vertexList.get(i).position.setTuple(
+							xLimit.get(i) + xControl.get(i),
+							yLimit.get(i) + yControl.get(i),
+							zLimit.get(i) + zControl.get(i)
+					);
 					
 					
 				}
@@ -283,8 +283,8 @@ public class JptLoader {
 						z += lc.getEntities().get(j).position.getZ() * lc.getWeights()[j];
 					}
 					
-					System.out.println("(" + x + ", " + y + ", " + z + ")");
-					System.out.println(l2v.limit);
+//					System.out.println("(" + x + ", " + y + ", " + z + ")");
+//					System.out.println(l2v.limit);
 				}
 //				for (Face face : sds.faceList) {
 //					for (HalfEdge edge : face.edgeIterable) {
