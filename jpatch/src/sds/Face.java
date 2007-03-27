@@ -25,7 +25,7 @@ public class Face {
 	final Slate2[] slates;
 	
 	final SlateEdge[] slateEdges;
-	private Material material = new BasicMaterial(new Color3f(1.0f, 1.0f, 1.0f), 0.2f, 0.8f, 1.0f, 0.0f, 0.1f);
+	private Material material = new BasicMaterial(new Color3f(1.0f, 1.0f, 1.0f), 0.1f, 0.5f, 1.0f, 0.0f, 0.01f);
 	
 	public final Level2Vertex facePoint;
 	public final HalfEdge edge;

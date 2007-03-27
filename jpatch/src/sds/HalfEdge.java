@@ -35,7 +35,7 @@ public class HalfEdge {
 			public void computeDerivedPosition() {
 				Tuple3 p0 = HalfEdge.this.vertex.position;
 				Tuple3 p1 = HalfEdge.this.pair.vertex.position;
-				int edgeSharpness = HalfEdge.this.getSharpness();
+				double edgeSharpness = HalfEdge.this.sharpness.getDouble();
 //				System.out.println("edge sharpness = " + edgeSharpness);
 				if (edgeSharpness > 0) {
 					position.setTuple(
@@ -57,7 +57,7 @@ public class HalfEdge {
 			
 			@Override
 			public void computeLimit() {
-				int edgeSharpness = HalfEdge.this.getSharpness();
+				double edgeSharpness = HalfEdge.this.creaseSharpness();
 				if (edgeSharpness > 0) {
 					Tuple3 p1 = vertex.vertexPoint.position;
 					Tuple3 p2 = pair.vertex.vertexPoint.position;
@@ -116,7 +116,7 @@ public class HalfEdge {
 	
 	public LinearCombination<TopLevelVertex> getEdgePointLc() {
 		LinearCombination<TopLevelVertex> lc = new LinearCombination<TopLevelVertex>();
-		if (getSharpness() > 0) {
+		if (creaseSharpness() > 0) {
 			lc.add(vertex, 0.5);
 			lc.add(pair.vertex, 0.5);
 		} else {
@@ -163,11 +163,15 @@ public class HalfEdge {
 		return face == null || pair.face == null;
 	}
 	
-	public int getSharpness() {
+	public DoubleAttr getSharpness() {
+		return sharpness;
+	}
+	
+	public double creaseSharpness() {
 		if (isBoundary()) {
-			return Integer.MAX_VALUE;
+			return 10.0;
 		} else {
-			return (int) (sharpness.getDouble() * 0x10000);
+			return sharpness.getDouble();
 		}
 	}
 	

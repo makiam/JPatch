@@ -289,11 +289,14 @@ public class AttributeUiHelper {
 		textField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("action");
-				if (!verifyTextField(textField, attribute))
+				if (!verifyTextField(textField, attribute)) {
 					;
 //					textField.setBackground(Color.YELLOW);
-				else
+				} else {
+					Main.getInstance().getActiveSds().rethinkSlates();
+					Main.getInstance().repaintViewports();
 					((JComponent) e.getSource()).transferFocus();
+				}
 			}
 		});
 		

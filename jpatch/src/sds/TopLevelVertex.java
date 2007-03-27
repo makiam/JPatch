@@ -27,6 +27,7 @@ public class TopLevelVertex extends BaseVertex {
 	public final Level2Vertex vertexPoint;
 	int valence = -1;
 
+	HalfEdge creaseEdge0, creaseEdge1;
 	
 	final Iterable<Face> faceIterable = new Iterable<Face>() {
 		public Iterator<Face> iterator() {
@@ -117,8 +118,8 @@ public class TopLevelVertex extends BaseVertex {
 				}
 				crease = Math.max(0, TopLevelVertex.this.crease - 1);
 				corner = Math.max(0, TopLevelVertex.this.corner - 1);
-				creaseEdge0 = TopLevelVertex.this.creaseEdge0;
-				creaseEdge1 = TopLevelVertex.this.creaseEdge1;
+				creaseEdge0 = TopLevelVertex.this.creaseEdge0 == null ? null : TopLevelVertex.this.creaseEdge0.slateEdge0;
+				creaseEdge1 = TopLevelVertex.this.creaseEdge1 == null ? null : TopLevelVertex.this.creaseEdge1.slateEdge0;
 			}
 			
 			@Override
@@ -277,11 +278,11 @@ public class TopLevelVertex extends BaseVertex {
 	
 	public void analyzeEdges() {
 		int i = 0;
-		int sharpestEdgeValue0 = 0, sharpestEdgeValue1 = 0, sharpestEdgeValue2 = 0;
+		double sharpestEdgeValue0 = 0, sharpestEdgeValue1 = 0, sharpestEdgeValue2 = 0;
 		corner = sharpness.getDouble();
 		crease = 0;
 		for (HalfEdge edge : getAdjacentEdges()) {
-			int edgeSharpness = edge.getSharpness();
+			double edgeSharpness = edge.creaseSharpness();
 			if (edgeSharpness > 0) {
 				if (edgeSharpness > sharpestEdgeValue0) {
 					sharpestEdgeValue2 = sharpestEdgeValue1;

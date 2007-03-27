@@ -157,7 +157,7 @@ public class Slate2 {
 //			int lx = (int) ((ex * 4 + fx + fans[corner][0].x * v2) * ik);
 //			int ly = (int) ((ey * 4 + fy + fans[corner][0].y * v2) * ik);
 			
-			if (corners[corner][0].getSharpness() > 0) {
+			if (corners[corner][0].creaseSharpness() > 0) {
 				crease = true;
 			}
 			
@@ -190,9 +190,7 @@ public class Slate2 {
 		} else {
 			s >>= 5;
 		}
-		if ((s & 0xffffff00) > 0) {
-			subdivLevel = 6;
-		} else if ((s & 0xc0) > 0) {
+		if ((s & 0xffffffc0) > 0) {
 			subdivLevel = 5;
 		} else if ((s & 0x30) > 0) {
 			subdivLevel = 4;
@@ -203,6 +201,7 @@ public class Slate2 {
 		} else {
 			subdivLevel = 1;
 		}
+//		subdivLevel = 5;
 	}
 	
 //	public void test() {
