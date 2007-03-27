@@ -22,6 +22,8 @@ public abstract class Level2Vertex extends BaseVertex {
 	public abstract void computeDerivedPosition();
 	public abstract void computeLimit();
 	
+	SlateEdge creaseEdge0, creaseEdge1;
+	
 	@Override
 	public void project(Matrix4f matrix) {
 		super.project(matrix);

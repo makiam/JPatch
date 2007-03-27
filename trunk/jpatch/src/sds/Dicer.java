@@ -48,6 +48,7 @@ public class Dicer {
 	private final int[][][] patchLimitStencil = new int[MAX_SUBDIV][][];						// [level][index][stencil]
 	private final int[][][][] cornerLimitStencil = new int[MAX_SUBDIV][MAX_VALENCE- 2][2][];	// [level][valence - 3][corner][stencil]
 	
+	private static final int[] CORNER_INDEXES = new int[] { 5, 6, 10, 9 };
 	
 	int[][][] rim0 = new int[MAX_SUBDIV][][];								//[level][side][index] outer grid rim
 	int[][][] rim1 = new int[MAX_SUBDIV][][];								//[level][side][index] inner grid rim
@@ -600,38 +601,66 @@ public class Dicer {
 		if (depth == 1) {
 //			float[] va = quadVertexArrays[1];
 //			float[] na = quadNormalArrays[1];
-			float[][] lp = limitPoints[0];
-			float[][] ln = limitNormals[0];
-			Level2Vertex v0 = slate.corners[0][0].vertex;
-			Level2Vertex v1 = slate.corners[1][0].vertex;
-			Level2Vertex v2 = slate.corners[2][0].vertex;
-			Level2Vertex v3 = slate.corners[3][0].vertex;
-		
+			final float[][] lp = limitPoints[0];
+			final float[][] ln = limitNormals[0];
 			
-			lp[5 + GRID_START][0] = v0.projectedLimit.x;
-			lp[5 + GRID_START][1] = v0.projectedLimit.y;
-			lp[5 + GRID_START][2] = v0.projectedLimit.z;
-			lp[6 + GRID_START][0] = v1.projectedLimit.x;
-			lp[6 + GRID_START][1] = v1.projectedLimit.y;
-			lp[6 + GRID_START][2] = v1.projectedLimit.z;
-			lp[10 + GRID_START][0] = v2.projectedLimit.x;
-			lp[10 + GRID_START][1] = v2.projectedLimit.y;
-			lp[10 + GRID_START][2] = v2.projectedLimit.z;
-			lp[9 + GRID_START][0] = v3.projectedLimit.x;
-			lp[9 + GRID_START][1] = v3.projectedLimit.y;
-			lp[9 + GRID_START][2] = v3.projectedLimit.z;
-			ln[5 + GRID_START][0] = ln[5 + GRID_START][3] = ln[5 + GRID_START][6] = ln[5 + GRID_START][9] = v0.projectedNormal.x;
-			ln[5 + GRID_START][1] = ln[5 + GRID_START][4] = ln[5 + GRID_START][7] = ln[5 + GRID_START][10] = v0.projectedNormal.y;
-			ln[5 + GRID_START][2] = ln[5 + GRID_START][5] = ln[5 + GRID_START][8] = ln[5 + GRID_START][11] = v0.projectedNormal.z;
-			ln[6 + GRID_START][0] = ln[6 + GRID_START][3] = ln[6 + GRID_START][6] = ln[6 + GRID_START][9] = v1.projectedNormal.x;
-			ln[6 + GRID_START][1] = ln[6 + GRID_START][4] = ln[6 + GRID_START][7] = ln[6 + GRID_START][10] = v1.projectedNormal.y;
-			ln[6 + GRID_START][2] = ln[6 + GRID_START][5] = ln[6 + GRID_START][8] = ln[6 + GRID_START][11] = v1.projectedNormal.z;
-			ln[10 + GRID_START][0] = ln[10 + GRID_START][3] = ln[10 + GRID_START][6] = ln[10 + GRID_START][9] = v2.projectedNormal.x;
-			ln[10 + GRID_START][1] = ln[10 + GRID_START][4] = ln[10 + GRID_START][7] = ln[10 + GRID_START][10] = v2.projectedNormal.y;
-			ln[10 + GRID_START][2] = ln[10 + GRID_START][5] = ln[10 + GRID_START][8] = ln[10 + GRID_START][11] = v2.projectedNormal.z;
-			ln[9 + GRID_START][0] = ln[9 + GRID_START][3] = ln[9 + GRID_START][6] = ln[9 + GRID_START][9] = v3.projectedNormal.x;
-			ln[9 + GRID_START][1] = ln[9 + GRID_START][4] = ln[9 + GRID_START][7] = ln[9 + GRID_START][10] = v3.projectedNormal.y;
-			ln[9 + GRID_START][2] = ln[9 + GRID_START][5] = ln[9 + GRID_START][8] = ln[9 + GRID_START][11] = v3.projectedNormal.z;
+			for (int i = 0; i < 4; i++) {
+				final SlateEdge edge = slate.corners[i][0];
+				final Level2Vertex v = edge.vertex;
+				final int gridPos = GRID_START + CORNER_INDEXES[i];
+				final int normalIndex = 3 * i;
+				// set limit point
+				lp[gridPos][0] = v.projectedLimit.x;
+				lp[gridPos][1] = v.projectedLimit.y;
+				lp[gridPos][2] = v.projectedLimit.z;
+				// set normal
+				if (v.corner > 0) {
+					// crease
+					final Level2Vertex vu = edge.pair.vertex;
+					final Level2Vertex vv = slate.corners[(i + 1) % 4][0].pair.vertex;
+					final float vx = vv.projectedPos.x - v.projectedPos.x;
+					final float vy = vv.projectedPos.y - v.projectedPos.y;
+					final float vz = vv.projectedPos.z - v.projectedPos.z;
+					final float ux = vu.projectedPos.x - v.projectedPos.x;
+					final float uy = vu.projectedPos.y - v.projectedPos.y;
+					final float uz = vu.projectedPos.z - v.projectedPos.z;
+					computeNormal(ux, uy, uz, vx, vy, vz, ln[gridPos], normalIndex);
+				} else if (v.crease > 0) {
+					/*
+					 * set crease0 to the first crease (clockwise) and crease1 to the second crease
+					 */
+					SlateEdge crease0 = null, crease1 = null;
+					for (SlateEdge e : slate.corners[i]) {
+						if (e == v.creaseEdge0) {
+							crease0 = v.creaseEdge0;
+							crease1 = v.creaseEdge1;
+							break;
+						} else if (e == v.creaseEdge1) {
+							crease0 = v.creaseEdge1;
+							crease1 = v.creaseEdge0;
+							break;
+						}
+					}
+					System.out.println("crease=" + v.crease + " ce0=" + v.creaseEdge0 + " ce1=" + v.creaseEdge1);
+					final Point3f pc0 = crease0.pair.vertex.projectedPos;
+					final Point3f pc1 = crease1.pair.vertex.projectedPos;
+					final Point3f p0 = v.projectedPos;
+					final Point3f p3 = slate.corners[(i + 2) % 4][0].vertex.projectedPos;
+					final float vx = pc1.x - pc0.x;
+					final float vy = pc1.y - pc0.y;
+					final float vz = pc1.z - pc0.z;
+					final float ux = p3.x - p0.x;
+					final float uy = p3.y - p0.y;
+					final float uz = p3.z - p0.z;
+					computeNormal(ux, uy, uz, vx, vy, vz, ln[gridPos], normalIndex);
+				} else {
+					// smooth
+					ln[gridPos][normalIndex] = v.projectedNormal.x;
+					ln[gridPos][normalIndex + 1] = v.projectedNormal.y;
+					ln[gridPos][normalIndex + 2] = v.projectedNormal.z;
+				}
+				
+			}
 			return 12;
 		}
 		final int dim = (1 << (depth - 1)) + 3;
@@ -759,15 +788,15 @@ public class Dicer {
 			geo[GRID_START + 8][1] = boundary[3][3].y;
 			geo[GRID_START + 8][2] = boundary[3][3].z;
 	//		// test crease stencils
-			patchStencil[1][7][1] = slate.corners[0][0].getSharpness();
-			patchStencil[1][13][1] = slate.corners[1][0].getSharpness();
-			patchStencil[1][17][1] = slate.corners[2][0].getSharpness();
-			patchStencil[1][11][1] = slate.corners[3][0].getSharpness();
+			patchStencil[1][7][1] = (int) (slate.corners[0][0].creaseSharpness() * 0x10000);
+			patchStencil[1][13][1] = (int) (slate.corners[1][0].creaseSharpness() * 0x10000);
+			patchStencil[1][17][1] = (int) (slate.corners[2][0].creaseSharpness() * 0x10000);
+			patchStencil[1][11][1] = (int) (slate.corners[3][0].creaseSharpness() * 0x10000);
 			
-			patchStencil[1][3][1] = slate.corners[1][2] == null ? 0 : slate.corners[1][2].getSharpness();
-			patchStencil[1][9][1] = slate.corners[1][3] == null ? 0 : slate.corners[1][3].getSharpness();
-			patchStencil[1][21][1] = slate.corners[3][2] == null ? 0 : slate.corners[3][2].getSharpness();
-			patchStencil[1][15][1] = slate.corners[3][3] == null ? 0 : slate.corners[3][3].getSharpness();
+			patchStencil[1][3][1] = (int) (slate.corners[1][2] == null ? 0 : slate.corners[1][2].creaseSharpness() * 0x10000);
+			patchStencil[1][9][1] = (int) (slate.corners[1][3] == null ? 0 : slate.corners[1][3].creaseSharpness() * 0x10000);
+			patchStencil[1][21][1] = (int) (slate.corners[3][2] == null ? 0 : slate.corners[3][2].creaseSharpness() * 0x10000);
+			patchStencil[1][15][1] = (int) (slate.corners[3][3] == null ? 0 : slate.corners[3][3].creaseSharpness() * 0x10000);
 					
 			patchStencil[1][8][1] = (int) (slate.corners[1][0].vertex.crease * 0x10000);
 			patchStencil[0][6][1] = (int) (slate.corners[1][0].vertex.crease * 0x10000);
@@ -804,10 +833,9 @@ public class Dicer {
 				cornerStencil[0][valence - 3][corner][1] = (int) (slate.corners[corner * 2][0].vertex.crease * 0x10000);
 				cornerStencil[1][valence - 3][corner][0] = (int) (slate.corners[corner * 2][0].vertex.corner * 0x10000);
 				cornerStencil[1][valence - 3][corner][1] = (int) (slate.corners[corner * 2][0].vertex.crease * 0x10000);
-				if (slate.corners[corner * 2][0].vertex.crease > 1) {
-					int ci0 = slate.getEdgeIndex(corner * 2, slate.corners[corner * 2][0].vertex.creaseEdge0.slateEdge0);
-					int ci1 = slate.getEdgeIndex(corner * 2, slate.corners[corner * 2][0].vertex.creaseEdge1.slateEdge0);
-					cornerStencil[0][valence - 3][corner][2] = 2 * ci0 + 7;
+				if (slate.corners[corner * 2][0].vertex.crease > 0) {
+					int ci0 = slate.getEdgeIndex(corner * 2, slate.corners[corner * 2][0].vertex.creaseEdge0);
+					int ci1 = slate.getEdgeIndex(corner * 2, slate.corners[corner * 2][0].vertex.creaseEdge1);
 					cornerStencil[0][valence - 3][corner][3] = 2 * ci1 + 7;
 					cornerStencil[1][valence - 3][corner][2] = 2 * ci0 + 7;
 					cornerStencil[1][valence - 3][corner][3] = 2 * ci1 + 7;
@@ -836,7 +864,7 @@ public class Dicer {
 				for (int i = 2; i < slate.corners[corner * 2].length; i++) {
 					int index = (i == slate.corners[corner * 2].length - 1) ? 0 : i * 2 - 3;
 	//				System.out.println("corner=" + corner + " length=" + slate.corners[corner * 2].length + " i=" + i + " index=" + index);
-					fanStencil[1][valence - 3][corner][index][1] = slate.corners[corner * 2][i] == null ? 0 : slate.corners[corner * 2][i].getSharpness();
+					fanStencil[1][valence - 3][corner][index][1] = slate.corners[corner * 2][i] == null ? 0 : (int) (slate.corners[corner * 2][i].creaseSharpness() * 0x10000);
 				}
 				if (n == 2) {
 					fanStencil[1][valence - 3][corner][1][1] = fanStencil[1][valence - 3][corner][0][1];
@@ -881,15 +909,16 @@ public class Dicer {
 							case EDGE_H:
 							if (s[1] > 0) {
 								// crease
+								System.out.println("level=" + level + " EDGE_H (crease) sharpness=" + s[1]);
 								out[outIndex][0] = (in[s[9]][0] + in[s[10]][0]) * 0.5f;
 								out[outIndex][1] = (in[s[9]][1] + in[s[10]][1]) * 0.5f;
 								out[outIndex][2] = (in[s[9]][2] + in[s[10]][2]) * 0.5f;
-								nextLevel[s[4]][1] = s[1] - 1;
+								nextLevel[s[4]][1] = s[1] - 0x10000;
 								nextLevel[s[5]][1] = 0;
-								nextLevel[s[6]][1] = s[1] - 1;
+								nextLevel[s[6]][1] = s[1] - 0x10000;
 								nextLevel[s[7]][1] = 0;
-								nextLevel[s[8]][1] = s[1] - 1;
-								nextLevel[s[4]][0] = CREASE_5_7;
+								nextLevel[s[8]][1] = s[1] - 0x10000;
+								nextLevel[s[4]][0] = s[1] > 0x10000 ? CREASE_5_7 : POINT;
 							} else {
 								// smooth
 								out[outIndex][0] = (in[s[9]][0] + in[s[10]][0]) * EDGE0 + ((in[s[11]][0] + in[s[12]][0]) + (in[s[13]][0] + in[s[14]][0])) * EDGE1;
@@ -907,15 +936,16 @@ public class Dicer {
 						case EDGE_V:
 							if (s[1] > 0) {
 								// crease
+								System.out.println("level=" + level + " EDGE_V (crease) sharpness=" + s[1]);
 								out[outIndex][0] = (in[s[9]][0] + in[s[10]][0]) * 0.5f;
 								out[outIndex][1] = (in[s[9]][1] + in[s[10]][1]) * 0.5f;
 								out[outIndex][2] = (in[s[9]][2] + in[s[10]][2]) * 0.5f;
-								nextLevel[s[4]][1] = s[1] - 1;
-								nextLevel[s[5]][1] = s[1] - 1;
+								nextLevel[s[4]][1] = s[1] - 0x10000;
+								nextLevel[s[5]][1] = s[1] - 0x10000;
 								nextLevel[s[6]][1] = 0;
-								nextLevel[s[7]][1] = s[1] - 1;
+								nextLevel[s[7]][1] = s[1] - 0x10000;
 								nextLevel[s[8]][1] = 0;
-								nextLevel[s[4]][0] = CREASE_4_6;
+								nextLevel[s[4]][0] = s[1] > 0x10000 ? CREASE_4_6 : POINT;
 							} else {
 								// smooth
 								out[outIndex][0] = (in[s[9]][0] + in[s[10]][0]) * EDGE0 + ((in[s[11]][0] + in[s[12]][0]) + (in[s[13]][0] + in[s[14]][0])) * EDGE1;
@@ -936,7 +966,7 @@ public class Dicer {
 								out[outIndex][0] = in[s[3]][0];
 								out[outIndex][1] = in[s[3]][1];
 								out[outIndex][2] = in[s[3]][2];
-								nextLevel[s[2]][1] = s[1] - 1;
+								nextLevel[s[2]][1] = s[1] - 0x10000;
 							} else {
 								// smooth
 								out[outIndex][0] = in[s[3]][0] * VERTEX0 + ((in[s[4]][0] + in[s[6]][0]) + (in[s[5]][0] + in[s[7]][0])) * VERTEX1 + ((in[s[8]][0] + in[s[10]][0]) + (in[s[9]][0] + in[s[11]][0])) * VERTEX2;
@@ -953,46 +983,52 @@ public class Dicer {
 							out[outIndex][2] = ((in[s[1]][2] + in[s[3]][2]) + (in[s[2]][2] + in[s[4]][2])) * FACE0;
 							break;
 						case CREASE_4_5:
+							System.out.println("level=" + level + " CREASE_4_5 sharpness=" + s[1]);
 							out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[5]][0]) * CREASE1;
 							out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[5]][1]) * CREASE1;
 							out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[5]][2]) * CREASE1;
-							nextLevel[s[2]][1] = s[1] - 1;
-							nextLevel[s[2]][0] = s[1] > 1 ? CREASE_4_5 : POINT;
+							nextLevel[s[2]][1] = s[1] - 0x10000;
+							nextLevel[s[2]][0] = s[1] > 0x10000 ? CREASE_4_5 : POINT;
 							break;
 						case CREASE_4_6:
+							System.out.println("level=" + level + " CREASE_4_6 sharpness=" + s[1]);
 							out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[6]][0]) * CREASE1;
 							out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[6]][1]) * CREASE1;
 							out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[6]][2]) * CREASE1;
-							nextLevel[s[2]][1] = s[1] - 1;
-							nextLevel[s[2]][0] = s[1] > 1 ? CREASE_4_6 : POINT;
+							nextLevel[s[2]][1] = s[1] - 0x10000;
+							nextLevel[s[2]][0] = s[1] > 0x10000 ? CREASE_4_6 : POINT;
 							break;
 						case CREASE_4_7:
+							System.out.println("level=" + level + " CREASE_4_7 sharpness=" + s[1]);
 							out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[7]][0]) * CREASE1;
 							out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[7]][1]) * CREASE1;
 							out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[7]][2]) * CREASE1;
-							nextLevel[s[2]][1] = s[1] - 1;
-							nextLevel[s[2]][0] = s[1] > 1 ? CREASE_4_7 : POINT;
+							nextLevel[s[2]][1] = s[1] - 0x10000;
+							nextLevel[s[2]][0] = s[1] > 0x10000 ? CREASE_4_7 : POINT;
 							break;
 						case CREASE_5_6:
+							System.out.println("level=" + level + " CREASE_5_6 sharpness=" + s[1]);
 							out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[5]][0] + in[s[6]][0]) * CREASE1;
 							out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[5]][1] + in[s[6]][1]) * CREASE1;
 							out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[5]][2] + in[s[6]][2]) * CREASE1;
-							nextLevel[s[2]][1] = s[1] - 1;
-							nextLevel[s[2]][0] = s[1] > 1 ? CREASE_5_6 : POINT;
+							nextLevel[s[2]][1] = s[1] - 0x10000;
+							nextLevel[s[2]][0] = s[1] > 0x10000 ? CREASE_5_6 : POINT;
 							break;
 						case CREASE_5_7:
+							System.out.println("level=" + level + " CREASE_5_7 sharpness=" + s[1]);
 							out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[5]][0] + in[s[7]][0]) * CREASE1;
 							out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[5]][1] + in[s[7]][1]) * CREASE1;
 							out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[5]][2] + in[s[7]][2]) * CREASE1;
-							nextLevel[s[2]][1] = s[1] - 1;
-							nextLevel[s[2]][0] = s[1] > 1 ? CREASE_5_7 : POINT;
+							nextLevel[s[2]][1] = s[1] - 0x10000;
+							nextLevel[s[2]][0] = s[1] > 0x10000 ? CREASE_5_7 : POINT;
 							break;
 						case CREASE_6_7:
+							System.out.println("level=" + level + " CREASE_6_7 sharpness=" + s[1]);
 							out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[6]][0] + in[s[7]][0]) * CREASE1;
 							out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[6]][1] + in[s[7]][1]) * CREASE1;
 							out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[6]][2] + in[s[7]][2]) * CREASE1;
-							nextLevel[s[2]][1] = s[1] - 1;
-							nextLevel[s[2]][0] = s[1] > 1 ? CREASE_6_7 : POINT;
+							nextLevel[s[2]][1] = s[1] - 0x10000;
+							nextLevel[s[2]][0] = s[1] > 0x10000 ? CREASE_6_7 : POINT;
 							break;
 						}
 					}
@@ -1100,6 +1136,7 @@ public class Dicer {
 						}
 					} else if (cs[1] > 0) {
 						//crease//
+						System.out.println(cs[1] + " " + cs[5] + " " + cs[2] + " " + cs[3]);
 						x = in[cs[5]][0] * CREASE0 + (in[cs[cs[2]]][0] + in[cs[cs[3]]][0]) * CREASE1;
 						y = in[cs[5]][1] * CREASE0 + (in[cs[cs[2]]][1] + in[cs[cs[3]]][1]) * CREASE1;
 						z = in[cs[5]][2] * CREASE0 + (in[cs[cs[2]]][2] + in[cs[cs[3]]][2]) * CREASE1;
@@ -1163,7 +1200,7 @@ public class Dicer {
 								out[oi][1] = (in[s[4]][1] + in[s[5]][1]) * 0.5f;
 								out[oi][2] = (in[s[4]][2] + in[s[5]][2]) * 0.5f;
 								if (rewriteStencils) {
-									nextArray[i][1] = s[1] - 1;
+									nextArray[i][1] = s[1] - 0x10000;
 								}
 							} else {
 								out[oi][0] = (in[s[4]][0] + in[s[5]][0]) * EDGE0 + ((in[s[6]][0] + in[s[7]][0]) + (in[s[8]][0] + in[s[9]][0])) * EDGE1;
@@ -1266,8 +1303,7 @@ public class Dicer {
 //					quadVertexArrays[depth][ls[9]] = quadVertexArrays[depth][ls[10]] = quadVertexArrays[depth][ls[11]] = quadVertexArrays[depth][ls[12]] = limitX;
 //					quadVertexArrays[depth][ls[9] + 1] = quadVertexArrays[depth][ls[10] + 1] = quadVertexArrays[depth][ls[11] + 1] = quadVertexArrays[depth][ls[12] + 1] = limitY;
 //					quadVertexArrays[depth][ls[9] + 2] = quadVertexArrays[depth][ls[10] + 2] = quadVertexArrays[depth][ls[11] + 2] = quadVertexArrays[depth][ls[12] + 2] = limitZ;
-//					
-					
+//					                                                  
 					out[outIndex][0] = limitX;
 					out[outIndex][1] = limitY;
 					out[outIndex][2] = limitZ;

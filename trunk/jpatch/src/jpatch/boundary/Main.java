@@ -256,14 +256,14 @@ public class Main {
 //			}
 //			System.exit(0);
 			
-			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/teapot.off"));
+			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/cube2.off"));
 //			new RibExport().export(activeSds, System.out);
 //			System.exit(0);
 //			activeSds = new JptLoader().importModel(new FileInputStream("/mnt/share/jpatch0.4/models/moai2.jpt"));
 
 //			activeSds.makeSlates();
 //			activeSds.verify();
-			activeSds.dump();
+//			activeSds.dump();
 //			activeSds.smooth();
 //			System.exit(0);
 		} catch (IOException e1) {

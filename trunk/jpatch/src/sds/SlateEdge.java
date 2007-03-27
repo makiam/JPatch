@@ -50,9 +50,9 @@ public class SlateEdge {
 		return primary || parentEdge.isBoundary();
 	}
 	
-	public int getSharpness() {
+	public double creaseSharpness() {
 		if (parentEdge != null) {
-			return Math.max(0,parentEdge.getSharpness() - 1);
+			return Math.max(0, parentEdge.creaseSharpness() - 1);
 		} else {
 			return 0;
 		}

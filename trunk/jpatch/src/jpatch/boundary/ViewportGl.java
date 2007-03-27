@@ -901,7 +901,7 @@ public class ViewportGl extends Viewport {
 			for (Face face : sds.faceList) {
 				for (HalfEdge edge : face.getEdges()) {
 					if (edge.isPrimary()) {
-						if (edge.getSharpness() > 0) {
+						if (edge.creaseSharpness() > 0) {
 							gl.glColor3f(1, 0, 0);
 						} else {
 							gl.glColor3f(1, 1, 1);
