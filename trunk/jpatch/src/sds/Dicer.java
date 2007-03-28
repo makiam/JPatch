@@ -629,26 +629,65 @@ public class Dicer {
 					/*
 					 * set crease0 to the first crease (clockwise) and crease1 to the second crease
 					 */
+					System.out.println("corner=" + i + " crease=" + v.crease);
+					for (int j = 0; j < slate.corners[i].length; j++) {
+						System.out.println("    edge" + j + "=" + slate.corners[i][j]);
+					}
+					System.out.println();
+					System.out.println("    creaseEdge0=" + v.creaseEdge0);
+					System.out.println("    creaseEdge1=" + v.creaseEdge1);
 					SlateEdge crease0 = null, crease1 = null;
+					int creaseIndex0 = 0, creaseIndex1 = 0;
 					for (int j = 0; j < slate.corners[i].length; j++) {
 						SlateEdge e = slate.corners[i][j];
 						if (e == v.creaseEdge0) {
-							crease0 = v.creaseEdge0;
-							crease1 = v.creaseEdge1;
-							break;
+							if (crease0 == null) {
+								crease0 = v.creaseEdge0;
+								creaseIndex0 = j;
+							} else {
+								crease1 = v.creaseEdge0;
+								creaseIndex1 = j;
+								break;
+							}
+						} else if (e == v.creaseEdge0.pair) {
+							if (crease0 == null) {
+								crease0 = v.creaseEdge0;
+								creaseIndex0 = j;
+							} else {
+								crease1 = v.creaseEdge0;
+								creaseIndex1 = j;
+								break;
+							}
 						} else if (e == v.creaseEdge1) {
-							crease0 = v.creaseEdge1;
-							crease1 = v.creaseEdge0;
-							break;
+							if (crease0 == null) {
+								crease0 = v.creaseEdge1;
+								creaseIndex0 = j;
+							} else {
+								crease1 = v.creaseEdge1;
+								creaseIndex1 = j;
+								break;
+							}
+						} else if (e == v.creaseEdge1.pair) {
+							if (crease0 == null) {
+								crease0 = v.creaseEdge1;
+								creaseIndex0 = j;
+							} else {
+								crease1 = v.creaseEdge1;
+								creaseIndex1 = j;
+								break;
+							}
 						}
 					}
-					System.out.println("crease=" + v.crease + " ce0=" + v.creaseEdge0 + " ce1=" + v.creaseEdge1);
+					System.out.println("    crease0=" + crease0 + " index=" + creaseIndex0);
+					System.out.println("    crease1=" + crease1 + " index=" + creaseIndex1);
+//					System.out.println("crease=" + v.crease + " ce0=" + v.creaseEdge0 + " ce1=" + v.creaseEdge1);
+//					System.out.println("crease0=" + crease0 + " crease1=" + crease1);
 					final Point3f pc0 = crease0.pair.vertex.projectedPos;
 					final Point3f pc1 = crease1.pair.vertex.projectedPos;
 					final Point3f p0 = v.projectedPos;
 					final Point3f p3;
-					if (crease0 == slate.corners[i][0]) {
-						if (crease1 == slate.corners[i][1]) {
+					if (creaseIndex0 == 0) {
+						if (creaseIndex1 == 1) {
 							p3 = slate.fans[(i + 2) % 4][0];
 							System.out.println("corner=" + i + " a");
 						} else {
@@ -659,6 +698,7 @@ public class Dicer {
 						System.out.println("corner=" + i + " c");
 						p3 = slate.fans[(i + 1) % 4][0];
 					}
+					System.out.println("====");
 					final float vx = pc1.x - pc0.x;
 					final float vy = pc1.y - pc0.y;
 					final float vz = pc1.z - pc0.z;

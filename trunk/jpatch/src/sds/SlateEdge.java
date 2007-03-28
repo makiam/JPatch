@@ -60,6 +60,6 @@ public class SlateEdge {
 	
 	@Override
 	public String toString() {
-		return super.toString() + ":" + slate;
+		return hashCode() + ":" + pair.hashCode();
 	}
 }
