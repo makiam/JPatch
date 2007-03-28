@@ -630,7 +630,8 @@ public class Dicer {
 					 * set crease0 to the first crease (clockwise) and crease1 to the second crease
 					 */
 					SlateEdge crease0 = null, crease1 = null;
-					for (SlateEdge e : slate.corners[i]) {
+					for (int j = 0; j < slate.corners[i].length; j++) {
+						SlateEdge e = slate.corners[i][j];
 						if (e == v.creaseEdge0) {
 							crease0 = v.creaseEdge0;
 							crease1 = v.creaseEdge1;
@@ -645,7 +646,19 @@ public class Dicer {
 					final Point3f pc0 = crease0.pair.vertex.projectedPos;
 					final Point3f pc1 = crease1.pair.vertex.projectedPos;
 					final Point3f p0 = v.projectedPos;
-					final Point3f p3 = slate.corners[(i + 2) % 4][0].vertex.projectedPos;
+					final Point3f p3;
+					if (crease0 == slate.corners[i][0]) {
+						if (crease1 == slate.corners[i][1]) {
+							p3 = slate.fans[(i + 2) % 4][0];
+							System.out.println("corner=" + i + " a");
+						} else {
+							p3 = slate.fans[(i + 3) % 4][0];
+							System.out.println("corner=" + i + " b");
+						}
+					} else {
+						System.out.println("corner=" + i + " c");
+						p3 = slate.fans[(i + 1) % 4][0];
+					}
 					final float vx = pc1.x - pc0.x;
 					final float vy = pc1.y - pc0.y;
 					final float vz = pc1.z - pc0.z;
@@ -788,19 +801,19 @@ public class Dicer {
 			geo[GRID_START + 8][1] = boundary[3][3].y;
 			geo[GRID_START + 8][2] = boundary[3][3].z;
 	//		// test crease stencils
-			patchStencil[1][7][1] = (int) (slate.corners[0][0].creaseSharpness() * 0x10000);
-			patchStencil[1][13][1] = (int) (slate.corners[1][0].creaseSharpness() * 0x10000);
-			patchStencil[1][17][1] = (int) (slate.corners[2][0].creaseSharpness() * 0x10000);
-			patchStencil[1][11][1] = (int) (slate.corners[3][0].creaseSharpness() * 0x10000);
+			patchStencil[1][7][1] = (int) (edges[0][0].creaseSharpness() * 0x10000);
+			patchStencil[1][13][1] = (int) (edges[1][0].creaseSharpness() * 0x10000);
+			patchStencil[1][17][1] = (int) (edges[2][0].creaseSharpness() * 0x10000);
+			patchStencil[1][11][1] = (int) (edges[3][0].creaseSharpness() * 0x10000);
 			
-			patchStencil[1][3][1] = (int) (slate.corners[1][2] == null ? 0 : slate.corners[1][2].creaseSharpness() * 0x10000);
-			patchStencil[1][9][1] = (int) (slate.corners[1][3] == null ? 0 : slate.corners[1][3].creaseSharpness() * 0x10000);
-			patchStencil[1][21][1] = (int) (slate.corners[3][2] == null ? 0 : slate.corners[3][2].creaseSharpness() * 0x10000);
-			patchStencil[1][15][1] = (int) (slate.corners[3][3] == null ? 0 : slate.corners[3][3].creaseSharpness() * 0x10000);
+			patchStencil[1][3][1] = (int) (edges[1][2] == null ? 0 : edges[1][2].creaseSharpness() * 0x10000);
+			patchStencil[1][9][1] = (int) (edges[1][3] == null ? 0 : edges[1][3].creaseSharpness() * 0x10000);
+			patchStencil[1][21][1] = (int) (edges[3][2] == null ? 0 : edges[3][2].creaseSharpness() * 0x10000);
+			patchStencil[1][15][1] = (int) (edges[3][3] == null ? 0 : edges[3][3].creaseSharpness() * 0x10000);
 					
-			patchStencil[1][8][1] = (int) (slate.corners[1][0].vertex.crease * 0x10000);
-			patchStencil[0][6][1] = (int) (slate.corners[1][0].vertex.crease * 0x10000);
-			if (slate.corners[1][0].vertex.crease > 0) {
+			patchStencil[1][8][1] = (int) (edges[1][0].vertex.crease * 0x10000);
+			patchStencil[0][6][1] = (int) (edges[1][0].vertex.crease * 0x10000);
+			if (edges[1][0].vertex.crease > 0) {
 				patchStencil[1][8][0] = CREASE_5_7;
 				patchStencil[0][6][0] = CREASE_5_7;
 			} else {
@@ -808,9 +821,9 @@ public class Dicer {
 				patchStencil[0][6][0] = POINT;
 			}
 			
-			patchStencil[1][16][1] = (int) (slate.corners[3][0].vertex.crease * 0x10000);
-			patchStencil[0][9][1] = (int) (slate.corners[3][0].vertex.crease * 0x10000);
-			if (slate.corners[3][0].vertex.crease > 0) {
+			patchStencil[1][16][1] = (int) (edges[3][0].vertex.crease * 0x10000);
+			patchStencil[0][9][1] = (int) (edges[3][0].vertex.crease * 0x10000);
+			if (edges[3][0].vertex.crease > 0) {
 				patchStencil[1][16][0] = CREASE_4_6;
 				patchStencil[0][9][0] = CREASE_4_6;
 			} else {
@@ -826,16 +839,16 @@ public class Dicer {
 			
 			for (int corner = 0; corner < 2; corner ++) {
 				final Point3f[] c = boundary[corner * 2];
-				final int valence = Math.max(3, slate.corners[corner * 2].length);
+				final int valence = Math.max(3, edges[corner * 2].length);
 				final int n = c.length;
 				final int start = corner * MAX_FAN_LENGTH;
-				cornerStencil[0][valence - 3][corner][0] = (int) (slate.corners[corner * 2][0].vertex.corner * 0x10000);
-				cornerStencil[0][valence - 3][corner][1] = (int) (slate.corners[corner * 2][0].vertex.crease * 0x10000);
-				cornerStencil[1][valence - 3][corner][0] = (int) (slate.corners[corner * 2][0].vertex.corner * 0x10000);
-				cornerStencil[1][valence - 3][corner][1] = (int) (slate.corners[corner * 2][0].vertex.crease * 0x10000);
-				if (slate.corners[corner * 2][0].vertex.crease > 0) {
-					int ci0 = slate.getEdgeIndex(corner * 2, slate.corners[corner * 2][0].vertex.creaseEdge0);
-					int ci1 = slate.getEdgeIndex(corner * 2, slate.corners[corner * 2][0].vertex.creaseEdge1);
+				cornerStencil[0][valence - 3][corner][0] = (int) (edges[corner * 2][0].vertex.corner * 0x10000);
+				cornerStencil[0][valence - 3][corner][1] = (int) (edges[corner * 2][0].vertex.crease * 0x10000);
+				cornerStencil[1][valence - 3][corner][0] = (int) (edges[corner * 2][0].vertex.corner * 0x10000);
+				cornerStencil[1][valence - 3][corner][1] = (int) (edges[corner * 2][0].vertex.crease * 0x10000);
+				if (edges[corner * 2][0].vertex.crease > 0) {
+					int ci0 = slate.getEdgeIndex(corner * 2, edges[corner * 2][0].vertex.creaseEdge0);
+					int ci1 = slate.getEdgeIndex(corner * 2, edges[corner * 2][0].vertex.creaseEdge1);
 					cornerStencil[0][valence - 3][corner][3] = 2 * ci1 + 7;
 					cornerStencil[1][valence - 3][corner][2] = 2 * ci0 + 7;
 					cornerStencil[1][valence - 3][corner][3] = 2 * ci1 + 7;
@@ -861,10 +874,10 @@ public class Dicer {
 				/* 
 				 * initialize fan stencils
 				 */
-				for (int i = 2; i < slate.corners[corner * 2].length; i++) {
-					int index = (i == slate.corners[corner * 2].length - 1) ? 0 : i * 2 - 3;
-	//				System.out.println("corner=" + corner + " length=" + slate.corners[corner * 2].length + " i=" + i + " index=" + index);
-					fanStencil[1][valence - 3][corner][index][1] = slate.corners[corner * 2][i] == null ? 0 : (int) (slate.corners[corner * 2][i].creaseSharpness() * 0x10000);
+				for (int i = 2; i < edges[corner * 2].length; i++) {
+					int index = (i == edges[corner * 2].length - 1) ? 0 : i * 2 - 3;
+	//				System.out.println("corner=" + corner + " length=" + edges[corner * 2].length + " i=" + i + " index=" + index);
+					fanStencil[1][valence - 3][corner][index][1] = edges[corner * 2][i] == null ? 0 : (int) (edges[corner * 2][i].creaseSharpness() * 0x10000);
 				}
 				if (n == 2) {
 					fanStencil[1][valence - 3][corner][1][1] = fanStencil[1][valence - 3][corner][0][1];
