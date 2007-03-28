@@ -101,6 +101,8 @@ public class HalfEdge {
 		pair = new HalfEdge(secondVertex, firstVertex, this, sharpness, edgePoint);
 		slateEdge0 = pair.slateEdge1.pair;
 		slateEdge1 = pair.slateEdge0.pair;
+		edgePoint.creaseEdge0 = slateEdge0;
+		edgePoint.creaseEdge1 = slateEdge1;
 		primary = true;
 	}
 	
