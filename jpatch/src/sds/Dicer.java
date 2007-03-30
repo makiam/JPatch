@@ -616,8 +616,8 @@ public class Dicer {
 				// set normal
 				if (v.corner > 0) {
 					// crease
-					final Level2Vertex vu = edge.pair.vertex;
-					final Level2Vertex vv = slate.corners[(i + 1) % 4][0].pair.vertex;
+					final Level2Vertex vv = edge.pair.vertex;
+					final Level2Vertex vu = slate.corners[(i + 1) % 4][0].pair.vertex;
 					final float vx = vv.projectedPos.x - v.projectedPos.x;
 					final float vy = vv.projectedPos.y - v.projectedPos.y;
 					final float vz = vv.projectedPos.z - v.projectedPos.z;
@@ -629,57 +629,74 @@ public class Dicer {
 					/*
 					 * set crease0 to the first crease (clockwise) and crease1 to the second crease
 					 */
-					System.out.println("corner=" + i + " crease=" + v.crease);
-					for (int j = 0; j < slate.corners[i].length; j++) {
-						System.out.println("    edge" + j + "=" + slate.corners[i][j]);
-					}
-					System.out.println();
-					System.out.println("    creaseEdge0=" + v.creaseEdge0);
-					System.out.println("    creaseEdge1=" + v.creaseEdge1);
+//					System.out.println("corner=" + i + " crease=" + v.crease);
+//					for (int j = 0; j < slate.corners[i].length; j++) {
+//						System.out.println("    edge" + j + "=" + slate.corners[i][j]);
+//					}
+//					System.out.println();
+//					System.out.println("    creaseEdge0=" + v.creaseEdge0);
+//					System.out.println("    creaseEdge1=" + v.creaseEdge1);
 					SlateEdge crease0 = null, crease1 = null;
 					int creaseIndex0 = 0, creaseIndex1 = 0;
 					for (int j = 0; j < slate.corners[i].length; j++) {
 						SlateEdge e = slate.corners[i][j];
 						if (e == v.creaseEdge0) {
 							if (crease0 == null) {
-								crease0 = v.creaseEdge0;
+								crease0 = e;
 								creaseIndex0 = j;
 							} else {
-								crease1 = v.creaseEdge0;
+								crease1 = e;
 								creaseIndex1 = j;
 								break;
 							}
 						} else if (e == v.creaseEdge0.pair) {
 							if (crease0 == null) {
-								crease0 = v.creaseEdge0;
+								crease0 = e;
 								creaseIndex0 = j;
 							} else {
-								crease1 = v.creaseEdge0;
+								crease1 = e;
 								creaseIndex1 = j;
 								break;
 							}
 						} else if (e == v.creaseEdge1) {
 							if (crease0 == null) {
-								crease0 = v.creaseEdge1;
+								crease0 = e;
 								creaseIndex0 = j;
 							} else {
-								crease1 = v.creaseEdge1;
+								crease1 = e;
 								creaseIndex1 = j;
 								break;
 							}
 						} else if (e == v.creaseEdge1.pair) {
 							if (crease0 == null) {
-								crease0 = v.creaseEdge1;
+								crease0 = e;
 								creaseIndex0 = j;
 							} else {
-								crease1 = v.creaseEdge1;
+								crease1 = e;
 								creaseIndex1 = j;
 								break;
 							}
 						}
 					}
-					System.out.println("    crease0=" + crease0 + " index=" + creaseIndex0);
-					System.out.println("    crease1=" + crease1 + " index=" + creaseIndex1);
+//					System.out.println("    slate=" + slate + " 0=" + crease0.slate + " 1=" + crease1.slate);
+//					if (crease0.slate != slate) {
+//						crease0 = crease0.pair;
+//					}
+//					if (crease1.slate != slate) {
+//						crease1 = crease1.pair;
+//					}
+					float dir = 1;
+					if (crease0.slate == slate || crease1.pair.slate == slate) {
+						dir = -1;
+					} else if (crease1.slate == slate || crease0.pair.slate == slate) {
+						dir = 1;
+					} else {
+						throw new RuntimeException();
+					}
+//					System.out.println("    n: " + crease0.vertex + " " + crease1.vertex);
+//					System.out.println("    slate=" + slate + " 0=" + crease0.slate + " 1=" + crease1.slate);
+//					System.out.println("    crease0=" + crease0 + " index=" + creaseIndex0);
+//					System.out.println("    crease1=" + crease1 + " index=" + creaseIndex1);
 //					System.out.println("crease=" + v.crease + " ce0=" + v.creaseEdge0 + " ce1=" + v.creaseEdge1);
 //					System.out.println("crease0=" + crease0 + " crease1=" + crease1);
 					final Point3f pc0 = crease0.pair.vertex.projectedPos;
@@ -689,19 +706,19 @@ public class Dicer {
 					if (creaseIndex0 == 0) {
 						if (creaseIndex1 == 1) {
 							p3 = slate.fans[(i + 2) % 4][0];
-							System.out.println("corner=" + i + " a");
+//							System.out.println("corner=" + i + " a");
 						} else {
 							p3 = slate.fans[(i + 3) % 4][0];
-							System.out.println("corner=" + i + " b");
+//							System.out.println("corner=" + i + " b");
 						}
 					} else {
-						System.out.println("corner=" + i + " c");
+//						System.out.println("corner=" + i + " c");
 						p3 = slate.fans[(i + 1) % 4][0];
 					}
-					System.out.println("====");
-					final float vx = pc1.x - pc0.x;
-					final float vy = pc1.y - pc0.y;
-					final float vz = pc1.z - pc0.z;
+//					System.out.println("====");
+					final float vx = dir * (pc1.x - pc0.x);
+					final float vy = dir * (pc1.y - pc0.y);
+					final float vz = dir * (pc1.z - pc0.z);
 					final float ux = p3.x - p0.x;
 					final float uy = p3.y - p0.y;
 					final float uz = p3.z - p0.z;
@@ -962,7 +979,7 @@ public class Dicer {
 							case EDGE_H:
 							if (s[1] > 0) {
 								// crease
-								System.out.println("level=" + level + " EDGE_H (crease) sharpness=" + s[1]);
+//								System.out.println("level=" + level + " EDGE_H (crease) sharpness=" + s[1]);
 								out[outIndex][0] = (in[s[9]][0] + in[s[10]][0]) * 0.5f;
 								out[outIndex][1] = (in[s[9]][1] + in[s[10]][1]) * 0.5f;
 								out[outIndex][2] = (in[s[9]][2] + in[s[10]][2]) * 0.5f;
@@ -989,7 +1006,7 @@ public class Dicer {
 						case EDGE_V:
 							if (s[1] > 0) {
 								// crease
-								System.out.println("level=" + level + " EDGE_V (crease) sharpness=" + s[1]);
+//								System.out.println("level=" + level + " EDGE_V (crease) sharpness=" + s[1]);
 								out[outIndex][0] = (in[s[9]][0] + in[s[10]][0]) * 0.5f;
 								out[outIndex][1] = (in[s[9]][1] + in[s[10]][1]) * 0.5f;
 								out[outIndex][2] = (in[s[9]][2] + in[s[10]][2]) * 0.5f;
@@ -1036,7 +1053,7 @@ public class Dicer {
 							out[outIndex][2] = ((in[s[1]][2] + in[s[3]][2]) + (in[s[2]][2] + in[s[4]][2])) * FACE0;
 							break;
 						case CREASE_4_5:
-							System.out.println("level=" + level + " CREASE_4_5 sharpness=" + s[1]);
+//							System.out.println("level=" + level + " CREASE_4_5 sharpness=" + s[1]);
 							out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[5]][0]) * CREASE1;
 							out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[5]][1]) * CREASE1;
 							out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[5]][2]) * CREASE1;
@@ -1044,7 +1061,7 @@ public class Dicer {
 							nextLevel[s[2]][0] = s[1] > 0x10000 ? CREASE_4_5 : POINT;
 							break;
 						case CREASE_4_6:
-							System.out.println("level=" + level + " CREASE_4_6 sharpness=" + s[1]);
+//							System.out.println("level=" + level + " CREASE_4_6 sharpness=" + s[1]);
 							out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[6]][0]) * CREASE1;
 							out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[6]][1]) * CREASE1;
 							out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[6]][2]) * CREASE1;
@@ -1052,7 +1069,7 @@ public class Dicer {
 							nextLevel[s[2]][0] = s[1] > 0x10000 ? CREASE_4_6 : POINT;
 							break;
 						case CREASE_4_7:
-							System.out.println("level=" + level + " CREASE_4_7 sharpness=" + s[1]);
+//							System.out.println("level=" + level + " CREASE_4_7 sharpness=" + s[1]);
 							out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[4]][0] + in[s[7]][0]) * CREASE1;
 							out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[4]][1] + in[s[7]][1]) * CREASE1;
 							out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[4]][2] + in[s[7]][2]) * CREASE1;
@@ -1060,7 +1077,7 @@ public class Dicer {
 							nextLevel[s[2]][0] = s[1] > 0x10000 ? CREASE_4_7 : POINT;
 							break;
 						case CREASE_5_6:
-							System.out.println("level=" + level + " CREASE_5_6 sharpness=" + s[1]);
+//							System.out.println("level=" + level + " CREASE_5_6 sharpness=" + s[1]);
 							out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[5]][0] + in[s[6]][0]) * CREASE1;
 							out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[5]][1] + in[s[6]][1]) * CREASE1;
 							out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[5]][2] + in[s[6]][2]) * CREASE1;
@@ -1068,7 +1085,7 @@ public class Dicer {
 							nextLevel[s[2]][0] = s[1] > 0x10000 ? CREASE_5_6 : POINT;
 							break;
 						case CREASE_5_7:
-							System.out.println("level=" + level + " CREASE_5_7 sharpness=" + s[1]);
+//							System.out.println("level=" + level + " CREASE_5_7 sharpness=" + s[1]);
 							out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[5]][0] + in[s[7]][0]) * CREASE1;
 							out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[5]][1] + in[s[7]][1]) * CREASE1;
 							out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[5]][2] + in[s[7]][2]) * CREASE1;
@@ -1076,7 +1093,7 @@ public class Dicer {
 							nextLevel[s[2]][0] = s[1] > 0x10000 ? CREASE_5_7 : POINT;
 							break;
 						case CREASE_6_7:
-							System.out.println("level=" + level + " CREASE_6_7 sharpness=" + s[1]);
+//							System.out.println("level=" + level + " CREASE_6_7 sharpness=" + s[1]);
 							out[outIndex][0] = in[s[3]][0] * CREASE0 + (in[s[6]][0] + in[s[7]][0]) * CREASE1;
 							out[outIndex][1] = in[s[3]][1] * CREASE0 + (in[s[6]][1] + in[s[7]][1]) * CREASE1;
 							out[outIndex][2] = in[s[3]][2] * CREASE0 + (in[s[6]][2] + in[s[7]][2]) * CREASE1;
@@ -1189,7 +1206,7 @@ public class Dicer {
 						}
 					} else if (cs[1] > 0) {
 						//crease//
-						System.out.println(cs[1] + " " + cs[5] + " " + cs[2] + " " + cs[3]);
+//						System.out.println(cs[1] + " " + cs[5] + " " + cs[2] + " " + cs[3]);
 						x = in[cs[5]][0] * CREASE0 + (in[cs[cs[2]]][0] + in[cs[cs[3]]][0]) * CREASE1;
 						y = in[cs[5]][1] * CREASE0 + (in[cs[cs[2]]][1] + in[cs[cs[3]]][1]) * CREASE1;
 						z = in[cs[5]][2] * CREASE0 + (in[cs[cs[2]]][2] + in[cs[cs[3]]][2]) * CREASE1;
@@ -1479,14 +1496,15 @@ public class Dicer {
 						a = tmp;
 					}
 					int next = (a == 1) ? 2 : (b + 2) % v;
-					final float vx = in[cs[a + 6]][0] - in[cs[b + 6]][0];
-					final float vy = in[cs[a + 6]][1] - in[cs[b + 6]][1];
-					final float vz = in[cs[a + 6]][2] - in[cs[b + 6]][2];
-					final float ux = in[cs[next + 6]][0] - in[cs[5]][0];
-					final float uy = in[cs[next + 6]][1] - in[cs[5]][1];
-					final float uz = in[cs[next + 6]][2] - in[cs[5]][2];
+					float dir = a == 1 ? 1 : -1;
+					final float ux = dir * (in[cs[b + 6]][0] - in[cs[a + 6]][0]);
+					final float uy = dir * (in[cs[b + 6]][1] - in[cs[a + 6]][1]);
+					final float uz = dir * (in[cs[b + 6]][2] - in[cs[a + 6]][2]);
+					final float vx = in[cs[next + 6]][0] - in[cs[5]][0];
+					final float vy = in[cs[next + 6]][1] - in[cs[5]][1];
+					final float vz = in[cs[next + 6]][2] - in[cs[5]][2];
 					float[] normal = norm[outIndex];
-					computeNormal(vx, vy, vz, ux, uy, uz, normal, 0);
+					computeNormal(ux, uy, uz, vx, vy, vz, normal, corner * 6);
 				} else {
 					// smooth //
 					float ux = 0, uy = 0, uz = 0, vx = 0, vy = 0, vz = 0;

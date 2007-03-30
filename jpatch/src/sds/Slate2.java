@@ -201,7 +201,7 @@ public class Slate2 {
 		} else {
 			subdivLevel = 1;
 		}
-		subdivLevel = 1;
+		subdivLevel = 3;
 	}
 	
 //	public void test() {
