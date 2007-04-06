@@ -1,6 +1,7 @@
 package sds;
 
 import javax.vecmath.*;
+import static sds.Dicer.*;
 
 public class Slate2 {
 	private static final Point3f NULL_POINT = new Point3f();
@@ -9,6 +10,10 @@ public class Slate2 {
 	Point3f[][] fans;
 	int subdivLevel;
 	float normalCone;
+	int[] creaseIndex0 = new int[4];
+	int[] creaseIndex1 = new int[4];
+	
+	int creaseType1, creaseType3;
 	
 //	Slate2(SlateEdge[][] corners) {
 //		this.corners = corners;
@@ -27,7 +32,39 @@ public class Slate2 {
 		return corners;
 	}
 	
+	void initCreases() {
+		if (corners[1][0].vertex.crease > 0) {
+			creaseType1 = CREASE_5_7;				// FIXME check for other creases one hierarchical modeling is possible
+			creaseIndex0[1] = 1;
+			creaseIndex1[1] = 3;
+		} else {
+			creaseType1 = POINT;
+		}
+		
+		if (corners[3][0].vertex.crease > 0) {
+			creaseType3 = CREASE_4_6;				// FIXME check for other creases one hierarchical modeling is possible
+			creaseIndex0[3] = 2;
+			creaseIndex1[3] = 0;
+		} else {
+			creaseType3 = POINT;
+		}
+		
+		creaseIndex0[0] = getEdgeIndex(0, corners[0][0].vertex.creaseEdge0);
+		creaseIndex1[0] = getEdgeIndex(0, corners[0][0].vertex.creaseEdge1);
+		creaseIndex0[2] = getEdgeIndex(2, corners[2][0].vertex.creaseEdge0);
+		creaseIndex1[2] = getEdgeIndex(2, corners[2][0].vertex.creaseEdge1);
+		for (int corner = 0; corner < 4; corner += 2) {
+			if (creaseIndex0[corner] == 0 || (creaseIndex1[corner] != 0 && creaseIndex0[corner] > creaseIndex1[corner])) {
+				/* swap the crease indexes to ensure that the tangent directions are consistent */
+				int tmp = creaseIndex0[corner];
+				creaseIndex0[corner] = creaseIndex1[corner];
+				creaseIndex1[corner] = tmp;
+			}
+		}
+	}
+	
 	void initFans() {
+		initCreases();
 		fans = new Point3f[4][];
 		fans[0] = new Point3f[Math.max(1, 2 * corners[0].length - 4)];
 		fans[0][0] = corners[0][0].vertex.projectedPos;
@@ -201,7 +238,6 @@ public class Slate2 {
 		} else {
 			subdivLevel = 1;
 		}
-		subdivLevel = 3;
 	}
 	
 //	public void test() {

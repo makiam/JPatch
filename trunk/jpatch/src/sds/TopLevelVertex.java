@@ -277,7 +277,6 @@ public class TopLevelVertex extends BaseVertex {
 //	}
 	
 	public void analyzeEdges() {
-		int i = 0;
 		double sharpestEdgeValue0 = 0, sharpestEdgeValue1 = 0, sharpestEdgeValue2 = 0;
 		corner = sharpness.getDouble();
 		crease = 0;
@@ -288,20 +287,19 @@ public class TopLevelVertex extends BaseVertex {
 					sharpestEdgeValue2 = sharpestEdgeValue1;
 					sharpestEdgeValue1 = sharpestEdgeValue0;
 					sharpestEdgeValue0 = edgeSharpness;
-//					creaseEdgeIndex1 = creaseEdgeIndex0;
-//					creaseEdgeIndex0 = i;
 					creaseEdge1 = creaseEdge0;
 					creaseEdge0 = edge;
 				} else if (edgeSharpness > sharpestEdgeValue1) {
 					sharpestEdgeValue2 = sharpestEdgeValue1;
 					sharpestEdgeValue1 = edgeSharpness;
-//					creaseEdgeIndex1 = i;
 					creaseEdge1 = edge;
 				} else if (edgeSharpness > sharpestEdgeValue2) {
 					sharpestEdgeValue2 = edgeSharpness;
 				}
 			}
 		}
+		
+		System.out.println("edge: " + sharpestEdgeValue0 + " " + sharpestEdgeValue1 + " " + sharpestEdgeValue2);
 		if (sharpestEdgeValue1 > 0) {
 			// there are at least two crease edges, set this
 			// crease value to the crease value of the sharpest edge and
