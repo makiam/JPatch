@@ -35,7 +35,7 @@ public class HalfEdge {
 			public void computeDerivedPosition() {
 				Tuple3 p0 = HalfEdge.this.vertex.position;
 				Tuple3 p1 = HalfEdge.this.pair.vertex.position;
-				double edgeSharpness = HalfEdge.this.sharpness.getDouble();
+				double edgeSharpness = creaseSharpness();
 //				System.out.println("edge sharpness = " + edgeSharpness);
 				if (edgeSharpness > 0) {
 					position.setTuple(

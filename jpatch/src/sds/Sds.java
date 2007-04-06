@@ -259,7 +259,11 @@ public class Sds {
 			vertex.analyzeEdges();
 		}
 		computeLevel2Vertices();
-		
+		for (Face face : faceList) {
+			for (Slate2 slate : face.slates) {
+				slate.initCreases();
+			}
+		}
 //		for (Vertex vertex : vertexList) {
 //			vertex.limitPoint.computeDerivedPosition();
 //		}
