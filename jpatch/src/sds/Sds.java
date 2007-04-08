@@ -27,7 +27,10 @@ public class Sds {
 	private Set<HalfEdge> poisonedEdges = new HashSet<HalfEdge>();
 	
 	public List<TopLevelVertex> vertexList = new ArrayList<TopLevelVertex>();
-	public List<Face> faceList = new LinkedList<Face>();
+	public List<Face> faceList = new ArrayList<Face>();
+	public List<TopLevelVertex[]> candidateFaceList = new ArrayList<TopLevelVertex[]>();
+	public Map<CandidateEdge, Integer> candidateEdgeMap = new HashMap<CandidateEdge, Integer>();
+	
 	public Level2Vertex[] level2Vertices;
 	
 //	public final Vertex[] topLevelVertices;
@@ -422,32 +425,42 @@ public class Sds {
 		faceList.add(face);
 	}
 	
-	private void replaceEdge(HalfEdge edge) {
-		System.out.println("replaceEdge(" + edge + ")");
-		TopLevelVertex oldV0 = edge.vertex;
-		TopLevelVertex oldV1 = edge.pair.vertex;
-		TopLevelVertex newV0 = new TopLevelVertex(oldV0);
-		TopLevelVertex newV1 = new TopLevelVertex(oldV1);
-		Face face = edge.face;
-//		TopLevelVertex[] vertexArray = new TopLevelVertex[face.sides];
-//		int i = 0;
-//		for (HalfEdge e : face.getEdges()) {
-//			TopLevelVertex v = e.vertex;
-//			if (v == oldV0) {
-//				v = newV0;
-//			} else if (v == oldV1) {
-//				v = newV1;
-//			}
-//			vertexArray[i++] = v;
-//			e.face = null;
-//		}
-//		addFace(vertexArray);
-//		vertexList.remove(oldV0);
-//		vertexList.remove(oldV1);
-//		vertexList.add(newV0);
-//		vertexList.add(newV1);
-		faceList.remove(face);
-		System.out.println("done");
+	void addCandidateFace(TopLevelVertex[] vertices) {
+		candidateFaceList.add(vertices);
+		for (int i = 0; i < vertices.length; i++) {
+			CandidateEdge ce = new CandidateEdge(vertices[i], vertices[(i + 1) % vertices.length]);
+			if (candidateEdgeMap.containsKey(ce)) {
+				candidateEdgeMap.put(ce, candidateEdgeMap.get(ce) + 1);
+			} else {
+				candidateEdgeMap.put(ce, 1);
+			}
+		}
+	}
+	
+	void addCandidateFaces() {
+		Set<Integer> verticesToReplace = new HashSet<Integer>();
+		Set<TopLevelVertex> vertexSet = new HashSet<TopLevelVertex>();
+		for (TopLevelVertex[] vertices : candidateFaceList) {
+			verticesToReplace.clear();
+			for (int i = 0; i < vertices.length; i++) {
+				TopLevelVertex v0 = vertices[i];
+				TopLevelVertex v1 = vertices[(i + 1) % vertices.length];
+				int edgeCount = candidateEdgeMap.get(new CandidateEdge(v0, v1));
+				if (edgeCount > 2) {
+					verticesToReplace.add(i);
+					verticesToReplace.add((i + 1) % vertices.length);
+				}
+			}
+			for (int i : verticesToReplace) {
+				vertices[i] = new TopLevelVertex(vertices[i]);
+				vertices[i].sharpness.setDouble(10.0);
+			}
+			for (TopLevelVertex v : vertices) {
+				vertexSet.add(v);
+			}
+			addFace(vertices);
+		}
+		vertexList.addAll(vertexSet);
 	}
 	
 	Face addFace(TopLevelVertex[] vertices) {
@@ -456,8 +469,8 @@ public class Sds {
 			TopLevelVertex v1 = vertices[(i + 1) % vertices.length];
 			HalfEdge nonManifoldEdge = checkEdge(v0, v1);
 			if (nonManifoldEdge != null) {
-//				v0.sharpness.setDouble(10.0);
-//				v1.sharpness.setDouble(10.0);
+				v0.sharpness.setDouble(10.0);
+				v1.sharpness.setDouble(10.0);
 				v0 = new TopLevelVertex(v0);
 				v1 = new TopLevelVertex(v1);
 				v0.sharpness.setDouble(10.0);
@@ -466,13 +479,7 @@ public class Sds {
 				vertexList.add(v1);
 				vertices[i] = v0;
 				vertices[(i + 1) % vertices.length] = v1;
-//				nonManifoldEdge.sharpness.setDouble(10.0);
-				if (nonManifoldEdge.face != null) {
-					poisonedEdges.add(nonManifoldEdge);
-				}
-				if (nonManifoldEdge.pair != null) {
-					poisonedEdges.add(nonManifoldEdge.pair);
-				}
+				nonManifoldEdge.sharpness.setDouble(10.0);
 			}
 		}
 		HalfEdge start = createEdge(vertices[0], vertices[1]);
@@ -555,6 +562,29 @@ public class Sds {
 		public boolean equals(Object o) {
 			EdgeKey ek = (EdgeKey) o;
 			return firstVertex == ek.firstVertex && secondVertex == ek.secondVertex;
+		}
+	}
+	
+	private static final class CandidateEdge {
+		private final TopLevelVertex firstVertex;
+		private final TopLevelVertex secondVertex;
+		private final int hashCode;
+		
+		private CandidateEdge(TopLevelVertex firstVertex, TopLevelVertex secondVertex) {
+			this.firstVertex = firstVertex;
+			this.secondVertex = secondVertex;
+			hashCode = System.identityHashCode(firstVertex) ^ System.identityHashCode(secondVertex);
+		}
+		
+		@Override
+		public int hashCode() {
+			return hashCode;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			CandidateEdge ce = (CandidateEdge) o;
+			return (firstVertex == ce.firstVertex && secondVertex == ce.secondVertex) || (firstVertex == ce.secondVertex && secondVertex == ce.firstVertex);
 		}
 	}
 }
