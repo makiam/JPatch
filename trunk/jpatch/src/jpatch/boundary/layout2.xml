@@ -1,6 +1,7 @@
 <layout>
 	<menu name="menubar">
 		<menu name="File" mnemonic="f">
+			<item command="load model" />
 		</menu>
 		<menu name="View" mnemonic="v">
 			<menu name="Viewport layout">

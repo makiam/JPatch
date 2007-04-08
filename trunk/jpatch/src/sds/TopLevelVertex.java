@@ -192,9 +192,9 @@ public class TopLevelVertex extends BaseVertex {
 	
 	public TopLevelVertex(double x, double y, double z) {
 		this();
-		System.out.println("new TopLevelVertex(" + x + ", " + y + ", " + z + ")");
+//		System.out.println("new TopLevelVertex(" + x + ", " + y + ", " + z + ")");
 		position.getReferenceTuple3().setTuple(x, y, z);
-		System.out.println("p=" + position + " pref=" + position.getReferenceTuple3());
+//		System.out.println("p=" + position + " pref=" + position.getReferenceTuple3());
 	}
 	
 	public TopLevelVertex(Point3d p) {
@@ -299,7 +299,7 @@ public class TopLevelVertex extends BaseVertex {
 			}
 		}
 		
-		System.out.println("edge: " + sharpestEdgeValue0 + " " + sharpestEdgeValue1 + " " + sharpestEdgeValue2);
+//		System.out.println("edge: " + sharpestEdgeValue0 + " " + sharpestEdgeValue1 + " " + sharpestEdgeValue2);
 		if (sharpestEdgeValue1 > 0) {
 			// there are at least two crease edges, set this
 			// crease value to the crease value of the sharpest edge and

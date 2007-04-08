@@ -184,10 +184,10 @@ public class Face {
 			int offset = valence - edge.vertex.getEdgeIndex(edge);
 			
 			for (int i = 0; i < valence; i++) {
-				corners[0][(i + offset) % valence] = e.slateEdge0;
-				if (e.prev != null) {
-					e = e.prev.pair;
-				}
+				corners[0][(i + offset) % valence] = edge.vertex.edges[i].slateEdge0;
+//				if (e.prev != null) {
+//					e = e.prev.pair;
+//				}
 			}
 //			for (HalfEdge e : edge.vertex.getAdjacentEdges()) {
 //				corners[0][(i + offset) % valence] = e.slateEdge0;

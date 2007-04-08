@@ -33,26 +33,50 @@ public class Slate2 {
 	}
 	
 	void initCreases() {
+		if (corners[0][0].vertex.crease > 0) {
+			creaseIndex0[0] = getEdgeIndex(0, corners[0][0].vertex.creaseEdge0);
+			creaseIndex1[0] = getEdgeIndex(0, corners[0][0].vertex.creaseEdge1);
+			if (creaseIndex0[0] == -1 || creaseIndex1[0] == -1) {
+//				System.out.println(corners[0][0].vertex.creaseEdge0 + " " + creaseIndex0[0]);
+//				System.out.println(corners[0][0].vertex.creaseEdge1 + " " + creaseIndex1[0]);
+//				for (int i = 0; i < corners[0].length; i++) {
+//					SlateEdge e = corners[0][i];
+//					System.out.println(i + ": " + e);
+//				}
+				throw new IllegalStateException();
+			}
+		}
+		
 		if (corners[1][0].vertex.crease > 0) {
-			creaseType1 = CREASE_5_7;				// FIXME check for other creases one hierarchical modeling is possible
+			creaseType1 = CREASE_5_7;				// FIXME check for other creases once hierarchical modeling is possible
 			creaseIndex0[1] = 1;
 			creaseIndex1[1] = 3;
 		} else {
 			creaseType1 = POINT;
+			creaseIndex0[1] = -1;
+			creaseIndex1[1] = -1;
+		}
+		
+		if (corners[2][0].vertex.crease > 0) {
+			creaseIndex0[2] = getEdgeIndex(2, corners[2][0].vertex.creaseEdge0);
+			creaseIndex1[2] = getEdgeIndex(2, corners[2][0].vertex.creaseEdge1);
+			if (creaseIndex0[2] == -1 || creaseIndex1[2] == -1) {
+//				System.out.println(corners[2][0].vertex.creaseEdge0 + " " + creaseIndex0[2]);
+//				System.out.println(corners[2][0].vertex.creaseEdge1 + " " + creaseIndex1[2]);
+				throw new IllegalStateException();
+			}
 		}
 		
 		if (corners[3][0].vertex.crease > 0) {
-			creaseType3 = CREASE_4_6;				// FIXME check for other creases one hierarchical modeling is possible
+			creaseType3 = CREASE_4_6;				// FIXME check for other creases once hierarchical modeling is possible
 			creaseIndex0[3] = 2;
 			creaseIndex1[3] = 0;
 		} else {
 			creaseType3 = POINT;
+			creaseIndex0[3] = -1;
+			creaseIndex1[3] = -1;
 		}
 		
-		creaseIndex0[0] = getEdgeIndex(0, corners[0][0].vertex.creaseEdge0);
-		creaseIndex1[0] = getEdgeIndex(0, corners[0][0].vertex.creaseEdge1);
-		creaseIndex0[2] = getEdgeIndex(2, corners[2][0].vertex.creaseEdge0);
-		creaseIndex1[2] = getEdgeIndex(2, corners[2][0].vertex.creaseEdge1);
 		for (int corner = 0; corner < 4; corner += 2) {
 			if (creaseIndex0[corner] == 0 || (creaseIndex1[corner] != 0 && creaseIndex0[corner] > creaseIndex1[corner])) {
 				/* swap the crease indexes to ensure that the tangent directions are consistent */
@@ -123,7 +147,7 @@ public class Slate2 {
 	int getEdgeIndex(int corner, SlateEdge edge) {
 		SlateEdge[] c = corners[corner];
 		for (int i = 0, n = c.length; i < n; i++) {
-			if (c[i] == edge) {
+			if (c[i] == edge || c[i] == edge.pair) {
 				return i;
 			}
 		}

@@ -59,7 +59,7 @@ public class Dicer {
 		for (int level = 0; level < MAX_SUBDIV; level++) {
 			final int dim = ((1 << level)) + 3;
 			
-			System.out.println("level = " + level + " dim = " + dim);
+//			System.out.println("level = " + level + " dim = " + dim);
 			if (level == 0) {
 				rim0[0] = new int[4][2];
 				rim0[0][0] = new int[] {5, 6};
@@ -628,6 +628,10 @@ public class Dicer {
 				} else if (v.crease > 0) {
 					int creaseIndex0 = slate.creaseIndex0[i];
 					int creaseIndex1 = slate.creaseIndex1[i];
+					if (creaseIndex0 == -1 || creaseIndex1 == -1) {
+//						System.out.println(v);
+						System.exit(0);
+					}
 					final Point3f pc0 = slate.corners[i][creaseIndex0].pair.vertex.projectedPos;
 					final Point3f pc1 = slate.corners[i][creaseIndex1].pair.vertex.projectedPos;
 					final Point3f p0 = v.projectedPos;
