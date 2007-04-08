@@ -24,6 +24,8 @@ public class Sds {
 		
 	};
 	private Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
+	private Set<HalfEdge> poisonedEdges = new HashSet<HalfEdge>();
+	
 	public List<TopLevelVertex> vertexList = new ArrayList<TopLevelVertex>();
 	public List<Face> faceList = new LinkedList<Face>();
 	public Level2Vertex[] level2Vertices;
@@ -334,6 +336,13 @@ public class Sds {
 //		validateVertices();
 //	}
 	
+	void replaceFaces() {
+		for (HalfEdge edge : new HashSet<HalfEdge>(poisonedEdges)) {
+			replaceEdge(edge);
+		}
+		poisonedEdges = null;
+	}
+	
 	void validateVertices() {
 		for (TopLevelVertex vertex : vertexList) {
 			vertex.validate();
@@ -413,7 +422,59 @@ public class Sds {
 		faceList.add(face);
 	}
 	
+	private void replaceEdge(HalfEdge edge) {
+		System.out.println("replaceEdge(" + edge + ")");
+		TopLevelVertex oldV0 = edge.vertex;
+		TopLevelVertex oldV1 = edge.pair.vertex;
+		TopLevelVertex newV0 = new TopLevelVertex(oldV0);
+		TopLevelVertex newV1 = new TopLevelVertex(oldV1);
+		Face face = edge.face;
+//		TopLevelVertex[] vertexArray = new TopLevelVertex[face.sides];
+//		int i = 0;
+//		for (HalfEdge e : face.getEdges()) {
+//			TopLevelVertex v = e.vertex;
+//			if (v == oldV0) {
+//				v = newV0;
+//			} else if (v == oldV1) {
+//				v = newV1;
+//			}
+//			vertexArray[i++] = v;
+//			e.face = null;
+//		}
+//		addFace(vertexArray);
+//		vertexList.remove(oldV0);
+//		vertexList.remove(oldV1);
+//		vertexList.add(newV0);
+//		vertexList.add(newV1);
+		faceList.remove(face);
+		System.out.println("done");
+	}
+	
 	Face addFace(TopLevelVertex[] vertices) {
+		for (int i = 0; i < vertices.length; i++) {
+			TopLevelVertex v0 = vertices[i];
+			TopLevelVertex v1 = vertices[(i + 1) % vertices.length];
+			HalfEdge nonManifoldEdge = checkEdge(v0, v1);
+			if (nonManifoldEdge != null) {
+//				v0.sharpness.setDouble(10.0);
+//				v1.sharpness.setDouble(10.0);
+				v0 = new TopLevelVertex(v0);
+				v1 = new TopLevelVertex(v1);
+				v0.sharpness.setDouble(10.0);
+				v1.sharpness.setDouble(10.0);
+				vertexList.add(v0);
+				vertexList.add(v1);
+				vertices[i] = v0;
+				vertices[(i + 1) % vertices.length] = v1;
+//				nonManifoldEdge.sharpness.setDouble(10.0);
+				if (nonManifoldEdge.face != null) {
+					poisonedEdges.add(nonManifoldEdge);
+				}
+				if (nonManifoldEdge.pair != null) {
+					poisonedEdges.add(nonManifoldEdge.pair);
+				}
+			}
+		}
 		HalfEdge start = createEdge(vertices[0], vertices[1]);
 		HalfEdge prev = start;
 		HalfEdge edge = null;
@@ -445,6 +506,16 @@ public class Sds {
 //		Face face = new Face(vertices.length, start);
 //		return face;
 //	}
+	
+	private HalfEdge checkEdge(TopLevelVertex vertex0, TopLevelVertex vertex1) {
+		EdgeKey key = new EdgeKey(vertex1, vertex0);
+		HalfEdge neighbor = edgeMap.get(key);
+		if (neighbor != null && (neighbor.pair.face != null || poisonedEdges.contains(neighbor) || poisonedEdges.contains(neighbor.pair))) {
+			return neighbor.getPrimary();
+		} else {
+			return null;
+		}
+	}
 	
 	private HalfEdge createEdge(TopLevelVertex vertex0, TopLevelVertex vertex1) {
 		EdgeKey key = new EdgeKey(vertex1, vertex0);

@@ -190,6 +190,11 @@ public class TopLevelVertex extends BaseVertex {
 		};
 	}
 	
+	public TopLevelVertex(TopLevelVertex vertex) {
+		this();
+		position.getReferenceTuple3().setTuple(vertex.position);
+	}
+	
 	public TopLevelVertex(double x, double y, double z) {
 		this();
 //		System.out.println("new TopLevelVertex(" + x + ", " + y + ", " + z + ")");

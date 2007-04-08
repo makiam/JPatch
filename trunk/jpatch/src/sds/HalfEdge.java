@@ -26,7 +26,7 @@ public class HalfEdge {
 	final SlateEdge slateEdge1;
 	public final HardBoundedDoubleAttr sharpness;
 	final boolean primary;
-	
+
 	public HalfEdge(TopLevelVertex firstVertex, TopLevelVertex secondVertex) {
 		sharpness = new HardBoundedDoubleAttr(0, 10, 0);
 		vertex = firstVertex;
