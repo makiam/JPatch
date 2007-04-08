@@ -366,7 +366,8 @@ public class ViewportGl extends Viewport {
 				gl.glPolygonOffset(1.0f, 1.0f);
 				gl.glDisable(GL_DEPTH_TEST);
 				gl.glEnable(GL_NORMALIZE);
-				
+				gl.glEnable(GL_CULL_FACE);
+				gl.glCullFace(GL_BACK);
 				canUseProgram = gl.isFunctionAvailable("glUseProgram");
 				if (gl.isFunctionAvailable("glCreateShader")) {
 					int vertexShader = gl.glCreateShader(GL_VERTEX_SHADER);
@@ -398,14 +399,14 @@ public class ViewportGl extends Viewport {
 			}
 
 			public void display(GLAutoDrawable drawable) {
-				long t = System.currentTimeMillis();
+//				long t = System.currentTimeMillis();
+				gl.glFinish();	// wait for previous gl functions to finish
 				
 				gl.glClearColor(COLORS.background.x, COLORS.background.y, COLORS.background.z, 0);	// set background color
 				gl.glClearDepth(CLEAR_DEPTH);									// set initial depth-buffer value
 				gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// clear color and depth buffers
 				draw();
-				gl.glFinish();
-				System.out.println(System.currentTimeMillis() - t);
+//				System.out.println(System.currentTimeMillis() - t);
 			}
 
 			public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
@@ -417,17 +418,17 @@ public class ViewportGl extends Viewport {
 			public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) { }
 		});
 		
-		component.addMouseWheelListener(new MouseWheelListener() {
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				subdivLevel += e.getWheelRotation();
-				if (subdivLevel < 1) subdivLevel = 1;
-				if (subdivLevel > 6) subdivLevel = 6;
-				
-				useProgram = !useProgram;
-
-				component.repaint();
-			}
-		});
+//		component.addMouseWheelListener(new MouseWheelListener() {
+//			public void mouseWheelMoved(MouseWheelEvent e) {
+//				subdivLevel += e.getWheelRotation();
+//				if (subdivLevel < 1) subdivLevel = 1;
+//				if (subdivLevel > 6) subdivLevel = 6;
+//				
+//				useProgram = !useProgram;
+//
+//				component.repaint();
+//			}
+//		});
 	}
 	
 	public void display() {
@@ -491,7 +492,6 @@ public class ViewportGl extends Viewport {
 	
 	@Override
 	public void draw() {
-		gl.glFinish();	// wait for previous gl functions to finish
 		
 //		rasterMode();
 //		drawGrid();
@@ -538,8 +538,10 @@ public class ViewportGl extends Viewport {
 		
 		gl.glPolygonMode(GL_FRONT, GL_FILL);
 //		drawSds(Main.getInstance().getActiveSds());
-		drawSds3(Main.getInstance().getActiveSds());
-		
+		Sds activeSds = Main.getInstance().getActiveSds();
+		if (activeSds != null) {
+			drawSds3(activeSds);
+		}
 		drawOrigin();
 		JPatchTool tool = Main.getInstance().getTool();
 //		if (tool != null) {
@@ -787,8 +789,7 @@ public class ViewportGl extends Viewport {
 		gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		gl.glEnable(GL_COLOR_MATERIAL);
 		gl.glColorMaterial(GL_FRONT, GL_EMISSION);
-//		gl.glEnable(GL_CULL_FACE);
-//		gl.glCullFace(GL_BACK);
+		
 //		if (gl.isFunctionAvailable("glUseProgram")) {
 //			gl.glUseProgram(useProgram ? program : 0);
 //		}

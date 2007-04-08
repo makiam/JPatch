@@ -75,7 +75,7 @@ public class JptLoader {
 							}
 						}
 					}
-					System.out.println(vertexList);
+//					System.out.println(vertexList);
 					Face face = sds.addFace(vertexList.toArray(new TopLevelVertex[vertexList.size()]));
 					face.setMaterial(materials.get(materialIndex));
 					chars = null;

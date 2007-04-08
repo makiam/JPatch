@@ -84,7 +84,7 @@ public class Sds {
 //		edgeMap = null;
 		offInputStream.close();
 		validateVertices();
-		dump();
+//		dump();
 		makeSlates();
 		rethinkSlates();
 	}
@@ -270,7 +270,7 @@ public class Sds {
 	}
 	
 	public void computeLevel2Vertices() {
-		System.out.println("cumputeLevel2Vertices...");
+//		System.out.println("cumputeLevel2Vertices...");
 		for (Level2Vertex v : level2Vertices) {
 			v.computeDerivedPosition();
 		}
@@ -282,7 +282,7 @@ public class Sds {
 				slate.computeNormalCone();
 			}
 		}
-		System.out.println("cumputeLevel2Vertices done.");
+//		System.out.println("cumputeLevel2Vertices done.");
 	}
 	
 	public void project(Matrix4f matrix) {

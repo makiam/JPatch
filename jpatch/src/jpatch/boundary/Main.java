@@ -227,9 +227,9 @@ public class Main {
 	 */
 	private Main() {
 
-		try {
-			int[] ts = new int[7];
-			int n = 0;
+//		try {
+//			int[] ts = new int[7];
+//			int n = 0;
 //			for (int i = 0; i < 1; i++) {
 //				activeSds = new Sds(new FileInputStream("/home/sascha/off/grid.off"));
 //			activeSds.dump();
@@ -256,9 +256,12 @@ public class Main {
 //			}
 //			System.exit(0);
 			
-			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/teapot.off"));
+//			activeSds = new Sds(ClassLoader.getSystemResourceAsStream("off/teapot.off"));
 //			new RibExport().export(activeSds, System.out);
 //			System.exit(0);
+
+//			activeSds = new JptLoader().importModel(new FileInputStream("/Users/sascha/cartoonRabbit.jpt"));
+
 //			activeSds = new JptLoader().importModel(new FileInputStream("/mnt/share/jpatch0.4/models/moai2.jpt"));
 
 //			activeSds.makeSlates();
@@ -266,9 +269,10 @@ public class Main {
 //			activeSds.dump();
 //			activeSds.smooth();
 //			System.exit(0);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//			System.exit(0);
+//		}
 
 		
 //		WorkspaceManager workspaceManager;
@@ -410,12 +414,20 @@ public class Main {
 		return screen;
 	}
 	
+	public JFrame getFrame() {
+		return frame;
+	}
+	
 	public Model getActiveModel() {
 		return activeModel;
 	}
 	
 	public Sds getActiveSds() {
 		return activeSds;
+	}
+	
+	public void setActiveSds(Sds sds) {
+		activeSds = sds;
 	}
 	
 	public void setLayout(Layout layout) {

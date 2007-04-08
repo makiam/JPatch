@@ -156,4 +156,9 @@
 		<property key="ShortDescription" value="Delete project" />
 	</action>
 	
+	<action name="load model" model="default">
+		<instantiate class="jpatch.boundary.newaction.LoadModelActions" method="createLoadModelAction" />
+		<property key="ShortDescription" value="Load model" />
+	</action>
+	
 </actions>

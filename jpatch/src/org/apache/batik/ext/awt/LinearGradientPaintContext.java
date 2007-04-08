@@ -136,11 +136,12 @@ final class LinearGradientPaintContext extends MultipleGradientPaintContext {
         else                    pixSz = dgdYAbs;
 
         //constant, incorporates the translation components from the matrix
-        gc = (a02-start.x)*constX + (a12-start.y)*constY;	       	
-
-        Object colorRend = hints.get(RenderingHints.KEY_COLOR_RENDERING);
-        Object rend      = hints.get(RenderingHints.KEY_RENDERING);
-
+        gc = (a02-start.x)*constX + (a12-start.y)*constY;
+        Object colorRend = null, rend = null;
+        if (hints != null) {
+        	colorRend = hints.get(RenderingHints.KEY_COLOR_RENDERING);
+        	rend      = hints.get(RenderingHints.KEY_RENDERING);
+        }
         fillMethod = DEFAULT_IMPL;
 
         if ((cycleMethod == MultipleGradientPaint.REPEAT) ||
