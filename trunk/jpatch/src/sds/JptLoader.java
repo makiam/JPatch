@@ -13,11 +13,12 @@ import javax.vecmath.*;
 import jpatch.entity.*;
 
 public class JptLoader {
-	private List<Cp> cpList = new ArrayList<Cp>();
+	private Map<Integer, Cp> cpList = new HashMap<Integer, Cp>();
 	private Map<Integer, Cp> childHookIndex = new HashMap<Integer, Cp>();
 	private int cpIndex;
 	private Sds sds;
 	private List<Material> materials = new ArrayList<Material>();
+	private Map<String, Integer> materialNameMap = new HashMap<String, Integer>();
 	
 	public ContentHandler handler = new DefaultHandler() {
 		StringBuilder chars;
@@ -27,6 +28,7 @@ public class JptLoader {
 		boolean patch;
 		boolean material;
 		int materialIndex = 0;
+		int cpIndex = 0;
 		Color3f color = new Color3f(1.0f, 1.0f, 1.0f);
 	
 		@Override
@@ -77,9 +79,10 @@ public class JptLoader {
 					}
 //					System.out.println(vertexList);
 					Face face = sds.addFace(vertexList.toArray(new TopLevelVertex[vertexList.size()]));
-					if (face != null) {
+//					if (face != null) {
 						face.setMaterial(materials.get(materialIndex));
-					}
+//					}
+//					sds.addCandidateFace(vertexList.toArray(new TopLevelVertex[vertexList.size()]));
 					chars = null;
 				}
 			}
@@ -92,6 +95,7 @@ public class JptLoader {
 					} else {
 						materialIndex = materials.size();
 					}
+					materialNameMap.put(name, materialIndex);
 				}
 				if (localName.equals("material")) {
 					if (materialIndex < materials.size()) {
@@ -120,6 +124,7 @@ public class JptLoader {
 				String attach = attributes.getValue("attach");
 				String hook = attributes.getValue("hook");
 				String hookPos = attributes.getValue("hookpos");
+				String id = attributes.getValue("id");
 				Cp cp;
 				if (attach != null) {
 					cp = new Cp(Integer.parseInt(attach));
@@ -138,7 +143,11 @@ public class JptLoader {
 							Double.parseDouble(attributes.getValue("z"))
 					);
 				}
-				cpList.add(cp);
+				int cpId = cpIndex++;
+				if (id != null) {
+					cpId = Integer.parseInt(id);
+				}
+				cpList.put(cpId, cp);
 				if (prevCp != null) {
 					prevCp.next = cp;
 					cp.prev = prevCp;
@@ -150,7 +159,11 @@ public class JptLoader {
 				chars = new StringBuilder();
 			} else if (localName.equals("patch")) {
 				patch = true;
-				materialIndex = Integer.parseInt(attributes.getValue("material"));
+				try {
+					materialIndex = Integer.parseInt(attributes.getValue("material"));
+				} catch (NumberFormatException e) {
+					materialIndex = materialNameMap.get(attributes.getValue("material"));
+				}
 			} else if (localName.equals("material")) {
 				material = true;
 			} else if (material) {
@@ -185,14 +198,15 @@ public class JptLoader {
 			xmlReader.parse(new InputSource(inputStream));
 			inputStream.close();
 			
-			for (Cp cp : cpList) {
-				cp.computeG1Tangents();
+			for (Integer cpId : cpList.keySet()) {
+				cpList.get(cpId).computeG1Tangents();
 			}
 			
 			Point3d p0 = new Point3d();
 			Point3d p1 = new Point3d();
 			Point3d p2 = new Point3d();
-			for (Cp cp : cpList) {
+			for (Integer cpId : cpList.keySet()) {
+				Cp cp = cpList.get(cpId);
 				if (cp.hookPos != -1) {
 					Cp start, end;
 					for (start = cp; start.prev != null; start = start.prev);
@@ -206,7 +220,8 @@ public class JptLoader {
 //					cp.vertex.pos.interpolate(start.getVertex().pos, end.getVertex().pos, cp.hookPos);
 				}
 			}
-			sds.replaceFaces();
+//			sds.addCandidateFaces();
+//			sds.replaceFaces();
 			sds.sortFaces();
 			sds.validateVertices();
 //			Map<Point3d, Vector3d> compensationMap = new HashMap<Point3d, Vector3d>();
