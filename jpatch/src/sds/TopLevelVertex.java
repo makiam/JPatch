@@ -256,6 +256,27 @@ public class TopLevelVertex extends BaseVertex {
 		return lc;
 	}
 	
+	public LinearCombination<TopLevelVertex> getTangentLc(int direction) {
+		LinearCombination<TopLevelVertex> lc = new LinearCombination<TopLevelVertex>();
+		if (crease == 0 && corner == 0) {
+			for (int i = 0; i < edges.length; i++) {
+				switch(direction) {
+				case 0:					// u direction
+					lc.addScaled(edges[i].face.getFacePointLc(), TANGENT_FACE_WEIGHT[valence][i]);
+					lc.addScaled(edges[i].getEdgePointLc(), TANGENT_FACE_WEIGHT[valence][i]);
+					lc.scale(1 / edges.length / 10);
+					break;
+				case 1:					// v direction
+					lc.addScaled(edges[(i + 1) % edges.length].face.getFacePointLc(), TANGENT_FACE_WEIGHT[valence][i]);
+					lc.addScaled(edges[(i + 1) % edges.length].getEdgePointLc(), TANGENT_FACE_WEIGHT[valence][i]);
+					lc.scale(1 / edges.length / 10);
+					break;
+				}
+			}
+		}
+		return lc;
+	}
+	
 	int getEdgeIndex(HalfEdge edge) {
 		for (int i = 0; i < edges.length; i++) {
 			if (edge == edges[i]) {
