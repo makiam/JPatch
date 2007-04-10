@@ -3,6 +3,8 @@ package jpatch.control;
 import java.util.*;
 import javax.swing.event.*;
 
+import jpatch.control.edit2.JPatchUndoableEdit;
+
 public final class JPatchUndoManager {
 	private final static int DEPTH = 50;
 	private final static JPatchUndoableEdit[] ARRAY = new JPatchUndoableEdit[0];

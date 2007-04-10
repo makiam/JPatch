@@ -2,6 +2,8 @@ package jpatch.control;
 
 import java.util.List;
 
+import jpatch.control.edit2.AbstractUndoableEdit;
+import jpatch.control.edit2.JPatchUndoableEdit;
 import jpatch.entity.ControlPoint;
 import jpatch.entity.Attribute;
 

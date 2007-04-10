@@ -10,6 +10,7 @@ import javax.vecmath.Point3d;
 
 import jpatch.boundary.*;
 import jpatch.control.*;
+import jpatch.control.edit2.JPatchUndoableEdit;
 import jpatch.entity.*;
 
 public class AddCurveTool implements JPatchTool {
