@@ -240,6 +240,9 @@ public class JptLoader {
 //			}
 			sds.makeSlates();
 			sds.rethinkSlates();
+			if (true) {
+				return sds;
+			}
 			
 			Map<TopLevelVertex, Integer> vertexIndexMap = new HashMap<TopLevelVertex, Integer>();
 			for (int i = 0; i < sds.vertexList.size(); i++) {
