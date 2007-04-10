@@ -2,6 +2,8 @@ package jpatch.control;
 
 import javax.vecmath.Tuple3f;
 import javax.vecmath.Tuple3d;
+
+import jpatch.control.edit2.JPatchUndoableEdit;
 import jpatch.entity.Attribute;
 
 /**

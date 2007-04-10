@@ -1,5 +1,7 @@
 package jpatch.control;
 
+import jpatch.control.edit2.AbstractUndoableEdit;
+
 public abstract class SwapperEdit extends AbstractUndoableEdit {
 	
 	@Override
