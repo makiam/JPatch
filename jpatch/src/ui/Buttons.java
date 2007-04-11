@@ -288,7 +288,6 @@ public class Buttons {
 	private static class TransparentToolbar extends JToolBar {
 		public void paintComponent(Graphics g) {
 			Rectangle bounds = getBounds();
-//			g.translate(-bounds.x, -bounds.y);
 			Graphics2D g2 = (Graphics2D) g;
 			AffineTransform saveAt = g2.getTransform();
 			g.translate(-bounds.x, -bounds.y);
@@ -300,7 +299,6 @@ public class Buttons {
 			final float l1 = (float) Math.sqrt((width / 2) * (width / 2) + (yoff + height) * (yoff + height));
 			final Color c0 = new Color(0.7f, 0.7f, 0.7f);
 			final Color c1 = new Color(0.4f, 0.4f, 0.4f);
-			System.out.println(l0 + " " + l1);
 			for (int i = 0; i < n; i++) {
 				float xoff = width * (i + 0.5f) / n - width / 2.0f;
 				float len = (float) Math.sqrt(xoff * xoff + yoff * yoff);
@@ -535,7 +533,6 @@ public class Buttons {
 		float height = textLayout.getAscent() + textLayout.getDescent();
 		
 		
-		System.out.println(bounds);
 		image = new BufferedImage((int) (bounds.getWidth()) + 5, (int) height + 2, BufferedImage.TYPE_INT_ARGB);
 		g2 = image.createGraphics();
 		g2.setColor(Color.BLACK);
@@ -587,7 +584,9 @@ public class Buttons {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setPaint(new GradientPaint(0, 0, new Color(0xff0000), 0, 13, new Color(0x0000ff)));
 		g.setStroke(new BasicStroke(2));
-		g.fillOval(1, 1, 17, 17);
+		g.drawLine(4, 4, 14, 14);
+		g.drawLine(4, 14, 14, 4);
+//		g.fillOval(1, 1, 17, 17);
 		return image;
 	}
 	

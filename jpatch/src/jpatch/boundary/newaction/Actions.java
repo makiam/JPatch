@@ -30,7 +30,6 @@ import javax.swing.*;
 
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
-import ui.State;
 import jpatch.auxilary.KeyStrokeUtils;
 import jpatch.boundary.*;
 import jpatch.boundary.settings.*;
@@ -48,7 +47,7 @@ public class Actions extends DefaultHandler {
 	private static final URL URL = ClassLoader.getSystemResource("jpatch/boundary/newaction/actions.xml");
 	private static Actions INSTANCE = new Actions(URL);
 	private Map<String, ActionDescriptor> actionMap = new HashMap<String, ActionDescriptor>();
-	private Map<String, State> stateMap = new HashMap<String, State>();
+	private Map<String, ButtonGroup> buttonGroupMap = new HashMap<String, ButtonGroup>();
 	private ActionDescriptor actionDescriptor;
 	
 	public static Actions getInstance() {
@@ -126,11 +125,11 @@ public class Actions extends DefaultHandler {
 //		enableAction("clear rotoscope image", MainFrame.getInstance().getModel() != null && MainFrame.getInstance().getModel().getRotoscope(viewDef.getView()) != null);
 //	}
 	
-	public State getState(String key) {
-		State state = stateMap.get(key);
-		if (state == null)
-			throw new IllegalArgumentException("no state for key " + key);
-		return state;
+	public ButtonGroup getButtonGroup(String key) {
+		ButtonGroup buttonGroup = buttonGroupMap.get(key);
+		if (buttonGroup == null)
+			throw new IllegalArgumentException("no buttongroup for key " + key);
+		return buttonGroup;
 	}
 	
 	public Action getAction(String key) {
@@ -252,7 +251,7 @@ public class Actions extends DefaultHandler {
 			}
 		} else if (localName.equals("buttongroup")) {
 			if (attributes.getValue("type").equals("standard"))
-				stateMap.put(attributes.getValue("name"), new ButtonGroup());
+				buttonGroupMap.put(attributes.getValue("name"), new ButtonGroup());
 			else if (attributes.getValue("type").equals("locking"))
 				buttonGroupMap.put(attributes.getValue("name"), new LockingButtonGroup());
 		} else if (localName.equals("action")) {
