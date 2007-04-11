@@ -1,0 +1,21 @@
+<states>
+	<state-group "tool">
+		<enum>jpatch.control.States.Tool</enum>
+		<attribute-listener>new jpatch.boundary.newaction.ChangeToolActions()</attribute-listener>
+		<state name="MOVE_VIEW">
+			<property key="ShortDescription" value="Move view" />
+			<property key="Mnemonic" value="m" />
+			<property key="Icon" value="jpatch/images/move.png" />
+		</state>
+		<state name="ROTATE_VIEW">
+			<property key="ShortDescription" value="Rotate view" />
+			<property key="Mnemonic" value="r" />
+			<property key="Icon" value="jpatch/images/rotate.png" />
+		</state>
+		<state name="ZOOM_VIEW">
+			<property key="ShortDescription" value="Zoom view" />
+			<property key="Mnemonic" value="r" />
+			<property key="Icon" value="jpatch/images/zoom.png" />
+		</state>
+	</state-group>
+</states>
