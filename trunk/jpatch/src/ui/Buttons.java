@@ -285,6 +285,36 @@ public class Buttons {
 		return c;
 	}
 	
+	private static class TransparentToolbar extends JToolBar {
+		public void paintComponent(Graphics g) {
+			Rectangle bounds = getBounds();
+//			g.translate(-bounds.x, -bounds.y);
+			Graphics2D g2 = (Graphics2D) g;
+			AffineTransform saveAt = g2.getTransform();
+			g.translate(-bounds.x, -bounds.y);
+			final float width = getParent().getWidth();
+			final float height = getParent().getHeight();
+			final float yoff = width * 1.414f;
+			final int n = 9;
+			final float l0 = yoff;
+			final float l1 = (float) Math.sqrt((width / 2) * (width / 2) + (yoff + height) * (yoff + height));
+			final Color c0 = new Color(0.7f, 0.7f, 0.7f);
+			final Color c1 = new Color(0.4f, 0.4f, 0.4f);
+			System.out.println(l0 + " " + l1);
+			for (int i = 0; i < n; i++) {
+				float xoff = width * (i + 0.5f) / n - width / 2.0f;
+				float len = (float) Math.sqrt(xoff * xoff + yoff * yoff);
+				float x0 = xoff / len * l0 + width / 2.0f;
+				float y0 = yoff / len * l0 - yoff;
+				float x1 = xoff / len * l1 + width / 2.0f;
+				float y1 = yoff / len * l1 - yoff;
+				g2.setPaint(new GradientPaint(x0, y0, c0, x1, y1, c1));
+				g2.fillRect(getParent().getWidth() * i / n, 0, getParent().getWidth() * (i + 1) / n - getParent().getWidth() * i / n, getParent().getHeight());
+			}
+			g2.setTransform(saveAt);
+		}
+	}
+	
 	private void test() {
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -294,21 +324,52 @@ public class Buttons {
 		frame.setLayout(new BorderLayout());
 		//frame.add(component);
 		
-		
-		JToolBar toolBar = new JToolBar() {
-			public void paintComponent(Graphics g) {
-				Graphics2D g2 = (Graphics2D) g;
-//				g2.setPaint(new GradientPaint(0, 0, new Color(0xb0b0b0), 0, getHeight(), new Color(0xa0a0a0)));
-//				g2.fillRect(0, 0, getWidth(), getHeight());
-				
-				g2.setPaint(new GradientPaint(getWidth() * 4 / 10, 0, new Color(0xe0e0e0), getWidth() * 1 / 10, getHeight(), new Color(0xc0c0c0)));
-				g2.fillRect(0, 0, getWidth() / 2, getHeight());
-				g2.setPaint(new GradientPaint(getWidth() * 6 / 10, 0, new Color(0xe0e0e0), getWidth() * 9 / 10, getHeight(), new Color(0xc0c0c0)));
-				g2.fillRect(getWidth() / 2, 0, getWidth() / 2, getHeight());
-				g2.setPaint(new GradientPaint(0, 0, new Color(0x00000000, true), 0, getHeight(), new Color(0x20000000, true)));
-				g2.fillRect(0, 0, getWidth(), getHeight());
-			}
+		JPanel panel = new JPanel() {
+//
+//			@Override
+//			public void doLayout() {
+////				super.doLayout();
+//				Dimension leftDim = getComponent(0).getPreferredSize();
+//				Dimension centerDim = getComponent(1).getPreferredSize();
+//				Dimension rightDim = getComponent(2).getPreferredSize();
+//				getComponent(0).setBounds(0, 0, leftDim.width, leftDim.height);
+//				getComponent(1).setBounds((getWidth() - centerDim.width) / 2, 0, centerDim.width, centerDim.height);
+//				getComponent(2).setBounds(getWidth() - rightDim.width, 0, rightDim.width, rightDim.height);
+//			}
+//			
+//			public void paintComponent(Graphics g) {
+//				Graphics2D g2 = (Graphics2D) g;
+//				final float width = getParent().getWidth();
+//				final float height = getParent().getHeight();
+//				final float yoff = width * 1.414f;
+//				final int n = 9;
+//				final float l0 = yoff;
+//				final float l1 = (float) Math.sqrt((width / 2) * (width / 2) + (yoff + height) * (yoff + height));
+//				final Color c0 = new Color(0.7f, 0.7f, 0.7f);
+//				final Color c1 = new Color(0.4f, 0.4f, 0.4f);
+//				System.out.println(l0 + " " + l1);
+//				for (int i = 0; i < n; i++) {
+//					float xoff = width * (i + 0.5f) / n - width / 2.0f;
+//					float len = (float) Math.sqrt(xoff * xoff + yoff * yoff);
+//					float x0 = xoff / len * l0 + width / 2.0f;
+//					float y0 = yoff / len * l0 - yoff;
+//					float x1 = xoff / len * l1 + width / 2.0f;
+//					float y1 = yoff / len * l1 - yoff;
+//					g2.setPaint(new GradientPaint(x0, y0, c0, x1, y1, c1));
+//					g2.fillRect(getParent().getWidth() * i / n, 0, getParent().getWidth() * (i + 1) / n - getParent().getWidth() * i / n, getParent().getHeight());
+//				}
+//			}
 		};
+		
+		JToolBar leftToolBar = new TransparentToolbar();
+		JToolBar centerToolBar = new TransparentToolbar();
+		JToolBar rightToolBar = new TransparentToolbar();
+		leftToolBar.setFloatable(false);
+		centerToolBar.setFloatable(false);
+		rightToolBar.setFloatable(false);
+		
+		centerToolBar.setLayout(new BorderLayout());
+		
 		JToggleButton tb1 = new JToggleButton();
 		JToggleButton tb2 = new JToggleButton();
 		JToggleButton tb3 = new JToggleButton();
@@ -384,38 +445,46 @@ public class Buttons {
 		group.add(tb6);
 		group = new ButtonGroup();
 		
-		toolBar.add(Box.createHorizontalStrut(8));
-		toolBar.add(tb1);
-		toolBar.add(tb2);
-		toolBar.add(tb3);
-		toolBar.add(Box.createHorizontalStrut(8));
-		toolBar.add(tb4);
-		toolBar.add(tb5);
-		toolBar.add(tb6);
-		toolBar.add(Box.createHorizontalStrut(8));
-		toolBar.add(b1);
-		toolBar.add(b2);
-		toolBar.add(b3);
+		leftToolBar.add(Box.createHorizontalStrut(8));
+		leftToolBar.add(tb1);
+		leftToolBar.add(tb2);
+		leftToolBar.add(tb3);
+		leftToolBar.add(Box.createHorizontalStrut(8));
+		leftToolBar.add(tb4);
+		leftToolBar.add(tb5);
+		leftToolBar.add(tb6);
+		leftToolBar.add(Box.createHorizontalStrut(8));
+		leftToolBar.add(b1);
+		leftToolBar.add(b2);
+		leftToolBar.add(b3);
 		
-		toolBar.add(Box.createHorizontalStrut(8));
-		toolBar.add(b7);
-		toolBar.add(b8);
-		toolBar.add(tb11);
-		toolBar.add(b4);
-		toolBar.add(b5);
-		toolBar.add(b6);
+		
+		rightToolBar.add(Box.createHorizontalStrut(8));
+		rightToolBar.add(b7);
+		rightToolBar.add(b8);
+		rightToolBar.add(tb11);
+		rightToolBar.add(b4);
+		rightToolBar.add(b5);
+		rightToolBar.add(b6);
 //		toolBar.add(b6);
-		toolBar.add(Box.createHorizontalStrut(8));
-		toolBar.add(tb7);
-		toolBar.add(tb8);
-		toolBar.add(tb9);
-		toolBar.add(tb10);
-		toolBar.add(Box.createHorizontalStrut(8));
+		rightToolBar.add(Box.createHorizontalStrut(8));
+		rightToolBar.add(tb7);
+		rightToolBar.add(tb8);
+		rightToolBar.add(tb9);
+		rightToolBar.add(tb10);
+		rightToolBar.add(Box.createHorizontalStrut(8));
 		tb1.setEnabled(false);
 		tb6.setEnabled(false);
-		toolBar.setBackground(new Color(0xbbbbbb));
-		toolBar.setFloatable(false);
-		frame.add(toolBar, BorderLayout.NORTH);
+		rightToolBar.setBackground(new Color(0xbbbbbb));
+		rightToolBar.setFloatable(false);
+		
+		panel.setLayout(new BorderLayout());
+//		panel.add(leftToolBar, new Spri)
+		panel.add(leftToolBar, BorderLayout.WEST);
+		panel.add(centerToolBar, BorderLayout.CENTER);
+		panel.add(rightToolBar, BorderLayout.EAST);
+		
+		frame.add(panel, BorderLayout.NORTH);
 		
 		JComponent testComponent = new JComponent() {
 			@Override
@@ -426,7 +495,7 @@ public class Buttons {
 			}
 		};
 		testComponent.setPreferredSize(new Dimension(50, 44));
-		toolBar.add(testComponent);
+		centerToolBar.add(testComponent, BorderLayout.CENTER);
 //		frame.add(testComponent, BorderLayout.CENTER);
 		
 		frame.setVisible(true);
