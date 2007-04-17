@@ -324,7 +324,7 @@ public class Buttons {
 		
 		
 		
-		JPatchToolbar toolBar = new JPatchToolbar();
+		JPatchToolBar toolBar = new JPatchToolBar();
 		toolBar.setFloatable(false);
 		
 		JToggleButton tb1 = new JToggleButton();
@@ -413,18 +413,18 @@ public class Buttons {
 		group.add(tb6);
 		group = new ButtonGroup();
 		
-		toolBar.add(Box.createHorizontalStrut(8), JPatchToolbar.Position.LEFT);
-		toolBar.add(tb1, JPatchToolbar.Position.LEFT);
-		toolBar.add(tb2, JPatchToolbar.Position.LEFT);
-		toolBar.add(tb3, JPatchToolbar.Position.LEFT);
-		toolBar.add(Box.createHorizontalStrut(8), JPatchToolbar.Position.LEFT);
-		toolBar.add(tb4, JPatchToolbar.Position.LEFT);
-		toolBar.add(tb5, JPatchToolbar.Position.LEFT);
-		toolBar.add(tb6, JPatchToolbar.Position.LEFT);
-		toolBar.add(Box.createHorizontalStrut(8), JPatchToolbar.Position.LEFT);
-		toolBar.add(b1, JPatchToolbar.Position.LEFT);
-		toolBar.add(b2, JPatchToolbar.Position.LEFT);
-		toolBar.add(b3, JPatchToolbar.Position.LEFT);
+		toolBar.add(Box.createHorizontalStrut(8), JPatchToolBar.Position.LEFT);
+		toolBar.add(tb1, JPatchToolBar.Position.LEFT);
+		toolBar.add(tb2, JPatchToolBar.Position.LEFT);
+		toolBar.add(tb3, JPatchToolBar.Position.LEFT);
+		toolBar.add(Box.createHorizontalStrut(8), JPatchToolBar.Position.LEFT);
+		toolBar.add(tb4, JPatchToolBar.Position.LEFT);
+		toolBar.add(tb5, JPatchToolBar.Position.LEFT);
+		toolBar.add(tb6, JPatchToolBar.Position.LEFT);
+		toolBar.add(Box.createHorizontalStrut(8), JPatchToolBar.Position.LEFT);
+		toolBar.add(b1, JPatchToolBar.Position.LEFT);
+		toolBar.add(b2, JPatchToolBar.Position.LEFT);
+		toolBar.add(b3, JPatchToolBar.Position.LEFT);
 		
 		JComponent testComponent = new JComponent() {
 			@Override
@@ -435,23 +435,23 @@ public class Buttons {
 			}
 		};
 		testComponent.setPreferredSize(new Dimension(50, 44));
-		toolBar.add(testComponent, JPatchToolbar.Position.CENTER);
+		toolBar.add(testComponent, JPatchToolBar.Position.CENTER);
 		
 		
-		toolBar.add(Box.createHorizontalStrut(8), JPatchToolbar.Position.RIGHT);
-		toolBar.add(b7, JPatchToolbar.Position.RIGHT);
-		toolBar.add(b8, JPatchToolbar.Position.RIGHT);
-		toolBar.add(tb11, JPatchToolbar.Position.RIGHT);
-		toolBar.add(b4, JPatchToolbar.Position.RIGHT);
-		toolBar.add(b5, JPatchToolbar.Position.RIGHT);
-		toolBar.add(b6, JPatchToolbar.Position.RIGHT);
+		toolBar.add(Box.createHorizontalStrut(8), JPatchToolBar.Position.RIGHT);
+		toolBar.add(b7, JPatchToolBar.Position.RIGHT);
+		toolBar.add(b8, JPatchToolBar.Position.RIGHT);
+		toolBar.add(tb11, JPatchToolBar.Position.RIGHT);
+		toolBar.add(b4, JPatchToolBar.Position.RIGHT);
+		toolBar.add(b5, JPatchToolBar.Position.RIGHT);
+		toolBar.add(b6, JPatchToolBar.Position.RIGHT);
 //		toolBar.add(b6);
-		toolBar.add(Box.createHorizontalStrut(8), JPatchToolbar.Position.RIGHT);
-		toolBar.add(tb7, JPatchToolbar.Position.RIGHT);
-		toolBar.add(tb8, JPatchToolbar.Position.RIGHT);
-		toolBar.add(tb9, JPatchToolbar.Position.RIGHT);
-		toolBar.add(tb10, JPatchToolbar.Position.RIGHT);
-		toolBar.add(Box.createHorizontalStrut(8), JPatchToolbar.Position.RIGHT);
+		toolBar.add(Box.createHorizontalStrut(8), JPatchToolBar.Position.RIGHT);
+		toolBar.add(tb7, JPatchToolBar.Position.RIGHT);
+		toolBar.add(tb8, JPatchToolBar.Position.RIGHT);
+		toolBar.add(tb9, JPatchToolBar.Position.RIGHT);
+		toolBar.add(tb10, JPatchToolBar.Position.RIGHT);
+		toolBar.add(Box.createHorizontalStrut(8), JPatchToolBar.Position.RIGHT);
 		tb1.setEnabled(false);
 		tb6.setEnabled(false);
 		
