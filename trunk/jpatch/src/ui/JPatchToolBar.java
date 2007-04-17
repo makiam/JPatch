@@ -12,26 +12,26 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 public class JPatchToolBar extends JToolBar {
-	public static enum Position { LEFT, CENTER, RIGHT };
-	
 	private static final int NORMAL = 0;
 	private static final int DISABLED = 1;
 	
 	private boolean hideText = true;
-	private Color textColor = Color.WHITE;
-	private Font textFont = new Font("sans-serif", Font.BOLD, 12);
+	private Color textColor = new Color(0xeeffffff, true);
+	private Font textFont = new Font("sans-serif", Font.BOLD, 14);
 	
 	private List<ToolTipComponent> componentList = new ArrayList<ToolTipComponent>();
 	private Dimension dimension = new Dimension();
 	
-	public void add(Component comp, Position position) {
-		ToolTipComponent tt = new ToolTipComponent(comp, position);
+	@Override
+	public Component add(Component comp) {
+		ToolTipComponent tt = new ToolTipComponent(comp);
 		componentList.add(tt);
-		add(tt);
-		add(tt.component);
+		super.add(tt);
+		super.add(tt.component);
 		setComponentZOrder(tt, 0);
 		setComponentZOrder(tt.component, getComponentCount() - 1);
 		computeSize();
+		return comp;
 	}
 
 	@Override
@@ -51,34 +51,24 @@ public class JPatchToolBar extends JToolBar {
 	
 	@Override
 	public void doLayout() {
-		List<ToolTipComponent>[] lists = new List[] {
-				new ArrayList<ToolTipComponent>(),
-				new ArrayList<ToolTipComponent>(),
-				new ArrayList<ToolTipComponent>()
-		};
-		for (ToolTipComponent comp : componentList) {
-			lists[comp.getPosition()].add(comp);
-		}
 		int xPos = 0;
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0, n = lists[i].size(); j < n; j++) {
-				ToolTipComponent comp = lists[i].get(j);
-				if (j == 0) {
-					xPos += comp.getOffsetWidth() - comp.component.getWidth() / 2;
-				}
-				comp.component.setBounds(xPos, Math.max(1, 18 - comp.component.getPreferredSize().height / 2), comp.component.getPreferredSize().width, comp.component.getPreferredSize().height);
-				comp.setBounds(xPos + (comp.component.getPreferredSize().width - comp.getImageWidth()) / 2, 37, comp.getImageWidth(), comp.getImageHeight());
-				xPos += (j == n - 1 ? comp.getOffsetWidth() : comp.component.getPreferredSize().width);
-//				System.out.println(xPos + " " + comp.getClass() + " " + comp.getBounds());
+		for (int i = 0, n = componentList.size(); i < n; i++) {
+			ToolTipComponent comp = componentList.get(i);
+			if (i == 0) {
+				xPos += comp.getOffsetWidth() - comp.component.getWidth() / 2;
 			}
+			comp.component.setBounds(xPos, Math.max(1, 18 - comp.component.getPreferredSize().height / 2), comp.component.getPreferredSize().width, comp.component.getPreferredSize().height);
+			comp.setBounds(xPos + (comp.component.getPreferredSize().width - comp.getImageWidth()) / 2, 35, comp.getImageWidth(), comp.getImageHeight());
+			xPos += (i == n - 1 ? comp.getOffsetWidth() : comp.component.getPreferredSize().width);
+//			System.out.println(xPos + " " + comp.getClass() + " " + comp.getBounds());
 		}
 	}
 
 	public void paintComponent(Graphics g) {
-//		Rectangle bounds = getBounds();
+		Rectangle bounds = getBounds();
 		Graphics2D g2 = (Graphics2D) g;
-//		AffineTransform saveAt = g2.getTransform();
-//		g.translate(-bounds.x, -bounds.y);
+		AffineTransform saveAt = g2.getTransform();
+		g.translate(-bounds.x, -bounds.y);
 		final float width = getParent().getWidth();
 		final float height = getParent().getHeight();
 		final float yoff = width * 1.414f;
@@ -97,28 +87,18 @@ public class JPatchToolBar extends JToolBar {
 			g2.setPaint(new GradientPaint(x0, y0, c0, x1, y1, c1));
 			g2.fillRect(getParent().getWidth() * i / n, 0, getParent().getWidth() * (i + 1) / n - getParent().getWidth() * i / n, getParent().getHeight());
 		}
-//		g2.setTransform(saveAt);
+		g2.setTransform(saveAt);
 	}
 	
 	@SuppressWarnings("unchecked")
 	private void computeSize() {
 		int width = 0, height = 0;
-		List<ToolTipComponent>[] lists = new List[] {
-				new ArrayList<ToolTipComponent>(),
-				new ArrayList<ToolTipComponent>(),
-				new ArrayList<ToolTipComponent>()
-		};
-		for (ToolTipComponent comp : componentList) {
-			lists[comp.getPosition()].add(comp);
-		}
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0, n = lists[i].size(); j < n; j++) {
-				ToolTipComponent comp = lists[i].get(j);
-				width += (j == 0 || j == n - 1) ? comp.getOffsetWidth() : comp.component.getPreferredSize().width;
-				int h = comp.component.getPreferredSize().height + comp.getHeight();
-				if (h > height) {
-					height = h;
-				}
+		for (int i = 0, n = componentList.size(); i < n; i++) {
+			ToolTipComponent comp = componentList.get(i);
+			width += (i == 0 || i == n - 1) ? comp.getOffsetWidth() : comp.component.getPreferredSize().width;
+			int h = comp.component.getPreferredSize().height + comp.getHeight();
+			if (h > height) {
+				height = h;
 			}
 		}
 		dimension.width = width;
@@ -127,13 +107,11 @@ public class JPatchToolBar extends JToolBar {
 	
 	private class ToolTipComponent extends JComponent {
 		private Component component;
-		private Position pos;
 		private Image enabledToolTip;
 		private Image disabledToolTip;
 		
-		ToolTipComponent(Component component, Position pos) {
+		ToolTipComponent(Component component) {
 			this.component = component;
-			this.pos = pos;
 //			System.out.print(component.getClass().getName() + "@" + System.identityHashCode(component) + " ");
 			if (component instanceof AbstractButton) {
 				AbstractButton button = (AbstractButton) component;
@@ -189,18 +167,6 @@ public class JPatchToolBar extends JToolBar {
 		
 		public int getImageHeight() {
 			return enabledToolTip == null ? 0 : enabledToolTip.getHeight(null);
-		}
-		
-		public int getPosition() {
-			switch(pos) {
-			case LEFT:
-				return 0;
-			case CENTER:
-				return 1;
-			case RIGHT:
-				return 2;
-			}
-			throw new IllegalStateException();
 		}
 	}
 }

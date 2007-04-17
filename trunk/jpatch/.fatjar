@@ -1,9 +1,9 @@
 #Fat Jar Configuration File
-#Mon Mar 05 15:43:00 CET 2007
+#Tue Apr 10 20:38:37 CEST 2007
 onejar.expand=
 autojar.enable=false
-excludes=<po|JPatch>~objects/;<po|JPatch>~patterns/;<po|JPatch>~org/;<po|JPatch>~inyo/;<po|JPatch>~jpatch_fat.jar
-manifest.removesigners=false
+excludes=<po|JPatch>~objects/;<po|JPatch>~patterns/;<po|JPatch>~org/;<po|JPatch>~inyo/
+manifest.removesigners=true
 manifest.mergeall=false
 manifest.file=<createnew>
 manifest.vmarguments=
