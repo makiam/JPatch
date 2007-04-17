@@ -40,14 +40,18 @@ public class ImageUtils {
 		int[] pixels = ((DataBufferInt) tmp.getRaster().getDataBuffer()).getData();
 		for (int i = 0; i < pixels.length; i++) {
 			int argb = pixels[i];
-			int a = (argb >> 24) & 0xff;
+			int a = ((argb >> 24) & 0xff) / 9;
 			int alpha = a;
 			
-			pixels[i] = (alpha << 24) | 0xffffff;
+			pixels[i] = (alpha << 24) | 0x000000;
 		}
 		BufferedImage image = new BufferedImage(source.getWidth(null), source.getHeight(null), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = image.createGraphics();
-		g.drawImage(tmp, 0, 1, null);
+		for (int y = 0; y < 3; y++) {
+			for (int x = 0; x < 3; x++) {
+				g.drawImage(tmp, x, y, null);
+			}
+		}
 		g.drawImage(source, 0, 0, null);
 		return image;
 	}
