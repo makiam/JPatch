@@ -51,7 +51,7 @@ public class JPatchToolBar extends JToolBar {
 	
 	@Override
 	public void doLayout() {
-		int xPos = 0;
+		int xPos = (getWidth() - dimension.width) / 2;
 		for (int i = 0, n = componentList.size(); i < n; i++) {
 			ToolTipComponent comp = componentList.get(i);
 			if (i == 0) {
@@ -119,7 +119,7 @@ public class JPatchToolBar extends JToolBar {
 				button.setToolTipText(null);
 				if (text != null) {
 //					System.out.print(text + " ");
-					enabledToolTip = ImageUtils.createEtchedIcon(ImageUtils.createTextIcon(textFont, textColor, text));
+					enabledToolTip = ImageUtils.createShadowIcon(ImageUtils.createTextIcon(textFont, textColor, text));
 					disabledToolTip = ImageUtils.createDisabledIcon(enabledToolTip);
 				}
 				button.addMouseListener(new MouseAdapter() {
