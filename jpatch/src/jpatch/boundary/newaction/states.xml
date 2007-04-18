@@ -1,21 +1,111 @@
-<states>
-	<state-group "tool">
-		<enum>jpatch.control.States.Tool</enum>
-		<attribute-listener>new jpatch.boundary.newaction.ChangeToolActions()</attribute-listener>
-		<state name="MOVE_VIEW">
-			<property key="ShortDescription" value="Move view" />
-			<property key="Mnemonic" value="m" />
-			<property key="Icon" value="jpatch/images/move.png" />
+<actions>
+	<action id="open-file">
+		<object>new jpatch.control.OpenFileAction()</object>
+		<property>
+			<key>"icon-image"</key>
+			<value>javax.imageio.ImageIO.read(ClassLoader.getSystemResource("jpatch/images/open.png"))</value>
+		</property>
+		<property>
+			<key>"short-text"</key>
+			<value>"Open model...</value>
+		</property>
+	</action>
+</actions>
+
+<toggles>
+	<toggle id="snap-to-grid">
+		<field>jpatch.boundary.Main.getInstance().toggles.snapToGrid</field>
+		<object>new jpatch.entity.SnapToGrid()</object>
+	</toggle>
+</toggles>
+
+<state-machines>
+	<!-- 
+	   - Tools
+	   -->
+	<state-machine id="tools">
+		<field>jpatch.boundary.Main.getInstance().states.tools</field>
+		<object>new jpatch.entity.ToolStateMachine()</object>
+		
+		<!-- 
+		  - Move View
+		  -->
+		<state id="move-view">
+			<object>jpatch.boundary.newtools.ChangeViewTool.createMoveViewTool()</object>
+			<property>
+				<key>"icon-image"</key>
+				<value>javax.imageio.ImageIO.read(ClassLoader.getSystemResource("jpatch/images/move.png"))</value>
+			</property>
 		</state>
-		<state name="ROTATE_VIEW">
-			<property key="ShortDescription" value="Rotate view" />
-			<property key="Mnemonic" value="r" />
-			<property key="Icon" value="jpatch/images/rotate.png" />
+		
+		<!-- 
+		  - Rotate View
+		  -->
+		<state id="rotate-view">
+			<object>jpatch.boundary.newtools.ChangeViewTool.createRotateViewTool()</object>
+			<property>
+				<key>"icon-image"</key>
+				<value>javax.imageio.ImageIO.read(ClassLoader.getSystemResource("jpatch/images/rotate.png"))</value>
+			</property>
 		</state>
-		<state name="ZOOM_VIEW">
-			<property key="ShortDescription" value="Zoom view" />
-			<property key="Mnemonic" value="r" />
-			<property key="Icon" value="jpatch/images/zoom.png" />
+		
+		<!-- 
+		  - Zoom View
+		  -->
+		<state id="zoom-view">
+			<object>jpatch.boundary.newtools.ChangeViewTool.createZoomViewTool()</object>
+			<property>
+				<key>"icon-image"</key>
+				<value>javax.imageio.ImageIO.read(ClassLoader.getSystemResource("jpatch/images/zoom.png"))</value>
+			</property>
 		</state>
-	</state-group>
-</states>
+		
+		<!-- 
+		  - Move vertex
+		  -->
+		<state id="move-vertex">
+			<object>new jpatch.boundary.newtools.MoveVertexTool()</object>
+			<property>
+				<key>"icon-image"</key>
+				<value>javax.imageio.ImageIO.read(ClassLoader.getSystemResource("jpatch/images/default.png"))</value>
+			</property>
+		</state>
+	</state-machine>
+</state-machines>
+
+<toolbars>
+	<toolbar position="left">
+		<radio-buttons style="glass" state-machine="tools">
+			<state id="move-view" />
+			<state id="rotate-view" />
+			<state id="zoom-view" />
+		</radio-buttons>
+	</toolbar>
+	<toolbar position="center">
+		<viewport-switcher />
+	</toolbar>
+	<toolbar position="right">
+		<radio-buttons style="plastic" state-machine="tools">
+			<state id="move-vertex">
+		</radio-buttons>
+	</toolbar>
+</toolbars>
+
+<menus>
+	<menu id="file">
+		<action-item action-id="open-file" />
+	</menu>
+	
+	<menu id="tools">		
+		<radio-item state-machine="tools" state-id="move-view" />
+		<radio-item state-machine="tools" state-id="rotate-view" />
+		<radio-item state-machine="tools" state-id="zoom-view" />
+		<separator />
+		<radio-item state-machine="tools" state-id="move-vertex" />
+	</menu>
+	
+	<menu-bar id="main">
+		<submenu id="file" />
+		<submenu id="tools" />
+	</menu-bar>
+</menus>

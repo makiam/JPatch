@@ -218,6 +218,7 @@ public class Actions extends DefaultHandler {
 		menuItem.setAction(actionDescriptor.action);
 		actionDescriptor.bound = bind;
 		return menuItem;
+		
 	}
 
 	public Set<Action> getUnboundActions() {
