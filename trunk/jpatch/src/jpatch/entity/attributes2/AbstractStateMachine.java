@@ -20,9 +20,9 @@ public class AbstractStateMachine<T> extends AbstractAttribute {
 
 	/**
 	 * Creates a new StateMachine for the specified states and sets the initial state to <i>null</i>.
-	 * @param states An array containing the possible states for this StateMachine
+	 * @param states an array containing the possible states for this StateMachine
 	 * @throws NullPointerException if states is <i>null</i>
-	 * @throws IllegalArgumentException if states does not contain <i>null</i> of if <i>performStateTransition(null)</i> returns false
+	 * @throws IllegalArgumentException if states does not contain <i>null</i> or if <i>performStateTransition(null)</i> returns false
 	 */
 	protected AbstractStateMachine(T[] states) {
 		this(states, null);
@@ -30,8 +30,8 @@ public class AbstractStateMachine<T> extends AbstractAttribute {
 	
 	/**
 	 * Creates a new StateMachine for the specified states and sets the initial state to the specified argument.
-	 * @param states An array containing the possible states for this StateMachine
-	 * @param state The initial state
+	 * @param states an array containing the possible states for this StateMachine
+	 * @param state the initial state
 	 * @throws NullPointerException if states is <i>null</i>
 	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
 	 */
@@ -49,7 +49,7 @@ public class AbstractStateMachine<T> extends AbstractAttribute {
 	
 	/**
 	 * Creates a new StateMachine for the specified states and sets the initial state to <i>null</i>.
-	 * @param states A list of possible states for this StateMachine
+	 * @param states a list of possible states for this StateMachine
 	 * @throws NullPointerException if states is <i>null</i>
 	 * @throws IllegalArgumentException if states does not contain <i>null</i> of if <i>performStateTransition(null)</i> returns false
 	 */
@@ -59,8 +59,8 @@ public class AbstractStateMachine<T> extends AbstractAttribute {
 	
 	/**
 	 * Creates a new StateMachine for the specified states and sets the initial state to the specified argument.
-	 * @param states A list of possible states for this StateMachine
-	 * @param state The initial state
+	 * @param states a list of possible states for this StateMachine
+	 * @param state the initial state
 	 * @throws NullPointerException if states is <i>null</i>
 	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
 	 */
@@ -95,9 +95,9 @@ public class AbstractStateMachine<T> extends AbstractAttribute {
 
 	/**
 	 * Causes this StateMachine to transition to <i>newState</i>.
-	 * This implementation will check if <i>newState<i> equals the current state and returns false if this is the case.
-	 * If <i>newState</i> is a valid state it will call the performStateTransition(T) method. If performStateTransition(T)
-	 * returned true, it will set <i>currentState</i> to <i>newState<i>, notify registered AttributeListeners by calling the
+	 * This implementation will check if <i>newState</i> equals the current state and returns false if this is the case.
+	 * If <i>newState</i> is a valid state it will call the performStateTransition(<i>newState</i>) method. If performStateTransition(<i>newState</i>)
+	 * returned true, it will set <i>currentState</i> to <i>newState</i>, notify registered AttributeListeners by calling the
 	 * fireAttributeChanged() method and finally return true.
 	 * Note that this method is declared final. Subclasses wishing to implement custom state-switching behavior must override
 	 * the performStateTransition(T) method.
