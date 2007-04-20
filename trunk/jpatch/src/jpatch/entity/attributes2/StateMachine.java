@@ -19,12 +19,59 @@ public class StateMachine<T> extends AbstractAttribute {
 	protected T currentState;
 
 	/**
+	 * The default state of this state machine (may be <i>null</i>)
+	 */
+	protected T defaultState;
+	
+	/**
+	 * Wheter or not this StateMachine should revert to the default state
+	 */
+	protected boolean revertToDefault;
+	
+	/**
+	 * Returns the default state of this StateMachine
+	 * @return the default state of this StateMachine
+	 */
+	public T getDefaultState() {
+		return defaultState;
+	}
+
+	/**
+	 * Sets the default state of this StateMachine to the specified state and sets the revertToDefault flag to true.
+	 * @param defaultState the default state of this StateMachine
+	 * @throws IllegalArgumentException if states does not contain defaultState
+	 */
+	public void setDefaultState(T defaultState) {
+		if (!states.contains(defaultState)) {
+			throw new IllegalArgumentException(defaultState + " is not a legal state of this statemachine (" + this + ")");
+		}
+		this.defaultState = defaultState;
+		revertToDefault = true;
+	}
+
+	/**
+	 * Returns the revertToDefault flag
+	 * @return true the revertToDefault flag
+	 */
+	public boolean isRevertToDefault() {
+		return revertToDefault;
+	}
+
+	/**
+	 * Sets the revertToDefault flag
+	 * @param revertToDefault
+	 */
+	public void setRevertToDefault(boolean revertToDefault) {
+		this.revertToDefault = revertToDefault;
+	}
+
+	/**
 	 * Creates a new StateMachine for the specified states and sets the initial state to <i>null</i>.
 	 * @param states an array containing the possible states for this StateMachine
 	 * @throws NullPointerException if states is <i>null</i>
 	 * @throws IllegalArgumentException if states does not contain <i>null</i> or if <i>performStateTransition(null)</i> returns false
 	 */
-	protected StateMachine(T[] states) {
+	public StateMachine(T[] states) {
 		this(states, null);
 	}
 	
@@ -35,7 +82,7 @@ public class StateMachine<T> extends AbstractAttribute {
 	 * @throws NullPointerException if states is <i>null</i>
 	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
 	 */
-	protected StateMachine(T[] states, T initialState) {
+	public StateMachine(T[] states, T initialState) {
 		for (T s : states) {
 			this.states.add(s);
 		}
@@ -53,7 +100,7 @@ public class StateMachine<T> extends AbstractAttribute {
 	 * @throws NullPointerException if states is <i>null</i>
 	 * @throws IllegalArgumentException if states does not contain <i>null</i> of if <i>performStateTransition(null)</i> returns false
 	 */
-	protected StateMachine(Class<? extends Enum> states) {
+	public StateMachine(Class<? extends Enum> states) {
 		this(states, null);
 	}
 	
@@ -65,7 +112,7 @@ public class StateMachine<T> extends AbstractAttribute {
 	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
 	 */
 	@SuppressWarnings("unchecked")
-	protected StateMachine(Class<? extends Enum> states, T initialState) {
+	public StateMachine(Class<? extends Enum> states, T initialState) {
 		for (Enum s : states.getEnumConstants()) {
 			this.states.add((T) s);
 		}
@@ -102,7 +149,7 @@ public class StateMachine<T> extends AbstractAttribute {
 	 * Note that this method is declared final. Subclasses wishing to implement custom state-switching behavior must override
 	 * the performStateTransition(T) method.
 	 * @param newState the new state to switch to
-	 * @return true if the state transition was successful, false otherwise
+	 * @return whether the current state has been changed (true if the state transition was successful, false otherwise)
 	 * @throws IllegalArgumentException if <i>newState</i> is not a legal state of this statemachine
 	 */
 	public final boolean setState(T newState) {
@@ -156,6 +203,19 @@ public class StateMachine<T> extends AbstractAttribute {
 		states.remove(state);
 	}
 
+	/**
+	 * If the revertToDefault flag is set, this method will try to switch the state to the default state and returns the result
+	 * of the <i>setState(defaultState)</i> method. Otherwise it will do nothing and return false.
+	 * @return whether the current state has been changed (true if the revertToDefault flag is set and <i>setState(defaultState)</i> returned true, false otherwise)
+	 */
+	public boolean revertToDefault() {
+		if (revertToDefault) {
+			return setState(defaultState);
+		} else {
+			return false;
+		}
+	}
+	
 	/**
 	 * Checks for duplicates in <i>states</i> (the list of possible states)
 	 * @return true, if <i>states</i> is free of duplicates, false otherwise

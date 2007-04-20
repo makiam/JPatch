@@ -4,6 +4,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.AbstractButton;
 import javax.swing.JToggleButton;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import jpatch.entity.attributes2.Attribute;
 import jpatch.entity.attributes2.AttributeListener;
@@ -12,10 +14,19 @@ import jpatch.entity.attributes2.Toggle;
 
 
 public class JPatchButtons {
-	public void configureRadioButton(final AbstractButton button, final StateMachine stateMachine, final Object state) {
+	public static void configureRadioButton(final AbstractButton button, final StateMachine stateMachine, final Object state) {
+		button.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				button.setSelected(stateMachine.getState() == state);
+			}
+		});
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				stateMachine.setState(state);
+				if (stateMachine.getState() == state) {
+					stateMachine.revertToDefault();
+				} else {
+					stateMachine.setState(state);
+				}
 			}
 		});
 		stateMachine.addAttributeListener(new AttributeListener() {
@@ -23,9 +34,10 @@ public class JPatchButtons {
 				button.setSelected(stateMachine.getState() == state);
 			}
 		});
+		button.setSelected(stateMachine.getState() == state);
 	}
 	
-	public void configureToggleButton(final AbstractButton button, final Toggle toggle) {
+	public static void configureToggleButton(final AbstractButton button, final Toggle toggle) {
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				toggle.setState(!toggle.getState());
@@ -36,6 +48,7 @@ public class JPatchButtons {
 				button.setSelected(toggle.getState());
 			}
 		});
+		button.setSelected(toggle.getState());
 	}
 	
 }
