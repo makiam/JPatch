@@ -182,8 +182,8 @@ public class Settings extends AbstractSettings {
 	}
 	
 	private Settings() {
-		if (SplashScreen.instance != null)
-			SplashScreen.instance.setText("Loading preferences");
+//		if (SplashScreen.instance != null)
+//			SplashScreen.instance.setText("Loading preferences");
 		System.out.println("Loading preferences...");
 		storeDefaults();
 		load();
