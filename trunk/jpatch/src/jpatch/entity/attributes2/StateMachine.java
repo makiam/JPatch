@@ -2,9 +2,9 @@ package jpatch.entity.attributes2;
 
 import java.util.*;
 
-public class AbstractStateMachine<T> extends AbstractAttribute {
+public class StateMachine<T> extends AbstractAttribute {
 	/**
-	 * A list of possible states of this AbstractStateMachine
+	 * A list of possible states of this StateMachine
 	 */
 	protected final List<T> states = new ArrayList<T>();
 	
@@ -24,7 +24,7 @@ public class AbstractStateMachine<T> extends AbstractAttribute {
 	 * @throws NullPointerException if states is <i>null</i>
 	 * @throws IllegalArgumentException if states does not contain <i>null</i> or if <i>performStateTransition(null)</i> returns false
 	 */
-	protected AbstractStateMachine(T[] states) {
+	protected StateMachine(T[] states) {
 		this(states, null);
 	}
 	
@@ -35,14 +35,14 @@ public class AbstractStateMachine<T> extends AbstractAttribute {
 	 * @throws NullPointerException if states is <i>null</i>
 	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
 	 */
-	protected AbstractStateMachine(T[] states, T initialState) {
+	protected StateMachine(T[] states, T initialState) {
 		for (T s : states) {
 			this.states.add(s);
 		}
 		if (!checkForDuplicates()) {
 			throw new IllegalArgumentException("State list " + this.states + " contains duplicate entries");
 		}
-		if (!switchState(initialState)) {
+		if (!setState(initialState)) {
 			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
 		}
 	}
@@ -53,7 +53,7 @@ public class AbstractStateMachine<T> extends AbstractAttribute {
 	 * @throws NullPointerException if states is <i>null</i>
 	 * @throws IllegalArgumentException if states does not contain <i>null</i> of if <i>performStateTransition(null)</i> returns false
 	 */
-	protected AbstractStateMachine(Class<? extends Enum> states) {
+	protected StateMachine(Class<? extends Enum> states) {
 		this(states, null);
 	}
 	
@@ -65,14 +65,14 @@ public class AbstractStateMachine<T> extends AbstractAttribute {
 	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
 	 */
 	@SuppressWarnings("unchecked")
-	protected AbstractStateMachine(Class<? extends Enum> states, T initialState) {
+	protected StateMachine(Class<? extends Enum> states, T initialState) {
 		for (Enum s : states.getEnumConstants()) {
 			this.states.add((T) s);
 		}
 		if (!checkForDuplicates()) {
 			throw new IllegalArgumentException("State list " + this.states + " contains duplicate entries");
 		}
-		if (!switchState(initialState)) {
+		if (!setState(initialState)) {
 			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
 		}
 	}
@@ -89,7 +89,7 @@ public class AbstractStateMachine<T> extends AbstractAttribute {
 	 * Returns the current state of this StateMachine
 	 * @return the current state of this StateMachine
 	 */
-	public final T getCurrentState() {
+	public final T getState() {
 		return currentState;
 	}
 
@@ -105,7 +105,7 @@ public class AbstractStateMachine<T> extends AbstractAttribute {
 	 * @return true if the state transition was successful, false otherwise
 	 * @throws IllegalArgumentException if <i>newState</i> is not a legal state of this statemachine
 	 */
-	public final boolean switchState(T newState) {
+	public final boolean setState(T newState) {
 		if (newState == currentState) {
 			return false;
 		}
@@ -145,7 +145,7 @@ public class AbstractStateMachine<T> extends AbstractAttribute {
 				if (s == state) {
 					continue;
 				}
-				if (switchState(s)) {
+				if (setState(s)) {
 					break;
 				}
 			}
