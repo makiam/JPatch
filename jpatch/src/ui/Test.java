@@ -28,10 +28,41 @@ public class Test {
 		JToggleButton tb2 = new JToggleButton("2");
 		JToggleButton tb3 = new JToggleButton("3");
 		
+		JMenuItem mi1 = new JMenuItem("a") {
+
+			@Override
+			public void paintComponent(Graphics g) {
+				g.setColor(getBackground());
+				Rectangle r = g.getClipBounds();
+				g.fillRect(r.x, r.y, r.width, r.height);
+//				g.drawString("aaa", 5, 16);
+			}
+			
+//			@Override
+//			public Dimension getPreferredSize() {
+//				return new Dimension(200, 200);
+//			}
+		};
+		
+		mi1.removeAll();
+		mi1.setLayout(new BorderLayout());
+		mi1.add(new JLabel("\u2713"), BorderLayout.WEST);
+		mi1.add(new JLabel("test"), BorderLayout.CENTER);
+		mi1.add(new JLabel("SHIFT X"), BorderLayout.EAST);
+		
+		Font font = new Font("sans serif", Font.PLAIN, 12);
+		FontMetrics fm = new JLabel().getFontMetrics(font);
+		System.out.println(fm.stringWidth("test"));
+		JMenuItem mi2 = new JCheckBoxMenuItem("2 skdfj asdfkjhskdjfh kasjdhf");
+		JMenuItem mi3 = new JCheckBoxMenuItem("3");
+		
 		final StateMachine<Integer> sm = new StateMachine<Integer>(new Integer[] {1, 2, 3}, 1);
 		JPatchButtons.configureRadioButton(tb1, sm, 1);
 		JPatchButtons.configureRadioButton(tb2, sm, 2);
 		JPatchButtons.configureRadioButton(tb3, sm, 3);
+		JPatchButtons.configureRadioButton(mi1, sm, 1);
+		JPatchButtons.configureRadioButton(mi2, sm, 2);
+		JPatchButtons.configureRadioButton(mi3, sm, 3);
 		sm.setDefaultState(1);
 		sm.addAttributeListener(new AttributeListener() {
 			public void attributeChanged(Attribute source) {
@@ -98,6 +129,15 @@ public class Test {
 		p2.setBackground(Color.BLACK);
 		p2.setPreferredSize(new Dimension(320, 240));
 		panel.add(p2);
+		
+		JMenuBar menuBar = new JMenuBar();
+		JMenu menu = new JMenu("Test");
+		
+		menu.add(mi1);
+		menu.add(mi2);
+		menu.add(mi3);
+		menuBar.add(menu);
+		frame.setJMenuBar(menuBar);
 		frame.add(toolBar, BorderLayout.NORTH);
 		frame.add(panel, BorderLayout.CENTER);
 		
