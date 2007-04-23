@@ -28,4 +28,12 @@ public class ToggleAction extends JPatchAction {
 			undoManager.addEdit(displayName, edit);
 		}
 	}
+	
+	public Toggle getToggle() {
+		return toggle;
+	}
+	
+	public boolean isSelected() {
+		return toggle.getState();
+	}
 }
