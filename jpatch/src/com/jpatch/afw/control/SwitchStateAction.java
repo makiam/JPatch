@@ -32,4 +32,16 @@ public class SwitchStateAction extends JPatchAction {
 			undoManager.addEdit(displayName, edit);
 		}
 	}
+	
+	public StateMachine getStateMachine() {
+		return stateMachine;
+	}
+	
+	public Object getState() {
+		return state;
+	}
+	
+	public boolean isSelected() {
+		return stateMachine.getState() == state;
+	}
 }

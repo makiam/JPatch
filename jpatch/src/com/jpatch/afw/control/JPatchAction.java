@@ -1,6 +1,8 @@
 package com.jpatch.afw.control;
 
 
+import com.jpatch.afw.ui.KeyboardShortcutManager;
+
 import java.awt.event.ActionListener;
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
@@ -12,14 +14,15 @@ public abstract class JPatchAction implements ActionListener {
 	protected String buttonText;
 	protected String menuText;
 	protected boolean useMenuIcon;
-	protected Icon buttonIcon;
-	protected Icon buttonSelectedIcon;
-	protected Icon buttonDisabledIcon;
-	protected Icon buttonDisabledSelectedIcon;
-	protected Icon buttonRolloverIcon;
-	protected Icon buttonRolloverSelectedIcon;
+	protected Icon icon;
+	protected Icon selectedIcon;
+	protected Icon disabledIcon;
+	protected Icon disabledSelectedIcon;
+	protected Icon rolloverIcon;
+	protected Icon rolloverSelectedIcon;
 	protected KeyStroke keyboardShortcut;
-	
+	protected boolean enabled = true;
+
 	public JPatchAction(JPatchUndoManager undoManager, String name) {
 		this.undoManager = undoManager;
 		this.name = name;
@@ -34,8 +37,16 @@ public abstract class JPatchAction implements ActionListener {
 	
 	public JPatchAction(JPatchUndoManager undoManager, String name, String text, Icon icon, boolean useMenuIcon) {
 		this(undoManager, name, text);
-		this.buttonIcon = icon;
+		this.icon = icon;
 		this.useMenuIcon = useMenuIcon;
+	}
+	
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 	
 	public String getDisplayName() {
@@ -46,52 +57,52 @@ public abstract class JPatchAction implements ActionListener {
 		this.displayName = displayName;
 	}
 	
-	public Icon getButtonDisabledIcon() {
-		return buttonDisabledIcon;
+	public Icon getDisabledIcon() {
+		return disabledIcon;
 	}
 
-	public void setButtonDisabledIcon(Icon buttonDisabledIcon) {
-		this.buttonDisabledIcon = buttonDisabledIcon;
+	public void setDisabledIcon(Icon disabledIcon) {
+		this.disabledIcon = disabledIcon;
 	}
 
-	public Icon getButtonDisabledSelectedIcon() {
-		return buttonDisabledSelectedIcon;
+	public Icon getDisabledSelectedIcon() {
+		return disabledSelectedIcon;
 	}
 
-	public void setButtonDisabledSelectedIcon(Icon buttonDisabledSelectedIcon) {
-		this.buttonDisabledSelectedIcon = buttonDisabledSelectedIcon;
+	public void setDisabledSelectedIcon(Icon disabledSelectedIcon) {
+		this.disabledSelectedIcon = disabledSelectedIcon;
 	}
 
-	public Icon getButtonIcon() {
-		return buttonIcon;
+	public Icon getIcon() {
+		return icon;
 	}
 
-	public void setButtonIcon(Icon buttonIcon) {
-		this.buttonIcon = buttonIcon;
+	public void setIcon(Icon icon) {
+		this.icon = icon;
 	}
 
-	public Icon getButtonRolloverIcon() {
-		return buttonRolloverIcon;
+	public Icon getRolloverIcon() {
+		return rolloverIcon;
 	}
 
-	public void setButtonRolloverIcon(Icon buttonRolloverIcon) {
-		this.buttonRolloverIcon = buttonRolloverIcon;
+	public void setRolloverIcon(Icon rolloverIcon) {
+		this.rolloverIcon = rolloverIcon;
 	}
 
-	public Icon getButtonRolloverSelectedIcon() {
-		return buttonRolloverSelectedIcon;
+	public Icon getRolloverSelectedIcon() {
+		return rolloverSelectedIcon;
 	}
 
-	public void setButtonRolloverSelectedIcon(Icon buttonRolloverSelectedIcon) {
-		this.buttonRolloverSelectedIcon = buttonRolloverSelectedIcon;
+	public void setRolloverSelectedIcon(Icon rolloverSelectedIcon) {
+		this.rolloverSelectedIcon = rolloverSelectedIcon;
 	}
 
-	public Icon getButtonSelectedIcon() {
-		return buttonSelectedIcon;
+	public Icon getSelectedIcon() {
+		return selectedIcon;
 	}
 
-	public void setButtonSelectedIcon(Icon buttonSelectedIcon) {
-		this.buttonSelectedIcon = buttonSelectedIcon;
+	public void setSelectedIcon(Icon selectedIcon) {
+		this.selectedIcon = selectedIcon;
 	}
 
 	public String getButtonText() {
@@ -127,6 +138,8 @@ public abstract class JPatchAction implements ActionListener {
 	}
 
 	public void setKeyboardShortcut(KeyStroke keyboardShortcut) {
+		KeyboardShortcutManager.getInstance().unmanageAction(this);
 		this.keyboardShortcut = keyboardShortcut;
+		KeyboardShortcutManager.getInstance().manageAction(this);
 	}
 }
