@@ -1,6 +1,9 @@
 package com.jpatch.afw.control;
 
 
+import com.jpatch.afw.ui.PlatformUtils;
+
+import java.awt.event.KeyEvent;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
@@ -30,7 +33,22 @@ public class ResourceManager {
 		for (Enumeration e = kn.getKeys(); e.hasMoreElements(); ) {
 			String key = (String) e.nextElement();
 			int keyCode = Integer.parseInt(key);
-			keyNames.put(keyCode, kn.getString(key));
+			String keyString = kn.getString(key);
+			if (PlatformUtils.getPlatform() == PlatformUtils.Platform.MAC_OS_X) {
+				/*
+				 * override text with symbols for special keys
+				 */
+				if (keyCode == KeyEvent.VK_ENTER) {
+					keyString = "\u23ce";
+				} else if (keyCode == KeyEvent.VK_DELETE) {
+					keyString = "\u2326";
+				} else if (keyCode == KeyEvent.VK_BACK_SPACE) {
+					keyString = "\u232b";
+				} else if (keyCode == KeyEvent.VK_TAB) {
+					keyString = "\u21e5";
+				}
+			}
+			keyNames.put(keyCode, keyString);
 		}
 	}
 	

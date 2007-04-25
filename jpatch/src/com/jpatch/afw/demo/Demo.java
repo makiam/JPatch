@@ -5,26 +5,30 @@ import java.awt.event.KeyEvent;
 import java.util.Locale;
 
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 
 import com.jpatch.afw.attributes.StateMachine;
 import com.jpatch.afw.attributes.Toggle;
 import com.jpatch.afw.control.*;
+import com.jpatch.afw.ui.JPatchCheckBoxMenuItem;
 import com.jpatch.afw.ui.JPatchMenu;
 import com.jpatch.afw.ui.JPatchMenuItem;
+import com.jpatch.afw.ui.JPatchRadioButtonMenuItem;
 
 public class Demo {
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		System.setProperty("swing.boldMetal", "false");
 		System.setProperty("swing.aatext", "true");
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
-		
+//		UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 		new Demo();
 	}
 	
@@ -66,10 +70,10 @@ public class Demo {
 				new SwitchStateAction(stateMachine, 3, null, "STATE_3")
 		};
 		
-		openAction.setKeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0));
-		ssa[0].setKeyboardShortcut(KeyStroke.getKeyStroke("pressed 1"));
-		ssa[1].setKeyboardShortcut(KeyStroke.getKeyStroke("pressed 2"));
-		ssa[2].setKeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK));
+		openAction.setKeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+		ssa[0].setKeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, KeyEvent.SHIFT_DOWN_MASK));
+		ssa[1].setKeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, KeyEvent.ALT_DOWN_MASK));
+		ssa[2].setKeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.META_DOWN_MASK));
 		
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -80,16 +84,16 @@ public class Demo {
 		JPatchMenu stateMenu = new JPatchMenu("STATES");
 		fileMenu.add(new JPatchMenuItem(openAction));
 		fileMenu.add(new JPatchMenuItem(saveAction));
-		stateMenu.add(new JPatchMenuItem(ta[0]));
-		stateMenu.add(new JPatchMenuItem(ta[1]));
+		stateMenu.add(new JPatchCheckBoxMenuItem(ta[0]));
+		stateMenu.add(new JPatchCheckBoxMenuItem(ta[1]));
 		stateMenu.add(new JSeparator());
-		stateMenu.add(new JPatchMenuItem(ssa[0]));
-		stateMenu.add(new JPatchMenuItem(ssa[1]));
-		stateMenu.add(new JPatchMenuItem(ssa[2]));
+		stateMenu.add(new JPatchRadioButtonMenuItem(ssa[0]));
+		stateMenu.add(new JPatchRadioButtonMenuItem(ssa[1]));
+		stateMenu.add(new JPatchRadioButtonMenuItem(ssa[2]));
 		fileMenu.add(new JSeparator());
 		fileMenu.add(stateMenu);
 		menuBar.add(fileMenu);
-		
+		frame.setTitle("JPatch Application Framework");
 		frame.setSize(640, 480);
 		frame.setVisible(true);
 	}

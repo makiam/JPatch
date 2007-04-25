@@ -71,12 +71,12 @@ public class JPatchToolBar extends JToolBar {
 		g.translate(-bounds.x, -bounds.y);
 		final float width = getParent().getWidth();
 		final float height = getParent().getHeight();
-		final float yoff = width * 1.414f;
+		final float yoff = width * 3;
 		final int n = 9;
 		final float l0 = yoff;
 		final float l1 = (float) Math.sqrt((width / 2) * (width / 2) + (yoff + height) * (yoff + height));
-		final Color c0 = new Color(0.7f, 0.7f, 0.7f);
-		final Color c1 = new Color(0.4f, 0.4f, 0.4f);
+		final Color c0 = new Color(0xcacaca);
+		final Color c1 = new Color(0x888888);
 		for (int i = 0; i < n; i++) {
 			float xoff = width * (i + 0.5f) / n - width / 2.0f;
 			float len = (float) Math.sqrt(xoff * xoff + yoff * yoff);
