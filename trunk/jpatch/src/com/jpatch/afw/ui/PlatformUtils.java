@@ -27,6 +27,10 @@ public class PlatformUtils {
 		}
 	}
 	
+	public static Platform getPlatform() {
+		return platform;
+	}
+	
 	public static String getAcceleratorString(KeyStroke keyStroke) {
 		if (keyStroke == null) {
 			return null;
@@ -38,13 +42,16 @@ public class PlatformUtils {
 		switch(platform) {
 		case MAC_OS_X:
 			if ((keyStroke.getModifiers() & KeyEvent.SHIFT_DOWN_MASK) != 0) {
-				sb.append("⇧");
+				sb.append("\u21e7");
 			}
 			if ((keyStroke.getModifiers() & KeyEvent.META_DOWN_MASK) != 0) {
-				sb.append("⌘");
+				sb.append("\u2318");
 			}
 			if ((keyStroke.getModifiers() & KeyEvent.ALT_DOWN_MASK) != 0) {
-				sb.append("⌥");
+				sb.append("\u2325");
+			}
+			if ((keyStroke.getModifiers() & KeyEvent.CTRL_DOWN_MASK) != 0) {
+				sb.append("\u2303");
 			}
 			break;
 		default:

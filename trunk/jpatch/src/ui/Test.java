@@ -18,7 +18,7 @@ public class Test {
 		System.setProperty("swing.boldMetal", Settings.JPATCH_ROOT_NODE.get("metalBoldText", "false"));
 		System.setProperty("swing.aatext", Settings.JPATCH_ROOT_NODE.get("fontSmoothing", "true"));
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
-		UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+//		UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 		new Test();
 	}
 	
@@ -261,7 +261,7 @@ public class Test {
 				int w = accelerator.getMinimumSize().width;
 //				System.out.println("comp width=" + c.getWidth() + " accel width=" + w);
 				accelerator.setBounds(0, 0, w, MENU_HEIGHT);
-				g.translate(c.getWidth() - ICON_WIDTH - GAP_WIDTH - w, 0);
+				g.translate(100 - ICON_WIDTH - GAP_WIDTH - w, 0);
 				accelerator.paint(g);
 			}
 		}
