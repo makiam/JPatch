@@ -1,30 +1,12 @@
 package com.jpatch.afw.icons;
 
-import com.jpatch.afw.ui.ImagePanel;
-import com.jpatch.afw.ui.ImageUtils;
+import com.jpatch.afw.ui.*;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Font;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Polygon;
-import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
+import java.awt.*;
+import java.awt.geom.*;
+import java.awt.image.*;
 
 import javax.swing.JFrame;
-
 import org.apache.batik.ext.awt.LinearGradientPaint;
 
 public class ImageGenerator {
@@ -65,12 +47,12 @@ public class ImageGenerator {
 		drawSwitcher(48, 42, g);
 		g.setTransform(at);
 		
-		Image im = makeIcon(2);
+		Image im = makeIcon(7);
 		g.drawImage(im, 16, 12, null);
-		im = makeIcon(3);
-		g.drawImage(im, 28 + 16, 12, null);
-		im = makeIcon(4);
-		g.drawImage(im, 24 + 28 + 16, 12, null);
+		im = makeIcon(8);
+		g.drawImage(im, 398, 14, null);
+		im = makeIcon(9);
+		g.drawImage(im, 398 + 28 + 6, 14, null);
 		
 		frame.add(imagePanel.getComponent());
 		frame.pack();
@@ -179,9 +161,9 @@ public class ImageGenerator {
 			g.fill(innerRect);
 			break;
 		case DARK:
-			g.setPaint(new GradientPaint(0, 1, new Color(0x646464), 0, 1 + innerHeight, new Color(0x444444)));
+			g.setPaint(new GradientPaint(0, 1, new Color(0x545454), 0, 1 + innerHeight, new Color(0x444444)));
 			g.fill(innerRect);
-			g.setPaint(new GradientPaint(0, 1, new Color(0xb0b0b0), 0, 1 + innerHeight * 0.5f, new Color(0x585858)));
+			g.setPaint(new GradientPaint(0, 1, new Color(0xa0a0a0), 0, 1 + innerHeight * 0.5f, new Color(0x505050)));
 			Area area = new Area(new RoundRectangle2D.Float(1, 1, innerWidth, innerHeight * 0.5f, innerHeight * 0.5f, innerHeight * 0.5f));
 			area.intersect(new Area(innerRect));
 			g.fill(area);
@@ -328,7 +310,67 @@ public class ImageGenerator {
 			p.lineTo(1, 12);
 			p.closePath();
 			g.fill(p);
-			
+			break;
+		case 5: // zoom view
+			g.setColor(new Color(0xc0000000, true));
+			g.draw(new Ellipse2D.Float(0, 0, 10, 10));
+			g.setStroke(new BasicStroke(1.5f));
+			g.drawLine(9, 9, 13, 13);
+			g.setStroke(new BasicStroke(2.5f));
+			g.drawLine(11, 11, 13, 13);
+			break;
+		case 6: // move view
+			g.setColor(new Color(0xc0000000, true));
+			g.drawLine(7, 4, 7, 1);
+			g.drawLine(10, 7, 13, 7);
+			g.drawLine(7, 10, 7, 13);
+			g.drawLine(4, 7, 1, 7);
+			g.draw(new Polygon(new int[] { 7, 9, 5 }, new int[] { 0, 2, 2 }, 3));
+			g.draw(new Polygon(new int[] { 0, 2, 2 }, new int[] { 7, 9, 5 }, 3));
+			g.draw(new Polygon(new int[] { 7, 9, 5 }, new int[] { 14, 12, 12 }, 3));
+			g.draw(new Polygon(new int[] { 14, 12, 12 }, new int[] { 7, 9, 5 }, 3));
+			break;
+		case 7: // rotate view
+			g.setColor(new Color(0x20000000, true));
+			g.drawArc(2, 2, 12, 11, 45, 300);
+			g.setColor(new Color(0x40000000, true));
+			g.drawArc(2, 2, 11, 11, 45, 270);
+			g.setColor(new Color(0x60000000, true));
+			g.drawArc(2, 2, 11, 11, 45, 240);
+			g.setColor(new Color(0x80000000, true));
+			g.drawArc(2, 2, 11, 11, 45, 210);
+			g.setColor(new Color(0xa0000000, true));
+			g.drawArc(2, 2, 11, 11, 45, 180);
+			g.setColor(new Color(0xc0000000, true));
+			g.drawArc(2, 2, 11, 11, 45, 150);
+			g.fill(new Polygon(new int[] { 14, 9, 14 }, new int[] { 6, 6, 1 }, 3));
+			break;
+		case 8: // undo
+			g.setPaint(new GradientPaint(0, 0, new Color(0xfffff8f8, true), 0, 8, new Color(0x00fff8f8, true)));
+			g.setStroke(new BasicStroke(4));
+			g.drawArc(-2, 2, 13, 13, 300, 110);
+			g.setPaint(new GradientPaint(0, 0, new Color(0xfffff0f0, true), 0, 12, new Color(0x00fff0f0, true)));
+			g.setStroke(new BasicStroke(3));
+			g.drawArc(-1, 2, 12, 13, 300, 110);
+			g.setPaint(new GradientPaint(0, 0, new Color(0xffffe8e8, true), 0, 16, new Color(0x00ffe8e8, true)));
+			g.setStroke(new BasicStroke(2));
+			g.drawArc(0, 2, 11, 13, 300, 110);
+			g.setPaint(new GradientPaint(0, 0, new Color(0xffffffff, true), 0, 12, new Color(0x00ffffff, true)));
+			g.fill(new Polygon(new int[] { 5, 13, 5 }, new int[] { 0, 1, 7 }, 3));
+			break;
+		case 9: // redo
+			g.setTransform(new AffineTransform(-1, 0, 0, 1, 16, 0));
+			g.setPaint(new GradientPaint(0, 0, new Color(0xfff8f8ff, true), 0, 8, new Color(0x00f8f8ff, true)));
+			g.setStroke(new BasicStroke(4));
+			g.drawArc(-2, 2, 13, 13, 300, 110);
+			g.setPaint(new GradientPaint(0, 0, new Color(0xfff0f0ff, true), 0, 12, new Color(0x00f0f0ff, true)));
+			g.setStroke(new BasicStroke(3));
+			g.drawArc(-1, 2, 12, 13, 300, 110);
+			g.setPaint(new GradientPaint(0, 0, new Color(0xffe8e8ff, true), 0, 16, new Color(0x00e8e8ff, true)));
+			g.setStroke(new BasicStroke(2));
+			g.drawArc(0, 2, 11, 13, 300, 110);
+			g.setPaint(new GradientPaint(0, 0, new Color(0xffffffff, true), 0, 12, new Color(0x00ffffff, true)));
+			g.fill(new Polygon(new int[] { 5, 13, 5 }, new int[] { 0, 1, 7 }, 3));
 			break;
 		}
 	}
