@@ -21,40 +21,41 @@ public class ImageGenerator {
 	void test() {
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		BufferedImage image = new BufferedImage(640, 480, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage image = new BufferedImage(640, 50, BufferedImage.TYPE_INT_ARGB);
 		ImagePanel imagePanel = new ImagePanel(image);
 		Graphics2D g = image.createGraphics();
 		configureGraphics(g);
-		drawBackground(g);
+//		drawBackground(g);
 		AffineTransform at = g.getTransform();
-		g.translate(8, 8);
-		drawGroupButtons(Style.GLOSSY, 28, 28, 22, g, false);
-		g.translate(28 * 3 + 8, 0);
-		drawButton(Style.GLOSSY, 28, 28, g, true);
-		g.translate(28 + 8, 0);
+		g.translate(1, 1);
+		drawGroupButtons(Style.GLOSSY, 29, 28, 22, g, false);
+		drawButton(Style.GLOSSY, 28, 22, g, false);
 		drawGroupButtons(Style.FROSTED, 28, 28, 22, g, false);
-		g.translate(28 * 3 + 8, 0);
-		drawButton(Style.FROSTED, 28, 28, g, true);
-		g.translate(28 + 8, 0);
+		drawButton(Style.FROSTED, 28, 22, g, false);
 		drawGroupButtons(Style.BRUSHED, 28, 28, 22, g, false);
-		g.translate(28 * 3 + 8, 0);
 		drawButton(Style.BRUSHED, 28, 22, g, false);
-		g.translate(28 + 8, 0);
 		drawGroupButtons(Style.DARK, 28, 28, 28, g, true);
-		g.translate(28 * 3 + 8 + 10, 0);
 		drawButton(Style.DARK, 28, 28, g, true);
-		g.translate(28 + 8, -4);
 		drawSwitcher(48, 42, g);
 		g.setTransform(at);
 		
-		Image im = makeIcon(7);
-		g.drawImage(im, 16, 12, null);
-		im = makeIcon(8);
-		g.drawImage(im, 398, 14, null);
-		im = makeIcon(9);
-		g.drawImage(im, 398 + 28 + 6, 14, null);
+//		Image im = makeIcon(7);
+//		g.drawImage(im, 16, 12, null);
+//		im = makeIcon(8);
+//		g.drawImage(im, 398, 14, null);
+//		im = makeIcon(9);
+//		g.drawImage(im, 398 + 28 + 6, 14, null);
 		
-		frame.add(imagePanel.getComponent());
+		frame.setLayout(new BorderLayout());
+		frame.add(imagePanel.getComponent(), BorderLayout.NORTH);
+		
+		BufferedImage zoomImage = new BufferedImage(30, 24, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D zg = zoomImage.createGraphics();
+		zg.drawImage(image, 0, 0, null);
+		
+		Image zoomedImage = zoomImage.getScaledInstance(zoomImage.getWidth() * 8, zoomImage.getHeight() * 8, BufferedImage.SCALE_FAST);
+		ImagePanel zoom = new ImagePanel(zoomedImage);
+		frame.add(zoom.getComponent(), BorderLayout.SOUTH);
 		frame.pack();
 		frame.setVisible(true);
 	}
@@ -113,6 +114,11 @@ public class ImageGenerator {
 	}
 	
 	void drawButton(Style style, int width, int height, Graphics2D g, boolean round) {
+		drawXButton(style, width, height, g, round);
+		g.translate(width + 2, 0);
+	}
+	
+	void drawXButton(Style style, int width, int height, Graphics2D g, boolean round) {
 		int outerWidth = width;
 		int innerWidth = outerWidth - 2;
 		int innerHeight = height - 2;
@@ -174,8 +180,7 @@ public class ImageGenerator {
 			}
 			g.draw(innerRect);
 			break;
-	}
-		
+		}
 	}
 	
 	void drawGroupButtons(Style style, int borderWidth, int centerWidth, int height, Graphics2D g, boolean round) {
@@ -191,14 +196,14 @@ public class ImageGenerator {
 //			g.setPaint(new GradientPaint(0, -2, new Color(0xb0b0b0), 0, height + 4, new Color(0xd0d0d0)));
 //			g.fill(innerRect);
 			g.translate(1, 0);
-			drawButton(style, height, height, g, true);
+			drawXButton(style, height, height, g, true);
 			g.translate(height + 4, 0);
-			drawButton(style, height, height, g, true);
+			drawXButton(style, height, height, g, true);
 			g.translate(height + 4, 0);
-			drawButton(style, height, height, g, true);
+			drawXButton(style, height, height, g, true);
 			g.translate(-2 * (height + 2) - 1, 0);
 		} else {
-			drawButton(style, outerWidth, height, g, false);
+			drawXButton(style, outerWidth, height, g, false);
 			g.setColor(new Color(0x40000000, true));
 			g.drawLine(borderWidth - 1, 1, borderWidth - 1, innerHeight);
 			g.drawLine(outerWidth - borderWidth - 1, 1, outerWidth - borderWidth - 1, innerHeight);
@@ -206,6 +211,7 @@ public class ImageGenerator {
 			g.drawLine(borderWidth, 1, borderWidth, innerHeight);
 			g.drawLine(outerWidth - borderWidth, 1, outerWidth - borderWidth, innerHeight);
 		}
+		g.translate(outerWidth + 2, 0);
 	}
 	
 	void configureGraphics(Graphics2D g) {
