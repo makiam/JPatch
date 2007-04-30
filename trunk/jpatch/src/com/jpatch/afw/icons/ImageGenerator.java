@@ -7,6 +7,13 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.geom.*;
 import java.awt.image.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.URL;
 
 import javax.swing.*;
 
@@ -44,11 +51,11 @@ public class ImageGenerator {
 	
 	int n = 0;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		new ImageGenerator().test();
 	}
 	
-	void test() {
+	void test() throws Exception {
 		frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		image = new BufferedImage(1000, 50, BufferedImage.TYPE_INT_ARGB);
@@ -62,19 +69,21 @@ public class ImageGenerator {
 //		drawBackground(g);
 		ig.translate(1, 1);
 		sg.translate(1, 1);
-		drawGroupButtons(Style.GLOSSY, 29, 28, 22, ig, sg, false);
-		drawGroupButtons(Style.FROSTED, 29, 28, 22, ig, sg, false);
-		drawGroupButtons(Style.BRUSHED, 29, 28, 22, ig, sg, false);
-		drawGroupButtons(Style.DARK, 28, 28, 28, ig, sg, true);
-		drawButton(Style.GLOSSY, 28, 22, ig, sg, false);
-		drawButton(Style.FROSTED, 28, 22, ig, sg, false);
-		drawButton(Style.BRUSHED, 28, 22, ig, sg, false);
-		drawButton(Style.GLOSSY, 28, 28, ig, sg, true);
-		drawButton(Style.FROSTED, 28, 28, ig, sg, true);
-		drawButton(Style.BRUSHED, 28, 28, ig, sg, true);
-		drawButton(Style.GLOSSY, 34, 34, ig, sg, true);
-		drawButton(Style.FROSTED, 34, 34, ig, sg, true);
-		drawButton(Style.BRUSHED, 34, 34, ig, sg, true);
+		if (false) {
+			drawGroupButtons(Style.GLOSSY, 29, 28, 22, ig, sg, false);
+			drawGroupButtons(Style.FROSTED, 29, 28, 22, ig, sg, false);
+			drawGroupButtons(Style.BRUSHED, 29, 28, 22, ig, sg, false);
+			drawGroupButtons(Style.DARK, 28, 28, 28, ig, sg, true);
+			drawButton(Style.GLOSSY, 28, 22, ig, sg, false);
+			drawButton(Style.FROSTED, 28, 22, ig, sg, false);
+			drawButton(Style.BRUSHED, 28, 22, ig, sg, false);
+			drawButton(Style.GLOSSY, 28, 28, ig, sg, true);
+			drawButton(Style.FROSTED, 28, 28, ig, sg, true);
+			drawButton(Style.BRUSHED, 28, 28, ig, sg, true);
+			drawButton(Style.GLOSSY, 34, 34, ig, sg, true);
+			drawButton(Style.FROSTED, 34, 34, ig, sg, true);
+			drawButton(Style.BRUSHED, 34, 34, ig, sg, true);
+		}
 //		drawSwitcher(48, 42, g);
 //		g.setTransform(at);
 		
@@ -102,8 +111,21 @@ public class ImageGenerator {
 				if (type == Type.CENTER) xoff = 6;
 				if (type == Type.RIGHT) xoff = 6;
 			}
+			if (type == Type.SINGLE) {
+				xoff = 7;
+			}
 			iconSet.setIcon(style, type, img, stc, xoff, yoff);
 		}
+		
+		
+//		File file = new File("src/com/jpatch/afw/icons/icons");
+//		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
+//		oos.writeObject(iconSet);
+//		oos.close();
+		
+		ObjectInputStream ois = new ObjectInputStream(ClassLoader.getSystemResourceAsStream("com/jpatch/afw/icons/icons"));
+		iconSet = (IconSet) ois.readObject();
+		ois.close();
 		
 		frame.setLayout(new BorderLayout());
 		
@@ -165,10 +187,32 @@ public class ImageGenerator {
 			Image i8 = makeIcon(9);
 			JToggleButton b9 = new JToggleButton();
 			JToggleButton b10 = new JToggleButton();
+			JToggleButton b11 = new JToggleButton();
+			JToggleButton b12 = new JToggleButton();
+			JToggleButton b13 = new JToggleButton();
+			JToggleButton b14 = new JToggleButton();
+			JToggleButton b15 = new JToggleButton();
 			Image i9 = makeIcon(10);
 			Image i10 = makeIcon(11);
+			Image i11 = makeIcon(12);
+			Image i12 = makeIcon(13);
+			Image i13 = makeIcon(14);
+			Image i14 = makeIcon(15);
+			Image i15 = makeIcon(16);
 			bg1.add(b9);
 			bg1.add(b10);
+			bg1.add(b11);
+			bg1.add(b12);
+			bg1.add(b13);
+			bg1.add(b14);
+			bg1.add(b15);
+			
+			b13.setEnabled(false);
+			b14.setEnabled(false);
+			b15.setEnabled(false);
+			
+			JToggleButton b16 = new JToggleButton();
+			Image i16 = makeIcon(17);
 			
 			iconSet.configureButton(b0, Style.FROSTED, Type.LEFT, i0);
 			iconSet.configureButton(b1, Style.FROSTED, Type.CENTER, i1);
@@ -181,12 +225,13 @@ public class ImageGenerator {
 			iconSet.configureButton(b8, Style.DARK, Type.RIGHT, i8);
 			iconSet.configureButton(b9, Style.BRUSHED, Type.LEFT, i9);
 			iconSet.configureButton(b10, Style.BRUSHED, Type.CENTER, i10);
+			iconSet.configureButton(b11, Style.BRUSHED, Type.CENTER, i11);
+			iconSet.configureButton(b12, Style.BRUSHED, Type.RIGHT, i12);
+			iconSet.configureButton(b13, Style.BRUSHED, Type.LEFT, i13);
+			iconSet.configureButton(b14, Style.BRUSHED, Type.CENTER, i14);
+			iconSet.configureButton(b15, Style.BRUSHED, Type.RIGHT, i15);
+			iconSet.configureButton(b16, Style.FROSTED, Type.SINGLE, i16);
 			
-			toolBar.add(b0);
-			toolBar.add(b1);
-			toolBar.add(b2);
-			toolBar.add(b3);
-			toolBar.add(Box.createHorizontalStrut(8));
 			toolBar.add(b4);
 			toolBar.add(b5);
 			toolBar.add(b6);
@@ -194,14 +239,33 @@ public class ImageGenerator {
 			toolBar.add(b7);
 			toolBar.add(b8);
 			toolBar.add(Box.createHorizontalStrut(8));
+			toolBar.add(b0);
+			toolBar.add(b1);
+			toolBar.add(b2);
+			toolBar.add(b3);
+			toolBar.add(Box.createHorizontalStrut(8));
+			toolBar.add(b16);
+			toolBar.add(Box.createHorizontalStrut(8));
 			toolBar.add(b9);
 			toolBar.add(b10);
+			toolBar.add(b11);
+			toolBar.add(b12);
+			toolBar.add(Box.createHorizontalStrut(8));
+			toolBar.add(b13);
+			toolBar.add(b14);
+			toolBar.add(b15);
 			JPanel panel = new JPanel(new BorderLayout());
 			panel.add(toolBar, BorderLayout.CENTER);
 			frame.add(panel, BorderLayout.NORTH);
 		}
-		frame.pack();
+		frame.setSize(1024, 768);
 		frame.setVisible(true);
+		iconSet = null;
+		System.gc();
+		for(;;) {
+			System.out.println(Runtime.getRuntime().totalMemory() + " " + Runtime.getRuntime().freeMemory());
+			Thread.sleep(1000);
+		}
 	}
 	
 	void drawx(int num) {
@@ -339,7 +403,7 @@ public class ImageGenerator {
 		case BRUSHED:
 //			g.setPaint(new LinearGradientPaint(0, 1, 0, 1 + innerHeight,new float[] { 0.0f, 0.3f, 0.7f, 1.0f }, new Color[] { new Color(1.0f, 1.0f, 1.0f), new Color(0.85f, 0.85f, 0.85f), new Color(0.7f, 0.7f, 0.7f), new Color(0.50f, 0.50f, 0.50f) } ));
 //			g.setPaint(new LinearGradientPaint(0, 1, 0, 1 + innerHeight,new float[] { 0.0f, 0.5f, 1.0f }, new Color[] { new Color(0.95f, 0.95f, 0.95f), new Color(0.75f, 0.75f, 0.75f), new Color(0.80f, 0.80f, 0.80f) } ));
-			ig.setPaint(new GradientPaint(0, 1, new Color(0xffffff), 0, 1 + innerHeight, new Color(0.8f, 0.8f, 0.8f)));
+			ig.setPaint(new GradientPaint(0, 1, new Color(0xffffff), 0, 1 + innerHeight, new Color(0.75f, 0.75f, 0.75f)));
 			ig.fill(innerRect);
 			break;
 		case DARK:
@@ -461,7 +525,7 @@ public class ImageGenerator {
 //			g.setComposite(AlphaComposite.Src);
 			g.setColor(new Color(0x40000000, true));
 			g.drawLine(1, 3, 7, 1);
-			g.drawLine(7, 1, 13, 3);
+			g.drawLine(7, 1, 13, 3);http://www.87er.com/herz.htm#
 			g.drawLine(13, 3, 7, 5);
 			g.drawLine(7, 5, 1, 3);
 			g.drawLine(13, 11, 7, 13);
@@ -508,15 +572,7 @@ public class ImageGenerator {
 			p.closePath();
 			g.fill(p);
 			break;
-		case 5: // zoom view
-			g.setColor(new Color(0xc0000000, true));
-			g.draw(new Ellipse2D.Float(0, 0, 10, 10));
-			g.setStroke(new BasicStroke(1.5f));
-			g.drawLine(9, 9, 13, 13);
-			g.setStroke(new BasicStroke(2.5f));
-			g.drawLine(11, 11, 13, 13);
-			break;
-		case 6: // move view
+		case 5: // move view
 			g.setColor(new Color(0xc0000000, true));
 			g.drawLine(7, 4, 7, 1);
 			g.drawLine(10, 7, 13, 7);
@@ -526,6 +582,14 @@ public class ImageGenerator {
 			g.draw(new Polygon(new int[] { 0, 2, 2 }, new int[] { 7, 9, 5 }, 3));
 			g.draw(new Polygon(new int[] { 7, 9, 5 }, new int[] { 14, 12, 12 }, 3));
 			g.draw(new Polygon(new int[] { 14, 12, 12 }, new int[] { 7, 9, 5 }, 3));
+			break;
+		case 6: // zoom view
+			g.setColor(new Color(0xc0000000, true));
+			g.draw(new Ellipse2D.Float(0, 0, 10, 10));
+			g.setStroke(new BasicStroke(1.5f));
+			g.drawLine(9, 9, 13, 13);
+			g.setStroke(new BasicStroke(2.5f));
+			g.drawLine(11, 11, 13, 13);
 			break;
 		case 7: // rotate view
 			g.setColor(new Color(0x20000000, true));
@@ -578,13 +642,106 @@ public class ImageGenerator {
 			g.setColor(Color.BLACK);
 			g.draw(pl);
 			break;
-		case 11: // rotate tool
+		case 11: // move tool
+			g.setColor(new Color(0xbb3333));
+			g.drawLine(4, 11, 13, 11);
+			g.drawPolygon(new Polygon(new int[] { 15, 12, 12 }, new int[] { 11, 13, 9 }, 3));
+			g.fillPolygon(new Polygon(new int[] { 15, 12, 12 }, new int[] { 11, 13, 9 }, 3));
+			g.setColor(new Color(0x339933));
+			g.drawLine(4, 2, 4, 11);
+			g.drawPolygon(new Polygon(new int[] { 4, 6, 2 }, new int[] { 0, 3, 3 }, 3));
+			g.fillPolygon(new Polygon(new int[] { 4, 6, 2 }, new int[] { 0, 3, 3 }, 3));
+			g.setColor(new Color(0x5555bb));
+			g.drawLine(4, 11, 1, 14);
+			g.drawPolygon(new Polygon(new int[] { 0, 3, 0 }, new int[] { 12, 15, 15 }, 3));
+			g.fillPolygon(new Polygon(new int[] { 0, 3, 0 }, new int[] { 12, 15, 15 }, 3));
+			break;
+		case 12: // scale tool
+			g.setColor(new Color(0xbb3333));
+			g.drawLine(4, 11, 13, 11);
+			g.fillRect(13, 10, 3, 3);
+			g.setColor(new Color(0x339933));
+			g.drawLine(4, 2, 4, 11);
+			g.fillRect(3, 0, 3, 3);
+			g.setColor(new Color(0x5555bb));
+			g.drawLine(4, 11, 1, 14);
+			g.fillRect(0, 13, 3, 3);
+			break;
+		case 13: // rotate tool
 			g.setColor(new Color(0xbb3333));
 			g.drawOval(6, 1, 4, 14);
 			g.setColor(new Color(0x339933));
 			g.drawOval(1, 6, 14, 4);
 			g.setColor(new Color(0x5555bb));
 			g.drawOval(1, 1, 14, 14);
+			break;
+		case 14: // extrude tool
+			g.setColor(new Color(0x60000000, true));
+			g.drawLine(5, 1, 13, 1);
+			g.drawLine(2, 4, 10, 4);
+			g.drawLine(5, 11, 13, 11);
+			g.drawLine(2, 14, 10, 14);
+			g.drawLine(13, 1, 12, 0);
+			g.drawLine(13, 1, 12, 2);
+			g.drawLine(10, 4, 9, 3);
+			g.drawLine(10, 4, 9, 5);
+			g.drawLine(10, 14, 9, 13);
+			g.drawLine(10, 14, 9, 15);
+			g.drawPolygon(new Polygon(new int[] { 4, 4, 1, 1}, new int[] { 1, 11, 14, 4 }, 4));
+			g.setColor(new Color(0xa0000000, true));
+			g.drawPolygon(new Polygon(new int[] { 14, 14, 11, 11}, new int[] { 1, 11, 14, 4 }, 4));
+			g.setColor(new Color(0x40000000, true));
+			g.fillPolygon(new Polygon(new int[] { 14, 14, 12, 12}, new int[] { 2, 11, 14, 5 }, 4));
+			break;
+		case 15: // lathe tool
+			p = new GeneralPath();
+			p.moveTo(2, 0);
+			p.curveTo(0, 4, 3, 7, 5, 7);
+			p.curveTo(7, 9, 7, 13, 4, 15);
+			p.lineTo(13, 15);
+			p.curveTo(10, 14, 10, 10, 12, 8);
+			p.curveTo(13, 8, 16, 5, 14.2f, 0);
+			p.closePath();
+			g.setPaint(new LinearGradientPaint(0, 0, 15, 0, new float[] { 0.0f, 0.5f, 1.0f }, new Color[] { new Color(0x30000000, true), new Color(0x00000000, true), new Color(0x60000000, true) }));
+			g.fill(p);
+			g.setColor(new Color(0xc0000000, true));
+			p = new GeneralPath();
+			p.moveTo(3, 0);
+			p.curveTo(1, 4, 3, 7, 5, 7);
+			p.curveTo(7, 9, 7, 13, 4, 14);
+			g.draw(p);
+			g.setColor(new Color(0x80000000, true));
+			p = new GeneralPath();
+			p.moveTo(16 - 3, 0);
+			p.curveTo(16 - 1, 4, 16 - 3, 7, 16 - 5, 7);
+			p.curveTo(16 - 7, 9, 16 - 7, 13, 16 - 4, 14);
+			g.draw(p);
+			g.setColor(new Color(0x60000000, true));
+			g.drawLine(8, 0, 8, 2);
+			g.drawLine(8, 4, 8, 4);
+			g.drawLine(8, 6, 8, 8);
+			g.drawLine(8, 10, 8, 10);
+			g.drawLine(8, 12, 8, 14);
+			break;
+		case 16: // polygon tool
+			break;
+		case 17: // snap to grid
+			g.setColor(new Color(0x30000000, true));
+			g.drawRect(0, 0, 15, 15);
+			
+			g.setColor(new Color(0x50000000, true));
+//			g.drawLine(0, 0, 15, 0);
+			g.drawLine(0, 5, 15, 5);
+			g.drawLine(0, 10, 15, 10);
+//			g.drawLine(0, 15, 15, 15);
+//			g.drawLine(0, 0, 0, 15);
+			g.drawLine(5, 0, 5, 15);
+			g.drawLine(10, 0, 10, 15);
+//			g.drawLine(15, 0, 15, 15);
+			g.setColor(new Color(0x70000000, true));
+			g.drawRect(5, 5, 5, 5);
+			break;
+		case 18: // hide
 			break;
 		}
 	}
