@@ -4,7 +4,10 @@ import com.jpatch.afw.ui.ImageUtils;
 
 import java.awt.Image;
 import java.awt.image.*;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.Random;
 
 import javax.swing.AbstractButton;
@@ -18,9 +21,12 @@ public class IconSet implements Serializable {
 	private Tint defaultTint = new Tint(+0x00, +0x00, +0x00);
 	private Tint rolloverTint = new Tint(+0x08, +0x08, -0x04);
 	private Tint selectedTint = new Tint(-0x20, -0x20, -0x18);
-	private Tint pressedTint = new Tint(-0x24, -0x24, -0x1c
-			);
+	private Tint pressedTint = new Tint(-0x24, -0x24, -0x1c);
 	private Tint rolloverSelectedTint = new Tint(-0x18, -0x18, -0x20);
+	
+	IconSet() {
+		
+	}
 	
 	public void setIcon(Style style, Type type, BufferedImage image, BufferedImage stencil, int xOffset, int yOffset) {
 		icons[style.ordinal()][type.ordinal()] = new PackedIcon(image, stencil, xOffset, yOffset);
