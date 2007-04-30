@@ -1,6 +1,7 @@
 package com.jpatch.afw.icons;
 
 import com.jpatch.afw.ui.*;
+import com.jpatch.ui.ViewportSwitcher;
 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -69,7 +70,7 @@ public class ImageGenerator {
 //		drawBackground(g);
 		ig.translate(1, 1);
 		sg.translate(1, 1);
-		if (false) {
+		if (true) {
 			drawGroupButtons(Style.GLOSSY, 29, 28, 22, ig, sg, false);
 			drawGroupButtons(Style.FROSTED, 29, 28, 22, ig, sg, false);
 			drawGroupButtons(Style.BRUSHED, 29, 28, 22, ig, sg, false);
@@ -117,6 +118,45 @@ public class ImageGenerator {
 			iconSet.setIcon(style, type, img, stc, xoff, yoff);
 		}
 		
+		int switcherWidth = 56, switcherHeight = 44;
+		BufferedImage switcherImage = new BufferedImage(switcherWidth, switcherHeight, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage switcherStencil = new BufferedImage(switcherWidth, switcherHeight, BufferedImage.TYPE_BYTE_GRAY);
+		Graphics2D sig = switcherImage.createGraphics();
+		Graphics2D ssg = switcherStencil.createGraphics();
+		configureGraphics(sig);
+		configureGraphics(ssg);
+		sig.translate(1, 1);
+		ssg.translate(1, 1);
+		drawSwitcher(switcherWidth - 2, switcherHeight - 2, sig, ssg);
+		PackedIcon[] switcherIcons = new PackedIcon[4];
+		for (int i = 0; i < 4; i++) {
+			BufferedImage img = new BufferedImage(switcherWidth / 2, switcherHeight / 2, BufferedImage.TYPE_INT_ARGB);
+			BufferedImage stc = new BufferedImage(switcherWidth / 2, switcherHeight / 2, BufferedImage.TYPE_BYTE_GRAY);
+			Graphics2D xig = img.createGraphics();
+			Graphics2D xsg = stc.createGraphics();
+			switch(i) {
+			case 1:
+				xig.translate(-switcherWidth / 2, 0);
+				xsg.translate(-switcherWidth / 2, 0);
+				break;
+			case 2:
+				xig.translate(0, -switcherHeight / 2);
+				xsg.translate(0, -switcherHeight / 2);
+				break;
+			case 3:
+				xig.translate(-switcherWidth / 2, -switcherHeight / 2);
+				xsg.translate(-switcherWidth / 2, -switcherHeight / 2);
+				break;
+			}
+			xig.drawImage(switcherImage, 0, 0, null);
+			xsg.drawImage(switcherStencil, 0, 0, null);
+			switcherIcons[i] = new PackedIcon(img, stc, 0, 0);
+		}
+		
+		File file = new File("src/com/jpatch/icons/switcher");
+		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
+		oos.writeObject(switcherIcons);
+		oos.close();
 		
 //		File file = new File("src/com/jpatch/afw/icons/icons");
 //		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
@@ -236,6 +276,8 @@ public class ImageGenerator {
 			toolBar.add(b5);
 			toolBar.add(b6);
 			toolBar.add(Box.createHorizontalStrut(8));
+			toolBar.add(new ViewportSwitcher().getComponent());
+			toolBar.add(Box.createHorizontalStrut(8));
 			toolBar.add(b7);
 			toolBar.add(b8);
 			toolBar.add(Box.createHorizontalStrut(8));
@@ -261,11 +303,7 @@ public class ImageGenerator {
 		frame.setSize(1024, 768);
 		frame.setVisible(true);
 		iconSet = null;
-		System.gc();
-		for(;;) {
-			System.out.println(Runtime.getRuntime().totalMemory() + " " + Runtime.getRuntime().freeMemory());
-			Thread.sleep(1000);
-		}
+		
 	}
 	
 	void drawx(int num) {
@@ -298,7 +336,7 @@ public class ImageGenerator {
 		return s;
 	}
 	
-	void drawSwitcher(int width, int height, Graphics2D g) {
+	void drawSwitcher(int width, int height, Graphics2D ig, Graphics2D sg) {
 		int outerWidth = width;
 		int innerWidth = outerWidth - 2;
 		int innerHeight = height - 2;
@@ -307,10 +345,13 @@ public class ImageGenerator {
 		innerRect = new RoundRectangle2D.Float(1, 1, innerWidth, innerHeight, innerHeight / 2.5f, innerHeight / 2.5f);
 		ooRect = new RoundRectangle2D.Float(-1, -1, outerWidth + 2, height + 2, (height + 2) / 2.1f, (height + 2) / 2.1f);
 		
-		g.setPaint(new GradientPaint(0, 0, new Color(0x20000000, true), 0, height, new Color(0x80ffffff, true)));
-		g.fill(ooRect);
-		g.setColor(new Color(0x80000000, true));
-		g.fill(outerRect);
+		sg.setColor(Color.WHITE);
+		sg.fill(innerRect);
+		
+		ig.setPaint(new GradientPaint(0, 0, new Color(0x20000000, true), 0, height, new Color(0x80ffffff, true)));
+		ig.fill(ooRect);
+		ig.setColor(new Color(0x80000000, true));
+		ig.fill(outerRect);
 		
 		float halfHeight = innerHeight / 4.0f;
 		Area area1 = new Area();
@@ -330,25 +371,25 @@ public class ImageGenerator {
 //		g.setPaint(new LinearGradientPaint(0, 1, 0, 1 + innerHeight,new float[] { 0.0f, 0.25f, 0.5f, 0.5f, 0.75f, 1.0f }, new Color[] { new Color(1.00f, 1.00f, 1.00f), new Color(0.80f, 0.80f, 0.80f), new Color(0.85f, 0.85f, 0.85f), new Color(1.00f, 1.00f, 1.00f), new Color(0.80f, 0.80f, 0.80f), new Color(0.85f, 0.85f, 0.85f) } ));
 //		g.fill(innerRect);
 		
-		g.setPaint(new LinearGradientPaint(0, 1, 0, 1 + innerHeight,new float[] { 0.0f, 0.5f, 0.5f, 1.0f }, new Color[] { new Color(0xe4e4e4), new Color(0xffffff), new Color(0xe4e4e4), new Color(0xffffff) } ));
-		g.fill(innerRect);
-		g.setPaint(new GradientPaint(0, 1, new Color(0xb8b8b8), 0, 1 + halfHeight * 2, new Color(0xffffff)));
-		g.fill(area1);
-		g.setPaint(new GradientPaint(0, halfHeight * 2 + 1, new Color(0xb8b8b8), 0, halfHeight * 2 + 1 + halfHeight * 2, new Color(0xffffff)));
-		g.fill(area3);
+		ig.setPaint(new LinearGradientPaint(0, 1, 0, 1 + innerHeight,new float[] { 0.0f, 0.5f, 0.5f, 1.0f }, new Color[] { new Color(0xe4e4e4), new Color(0xffffff), new Color(0xe4e4e4), new Color(0xffffff) } ));
+		ig.fill(innerRect);
+		ig.setPaint(new GradientPaint(0, 1, new Color(0xb8b8b8), 0, 1 + halfHeight * 2, new Color(0xffffff)));
+		ig.fill(area1);
+		ig.setPaint(new GradientPaint(0, halfHeight * 2 + 1, new Color(0xb8b8b8), 0, halfHeight * 2 + 1 + halfHeight * 2, new Color(0xffffff)));
+		ig.fill(area3);
 		
-		g.setColor(new Color(0x40000000, true));
-		g.drawLine(width / 2 - 1, 1, width / 2 - 1, innerHeight);
-		g.drawLine(1, height / 2 - 1, width - 2, height / 2 - 1);
-		g.setColor(new Color(0x40ffffff, true));
-		g.drawLine(width / 2, 1, width / 2, innerHeight);
-		g.drawLine(1, height / 2, width - 2, height / 2);
+		ig.setColor(new Color(0x40000000, true));
+		ig.drawLine(width / 2 - 1, 1, width / 2 - 1, innerHeight);
+		ig.drawLine(1, height / 2 - 1, width - 2, height / 2 - 1);
+		ig.setColor(new Color(0x40ffffff, true));
+		ig.drawLine(width / 2, 1, width / 2, innerHeight);
+		ig.drawLine(1, height / 2, width - 2, height / 2);
 		
 		Font font = new Font("monospaced", Font.BOLD, 20);
-		g.drawImage(ImageUtils.createTextIcon(font, new Color(0x30000000, true), "1"), width / 4 - 6, height / 4 - 10, null);
-		g.drawImage(ImageUtils.createTextIcon(font, new Color(0x30000000, true), "2"), width * 3 / 4 - 8, height / 4 - 10, null);
-		g.drawImage(ImageUtils.createTextIcon(font, new Color(0x30000000, true), "3"), width / 4 - 5, height * 3 / 4 - 11, null);
-		g.drawImage(ImageUtils.createTextIcon(font, new Color(0x30000000, true), "4"), width * 3 / 4 - 9, height * 3 / 4 - 11, null);
+		ig.drawImage(ImageUtils.createTextIcon(font, new Color(0x30000000, true), "1"), width / 4 - 6, height / 4 - 10, null);
+		ig.drawImage(ImageUtils.createTextIcon(font, new Color(0x30000000, true), "2"), width * 3 / 4 - 8, height / 4 - 10, null);
+		ig.drawImage(ImageUtils.createTextIcon(font, new Color(0x30000000, true), "3"), width / 4 - 5, height * 3 / 4 - 11, null);
+		ig.drawImage(ImageUtils.createTextIcon(font, new Color(0x30000000, true), "4"), width * 3 / 4 - 9, height * 3 / 4 - 11, null);
 	}
 	
 	void drawButton(Style style, int width, int height, Graphics2D ig, Graphics2D sg, boolean round) {
