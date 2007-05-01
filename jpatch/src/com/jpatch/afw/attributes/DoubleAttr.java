@@ -9,7 +9,7 @@ public class DoubleAttr extends AbstractAttribute {
 	}
 	
 	public DoubleAttr(double value) {
-		this(value, new LinearMapping());
+		this(value, new IdentityMapping());
 	}
 	
 	public DoubleAttr(double value, Mapping mapping) {
