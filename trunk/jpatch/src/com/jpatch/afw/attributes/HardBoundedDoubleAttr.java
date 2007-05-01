@@ -9,7 +9,7 @@ public class HardBoundedDoubleAttr extends DoubleAttr {
 	}
 	
 	public HardBoundedDoubleAttr(double min, double max, double value) {
-		this(min, max, value, new LinearMapping());
+		this(min, max, value, new IdentityMapping());
 	}
 	
 	public HardBoundedDoubleAttr(double min, double max, double value, Mapping mapping) {
