@@ -1,7 +1,7 @@
 package com.jpatch.afw.attributes;
 
-public abstract class AbstractAttribute implements Attribute{
-	protected AttributeListener[] attributeListeners = new AttributeListener[0];
+public abstract class AbstractAttribute<T> implements Attribute{
+	protected AttributeListener<T>[] attributeListeners = new AttributeListener[0];
 	protected boolean fireEvents = true;
 	
 	/**
@@ -61,11 +61,39 @@ public abstract class AbstractAttribute implements Attribute{
     	fireEvents = !suppress;
     }
     
-    protected void fireAttributeChanged() {
+    protected boolean fireAttributeWillChange(boolean value) {
+    	for (int i = attributeListeners.length - 1; i >= 0; i--) {
+	    	value = attributeListeners[i].attributeWillChange(this, value);
+    	}
+    	return value;
+    }
+    
+    protected int fireAttributeWillChange(int value) {
+    	for (int i = attributeListeners.length - 1; i >= 0; i--) {
+	    	value = attributeListeners[i].attributeWillChange(this, value);
+    	}
+    	return value;
+    }
+    
+    protected double fireAttributeWillChange(double value) {
+    	for (int i = attributeListeners.length - 1; i >= 0; i--) {
+	    	value = attributeListeners[i].attributeWillChange(this, value);
+    	}
+    	return value;
+    }
+    
+    protected T fireAttributeWillChange(T value) {
+    	for (int i = attributeListeners.length - 1; i >= 0; i--) {
+	    	value = attributeListeners[i].attributeWillChange(this, value);
+    	}
+    	return value;
+    }
+    
+    protected void fireAttributeHasChanged() {
     	if (fireEvents) {
     		fireEvents = false;
 	    	for (int i = attributeListeners.length - 1; i >= 0; i--) {
-		      	attributeListeners[i].attributeChanged(this);
+		      	attributeListeners[i].attributeHasChanged(this);
 		    }
 	    	fireEvents = true;
     	}

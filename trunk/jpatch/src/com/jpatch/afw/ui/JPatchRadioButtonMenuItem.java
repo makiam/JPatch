@@ -17,7 +17,7 @@ public final class JPatchRadioButtonMenuItem extends JRadioButtonMenuItem {
 		setIcon(menuIcon);
 		setSelected(action.isSelected());
 		action.getStateMachine().addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute source) {
+			public void attributeHasChanged(Attribute source) {
 				setSelected(JPatchRadioButtonMenuItem.this.action.isSelected());
 			}
 		});

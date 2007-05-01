@@ -11,16 +11,18 @@ public abstract class TransformedTuple3 extends Tuple3 {
 	protected boolean inverseInvalid = false;
 	protected boolean autoTransform = true;
 	
-	private final AttributeListener transformAttributeListener = new AttributeListener() {
-		public void attributeChanged(Attribute source) {
+	private final AttributeListener transformAttributeListener = new AttributeAdapter() {
+		@Override
+		public void attributeHasChanged(Attribute source) {
 			if (autoTransform) {
 				transform();
 			}
 		}
 	};
 	
-	private final AttributeListener invTransformAttributeListener = new AttributeListener() {
-		public void attributeChanged(Attribute source) {
+	private final AttributeListener invTransformAttributeListener = new AttributeAdapter() {
+		@Override
+		public void attributeHasChanged(Attribute source) {
 			if (autoTransform) {
 				invTransform();
 			}
@@ -52,13 +54,13 @@ public abstract class TransformedTuple3 extends Tuple3 {
 					yAttr.fireEvents = fireY;
 					zAttr.fireEvents = fireZ;
 					if (oldX != xAttr.value) {
-						xAttr.fireAttributeChanged();
+						xAttr.fireAttributeHasChanged();	// FIXME should fire willChange first ???
 					}
 					if (oldY != xAttr.value) {
-						xAttr.fireAttributeChanged();
+						xAttr.fireAttributeHasChanged();
 					}
 					if (oldZ != xAttr.value) {
-						xAttr.fireAttributeChanged();
+						xAttr.fireAttributeHasChanged();
 					}
 				} else {
 					super.setTuple(x, y, z);

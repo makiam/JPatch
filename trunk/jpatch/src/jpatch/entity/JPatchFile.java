@@ -28,7 +28,7 @@ public abstract class JPatchFile extends AbstractJPatchObject {
 		this.file = f;
 		name.set(removeSuffix(file.getName()));
 		name.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
+			public void attributeHasChanged(Attribute attribute) {
 				if (!rename && !file.renameTo(new File(file.getParentFile(), addSuffix(name.get())))) {
 					rename = true;
 					name.set(removeSuffix(file.getName()));

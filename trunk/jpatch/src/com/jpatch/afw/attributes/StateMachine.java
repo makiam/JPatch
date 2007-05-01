@@ -2,7 +2,7 @@ package com.jpatch.afw.attributes;
 
 import java.util.*;
 
-public class StateMachine<T> extends AbstractAttribute {
+public class StateMachine<T> extends AbstractAttribute<T> {
 	/**
 	 * A list of possible states of this StateMachine
 	 */
@@ -89,7 +89,7 @@ public class StateMachine<T> extends AbstractAttribute {
 		if (!checkForDuplicates()) {
 			throw new IllegalArgumentException("State list " + this.states + " contains duplicate entries");
 		}
-		if (!setState(initialState)) {
+		if (setState(initialState) != initialState) {
 			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
 		}
 	}
@@ -119,7 +119,7 @@ public class StateMachine<T> extends AbstractAttribute {
 		if (!checkForDuplicates()) {
 			throw new IllegalArgumentException("State list " + this.states + " contains duplicate entries");
 		}
-		if (!setState(initialState)) {
+		if (setState(initialState) != initialState) {
 			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
 		}
 	}
@@ -149,22 +149,19 @@ public class StateMachine<T> extends AbstractAttribute {
 	 * Note that this method is declared final. Subclasses wishing to implement custom state-switching behavior must override
 	 * the performStateTransition(T) method.
 	 * @param newState the new state to switch to
-	 * @return whether the current state has been changed (true if the state transition was successful, false otherwise)
+	 * @return the state after the state change
 	 * @throws IllegalArgumentException if <i>newState</i> is not a legal state of this statemachine
 	 */
-	public final boolean setState(T newState) {
-		if (newState == currentState) {
-			return false;
-		}
+	public final T setState(T newState) {
 		if (!states.contains(newState)) {
 			throw new IllegalArgumentException(newState + " is not a legal state of this statemachine (" + this + ")");
 		}
-		if (!performStateTransition(newState)) {
-			return false;
+		if (newState != currentState) {
+			newState = fireAttributeWillChange(newState);
+			currentState = performStateTransition(newState);
+			fireAttributeHasChanged();
 		}
-		currentState = newState;
-		fireAttributeChanged();
-		return true;
+		return currentState;
 	}
 
 	/**
@@ -192,7 +189,7 @@ public class StateMachine<T> extends AbstractAttribute {
 				if (s == state) {
 					continue;
 				}
-				if (setState(s)) {
+				if (setState(s) == s) {
 					break;
 				}
 			}
@@ -210,7 +207,7 @@ public class StateMachine<T> extends AbstractAttribute {
 	 */
 	public boolean revertToDefault() {
 		if (revertToDefault) {
-			return setState(defaultState);
+			return setState(defaultState) == defaultState;
 		} else {
 			return false;
 		}
@@ -227,11 +224,10 @@ public class StateMachine<T> extends AbstractAttribute {
 	
 	/**
 	 * Performs the state transition.
-	 * This implementation does nothing at all, and returns true. It is intended to be overriden by subclasses.
 	 * @param newState the state to switch to
-	 * @return true if the state transition was successful, false otherwise
+	 * @return the state after the state transition
 	 */
-	protected boolean performStateTransition(T newState) {
-		return true;
+	protected T performStateTransition(T newState) {
+		return newState;
 	}
 }

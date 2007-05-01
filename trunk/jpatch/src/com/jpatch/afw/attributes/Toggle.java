@@ -12,15 +12,12 @@ public class Toggle extends AbstractAttribute {
 	}
 	
 	public boolean setState(boolean newState) {
-		if (newState == currentState) {
-			return false;
+		if (newState != currentState) {
+			newState = fireAttributeWillChange(newState);
+			currentState = toggle(newState);
+			fireAttributeHasChanged();
 		}
-		if (!toggle(newState)) {
-			return false;
-		}
-		currentState = newState;
-		fireAttributeChanged();
-		return true;
+		return currentState;
 	}
 	
 	public boolean getState() {
@@ -28,6 +25,6 @@ public class Toggle extends AbstractAttribute {
 	}
 	
 	protected boolean toggle(boolean newState) {
-		return true;
+		return newState;
 	}
 }

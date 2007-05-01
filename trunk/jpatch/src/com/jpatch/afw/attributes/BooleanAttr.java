@@ -16,10 +16,11 @@ public class BooleanAttr extends AbstractAttribute {
 		return value;
 	}
 
-	public void setBoolean(boolean value) {
+	public boolean setBoolean(boolean value) {
 		if (value != this.value) {
-			this.value = value;
-			fireAttributeChanged();
+			this.value = fireAttributeWillChange(value);
+			fireAttributeHasChanged();
 		}
+		return this.value;
 	}
 }
