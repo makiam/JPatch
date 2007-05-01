@@ -65,9 +65,8 @@ public class ResourceManager {
 	
 	public void configureAction(JPatchAction action) {
 		String name = getString(action.getName());
-		action.setButtonText(name);
-		action.setMenuText(name);
-		action.setDisplayName(name);
-//		System.out.println(action.getName() + " " + action.getMenuText() + " " + action.getButtonText() + " " + action.getDisplayName());
+		action.getButtonText().setObject(name);
+		action.getMenuText().setObject(name);
+		action.getDisplayName().setObject(name);
 	}
 }

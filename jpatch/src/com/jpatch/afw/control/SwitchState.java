@@ -16,8 +16,7 @@ public class SwitchState extends EditAttribute {
 	@Override
 	protected void toggle() {
 		Object tmp = stateMachine.getState();
-		if (stateMachine.setState(state)) {
-			state = tmp;
-		}
+		stateMachine.setState(state);
+		state = tmp;
 	}
 }

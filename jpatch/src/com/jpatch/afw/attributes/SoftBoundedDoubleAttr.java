@@ -6,8 +6,9 @@ public class SoftBoundedDoubleAttr extends DoubleAttr {
 	private final BooleanAttr minLimitAttr;
 	private final BooleanAttr maxLimitAttr;
 	
-	private final AttributeListener attributeListener = new AttributeListener() {
-		public void attributeChanged(Attribute source) {
+	private final AttributeListener attributeListener = new AttributeAdapter() {
+		@Override
+		public void attributeHasChanged(Attribute source) {
 			setDouble(value);
 		}
 	};
@@ -63,13 +64,13 @@ public class SoftBoundedDoubleAttr extends DoubleAttr {
 	}
 	
 	@Override
-	public void setDouble(double value) {
+	public double setDouble(double value) {
 		if (minLimitAttr.getBoolean() && value < minAttr.getDouble()) {
-			super.setDouble(minAttr.getDouble());
+			return super.setDouble(minAttr.getDouble());
 		} else if (maxLimitAttr.getBoolean() && value > maxAttr.getDouble()) {
-			super.setDouble(maxAttr.getDouble());
+			return super.setDouble(maxAttr.getDouble());
 		} else {
-			super.setDouble(value);
+			return super.setDouble(value);
 		}
 	}
 }

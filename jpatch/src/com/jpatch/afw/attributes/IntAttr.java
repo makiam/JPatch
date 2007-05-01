@@ -15,10 +15,11 @@ public class IntAttr extends AbstractAttribute {
 		return value;
 	}
 
-	public void setInt(int value) {
+	public int setInt(int value) {
 		if (value != this.value) {
-			this.value = value;
-			fireAttributeChanged();
+			this.value = fireAttributeWillChange(value);
+			fireAttributeHasChanged();
 		}
+		return this.value;
 	}
 }

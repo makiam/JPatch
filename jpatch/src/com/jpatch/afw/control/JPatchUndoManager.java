@@ -1,5 +1,7 @@
 package com.jpatch.afw.control;
 
+import com.jpatch.afw.attributes.GenericAttr;
+
 import java.util.*;
 
 import jpatch.boundary.settings.Settings;
@@ -10,11 +12,11 @@ public class JPatchUndoManager {
 	private List<NamedEditList> undoStack = new ArrayList<NamedEditList>();
 	private int position;
 	
-	public void addEdit(String name, List<JPatchUndoableEdit> editList) {
+	public void addEdit(GenericAttr<String> name, List<JPatchUndoableEdit> editList) {
 		addEdit(new NamedEditList(name, editList));
 	}
 	
-	public void addEdit(String name, JPatchUndoableEdit edit) {
+	public void addEdit(GenericAttr<String> name, JPatchUndoableEdit edit) {
 		addEdit(new NamedEditList(name, edit));
 	}
 	
@@ -28,17 +30,17 @@ public class JPatchUndoManager {
 	
 	public String getUndoName() {
 		if (canUndo()) {
-			return undoStack.get(position - 1).name;
+			return undoStack.get(position - 1).name.getObject();
 		} else {
-			return "can't undo";
+			return ResourceManager.getInstance().getString("CANT_UNDO");
 		}
 	}
 	
 	public String getRedoName() {
 		if (canRedo()) {
-			return undoStack.get(position).name;
+			return undoStack.get(position).name.getObject();
 		} else {
-			return "can't redo";
+			return ResourceManager.getInstance().getString("CANT_REDO");
 		}
 	}
 	
@@ -68,15 +70,15 @@ public class JPatchUndoManager {
 	}
 	
 	private static class NamedEditList {
-		private final String name;
+		private final GenericAttr<String> name;
 		private final JPatchUndoableEdit[] edits;
 		
-		private NamedEditList(String name, List<JPatchUndoableEdit> editList) {
+		private NamedEditList(GenericAttr<String> name, List<JPatchUndoableEdit> editList) {
 			this.name = name;
 			edits = editList.toArray(new JPatchUndoableEdit[editList.size()]);
 		}
 		
-		private NamedEditList(String name, JPatchUndoableEdit edit) {
+		private NamedEditList(GenericAttr<String> name, JPatchUndoableEdit edit) {
 			this.name = name;
 			edits = new JPatchUndoableEdit[] { edit };
 		}

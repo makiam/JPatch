@@ -74,7 +74,7 @@ public class ObjectRegistry implements AttributeListener {
 	 * If the name of an object changes, remove it from the maps and add it again.
 	 * @see jpatch.entity.AttributeListener#attributeChanged(jpatch.entity.Attribute)
 	 */
-	public void attributeChanged(Attribute attribute) {
+	public void attributeHasChanged(Attribute attribute) {
 		AbstractNamedObject object = attributeMap.get(attribute);
 		removeFromMap(object);
 		insert(object);

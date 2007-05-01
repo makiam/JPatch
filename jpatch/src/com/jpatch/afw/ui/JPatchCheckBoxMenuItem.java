@@ -17,7 +17,7 @@ public class JPatchCheckBoxMenuItem extends JCheckBoxMenuItem {
 		setIcon(menuIcon);
 		setSelected(action.isSelected());
 		action.getToggle().addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute source) {
+			public void attributeHasChanged(Attribute source) {
 				setSelected(JPatchCheckBoxMenuItem.this.action.isSelected());
 			}
 		});

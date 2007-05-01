@@ -21,11 +21,12 @@ public class DoubleAttr extends AbstractAttribute {
 		return value;
 	}
 
-	public void setDouble(double value) {
+	public double setDouble(double value) {
 		if (value != this.value) {
-			this.value = value;
-			fireAttributeChanged();
+			this.value = fireAttributeWillChange(value);
+			fireAttributeHasChanged();
 		}
+		return this.value;
 	}
 
 	public Mapping getMapping() {

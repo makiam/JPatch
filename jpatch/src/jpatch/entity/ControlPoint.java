@@ -49,7 +49,7 @@ public class ControlPoint extends AbstractJPatchXObject {
 		this.model = model;
 		id = model.getNextCpId();
 		position.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
+			public void attributeHasChanged(Attribute attribute) {
 //				System.out.println(ControlPoint.this + " position changed");
 				position.get(pos);
 				refPos.set(pos);
@@ -63,7 +63,7 @@ public class ControlPoint extends AbstractJPatchXObject {
 			}
 		});
 		referencePosition.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
+			public void attributeHasChanged(Attribute attribute) {
 				referencePosition.get(refPos);
 				pos.set(refPos);
 				transform.transform(pos);

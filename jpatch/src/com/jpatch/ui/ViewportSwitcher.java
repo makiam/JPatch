@@ -1,27 +1,34 @@
 package com.jpatch.ui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ObjectInputStream;
 
 import javax.swing.JComponent;
 
+import com.jpatch.afw.attributes.StateMachine;
 import com.jpatch.afw.icons.IconSet;
 import com.jpatch.afw.icons.PackedIcon;
 
 public class ViewportSwitcher {
+	public static enum Mode { VIEWPORT_1, VIEWPORT_2, VIEWPORT_3, VIEWPORT_4, SPLIT_1_2, SPLIT_3_4, SPLIT_1_3, SPLIT_2_4, QUAD } 
 	private final BufferedImage[][] images = new BufferedImage[4][5];
 	private final boolean[] selected = new boolean[] { true, false, false, false };
 	private final int[] xOff = new int[4];
 	private final int[] yOff = new int[4];
 	private final int w, h;
+	private final StateMachine<Mode> stateMachine;
 	private int mousePosition = -1;
+	private int mx0, my0, mx1, my1;
 	private boolean mousePressed = false;
-	private JComponent component = new JComponent() {
+	private final JComponent component = new JComponent() {
 		@Override
 		protected void paintComponent(Graphics g) {
 			for (int i = 0; i < 4; i++) {
@@ -43,10 +50,23 @@ public class ViewportSwitcher {
 				}
 				g.drawImage(images[i][mode], xOff[i], yOff[i], null);
 			}
+			if (mousePressed) {
+				int rx = Math.min(mx0, mx1);
+				int ry = Math.min(my0, my1);
+				int rw = Math.abs(mx1 - mx0);
+				int rh = Math.abs(my1 - my0);
+				g.setClip(new RoundRectangle2D.Float(2, 2, w * 2 - 4, h * 2 - 4, h * 0.5f, h * 0.5f));
+				g.setColor(new Color(0x40ffffff, true));
+				g.fillRect(rx, ry, rw, rh);
+				g.setColor(new Color(0x80ffffff, true));
+				g.drawRect(rx, ry, rw, rh);
+				g.setClip(null);
+			}
 		}
 	};
 	
-	public ViewportSwitcher() {
+	public ViewportSwitcher(StateMachine<Mode> modeStateMachine) {
+		stateMachine = modeStateMachine;
 		PackedIcon[] icons;
 		try {
 			ObjectInputStream ois = new ObjectInputStream(ClassLoader.getSystemResourceAsStream("com/jpatch/icons/switcher"));
@@ -67,6 +87,7 @@ public class ViewportSwitcher {
 		h = images[0][0].getHeight();
 		xOff[1] = xOff[3] = w;
 		yOff[2] = yOff[3] = h;
+		
 		component.setPreferredSize(new Dimension(2 * w, 2 * h));
 		component.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
@@ -77,17 +98,37 @@ public class ViewportSwitcher {
 					component.repaint();
 				}
 			}
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				mx1 = e.getX();
+				my1 = e.getY();
+				int pos = getPosition(mx1, my1);
+				for (int i = 0; i < 4; i++) {
+					selected[i] = i == mousePosition || i == pos;
+				}
+				if (selected[0] && selected[3]) {
+					selected[1] = selected[2] = true;
+				} else if (selected[1] && selected[2]) {
+					selected[0] = selected[3] = true;
+				}
+				component.repaint();
+			}
+			
 		});
 		component.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseExited(MouseEvent e) {
-				mousePosition = -1;
-				component.repaint();
+				if (!mousePressed) {
+					mousePosition = -1;
+					component.repaint();
+				}
 			}
 			@Override
 			public void mousePressed(MouseEvent e) {
 				mousePressed = true;
-				mousePosition = getPosition(e.getX(), e.getY());
+				mx0 = mx1 = e.getX();
+				my0 = my1 = e.getY();
+				mousePosition = getPosition(mx0, my0);
 				for (int i = 0; i < 4; i++) {
 					selected[i] = mousePosition == i;
 				}
@@ -96,7 +137,23 @@ public class ViewportSwitcher {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				mousePressed = false;
-				mousePosition = getPosition(e.getX(), e.getY());
+				int x = e.getX();
+				int y = e.getY();
+				if (x < 0 || y < 0 || x > w * 2 || y > h * 2) {
+					mousePosition = -1;
+				} else {
+					mousePosition = getPosition(x, y);
+				}
+				if (selected[0] && !selected[1] && !selected[2] && !selected[3]) stateMachine.setState(Mode.VIEWPORT_1);
+				else if (!selected[0] && selected[1] && !selected[2] && !selected[3]) stateMachine.setState(Mode.VIEWPORT_2);
+				else if (!selected[0] && !selected[1] && selected[2] && !selected[3]) stateMachine.setState(Mode.VIEWPORT_3);
+				else if (!selected[0] && !selected[1] && !selected[2] && selected[3]) stateMachine.setState(Mode.VIEWPORT_4);
+				else if (selected[0] && selected[1] && !selected[2] && !selected[3]) stateMachine.setState(Mode.SPLIT_1_2);
+				else if (!selected[0] && !selected[1] && selected[2] && selected[3]) stateMachine.setState(Mode.SPLIT_3_4);
+				else if (selected[0] && !selected[1] && selected[2] && !selected[3]) stateMachine.setState(Mode.SPLIT_1_3);
+				else if (!selected[0] && selected[1] && !selected[2] && selected[3]) stateMachine.setState(Mode.SPLIT_2_4);
+				else if (selected[0] && selected[1] && selected[2] && selected[3]) stateMachine.setState(Mode.QUAD);
+				else throw new IllegalStateException();
 				component.repaint();
 			}
 		});

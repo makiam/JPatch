@@ -99,34 +99,34 @@ public class TransformNode extends AbstractTransform {
 //		});
 		
 		position.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
+			public void attributeHasChanged(Attribute attribute) {
 				positionChanged(position, translation);
 				computeBranch();
 			}
 		});
 		translation.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
+			public void attributeHasChanged(Attribute attribute) {
 				translationChanged(translation, position);
 				computeBranch();
 			}
 		});
 		scalePivotPosition.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
+			public void attributeHasChanged(Attribute attribute) {
 				positionChanged(scalePivotPosition, scalePivotTranslation);
 			}
 		});
 		scalePivotTranslation.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
+			public void attributeHasChanged(Attribute attribute) {
 				translationChanged(scalePivotTranslation, scalePivotPosition);
 			}
 		});
 		rotatePivotPosition.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
+			public void attributeHasChanged(Attribute attribute) {
 				positionChanged(rotatePivotPosition, rotatePivotTranslation);
 			}
 		});
 		rotatePivotTranslation.addAttributeListener(new AttributeListener() {
-			public void attributeChanged(Attribute attribute) {
+			public void attributeHasChanged(Attribute attribute) {
 				translationChanged(rotatePivotTranslation, rotatePivotPosition);
 			}
 		});
