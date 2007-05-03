@@ -124,24 +124,21 @@ public class JPatchToolBar extends JToolBar {
 					enabledToolTip = ImageUtils.createShadowIcon(ImageUtils.createTextIcon(textFont, textColor, text));
 					disabledToolTip = ImageUtils.createDisabledIcon(enabledToolTip);
 				}
-				((AbstractButton) button).addChangeListener(new ChangeListener() {
-					public void stateChanged(ChangeEvent e) {
-						setVisible(((AbstractButton) e.getSource()).getModel().isRollover());
-					}
-				});
-//				((AbstractButton) button).addMouseListener(new MouseAdapter() {
-//
-//					@Override
-//					public void mouseEntered(MouseEvent e) {
-//						setVisible(true);
+//				((AbstractButton) button).addChangeListener(new ChangeListener() {
+//					public void stateChanged(ChangeEvent e) {
+//						setVisible(((AbstractButton) e.getSource()).getModel().isRollover());
 //					}
-//
-//					@Override
-//					public void mouseExited(MouseEvent e) {
-//						setVisible(false);
-//					}
-//					
 //				});
+				((AbstractButton) button).addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseEntered(MouseEvent e) {
+						setVisible(true);
+					}
+					@Override
+					public void mouseExited(MouseEvent e) {
+						setVisible(false);
+					}			
+				});
 			}
 			setVisible(false);
 		}
