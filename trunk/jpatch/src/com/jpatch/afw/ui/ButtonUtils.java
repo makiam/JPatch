@@ -12,6 +12,8 @@ import java.io.ObjectInputStream;
 
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
+import javax.swing.plaf.ButtonUI;
+import javax.swing.plaf.metal.MetalButtonUI;
 
 
 public class ButtonUtils {
@@ -36,6 +38,7 @@ public class ButtonUtils {
 	
 	public void configureButtons(Style style, JPatchButton... buttons) {
 		for (int i = 0; i < buttons.length; i++) {
+			final AbstractButton button = (AbstractButton) buttons[i];
 			JPatchAction action = buttons[i].getJPatchAction();
 			Icon icon = action.getIcon().getObject();
 			boolean first = i == 0;
@@ -53,7 +56,6 @@ public class ButtonUtils {
 			} else {
 				iconSet.configureButton((AbstractButton) buttons[i], style, Type.CENTER, icon);
 			}
-			final AbstractButton button = (AbstractButton) buttons[i];
 			button.setEnabled(action.getEnabled().getBoolean());
 			action.getEnabled().addAttributeListener(new AttributeAdapter() {
 				@Override

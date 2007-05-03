@@ -133,12 +133,10 @@ public class JPatchToolBar extends JToolBar {
 					@Override
 					public void mouseEntered(MouseEvent e) {
 						setVisible(true);
-						((AbstractButton) e.getSource()).getModel().setRollover(true);
-					}
+						}
 					@Override
 					public void mouseExited(MouseEvent e) {
 						setVisible(false);
-						((AbstractButton) e.getSource()).getModel().setRollover(false);
 					}			
 				});
 			}
