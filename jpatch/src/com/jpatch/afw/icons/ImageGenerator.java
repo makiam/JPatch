@@ -57,7 +57,7 @@ public class ImageGenerator {
 	int n = 0;
 	
 	public static void main(String[] args) throws Exception {
-		new ImageGenerator().test2();
+		new ImageGenerator().test();
 	}
 	
 	void test2() throws Exception {
@@ -264,50 +264,14 @@ public class ImageGenerator {
 			iconSet.setIcon(style, type, img, stc, xoff, yoff);
 		}
 		
-		int switcherWidth = 56, switcherHeight = 44;
-		BufferedImage switcherImage = new BufferedImage(switcherWidth, switcherHeight, BufferedImage.TYPE_INT_ARGB);
-		BufferedImage switcherStencil = new BufferedImage(switcherWidth, switcherHeight, BufferedImage.TYPE_BYTE_GRAY);
-		Graphics2D sig = switcherImage.createGraphics();
-		Graphics2D ssg = switcherStencil.createGraphics();
-		configureGraphics(sig);
-		configureGraphics(ssg);
-		sig.translate(1, 1);
-		ssg.translate(1, 1);
-		drawSwitcher(switcherWidth - 2, switcherHeight - 2, sig, ssg);
-		PackedIcon[] switcherIcons = new PackedIcon[4];
-		for (int i = 0; i < 4; i++) {
-			BufferedImage img = new BufferedImage(switcherWidth / 2, switcherHeight / 2, BufferedImage.TYPE_INT_ARGB);
-			BufferedImage stc = new BufferedImage(switcherWidth / 2, switcherHeight / 2, BufferedImage.TYPE_BYTE_GRAY);
-			Graphics2D xig = img.createGraphics();
-			Graphics2D xsg = stc.createGraphics();
-			switch(i) {
-			case 1:
-				xig.translate(-switcherWidth / 2, 0);
-				xsg.translate(-switcherWidth / 2, 0);
-				break;
-			case 2:
-				xig.translate(0, -switcherHeight / 2);
-				xsg.translate(0, -switcherHeight / 2);
-				break;
-			case 3:
-				xig.translate(-switcherWidth / 2, -switcherHeight / 2);
-				xsg.translate(-switcherWidth / 2, -switcherHeight / 2);
-				break;
-			}
-			xig.drawImage(switcherImage, 0, 0, null);
-			xsg.drawImage(switcherStencil, 0, 0, null);
-			switcherIcons[i] = new PackedIcon(img, stc, 0, 0);
-		}
 		
-		File file = new File("src/com/jpatch/icons/switcher");
+		
+		File file = new File("src/com/jpatch/afw/icons/buttonBorders.iconset");
 		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
-		oos.writeObject(switcherIcons);
+		oos.writeObject(iconSet);
 		oos.close();
 		
-//		File file = new File("src/com/jpatch/afw/icons/icons");
-//		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
-//		oos.writeObject(iconSet);
-//		oos.close();
+		System.exit(0);
 		
 		ObjectInputStream ois = new ObjectInputStream(ClassLoader.getSystemResourceAsStream("com/jpatch/afw/icons/icons"));
 		iconSet = (IconSet) ois.readObject();
@@ -339,123 +303,7 @@ public class ImageGenerator {
 				
 			});
 			frame.add(zoom.getComponent(), BorderLayout.SOUTH);
-		} else {
-			JToolBar toolBar = new JPatchToolBar();
-			toolBar.setFloatable(false);
-			toolBar.setBorder(null);
-			JToggleButton b0 = new JToggleButton();
-			JToggleButton b1 = new JToggleButton();
-			JToggleButton b2 = new JToggleButton();
-			JToggleButton b3 = new JToggleButton();
-			Image test = makeIcon(0);
-			Image i0 = makeIcon(1);
-			Image i1 = makeIcon(2);
-			Image i2 = makeIcon(3);
-			Image i3 = makeIcon(4);
-			ButtonGroup bg0 = new ButtonGroup();
-			bg0.add(b0);
-			bg0.add(b1);
-			bg0.add(b2);
-			bg0.add(b3);
-			JToggleButton b4 = new JToggleButton();
-			JToggleButton b5 = new JToggleButton();
-			JToggleButton b6 = new JToggleButton();
-			Image i4 = makeIcon(5);
-			Image i5 = makeIcon(6);
-			Image i6 = makeIcon(7);
-			ButtonGroup bg1 = new ButtonGroup();
-			bg1.add(b4);
-			bg1.add(b5);
-			bg1.add(b6);
-			JButton b7 = new JButton();
-			JButton b8 = new JButton();
-			Image i7 = makeIcon(8);
-			Image i8 = makeIcon(9);
-			JToggleButton b9 = new JToggleButton();
-			JToggleButton b10 = new JToggleButton();
-			JToggleButton b11 = new JToggleButton();
-			JToggleButton b12 = new JToggleButton();
-			JToggleButton b13 = new JToggleButton();
-			JToggleButton b14 = new JToggleButton();
-			JToggleButton b15 = new JToggleButton();
-			Image i9 = makeIcon(10);
-			Image i10 = makeIcon(11);
-			Image i11 = makeIcon(12);
-			Image i12 = makeIcon(13);
-			Image i13 = makeIcon(14);
-			Image i14 = makeIcon(15);
-			Image i15 = makeIcon(16);
-			bg1.add(b9);
-			bg1.add(b10);
-			bg1.add(b11);
-			bg1.add(b12);
-			bg1.add(b13);
-			bg1.add(b14);
-			bg1.add(b15);
-			
-			b13.setEnabled(false);
-			b14.setEnabled(false);
-			b15.setEnabled(false);
-			
-			JToggleButton b16 = new JToggleButton();
-			Image i16 = makeIcon(17);
-			
-			iconSet.configureButton(b0, Style.FROSTED, Type.LEFT, i0);
-			iconSet.configureButton(b1, Style.FROSTED, Type.CENTER, i1);
-			iconSet.configureButton(b2, Style.FROSTED, Type.CENTER, i2);
-			iconSet.configureButton(b3, Style.FROSTED, Type.RIGHT, i3);
-			iconSet.configureButton(b4, Style.GLOSSY, Type.LEFT, i4);
-			iconSet.configureButton(b5, Style.GLOSSY, Type.CENTER, i5);
-			iconSet.configureButton(b6, Style.GLOSSY, Type.RIGHT, i6);
-			iconSet.configureButton(b7, Style.DARK, Type.LEFT, i7);
-			iconSet.configureButton(b8, Style.DARK, Type.RIGHT, i8);
-			iconSet.configureButton(b9, Style.BRUSHED, Type.LEFT, i9);
-			iconSet.configureButton(b10, Style.BRUSHED, Type.CENTER, i10);
-			iconSet.configureButton(b11, Style.BRUSHED, Type.CENTER, i11);
-			iconSet.configureButton(b12, Style.BRUSHED, Type.RIGHT, i12);
-			iconSet.configureButton(b13, Style.BRUSHED, Type.LEFT, i13);
-			iconSet.configureButton(b14, Style.BRUSHED, Type.CENTER, i14);
-			iconSet.configureButton(b15, Style.BRUSHED, Type.RIGHT, i15);
-			iconSet.configureButton(b16, Style.FROSTED, Type.SINGLE, i16);
-			
-			StateMachine<ViewportSwitcher.Mode> sm = new StateMachine<ViewportSwitcher.Mode>(ViewportSwitcher.Mode.class, ViewportSwitcher.Mode.VIEWPORT_1);
-			sm.addAttributeListener(new AttributeAdapter() {
-				public void attributeHasChanged(Attribute source) {
-					System.out.println(((StateMachine) source).getState());
-				}
-			});
-			toolBar.add(b4);
-			toolBar.add(b5);
-			toolBar.add(b6);
-			toolBar.add(Box.createHorizontalStrut(8));
-			toolBar.add(new ViewportSwitcher(sm).getComponent());
-			toolBar.add(Box.createHorizontalStrut(8));
-			toolBar.add(b7);
-			toolBar.add(b8);
-			toolBar.add(Box.createHorizontalStrut(8));
-			toolBar.add(b0);
-			toolBar.add(b1);
-			toolBar.add(b2);
-			toolBar.add(b3);
-			toolBar.add(Box.createHorizontalStrut(8));
-			toolBar.add(b16);
-			toolBar.add(Box.createHorizontalStrut(8));
-			toolBar.add(b9);
-			toolBar.add(b10);
-			toolBar.add(b11);
-			toolBar.add(b12);
-			toolBar.add(Box.createHorizontalStrut(8));
-			toolBar.add(b13);
-			toolBar.add(b14);
-			toolBar.add(b15);
-			JPanel panel = new JPanel(new BorderLayout());
-			panel.add(toolBar, BorderLayout.CENTER);
-			frame.add(panel, BorderLayout.NORTH);
-		}
-		frame.setSize(1024, 768);
-		frame.setVisible(true);
-		iconSet = null;
-		
+		} 
 	}
 	
 	void drawx(int num) {
@@ -488,61 +336,7 @@ public class ImageGenerator {
 		return s;
 	}
 	
-	void drawSwitcher(int width, int height, Graphics2D ig, Graphics2D sg) {
-		int outerWidth = width;
-		int innerWidth = outerWidth - 2;
-		int innerHeight = height - 2;
-		RoundRectangle2D outerRect, innerRect, ooRect;
-		outerRect = new RoundRectangle2D.Float(0, 0, outerWidth, height, height / 2.3f, height / 2.3f);
-		innerRect = new RoundRectangle2D.Float(1, 1, innerWidth, innerHeight, innerHeight / 2.5f, innerHeight / 2.5f);
-		ooRect = new RoundRectangle2D.Float(-1, -1, outerWidth + 2, height + 2, (height + 2) / 2.1f, (height + 2) / 2.1f);
-		
-		sg.setColor(Color.WHITE);
-		sg.fill(innerRect);
-		
-		ig.setPaint(new GradientPaint(0, 0, new Color(0x20000000, true), 0, height, new Color(0x80ffffff, true)));
-		ig.fill(ooRect);
-		ig.setColor(new Color(0x80000000, true));
-		ig.fill(outerRect);
-		
-		float halfHeight = innerHeight / 4.0f;
-		Area area1 = new Area();
-		area1.add(new Area(new Arc2D.Float(1, 1 + halfHeight, halfHeight * 2, halfHeight * 2, 90, 90, Arc2D.PIE)));
-		area1.add(new Area(new Rectangle2D.Float(1 + halfHeight, 1 + halfHeight, innerWidth / 2.0f, halfHeight)));
-		Area area2 = new Area();
-		area2.add(new Area(new Rectangle2D.Float(1 + innerWidth / 2.0f, 1, innerWidth / 2.0f, innerHeight)));
-		area2.subtract(new Area(new Ellipse2D.Float(1 + innerWidth - halfHeight * 2, 1 - halfHeight, halfHeight * 2, halfHeight * 2)));
-		area2.subtract(new Area(new Rectangle2D.Float(1 + innerWidth / 2.0f, 1, innerWidth / 2.0f - halfHeight, halfHeight)));
-		area1.add(area2);
-		Area area3 = new Area(area1);
-		area3.transform(new AffineTransform(1, 0, 0, 1, 0, halfHeight * 2));
-		area1.intersect(new Area(innerRect));
-		area1.intersect(new Area(new Rectangle2D.Float(0, 0, width, height / 2.0f)));
-		area3.intersect(new Area(innerRect));
-		
-//		g.setPaint(new LinearGradientPaint(0, 1, 0, 1 + innerHeight,new float[] { 0.0f, 0.25f, 0.5f, 0.5f, 0.75f, 1.0f }, new Color[] { new Color(1.00f, 1.00f, 1.00f), new Color(0.80f, 0.80f, 0.80f), new Color(0.85f, 0.85f, 0.85f), new Color(1.00f, 1.00f, 1.00f), new Color(0.80f, 0.80f, 0.80f), new Color(0.85f, 0.85f, 0.85f) } ));
-//		g.fill(innerRect);
-		
-		ig.setPaint(new LinearGradientPaint(0, 1, 0, 1 + innerHeight,new float[] { 0.0f, 0.5f, 0.5f, 1.0f }, new Color[] { new Color(0xe4e4e4), new Color(0xffffff), new Color(0xe4e4e4), new Color(0xffffff) } ));
-		ig.fill(innerRect);
-		ig.setPaint(new GradientPaint(0, 1, new Color(0xb8b8b8), 0, 1 + halfHeight * 2, new Color(0xffffff)));
-		ig.fill(area1);
-		ig.setPaint(new GradientPaint(0, halfHeight * 2 + 1, new Color(0xb8b8b8), 0, halfHeight * 2 + 1 + halfHeight * 2, new Color(0xffffff)));
-		ig.fill(area3);
-		
-		ig.setColor(new Color(0x40000000, true));
-		ig.drawLine(width / 2 - 1, 1, width / 2 - 1, innerHeight);
-		ig.drawLine(1, height / 2 - 1, width - 2, height / 2 - 1);
-		ig.setColor(new Color(0x40ffffff, true));
-		ig.drawLine(width / 2, 1, width / 2, innerHeight);
-		ig.drawLine(1, height / 2, width - 2, height / 2);
-		
-		Font font = new Font("monospaced", Font.BOLD, 20);
-		ig.drawImage(ImageUtils.createTextIcon(font, new Color(0x30000000, true), "1"), width / 4 - 6, height / 4 - 10, null);
-		ig.drawImage(ImageUtils.createTextIcon(font, new Color(0x30000000, true), "2"), width * 3 / 4 - 8, height / 4 - 10, null);
-		ig.drawImage(ImageUtils.createTextIcon(font, new Color(0x30000000, true), "3"), width / 4 - 5, height * 3 / 4 - 11, null);
-		ig.drawImage(ImageUtils.createTextIcon(font, new Color(0x30000000, true), "4"), width * 3 / 4 - 9, height * 3 / 4 - 11, null);
-	}
+	
 	
 	void drawButton(Style style, int width, int height, Graphics2D ig, Graphics2D sg, boolean round) {
 		drawXButton(style, width, height, ig, sg, round);
@@ -669,13 +463,7 @@ public class ImageGenerator {
 		g.fillRect(0, 0, 600, 50);
 	}
 	
-	Image makeIcon(int num) {
-		BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g = image.createGraphics();
-		configureGraphics(g);
-		drawIcon(num, g);
-		return image;
-	}
+	
 	
 	void drawIcon(int num, Graphics2D g) {
 		g.setComposite(AlphaComposite.DstAtop);

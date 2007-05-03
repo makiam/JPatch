@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.AbstractButton;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.plaf.metal.MetalButtonUI;
@@ -38,7 +39,9 @@ public class IconSet implements Serializable {
 		return tints.get(mode).createTintedImage(packedIcon);
 	}
 	
-	public void configureButton(AbstractButton button, Style style, Type type, Image icon) {
+	public void configureButton(AbstractButton button, Style style, Type type, Icon icon) {
+		BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+		icon.paintIcon(null, image.createGraphics(), 0, 0);
 		BufferedImage defaultImage = createTintedImage(icons[style.ordinal()][type.ordinal()], Mode.DEFAULT);
 		BufferedImage disabledImage = createTintedImage(icons[style.ordinal()][type.ordinal()], Mode.DEFAULT);
 		BufferedImage rolloverImage = createTintedImage(icons[style.ordinal()][type.ordinal()], Mode.ROLLOVER);
@@ -46,15 +49,15 @@ public class IconSet implements Serializable {
 		BufferedImage pressedImage = createTintedImage(icons[style.ordinal()][type.ordinal()], Mode.PRESSED);
 		BufferedImage rolloverSelectedImage = createTintedImage(icons[style.ordinal()][type.ordinal()], Mode.ROLLOVERSELECTED);
 		BufferedImage disabledSelectedImage = createTintedImage(icons[style.ordinal()][type.ordinal()], Mode.SELECTED);
-		Image disabledIcon = ImageUtils.createDisabledIcon(icon);
+		Image disabledIcon = ImageUtils.createDisabledIcon(image);
 		int xOffset = icons[style.ordinal()][type.ordinal()].getXOffset();
 		int yOffset = icons[style.ordinal()][type.ordinal()].getYOffset();
-		defaultImage.createGraphics().drawImage(icon, xOffset, yOffset, null);
+		defaultImage.createGraphics().drawImage(image, xOffset, yOffset, null);
 		disabledImage.createGraphics().drawImage(disabledIcon, xOffset, yOffset, null);
-		rolloverImage.createGraphics().drawImage(icon, xOffset, yOffset, null);
-		selectedImage.createGraphics().drawImage(icon, xOffset, yOffset, null);
-		pressedImage.createGraphics().drawImage(icon, xOffset, yOffset, null);
-		rolloverSelectedImage.createGraphics().drawImage(icon, xOffset, yOffset, null);
+		rolloverImage.createGraphics().drawImage(image, xOffset, yOffset, null);
+		selectedImage.createGraphics().drawImage(image, xOffset, yOffset, null);
+		pressedImage.createGraphics().drawImage(image, xOffset, yOffset, null);
+		rolloverSelectedImage.createGraphics().drawImage(image, xOffset, yOffset, null);
 		disabledSelectedImage.createGraphics().drawImage(disabledIcon, xOffset, yOffset, null);
 		button.setIcon(new ImageIcon(defaultImage));
 		button.setDisabledIcon(new ImageIcon(disabledImage));
