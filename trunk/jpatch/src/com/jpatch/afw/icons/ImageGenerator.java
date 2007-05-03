@@ -122,7 +122,7 @@ public class ImageGenerator {
 			iconSet.setIcon(style, type, img, stc, xoff, yoff);
 		}
 		
-		int switcherWidth = 56, switcherHeight = 44;
+		int switcherWidth = 58, switcherHeight = 46;
 		BufferedImage switcherImage = new BufferedImage(switcherWidth, switcherHeight, BufferedImage.TYPE_INT_ARGB);
 		BufferedImage switcherStencil = new BufferedImage(switcherWidth, switcherHeight, BufferedImage.TYPE_BYTE_GRAY);
 		Graphics2D sig = switcherImage.createGraphics();
@@ -205,6 +205,10 @@ public class ImageGenerator {
 			JToggleButton b1 = new JToggleButton();
 			JToggleButton b2 = new JToggleButton();
 			JToggleButton b3 = new JToggleButton();
+			b0.setToolTipText("Vertex mode");
+			b1.setToolTipText("Edge mode");
+			b2.setToolTipText("Face mode");
+			b3.setToolTipText("Object mode");
 			Image test = makeIcon(0);
 			Image i0 = makeIcon(1);
 			Image i1 = makeIcon(2);
@@ -218,6 +222,9 @@ public class ImageGenerator {
 			JToggleButton b4 = new JToggleButton();
 			JToggleButton b5 = new JToggleButton();
 			JToggleButton b6 = new JToggleButton();
+			b4.setToolTipText("Move view");
+			b5.setToolTipText("Zoom view");
+			b6.setToolTipText("Rotate view");
 			Image i4 = makeIcon(5);
 			Image i5 = makeIcon(6);
 			Image i6 = makeIcon(7);
@@ -227,6 +234,8 @@ public class ImageGenerator {
 			bg1.add(b6);
 			JButton b7 = new JButton();
 			JButton b8 = new JButton();
+			b7.setToolTipText("Undo");
+			b8.setToolTipText("Redo");
 			Image i7 = makeIcon(8);
 			Image i8 = makeIcon(9);
 			JToggleButton b9 = new JToggleButton();
@@ -236,6 +245,12 @@ public class ImageGenerator {
 			JToggleButton b13 = new JToggleButton();
 			JToggleButton b14 = new JToggleButton();
 			JToggleButton b15 = new JToggleButton();
+			b9.setToolTipText("Default tool");
+			b10.setToolTipText("Move tool");
+			b11.setToolTipText("Scale tool");
+			b12.setToolTipText("Rotate tool");
+			b13.setToolTipText("Extrude tool");
+			b14.setToolTipText("Lathe tool");
 			Image i9 = makeIcon(10);
 			Image i10 = makeIcon(11);
 			Image i11 = makeIcon(12);
@@ -256,6 +271,7 @@ public class ImageGenerator {
 			b15.setEnabled(false);
 			
 			JToggleButton b16 = new JToggleButton();
+			b16.setToolTipText("Snap to grid");
 			Image i16 = makeIcon(17);
 			
 			iconSet.configureButton(b0, Style.FROSTED, Type.LEFT, i0);
@@ -282,15 +298,16 @@ public class ImageGenerator {
 					System.out.println(((StateMachine) source).getState());
 				}
 			});
+			toolBar.add(b7);
+			toolBar.add(b8);
+			toolBar.add(Box.createHorizontalStrut(16));
 			toolBar.add(b4);
 			toolBar.add(b5);
 			toolBar.add(b6);
-			toolBar.add(Box.createHorizontalStrut(8));
+			toolBar.add(Box.createHorizontalStrut(32));
 			toolBar.add(new ViewportSwitcher(sm).getComponent());
-			toolBar.add(Box.createHorizontalStrut(8));
-			toolBar.add(b7);
-			toolBar.add(b8);
-			toolBar.add(Box.createHorizontalStrut(8));
+			toolBar.add(Box.createHorizontalStrut(32));
+			
 			toolBar.add(b0);
 			toolBar.add(b1);
 			toolBar.add(b2);
@@ -658,31 +675,21 @@ public class ImageGenerator {
 			g.fill(new Polygon(new int[] { 14, 9, 14 }, new int[] { 6, 6, 1 }, 3));
 			break;
 		case 8: // undo
-			g.setPaint(new GradientPaint(0, 0, new Color(0xfffff8f8, true), 0, 8, new Color(0x00fff8f8, true)));
-			g.setStroke(new BasicStroke(4));
-			g.drawArc(-2, 2, 13, 13, 300, 110);
-			g.setPaint(new GradientPaint(0, 0, new Color(0xfffff0f0, true), 0, 12, new Color(0x00fff0f0, true)));
-			g.setStroke(new BasicStroke(3));
-			g.drawArc(-1, 2, 12, 13, 300, 110);
-			g.setPaint(new GradientPaint(0, 0, new Color(0xffffe8e8, true), 0, 16, new Color(0x00ffe8e8, true)));
-			g.setStroke(new BasicStroke(2));
-			g.drawArc(0, 2, 11, 13, 300, 110);
-			g.setPaint(new GradientPaint(0, 0, new Color(0xffffffff, true), 0, 12, new Color(0x00ffffff, true)));
-			g.fill(new Polygon(new int[] { 5, 13, 5 }, new int[] { 0, 1, 7 }, 3));
+			g.setPaint(new GradientPaint(0, 0, new Color(0xffffffff, true), 0, 16, new Color(0x80ffc0c0, true)));
+			Area a = new Area(new Ellipse2D.Float(0, 0, 11.5f, 16));
+			a.subtract(new Area(new Ellipse2D.Float(-1, 3, 9.5f, 14)));
+			a.subtract(new Area(new Rectangle2D.Float(0, 0, 6, 16)));
+			g.fill(a);
+			g.fill(new Polygon(new int[] { 4, 12, 4 }, new int[] { 0, 0, 7 }, 3));
 			break;
 		case 9: // redo
 			g.setTransform(new AffineTransform(-1, 0, 0, 1, 16, 0));
-			g.setPaint(new GradientPaint(0, 0, new Color(0xfff8f8ff, true), 0, 8, new Color(0x00f8f8ff, true)));
-			g.setStroke(new BasicStroke(4));
-			g.drawArc(-2, 2, 13, 13, 300, 110);
-			g.setPaint(new GradientPaint(0, 0, new Color(0xfff0f0ff, true), 0, 12, new Color(0x00f0f0ff, true)));
-			g.setStroke(new BasicStroke(3));
-			g.drawArc(-1, 2, 12, 13, 300, 110);
-			g.setPaint(new GradientPaint(0, 0, new Color(0xffe8e8ff, true), 0, 16, new Color(0x00e8e8ff, true)));
-			g.setStroke(new BasicStroke(2));
-			g.drawArc(0, 2, 11, 13, 300, 110);
-			g.setPaint(new GradientPaint(0, 0, new Color(0xffffffff, true), 0, 12, new Color(0x00ffffff, true)));
-			g.fill(new Polygon(new int[] { 5, 13, 5 }, new int[] { 0, 1, 7 }, 3));
+			g.setPaint(new GradientPaint(0, 0, new Color(0xffffffff, true), 0, 16, new Color(0x80c0c0ff, true)));
+			a = new Area(new Ellipse2D.Float(0, 0, 11.5f, 16));
+			a.subtract(new Area(new Ellipse2D.Float(-1, 3, 9.5f, 14)));
+			a.subtract(new Area(new Rectangle2D.Float(0, 0, 6, 16)));
+			g.fill(a);
+			g.fill(new Polygon(new int[] { 4, 12, 4 }, new int[] { 0, 0, 7 }, 3));
 			break;
 		case 10: // default tool
 			g.setComposite(AlphaComposite.Src);
@@ -780,7 +787,7 @@ public class ImageGenerator {
 			g.setColor(new Color(0x30000000, true));
 			g.drawRect(0, 0, 15, 15);
 			
-			g.setColor(new Color(0x50000000, true));
+			g.setColor(new Color(0x60000000, true));
 //			g.drawLine(0, 0, 15, 0);
 			g.drawLine(0, 5, 15, 5);
 			g.drawLine(0, 10, 15, 10);
@@ -789,7 +796,7 @@ public class ImageGenerator {
 			g.drawLine(5, 0, 5, 15);
 			g.drawLine(10, 0, 10, 15);
 //			g.drawLine(15, 0, 15, 15);
-			g.setColor(new Color(0x70000000, true));
+			g.setColor(new Color(0x90000000, true));
 			g.drawRect(5, 5, 5, 5);
 			break;
 		case 18: // hide
