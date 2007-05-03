@@ -1,5 +1,8 @@
 package com.jpatch.afw.ui;
 
+import com.jpatch.afw.attributes.Attribute;
+import com.jpatch.afw.attributes.AttributeAdapter;
+import com.jpatch.afw.attributes.BooleanAttr;
 import com.jpatch.afw.control.JPatchAction;
 import com.jpatch.afw.icons.IconSet;
 import com.jpatch.afw.icons.IconSet.Style;
@@ -17,7 +20,7 @@ public class ButtonUtils {
 	public ButtonUtils() {
 		ObjectInputStream ois;
 		try {
-			ois = new ObjectInputStream(ClassLoader.getSystemResourceAsStream("com/jpatch/afw/icons/icons"));
+			ois = new ObjectInputStream(ClassLoader.getSystemResourceAsStream("com/jpatch/afw/icons/buttonBorders.iconset"));
 			iconSet = (IconSet) ois.readObject();
 			ois.close();
 		} catch (Exception e) {
@@ -38,7 +41,11 @@ public class ButtonUtils {
 			boolean first = i == 0;
 			boolean last = i == buttons.length - 1;
 			if (first && last) {
-				iconSet.configureButton((AbstractButton) buttons[i], style, Type.ROUND, icon);
+				if (buttons[i] instanceof JPatchToggleButton) {
+					iconSet.configureButton((AbstractButton) buttons[i], style, Type.SINGLE, icon);
+				} else {
+					iconSet.configureButton((AbstractButton) buttons[i], style, Type.ROUND, icon);
+				}
 			} else if (first) {
 				iconSet.configureButton((AbstractButton) buttons[i], style, Type.LEFT, icon);
 			} else if (last) {
@@ -46,7 +53,14 @@ public class ButtonUtils {
 			} else {
 				iconSet.configureButton((AbstractButton) buttons[i], style, Type.CENTER, icon);
 			}
+			final AbstractButton button = (AbstractButton) buttons[i];
+			button.setEnabled(action.getEnabled().getBoolean());
+			action.getEnabled().addAttributeListener(new AttributeAdapter() {
+				@Override
+				public void attributeHasChanged(Attribute source) {
+					button.setEnabled(((BooleanAttr) source).getBoolean());
+				}
+			});
 		}
 	}
-	
 }

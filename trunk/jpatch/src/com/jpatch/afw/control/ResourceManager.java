@@ -11,6 +11,11 @@ import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
+import java.io.InputStream;
+import java.net.URL;
+
+import javax.swing.ImageIcon;
+
 public class ResourceManager {
 	private static ResourceManager INSTANCE;
 	private ResourceBundle strings;
@@ -68,5 +73,9 @@ public class ResourceManager {
 		action.getButtonText().setObject(name);
 		action.getMenuText().setObject(name);
 		action.getDisplayName().setObject(name);
+		URL url = ClassLoader.getSystemResource(Configuration.getInstance().getString("iconDir") + action.getName() + ".png");
+		if (url != null) {
+			action.icon.setObject(new ImageIcon(url));
+		}
 	}
 }

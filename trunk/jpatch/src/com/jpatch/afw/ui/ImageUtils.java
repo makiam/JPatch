@@ -40,7 +40,7 @@ public class ImageUtils {
 		int[] pixels = ((DataBufferInt) tmp.getRaster().getDataBuffer()).getData();
 		for (int i = 0; i < pixels.length; i++) {
 			int argb = pixels[i];
-			int a = ((argb >> 24) & 0xff) / 9;
+			int a = ((argb >> 24) & 0xff) / 8;
 			int alpha = a;
 			
 			pixels[i] = (alpha << 24) | 0x000000;

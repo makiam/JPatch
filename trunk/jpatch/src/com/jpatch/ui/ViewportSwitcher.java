@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ObjectInputStream;
@@ -16,15 +15,18 @@ import javax.swing.JComponent;
 import com.jpatch.afw.attributes.StateMachine;
 import com.jpatch.afw.icons.IconSet;
 import com.jpatch.afw.icons.PackedIcon;
+import com.jpatch.boundary.actions.Actions;
+
+import static com.jpatch.boundary.actions.Actions.ViewportMode;
 
 public class ViewportSwitcher {
-	public static enum Mode { VIEWPORT_1, VIEWPORT_2, VIEWPORT_3, VIEWPORT_4, SPLIT_1_2, SPLIT_3_4, SPLIT_1_3, SPLIT_2_4, QUAD } 
+	
 	private final BufferedImage[][] images = new BufferedImage[4][5];
 	private final boolean[] selected = new boolean[] { true, false, false, false };
 	private final int[] xOff = new int[4];
 	private final int[] yOff = new int[4];
 	private final int w, h;
-	private final StateMachine<Mode> stateMachine;
+	private final StateMachine<Actions.ViewportMode> stateMachine;
 	private int mousePosition = -1;
 	private int mx0, my0, mx1, my1;
 	private boolean mousePressed = false;
@@ -65,11 +67,11 @@ public class ViewportSwitcher {
 		}
 	};
 	
-	public ViewportSwitcher(StateMachine<Mode> modeStateMachine) {
+	public ViewportSwitcher(StateMachine<Actions.ViewportMode> modeStateMachine) {
 		stateMachine = modeStateMachine;
 		PackedIcon[] icons;
 		try {
-			ObjectInputStream ois = new ObjectInputStream(ClassLoader.getSystemResourceAsStream("com/jpatch/icons/switcher"));
+			ObjectInputStream ois = new ObjectInputStream(ClassLoader.getSystemResourceAsStream("com/jpatch/icons/switcher.iconset"));
 			icons = (PackedIcon[]) ois.readObject();
 			ois.close();
 		} catch (Exception e) {
@@ -144,15 +146,15 @@ public class ViewportSwitcher {
 				} else {
 					mousePosition = getPosition(x, y);
 				}
-				if (selected[0] && !selected[1] && !selected[2] && !selected[3]) stateMachine.setState(Mode.VIEWPORT_1);
-				else if (!selected[0] && selected[1] && !selected[2] && !selected[3]) stateMachine.setState(Mode.VIEWPORT_2);
-				else if (!selected[0] && !selected[1] && selected[2] && !selected[3]) stateMachine.setState(Mode.VIEWPORT_3);
-				else if (!selected[0] && !selected[1] && !selected[2] && selected[3]) stateMachine.setState(Mode.VIEWPORT_4);
-				else if (selected[0] && selected[1] && !selected[2] && !selected[3]) stateMachine.setState(Mode.SPLIT_1_2);
-				else if (!selected[0] && !selected[1] && selected[2] && selected[3]) stateMachine.setState(Mode.SPLIT_3_4);
-				else if (selected[0] && !selected[1] && selected[2] && !selected[3]) stateMachine.setState(Mode.SPLIT_1_3);
-				else if (!selected[0] && selected[1] && !selected[2] && selected[3]) stateMachine.setState(Mode.SPLIT_2_4);
-				else if (selected[0] && selected[1] && selected[2] && selected[3]) stateMachine.setState(Mode.QUAD);
+				if (selected[0] && !selected[1] && !selected[2] && !selected[3]) stateMachine.setState(ViewportMode.VIEWPORT_1);
+				else if (!selected[0] && selected[1] && !selected[2] && !selected[3]) stateMachine.setState(ViewportMode.VIEWPORT_2);
+				else if (!selected[0] && !selected[1] && selected[2] && !selected[3]) stateMachine.setState(ViewportMode.VIEWPORT_3);
+				else if (!selected[0] && !selected[1] && !selected[2] && selected[3]) stateMachine.setState(ViewportMode.VIEWPORT_4);
+				else if (selected[0] && selected[1] && !selected[2] && !selected[3]) stateMachine.setState(ViewportMode.SPLIT_1_2);
+				else if (!selected[0] && !selected[1] && selected[2] && selected[3]) stateMachine.setState(ViewportMode.SPLIT_3_4);
+				else if (selected[0] && !selected[1] && selected[2] && !selected[3]) stateMachine.setState(ViewportMode.SPLIT_1_3);
+				else if (!selected[0] && selected[1] && !selected[2] && selected[3]) stateMachine.setState(ViewportMode.SPLIT_2_4);
+				else if (selected[0] && selected[1] && selected[2] && selected[3]) stateMachine.setState(ViewportMode.QUAD);
 				else throw new IllegalStateException();
 				component.repaint();
 			}
