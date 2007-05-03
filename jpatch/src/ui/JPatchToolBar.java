@@ -16,8 +16,8 @@ public class JPatchToolBar extends JToolBar {
 	private static final int DISABLED = 1;
 	
 	private boolean hideText = true;
-	private Color textColor = new Color(0xeeffffff, true);
-	private Font textFont = new Font("sans-serif", Font.BOLD, 14);
+	private Color textColor = new Color(0xffffffff, true);
+	private Font textFont = new Font("sans-serif", Font.BOLD, 13);
 	
 	private List<ToolTipComponent> componentList = new ArrayList<ToolTipComponent>();
 	private Dimension dimension = new Dimension();
@@ -57,8 +57,8 @@ public class JPatchToolBar extends JToolBar {
 			if (i == 0) {
 				xPos += comp.getOffsetWidth() - comp.component.getWidth() / 2;
 			}
-			comp.component.setBounds(xPos, Math.max(1, 18 - comp.component.getPreferredSize().height / 2), comp.component.getPreferredSize().width, comp.component.getPreferredSize().height);
-			comp.setBounds(xPos + (comp.component.getPreferredSize().width - comp.getImageWidth()) / 2, 35, comp.getImageWidth(), comp.getImageHeight());
+			comp.component.setBounds(xPos, Math.max(0, 18 - comp.component.getPreferredSize().height / 2), comp.component.getPreferredSize().width, comp.component.getPreferredSize().height);
+			comp.setBounds(xPos + (comp.component.getPreferredSize().width - comp.getImageWidth()) / 2, 33, comp.getImageWidth(), comp.getImageHeight());
 			xPos += (i == n - 1 ? comp.getOffsetWidth() : comp.component.getPreferredSize().width);
 //			System.out.println(xPos + " " + comp.getClass() + " " + comp.getBounds());
 		}
@@ -102,7 +102,7 @@ public class JPatchToolBar extends JToolBar {
 			}
 		}
 		dimension.width = width;
-		dimension.height = 52;
+		dimension.height = 48;
 	}
 	
 	private class ToolTipComponent extends JComponent {

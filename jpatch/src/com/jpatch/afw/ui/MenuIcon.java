@@ -47,8 +47,8 @@ class MenuIcon implements Icon {
 				action = ((JPatchRadioButtonMenuItem) menuItem).getJPatchAction();
 			}
 			if (action != null) {
-				menuText.setText(action.getMenuText());
-				menuAccelerator.setText(PlatformUtils.getAcceleratorString(action.getKeyboardShortcut()));
+				menuText.setText(action.getMenuText().getObject());
+				menuAccelerator.setText(PlatformUtils.getAcceleratorString(action.getKeyboardShortcut().getObject()));
 			}
 		}
 		Font font = UIManager.getFont("MenuItem.font");
@@ -65,7 +65,7 @@ class MenuIcon implements Icon {
 		for (Component comp : menuItem.getParent().getComponents()) {
 			if (comp instanceof JPatchMenuItem) {
 				JPatchMenuItem mi = (JPatchMenuItem) comp;
-				if (mi.menuIcon.hasIcon()) {
+				if (((MenuIcon) mi.getIcon()).hasIcon()) {
 					flags |= 1;
 				}
 			} else if (comp instanceof JPatchMenu) {
@@ -83,7 +83,7 @@ class MenuIcon implements Icon {
 		for (Component comp : menuItem.getParent().getComponents()) {
 			MenuIcon mi;
 			if (comp instanceof JPatchMenuItem) {
-				mi = ((JPatchMenuItem) comp).menuIcon;
+				mi = (MenuIcon) ((JPatchMenuItem) comp).getIcon();
 			} else if (comp instanceof JPatchCheckBoxMenuItem) {
 				mi = ((JPatchCheckBoxMenuItem) comp).menuIcon;
 			} else if (comp instanceof JPatchRadioButtonMenuItem) {
@@ -158,7 +158,7 @@ class MenuIcon implements Icon {
 			if (action instanceof ToggleAction || action instanceof SwitchStateAction) {
 				return true;
 			}
-			if (action.isUseMenuIcon() && action.getIcon() != null) {
+			if (action.getUseMenuIcon().getBoolean() && action.getIcon() != null) {
 				return true;
 			}
 		}

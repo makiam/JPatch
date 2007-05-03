@@ -6,13 +6,11 @@ import javax.swing.JMenuItem;
 
 public class JPatchMenuItem extends JMenuItem {
 	JPatchAction action;
-	MenuIcon menuIcon;
 	
 	public JPatchMenuItem(JPatchAction action) {
 		this.action = action;
 		addActionListener(action);
-		menuIcon = new MenuIcon(this);
-		setIcon(menuIcon);
+		setIcon(new MenuIcon(this));
 	}
 	
 	JPatchAction getJPatchAction() {
