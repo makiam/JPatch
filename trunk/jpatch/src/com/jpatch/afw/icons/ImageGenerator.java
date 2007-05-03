@@ -57,7 +57,149 @@ public class ImageGenerator {
 	int n = 0;
 	
 	public static void main(String[] args) throws Exception {
-		new ImageGenerator().test();
+		new ImageGenerator().test2();
+	}
+	
+	void test2() throws Exception {
+		frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLayout(new BorderLayout());
+		
+		ObjectInputStream ois = new ObjectInputStream(ClassLoader.getSystemResourceAsStream("com/jpatch/afw/icons/icons"));
+		IconSet iconSet = (IconSet) ois.readObject();
+		ois.close();
+		
+		JToolBar toolBar = new JPatchToolBar();
+		toolBar.setFloatable(false);
+		toolBar.setBorder(null);
+		JToggleButton b0 = new JToggleButton();
+		JToggleButton b1 = new JToggleButton();
+		JToggleButton b2 = new JToggleButton();
+		JToggleButton b3 = new JToggleButton();
+		b0.setToolTipText("Vertex mode");
+		b1.setToolTipText("Edge mode");
+		b2.setToolTipText("Face mode");
+		b3.setToolTipText("Object mode");
+		Image test = makeIcon(0);
+		Image i0 = makeIcon(1);
+		Image i1 = makeIcon(2);
+		Image i2 = makeIcon(3);
+		Image i3 = makeIcon(4);
+		ButtonGroup bg0 = new ButtonGroup();
+		bg0.add(b0);
+		bg0.add(b1);
+		bg0.add(b2);
+		bg0.add(b3);
+		JToggleButton b4 = new JToggleButton();
+		JToggleButton b5 = new JToggleButton();
+		JToggleButton b6 = new JToggleButton();
+		b4.setToolTipText("Move view");
+		b5.setToolTipText("Zoom view");
+		b6.setToolTipText("Rotate view");
+		Image i4 = makeIcon(5);
+		Image i5 = makeIcon(6);
+		Image i6 = makeIcon(7);
+		ButtonGroup bg1 = new ButtonGroup();
+		bg1.add(b4);
+		bg1.add(b5);
+		bg1.add(b6);
+		JButton b7 = new JButton();
+		JButton b8 = new JButton();
+		b7.setToolTipText("Undo");
+		b8.setToolTipText("Redo");
+		Image i7 = makeIcon(8);
+		Image i8 = makeIcon(9);
+		JToggleButton b9 = new JToggleButton();
+		JToggleButton b10 = new JToggleButton();
+		JToggleButton b11 = new JToggleButton();
+		JToggleButton b12 = new JToggleButton();
+		JToggleButton b13 = new JToggleButton();
+		JToggleButton b14 = new JToggleButton();
+		JToggleButton b15 = new JToggleButton();
+		b9.setToolTipText("Default tool");
+		b10.setToolTipText("Move tool");
+		b11.setToolTipText("Scale tool");
+		b12.setToolTipText("Rotate tool");
+		b13.setToolTipText("Extrude tool");
+		b14.setToolTipText("Lathe tool");
+		Image i9 = makeIcon(10);
+		Image i10 = makeIcon(11);
+		Image i11 = makeIcon(12);
+		Image i12 = makeIcon(13);
+		Image i13 = makeIcon(14);
+		Image i14 = makeIcon(15);
+		Image i15 = makeIcon(16);
+		bg1.add(b9);
+		bg1.add(b10);
+		bg1.add(b11);
+		bg1.add(b12);
+		bg1.add(b13);
+		bg1.add(b14);
+		bg1.add(b15);
+		
+		b13.setEnabled(false);
+		b14.setEnabled(false);
+		b15.setEnabled(false);
+		
+		JToggleButton b16 = new JToggleButton();
+		b16.setToolTipText("Snap to grid");
+		Image i16 = makeIcon(17);
+		
+		iconSet.configureButton(b0, Style.FROSTED, Type.LEFT, i0);
+		iconSet.configureButton(b1, Style.FROSTED, Type.CENTER, i1);
+		iconSet.configureButton(b2, Style.FROSTED, Type.CENTER, i2);
+		iconSet.configureButton(b3, Style.FROSTED, Type.RIGHT, i3);
+		iconSet.configureButton(b4, Style.GLOSSY, Type.LEFT, i4);
+		iconSet.configureButton(b5, Style.GLOSSY, Type.CENTER, i5);
+		iconSet.configureButton(b6, Style.GLOSSY, Type.RIGHT, i6);
+		iconSet.configureButton(b7, Style.DARK, Type.LEFT, i7);
+		iconSet.configureButton(b8, Style.DARK, Type.RIGHT, i8);
+		iconSet.configureButton(b9, Style.BRUSHED, Type.LEFT, i9);
+		iconSet.configureButton(b10, Style.BRUSHED, Type.CENTER, i10);
+		iconSet.configureButton(b11, Style.BRUSHED, Type.CENTER, i11);
+		iconSet.configureButton(b12, Style.BRUSHED, Type.RIGHT, i12);
+		iconSet.configureButton(b13, Style.BRUSHED, Type.LEFT, i13);
+		iconSet.configureButton(b14, Style.BRUSHED, Type.CENTER, i14);
+		iconSet.configureButton(b15, Style.BRUSHED, Type.RIGHT, i15);
+		iconSet.configureButton(b16, Style.FROSTED, Type.SINGLE, i16);
+		
+		StateMachine<ViewportSwitcher.Mode> sm = new StateMachine<ViewportSwitcher.Mode>(ViewportSwitcher.Mode.class, ViewportSwitcher.Mode.VIEWPORT_1);
+		sm.addAttributeListener(new AttributeAdapter() {
+			public void attributeHasChanged(Attribute source) {
+				System.out.println(((StateMachine) source).getState());
+			}
+		});
+		toolBar.add(b7);
+		toolBar.add(b8);
+		toolBar.add(Box.createHorizontalStrut(16));
+		toolBar.add(b4);
+		toolBar.add(b5);
+		toolBar.add(b6);
+		toolBar.add(Box.createHorizontalStrut(32));
+		toolBar.add(new ViewportSwitcher(sm).getComponent());
+		toolBar.add(Box.createHorizontalStrut(32));
+		
+		toolBar.add(b0);
+		toolBar.add(b1);
+		toolBar.add(b2);
+		toolBar.add(b3);
+		toolBar.add(Box.createHorizontalStrut(8));
+		toolBar.add(b16);
+		toolBar.add(Box.createHorizontalStrut(8));
+		toolBar.add(b9);
+		toolBar.add(b10);
+		toolBar.add(b11);
+		toolBar.add(b12);
+		toolBar.add(Box.createHorizontalStrut(8));
+		toolBar.add(b13);
+		toolBar.add(b14);
+		toolBar.add(b15);
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(toolBar, BorderLayout.CENTER);
+		frame.add(panel, BorderLayout.NORTH);
+		frame.setSize(1024, 768);
+		frame.setVisible(true);
+		iconSet = null;
 	}
 	
 	void test() throws Exception {
@@ -122,7 +264,7 @@ public class ImageGenerator {
 			iconSet.setIcon(style, type, img, stc, xoff, yoff);
 		}
 		
-		int switcherWidth = 58, switcherHeight = 46;
+		int switcherWidth = 56, switcherHeight = 44;
 		BufferedImage switcherImage = new BufferedImage(switcherWidth, switcherHeight, BufferedImage.TYPE_INT_ARGB);
 		BufferedImage switcherStencil = new BufferedImage(switcherWidth, switcherHeight, BufferedImage.TYPE_BYTE_GRAY);
 		Graphics2D sig = switcherImage.createGraphics();
@@ -205,10 +347,6 @@ public class ImageGenerator {
 			JToggleButton b1 = new JToggleButton();
 			JToggleButton b2 = new JToggleButton();
 			JToggleButton b3 = new JToggleButton();
-			b0.setToolTipText("Vertex mode");
-			b1.setToolTipText("Edge mode");
-			b2.setToolTipText("Face mode");
-			b3.setToolTipText("Object mode");
 			Image test = makeIcon(0);
 			Image i0 = makeIcon(1);
 			Image i1 = makeIcon(2);
@@ -222,9 +360,6 @@ public class ImageGenerator {
 			JToggleButton b4 = new JToggleButton();
 			JToggleButton b5 = new JToggleButton();
 			JToggleButton b6 = new JToggleButton();
-			b4.setToolTipText("Move view");
-			b5.setToolTipText("Zoom view");
-			b6.setToolTipText("Rotate view");
 			Image i4 = makeIcon(5);
 			Image i5 = makeIcon(6);
 			Image i6 = makeIcon(7);
@@ -234,8 +369,6 @@ public class ImageGenerator {
 			bg1.add(b6);
 			JButton b7 = new JButton();
 			JButton b8 = new JButton();
-			b7.setToolTipText("Undo");
-			b8.setToolTipText("Redo");
 			Image i7 = makeIcon(8);
 			Image i8 = makeIcon(9);
 			JToggleButton b9 = new JToggleButton();
@@ -245,12 +378,6 @@ public class ImageGenerator {
 			JToggleButton b13 = new JToggleButton();
 			JToggleButton b14 = new JToggleButton();
 			JToggleButton b15 = new JToggleButton();
-			b9.setToolTipText("Default tool");
-			b10.setToolTipText("Move tool");
-			b11.setToolTipText("Scale tool");
-			b12.setToolTipText("Rotate tool");
-			b13.setToolTipText("Extrude tool");
-			b14.setToolTipText("Lathe tool");
 			Image i9 = makeIcon(10);
 			Image i10 = makeIcon(11);
 			Image i11 = makeIcon(12);
@@ -271,7 +398,6 @@ public class ImageGenerator {
 			b15.setEnabled(false);
 			
 			JToggleButton b16 = new JToggleButton();
-			b16.setToolTipText("Snap to grid");
 			Image i16 = makeIcon(17);
 			
 			iconSet.configureButton(b0, Style.FROSTED, Type.LEFT, i0);
@@ -298,16 +424,15 @@ public class ImageGenerator {
 					System.out.println(((StateMachine) source).getState());
 				}
 			});
-			toolBar.add(b7);
-			toolBar.add(b8);
-			toolBar.add(Box.createHorizontalStrut(16));
 			toolBar.add(b4);
 			toolBar.add(b5);
 			toolBar.add(b6);
-			toolBar.add(Box.createHorizontalStrut(32));
+			toolBar.add(Box.createHorizontalStrut(8));
 			toolBar.add(new ViewportSwitcher(sm).getComponent());
-			toolBar.add(Box.createHorizontalStrut(32));
-			
+			toolBar.add(Box.createHorizontalStrut(8));
+			toolBar.add(b7);
+			toolBar.add(b8);
+			toolBar.add(Box.createHorizontalStrut(8));
 			toolBar.add(b0);
 			toolBar.add(b1);
 			toolBar.add(b2);
@@ -787,7 +912,7 @@ public class ImageGenerator {
 			g.setColor(new Color(0x30000000, true));
 			g.drawRect(0, 0, 15, 15);
 			
-			g.setColor(new Color(0x60000000, true));
+			g.setColor(new Color(0x50000000, true));
 //			g.drawLine(0, 0, 15, 0);
 			g.drawLine(0, 5, 15, 5);
 			g.drawLine(0, 10, 15, 10);
@@ -796,7 +921,7 @@ public class ImageGenerator {
 			g.drawLine(5, 0, 5, 15);
 			g.drawLine(10, 0, 10, 15);
 //			g.drawLine(15, 0, 15, 15);
-			g.setColor(new Color(0x90000000, true));
+			g.setColor(new Color(0x70000000, true));
 			g.drawRect(5, 5, 5, 5);
 			break;
 		case 18: // hide
