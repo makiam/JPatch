@@ -10,6 +10,8 @@ import java.util.Map;
 
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
+import javax.swing.plaf.basic.BasicButtonUI;
+import javax.swing.plaf.metal.MetalButtonUI;
 
 public class IconSet implements Serializable {
 	private static final long serialVersionUID = -5773242156358795217L;
@@ -64,5 +66,6 @@ public class IconSet implements Serializable {
 		button.setContentAreaFilled(false);
 		button.setBorderPainted(false);
 		button.setBorder(null);
+		button.setRolloverEnabled(true);
 	}
 }
