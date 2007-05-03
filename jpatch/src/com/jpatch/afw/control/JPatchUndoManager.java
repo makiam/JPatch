@@ -1,12 +1,13 @@
 package com.jpatch.afw.control;
 
+import com.jpatch.afw.attributes.AbstractAttribute;
 import com.jpatch.afw.attributes.GenericAttr;
 
 import java.util.*;
 
 import jpatch.boundary.settings.Settings;
 
-public class JPatchUndoManager {
+public class JPatchUndoManager extends AbstractAttribute {
 	private static final int MAX_DEPTH = Settings.getInstance().undoDepth;
 	
 	private List<NamedEditList> undoStack = new ArrayList<NamedEditList>();
@@ -49,6 +50,7 @@ public class JPatchUndoManager {
 			throw new IllegalStateException("can't undo");
 		}
 		undoStack.get(--position).undo();
+		fireAttributeHasChanged();
 	}
 	
 	public void redo() {
@@ -56,6 +58,7 @@ public class JPatchUndoManager {
 			throw new IllegalStateException("can't redo");
 		}
 		undoStack.get(position++).redo();
+		fireAttributeHasChanged();
 	}
 	
 	private void addEdit(NamedEditList namedEditList) {
@@ -67,6 +70,7 @@ public class JPatchUndoManager {
 			}
 		}
 		undoStack.add(position++, namedEditList);
+		fireAttributeHasChanged();
 	}
 	
 	private static class NamedEditList {

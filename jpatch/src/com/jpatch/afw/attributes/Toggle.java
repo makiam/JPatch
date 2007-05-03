@@ -20,6 +20,10 @@ public class Toggle extends AbstractAttribute {
 		return currentState;
 	}
 	
+	public boolean toggleState() {
+		return setState(!currentState);
+	}
+	
 	public boolean getState() {
 		return currentState;
 	}
