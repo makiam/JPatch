@@ -2,8 +2,12 @@ package com.jpatch.afw.attributes;
 
 public class TransformedVector3 extends TransformedTuple3 {
 
-	public TransformedVector3(DoubleAttr x, DoubleAttr y, DoubleAttr z, final boolean checkLimit) {
-		super(x, y, z, checkLimit);
+	public TransformedVector3(DoubleAttr x, DoubleAttr y, DoubleAttr z) {
+		super(x, y, z);
+	}
+	
+	public TransformedVector3(double x, double y, double z) {
+		super(x, y, z);
 	}
 	
 	@Override

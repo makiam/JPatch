@@ -2,36 +2,39 @@ package com.jpatch.boundary.actions;
 
 import java.awt.event.ActionEvent;
 
-import com.jpatch.afw.attributes.Attribute;
-import com.jpatch.afw.attributes.AttributeAdapter;
-import com.jpatch.afw.attributes.StateMachine;
-import com.jpatch.afw.attributes.Toggle;
-import com.jpatch.afw.control.JPatchAction;
-import com.jpatch.afw.control.JPatchUndoManager;
-import com.jpatch.afw.control.SwitchStateAction;
-import com.jpatch.afw.control.ToggleAction;
+import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.control.*;
+import com.jpatch.boundary.tools.*;
 
 public class Actions {
-	public static enum Tool { MOVE_VIEW, ZOOM_VIEW, ROTATE_VIEW, DEFAULT_TOOL, MOVE_TOOL, SCALE_TOOL, ROTATE_TOOL, EXTRUDE_TOOL, LATHE_TOOL }
+//	public static enum Tool { MOVE_VIEW, ZOOM_VIEW, ROTATE_VIEW, DEFAULT_TOOL, MOVE_TOOL, SCALE_TOOL, ROTATE_TOOL, EXTRUDE_TOOL, LATHE_TOOL }
 	public static enum SdsMode { VERTEX_MODE, EDGE_MODE, FACE_MODE, OBJECT_MODE }
 	public static enum ViewportMode { VIEWPORT_1, VIEWPORT_2, VIEWPORT_3, VIEWPORT_4, SPLIT_1_2, SPLIT_3_4, SPLIT_1_3, SPLIT_2_4, QUAD } 
 	
+	public final JPatchTool[] tools = new JPatchTool[] {
+			ChangeViewTool.createMoveViewTool(),
+			ChangeViewTool.createZoomViewTool(),
+			ChangeViewTool.createRotateViewTool(),
+			new MoveVertexTool(),
+			null
+	};
+	
 	public final JPatchUndoManager undoManager = new JPatchUndoManager();
-	public final StateMachine<Tool> toolSM = new StateMachine<Tool>(Tool.class, Tool.DEFAULT_TOOL);
+	public final StateMachine<JPatchTool> toolSM = new StateMachine<JPatchTool>(tools, tools[3]);
 	public final StateMachine<SdsMode> sdsModeSM = new StateMachine<SdsMode>(SdsMode.class, SdsMode.VERTEX_MODE);
 	public final StateMachine<ViewportMode> viewportModeSM = new StateMachine<ViewportMode>(ViewportMode.class, ViewportMode.VIEWPORT_1);
 	public final Toggle snapToGridToggle = new Toggle();
 	
-	public final SwitchStateAction moveView = new SwitchStateAction(toolSM, Tool.MOVE_VIEW, undoManager, "MOVE_VIEW");
-	public final SwitchStateAction zoomView = new SwitchStateAction(toolSM, Tool.ZOOM_VIEW, undoManager, "ZOOM_VIEW");
-	public final SwitchStateAction rotateView = new SwitchStateAction(toolSM, Tool.ROTATE_VIEW, undoManager, "ROTATE_VIEW");
+	public final SwitchStateAction moveView = new SwitchStateAction(toolSM, tools[0], undoManager, "MOVE_VIEW");
+	public final SwitchStateAction zoomView = new SwitchStateAction(toolSM, tools[1], undoManager, "ZOOM_VIEW");
+	public final SwitchStateAction rotateView = new SwitchStateAction(toolSM, tools[2], undoManager, "ROTATE_VIEW");
 	
-	public final SwitchStateAction defaultTool = new SwitchStateAction(toolSM, Tool.DEFAULT_TOOL, undoManager, "DEFAULT_TOOL");
-	public final SwitchStateAction moveTool = new SwitchStateAction(toolSM, Tool.MOVE_TOOL, undoManager, "MOVE_TOOL");
-	public final SwitchStateAction scaleTool = new SwitchStateAction(toolSM, Tool.SCALE_TOOL, undoManager, "SCALE_TOOL");
-	public final SwitchStateAction rotateTool = new SwitchStateAction(toolSM, Tool.ROTATE_TOOL, undoManager, "ROTATE_TOOL");
-	public final SwitchStateAction extrudeTool = new SwitchStateAction(toolSM, Tool.EXTRUDE_TOOL, undoManager, "EXTRUDE_TOOL");
-	public final SwitchStateAction latheTool = new SwitchStateAction(toolSM, Tool.LATHE_TOOL, undoManager, "LATHE_TOOL");
+	public final SwitchStateAction defaultTool = new SwitchStateAction(toolSM, tools[3], undoManager, "DEFAULT_TOOL");
+	public final SwitchStateAction moveTool = new SwitchStateAction(toolSM, tools[4], undoManager, "MOVE_TOOL");
+	public final SwitchStateAction scaleTool = new SwitchStateAction(toolSM, tools[4], undoManager, "SCALE_TOOL");
+	public final SwitchStateAction rotateTool = new SwitchStateAction(toolSM, tools[4], undoManager, "ROTATE_TOOL");
+	public final SwitchStateAction extrudeTool = new SwitchStateAction(toolSM, tools[4], undoManager, "EXTRUDE_TOOL");
+	public final SwitchStateAction latheTool = new SwitchStateAction(toolSM, tools[4], undoManager, "LATHE_TOOL");
 	
 	public final SwitchStateAction vertexMode = new SwitchStateAction(sdsModeSM, SdsMode.VERTEX_MODE, undoManager, "VERTEX_MODE");
 	public final SwitchStateAction edgeMode = new SwitchStateAction(sdsModeSM, SdsMode.EDGE_MODE, undoManager, "EDGE_MODE");
@@ -59,7 +62,7 @@ public class Actions {
 		/*
 		 * configure tool statemachine
 		 */
-		toolSM.setDefaultState(Tool.DEFAULT_TOOL);
+		toolSM.setDefaultState(tools[4]);
 		
 		/*
 		 * configure undo and redo actions

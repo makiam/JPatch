@@ -29,43 +29,18 @@ public abstract class TransformedTuple3 extends Tuple3 {
 		}
 	};
 	
-	protected TransformedTuple3(DoubleAttr x, DoubleAttr y, DoubleAttr z, final boolean checkLimit) {
+	protected TransformedTuple3(double x, double y, double z) {
+		this(new DoubleAttr(x), new DoubleAttr(y), new DoubleAttr(z));
+	}
+	
+	protected TransformedTuple3(DoubleAttr x, DoubleAttr y, DoubleAttr z) {
 		super(x, y, z);
 		referenceTuple = new Tuple3() {
 			@Override
 			public final void setTuple(double x, double y, double z) {
 				autoTransform = false;
-				if (checkLimit) {
-					double oldX = xAttr.value;
-					double oldY = yAttr.value;
-					double oldZ = zAttr.value;
-					xAttr.value = x;
-					yAttr.value = y;
-					zAttr.value = z;
-					invTransform();
-					boolean fireX = xAttr.fireEvents;
-					boolean fireY = yAttr.fireEvents;
-					boolean fireZ = zAttr.fireEvents;
-					xAttr.fireEvents = false;
-					yAttr.fireEvents = false;
-					zAttr.fireEvents = false;
-					transform();
-					xAttr.fireEvents = fireX;
-					yAttr.fireEvents = fireY;
-					zAttr.fireEvents = fireZ;
-					if (oldX != xAttr.value) {
-						xAttr.fireAttributeHasChanged();	// FIXME should fire willChange first ???
-					}
-					if (oldY != xAttr.value) {
-						xAttr.fireAttributeHasChanged();
-					}
-					if (oldZ != xAttr.value) {
-						xAttr.fireAttributeHasChanged();
-					}
-				} else {
-					super.setTuple(x, y, z);
-					transform();
-				}
+				super.setTuple(x, y, z);
+				transform();
 				autoTransform = true;
 			}
 		};

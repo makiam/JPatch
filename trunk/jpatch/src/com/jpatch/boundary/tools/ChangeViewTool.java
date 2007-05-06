@@ -1,9 +1,9 @@
-package jpatch.boundary.newtools;
+package com.jpatch.boundary.tools;
+
+import com.jpatch.boundary.*;
 
 import java.awt.event.*;
 
-
-import jpatch.boundary.*;
 //import jpatch.entity.*;
 
 public class ChangeViewTool implements JPatchTool {
