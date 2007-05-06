@@ -33,6 +33,7 @@ public class ResourceManager {
 	}
 	
 	public void setLocale(Locale locale) {
+		System.out.println(Configuration.getInstance().getString("stringResource"));
 		strings = PropertyResourceBundle.getBundle(Configuration.getInstance().getString("stringResource"), locale);
 		ResourceBundle kn = PropertyResourceBundle.getBundle("com/jpatch/afw/resources/KeyNames", locale);
 		for (Enumeration e = kn.getKeys(); e.hasMoreElements(); ) {

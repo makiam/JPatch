@@ -1,0 +1,198 @@
+/*
+ * $Id: Settings.java 476 2007-04-20 13:16:57Z sascha_l $
+ *
+ * Copyright (c) 2005 Sascha Ledinsky
+ *
+ * This file is part of JPatch.
+ *
+ * JPatch is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * JPatch is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with JPatch; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+package com.jpatch.settings;
+
+import com.jpatch.afw.settings.*;
+
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.table.*;
+
+import jpatch.boundary.*;
+
+
+/**
+ * @author sascha
+ *
+ */
+public class Settings extends AbstractSettings {
+	private static Settings INSTANCE;
+	
+	public static enum Plaf { CROSS_PLATFORM, SYSTEM, JPATCH };
+
+	@Hidden
+	public boolean newInstallation = true;
+	
+	@Hidden
+	public boolean cleanExit = false;
+	
+	@Hidden
+	public boolean startupFinished = false;
+	
+	@Hidden
+	public File workspace = new File(System.getProperty("user.home"), "jpatch_workspace");
+	
+	@DisplayName(value = "Prompt for workspace")
+	@BooleanOptions(trueOption = "yes", falseOption = "no")
+	public boolean promptForWorkspace = true;
+	
+	@DisplayName(value = "Screen position (left)")
+	public int screenPositionX = 0;
+	
+	@DisplayName(value = "Screen position (top)")
+	public int screenPositionY = 0;
+	
+	@DisplayName(value = "Screen width")
+	public int screenWidth = 1024;
+	
+	@DisplayName(value = "Screen height")
+	public int screenHeight = 768;
+
+	@DisplayName(value = "Save screen dimensions on exit")
+	@BooleanOptions(trueOption = "yes", falseOption = "no")
+	public boolean saveScreenDimensionsOnExit = true;
+	
+	@DisplayName(value = "Look&Feel")
+	public Plaf lookAndFeel = Plaf.CROSS_PLATFORM;
+	
+	@DisplayName(value = "Bold fonts")
+	@BooleanOptions(trueOption = "on", falseOption = "off")
+	public boolean metalBoldText = false;
+	
+	@DisplayName(value = "Font smoothing")
+	@BooleanOptions(trueOption = "on", falseOption = "off")
+	public boolean fontSmoothing = true;
+	
+	@DisplayName(value = "Undo depth")
+	public int undoDepth = 30;
+	
+	@DisplayName(value = "History depth")
+	public int historyDepth = 10;
+	
+	public final DirectorySettings directories = new DirectorySettings();
+	
+	public final ViewportSettings viewports = new ViewportSettings();
+	
+	public final ColorSettings colors = new ColorSettings();
+	
+	public final RealtimeRendererSettings realtimeRenderer = new RealtimeRendererSettings();
+	
+	public final RendererSettings export = new RendererSettings();
+	
+	public void showDialog(Component parent) {
+		load();
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+//		initTree();
+		final JTable table = new JTable();
+		table.setShowHorizontalLines(true);
+		table.setShowVerticalLines(true);
+		table.setGridColor(new Color(0xc0c0c0));
+		table.setRowHeight(22);
+		initTable(table, this);
+		table.addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent evt) {
+				table.repaint();
+				
+			}
+		});
+		JTree tree = new JTree(this);
+		tree.setCellRenderer(getTreeCellRenderer());
+		tree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+			public void valueChanged(TreeSelectionEvent e) {
+				AbstractSettings settings = (AbstractSettings) e.getPath().getLastPathComponent();
+				initTable(table, settings);
+			}
+		});
+		
+		JScrollPane sp = new JScrollPane(table);
+		sp.getViewport().setBackground(Color.WHITE);
+		splitPane.add(new JScrollPane(tree));
+		splitPane.add(sp);
+		MainFrame mf = MainFrame.getInstance();
+		if (mf != null) {
+			screenPositionX = mf.getX();
+			screenPositionY = mf.getY();
+			screenWidth = mf.getWidth();
+			screenHeight = mf.getHeight();
+		}
+		
+		if (JOptionPane.showConfirmDialog(parent, splitPane, "Preferences", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null) == JOptionPane.OK_OPTION) {
+			if (mf != null && (screenWidth != mf.getWidth() || screenHeight != mf.getHeight() || screenPositionX != mf.getX() || screenPositionY != mf.getY()))
+				mf.setBounds(screenPositionX, screenPositionY, screenWidth, screenHeight);
+			save();
+			
+			try {
+				switch (lookAndFeel) {
+				case CROSS_PLATFORM:
+					UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+					UIManager.put("swing.boldMetal", false);
+					break;
+				case SYSTEM:
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+					break;
+//				case JPATCH:
+//					UIManager.setLookAndFeel(new SmoothLookAndFeel());
+//					UIManager.put("swing.boldMetal", false);
+//					break;
+				}
+				if (mf != null) {
+					SwingUtilities.updateComponentTreeUI(mf);
+					SwingUtilities.updateComponentTreeUI(mf.getJPatchScreen().getPopupMenu());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		} else {
+			System.out.println("Cancel");
+			load();
+		}
+	}
+	
+	private void initTable(JTable table, AbstractSettings settings) {
+		table.setModel((TableModel) settings.getTableModel());
+		table.setDefaultRenderer(Object.class, settings.getTableCellRenderer());
+		table.getColumnModel().getColumn(0).setHeaderValue("Preference Name");
+		table.getColumnModel().getColumn(1).setHeaderValue("Value");
+		table.setDefaultEditor(Object.class, settings.getTableCellEditor());
+	}
+	
+	private Settings() {
+//		if (SplashScreen.instance != null)
+//			SplashScreen.instance.setText("Loading preferences");
+		System.out.println("Loading preferences...");
+		storeDefaults();
+		load();
+		initTree();
+		INSTANCE = this;
+	}
+	
+	public static Settings getInstance() {
+		if (INSTANCE == null)
+			new Settings();
+		return INSTANCE;
+	}
+}

@@ -66,6 +66,19 @@ public class JPatchToolBar extends JToolBar {
 	}
 
 	public void paintComponent(Graphics g) {
+		if (false) {
+			super.paintComponent(g);
+			return;
+		}
+		if (false) {
+			Graphics2D g2 = (Graphics2D) g;
+			int s = (getHeight() * 2) / 3;
+			g2.setPaint(new GradientPaint(0, 0, new Color(0xf0f0f0), 0, s, new Color(0xa0a0a0)));
+			g2.fillRect(0, 0, getWidth(), s);
+			g2.setPaint(new GradientPaint(0, s, new Color(0xa0a0a0), 0, getHeight(), new Color(0xb0b0b0)));
+			g2.fillRect(0, s, getWidth(), getHeight() - s);
+			return;
+		}
 		Rectangle bounds = getBounds();
 		Graphics2D g2 = (Graphics2D) g;
 		AffineTransform saveAt = g2.getTransform();
@@ -77,7 +90,7 @@ public class JPatchToolBar extends JToolBar {
 		final float l0 = yoff;
 		final float l1 = (float) Math.sqrt((width / 2) * (width / 2) + (yoff + height) * (yoff + height));
 		final Color c0 = new Color(0xe0e0e0);
-		final Color c1 = new Color(0x909090);
+		final Color c1 = new Color(0xa0a0a0);
 		for (int i = 0; i < n; i++) {
 			float xoff = width * (i + 0.5f) / n - width / 2.0f;
 			float len = (float) Math.sqrt(xoff * xoff + yoff * yoff);
@@ -89,6 +102,8 @@ public class JPatchToolBar extends JToolBar {
 			g2.fillRect(getParent().getWidth() * i / n, 0, getParent().getWidth() * (i + 1) / n - getParent().getWidth() * i / n, getParent().getHeight());
 		}
 		g2.setTransform(saveAt);
+		g.setColor(new Color(0x808080));
+		g.drawLine(0, bounds.height - 1, bounds.width - 1, bounds.height - 1);
 	}
 	
 	@SuppressWarnings("unchecked")

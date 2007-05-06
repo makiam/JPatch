@@ -1,4 +1,4 @@
-package sds;
+package com.jpatch.entity.sds;
 
 import java.io.*;
 import java.util.*;

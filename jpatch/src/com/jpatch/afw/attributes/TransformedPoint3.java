@@ -2,8 +2,12 @@ package com.jpatch.afw.attributes;
 
 public class TransformedPoint3 extends TransformedTuple3 {
 
-	public TransformedPoint3(DoubleAttr x, DoubleAttr y, DoubleAttr z, final boolean checkLimit) {
-		super(x, y, z, checkLimit);
+	public TransformedPoint3(DoubleAttr x, DoubleAttr y, DoubleAttr z) {
+		super(x, y, z);
+	}
+	
+	public TransformedPoint3(double x, double y, double z) {
+		super(x, y, z);
 	}
 	
 	@Override
