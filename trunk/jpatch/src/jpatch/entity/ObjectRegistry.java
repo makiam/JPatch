@@ -2,7 +2,7 @@ package jpatch.entity;
 
 import java.util.*;
 
-public class ObjectRegistry implements AttributeListener {
+public class ObjectRegistry implements AttributePostChangeListener {
 	private Map<Class, Map<String, AbstractNamedObject>> classNameMap = new HashMap<Class, Map<String, AbstractNamedObject>>();
 	private Map<Class, Map<AbstractNamedObject, String>> classObjectMap = new HashMap<Class, Map<AbstractNamedObject, String>>();
 	private Map<Attribute.String, AbstractNamedObject> attributeMap = new HashMap<Attribute.String, AbstractNamedObject>();

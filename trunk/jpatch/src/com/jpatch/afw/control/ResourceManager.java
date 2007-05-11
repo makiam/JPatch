@@ -71,12 +71,12 @@ public class ResourceManager {
 	
 	public void configureAction(JPatchAction action) {
 		String name = getString(action.getName());
-		action.getButtonText().setObject(name);
-		action.getMenuText().setObject(name);
-		action.getDisplayName().setObject(name);
+		action.getButtonText().setValue(name);
+		action.getMenuText().setValue(name);
+		action.getDisplayName().setValue(name);
 		URL url = ClassLoader.getSystemResource(Configuration.getInstance().getString("iconDir") + action.getName() + ".png");
 		if (url != null) {
-			action.icon.setObject(new ImageIcon(url));
+			action.icon.setValue(new ImageIcon(url));
 		}
 	}
 }

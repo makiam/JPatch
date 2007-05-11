@@ -1,11 +1,11 @@
 package com.jpatch.afw.ui;
 
+import com.jpatch.afw.attributes.Attribute;
+import com.jpatch.afw.attributes.AttributePostChangeListener;
+import com.jpatch.afw.control.SwitchStateAction;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import com.jpatch.afw.attributes.Attribute;
-import com.jpatch.afw.attributes.AttributeAdapter;
-import com.jpatch.afw.control.*;
 
 import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
@@ -30,8 +30,7 @@ public class JPatchStateButton extends JToggleButton implements JPatchButton {
 				}
 			}
 		});
-		jpatchAction.getStateMachine().addAttributeListener(new AttributeAdapter() {
-			@Override
+		jpatchAction.getStateMachine().addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				setSelected(jpatchAction.getStateMachine().getState() == jpatchAction.getState());
 			}

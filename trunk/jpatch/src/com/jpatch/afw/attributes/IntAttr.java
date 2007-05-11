@@ -22,4 +22,9 @@ public class IntAttr extends AbstractAttribute {
 		}
 		return this.value;
 	}
+	
+	@Override
+	public String toString() {
+		return Integer.toString(value);
+	}
 }

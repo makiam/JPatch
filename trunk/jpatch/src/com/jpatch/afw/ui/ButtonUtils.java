@@ -1,7 +1,7 @@
 package com.jpatch.afw.ui;
 
 import com.jpatch.afw.attributes.Attribute;
-import com.jpatch.afw.attributes.AttributeAdapter;
+import com.jpatch.afw.attributes.AttributePostChangeListener;
 import com.jpatch.afw.attributes.BooleanAttr;
 import com.jpatch.afw.control.JPatchAction;
 import com.jpatch.afw.icons.IconSet;
@@ -12,8 +12,6 @@ import java.io.ObjectInputStream;
 
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
-import javax.swing.plaf.ButtonUI;
-import javax.swing.plaf.metal.MetalButtonUI;
 
 
 public class ButtonUtils {
@@ -32,7 +30,7 @@ public class ButtonUtils {
 	
 	public void configureActionButton(JPatchActionButton button, Style style) {
 		JPatchAction action = button.getJPatchAction();
-		Icon icon = action.getIcon().getObject();
+		Icon icon = action.getIcon().getValue();
 		iconSet.configureButton(button, style, Type.ROUND, icon);
 	}
 	
@@ -40,7 +38,7 @@ public class ButtonUtils {
 		for (int i = 0; i < buttons.length; i++) {
 			final AbstractButton button = (AbstractButton) buttons[i];
 			JPatchAction action = buttons[i].getJPatchAction();
-			Icon icon = action.getIcon().getObject();
+			Icon icon = action.getIcon().getValue();
 			boolean first = i == 0;
 			boolean last = i == buttons.length - 1;
 			if (first && last) {
@@ -57,8 +55,7 @@ public class ButtonUtils {
 				iconSet.configureButton((AbstractButton) buttons[i], style, Type.CENTER, icon);
 			}
 			button.setEnabled(action.getEnabled().getBoolean());
-			action.getEnabled().addAttributeListener(new AttributeAdapter() {
-				@Override
+			action.getEnabled().addAttributePostChangeListener(new AttributePostChangeListener() {
 				public void attributeHasChanged(Attribute source) {
 					button.setEnabled(((BooleanAttr) source).getBoolean());
 				}

@@ -31,7 +31,7 @@ public class JPatchUndoManager extends AbstractAttribute {
 	
 	public String getUndoName() {
 		if (canUndo()) {
-			return undoStack.get(position - 1).name.getObject();
+			return undoStack.get(position - 1).name.getValue();
 		} else {
 			return ResourceManager.getInstance().getString("CANT_UNDO");
 		}
@@ -39,7 +39,7 @@ public class JPatchUndoManager extends AbstractAttribute {
 	
 	public String getRedoName() {
 		if (canRedo()) {
-			return undoStack.get(position).name.getObject();
+			return undoStack.get(position).name.getValue();
 		} else {
 			return ResourceManager.getInstance().getString("CANT_REDO");
 		}

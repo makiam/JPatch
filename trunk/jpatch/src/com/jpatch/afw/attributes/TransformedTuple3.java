@@ -11,8 +11,7 @@ public abstract class TransformedTuple3 extends Tuple3 {
 	protected boolean inverseInvalid = false;
 	protected boolean autoTransform = true;
 	
-	private final AttributeListener transformAttributeListener = new AttributeAdapter() {
-		@Override
+	private final AttributePostChangeListener transformAttributeListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
 			if (autoTransform) {
 				transform();
@@ -20,8 +19,7 @@ public abstract class TransformedTuple3 extends Tuple3 {
 		}
 	};
 	
-	private final AttributeListener invTransformAttributeListener = new AttributeAdapter() {
-		@Override
+	private final AttributePostChangeListener invTransformAttributeListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
 			if (autoTransform) {
 				invTransform();
@@ -44,12 +42,12 @@ public abstract class TransformedTuple3 extends Tuple3 {
 				autoTransform = true;
 			}
 		};
-		xAttr.addAttributeListener(invTransformAttributeListener);
-		yAttr.addAttributeListener(invTransformAttributeListener);
-		zAttr.addAttributeListener(invTransformAttributeListener);
-		referenceTuple.xAttr.addAttributeListener(transformAttributeListener);
-		referenceTuple.yAttr.addAttributeListener(transformAttributeListener);
-		referenceTuple.zAttr.addAttributeListener(transformAttributeListener);
+		xAttr.addAttributePostChangeListener(invTransformAttributeListener);
+		yAttr.addAttributePostChangeListener(invTransformAttributeListener);
+		zAttr.addAttributePostChangeListener(invTransformAttributeListener);
+		referenceTuple.xAttr.addAttributePostChangeListener(transformAttributeListener);
+		referenceTuple.yAttr.addAttributePostChangeListener(transformAttributeListener);
+		referenceTuple.zAttr.addAttributePostChangeListener(transformAttributeListener);
 	}
 	
 	@Override

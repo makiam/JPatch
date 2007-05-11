@@ -44,12 +44,12 @@ public abstract class Viewport {
 	
 	protected ViewDirection viewDirection;
 	
-	private AttributeListener focalLengthAttributeListener = new AttributeAdapter() {
+	private AttributePostChangeListener focalLengthAttributeListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute attribute) {
 //			fw = (float) camera.focalLength.get() / 35 * component.getWidth();
 		}
 	};
-	private AttributeListener updateAttributeListener = new AttributeAdapter() {
+	private AttributePostChangeListener updateAttributeListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute attribute) {
 			if (
 					attribute == viewTranslation.getXAttr() ||
@@ -78,14 +78,14 @@ public abstract class Viewport {
 //		viewType.setObject(viewDirection);
 		viewDirection.bindTo(this);
 //		viewType.addAttributeListener(updateAttributeListener);
-		showControlMesh.addAttributeListener(updateAttributeListener);
-		showLimitSurface.addAttributeListener(updateAttributeListener);
-		showProjectedMesh.addAttributeListener(updateAttributeListener);
-		viewTranslation.getXAttr().addAttributeListener(updateAttributeListener);
-		viewTranslation.getYAttr().addAttributeListener(updateAttributeListener);
-		viewRotation.getXAttr().addAttributeListener(updateAttributeListener);
-		viewRotation.getYAttr().addAttributeListener(updateAttributeListener);
-		viewScale.addAttributeListener(updateAttributeListener);
+		showControlMesh.addAttributePostChangeListener(updateAttributeListener);
+		showLimitSurface.addAttributePostChangeListener(updateAttributeListener);
+		showProjectedMesh.addAttributePostChangeListener(updateAttributeListener);
+		viewTranslation.getXAttr().addAttributePostChangeListener(updateAttributeListener);
+		viewTranslation.getYAttr().addAttributePostChangeListener(updateAttributeListener);
+		viewRotation.getXAttr().addAttributePostChangeListener(updateAttributeListener);
+		viewRotation.getYAttr().addAttributePostChangeListener(updateAttributeListener);
+		viewScale.addAttributePostChangeListener(updateAttributeListener);
 //		name.set("Viewport " + id);
 	}
 

@@ -12,11 +12,11 @@ public class GenericAttr<T> extends AbstractAttribute<T> {
 	}
 	
 	
-	public T getObject() {
+	public T getValue() {
 		return value;
 	}
 
-	public T setObject(T value) {
+	public T setValue(T value) {
 		if ((value == null && this.value != null) || (!value.equals(this.value))) {
 			this.value = fireAttributeWillChange(value);
 			fireAttributeHasChanged();

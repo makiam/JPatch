@@ -5,10 +5,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import jpatch.boundary.Main;
-import jpatch.boundary.Viewport;
-import jpatch.entity.ControlPoint;
-
 public class TranslateTool implements JPatchTool{
 	private MouseListener[] mouseListeners;
 	//private TriangleMesh cone = TriangleMesh.createCone();

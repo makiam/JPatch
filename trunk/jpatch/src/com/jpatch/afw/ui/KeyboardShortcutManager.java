@@ -76,14 +76,14 @@ public class KeyboardShortcutManager implements KeyEventPostProcessor {
 	}
 	
 	public void manageAction(JPatchAction action) {
-		KeyStroke keyStroke = action.getKeyboardShortcut().getObject();
+		KeyStroke keyStroke = action.getKeyboardShortcut().getValue();
 		if (keyStroke != null) {
 			keyMap.put(keyStroke, action);
 		}
 	}
 	
 	public void unmanageAction(JPatchAction action) {
-		KeyStroke keyStroke = action.getKeyboardShortcut().getObject();
+		KeyStroke keyStroke = action.getKeyboardShortcut().getValue();
 		if (keyStroke != null) {
 			keyMap.remove(keyStroke);
 		}

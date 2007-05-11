@@ -1,22 +1,21 @@
 package com.jpatch.afw.attributes;
 
-public class AttributeAdapter<T> implements AttributeListener<T> {
-
-	public void attributeHasChanged(Attribute source) { }
+public class AttributePreChangeAdapter<T> implements AttributePreChangeListener<T> {
 
 	public boolean attributeWillChange(Attribute source, boolean value) {
-		return value;
+		throw new UnsupportedOperationException();
 	}
 
 	public int attributeWillChange(Attribute source, int value) {
-		return value;
+		throw new UnsupportedOperationException();
 	}
-	
+
 	public double attributeWillChange(Attribute source, double value) {
-		return value;
+		throw new UnsupportedOperationException();
 	}
-	
+
 	public T attributeWillChange(Attribute source, T value) {
-		return value;
+		throw new UnsupportedOperationException();
 	}
+
 }

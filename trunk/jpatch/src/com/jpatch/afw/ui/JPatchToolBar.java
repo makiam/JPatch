@@ -133,7 +133,7 @@ public class JPatchToolBar extends JToolBar {
 //			System.out.print(component.getClass().getName() + "@" + System.identityHashCode(component) + " ");
 			if (component instanceof JPatchButton) {
 				JPatchButton button = (JPatchButton) component;
-				String text = button.getJPatchAction().getButtonText().getObject();
+				String text = button.getJPatchAction().getButtonText().getValue();
 				if (text != null) {
 //					System.out.print(text + " ");
 					enabledToolTip = ImageUtils.createShadowIcon(ImageUtils.createTextIcon(textFont, textColor, text));
