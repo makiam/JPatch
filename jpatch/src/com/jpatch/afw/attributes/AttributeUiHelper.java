@@ -206,8 +206,7 @@ public class AttributeUiHelper {
 		});
 		
 		/* create a AttributeListener to update the CheckBox if the attribute changes */
-		final AttributeListener attributeListener = new AttributeAdapter() {
-			@Override
+		final AttributePostChangeListener attributeListener = new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute attr) {
 				checkBox.setSelected(a.getBoolean());
 			}
@@ -218,9 +217,9 @@ public class AttributeUiHelper {
 			public void hierarchyChanged(HierarchyEvent e) {
 				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
 					if (checkBox.isShowing())
-						a.addAttributeListener(attributeListener);
+						a.addAttributePostChangeListener(attributeListener);
 					else
-						a.removeAttributeListener(attributeListener);
+						a.removeAttributePostChangeListener(attributeListener);
 				}
 			}
 		});
@@ -246,7 +245,7 @@ public class AttributeUiHelper {
 			textField.setText(DOUBLE_FORMAT.format(((DoubleAttr) attribute).getDouble()));
 			textField.setHorizontalAlignment(SwingConstants.RIGHT);
 		} else if (attribute instanceof GenericAttr) {
-			textField.setText((String) ((GenericAttr) attribute).getObject());
+			textField.setText((String) ((GenericAttr) attribute).getValue());
 		} else {
 			throw new IllegalStateException(attribute.toString());
 		}
@@ -301,8 +300,7 @@ public class AttributeUiHelper {
 		});
 		
 		/* create a AttributeListener to update the textField if the attribute changes */
-		final AttributeListener attributeListener = new AttributeAdapter() {
-			@Override
+		final AttributePostChangeListener attributeListener = new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute a) {
 				setTextFieldValue(textField, attribute);
 			}
@@ -313,9 +311,9 @@ public class AttributeUiHelper {
 			public void hierarchyChanged(HierarchyEvent e) {
 				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
 					if (textField.isShowing()) {
-						attribute.addAttributeListener(attributeListener);
+						attribute.addAttributePostChangeListener(attributeListener);
 					} else {
-						attribute.removeAttributeListener(attributeListener);
+						attribute.removeAttributePostChangeListener(attributeListener);
 					}
 				}
 			}
@@ -335,8 +333,7 @@ public class AttributeUiHelper {
 		});
 		
 		/* create a AttributeListener to update the CheckBox if the attribute changes */
-		final AttributeListener attributeListener = new AttributeAdapter() {
-			@Override
+		final AttributePostChangeListener attributeListener = new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute a) {
 				comboBox.setSelectedItem(stateMachine.getState());
 			}
@@ -347,9 +344,9 @@ public class AttributeUiHelper {
 			public void hierarchyChanged(HierarchyEvent e) {
 				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
 					if (comboBox.isShowing()) {
-						stateMachine.addAttributeListener(attributeListener);
+						stateMachine.addAttributePostChangeListener(attributeListener);
 					} else {
-						stateMachine.removeAttributeListener(attributeListener);
+						stateMachine.removeAttributePostChangeListener(attributeListener);
 					}
 				}
 			}
@@ -409,7 +406,7 @@ public class AttributeUiHelper {
 		} else if (attribute instanceof DoubleAttr) {
 			textField.setText(DOUBLE_FORMAT.format(((DoubleAttr) attribute).getDouble()));
 		} else if (attribute instanceof GenericAttr) {
-			textField.setText((String) ((GenericAttr) attribute).getObject());
+			textField.setText((String) ((GenericAttr) attribute).getValue());
 		} else {
 			throw new IllegalArgumentException();
 		}

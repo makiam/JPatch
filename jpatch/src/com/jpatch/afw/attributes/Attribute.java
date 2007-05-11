@@ -1,6 +1,8 @@
 package com.jpatch.afw.attributes;
 
 public interface Attribute {
-	public void addAttributeListener(AttributeListener attributeListener);
-	public void removeAttributeListener(AttributeListener attributeListener);
+	public void addAttributePreChangeListener(AttributePreChangeListener listener);
+	public void addAttributePostChangeListener(AttributePostChangeListener listener);
+	public void removeAttributePreChangeListener(AttributePreChangeListener listener);
+	public void removeAttributePostChangeListener(AttributePostChangeListener listener);
 }

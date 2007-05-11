@@ -9,11 +9,7 @@ public class HardBoundedDoubleAttr extends DoubleAttr {
 	}
 	
 	public HardBoundedDoubleAttr(double min, double max, double value) {
-		this(min, max, value, new IdentityMapping());
-	}
-	
-	public HardBoundedDoubleAttr(double min, double max, double value, Mapping mapping) {
-		super(value, mapping);
+		super(value);
 		if (min > max) {
 			throw new IllegalArgumentException("min (" + min + ") > max (" + max + ")");
 		}

@@ -1,59 +1,138 @@
 package com.jpatch.afw.attributes;
 
 public abstract class AbstractAttribute<T> implements Attribute{
-	protected AttributeListener<T>[] attributeListeners = new AttributeListener[0];
+	/**
+	 * An array holding the AttributePreChangeListeners of this AbstractAttributes.
+	 * Can be null (i.e. will be set to null if the list is empty)
+	 */
+	protected AttributePreChangeListener<T>[] attributePreChangeListeners = null;
+	/**
+	 * An array holding the AttributePostChangeListener of this AbstractAttributes.
+	 * Can be null (i.e. will be set to null if the list is empty)
+	 */
+	protected AttributePostChangeListener<T>[] attributePostChangeListeners = null;
+	/**
+	 * Whether or not to fire "attributeHasChanged" events (post-change-notifications)
+	 */
 	protected boolean fireEvents = true;
 	
 	/**
-     * Adds a AttributeListener to this attribute.
+     * Adds an AttributePreChangeListener to this attribute.
      *
-     * @param l the AttributeListener to add
-     * @see #fireAttributeChanged
-     * @see #removeAttributeListener
+     * @param l the AttributePreChangeListener to add
+     * @see #removeAttributePreChangeListener
+     * @throws NullPointerException if the specified argument is null
+     * @throws IllegalArgumentException if the specified AttributePreChangeListener has already been added to this AbstractAttribute
      */
-    public void addAttributeListener(AttributeListener l) {
+    public void addAttributePreChangeListener(AttributePreChangeListener l) {
     	if (l == null) {
     		throw new NullPointerException();
     	}
-		for (AttributeListener al : attributeListeners) {
-			if (al == l) {
-				throw new IllegalArgumentException("AttributeListener " + l + " has already been added to " + this);
-			}
+    	if (attributePreChangeListeners != null) {
+    		for (AttributePreChangeListener al : attributePreChangeListeners) {
+    			if (al == l) {
+    				throw new IllegalArgumentException(l + " has already been added to " + this);
+    			}
+    		}
 		}
-    	int i = attributeListeners.length;
-    	AttributeListener[] tmp = new AttributeListener[i + 1];
- 	    System.arraycopy(attributeListeners, 0, tmp, 0, i);
+    	int i = attributePreChangeListeners == null ? 0 : attributePreChangeListeners.length;
+    	AttributePreChangeListener[] tmp = new AttributePreChangeListener[i + 1];
+    	if (i > 0) {
+    		System.arraycopy(attributePreChangeListeners, 0, tmp, 0, i);
+    	}
  	    tmp[i] = l;
- 	    attributeListeners = tmp;
+ 	    attributePreChangeListeners = tmp;
     }
     
     /**
-     * Removes a AttributeListener from this attribute.
+     * Adds an addAttributePostChangeListener to this attribute.
      *
-     * @param l the AttributeListener to remove
-     * @see #fireAttributeChanged
-     * @see #addAttributeListener
+     * @param l the addAttributePostChangeListener to add
+     * @see #removeAttributePostChangeListener
+     * @throws NullPointerException if the specified argument is null
+     * @throws IllegalArgumentException if the specified addAttributePostChangeListener has already been added to this AbstractAttribute
      */
-    public void removeAttributeListener(AttributeListener l) {
+    public void addAttributePostChangeListener(AttributePostChangeListener l) {
+    	if (l == null) {
+    		throw new NullPointerException();
+    	}
+    	if (attributePostChangeListeners != null) {
+    		for (AttributePostChangeListener al : attributePostChangeListeners) {
+    			if (al == l) {
+    				throw new IllegalArgumentException(l + " has already been added to " + this);
+    			}
+    		}
+		}
+    	int i = attributePostChangeListeners == null ? 0 : attributePostChangeListeners.length;
+    	AttributePostChangeListener[] tmp = new AttributePostChangeListener[i + 1];
+    	if (i > 0) {
+    		System.arraycopy(attributePostChangeListeners, 0, tmp, 0, i);
+    	}
+ 	    tmp[i] = l;
+ 	    attributePostChangeListeners = tmp;
+    }
+    
+    /**
+     * Removes an AttributePreChangeListener from this attribute.
+     * If the specified AttributePreChangeListener is not on the listener-list of this AbstractAttribute
+     * calling this method has no effect whatsoever.
+     * @param l the AttributePreChangeListener to remove
+     * @see #addAttributePreChangeListener
+     */
+    public void removeAttributePreChangeListener(AttributePreChangeListener l) {
+    	if (attributePreChangeListeners == null) {
+    		return; 								// listener list is empty, ignore silently and return
+    	}
+    	if (attributePreChangeListeners.length == 1 && attributePreChangeListeners[0] == l) {
+    		attributePreChangeListeners = null;		// the last listener is being removed, set list to null
+    	}
     	int i = 0;
-    	while (i < attributeListeners.length && attributeListeners[i] != l) {
+    	while (i < attributePreChangeListeners.length && attributePreChangeListeners[i] != l) {
     		i++;
     	}
-    	if (i < attributeListeners.length) {
-    		AttributeListener[] tmp = new AttributeListener[attributeListeners.length - 1];
+    	if (i < attributePreChangeListeners.length) {
+    		AttributePreChangeListener[] tmp = new AttributePreChangeListener[attributePreChangeListeners.length - 1];
     	    // Copy the list up to i
-    	    System.arraycopy(attributeListeners, 0, tmp, 0, i);
+    	    System.arraycopy(attributePreChangeListeners, 0, tmp, 0, i);
     	    // Copy from one past the index, up to
     	    // the end of tmp (which is one element
     	    // shorter than the old list)
     	    if (i < tmp.length)
-    	    	System.arraycopy(attributeListeners, i + 1, tmp, i, tmp.length - i);
+    	    	System.arraycopy(attributePreChangeListeners, i + 1, tmp, i, tmp.length - i);
     	    // set the listener array to the new array
-    	    attributeListeners = tmp;
-    	} else {
-    		if (l == null) {
-    			throw new NullPointerException();
-    		}
+    	    attributePreChangeListeners = tmp;
+    	}
+    }
+    
+    /**
+     * Removes an AttributePostChangeListener from this attribute.
+     * If the specified AttributePostChangeListener is not on the listener-list of this AbstractAttribute
+     * calling this method has no effect whatsoever.
+     * @param l the AttributePostChangeListener to remove
+     * @see #addAttributePostChangeListener
+     */
+    public void removeAttributePostChangeListener(AttributePostChangeListener l) {
+    	if (attributePostChangeListeners == null) {
+    		return; 								// listener list is empty, ignore silently and return
+    	}
+    	if (attributePostChangeListeners.length == 1 && attributePostChangeListeners[0] == l) {
+    		attributePostChangeListeners = null;		// the last listener is being removed, set list to null
+    	}
+    	int i = 0;
+    	while (i < attributePostChangeListeners.length && attributePostChangeListeners[i] != l) {
+    		i++;
+    	}
+    	if (i < attributePostChangeListeners.length) {
+    		AttributePostChangeListener[] tmp = new AttributePostChangeListener[attributePostChangeListeners.length - 1];
+    	    // Copy the list up to i
+    	    System.arraycopy(attributePostChangeListeners, 0, tmp, 0, i);
+    	    // Copy from one past the index, up to
+    	    // the end of tmp (which is one element
+    	    // shorter than the old list)
+    	    if (i < tmp.length)
+    	    	System.arraycopy(attributePostChangeListeners, i + 1, tmp, i, tmp.length - i);
+    	    // set the listener array to the new array
+    	    attributePostChangeListeners = tmp;
     	}
     }
     
@@ -62,38 +141,47 @@ public abstract class AbstractAttribute<T> implements Attribute{
     }
     
     protected boolean fireAttributeWillChange(boolean value) {
-    	for (int i = attributeListeners.length - 1; i >= 0; i--) {
-	    	value = attributeListeners[i].attributeWillChange(this, value);
+    	if (attributePreChangeListeners != null) {
+    		for (int i = 0; i < attributePreChangeListeners.length; i++) {
+    			value = attributePreChangeListeners[i].attributeWillChange(this, value);
+    		}
     	}
     	return value;
     }
     
     protected int fireAttributeWillChange(int value) {
-    	for (int i = attributeListeners.length - 1; i >= 0; i--) {
-	    	value = attributeListeners[i].attributeWillChange(this, value);
+    	if (attributePreChangeListeners != null) {
+    		for (int i = 0; i < attributePreChangeListeners.length; i++) {
+    			value = attributePreChangeListeners[i].attributeWillChange(this, value);
+    		}
     	}
     	return value;
     }
     
+    
     protected double fireAttributeWillChange(double value) {
-    	for (int i = attributeListeners.length - 1; i >= 0; i--) {
-	    	value = attributeListeners[i].attributeWillChange(this, value);
+    	if (attributePreChangeListeners != null) {
+    		for (int i = 0; i < attributePreChangeListeners.length; i++) {
+    			value = attributePreChangeListeners[i].attributeWillChange(this, value);
+    		}
     	}
     	return value;
     }
     
     protected T fireAttributeWillChange(T value) {
-    	for (int i = attributeListeners.length - 1; i >= 0; i--) {
-	    	value = attributeListeners[i].attributeWillChange(this, value);
+    	if (attributePreChangeListeners != null) {
+    		for (int i = 0; i < attributePreChangeListeners.length; i++) {
+    			value = attributePreChangeListeners[i].attributeWillChange(this, value);
+    		}
     	}
     	return value;
     }
     
     protected void fireAttributeHasChanged() {
-    	if (fireEvents) {
+    	if (fireEvents && attributePostChangeListeners != null) {
     		fireEvents = false;
-	    	for (int i = attributeListeners.length - 1; i >= 0; i--) {
-		      	attributeListeners[i].attributeHasChanged(this);
+	    	for (int i = 0; i < attributePostChangeListeners.length; i++) {
+	    		attributePostChangeListeners[i].attributeHasChanged(this);
 		    }
 	    	fireEvents = true;
     	}

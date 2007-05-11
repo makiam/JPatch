@@ -152,7 +152,7 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 				Component parent;
 				for (parent = box; parent.getParent() != null; parent = parent.getParent());
 				if (fileChooser.showDialog(parent, approveButtonText) == JFileChooser.APPROVE_OPTION) {
-					attribute.setObject(fileChooser.getSelectedFile());
+					attribute.setValue(fileChooser.getSelectedFile());
 				}
 			}
 		});

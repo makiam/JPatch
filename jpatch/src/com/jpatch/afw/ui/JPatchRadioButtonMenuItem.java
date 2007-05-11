@@ -1,7 +1,7 @@
 package com.jpatch.afw.ui;
 
 import com.jpatch.afw.attributes.Attribute;
-import com.jpatch.afw.attributes.AttributeAdapter;
+import com.jpatch.afw.attributes.AttributePostChangeListener;
 import com.jpatch.afw.control.SwitchStateAction;
 
 import javax.swing.JRadioButtonMenuItem;
@@ -16,7 +16,7 @@ public final class JPatchRadioButtonMenuItem extends JRadioButtonMenuItem {
 		menuIcon = new MenuIcon(this);
 		setIcon(menuIcon);
 		setSelected(action.isSelected());
-		action.getStateMachine().addAttributeListener(new AttributeAdapter() {
+		action.getStateMachine().addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				setSelected(JPatchRadioButtonMenuItem.this.action.isSelected());
 			}

@@ -1,7 +1,7 @@
 package com.jpatch.test;
 
 import com.jpatch.afw.attributes.Attribute;
-import com.jpatch.afw.attributes.AttributeAdapter;
+import com.jpatch.afw.attributes.AttributePreChangeAdapter;
 import com.jpatch.afw.attributes.StateMachine;
 import com.jpatch.afw.control.Configuration;
 import com.jpatch.afw.icons.IconSet;
@@ -99,7 +99,7 @@ public class Test {
 		
 		frame.setSize(1024, 768);
 		frame.setVisible(true);
-		actions.toolSM.addAttributeListener(new AttributeAdapter() {
+		actions.toolSM.addAttributeListener(new AttributePreChangeAdapter() {
 
 			@Override
 			public void attributeHasChanged(Attribute source) {

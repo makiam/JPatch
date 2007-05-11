@@ -47,8 +47,8 @@ class MenuIcon implements Icon {
 				action = ((JPatchRadioButtonMenuItem) menuItem).getJPatchAction();
 			}
 			if (action != null) {
-				menuText.setText(action.getMenuText().getObject());
-				menuAccelerator.setText(PlatformUtils.getAcceleratorString(action.getKeyboardShortcut().getObject()));
+				menuText.setText(action.getMenuText().getValue());
+				menuAccelerator.setText(PlatformUtils.getAcceleratorString(action.getKeyboardShortcut().getValue()));
 			}
 		}
 		Font font = UIManager.getFont("MenuItem.font");

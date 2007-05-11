@@ -6,8 +6,7 @@ public class SoftBoundedDoubleAttr extends DoubleAttr {
 	private final BooleanAttr minLimitAttr;
 	private final BooleanAttr maxLimitAttr;
 	
-	private final AttributeListener attributeListener = new AttributeAdapter() {
-		@Override
+	private final AttributePostChangeListener attributeListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
 			setDouble(value);
 		}
@@ -18,11 +17,7 @@ public class SoftBoundedDoubleAttr extends DoubleAttr {
 	}
 	
 	public SoftBoundedDoubleAttr(double min, double max, double value) {
-		this(min, max, value, new IdentityMapping());
-	}
-	
-	public SoftBoundedDoubleAttr(double min, double max, double value, Mapping mapping) {
-		super(value, mapping);
+		super(value);
 		if (min > max) {
 			throw new IllegalArgumentException("min (" + min + ") > max (" + max + ")");
 		}
@@ -33,10 +28,10 @@ public class SoftBoundedDoubleAttr extends DoubleAttr {
 		maxAttr = new DoubleAttr(max);
 		minLimitAttr = new BooleanAttr(false);
 		maxLimitAttr = new BooleanAttr(false);
-		minAttr.addAttributeListener(attributeListener);
-		maxAttr.addAttributeListener(attributeListener);
-		minLimitAttr.addAttributeListener(attributeListener);
-		maxLimitAttr.addAttributeListener(attributeListener);
+		minAttr.addAttributePostChangeListener(attributeListener);
+		maxAttr.addAttributePostChangeListener(attributeListener);
+		minLimitAttr.addAttributePostChangeListener(attributeListener);
+		maxLimitAttr.addAttributePostChangeListener(attributeListener);
 	}
 	
 	public double getMin() {

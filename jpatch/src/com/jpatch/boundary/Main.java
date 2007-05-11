@@ -307,8 +307,7 @@ public class Main {
 		 * Add a listener to the viewport switcher state-machine to relayout the
 		 * screen when the viewport mode has changed
 		 */
-		actions.viewportModeSM.addAttributeListener(new AttributeAdapter() {
-			@Override
+		actions.viewportModeSM.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				screen.doLayout();
 			}
@@ -349,12 +348,7 @@ public class Main {
 		frame.setLayout(new BorderLayout());
 		frame.add(statusBar, BorderLayout.SOUTH);
 		
-		actions.toolSM.addAttributeListener(new AttributeAdapter() {
-			@Override
-			public void attributeHasChanged(Attribute source) {
-				StateMachine<JPatchTool> sm = (StateMachine<JPatchTool>) source;
-				sm.getState().registerListeners(viewports);
-			}
+		actions.toolSM.addAttributePreChangeListener(new AttributePreChangeAdapter() {
 			@Override
 			public Object attributeWillChange(Attribute source, Object value) {
 				StateMachine<JPatchTool> sm = (StateMachine<JPatchTool>) source;
@@ -362,6 +356,13 @@ public class Main {
 				return value;
 			}
 		});
+		actions.toolSM.addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				StateMachine<JPatchTool> sm = (StateMachine<JPatchTool>) source;
+				sm.getState().registerListeners(viewports);
+			}
+		});
+		
 		actions.toolSM.getState().registerListeners(viewports);
 		
 		JPatchToolBar toolBar = new JPatchToolBar();

@@ -69,8 +69,7 @@ public class Actions {
 		 */
 		undo.getEnabled().setBoolean(undoManager.canUndo());
 		redo.getEnabled().setBoolean(undoManager.canRedo());
-		undoManager.addAttributeListener(new AttributeAdapter() {
-			@Override
+		undoManager.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				undo.getEnabled().setBoolean(undoManager.canUndo());
 				redo.getEnabled().setBoolean(undoManager.canRedo());

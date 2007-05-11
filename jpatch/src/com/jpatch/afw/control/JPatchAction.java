@@ -1,10 +1,15 @@
 package com.jpatch.afw.control;
 
 
-import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.attributes.Attribute;
+import com.jpatch.afw.attributes.AttributePostChangeListener;
+import com.jpatch.afw.attributes.AttributePreChangeAdapter;
+import com.jpatch.afw.attributes.BooleanAttr;
+import com.jpatch.afw.attributes.GenericAttr;
 import com.jpatch.afw.ui.KeyboardShortcutManager;
 
 import java.awt.event.ActionListener;
+
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
 
@@ -28,15 +33,16 @@ public abstract class JPatchAction implements ActionListener {
 	public JPatchAction(JPatchUndoManager undoManager, String name) {
 		this.undoManager = undoManager;
 		this.name = name;
-		keyboardShortcut.addAttributeListener(new AttributeAdapter<String>() {
-			@Override
-			public void attributeHasChanged(Attribute source) {
-				KeyboardShortcutManager.getInstance().manageAction(JPatchAction.this);
-			}
+		keyboardShortcut.addAttributePreChangeListener(new AttributePreChangeAdapter<String>() {
 			@Override
 			public String attributeWillChange(Attribute source, String value) {
 				KeyboardShortcutManager.getInstance().unmanageAction(JPatchAction.this);
 				return value;
+			}
+		});
+		keyboardShortcut.addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				KeyboardShortcutManager.getInstance().manageAction(JPatchAction.this);
 			}
 		});
 		ResourceManager.getInstance().configureAction(this);
@@ -44,13 +50,13 @@ public abstract class JPatchAction implements ActionListener {
 
 	public JPatchAction(JPatchUndoManager undoManager, String name, String text) {
 		this(undoManager, name);
-		this.buttonText.setObject(text);
-		this.menuText.setObject(text);
+		this.buttonText.setValue(text);
+		this.menuText.setValue(text);
 	}
 	
 	public JPatchAction(JPatchUndoManager undoManager, String name, String text, Icon icon, boolean useMenuIcon) {
 		this(undoManager, name, text);
-		this.icon.setObject(icon);
+		this.icon.setValue(icon);
 		this.useMenuIcon.setBoolean(useMenuIcon);
 	}
 	

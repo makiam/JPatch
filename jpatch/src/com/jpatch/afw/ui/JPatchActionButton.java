@@ -1,7 +1,7 @@
 package com.jpatch.afw.ui;
 
 import com.jpatch.afw.attributes.Attribute;
-import com.jpatch.afw.attributes.AttributeAdapter;
+import com.jpatch.afw.attributes.AttributePostChangeListener;
 import com.jpatch.afw.attributes.BooleanAttr;
 import com.jpatch.afw.control.JPatchAction;
 import javax.swing.JButton;
@@ -11,8 +11,7 @@ public class JPatchActionButton extends JButton implements JPatchButton {
 	
 	public JPatchActionButton(JPatchAction action) {
 		this.jpatchAction = action;
-		action.getEnabled().addAttributeListener(new AttributeAdapter() {
-			@Override
+		action.getEnabled().addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				setEnabled(((BooleanAttr) source).getBoolean());
 			}

@@ -1,8 +1,8 @@
 package com.jpatch.afw.icons;
 
 import com.jpatch.afw.attributes.Attribute;
-import com.jpatch.afw.attributes.AttributeAdapter;
-import com.jpatch.afw.attributes.AttributeListener;
+import com.jpatch.afw.attributes.AttributePreChangeAdapter;
+import com.jpatch.afw.attributes.AttributePostChangeListener;
 import com.jpatch.afw.attributes.StateMachine;
 import com.jpatch.afw.ui.*;
 import com.jpatch.ui.ViewportSwitcher;
@@ -164,7 +164,7 @@ public class ImageGenerator {
 		iconSet.configureButton(b16, Style.FROSTED, Type.SINGLE, i16);
 		
 		StateMachine<ViewportSwitcher.Mode> sm = new StateMachine<ViewportSwitcher.Mode>(ViewportSwitcher.Mode.class, ViewportSwitcher.Mode.VIEWPORT_1);
-		sm.addAttributeListener(new AttributeAdapter() {
+		sm.addAttributeListener(new AttributePreChangeAdapter() {
 			public void attributeHasChanged(Attribute source) {
 				System.out.println(((StateMachine) source).getState());
 			}
