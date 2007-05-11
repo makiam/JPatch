@@ -1,6 +1,14 @@
 package com.jpatch.afw.attributes;
 
-public class AttributePreChangeAdapter<T> implements AttributePreChangeListener<T> {
+/**
+ * An abstract implementation of AttributePreChangeListener.
+ * To avoid programming errors, all methods throw an UnsupportedOperationException().
+ * 
+ * @author sascha
+ *
+ * @param <T> the object class if the listener is intended to be used for GenericAttr attribtues.
+ */
+public abstract class AttributePreChangeAdapter<T> implements AttributePreChangeListener<T> {
 
 	public boolean attributeWillChange(Attribute source, boolean value) {
 		throw new UnsupportedOperationException();
