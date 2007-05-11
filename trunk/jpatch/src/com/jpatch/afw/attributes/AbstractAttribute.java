@@ -1,5 +1,14 @@
 package com.jpatch.afw.attributes;
 
+/**
+ * The base class for all Attributes in this package.
+ * It provides a full implementation of the <i>Attribute</i> interface, manages
+ * the listener lists and provides methods to fire event notifications.
+ * 
+ * @author sascha
+ *
+ * @param <T>
+ */
 public abstract class AbstractAttribute<T> implements Attribute{
 	/**
 	 * An array holding the AttributePreChangeListeners of this AbstractAttributes.
@@ -136,10 +145,22 @@ public abstract class AbstractAttribute<T> implements Attribute{
     	}
     }
     
+    /**
+     * Toggles suppression of change notifications
+     * @param suppress true to suppression, false otherwise
+     */
     public void suppressChangeNotification(boolean suppress) {
     	fireEvents = !suppress;
     }
     
+    /**
+     * Calls the attributeWillChange method of each registered attributePreChangeListener,
+     * starting with the specified value. The value returned by the first listener is used
+     * when calling the attributeWillChange method of the second listener, and so on.
+     * Finally this method returnes the value returned by the last listener.
+     * @param value the value this Attribute is about to change to.
+     * @return the value after all registered attributePreChangeListener have been asked for veto.
+     */
     protected boolean fireAttributeWillChange(boolean value) {
     	if (attributePreChangeListeners != null) {
     		for (int i = 0; i < attributePreChangeListeners.length; i++) {
@@ -149,6 +170,14 @@ public abstract class AbstractAttribute<T> implements Attribute{
     	return value;
     }
     
+    /**
+     * Calls the attributeWillChange method of each registered attributePreChangeListener,
+     * starting with the specified value. The value returned by the first listener is used
+     * when calling the attributeWillChange method of the second listener, and so on.
+     * Finally this method returnes the value returned by the last listener.
+     * @param value the value this Attribute is about to change to.
+     * @return the value after all registered attributePreChangeListener have been asked for veto.
+     */
     protected int fireAttributeWillChange(int value) {
     	if (attributePreChangeListeners != null) {
     		for (int i = 0; i < attributePreChangeListeners.length; i++) {
@@ -158,7 +187,14 @@ public abstract class AbstractAttribute<T> implements Attribute{
     	return value;
     }
     
-    
+    /**
+     * Calls the attributeWillChange method of each registered attributePreChangeListener,
+     * starting with the specified value. The value returned by the first listener is used
+     * when calling the attributeWillChange method of the second listener, and so on.
+     * Finally this method returnes the value returned by the last listener.
+     * @param value the value this Attribute is about to change to.
+     * @return the value after all registered attributePreChangeListener have been asked for veto.
+     */
     protected double fireAttributeWillChange(double value) {
     	if (attributePreChangeListeners != null) {
     		for (int i = 0; i < attributePreChangeListeners.length; i++) {
@@ -168,6 +204,14 @@ public abstract class AbstractAttribute<T> implements Attribute{
     	return value;
     }
     
+    /**
+     * Calls the attributeWillChange method of each registered attributePreChangeListener,
+     * starting with the specified value. The value returned by the first listener is used
+     * when calling the attributeWillChange method of the second listener, and so on.
+     * Finally this method returnes the value returned by the last listener.
+     * @param value the value this Attribute is about to change to.
+     * @return the value after all registered attributePreChangeListener have been asked for veto.
+     */
     protected T fireAttributeWillChange(T value) {
     	if (attributePreChangeListeners != null) {
     		for (int i = 0; i < attributePreChangeListeners.length; i++) {
@@ -177,6 +221,9 @@ public abstract class AbstractAttribute<T> implements Attribute{
     	return value;
     }
     
+    /**
+     * Calls the attributeHasChanged method of each registered attributePostChangeListener.
+     */
     protected void fireAttributeHasChanged() {
     	if (fireEvents && attributePostChangeListeners != null) {
     		fireEvents = false;
