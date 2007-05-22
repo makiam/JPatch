@@ -2,9 +2,14 @@ package com.jpatch.afw.attributes;
 
 import javax.vecmath.*;
 
-public class Tuple2 {
+public class Tuple2 extends AbstractAttribute<Tuple2d> {
 	protected final DoubleAttr xAttr;
 	protected final DoubleAttr yAttr;
+	private final AttributePostChangeListener listener = new AttributePostChangeListener() {
+		public void attributeHasChanged(Attribute source) {
+			fireAttributeHasChanged();
+		}
+	};
 	
 	public Tuple2() {
 		this(new DoubleAttr(), new DoubleAttr());
@@ -17,6 +22,8 @@ public class Tuple2 {
 	public Tuple2(DoubleAttr x, DoubleAttr y) {
 		xAttr = x;
 		yAttr = y;
+		xAttr.addAttributePostChangeListener(listener);
+		yAttr.addAttributePostChangeListener(listener);
 	}
 	
 	public DoubleAttr getXAttr() {
@@ -66,7 +73,14 @@ public class Tuple2 {
 	}
 	
 	public void setTuple(double x, double y) {
+		double oldX = xAttr.getDouble();
+		double oldY = yAttr.getDouble();
+		fireEvents = false;													// prevent event notification
 		xAttr.setDouble(x);
 		yAttr.setDouble(y);
+		fireEvents = true;													// enable event notification
+		if (xAttr.getDouble() != oldX || yAttr.getDouble() != oldY) {		// only if one of the component values actually has changed
+			fireAttributeHasChanged();										// fire events
+		}
 	}
 }
