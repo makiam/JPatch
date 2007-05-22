@@ -2,10 +2,15 @@ package com.jpatch.afw.attributes;
 
 import javax.vecmath.*;
 
-public class Tuple3 {
+public class Tuple3 extends AbstractAttribute<Tuple3d> {
 	protected final DoubleAttr xAttr;
 	protected final DoubleAttr yAttr;
 	protected final DoubleAttr zAttr;
+	private final AttributePostChangeListener listener = new AttributePostChangeListener() {
+		public void attributeHasChanged(Attribute source) {
+			fireAttributeHasChanged();
+		}
+	};
 	
 	public Tuple3() {
 		this(new DoubleAttr(), new DoubleAttr(), new DoubleAttr());
@@ -19,6 +24,9 @@ public class Tuple3 {
 		xAttr = x;
 		yAttr = y;
 		zAttr = z;
+		xAttr.addAttributePostChangeListener(listener);
+		yAttr.addAttributePostChangeListener(listener);
+		zAttr.addAttributePostChangeListener(listener);
 	}
 	
 	public DoubleAttr getXAttr() {
@@ -70,9 +78,17 @@ public class Tuple3 {
 	}
 	
 	public void setTuple(double x, double y, double z) {
+		double oldX = xAttr.getDouble();
+		double oldY = yAttr.getDouble();
+		double oldZ = zAttr.getDouble();
+		fireEvents = false;													// prevent event notification
 		xAttr.setDouble(x);
 		yAttr.setDouble(y);
 		zAttr.setDouble(z);
+		fireEvents = true;													// enable event notification
+		if (xAttr.getDouble() != oldX || yAttr.getDouble() != oldY || zAttr.getDouble() != oldZ) {		// only if one of the component values actually has changed
+			fireAttributeHasChanged();										// fire events
+		}
 	}
 	
 	@Override
