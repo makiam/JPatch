@@ -22,8 +22,8 @@ public abstract class Viewport {
 	};
 	
 //	final ArrayAttr<ViewDirection> viewType = new ArrayAttr<ViewDirection>(standardViewDirections);
-	final Tuple2 viewRotation = new Tuple2(0, 0);
-	final Tuple2 viewTranslation = new Tuple2(0, 0);
+	final Tuple2Attr viewRotation = new Tuple2Attr(0, 0);
+	final Tuple2Attr viewTranslation = new Tuple2Attr(0, 0);
 	final DoubleAttr viewScale = new DoubleAttr(1);
 	final BooleanAttr showControlMesh = new BooleanAttr(true);
 	final BooleanAttr showLimitSurface = new BooleanAttr(true);
@@ -103,7 +103,7 @@ public abstract class Viewport {
 		return showProjectedMesh;
 	}
 
-	public Tuple2 getViewRotation() {
+	public Tuple2Attr getViewRotation() {
 		return viewRotation;
 	}
 
@@ -111,7 +111,7 @@ public abstract class Viewport {
 		return viewScale;
 	}
 
-	public Tuple2 getViewTranslation() {
+	public Tuple2Attr getViewTranslation() {
 		return viewTranslation;
 	}
 

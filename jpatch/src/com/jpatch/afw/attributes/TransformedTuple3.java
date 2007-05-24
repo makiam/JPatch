@@ -4,8 +4,8 @@ import javax.vecmath.*;
 
 import jpatch.entity.Constants;
 
-public abstract class TransformedTuple3 extends Tuple3 {
-	protected final Tuple3 referenceTuple;
+public abstract class TransformedTuple3 extends Tuple3Attr {
+	protected final Tuple3Attr referenceTuple;
 	protected final Matrix4d matrix = new Matrix4d(Constants.IDENTITY_MATRIX);
 	protected final Matrix4d inverseMatrix = new Matrix4d(Constants.IDENTITY_MATRIX);
 	protected boolean inverseInvalid = false;
@@ -33,7 +33,7 @@ public abstract class TransformedTuple3 extends Tuple3 {
 	
 	protected TransformedTuple3(DoubleAttr x, DoubleAttr y, DoubleAttr z) {
 		super(x, y, z);
-		referenceTuple = new Tuple3() {
+		referenceTuple = new Tuple3Attr() {
 			@Override
 			public final void setTuple(double x, double y, double z) {
 				autoTransform = false;
@@ -64,7 +64,7 @@ public abstract class TransformedTuple3 extends Tuple3 {
 		transform();
 	}
 	
-	public Tuple3 getReferenceTuple3() {
+	public Tuple3Attr getReferenceTuple3() {
 		return referenceTuple;
 	}
 	

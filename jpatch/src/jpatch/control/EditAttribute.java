@@ -55,7 +55,7 @@ public final class EditAttribute {
 	 * @param changeNow set to true to apply the change now
 	 * @return a new JPatchUndoableEdit object that encapsulates the specified modification
 	 */
-	public static JPatchUndoableEdit changeAttribute(Attribute.Tuple3 attribute, Tuple3d tuple, boolean changeNow) {
+	public static JPatchUndoableEdit changeAttribute(Attribute.Tuple3Attr attribute, Tuple3d tuple, boolean changeNow) {
 		return changeAttribute(attribute, tuple.x, tuple.y, tuple.z, changeNow);
 	}
 	
@@ -66,7 +66,7 @@ public final class EditAttribute {
 	 * @param changeNow set to true to apply the change now
 	 * @return a new JPatchUndoableEdit object that encapsulates the specified modification
 	 */
-	public static JPatchUndoableEdit changeAttribute(Attribute.Tuple3 attribute, Tuple3f tuple, boolean changeNow) {
+	public static JPatchUndoableEdit changeAttribute(Attribute.Tuple3Attr attribute, Tuple3f tuple, boolean changeNow) {
 		return changeAttribute(attribute, tuple.x, tuple.y, tuple.z, changeNow);
 	}
 	
@@ -79,7 +79,7 @@ public final class EditAttribute {
 	 * @param changeNow set to true to apply the change now
 	 * @return a new JPatchUndoableEdit object that encapsulates the specified modification
 	 */
-	public static JPatchUndoableEdit changeAttribute(Attribute.Tuple3 attribute, double x, double y, double z, boolean changeNow) {
+	public static JPatchUndoableEdit changeAttribute(Attribute.Tuple3Attr attribute, double x, double y, double z, boolean changeNow) {
 		return new Tuple(attribute, x, y, z, changeNow);
 	}
 	
@@ -174,10 +174,10 @@ public final class EditAttribute {
 	 * JPatchUndoableEdit that modifies a tuple Attribute
 	 */
 	private static final class Tuple extends SwapperEdit {
-		private final Attribute.Tuple3 attribute;
+		private final Attribute.Tuple3Attr attribute;
 		double x, y, z;
 		
-		private Tuple(Attribute.Tuple3 attribute, double x, double y, double z, boolean changeNow) {
+		private Tuple(Attribute.Tuple3Attr attribute, double x, double y, double z, boolean changeNow) {
 			this.attribute = attribute;
 			this.x = x;
 			this.y = y;
