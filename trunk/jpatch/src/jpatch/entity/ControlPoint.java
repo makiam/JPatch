@@ -13,8 +13,8 @@ import javax.vecmath.*;
 public class ControlPoint extends AbstractJPatchXObject {
 	public static enum TangentMode { DEFAULT, SPATCH };
 	
-	public Attribute.Tuple3 referencePosition = new Attribute.Tuple3(null, 0, 0, 0, false);
-	public Attribute.Tuple3 position = new Attribute.Tuple3(null, 0, 0, 0, false);
+	public Attribute.Tuple3Attr referencePosition = new Attribute.Tuple3Attr(null, 0, 0, 0, false);
+	public Attribute.Tuple3Attr position = new Attribute.Tuple3Attr(null, 0, 0, 0, false);
 	public Attribute.Double magnitude = new Attribute.Double(1);
 	public Attribute.Enum<TangentMode> tangentMode = new Attribute.Enum<TangentMode>(TangentMode.DEFAULT);
 	public Attribute.Double hookPos = new Attribute.Double();

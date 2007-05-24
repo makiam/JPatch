@@ -25,20 +25,20 @@ public class Bone extends AbstractTransform {
 		}
 	};
 	
-	public Attribute.Tuple3 color = new Attribute.Tuple3("Color", COLORS[col++ % COLORS.length], false);
+	public Attribute.Tuple3Attr color = new Attribute.Tuple3Attr("Color", COLORS[col++ % COLORS.length], false);
 	public Attribute.Enum rotationOrder = new Attribute.Enum(Rotation3d.Order.XYZ);
 	public Attribute.Enum axisRotationOrder = new Attribute.Enum(Rotation3d.Order.XYZ);
-	public Attribute.Tuple3 extent = new Attribute.Tuple3("Extent", 0, 0, 1, false);
-	public Attribute.Tuple3 up = new Attribute.Tuple3("Up", 0, 1, 0, false);
-	public Attribute.Tuple3 axisRotation = new Attribute.Tuple3("Axis Rotation", 0, 0, 0, false);
-	public Attribute.Tuple3 translation = new Attribute.Tuple3("Translation", 0, 0, 0, false);
-	public Attribute.Tuple3 position = new Attribute.Tuple3("Position", 0, 0, 0, false);
-	public Attribute.Tuple3 rotation = new Attribute.Tuple3("Rotation", 0, 0, 0, true);
-	public Attribute.Tuple3 orientation = new Attribute.Tuple3("Orientation", 0, 0, 0, false);
+	public Attribute.Tuple3Attr extent = new Attribute.Tuple3Attr("Extent", 0, 0, 1, false);
+	public Attribute.Tuple3Attr up = new Attribute.Tuple3Attr("Up", 0, 1, 0, false);
+	public Attribute.Tuple3Attr axisRotation = new Attribute.Tuple3Attr("Axis Rotation", 0, 0, 0, false);
+	public Attribute.Tuple3Attr translation = new Attribute.Tuple3Attr("Translation", 0, 0, 0, false);
+	public Attribute.Tuple3Attr position = new Attribute.Tuple3Attr("Position", 0, 0, 0, false);
+	public Attribute.Tuple3Attr rotation = new Attribute.Tuple3Attr("Rotation", 0, 0, 0, true);
+	public Attribute.Tuple3Attr orientation = new Attribute.Tuple3Attr("Orientation", 0, 0, 0, false);
 	public Attribute.Enum weightingX = new Attribute.Enum(WeightingMode.RIGID);
 	public Attribute.Enum weightingY = new Attribute.Enum(WeightingMode.RIGID);
 	public Attribute.Enum weightingZ = new Attribute.Enum(WeightingMode.RIGID);
-	public Attribute.Tuple3 scale = new Attribute.Tuple3("Scale", 1, 1, 1, true);
+	public Attribute.Tuple3Attr scale = new Attribute.Tuple3Attr("Scale", 1, 1, 1, true);
 	
 	private Rotation3d axisRotationTuple = new Rotation3d();
 	private Vector3d translationTuple = new Vector3d();

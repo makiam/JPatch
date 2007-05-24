@@ -2,7 +2,7 @@ package com.jpatch.afw.attributes;
 
 import javax.vecmath.*;
 
-public class Tuple3 extends AbstractAttribute<Tuple3d> {
+public class Tuple3Attr extends AbstractAttribute<Tuple3d> {
 	protected final DoubleAttr xAttr;
 	protected final DoubleAttr yAttr;
 	protected final DoubleAttr zAttr;
@@ -12,15 +12,15 @@ public class Tuple3 extends AbstractAttribute<Tuple3d> {
 		}
 	};
 	
-	public Tuple3() {
+	public Tuple3Attr() {
 		this(new DoubleAttr(), new DoubleAttr(), new DoubleAttr());
 	}
 	
-	public Tuple3(double x, double y, double z) {
+	public Tuple3Attr(double x, double y, double z) {
 		this(new DoubleAttr(x), new DoubleAttr(y), new DoubleAttr(z));
 	}
 	
-	public Tuple3(DoubleAttr x, DoubleAttr y, DoubleAttr z) {
+	public Tuple3Attr(DoubleAttr x, DoubleAttr y, DoubleAttr z) {
 		xAttr = x;
 		yAttr = y;
 		zAttr = z;
@@ -65,7 +65,7 @@ public class Tuple3 extends AbstractAttribute<Tuple3d> {
 		tuple.z = (float) zAttr.getDouble();
 	}
 	
-	public void setTuple(Tuple3 tuple) {
+	public void setTuple(Tuple3Attr tuple) {
 		setTuple(tuple.getX(), tuple.getY(), tuple.getZ());
 	}
 	
@@ -94,5 +94,14 @@ public class Tuple3 extends AbstractAttribute<Tuple3d> {
 	@Override
 	public String toString() {
 		return "(" + xAttr.getDouble() + ", " + yAttr.getDouble() + ", " + zAttr.getDouble() + ")";
+	}
+	
+	/**
+	 * Trows an UnsupportedOperationException
+	 * @throws UnsupportedOperationException
+	 */
+	@Override
+	public void addAttributePreChangeListener(AttributePreChangeListener l) {
+		throw new UnsupportedOperationException();
 	}
 }

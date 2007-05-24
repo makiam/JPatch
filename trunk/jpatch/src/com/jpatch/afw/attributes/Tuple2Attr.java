@@ -2,7 +2,7 @@ package com.jpatch.afw.attributes;
 
 import javax.vecmath.*;
 
-public class Tuple2 extends AbstractAttribute<Tuple2d> {
+public class Tuple2Attr extends AbstractAttribute<Tuple2d> {
 	protected final DoubleAttr xAttr;
 	protected final DoubleAttr yAttr;
 	private final AttributePostChangeListener listener = new AttributePostChangeListener() {
@@ -11,15 +11,15 @@ public class Tuple2 extends AbstractAttribute<Tuple2d> {
 		}
 	};
 	
-	public Tuple2() {
+	public Tuple2Attr() {
 		this(new DoubleAttr(), new DoubleAttr());
 	}
 	
-	public Tuple2(double x, double y) {
+	public Tuple2Attr(double x, double y) {
 		this(new DoubleAttr(x), new DoubleAttr(y));
 	}
 	
-	public Tuple2(DoubleAttr x, DoubleAttr y) {
+	public Tuple2Attr(DoubleAttr x, DoubleAttr y) {
 		xAttr = x;
 		yAttr = y;
 		xAttr.addAttributePostChangeListener(listener);
@@ -60,7 +60,7 @@ public class Tuple2 extends AbstractAttribute<Tuple2d> {
 		tuple.y = (float) yAttr.getDouble();
 	}
 	
-	public void setTuple(Tuple2 tuple) {
+	public void setTuple(Tuple2Attr tuple) {
 		setTuple(tuple.getX(), tuple.getY());
 	}
 	
@@ -82,5 +82,19 @@ public class Tuple2 extends AbstractAttribute<Tuple2d> {
 		if (xAttr.getDouble() != oldX || yAttr.getDouble() != oldY) {		// only if one of the component values actually has changed
 			fireAttributeHasChanged();										// fire events
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return "(" + xAttr.getDouble() + ", " + yAttr.getDouble() + ")";
+	}
+	
+	/**
+	 * Trows an UnsupportedOperationException
+	 * @throws UnsupportedOperationException
+	 */
+	@Override
+	public void addAttributePreChangeListener(AttributePreChangeListener l) {
+		throw new UnsupportedOperationException();
 	}
 }

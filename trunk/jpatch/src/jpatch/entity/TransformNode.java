@@ -34,16 +34,16 @@ public class TransformNode extends AbstractTransform {
 	
 	public Attribute.KeyedBoolean visibility = new Attribute.KeyedBoolean("Visibility", true);
 	public Attribute.Enum rotationOrder = new Attribute.Enum(Rotation3d.Order.XYZ);
-	public Attribute.Tuple3 position = new Attribute.Tuple3("Position", 0, 0, 0, false);
-	public Attribute.Tuple3 translation = new Attribute.Tuple3("Translation", 0, 0, 0, true);
-	public Attribute.Tuple3 orientation = new Attribute.Tuple3("Orientation", 0, 0, 0, false);
-	public Attribute.Tuple3 rotation = new Attribute.Tuple3("Rotation", 0, 0, 0, true);
-	public Attribute.Tuple3 scale = new Attribute.Tuple3("Scale", 1, 1, 1, true);
-	public Attribute.Tuple3 scalePivotPosition = new Attribute.Tuple3("Pivot (world)", 0, 0, 0, false);
-	public Attribute.Tuple3 scalePivotTranslation = new Attribute.Tuple3("Pivot (local)", 0, 0, 0, false);
-	public Attribute.Tuple3 rotatePivotPosition = new Attribute.Tuple3("Pivot (world)", 0, 0, 0, false);
-	public Attribute.Tuple3 rotatePivotTranslation = new Attribute.Tuple3("Pivot (local)", 0, 0, 0, false);
-	public Attribute.Tuple3 shear = new Attribute.Tuple3("Shear", 0, 0, 0, true);
+	public Attribute.Tuple3Attr position = new Attribute.Tuple3Attr("Position", 0, 0, 0, false);
+	public Attribute.Tuple3Attr translation = new Attribute.Tuple3Attr("Translation", 0, 0, 0, true);
+	public Attribute.Tuple3Attr orientation = new Attribute.Tuple3Attr("Orientation", 0, 0, 0, false);
+	public Attribute.Tuple3Attr rotation = new Attribute.Tuple3Attr("Rotation", 0, 0, 0, true);
+	public Attribute.Tuple3Attr scale = new Attribute.Tuple3Attr("Scale", 1, 1, 1, true);
+	public Attribute.Tuple3Attr scalePivotPosition = new Attribute.Tuple3Attr("Pivot (world)", 0, 0, 0, false);
+	public Attribute.Tuple3Attr scalePivotTranslation = new Attribute.Tuple3Attr("Pivot (local)", 0, 0, 0, false);
+	public Attribute.Tuple3Attr rotatePivotPosition = new Attribute.Tuple3Attr("Pivot (world)", 0, 0, 0, false);
+	public Attribute.Tuple3Attr rotatePivotTranslation = new Attribute.Tuple3Attr("Pivot (local)", 0, 0, 0, false);
+	public Attribute.Tuple3Attr shear = new Attribute.Tuple3Attr("Shear", 0, 0, 0, true);
 	
 	private ObjectRegistry objectRegistry;
 	private TransformNode parent;

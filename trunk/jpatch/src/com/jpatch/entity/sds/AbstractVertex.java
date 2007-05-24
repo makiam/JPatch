@@ -14,7 +14,7 @@ public abstract class AbstractVertex {
 		return position;
 	}
 	
-	public Tuple3 getReferencePosition() {
+	public Tuple3Attr getReferencePosition() {
 		return position.getReferenceTuple3();
 	}
 	

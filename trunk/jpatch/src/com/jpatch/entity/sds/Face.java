@@ -62,7 +62,7 @@ public class Face {
 			public void computeDerivedPosition() {
 				double x = 0, y = 0, z = 0;
 				for (HalfEdge edge : getEdges()) {
-					Tuple3 t = edge.vertex.position;
+					Tuple3Attr t = edge.vertex.position;
 					x += t.getX();
 					y += t.getY();
 					z += t.getZ();
@@ -75,7 +75,7 @@ public class Face {
 				double fx = 0, fy = 0, fz = 0;
 				double ex = 0, ey = 0, ez = 0;
 				for (HalfEdge edge : edgeIterable) {
-					Tuple3 t = edge.vertex.vertexPoint.position;
+					Tuple3Attr t = edge.vertex.vertexPoint.position;
 					fx += t.getX();
 					fy += t.getY();
 					fz += t.getZ();
@@ -99,10 +99,10 @@ public class Face {
 				int i = 0;
 				for (HalfEdge edge : edgeIterable) {
 					HalfEdge nextEdge = edge.next;
-					Tuple3 t0f = edge.face.facePoint.position;
-					Tuple3 t0e = edge.edgePoint.position;
-					Tuple3 t1f = nextEdge.face.facePoint.position;
-					Tuple3 t1e = nextEdge.edgePoint.position;
+					Tuple3Attr t0f = edge.face.facePoint.position;
+					Tuple3Attr t0e = edge.edgePoint.position;
+					Tuple3Attr t1f = nextEdge.face.facePoint.position;
+					Tuple3Attr t1e = nextEdge.edgePoint.position;
 					float ew = TANGENT_EDGE_WEIGHT[Face.this.sides][i];
 					float fw = TANGENT_FACE_WEIGHT[Face.this.sides][i];
 					ax += t1f.getX() * fw;

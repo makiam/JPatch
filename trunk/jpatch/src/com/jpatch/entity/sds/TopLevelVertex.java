@@ -76,9 +76,9 @@ public class TopLevelVertex extends BaseVertex {
 					if (TopLevelVertex.this.corner > 0) {
 						position.setTuple(TopLevelVertex.this.position);
 					} else if (TopLevelVertex.this.crease > 0) {
-						Tuple3 p0 = TopLevelVertex.this.position;
-						Tuple3 p1 = TopLevelVertex.this.creaseEdge0.pair.vertex.position;
-						Tuple3 p2 = TopLevelVertex.this.creaseEdge1.pair.vertex.position;
+						Tuple3Attr p0 = TopLevelVertex.this.position;
+						Tuple3Attr p1 = TopLevelVertex.this.creaseEdge0.pair.vertex.position;
+						Tuple3Attr p2 = TopLevelVertex.this.creaseEdge1.pair.vertex.position;
 						position.setTuple(
 								p0.getX() * CREASE0 + (p1.getX() + p2.getX()) * CREASE1,
 								p0.getY() * CREASE0 + (p1.getY() + p2.getY()) * CREASE1,
@@ -90,7 +90,7 @@ public class TopLevelVertex extends BaseVertex {
 						double w = (valence - 2.0) / valence;
 						double x = 0, y = 0, z = 0;
 						for (HalfEdge edge : edges) {
-							Tuple3 p = edge.face.facePoint.position;
+							Tuple3Attr p = edge.face.facePoint.position;
 							x += p.getX();
 							y += p.getY();
 							z += p.getZ();
@@ -125,8 +125,8 @@ public class TopLevelVertex extends BaseVertex {
 				if (TopLevelVertex.this.corner > 0) {
 					TopLevelVertex.this.position.getTuple(limit);
 				} else if (TopLevelVertex.this.crease > 0) {
-					Tuple3 p1 = TopLevelVertex.this.creaseEdge0.edgePoint.position;
-					Tuple3 p2 = TopLevelVertex.this.creaseEdge1.edgePoint.position;
+					Tuple3Attr p1 = TopLevelVertex.this.creaseEdge0.edgePoint.position;
+					Tuple3Attr p2 = TopLevelVertex.this.creaseEdge1.edgePoint.position;
 					limit.set(
 							position.getX() * CREASE_LIMIT0 + (p1.getX() + p2.getX()) * CREASE_LIMIT1,
 							position.getY() * CREASE_LIMIT0 + (p1.getY() + p2.getY()) * CREASE_LIMIT1,
@@ -136,7 +136,7 @@ public class TopLevelVertex extends BaseVertex {
 					double fx = 0, fy = 0, fz = 0;
 					double ex = 0, ey = 0, ez = 0;
 					for (HalfEdge edge : edges) {
-						Tuple3 p = edge.face.facePoint.position;
+						Tuple3Attr p = edge.face.facePoint.position;
 						fx += p.getX();
 						fy += p.getY();
 						fz += p.getZ();
@@ -160,10 +160,10 @@ public class TopLevelVertex extends BaseVertex {
 					float bz = 0;
 					for (int i = 0; i < edges.length; i++) {
 						int j = (i + 1) % edges.length;
-						Tuple3 p0f = edges[i].face.facePoint.position;
-						Tuple3 p0e = edges[i].edgePoint.position;
-						Tuple3 p1f = edges[j].face.facePoint.position;
-						Tuple3 p1e = edges[j].edgePoint.position;
+						Tuple3Attr p0f = edges[i].face.facePoint.position;
+						Tuple3Attr p0e = edges[i].edgePoint.position;
+						Tuple3Attr p1f = edges[j].face.facePoint.position;
+						Tuple3Attr p1e = edges[j].edgePoint.position;
 						float ew = TANGENT_EDGE_WEIGHT[valence][i];
 						float fw = TANGENT_FACE_WEIGHT[valence][i];
 						ax += p1f.getX() * fw;

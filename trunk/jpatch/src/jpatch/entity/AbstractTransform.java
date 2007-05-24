@@ -66,7 +66,7 @@ public abstract class AbstractTransform extends AbstractNamedObject {
 	
 	protected void evaluateConstraints() { }
 	
-	protected void positionChanged(Attribute.Tuple3 position, Attribute.Tuple3 translation) {
+	protected void positionChanged(Attribute.Tuple3Attr position, Attribute.Tuple3Attr translation) {
 		Point3d tmp = new Point3d();
 		position.get(tmp);
 		if (parent != null)
@@ -76,7 +76,7 @@ public abstract class AbstractTransform extends AbstractNamedObject {
 //		position.setValueAdjusting(false);
 	}
 	
-	protected void translationChanged(Attribute.Tuple3 translation, Attribute.Tuple3 position) {
+	protected void translationChanged(Attribute.Tuple3Attr translation, Attribute.Tuple3Attr position) {
 		Point3d tmp = new Point3d();
 		translation.get(tmp);
 		if (parent != null)
