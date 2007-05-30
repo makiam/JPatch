@@ -3,7 +3,11 @@ package com.jpatch.entity;
 import com.jpatch.afw.vecmath.*;
 import javax.vecmath.*;
 
-public class Transform {
+public abstract class Transform {
+	/**
+	 * The parent Transform (may be null)
+	 */
+	protected Transform parent;
 	/**
 	 * The transformation matrix
 	 */
@@ -82,6 +86,27 @@ public class Transform {
 	public Matrix4d getMatrix(Matrix4d matrix) {
 		matrix.set(this.matrix);
 		return matrix;
+	}
+	
+	/**
+	 * Computes this matrix. Non abstract subclasses must implement this method and either compute the inverse too
+	 * or set the invInvalid flag to true.
+	 */
+	public abstract void computeMatrix();
+	
+	/**
+	 * Computes all transformed values
+	 */
+	public void computeTransformedValues() { }
+	
+	/**
+	 * Calls computeMatrix() followed by computeTransformedValues() on this obeject. Subclasses that are part of a
+	 * transform hierarchy and have child objects should call this method on their superclass or directly invoke
+	 * computeMatrix() and computeTransformedValues() <i>and</i> call computeBranch() on all of their children.
+	 */
+	public void computeBranch() {
+		computeMatrix();
+		computeTransformedValues();
 	}
 	
 	/**

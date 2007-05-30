@@ -12,9 +12,9 @@ public class Bench {
 		System.out.println(Math.toRadians(deg));
 		System.out.println(Math.sin(Math.toRadians(deg)));
 		System.out.println(Utils3d.degSin(deg) + " " + Utils3d.degCos(deg));
-//		for (int i = -720; i <= 720; i += 30) {
-//			System.out.println(Rotation3d.sin(i) + " " + Rotation3d.cos(i));
-//		}
+		for (int i = -720; i <= 720; i += 30) {
+			System.out.println(Utils3d.degSin(i) + " " + Utils3d.degCos(i));
+		}
 		System.exit(0);
 		System.out.println("dry run");
 		/* dry run */

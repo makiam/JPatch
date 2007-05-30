@@ -5,13 +5,15 @@ import javax.vecmath.*;
 /**
  * A Tuple3d object that represents a rotation. The x, y and z fields store the clockwise rotation
  * around the positive x, y and z axes respectively, in degrees. The order of rotations defaults to
- * X, Y, Z, but can be set to any other order specified in the Order Enum using the setOrder method.
+ * X, Y, Z, but can be set to any other order specified in the order enum using the setOrder method.
  */
 @SuppressWarnings("serial")
 public class Rotation3d extends Tuple3d {
-	private double sinX, sinY, sinZ;	// cached sinus values
-	private double cosX, cosY, cosZ;	// cached cosinus values
-	private double oldX, oldY, oldZ;	// used to check wheter cached sin and cos values are valid
+	private double m00, m01, m02;			// used to...
+	private double m10, m11, m12;			// ...cache the...
+	private double m20, m21, m22;			// ...rotation matrix
+	private double oldX, oldY, oldZ;		// used to check wheter cached matrix is valid
+	private boolean matrixInvalid = true;	// flag to force recomputation of cached matrix
 	
 	/**
 	 * Enum to encapsulate the order of rotation
@@ -68,6 +70,7 @@ public class Rotation3d extends Tuple3d {
 	 */
 	public void setOrder(Order order) {
 		this.order = order;
+		matrixInvalid = true;
 	}
 	
 	/**
@@ -77,75 +80,16 @@ public class Rotation3d extends Tuple3d {
 	 * @throws NullPointerException if the specified parameter was null
 	 */
 	public Matrix3d getRotationMatrix(Matrix3d m) {
-		computeTrig();
-		switch(order) {
-		case XYZ:
-			m.m00 = cosY * cosZ;
-			m.m01 = -cosY * sinZ;
-			m.m02 = sinY;
-			m.m10 = sinX * sinY * cosZ + cosX * sinZ;
-			m.m11 = -sinX * sinY * sinZ + cosX * cosZ;
-			m.m12 = -sinX * cosY;
-			m.m20 = -cosX * sinY * cosZ + sinX * sinZ;
-			m.m21 = cosX * sinY * sinZ + sinX * cosZ;
-			m.m22 = cosX * cosY;
-			break;
-		case XZY:
-			m.m00 = cosZ * cosY;
-			m.m01 = -sinZ;
-			m.m02 = cosZ * sinY;
-			m.m10 = cosX * sinZ * cosY + sinX * sinY;
-			m.m11 = cosX * cosZ;
-			m.m12 = cosX * sinZ * sinY - sinX * cosY;
-			m.m20 = sinX * sinZ * cosY - cosX * sinY;
-			m.m21 = sinX * cosZ;
-			m.m22 = sinX * sinZ * sinY + cosX * cosY;
-			break;
-		case YXZ:
-			m.m00 = cosY * cosZ + sinY * sinX * sinZ;
-			m.m01 = -cosY * sinZ + sinY * sinX * cosZ;
-			m.m02 = sinY * cosX;
-			m.m10 = cosX * sinZ;
-			m.m11 = cosX * cosZ;
-			m.m12 = -sinX;
-			m.m20 = -sinY * cosZ + cosY * sinX * sinZ;
-			m.m21 = sinY * sinZ + cosY * sinX * cosZ;
-			m.m22 = cosY * cosX;
-			break;
-		case YZX:
-			m.m00 = cosY * cosZ;
-			m.m01 = -cosY * sinZ * cosX + sinY * sinX;
-			m.m02 = cosY * sinZ * sinX + sinY * cosX;
-			m.m10 = sinZ;
-			m.m11 = cosZ * cosX;
-			m.m12 = -cosZ * sinX;
-			m.m20 = -sinY * cosZ;
-			m.m21 = sinY * sinZ * cosX + cosY * sinX;
-			m.m22 = -sinY * sinZ * sinX + cosY * cosX;
-			break;
-		case ZXY:
-			m.m00 = cosZ * cosY - sinZ * sinX * sinY;
-			m.m01 = -sinZ * cosX;
-			m.m02 = cosZ * sinY + sinZ * sinX * cosY;
-			m.m10 = sinZ * cosY + cosZ * sinX * sinY;
-			m.m11 = cosZ * cosX;
-			m.m12 = sinZ * sinY - cosZ * sinX * cosY;
-			m.m20 = -cosX * sinY;
-			m.m21 = sinX;
-			m.m22 = cosX * cosY;
-			break;
-		case ZYX:
-			m.m00 = cosZ * cosY;
-			m.m01 = -sinZ * cosX + cosZ * sinY * sinX;
-			m.m02 = sinZ * sinX + cosZ * sinY * cosX;
-			m.m10 = sinZ * cosY;
-			m.m11 = cosZ * cosX + sinZ * sinY * sinX;
-			m.m12 = -cosZ * sinX + sinZ * sinY * cosX;
-			m.m20 = -sinY;
-			m.m21 = cosY * sinX;
-			m.m22 = cosY * cosX;
-			break;
-		}
+		computeMatrix();
+		m.m00 = m00;
+		m.m01 = m01;
+		m.m02 = m02;
+		m.m10 = m10;
+		m.m11 = m11;
+		m.m12 = m12;
+		m.m20 = m20;
+		m.m21 = m21;
+		m.m22 = m22;
 		return m;
 	}
 	
@@ -159,75 +103,16 @@ public class Rotation3d extends Tuple3d {
 	 * @throws NullPointerException if the specified parameter was null
 	 */
 	public Matrix4d getRotationMatrix(Matrix4d m) {
-		computeTrig();
-		switch(order) {
-		case XYZ:
-			m.m00 = cosY * cosZ;
-			m.m01 = -cosY * sinZ;
-			m.m02 = sinY;
-			m.m10 = sinX * sinY * cosZ + cosX * sinZ;
-			m.m11 = -sinX * sinY * sinZ + cosX * cosZ;
-			m.m12 = -sinX * cosY;
-			m.m20 = -cosX * sinY * cosZ + sinX * sinZ;
-			m.m21 = cosX * sinY * sinZ + sinX * cosZ;
-			m.m22 = cosX * cosY;
-			break;
-		case XZY:
-			m.m00 = cosZ * cosY;
-			m.m01 = -sinZ;
-			m.m02 = cosZ * sinY;
-			m.m10 = cosX * sinZ * cosY + sinX * sinY;
-			m.m11 = cosX * cosZ;
-			m.m12 = cosX * sinZ * sinY - sinX * cosY;
-			m.m20 = sinX * sinZ * cosY - cosX * sinY;
-			m.m21 = sinX * cosZ;
-			m.m22 = sinX * sinZ * sinY + cosX * cosY;
-			break;
-		case YXZ:
-			m.m00 = cosY * cosZ + sinY * sinX * sinZ;
-			m.m01 = -cosY * sinZ + sinY * sinX * cosZ;
-			m.m02 = sinY * cosX;
-			m.m10 = cosX * sinZ;
-			m.m11 = cosX * cosZ;
-			m.m12 = -sinX;
-			m.m20 = -sinY * cosZ + cosY * sinX * sinZ;
-			m.m21 = sinY * sinZ + cosY * sinX * cosZ;
-			m.m22 = cosY * cosX;
-			break;
-		case YZX:
-			m.m00 = cosY * cosZ;
-			m.m01 = -cosY * sinZ * cosX + sinY * sinX;
-			m.m02 = cosY * sinZ * sinX + sinY * cosX;
-			m.m10 = sinZ;
-			m.m11 = cosZ * cosX;
-			m.m12 = -cosZ * sinX;
-			m.m20 = -sinY * cosZ;
-			m.m21 = sinY * sinZ * cosX + cosY * sinX;
-			m.m22 = -sinY * sinZ * sinX + cosY * cosX;
-			break;
-		case ZXY:
-			m.m00 = cosZ * cosY - sinZ * sinX * sinY;
-			m.m01 = -sinZ * cosX;
-			m.m02 = cosZ * sinY + sinZ * sinX * cosY;
-			m.m10 = sinZ * cosY + cosZ * sinX * sinY;
-			m.m11 = cosZ * cosX;
-			m.m12 = sinZ * sinY - cosZ * sinX * cosY;
-			m.m20 = -cosX * sinY;
-			m.m21 = sinX;
-			m.m22 = cosX * cosY;
-			break;
-		case ZYX:
-			m.m00 = cosZ * cosY;
-			m.m01 = -sinZ * cosX + cosZ * sinY * sinX;
-			m.m02 = sinZ * sinX + cosZ * sinY * cosX;
-			m.m10 = sinZ * cosY;
-			m.m11 = cosZ * cosX + sinZ * sinY * sinX;
-			m.m12 = -cosZ * sinX + sinZ * sinY * cosX;
-			m.m20 = -sinY;
-			m.m21 = cosY * sinX;
-			m.m22 = cosY * cosX;
-			break;
-		}
+		computeMatrix();
+		m.m00 = m00;
+		m.m01 = m01;
+		m.m02 = m02;
+		m.m10 = m10;
+		m.m11 = m11;
+		m.m12 = m12;
+		m.m20 = m20;
+		m.m21 = m21;
+		m.m22 = m22;
 		return m;
 	}
 	
@@ -239,84 +124,12 @@ public class Rotation3d extends Tuple3d {
 	 * @throws NullPointerException if the specified parameter was null
 	 */
 	public Matrix3d rotateMatrix(Matrix3d m) {
-		computeTrig();
-		double m00, m01, m02, m10, m11, m12, m20, m21, m22;	// temporarily stores this rotation matrix
-		switch(order) {
-		case XYZ:
-			m00 = cosY * cosZ;
-			m01 = -cosY * sinZ;
-			m02 = sinY;
-			m10 = sinX * sinY * cosZ + cosX * sinZ;
-			m11 = -sinX * sinY * sinZ + cosX * cosZ;
-			m12 = -sinX * cosY;
-			m20 = -cosX * sinY * cosZ + sinX * sinZ;
-			m21 = cosX * sinY * sinZ + sinX * cosZ;
-			m22 = cosX * cosY;
-			break;
-		case XZY:
-			m00 = cosZ * cosY;
-			m01 = -sinZ;
-			m02 = cosZ * sinY;
-			m10 = cosX * sinZ * cosY + sinX * sinY;
-			m11 = cosX * cosZ;
-			m12 = cosX * sinZ * sinY - sinX * cosY;
-			m20 = sinX * sinZ * cosY - cosX * sinY;
-			m21 = sinX * cosZ;
-			m22 = sinX * sinZ * sinY + cosX * cosY;
-			break;
-		case YXZ:
-			m00 = cosY * cosZ + sinY * sinX * sinZ;
-			m01 = -cosY * sinZ + sinY * sinX * cosZ;
-			m02 = sinY * cosX;
-			m10 = cosX * sinZ;
-			m11 = cosX * cosZ;
-			m12 = -sinX;
-			m20 = -sinY * cosZ + cosY * sinX * sinZ;
-			m21 = sinY * sinZ + cosY * sinX * cosZ;
-			m22 = cosY * cosX;
-			break;
-		case YZX:
-			m00 = cosY * cosZ;
-			m01 = -cosY * sinZ * cosX + sinY * sinX;
-			m02 = cosY * sinZ * sinX + sinY * cosX;
-			m10 = sinZ;
-			m11 = cosZ * cosX;
-			m12 = -cosZ * sinX;
-			m20 = -sinY * cosZ;
-			m21 = sinY * sinZ * cosX + cosY * sinX;
-			m22 = -sinY * sinZ * sinX + cosY * cosX;
-			break;
-		case ZXY:
-			m00 = cosZ * cosY - sinZ * sinX * sinY;
-			m01 = -sinZ * cosX;
-			m02 = cosZ * sinY + sinZ * sinX * cosY;
-			m10 = sinZ * cosY + cosZ * sinX * sinY;
-			m11 = cosZ * cosX;
-			m12 = sinZ * sinY - cosZ * sinX * cosY;
-			m20 = -cosX * sinY;
-			m21 = sinX;
-			m22 = cosX * cosY;
-			break;
-		case ZYX:
-			m00 = cosZ * cosY;
-			m01 = -sinZ * cosX + cosZ * sinY * sinX;
-			m02 = sinZ * sinX + cosZ * sinY * cosX;
-			m10 = sinZ * cosY;
-			m11 = cosZ * cosX + sinZ * sinY * sinX;
-			m12 = -cosZ * sinX + sinZ * sinY * cosX;
-			m20 = -sinY;
-			m21 = cosY * sinX;
-			m22 = cosY * cosX;
-			break;
-		default:
-			throw new IllegalStateException();
-		}
-		
-		double t00, t01, t02, t10, t11, t12, t20, t21, t22; // temporarily stores the result of the matrix multiplication
+		computeMatrix();
 		
 		/*
 		 * perform matrix multiplication
 		 */
+		double t00, t01, t02, t10, t11, t12, t20, t21, t22; // temporarily stores the result of the matrix multiplication
 		t00 = m.m00 * m00 + m.m01 * m10 + m.m02 * m20;
 		t01 = m.m00 * m01 + m.m01 * m11 + m.m02 * m21;
 		t02 = m.m00 * m02 + m.m01 * m12 + m.m02 * m22;
@@ -344,84 +157,12 @@ public class Rotation3d extends Tuple3d {
 	 * @throws NullPointerException if the specified parameter was null
 	 */
 	public Matrix4d rotateMatrix(Matrix4d m) {
-		computeTrig();
-		double m00, m01, m02, m10, m11, m12, m20, m21, m22;	// temporarily stores this rotation matrix
-		switch(order) {
-		case XYZ:
-			m00 = cosY * cosZ;
-			m01 = -cosY * sinZ;
-			m02 = sinY;
-			m10 = sinX * sinY * cosZ + cosX * sinZ;
-			m11 = -sinX * sinY * sinZ + cosX * cosZ;
-			m12 = -sinX * cosY;
-			m20 = -cosX * sinY * cosZ + sinX * sinZ;
-			m21 = cosX * sinY * sinZ + sinX * cosZ;
-			m22 = cosX * cosY;
-			break;
-		case XZY:
-			m00 = cosZ * cosY;
-			m01 = -sinZ;
-			m02 = cosZ * sinY;
-			m10 = cosX * sinZ * cosY + sinX * sinY;
-			m11 = cosX * cosZ;
-			m12 = cosX * sinZ * sinY - sinX * cosY;
-			m20 = sinX * sinZ * cosY - cosX * sinY;
-			m21 = sinX * cosZ;
-			m22 = sinX * sinZ * sinY + cosX * cosY;
-			break;
-		case YXZ:
-			m00 = cosY * cosZ + sinY * sinX * sinZ;
-			m01 = -cosY * sinZ + sinY * sinX * cosZ;
-			m02 = sinY * cosX;
-			m10 = cosX * sinZ;
-			m11 = cosX * cosZ;
-			m12 = -sinX;
-			m20 = -sinY * cosZ + cosY * sinX * sinZ;
-			m21 = sinY * sinZ + cosY * sinX * cosZ;
-			m22 = cosY * cosX;
-			break;
-		case YZX:
-			m00 = cosY * cosZ;
-			m01 = -cosY * sinZ * cosX + sinY * sinX;
-			m02 = cosY * sinZ * sinX + sinY * cosX;
-			m10 = sinZ;
-			m11 = cosZ * cosX;
-			m12 = -cosZ * sinX;
-			m20 = -sinY * cosZ;
-			m21 = sinY * sinZ * cosX + cosY * sinX;
-			m22 = -sinY * sinZ * sinX + cosY * cosX;
-			break;
-		case ZXY:
-			m00 = cosZ * cosY - sinZ * sinX * sinY;
-			m01 = -sinZ * cosX;
-			m02 = cosZ * sinY + sinZ * sinX * cosY;
-			m10 = sinZ * cosY + cosZ * sinX * sinY;
-			m11 = cosZ * cosX;
-			m12 = sinZ * sinY - cosZ * sinX * cosY;
-			m20 = -cosX * sinY;
-			m21 = sinX;
-			m22 = cosX * cosY;
-			break;
-		case ZYX:
-			m00 = cosZ * cosY;
-			m01 = -sinZ * cosX + cosZ * sinY * sinX;
-			m02 = sinZ * sinX + cosZ * sinY * cosX;
-			m10 = sinZ * cosY;
-			m11 = cosZ * cosX + sinZ * sinY * sinX;
-			m12 = -cosZ * sinX + sinZ * sinY * cosX;
-			m20 = -sinY;
-			m21 = cosY * sinX;
-			m22 = cosY * cosX;
-			break;
-		default:
-			throw new IllegalStateException();
-		}
-		
-		double t00, t01, t02, t10, t11, t12, t20, t21, t22, t30, t31, t32; // temporarily stores the result of the matrix multiplication
+		computeMatrix();
 		
 		/*
 		 * perform matrix multiplication
 		 */
+		double t00, t01, t02, t10, t11, t12, t20, t21, t22, t30, t31, t32; // temporarily stores the result of the matrix multiplication
 		t00 = m.m00 * m00 + m.m01 * m10 + m.m02 * m20;
 		t01 = m.m00 * m01 + m.m01 * m11 + m.m02 * m21;
 		t02 = m.m00 * m02 + m.m01 * m12 + m.m02 * m22;
@@ -552,24 +293,89 @@ public class Rotation3d extends Tuple3d {
 	}
 	
 	/**
-	 * If necessary, recompute trig function values and cache
-	 * the results (trig functions are slow, especially in Java)
+	 * If necessary, recompute the matrix (trig functions are slow, especially in Java)
+	 * @param force true to force the recomputation, false to use cached value if possible
 	 */
-	private final void computeTrig() {
-		if (oldX != x) {
-			sinX = Utils3d.degSin(x);
-			cosX = Utils3d.degCos(x);
+	private final void computeMatrix() {
+		if (oldX != x || oldY != y || oldZ != z || matrixInvalid) {
 			oldX = x;
-		}
-		if (oldY != y) {
-			sinY = Utils3d.degSin(x);
-			cosY = Utils3d.degCos(x);
-			oldY = x;
-		}
-		if (oldZ != z) {
-			sinZ = Utils3d.degSin(x);
-			cosZ = Utils3d.degCos(x);
+			oldY = y;
 			oldZ = z;
+			matrixInvalid = false;
+			double sx = Utils3d.degSin(x);
+			double cx = Utils3d.degCos(x);
+			double sy = Utils3d.degSin(y);
+			double cy = Utils3d.degCos(y);
+			double sz = Utils3d.degSin(z);
+			double cz = Utils3d.degCos(z);
+			switch(order) {
+			case XYZ:
+				m00 = cy * cz;
+				m01 = -cy * sz;
+				m02 = sy;
+				m10 = sx * sy * cz + cx * sz;
+				m11 = -sx * sy * sz + cx * cz;
+				m12 = -sx * cy;
+				m20 = -cx * sy * cz + sx * sz;
+				m21 = cx * sy * sz + sx * cz;
+				m22 = cx * cy;
+				break;
+			case XZY:
+				m00 = cz * cy;
+				m01 = -sz;
+				m02 = cz * sy;
+				m10 = cx * sz * cy + sx * sy;
+				m11 = cx * cz;
+				m12 = cx * sz * sy - sx * cy;
+				m20 = sx * sz * cy - cx * sy;
+				m21 = sx * cz;
+				m22 = sx * sz * sy + cx * cy;
+				break;
+			case YXZ:
+				m00 = cy * cz + sy * sx * sz;
+				m01 = -cy * sz + sy * sx * cz;
+				m02 = sy * cx;
+				m10 = cx * sz;
+				m11 = cx * cz;
+				m12 = -sx;
+				m20 = -sy * cz + cy * sx * sz;
+				m21 = sy * sz + cy * sx * cz;
+				m22 = cy * cx;
+				break;
+			case YZX:
+				m00 = cy * cz;
+				m01 = -cy * sz * cx + sy * sx;
+				m02 = cy * sz * sx + sy * cx;
+				m10 = sz;
+				m11 = cz * cx;
+				m12 = -cz * sx;
+				m20 = -sy * cz;
+				m21 = sy * sz * cx + cy * sx;
+				m22 = -sy * sz * sx + cy * cx;
+				break;
+			case ZXY:
+				m00 = cz * cy - sz * sx * sy;
+				m01 = -sz * cx;
+				m02 = cz * sy + sz * sx * cy;
+				m10 = sz * cy + cz * sx * sy;
+				m11 = cz * cx;
+				m12 = sz * sy - cz * sx * cy;
+				m20 = -cx * sy;
+				m21 = sx;
+				m22 = cx * cy;
+				break;
+			case ZYX:
+				m00 = cz * cy;
+				m01 = -sz * cx + cz * sy * sx;
+				m02 = sz * sx + cz * sy * cx;
+				m10 = sz * cy;
+				m11 = cz * cx + sz * sy * sx;
+				m12 = -cz * sx + sz * sy * cx;
+				m20 = -sy;
+				m21 = cy * sx;
+				m22 = cy * cx;
+				break;
+			}
 		}
 	}
 }

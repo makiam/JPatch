@@ -17,7 +17,7 @@ public class TransformNode extends AbstractTransformNode {
 	 * Computes the transformation matrix using the translation, rotation and scale attributes.
 	 * This implementation sets the invInvalid flag to true.
 	 */
-	protected void computeMatrix() {
+	public void computeMatrix() {
 		if (parent != null) {
 			parent.getMatrix(matrix);
 		} else {
@@ -27,7 +27,7 @@ public class TransformNode extends AbstractTransformNode {
 		rotationAttr.getTuple(rotationTuple);
 		scaleAttr.getTuple(scaleTuple);
 		scaleTuple.scaleMatrix(matrix);
-		rotationTuple.rotateMatrix(matrix);
+		rotationTuple.rotateMatrix(matrix);					// FIXME this is very slow due of the use of trigonometric functions
 		Utils3d.translateMatrix(matrix, translationTuple);
 		invInvalid = true;
 	}
