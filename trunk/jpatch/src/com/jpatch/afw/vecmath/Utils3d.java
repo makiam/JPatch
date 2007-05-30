@@ -30,33 +30,31 @@ public class Utils3d {
 	}
 	
 	/**
-	 * Returns the sinus of the specified angle.
-	 * This functions works around the performance problems of Java trigonomy functions
-	 * on the x86 platform the inaccuracy involved when convertinglarge angles
-	 * from degrees to radians.
-	 * @param alpha the angle in degrees
-	 * @return the sinus of the specified angle
-	 */
-	public static final double degSin(double alpha){
-		alpha %= 360.0;
-		if (Math.abs(alpha) > 180.0) {
-			alpha -= 360.0;
-		}
-		if (Math.abs(alpha) > 90.0) {
-			alpha = 180.0 - alpha;
-		}
-		return Math.sin(alpha / 180 * Math.PI);
-	}
-	
-	/**
 	 * Returns the cosinus of the specified angle.
-	 * This functions works around the performance problems of Java trigonomy functions
-	  * on the x86 platform the inaccuracy involved when convertinglarge angles
+	 * This functions works around the performance problems of Java trigonometry functions
+	 * on the x86 platform and the inaccuracy involved when converting large angles
 	 * from degrees to radians.
 	 * @param alpha the angle in degrees
 	 * @return the cosinus of the specified angle
 	 */
 	public static final double degCos(double alpha){
-		return degSin(alpha + 90);
+		alpha = Math.abs(alpha) % 360;
+		if (alpha > 295) return  Math.cos((alpha - 360) / 180 * Math.PI);
+		if (alpha > 205) return  Math.sin((alpha - 270) / 180 * Math.PI);
+		if (alpha > 135) return -Math.cos((alpha - 180) / 180 * Math.PI);
+		if (alpha > 45)  return -Math.sin((alpha - 90)  / 180 * Math.PI);
+		return Math.cos(alpha / 180 * Math.PI);
+	}
+	
+	/**
+	 * Returns the sinus of the specified angle.
+	 * This functions works around the performance problems of Java trigonometry functions
+	 * on the x86 platform and the inaccuracy involved when converting large angles
+	 * from degrees to radians.
+	 * @param alpha the angle in degrees
+	 * @return the sinus of the specified angle
+	 */
+	public static final double degSin(double alpha){
+		return degCos(alpha - 90);
 	}
 }
