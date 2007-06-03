@@ -37,9 +37,7 @@ public abstract class Transform {
 	 * @return the specified normal vector (after the transformation)
 	 */
 	public Vector3d invTransform(Vector3d normal) {
-		if (invInvalid) {
-			computeInverse();
-		}
+		computeInverse();
 		invMatrix.transform(normal);
 		return normal;
 	}
@@ -60,9 +58,7 @@ public abstract class Transform {
 	 * @return the specified point (after the transformation)
 	 */
 	public Point3d invTransform(Point3d point) {
-		if (invInvalid) {
-			computeInverse();
-		}
+		computeInverse();
 		invMatrix.transform(point);
 		return point;
 	}
@@ -110,10 +106,15 @@ public abstract class Transform {
 	}
 	
 	/**
-	 * Sets invMatrix to the inverse of matrix and clears the invInvalid flag
+	 * Computes invMatrix (sets invMatrox to the inverse of matrix).
+	 * This implementation checks wheter the invInvalid flag is set and
+	 * computes the matrix only if so. Once the invMatrix has been
+	 * computed, the invInvalid flag is cleared.
 	 */
 	private void computeInverse() {
-		invMatrix.invert(matrix);
-		invInvalid = false;
+		if (invInvalid) {
+			invMatrix.invert(matrix);
+			invInvalid = false;
+		}
 	}
 }

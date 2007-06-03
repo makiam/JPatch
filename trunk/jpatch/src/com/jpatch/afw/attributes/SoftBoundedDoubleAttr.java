@@ -60,12 +60,16 @@ public class SoftBoundedDoubleAttr extends DoubleAttr {
 	
 	@Override
 	public double setDouble(double value) {
+		return super.setDouble(getBoundedValue(value));
+	}
+	
+	public double getBoundedValue(double value) {
 		if (minLimitAttr.getBoolean() && value < minAttr.getDouble()) {
-			return super.setDouble(minAttr.getDouble());
-		} else if (maxLimitAttr.getBoolean() && value > maxAttr.getDouble()) {
-			return super.setDouble(maxAttr.getDouble());
-		} else {
-			return super.setDouble(value);
+			return minAttr.getDouble();
 		}
+		if (maxLimitAttr.getBoolean() && value > maxAttr.getDouble()) {
+			return maxAttr.getDouble();
+		}
+		return value;
 	}
 }

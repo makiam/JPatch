@@ -22,7 +22,7 @@ public class Utils3d {
 	 * @param vector the translation vector
 	 * @return the specified matrix
 	 */
-	public static final Matrix4d translateMatrix(Matrix4d matrix, Vector3d vector) {
+	public static final Matrix4d translateMatrix(Matrix4d matrix, Tuple3d vector) {
 		matrix.m03 += vector.x;
 		matrix.m13 += vector.y;
 		matrix.m23 += vector.z;
