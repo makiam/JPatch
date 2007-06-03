@@ -9,7 +9,7 @@ package com.jpatch.afw.attributes;
  *
  * @param <T>
  */
-public abstract class AbstractAttribute<T> implements Attribute{
+public abstract class AbstractAttribute<T> implements Attribute {
 	/**
 	 * An array holding the AttributePreChangeListeners of this AbstractAttributes.
 	 * Can be null (i.e. will be set to null if the list is empty)

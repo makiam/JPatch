@@ -30,12 +30,10 @@ public class HardBoundedDoubleAttr extends DoubleAttr {
 
 	@Override
 	public double setDouble(double value) {
-		if (value < min) {
-			return super.setDouble(min);
-		} else if (value > max) {
-			return super.setDouble(max);
-		} else {
-			return super.setDouble(value);
-		}
+		return super.setDouble(getBoundedValue(value));
+	}
+	
+	public double getBoundedValue(double value) {
+		return value < min ? min : value > max ? max : value;
 	}
 }
