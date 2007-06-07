@@ -1,8 +1,15 @@
 package com.jpatch.afw.ui;
 
 import com.jpatch.afw.control.ResourceManager;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
 
 public class PlatformUtils {
 	public static enum Platform { LINUX, MAC_OS_X, WINDOWS, SOLARIS, UNKNOWN_OTHER }
@@ -68,5 +75,38 @@ public class PlatformUtils {
 		}
 		sb.append(ResourceManager.getInstance().getKeyName(keyStroke.getKeyCode()));
 		return sb.toString();
+	}
+	
+	public static void setupSwing() {
+		System.setProperty("swing.boldMetal", "false");
+		System.setProperty("swing.aatext", "true");
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
+		UIManager.getLookAndFeelDefaults().put("ComboBox.background", Color.WHITE);
+		UIManager.getLookAndFeelDefaults().put("TextField.border", new Border() {
+			private final Color BORDER_COLOR = UIManager.getDefaults().getColor("Button.darkShadow");
+			private final Color SHADOW1_COLOR = new Color(0x40000000, true);
+			private final Color SHADOW2_COLOR = new Color(0x20000000, true);
+			private final Color SHADOW3_COLOR = new Color(0x0c000000, true);
+			private final Insets INSETS = new Insets(2, 4, 1, 1);
+			
+			public Insets getBorderInsets(Component c) {
+				return INSETS;
+			}
+
+			public boolean isBorderOpaque() {
+				return true;
+			}
+
+			public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+				g.setColor(SHADOW1_COLOR);
+				g.drawRect(x + 1, y + 1, width, height);
+				g.setColor(SHADOW2_COLOR);
+				g.drawRect(x + 2, y + 2, width, height);
+				g.setColor(SHADOW3_COLOR);
+				g.drawRect(x + 3, y + 3, width, height);
+				g.setColor(BORDER_COLOR);
+				g.drawRect(x, y, width - 1, height - 1);
+			}
+		});
 	}
 }
