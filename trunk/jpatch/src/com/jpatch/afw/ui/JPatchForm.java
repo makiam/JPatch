@@ -22,12 +22,12 @@ public class JPatchForm {
 		label.setPreferredSize(LABEL_SIZE);
 		label.setMaximumSize(LABEL_SIZE);
 		component.add(label, gbc);
-		for (JComponent c : components) {
-			/* set equal preferred sizes for all components (metal combobox would be too high otherwise) */
-			if (getFill(c) == GridBagConstraints.HORIZONTAL) {
-				c.setPreferredSize(SLIDER_SIZE);
-			}
-		}
+//		for (JComponent c : components) {
+//			/* set equal preferred sizes for all components (metal combobox would be too high otherwise) */
+//			if (getFill(c) == GridBagConstraints.HORIZONTAL) {
+//				c.setPreferredSize(SLIDER_SIZE);
+//			}
+//		}
 		if (components.length == 3) {
 			/* add three components to the grid */
 			for (int i = 0; i < 3; i++) {
@@ -42,8 +42,9 @@ public class JPatchForm {
 			if (components[1] instanceof JSlider) {
 				/* if the right component is a slider, fill the right side of the grid with the slider */
 				gbc = new GridBagConstraints(2, row, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, getFill(components[1]), INSETS, 0, 0);
+				components[1].setPreferredSize(SLIDER_SIZE);
 			} else {
-				gbc = new GridBagConstraints(2, row, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, getFill(components[1]), INSETS, 0, 0);
+				gbc = new GridBagConstraints(1, row, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, getFill(components[0]), INSETS, 0, 0);
 			}
 			component.add(components[1], gbc);
 		} else if (components.length == 1) {
