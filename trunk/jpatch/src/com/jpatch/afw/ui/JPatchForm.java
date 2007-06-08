@@ -22,7 +22,7 @@ public class JPatchForm {
 	
 	private int row = 0;
 	private JPatchFormContainer container;
-	private final Insets BORDER_INSETS = new Insets(8, 8, 8, 8);
+	private final Insets BORDER_INSETS = new Insets(0, 8, 0, 8);
 	
 	public JPatchForm() {
 		component.setBorder(new Border() {

@@ -174,6 +174,7 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 			throw new IllegalArgumentException(state + " is already a state of this statemachine (" + this + ")");
 		}
 		states.add(state);
+		fire
 	}
 
 	/**
