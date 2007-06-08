@@ -62,6 +62,7 @@ public abstract class AbstractAttribute<T> implements Attribute {
      * @throws IllegalArgumentException if the specified addAttributePostChangeListener has already been added to this AbstractAttribute
      */
     public void addAttributePostChangeListener(AttributePostChangeListener l) {
+//    	System.out.println("addAttributePostChangeListener " + l);
     	if (l == null) {
     		throw new NullPointerException();
     	}
@@ -121,6 +122,7 @@ public abstract class AbstractAttribute<T> implements Attribute {
      * @see #addAttributePostChangeListener
      */
     public void removeAttributePostChangeListener(AttributePostChangeListener l) {
+//    	System.out.println("removeAttributePostChangeListener " + l);
     	if (attributePostChangeListeners == null) {
     		return; 								// listener list is empty, ignore silently and return
     	}
