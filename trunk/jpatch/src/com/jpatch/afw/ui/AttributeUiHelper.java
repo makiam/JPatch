@@ -10,6 +10,8 @@ import java.text.*;
 import java.util.*;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class AttributeUiHelper {
 	private static final DecimalFormat INT_FORMAT = new DecimalFormat("0", new DecimalFormatSymbols(Locale.ENGLISH));
@@ -28,6 +30,67 @@ public class AttributeUiHelper {
 	
 	public static JComboBox bindComboBoxToAttribute(final JComboBox comboBox, final StateMachine stateMachine) {
 		return comboBox;
+	}
+	
+	public static JSlider bindSliderToAttribute(final JSlider slider, final DoubleAttr doubleAttr, final DoubleAttr min, final DoubleAttr max, final Mapping mapping) {
+		slider.setMinimum(0);
+		slider.setMaximum(1000);
+		setSliderPosition(slider, doubleAttr, min, max, mapping);
+		
+		/* pointer to a flag that's checked by the listeners to prevent loops - agreeable an ugly hack */
+		final boolean[] sliderAdjusting = new boolean[] { false };
+		
+		/* create and an AttributePostChangeListener to listen for attribute changes und update the slider */
+		AttributePostChangeListener attrListener = new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				if (!sliderAdjusting[0]) {
+					sliderAdjusting[0] = true;
+					setSliderPosition(slider, doubleAttr, min, max, mapping);
+					sliderAdjusting[0] = false;
+				}
+			}
+		};
+		
+		ChangeListener changeListener = new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (!sliderAdjusting[0]) {
+					sliderAdjusting[0] = true;
+					getSliderValue(slider, doubleAttr, min, max, mapping);
+					sliderAdjusting[0] = false;
+				}
+			}
+		};
+		
+		/* create the binding */
+		createBinding(slider, doubleAttr, min, max, attrListener, null, null, changeListener);
+		
+		return slider;
+	}
+	
+	
+	private static void setSliderPosition(JSlider slider, DoubleAttr value, DoubleAttr min, DoubleAttr max, Mapping mapping) {
+		double mappedValue = mapping.getValue(value.getDouble());
+		double mappedMin = mapping.getValue(min.getDouble());
+		double mappedMax = mapping.getValue(max.getDouble());
+		int sliderValue = slider.getMinimum() + (int) ((slider.getMaximum() - slider.getMinimum()) * (mappedValue - mappedMin) / (mappedMax - mappedMin));
+		
+		System.out.println("value min=" + mappedMin + " max=" + mappedMax + " current=" + mappedValue);
+		System.out.println("slider min=" + slider.getMinimum() + " max=" + slider.getMaximum() + " current=" + sliderValue);
+		
+		slider.setValue(slider.getMinimum() + (int) ((slider.getMaximum() - slider.getMinimum()) * (mappedValue - mappedMin) / (mappedMax - mappedMin)));
+	}
+	
+	private static void getSliderValue(JSlider slider, DoubleAttr value, DoubleAttr min, DoubleAttr max, Mapping mapping) {
+		double mappedMin = mapping.getValue(min.getDouble());
+		double mappedMax = mapping.getValue(max.getDouble());
+//		System.out.println(slider.getValue() - slider.getMinimum());
+//		System.out.println(slider.getMaximum() - slider.getMaximum());
+		double mappedValue = mappedMin + (mappedMax - mappedMin) * (slider.getValue() - slider.getMinimum()) / (slider.getMaximum() - slider.getMinimum());
+		
+		System.out.println("slider min=" + slider.getMinimum() + " max=" + slider.getMaximum() + " current=" + slider.getValue());
+		System.out.println("value min=" + mappedMin + " max=" + mappedMax + " current=" + mappedValue);
+		
+		value.setDouble(mapping.getMappedValue(mappedValue));
 	}
 	
 	/**
@@ -54,7 +117,7 @@ public class AttributeUiHelper {
 		};
 		
 		/* create the binding */
-		createBinding(checkBox, booleanAttr, attrListener, actionListener, null);
+		createBinding(checkBox, booleanAttr, null, null, attrListener, actionListener, null, null);
 		
 		return checkBox;
 	}
@@ -94,7 +157,7 @@ public class AttributeUiHelper {
 		};
 		
 		/* create the binding */
-		createBinding(textField, doubleAttr, attrListener, TRANSFER_FOCUS_ACTIONLISTENER, focusListener);
+		createBinding(textField, doubleAttr, null, null, attrListener, TRANSFER_FOCUS_ACTIONLISTENER, focusListener, null);
 		
 		return textField;
 	}
@@ -124,19 +187,23 @@ public class AttributeUiHelper {
 	 */
 	private static void createBinding(JComponent component,
 			Attribute attribute,
+			Attribute min,
+			Attribute max,
 			AttributePostChangeListener attributePostChangeListener,
 			ActionListener actionListener,
-			FocusListener focusListener) {
-		new Binding(component, attribute, attributePostChangeListener, actionListener, focusListener);
+			FocusListener focusListener,
+			ChangeListener changeListener) {
+		new Binding(component, attribute, min, max, attributePostChangeListener, actionListener, focusListener, changeListener);
 	}
 	
 	private static class Binding {
 		static final Map<Component, Binding> componentMap = new HashMap<Component, Binding>();
 		final JComponent component;
-		final Attribute attribute;
+		final Attribute attribute, min, max;
 		final AttributePostChangeListener attributePostChangeListener;
 		final ActionListener actionListener;
 		final FocusListener focusListener;
+		final ChangeListener changeListener;
 		final HierarchyListener hierarchyListener;
 
 		/**
@@ -154,9 +221,12 @@ public class AttributeUiHelper {
 		 */
 		private Binding(JComponent component,
 				Attribute attribute,
+				Attribute min,
+				Attribute max,
 				AttributePostChangeListener attributePostChangeListener,
 				ActionListener actionListener,
-				FocusListener focusListener) {
+				FocusListener focusListener,
+				ChangeListener changeListener) {
 			if (component == null) {
 				throw new NullPointerException("component must not be null");
 			}
@@ -168,9 +238,12 @@ public class AttributeUiHelper {
 			}
 			this.component = component;
 			this.attribute = attribute;
+			this.min = min;
+			this.max = max;
 			this.attributePostChangeListener = attributePostChangeListener;
 			this.actionListener = actionListener;
 			this.focusListener = focusListener;
+			this.changeListener = changeListener;
 			this.hierarchyListener = new HierarchyListener() {
 				public void hierarchyChanged(HierarchyEvent e) {
 					if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
@@ -208,6 +281,14 @@ public class AttributeUiHelper {
 				attribute.addAttributePostChangeListener(attributePostChangeListener);
 			}
 			
+			/* add the attributePostChangeListener to the min and max attributes if applicable */
+			if (min != null) {
+				min.addAttributePostChangeListener(attributePostChangeListener);
+			}
+			if (max != null) {
+				max.addAttributePostChangeListener(attributePostChangeListener);
+			}
+			
 			/* if there is an actionListener, add it to the component (if at all possible) */
 			if (actionListener != null) {
 				if (component instanceof AbstractButton) {
@@ -222,6 +303,15 @@ public class AttributeUiHelper {
 			/* if there is a focusListener, add it to the component */
 			if (focusListener != null) {
 				component.addFocusListener(focusListener);
+			}
+			
+			/* if there is a changeListner, add it to the component (if at all possible) */
+			if (changeListener != null) {
+				if (component instanceof JSlider) {
+					((JSlider) component).addChangeListener(changeListener);
+				} else {
+					throw new RuntimeException("Can't add changeListener to " + component);
+				}
 			}
 			
 			/* add the hierarchyListener */
@@ -252,6 +342,14 @@ public class AttributeUiHelper {
 				attribute.removeAttributePostChangeListener(attributePostChangeListener);
 			}
 			
+			/* remove the attributePostChangeListener from the min and max attributes if applicable */
+			if (min != null) {
+				min.removeAttributePostChangeListener(attributePostChangeListener);
+			}
+			if (max != null) {
+				max.removeAttributePostChangeListener(attributePostChangeListener);
+			}
+			
 			/* if there is an actionListener, remove it from the component (if at all possible) */
 			if (actionListener != null) {
 				if (component instanceof AbstractButton) {
@@ -266,6 +364,15 @@ public class AttributeUiHelper {
 			/* if there is a focusListener, remove it from the component */
 			if (focusListener != null) {
 				component.removeFocusListener(focusListener);
+			}
+			
+			/* if there is a changeListner, remove it from the component (if at all possible) */
+			if (changeListener != null) {
+				if (component instanceof JSlider) {
+					((JSlider) component).removeChangeListener(changeListener);
+				} else {
+					throw new RuntimeException("Can't remove changeListener to " + component);
+				}
 			}
 			
 			/* remove the hierarchyListener */
