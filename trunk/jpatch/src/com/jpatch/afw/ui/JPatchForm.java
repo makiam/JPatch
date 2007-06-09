@@ -212,10 +212,9 @@ public class JPatchForm {
 					maxHeight = height;
 				}
 			}
-			System.out.println("maxHeight = " + maxHeight);
+//			System.out.println("maxHeight = " + maxHeight);
 			int start = LABEL_SIZE.width, width = parent.getSize().width - start;
 			setComponentBounds(parent.getComponent(0), 0, 0, start, maxHeight, false, false);
-//			parent.getComponent(0).setBounds(0, 0, start, maxHeight);
 			for (int i = 0, n = parent.getComponentCount() - 1; i < n; i++) {
 				Component c = parent.getComponent(i + 1);
 				int d = n;
@@ -227,7 +226,6 @@ public class JPatchForm {
 				boolean fill = !(c instanceof JCheckBox || c instanceof JButton);
 				int w = c instanceof JSlider ? width - (i * width / d) : (i + 1) * width / d - (i * width / d);
 				setComponentBounds(c, start + (i * width / d), 0, w, maxHeight, true, fill);
-//				parent.getComponent(i + 1).setBounds(start + (i * width / n), 0, (i + 1) * width / n - (i * width / n), maxHeight);
 			}
 		}
 
