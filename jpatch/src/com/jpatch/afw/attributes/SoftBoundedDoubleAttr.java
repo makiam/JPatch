@@ -17,7 +17,6 @@ public class SoftBoundedDoubleAttr extends DoubleAttr {
 	}
 	
 	public SoftBoundedDoubleAttr(double min, double max, double value) {
-		super(value);
 		if (min > max) {
 			throw new IllegalArgumentException("min (" + min + ") > max (" + max + ")");
 		}
@@ -32,6 +31,7 @@ public class SoftBoundedDoubleAttr extends DoubleAttr {
 		maxAttr.addAttributePostChangeListener(attributeListener);
 		minLimitAttr.addAttributePostChangeListener(attributeListener);
 		maxLimitAttr.addAttributePostChangeListener(attributeListener);
+		setDouble(value);
 	}
 	
 	public double getMin() {

@@ -8,7 +8,7 @@ public class DoubleAttr extends AbstractAttribute {
 	}
 	
 	public DoubleAttr(double value) {
-		setDouble(value);
+		this.value = value;
 	}
 	
 	public double getDouble() {
