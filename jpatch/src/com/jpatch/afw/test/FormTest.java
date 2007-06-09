@@ -41,7 +41,7 @@ public class FormTest {
 		transform.addRow(new JLabel("scale"), new JTextField(), new JTextField(), new JTextField());
 		
 		JPatchForm advanced = new JPatchForm();
-		advanced.addRow(new JLabel("visibility"), new JComboBox(new String[] { "visible", "invisible" } ));
+		advanced.addRow(new JLabel("visibility"), new JCheckBox());
 		advanced.addRow(new JLabel("rotation order"), new JComboBox(Rotation3d.Order.values()));
 		advanced.addRow(new JLabel("position"), new JTextField(), new JTextField(), new JTextField());
 		advanced.addRow(new JLabel("orientation"), new JTextField(), new JTextField(), new JTextField());
@@ -93,6 +93,10 @@ public class FormTest {
 //		limits.addRow(new JLabel("scale min"), new JTextField(), new JTextField(), new JTextField());
 //		limits.addRow(new JLabel("scale max"), new JTextField(), new JTextField(), new JTextField());
 		
+		JPatchForm test = new JPatchForm();
+		test.addRow(new JLabel("2D test"), new JTextField(), new JTextField());
+		test.addRow(new JLabel("1D test"), new JTextField());
+		test.addRow(new JLabel("Slider test"), new JTextField(), new JSlider());
 		
 		frame.setLayout(new BorderLayout());
 		
@@ -106,6 +110,7 @@ public class FormTest {
 		JPatchFormContainer container6 = new JPatchFormContainer("Scale");
 		JPatchFormContainer container7 = new JPatchFormContainer("Lock");
 		JPatchFormContainer container8 = new JPatchFormContainer("Animate");
+		JPatchFormContainer container9 = new JPatchFormContainer("Test");
 		
 		container4.add(transLimits);
 		container5.add(rotLimits);
@@ -122,6 +127,9 @@ public class FormTest {
 		container2.add(container8);
 		container7.add(locks);
 		container8.add(animate);
+		
+		container9.add(test);
+		container.add(container9);
 		
 		frame.add(container.getComponent(), BorderLayout.NORTH);
 		frame.setSize(300, 500);

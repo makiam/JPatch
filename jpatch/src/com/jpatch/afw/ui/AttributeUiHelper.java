@@ -32,7 +32,6 @@ public class AttributeUiHelper {
 	}
 	/**
 	 * Binds the specified JCheckBox to the specified Attribute.
-	 * This method <b>must</b> be called <b>before</b> the JCheckBox becomes visible!
 	 * @param checkBox
 	 * @param booleanAttr
 	 * @return the specified JCheckBox
@@ -61,13 +60,13 @@ public class AttributeUiHelper {
 	
 	/**
 	 * Binds the specified JTextField to the specified Attribute.
-	 * This method <b>must</b> be called <b>before</b> the JTextField becomes visible!
 	 * @param textField
 	 * @param doubleAttr
 	 * @return the specified JTextField
 	 * @throws NullPointerException if any of the specified parameters is null
 	 */
 	public static JTextField bindTextFieldToAttribute(final JTextField textField, final DoubleAttr doubleAttr) {
+		textField.setColumns(COLUMNS);
 		textField.setHorizontalAlignment(SwingConstants.RIGHT);
 		textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
 		
@@ -129,6 +128,9 @@ public class AttributeUiHelper {
 	 */
 	private static void prepareHierarchyListener(final JComponent component, final Attribute attr, final AttributePostChangeListener attrListener) {
 		/* add a HierarchyListener to add/remove the changelistener if the component becomes showing */
+		if (component.isShowing()) {
+			attr.addAttributePostChangeListener(attrListener);
+		}
 		component.addHierarchyListener(new HierarchyListener() {
 			public void hierarchyChanged(HierarchyEvent e) {
 				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
