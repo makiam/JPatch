@@ -32,9 +32,10 @@ public class JPatchFormContainer {
 			}
 		});
 		button.setContentAreaFilled(false);
-		button.setBorder(null);
+		button.setBorderPainted(false);
 		button.setIcon(COLLAPSED_ICON);
 		button.setSelectedIcon(EXPANDED_ICON);
+		button.setPreferredSize(new Dimension(COLLAPSED_ICON.getIconWidth(), COLLAPSED_ICON.getIconHeight()));
 		titleBar.add(button, BorderLayout.WEST);
 		JLabel label = new JLabel(title);
 		label.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
@@ -55,17 +56,19 @@ public class JPatchFormContainer {
 			}
 
 			public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+				int h = titleBar.getHeight();
 				Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 				g2.setColor(BORDER_COLORS[getLevel() - 1]);
-				g2.fillRoundRect(x, y + 1, width, 16, 8, 8);
+				g2.fillRoundRect(x, y + 1, width, h, 8, 8);
+				g2.drawRoundRect(x, y + 1, width - 1, h - 1, 8, 8);
 				if (expanded) {
 //					g.fillRect(x, y, 2, height - 4);
 //					g.fillRect(x + width - 2, y, 2, height - 4);
 //					g.fillRect(x, y + height - 4, width, 2);
 //					g2.setStroke(new BasicStroke(2));
-					g2.drawRoundRect(x, y + 14 + 1, width - 1, height - 3 - 14, 8, 8);
-					g2.drawRoundRect(x + 1, y + 15 + 1, width - 3, height - 5 - 14, 6, 6);
+					g2.drawRoundRect(x, y + h - 1, width - 1, height - h - 1, 8, 8);
+					g2.drawRoundRect(x + 1, y + h, width - 3, height - h - 3, 6, 6);
 					g2.fillRect(x, 12, 2, 8);
 					g2.fillRect(x + width - 2, 12, 2, 8);
 				}
