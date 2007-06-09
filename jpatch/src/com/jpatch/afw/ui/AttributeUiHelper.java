@@ -1,22 +1,13 @@
 package com.jpatch.afw.ui;
 
-import com.jpatch.afw.attributes.Attribute;
-import com.jpatch.afw.attributes.AttributePostChangeListener;
-import com.jpatch.afw.attributes.BooleanAttr;
-import com.jpatch.afw.attributes.DoubleAttr;
-import com.jpatch.afw.attributes.StateMachine;
-import com.jpatch.afw.control.Configuration;
+import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.control.*;
 import com.jpatch.boundary.Main;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
+import java.awt.*;
+import java.awt.event.*;
 import java.text.*;
-import java.util.Locale;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -25,11 +16,20 @@ public class AttributeUiHelper {
 	private static final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("0.000", new DecimalFormatSymbols(Locale.ENGLISH));
 	private static final int COLUMNS = 6;
 	
+	/**
+	 * An actionListener that transfers the focus of the component that fired the actionEvent
+	 * (needed for textFields)
+	 */
+	private static final ActionListener TRANSFER_FOCUS_ACTIONLISTENER = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			((JComponent) e.getSource()).transferFocus();
+		};
+	};
 	
 	public static JComboBox bindComboBoxToAttribute(final JComboBox comboBox, final StateMachine stateMachine) {
-		
 		return comboBox;
 	}
+	
 	/**
 	 * Binds the specified JCheckBox to the specified Attribute.
 	 * @param checkBox
@@ -40,20 +40,21 @@ public class AttributeUiHelper {
 	public static JCheckBox bindCheckBoxToAttribute(final JCheckBox checkBox, final BooleanAttr booleanAttr) {
 		checkBox.setSelected(booleanAttr.getBoolean());
 		
-		/* create and an AttributePostChangeListener to listen for attribute changes und update the textfield */
+		/* create and an AttributePostChangeListener to listen for attribute changes und update the checkbox */
 		AttributePostChangeListener attrListener = new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				checkBox.setSelected(booleanAttr.getBoolean());
 			}
 		};
 		
-		checkBox.addActionListener(new ActionListener() {
+		ActionListener actionListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				booleanAttr.setBoolean(checkBox.isSelected());
 			}
-		});
+		};
 		
-		prepareHierarchyListener(checkBox, booleanAttr, attrListener);
+		/* create the binding */
+		createBinding(checkBox, booleanAttr, attrListener, actionListener, null);
 		
 		return checkBox;
 	}
@@ -77,8 +78,8 @@ public class AttributeUiHelper {
 			}
 		};
 		
-		/* add a FocusListener to the textfied to verify and update the attribute value on focus loss */
-		textField.addFocusListener(new FocusAdapter() {
+		/* create a FocusListener to for textfied to verify and update the attribute value on focus loss */
+		FocusListener focusListener = new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
 				try {
@@ -90,57 +91,202 @@ public class AttributeUiHelper {
 					textField.requestFocus();
 				}
 			}
-		});
+		};
 		
-		prepareTextFieldCommonListeners(textField, doubleAttr, attrListener);
+		/* create the binding */
+		createBinding(textField, doubleAttr, attrListener, TRANSFER_FOCUS_ACTIONLISTENER, focusListener);
 		
 		return textField;
 	}
 	
 	/**
-	 * This method adds two listeners to the specified JTextField:
-	 * <ol><li>A HierarchyListener that adds the specified AttributePostChangeListener to the attribute when the JTextField becomes
-	 * visible and removes it when the JTextField becomes invisible.</li>
-	 * <li>An ActionListener that calles transferFocus() on the specified JTextField. Event processing should be handled in a FocusListener.</li></ol>
-	 * @param textField the TextField to add the listeners to
-	 * @param attr the Attribute that's to be bound to this TextField
-	 * @param attrListener the AttributeListener that's to be bound to this TextField
-	 * @throws NullPointerException if any of the specified parameters is null
+	 * Removes the binding between the specified component and the attribute it's bound to
+	 * by removing all the listeners that have been added to the component and the attribute
+	 * when they were bound together.
+	 * @throws IllegalArgumentException if this component is not bound to an attribute
+	 * @see all the relevant bind... methods.
 	 */
-	private static void prepareTextFieldCommonListeners(final JTextField textField, final Attribute attr, final AttributePostChangeListener attrListener) {
-		prepareHierarchyListener(textField, attr, attrListener);
-		
-		/* add an action listener to the textfield */
-		textField.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				textField.transferFocus();
-			}
-		});
+	public static void unbindComponent(JComponent component) {
+		Binding.unbind(component);
 	}
 	
 	/**
-	 * This method adds a HierarchyListener to the component that adds the specified AttributePostChangeListener to the
-	 * attribute when the component becomes visible and removes it when the JTextField becomes invisible.
-	 * @param component the component to add the listeners to
-	 * @param attr the Attribute that's to be bound to this component
-	 * @param attrListener the AttributeListener that's to be bound to this component
-	 * @throws NullPointerException if any of the specified parameters is null
+	 * Establishes a new component-To-attribute binding. If the specified component is already bound, this method
+	 * will remove the established binding first.
+	 * All relevant listeners are registered and this binding is added to the static component-to-binding map.
+	 * @param component
+	 * @param attribute
+	 * @param attributePostChangeListener
+	 * @param actionListener
+	 * @param focusListener
+	 * @throws NullPointerException if component, attribute and/or attributePostChangeListener are null
+	 * @throws RuntimeException if one of the listeners can't be added to the component
 	 */
-	private static void prepareHierarchyListener(final JComponent component, final Attribute attr, final AttributePostChangeListener attrListener) {
-		/* add a HierarchyListener to add/remove the changelistener if the component becomes showing */
-		if (component.isShowing()) {
-			attr.addAttributePostChangeListener(attrListener);
-		}
-		component.addHierarchyListener(new HierarchyListener() {
-			public void hierarchyChanged(HierarchyEvent e) {
-				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-					if (component.isShowing()) {
-						attr.addAttributePostChangeListener(attrListener);
-					} else {
-						attr.removeAttributePostChangeListener(attrListener);
+	private static void createBinding(JComponent component,
+			Attribute attribute,
+			AttributePostChangeListener attributePostChangeListener,
+			ActionListener actionListener,
+			FocusListener focusListener) {
+		new Binding(component, attribute, attributePostChangeListener, actionListener, focusListener);
+	}
+	
+	private static class Binding {
+		static final Map<Component, Binding> componentMap = new HashMap<Component, Binding>();
+		final JComponent component;
+		final Attribute attribute;
+		final AttributePostChangeListener attributePostChangeListener;
+		final ActionListener actionListener;
+		final FocusListener focusListener;
+		final HierarchyListener hierarchyListener;
+
+		/**
+		 * Constructs and establishes a new component-To-attribute binding.
+		 * If the component is currently bound, the current binding is removed.
+		 * All relevant listeners are registered and this binding is added to the static component-to-binding map.
+		 * @param component
+		 * @param attribute
+		 * @param attributePostChangeListener
+		 * @param actionListener
+		 * @param focusListener
+		 * @throws NullPointerException if component, attribute and/or attributePostChangeListener are null
+		 * @throws IllegalStateException if this component is already bound to an attribute
+		 * @throws RuntimeException if one of the listeners can't be added to the component
+		 */
+		private Binding(JComponent component,
+				Attribute attribute,
+				AttributePostChangeListener attributePostChangeListener,
+				ActionListener actionListener,
+				FocusListener focusListener) {
+			if (component == null) {
+				throw new NullPointerException("component must not be null");
+			}
+			if (attribute == null) {
+				throw new NullPointerException("attribute must not be null");
+			}
+			if (attributePostChangeListener == null) {
+				throw new NullPointerException("attributePostChangeListener must not be null");
+			}
+			this.component = component;
+			this.attribute = attribute;
+			this.attributePostChangeListener = attributePostChangeListener;
+			this.actionListener = actionListener;
+			this.focusListener = focusListener;
+			this.hierarchyListener = new HierarchyListener() {
+				public void hierarchyChanged(HierarchyEvent e) {
+					if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+						if (Binding.this.component.isShowing()) {
+							Binding.this.attribute.addAttributePostChangeListener(Binding.this.attributePostChangeListener);
+						} else {
+							Binding.this.attribute.removeAttributePostChangeListener(Binding.this.attributePostChangeListener);
+						}
 					}
 				}
+			};
+			bind();
+		}
+		
+		/**
+		 * Adds the various listeners to the component and the attribute, respectively.
+		 * If the component is currently bound, the current binding is removed.
+		 * Adds this Binding to the static Component-to-Binding map.
+		 * This method is called by the constructor and must not be called from anywhere else!
+		 * @throws RuntimeException if one of the listeners can't be added to the component
+		 */
+		private void bind() {
+			/* ensure that this binding is not already mapped to a component */
+			Binding currentBinding = componentMap.get(component);
+			if (currentBinding != null) {
+				currentBinding.unbind();
 			}
-		});
+			
+			/*
+			 * if the component is currently showing, add the attributePostChangeListener to the
+			 * attribute (otherwise this is done by the hierarchyListener when the component
+			 * gets shown)
+			 */
+			if (component.isShowing()) {
+				attribute.addAttributePostChangeListener(attributePostChangeListener);
+			}
+			
+			/* if there is an actionListener, add it to the component (if at all possible) */
+			if (actionListener != null) {
+				if (component instanceof AbstractButton) {
+					((AbstractButton) component).addActionListener(actionListener);
+				} else if (component instanceof JTextField) {
+					((JTextField) component).addActionListener(actionListener);
+				} else {
+					throw new RuntimeException("Can't add actionListener to " + component);
+				}
+			}
+			
+			/* if there is a focusListener, add it to the component */
+			if (focusListener != null) {
+				component.addFocusListener(focusListener);
+			}
+			
+			/* add the hierarchyListener */
+			component.addHierarchyListener(hierarchyListener);
+			
+			/* add this binding to the component-to-binding map */
+			componentMap.put(component, this);
+		}
+		
+		/**
+		 * Removes listeners from the component and the attribute.
+		 * Removes this Binding from the static Component-to-Binding map.
+		 * @throws IllegalStateException if this component is not bound to an attribute
+		 * @throws RuntimeException if one of the listeners can't be removed from the component
+		 */
+		private void unbind() {
+			/* ensure that this binding actually is mapped to a component */
+			if (!componentMap.containsKey(component)) {
+				throw new IllegalStateException("Component " + component + " is not bound to an attribute");
+			}
+			
+			/*
+			 * if the component is currently showing, remove the attributePostChangeListener from the
+			 * attribute (otherwise this was done by the hierarchyListener when the component
+			 * was hidden)
+			 */
+			if (component.isShowing()) {
+				attribute.removeAttributePostChangeListener(attributePostChangeListener);
+			}
+			
+			/* if there is an actionListener, remove it from the component (if at all possible) */
+			if (actionListener != null) {
+				if (component instanceof AbstractButton) {
+					((AbstractButton) component).removeActionListener(actionListener);
+				} else if (component instanceof JTextField) {
+					((JTextField) component).removeActionListener(actionListener);
+				} else {
+					throw new RuntimeException("Can't remove actionListener from " + component);
+				}
+			}
+			
+			/* if there is a focusListener, remove it from the component */
+			if (focusListener != null) {
+				component.removeFocusListener(focusListener);
+			}
+			
+			/* remove the hierarchyListener */
+			component.removeHierarchyListener(hierarchyListener);
+			
+			/* remove this binding from the component-to-binding map */
+			componentMap.remove(component);
+		}
+		
+		/**
+		 * Removes all listeners from the specified component and the attribute it is bound to.
+		 * Removes this Binding from the static Component-to-Binding map.
+		 * @throws IllegalArgumentException if this component is not bound to an attribute
+		 * @throws RuntimeException if one of the listeners can't be removed from the component
+		 */
+		private static void unbind(JComponent component) {
+			Binding binding = componentMap.get(component);
+			if (binding == null) {
+				throw new IllegalArgumentException("Component " + component + " is not bound to an attribute");
+			}
+			binding.unbind();
+		}
 	}
 }
