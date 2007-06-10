@@ -1,0 +1,18 @@
+ <html>
+ <body>
+ Attributes are wrappers around a primitives or objects. Unlike the primitive wrappers in java.lang
+ (Integer, Boolean, Float, etc.), Attributes are deliberately mutable.
+ The purpose of Attributes is to provide event notification when the wrapped value was changed.
+ Unlike the event processing in the AWT and in Swing, Attributes provide <i>pre</i>- and
+ <i>post</i>-event-notifications.
+ <p>
+ The classes in this package are generally <b>not thread-safe</b>!
+ <p>
+ Besides the "primitive" Attributes <i>BooleanAttr</i>, <i>IntAttr</i> and <i>DoubleAttr</i> there are spicialized versions of <i>DoubleAttr</i>
+ (<i>HardBoundedDoubleAttr</i> and <i>SoftBoundedDoubleAttr</i>), a <i>GenericAttr</i> (that wraps around any object), Attributes that represent
+ Tuples of 2 or 3 DoubleAttrs, a <i>CollectionAttr</i> that wraps a Collection and finally a <i>StateMachine</i>.
+ <p>
+ Attributes are especially useful for binding user-interface components like TextFields or Sliders to attribute-values. A lot of useful classes
+ for this purpos can be found in the com.jpatch.awf.ui package.
+ </body>
+ </html>
