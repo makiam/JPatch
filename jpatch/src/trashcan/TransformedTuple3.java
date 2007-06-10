@@ -1,4 +1,9 @@
-package com.jpatch.afw.attributes;
+package trashcan;
+
+import com.jpatch.afw.attributes.Attribute;
+import com.jpatch.afw.attributes.AttributePostChangeListener;
+import com.jpatch.afw.attributes.DoubleAttr;
+import com.jpatch.afw.attributes.Tuple3Attr;
 
 import javax.vecmath.*;
 

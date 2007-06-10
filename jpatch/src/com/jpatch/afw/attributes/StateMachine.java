@@ -2,16 +2,18 @@ package com.jpatch.afw.attributes;
 
 import java.util.*;
 
+/**
+ * An Attribute that acts as a state-machine. Pre- and post-change listeners can be added that will be notified
+ * before and after a state-transition occured. Subclasses may implement more specialized state-transition behavior.
+ * Furthermore, the addStateSetChangeListener() and removeStateSetChangeListener() methods can be used to add or remove listeners
+ * respectively that will be notified whenever states were added or removed from this StateMachine.
+ * @param <T> The type of possible states
+ */
 public class StateMachine<T> extends AbstractAttribute<T> {
 	/**
 	 * A list of possible states of this StateMachine
 	 */
-	protected final List<T> states = new ArrayList<T>();
-	
-	/**
-	 * An unmodifyable view of the list of possible states
-	 */
-	private final List<T> clonedStates = Collections.unmodifiableList(states);
+	protected final CollectionAttr<T> states = new CollectionAttr<T>(LinkedHashSet.class);
 	
 	/**
 	 * The current state of this state machine
@@ -27,6 +29,59 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 	 * Wheter or not this StateMachine should revert to the default state
 	 */
 	protected boolean revertToDefault;
+	
+	/**
+	 * Creates a new StateMachine for the specified states and sets the initial state to <i>null</i>.
+	 * @param states an array containing the possible states for this StateMachine
+	 * @throws NullPointerException if states is <i>null</i>
+	 * @throws IllegalArgumentException if states does not contain <i>null</i> or if <i>performStateTransition(null)</i> returns false
+	 */
+	public StateMachine(T[] states) {
+		this(states, null);
+	}
+	
+	/**
+	 * Creates a new StateMachine for the specified states and sets the initial state to the specified argument.
+	 * @param states an array containing the possible states for this StateMachine
+	 * @param state the initial state
+	 * @throws NullPointerException if states is <i>null</i>
+	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
+	 */
+	public StateMachine(T[] states, T initialState) {
+		for (T s : states) {
+			this.states.add(s);
+		}
+		if (setState(initialState) != initialState) {
+			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
+		}
+	}
+	
+	/**
+	 * Creates a new StateMachine for the specified states and sets the initial state to <i>null</i>.
+	 * @param states a list of possible states for this StateMachine
+	 * @throws NullPointerException if states is <i>null</i>
+	 * @throws IllegalArgumentException if states does not contain <i>null</i> of if <i>performStateTransition(null)</i> returns false
+	 */
+	public StateMachine(Class<? extends Enum> states) {
+		this(states, null);
+	}
+	
+	/**
+	 * Creates a new StateMachine for the specified states and sets the initial state to the specified argument.
+	 * @param states a list of possible states for this StateMachine
+	 * @param state the initial state
+	 * @throws NullPointerException if states is <i>null</i>
+	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
+	 */
+	@SuppressWarnings("unchecked")
+	public StateMachine(Class<? extends Enum> states, T initialState) {
+		for (Enum s : states.getEnumConstants()) {
+			this.states.add((T) s);
+		}
+		if (setState(initialState) != initialState) {
+			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
+		}
+	}
 	
 	/**
 	 * Returns the default state of this StateMachine
@@ -66,70 +121,12 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 	}
 
 	/**
-	 * Creates a new StateMachine for the specified states and sets the initial state to <i>null</i>.
-	 * @param states an array containing the possible states for this StateMachine
-	 * @throws NullPointerException if states is <i>null</i>
-	 * @throws IllegalArgumentException if states does not contain <i>null</i> or if <i>performStateTransition(null)</i> returns false
+	 * Returns an Iterable that iterates over the possible states of this StateMachine.
+	 * The order of states is preserved.
+	 * @return an Iterable that iterates over the possible states of this StateMachine
 	 */
-	public StateMachine(T[] states) {
-		this(states, null);
-	}
-	
-	/**
-	 * Creates a new StateMachine for the specified states and sets the initial state to the specified argument.
-	 * @param states an array containing the possible states for this StateMachine
-	 * @param state the initial state
-	 * @throws NullPointerException if states is <i>null</i>
-	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
-	 */
-	public StateMachine(T[] states, T initialState) {
-		for (T s : states) {
-			this.states.add(s);
-		}
-		if (!checkForDuplicates()) {
-			throw new IllegalArgumentException("State list " + this.states + " contains duplicate entries");
-		}
-		if (setState(initialState) != initialState) {
-			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
-		}
-	}
-	
-	/**
-	 * Creates a new StateMachine for the specified states and sets the initial state to <i>null</i>.
-	 * @param states a list of possible states for this StateMachine
-	 * @throws NullPointerException if states is <i>null</i>
-	 * @throws IllegalArgumentException if states does not contain <i>null</i> of if <i>performStateTransition(null)</i> returns false
-	 */
-	public StateMachine(Class<? extends Enum> states) {
-		this(states, null);
-	}
-	
-	/**
-	 * Creates a new StateMachine for the specified states and sets the initial state to the specified argument.
-	 * @param states a list of possible states for this StateMachine
-	 * @param state the initial state
-	 * @throws NullPointerException if states is <i>null</i>
-	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
-	 */
-	@SuppressWarnings("unchecked")
-	public StateMachine(Class<? extends Enum> states, T initialState) {
-		for (Enum s : states.getEnumConstants()) {
-			this.states.add((T) s);
-		}
-		if (!checkForDuplicates()) {
-			throw new IllegalArgumentException("State list " + this.states + " contains duplicate entries");
-		}
-		if (setState(initialState) != initialState) {
-			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
-		}
-	}
-	
-	/**
-	 * Returns an (unmodifyable) List of possible states of this StateMachine
-	 * @return an (unmodifyable) List of possible states of this StateMachine
-	 */
-	public List<T> getStates() {
-		return clonedStates;
+	public Iterable<T> getStates() {
+		return states.getElements();
 	}
 
 	/**
@@ -174,24 +171,27 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 			throw new IllegalArgumentException(state + " is already a state of this statemachine (" + this + ")");
 		}
 		states.add(state);
-		fire
 	}
 
 	/**
 	 * Removes <i>state</i> from the list of possible states.
-	 * If the state to be removed is the current state, this StateMachine will try to switch to another state, starting with the first state
+	 * If the state to be removed is the current state, this StateMachine will try to switch to another state. It first tries to switch
+	 * to the default state if the revertToDefault flag is set. If the revertToDefault flag is not set or it can't switch to the default
+	 * state, it tries to switch to any other state, starting with the first state
 	 * in the list of possible states. If it can't switch to any other state, an IllegalStateException is thrown.
 	 * @param state the state to remove
 	 * @throws IllegalStateException if the state to be removed is the current state and this StateMachine is unable to switch to any other state
 	 */
 	public final void removeState(T state) {
 		if (state == currentState) {
-			for (T s : states) {
-				if (s == state) {
-					continue;
-				}
-				if (setState(s) == s) {
-					break;
+			if (!revertToDefault()) {
+				for (T s : states.getElements()) {
+					if (s == state) {
+						continue;
+					}
+					if (setState(s) == s) {
+						break;
+					}
 				}
 			}
 			if (state == currentState) {
@@ -215,12 +215,22 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 	}
 	
 	/**
-	 * Checks for duplicates in <i>states</i> (the list of possible states)
-	 * @return true, if <i>states</i> is free of duplicates, false otherwise
+	 * Adds an AttributePostChangeListener that will be notified whenever states are added or
+	 * removeed from this StateMachine.
+	 * @param the listener to be added
+	 * @see removeStateSetChangeListener(AttributePostChangeListener) 
 	 */
-	private boolean checkForDuplicates() {
-		HashSet<T> set = new HashSet<T>(states);
-		return (set.size() == states.size());
+	public void addStateSetChangeListener(AttributePostChangeListener listener) {
+		states.addAttributePostChangeListener(listener);
+	}
+	
+	/**
+	 * Removes the specified AttributePostChangeListener
+	 * @param the listener to be removed
+	 * @see addStateSetChangeListener(AttributePostChangeListener) 
+	 */
+	public void removeStateSetChangeListener(AttributePostChangeListener listener) {
+		states.addAttributePostChangeListener(listener);
 	}
 	
 	/**

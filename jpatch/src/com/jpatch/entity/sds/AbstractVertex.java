@@ -4,6 +4,8 @@ import com.jpatch.afw.attributes.*;
 
 import javax.vecmath.*;
 
+import trashcan.TransformedPoint3;
+
 public abstract class AbstractVertex {
 	final TransformedPoint3 position = new TransformedPoint3(0, 0, 0);
 	final DoubleAttr sharpness = new HardBoundedDoubleAttr(0, 10, 0);
