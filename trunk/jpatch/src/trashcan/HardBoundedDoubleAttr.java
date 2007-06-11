@@ -1,4 +1,6 @@
-package com.jpatch.afw.attributes;
+package trashcan;
+
+import com.jpatch.afw.attributes.DoubleAttr;
 
 public class HardBoundedDoubleAttr extends DoubleAttr {
 	private final double min;
