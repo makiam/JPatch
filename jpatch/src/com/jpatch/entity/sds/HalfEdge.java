@@ -1,6 +1,7 @@
 package com.jpatch.entity.sds;
 
 import static com.jpatch.entity.sds.SdsWeights.*;
+import trashcan.HardBoundedDoubleAttr;
 
 import com.jpatch.afw.attributes.*;
 

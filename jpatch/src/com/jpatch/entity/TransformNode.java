@@ -1,6 +1,8 @@
 package com.jpatch.entity;
 
 import javax.vecmath.*;
+
+import trashcan.SoftBoundedDoubleAttr;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.afw.attributes.*;
 

@@ -6,9 +6,7 @@ import java.util.*;
 import com.jpatch.afw.attributes.Attribute;
 import com.jpatch.afw.attributes.AttributePostChangeListener;
 import com.jpatch.afw.attributes.DoubleAttr;
-import com.jpatch.afw.attributes.HardBoundedDoubleAttr;
 import com.jpatch.afw.attributes.IdentityMapping;
-import com.jpatch.afw.attributes.SoftBoundedDoubleAttr;
 import com.jpatch.afw.control.Configuration;
 import com.jpatch.afw.ui.*;
 import com.jpatch.afw.vecmath.Rotation3d;
@@ -19,6 +17,8 @@ import javax.swing.border.Border;
 import javax.swing.plaf.ColorUIResource;
 
 import jpatch.entity.attributes2.LinearMapping;
+import trashcan.HardBoundedDoubleAttr;
+import trashcan.SoftBoundedDoubleAttr;
 
 public class FormTest {
 	public static void main(String[] args) {
