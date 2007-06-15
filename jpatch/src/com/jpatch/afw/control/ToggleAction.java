@@ -34,6 +34,6 @@ public class ToggleAction extends JPatchAction {
 	}
 	
 	public boolean isSelected() {
-		return toggle.getState();
+		return toggle.getBoolean();
 	}
 }

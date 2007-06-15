@@ -18,20 +18,20 @@ public class JPatchToggleButton extends JToggleButton implements JPatchButton {
 		this.jpatchAction = action;
 		addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-				setSelected(jpatchAction.getToggle().getState());
+				setSelected(jpatchAction.getToggle().getBoolean());
 			}
 		});
 		addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				setSelected(jpatchAction.getToggle().toggleState());
+				setSelected(jpatchAction.getToggle().toggle());
 			}
 		});
 		jpatchAction.getToggle().addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
-				setSelected(jpatchAction.getToggle().getState());
+				setSelected(jpatchAction.getToggle().getBoolean());
 			}
 		});
-		setSelected(jpatchAction.getToggle().getState());
+		setSelected(jpatchAction.getToggle().getBoolean());
 	}
 	
 	public ToggleAction getJPatchAction() {

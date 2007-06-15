@@ -6,6 +6,8 @@ import java.util.*;
 import com.jpatch.afw.attributes.Attribute;
 import com.jpatch.afw.attributes.AttributePostChangeListener;
 import com.jpatch.afw.attributes.DoubleAttr;
+import com.jpatch.afw.attributes.DoubleMaximum;
+import com.jpatch.afw.attributes.DoubleMinimum;
 import com.jpatch.afw.attributes.IdentityMapping;
 import com.jpatch.afw.control.Configuration;
 import com.jpatch.afw.ui.*;
@@ -17,6 +19,7 @@ import javax.swing.border.Border;
 import javax.swing.plaf.ColorUIResource;
 
 import jpatch.entity.attributes2.LinearMapping;
+
 import trashcan.HardBoundedDoubleAttr;
 import trashcan.SoftBoundedDoubleAttr;
 
@@ -41,8 +44,8 @@ public class FormTest {
 				System.out.println(((DoubleAttr) source).getDouble());
 			}
 		});
-		AttributeUiHelper.bindTextFieldToAttribute(textField, doubleAttr);
-		AttributeUiHelper.bindSliderToAttribute(slider, doubleAttr, doubleAttr.getMinAttr(), doubleAttr.getMaxAttr(), new IdentityMapping());
+		AttributeManager.getInstance().bindTextFieldToAttribute(textField, doubleAttr);
+		AttributeManager.getInstance().bindSliderToAttribute(slider, doubleAttr, doubleAttr.getMinAttr(), doubleAttr.getMaxAttr(), new IdentityMapping());
 		
 		transform.addRow(new JLabel("translation"), textField, slider);
 		transform.addRow(new JLabel("rotation"), new JTextField(), new JTextField(), new JTextField());
@@ -58,17 +61,22 @@ public class FormTest {
 		
 		JPatchForm transLimits = new JPatchForm();
 		JTextField minTextField = new JTextField();
+		JButton setMin = new JButton("set");
+		JButton clearMin = new JButton("clr");
+		JButton setMax = new JButton("set");
+		JButton clearMax = new JButton("clr");
 		JTextField maxTextField = new JTextField();
-		AttributeUiHelper.bindTextFieldToAttribute(minTextField, doubleAttr.getMinAttr());
-		AttributeUiHelper.bindTextFieldToAttribute(maxTextField, doubleAttr.getMaxAttr());
-		
-		transLimits.addRow(new JLabel("maximum"), minTextField, new JTextField(), new JTextField());
-		transLimits.addRow(new JLabel("set max"), new JButton("set"), new JButton("set"), new JButton("set"));
-		transLimits.addRow(new JLabel("enable max"), new JCheckBox(), new JCheckBox(), new JCheckBox());
+//		AttributeManager.getInstance().bindTextFieldToAttribute(minTextField, doubleAttr.getMinAttr());
+//		AttributeManager.getInstance().bindTextFieldToAttribute(maxTextField, doubleAttr.getMaxAttr());
+		AttributeManager.getInstance().bindLimit(doubleAttr, DoubleMaximum.class, setMax, clearMax, maxTextField);
+		AttributeManager.getInstance().bindLimit(doubleAttr, DoubleMinimum.class, setMin, clearMin, minTextField);
+		transLimits.addRow(new JLabel("maximum"), maxTextField, new JTextField(), new JTextField());
+		transLimits.addRow(new JLabel("set max"), setMax, new JButton("set"), new JButton("set"));
+		transLimits.addRow(new JLabel("clear max"), clearMax, new JButton("clr"), new JButton("clr"));
 		transLimits.addRow(new JLabel("current"), new JTextField(), new JTextField(), new JTextField());
-		transLimits.addRow(new JLabel("enable min"), new JCheckBox(), new JCheckBox(), new JCheckBox());
-		transLimits.addRow(new JLabel("set min"), new JButton("set"), new JButton("set"), new JButton("set"));
-		transLimits.addRow(new JLabel("minumum"), maxTextField, new JTextField(), new JTextField());
+		transLimits.addRow(new JLabel("clear min"), clearMin, new JButton("clr"), new JButton("clr"));
+		transLimits.addRow(new JLabel("set min"), setMin, new JButton("set"), new JButton("set"));
+		transLimits.addRow(new JLabel("minumum"), minTextField, new JTextField(), new JTextField());
 		
 		JPatchForm rotLimits = new JPatchForm();
 		rotLimits.addRow(new JLabel("maximum"), new JTextField(), new JTextField(), new JTextField());

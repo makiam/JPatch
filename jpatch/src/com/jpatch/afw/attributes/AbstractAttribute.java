@@ -95,6 +95,7 @@ public abstract class AbstractAttribute<T> implements Attribute {
     	}
     	if (attributePreChangeListeners.length == 1 && attributePreChangeListeners[0] == l) {
     		attributePreChangeListeners = null;		// the last listener is being removed, set list to null
+    		return;
     	}
     	int i = 0;
     	while (i < attributePreChangeListeners.length && attributePreChangeListeners[i] != l) {
@@ -128,6 +129,7 @@ public abstract class AbstractAttribute<T> implements Attribute {
     	}
     	if (attributePostChangeListeners.length == 1 && attributePostChangeListeners[0] == l) {
     		attributePostChangeListeners = null;		// the last listener is being removed, set list to null
+    		return;
     	}
     	int i = 0;
     	while (i < attributePostChangeListeners.length && attributePostChangeListeners[i] != l) {
