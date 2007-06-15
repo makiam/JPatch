@@ -252,6 +252,7 @@ public class AttributeManager {
 	 * @param booleanAttr
 	 * @return the specified JCheckBox
 	 * @throws NullPointerException if any of the specified parameters is null
+	 * @throws IllegalStateException if the specified JCheckBox is already bound (to <i>any</i> Attribute)
 	 */
 	public JCheckBox bindCheckBoxToAttribute(final JCheckBox checkBox, final BooleanAttr booleanAttr) {
 		checkBox.setSelected(booleanAttr.getBoolean());
@@ -264,10 +265,10 @@ public class AttributeManager {
 		};
 		
 		/* bind attribute and attrListener to component */
-		bind(checkBox, booleanAttr, attrListener);
+		bind(checkBox, booleanAttr, attrListener);						// throws IllegalStateException if already bound
 		
 		/* create and add an ActionListener */
-		addListener(checkBox, new ActionListener() {
+		addListener(checkBox, new ActionListener() {					// throws IllegalStateException if already bound
 			public void actionPerformed(ActionEvent e) {
 				booleanAttr.setBoolean(checkBox.isSelected());
 			}
