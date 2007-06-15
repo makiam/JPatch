@@ -1,4 +1,4 @@
-package com.jpatch.afw.ui;
+package trashcan;
 
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;

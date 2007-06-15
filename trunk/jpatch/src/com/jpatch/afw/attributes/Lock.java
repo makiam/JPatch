@@ -11,7 +11,7 @@ public class Lock implements AttributePreChangeListener {
 	
 	public boolean attributeWillChange(Attribute source, boolean value) {
 		if (source instanceof Toggle) {
-			return ((Toggle) source).getState();
+			return ((Toggle) source).getBoolean();
 		} else {
 			return ((BooleanAttr) source).getBoolean();
 		}

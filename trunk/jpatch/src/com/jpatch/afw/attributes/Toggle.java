@@ -1,34 +1,29 @@
 package com.jpatch.afw.attributes;
 
-public class Toggle extends AbstractAttribute {
-	protected boolean currentState;
-
+public class Toggle extends BooleanAttr {
 	public Toggle() {
-		this(false);
+		super();
 	}
 	
 	public Toggle(boolean initialState) {
-		this.currentState = initialState;
+		super(initialState);
 	}
 	
-	public boolean setState(boolean newState) {
-		if (newState != currentState) {
+	@Override
+	public boolean setBoolean(boolean newState) {
+		if (newState != value) {
 			newState = fireAttributeWillChange(newState);
-			currentState = toggle(newState);
+			value = setState(newState);
 			fireAttributeHasChanged();
 		}
-		return currentState;
+		return value;
 	}
 	
-	public boolean toggleState() {
-		return setState(!currentState);
+	public boolean toggle() {
+		return setBoolean(!value);
 	}
 	
-	public boolean getState() {
-		return currentState;
-	}
-	
-	protected boolean toggle(boolean newState) {
+	protected boolean setState(boolean newState) {
 		return newState;
 	}
 }

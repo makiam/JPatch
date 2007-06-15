@@ -1,6 +1,9 @@
 package com.jpatch.afw.ui;
 
+import java.awt.Color;
 import java.awt.event.*;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.*;
 
 import javax.swing.*;
@@ -9,11 +12,38 @@ import javax.swing.event.*;
 import com.jpatch.afw.attributes.*;
 
 public class AttributeManager {
+	private static AttributeManager INSTANCE = new AttributeManager();
+	private static final DecimalFormat INT_FORMAT = new DecimalFormat("0", new DecimalFormatSymbols(Locale.ENGLISH));
+	private static final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("0.000", new DecimalFormatSymbols(Locale.ENGLISH));
+	private static final int COLUMNS = 6;
+	/**
+	 * An actionListener that transfers the focus of the component that fired the actionEvent
+	 * (needed for textFields)
+	 */
+	private static final ActionListener TRANSFER_FOCUS_ACTIONLISTENER = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			((JComponent) e.getSource()).transferFocus();
+		};
+	};
+	
 	private final Set<Attribute> locks = new HashSet<Attribute>();
 	private final Map<DoubleAttr, DoubleMaximum> upperLimits = new HashMap<DoubleAttr, DoubleMaximum>();
-	private final Map<DoubleAttr, DoubleMaximum> lowerLimits = new HashMap<DoubleAttr, DoubleMaximum>();
+	private final Map<DoubleAttr, DoubleMinimum> lowerLimits = new HashMap<DoubleAttr, DoubleMinimum>();
 	private final Map<JComponent, Collection<Object>> componentListeners = new HashMap<JComponent, Collection<Object>>();
-	private final Map<JComponent, AttributeBinding> componentBindings = new HashMap<JComponent, AttributeBinding>();
+	private final Map<JComponent, AttributeBinding[]> componentBindings = new HashMap<JComponent, AttributeBinding[]>();
+	
+	/**
+	 * Returns the single AttributeManager instance (singleton pattern)
+	 * @return the single AttributeManager instance
+	 */
+	public static AttributeManager getInstance() {
+		return INSTANCE;
+	}
+	
+	/**
+	 * Private constructor (singleton pattern)
+	 */
+	private AttributeManager() { }
 	
 	/**
 	 * Locks the specified attribute
@@ -56,20 +86,20 @@ public class AttributeManager {
 			throw new IllegalStateException(attr + " has already set an upper limit: " + upperLimits.get(attr));
 		}
 		attr.addAttributePreChangeListener(limit);
+		upperLimits.put(attr, limit);
 		return limit;
 	}
 	
 	/**
 	 * Clears the upper limit for the specified attribute
 	 * @param attr the attribute whose upper limit should be cleared
-	 * * @throws IllegalArgumentException if the specified attribute does not have an upper limit set
 	 */
 	public void clearUpperLimit(DoubleAttr attr) {
 		DoubleLimit limit = upperLimits.get(attr);
-		if (limit == null) {
-			throw new IllegalStateException(attr + " has not set an upper limit");
+		if (limit != null) {
+			attr.removeAttributePreChangeListener(limit);
+			upperLimits.remove(attr);
 		}
-		attr.removeAttributePreChangeListener(limit);
 	}
 	
 	/**
@@ -79,36 +109,232 @@ public class AttributeManager {
 	 * @return the lower limit for the specified attribute
 	 * @throws IllegalArgumentException if the specified attribute already has an lower limit set
 	 */
-	public DoubleMaximum setLowerLimit(DoubleAttr attr, DoubleMaximum limit) {
+	public DoubleMinimum setLowerLimit(DoubleAttr attr, DoubleMinimum limit) {
 		if (lowerLimits.containsKey(attr)) {
 			throw new IllegalStateException(attr + " has already set an lower limit: " + lowerLimits.get(attr));
 		}
 		attr.addAttributePreChangeListener(limit);
+		lowerLimits.put(attr, limit);
 		return limit;
 	}
 	
 	/**
 	 * Clears the lower limit for the specified attribute
 	 * @param attr the attribute whose lower limit should be cleared
-	 * * @throws IllegalArgumentException if the specified attribute does not have an lower limit set
 	 */
 	public void clearLowerLimit(DoubleAttr attr) {
 		DoubleLimit limit = lowerLimits.get(attr);
-		if (limit == null) {
-			throw new IllegalStateException(attr + " has not set an lower limit");
+		if (limit != null) {
+			attr.removeAttributePreChangeListener(limit);
 		}
-		attr.removeAttributePreChangeListener(limit);
+		lowerLimits.remove(attr);
+	}
+	
+	/**
+	 * Unbinds the specified Component from the Attribute it is bound to.
+	 * @param component the Component to unbind
+	 * @throws IllegalArgumentException if the specified Component is not bound to an Attribute.
+	 */
+	public void unbind(JComponent component) {
+		AttributeBinding[] bindings = componentBindings.get(component);
+		if (bindings == null) {
+			throw new IllegalArgumentException(component + " is not bound");
+		}
+
+		/*
+		 * remove the AttributePostChangeListener if the component is currently showing
+		 * (otherwise this has been done by the HierarchyListener already)
+		 */
+		if (component.isShowing()) {
+			for (AttributeBinding binding : bindings) {
+				binding.unbind();
+			}
+		}
+		
+		/* remove all "managed" listeners*/
+		removeListeners(component);
+		
+		/* remove this component from the componentBindings map*/
+		componentBindings.remove(component);
+	}
+	
+	/**
+	 * Binds the specified JCheckBox to the specified Attribute.
+	 * @param checkBox
+	 * @param booleanAttr
+	 * @return the specified JCheckBox
+	 * @throws NullPointerException if any of the specified parameters is null
+	 * @throws IllegalStateException if the specified JCheckBox is already bound (to <i>any</i> Attribute)
+	 */
+	public JCheckBox bindCheckBoxToAttribute(final JCheckBox checkBox, final BooleanAttr booleanAttr) {
+		checkBox.setSelected(booleanAttr.getBoolean());
+		
+		/* create an AttributePostChangeListener to listen for attribute changes und update the checkbox */
+		AttributePostChangeListener attrListener = new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				checkBox.setSelected(booleanAttr.getBoolean());
+			}
+		};
+		
+		/* bind attribute and attrListener to component */
+		bind(checkBox, new AttributeBinding(booleanAttr, attrListener));						// throws IllegalStateException if already bound
+		
+		/* create and add an ActionListener */
+		addListener(checkBox, new ActionListener() {					// throws IllegalStateException if already bound
+			public void actionPerformed(ActionEvent e) {
+				booleanAttr.setBoolean(checkBox.isSelected());
+			}
+		});
+		
+		return checkBox;
+	}
+	
+	/**
+	 * Binds the specified JTextField to the specified Attribute.
+	 * @param textField
+	 * @param doubleAttr
+	 * @return the specified JTextField
+	 * @throws NullPointerException if any of the specified parameters is null
+	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
+	 */
+	public JTextField bindTextFieldToAttribute(final JTextField textField, final DoubleAttr doubleAttr) {
+		textField.setColumns(COLUMNS);
+		textField.setHorizontalAlignment(SwingConstants.RIGHT);
+		textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
+		
+		/* create and an AttributePostChangeListener to listen for attribute changes und update the textfield */
+		AttributePostChangeListener attrListener = new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
+			}
+		};
+		
+		/* bind attribute and attrListener to component */
+		bind(textField, new AttributeBinding(doubleAttr, attrListener));						// throws IllegalStateException if already bound
+		
+		
+		/* create and add a FocusListener to verify and update the attribute value on focus loss */
+		addListener(textField, new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				try {
+					doubleAttr.setDouble(Double.parseDouble(textField.getText()));
+					textField.setBackground(UIManager.getColor("TextField.background"));
+					textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
+				} catch (NumberFormatException exception) {
+					textField.setBackground(Color.YELLOW);
+					textField.requestFocus();
+				}
+			}
+		});
+		
+		/* add the TRANSFER_FOCUS_ACTIONLISTENER (which simply transfers the focus when the user presses enter over the TextField */
+		addListener(textField, TRANSFER_FOCUS_ACTIONLISTENER);
+		
+		return textField;
+	}
+	
+	/**
+	 * Binds the specified JSlider to the specified Attribute.
+	 * @param slider
+	 * @param doubleAttr
+	 * @param min
+	 * @param max
+	 * @param mapping
+	 * @return the specified JSlider
+	 * @throws NullPointerException if any of the specified parameters is null
+	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
+	 */
+	public JSlider bindSliderToAttribute(final JSlider slider, final DoubleAttr doubleAttr, final DoubleAttr min, final DoubleAttr max, final Mapping mapping) {
+		slider.setMinimum(0);
+		slider.setMaximum(1000);
+		setSliderPosition(slider, doubleAttr, min, max, mapping);
+		
+		/* pointer to a flag that's checked by the listeners to prevent loops - agreeable an ugly hack */
+		final boolean[] sliderAdjusting = new boolean[] { false };
+		
+		/* create and an AttributePostChangeListener to listen for attribute changes und update the slider */
+		AttributePostChangeListener attrListener = new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				if (!sliderAdjusting[0]) {
+					sliderAdjusting[0] = true;
+					setSliderPosition(slider, doubleAttr, min, max, mapping);
+					sliderAdjusting[0] = false;
+				}
+			}
+		};
+		
+		/* bind attribute and attrListener to component */
+		bind(slider, new AttributeBinding(doubleAttr, attrListener), new AttributeBinding(min, attrListener), new AttributeBinding(max, attrListener));				// throws IllegalStateException if already bound
+		
+		/* create and add a ChangeListener to track the slider value */
+		addListener(slider, new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (!sliderAdjusting[0]) {
+					sliderAdjusting[0] = true;
+					getSliderValue(slider, doubleAttr, min, max, mapping);
+					sliderAdjusting[0] = false;
+				}
+			}
+		});
+		
+		return slider;
+	}
+	
+	public void bindLimit(final DoubleAttr attr, final Class<? extends DoubleLimit> type, final JButton set, final JButton clear, final JTextField textField) {
+		ActionListener setListener = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DoubleAttr limitAttr = new DoubleAttr(attr.getDouble());
+				if (type == DoubleMinimum.class) {
+					clearLowerLimit(attr);
+					setLowerLimit(attr, new DoubleMinimum(limitAttr));
+				} else if (type == DoubleMaximum.class) {
+					clearUpperLimit(attr);
+					setUpperLimit(attr, new DoubleMaximum(limitAttr));
+				} else {
+					throw new RuntimeException();
+				}
+				textField.setEnabled(true);
+				clear.setEnabled(true);
+				if (componentBindings.containsKey(textField)) {
+					unbind(textField);
+				}
+				bindTextFieldToAttribute(textField, limitAttr);
+			}
+		};
+		
+		ActionListener clearListener = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (type == DoubleMinimum.class) {
+					clearLowerLimit(attr);
+				} else if (type == DoubleMaximum.class) {
+					clearUpperLimit(attr);
+				} else {
+					throw new RuntimeException();
+				}
+				clear.setEnabled(false);
+				unbind(textField);
+				textField.setText("not set");
+				textField.setEnabled(false);
+			}
+		};
+		
+		addListener(set, setListener);
+		addListener(clear, clearListener);
 	}
 	
 	/**
 	 * Adds the specified listener to the specified component and stores the listener
-	 * in a collection in the componentListeners map.
-	 * @param component the component to add the listener to
+	 * in a collection in the componentListeners map. The following listeners are supported:<br />
+	 * HierarchyListeners, FocusListeners, ActionListeners (for TextFields and AbstractButtons only) and
+	 * ChangeListeners (for JSliders only).
+	 * @param component the component to add the listener to. 
 	 * @param listener the listener to add
 	 * @throws IllegalStateException if the specified listener has already been added to the specified component
 	 * @throws IllegalArgumentException if the specified listener can't be added to the specified component
 	 */
 	private void addListener(JComponent component, Object listener) {
+		System.out.println("adding " + listener + " to " + component.getClass().getName() + "@" + System.identityHashCode(component));
 		Collection<Object> listeners = componentListeners.get(component);
 		if (listeners == null) {
 			listeners = new HashSet<Object>(4);
@@ -122,6 +348,9 @@ public class AttributeManager {
 		if (listener instanceof ActionListener) {
 			if (component instanceof AbstractButton) {
 				((AbstractButton) component).addActionListener((ActionListener) listener);
+				return;
+			} else if (component instanceof JTextField) {
+				((JTextField) component).addActionListener((ActionListener) listener);
 				return;
 			}
 		} else if (listener instanceof ChangeListener) {
@@ -152,9 +381,13 @@ public class AttributeManager {
 			throw new IllegalStateException(component + " doesn't have managed listeners attached");
 		}
 		for (Object listener : listeners) {
+			System.out.println("removing " + listener + " to " + component.getClass().getName() + "@" + System.identityHashCode(component));
 			if (listener instanceof ActionListener) {
 				if (component instanceof AbstractButton) {
 					((AbstractButton) component).removeActionListener((ActionListener) listener);
+					continue;
+				} else if (component instanceof JTextField) {
+					((JTextField) component).removeActionListener((ActionListener) listener);
 					continue;
 				}
 			} else if (listener instanceof ChangeListener) {
@@ -188,20 +421,22 @@ public class AttributeManager {
 	 * @param attributePostChangeListener the AttributePostChangeListener to add/remove to/from the specified Attribute
 	 * @throws IllegalStateException if the specified Component is already bound (if <code>componentBindings</code> contains the specified Component as a key)
 	 */
-	private void bind(JComponent component, Attribute attribute, AttributePostChangeListener listener) {
+	private void bind(JComponent component, AttributeBinding... bindings) {
 		if (componentBindings.containsKey(component)) {
 			throw new IllegalStateException(component + " is already bound");
 		}
 
 		/* put a component to attribute/listener mapping into the componentBindings map*/
-		componentBindings.put(component, new AttributeBinding(attribute, listener));
+		componentBindings.put(component, bindings);
 
 		/*
 		 * add the AttributePostChangeListener if the component is currently showing
 		 * (otherwise this has will done by the HierarchyListener below)
 		 */
 		if (component.isShowing()) {
-			attribute.addAttributePostChangeListener(listener);
+			for (AttributeBinding binding : bindings) {
+				binding.bind();
+			}
 		}
 		
 		/* Create the HierarchyListener and add it */
@@ -209,11 +444,15 @@ public class AttributeManager {
 			public void hierarchyChanged(HierarchyEvent e) {
 				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
 					JComponent component = (JComponent) e.getSource();
-					AttributeBinding binding = componentBindings.get(e.getSource());
+					AttributeBinding[] bindings = componentBindings.get(e.getSource());
 					if (component.isShowing()) {
-						binding.attribute.addAttributePostChangeListener(binding.listener);
+						for (AttributeBinding binding : bindings) {
+							binding.bind();
+						}
 					} else {
-						binding.attribute.removeAttributePostChangeListener(binding.listener);
+						for (AttributeBinding binding : bindings) {
+							binding.unbind();
+						}
 					}
 				}
 			}
@@ -221,72 +460,53 @@ public class AttributeManager {
 	}
 	
 	/**
-	 * Unbinds the specified Component from the Attribute its bound to.
-	 * @param component the Component to unbind
-	 * @throws IllegalArgumentException if the specified Component is not bound to an Attribute.
+	 * Sets the JSlider's position to the value represented by the specified DoubleAttr
+	 * @param slider the JSlider whose value to set
+	 * @param value the value
+	 * @param min the minimum value
+	 * @param max the maximum value
+	 * @param mapping the mapping to use
 	 */
-	public void unbind(JComponent component) {
-		AttributeBinding binding = componentBindings.get(component);
-		if (binding == null) {
-			throw new IllegalArgumentException(component + " is not bound");
-		}
-
-		/*
-		 * remove the AttributePostChangeListener if the component is currently showing
-		 * (otherwise this has been done by the HierarchyListener already)
-		 */
-		if (component.isShowing()) {
-			binding.attribute.removeAttributePostChangeListener(binding.listener);
-		}
-		
-		/* remove all "managed" listeners*/
-		removeListeners(component);
-		
-		/* remove this component from the componentBindings map*/
-		componentBindings.remove(component);
+	private static void setSliderPosition(JSlider slider, DoubleAttr value, DoubleAttr min, DoubleAttr max, Mapping mapping) {
+		double mappedValue = mapping.getValue(value.getDouble());
+		double mappedMin = mapping.getValue(min.getDouble());
+		double mappedMax = mapping.getValue(max.getDouble());
+		slider.setValue(slider.getMinimum() + (int) ((slider.getMaximum() - slider.getMinimum()) * (mappedValue - mappedMin) / (mappedMax - mappedMin)));
 	}
 	
 	/**
-	 * Binds the specified JCheckBox to the specified Attribute.
-	 * @param checkBox
-	 * @param booleanAttr
-	 * @return the specified JCheckBox
-	 * @throws NullPointerException if any of the specified parameters is null
-	 * @throws IllegalStateException if the specified JCheckBox is already bound (to <i>any</i> Attribute)
+	 * Sets the value DoubleAttr to the value represented by the JSlider's position
+	 * @param slider the slider to whose value the DoubleAttr should be set
+	 * @param value the value to set
+	 * @param min the minimum value
+	 * @param max the maximum value
+	 * @param mapping the mapping to use
 	 */
-	public JCheckBox bindCheckBoxToAttribute(final JCheckBox checkBox, final BooleanAttr booleanAttr) {
-		checkBox.setSelected(booleanAttr.getBoolean());
-		
-		/* create an AttributePostChangeListener to listen for attribute changes und update the checkbox */
-		AttributePostChangeListener attrListener = new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute source) {
-				checkBox.setSelected(booleanAttr.getBoolean());
-			}
-		};
-		
-		/* bind attribute and attrListener to component */
-		bind(checkBox, booleanAttr, attrListener);						// throws IllegalStateException if already bound
-		
-		/* create and add an ActionListener */
-		addListener(checkBox, new ActionListener() {					// throws IllegalStateException if already bound
-			public void actionPerformed(ActionEvent e) {
-				booleanAttr.setBoolean(checkBox.isSelected());
-			}
-		});
-		
-		return checkBox;
+	private static void getSliderValue(JSlider slider, DoubleAttr value, DoubleAttr min, DoubleAttr max, Mapping mapping) {
+		double mappedMin = mapping.getValue(min.getDouble());
+		double mappedMax = mapping.getValue(max.getDouble());
+		double mappedValue = mappedMin + (mappedMax - mappedMin) * (slider.getValue() - slider.getMinimum()) / (slider.getMaximum() - slider.getMinimum());
+		value.setDouble(mapping.getMappedValue(mappedValue));
 	}
 	
 	/**
 	 * A simple structure that stores Attributes and AttributePostChangeListener.
 	 * It's only used in the <code>componentBindings</code> map.
 	 */
-	private static class AttributeBinding {
-		Attribute attribute;
-		AttributePostChangeListener listener;
+	private static final class AttributeBinding {
+		final Attribute attribute;
+		final AttributePostChangeListener listener;
 		AttributeBinding(Attribute attribute, AttributePostChangeListener listener) {
 			this.attribute = attribute;
 			this.listener = listener;
+		}
+		
+		void bind() {
+			attribute.addAttributePostChangeListener(listener);
+		}
+		
+		void unbind() {
+			attribute.removeAttributePostChangeListener(listener);
 		}
 	}
 }

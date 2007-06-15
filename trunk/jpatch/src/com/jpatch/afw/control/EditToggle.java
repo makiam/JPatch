@@ -11,6 +11,6 @@ public final class EditToggle extends EditAttribute {
 	}
 	
 	protected void toggle() {
-		toggle.setState(!toggle.getState());
+		toggle.setBoolean(!toggle.getBoolean());
 	}
 }
