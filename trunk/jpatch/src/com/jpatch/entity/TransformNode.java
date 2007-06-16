@@ -80,6 +80,8 @@ public class TransformNode extends AbstractTransformNode {
 			new SoftBoundedDoubleAttr(0, 0, 0)
 	);
 	
+	protected BooleanAttr visibilityAttr = new BooleanAttr(true);
+	
 	/**
 	 * Auto-transform flag, used to prevent loops when a position change updates the translation
 	 * or vice versa.
@@ -175,7 +177,7 @@ public class TransformNode extends AbstractTransformNode {
 	 * Returns the axis rotation attribute
 	 * @return the axis rotation attribute
 	 */
-	public Tuple3Attr getAxesRotationAttribute() {
+	public Tuple3Attr getAxisRotationAttribute() {
 		return axisRotationAttr;
 	}
 	
@@ -217,6 +219,22 @@ public class TransformNode extends AbstractTransformNode {
 	 */
 	public Rotation3d.Order getRotationOrder() {
 		return rotationTuple.getOrder();
+	}
+	
+	/**
+	 * Returns the visibility attribute
+	 * @return the visibility attribute
+	 */
+	public BooleanAttr getVisibilityAttribute() {
+		return visibilityAttr;
+	}
+	
+	/**
+	 * Returns the visibility of this node
+	 * @return true if the node is visibile, false otherwise
+	 */
+	public boolean isVisible() {
+		return visibilityAttr.getBoolean();
 	}
 	
 	/**

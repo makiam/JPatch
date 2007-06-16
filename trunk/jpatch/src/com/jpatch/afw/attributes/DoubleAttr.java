@@ -16,7 +16,7 @@ public class DoubleAttr extends AbstractAttribute {
 	}
 
 	public double setDouble(double value) {
-		System.out.println("old=" + this.value + " new=" + value);
+//		System.out.println("old=" + this.value + " new=" + value);
 		if (value != this.value) {
 			this.value = fireAttributeWillChange(value);
 			fireAttributeHasChanged();
