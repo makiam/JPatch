@@ -8,6 +8,7 @@ import com.jpatch.afw.icons.IconSet;
 import com.jpatch.afw.icons.IconSet.Style;
 import com.jpatch.afw.icons.IconSet.Type;
 
+import java.awt.Insets;
 import java.io.ObjectInputStream;
 
 import javax.swing.AbstractButton;
@@ -61,5 +62,10 @@ public class ButtonUtils {
 				}
 			});
 		}
+	}
+	
+	public void configureButton(AbstractButton button, Style style, Type type, Icon icon) {
+		iconSet.configureButton(button, style, type, icon);
+		button.setMargin(new Insets(0, 0, 0, 0));
 	}
 }

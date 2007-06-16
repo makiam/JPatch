@@ -10,6 +10,8 @@ import com.jpatch.afw.attributes.DoubleMaximum;
 import com.jpatch.afw.attributes.DoubleMinimum;
 import com.jpatch.afw.attributes.IdentityMapping;
 import com.jpatch.afw.control.Configuration;
+import com.jpatch.afw.icons.IconSet;
+import com.jpatch.afw.icons.IconSet.*;
 import com.jpatch.afw.ui.*;
 import com.jpatch.afw.vecmath.Rotation3d;
 
@@ -36,16 +38,17 @@ public class FormTest {
 		
 		JTextField textField = new JTextField();
 		JSlider slider = new JSlider();
-		SoftBoundedDoubleAttr doubleAttr = new SoftBoundedDoubleAttr(-100, 100);
-		doubleAttr.getMinLimitAttr().setBoolean(true);
-		doubleAttr.getMaxLimitAttr().setBoolean(true);
+		DoubleAttr min = new DoubleAttr(-100);
+		DoubleAttr max = new DoubleAttr(100);
+		DoubleAttr doubleAttr = AttributeManager.getInstance().createBoundedDoubleAttr(min, max);
+		
 		doubleAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				System.out.println(((DoubleAttr) source).getDouble());
 			}
 		});
 		AttributeManager.getInstance().bindTextFieldToAttribute(textField, doubleAttr);
-		AttributeManager.getInstance().bindSliderToAttribute(slider, doubleAttr, doubleAttr.getMinAttr(), doubleAttr.getMaxAttr(), new IdentityMapping());
+		AttributeManager.getInstance().bindSliderToAttribute(slider, doubleAttr, IdentityMapping.getInstance());
 		
 		transform.addRow(new JLabel("translation"), textField, slider);
 		transform.addRow(new JLabel("rotation"), new JTextField(), new JTextField(), new JTextField());
@@ -61,18 +64,55 @@ public class FormTest {
 		
 		JPatchForm transLimits = new JPatchForm();
 		JTextField minTextField = new JTextField();
-		JButton setMin = new JButton("set");
-		JButton clearMin = new JButton("clr");
-		JButton setMax = new JButton("set");
-		JButton clearMax = new JButton("clr");
+		
+		Icon LOWER_LIMIT = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/SET_LOWER_LIMIT.png"));
+		Icon UPPER_LIMIT = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/SET_UPPER_LIMIT.png"));
+		Icon CLEAR_LIMIT = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/CLEAR_LIMIT.png"));
+		
+		JButton setMin = new JButton();
+		JButton clearMin = new JButton();
+		JButton setMax = new JButton();
+		JButton clearMax = new JButton();
+//		setMin.setBorderPainted(false);
+//		setMin.setBorder(null);
+//		setMin.setPreferredSize(new Dimension(16, 16));
+//		setMin.setContentAreaFilled(false);
+//		setMax.setBorderPainted(false);
+//		setMax.setBorder(null);
+//		setMax.setPreferredSize(new Dimension(16, 16));
+//		setMax.setContentAreaFilled(false);
+//		clearMin.setBorderPainted(false);
+//		clearMin.setBorder(null);
+//		clearMin.setPreferredSize(new Dimension(16, 16));
+//		clearMin.setContentAreaFilled(false);
+//		clearMax.setBorderPainted(false);
+//		clearMax.setBorder(null);
+//		clearMax.setPreferredSize(new Dimension(16, 16));
+//		clearMax.setContentAreaFilled(false);
+		ButtonUtils buttonUtils = new ButtonUtils();
+		buttonUtils.configureButton(setMin, IconSet.Style.GLOSSY, IconSet.Type.LEFT, LOWER_LIMIT);
+		buttonUtils.configureButton(setMax, IconSet.Style.GLOSSY, IconSet.Type.LEFT, UPPER_LIMIT);
+		buttonUtils.configureButton(clearMin, IconSet.Style.GLOSSY, IconSet.Type.RIGHT, CLEAR_LIMIT);
+		buttonUtils.configureButton(clearMax, IconSet.Style.GLOSSY, IconSet.Type.RIGHT, CLEAR_LIMIT);
+		
 		JTextField maxTextField = new JTextField();
 //		AttributeManager.getInstance().bindTextFieldToAttribute(minTextField, doubleAttr.getMinAttr());
 //		AttributeManager.getInstance().bindTextFieldToAttribute(maxTextField, doubleAttr.getMaxAttr());
 		AttributeManager.getInstance().bindLimit(doubleAttr, DoubleMaximum.class, setMax, clearMax, maxTextField);
 		AttributeManager.getInstance().bindLimit(doubleAttr, DoubleMinimum.class, setMin, clearMin, minTextField);
+		
+		JComponent setClr1 = Box.createHorizontalBox();
+		setClr1.add(setMax);
+		setClr1.add(clearMax);
+		JComponent setClr2 = Box.createHorizontalBox();
+		setClr2.add(new JButton("x"));
+		setClr2.add(new JButton("y"));
+		JComponent setClr3 = Box.createHorizontalBox();
+		setClr3.add(new JButton("a"));
+		setClr3.add(new JButton("b"));
+		
 		transLimits.addRow(new JLabel("maximum"), maxTextField, new JTextField(), new JTextField());
-		transLimits.addRow(new JLabel("set max"), setMax, new JButton("set"), new JButton("set"));
-		transLimits.addRow(new JLabel("clear max"), clearMax, new JButton("clr"), new JButton("clr"));
+		transLimits.addRow(new JLabel("set/clear"), setClr1, setClr2, setClr3);
 		transLimits.addRow(new JLabel("current"), new JTextField(), new JTextField(), new JTextField());
 		transLimits.addRow(new JLabel("clear min"), clearMin, new JButton("clr"), new JButton("clr"));
 		transLimits.addRow(new JLabel("set min"), setMin, new JButton("set"), new JButton("set"));

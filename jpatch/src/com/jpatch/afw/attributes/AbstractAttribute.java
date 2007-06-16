@@ -237,4 +237,23 @@ public abstract class AbstractAttribute<T> implements Attribute {
 	    	fireEvents = true;
     	}
     }
+    
+    /**
+     * Debugging method
+     */
+    public void dumpListeners() {
+    	System.out.println(this + " preChangeListeners:");
+    	if (attributePreChangeListeners != null) {
+	    	for (AttributePreChangeListener l : attributePreChangeListeners) {
+	    		System.out.println("    " + l);
+	    	}
+    	}
+    	System.out.println(this + " postChangeListeners:");
+    	if (attributePostChangeListeners != null) {
+    		for (AttributePostChangeListener l : attributePostChangeListeners) {
+    			System.out.println("    " + l);
+    		}
+    	}
+    	System.out.println();
+    }
 }

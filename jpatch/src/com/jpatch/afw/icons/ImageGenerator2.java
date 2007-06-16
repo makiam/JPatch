@@ -1,6 +1,7 @@
 package com.jpatch.afw.icons;
 
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
@@ -14,7 +15,10 @@ import javax.imageio.ImageIO;
 public class ImageGenerator2 {
 	static String[] iconNames = {
 		"COLLAPSED",
-		"EXPANDED"
+		"EXPANDED",
+		"SET_UPPER_LIMIT",
+		"SET_LOWER_LIMIT",
+		"CLEAR_LIMIT"
 	};
 	
 	public static void main(String[] args) throws Exception {
@@ -46,11 +50,25 @@ public class ImageGenerator2 {
 			break;
 		case 1:	// collapsed
 			g.setColor(new Color(0x80000000, true));
-			g.fill(new Polygon(new int[] { 2, 14, 2 }, new int[] { 2, 8, 14 }, 3));
+			g.fill(new Polygon(new int[] { 5, 13, 5 }, new int[] { 5, 9, 13 }, 3));
 			break;
 		case 2:	// expanded
 			g.setColor(new Color(0x80000000, true));
-			g.fill(new Polygon(new int[] { 2, 8, 14 }, new int[] { 2, 14, 2 }, 3));
+			g.fill(new Polygon(new int[] { 5, 9, 13 }, new int[] { 5, 13, 5 }, 3));
+			break;
+		case 3:	// set upper limit
+			g.setColor(new Color(0x80000000, true));
+			g.fill(new Polygon(new int[] { 3, 8, 13 }, new int[] { 13, 2, 13 }, 3));
+			break;
+		case 4:	// set lower limit
+			g.setColor(new Color(0x80000000, true));
+			g.fill(new Polygon(new int[] { 3, 8, 13 }, new int[] { 2, 13, 2 }, 3));
+			break;
+		case 5:	// clear limit
+			g.setColor(new Color(0x80800000, true));
+			g.setStroke(new BasicStroke(3));
+			g.drawLine(3, 3, 12, 12);
+			g.drawLine(3, 12, 12, 3);
 			break;
 		}
 	}

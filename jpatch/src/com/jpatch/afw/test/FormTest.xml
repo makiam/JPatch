@@ -1,0 +1,45 @@
+<form name="TRANSFORM">
+	<field name="TRANSLATION" attribute="Translation" />
+	<field name="ROTATION" attribute="Rotation" />
+	<field name="SCALE" attribute="Scale" />
+	<form name="ADVANCED">
+		<field name="VISIBILITY" attribute="Visibility" />
+		<field name="ROTATION_ORDER" attribute="RotationOrder" />
+		<field name="POSITION" attribute="Position" />
+		<field name="ORIENTATION" attribute="Orientation" />
+		<field name="SHEAR" attribute="Shear" />
+		<field name="AXIS_ROTATION" attribute="AxisRotation" />
+		<form name="LOCK">
+			<field name="TRANSLATION" attribute="Translation" type="lock" />
+			<field name="ROTATION" attribute="Rotation" type="lock" />
+			<field name="SCALE" attribute="Scale" type="lock" />
+			<field name="SHEAR" attribute="Shear" type="lock" />
+		</form>
+		<form name="ANIMATE">
+			<field name="TRANSLATION" attribute="Translation" type="key" />
+			<field name="ROTATION" attribute="Rotation" type="key" />
+			<field name="SCALE" attribute="Scale" type="key" />
+			<field name="SHEAR" attribute="Shear" type="key" />
+		</form>
+	</form>
+	<form name="LIMITS">
+		<form name="TRANSLATION">
+			<limits attribute="Translation" />
+		</form>
+		<form name="ROTATION">
+			<limits attribute="Rotation" />
+		</form>
+		<form name="SCALE">
+			<limits attribute="Scale" />
+		</form>
+	</form>
+<!--
+	<form name="TEST">
+		<field name="2D_TEST" attribute="test2d" />
+		<field name="1D_TEST" attribute="test1d" />
+		<field name="SLIDER_TEST" attribute="test1d" type="slider" />
+		<limits name="1D_TEST" attribute="test1d" />
+		<field name="SLIDER_TEST2" attribute="test" type="slider" min="0" max="100" />
+	</form>
+-->
+</form>

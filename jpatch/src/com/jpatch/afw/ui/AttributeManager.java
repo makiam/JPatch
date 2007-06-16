@@ -12,10 +12,26 @@ import javax.swing.event.*;
 import com.jpatch.afw.attributes.*;
 
 public class AttributeManager {
+	/**
+	 * The sole AttributeManager instance (singleton pattern)
+	 */
 	private static AttributeManager INSTANCE = new AttributeManager();
+	
+	/**
+	 * DecimalFormat used to print integers in TextFields
+	 */
 	private static final DecimalFormat INT_FORMAT = new DecimalFormat("0", new DecimalFormatSymbols(Locale.ENGLISH));
+	
+	/**
+	 * DecimalFormat used to print doubles in TextFields
+	 */
 	private static final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("0.000", new DecimalFormatSymbols(Locale.ENGLISH));
+	
+	/**
+	 * Columns (width of the TextFields)
+	 */
 	private static final int COLUMNS = 6;
+	
 	/**
 	 * An actionListener that transfers the focus of the component that fired the actionEvent
 	 * (needed for textFields)
@@ -26,10 +42,29 @@ public class AttributeManager {
 		};
 	};
 	
+	/**
+	 * A set containing all locked attributes
+	 */
 	private final Set<Attribute> locks = new HashSet<Attribute>();
+	
+	/**
+	 * Maps DoubleAttr to their upper limits
+	 */
 	private final Map<DoubleAttr, DoubleMaximum> upperLimits = new HashMap<DoubleAttr, DoubleMaximum>();
+	
+	/**
+	 * Maps DoubleAttr to their lower limits
+	 */
 	private final Map<DoubleAttr, DoubleMinimum> lowerLimits = new HashMap<DoubleAttr, DoubleMinimum>();
+	
+	/**
+	 * Stores the managed listeners for managed JComponents
+	 */
 	private final Map<JComponent, Collection<Object>> componentListeners = new HashMap<JComponent, Collection<Object>>();
+	
+	/**
+	 * Stores the AttributeBindings for managed JComponents
+	 */
 	private final Map<JComponent, AttributeBinding[]> componentBindings = new HashMap<JComponent, AttributeBinding[]>();
 	
 	/**
@@ -103,6 +138,15 @@ public class AttributeManager {
 	}
 	
 	/**
+	 * Returns the upper limit of the specified attribute
+	 * @param attr the attribute whose upper limit should be returned
+	 * @return the upper limit of the specified attribute, or null if no upper limit is set
+	 */
+	public DoubleAttr getUpperLimit(DoubleAttr attr) {
+		return upperLimits.get(attr).getAttr();
+	}
+	
+	/**
 	 * Sets the lower limit for the specified attribute
 	 * @param attr the attribute to be bounded
 	 * @param limit the lower limit for the specified attribute
@@ -131,14 +175,36 @@ public class AttributeManager {
 	}
 	
 	/**
+	 * Returns the lower limit of the specified attribute
+	 * @param attr the attribute whose lower limit should be returned
+	 * @return the lower limit of the specified attribute, or null if no lower limit is set
+	 */
+	public DoubleAttr getLowerLimit(DoubleAttr attr) {
+		return lowerLimits.get(attr).getAttr();
+	}
+	
+	/**
+	 * Creates a new bounded DoubleAttr that is limited by the specified min and max attributes
+	 * @param min the attribute representing the minimum value
+	 * @param max the attribute representing the maximum value
+	 * @return a new bounded DoubleAttr that is limited by the specified min and max attributes
+	 */
+	public DoubleAttr createBoundedDoubleAttr(DoubleAttr min, DoubleAttr max) {
+		DoubleAttr attr = new DoubleAttr();
+		setLowerLimit(attr, new DoubleMinimum(min));
+		setUpperLimit(attr, new DoubleMaximum(max));
+		return attr;
+	}
+	
+	/**
 	 * Unbinds the specified Component from the Attribute it is bound to.
+	 * If the component is not bound, this method returns without doing anything.
 	 * @param component the Component to unbind
-	 * @throws IllegalArgumentException if the specified Component is not bound to an Attribute.
 	 */
 	public void unbind(JComponent component) {
 		AttributeBinding[] bindings = componentBindings.get(component);
 		if (bindings == null) {
-			throw new IllegalArgumentException(component + " is not bound");
+			return;
 		}
 
 		/*
@@ -167,7 +233,7 @@ public class AttributeManager {
 	 * @throws IllegalStateException if the specified JCheckBox is already bound (to <i>any</i> Attribute)
 	 */
 	public JCheckBox bindCheckBoxToAttribute(final JCheckBox checkBox, final BooleanAttr booleanAttr) {
-		checkBox.setSelected(booleanAttr.getBoolean());
+//		checkBox.setSelected(booleanAttr.getBoolean());
 		
 		/* create an AttributePostChangeListener to listen for attribute changes und update the checkbox */
 		AttributePostChangeListener attrListener = new AttributePostChangeListener() {
@@ -189,6 +255,14 @@ public class AttributeManager {
 		return checkBox;
 	}
 	
+	
+	public JTextField bindTextFieldToAttribute(JTextField textField, Attribute attribute) {
+		if (attribute instanceof DoubleAttr) {
+			return bindTextFieldToAttribute(textField, (DoubleAttr) attribute);
+		}
+		throw new IllegalArgumentException("can't bind " + attribute + " to " + textField);
+	}
+	
 	/**
 	 * Binds the specified JTextField to the specified Attribute.
 	 * @param textField
@@ -197,10 +271,10 @@ public class AttributeManager {
 	 * @throws NullPointerException if any of the specified parameters is null
 	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
 	 */
-	public JTextField bindTextFieldToAttribute(final JTextField textField, final DoubleAttr doubleAttr) {
+	private JTextField bindTextFieldToAttribute(final JTextField textField, final DoubleAttr doubleAttr) {
 		textField.setColumns(COLUMNS);
 		textField.setHorizontalAlignment(SwingConstants.RIGHT);
-		textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
+//		textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
 		
 		/* create and an AttributePostChangeListener to listen for attribute changes und update the textfield */
 		AttributePostChangeListener attrListener = new AttributePostChangeListener() {
@@ -235,9 +309,45 @@ public class AttributeManager {
 	}
 	
 	/**
+	 * Binds the specified JSlider to the specified (bounded!) Attribute.
+	 * @param slider
+	 * @param attr
+	 * @param mapping
+	 * @return the specified JSlider
+	 * @throws NullPointerException if any of the specified parameters is null
+	 * @throws IllegalArgumentEexception if the specified attribute is not bounded
+	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
+	 */
+	public JSlider bindSliderToAttribute(JSlider slider, DoubleAttr attr, Mapping mapping) {
+		DoubleAttr min = getLowerLimit(attr);
+		DoubleAttr max = getUpperLimit(attr);
+		if (min == null || max == null) {
+			throw new IllegalArgumentException(attr + " is not bounded");
+		}
+		return bindSliderToAttribute(slider, attr, min, max, mapping);
+	}
+	
+	/**
+	 * Binds the specified JSlider to the specified Attribute. Constant minimum and maximum slider
+	 * values must be provided.
+	 * @param slider
+	 * @param attr
+	 * @param min
+	 * @param max
+	 * @param mapping
+	 * @return the specified JSlider
+	 * @throws NullPointerException if any of the specified parameters is null
+	 * @throws IllegalArgumentEexception if the specified attribute is not bounded
+	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
+	 */
+	public JSlider bindSliderToAttribute(JSlider slider, DoubleAttr attr, double min, double max, Mapping mapping) {
+		return bindSliderToAttribute(slider, attr, new DoubleAttr(min), new DoubleAttr(max), mapping);
+	}
+	
+	/**
 	 * Binds the specified JSlider to the specified Attribute.
 	 * @param slider
-	 * @param doubleAttr
+	 * @param attr
 	 * @param min
 	 * @param max
 	 * @param mapping
@@ -245,12 +355,12 @@ public class AttributeManager {
 	 * @throws NullPointerException if any of the specified parameters is null
 	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
 	 */
-	public JSlider bindSliderToAttribute(final JSlider slider, final DoubleAttr doubleAttr, final DoubleAttr min, final DoubleAttr max, final Mapping mapping) {
+	private JSlider bindSliderToAttribute(final JSlider slider, final DoubleAttr attr, final DoubleAttr min, final DoubleAttr max, final Mapping mapping) {
 		slider.setMinimum(0);
 		slider.setMaximum(1000);
-		setSliderPosition(slider, doubleAttr, min, max, mapping);
+//		setSliderPosition(slider, attr, min, max, mapping);
 		
-		/* pointer to a flag that's checked by the listeners to prevent loops - agreeable an ugly hack */
+		/* pointer to a flag that's checked by the listeners to prevent loops - admittedly an ugly hack */
 		final boolean[] sliderAdjusting = new boolean[] { false };
 		
 		/* create and an AttributePostChangeListener to listen for attribute changes und update the slider */
@@ -258,21 +368,21 @@ public class AttributeManager {
 			public void attributeHasChanged(Attribute source) {
 				if (!sliderAdjusting[0]) {
 					sliderAdjusting[0] = true;
-					setSliderPosition(slider, doubleAttr, min, max, mapping);
+					setSliderPosition(slider, attr, min, max, mapping);
 					sliderAdjusting[0] = false;
 				}
 			}
 		};
 		
 		/* bind attribute and attrListener to component */
-		bind(slider, new AttributeBinding(doubleAttr, attrListener), new AttributeBinding(min, attrListener), new AttributeBinding(max, attrListener));				// throws IllegalStateException if already bound
+		bind(slider, new AttributeBinding(attr, attrListener), new AttributeBinding(min, attrListener), new AttributeBinding(max, attrListener));				// throws IllegalStateException if already bound
 		
 		/* create and add a ChangeListener to track the slider value */
 		addListener(slider, new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (!sliderAdjusting[0]) {
 					sliderAdjusting[0] = true;
-					getSliderValue(slider, doubleAttr, min, max, mapping);
+					getSliderValue(slider, attr, min, max, mapping);
 					sliderAdjusting[0] = false;
 				}
 			}
@@ -281,7 +391,34 @@ public class AttributeManager {
 		return slider;
 	}
 	
+	/**
+	 * Binds a textfied, a set and a clear button to an attribute that allow to specify an upper or lower
+	 * limit for that attribute. The textfield is bound to the limit itself, the set button can be used to
+	 * set the limit to the current value and the clear button can be used to clear the limit.
+	 * @param attr the attribute to be limited
+	 * @param type the type of the limit. Must be DoubleMimimum.class or DoubleMaximum.class.
+	 * @param set the button used for the "set" action
+	 * @param clear the button used fot the "clear" action
+	 * @param textField the textfield to bind to the limit
+	 */
 	public void bindLimit(final DoubleAttr attr, final Class<? extends DoubleLimit> type, final JButton set, final JButton clear, final JTextField textField) {
+		if (type == DoubleMinimum.class) {
+			DoubleAttr limit = getLowerLimit(attr);
+			clear.setEnabled(limit != null);
+			if (limit != null) {
+				bindTextFieldToAttribute(textField, limit);
+			}
+		} else if (type == DoubleMaximum.class) {
+			DoubleAttr limit = getUpperLimit(attr);
+			clear.setEnabled(limit != null);
+			if (limit != null) {
+				bindTextFieldToAttribute(textField, limit);
+			}
+		} else {
+			throw new IllegalArgumentException(type + " must be DoubleMimimum.class or DoubleMaximum.class");
+		}
+		set.setEnabled(true);
+		
 		ActionListener setListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				DoubleAttr limitAttr = new DoubleAttr(attr.getDouble());
@@ -291,8 +428,6 @@ public class AttributeManager {
 				} else if (type == DoubleMaximum.class) {
 					clearUpperLimit(attr);
 					setUpperLimit(attr, new DoubleMaximum(limitAttr));
-				} else {
-					throw new RuntimeException();
 				}
 				textField.setEnabled(true);
 				clear.setEnabled(true);
@@ -309,8 +444,6 @@ public class AttributeManager {
 					clearLowerLimit(attr);
 				} else if (type == DoubleMaximum.class) {
 					clearUpperLimit(attr);
-				} else {
-					throw new RuntimeException();
 				}
 				clear.setEnabled(false);
 				unbind(textField);
@@ -503,6 +636,11 @@ public class AttributeManager {
 		
 		void bind() {
 			attribute.addAttributePostChangeListener(listener);
+			/*
+			 * Cause the listener to receive the current value by faking
+			 * an attributeHasChanged event - TODO that's a hack, is there a better way?
+			 */
+			listener.attributeHasChanged(attribute);
 		}
 		
 		void unbind() {

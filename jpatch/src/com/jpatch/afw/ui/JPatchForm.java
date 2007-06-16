@@ -223,7 +223,7 @@ public class JPatchForm {
 				} else if (n == 1) {
 					d = c instanceof JCheckBox ? 3 : 1;
 				}
-				boolean fill = !(c instanceof JCheckBox || c instanceof JButton);
+				boolean fill = !(c instanceof JCheckBox || c instanceof JButton || c instanceof Box);
 				int w = c instanceof JSlider ? width - (i * width / d) : (i + 1) * width / d - (i * width / d);
 				setComponentBounds(c, start + (i * width / d), 0, w, maxHeight, true, fill);
 			}
