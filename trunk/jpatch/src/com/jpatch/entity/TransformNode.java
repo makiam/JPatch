@@ -69,7 +69,7 @@ public class TransformNode extends AbstractTransformNode {
 	/**
 	 * Rotation-order attribute
 	 */
-	protected GenericAttr<Rotation3d.Order> rotationOrderAttr = new GenericAttr<Rotation3d.Order>(getRotationOrder());
+	protected StateMachine<Rotation3d.Order> rotationOrderAttr = new StateMachine<Rotation3d.Order>(Rotation3d.Order.values(), getRotationOrder());
 	
 	/**
 	 * Scale attribute (Tuple3 consisting of 3 SoftBoundedDoubleAttr)
@@ -131,7 +131,7 @@ public class TransformNode extends AbstractTransformNode {
 	 */
 	protected AttributePostChangeListener rotationOrderListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
-			setRotationOrder(rotationOrderAttr.getValue());
+			setRotationOrder(rotationOrderAttr.getState());
 		}
 	};
 	
@@ -141,7 +141,7 @@ public class TransformNode extends AbstractTransformNode {
 	public TransformNode() {
 		translationAttr.addAttributePostChangeListener(translationListener);
 		positionAttr.addAttributePostChangeListener(positionListener);
-		rotationOrderAttr.addAttributePostChangeListener(rotationOrderListener);
+//		rotationOrderAttr.addAttributePostChangeListener(rotationOrderListener);
 	}
 	
 	/**
@@ -209,7 +209,7 @@ public class TransformNode extends AbstractTransformNode {
 	 * Returns the rotation order attribute
 	 * @return the rotation order attribute
 	 */
-	public GenericAttr<Rotation3d.Order> getRotationOrderAttribute() {
+	public StateMachine<Rotation3d.Order> getRotationOrderAttribute() {
 		return rotationOrderAttr;
 	}
 	
@@ -243,7 +243,7 @@ public class TransformNode extends AbstractTransformNode {
 	 */
 	public void setRotationOrder(Rotation3d.Order order) {
 		if (order != getRotationOrder()) {
-			rotationOrderAttr.setValue(order);
+			rotationOrderAttr.setState(order);
 			computeBranch();
 		}
 	}
