@@ -25,7 +25,7 @@ public class AttributeManager {
 	/**
 	 * DecimalFormat used to print doubles in TextFields
 	 */
-	private static final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("0.000", new DecimalFormatSymbols(Locale.ENGLISH));
+	private static final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.ENGLISH));
 	
 	/**
 	 * Columns (width of the TextFields)
@@ -256,13 +256,54 @@ public class AttributeManager {
 	}
 	
 	
-	public JTextField bindTextFieldToAttribute(JTextField textField, Attribute attribute) {
+	public JTextField bindTextFieldToAttribute(final JTextField textField, Attribute attribute) {
 		if (attribute instanceof DoubleAttr) {
 			return bindTextFieldToAttribute(textField, (DoubleAttr) attribute);
 		}
 		throw new IllegalArgumentException("can't bind " + attribute + " to " + textField);
 	}
 	
+	public JComboBox bindComboBoxToAttribute(final JComboBox comboBox, final StateMachine stateMachine) {
+		class ComboListener implements ActionListener, AttributePostChangeListener {
+			private boolean suppressAction = false;
+			
+			public void actionPerformed(ActionEvent e) {
+				if (!suppressAction) {
+					if (comboBox.getSelectedItem() != stateMachine.getState()) {
+						Object newState = stateMachine.setState(comboBox.getSelectedItem());
+						if (newState != comboBox.getSelectedItem()) {
+							comboBox.setSelectedItem(newState);
+						}
+					}
+				}
+			}
+
+			public void attributeHasChanged(Attribute source) {
+				suppressAction = true;
+				if (source == stateMachine) {
+					comboBox.setSelectedItem(stateMachine.getState());
+				} else if (source == stateMachine.getStateSet()) {
+					comboBox.removeAllItems();
+					for (Object o : ((CollectionAttr) source).getElements()) {
+						comboBox.addItem(o);
+					}
+					comboBox.setSelectedItem(stateMachine.getState());
+				}
+				suppressAction = false;
+			}
+		}
+		
+		ComboListener listener = new ComboListener();
+		
+		bind(comboBox, new AttributeBinding(stateMachine, listener), new AttributeBinding(stateMachine.getStateSet(), listener));
+		
+		/* stimulate stateSetListener to update state-list in comboBox */
+//		stateSetListener.attributeHasChanged(stateMachine.getStateSet());
+		
+		addListener(comboBox, listener);
+		
+		return comboBox;
+	}
 	/**
 	 * Binds the specified JTextField to the specified Attribute.
 	 * @param textField
@@ -291,6 +332,7 @@ public class AttributeManager {
 		addListener(textField, new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
+				System.out.println("focusLost");
 				try {
 					doubleAttr.setDouble(Double.parseDouble(textField.getText()));
 					textField.setBackground(UIManager.getColor("TextField.background"));
@@ -361,6 +403,7 @@ public class AttributeManager {
 //		setSliderPosition(slider, attr, min, max, mapping);
 		
 		/* pointer to a flag that's checked by the listeners to prevent loops - admittedly an ugly hack */
+		/* TODO this doesn't work!!!!!!!!! */
 		final boolean[] sliderAdjusting = new boolean[] { false };
 		
 		/* create and an AttributePostChangeListener to listen for attribute changes und update the slider */
@@ -459,7 +502,7 @@ public class AttributeManager {
 	/**
 	 * Adds the specified listener to the specified component and stores the listener
 	 * in a collection in the componentListeners map. The following listeners are supported:<br />
-	 * HierarchyListeners, FocusListeners, ActionListeners (for TextFields and AbstractButtons only) and
+	 * HierarchyListeners, FocusListeners, ActionListeners (for TextFields, ComboBoxes and AbstractButtons only) and
 	 * ChangeListeners (for JSliders only).
 	 * @param component the component to add the listener to. 
 	 * @param listener the listener to add
@@ -467,7 +510,10 @@ public class AttributeManager {
 	 * @throws IllegalArgumentException if the specified listener can't be added to the specified component
 	 */
 	private void addListener(JComponent component, Object listener) {
-		System.out.println("adding " + listener + " to " + component.getClass().getName() + "@" + System.identityHashCode(component));
+		if (component instanceof JComboBox && listener instanceof ActionListener) {
+			System.out.println("adding " + listener + " to " + component.getClass().getName() + "@" + System.identityHashCode(component));
+//			Thread.dumpStack();
+		}
 		Collection<Object> listeners = componentListeners.get(component);
 		if (listeners == null) {
 			listeners = new HashSet<Object>(4);
@@ -484,6 +530,9 @@ public class AttributeManager {
 				return;
 			} else if (component instanceof JTextField) {
 				((JTextField) component).addActionListener((ActionListener) listener);
+				return;
+			} else if (component instanceof JComboBox) {
+				((JComboBox) component).addActionListener((ActionListener) listener);
 				return;
 			}
 		} else if (listener instanceof ChangeListener) {
@@ -505,22 +554,24 @@ public class AttributeManager {
 	 * Removes all (previously added) listeners from the specified component. The listeners are stored
 	 * in the componentListeners map.
 	 * @param component the component to remove the listeners from
-	 * @throws IllegalStateException if there is no entry for the specified component in the componentListeners map
 	 * @throws IllegalArgumentException if one of the listeners can't be removed from the specified component
 	 */
 	private void removeListeners(JComponent component) {
 		Collection<Object> listeners = componentListeners.get(component);
 		if (listeners == null) {
-			throw new IllegalStateException(component + " doesn't have managed listeners attached");
+			return;
 		}
 		for (Object listener : listeners) {
-			System.out.println("removing " + listener + " to " + component.getClass().getName() + "@" + System.identityHashCode(component));
+			if (component instanceof JComboBox && listener instanceof ActionListener) System.out.println("removing " + listener + " to " + component.getClass().getName() + "@" + System.identityHashCode(component));
 			if (listener instanceof ActionListener) {
 				if (component instanceof AbstractButton) {
 					((AbstractButton) component).removeActionListener((ActionListener) listener);
 					continue;
 				} else if (component instanceof JTextField) {
 					((JTextField) component).removeActionListener((ActionListener) listener);
+					continue;
+				} else if (component instanceof JComboBox) {
+					((JComboBox) component).removeActionListener((ActionListener) listener);
 					continue;
 				}
 			} else if (listener instanceof ChangeListener) {

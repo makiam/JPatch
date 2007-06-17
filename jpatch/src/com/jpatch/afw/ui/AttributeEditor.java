@@ -68,10 +68,18 @@ public class AttributeEditor {
 			JTextField y = new JTextField();
 			form.addRow(new JLabel(label), x, y);
 			addBinding(new ComponentBinding(getAttributeMethod(attributeName), x, y));
+		} else if (attribute instanceof BooleanAttr) {
+			JCheckBox checkBox = new JCheckBox();
+			form.addRow(new JLabel(label), checkBox);
+			addBinding(new ComponentBinding(getAttributeMethod(attributeName), checkBox));
+		} else if (attribute instanceof StateMachine) {
+			JComboBox comboBox = new JComboBox();
+			form.addRow(new JLabel(label), comboBox);
+			addBinding(new ComponentBinding(getAttributeMethod(attributeName), comboBox));
 		} else {
-			JTextField x = new JTextField();
-			form.addRow(new JLabel(label), x);
-			addBinding(new ComponentBinding(getAttributeMethod(attributeName), x));
+			JTextField textField = new JTextField();
+			form.addRow(new JLabel(label), textField);
+			addBinding(new ComponentBinding(getAttributeMethod(attributeName), textField));
 		}
 	}
 	
@@ -108,6 +116,10 @@ public class AttributeEditor {
 		} else if (attribute instanceof Tuple2Attr) {
 			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[0], ((Tuple3Attr) attribute).getXAttr());
 			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[1], ((Tuple3Attr) attribute).getYAttr());
+		} else if (attribute instanceof BooleanAttr) {
+			AttributeManager.getInstance().bindCheckBoxToAttribute((JCheckBox) binding.components[0], (BooleanAttr) attribute);
+		} else if (attribute instanceof StateMachine) {
+			AttributeManager.getInstance().bindComboBoxToAttribute((JComboBox) binding.components[0], (StateMachine) attribute);
 		} else {
 			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[0], ((Tuple3Attr) attribute).getXAttr());
 			if (binding.components.length == 2) {

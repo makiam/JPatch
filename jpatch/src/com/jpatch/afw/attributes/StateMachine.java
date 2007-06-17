@@ -150,6 +150,8 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 	 * @throws IllegalArgumentException if <i>newState</i> is not a legal state of this statemachine
 	 */
 	public final T setState(T newState) {
+		System.out.println(this + " setState(" + newState + ")");
+		Thread.dumpStack();
 		if (!states.contains(newState)) {
 			throw new IllegalArgumentException(newState + " is not a legal state of this statemachine (" + this + ")");
 		}
@@ -215,13 +217,11 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 	}
 	
 	/**
-	 * Adds an AttributePostChangeListener that will be notified whenever states are added or
-	 * removeed from this StateMachine.
-	 * @param the listener to be added
-	 * @see removeStateSetChangeListener(AttributePostChangeListener) 
+	 * Returns the CollectionAttr that contains the states of this StateMachine
+	 * @return the CollectionAttr that contains the states of this StateMachine
 	 */
-	public void addStateSetChangeListener(AttributePostChangeListener listener) {
-		states.addAttributePostChangeListener(listener);
+	public CollectionAttr<T> getStateSet() {
+		return states;
 	}
 	
 	/**

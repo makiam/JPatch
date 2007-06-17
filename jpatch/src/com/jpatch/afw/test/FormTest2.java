@@ -33,7 +33,11 @@ public class FormTest2 {
 		ae.addField("SCALE", "Scale");
 		ae.startContainer("Advanced");
 		ae.addField("AXIS_ROTATION", "AxisRotation");
-		ae.addField("TRANSLATE", "Translation");
+//		ae.addField("TRANSLATE", "Translation");
+		ae.addField("VISIBILITY", "Visibility");
+		System.out.println("<<<");
+		ae.addField("ORDER", "RotationOrder");
+		System.out.println(">>>");
 		
 		frame.add(ae.getRootContainer().getComponent(), BorderLayout.NORTH);
 		frame.setSize(300, 500);
