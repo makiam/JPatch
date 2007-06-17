@@ -1,8 +1,12 @@
 package com.jpatch.afw.test;
 
+import com.jpatch.afw.attributes.DoubleAttr;
+import com.jpatch.afw.attributes.Tuple2Attr;
 import com.jpatch.afw.control.Configuration;
 import com.jpatch.afw.ui.AttributeEditor;
+import com.jpatch.afw.ui.AttributeManager;
 import com.jpatch.afw.ui.PlatformUtils;
+import com.jpatch.afw.vecmath.Rotation3d;
 import com.jpatch.entity.TransformNode;
 
 import java.awt.*;
@@ -23,9 +27,9 @@ public class FormTest2 {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 		
-		final AttributeEditor ae = new AttributeEditor(TransformNode.class, "Transform");
-		final TransformNode tn1 = new TransformNode();
-		TransformNode tn2 = new TransformNode();
+		final AttributeEditor ae = new AttributeEditor(TestNode.class, "Transform");
+		final TestNode tn1 = new TestNode();
+		TestNode tn2 = new TestNode();
 		ae.setEntity(tn1);
 		
 		ae.addField("TRANSLATE", "Translation");
@@ -37,6 +41,10 @@ public class FormTest2 {
 		ae.addField("VISIBILITY", "Visibility");
 		System.out.println("<<<");
 		ae.addField("ORDER", "RotationOrder");
+		ae.addField("VALUE", "Slider");
+		ae.addSlider("SLIDER", "Slider");
+		ae.addField("LIMITS", "Limits");
+		ae.addLimits("Translation");
 		System.out.println(">>>");
 		
 		frame.add(ae.getRootContainer().getComponent(), BorderLayout.NORTH);
@@ -50,6 +58,31 @@ public class FormTest2 {
 				tn1.getTranslationAttribute().getXAttr().dumpListeners();
 			}
 		});
+		tn1.getRotationOrderAttribute().removeState(Rotation3d.Order.ZYX);
 		frame.add(combo, BorderLayout.SOUTH);
+		
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		tn1.getRotationOrderAttribute().addState(Rotation3d.Order.ZYX);
+		System.out.println("*");
+	}
+	
+	public static class TestNode extends TransformNode {
+		private DoubleAttr min = new DoubleAttr(-10);
+		private DoubleAttr max = new DoubleAttr(10);
+		private Tuple2Attr limits = new Tuple2Attr(min, max);
+		private DoubleAttr slider = AttributeManager.getInstance().createBoundedDoubleAttr(min, max);
+		
+		public DoubleAttr getSliderAttribute() {
+			return slider;
+		}
+		
+		public Tuple2Attr getLimitsAttribute() {
+			return limits;
+		}
 	}
 }

@@ -6,9 +6,12 @@ import java.util.*;
 import javax.swing.*;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.icons.IconSet;
 
 public class AttributeEditor {
-
+	private static final Icon LOWER_LIMIT = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/SET_LOWER_LIMIT.png"));
+	private static final Icon UPPER_LIMIT = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/SET_UPPER_LIMIT.png"));
+	private static final Icon CLEAR_LIMIT = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/CLEAR_LIMIT.png"));
 	
 	private final Class entityClass;
 	private Object entity;
@@ -83,6 +86,47 @@ public class AttributeEditor {
 		}
 	}
 	
+	public void addSlider(String label, String attributeName) {
+		JTextField textField = new JTextField();
+		JSlider slider = new JSlider();
+		form.addRow(new JLabel(label), textField, slider);
+		addBinding(new ComponentBinding(getAttributeMethod(attributeName), textField, slider));
+	}
+	
+	public void addLimits(String attributeName) {
+		JButton[] setButtons = new JButton[6];
+		JButton[] clrButtons = new JButton[6];
+		JTextField[] textFields = new JTextField[6];
+		JComponent[] boxes = new JComponent[6];
+		ButtonUtils buttonUtils = new ButtonUtils();
+		for (int i = 0; i < 6; i++) {
+			setButtons[i] = new JButton();
+			clrButtons[i] = new JButton();
+			textFields[i] = new JTextField();
+			boxes[i] = Box.createHorizontalBox();
+			boxes[i].add(setButtons[i]);
+			boxes[i].add(clrButtons[i]);
+			buttonUtils.configureButton(setButtons[i], IconSet.Style.GLOSSY, IconSet.Type.LEFT, i % 2 == 0 ? UPPER_LIMIT : LOWER_LIMIT);
+			buttonUtils.configureButton(clrButtons[i], IconSet.Style.GLOSSY, IconSet.Type.RIGHT, CLEAR_LIMIT);
+		}
+		
+		
+		JComponent[] components = new JComponent[18];
+		for (int i = 0; i < components.length; i++) {
+			if (i < 6) components[i] = textFields[i];
+			else if (i < 12) components[i] = setButtons[i - 6];
+			else components[i] = clrButtons[i - 12];
+		}
+		
+		addBinding(new ComponentBinding(getAttributeMethod(attributeName), components));
+		
+		form.addRow(new JLabel("MAXIMUM"), textFields[0], textFields[2], textFields[4]);
+		form.addRow(new JLabel("SET/CLR"), boxes[0], boxes[2], boxes[4]);
+		addField("Current", attributeName);
+		form.addRow(new JLabel("SET/CLR"), boxes[1], boxes[3], boxes[5]);
+		form.addRow(new JLabel("MINIMUM"), textFields[1], textFields[3], textFields[5]);
+	}
+	
 	private void addBinding(ComponentBinding binding) {
 		bindings.add(binding);
 		bind(binding);
@@ -109,19 +153,29 @@ public class AttributeEditor {
 		}
 		
 		/* bind components */
-		if (attribute instanceof Tuple3Attr) {
+		if (binding.components.length == 18) {
+			/* limit */
+			Tuple3Attr attr = (Tuple3Attr) attribute;
+			JComponent[] components = binding.components;
+			AttributeManager.getInstance().bindLimit(attr.getXAttr(), DoubleMaximum.class, (JButton) components[6], (JButton) components[12], (JTextField) components[0]);
+			AttributeManager.getInstance().bindLimit(attr.getXAttr(), DoubleMinimum.class, (JButton) components[7], (JButton) components[13], (JTextField) components[1]);
+			AttributeManager.getInstance().bindLimit(attr.getYAttr(), DoubleMaximum.class, (JButton) components[8], (JButton) components[14], (JTextField) components[2]);
+			AttributeManager.getInstance().bindLimit(attr.getYAttr(), DoubleMinimum.class, (JButton) components[9],(JButton) components[15], (JTextField) components[3]);
+			AttributeManager.getInstance().bindLimit(attr.getZAttr(), DoubleMaximum.class, (JButton) components[10], (JButton) components[16], (JTextField) components[4]);
+			AttributeManager.getInstance().bindLimit(attr.getZAttr(), DoubleMinimum.class, (JButton) components[11], (JButton) components[17], (JTextField) components[5]);
+		} else if (attribute instanceof Tuple3Attr) {
 			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[0], ((Tuple3Attr) attribute).getXAttr());
 			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[1], ((Tuple3Attr) attribute).getYAttr());
 			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[2], ((Tuple3Attr) attribute).getZAttr());
 		} else if (attribute instanceof Tuple2Attr) {
-			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[0], ((Tuple3Attr) attribute).getXAttr());
-			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[1], ((Tuple3Attr) attribute).getYAttr());
+			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[0], ((Tuple2Attr) attribute).getXAttr());
+			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[1], ((Tuple2Attr) attribute).getYAttr());
 		} else if (attribute instanceof BooleanAttr) {
 			AttributeManager.getInstance().bindCheckBoxToAttribute((JCheckBox) binding.components[0], (BooleanAttr) attribute);
 		} else if (attribute instanceof StateMachine) {
 			AttributeManager.getInstance().bindComboBoxToAttribute((JComboBox) binding.components[0], (StateMachine) attribute);
 		} else {
-			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[0], ((Tuple3Attr) attribute).getXAttr());
+			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[0], attribute);
 			if (binding.components.length == 2) {
 				AttributeManager.getInstance().bindSliderToAttribute((JSlider) binding.components[1], (DoubleAttr) attribute, IdentityMapping.getInstance());
 			}

@@ -116,11 +116,16 @@ public class AttributeManager {
 	 * @return the upper limit for the specified attribute
 	 * @throws IllegalArgumentException if the specified attribute already has an upper limit set
 	 */
-	public DoubleMaximum setUpperLimit(DoubleAttr attr, DoubleMaximum limit) {
+	public DoubleMaximum setUpperLimit(final DoubleAttr attr, final DoubleMaximum limit) {
 		if (upperLimits.containsKey(attr)) {
 			throw new IllegalStateException(attr + " has already set an upper limit: " + upperLimits.get(attr));
 		}
 		attr.addAttributePreChangeListener(limit);
+		limit.getAttr().addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				attr.setDouble(limit.attributeWillChange(attr, attr.getDouble()));
+			}
+		});
 		upperLimits.put(attr, limit);
 		return limit;
 	}
@@ -143,7 +148,8 @@ public class AttributeManager {
 	 * @return the upper limit of the specified attribute, or null if no upper limit is set
 	 */
 	public DoubleAttr getUpperLimit(DoubleAttr attr) {
-		return upperLimits.get(attr).getAttr();
+		DoubleMaximum limit = upperLimits.get(attr);
+		return limit == null ? null : limit.getAttr();
 	}
 	
 	/**
@@ -153,11 +159,16 @@ public class AttributeManager {
 	 * @return the lower limit for the specified attribute
 	 * @throws IllegalArgumentException if the specified attribute already has an lower limit set
 	 */
-	public DoubleMinimum setLowerLimit(DoubleAttr attr, DoubleMinimum limit) {
+	public DoubleMinimum setLowerLimit(final DoubleAttr attr, final DoubleMinimum limit) {
 		if (lowerLimits.containsKey(attr)) {
-			throw new IllegalStateException(attr + " has already set an lower limit: " + lowerLimits.get(attr));
+			throw new IllegalStateException(attr + " has already set a lower limit: " + lowerLimits.get(attr));
 		}
 		attr.addAttributePreChangeListener(limit);
+		limit.getAttr().addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				attr.setDouble(limit.attributeWillChange(attr, attr.getDouble()));
+			}
+		});
 		lowerLimits.put(attr, limit);
 		return limit;
 	}
@@ -180,7 +191,8 @@ public class AttributeManager {
 	 * @return the lower limit of the specified attribute, or null if no lower limit is set
 	 */
 	public DoubleAttr getLowerLimit(DoubleAttr attr) {
-		return lowerLimits.get(attr).getAttr();
+		DoubleMinimum limit = lowerLimits.get(attr);
+		return limit == null ? null : limit.getAttr();
 	}
 	
 	/**

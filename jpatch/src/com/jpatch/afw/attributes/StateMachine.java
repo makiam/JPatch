@@ -13,7 +13,7 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 	/**
 	 * A list of possible states of this StateMachine
 	 */
-	protected final CollectionAttr<T> states = new CollectionAttr<T>(LinkedHashSet.class);
+	protected final CollectionAttr<T> states;
 	
 	/**
 	 * The current state of this state machine
@@ -48,6 +48,7 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
 	 */
 	public StateMachine(T[] states, T initialState) {
+		this.states = new CollectionAttr<T>(LinkedHashSet.class);
 		for (T s : states) {
 			this.states.add(s);
 		}
@@ -75,9 +76,24 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public StateMachine(Class<? extends Enum> states, T initialState) {
+		this.states = new CollectionAttr<T>(LinkedHashSet.class);
 		for (Enum s : states.getEnumConstants()) {
 			this.states.add((T) s);
 		}
+		if (setState(initialState) != initialState) {
+			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
+		}
+	}
+	
+	/**
+	 * Creates a new StateMachine for the specified states and sets the initial state to the specified argument.
+	 * @param states
+	 * @param initialState
+	 * @throws NullPointerException if states is <i>null</i>
+	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
+	 */
+	public StateMachine(CollectionAttr<T> states, T initialState) {
+		this.states = states;
 		if (setState(initialState) != initialState) {
 			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
 		}
@@ -150,8 +166,6 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 	 * @throws IllegalArgumentException if <i>newState</i> is not a legal state of this statemachine
 	 */
 	public final T setState(T newState) {
-		System.out.println(this + " setState(" + newState + ")");
-		Thread.dumpStack();
 		if (!states.contains(newState)) {
 			throw new IllegalArgumentException(newState + " is not a legal state of this statemachine (" + this + ")");
 		}
