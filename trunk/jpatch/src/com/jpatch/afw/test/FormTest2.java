@@ -4,6 +4,7 @@ import com.jpatch.afw.attributes.DoubleAttr;
 import com.jpatch.afw.attributes.Tuple2Attr;
 import com.jpatch.afw.control.Configuration;
 import com.jpatch.afw.ui.AttributeEditor;
+import com.jpatch.afw.ui.AttributeEditorFactory;
 import com.jpatch.afw.ui.AttributeManager;
 import com.jpatch.afw.ui.PlatformUtils;
 import com.jpatch.afw.vecmath.Rotation3d;
@@ -29,57 +30,52 @@ public class FormTest2 {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 		
-		final AttributeEditor ae = new AttributeEditor(TestNode.class, "Transform");
+		
+		
+//		final AttributeEditor ae = new AttributeEditor(TestNode.class, "Transform");
 		final TestNode tn1 = new TestNode();
 		TestNode tn2 = new TestNode();
+		
+		final AttributeEditor ae = AttributeEditorFactory.getInstance().getEditorFor(tn1);
+		
 		ae.setEntity(tn1);
 		
-		ae.addField("TRANSLATE", "Translation");
-		ae.addField("ROTATE", "Rotation");
-		ae.addField("SCALE", "Scale");
-		ae.startContainer("Advanced");
-		ae.addField("AXIS_ROTATION", "AxisRotation");
 //		ae.addField("TRANSLATE", "Translation");
-		ae.addField("VISIBILITY", "Visibility");
-		System.out.println("<<<");
-		ae.addField("ORDER", "RotationOrder");
-		ae.addField("VALUE", "Slider");
-		ae.addSlider("SLIDER", "Slider");
-		ae.addField("LIMITS", "Limits");
-		ae.endContainer();
-		ae.startContainer("LIMITS");
-		ae.startContainer("TRANSLATION");
-		ae.addLimits("Translation");
-		ae.endContainer();
-		ae.startContainer("ROTATION");
-		ae.addLimits("Rotation");
-		ae.endContainer();
-		ae.startContainer("SCALE");
-		ae.addLimits("Scale");
-		ae.endContainer();
-		System.out.println(">>>");
+//		ae.addField("ROTATE", "Rotation");
+//		ae.addField("SCALE", "Scale");
+//		ae.startContainer("Advanced");
+//		ae.addField("AXIS_ROTATION", "AxisRotation");
+////		ae.addField("TRANSLATE", "Translation");
+//		ae.addField("VISIBILITY", "Visibility");
+//		System.out.println("<<<");
+//		ae.addField("ORDER", "RotationOrder");
+//		ae.addField("VALUE", "Slider");
+//		ae.addSlider("SLIDER", "Slider");
+//		ae.addField("LIMITS", "Limits");
+//		ae.endContainer();
+//		ae.startContainer("LIMITS");
+//		ae.startContainer("TRANSLATION");
+//		ae.addLimits("Translation");
+//		ae.endContainer();
+//		ae.startContainer("ROTATION");
+//		ae.addLimits("Rotation");
+//		ae.endContainer();
+//		ae.startContainer("SCALE");
+//		ae.addLimits("Scale");
+//		ae.endContainer();
+//		System.out.println(">>>");
 		frame.add(ae.getRootContainer().getComponent(), BorderLayout.NORTH);
-		frame.setSize(300, 500);
+		frame.setSize(320, 500);
 		frame.setVisible(true);
 		
 		JComboBox combo = new JComboBox(new Object[] { tn1, tn2 });
 		combo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ae.setEntity(((JComboBox) e.getSource()).getSelectedItem());
-//				tn1.getTranslationAttribute().getXAttr().dumpListeners();
 			}
 		});
 		tn1.getRotationOrderAttribute().removeState(Rotation3d.Order.ZYX);
 		frame.add(combo, BorderLayout.SOUTH);
-		
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		tn1.getRotationOrderAttribute().addState(Rotation3d.Order.ZYX);
-		System.out.println("*");
 	}
 	
 	public static class TestNode extends TransformNode {
