@@ -1,6 +1,7 @@
 package com.jpatch.afw.ui;
 
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -28,8 +29,9 @@ public class AttributeEditor {
 	private JPatchForm form = new JPatchForm();
 	private final List<ComponentBinding> bindings = new ArrayList<ComponentBinding>();
 	
-	public AttributeEditor(Class entityClass, String name) {
+	public AttributeEditor(Class entityClass, String name, Object entity) {
 		this.entityClass = entityClass;
+		this.entity = entity;
 		startContainer(name);
 	}
 	
@@ -144,9 +146,11 @@ public class AttributeEditor {
 	
 	public void setEntity(Object entity) {
 		this.entity = entity;
+		getRootContainer().getComponent().setVisible(false);	// otherwise Swing would repaint each component individually
 		for (ComponentBinding binding : bindings) {
 			bind(binding);
 		}
+		getRootContainer().getComponent().setVisible(true);
 	}
 	
 	private void bind(ComponentBinding binding) {

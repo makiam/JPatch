@@ -8,7 +8,7 @@ import javax.swing.border.*;
 public class JPatchForm {
 	private static final Insets LABEL_INSETS = new Insets(0, 0, 0, 4);
 	private static final Insets INSETS = new Insets(1, 1, 1, 1);
-	private static final Dimension LABEL_SIZE = new Dimension(80, 20);
+	private static final Dimension LABEL_SIZE = new Dimension(100, 20);
 	private static final Dimension SLIDER_SIZE = new Dimension(20, 20);
 	private final JComponent component = new JPanel(new ColumnLayout());
 //		@Override

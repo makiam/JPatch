@@ -1,7 +1,5 @@
 package com.jpatch.afw.attributes;
 
-import com.jpatch.afw.attributes.AbstractAttributeEditor.Item;
-import com.jpatch.afw.attributes.AbstractAttributeEditor.Type;
 
 import java.io.*;
 import java.net.*;
@@ -9,6 +7,9 @@ import java.util.*;
 
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
+import trashcan.AbstractAttributeEditor;
+import trashcan.AbstractAttributeEditor.Item;
+import trashcan.AbstractAttributeEditor.Type;
 
 public class AttributeEditorFactory {
 	public static final AttributeEditorFactory INSTANCE = new AttributeEditorFactory();

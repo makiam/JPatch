@@ -19,7 +19,13 @@
  * along with JPatch; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package com.jpatch.afw.attributes;
+package trashcan;
+
+import com.jpatch.afw.attributes.Attribute;
+import com.jpatch.afw.attributes.BooleanAttr;
+import com.jpatch.afw.attributes.GenericAttr;
+import com.jpatch.afw.attributes.Tuple2Attr;
+import com.jpatch.afw.attributes.Tuple3Attr;
 
 import java.awt.*;
 import java.awt.event.*;
