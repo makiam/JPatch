@@ -1,12 +1,21 @@
 package com.jpatch.afw.ui;
 
+import java.awt.Color;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.lang.reflect.*;
 import java.util.*;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicSliderUI;
+import javax.swing.plaf.metal.MetalSliderUI;
 
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.icons.IconSet;
+import com.sun.java.swing.plaf.motif.MotifSliderUI;
 
 public class AttributeEditor {
 	private static final Icon LOWER_LIMIT = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/SET_LOWER_LIMIT.png"));
@@ -89,6 +98,7 @@ public class AttributeEditor {
 	public void addSlider(String label, String attributeName) {
 		JTextField textField = new JTextField();
 		JSlider slider = new JSlider();
+//		slider.setUI(new SliderUI());
 		form.addRow(new JLabel(label), textField, slider);
 		addBinding(new ComponentBinding(getAttributeMethod(attributeName), textField, slider));
 	}
@@ -101,7 +111,9 @@ public class AttributeEditor {
 		ButtonUtils buttonUtils = new ButtonUtils();
 		for (int i = 0; i < 6; i++) {
 			setButtons[i] = new JButton();
+			setButtons[i].setToolTipText(i % 2 == 0 ? "set maximum value" : "set minimum value");
 			clrButtons[i] = new JButton();
+			clrButtons[i].setToolTipText(i % 2 == 0 ? "clear maximum value" : "clear minimum value");
 			textFields[i] = new JTextField();
 			boxes[i] = Box.createHorizontalBox();
 			boxes[i].add(setButtons[i]);
@@ -117,14 +129,12 @@ public class AttributeEditor {
 			else if (i < 12) components[i] = setButtons[i - 6];
 			else components[i] = clrButtons[i - 12];
 		}
-		
-		addBinding(new ComponentBinding(getAttributeMethod(attributeName), components));
-		
 		form.addRow(new JLabel("MAXIMUM"), textFields[0], textFields[2], textFields[4]);
 		form.addRow(new JLabel("SET/CLR"), boxes[0], boxes[2], boxes[4]);
 		addField("Current", attributeName);
 		form.addRow(new JLabel("SET/CLR"), boxes[1], boxes[3], boxes[5]);
 		form.addRow(new JLabel("MINIMUM"), textFields[1], textFields[3], textFields[5]);
+		addBinding(new ComponentBinding(getAttributeMethod(attributeName), components));
 	}
 	
 	private void addBinding(ComponentBinding binding) {

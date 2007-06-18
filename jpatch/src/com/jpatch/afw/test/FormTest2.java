@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.util.Locale;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalSliderUI;
 
 public class FormTest2 {
 	public static void main(String[] args) {
@@ -24,6 +25,7 @@ public class FormTest2 {
 		Configuration.getInstance().put("settingsUserRoot", "com/jpatch/settings/preferences");
 		PlatformUtils.setupSwing();
 		JFrame frame = new JFrame();
+		SwingUtilities.updateComponentTreeUI(frame);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 		
@@ -44,9 +46,18 @@ public class FormTest2 {
 		ae.addField("VALUE", "Slider");
 		ae.addSlider("SLIDER", "Slider");
 		ae.addField("LIMITS", "Limits");
+		ae.endContainer();
+		ae.startContainer("LIMITS");
+		ae.startContainer("TRANSLATION");
 		ae.addLimits("Translation");
+		ae.endContainer();
+		ae.startContainer("ROTATION");
+		ae.addLimits("Rotation");
+		ae.endContainer();
+		ae.startContainer("SCALE");
+		ae.addLimits("Scale");
+		ae.endContainer();
 		System.out.println(">>>");
-		
 		frame.add(ae.getRootContainer().getComponent(), BorderLayout.NORTH);
 		frame.setSize(300, 500);
 		frame.setVisible(true);
@@ -55,7 +66,7 @@ public class FormTest2 {
 		combo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ae.setEntity(((JComboBox) e.getSource()).getSelectedItem());
-				tn1.getTranslationAttribute().getXAttr().dumpListeners();
+//				tn1.getTranslationAttribute().getXAttr().dumpListeners();
 			}
 		});
 		tn1.getRotationOrderAttribute().removeState(Rotation3d.Order.ZYX);
