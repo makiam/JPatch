@@ -214,18 +214,17 @@ public class AttributeManager {
 	 * @param component the Component to unbind
 	 */
 	public void unbind(JComponent component) {
+//		System.out.println("unbind " + component);
 		AttributeBinding[] bindings = componentBindings.get(component);
-		if (bindings == null) {
-			return;
-		}
-
-		/*
-		 * remove the AttributePostChangeListener if the component is currently showing
-		 * (otherwise this has been done by the HierarchyListener already)
-		 */
-		if (component.isShowing()) {
-			for (AttributeBinding binding : bindings) {
-				binding.unbind();
+		if (bindings != null) {	
+			/*
+			 * remove the AttributePostChangeListener if the component is currently showing
+			 * (otherwise this has been done by the HierarchyListener already)
+			 */
+			if (component.isShowing()) {
+				for (AttributeBinding binding : bindings) {
+					binding.unbind();
+				}
 			}
 		}
 		
@@ -347,7 +346,7 @@ public class AttributeManager {
 				System.out.println("focusLost");
 				try {
 					doubleAttr.setDouble(Double.parseDouble(textField.getText()));
-					textField.setBackground(UIManager.getColor("TextField.background"));
+					textField.setBackground(textField.isEnabled() ? UIManager.getColor("TextField.background") : UIManager.getColor("TextField.inactiveBackground"));
 					textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
 				} catch (NumberFormatException exception) {
 					textField.setBackground(Color.YELLOW);
@@ -457,17 +456,27 @@ public class AttributeManager {
 	 * @param textField the textfield to bind to the limit
 	 */
 	public void bindLimit(final DoubleAttr attr, final Class<? extends DoubleLimit> type, final JButton set, final JButton clear, final JTextField textField) {
+		textField.setColumns(COLUMNS);
+		textField.setHorizontalAlignment(SwingConstants.RIGHT);
 		if (type == DoubleMinimum.class) {
 			DoubleAttr limit = getLowerLimit(attr);
 			clear.setEnabled(limit != null);
+			textField.setEnabled(limit != null);
 			if (limit != null) {
 				bindTextFieldToAttribute(textField, limit);
+			} else {
+				textField.setText("not set");
+				textField.setBackground(UIManager.getColor("TextField.inactiveBackground"));
 			}
 		} else if (type == DoubleMaximum.class) {
 			DoubleAttr limit = getUpperLimit(attr);
 			clear.setEnabled(limit != null);
+			textField.setEnabled(limit != null);
 			if (limit != null) {
 				bindTextFieldToAttribute(textField, limit);
+			} else {
+				textField.setText("not set");
+				textField.setBackground(UIManager.getColor("TextField.inactiveBackground"));
 			}
 		} else {
 			throw new IllegalArgumentException(type + " must be DoubleMimimum.class or DoubleMaximum.class");
@@ -504,6 +513,7 @@ public class AttributeManager {
 				unbind(textField);
 				textField.setText("not set");
 				textField.setEnabled(false);
+				textField.setBackground(UIManager.getColor("TextField.inactiveBackground"));
 			}
 		};
 		
@@ -522,10 +532,10 @@ public class AttributeManager {
 	 * @throws IllegalArgumentException if the specified listener can't be added to the specified component
 	 */
 	private void addListener(JComponent component, Object listener) {
-		if (component instanceof JComboBox && listener instanceof ActionListener) {
-			System.out.println("adding " + listener + " to " + component.getClass().getName() + "@" + System.identityHashCode(component));
-//			Thread.dumpStack();
-		}
+//		if (component instanceof AbstractButton && listener instanceof ActionListener) {
+//			System.out.println("adding " + listener + " to " + component.getClass().getName() + "@" + System.identityHashCode(component));
+////			Thread.dumpStack();
+//		}
 		Collection<Object> listeners = componentListeners.get(component);
 		if (listeners == null) {
 			listeners = new HashSet<Object>(4);
@@ -574,7 +584,7 @@ public class AttributeManager {
 			return;
 		}
 		for (Object listener : listeners) {
-			if (component instanceof JComboBox && listener instanceof ActionListener) System.out.println("removing " + listener + " to " + component.getClass().getName() + "@" + System.identityHashCode(component));
+//			if (component instanceof AbstractButton && listener instanceof ActionListener) System.out.println("removing " + listener + " from " + component.getClass().getName() + "@" + System.identityHashCode(component));
 			if (listener instanceof ActionListener) {
 				if (component instanceof AbstractButton) {
 					((AbstractButton) component).removeActionListener((ActionListener) listener);

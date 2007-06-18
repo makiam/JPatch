@@ -20,9 +20,9 @@ public class JPatchFormContainer {
 	private JPatchFormContainer parentContainer;
 	private boolean expanded;
 	private static final Color[] BORDER_COLORS = new Color[] {
-		new Color(0x888888),
-		new Color(0xaaaaaa),
-		new Color(0xcccccc)
+		new Color(0x909090),
+		new Color(0xb8b8b8),
+		new Color(0xd0d0d0)
 	};
 	public JPatchFormContainer(String title) {
 		JToggleButton button = new JToggleButton();
