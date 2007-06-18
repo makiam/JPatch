@@ -8,6 +8,7 @@ import com.jpatch.afw.ui.AttributeEditorFactory;
 import com.jpatch.afw.ui.AttributeManager;
 import com.jpatch.afw.ui.PlatformUtils;
 import com.jpatch.afw.vecmath.Rotation3d;
+import com.jpatch.boundary.ViewportGl;
 import com.jpatch.entity.TransformNode;
 
 import java.awt.*;
@@ -36,9 +37,9 @@ public class FormTest2 {
 		final TestNode tn1 = new TestNode();
 		TestNode tn2 = new TestNode();
 		
-		final AttributeEditor ae = AttributeEditorFactory.getInstance().getEditorFor(tn1);
+		final AttributeEditor ae = AttributeEditorFactory.getInstance().getEditorFor(new ViewportGl(1, 1));
 		
-		ae.setEntity(tn1);
+//		ae.setEntity(tn1);
 		
 //		ae.addField("TRANSLATE", "Translation");
 //		ae.addField("ROTATE", "Rotation");

@@ -21,7 +21,7 @@ public abstract class Viewport {
 			new OrthoViewDirection.BirdsEye()
 	};
 	
-//	final ArrayAttr<ViewDirection> viewType = new ArrayAttr<ViewDirection>(standardViewDirections);
+	final StateMachine<ViewDirection> viewType = new StateMachine<ViewDirection>(standardViewDirections, OrthoViewDirection.FRONT);
 	final Tuple2Attr viewRotation = new Tuple2Attr(0, 0);
 	final Tuple2Attr viewTranslation = new Tuple2Attr(0, 0);
 	final DoubleAttr viewScale = new DoubleAttr(1);
@@ -41,8 +41,6 @@ public abstract class Viewport {
 	static final float nearClip = 1;
 	static final float farClip = 1 << 15;
 	static final RealtimeRendererSettings RENDERER_SETTINGS = Settings.getInstance().realtimeRenderer;
-	
-	protected ViewDirection viewDirection;
 	
 	private AttributePostChangeListener focalLengthAttributeListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute attribute) {
@@ -74,9 +72,9 @@ public abstract class Viewport {
 	public Viewport(int id, int viewDir) {
 		this.id = id;
 		matrix.setIdentity();
-		viewDirection = standardViewDirections[viewDir];
+		viewType.setState(standardViewDirections[viewDir]);
+		viewType.getState().bindTo(this);
 //		viewType.setObject(viewDirection);
-		viewDirection.bindTo(this);
 //		viewType.addAttributeListener(updateAttributeListener);
 		showControlMesh.addAttributePostChangeListener(updateAttributeListener);
 		showLimitSurface.addAttributePostChangeListener(updateAttributeListener);
@@ -91,33 +89,33 @@ public abstract class Viewport {
 
 	
 	
-	public BooleanAttr getShowControlMesh() {
+	public BooleanAttr getShowControlMeshAttribute() {
 		return showControlMesh;
 	}
 
-	public BooleanAttr getShowLimitSurface() {
+	public BooleanAttr getShowLimitSurfaceAttribute() {
 		return showLimitSurface;
 	}
 
-	public BooleanAttr getShowProjectedMesh() {
+	public BooleanAttr getShowProjectedMeshAttribute() {
 		return showProjectedMesh;
 	}
 
-	public Tuple2Attr getViewRotation() {
+	public Tuple2Attr getViewRotationAttribute() {
 		return viewRotation;
 	}
 
-	public DoubleAttr getViewScale() {
+	public DoubleAttr getViewScaleAttribute() {
 		return viewScale;
 	}
 
-	public Tuple2Attr getViewTranslation() {
+	public Tuple2Attr getViewTranslationAttribute() {
 		return viewTranslation;
 	}
 
-//	public ArrayAttr<ViewDirection> getViewType() {
-//		return viewType;
-//	}
+	public StateMachine<ViewDirection> getViewTypeAttribute() {
+		return viewType;
+	}
 
 	public BooleanAttr getFragmentShader() {
 		return fragmentShader;
@@ -139,7 +137,7 @@ public abstract class Viewport {
 //	}
 
 	public String getInfo() {
-		return "Viewport " + id + ": " + viewDirection;
+		return "Viewport " + id + ": " + viewType.toString();
 	}
 	
 	public abstract void draw();
