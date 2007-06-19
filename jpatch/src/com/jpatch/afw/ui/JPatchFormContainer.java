@@ -12,7 +12,8 @@ public class JPatchFormContainer {
 	private static final Icon COLLAPSED_ICON = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/COLLAPSED.png"));
 	private static final Insets EXPANDED_INSETS = new Insets(0, 4, 4, 4);
 	private static final Insets COLLAPSED_INSETS = new Insets(0, 4, 2, 4);
-	private final JComponent component = Box.createVerticalBox(); //new JPanel(new JPatchForm.ColumnLayout());
+	private final JComponent component = Box.createVerticalBox();
+//	private final JComponent component = new JPanel(new JPatchForm.ColumnLayout());
 	private final JPanel titleBar = new JPanel(new BorderLayout());
 	private final Component strut = Box.createVerticalStrut(2);
 	private final Box formBox = Box.createVerticalBox();
@@ -105,19 +106,19 @@ public class JPatchFormContainer {
 			component.add(strut);
 			component.add(formBox);
 			component.add(containerBox);
-			getRootContainer().component.getParent().validate();
+			getRootContainer().component.getRootPane().validate();
 //			getRootContainer().component.paintImmediately(getRootContainer().component.getBounds());
 		} else if (this.expanded && !expanded) {
 			this.expanded = false;
 			component.remove(strut);
 			component.remove(formBox);
 			component.remove(containerBox);
-			getRootContainer().component.getParent().validate();
+			getRootContainer().component.getRootPane().validate();
 //			getRootContainer().component.paintImmediately(getRootContainer().component.getBounds());
 		}
 	}
 	
-	private JPatchFormContainer getRootContainer() {
+	JPatchFormContainer getRootContainer() {
 		return parentContainer == null ? this : parentContainer.getRootContainer();
 	}
 	

@@ -172,7 +172,7 @@ public class JPatchForm {
 		}
 	}
 	
-	private static class RowLayout implements LayoutManager2 {
+	private class RowLayout implements LayoutManager2 {
 		private Dimension layoutSize = new Dimension();
 		
 		public void addLayoutComponent(Component comp, Object constraints) {
@@ -219,7 +219,7 @@ public class JPatchForm {
 				Component c = parent.getComponent(i + 1);
 				int d = n;
 				if (n == 2) {
-					d = 3;
+					d = 2;
 				} else if (n == 1) {
 					d = c instanceof JCheckBox ? 3 : 1;
 				}
@@ -253,6 +253,7 @@ public class JPatchForm {
 			}
 			layoutSize.height = height;
 			layoutSize.width = Short.MAX_VALUE;
+//			layoutSize.width = 300;//JPatchForm.this.container.getRootContainer().getComponent().getRootPane().getWidth();
 //			System.out.println("row-size:" + layoutSize);
 			return layoutSize;
 		}

@@ -25,10 +25,10 @@ public abstract class Viewport {
 	final Tuple2Attr viewRotation = new Tuple2Attr(0, 0);
 	final Tuple2Attr viewTranslation = new Tuple2Attr(0, 0);
 	final DoubleAttr viewScale = new DoubleAttr(1);
-	final BooleanAttr showControlMesh = new BooleanAttr(true);
-	final BooleanAttr showLimitSurface = new BooleanAttr(true);
-	final BooleanAttr showProjectedMesh = new BooleanAttr(true);
-	final BooleanAttr fragmentShader = new BooleanAttr(false);
+	final Toggle showControlMesh = new Toggle(true);
+	final Toggle showLimitSurface = new Toggle(true);
+	final Toggle showProjectedMesh = new Toggle(true);
+	final Toggle fragmentShader = new Toggle(false);
 	
 	final int id;
 	Component component;
