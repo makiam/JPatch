@@ -48,7 +48,8 @@ public class JPatchLookAndFeel extends MetalLookAndFeel {
 	protected void initClassDefaults(UIDefaults uidefaults) {
         super.initClassDefaults(uidefaults);
         Object classMap[] = {
-        		"SliderUI", PACKAGE + "SliderUI"
+        		"SliderUI", PACKAGE + "SliderUI",
+        		"CheckBoxUI", PACKAGE + "CheckBoxUI"
         };
         uidefaults.putDefaults(classMap);
     }
