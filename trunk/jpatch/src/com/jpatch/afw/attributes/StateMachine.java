@@ -9,17 +9,12 @@ import java.util.*;
  * respectively that will be notified whenever states were added or removed from this StateMachine.
  * @param <T> The type of possible states
  */
-public class StateMachine<T> extends AbstractAttribute<T> {
+public class StateMachine<T> extends GenericAttr<T> {
 	/**
 	 * A list of possible states of this StateMachine
 	 */
 	protected final CollectionAttr<T> states;
 	
-	/**
-	 * The current state of this state machine
-	 */
-	protected T currentState;
-
 	/**
 	 * The default state of this state machine (may be <i>null</i>)
 	 */
@@ -52,7 +47,7 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 		for (T s : states) {
 			this.states.add(s);
 		}
-		if (setState(initialState) != initialState) {
+		if (setValue(initialState) != initialState) {
 			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
 		}
 	}
@@ -80,7 +75,7 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 		for (Enum s : states.getEnumConstants()) {
 			this.states.add((T) s);
 		}
-		if (setState(initialState) != initialState) {
+		if (setValue(initialState) != initialState) {
 			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
 		}
 	}
@@ -94,7 +89,7 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 	 */
 	public StateMachine(CollectionAttr<T> states, T initialState) {
 		this.states = states;
-		if (setState(initialState) != initialState) {
+		if (setValue(initialState) != initialState) {
 			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
 		}
 	}
@@ -146,14 +141,6 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 	}
 
 	/**
-	 * Returns the current state of this StateMachine
-	 * @return the current state of this StateMachine
-	 */
-	public final T getState() {
-		return currentState;
-	}
-
-	/**
 	 * Causes this StateMachine to transition to <i>newState</i>.
 	 * This implementation will check if <i>newState</i> equals the current state and returns false if this is the case.
 	 * If <i>newState</i> is a valid state it will call the performStateTransition(<i>newState</i>) method. If performStateTransition(<i>newState</i>)
@@ -165,16 +152,17 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 	 * @return the state after the state change
 	 * @throws IllegalArgumentException if <i>newState</i> is not a legal state of this statemachine
 	 */
-	public final T setState(T newState) {
+	@Override
+	public final T setValue(T newState) {
 		if (!states.contains(newState)) {
 			throw new IllegalArgumentException(newState + " is not a legal state of this statemachine (" + this + ")");
 		}
-		if (newState != currentState) {
+		if (newState != value) {
 			newState = fireAttributeWillChange(newState);
-			currentState = performStateTransition(newState);
+			value = performStateTransition(newState);
 			fireAttributeHasChanged();
 		}
-		return currentState;
+		return value;
 	}
 
 	/**
@@ -199,18 +187,18 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 	 * @throws IllegalStateException if the state to be removed is the current state and this StateMachine is unable to switch to any other state
 	 */
 	public final void removeState(T state) {
-		if (state == currentState) {
+		if (state == value) {
 			if (!revertToDefault()) {
 				for (T s : states.getElements()) {
 					if (s == state) {
 						continue;
 					}
-					if (setState(s) == s) {
+					if (setValue(s) == s) {
 						break;
 					}
 				}
 			}
-			if (state == currentState) {
+			if (state == value) {
 				throw new IllegalStateException("can't remove state " + state + " - unable to switch state");
 			}
 		}
@@ -224,7 +212,7 @@ public class StateMachine<T> extends AbstractAttribute<T> {
 	 */
 	public boolean revertToDefault() {
 		if (revertToDefault) {
-			return setState(defaultState) == defaultState;
+			return setValue(defaultState) == defaultState;
 		} else {
 			return false;
 		}

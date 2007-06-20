@@ -131,7 +131,7 @@ public class TransformNode extends AbstractTransformNode {
 	 */
 	protected AttributePostChangeListener rotationOrderListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
-			setRotationOrder(rotationOrderAttr.getState());
+			setRotationOrder(rotationOrderAttr.getValue());
 		}
 	};
 	
@@ -243,7 +243,7 @@ public class TransformNode extends AbstractTransformNode {
 	 */
 	public void setRotationOrder(Rotation3d.Order order) {
 		if (order != getRotationOrder()) {
-			rotationOrderAttr.setState(order);
+			rotationOrderAttr.setValue(order);
 			computeBranch();
 		}
 	}

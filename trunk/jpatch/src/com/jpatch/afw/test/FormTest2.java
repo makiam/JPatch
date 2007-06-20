@@ -5,9 +5,11 @@ import com.jpatch.afw.attributes.Tuple2Attr;
 import com.jpatch.afw.control.Configuration;
 import com.jpatch.afw.ui.AttributeEditor;
 import com.jpatch.afw.ui.AttributeEditorFactory;
+import com.jpatch.afw.ui.AttributeEditorPanel;
 import com.jpatch.afw.ui.AttributeManager;
 import com.jpatch.afw.ui.PlatformUtils;
 import com.jpatch.afw.vecmath.Rotation3d;
+import com.jpatch.boundary.JPatchInspector;
 import com.jpatch.boundary.ViewportGl;
 import com.jpatch.entity.TransformNode;
 
@@ -30,15 +32,14 @@ public class FormTest2 {
 		SwingUtilities.updateComponentTreeUI(frame);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
-		Box box = Box.createVerticalBox();
 		
 		
 //		final AttributeEditor ae = new AttributeEditor(TestNode.class, "Transform");
 		final TestNode tn1 = new TestNode();
 		TestNode tn2 = new TestNode();
 		
-		final AttributeEditor ae1 = AttributeEditorFactory.getInstance().getEditorFor(new ViewportGl(1, 1));
-		final AttributeEditor ae2 = AttributeEditorFactory.getInstance().getEditorFor(tn1);
+		final AttributeEditor ae1 = AttributeEditorFactory.getInstance().getEditorFor(new ViewportGl(1, 1), new Color(0x8888aa));
+		final AttributeEditor ae2 = AttributeEditorFactory.getInstance().getEditorFor(tn1, new Color(0x779977));
 		
 //		ae.setEntity(tn1);
 		
@@ -66,47 +67,14 @@ public class FormTest2 {
 //		ae.addLimits("Scale");
 //		ae.endContainer();
 //		System.out.println(">>>");
-		box.add(ae1.getRootContainer().getComponent());
-		box.add(ae2.getRootContainer().getComponent());
-		box.setOpaque(false);
-//		box.setPreferredSize(new Dimension(0, 0));
-		class MyPanel extends JPanel implements Scrollable {
-			
-			MyPanel() {
-				super(new BorderLayout());
-			}
-			
-			public Dimension getPreferredScrollableViewportSize() {
-				return new Dimension(0, 0);
-			}
 		
-			public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-				return 20;
-			}
+		JPatchInspector jpi = new JPatchInspector();
+		AttributeEditorPanel aep = new AttributeEditorPanel();
+		aep.add(ae1, 0);
+		aep.add(ae2, 1);
 		
-			public boolean getScrollableTracksViewportHeight() {
-				return false;
-			}
-		
-			public boolean getScrollableTracksViewportWidth() {
-				return true;
-			}
-		
-			public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-				return 20;
-			}
-			
-		}
-//		JPanel panel = new JPanel(new BorderLayout()) {
-//			@Override
-//			public Dimension getPreferredSize() {
-//				return new Dimension(0, getComponent(0).getPreferredSize().height);
-//			}
-//		};
-		MyPanel panel = new MyPanel();
-		panel.add(box, BorderLayout.NORTH);
 //		panel.setPreferredSize(new Dimension(0, 200));
-		JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		JScrollPane scrollPane = new JScrollPane(jpi.getComponent(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(null);
 //		scrollPane.setWheelScrollingEnabled(handleWheel)
 //		scrollPane.getViewport().getView().setPreferredSize(new Dimension(0, 0));

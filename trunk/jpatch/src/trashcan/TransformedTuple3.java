@@ -50,9 +50,9 @@ public abstract class TransformedTuple3 extends Tuple3Attr {
 		xAttr.addAttributePostChangeListener(invTransformAttributeListener);
 		yAttr.addAttributePostChangeListener(invTransformAttributeListener);
 		zAttr.addAttributePostChangeListener(invTransformAttributeListener);
-		referenceTuple.xAttr.addAttributePostChangeListener(transformAttributeListener);
-		referenceTuple.yAttr.addAttributePostChangeListener(transformAttributeListener);
-		referenceTuple.zAttr.addAttributePostChangeListener(transformAttributeListener);
+		referenceTuple.getXAttr().addAttributePostChangeListener(transformAttributeListener);
+		referenceTuple.getYAttr().addAttributePostChangeListener(transformAttributeListener);
+		referenceTuple.getZAttr().addAttributePostChangeListener(transformAttributeListener);
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package com.jpatch.afw.ui;
 
+import java.awt.Color;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -20,7 +21,7 @@ public class AttributeEditorFactory {
 		return INSTANCE;
 	}
 	
-	public AttributeEditor getEditorFor(Object object) {
+	public AttributeEditor getEditorFor(Object object, Color borderColor) {
 		AttributeEditor editor = editors.get(object.getClass());
 		if (editor == null) {
 			URL url = null;
@@ -40,7 +41,7 @@ public class AttributeEditorFactory {
 			try {
 				System.out.println("reading...");
 				XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-				AttributeContentHandler handler = new AttributeContentHandler(objectClass, object);
+				AttributeContentHandler handler = new AttributeContentHandler(objectClass, object, borderColor);
 				xmlReader.setContentHandler(handler);
 				xmlReader.parse(url.toString());
 				editor = handler.getEditor();
@@ -52,6 +53,7 @@ public class AttributeEditorFactory {
 				throw new RuntimeException(e);
 			}
 		}
+		editor.setEntity(object);
 		return editor;
 	}
 	
@@ -59,9 +61,9 @@ public class AttributeEditorFactory {
 		private final Class objectClass;
 		private final AttributeEditor editor;
 		
-		private AttributeContentHandler(Class objectClass, Object entity) {
+		private AttributeContentHandler(Class objectClass, Object entity, Color borderColor) {
 			this.objectClass = objectClass;
-			this.editor = new AttributeEditor(objectClass, objectClass.getSimpleName(), entity);
+			this.editor = new AttributeEditor(objectClass, objectClass.getSimpleName(), entity, borderColor);
 		}
 		
 		@Override

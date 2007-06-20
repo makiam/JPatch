@@ -101,7 +101,7 @@ public class PlatformUtils {
 			
 			Set x = UIManager.getLookAndFeelDefaults().entrySet();
 			for (Object key : x) {
-				if (key.toString().startsWith("TextField"))
+				if (key.toString().contains("background"))
 					System.out.println(key + " => " + UIManager.getLookAndFeelDefaults().get(key));
 			}
 			

@@ -11,6 +11,9 @@ public class MouseSelector {
 	static final private double MIN_DIST_SQ = 64;
 	
 	public static TopLevelVertex getVertexAt(Viewport viewport, double x, double y, Sds sds) {
+		if (sds == null) {
+			return null;
+		}
 		Matrix4d matrix = viewport.getMatrix();
 		Point3d p = new Point3d();
 		x -= (viewport.getComponent().getWidth() >> 1);
@@ -35,6 +38,9 @@ public class MouseSelector {
 	}
 	
 	public static HalfEdge getEdgeAt(Viewport viewport, double x, double y, Sds sds) {
+		if (sds == null) {
+			return null;
+		}
 		Matrix4d matrix = viewport.getMatrix();
 		Point3d p0 = new Point3d();
 		Point3d p1 = new Point3d();

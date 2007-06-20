@@ -36,6 +36,7 @@ import com.jpatch.afw.ui.JPatchToolBar;
 import com.jpatch.boundary.actions.Actions;
 import com.jpatch.boundary.actions.Actions.ViewportMode;
 import com.jpatch.boundary.tools.JPatchTool;
+import com.jpatch.entity.sds.JptLoader;
 import com.jpatch.entity.sds.Sds;
 import com.jpatch.settings.Settings;
 import com.jpatch.ui.ViewportSwitcher;
@@ -69,19 +70,14 @@ public class Main {
 	
 	private Sds activeSds;
 
-	private int activeViewport = 0;
-	
-	private Screen screen = new Screen();
-	
-	private Inspector viewInspector = new Inspector();
-	private Inspector toolInspector = new Inspector();
-	private Inspector selectionInspector = new Inspector();
+	private JComponent screen = new JPanel();
 	
 //	private JPatchTree tree = new JPatchTree();
 //	private UIFactory uiFactory = new UIFactory();
 	
 	private Viewport[] viewports = new Viewport[4];
-
+	private StateMachine<Viewport> activeViewport; 
+	
 	private Actions actions = new Actions();
 	
 	private LayoutManager2 screenLayout = new LayoutManager2() {
@@ -129,72 +125,72 @@ public class Main {
 			int hBottom = height - hTop;
 			int wLeft = width >> 1;
 			int wRight = width - wLeft;
-			switch (actions.viewportModeSM.getState()) {
+			switch (actions.viewportModeSM.getValue()) {
 			case VIEWPORT_1:
-				viewports[0].getComponent().setBounds(1, 1, width - 2, height - 2);
+				viewports[0].getComponent().setBounds(2, 2, width - 4, height - 4);
 				viewports[0].getComponent().setVisible(true);
 				viewports[1].getComponent().setVisible(false);
 				viewports[2].getComponent().setVisible(false);
 				viewports[3].getComponent().setVisible(false);
 				break;
 			case VIEWPORT_2:
-				viewports[1].getComponent().setBounds(1, 1, width - 2, height - 2);
+				viewports[1].getComponent().setBounds(2, 2, width - 4, height - 4);
 				viewports[1].getComponent().setVisible(true);
 				viewports[0].getComponent().setVisible(false);
 				viewports[2].getComponent().setVisible(false);
 				viewports[3].getComponent().setVisible(false);
 				break;
 			case VIEWPORT_3:
-				viewports[2].getComponent().setBounds(1, 1, width - 2, height - 2);
+				viewports[2].getComponent().setBounds(2, 2, width - 4, height - 4);
 				viewports[2].getComponent().setVisible(true);
 				viewports[0].getComponent().setVisible(false);
 				viewports[1].getComponent().setVisible(false);
 				viewports[3].getComponent().setVisible(false);
 				break;
 			case VIEWPORT_4:
-				viewports[3].getComponent().setBounds(1, 1, width - 2, height - 2);
+				viewports[3].getComponent().setBounds(2, 2, width - 4, height - 4);
 				viewports[3].getComponent().setVisible(true);
 				viewports[0].getComponent().setVisible(false);
 				viewports[1].getComponent().setVisible(false);
 				viewports[2].getComponent().setVisible(false);
 				break;
 			case SPLIT_1_3:
-				viewports[0].getComponent().setBounds(1, 1, width - 2, hTop - 2);
-				viewports[2].getComponent().setBounds(1, hTop + 1, width - 2, hBottom - 2);
+				viewports[0].getComponent().setBounds(2, 2, width - 4, hTop - 3);
+				viewports[2].getComponent().setBounds(2, hTop + 1, width - 4, hBottom - 3);
 				viewports[0].getComponent().setVisible(true);
 				viewports[1].getComponent().setVisible(false);
 				viewports[2].getComponent().setVisible(true);
 				viewports[3].getComponent().setVisible(false);
 				break;
 			case SPLIT_2_4:
-				viewports[1].getComponent().setBounds(1, 1, width - 2, hTop - 2);
-				viewports[3].getComponent().setBounds(1, hTop + 1, width - 2, hBottom - 2);
+				viewports[1].getComponent().setBounds(2, 2, width - 4, hTop - 3);
+				viewports[3].getComponent().setBounds(2, hTop + 1, width - 4, hBottom - 3);
 				viewports[0].getComponent().setVisible(false);
 				viewports[1].getComponent().setVisible(true);
 				viewports[2].getComponent().setVisible(false);
 				viewports[3].getComponent().setVisible(true);
 				break;
 			case SPLIT_1_2:
-				viewports[0].getComponent().setBounds(1, 1, wLeft - 2, height - 2);
-				viewports[1].getComponent().setBounds(wLeft + 1, 1, wRight - 2, height - 2);
+				viewports[0].getComponent().setBounds(2, 2, wLeft - 3, height - 4);
+				viewports[1].getComponent().setBounds(wLeft + 1, 2, wRight - 3, height - 4);
 				viewports[0].getComponent().setVisible(true);
 				viewports[1].getComponent().setVisible(true);
 				viewports[2].getComponent().setVisible(false);
 				viewports[3].getComponent().setVisible(false);
 				break;
 			case SPLIT_3_4:
-				viewports[2].getComponent().setBounds(1, 1, wLeft - 2, height - 2);
-				viewports[3].getComponent().setBounds(wLeft + 1, 1, wRight - 2, height - 2);
+				viewports[2].getComponent().setBounds(2, 2, wLeft - 3, height - 4);
+				viewports[3].getComponent().setBounds(wLeft + 1, 2, wRight - 3, height - 4);
 				viewports[0].getComponent().setVisible(false);
 				viewports[1].getComponent().setVisible(false);
 				viewports[2].getComponent().setVisible(true);
 				viewports[3].getComponent().setVisible(true);
 				break;
 			case QUAD:
-				viewports[0].getComponent().setBounds(1, 1, wLeft - 2, hTop - 2);
-				viewports[1].getComponent().setBounds(wLeft + 1, 1, wRight - 2, hTop - 2);
-				viewports[2].getComponent().setBounds(1, hTop + 1, wLeft - 2, hBottom - 2);
-				viewports[3].getComponent().setBounds(wLeft + 1, hTop + 1, wRight - 2, hBottom - 2);
+				viewports[0].getComponent().setBounds(2, 2, wLeft - 3, hTop - 3);
+				viewports[1].getComponent().setBounds(wLeft + 1, 2, wRight - 3, hTop - 3);
+				viewports[2].getComponent().setBounds(2, hTop + 1, wLeft - 3, hBottom - 3);
+				viewports[3].getComponent().setBounds(wLeft + 1, hTop + 1, wRight - 3, hBottom - 3);
 				viewports[0].getComponent().setVisible(true);
 				viewports[1].getComponent().setVisible(true);
 				viewports[2].getComponent().setVisible(true);
@@ -268,7 +264,8 @@ public class Main {
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
-		
+
+		screen.setBackground(Color.BLACK);
 		try {
 			robot = new Robot();
 		} catch (AWTException e) {
@@ -277,6 +274,7 @@ public class Main {
 
 //		Color BACKGROUND = new Color(0xa0a0a0);
 		frame = new JFrame("JPatch");
+		frame.setBackground(Color.BLACK);
 //		frame.setBackground(BACKGROUND);
 		frame.setSize(1024, 768);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -290,18 +288,22 @@ public class Main {
 			final int viewportNumber = i;
 			viewports[i].getComponent().addMouseListener(new MouseAdapter() {
 				public void mousePressed(MouseEvent e) {
-					activeViewport = viewportNumber;
-					validateActiveViewport();
-					screen.paintBorder(screen.getGraphics());
-//					if (e.getClickCount() == 2 || viewInspector.getObject() instanceof Viewport) {
-						if (viewInspector.getObject() != viewports[activeViewport]) {
-							viewInspector.setObject(viewports[activeViewport]);
-						}
-//					}
+					activeViewport.setValue(viewports[viewportNumber]);
 				}
 			});
 		}
+		activeViewport = new StateMachine<Viewport>(viewports, viewports[0]);
 		screen.setLayout(screenLayout);
+		
+		activeViewport.addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				Viewport active = ((StateMachine<Viewport>) source).getValue();
+				for (Viewport vp : ((StateMachine<Viewport>) source).getStates()) {
+					vp.setActive(vp == active);
+				}
+				repaintViewports();
+			}
+		});
 		
 		/*
 		 * Add a listener to the viewport switcher state-machine to relayout the
@@ -313,6 +315,16 @@ public class Main {
 			}
 		});
 //		screen.setOpaque(false);
+		
+		try {
+			activeSds = new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		Box statusBar = Box.createHorizontalBox();
 		statusBar.add(statusLabel);
@@ -352,18 +364,18 @@ public class Main {
 			@Override
 			public Object attributeWillChange(Attribute source, Object value) {
 				StateMachine<JPatchTool> sm = (StateMachine<JPatchTool>) source;
-				sm.getState().unregisterListeners(viewports);
+				sm.getValue().unregisterListeners(viewports);
 				return value;
 			}
 		});
 		actions.toolSM.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				StateMachine<JPatchTool> sm = (StateMachine<JPatchTool>) source;
-				sm.getState().registerListeners(viewports);
+				sm.getValue().registerListeners(viewports);
 			}
 		});
 		
-		actions.toolSM.getState().registerListeners(viewports);
+		actions.toolSM.getValue().registerListeners(viewports);
 		
 		JPatchToolBar toolBar = new JPatchToolBar();
 		JPanel panel = new JPanel(new BorderLayout());
@@ -428,25 +440,29 @@ public class Main {
 		
 		
 		
-		JTabbedPane inspectorPane = new JTabbedPane();
-		inspectorPane.add("View", new JScrollPane(viewInspector.getComponent()));
-		inspectorPane.add("Tool", new JScrollPane(toolInspector.getComponent()));
-		inspectorPane.add("Selection", new JScrollPane(selectionInspector.getComponent()));
-		JPatchSplitPane vSplit = new JPatchSplitPane();
+		JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		JPatchInspector inspector = new JPatchInspector();
+		activeViewport.addAttributePostChangeListener(inspector.getViewportChangeListener());
+		inspector.getComponent().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		JScrollPane scrollPane = new JScrollPane(new JScrollPane(inspector.getComponent(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
+		scrollPane.getViewport().setBorder(null);
+		scrollPane.setBorder(null);
+		vSplit.setBorder(null);
+		vSplit.setContinuousLayout(true);
 //		vSplit.setBackground(BACKGROUND);
-		vSplit.add(inspectorPane, "Inspector");
+		vSplit.add(scrollPane);
 //		vSplit.setDividerSize(8);
 //		vSplit.add(new JScrollPane(tree));
-		vSplit.add(new JPanel(), "Test");
+		vSplit.add(new JPanel());
 	
 //		hSplit.setBackground(BACKGROUND);
-		hSplit.add(vSplit.getComponent());
+		hSplit.add(vSplit);
 		hSplit.add(screen);
 		hSplit.setBorder(null);
 		hSplit.setContinuousLayout(true);
 		hSplit.setOneTouchExpandable(true);
 //		hSplit.setDividerSize(8);
-		hSplit.setUI(new BasicSplitPaneUI());
+//		hSplit.setUI(new BasicSplitPaneUI());
 		
 //		vSplit.setContinuousLayout(true);
 //		vSplit.setOneTouchExpandable(true);
@@ -471,16 +487,16 @@ public class Main {
 //		return selectedNode.getUserObject();
 //	}
 	
-	private void validateActiveViewport() {
-		if (!viewports[activeViewport].getComponent().isVisible()) {
-			for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-				if (viewports[i].getComponent().isVisible()) {
-					activeViewport = i;
-					break;
-				}
-			}
-		}
-	}
+//	private void validateActiveViewport() {
+//		if (!viewports[activeViewport].getComponent().isVisible()) {
+//			for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+//				if (viewports[i].getComponent().isVisible()) {
+//					activeViewport = i;
+//					break;
+//				}
+//			}
+//		}
+//	}
 	
 	public static Main getInstance() {
 		return INSTANCE;
@@ -510,7 +526,9 @@ public class Main {
 	
 	public void repaintViewports() {
 		for (int i = 0; i < viewports.length; i++) {
-			viewports[i].getComponent().repaint();
+			if (viewports[i].getComponent().isVisible()) {
+				viewports[i].getComponent().repaint();
+			}
 		}
 	}
 	
@@ -532,24 +550,24 @@ public class Main {
 //		tree.repaint();
 //	}
 	
-	public void setSelectedObject(Object object) {
-		selectionInspector.setObject(object);
-	}
+//	public void setSelectedObject(Object object) {
+//		selectionInspector.setObject(object);
+//	}
 	
-	private class Screen extends JComponent {
-		@Override
-		public void paintBorder(Graphics g) {
-//			if (true) return;
-			for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-				Component c = viewports[i].getComponent();
-				if (!c.isVisible()) {
-					continue;
-				}
-				g.setColor(i == activeViewport ? ACTIVE_VIEWPORT_BORDER_COLOR : VIEWPORT_BORDER_COLOR);
-				g.drawRect(c.getX() - 1, c.getY() - 1, c.getWidth() + 1, c.getHeight() + 1);
-			}
-		}	
-	}
+//	private class Screen extends JComponent {
+//		@Override
+//		public void paintBorder(Graphics g) {
+////			if (true) return;
+//			for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+//				Component c = viewports[i].getComponent();
+//				if (!c.isVisible()) {
+//					continue;
+//				}
+//				g.setColor(viewports[i] == activeViewport.getState() ? VIEWPORT_BORDER_COLOR : VIEWPORT_BORDER_COLOR);
+//				g.drawRect(c.getX() - 1, c.getY() - 1, c.getWidth() + 1, c.getHeight() + 1);
+//			}
+//		}	
+//	}
 	
 	
 }

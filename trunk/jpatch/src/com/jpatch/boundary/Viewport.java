@@ -41,6 +41,7 @@ public abstract class Viewport {
 	static final float nearClip = 1;
 	static final float farClip = 1 << 15;
 	static final RealtimeRendererSettings RENDERER_SETTINGS = Settings.getInstance().realtimeRenderer;
+	boolean active = false;
 	
 	private AttributePostChangeListener focalLengthAttributeListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute attribute) {
@@ -72,8 +73,8 @@ public abstract class Viewport {
 	public Viewport(int id, int viewDir) {
 		this.id = id;
 		matrix.setIdentity();
-		viewType.setState(standardViewDirections[viewDir]);
-		viewType.getState().bindTo(this);
+		viewType.setValue(standardViewDirections[viewDir]);
+		viewType.getValue().bindTo(this);
 //		viewType.setObject(viewDirection);
 //		viewType.addAttributeListener(updateAttributeListener);
 		showControlMesh.addAttributePostChangeListener(updateAttributeListener);
@@ -208,4 +209,10 @@ public abstract class Viewport {
 	protected abstract void drawOrigin();
 	
 	protected abstract void drawInfo();
+
+
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
 }

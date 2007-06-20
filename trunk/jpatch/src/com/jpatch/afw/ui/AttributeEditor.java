@@ -29,10 +29,11 @@ public class AttributeEditor {
 	private JPatchForm form = new JPatchForm();
 	private final List<ComponentBinding> bindings = new ArrayList<ComponentBinding>();
 	
-	public AttributeEditor(Class entityClass, String name, Object entity) {
+	public AttributeEditor(Class entityClass, String name, Object entity, Color borderColor) {
 		this.entityClass = entityClass;
 		this.entity = entity;
 		startContainer(name);
+		containerStack.peek().setRootBorderColor(borderColor);
 	}
 	
 	private Method getAttributeMethod(String name) {

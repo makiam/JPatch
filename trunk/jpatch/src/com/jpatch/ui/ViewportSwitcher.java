@@ -146,15 +146,15 @@ public class ViewportSwitcher {
 				} else {
 					mousePosition = getPosition(x, y);
 				}
-				if (selected[0] && !selected[1] && !selected[2] && !selected[3]) stateMachine.setState(ViewportMode.VIEWPORT_1);
-				else if (!selected[0] && selected[1] && !selected[2] && !selected[3]) stateMachine.setState(ViewportMode.VIEWPORT_2);
-				else if (!selected[0] && !selected[1] && selected[2] && !selected[3]) stateMachine.setState(ViewportMode.VIEWPORT_3);
-				else if (!selected[0] && !selected[1] && !selected[2] && selected[3]) stateMachine.setState(ViewportMode.VIEWPORT_4);
-				else if (selected[0] && selected[1] && !selected[2] && !selected[3]) stateMachine.setState(ViewportMode.SPLIT_1_2);
-				else if (!selected[0] && !selected[1] && selected[2] && selected[3]) stateMachine.setState(ViewportMode.SPLIT_3_4);
-				else if (selected[0] && !selected[1] && selected[2] && !selected[3]) stateMachine.setState(ViewportMode.SPLIT_1_3);
-				else if (!selected[0] && selected[1] && !selected[2] && selected[3]) stateMachine.setState(ViewportMode.SPLIT_2_4);
-				else if (selected[0] && selected[1] && selected[2] && selected[3]) stateMachine.setState(ViewportMode.QUAD);
+				if (selected[0] && !selected[1] && !selected[2] && !selected[3]) stateMachine.setValue(ViewportMode.VIEWPORT_1);
+				else if (!selected[0] && selected[1] && !selected[2] && !selected[3]) stateMachine.setValue(ViewportMode.VIEWPORT_2);
+				else if (!selected[0] && !selected[1] && selected[2] && !selected[3]) stateMachine.setValue(ViewportMode.VIEWPORT_3);
+				else if (!selected[0] && !selected[1] && !selected[2] && selected[3]) stateMachine.setValue(ViewportMode.VIEWPORT_4);
+				else if (selected[0] && selected[1] && !selected[2] && !selected[3]) stateMachine.setValue(ViewportMode.SPLIT_1_2);
+				else if (!selected[0] && !selected[1] && selected[2] && selected[3]) stateMachine.setValue(ViewportMode.SPLIT_3_4);
+				else if (selected[0] && !selected[1] && selected[2] && !selected[3]) stateMachine.setValue(ViewportMode.SPLIT_1_3);
+				else if (!selected[0] && selected[1] && !selected[2] && selected[3]) stateMachine.setValue(ViewportMode.SPLIT_2_4);
+				else if (selected[0] && selected[1] && selected[2] && selected[3]) stateMachine.setValue(ViewportMode.QUAD);
 				else throw new IllegalStateException();
 				component.repaint();
 			}
