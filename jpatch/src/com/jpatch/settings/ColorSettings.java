@@ -33,6 +33,7 @@ public class ColorSettings extends AbstractSettings {
 		return icon;
 	}
 	public Color3f background = new Color3f(new Color(0x38,0x38,0x38));
+	public Color3f activeBackground = new Color3f(new Color(0x40,0x40,0x40));
 	public Color3f curves = new Color3f(new Color(255,255,255));
 	public Color3f points = new Color3f(new Color(255,255,0));
 	public Color3f headPoints = new Color3f(new Color(255,0,0));

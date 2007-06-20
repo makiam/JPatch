@@ -10,11 +10,7 @@ public class Lock implements AttributePreChangeListener {
 	}
 	
 	public boolean attributeWillChange(Attribute source, boolean value) {
-		if (source instanceof Toggle) {
-			return ((Toggle) source).getBoolean();
-		} else {
-			return ((BooleanAttr) source).getBoolean();
-		}
+		return ((BooleanAttr) source).getBoolean();
 	}
 
 	public double attributeWillChange(Attribute source, double value) {
@@ -26,10 +22,6 @@ public class Lock implements AttributePreChangeListener {
 	}
 
 	public Object attributeWillChange(Attribute source, Object value) {
-		if (source instanceof StateMachine) {
-			return ((StateMachine) source).getState();
-		} else {
-			return ((GenericAttr) source).getValue();
-		}
+		return ((GenericAttr) source).getValue();
 	}
 }

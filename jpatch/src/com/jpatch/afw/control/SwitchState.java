@@ -15,8 +15,8 @@ public class SwitchState extends EditAttribute {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void toggle() {
-		Object tmp = stateMachine.getState();
-		stateMachine.setState(state);
+		Object tmp = stateMachine.getValue();
+		stateMachine.setValue(state);
 		state = tmp;
 	}
 }

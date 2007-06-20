@@ -358,7 +358,8 @@ public class ViewportGl extends Viewport {
 				gl.glEnable(GL_CULL_FACE);
 				gl.glCullFace(GL_BACK);
 				canUseProgram = gl.isFunctionAvailable("glUseProgram");
-				if (gl.isFunctionAvailable("glCreateShader")) {
+				canUseProgram = false;
+				if (canUseProgram) {
 					int vertexShader = gl.glCreateShader(GL_VERTEX_SHADER);
 					try {
 						loadShader(ClassLoader.getSystemResourceAsStream("glsl/perPixelLight.vs"), gl, vertexShader);
@@ -390,8 +391,8 @@ public class ViewportGl extends Viewport {
 			public void display(GLAutoDrawable drawable) {
 //				long t = System.currentTimeMillis();
 				gl.glFinish();	// wait for previous gl functions to finish
-				
-				gl.glClearColor(COLORS.background.x, COLORS.background.y, COLORS.background.z, 0);	// set background color
+				Color3f background = active ? COLORS.activeBackground : COLORS.background;
+				gl.glClearColor(background.x, background.y, background.z, 0);	// set background color
 				gl.glClearDepth(CLEAR_DEPTH);									// set initial depth-buffer value
 				gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// clear color and depth buffers
 				draw();

@@ -20,11 +20,8 @@ public class JPatchFormContainer {
 	private final Box containerBox = Box.createVerticalBox();
 	private JPatchFormContainer parentContainer;
 	private boolean expanded;
-	private static final Color[] BORDER_COLORS = new Color[] {
-		new Color(0x909090),
-		new Color(0xb8b8b8),
-		new Color(0xd0d0d0)
-	};
+	private Color borderColor = new Color(0x808080);
+	
 	public JPatchFormContainer(String title) {
 		JToggleButton button = new JToggleButton();
 		button.addActionListener(new ActionListener() {
@@ -60,7 +57,7 @@ public class JPatchFormContainer {
 				int h = titleBar.getHeight();
 				Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				g2.setColor(BORDER_COLORS[getLevel() - 1]);
+				g2.setColor(borderColor);
 				g2.fillRoundRect(x, y + 1, width, h, 8, 8);
 				g2.drawRoundRect(x, y + 1, width - 1, h - 1, 8, 8);
 				if (expanded) {
@@ -82,14 +79,31 @@ public class JPatchFormContainer {
 		return component;
 	}
 	
+	public void setRootBorderColor(Color color) {
+		borderColor = color;
+	}
+	
 	public void add(JPatchForm form) {
 		formBox.add(form.getComponent());
-		form.setFormContainer(this);
+		form.setFormContainer(this);	
 	}
 	
 	public void add(JPatchFormContainer formContainer) {
 		containerBox.add(formContainer.getComponent());
 		formContainer.parentContainer = this;
+		Color background = UIManager.getColor("Panel.background");
+//		Color color = getRootContainer().g
+		int t = 255 - 100;
+//		int level = getLevel();
+//		if (level == 1) t = 255 - 100;
+//		if (level == 2) t = 255 - 100 - 0;
+//		if (level == 3) t = 255 - 100 - 20 - 10;
+//		System.out.println(((JLabel) formContainer.titleBar.getComponent(1)).getText() + " " + level);
+		formContainer.borderColor = new Color(
+				(borderColor.getRed() * t + background.getRed() * (255 - t)) / 255,
+				(borderColor.getGreen() * t + background.getGreen() * (255 - t)) / 255,
+				(borderColor.getBlue() * t + background.getBlue() * (255 - t)) / 255
+		);
 	}
 	
 	public void remove(JPatchForm form) {
@@ -101,6 +115,11 @@ public class JPatchFormContainer {
 	}
 	
 	public void setExpanded(boolean expanded) {
+//		System.out.println(formBox.getComponentCount());
+//		System.out.println(containerBox.getComponentCount());
+//		if (formBox.getComponentCount() == 1 && containerBox.getComponentCount() == 0) {
+//			return;
+//		}
 		if (!this.expanded && expanded) {
 			this.expanded = true;
 			component.add(strut);

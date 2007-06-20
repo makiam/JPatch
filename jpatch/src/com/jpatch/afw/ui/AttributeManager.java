@@ -280,8 +280,8 @@ public class AttributeManager {
 			
 			public void actionPerformed(ActionEvent e) {
 				if (!suppressAction) {
-					if (comboBox.getSelectedItem() != stateMachine.getState()) {
-						Object newState = stateMachine.setState(comboBox.getSelectedItem());
+					if (comboBox.getSelectedItem() != stateMachine.getValue()) {
+						Object newState = stateMachine.setValue(comboBox.getSelectedItem());
 						if (newState != comboBox.getSelectedItem()) {
 							comboBox.setSelectedItem(newState);
 						}
@@ -292,13 +292,13 @@ public class AttributeManager {
 			public void attributeHasChanged(Attribute source) {
 				suppressAction = true;
 				if (source == stateMachine) {
-					comboBox.setSelectedItem(stateMachine.getState());
+					comboBox.setSelectedItem(stateMachine.getValue());
 				} else if (source == stateMachine.getStateSet()) {
 					comboBox.removeAllItems();
 					for (Object o : ((CollectionAttr) source).getElements()) {
 						comboBox.addItem(o);
 					}
-					comboBox.setSelectedItem(stateMachine.getState());
+					comboBox.setSelectedItem(stateMachine.getValue());
 				}
 				suppressAction = false;
 			}

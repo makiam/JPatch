@@ -42,6 +42,6 @@ public class SwitchStateAction extends JPatchAction {
 	}
 	
 	public boolean isSelected() {
-		return stateMachine.getState() == state;
+		return stateMachine.getValue() == state;
 	}
 }

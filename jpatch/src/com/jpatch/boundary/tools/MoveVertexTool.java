@@ -50,11 +50,11 @@ public class MoveVertexTool implements JPatchTool {
 				if (vertex != null) {
 					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, vertex);
 					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
-					Main.getInstance().setSelectedObject(vertex);
+//					Main.getInstance().setSelectedObject(vertex);
 				} else if (edge != null) {
-					Main.getInstance().setSelectedObject(edge);
+//					Main.getInstance().setSelectedObject(edge);
 				} else {
-					Main.getInstance().setSelectedObject(null);
+//					Main.getInstance().setSelectedObject(null);
 				}
 			}
 		}

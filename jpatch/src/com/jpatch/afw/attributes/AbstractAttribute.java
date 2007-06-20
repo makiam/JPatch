@@ -19,7 +19,7 @@ public abstract class AbstractAttribute<T> implements Attribute {
 	 * An array holding the AttributePostChangeListener of this AbstractAttributes.
 	 * Can be null (i.e. will be set to null if the list is empty)
 	 */
-	protected AttributePostChangeListener<T>[] attributePostChangeListeners = null;
+	protected AttributePostChangeListener[] attributePostChangeListeners = null;
 	/**
 	 * Whether or not to fire "attributeHasChanged" events (post-change-notifications)
 	 */

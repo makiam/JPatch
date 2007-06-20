@@ -18,24 +18,24 @@ public class JPatchStateButton extends JToggleButton implements JPatchButton {
 		this.jpatchAction = action;
 		addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-				setSelected(jpatchAction.getStateMachine().getState() == jpatchAction.getState());
+				setSelected(jpatchAction.getStateMachine().getValue() == jpatchAction.getState());
 			}
 		});
 		addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (jpatchAction.getStateMachine().getState() == jpatchAction.getState()) {
+				if (jpatchAction.getStateMachine().getValue() == jpatchAction.getState()) {
 					jpatchAction.getStateMachine().revertToDefault();
 				} else {
-					jpatchAction.getStateMachine().setState(jpatchAction.getState());
+					jpatchAction.getStateMachine().setValue(jpatchAction.getState());
 				}
 			}
 		});
 		jpatchAction.getStateMachine().addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
-				setSelected(jpatchAction.getStateMachine().getState() == jpatchAction.getState());
+				setSelected(jpatchAction.getStateMachine().getValue() == jpatchAction.getState());
 			}
 		});
-		setSelected(jpatchAction.getStateMachine().getState() == jpatchAction.getState());
+		setSelected(jpatchAction.getStateMachine().getValue() == jpatchAction.getState());
 	}
 	
 	public SwitchStateAction getJPatchAction() {
