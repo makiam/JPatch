@@ -549,7 +549,7 @@ public class Main {
 		for (int i = 0; i < viewports.length; i++) {
 			if (viewports[i].getComponent().isVisible()) {
 //				viewports[i].getComponent().repaint();
-				((ViewportGl) viewports[i]).draw();
+				((ViewportGl) viewports[i]).drawable.display();
 			}
 		}
 	}
