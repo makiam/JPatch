@@ -35,9 +35,14 @@ public class CheckBoxUI extends MetalCheckBoxUI {
 	
 	public static ComponentUI createUI(JComponent jcomponent) {
 		return new CheckBoxUI();
+		
 	}
 
-
+	@Override
+	public Dimension getPreferredSize(JComponent component) {
+		return new Dimension(16, 16);
+	}
+	
 	@Override
 	public void paint(Graphics g, JComponent c) {
 		// TODO Auto-generated method stub
@@ -47,15 +52,15 @@ public class CheckBoxUI extends MetalCheckBoxUI {
 //		g.drawRect(0, 0, 10, 10);
 		if (((AbstractButton) c).isSelected()) {
 			if (((AbstractButton) c).getModel().isPressed()) {
-				CHECKED_PRESSED_ICON.paintIcon(c, g, 0, 1);
+				CHECKED_PRESSED_ICON.paintIcon(c, g, 0, 0);
 			} else {
-				CHECKED_ICON.paintIcon(c, g, 0, 1);
+				CHECKED_ICON.paintIcon(c, g, 0, 0);
 			}
 		} else {
 			if (((AbstractButton) c).getModel().isPressed()) {
-				UNCHECKED_PRESSED_ICON.paintIcon(c, g, 0, 1);
+				UNCHECKED_PRESSED_ICON.paintIcon(c, g, 0, 0);
 			} else {
-				UNCHECKED_ICON.paintIcon(c, g, 0, 1);
+				UNCHECKED_ICON.paintIcon(c, g, 0, 0);
 			}
 		}
 	}

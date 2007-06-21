@@ -137,11 +137,11 @@ public class JPatchForm {
 
 		public void layoutContainer(Container parent) {
 			int insets = JPatchFormContainer.MAX_NEST_LEVEL - container.getLevel();
-			int y = 0, w = parent.getSize().width - 8 * insets;
+			int y = 1, w = parent.getSize().width - 8 * insets;
 			for (Component c : parent.getComponents()) {
 				int height = c.getPreferredSize().height;
 				c.setBounds(4 * insets, y, w, height);
-				y += height + 2;
+				y += height + 1;
 			}
 		}
 
@@ -159,10 +159,10 @@ public class JPatchForm {
 		}
 		
 		private Dimension computeSize(Container parent) {
-			int width = 0, height = 0;
+			int width = 0, height = 1;
 			for (Component c : parent.getComponents()) {
 				Dimension size = c.getPreferredSize();
-				height += size.height + 2;
+				height += size.height + 1;
 				width = Math.max(width, size.width);
 			}
 			layoutSize.height = height;
@@ -225,7 +225,8 @@ public class JPatchForm {
 				}
 				boolean fill = !(c instanceof JCheckBox || c instanceof JButton || c instanceof Box);
 				int w = c instanceof JSlider ? width - (i * width / d) : (i + 1) * width / d - (i * width / d);
-				setComponentBounds(c, start + (i * width / d), 0, w, maxHeight, true, fill);
+				int y = c instanceof Box ? -1 : 0;
+				setComponentBounds(c, start + (i * width / d), y, w + 1, maxHeight, true, fill);
 			}
 		}
 

@@ -29,7 +29,6 @@ import com.jpatch.afw.control.Configuration;
 import com.jpatch.afw.icons.IconSet;
 import com.jpatch.afw.ui.ButtonUtils;
 import com.jpatch.afw.ui.JPatchActionButton;
-import com.jpatch.afw.ui.JPatchSplitPane;
 import com.jpatch.afw.ui.JPatchStateButton;
 import com.jpatch.afw.ui.JPatchToggleButton;
 import com.jpatch.afw.ui.JPatchToolBar;
@@ -265,6 +264,7 @@ public class Main {
 //			e.printStackTrace();
 //		}
 
+		
 		screen.setBackground(Color.BLACK);
 		try {
 			robot = new Robot();
@@ -316,22 +316,23 @@ public class Main {
 		});
 //		screen.setOpaque(false);
 		
-		try {
-			activeSds = new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt"));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			activeSds = new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt"));
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		Box statusBar = Box.createHorizontalBox();
 		statusBar.add(statusLabel);
 		statusBar.add(Box.createHorizontalGlue());
 //		statusBar.add(MemoryMonitor.createMemoryMonitor(), BorderLayout.EAST);
 		statusBar.add(Box.createHorizontalStrut(16));
-
+		statusBar.setOpaque(true);
+		statusBar.setBackground(new Color(0xb0b0b0));
 //		tree.addMouseListener(new PopupAdapter() {
 //			@Override
 //			protected void openPopup(MouseEvent e) {
@@ -359,7 +360,7 @@ public class Main {
 //		frame.setBackground(Settings.getInstance().colors.background.get());
 		frame.setLayout(new BorderLayout());
 		frame.add(statusBar, BorderLayout.SOUTH);
-		
+//		frame.setUndecorated(true);
 		actions.toolSM.addAttributePreChangeListener(new AttributePreChangeAdapter() {
 			@Override
 			public Object attributeWillChange(Attribute source, Object value) {
@@ -440,7 +441,7 @@ public class Main {
 		
 		
 		
-		JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		final JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		JPatchInspector inspector = new JPatchInspector();
 		activeViewport.addAttributePostChangeListener(inspector.getViewportChangeListener());
 		inspector.getComponent().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -451,17 +452,19 @@ public class Main {
 		vSplit.setContinuousLayout(true);
 //		vSplit.setBackground(BACKGROUND);
 		vSplit.add(scrollPane);
-//		vSplit.setDividerSize(8);
+		vSplit.setDividerSize(9);
 //		vSplit.add(new JScrollPane(tree));
 		vSplit.add(new JPanel());
-	
+		vSplit.setOneTouchExpandable(true);
 //		hSplit.setBackground(BACKGROUND);
 		hSplit.add(vSplit);
 		hSplit.add(screen);
 		hSplit.setBorder(null);
 		hSplit.setContinuousLayout(true);
 		hSplit.setOneTouchExpandable(true);
-//		hSplit.setDividerSize(8);
+		hSplit.setDividerLocation(300);
+
+		hSplit.setDividerSize(9);
 //		hSplit.setUI(new BasicSplitPaneUI());
 		
 //		vSplit.setContinuousLayout(true);
@@ -477,6 +480,11 @@ public class Main {
 		
 		
 		frame.setVisible(true);
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				vSplit.setDividerLocation(0.5);
+			}
+		});
 	}
 	
 //	public JPatchObject getSelectedTreeUserObject() {
