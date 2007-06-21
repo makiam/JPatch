@@ -23,7 +23,7 @@ public class ViewportGl extends Viewport {
 	private static final ColorSettings COLORS = Settings.getInstance().colors;
 	private static final RealtimeRendererSettings RENDERER = Settings.getInstance().realtimeRenderer;
 	
-	private final GLAutoDrawable drawable;
+	final GLAutoDrawable drawable;
 	private GL gl;
 	private final Point3f p = new Point3f();
 	private final Vector3f v = new Vector3f();
@@ -322,12 +322,15 @@ public class ViewportGl extends Viewport {
 	
 	private int maxLights, maxTextureSize;
 	
+	GLEventListener glEventListener;
+	
 	public ViewportGl(int id, int view) {
 		super(id, view);
 		drawable = LIGHTWEIGHT ? new GLJPanel() : new GLCanvas();
 		component = (Component) drawable;
 		component.setBackground(COLORS.background.get());
-		drawable.addGLEventListener(new GLEventListener() {
+//		drawable.
+		glEventListener = new GLEventListener() {
 
 			public void init(GLAutoDrawable drawable) {
 				gl = drawable.getGL();
@@ -406,7 +409,9 @@ public class ViewportGl extends Viewport {
 			}
 
 			public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) { }
-		});
+		};
+		
+		drawable.addGLEventListener(glEventListener);
 		
 //		component.addMouseWheelListener(new MouseWheelListener() {
 //			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -421,9 +426,9 @@ public class ViewportGl extends Viewport {
 //		});
 	}
 	
-	public void display() {
-		
-	}
+//	public void display() {
+//		drawable.
+//	}
 
 	public GL getGl() {
 		return gl;
@@ -533,14 +538,14 @@ public class ViewportGl extends Viewport {
 			drawSds3(activeSds);
 		}
 		drawOrigin();
-//		JPatchTool tool = Main.getInstance().getTool();
-//		if (tool != null) {
-//			tool.draw(this);
-//		}
+		JPatchTool tool = Main.getInstance().getActiveTool();
+		if (tool != null) {
+			tool.draw(this);
+		}
 		rasterMode();
 		drawInfo();
 		gl.glFlush(); // ensure that everything gets drawn
-//		gl.glFinish();
+		gl.glFinish();
 	}
 	
 //	public void setMaterial(Color3f ka) {

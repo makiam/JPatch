@@ -35,6 +35,7 @@ import com.jpatch.afw.ui.JPatchToolBar;
 import com.jpatch.boundary.actions.Actions;
 import com.jpatch.boundary.actions.Actions.ViewportMode;
 import com.jpatch.boundary.tools.JPatchTool;
+import com.jpatch.boundary.tools.RotateTool;
 import com.jpatch.entity.sds.JptLoader;
 import com.jpatch.entity.sds.Sds;
 import com.jpatch.settings.Settings;
@@ -50,6 +51,8 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.TreePath;
+
+import jpatch.boundary.tools.Tools;
 
 
 /**
@@ -478,6 +481,11 @@ public class Main {
 //		frame.add(uiFactory.getComponent("edit toolbar"), BorderLayout.EAST);
 //		frame.setJMenuBar((JMenuBar) uiFactory.getComponent("menubar"));
 		
+		actions.toolSM.addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				repaintViewports();
+			}
+		});
 		
 		frame.setVisible(true);
 		EventQueue.invokeLater(new Runnable() {
@@ -526,6 +534,11 @@ public class Main {
 		return activeSds;
 	}
 	
+	public JPatchTool getActiveTool() {
+//		return actions.toolSM.getValue();
+		return new RotateTool();
+	}
+	
 	public void setActiveSds(Sds sds) {
 		activeSds = sds;
 	}
@@ -535,7 +548,8 @@ public class Main {
 	public void repaintViewports() {
 		for (int i = 0; i < viewports.length; i++) {
 			if (viewports[i].getComponent().isVisible()) {
-				viewports[i].getComponent().repaint();
+//				viewports[i].getComponent().repaint();
+				((ViewportGl) viewports[i]).draw();
 			}
 		}
 	}
