@@ -1,6 +1,7 @@
 package com.jpatch.afw.ui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -121,8 +122,8 @@ public class AttributeEditor {
 			boxes[i] = Box.createHorizontalBox();
 			boxes[i].add(setButtons[i]);
 			boxes[i].add(clrButtons[i]);
-			buttonUtils.configureButton(setButtons[i], IconSet.Style.GLOSSY, IconSet.Type.LEFT, i % 2 == 0 ? UPPER_LIMIT : LOWER_LIMIT);
-			buttonUtils.configureButton(clrButtons[i], IconSet.Style.GLOSSY, IconSet.Type.RIGHT, CLEAR_LIMIT);
+			buttonUtils.configureButton(setButtons[i], IconSet.Style.TINY, IconSet.Type.LEFT, i % 2 == 0 ? UPPER_LIMIT : LOWER_LIMIT);
+			buttonUtils.configureButton(clrButtons[i], IconSet.Style.TINY, IconSet.Type.RIGHT, CLEAR_LIMIT);
 		}
 		
 		

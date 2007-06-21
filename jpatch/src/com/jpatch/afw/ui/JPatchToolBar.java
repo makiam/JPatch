@@ -102,8 +102,8 @@ public class JPatchToolBar extends JToolBar {
 			g2.fillRect(getParent().getWidth() * i / n, 0, getParent().getWidth() * (i + 1) / n - getParent().getWidth() * i / n, getParent().getHeight());
 		}
 		g2.setTransform(saveAt);
-		g.setColor(new Color(0x808080));
-		g.drawLine(0, bounds.height - 1, bounds.width - 1, bounds.height - 1);
+//		g.setColor(new Color(0x808080));
+//		g.drawLine(0, bounds.height - 1, bounds.width - 1, bounds.height - 1);
 	}
 	
 	@SuppressWarnings("unchecked")

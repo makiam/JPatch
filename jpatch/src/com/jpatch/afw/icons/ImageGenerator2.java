@@ -65,11 +65,11 @@ public class ImageGenerator2 {
 			break;
 		case 3:	// set upper limit
 			g.setColor(new Color(0x80000000, true));
-			g.fill(new Polygon(new int[] { 3, 8, 13 }, new int[] { 13, 2, 13 }, 3));
+			g.fill(new Polygon(new int[] { 4, 9, 14 }, new int[] { 13, 2, 13 }, 3));
 			break;
 		case 4:	// set lower limit
 			g.setColor(new Color(0x80000000, true));
-			g.fill(new Polygon(new int[] { 3, 8, 13 }, new int[] { 2, 13, 2 }, 3));
+			g.fill(new Polygon(new int[] { 4, 9, 14 }, new int[] { 3, 14, 3 }, 3));
 			break;
 		case 5:	// clear limit
 			g.setColor(new Color(0x80800000, true));
@@ -78,9 +78,14 @@ public class ImageGenerator2 {
 			g.drawLine(3, 12, 12, 3);
 			break;
 		case 6:	// CHECKBOX_UNCHECKED
+			g.translate(0, -1);
 			g.setComposite(AlphaComposite.Src);
-			g.setColor(new Color(0x22000000, true));
-			g.fillRoundRect(1, 2, 14, 14, 8, 8);
+			g.setColor(new Color(0x30000000, true));
+			for (int y = 0; y < 2; y++) {
+				for (int x = 0; x < 2; x++) {
+					g.fillRoundRect(x + 0, y + 1, 14, 14, 8, 8);
+				}
+			}
 			g.setColor(new Color(0x66000000, true));
 			g.fillRoundRect(0, 1, 14, 14, 6, 6);
 			g.setPaint(new GradientPaint(0, 8, new Color(0xcccccc), 0, 14, new Color(0xffffff)));
@@ -90,38 +95,53 @@ public class ImageGenerator2 {
 			g.fillRoundRect(1, 2, 12, 6, 6, 6);
 			break;
 		case 7: // CHECKBOX_CHECKED
+			g.translate(0, -1);
 			g.setComposite(AlphaComposite.Src);
-			g.setColor(new Color(0x22000000, true));
-			g.fillRoundRect(1, 2, 14, 14, 8, 8);
+			g.setColor(new Color(0x30000000, true));
+			for (int y = 0; y < 2; y++) {
+				for (int x = 0; x < 2; x++) {
+					g.fillRoundRect(x + 0, y + 1, 14, 14, 8, 8);
+				}
+			}
 			g.setColor(new Color(0x88000000, true));
 			g.fillRoundRect(0, 1, 14, 14, 6, 6);
-			g.setPaint(new GradientPaint(0, 8, new Color(0x888888), 0, 14, new Color(0xeeeeee)));
+			g.setPaint(new GradientPaint(0, 8, new Color(0xacacb4), 0, 14, new Color(0xcfcfe7)));
 			g.fillRoundRect(1, 2, 12, 12, 6, 6);
 			g.setComposite(AlphaComposite.SrcAtop);
 			g.setPaint(new GradientPaint(0, 0, new Color(0x00ffffff, true), 0, 8, new Color(0xccffffff, true)));
 			g.fillRoundRect(1, 2, 12, 6, 6, 6);
 			g.setComposite(AlphaComposite.Src);
 			g.setColor(Color.BLACK);
-			g.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-			g.drawLine(13, 1, 7, 10);
-			g.drawLine(7, 10, 3, 6);
+			g.setStroke(new BasicStroke(1.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			g.drawLine(11, 1, 6, 11);
+			g.drawLine(6, 11, 3, 7);
 			break;
 		case 8: // CHECKBOX_UNCHECKED_PRESSED
+			g.translate(0, -1);
 			g.setComposite(AlphaComposite.Src);
-			g.setColor(new Color(0x22000000, true));
-			g.fillRoundRect(1, 2, 14, 14, 8, 8);
+			g.setColor(new Color(0x30000000, true));
+			for (int y = 0; y < 2; y++) {
+				for (int x = 0; x < 2; x++) {
+					g.fillRoundRect(x + 0, y + 1, 14, 14, 8, 8);
+				}
+			}
 			g.setColor(new Color(0x88000000, true));
 			g.fillRoundRect(0, 1, 14, 14, 6, 6);
-			g.setPaint(new GradientPaint(0, 8, new Color(0x888888), 0, 14, new Color(0xeeeeee)));
+			g.setPaint(new GradientPaint(0, 8, new Color(0xacacb4), 0, 14, new Color(0xcfcfe7)));
 			g.fillRoundRect(1, 2, 12, 12, 6, 6);
 			g.setComposite(AlphaComposite.SrcAtop);
 			g.setPaint(new GradientPaint(0, 0, new Color(0x00ffffff, true), 0, 8, new Color(0xccffffff, true)));
 			g.fillRoundRect(1, 2, 12, 6, 6, 6);
 			break;
 		case 9: // CHECKBOX_CHECKED_PRESSED
+			g.translate(0, -1);
 			g.setComposite(AlphaComposite.Src);
-			g.setColor(new Color(0x22000000, true));
-			g.fillRoundRect(1, 2, 14, 14, 8, 8);
+			g.setColor(new Color(0x30000000, true));
+			for (int y = 0; y < 2; y++) {
+				for (int x = 0; x < 2; x++) {
+					g.fillRoundRect(x + 0, y + 1, 14, 14, 8, 8);
+				}
+			}
 			g.setColor(new Color(0x66000000, true));
 			g.fillRoundRect(0, 1, 14, 14, 6, 6);
 			g.setPaint(new GradientPaint(0, 8, new Color(0xcccccc), 0, 14, new Color(0xffffff)));
@@ -132,8 +152,8 @@ public class ImageGenerator2 {
 			g.setComposite(AlphaComposite.Src);
 			g.setColor(Color.BLACK);
 			g.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-			g.drawLine(13, 1, 7, 10);
-			g.drawLine(7, 10, 3, 6);
+			g.drawLine(11, 1, 6, 11);
+			g.drawLine(6, 11, 3, 7);
 			break;
 		}
 	}

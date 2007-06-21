@@ -2,13 +2,16 @@ package com.jpatch.afw.icons;
 
 import com.jpatch.afw.ui.ImageUtils;
 
+import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.image.*;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.plaf.basic.BasicButtonUI;
@@ -16,7 +19,7 @@ import javax.swing.plaf.metal.MetalButtonUI;
 
 public class IconSet implements Serializable {
 	private static final long serialVersionUID = -5773242156358795217L;
-	public static enum Style { GLOSSY, FROSTED, BRUSHED, DARK }
+	public static enum Style { GLOSSY, FROSTED, BRUSHED, DARK, TINY }
 	public static enum Type { SINGLE, ROUND, LARGE, LEFT, CENTER, RIGHT }
 	public static enum Mode { DEFAULT, ROLLOVER, SELECTED, PRESSED, ROLLOVERSELECTED }
 	
@@ -69,6 +72,7 @@ public class IconSet implements Serializable {
 		button.setContentAreaFilled(false);
 		button.setBorderPainted(false);
 		button.setBorder(null);
+		button.setPreferredSize(new Dimension(defaultImage.getWidth(), defaultImage.getHeight()));
 		button.setRolloverEnabled(true);
 	}
 }

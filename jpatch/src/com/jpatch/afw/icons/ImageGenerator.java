@@ -13,6 +13,7 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.*;
 import java.awt.image.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -51,7 +52,10 @@ public class ImageGenerator {
 			{ Style.BRUSHED.ordinal(), Type.ROUND.ordinal(), 30, 30 },
 			{ Style.GLOSSY.ordinal(), Type.LARGE.ordinal(), 36, 36 },
 			{ Style.FROSTED.ordinal(), Type.LARGE.ordinal(), 36, 36 },
-			{ Style.BRUSHED.ordinal(), Type.LARGE.ordinal(), 36, 36 }
+			{ Style.BRUSHED.ordinal(), Type.LARGE.ordinal(), 36, 36 },
+			{ Style.TINY.ordinal(), Type.LEFT.ordinal(), 19, 16 },
+			{ Style.TINY.ordinal(), Type.CENTER.ordinal(), 18, 16 },
+			{ Style.TINY.ordinal(), Type.RIGHT.ordinal(), 19, 16 },
 	};
 	
 	int n = 0;
@@ -230,6 +234,7 @@ public class ImageGenerator {
 			drawButton(Style.GLOSSY, 34, 34, ig, sg, true);
 			drawButton(Style.FROSTED, 34, 34, ig, sg, true);
 			drawButton(Style.BRUSHED, 34, 34, ig, sg, true);
+			drawGroupButtons(Style.TINY, 19, 18, 16, ig, sg, false);
 		}
 //		drawSwitcher(48, 42, g);
 //		g.setTransform(at);
@@ -261,6 +266,10 @@ public class ImageGenerator {
 			if (type == Type.SINGLE) {
 				xoff = 7;
 			}
+			if (style == Style.TINY) {
+				xoff = 1;
+				yoff = 0;
+			}
 			iconSet.setIcon(style, type, img, stc, xoff, yoff);
 		}
 		
@@ -271,15 +280,15 @@ public class ImageGenerator {
 		oos.writeObject(iconSet);
 		oos.close();
 		
-		System.exit(0);
+//		System.exit(0);
 		
-		ObjectInputStream ois = new ObjectInputStream(ClassLoader.getSystemResourceAsStream("com/jpatch/afw/icons/icons"));
+		ObjectInputStream ois = new ObjectInputStream(new FileInputStream("src/com/jpatch/afw/icons/buttonBorders.iconset"));
 		iconSet = (IconSet) ois.readObject();
 		ois.close();
 		
 		frame.setLayout(new BorderLayout());
 		
-		if (false) {
+		if (true) {
 			frame.add(imagePanel.getComponent(), BorderLayout.NORTH);
 			frame.add(stencilPanel.getComponent(), BorderLayout.CENTER);
 			frame.addKeyListener(new KeyAdapter() {
@@ -303,11 +312,12 @@ public class ImageGenerator {
 				
 			});
 			frame.add(zoom.getComponent(), BorderLayout.SOUTH);
+			frame.setVisible(true);
 		} 
 	}
 	
 	void drawx(int num) {
-		BufferedImage zimage = drawStencil(num);
+		BufferedImage zimage = drawImage(num);
 		
 		Image zoomedImage = zimage.getScaledInstance(zimage.getWidth() * 8, zimage.getHeight() * 8, BufferedImage.SCALE_FAST);
 		zoom.setImage(zoomedImage);
@@ -317,22 +327,24 @@ public class ImageGenerator {
 	}
 	
 	BufferedImage drawImage(int n) {
-		int xoff = 0;
+		int xoff = n > 20 ? 1 : 0;
+		int yoff = n > 20 ? -1 : 0;
 		for (int i = 0; i < n; i++) {
 			xoff += offsets[i][2];
 		}
 		BufferedImage i = new BufferedImage(offsets[n][2], offsets[n][3], BufferedImage.TYPE_INT_ARGB);
-		i.createGraphics().drawImage(image, -xoff, 0, null);
+		i.createGraphics().drawImage(image, -xoff, yoff, null);
 		return i;
 	}
 	
 	BufferedImage drawStencil(int n) {
-		int xoff = 0;
+		int xoff = n > 20 ? 2 : 0;
+		int yoff = n > 20 ? -2 : 0;
 		for (int i = 0; i < n; i++) {
 			xoff += offsets[i][2];
 		}
 		BufferedImage s = new BufferedImage(offsets[n][2], offsets[n][3], BufferedImage.TYPE_BYTE_GRAY);
-		s.createGraphics().drawImage(stencil, -xoff, 0, null);
+		s.createGraphics().drawImage(stencil, -xoff, yoff, null);
 		return s;
 	}
 	
@@ -384,6 +396,12 @@ public class ImageGenerator {
 		case FROSTED:
 //			g.setPaint(new LinearGradientPaint(0, 1, 0, 1 + innerHeight,new float[] { 0.0f, 0.3f, 0.7f, 1.0f }, new Color[] { new Color(1.0f, 1.0f, 1.0f), new Color(0.85f, 0.85f, 0.85f), new Color(0.7f, 0.7f, 0.7f), new Color(0.50f, 0.50f, 0.50f) } ));
 			ig.setPaint(new LinearGradientPaint(0, 1, 0, 1 + innerHeight,new float[] { 0.0f, 0.5f, 1.0f }, new Color[] { new Color(1.00f, 1.00f, 1.00f), new Color(0.85f, 0.85f, 0.85f), new Color(0.90f, 0.90f, 0.90f) } ));
+//			g.setPaint(new GradientPaint(0, 1, new Color(0xffffff), 0, 1 + innerHeight, new Color(0xa0a0a0)));
+			ig.fill(innerRect);
+			break;
+		case TINY:
+//			g.setPaint(new LinearGradientPaint(0, 1, 0, 1 + innerHeight,new float[] { 0.0f, 0.3f, 0.7f, 1.0f }, new Color[] { new Color(1.0f, 1.0f, 1.0f), new Color(0.85f, 0.85f, 0.85f), new Color(0.7f, 0.7f, 0.7f), new Color(0.50f, 0.50f, 0.50f) } ));
+			ig.setPaint(new LinearGradientPaint(0, 1, 0, 1 + innerHeight,new float[] { 0.0f, 0.45f, 0.45f, 1.0f }, new Color[] { new Color(0.9f, 0.9f, 0.9f), new Color(1.0f, 1.0f ,1.0f), new Color(0.85f, 0.85f, 0.85f), new Color(0.9f, 0.9f, 0.9f) } ));
 //			g.setPaint(new GradientPaint(0, 1, new Color(0xffffff), 0, 1 + innerHeight, new Color(0xa0a0a0)));
 			ig.fill(innerRect);
 			break;
