@@ -66,7 +66,9 @@ public abstract class Viewport {
 ////				viewRotation.setValueAdjusting(false);
 //				computeMatrices();
 			}
-			component.repaint();
+//			getComponent().update(null);
+			((ViewportGl) Viewport.this).drawable.display();
+//			((ViewportGl) Viewport.this).drawable.swapBuffers();
 		}
 	};
 	
