@@ -29,7 +29,8 @@ public class RotateTool implements JPatchTool {
 	
 	public void draw(Viewport viewport) {
 		GL gl = ((ViewportGl) viewport).getGl();
-		System.out.println("drawing rotateTool " + n++);
+		gl.glDisable(GL_LIGHTING);
+//		System.out.println("drawing rotateTool " + n++);
 		Point3f p = new Point3f();
 		for (int i = 0; i < 3; i++) {
 			switch (i) {

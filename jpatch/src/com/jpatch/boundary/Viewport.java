@@ -2,10 +2,15 @@ package com.jpatch.boundary;
 
 import com.jpatch.afw.attributes.*;
 import com.jpatch.settings.*;
+import com.sun.opengl.impl.GLWorkerThread;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
+import java.lang.reflect.InvocationTargetException;
 
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLCanvas;
+import javax.media.opengl.GLDrawable;
 import javax.vecmath.*;
 
 
@@ -50,11 +55,12 @@ public abstract class Viewport {
 	};
 	private AttributePostChangeListener updateAttributeListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute attribute) {
+			if (getComponent() == null) {
+				return;
+			}
 			if (
-					attribute == viewTranslation.getXAttr() ||
-					attribute == viewTranslation.getYAttr() ||
-					attribute == viewRotation.getXAttr() ||
-					attribute == viewRotation.getYAttr() ||
+					attribute == viewTranslation ||
+					attribute == viewRotation ||
 					attribute == viewScale
 			) {
 				computeMatrices();
@@ -67,8 +73,17 @@ public abstract class Viewport {
 //				computeMatrices();
 			}
 //			getComponent().update(null);
-			((ViewportGl) Viewport.this).drawable.display();
+//			getComponent().repaint();
+			((GLAutoDrawable) getComponent()).display();
+//			EventQueue.invokeLater(new Runnable() {
+//				public void run() {
+//					getComponent().paint(null);
+//				}
+//			});
+			
+//			((ViewportGl) Viewport.this).drawable.display();
 //			((ViewportGl) Viewport.this).drawable.swapBuffers();
+			
 		}
 	};
 	
@@ -82,10 +97,8 @@ public abstract class Viewport {
 		showControlMesh.addAttributePostChangeListener(updateAttributeListener);
 		showLimitSurface.addAttributePostChangeListener(updateAttributeListener);
 		showProjectedMesh.addAttributePostChangeListener(updateAttributeListener);
-		viewTranslation.getXAttr().addAttributePostChangeListener(updateAttributeListener);
-		viewTranslation.getYAttr().addAttributePostChangeListener(updateAttributeListener);
-		viewRotation.getXAttr().addAttributePostChangeListener(updateAttributeListener);
-		viewRotation.getYAttr().addAttributePostChangeListener(updateAttributeListener);
+		viewTranslation.addAttributePostChangeListener(updateAttributeListener);
+		viewRotation.addAttributePostChangeListener(updateAttributeListener);
 		viewScale.addAttributePostChangeListener(updateAttributeListener);
 //		name.set("Viewport " + id);
 	}

@@ -80,6 +80,14 @@ public abstract class AbstractAttribute<T> implements Attribute {
     	}
  	    tmp[i] = l;
  	    attributePostChangeListeners = tmp;
+ 	    
+ 	    /*
+ 	     * notify the new listener about the current value
+ 	     * TODO: is this really a good idea?
+ 	     */
+ 	    fireEvents = false;
+ 	    l.attributeHasChanged(this);
+ 	    fireEvents = true;
     }
     
     /**

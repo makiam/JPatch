@@ -13,9 +13,7 @@ public class JPatchFormContainer {
 	private static final Insets EXPANDED_INSETS = new Insets(0, 4, 4, 4);
 	private static final Insets COLLAPSED_INSETS = new Insets(0, 4, 2, 4);
 	private final JComponent component = Box.createVerticalBox();
-//	private final JComponent component = new JPanel(new JPatchForm.ColumnLayout());
-	private final JPanel titleBar = new JPanel(new BorderLayout());
-	private final Component strut = Box.createVerticalStrut(2);
+	private final JComponent titleBar = new JPanel(new BorderLayout());
 	private final Box formBox = Box.createVerticalBox();
 	private final Box containerBox = Box.createVerticalBox();
 	private JPatchFormContainer parentContainer;
@@ -23,7 +21,7 @@ public class JPatchFormContainer {
 	private Color borderColor = new Color(0x808080);
 	
 	public JPatchFormContainer(String title) {
-		JToggleButton button = new JToggleButton();
+		JToggleButton button = new JToggleButton("abc");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setExpanded(((JToggleButton) e.getSource()).isSelected());
@@ -31,16 +29,14 @@ public class JPatchFormContainer {
 		});
 		button.setContentAreaFilled(false);
 		button.setBorderPainted(false);
+		button.setBorder(null);
 		button.setIcon(COLLAPSED_ICON);
 		button.setSelectedIcon(EXPANDED_ICON);
-		button.setPreferredSize(new Dimension(COLLAPSED_ICON.getIconWidth(), COLLAPSED_ICON.getIconHeight()));
+		button.setFocusable(false);
+		button.setText(title);
 		titleBar.add(button, BorderLayout.WEST);
-		JLabel label = new JLabel(title);
-		label.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
-		label.setFont(LABEL_FONT);
-		titleBar.add(label, BorderLayout.CENTER);
+		button.setFont(LABEL_FONT);
 		titleBar.setOpaque(false);
-//		titleBar.setBackground(BORDER_COLORS[0]);
 		component.add(titleBar);
 		component.setBorder(new Border() {
 			private final Insets insets = new Insets(0, 4, 0, 4);
@@ -49,7 +45,6 @@ public class JPatchFormContainer {
 			}
 
 			public boolean isBorderOpaque() {
-				// TODO Auto-generated method stub
 				return false;
 			}
 
@@ -58,17 +53,13 @@ public class JPatchFormContainer {
 				Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 				g2.setColor(borderColor);
-				g2.fillRoundRect(x, y + 1, width, h, 8, 8);
-				g2.drawRoundRect(x, y + 1, width - 1, h - 1, 8, 8);
+				g2.fillRoundRect(x, y + 0, width, h, 8, 8);
+				g2.drawRoundRect(x, y + 0, width - 1, h - 1, 8, 8);
 				if (expanded) {
-//					g.fillRect(x, y, 2, height - 4);
-//					g.fillRect(x + width - 2, y, 2, height - 4);
-//					g.fillRect(x, y + height - 4, width, 2);
-//					g2.setStroke(new BasicStroke(2));
-					g2.drawRoundRect(x, y + h - 1, width - 1, height - h - 1, 8, 8);
-					g2.drawRoundRect(x + 1, y + h, width - 3, height - h - 3, 6, 6);
-					g2.fillRect(x, 12, 2, 8);
-					g2.fillRect(x + width - 2, 12, 2, 8);
+					g2.drawRoundRect(x, y + h - 2, width - 1, height - h - 1, 8, 8);
+					g2.drawRoundRect(x + 1, y + h - 1, width - 3, height - h - 3, 6, 6);
+					g2.fillRect(x, 11, 2, 8);
+					g2.fillRect(x + width - 2, 11, 2, 8);
 				}
 			}
 			
@@ -84,6 +75,7 @@ public class JPatchFormContainer {
 	}
 	
 	public void add(JPatchForm form) {
+		System.out.println("add " + form);
 		formBox.add(form.getComponent());
 		form.setFormContainer(this);	
 	}
@@ -92,13 +84,7 @@ public class JPatchFormContainer {
 		containerBox.add(formContainer.getComponent());
 		formContainer.parentContainer = this;
 		Color background = UIManager.getColor("Panel.background");
-//		Color color = getRootContainer().g
 		int t = 255 - 100;
-//		int level = getLevel();
-//		if (level == 1) t = 255 - 100;
-//		if (level == 2) t = 255 - 100 - 0;
-//		if (level == 3) t = 255 - 100 - 20 - 10;
-//		System.out.println(((JLabel) formContainer.titleBar.getComponent(1)).getText() + " " + level);
 		formContainer.borderColor = new Color(
 				(borderColor.getRed() * t + background.getRed() * (255 - t)) / 255,
 				(borderColor.getGreen() * t + background.getGreen() * (255 - t)) / 255,
@@ -115,25 +101,16 @@ public class JPatchFormContainer {
 	}
 	
 	public void setExpanded(boolean expanded) {
-//		System.out.println(formBox.getComponentCount());
-//		System.out.println(containerBox.getComponentCount());
-//		if (formBox.getComponentCount() == 1 && containerBox.getComponentCount() == 0) {
-//			return;
-//		}
 		if (!this.expanded && expanded) {
 			this.expanded = true;
-			component.add(strut);
 			component.add(formBox);
 			component.add(containerBox);
 			getRootContainer().component.getRootPane().validate();
-//			getRootContainer().component.paintImmediately(getRootContainer().component.getBounds());
 		} else if (this.expanded && !expanded) {
 			this.expanded = false;
-			component.remove(strut);
 			component.remove(formBox);
 			component.remove(containerBox);
 			getRootContainer().component.getRootPane().validate();
-//			getRootContainer().component.paintImmediately(getRootContainer().component.getBounds());
 		}
 	}
 	

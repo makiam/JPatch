@@ -137,7 +137,7 @@ public class JPatchForm {
 
 		public void layoutContainer(Container parent) {
 			int insets = JPatchFormContainer.MAX_NEST_LEVEL - container.getLevel();
-			int y = 1, w = parent.getSize().width - 8 * insets;
+			int y = 2, w = parent.getSize().width - 8 * insets;
 			for (Component c : parent.getComponents()) {
 				int height = c.getPreferredSize().height;
 				c.setBounds(4 * insets, y, w, height);
@@ -159,13 +159,13 @@ public class JPatchForm {
 		}
 		
 		private Dimension computeSize(Container parent) {
-			int width = 0, height = 1;
+			int width = 0, height = 2;
 			for (Component c : parent.getComponents()) {
 				Dimension size = c.getPreferredSize();
 				height += size.height + 1;
 				width = Math.max(width, size.width);
 			}
-			layoutSize.height = height;
+			layoutSize.height = parent.getComponentCount() > 0 ? height + 1 : height;
 			layoutSize.width = width;
 //			System.out.println("column-size:" + layoutSize);
 			return layoutSize;

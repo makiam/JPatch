@@ -13,9 +13,9 @@ import com.jpatch.entity.TransformNode;
 
 public class JPatchInspector {
 	public AttributeEditorPanel panel = new AttributeEditorPanel();
-	private static final Color VIEW_COLOR = new Color(0x8888bb);
-	private static final Color TOOL_COLOR = new Color(0xbb8888);
-	private static final Color SELECTION_COLOR = new Color(0x77aa77);
+	private static final Color VIEW_COLOR = new Color(0x99aabb);
+	private static final Color TOOL_COLOR = new Color(0xbbaa99);
+	private static final Color SELECTION_COLOR = new Color(0x88aa88);
 	
 	private static final AttributeEditor NULL_VIEW = new AttributeEditor(null, "View", null, VIEW_COLOR);
 	private AttributeEditor toolEditor = new AttributeEditor(null, "Tool", null, TOOL_COLOR);

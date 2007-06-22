@@ -101,12 +101,16 @@ public class ChangeViewTool implements JPatchTool {
 			viewport.setBirdsEyeView();
 			switch (mode) {
 			case MOVE:
-				viewport.getViewTranslationAttribute().setX(viewport.getViewTranslationAttribute().getX() + dx / w);
-				viewport.getViewTranslationAttribute().setY(viewport.getViewTranslationAttribute().getY() - dy / w);
+				viewport.getViewTranslationAttribute().setTuple(
+						viewport.getViewTranslationAttribute().getX() + dx / w,
+						viewport.getViewTranslationAttribute().getY() - dy / w
+				);
 				break;
 			case ROTATE:
-				viewport.getViewRotationAttribute().setX(Math.min(Math.max(viewport.getViewRotationAttribute().getX() + 0.25 * dy, -90), 90));
-				viewport.getViewRotationAttribute().setY((viewport.getViewRotationAttribute().getY() + 0.25 * dx + 360) % 360);
+				viewport.getViewRotationAttribute().setTuple(
+						Math.min(Math.max(viewport.getViewRotationAttribute().getX() + 0.25 * dy, -90), 90),
+						(viewport.getViewRotationAttribute().getY() + 0.25 * dx + 360) % 360
+				);
 				break;
 			case ZOOM:
 				double factor = Math.min(Math.max(1 + (dx - dy) / 200.0, 0.2), 5);

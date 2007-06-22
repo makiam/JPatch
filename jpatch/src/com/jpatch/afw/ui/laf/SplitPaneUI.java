@@ -1,5 +1,7 @@
 package com.jpatch.afw.ui.laf;
 
+import com.jpatch.afw.ui.Background;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -38,9 +40,10 @@ public class SplitPaneUI extends MetalSplitPaneUI {
 
 		@Override
 		public void paint(Graphics g) {
-			g.setColor(new Color(0xb0b0b0));
-			g.fillRect(0, 0, getWidth(), getHeight());
+//			g.setColor(new Color(0xb0b0b0));
+//			g.fillRect(0, 0, getWidth(), getHeight());
 //			super.paint(g);
+			Background.fillComponent(this, g);
 			paintComponents(g);
 		}
 
