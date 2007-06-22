@@ -402,14 +402,14 @@ public class ViewportGl extends Viewport {
 				gl.glClearDepth(CLEAR_DEPTH);									// set initial depth-buffer value
 				gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// clear color and depth buffers
 				draw();
-//				gl.glFlush();
-//				gl.glFinish();
+				gl.glFlush();
+				gl.glFinish();
 //				System.out.println("GL display on thread " + Thread.currentThread());
 //				System.out.println(System.currentTimeMillis() - t);
 			}
 
 			public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-				computeMatrices();
+//				computeMatrices();
 //				init(drawable);
 //				display(drawable);
 			}
