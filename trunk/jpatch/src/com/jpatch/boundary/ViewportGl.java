@@ -333,8 +333,10 @@ public class ViewportGl extends Viewport {
 		glEventListener = new GLEventListener() {
 
 			public void init(GLAutoDrawable drawable) {
+				
+				drawable.setGL(new DebugGL(drawable.getGL()));
 				gl = drawable.getGL();
-				gl.glEnd();
+//				gl.glEnd();
 				
 				/* Generate display lists to render font characters. */
 				gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 1);
@@ -393,6 +395,7 @@ public class ViewportGl extends Viewport {
 
 			public void display(GLAutoDrawable drawable) {
 //				long t = System.currentTimeMillis();
+				gl.glFlush();
 				gl.glFinish();	// wait for previous gl functions to finish
 				Color3f background = active ? COLORS.activeBackground : COLORS.background;
 				gl.glClearColor(background.x, background.y, background.z, 0);	// set background color
@@ -407,8 +410,8 @@ public class ViewportGl extends Viewport {
 
 			public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
 				computeMatrices();
-				init(drawable);
-				display(drawable);
+//				init(drawable);
+//				display(drawable);
 			}
 
 			public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) { }
@@ -793,7 +796,7 @@ public class ViewportGl extends Viewport {
 //		}
 		gl.glPointSize(3);
 //		time = 0;
-		gl.glEnd();
+//		gl.glEnd();
 //		for (Face face : sds.faceList) {
 //			drawFace(face, subdivLevel);
 //			break;

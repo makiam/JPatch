@@ -63,7 +63,7 @@ public class Actions {
 		/*
 		 * configure tool statemachine
 		 */
-		toolSM.setDefaultState(tools[4]);
+		toolSM.setDefaultState(tools[3]);
 		
 		/*
 		 * configure undo and redo actions

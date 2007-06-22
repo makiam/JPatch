@@ -79,7 +79,7 @@ public class Main {
 	
 	private Sds activeSds;
 
-	private JComponent screen = new JPanel();
+	private JComponent screen = new Screen();
 	
 //	private JPatchTree tree = new JPatchTree();
 //	private UIFactory uiFactory = new UIFactory();
@@ -316,7 +316,7 @@ public class Main {
 				for (Viewport vp : ((StateMachine<Viewport>) source).getStates()) {
 					vp.setActive(vp == active);
 				}
-				repaintViewports();
+//				repaintViewports();
 			}
 		});
 		
@@ -509,6 +509,7 @@ public class Main {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				vSplit.setDividerLocation(0.5);
+				repaintViewports();
 			}
 		});
 	}
@@ -593,20 +594,20 @@ public class Main {
 //		selectionInspector.setObject(object);
 //	}
 	
-//	private class Screen extends JComponent {
-//		@Override
-//		public void paintBorder(Graphics g) {
-////			if (true) return;
-//			for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-//				Component c = viewports[i].getComponent();
-//				if (!c.isVisible()) {
-//					continue;
-//				}
-//				g.setColor(viewports[i] == activeViewport.getState() ? VIEWPORT_BORDER_COLOR : VIEWPORT_BORDER_COLOR);
-//				g.drawRect(c.getX() - 1, c.getY() - 1, c.getWidth() + 1, c.getHeight() + 1);
-//			}
-//		}	
-//	}
+	private class Screen extends JComponent {
+		@Override
+		public void paintBorder(Graphics g) {
+//			if (true) return;
+			for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
+				Component c = viewports[i].getComponent();
+				if (!c.isVisible()) {
+					continue;
+				}
+				g.setColor(viewports[i].active ? VIEWPORT_BORDER_COLOR : VIEWPORT_BORDER_COLOR);
+				g.drawRect(c.getX() - 1, c.getY() - 1, c.getWidth() + 1, c.getHeight() + 1);
+			}
+		}	
+	}
 	
 	
 }
