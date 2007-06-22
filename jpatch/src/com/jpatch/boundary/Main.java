@@ -465,8 +465,10 @@ public class Main {
 		activeViewport.addAttributePostChangeListener(inspector.getViewportChangeListener());
 		inspector.getComponent().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		JScrollPane scrollPane = new JScrollPane(new JScrollPane(inspector.getComponent(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
-		scrollPane.getViewport().setBorder(null);
 		scrollPane.setBorder(null);
+		scrollPane.getViewport().setBorder(null);
+		scrollPane.setViewportBorder(null);
+		scrollPane.getVerticalScrollBar().setBorder(null);
 		vSplit.setBorder(null);
 		vSplit.setContinuousLayout(true);
 //		vSplit.setBackground(BACKGROUND);
