@@ -66,6 +66,7 @@ public class JPatchToolBar extends JToolBar {
 	}
 
 	public void paintComponent(Graphics g) {
+		Background.fillComponent(this, g);
 		if (false) {
 			super.paintComponent(g);
 			return;
@@ -79,29 +80,29 @@ public class JPatchToolBar extends JToolBar {
 			g2.fillRect(0, s, getWidth(), getHeight() - s);
 			return;
 		}
-		Rectangle bounds = getBounds();
-		Graphics2D g2 = (Graphics2D) g;
-		AffineTransform saveAt = g2.getTransform();
-		g.translate(-bounds.x, -bounds.y);
-		final float width = getParent().getWidth();
-		final float height = getParent().getHeight();
-		final float yoff = width * 2;
-		final int n = 9;
-		final float l0 = yoff;
-		final float l1 = (float) Math.sqrt((width / 2) * (width / 2) + (yoff + height) * (yoff + height));
-		final Color c0 = new Color(0xe0e0e0);
-		final Color c1 = new Color(0xa0a0a0);
-		for (int i = 0; i < n; i++) {
-			float xoff = width * (i + 0.5f) / n - width / 2.0f;
-			float len = (float) Math.sqrt(xoff * xoff + yoff * yoff);
-			float x0 = xoff / len * l0 + width / 2.0f;
-			float y0 = yoff / len * l0 - yoff;
-			float x1 = xoff / len * l1 + width / 2.0f;
-			float y1 = yoff / len * l1 - yoff;
-			g2.setPaint(new GradientPaint(x0, y0, c0, x1, y1, c1));
-			g2.fillRect(getParent().getWidth() * i / n, 0, getParent().getWidth() * (i + 1) / n - getParent().getWidth() * i / n, getParent().getHeight());
-		}
-		g2.setTransform(saveAt);
+//		Rectangle bounds = getBounds();
+//		Graphics2D g2 = (Graphics2D) g;
+//		AffineTransform saveAt = g2.getTransform();
+//		g.translate(-bounds.x, -bounds.y);
+//		final float width = getParent().getWidth();
+//		final float height = getParent().getHeight();
+//		final float yoff = width * 2;
+//		final int n = 9;
+//		final float l0 = yoff;
+//		final float l1 = (float) Math.sqrt((width / 2) * (width / 2) + (yoff + height) * (yoff + height));
+//		final Color c0 = new Color(0xe0e0e0);
+//		final Color c1 = new Color(0xa0a0a0);
+//		for (int i = 0; i < n; i++) {
+//			float xoff = width * (i + 0.5f) / n - width / 2.0f;
+//			float len = (float) Math.sqrt(xoff * xoff + yoff * yoff);
+//			float x0 = xoff / len * l0 + width / 2.0f;
+//			float y0 = yoff / len * l0 - yoff;
+//			float x1 = xoff / len * l1 + width / 2.0f;
+//			float y1 = yoff / len * l1 - yoff;
+//			g2.setPaint(new GradientPaint(x0, y0, c0, x1, y1, c1));
+//			g2.fillRect(getParent().getWidth() * i / n, 0, getParent().getWidth() * (i + 1) / n - getParent().getWidth() * i / n, getParent().getHeight());
+//		}
+//		g2.setTransform(saveAt);
 //		g.setColor(new Color(0x808080));
 //		g.drawLine(0, bounds.height - 1, bounds.width - 1, bounds.height - 1);
 	}

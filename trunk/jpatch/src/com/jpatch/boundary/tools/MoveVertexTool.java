@@ -16,6 +16,10 @@ public class MoveVertexTool implements JPatchTool {
 	private MouseListener[] mouseListeners;
 	
 	public void registerListeners(Viewport[] viewports) {
+		System.out.println("MoveVertexTool registerListeners");
+		if (mouseListeners != null) {
+			throw new IllegalStateException("already registered");
+		}
 		mouseListeners = new MouseListener[viewports.length];
 		for (int i = 0; i < viewports.length; i++) {
 			mouseListeners[i] = new MoveVertexMouseListener(viewports[i]);
@@ -24,6 +28,7 @@ public class MoveVertexTool implements JPatchTool {
 	}
 
 	public void unregisterListeners(Viewport[] viewports) {
+		System.out.println("MoveVertexTool unregisterListeners");
 		for (int i = 0; i < viewports.length; i++) {
 			viewports[i].getComponent().removeMouseListener(mouseListeners[i]);
 		}

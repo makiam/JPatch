@@ -27,6 +27,7 @@ package com.jpatch.boundary;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.Configuration;
 import com.jpatch.afw.icons.IconSet;
+import com.jpatch.afw.ui.Background;
 import com.jpatch.afw.ui.ButtonUtils;
 import com.jpatch.afw.ui.JPatchActionButton;
 import com.jpatch.afw.ui.JPatchStateButton;
@@ -40,12 +41,18 @@ import com.jpatch.entity.sds.JptLoader;
 import com.jpatch.entity.sds.Sds;
 import com.jpatch.settings.Settings;
 import com.jpatch.ui.ViewportSwitcher;
+import com.sun.opengl.impl.GLWorkerThread;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.util.*;
 
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLCanvas;
+import javax.media.opengl.Threading;
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -205,7 +212,12 @@ public class Main {
 	/**
 	 * private constructor (singleton pattern)
 	 */
+	@SuppressWarnings("serial")
 	private Main() {
+		
+//		System.out.println("opengl is single threaded: " + Threading.isSingleThreaded());
+//		Threading.disableSingleThreading();
+//		System.out.println("opengl is single threaded: " + Threading.isSingleThreaded());
 		
 //		try {
 //			int[] ts = new int[7];
@@ -319,17 +331,21 @@ public class Main {
 		});
 //		screen.setOpaque(false);
 		
-//		try {
-//			activeSds = new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt"));
-//		} catch (FileNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		try {
+			activeSds = new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		Box statusBar = Box.createHorizontalBox();
+		Box statusBar = new Box(SwingConstants.HORIZONTAL) {
+			public void paintComponent(Graphics g) {
+				Background.fillComponent(this, g);
+			}
+		};
 		statusBar.add(statusLabel);
 		statusBar.add(Box.createHorizontalGlue());
 //		statusBar.add(MemoryMonitor.createMemoryMonitor(), BorderLayout.EAST);
@@ -379,7 +395,7 @@ public class Main {
 			}
 		});
 		
-		actions.toolSM.getValue().registerListeners(viewports);
+//		actions.toolSM.getValue().registerListeners(viewports);
 		
 		JPatchToolBar toolBar = new JPatchToolBar();
 		JPanel panel = new JPanel(new BorderLayout());
@@ -466,9 +482,9 @@ public class Main {
 		hSplit.setContinuousLayout(true);
 		hSplit.setOneTouchExpandable(true);
 		hSplit.setDividerLocation(300);
-
 		hSplit.setDividerSize(9);
 //		hSplit.setUI(new BasicSplitPaneUI());
+		
 		
 //		vSplit.setContinuousLayout(true);
 //		vSplit.setOneTouchExpandable(true);
@@ -487,6 +503,8 @@ public class Main {
 			}
 		});
 		
+//		viewports[0].setActive(true);
+//		activeViewport.setValue(viewports[0]);
 		frame.setVisible(true);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -548,8 +566,7 @@ public class Main {
 	public void repaintViewports() {
 		for (int i = 0; i < viewports.length; i++) {
 			if (viewports[i].getComponent().isVisible()) {
-//				viewports[i].getComponent().repaint();
-				((ViewportGl) viewports[i]).drawable.display();
+				((GLAutoDrawable) viewports[i].getComponent()).display();
 			}
 		}
 	}
