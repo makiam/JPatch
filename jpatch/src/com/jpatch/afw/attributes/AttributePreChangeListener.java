@@ -17,7 +17,7 @@ public interface AttributePreChangeListener<T> {
 	 * @param value the value the attribute intends to change to
 	 * @return the value the attribute should change to
 	 */
-	public boolean attributeWillChange(Attribute source, boolean value);
+	public boolean attributeWillChange(ScalarAttribute source, boolean value);
 	
 	/**
 	 * This method gets called from Attributes whose value is about to change.
@@ -26,7 +26,7 @@ public interface AttributePreChangeListener<T> {
 	 * @param value the value the attribute intends to change to
 	 * @return the value the attribute should change to
 	 */
-	public int attributeWillChange(Attribute source, int value);
+	public int attributeWillChange(ScalarAttribute source, int value);
 	
 	/**
 	 * This method gets called from Attributes whose value is about to change.
@@ -35,7 +35,7 @@ public interface AttributePreChangeListener<T> {
 	 * @param value the value the attribute intends to change to
 	 * @return the value the attribute should change to
 	 */
-	public double attributeWillChange(Attribute source, double value);
+	public double attributeWillChange(ScalarAttribute source, double value);
 	
 	/**
 	 * This method gets called from Attributes whose value is about to change.
@@ -44,5 +44,5 @@ public interface AttributePreChangeListener<T> {
 	 * @param value the value the attribute intends to change to
 	 * @return the value the attribute should change to
 	 */
-	public T attributeWillChange(Attribute source, T value);
+	public T attributeWillChange(ScalarAttribute source, T value);
 }

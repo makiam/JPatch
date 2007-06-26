@@ -122,24 +122,4 @@ public class CollectionAttr<T> extends AbstractAttribute {
 	public int size() {
 		return collection.size();
 	}
-
-	/**
-	 * Not supported by this class
-	 * @throws UnsupportedOperationException
-	 */
-	@Override
-	public void addAttributePreChangeListener(AttributePreChangeListener l) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Not supported by this class
-	 * @throws UnsupportedOperationException
-	 */
-	@Override
-	public void removeAttributePreChangeListener(AttributePreChangeListener l) {
-		throw new UnsupportedOperationException();
-	}
-	
-	
 }

@@ -45,7 +45,7 @@ public class AttributeManager {
 	/**
 	 * A set containing all locked attributes
 	 */
-	private final Set<Attribute> locks = new HashSet<Attribute>();
+	private final Set<ScalarAttribute> locks = new HashSet<ScalarAttribute>();
 	
 	/**
 	 * Maps DoubleAttr to their upper limits
@@ -85,7 +85,7 @@ public class AttributeManager {
 	 * @param attr the attribute to be locked
 	 * @throws IllegalArgumentException if the specified attribute has already been locked
 	 */
-	public void lock(Attribute attr) {
+	public void lock(ScalarAttribute attr) {
 		attr.addAttributePreChangeListener(Lock.getInstance());		// throws IllegalArgumentException if already locked
 		locks.add(attr);
 	}
@@ -95,7 +95,7 @@ public class AttributeManager {
 	 * @param attr the attribute to be unlocked
 	 * @throws IllegalArgumentException if the specified attribute has not been locked
 	 */
-	public void unlock(Attribute attr) {
+	public void unlock(ScalarAttribute attr) {
 		attr.removeAttributePreChangeListener(Lock.getInstance());	// throws IllegalArgumentException if already locked
 		locks.remove(attr);
 	}
@@ -105,7 +105,7 @@ public class AttributeManager {
 	 * @param attr the attribute to check for a lock
 	 * @return true if the specified attribute is locked, false otherwise
 	 */
-	public boolean isLocked(Attribute attr) {
+	public boolean isLocked(ScalarAttribute attr) {
 		return locks.contains(attr);
 	}
 	
@@ -267,7 +267,7 @@ public class AttributeManager {
 	}
 	
 	
-	public JTextField bindTextFieldToAttribute(final JTextField textField, Attribute attribute) {
+	public JTextField bindTextFieldToAttribute(final JTextField textField, ScalarAttribute attribute) {
 		if (attribute instanceof DoubleAttr) {
 			return bindTextFieldToAttribute(textField, (DoubleAttr) attribute);
 		}

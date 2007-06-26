@@ -5,7 +5,7 @@ import java.util.*;
 public class ObjectRegistry implements AttributePostChangeListener {
 	private Map<Class, Map<String, AbstractNamedObject>> classNameMap = new HashMap<Class, Map<String, AbstractNamedObject>>();
 	private Map<Class, Map<AbstractNamedObject, String>> classObjectMap = new HashMap<Class, Map<AbstractNamedObject, String>>();
-	private Map<Attribute.String, AbstractNamedObject> attributeMap = new HashMap<Attribute.String, AbstractNamedObject>();
+	private Map<ScalarAttribute.String, AbstractNamedObject> attributeMap = new HashMap<ScalarAttribute.String, AbstractNamedObject>();
 	
 	/**
 	 * Adds a JPatchObject to the maps. This method also adds an AttributeListener to
@@ -18,7 +18,7 @@ public class ObjectRegistry implements AttributePostChangeListener {
 			throw new IllegalStateException();
 		}
 		insert(object);
-		Attribute.String nameAttribute = object.name;
+		ScalarAttribute.String nameAttribute = object.name;
 		attributeMap.put(nameAttribute, object);
 		nameAttribute.addAttributeListener(this);
 	}
@@ -30,7 +30,7 @@ public class ObjectRegistry implements AttributePostChangeListener {
 	 */
 	public void remove(AbstractNamedObject object) {
 		removeFromMap(object);
-		Attribute.String nameAttribute = object.name;
+		ScalarAttribute.String nameAttribute = object.name;
 		nameAttribute.removeAttributeListener(this);
 		attributeMap.remove(nameAttribute);
 	}
@@ -74,7 +74,7 @@ public class ObjectRegistry implements AttributePostChangeListener {
 	 * If the name of an object changes, remove it from the maps and add it again.
 	 * @see jpatch.entity.AttributeListener#attributeChanged(jpatch.entity.Attribute)
 	 */
-	public void attributeHasChanged(Attribute attribute) {
+	public void attributeHasChanged(ScalarAttribute attribute) {
 		AbstractNamedObject object = attributeMap.get(attribute);
 		removeFromMap(object);
 		insert(object);

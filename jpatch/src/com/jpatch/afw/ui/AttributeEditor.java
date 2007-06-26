@@ -190,11 +190,13 @@ public class AttributeEditor {
 			AttributeManager.getInstance().bindCheckBoxToAttribute((JCheckBox) binding.components[0], (BooleanAttr) attribute);
 		} else if (attribute instanceof StateMachine) {
 			AttributeManager.getInstance().bindComboBoxToAttribute((JComboBox) binding.components[0], (StateMachine) attribute);
-		} else {
-			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[0], attribute);
+		} else if (attribute instanceof ScalarAttribute){
+			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[0], (ScalarAttribute) attribute);
 			if (binding.components.length == 2) {
 				AttributeManager.getInstance().bindSliderToAttribute((JSlider) binding.components[1], (DoubleAttr) attribute, IdentityMapping.getInstance());
 			}
+		} else {
+			throw new IllegalStateException();
 		}
 	}
 	

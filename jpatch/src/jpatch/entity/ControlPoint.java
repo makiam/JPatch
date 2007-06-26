@@ -13,11 +13,11 @@ import javax.vecmath.*;
 public class ControlPoint extends AbstractJPatchXObject {
 	public static enum TangentMode { DEFAULT, SPATCH };
 	
-	public Attribute.Tuple3Attr referencePosition = new Attribute.Tuple3Attr(null, 0, 0, 0, false);
-	public Attribute.Tuple3Attr position = new Attribute.Tuple3Attr(null, 0, 0, 0, false);
-	public Attribute.Double magnitude = new Attribute.Double(1);
-	public Attribute.Enum<TangentMode> tangentMode = new Attribute.Enum<TangentMode>(TangentMode.DEFAULT);
-	public Attribute.Double hookPos = new Attribute.Double();
+	public ScalarAttribute.Tuple3Attr referencePosition = new ScalarAttribute.Tuple3Attr(null, 0, 0, 0, false);
+	public ScalarAttribute.Tuple3Attr position = new ScalarAttribute.Tuple3Attr(null, 0, 0, 0, false);
+	public ScalarAttribute.Double magnitude = new ScalarAttribute.Double(1);
+	public ScalarAttribute.Enum<TangentMode> tangentMode = new ScalarAttribute.Enum<TangentMode>(TangentMode.DEFAULT);
+	public ScalarAttribute.Double hookPos = new ScalarAttribute.Double();
 	
 	private Matrix4d transform = new Matrix4d(Constants.IDENTITY_MATRIX);
 	private Matrix4d invTransform = new Matrix4d(Constants.IDENTITY_MATRIX);
@@ -49,7 +49,7 @@ public class ControlPoint extends AbstractJPatchXObject {
 		this.model = model;
 		id = model.getNextCpId();
 		position.addAttributeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute attribute) {
+			public void attributeHasChanged(ScalarAttribute attribute) {
 //				System.out.println(ControlPoint.this + " position changed");
 				position.get(pos);
 				refPos.set(pos);
@@ -63,7 +63,7 @@ public class ControlPoint extends AbstractJPatchXObject {
 			}
 		});
 		referencePosition.addAttributeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute attribute) {
+			public void attributeHasChanged(ScalarAttribute attribute) {
 				referencePosition.get(refPos);
 				pos.set(refPos);
 				transform.transform(pos);

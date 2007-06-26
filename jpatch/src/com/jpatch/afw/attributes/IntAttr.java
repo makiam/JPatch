@@ -1,6 +1,6 @@
 package com.jpatch.afw.attributes;
 
-public class IntAttr extends AbstractAttribute {
+public class IntAttr extends AbstractScalarAttribute {
 	protected int value;
 
 	public IntAttr() {

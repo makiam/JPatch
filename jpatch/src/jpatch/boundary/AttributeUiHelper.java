@@ -46,7 +46,7 @@ public class AttributeUiHelper {
 //		return label;
 //	}
 	
-	public static JSlider createSliderFor(final Attribute.Double attribute, final double min, final double max) {
+	public static JSlider createSliderFor(final ScalarAttribute.Double attribute, final double min, final double max) {
 		final JSlider slider;
 		slider = new JSlider(0, 0x10000);
 		final int intMax = 0x10000 * 0x10000;
@@ -90,12 +90,12 @@ public class AttributeUiHelper {
 	
 	public static JSlider createSliderFor(final Attribute attribute) {
 		final JSlider slider;
-		if (attribute instanceof Attribute.BoundedInteger) {
+		if (attribute instanceof ScalarAttribute.BoundedInteger) {
 			slider = new JSlider(((Attribute.BoundedInteger) attribute).getMin(), ((Attribute.BoundedInteger) attribute).getMax());
 			slider.setMinorTickSpacing(1);
 			slider.setSnapToTicks(true);
 			slider.setToolTipText(attribute.getName());
-		} else if (attribute instanceof Attribute.BoundedDouble) {
+		} else if (attribute instanceof ScalarAttribute.BoundedDouble) {
 			slider = new JSlider(0, 100000);
 		} else {
 			throw new IllegalStateException();
@@ -106,10 +106,10 @@ public class AttributeUiHelper {
 		/* create a ChangeListener to update the attribute if the slider was changed */
 		slider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				if (attribute instanceof Attribute.BoundedInteger) {
+				if (attribute instanceof ScalarAttribute.BoundedInteger) {
 					((Attribute.BoundedInteger) attribute).set(slider.getValue());
-				} else if (attribute instanceof Attribute.BoundedDouble) {
-					Attribute.BoundedDouble bdAttr = ((Attribute.BoundedDouble) attribute);
+				} else if (attribute instanceof ScalarAttribute.BoundedDouble) {
+					ScalarAttribute.BoundedDouble bdAttr = ((Attribute.BoundedDouble) attribute);
 					double min = bdAttr.min.get();
 					double max = bdAttr.max.get();
 					bdAttr.set(min + slider.getValue() * (max - min) / (slider.getMaximum() - slider.getMinimum()));
@@ -146,7 +146,7 @@ public class AttributeUiHelper {
 	public static JComponent createBooleanComboFor(final Attribute attribute) {
 		
 		
-		final Attribute.KeyedBoolean attrkb = (Attribute.KeyedBoolean) attribute;
+		final ScalarAttribute.KeyedBoolean attrkb = (Attribute.KeyedBoolean) attribute;
 		Box box = Box.createHorizontalBox();
 		
 		final JSpinner comboBox = new JSpinner(new SpinnerListModel(OFF_ON));
@@ -322,7 +322,7 @@ public class AttributeUiHelper {
 		return textField;
 	}
 	
-	public static JComboBox createComboBoxFor(final Attribute.Enum attribute) {
+	public static JComboBox createComboBoxFor(final ScalarAttribute.Enum attribute) {
 		final JComboBox comboBox = new JComboBox(attribute.get().getDeclaringClass().getEnumConstants());
 		comboBox.setSelectedIndex(attribute.get().ordinal());
 		
@@ -387,10 +387,10 @@ public class AttributeUiHelper {
 	}
 	
 	private static void setSliderValue(JSlider slider, Attribute attribute) {
-		if (attribute instanceof Attribute.BoundedInteger) {
+		if (attribute instanceof ScalarAttribute.BoundedInteger) {
 			slider.setValue(((Attribute.Integer) attribute).get());
-		} else if (attribute instanceof Attribute.BoundedDouble) {
-			Attribute.BoundedDouble bdAttr = (Attribute.BoundedDouble) attribute;
+		} else if (attribute instanceof ScalarAttribute.BoundedDouble) {
+			ScalarAttribute.BoundedDouble bdAttr = (Attribute.BoundedDouble) attribute;
 			double min = bdAttr.min.get();
 			double max = bdAttr.max.get();
 			double value = bdAttr.get();

@@ -7,7 +7,7 @@ import jpatch.entity.*;
 
 public class AttributeXmlWriter {
 	
-	public void writeAttribute(PrintStream out, String prefix, Attribute attribute) {
+	public void writeAttribute(PrintStream out, String prefix, ScalarAttribute attribute) {
 		out.append(prefix).append("<attribute name=\"").append(attribute.getName()).append("\" ");
 		writeAttributeTag(out, attribute);
 		out.append(">");
@@ -18,71 +18,71 @@ public class AttributeXmlWriter {
 			out.append(prefix).append("\t<value>").append(getAttributeValue(attribute)).append("</value>");
 			out.println();
 		}
-		if (attribute instanceof Attribute.BoundedDouble) {
-			writeAttribute(out, prefix + "\t", ((Attribute.BoundedDouble) attribute).min);
-			writeAttribute(out, prefix + "\t", ((Attribute.BoundedDouble) attribute).max);
-		} else if (attribute instanceof Attribute.Tuple3Attr) {
-			writeAttribute(out, prefix + "\t", ((Attribute.Tuple3Attr) attribute).x);
-			writeAttribute(out, prefix + "\t", ((Attribute.Tuple3Attr) attribute).y);
-			writeAttribute(out, prefix + "\t", ((Attribute.Tuple3Attr) attribute).z);
-			if (attribute instanceof Attribute.Rotation) {
-				writeAttribute(out, prefix + "\t", ((Attribute.Rotation) attribute).order);
+		if (attribute instanceof ScalarAttribute.BoundedDouble) {
+			writeAttribute(out, prefix + "\t", ((ScalarAttribute.BoundedDouble) attribute).min);
+			writeAttribute(out, prefix + "\t", ((ScalarAttribute.BoundedDouble) attribute).max);
+		} else if (attribute instanceof ScalarAttribute.Tuple3Attr) {
+			writeAttribute(out, prefix + "\t", ((ScalarAttribute.Tuple3Attr) attribute).x);
+			writeAttribute(out, prefix + "\t", ((ScalarAttribute.Tuple3Attr) attribute).y);
+			writeAttribute(out, prefix + "\t", ((ScalarAttribute.Tuple3Attr) attribute).z);
+			if (attribute instanceof ScalarAttribute.Rotation) {
+				writeAttribute(out, prefix + "\t", ((ScalarAttribute.Rotation) attribute).order);
 			}
 		}
 		out.append(getAttributeValue(attribute)).append("</attribute>");
 		out.println();
 	}
 	
-	private void writeAttributeTag(PrintStream out, Attribute attribute) {
+	private void writeAttributeTag(PrintStream out, ScalarAttribute attribute) {
 		throw new IllegalArgumentException();
 	}
 	
-	private void writeAttributeTag(PrintStream out, Attribute.Boolean attribute) {
+	private void writeAttributeTag(PrintStream out, ScalarAttribute.Boolean attribute) {
 		out.append("type=\"boolean\"");
 	}
 	
-	private void writeAttributeTag(PrintStream out, Attribute.BoundedDouble attribute) {
+	private void writeAttributeTag(PrintStream out, ScalarAttribute.BoundedDouble attribute) {
 		out.append("type=\"bounded double\"");
 	}
 	
-	private void writeAttributeTag(PrintStream out, Attribute.BoundedInteger attribute) {
+	private void writeAttributeTag(PrintStream out, ScalarAttribute.BoundedInteger attribute) {
 		out.append("type=\"bounded integer\" ");
 		out.append("min=\"").append(Integer.toString(attribute.getMin())).append("\" ");
 		out.append("max=\"").append(Integer.toString(attribute.getMax())).append("\"");
 	}
 	
-	private void writeAttributeTag(PrintStream out, Attribute.Double attribute) {
+	private void writeAttributeTag(PrintStream out, ScalarAttribute.Double attribute) {
 		out.append("type=\"double\"");
 	}
 	
-	private void writeAttributeTag(PrintStream out, Attribute.Enum attribute) {
+	private void writeAttributeTag(PrintStream out, ScalarAttribute.Enum attribute) {
 		out.append("type=\"enum\"");
 	}
 	
-	private void writeAttributeTag(PrintStream out, Attribute.Integer attribute) {
+	private void writeAttributeTag(PrintStream out, ScalarAttribute.Integer attribute) {
 		out.append("type=\"integer\"");
 	}
 	
-	private void writeAttributeTag(PrintStream out, Attribute.KeyedBoolean attribute) {
+	private void writeAttributeTag(PrintStream out, ScalarAttribute.KeyedBoolean attribute) {
 		out.append("type=\"keyed boolean\"");
 	}
 	
-	private void writeAttributeTag(PrintStream out, Attribute.Limit attribute) {
+	private void writeAttributeTag(PrintStream out, ScalarAttribute.Limit attribute) {
 		out.append("type=\"limit\"");
 	}
 	
-	private void writeAttributeTag(PrintStream out, Attribute.Rotation attribute) {
+	private void writeAttributeTag(PrintStream out, ScalarAttribute.Rotation attribute) {
 		out.append("type=\"rotation\"");
 	}
 	
-	private void writeAttributeTag(PrintStream out, Attribute.String attribute) {
+	private void writeAttributeTag(PrintStream out, ScalarAttribute.String attribute) {
 		if (attribute.isUseTextArea())
 			out.append("type=\"text\"");
 		else
 			out.append("type=\"string\"");
 	}
 	
-	private void writeAttributeTag(PrintStream out, Attribute.Tuple3Attr attribute) {
+	private void writeAttributeTag(PrintStream out, ScalarAttribute.Tuple3Attr attribute) {
 		if (attribute.getTupleClass().equals(javax.vecmath.Point3d.class))
 			out.append("type=\"point\"");
 		if (attribute.getTupleClass().equals(Vector3d.class))
@@ -92,27 +92,27 @@ public class AttributeXmlWriter {
 	}
 	
 	@SuppressWarnings("unused")
-	private String getAttributeValue(Attribute attribute) {
+	private String getAttributeValue(ScalarAttribute attribute) {
 		throw new IllegalArgumentException();
 	}
 	
 	@SuppressWarnings("unused")
-	private String getAttributeValue(Attribute.Boolean attribute) {
+	private String getAttributeValue(ScalarAttribute.Boolean attribute) {
 		return Boolean.toString(attribute.get());
 	}
 	
 	@SuppressWarnings("unused")
-	private String getAttributeValue(Attribute.Double attribute) {
+	private String getAttributeValue(ScalarAttribute.Double attribute) {
 		return Double.toString(attribute.get());
 	}
 	
 	@SuppressWarnings("unused")
-	private String getAttributeValue(Attribute.Integer attribute) {
+	private String getAttributeValue(ScalarAttribute.Integer attribute) {
 		return Integer.toString(attribute.get());
 	}
 	
 	@SuppressWarnings("unused")
-	private String getAttributeValue(Attribute.Enum attribute) {
+	private String getAttributeValue(ScalarAttribute.Enum attribute) {
 		return attribute.get().name();
 	}
 }

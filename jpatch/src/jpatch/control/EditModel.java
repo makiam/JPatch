@@ -402,8 +402,8 @@ public class EditModel {
 		if (DEBUG) {
 			System.out.println("EditModel.weldControlPoint(" + editList + ", " + cp + ", " + target + ")");
 		}
-		Attribute.Tuple3Attr cpPos = cp.getNext() != null ? cp.getNext().position : cp.getPrev().position;
-		Attribute.Tuple3Attr targetPos = target.getHead().position;
+		ScalarAttribute.Tuple3Attr cpPos = cp.getNext() != null ? cp.getNext().position : cp.getPrev().position;
+		ScalarAttribute.Tuple3Attr targetPos = target.getHead().position;
 		ControlPoint cpEnd = getCurveEnd(cp.getHead(), targetPos.x.get(), targetPos.y.get(), targetPos.z.get());
 		ControlPoint targetEnd = getCurveEnd(target.getHead(), cpPos.x.get(), cpPos.y.get(), cpPos.z.get());
 		if (cpEnd != null && targetEnd != null && (cpEnd.isUnattached() || targetEnd.isUnattached())) {
@@ -456,7 +456,7 @@ public class EditModel {
 			System.out.println("getCurveEnd(" + head + ", " + matchX + ", " + matchY + ", " + matchZ + ")");
 		}
 		assert head.isHead() : head + " is not a head.";
-		Attribute.Tuple3Attr pos = head.position;
+		ScalarAttribute.Tuple3Attr pos = head.position;
 		double posX = pos.x.get();
 		double posY = pos.y.get();
 		double posZ = pos.z.get();
@@ -477,12 +477,12 @@ public class EditModel {
 			ControlPoint next = cp.getNext();
 			ControlPoint prev = cp.getPrev();
 			if (next != null && prev == null) {
-				Attribute.Tuple3Attr nPos = next.position;
+				ScalarAttribute.Tuple3Attr nPos = next.position;
 				testX = posX - nPos.x.get();
 				testY = posY - nPos.y.get();
 				testZ = posZ - nPos.z.get();
 			} else if (next == null && prev != null) {
-				Attribute.Tuple3Attr pPos = prev.position;
+				ScalarAttribute.Tuple3Attr pPos = prev.position;
 				testX = posX - pPos.x.get();
 				testY = posY - pPos.y.get();
 				testZ = posZ - pPos.z.get();

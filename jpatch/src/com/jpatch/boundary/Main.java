@@ -382,7 +382,7 @@ public class Main {
 //		frame.setUndecorated(true);
 		actions.toolSM.addAttributePreChangeListener(new AttributePreChangeAdapter() {
 			@Override
-			public Object attributeWillChange(Attribute source, Object value) {
+			public Object attributeWillChange(ScalarAttribute source, Object value) {
 				StateMachine<JPatchTool> sm = (StateMachine<JPatchTool>) source;
 				sm.getValue().unregisterListeners(viewports);
 				return value;

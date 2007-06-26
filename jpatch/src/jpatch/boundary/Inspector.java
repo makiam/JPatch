@@ -89,7 +89,7 @@ public class Inspector {
 		return object;
 	}
 	
-	private void setLabelText(Attribute.Name attribute) {
+	private void setLabelText(ScalarAttribute.Name attribute) {
 		label.setText(attribute.get());
 	}
 }

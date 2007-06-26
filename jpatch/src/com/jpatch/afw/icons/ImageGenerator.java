@@ -1,6 +1,6 @@
 package com.jpatch.afw.icons;
 
-import com.jpatch.afw.attributes.Attribute;
+import com.jpatch.afw.attributes.ScalarAttribute;
 import com.jpatch.afw.attributes.AttributePreChangeAdapter;
 import com.jpatch.afw.attributes.AttributePostChangeListener;
 import com.jpatch.afw.attributes.StateMachine;
@@ -169,7 +169,7 @@ public class ImageGenerator {
 		
 		StateMachine<ViewportSwitcher.Mode> sm = new StateMachine<ViewportSwitcher.Mode>(ViewportSwitcher.Mode.class, ViewportSwitcher.Mode.VIEWPORT_1);
 		sm.addAttributeListener(new AttributePreChangeAdapter() {
-			public void attributeHasChanged(Attribute source) {
+			public void attributeHasChanged(ScalarAttribute source) {
 				System.out.println(((StateMachine) source).getState());
 			}
 		});

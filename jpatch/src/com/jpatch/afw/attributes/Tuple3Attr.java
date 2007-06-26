@@ -2,7 +2,7 @@ package com.jpatch.afw.attributes;
 
 import javax.vecmath.*;
 
-public class Tuple3Attr extends AbstractAttribute<Tuple3d> {
+public class Tuple3Attr extends AbstractAttribute {
 	protected final DoubleAttr xAttr;
 	protected final DoubleAttr yAttr;
 	protected final DoubleAttr zAttr;
@@ -94,14 +94,5 @@ public class Tuple3Attr extends AbstractAttribute<Tuple3d> {
 	@Override
 	public String toString() {
 		return "(" + xAttr.getDouble() + ", " + yAttr.getDouble() + ", " + zAttr.getDouble() + ")";
-	}
-	
-	/**
-	 * Trows an UnsupportedOperationException
-	 * @throws UnsupportedOperationException
-	 */
-	@Override
-	public void addAttributePreChangeListener(AttributePreChangeListener l) {
-		throw new UnsupportedOperationException();
 	}
 }

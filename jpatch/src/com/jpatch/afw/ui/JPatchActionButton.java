@@ -1,8 +1,6 @@
 package com.jpatch.afw.ui;
 
-import com.jpatch.afw.attributes.Attribute;
-import com.jpatch.afw.attributes.AttributePostChangeListener;
-import com.jpatch.afw.attributes.BooleanAttr;
+import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.JPatchAction;
 import javax.swing.JButton;
 

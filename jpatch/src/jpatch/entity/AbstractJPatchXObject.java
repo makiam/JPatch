@@ -5,33 +5,33 @@ import java.util.Iterator;
 
 public abstract class AbstractJPatchXObject implements JPatchObject {
 	
-	private Iterable<Attribute> attributes = new Iterable<Attribute>() {
-		public Iterator<Attribute> iterator() {
+	private Iterable<ScalarAttribute> attributes = new Iterable<ScalarAttribute>() {
+		public Iterator<ScalarAttribute> iterator() {
 			return createAttributeIterator();
 		}
 	};
 	
-	private Iterable<Attribute> channels = new Iterable<Attribute>() {
-		public Iterator<Attribute> iterator() {
+	private Iterable<ScalarAttribute> channels = new Iterable<ScalarAttribute>() {
+		public Iterator<ScalarAttribute> iterator() {
 			return createChannelIterator();
 		}
 	};
 	
-	public Iterable<Attribute> getAttributes() {
+	public Iterable<ScalarAttribute> getAttributes() {
 		return attributes;
 	}
 	
-	public Iterable<Attribute> getChannels() {
+	public Iterable<ScalarAttribute> getChannels() {
 		return channels;
 	}
 	
-	public Attribute getAttribute(int index) {
+	public ScalarAttribute getAttribute(int index) {
 		int i = 0;
 		for (Field field : getClass().getFields()) {
-			if (Attribute.class.isAssignableFrom(field.getType())) {
+			if (ScalarAttribute.class.isAssignableFrom(field.getType())) {
 				if (i == index) {
 					try {
-						return (Attribute) field.get(this);
+						return (ScalarAttribute) field.get(this);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -42,15 +42,15 @@ public abstract class AbstractJPatchXObject implements JPatchObject {
 		return null;
 	}
 
-	private Iterator<Attribute> createAttributeIterator() {
-		return new Iterator<Attribute>() {
+	private Iterator<ScalarAttribute> createAttributeIterator() {
+		return new Iterator<ScalarAttribute>() {
 			private int index = 0;
 			
 			public boolean hasNext() {
 				return getAttribute(index + 1) != null;
 			}
 
-			public Attribute next() {
+			public ScalarAttribute next() {
 				return getAttribute(index++);
 			}
 			
@@ -60,16 +60,16 @@ public abstract class AbstractJPatchXObject implements JPatchObject {
 		};
 	}
 	
-	private Iterator<Attribute> createChannelIterator() {
-		return new Iterator<Attribute>() {
+	private Iterator<ScalarAttribute> createChannelIterator() {
+		return new Iterator<ScalarAttribute>() {
 			private int index = searchNextChannel();
 			
 			public boolean hasNext() {
 				return getAttribute(index + 1) != null;
 			}
 
-			public Attribute next() {
-				Attribute a = getAttribute(index++);
+			public ScalarAttribute next() {
+				ScalarAttribute a = getAttribute(index++);
 				searchNextChannel();
 				return a;
 			}
@@ -79,7 +79,7 @@ public abstract class AbstractJPatchXObject implements JPatchObject {
 			}
 			
 			private int searchNextChannel() {
-				Attribute a;
+				ScalarAttribute a;
 				for (a = getAttribute(index); a != null; index++)
 					if (a.isKeyed())
 						break;

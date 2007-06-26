@@ -32,18 +32,18 @@ import jpatch.auxilary.*;
 
 public class TransformNode extends AbstractTransform {
 	
-	public Attribute.KeyedBoolean visibility = new Attribute.KeyedBoolean("Visibility", true);
-	public Attribute.Enum rotationOrder = new Attribute.Enum(Rotation3d.Order.XYZ);
-	public Attribute.Tuple3Attr position = new Attribute.Tuple3Attr("Position", 0, 0, 0, false);
-	public Attribute.Tuple3Attr translation = new Attribute.Tuple3Attr("Translation", 0, 0, 0, true);
-	public Attribute.Tuple3Attr orientation = new Attribute.Tuple3Attr("Orientation", 0, 0, 0, false);
-	public Attribute.Tuple3Attr rotation = new Attribute.Tuple3Attr("Rotation", 0, 0, 0, true);
-	public Attribute.Tuple3Attr scale = new Attribute.Tuple3Attr("Scale", 1, 1, 1, true);
-	public Attribute.Tuple3Attr scalePivotPosition = new Attribute.Tuple3Attr("Pivot (world)", 0, 0, 0, false);
-	public Attribute.Tuple3Attr scalePivotTranslation = new Attribute.Tuple3Attr("Pivot (local)", 0, 0, 0, false);
-	public Attribute.Tuple3Attr rotatePivotPosition = new Attribute.Tuple3Attr("Pivot (world)", 0, 0, 0, false);
-	public Attribute.Tuple3Attr rotatePivotTranslation = new Attribute.Tuple3Attr("Pivot (local)", 0, 0, 0, false);
-	public Attribute.Tuple3Attr shear = new Attribute.Tuple3Attr("Shear", 0, 0, 0, true);
+	public ScalarAttribute.KeyedBoolean visibility = new ScalarAttribute.KeyedBoolean("Visibility", true);
+	public ScalarAttribute.Enum rotationOrder = new ScalarAttribute.Enum(Rotation3d.Order.XYZ);
+	public ScalarAttribute.Tuple3Attr position = new ScalarAttribute.Tuple3Attr("Position", 0, 0, 0, false);
+	public ScalarAttribute.Tuple3Attr translation = new ScalarAttribute.Tuple3Attr("Translation", 0, 0, 0, true);
+	public ScalarAttribute.Tuple3Attr orientation = new ScalarAttribute.Tuple3Attr("Orientation", 0, 0, 0, false);
+	public ScalarAttribute.Tuple3Attr rotation = new ScalarAttribute.Tuple3Attr("Rotation", 0, 0, 0, true);
+	public ScalarAttribute.Tuple3Attr scale = new ScalarAttribute.Tuple3Attr("Scale", 1, 1, 1, true);
+	public ScalarAttribute.Tuple3Attr scalePivotPosition = new ScalarAttribute.Tuple3Attr("Pivot (world)", 0, 0, 0, false);
+	public ScalarAttribute.Tuple3Attr scalePivotTranslation = new ScalarAttribute.Tuple3Attr("Pivot (local)", 0, 0, 0, false);
+	public ScalarAttribute.Tuple3Attr rotatePivotPosition = new ScalarAttribute.Tuple3Attr("Pivot (world)", 0, 0, 0, false);
+	public ScalarAttribute.Tuple3Attr rotatePivotTranslation = new ScalarAttribute.Tuple3Attr("Pivot (local)", 0, 0, 0, false);
+	public ScalarAttribute.Tuple3Attr shear = new ScalarAttribute.Tuple3Attr("Shear", 0, 0, 0, true);
 	
 	private ObjectRegistry objectRegistry;
 	private TransformNode parent;
@@ -99,34 +99,34 @@ public class TransformNode extends AbstractTransform {
 //		});
 		
 		position.addAttributeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute attribute) {
+			public void attributeHasChanged(ScalarAttribute attribute) {
 				positionChanged(position, translation);
 				computeBranch();
 			}
 		});
 		translation.addAttributeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute attribute) {
+			public void attributeHasChanged(ScalarAttribute attribute) {
 				translationChanged(translation, position);
 				computeBranch();
 			}
 		});
 		scalePivotPosition.addAttributeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute attribute) {
+			public void attributeHasChanged(ScalarAttribute attribute) {
 				positionChanged(scalePivotPosition, scalePivotTranslation);
 			}
 		});
 		scalePivotTranslation.addAttributeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute attribute) {
+			public void attributeHasChanged(ScalarAttribute attribute) {
 				translationChanged(scalePivotTranslation, scalePivotPosition);
 			}
 		});
 		rotatePivotPosition.addAttributeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute attribute) {
+			public void attributeHasChanged(ScalarAttribute attribute) {
 				positionChanged(rotatePivotPosition, rotatePivotTranslation);
 			}
 		});
 		rotatePivotTranslation.addAttributeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute attribute) {
+			public void attributeHasChanged(ScalarAttribute attribute) {
 				translationChanged(rotatePivotTranslation, rotatePivotPosition);
 			}
 		});
