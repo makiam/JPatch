@@ -16,7 +16,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 	private final CollectionAttr<T> states;
 	
 	/**
-	 * A view to the states CollectionAttr. Redirects read-requests to the states objects, but prohibits any modification of the states object.
+	 * A view of the states CollectionAttr. Redirects read-requests to the states objects, but prohibits any modification of the states object.
 	 */
 	private final CollectionAttr<T> statesView = new CollectionAttr<T>() {
 		@Override
@@ -60,12 +60,12 @@ public class StateMachine<T> extends GenericAttr<T> {
 	/**
 	 * The default state of this state machine (may be <i>null</i>)
 	 */
-	protected T defaultState;
+	private T defaultState;
 	
 	/**
 	 * Wheter or not this StateMachine should revert to the default state
 	 */
-	protected boolean revertToDefault;
+	private boolean revertToDefault;
 	
 	/**
 	 * Creates a new StateMachine for the specified states and sets the initial state to <i>null</i>.

@@ -1,7 +1,7 @@
 package com.jpatch.afw.attributes;
 
 public class DoubleAttr extends AbstractScalarAttribute {
-	protected double value;
+	private double value;
 
 	public DoubleAttr() {
 		this(0.0);

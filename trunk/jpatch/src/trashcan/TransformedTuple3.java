@@ -47,9 +47,9 @@ public abstract class TransformedTuple3 extends Tuple3Attr {
 				autoTransform = true;
 			}
 		};
-		xAttr.addAttributePostChangeListener(invTransformAttributeListener);
-		yAttr.addAttributePostChangeListener(invTransformAttributeListener);
-		zAttr.addAttributePostChangeListener(invTransformAttributeListener);
+		getXAttr().addAttributePostChangeListener(invTransformAttributeListener);
+		getYAttr().addAttributePostChangeListener(invTransformAttributeListener);
+		getZAttr().addAttributePostChangeListener(invTransformAttributeListener);
 		referenceTuple.getXAttr().addAttributePostChangeListener(transformAttributeListener);
 		referenceTuple.getYAttr().addAttributePostChangeListener(transformAttributeListener);
 		referenceTuple.getZAttr().addAttributePostChangeListener(transformAttributeListener);

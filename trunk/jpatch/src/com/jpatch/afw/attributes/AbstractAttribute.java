@@ -5,12 +5,12 @@ public class AbstractAttribute implements Attribute {
 	 * An array holding the AttributePostChangeListener of this AbstractAttributes.
 	 * Can be null (i.e. will be set to null if the list is empty)
 	 */
-	protected AttributePostChangeListener[] attributePostChangeListeners = null;
+	private AttributePostChangeListener[] attributePostChangeListeners = null;
 
 	/**
 	 * Whether or not to fire "attributeHasChanged" events (post-change-notifications)
 	 */
-	protected boolean fireEvents = true;
+	boolean fireEvents = true;
 	
 	/**
      * Adds an addAttributePostChangeListener to this attribute.
@@ -94,7 +94,7 @@ public class AbstractAttribute implements Attribute {
     /**
      * Calls the attributeHasChanged method of each registered attributePostChangeListener.
      */
-    protected void fireAttributeHasChanged() {
+    void fireAttributeHasChanged() {
     	if (fireEvents && attributePostChangeListeners != null) {
     		fireEvents = false;
 	    	for (int i = 0; i < attributePostChangeListeners.length; i++) {

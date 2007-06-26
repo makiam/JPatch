@@ -13,7 +13,7 @@ public class SoftBoundedDoubleAttr extends DoubleAttr {
 	
 	private final AttributePostChangeListener attributeListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
-			setDouble(value);
+			setDouble(getDouble());
 		}
 	};
 	
