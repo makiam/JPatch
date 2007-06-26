@@ -6,6 +6,7 @@ public class AbstractAttribute implements Attribute {
 	 * Can be null (i.e. will be set to null if the list is empty)
 	 */
 	protected AttributePostChangeListener[] attributePostChangeListeners = null;
+
 	/**
 	 * Whether or not to fire "attributeHasChanged" events (post-change-notifications)
 	 */
