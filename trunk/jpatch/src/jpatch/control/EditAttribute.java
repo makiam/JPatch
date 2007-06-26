@@ -16,7 +16,7 @@ import jpatch.entity.Attribute;
  * applied and the edit is used to make the change undoable.
  * 
  * @author sascha
- * @see jpatch.entity.Attribute
+ * @see jpatch.entity.ScalarAttribute
  */
 public final class EditAttribute {
 	
@@ -33,7 +33,7 @@ public final class EditAttribute {
 	 * @param changeNow set to true to apply the change now
 	 * @return a new JPatchUndoableEdit object that encapsulates the specified modification
 	 */
-	public static JPatchUndoableEdit changeAttribute(Attribute.Double attribute, double value, boolean changeNow) {
+	public static JPatchUndoableEdit changeAttribute(ScalarAttribute.Double attribute, double value, boolean changeNow) {
 		return new Double(attribute, value, changeNow);
 	}
 	
@@ -44,7 +44,7 @@ public final class EditAttribute {
 	 * @param changeNow set to true to apply the change now
 	 * @return a new JPatchUndoableEdit object that encapsulates the specified modification
 	 */
-	public static JPatchUndoableEdit changeAttribute(Attribute.Integer attribute, int value, boolean changeNow) {
+	public static JPatchUndoableEdit changeAttribute(ScalarAttribute.Integer attribute, int value, boolean changeNow) {
 		return new Integer(attribute, value, changeNow);
 	}
 	
@@ -55,7 +55,7 @@ public final class EditAttribute {
 	 * @param changeNow set to true to apply the change now
 	 * @return a new JPatchUndoableEdit object that encapsulates the specified modification
 	 */
-	public static JPatchUndoableEdit changeAttribute(Attribute.Tuple3Attr attribute, Tuple3d tuple, boolean changeNow) {
+	public static JPatchUndoableEdit changeAttribute(ScalarAttribute.Tuple3Attr attribute, Tuple3d tuple, boolean changeNow) {
 		return changeAttribute(attribute, tuple.x, tuple.y, tuple.z, changeNow);
 	}
 	
@@ -66,7 +66,7 @@ public final class EditAttribute {
 	 * @param changeNow set to true to apply the change now
 	 * @return a new JPatchUndoableEdit object that encapsulates the specified modification
 	 */
-	public static JPatchUndoableEdit changeAttribute(Attribute.Tuple3Attr attribute, Tuple3f tuple, boolean changeNow) {
+	public static JPatchUndoableEdit changeAttribute(ScalarAttribute.Tuple3Attr attribute, Tuple3f tuple, boolean changeNow) {
 		return changeAttribute(attribute, tuple.x, tuple.y, tuple.z, changeNow);
 	}
 	
@@ -79,7 +79,7 @@ public final class EditAttribute {
 	 * @param changeNow set to true to apply the change now
 	 * @return a new JPatchUndoableEdit object that encapsulates the specified modification
 	 */
-	public static JPatchUndoableEdit changeAttribute(Attribute.Tuple3Attr attribute, double x, double y, double z, boolean changeNow) {
+	public static JPatchUndoableEdit changeAttribute(ScalarAttribute.Tuple3Attr attribute, double x, double y, double z, boolean changeNow) {
 		return new Tuple(attribute, x, y, z, changeNow);
 	}
 	
@@ -90,7 +90,7 @@ public final class EditAttribute {
 	 * @param changeNow set to true to apply the change now
 	 * @return a new JPatchUndoableEdit object that encapsulates the specified modification
 	 */
-	public static JPatchUndoableEdit changeAttribute(Attribute.Enum attribute, java.lang.Enum e, boolean changeNow) {
+	public static JPatchUndoableEdit changeAttribute(ScalarAttribute.Enum attribute, java.lang.Enum e, boolean changeNow) {
 		return new Enum(attribute, e, changeNow);
 	}
 	
@@ -101,7 +101,7 @@ public final class EditAttribute {
 	 * @param changeNow set to true to apply the change now
 	 * @return a new JPatchUndoableEdit object that encapsulates the specified modification
 	 */
-	public static JPatchUndoableEdit changeAttribute(Attribute.String attribute, java.lang.String string, boolean changeNow) {
+	public static JPatchUndoableEdit changeAttribute(ScalarAttribute.String attribute, java.lang.String string, boolean changeNow) {
 		return new String(attribute, string, changeNow);
 	}
 	
@@ -126,10 +126,10 @@ public final class EditAttribute {
 	 * JPatchUndoableEdit that modifies a double Attribute
 	 */
 	private static final class Double extends SwapperEdit {
-		private final Attribute.Double attribute;
+		private final ScalarAttribute.Double attribute;
 		double value;
 		
-		private Double(Attribute.Double attribute, double value, boolean changeNow) {
+		private Double(ScalarAttribute.Double attribute, double value, boolean changeNow) {
 			this.attribute = attribute;
 			this.value = value;
 			if (changeNow) {
@@ -150,10 +150,10 @@ public final class EditAttribute {
 	 * JPatchUndoableEdit that modifies an integer Attribute
 	 */
 	private static final class Integer extends SwapperEdit {
-		private final Attribute.Integer attribute;
+		private final ScalarAttribute.Integer attribute;
 		int value;
 		
-		private Integer(Attribute.Integer attribute, int value, boolean changeNow) {
+		private Integer(ScalarAttribute.Integer attribute, int value, boolean changeNow) {
 			this.attribute = attribute;
 			this.value = value;
 			if (changeNow) {
@@ -174,10 +174,10 @@ public final class EditAttribute {
 	 * JPatchUndoableEdit that modifies a tuple Attribute
 	 */
 	private static final class Tuple extends SwapperEdit {
-		private final Attribute.Tuple3Attr attribute;
+		private final ScalarAttribute.Tuple3Attr attribute;
 		double x, y, z;
 		
-		private Tuple(Attribute.Tuple3Attr attribute, double x, double y, double z, boolean changeNow) {
+		private Tuple(ScalarAttribute.Tuple3Attr attribute, double x, double y, double z, boolean changeNow) {
 			this.attribute = attribute;
 			this.x = x;
 			this.y = y;
@@ -204,10 +204,10 @@ public final class EditAttribute {
 	 * JPatchUndoableEdit that modifies an enum Attribute
 	 */
 	private static final class Enum extends SwapperEdit {
-		private final Attribute.Enum attribute;
+		private final ScalarAttribute.Enum attribute;
 		java.lang.Enum e;
 		
-		private Enum(Attribute.Enum attribute, java.lang.Enum e, boolean changeNow) {
+		private Enum(ScalarAttribute.Enum attribute, java.lang.Enum e, boolean changeNow) {
 			this.attribute = attribute;
 			this.e = e;
 			if (changeNow) {
@@ -229,10 +229,10 @@ public final class EditAttribute {
 	 * JPatchUndoableEdit that modifies a string Attribute
 	 */
 	private static final class String extends SwapperEdit {
-		private final Attribute.String attribute;
+		private final ScalarAttribute.String attribute;
 		java.lang.String string;
 		
-		private String(Attribute.String attribute, java.lang.String string, boolean changeNow) {
+		private String(ScalarAttribute.String attribute, java.lang.String string, boolean changeNow) {
 			this.attribute = attribute;
 			this.string = string;
 			if (changeNow) {

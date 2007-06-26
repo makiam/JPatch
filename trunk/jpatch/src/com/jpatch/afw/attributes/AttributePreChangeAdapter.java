@@ -10,19 +10,19 @@ package com.jpatch.afw.attributes;
  */
 public abstract class AttributePreChangeAdapter<T> implements AttributePreChangeListener<T> {
 
-	public boolean attributeWillChange(Attribute source, boolean value) {
+	public boolean attributeWillChange(ScalarAttribute source, boolean value) {
 		throw new UnsupportedOperationException();
 	}
 
-	public int attributeWillChange(Attribute source, int value) {
+	public int attributeWillChange(ScalarAttribute source, int value) {
 		throw new UnsupportedOperationException();
 	}
 
-	public double attributeWillChange(Attribute source, double value) {
+	public double attributeWillChange(ScalarAttribute source, double value) {
 		throw new UnsupportedOperationException();
 	}
 
-	public T attributeWillChange(Attribute source, T value) {
+	public T attributeWillChange(ScalarAttribute source, T value) {
 		throw new UnsupportedOperationException();
 	}
 

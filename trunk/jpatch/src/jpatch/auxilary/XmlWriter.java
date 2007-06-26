@@ -120,23 +120,23 @@ public class XmlWriter {
 		saveAttribute(name, Boolean.toString(b));
 	}
 	
-	public void attribute(String name, Attribute.Boolean attr) throws IOException {
+	public void attribute(String name, ScalarAttribute.Boolean attr) throws IOException {
 		attribute(name, attr.get());
 	}
 	
-	public void attribute(String name, Attribute.Integer attr) throws IOException {
+	public void attribute(String name, ScalarAttribute.Integer attr) throws IOException {
 		attribute(name, attr.get());
 	}
 	
-	public void attribute(String name, Attribute.Double attr) throws IOException {
+	public void attribute(String name, ScalarAttribute.Double attr) throws IOException {
 		attribute(name, attr.get());
 	}
 	
-	public void attribute(String name, Attribute.Enum attr) throws IOException {
+	public void attribute(String name, ScalarAttribute.Enum attr) throws IOException {
 		attribute(name, attr.get().name().toLowerCase());
 	}
 	
-	public void attribute(String name, Attribute.String attr) throws IOException {
+	public void attribute(String name, ScalarAttribute.String attr) throws IOException {
 		attribute(name, attr.get());
 	}
 	

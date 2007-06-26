@@ -9,19 +9,19 @@ public class Lock implements AttributePreChangeListener {
 		return INSTANCE;
 	}
 	
-	public boolean attributeWillChange(Attribute source, boolean value) {
+	public boolean attributeWillChange(ScalarAttribute source, boolean value) {
 		return ((BooleanAttr) source).getBoolean();
 	}
 
-	public double attributeWillChange(Attribute source, double value) {
+	public double attributeWillChange(ScalarAttribute source, double value) {
 		return ((DoubleAttr) source).getDouble();
 	}
 
-	public int attributeWillChange(Attribute source, int value) {
+	public int attributeWillChange(ScalarAttribute source, int value) {
 		return ((IntAttr) source).getInt();
 	}
 
-	public Object attributeWillChange(Attribute source, Object value) {
+	public Object attributeWillChange(ScalarAttribute source, Object value) {
 		return ((GenericAttr) source).getValue();
 	}
 }

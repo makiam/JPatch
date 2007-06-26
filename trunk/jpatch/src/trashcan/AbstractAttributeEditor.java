@@ -21,7 +21,7 @@
  */
 package trashcan;
 
-import com.jpatch.afw.attributes.Attribute;
+import com.jpatch.afw.attributes.ScalarAttribute;
 import com.jpatch.afw.attributes.BooleanAttr;
 import com.jpatch.afw.attributes.GenericAttr;
 import com.jpatch.afw.attributes.Tuple2Attr;
@@ -100,16 +100,16 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 	
 	public void addAttribute(String name, Object object) {
 		assert container != null : "addAttribute called outside a section.";
-		if (object instanceof Attribute) {
-			addScalar(container, name, (Attribute) object);
+		if (object instanceof ScalarAttribute) {
+			addScalar(container, name, (ScalarAttribute) object);
 		} else {
 			container.add(new JLabel(name));
 			JComponent box = new ExpandableFormRow();
 			box.setOpaque(false);
 			try {
 				for (Method method : object.getClass().getMethods()) {
-					if (Attribute.class.isAssignableFrom(method.getReturnType())) {
-						box.add(AttributeUiHelper.createTextFieldFor(name, (Attribute) method.invoke(object, (Object[]) null)));
+					if (ScalarAttribute.class.isAssignableFrom(method.getReturnType())) {
+						box.add(AttributeUiHelper.createTextFieldFor(name, (ScalarAttribute) method.invoke(object, (Object[]) null)));
 					}
 				}
 			} catch (IllegalAccessException e) {
@@ -128,7 +128,7 @@ public class AbstractAttributeEditor extends ExpandableFormContainer {
 //		c.add(box);
 //	}
 	
-	protected void addScalar(Container c, String name, Attribute a) {
+	protected void addScalar(Container c, String name, ScalarAttribute a) {
 		c.add(new JLabel(name));
 		Box box = Box.createHorizontalBox();
 //		if (a instanceof Attribute.KeyedBoolean) {

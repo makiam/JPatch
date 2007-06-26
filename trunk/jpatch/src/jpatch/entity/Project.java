@@ -54,7 +54,7 @@ public class Project extends AbstractNamedObject {
 	private JPatchFile.ChoreographyFile[] choreographyFiles;
 	
 	public Project(WorkspaceManager workspaceManager, String projectName) throws IOException {
-		name = new Attribute.Name(this);
+		name = new ScalarAttribute.Name(this);
 		name.set(projectName);
 		projectDir = new File(workspaceManager.getDirectory(), projectName);
 		modelDir = new File(projectDir, "models");

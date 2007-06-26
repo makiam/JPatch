@@ -7,7 +7,7 @@ public class DoubleMaximum extends DoubleLimit {
 	}
 	
 	@Override
-	public double attributeWillChange(Attribute source, double value) {
+	public double attributeWillChange(ScalarAttribute source, double value) {
 		return Math.min(this.limit.getDouble(), value);
 	}
 }

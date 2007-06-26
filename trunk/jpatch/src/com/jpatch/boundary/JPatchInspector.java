@@ -4,10 +4,7 @@ import java.awt.Color;
 
 import javax.swing.JComponent;
 
-import com.jpatch.afw.attributes.Attribute;
-import com.jpatch.afw.attributes.AttributePostChangeListener;
-import com.jpatch.afw.attributes.GenericAttr;
-import com.jpatch.afw.attributes.StateMachine;
+import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.ui.*;
 import com.jpatch.entity.TransformNode;
 

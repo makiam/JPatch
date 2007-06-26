@@ -1,6 +1,6 @@
 package com.jpatch.test;
 
-import com.jpatch.afw.attributes.Attribute;
+import com.jpatch.afw.attributes.ScalarAttribute;
 import com.jpatch.afw.attributes.AttributePreChangeAdapter;
 import com.jpatch.afw.attributes.StateMachine;
 import com.jpatch.afw.control.Configuration;
@@ -102,7 +102,7 @@ public class Test {
 		actions.toolSM.addAttributeListener(new AttributePreChangeAdapter() {
 
 			@Override
-			public void attributeHasChanged(Attribute source) {
+			public void attributeHasChanged(ScalarAttribute source) {
 				System.out.println(((StateMachine) source).getState());
 			}
 		});

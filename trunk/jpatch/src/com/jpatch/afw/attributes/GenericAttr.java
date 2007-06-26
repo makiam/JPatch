@@ -1,6 +1,6 @@
 package com.jpatch.afw.attributes;
 
-public class GenericAttr<T> extends AbstractAttribute<T> {
+public class GenericAttr<T> extends AbstractScalarAttribute<T> {
 	protected T value;
 
 	public GenericAttr() {

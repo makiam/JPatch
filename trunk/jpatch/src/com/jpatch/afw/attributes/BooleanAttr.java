@@ -5,7 +5,7 @@ package com.jpatch.afw.attributes;
  * @author sascha
  *
  */
-public class BooleanAttr extends AbstractAttribute {
+public class BooleanAttr extends AbstractScalarAttribute {
 	/**
 	 * The boolean value this attribute represents
 	 */

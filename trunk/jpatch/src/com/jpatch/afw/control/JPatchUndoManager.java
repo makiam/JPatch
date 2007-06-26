@@ -1,13 +1,13 @@
 package com.jpatch.afw.control;
 
-import com.jpatch.afw.attributes.AbstractAttribute;
+import com.jpatch.afw.attributes.AbstractScalarAttribute;
 import com.jpatch.afw.attributes.GenericAttr;
 
 import java.util.*;
 
 import jpatch.boundary.settings.Settings;
 
-public class JPatchUndoManager extends AbstractAttribute {
+public class JPatchUndoManager extends AbstractScalarAttribute {
 	private static final int MAX_DEPTH = Settings.getInstance().undoDepth;
 	
 	private List<NamedEditList> undoStack = new ArrayList<NamedEditList>();

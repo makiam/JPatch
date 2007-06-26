@@ -11,7 +11,7 @@ public abstract class JPatchFile extends AbstractJPatchObject {
 	private static XmlLoader xmlLoader;
 	
 	private final static String SUFFIX = ".xml";
-	public Attribute.Name name = new Attribute.Name(this);
+	public ScalarAttribute.Name name = new ScalarAttribute.Name(this);
 	File file;
 	private JPatchDirectory directory;
 	private boolean rename = false;
@@ -28,7 +28,7 @@ public abstract class JPatchFile extends AbstractJPatchObject {
 		this.file = f;
 		name.set(removeSuffix(file.getName()));
 		name.addAttributeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute attribute) {
+			public void attributeHasChanged(ScalarAttribute attribute) {
 				if (!rename && !file.renameTo(new File(file.getParentFile(), addSuffix(name.get())))) {
 					rename = true;
 					name.set(removeSuffix(file.getName()));

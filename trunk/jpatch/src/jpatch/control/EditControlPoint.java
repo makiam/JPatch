@@ -15,7 +15,7 @@ import jpatch.entity.ControlPoint;
  * applied and the edit is used to make the change undoable.
  * 
  * @author sascha
- * @see jpatch.entity.Attribute
+ * @see jpatch.entity.ScalarAttribute
  */
 
 public class EditControlPoint {

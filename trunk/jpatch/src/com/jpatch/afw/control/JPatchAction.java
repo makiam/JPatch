@@ -1,11 +1,7 @@
 package com.jpatch.afw.control;
 
 
-import com.jpatch.afw.attributes.Attribute;
-import com.jpatch.afw.attributes.AttributePostChangeListener;
-import com.jpatch.afw.attributes.AttributePreChangeAdapter;
-import com.jpatch.afw.attributes.BooleanAttr;
-import com.jpatch.afw.attributes.GenericAttr;
+import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.ui.KeyboardShortcutManager;
 
 import java.awt.event.ActionListener;
@@ -35,7 +31,7 @@ public abstract class JPatchAction implements ActionListener {
 		this.name = name;
 		keyboardShortcut.addAttributePreChangeListener(new AttributePreChangeAdapter<String>() {
 			@Override
-			public String attributeWillChange(Attribute source, String value) {
+			public String attributeWillChange(ScalarAttribute source, String value) {
 				KeyboardShortcutManager.getInstance().unmanageAction(JPatchAction.this);
 				return value;
 			}

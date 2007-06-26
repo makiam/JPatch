@@ -2,7 +2,7 @@ package jpatch.entity;
 
 public class Camera extends AbstractNamedObject {
 	
-	public Attribute.BoundedDouble focalLength = new Attribute.BoundedDouble("Focal Length", 50);
+	public ScalarAttribute.BoundedDouble focalLength = new ScalarAttribute.BoundedDouble("Focal Length", 50);
 	
 	private ObjectRegistry objectRegistry;
 	

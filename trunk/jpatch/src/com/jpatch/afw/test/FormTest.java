@@ -3,12 +3,7 @@ package com.jpatch.afw.test;
 import java.awt.*;
 import java.util.*;
 
-import com.jpatch.afw.attributes.Attribute;
-import com.jpatch.afw.attributes.AttributePostChangeListener;
-import com.jpatch.afw.attributes.DoubleAttr;
-import com.jpatch.afw.attributes.DoubleMaximum;
-import com.jpatch.afw.attributes.DoubleMinimum;
-import com.jpatch.afw.attributes.IdentityMapping;
+import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.Configuration;
 import com.jpatch.afw.icons.IconSet;
 import com.jpatch.afw.icons.IconSet.*;
