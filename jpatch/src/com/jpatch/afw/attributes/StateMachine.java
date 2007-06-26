@@ -13,7 +13,49 @@ public class StateMachine<T> extends GenericAttr<T> {
 	/**
 	 * A list of possible states of this StateMachine
 	 */
-	protected final CollectionAttr<T> states;
+	private final CollectionAttr<T> states;
+	
+	/**
+	 * A view to the states CollectionAttr. Redirects read-requests to the states objects, but prohibits any modification of the states object.
+	 */
+	private final CollectionAttr<T> statesView = new CollectionAttr<T>() {
+		@Override
+		public void add(T element) {
+			throw new UnsupportedOperationException("Can't modify StateMachine internal CollectionAttr. Use add/removeState of StateMachine instead.");
+		}
+		@Override
+		public void addAll(Collection<T> elements) {
+			throw new UnsupportedOperationException("Can't modify StateMachine internal CollectionAttr. Use add/removeState of StateMachine instead.");
+		}
+		@Override
+		public boolean contains(Object object) {
+			return StateMachine.this.states.contains(object);
+		}
+		@Override
+		public boolean containsAll(Collection objects) {
+			return StateMachine.this.states.containsAll(objects);
+		}
+		@Override
+		public Iterable<T> getElements() {
+			return StateMachine.this.states.getElements();
+		}
+		@Override
+		public void remove(T element) {
+			throw new UnsupportedOperationException("Can't modify StateMachine internal CollectionAttr. Use add/removeState of StateMachine instead.");
+		}
+		@Override
+		public void removeAll(Collection<T> elements) {
+			throw new UnsupportedOperationException("Can't modify StateMachine internal CollectionAttr. Use add/removeState of StateMachine instead.");
+		}
+		@Override
+		public void retainAll(Collection<T> elements) {
+			throw new UnsupportedOperationException("Can't modify StateMachine internal CollectionAttr. Use add/removeState of StateMachine instead.");
+		}
+		@Override
+		public int size() {
+			return StateMachine.this.states.size();
+		}
+	};
 	
 	/**
 	 * The default state of this state machine (may be <i>null</i>)
@@ -50,6 +92,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 		if (setValue(initialState) != initialState) {
 			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
 		}
+		
 	}
 	
 	/**
@@ -175,6 +218,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 			throw new IllegalArgumentException(state + " is already a state of this statemachine (" + this + ")");
 		}
 		states.add(state);
+		statesView.fireAttributeHasChanged();
 	}
 
 	/**
@@ -203,6 +247,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 			}
 		}
 		states.remove(state);
+		statesView.fireAttributeHasChanged();
 	}
 
 	/**
@@ -219,20 +264,16 @@ public class StateMachine<T> extends GenericAttr<T> {
 	}
 	
 	/**
-	 * Returns the CollectionAttr that contains the states of this StateMachine
+	 * Returns a view of the CollectionAttr that contains the states of this StateMachine.
+	 * Clients may add listeners to the returned CollectionAttr or use it to
+	 * check the source of an attributeHasChanged event, but they <u>must
+	 * not add or remove elements to or from it!</u> (otherwise an UnsupportedOperationException
+	 * will be thrown). To add or remove states, use the
+	 * addState and removeState methods of this class.
 	 * @return the CollectionAttr that contains the states of this StateMachine
 	 */
 	public CollectionAttr<T> getStateSet() {
-		return states;
-	}
-	
-	/**
-	 * Removes the specified AttributePostChangeListener
-	 * @param the listener to be removed
-	 * @see addStateSetChangeListener(AttributePostChangeListener) 
-	 */
-	public void removeStateSetChangeListener(AttributePostChangeListener listener) {
-		states.addAttributePostChangeListener(listener);
+		return statesView;
 	}
 	
 	/**
