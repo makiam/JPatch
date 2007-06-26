@@ -9,7 +9,7 @@ public class BooleanAttr extends AbstractScalarAttribute {
 	/**
 	 * The boolean value this attribute represents
 	 */
-	protected boolean value;
+	boolean value;
 
 	/**
 	 * Constructs a newly allocated BooleanAttr with a value of false.

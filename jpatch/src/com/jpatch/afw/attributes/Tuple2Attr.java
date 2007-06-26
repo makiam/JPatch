@@ -3,8 +3,8 @@ package com.jpatch.afw.attributes;
 import javax.vecmath.*;
 
 public class Tuple2Attr extends AbstractAttribute {
-	protected final DoubleAttr xAttr;
-	protected final DoubleAttr yAttr;
+	private final DoubleAttr xAttr;
+	private final DoubleAttr yAttr;
 	private final AttributePostChangeListener listener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
 			fireAttributeHasChanged();

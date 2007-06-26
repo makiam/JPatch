@@ -14,7 +14,7 @@ public abstract class AbstractScalarAttribute<T> extends AbstractAttribute imple
 	 * An array holding the AttributePreChangeListeners of this AbstractAttributes.
 	 * Can be null (i.e. will be set to null if the list is empty)
 	 */
-	protected AttributePreChangeListener<T>[] attributePreChangeListeners = null;
+	private AttributePreChangeListener<T>[] attributePreChangeListeners = null;
 	
 	
 	/**
@@ -91,7 +91,7 @@ public abstract class AbstractScalarAttribute<T> extends AbstractAttribute imple
      * @param value the value this Attribute is about to change to.
      * @return the value after all registered attributePreChangeListener have been asked for veto.
      */
-    protected boolean fireAttributeWillChange(boolean value) {
+    boolean fireAttributeWillChange(boolean value) {
     	if (attributePreChangeListeners != null) {
     		for (int i = 0; i < attributePreChangeListeners.length; i++) {
     			value = attributePreChangeListeners[i].attributeWillChange(this, value);
@@ -108,7 +108,7 @@ public abstract class AbstractScalarAttribute<T> extends AbstractAttribute imple
      * @param value the value this Attribute is about to change to.
      * @return the value after all registered attributePreChangeListener have been asked for veto.
      */
-    protected int fireAttributeWillChange(int value) {
+    int fireAttributeWillChange(int value) {
     	if (attributePreChangeListeners != null) {
     		for (int i = 0; i < attributePreChangeListeners.length; i++) {
     			value = attributePreChangeListeners[i].attributeWillChange(this, value);
@@ -125,7 +125,7 @@ public abstract class AbstractScalarAttribute<T> extends AbstractAttribute imple
      * @param value the value this Attribute is about to change to.
      * @return the value after all registered attributePreChangeListener have been asked for veto.
      */
-    protected double fireAttributeWillChange(double value) {
+    double fireAttributeWillChange(double value) {
     	if (attributePreChangeListeners != null) {
     		for (int i = 0; i < attributePreChangeListeners.length; i++) {
     			value = attributePreChangeListeners[i].attributeWillChange(this, value);
@@ -142,7 +142,7 @@ public abstract class AbstractScalarAttribute<T> extends AbstractAttribute imple
      * @param value the value this Attribute is about to change to.
      * @return the value after all registered attributePreChangeListener have been asked for veto.
      */
-    protected T fireAttributeWillChange(T value) {
+    T fireAttributeWillChange(T value) {
     	if (attributePreChangeListeners != null) {
     		for (int i = 0; i < attributePreChangeListeners.length; i++) {
     			value = attributePreChangeListeners[i].attributeWillChange(this, value);
