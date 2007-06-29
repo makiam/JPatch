@@ -215,6 +215,7 @@ public class Main {
 	@SuppressWarnings("serial")
 	private Main() {
 		
+		
 //		System.out.println("opengl is single threaded: " + Threading.isSingleThreaded());
 //		Threading.disableSingleThreading();
 //		System.out.println("opengl is single threaded: " + Threading.isSingleThreaded());
@@ -514,6 +515,8 @@ public class Main {
 				repaintViewports();
 			}
 		});
+		
+		new BshConsole();
 	}
 	
 //	public JPatchObject getSelectedTreeUserObject() {
