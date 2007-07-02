@@ -1,5 +1,9 @@
 package com.jpatch.afw.control;
 
+import com.jpatch.afw.attributes.AttributePreChangeAdapter;
+import com.jpatch.afw.attributes.AttributePreChangeListener;
+import com.jpatch.afw.attributes.ScalarAttribute;
+
 import java.util.*;
 import java.util.regex.*;
 
@@ -8,6 +12,17 @@ public final class ObjectRegistry<T> {
 	
 	private final Map<String, T> nameMap = new HashMap<String, T>();
 	private final Map<Object, String> objectMap;
+	
+	private final AttributePreChangeListener<T> preChangeListener = new AttributePreChangeAdapter<T>() {
+		public String attributeWillChange(ScalarAttribute source, String value) {
+			Object object = getObjectByName(value);
+			if (object == null || object == source) {
+				return value;
+			} else {
+				return getValidName(value);
+			}
+		}
+	};
 	
 	public ObjectRegistry(Map<Object, String> objectMap) {
 		this.objectMap = objectMap;
@@ -56,6 +71,10 @@ public final class ObjectRegistry<T> {
 		}
 		objectMap.put(object, name);
 		nameMap.put(name, object);
+	}
+	
+	public AttributePreChangeListener<T> getPreChangeListener() {
+		return preChangeListener;
 	}
 	
 	public static void main(String[] args) {

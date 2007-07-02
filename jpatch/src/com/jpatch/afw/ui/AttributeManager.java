@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.control.ObjectRegistry;
 
 public class AttributeManager {
 	/**
@@ -266,16 +267,18 @@ public class AttributeManager {
 		return checkBox;
 	}
 	
-	
 	public JTextField bindTextFieldToAttribute(final JTextField textField, ScalarAttribute attribute) {
 		if (attribute instanceof DoubleAttr) {
 			return bindTextFieldToAttribute(textField, (DoubleAttr) attribute);
+		} else if (attribute instanceof GenericAttr) {
+			return bindTextFieldToAttribute(textField, (GenericAttr<String>) attribute);
+		} else {
+			throw new IllegalArgumentException("can't bind " + attribute + " to " + textField);
 		}
-		throw new IllegalArgumentException("can't bind " + attribute + " to " + textField);
 	}
 	
 	public JComboBox bindComboBoxToAttribute(final JComboBox comboBox, final StateMachine stateMachine) {
-		class ComboListener implements ActionListener, AttributePostChangeListener {
+		class SuperListener implements ActionListener, AttributePostChangeListener {
 			private boolean suppressAction = false;
 			
 			public void actionPerformed(ActionEvent e) {
@@ -304,7 +307,7 @@ public class AttributeManager {
 			}
 		}
 		
-		ComboListener listener = new ComboListener();
+		SuperListener listener = new SuperListener();
 		
 		bind(comboBox, new AttributeBinding(stateMachine, listener), new AttributeBinding(stateMachine.getStateSet(), listener));
 		
@@ -315,6 +318,61 @@ public class AttributeManager {
 		
 		return comboBox;
 	}
+	
+	/**
+	 * Binds the specified JTextField to the specified Attribute.
+	 * @param textField
+	 * @param doubleAttr
+	 * @return the specified JTextField
+	 * @throws NullPointerException if any of the specified parameters is null
+	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
+	 */
+	private JTextField bindTextFieldToAttribute(final JTextField textField, final GenericAttr<String> stringAttr) {
+		textField.setColumns(COLUMNS);
+		textField.setHorizontalAlignment(SwingConstants.RIGHT);
+//		textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
+		
+		class SuperListener extends FocusAdapter implements FocusListener, AttributePostChangeListener {
+			private boolean suppressAction = false;
+
+			public void focusLost(FocusEvent e) {
+				if (!suppressAction) {
+					suppressAction = true;
+					String newValue = stringAttr.setValue(textField.getText());
+					if (newValue.equals(textField.getText())) {
+						textField.setBackground(textField.isEnabled() ? UIManager.getColor("TextField.background") : UIManager.getColor("TextField.inactiveBackground"));
+					} else {
+						textField.setBackground(Color.YELLOW);
+						textField.requestFocus();
+					}
+					suppressAction = false;
+				}
+			}
+			
+			public void attributeHasChanged(Attribute source) {
+				if (!suppressAction) {
+					suppressAction = true;
+					textField.setText(stringAttr.getValue());
+					suppressAction = false;
+				}
+			}
+		}
+		
+		SuperListener listener = new SuperListener();
+		
+		/* bind attribute and attrListener to component */
+		bind(textField, new AttributeBinding(stringAttr, listener));						// throws IllegalStateException if already bound
+		
+		
+		/* add a FocusListener to verify and update the attribute value on focus loss */
+		addListener(textField, listener);
+		
+		/* add the TRANSFER_FOCUS_ACTIONLISTENER (which simply transfers the focus when the user presses enter over the TextField */
+		addListener(textField, TRANSFER_FOCUS_ACTIONLISTENER);
+		
+		return textField;
+	}
+	
 	/**
 	 * Binds the specified JTextField to the specified Attribute.
 	 * @param textField
@@ -328,32 +386,44 @@ public class AttributeManager {
 		textField.setHorizontalAlignment(SwingConstants.RIGHT);
 //		textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
 		
-		/* create and an AttributePostChangeListener to listen for attribute changes und update the textfield */
-		AttributePostChangeListener attrListener = new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute source) {
-				textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
-			}
-		};
-		
-		/* bind attribute and attrListener to component */
-		bind(textField, new AttributeBinding(doubleAttr, attrListener));						// throws IllegalStateException if already bound
 		
 		
-		/* create and add a FocusListener to verify and update the attribute value on focus loss */
-		addListener(textField, new FocusAdapter() {
-			@Override
+		class SuperListener extends FocusAdapter implements FocusListener, AttributePostChangeListener {
+			private boolean suppressAction = false;
+
 			public void focusLost(FocusEvent e) {
-				System.out.println("focusLost");
-				try {
-					doubleAttr.setDouble(Double.parseDouble(textField.getText()));
-					textField.setBackground(textField.isEnabled() ? UIManager.getColor("TextField.background") : UIManager.getColor("TextField.inactiveBackground"));
-					textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
-				} catch (NumberFormatException exception) {
-					textField.setBackground(Color.YELLOW);
-					textField.requestFocus();
+				if (!suppressAction) {
+					suppressAction = true;
+					try {
+						doubleAttr.setDouble(Double.parseDouble(textField.getText()));
+						textField.setBackground(textField.isEnabled() ? UIManager.getColor("TextField.background") : UIManager.getColor("TextField.inactiveBackground"));
+						textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
+					} catch (NumberFormatException exception) {
+						textField.setBackground(Color.YELLOW);
+						textField.requestFocus();
+					} finally {
+						suppressAction = false;
+					}
 				}
 			}
-		});
+			
+			public void attributeHasChanged(Attribute source) {
+				if (!suppressAction) {
+					suppressAction = true;
+					textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
+					suppressAction = false;
+				}
+			}
+		}
+		
+		SuperListener listener = new SuperListener();
+		
+		/* bind attribute and attrListener to component */
+		bind(textField, new AttributeBinding(doubleAttr, listener));						// throws IllegalStateException if already bound
+		
+		
+		/* add a FocusListener to verify and update the attribute value on focus loss */
+		addListener(textField, listener);
 		
 		/* add the TRANSFER_FOCUS_ACTIONLISTENER (which simply transfers the focus when the user presses enter over the TextField */
 		addListener(textField, TRANSFER_FOCUS_ACTIONLISTENER);
@@ -411,36 +481,37 @@ public class AttributeManager {
 	private JSlider bindSliderToAttribute(final JSlider slider, final DoubleAttr attr, final DoubleAttr min, final DoubleAttr max, final Mapping mapping) {
 		slider.setMinimum(0);
 		slider.setMaximum(1000);
+		
+		class SuperListener implements ChangeListener, AttributePostChangeListener {
+			private boolean suppressAction = false;
+
+			public void stateChanged(ChangeEvent e) {
+				if (!suppressAction) {
+					suppressAction = true;
+					getSliderValue(slider, attr, min, max, mapping);
+					suppressAction = false;
+				}
+			}
+			
+			public void attributeHasChanged(Attribute source) {
+				if (!suppressAction) {
+					suppressAction = true;
+					setSliderPosition(slider, attr, min, max, mapping);
+					suppressAction = false;
+				}
+			}
+		}
+		
+		SuperListener listener = new SuperListener();
+		
 //		setSliderPosition(slider, attr, min, max, mapping);
 		
-		/* pointer to a flag that's checked by the listeners to prevent loops - admittedly an ugly hack */
-		/* TODO this doesn't work!!!!!!!!! */
-		final boolean[] sliderAdjusting = new boolean[] { false };
-		
-		/* create and an AttributePostChangeListener to listen for attribute changes und update the slider */
-		AttributePostChangeListener attrListener = new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute source) {
-				if (!sliderAdjusting[0]) {
-					sliderAdjusting[0] = true;
-					setSliderPosition(slider, attr, min, max, mapping);
-					sliderAdjusting[0] = false;
-				}
-			}
-		};
 		
 		/* bind attribute and attrListener to component */
-		bind(slider, new AttributeBinding(attr, attrListener), new AttributeBinding(min, attrListener), new AttributeBinding(max, attrListener));				// throws IllegalStateException if already bound
+		bind(slider, new AttributeBinding(attr, listener), new AttributeBinding(min, listener), new AttributeBinding(max, listener));				// throws IllegalStateException if already bound
 		
-		/* create and add a ChangeListener to track the slider value */
-		addListener(slider, new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if (!sliderAdjusting[0]) {
-					sliderAdjusting[0] = true;
-					getSliderValue(slider, attr, min, max, mapping);
-					sliderAdjusting[0] = false;
-				}
-			}
-		});
+		/* add a ChangeListener to track the slider value */
+		addListener(slider, listener);
 		
 		return slider;
 	}

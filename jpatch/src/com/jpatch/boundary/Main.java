@@ -79,7 +79,7 @@ public class Main {
 	
 	private Sds activeSds;
 
-	private JComponent screen = new Screen();
+	private JComponent screen = new JPanel();
 	
 //	private JPatchTree tree = new JPatchTree();
 //	private UIFactory uiFactory = new UIFactory();
@@ -516,7 +516,7 @@ public class Main {
 			}
 		});
 		
-		new BshConsole();
+//		new BshConsole();
 	}
 	
 //	public JPatchObject getSelectedTreeUserObject() {
