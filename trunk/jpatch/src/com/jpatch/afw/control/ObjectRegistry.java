@@ -1,8 +1,6 @@
 package com.jpatch.afw.control;
 
-import com.jpatch.afw.attributes.AttributePreChangeAdapter;
-import com.jpatch.afw.attributes.AttributePreChangeListener;
-import com.jpatch.afw.attributes.ScalarAttribute;
+import com.jpatch.afw.attributes.*;
 
 import java.util.*;
 import java.util.regex.*;
@@ -11,6 +9,8 @@ public final class ObjectRegistry<T> {
 	private static final Pattern pattern = Pattern.compile("^(.*)\\((\\d+)\\)$");
 	
 	private final Map<String, T> nameMap = new HashMap<String, T>();
+	private final Map<GenericAttr<String>, Object> nameObjectMap;
+	
 	private final Map<Object, String> objectMap;
 	
 	private final AttributePreChangeListener<T> preChangeListener = new AttributePreChangeAdapter<T>() {

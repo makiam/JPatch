@@ -329,8 +329,6 @@ public class AttributeManager {
 	 */
 	private JTextField bindTextFieldToAttribute(final JTextField textField, final GenericAttr<String> stringAttr) {
 		textField.setColumns(COLUMNS);
-		textField.setHorizontalAlignment(SwingConstants.RIGHT);
-//		textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
 		
 		class SuperListener extends FocusAdapter implements FocusListener, AttributePostChangeListener {
 			private boolean suppressAction = false;

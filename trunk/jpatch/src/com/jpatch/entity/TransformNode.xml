@@ -1,4 +1,5 @@
 <attributeEditor name="Transform" class="com.jpatch.entity.TransformNode">
+	<field name="Name" attribute="Name" />
 	<field name="Translation" attribute="Translation" />
 	<field name="Rotation" attribute="Rotation" />
 	<field name="Scale" attribute="Scale" />
