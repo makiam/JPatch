@@ -5,10 +5,10 @@ import javax.swing.border.*;
 
 public class TextFieldBorder implements Border {
 	private final Color BORDER_COLOR = new Color(0xaaaaaa);
-	private final Color SHADOW1_COLOR = new Color(0x40000000, true);
-	private final Color SHADOW2_COLOR = new Color(0x20000000, true);
-	private final Color SHADOW3_COLOR = new Color(0x0c000000, true);
-	private final Insets INSETS = new Insets(0, 1, 0, 1);
+	private final Color SHADOW1_COLOR = new Color(0x30000000, true);
+	private final Color SHADOW2_COLOR = new Color(0x18000000, true);
+	private final Color SHADOW3_COLOR = new Color(0x08000000, true);
+	private final Insets INSETS = new Insets(0, 2, 0, 1);
 	
 	public Insets getBorderInsets(Component c) {
 		return INSETS;

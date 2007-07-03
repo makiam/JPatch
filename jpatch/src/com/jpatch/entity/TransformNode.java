@@ -82,6 +82,8 @@ public class TransformNode extends AbstractTransformNode {
 	
 	protected BooleanAttr visibilityAttr = new BooleanAttr(true);
 	
+	protected GenericAttr<String> nameAttr = new GenericAttr<String>();
+	
 	/**
 	 * Auto-transform flag, used to prevent loops when a position change updates the translation
 	 * or vice versa.
@@ -246,6 +248,14 @@ public class TransformNode extends AbstractTransformNode {
 			rotationOrderAttr.setValue(order);
 			computeBranch();
 		}
+	}
+	
+	/**
+	 * Returns the name attribute
+	 * @return the name attribute
+	 */
+	public GenericAttr<String> getNameAttribute() {
+		return nameAttr;
 	}
 	
 	@Override
