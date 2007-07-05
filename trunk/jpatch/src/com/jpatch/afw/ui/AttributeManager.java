@@ -10,7 +10,6 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import com.jpatch.afw.attributes.*;
-import com.jpatch.afw.control.ObjectRegistry;
 
 public class AttributeManager {
 	/**

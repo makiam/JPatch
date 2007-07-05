@@ -91,7 +91,7 @@ public abstract class AbstractScalarAttribute<T> extends AbstractAttribute imple
      * @param value the value this Attribute is about to change to.
      * @return the value after all registered attributePreChangeListener have been asked for veto.
      */
-    boolean fireAttributeWillChange(boolean value) {
+    protected final boolean fireAttributeWillChange(boolean value) {
     	if (attributePreChangeListeners != null) {
     		for (int i = 0; i < attributePreChangeListeners.length; i++) {
     			value = attributePreChangeListeners[i].attributeWillChange(this, value);
@@ -108,7 +108,7 @@ public abstract class AbstractScalarAttribute<T> extends AbstractAttribute imple
      * @param value the value this Attribute is about to change to.
      * @return the value after all registered attributePreChangeListener have been asked for veto.
      */
-    int fireAttributeWillChange(int value) {
+    protected final  int fireAttributeWillChange(int value) {
     	if (attributePreChangeListeners != null) {
     		for (int i = 0; i < attributePreChangeListeners.length; i++) {
     			value = attributePreChangeListeners[i].attributeWillChange(this, value);
@@ -125,7 +125,7 @@ public abstract class AbstractScalarAttribute<T> extends AbstractAttribute imple
      * @param value the value this Attribute is about to change to.
      * @return the value after all registered attributePreChangeListener have been asked for veto.
      */
-    double fireAttributeWillChange(double value) {
+    protected final  double fireAttributeWillChange(double value) {
     	if (attributePreChangeListeners != null) {
     		for (int i = 0; i < attributePreChangeListeners.length; i++) {
     			value = attributePreChangeListeners[i].attributeWillChange(this, value);
@@ -142,7 +142,7 @@ public abstract class AbstractScalarAttribute<T> extends AbstractAttribute imple
      * @param value the value this Attribute is about to change to.
      * @return the value after all registered attributePreChangeListener have been asked for veto.
      */
-    T fireAttributeWillChange(T value) {
+    protected final  T fireAttributeWillChange(T value) {
     	if (attributePreChangeListeners != null) {
     		for (int i = 0; i < attributePreChangeListeners.length; i++) {
     			value = attributePreChangeListeners[i].attributeWillChange(this, value);

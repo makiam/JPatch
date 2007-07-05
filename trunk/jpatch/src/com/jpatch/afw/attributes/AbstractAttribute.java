@@ -94,7 +94,7 @@ public class AbstractAttribute implements Attribute {
     /**
      * Calls the attributeHasChanged method of each registered attributePostChangeListener.
      */
-    void fireAttributeHasChanged() {
+    protected final void fireAttributeHasChanged() {
     	if (fireEvents && attributePostChangeListeners != null) {
     		fireEvents = false;
 	    	for (int i = 0; i < attributePostChangeListeners.length; i++) {
