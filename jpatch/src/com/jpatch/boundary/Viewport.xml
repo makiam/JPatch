@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <attributeEditor name="View" class="com.jpatch.boundary.Viewport">
+	<field name="Name" attribute="Name" />
 	<field name="View" attribute="ViewType" />
 	<field name="Translation" attribute="ViewTranslation" />
 	<field name="Rotation" attribute="ViewRotation" />

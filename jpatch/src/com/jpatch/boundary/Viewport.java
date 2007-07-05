@@ -14,7 +14,7 @@ import javax.media.opengl.GLDrawable;
 import javax.vecmath.*;
 
 
-public abstract class Viewport {
+public abstract class Viewport implements NamedObject {
 	public static final double MIN_DIST_SQ = 64;
 	public ViewDirection[] standardViewDirections = new ViewDirection[] {
 			OrthoViewDirection.FRONT,
@@ -34,6 +34,7 @@ public abstract class Viewport {
 	final Toggle showLimitSurface = new Toggle(true);
 	final Toggle showProjectedMesh = new Toggle(true);
 	final Toggle fragmentShader = new Toggle(false);
+	final GenericAttr<String> nameAttr = new GenericAttr<String>();
 	
 	final int id;
 	Component component;
@@ -101,6 +102,7 @@ public abstract class Viewport {
 		viewRotation.addAttributePostChangeListener(updateAttributeListener);
 		viewScale.addAttributePostChangeListener(updateAttributeListener);
 //		name.set("Viewport " + id);
+		nameAttr.setValue("Viewport " + id);
 	}
 
 	
@@ -229,5 +231,9 @@ public abstract class Viewport {
 
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+	
+	public GenericAttr<String> getNameAttribute() {
+		return nameAttr;
 	}
 }

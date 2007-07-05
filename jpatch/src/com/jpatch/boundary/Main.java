@@ -73,7 +73,7 @@ public class Main {
 	private static Color VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.text.get();
 	private static Color ACTIVE_VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.selection.get();
 	
-	private Robot robot;
+//	private Robot robot;
 	private JFrame frame;
 	private JLabel statusLabel = new JLabel("status");
 	
@@ -282,11 +282,11 @@ public class Main {
 
 		
 		screen.setBackground(Color.BLACK);
-		try {
-			robot = new Robot();
-		} catch (AWTException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			robot = new Robot();
+//		} catch (AWTException e) {
+//			e.printStackTrace();
+//		}
 
 //		Color BACKGROUND = new Color(0xa0a0a0);
 		frame = new JFrame("JPatch");
@@ -298,6 +298,8 @@ public class Main {
 		/*
 		 * initialize viewports
 		 */
+		ObjectRegistry<Viewport> viewportRegistry = new ObjectRegistry<Viewport>();
+		
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
 			viewports[i] = new ViewportGl(i + 1, i * 2);
 			screen.add(viewports[i].getComponent());
@@ -307,7 +309,10 @@ public class Main {
 					activeViewport.setValue(viewports[viewportNumber]);
 				}
 			});
+			viewports[i].getNameAttribute().setValue("Viewport");
+			viewportRegistry.addObject(viewports[i]);
 		}
+		
 		activeViewport = new StateMachine<Viewport>(viewports, viewports[0]);
 		screen.setLayout(screenLayout);
 		
@@ -542,9 +547,9 @@ public class Main {
 		return INSTANCE;
 	}
 	
-	public Robot getRobot() {
-		return robot;
-	}
+//	public Robot getRobot() {
+//		return robot;
+//	}
 	
 	public JComponent getScreen() {
 		return screen;
