@@ -151,10 +151,11 @@ public class TransformNode extends AbstractTransformNode {
 	 * This implementation sets the invInvalid flag to true.
 	 */
 	public void computeMatrix() {
-		if (parent != null) {
-			parent.getMatrix(matrix);
-		} else {
+		SceneGraphNode parent = parentAttr.getValue();
+		if (parent == null) {
 			matrix.set(IDENTITY_MATRIX);
+		} else {
+			parent.getMatrix(matrix);
 		}
 		translationAttr.getTuple(translationTuple);
 		axisRotationAttr.getTuple(axisRotationTuple);

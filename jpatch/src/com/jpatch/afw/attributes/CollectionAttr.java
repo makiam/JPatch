@@ -3,13 +3,9 @@ package com.jpatch.afw.attributes;
 import java.util.*;
 
 /**
- * Attribute that wraps around a collection and notifies
+ * An Attribute that wraps around a collection and notifies
  * its listeners if elements were added to or removed
  * from the collection.
- * Unlike most other Attributes, this implementation does not
- * perform pre-event-notification (the attributePreChangeListeners
- * are never called). Post-event-notification (attributePostChanegListeners)
- * is performed as usual.
  * @param <T> type of the elements in the collection
  */
 public class CollectionAttr<T> extends AbstractAttribute {
@@ -45,10 +41,10 @@ public class CollectionAttr<T> extends AbstractAttribute {
 	}
 	
 	/**
-	 * Returns an Iterable that iterates over all elements of this CollectionAttr
-	 * @return an Iterable that iterates over all elements of this CollectionAttr
+	 * Returns an Collection of all elements of this CollectionAttr
+	 * @return an Collection of all elements of this CollectionAttr
 	 */
-	public Iterable<T> getElements() {
+	public Collection<T> getElements() {
 		return unmodifiableView;
 	}
 	
@@ -71,7 +67,7 @@ public class CollectionAttr<T> extends AbstractAttribute {
 	}
 	
 	/**
-	 * Removes the specified element to this CollectionAttr
+	 * Removes the specified element from this CollectionAttr
 	 * @param element element to be added to this CollectionAttr
 	 */
 	public void remove(T element) {
