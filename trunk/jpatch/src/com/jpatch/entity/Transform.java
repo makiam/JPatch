@@ -1,13 +1,11 @@
 package com.jpatch.entity;
 
+import com.jpatch.afw.attributes.GenericAttr;
 import com.jpatch.afw.vecmath.*;
 import javax.vecmath.*;
 
 public abstract class Transform {
-	/**
-	 * The parent Transform (may be null)
-	 */
-	protected Transform parent;
+
 	/**
 	 * The transformation matrix
 	 */

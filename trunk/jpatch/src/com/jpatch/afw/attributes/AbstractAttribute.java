@@ -14,7 +14,8 @@ public class AbstractAttribute implements Attribute {
 	
 	/**
      * Adds an addAttributePostChangeListener to this attribute.
-     *
+     * <br /><b>Note:</b> The attributeHasChanged method of the specified listener is called immediately in order
+     * to notify the listener of the current value of this Attribute.
      * @param l the addAttributePostChangeListener to add
      * @see #removeAttributePostChangeListener
      * @throws NullPointerException if the specified argument is null

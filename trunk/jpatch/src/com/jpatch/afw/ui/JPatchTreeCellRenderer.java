@@ -19,7 +19,7 @@
  * along with JPatch; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package jpatch.boundary.tree;
+package com.jpatch.afw.ui;
 
 import java.awt.*;
 import java.util.*;
@@ -51,9 +51,9 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 		/* initialze label by calling superclass method */
 		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 		
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;		// node needs to be a DefaultMutableTreeNode
+		JPatchTreeNode node = (JPatchTreeNode) value;		// node needs to be a JPatchTreeNode
 		Object userObject = node.getUserObject();
-		setText(userObject.toString());							// set the label text
+		setText(node.getName());							// set the label text
 		if (userObject != null) {
 			if (userObject instanceof Project && ((Project) userObject).isOpen()) {
 				setIcon(projectOpenIcon);

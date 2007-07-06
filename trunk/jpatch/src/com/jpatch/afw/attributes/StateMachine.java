@@ -36,7 +36,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 			return StateMachine.this.states.containsAll(objects);
 		}
 		@Override
-		public Iterable<T> getElements() {
+		public Collection<T> getElements() {
 			return StateMachine.this.states.getElements();
 		}
 		@Override
