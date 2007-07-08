@@ -17,7 +17,10 @@ public class GenericAttr<T> extends AbstractScalarAttribute<T> {
 	}
 
 	public T setValue(T value) {
-		if ((value == null && this.value != null) || (!value.equals(this.value))) {
+		if (value == null && this.value == null) {
+			return this.value;
+		}
+		if (value == null || this.value == null || !value.equals(this.value)) {
 			this.value = fireAttributeWillChange(value);
 			fireAttributeHasChanged();
 		}
