@@ -13,49 +13,12 @@ public class StateMachine<T> extends GenericAttr<T> {
 	/**
 	 * A list of possible states of this StateMachine
 	 */
-	private final CollectionAttr<T> states;
+	private final MutableCollectionAttr<T> states;
 	
 	/**
-	 * A view of the states CollectionAttr. Redirects read-requests to the states objects, but prohibits any modification of the states object.
+	 * An unmodifiable view of the states CollectionAttr.
 	 */
-	private final CollectionAttr<T> statesView = new CollectionAttr<T>() {
-		@Override
-		public void add(T element) {
-			throw new UnsupportedOperationException("Can't modify StateMachine internal CollectionAttr. Use add/removeState of StateMachine instead.");
-		}
-		@Override
-		public void addAll(Collection<T> elements) {
-			throw new UnsupportedOperationException("Can't modify StateMachine internal CollectionAttr. Use add/removeState of StateMachine instead.");
-		}
-		@Override
-		public boolean contains(Object object) {
-			return StateMachine.this.states.contains(object);
-		}
-		@Override
-		public boolean containsAll(Collection objects) {
-			return StateMachine.this.states.containsAll(objects);
-		}
-		@Override
-		public Collection<T> getElements() {
-			return StateMachine.this.states.getElements();
-		}
-		@Override
-		public void remove(T element) {
-			throw new UnsupportedOperationException("Can't modify StateMachine internal CollectionAttr. Use add/removeState of StateMachine instead.");
-		}
-		@Override
-		public void removeAll(Collection<T> elements) {
-			throw new UnsupportedOperationException("Can't modify StateMachine internal CollectionAttr. Use add/removeState of StateMachine instead.");
-		}
-		@Override
-		public void retainAll(Collection<T> elements) {
-			throw new UnsupportedOperationException("Can't modify StateMachine internal CollectionAttr. Use add/removeState of StateMachine instead.");
-		}
-		@Override
-		public int size() {
-			return StateMachine.this.states.size();
-		}
-	};
+	private final UnmodifiableCollectionAttr<T> statesView;
 	
 	/**
 	 * The default state of this state machine (may be <i>null</i>)
@@ -85,7 +48,8 @@ public class StateMachine<T> extends GenericAttr<T> {
 	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
 	 */
 	public StateMachine(T[] states, T initialState) {
-		this.states = new CollectionAttr<T>(LinkedHashSet.class);
+		this.states = new MutableCollectionAttr<T>(LinkedHashSet.class);
+		this.statesView = new UnmodifiableCollectionAttr<T>(this.states);
 		for (T s : states) {
 			this.states.add(s);
 		}
@@ -114,7 +78,8 @@ public class StateMachine<T> extends GenericAttr<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public StateMachine(Class<? extends Enum> states, T initialState) {
-		this.states = new CollectionAttr<T>(LinkedHashSet.class);
+		this.states = new MutableCollectionAttr<T>(LinkedHashSet.class);
+		this.statesView = new UnmodifiableCollectionAttr<T>(this.states);
 		for (Enum s : states.getEnumConstants()) {
 			this.states.add((T) s);
 		}
@@ -130,8 +95,9 @@ public class StateMachine<T> extends GenericAttr<T> {
 	 * @throws NullPointerException if states is <i>null</i>
 	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
 	 */
-	public StateMachine(CollectionAttr<T> states, T initialState) {
+	public StateMachine(MutableCollectionAttr<T> states, T initialState) {
 		this.states = states;
+		this.statesView = new UnmodifiableCollectionAttr<T>(this.states);
 		if (setValue(initialState) != initialState) {
 			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
 		}
@@ -218,7 +184,6 @@ public class StateMachine<T> extends GenericAttr<T> {
 			throw new IllegalArgumentException(state + " is already a state of this statemachine (" + this + ")");
 		}
 		states.add(state);
-		statesView.fireAttributeHasChanged();
 	}
 
 	/**
@@ -247,7 +212,6 @@ public class StateMachine<T> extends GenericAttr<T> {
 			}
 		}
 		states.remove(state);
-		statesView.fireAttributeHasChanged();
 	}
 
 	/**
@@ -264,12 +228,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 	}
 	
 	/**
-	 * Returns a view of the CollectionAttr that contains the states of this StateMachine.
-	 * Clients may add listeners to the returned CollectionAttr or use it to
-	 * check the source of an attributeHasChanged event, but they <u>must
-	 * not add or remove elements to or from it!</u> (otherwise an UnsupportedOperationException
-	 * will be thrown). To add or remove states, use the
-	 * addState and removeState methods of this class.
+	 * Returns a CollectionAttr that contains the states of this StateMachine.
 	 * @return the CollectionAttr that contains the states of this StateMachine
 	 */
 	public CollectionAttr<T> getStateSet() {
