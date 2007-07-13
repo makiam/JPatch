@@ -297,7 +297,7 @@ public class AttributeManager {
 					comboBox.setSelectedItem(stateMachine.getValue());
 				} else if (source == stateMachine.getStateSet()) {
 					comboBox.removeAllItems();
-					for (Object o : ((CollectionAttr) source).getElements()) {
+					for (Object o : ((MutableCollectionAttr) source).getElements()) {
 						comboBox.addItem(o);
 					}
 					comboBox.setSelectedItem(stateMachine.getValue());

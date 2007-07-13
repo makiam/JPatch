@@ -5,8 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.TimerTask;
 
+import com.jpatch.boundary.SceneGraphTreeNode;
 import com.jpatch.boundary.TreeManager;
-import com.jpatch.entity.SceneGraphTreeNode;
 import com.jpatch.entity.TransformNode;
 
 import javax.swing.*;

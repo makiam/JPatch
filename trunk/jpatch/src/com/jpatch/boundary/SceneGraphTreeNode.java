@@ -1,6 +1,8 @@
-package com.jpatch.entity;
+package com.jpatch.boundary;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.entity.SceneGraphLeaf;
+import com.jpatch.entity.SceneGraphNode;
 
 import java.util.*;
 
