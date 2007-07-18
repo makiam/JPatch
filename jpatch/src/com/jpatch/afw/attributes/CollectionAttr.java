@@ -1,16 +1,14 @@
 package com.jpatch.afw.attributes;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * An Attribute that wraps around a collection and notifies
  * its listeners if elements were added to or removed
- * from the collection. This is the baseclass of all CollectionAttr classes
- * like MutableCollectionAttr and UnmodifiableCollectionAttr.
+ * from the collection.
  * @param <T> type of the elements in the collection
  */
-public abstract class CollectionAttr<T> extends AbstractAttribute {
+public class CollectionAttr<T> extends AbstractAttribute {
 	/**
 	 * Backing collection
 	 */
@@ -21,46 +19,77 @@ public abstract class CollectionAttr<T> extends AbstractAttribute {
 	 */
 	private final Collection<T> unmodifiableView;
 	
-	/**
-	 * Package private constructor needed by MutableCollectionAttr
-	 * @param collectionClass the Collection class to be used as backing collection
-	 */
-	@SuppressWarnings("unchecked")
-	CollectionAttr(Class<? extends Collection> collectionClass) {
-		try {
-			collection = collectionClass.newInstance();
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-		unmodifiableView = Collections.unmodifiableCollection(collection);
+	
+	CollectionAttr(Collection<T> collection) {
+		this.collection = collection;
+		unmodifiableView = Collections.unmodifiableCollection(this.collection);
 	}
-			
+	
 	/**
 	 * Creates a new CollectionAttr that uses the specified collection type as backing collection
 	 * @param collectionClass the Collection class to be used as backing collection
 	 */
-	public CollectionAttr(Collection<T> collection) {
-		this.collection = collection;
-		this.unmodifiableView = Collections.unmodifiableCollection(this.collection);
+	@SuppressWarnings("unchecked")
+	public CollectionAttr(Class<? extends Collection> collectionClass) {
+		try{
+			collection = collectionClass.newInstance();
+			unmodifiableView = Collections.unmodifiableCollection(collection);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**
 	 * Returns an Collection of all elements of this CollectionAttr
-	 * @return an Collection of all elements of this CollectionAttr. It's actually an unmodifiable
-	 * view of the collection, so attempts to modify it will result in an UnsupportedOperationException.
+	 * @return an Collection of all elements of this CollectionAttr
 	 */
 	public Collection<T> getElements() {
 		return unmodifiableView;
 	}
 	
 	/**
-	 * Returns the number of elements in this CollectionAttr
-	 * @return the number of elements in this CollectionAttr
+	 * Adds the specified element to this CollectionAttr
+	 * @param element element to be added to this CollectionAttr
 	 */
-	public int size() {
-		return collection.size();
+	public void add(T element) {
+		collection.add(element);
+		fireAttributeHasChanged();
+	}
+	
+	/**
+	 * Adds all the elements of the specified collection to this CollectionAttr
+	 * @param elements collection containing the elements to be added to this CollectionAttr
+	 */
+	public void addAll(Collection<T> elements) {
+		collection.addAll(elements);
+		fireAttributeHasChanged();
+	}
+	
+	/**
+	 * Removes the specified element from this CollectionAttr
+	 * @param element element to be added to this CollectionAttr
+	 */
+	public void remove(T element) {
+		collection.remove(element);
+		fireAttributeHasChanged();
+	}
+	
+	/**
+	 * Removes all the elements of the specified collection from this CollectionAttr
+	 * @param elements collection containing the elements to be removed to this CollectionAttr
+	 */
+	public void removeAll(Collection<T> elements) {
+		collection.removeAll(elements);
+		fireAttributeHasChanged();
+	}
+	
+	/**
+	 * Retains only the elements of the specified collection in this CollectionAttr
+	 * @param elements collection containing the elements to be retained in this CollectionAttr
+	 */
+	public void retainAll(Collection<T> elements) {
+		collection.retainAll(elements);
+		fireAttributeHasChanged();
 	}
 	
 	/**
@@ -79,5 +108,13 @@ public abstract class CollectionAttr<T> extends AbstractAttribute {
 	 */
 	public boolean containsAll(Collection objects) {
 		return collection.containsAll(objects);
+	}
+	
+	/**
+	 * Returns the number of elements in this CollectionAttr
+	 * @return the number of elements in this CollectionAttr
+	 */
+	public int size() {
+		return collection.size();
 	}
 }

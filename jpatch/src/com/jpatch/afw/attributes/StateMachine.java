@@ -13,7 +13,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 	/**
 	 * A list of possible states of this StateMachine
 	 */
-	private final MutableCollectionAttr<T> states;
+	private final CollectionAttr<T> states;
 	
 	/**
 	 * An unmodifiable view of the states CollectionAttr.
@@ -48,7 +48,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
 	 */
 	public StateMachine(T[] states, T initialState) {
-		this.states = new MutableCollectionAttr<T>(LinkedHashSet.class);
+		this.states = new CollectionAttr<T>(LinkedHashSet.class);
 		this.statesView = new UnmodifiableCollectionAttr<T>(this.states);
 		for (T s : states) {
 			this.states.add(s);
@@ -78,7 +78,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public StateMachine(Class<? extends Enum> states, T initialState) {
-		this.states = new MutableCollectionAttr<T>(LinkedHashSet.class);
+		this.states = new CollectionAttr<T>(LinkedHashSet.class);
 		this.statesView = new UnmodifiableCollectionAttr<T>(this.states);
 		for (Enum s : states.getEnumConstants()) {
 			this.states.add((T) s);
@@ -95,7 +95,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 	 * @throws NullPointerException if states is <i>null</i>
 	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
 	 */
-	public StateMachine(MutableCollectionAttr<T> states, T initialState) {
+	public StateMachine(CollectionAttr<T> states, T initialState) {
 		this.states = states;
 		this.statesView = new UnmodifiableCollectionAttr<T>(this.states);
 		if (setValue(initialState) != initialState) {

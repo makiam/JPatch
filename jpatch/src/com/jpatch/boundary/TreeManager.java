@@ -57,13 +57,15 @@ public class TreeManager {
 					ignore = true;
 					if (treeNode.getParent() != null) {
 						System.out.println("removing " + treeNode + " from " + treeNode.getParent());
-						Thread.dumpStack();
-//						treeModel.removeNodeFromParent(treeNode);
+//						Thread.dumpStack();
+						treeModel.removeNodeFromParent(treeNode);
 					}
+					System.out.println("new parent node = " + node.getParentAttribute().getValue());
 					MutableTreeNode parentTreeNode = treeNodeMap.get(node.getParentAttribute().getValue());
 					if (parentTreeNode == null) {
 						parentTreeNode = (MutableTreeNode) treeModel.getRoot();
 					}
+					System.out.println("new parent treenode = " + parentTreeNode);
 					parentTreeNode.insert(treeNode, parentTreeNode.getChildCount());
 					ignore = false;
 				}

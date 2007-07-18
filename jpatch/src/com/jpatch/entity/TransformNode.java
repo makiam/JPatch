@@ -6,7 +6,7 @@ import trashcan.SoftBoundedDoubleAttr;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.afw.attributes.*;
 
-public class TransformNode extends AbstractTransformNode {
+public class TransformNode extends SceneGraphNode {
 	/**
 	 * Identity matrix
 	 */
@@ -98,7 +98,7 @@ public class TransformNode extends AbstractTransformNode {
 			if (autoTransform) {
 				autoTransform = false;
 				translationAttr.getTuple(positionTuple);
-				transform(positionTuple);
+				transform.transform(positionTuple);
 				positionAttr.setTuple(positionTuple);
 				autoTransform = true;
 			}
@@ -113,14 +113,14 @@ public class TransformNode extends AbstractTransformNode {
 			if (autoTransform) {
 				autoTransform = false;
 				positionAttr.getTuple(translationTuple);
-				invTransform(translationTuple);
+				transform.invTransform(translationTuple);
 				double x = ((SoftBoundedDoubleAttr) translationAttr.getXAttr()).getBoundedValue(translationTuple.x);
 				double y = ((SoftBoundedDoubleAttr) translationAttr.getXAttr()).getBoundedValue(translationTuple.x);
 				double z = ((SoftBoundedDoubleAttr) translationAttr.getXAttr()).getBoundedValue(translationTuple.x);
 				translationAttr.setTuple(x, y, z);
 				if (x != translationAttr.getX() || y != translationAttr.getY() || z != translationAttr.getZ()) {
 					positionTuple.set(x, y, z);
-					transform(positionTuple);
+					transform.transform(positionTuple);
 					positionAttr.setTuple(positionTuple);
 				}
 				autoTransform = true;
@@ -137,6 +137,42 @@ public class TransformNode extends AbstractTransformNode {
 		}
 	};
 	
+	private final Transform transform = new Transform() {
+		@Override
+		public void computeMatrix() {
+			SceneGraphNode parent = parentAttr.getValue();
+			if (parent == null) {
+				matrix.setIdentity();
+			} else {
+				parent.getTransform().getMatrix(matrix);
+			}
+			translationAttr.getTuple(translationTuple);
+			axisRotationAttr.getTuple(axisRotationTuple);
+			rotationAttr.getTuple(rotationTuple);
+			scaleAttr.getTuple(scaleTuple);
+			scaleTuple.scaleMatrix(matrix);
+			axisRotationTuple.rotateMatrix(matrix);
+			rotationTuple.rotateMatrix(matrix);
+			Utils3d.translateMatrix(matrix, translationTuple);
+			invInvalid = true;
+		}
+		
+		@Override
+		public void computeTransformedValues() {
+			if (autoTransform) {
+				autoTransform = false;
+				translationAttr.getTuple(positionTuple);
+				transform.transform(positionTuple);
+				positionAttr.setTuple(positionTuple);
+				autoTransform = true;
+			}
+		}
+	};
+	
+	public Transform getTransform() {
+		return transform;
+	}
+	
 	/**
 	 * Constructor
 	 */
@@ -144,28 +180,6 @@ public class TransformNode extends AbstractTransformNode {
 		translationAttr.addAttributePostChangeListener(translationListener);
 		positionAttr.addAttributePostChangeListener(positionListener);
 //		rotationOrderAttr.addAttributePostChangeListener(rotationOrderListener);
-	}
-	
-	/**
-	 * Computes the transformation matrix using the translation, rotation and scale attributes.
-	 * This implementation sets the invInvalid flag to true.
-	 */
-	public void computeMatrix() {
-		SceneGraphNode parent = sceneGraphNode.getParentAttribute().getValue();
-		if (parent == null) {
-			matrix.set(IDENTITY_MATRIX);
-		} else {
-			parent.getMatrix(matrix);
-		}
-		translationAttr.getTuple(translationTuple);
-		axisRotationAttr.getTuple(axisRotationTuple);
-		rotationAttr.getTuple(rotationTuple);
-		scaleAttr.getTuple(scaleTuple);
-		scaleTuple.scaleMatrix(matrix);
-		axisRotationTuple.rotateMatrix(matrix);
-		rotationTuple.rotateMatrix(matrix);
-		Utils3d.translateMatrix(matrix, translationTuple);
-		invInvalid = true;
 	}
 	
 	/**
@@ -247,7 +261,7 @@ public class TransformNode extends AbstractTransformNode {
 	public void setRotationOrder(Rotation3d.Order order) {
 		if (order != getRotationOrder()) {
 			rotationOrderAttr.setValue(order);
-			computeBranch();
+			transform.computeBranch();
 		}
 	}
 	
@@ -257,16 +271,5 @@ public class TransformNode extends AbstractTransformNode {
 	 */
 	public GenericAttr<String> getNameAttribute() {
 		return nameAttr;
-	}
-	
-	@Override
-	public void computeTransformedValues() {
-		if (autoTransform) {
-			autoTransform = false;
-			translationAttr.getTuple(positionTuple);
-			transform(positionTuple);
-			positionAttr.setTuple(positionTuple);
-			autoTransform = true;
-		}
 	}
 }
