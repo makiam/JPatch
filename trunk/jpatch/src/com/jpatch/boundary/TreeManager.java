@@ -55,18 +55,20 @@ public class TreeManager {
 			public void attributeHasChanged(Attribute source) {
 				if (!ignore) {
 					ignore = true;
+					SceneGraphNode newParent = node.getParentAttribute().getValue();
 					if (treeNode.getParent() != null) {
 						System.out.println("removing " + treeNode + " from " + treeNode.getParent());
 //						Thread.dumpStack();
 						treeModel.removeNodeFromParent(treeNode);
 					}
-					System.out.println("new parent node = " + node.getParentAttribute().getValue());
-					MutableTreeNode parentTreeNode = treeNodeMap.get(node.getParentAttribute().getValue());
+//					System.out.println("new parent node = " + node.getParentAttribute().getValue());
+					MutableTreeNode parentTreeNode = treeNodeMap.get(newParent);
 					if (parentTreeNode == null) {
 						parentTreeNode = (MutableTreeNode) treeModel.getRoot();
 					}
-					System.out.println("new parent treenode = " + parentTreeNode);
-					parentTreeNode.insert(treeNode, parentTreeNode.getChildCount());
+					treeModel.insertNodeInto(treeNode, parentTreeNode, parentTreeNode.getChildCount());
+//					System.out.println("new parent treenode = " + parentTreeNode);
+//					parentTreeNode.insert(treeNode, parentTreeNode.getChildCount());
 					ignore = false;
 				}
 			}
@@ -75,6 +77,13 @@ public class TreeManager {
 		return treeNode;
 	}
 	
+	void sceneGraphNodeParentChanged(SceneGraphNode node) {
+		SceneGraphTreeNode treeNode = getTreeNodeFor(node);
+		if (treeNode == null) {
+			throw new IllegalArgumentException(node.toString());
+		}
+		
+	}
 	public SceneGraphTreeNode getTreeNodeFor(SceneGraphLeaf node) {
 		return treeNodeMap.get(node);
 	}

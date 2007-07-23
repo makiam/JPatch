@@ -52,8 +52,10 @@ public class TreeTest {
 			public void actionPerformed(ActionEvent e) {
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
-						System.out.println("*");
-						node4.getParentAttribute().setValue(node1);
+						System.out.println("*" + " node4 new parent = " + node1);
+//						node4.getParentAttribute().setValue(node1);
+						treeModel.removeNodeFromParent(treeManager.getTreeNodeFor(node4));
+						treeModel.insertNodeInto(treeManager.getTreeNodeFor(node4), treeManager.getTreeNodeFor(node1), 0);
 					}
 				});
 			}	

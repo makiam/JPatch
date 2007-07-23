@@ -39,4 +39,30 @@ public class Utils {
 			}
 		};
 	}
+	
+	public static void trace(Object ... args) {
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		System.err.println(stackTrace[3]);
+		if (args.length > 0) {
+			System.err.print("    args: (");
+			for (int i = 0; i < args.length; i++) {
+				System.err.print(args[i].toString());
+				if (i < args.length - 1) {
+					System.err.print(", ");
+				} else {
+					System.err.println(")");
+				}
+			}
+		}
+		int min = 4;
+		for (int i = 4; i < stackTrace.length; i++) {
+			if (stackTrace[i].getClassName().startsWith("com.jpatch")) {
+				min = i;
+				break;
+			}
+		}
+		for (int i = 4; i <= min; i++) {
+			System.err.println("        called by --> " + stackTrace[i]);
+		}
+	}
 }

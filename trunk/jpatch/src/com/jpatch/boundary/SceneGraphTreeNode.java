@@ -1,5 +1,6 @@
 package com.jpatch.boundary;
 
+import com.jpatch.afw.Utils;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.entity.SceneGraphLeaf;
 import com.jpatch.entity.SceneGraphNode;
@@ -33,8 +34,9 @@ public class SceneGraphTreeNode implements MutableTreeNode {
 	}
 	
 	public void insert(MutableTreeNode child, int index) {
+		Utils.trace(child, index);
 		if (sceneGraphNode == null) {
-			throw new IllegalStateException("cant add child to leaf " + this);
+			throw new IllegalStateException("can't add child to leaf " + this);
 		}
 		child.setParent(this);
 		SceneGraphLeaf userChild = ((SceneGraphTreeNode) child).sceneGraphLeaf;
@@ -43,10 +45,12 @@ public class SceneGraphTreeNode implements MutableTreeNode {
 	}
 
 	public void remove(int index) {
+		Utils.trace(index);
 		remove(leafs.get(index));
 	}
 
 	public void remove(MutableTreeNode node) {
+		Utils.trace(node);
 		node.setParent(null);
 		SceneGraphLeaf userChild = ((SceneGraphTreeNode) node).sceneGraphLeaf;
 		userChild.getParentAttribute().setValue(null);
@@ -54,10 +58,12 @@ public class SceneGraphTreeNode implements MutableTreeNode {
 	}
 
 	public void removeFromParent() {
+		Utils.trace();
 		parent = null;
 	}
 
 	public void setParent(MutableTreeNode newParent) {
+		Utils.trace(newParent);
 		parent = newParent;
 	}
 
@@ -66,6 +72,7 @@ public class SceneGraphTreeNode implements MutableTreeNode {
 	}
 
 	public Enumeration children() {
+		Utils.trace();
 		return new Enumeration() {
 			int index = 0;
 			
@@ -90,26 +97,33 @@ public class SceneGraphTreeNode implements MutableTreeNode {
 	}
 
 	public boolean getAllowsChildren() {
+		Utils.trace();
 		return sceneGraphNode != null;
 	}
 
 	public TreeNode getChildAt(int childIndex) {
+		Utils.trace(childIndex);
 		return leafs.get(childIndex);
 	}
 
 	public int getChildCount() {
+		Utils.trace();
 		return leafs.size();
 	}
 
 	public int getIndex(TreeNode node) {
+		Utils.trace(node);
 		return leafs.indexOf(node);
 	}
 
 	public TreeNode getParent() {
+		Utils.trace();
+		Utils.trace();
 		return parent;
 	}
 
 	public boolean isLeaf() {
+		Utils.trace();
 		return leafs.size() == 0;
 	}
 
