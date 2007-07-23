@@ -1,0 +1,36 @@
+DefaultMutableTreeNode {
+
+	insert(newChild, childIndex) {
+		-> oldParent.remove(newChild);
+		-> newChild.setParent(this);
+		[update children list]
+	}
+	
+	remove(childIndex) {
+		-> child.setParent(null);
+		[update children list]
+	}
+	
+	removeFromParent() {
+		-> parent.remove(this);
+	}
+	setParent(newParent) {
+		[set parent]
+	}
+
+}
+
+DefaultTreeModel {
+
+	insertNodeInto(newChild, parent, index) {
+		parent.insert(newChild, index);
+		nodesWereIndserted(...);
+	}
+	
+	removeNodeFromParent(node) {
+		parent = node.getParent();
+		parent.remove(node);
+		nodesWereRemoved(...);
+	}
+	
+}
