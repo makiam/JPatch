@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.TimerTask;
 
-import com.jpatch.boundary.SceneGraphTreeNode;
 import com.jpatch.boundary.TreeManager;
 import com.jpatch.entity.TransformNode;
 
@@ -53,9 +52,9 @@ public class TreeTest {
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
 						System.out.println("*" + " node4 new parent = " + node1);
-//						node4.getParentAttribute().setValue(node1);
-						treeModel.removeNodeFromParent(treeManager.getTreeNodeFor(node4));
-						treeModel.insertNodeInto(treeManager.getTreeNodeFor(node4), treeManager.getTreeNodeFor(node1), 0);
+						node4.getParentAttribute().setValue(node1);
+//						treeModel.removeNodeFromParent(treeManager.getTreeNodeFor(node4));
+//						treeModel.insertNodeInto(treeManager.getTreeNodeFor(node4), treeManager.getTreeNodeFor(node1), 0);
 					}
 				});
 			}	
