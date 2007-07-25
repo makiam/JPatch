@@ -95,7 +95,10 @@ public class PlatformUtils {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			Color grayBackground = UIManager.getLookAndFeelDefaults().getColor("Panel.background");
 			UIManager.getLookAndFeelDefaults().put("ComboBox.background", Color.WHITE);
+			UIManager.getLookAndFeelDefaults().put("Tree.background", grayBackground);
+			UIManager.getLookAndFeelDefaults().put("Tree.textBackground", grayBackground);
 //			System.out.println(UIManager.getLookAndFeelDefaults().get("SliderUI"));
 //			UIManager.getLookAndFeelDefaults().put("Slider.paintThumbArrowShape", Boolean.TRUE);
 			

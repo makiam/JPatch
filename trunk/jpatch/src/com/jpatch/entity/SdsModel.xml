@@ -1,0 +1,3 @@
+<attributeEditor name="SdsModel" class="com.jpatch.entity.SdsModel">
+	<field name="Name" attribute="Name" />
+</attributeEditor>

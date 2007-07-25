@@ -75,7 +75,7 @@ public abstract class Viewport implements NamedObject {
 			}
 //			getComponent().update(null);
 //			getComponent().repaint();
-			((GLAutoDrawable) getComponent()).display();
+//			((GLAutoDrawable) getComponent()).display();
 //			EventQueue.invokeLater(new Runnable() {
 //				public void run() {
 //					getComponent().paint(null);

@@ -7,10 +7,6 @@ import com.jpatch.afw.vecmath.*;
 import com.jpatch.afw.attributes.*;
 
 public class TransformNode extends SceneGraphNode {
-	/**
-	 * Identity matrix
-	 */
-	private static final Matrix4d IDENTITY_MATRIX = Utils3d.createIdentityMatrix();
 	
 	/**
 	 * Temporary storage for the translation (relative to the parent node)
@@ -41,11 +37,7 @@ public class TransformNode extends SceneGraphNode {
 	/**
 	 * Translation attribute (Tuple3 consisting of 3 SoftBoundedDoubleAttr)
 	 */
-	protected Tuple3Attr translationAttr = new Tuple3Attr(
-			new SoftBoundedDoubleAttr(0, 0, 0),
-			new SoftBoundedDoubleAttr(0, 0, 0),
-			new SoftBoundedDoubleAttr(0, 0, 0)
-	);
+	protected Tuple3Attr translationAttr = new Tuple3Attr();
 	
 	/**
 	 * Position attribute (Tuple3 consisting of 3 DoubleAttr)
@@ -60,11 +52,7 @@ public class TransformNode extends SceneGraphNode {
 	/**
 	 * Rotation attribute (Tuple3 consisting of 3 SoftBoundedDoubleAttr)
 	 */
-	protected Tuple3Attr rotationAttr = new Tuple3Attr(
-			new SoftBoundedDoubleAttr(0, 0, 0),
-			new SoftBoundedDoubleAttr(0, 0, 0),
-			new SoftBoundedDoubleAttr(0, 0, 0)
-	);
+	protected Tuple3Attr rotationAttr = new Tuple3Attr();
 	
 	/**
 	 * Rotation-order attribute
@@ -74,11 +62,7 @@ public class TransformNode extends SceneGraphNode {
 	/**
 	 * Scale attribute (Tuple3 consisting of 3 SoftBoundedDoubleAttr)
 	 */
-	protected Tuple3Attr scaleAttr = new Tuple3Attr(
-			new SoftBoundedDoubleAttr(0, 0, 0),
-			new SoftBoundedDoubleAttr(0, 0, 0),
-			new SoftBoundedDoubleAttr(0, 0, 0)
-	);
+	protected Tuple3Attr scaleAttr = new Tuple3Attr(1, 1, 1);
 	
 	protected BooleanAttr visibilityAttr = new BooleanAttr(true);
 	
@@ -97,9 +81,7 @@ public class TransformNode extends SceneGraphNode {
 		public void attributeHasChanged(Attribute source) {
 			if (autoTransform) {
 				autoTransform = false;
-				translationAttr.getTuple(positionTuple);
-				transform.transform(positionTuple);
-				positionAttr.setTuple(positionTuple);
+				computePosition();
 				autoTransform = true;
 			}
 		}
@@ -114,12 +96,9 @@ public class TransformNode extends SceneGraphNode {
 				autoTransform = false;
 				positionAttr.getTuple(translationTuple);
 				transform.invTransform(translationTuple);
-				double x = ((SoftBoundedDoubleAttr) translationAttr.getXAttr()).getBoundedValue(translationTuple.x);
-				double y = ((SoftBoundedDoubleAttr) translationAttr.getXAttr()).getBoundedValue(translationTuple.x);
-				double z = ((SoftBoundedDoubleAttr) translationAttr.getXAttr()).getBoundedValue(translationTuple.x);
-				translationAttr.setTuple(x, y, z);
-				if (x != translationAttr.getX() || y != translationAttr.getY() || z != translationAttr.getZ()) {
-					positionTuple.set(x, y, z);
+				translationAttr.setTuple(translationTuple);
+				if (translationTuple.x != translationAttr.getX() || translationTuple.y != translationAttr.getY() || translationTuple.z != translationAttr.getZ()) {
+					positionTuple.set(translationTuple);
 					transform.transform(positionTuple);
 					positionAttr.setTuple(positionTuple);
 				}
@@ -137,14 +116,21 @@ public class TransformNode extends SceneGraphNode {
 		}
 	};
 	
+	void computePosition() {
+		translationAttr.getTuple(positionTuple);
+		transform.transform(positionTuple);
+		positionAttr.setTuple(positionTuple);
+	}
+	
 	private final Transform transform = new Transform() {
 		@Override
 		public void computeMatrix() {
 			SceneGraphNode parent = parentAttr.getValue();
-			if (parent == null) {
-				matrix.setIdentity();
+			Transform parentTransform = parent.getTransform();
+			if (parentTransform != null) {
+				parentTransform.getMatrix(matrix);
 			} else {
-				parent.getTransform().getMatrix(matrix);
+				matrix.setIdentity();
 			}
 			translationAttr.getTuple(translationTuple);
 			axisRotationAttr.getTuple(axisRotationTuple);
@@ -155,6 +141,7 @@ public class TransformNode extends SceneGraphNode {
 			rotationTuple.rotateMatrix(matrix);
 			Utils3d.translateMatrix(matrix, translationTuple);
 			invInvalid = true;
+//			System.out.println(nameAttr.getValue() + " computeMatrix called, matrix is " + matrix);
 		}
 		
 		@Override

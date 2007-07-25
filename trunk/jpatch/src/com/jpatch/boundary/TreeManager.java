@@ -22,7 +22,7 @@ public class TreeManager {
 	/**
 	 * Used to detect concurrent modifications when iterating over treeNode children
 	 */
-	private static final AttributePostChangeListener CONCURRENT_MODIFICATION_LISTENER = new AttributePostChangeListener() {
+	static final AttributePostChangeListener CONCURRENT_MODIFICATION_LISTENER = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
 			throw new ConcurrentModificationException();
 		}
@@ -58,7 +58,7 @@ public class TreeManager {
 		}
 		
 		/* create new SceneGraphTreeNode and add it to the treeMap */
-		final SceneGraphTreeNode treeNode = new SceneGraphTreeNode(node);
+		final SceneGraphTreeNode treeNode = new SceneGraphTreeNode(this, node);
 		treeNodeMap.put(node, treeNode);
 		
 		/* if it's not a leaf, recursively call this method for all children */
@@ -133,110 +133,6 @@ public class TreeManager {
 			ignoreModelChange = true;
 			child.getParentAttribute().setValue(parent);
 			ignoreModelChange = false;
-		}
-	}
-	
-	/**
-	 * private MutableTreeNode implementation
-	 * @author sascha
-	 */
-	private class SceneGraphTreeNode implements MutableTreeNode {
-		private MutableTreeNode parent;
-		private final SceneGraphLeaf sceneGraphLeaf;
-		private final SceneGraphNode sceneGraphNode;
-		private final List<SceneGraphTreeNode> leafs = new ArrayList<SceneGraphTreeNode>();
-		
-		public SceneGraphTreeNode(SceneGraphLeaf sceneGraphLeaf) {
-			this.sceneGraphLeaf = sceneGraphLeaf;
-			if (sceneGraphLeaf instanceof SceneGraphNode) {
-				sceneGraphNode = (SceneGraphNode) sceneGraphLeaf;
-			} else {
-				sceneGraphNode = null;
-			}
-		}
-		
-		public void insert(MutableTreeNode newChild, int childIndex) {
-			if (sceneGraphNode == null) {
-				throw new IllegalStateException("can't add child to leaf " + this);
-			}
-			MutableTreeNode oldParent = (MutableTreeNode) newChild.getParent();
-			if (oldParent != null) {
-				oldParent.remove(newChild);
-		    }
-			newChild.setParent(this);
-			leafs.add(childIndex, (SceneGraphTreeNode) newChild);
-		}
-
-		public void remove(int index) {
-			remove(leafs.get(index));
-		}
-
-		public void remove(MutableTreeNode node) {
-			node.setParent(null);
-			leafs.remove(node);
-		}
-
-		public void removeFromParent() {
-			parent.remove(this);	// will call setParent(null) on this node
-		}
-
-		public void setParent(MutableTreeNode newParent) {
-			parent = newParent;
-			if (parent instanceof SceneGraphTreeNode) {
-				treeNodeInsert(((SceneGraphTreeNode) parent).sceneGraphNode, sceneGraphLeaf);
-			}
-		}
-
-		public void setUserObject(Object object) {
-			throw new UnsupportedOperationException();
-		}
-
-		public Enumeration children() {
-			return new Enumeration() {
-				int index = 0;
-				
-				public boolean hasMoreElements() {
-					boolean hasNext = index < leafs.size();
-					if (index == 0 && hasNext) {
-						sceneGraphNode.getChildrenAttribute().addAttributePostChangeListener(CONCURRENT_MODIFICATION_LISTENER);
-					} else if (!hasNext) {
-						sceneGraphNode.getChildrenAttribute().removeAttributePostChangeListener(CONCURRENT_MODIFICATION_LISTENER);
-					}
-					return hasNext;
-				}
-
-				public Object nextElement() {
-					try {
-						return leafs.get(index++);
-					} catch (IndexOutOfBoundsException e) {
-						throw new NoSuchElementException(e.getMessage());
-					}
-				}
-			};
-		}
-
-		public boolean getAllowsChildren() {
-			return sceneGraphNode != null;
-		}
-
-		public TreeNode getChildAt(int childIndex) {
-			return leafs.get(childIndex);
-		}
-
-		public int getChildCount() {
-			return leafs.size();
-		}
-
-		public int getIndex(TreeNode node) {
-			return leafs.indexOf(node);
-		}
-
-		public TreeNode getParent() {
-			return parent;
-		}
-
-		public boolean isLeaf() {
-			return leafs.size() == 0;
 		}
 	}
 }

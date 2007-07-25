@@ -69,6 +69,7 @@ public class MoveVertexTool implements JPatchTool {
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				if (mouseMotionListener != null) {
 					viewport.getComponent().removeMouseMotionListener(mouseMotionListener);
+					Main.getInstance().syncViewports(viewport);
 				}
 			}
 		}
@@ -97,8 +98,7 @@ public class MoveVertexTool implements JPatchTool {
 //			p.add(pos);
 			vertex.getPosition().setTuple(p);
 			Main.getInstance().getActiveSds().computeLevel2Vertices();
-			((GLCanvas) viewport.getComponent()).display();
+			Main.getInstance().syncRepaintViewport(viewport);
 		}
 	}
-
 }

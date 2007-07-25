@@ -2,6 +2,9 @@ package com.jpatch.afw;
 
 import java.util.*;
 
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+
 public class Utils {
 	/**
 	 * Returns an Enumeration that iterates over all elements of the specified Iterator
@@ -64,5 +67,35 @@ public class Utils {
 		for (int i = 4; i <= min; i++) {
 			System.err.println("        called by --> " + stackTrace[i]);
 		}
+	}
+	
+	/**
+	 * Returns the distance from the root node to the specified node.
+	 * @param node
+	 * @return the distance from the root node to the specified node.
+	 * If the specified node is the root node, 0 is returned.
+	 */
+	public static int getTreeNodeLevel(TreeNode node) {
+		int level = 0;
+		while (node != null) {
+			node = node.getParent();
+			level++;
+		}
+		return level - 1;
+	}
+	
+	/**
+	 * Returns the TreePath from the root node to the specified node.
+	 * @param node
+	 * @return the TreePath from the root node to the specified node.
+	 */
+	public static TreePath createTreePath(TreeNode node) {
+		int n = getTreeNodeLevel(node) + 1;
+		Object[] path = new Object[n];
+		for (int i = n - 1; i >= 0; i--) {
+			path[i] = node;
+			node = node.getParent();
+		}
+		return new TreePath(path);
 	}
 }

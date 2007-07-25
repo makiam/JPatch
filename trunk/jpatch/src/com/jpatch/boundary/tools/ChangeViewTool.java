@@ -4,6 +4,8 @@ import com.jpatch.boundary.*;
 
 import java.awt.event.*;
 
+import javax.media.opengl.GLAutoDrawable;
+
 //import jpatch.entity.*;
 
 public class ChangeViewTool implements JPatchTool {
@@ -117,6 +119,7 @@ public class ChangeViewTool implements JPatchTool {
 				viewport.getViewScaleAttribute().setDouble(viewport.getViewScaleAttribute().getDouble() * factor);
 				break;
 			}
+			Main.getInstance().repaintViewport(viewport);
 		}
 	}
 }
