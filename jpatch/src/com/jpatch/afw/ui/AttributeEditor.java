@@ -1,15 +1,10 @@
 package com.jpatch.afw.ui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import java.awt.*;
+import java.awt.event.ActionListener;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicSliderUI;
@@ -20,6 +15,7 @@ import com.jpatch.afw.icons.IconSet;
 import com.sun.java.swing.plaf.motif.MotifSliderUI;
 
 public class AttributeEditor {
+	
 	private static final Icon LOWER_LIMIT = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/SET_LOWER_LIMIT.png"));
 	private static final Icon UPPER_LIMIT = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/SET_UPPER_LIMIT.png"));
 	private static final Icon CLEAR_LIMIT = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/CLEAR_LIMIT.png"));
@@ -173,27 +169,27 @@ public class AttributeEditor {
 			/* limit */
 			Tuple3Attr attr = (Tuple3Attr) attribute;
 			JComponent[] components = binding.components;
-			AttributeManager.getInstance().bindLimit(attr.getXAttr(), DoubleMaximum.class, (JButton) components[6], (JButton) components[12], (JTextField) components[0]);
-			AttributeManager.getInstance().bindLimit(attr.getXAttr(), DoubleMinimum.class, (JButton) components[7], (JButton) components[13], (JTextField) components[1]);
-			AttributeManager.getInstance().bindLimit(attr.getYAttr(), DoubleMaximum.class, (JButton) components[8], (JButton) components[14], (JTextField) components[2]);
-			AttributeManager.getInstance().bindLimit(attr.getYAttr(), DoubleMinimum.class, (JButton) components[9],(JButton) components[15], (JTextField) components[3]);
-			AttributeManager.getInstance().bindLimit(attr.getZAttr(), DoubleMaximum.class, (JButton) components[10], (JButton) components[16], (JTextField) components[4]);
-			AttributeManager.getInstance().bindLimit(attr.getZAttr(), DoubleMinimum.class, (JButton) components[11], (JButton) components[17], (JTextField) components[5]);
+			AttributeManager.getInstance().bindLimit(entity, attr.getXAttr(), DoubleMaximum.class, (JButton) components[6], (JButton) components[12], (JTextField) components[0]);
+			AttributeManager.getInstance().bindLimit(entity, attr.getXAttr(), DoubleMinimum.class, (JButton) components[7], (JButton) components[13], (JTextField) components[1]);
+			AttributeManager.getInstance().bindLimit(entity, attr.getYAttr(), DoubleMaximum.class, (JButton) components[8], (JButton) components[14], (JTextField) components[2]);
+			AttributeManager.getInstance().bindLimit(entity, attr.getYAttr(), DoubleMinimum.class, (JButton) components[9],(JButton) components[15], (JTextField) components[3]);
+			AttributeManager.getInstance().bindLimit(entity, attr.getZAttr(), DoubleMaximum.class, (JButton) components[10], (JButton) components[16], (JTextField) components[4]);
+			AttributeManager.getInstance().bindLimit(entity, attr.getZAttr(), DoubleMinimum.class, (JButton) components[11], (JButton) components[17], (JTextField) components[5]);
 		} else if (attribute instanceof Tuple3Attr) {
-			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[0], ((Tuple3Attr) attribute).getXAttr());
-			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[1], ((Tuple3Attr) attribute).getYAttr());
-			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[2], ((Tuple3Attr) attribute).getZAttr());
+			AttributeManager.getInstance().bindTextFieldToAttribute(entity, (JTextField) binding.components[0], ((Tuple3Attr) attribute).getXAttr());
+			AttributeManager.getInstance().bindTextFieldToAttribute(entity, (JTextField) binding.components[1], ((Tuple3Attr) attribute).getYAttr());
+			AttributeManager.getInstance().bindTextFieldToAttribute(entity, (JTextField) binding.components[2], ((Tuple3Attr) attribute).getZAttr());
 		} else if (attribute instanceof Tuple2Attr) {
-			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[0], ((Tuple2Attr) attribute).getXAttr());
-			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[1], ((Tuple2Attr) attribute).getYAttr());
+			AttributeManager.getInstance().bindTextFieldToAttribute(entity, (JTextField) binding.components[0], ((Tuple2Attr) attribute).getXAttr());
+			AttributeManager.getInstance().bindTextFieldToAttribute(entity, (JTextField) binding.components[1], ((Tuple2Attr) attribute).getYAttr());
 		} else if (attribute instanceof BooleanAttr) {
-			AttributeManager.getInstance().bindCheckBoxToAttribute((JCheckBox) binding.components[0], (BooleanAttr) attribute);
+			AttributeManager.getInstance().bindCheckBoxToAttribute(entity, (JCheckBox) binding.components[0], (BooleanAttr) attribute);
 		} else if (attribute instanceof StateMachine) {
-			AttributeManager.getInstance().bindComboBoxToAttribute((JComboBox) binding.components[0], (StateMachine) attribute);
+			AttributeManager.getInstance().bindComboBoxToAttribute(entity, (JComboBox) binding.components[0], (StateMachine) attribute);
 		} else if (attribute instanceof ScalarAttribute){
-			AttributeManager.getInstance().bindTextFieldToAttribute((JTextField) binding.components[0], (ScalarAttribute) attribute);
+			AttributeManager.getInstance().bindTextFieldToAttribute(entity, (JTextField) binding.components[0], (ScalarAttribute) attribute);
 			if (binding.components.length == 2) {
-				AttributeManager.getInstance().bindSliderToAttribute((JSlider) binding.components[1], (DoubleAttr) attribute, IdentityMapping.getInstance());
+				AttributeManager.getInstance().bindSliderToAttribute(entity, (JSlider) binding.components[1], (DoubleAttr) attribute, IdentityMapping.getInstance());
 			}
 		} else {
 			throw new IllegalStateException();

@@ -27,21 +27,26 @@ package com.jpatch.boundary;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.Configuration;
 import com.jpatch.afw.icons.IconSet;
+import com.jpatch.afw.ui.AttributeManager;
 import com.jpatch.afw.ui.Background;
 import com.jpatch.afw.ui.ButtonUtils;
 import com.jpatch.afw.ui.JPatchActionButton;
 import com.jpatch.afw.ui.JPatchStateButton;
 import com.jpatch.afw.ui.JPatchToggleButton;
 import com.jpatch.afw.ui.JPatchToolBar;
+import com.jpatch.afw.ui.UserInputListener;
 import com.jpatch.boundary.actions.Actions;
 import com.jpatch.boundary.actions.Actions.ViewportMode;
 import com.jpatch.boundary.tools.JPatchTool;
 import com.jpatch.boundary.tools.RotateTool;
+import com.jpatch.entity.SceneGraphNode;
+import com.jpatch.entity.SdsModel;
+import com.jpatch.entity.Transform;
+import com.jpatch.entity.TransformNode;
 import com.jpatch.entity.sds.JptLoader;
 import com.jpatch.entity.sds.Sds;
 import com.jpatch.settings.Settings;
 import com.jpatch.ui.ViewportSwitcher;
-import com.sun.opengl.impl.GLWorkerThread;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -54,9 +59,12 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.Threading;
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import jpatch.boundary.tools.Tools;
@@ -88,6 +96,14 @@ public class Main {
 	private StateMachine<Viewport> activeViewport; 
 	
 	private Actions actions = new Actions();
+	private boolean syncViewports = false;
+	
+	private SceneGraphNode sceneGraphRoot = new SceneGraphNode() {
+		@Override
+		public Transform getTransform() {
+			return null;
+		}
+	};
 	
 	private LayoutManager2 screenLayout = new LayoutManager2() {
 		private Dimension dim = new Dimension();
@@ -470,8 +486,32 @@ public class Main {
 		JPatchInspector inspector = new JPatchInspector();
 		activeViewport.addAttributePostChangeListener(inspector.getViewportChangeListener());
 		inspector.getComponent().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		JScrollPane scrollPane = new JScrollPane(new JScrollPane(inspector.getComponent(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
-		scrollPane.setBorder(null);
+		
+		final DefaultTreeModel treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
+		final TreeManager treeManager = new TreeManager(treeModel);
+		
+		final TransformNode node1 = new TransformNode();
+		final TransformNode node2 = new TransformNode();
+		final TransformNode node3 = new TransformNode();
+		final TransformNode node4 = new TransformNode();
+		final SdsModel model1 = new SdsModel(activeSds);
+		
+		node1.getNameAttribute().setValue("node 1");
+		node1.getParentAttribute().setValue(sceneGraphRoot);
+		node2.getParentAttribute().setValue(node1);
+		node2.getNameAttribute().setValue("node 2");
+		node3.getParentAttribute().setValue(node2);
+		node3.getNameAttribute().setValue("node 3");
+		node4.getParentAttribute().setValue(node2);
+		node4.getNameAttribute().setValue("node 4");
+		model1.getParentAttribute().setValue(node4);
+		model1.getNameAttribute().setValue("model 1");
+		
+		treeManager.createTreeNodeFor(sceneGraphRoot);
+		JTree tree = new JTree(treeModel);
+		
+		JScrollPane scrollPane = new JScrollPane(inspector.getComponent(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setBorder(BorderFactory.createLineBorder(new Color(0xcccccc), 1));
 		scrollPane.getViewport().setBorder(null);
 		scrollPane.setViewportBorder(null);
 		scrollPane.getVerticalScrollBar().setBorder(null);
@@ -481,11 +521,41 @@ public class Main {
 		vSplit.add(scrollPane);
 		vSplit.setDividerSize(9);
 //		vSplit.add(new JScrollPane(tree));
-		vSplit.add(new JPanel());
+		
+		JScrollPane scrollPane2 = new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane2.setBorder(BorderFactory.createLineBorder(new Color(0xcccccc), 1));
+		scrollPane2.getViewport().setBorder(null);
+		scrollPane2.setViewportBorder(null);
+		scrollPane2.getVerticalScrollBar().setBorder(null);
+		
+		vSplit.add(scrollPane2);
 		vSplit.setOneTouchExpandable(true);
 //		hSplit.setBackground(BACKGROUND);
-		hSplit.add(vSplit);
-		hSplit.add(screen);
+		
+		JComponent sideBar = new JPanel(new BorderLayout());
+		JComponent leftStrut = new JComponent() {
+			@Override
+			public void paintComponent(Graphics g) {
+				Background.fillComponent(this, g);
+			}
+		};
+		leftStrut.setPreferredSize(new Dimension(2, 2));
+		sideBar.add(leftStrut, BorderLayout.WEST);
+		sideBar.add(vSplit, BorderLayout.CENTER);
+		
+		JComponent screenArea = new JPanel(new BorderLayout());
+		JComponent rightStrut = new JComponent() {
+			@Override
+			public void paintComponent(Graphics g) {
+				Background.fillComponent(this, g);
+			}
+		};
+		rightStrut.setPreferredSize(new Dimension(2, 2));
+		screenArea.add(screen, BorderLayout.CENTER);
+		screenArea.add(rightStrut, BorderLayout.EAST);
+		
+		hSplit.add(sideBar);
+		hSplit.add(screenArea);
 		hSplit.setBorder(null);
 		hSplit.setContinuousLayout(true);
 		hSplit.setOneTouchExpandable(true);
@@ -513,6 +583,25 @@ public class Main {
 		
 //		viewports[0].setActive(true);
 //		activeViewport.setValue(viewports[0]);
+		
+		SelectionManager selectionManager = new SelectionManager(tree, treeManager);
+		selectionManager.getSelectedObjectAttribute().addAttributePostChangeListener(inspector.getSelectionChangeListener());
+		
+		AttributeManager.getInstance().addUserInputListener(new UserInputListener() {
+			public void userInput(Object source) {
+//				System.out.println("UserInput from " + source);
+				/*
+				 * if the input came from a viewport, repaint just this viewport,
+				 * otherwise repaint all viewports
+				 */
+				if (source instanceof Viewport) {
+					repaintViewport((Viewport) source);
+				} else {
+					repaintViewports();
+				}
+			}
+		});
+		
 		frame.setVisible(true);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -563,6 +652,10 @@ public class Main {
 		return activeSds;
 	}
 	
+	public SceneGraphNode getSceneGraphRoot() {
+		return sceneGraphRoot;
+	}
+	
 	public JPatchTool getActiveTool() {
 //		return actions.toolSM.getValue();
 		return new RotateTool();
@@ -573,11 +666,33 @@ public class Main {
 	}
 	
 	
+	public void repaintViewport(Viewport viewport) {
+		Component component = viewport.getComponent();
+		if (component.isVisible()) {
+			((GLAutoDrawable) component).display();
+		}
+	}
 	
 	public void repaintViewports() {
-		for (int i = 0; i < viewports.length; i++) {
-			if (viewports[i].getComponent().isVisible()) {
-				((GLAutoDrawable) viewports[i].getComponent()).display();
+		for (Viewport viewport : viewports) {
+			repaintViewport(viewport);
+		}
+	}
+	
+	public void syncRepaintViewport(Viewport viewport) {
+		if (syncViewports) {
+			repaintViewports();
+		} else {
+			repaintViewport(viewport);
+		}
+	}
+	
+	public void syncViewports(Viewport viewport) {
+		if (!syncViewports) {
+			for (Viewport v : viewports) {
+				if (v != viewport) {
+					repaintViewport(v);
+				}
 			}
 		}
 	}

@@ -294,7 +294,6 @@ public class Rotation3d extends Tuple3d {
 	
 	/**
 	 * If necessary, recompute the matrix (trig functions are slow, especially in Java)
-	 * @param force true to force the recomputation, false to use cached value if possible
 	 */
 	private final void computeMatrix() {
 		if (oldX != x || oldY != y || oldZ != z || matrixInvalid) {

@@ -68,6 +68,11 @@ public class AttributeManager {
 	private final Map<JComponent, AttributeBinding[]> componentBindings = new HashMap<JComponent, AttributeBinding[]>();
 	
 	/**
+	 * A list of ActionListeners
+	 */
+	private final List<UserInputListener> listenerList = new ArrayList<UserInputListener>();
+	
+	/**
 	 * Returns the single AttributeManager instance (singleton pattern)
 	 * @return the single AttributeManager instance
 	 */
@@ -79,6 +84,23 @@ public class AttributeManager {
 	 * Private constructor (singleton pattern)
 	 */
 	private AttributeManager() { }
+	
+	/**
+	 * Adds the specified ActionListener. The listeners actionPerformed method will be
+	 * called on every user input.
+	 * @param listener the ActionListener to add
+	 */
+	public void addUserInputListener(UserInputListener listener) {
+		listenerList.add(listener);
+	}
+	
+	/**
+	 * Removes the specified ActionListener.
+	 * @param listener the ActionListener to remove
+	 */
+	public void removeUserInputListener(UserInputListener listener) {
+		listenerList.remove(listener);
+	}
 	
 	/**
 	 * Locks the specified attribute
@@ -243,7 +265,7 @@ public class AttributeManager {
 	 * @throws NullPointerException if any of the specified parameters is null
 	 * @throws IllegalStateException if the specified JCheckBox is already bound (to <i>any</i> Attribute)
 	 */
-	public JCheckBox bindCheckBoxToAttribute(final JCheckBox checkBox, final BooleanAttr booleanAttr) {
+	public JCheckBox bindCheckBoxToAttribute(final Object entity, final JCheckBox checkBox, final BooleanAttr booleanAttr) {
 //		checkBox.setSelected(booleanAttr.getBoolean());
 		
 		/* create an AttributePostChangeListener to listen for attribute changes und update the checkbox */
@@ -260,23 +282,24 @@ public class AttributeManager {
 		addListener(checkBox, new ActionListener() {					// throws IllegalStateException if already bound
 			public void actionPerformed(ActionEvent e) {
 				booleanAttr.setBoolean(checkBox.isSelected());
+				fireActionPerformed(entity);
 			}
 		});
 		
 		return checkBox;
 	}
 	
-	public JTextField bindTextFieldToAttribute(final JTextField textField, ScalarAttribute attribute) {
+	public JTextField bindTextFieldToAttribute(Object entity, final JTextField textField, ScalarAttribute attribute) {
 		if (attribute instanceof DoubleAttr) {
-			return bindTextFieldToAttribute(textField, (DoubleAttr) attribute);
+			return bindTextFieldToAttribute(entity, textField, (DoubleAttr) attribute);
 		} else if (attribute instanceof GenericAttr) {
-			return bindTextFieldToAttribute(textField, (GenericAttr<String>) attribute);
+			return bindTextFieldToAttribute(entity, textField, (GenericAttr<String>) attribute);
 		} else {
 			throw new IllegalArgumentException("can't bind " + attribute + " to " + textField);
 		}
 	}
 	
-	public JComboBox bindComboBoxToAttribute(final JComboBox comboBox, final StateMachine stateMachine) {
+	public JComboBox bindComboBoxToAttribute(final Object entity, final JComboBox comboBox, final StateMachine stateMachine) {
 		class SuperListener implements ActionListener, AttributePostChangeListener {
 			private boolean suppressAction = false;
 			
@@ -284,6 +307,7 @@ public class AttributeManager {
 				if (!suppressAction) {
 					if (comboBox.getSelectedItem() != stateMachine.getValue()) {
 						Object newState = stateMachine.setValue(comboBox.getSelectedItem());
+						fireActionPerformed(entity);
 						if (newState != comboBox.getSelectedItem()) {
 							comboBox.setSelectedItem(newState);
 						}
@@ -326,7 +350,7 @@ public class AttributeManager {
 	 * @throws NullPointerException if any of the specified parameters is null
 	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
 	 */
-	private JTextField bindTextFieldToAttribute(final JTextField textField, final GenericAttr<String> stringAttr) {
+	private JTextField bindTextFieldToAttribute(final Object entity, final JTextField textField, final GenericAttr<String> stringAttr) {
 		textField.setColumns(COLUMNS);
 		
 		class SuperListener extends FocusAdapter implements FocusListener, AttributePostChangeListener {
@@ -338,6 +362,7 @@ public class AttributeManager {
 					String newValue = stringAttr.setValue(textField.getText());
 					if (newValue.equals(textField.getText())) {
 						textField.setBackground(textField.isEnabled() ? UIManager.getColor("TextField.background") : UIManager.getColor("TextField.inactiveBackground"));
+						fireActionPerformed(entity);
 					} else {
 						textField.setBackground(Color.YELLOW);
 						textField.requestFocus();
@@ -378,7 +403,7 @@ public class AttributeManager {
 	 * @throws NullPointerException if any of the specified parameters is null
 	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
 	 */
-	private JTextField bindTextFieldToAttribute(final JTextField textField, final DoubleAttr doubleAttr) {
+	private JTextField bindTextFieldToAttribute(final Object entity, final JTextField textField, final DoubleAttr doubleAttr) {
 		textField.setColumns(COLUMNS);
 		textField.setHorizontalAlignment(SwingConstants.RIGHT);
 //		textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
@@ -392,9 +417,13 @@ public class AttributeManager {
 				if (!suppressAction) {
 					suppressAction = true;
 					try {
-						doubleAttr.setDouble(Double.parseDouble(textField.getText()));
-						textField.setBackground(textField.isEnabled() ? UIManager.getColor("TextField.background") : UIManager.getColor("TextField.inactiveBackground"));
-						textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
+						double value = Double.parseDouble(textField.getText());
+						if (value != doubleAttr.getDouble()) {
+							doubleAttr.setDouble(Double.parseDouble(textField.getText()));
+							textField.setBackground(textField.isEnabled() ? UIManager.getColor("TextField.background") : UIManager.getColor("TextField.inactiveBackground"));
+							textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
+							fireActionPerformed(entity);
+						}
 					} catch (NumberFormatException exception) {
 						textField.setBackground(Color.YELLOW);
 						textField.requestFocus();
@@ -438,13 +467,13 @@ public class AttributeManager {
 	 * @throws IllegalArgumentEexception if the specified attribute is not bounded
 	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
 	 */
-	public JSlider bindSliderToAttribute(JSlider slider, DoubleAttr attr, Mapping mapping) {
+	public JSlider bindSliderToAttribute(Object entity, JSlider slider, DoubleAttr attr, Mapping mapping) {
 		DoubleAttr min = getLowerLimit(attr);
 		DoubleAttr max = getUpperLimit(attr);
 		if (min == null || max == null) {
 			throw new IllegalArgumentException(attr + " is not bounded");
 		}
-		return bindSliderToAttribute(slider, attr, min, max, mapping);
+		return bindSliderToAttribute(entity, slider, attr, min, max, mapping);
 	}
 	
 	/**
@@ -460,8 +489,8 @@ public class AttributeManager {
 	 * @throws IllegalArgumentEexception if the specified attribute is not bounded
 	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
 	 */
-	public JSlider bindSliderToAttribute(JSlider slider, DoubleAttr attr, double min, double max, Mapping mapping) {
-		return bindSliderToAttribute(slider, attr, new DoubleAttr(min), new DoubleAttr(max), mapping);
+	public JSlider bindSliderToAttribute(Object entity, JSlider slider, DoubleAttr attr, double min, double max, Mapping mapping) {
+		return bindSliderToAttribute(entity, slider, attr, new DoubleAttr(min), new DoubleAttr(max), mapping);
 	}
 	
 	/**
@@ -475,7 +504,7 @@ public class AttributeManager {
 	 * @throws NullPointerException if any of the specified parameters is null
 	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
 	 */
-	private JSlider bindSliderToAttribute(final JSlider slider, final DoubleAttr attr, final DoubleAttr min, final DoubleAttr max, final Mapping mapping) {
+	private JSlider bindSliderToAttribute(final Object entity, final JSlider slider, final DoubleAttr attr, final DoubleAttr min, final DoubleAttr max, final Mapping mapping) {
 		slider.setMinimum(0);
 		slider.setMaximum(1000);
 		
@@ -486,6 +515,7 @@ public class AttributeManager {
 				if (!suppressAction) {
 					suppressAction = true;
 					getSliderValue(slider, attr, min, max, mapping);
+					fireActionPerformed(entity);
 					suppressAction = false;
 				}
 			}
@@ -523,7 +553,7 @@ public class AttributeManager {
 	 * @param clear the button used fot the "clear" action
 	 * @param textField the textfield to bind to the limit
 	 */
-	public void bindLimit(final DoubleAttr attr, final Class<? extends DoubleLimit> type, final JButton set, final JButton clear, final JTextField textField) {
+	public void bindLimit(final Object entity, final DoubleAttr attr, final Class<? extends DoubleLimit> type, final JButton set, final JButton clear, final JTextField textField) {
 		textField.setColumns(COLUMNS);
 		textField.setHorizontalAlignment(SwingConstants.RIGHT);
 		if (type == DoubleMinimum.class) {
@@ -531,7 +561,7 @@ public class AttributeManager {
 			clear.setEnabled(limit != null);
 			textField.setEnabled(limit != null);
 			if (limit != null) {
-				bindTextFieldToAttribute(textField, limit);
+				bindTextFieldToAttribute(entity, textField, limit);
 			} else {
 				textField.setText("not set");
 				textField.setBackground(UIManager.getColor("TextField.inactiveBackground"));
@@ -541,7 +571,7 @@ public class AttributeManager {
 			clear.setEnabled(limit != null);
 			textField.setEnabled(limit != null);
 			if (limit != null) {
-				bindTextFieldToAttribute(textField, limit);
+				bindTextFieldToAttribute(entity, textField, limit);
 			} else {
 				textField.setText("not set");
 				textField.setBackground(UIManager.getColor("TextField.inactiveBackground"));
@@ -566,7 +596,7 @@ public class AttributeManager {
 				if (componentBindings.containsKey(textField)) {
 					unbind(textField);
 				}
-				bindTextFieldToAttribute(textField, limitAttr);
+				bindTextFieldToAttribute(entity, textField, limitAttr);
 			}
 		};
 		
@@ -733,6 +763,12 @@ public class AttributeManager {
 		});
 	}
 	
+	private void fireActionPerformed(Object entity) {
+		for (UserInputListener l : listenerList) {
+			l.userInput(entity);
+		}
+	}
+	
 	/**
 	 * Sets the JSlider's position to the value represented by the specified DoubleAttr
 	 * @param slider the JSlider whose value to set
@@ -770,6 +806,7 @@ public class AttributeManager {
 	private static final class AttributeBinding {
 		final Attribute attribute;
 		final AttributePostChangeListener listener;
+
 		AttributeBinding(Attribute attribute, AttributePostChangeListener listener) {
 			this.attribute = attribute;
 			this.listener = listener;
