@@ -6,7 +6,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 public class JPatchFormContainer {
-	static final int MAX_NEST_LEVEL = 3;
+	static final int MAX_NEST_LEVEL = 4;
 	private static final Font LABEL_FONT = new Font("sans-serif", Font.BOLD, 12);
 	private static final Icon EXPANDED_ICON = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/EXPANDED.png"));
 	private static final Icon COLLAPSED_ICON = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/COLLAPSED.png"));

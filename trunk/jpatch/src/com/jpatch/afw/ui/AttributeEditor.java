@@ -22,13 +22,15 @@ public class AttributeEditor {
 	
 	private final Class entityClass;
 	private Object entity;
+	private Object currentObject;
+	private final Stack<Method> objectStack = new Stack<Method>();
 	private final Stack<JPatchFormContainer> containerStack = new Stack<JPatchFormContainer>();
 	private JPatchForm form = new JPatchForm();
 	private final List<ComponentBinding> bindings = new ArrayList<ComponentBinding>();
 	
 	public AttributeEditor(Class entityClass, String name, Object entity, Color borderColor) {
 		this.entityClass = entityClass;
-		this.entity = entity;
+		this.entity = this.currentObject = entity;
 		startContainer(name);
 		containerStack.peek().setRootBorderColor(borderColor);
 	}
@@ -43,7 +45,7 @@ public class AttributeEditor {
 	
 	private Attribute getAttribute(String name) {
 		try {
-			return (Attribute) getAttributeMethod(name).invoke(entity, (Object[]) null);
+			return (Attribute) getAttributeMethod(name).invoke(currentObject, (Object[]) null);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -154,7 +156,7 @@ public class AttributeEditor {
 	private void bind(ComponentBinding binding) {
 		Attribute attribute;
 		try {
-			attribute = (Attribute) binding.getAttributeMethod.invoke(entity, (Object[]) null);
+			attribute = binding.getAttribute();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -196,12 +198,22 @@ public class AttributeEditor {
 		}
 	}
 	
-	private static class ComponentBinding {
+	private class ComponentBinding {
+		final Method[] getObjectMethod;
 		final Method getAttributeMethod;
 		final JComponent[] components;
 		ComponentBinding(Method getAttributeMethod, JComponent... components) {
+			this.getObjectMethod = objectStack.toArray(new Method[objectStack.size()]);
 			this.getAttributeMethod = getAttributeMethod;
 			this.components = components.clone();
+		}
+		
+		Attribute getAttribute() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+			Object object = entity;
+			for (Method method : getObjectMethod) {
+				object = method.invoke(object, (Object[]) null);
+			}
+			return (Attribute) getAttributeMethod.invoke(object, (Object[]) null);
 		}
 	}
 }

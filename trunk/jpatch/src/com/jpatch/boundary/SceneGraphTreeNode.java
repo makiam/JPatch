@@ -1,6 +1,5 @@
 package com.jpatch.boundary;
 
-import com.jpatch.entity.SceneGraphLeaf;
 import com.jpatch.entity.SceneGraphNode;
 
 import java.util.ArrayList;
@@ -19,32 +18,18 @@ public class SceneGraphTreeNode implements MutableTreeNode {
 	
 	private final TreeManager treeManager;
 	private MutableTreeNode parent;
-	private final SceneGraphLeaf sceneGraphLeaf;
 	private final SceneGraphNode sceneGraphNode;
 	private final List<SceneGraphTreeNode> leafs = new ArrayList<SceneGraphTreeNode>();
 	
-	public SceneGraphTreeNode(TreeManager manager, SceneGraphLeaf sceneGraphLeaf) {
+	public SceneGraphTreeNode(TreeManager manager, SceneGraphNode sceneGraphNode) {
 		treeManager = manager;
-		this.sceneGraphLeaf = sceneGraphLeaf;
-		if (sceneGraphLeaf instanceof SceneGraphNode) {
-			sceneGraphNode = (SceneGraphNode) sceneGraphLeaf;
-		} else {
-			sceneGraphNode = null;
-		}
+		this.sceneGraphNode = sceneGraphNode;
 	}
 	
-	/**
-	 * Returns the SceneGraphLeaf managed by this SceneGraphTreeNode
-	 * @return the SceneGraphLeaf managed by this SceneGraphTreeNode
-	 */
-	public SceneGraphLeaf getSceneGraphLeaf() {
-		return sceneGraphLeaf;
-	}
 	
 	/**
 	 * Returns the SceneGraphNode managed by this SceneGraphTreeNode
-	 * @return the SceneGraphNode managed by this SceneGraphTreeNode, or null if this
-	 * SceneGraphTreeNode is managing just a SceneGraphLeaf
+	 * @return the SceneGraphNode managed by this SceneGraphTreeNode
 	 */
 	public SceneGraphNode getSceneGraphNode() {
 		return sceneGraphNode;
@@ -99,7 +84,7 @@ public class SceneGraphTreeNode implements MutableTreeNode {
 	public void setParent(MutableTreeNode newParent) {
 		parent = newParent;
 		if (parent instanceof SceneGraphTreeNode) {
-			treeManager.treeNodeInsert(((SceneGraphTreeNode) parent).sceneGraphNode, sceneGraphLeaf);
+			treeManager.treeNodeInsert(((SceneGraphTreeNode) parent).sceneGraphNode, sceneGraphNode);
 		}
 	}
 

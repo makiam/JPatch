@@ -125,7 +125,7 @@ public class TransformNode extends SceneGraphNode {
 	private final Transform transform = new Transform() {
 		@Override
 		public void computeMatrix() {
-			SceneGraphNode parent = parentAttr.getValue();
+			SceneGraphNode parent = getParentAttribute().getValue();
 			Transform parentTransform = parent.getTransform();
 			if (parentTransform != null) {
 				parentTransform.getMatrix(matrix);

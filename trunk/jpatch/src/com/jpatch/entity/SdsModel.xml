@@ -1,3 +1,27 @@
 <attributeEditor name="SdsModel" class="com.jpatch.entity.SdsModel">
 	<field name="Name" attribute="Name" />
+	<group name="Transform">
+		<field name="Translation" attribute="Translation" />
+		<field name="Rotation" attribute="Rotation" />
+		<field name="Scale" attribute="Scale" />
+		<group name="Advanced">
+			<field name="Visibility" attribute="Visibility" />
+	<!--	<field name="Shear" attribute="Shear" />	-->
+			<field name="Position" attribute="Position" />
+	<!--	<field name="Orientation" attribute="Orientation" />	-->
+			<field name="Axis rotation" attribute="AxisRotation" />
+			<field name="Rotation order" attribute="RotationOrder" />
+		</group>
+		<group name="Limits">
+			<group name="Translation">
+				<limits attribute="Translation" />
+			</group>
+			<group name="Rotation">
+				<limits attribute="Rotation" />
+			</group>
+			<group name="Scale">
+				<limits attribute="Scale" />
+			</group>
+		</group>
+	</group>
 </attributeEditor>

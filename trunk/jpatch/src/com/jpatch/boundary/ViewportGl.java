@@ -559,35 +559,29 @@ public class ViewportGl extends Viewport {
 		gl.glFinish();
 	}
 	
-	private void drawSceneGraphElement(SceneGraphLeaf element) {
-		if (element instanceof SdsModel) {
-			drawSds3(((SdsModel) element).getSds());
+	private void drawSceneGraphElement(SceneGraphNode node) {
+		
+		
+	
+		Transform transform = node.getTransform();
+		if (transform != null) {
+			transform.getMatrix(modelViewMatrix);
+			if (node instanceof TransformNode) {
+				System.out.println("sceneGraph TransformNode @ " + ((TransformNode) node).getNameAttribute().getValue());
+				System.out.println(modelViewMatrix);
+			}
+			modelViewMatrix.mul(matrix);
+			modelView.set(modelViewMatrix);
+		} else {
+			modelView.set(matrix);
+		}
+		if (node instanceof SdsModel) {
+			drawSds3(((SdsModel) node).getSds());
+		}
+		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
+			drawSceneGraphElement(child);
 		}
 		
-		/*
-		 * If the element is a SceneGraphNode, recursively
-		 * draw its children.
-		 */
-		if (element instanceof SceneGraphNode) {
-			SceneGraphNode node = (SceneGraphNode) element;
-			Transform transform = node.getTransform();
-			if (transform != null) {
-				transform.computeMatrix();
-				transform.getMatrix(modelViewMatrix);
-				if (element instanceof TransformNode) {
-					System.out.println("sceneGraph TransformNode @ " + ((TransformNode) element).getNameAttribute().getValue());
-					System.out.println(modelViewMatrix);
-				}
-				modelViewMatrix.mul(matrix);
-				modelView.set(modelViewMatrix);
-			} else {
-				modelView.set(matrix);
-			}
-			
-			for (SceneGraphLeaf child : node.getChildrenAttribute().getElements()) {
-				drawSceneGraphElement(child);
-			}
-		}
 	}
 //	public void setMaterial(Color3f ka) {
 //		gl.glMaterialfv(side, GL_AMBIENT, new float[] { mp.red * mp.ambient, mp.green * mp.ambient, mp.blue * mp.ambient, 1 } );

@@ -12,7 +12,7 @@ public class TreeManager {
 	/**
 	 * maps sceneGraph-nodes to tree-nodes
 	 */
-	private final Map<SceneGraphLeaf, SceneGraphTreeNode> treeNodeMap = new HashMap<SceneGraphLeaf, SceneGraphTreeNode>();
+	private final Map<SceneGraphNode, SceneGraphTreeNode> treeNodeMap = new HashMap<SceneGraphNode, SceneGraphTreeNode>();
 	
 	/**
 	 * The Swing TreeModel
@@ -46,7 +46,7 @@ public class TreeManager {
 	 * @param node the SceneGraphLeaf/Node
 	 * @return a new MutableTreeNode for the specified SceneGraphLeaf/Node
 	 */
-	public MutableTreeNode createTreeNodeFor(final SceneGraphLeaf node) {
+	public MutableTreeNode createTreeNodeFor(final SceneGraphNode node) {
 		/* check if node is already managed */
 		if (treeNodeMap.containsKey(node)) {
 			throw new IllegalStateException(node + " is already managed by " + this);
@@ -63,7 +63,7 @@ public class TreeManager {
 		
 		/* if it's not a leaf, recursively call this method for all children */
 		if (node instanceof SceneGraphNode) {
-			for (SceneGraphLeaf child : ((SceneGraphNode) node).getChildrenAttribute().getElements()) {
+			for (SceneGraphNode child : ((SceneGraphNode) node).getChildrenAttribute().getElements()) {
 				createTreeNodeFor(child);
 			}
 		}
@@ -93,7 +93,7 @@ public class TreeManager {
 	 * @param node the SceneGraphLeaf/Node to look for
 	 * @return the MutableTreeNode for the specified SceneGraphLeaf/Node
 	 */
-	public MutableTreeNode getTreeNodeFor(SceneGraphLeaf node) {
+	public MutableTreeNode getTreeNodeFor(SceneGraphNode node) {
 		return treeNodeMap.get(node);
 	}
 	
@@ -102,7 +102,7 @@ public class TreeManager {
 	 * to update the TreeModel accordingly
 	 * @param node the SceneGraphLeaf/Node whose parent has changed
 	 */
-	void sceneGraphNodeParentChanged(SceneGraphLeaf node) {
+	void sceneGraphNodeParentChanged(SceneGraphNode node) {
 		if (!ignoreModelChange) {
 			ignoreModelChange = true;
 			SceneGraphTreeNode treeNode = (SceneGraphTreeNode) getTreeNodeFor(node);
@@ -128,7 +128,7 @@ public class TreeManager {
 	 * @param parent the new parent
 	 * @param child the child
 	 */
-	void treeNodeInsert(SceneGraphNode parent, SceneGraphLeaf child) {
+	void treeNodeInsert(SceneGraphNode parent, SceneGraphNode child) {
 		if (!ignoreModelChange) {
 			ignoreModelChange = true;
 			child.getParentAttribute().setValue(parent);
