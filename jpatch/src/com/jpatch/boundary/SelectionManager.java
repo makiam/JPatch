@@ -9,7 +9,7 @@ import com.jpatch.afw.Utils;
 import com.jpatch.afw.attributes.Attribute;
 import com.jpatch.afw.attributes.AttributePostChangeListener;
 import com.jpatch.afw.attributes.GenericAttr;
-import com.jpatch.entity.SceneGraphLeaf;
+import com.jpatch.entity.SceneGraphNode;
 
 public class SelectionManager {
 	/**
@@ -32,11 +32,11 @@ public class SelectionManager {
 				if (!ignoreChange) {
 					ignoreChange = true;
 					Object selectedObject = selectedObjectAttr.getValue();
-					SceneGraphLeaf sceneGraphLeaf = null;
-					if (selectedObject instanceof SceneGraphLeaf) {
-						sceneGraphLeaf = (SceneGraphLeaf) selectedObject;
+					SceneGraphNode sceneGraphNode = null;
+					if (selectedObject instanceof SceneGraphNode) {
+						sceneGraphNode = (SceneGraphNode) selectedObject;
 					}
-					TreeNode treeNode = treeManager.getTreeNodeFor(sceneGraphLeaf);
+					TreeNode treeNode = treeManager.getTreeNodeFor(sceneGraphNode);
 					if (treeNode != null) {
 						tree.setSelectionPath(Utils.createTreePath(treeNode));
 					} else {
@@ -57,7 +57,7 @@ public class SelectionManager {
 					ignoreChange = true;
 					Object selectedTreeNode = e.getNewLeadSelectionPath().getLastPathComponent();
 					if (selectedTreeNode instanceof SceneGraphTreeNode) {
-						Object selection = ((SceneGraphTreeNode) selectedTreeNode).getSceneGraphLeaf();
+						Object selection = ((SceneGraphTreeNode) selectedTreeNode).getSceneGraphNode();
 						selectedObjectAttr.setValue(selection);
 					}
 					ignoreChange = false;

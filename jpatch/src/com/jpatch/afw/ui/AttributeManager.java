@@ -282,7 +282,7 @@ public class AttributeManager {
 		addListener(checkBox, new ActionListener() {					// throws IllegalStateException if already bound
 			public void actionPerformed(ActionEvent e) {
 				booleanAttr.setBoolean(checkBox.isSelected());
-				fireActionPerformed(entity);
+				fireActionPerformed(entity, booleanAttr);
 			}
 		});
 		
@@ -307,7 +307,7 @@ public class AttributeManager {
 				if (!suppressAction) {
 					if (comboBox.getSelectedItem() != stateMachine.getValue()) {
 						Object newState = stateMachine.setValue(comboBox.getSelectedItem());
-						fireActionPerformed(entity);
+						fireActionPerformed(entity, stateMachine);
 						if (newState != comboBox.getSelectedItem()) {
 							comboBox.setSelectedItem(newState);
 						}
@@ -362,7 +362,7 @@ public class AttributeManager {
 					String newValue = stringAttr.setValue(textField.getText());
 					if (newValue.equals(textField.getText())) {
 						textField.setBackground(textField.isEnabled() ? UIManager.getColor("TextField.background") : UIManager.getColor("TextField.inactiveBackground"));
-						fireActionPerformed(entity);
+						fireActionPerformed(entity, stringAttr);
 					} else {
 						textField.setBackground(Color.YELLOW);
 						textField.requestFocus();
@@ -422,7 +422,7 @@ public class AttributeManager {
 							doubleAttr.setDouble(Double.parseDouble(textField.getText()));
 							textField.setBackground(textField.isEnabled() ? UIManager.getColor("TextField.background") : UIManager.getColor("TextField.inactiveBackground"));
 							textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
-							fireActionPerformed(entity);
+							fireActionPerformed(entity, doubleAttr);
 						}
 					} catch (NumberFormatException exception) {
 						textField.setBackground(Color.YELLOW);
@@ -515,7 +515,7 @@ public class AttributeManager {
 				if (!suppressAction) {
 					suppressAction = true;
 					getSliderValue(slider, attr, min, max, mapping);
-					fireActionPerformed(entity);
+					fireActionPerformed(entity, attr);
 					suppressAction = false;
 				}
 			}
@@ -753,6 +753,9 @@ public class AttributeManager {
 						for (AttributeBinding binding : bindings) {
 							binding.bind();
 						}
+						if (component instanceof JTextField) {
+							component.setBackground(Color.WHITE);
+						}
 					} else {
 						for (AttributeBinding binding : bindings) {
 							binding.unbind();
@@ -763,9 +766,9 @@ public class AttributeManager {
 		});
 	}
 	
-	private void fireActionPerformed(Object entity) {
+	private void fireActionPerformed(Object entity, Attribute attribute) {
 		for (UserInputListener l : listenerList) {
-			l.userInput(entity);
+			l.userInput(entity, attribute);
 		}
 	}
 	

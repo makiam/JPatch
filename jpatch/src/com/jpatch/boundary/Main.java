@@ -588,7 +588,7 @@ public class Main {
 		selectionManager.getSelectedObjectAttribute().addAttributePostChangeListener(inspector.getSelectionChangeListener());
 		
 		AttributeManager.getInstance().addUserInputListener(new UserInputListener() {
-			public void userInput(Object source) {
+			public void userInput(Object source, Attribute attr) {
 //				System.out.println("UserInput from " + source);
 				/*
 				 * if the input came from a viewport, repaint just this viewport,
@@ -596,6 +596,10 @@ public class Main {
 				 */
 				if (source instanceof Viewport) {
 					repaintViewport((Viewport) source);
+				} else if (source instanceof SceneGraphNode) {
+					System.out.println("recomputeing scene graph");
+					computeSceneGraph((SceneGraphNode) source);
+					repaintViewports();
 				} else {
 					repaintViewports();
 				}
@@ -665,6 +669,19 @@ public class Main {
 		activeSds = sds;
 	}
 	
+	public void computeSceneGraph() {
+		computeSceneGraph(sceneGraphRoot);
+	}
+	
+	public void computeSceneGraph(SceneGraphNode node) {
+		Transform transform = node.getTransform();
+		if (transform != null) {
+			transform.computeMatrix();
+		}
+		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
+			computeSceneGraph(child);
+		}
+	}
 	
 	public void repaintViewport(Viewport viewport) {
 		Component component = viewport.getComponent();

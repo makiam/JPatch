@@ -3,7 +3,7 @@ package com.jpatch.entity;
 import com.jpatch.afw.attributes.GenericAttr;
 import com.jpatch.entity.sds.Sds;
 
-public class SdsModel extends SceneGraphLeaf {
+public class SdsModel extends TransformNode {
 	private final GenericAttr<String> nameAttr = new GenericAttr<String>();
 	private final Sds sds;
 	

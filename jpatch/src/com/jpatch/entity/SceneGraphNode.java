@@ -1,19 +1,48 @@
 package com.jpatch.entity;
 
-import java.util.Collection;
 import java.util.HashSet;
 
 import com.jpatch.afw.attributes.*;
 
-import javax.vecmath.Matrix4d;
-
-public abstract class SceneGraphNode extends SceneGraphLeaf {
-	final CollectionAttr<SceneGraphLeaf> childrenAttr = new CollectionAttr<SceneGraphLeaf>(HashSet.class);
-	private final UnmodifiableCollectionAttr<SceneGraphLeaf> childrenAttrView = new UnmodifiableCollectionAttr<SceneGraphLeaf>(childrenAttr);
+public abstract class SceneGraphNode {
+	private final GenericAttr<SceneGraphNode> parentAttr;
+	private final CollectionAttr<SceneGraphNode> childrenAttr = new CollectionAttr<SceneGraphNode>(HashSet.class);
+	private final UnmodifiableCollectionAttr<SceneGraphNode> childrenAttrView = new UnmodifiableCollectionAttr<SceneGraphNode>(childrenAttr);
 	
-	public UnmodifiableCollectionAttr<SceneGraphLeaf> getChildrenAttribute() {
+	protected SceneGraphNode() {
+		this(null);
+	}
+	
+	protected SceneGraphNode(SceneGraphNode parent) {
+		parentAttr = new GenericAttr<SceneGraphNode>(parent);
+		parentAttr.addAttributePreChangeListener(new AttributePreChangeAdapter<SceneGraphNode>() {
+			@Override
+			public SceneGraphNode attributeWillChange(ScalarAttribute source, SceneGraphNode value) {
+				SceneGraphNode parent = (SceneGraphNode) parentAttr.getValue();
+				if (parent != null) {
+					parent.childrenAttr.remove(SceneGraphNode.this);
+				}
+				return value;
+			}
+		});
+		parentAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				SceneGraphNode parent = (SceneGraphNode) parentAttr.getValue();
+				if (parent != null) {
+					parent.childrenAttr.add(SceneGraphNode.this);
+				}
+			}
+		});
+	}
+	
+	public GenericAttr<SceneGraphNode> getParentAttribute() {
+		return parentAttr;
+	}
+	
+	public UnmodifiableCollectionAttr<SceneGraphNode> getChildrenAttribute() {
 		return childrenAttrView;
 	}
 	
 	public abstract Transform getTransform();
+	
 }
