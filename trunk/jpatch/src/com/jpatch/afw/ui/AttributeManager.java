@@ -319,7 +319,7 @@ public class AttributeManager {
 				suppressAction = true;
 				if (source == stateMachine) {
 					comboBox.setSelectedItem(stateMachine.getValue());
-				} else if (source == stateMachine.getStateSet()) {
+				} else if (source == stateMachine.getStatesAttribute()) {
 					comboBox.removeAllItems();
 					for (Object o : ((CollectionAttr) source).getElements()) {
 						comboBox.addItem(o);
@@ -332,7 +332,7 @@ public class AttributeManager {
 		
 		SuperListener listener = new SuperListener();
 		
-		bind(comboBox, new AttributeBinding(stateMachine, listener), new AttributeBinding(stateMachine.getStateSet(), listener));
+		bind(comboBox, new AttributeBinding(stateMachine, listener), new AttributeBinding(stateMachine.getStatesAttribute(), listener));
 		
 		/* stimulate stateSetListener to update state-list in comboBox */
 //		stateSetListener.attributeHasChanged(stateMachine.getStateSet());

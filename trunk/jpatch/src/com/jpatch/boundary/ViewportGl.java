@@ -1,6 +1,7 @@
 package com.jpatch.boundary;
 
 import com.jpatch.settings.*;
+import com.jpatch.afw.attributes.CollectionAttr;
 import com.jpatch.boundary.tools.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds.*;
@@ -326,8 +327,8 @@ public class ViewportGl extends Viewport {
 	
 	GLEventListener glEventListener;
 	
-	public ViewportGl(int id, int view) {
-		super(id, view);
+	public ViewportGl(int id, ViewDirection direction, CollectionAttr<ViewDirection> views) {
+		super(id, direction, views);
 		drawable = LIGHTWEIGHT ? new GLJPanel() : new GLCanvas();
 		component = (Component) drawable;
 		component.setBackground(COLORS.background.get());
@@ -1285,11 +1286,14 @@ public class ViewportGl extends Viewport {
 		float h = (float) component.getHeight() / 2;
 		gl.glMatrixMode(GL_PROJECTION);
 		gl.glLoadIdentity();
-		if (false) {
+		if (viewType.getValue() instanceof PerspectiveViewDirection) {
+			Perspective perspective = ((PerspectiveViewDirection) viewType.getValue()).getPerspective();
+			float a = (float) (17.5 / perspective.getFocalLength());
+			float b = a * h / w;
 //			float a = 17.5f / (float) camera.focalLength.get(); 	// 35/focallength/2
 //			float b = a * h / w;
-//			gl.glDepthFunc(GL_LEQUAL);
-//			gl.glFrustum(-a, a, -b, b, nearClip, farClip);
+			gl.glDepthFunc(GL_LEQUAL);
+			gl.glFrustum(-a, a, -b, b, nearClip, farClip);
 		} else {
 			gl.glDepthFunc(GL_LEQUAL);
 			gl.glOrtho(-w, w, -h, h, -farClip, farClip);
