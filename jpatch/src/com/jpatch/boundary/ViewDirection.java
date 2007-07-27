@@ -25,7 +25,7 @@ package com.jpatch.boundary;
  * @author sascha
  *
  */
-public interface ViewDirection {
+public interface ViewDirection extends Comparable {
 	void bindTo(Viewport viewport);
 	void unbind(Viewport viewport);
 }

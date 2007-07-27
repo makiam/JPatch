@@ -40,6 +40,19 @@ public class CollectionAttr<T> extends AbstractAttribute {
 	}
 	
 	/**
+	 * Creates a new CollectionAttr that uses the specified collection type as backing collection
+	 * @param collectionClass the Collection class to be used as backing collection
+	 * @param elements the elements to add to this collection
+	 */
+	@SuppressWarnings("unchecked")
+	public CollectionAttr(Class<? extends Collection> collectionClass, T[] elements) {
+		this(collectionClass);
+		for (T element : elements) {
+			add(element);
+		}
+	}
+	
+	/**
 	 * Returns an Collection of all elements of this CollectionAttr
 	 * @return an Collection of all elements of this CollectionAttr
 	 */

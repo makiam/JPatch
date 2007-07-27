@@ -39,6 +39,7 @@ import com.jpatch.boundary.actions.Actions;
 import com.jpatch.boundary.actions.Actions.ViewportMode;
 import com.jpatch.boundary.tools.JPatchTool;
 import com.jpatch.boundary.tools.RotateTool;
+import com.jpatch.entity.Camera;
 import com.jpatch.entity.SceneGraphNode;
 import com.jpatch.entity.SdsModel;
 import com.jpatch.entity.Transform;
@@ -97,6 +98,8 @@ public class Main {
 	
 	private Actions actions = new Actions();
 	private boolean syncViewports = false;
+	
+	private CollectionAttr<ViewDirection> viewDirectionsAttr = new CollectionAttr<ViewDirection>(TreeSet.class, OrthoViewDirection.STANDARD_VIEW_DIRECTIONS);
 	
 	private SceneGraphNode sceneGraphRoot = new SceneGraphNode() {
 		@Override
@@ -317,7 +320,7 @@ public class Main {
 		ObjectRegistry<Viewport> viewportRegistry = new ObjectRegistry<Viewport>();
 		
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			viewports[i] = new ViewportGl(i + 1, i * 2);
+			viewports[i] = new ViewportGl(i + 1, OrthoViewDirection.STANDARD_VIEW_DIRECTIONS[i * 2], viewDirectionsAttr);
 			screen.add(viewports[i].getComponent());
 			final int viewportNumber = i;
 			viewports[i].getComponent().addMouseListener(new MouseAdapter() {
@@ -495,6 +498,8 @@ public class Main {
 		final TransformNode node3 = new TransformNode();
 		final TransformNode node4 = new TransformNode();
 		final SdsModel model1 = new SdsModel(activeSds);
+		final Camera camera1 = new Camera();
+		final Camera camera2 = new Camera();
 		
 		node1.getNameAttribute().setValue("node 1");
 		node1.getParentAttribute().setValue(sceneGraphRoot);
@@ -506,6 +511,13 @@ public class Main {
 		node4.getNameAttribute().setValue("node 4");
 		model1.getParentAttribute().setValue(node4);
 		model1.getNameAttribute().setValue("model 1");
+		camera1.getParentAttribute().setValue(node3);
+		camera1.getNameAttribute().setValue("camera 1");
+		camera2.getParentAttribute().setValue(node4);
+		camera2.getNameAttribute().setValue("camera 2");
+		
+		viewDirectionsAttr.add(new PerspectiveViewDirection(camera1));
+		viewDirectionsAttr.add(new PerspectiveViewDirection(camera2));
 		
 		treeManager.createTreeNodeFor(sceneGraphRoot);
 		JTree tree = new JTree(treeModel);
@@ -749,6 +761,10 @@ public class Main {
 				g.drawRect(c.getX() - 1, c.getY() - 1, c.getWidth() + 1, c.getHeight() + 1);
 			}
 		}	
+	}
+
+	public CollectionAttr<ViewDirection> getViewDirectionsAttribute() {
+		return viewDirectionsAttr;
 	}
 	
 	

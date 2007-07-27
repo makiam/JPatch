@@ -13,12 +13,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 	/**
 	 * A list of possible states of this StateMachine
 	 */
-	private final CollectionAttr<T> states;
-	
-	/**
-	 * An unmodifiable view of the states CollectionAttr.
-	 */
-	private final UnmodifiableCollectionAttr<T> statesView;
+	private final CollectionAttr<T> statesAttr;
 	
 	/**
 	 * The default state of this state machine (may be <i>null</i>)
@@ -48,15 +43,14 @@ public class StateMachine<T> extends GenericAttr<T> {
 	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
 	 */
 	public StateMachine(T[] states, T initialState) {
-		this.states = new CollectionAttr<T>(LinkedHashSet.class);
-		this.statesView = new UnmodifiableCollectionAttr<T>(this.states);
+		this.statesAttr = new CollectionAttr<T>(LinkedHashSet.class);
 		for (T s : states) {
-			this.states.add(s);
+			this.statesAttr.add(s);
 		}
 		if (setValue(initialState) != initialState) {
 			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
 		}
-		
+		bindStateSetListeners();
 	}
 	
 	/**
@@ -78,14 +72,14 @@ public class StateMachine<T> extends GenericAttr<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public StateMachine(Class<? extends Enum> states, T initialState) {
-		this.states = new CollectionAttr<T>(LinkedHashSet.class);
-		this.statesView = new UnmodifiableCollectionAttr<T>(this.states);
+		this.statesAttr = new CollectionAttr<T>(LinkedHashSet.class);
 		for (Enum s : states.getEnumConstants()) {
-			this.states.add((T) s);
+			this.statesAttr.add((T) s);
 		}
 		if (setValue(initialState) != initialState) {
 			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
 		}
+		bindStateSetListeners();
 	}
 	
 	/**
@@ -96,11 +90,40 @@ public class StateMachine<T> extends GenericAttr<T> {
 	 * @throws IllegalArgumentException if states does not contain initialState or if <i>performStateTransition(initialState)</i> returns false
 	 */
 	public StateMachine(CollectionAttr<T> states, T initialState) {
-		this.states = states;
-		this.statesView = new UnmodifiableCollectionAttr<T>(this.states);
+		this.statesAttr = states;
 		if (setValue(initialState) != initialState) {
 			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
 		}
+		bindStateSetListeners();
+	}
+	
+	/**
+	 * Adds a listener to the sets of possible states - if the current state is removed
+	 * it will try to switch to the default state (if any), if this doesn't work it
+	 * will try to switch to any other state.
+	 * If the state can't be switched, a new IllegalStateException is raised
+	 */
+	private void bindStateSetListeners() {
+		statesAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				/* check if the current state is still valid */
+				if (!statesAttr.contains(value)) {
+					/* No?, see if we can switch to the default state */
+					if (!revertToDefault()) {
+						/* No?, try switching to any other state */
+						for (T s : statesAttr.getElements()) {
+							if (setValue(s) == s) {
+								break;
+							}
+						}
+					}
+					/* check if we now have a valid state */
+					if (!statesAttr.contains(value)) {
+						throw new IllegalStateException("can't switch state");
+					}
+				}
+			}
+		});
 	}
 	
 	/**
@@ -117,7 +140,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 	 * @throws IllegalArgumentException if states does not contain defaultState
 	 */
 	public void setDefaultState(T defaultState) {
-		if (!states.contains(defaultState)) {
+		if (!statesAttr.contains(defaultState)) {
 			throw new IllegalArgumentException(defaultState + " is not a legal state of this statemachine (" + this + ")");
 		}
 		this.defaultState = defaultState;
@@ -145,8 +168,8 @@ public class StateMachine<T> extends GenericAttr<T> {
 	 * The order of states is preserved.
 	 * @return an Iterable that iterates over the possible states of this StateMachine
 	 */
-	public Iterable<T> getStates() {
-		return states.getElements();
+	public Collection<T> getStates() {
+		return statesAttr.getElements();
 	}
 
 	/**
@@ -163,7 +186,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 	 */
 	@Override
 	public final T setValue(T newState) {
-		if (!states.contains(newState)) {
+		if (!statesAttr.contains(newState)) {
 			throw new IllegalArgumentException(newState + " is not a legal state of this statemachine (" + this + ")");
 		}
 		if (newState != value) {
@@ -174,17 +197,6 @@ public class StateMachine<T> extends GenericAttr<T> {
 		return value;
 	}
 
-	/**
-	 * Adds <i>state</i> to the list of possible states of this StateMachine
-	 * @param state the state to add
-	 * @throws IllegalArgumentException if the list of possible states already contained the specified state.
-	 */
-	public final void addState(T state) {
-		if (states.contains(state)) {
-			throw new IllegalArgumentException(state + " is already a state of this statemachine (" + this + ")");
-		}
-		states.add(state);
-	}
 
 	/**
 	 * Removes <i>state</i> from the list of possible states.
@@ -198,7 +210,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 	public final void removeState(T state) {
 		if (state == value) {
 			if (!revertToDefault()) {
-				for (T s : states.getElements()) {
+				for (T s : statesAttr.getElements()) {
 					if (s == state) {
 						continue;
 					}
@@ -211,7 +223,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 				throw new IllegalStateException("can't remove state " + state + " - unable to switch state");
 			}
 		}
-		states.remove(state);
+		statesAttr.remove(state);
 	}
 
 	/**
@@ -231,8 +243,8 @@ public class StateMachine<T> extends GenericAttr<T> {
 	 * Returns a CollectionAttr that contains the states of this StateMachine.
 	 * @return the CollectionAttr that contains the states of this StateMachine
 	 */
-	public CollectionAttr<T> getStateSet() {
-		return statesView;
+	public CollectionAttr<T> getStatesAttribute() {
+		return statesAttr;
 	}
 	
 	/**

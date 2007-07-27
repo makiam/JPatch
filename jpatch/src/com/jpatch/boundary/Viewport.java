@@ -1,6 +1,7 @@
 package com.jpatch.boundary;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.entity.Perspective;
 import com.jpatch.settings.*;
 import com.sun.opengl.impl.GLWorkerThread;
 
@@ -16,17 +17,8 @@ import javax.vecmath.*;
 
 public abstract class Viewport implements NamedObject {
 	public static final double MIN_DIST_SQ = 64;
-	public ViewDirection[] standardViewDirections = new ViewDirection[] {
-			OrthoViewDirection.FRONT,
-			OrthoViewDirection.BACK,
-			OrthoViewDirection.TOP,
-			OrthoViewDirection.BOTTOM,
-			OrthoViewDirection.LEFT,
-			OrthoViewDirection.RIGHT,
-			new OrthoViewDirection.BirdsEye()
-	};
 	
-	final StateMachine<ViewDirection> viewType = new StateMachine<ViewDirection>(standardViewDirections, OrthoViewDirection.FRONT);
+	final StateMachine<ViewDirection> viewType;
 	final Tuple2Attr viewRotation = new Tuple2Attr(0, 0);
 	final Tuple2Attr viewTranslation = new Tuple2Attr(0, 0);
 	final DoubleAttr viewScale = new DoubleAttr(1);
@@ -66,6 +58,7 @@ public abstract class Viewport implements NamedObject {
 			) {
 				computeMatrices();
 //			} else if (attribute == viewType) {
+//				viewType.getValue().
 //				viewDirection.unbind(Viewport.this);
 //				viewDirection = viewType.getObject();
 ////				viewRotation.suppressChangeNotification(true);
@@ -88,13 +81,27 @@ public abstract class Viewport implements NamedObject {
 		}
 	};
 	
-	public Viewport(int id, int viewDir) {
+	public Viewport(int id, ViewDirection direction, CollectionAttr<ViewDirection> views) {
 		this.id = id;
 		matrix.setIdentity();
-		viewType.setValue(standardViewDirections[viewDir]);
+		viewType = new StateMachine<ViewDirection>(views, direction);
 		viewType.getValue().bindTo(this);
 //		viewType.setObject(viewDirection);
 //		viewType.addAttributeListener(updateAttributeListener);
+		/* this will unbind the old ViewDirection when ViewType changes */
+		viewType.addAttributePreChangeListener(new AttributePreChangeAdapter<ViewDirection>() {
+			@Override
+			public ViewDirection attributeWillChange(ScalarAttribute source, ViewDirection value) {
+				viewType.getValue().unbind(Viewport.this);
+				return value;
+			}
+		});
+		/* this will bind the new ViewDirection when ViewType changes */
+		viewType.addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				viewType.getValue().bindTo(Viewport.this);
+			}
+		});
 		showControlMesh.addAttributePostChangeListener(updateAttributeListener);
 		showLimitSurface.addAttributePostChangeListener(updateAttributeListener);
 		showProjectedMesh.addAttributePostChangeListener(updateAttributeListener);
@@ -167,7 +174,8 @@ public abstract class Viewport implements NamedObject {
 	}
 	
 	public void setBirdsEyeView() {
-		standardViewDirections[6].unbind(this);
+		
+//		standardViewDirections[6].unbind(this);
 //		viewType.setObject(standardViewDirections[6]);
 	}
 	
@@ -196,30 +204,36 @@ public abstract class Viewport implements NamedObject {
 	}
 	
 	protected void computeMatrices() {
-		double scale = viewScale.getDouble() / 20 * component.getWidth();
-		double x = Math.toRadians(viewRotation.getX());
-		double y = Math.toRadians(viewRotation.getY());
-		double sx = Math.sin(x);
-		double cx = Math.cos(x);
-		double sy = Math.sin(y);
-		double cy = Math.cos(y);
-		
-		matrix.m00 = cy * scale;
-		matrix.m01 = 0;
-		matrix.m02 = -sy * scale;
-		matrix.m03 = 0;
-		matrix.m10 = sy * sx * scale;
-		matrix.m11 = cx * scale;
-		matrix.m12 = cy * sx * scale;
-		matrix.m20 = sy * cx * scale;
-		matrix.m21 = -sx * scale;
-		matrix.m22 = cy * cx * scale;
-		matrix.m03 = viewTranslation.getX() * scale;
-		matrix.m13 = viewTranslation.getY() * scale;
-		matrix.m23 = 0;
+		if (viewType.getValue() instanceof OrthoViewDirection) {
+			double scale = viewScale.getDouble() / 20 * component.getWidth();
+			double x = Math.toRadians(viewRotation.getX());
+			double y = Math.toRadians(viewRotation.getY());
+			double sx = Math.sin(x);
+			double cx = Math.cos(x);
+			double sy = Math.sin(y);
+			double cy = Math.cos(y);
+			
+			matrix.m00 = cy * scale;
+			matrix.m01 = 0;
+			matrix.m02 = -sy * scale;
+			matrix.m03 = 0;
+			matrix.m10 = sy * sx * scale;
+			matrix.m11 = cx * scale;
+			matrix.m12 = cy * sx * scale;
+			matrix.m20 = sy * cx * scale;
+			matrix.m21 = -sx * scale;
+			matrix.m22 = cy * cx * scale;
+			matrix.m03 = viewTranslation.getX() * scale;
+			matrix.m13 = viewTranslation.getY() * scale;
+			matrix.m23 = 0;
+		} else {
+			Perspective perspective = ((PerspectiveViewDirection) viewType.getValue()).getPerspective();
+			perspective.getTransform().getMatrix(matrix);
+			System.out.println("Setting perspective matrix to " + matrix);
+		}
 		
 		inverseMatrix.invert(matrix);
-		modelView.set(matrix);
+//		modelView.set(matrix);
 	}
 	
 	protected abstract void drawGrid();
