@@ -18,7 +18,7 @@ import javax.vecmath.*;
 public abstract class Viewport implements NamedObject {
 	public static final double MIN_DIST_SQ = 64;
 	
-	final StateMachine<ViewDirection> viewType;
+	final StateMachine<ViewDef> viewType;
 	final Tuple2Attr viewRotation = new Tuple2Attr(0, 0);
 	final Tuple2Attr viewTranslation = new Tuple2Attr(0, 0);
 	final DoubleAttr viewScale = new DoubleAttr(1);
@@ -138,7 +138,7 @@ public abstract class Viewport implements NamedObject {
 		return viewTranslation;
 	}
 
-	public StateMachine<ViewDirection> getViewTypeAttribute() {
+	public StateMachine<ViewDef> getViewTypeAttribute() {
 		return viewType;
 	}
 
