@@ -39,7 +39,7 @@ public class AttributeEditor {
 		try {
 			return entityClass.getMethod("get" + name + "Attribute", (Class[]) null);
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("class:" + entityClass + " method:" + "get" + name + "Attribute", e);
 		}
 	}
 	
@@ -47,7 +47,7 @@ public class AttributeEditor {
 		try {
 			return (Attribute) getAttributeMethod(name).invoke(currentObject, (Object[]) null);
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("object:" + currentObject + " method:" + getAttributeMethod(name), e);
 		}
 	}
 	
