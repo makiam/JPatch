@@ -17,6 +17,7 @@ import javax.media.opengl.*;
 import static javax.media.opengl.GL.*;
 import javax.vecmath.*;
 
+
 public class ViewportGl extends Viewport {
 	
 	private static final boolean LIGHTWEIGHT = false;
@@ -327,8 +328,8 @@ public class ViewportGl extends Viewport {
 	
 	GLEventListener glEventListener;
 	
-	public ViewportGl(int id, ViewDirection direction, CollectionAttr<ViewDirection> views) {
-		super(id, direction, views);
+	public ViewportGl(int id, ViewDirection direction, CollectionAttr<ViewDirection> orthoDirections, JPatchInspector inspector) {
+		super(id, direction, orthoDirections, inspector);
 		drawable = LIGHTWEIGHT ? new GLJPanel() : new GLCanvas();
 		component = (Component) drawable;
 		component.setBackground(COLORS.background.get());
@@ -413,7 +414,7 @@ public class ViewportGl extends Viewport {
 			}
 
 			public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-				computeMatrices();
+				viewDef.computeMatrix();
 //				init(drawable);
 //				display(drawable);
 			}
@@ -475,6 +476,8 @@ public class ViewportGl extends Viewport {
 	
 	private void drawTriangleMesh(TriangleMesh t) {
 		setMaterial(t.m.getArray());
+		Matrix4d matrix = viewDef.getMatrix();
+		
 		for (int i = 0, n = t.t.length; i < n; i++) {
 			p.set(t.v[t.t[i]]);
 			v.set(t.n[t.t[i]]);
@@ -488,6 +491,7 @@ public class ViewportGl extends Viewport {
 	
 	private void drawWireFrame(WireFrame w) {
 		gl.glColor4fv(w.array, 0);
+		Matrix4d matrix = viewDef.getMatrix();
 		for (int i = 0, n = w.l.length; i < n; i++) {
 			p.set(w.v[w.l[i]]);
 			matrix.transform(p);
@@ -497,7 +501,7 @@ public class ViewportGl extends Viewport {
 	
 	@Override
 	public void draw() {
-		
+		if (true) return;
 //		rasterMode();
 //		drawGrid();
 		spatialMode();
@@ -563,7 +567,7 @@ public class ViewportGl extends Viewport {
 	private void drawSceneGraphElement(SceneGraphNode node) {
 		
 		
-	
+		Matrix4d matrix = viewDef.getMatrix();
 		Transform transform = node.getTransform();
 		if (transform != null) {
 			transform.getMatrix(modelViewMatrix);
@@ -737,7 +741,7 @@ public class ViewportGl extends Viewport {
 	
 	@Override
 	protected void drawGrid() {
-		double scale = viewScale.getDouble();
+		double scale = viewTypeAttr.getValue()..getDouble();
 		double width = component.getWidth();
 		double height = component.getHeight();
 		double matrixScale = scale / 20 * width;
@@ -814,7 +818,7 @@ public class ViewportGl extends Viewport {
 	}
 	
 	private void drawSds3(Sds sds) {
-		useProgram = fragmentShader.getBoolean();
+		useProgram = false;
 //		gl.glEnable(GL_LIGHTING);
 		gl.glShadeModel(GL_SMOOTH);
 		gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -855,7 +859,7 @@ public class ViewportGl extends Viewport {
 		
 		GlMaterial currentMaterial = null;
 		gl.glColor3f(0.0f, 0.0f, 0.0f);
-		if (showLimitSurface.getBoolean()) {
+		if (showLimitSurfaceAttr.getBoolean()) {
 			for (Face face : sds.faceList) {
 				GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
 				if (currentMaterial != faceMaterial) {
@@ -892,9 +896,9 @@ public class ViewportGl extends Viewport {
 		gl.glColor3f(0.0f, 0.0f, 0.0f);
 		gl.glDisable(GL_COLOR_MATERIAL);
 		
-		if (showControlMesh.getBoolean()) {
+		if (showControlMeshAttr.getBoolean()) {
 			
-			if (!showLimitSurface.getBoolean()) {
+			if (!showLimitSurfaceAttr.getBoolean()) {
 				for (Face face : sds.faceList) {
 					GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
 					if (currentMaterial != faceMaterial) {
@@ -1162,7 +1166,7 @@ public class ViewportGl extends Viewport {
 //			gl.glUseProgram(useProgram ? program : 0);
 //		}
 		
-		if (showProjectedMesh.getBoolean()) {
+		if (showProjectedMeshAttr.getBoolean()) {
 //			gl.glDisable(GL_LIGHTING);
 //			gl.glColor3f(0.5f, 0.5f, 0.5f);
 			gl.glColor3f(1.0f, 1.0f, 1.0f);
@@ -1286,14 +1290,14 @@ public class ViewportGl extends Viewport {
 		float h = (float) component.getHeight() / 2;
 		gl.glMatrixMode(GL_PROJECTION);
 		gl.glLoadIdentity();
-		if (viewType.getValue() instanceof PerspectiveViewDirection) {
-			Perspective perspective = ((PerspectiveViewDirection) viewType.getValue()).getPerspective();
-			float a = (float) (17.5 / perspective.getFocalLength());
-			float b = a * h / w;
-//			float a = 17.5f / (float) camera.focalLength.get(); 	// 35/focallength/2
+		if (false && viewTypeAttr.getValue() instanceof PerspectiveViewDirection) {
+//			Perspective perspective = ((PerspectiveViewDirection) viewType.getValue()).getPerspective();
+//			float a = (float) (17.5 / perspective.getFocalLength());
 //			float b = a * h / w;
-			gl.glDepthFunc(GL_LEQUAL);
-			gl.glFrustum(-a, a, -b, b, nearClip, farClip);
+////			float a = 17.5f / (float) camera.focalLength.get(); 	// 35/focallength/2
+////			float b = a * h / w;
+//			gl.glDepthFunc(GL_LEQUAL);
+//			gl.glFrustum(-a, a, -b, b, nearClip, farClip);
 		} else {
 			gl.glDepthFunc(GL_LEQUAL);
 			gl.glOrtho(-w, w, -h, h, -farClip, farClip);

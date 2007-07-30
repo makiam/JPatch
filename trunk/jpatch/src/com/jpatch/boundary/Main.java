@@ -99,7 +99,7 @@ public class Main {
 	private Actions actions = new Actions();
 	private boolean syncViewports = false;
 	
-	private CollectionAttr<ViewDirection> viewDirectionsAttr = new CollectionAttr<ViewDirection>(TreeSet.class, OrthoViewDirection.STANDARD_VIEW_DIRECTIONS);
+	private CollectionAttr<ViewDirection> viewDirectionsAttr = new CollectionAttr<ViewDirection>(TreeSet.class, OrthoViewDirection.DIRECTIONS);
 	
 	private SceneGraphNode sceneGraphRoot = new SceneGraphNode() {
 		@Override
@@ -314,13 +314,15 @@ public class Main {
 		frame.setSize(1024, 768);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+		JPatchInspector inspector = new JPatchInspector();
+		
 		/*
 		 * initialize viewports
 		 */
 		ObjectRegistry<Viewport> viewportRegistry = new ObjectRegistry<Viewport>();
 		
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			viewports[i] = new ViewportGl(i + 1, OrthoViewDirection.STANDARD_VIEW_DIRECTIONS[i * 2], viewDirectionsAttr);
+			viewports[i] = new ViewportGl(i + 1, OrthoViewDirection.DIRECTIONS[i * 2], viewDirectionsAttr, inspector);
 			screen.add(viewports[i].getComponent());
 			final int viewportNumber = i;
 			viewports[i].getComponent().addMouseListener(new MouseAdapter() {
@@ -486,7 +488,6 @@ public class Main {
 		
 		
 		final JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		JPatchInspector inspector = new JPatchInspector();
 		activeViewport.addAttributePostChangeListener(inspector.getViewportChangeListener());
 		inspector.getComponent().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		
@@ -516,8 +517,8 @@ public class Main {
 		camera2.getParentAttribute().setValue(node4);
 		camera2.getNameAttribute().setValue("camera 2");
 		
-		viewDirectionsAttr.add(new PerspectiveViewDirection(camera1));
-		viewDirectionsAttr.add(new PerspectiveViewDirection(camera2));
+//		viewDirectionsAttr.add(new PerspectiveViewDirection(camera1));
+//		viewDirectionsAttr.add(new PerspectiveViewDirection(camera2));
 		
 		treeManager.createTreeNodeFor(sceneGraphRoot);
 		JTree tree = new JTree(treeModel);

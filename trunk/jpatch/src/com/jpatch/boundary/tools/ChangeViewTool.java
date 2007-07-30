@@ -99,24 +99,26 @@ public class ChangeViewTool implements JPatchTool {
 			int dy = e.getY() - y;
 			x = e.getX();
 			y = e.getY();
-			double w = viewport.getComponent().getWidth() / 20 * viewport.getViewScaleAttribute().getDouble();
-			viewport.setBirdsEyeView();
+			
+//			viewport.setBirdsEyeView();
+			OrthoViewDef orthoViewDef = (OrthoViewDef) viewport.getViewDef();
+			double w = viewport.getComponent().getWidth() / 20 * orthoViewDef.getScaleAttribute().getDouble();
 			switch (mode) {
 			case MOVE:
-				viewport.getViewTranslationAttribute().setTuple(
-						viewport.getViewTranslationAttribute().getX() + dx / w,
-						viewport.getViewTranslationAttribute().getY() - dy / w
+				orthoViewDef.getTranslationAttribute().setTuple(
+						orthoViewDef.getTranslationAttribute().getX() + dx / w,
+						orthoViewDef.getTranslationAttribute().getY() - dy / w
 				);
 				break;
 			case ROTATE:
-				viewport.getViewRotationAttribute().setTuple(
-						Math.min(Math.max(viewport.getViewRotationAttribute().getX() + 0.25 * dy, -90), 90),
-						(viewport.getViewRotationAttribute().getY() + 0.25 * dx + 360) % 360
+				orthoViewDef.getRotationAttribute().setTuple(
+						Math.min(Math.max(orthoViewDef.getRotationAttribute().getX() + 0.25 * dy, -90), 90),
+						(orthoViewDef.getRotationAttribute().getY() + 0.25 * dx + 360) % 360
 				);
 				break;
 			case ZOOM:
 				double factor = Math.min(Math.max(1 + (dx - dy) / 200.0, 0.2), 5);
-				viewport.getViewScaleAttribute().setDouble(viewport.getViewScaleAttribute().getDouble() * factor);
+				orthoViewDef.getScaleAttribute().setDouble(orthoViewDef.getScaleAttribute().getDouble() * factor);
 				break;
 			}
 			Main.getInstance().repaintViewport(viewport);

@@ -20,11 +20,7 @@ public class JPatchInspector {
 
 	private AttributePostChangeListener viewportChangeListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
-			panel.remove(0);
-			System.out.println("viewport=" + ((GenericAttr<Viewport>) source).getValue());
-			panel.add(AttributeEditorFactory.getInstance().getEditorFor(((GenericAttr<Viewport>) source).getValue(), VIEW_COLOR), 0);
-			panel.getComponent().validate();
-			panel.getComponent().repaint();
+			setViewport(((GenericAttr<Viewport>) source).getValue());
 		}
 	};
 	
@@ -49,6 +45,14 @@ public class JPatchInspector {
 	
 	public AttributePostChangeListener getSelectionChangeListener() {
 		return selectionChangeListener;
+	}
+	
+	public void setViewport(Viewport viewport) {
+		panel.remove(0);
+		System.out.println("viewport=" + viewport);
+		panel.add(AttributeEditorFactory.getInstance().getEditorFor(viewport.viewDef, VIEW_COLOR), 0);
+		panel.getComponent().validate();
+		panel.getComponent().repaint();
 	}
 	
 	public JPatchInspector() {

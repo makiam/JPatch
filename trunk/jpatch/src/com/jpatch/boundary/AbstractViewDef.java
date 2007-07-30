@@ -4,9 +4,9 @@ import com.jpatch.afw.attributes.BooleanAttr;
 import com.jpatch.afw.attributes.StateMachine;
 
 public abstract class AbstractViewDef implements ViewDef {
-	protected Viewport viewport;
+	protected final Viewport viewport;
 	
-	public void setViewport(Viewport viewport) {
+	public AbstractViewDef(Viewport viewport) {
 		this.viewport = viewport;
 	}
 	
@@ -22,8 +22,8 @@ public abstract class AbstractViewDef implements ViewDef {
 		return viewport.getShowProjectedMeshAttribute();
 	}
 
-	public StateMachine<ViewDef> getViewTypeAttribute() {
-		return viewport.getViewTypeAttribute();
+	public StateMachine<ViewDirection> getViewDirectionAttribute() {
+		return viewport.getViewDirectionAttribute();
 	}
 
 }

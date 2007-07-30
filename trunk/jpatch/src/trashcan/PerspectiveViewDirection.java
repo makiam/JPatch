@@ -1,7 +1,8 @@
-package com.jpatch.boundary;
+package trashcan;
 
 import com.jpatch.afw.attributes.GenericAttr;
 import com.jpatch.afw.ui.AttributeManager;
+import com.jpatch.boundary.Viewport;
 import com.jpatch.entity.Camera;
 import com.jpatch.entity.Perspective;
 

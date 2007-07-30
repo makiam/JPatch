@@ -19,7 +19,9 @@
  * along with JPatch; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package com.jpatch.boundary;
+package trashcan;
+
+import com.jpatch.boundary.Viewport;
 
 /**
  * @author sascha
