@@ -501,7 +501,7 @@ public class ViewportGl extends Viewport {
 	
 	@Override
 	public void draw() {
-		if (true) return;
+//		if (true) return;
 //		rasterMode();
 //		drawGrid();
 		spatialMode();
@@ -1290,7 +1290,7 @@ public class ViewportGl extends Viewport {
 		float h = (float) component.getHeight() / 2;
 		gl.glMatrixMode(GL_PROJECTION);
 		gl.glLoadIdentity();
-		if (false && viewTypeAttr.getValue() instanceof PerspectiveViewDirection) {
+		if (false) {
 //			Perspective perspective = ((PerspectiveViewDirection) viewType.getValue()).getPerspective();
 //			float a = (float) (17.5 / perspective.getFocalLength());
 //			float b = a * h / w;
