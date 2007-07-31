@@ -252,17 +252,22 @@ public class Slate2 {
 		} else {
 			s >>= 5;
 		}
-		if ((s & 0xffffffc0) > 0) {
-			subdivLevel = 5;
-		} else if ((s & 0x30) > 0) {
-			subdivLevel = 4;
-		} else if ((s & 0xc) > 0) {
-			subdivLevel = 3;
-		} else if ((s & 0x2) > 0) {
-			subdivLevel = 2;
-		} else {
-			subdivLevel = 1;
-		}
+//		if ((s & 0xffffffc0) > 0) {
+//			subdivLevel = 5;
+//		} else if ((s & 0x30) > 0) {
+//			subdivLevel = 4;
+//		} else if ((s & 0xc) > 0) {
+//			subdivLevel = 3;
+//		} else if ((s & 0x2) > 0) {
+//			subdivLevel = 2;
+//		} else {
+//			subdivLevel = 1;
+//		}
+		if (s > 81)       subdivLevel = 5;
+		else if (s > 27 ) subdivLevel = 4;
+		else if (s > 9)   subdivLevel = 3;
+		else if (s > 3)   subdivLevel = 2;
+		else              subdivLevel = 1;
 	}
 	
 //	public void test() {

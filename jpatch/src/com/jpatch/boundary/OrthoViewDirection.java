@@ -47,7 +47,27 @@ public abstract class OrthoViewDirection implements ViewDirection {
 	}
 	
 	public int compareTo(Object o) {
-		return o.hashCode() - hashCode(); // FIXME
+		/* check for equality */
+		if (this == o) {
+			return 0;
+		}
+		
+		if (o instanceof OrthoViewDirection) {
+			/* 
+			 * o is an OrthoViewDirection
+			 * loop through the list of DIRECTIONS, return -1 if <i>this</i> comes
+			 * first and 1 if <i>o</i> comes first.
+			 */
+			for (int i = 0; i < DIRECTIONS.length; i++) {
+				if (this == DIRECTIONS[i]) {
+					return -1;
+				} else if (o == DIRECTIONS[i]) {
+					return 1;
+				}
+			}
+		}
+		/* o is not an OrthoViewDirection, return -1 (OrthoViewDirections are ordered first) */
+		return -1;
 	}
 	
 	private static class FixedViewDirection extends OrthoViewDirection {
@@ -67,7 +87,9 @@ public abstract class OrthoViewDirection implements ViewDirection {
 							birdsEyeView = new OrthoView();
 							BIRDS_EYE.viewMap.put(viewport, birdsEyeView);
 						}
+						unbindViewport(viewport);
 						OrthoView storedView = viewMap.get(viewport);
+						storedView.updateViewdef(((OrthoViewDef) viewport.getViewDef()));
 						birdsEyeView.set(storedView);
 						rot.getTuple(birdsEyeView.rotation);		
 						viewport.getViewDirectionAttribute().setValue(BIRDS_EYE);

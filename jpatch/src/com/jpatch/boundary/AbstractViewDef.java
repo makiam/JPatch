@@ -10,6 +10,10 @@ public abstract class AbstractViewDef implements ViewDef {
 		this.viewport = viewport;
 	}
 	
+	public Viewport getViewport() {
+		return viewport;
+	}
+	
 	public BooleanAttr getShowControlMeshAttribute() {
 		return viewport.getShowControlMeshAttribute();
 	}

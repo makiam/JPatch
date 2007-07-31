@@ -607,8 +607,8 @@ public class Main {
 				 * if the input came from a viewport, repaint just this viewport,
 				 * otherwise repaint all viewports
 				 */
-				if (source instanceof Viewport) {
-					repaintViewport((Viewport) source);
+				if (source instanceof ViewDef) {
+					repaintViewport(((ViewDef) source).getViewport());
 				} else if (source instanceof SceneGraphNode) {
 					System.out.println("recomputeing scene graph");
 					computeSceneGraph((SceneGraphNode) source);
@@ -699,6 +699,7 @@ public class Main {
 	public void repaintViewport(Viewport viewport) {
 		Component component = viewport.getComponent();
 		if (component.isVisible()) {
+			viewport.getViewDef().computeMatrix();
 			((GLAutoDrawable) component).display();
 		}
 	}

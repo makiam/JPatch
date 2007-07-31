@@ -47,7 +47,7 @@ public class RotateTool implements JPatchTool {
 			gl.glBegin(GL_LINE_STRIP);
 			for (int j = 0; j <= SEGMENTS; j++) {
 				p.set(points[i][(j < SEGMENTS) ? j : 0]);
-				viewport.getMatrix().transform(p);
+				viewport.getViewDef().getMatrix().transform(p);
 				gl.glVertex3f(p.x, p.y, p.z);
 			}
 			gl.glEnd();

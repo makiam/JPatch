@@ -90,15 +90,15 @@ public class MoveVertexTool implements JPatchTool {
 		
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			viewport.getMatrix().transform(p);
-			viewport.get3DPosition(e.getX(), e.getY(), p);
-//			p.sub(limit);
-//			double n = vertex.valence();
-//			p.scale((n + 5) / n);
-//			p.add(pos);
-			vertex.getPosition().setTuple(p);
-			Main.getInstance().getActiveSds().computeLevel2Vertices();
-			Main.getInstance().syncRepaintViewport(viewport);
+//			viewport.getMatrix().transform(p);
+//			viewport.get3DPosition(e.getX(), e.getY(), p);
+////			p.sub(limit);
+////			double n = vertex.valence();
+////			p.scale((n + 5) / n);
+////			p.add(pos);
+//			vertex.getPosition().setTuple(p);
+//			Main.getInstance().getActiveSds().computeLevel2Vertices();
+//			Main.getInstance().syncRepaintViewport(viewport);
 		}
 	}
 }

@@ -20,6 +20,8 @@ import javax.vecmath.*;
 
 public class ViewportGl extends Viewport {
 	
+	private static int repaintCount;
+	
 	private static final boolean LIGHTWEIGHT = false;
 	private static final double CLEAR_DEPTH = 100000;
 	private static final ColorSettings COLORS = Settings.getInstance().colors;
@@ -337,7 +339,7 @@ public class ViewportGl extends Viewport {
 		glEventListener = new GLEventListener() {
 
 			public void init(GLAutoDrawable drawable) {
-				
+//				System.out.println("GL init");
 				drawable.setGL(new DebugGL(drawable.getGL()));
 				gl = drawable.getGL();
 //				gl.glEnd();
@@ -398,6 +400,7 @@ public class ViewportGl extends Viewport {
 			}
 
 			public void display(GLAutoDrawable drawable) {
+//				System.out.println("GL display " + this + " " + repaintCount++);
 //				long t = System.currentTimeMillis();
 				gl.glFlush();
 				gl.glFinish();	// wait for previous gl functions to finish
@@ -405,21 +408,25 @@ public class ViewportGl extends Viewport {
 				gl.glClearColor(background.x, background.y, background.z, 0);	// set background color
 				gl.glClearDepth(CLEAR_DEPTH);									// set initial depth-buffer value
 				gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// clear color and depth buffers
-				gl.glFlush();
+//				gl.glFlush();
+//				gl.glFinish();
 				draw();
-				gl.glFlush();
-				gl.glFinish();
+//				gl.glFlush();
+//				gl.glFinish();
 //				System.out.println("GL display on thread " + Thread.currentThread());
 //				System.out.println(System.currentTimeMillis() - t);
 			}
 
 			public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+//				System.out.println("GL reshape");
 				viewDef.computeMatrix();
 //				init(drawable);
 //				display(drawable);
 			}
 
-			public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) { }
+			public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
+//				System.out.println("GL displayChanged");
+			}
 		};
 		
 		drawable.addGLEventListener(glEventListener);
@@ -505,7 +512,7 @@ public class ViewportGl extends Viewport {
 //		rasterMode();
 //		drawGrid();
 		spatialMode();
-		
+//		if (true) return;
 		
 //		gl.glEnable(GL_BLEND);
 //		Matrix4d m = new Matrix4d();
@@ -545,7 +552,7 @@ public class ViewportGl extends Viewport {
 //			drawModel(model);
 //		}
 		
-		gl.glPolygonMode(GL_FRONT, GL_FILL);
+//		gl.glPolygonMode(GL_FRONT, GL_LINE);
 //		drawSds(Main.getInstance().getActiveSds());
 //		Sds activeSds = Main.getInstance().getActiveSds();
 //		if (activeSds != null) {
@@ -567,16 +574,20 @@ public class ViewportGl extends Viewport {
 	private void drawSceneGraphElement(SceneGraphNode node) {
 		
 		
-		Matrix4d matrix = viewDef.getMatrix();
+		Matrix4d matrix = new Matrix4d(viewDef.getMatrix());
 		Transform transform = node.getTransform();
 		if (transform != null) {
-			transform.getMatrix(modelViewMatrix);
-			if (node instanceof TransformNode) {
-				System.out.println("sceneGraph TransformNode @ " + ((TransformNode) node).getNameAttribute().getValue());
-				System.out.println(modelViewMatrix);
-			}
-			modelViewMatrix.mul(matrix);
-			modelView.set(modelViewMatrix);
+			Matrix4d m = new Matrix4d();
+			
+			transform.getMatrix(m);
+//			if (node instanceof TransformNode) {
+//				System.out.println("sceneGraph TransformNode @ " + ((TransformNode) node).getNameAttribute().getValue());
+//				System.out.println(modelViewMatrix);
+//			}
+//			modelViewMatrix.set(matrix);
+			matrix.mul(m);
+//			modelViewMatrix.mul(matrix);
+			modelView.set(matrix);
 		} else {
 			modelView.set(matrix);
 		}
@@ -819,9 +830,9 @@ public class ViewportGl extends Viewport {
 	
 	private void drawSds3(Sds sds) {
 		useProgram = false;
-//		gl.glEnable(GL_LIGHTING);
+		gl.glEnable(GL_LIGHTING);
 		gl.glShadeModel(GL_SMOOTH);
-		gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		gl.glPolygonMode(GL_FRONT, GL_FILL);
 		gl.glEnable(GL_COLOR_MATERIAL);
 		gl.glColorMaterial(GL_FRONT, GL_EMISSION);
 		
@@ -849,13 +860,13 @@ public class ViewportGl extends Viewport {
 //		Point3f p0 = new Point3f();
 //		Point3f p1 = new Point3f();
 //		gl.glInterleavedArrays(GL_N3F_V3F, 0, dicer.getBuffer());
-		gl.glEnable(GL_LIGHTING);
+//		gl.glEnable(GL_LIGHTING);
 //		gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 0, 0.9f }, 0);
 //		gl.glMaterialfv(GL_FRONT, GL_AMBIENT, new float[] { 0, 0, 0.2f }, 0);
 		
-		if (canUseProgram) {
-			gl.glUseProgram(useProgram ? program : 0);
-		}
+//		if (canUseProgram) {
+//			gl.glUseProgram(useProgram ? program : 0);
+//		}
 		
 		GlMaterial currentMaterial = null;
 		gl.glColor3f(0.0f, 0.0f, 0.0f);
@@ -889,16 +900,19 @@ public class ViewportGl extends Viewport {
 	//				}
 	//				setMaterial(face.getMaterial().getGlMaterial().getArray());
 					drawSlate(slate);
+//					gl.glFlush();
+//					gl.glFinish();
 				}
 			}
 		}
 		
-		gl.glColor3f(0.0f, 0.0f, 0.0f);
-		gl.glDisable(GL_COLOR_MATERIAL);
+//		gl.glColor3f(0.0f, 0.0f, 0.0f);
+//		gl.glDisable(GL_COLOR_MATERIAL);
 		
 		if (showControlMeshAttr.getBoolean()) {
 			
 			if (!showLimitSurfaceAttr.getBoolean()) {
+				gl.glEnable(GL_LIGHTING);
 				for (Face face : sds.faceList) {
 					GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
 					if (currentMaterial != faceMaterial) {
@@ -925,9 +939,9 @@ public class ViewportGl extends Viewport {
 			}
 			
 			gl.glDisable(GL_LIGHTING);
-			if (canUseProgram && useProgram) {
-				gl.glUseProgram(0);
-			}
+//			if (canUseProgram && useProgram) {
+//				gl.glUseProgram(0);
+//			}
 	//		if (gl.isFunctionAvailable("glUseProgram")) {
 	//			gl.glUseProgram(0);
 	//		}
@@ -1066,15 +1080,22 @@ public class ViewportGl extends Viewport {
 	
 	private void drawSlate(Slate2 slate) {
 		
+		/*
+		 * turning lighting on/off (using glEnable(GL_LIGHTING) and glDisable(GL_LIGHTING)
+		 * a lot during rendering proved to be very slow. This code therefore uses
+		 * GL_COLOR_MATERIAL to render the wireframe of the projected mesgh.
+		 */
 		final int level = slate.getSubdivLevel();
 		if (level < 0) {
 			return;
 		}
+		
+		dicer.dice(slate, level);
+		
 //		if (l < 2) {
 //			l = 2;
 //		}
 //		System.out.println("Slate=" + slate + " level=" + level);
-		int count = dicer.dice(slate, level);
 		
 		
 //		count = (dim - 1) * (dim - 1);
@@ -1095,7 +1116,6 @@ public class ViewportGl extends Viewport {
 //		gl.glFlush();
 //		gl.glFinish();
 		
-		
 		final int start, end;
 		final int dim = (1 << (level - 1)) + 3;
 		if (level < 2) {
@@ -1108,6 +1128,11 @@ public class ViewportGl extends Viewport {
 		int ydim = start * dim;
 		final float[][] normals = dicer.getLimitNormals(level - 1);
 		final float[][] vertices = dicer.getLimitVertices(level - 1);
+		
+//		gl.glEnable(GL_COLOR_MATERIAL);
+//		gl.glEnable(GL_LIGHTING);
+		
+		gl.glColor3f(0, 0, 0);
 		gl.glBegin(GL_QUADS);
 		for (int y = start; y < end; y++) {
 			int gsydim = Dicer.GRID_START + ydim;
@@ -1189,7 +1214,7 @@ public class ViewportGl extends Viewport {
 					gl.glBegin(GL_LINE_STRIP);
 					for (int j = 0; j < lineArray.length; j++) {
 //						if (lineNormals[lineArray[j] + Dicer.GRID_START][2] > 0) {
-							int offset = (j > 0 && j < lineArray.length - 1) ? side * 3 : 0;
+//							int offset = (j > 0 && j < lineArray.length - 1) ? side * 3 : 0;
 //							gl.glNormal3fv(lineNormals[lineArray[j] + Dicer.GRID_START], offset);
 							gl.glVertex3fv(lineVertices[lineArray[j] + Dicer.GRID_START], 0);
 //						}
@@ -1197,7 +1222,7 @@ public class ViewportGl extends Viewport {
 					gl.glEnd();
 				}
 			}
-			gl.glColor3f(0.0f, 0.0f, 0.0f);
+//			gl.glColor3f(0.0f, 0.0f, 0.0f);
 //			gl.glEnable(GL_LIGHTING);
 		}
 		
