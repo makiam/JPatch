@@ -298,6 +298,7 @@ public class Sds {
 			v.project(matrix);
 		}
 	}
+	
 //	public void subdivide() {
 //		edgeMap = new HashMap<EdgeKey, HalfEdge>(edgeMap.size() * 4);
 //		for (Face face : faceList) {

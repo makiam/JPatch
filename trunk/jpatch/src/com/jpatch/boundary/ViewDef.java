@@ -11,4 +11,5 @@ public interface ViewDef {
 	public Matrix4d getMatrix();
 	public Matrix4d getInverseMatrix();
 	public void computeMatrix();
+	public Viewport getViewport();
 }
