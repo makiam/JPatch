@@ -1,5 +1,7 @@
 package com.jpatch.afw.ui;
 
+import com.jpatch.afw.attributes.BooleanAttr;
+
 import java.awt.Color;
 import java.io.*;
 import java.net.*;
@@ -14,6 +16,7 @@ public class AttributeEditorFactory {
 	private static final AttributeEditorFactory INSTANCE = new AttributeEditorFactory();
 	
 	private Map <Class, AttributeEditor> editors = new HashMap<Class, AttributeEditor>();
+	private Map <String, BooleanAttr> expansionControls = new HashMap<String, BooleanAttr>();
 	
 	private AttributeEditorFactory() { }
 	
@@ -21,7 +24,7 @@ public class AttributeEditorFactory {
 		return INSTANCE;
 	}
 	
-	public AttributeEditor getEditorFor(Object object, Color borderColor) {
+	public AttributeEditor getEditorFor(Object object, BooleanAttr expansionControl, Color borderColor) {
 		AttributeEditor editor = editors.get(object.getClass());
 		if (editor == null) {
 			URL url = null;
@@ -41,7 +44,7 @@ public class AttributeEditorFactory {
 			try {
 				System.out.println("reading...");
 				XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-				AttributeContentHandler handler = new AttributeContentHandler(objectClass, object, borderColor);
+				AttributeContentHandler handler = new AttributeContentHandler(objectClass, object, expansionControl, borderColor);
 				xmlReader.setContentHandler(handler);
 				xmlReader.parse(url.toString());
 				editor = handler.getEditor();
@@ -57,25 +60,33 @@ public class AttributeEditorFactory {
 		return editor;
 	}
 	
-	private static class AttributeContentHandler extends DefaultHandler {
+	private class AttributeContentHandler extends DefaultHandler {
 		private final Class objectClass;
 		private final AttributeEditor editor;
 		
-		private AttributeContentHandler(Class objectClass, Object entity, Color borderColor) {
+		private AttributeContentHandler(Class objectClass, Object entity, BooleanAttr expansionControl, Color borderColor) {
 			this.objectClass = objectClass;
-			this.editor = new AttributeEditor(objectClass, objectClass.getSimpleName(), entity, borderColor);
+			this.editor = new AttributeEditor(objectClass, objectClass.getSimpleName(), expansionControl, entity, borderColor);
 		}
 		
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-			System.out.println(localName);
 			if (localName.equals("attributeEditor")) {
 				if (!attributes.getValue("class").equals(objectClass.getName())) {
 					throw new SAXException("wrong class: " + attributes.getValue("class") + ", excpected " + objectClass.getSimpleName());
 				}
 			}
 			if (localName.equals("group")) {
-				editor.startContainer(attributes.getValue("name"));
+				String expansion = attributes.getValue("expansion");
+				BooleanAttr expansionControl = null;
+				if (expansion != null) {
+					expansionControl = expansionControls.get(expansion);
+					if (expansionControl == null) {
+						expansionControl = new BooleanAttr();
+						expansionControls.put(expansion, expansionControl);
+					}
+				}
+				editor.startContainer(attributes.getValue("name"), expansionControl);
 			} else if (localName.equals("field")) {
 				editor.addField(attributes.getValue("name"), attributes.getValue("attribute"));
 			} else if (localName.equals("limits")) {

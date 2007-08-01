@@ -1,7 +1,12 @@
 package com.jpatch.afw.ui;
 
+import com.jpatch.afw.attributes.Attribute;
+import com.jpatch.afw.attributes.AttributePostChangeListener;
+import com.jpatch.afw.attributes.BooleanAttr;
+
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -17,11 +22,23 @@ public class JPatchFormContainer {
 	private final Box formBox = Box.createVerticalBox();
 	private final Box containerBox = Box.createVerticalBox();
 	private JPatchFormContainer parentContainer;
-	private boolean expanded;
+	private final BooleanAttr expandedAttr;
+	private boolean componentsAdded;
 	private Color borderColor = new Color(0x808080);
-	
-	public JPatchFormContainer(String title) {
-		JToggleButton button = new JToggleButton("abc");
+	private final String title; // FIXME: for debugging, remove
+	private AttributePostChangeListener expansionListener = new AttributePostChangeListener() {
+		public void attributeHasChanged(Attribute source) {
+			setExpanded(expandedAttr.getBoolean());
+		}
+	};
+	public JPatchFormContainer(String title, BooleanAttr expansionControl) {
+		this.title = title;
+		if (expansionControl != null) {
+			expandedAttr = expansionControl;
+		} else {
+			expandedAttr = new BooleanAttr();
+		}
+		JToggleButton button = new JToggleButton("", expandedAttr.getBoolean());
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setExpanded(((JToggleButton) e.getSource()).isSelected());
@@ -41,7 +58,7 @@ public class JPatchFormContainer {
 		component.setBorder(new Border() {
 			private final Insets insets = new Insets(0, 4, 0, 4);
 			public Insets getBorderInsets(Component c) {
-				return expanded ? EXPANDED_INSETS : COLLAPSED_INSETS;
+				return expandedAttr.getBoolean() ? EXPANDED_INSETS : COLLAPSED_INSETS;
 			}
 
 			public boolean isBorderOpaque() {
@@ -55,7 +72,7 @@ public class JPatchFormContainer {
 				g2.setColor(borderColor);
 				g2.fillRoundRect(x, y + 0, width, h, 8, 8);
 				g2.drawRoundRect(x, y + 0, width - 1, h - 1, 8, 8);
-				if (expanded) {
+				if (expandedAttr.getBoolean()) {
 					g2.drawRoundRect(x, y + h - 2, width - 1, height - h - 1, 8, 8);
 					g2.drawRoundRect(x + 1, y + h - 1, width - 3, height - h - 3, 6, 6);
 					g2.fillRect(x, 11, 2, 8);
@@ -64,6 +81,19 @@ public class JPatchFormContainer {
 			}
 			
 		});
+//		setExpanded(expandedAttr.getBoolean());
+//		component.addHierarchyListener(new HierarchyListener() {
+//			public void hierarchyChanged(HierarchyEvent e) {
+//				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+//					if (component.isShowing()) {
+////						setExpanded(expandedAttr.getBoolean());
+//						expandedAttr.addAttributePostChangeListener(expansionListener);
+//					} else {
+//						expandedAttr.removeAttributePostChangeListener(expansionListener);
+//					}
+//				}
+//			}
+//		});
 	}
 	
 	public JComponent getComponent() {
@@ -100,16 +130,20 @@ public class JPatchFormContainer {
 		containerBox.remove(formContainer.getComponent());
 	}
 	
-	public void setExpanded(boolean expanded) {
-		if (!this.expanded && expanded) {
-			this.expanded = true;
+	private void setExpanded(boolean expanded) {
+		System.err.println(title + " setExpanded(" + expanded + ") called");
+		System.err.println("    componentsAdded=" + componentsAdded + " expandedAttr=" + expandedAttr.getBoolean());
+		if (!componentsAdded && expanded) {
+			componentsAdded = true;
 			component.add(formBox);
 			component.add(containerBox);
-			getRootContainer().component.getRootPane().validate();
-		} else if (this.expanded && !expanded) {
-			this.expanded = false;
+		} else if (componentsAdded && !expanded) {
+			componentsAdded = false;
 			component.remove(formBox);
 			component.remove(containerBox);
+		}
+		expandedAttr.setBoolean(expanded);
+		if (component.isShowing()) {
 			getRootContainer().component.getRootPane().validate();
 		}
 	}

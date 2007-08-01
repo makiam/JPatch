@@ -1,11 +1,11 @@
 <attributeEditor name="Camera" class="com.jpatch.entity.Camera">
 	<field name="Name" attribute="Name" />
 	<field name="Focal length" attribute="FocalLength" />
-	<group name="Transform">
+	<group name="Transform" expansion="embeddedTransform">
 		<field name="Translation" attribute="Translation" />
 		<field name="Rotation" attribute="Rotation" />
 		<field name="Scale" attribute="Scale" />
-		<group name="Advanced">
+		<group name="Advanced" expansion="embeddedTransform.advanced">
 			<field name="Visibility" attribute="Visibility" />
 	<!--	<field name="Shear" attribute="Shear" />	-->
 			<field name="Position" attribute="Position" />
@@ -13,14 +13,14 @@
 			<field name="Axis rotation" attribute="AxisRotation" />
 			<field name="Rotation order" attribute="RotationOrder" />
 		</group>
-		<group name="Limits">
-			<group name="Translation">
+		<group name="Limits" expansion="embeddedTransform.limits">
+			<group name="Translation" expansion="embeddedTransform.limits.translation">
 				<limits attribute="Translation" />
 			</group>
-			<group name="Rotation">
+			<group name="Rotation" expansion="embeddedTransform.limits.rotation">
 				<limits attribute="Rotation" />
 			</group>
-			<group name="Scale">
+			<group name="Scale" expansion="embeddedTransform.limits.scale">
 				<limits attribute="Scale" />
 			</group>
 		</group>

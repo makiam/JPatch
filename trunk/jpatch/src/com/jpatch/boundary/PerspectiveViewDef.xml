@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<attributeEditor name="View" class="com.jpatch.boundary.OrthoViewDef">
+<attributeEditor name="View" class="com.jpatch.boundary.PerspectiveViewDef">
 	<field name="View" attribute="ViewDirection" />
 	<field name="Translation" attribute="Translation" />
 	<field name="Rotation" attribute="Rotation" />
-	<field name="Scale" attribute="Scale" />
+	<field name="Focal Length" attribute="FocalLength" />
 	<group name="Rendering" expansion="view.rendering">
 		<field name="Control mesh" attribute="ShowControlMesh" />
 		<field name="Limit surface" attribute="ShowLimitSurface" />

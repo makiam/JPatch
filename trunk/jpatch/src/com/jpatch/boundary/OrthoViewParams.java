@@ -24,18 +24,18 @@ package com.jpatch.boundary;
 import javax.vecmath.Tuple2d;
 import javax.vecmath.Vector2d;
 
-class OrthoView {
+class OrthoViewParams {
 	final Tuple2d translation = new Vector2d(0.0, 0.0);
 	final Tuple2d rotation = new Vector2d(0.0, 0.0);
 	double scale = 1.0;
 	
-	OrthoView() { }
+	OrthoViewParams() { }
 	
-	OrthoView(OrthoView view) {
+	OrthoViewParams(OrthoViewParams view) {
 		set(view);
 	}
 	
-	void set(OrthoView view) {
+	void set(OrthoViewParams view) {
 		this.translation.set(view.translation);
 		this.rotation.set(view.rotation);
 		this.scale = view.scale;

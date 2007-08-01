@@ -735,7 +735,7 @@ public class AttributeManager {
 
 		/*
 		 * add the AttributePostChangeListener if the component is currently showing
-		 * (otherwise this has will done by the HierarchyListener below)
+		 * (otherwise this will done by the HierarchyListener below)
 		 */
 		if (component.isShowing()) {
 			for (AttributeBinding binding : bindings) {
@@ -750,6 +750,8 @@ public class AttributeManager {
 					JComponent component = (JComponent) e.getSource();
 					AttributeBinding[] bindings = componentBindings.get(e.getSource());
 					if (component.isShowing()) {
+//						System.err.println("+showing:" + System.identityHashCode(component));
+//						Thread.dumpStack();
 						for (AttributeBinding binding : bindings) {
 							binding.bind();
 						}
@@ -757,6 +759,7 @@ public class AttributeManager {
 							component.setBackground(Color.WHITE);
 						}
 					} else {
+//						System.err.println("-hiding :" + System.identityHashCode(component));
 						for (AttributeBinding binding : bindings) {
 							binding.unbind();
 						}
