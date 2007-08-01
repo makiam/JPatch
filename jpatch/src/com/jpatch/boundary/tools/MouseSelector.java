@@ -14,7 +14,7 @@ public class MouseSelector {
 		if (sds == null) {
 			return null;
 		}
-		Matrix4d matrix = viewport.getViewDef().getMatrix();
+		Matrix4d matrix = viewport.getViewDef().getMatrix(new Matrix4d());
 		Point3d p = new Point3d();
 		x -= (viewport.getComponent().getWidth() >> 1);
 		y = (viewport.getComponent().getHeight() >> 1) - y;
@@ -41,7 +41,7 @@ public class MouseSelector {
 		if (sds == null) {
 			return null;
 		}
-		Matrix4d matrix = viewport.getViewDef().getMatrix();
+		Matrix4d matrix = viewport.getViewDef().getMatrix(new Matrix4d());
 		Point3d p0 = new Point3d();
 		Point3d p1 = new Point3d();
 		x -= (viewport.getComponent().getWidth() >> 1);

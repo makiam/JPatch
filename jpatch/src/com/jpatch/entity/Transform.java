@@ -50,6 +50,7 @@ public abstract class Transform {
 		return point;
 	}
 	
+	
 	/**
 	 * Transforms the specified point using the inverse of this transformation matrix
 	 * @param normal the point to be transformed
@@ -80,6 +81,17 @@ public abstract class Transform {
 	public Matrix4d getMatrix(Matrix4d matrix) {
 		matrix.set(this.matrix);
 		return matrix;
+	}
+	
+	/**
+	 * Sets the elements of the specified matrix to that of the inverse of this transformation matrix and returns
+	 * the specified matrix
+	 * @param matrix A matrix4d object
+	 * @return the specified matrix
+	 */
+	public Matrix4d getInverseMatrix(Matrix4d inverseMatrix) {
+		inverseMatrix.set(this.invMatrix);
+		return inverseMatrix;
 	}
 	
 	/**

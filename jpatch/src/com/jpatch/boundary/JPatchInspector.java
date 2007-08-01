@@ -14,9 +14,13 @@ public class JPatchInspector {
 	private static final Color TOOL_COLOR = new Color(0xbbaa99);
 	private static final Color SELECTION_COLOR = new Color(0x88aa88);
 	
-	private static final AttributeEditor NULL_VIEW = new AttributeEditor(null, "View", null, VIEW_COLOR);
-	private AttributeEditor toolEditor = new AttributeEditor(null, "Tool", null, TOOL_COLOR);
-	private AttributeEditor selectionEditor = new AttributeEditor(null, "Selection", null, SELECTION_COLOR);
+	private final BooleanAttr viewExpandedAttr = new BooleanAttr();
+	private final BooleanAttr toolExpandedAttr = new BooleanAttr();
+	private final BooleanAttr selectionExpandedAttr = new BooleanAttr();
+	
+	private AttributeEditor NULL_VIEW = new AttributeEditor(null, "View", viewExpandedAttr, null, VIEW_COLOR);
+	private AttributeEditor toolEditor = new AttributeEditor(null, "Tool", toolExpandedAttr, null, TOOL_COLOR);
+	private AttributeEditor selectionEditor = new AttributeEditor(null, "Selection", selectionExpandedAttr, null, SELECTION_COLOR);
 
 	private AttributePostChangeListener viewportChangeListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
@@ -30,12 +34,12 @@ public class JPatchInspector {
 			System.out.println("selection=" + ((GenericAttr<Object>) source).getValue());
 			Object selectedObject = ((GenericAttr<Object>) source).getValue();
 			if (selectedObject != null) {
-				panel.add(AttributeEditorFactory.getInstance().getEditorFor(((GenericAttr<Object>) source).getValue(), SELECTION_COLOR), 2);
+				panel.add(AttributeEditorFactory.getInstance().getEditorFor(((GenericAttr<Object>) source).getValue(), selectionExpandedAttr, SELECTION_COLOR), 2);
 			} else {
 				panel.add(selectionEditor, 2);
 			}
 			panel.getComponent().validate();
-			panel.getComponent().repaint();
+//			panel.getComponent().repaint();
 		}
 	};
 	
@@ -50,9 +54,9 @@ public class JPatchInspector {
 	public void setViewport(Viewport viewport) {
 		panel.remove(0);
 		System.out.println("viewport=" + viewport);
-		panel.add(AttributeEditorFactory.getInstance().getEditorFor(viewport.viewDef, VIEW_COLOR), 0);
+		panel.add(AttributeEditorFactory.getInstance().getEditorFor(viewport.viewDef, viewExpandedAttr, VIEW_COLOR), 0);
 		panel.getComponent().validate();
-		panel.getComponent().repaint();
+//		panel.getComponent().repaint();
 	}
 	
 	public JPatchInspector() {

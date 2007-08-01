@@ -28,10 +28,10 @@ public class AttributeEditor {
 	private JPatchForm form = new JPatchForm();
 	private final List<ComponentBinding> bindings = new ArrayList<ComponentBinding>();
 	
-	public AttributeEditor(Class entityClass, String name, Object entity, Color borderColor) {
+	public AttributeEditor(Class entityClass, String name, BooleanAttr expansionControl, Object entity, Color borderColor) {
 		this.entityClass = entityClass;
 		this.entity = this.currentObject = entity;
-		startContainer(name);
+		startContainer(name, expansionControl);
 		containerStack.peek().setRootBorderColor(borderColor);
 	}
 	
@@ -55,8 +55,8 @@ public class AttributeEditor {
 		return containerStack.firstElement();
 	}
 	
-	public void startContainer(String name) {
-		JPatchFormContainer formContainer = new JPatchFormContainer(name);
+	public void startContainer(String name, BooleanAttr expansionControl) {
+		JPatchFormContainer formContainer = new JPatchFormContainer(name, expansionControl);
 		form = new JPatchForm();
 		formContainer.add(form);
 		if (!containerStack.isEmpty()) {

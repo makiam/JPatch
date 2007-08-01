@@ -574,7 +574,7 @@ public class ViewportGl extends Viewport {
 	private void drawSceneGraphElement(SceneGraphNode node) {
 		
 		
-		Matrix4d matrix = new Matrix4d(viewDef.getMatrix());
+		Matrix4d matrix = new Matrix4d(viewDef.getMatrix(new Matrix4d()));
 		Transform transform = node.getTransform();
 		if (transform != null) {
 			Matrix4d m = new Matrix4d();
@@ -1315,14 +1315,15 @@ public class ViewportGl extends Viewport {
 		float h = (float) component.getHeight() / 2;
 		gl.glMatrixMode(GL_PROJECTION);
 		gl.glLoadIdentity();
-		if (false) {
-//			Perspective perspective = ((PerspectiveViewDirection) viewType.getValue()).getPerspective();
+		if (viewDef instanceof PerspectiveViewDef) {
+			PerspectiveViewDef perspectiveView = ((PerspectiveViewDef) viewDef);
 //			float a = (float) (17.5 / perspective.getFocalLength());
+			float a = 1.0f / (float) perspectiveView.getRelativeFocalLength();
+			float b = a * h / w;
+//			float a = 17.5f / (float) camera.focalLength.get(); 	// 35/focallength/2
 //			float b = a * h / w;
-////			float a = 17.5f / (float) camera.focalLength.get(); 	// 35/focallength/2
-////			float b = a * h / w;
-//			gl.glDepthFunc(GL_LEQUAL);
-//			gl.glFrustum(-a, a, -b, b, nearClip, farClip);
+			gl.glDepthFunc(GL_LEQUAL);
+			gl.glFrustum(-a, a, -b, b, nearClip, farClip);
 		} else {
 			gl.glDepthFunc(GL_LEQUAL);
 			gl.glOrtho(-w, w, -h, h, -farClip, farClip);

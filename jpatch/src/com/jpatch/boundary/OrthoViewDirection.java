@@ -18,8 +18,8 @@ public abstract class OrthoViewDirection implements ViewDirection {
 	public static final OrthoViewDirection[] DIRECTIONS = new OrthoViewDirection[] { FRONT, REAR, LEFT, RIGHT, TOP, BOTTOM, BIRDS_EYE };
 	
 	final String name;
-	final OrthoView initialView = new OrthoView();
-	final Map <Viewport, OrthoView> viewMap = new HashMap<Viewport, OrthoView>();
+	final OrthoViewParams initialView = new OrthoViewParams();
+	final Map <Viewport, OrthoViewParams> viewMap = new HashMap<Viewport, OrthoViewParams>();
 	
 	private OrthoViewDirection(String name, double rotX, double rotY) {
 		this.name = name;
@@ -27,16 +27,16 @@ public abstract class OrthoViewDirection implements ViewDirection {
 	}
 	
 	public void bindViewport(Viewport viewport) {
-		OrthoView storedView = viewMap.get(viewport);
+		OrthoViewParams storedView = viewMap.get(viewport);
 		if (storedView == null) {
-			storedView = new OrthoView(initialView);
+			storedView = new OrthoViewParams(initialView);
 			viewMap.put(viewport, storedView);
 		}
 		viewport.setViewDef(new OrthoViewDef(viewport, storedView));
 	}
 
 	public void unbindViewport(Viewport viewport) {
-		OrthoView storedView = viewMap.get(viewport);
+		OrthoViewParams storedView = viewMap.get(viewport);
 		((OrthoViewDef) viewport.getViewDef()).getTranslationAttribute().getTuple(storedView.translation);
 		storedView.scale = ((OrthoViewDef) viewport.getViewDef()).getScaleAttribute().getDouble();
 	}
@@ -82,13 +82,13 @@ public abstract class OrthoViewDirection implements ViewDirection {
 				public void attributeHasChanged(Attribute source) {
 					Tuple2Attr rot = (Tuple2Attr) source;
 					if (rot.getX() != initialView.rotation.x || rot.getY() != initialView.rotation.y) {
-						OrthoView birdsEyeView = BIRDS_EYE.viewMap.get(viewport);
+						OrthoViewParams birdsEyeView = BIRDS_EYE.viewMap.get(viewport);
 						if (birdsEyeView == null) {
-							birdsEyeView = new OrthoView();
+							birdsEyeView = new OrthoViewParams();
 							BIRDS_EYE.viewMap.put(viewport, birdsEyeView);
 						}
 						unbindViewport(viewport);
-						OrthoView storedView = viewMap.get(viewport);
+						OrthoViewParams storedView = viewMap.get(viewport);
 						storedView.updateViewdef(((OrthoViewDef) viewport.getViewDef()));
 						birdsEyeView.set(storedView);
 						rot.getTuple(birdsEyeView.rotation);		
@@ -108,7 +108,7 @@ public abstract class OrthoViewDirection implements ViewDirection {
 		@Override
 		public void unbindViewport(Viewport viewport) {
 			super.unbindViewport(viewport);
-			OrthoView storedView = viewMap.get(viewport);
+			OrthoViewParams storedView = viewMap.get(viewport);
 			((OrthoViewDef) viewport.getViewDef()).getRotationAttribute().getTuple(storedView.rotation);
 		}
 	}

@@ -187,6 +187,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 	@Override
 	public final T setValue(T newState) {
 		if (!statesAttr.contains(newState)) {
+			System.err.println(statesAttr.getElements());
 			throw new IllegalArgumentException(newState + " is not a legal state of this statemachine (" + this + ")");
 		}
 		if (newState != value) {

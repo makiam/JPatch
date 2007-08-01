@@ -6,24 +6,23 @@ import com.jpatch.settings.ColorSettings;
 import com.jpatch.settings.Settings;
 
 import javax.media.opengl.GL;
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Point3f;
+import javax.vecmath.*;
 
 import static javax.media.opengl.GL.*;
 
 public class RotateTool implements JPatchTool {
 	private static final int SEGMENTS = 72;
 	private final ColorSettings colorSettings = Settings.getInstance().colors;
-	private final Point3f[][] points = new Point3f[3][SEGMENTS + 1];
+	private final Point3d[][] points = new Point3d[3][SEGMENTS + 1];
 	static int n = 0;
 	
 	public RotateTool() {
 		for (int i = 0; i < SEGMENTS; i++) {
-			float sin = (float) Math.sin(2 * Math.PI / SEGMENTS * i);
-			float cos = (float) Math.cos(2 * Math.PI / SEGMENTS * i);
-			points[0][i] = new Point3f(0, -sin, cos);
-			points[1][i] = new Point3f(cos, 0, sin);
-			points[2][i] = new Point3f(cos, -sin, 0);
+			double sin = Math.sin(2 * Math.PI / SEGMENTS * i);
+			double cos = Math.cos(2 * Math.PI / SEGMENTS * i);
+			points[0][i] = new Point3d(0, -sin, cos);
+			points[1][i] = new Point3d(cos, 0, sin);
+			points[2][i] = new Point3d(cos, -sin, 0);
 		}
 	}
 	
@@ -31,7 +30,7 @@ public class RotateTool implements JPatchTool {
 		GL gl = ((ViewportGl) viewport).getGl();
 		gl.glDisable(GL_LIGHTING);
 //		System.out.println("drawing rotateTool " + n++);
-		Point3f p = new Point3f();
+		Point3d p = new Point3d();
 		for (int i = 0; i < 3; i++) {
 			switch (i) {
 			case 0:
@@ -47,8 +46,8 @@ public class RotateTool implements JPatchTool {
 			gl.glBegin(GL_LINE_STRIP);
 			for (int j = 0; j <= SEGMENTS; j++) {
 				p.set(points[i][(j < SEGMENTS) ? j : 0]);
-				viewport.getViewDef().getMatrix().transform(p);
-				gl.glVertex3f(p.x, p.y, p.z);
+				viewport.getViewDef().transform(p);
+				gl.glVertex3d(p.x, p.y, p.z);
 			}
 			gl.glEnd();
 		}

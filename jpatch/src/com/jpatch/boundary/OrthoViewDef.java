@@ -1,6 +1,7 @@
 package com.jpatch.boundary;
 
 import javax.vecmath.*;
+
 import com.jpatch.afw.attributes.*;
 
 public class OrthoViewDef extends AbstractViewDef {
@@ -10,7 +11,7 @@ public class OrthoViewDef extends AbstractViewDef {
 	private final Tuple2Attr rotationAttr = new Tuple2Attr();
 	private final DoubleAttr scaleAttr = new DoubleAttr(1.0);
 	
-	public OrthoViewDef(Viewport viewport, OrthoView orthoView) {
+	public OrthoViewDef(Viewport viewport, OrthoViewParams orthoView) {
 		super(viewport);
 		orthoView.updateViewdef(this);
 	}
@@ -27,11 +28,13 @@ public class OrthoViewDef extends AbstractViewDef {
 		return scaleAttr;
 	}
 
-	public Matrix4d getMatrix() {
+	public Matrix4d getMatrix(Matrix4d matrix) {
+		matrix.set(this.matrix);
 		return matrix;
 	}
 	
-	public Matrix4d getInverseMatrix() {
+	public Matrix4d getInverseMatrix(Matrix4d inverseMatrix) {
+		inverseMatrix.set(this.inverseMatrix);
 		return inverseMatrix;
 	}
 	
@@ -59,5 +62,15 @@ public class OrthoViewDef extends AbstractViewDef {
 		matrix.m23 = 0;
 		
 		inverseMatrix.invert(matrix);
+	}
+
+	public Point3d transform(Point3d p) {
+		inverseMatrix.transform(p);
+		return p;
+	}
+	
+	public Point3d invTransform(Point3d p) {
+		matrix.transform(p);
+		return p;
 	}
 }

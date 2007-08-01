@@ -517,8 +517,9 @@ public class Main {
 		camera2.getParentAttribute().setValue(node4);
 		camera2.getNameAttribute().setValue("camera 2");
 		
-//		viewDirectionsAttr.add(new PerspectiveViewDirection(camera1));
-//		viewDirectionsAttr.add(new PerspectiveViewDirection(camera2));
+		viewDirectionsAttr.add(new PerspectiveViewDirection(camera1));
+		viewDirectionsAttr.add(new PerspectiveViewDirection(camera2));
+		System.out.println(viewDirectionsAttr.getElements());
 		
 		treeManager.createTreeNodeFor(sceneGraphRoot);
 		JTree tree = new JTree(treeModel);
