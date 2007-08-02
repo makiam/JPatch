@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import javax.swing.JComponent;
 
+import com.jpatch.afw.Utils;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.ui.*;
 import com.jpatch.entity.TransformNode;
@@ -18,9 +19,9 @@ public class JPatchInspector {
 	private final BooleanAttr toolExpandedAttr = new BooleanAttr();
 	private final BooleanAttr selectionExpandedAttr = new BooleanAttr();
 	
-	private AttributeEditor NULL_VIEW = new AttributeEditor(null, "View", viewExpandedAttr, null, VIEW_COLOR);
-	private AttributeEditor toolEditor = new AttributeEditor(null, "Tool", toolExpandedAttr, null, TOOL_COLOR);
-	private AttributeEditor selectionEditor = new AttributeEditor(null, "Selection", selectionExpandedAttr, null, SELECTION_COLOR);
+	private AttributeEditor NULL_VIEW = new AttributeEditor(null, "NULL_VIEW", viewExpandedAttr, null, VIEW_COLOR);
+	private AttributeEditor toolEditor = new AttributeEditor(null, "NULL_TOOL", toolExpandedAttr, null, TOOL_COLOR);
+	private AttributeEditor selectionEditor = new AttributeEditor(null, "NULL_SELECTION", selectionExpandedAttr, null, SELECTION_COLOR);
 
 	private AttributePostChangeListener viewportChangeListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
@@ -38,7 +39,7 @@ public class JPatchInspector {
 			} else {
 				panel.add(selectionEditor, 2);
 			}
-			panel.getComponent().validate();
+			panel.getComponent().revalidate();
 //			panel.getComponent().repaint();
 		}
 	};
@@ -53,9 +54,15 @@ public class JPatchInspector {
 	
 	public void setViewport(Viewport viewport) {
 		panel.remove(0);
-		System.out.println("viewport=" + viewport);
+//		System.out.println("viewport=" + viewport);
 		panel.add(AttributeEditorFactory.getInstance().getEditorFor(viewport.viewDef, viewExpandedAttr, VIEW_COLOR), 0);
-		panel.getComponent().validate();
+//		if (panel.getComponent().getRootPane() != null) {
+//			System.out.println("validate " + panel.getComponent().getRootPane());
+		JComponent component = panel.getComponent();
+		System.out.println("inspector" + " component=" + System.identityHashCode(component) + " parent=" + System.identityHashCode(component.getParent()) + " validateRoot=" + System.identityHashCode(Utils.getValidateRoot(component)));
+		
+			component.revalidate();
+//		}
 //		panel.getComponent().repaint();
 	}
 	

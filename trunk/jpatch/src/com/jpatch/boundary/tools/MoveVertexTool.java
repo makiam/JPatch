@@ -10,6 +10,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 
 import javax.media.opengl.GLCanvas;
+import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3d;
 
 public class MoveVertexTool implements JPatchTool {
@@ -76,9 +77,10 @@ public class MoveVertexTool implements JPatchTool {
 	}
 	
 	private static class MoveVertexMouseMotionListener extends MouseMotionAdapter {
-		private Viewport viewport;
-		private TopLevelVertex vertex;
-		Point3d p = new Point3d();
+		private final Viewport viewport;
+		private final TopLevelVertex vertex;
+		private final Point3d p = new Point3d();
+		double z;
 //		Point3d pos = new Point3d();
 //		Point3d limit = new Point3d();
 		
@@ -86,19 +88,23 @@ public class MoveVertexTool implements JPatchTool {
 			this.viewport = viewport;
 			this.vertex = vertex;
 			vertex.getPos(p);
+			viewport.getViewDef().transform(p);
+			z = p.z;
 		}
 		
 		@Override
 		public void mouseDragged(MouseEvent e) {
-//			viewport.getMatrix().transform(p);
-//			viewport.get3DPosition(e.getX(), e.getY(), p);
-////			p.sub(limit);
-////			double n = vertex.valence();
-////			p.scale((n + 5) / n);
-////			p.add(pos);
-//			vertex.getPosition().setTuple(p);
-//			Main.getInstance().getActiveSds().computeLevel2Vertices();
-//			Main.getInstance().syncRepaintViewport(viewport);
+			p.x = e.getX() - viewport.getComponent().getWidth() / 2;
+			p.y = viewport.getComponent().getHeight() / 2 - e.getY();
+			p.z = z;
+			viewport.getViewDef().invTransform(p);
+//			p.sub(limit);
+//			double n = vertex.valence();
+//			p.scale((n + 5) / n);
+//			p.add(pos);
+			vertex.getPosition().setTuple(p);
+			Main.getInstance().getActiveSds().computeLevel2Vertices();
+			Main.getInstance().syncRepaintViewport(viewport);
 		}
 	}
 }

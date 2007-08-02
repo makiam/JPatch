@@ -39,11 +39,11 @@ public class PerspectiveViewDef extends AbstractViewDef {
 	}
 
 	public Matrix4d getInverseMatrix(Matrix4d inverseMatrix) {
-		return perspective.getTransform().getInverseMatrix(inverseMatrix);
+		return perspective.getTransform().getMatrix(inverseMatrix);
 	}
 
 	public Matrix4d getMatrix(Matrix4d matrix) {
-		return perspective.getTransform().getMatrix(matrix);
+		return perspective.getTransform().getInverseMatrix(matrix);
 	}
 
 	public double getRelativeFocalLength() {
@@ -51,7 +51,7 @@ public class PerspectiveViewDef extends AbstractViewDef {
 	}
 	
 	public Point3d transform(Point3d p) {
-		perspective.getTransform().transform(p);
+		perspective.getTransform().invTransform(p);
 		double w = getRelativeFocalLength() / p.z;
 		p.x *= w;
 		p.y *= w;
@@ -62,6 +62,6 @@ public class PerspectiveViewDef extends AbstractViewDef {
 		double w = p.z / getRelativeFocalLength();
 		p.x *= w;
 		p.y *= w;
-		return perspective.getTransform().invTransform(p);
+		return perspective.getTransform().transform(p);
 	}
 }

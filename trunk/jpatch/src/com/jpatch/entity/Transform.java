@@ -90,6 +90,7 @@ public abstract class Transform {
 	 * @return the specified matrix
 	 */
 	public Matrix4d getInverseMatrix(Matrix4d inverseMatrix) {
+		computeInverse();
 		inverseMatrix.set(this.invMatrix);
 		return inverseMatrix;
 	}
