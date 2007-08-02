@@ -101,25 +101,36 @@ public class ChangeViewTool implements JPatchTool {
 			y = e.getY();
 			
 //			viewport.setBirdsEyeView();
-			OrthoViewDef orthoViewDef = (OrthoViewDef) viewport.getViewDef();
-			double w = viewport.getComponent().getWidth() / 20 * orthoViewDef.getScaleAttribute().getDouble();
-			switch (mode) {
-			case MOVE:
-				orthoViewDef.getTranslationAttribute().setTuple(
-						orthoViewDef.getTranslationAttribute().getX() + dx / w,
-						orthoViewDef.getTranslationAttribute().getY() - dy / w
-				);
-				break;
-			case ROTATE:
-				orthoViewDef.getRotationAttribute().setTuple(
-						Math.min(Math.max(orthoViewDef.getRotationAttribute().getX() + 0.25 * dy, -90), 90),
-						(orthoViewDef.getRotationAttribute().getY() + 0.25 * dx + 360) % 360
-				);
-				break;
-			case ZOOM:
-				double factor = Math.min(Math.max(1 + (dx - dy) / 200.0, 0.2), 5);
-				orthoViewDef.getScaleAttribute().setDouble(orthoViewDef.getScaleAttribute().getDouble() * factor);
-				break;
+			ViewDef viewDef = viewport.getViewDef();
+			if (viewDef instanceof OrthoViewDef) {
+				OrthoViewDef orthoViewDef = (OrthoViewDef) viewDef;
+				double w = viewport.getComponent().getWidth() / 20 * orthoViewDef.getScaleAttribute().getDouble();
+				switch (mode) {
+				case MOVE:
+					orthoViewDef.getTranslationAttribute().setTuple(
+							orthoViewDef.getTranslationAttribute().getX() + dx / w,
+							orthoViewDef.getTranslationAttribute().getY() - dy / w
+					);
+					break;
+				case ROTATE:
+					orthoViewDef.getRotationAttribute().setTuple(
+							Math.min(Math.max(orthoViewDef.getRotationAttribute().getX() + 0.25 * dy, -90), 90),
+							(orthoViewDef.getRotationAttribute().getY() + 0.25 * dx + 360) % 360
+					);
+					break;
+				case ZOOM:
+					double factor = Math.min(Math.max(1 + (dx - dy) / 200.0, 0.2), 5);
+					orthoViewDef.getScaleAttribute().setDouble(orthoViewDef.getScaleAttribute().getDouble() * factor);
+					break;
+				}
+			} else if (viewDef instanceof PerspectiveViewDef) {
+				PerspectiveViewDef prespectiveViewDef = (PerspectiveViewDef) viewDef;
+				switch (mode) {
+				case ZOOM:
+					double factor = Math.min(Math.max(1 + (dx - dy) / 200.0, 0.2), 5);
+					prespectiveViewDef.getFocalLengthAttribute().setDouble(prespectiveViewDef.getFocalLengthAttribute().getDouble() * factor);
+					break;
+				}
 			}
 			Main.getInstance().repaintViewport(viewport);
 		}

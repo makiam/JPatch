@@ -2,8 +2,10 @@ package com.jpatch.afw;
 
 import java.util.*;
 
+import javax.swing.JComponent;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import javax.vecmath.Matrix4d;
 
 public class Utils {
 	/**
@@ -64,7 +66,9 @@ public class Utils {
 				break;
 			}
 		}
-		for (int i = 4; i <= min; i++) {
+		min = 8;
+		
+		for (int i = 3; i < min; i++) {
 			System.err.println("        called by --> " + stackTrace[i]);
 		}
 	}
@@ -84,6 +88,12 @@ public class Utils {
 		return level - 1;
 	}
 	
+	public static Matrix4d createIdentityMatrix() {
+		Matrix4d matrix = new Matrix4d();
+		matrix.setIdentity();
+		return matrix;
+	}
+	
 	/**
 	 * Returns the TreePath from the root node to the specified node.
 	 * @param node
@@ -97,5 +107,20 @@ public class Utils {
 			node = node.getParent();
 		}
 		return new TreePath(path);
+	}
+	
+	public static JComponent getValidateRoot(JComponent component) {
+//		trace(component);
+		return recurseValidateRoot(component);
+	}
+	
+	private static JComponent recurseValidateRoot(JComponent component) {
+		if (component == null) {
+			return null;
+		} else if (component.isValidateRoot()) {
+			return component;
+		} else {
+			return recurseValidateRoot((JComponent) component.getParent());
+		}
 	}
 }
