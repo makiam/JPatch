@@ -97,7 +97,9 @@ public class MoveVertexTool implements JPatchTool {
 			p.x = e.getX() - viewport.getComponent().getWidth() / 2;
 			p.y = viewport.getComponent().getHeight() / 2 - e.getY();
 			p.z = z;
+			System.out.println("Pscreen =" + p);
 			viewport.getViewDef().invTransform(p);
+			System.out.println("Pworld  =" + p);
 //			p.sub(limit);
 //			double n = vertex.valence();
 //			p.scale((n + 5) / n);

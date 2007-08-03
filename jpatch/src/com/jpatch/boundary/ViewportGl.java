@@ -1318,7 +1318,7 @@ public class ViewportGl extends Viewport {
 		if (viewDef instanceof PerspectiveViewDef) {
 			PerspectiveViewDef perspectiveView = ((PerspectiveViewDef) viewDef);
 //			float a = (float) (17.5 / perspective.getFocalLength());
-			float a = 1.0f / (float) perspectiveView.getRelativeFocalLength();
+			float a = 0.5f / (float) perspectiveView.getRelativeFocalLength();
 			float b = a * h / w;
 //			float a = 17.5f / (float) camera.focalLength.get(); 	// 35/focallength/2
 //			float b = a * h / w;

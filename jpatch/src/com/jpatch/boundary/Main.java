@@ -359,7 +359,7 @@ public class Main {
 //		screen.setOpaque(false);
 		
 		try {
-			activeSds = new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt"));
+			activeSds = new JptLoader().importModel(new FileInputStream("/home/sascha/sphere.jpt"));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
