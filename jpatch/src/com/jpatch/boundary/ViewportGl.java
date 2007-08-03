@@ -585,9 +585,10 @@ public class ViewportGl extends Viewport {
 //				System.out.println(modelViewMatrix);
 //			}
 //			modelViewMatrix.set(matrix);
-			matrix.mul(m);
+			m.mul(matrix);
+//			matrix.mul(m);
 //			modelViewMatrix.mul(matrix);
-			modelView.set(matrix);
+			modelView.set(m);
 		} else {
 			modelView.set(matrix);
 		}
