@@ -14,17 +14,21 @@ public class MouseSelector {
 		if (sds == null) {
 			return null;
 		}
-		Matrix4d matrix = viewport.getViewDef().getMatrix(new Matrix4d());
+		
+		ViewDef viewDef = viewport.getViewDef();
+//		Matrix4d matrix = viewport.getViewDef().getMatrix(new Matrix4d());
 		Point3d p = new Point3d();
 		x -= (viewport.getComponent().getWidth() >> 1);
 		y = (viewport.getComponent().getHeight() >> 1) - y;
+		System.out.println("getVertexAt(" + x + ", " + y + ")");
 		TopLevelVertex hit = null;
 		double min = MIN_DIST_SQ;
 		for (Face face : sds.faceList) {
 			for (HalfEdge edge : face.getEdges()) {
 				TopLevelVertex vertex = edge.getFirstVertex();
 				vertex.getPos(p);
-				matrix.transform(p);
+				viewDef.transform(p);
+				System.out.println(p);
 				double dx = x - p.x;
 				double dy = y - p.y;
 				double distanceSq = dx * dx + dy * dy;
