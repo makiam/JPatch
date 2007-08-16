@@ -1,10 +1,12 @@
 package com.jpatch.boundary.tools;
 
+import com.jpatch.afw.vecmath.Rotation3d;
 import com.jpatch.boundary.*;
 
 import java.awt.event.*;
 
 import javax.media.opengl.GLAutoDrawable;
+import javax.vecmath.*;
 
 //import jpatch.entity.*;
 
@@ -126,6 +128,32 @@ public class ChangeViewTool implements JPatchTool {
 			} else if (viewDef instanceof PerspectiveViewDef) {
 				PerspectiveViewDef prespectiveViewDef = (PerspectiveViewDef) viewDef;
 				switch (mode) {
+				case MOVE:
+					double f = prespectiveViewDef.getRelativeFocalLength() * viewport.getComponent().getWidth();
+					double sx0 = x - viewport.getComponent().getWidth() / 2.0;
+					double sy0 = y - viewport.getComponent().getHeight() / 2.0;
+					double sx1 = (x - dx) - viewport.getComponent().getWidth() / 2.0;
+					double sy1 = (y - dy) - viewport.getComponent().getHeight() / 2.0;
+					double l0 = Math.sqrt(sx0 * sx0 + sy0 * sy0 + f * f);
+					double l1 = Math.sqrt(sx1 * sx1 + sy1 * sy1 + f * f);
+					double x0 = sx0 / l0;
+					double y0 = sy0 / l0;
+					double x1 = sx1 / l1;
+					double y1 = sy1 / l1;
+					
+					double ax0 = Math.asin(y0);
+					double ay0 = Math.asin(x0 / Math.cos(ax0));
+					double ax1 = Math.asin(y1);
+					double ay1 = Math.asin(x1 / Math.cos(ax1));
+					double ax = Math.toDegrees(ax0 - ax1);
+					double ay = Math.toDegrees(ay0 - ay1);
+//					System.out.println("screen: " + x0 + "/" + y0 + " sphere: " + Math.toDegrees(ax0) + "/" + Math.toDegrees(ay0));
+					prespectiveViewDef.getRotationAttribute().setTuple(
+							prespectiveViewDef.getRotationAttribute().getX() + ax,
+							prespectiveViewDef.getRotationAttribute().getY() + ay,
+							prespectiveViewDef.getRotationAttribute().getZ()
+					);
+					break;
 				case ZOOM:
 					double factor = Math.min(Math.max(1 + (dx - dy) / 200.0, 0.2), 5);
 					prespectiveViewDef.getFocalLengthAttribute().setDouble(prespectiveViewDef.getFocalLengthAttribute().getDouble() * factor);

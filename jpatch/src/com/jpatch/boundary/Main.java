@@ -358,15 +358,7 @@ public class Main {
 		});
 //		screen.setOpaque(false);
 		
-		try {
-			activeSds = new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt"));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		
 		Box statusBar = new Box(SwingConstants.HORIZONTAL) {
 			public void paintComponent(Graphics g) {
@@ -494,31 +486,46 @@ public class Main {
 		final DefaultTreeModel treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
 		final TreeManager treeManager = new TreeManager(treeModel);
 		
-		final TransformNode node1 = new TransformNode();
-		final TransformNode node2 = new TransformNode();
-		final TransformNode node3 = new TransformNode();
-		final TransformNode node4 = new TransformNode();
-		final SdsModel model1 = new SdsModel(activeSds);
-		final Camera camera1 = new Camera();
-		final Camera camera2 = new Camera();
+//		final TransformNode node1 = new TransformNode();
+//		final TransformNode node2 = new TransformNode();
+//		final TransformNode node3 = new TransformNode();
+//		final TransformNode node4 = new TransformNode();
 		
-		node1.getNameAttribute().setValue("node 1");
-		node1.getParentAttribute().setValue(sceneGraphRoot);
-		node2.getParentAttribute().setValue(node1);
-		node2.getNameAttribute().setValue("node 2");
-		node3.getParentAttribute().setValue(node2);
-		node3.getNameAttribute().setValue("node 3");
-		node4.getParentAttribute().setValue(node2);
-		node4.getNameAttribute().setValue("node 4");
-		model1.getParentAttribute().setValue(node4);
-		model1.getNameAttribute().setValue("model 1");
-		camera1.getParentAttribute().setValue(node3);
+		try {
+			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
+			final SdsModel model2 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
+			final SdsModel model3 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
+			model1.getNameAttribute().setValue("model 1");
+			model1.getParentAttribute().setValue(sceneGraphRoot);
+			model2.getNameAttribute().setValue("model 2");
+			model2.getParentAttribute().setValue(model1);
+			model3.getNameAttribute().setValue("model 3");
+			model3.getParentAttribute().setValue(model2);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		
+		
+		final Camera camera1 = new Camera();
+//		final Camera camera2 = new Camera();
+		
+//		node1.getNameAttribute().setValue("node 1");
+//		node1.getParentAttribute().setValue(sceneGraphRoot);
+//		node2.getParentAttribute().setValue(node1);
+//		node2.getNameAttribute().setValue("node 2");
+//		node3.getParentAttribute().setValue(node2);
+//		node3.getNameAttribute().setValue("node 3");
+//		node4.getParentAttribute().setValue(node2);
+//		node4.getNameAttribute().setValue("node 4");
+		
+		camera1.getParentAttribute().setValue(sceneGraphRoot);
 		camera1.getNameAttribute().setValue("camera 1");
-		camera2.getParentAttribute().setValue(node4);
-		camera2.getNameAttribute().setValue("camera 2");
+//		camera2.getParentAttribute().setValue(node4);
+//		camera2.getNameAttribute().setValue("camera 2");
 		
 		viewDirectionsAttr.add(new PerspectiveViewDirection(camera1));
-		viewDirectionsAttr.add(new PerspectiveViewDirection(camera2));
+//		viewDirectionsAttr.add(new PerspectiveViewDirection(camera2));
 		System.out.println(viewDirectionsAttr.getElements());
 		
 		treeManager.createTreeNodeFor(sceneGraphRoot);

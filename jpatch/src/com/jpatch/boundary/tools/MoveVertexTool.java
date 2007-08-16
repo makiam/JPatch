@@ -1,6 +1,7 @@
 package com.jpatch.boundary.tools;
 
 import com.jpatch.boundary.*;
+import com.jpatch.entity.SdsModel;
 import com.jpatch.entity.sds.*;
 
 import java.awt.event.MouseAdapter;
@@ -51,15 +52,15 @@ public class MoveVertexTool implements JPatchTool {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON1) {
-				TopLevelVertex vertex = MouseSelector.getVertexAt(viewport, e.getX(), e.getY(), Main.getInstance().getActiveSds());
-				HalfEdge edge = MouseSelector.getEdgeAt(viewport, e.getX(), e.getY(), Main.getInstance().getActiveSds());
-				if (vertex != null) {
-					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, vertex);
+				MouseSelector.Hit hit = MouseSelector.getVertexAt(viewport, e.getX(), e.getY());
+//				HalfEdge edge = MouseSelector.getEdgeAt(viewport, e.getX(), e.getY(), Main.getInstance().getActiveSds());
+				if (hit.object != null) {
+					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, (SdsModel) hit.node, (TopLevelVertex) hit.object);
 					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 //					Main.getInstance().setSelectedObject(vertex);
-				} else if (edge != null) {
+//				} else if (edge != null) {
 //					Main.getInstance().setSelectedObject(edge);
-				} else {
+//				} else {
 //					Main.getInstance().setSelectedObject(null);
 				}
 			}
@@ -80,14 +81,17 @@ public class MoveVertexTool implements JPatchTool {
 		private final Viewport viewport;
 		private final TopLevelVertex vertex;
 		private final Point3d p = new Point3d();
+		private final SdsModel sdsModel;
 		double z;
 //		Point3d pos = new Point3d();
 //		Point3d limit = new Point3d();
 		
-		MoveVertexMouseMotionListener(Viewport viewport, TopLevelVertex vertex) {
+		MoveVertexMouseMotionListener(Viewport viewport, SdsModel sdsModel, TopLevelVertex vertex) {
 			this.viewport = viewport;
 			this.vertex = vertex;
+			this.sdsModel = sdsModel;
 			vertex.getPos(p);
+			sdsModel.getTransform().transform(p);
 			viewport.getViewDef().transform(p);
 			z = p.z;
 		}
@@ -97,15 +101,16 @@ public class MoveVertexTool implements JPatchTool {
 			p.x = e.getX() - viewport.getComponent().getWidth() / 2;
 			p.y = viewport.getComponent().getHeight() / 2 - e.getY();
 			p.z = z;
-			System.out.println("Pscreen =" + p);
+//			System.out.println("Pscreen =" + p);
 			viewport.getViewDef().invTransform(p);
-			System.out.println("Pworld  =" + p);
+			sdsModel.getTransform().invTransform(p);
+//			System.out.println("Pworld  =" + p);
 //			p.sub(limit);
 //			double n = vertex.valence();
 //			p.scale((n + 5) / n);
 //			p.add(pos);
 			vertex.getPosition().setTuple(p);
-			Main.getInstance().getActiveSds().computeLevel2Vertices();
+			sdsModel.getSds().computeLevel2Vertices();
 			Main.getInstance().syncRepaintViewport(viewport);
 		}
 	}

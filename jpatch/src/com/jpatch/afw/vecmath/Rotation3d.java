@@ -130,17 +130,17 @@ public class Rotation3d extends Tuple3d {
 		 * perform matrix multiplication
 		 */
 		double t00, t01, t02, t10, t11, t12, t20, t21, t22; // temporarily stores the result of the matrix multiplication
-		t00 = m.m00 * m00 + m.m01 * m10 + m.m02 * m20;
-		t01 = m.m00 * m01 + m.m01 * m11 + m.m02 * m21;
-		t02 = m.m00 * m02 + m.m01 * m12 + m.m02 * m22;
+		t00 = m00 * m.m00 + m01 * m.m10 + m02 * m.m20;
+		t01 = m00 * m.m01 + m01 * m.m11 + m02 * m.m21;
+		t02 = m00 * m.m02 + m01 * m.m12 + m02 * m.m22;
 		
-		t10 = m.m10 * m00 + m.m11 * m10 + m.m12 * m20;
-		t11 = m.m10 * m01 + m.m11 * m11 + m.m12 * m21;
-		t12 = m.m10 * m02 + m.m11 * m12 + m.m12 * m22;
+		t10 = m10 * m.m00 + m11 * m.m10 + m12 * m.m20;
+		t11 = m10 * m.m01 + m11 * m.m11 + m12 * m.m21;
+		t12 = m10 * m.m02 + m11 * m.m12 + m12 * m.m22;
 		
-		t20 = m.m20 * m00 + m.m21 * m10 + m.m22 * m20;
-		t21 = m.m20 * m01 + m.m21 * m11 + m.m22 * m21;
-		t22 = m.m20 * m02 + m.m21 * m12 + m.m22 * m22;
+		t20 = m20 * m.m00 + m21 * m.m10 + m22 * m.m20;
+		t21 = m20 * m.m01 + m21 * m.m11 + m22 * m.m21;
+		t22 = m20 * m.m02 + m21 * m.m12 + m22 * m.m22;
 		
 		m.m00 = t00; m.m01 = t01; m.m02 = t02;
 		m.m10 = t10; m.m11 = t11; m.m12 = t12;
@@ -162,27 +162,25 @@ public class Rotation3d extends Tuple3d {
 		/*
 		 * perform matrix multiplication
 		 */
-		double t00, t01, t02, t10, t11, t12, t20, t21, t22, t30, t31, t32; // temporarily stores the result of the matrix multiplication
-		t00 = m.m00 * m00 + m.m01 * m10 + m.m02 * m20;
-		t01 = m.m00 * m01 + m.m01 * m11 + m.m02 * m21;
-		t02 = m.m00 * m02 + m.m01 * m12 + m.m02 * m22;
+		double t00, t01, t02, t03, t10, t11, t12, t13, t20, t21, t22, t23; // temporarily stores the result of the matrix multiplication
+		t00 = m00 * m.m00 + m01 * m.m10 + m02 * m.m20;
+		t01 = m00 * m.m01 + m01 * m.m11 + m02 * m.m21;
+		t02 = m00 * m.m02 + m01 * m.m12 + m02 * m.m22;
+		t03 = m00 * m.m03 + m01 * m.m13 + m02 * m.m23;
 		
-		t10 = m.m10 * m00 + m.m11 * m10 + m.m12 * m20;
-		t11 = m.m10 * m01 + m.m11 * m11 + m.m12 * m21;
-		t12 = m.m10 * m02 + m.m11 * m12 + m.m12 * m22;
+		t10 = m10 * m.m00 + m11 * m.m10 + m12 * m.m20;
+		t11 = m10 * m.m01 + m11 * m.m11 + m12 * m.m21;
+		t12 = m10 * m.m02 + m11 * m.m12 + m12 * m.m22;
+		t13 = m10 * m.m03 + m11 * m.m13 + m12 * m.m23;
 		
-		t20 = m.m20 * m00 + m.m21 * m10 + m.m22 * m20;
-		t21 = m.m20 * m01 + m.m21 * m11 + m.m22 * m21;
-		t22 = m.m20 * m02 + m.m21 * m12 + m.m22 * m22;
+		t20 = m20 * m.m00 + m21 * m.m10 + m22 * m.m20;
+		t21 = m20 * m.m01 + m21 * m.m11 + m22 * m.m21;
+		t22 = m20 * m.m02 + m21 * m.m12 + m22 * m.m22;
+		t23 = m20 * m.m03 + m21 * m.m13 + m22 * m.m23;
 		
-		t30 = m.m30 * m00 + m.m31 * m10 + m.m32 * m20;
-		t31 = m.m30 * m01 + m.m31 * m11 + m.m32 * m21;
-		t32 = m.m30 * m02 + m.m31 * m12 + m.m32 * m22;
-		
-		m.m00 = t00; m.m01 = t01; m.m02 = t02;
-		m.m10 = t10; m.m11 = t11; m.m12 = t12;
-		m.m20 = t20; m.m21 = t21; m.m22 = t22;
-		m.m30 = t30; m.m31 = t31; m.m32 = t32;
+		m.m00 = t00; m.m01 = t01; m.m02 = t02; m.m03 = t03;
+		m.m10 = t10; m.m11 = t11; m.m12 = t12; m.m13 = t13;
+		m.m20 = t20; m.m21 = t21; m.m22 = t22; m.m23 = t23;
 		
 		return m;
 	}

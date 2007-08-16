@@ -95,6 +95,18 @@ public abstract class Transform {
 		return inverseMatrix;
 	}
 	
+	public void mul(Matrix4d matrix) {
+//		Matrix4d m = new Matrix4d(this.matrix);
+//		m.mul(matrix);
+//		matrix.set(m);
+		
+		matrix.mul(this.matrix, matrix);
+	}
+	
+	public void mul2(Matrix4d matrix) {
+		matrix.mul(matrix, this.matrix);
+	}
+	
 	/**
 	 * Computes this matrix. Non abstract subclasses must implement this method and either compute the inverse too
 	 * or set the invInvalid flag to true.
