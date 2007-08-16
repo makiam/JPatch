@@ -577,21 +577,21 @@ public class ViewportGl extends Viewport {
 		Matrix4d matrix = new Matrix4d(viewDef.getMatrix(new Matrix4d()));
 		Transform transform = node.getTransform();
 		if (transform != null) {
-			Matrix4d m = new Matrix4d();
-			
-			transform.getMatrix(m);
+//			Matrix4d m = new Matrix4d();
+			transform.mul2(matrix);
+//			transform.getMatrix(m);
 //			if (node instanceof TransformNode) {
 //				System.out.println("sceneGraph TransformNode @ " + ((TransformNode) node).getNameAttribute().getValue());
 //				System.out.println(modelViewMatrix);
 //			}
 //			modelViewMatrix.set(matrix);
-			m.mul(matrix);
+//			matrix.mul(m);
+//			m.mul(matrix);
 //			matrix.mul(m);
 //			modelViewMatrix.mul(matrix);
-			modelView.set(m);
-		} else {
-			modelView.set(matrix);
 		}
+		modelView.set(matrix);
+		
 		if (node instanceof SdsModel) {
 			drawSds3(((SdsModel) node).getSds());
 		}

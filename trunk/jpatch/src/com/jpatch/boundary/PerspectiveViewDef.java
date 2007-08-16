@@ -52,14 +52,14 @@ public class PerspectiveViewDef extends AbstractViewDef {
 	
 	public Point3d transform(Point3d p) {
 		perspective.getTransform().invTransform(p);
-		double w = getRelativeFocalLength() * viewport.getComponent().getWidth() / p.z;
+		double w = -getRelativeFocalLength() * viewport.getComponent().getWidth() / p.z;
 		p.x *= w;
 		p.y *= w;
 		return p;
 	}
 	
 	public Point3d invTransform(Point3d p) {
-		double w = p.z / (getRelativeFocalLength() * viewport.getComponent().getWidth());
+		double w = -p.z / (getRelativeFocalLength() * viewport.getComponent().getWidth());
 		p.x *= w;
 		p.y *= w;
 		perspective.getTransform().transform(p);

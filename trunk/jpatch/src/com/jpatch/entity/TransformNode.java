@@ -127,11 +127,8 @@ public class TransformNode extends SceneGraphNode {
 		public void computeMatrix() {
 			SceneGraphNode parent = getParentAttribute().getValue();
 			Transform parentTransform = parent.getTransform();
-			if (parentTransform != null) {
-				parentTransform.getMatrix(matrix);
-			} else {
-				matrix.setIdentity();
-			}
+			matrix.setIdentity();
+			
 			translationAttr.getTuple(translationTuple);
 			axisRotationAttr.getTuple(axisRotationTuple);
 			rotationAttr.getTuple(rotationTuple);
@@ -140,6 +137,10 @@ public class TransformNode extends SceneGraphNode {
 			axisRotationTuple.rotateMatrix(matrix);
 			rotationTuple.rotateMatrix(matrix);
 			Utils3d.translateMatrix(matrix, translationTuple);
+			
+			if (parentTransform != null) {
+				parentTransform.mul(matrix);
+			} 
 			invInvalid = true;
 //			System.out.println(nameAttr.getValue() + " computeMatrix called, matrix is " + matrix);
 		}
