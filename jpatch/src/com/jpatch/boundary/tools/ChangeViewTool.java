@@ -138,13 +138,25 @@ public class ChangeViewTool implements JPatchTool {
 					double l1 = Math.sqrt(sx1 * sx1 + sy1 * sy1 + f * f);
 					double x0 = sx0 / l0;
 					double y0 = sy0 / l0;
+					double z0 = f / l0;
 					double x1 = sx1 / l1;
 					double y1 = sy1 / l1;
+					double z1 = f / l1;
+					Vector3d v0 = new Vector3d(x0, y0, z0);
+					Vector3d v1 = new Vector3d(x1, y1, z1);
+//					Matrix3d m = new Matrix3d();
+//					m.rotZ(Math.toRadians(-prespectiveViewDef.getRotationAttribute().getZ()));
+//					Matrix4d m = viewport.getViewDef().getInverseMatrix(new Matrix4d());
+//					m.transform(v0);
+//					m.transform(v1);
+//					v0.normalize();
+//					v1.normalize();
 					
-					double ax0 = Math.asin(y0);
-					double ay0 = Math.asin(x0 / Math.cos(ax0));
-					double ax1 = Math.asin(y1);
-					double ay1 = Math.asin(x1 / Math.cos(ax1));
+//					System.out.println(v0);
+					double ax0 = Math.asin(v0.y);
+					double ay0 = Math.asin(v0.x / Math.cos(ax0));
+					double ax1 = Math.asin(v1.y);
+					double ay1 = Math.asin(v1.x / Math.cos(ax1));
 					double ax = Math.toDegrees(ax0 - ax1);
 					double ay = Math.toDegrees(ay0 - ay1);
 //					System.out.println("screen: " + x0 + "/" + y0 + " sphere: " + Math.toDegrees(ax0) + "/" + Math.toDegrees(ay0));
@@ -152,6 +164,13 @@ public class ChangeViewTool implements JPatchTool {
 							prespectiveViewDef.getRotationAttribute().getX() + ax,
 							prespectiveViewDef.getRotationAttribute().getY() + ay,
 							prespectiveViewDef.getRotationAttribute().getZ()
+					);
+					break;
+				case ROTATE:
+					prespectiveViewDef.getRotationAttribute().setTuple(
+							prespectiveViewDef.getRotationAttribute().getX(),
+							prespectiveViewDef.getRotationAttribute().getY(),
+							prespectiveViewDef.getRotationAttribute().getZ() - dx / 10.0
 					);
 					break;
 				case ZOOM:

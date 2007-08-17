@@ -29,7 +29,7 @@ public class Rotation3d extends Tuple3d {
 	/**
 	 * The order of rotation
 	 */
-	private Order order = Order.XYZ;
+	private Order order = Order.YXZ;
 	
 	/* suplerclass constructor */
 	public Rotation3d() {
@@ -295,6 +295,7 @@ public class Rotation3d extends Tuple3d {
 	 */
 	private final void computeMatrix() {
 		if (oldX != x || oldY != y || oldZ != z || matrixInvalid) {
+//			System.out.println("Computing rotation matrix, order=" + order);
 			oldX = x;
 			oldY = y;
 			oldZ = z;

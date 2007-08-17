@@ -167,7 +167,7 @@ public class TransformNode extends SceneGraphNode {
 	public TransformNode() {
 		translationAttr.addAttributePostChangeListener(translationListener);
 		positionAttr.addAttributePostChangeListener(positionListener);
-//		rotationOrderAttr.addAttributePostChangeListener(rotationOrderListener);
+		rotationOrderAttr.addAttributePostChangeListener(rotationOrderListener);
 	}
 	
 	/**
@@ -249,6 +249,7 @@ public class TransformNode extends SceneGraphNode {
 	public void setRotationOrder(Rotation3d.Order order) {
 		if (order != getRotationOrder()) {
 			rotationOrderAttr.setValue(order);
+			rotationTuple.setOrder(order);
 			transform.computeBranch();
 		}
 	}
