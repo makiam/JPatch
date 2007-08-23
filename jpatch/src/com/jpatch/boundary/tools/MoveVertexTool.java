@@ -4,6 +4,11 @@ import com.jpatch.boundary.*;
 import com.jpatch.entity.SdsModel;
 import com.jpatch.entity.sds.*;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -14,7 +19,13 @@ import javax.media.opengl.GLCanvas;
 import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3d;
 
+import jpatch.boundary.settings.Settings;
+
 public class MoveVertexTool implements JPatchTool {
+	private static final Color XOR_MODE = new Color(Settings.getInstance().colors.background.get().getRGB() ^ Settings.getInstance().colors.selection.get().getRGB());
+	private static final Stroke DASHES = new BasicStroke(1.0f,BasicStroke.CAP_BUTT,BasicStroke.JOIN_BEVEL,0.0f,new float[] { 1.0f, 1.0f }, 0.0f);
+	
+	
 	private MouseListener[] mouseListeners;
 	
 	public void registerListeners(Viewport[] viewports) {
@@ -62,6 +73,9 @@ public class MoveVertexTool implements JPatchTool {
 //					Main.getInstance().setSelectedObject(edge);
 //				} else {
 //					Main.getInstance().setSelectedObject(null);
+				} else {
+					mouseMotionListener = new LassoSelectMouseMotionListener(e.getX(), e.getY());
+					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 				}
 			}
 		}
@@ -74,6 +88,38 @@ public class MoveVertexTool implements JPatchTool {
 					Main.getInstance().syncViewports(viewport);
 				}
 			}
+		}
+	}
+	
+	private static class LassoSelectMouseMotionListener extends MouseMotionAdapter {
+		private final Rectangle rectangle = new Rectangle();
+		private int x, y;
+		
+		private LassoSelectMouseMotionListener(int x, int y) {
+			this.x = x;
+			this.y = y;
+		}
+		
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			Graphics2D g = (Graphics2D) e.getComponent().getGraphics();
+			int mx = e.getX();
+			int my = e.getY();
+			drawRectangle(g, rectangle);
+			rectangle.x = mx > x ? x : mx;
+			rectangle.y = my > y ? y : my;
+			rectangle.width = Math.abs(mx - x);
+			rectangle.height = Math.abs(my - y);
+			drawRectangle(g, rectangle);
+		}
+		
+		private void drawRectangle(Graphics2D g, Rectangle r) {
+			g.setXORMode(XOR_MODE);
+			g.setStroke(DASHES);
+			g.drawLine(r.x, r.y, r.x + r.width, r.y);
+			g.drawLine(r.x + r.width, r.y + 1, r.x + r.width, r.y + r.height);
+			g.drawLine(r.x + 1, r.y + r.height, r.x + r.width, r.y + r.height);
+			g.drawLine(r.x, r.y + 2, r.x, r.y + r.height);
 		}
 	}
 	
