@@ -101,6 +101,8 @@ public class Main {
 	
 	private CollectionAttr<ViewDirection> viewDirectionsAttr = new CollectionAttr<ViewDirection>(TreeSet.class, OrthoViewDirection.DIRECTIONS);
 	
+	private Selection selection = new Selection();
+	
 	private SceneGraphNode sceneGraphRoot = new SceneGraphNode() {
 		@Override
 		public Transform getTransform() {
@@ -492,15 +494,16 @@ public class Main {
 //		final TransformNode node4 = new TransformNode();
 		
 		try {
-			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/sphere.jpt")));
-			final SdsModel model2 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
-			final SdsModel model3 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
+			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/barrel.jpt")));
+//			final SdsModel model2 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
+//			final SdsModel model3 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
 			model1.getNameAttribute().setValue("model 1");
 			model1.getParentAttribute().setValue(sceneGraphRoot);
-			model2.getNameAttribute().setValue("model 2");
-			model2.getParentAttribute().setValue(model1);
-			model3.getNameAttribute().setValue("model 3");
-			model3.getParentAttribute().setValue(model2);
+			selection.getSelectedSdsModelAttribute().setValue(model1);
+//			model2.getNameAttribute().setValue("model 2");
+//			model2.getParentAttribute().setValue(model1);
+//			model3.getNameAttribute().setValue("model 3");
+//			model3.getParentAttribute().setValue(model2);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -775,6 +778,14 @@ public class Main {
 
 	public CollectionAttr<ViewDirection> getViewDirectionsAttribute() {
 		return viewDirectionsAttr;
+	}
+
+	public Selection getSelection() {
+		return selection;
+	}
+
+	public void setSelection(Selection selection) {
+		this.selection = selection;
 	}
 	
 	

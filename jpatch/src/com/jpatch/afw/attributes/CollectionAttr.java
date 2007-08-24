@@ -61,6 +61,14 @@ public class CollectionAttr<T> extends AbstractAttribute {
 	}
 	
 	/**
+	 * Clears all elements of this CollectionAttr
+	 */
+	public void clear() {
+		collection.clear();
+		fireAttributeHasChanged();
+	}
+	
+	/**
 	 * Adds the specified element to this CollectionAttr
 	 * @param element element to be added to this CollectionAttr
 	 */
