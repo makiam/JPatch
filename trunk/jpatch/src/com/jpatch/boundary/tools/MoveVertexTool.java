@@ -74,7 +74,8 @@ public class MoveVertexTool implements JPatchTool {
 //				} else {
 //					Main.getInstance().setSelectedObject(null);
 				} else {
-					mouseMotionListener = new LassoSelectMouseMotionListener(e.getX(), e.getY());
+					SdsModel sdsModel = Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue();
+					mouseMotionListener = new LassoSelectMouseMotionListener(viewport, sdsModel, e.getX(), e.getY());
 					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 				}
 			}
@@ -85,7 +86,13 @@ public class MoveVertexTool implements JPatchTool {
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				if (mouseMotionListener != null) {
 					viewport.getComponent().removeMouseMotionListener(mouseMotionListener);
-					Main.getInstance().syncViewports(viewport);
+					if (mouseMotionListener instanceof LassoSelectMouseMotionListener) {
+						LassoSelectMouseMotionListener lassoListener = (LassoSelectMouseMotionListener) mouseMotionListener;
+						lassoListener.getSelectedVertices(Main.getInstance().getSelection());
+						Main.getInstance().repaintViewports();
+					} else {
+						Main.getInstance().syncViewports(viewport);
+					}
 				}
 			}
 		}
@@ -93,9 +100,13 @@ public class MoveVertexTool implements JPatchTool {
 	
 	private static class LassoSelectMouseMotionListener extends MouseMotionAdapter {
 		private final Rectangle rectangle = new Rectangle();
+		private final Viewport viewport;
+		private final SdsModel sdsModel;
 		private int x, y;
 		
-		private LassoSelectMouseMotionListener(int x, int y) {
+		private LassoSelectMouseMotionListener(Viewport viewport, SdsModel sdsModel, int x, int y) {
+			this.viewport = viewport;
+			this.sdsModel = sdsModel;
 			this.x = x;
 			this.y = y;
 		}
@@ -120,6 +131,14 @@ public class MoveVertexTool implements JPatchTool {
 			g.drawLine(r.x + r.width, r.y + 1, r.x + r.width, r.y + r.height);
 			g.drawLine(r.x + 1, r.y + r.height, r.x + r.width, r.y + r.height);
 			g.drawLine(r.x, r.y + 2, r.x, r.y + r.height);
+		}
+		
+		private void getSelectedVertices(Selection selection) {
+			double x0 = rectangle.x;
+			double y0 = rectangle.y;
+			double x1 = rectangle.x + rectangle.width;
+			double y1 = rectangle.y + rectangle.height;
+			MouseSelector.getVertices(viewport, x0, y0, x1, y1, sdsModel, selection);
 		}
 	}
 	
