@@ -15,7 +15,7 @@ import javax.vecmath.*;
 import static javax.media.opengl.GL.*;
 
 public class RotateTool implements JPatchTool {
-	private static final int SEGMENTS = 72;
+	private static final int SEGMENTS = 128;
 	private final ColorSettings colorSettings = Settings.getInstance().colors;
 	private final Point3d[][] points = new Point3d[3][SEGMENTS + 1];
 	private final static GlMaterial FRONT_MATERIAL, BACK_MATERIAL;
@@ -69,7 +69,7 @@ public class RotateTool implements JPatchTool {
 		m.transform(p);
 		double z = p.z;
 	
-		gl.glLineWidth(4.0f);
+		gl.glLineWidth(3f);
 		
 		for (int i = 0; i < 3; i++) {
 			gl.glBegin(GL_LINE_STRIP);
@@ -83,7 +83,7 @@ public class RotateTool implements JPatchTool {
 			gl.glEnd();
 		}
 
-		gl.glLineWidth(2.0f);
+		gl.glLineWidth(2f);
 		for (int i = 0; i < 3; i++) {
 			
 			gl.glBegin(GL_LINE_STRIP);
