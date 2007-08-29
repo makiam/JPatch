@@ -473,16 +473,16 @@ public class ViewportGl extends Viewport {
 		gl.glDisable(GL_LINE_SMOOTH);
 	}
 	
-	private void setMaterial(float[] array) {
-		gl.glMaterialfv(GL_FRONT, GL_AMBIENT, array, GlMaterial.AMBIENT);
-		gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, array, GlMaterial.DIFFUSE);
-		gl.glMaterialfv(GL_FRONT, GL_SPECULAR, array, GlMaterial.SPECULAR);
-		gl.glMaterialfv(GL_FRONT, GL_EMISSION, array, GlMaterial.EMISSION);
-		gl.glMaterialfv(GL_FRONT, GL_SHININESS, array, GlMaterial.SHININESS);
+	public void setMaterial(int side, float[] array) {
+		gl.glMaterialfv(side, GL_AMBIENT, array, GlMaterial.AMBIENT);
+		gl.glMaterialfv(side, GL_DIFFUSE, array, GlMaterial.DIFFUSE);
+		gl.glMaterialfv(side, GL_SPECULAR, array, GlMaterial.SPECULAR);
+		gl.glMaterialfv(side, GL_EMISSION, array, GlMaterial.EMISSION);
+		gl.glMaterialfv(side, GL_SHININESS, array, GlMaterial.SHININESS);
 	}
 	
 	private void drawTriangleMesh(TriangleMesh t) {
-		setMaterial(t.m.getArray());
+		setMaterial(GL_FRONT, t.m.getArray());
 		Matrix4d matrix = viewDef.getMatrix();
 		
 		for (int i = 0, n = t.t.length; i < n; i++) {
@@ -946,7 +946,7 @@ public class ViewportGl extends Viewport {
 			for (Face face : sds.faceList) {
 				GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
 				if (currentMaterial != faceMaterial) {
-					setMaterial(faceMaterial.getArray());
+					setMaterial(GL_FRONT, faceMaterial.getArray());
 					currentMaterial = faceMaterial;
 				}
 				for (Slate2 slate : face.getSlates()) {
@@ -988,7 +988,7 @@ public class ViewportGl extends Viewport {
 				for (Face face : sds.faceList) {
 					GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
 					if (currentMaterial != faceMaterial) {
-						setMaterial(faceMaterial.getArray());
+						setMaterial(GL_FRONT, faceMaterial.getArray());
 						currentMaterial = faceMaterial;
 					}
 					gl.glBegin(GL_TRIANGLE_FAN);
