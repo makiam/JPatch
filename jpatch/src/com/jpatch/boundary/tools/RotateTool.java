@@ -7,6 +7,8 @@ import com.jpatch.afw.attributes.Tuple3Attr;
 import com.jpatch.afw.vecmath.Rotation3d;
 import com.jpatch.afw.vecmath.Utils3d;
 import com.jpatch.boundary.Main;
+import com.jpatch.boundary.OrthoViewDef;
+import com.jpatch.boundary.PerspectiveViewDef;
 import com.jpatch.boundary.Viewport;
 import com.jpatch.boundary.ViewportGl;
 import com.jpatch.entity.BasicMaterial;
@@ -34,11 +36,15 @@ public class RotateTool implements JPatchTool {
 	private final Point3d pivot = new Point3d();
 	private final Rotation3d axisRotation = new Rotation3d();
 	private final Rotation3d rotation = new Rotation3d();
-	private double radius = 1.0;
+	private double radius = 10.0;
 	private Matrix3d matrix = new Matrix3d();
 	private MouseListener[] mouseListeners;
+	private MouseMotionAdapter mouseMotionListener;
 	
-	private Point3d hitPoint = new Point3d();
+	private Vector3d fromVector = new Vector3d();
+	private Vector3d toVector = new Vector3d();
+	
+	
 	
 	static {
 		Color3f black = new Color3f(0, 0, 0);
@@ -60,8 +66,8 @@ public class RotateTool implements JPatchTool {
 	}
 	
 	public void draw(Viewport viewport) {
-		rotation.getRotationMatrix(matrix);
-		axisRotation.rotateMatrix(matrix);
+		axisRotation.getRotationMatrix(matrix);
+		rotation.rotateMatrix(matrix);
 		
 		ViewportGl glViewport = (ViewportGl) viewport;
 		GL gl = glViewport.getGl();
@@ -110,7 +116,7 @@ public class RotateTool implements JPatchTool {
 					p.add(pivot);
 					matrix.transform(p);
 					m.transform(p);
-					float alpha = (float) Math.min(1.0, (p.z - z) * scale + 0.6);
+					float alpha = (float) Math.max(0.1, Math.min(0.9, (p.z - z) * scale + 0.6));
 					if (pass == 0) {
 						gl.glColor4f(0, 0, 0, alpha);
 					} else {
@@ -131,21 +137,66 @@ public class RotateTool implements JPatchTool {
 				gl.glEnd();
 			}
 		}
-		gl.glColor3f(1, 1, 1);
-		gl.glBegin(GL_LINES);
+		gl.glLineWidth(1.0f);
+		gl.glDisable(GL_CULL_FACE);
+		
+		for (int pass = 0; pass < 2; pass++) {
+			if (pass == 0) {
+				gl.glColor4f(1, 1, 1, 0.25f);
+				gl.glBegin(GL_TRIANGLE_FAN);
+			} else {
+				gl.glEnd();
+				gl.glColor4f(1, 1, 1, 0.75f);
+				gl.glBegin(GL_LINE_STRIP);
+			}
+			p.set(pivot);
+			m.transform(p);
+			gl.glVertex3d(p.x, p.y, p.z);
+			Vector3d axis = new Vector3d();
+			axis.cross(fromVector, toVector);
+			double angle = Math.acos(fromVector.dot(toVector));
+			Matrix3d ma = new Matrix3d();
+			AxisAngle4d axisAngle = new AxisAngle4d(axis, 0);
+			Vector3d ve = new Vector3d();
+			for (double a = 0; a < angle; a += Math.PI / 64.0) {
+				axisAngle.angle = a;
+				ma.set(axisAngle);
+				ve.set(fromVector);
+				ma.transform(ve);
+				ve.scale(radius);
+				p.set(pivot);
+				p.add(ve);
+				m.transform(p);
+				gl.glVertex3d(p.x, p.y, p.z);
+			}
+			p.set(pivot);
+			ve.set(toVector);
+			ve.scale(radius);
+			p.add(ve);
+			m.transform(p);
+			gl.glVertex3d(p.x, p.y, p.z);
+		}
 		p.set(pivot);
 		m.transform(p);
 		gl.glVertex3d(p.x, p.y, p.z);
-		p.set(hitPoint);
-		m.transform(p);
-		gl.glVertex3d(p.x, p.y, p.z);
 		gl.glEnd();
+//		p.set(pivot);
+//		p.add(fromVector);
+//		m.transform(p);
+//		gl.glVertex3d(p.x, p.y, p.z);
+//		p.set(pivot);
+//		m.transform(p);
+//		gl.glVertex3d(p.x, p.y, p.z);
+//		p.set(pivot);
+//		p.add(toVector);
+//		m.transform(p);
+//		gl.glVertex3d(p.x, p.y, p.z);
 		
 		gl.glDisable(GL_BLEND);
 		gl.glDisable(GL_LINE_SMOOTH);
 		gl.glEnable(GL_DEPTH_TEST);
 		gl.glEnable(GL_LIGHTING);
-		gl.glLineWidth(1.0f);
+		gl.glEnable(GL_CULL_FACE);
 	}
 	
 	public void registerListeners(Viewport[] viewports) {
@@ -179,30 +230,82 @@ public class RotateTool implements JPatchTool {
 		return rotationAttr;
 	}
 	
-	private class HitMouseListener extends MouseAdapter {
-		final Viewport viewport;
-		
-		private HitMouseListener(Viewport viewport) {
-			this.viewport = viewport;
-		}
-		
-		@Override
-		public void mousePressed(MouseEvent e) {
-			Point3d rayOrigin = new Point3d(
-					e.getX() - viewport.getComponent().getWidth() / 2,
-					viewport.getComponent().getHeight() / 2 - e.getY(),
-					1
-			);
-			Vector3d rayDirection = new Vector3d(0, 0, -1);
-			
+	
+
+	private boolean setIntersectionVector(Viewport viewport, int mouseX, int mouseY, Vector3d vector) {
+		double x = mouseX - viewport.getComponent().getWidth() * 0.5;
+		double y = viewport.getComponent().getHeight() * 0.5 - mouseY;
+		Point3d rayOrigin = new Point3d();
+		Vector3d rayDirection = new Vector3d();
+		if (viewport.getViewDef() instanceof OrthoViewDef) {
+			rayOrigin.set(x, y, 1);
+			rayDirection.set(0, 0, -1);
 			Matrix4d m = viewport.getViewDef().getInverseMatrix(new Matrix4d());
 			m.transform(rayOrigin);
 			m.transform(rayDirection);
-			
-			System.out.println(Utils3d.raySphereIntersection(rayOrigin, rayDirection, pivot, radius, hitPoint, true));
-			Main.getInstance().repaintViewport(viewport);
+		} else {
+			PerspectiveViewDef perspective = (PerspectiveViewDef) viewport.getViewDef();
+			double z = perspective.getRelativeFocalLength() * viewport.getComponent().getWidth();
+			rayOrigin.set(0, 0, 0);
+			rayDirection.set(x, y, -z);
+			Matrix4d m = viewport.getViewDef().getInverseMatrix(new Matrix4d());
+			m.transform(rayOrigin);
+			m.transform(rayDirection);
 		}
-		
+		if (Utils3d.raySphereIntersection(rayOrigin, rayDirection, pivot, radius, vector, true)) {
+			vector.sub(pivot);
+			vector.normalize();
+			return true;
+		}
+		return false;
+	}
+	
+	private class HitMouseListener extends MouseAdapter {
+		final Viewport viewport;
+		private HitMouseListener(Viewport viewport) {
+			this.viewport = viewport;
+		}
+		@Override
+		public void mousePressed(MouseEvent e) {
+			if (setIntersectionVector(viewport, e.getX(), e.getY(), fromVector)) {
+				mouseMotionListener = new HitMouseMotionListener(viewport);
+				viewport.getComponent().addMouseMotionListener(mouseMotionListener);
+			}
+		}
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			if (mouseMotionListener != null) {
+				viewport.getComponent().removeMouseMotionListener(mouseMotionListener);
+				mouseMotionListener = null;
+				Matrix3d m = new Matrix3d();
+				axisRotation.getRotationMatrix(m);
+				rotation.rotateMatrix(m);
+				axisRotation.setRotation(m);
+				rotation.set(0, 0, 0);
+				axisRotationAttr.setTuple(axisRotation);
+				rotationAttr.setTuple(rotation);
+				Main.getInstance().repaintViewports();
+			}
+		}
 	};
-
+	
+	private class HitMouseMotionListener extends MouseMotionAdapter {
+		final Viewport viewport;
+		private HitMouseMotionListener(Viewport viewport) {
+			this.viewport = viewport;
+		}
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			if (setIntersectionVector(viewport, e.getX(), e.getY(), toVector)) {
+				Vector3d axis = new Vector3d();
+				axis.cross(fromVector, toVector);
+				double angle = Math.acos(fromVector.dot(toVector));
+				Matrix3d m = new Matrix3d();
+				m.set(new AxisAngle4d(axis, angle));
+				rotation.setRotation(m);
+				rotationAttr.setTuple(rotation);
+				Main.getInstance().syncRepaintViewport(viewport);
+			}
+		}
+	}
 }
