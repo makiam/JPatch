@@ -71,7 +71,7 @@ public class Utils3d {
 	 * @param first true to compute the 1st intersection, false to compute the 2nd intersection
 	 * @return true if there is an intersection, false otherwise
 	 */
-	public static final boolean raySphereIntersection(Point3d rayOrigin, Vector3d rayDirection, Point3d sphereCenter, double sphereRadius, Point3d intersectionPoint, boolean first) {
+	public static final boolean raySphereIntersection(Point3d rayOrigin, Vector3d rayDirection, Point3d sphereCenter, double sphereRadius, Tuple3d intersectionPoint, boolean first) {
 		Vector3d rayDir = new Vector3d(rayDirection);
 		rayDir.normalize();
 		Vector3d distance = new Vector3d(rayOrigin);
