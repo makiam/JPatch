@@ -57,4 +57,36 @@ public class Utils3d {
 	public static final double degSin(double alpha){
 		return degCos(alpha - 90);
 	}
+	
+	/**
+	 * Computes the intersection point of the specified ray and the specified sphere. If there is an intersection,
+	 * <i>intersectionPoint</i> is set to the point of intersection and true is returned. Otherwise <i>intersectionPoint</i>
+	 * is not modified and false is returned. The specified <i>rayOrigin</i>, <i>rayDirection</i> and <i>sphereCenter</i> objects are not modified.
+	 * The boolean <i>first</i> parameter is used to specify which of the two intersection points (1st or 2nd) should be computed.
+	 * @param rayOrigin	the origin of the ray
+	 * @param rayDirection the direction of the ray (it's possible to specify a non-normalized vector)
+	 * @param sphereCenter the center of the sphere
+	 * @param sphereRadius the radius of the sphere
+	 * @param intersectionPoint the intersection point (will be set by this method if there is an intersection)
+	 * @param first true to compute the 1st intersection, false to compute the 2nd intersection
+	 * @return true if there is an intersection, false otherwise
+	 */
+	public static final boolean raySphereIntersection(Point3d rayOrigin, Vector3d rayDirection, Point3d sphereCenter, double sphereRadius, Point3d intersectionPoint, boolean first) {
+		Vector3d rayDir = new Vector3d(rayDirection);
+		rayDir.normalize();
+		Vector3d distance = new Vector3d(rayOrigin);
+		distance.sub(sphereCenter);
+		double b = distance.dot(rayDir);
+		double c = distance.dot(distance) - sphereRadius * sphereRadius;
+		double d = b * b - c;
+		if (d > 0) {
+			double t = first ? -b - Math.sqrt(d) : -b + Math.sqrt(d);
+			rayDir.scale(t);
+			intersectionPoint.set(rayOrigin);
+			intersectionPoint.add(rayDir);
+			return true;
+		}
+		return false;
+	}
+			
 }

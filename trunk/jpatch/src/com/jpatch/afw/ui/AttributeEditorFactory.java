@@ -25,11 +25,13 @@ public class AttributeEditorFactory {
 	}
 	
 	public AttributeEditor getEditorFor(Object object, BooleanAttr expansionControl, Color borderColor) {
+		System.out.println("getEditorFor(" + object + ")");
 		AttributeEditor editor = editors.get(object.getClass());
 		if (editor == null) {
 			URL url = null;
 			Class objectClass = object.getClass();
 			while (url == null) {
+				System.out.println(objectClass + " " + objectClass.getName());
 				url = ClassLoader.getSystemResource(objectClass.getName().replace('.', '/') + ".xml");
 				System.out.println("URL=" + url);
 				editor = editors.get(objectClass);
@@ -39,6 +41,9 @@ public class AttributeEditorFactory {
 				}
 				if (url == null) {
 					objectClass = objectClass.getSuperclass();
+					if (objectClass == null) {
+						return null;
+					}
 				}
 			}
 			try {
