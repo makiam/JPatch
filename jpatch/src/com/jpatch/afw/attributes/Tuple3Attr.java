@@ -53,16 +53,18 @@ public class Tuple3Attr extends AbstractAttribute {
 		return zAttr.getDouble();
 	}
 	
-	public void getTuple(Tuple3d tuple) {
+	public Tuple3d getTuple(Tuple3d tuple) {
 		tuple.x = xAttr.getDouble();
 		tuple.y = yAttr.getDouble();
 		tuple.z = zAttr.getDouble();
+		return tuple;
 	}
 	
-	public void getTuple(Tuple3f tuple) {
+	public Tuple3f getTuple(Tuple3f tuple) {
 		tuple.x = (float) xAttr.getDouble();
 		tuple.y = (float) yAttr.getDouble();
 		tuple.z = (float) zAttr.getDouble();
+		return tuple;
 	}
 	
 	public void setTuple(Tuple3Attr tuple) {
@@ -94,5 +96,22 @@ public class Tuple3Attr extends AbstractAttribute {
 	@Override
 	public String toString() {
 		return "(" + xAttr.getDouble() + ", " + yAttr.getDouble() + ", " + zAttr.getDouble() + ")";
+	}
+	
+	public void bindTuple(Tuple3d tuple) {
+		addAttributePostChangeListener(new BindTupleListener(tuple));
+	}
+	
+	private static class BindTupleListener implements AttributePostChangeListener {
+		private final Tuple3d tuple;
+		
+		private BindTupleListener(Tuple3d tuple) {
+			this.tuple = tuple;
+		}
+		
+		public void attributeHasChanged(Attribute source) {
+			Tuple3Attr tuple3Attr = (Tuple3Attr) source;
+			tuple3Attr.getTuple(tuple);
+		}
 	}
 }

@@ -610,6 +610,7 @@ public class Main {
 		
 		SelectionManager selectionManager = new SelectionManager(tree, treeManager);
 		selectionManager.getSelectedObjectAttribute().addAttributePostChangeListener(inspector.getSelectionChangeListener());
+		actions.toolSM.addAttributePostChangeListener(inspector.getToolChangeListener());
 		
 		AttributeManager.getInstance().addUserInputListener(new UserInputListener() {
 			public void userInput(Object source, Attribute attr) {
@@ -686,7 +687,7 @@ public class Main {
 	
 	public JPatchTool getActiveTool() {
 //		return actions.toolSM.getValue();
-		return new RotateTool();
+		return actions.toolSM.getValue();
 	}
 	
 	public void setActiveSds(Sds sds) {

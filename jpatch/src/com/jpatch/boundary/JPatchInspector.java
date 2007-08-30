@@ -7,6 +7,7 @@ import javax.swing.JComponent;
 import com.jpatch.afw.Utils;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.ui.*;
+import com.jpatch.boundary.tools.JPatchTool;
 import com.jpatch.entity.TransformNode;
 
 public class JPatchInspector {
@@ -29,6 +30,26 @@ public class JPatchInspector {
 		}
 	};
 	
+	private AttributePostChangeListener toolChangeListener = new AttributePostChangeListener() {
+		public void attributeHasChanged(Attribute source) {
+			panel.remove(1);
+			JPatchTool activeTool = ((GenericAttr<JPatchTool>) source).getValue();
+			if (activeTool != null) {
+				AttributeEditor editor = AttributeEditorFactory.getInstance().getEditorFor(activeTool, null, TOOL_COLOR);
+				if (editor != null) {
+					panel.add(AttributeEditorFactory.getInstance().getEditorFor(activeTool, null, TOOL_COLOR), 1);
+				} else {
+					panel.add(toolEditor, 1);
+				}
+			} else {
+				panel.add(toolEditor, 1);
+			}
+			System.out.println("inspector tool change");
+			panel.getComponent().revalidate();
+			panel.getComponent().repaint();
+		}
+	};
+	
 	private AttributePostChangeListener selectionChangeListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
 			panel.remove(2);
@@ -40,7 +61,7 @@ public class JPatchInspector {
 				panel.add(selectionEditor, 2);
 			}
 			panel.getComponent().revalidate();
-//			panel.getComponent().repaint();
+			panel.getComponent().repaint();
 		}
 	};
 	
@@ -52,6 +73,10 @@ public class JPatchInspector {
 		return selectionChangeListener;
 	}
 	
+	public AttributePostChangeListener getToolChangeListener() {
+		return toolChangeListener;
+	}
+	
 	public void setViewport(Viewport viewport) {
 		panel.remove(0);
 //		System.out.println("viewport=" + viewport);
@@ -61,7 +86,8 @@ public class JPatchInspector {
 		JComponent component = panel.getComponent();
 		System.out.println("inspector" + " component=" + System.identityHashCode(component) + " parent=" + System.identityHashCode(component.getParent()) + " validateRoot=" + System.identityHashCode(Utils.getValidateRoot(component)));
 		
-			component.revalidate();
+		component.revalidate();
+		component.repaint();
 //		}
 //		panel.getComponent().repaint();
 	}
