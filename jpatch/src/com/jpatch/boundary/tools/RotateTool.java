@@ -1,6 +1,7 @@
 package com.jpatch.boundary.tools;
 
 import java.awt.event.*;
+import java.awt.geom.Line2D;
 import java.util.Arrays;
 
 import com.jpatch.afw.attributes.Tuple3Attr;
@@ -66,8 +67,8 @@ public class RotateTool implements JPatchTool {
 	}
 	
 	public void draw(Viewport viewport) {
-		axisRotation.getRotationMatrix(matrix);
-		rotation.rotateMatrix(matrix);
+		rotation.getRotationMatrix(matrix);
+		axisRotation.rotateMatrix(matrix);
 		
 		ViewportGl glViewport = (ViewportGl) viewport;
 		GL gl = glViewport.getGl();
@@ -230,7 +231,43 @@ public class RotateTool implements JPatchTool {
 		return rotationAttr;
 	}
 	
-	
+	private int getHitCircle(Viewport viewport, int mouseX, int mouseY) {
+		axisRotation.getRotationMatrix(matrix);
+		rotation.rotateMatrix(matrix);
+		double x = mouseX - viewport.getComponent().getWidth() * 0.5;
+		double y = viewport.getComponent().getHeight() * 0.5 - mouseY;
+		int hit = -1;
+		double distSqMin = 64;
+		Point3d p = new Point3d();
+		Line2D.Double line = new Line2D.Double();
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j <= SEGMENTS; j++) {
+				p.set(points[i][j % SEGMENTS]);
+				p.scale(radius);
+				p.add(pivot);
+				matrix.transform(p);
+				viewport.getViewDef().transform(p);
+				line.x1 = p.x;
+				line.y1 = p.y;
+				p.set(points[i][(j + 1) % SEGMENTS]);
+				p.scale(radius);
+				p.add(pivot);
+				matrix.transform(p);
+				viewport.getViewDef().transform(p);
+				line.x2 = p.x;
+				line.y2 = p.y;
+				
+				double distSq = line.ptSegDistSq(x, y);
+//				System.out.println(line.x1 + "/" + line.y1 + " - " + line.x2 + "/" + line.y2 + " \t " + Math.sqrt(distSq));
+				if (distSq < distSqMin) {
+					System.out.println("\n***\n");
+					distSqMin = distSq;
+					hit = i;
+				}
+			}
+		}
+		return hit;
+	}
 
 	private boolean setIntersectionVector(Viewport viewport, int mouseX, int mouseY, Vector3d vector) {
 		double x = mouseX - viewport.getComponent().getWidth() * 0.5;
@@ -267,10 +304,12 @@ public class RotateTool implements JPatchTool {
 		}
 		@Override
 		public void mousePressed(MouseEvent e) {
+			int constraint = getHitCircle(viewport, e.getX(), e.getY());
 			if (setIntersectionVector(viewport, e.getX(), e.getY(), fromVector)) {
-				mouseMotionListener = new HitMouseMotionListener(viewport);
+				mouseMotionListener = new HitMouseMotionListener(viewport, constraint);
 				viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 			}
+//			System.out.println(getHitCircle(viewport, e.getX(), e.getY()));
 		}
 		@Override
 		public void mouseReleased(MouseEvent e) {
@@ -278,8 +317,8 @@ public class RotateTool implements JPatchTool {
 				viewport.getComponent().removeMouseMotionListener(mouseMotionListener);
 				mouseMotionListener = null;
 				Matrix3d m = new Matrix3d();
-				axisRotation.getRotationMatrix(m);
-				rotation.rotateMatrix(m);
+				rotation.getRotationMatrix(m);
+				axisRotation.rotateMatrix(m);
 				axisRotation.setRotation(m);
 				rotation.set(0, 0, 0);
 				axisRotationAttr.setTuple(axisRotation);
@@ -291,8 +330,10 @@ public class RotateTool implements JPatchTool {
 	
 	private class HitMouseMotionListener extends MouseMotionAdapter {
 		final Viewport viewport;
-		private HitMouseMotionListener(Viewport viewport) {
+		final int constraint;
+		private HitMouseMotionListener(Viewport viewport, int constraint) {
 			this.viewport = viewport;
+			this.constraint = constraint;
 		}
 		@Override
 		public void mouseDragged(MouseEvent e) {
@@ -301,8 +342,26 @@ public class RotateTool implements JPatchTool {
 				axis.cross(fromVector, toVector);
 				double angle = Math.acos(fromVector.dot(toVector));
 				Matrix3d m = new Matrix3d();
+				axisRotation.getRotationMatrix(m);
+				m.invert();
+				m.transform(axis);
+				axis.normalize();
 				m.set(new AxisAngle4d(axis, angle));
 				rotation.setRotation(m);
+				switch (constraint) {
+				case 0:
+					rotation.y = 0;
+					rotation.z = 0;
+					break;
+				case 1:
+					rotation.x = 0;
+					rotation.z = 0;
+					break;
+				case 2:
+					rotation.x = 0;
+					rotation.y = 0;
+					break;
+				}
 				rotationAttr.setTuple(rotation);
 				Main.getInstance().syncRepaintViewport(viewport);
 			}
