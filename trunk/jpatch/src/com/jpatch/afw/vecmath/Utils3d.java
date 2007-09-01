@@ -88,5 +88,28 @@ public class Utils3d {
 		}
 		return false;
 	}
-			
+	
+	public static final boolean rayPlaneIntersection(Point3d rayOrigin, Vector3d rayDirection, Point3d pointOnPlane, Vector3d planeNormal, Tuple3d intersectionPoint) {
+		Vector3d rayDir = new Vector3d(rayDirection);
+		rayDir.normalize();
+		Vector3d normal = new Vector3d(planeNormal);
+		normal.normalize();
+		Vector3d v = new Vector3d(pointOnPlane);
+		v.sub(rayOrigin);
+		double a = v.dot(normal);
+		double b = rayDir.dot(normal);
+		System.out.println("b=" + b);
+		if (Math.abs(b) < 0.1) {
+			return false;
+		}
+		double distance = a / b;
+//		System.out.println("distance=" + distance);
+//		if (distance < 0.1) {
+//			return false;
+//		}
+		intersectionPoint.set(rayDir);
+		intersectionPoint.scale(distance);
+		intersectionPoint.add(rayOrigin);
+		return true;
+	}
 }
