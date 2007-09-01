@@ -97,7 +97,7 @@ public class RotateTool implements JPatchTool {
 		Point3d p = new Point3d();
 		Vector3d v = new Vector3d();
 		Matrix4d m = viewport.getViewDef().getMatrix(new Matrix4d());
-		final double scale = 3.0 / (float) m.getScale();
+		final double scale = 1.0 / (float) m.getScale() / radius;
 		m.transform(p);
 		double z = p.z;
 	
@@ -117,7 +117,7 @@ public class RotateTool implements JPatchTool {
 					p.add(pivot);
 					matrix.transform(p);
 					m.transform(p);
-					float alpha = (float) Math.max(0.1, Math.min(0.9, (p.z - z) * scale + 0.6));
+					float alpha = (float) Math.max(0.2, Math.min(0.9, (p.z - z) * scale + 0.6));
 					if (pass == 0) {
 						gl.glColor4f(0, 0, 0, alpha);
 					} else {
@@ -260,7 +260,6 @@ public class RotateTool implements JPatchTool {
 				double distSq = line.ptSegDistSq(x, y);
 //				System.out.println(line.x1 + "/" + line.y1 + " - " + line.x2 + "/" + line.y2 + " \t " + Math.sqrt(distSq));
 				if (distSq < distSqMin) {
-					System.out.println("\n***\n");
 					distSqMin = distSq;
 					hit = i;
 				}
@@ -269,7 +268,7 @@ public class RotateTool implements JPatchTool {
 		return hit;
 	}
 
-	private boolean setIntersectionVector(Viewport viewport, int mouseX, int mouseY, Vector3d vector) {
+	private boolean setIntersectionVector(Viewport viewport, int mouseX, int mouseY, int constraintAxis, Vector3d vector) {
 		double x = mouseX - viewport.getComponent().getWidth() * 0.5;
 		double y = viewport.getComponent().getHeight() * 0.5 - mouseY;
 		Point3d rayOrigin = new Point3d();
@@ -277,22 +276,51 @@ public class RotateTool implements JPatchTool {
 		if (viewport.getViewDef() instanceof OrthoViewDef) {
 			rayOrigin.set(x, y, 1);
 			rayDirection.set(0, 0, -1);
-			Matrix4d m = viewport.getViewDef().getInverseMatrix(new Matrix4d());
-			m.transform(rayOrigin);
-			m.transform(rayDirection);
+			
 		} else {
 			PerspectiveViewDef perspective = (PerspectiveViewDef) viewport.getViewDef();
 			double z = perspective.getRelativeFocalLength() * viewport.getComponent().getWidth();
 			rayOrigin.set(0, 0, 0);
 			rayDirection.set(x, y, -z);
-			Matrix4d m = viewport.getViewDef().getInverseMatrix(new Matrix4d());
-			m.transform(rayOrigin);
-			m.transform(rayDirection);
 		}
-		if (Utils3d.raySphereIntersection(rayOrigin, rayDirection, pivot, radius, vector, true)) {
-			vector.sub(pivot);
-			vector.normalize();
-			return true;
+		Matrix4d m = viewport.getViewDef().getInverseMatrix(new Matrix4d());
+		m.transform(rayOrigin);
+		m.transform(rayDirection);
+		if (constraintAxis < 0) {
+			/* rotate freely, compute ray/sphere intersection */
+			if (Utils3d.raySphereIntersection(rayOrigin, rayDirection, pivot, radius, vector, true)) {
+				vector.sub(pivot);
+				vector.normalize();
+				return true;
+			}
+		} else {
+			/* rotation is constrained to an axis, compute ray/plane intersection */
+			Vector3d normal = new Vector3d();
+			switch (constraintAxis) {
+			case 0:
+				normal.set(1, 0, 0);
+				break;
+			case 1:
+				normal.set(0, 1, 0);
+				break;
+			case 2:
+				normal.set(0, 0, 1);
+				break;
+			default:
+				throw new RuntimeException();
+			}
+			matrix.transform(normal);
+//			m.transform(normal);
+			if (Utils3d.rayPlaneIntersection(rayOrigin, rayDirection, pivot, normal, vector)) {
+				Point3d p = new Point3d(vector);
+//				System.out.println(p.distance(pivot));
+				if (p.distance(pivot) < radius * 0.2) {
+					return false;
+				}
+				vector.sub(pivot);
+				vector.normalize();
+				return true;
+			}
 		}
 		return false;
 	}
@@ -305,7 +333,7 @@ public class RotateTool implements JPatchTool {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			int constraint = getHitCircle(viewport, e.getX(), e.getY());
-			if (setIntersectionVector(viewport, e.getX(), e.getY(), fromVector)) {
+			if (setIntersectionVector(viewport, e.getX(), e.getY(), constraint, fromVector)) {
 				mouseMotionListener = new HitMouseMotionListener(viewport, constraint);
 				viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 			}
@@ -337,7 +365,7 @@ public class RotateTool implements JPatchTool {
 		}
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			if (setIntersectionVector(viewport, e.getX(), e.getY(), toVector)) {
+			if (setIntersectionVector(viewport, e.getX(), e.getY(), constraint, toVector)) {
 				Vector3d axis = new Vector3d();
 				axis.cross(fromVector, toVector);
 				double angle = Math.acos(fromVector.dot(toVector));
