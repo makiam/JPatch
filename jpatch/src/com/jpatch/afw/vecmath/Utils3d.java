@@ -101,7 +101,7 @@ public class Utils3d {
 		double a = v.dot(normal);
 		double b = rayDir.dot(normal);
 //		System.out.println("b=" + b);
-		if (Math.abs(b) < 0.1) {
+		if (Math.abs(b) < 0.01) {
 			return false;
 		}
 		double distance = a / b;
