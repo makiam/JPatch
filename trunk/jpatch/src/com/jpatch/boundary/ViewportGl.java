@@ -474,11 +474,13 @@ public class ViewportGl extends Viewport {
 	}
 	
 	public void setMaterial(int side, float[] array) {
+		gl.glDisable(GL_COLOR_MATERIAL);
 		gl.glMaterialfv(side, GL_AMBIENT, array, GlMaterial.AMBIENT);
 		gl.glMaterialfv(side, GL_DIFFUSE, array, GlMaterial.DIFFUSE);
 		gl.glMaterialfv(side, GL_SPECULAR, array, GlMaterial.SPECULAR);
 		gl.glMaterialfv(side, GL_EMISSION, array, GlMaterial.EMISSION);
 		gl.glMaterialfv(side, GL_SHININESS, array, GlMaterial.SHININESS);
+		gl.glEnable(GL_COLOR_MATERIAL);
 	}
 	
 	private void drawTriangleMesh(TriangleMesh t) {
@@ -1202,9 +1204,6 @@ public class ViewportGl extends Viewport {
 		final float[][] normals = dicer.getLimitNormals(level - 1);
 		final float[][] vertices = dicer.getLimitVertices(level - 1);
 		
-//		gl.glEnable(GL_COLOR_MATERIAL);
-//		gl.glEnable(GL_LIGHTING);
-		
 		gl.glColor3f(0, 0, 0);
 		gl.glBegin(GL_QUADS);
 		for (int y = start; y < end; y++) {
@@ -1265,6 +1264,7 @@ public class ViewportGl extends Viewport {
 //		}
 		
 		if (showProjectedMeshAttr.getBoolean()) {
+//			gl.glEnable(GL_COLOR_MATERIAL);
 //			gl.glDisable(GL_LIGHTING);
 //			gl.glColor3f(0.5f, 0.5f, 0.5f);
 			gl.glColor3f(1.0f, 1.0f, 1.0f);
@@ -1295,7 +1295,8 @@ public class ViewportGl extends Viewport {
 					gl.glEnd();
 				}
 			}
-//			gl.glColor3f(0.0f, 0.0f, 0.0f);
+//			gl.glDisable(GL_COLOR_MATERIAL);
+			gl.glColor3f(0.0f, 0.0f, 0.0f);
 //			gl.glEnable(GL_LIGHTING);
 		}
 		

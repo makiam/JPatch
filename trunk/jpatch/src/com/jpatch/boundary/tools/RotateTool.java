@@ -24,9 +24,10 @@ import javax.vecmath.*;
 import static javax.media.opengl.GL.*;
 
 public class RotateTool implements JPatchTool {
-	private static final int SEGMENTS = 360;
-	private static final double[] COS = new double[SEGMENTS];
-	private static final double[] SIN = new double[SEGMENTS];
+	private static final int SEGMENTS = 180;
+	private static final int CIRCLE_SEGMENTS = 36000;
+	private static final double[] COS = new double[CIRCLE_SEGMENTS];
+	private static final double[] SIN = new double[CIRCLE_SEGMENTS];
 	private final ColorSettings colorSettings = Settings.getInstance().colors;
 	private final Point3d[][] points = new Point3d[3][SEGMENTS + 1];
 	private final static GlMaterial FRONT_MATERIAL, BACK_MATERIAL;
@@ -38,7 +39,7 @@ public class RotateTool implements JPatchTool {
 	private final Point3d pivot = new Point3d();
 	private final Rotation3d axisRotation = new Rotation3d();
 	private final Rotation3d rotation = new Rotation3d();
-	private double radius = 5.0;
+	private double radius = 50.0;
 	int axisConstraint = -1;
 	private Matrix3d matrix = new Matrix3d();
 	private MouseListener[] mouseListeners;
@@ -53,16 +54,16 @@ public class RotateTool implements JPatchTool {
 		Color3f black = new Color3f(0, 0, 0);
 		FRONT_MATERIAL = new GlMaterial(black, black, black, black, 0);
 		BACK_MATERIAL = new GlMaterial(black, black, black, black, 0);
-		for (int i = 0; i < SEGMENTS; i++) {
-			COS[i] = Math.cos(i * 2 * Math.PI / SEGMENTS);
-			SIN[i] = Math.sin(i * 2 * Math.PI / SEGMENTS);
+		for (int i = 0; i < CIRCLE_SEGMENTS; i++) {
+			COS[i] = Math.cos(i * 2 * Math.PI / CIRCLE_SEGMENTS);
+			SIN[i] = Math.sin(i * 2 * Math.PI / CIRCLE_SEGMENTS);
 		}
 	}
 	
 	public RotateTool() {
 		for (int i = 0; i < SEGMENTS; i++) {
-			double sin = SIN[i];
-			double cos = COS[i];
+			double sin = Math.sin(i * 2 * Math.PI / SEGMENTS);
+			double cos = Math.cos(i * 2 * Math.PI / SEGMENTS);
 			points[0][i] = new Point3d(0, -sin, cos);
 			points[1][i] = new Point3d(cos, 0, sin);
 			points[2][i] = new Point3d(cos, -sin, 0);
@@ -412,6 +413,7 @@ public class RotateTool implements JPatchTool {
 				if (vector.length() < radius) {
 					/* when inside the disc, use ray/plane intersection point */
 					vector.normalize();
+//					System.out.println("inside");
 					return true;
 				}
 			}
@@ -444,7 +446,8 @@ public class RotateTool implements JPatchTool {
 		double minDistSq = Double.MAX_VALUE;
 		double z0 = -Double.MAX_VALUE;
 //		double tt = -1;
-		for (int i = 0; i < SEGMENTS; i++) {
+//		long time = System.currentTimeMillis();
+		for (int i = 0; i < CIRCLE_SEGMENTS; i++) {
 			double rcos = radius * COS[i];
 			double rsin = radius * SIN[i];
 			p0.set(
@@ -452,8 +455,8 @@ public class RotateTool implements JPatchTool {
 					u0.y * rcos + u1.y * rsin + pivot.y,
 					u0.z * rcos + u1.z * rsin + pivot.z
 			);
-			rcos = radius * COS[(i + 1) % SEGMENTS];
-			rsin = radius * SIN[(i + 1) % SEGMENTS];
+			rcos = radius * COS[(i + 1) % CIRCLE_SEGMENTS];
+			rsin = radius * SIN[(i + 1) % CIRCLE_SEGMENTS];
 			p1.set(
 					u0.x * rcos + u1.x * rsin + pivot.x,
 					u0.y * rcos + u1.y * rsin + pivot.y,
@@ -491,6 +494,7 @@ public class RotateTool implements JPatchTool {
 			}
 			
 		}
+//		System.out.println(System.currentTimeMillis() - time);
 //		System.out.println(minDistSq + " " + vector);
 //		System.out.println("mouse=" + x + "/" + y + "\t hit=" + sx + "/" + sy + "\t distance=" + Math.round(Math.sqrt(minDistSq)) + "\t t=" + tt);
 		return minDistSq;
