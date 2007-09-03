@@ -6,6 +6,8 @@ import javax.vecmath.*;
  * Static utility methods for 3d calculations
  */
 public class Utils3d {
+	private static final Vector3d VX = new Vector3d(1,0,0);
+	private static final Vector3d VZ = new Vector3d(0,0,1);
 	
 	/**
 	 * Returns a new 4x4 identity matrix
@@ -98,7 +100,7 @@ public class Utils3d {
 		v.sub(rayOrigin);
 		double a = v.dot(normal);
 		double b = rayDir.dot(normal);
-		System.out.println("b=" + b);
+//		System.out.println("b=" + b);
 		if (Math.abs(b) < 0.1) {
 			return false;
 		}
@@ -111,5 +113,67 @@ public class Utils3d {
 		intersectionPoint.scale(distance);
 		intersectionPoint.add(rayOrigin);
 		return true;
+	}
+	
+	/**
+	 * Computes a vector perpendicular to the specified vector. The result is stored in the specified
+	 * perpendicularVector
+	 * @param vector the vector
+	 * @param perpendicularVector will be set to a vector perpendicular to the specified vector
+	 * @return the specified perpendicularVector
+	 */
+	public static Vector3d perpendicularVector(Vector3d vector, Vector3d perpendicularVector) {
+		/* check if vector == (0,0,0) */
+		if (vector.x == 0 && vector.y == 0 && vector.z == 0) {
+			/* return (0, 0, 0) */
+			perpendicularVector.set(0, 0, 0);
+		} else {
+			/* compute perpendicular vector */
+			double ax = Math.abs(vector.x);
+			double ay = Math.abs(vector.y);
+			double az = Math.abs(vector.z);
+			double dm = Math.max(ax,Math.max(ay,az));
+			if (ax == dm) {
+				if (vector.x < 0)
+					perpendicularVector.cross(VZ, vector);
+				else
+					perpendicularVector.cross(vector,VZ);
+			} else if (az == dm) {
+				if (vector.z < 0)
+					perpendicularVector.cross(vector,VX);
+				else
+					perpendicularVector.cross(VX, vector);
+			} else {
+				if (vector.y < 0)
+					perpendicularVector.cross(vector,VX);
+				else
+					perpendicularVector.cross(VX, vector);
+			}
+			perpendicularVector.normalize();
+		}
+//		System.out.println("vector perpendicular to " + vector + " is " + perpendicularVector);
+		return perpendicularVector;
+	}
+	
+	/**
+	 * Returns factor t such that a(1-t)+bt is the point on line ab (specified by ax, ay, bx and by) closest to p (specified by px and py).
+	 * Note that only for 0 &lt; t &lt; 1 the computed point is on the line segment ab.
+	 * @param ax x coordinate of point a (start of line segment)
+	 * @param ay y coordinate of point a (start of line segment)
+	 * @param bx x coordinate of point b (end of line segment)
+	 * @param by y coordinate of point b (end of line segment)
+	 * @param px x coordinate of point p
+	 * @param py y coordinate of point p
+	 * @return factor t such that a(1-t)+bt is the point on line ab closest to p
+	 */
+	public static double closestPointOnLine(double ax, double ay, double bx, double by, double px, double py) {
+		double vx = bx - ax;
+		double vy = by - ay;
+		double wx = px - ax;
+		double wy = py - ay;
+		
+		double c1 = wx * vx + wy * vy; // dot product w dot v
+		double c2 = vx * vx + vy * vy; // dot product v dot v
+		return c1 / c2;
 	}
 }
