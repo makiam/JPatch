@@ -24,7 +24,7 @@ import javax.vecmath.*;
 import static javax.media.opengl.GL.*;
 
 public class RotateTool implements JPatchTool {
-	private static final int SEGMENTS = 128;
+	private static final int SEGMENTS = 360;
 	private static final double[] COS = new double[SEGMENTS];
 	private static final double[] SIN = new double[SEGMENTS];
 	private final ColorSettings colorSettings = Settings.getInstance().colors;
@@ -126,7 +126,7 @@ public class RotateTool implements JPatchTool {
 					matrix.transform(p);
 					p.add(pivot);
 					m.transform(p);
-					float alpha = (float) Math.max(0.2, Math.min(1.0, (p.z - z) * scale + 0.6));
+					float alpha = (float) Math.max(0.25, Math.min(1.0, (p.z - z) * scale + 0.6));
 					if (pass == 0) {
 						gl.glColor4f(0, 0, 0, alpha);
 					} else {
@@ -151,7 +151,6 @@ public class RotateTool implements JPatchTool {
 		gl.glDisable(GL_CULL_FACE);
 		gl.glEnable(GL_DEPTH_TEST);
 		
-		double axisFactor = axisConstraint == -1 ? 1.0 : 0.99;
 		int passes = axisConstraint == -1 ? 2 : 1;
 		/* draw plane segment */
 		for (int pass = 0; pass < passes; pass++) {
@@ -193,8 +192,12 @@ public class RotateTool implements JPatchTool {
 				ma.set(axisAngle);
 				ve.set(fromVector);
 				ma.transform(ve);
-				p.scaleAdd(radius * axisFactor, ve, pivot);
+				p.scaleAdd(radius, ve, pivot);
 				m.transform(p);
+				if (pass == 1) {
+					float alpha = (float) Math.max(0.25, Math.min(1.0, (p.z - z) * scale + 0.6));
+					gl.glColor4f(1, 1, 1, alpha);
+				}
 				gl.glVertex3d(p.x, p.y, p.z);
 			}
 //			if (pass == 2) {
@@ -242,7 +245,7 @@ public class RotateTool implements JPatchTool {
 			ma.set(axisAngle);
 			ve.set(fromVector);
 			ma.transform(ve);
-			p.scaleAdd(radius * axisFactor, ve, pivot);
+			p.scaleAdd(radius, ve, pivot);
 			m.transform(p);
 			gl.glVertex3d(p.x, p.y, p.z);
 			double factor;
@@ -253,7 +256,7 @@ public class RotateTool implements JPatchTool {
 			else factor = 1 - 0.04;
 			ve.set(fromVector);
 			ma.transform(ve);
-			p.scaleAdd(radius * factor * axisFactor, ve, pivot);
+			p.scaleAdd(radius * factor, ve, pivot);
 			m.transform(p);
 			gl.glVertex3d(p.x, p.y, p.z);
 			n += 1;
@@ -263,7 +266,7 @@ public class RotateTool implements JPatchTool {
 		ma.set(axisAngle);
 		ve.set(fromVector);
 		ma.transform(ve);
-		p.scaleAdd(radius * axisFactor, ve, pivot);
+		p.scaleAdd(radius, ve, pivot);
 		m.transform(p);
 		gl.glVertex3d(p.x, p.y, p.z);
 		p.set(pivot);
@@ -403,18 +406,17 @@ public class RotateTool implements JPatchTool {
 			}
 			matrix.transform(normal);
 			
-//			/* ray/plane */
-//			if (Utils3d.rayPlaneIntersection(rayOrigin, rayDirection, pivot, normal, vector)) {
-//				Point3d p = new Point3d(vector);
-//				if (p.distance(pivot) < radius * 0.2) {
-//					return false;
-//				}
-//				vector.sub(pivot);
-//				vector.normalize();
-//				return true;
-//			}
+			/* ray/plane */
+			if (Utils3d.rayPlaneIntersection(rayOrigin, rayDirection, pivot, normal, vector)) {
+				vector.sub(pivot);
+				if (vector.length() < radius) {
+					/* when inside the disc, use ray/plane intersection point */
+					vector.normalize();
+					return true;
+				}
+			}
 		
-			/* closest on screen */
+			/* outside of disc, use closest on screen */
 			getAxisHit(viewport, mouseX, mouseY, normal, vector);
 //			System.out.println(vector);
 			vector.normalize();
