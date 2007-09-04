@@ -128,6 +128,7 @@ public class RotateTool implements JPatchTool {
 				gl.glDisable(GL_DEPTH_TEST);
 				gl.glLineWidth(2.5f);
 			}
+			loop:
 			for (int i = 0; i < 6; i++) {
 				gl.glBegin(GL_LINE_STRIP);
 				for (int j = 0; j <= SEGMENTS; j++) {
@@ -138,20 +139,48 @@ public class RotateTool implements JPatchTool {
 					} else {
 						antiRotation.transform(p);
 					}
+					
+					Vector3d distance = new Vector3d();
+					
+					if (i == 2 && viewport.getViewDef() instanceof PerspectiveViewDef) {
+						distance.set(pivot);
+						distance.x += m.m03;
+						distance.y += m.m13;
+						distance.z += m.m23;
+//						System.out.println(distance);
+						double d = Math.sqrt(distance.x * distance.x + distance.y * distance.y + distance.z * distance.z);
+						double s = radius * radius / d;
+						double t = d - s;
+						double x = Math.sqrt(radius * radius - s * s);
+						
+//						System.out.println("r=" + radius + " x=" + x + " d=" + d + " s=" + s);
+						p.scale(x / radius);
+						distance.scale(s / d);
+//						System.out.println(distance);
+					}
+					
 					p.add(pivot);
+					
+					
 //					if (i >= 3) {
-						m.transform(p);
+					m.transform(p);
+					p.sub(distance);
+//					p.sub(distance);
 //					} else {
 //						p.scale(viewScale);
 //						p.x += m.m03;
 //						p.y += m.m13;
 //						p.z += m.m23;
 //					}
+					
+					
+
 					double dist;
 					if (viewport.getViewDef() instanceof OrthoViewDef) {
 						dist = p.z;
 					} else {
 						dist = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
+						
 					}
 					float alpha = (float) Math.max(0.4, Math.min(1.0, (dist - z) * scale + 0.6));
 					if (pass == 0) {
