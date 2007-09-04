@@ -10,6 +10,8 @@ import com.jpatch.afw.vecmath.Utils3d;
 import com.jpatch.boundary.Main;
 import com.jpatch.boundary.OrthoViewDef;
 import com.jpatch.boundary.PerspectiveViewDef;
+import com.jpatch.boundary.ViewDef;
+import com.jpatch.boundary.ViewDirection;
 import com.jpatch.boundary.Viewport;
 import com.jpatch.boundary.ViewportGl;
 import com.jpatch.entity.BasicMaterial;
@@ -24,8 +26,8 @@ import javax.vecmath.*;
 import static javax.media.opengl.GL.*;
 
 public class RotateTool implements JPatchTool {
-	private static final int SEGMENTS = 180;
-	private static final int CIRCLE_SEGMENTS = 36000;
+	private static final int SEGMENTS = 128;
+	private static final int CIRCLE_SEGMENTS = 4096;
 	private static final double[] COS = new double[CIRCLE_SEGMENTS];
 	private static final double[] SIN = new double[CIRCLE_SEGMENTS];
 	private final ColorSettings colorSettings = Settings.getInstance().colors;
@@ -107,9 +109,16 @@ public class RotateTool implements JPatchTool {
 		Matrix4d m = viewport.getViewDef().getMatrix(new Matrix4d());
 		final double scale = 1.5 / (float) m.getScale() / radius;
 		m.transform(p);
-		double z = p.z;
+		double z;
+		if (viewport.getViewDef() instanceof OrthoViewDef) {
+			z = p.z;
+		} else {
+			z = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
+		}
 	
 		Point3d pivot = (Point3d) pivotAttr.getTuple(new Point3d());
+		double viewScale = m.getScale();
+		Matrix3d antiRotation = getAntiRotation(viewport.getViewDef());
 		
 		/* draw rgb circles */
 		for (int pass = 0; pass < 2; pass++) {
@@ -119,28 +128,52 @@ public class RotateTool implements JPatchTool {
 				gl.glDisable(GL_DEPTH_TEST);
 				gl.glLineWidth(2.5f);
 			}
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < 6; i++) {
 				gl.glBegin(GL_LINE_STRIP);
 				for (int j = 0; j <= SEGMENTS; j++) {
-					p.set(points[i][(j < SEGMENTS) ? j : 0]);
+					p.set(points[i % 3][(j < SEGMENTS) ? j : 0]);
 					p.scale(radius);
-					matrix.transform(p);
+					if (i >= 3) {
+						matrix.transform(p);
+					} else {
+						antiRotation.transform(p);
+					}
 					p.add(pivot);
-					m.transform(p);
-					float alpha = (float) Math.max(0.25, Math.min(1.0, (p.z - z) * scale + 0.6));
+//					if (i >= 3) {
+						m.transform(p);
+//					} else {
+//						p.scale(viewScale);
+//						p.x += m.m03;
+//						p.y += m.m13;
+//						p.z += m.m23;
+//					}
+					double dist;
+					if (viewport.getViewDef() instanceof OrthoViewDef) {
+						dist = p.z;
+					} else {
+						dist = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
+					}
+					float alpha = (float) Math.max(0.4, Math.min(1.0, (dist - z) * scale + 0.6));
 					if (pass == 0) {
 						gl.glColor4f(0, 0, 0, alpha);
 					} else {
 						switch (i) {
-						case 0:
+						case 0:	// fallthrough intentional
+						case 1: // fallthrough intentional
+						case 2:
+							gl.glColor4f(0.5f, 0.5f, 0.5f, alpha);
+							break;
+						case 3:
 							gl.glColor4f(colorSettings.xAxis.x, colorSettings.xAxis.y, colorSettings.xAxis.z, alpha);
 							break;
-						case 1:
+						case 4:
 							gl.glColor4f(colorSettings.yAxis.x, colorSettings.yAxis.y, colorSettings.yAxis.z, alpha);
 							break;
-						case 2:
+						case 5:
 							gl.glColor4f(colorSettings.zAxis.x, colorSettings.zAxis.y, colorSettings.zAxis.z, alpha);
 							break;
+						default:
+							throw new RuntimeException();	
 						}
 					}
 					gl.glVertex3d(p.x, p.y, p.z);
@@ -158,15 +191,18 @@ public class RotateTool implements JPatchTool {
 			if (pass == 0) {
 				switch (axisConstraint) {
 				case -1:
+				case 0:
+				case 1:
+				case 2:
 					gl.glColor4f(0, 0, 0, 0.15f);
 					break;
-				case 0:
+				case 3:
 					gl.glColor4f(0.25f, 0, 0, 0.2f);
 					break;
-				case 1:
+				case 4:
 					gl.glColor4f(0, 0.25f, 0, 0.2f);
 					break;
-				case 2:
+				case 5:
 					gl.glColor4f(0, 0, 0.25f, 0.2f);
 					break;
 				default:
@@ -196,7 +232,13 @@ public class RotateTool implements JPatchTool {
 				p.scaleAdd(radius, ve, pivot);
 				m.transform(p);
 				if (pass == 1) {
-					float alpha = (float) Math.max(0.25, Math.min(1.0, (p.z - z) * scale + 0.6));
+					double dist;
+					if (viewport.getViewDef() instanceof OrthoViewDef) {
+						dist = p.z;
+					} else {
+						dist = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
+					}
+					float alpha = (float) Math.max(0.4, Math.min(1.0, (dist - z) * scale + 0.6));
 					gl.glColor4f(1, 1, 1, alpha);
 				}
 				gl.glVertex3d(p.x, p.y, p.z);
@@ -218,15 +260,18 @@ public class RotateTool implements JPatchTool {
 //		gl.glColor4f(1, 1, 1, 0.75f);
 		switch (axisConstraint) {
 		case -1:
+		case 0:
+		case 1:
+		case 2:
 			gl.glColor4f(1.00f, 1.00f, 1.00f, 0.90f);
 			break;
-		case 0:
+		case 3:
 			gl.glColor4f(1.00f, 0.75f, 0.75f, 0.90f);
 			break;
-		case 1:
+		case 4:
 			gl.glColor4f(0.50f, 1.00f, 0.50f, 0.90f);
 			break;
-		case 2:
+		case 5:
 			gl.glColor4f(0.85f, 0.85f, 1.00f, 0.90f);
 			break;
 		default:
@@ -241,7 +286,7 @@ public class RotateTool implements JPatchTool {
 		AxisAngle4d axisAngle = new AxisAngle4d(axis, 0);
 		Vector3d ve = new Vector3d();
 		int n = 0;
-		for (double a = Math.PI / 180.0 * 1; a < angle; a += Math.PI / 180.0 * 1) {
+		for (double a = 0; a < angle; a += Math.PI / 180.0 * 1) {
 			axisAngle.angle = a;
 			ma.set(axisAngle);
 			ve.set(fromVector);
@@ -336,18 +381,27 @@ public class RotateTool implements JPatchTool {
 		double distSqMin = 64;
 		Point3d p = new Point3d();
 		Line2D.Double line = new Line2D.Double();
-		for (int i = 0; i < 3; i++) {
+		Matrix3d antiRotation = getAntiRotation(viewport.getViewDef());
+		for (int i = 0; i < 6; i++) {
 			for (int j = 0; j <= SEGMENTS; j++) {
-				p.set(points[i][j % SEGMENTS]);
+				p.set(points[i % 3][j % SEGMENTS]);
 				p.scale(radius);
-				matrix.transform(p);
+				if (i >= 3) {
+					matrix.transform(p);
+				} else {
+					antiRotation.transform(p);
+				}
 				p.add(pivot);
 				viewport.getViewDef().transform(p);
 				line.x1 = p.x;
 				line.y1 = p.y;
-				p.set(points[i][(j + 1) % SEGMENTS]);
+				p.set(points[i % 3][(j + 1) % SEGMENTS]);
 				p.scale(radius);
-				matrix.transform(p);
+				if (i >= 3) {
+					matrix.transform(p);
+				} else {
+					antiRotation.transform(p);
+				}
 				p.add(pivot);
 				viewport.getViewDef().transform(p);
 				line.x2 = p.x;
@@ -364,6 +418,34 @@ public class RotateTool implements JPatchTool {
 		return hit;
 	}
 
+	private Matrix3d getAntiRotation(ViewDef viewdef) {
+		Matrix3d antiRotation = new Matrix3d();
+		viewdef.getInverseMatrix(new Matrix4d()).getRotationScale(antiRotation);
+		if (viewdef instanceof PerspectiveViewDef) {
+			Point3d p = new Point3d(pivot);
+			Matrix4d m = viewdef.getMatrix(new Matrix4d());
+			m.transform(p);
+			Vector3d x = new Vector3d();
+			Vector3d y = new Vector3d();
+			Vector3d z = new Vector3d(p);
+			Vector3d up = new Vector3d(0, 1, 0);
+			x.cross(z, up);
+			y.cross(x, z);
+			x.normalize();
+			y.normalize();
+			z.normalize();
+			Matrix3d matrix = new Matrix3d(
+					x.x, y.x, z.x,
+					x.y, y.y, z.y,
+					x.z, y.z, z.z
+			);
+			matrix.normalize();
+			antiRotation.mul(matrix);
+		}
+		antiRotation.normalize();
+		return antiRotation;
+	}
+	
 	private boolean setIntersectionVector(Viewport viewport, int mouseX, int mouseY, int constraintAxis, Vector3d vector) {
 		double x = mouseX - viewport.getComponent().getWidth() * 0.5;
 		double y = viewport.getComponent().getHeight() * 0.5 - mouseY;
@@ -377,11 +459,14 @@ public class RotateTool implements JPatchTool {
 			PerspectiveViewDef perspective = (PerspectiveViewDef) viewport.getViewDef();
 			double z = perspective.getRelativeFocalLength() * viewport.getComponent().getWidth();
 			rayOrigin.set(0, 0, 0);
-			rayDirection.set(x, y, -z);
+			rayDirection.set(-x, -y, z);
 		}
 		Matrix4d m = viewport.getViewDef().getInverseMatrix(new Matrix4d());
 		m.transform(rayOrigin);
 		m.transform(rayDirection);
+		
+		Matrix3d antiRotation = getAntiRotation(viewport.getViewDef());
+		
 		if (constraintAxis < 0) {
 			/* rotate freely, compute ray/sphere intersection */
 			if (Utils3d.raySphereIntersection(rayOrigin, rayDirection, pivot, radius, vector, true)) {
@@ -393,19 +478,26 @@ public class RotateTool implements JPatchTool {
 			/* rotation is constrained to an axis, compute ray/plane intersection */
 			Vector3d normal = new Vector3d();
 			switch (constraintAxis) {
-			case 0:
+			case 0: // fallthrough intentional
+			case 3:
 				normal.set(1, 0, 0);
 				break;
-			case 1:
+			case 1: // fallthrough intentional
+			case 4:
 				normal.set(0, 1, 0);
 				break;
-			case 2:
+			case 2: // fallthrough intentional
+			case 5:
 				normal.set(0, 0, 1);
 				break;
 			default:
 				throw new RuntimeException();
 			}
-			matrix.transform(normal);
+			if (constraintAxis >= 3) {
+				matrix.transform(normal);
+			} else {
+				antiRotation.transform(normal);
+			}
 			
 			/* ray/plane */
 			if (Utils3d.rayPlaneIntersection(rayOrigin, rayDirection, pivot, normal, vector)) {
@@ -558,20 +650,20 @@ public class RotateTool implements JPatchTool {
 				axis.normalize();
 				m.set(new AxisAngle4d(axis, angle));
 				rotation.setRotation(m);
-				switch (constraint) {
-				case 0:
-					rotation.y = 0;
-					rotation.z = 0;
-					break;
-				case 1:
-					rotation.x = 0;
-					rotation.z = 0;
-					break;
-				case 2:
-					rotation.x = 0;
-					rotation.y = 0;
-					break;
-				}
+//				switch (constraint) {
+//				case 0:
+//					rotation.y = 0;
+//					rotation.z = 0;
+//					break;
+//				case 1:
+//					rotation.x = 0;
+//					rotation.z = 0;
+//					break;
+//				case 2:
+//					rotation.x = 0;
+//					rotation.y = 0;
+//					break;
+//				}
 				rotationAttr.setTuple(rotation);
 				Main.getInstance().syncRepaintViewport(viewport);
 			}
