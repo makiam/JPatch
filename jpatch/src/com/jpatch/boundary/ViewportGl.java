@@ -560,6 +560,9 @@ public class ViewportGl extends Viewport {
 //		if (activeSds != null) {
 //			drawSds3(activeSds);
 //		}
+		
+		drawOrigin();
+		
 		SceneGraphNode sceneGraphRoot = Main.getInstance().getSceneGraphRoot();
 		drawSceneGraphElement(sceneGraphRoot);
 		Selection selection = Main.getInstance().getSelection();
@@ -831,8 +834,28 @@ public class ViewportGl extends Viewport {
 
 	@Override
 	protected void drawOrigin() {
-		// TODO Auto-generated method stub
-
+		Point3f p0 = new Point3f(0, 0, 0);
+		Point3f px = new Point3f(1, 0, 0);
+		Point3f py = new Point3f(0, 1, 0);
+		Point3f pz = new Point3f(0, 0, 1);
+		Matrix4d m = viewDef.getMatrix(new Matrix4d());
+		m.transform(p0);
+		m.transform(px);
+		m.transform(py);
+		m.transform(pz);
+		gl.glDisable(GL_LIGHTING);
+		gl.glBegin(GL_LINES);
+		gl.glColor3f(1, 0, 0);
+		gl.glVertex3f(p0.x, p0.y, p0.z);
+		gl.glVertex3f(px.x, px.y, px.z);
+		gl.glColor3f(0, 1, 0);
+		gl.glVertex3f(p0.x, p0.y, p0.z);
+		gl.glVertex3f(py.x, py.y, py.z);
+		gl.glColor3f(0, 0, 1);
+		gl.glVertex3f(p0.x, p0.y, p0.z);
+		gl.glVertex3f(pz.x, pz.y, pz.z);
+		gl.glEnd();
+		gl.glEnable(GL_LIGHTING);
 	}
 	
 	private void drawSelection(Selection selection) {
