@@ -753,6 +753,7 @@ public class RotateTool implements JPatchTool {
 		}
 		@Override
 		public void mouseDragged(MouseEvent e) {
+			System.out.println(constraint);
 			if (setIntersectionVector(viewport, e.getX(), e.getY(), constraint, toVector)) {
 				Vector3d axis = new Vector3d(1, 0, 0);
 //				System.out.println(fromVector.dot(toVector));
