@@ -4,6 +4,7 @@ import javax.vecmath.*;
 
 import com.jpatch.afw.Utils;
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.vecmath.Utils3d;
 
 public class OrthoViewDef extends AbstractViewDef {
 	private final Matrix4d matrix = Utils.createIdentityMatrix();
@@ -42,12 +43,11 @@ public class OrthoViewDef extends AbstractViewDef {
 	public void computeMatrix() {
 		double width = viewport.getComponent().getWidth();
 		double viewScale = scaleAttr.getDouble() / 20 * width;
-		double x = Math.toRadians(rotationAttr.getX());
-		double y = Math.toRadians(rotationAttr.getY());
-		double sx = Math.sin(x);
-		double cx = Math.cos(x);
-		double sy = Math.sin(y);
-		double cy = Math.cos(y);
+		
+		double sx = Utils3d.degSin(rotationAttr.getX());
+		double cx = Utils3d.degCos(rotationAttr.getX());
+		double sy = Utils3d.degSin(rotationAttr.getY());
+		double cy = Utils3d.degCos(rotationAttr.getY());
 		
 		matrix.m00 = cy * viewScale;
 		matrix.m01 = 0;

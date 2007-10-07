@@ -29,7 +29,7 @@ public abstract class Viewport implements NamedObject {
 	
 	final int id;
 	Component component;
-	Matrix4f modelView = new Matrix4f();
+//	Matrix4f modelView = new Matrix4f();
 	double zPos;
 	double fw;
 	static final int maxSubdiv = 10;
@@ -120,7 +120,7 @@ public abstract class Viewport implements NamedObject {
 	
 	public abstract void draw();
 	
-	public abstract void drawShape(com.jpatch.boundary.tools.Shape shape);
+//	public abstract void drawShape(com.jpatch.boundary.tools.Shape shape);
 	
 	
 	public Component getComponent() {
@@ -149,9 +149,9 @@ public abstract class Viewport implements NamedObject {
 	
 	
 	
-	protected abstract void drawGrid();
+//	protected abstract void drawGrid();
 	protected abstract void drawOrigin();
-	
+//	
 	protected abstract void drawInfo();
 
 
