@@ -369,6 +369,17 @@ public class TransformUtil {
 	}
 	
 	/**
+	 * Sets the specified modelView matrix to the local to camera space transformation matrix.
+	 * @param modelView the matrix to set
+	 * @return the specified matrix
+	 */
+	public Matrix4f getModelViewMatrix(Matrix4f modelView) {
+		computeLocal2Camera();
+		modelView.set(local2Camera);
+		return modelView;
+	}
+	
+	/**
 	 * If world2LocalInvalid is set, computes the world2Local matrix by inverting the local2World matrix and
 	 * sets world2LocalInvalid to false.
 	 */

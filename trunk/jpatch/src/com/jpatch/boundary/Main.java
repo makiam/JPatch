@@ -494,7 +494,7 @@ public class Main {
 //		final TransformNode node4 = new TransformNode();
 		
 		try {
-			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
+			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt")));
 //			final SdsModel model2 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
 //			final SdsModel model3 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
 			model1.getNameAttribute().setValue("model 1");
