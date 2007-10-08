@@ -25,7 +25,7 @@ import javax.vecmath.*;
 
 import static javax.media.opengl.GL.*;
 
-public class RotateTool implements JPatchTool {
+public class RotateTool_old implements JPatchTool {
 	private static final int SEGMENTS = 128;
 	private static final int CIRCLE_SEGMENTS = 4096;
 	private static final double[] COS = new double[CIRCLE_SEGMENTS];

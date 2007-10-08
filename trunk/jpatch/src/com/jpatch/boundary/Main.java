@@ -35,6 +35,7 @@ import com.jpatch.afw.ui.JPatchStateButton;
 import com.jpatch.afw.ui.JPatchToggleButton;
 import com.jpatch.afw.ui.JPatchToolBar;
 import com.jpatch.afw.ui.UserInputListener;
+import com.jpatch.afw.vecmath.Transform;
 import com.jpatch.boundary.actions.Actions;
 import com.jpatch.boundary.actions.Actions.ViewportMode;
 import com.jpatch.boundary.tools.JPatchTool;
@@ -42,7 +43,6 @@ import com.jpatch.boundary.tools.RotateTool;
 import com.jpatch.entity.Camera;
 import com.jpatch.entity.SceneGraphNode;
 import com.jpatch.entity.SdsModel;
-import com.jpatch.entity.Transform;
 import com.jpatch.entity.TransformNode;
 import com.jpatch.entity.sds.JptLoader;
 import com.jpatch.entity.sds.Sds;
@@ -494,7 +494,7 @@ public class Main {
 //		final TransformNode node4 = new TransformNode();
 		
 		try {
-			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt")));
+			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/barrel.jpt")));
 //			final SdsModel model2 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
 //			final SdsModel model3 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
 			model1.getNameAttribute().setValue("model 1");

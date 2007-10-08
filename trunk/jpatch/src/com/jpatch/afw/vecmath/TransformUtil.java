@@ -22,11 +22,9 @@ import javax.vecmath.*;
  * @author Sascha Ledinsky
  */
 public class TransformUtil {
-	/** 4x4 identity matrix */
-	private static final Matrix4d IDENTITY = new Matrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 	
 	/** Camera to local space transformation matrix */
-	private Matrix4d camera2Local = new Matrix4d(IDENTITY);
+	private Matrix4d camera2Local = Utils3d.createIdentityMatrix();
 	
 	/** Flag to tell whether camera2Local is invalid, used for lazy evaluation of the camera2Local matrix */
 	private boolean camera2LocalInvalid = false;
@@ -36,19 +34,19 @@ public class TransformUtil {
 	 * If an orthographic projection is used, this matrix is supposed to also
 	 * contain a scale component.
 	 */
-	private Matrix4d camera2World = new Matrix4d(IDENTITY);
+	private Matrix4d camera2World = Utils3d.createIdentityMatrix();
 	
 	/** Flag to tell whether camera2World is invalid, used for lazy evaluation of the camera2World matrix */
 	private boolean camera2WorldInvalid = false;
 	
 	/** Local to camera space transformation matrix */
-	private Matrix4d local2Camera = new Matrix4d(IDENTITY);
+	private Matrix4d local2Camera = Utils3d.createIdentityMatrix();
 	
 	/** Flag to tell whether local2Camera is invalid, used for lazy evaluation of the local2Camera matrix */
 	private boolean local2CameraInvalid = false;
 	
 	/** Local to world space transformation matrix */
-	private Matrix4d local2World = new Matrix4d(IDENTITY);
+	private Matrix4d local2World = Utils3d.createIdentityMatrix();
 	
 	/** Flag to tell whether local2World is invalid, used for lazy evaluation of the local2World matrix */
 	private boolean local2WorldInvalid = false;
@@ -70,13 +68,13 @@ public class TransformUtil {
 	 * If an orthographic projection is used, this matrix is supposed to also
 	 * contain a scale component.
 	 */
-	private Matrix4d world2Camera = new Matrix4d(IDENTITY);
+	private Matrix4d world2Camera = Utils3d.createIdentityMatrix();
 	
 	/** Flag to tell whether world2Camera is invalid, used for lazy evaluation of the world2Camera matrix */
 	private boolean world2CameraInvalid = false;
 	
 	/** world to local space transformation matrix */
-	private Matrix4d world2Local = new Matrix4d(IDENTITY);
+	private Matrix4d world2Local = Utils3d.createIdentityMatrix();
 	
 	/** Flag to tell whether world2Local is invalid, used for lazy evaluation of the world2Local matrix */
 	private boolean world2LocalInvalid = false;
@@ -121,6 +119,27 @@ public class TransformUtil {
 			out.y = viewportHeight * 0.5 - in.y * w;
 		} else {
 			out.x = viewportWidth * 0.5 + in.x;
+			out.y = viewportHeight * 0.5 - in.y;
+		}
+		out.z = in.z;
+	}
+	
+	/**
+	 * Projects the <i>in</i> point from screen coordinates to the specified <i>out</i> point in camera space.
+	 * This method sets the specified <i>out</i> Point3d to the coordinates of the specified <i>in</i> Point3d,
+	 * projected from screen to camera space. If a perspective projection is used, the perspective devision is performed.
+	 * Screen space is defined with 0/0 as the upper left corner and (viewportWidth, viewportHeight) as the lower right
+	 * corner.
+	 * @param in the point in screen coordinates
+	 * @param out this point will be set to the point in camera space. May be the same Point3d object as <i>in</i>
+	 */
+	public void screen2Camera(Point3d in, Point3d out) {
+		if (perspective) {
+			double w = in.z / (viewportWidth * relativeFocalLength);
+			out.x = in.x * w - viewportWidth * 0.5;
+			out.y = viewportHeight * 0.5 - in.y * w;
+		} else {
+			out.x = in.x - viewportWidth * 0.5;
 			out.y = viewportHeight * 0.5 - in.y;
 		}
 		out.z = in.z;
@@ -175,6 +194,30 @@ public class TransformUtil {
 	}
 	
 	/**
+	 * Transforms the <i>in</i> point from local space to the specified <i>out</i> point in camera space.
+	 * This method sets the specified <i>out</i> Point3f to the coordinates of the specified <i>in</i> Point3f,
+	 * transformed from local to camera space.
+	 * @param in the point in local space
+	 * @param out this point will be set to the point in camera space. May be the same Point3f object as <i>in</i>
+	 */
+	public void local2Camera(Point3f in, Point3f out) {
+		computeLocal2Camera();
+		local2Camera.transform(in, out);
+	}
+	
+	/**
+	 * Transforms the <i>in</i> vector from local space to the specified <i>out</i> vector in camera space.
+	 * This method sets the specified <i>out</i> Vector3f to the coordinates of the specified <i>in</i> Vector3f,
+	 * transformed from local to camera space.
+	 * @param in the vector in local space
+	 * @param out this vector will be set to the vector in camera space. May be the same Vector3f object as <i>in</i>
+	 */
+	public void local2Camera(Vector3f in, Vector3f out) {
+		computeLocal2Camera();
+		local2Camera.transform(in, out);
+	}
+	
+	/**
 	 * Projects the <i>in</i> point from local space to the specified <i>out</i> point in screen coordinates.
 	 * This method sets the specified <i>out</i> Point3d to the coordinates of the specified <i>in</i> Point3d,
 	 * projected from local to screen space. If a perspective projection is used, the perspective devision is performed.
@@ -186,6 +229,34 @@ public class TransformUtil {
 	public void local2Screen(Point3d in, Point3d out) {
 		local2Camera(in, out);
 		camera2Screen(out, out);
+	}
+	
+	/**
+	 * Projects the <i>in</i> point from screen coordinates to the specified <i>out</i> point in local space.
+	 * This method sets the specified <i>out</i> Point3d to the coordinates of the specified <i>in</i> Point3d,
+	 * projected from screen to local space. If a perspective projection is used, the perspective devision is performed.
+	 * Screen space is defined with 0/0 as the upper left corner and (viewportWidth, viewportHeight) as the lower right
+	 * corner.
+	 * @param in the point in screen coordinates
+	 * @param out this point will be set to the point in local space. May be the same Point3d object as <i>in</i>
+	 */
+	public void screen2Local(Point3d in, Point3d out) {
+		screen2Camera(in, out);
+		camera2Local(out, out);
+	}
+	
+	/**
+	 * Projects the <i>in</i> point from screen coordinates to the specified <i>out</i> point in world space.
+	 * This method sets the specified <i>out</i> Point3d to the coordinates of the specified <i>in</i> Point3d,
+	 * projected from screen to world space. If a perspective projection is used, the perspective devision is performed.
+	 * Screen space is defined with 0/0 as the upper left corner and (viewportWidth, viewportHeight) as the lower right
+	 * corner.
+	 * @param in the point in screen coordinates
+	 * @param out this point will be set to the point in world space. May be the same Point3d object as <i>in</i>
+	 */
+	public void screen2World(Point3d in, Point3d out) {
+		screen2Camera(in, out);
+		camera2World(out, out);
 	}
 	
 	/**
@@ -331,6 +402,30 @@ public class TransformUtil {
 	}
 	
 	/**
+	 * Transforms the <i>in</i> point from world space to the specified <i>out</i> point in camera space.
+	 * This method sets the specified <i>out</i> Point3f to the coordinates of the specified <i>in</i> Point3f,
+	 * transformed from world to camera space.
+	 * @param in the point in world space
+	 * @param out this point will be set to the point in camera space. May be the same Point3f object as <i>in</i>
+	 */
+	public void world2Camera(Point3f in, Point3f out) {
+		computeWorld2Camera();
+		world2Camera.transform(in, out);
+	}
+	
+	/**
+	 * Transforms the <i>in</i> vector from world space to the specified <i>out</i> vector in camera space.
+	 * This method sets the specified <i>out</i> Vector3f to the coordinates of the specified <i>in</i> Vector3f,
+	 * transformed from world to camera space.
+	 * @param in the vector in world space
+	 * @param out this vector will be set to the vector in camera space. May be the same Vector3f object as <i>in</i>
+	 */
+	public void world2Camera(Vector3f in, Vector3f out) {
+		computeWorld2Camera();
+		world2Camera.transform(in, out);
+	}
+	
+	/**
 	 * Transforms the <i>in</i> point from world space to the specified <i>out</i> point in local space.
 	 * This method sets the specified <i>out</i> Point3d to the coordinates of the specified <i>in</i> Point3d,
 	 * transformed from world to local space.
@@ -377,6 +472,32 @@ public class TransformUtil {
 		computeLocal2Camera();
 		modelView.set(local2Camera);
 		return modelView;
+	}
+	
+	public void setLocalTransform(Transform transform) {
+		setWorld2Local(transform.matrix);
+	}
+	
+	public void setCameraTransform(Transform transform) {
+		setWorld2Camera(transform.matrix);
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Projection: ");
+		if (perspective) {
+			sb.append("perspective, relative focal length = " + relativeFocalLength + "\n");
+		} else {
+			sb.append("orthographic\n");
+		}
+		if (!camera2LocalInvalid) sb.append("camera => local\n").append(camera2Local).append("\n");
+		if (!camera2WorldInvalid) sb.append("camera => world\n").append(camera2World).append("\n");
+		if (!local2CameraInvalid) sb.append("local => camera\n").append(local2Camera).append("\n");
+		if (!local2WorldInvalid) sb.append("local => world\n").append(local2World).append("\n");
+		if (!world2CameraInvalid) sb.append("world => camera\n").append(world2Camera).append("\n");
+		if (!world2LocalInvalid) sb.append("world => local\n").append(world2Local).append("\n");
+		return sb.toString();
 	}
 	
 	/**
