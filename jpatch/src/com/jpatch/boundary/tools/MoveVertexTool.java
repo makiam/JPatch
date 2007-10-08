@@ -1,5 +1,6 @@
 package com.jpatch.boundary.tools;
 
+import com.jpatch.afw.vecmath.TransformUtil;
 import com.jpatch.boundary.*;
 import com.jpatch.entity.SdsModel;
 import com.jpatch.entity.sds.*;
@@ -134,10 +135,10 @@ public class MoveVertexTool implements JPatchTool {
 		}
 		
 		private void getSelectedVertices(Selection selection) {
-			double x0 = rectangle.x;
-			double y0 = rectangle.y;
-			double x1 = rectangle.x + rectangle.width;
-			double y1 = rectangle.y + rectangle.height;
+			int x0 = rectangle.x;
+			int y0 = rectangle.y;
+			int x1 = rectangle.x + rectangle.width;
+			int y1 = rectangle.y + rectangle.height;
 			MouseSelector.getVertices(viewport, x0, y0, x1, y1, sdsModel, selection);
 		}
 	}
@@ -147,6 +148,7 @@ public class MoveVertexTool implements JPatchTool {
 		private final TopLevelVertex vertex;
 		private final Point3d p = new Point3d();
 		private final SdsModel sdsModel;
+		private final TransformUtil transformUtil;
 		double z;
 //		Point3d pos = new Point3d();
 //		Point3d limit = new Point3d();
@@ -155,20 +157,30 @@ public class MoveVertexTool implements JPatchTool {
 			this.viewport = viewport;
 			this.vertex = vertex;
 			this.sdsModel = sdsModel;
+			
+			transformUtil = viewport.getViewDef().getTransformUtil();
+			transformUtil.setLocalTransform(sdsModel.getTransform());
+			
 			vertex.getPos(p);
-			sdsModel.getTransform().transform(p);
-			viewport.getViewDef().transform(p);
+			System.out.print("local=" + p + " screen=");
+			transformUtil.local2Screen(p, p);
+			System.out.println(p);
+			Point3d p2 = new Point3d();
+			transformUtil.screen2Local(p, p2);
+			System.out.println("local=" + p2);
+			System.out.println(transformUtil);
 			z = p.z;
 		}
 		
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			p.x = e.getX() - viewport.getComponent().getWidth() / 2;
-			p.y = viewport.getComponent().getHeight() / 2 - e.getY();
+			p.x = e.getX();
+			p.y = e.getY();
 			p.z = z;
 //			System.out.println("Pscreen =" + p);
-			viewport.getViewDef().invTransform(p);
-			sdsModel.getTransform().invTransform(p);
+			System.out.print("screen=" + p + " local=");
+			transformUtil.screen2Local(p, p);
+			System.out.println(p);
 //			System.out.println("Pworld  =" + p);
 //			p.sub(limit);
 //			double n = vertex.valence();

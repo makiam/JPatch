@@ -1,7 +1,5 @@
-package com.jpatch.entity;
+package com.jpatch.afw.vecmath;
 
-import com.jpatch.afw.attributes.GenericAttr;
-import com.jpatch.afw.vecmath.*;
 import javax.vecmath.*;
 
 public abstract class Transform {

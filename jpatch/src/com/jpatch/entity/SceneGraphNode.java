@@ -3,6 +3,7 @@ package com.jpatch.entity;
 import java.util.HashSet;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.vecmath.Transform;
 
 public abstract class SceneGraphNode {
 	private final GenericAttr<SceneGraphNode> parentAttr;

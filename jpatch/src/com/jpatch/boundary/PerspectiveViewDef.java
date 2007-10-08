@@ -3,6 +3,7 @@ package com.jpatch.boundary;
 import com.jpatch.afw.attributes.DoubleAttr;
 import com.jpatch.afw.attributes.Tuple2Attr;
 import com.jpatch.afw.attributes.Tuple3Attr;
+import com.jpatch.afw.vecmath.TransformUtil;
 import com.jpatch.entity.Perspective;
 
 import javax.vecmath.Matrix4d;
@@ -16,6 +17,8 @@ public class PerspectiveViewDef extends AbstractViewDef {
 	private final double filmApertureWidth = 36.0;
 	
 	private final Perspective perspective;
+	
+	private final TransformUtil transformUtil = new TransformUtil();
 	
 	public PerspectiveViewDef(Viewport viewport, Perspective perspective) {
 		super(viewport);
@@ -36,33 +39,17 @@ public class PerspectiveViewDef extends AbstractViewDef {
 	
 	public void computeMatrix() {
 		perspective.getTransform().computeMatrix();
-	}
-
-	public Matrix4d getInverseMatrix(Matrix4d inverseMatrix) {
-		return perspective.getTransform().getMatrix(inverseMatrix);
-	}
-
-	public Matrix4d getMatrix(Matrix4d matrix) {
-		return perspective.getTransform().getInverseMatrix(matrix);
+//		transformUtil.setCameraTransform(perspective.getTransform());
+		transformUtil.setPerspectiveProjection(getRelativeFocalLength());
+		Matrix4d matrix = perspective.getTransform().getMatrix(new Matrix4d());
+		transformUtil.setWorld2Camera(matrix);
 	}
 
 	public double getRelativeFocalLength() {
 		return perspective.getFocalLength() / filmApertureWidth;
 	}
-	
-	public Point3d transform(Point3d p) {
-		perspective.getTransform().invTransform(p);
-		double w = -getRelativeFocalLength() * viewport.getComponent().getWidth() / p.z;
-		p.x *= w;
-		p.y *= w;
-		return p;
-	}
-	
-	public Point3d invTransform(Point3d p) {
-		double w = -p.z / (getRelativeFocalLength() * viewport.getComponent().getWidth());
-		p.x *= w;
-		p.y *= w;
-		perspective.getTransform().transform(p);
-		return p;
+
+	public TransformUtil getTransformUtil() {
+		return transformUtil;
 	}
 }
