@@ -479,7 +479,31 @@ public class TransformUtil {
 	}
 	
 	public void setCameraTransform(Transform transform) {
-		setWorld2Camera(transform.matrix);
+		this.camera2World.set(transform.matrix);
+		
+		/* rotate the camera to look down the positive z axis */
+		camera2World.m00 = -transform.matrix.m00;
+		camera2World.m01 = -transform.matrix.m01;
+		camera2World.m02 = -transform.matrix.m02;
+		camera2World.m03 = transform.matrix.m03;
+		camera2World.m10 = transform.matrix.m10;
+		camera2World.m11 = transform.matrix.m11;
+		camera2World.m12 = transform.matrix.m12;
+		camera2World.m13 = transform.matrix.m13;
+		camera2World.m20 = -transform.matrix.m20;
+		camera2World.m21 = -transform.matrix.m21;
+		camera2World.m22 = -transform.matrix.m22;
+		camera2World.m23 = transform.matrix.m23;
+		camera2World.m30 = transform.matrix.m30;
+		camera2World.m31 = transform.matrix.m31;
+		camera2World.m32 = transform.matrix.m32;
+		camera2World.m33 = transform.matrix.m33;
+		
+		/* set matrix invalidation flags for lazy evaluation */
+		camera2WorldInvalid = false;
+		world2CameraInvalid = true;
+		camera2LocalInvalid = true;
+		local2CameraInvalid = true;
 	}
 	
 	@Override
