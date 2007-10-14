@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import com.jpatch.afw.attributes.Tuple3Attr;
 import com.jpatch.afw.vecmath.Rotation3d;
+import com.jpatch.afw.vecmath.TransformUtil;
 import com.jpatch.afw.vecmath.Utils3d;
 import com.jpatch.boundary.Main;
 import com.jpatch.boundary.OrthoViewDef;
@@ -32,6 +33,13 @@ public class RotateTool implements JPatchTool {
 	private static final double[] SIN = new double[CIRCLE_SEGMENTS];
 	private final ColorSettings colorSettings = Settings.getInstance().colors;
 	private final Point3d[][] points = new Point3d[3][SEGMENTS + 1];
+	private final float[][] COLORS = new float[][] {
+			{ 1.0f, 0.0f, 0.0f },	// x axis
+			{ 0.0f, 0.9f, 0.0f },	// y axis
+			{ 0.4f, 0.4f, 1.0f },	// z axis
+			{ 0.0f, 0.0f, 0.0f },	// outline
+			{ 0.5f, 0.5f, 0.5f}		// grey axis
+	};
 	private final static GlMaterial FRONT_MATERIAL, BACK_MATERIAL;
 	static int n = 0;
 	
@@ -43,7 +51,7 @@ public class RotateTool implements JPatchTool {
 	private final Rotation3d rotation = new Rotation3d();
 	private double radius = 50.0;
 	int axisConstraint = -1;
-	private Matrix3d matrix = new Matrix3d();
+	private Matrix4d matrix = new Matrix4d();
 	private MouseListener[] mouseListeners;
 	private MouseMotionAdapter mouseMotionListener;
 	
@@ -76,8 +84,78 @@ public class RotateTool implements JPatchTool {
 	}
 	
 	public void draw(Viewport viewport) {
+		
+		/* initialize GL for rendering */
+		GL gl = ((ViewportGl) viewport).getGl();
+		gl.glEnable(GL_BLEND);
+		gl.glEnable(GL_LINE_SMOOTH);
+		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		gl.glDisable(GL_LIGHTING);
+		
+		TransformUtil transformUtil = viewport.getViewDef().getTransformUtil();
+		
+		/* compute rotation matrix */
 		rotation.getRotationMatrix(matrix);
 		axisRotation.rotateMatrix(matrix);
+		/* add pivot translation */
+		matrix.m03 = pivot.x;
+		matrix.m13 = pivot.y;
+		matrix.m23 = pivot.z;
+		/* set local2world to rotate-tool matrix */ 
+		transformUtil.setLocal2World(matrix);
+		
+		Point3d p = new Point3d();
+		/* draw RGB circles */
+		for (int pass = 0; pass < 3; pass++) {
+			switch (pass) {
+			case 0:
+				gl.glDepthMask(false);
+				gl.glLineWidth(3.5f);
+				break;
+			case 1:
+				gl.glDepthMask(true);
+				gl.glLineWidth(2.5f);
+				break;
+			case 2:
+				gl.glDisable(GL_DEPTH_TEST);
+				gl.glLineWidth(1.0f);
+				break;
+			default:
+				throw new RuntimeException();
+			}
+			for (int i = 0; i < 3; i++) {
+				int colorIndex;
+				if (pass == 0) {
+					colorIndex = 3;
+				} else {
+					colorIndex = i;
+				}
+				gl.glColor3fv(COLORS[colorIndex], 0);
+				gl.glBegin(GL_LINE_STRIP);
+				for (int j = 0; j <= SEGMENTS; j++) {
+					p.set(points[i % 3][(j < SEGMENTS) ? j : 0]);
+					p.scale(radius);
+					transformUtil.local2Camera(p, p);
+					gl.glVertex3d(p.x, p.y, p.z);
+				}
+				gl.glEnd();
+			}
+		}
+		
+		/* cleanup gl */
+		gl.glDisable(GL_BLEND);
+		gl.glDisable(GL_LINE_SMOOTH);
+		gl.glEnable(GL_LIGHTING);
+		
+	}
+	
+	public void draw2(Viewport viewport) {
+		TransformUtil transformUtil = viewport.getViewDef().getTransformUtil();
+		
+		rotation.getRotationMatrix(matrix);
+		axisRotation.rotateMatrix(matrix);
+		
+		transformUtil.setLocal2World(matrix);
 		
 		ViewportGl glViewport = (ViewportGl) viewport;
 		GL gl = glViewport.getGl();
@@ -106,61 +184,61 @@ public class RotateTool implements JPatchTool {
 //		System.out.println("drawing rotateTool " + n++);
 		Point3d p = new Point3d(pivot);
 		Vector3d v = new Vector3d();
-		Matrix4d m = viewport.getViewDef().getMatrix(new Matrix4d());
-		final double scale = 1.0 / (float) m.getScale() / radius;
-		m.transform(p);
-		double z;
-		if (viewport.getViewDef() instanceof OrthoViewDef) {
-			z = p.z;
-		} else {
-			z = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
-		}
+//		Matrix4d m = viewport.getViewDef().getMatrix(new Matrix4d());
+//		final double scale = 1.0 / (float) m.getScale() / radius;
+//		m.transform(p);
+//		double z;
+//		if (viewport.getViewDef() instanceof OrthoViewDef) {
+//			z = p.z;
+//		} else {
+//			z = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
+//		}
 	
 		Point3d pivot = (Point3d) pivotAttr.getTuple(new Point3d());
-		double viewScale = m.getScale();
+//		double viewScale = m.getScale();
 		Matrix3d antiRotation = getAntiRotation(viewport.getViewDef());
 		
 		
 		/* clear depth buffer */
 		gl.glClear(GL_DEPTH_BUFFER_BIT);
 		
-		/* draw plane into depth buffer */
-		gl.glColorMask(false, false, false, false);
-		gl.glDisable(GL_CULL_FACE);
-			gl.glColor3f(1, 0, 0);
-			gl.glBegin(GL_TRIANGLE_FAN);
-			
-				
-				for (int j = 0; j <= SEGMENTS; j++) {
-					p.set(points[2][(j < SEGMENTS) ? j : 0]);
-					p.scale(radius);
-					antiRotation.transform(p);
-				
-					
-					Vector3d distance = new Vector3d();
-					
-					if (viewport.getViewDef() instanceof PerspectiveViewDef) {
-						distance.set(pivot);
-						distance.x += m.m03;
-						distance.y += m.m13;
-						distance.z += m.m23;
-						double d = Math.sqrt(distance.x * distance.x + distance.y * distance.y + distance.z * distance.z);
-						double s = radius * radius / d;
-						double t = d - s;
-						double x = Math.sqrt(radius * radius - s * s);
-						p.scale(x / radius);
-						distance.scale(s / d);;
-					}
-					
-					p.add(pivot);
-					m.transform(p);
-					p.sub(distance);
-
-					gl.glVertex3d(p.x, p.y, p.z);
-				}
-				gl.glEnd();
-			//if (true) return;
-				gl.glColorMask(true, true, true, true);
+//		/* draw plane into depth buffer */
+//		gl.glColorMask(false, false, false, false);
+//		gl.glDisable(GL_CULL_FACE);
+//			gl.glColor3f(1, 0, 0);
+//			gl.glBegin(GL_TRIANGLE_FAN);
+//			
+//				
+//				for (int j = 0; j <= SEGMENTS; j++) {
+//					p.set(points[2][(j < SEGMENTS) ? j : 0]);
+//					p.scale(radius);
+//					antiRotation.transform(p);
+//				
+//					
+//					Vector3d distance = new Vector3d();
+//					
+//					if (viewport.getViewDef() instanceof PerspectiveViewDef) {
+//						distance.set(pivot);
+//						distance.x += m.m03;
+//						distance.y += m.m13;
+//						distance.z += m.m23;
+//						double d = Math.sqrt(distance.x * distance.x + distance.y * distance.y + distance.z * distance.z);
+//						double s = radius * radius / d;
+//						double t = d - s;
+//						double x = Math.sqrt(radius * radius - s * s);
+//						p.scale(x / radius);
+//						distance.scale(s / d);;
+//					}
+//					
+//					p.add(pivot);
+//					m.transform(p);
+//					p.sub(distance);
+//
+//					gl.glVertex3d(p.x, p.y, p.z);
+//				}
+//				gl.glEnd();
+//			//if (true) return;
+//				gl.glColorMask(true, true, true, true);
 		
 		/* draw rgb circles */
 		for (int pass = 0; pass < 3; pass++) {
@@ -186,12 +264,13 @@ public class RotateTool implements JPatchTool {
 				
 			}
 			
-			for (int i = 0; i < 6; i++) {
+			for (int i = 3; i < 6; i++) {
 				gl.glBegin(GL_LINE_STRIP);
 				for (int j = 0; j <= SEGMENTS; j++) {
 					p.set(points[i % 3][(j < SEGMENTS) ? j : 0]);
 					p.scale(radius);
 					if (i >= 3) {
+						
 						matrix.transform(p);
 					} else {
 						antiRotation.transform(p);
@@ -437,6 +516,7 @@ public class RotateTool implements JPatchTool {
 	}
 	
 	public void registerListeners(Viewport[] viewports) {
+		if (true) return; // FIXME
 		if (mouseListeners != null) {
 			throw new IllegalStateException("already registered");
 		}
@@ -448,6 +528,7 @@ public class RotateTool implements JPatchTool {
 	}
 	
 	public void unregisterListeners(Viewport[] viewports) {
+		if (true) return; // FIXME
 		System.out.println("MoveVertexTool unregisterListeners");
 		for (int i = 0; i < viewports.length; i++) {
 			viewports[i].getComponent().removeMouseListener(mouseListeners[i]);

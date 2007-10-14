@@ -43,20 +43,39 @@ public class OrthoViewDef extends AbstractViewDef {
 		matrix.m00 = cy * viewScale;
 		matrix.m01 = 0;
 		matrix.m02 = sy * viewScale;
-		matrix.m03 = 0;
-		matrix.m10 = sy * sx * viewScale;
-		matrix.m11 = cx * viewScale;
-		matrix.m12 = -cy * sx * viewScale;
-		matrix.m20 = -sy * cx * viewScale;
-		matrix.m21 = sx * viewScale;
-		matrix.m22 = cy * cx * viewScale;
 		matrix.m03 = translationAttr.getX() * viewScale;
+		matrix.m10 = sx * sy * viewScale;
+		matrix.m11 = cx * viewScale;
+		matrix.m12 = -sx * cy * viewScale;
 		matrix.m13 = translationAttr.getY() * viewScale;
+		matrix.m20 = -cx * sy * viewScale;
+		matrix.m21 = sx * viewScale;
+		matrix.m22 = cx * cy * viewScale;
 		matrix.m23 = 0;
 		matrix.m30 = 0;
 		matrix.m31 = 0;
 		matrix.m32 = 0;
 		matrix.m33 = 1;
+		
+//		matrix.m00 = cy * viewScale;
+//		matrix.m01 = 0;
+//		matrix.m02 = -sy * viewScale;
+//		matrix.m03 = 0;
+//		matrix.m10 = sy * sx * viewScale;
+//		matrix.m11 = cx * viewScale;
+//		matrix.m12 = cy * sx * viewScale;
+//		matrix.m20 = -sy * cx * viewScale;
+//		matrix.m21 = sx * viewScale;
+//		matrix.m22 = -cy * cx * viewScale;
+//		matrix.m03 = translationAttr.getX() * viewScale;
+//		matrix.m13 = translationAttr.getY() * viewScale;
+//		matrix.m23 = 0;
+//		matrix.m30 = 0;
+//		matrix.m31 = 0;
+//		matrix.m32 = 0;
+//		matrix.m33 = 1;
+		
+//		System.out.println(matrix);
 		
 		transformUtil.setWorld2Camera(matrix);
 		transformUtil.setViewportDimension(width, height);

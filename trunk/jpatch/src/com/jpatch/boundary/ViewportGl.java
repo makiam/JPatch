@@ -25,7 +25,7 @@ public class ViewportGl extends Viewport {
 	private static int repaintCount;
 	
 	private static final boolean LIGHTWEIGHT = false;
-	private static final double CLEAR_DEPTH = 100000;
+//	private static final double CLEAR_DEPTH = 100000;
 	private static final ColorSettings COLORS = Settings.getInstance().colors;
 	private static final RealtimeRendererSettings RENDERER = Settings.getInstance().realtimeRenderer;
 	
@@ -368,9 +368,10 @@ public class ViewportGl extends Viewport {
 				gl.glEnable(GL_POLYGON_OFFSET_FILL);
 				gl.glPolygonOffset(1.0f, 1.0f);
 				gl.glDisable(GL_DEPTH_TEST);
-				gl.glEnable(GL_NORMALIZE);
+				gl.glDisable(GL_NORMALIZE);
 				gl.glEnable(GL_CULL_FACE);
 				gl.glCullFace(GL_BACK);
+//				gl.glFrontFace(GL_CW);	// left handed
 				canUseProgram = gl.isFunctionAvailable("glUseProgram");
 				canUseProgram = false;
 				if (canUseProgram) {
@@ -409,7 +410,7 @@ public class ViewportGl extends Viewport {
 				gl.glFinish();	// wait for previous gl functions to finish
 				Color3f background = active ? COLORS.activeBackground : COLORS.background;
 				gl.glClearColor(background.x, background.y, background.z, 0);	// set background color
-				gl.glClearDepth(CLEAR_DEPTH);									// set initial depth-buffer value
+//				gl.glClearDepth(farClip);									// set initial depth-buffer value
 				gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// clear color and depth buffers
 //				gl.glFlush();
 //				gl.glFinish();
@@ -851,6 +852,10 @@ public class ViewportGl extends Viewport {
 		transformUtil.world2Camera(px, px);
 		transformUtil.world2Camera(py, py);
 		transformUtil.world2Camera(pz, pz);
+//		System.out.println("p0 = " + p0);
+//		System.out.println("px = " + px);
+//		System.out.println("py = " + py);
+//		System.out.println("pz = " + pz);
 		
 		gl.glDisable(GL_LIGHTING);
 		gl.glBegin(GL_LINES);
@@ -864,6 +869,33 @@ public class ViewportGl extends Viewport {
 		gl.glVertex3f(p0.x, p0.y, p0.z);
 		gl.glVertex3f(pz.x, pz.y, pz.z);
 		gl.glEnd();
+		
+//		gl.glDisable(GL_CULL_FACE);
+//		for (int z = 0; z < 3; z++) {
+//			Point3f a = new Point3f(-1, 1, z);
+//			Point3f b = new Point3f( 1, 1, z);
+//			Point3f c = new Point3f( 1,-1, z);
+//			Point3f d = new Point3f(-1,-1, z);
+//			transformUtil.world2Camera(a, a);
+//			transformUtil.world2Camera(b, b);
+//			transformUtil.world2Camera(c, c);
+//			transformUtil.world2Camera(d, d);
+//			if (z == 0) {
+//				gl.glColor3f(1, 0, 0);
+//			} else if (z == 1) {
+//				gl.glColor3f(0, 1, 0);
+//			} else if (z == 2) {
+//				gl.glColor3f(0, 0, 1);
+//			}
+//			System.out.println(z + " " + a + " " + b + " " + c + " " + d);
+//			gl.glBegin(GL_QUADS);
+//			gl.glVertex3f(a.x, a.y, a.z);
+//			gl.glVertex3f(b.x, b.y, b.z);
+//			gl.glVertex3f(c.x, c.y, c.z);
+//			gl.glVertex3f(d.x, d.y, d.z);
+//			gl.glEnd();
+//		}
+		
 		gl.glEnable(GL_LIGHTING);
 	}
 	
@@ -1438,6 +1470,7 @@ public class ViewportGl extends Viewport {
 		}
 		gl.glMatrixMode(GL_MODELVIEW);
 		gl.glLoadIdentity();
+//		gl.glScalef(1, 1, -1); // switch to left handed coordinate system
 		gl.glEnable(GL_DEPTH_TEST);
 	}
 	
