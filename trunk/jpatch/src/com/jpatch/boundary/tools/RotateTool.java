@@ -34,11 +34,14 @@ public class RotateTool implements JPatchTool {
 	private final ColorSettings colorSettings = Settings.getInstance().colors;
 	private final Point3d[][] points = new Point3d[3][SEGMENTS + 1];
 	private final float[][] COLORS = new float[][] {
-			{ 1.0f, 0.0f, 0.0f },	// x axis
-			{ 0.0f, 0.9f, 0.0f },	// y axis
-			{ 0.4f, 0.4f, 1.0f },	// z axis
-			{ 0.0f, 0.0f, 0.0f },	// outline
-			{ 0.5f, 0.5f, 0.5f}		// grey axis
+			{ 1.0f, 0.0f, 0.0f, 1.0f },	// x axis
+			{ 0.0f, 0.9f, 0.0f, 1.0f },	// y axis
+			{ 0.4f, 0.4f, 1.0f, 1.0f },	// z axis
+			{ 1.0f, 0.0f, 0.0f, 0.5f },	// x axis hidden
+			{ 0.0f, 0.9f, 0.0f, 0.5f },	// y axis hidden
+			{ 0.4f, 0.4f, 1.0f, 0.5f },	// z axis hidden
+			{ 0.5f, 0.5f, 0.5f, 1.0f },	// grey axis
+			{ 0.0f, 0.0f, 0.0f, 1.0f }	// outline
 	};
 	private final static GlMaterial FRONT_MATERIAL, BACK_MATERIAL;
 	static int n = 0;
@@ -49,7 +52,7 @@ public class RotateTool implements JPatchTool {
 	private final Point3d pivot = new Point3d();
 	private final Rotation3d axisRotation = new Rotation3d();
 	private final Rotation3d rotation = new Rotation3d();
-	private double radius = 50.0;
+	private double radius = 10.0;
 	int axisConstraint = -1;
 	private Matrix4d matrix = new Matrix4d();
 	private MouseListener[] mouseListeners;
@@ -91,6 +94,7 @@ public class RotateTool implements JPatchTool {
 		gl.glEnable(GL_LINE_SMOOTH);
 		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		gl.glDisable(GL_LIGHTING);
+		gl.glDisable(GL_CULL_FACE);
 		
 		TransformUtil transformUtil = viewport.getViewDef().getTransformUtil();
 		
@@ -101,11 +105,44 @@ public class RotateTool implements JPatchTool {
 		matrix.m03 = pivot.x;
 		matrix.m13 = pivot.y;
 		matrix.m23 = pivot.z;
+		
+		matrix.m33 = 1;
+		
 		/* set local2world to rotate-tool matrix */ 
 		transformUtil.setLocal2World(matrix);
 		
-		Point3d p = new Point3d();
-		/* draw RGB circles */
+		/* set cameraPivot to pivot in camera space */
+		Point3d cameraPivot = new Point3d();
+		transformUtil.world2Camera(pivot, cameraPivot);
+		
+		Point3d p = new Point3d();	// Point3d object to perform temporary transformations and rendering
+		Point3d p1 = new Point3d();
+		
+		Matrix3d orientMatrix = createOrientTowardsCameraMatrix(transformUtil);
+		
+		gl.glClear(GL_DEPTH_BUFFER_BIT);	// clear depth buffer
+		
+		/*
+		 * draw a disc into the depth-buffer to distinguish front and backside of the sphere
+		 */
+		gl.glColorMask(false, false, false, false);		// disable rendering into the color buffer
+		gl.glBegin(GL_TRIANGLE_FAN);
+		for (int i = 0; i <= SEGMENTS; i++) {
+			p.set(points[2][(i < SEGMENTS) ? i : 0]);
+			p.scale(radius);
+			orientMatrix.transform(p);
+			p.add(cameraPivot);
+			gl.glVertex3d(p.x, p.y, p.z);
+		}
+		gl.glEnd();
+		gl.glColorMask(true, true, true, true);			// enable rendering into the color buffer
+		
+		/*
+		 * draw RGB circles
+		 * pass 0: outline
+		 * pass 1: fill color, thick
+		 * pass 2: fill color, thin, with depth test disabled ("hidden lines")
+		 */
 		for (int pass = 0; pass < 3; pass++) {
 			switch (pass) {
 			case 0:
@@ -123,30 +160,151 @@ public class RotateTool implements JPatchTool {
 			default:
 				throw new RuntimeException();
 			}
-			for (int i = 0; i < 3; i++) {
+			
+			/*
+			 * index 0,1,2 : x,y,z
+			 * index 3,4,5 : x,y,z oriented towards camera
+			 */
+			for (int i = 0; i < 6; i++) {
 				int colorIndex;
-				if (pass == 0) {
-					colorIndex = 3;
-				} else {
-					colorIndex = i;
+				switch (pass) {
+				case 0:
+					colorIndex = 7;
+					break;
+				case 1:
+					if (i < 3) {
+						colorIndex = i;
+					} else {
+						colorIndex = 6;
+					}
+					break;
+				case 2:
+					if (i < 3) {
+						colorIndex = i + 3;
+					} else {
+						colorIndex = 6;
+					}
+					break;
+				default:
+					throw new RuntimeException();
 				}
-				gl.glColor3fv(COLORS[colorIndex], 0);
+				
+				float[] color = COLORS[colorIndex].clone();
+				float alpha = color[3];
+				
+				gl.glColor4fv(COLORS[colorIndex], 0);
 				gl.glBegin(GL_LINE_STRIP);
 				for (int j = 0; j <= SEGMENTS; j++) {
 					p.set(points[i % 3][(j < SEGMENTS) ? j : 0]);
 					p.scale(radius);
-					transformUtil.local2Camera(p, p);
+					if (i < 3) {
+						transformUtil.local2Camera(p, p);
+					} else {
+						orientMatrix.transform(p);
+						p.add(cameraPivot);
+					}
+					p1.set(p);
+					orientMatrix.transform(p1);
+					p1.sub(cameraPivot);
+					p1.scale(1 / radius / transformUtil.getCameraScale() / transformUtil.getCameraScale());
+					color[3] = alpha * ((float) p1.z * 0.4f + 0.6f);
+					gl.glColor4fv(color, 0);
 					gl.glVertex3d(p.x, p.y, p.z);
 				}
 				gl.glEnd();
 			}
 		}
 		
+		/*
+		 * draw rotation great circle
+		 */
+		
+		/* compute rotation matrix */
+		axisRotation.getRotationMatrix(matrix);
+		/* add pivot translation */
+		matrix.m03 = pivot.x;
+		matrix.m13 = pivot.y;
+		matrix.m23 = pivot.z;
+		
+		matrix.m33 = 1;
+		
+		/* set local2world to rotate-tool axis-rotation matrix */ 
+		transformUtil.setLocal2World(matrix);
+		
+		Vector3d axis = new Vector3d();
+		axis.cross(fromVector, toVector);
+		double angle = Math.acos(fromVector.dot(toVector));
+		
+		AxisAngle4d axisAngle = new AxisAngle4d(axis, 0);
+		Matrix3d matrix = new Matrix3d();
+		
+		gl.glBegin(GL_LINE_STRIP);
+		for (int i = 0; i <= SEGMENTS; i++) {
+			axisAngle.angle = i * 2 * Math.PI / SEGMENTS;
+			matrix.set(axisAngle);
+			p.scale(radius, fromVector);
+			matrix.transform(p);
+			transformUtil.local2Camera(p, p);
+			gl.glVertex3d(p.x, p.y, p.z);
+		}
+		gl.glEnd();
+		
+		gl.glColor3f(1, 1, 1);
+		gl.glBegin(GL_LINES);
+		p.scale(radius, fromVector);
+		transformUtil.local2Camera(p, p);
+		gl.glVertex3d(p.x, p.y, p.z);
+		p.scale(radius, toVector);
+		transformUtil.local2Camera(p, p);
+		gl.glVertex3d(p.x, p.y, p.z);
+		gl.glEnd();
+		
 		/* cleanup gl */
 		gl.glDisable(GL_BLEND);
 		gl.glDisable(GL_LINE_SMOOTH);
 		gl.glEnable(GL_LIGHTING);
-		
+		gl.glEnable(GL_CULL_FACE);
+	}
+	
+	/**
+	 * Returns a new Matrix3d that transforms from camera space to a space that always faces
+	 * towards the viewer.
+	 * @param transformUtil the ViewDef's TransformUtil
+	 * @return a new Matrix3d that transforms from camera space to a space that always faces
+	 * towards the viewer.
+	 */
+	private Matrix3d createOrientTowardsCameraMatrix(TransformUtil transformUtil) {
+		if (!transformUtil.isPerspective()) {
+			/* if this is an orthographic projection, return the identity matrix */
+			double scale = transformUtil.getCameraScale();
+			return new Matrix3d(
+					scale, 0, 0,
+					0, scale, 0,
+					0, 0, scale
+			);
+		} else {
+			/* perspective projection */
+			/* set cameraPivot to camera-space pivot and compute vector from pivot to camera*/
+			Point3d cameraPivot = new Point3d();
+			transformUtil.world2Camera(pivot, cameraPivot);
+
+			Vector3d x = new Vector3d(), y = new Vector3d(), z = new Vector3d();
+			
+			/* set z vector to point towards camera and normlaize it */
+			z.set(-cameraPivot.x, -cameraPivot.y, -cameraPivot.z);
+			z.normalize();
+			
+			x.set(1, 0, 0);		// camera space right vector
+			y.cross(x, z);		// compute up vector
+			x.cross(z, y);		// compute right vector
+			
+			/* create and return the 3x3 transformation matrix */
+			return new Matrix3d(
+					x.x, y.x, z.x,
+					x.y, y.y, z.y,
+					x.z, y.z, z.z
+			);
+		}
 	}
 	
 	public void draw2(Viewport viewport) {
@@ -516,7 +674,6 @@ public class RotateTool implements JPatchTool {
 	}
 	
 	public void registerListeners(Viewport[] viewports) {
-		if (true) return; // FIXME
 		if (mouseListeners != null) {
 			throw new IllegalStateException("already registered");
 		}
@@ -528,7 +685,6 @@ public class RotateTool implements JPatchTool {
 	}
 	
 	public void unregisterListeners(Viewport[] viewports) {
-		if (true) return; // FIXME
 		System.out.println("MoveVertexTool unregisterListeners");
 		for (int i = 0; i < viewports.length; i++) {
 			viewports[i].getComponent().removeMouseListener(mouseListeners[i]);
@@ -647,7 +803,54 @@ public class RotateTool implements JPatchTool {
 		return antiRotation;
 	}
 	
-	private boolean setIntersectionVector(Viewport viewport, int mouseX, int mouseY, int constraintAxis, Vector3d vector) {
+	private Point3d getIntersectionPoint(TransformUtil transformUtil, int mouseX, int mouseY, int constraintAxis) {
+		/* set cameraPivot to pivot in camera space */
+		Point3d cameraPivot = new Point3d();
+		transformUtil.world2Camera(pivot, cameraPivot);
+		
+		double cameraRadius = radius * transformUtil.getCameraScale();
+		
+		Point3d rayOrigin = new Point3d();
+		Vector3d rayDirection = new Vector3d();
+		if (transformUtil.isPerspective()) {
+			rayOrigin.set(0, 0, 0);
+			rayDirection.set(mouseX, mouseY, 1);
+			transformUtil.screen2Camera(rayDirection, rayDirection);
+			rayDirection.z = -1; // TODO: WHY?
+		} else {
+			rayOrigin.set(mouseX, mouseY, 0);
+			transformUtil.screen2Camera(rayOrigin, rayOrigin);
+			rayDirection.set(0, 0, -1);
+		}
+		
+//		System.out.println("ray origin=" + rayOrigin + " direction=" + rayDirection);
+		Point3d intersectionPoint = new Point3d();
+		
+		boolean hit = Utils3d.raySphereIntersection(rayOrigin, rayDirection, cameraPivot, cameraRadius, intersectionPoint, true);
+		if (hit) {
+			/* compute rotation matrix */
+			axisRotation.getRotationMatrix(matrix);
+			/* add pivot translation */
+			matrix.m03 = pivot.x;
+			matrix.m13 = pivot.y;
+			matrix.m23 = pivot.z;
+			
+			matrix.m33 = 1;
+			
+			/* set local2world to rotate-tool axis-rotation matrix */ 
+			transformUtil.setLocal2World(matrix);
+			
+			transformUtil.camera2Local(intersectionPoint, intersectionPoint);
+//			System.out.println("hit at " + intersectionPoint);
+			return intersectionPoint;
+		} else {
+//			System.out.println("miss");
+		}
+		
+		return null;
+	}
+	
+	private boolean setIntersectionVector2(Viewport viewport, int mouseX, int mouseY, int constraintAxis, Vector3d vector) {
 		double x = mouseX - viewport.getComponent().getWidth() * 0.5;
 		double y = viewport.getComponent().getHeight() * 0.5 - mouseY;
 		Point3d rayOrigin = new Point3d();
@@ -800,12 +1003,20 @@ public class RotateTool implements JPatchTool {
 		}
 		@Override
 		public void mousePressed(MouseEvent e) {
-			int constraint = getHitCircle(viewport, e.getX(), e.getY());
-			axisConstraint = constraint;
-			if (setIntersectionVector(viewport, e.getX(), e.getY(), constraint, fromVector)) {
-				mouseMotionListener = new HitMouseMotionListener(viewport, constraint);
+//			int constraint = getHitCircle(viewport, e.getX(), e.getY());
+//			axisConstraint = constraint;
+			
+			Point3d hitPoint = getIntersectionPoint(viewport.getViewDef().getTransformUtil(), e.getX(), e.getY(), 0);
+			if (hitPoint != null) {
+				fromVector.set(hitPoint);
+				fromVector.normalize();
+				mouseMotionListener = new HitMouseMotionListener(viewport, 0);
 				viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 			}
+//			if (setIntersectionVector(viewport, e.getX(), e.getY(), constraint, fromVector)) {
+//				mouseMotionListener = new HitMouseMotionListener(viewport, constraint);
+//				viewport.getComponent().addMouseMotionListener(mouseMotionListener);
+//			}
 //			System.out.println(getHitCircle(viewport, e.getX(), e.getY()));
 		}
 		@Override
@@ -834,8 +1045,13 @@ public class RotateTool implements JPatchTool {
 		}
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			System.out.println(constraint);
-			if (setIntersectionVector(viewport, e.getX(), e.getY(), constraint, toVector)) {
+//			System.out.println(constraint);
+			Point3d hitPoint = getIntersectionPoint(viewport.getViewDef().getTransformUtil(), e.getX(), e.getY(), 0);
+			if (hitPoint != null) {
+				toVector.set(hitPoint);
+				toVector.normalize();
+				
+//				System.out.println(fromVector + " - " + toVector);
 				Vector3d axis = new Vector3d(1, 0, 0);
 //				System.out.println(fromVector.dot(toVector));
 				double angle = 0;
@@ -848,8 +1064,8 @@ public class RotateTool implements JPatchTool {
 				Matrix3d m = new Matrix3d();
 				axisRotation.getRotationMatrix(m);
 				m.invert();
-				m.transform(axis);
-				axis.normalize();
+				//m.transform(axis);
+				//axis.normalize();
 				m.set(new AxisAngle4d(axis, angle));
 				rotation.setRotation(m);
 //				switch (constraint) {

@@ -13,8 +13,16 @@ public class Utils3d {
 	 * Returns a new 4x4 identity matrix
 	 * @return a new 4x4 identity matrix
 	 */
-	public static final Matrix4d createIdentityMatrix() {
-		return new Matrix4d( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+	public static final Matrix4d createIdentityMatrix4d() {
+		return new Matrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+	}
+	
+	/**
+	 * Returns a new 3x3 identity matrix
+	 * @return a new 3x3 identity matrix
+	 */
+	public static final Matrix3d createIdentityMatrix3d() {
+		return new Matrix3d(1, 0, 0, 0, 1, 0, 0, 0, 1);
 	}
 	
 	/**

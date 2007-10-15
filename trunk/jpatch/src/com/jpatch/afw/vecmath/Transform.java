@@ -7,11 +7,11 @@ public abstract class Transform {
 	/**
 	 * The transformation matrix
 	 */
-	protected final Matrix4d matrix = Utils3d.createIdentityMatrix();
+	protected final Matrix4d matrix = Utils3d.createIdentityMatrix4d();
 	/**
 	 * The invertex transformation matrix
 	 */
-	protected final Matrix4d invMatrix = Utils3d.createIdentityMatrix();
+	protected final Matrix4d invMatrix = Utils3d.createIdentityMatrix4d();
 	/**
 	 * Flag to tell if the invertex matrix is invalid (true) or valid (false)
 	 */

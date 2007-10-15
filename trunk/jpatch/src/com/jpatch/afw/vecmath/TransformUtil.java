@@ -24,7 +24,7 @@ import javax.vecmath.*;
 public class TransformUtil {
 	
 	/** Camera to local space transformation matrix */
-	private Matrix4d camera2Local = Utils3d.createIdentityMatrix();
+	private Matrix4d camera2Local = Utils3d.createIdentityMatrix4d();
 	
 	/** Flag to tell whether camera2Local is invalid, used for lazy evaluation of the camera2Local matrix */
 	private boolean camera2LocalInvalid = false;
@@ -34,19 +34,19 @@ public class TransformUtil {
 	 * If an orthographic projection is used, this matrix is supposed to also
 	 * contain a scale component.
 	 */
-	private Matrix4d camera2World = Utils3d.createIdentityMatrix();
+	private Matrix4d camera2World = Utils3d.createIdentityMatrix4d();
 	
 	/** Flag to tell whether camera2World is invalid, used for lazy evaluation of the camera2World matrix */
 	private boolean camera2WorldInvalid = false;
 	
 	/** Local to camera space transformation matrix */
-	private Matrix4d local2Camera = Utils3d.createIdentityMatrix();
+	private Matrix4d local2Camera = Utils3d.createIdentityMatrix4d();
 	
 	/** Flag to tell whether local2Camera is invalid, used for lazy evaluation of the local2Camera matrix */
 	private boolean local2CameraInvalid = false;
 	
 	/** Local to world space transformation matrix */
-	private Matrix4d local2World = Utils3d.createIdentityMatrix();
+	private Matrix4d local2World = Utils3d.createIdentityMatrix4d();
 	
 	/** Flag to tell whether local2World is invalid, used for lazy evaluation of the local2World matrix */
 	private boolean local2WorldInvalid = false;
@@ -68,13 +68,13 @@ public class TransformUtil {
 	 * If an orthographic projection is used, this matrix is supposed to also
 	 * contain a scale component.
 	 */
-	private Matrix4d world2Camera = Utils3d.createIdentityMatrix();
+	private Matrix4d world2Camera = Utils3d.createIdentityMatrix4d();
 	
 	/** Flag to tell whether world2Camera is invalid, used for lazy evaluation of the world2Camera matrix */
 	private boolean world2CameraInvalid = false;
 	
 	/** world to local space transformation matrix */
-	private Matrix4d world2Local = Utils3d.createIdentityMatrix();
+	private Matrix4d world2Local = Utils3d.createIdentityMatrix4d();
 	
 	/** Flag to tell whether world2Local is invalid, used for lazy evaluation of the world2Local matrix */
 	private boolean world2LocalInvalid = false;
@@ -112,7 +112,7 @@ public class TransformUtil {
 	 * @param in the point in camera space
 	 * @param out this point will be set to the point in screen coordinates. May be the same Point3d object as <i>in</i>
 	 */
-	public void camera2Screen(Point3d in, Point3d out) {
+	public void camera2Screen(Tuple3d in, Tuple3d out) {
 		if (perspective) {
 			double w = viewportWidth * relativeFocalLength / in.z;
 			out.x = viewportWidth * 0.5 + in.x * w;
@@ -133,11 +133,11 @@ public class TransformUtil {
 	 * @param in the point in screen coordinates
 	 * @param out this point will be set to the point in camera space. May be the same Point3d object as <i>in</i>
 	 */
-	public void screen2Camera(Point3d in, Point3d out) {
+	public void screen2Camera(Tuple3d in, Tuple3d out) {
 		if (perspective) {
 			double w = in.z / (viewportWidth * relativeFocalLength);
-			out.x = in.x * w - viewportWidth * 0.5;
-			out.y = viewportHeight * 0.5 - in.y * w;
+			out.x = (in.x - viewportWidth * 0.5) * w;
+			out.y = (viewportHeight * 0.5 - in.y) * w;
 		} else {
 			out.x = in.x - viewportWidth * 0.5;
 			out.y = viewportHeight * 0.5 - in.y;
@@ -472,6 +472,18 @@ public class TransformUtil {
 		computeLocal2Camera();
 		modelView.set(local2Camera);
 		return modelView;
+	}
+	
+	public double getCameraScale() {
+		return world2Camera.getScale();
+	}
+	
+	public double getRelativeFocalLength() {
+		return relativeFocalLength;
+	}
+	
+	public boolean isPerspective() {
+		return perspective;
 	}
 	
 	public void setLocalTransform(Transform transform) {

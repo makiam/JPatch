@@ -41,6 +41,7 @@ public class PerspectiveViewDef extends AbstractViewDef {
 		perspective.getTransform().computeMatrix();
 		transformUtil.setCameraTransform(perspective.getTransform());
 		transformUtil.setPerspectiveProjection(getRelativeFocalLength());
+		transformUtil.setViewportDimension(viewport.getComponent().getWidth(), viewport.getComponent().getHeight());
 //		Matrix4d matrix = perspective.getTransform().getMatrix(new Matrix4d());
 //		
 //		/* rotate the camera to look down the positive z axis */
