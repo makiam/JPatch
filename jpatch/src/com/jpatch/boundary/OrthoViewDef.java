@@ -7,7 +7,7 @@ import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.vecmath.*;
 
 public class OrthoViewDef extends AbstractViewDef {
-	private final Matrix4d matrix = Utils3d.createIdentityMatrix();
+	private final Matrix4d matrix = Utils3d.createIdentityMatrix4d();
 	private final Tuple2Attr translationAttr = new Tuple2Attr(0.0, 0.0);
 	private final Tuple2Attr rotationAttr = new Tuple2Attr();
 	private final DoubleAttr scaleAttr = new DoubleAttr(1.0);
