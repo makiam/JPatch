@@ -68,7 +68,7 @@ public class TransformUtil {
 	 * If an orthographic projection is used, this matrix is supposed to also
 	 * contain a scale component.
 	 */
-	private Matrix4d world2Camera = Utils3d.createIdentityMatrix4d();
+	public Matrix4d world2Camera = Utils3d.createIdentityMatrix4d();
 	
 	/** Flag to tell whether world2Camera is invalid, used for lazy evaluation of the world2Camera matrix */
 	private boolean world2CameraInvalid = false;
@@ -472,6 +472,13 @@ public class TransformUtil {
 		computeLocal2Camera();
 		modelView.set(local2Camera);
 		return modelView;
+	}
+	
+	public Matrix3d getCameraToWorldRotation(Matrix3d rotationMatrix) {
+		computeCamera2World();
+		camera2World.getRotationScale(rotationMatrix);
+		rotationMatrix.normalize();
+		return rotationMatrix;
 	}
 	
 	public double getCameraScale() {
