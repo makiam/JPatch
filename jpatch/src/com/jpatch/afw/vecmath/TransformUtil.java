@@ -117,11 +117,12 @@ public class TransformUtil {
 			double w = viewportWidth * relativeFocalLength / in.z;
 			out.x = viewportWidth * 0.5 + in.x * w;
 			out.y = viewportHeight * 0.5 - in.y * w;
+			out.z = -in.z;	// camera looks down positive(!) z-axis
 		} else {
 			out.x = viewportWidth * 0.5 + in.x;
 			out.y = viewportHeight * 0.5 - in.y;
+			out.z = in.z;
 		}
-		out.z = in.z;
 	}
 	
 	/**
@@ -138,11 +139,12 @@ public class TransformUtil {
 			double w = in.z / (viewportWidth * relativeFocalLength);
 			out.x = (in.x - viewportWidth * 0.5) * w;
 			out.y = (viewportHeight * 0.5 - in.y) * w;
+			out.z = -in.z;	// camera looks down positive(!) z-axis
 		} else {
 			out.x = in.x - viewportWidth * 0.5;
 			out.y = viewportHeight * 0.5 - in.y;
+			out.z = in.z;
 		}
-		out.z = in.z;
 	}
 	
 	/**
