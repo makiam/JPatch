@@ -1030,7 +1030,8 @@ public class RotateTool implements JPatchTool {
 	 * @param result a vector pointing from the pivot to the point on the circle closest to mouseX, mouseY (in camera space)
 	 * @returns the screen-space distance, in pixel
 	 */
-	private double distToCircle(TransformUtil transformUtil, int mouseX, int mouseY, Vector3d cameraAxis, Vector3d result) {
+	private double distToCircle(Viewport viewport, TransformUtil transformUtil, int mouseX, int mouseY, Vector3d cameraAxis, Vector3d result) {
+		
 		/* set cameraPivot to pivot in camera space */
 		Point3d cameraPivot = new Point3d();
 		transformUtil.world2Camera(pivot, cameraPivot);
@@ -1058,9 +1059,9 @@ public class RotateTool implements JPatchTool {
 			double rsin = r * SIN[index];
 			p1.set(p0);
 			p0.set(
-					u.x * rcos + v.x * rsin + pivot.x,
-					u.y * rcos + v.y * rsin + pivot.y,
-					u.z * rcos + v.z * rsin + pivot.z
+					u.x * rcos + v.x * rsin + cameraPivot.x,
+					u.y * rcos + v.y * rsin + cameraPivot.y,
+					u.z * rcos + v.z * rsin + cameraPivot.z
 			);
 			if (i >= 0) {
 				transformUtil.camera2Screen(p0, p0s);
@@ -1070,8 +1071,10 @@ public class RotateTool implements JPatchTool {
 				double t = Utils3d.closestPointOnLine(p0s.x, p0s.y, p1s.x, p1s.y, mouseX, mouseY);
 				t = Math.min(1, Math.max(0, t));
 				
-				p.interpolate(p0, p1, t);
-				transformUtil.camera2Screen(p, ps);
+				ps.interpolate(p0s, p1s, t);
+				transformUtil.screen2Camera(ps, p);
+				
+				viewport.getComponent().getGraphics().fillRect((int) p0s.x, (int) p0s.y, 3, 3);
 				
 				double dx = ps.x - mouseX;
 				double dy = ps.y - mouseY;
@@ -1177,10 +1180,23 @@ public class RotateTool implements JPatchTool {
 //			axisConstraint = constraint;
 			TransformUtil transformUtil = viewport.getViewDef().getTransformUtil();
 			
+			/* compute rotation matrix */
+			axisRotation.getRotationMatrix(matrix);
+			/* add pivot translation */
+			matrix.m03 = pivot.x;
+			matrix.m13 = pivot.y;
+			matrix.m23 = pivot.z;
+			
+			matrix.m33 = 1;
+			
+			/* set local2world to rotate-tool axis-rotation matrix */ 
+			transformUtil.setLocal2World(matrix);
+			
+			
 			Vector3d cameraAxis = new Vector3d(1, 0, 0);
 			transformUtil.local2Camera(cameraAxis, cameraAxis);
 			cameraAxis.normalize();
-			System.out.println(distToCircle(transformUtil, e.getX(), e.getY(), cameraAxis, new Vector3d()));
+			System.out.println(distToCircle(viewport, transformUtil, e.getX(), e.getY(), cameraAxis, new Vector3d()));
 			
 			Point3d hitPoint = getIntersectionPoint(transformUtil, e.getX(), e.getY());
 			if (hitPoint != null) {

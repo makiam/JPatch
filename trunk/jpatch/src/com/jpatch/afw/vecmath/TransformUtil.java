@@ -114,10 +114,12 @@ public class TransformUtil {
 	 */
 	public void camera2Screen(Tuple3d in, Tuple3d out) {
 		if (perspective) {
-			double w = viewportWidth * relativeFocalLength / in.z;
+			double w = -viewportWidth * relativeFocalLength / in.z;
 			out.x = viewportWidth * 0.5 + in.x * w;
 			out.y = viewportHeight * 0.5 - in.y * w;
 			out.z = -in.z;	// camera looks down positive(!) z-axis
+			
+			System.out.println("camera2Screen: " + in + " -> " + out);
 		} else {
 			out.x = viewportWidth * 0.5 + in.x;
 			out.y = viewportHeight * 0.5 - in.y;
