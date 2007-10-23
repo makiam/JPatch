@@ -36,11 +36,11 @@ public class Demo {
 		Configuration.getInstance().put("locale", Locale.GERMAN);
 		Configuration.getInstance().put("stringResource", "com/jpatch/afw/demo/Strings");
 		StateMachine<Integer> stateMachine = new StateMachine<Integer>(new Integer[] { 1, 2, 3 }, 1) {
-			@Override
-			protected boolean performStateTransition(Integer newState) {
-				System.out.println("Switching to state " + newState);
-				return true;
-			}
+//			@Override
+//			protected boolean performStateTransition(Integer newState) {
+//				System.out.println("Switching to state " + newState);
+//				return true;
+//			}
 		};
 		
 		JPatchAction openAction = new JPatchAction(null, "OPEN") {
@@ -70,10 +70,10 @@ public class Demo {
 				new SwitchStateAction(stateMachine, 3, null, "STATE_3")
 		};
 		
-		openAction.setKeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
-		ssa[0].setKeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, KeyEvent.SHIFT_DOWN_MASK));
-		ssa[1].setKeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, KeyEvent.ALT_DOWN_MASK));
-		ssa[2].setKeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.META_DOWN_MASK));
+//		openAction.setKeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+//		ssa[0].setKeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, KeyEvent.SHIFT_DOWN_MASK));
+//		ssa[1].setKeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, KeyEvent.ALT_DOWN_MASK));
+//		ssa[2].setKeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.META_DOWN_MASK));
 		
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

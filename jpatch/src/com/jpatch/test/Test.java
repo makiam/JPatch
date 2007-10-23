@@ -99,12 +99,12 @@ public class Test {
 		
 		frame.setSize(1024, 768);
 		frame.setVisible(true);
-		actions.toolSM.addAttributeListener(new AttributePreChangeAdapter() {
-
-			@Override
-			public void attributeHasChanged(ScalarAttribute source) {
-				System.out.println(((StateMachine) source).getState());
-			}
-		});
+//		actions.toolSM.addAttributeListener(new AttributePreChangeAdapter() {
+//
+//			@Override
+//			public void attributeHasChanged(ScalarAttribute source) {
+//				System.out.println(((StateMachine) source).getState());
+//			}
+//		});
 	}
 }

@@ -40,6 +40,7 @@ import com.jpatch.boundary.actions.Actions;
 import com.jpatch.boundary.actions.Actions.ViewportMode;
 import com.jpatch.boundary.tools.JPatchTool;
 import com.jpatch.boundary.tools.RotateTool;
+import com.jpatch.boundary.tools.VisibleTool;
 import com.jpatch.entity.Camera;
 import com.jpatch.entity.SceneGraphNode;
 import com.jpatch.entity.SdsModel;
@@ -102,6 +103,7 @@ public class Main {
 	private CollectionAttr<ViewDirection> viewDirectionsAttr = new CollectionAttr<ViewDirection>(TreeSet.class, OrthoViewDirection.DIRECTIONS);
 	
 	private Selection selection = new Selection();
+	private JPatchTool visibleTool = null;
 	
 	private SceneGraphNode sceneGraphRoot = new SceneGraphNode() {
 		@Override
@@ -360,7 +362,16 @@ public class Main {
 		});
 //		screen.setOpaque(false);
 		
-		
+		actions.toolSM.addAttributePreChangeListener(new AttributePreChangeAdapter<JPatchTool>() {
+			@Override
+			public JPatchTool attributeWillChange(ScalarAttribute source, JPatchTool value) {
+				JPatchTool currentTool = actions.toolSM.getValue();
+				if (currentTool instanceof VisibleTool) {
+					visibleTool = currentTool;
+				}
+				return value;
+			}
+		});
 		
 		Box statusBar = new Box(SwingConstants.HORIZONTAL) {
 			public void paintComponent(Graphics g) {
@@ -494,8 +505,8 @@ public class Main {
 //		final TransformNode node4 = new TransformNode();
 		
 		try {
-			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
-//			final SdsModel model2 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
+//			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt")));
+			final SdsModel model1 = new SdsModel(new Sds(new FileInputStream("/home/sascha/off/cube.off")));
 //			final SdsModel model3 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
 			model1.getNameAttribute().setValue("model 1");
 			model1.getParentAttribute().setValue(sceneGraphRoot);
@@ -687,7 +698,12 @@ public class Main {
 	
 	public JPatchTool getActiveTool() {
 //		return actions.toolSM.getValue();
-		return actions.toolSM.getValue();
+		JPatchTool currentTool = actions.toolSM.getValue();
+		if (currentTool instanceof VisibleTool) {
+			return currentTool;
+		} else {
+			return visibleTool;
+		}
 	}
 	
 	public void setActiveSds(Sds sds) {

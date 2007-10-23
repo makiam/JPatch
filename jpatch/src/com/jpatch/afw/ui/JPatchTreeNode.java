@@ -88,8 +88,8 @@ public class JPatchTreeNode extends DefaultMutableTreeNode implements Comparable
 	@Override
 	public void setParent(MutableTreeNode newParent) {
 		super.setParent(newParent);
-		JPatchObject userParent = newParent == null ? null : ((JPatchTreeNode) newParent).getUserObject();
-		getUserObject().setParent(userParent); 
+//		JPatchObject userParent = newParent == null ? null : ((JPatchTreeNode) newParent).getUserObject();
+//		getUserObject().setParent(userParent); 
 	}
 
 //	@Override
@@ -102,11 +102,11 @@ public class JPatchTreeNode extends DefaultMutableTreeNode implements Comparable
 		this.treeModel = treeModel;
 	}
 
-	public void attributeChanged(Attribute attribute) {
-		JPatchTreeNode parent = (JPatchTreeNode) getParent();
-		removeFromParent();
-		parent.add(this);
-	}
+//	public void attributeChanged(Attribute attribute) {
+//		JPatchTreeNode parent = (JPatchTreeNode) getParent();
+//		removeFromParent();
+//		parent.add(this);
+//	}
 
 	public int compareTo(Object o) {
 		System.out.println(this + " compareTo " + o);
