@@ -119,7 +119,7 @@ public class TransformUtil {
 			out.y = viewportHeight * 0.5 - in.y * w;
 			out.z = -in.z;	// camera looks down positive(!) z-axis
 			
-			System.out.println("camera2Screen: " + in + " -> " + out);
+//			System.out.println("camera2Screen: " + in + " -> " + out);
 		} else {
 			out.x = viewportWidth * 0.5 + in.x;
 			out.y = viewportHeight * 0.5 - in.y;

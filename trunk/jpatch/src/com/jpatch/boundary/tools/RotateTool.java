@@ -28,6 +28,7 @@ import javax.vecmath.*;
 import static javax.media.opengl.GL.*;
 
 public class RotateTool implements VisibleTool {
+	private static final double SCREEN_ROTATE_FACTOR = 1.2;
 	private static final int SEGMENTS = 128;
 	private static final int CIRCLE_SEGMENTS = 128; //4096;
 	private static final double[] COS = new double[CIRCLE_SEGMENTS];
@@ -181,7 +182,7 @@ public class RotateTool implements VisibleTool {
 				if (i == 3 || i == 4) {
 					continue;
 				}
-				double ringRadius = (i == 5) ? vv.offsetRadius * 1.2: vv.radius;
+				double ringRadius = (i == 5) ? vv.offsetRadius * SCREEN_ROTATE_FACTOR : vv.radius;
 				int colorIndex;
 				switch (pass) {
 				case 0:
@@ -596,7 +597,7 @@ public class RotateTool implements VisibleTool {
 	/**
 	 * Computes the distance in pixel from the screen point specified by mouseX and mouseY to the
 	 * circle specified by cameraAxis and the member-variables pivot and radius (projected into
-	 * screen space).
+	 * screen space). // FIXME
 	 * @param transformUtil
 	 * @param mouseX
 	 * @param mouseY
@@ -604,7 +605,7 @@ public class RotateTool implements VisibleTool {
 	 * @param result a vector pointing from the pivot to the point on the circle closest to mouseX, mouseY (in camera space)
 	 * @returns the screen-space distance, in pixel
 	 */
-	private double distToCircle(ViewportVars vv, int mouseX, int mouseY, Vector3d cameraAxis, Vector3d result) {
+	private double distToCircle(ViewportVars vv, int mouseX, int mouseY, Vector3d cameraAxis, boolean orient, Vector3d result) {
 		
 		
 		Vector3d axis = new Vector3d();
@@ -622,22 +623,29 @@ public class RotateTool implements VisibleTool {
 		
 		double minDistSq = 64;
 		boolean frontsideOnly = false;
-		double r = vv.transformUtil.getCameraScale() * vv.radius;
-		
+		double r, offset;
+		if (orient) {
+			r = vv.transformUtil.getCameraScale() * vv.offsetRadius * SCREEN_ROTATE_FACTOR;
+			offset = vv.offsetFactor;
+		} else {
+			r = vv.transformUtil.getCameraScale() * vv.radius;
+			offset = 1;
+		}
 		for (int i = -1; i < CIRCLE_SEGMENTS; i++) {
 			int index = i == -1 ? CIRCLE_SEGMENTS - 1 : i;
 			double rcos = r * COS[index];
 			double rsin = r * SIN[index];
 			p1.set(p0);
 			p0.set(
-					u.x * rcos + v.x * rsin + vv.cameraPivot.x,
-					u.y * rcos + v.y * rsin + vv.cameraPivot.y,
-					u.z * rcos + v.z * rsin + vv.cameraPivot.z
+					u.x * rcos + v.x * rsin + offset * vv.cameraPivot.x,
+					u.y * rcos + v.y * rsin + offset * vv.cameraPivot.y,
+					u.z * rcos + v.z * rsin + offset * vv.cameraPivot.z
 			);
 			if (i >= 0) {
 				vv.transformUtil.camera2Screen(p0, p0s);
 				vv.transformUtil.camera2Screen(p1, p1s);
 				
+				vv.viewport.getComponent().getGraphics().drawLine((int) p0s.x, (int) p0s.y, (int) p1s.x, (int) p1s.y);
 				double t = Utils3d.closestPointOnLine(p0s.x, p0s.y, p1s.x, p1s.y, mouseX, mouseY);
 				t = Math.min(1, Math.max(0, t));
 				
@@ -764,32 +772,32 @@ public class RotateTool implements VisibleTool {
 			/* check if an axis-circle was hit */
 			Vector3d cameraAxis = new Vector3d();
 			for (int i = 0; i < 4; i++) {
+				boolean orient = false;
 				switch (i) {
 				case 0:
 					cameraAxis.set(1, 0, 0);
 					transformUtil.local2Camera(cameraAxis, cameraAxis);
-					cameraAxis.normalize();
 					break;
 				case 1:
 					cameraAxis.set(0, 1, 0);
 					transformUtil.local2Camera(cameraAxis, cameraAxis);
-					cameraAxis.normalize();
 					break;
 				case 2:
 					cameraAxis.set(0, 0, 1);
 					transformUtil.local2Camera(cameraAxis, cameraAxis);
-					cameraAxis.normalize();
 					break;
 				case 3:
-					cameraAxis.set(1, 0, 0);
-					transformUtil.local2Camera(cameraAxis, cameraAxis);
-					cameraAxis.normalize();
+					cameraAxis.set(0, 0, 1);
+					vv.orientMatrix.transform(cameraAxis);
+					orient = true;
 					break;
 				}
+				cameraAxis.normalize();
+				System.out.println(i + " " + orient + " " + distToCircle(vv, e.getX(), e.getY(), cameraAxis, orient, new Vector3d()));
 			}
-			transformUtil.local2Camera(cameraAxis, cameraAxis);
-			cameraAxis.normalize();
-			System.out.println(distToCircle(vv, e.getX(), e.getY(), cameraAxis, new Vector3d()));
+//			transformUtil.local2Camera(cameraAxis, cameraAxis);
+//			cameraAxis.normalize();
+//			System.out.println(distToCircle(vv, e.getX(), e.getY(), cameraAxis, new Vector3d()));
 			
 			Point3d hitPoint = getIntersectionPoint(vv, e.getX(), e.getY());
 			if (hitPoint != null) {
@@ -887,6 +895,7 @@ public class RotateTool implements VisibleTool {
 	}
 	
 	class ViewportVars {
+		final Viewport viewport; //FIXME only needed for debugging
 		final double radius;
 		final double offsetFactor;
 		final double offsetRadius;
@@ -895,6 +904,7 @@ public class RotateTool implements VisibleTool {
 		final Matrix3d orientMatrix = new Matrix3d();
 		
 		ViewportVars(Viewport viewport) {
+			this.viewport = viewport;
 			transformUtil = viewport.getViewDef().getTransformUtil();
 			
 			/* set cameraPivot to pivot in camera space */
