@@ -3,9 +3,13 @@ package com.jpatch.boundary.tools;
 import java.awt.Dimension;
 import java.awt.event.*;
 import java.awt.geom.Line2D;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import com.jpatch.afw.attributes.GenericAttr;
 import com.jpatch.afw.attributes.Tuple3Attr;
+import com.jpatch.afw.control.JPatchUndoableEdit;
 import com.jpatch.afw.vecmath.Rotation3d;
 import com.jpatch.afw.vecmath.Sphere;
 import com.jpatch.afw.vecmath.TransformUtil;
@@ -18,6 +22,7 @@ import com.jpatch.boundary.ViewDef;
 import com.jpatch.boundary.ViewDirection;
 import com.jpatch.boundary.Viewport;
 import com.jpatch.boundary.ViewportGl;
+import com.jpatch.boundary.actions.Actions;
 import com.jpatch.entity.BasicMaterial;
 import com.jpatch.entity.GlMaterial;
 import com.jpatch.settings.ColorSettings;
@@ -30,6 +35,7 @@ import javax.vecmath.*;
 import static javax.media.opengl.GL.*;
 
 public class RotateTool implements VisibleTool {
+	public static final GenericAttr<String> EDIT_NAME = new GenericAttr<String>("rotate");
 	private static final double SCREEN_ROTATE_FACTOR = 1.2;
 	private static final int SEGMENTS = 128;
 	private static final int CIRCLE_SEGMENTS = 128; //4096;
@@ -895,7 +901,9 @@ public class RotateTool implements VisibleTool {
 				axisRotationAttr.setTuple(axisRotation);
 				rotationAttr.setTuple(rotation);
 				Selection selection = Main.getInstance().getSelection();
-				selection.end();
+				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(selection.getVertexCount());
+				selection.end(editList);
+				Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
 				Main.getInstance().repaintViewports();
 			}
 		}

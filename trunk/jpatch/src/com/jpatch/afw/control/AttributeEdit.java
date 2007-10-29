@@ -1,10 +1,8 @@
-package jpatch.control;
+package com.jpatch.afw.control;
 
 import javax.vecmath.*;
 
-import jpatch.control.edit2.JPatchUndoableEdit;
 import com.jpatch.afw.attributes.*;
-import com.jpatch.afw.control.AbstractUndoableEdit;
 
 /**
  * This class provides factory methods to manipulate Attributes.
@@ -103,7 +101,7 @@ public abstract class AttributeEdit extends AbstractUndoableEdit {
 	 * @param changeNow set to true to apply the change now
 	 * @return a new JPatchUndoableEdit object that encapsulates the specified modification
 	 */
-	public static JPatchUndoableEdit changeAttribute(Tuple3Attr attr, Tuple3f tuple, boolean changeNow) {
+	public static JPatchUndoableEdit changeAttribute(Tuple3Attr attr, Tuple3d tuple, boolean changeNow) {
 		return changeAttribute(attr, tuple.x, tuple.y, tuple.z, changeNow);
 	}
 	
@@ -151,17 +149,14 @@ public abstract class AttributeEdit extends AbstractUndoableEdit {
 	/**
 	 * JPatchUndoableEdit that modifies a double Attribute
 	 */
-	private static final class Double extends AbstractUndoableEdit {
+	private static final class Double extends AttributeEdit {
 		private final DoubleAttr attr;
 		double value;
 		
 		private Double(DoubleAttr attr, double value, boolean changeNow) {
 			this.attr = attr;
 			this.value = value;
-			if (changeNow) {
-				swap();
-				applied = true;
-			}
+			apply(changeNow);
 		}
 		
 		@Override
@@ -175,17 +170,14 @@ public abstract class AttributeEdit extends AbstractUndoableEdit {
 	/**
 	 * JPatchUndoableEdit that modifies an integer Attribute
 	 */
-	private static final class Integer extends SwapperEdit {
+	private static final class Integer extends AttributeEdit {
 		private final IntAttr attr;
 		private int value;
 		
 		private Integer(IntAttr attr, int value, boolean changeNow) {
 			this.attr = attr;
 			this.value = value;
-			if (changeNow) {
-				swap();
-				applied = true;
-			}
+			apply(changeNow);
 		}
 		
 		@Override
@@ -199,17 +191,14 @@ public abstract class AttributeEdit extends AbstractUndoableEdit {
 	/**
 	 * JPatchUndoableEdit that modifies an integer Attribute
 	 */
-	private static final class Boolean extends SwapperEdit {
+	private static final class Boolean extends AttributeEdit {
 		private final BooleanAttr attr;
 		private boolean value;
 		
 		private Boolean(BooleanAttr attr, boolean value, boolean changeNow) {
 			this.attr = attr;
 			this.value = value;
-			if (changeNow) {
-				swap();
-				applied = true;
-			}
+			apply(changeNow);
 		}
 		
 		@Override
@@ -223,17 +212,14 @@ public abstract class AttributeEdit extends AbstractUndoableEdit {
 	/**
 	 * JPatchUndoableEdit that modifies a tuple Attribute
 	 */
-	private static final class Tuple2 extends SwapperEdit {
+	private static final class Tuple2 extends AttributeEdit {
 		private final Tuple2Attr attr;
 		private final Tuple2d value = new Point2d();
 		
 		private Tuple2(Tuple2Attr attr, double x, double y, boolean changeNow) {
 			this.attr = attr;
 			this.value.set(x, y);
-			if (changeNow) {
-				swap();
-				applied = true;
-			}
+			apply(changeNow);
 		}
 		
 		@Override
@@ -248,17 +234,14 @@ public abstract class AttributeEdit extends AbstractUndoableEdit {
 	/**
 	 * JPatchUndoableEdit that modifies a tuple Attribute
 	 */
-	private static final class Tuple3 extends SwapperEdit {
+	private static final class Tuple3 extends AttributeEdit {
 		private final Tuple3Attr attr;
 		private final Tuple3d value = new Point3d();
 		
 		private Tuple3(Tuple3Attr attr, double x, double y, double z, boolean changeNow) {
 			this.attr = attr;
 			this.value.set(x, y, z);
-			if (changeNow) {
-				swap();
-				applied = true;
-			}
+			apply(changeNow);
 		}
 		
 		@Override
@@ -274,17 +257,14 @@ public abstract class AttributeEdit extends AbstractUndoableEdit {
 	/**
 	 * JPatchUndoableEdit that modifies a generic Attribute
 	 */
-	private static final class Generic extends SwapperEdit {
+	private static final class Generic extends AttributeEdit {
 		private final GenericAttr attr;
 		private Object value;
 		
 		private Generic(GenericAttr attr, Object value, boolean changeNow) {
 			this.attr = attr;
 			this.value = value;
-			if (changeNow) {
-				swap();
-				applied = true;
-			}
+			apply(changeNow);
 		}
 		
 		@SuppressWarnings("unchecked")

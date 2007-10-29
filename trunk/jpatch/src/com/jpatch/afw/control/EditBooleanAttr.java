@@ -2,7 +2,7 @@ package com.jpatch.afw.control;
 
 import com.jpatch.afw.attributes.BooleanAttr;
 
-public final class EditBooleanAttr extends EditAttribute {
+public final class EditBooleanAttr extends AttributeEdit {
 	BooleanAttr booleanAttr;
 	
 	public EditBooleanAttr(BooleanAttr booleanAttr, boolean applyNow) {
