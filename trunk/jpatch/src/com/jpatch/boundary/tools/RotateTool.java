@@ -7,11 +7,13 @@ import java.util.Arrays;
 
 import com.jpatch.afw.attributes.Tuple3Attr;
 import com.jpatch.afw.vecmath.Rotation3d;
+import com.jpatch.afw.vecmath.Sphere;
 import com.jpatch.afw.vecmath.TransformUtil;
 import com.jpatch.afw.vecmath.Utils3d;
 import com.jpatch.boundary.Main;
 import com.jpatch.boundary.OrthoViewDef;
 import com.jpatch.boundary.PerspectiveViewDef;
+import com.jpatch.boundary.Selection;
 import com.jpatch.boundary.ViewDef;
 import com.jpatch.boundary.ViewDirection;
 import com.jpatch.boundary.Viewport;
@@ -62,8 +64,6 @@ public class RotateTool implements VisibleTool {
 	
 	private Vector3d fromVector = new Vector3d();
 	private Vector3d toVector = new Vector3d();
-	
-	
 	
 	static {
 		Color3f black = new Color3f(0, 0, 0);
@@ -234,106 +234,108 @@ public class RotateTool implements VisibleTool {
 			}
 		}
 		
-		/*
-		 * draw plane of rotation
-		 */
-		
-		/* compute rotation matrix */
-		axisRotation.getRotationMatrix(matrix);
-		/* add pivot translation */
-		matrix.m03 = pivot.x;
-		matrix.m13 = pivot.y;
-		matrix.m23 = pivot.z;
-		
-		matrix.m33 = 1;
-		
-		/* set local2world to rotate-tool axis-rotation matrix */ 
-		transformUtil.setLocal2World(matrix);
-		
-		Vector3d axis = new Vector3d();
-		axis.cross(fromVector, toVector);
-		double angle = Math.acos(fromVector.dot(toVector));
-		
-		AxisAngle4d axisAngle = new AxisAngle4d(axis, 0);
-		Matrix3d matrix = new Matrix3d();
-		
-		for (int pass = 0; pass < 3; pass++) {
-			float gray, alpha;
-			switch (pass) {
-			case 0:
-				gl.glDepthMask(false);
-				gl.glBegin(GL_TRIANGLE_FAN);
-				gray = 0.5f;
-				alpha = 0.25f;
-				break;
-			case 1:
-				gl.glBegin(GL_LINE_STRIP);
-				gray = 0.5f;
-				alpha = 0.5f;
-				break;
-			case 2:
-				gl.glDepthMask(true);
-				gl.glEnable(GL_DEPTH_TEST);
-				gl.glBegin(GL_LINE_STRIP);
-				gray = 0.5f;
-				alpha = 1.0f;
-				break;
-			default:
-				throw new RuntimeException();
+		if (mouseMotionListener != null) {
+			/*
+			 * draw plane of rotation
+			 */
+			
+			/* compute rotation matrix */
+			axisRotation.getRotationMatrix(matrix);
+			/* add pivot translation */
+			matrix.m03 = pivot.x;
+			matrix.m13 = pivot.y;
+			matrix.m23 = pivot.z;
+			
+			matrix.m33 = 1;
+			
+			/* set local2world to rotate-tool axis-rotation matrix */ 
+			transformUtil.setLocal2World(matrix);
+			
+			Vector3d axis = new Vector3d();
+			axis.cross(fromVector, toVector);
+			double angle = Math.acos(fromVector.dot(toVector));
+			
+			AxisAngle4d axisAngle = new AxisAngle4d(axis, 0);
+			Matrix3d matrix = new Matrix3d();
+			
+			for (int pass = 0; pass < 3; pass++) {
+				float gray, alpha;
+				switch (pass) {
+				case 0:
+					gl.glDepthMask(false);
+					gl.glBegin(GL_TRIANGLE_FAN);
+					gray = 0.5f;
+					alpha = 0.25f;
+					break;
+				case 1:
+					gl.glBegin(GL_LINE_STRIP);
+					gray = 0.5f;
+					alpha = 0.5f;
+					break;
+				case 2:
+					gl.glDepthMask(true);
+					gl.glEnable(GL_DEPTH_TEST);
+					gl.glBegin(GL_LINE_STRIP);
+					gray = 0.5f;
+					alpha = 1.0f;
+					break;
+				default:
+					throw new RuntimeException();
+				}
+				for (int i = 0; i <= SEGMENTS; i++) {
+					axisAngle.angle = i * 2 * Math.PI / SEGMENTS;
+					matrix.set(axisAngle);
+					p.scale(vv.radius, fromVector);
+					matrix.transform(p);
+					transformUtil.local2Camera(p, p);
+					
+					p1.set(p);
+					vv.orientMatrix.transform(p1);
+					p1.sub(vv.cameraPivot);
+					p1.scale(1 / vv.radius / transformUtil.getCameraScale() / transformUtil.getCameraScale());
+					gl.glColor4f(gray, gray, gray, alpha * ((float) p1.z * 0.4f + 0.6f));
+					gl.glVertex3d(p.x, p.y, p.z);
+					
+				}
+				gl.glEnd();
 			}
-			for (int i = 0; i <= SEGMENTS; i++) {
-				axisAngle.angle = i * 2 * Math.PI / SEGMENTS;
+			
+			/* draw ticks */
+			gl.glDisable(GL_DEPTH_TEST);
+			gl.glBegin(GL_LINES);
+			gl.glColor4f(1, 1, 1, 0.75f);
+			Point3d pOld = new Point3d();
+			for (int a = 0; a < (Math.toDegrees(angle) + 1); a++) {
+				double factor = 0.0;
+				if (a < Math.toDegrees(angle)) {
+					axisAngle.angle = Math.toRadians(a);
+					if (a == 0) factor = 0.0;
+					else if (a % 45 == 0) factor = 1 - 0.32;
+					else if (a % 15 == 0) factor = 1 - 0.16;
+					else if (a % 5 == 0) factor = 1 - 0.08;
+					else factor = 1;
+				} else {
+					axisAngle.angle = angle;
+				}
 				matrix.set(axisAngle);
 				p.scale(vv.radius, fromVector);
+				p1.scale(factor, p);
 				matrix.transform(p);
+				matrix.transform(p1);
 				transformUtil.local2Camera(p, p);
-				
-				p1.set(p);
-				vv.orientMatrix.transform(p1);
-				p1.sub(vv.cameraPivot);
-				p1.scale(1 / vv.radius / transformUtil.getCameraScale() / transformUtil.getCameraScale());
-				gl.glColor4f(gray, gray, gray, alpha * ((float) p1.z * 0.4f + 0.6f));
-				gl.glVertex3d(p.x, p.y, p.z);
-				
+				transformUtil.local2Camera(p1, p1);
+				if (factor < 1) {
+					gl.glVertex3d(p.x, p.y, p.z);
+					gl.glVertex3d(p1.x, p1.y, p1.z);
+				}
+				if (a > 0) {
+					gl.glVertex3d(pOld.x, pOld.y, pOld.z);
+					gl.glVertex3d(p.x, p.y, p.z);
+				}
+				pOld.set(p);
 			}
 			gl.glEnd();
 		}
-		
-		/* draw ticks */
-		gl.glDisable(GL_DEPTH_TEST);
-		gl.glBegin(GL_LINES);
-		gl.glColor4f(1, 1, 1, 0.75f);
-		Point3d pOld = new Point3d();
-		for (int a = 0; a < (Math.toDegrees(angle) + 1); a++) {
-			double factor = 0.0;
-			if (a < Math.toDegrees(angle)) {
-				axisAngle.angle = Math.toRadians(a);
-				if (a == 0) factor = 0.0;
-				else if (a % 45 == 0) factor = 1 - 0.32;
-				else if (a % 15 == 0) factor = 1 - 0.16;
-				else if (a % 5 == 0) factor = 1 - 0.08;
-				else factor = 1;
-			} else {
-				axisAngle.angle = angle;
-			}
-			matrix.set(axisAngle);
-			p.scale(vv.radius, fromVector);
-			p1.scale(factor, p);
-			matrix.transform(p);
-			matrix.transform(p1);
-			transformUtil.local2Camera(p, p);
-			transformUtil.local2Camera(p1, p1);
-			if (factor < 1) {
-				gl.glVertex3d(p.x, p.y, p.z);
-				gl.glVertex3d(p1.x, p1.y, p1.z);
-			}
-			if (a > 0) {
-				gl.glVertex3d(pOld.x, pOld.y, pOld.z);
-				gl.glVertex3d(p.x, p.y, p.z);
-			}
-			pOld.set(p);
-		}
-		gl.glEnd();
 		
 		/* cleanup gl */
 		gl.glDisable(GL_BLEND);
@@ -344,6 +346,9 @@ public class RotateTool implements VisibleTool {
 	}
 	
 	public void registerListeners(Viewport[] viewports) {
+		Selection selection = Main.getInstance().getSelection();
+		selection.getCenter(pivot);
+		pivotAttr.setTuple(pivot);
 		if (mouseListeners != null) {
 			throw new IllegalStateException("already registered");
 		}
@@ -474,10 +479,17 @@ public class RotateTool implements VisibleTool {
 //	}
 	
 	/**
-	 * Computes and returns the ray/sphere intersection of a ray shot through the point (on screen) specified
-	 * by the mouseX and mouseY parameters and the rotate-tool's enclosing sphere.
+	 * Computes the ray/sphere intersection of a ray shot through the point (on screen) specified
+	 * by the mouseX and mouseY parameters and the rotate-tool's enclosing sphere in local space.
+	 * @param vv ViewportVars
+	 * @param mouseX mouse x position (screen space)
+	 * @param mouseY mouse y position (screen space)
+	 * @param result the coordinates of the intersection point (in local space) will be stored in this Point3d object. Note that this object will be modified,
+	 * even if there was no intersection
+	 * @return true if there was an intersection, false otherwise
 	 */
-	private Point3d getIntersectionPoint(ViewportVars vv, int mouseX, int mouseY) {
+	private boolean computeIntersectionPoint(ViewportVars vv, int mouseX, int mouseY, int constraint, Point3d result) {
+		System.out.println("computeIntersectionPoint constraint=" + constraint);
 		double cameraRadius = vv.radius * vv.transformUtil.getCameraScale();
 		
 		Point3d rayOrigin = new Point3d();
@@ -493,10 +505,43 @@ public class RotateTool implements VisibleTool {
 			rayDirection.set(0, 0, -1);
 		}
 		
-//		System.out.println("ray origin=" + rayOrigin + " direction=" + rayDirection);
-		Point3d intersectionPoint = new Point3d();
+		boolean hit = false;
 		
-		boolean hit = Utils3d.raySphereIntersection(rayOrigin, rayDirection, vv.cameraPivot, cameraRadius, intersectionPoint, true);
+		if (constraint == -1) {
+			/* no axis constraint, use ray/shpere intersection */
+			hit = Utils3d.raySphereIntersection(rayOrigin, rayDirection, vv.cameraPivot, cameraRadius, result, true);
+		} else {
+			/* axis constraint active, setup axis in camera space */
+			Vector3d cameraAxis = new Vector3d();
+			switch (constraint) {
+			case 0:
+				cameraAxis.set(1, 0, 0);
+				vv.transformUtil.local2Camera(cameraAxis, cameraAxis);
+				break;
+			case 1:
+				cameraAxis.set(0, 1, 0);
+				vv.transformUtil.local2Camera(cameraAxis, cameraAxis);
+				break;
+			case 2:
+				cameraAxis.set(0, 0, 1);
+				vv.transformUtil.local2Camera(cameraAxis, cameraAxis);
+				break;
+			case 3:
+				cameraAxis.set(0, 0, 1);
+				vv.orientMatrix.transform(cameraAxis);
+				break;
+			}
+			cameraAxis.normalize();
+			System.out.println("cameraAxis=" + cameraAxis);
+			/* compute ray/plane intersection */
+			hit = Utils3d.rayPlaneIntersection(rayOrigin, rayDirection, vv.cameraPivot, cameraAxis, result);
+			
+			/* outside of radius? */
+			if (!hit || constraint != 3 && result.distance(vv.cameraPivot) > cameraRadius) {
+				distSqToCircle(vv, mouseX, mouseY, cameraAxis, false, false, result);
+				hit = true;
+			}
+		}
 		if (hit) {
 			/* compute rotation matrix */
 			axisRotation.getRotationMatrix(matrix);
@@ -510,14 +555,10 @@ public class RotateTool implements VisibleTool {
 			/* set local2world to rotate-tool axis-rotation matrix */ 
 			vv.transformUtil.setLocal2World(matrix);
 			
-			vv.transformUtil.camera2Local(intersectionPoint, intersectionPoint);
-//			System.out.println("hit at " + intersectionPoint);
-			return intersectionPoint;
-		} else {
-//			System.out.println("miss");
+			vv.transformUtil.camera2Local(result, result);
+			return true;
 		}
-		
-		return null;
+		return false;
 	}
 	
 //	private boolean setIntersectionVector2(Viewport viewport, int mouseX, int mouseY, int constraintAxis, Vector3d vector) {
@@ -603,9 +644,9 @@ public class RotateTool implements VisibleTool {
 	 * @param mouseY
 	 * @param cameraAxis the axis of the circle (in camera space)
 	 * @param result a vector pointing from the pivot to the point on the circle closest to mouseX, mouseY (in camera space)
-	 * @returns the screen-space distance, in pixel
+	 * @returns the squared screen-space distance, in pixel
 	 */
-	private double distToCircle(ViewportVars vv, int mouseX, int mouseY, Vector3d cameraAxis, boolean orient, Vector3d result) {
+	private double distSqToCircle(ViewportVars vv, int mouseX, int mouseY, Vector3d cameraAxis, boolean orient, boolean frontsideOnly, Tuple3d result) {
 		
 		
 		Vector3d axis = new Vector3d();
@@ -621,8 +662,8 @@ public class RotateTool implements VisibleTool {
 		Point3d p1s = new Point3d();	// end point of line segment in screen space
 		Point3d ps = new Point3d();		// point on line segment closest to mouseX/mouseY in screen space
 		
-		double minDistSq = 64;
-		boolean frontsideOnly = false;
+		double minDistSq = Double.MAX_VALUE;
+		double minFrontSq = 64;
 		double r, offset;
 		if (orient) {
 			r = vv.transformUtil.getCameraScale() * vv.offsetRadius * SCREEN_ROTATE_FACTOR;
@@ -645,7 +686,7 @@ public class RotateTool implements VisibleTool {
 				vv.transformUtil.camera2Screen(p0, p0s);
 				vv.transformUtil.camera2Screen(p1, p1s);
 				
-				vv.viewport.getComponent().getGraphics().drawLine((int) p0s.x, (int) p0s.y, (int) p1s.x, (int) p1s.y);
+//				vv.viewport.getComponent().getGraphics().drawLine((int) p0s.x, (int) p0s.y, (int) p1s.x, (int) p1s.y);
 				double t = Utils3d.closestPointOnLine(p0s.x, p0s.y, p1s.x, p1s.y, mouseX, mouseY);
 				t = Math.min(1, Math.max(0, t));
 				
@@ -655,21 +696,28 @@ public class RotateTool implements VisibleTool {
 				double dx = ps.x - mouseX;
 				double dy = ps.y - mouseY;
 				double distSq = (dx * dx + dy * dy);
+				boolean frontside = distSq < minFrontSq && p.z >= vv.cameraPivot.z;
+				
+				if (p.z < vv.cameraPivot.z) {
+					distSq *= 2;
+				}
+				
 				if (distSq < minDistSq) {
 					p.sub(vv.cameraPivot);
-					boolean frontside = p.z > vv.cameraPivot.z;
+					
 					if (frontside) {
 						frontsideOnly = true;
 					}
 					if (!frontsideOnly || frontside) {
 						minDistSq = distSq;
 						result.sub(p, vv.cameraPivot);
-						result.normalize();
+						/* normalize */
+						result.scale(1.0 / Math.sqrt (result.x * result.x + result.y * result.y + result.z * result.z));
 					}
 				}
 			}
 		}
-		return Math.sqrt(minDistSq);
+		return minDistSq;
 	}
 	
 //	private double getAxisHit(TransformUtil transformUtil, int mouseX, int mouseY, Vector3d axis, Vector3d vector) {
@@ -754,8 +802,6 @@ public class RotateTool implements VisibleTool {
 		}
 		@Override
 		public void mousePressed(MouseEvent e) {
-//			int constraint = getHitCircle(viewport, e.getX(), e.getY());
-//			axisConstraint = constraint;
 			TransformUtil transformUtil = viewport.getViewDef().getTransformUtil();
 			
 			/* compute rotation matrix */
@@ -771,6 +817,8 @@ public class RotateTool implements VisibleTool {
 			
 			/* check if an axis-circle was hit */
 			Vector3d cameraAxis = new Vector3d();
+			int axis = -1;
+			double min = 64;
 			for (int i = 0; i < 4; i++) {
 				boolean orient = false;
 				switch (i) {
@@ -793,30 +841,41 @@ public class RotateTool implements VisibleTool {
 					break;
 				}
 				cameraAxis.normalize();
-				System.out.println(i + " " + orient + " " + distToCircle(vv, e.getX(), e.getY(), cameraAxis, orient, new Vector3d()));
-			}
-//			transformUtil.local2Camera(cameraAxis, cameraAxis);
-//			cameraAxis.normalize();
-//			System.out.println(distToCircle(vv, e.getX(), e.getY(), cameraAxis, new Vector3d()));
-			
-			Point3d hitPoint = getIntersectionPoint(vv, e.getX(), e.getY());
-			if (hitPoint != null) {
-				if (e.getClickCount() == 2) {
-					/* align axisrotation, z should point to viewer */
-					Matrix3d orientMatrix = new Matrix3d(vv.orientMatrix);
-					orientMatrix.normalize();
-					Matrix3d m = transformUtil.getCameraToWorldRotation(new Matrix3d());
-					m.mul(orientMatrix);
-					axisRotation.setRotation(m);
-					axisRotationAttr.setTuple(axisRotation);
-					Main.getInstance().repaintViewports();
-					return;
+				
+				double distSq = distSqToCircle(vv, e.getX(), e.getY(), cameraAxis, orient, true, fromVector);
+				if (distSq < min) {
+					min = distSq;
+					axis = i;
 				}
-				fromVector.set(hitPoint);
-				fromVector.normalize();
-				mouseMotionListener = new HitMouseMotionListener(viewport, 0);
-				viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 			}
+			
+//			if (axis >= 0) {
+//				System.out.println(axis);
+//				mouseMotionListener = new HitMouseMotionListener(viewport, axis);
+//				viewport.getComponent().addMouseMotionListener(mouseMotionListener);
+//			} else {
+				Point3d hitPoint = new Point3d();
+				boolean intersection = computeIntersectionPoint(vv, e.getX(), e.getY(), axis, hitPoint);
+				if (intersection) {
+					if (e.getClickCount() == 2) {
+						/* align axisrotation, z should point to viewer */
+						Matrix3d orientMatrix = new Matrix3d(vv.orientMatrix);
+						orientMatrix.normalize();
+						Matrix3d m = transformUtil.getCameraToWorldRotation(new Matrix3d());
+						m.mul(orientMatrix);
+						axisRotation.setRotation(m);
+						axisRotationAttr.setTuple(axisRotation);
+						Main.getInstance().repaintViewports();
+						return;
+					}
+					fromVector.set(hitPoint);
+					fromVector.normalize();
+					mouseMotionListener = new HitMouseMotionListener(viewport, axis);
+					Selection selection = Main.getInstance().getSelection();
+					selection.begin();
+					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
+				}
+//			}
 //			if (setIntersectionVector(viewport, e.getX(), e.getY(), constraint, fromVector)) {
 //				mouseMotionListener = new HitMouseMotionListener(viewport, constraint);
 //				viewport.getComponent().addMouseMotionListener(mouseMotionListener);
@@ -835,6 +894,8 @@ public class RotateTool implements VisibleTool {
 				rotation.set(0, 0, 0);
 				axisRotationAttr.setTuple(axisRotation);
 				rotationAttr.setTuple(rotation);
+				Selection selection = Main.getInstance().getSelection();
+				selection.end();
 				Main.getInstance().repaintViewports();
 			}
 		}
@@ -852,8 +913,9 @@ public class RotateTool implements VisibleTool {
 		@Override
 		public void mouseDragged(MouseEvent e) {
 //			System.out.println(constraint);
-			Point3d hitPoint = getIntersectionPoint(vv, e.getX(), e.getY());
-			if (hitPoint != null) {
+			Point3d hitPoint = new Point3d();
+			boolean intersection = computeIntersectionPoint(vv, e.getX(), e.getY(), constraint, hitPoint);
+			if (intersection) {
 				toVector.set(hitPoint);
 				toVector.normalize();
 				
@@ -872,7 +934,8 @@ public class RotateTool implements VisibleTool {
 				m.invert();
 				//m.transform(axis);
 				//axis.normalize();
-				m.set(new AxisAngle4d(axis, angle));
+				AxisAngle4d axisAngle = new AxisAngle4d(axis, angle);
+				m.set(axisAngle);
 				rotation.setRotation(m);
 //				switch (constraint) {
 //				case 0:
@@ -888,7 +951,14 @@ public class RotateTool implements VisibleTool {
 //					rotation.y = 0;
 //					break;
 //				}
+				vv.transformUtil.local2World(axis, axis);
+				Selection selection = Main.getInstance().getSelection();
+				selection.rotateTo(pivot, new AxisAngle4d(axis, angle));
+				selection.getSelectedSdsModelAttribute().getValue().getSds().computeLevel2Vertices();
+				
 				rotationAttr.setTuple(rotation);
+				
+				
 				Main.getInstance().syncRepaintViewport(viewport);
 			}
 		}

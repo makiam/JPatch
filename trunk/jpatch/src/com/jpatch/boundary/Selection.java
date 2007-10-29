@@ -9,9 +9,10 @@ import com.jpatch.afw.vecmath.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds.*;
 
-public class Selection {
+public class Selection implements Transformable {
 	private final GenericAttr<SdsModel> selectedSdsModelAttr = new GenericAttr<SdsModel>();
-	private final CollectionAttr<AbstractVertex> selectedVerticesAttr = new CollectionAttr<AbstractVertex>(HashSet.class);
+	private final CollectionAttr<AbstractVertex> selectedVerticesAttr = new CollectionAttr<AbstractVertex>(LinkedHashSet.class);
+	private Point3d[] startPositions;
 	
 	public GenericAttr<SdsModel> getSelectedSdsModelAttribute() {
 		return selectedSdsModelAttr;
@@ -51,28 +52,83 @@ public class Selection {
 		}
 	}
 	
-	public void getBounds(Sphere sphere) {
-		SdsModel sdsModel = selectedSdsModelAttr.getValue();
-		Transform transform = sdsModel.getTransform();
+	public void getCenter(Point3d center) {
 		Point3d p = new Point3d();
-		Point3d center = new Point3d();
-		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
-			vertex.getPos(p);
-			center.add(p);
-		}
-		center.scale(1.0 / selectedVerticesAttr.size());
-		double radiusSq = 0;
-		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
-			vertex.getPos(p);
-			double distanceSq = p.distanceSquared(center);
-			if (distanceSq > radiusSq) {
-				radiusSq = distanceSq;
-			}
-		}
-		transform.transform(center);
-		Matrix4d m = transform.getMatrix(new Matrix4d());
-		
-		sphere.setCenter(center);
-		sphere.setRadius(Math.sqrt(radiusSq) * m.getScale());
+		getBounds(p, center);
+		center.interpolate(p, 0.5);
 	}
+	
+//	public Sphere getBounds(Sphere sphere) {
+//		SdsModel sdsModel = selectedSdsModelAttr.getValue();
+//		Transform transform = sdsModel.getTransform();
+//		Point3d p = new Point3d();
+//		Point3d center = new Point3d();
+//		getBounds(p, center);
+//		center.interpolate(p, 0.5);
+////		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
+////			vertex.getPos(p);
+////			center.add(p);
+////		}
+////		center.scale(1.0 / selectedVerticesAttr.size());
+//		double radiusSq = 0;
+//		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
+//			vertex.getPos(p);
+//			transform.transform(p);
+//			double distanceSq = p.distanceSquared(center);
+//			if (distanceSq > radiusSq) {
+//				radiusSq = distanceSq;
+//			}
+//		}
+//		transform.transform(center);
+//		Matrix4d m = transform.getMatrix(new Matrix4d());
+//		
+//		sphere.setCenter(center);
+//		sphere.setRadius(Math.sqrt(radiusSq) * m.getScale());
+//		
+//		return sphere;
+//	}
+
+	public void begin() {
+		int count = selectedVerticesAttr.getElements().size();
+		startPositions = new Point3d[count];
+		int i = 0;
+		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
+			startPositions[i] = new Point3d();
+			vertex.getPos(startPositions[i]);
+			i++;
+		}
+	}
+
+	public void end() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void rotateTo(Point3d pivot, AxisAngle4d axisAngle) {
+		Matrix3d rotation = new Matrix3d();
+		rotation.set(axisAngle);
+		Point3d xPivot = new Point3d(pivot);
+		rotation.transform(xPivot);
+		Matrix4d matrix = new Matrix4d(
+				rotation.m00, rotation.m01, rotation.m02, pivot.x - xPivot.x,
+				rotation.m10, rotation.m11, rotation.m12, pivot.y - xPivot.y,
+				rotation.m20, rotation.m21, rotation.m22, pivot.z - xPivot.z,
+				0, 0, 0, 1
+		);
+		int i = 0;
+		Point3d p = new Point3d();
+		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
+			p.set(startPositions[i]);
+			matrix.transform(p);
+			vertex.getPosition().setTuple(p);
+			i++;
+		}
+	}
+
+	public void transform(Matrix4d matrix) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 }

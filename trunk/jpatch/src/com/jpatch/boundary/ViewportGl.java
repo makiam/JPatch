@@ -536,7 +536,7 @@ public class ViewportGl extends Viewport {
 //		m.set(new double[] {
 //				0.2, 0, 0, 0,
 //				0, 0, 0.2, 0.9,
-//				0, 0.2, 0, 0,
+//				0, 0.2, 0, 0,Matrix4f
 //				0, 0, 0, 1
 //		});
 //		cy.transform(m);
@@ -575,10 +575,10 @@ public class ViewportGl extends Viewport {
 		SceneGraphNode sceneGraphRoot = Main.getInstance().getSceneGraphRoot();
 		drawSceneGraphElement(sceneGraphRoot);
 		Selection selection = Main.getInstance().getSelection();
-		if (selection.getSelectedVerticesAttribute().size() > 1) {
-			drawSelection(selection);
-		}
+		drawSelection(selection);
+		
 		JPatchTool tool = Main.getInstance().getActiveTool();
+		System.out.println("tool = " + tool);
 		if (tool != null) {
 			tool.draw(this);
 		}
@@ -900,70 +900,25 @@ public class ViewportGl extends Viewport {
 	}
 	
 	private void drawSelection(Selection selection) {
-		Point3d p0 = new Point3d();
-		Point3d p1 = new Point3d();
-		selection.getBounds(p0, p1);
-		double sc = p0.distance(p1) * 0.02;
-		p0.x -= sc;
-		p0.y -= sc;
-		p0.z -= sc;
-		p1.x += sc;
-		p1.y += sc;
-		p1.z += sc;
-		
-		Point3f p000 = new Point3f(p0);
-		Point3f p111 = new Point3f(p1);
-		Point3f p001 = new Point3f(p000.x, p000.y, p111.z);
-		Point3f p010 = new Point3f(p000.x, p111.y, p000.z);
-		Point3f p011 = new Point3f(p000.x, p111.y, p111.z);
-		Point3f p100 = new Point3f(p111.x, p000.y, p000.z);
-		Point3f p101 = new Point3f(p111.x, p000.y, p111.z);
-		Point3f p110 = new Point3f(p111.x, p111.y, p000.z);
-		modelView.transform(p000);
-		modelView.transform(p001);
-		modelView.transform(p010);
-		modelView.transform(p011);
-		modelView.transform(p100);
-		modelView.transform(p101);
-		modelView.transform(p110);
-		modelView.transform(p111);
-		gl.glEnable(GL_BLEND);
-		gl.glEnable(GL_LINE_SMOOTH);
-		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		gl.glDisable(GL_DEPTH_TEST);
-		gl.glColor4f(1, 1, 0, 0.25f);
-		gl.glBegin(GL_LINES);
-		gl.glVertex3f(p000.x, p000.y, p000.z); gl.glVertex3f(p001.x, p001.y, p001.z);
-		gl.glVertex3f(p001.x, p001.y, p001.z); gl.glVertex3f(p011.x, p011.y, p011.z);
-		gl.glVertex3f(p011.x, p011.y, p011.z); gl.glVertex3f(p010.x, p010.y, p010.z);
-		gl.glVertex3f(p010.x, p010.y, p010.z); gl.glVertex3f(p000.x, p000.y, p000.z);
-		gl.glVertex3f(p100.x, p100.y, p100.z); gl.glVertex3f(p101.x, p101.y, p101.z);
-		gl.glVertex3f(p101.x, p101.y, p101.z); gl.glVertex3f(p111.x, p111.y, p111.z);
-		gl.glVertex3f(p111.x, p111.y, p111.z); gl.glVertex3f(p110.x, p110.y, p110.z);
-		gl.glVertex3f(p110.x, p110.y, p110.z); gl.glVertex3f(p100.x, p100.y, p100.z);
-		gl.glVertex3f(p000.x, p000.y, p000.z); gl.glVertex3f(p100.x, p100.y, p100.z);
-		gl.glVertex3f(p001.x, p001.y, p001.z); gl.glVertex3f(p101.x, p101.y, p101.z);
-		gl.glVertex3f(p010.x, p010.y, p010.z); gl.glVertex3f(p110.x, p110.y, p110.z);
-		gl.glVertex3f(p011.x, p011.y, p011.z); gl.glVertex3f(p111.x, p111.y, p111.z);
-		gl.glEnd();
-		gl.glColor4f(1, 1, 0, 1.0f);
-		gl.glEnable(GL_DEPTH_TEST);
-		gl.glBegin(GL_LINES);
-		gl.glVertex3f(p000.x, p000.y, p000.z); gl.glVertex3f(p001.x, p001.y, p001.z);
-		gl.glVertex3f(p001.x, p001.y, p001.z); gl.glVertex3f(p011.x, p011.y, p011.z);
-		gl.glVertex3f(p011.x, p011.y, p011.z); gl.glVertex3f(p010.x, p010.y, p010.z);
-		gl.glVertex3f(p010.x, p010.y, p010.z); gl.glVertex3f(p000.x, p000.y, p000.z);
-		gl.glVertex3f(p100.x, p100.y, p100.z); gl.glVertex3f(p101.x, p101.y, p101.z);
-		gl.glVertex3f(p101.x, p101.y, p101.z); gl.glVertex3f(p111.x, p111.y, p111.z);
-		gl.glVertex3f(p111.x, p111.y, p111.z); gl.glVertex3f(p110.x, p110.y, p110.z);
-		gl.glVertex3f(p110.x, p110.y, p110.z); gl.glVertex3f(p100.x, p100.y, p100.z);
-		gl.glVertex3f(p000.x, p000.y, p000.z); gl.glVertex3f(p100.x, p100.y, p100.z);
-		gl.glVertex3f(p001.x, p001.y, p001.z); gl.glVertex3f(p101.x, p101.y, p101.z);
-		gl.glVertex3f(p010.x, p010.y, p010.z); gl.glVertex3f(p110.x, p110.y, p110.z);
-		gl.glVertex3f(p011.x, p011.y, p011.z); gl.glVertex3f(p111.x, p111.y, p111.z);
-		gl.glEnd();
-		gl.glDisable(GL_BLEND);
-		gl.glDisable(GL_LINE_SMOOTH);
+		gl.glPointSize(4);
+		for (int pass = 0; pass < 2; pass++) {
+			if (pass == 0) {
+				gl.glDisable(GL_DEPTH_TEST);
+				gl.glEnable(GL_BLEND);
+				gl.glColor4f(0, 1, 0, 0.33f);
+			} else {
+				gl.glEnable(GL_DEPTH_TEST);
+				gl.glDisable(GL_BLEND);
+				gl.glColor3f(0, 1, 0);
+			}
+			gl.glBegin(GL_POINTS);
+			for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
+				Point3f p = vertex.projectedPos;
+				gl.glVertex3f(p.x, p.y, p.z);
+			}
+			gl.glEnd();
+		}
+		gl.glPointSize(3);
 	}
 	
 	private void drawSds3(Sds sds) {
@@ -1113,7 +1068,7 @@ public class ViewportGl extends Viewport {
 		
 		
 		
-//			gl.glColor3f(1, 1, 0);
+			gl.glColor3f(1, 0, 0);
 			gl.glBegin(GL_POINTS);
 			CollectionAttr<AbstractVertex> selectedVertices = Main.getInstance().getSelection().getSelectedVerticesAttribute();
 			for (Face face : sds.faceList) {
@@ -1121,20 +1076,15 @@ public class ViewportGl extends Viewport {
 					if (edge.isPrimary()) {
 						AbstractVertex vertex = edge.getFirstVertex();
 						Point3f p = vertex.projectedPos;
-						if (selectedVertices.contains(vertex)) {
-							gl.glColor3f(0, 1, 0);
-						} else {
-							gl.glColor3f(1, 0, 0);
-						}
 						gl.glVertex3f(p.x, p.y, p.z);
-						vertex = edge.getSecondVertex();
-						p = vertex.projectedPos;
-						if (selectedVertices.contains(vertex)) {
-							gl.glColor3f(0, 1, 0);
-						} else {
-							gl.glColor3f(1, 0, 0);
-						}
-						gl.glVertex3f(p.x, p.y, p.z);
+//						vertex = edge.getSecondVertex();
+//						p = vertex.projectedPos;
+//						if (selectedVertices.contains(vertex)) {
+//							gl.glColor3f(0, 1, 0);
+//						} else {
+//							gl.glColor3f(1, 0, 0);
+//						}
+//						gl.glVertex3f(p.x, p.y, p.z);
 						
 					}
 				}
