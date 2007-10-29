@@ -505,8 +505,8 @@ public class Main {
 //		final TransformNode node4 = new TransformNode();
 		
 		try {
-//			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt")));
-			final SdsModel model1 = new SdsModel(new Sds(new FileInputStream("/home/sascha/off/cube.off")));
+			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt")));
+//			final SdsModel model1 = new SdsModel(new Sds(new FileInputStream("/home/sascha/off/cube.off")));
 //			final SdsModel model3 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
 			model1.getNameAttribute().setValue("model 1");
 			model1.getParentAttribute().setValue(sceneGraphRoot);

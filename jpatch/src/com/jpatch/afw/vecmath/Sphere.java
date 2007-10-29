@@ -6,6 +6,10 @@ public class Sphere {
 	private final Point3d center = new Point3d();
 	private double radius;
 	
+	public Sphere() {
+		this(0, 0, 0, 0);
+	}
+	
 	public Sphere(Point3d center, double radius) {
 		this(center.x, center.y, center.z, radius);
 	}

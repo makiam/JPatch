@@ -1,5 +1,11 @@
 package com.jpatch.boundary.tools;
 
+import static javax.media.opengl.GL.GL_BLEND;
+import static javax.media.opengl.GL.GL_DEPTH_TEST;
+import static javax.media.opengl.GL.GL_LINES;
+import static javax.media.opengl.GL.GL_LINE_SMOOTH;
+import static javax.media.opengl.GL.GL_ONE_MINUS_SRC_ALPHA;
+import static javax.media.opengl.GL.GL_SRC_ALPHA;
 import com.jpatch.afw.vecmath.TransformUtil;
 import com.jpatch.boundary.*;
 import com.jpatch.entity.SdsModel;
@@ -16,13 +22,16 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 
+import javax.media.opengl.GL;
 import javax.media.opengl.GLCanvas;
 import javax.vecmath.Matrix4d;
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3d;
+import javax.vecmath.Point3f;
 
 import jpatch.boundary.settings.Settings;
 
-public class MoveVertexTool implements JPatchTool {
+public class MoveVertexTool implements VisibleTool {
 	private static final Color XOR_MODE = new Color(Settings.getInstance().colors.background.get().getRGB() ^ Settings.getInstance().colors.selection.get().getRGB());
 	private static final Stroke DASHES = new BasicStroke(1.0f,BasicStroke.CAP_BUTT,BasicStroke.JOIN_BEVEL,0.0f,new float[] { 1.0f, 1.0f }, 0.0f);
 	
@@ -50,7 +59,77 @@ public class MoveVertexTool implements JPatchTool {
 	}
 
 	public void draw(Viewport viewport) {
-//		viewport.drawShape(cone);
+		System.out.println("MoveVertexTool.draw()");
+		GL gl = ((ViewportGl) viewport).getGl();
+		Matrix4f modelView = viewport.getViewDef().getTransformUtil().getModelViewMatrix(new Matrix4f());
+		Selection selection = Main.getInstance().getSelection();
+		if (selection == null) {
+			return;
+		}
+		Point3d p0 = new Point3d();
+		Point3d p1 = new Point3d();
+		selection.getBounds(p0, p1);
+		double sc = p0.distance(p1) * 0.02;
+		p0.x -= sc;
+		p0.y -= sc;
+		p0.z -= sc;
+		p1.x += sc;
+		p1.y += sc;
+		p1.z += sc;
+		
+		Point3f p000 = new Point3f(p0);
+		Point3f p111 = new Point3f(p1);
+		Point3f p001 = new Point3f(p000.x, p000.y, p111.z);
+		Point3f p010 = new Point3f(p000.x, p111.y, p000.z);
+		Point3f p011 = new Point3f(p000.x, p111.y, p111.z);
+		Point3f p100 = new Point3f(p111.x, p000.y, p000.z);
+		Point3f p101 = new Point3f(p111.x, p000.y, p111.z);
+		Point3f p110 = new Point3f(p111.x, p111.y, p000.z);
+		modelView.transform(p000);
+		modelView.transform(p001);
+		modelView.transform(p010);
+		modelView.transform(p011);
+		modelView.transform(p100);
+		modelView.transform(p101);
+		modelView.transform(p110);
+		modelView.transform(p111);
+		gl.glEnable(GL_BLEND);
+		gl.glEnable(GL_LINE_SMOOTH);
+		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		gl.glDisable(GL_DEPTH_TEST);
+		gl.glColor4f(1, 1, 0, 0.25f);
+		gl.glBegin(GL_LINES);
+		gl.glVertex3f(p000.x, p000.y, p000.z); gl.glVertex3f(p001.x, p001.y, p001.z);
+		gl.glVertex3f(p001.x, p001.y, p001.z); gl.glVertex3f(p011.x, p011.y, p011.z);
+		gl.glVertex3f(p011.x, p011.y, p011.z); gl.glVertex3f(p010.x, p010.y, p010.z);
+		gl.glVertex3f(p010.x, p010.y, p010.z); gl.glVertex3f(p000.x, p000.y, p000.z);
+		gl.glVertex3f(p100.x, p100.y, p100.z); gl.glVertex3f(p101.x, p101.y, p101.z);
+		gl.glVertex3f(p101.x, p101.y, p101.z); gl.glVertex3f(p111.x, p111.y, p111.z);
+		gl.glVertex3f(p111.x, p111.y, p111.z); gl.glVertex3f(p110.x, p110.y, p110.z);
+		gl.glVertex3f(p110.x, p110.y, p110.z); gl.glVertex3f(p100.x, p100.y, p100.z);
+		gl.glVertex3f(p000.x, p000.y, p000.z); gl.glVertex3f(p100.x, p100.y, p100.z);
+		gl.glVertex3f(p001.x, p001.y, p001.z); gl.glVertex3f(p101.x, p101.y, p101.z);
+		gl.glVertex3f(p010.x, p010.y, p010.z); gl.glVertex3f(p110.x, p110.y, p110.z);
+		gl.glVertex3f(p011.x, p011.y, p011.z); gl.glVertex3f(p111.x, p111.y, p111.z);
+		gl.glEnd();
+		gl.glColor4f(1, 1, 0, 1.0f);
+		gl.glEnable(GL_DEPTH_TEST);
+		gl.glBegin(GL_LINES);
+		gl.glVertex3f(p000.x, p000.y, p000.z); gl.glVertex3f(p001.x, p001.y, p001.z);
+		gl.glVertex3f(p001.x, p001.y, p001.z); gl.glVertex3f(p011.x, p011.y, p011.z);
+		gl.glVertex3f(p011.x, p011.y, p011.z); gl.glVertex3f(p010.x, p010.y, p010.z);
+		gl.glVertex3f(p010.x, p010.y, p010.z); gl.glVertex3f(p000.x, p000.y, p000.z);
+		gl.glVertex3f(p100.x, p100.y, p100.z); gl.glVertex3f(p101.x, p101.y, p101.z);
+		gl.glVertex3f(p101.x, p101.y, p101.z); gl.glVertex3f(p111.x, p111.y, p111.z);
+		gl.glVertex3f(p111.x, p111.y, p111.z); gl.glVertex3f(p110.x, p110.y, p110.z);
+		gl.glVertex3f(p110.x, p110.y, p110.z); gl.glVertex3f(p100.x, p100.y, p100.z);
+		gl.glVertex3f(p000.x, p000.y, p000.z); gl.glVertex3f(p100.x, p100.y, p100.z);
+		gl.glVertex3f(p001.x, p001.y, p001.z); gl.glVertex3f(p101.x, p101.y, p101.z);
+		gl.glVertex3f(p010.x, p010.y, p010.z); gl.glVertex3f(p110.x, p110.y, p110.z);
+		gl.glVertex3f(p011.x, p011.y, p011.z); gl.glVertex3f(p111.x, p111.y, p111.z);
+		gl.glEnd();
+		gl.glDisable(GL_BLEND);
+		gl.glDisable(GL_LINE_SMOOTH);
 	}
 
 	private static class MoveVertexMouseListener extends MouseAdapter {
