@@ -2,7 +2,7 @@ package com.jpatch.afw.control;
 
 import com.jpatch.afw.attributes.StateMachine;
 
-public class SwitchState extends EditAttribute {
+public class SwitchState extends AttributeEdit {
 	private final StateMachine stateMachine;
 	private Object state;
 	

@@ -5,6 +5,8 @@ import java.util.*;
 import javax.vecmath.*;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.control.AttributeEdit;
+import com.jpatch.afw.control.JPatchUndoableEdit;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds.*;
@@ -50,6 +52,10 @@ public class Selection implements Transformable {
 				p1.z = p.z;
 			}
 		}
+	}
+	
+	public int getVertexCount() {
+		return selectedVerticesAttr.size();
 	}
 	
 	public void getCenter(Point3d center) {
@@ -99,9 +105,12 @@ public class Selection implements Transformable {
 		}
 	}
 
-	public void end() {
-		// TODO Auto-generated method stub
-		
+	public void end(List<JPatchUndoableEdit> editList) {
+		int i = 0;
+		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
+			editList.add(AttributeEdit.changeAttribute(vertex.getReferencePosition(), startPositions[i], false));
+			i++;
+		}
 	}
 
 	public void rotateTo(Point3d pivot, AxisAngle4d axisAngle) {

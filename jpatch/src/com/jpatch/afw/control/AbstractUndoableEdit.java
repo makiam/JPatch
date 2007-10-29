@@ -13,12 +13,16 @@ public abstract class AbstractUndoableEdit implements JPatchUndoableEdit {
 	}
 	
 	public void undo() {
-		assert applied : "undo attempted on unapplied edit " + this;
+		if (!applied) {
+			throw new IllegalStateException("undo attempted on unapplied edit " + this);
+		}
 		applied = false;
 	}
 	
 	public void redo() {
-		assert !applied : "redo attempted on already applied edit " + this;
+		if (applied) {
+			throw new IllegalStateException("redo attempted on already applied edit " + this);
+		}
 		applied = true;
 	}
 }

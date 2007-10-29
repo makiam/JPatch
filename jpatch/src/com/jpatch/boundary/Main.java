@@ -26,6 +26,7 @@ package com.jpatch.boundary;
 
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.Configuration;
+import com.jpatch.afw.control.JPatchUndoManager;
 import com.jpatch.afw.icons.IconSet;
 import com.jpatch.afw.ui.AttributeManager;
 import com.jpatch.afw.ui.Background;
@@ -704,6 +705,10 @@ public class Main {
 		} else {
 			return visibleTool;
 		}
+	}
+	
+	public JPatchUndoManager getUndoManager() {
+		return actions.undoManager;
 	}
 	
 	public void setActiveSds(Sds sds) {

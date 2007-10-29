@@ -10,11 +10,15 @@ import jpatch.boundary.settings.Settings;
 public class JPatchUndoManager extends AbstractScalarAttribute {
 	private static final int MAX_DEPTH = Settings.getInstance().undoDepth;
 	
-	private List<NamedEditList> undoStack = new ArrayList<NamedEditList>();
+	private final List<NamedEditList> undoStack = new ArrayList<NamedEditList>();
 	private int position;
 	
 	public void addEdit(GenericAttr<String> name, List<JPatchUndoableEdit> editList) {
-		addEdit(new NamedEditList(name, editList));
+		addEdit(new NamedEditList(name, editList.toArray(new JPatchUndoableEdit[editList.size()])));
+	}
+	
+	public void addEdit(GenericAttr<String> name, JPatchUndoableEdit[] edits) {
+		addEdit(new NamedEditList(name, edits));
 	}
 	
 	public void addEdit(GenericAttr<String> name, JPatchUndoableEdit edit) {
@@ -77,9 +81,9 @@ public class JPatchUndoManager extends AbstractScalarAttribute {
 		private final GenericAttr<String> name;
 		private final JPatchUndoableEdit[] edits;
 		
-		private NamedEditList(GenericAttr<String> name, List<JPatchUndoableEdit> editList) {
+		private NamedEditList(GenericAttr<String> name, JPatchUndoableEdit[] edits) {
 			this.name = name;
-			edits = editList.toArray(new JPatchUndoableEdit[editList.size()]);
+			this.edits = edits;
 		}
 		
 		private NamedEditList(GenericAttr<String> name, JPatchUndoableEdit edit) {
