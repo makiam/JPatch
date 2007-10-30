@@ -57,74 +57,76 @@ public class Face {
 		
 		recSides = 1.0 / sides;
 		
-		facePoint = new Level2Vertex() {
-			@Override
-			public void computeDerivedPosition() {
-				double x = 0, y = 0, z = 0;
-				for (HalfEdge edge : getEdges()) {
-					Tuple3Attr t = edge.vertex.position;
-					x += t.getX();
-					y += t.getY();
-					z += t.getZ();
-				}
-				position.setTuple(x * recSides, y * recSides, z * recSides);
-			}
-			
-			@Override
-			public void computeLimit() {
-				double fx = 0, fy = 0, fz = 0;
-				double ex = 0, ey = 0, ez = 0;
-				for (HalfEdge edge : edgeIterable) {
-					Tuple3Attr t = edge.vertex.vertexPoint.position;
-					fx += t.getX();
-					fy += t.getY();
-					fz += t.getZ();
-					t = edge.edgePoint.position;
-					ex += t.getX();
-					ey += t.getY();
-					ez += t.getZ();
-				}
-				limit.set(
-						fx * VERTEX_FACE_LIMIT[Face.this.sides] + ex * VERTEX_EDGE_LIMIT[Face.this.sides] + position.getX() * VERTEX_POINT_LIMIT[Face.this.sides],
-						fy * VERTEX_FACE_LIMIT[Face.this.sides] + ey * VERTEX_EDGE_LIMIT[Face.this.sides] + position.getY() * VERTEX_POINT_LIMIT[Face.this.sides],
-						fz * VERTEX_FACE_LIMIT[Face.this.sides] + ez * VERTEX_EDGE_LIMIT[Face.this.sides] + position.getZ() * VERTEX_POINT_LIMIT[Face.this.sides]
-				);
-				
-				float ax = 0;
-				float ay = 0;
-				float az = 0;
-				float bx = 0;
-				float by = 0;
-				float bz = 0;
-				int i = 0;
-				for (HalfEdge edge : edgeIterable) {
-					HalfEdge nextEdge = edge.next;
-					Tuple3Attr t0f = edge.face.facePoint.position;
-					Tuple3Attr t0e = edge.edgePoint.position;
-					Tuple3Attr t1f = nextEdge.face.facePoint.position;
-					Tuple3Attr t1e = nextEdge.edgePoint.position;
-					float ew = TANGENT_EDGE_WEIGHT[Face.this.sides][i];
-					float fw = TANGENT_FACE_WEIGHT[Face.this.sides][i];
-					ax += t1f.getX() * fw;
-					ay += t1f.getY() * fw;
-					az += t1f.getZ() * fw;
-					ax += t1e.getX() * ew;
-					ay += t1e.getY() * ew;
-					az += t1e.getZ() * ew;
-					bx += t0f.getX() * fw;
-					by += t0f.getY() * fw;
-					bz += t0f.getZ() * fw;
-					bx += t0e.getX() * ew;
-					by += t0e.getY() * ew;
-					bz += t0e.getZ() * ew;
-					i++;
-				}
-				uTangent.set(bx, by, bz);
-				vTangent.set(ax, ay, az);
-				normal.cross(uTangent, vTangent);
-				normal.normalize();
-			}
-		};
+		facePoint = new Level2Vertex(getFacePointLc(), getLimitLc(), getTangentLc(0), getTangentLc(1));
+		
+//		facePoint = new Level2Vertex() {
+//			@Override
+//			public void computeDerivedPosition() {
+//				double x = 0, y = 0, z = 0;
+//				for (HalfEdge edge : getEdges()) {
+//					Tuple3Attr t = edge.vertex.position;
+//					x += t.getX();
+//					y += t.getY();
+//					z += t.getZ();
+//				}
+//				position.setTuple(x * recSides, y * recSides, z * recSides);
+//			}
+//			
+//			@Override
+//			public void computeLimit() {
+//				double fx = 0, fy = 0, fz = 0;
+//				double ex = 0, ey = 0, ez = 0;
+//				for (HalfEdge edge : edgeIterable) {
+//					Tuple3Attr t = edge.vertex.vertexPoint.position;
+//					fx += t.getX();
+//					fy += t.getY();
+//					fz += t.getZ();
+//					t = edge.edgePoint.position;
+//					ex += t.getX();
+//					ey += t.getY();
+//					ez += t.getZ();
+//				}
+//				limit.set(
+//						fx * VERTEX_FACE_LIMIT[Face.this.sides] + ex * VERTEX_EDGE_LIMIT[Face.this.sides] + position.getX() * VERTEX_POINT_LIMIT[Face.this.sides],
+//						fy * VERTEX_FACE_LIMIT[Face.this.sides] + ey * VERTEX_EDGE_LIMIT[Face.this.sides] + position.getY() * VERTEX_POINT_LIMIT[Face.this.sides],
+//						fz * VERTEX_FACE_LIMIT[Face.this.sides] + ez * VERTEX_EDGE_LIMIT[Face.this.sides] + position.getZ() * VERTEX_POINT_LIMIT[Face.this.sides]
+//				);
+//				
+//				float ax = 0;
+//				float ay = 0;
+//				float az = 0;
+//				float bx = 0;
+//				float by = 0;
+//				float bz = 0;
+//				int i = 0;
+//				for (HalfEdge edge : edgeIterable) {
+//					HalfEdge nextEdge = edge.next;
+//					Tuple3Attr t0f = edge.face.facePoint.position;
+//					Tuple3Attr t0e = edge.edgePoint.position;
+//					Tuple3Attr t1f = nextEdge.face.facePoint.position;
+//					Tuple3Attr t1e = nextEdge.edgePoint.position;
+//					float ew = TANGENT_EDGE_WEIGHT[Face.this.sides][i];
+//					float fw = TANGENT_FACE_WEIGHT[Face.this.sides][i];
+//					ax += t1f.getX() * fw;
+//					ay += t1f.getY() * fw;
+//					az += t1f.getZ() * fw;
+//					ax += t1e.getX() * ew;
+//					ay += t1e.getY() * ew;
+//					az += t1e.getZ() * ew;
+//					bx += t0f.getX() * fw;
+//					by += t0f.getY() * fw;
+//					bz += t0f.getZ() * fw;
+//					bx += t0e.getX() * ew;
+//					by += t0e.getY() * ew;
+//					bz += t0e.getZ() * ew;
+//					i++;
+//				}
+//				uTangent.set(bx, by, bz);
+//				vTangent.set(ax, ay, az);
+//				normal.cross(uTangent, vTangent);
+//				normal.normalize();
+//			}
+//		};
 		
 		slates = new Slate2[sides];
 		slateEdges = new SlateEdge[sides];
