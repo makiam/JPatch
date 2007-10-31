@@ -127,13 +127,13 @@ public class RotateTool implements VisibleTool {
 		Point3d p = new Point3d();	// Point3d object to perform temporary transformations and rendering
 		Point3d p1 = new Point3d();
 		
-		gl.glClear(GL_DEPTH_BUFFER_BIT);	// clear depth buffer
-		
 		/*
 		 * draw sphere outline and
 		 * draw disc into the depth-buffer to distinguish front and backside of the sphere
 		 */
+		gl.glDepthFunc(GL_ALWAYS);								// always path depth-test
 		for (int pass = 0; pass < 2; pass++) {
+			double r = vv.offsetRadius;
 			switch (pass) {
 			case 0:
 				gl.glColor3fv(COLORS[6], 0);
@@ -148,7 +148,7 @@ public class RotateTool implements VisibleTool {
 			}
 			for (int i = 0; i <= SEGMENTS; i++) {
 				p.set(points[2][(i < SEGMENTS) ? i : 0]);
-				p.scale(vv.offsetRadius);
+				p.scale(r);
 				vv.orientMatrix.transform(p);
 				p.x += vv.offsetFactor * vv.cameraPivot.x;
 				p.y += vv.offsetFactor * vv.cameraPivot.y;
@@ -158,6 +158,7 @@ public class RotateTool implements VisibleTool {
 			gl.glEnd();
 		}
 		gl.glColorMask(true, true, true, true);			// enable rendering into the color buffer
+		gl.glDepthFunc(GL_LEQUAL);						// normal depth test operation
 		
 		/*
 		 * draw RGB circles
@@ -165,6 +166,7 @@ public class RotateTool implements VisibleTool {
 		 * pass 1: fill color, thick
 		 * pass 2: fill color, thin, with depth test disabled ("hidden lines")
 		 */
+		gl.glEnable(GL_DEPTH_TEST);
 		for (int pass = 0; pass < 3; pass++) {
 			switch (pass) {
 			case 0:
@@ -187,29 +189,18 @@ public class RotateTool implements VisibleTool {
 			 * index 0,1,2 : x,y,z
 			 * index 3,4,5 : x,y,z oriented towards camera
 			 */
-			for (int i = 0; i < 6; i++) {
-				if (i == 3 || i == 4) {
-					continue;
-				}
-				double ringRadius = (i == 5) ? vv.offsetRadius * SCREEN_ROTATE_FACTOR : vv.radius;
+			for (int i = 0; i < 3; i++) {
+				double ringRadius = vv.radius;
 				int colorIndex;
 				switch (pass) {
 				case 0:
 					colorIndex = 7;
 					break;
 				case 1:
-					if (i < 3) {
-						colorIndex = i;
-					} else {
-						colorIndex = 8;
-					}
+					colorIndex = i;
 					break;
 				case 2:
-					if (i < 3) {
-						colorIndex = i + 3;
-					} else {
-						colorIndex = 8;
-					}
+					colorIndex = i + 3;
 					break;
 				default:
 					throw new RuntimeException();
@@ -223,14 +214,9 @@ public class RotateTool implements VisibleTool {
 				for (int j = 0; j <= SEGMENTS; j++) {
 					p.set(points[i % 3][(j < SEGMENTS) ? j : 0]);
 					p.scale(ringRadius);
-					if (i < 3) {
-						transformUtil.local2Camera(p, p);
-					} else {
-						vv.orientMatrix.transform(p);
-						p.x += vv.offsetFactor * vv.cameraPivot.x;
-						p.y += vv.offsetFactor * vv.cameraPivot.y;
-						p.z += vv.offsetFactor * vv.cameraPivot.z;
-					}
+					
+					transformUtil.local2Camera(p, p);
+					
 					p1.set(p);
 					p1.sub(vv.cameraPivot);
 //					vv.orientMatrix.transform(p1);
@@ -244,6 +230,40 @@ public class RotateTool implements VisibleTool {
 				gl.glEnd();
 			}
 		}
+		
+		gl.glDisable(GL_DEPTH_TEST);
+		for (int pass = 0; pass < 2; pass++) {
+			int colorIndex;
+			if (pass == 0) {
+				gl.glColor4fv(COLORS[7], 0);
+				gl.glLineWidth(3.5f);
+			} else {
+				gl.glColor4fv(COLORS[8], 0);
+				gl.glLineWidth(2.5f);
+			}
+			
+			/*
+			 * index 0,1,2 : x,y,z
+			 * index 3,4,5 : x,y,z oriented towards camera
+			 */
+			
+			double ringRadius = vv.offsetRadius * SCREEN_ROTATE_FACTOR;
+			
+			gl.glBegin(GL_LINE_STRIP);
+			for (int j = 0; j <= SEGMENTS; j++) {
+				p.set(points[2][(j < SEGMENTS) ? j : 0]);
+				p.scale(ringRadius);
+				
+				vv.orientMatrix.transform(p);
+				p.x += vv.offsetFactor * vv.cameraPivot.x;
+				p.y += vv.offsetFactor * vv.cameraPivot.y;
+				p.z += vv.offsetFactor * vv.cameraPivot.z;
+				
+				gl.glVertex3d(p.x, p.y, p.z);
+			}
+			gl.glEnd();
+		}
+		gl.glLineWidth(1.0f);
 		
 		if (mouseMotionListener != null) {
 			/*

@@ -1413,12 +1413,11 @@ public class ViewportGl extends Viewport {
 			float b = a * h / w;
 //			float a = 17.5f / (float) camera.focalLength.get(); 	// 35/focallength/2
 //			float b = a * h / w;
-			gl.glDepthFunc(GL_LEQUAL);
 			gl.glFrustum(-a, a, -b, b, nearClip, farClip);
 		} else {
-			gl.glDepthFunc(GL_LEQUAL);
 			gl.glOrtho(-w, w, -h, h, -farClip, farClip);
 		}
+		gl.glDepthFunc(GL_LEQUAL);
 		gl.glMatrixMode(GL_MODELVIEW);
 		gl.glLoadIdentity();
 //		gl.glScalef(1, 1, -1); // switch to left handed coordinate system

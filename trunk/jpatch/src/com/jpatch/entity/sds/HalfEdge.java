@@ -34,7 +34,7 @@ public class HalfEdge {
 		edgePoint = new Level2Vertex() {
 			@Override
 			public void computeDerivedPosition() {
-				if (valid) {
+				if (positionValid) {
 					return;
 				}
 				Tuple3Attr p0 = HalfEdge.this.vertex.position;
@@ -57,11 +57,12 @@ public class HalfEdge {
 					);
 				}
 				crease = Math.max(0, edgeSharpness - 1);
+				positionValid = true;
 			}
 			
 			@Override
 			public void computeLimit() {
-				if (valid) {
+				if (limitValid) {
 					return;
 				}
 				double edgeSharpness = HalfEdge.this.creaseSharpness();
@@ -103,12 +104,7 @@ public class HalfEdge {
 					normal.cross(uTangent, vTangent);
 					normal.normalize();
 				}
-				valid = true;
-			}
-
-			@Override
-			public void invalidate() {
-				valid = false;
+				limitValid = true;
 			}
 		};
 		pair = new HalfEdge(secondVertex, firstVertex, this, sharpness, edgePoint);

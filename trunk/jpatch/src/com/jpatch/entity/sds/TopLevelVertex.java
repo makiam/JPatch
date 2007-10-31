@@ -5,7 +5,6 @@ import java.util.*;
 import javax.vecmath.*;
 
 import com.jpatch.afw.attributes.*;
-import com.sun.xml.internal.messaging.saaj.util.transform.EfficientStreamingTransformer;
 
 import static com.jpatch.entity.sds.SdsWeights.*;
 
@@ -82,7 +81,7 @@ public class TopLevelVertex extends BaseVertex {
 			
 			@Override
 			public void computeDerivedPosition() {
-				if (valid) {
+				if (positionValid) {
 					return;
 				}
 				if (!overridePosition.getBoolean()) {
@@ -130,12 +129,13 @@ public class TopLevelVertex extends BaseVertex {
 				crease = Math.max(0, TopLevelVertex.this.crease - 1);
 				corner = Math.max(0, TopLevelVertex.this.corner - 1);
 				creaseEdge0 = TopLevelVertex.this.creaseEdge0 == null ? null : TopLevelVertex.this.creaseEdge0.slateEdge0;
-				creaseEdge1 = TopLevelVertex.this.creaseEdge1 == null ? null : TopLevelVertex.this.creaseEdge1.slateEdge0;
+				creaseEdge1 = TopLevelVertex.this.creaseEdge1 == null ? null : TopLevelVertex.this.creaseEdge1.slateEdge0;			
+				positionValid = true;
 			}
 			
 			@Override
 			public void computeLimit() {
-				if (valid) {
+				if (limitValid) {
 					return;
 				}
 				if (TopLevelVertex.this.corner > 0) {
@@ -199,13 +199,8 @@ public class TopLevelVertex extends BaseVertex {
 					vTangent.set(ax, ay, az);
 					normal.cross(uTangent, vTangent);
 					normal.normalize();
-				}
-				valid = true;
-			}
-
-			@Override
-			public void invalidate() {
-				valid = false;
+				}	
+				limitValid = true;
 			}
 		};
 		
@@ -373,15 +368,27 @@ public class TopLevelVertex extends BaseVertex {
 	}
 	
 	public void invalidateLevel2Verices() {
-//		vertexPoint.invalidate();
+		vertexPoint.positionValid = false;
+		vertexPoint.limitValid = false;
 		for (HalfEdge edge : edges) {
-//			edge.edgePoint.invalidate();
+			edge.edgePoint.positionValid = false;
 			Face face = edge.face;
 			if (face != null) {
-				face.facePoint.invalidate();
-				for (HalfEdge faceEdge : face.edgeIterable) {
-					faceEdge.edgePoint.invalidate();
-					faceEdge.getFirstVertex().vertexPoint.invalidate();
+				face.facePoint.positionValid = false;
+				HalfEdge e = edge.next;
+				e.edgePoint.positionValid = false;
+				for (int i = 0, n = face.sides - 2; i < n; i++) {
+					e.vertex.vertexPoint.positionValid = false;
+					e.vertex.vertexPoint.limitValid = false;
+					TopLevelVertex v = e.vertex;
+					for (HalfEdge e2 : v.edges) {
+						e2.edgePoint.limitValid = false;
+						Face f = e2.face;
+						if (f != null) {
+							f.facePoint.limitValid = false;
+						}
+					}
+					e = e.next;
 				}
 			}
 		}

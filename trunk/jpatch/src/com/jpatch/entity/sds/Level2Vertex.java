@@ -30,11 +30,11 @@ public abstract class Level2Vertex extends BaseVertex {
 //	private final float[] vTangentWeights;
 	
 	SlateEdge creaseEdge0, creaseEdge1;
-	boolean valid = false;
+	boolean positionValid = false;
+	boolean limitValid = false;
 	
 	public abstract void computeDerivedPosition();
 	public abstract void computeLimit();
-	public abstract void invalidate();
 	
 //	public Level2Vertex(
 //			LinearCombination<TopLevelVertex> positionLc,
