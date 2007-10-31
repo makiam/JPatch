@@ -26,6 +26,7 @@ package com.jpatch.boundary;
 
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.Configuration;
+import com.jpatch.afw.control.JPatchUndoListener;
 import com.jpatch.afw.control.JPatchUndoManager;
 import com.jpatch.afw.icons.IconSet;
 import com.jpatch.afw.ui.AttributeManager;
@@ -651,6 +652,22 @@ public class Main {
 			}
 		});
 		
+		actions.undoManager.addUndoListener(new JPatchUndoListener() {
+
+			public void editAdded(JPatchUndoManager undoManager) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void redoPerformed(JPatchUndoManager undoManager) {
+				repaintViewports();
+			}
+
+			public void undoPerformed(JPatchUndoManager undoManager) {
+				repaintViewports();
+			}
+			
+		});
 //		new BshConsole();
 	}
 	

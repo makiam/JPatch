@@ -13,6 +13,7 @@ public abstract class AbstractUndoableEdit implements JPatchUndoableEdit {
 	}
 	
 	public void undo() {
+//		System.out.println("undo " + this);
 		if (!applied) {
 			throw new IllegalStateException("undo attempted on unapplied edit " + this);
 		}
@@ -20,6 +21,7 @@ public abstract class AbstractUndoableEdit implements JPatchUndoableEdit {
 	}
 	
 	public void redo() {
+//		System.out.println("redo " + this);
 		if (applied) {
 			throw new IllegalStateException("redo attempted on already applied edit " + this);
 		}

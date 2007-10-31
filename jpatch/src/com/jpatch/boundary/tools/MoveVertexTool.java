@@ -59,7 +59,6 @@ public class MoveVertexTool implements VisibleTool {
 	}
 
 	public void draw(Viewport viewport) {
-		System.out.println("MoveVertexTool.draw()");
 		GL gl = ((ViewportGl) viewport).getGl();
 		Matrix4f modelView = viewport.getViewDef().getTransformUtil().getModelViewMatrix(new Matrix4f());
 		Selection selection = Main.getInstance().getSelection();
@@ -241,13 +240,13 @@ public class MoveVertexTool implements VisibleTool {
 			transformUtil.setLocalTransform(sdsModel.getTransform());
 			
 			vertex.getPos(p);
-			System.out.print("local=" + p + " screen=");
+//			System.out.print("local=" + p + " screen=");
 			transformUtil.local2Screen(p, p);
-			System.out.println(p);
+//			System.out.println(p);
 			Point3d p2 = new Point3d();
 			transformUtil.screen2Local(p, p2);
-			System.out.println("local=" + p2);
-			System.out.println(transformUtil);
+//			System.out.println("local=" + p2);
+//			System.out.println(transformUtil);
 			z = p.z;
 		}
 		
@@ -257,16 +256,16 @@ public class MoveVertexTool implements VisibleTool {
 			p.y = e.getY();
 			p.z = z;
 //			System.out.println("Pscreen =" + p);
-			System.out.print("screen=" + p + " local=");
+//			System.out.print("screen=" + p + " local=");
 			transformUtil.screen2Local(p, p);
-			System.out.println(p);
+//			System.out.println(p);
 //			System.out.println("Pworld  =" + p);
 //			p.sub(limit);
 //			double n = vertex.valence();
 //			p.scale((n + 5) / n);
 //			p.add(pos);
 			vertex.getPosition().setTuple(p);
-			sdsModel.getSds().computeLevel2Vertices();
+//			sdsModel.getSds().computeLevel2Vertices();
 			Main.getInstance().syncRepaintViewport(viewport);
 		}
 	}

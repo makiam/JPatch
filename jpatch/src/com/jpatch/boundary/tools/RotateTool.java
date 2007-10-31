@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.jpatch.afw.attributes.GenericAttr;
 import com.jpatch.afw.attributes.Tuple3Attr;
+import com.jpatch.afw.control.AttributeEdit;
 import com.jpatch.afw.control.JPatchUndoableEdit;
 import com.jpatch.afw.vecmath.Rotation3d;
 import com.jpatch.afw.vecmath.Sphere;
@@ -31,6 +32,8 @@ import com.jpatch.settings.Settings;
 import javax.media.opengl.GL;
 import javax.vecmath.*;
 
+import jpatch.boundary.action.EditAnimObjectAction;
+
 
 import static javax.media.opengl.GL.*;
 
@@ -38,7 +41,7 @@ public class RotateTool implements VisibleTool {
 	public static final GenericAttr<String> EDIT_NAME = new GenericAttr<String>("rotate");
 	private static final double SCREEN_ROTATE_FACTOR = 1.2;
 	private static final int SEGMENTS = 128;
-	private static final int CIRCLE_SEGMENTS = 128; //4096;
+	private static final int CIRCLE_SEGMENTS = 4096;
 	private static final double[] COS = new double[CIRCLE_SEGMENTS];
 	private static final double[] SIN = new double[CIRCLE_SEGMENTS];
 	private final ColorSettings colorSettings = Settings.getInstance().colors;
@@ -229,9 +232,11 @@ public class RotateTool implements VisibleTool {
 						p.z += vv.offsetFactor * vv.cameraPivot.z;
 					}
 					p1.set(p);
-					vv.orientMatrix.transform(p1);
 					p1.sub(vv.cameraPivot);
-					p1.scale(1 / ringRadius / transformUtil.getCameraScale() / transformUtil.getCameraScale());
+//					vv.orientMatrix.transform(p1);
+					
+					p1.scale(1 / ringRadius / transformUtil.getCameraScale());
+//					System.out.println(p1);
 					color[3] = alpha * ((float) p1.z * 0.4f + 0.6f);
 					gl.glColor4fv(color, 0);
 					gl.glVertex3d(p.x, p.y, p.z);
@@ -244,6 +249,30 @@ public class RotateTool implements VisibleTool {
 			/*
 			 * draw plane of rotation
 			 */
+			
+			int constraint = ((HitMouseMotionListener) mouseMotionListener).constraint;
+			float r, g, b;
+			double extraScale = 1;
+			switch (constraint) {
+			case -1:
+				r = 0.5f; g = 0.5f; b = 0.5f;
+				break;
+			case 0:
+				r = 1.0f; g = 0.25f; b = 0.25f;
+				break;
+			case 1:
+				r = 0.25f; g = 0.75f; b = 0.25f;
+				break;
+			case 2:
+				r = 0.25f; g = 0.25f; b = 1.0f;
+				break;
+			case 3:
+				r = 0.66f; g = 0.66f; b = 0.25f;
+				extraScale = SCREEN_ROTATE_FACTOR;
+				break;
+			default:
+				throw new RuntimeException();
+			}
 			
 			/* compute rotation matrix */
 			axisRotation.getRotationMatrix(matrix);
@@ -265,24 +294,21 @@ public class RotateTool implements VisibleTool {
 			Matrix3d matrix = new Matrix3d();
 			
 			for (int pass = 0; pass < 3; pass++) {
-				float gray, alpha;
+				float alpha;
 				switch (pass) {
 				case 0:
 					gl.glDepthMask(false);
 					gl.glBegin(GL_TRIANGLE_FAN);
-					gray = 0.5f;
 					alpha = 0.25f;
 					break;
 				case 1:
 					gl.glBegin(GL_LINE_STRIP);
-					gray = 0.5f;
 					alpha = 0.5f;
 					break;
 				case 2:
 					gl.glDepthMask(true);
 					gl.glEnable(GL_DEPTH_TEST);
 					gl.glBegin(GL_LINE_STRIP);
-					gray = 0.5f;
 					alpha = 1.0f;
 					break;
 				default:
@@ -291,15 +317,18 @@ public class RotateTool implements VisibleTool {
 				for (int i = 0; i <= SEGMENTS; i++) {
 					axisAngle.angle = i * 2 * Math.PI / SEGMENTS;
 					matrix.set(axisAngle);
-					p.scale(vv.radius, fromVector);
+					p.scale(vv.radius * extraScale, fromVector);
 					matrix.transform(p);
 					transformUtil.local2Camera(p, p);
 					
 					p1.set(p);
-					vv.orientMatrix.transform(p1);
 					p1.sub(vv.cameraPivot);
-					p1.scale(1 / vv.radius / transformUtil.getCameraScale() / transformUtil.getCameraScale());
-					gl.glColor4f(gray, gray, gray, alpha * ((float) p1.z * 0.4f + 0.6f));
+//					vv.orientMatrix.transform(p1);
+					
+					p1.scale(1 / vv.radius / extraScale / transformUtil.getCameraScale());
+					
+					
+					gl.glColor4f(r, g, b, alpha * ((float) p1.z * 0.4f + 0.6f));
 					gl.glVertex3d(p.x, p.y, p.z);
 					
 				}
@@ -324,7 +353,7 @@ public class RotateTool implements VisibleTool {
 					axisAngle.angle = angle;
 				}
 				matrix.set(axisAngle);
-				p.scale(vv.radius, fromVector);
+				p.scale(vv.radius * extraScale, fromVector);
 				p1.scale(factor, p);
 				matrix.transform(p);
 				matrix.transform(p1);
@@ -495,7 +524,7 @@ public class RotateTool implements VisibleTool {
 	 * @return true if there was an intersection, false otherwise
 	 */
 	private boolean computeIntersectionPoint(ViewportVars vv, int mouseX, int mouseY, int constraint, Point3d result) {
-		System.out.println("computeIntersectionPoint constraint=" + constraint);
+//		System.out.println("computeIntersectionPoint constraint=" + constraint);
 		double cameraRadius = vv.radius * vv.transformUtil.getCameraScale();
 		
 		Point3d rayOrigin = new Point3d();
@@ -538,12 +567,12 @@ public class RotateTool implements VisibleTool {
 				break;
 			}
 			cameraAxis.normalize();
-			System.out.println("cameraAxis=" + cameraAxis);
+//			System.out.println("cameraAxis=" + cameraAxis);
 			/* compute ray/plane intersection */
 			hit = Utils3d.rayPlaneIntersection(rayOrigin, rayDirection, vv.cameraPivot, cameraAxis, result);
 			
 			/* outside of radius? */
-			if (!hit || constraint != 3 && result.distance(vv.cameraPivot) > cameraRadius) {
+			if (!hit || (constraint != 3 && result.distance(vv.cameraPivot) > cameraRadius)) {
 				distSqToCircle(vv, mouseX, mouseY, cameraAxis, false, false, result);
 				hit = true;
 			}
@@ -649,7 +678,7 @@ public class RotateTool implements VisibleTool {
 	 * @param mouseX
 	 * @param mouseY
 	 * @param cameraAxis the axis of the circle (in camera space)
-	 * @param result a vector pointing from the pivot to the point on the circle closest to mouseX, mouseY (in camera space)
+	 * @param result closest point on circle (in camera space)
 	 * @returns the squared screen-space distance, in pixel
 	 */
 	private double distSqToCircle(ViewportVars vv, int mouseX, int mouseY, Vector3d cameraAxis, boolean orient, boolean frontsideOnly, Tuple3d result) {
@@ -705,20 +734,21 @@ public class RotateTool implements VisibleTool {
 				boolean frontside = distSq < minFrontSq && p.z >= vv.cameraPivot.z;
 				
 				if (p.z < vv.cameraPivot.z) {
-					distSq *= 2;
+					distSq += minFrontSq;
 				}
 				
 				if (distSq < minDistSq) {
-					p.sub(vv.cameraPivot);
-					
 					if (frontside) {
 						frontsideOnly = true;
 					}
 					if (!frontsideOnly || frontside) {
 						minDistSq = distSq;
-						result.sub(p, vv.cameraPivot);
+//						result.sub(p, vv.cameraPivot);
+						result.set(p);
 						/* normalize */
-						result.scale(1.0 / Math.sqrt (result.x * result.x + result.y * result.y + result.z * result.z));
+//						result.scale(1.0 / Math.sqrt (result.x * result.x + result.y * result.y + result.z * result.z));
+						
+//						vv.viewport.getComponent().getGraphics().fillRect((int) ps.x - 2, (int) ps.y - 2, 5, 5);
 					}
 				}
 			}
@@ -801,6 +831,8 @@ public class RotateTool implements VisibleTool {
 	private class HitMouseListener extends MouseAdapter {
 		final Viewport viewport;
 		final ViewportVars vv;
+		final Tuple3d oldAxisRotation = new Point3d();
+		final Tuple3d oldRotation = new Point3d();
 		
 		private HitMouseListener(Viewport viewport) {
 			this.viewport = viewport;
@@ -887,6 +919,8 @@ public class RotateTool implements VisibleTool {
 //				viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 //			}
 //			System.out.println(getHitCircle(viewport, e.getX(), e.getY()));
+				oldAxisRotation.set(axisRotation);
+				oldRotation.set(rotation);
 		}
 		@Override
 		public void mouseReleased(MouseEvent e) {
@@ -898,11 +932,15 @@ public class RotateTool implements VisibleTool {
 				axisRotation.rotateMatrix(m);
 				axisRotation.setRotation(m);
 				rotation.set(0, 0, 0);
-				axisRotationAttr.setTuple(axisRotation);
-				rotationAttr.setTuple(rotation);
+//				axisRotationAttr.setTuple(axisRotation);
+//				rotationAttr.setTuple(rotation);
 				Selection selection = Main.getInstance().getSelection();
 				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(selection.getVertexCount());
 				selection.end(editList);
+				axisRotationAttr.setTuple(oldAxisRotation);
+				rotationAttr.setTuple(oldRotation);
+				editList.add(AttributeEdit.changeAttribute(axisRotationAttr, axisRotation, true));
+				editList.add(AttributeEdit.changeAttribute(rotationAttr, rotation, true));
 				Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
 				Main.getInstance().repaintViewports();
 			}
@@ -962,7 +1000,7 @@ public class RotateTool implements VisibleTool {
 				vv.transformUtil.local2World(axis, axis);
 				Selection selection = Main.getInstance().getSelection();
 				selection.rotateTo(pivot, new AxisAngle4d(axis, angle));
-				selection.getSelectedSdsModelAttribute().getValue().getSds().computeLevel2Vertices();
+//				selection.getSelectedSdsModelAttribute().getValue().getSds().computeLevel2Vertices();
 				
 				rotationAttr.setTuple(rotation);
 				

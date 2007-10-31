@@ -88,7 +88,7 @@ public class Settings extends AbstractSettings {
 	public boolean fontSmoothing = true;
 	
 	@DisplayName(value = "Undo depth")
-	public int undoDepth = 30;
+	public int undoDepth = 100;
 	
 	@DisplayName(value = "History depth")
 	public int historyDepth = 10;
