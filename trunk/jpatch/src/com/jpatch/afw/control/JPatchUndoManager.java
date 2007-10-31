@@ -7,11 +7,51 @@ import java.util.*;
 
 import jpatch.boundary.settings.Settings;
 
-public class JPatchUndoManager extends AbstractScalarAttribute {
+public class JPatchUndoManager {
 	private static final int MAX_DEPTH = Settings.getInstance().undoDepth;
 	
 	private final List<NamedEditList> undoStack = new ArrayList<NamedEditList>();
+	private final ArrayList<JPatchUndoListener> undoListeners = new ArrayList();
+	
 	private int position;
+	
+	public void addUndoListener(JPatchUndoListener undoListener) {
+		if (undoListener == null) {
+			throw new NullPointerException();
+		}
+		if (undoListeners.contains(undoListener)) {
+			throw new IllegalArgumentException("UndoListener " + undoListener + " has already been added to " + this);
+		}
+		undoListeners.add(undoListener);
+	}
+	
+	public void removeUndoListener(JPatchUndoListener undoListener) {
+		if (undoListener == null) {
+			throw new NullPointerException();
+		}
+		if (!undoListeners.contains(undoListener)) {
+			throw new IllegalArgumentException("UndoListener " + undoListener + " has not been added to " + this);
+		}
+		undoListeners.remove(undoListener);
+	}
+	
+	private void fireUndoPerformed() {
+		for (JPatchUndoListener undoListener : undoListeners) {
+			undoListener.undoPerformed(this);
+		}
+	}
+	
+	private void fireRedoPerformed() {
+		for (JPatchUndoListener undoListener : undoListeners) {
+			undoListener.redoPerformed(this);
+		}
+	}
+	
+	private void fireEditAdded() {
+		for (JPatchUndoListener undoListener : undoListeners) {
+			undoListener.editAdded(this);
+		}
+	}
 	
 	public void addEdit(GenericAttr<String> name, List<JPatchUndoableEdit> editList) {
 		addEdit(new NamedEditList(name, editList.toArray(new JPatchUndoableEdit[editList.size()])));
@@ -54,15 +94,15 @@ public class JPatchUndoManager extends AbstractScalarAttribute {
 			throw new IllegalStateException("can't undo");
 		}
 		undoStack.get(--position).undo();
-		fireAttributeHasChanged();
+		fireUndoPerformed();
 	}
-	
+
 	public void redo() {
 		if (!canRedo()) {
 			throw new IllegalStateException("can't redo");
 		}
 		undoStack.get(position++).redo();
-		fireAttributeHasChanged();
+		fireRedoPerformed();
 	}
 	
 	private void addEdit(NamedEditList namedEditList) {
@@ -74,7 +114,7 @@ public class JPatchUndoManager extends AbstractScalarAttribute {
 			}
 		}
 		undoStack.add(position++, namedEditList);
-		fireAttributeHasChanged();
+		fireEditAdded();
 	}
 	
 	private static class NamedEditList {
@@ -92,14 +132,14 @@ public class JPatchUndoManager extends AbstractScalarAttribute {
 		}
 		
 		private void undo() {
-			for (int i = edits.length - 1; i > 0; i--) {
+			for (int i = edits.length - 1; i >= 0; i--) {
 				edits[i].undo();
 			}
 		}
 		
 		private void redo() {
 			for (int i = 0; i < edits.length; i++) {
-				edits[i].undo();
+				edits[i].redo();
 			}
 		}
 	}

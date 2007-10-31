@@ -578,7 +578,7 @@ public class ViewportGl extends Viewport {
 		drawSelection(selection);
 		
 		JPatchTool tool = Main.getInstance().getActiveTool();
-		System.out.println("tool = " + tool);
+//		System.out.println("tool = " + tool);
 		if (tool != null) {
 			tool.draw(this);
 		}
@@ -944,6 +944,7 @@ public class ViewportGl extends Viewport {
 		
 //		Matrix4d m = new Matrix4d();
 		
+		sds.computeLevel2Vertices();
 		sds.project(modelView);
 		
 		for (Face face : sds.faceList) {

@@ -65,13 +65,26 @@ public class Actions {
 		 */
 		toolSM.setDefaultState(tools[3]);
 		
+		extrudeTool.getEnabled().setBoolean(false);
+		latheTool.getEnabled().setBoolean(false);
+		
 		/*
 		 * configure undo and redo actions
 		 */
 		undo.getEnabled().setBoolean(undoManager.canUndo());
 		redo.getEnabled().setBoolean(undoManager.canRedo());
-		undoManager.addAttributePostChangeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute source) {
+		undoManager.addUndoListener(new JPatchUndoListener() {
+			public void editAdded(JPatchUndoManager undoManager) {
+				undo.getEnabled().setBoolean(undoManager.canUndo());
+				redo.getEnabled().setBoolean(undoManager.canRedo());
+			}
+
+			public void redoPerformed(JPatchUndoManager undoManager) {
+				undo.getEnabled().setBoolean(undoManager.canUndo());
+				redo.getEnabled().setBoolean(undoManager.canRedo());
+			}
+
+			public void undoPerformed(JPatchUndoManager undoManager) {
 				undo.getEnabled().setBoolean(undoManager.canUndo());
 				redo.getEnabled().setBoolean(undoManager.canRedo());
 			}
