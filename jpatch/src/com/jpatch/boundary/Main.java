@@ -508,8 +508,8 @@ public class Main {
 		
 		try {
 			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt")));
-//			final SdsModel model1 = new SdsModel(new Sds(new FileInputStream("/home/sascha/off/cube.off")));
-//			final SdsModel model3 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/arrows.jpt")));
+//			final SdsModel model1 = new SdsModel(new Sds(new FileInputStream("/home/sascha/off/cube2.off")));
+//			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/barrel.jpt")));
 			model1.getNameAttribute().setValue("model 1");
 			model1.getParentAttribute().setValue(sceneGraphRoot);
 			selection.getSelectedSdsModelAttribute().setValue(model1);

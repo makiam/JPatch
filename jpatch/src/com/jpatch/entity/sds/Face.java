@@ -62,7 +62,7 @@ public class Face {
 		facePoint = new Level2Vertex() {
 			@Override
 			public void computeDerivedPosition() {
-				if (valid) {
+				if (positionValid) {
 					return;
 				}
 				double x = 0, y = 0, z = 0;
@@ -73,11 +73,12 @@ public class Face {
 					z += t.getZ();
 				}
 				position.setTuple(x * recSides, y * recSides, z * recSides);
+				positionValid = true;
 			}
 			
 			@Override
 			public void computeLimit() {
-				if (valid) {
+				if (limitValid) {
 					return;
 				}
 				double fx = 0, fy = 0, fz = 0;
@@ -131,13 +132,7 @@ public class Face {
 				vTangent.set(ax, ay, az);
 				normal.cross(uTangent, vTangent);
 				normal.normalize();
-				
-				valid = true;
-			}
-
-			@Override
-			public void invalidate() {
-				valid = false;
+				limitValid = true;
 			}
 		};
 		
