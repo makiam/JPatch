@@ -3,16 +3,16 @@ package com.jpatch.boundary.tools;
 import static javax.media.opengl.GL.*;
 
 import java.awt.Dimension;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.Point;
+import java.awt.event.*;
 import java.util.Arrays;
 import java.util.Comparator;
 
 import javax.media.opengl.GL;
+import javax.swing.SwingUtilities;
 import javax.vecmath.*;
 
+import com.jpatch.afw.attributes.StateMachine;
 import com.jpatch.afw.attributes.Tuple3Attr;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.boundary.*;
@@ -85,7 +85,7 @@ public class TranslateTool implements VisibleTool {
 	private final Point3d pivot = new Point3d();
 	private final Vector3d vector = new Vector3d(2, 1, 0);
 	private final Rotation3d axisRotation = new Rotation3d();
-	
+	private final StateMachine<Integer> modeAttr = new StateMachine<Integer>(new Integer[] { 3, 6 }, 6);
 	private final static Shape arrow = new Shape(
 			new Point3f[] {
 					new Point3f(1, 0, 0),
@@ -135,6 +135,10 @@ public class TranslateTool implements VisibleTool {
 	
 	public Tuple3Attr getVectorAttribute() {
 		return vectorAttr;
+	}
+	
+	public StateMachine<Integer> getModeAttribute() {
+		return modeAttr;
 	}
 	
 	
@@ -214,8 +218,6 @@ public class TranslateTool implements VisibleTool {
 		GL gl = ((ViewportGl) viewport).getGl();
 		gl.glEnable(GL_BLEND);
 		gl.glEnable(GL_LINE_SMOOTH);
-		gl.glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-		gl.glEnable(GL_POLYGON_SMOOTH);
 		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		gl.glDisable(GL_LIGHTING);
 		gl.glDisable(GL_COLOR_MATERIAL);
@@ -233,13 +235,15 @@ public class TranslateTool implements VisibleTool {
 		
 		for (int ghost = 0; ghost < 2; ghost++) {
 			if (ghost == 1) {
+				Vector3d v = new Vector3d(vector);
+				axisRotation.getRotationMatrix(new Matrix3d()).transform(v);
 				axisRotation.getRotationMatrix(matrix);
 				matrix.mul(radius);
 				
 				/* add pivot translation */
-				matrix.m03 = pivot.x + vector.x;
-				matrix.m13 = pivot.y + vector.y;
-				matrix.m23 = pivot.z + vector.z;
+				matrix.m03 = pivot.x + v.x;
+				matrix.m13 = pivot.y + v.y;
+				matrix.m23 = pivot.z + v.z;
 				
 				matrix.m33 = 1;
 			
@@ -249,53 +253,55 @@ public class TranslateTool implements VisibleTool {
 			
 			for (int i = 0; i < 6; i++) {
 				int axis = order[i];
+				if (modeAttr.getValue() == 6 || axis % 2 == 0) {
 				m.set(modelView);
 				m.mul(matrices[axis]);
-				for (int j = 0; j < 2; j++) {
-					if ((j == 0 && axisPoints[axis].z > cameraPivot.z) || (j == 1 && axisPoints[axis].z <= cameraPivot.z)) {
-						gl.glEnable(GL_LINE_SMOOTH);
-						for (int pass = 0; pass < 2; pass++) {
-							if (pass != 1 && ghost == 0) {
-								continue;
-							}
-							if (pass == 0) {
-								gl.glLineWidth(3.5f);
-							} else {
-								gl.glLineWidth(2.5f);
-							}
-							
-							if (pass == 1) {
-								if (ghost == 0) {
-									gl.glColor4fv(COLORS[5], 0);
-								} else {
-									gl.glColor3fv(COLORS[axis / 2], 0);
+					for (int j = 0; j < 2; j++) {
+						if ((j == 0 && axisPoints[axis].z > cameraPivot.z) || (j == 1 && axisPoints[axis].z <= cameraPivot.z)) {
+							gl.glEnable(GL_LINE_SMOOTH);
+							for (int pass = 0; pass < 2; pass++) {
+								if (pass != 1 && ghost == 0) {
+									continue;
 								}
+								if (pass == 0) {
+									gl.glLineWidth(3.5f);
+								} else {
+									gl.glLineWidth(2.5f);
+								}
+								
+								if (pass == 1) {
+									if (ghost == 0) {
+										gl.glColor4fv(COLORS[5], 0);
+									} else {
+										gl.glColor3fv(COLORS[axis / 2], 0);
+									}
+								}
+								gl.glBegin(GL_LINES);
+								p.set(ARROW_START, 0, 0);
+								m.transform(p);
+								gl.glVertex3f(p.x, p.y, p.z);
+								p.set(1 - ARROW_LENGTH, 0, 0);
+								m.transform(p);
+								gl.glVertex3f(p.x, p.y, p.z);
+								gl.glEnd();
 							}
-							gl.glBegin(GL_LINES);
-							p.set(ARROW_START, 0, 0);
-							m.transform(p);
-							gl.glVertex3f(p.x, p.y, p.z);
-							p.set(1 - ARROW_LENGTH, 0, 0);
-							m.transform(p);
-							gl.glVertex3f(p.x, p.y, p.z);
-							gl.glEnd();
 						}
-					}
-					if (j == 0) {
-						m.set(modelView);
-						m.mul(matrices[axis]);
-						if (ghost == 1) {
-							gl.glLineWidth(2f);
-							gl.glColor3fv(COLORS[3], 0);
-							arrow.drawOutline(gl, m);
-							gl.glEnable(GL_LIGHTING);
-							int mat = (ghost == 0) ? 3 : axis / 2;
-							MATERIALS[mat].applyMaterial(gl, GL_FRONT);
-							arrow.draw(gl, m);
-							gl.glDisable(GL_LIGHTING);
-						} else {
-							gl.glColor4fv(COLORS[5], 0);
-							arrow.draw(gl, m);
+						if (j == 0) {
+							m.set(modelView);
+							m.mul(matrices[axis]);
+							if (ghost == 1) {
+								gl.glLineWidth(2f);
+								gl.glColor3fv(COLORS[3], 0);
+								arrow.drawOutline(gl, m);
+								gl.glEnable(GL_LIGHTING);
+								int mat = (ghost == 0) ? 3 : axis / 2;
+								MATERIALS[mat].applyMaterial(gl, GL_FRONT);
+								arrow.draw(gl, m);
+								gl.glDisable(GL_LIGHTING);
+							} else {
+								gl.glColor4fv(COLORS[5], 0);
+								arrow.draw(gl, m);
+							}
 						}
 					}
 				}
@@ -351,6 +357,57 @@ public class TranslateTool implements VisibleTool {
 		
 	}
 
+	private class HitMouseMotionListener extends MouseMotionAdapter {
+		final int constraint;
+		final Viewport viewport;
+		final TransformUtil transformUtil;
+		final Point3d pScreen = new Point3d();
+		final Point3d pLocal = new Point3d();
+		HitMouseMotionListener(Viewport viewport, int constraint, double z) {
+			this.viewport = viewport;
+			transformUtil = viewport.getViewDef().getTransformUtil();
+			this.constraint = constraint;
+			pScreen.z = z;
+			System.out.println("screenZ = " + z);
+			
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			// TODO Auto-generated method stub
+			Matrix4d matrix = new Matrix4d();
+			axisRotation.getRotationMatrix(matrix);
+			
+			/* add pivot translation */
+			matrix.m03 = pivot.x;
+			matrix.m13 = pivot.y;
+			matrix.m23 = pivot.z;
+			
+			matrix.m33 = 1;
+			
+			transformUtil.setLocal2World(matrix);
+			
+			if (constraint < 0) {
+				pScreen.x = e.getX();
+				pScreen.y = e.getY();
+				transformUtil.screen2Local(pScreen, pLocal);
+				vector.set(pLocal);
+			} else {
+				Point3d p0 = new Point3d();
+				transformUtil.local2Screen(p0, p0);
+				Point3d p1 = new Point3d(1 - ARROW_LENGTH * 0.75, 0, 0);
+				matrices[constraint].transform(p1);
+				transformUtil.local2Screen(p1, p1);
+				double t = Utils3d.closestPointOnLine(p0.x, p0.y, p1.x, p1.y, pScreen.x, pScreen.y);
+				System.out.println(t);
+				pScreen.interpolate(p0, p1, t);
+				transformUtil.screen2Local(pScreen, pLocal);
+				vector.set(pLocal);
+			}
+			Main.getInstance().syncRepaintViewport(viewport);
+		}
+	}
+	
 	private class HitMouseListener extends MouseAdapter {
 		Viewport viewport;
 		TransformUtil transformUtil;
@@ -363,28 +420,45 @@ public class TranslateTool implements VisibleTool {
 		public void mousePressed(MouseEvent e) {
 			double minDistSq = 100;
 			Point3d p = new Point3d(0, 0, 0);
+			Point hitPoint = new Point();
+			double hitZ = 0;
 			transformUtil.local2Screen(p, p);
+			int hit = -2;
 			if (distSq(e.getX(), e.getY(), p) < minDistSq) {
-				// origin hit
-				System.out.println("origin");
+				hit = -1;
+				hitPoint.setLocation((int) Math.round(p.x), (int) Math.round(p.y));
+				hitZ = p.z;
 			} else {
-				int hit = -1;
 				for (int i = 0; i < matrices.length; i++) {
-					p.set(1 - ARROW_LENGTH * 0.5, 0, 0);
+					p.set(1 - ARROW_LENGTH * 0.75, 0, 0);
 					matrices[i].transform(p);
 					transformUtil.local2Screen(p, p);
 					double distSq = distSq(e.getX(), e.getY(), p);
 					if (distSq < minDistSq) {
 						minDistSq = distSq;
 						hit = i;
+						hitPoint.setLocation((int) Math.round(p.x), (int) Math.round(p.y));
+						hitZ = p.z;
 					}
 				}
-				if (hit > -1) {
-					System.out.println(hit);
-				}
+			}
+			if (hit > -2) {
+				System.out.println(hit);
+				SwingUtilities.convertPointToScreen(hitPoint, viewport.getComponent());
+				Main.getInstance().getRobot().mouseMove(hitPoint.x, hitPoint.y);
+				mouseMotionListener = new HitMouseMotionListener(viewport, hit, hitZ);
+				viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 			}
 		}
 		
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			if (mouseMotionListener != null) {
+				viewport.getComponent().removeMouseMotionListener(mouseMotionListener);
+				mouseMotionListener = null;
+				Main.getInstance().syncViewports(viewport);
+			}
+		}
 		
 		private double distSq(int x, int y, Point3d screenPoint) {
 			double dx = screenPoint.x - x;
