@@ -85,7 +85,7 @@ public class Main {
 	private static Color VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.text.get();
 	private static Color ACTIVE_VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.selection.get();
 	
-//	private Robot robot;
+	private Robot robot;
 	private JFrame frame;
 	private JLabel statusLabel = new JLabel("status");
 	
@@ -307,11 +307,11 @@ public class Main {
 
 		
 		screen.setBackground(Color.BLACK);
-//		try {
-//			robot = new Robot();
-//		} catch (AWTException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			robot = new Robot();
+		} catch (AWTException e) {
+			e.printStackTrace();
+		}
 
 //		Color BACKGROUND = new Color(0xa0a0a0);
 		frame = new JFrame("JPatch");
@@ -712,6 +712,10 @@ public class Main {
 	
 	public SceneGraphNode getSceneGraphRoot() {
 		return sceneGraphRoot;
+	}
+	
+	public Robot getRobot() {
+		return robot;
 	}
 	
 	public JPatchTool getActiveTool() {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <attributeEditor name="View" class="com.jpatch.boundary.tools.TranslateTool">
+	<field name="Arms" attribute="Mode" />
 	<field name="Axis rotation" attribute="AxisRotation" />
 	<field name="Move to" attribute="Pivot" />
 	<field name="Move by" attribute="Vector" />
