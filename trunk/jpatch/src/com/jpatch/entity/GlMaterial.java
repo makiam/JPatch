@@ -1,5 +1,7 @@
 package com.jpatch.entity;
 
+import static javax.media.opengl.GL.*;
+import javax.media.opengl.GL;
 import javax.vecmath.*;
 
 public class GlMaterial {
@@ -9,6 +11,25 @@ public class GlMaterial {
 	public static final int EMISSION = 12;
 	public static final int SHININESS = 16;
 	private final float[] array = new float[17];
+	
+	public GlMaterial(GlMaterial copy) {
+		System.arraycopy(copy.array, 0, array, 0, array.length);
+	}
+	
+	public GlMaterial(final Color3f color, final float ambientAmount, final float metallic, final float shininess) {
+		Color3f ka = new Color3f(color);
+		ka.scale(ambientAmount);
+		Color3f kd = new Color3f(color);
+		kd.scale(1 - ambientAmount);
+		Color3f ks = new Color3f(1, 1, 1);
+		ks.interpolate(color, metallic);
+		Color3f ke = new Color3f(0, 0, 0);
+		setKa(ka);
+		setKd(kd);
+		setKs(ks);
+		setKe(ke);
+		setShininess(shininess);
+	}
 	
 	public GlMaterial(final Color3f ka, final Color3f kd, final Color3f ks, final Color3f ke, final float shininess) {
 		setKa(ka);
@@ -132,5 +153,15 @@ public class GlMaterial {
 	
 	public void setShininess(float shininess) {
 		array[SHININESS] = shininess;
+	}
+	
+	public void applyMaterial(GL gl, int side) {
+//		gl.glDisable(GL_COLOR_MATERIAL);
+		gl.glMaterialfv(side, GL_AMBIENT, array, GlMaterial.AMBIENT);
+		gl.glMaterialfv(side, GL_DIFFUSE, array, GlMaterial.DIFFUSE);
+		gl.glMaterialfv(side, GL_SPECULAR, array, GlMaterial.SPECULAR);
+		gl.glMaterialfv(side, GL_EMISSION, array, GlMaterial.EMISSION);
+		gl.glMaterialfv(side, GL_SHININESS, array, GlMaterial.SHININESS);
+//		gl.glEnable(GL_COLOR_MATERIAL);
 	}
 }

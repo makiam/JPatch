@@ -363,7 +363,8 @@ public class ViewportGl extends Viewport {
 				gl.glGetIntegerv(GL_MAX_TEXTURE_SIZE, I, 0);
 				maxTextureSize = I[0];
 				
-				setLighting(RealtimeLighting.createThreepointLight());
+				setLighting(RealtimeLighting.createThreepointLight());			
+//				setLighting(RealtimeLighting.createHeadLight());
 				
 				gl.glEnable(GL_POLYGON_OFFSET_FILL);
 				gl.glPolygonOffset(1.0f, 1.0f);
