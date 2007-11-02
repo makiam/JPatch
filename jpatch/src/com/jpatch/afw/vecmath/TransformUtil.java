@@ -478,6 +478,12 @@ public class TransformUtil {
 		return modelView;
 	}
 	
+	public Matrix4d getModelViewMatrix(Matrix4d modelView) {
+		computeLocal2Camera();
+		modelView.set(local2Camera);
+		return modelView;
+	}
+	
 	public Matrix3d getCameraToWorldRotation(Matrix3d rotationMatrix) {
 		computeCamera2World();
 		camera2World.getRotationScale(rotationMatrix);

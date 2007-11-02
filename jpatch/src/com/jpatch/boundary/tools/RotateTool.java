@@ -69,7 +69,7 @@ public class RotateTool implements VisibleTool {
 	int axisConstraint = -1;
 	private Matrix4d matrix = new Matrix4d();
 	private MouseListener[] mouseListeners;
-	private MouseMotionAdapter mouseMotionListener;
+	private MouseMotionListener mouseMotionListener;
 	
 	private Vector3d fromVector = new Vector3d();
 	private Vector3d toVector = new Vector3d();

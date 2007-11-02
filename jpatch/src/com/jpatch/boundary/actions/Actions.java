@@ -17,6 +17,7 @@ public class Actions {
 			ChangeViewTool.createRotateViewTool(),
 			new MoveVertexTool(),
 			new RotateTool(),
+			new TranslateTool(),
 			null
 	};
 	
@@ -32,10 +33,10 @@ public class Actions {
 	
 	public final SwitchStateAction defaultTool = new SwitchStateAction(toolSM, tools[3], undoManager, "DEFAULT_TOOL");
 	public final SwitchStateAction moveTool = new SwitchStateAction(toolSM, tools[5], undoManager, "MOVE_TOOL");
-	public final SwitchStateAction scaleTool = new SwitchStateAction(toolSM, tools[5], undoManager, "SCALE_TOOL");
+	public final SwitchStateAction scaleTool = new SwitchStateAction(toolSM, tools[6], undoManager, "SCALE_TOOL");
 	public final SwitchStateAction rotateTool = new SwitchStateAction(toolSM, tools[4], undoManager, "ROTATE_TOOL");
-	public final SwitchStateAction extrudeTool = new SwitchStateAction(toolSM, tools[5], undoManager, "EXTRUDE_TOOL");
-	public final SwitchStateAction latheTool = new SwitchStateAction(toolSM, tools[5], undoManager, "LATHE_TOOL");
+	public final SwitchStateAction extrudeTool = new SwitchStateAction(toolSM, tools[6], undoManager, "EXTRUDE_TOOL");
+	public final SwitchStateAction latheTool = new SwitchStateAction(toolSM, tools[6], undoManager, "LATHE_TOOL");
 	
 	public final SwitchStateAction vertexMode = new SwitchStateAction(sdsModeSM, SdsMode.VERTEX_MODE, undoManager, "VERTEX_MODE");
 	public final SwitchStateAction edgeMode = new SwitchStateAction(sdsModeSM, SdsMode.EDGE_MODE, undoManager, "EDGE_MODE");
