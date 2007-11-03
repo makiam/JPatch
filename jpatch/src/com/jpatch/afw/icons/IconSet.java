@@ -19,7 +19,7 @@ import javax.swing.plaf.metal.MetalButtonUI;
 
 public class IconSet implements Serializable {
 	private static final long serialVersionUID = -5773242156358795217L;
-	public static enum Style { GLOSSY, FROSTED, BRUSHED, DARK, TINY }
+	public static enum Style { GLOSSY, FROSTED, BRUSHED, DARK, TINY, UNDECORATED }
 	public static enum Type { SINGLE, ROUND, LARGE, LEFT, CENTER, RIGHT }
 	public static enum Mode { DEFAULT, ROLLOVER, SELECTED, PRESSED, ROLLOVERSELECTED }
 	
@@ -45,6 +45,17 @@ public class IconSet implements Serializable {
 	public void configureButton(AbstractButton button, Style style, Type type, Icon icon) {
 		BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 		icon.paintIcon(null, image.createGraphics(), 0, 0);
+		if (style == Style.UNDECORATED) {
+			button.setIcon(new ImageIcon(image));
+			button.setContentAreaFilled(false);
+			button.setBorderPainted(false);
+			button.setBorder(null);
+			button.setOpaque(false);
+			button.setPreferredSize(new Dimension(icon.getIconWidth() + 4, icon.getIconHeight() + 6));
+			button.setRolloverEnabled(true);
+			button.setFocusable(false);
+			return;
+		}
 		BufferedImage defaultImage = createTintedImage(icons[style.ordinal()][type.ordinal()], Mode.DEFAULT);
 		BufferedImage disabledImage = createTintedImage(icons[style.ordinal()][type.ordinal()], Mode.DEFAULT);
 		BufferedImage rolloverImage = createTintedImage(icons[style.ordinal()][type.ordinal()], Mode.ROLLOVER);

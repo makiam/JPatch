@@ -78,6 +78,7 @@ public class JptLoader {
 						}
 					}
 //					System.out.println(vertexList);
+					Collections.reverse(vertexList);
 					Face face = sds.addFace(vertexList.toArray(new TopLevelVertex[vertexList.size()]));
 //					if (face != null) {
 						face.setMaterial(materials.get(materialIndex));
@@ -140,7 +141,7 @@ public class JptLoader {
 					cp = new Cp(
 							Double.parseDouble(attributes.getValue("x")),
 							Double.parseDouble(attributes.getValue("y")),
-							Double.parseDouble(attributes.getValue("z"))
+							-Double.parseDouble(attributes.getValue("z"))
 					);
 				}
 				int cpId = cpIndex++;

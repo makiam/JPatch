@@ -102,11 +102,11 @@ public class PlatformUtils {
 //			System.out.println(UIManager.getLookAndFeelDefaults().get("SliderUI"));
 //			UIManager.getLookAndFeelDefaults().put("Slider.paintThumbArrowShape", Boolean.TRUE);
 			
-			Set x = UIManager.getLookAndFeelDefaults().entrySet();
-			for (Object key : x) {
-				if (key.toString().contains("background"))
-					System.out.println(key + " => " + UIManager.getLookAndFeelDefaults().get(key));
-			}
+//			Set x = UIManager.getLookAndFeelDefaults().entrySet();
+//			for (Object key : x) {
+//				if (key.toString().contains("background"))
+//					System.out.println(key + " => " + UIManager.getLookAndFeelDefaults().get(key));
+//			}
 			
 			
 //			com.sun.java.swing.plaf.windows.WindowsSliderUI
