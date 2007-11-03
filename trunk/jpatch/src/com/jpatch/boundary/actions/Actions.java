@@ -1,10 +1,17 @@
 package com.jpatch.boundary.actions;
 
 import java.awt.event.ActionEvent;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.swing.JFileChooser;
 
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
+import com.jpatch.boundary.Main;
 import com.jpatch.boundary.tools.*;
+import com.jpatch.entity.sds.*;
 
 public class Actions {
 //	public static enum Tool { MOVE_VIEW, ZOOM_VIEW, ROTATE_VIEW, DEFAULT_TOOL, MOVE_TOOL, SCALE_TOOL, ROTATE_TOOL, EXTRUDE_TOOL, LATHE_TOOL }
@@ -60,6 +67,27 @@ public class Actions {
 		}
 	};
 	
+	public final JPatchAction open = new JPatchAction(undoManager, "OPEN_FILE") {
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser fileChooser = new JFileChooser();
+			if (fileChooser.showOpenDialog(Main.getInstance().getFrame()) == JFileChooser.APPROVE_OPTION) {
+				try {
+					Sds sds = new JptLoader().importModel(new FileInputStream(fileChooser.getSelectedFile()));
+					Main.getInstance().setModel(sds);
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				} 
+			}
+			
+		}
+	};
+	
+	public final JPatchAction save = new JPatchAction(undoManager, "SAVE_FILE") {
+		public void actionPerformed(ActionEvent e) {
+			System.out.println("save");
+		}
+	};
+	
 	public Actions() {
 		/*
 		 * configure tool statemachine
@@ -68,6 +96,8 @@ public class Actions {
 		
 		extrudeTool.getEnabled().setBoolean(false);
 		latheTool.getEnabled().setBoolean(false);
+		scaleTool.getEnabled().setBoolean(false);
+		save.getEnabled().setBoolean(false);
 		
 		/*
 		 * configure undo and redo actions

@@ -31,7 +31,7 @@ public class Sds {
 	public List<TopLevelVertex[]> candidateFaceList = new ArrayList<TopLevelVertex[]>();
 	public Map<CandidateEdge, Integer> candidateEdgeMap = new HashMap<CandidateEdge, Integer>();
 	
-	public Level2Vertex[] level2Vertices;
+	public Level2Vertex[] level2Vertices = new Level2Vertex[0];
 	
 //	public final Vertex[] topLevelVertices;
 	
@@ -51,7 +51,7 @@ public class Sds {
 //		new Edge(vertexList.get(1), vertexList.get(0)).hashCode();
 //	}
 	
-	Sds() { }
+	public Sds() { }
 	
 	public Sds(InputStream offInputStream) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(offInputStream));

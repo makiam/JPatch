@@ -11,9 +11,9 @@ public abstract class OrthoViewDirection implements ViewDirection {
 	public static final OrthoViewDirection REAR = new FixedViewDirection("Rear", 0, 180);
 	public static final OrthoViewDirection LEFT = new FixedViewDirection("Left", 0, 90);
 	public static final OrthoViewDirection RIGHT = new FixedViewDirection("Right", 0, -90);
-	public static final OrthoViewDirection TOP = new FixedViewDirection("Top", -90, 0);
-	public static final OrthoViewDirection BOTTOM = new FixedViewDirection("Bottom", 90, 0);
-	public static final OrthoViewDirection BIRDS_EYE = new BirdsEyeViewDirection("Bird's Eye", -45, -45);
+	public static final OrthoViewDirection TOP = new FixedViewDirection("Top", 90, 0);
+	public static final OrthoViewDirection BOTTOM = new FixedViewDirection("Bottom", -90, 0);
+	public static final OrthoViewDirection BIRDS_EYE = new BirdsEyeViewDirection("Bird's Eye", 45, 135);
 	
 	public static final OrthoViewDirection[] DIRECTIONS = new OrthoViewDirection[] { FRONT, REAR, LEFT, RIGHT, TOP, BOTTOM, BIRDS_EYE };
 	

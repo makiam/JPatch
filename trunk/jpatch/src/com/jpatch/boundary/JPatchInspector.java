@@ -56,7 +56,12 @@ public class JPatchInspector {
 			System.out.println("selection=" + ((GenericAttr<Object>) source).getValue());
 			Object selectedObject = ((GenericAttr<Object>) source).getValue();
 			if (selectedObject != null) {
-				panel.add(AttributeEditorFactory.getInstance().getEditorFor(((GenericAttr<Object>) source).getValue(), selectionExpandedAttr, SELECTION_COLOR), 2);
+				AttributeEditor ae = AttributeEditorFactory.getInstance().getEditorFor(((GenericAttr<Object>) source).getValue(), selectionExpandedAttr, SELECTION_COLOR);
+				if (ae != null) {
+					panel.add(ae, 2);
+				} else {
+					panel.add(selectionEditor, 2);
+				} 
 			} else {
 				panel.add(selectionEditor, 2);
 			}

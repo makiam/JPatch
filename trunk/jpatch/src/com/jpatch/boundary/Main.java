@@ -51,6 +51,7 @@ import com.jpatch.entity.sds.JptLoader;
 import com.jpatch.entity.sds.Sds;
 import com.jpatch.settings.Settings;
 import com.jpatch.ui.ViewportSwitcher;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -439,6 +440,9 @@ public class Main {
 		
 		ButtonUtils buttonUtils = new ButtonUtils();
 		
+		JPatchActionButton openButton = new JPatchActionButton(actions.open);
+		JPatchActionButton saveButton = new JPatchActionButton(actions.save);
+		
 		JPatchActionButton undoButton = new JPatchActionButton(actions.undo);
 		JPatchActionButton redoButton = new JPatchActionButton(actions.redo);
 		
@@ -461,6 +465,7 @@ public class Main {
 		JPatchStateButton extrudeTool = new JPatchStateButton(actions.extrudeTool);
 		JPatchStateButton latheTool = new JPatchStateButton(actions.latheTool);
 		
+		buttonUtils.configureButtons(IconSet.Style.UNDECORATED, openButton, saveButton);
 		buttonUtils.configureButtons(IconSet.Style.DARK, undoButton, redoButton);
 		buttonUtils.configureButtons(IconSet.Style.GLOSSY, moveView, zoomView, rotateView);
 		buttonUtils.configureButtons(IconSet.Style.FROSTED, vertexMode, edgeMode, faceMode, objectMode);
@@ -468,6 +473,9 @@ public class Main {
 		buttonUtils.configureButtons(IconSet.Style.BRUSHED, defaultTool, moveTool, scaleTool, rotateTool);
 		buttonUtils.configureButtons(IconSet.Style.BRUSHED, extrudeTool, latheTool);
 		
+		toolBar.add(openButton);
+		toolBar.add(saveButton);
+		toolBar.add(Box.createHorizontalStrut(32));
 		toolBar.add(viewportSwitcher.getComponent());
 		toolBar.add(Box.createHorizontalStrut(32));
 		toolBar.add(undoButton);
@@ -507,16 +515,20 @@ public class Main {
 //		final TransformNode node4 = new TransformNode();
 		
 		try {
-			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt")));
+//			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt")));
 //			final SdsModel model1 = new SdsModel(new Sds(new FileInputStream("/home/sascha/off/cube2.off")));
 //			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/barrel.jpt")));
-			model1.getNameAttribute().setValue("model 1");
-			model1.getParentAttribute().setValue(sceneGraphRoot);
-			selection.getSelectedSdsModelAttribute().setValue(model1);
+//			model1.getNameAttribute().setValue("model 1");
+//			model1.getParentAttribute().setValue(sceneGraphRoot);
+//			selection.getSelectedSdsModelAttribute().setValue(model1);
 //			model2.getNameAttribute().setValue("model 2");
 //			model2.getParentAttribute().setValue(model1);
 //			model3.getNameAttribute().setValue("model 3");
 //			model3.getParentAttribute().setValue(model2);
+			SdsModel model = new SdsModel(new Sds());
+			model.getNameAttribute().setValue("SDS model");
+			model.getParentAttribute().setValue(sceneGraphRoot);
+			selection.getSelectedSdsModelAttribute().setValue(model);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -732,8 +744,12 @@ public class Main {
 		return actions.undoManager;
 	}
 	
-	public void setActiveSds(Sds sds) {
-		activeSds = sds;
+	public void setModel(Sds sds) {
+		SdsModel model = new SdsModel(sds);
+		model.getNameAttribute().setValue("model");
+		sceneGraphRoot.getChildrenAttribute().clear();
+		model.getParentAttribute().setValue(sceneGraphRoot);
+		selection.getSelectedSdsModelAttribute().setValue(model);
 	}
 	
 	public void computeSceneGraph() {
