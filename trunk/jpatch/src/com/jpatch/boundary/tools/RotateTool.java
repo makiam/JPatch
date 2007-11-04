@@ -962,7 +962,7 @@ public class RotateTool implements VisibleTool {
 				editList.add(AttributeEdit.changeAttribute(axisRotationAttr, axisRotation, true));
 				editList.add(AttributeEdit.changeAttribute(rotationAttr, rotation, true));
 				Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
-				Main.getInstance().repaintViewports();
+				Main.getInstance().syncViewports(viewport);
 			}
 		}
 	};
