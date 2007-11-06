@@ -4,6 +4,7 @@ import com.jpatch.settings.*;
 import com.jpatch.afw.attributes.CollectionAttr;
 import com.jpatch.afw.vecmath.Transform;
 import com.jpatch.afw.vecmath.TransformUtil;
+import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.tools.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds.*;
@@ -407,8 +408,8 @@ public class ViewportGl extends Viewport {
 			public void display(GLAutoDrawable drawable) {
 //				System.out.println("GL display " + this + " " + repaintCount++);
 //				long t = System.currentTimeMillis();
-				gl.glFlush();
-				gl.glFinish();	// wait for previous gl functions to finish
+//				gl.glFlush();
+//				gl.glFinish();	// wait for previous gl functions to finish
 				Color3f background = active ? COLORS.activeBackground : COLORS.background;
 				gl.glClearColor(background.x, background.y, background.z, 0);	// set background color
 //				gl.glClearDepth(farClip);									// set initial depth-buffer value
@@ -515,6 +516,7 @@ public class ViewportGl extends Viewport {
 	
 	@Override
 	public void draw() {
+		time = System.nanoTime();
 //		System.out.println("ViewportGL.draw() at " + System.currentTimeMillis());
 //		if (true) return;
 //		rasterMode();
@@ -610,7 +612,7 @@ public class ViewportGl extends Viewport {
 //			modelViewMatrix.mul(matrix);
 		}
 //		modelView.set(matrix);
-		transformUtil.getModelViewMatrix(modelView);
+		transformUtil.getMatrix(LOCAL, CAMERA, modelView);
 		if (node instanceof SdsModel) {
 			drawSds3(((SdsModel) node).getSds());
 		}
@@ -849,10 +851,11 @@ public class ViewportGl extends Viewport {
 		Point3f py = new Point3f(0, 1, 0);
 		Point3f pz = new Point3f(0, 0, 1);
 		TransformUtil transformUtil = viewDef.getTransformUtil();
-		transformUtil.world2Camera(p0, p0);
-		transformUtil.world2Camera(px, px);
-		transformUtil.world2Camera(py, py);
-		transformUtil.world2Camera(pz, pz);
+		transformUtil.transform(WORLD, p0, CAMERA, p0);
+		transformUtil.transform(WORLD, px, CAMERA, px);
+		transformUtil.transform(WORLD, py, CAMERA, py);
+		transformUtil.transform(WORLD, pz, CAMERA, pz);
+		
 //		System.out.println("p0 = " + p0);
 //		System.out.println("px = " + px);
 //		System.out.println("py = " + py);
@@ -968,37 +971,58 @@ public class ViewportGl extends Viewport {
 		GlMaterial currentMaterial = null;
 		gl.glColor3f(0.0f, 0.0f, 0.0f);
 		if (showLimitSurfaceAttr.getBoolean()) {
+			
+//			System.out.println("simple model = " + simpleModel);
 			for (Face face : sds.faceList) {
 				GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
 				if (currentMaterial != faceMaterial) {
 					setMaterial(GL_FRONT, faceMaterial.getArray());
 					currentMaterial = faceMaterial;
 				}
+				boolean simple = true;
 				for (Slate2 slate : face.getSlates()) {
-	//				switch (slate.getSubdivisionLevel()) {
-	//				case 1:
-	//					gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 1, 0, 0 }, 0);
-	//					break;
-	//				case 2:
-	//					gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 1, 1, 0 }, 0);
-	//					break;
-	//				case 3:
-	//					gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 1, 0 }, 0);
-	//					break;
-	//				case 4:
-	//					gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 1, 1 }, 0);
-	//					break;
-	//				case 5:
-	//					gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 0, 0, 1 }, 0);
-	//					break;
-	//				case 6:
-	//					gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[] { 1, 0, 1 }, 0);
-	//					break;
-	//				}
-	//				setMaterial(face.getMaterial().getGlMaterial().getArray());
-					drawSlate(slate);
-//					gl.glFlush();
-//					gl.glFinish();
+					if (!slate.isSimple()) {
+						simple = false;
+					}
+				}
+				if (simple) {
+					gl.glBegin(GL_TRIANGLE_FAN);
+					Point3f p = face.facePoint.projectedLimit;
+					Vector3f n = face.facePoint.projectedNormal;
+					gl.glNormal3f(n.x, n.y, n.z);
+					gl.glVertex3f(p.x, p.y, p.z);
+					for (HalfEdge edge : face.getEdges()) {
+						p = edge.getFirstVertex().vertexPoint.projectedLimit;
+						n = edge.getFirstVertex().vertexPoint.projectedNormal;
+						gl.glNormal3f(n.x, n.y, n.z);
+						gl.glVertex3f(p.x, p.y, p.z);
+						p = edge.edgePoint.projectedLimit;
+						n = edge.edgePoint.projectedNormal;
+						gl.glNormal3f(n.x, n.y, n.z);
+						gl.glVertex3f(p.x, p.y, p.z);
+					}
+					p = face.getEdges()[0].getFirstVertex().vertexPoint.projectedLimit;
+					n = face.getEdges()[0].getFirstVertex().vertexPoint.projectedNormal;
+					gl.glNormal3f(n.x, n.y, n.z);
+					gl.glVertex3f(p.x, p.y, p.z);
+					gl.glEnd();
+					if (showProjectedMeshAttr.getBoolean()) {
+						gl.glColor3f(1, 1, 1);
+						gl.glBegin(GL_LINE_LOOP);
+						for (HalfEdge edge : face.getEdges()) {
+							p = edge.getFirstVertex().vertexPoint.projectedLimit;
+							gl.glVertex3f(p.x, p.y, p.z);
+							p = edge.edgePoint.projectedLimit;
+							gl.glVertex3f(p.x, p.y, p.z);
+						}
+						gl.glEnd();
+						gl.glColor3f(0, 0, 0);
+					}
+					
+				} else {
+					for (Slate2 slate : face.getSlates()) {
+						drawSlate(slate);
+					}
 				}
 			}
 		}
@@ -1024,12 +1048,12 @@ public class ViewportGl extends Viewport {
 					for (HalfEdge edge : face.getEdges()) {
 						p = edge.getFirstVertex().projectedPos;
 //						n = edge.getFirstVertex().vertexPoint.projectedNormal;
-						gl.glNormal3f(n.x, n.y, n.z);
+//						gl.glNormal3f(n.x, n.y, n.z);
 						gl.glVertex3f(p.x, p.y, p.z);
 					}
-					p = face.edge.getFirstVertex().projectedPos;
+					p = face.getEdges()[0].getFirstVertex().projectedPos;
 //					n = face.edge.getFirstVertex().vertexPoint.projectedNormal;
-					gl.glNormal3f(n.x, n.y, n.z);
+//					gl.glNormal3f(n.x, n.y, n.z);
 					gl.glVertex3f(p.x, p.y, p.z);
 					gl.glEnd();
 				}
@@ -1389,7 +1413,8 @@ public class ViewportGl extends Viewport {
 		rasterMode();
 		gl.glColor3f(COLORS.text.x, COLORS.text.y, COLORS.text.z);
 		drawString(getInfo(), 4, 16);
-		drawString("OpenGL", 4, 32);
+		String fps = Long.toString(1000000000 / (System.nanoTime() - time));
+		drawString("OpenGL " + fps + "fps", 4, 32);
 	}
 	
 	private void drawString(String string, int x, int y) {

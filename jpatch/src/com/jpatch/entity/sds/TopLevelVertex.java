@@ -22,49 +22,50 @@ public class TopLevelVertex extends BaseVertex {
 	final int num = count++;
 	
 	HalfEdge[] edges = new HalfEdge[0];
+	Face[] faces = new Face[0];
 	public final Level2Vertex vertexPoint;
 	int valence = -1;
 
 	HalfEdge creaseEdge0, creaseEdge1;
 	
-	final Iterable<Face> faceIterable = new Iterable<Face>() {
-		public Iterator<Face> iterator() {
-			return new Iterator<Face>() {
-				private int i = 0;
-				
-				public boolean hasNext() {
-					return i < edges.length;
-				}
-				
-				public Face next() {
-					return edges[i++].face;
-				}
-				
-				public void remove() {
-					throw new UnsupportedOperationException();
-				}
-			};
-		}
-	};
-	final Iterable<HalfEdge> edgeIterable = new Iterable<HalfEdge>() {
-		public Iterator<HalfEdge> iterator() {
-			return new Iterator<HalfEdge>() {
-				private int i = 0;
-				
-				public boolean hasNext() {
-					return i < edges.length;
-				}
-				
-				public HalfEdge next() {
-					return edges[i++];
-				}
-				
-				public void remove() {
-					throw new UnsupportedOperationException();
-				}
-			};
-		}
-	};
+//	final Iterable<Face> faceIterable = new Iterable<Face>() {
+//		public Iterator<Face> iterator() {
+//			return new Iterator<Face>() {
+//				private int i = 0;
+//				
+//				public boolean hasNext() {
+//					return i < edges.length;
+//				}
+//				
+//				public Face next() {
+//					return edges[i++].face;
+//				}
+//				
+//				public void remove() {
+//					throw new UnsupportedOperationException();
+//				}
+//			};
+//		}
+//	};
+//	final Iterable<HalfEdge> edgeIterable = new Iterable<HalfEdge>() {
+//		public Iterator<HalfEdge> iterator() {
+//			return new Iterator<HalfEdge>() {
+//				private int i = 0;
+//				
+//				public boolean hasNext() {
+//					return i < edges.length;
+//				}
+//				
+//				public HalfEdge next() {
+//					return edges[i++];
+//				}
+//				
+//				public void remove() {
+//					throw new UnsupportedOperationException();
+//				}
+//			};
+//		}
+//	};
 	
 	private final AttributePostChangeListener level2Invalidator = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
@@ -224,12 +225,12 @@ public class TopLevelVertex extends BaseVertex {
 		this(p.x, p.y, p.z);
 	}
 	
-	public Iterable<HalfEdge> getAdjacentEdges() {
-		return edgeIterable;
+	public HalfEdge[] getAdjacentEdges() {
+		return edges;
 	}
 	
-	public Iterable<Face> getAdjacentFaces() {
-		return faceIterable;
+	public Face[] getAdjacentFaces() {
+		return faces;
 	}
 	
 	public int getValence() {
@@ -428,6 +429,11 @@ public class TopLevelVertex extends BaseVertex {
 		System.arraycopy(edges, 0, tmp, 0, edges.length);
 		tmp[edges.length] = edge;
 		edges = tmp;
+		
+		final Face[] tmpFace = new Face[faces.length + 1];
+		System.arraycopy(faces, 0, tmpFace, 0, faces.length);
+		tmpFace[faces.length] = edge.face;
+		faces = tmpFace;
 	}
 	
 	public String toString() {

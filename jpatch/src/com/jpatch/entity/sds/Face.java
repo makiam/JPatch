@@ -27,33 +27,38 @@ public class Face {
 	private Material material = new BasicMaterial(new Color3f(1.0f, 1.0f, 1.0f));
 	
 	public final Level2Vertex facePoint;
-	public final HalfEdge edge;
-	final Iterable<HalfEdge> edgeIterable = new Iterable<HalfEdge>() {
-		public Iterator<HalfEdge> iterator() {
-			return new Iterator<HalfEdge>() {
-				private HalfEdge e = edge;
-				private int i;
-				public boolean hasNext() {
-					return i < sides;
-				}
-
-				public HalfEdge next() {
-					i++;
-					HalfEdge tmp = e;
-					e = e.next;
-					return tmp;
-				}
-
-				public void remove() {
-					throw new UnsupportedOperationException();
-				}
-			};
-		}
-	};
+	public final HalfEdge[] edges;
+//	final Iterable<HalfEdge> edgeIterable = new Iterable<HalfEdge>() {
+//		public Iterator<HalfEdge> iterator() {
+//			return new Iterator<HalfEdge>() {
+//				private HalfEdge e = edge;
+//				private int i;
+//				public boolean hasNext() {
+//					return i < sides;
+//				}
+//
+//				public HalfEdge next() {
+//					i++;
+//					HalfEdge tmp = e;
+//					e = e.next;
+//					return tmp;
+//				}
+//
+//				public void remove() {
+//					throw new UnsupportedOperationException();
+//				}
+//			};
+//		}
+//	};
 	
 	Face(int sides, HalfEdge start) {
 		this.sides = sides;
-		this.edge = start;
+		edges = new HalfEdge[sides];
+		HalfEdge edge = start;
+		for (int i = 0; i < sides; i++) {
+			edges[i] = edge;
+			edge = edge.next;
+		}
 		
 		recSides = 1.0 / sides;
 		
@@ -83,7 +88,7 @@ public class Face {
 				}
 				double fx = 0, fy = 0, fz = 0;
 				double ex = 0, ey = 0, ez = 0;
-				for (HalfEdge edge : edgeIterable) {
+				for (HalfEdge edge : edges) {
 					Tuple3Attr t = edge.vertex.vertexPoint.position;
 					fx += t.getX();
 					fy += t.getY();
@@ -106,7 +111,7 @@ public class Face {
 				float by = 0;
 				float bz = 0;
 				int i = 0;
-				for (HalfEdge edge : edgeIterable) {
+				for (HalfEdge edge : edges) {
 					HalfEdge nextEdge = edge.next;
 					Tuple3Attr t0f = edge.face.facePoint.position;
 					Tuple3Attr t0e = edge.edgePoint.position;
@@ -168,7 +173,7 @@ public class Face {
 	}
 	
 	void prepareSlates() {
-		HalfEdge e = this.edge;
+		HalfEdge e = edges[0];
 		for (int n = 0; n < sides; n++) {
 			Face f = e.face;
 			e.slateEdge0.slate = f.slates[f.getEdgeIndex(e)];
@@ -178,7 +183,7 @@ public class Face {
 	}
 	
 	void setupSlates() {
-		HalfEdge edge = this.edge;
+		HalfEdge edge = edges[0];
 		
 		for (int n = 0; n < sides; n++) {
 			SlateEdge[][] corners = new SlateEdge[4][];
@@ -317,12 +322,10 @@ public class Face {
 //	}
 	
 	int getEdgeIndex(HalfEdge edge) {
-		HalfEdge e = this.edge;
 		for (int i = 0; i < sides; i++) {
-			if (e == edge) {
+			if (edges[i] == edge) {
 				return i;
 			}
-			e = e.next;
 		}
 		throw new IllegalArgumentException(edge.toString());
 	}
@@ -482,8 +485,8 @@ public class Face {
 		return slates;
 	}
 	
-	public Iterable<HalfEdge> getEdges() {
-		return edgeIterable;
+	public HalfEdge[] getEdges() {
+		return edges;
 	}
 	
 	public String toString() {

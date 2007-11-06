@@ -770,6 +770,7 @@ public class Main {
 		Component component = viewport.getComponent();
 		if (component.isVisible()) {
 			viewport.getViewDef().computeMatrix();
+//			viewport.getComponent().repaint();
 			((GLAutoDrawable) component).display();
 		}
 	}

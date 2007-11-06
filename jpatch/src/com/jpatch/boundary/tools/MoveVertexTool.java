@@ -7,6 +7,7 @@ import static javax.media.opengl.GL.GL_LINE_SMOOTH;
 import static javax.media.opengl.GL.GL_ONE_MINUS_SRC_ALPHA;
 import static javax.media.opengl.GL.GL_SRC_ALPHA;
 import com.jpatch.afw.vecmath.TransformUtil;
+import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.*;
 import com.jpatch.entity.SdsModel;
 import com.jpatch.entity.sds.*;
@@ -60,7 +61,7 @@ public class MoveVertexTool implements VisibleTool {
 
 	public void draw(Viewport viewport) {
 		GL gl = ((ViewportGl) viewport).getGl();
-		Matrix4f modelView = viewport.getViewDef().getTransformUtil().getModelViewMatrix(new Matrix4f());
+		Matrix4f modelView = viewport.getViewDef().getTransformUtil().getMatrix(LOCAL, CAMERA, new Matrix4f());
 		Selection selection = Main.getInstance().getSelection();
 		if (selection == null) {
 			return;
@@ -241,10 +242,10 @@ public class MoveVertexTool implements VisibleTool {
 			
 			vertex.getPos(p);
 //			System.out.print("local=" + p + " screen=");
-			transformUtil.local2Screen(p, p);
+			transformUtil.projectToScreen(LOCAL, p, p);
 //			System.out.println(p);
-			Point3d p2 = new Point3d();
-			transformUtil.screen2Local(p, p2);
+//			Point3d p2 = new Point3d();
+//			transformUtil.projectToScreen(LOCAL, p, p2);
 //			System.out.println("local=" + p2);
 //			System.out.println(transformUtil);
 			z = p.z;
@@ -257,7 +258,7 @@ public class MoveVertexTool implements VisibleTool {
 			p.z = z;
 //			System.out.println("Pscreen =" + p);
 //			System.out.print("screen=" + p + " local=");
-			transformUtil.screen2Local(p, p);
+			transformUtil.projectFromScreen(LOCAL, p, p);
 //			System.out.println(p);
 //			System.out.println("Pworld  =" + p);
 //			p.sub(limit);

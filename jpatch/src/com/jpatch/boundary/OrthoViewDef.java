@@ -76,8 +76,9 @@ public class OrthoViewDef extends AbstractViewDef {
 //		matrix.m33 = 1;
 		
 //		System.out.println(matrix);
-		
-		transformUtil.setWorld2Camera(matrix);
+		transformUtil.setOrthographicProjection();
+		transformUtil.setWorld2Space(TransformUtil.CAMERA, matrix);
+		transformUtil.setCameraScale(viewScale);
 		transformUtil.setViewportDimension(width, height);
 	}
 

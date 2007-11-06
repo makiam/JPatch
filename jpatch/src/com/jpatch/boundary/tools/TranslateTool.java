@@ -5,21 +5,26 @@ import static javax.media.opengl.GL.*;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 import javax.media.opengl.GL;
 import javax.swing.SwingUtilities;
 import javax.vecmath.*;
 
+import com.jpatch.afw.attributes.GenericAttr;
 import com.jpatch.afw.attributes.StateMachine;
 import com.jpatch.afw.attributes.Tuple3Attr;
+import com.jpatch.afw.control.JPatchUndoableEdit;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.boundary.*;
 
 import com.jpatch.entity.GlMaterial;
 
 public class TranslateTool implements VisibleTool {
+	public static final GenericAttr<String> EDIT_NAME = new GenericAttr<String>("translate");
 	private static float ARROW_WIDTH = 0.05f;
 	private static float ARROW_LENGTH = 0.1f;
 	private static float ARROW_START = 0.05f;
@@ -78,6 +83,8 @@ public class TranslateTool implements VisibleTool {
 					 0,  0,  0,  1
 			),
 	};
+	
+	private final Matrix4d transformMatrix = new Matrix4d();
 	
 	private final Tuple3Attr pivotAttr = new Tuple3Attr();
 	private final Tuple3Attr axisRotationAttr = new Tuple3Attr();
@@ -165,7 +172,7 @@ public class TranslateTool implements VisibleTool {
 	}
 	
 	public void draw(Viewport viewport) {
-		TransformUtil transformUtil = viewport.getViewDef().getTransformUtil();
+		TransformUtilOld transformUtil = viewport.getViewDef().getTransformUtil();
 		double radius;
 		/*
 		 * set the radius so that the tool will occupy about 1/3rd of the screen
@@ -232,8 +239,8 @@ public class TranslateTool implements VisibleTool {
 		Matrix4d m = new Matrix4d();
 		/* draw x/y/z lines */
 		
-		
-		for (int ghost = 0; ghost < 2; ghost++) {
+		int start = mouseMotionListener == null ? 1 : 0;
+		for (int ghost = start; ghost < 2; ghost++) {
 			if (ghost == 1) {
 				Vector3d v = new Vector3d(vector);
 				axisRotation.getRotationMatrix(new Matrix3d()).transform(v);
@@ -360,7 +367,7 @@ public class TranslateTool implements VisibleTool {
 	private class HitMouseMotionListener extends MouseMotionAdapter {
 		final int constraint;
 		final Viewport viewport;
-		final TransformUtil transformUtil;
+		final TransformUtilOld transformUtil;
 		final Point3d pScreen = new Point3d();
 		final Point3d pLocal = new Point3d();
 		HitMouseMotionListener(Viewport viewport, int constraint, double z) {
@@ -369,7 +376,7 @@ public class TranslateTool implements VisibleTool {
 			this.constraint = constraint;
 			pScreen.z = z;
 			System.out.println("screenZ = " + z);
-			
+			transformMatrix.setIdentity();
 		}
 
 		@Override
@@ -404,13 +411,17 @@ public class TranslateTool implements VisibleTool {
 				transformUtil.screen2Local(pScreen, pLocal);
 				vector.set(pLocal);
 			}
+			transformUtil.local2World(vector, vector);
+			transformMatrix.setTranslation(vector);
+			Selection selection = Main.getInstance().getSelection();
+			selection.transform(transformMatrix);
 			Main.getInstance().syncRepaintViewport(viewport);
 		}
 	}
 	
 	private class HitMouseListener extends MouseAdapter {
 		Viewport viewport;
-		TransformUtil transformUtil;
+		TransformUtilOld transformUtil;
 		
 		HitMouseListener(Viewport viewport) {
 			this.viewport = viewport;
@@ -448,6 +459,8 @@ public class TranslateTool implements VisibleTool {
 				Main.getInstance().getRobot().mouseMove(hitPoint.x, hitPoint.y);
 				mouseMotionListener = new HitMouseMotionListener(viewport, hit, hitZ);
 				viewport.getComponent().addMouseMotionListener(mouseMotionListener);
+				Selection selection = Main.getInstance().getSelection();
+				selection.begin();
 			}
 		}
 		
@@ -456,7 +469,21 @@ public class TranslateTool implements VisibleTool {
 			if (mouseMotionListener != null) {
 				viewport.getComponent().removeMouseMotionListener(mouseMotionListener);
 				mouseMotionListener = null;
+				Selection selection = Main.getInstance().getSelection();
+				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(selection.getVertexCount());
+				selection.end(editList);
+				Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
 				Main.getInstance().syncViewports(viewport);
+				
+				Matrix4d matrix = new Matrix4d();
+				axisRotation.getRotationMatrix(matrix);
+				matrix.transform(vector);
+				pivot.add(vector);
+				vector.set(0, 0, 0);
+				pivotAttr.setTuple(pivot);
+				vectorAttr.setTuple(vector);
+				
+				Main.getInstance().repaintViewports();
 			}
 		}
 		
