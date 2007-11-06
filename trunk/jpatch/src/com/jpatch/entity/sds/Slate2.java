@@ -306,4 +306,17 @@ public class Slate2 {
 	public int getSubdivLevel() {
 		return subdivLevel;
 	}
+	
+	public boolean isSimple() {
+		if (subdivLevel > 1) return false;
+		if (corners[0][0].vertex.corner > 0) return false;
+		if (corners[0][0].vertex.crease > 0) return false;
+		if (corners[1][0].vertex.corner > 0) return false;
+		if (corners[1][0].vertex.crease > 0) return false;
+		if (corners[2][0].vertex.corner > 0) return false;
+		if (corners[2][0].vertex.crease > 0) return false;
+		if (corners[3][0].vertex.corner > 0) return false;
+		if (corners[3][0].vertex.crease > 0) return false;
+		return true;
+	}
 }

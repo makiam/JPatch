@@ -7,6 +7,7 @@ import javax.vecmath.*;
 import com.jpatch.afw.attributes.CollectionAttr;
 import com.jpatch.afw.vecmath.Transform;
 import com.jpatch.afw.vecmath.TransformUtil;
+import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.*;
 import com.jpatch.entity.SceneGraphNode;
 import com.jpatch.entity.SdsModel;
@@ -53,7 +54,7 @@ public class MouseSelector {
 			for (HalfEdge edge : face.getEdges()) {
 				TopLevelVertex vertex = edge.getFirstVertex();
 				vertex.getPos(p);
-				transformUtil.local2Screen(p, p);
+				transformUtil.projectToScreen(LOCAL, p, p);
 				double dx = x - p.x;
 				double dy = y - p.y;
 				double distanceSq = dx * dx + dy * dy;
@@ -95,7 +96,7 @@ public class MouseSelector {
 			for (HalfEdge edge : face.getEdges()) {
 				TopLevelVertex vertex = edge.getFirstVertex();
 				vertex.getPos(p);
-				transformUtil.local2Screen(p, p);
+				transformUtil.projectToScreen(LOCAL, p, p);
 				if (p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1) {
 					selectedVertices.add(vertex);
 				}
@@ -120,8 +121,8 @@ public class MouseSelector {
 				if (edge.isPrimary()) {
 					edge.getFirstVertex().getPos(p0);
 					edge.getSecondVertex().getPos(p1);
-					transformUtil.local2Screen(p0, p0);
-					transformUtil.local2Screen(p1, p1);
+					transformUtil.projectToScreen(LOCAL, p0, p0);
+					transformUtil.projectToScreen(LOCAL, p1, p1);
 					line.setLine(p0.x, p0.y, p1.x, p1.y);
 					double distanceSq = line.ptSegDistSq(x, y);
 					if (distanceSq < min) {

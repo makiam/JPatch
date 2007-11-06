@@ -7,7 +7,7 @@ public class TransformUtilTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		TransformUtil transformUtil = new TransformUtil();
+		TransformUtilOld transformUtil = new TransformUtilOld();
 		Transform transform1 = new Transform() {
 			@Override
 			public void computeMatrix() {

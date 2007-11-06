@@ -4,6 +4,7 @@ import com.jpatch.afw.attributes.DoubleAttr;
 import com.jpatch.afw.attributes.Tuple2Attr;
 import com.jpatch.afw.attributes.Tuple3Attr;
 import com.jpatch.afw.vecmath.TransformUtil;
+import com.jpatch.afw.vecmath.TransformUtilOld;
 import com.jpatch.entity.Perspective;
 
 import javax.vecmath.Matrix4d;
@@ -42,6 +43,7 @@ public class PerspectiveViewDef extends AbstractViewDef {
 		transformUtil.setCameraTransform(perspective.getTransform());
 		transformUtil.setPerspectiveProjection(getRelativeFocalLength());
 		transformUtil.setViewportDimension(viewport.getComponent().getWidth(), viewport.getComponent().getHeight());
+		transformUtil.setCameraScale(1);
 //		Matrix4d matrix = perspective.getTransform().getMatrix(new Matrix4d());
 //		
 //		/* rotate the camera to look down the positive z axis */

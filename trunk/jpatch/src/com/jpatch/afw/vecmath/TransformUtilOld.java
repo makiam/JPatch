@@ -21,7 +21,7 @@ import javax.vecmath.*;
  * </ul>
  * @author Sascha Ledinsky
  */
-public class TransformUtil {
+public class TransformUtilOld {
 	
 	/** Camera to local space transformation matrix */
 	private Matrix4d camera2Local = Utils3d.createIdentityMatrix4d();
@@ -508,8 +508,6 @@ public class TransformUtil {
 	}
 	
 	public void setCameraTransform(Transform transform) {
-		this.camera2World.set(transform.matrix);
-		
 		/* rotate the camera to look down the positive z axis */
 		camera2World.m00 = -transform.matrix.m00;
 		camera2World.m01 = -transform.matrix.m01;

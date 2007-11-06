@@ -357,14 +357,14 @@ public class Sds {
 		System.out.println("Faces:");
 		for (Face face : faceList) {
 			System.out.print(face + ": ");
-			for (HalfEdge edge : face.edgeIterable) {
+			for (HalfEdge edge : face.edges) {
 				System.out.print(edge + " ");
 			}
 			System.out.println();
 		}
 		List<HalfEdge> edgeList = new ArrayList<HalfEdge>();
 		for (Face face : faceList) {
-			for (HalfEdge edge : face.edgeIterable) {
+			for (HalfEdge edge : face.edges) {
 				edgeList.add(edge);
 			}
 		}
@@ -381,7 +381,7 @@ public class Sds {
 		System.out.println("Vertices:");
 		for (TopLevelVertex vertex : vertexList) {
 			System.out.print(vertex + ": ");
-			for (HalfEdge edge : vertex.edgeIterable) {
+			for (HalfEdge edge : vertex.edges) {
 				System.out.print(edge + " ");
 			}
 			System.out.println();

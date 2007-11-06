@@ -135,8 +135,14 @@ public class Selection implements Transformable {
 	}
 
 	public void transform(Matrix4d matrix) {
-		// TODO Auto-generated method stub
-		
+		int i = 0;
+		Point3d p = new Point3d();
+		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
+			p.set(startPositions[i]);
+			matrix.transform(p);
+			vertex.getPosition().setTuple(p);
+			i++;
+		}
 	}
 	
 	
