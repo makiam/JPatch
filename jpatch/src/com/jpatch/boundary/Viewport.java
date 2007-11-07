@@ -149,11 +149,7 @@ public abstract class Viewport implements NamedObject {
 	
 	
 	
-//	protected abstract void drawGrid();
-	protected abstract void drawOrigin();
 //	
-	protected abstract void drawInfo();
-
 
 
 	public void setActive(boolean active) {

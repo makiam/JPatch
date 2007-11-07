@@ -55,7 +55,10 @@ public class SelectionManager {
 			public void valueChanged(TreeSelectionEvent e) {
 				if (!ignoreChange) {
 					ignoreChange = true;
-					Object selectedTreeNode = e.getNewLeadSelectionPath().getLastPathComponent();
+					Object selectedTreeNode = null;
+					if (e.getNewLeadSelectionPath() != null) {
+						selectedTreeNode = e.getNewLeadSelectionPath().getLastPathComponent();
+					}
 					if (selectedTreeNode instanceof SceneGraphTreeNode) {
 						Object selection = ((SceneGraphTreeNode) selectedTreeNode).getSceneGraphNode();
 						selectedObjectAttr.setValue(selection);

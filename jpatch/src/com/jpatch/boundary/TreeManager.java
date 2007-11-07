@@ -97,6 +97,13 @@ public class TreeManager {
 		return treeNodeMap.get(node);
 	}
 	
+	public void removeNode(SceneGraphNode node) {
+		ignoreModelChange = true;
+		node.getParentAttribute().setValue(null);
+		treeModel.removeNodeFromParent(getTreeNodeFor(node));
+		ignoreModelChange = false;
+	}
+	
 	/**
 	 * called when the parent attribute of the sceneGraphNode has changed,
 	 * to update the TreeModel accordingly
