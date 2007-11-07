@@ -7,11 +7,11 @@ import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.vecmath.*;
 
 public class OrthoViewDef extends AbstractViewDef {
+	private static final double SCALE_FACTOR = 1.0 / 20.0;
 	private final Matrix4d matrix = Utils3d.createIdentityMatrix4d();
 	private final Tuple2Attr translationAttr = new Tuple2Attr(0.0, 0.0);
 	private final Tuple2Attr rotationAttr = new Tuple2Attr();
 	private final DoubleAttr scaleAttr = new DoubleAttr(1.0);
-	private final TransformUtil transformUtil = new TransformUtil();
 	
 	public OrthoViewDef(Viewport viewport, OrthoViewParams orthoView) {
 		super(viewport);
@@ -33,7 +33,7 @@ public class OrthoViewDef extends AbstractViewDef {
 	public void computeMatrix() {
 		int width = viewport.getComponent().getWidth();
 		int height = viewport.getComponent().getHeight();
-		double viewScale = scaleAttr.getDouble() / 20 * width;
+		double viewScale = scaleAttr.getDouble() * width * SCALE_FACTOR;
 		
 		double sx = Utils3d.degSin(rotationAttr.getX());
 		double cx = Utils3d.degCos(rotationAttr.getX());
@@ -76,14 +76,16 @@ public class OrthoViewDef extends AbstractViewDef {
 //		matrix.m33 = 1;
 		
 //		System.out.println(matrix);
-		transformUtil.setOrthographicProjection();
-		transformUtil.setWorld2Space(TransformUtil.CAMERA, matrix);
-		transformUtil.setCameraScale(viewScale);
-		transformUtil.setViewportDimension(width, height);
 	}
 
-	public TransformUtil getTransformUtil() {
-		return transformUtil;
+	public void configureTransformUtil(TransformUtil transformUtil) {
+		int width = viewport.getComponent().getWidth();
+		int height = viewport.getComponent().getHeight();
+		double viewScale = scaleAttr.getDouble() * width * SCALE_FACTOR;
+		transformUtil.setOrthographicProjection();
+		transformUtil.setWorld2Space(transformUtil.CAMERA, matrix);
+		transformUtil.setCameraScale(viewScale);
+		transformUtil.setViewportDimension(width, height);
 	}
 
 }

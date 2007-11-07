@@ -39,6 +39,8 @@ public class MoveVertexTool implements VisibleTool {
 	
 	private MouseListener[] mouseListeners;
 	
+	private final TransformUtil transformUtil = new TransformUtil();
+	
 	public void registerListeners(Viewport[] viewports) {
 		System.out.println("MoveVertexTool registerListeners");
 		if (mouseListeners != null) {
@@ -61,7 +63,8 @@ public class MoveVertexTool implements VisibleTool {
 
 	public void draw(Viewport viewport) {
 		GL gl = ((ViewportGl) viewport).getGl();
-		Matrix4f modelView = viewport.getViewDef().getTransformUtil().getMatrix(LOCAL, CAMERA, new Matrix4f());
+		viewport.getViewDef().configureTransformUtil(transformUtil);
+		Matrix4f modelView = transformUtil.getMatrix(transformUtil.WORLD, transformUtil.CAMERA, new Matrix4f());
 		Selection selection = Main.getInstance().getSelection();
 		if (selection == null) {
 			return;
@@ -227,7 +230,7 @@ public class MoveVertexTool implements VisibleTool {
 		private final TopLevelVertex vertex;
 		private final Point3d p = new Point3d();
 		private final SdsModel sdsModel;
-		private final TransformUtil transformUtil;
+		private final TransformUtil transformUtil = new TransformUtil();
 		double z;
 //		Point3d pos = new Point3d();
 //		Point3d limit = new Point3d();
@@ -237,12 +240,12 @@ public class MoveVertexTool implements VisibleTool {
 			this.vertex = vertex;
 			this.sdsModel = sdsModel;
 			
-			transformUtil = viewport.getViewDef().getTransformUtil();
+			viewport.getViewDef().configureTransformUtil(transformUtil);
 			transformUtil.setLocalTransform(sdsModel.getTransform());
 			
 			vertex.getPos(p);
 //			System.out.print("local=" + p + " screen=");
-			transformUtil.projectToScreen(LOCAL, p, p);
+			transformUtil.projectToScreen(transformUtil.LOCAL, p, p);
 //			System.out.println(p);
 //			Point3d p2 = new Point3d();
 //			transformUtil.projectToScreen(LOCAL, p, p2);
@@ -258,7 +261,7 @@ public class MoveVertexTool implements VisibleTool {
 			p.z = z;
 //			System.out.println("Pscreen =" + p);
 //			System.out.print("screen=" + p + " local=");
-			transformUtil.projectFromScreen(LOCAL, p, p);
+			transformUtil.projectFromScreen(transformUtil.LOCAL, p, p);
 //			System.out.println(p);
 //			System.out.println("Pworld  =" + p);
 //			p.sub(limit);

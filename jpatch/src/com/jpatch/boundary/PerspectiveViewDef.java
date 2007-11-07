@@ -19,8 +19,6 @@ public class PerspectiveViewDef extends AbstractViewDef {
 	
 	private final Perspective perspective;
 	
-	private final TransformUtil transformUtil = new TransformUtil();
-	
 	public PerspectiveViewDef(Viewport viewport, Perspective perspective) {
 		super(viewport);
 		this.perspective = perspective;
@@ -40,10 +38,7 @@ public class PerspectiveViewDef extends AbstractViewDef {
 	
 	public void computeMatrix() {
 		perspective.getTransform().computeMatrix();
-		transformUtil.setCameraTransform(perspective.getTransform());
-		transformUtil.setPerspectiveProjection(getRelativeFocalLength());
-		transformUtil.setViewportDimension(viewport.getComponent().getWidth(), viewport.getComponent().getHeight());
-		transformUtil.setCameraScale(1);
+		
 //		Matrix4d matrix = perspective.getTransform().getMatrix(new Matrix4d());
 //		
 //		/* rotate the camera to look down the positive z axis */
@@ -61,7 +56,10 @@ public class PerspectiveViewDef extends AbstractViewDef {
 		return perspective.getFocalLength() / filmApertureWidth;
 	}
 
-	public TransformUtil getTransformUtil() {
-		return transformUtil;
+	public void configureTransformUtil(TransformUtil transformUtil) {
+		transformUtil.setCameraTransform(perspective.getTransform());
+		transformUtil.setPerspectiveProjection(getRelativeFocalLength());
+		transformUtil.setViewportDimension(viewport.getComponent().getWidth(), viewport.getComponent().getHeight());
+		transformUtil.setCameraScale(1);
 	}
 }

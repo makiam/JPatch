@@ -4,15 +4,10 @@ import javax.vecmath.*;
 
 public class TransformUtil extends AbstractTransformUtil {
 	/** camera space, should only be set by the viewport */
-	public static final int CAMERA = 1;
+	public final int CAMERA = addSpace("camera");
 	/** local object space */
-	public static final int LOCAL = 2;
-	/** auxilary space, e.g. for tools */
-	public static final int AUX1 = 3;
-	/** auxilary space, e.g. for tools */
-	public static final int AUX2 = 4;
-	/** auxilary space, e.g. for tools */
-	public static final int AUX3 = 4;
+	public final int LOCAL = addSpace("local");
+	
 	/** perspective projection flag */
 	private boolean perspective;
 	/** relative focal length (focal length / aperture width) */
@@ -24,9 +19,6 @@ public class TransformUtil extends AbstractTransformUtil {
 	/** scale component of the camera matrix */
 	private double cameraScale;
 	
-	public TransformUtil() {
-		super("local", "camera", "aux1", "aux2");
-	}
 	
 	/**
 	 * Sets an orthographics projection

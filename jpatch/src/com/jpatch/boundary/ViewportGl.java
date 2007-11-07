@@ -4,6 +4,7 @@ import com.jpatch.settings.*;
 import com.jpatch.afw.attributes.CollectionAttr;
 import com.jpatch.afw.vecmath.Transform;
 import com.jpatch.afw.vecmath.TransformUtil;
+import com.jpatch.afw.vecmath.Utils3d;
 import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.tools.*;
 import com.jpatch.entity.*;
@@ -22,7 +23,7 @@ import javax.vecmath.*;
 
 
 public class ViewportGl extends Viewport {
-	
+	private static Matrix4d IDENTITY = Utils3d.createIdentityMatrix4d();
 	private static int repaintCount;
 	
 	private static final boolean LIGHTWEIGHT = false;
@@ -47,6 +48,7 @@ public class ViewportGl extends Viewport {
 	private int num;
 	
 	private Matrix4f modelView = new Matrix4f();
+	private TransformUtil transformUtil = new TransformUtil();
 //	private final TransformUtil transformUtil = new TransformUtil();
 	
 	/**
@@ -516,6 +518,7 @@ public class ViewportGl extends Viewport {
 	
 	@Override
 	public void draw() {
+		viewDef.configureTransformUtil(transformUtil);
 		time = System.nanoTime();
 //		System.out.println("ViewportGL.draw() at " + System.currentTimeMillis());
 //		if (true) return;
@@ -595,7 +598,6 @@ public class ViewportGl extends Viewport {
 //		System.out.println("drawing " + node + " " + (node == null ? "(null)" : "(not null)"));
 //		Matrix4d matrix = new Matrix4d(viewDef.getMatrix(new Matrix4d()));
 		Transform transform = node.getTransform();
-		TransformUtil transformUtil = viewDef.getTransformUtil();
 		if (transform != null) {
 			transformUtil.setLocalTransform(transform);
 //			transform.mul2(matrix);
@@ -609,9 +611,11 @@ public class ViewportGl extends Viewport {
 //			m.mul(matrix);
 //			matrix.mul(m);
 //			modelViewMatrix.mul(matrix);
+		} else {
+			transformUtil.setSpace2World(transformUtil.LOCAL, IDENTITY);
 		}
 //		modelView.set(matrix);
-		transformUtil.getMatrix(LOCAL, CAMERA, modelView);
+		transformUtil.getMatrix(transformUtil.LOCAL, transformUtil.CAMERA, modelView);
 		drawOrigin(modelView);
 		if (node instanceof SdsModel) {
 			drawSds3(((SdsModel) node).getSds());

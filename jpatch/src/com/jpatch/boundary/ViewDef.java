@@ -11,5 +11,5 @@ public interface ViewDef {
 	public StateMachine<ViewDirection> getViewDirectionAttribute();
 	public void computeMatrix();
 	public Viewport getViewport();
-	public TransformUtil getTransformUtil();
+	public void configureTransformUtil(TransformUtil transformUtil);
 }

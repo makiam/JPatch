@@ -15,6 +15,7 @@ import com.jpatch.entity.sds.*;
 
 public class MouseSelector {
 	static final private double MIN_DIST_SQ = 64;
+	static final TransformUtil transformUtil = new TransformUtil();
 	
 	public static Hit getVertexAt(Viewport viewport, int x, int y) {	
 		return getVertexAt(viewport, x, y, Main.getInstance().getSceneGraphRoot(), new Hit());
@@ -48,13 +49,13 @@ public class MouseSelector {
 //		Matrix4d matrix = viewport.getViewDef().getMatrix(new Matrix4d());
 		Point3d p = new Point3d();
 //		System.out.println("getVertexAt(" + x + ", " + y + ")");
-		TransformUtil transformUtil = viewDef.getTransformUtil();
+		viewDef.configureTransformUtil(transformUtil);
 		transformUtil.setLocalTransform(sdsModel.getTransform());
 		for (Face face : sdsModel.getSds().faceList) {
 			for (HalfEdge edge : face.getEdges()) {
 				TopLevelVertex vertex = edge.getFirstVertex();
 				vertex.getPos(p);
-				transformUtil.projectToScreen(LOCAL, p, p);
+				transformUtil.projectToScreen(transformUtil.LOCAL, p, p);
 				double dx = x - p.x;
 				double dy = y - p.y;
 				double distanceSq = dx * dx + dy * dy;
@@ -73,7 +74,7 @@ public class MouseSelector {
 		
 		ViewDef viewDef = viewport.getViewDef();
 		
-		TransformUtil transformUtil = viewDef.getTransformUtil();
+		viewDef.configureTransformUtil(transformUtil);
 		transformUtil.setLocalTransform(sdsModel.getTransform());
 		
 		/* ensure that x0 is the left side and x1 is the right side (x0 < x1) */
@@ -96,7 +97,7 @@ public class MouseSelector {
 			for (HalfEdge edge : face.getEdges()) {
 				TopLevelVertex vertex = edge.getFirstVertex();
 				vertex.getPos(p);
-				transformUtil.projectToScreen(LOCAL, p, p);
+				transformUtil.projectToScreen(transformUtil.LOCAL, p, p);
 				if (p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1) {
 					selectedVertices.add(vertex);
 				}
@@ -107,7 +108,7 @@ public class MouseSelector {
 	public static HalfEdge getEdgeAt(Viewport viewport, int x, int y, SdsModel sdsModel) {
 		ViewDef viewDef = viewport.getViewDef();
 		
-		TransformUtil transformUtil = viewDef.getTransformUtil();
+		viewDef.configureTransformUtil(transformUtil);
 		transformUtil.setLocalTransform(sdsModel.getTransform());
 		
 //		Matrix4d matrix = viewport.getViewDef().getMatrix(new Matrix4d());
@@ -121,8 +122,8 @@ public class MouseSelector {
 				if (edge.isPrimary()) {
 					edge.getFirstVertex().getPos(p0);
 					edge.getSecondVertex().getPos(p1);
-					transformUtil.projectToScreen(LOCAL, p0, p0);
-					transformUtil.projectToScreen(LOCAL, p1, p1);
+					transformUtil.projectToScreen(transformUtil.LOCAL, p0, p0);
+					transformUtil.projectToScreen(transformUtil.LOCAL, p1, p1);
 					line.setLine(p0.x, p0.y, p1.x, p1.y);
 					double distanceSq = line.ptSegDistSq(x, y);
 					if (distanceSq < min) {
