@@ -586,13 +586,13 @@ public class ViewportGl extends Viewport {
 		}
 		rasterMode();
 		drawInfo();
-		gl.glFlush(); // ensure that everything gets drawn
-		gl.glFinish();
+//		gl.glFlush(); // ensure that everything gets drawn
+//		gl.glFinish();
 	}
 	
 	private void drawSceneGraphElement(SceneGraphNode node) {
 		
-		System.out.println("drawing " + node + " " + (node == null ? "(null)" : "(not null)"));
+//		System.out.println("drawing " + node + " " + (node == null ? "(null)" : "(not null)"));
 //		Matrix4d matrix = new Matrix4d(viewDef.getMatrix(new Matrix4d()));
 		Transform transform = node.getTransform();
 		TransformUtil transformUtil = viewDef.getTransformUtil();
