@@ -2,13 +2,30 @@ package com.jpatch.afw.vecmath;
 
 import javax.vecmath.*;
 
+/**
+ * A utility that allows to transform points and vectors between
+ * various spaces. This class is abstract and therefor intended
+ * to be subclasses. It defines only one space (space 0, world space)
+ * and subclasses should add other spaced during construction.
+ */
 public abstract class AbstractTransformUtil {
+	/** constant identifying world space */
 	public static final int WORLD = 0;
+	/** a 2D array of matrices used to transform between arbitrary spaces */
 	private final Matrix4d[][] matrices;
+	/** a 2D array of flags to keep track of valid/invalid matrices for lazy evaluation */
 	private final boolean[][] matricesValid;
+	/** the number of spaces */
 	private final int numSpaces;
+	/** the names of the spaces */
 	private final String[] spaceNames;
 	
+	/**
+	 * Creates a new AbstractTransformUtil with the specified spaces.
+	 * The specified spaces will be added to the predefined WORLD space,
+	 * so the first specified space will be #1 (world is #0)
+	 * @param spaceNames
+	 */
 	AbstractTransformUtil(String... spaceNames) {
 		numSpaces = spaceNames.length + 1;
 		this.spaceNames = new String[numSpaces];
@@ -24,6 +41,12 @@ public abstract class AbstractTransformUtil {
 		}
 	}
 	
+	/**
+	 * Sets the transformation matrix for transforming from world space
+	 * to the specified space.
+	 * @param space
+	 * @param matrix
+	 */
 	public void setWorld2Space(int space, Matrix4d matrix) {
 		for (int i = 0; i < numSpaces; i++) {
 			matricesValid[space][i] = false;
@@ -33,6 +56,12 @@ public abstract class AbstractTransformUtil {
 		matricesValid[WORLD][space] = true;
 	}
 	
+	/**
+	 * Sets the transformation matrix for transforming from the specified space
+	 * to world space.
+	 * @param space
+	 * @param matrix
+	 */
 	public void setSpace2World(int space, Matrix4d matrix) {
 		for (int i = 0; i < numSpaces; i++) {
 			matricesValid[space][i] = false;
@@ -42,50 +71,116 @@ public abstract class AbstractTransformUtil {
 		matricesValid[space][WORLD] = true;
 	}
 	
+	/**
+	 * Sets toPoint to the coordinates of fromPoint, transformed from fromSpace to toSpace
+	 * @param fromSpace
+	 * @param fromPoint
+	 * @param toSpace
+	 * @param toPoint
+	 */
 	public void transform(int fromSpace, Point3d fromPoint, int toSpace, Point3d toPoint) {
 		validateMatrix(fromSpace, toSpace);
 		matrices[fromSpace][toSpace].transform(fromPoint, toPoint);
 	}
 	
+	/**
+	 * Sets toVector to the coordinates of fromVector, transformed from fromSpace to toSpace
+	 * @param fromSpace
+	 * @param fromVector
+	 * @param toSpace
+	 * @param toVector
+	 */
 	public void transform(int fromSpace, Vector3d fromVector, int toSpace, Vector3d toVector) {
 		validateMatrix(fromSpace, toSpace);
 		matrices[fromSpace][toSpace].transform(fromVector, toVector);
 	}
 	
+	/**
+	 * Sets toPoint to the coordinates of fromPoint, transformed from fromSpace to toSpace
+	 * @param fromSpace
+	 * @param fromPoint
+	 * @param toSpace
+	 * @param toPoint
+	 */
 	public void transform(int fromSpace, Point3f fromPoint, int toSpace, Point3f toPoint) {
 		validateMatrix(fromSpace, toSpace);
 		matrices[fromSpace][toSpace].transform(fromPoint, toPoint);
 	}
 	
+	/**
+	 * Sets toVector to the coordinates of fromVector, transformed from fromSpace to toSpace
+	 * @param fromSpace
+	 * @param fromVector
+	 * @param toSpace
+	 * @param toVector
+	 */
 	public void transform(int fromSpace, Vector3f fromVector, int toSpace, Vector3f toVector) {
 		validateMatrix(fromSpace, toSpace);
 		matrices[fromSpace][toSpace].transform(fromVector, toVector);
 	}
 	
+	/**
+	 * Sets the specified matrix to the transformation matrix for transforming
+	 * from fromSpace to toSpace
+	 * @param fromSpace
+	 * @param toSpace
+	 * @param matrix
+	 * @return
+	 */
 	public Matrix4d getMatrix(int fromSpace, int toSpace, Matrix4d matrix) {
 		validateMatrix(fromSpace, toSpace);
 		matrix.set(matrices[fromSpace][toSpace]);
 		return matrix;
 	}
 	
+	/**
+	 * Sets the specified matrix to the transformation matrix for transforming
+	 * from fromSpace to toSpace
+	 * @param fromSpace
+	 * @param toSpace
+	 * @param matrix
+	 * @return
+	 */
 	public Matrix4f getMatrix(int fromSpace, int toSpace, Matrix4f matrix) {
 		validateMatrix(fromSpace, toSpace);
 		matrix.set(matrices[fromSpace][toSpace]);
 		return matrix;
 	}
 	
+	/**
+	 * Sets the specified matrix to the rotation/scale component of the matrix
+	 * for transforming from fromSpace to toSpace
+	 * @param fromSpace
+	 * @param toSpace
+	 * @param matrix
+	 * @return
+	 */
 	public Matrix3d getRotationScaleMatrix(int fromSpace, int toSpace, Matrix3d matrix) {
 		validateMatrix(fromSpace, toSpace);
 		matrices[fromSpace][toSpace].getRotationScale(matrix);
 		return matrix;
 	}
 	
+	/**
+	 * Sets the specified matrix to the rotation/scale component of the matrix
+	 * for transforming from fromSpace to toSpace
+	 * @param fromSpace
+	 * @param toSpace
+	 * @param matrix
+	 * @return
+	 */
 	public Matrix3f getRotationScaleMatrix(int fromSpace, int toSpace, Matrix3f matrix) {
 		validateMatrix(fromSpace, toSpace);
 		matrices[fromSpace][toSpace].getRotationScale(matrix);
 		return matrix;
 	}
-	
+	/**
+	 * Checks wheter the matrix for transforming from fromSpace to toSpace is valid.
+	 * If not, the matrix is computed.
+	 * @param fromSpace
+	 * @param toSpace
+	 * @throws IllegalStateException if the matrix cannot be computed (should never happen)
+	 */
 	private void validateMatrix(int fromSpace, int toSpace) {
 		if (matricesValid[fromSpace][toSpace]) {
 			return;
@@ -119,6 +214,11 @@ public abstract class AbstractTransformUtil {
 		matricesValid[fromSpace][toSpace] = true;
 	}
 	
+	/**
+	 * Flips the z-axis of the space-to-world matrix for the specified space
+	 * Needed for cameras to turn them to face down the positive z-axis.
+	 * @param space
+	 */
 	protected void flipZAxis(int space) {
 		Matrix4d m = matrices[space][WORLD];
 		m.m00 = -m.m00;

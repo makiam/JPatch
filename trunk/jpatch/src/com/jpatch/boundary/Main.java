@@ -86,6 +86,10 @@ public class Main {
 	private static Color VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.text.get();
 	private static Color ACTIVE_VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.selection.get();
 	
+	
+	final DefaultTreeModel treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
+	final TreeManager treeManager = new TreeManager(treeModel);
+	
 	private Robot robot;
 	private JFrame frame;
 	private JLabel statusLabel = new JLabel("status");
@@ -234,6 +238,8 @@ public class Main {
 			}
 		}
 	};
+	
+	private TransformNode tmpNode;
 	
 	/**
 	 * private constructor (singleton pattern)
@@ -430,6 +436,16 @@ public class Main {
 			}
 		});
 		
+//		selection.getSelectedSdsModelAttribute().addAttributePostChangeListener(new AttributePostChangeListener() {
+//
+//			public void attributeHasChanged(Attribute source) {
+//				for (Viewport viewport : viewports) {
+//					TransformNode node = selection.getSelectedSdsModelAttribute().getValue();
+//					viewport.getViewDef().getTransformUtil().setLocalTransform(node.getTransform());
+//				}
+//			}
+//			
+//		});
 //		actions.toolSM.getValue().registerListeners(viewports);
 		
 		JPatchToolBar toolBar = new JPatchToolBar();
@@ -506,14 +522,16 @@ public class Main {
 		activeViewport.addAttributePostChangeListener(inspector.getViewportChangeListener());
 		inspector.getComponent().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		
-		final DefaultTreeModel treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
-		final TreeManager treeManager = new TreeManager(treeModel);
 		
-//		final TransformNode node1 = new TransformNode();
-//		final TransformNode node2 = new TransformNode();
+		
+		final TransformNode node1 = new TransformNode();
+		tmpNode = new TransformNode();
 //		final TransformNode node3 = new TransformNode();
 //		final TransformNode node4 = new TransformNode();
-		
+		node1.getNameAttribute().setValue("node1");
+		node1.getParentAttribute().setValue(sceneGraphRoot);
+		tmpNode.getParentAttribute().setValue(node1);
+		tmpNode.getNameAttribute().setValue("node2");
 		try {
 //			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt")));
 //			final SdsModel model1 = new SdsModel(new Sds(new FileInputStream("/home/sascha/off/cube2.off")));
@@ -527,7 +545,7 @@ public class Main {
 //			model3.getParentAttribute().setValue(model2);
 			SdsModel model = new SdsModel(new Sds());
 			model.getNameAttribute().setValue("SDS model");
-			model.getParentAttribute().setValue(sceneGraphRoot);
+			model.getParentAttribute().setValue(tmpNode);
 			selection.getSelectedSdsModelAttribute().setValue(model);
 			
 		} catch (Exception e) {
@@ -746,10 +764,14 @@ public class Main {
 	
 	public void setModel(Sds sds) {
 		SdsModel model = new SdsModel(sds);
+		treeManager.createTreeNodeFor(model);
 		model.getNameAttribute().setValue("model");
-		sceneGraphRoot.getChildrenAttribute().clear();
-		model.getParentAttribute().setValue(sceneGraphRoot);
+		model.getParentAttribute().setValue(tmpNode);
+		
+		SdsModel oldModel = selection.getSelectedSdsModelAttribute().getValue();
 		selection.getSelectedSdsModelAttribute().setValue(model);
+		
+		treeManager.removeNode(oldModel);
 	}
 	
 	public void computeSceneGraph() {
@@ -844,9 +866,9 @@ public class Main {
 		return selection;
 	}
 
-	public void setSelection(Selection selection) {
-		this.selection = selection;
-	}
+//	public void setSelection(Selection selection) {
+//		this.selection = selection;
+//	}
 	
 	
 }

@@ -171,4 +171,9 @@ public class SceneGraphTreeNode implements MutableTreeNode {
 	public boolean isLeaf() {
 		return leafs.size() == 0;
 	}
+	
+	@Override
+	public String toString() {
+		return sceneGraphNode.toString();
+	}
 }

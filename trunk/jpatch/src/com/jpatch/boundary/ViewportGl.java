@@ -572,8 +572,7 @@ public class ViewportGl extends Viewport {
 //		Matrix4d cameraMatrix = viewDef.getMatrix(new Matrix4d());	// TODO: write better implementation 
 //		transformUtil.setCamera2World(cameraMatrix);
 		
-		
-		drawOrigin();
+//		drawOrigin(viewDef.getTransformUtil().getMatrix(WORLD, CAMERA, new Matrix4f()));
 		
 		SceneGraphNode sceneGraphRoot = Main.getInstance().getSceneGraphRoot();
 		drawSceneGraphElement(sceneGraphRoot);
@@ -593,7 +592,7 @@ public class ViewportGl extends Viewport {
 	
 	private void drawSceneGraphElement(SceneGraphNode node) {
 		
-		
+		System.out.println("drawing " + node + " " + (node == null ? "(null)" : "(not null)"));
 //		Matrix4d matrix = new Matrix4d(viewDef.getMatrix(new Matrix4d()));
 		Transform transform = node.getTransform();
 		TransformUtil transformUtil = viewDef.getTransformUtil();
@@ -613,6 +612,7 @@ public class ViewportGl extends Viewport {
 		}
 //		modelView.set(matrix);
 		transformUtil.getMatrix(LOCAL, CAMERA, modelView);
+		drawOrigin(modelView);
 		if (node instanceof SdsModel) {
 			drawSds3(((SdsModel) node).getSds());
 		}
@@ -844,17 +844,17 @@ public class ViewportGl extends Viewport {
 //		gl.glDisable(GL_BLEND);
 //	}
 
-	@Override
-	protected void drawOrigin() {
+	protected void drawOrigin(Matrix4f matrix) {
 		Point3f p0 = new Point3f(0, 0, 0);
 		Point3f px = new Point3f(1, 0, 0);
 		Point3f py = new Point3f(0, 1, 0);
 		Point3f pz = new Point3f(0, 0, 1);
-		TransformUtil transformUtil = viewDef.getTransformUtil();
-		transformUtil.transform(WORLD, p0, CAMERA, p0);
-		transformUtil.transform(WORLD, px, CAMERA, px);
-		transformUtil.transform(WORLD, py, CAMERA, py);
-		transformUtil.transform(WORLD, pz, CAMERA, pz);
+		
+		matrix.transform(p0);
+		matrix.transform(px);
+		matrix.transform(py);
+		matrix.transform(pz);
+	
 		
 //		System.out.println("p0 = " + p0);
 //		System.out.println("px = " + px);
@@ -1408,7 +1408,6 @@ public class ViewportGl extends Viewport {
 //		gl.glEnd();
 	}
 
-	@Override
 	protected void drawInfo() {
 		rasterMode();
 		gl.glColor3f(COLORS.text.x, COLORS.text.y, COLORS.text.z);
