@@ -4,9 +4,9 @@ import javax.vecmath.*;
 
 public class TransformUtil extends AbstractTransformUtil {
 	/** camera space, should only be set by the viewport */
-	public final int CAMERA = addSpace("camera");
+	public final int CAMERA = 1;
 	/** local object space */
-	public final int LOCAL = addSpace("local");
+	public final int LOCAL = 2;
 	
 	/** perspective projection flag */
 	private boolean perspective;
