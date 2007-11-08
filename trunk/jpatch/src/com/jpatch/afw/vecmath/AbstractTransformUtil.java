@@ -9,59 +9,36 @@ import javax.vecmath.*;
  * and subclasses should add other spaced during construction.
  */
 public abstract class AbstractTransformUtil {
-	private static final int MAX = 10;
-	/** a 2D array of matrices used to transform between arbitrary spaces */
-	private final Matrix4d[][] matrices = new Matrix4d[MAX][MAX];
-	/** a 2D array of flags to keep track of valid/invalid matrices for lazy evaluation */
-	private final boolean[][] matricesValid = new boolean[MAX][MAX];
-	/** the number of spaces */
-	private int numSpaces = 0;
-	/** the names of the spaces */
-	private final String[] spaceNames = new String[10];
 	/** constant identifying world space */
-	public final int WORLD = addSpace("world");
+	public static final int WORLD = 0;
+	/** a 2D array of matrices used to transform between arbitrary spaces */
+	private final Matrix4d[][] matrices;
+	/** a 2D array of flags to keep track of valid/invalid matrices for lazy evaluation */
+	private final boolean[][] matricesValid;
+	/** the number of spaces */
+	private final int numSpaces;
+	/** the names of the spaces */
+	private final String[] spaceNames;
 	
-	public int addSpace(String spaceName) {
-		/* search next free space */
-		for (int space = 0; space < MAX; space++) {
-			if (spaceNames[space] == null) {
-				spaceNames[space] = spaceName;
-				computeNumSpaces();
-				for (int i = 0; i < numSpaces; i++) {
-					matrices[space][i] = new Matrix4d();
-					matricesValid[space][i] = false;
-					if (space != i) {
-						matrices[i][space] = new Matrix4d();
-						matricesValid[i][space] = false;
-					}
-				}
-				return space;
-			}
-		}
-		throw new IllegalStateException("All spaces are occupied (max=" + MAX + ")");
-	}
-	
-	public void removeSpace(int space) {
-		spaceNames[space] = null;
+	/**
+	 * Creates a new AbstractTransformUtil with the specified spaces.
+	 * The specified spaces will be added to the predefined WORLD space,
+	 * so the first specified space will be #1 (world is #0)
+	 * @param spaceNames
+	 */
+	AbstractTransformUtil(String... spaceNames) {
+		numSpaces = spaceNames.length + 1;
+		this.spaceNames = new String[numSpaces];
+		this.spaceNames[0] = "world";
+		System.arraycopy(spaceNames, 0, this.spaceNames, 1, spaceNames.length);
+		matrices = new Matrix4d[numSpaces][numSpaces];
+		matricesValid = new boolean[numSpaces][numSpaces];
 		for (int i = 0; i < numSpaces; i++) {
-			matrices[space][i] = null;
-			matricesValid[space][i] = false;
-			if (space != i) {
-				matrices[i][space] = null;
-				matricesValid[i][space] = false;
+			for (int j = 0; j < numSpaces; j++) {
+				matrices[i][j] = Utils3d.createIdentityMatrix4d();
+				matricesValid[i][j] = true;
 			}
 		}
-		computeNumSpaces();
-	}
-	
-	private void computeNumSpaces() {
-		for (int space = MAX - 1; space >= 0; space--) {
-			if (spaceNames[space] != null) {
-				numSpaces = space + 1;
-				return;
-			}
-		}
-		numSpaces = 0;
 	}
 	
 	/**
@@ -250,14 +227,5 @@ public abstract class AbstractTransformUtil {
 		m.m20 = -m.m20;
 		m.m21 = -m.m21;
 		m.m22 = -m.m22;
-	}
-	
-	void dump() {
-		for (int i = 0; i < MAX; i++) {
-			for (int j = 0; j < MAX ; j++) {
-				System.out.print((matrices[i][j] == null) ? ". " : "* ");
-			}
-			System.out.println();
-		}
 	}
 }
