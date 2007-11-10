@@ -25,6 +25,7 @@ public abstract class Viewport implements NamedObject {
 	final BooleanAttr showControlMeshAttr = new BooleanAttr(true);
 	final BooleanAttr showLimitSurfaceAttr = new BooleanAttr(true);
 	final BooleanAttr showProjectedMeshAttr = new BooleanAttr(true);
+	final BooleanAttr antialiasAttr = new BooleanAttr(true);
 	final StateMachine<ViewDirection> viewDirectionAttr;
 	
 	final int id;
@@ -94,6 +95,10 @@ public abstract class Viewport implements NamedObject {
 
 	public BooleanAttr getShowProjectedMeshAttribute() {
 		return showProjectedMeshAttr;
+	}
+	
+	public BooleanAttr getAntialiasAttribute() {
+		return antialiasAttr;
 	}
 
 	public StateMachine<ViewDirection> getViewDirectionAttribute() {

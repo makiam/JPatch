@@ -329,6 +329,30 @@ public class ViewportGl extends Viewport {
 		7,7,7,7,7,7,10,6,7,7,7,7,3,3,3,3,7,7,7,7,7,7,7,10,7,7,7,7,7,6,8,6
 	};
 	
+	static class MultisampleChooser extends DefaultGLCapabilitiesChooser {
+	    public int chooseCapabilities(GLCapabilities desired,
+	                                  GLCapabilities[] available,
+	                                  int windowSystemRecommendedChoice) {
+	      boolean anyHaveSampleBuffers = false;
+	      for (int i = 0; i < available.length; i++) {
+	        GLCapabilities caps = available[i];
+	        if (caps != null && caps.getSampleBuffers()) {
+	          anyHaveSampleBuffers = true;
+	          break;
+	        }
+	      }
+	      int selection = super.chooseCapabilities(desired, available, windowSystemRecommendedChoice);
+	      if (!anyHaveSampleBuffers) {
+	        System.err.println("WARNING: antialiasing will be disabled because none of the available pixel formats had it to offer");
+	      } else {
+	        if (!available[selection].getSampleBuffers()) {
+	          System.err.println("WARNING: antialiasing will be disabled because the DefaultGLCapabilitiesChooser didn't supply it");
+	        }
+	      }
+	      return selection;
+	    }
+	  }
+	
 	/** Offset to the GL Display-Lists holding the character bitmaps. */
 	private int fontOffset;
 	
@@ -338,7 +362,16 @@ public class ViewportGl extends Viewport {
 	
 	public ViewportGl(int id, ViewDirection direction, CollectionAttr<ViewDirection> orthoDirections, JPatchInspector inspector) {
 		super(id, direction, orthoDirections, inspector);
-		drawable = LIGHTWEIGHT ? new GLJPanel() : new GLCanvas();
+		
+		GLCapabilities caps = new GLCapabilities();
+	    GLCapabilitiesChooser chooser = new MultisampleChooser();
+
+	    caps.setSampleBuffers(true);
+	    caps.setNumSamples(4);
+	    drawable = new GLCanvas(caps, chooser, null, null);
+	    
+	    
+//		drawable = LIGHTWEIGHT ? new GLJPanel(caps) : new GLCanvas(caps);
 		component = (Component) drawable;
 		component.setBackground(COLORS.background.get());
 		
@@ -368,6 +401,9 @@ public class ViewportGl extends Viewport {
 				
 				setLighting(RealtimeLighting.createThreepointLight());			
 //				setLighting(RealtimeLighting.createHeadLight());
+				
+//				gl.glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
+				
 				
 				gl.glEnable(GL_POLYGON_OFFSET_FILL);
 				gl.glPolygonOffset(1.0f, 1.0f);
@@ -518,6 +554,11 @@ public class ViewportGl extends Viewport {
 	
 	@Override
 	public void draw() {
+		if (antialiasAttr.getBoolean()) {
+			gl.glEnable(GL_MULTISAMPLE);
+		} else {
+			gl.glDisable(GL_MULTISAMPLE);
+		}
 		viewDef.configureTransformUtil(transformUtil);
 		time = System.nanoTime();
 //		System.out.println("ViewportGL.draw() at " + System.currentTimeMillis());

@@ -26,6 +26,10 @@ public abstract class AbstractViewDef implements ViewDef {
 		return viewport.getShowProjectedMeshAttribute();
 	}
 
+	public BooleanAttr getAntialiasAttribute() {
+		return viewport.getAntialiasAttribute();
+	}
+	
 	public StateMachine<ViewDirection> getViewDirectionAttribute() {
 		return viewport.getViewDirectionAttribute();
 	}
