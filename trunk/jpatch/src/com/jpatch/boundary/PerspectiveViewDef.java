@@ -57,7 +57,7 @@ public class PerspectiveViewDef extends AbstractViewDef {
 	}
 
 	public void configureTransformUtil(TransformUtil transformUtil) {
-		transformUtil.setCameraTransform(perspective.getTransform());
+		transformUtil.setTransform(TransformUtil.CAMERA, perspective.getTransform());
 		transformUtil.setPerspectiveProjection(getRelativeFocalLength());
 		transformUtil.setViewportDimension(viewport.getComponent().getWidth(), viewport.getComponent().getHeight());
 		transformUtil.setCameraScale(1);

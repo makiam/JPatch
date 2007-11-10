@@ -4,9 +4,9 @@ import javax.vecmath.*;
 
 public class TransformUtil extends AbstractTransformUtil {
 	/** camera space, should only be set by the viewport */
-	public final int CAMERA = 1;
+	public static final int CAMERA = 1;
 	/** local object space */
-	public final int LOCAL = 2;
+	public static final int LOCAL = 2;
 	
 	/** perspective projection flag */
 	private boolean perspective;
@@ -19,6 +19,9 @@ public class TransformUtil extends AbstractTransformUtil {
 	/** scale component of the camera matrix */
 	private double cameraScale;
 	
+	public TransformUtil(String... additionalSpaceNames) {
+		super(concatenateSpaceNames(new String[] { "camera", "local" }, additionalSpaceNames));
+	}
 	
 	/**
 	 * Sets an orthographics projection
@@ -107,22 +110,14 @@ public class TransformUtil extends AbstractTransformUtil {
 	}
 	
 	/**
-	 * Sets the world-to-local transformation matrix to the matrix of the specified transform object
+	 * Sets the world-to-space transformation matrix to the matrix of the specified transform object
 	 * @param transform
 	 */
-	public void setLocalTransform(Transform transform) {
-		setWorld2Space(LOCAL, transform.matrix);
-	}
-	
-	/**
-	 * Sets the camera-to-world transformation matrix to the matrix of the specified transform object
-	 * and flips the z-axis (to make the camera look into the direction of the positive z axis)
-	 * @param transform
-	 */
-	public void setCameraTransform(Transform transform) {
-		setSpace2World(CAMERA, transform.matrix);
-		/* rotate the camera to look down the positive z axis */
-		flipZAxis(CAMERA);
+	public void setTransform(int space, Transform transform) {
+		setSpace2World(space, transform.matrix);
+		if (space == CAMERA) {
+			flipZAxis(CAMERA);
+		}
 	}
 	
 	/**

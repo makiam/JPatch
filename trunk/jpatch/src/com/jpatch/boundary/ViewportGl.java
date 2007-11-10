@@ -599,7 +599,7 @@ public class ViewportGl extends Viewport {
 //		Matrix4d matrix = new Matrix4d(viewDef.getMatrix(new Matrix4d()));
 		Transform transform = node.getTransform();
 		if (transform != null) {
-			transformUtil.setLocalTransform(transform);
+			transformUtil.setTransform(LOCAL, transform);
 //			transform.mul2(matrix);
 //			transform.getMatrix(m);
 //			if (node instanceof TransformNode) {

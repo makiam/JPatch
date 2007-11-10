@@ -94,6 +94,10 @@ public class Selection implements Transformable {
 //		return sphere;
 //	}
 
+	public void configureTransformUtil(TransformUtil transformUtil) {
+		transformUtil.setTransform(TransformUtil.LOCAL, selectedSdsModelAttr.getValue().getTransform());
+	}
+	
 	public void begin() {
 		int count = selectedVerticesAttr.getElements().size();
 		startPositions = new Point3d[count];
