@@ -8,5 +8,6 @@
 		<field name="Control mesh" attribute="ShowControlMesh" />
 		<field name="Limit surface" attribute="ShowLimitSurface" />
 		<field name="Projected mesh" attribute="ShowProjectedMesh" />
+		<field name="Antialiasing" attribute="Antialias" />
 	</group>
 </attributeEditor>
