@@ -1,5 +1,7 @@
 package com.jpatch.afw.vecmath;
 
+import java.util.Arrays;
+
 import javax.vecmath.*;
 
 /**
@@ -15,8 +17,6 @@ public abstract class AbstractTransformUtil {
 	private final Matrix4d[][] matrices;
 	/** a 2D array of flags to keep track of valid/invalid matrices for lazy evaluation */
 	private final boolean[][] matricesValid;
-	/** the number of spaces */
-	private final int numSpaces;
 	/** the names of the spaces */
 	private final String[] spaceNames;
 	
@@ -26,19 +26,23 @@ public abstract class AbstractTransformUtil {
 	 * so the first specified space will be #1 (world is #0)
 	 * @param spaceNames
 	 */
-	AbstractTransformUtil(String... spaceNames) {
-		numSpaces = spaceNames.length + 1;
-		this.spaceNames = new String[numSpaces];
-		this.spaceNames[0] = "world";
-		System.arraycopy(spaceNames, 0, this.spaceNames, 1, spaceNames.length);
-		matrices = new Matrix4d[numSpaces][numSpaces];
-		matricesValid = new boolean[numSpaces][numSpaces];
-		for (int i = 0; i < numSpaces; i++) {
-			for (int j = 0; j < numSpaces; j++) {
+	AbstractTransformUtil(String... additionalSpaceNames) {
+		spaceNames = concatenateSpaceNames(new String[] { "world" }, additionalSpaceNames);
+		matrices = new Matrix4d[spaceNames.length][spaceNames.length];
+		matricesValid = new boolean[spaceNames.length][spaceNames.length];
+		for (int i = 0; i < spaceNames.length; i++) {
+			for (int j = 0; j < spaceNames.length; j++) {
 				matrices[i][j] = Utils3d.createIdentityMatrix4d();
 				matricesValid[i][j] = true;
 			}
 		}
+	}
+	
+	protected static String[] concatenateSpaceNames(String[] start, String[] end) {
+		String[] concat = new String[start.length + end.length];
+		System.arraycopy(start, 0, concat, 0, start.length);
+		System.arraycopy(end, 0, concat, start.length, end.length);
+		return concat;
 	}
 	
 	/**
@@ -48,7 +52,7 @@ public abstract class AbstractTransformUtil {
 	 * @param matrix
 	 */
 	public void setWorld2Space(int space, Matrix4d matrix) {
-		for (int i = 0; i < numSpaces; i++) {
+		for (int i = 0; i < spaceNames.length; i++) {
 			matricesValid[space][i] = false;
 			matricesValid[i][space] = false;
 		}
@@ -63,7 +67,7 @@ public abstract class AbstractTransformUtil {
 	 * @param matrix
 	 */
 	public void setSpace2World(int space, Matrix4d matrix) {
-		for (int i = 0; i < numSpaces; i++) {
+		for (int i = 0; i < spaceNames.length; i++) {
 			matricesValid[space][i] = false;
 			matricesValid[i][space] = false;
 		}
