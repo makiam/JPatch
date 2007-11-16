@@ -995,46 +995,52 @@ public class RotateTool implements VisibleTool {
 		final double offsetFactor;
 		final double offsetRadius;
 		final Point3d cameraPivot = new Point3d();
+		final Point3d worldPivot = new Point3d();
 		final Matrix3d orientMatrix = new Matrix3d();
 		
 		ViewportVars(Viewport viewport) {
 			this.viewport = viewport;
 			viewport.getViewDef().computeMatrix();
 			viewport.getViewDef().configureTransformUtil(transformUtil);
-//			Main.getInstance().getSelection().configureTransformUtil(transformUtil);
+			Main.getInstance().getSelection().configureTransformUtil(transformUtil);
+			
+			/* set cameraPivot to pivot in camera space */
+			transformUtil.transform(LOCAL, pivot, CAMERA, cameraPivot);
+			transformUtil.transform(LOCAL, pivot, WORLD, worldPivot);
 			
 			Matrix4d matrix = new Matrix4d();
 			Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getTransform().getMatrix(matrix);
 			
 			/* compute rotation matrix */
+//			Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getTransform().getMatrix(matrix);
 			axisRotation.getRotationMatrix(matrix);
+			
 			/* add pivot translation */
-			matrix.m03 = pivot.x;
-			matrix.m13 = pivot.y;
-			matrix.m23 = pivot.z;
+			matrix.m03 = worldPivot.x;
+			matrix.m13 = worldPivot.y;
+			matrix.m23 = worldPivot.z;
 			matrix.m33 = 1;
 			
-//			matrix.mul(Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getTransform().getMatrix(new Matrix4d()));
 			
 			/* set local2world to rotate-tool matrix */ 
 			transformUtil.setSpace2World(AXIS_ROTATION, matrix);
 			
 			/* compute rotation matrix */
+//			Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getTransform().getMatrix(matrix);
 			rotation.getRotationMatrix(matrix);
 			axisRotation.rotateMatrix(matrix);
+			
 			/* add pivot translation */
-			matrix.m03 = pivot.x;
-			matrix.m13 = pivot.y;
-			matrix.m23 = pivot.z;
+			matrix.m03 = worldPivot.x;
+			matrix.m13 = worldPivot.y;
+			matrix.m23 = worldPivot.z;
 			matrix.m33 = 1;
 			
-//			matrix.mul(Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getTransform().getMatrix(new Matrix4d()));
 			
 			/* set local2world to rotate-tool matrix */ 
 			transformUtil.setSpace2World(ROTATION, matrix);
 			
-			/* set cameraPivot to pivot in camera space */
-			transformUtil.transform(WORLD, pivot, CAMERA, cameraPivot);
+			
 			
 			/*
 			 * set the radius so that the tool will occupy about 1/3rd of the screen

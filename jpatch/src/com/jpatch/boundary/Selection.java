@@ -32,7 +32,7 @@ public class Selection implements Transformable {
 		Point3d p = new Point3d();
 		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
 			vertex.getPos(p);
-			transform.transform(p);
+//			transform.transform(p);
 			if (p.x < p0.x) {
 				p0.x = p.x;
 			}
