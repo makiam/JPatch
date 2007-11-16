@@ -71,7 +71,7 @@ public class MoveVertexTool implements VisibleTool {
 		}
 		Point3d p0 = new Point3d();
 		Point3d p1 = new Point3d();
-		selection.getBounds(p0, p1);
+		selection.getBounds(p0, p1, null);
 		double sc = p0.distance(p1) * 0.02;
 		p0.x -= sc;
 		p0.y -= sc;
@@ -241,7 +241,7 @@ public class MoveVertexTool implements VisibleTool {
 			this.sdsModel = sdsModel;
 			
 			viewport.getViewDef().configureTransformUtil(transformUtil);
-			transformUtil.setLocalTransform(sdsModel.getTransform());
+			transformUtil.setTransform(TransformUtil.LOCAL, sdsModel.getTransform());
 			
 			vertex.getPos(p);
 //			System.out.print("local=" + p + " screen=");

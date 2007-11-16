@@ -232,4 +232,37 @@ public abstract class AbstractTransformUtil {
 		m.m21 = -m.m21;
 		m.m22 = -m.m22;
 	}
+	
+	public String getValidMatrices() {
+		matricesValid[0][0] = false;
+		StringBuilder sb = new StringBuilder();
+		int maxStringLength = 0;
+		for (int i = 0; i < spaceNames.length; i++) {
+			maxStringLength = Math.max(maxStringLength, spaceNames[i].length());
+		}
+		char[] spaces = new char[maxStringLength + 1];
+		Arrays.fill(spaces, ' ');
+		sb.append(spaces);
+		for (int i = 0; i < spaceNames.length; i++) {
+			sb.append(spaceNames[i]).append(' ');
+		}
+		sb.append('\n');
+		for (int to = 0; to < spaceNames.length; to++) {
+			sb.append(spaceNames[to]);
+			sb.append(spaces, 0, maxStringLength - spaceNames[to].length());
+			sb.append(' ');
+			for (int from = 0; from < spaceNames.length; from++) {
+				sb.append(spaces, 0, spaceNames[from].length() / 2);
+				if (matricesValid[from][to]) {
+					sb.append('\u2612');
+				} else {
+					sb.append('\u2610');
+				}
+				sb.append(spaces, 0, spaceNames[from].length() - spaceNames[from].length() / 2 - 1);
+				sb.append(' ');
+			}
+			sb.append('\n');
+		}
+		return sb.toString();
+	}
 }

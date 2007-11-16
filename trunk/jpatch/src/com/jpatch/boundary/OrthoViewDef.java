@@ -83,7 +83,7 @@ public class OrthoViewDef extends AbstractViewDef {
 		int height = viewport.getComponent().getHeight();
 		double viewScale = scaleAttr.getDouble() * width * SCALE_FACTOR;
 		transformUtil.setOrthographicProjection();
-		transformUtil.setWorld2Space(transformUtil.CAMERA, matrix);
+		transformUtil.setWorld2Space(TransformUtil.CAMERA, matrix);
 		transformUtil.setCameraScale(viewScale);
 		transformUtil.setViewportDimension(width, height);
 	}
