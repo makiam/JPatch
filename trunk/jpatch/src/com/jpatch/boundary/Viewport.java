@@ -24,8 +24,8 @@ public abstract class Viewport implements NamedObject {
 	final GenericAttr<String> nameAttr = new GenericAttr<String>();
 	final BooleanAttr showControlMeshAttr = new BooleanAttr(true);
 	final BooleanAttr showLimitSurfaceAttr = new BooleanAttr(true);
-	final BooleanAttr showProjectedMeshAttr = new BooleanAttr(true);
-	final BooleanAttr antialiasAttr = new BooleanAttr(true);
+	final BooleanAttr showProjectedMeshAttr = new BooleanAttr(false);
+	final BooleanAttr antialiasAttr = new BooleanAttr(false);
 	final StateMachine<ViewDirection> viewDirectionAttr;
 	
 	final int id;
