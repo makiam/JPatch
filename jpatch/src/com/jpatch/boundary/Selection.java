@@ -24,15 +24,15 @@ public class Selection implements Transformable {
 		return selectedVerticesAttr;
 	}
 	
-	public void getBounds(Tuple3d p0, Tuple3d p1) {
+	public void getBounds(Tuple3d p0, Tuple3d p1, Matrix4d matrix) {
 		p0.set(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 		p1.set(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
-		SdsModel sdsModel = selectedSdsModelAttr.getValue();
-		Transform transform = sdsModel.getTransform();
 		Point3d p = new Point3d();
 		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
 			vertex.getPos(p);
-//			transform.transform(p);
+			if (matrix != null) {
+				matrix.transform(p);
+			}
 			if (p.x < p0.x) {
 				p0.x = p.x;
 			}
@@ -58,9 +58,9 @@ public class Selection implements Transformable {
 		return selectedVerticesAttr.size();
 	}
 	
-	public void getCenter(Point3d center) {
+	public void getCenter(Point3d center, Matrix4d matrix) {
 		Point3d p = new Point3d();
-		getBounds(p, center);
+		getBounds(p, center, matrix);
 		center.interpolate(p, 0.5);
 	}
 	

@@ -653,10 +653,10 @@ public class ViewportGl extends Viewport {
 //			matrix.mul(m);
 //			modelViewMatrix.mul(matrix);
 		} else {
-			transformUtil.setSpace2World(transformUtil.LOCAL, IDENTITY);
+			transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
 		}
 //		modelView.set(matrix);
-		transformUtil.getMatrix(transformUtil.LOCAL, transformUtil.CAMERA, modelView);
+		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
 		drawOrigin(modelView);
 		if (node instanceof SdsModel) {
 			drawSds3(((SdsModel) node).getSds());

@@ -89,6 +89,7 @@ public class RotateTool implements VisibleTool {
 	}
 	
 	public RotateTool() {
+		System.out.println(transformUtil.getValidMatrices());
 		for (int i = 0; i < SEGMENTS; i++) {
 			double sin = Math.sin(i * 2 * Math.PI / SEGMENTS);
 			double cos = Math.cos(i * 2 * Math.PI / SEGMENTS);
@@ -379,7 +380,7 @@ public class RotateTool implements VisibleTool {
 	
 	public void registerListeners(Viewport[] viewports) {
 		Selection selection = Main.getInstance().getSelection();
-		selection.getCenter(pivot);
+		selection.getCenter(pivot, null);
 		pivotAttr.setTuple(pivot);
 		if (mouseListeners != null) {
 			throw new IllegalStateException("already registered");
