@@ -1,5 +1,6 @@
 package com.jpatch.boundary.tools;
 
+import static com.jpatch.afw.vecmath.TransformUtil.*;
 import static javax.media.opengl.GL.*;
 
 import java.awt.Dimension;
@@ -90,6 +91,8 @@ public class TranslateTool implements VisibleTool {
 	private final Tuple3Attr axisRotationAttr = new Tuple3Attr();
 	private final Tuple3Attr vectorAttr = new Tuple3Attr();
 	private final Point3d pivot = new Point3d();
+	private final Point3d cameraPivot = new Point3d();
+	
 	private final Vector3d vector = new Vector3d(2, 1, 0);
 	private final Rotation3d axisRotation = new Rotation3d();
 	private final StateMachine<Integer> modeAttr = new StateMachine<Integer>(new Integer[] { 3, 6 }, 6);
@@ -123,6 +126,11 @@ public class TranslateTool implements VisibleTool {
 			}
 	);
 	
+	private TransformUtil transformUtil = new TransformUtil("axis_rotation");
+	private static final int AXIS_ROTATION = 3;
+	
+	private double radius;
+	
 	private MouseListener[] mouseListeners;
 	private MouseMotionListener mouseMotionListener;
 	
@@ -151,7 +159,7 @@ public class TranslateTool implements VisibleTool {
 	
 	public void registerListeners(Viewport[] viewports) {
 		Selection selection = Main.getInstance().getSelection();
-		selection.getCenter(pivot);
+		selection.getCenter(pivot, null);
 		pivotAttr.setTuple(pivot);
 		if (mouseListeners != null) {
 			throw new IllegalStateException("already registered");
@@ -171,23 +179,23 @@ public class TranslateTool implements VisibleTool {
 		mouseListeners = null;
 	}
 	
-	public void draw(Viewport viewport) {
-		TransformUtilOld transformUtil = viewport.getViewDef().getTransformUtil();
-		double radius;
+	private void configureFor(Viewport viewport) {
+		viewport.getViewDef().computeMatrix();
+		viewport.getViewDef().configureTransformUtil(transformUtil);
+		Main.getInstance().getSelection().configureTransformUtil(transformUtil);
+		
+		/* set the transformUtil's local->world matrix's scale to 1.0 */
+		transformUtil.setScale(LOCAL, WORLD, 1.0);
+		
+		transformUtil.transform(LOCAL, pivot, CAMERA, cameraPivot);
 		/*
 		 * set the radius so that the tool will occupy about 1/3rd of the screen
 		 */
-		if (!transformUtil.isPerspective()) {
-			Dimension size = viewport.getComponent().getSize();
-			radius = Math.min(size.width, size.height) / transformUtil.getCameraScale() * 0.2;
-		} else {
-			/* set cameraPivot to camera-space pivot and compute vector from pivot to camera*/
-			Point3d cameraPivot = new Point3d();
-			transformUtil.world2Camera(pivot, cameraPivot);
-			radius = cameraPivot.z / transformUtil.getRelativeFocalLength() * -0.2;
-		}
+		radius = transformUtil.getNiceRadius(-cameraPivot.z, viewport.getComponent().getWidth(), viewport.getComponent().getHeight());
 		
 		Matrix4d matrix = new Matrix4d();
+		
+		/* compute rotation matrix */
 		axisRotation.getRotationMatrix(matrix);
 		matrix.mul(radius);
 		
@@ -195,20 +203,21 @@ public class TranslateTool implements VisibleTool {
 		matrix.m03 = pivot.x;
 		matrix.m13 = pivot.y;
 		matrix.m23 = pivot.z;
-		
 		matrix.m33 = 1;
 		
-		transformUtil.setLocal2World(matrix);
-		
-		Point3d cameraPivot = new Point3d();
-		transformUtil.world2Camera(pivot, cameraPivot);
+		/* set local2world to rotate-tool matrix */ 
+		transformUtil.setSpace2World(AXIS_ROTATION, LOCAL, matrix);
+	}
+	
+	public void draw(Viewport viewport) {
+		configureFor(viewport);
 		
 		final Point3f[] axisPoints = new Point3f[matrices.length];
 		Integer[] order = new Integer[matrices.length];
 		for (int i = 0; i < matrices.length; i++) {
 			axisPoints[i] = new Point3f(1, 0, 0);
 			matrices[i].transform(axisPoints[i]);
-			transformUtil.local2Camera(axisPoints[i], axisPoints[i]);
+			transformUtil.transform(AXIS_ROTATION, axisPoints[i], CAMERA,axisPoints[i]);
 			order[i] = i;
 		};
 		
@@ -234,29 +243,29 @@ public class TranslateTool implements VisibleTool {
 //		gl.glClear(GL_DEPTH_BUFFER_BIT);
 		
 		Point3f p = new Point3f();
-		Matrix4d modelView = transformUtil.getModelViewMatrix(new Matrix4d());
+		Matrix4d modelView = transformUtil.getMatrix(AXIS_ROTATION, CAMERA, new Matrix4d());
 		
 		Matrix4d m = new Matrix4d();
 		/* draw x/y/z lines */
 		
 		int start = mouseMotionListener == null ? 1 : 0;
 		for (int ghost = start; ghost < 2; ghost++) {
-			if (ghost == 1) {
-				Vector3d v = new Vector3d(vector);
-				axisRotation.getRotationMatrix(new Matrix3d()).transform(v);
-				axisRotation.getRotationMatrix(matrix);
-				matrix.mul(radius);
-				
-				/* add pivot translation */
-				matrix.m03 = pivot.x + v.x;
-				matrix.m13 = pivot.y + v.y;
-				matrix.m23 = pivot.z + v.z;
-				
-				matrix.m33 = 1;
-			
-				transformUtil.setLocal2World(matrix);
-				transformUtil.getModelViewMatrix(modelView);
-			}
+//			if (ghost == 1) {
+//				Vector3d v = new Vector3d(vector);
+//				axisRotation.getRotationMatrix(new Matrix3d()).transform(v);
+//				axisRotation.getRotationMatrix(matrix);
+//				matrix.mul(radius);
+//				
+//				/* add pivot translation */
+//				matrix.m03 = pivot.x + v.x;
+//				matrix.m13 = pivot.y + v.y;
+//				matrix.m23 = pivot.z + v.z;
+//				
+//				matrix.m33 = 1;
+//			
+//				transformUtil.setLocal2World(matrix);
+//				transformUtil.getModelViewMatrix(modelView);
+//			}
 			
 			for (int i = 0; i < 6; i++) {
 				int axis = order[i];
@@ -367,12 +376,10 @@ public class TranslateTool implements VisibleTool {
 	private class HitMouseMotionListener extends MouseMotionAdapter {
 		final int constraint;
 		final Viewport viewport;
-		final TransformUtilOld transformUtil;
 		final Point3d pScreen = new Point3d();
 		final Point3d pLocal = new Point3d();
 		HitMouseMotionListener(Viewport viewport, int constraint, double z) {
 			this.viewport = viewport;
-			transformUtil = viewport.getViewDef().getTransformUtil();
 			this.constraint = constraint;
 			pScreen.z = z;
 			System.out.println("screenZ = " + z);
@@ -381,38 +388,27 @@ public class TranslateTool implements VisibleTool {
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			// TODO Auto-generated method stub
-			Matrix4d matrix = new Matrix4d();
-			axisRotation.getRotationMatrix(matrix);
-			
-			/* add pivot translation */
-			matrix.m03 = pivot.x;
-			matrix.m13 = pivot.y;
-			matrix.m23 = pivot.z;
-			
-			matrix.m33 = 1;
-			
-			transformUtil.setLocal2World(matrix);
+			configureFor(viewport);
 			
 			if (constraint < 0) {
 				pScreen.x = e.getX();
 				pScreen.y = e.getY();
-				transformUtil.screen2Local(pScreen, pLocal);
+				transformUtil.projectFromScreen(AXIS_ROTATION, pScreen, pLocal);
 				vector.set(pLocal);
 			} else {
 				Point3d p0 = new Point3d();
-				transformUtil.local2Screen(p0, p0);
+				transformUtil.projectToScreen(AXIS_ROTATION, p0, p0);
 				Point3d p1 = new Point3d(1 - ARROW_LENGTH * 0.75, 0, 0);
 				matrices[constraint].transform(p1);
-				transformUtil.local2Screen(p1, p1);
+				transformUtil.projectToScreen(AXIS_ROTATION, p1, p1);
 				double t = Utils3d.closestPointOnLine(p0.x, p0.y, p1.x, p1.y, pScreen.x, pScreen.y);
 				System.out.println(t);
 				pScreen.interpolate(p0, p1, t);
-				transformUtil.screen2Local(pScreen, pLocal);
+				transformUtil.projectFromScreen(AXIS_ROTATION, pScreen, pLocal);
 				vector.set(pLocal);
 			}
-			transformUtil.local2World(vector, vector);
-			transformMatrix.setTranslation(vector);
+//			transformUtil.transform(AXIS_ROTATIONvector, vector);
+//			transformMatrix.setTranslation(vector);
 			Selection selection = Main.getInstance().getSelection();
 			selection.transform(transformMatrix);
 			Main.getInstance().syncRepaintViewport(viewport);
@@ -421,19 +417,19 @@ public class TranslateTool implements VisibleTool {
 	
 	private class HitMouseListener extends MouseAdapter {
 		Viewport viewport;
-		TransformUtilOld transformUtil;
 		
 		HitMouseListener(Viewport viewport) {
 			this.viewport = viewport;
-			transformUtil = viewport.getViewDef().getTransformUtil();
 		}
 		@Override
 		public void mousePressed(MouseEvent e) {
+			configureFor(viewport);
+			
 			double minDistSq = 100;
 			Point3d p = new Point3d(0, 0, 0);
 			Point hitPoint = new Point();
 			double hitZ = 0;
-			transformUtil.local2Screen(p, p);
+			transformUtil.projectToScreen(AXIS_ROTATION, p, p);
 			int hit = -2;
 			if (distSq(e.getX(), e.getY(), p) < minDistSq) {
 				hit = -1;
@@ -443,7 +439,7 @@ public class TranslateTool implements VisibleTool {
 				for (int i = 0; i < matrices.length; i++) {
 					p.set(1 - ARROW_LENGTH * 0.75, 0, 0);
 					matrices[i].transform(p);
-					transformUtil.local2Screen(p, p);
+					transformUtil.projectToScreen(AXIS_ROTATION, p, p);
 					double distSq = distSq(e.getX(), e.getY(), p);
 					if (distSq < minDistSq) {
 						minDistSq = distSq;

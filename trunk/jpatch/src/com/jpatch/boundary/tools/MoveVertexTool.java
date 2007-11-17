@@ -64,11 +64,12 @@ public class MoveVertexTool implements VisibleTool {
 	public void draw(Viewport viewport) {
 		GL gl = ((ViewportGl) viewport).getGl();
 		viewport.getViewDef().configureTransformUtil(transformUtil);
-		Matrix4f modelView = transformUtil.getMatrix(transformUtil.WORLD, transformUtil.CAMERA, new Matrix4f());
 		Selection selection = Main.getInstance().getSelection();
 		if (selection == null) {
 			return;
 		}
+		transformUtil.setTransform(LOCAL, selection.getSelectedSdsModelAttribute().getValue().getTransform());
+		Matrix4f modelView = transformUtil.getMatrix(LOCAL, CAMERA, new Matrix4f());
 		Point3d p0 = new Point3d();
 		Point3d p1 = new Point3d();
 		selection.getBounds(p0, p1, null);
