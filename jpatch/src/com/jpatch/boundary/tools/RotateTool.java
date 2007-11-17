@@ -412,105 +412,6 @@ public class RotateTool implements VisibleTool {
 		return rotationAttr;
 	}
 	
-//	private int getHitCircle(Viewport viewport, int mouseX, int mouseY) {
-//		axisRotation.getRotationMatrix(matrix);
-//		rotation.rotateMatrix(matrix);
-//		double x = mouseX - viewport.getComponent().getWidth() * 0.5;
-//		double y = viewport.getComponent().getHeight() * 0.5 - mouseY;
-//		int hit = -1;
-//		double distSqMin = 64;
-//		Line2D.Double line = new Line2D.Double();
-//		Matrix3d antiRotation = getAntiRotation(viewport.getViewDef());
-//		
-//		Point3d p = new Point3d(pivot);
-//		Vector3d v = new Vector3d();
-//		Matrix4d m = viewport.getViewDef().getMatrix(new Matrix4d());
-//		final double scale = 1.5 / (float) m.getScale() / radius;
-//		m.transform(p);
-//		double z;
-//		if (viewport.getViewDef() instanceof OrthoViewDef) {
-//			z = p.z;
-//		} else {
-//			z = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
-//		}
-//		Point3d p0 = new Point3d();
-//		
-//		for (int i = 0; i < 6; i++) {
-//			for (int j = 0; j <= SEGMENTS; j++) {
-//				p.set(points[i % 3][j % SEGMENTS]);
-//				p.scale(radius);
-//				if (i >= 3) {
-//					matrix.transform(p);
-//				} else {
-//					antiRotation.transform(p);
-//				}
-//				p.add(pivot);
-//				viewport.getViewDef().transform(p);
-//				line.x1 = p.x;
-//				line.y1 = p.y;
-//				p.set(points[i % 3][(j + 1) % SEGMENTS]);
-//				p.scale(radius);
-//				if (i >= 3) {
-//					matrix.transform(p);
-//				} else {
-//					antiRotation.transform(p);
-//				}
-//				p.add(pivot);
-//				p0.set(p);
-//				viewport.getViewDef().transform(p);
-//				m.transform(p0);
-//				line.x2 = p.x;
-//				line.y2 = p.y;
-//				
-//				double distSq = line.ptSegDistSq(x, y);
-//				
-//				double dist;
-//				if (viewport.getViewDef() instanceof OrthoViewDef) {
-//					dist = p0.z;
-//				} else {
-//					dist = 2 * z - Math.sqrt(p0.x * p0.x + p0.y * p0.y + p0.z * p0.z);
-//				}
-//				
-////				System.out.println("z=" + z + " dist=" + dist);
-////				System.out.println(line.x1 + "/" + line.y1 + " - " + line.x2 + "/" + line.y2 + " \t " + Math.sqrt(distSq));
-//				if (z < (dist + 0.001) && distSq < distSqMin) {
-//					distSqMin = distSq;
-//					hit = i;
-//					System.out.println("z=" + z + " dist=" + dist);
-//				}
-//			}
-//		}
-//		return hit;
-//	}
-
-//	private Matrix3d getAntiRotation(ViewDef viewdef) {
-//		Matrix3d antiRotation = new Matrix3d();
-//		viewdef.getInverseMatrix(new Matrix4d()).getRotationScale(antiRotation);
-//		if (viewdef instanceof PerspectiveViewDef) {
-//			Point3d p = new Point3d(pivot);
-//			Matrix4d m = viewdef.getMatrix(new Matrix4d());
-//			m.transform(p);
-//			Vector3d x = new Vector3d();
-//			Vector3d y = new Vector3d();
-//			Vector3d z = new Vector3d(p);
-//			Vector3d up = new Vector3d(0, 1, 0);
-//			x.cross(z, up);
-//			y.cross(x, z);
-//			x.normalize();
-//			y.normalize();
-//			z.normalize();
-//			Matrix3d matrix = new Matrix3d(
-//					x.x, y.x, z.x,
-//					x.y, y.y, z.y,
-//					x.z, y.z, z.z
-//			);
-//			matrix.normalize();
-//			antiRotation.mul(matrix);
-//		}
-//		antiRotation.normalize();
-//		return antiRotation;
-//	}
-	
 	/**
 	 * Computes the ray/sphere intersection of a ray shot through the point (on screen) specified
 	 * by the mouseX and mouseY parameters and the rotate-tool's enclosing sphere in local space.
@@ -522,7 +423,6 @@ public class RotateTool implements VisibleTool {
 	 * @return true if there was an intersection, false otherwise
 	 */
 	private boolean computeIntersectionPoint(ViewportVars vv, int mouseX, int mouseY, int constraint, Point3d result) {
-//		System.out.println("computeIntersectionPoint constraint=" + constraint);
 		double cameraRadius = vv.radius * transformUtil.getCameraScale();
 		
 		Point3d rayOrigin = new Point3d();
@@ -565,7 +465,6 @@ public class RotateTool implements VisibleTool {
 				break;
 			}
 			cameraAxis.normalize();
-//			System.out.println("cameraAxis=" + cameraAxis);
 			/* compute ray/plane intersection */
 			hit = Utils3d.rayPlaneIntersection(rayOrigin, rayDirection, vv.cameraPivot, cameraAxis, result);
 			
@@ -581,80 +480,6 @@ public class RotateTool implements VisibleTool {
 		}
 		return false;
 	}
-	
-//	private boolean setIntersectionVector2(Viewport viewport, int mouseX, int mouseY, int constraintAxis, Vector3d vector) {
-//		double x = mouseX - viewport.getComponent().getWidth() * 0.5;
-//		double y = viewport.getComponent().getHeight() * 0.5 - mouseY;
-//		Point3d rayOrigin = new Point3d();
-//		Vector3d rayDirection = new Vector3d();
-//		if (viewport.getViewDef() instanceof OrthoViewDef) {
-//			rayOrigin.set(x, y, 1);
-//			rayDirection.set(0, 0, -1);
-//			
-//		} else {
-//			PerspectiveViewDef perspective = (PerspectiveViewDef) viewport.getViewDef();
-//			double z = perspective.getRelativeFocalLength() * viewport.getComponent().getWidth();
-//			rayOrigin.set(0, 0, 0);
-//			rayDirection.set(x, y, -z);
-//		}
-//		Matrix4d m = viewport.getViewDef().getInverseMatrix(new Matrix4d());
-//		m.transform(rayOrigin);
-//		m.transform(rayDirection);
-//		
-//		Matrix3d antiRotation = getAntiRotation(viewport.getViewDef());
-//		
-//		if (constraintAxis < 0) {
-//			/* rotate freely, compute ray/sphere intersection */
-//			if (Utils3d.raySphereIntersection(rayOrigin, rayDirection, pivot, radius, vector, true)) {
-//				vector.sub(pivot);
-//				vector.normalize();
-//				return true;
-//			}
-//		} else {
-//			/* rotation is constrained to an axis, compute ray/plane intersection */
-//			Vector3d normal = new Vector3d();
-//			switch (constraintAxis) {
-//			case 0: // fallthrough intentional
-//			case 3:
-//				normal.set(1, 0, 0);
-//				break;
-//			case 1: // fallthrough intentional
-//			case 4:
-//				normal.set(0, 1, 0);
-//				break;
-//			case 2: // fallthrough intentional
-//			case 5:
-//				normal.set(0, 0, 1);
-//				break;
-//			default:
-//				throw new RuntimeException();
-//			}
-//			if (constraintAxis >= 3) {
-//				matrix.transform(normal);
-//			} else {
-//				antiRotation.transform(normal);
-//			}
-//			
-//			/* ray/plane */
-//			if (Utils3d.rayPlaneIntersection(rayOrigin, rayDirection, pivot, normal, vector)) {
-//				vector.sub(pivot);
-//				if (vector.length() < radius) {
-//					/* when inside the disc, use ray/plane intersection point */
-//					vector.normalize();
-////					System.out.println("inside");
-//					return true;
-//				}
-//			}
-//		
-//			/* outside of disc, use closest on screen */
-//			getAxisHit(viewport, mouseX, mouseY, normal, vector);
-////			System.out.println(vector);
-//			vector.normalize();
-//			return true;
-//			
-//		}
-//		return false;
-//	}
 	
 	/**
 	 * Computes the distance in pixel from the screen point specified by mouseX and mouseY to the
@@ -746,78 +571,6 @@ public class RotateTool implements VisibleTool {
 		return minDistSq;
 	}
 	
-//	private double getAxisHit(TransformUtil transformUtil, int mouseX, int mouseY, Vector3d axis, Vector3d vector) {
-//		double x = mouseX - viewport.getComponent().getWidth() * 0.5;
-//		double y = viewport.getComponent().getHeight() * 0.5 - mouseY;
-////		System.out.println("getAxisHit " + x + "," + y);
-//		Vector3d normal = new Vector3d(axis);
-//		normal.normalize();
-//		Vector3d u0 = Utils3d.perpendicularVector(normal, new Vector3d());
-//		Vector3d u1 = new Vector3d();
-//		u1.cross(u0, normal);
-////		System.out.println("u0=" + u0 + " u1=" + u1);
-//		Point3d p0 = new Point3d();
-//		Point3d p1 = new Point3d();
-//		Point3d p0s = new Point3d();
-//		Point3d p1s = new Point3d();
-////		int sx = 0, sy = 0;
-//		double minDistSq = Double.MAX_VALUE;
-//		double z0 = -Double.MAX_VALUE;
-////		double tt = -1;
-////		long time = System.currentTimeMillis();
-//		for (int i = 0; i < CIRCLE_SEGMENTS; i++) {
-//			double rcos = radius * COS[i];
-//			double rsin = radius * SIN[i];
-//			p0.set(
-//					u0.x * rcos + u1.x * rsin + pivot.x,
-//					u0.y * rcos + u1.y * rsin + pivot.y,
-//					u0.z * rcos + u1.z * rsin + pivot.z
-//			);
-//			rcos = radius * COS[(i + 1) % CIRCLE_SEGMENTS];
-//			rsin = radius * SIN[(i + 1) % CIRCLE_SEGMENTS];
-//			p1.set(
-//					u0.x * rcos + u1.x * rsin + pivot.x,
-//					u0.y * rcos + u1.y * rsin + pivot.y,
-//					u0.z * rcos + u1.z * rsin + pivot.z
-//			);
-////			matrix.transform(p0);
-//			p0s.set(p0);
-//			viewport.getViewDef().transform(p0s);
-////			matrix.transform(p1);
-//			p1s.set(p1);
-//			viewport.getViewDef().transform(p1s);
-//			double t = Utils3d.closestPointOnLine(p0s.x, p0s.y, p1s.x, p1s.y, x, y);
-//			
-//			if (t < 0) {
-//				t = 0;
-//			} else if (t > 1) {
-//				t = 1;
-//			}
-//			
-//			double dx = p0s.x * (1.0 - t) + p1s.x * t - x;
-//			double dy = p0s.y * (1.0 - t) + p1s.y * t - y;
-//			double z = p0.z * (1.0 - t) + p1.z * t;
-////				System.out.println(t + "     " + dx + "," + dy);
-//			double distSq = (dx * dx + dy * dy);
-//			double factor = (z > z0) ? 0.99 : 1;
-//			distSq *= factor;
-//			if (distSq < minDistSq) {
-//				minDistSq = distSq;
-//				z0 = z;
-//				vector.interpolate(p0, p1, t);
-//				vector.sub(pivot);
-////				sx = (int) (p0s.x * (1.0 - t) + p1s.x * t);
-////				sy = (int) (p0s.y * (1.0 - t) + p1s.y * t);
-////				tt = t;
-//			}
-//			
-//		}
-////		System.out.println(System.currentTimeMillis() - time);
-////		System.out.println(minDistSq + " " + vector);
-////		System.out.println("mouse=" + x + "/" + y + "\t hit=" + sx + "/" + sy + "\t distance=" + Math.round(Math.sqrt(minDistSq)) + "\t t=" + tt);
-//		return minDistSq;
-//	}
-//	
 	private class HitMouseListener extends MouseAdapter {
 		final Viewport viewport;
 		final ViewportVars vv;
@@ -960,20 +713,7 @@ public class RotateTool implements VisibleTool {
 				AxisAngle4d axisAngle = new AxisAngle4d(axis, angle);
 				m.set(axisAngle);
 				rotation.setRotation(m);
-//				switch (constraint) {
-//				case 0:
-//					rotation.y = 0;
-//					rotation.z = 0;
-//					break;
-//				case 1:
-//					rotation.x = 0;
-//					rotation.z = 0;
-//					break;
-//				case 2:
-//					rotation.x = 0;
-//					rotation.y = 0;
-//					break;
-//				}
+
 				transformUtil.transform(AXIS_ROTATION, axis, LOCAL, axis);
 				Selection selection = Main.getInstance().getSelection();
 				selection.rotateTo(pivot, new AxisAngle4d(axis, angle));
@@ -1046,17 +786,7 @@ public class RotateTool implements VisibleTool {
 			/*
 			 * set the radius so that the tool will occupy about 1/3rd of the screen
 			 */
-			radius = transformUtil.getNiceRadius(-cameraPivot.z, viewport.getComponent().getWidth(), viewport.getComponent().getHeight());
-			
-//			if (!transformUtil.isPerspective()) {
-//				Dimension size = viewport.getComponent().getSize();
-//				radius = Math.min(size.width, size.height) / transformUtil.getCameraScale() * 0.2;
-//			} else {
-//				/* set cameraPivot to camera-space pivot and compute vector from pivot to camera*/
-//				Point3d cameraPivot = new Point3d();
-//				transformUtil.transform(WORLD, pivot, CAMERA, cameraPivot);
-//				radius = cameraPivot.z / transformUtil.getRelativeFocalLength() * -0.2;
-//			}
+			radius = transformUtil.computeNiceRadius(-cameraPivot.z, viewport.getComponent().getWidth(), viewport.getComponent().getHeight());
 			
 			/*
 			 * compute shilouette offset

@@ -890,7 +890,7 @@ public class ViewportGl extends Viewport {
 //	}
 
 	protected void drawOrigin(Matrix4f matrix) {
-		float radius = (float) transformUtil.getNiceRadius(-matrix.m23, component.getWidth(), component.getHeight()) / 2;
+		float radius = (float) transformUtil.computeNiceRadius(-matrix.m23, component.getWidth(), component.getHeight()) / 2;
 		Point3f p0 = new Point3f(0, 0, 0);
 		Point3f px = new Point3f(radius, 0, 0);
 		Point3f py = new Point3f(0, radius, 0);

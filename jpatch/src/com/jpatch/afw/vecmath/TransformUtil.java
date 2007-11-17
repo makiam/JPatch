@@ -10,7 +10,7 @@ import javax.vecmath.*;
 public class TransformUtil extends AbstractTransformUtil {
 	/** camera space, should only be set by the viewport */
 	public static final int CAMERA = 1;
-	/** local object space */
+	/** local object space, should be set by scene-graph nodes */
 	public static final int LOCAL = 2;
 	
 	/** perspective projection flag */
@@ -149,7 +149,7 @@ public class TransformUtil extends AbstractTransformUtil {
 	 * @param viewportHeight the height of the viewport in pixel
 	 * @return radius of the sphere such that the sphere will occupy about 1/4th of the viewport area
 	 */
-	public double getNiceRadius(double zDistance, int viewportWidth, int viewportHeight) {
+	public double computeNiceRadius(double zDistance, int viewportWidth, int viewportHeight) {
 		if (!isPerspective()) {
 			return Math.min(viewportWidth, viewportHeight) / getCameraScale() * 0.2;
 		} else {
