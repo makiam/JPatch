@@ -52,6 +52,28 @@ public abstract class AbstractTransformUtil {
 	 * @param matrix
 	 */
 	public void setWorld2Space(int space, Matrix4d matrix) {
+		setWorld2SpaceImpl(space, matrix);
+	}
+	
+	/**
+	 * Sets the transformation matrix for transforming from world space
+	 * to the specified toSpace via the specified fromSpace. The specified matrix
+	 * represents the transformation from fromSpace to toSpace.
+	 * @param fromSpace
+	 * @param toSpace
+	 * @param matrix
+	 * @throws IllegalStateException if the World to fromSpace matrix can't be validated
+	 */
+	public void setWorldToSpace(int fromSpace, int toSpace, Matrix4d matrix) {
+		validateMatrix(WORLD, fromSpace);
+		setWorld2SpaceImpl(toSpace, matrix);
+		matrices[WORLD][toSpace].mul(matrices[WORLD][fromSpace]);
+	}
+	
+	/**
+	 * private implementation of the setWorld2Space method
+	 */
+	private final void setWorld2SpaceImpl(int space, Matrix4d matrix) {
 		for (int i = 0; i < spaceNames.length; i++) {
 			matricesValid[space][i] = false;
 			matricesValid[i][space] = false;
@@ -67,6 +89,28 @@ public abstract class AbstractTransformUtil {
 	 * @param matrix
 	 */
 	public void setSpace2World(int space, Matrix4d matrix) {
+		setSpace2WorldImpl(space, matrix);
+	}
+	
+	/**
+	 * Sets the transformation matrix for transforming from the specified fromSpace
+	 * to world space via the specified toSpace. The specified matrix
+	 * represents the transformation from fromSpace to toSpace.
+	 * @param fromSpace
+	 * @param toSpace
+	 * @param matrix
+	 * @throws IllegalStateException if the toSpace to world matrix can't be validated
+	 */
+	public void setSpace2World(int fromSpace, int toSpace, Matrix4d matrix) {
+		validateMatrix(toSpace, WORLD);
+		setSpace2WorldImpl(fromSpace, matrices[toSpace][WORLD]);
+		matrices[fromSpace][WORLD].mul(matrix);
+	}
+	
+	/**
+	 * private implementation of the setSpace2World method
+	 */
+	private final void setSpace2WorldImpl(int space, Matrix4d matrix) {
 		for (int i = 0; i < spaceNames.length; i++) {
 			matricesValid[space][i] = false;
 			matricesValid[i][space] = false;
@@ -152,7 +196,7 @@ public abstract class AbstractTransformUtil {
 	}
 	
 	/**
-	 * Sets the specified matrix to the rotation/scale component of the matrix
+	 * Sets the specified matrix to the rotatisetSpace2Worldon/scale component of the matrix
 	 * for transforming from fromSpace to toSpace
 	 * @param fromSpace
 	 * @param toSpace
@@ -178,6 +222,29 @@ public abstract class AbstractTransformUtil {
 		matrices[fromSpace][toSpace].getRotationScale(matrix);
 		return matrix;
 	}
+	
+	/**
+	 * Sets the scale of the transformation matrix used to transform from fromSpace to
+	 * toSpace to the specified value. Either fromSpace or toSpace must be WORLD.
+	 * @param fromSpace
+	 * @param toSpace
+	 * @param scale
+	 * @throws IllegalArgumentException if neither fromSpace nor toSpace == WORLD
+	 * @throws IllegalStateException if the formSpace->toSpace matrix can't be validated
+	 */
+	public void setScale(int fromSpace, int toSpace, double scale) {
+		if (fromSpace != WORLD && toSpace != WORLD) {
+			throw new IllegalArgumentException("neither fromSpace nor toSpace == world");
+		}
+		validateMatrix(fromSpace, toSpace);
+		matrices[fromSpace][toSpace].setScale(scale);
+		if (fromSpace == WORLD) {
+			setWorld2SpaceImpl(toSpace, matrices[fromSpace][toSpace]);
+		} else {
+			setSpace2WorldImpl(fromSpace, matrices[fromSpace][toSpace]);
+		}
+	}
+
 	/**
 	 * Checks wheter the matrix for transforming from fromSpace to toSpace is valid.
 	 * If not, the matrix is computed.

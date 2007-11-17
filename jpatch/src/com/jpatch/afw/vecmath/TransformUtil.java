@@ -1,5 +1,10 @@
 package com.jpatch.afw.vecmath;
 
+import static com.jpatch.afw.vecmath.AbstractTransformUtil.WORLD;
+import static com.jpatch.afw.vecmath.TransformUtil.CAMERA;
+
+import java.awt.Dimension;
+
 import javax.vecmath.*;
 
 public class TransformUtil extends AbstractTransformUtil {
@@ -134,6 +139,22 @@ public class TransformUtil extends AbstractTransformUtil {
 	 */
 	public double getCameraScale() {
 		return cameraScale;
+	}
+	
+	/**
+	 * Cumputes the radius of the sphere at the specified distance from the viewing plane
+	 * to occupy about 1/4th of the viewport specified by viewportWidth and viewportHeight
+	 * @param zDistance the distance of the sphere center from the viewing plane
+	 * @param viewportWidth the width of the viewport in pixel
+	 * @param viewportHeight the height of the viewport in pixel
+	 * @return radius of the sphere such that the sphere will occupy about 1/4th of the viewport area
+	 */
+	public double getNiceRadius(double zDistance, int viewportWidth, int viewportHeight) {
+		if (!isPerspective()) {
+			return Math.min(viewportWidth, viewportHeight) / getCameraScale() * 0.2;
+		} else {
+			return zDistance / getRelativeFocalLength() * 0.2;
+		}
 	}
 	
 	/**

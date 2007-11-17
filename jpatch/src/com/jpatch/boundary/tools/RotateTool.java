@@ -867,40 +867,37 @@ public class RotateTool implements VisibleTool {
 				}
 			}
 			
-//			if (axis >= 0) {
-//				System.out.println(axis);
-//				mouseMotionListener = new HitMouseMotionListener(viewport, axis);
-//				viewport.getComponent().addMouseMotionListener(mouseMotionListener);
-//			} else {
-				Point3d hitPoint = new Point3d();
-				boolean intersection = computeIntersectionPoint(vv, e.getX(), e.getY(), axis, hitPoint);
-				if (intersection) {
-					if (e.getClickCount() == 2) {
-						/* align axisrotation, z should point to viewer */
-						Matrix3d orientMatrix = new Matrix3d(vv.orientMatrix);
-						orientMatrix.normalize();
-						Matrix3d m = getCameraToWorldRotation(transformUtil, new Matrix3d());
-						m.mul(orientMatrix);
-						axisRotation.setRotation(m);
-						axisRotationAttr.setTuple(axisRotation);
-						Main.getInstance().repaintViewports();
-						return;
-					}
+			Point3d hitPoint = new Point3d();
+			boolean intersection = computeIntersectionPoint(vv, e.getX(), e.getY(), axis, hitPoint);
+			if (intersection) {
+				if (e.getClickCount() == 2) {
+					axisRotation.set(0, 0, 0);
+					axisRotationAttr.setTuple(axisRotation);
+					Main.getInstance().repaintViewports();
+				}
+				else if (e.getClickCount() == 3) {
+					/* align axisrotation, z should point to viewer */
+					Matrix3d orientMatrix = new Matrix3d(vv.orientMatrix);
+					orientMatrix.normalize();
+					Matrix3d m = getCameraToWorldRotation(transformUtil, new Matrix3d());
+					m.mul(orientMatrix);
+					
+					transformUtil.getRotationScaleMatrix(WORLD, LOCAL, orientMatrix);
+					orientMatrix.mul(m);
+					axisRotation.setRotation(orientMatrix);
+					axisRotationAttr.setTuple(axisRotation);
+					Main.getInstance().repaintViewports();
+				} else {
 					fromVector.set(hitPoint);
 					fromVector.normalize();
 					mouseMotionListener = new HitMouseMotionListener(viewport, axis);
 					Selection selection = Main.getInstance().getSelection();
 					selection.begin();
+					oldAxisRotation.set(axisRotation);
+					oldRotation.set(rotation);
 					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 				}
-//			}
-//			if (setIntersectionVector(viewport, e.getX(), e.getY(), constraint, fromVector)) {
-//				mouseMotionListener = new HitMouseMotionListener(viewport, constraint);
-//				viewport.getComponent().addMouseMotionListener(mouseMotionListener);
-//			}
-//			System.out.println(getHitCircle(viewport, e.getX(), e.getY()));
-				oldAxisRotation.set(axisRotation);
-				oldRotation.set(rotation);
+			}
 		}
 		@Override
 		public void mouseReleased(MouseEvent e) {
@@ -1005,26 +1002,29 @@ public class RotateTool implements VisibleTool {
 			viewport.getViewDef().configureTransformUtil(transformUtil);
 			Main.getInstance().getSelection().configureTransformUtil(transformUtil);
 			
+			/* set the transformUtil's local->world matrix's scale to 1.0 */
+			transformUtil.setScale(LOCAL, WORLD, 1.0);
+			
 			/* set cameraPivot to pivot in camera space */
 			transformUtil.transform(LOCAL, pivot, CAMERA, cameraPivot);
 			transformUtil.transform(LOCAL, pivot, WORLD, worldPivot);
 			
 			Matrix4d matrix = new Matrix4d();
-			Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getTransform().getMatrix(matrix);
 			
 			/* compute rotation matrix */
 //			Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getTransform().getMatrix(matrix);
 			axisRotation.getRotationMatrix(matrix);
 			
 			/* add pivot translation */
-			matrix.m03 = worldPivot.x;
-			matrix.m13 = worldPivot.y;
-			matrix.m23 = worldPivot.z;
+			matrix.m03 = pivot.x;
+			matrix.m13 = pivot.y;
+			matrix.m23 = pivot.z;
 			matrix.m33 = 1;
 			
 			
 			/* set local2world to rotate-tool matrix */ 
-			transformUtil.setSpace2World(AXIS_ROTATION, matrix);
+			transformUtil.setSpace2World(AXIS_ROTATION, LOCAL, matrix);
+//			transformUtil.setSpace2World (AXIS_ROTATION, matrix);
 			
 			/* compute rotation matrix */
 //			Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getTransform().getMatrix(matrix);
@@ -1032,29 +1032,31 @@ public class RotateTool implements VisibleTool {
 			axisRotation.rotateMatrix(matrix);
 			
 			/* add pivot translation */
-			matrix.m03 = worldPivot.x;
-			matrix.m13 = worldPivot.y;
-			matrix.m23 = worldPivot.z;
+			matrix.m03 = pivot.x;
+			matrix.m13 = pivot.y;
+			matrix.m23 = pivot.z;
 			matrix.m33 = 1;
 			
 			
 			/* set local2world to rotate-tool matrix */ 
-			transformUtil.setSpace2World(ROTATION, matrix);
+			transformUtil.setSpace2World(ROTATION, LOCAL, matrix);
 			
 			
 			
 			/*
 			 * set the radius so that the tool will occupy about 1/3rd of the screen
 			 */
-			if (!transformUtil.isPerspective()) {
-				Dimension size = viewport.getComponent().getSize();
-				radius = Math.min(size.width, size.height) / transformUtil.getCameraScale() * 0.2;
-			} else {
-				/* set cameraPivot to camera-space pivot and compute vector from pivot to camera*/
-				Point3d cameraPivot = new Point3d();
-				transformUtil.transform(WORLD, pivot, CAMERA, cameraPivot);
-				radius = cameraPivot.z / transformUtil.getRelativeFocalLength() * -0.2;
-			}
+			radius = transformUtil.getNiceRadius(-cameraPivot.z, viewport.getComponent().getWidth(), viewport.getComponent().getHeight());
+			
+//			if (!transformUtil.isPerspective()) {
+//				Dimension size = viewport.getComponent().getSize();
+//				radius = Math.min(size.width, size.height) / transformUtil.getCameraScale() * 0.2;
+//			} else {
+//				/* set cameraPivot to camera-space pivot and compute vector from pivot to camera*/
+//				Point3d cameraPivot = new Point3d();
+//				transformUtil.transform(WORLD, pivot, CAMERA, cameraPivot);
+//				radius = cameraPivot.z / transformUtil.getRelativeFocalLength() * -0.2;
+//			}
 			
 			/*
 			 * compute shilouette offset
