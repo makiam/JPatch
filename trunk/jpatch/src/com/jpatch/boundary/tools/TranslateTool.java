@@ -191,7 +191,7 @@ public class TranslateTool implements VisibleTool {
 		/*
 		 * set the radius so that the tool will occupy about 1/3rd of the screen
 		 */
-		radius = transformUtil.getNiceRadius(-cameraPivot.z, viewport.getComponent().getWidth(), viewport.getComponent().getHeight());
+		radius = transformUtil.computeNiceRadius(-cameraPivot.z, viewport.getComponent().getWidth(), viewport.getComponent().getHeight());
 		
 		Matrix4d matrix = new Matrix4d();
 		
