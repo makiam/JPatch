@@ -250,22 +250,23 @@ public class TranslateTool implements VisibleTool {
 		
 		int start = mouseMotionListener == null ? 1 : 0;
 		for (int ghost = start; ghost < 2; ghost++) {
-//			if (ghost == 1) {
-//				Vector3d v = new Vector3d(vector);
-//				axisRotation.getRotationMatrix(new Matrix3d()).transform(v);
-//				axisRotation.getRotationMatrix(matrix);
-//				matrix.mul(radius);
-//				
-//				/* add pivot translation */
-//				matrix.m03 = pivot.x + v.x;
-//				matrix.m13 = pivot.y + v.y;
-//				matrix.m23 = pivot.z + v.z;
-//				
-//				matrix.m33 = 1;
-//			
-//				transformUtil.setLocal2World(matrix);
+			if (ghost == 1) {
+				Vector3d v = new Vector3d(vector);
+				axisRotation.getRotationMatrix(new Matrix3d()).transform(v);
+				axisRotation.getRotationMatrix(m);
+				m.mul(radius);
+				
+				/* add pivot translation */
+				m.m03 = pivot.x + v.x;
+				m.m13 = pivot.y + v.y;
+				m.m23 = pivot.z + v.z;
+				
+				m.m33 = 1;
+			
+				transformUtil.setSpace2World(AXIS_ROTATION, m);
+				transformUtil.getMatrix(AXIS_ROTATION, CAMERA, modelView);
 //				transformUtil.getModelViewMatrix(modelView);
-//			}
+			}
 			
 			for (int i = 0; i < 6; i++) {
 				int axis = order[i];
@@ -389,26 +390,31 @@ public class TranslateTool implements VisibleTool {
 		@Override
 		public void mouseDragged(MouseEvent e) {
 			configureFor(viewport);
-			
+			pScreen.x = e.getX();
+			pScreen.y = e.getY();
 			if (constraint < 0) {
-				pScreen.x = e.getX();
-				pScreen.y = e.getY();
 				transformUtil.projectFromScreen(AXIS_ROTATION, pScreen, pLocal);
 				vector.set(pLocal);
 			} else {
-				Point3d p0 = new Point3d();
-				transformUtil.projectToScreen(AXIS_ROTATION, p0, p0);
+				Point3d p0s = new Point3d();
+				transformUtil.projectToScreen(AXIS_ROTATION, p0s, p0s);
 				Point3d p1 = new Point3d(1 - ARROW_LENGTH * 0.75, 0, 0);
 				matrices[constraint].transform(p1);
-				transformUtil.projectToScreen(AXIS_ROTATION, p1, p1);
-				double t = Utils3d.closestPointOnLine(p0.x, p0.y, p1.x, p1.y, pScreen.x, pScreen.y);
-				System.out.println(t);
-				pScreen.interpolate(p0, p1, t);
+				Point3d p1s = new Point3d();
+				transformUtil.projectToScreen(AXIS_ROTATION, p1, p1s);
+				double t = Utils3d.closestPointOnLine(p0s.x, p0s.y, p1s.x, p1s.y, pScreen.x, pScreen.y);
+				System.out.println(p0s.x + "," + p0s.y + "-" + p1s.x + "," + p1s.y + " " + t);
+				pScreen.interpolate(p0s, p1s, t);
 				transformUtil.projectFromScreen(AXIS_ROTATION, pScreen, pLocal);
+				pLocal.sub(p1);
 				vector.set(pLocal);
 			}
-//			transformUtil.transform(AXIS_ROTATIONvector, vector);
-//			transformMatrix.setTranslation(vector);
+			vector.scale(radius);
+			Vector3d vector2 = new Vector3d(vector);
+			axisRotation.getRotationMatrix(new Matrix3d()).transform(vector2);
+//			System.out.println(vector);
+//			transformUtil.transform(AXIS_ROTATION, vector, vector);
+			transformMatrix.setTranslation(vector2);
 			Selection selection = Main.getInstance().getSelection();
 			selection.transform(transformMatrix);
 			Main.getInstance().syncRepaintViewport(viewport);

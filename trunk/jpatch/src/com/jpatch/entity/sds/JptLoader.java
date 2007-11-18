@@ -5,8 +5,8 @@ import com.jpatch.entity.*;
 import java.io.*;
 import java.util.*;
 
-//import no.uib.cipr.matrix.*;
-//import no.uib.cipr.matrix.sparse.*;
+import no.uib.cipr.matrix.*;
+import no.uib.cipr.matrix.sparse.*;
 
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
@@ -241,146 +241,89 @@ public class JptLoader {
 //			}
 			sds.makeSlates();
 			sds.rethinkSlates();
+			Map<TopLevelVertex, Integer> vertexIndexMap = new HashMap<TopLevelVertex, Integer>();
+			for (int i = 0; i < sds.vertexList.size(); i++) {
+				vertexIndexMap.put(sds.vertexList.get(i), i);
+			}
+			int size = sds.vertexList.size();
+			FlexCompRowMatrix matrix = new FlexCompRowMatrix(size, size);
+			DenseVector xLimit = new DenseVector(size);
+			DenseVector yLimit = new DenseVector(size);
+			DenseVector zLimit = new DenseVector(size);
+			DenseVector xControl = new DenseVector(size);
+			DenseVector yControl = new DenseVector(size);
+			DenseVector zControl = new DenseVector(size);
+			for (int i = 0; i < sds.vertexList.size(); i++) {
+				TopLevelVertex v = sds.vertexList.get(i);
+				xLimit.set(i, v.position.getX());
+				yLimit.set(i, v.position.getY());
+				zLimit.set(i, v.position.getZ());
+				xControl.set(i, v.position.getX());
+				yControl.set(i, v.position.getY());
+				zControl.set(i, v.position.getZ());
+				LinearCombination<TopLevelVertex> lc = v.getLimitLc();
+				for (int j = 0; j < lc.size(); j++) {
+					int index = vertexIndexMap.get(lc.getEntities().get(j));
+					matrix.add(i, index, lc.getWeights()[j]);
+				}
+			}
+		
+			CompRowMatrix m = new CompRowMatrix(matrix);
 			
-			return sds;
-	
-			
-//			Map<TopLevelVertex, Integer> vertexIndexMap = new HashMap<TopLevelVertex, Integer>();
-//			for (int i = 0; i < sds.vertexList.size(); i++) {
-//				vertexIndexMap.put(sds.vertexList.get(i), i);
-//			}
-//			int size = sds.vertexList.size();
-//			FlexCompRowMatrix matrix = new FlexCompRowMatrix(size * 3, size);
-//			DenseVector xLimit = new DenseVector(size * 3);
-//			DenseVector yLimit = new DenseVector(size * 3);
-//			DenseVector zLimit = new DenseVector(size * 3);
-//			DenseVector xControl = new DenseVector(size);
-//			DenseVector yControl = new DenseVector(size);
-//			DenseVector zControl = new DenseVector(size);
-//			for (int i = 0; i < size; i++) {
-//				TopLevelVertex v = sds.vertexList.get(i);
-//				xLimit.set(i, v.position.getX());
-//				yLimit.set(i, v.position.getY());
-//				zLimit.set(i, v.position.getZ());
-//				xControl.set(i, v.position.getX());
-//				yControl.set(i, v.position.getY());
-//				zControl.set(i, v.position.getZ());
-//				LinearCombination<TopLevelVertex> lc = v.getLimitLc();
-//				for (int j = 0; j < lc.size(); j++) {
-//					int index = vertexIndexMap.get(lc.getEntities().get(j));
-//					matrix.add(i, index, lc.getWeights()[j]);
-//				}
-//			}
-//		
-//			double[] uTangent = new double[3];
-//			double[] vTangent = new double[3];
-//			for (int i = 0; i < size; i++) {
-//				TopLevelVertex v = sds.vertexList.get(i);
-//				computeTangents(v, uTangent, vTangent);
-//				xLimit.set(i + size, uTangent[0]);
-//				yLimit.set(i + size, uTangent[1]);
-//				zLimit.set(i + size, uTangent[2]);
-////				xControl.set(i + size, uTangent[0]);
-////				yControl.set(i + size, uTangent[1]);
-////				zControl.set(i + size, uTangent[2]);
-//				xLimit.set(i + 2 * size, vTangent[0]);
-//				yLimit.set(i + 2 * size, vTangent[1]);
-//				zLimit.set(i + 2 * size, vTangent[2]);
-////				xControl.set(i + 2 * size, vTangent[0]);
-////				yControl.set(i + 2 * size, vTangent[1]);
-////				zControl.set(i + 2 * size, vTangent[2]);
-//				LinearCombination<TopLevelVertex> uLc = v.getTangentLc(0);
-//				for (int j = 0; j < uLc.size(); j++) {
-//					int index = vertexIndexMap.get(uLc.getEntities().get(j));
-//					matrix.add(i + size, index, uLc.getWeights()[j]);
-//				}
-//				LinearCombination<TopLevelVertex> vLc = v.getTangentLc(0);
-//				for (int j = 0; j < uLc.size(); j++) {
-//					int index = vertexIndexMap.get(vLc.getEntities().get(j));
-//					matrix.add(i + 2 * size, index, vLc.getWeights()[j]);
-//				}
-//			}
-//			
-////			matrix.
-////			CompRowMatrix m = new CompRowMatrix(matrix);
-////			
-////			
-//			System.out.println("1");
-//			Matrix mT = new FlexCompColMatrix(size, size * 3);
-//			matrix.transpose(mT);
-//			System.out.println("2");
-//			DenseVector xx = new DenseVector(size);
-//			DenseVector yy = new DenseVector(size);
-//			DenseVector zz = new DenseVector(size);
-////			
-//			mT.mult(xLimit, xx);
-//			mT.mult(yLimit, yy);
-//			mT.mult(zLimit, zz);
-////			
-//			System.out.println("3");
-//			Matrix mAT = new FlexCompRowMatrix(size, size);
-//			mT.mult(matrix, mAT);
-//			
-//			System.out.println("4");
-////			
-//			IterativeSolver solver = new IR(xControl);
-////			Preconditioner preconditioner = new ILU(m.copy());
-////			preconditioner.setMatrix(mAT);
-////			solver.setPreconditioner(preconditioner);
-////			solver.getIterationMonitor().setIterationReporter(new OutputIterationReporter());
-////			if (true) return sds;
-//			try {
-////				mAT.solve(xx, xControl);
-////				mAT.solve(yy, yControl);
-////				mAT.solve(zz, zControl);
-//				solver.solve(mAT, xx, xControl);
-//				solver.solve(mAT, yy, yControl);
-//				solver.solve(mAT, zz, zControl);
-//				for (int i = 0; i < size; i++) {
-//					
-//					sds.vertexList.get(i).position.setTuple(
-//							xControl.get(i),
-//							yControl.get(i),
-//							zControl.get(i)
-//					);
-//					
-//					
-//				}
-//				sds.rethinkSlates();
-//				for (int i = 0; i < size; i++) {
-////					System.out.print(sds.vertexList.get(i).pos);
-////					System.out.print(" => ");
-//					Level2Vertex l2v = sds.vertexList.get(i).vertexPoint;
-//					LinearCombination<TopLevelVertex> lc = sds.vertexList.get(i).getLimitLc();
-//					double x = 0, y = 0, z = 0;
-//					for (int j = 0; j < lc.size(); j++) {
-//						x += lc.getEntities().get(j).position.getX() * lc.getWeights()[j];
-//						y += lc.getEntities().get(j).position.getY() * lc.getWeights()[j];
-//						z += lc.getEntities().get(j).position.getZ() * lc.getWeights()[j];
+			IterativeSolver solver = new IR(xControl);
+			Preconditioner preconditioner = new ICC(m.copy());
+			preconditioner.setMatrix(m);
+			solver.setPreconditioner(preconditioner);
+			solver.getIterationMonitor().setIterationReporter(new OutputIterationReporter());
+			try {
+				solver.solve(m, xLimit, xControl);
+				solver.solve(m, yLimit, yControl);
+				solver.solve(m, zLimit, zControl);
+				for (int i = 0; i < size; i++) {
+					
+					sds.vertexList.get(i).position.setTuple(
+							xLimit.get(i) + xControl.get(i),
+							yLimit.get(i) + yControl.get(i),
+							zLimit.get(i) + zControl.get(i)
+					);
+					
+					
+				}
+				sds.rethinkSlates();
+				for (int i = 0; i < size; i++) {
+//					System.out.print(sds.vertexList.get(i).pos);
+//					System.out.print(" => ");
+					Level2Vertex l2v = sds.vertexList.get(i).vertexPoint;
+					LinearCombination<TopLevelVertex> lc = sds.vertexList.get(i).getLimitLc();
+					double x = 0, y = 0, z = 0;
+					for (int j = 0; j < lc.size(); j++) {
+						x += lc.getEntities().get(j).position.getX() * lc.getWeights()[j];
+						y += lc.getEntities().get(j).position.getY() * lc.getWeights()[j];
+						z += lc.getEntities().get(j).position.getZ() * lc.getWeights()[j];
+					}
+					
+//					System.out.println("(" + x + ", " + y + ", " + z + ")");
+//					System.out.println(l2v.limit);
+				}
+//				for (Face face : sds.faceList) {
+//					for (HalfEdge edge : face.edgeIterable) {
+//						LinearCombination<TopLevelVertex> lc = edge.getEdgePointLc();
+//						double x = 0, y = 0, z = 0;
+//						for (int j = 0; j < lc.size(); j++) {
+//							x += lc.getEntities().get(j).pos.x * lc.getWeights()[j];
+//							y += lc.getEntities().get(j).pos.y * lc.getWeights()[j];
+//							z += lc.getEntities().get(j).pos.z * lc.getWeights()[j];
+//						}
+//						
+//						System.out.println("(" + x + ", " + y + ", " + z + ")");
+//						System.out.println(edge.edgePoint.pos);
 //					}
-//					
-////					System.out.println("(" + x + ", " + y + ", " + z + ")");
-////					System.out.println(l2v.limit);
 //				}
-////				for (Face face : sds.faceList) {
-////					for (HalfEdge edge : face.edgeIterable) {
-////						LinearCombination<TopLevelVertex> lc = edge.getEdgePointLc();
-////						double x = 0, y = 0, z = 0;
-////						for (int j = 0; j < lc.size(); j++) {
-////							x += lc.getEntities().get(j).pos.x * lc.getWeights()[j];
-////							y += lc.getEntities().get(j).pos.y * lc.getWeights()[j];
-////							z += lc.getEntities().get(j).pos.z * lc.getWeights()[j];
-////						}
-////						
-////						System.out.println("(" + x + ", " + y + ", " + z + ")");
-////						System.out.println(edge.edgePoint.pos);
-////					}
-////				}
-//			} catch (Exception e) {
-//				  e.printStackTrace();
-//			}
-////			System.exit(0);
-//			return sds;
+			} catch (IterativeSolverNotConvergedException e) {
+				  System.err.println("Iterative solver failed to converge");
+			}
+//			System.exit(0);
+			return sds;
 		} catch (SAXException e) {
 			e.printStackTrace();
 			return null;
