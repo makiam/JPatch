@@ -59,9 +59,18 @@ public class Selection implements Transformable {
 	}
 	
 	public void getCenter(Point3d center, Matrix4d matrix) {
-		Point3d p = new Point3d();
-		getBounds(p, center, matrix);
-		center.interpolate(p, 0.5);
+		Miniball mb = new Miniball();
+		ArrayList<Point3d> points = new ArrayList<Point3d>();
+		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
+			Point3d p = new Point3d();
+			vertex.getPos(p);
+			if (matrix != null) {
+				matrix.transform(p);
+			}
+			points.add(p);
+		}
+		mb.build(points);
+		center.set(mb.center());
 	}
 	
 //	public Sphere getBounds(Sphere sphere) {
