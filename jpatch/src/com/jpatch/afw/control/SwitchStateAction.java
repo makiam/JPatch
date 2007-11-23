@@ -25,13 +25,6 @@ public class SwitchStateAction extends JPatchAction {
 		this.stateMachine = stateMachine;
 		this.state = state;
 	}
-
-	public void actionPerformed(ActionEvent event) {
-		JPatchUndoableEdit edit = new SwitchState(stateMachine, state, true);
-		if (undoManager != null) {
-			undoManager.addEdit(displayName, edit);
-		}
-	}
 	
 	public StateMachine getStateMachine() {
 		return stateMachine;
@@ -43,5 +36,10 @@ public class SwitchStateAction extends JPatchAction {
 	
 	public boolean isSelected() {
 		return stateMachine.getValue() == state;
+	}
+
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }

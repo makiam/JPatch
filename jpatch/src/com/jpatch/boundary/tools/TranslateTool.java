@@ -18,6 +18,7 @@ import javax.vecmath.*;
 import com.jpatch.afw.attributes.GenericAttr;
 import com.jpatch.afw.attributes.StateMachine;
 import com.jpatch.afw.attributes.Tuple3Attr;
+import com.jpatch.afw.control.AttributeEdit;
 import com.jpatch.afw.control.JPatchUndoableEdit;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.boundary.*;
@@ -95,7 +96,7 @@ public class TranslateTool implements VisibleTool {
 	
 	private final Vector3d vector = new Vector3d(2, 1, 0);
 	private final Rotation3d axisRotation = new Rotation3d();
-	private final StateMachine<Integer> modeAttr = new StateMachine<Integer>(new Integer[] { 3, 6 }, 6);
+	private final StateMachine<Integer> modeAttr = new StateMachine<Integer>(new Integer[] { 3, 6 }, 3);
 	private final static Shape arrow = new Shape(
 			new Point3f[] {
 					new Point3f(1, 0, 0),
@@ -263,16 +264,18 @@ public class TranslateTool implements VisibleTool {
 				
 				m.m33 = 1;
 			
-				transformUtil.setSpace2World(AXIS_ROTATION, m);
+				transformUtil.setSpace2World(AXIS_ROTATION, LOCAL, m);
 				transformUtil.getMatrix(AXIS_ROTATION, CAMERA, modelView);
 //				transformUtil.getModelViewMatrix(modelView);
 			}
 			
+			
 			for (int i = 0; i < 6; i++) {
 				int axis = order[i];
+				gl.glColor4fv(COLORS[3], 0);
 				if (modeAttr.getValue() == 6 || axis % 2 == 0) {
-				m.set(modelView);
-				m.mul(matrices[axis]);
+					m.set(modelView);
+					m.mul(matrices[axis]);
 					for (int j = 0; j < 2; j++) {
 						if ((j == 0 && axisPoints[axis].z > cameraPivot.z) || (j == 1 && axisPoints[axis].z <= cameraPivot.z)) {
 							gl.glEnable(GL_LINE_SMOOTH);
@@ -285,7 +288,7 @@ public class TranslateTool implements VisibleTool {
 								} else {
 									gl.glLineWidth(2.5f);
 								}
-								
+
 								if (pass == 1) {
 									if (ghost == 0) {
 										gl.glColor4fv(COLORS[5], 0);
@@ -336,12 +339,12 @@ public class TranslateTool implements VisibleTool {
 						gl.glColor4fv(COLORS[5], 0);
 						cube.draw(gl, modelView);
 					}
-					
-					
+
+
 				}
 			}
 		}
-		
+
 		
 		
 		
@@ -403,7 +406,7 @@ public class TranslateTool implements VisibleTool {
 				Point3d p1s = new Point3d();
 				transformUtil.projectToScreen(AXIS_ROTATION, p1, p1s);
 				double t = Utils3d.closestPointOnLine(p0s.x, p0s.y, p1s.x, p1s.y, pScreen.x, pScreen.y);
-				System.out.println(p0s.x + "," + p0s.y + "-" + p1s.x + "," + p1s.y + " " + t);
+//				System.out.println(p0s.x + "," + p0s.y + "-" + p1s.x + "," + p1s.y + " " + t);
 				pScreen.interpolate(p0s, p1s, t);
 				transformUtil.projectFromScreen(AXIS_ROTATION, pScreen, pLocal);
 				pLocal.sub(p1);
@@ -474,18 +477,22 @@ public class TranslateTool implements VisibleTool {
 				Selection selection = Main.getInstance().getSelection();
 				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(selection.getVertexCount());
 				selection.end(editList);
-				Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
-				Main.getInstance().syncViewports(viewport);
+				
+				
 				
 				Matrix4d matrix = new Matrix4d();
 				axisRotation.getRotationMatrix(matrix);
 				matrix.transform(vector);
 				pivot.add(vector);
 				vector.set(0, 0, 0);
-				pivotAttr.setTuple(pivot);
-				vectorAttr.setTuple(vector);
+//				pivotAttr.setTuple(pivot);
+//				vectorAttr.setTuple(vector);
 				
-				Main.getInstance().repaintViewports();
+				editList.add(AttributeEdit.changeAttribute(pivotAttr, pivot, true));
+				editList.add(AttributeEdit.changeAttribute(vectorAttr, vector, true));
+				Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
+				Main.getInstance().repaintViewports();	// need to repaint all viewports to make the ghost disappear,
+														// therefore no syncRepaintViewports()
 			}
 		}
 		

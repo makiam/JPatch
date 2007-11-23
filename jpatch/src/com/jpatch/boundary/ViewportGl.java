@@ -951,15 +951,16 @@ public class ViewportGl extends Viewport {
 	
 	private void drawSelection(Selection selection) {
 		gl.glPointSize(4);
+		gl.glDisable(GL_LIGHTING);
 		for (int pass = 0; pass < 2; pass++) {
 			if (pass == 0) {
 				gl.glDisable(GL_DEPTH_TEST);
 				gl.glEnable(GL_BLEND);
-				gl.glColor4f(0, 1, 0, 0.5f);
+				gl.glColor4f(1, 1, 0, 0.5f);
 			} else {
 				gl.glEnable(GL_DEPTH_TEST);
 				gl.glDisable(GL_BLEND);
-				gl.glColor3f(0, 1, 0);
+				gl.glColor3f(1, 1, 0);
 			}
 			gl.glBegin(GL_POINTS);
 			for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {

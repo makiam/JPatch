@@ -2,10 +2,14 @@ package com.jpatch.afw.ui;
 
 import com.jpatch.afw.attributes.Attribute;
 import com.jpatch.afw.attributes.AttributePostChangeListener;
+import com.jpatch.afw.attributes.GenericAttr;
+import com.jpatch.afw.attributes.StateMachine;
+import com.jpatch.afw.control.AttributeEdit;
 import com.jpatch.afw.control.SwitchStateAction;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.GenericArrayType;
 
 import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
@@ -13,6 +17,8 @@ import javax.swing.event.ChangeListener;
 
 
 public class JPatchStateButton extends JToggleButton implements JPatchButton {
+	private static final GenericAttr<String> EDIT_NAME = new GenericAttr<String>("statechange");
+	
 	private SwitchStateAction jpatchAction;
 	public JPatchStateButton(SwitchStateAction action) {
 		this.jpatchAction = action;
@@ -23,10 +29,16 @@ public class JPatchStateButton extends JToggleButton implements JPatchButton {
 		});
 		addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (jpatchAction.getStateMachine().getValue() == jpatchAction.getState()) {
-					jpatchAction.getStateMachine().revertToDefault();
+				StateMachine stateMachine = jpatchAction.getStateMachine();
+				Object currentValue = stateMachine.getValue();
+				if (currentValue == jpatchAction.getState()) {
+					Object newValue = stateMachine.revertToDefault();
+					if (newValue != currentValue) {
+						jpatchAction.getUndoManager().addEdit(EDIT_NAME, AttributeEdit.changeAttribute(stateMachine, currentValue, false));
+					}
 				} else {
-					jpatchAction.getStateMachine().setValue(jpatchAction.getState());
+					jpatchAction.getUndoManager().addEdit(EDIT_NAME, AttributeEdit.changeAttribute(stateMachine, jpatchAction.getState(), true));
+//					jpatchAction.getStateMachine().setValue(jpatchAction.getState());
 				}
 			}
 		});

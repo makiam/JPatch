@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
+import javax.swing.undo.UndoManager;
 
 public abstract class JPatchAction implements ActionListener {
 	protected final String name;
@@ -110,5 +111,9 @@ public abstract class JPatchAction implements ActionListener {
 
 	public BooleanAttr getUseMenuIcon() {
 		return useMenuIcon;
+	}
+	
+	public JPatchUndoManager getUndoManager() {
+		return undoManager;
 	}
 }
