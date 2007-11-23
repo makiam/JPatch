@@ -112,7 +112,7 @@ public class Main {
 	private Selection selection = new Selection();
 	private JPatchTool visibleTool = null;
 	
-	private SceneGraphNode sceneGraphRoot = new SceneGraphNode() {
+	private TransformNode sceneGraphRoot = new TransformNode() {
 		@Override
 		public Transform getTransform() {
 			return null;
@@ -522,7 +522,7 @@ public class Main {
 		activeViewport.addAttributePostChangeListener(inspector.getViewportChangeListener());
 		inspector.getComponent().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		
-		
+		sceneGraphRoot.getNameAttribute().setValue("Origin");
 		
 		final TransformNode node1 = new TransformNode();
 		tmpNode = new TransformNode();
@@ -866,6 +866,9 @@ public class Main {
 		return selection;
 	}
 
+	public Actions getActions() {
+		return actions;
+	}
 //	public void setSelection(Selection selection) {
 //		this.selection = selection;
 //	}
