@@ -1,11 +1,6 @@
 package com.jpatch.boundary.tools;
 
-import static javax.media.opengl.GL.GL_BLEND;
-import static javax.media.opengl.GL.GL_DEPTH_TEST;
-import static javax.media.opengl.GL.GL_LINES;
-import static javax.media.opengl.GL.GL_LINE_SMOOTH;
-import static javax.media.opengl.GL.GL_ONE_MINUS_SRC_ALPHA;
-import static javax.media.opengl.GL.GL_SRC_ALPHA;
+import static javax.media.opengl.GL.*;
 import com.jpatch.afw.vecmath.TransformUtil;
 import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.*;
@@ -101,6 +96,7 @@ public class MoveVertexTool implements VisibleTool {
 		gl.glEnable(GL_LINE_SMOOTH);
 		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		gl.glDisable(GL_DEPTH_TEST);
+		gl.glDisable(GL_LIGHTING);
 		gl.glColor4f(1, 1, 0, 0.25f);
 		gl.glBegin(GL_LINES);
 		gl.glVertex3f(p000.x, p000.y, p000.z); gl.glVertex3f(p001.x, p001.y, p001.z);

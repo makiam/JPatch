@@ -9,6 +9,7 @@ import jpatch.boundary.settings.Settings;
 
 public class JPatchUndoManager {
 	private static final int MAX_DEPTH = Settings.getInstance().undoDepth;
+	private static final boolean LOG = true;
 	
 	private final List<NamedEditList> undoStack = new ArrayList<NamedEditList>();
 	private final ArrayList<JPatchUndoListener> undoListeners = new ArrayList();
@@ -132,12 +133,18 @@ public class JPatchUndoManager {
 		}
 		
 		private void undo() {
+			if (LOG) {
+				System.out.println("undo " + name.getValue());
+			}
 			for (int i = edits.length - 1; i >= 0; i--) {
 				edits[i].undo();
 			}
 		}
 		
 		private void redo() {
+			if (LOG) {
+				System.out.println("redo " + name.getValue());
+			}
 			for (int i = 0; i < edits.length; i++) {
 				edits[i].redo();
 			}
