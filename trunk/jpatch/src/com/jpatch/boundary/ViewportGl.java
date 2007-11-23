@@ -629,6 +629,9 @@ public class ViewportGl extends Viewport {
 			tool.draw(this);
 		}
 		rasterMode();
+		if (showNodeNamesAttr.getBoolean()) {
+			drawSceneGraphNames(sceneGraphRoot);
+		}
 		drawInfo();
 //		gl.glFlush(); // ensure that everything gets drawn
 //		gl.glFinish();
@@ -666,6 +669,24 @@ public class ViewportGl extends Viewport {
 		}
 		
 	}
+	
+	private void drawSceneGraphNames(SceneGraphNode node) {
+		Transform transform = node.getTransform();
+		if (transform != null) {
+			transformUtil.setTransform(LOCAL, transform);
+		} else {
+			transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
+		}
+		Point3d p = new Point3d();
+		transformUtil.projectToScreen(LOCAL, p, p);
+		if (node instanceof TransformNode) {
+			drawString(((TransformNode) node).getNameAttribute().getValue(), (int) p.x, (int) p.y);
+		}
+		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
+			drawSceneGraphNames(child);
+		}
+	}
+	
 //	public void setMaterial(Color3f ka) {
 //		gl.glMaterialfv(side, GL_AMBIENT, new float[] { mp.red * mp.ambient, mp.green * mp.ambient, mp.blue * mp.ambient, 1 } );
 //		gl.glMaterialfv(side, GL_DIFFUSE, new float[] { mp.red * mp.diffuse, mp.green * mp.diffuse, mp.blue * mp.diffuse, 1 } );
@@ -956,16 +977,25 @@ public class ViewportGl extends Viewport {
 			if (pass == 0) {
 				gl.glDisable(GL_DEPTH_TEST);
 				gl.glEnable(GL_BLEND);
-				gl.glColor4f(1, 1, 0, 0.5f);
+				gl.glColor4f(1, 1, 0, 0.4f);
 			} else {
 				gl.glEnable(GL_DEPTH_TEST);
 				gl.glDisable(GL_BLEND);
 				gl.glColor3f(1, 1, 0);
 			}
 			gl.glBegin(GL_POINTS);
-			for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
-				Point3f p = vertex.projectedPos;
-				gl.glVertex3f(p.x, p.y, p.z);
+			if (viewDef.getShowControlMeshAttribute().getBoolean()) {
+				for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
+					Point3f p = vertex.projectedPos;
+					gl.glVertex3f(p.x, p.y, p.z);
+				}
+			} else if (viewDef.getShowProjectedMeshAttribute().getBoolean()) {
+				for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
+					if (vertex instanceof TopLevelVertex) {
+						Point3f p = ((TopLevelVertex) vertex).vertexPoint.projectedLimit;
+						gl.glVertex3f(p.x, p.y, p.z);
+					}
+				}
 			}
 			gl.glEnd();
 		}
@@ -1143,7 +1173,6 @@ public class ViewportGl extends Viewport {
 		
 			gl.glColor3f(1, 0, 0);
 			gl.glBegin(GL_POINTS);
-			CollectionAttr<AbstractVertex> selectedVertices = Main.getInstance().getSelection().getSelectedVerticesAttribute();
 			for (Face face : sds.faceList) {
 				for (HalfEdge edge : face.getEdges()) {
 					if (edge.isPrimary()) {
@@ -1168,6 +1197,20 @@ public class ViewportGl extends Viewport {
 			}
 			gl.glEnd();
 			
+		} else if (showProjectedMeshAttr.getBoolean()) {
+			gl.glDisable(GL_LIGHTING);
+			gl.glColor3f(1, 0, 0);
+			gl.glBegin(GL_POINTS);
+			for (Face face : sds.faceList) {
+				for (HalfEdge edge : face.getEdges()) {
+					if (edge.isPrimary()) {
+						TopLevelVertex vertex = edge.getFirstVertex();
+						Point3f p = vertex.vertexPoint.projectedLimit;
+						gl.glVertex3f(p.x, p.y, p.z);
+					}
+				}
+			}
+			gl.glEnd();
 		}
 //		for (Level2Vertex v : sds.level2Vertices) {
 //			v.getProjectedPos(p0);
@@ -1457,13 +1500,28 @@ public class ViewportGl extends Viewport {
 
 	protected void drawInfo() {
 		rasterMode();
-		gl.glColor3f(COLORS.text.x, COLORS.text.y, COLORS.text.z);
-		drawString(getInfo(), 4, 16);
+//		gl.glColor3f(COLORS.text.x, COLORS.text.y, COLORS.text.z);
 		String fps = Long.toString(1000000000 / (System.nanoTime() - time));
-		drawString("OpenGL " + fps + "fps", 4, 32);
+		drawString(getInfo() + " @" + fps + "fps", 4, 16);
+		
+//		drawString("OpenGL " + fps + "fps", 4, 32);
 	}
 	
 	private void drawString(String string, int x, int y) {
+		gl.glEnable(GL_BLEND);
+		gl.glColor4f(0, 0, 0, 0.5f);
+		for (int yy = y - 1; yy < y + 2; yy++) {
+			for (int xx = x - 1; xx < x + 2; xx++) {
+				gl.glRasterPos2i(xx, yy);							// set raster position
+				char[] c = string.toCharArray();
+			    for (int i = 0, n = c.length; i < n; i++) {		// loop over characters
+			    	if (c[i] < 256) {
+			    		gl.glCallList(fontOffset + c[i]);		// call display list that draws a character
+			    	}
+			    }
+			}
+		}
+		gl.glColor4f(1, 1, 1, 0.75f);
 		gl.glRasterPos2i(x, y);							// set raster position
 		char[] c = string.toCharArray();
 	    for (int i = 0, n = c.length; i < n; i++) {		// loop over characters
@@ -1471,6 +1529,7 @@ public class ViewportGl extends Viewport {
 	    		gl.glCallList(fontOffset + c[i]);		// call display list that draws a character
 	    	}
 	    }
+	    gl.glDisable(GL_BLEND);
 	}
 	
 	private void spatialMode() {

@@ -6,7 +6,7 @@ import trashcan.SoftBoundedDoubleAttr;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.afw.attributes.*;
 
-public class TransformNode extends SceneGraphNode {
+public class TransformNode extends SceneGraphNode implements NamedObject {
 	
 	/**
 	 * Temporary storage for the translation (relative to the parent node)
@@ -260,5 +260,9 @@ public class TransformNode extends SceneGraphNode {
 	 */
 	public GenericAttr<String> getNameAttribute() {
 		return nameAttr;
+	}
+	
+	public String toString() {
+		return nameAttr.getValue();
 	}
 }

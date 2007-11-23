@@ -135,6 +135,8 @@ public class TranslateTool implements VisibleTool {
 	private MouseListener[] mouseListeners;
 	private MouseMotionListener mouseMotionListener;
 	
+	private boolean toolStateChange;
+	
 	public TranslateTool() {
 		axisRotationAttr.bindTuple(axisRotation);
 		pivotAttr.bindTuple(pivot);
@@ -162,6 +164,7 @@ public class TranslateTool implements VisibleTool {
 		Selection selection = Main.getInstance().getSelection();
 		selection.getCenter(pivot, null);
 		pivotAttr.setTuple(pivot);
+		toolStateChange = true;
 		if (mouseListeners != null) {
 			throw new IllegalStateException("already registered");
 		}
@@ -475,7 +478,13 @@ public class TranslateTool implements VisibleTool {
 				viewport.getComponent().removeMouseMotionListener(mouseMotionListener);
 				mouseMotionListener = null;
 				Selection selection = Main.getInstance().getSelection();
-				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(selection.getVertexCount());
+				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(selection.getVertexCount() + 3);
+				if (toolStateChange) { // FIXME this doesn't work
+					StateMachine toolStateMachine = Main.getInstance().getActions().toolSM;
+					editList.add(AttributeEdit.changeAttribute(toolStateMachine, toolStateMachine.getPreviousState(), false));
+					toolStateChange = false;
+				}
+				
 				selection.end(editList);
 				
 				

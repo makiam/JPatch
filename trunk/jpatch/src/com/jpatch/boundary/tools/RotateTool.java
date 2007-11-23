@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.jpatch.afw.attributes.GenericAttr;
+import com.jpatch.afw.attributes.StateMachine;
 import com.jpatch.afw.attributes.Tuple3Attr;
 import com.jpatch.afw.control.AttributeEdit;
 import com.jpatch.afw.control.JPatchUndoableEdit;
@@ -77,6 +78,7 @@ public class RotateTool implements VisibleTool {
 	private TransformUtil transformUtil = new TransformUtil("axisRotation", "rotation");
 	private static final int AXIS_ROTATION = 3;
 	private static final int ROTATION = 4;
+	private boolean toolStateChange;
 	
 	static {
 		Color3f black = new Color3f(0, 0, 0);
@@ -382,6 +384,7 @@ public class RotateTool implements VisibleTool {
 		Selection selection = Main.getInstance().getSelection();
 		selection.getCenter(pivot, null);
 		pivotAttr.setTuple(pivot);
+		toolStateChange = true;
 		if (mouseListeners != null) {
 			throw new IllegalStateException("already registered");
 		}
@@ -665,7 +668,12 @@ public class RotateTool implements VisibleTool {
 //				axisRotationAttr.setTuple(axisRotation);
 //				rotationAttr.setTuple(rotation);
 				Selection selection = Main.getInstance().getSelection();
-				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(selection.getVertexCount());
+				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(selection.getVertexCount() + 3);
+				if (toolStateChange) {
+					StateMachine toolStateMachine = Main.getInstance().getActions().toolSM;
+					editList.add(AttributeEdit.changeAttribute(toolStateMachine, toolStateMachine.getPreviousState(), false));
+					toolStateChange = false;
+				}
 				selection.end(editList);
 				axisRotationAttr.setTuple(oldAxisRotation);
 				rotationAttr.setTuple(oldRotation);

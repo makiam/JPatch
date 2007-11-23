@@ -9,7 +9,6 @@ import com.jpatch.afw.control.SwitchStateAction;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.GenericArrayType;
 
 import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
@@ -34,11 +33,12 @@ public class JPatchStateButton extends JToggleButton implements JPatchButton {
 				if (currentValue == jpatchAction.getState()) {
 					Object newValue = stateMachine.revertToDefault();
 					if (newValue != currentValue) {
-						jpatchAction.getUndoManager().addEdit(EDIT_NAME, AttributeEdit.changeAttribute(stateMachine, currentValue, false));
+//						jpatchAction.getUndoManager().addEdit(EDIT_NAME, AttributeEdit.changeAttribute(stateMachine, currentValue, false));
+						stateMachine.revertToDefault();
 					}
 				} else {
-					jpatchAction.getUndoManager().addEdit(EDIT_NAME, AttributeEdit.changeAttribute(stateMachine, jpatchAction.getState(), true));
-//					jpatchAction.getStateMachine().setValue(jpatchAction.getState());
+//					jpatchAction.getUndoManager().addEdit(EDIT_NAME, AttributeEdit.changeAttribute(stateMachine, jpatchAction.getState(), true));
+					jpatchAction.getStateMachine().setValue(jpatchAction.getState());
 				}
 			}
 		});

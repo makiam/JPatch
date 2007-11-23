@@ -30,6 +30,10 @@ public abstract class AbstractViewDef implements ViewDef {
 		return viewport.getAntialiasAttribute();
 	}
 	
+	public BooleanAttr getShowNodeNamesAttribute() {
+		return viewport.getShowNodeNamesAttribute();
+	}
+	
 	public StateMachine<ViewDirection> getViewDirectionAttribute() {
 		return viewport.getViewDirectionAttribute();
 	}
