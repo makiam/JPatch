@@ -59,7 +59,6 @@ public class RotateTool implements VisibleTool {
 			{ 0.0f, 0.0f, 0.0f, 1.0f },	// outline
 			{ 0.9f, 0.9f, 0.0f, 1.0f }	// yellow axis
 	};
-	private final static GlMaterial FRONT_MATERIAL, BACK_MATERIAL;
 	static int n = 0;
 	
 	private final Tuple3Attr pivotAttr = new Tuple3Attr();
@@ -69,7 +68,6 @@ public class RotateTool implements VisibleTool {
 	private final Rotation3d axisRotation = new Rotation3d();
 	private final Rotation3d rotation = new Rotation3d();
 	int axisConstraint = -1;
-	private Matrix4d matrix = new Matrix4d();
 	private MouseListener[] mouseListeners;
 	private MouseMotionListener mouseMotionListener;
 	
@@ -78,12 +76,11 @@ public class RotateTool implements VisibleTool {
 	private TransformUtil transformUtil = new TransformUtil("axisRotation", "rotation");
 	private static final int AXIS_ROTATION = 3;
 	private static final int ROTATION = 4;
-	private boolean toolStateChange;
 	
 	static {
-		Color3f black = new Color3f(0, 0, 0);
-		FRONT_MATERIAL = new GlMaterial(black, black, black, black, 0);
-		BACK_MATERIAL = new GlMaterial(black, black, black, black, 0);
+//		Color3f black = new Color3f(0, 0, 0);
+//		FRONT_MATERIAL = new GlMaterial(black, black, black, black, 0);
+//		BACK_MATERIAL = new GlMaterial(black, black, black, black, 0);
 		for (int i = 0; i < CIRCLE_SEGMENTS; i++) {
 			COS[i] = Math.cos(i * 2 * Math.PI / CIRCLE_SEGMENTS);
 //			SIN[i] = Math.sin(i * 2 * Math.PI / CIRCLE_SEGMENTS);
@@ -384,7 +381,6 @@ public class RotateTool implements VisibleTool {
 		Selection selection = Main.getInstance().getSelection();
 		selection.getCenter(pivot, null);
 		pivotAttr.setTuple(pivot);
-		toolStateChange = true;
 		if (mouseListeners != null) {
 			throw new IllegalStateException("already registered");
 		}
@@ -669,16 +665,15 @@ public class RotateTool implements VisibleTool {
 //				rotationAttr.setTuple(rotation);
 				Selection selection = Main.getInstance().getSelection();
 				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(selection.getVertexCount() + 3);
-				if (toolStateChange) {
-					StateMachine toolStateMachine = Main.getInstance().getActions().toolSM;
-					editList.add(AttributeEdit.changeAttribute(toolStateMachine, toolStateMachine.getPreviousState(), false));
-					toolStateChange = false;
-				}
-				selection.end(editList);
 				axisRotationAttr.setTuple(oldAxisRotation);
 				rotationAttr.setTuple(oldRotation);
 				editList.add(AttributeEdit.changeAttribute(axisRotationAttr, axisRotation, true));
 				editList.add(AttributeEdit.changeAttribute(rotationAttr, rotation, true));
+				if (LastModifierTool.getInstance().get() != RotateTool.this) {
+					editList.add(AttributeEdit.changeAttribute(Main.getInstance().getActions().toolSM, LastModifierTool.getInstance().get(), false));
+					LastModifierTool.getInstance().set(RotateTool.this);
+				}
+				selection.end(editList);
 				Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
 				Main.getInstance().repaintViewports();
 			}

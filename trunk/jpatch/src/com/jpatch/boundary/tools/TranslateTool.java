@@ -135,8 +135,6 @@ public class TranslateTool implements VisibleTool {
 	private MouseListener[] mouseListeners;
 	private MouseMotionListener mouseMotionListener;
 	
-	private boolean toolStateChange;
-	
 	public TranslateTool() {
 		axisRotationAttr.bindTuple(axisRotation);
 		pivotAttr.bindTuple(pivot);
@@ -164,7 +162,6 @@ public class TranslateTool implements VisibleTool {
 		Selection selection = Main.getInstance().getSelection();
 		selection.getCenter(pivot, null);
 		pivotAttr.setTuple(pivot);
-		toolStateChange = true;
 		if (mouseListeners != null) {
 			throw new IllegalStateException("already registered");
 		}
@@ -479,16 +476,12 @@ public class TranslateTool implements VisibleTool {
 				mouseMotionListener = null;
 				Selection selection = Main.getInstance().getSelection();
 				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(selection.getVertexCount() + 3);
-				if (toolStateChange) { // FIXME this doesn't work
-					StateMachine toolStateMachine = Main.getInstance().getActions().toolSM;
-					editList.add(AttributeEdit.changeAttribute(toolStateMachine, toolStateMachine.getPreviousState(), false));
-					toolStateChange = false;
+				
+				
+				if (LastModifierTool.getInstance().get() != TranslateTool.this) {
+					editList.add(AttributeEdit.changeAttribute(Main.getInstance().getActions().toolSM, LastModifierTool.getInstance().get(), false));
+					LastModifierTool.getInstance().set(TranslateTool.this);
 				}
-				
-				selection.end(editList);
-				
-				
-				
 				Matrix4d matrix = new Matrix4d();
 				axisRotation.getRotationMatrix(matrix);
 				matrix.transform(vector);
@@ -499,6 +492,12 @@ public class TranslateTool implements VisibleTool {
 				
 				editList.add(AttributeEdit.changeAttribute(pivotAttr, pivot, true));
 				editList.add(AttributeEdit.changeAttribute(vectorAttr, vector, true));
+				
+				selection.end(editList);
+				
+				
+				
+				
 				Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
 				Main.getInstance().repaintViewports();	// need to repaint all viewports to make the ghost disappear,
 														// therefore no syncRepaintViewports()

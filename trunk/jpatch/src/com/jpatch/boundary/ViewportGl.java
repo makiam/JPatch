@@ -24,7 +24,7 @@ import javax.vecmath.*;
 
 public class ViewportGl extends Viewport {
 	private static Matrix4d IDENTITY = Utils3d.createIdentityMatrix4d();
-	private static int repaintCount;
+	private int repaintCount = 0;
 	
 	private static final boolean LIGHTWEIGHT = false;
 //	private static final double CLEAR_DEPTH = 100000;
@@ -1502,9 +1502,9 @@ public class ViewportGl extends Viewport {
 		rasterMode();
 //		gl.glColor3f(COLORS.text.x, COLORS.text.y, COLORS.text.z);
 		String fps = Long.toString(1000000000 / (System.nanoTime() - time));
-		drawString(getInfo() + " @" + fps + "fps", 4, 16);
+		drawString(getInfo(), 4, 16);
 		
-//		drawString("OpenGL " + fps + "fps", 4, 32);
+		drawString("repaint " + (repaintCount++) + " " + fps + "fps", 4, 32);
 	}
 	
 	private void drawString(String string, int x, int y) {
