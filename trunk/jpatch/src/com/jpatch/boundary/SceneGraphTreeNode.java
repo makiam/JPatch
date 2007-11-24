@@ -1,5 +1,7 @@
 package com.jpatch.boundary;
 
+import com.jpatch.afw.attributes.GenericAttr;
+import com.jpatch.afw.attributes.NamedObject;
 import com.jpatch.entity.SceneGraphNode;
 
 import java.util.ArrayList;
@@ -171,6 +173,7 @@ public class SceneGraphTreeNode implements MutableTreeNode {
 	public boolean isLeaf() {
 		return leafs.size() == 0;
 	}
+	
 	
 	@Override
 	public String toString() {
