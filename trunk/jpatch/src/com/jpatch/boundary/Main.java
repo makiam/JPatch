@@ -113,6 +113,8 @@ public class Main {
 	private Selection selection = new Selection();
 	private JPatchTool visibleTool = null;
 	
+	private final SelectionManager selectionManager;
+	
 	private SceneGraphNode sceneGraphRoot = new SceneGraphNode() {
 		@Override
 		public Transform getTransform() {
@@ -657,7 +659,7 @@ public class Main {
 //		viewports[0].setActive(true);
 //		activeViewport.setValue(viewports[0]);
 		
-		SelectionManager selectionManager = new SelectionManager(tree, treeManager);
+		selectionManager = new SelectionManager(tree, treeManager);
 		selectionManager.getSelectedObjectAttribute().addAttributePostChangeListener(inspector.getSelectionChangeListener());
 		actions.toolSM.addAttributePostChangeListener(inspector.getToolChangeListener());
 		
@@ -874,6 +876,10 @@ public class Main {
 
 	public Actions getActions() {
 		return actions;
+	}
+	
+	public SelectionManager getSelectionManager() {
+		return selectionManager;
 	}
 //	public void setSelection(Selection selection) {
 //		this.selection = selection;
