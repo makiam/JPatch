@@ -41,6 +41,7 @@ import com.jpatch.afw.vecmath.Transform;
 import com.jpatch.boundary.actions.Actions;
 import com.jpatch.boundary.actions.Actions.ViewportMode;
 import com.jpatch.boundary.tools.JPatchTool;
+import com.jpatch.boundary.tools.LastModifierTool;
 import com.jpatch.boundary.tools.RotateTool;
 import com.jpatch.boundary.tools.VisibleTool;
 import com.jpatch.entity.Camera;
@@ -312,6 +313,7 @@ public class Main {
 //			e.printStackTrace();
 //		}
 
+		LastModifierTool.getInstance().set(actions.tools[3]);
 		
 		screen.setBackground(Color.BLACK);
 		try {
@@ -645,6 +647,8 @@ public class Main {
 		actions.toolSM.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				repaintViewports();
+				// FIXME this is suboptimal, as it causes two repaints when used
+				//       with undo/redo!
 			}
 		});
 		

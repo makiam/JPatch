@@ -20,10 +20,10 @@ public class StateMachine<T> extends GenericAttr<T> {
 	 */
 	private T defaultState;
 	
-	/**
-	 * The previous state of this state machine
-	 */
-	private T previousState;
+//	/**
+//	 * The previous state of this state machine
+//	 */
+//	private T previousState;
 	
 	/**
 	 * Wheter or not this StateMachine should revert to the default state
@@ -55,7 +55,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 		if (setValue(initialState) != initialState) {
 			throw new IllegalArgumentException("Can't initialize state-machine. Unable to switch state to " + initialState);
 		}
-		previousState = initialState;
+//		previousState = initialState;
 		bindStateSetListeners();
 	}
 	
@@ -178,15 +178,15 @@ public class StateMachine<T> extends GenericAttr<T> {
 		return statesAttr.getElements();
 	}
 
-	/**
-	 * Returns the previous state (the state of this StateMachine before the last state transition).
-	 * Initially, this method will return the initial state.
-	 * @return the previous state (the state of this StateMachine before the last state transition)
-	 */
-	public T getPreviousState() {
-		System.out.println("previousState=" + previousState);
-		return previousState;
-	}
+//	/**
+//	 * Returns the previous state (the state of this StateMachine before the last state transition).
+//	 * Initially, this method will return the initial state.
+//	 * @return the previous state (the state of this StateMachine before the last state transition)
+//	 */
+//	public T getPreviousState() {
+//		System.out.println("previousState=" + previousState);
+//		return previousState;
+//	}
 	
 	/**
 	 * Causes this StateMachine to transition to <i>newState</i>.
@@ -207,7 +207,7 @@ public class StateMachine<T> extends GenericAttr<T> {
 			throw new IllegalArgumentException(newState + " is not a legal state of this statemachine (" + this + ")");
 		}
 		if (newState != value) {
-			previousState = value;
+//			previousState = value;
 			newState = fireAttributeWillChange(newState);
 			value = performStateTransition(newState);
 			fireAttributeHasChanged();

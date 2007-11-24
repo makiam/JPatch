@@ -1,6 +1,9 @@
 package com.jpatch.boundary.tools;
 
 import static javax.media.opengl.GL.*;
+import com.jpatch.afw.attributes.GenericAttr;
+import com.jpatch.afw.control.AttributeEdit;
+import com.jpatch.afw.control.JPatchUndoableEdit;
 import com.jpatch.afw.vecmath.TransformUtil;
 import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.*;
@@ -17,6 +20,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLCanvas;
@@ -28,6 +33,7 @@ import javax.vecmath.Point3f;
 import jpatch.boundary.settings.Settings;
 
 public class MoveVertexTool implements VisibleTool {
+	public static final GenericAttr<String> EDIT_NAME = new GenericAttr<String>("movevertextool");
 	private static final Color XOR_MODE = new Color(Settings.getInstance().colors.background.get().getRGB() ^ Settings.getInstance().colors.selection.get().getRGB());
 	private static final Stroke DASHES = new BasicStroke(1.0f,BasicStroke.CAP_BUTT,BasicStroke.JOIN_BEVEL,0.0f,new float[] { 1.0f, 1.0f }, 0.0f);
 	
@@ -132,7 +138,7 @@ public class MoveVertexTool implements VisibleTool {
 		gl.glDisable(GL_LINE_SMOOTH);
 	}
 
-	private static class MoveVertexMouseListener extends MouseAdapter {
+	private class MoveVertexMouseListener extends MouseAdapter {
 		private Viewport viewport;
 		private MouseMotionListener mouseMotionListener;
 		
@@ -169,6 +175,14 @@ public class MoveVertexTool implements VisibleTool {
 					if (mouseMotionListener instanceof LassoSelectMouseMotionListener) {
 						LassoSelectMouseMotionListener lassoListener = (LassoSelectMouseMotionListener) mouseMotionListener;
 						lassoListener.getSelectedVertices(Main.getInstance().getSelection());
+						
+						List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(1);
+						if (LastModifierTool.getInstance().get() != MoveVertexTool.this) {
+							editList.add(AttributeEdit.changeAttribute(Main.getInstance().getActions().toolSM, LastModifierTool.getInstance().get(), false));
+							LastModifierTool.getInstance().set(MoveVertexTool.this);
+						}
+						Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
+						
 						Main.getInstance().repaintViewports();
 					} else {
 						Main.getInstance().syncViewports(viewport);
