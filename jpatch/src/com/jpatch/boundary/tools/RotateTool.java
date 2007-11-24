@@ -39,7 +39,7 @@ import jpatch.boundary.action.EditAnimObjectAction;
 
 import static javax.media.opengl.GL.*;
 
-public class RotateTool implements VisibleTool {
+public class RotateTool extends AbstractManipulatorTool implements VisibleTool {
 	public static final GenericAttr<String> EDIT_NAME = new GenericAttr<String>("rotate");
 	private static final double SCREEN_ROTATE_FACTOR = 1.2;
 	private static final int SEGMENTS = 128;
@@ -67,15 +67,18 @@ public class RotateTool implements VisibleTool {
 	private final Point3d pivot = new Point3d();
 	private final Rotation3d axisRotation = new Rotation3d();
 	private final Rotation3d rotation = new Rotation3d();
+	private final Rotation3d startRotation = new Rotation3d();
+	
 	int axisConstraint = -1;
 	private MouseListener[] mouseListeners;
 	private MouseMotionListener mouseMotionListener;
 	
 	private Vector3d fromVector = new Vector3d();
 	private Vector3d toVector = new Vector3d();
-	private TransformUtil transformUtil = new TransformUtil("axisRotation", "rotation");
+	private TransformUtil transformUtil = new TransformUtil("axisRotation", "startRotation", "rotation");
 	private static final int AXIS_ROTATION = 3;
-	private static final int ROTATION = 4;
+	private static final int START_ROTATION = 4;
+	private static final int ROTATION = 5;
 	
 	static {
 //		Color3f black = new Color3f(0, 0, 0);
@@ -316,7 +319,7 @@ public class RotateTool implements VisibleTool {
 					matrix.set(axisAngle);
 					p.scale(vv.radius * extraScale, fromVector);
 					matrix.transform(p);
-					transformUtil.transform(AXIS_ROTATION, p, CAMERA, p);
+					transformUtil.transform(START_ROTATION, p, CAMERA, p);
 					
 					p1.set(p);
 					p1.sub(vv.cameraPivot);
@@ -354,8 +357,8 @@ public class RotateTool implements VisibleTool {
 				p1.scale(factor, p);
 				matrix.transform(p);
 				matrix.transform(p1);
-				transformUtil.transform(AXIS_ROTATION, p, CAMERA, p);
-				transformUtil.transform(AXIS_ROTATION, p1, CAMERA, p1);
+				transformUtil.transform(START_ROTATION, p, CAMERA, p);
+				transformUtil.transform(START_ROTATION, p1, CAMERA, p1);
 				if (factor < 1) {
 					gl.glVertex3d(p.x, p.y, p.z);
 					gl.glVertex3d(p1.x, p1.y, p1.z);
@@ -378,8 +381,7 @@ public class RotateTool implements VisibleTool {
 	}
 	
 	public void registerListeners(Viewport[] viewports) {
-		Selection selection = Main.getInstance().getSelection();
-		selection.getCenter(pivot, null);
+		resetPivot(pivot);
 		pivotAttr.setTuple(pivot);
 		if (mouseListeners != null) {
 			throw new IllegalStateException("already registered");
@@ -448,15 +450,15 @@ public class RotateTool implements VisibleTool {
 			switch (constraint) {
 			case 0:
 				cameraAxis.set(1, 0, 0);
-				transformUtil.transform(AXIS_ROTATION, cameraAxis, CAMERA, cameraAxis);
+				transformUtil.transform(START_ROTATION, cameraAxis, CAMERA, cameraAxis);
 				break;
 			case 1:
 				cameraAxis.set(0, 1, 0);
-				transformUtil.transform(AXIS_ROTATION, cameraAxis, CAMERA, cameraAxis);
+				transformUtil.transform(START_ROTATION, cameraAxis, CAMERA, cameraAxis);
 				break;
 			case 2:
 				cameraAxis.set(0, 0, 1);
-				transformUtil.transform(AXIS_ROTATION, cameraAxis, CAMERA, cameraAxis);
+				transformUtil.transform(START_ROTATION, cameraAxis, CAMERA, cameraAxis);
 				break;
 			case 3:
 				cameraAxis.set(0, 0, 1);
@@ -474,7 +476,7 @@ public class RotateTool implements VisibleTool {
 			}
 		}
 		if (hit) {
-			transformUtil.transform(CAMERA, result, AXIS_ROTATION, result);
+			transformUtil.transform(CAMERA, result, START_ROTATION, result);
 			return true;
 		}
 		return false;
@@ -594,15 +596,15 @@ public class RotateTool implements VisibleTool {
 				switch (i) {
 				case 0:
 					cameraAxis.set(1, 0, 0);
-					transformUtil.transform(AXIS_ROTATION, cameraAxis, CAMERA, cameraAxis);
+					transformUtil.transform(START_ROTATION, cameraAxis, CAMERA, cameraAxis);
 					break;
 				case 1:
 					cameraAxis.set(0, 1, 0);
-					transformUtil.transform(AXIS_ROTATION, cameraAxis, CAMERA, cameraAxis);
+					transformUtil.transform(START_ROTATION, cameraAxis, CAMERA, cameraAxis);
 					break;
 				case 2:
 					cameraAxis.set(0, 0, 1);
-					transformUtil.transform(AXIS_ROTATION, cameraAxis, CAMERA, cameraAxis);
+					transformUtil.transform(START_ROTATION, cameraAxis, CAMERA, cameraAxis);
 					break;
 				case 3:
 					cameraAxis.set(0, 0, 1);
@@ -623,8 +625,9 @@ public class RotateTool implements VisibleTool {
 			boolean intersection = computeIntersectionPoint(vv, e.getX(), e.getY(), axis, hitPoint);
 			if (intersection) {
 				if (e.getClickCount() == 2) {
-					axisRotation.set(0, 0, 0);
-					axisRotationAttr.setTuple(axisRotation);
+					rotation.set(0, 0, 0);
+					rotationAttr.setTuple(rotation);
+					startRotation.set(rotation);
 					Main.getInstance().repaintViewports();
 				}
 				else if (e.getClickCount() == 3) {
@@ -636,8 +639,9 @@ public class RotateTool implements VisibleTool {
 					
 					transformUtil.getRotationScaleMatrix(WORLD, LOCAL, orientMatrix);
 					orientMatrix.mul(m);
-					axisRotation.setRotation(orientMatrix);
-					axisRotationAttr.setTuple(axisRotation);
+					rotation.setRotation(orientMatrix);
+					rotationAttr.setTuple(rotation);
+					startRotation.set(rotation);
 					Main.getInstance().repaintViewports();
 				} else {
 					fromVector.set(hitPoint);
@@ -647,6 +651,7 @@ public class RotateTool implements VisibleTool {
 					selection.begin();
 					oldAxisRotation.set(axisRotation);
 					oldRotation.set(rotation);
+					startRotation.set(rotation);
 					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 				}
 			}
@@ -656,25 +661,24 @@ public class RotateTool implements VisibleTool {
 			if (mouseMotionListener != null) {
 				viewport.getComponent().removeMouseMotionListener(mouseMotionListener);
 				mouseMotionListener = null;
-				Matrix3d m = new Matrix3d();
-				rotation.getRotationMatrix(m);
-				axisRotation.rotateMatrix(m);
-				axisRotation.setRotation(m);
-				rotation.set(0, 0, 0);
-//				axisRotationAttr.setTuple(axisRotation);
-//				rotationAttr.setTuple(rotation);
+//				Matrix3d m = new Matrix3d();
+//				rotation.getRotationMatrix(m);
+//				axisRotation.rotateMatrix(m);
+//				axisRotation.setRotation(m);
+//				rotation.set(0, 0, 0);
 				Selection selection = Main.getInstance().getSelection();
 				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(selection.getVertexCount() + 3);
-				axisRotationAttr.setTuple(oldAxisRotation);
-				rotationAttr.setTuple(oldRotation);
-				editList.add(AttributeEdit.changeAttribute(axisRotationAttr, axisRotation, true));
-				editList.add(AttributeEdit.changeAttribute(rotationAttr, rotation, true));
+//				axisRotationAttr.setTuple(oldAxisRotation);
+//				rotationAttr.setTuple(oldRotation);
+//				editList.add(AttributeEdit.changeAttribute(axisRotationAttr, oldAxisRotation, true));
+				editList.add(AttributeEdit.changeAttribute(rotationAttr, oldRotation, false));
 				if (LastModifierTool.getInstance().get() != RotateTool.this) {
 					editList.add(AttributeEdit.changeAttribute(Main.getInstance().getActions().toolSM, LastModifierTool.getInstance().get(), false));
 					LastModifierTool.getInstance().set(RotateTool.this);
 				}
 				selection.end(editList);
 				Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
+				startRotation.set(rotation);
 				Main.getInstance().repaintViewports();
 			}
 		}
@@ -715,11 +719,24 @@ public class RotateTool implements VisibleTool {
 				//axis.normalize();
 				AxisAngle4d axisAngle = new AxisAngle4d(axis, angle);
 				m.set(axisAngle);
-				rotation.setRotation(m);
+				
+				Matrix3d m2 = startRotation.getRotationMatrix(new Matrix3d());
+				m2.mul(m);
+				
+				
+				
+				if (isObjectMode()) {
+					Rotation3d r1 = new Rotation3d();
+					r1.setRotation(m);
+					getSelectedNode().getRotationAttribute().setTuple(r1);
+					getSelectedNode().getTransform().computeBranch();
+				} else {
+					rotation.setRotation(m2);
 
-				transformUtil.transform(AXIS_ROTATION, axis, LOCAL, axis);
-				Selection selection = Main.getInstance().getSelection();
-				selection.rotateTo(pivot, new AxisAngle4d(axis, angle));
+					transformUtil.transform(START_ROTATION, axis, LOCAL, axis);
+					Selection selection = Main.getInstance().getSelection();
+					selection.rotateTo(pivot, new AxisAngle4d(axis, angle));
+				}
 //				selection.getSelectedSdsModelAttribute().getValue().getSds().computeLevel2Vertices();
 				
 				rotationAttr.setTuple(rotation);
@@ -757,6 +774,7 @@ public class RotateTool implements VisibleTool {
 			/* compute rotation matrix */
 //			Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getTransform().getMatrix(matrix);
 			axisRotation.getRotationMatrix(matrix);
+//			axisRotation.rotateMatrix(matrix);
 			
 			/* add pivot translation */
 			matrix.m03 = pivot.x;
@@ -784,7 +802,20 @@ public class RotateTool implements VisibleTool {
 			/* set local2world to rotate-tool matrix */ 
 			transformUtil.setSpace2World(ROTATION, LOCAL, matrix);
 			
+			/* compute rotation matrix */
+//			Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getTransform().getMatrix(matrix);
+			startRotation.getRotationMatrix(matrix);
+			axisRotation.rotateMatrix(matrix);
 			
+			/* add pivot translation */
+			matrix.m03 = pivot.x;
+			matrix.m13 = pivot.y;
+			matrix.m23 = pivot.z;
+			matrix.m33 = 1;
+			
+			
+			/* set local2world to rotate-tool matrix */ 
+			transformUtil.setSpace2World(START_ROTATION, LOCAL, matrix);
 			
 			/*
 			 * set the radius so that the tool will occupy about 1/3rd of the screen
