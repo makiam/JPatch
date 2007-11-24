@@ -6,7 +6,7 @@ import trashcan.SoftBoundedDoubleAttr;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.afw.attributes.*;
 
-public class TransformNode extends SceneGraphNode implements NamedObject {
+public class TransformNode extends SceneGraphNode {
 	
 	/**
 	 * Temporary storage for the translation (relative to the parent node)
@@ -66,7 +66,7 @@ public class TransformNode extends SceneGraphNode implements NamedObject {
 	
 	protected BooleanAttr visibilityAttr = new BooleanAttr(true);
 	
-	protected GenericAttr<String> nameAttr = new GenericAttr<String>();
+	
 	
 	/**
 	 * Auto-transform flag, used to prevent loops when a position change updates the translation
@@ -254,15 +254,5 @@ public class TransformNode extends SceneGraphNode implements NamedObject {
 		}
 	}
 	
-	/**
-	 * Returns the name attribute
-	 * @return the name attribute
-	 */
-	public GenericAttr<String> getNameAttribute() {
-		return nameAttr;
-	}
 	
-	public String toString() {
-		return nameAttr.getValue();
-	}
 }

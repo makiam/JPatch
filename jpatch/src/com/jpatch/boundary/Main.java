@@ -88,7 +88,7 @@ public class Main {
 	private static Color ACTIVE_VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.selection.get();
 	
 	
-	final DefaultTreeModel treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
+	final DefaultTreeModel treeModel = new DefaultTreeModel(new DefaultMutableTreeNode("TREE ROOT"));
 	final TreeManager treeManager = new TreeManager(treeModel);
 	
 	private Robot robot;
@@ -113,7 +113,7 @@ public class Main {
 	private Selection selection = new Selection();
 	private JPatchTool visibleTool = null;
 	
-	private TransformNode sceneGraphRoot = new TransformNode() {
+	private SceneGraphNode sceneGraphRoot = new SceneGraphNode() {
 		@Override
 		public Transform getTransform() {
 			return null;
@@ -578,6 +578,8 @@ public class Main {
 		
 		treeManager.createTreeNodeFor(sceneGraphRoot);
 		JTree tree = new JTree(treeModel);
+		tree.setRootVisible(false);
+		tree.setShowsRootHandles(true);
 		
 		JScrollPane scrollPane = new JScrollPane(inspector.getComponent(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(BorderFactory.createLineBorder(new Color(0xcccccc), 1));
