@@ -11,7 +11,7 @@ import com.jpatch.afw.vecmath.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds.*;
 
-public class Selection implements Transformable {
+public class Selection extends AbstractTransformable {
 	private final GenericAttr<SdsModel> selectedSdsModelAttr = new GenericAttr<SdsModel>();
 	private final CollectionAttr<AbstractVertex> selectedVerticesAttr = new CollectionAttr<AbstractVertex>(LinkedHashSet.class);
 	private Point3d[] startPositions;
@@ -59,6 +59,9 @@ public class Selection implements Transformable {
 	}
 	
 	public void getCenter(Point3d center, Matrix4d matrix) {
+		if (selectedVerticesAttr.size() == 0) {
+			return;
+		}
 		Miniball mb = new Miniball();
 		ArrayList<Point3d> points = new ArrayList<Point3d>();
 		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
@@ -73,35 +76,7 @@ public class Selection implements Transformable {
 		center.set(mb.center());
 	}
 	
-//	public Sphere getBounds(Sphere sphere) {
-//		SdsModel sdsModel = selectedSdsModelAttr.getValue();
-//		Transform transform = sdsModel.getTransform();
-//		Point3d p = new Point3d();
-//		Point3d center = new Point3d();
-//		getBounds(p, center);
-//		center.interpolate(p, 0.5);
-////		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
-////			vertex.getPos(p);
-////			center.add(p);
-////		}
-////		center.scale(1.0 / selectedVerticesAttr.size());
-//		double radiusSq = 0;
-//		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
-//			vertex.getPos(p);
-//			transform.transform(p);
-//			double distanceSq = p.distanceSquared(center);
-//			if (distanceSq > radiusSq) {
-//				radiusSq = distanceSq;
-//			}
-//		}
-//		transform.transform(center);
-//		Matrix4d m = transform.getMatrix(new Matrix4d());
-//		
-//		sphere.setCenter(center);
-//		sphere.setRadius(Math.sqrt(radiusSq) * m.getScale());
-//		
-//		return sphere;
-//	}
+
 
 	public void configureTransformUtil(TransformUtil transformUtil) {
 		transformUtil.setTransform(TransformUtil.LOCAL, selectedSdsModelAttr.getValue().getTransform());
@@ -127,35 +102,28 @@ public class Selection implements Transformable {
 	}
 
 	public void rotateTo(Point3d pivot, AxisAngle4d axisAngle) {
-		Matrix3d rotation = new Matrix3d();
-		rotation.set(axisAngle);
-		Point3d xPivot = new Point3d(pivot);
-		rotation.transform(xPivot);
-		Matrix4d matrix = new Matrix4d(
-				rotation.m00, rotation.m01, rotation.m02, pivot.x - xPivot.x,
-				rotation.m10, rotation.m11, rotation.m12, pivot.y - xPivot.y,
-				rotation.m20, rotation.m21, rotation.m22, pivot.z - xPivot.z,
-				0, 0, 0, 1
-		);
-		int i = 0;
-		Point3d p = new Point3d();
-		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
-			p.set(startPositions[i]);
-			matrix.transform(p);
-			vertex.getPosition().setTuple(p);
-			i++;
-		}
+		super.rotateTo(pivot, axisAngle);
+		transformVertices();
 	}
 
 	public void transform(Matrix4d matrix) {
-		int i = 0;
+		super.transform(matrix);
+		transformVertices();
+	}
+
+	private void transformVertices() {
 		Point3d p = new Point3d();
+		int i = 0;
 		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
-			p.set(startPositions[i]);
+			p.set(startPositions[i++]);
 			matrix.transform(p);
 			vertex.getPosition().setTuple(p);
-			i++;
 		}
+	}
+
+	public void sync() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	

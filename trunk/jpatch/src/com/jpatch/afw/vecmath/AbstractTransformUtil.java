@@ -26,7 +26,7 @@ public abstract class AbstractTransformUtil {
 	 * so the first specified space will be #1 (world is #0)
 	 * @param spaceNames
 	 */
-	AbstractTransformUtil(String... additionalSpaceNames) {
+	protected AbstractTransformUtil(String... additionalSpaceNames) {
 		spaceNames = concatenateSpaceNames(new String[] { "world" }, additionalSpaceNames);
 		matrices = new Matrix4d[spaceNames.length][spaceNames.length];
 		matricesValid = new boolean[spaceNames.length][spaceNames.length];
