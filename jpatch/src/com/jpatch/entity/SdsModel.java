@@ -3,7 +3,7 @@ package com.jpatch.entity;
 import com.jpatch.afw.attributes.GenericAttr;
 import com.jpatch.entity.sds.Sds;
 
-public class SdsModel extends TransformNode {
+public class SdsModel extends XFormNode {
 	private final Sds sds;
 	
 	public SdsModel(Sds sds) {

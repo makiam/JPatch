@@ -39,7 +39,7 @@ import jpatch.boundary.action.EditAnimObjectAction;
 
 import static javax.media.opengl.GL.*;
 
-public class RotateTool extends AbstractManipulatorTool implements VisibleTool {
+public class RotateTool_old2 extends AbstractManipulatorTool implements VisibleTool {
 	public static final GenericAttr<String> EDIT_NAME = new GenericAttr<String>("rotate");
 	private static final double SCREEN_ROTATE_FACTOR = 1.2;
 	private static final int SEGMENTS = 128;

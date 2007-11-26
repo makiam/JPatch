@@ -29,6 +29,21 @@ public class Tuple3Attr extends AbstractAttribute {
 		zAttr.addAttributePostChangeListener(listener);
 	}
 	
+	public Tuple3Attr(Tuple3d tuple) {
+		this(tuple.x, tuple.y, tuple.z);
+		bindTuple(tuple);
+	}
+	
+	public Tuple3Attr(Tuple3d tuple, double x, double y, double z) {
+		this(x, y, z);
+		bindTuple(tuple);
+	}
+	
+	public Tuple3Attr(Tuple3d tuple, DoubleAttr x, DoubleAttr y, DoubleAttr z) {
+		this(x, y, z);
+		bindTuple(tuple);
+	}
+	
 	public DoubleAttr getXAttr() {
 		return xAttr;
 	}

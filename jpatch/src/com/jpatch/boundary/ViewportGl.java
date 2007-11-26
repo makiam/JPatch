@@ -641,23 +641,30 @@ public class ViewportGl extends Viewport {
 		
 //		System.out.println("drawing " + node + " " + (node == null ? "(null)" : "(not null)"));
 //		Matrix4d matrix = new Matrix4d(viewDef.getMatrix(new Matrix4d()));
-		Transform transform = node.getTransform();
-		if (transform != null) {
-			transformUtil.setTransform(LOCAL, transform);
-//			transform.mul2(matrix);
-//			transform.getMatrix(m);
-//			if (node instanceof TransformNode) {
-//				System.out.println("sceneGraph TransformNode @ " + ((TransformNode) node).getNameAttribute().getValue());
-//				System.out.println(modelViewMatrix);
-//			}
-//			modelViewMatrix.set(matrix);
-//			matrix.mul(m);
-//			m.mul(matrix);
-//			matrix.mul(m);
-//			modelViewMatrix.mul(matrix);
+//		Transform transform = node.getTransform();
+		
+		if (node instanceof XFormNode) {
+			((XFormNode) node).getLocal2WorldTransform(transformUtil, LOCAL);
 		} else {
 			transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
 		}
+		
+//		if (transform != null) {
+//			transformUtil.setTransform(LOCAL, transform);
+////			transform.mul2(matrix);
+////			transform.getMatrix(m);
+////			if (node instanceof TransformNode) {
+////				System.out.println("sceneGraph TransformNode @ " + ((TransformNode) node).getNameAttribute().getValue());
+////				System.out.println(modelViewMatrix);
+////			}
+////			modelViewMatrix.set(matrix);
+////			matrix.mul(m);
+////			m.mul(matrix);
+////			matrix.mul(m);
+////			modelViewMatrix.mul(matrix);
+//		} else {
+//			transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
+//		}
 //		modelView.set(matrix);
 		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
 		drawOrigin(modelView);
@@ -671,9 +678,8 @@ public class ViewportGl extends Viewport {
 	}
 	
 	private void drawSceneGraphNames(SceneGraphNode node) {
-		Transform transform = node.getTransform();
-		if (transform != null) {
-			transformUtil.setTransform(LOCAL, transform);
+		if (node instanceof XFormNode) {
+			((XFormNode) node).getLocal2WorldTransform(transformUtil, LOCAL);
 		} else {
 			transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
 		}
