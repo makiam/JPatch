@@ -19,7 +19,6 @@ public class XFormNode extends SceneGraphNode {
 	/** possible orders of transform operations */
 	private static final TransformOrder[] ORDERS = new TransformOrder[] {
 		new TransformOrder(XFormOp.TRANSLATION, XFormOp.SCALE, XFormOp.ROTATION),
-		new TransformOrder(XFormOp.TRANSLATION, XFormOp.SCALE, XFormOp.ROTATION),
 		new TransformOrder(XFormOp.TRANSLATION, XFormOp.ROTATION, XFormOp.SCALE),
 		new TransformOrder(XFormOp.SCALE, XFormOp.TRANSLATION, XFormOp.ROTATION),
 		new TransformOrder(XFormOp.SCALE, XFormOp.ROTATION, XFormOp.TRANSLATION),
