@@ -30,7 +30,8 @@ public class OrthoViewDef extends AbstractViewDef {
 		return scaleAttr;
 	}
 	
-	public void computeMatrix() {
+	private void computeMatrix() {
+		//FIXME use lazy evaluation
 		int width = viewport.getComponent().getWidth();
 		int height = viewport.getComponent().getHeight();
 		double viewScale = scaleAttr.getDouble() * width * SCALE_FACTOR;
@@ -82,6 +83,7 @@ public class OrthoViewDef extends AbstractViewDef {
 		int width = viewport.getComponent().getWidth();
 		int height = viewport.getComponent().getHeight();
 		double viewScale = scaleAttr.getDouble() * width * SCALE_FACTOR;
+		computeMatrix();
 		transformUtil.setOrthographicProjection();
 		transformUtil.setWorld2Space(TransformUtil.CAMERA, matrix);
 		transformUtil.setCameraScale(viewScale);

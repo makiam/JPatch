@@ -9,7 +9,6 @@ public interface ViewDef {
 	public BooleanAttr getShowLimitSurfaceAttribute();
 	public BooleanAttr getShowProjectedMeshAttribute();
 	public StateMachine<ViewDirection> getViewDirectionAttribute();
-	public void computeMatrix();
 	public Viewport getViewport();
 	public void configureTransformUtil(TransformUtil transformUtil);
 }

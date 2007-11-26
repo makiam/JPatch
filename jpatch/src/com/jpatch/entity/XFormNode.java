@@ -1,20 +1,18 @@
 package com.jpatch.entity;
 
+import static com.jpatch.afw.vecmath.TransformUtil.LOCAL;
+
+import java.util.List;
+
 import javax.vecmath.*;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.control.JPatchUndoableEdit;
 import com.jpatch.afw.vecmath.*;
 
-public class XFormNode extends SceneGraphNode {
+public class XFormNode extends SceneGraphNode implements Transformable {
 	/** enumeration of transform operations */
-	private static enum XFormOp {
-		TRANSLATION, SCALE, AXIS_ROTATION, ROTATION;
-	
-		@Override
-		public String toString() {
-			return name().toLowerCase();
-		}
-	}
+	private static enum XFormOp { TRANSLATION, SCALE, AXIS_ROTATION, ROTATION }
 	
 	/** possible orders of transform operations */
 	private static final TransformOrder[] ORDERS = new TransformOrder[] {
@@ -27,7 +25,7 @@ public class XFormNode extends SceneGraphNode {
 	};
 	
 	/** transform order attribute */
-	protected final StateMachine<TransformOrder> transformOrderAttr = new StateMachine<TransformOrder>(ORDERS, ORDERS[0]);
+	protected final StateMachine<TransformOrder> transformOrderAttr = new StateMachine<TransformOrder>(ORDERS, ORDERS[3]);
 	
 	/** translation vector */
 	protected final Vector3d translation = new Vector3d();
@@ -68,10 +66,10 @@ public class XFormNode extends SceneGraphNode {
 	/** local transform matrix */
 	protected final Matrix4d localMatrix = new Matrix4d();
 
-	/** local axisRotation transform matrix */
+	/** world axisRotation transform matrix */
 	protected final Matrix4d axisRotation2WolrdMatrix = new Matrix4d();
 	
-	/** local transform matrix */
+	/** world transform matrix */
 	protected final Matrix4d local2WorldMatrix = new Matrix4d();
 	
 	/** lazy evaluation flag */
@@ -86,6 +84,8 @@ public class XFormNode extends SceneGraphNode {
 		}
 	};
 	
+	private final TransformableHelper transformable = new TransformableHelper();
+	
 	public XFormNode() {
 		/* add invalidation listener to attributes */
 		translationAttr.addAttributePostChangeListener(invalidationListener);
@@ -96,6 +96,10 @@ public class XFormNode extends SceneGraphNode {
 		rotationOrderAttr.addAttributePostChangeListener(invalidationListener);
 		transformOrderAttr.addAttributePostChangeListener(invalidationListener);
 	}
+	
+	/*
+	 * attribute getter methods
+	 */
 	
 	/**
 	 * Gets the axis rotation attribute
@@ -161,6 +165,42 @@ public class XFormNode extends SceneGraphNode {
 		return visibilityAttr;
 	}
 
+	/*
+	 * Transformable implementation
+	 */
+	
+	public void begin() {
+		transformable.begin();
+	}
+
+	public void end(List<JPatchUndoableEdit> editList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void rotate(Point3d pivot, AxisAngle4d axisAngle) {
+		transformable.rotate(pivot, axisAngle);
+	}
+
+	public void scale(Scale3d scale) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sync() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void translate(Vector3d vector) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	/*
+	 * public methods
+	 */
+	
 	/**
 	 * Sets the specified matrix to the axisRotation->world transformation matrix
 	 * of this node.
@@ -314,10 +354,10 @@ public class XFormNode extends SceneGraphNode {
 			/* create string representation */
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < order.length - 1; i++) {
-				sb.append(order[i]);
+				sb.append(asString(order[i]));
 				sb.append(", ");
 			}
-			sb.append(order[order.length - 1]);
+			sb.append(asString(order[order.length - 1]));
 			name = sb.toString();
 		}
 		
@@ -336,8 +376,8 @@ public class XFormNode extends SceneGraphNode {
 			}
 		}
 		
-		private void transformMatrix(XFormNode node, Matrix4d matrix, XFormOp order) {
-			switch (order) {
+		private void transformMatrix(XFormNode node, Matrix4d matrix, XFormOp xformOp) {
+			switch (xformOp) {
 			case SCALE:
 				node.scale.scaleMatrix(matrix);
 				break;
@@ -355,9 +395,43 @@ public class XFormNode extends SceneGraphNode {
 			}
 		}
 		
+		private String asString(XFormOp xformOp) {
+			switch (xformOp) {
+			case SCALE:
+				return "scale";
+			case TRANSLATION:
+				return "transl";
+			case ROTATION:
+				return "rot";
+			default:
+				throw new RuntimeException();
+			}
+		}
+		
 		@Override
 		public String toString() {
 			return name;
+		}
+	}
+	
+	private class TransformableHelper {
+		private Matrix3d startRot = new Matrix3d();
+		private Matrix3d newRot = new Matrix3d();
+		
+		public void begin() {
+			rotation.getRotationMatrix(startRot);
+		}
+		
+		public void rotate(Point3d pivot, AxisAngle4d axisAngle) {
+			newRot.set(axisAngle);
+			newRot.mul(startRot);
+			rotation.setRotation(newRot);
+//			tmp.m03 = tmp.m00 * pivot.x + tmp.m01 * pivot.y + tmp.m02 * pivot.z;
+//			tmp.m13 = tmp.m10 * pivot.x + tmp.m11 * pivot.y + tmp.m12 * pivot.z;
+//			tmp.m23 = tmp.m20 * pivot.x + tmp.m21 * pivot.y + tmp.m22 * pivot.z;
+			
+			
+//			transformUtil.setSpace2World(LOCAL, START, matrix);
 		}
 	}
 }
