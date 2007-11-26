@@ -104,6 +104,7 @@ public class Scale3d extends Tuple3d {
 	 * @throws NullPointerException if the specified parameter was null
 	 */
 	public Matrix4d scaleMatrix(Matrix4d m) {
+		System.out.println("scaling by " + x + ", " + y + ", " + z);
 		m.m00 *= x;
 		m.m01 *= x;
 		m.m02 *= x;

@@ -69,7 +69,8 @@ public class MoveVertexTool implements VisibleTool {
 		if (selection == null) {
 			return;
 		}
-		transformUtil.setTransform(LOCAL, selection.getSelectedSdsModelAttribute().getValue().getTransform());
+		selection.getSelectedSdsModelAttribute().getValue().getLocal2WorldTransform(transformUtil, LOCAL);
+//		transformUtil.setTransform(LOCAL, selection.getSelectedSdsModelAttribute().getValue().getTransform());
 		Matrix4f modelView = transformUtil.getMatrix(LOCAL, CAMERA, new Matrix4f());
 		Point3d p0 = new Point3d();
 		Point3d p1 = new Point3d();
@@ -252,7 +253,8 @@ public class MoveVertexTool implements VisibleTool {
 			this.sdsModel = sdsModel;
 			
 			viewport.getViewDef().configureTransformUtil(transformUtil);
-			transformUtil.setTransform(TransformUtil.LOCAL, sdsModel.getTransform());
+			sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
+//			transformUtil.setTransform(TransformUtil.LOCAL, sdsModel.getTransform());
 			
 			vertex.getPos(p);
 //			System.out.print("local=" + p + " screen=");

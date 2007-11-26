@@ -37,7 +37,6 @@ import javax.media.opengl.GL;
 import javax.vecmath.*;
 
 import jpatch.boundary.action.EditAnimObjectAction;
-import sun.rmi.runtime.GetThreadPoolAction;
 
 
 import static javax.media.opengl.GL.*;

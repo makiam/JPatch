@@ -48,6 +48,7 @@ import com.jpatch.entity.Camera;
 import com.jpatch.entity.SceneGraphNode;
 import com.jpatch.entity.SdsModel;
 import com.jpatch.entity.TransformNode;
+import com.jpatch.entity.XFormNode;
 import com.jpatch.entity.sds.JptLoader;
 import com.jpatch.entity.sds.Sds;
 import com.jpatch.settings.Settings;
@@ -116,10 +117,10 @@ public class Main {
 	private final SelectionManager selectionManager;
 	
 	private SceneGraphNode sceneGraphRoot = new SceneGraphNode() {
-		@Override
-		public Transform getTransform() {
-			return null;
-		}
+//		@Override
+//		public Transform getTransform() {
+//			return null;
+//		}
 	};
 	
 	private LayoutManager2 screenLayout = new LayoutManager2() {
@@ -242,7 +243,7 @@ public class Main {
 		}
 	};
 	
-	private TransformNode tmpNode;
+	private XFormNode tmpNode;
 	
 	/**
 	 * private constructor (singleton pattern)
@@ -528,8 +529,8 @@ public class Main {
 		
 		sceneGraphRoot.getNameAttribute().setValue("Origin");
 		
-		final TransformNode node1 = new TransformNode();
-		tmpNode = new TransformNode();
+		final XFormNode node1 = new XFormNode();
+		tmpNode = new XFormNode();
 //		final TransformNode node3 = new TransformNode();
 //		final TransformNode node4 = new TransformNode();
 		node1.getNameAttribute().setValue("node1");
@@ -673,8 +674,8 @@ public class Main {
 				if (source instanceof ViewDef) {
 					repaintViewport(((ViewDef) source).getViewport());
 				} else if (source instanceof SceneGraphNode) {
-					System.out.println("recomputeing scene graph");
-					computeSceneGraph((SceneGraphNode) source);
+//					System.out.println("recomputeing scene graph");
+//					computeSceneGraph((SceneGraphNode) source);
 					repaintViewports();
 				} else {
 					repaintViewports();
@@ -782,19 +783,19 @@ public class Main {
 		treeManager.removeNode(oldModel);
 	}
 	
-	public void computeSceneGraph() {
-		computeSceneGraph(sceneGraphRoot);
-	}
-	
-	public void computeSceneGraph(SceneGraphNode node) {
-		Transform transform = node.getTransform();
-		if (transform != null) {
-			transform.computeMatrix();
-		}
-		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
-			computeSceneGraph(child);
-		}
-	}
+//	public void computeSceneGraph() {
+//		computeSceneGraph(sceneGraphRoot);
+//	}
+//	
+//	public void computeSceneGraph(SceneGraphNode node) {
+//		Transform transform = node.getTransform();
+//		if (transform != null) {
+//			transform.computeMatrix();
+//		}
+//		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
+//			computeSceneGraph(child);
+//		}
+//	}
 	
 	public void repaintViewport(Viewport viewport) {
 		Component component = viewport.getComponent();

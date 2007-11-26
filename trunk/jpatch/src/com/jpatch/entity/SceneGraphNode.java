@@ -58,6 +58,8 @@ public abstract class SceneGraphNode implements NamedObject {
 		return nameAttr.getValue();
 	}
 	
+//	public abstract void computeBranch();
+	
 //	public abstract Transform getTransform();
 	
 }
