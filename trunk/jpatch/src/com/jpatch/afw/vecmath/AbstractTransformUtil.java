@@ -290,7 +290,7 @@ public abstract class AbstractTransformUtil {
 	 * Needed for cameras to turn them to face down the positive z-axis.
 	 * @param space
 	 */
-	protected void flipZAxis(int space) {
+	public void flipZAxis(int space) {
 		Matrix4d m = matrices[space][WORLD];
 		m.m00 = -m.m00;
 		m.m01 = -m.m01;

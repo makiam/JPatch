@@ -463,7 +463,7 @@ public class ViewportGl extends Viewport {
 
 			public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
 //				System.out.println("GL reshape");
-				viewDef.computeMatrix();
+//				viewDef.computeMatrix();
 //				init(drawable);
 //				display(drawable);
 			}

@@ -5,12 +5,11 @@
 		<field name="Rotation" attribute="Rotation" />
 		<field name="Scale" attribute="Scale" />
 		<group name="Advanced" expansion="embeddedTransform.advanced">
-			<field name="Visibility" attribute="Visibility" />
-	<!--	<field name="Shear" attribute="Shear" />		-->
-	<!--		<field name="Position" attribute="Position" />	-->
-	<!--	<field name="Orientation" attribute="Orientation" />	-->
-			<field name="Axis rotation" attribute="AxisRotation" />
+			<field name="Transform order" attribute="TransformOrder" />
 			<field name="Rotation order" attribute="RotationOrder" />
+			<field name="Axis rotation order" attribute="AxisRotationOrder" />
+			<field name="Axis rotation" attribute="AxisRotation" />
+			<field name="Visibility" attribute="Visibility" />
 		</group>
 		<group name="Limits" expansion="embeddedTransform.limits">
 			<group name="Translation" expansion="embeddedTransform.limits.translation">

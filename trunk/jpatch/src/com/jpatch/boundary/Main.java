@@ -800,7 +800,7 @@ public class Main {
 	public void repaintViewport(Viewport viewport) {
 		Component component = viewport.getComponent();
 		if (component.isVisible()) {
-			viewport.getViewDef().computeMatrix();
+//			viewport.getViewDef().computeMatrix();
 //			viewport.getComponent().repaint();
 			((GLAutoDrawable) component).display();
 		}
