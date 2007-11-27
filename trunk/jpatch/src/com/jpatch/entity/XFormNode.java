@@ -437,7 +437,7 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 		public void rotate(Point3d pivot, AxisAngle4d axisAngle) {
 			System.out.println("rotate");
 			newRot.set(axisAngle);
-			newRot.mul(startRot);
+			newRot.mul(startRot, newRot);
 			rotation.setRotation(newRot);
 			rotationAttr.setTuple(rotation);
 			

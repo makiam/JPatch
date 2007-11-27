@@ -181,7 +181,7 @@ public class TranslateTool implements VisibleTool {
 	}
 	
 	private void configureFor(Viewport viewport) {
-		viewport.getViewDef().computeMatrix();
+//		viewport.getViewDef().computeMatrix();
 		viewport.getViewDef().configureTransformUtil(transformUtil);
 		Main.getInstance().getSelection().configureTransformUtil(transformUtil);
 		
