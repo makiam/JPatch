@@ -8,8 +8,6 @@ import java.util.List;
 import javax.vecmath.*;
 
 public interface Transformable {
-	/* snychronize to scenegraph */
-	public void sync();
 	/* begin manipulation */
 	public void begin();
 	/* rotate */
@@ -20,4 +18,8 @@ public interface Transformable {
 	public void scale(Scale3d scale);
 	/* end manipulation */
 	public void end(List<JPatchUndoableEdit> editList);
+	/** set specified pivot to pivot this transformable's pivot */
+	public void getPivot(Point3d pivot);
+	
+	public void getBaseTransform(TransformUtil transformUtil, int space);
 }

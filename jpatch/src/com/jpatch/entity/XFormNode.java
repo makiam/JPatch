@@ -174,8 +174,7 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	}
 
 	public void end(List<JPatchUndoableEdit> editList) {
-		// TODO Auto-generated method stub
-		
+		transformable.end(editList);
 	}
 
 	public void rotate(Point3d pivot, AxisAngle4d axisAngle) {
@@ -195,6 +194,15 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	public void translate(Vector3d vector) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void getPivot(Point3d pivot) {
+		pivot.set(0, 0, 0);
+	}
+	
+	
+	public void getBaseTransform(TransformUtil transformUtil, int space) {
+		transformable.getBaseTransform(transformUtil, space);
 	}
 	
 	/*
@@ -417,15 +425,22 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	private class TransformableHelper {
 		private Matrix3d startRot = new Matrix3d();
 		private Matrix3d newRot = new Matrix3d();
+		private Matrix4d localTransform = new Matrix4d();
+		private boolean active = false;
 		
 		public void begin() {
 			rotation.getRotationMatrix(startRot);
+			getLocal2WorldTransform(localTransform);
+			active = true;
 		}
 		
 		public void rotate(Point3d pivot, AxisAngle4d axisAngle) {
+			System.out.println("rotate");
 			newRot.set(axisAngle);
 			newRot.mul(startRot);
 			rotation.setRotation(newRot);
+			rotationAttr.setTuple(rotation);
+			
 //			tmp.m03 = tmp.m00 * pivot.x + tmp.m01 * pivot.y + tmp.m02 * pivot.z;
 //			tmp.m13 = tmp.m10 * pivot.x + tmp.m11 * pivot.y + tmp.m12 * pivot.z;
 //			tmp.m23 = tmp.m20 * pivot.x + tmp.m21 * pivot.y + tmp.m22 * pivot.z;
@@ -433,5 +448,18 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 			
 //			transformUtil.setSpace2World(LOCAL, START, matrix);
 		}
+		
+		public void end(List<JPatchUndoableEdit> editList) {
+			active = false;
+		}
+		
+		public void getBaseTransform(TransformUtil transformUtil, int space) {
+			if (active) {
+				transformUtil.setSpace2World(space, localTransform);
+			} else {
+				getLocal2WorldTransform(transformUtil, space);
+			}
+		}
+		
 	}
 }

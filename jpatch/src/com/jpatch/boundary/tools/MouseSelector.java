@@ -50,7 +50,7 @@ public class MouseSelector {
 		Point3d p = new Point3d();
 //		System.out.println("getVertexAt(" + x + ", " + y + ")");
 		viewDef.configureTransformUtil(transformUtil);
-		transformUtil.setTransform(LOCAL, sdsModel.getTransform());
+		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
 		for (Face face : sdsModel.getSds().faceList) {
 			for (HalfEdge edge : face.getEdges()) {
 				TopLevelVertex vertex = edge.getFirstVertex();
@@ -75,7 +75,7 @@ public class MouseSelector {
 		ViewDef viewDef = viewport.getViewDef();
 		
 		viewDef.configureTransformUtil(transformUtil);
-		transformUtil.setTransform(LOCAL, sdsModel.getTransform());
+		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
 		
 		/* ensure that x0 is the left side and x1 is the right side (x0 < x1) */
 		if (x1 < x0) {
@@ -109,7 +109,7 @@ public class MouseSelector {
 		ViewDef viewDef = viewport.getViewDef();
 		
 		viewDef.configureTransformUtil(transformUtil);
-		transformUtil.setTransform(LOCAL, sdsModel.getTransform());
+		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
 		
 //		Matrix4d matrix = viewport.getViewDef().getMatrix(new Matrix4d());
 		Point3d p0 = new Point3d();
