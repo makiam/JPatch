@@ -11,10 +11,11 @@ import com.jpatch.afw.vecmath.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds.*;
 
-public class Selection extends AbstractTransformable {
+public class Selection implements Transformable {
 	private final GenericAttr<SdsModel> selectedSdsModelAttr = new GenericAttr<SdsModel>();
 	private final CollectionAttr<AbstractVertex> selectedVerticesAttr = new CollectionAttr<AbstractVertex>(LinkedHashSet.class);
 	private Point3d[] startPositions;
+	private Matrix4d matrix = new Matrix4d();
 	
 	public GenericAttr<SdsModel> getSelectedSdsModelAttribute() {
 		return selectedSdsModelAttr;
@@ -76,12 +77,6 @@ public class Selection extends AbstractTransformable {
 		center.set(mb.center());
 	}
 	
-
-
-	public void configureTransformUtil(TransformUtil transformUtil) {
-		transformUtil.setTransform(TransformUtil.LOCAL, selectedSdsModelAttr.getValue().getTransform());
-	}
-	
 	public void begin() {
 		int count = selectedVerticesAttr.getElements().size();
 		startPositions = new Point3d[count];
@@ -101,13 +96,16 @@ public class Selection extends AbstractTransformable {
 		}
 	}
 
-	public void rotateTo(Point3d pivot, AxisAngle4d axisAngle) {
-		super.rotateTo(pivot, axisAngle);
-		transformVertices();
-	}
-
-	public void transform(Matrix4d matrix) {
-		super.transform(matrix);
+	public void rotate(Point3d pivot, AxisAngle4d axisAngle) {
+		/* set matrix to the rotation matrix specified by axisAngle around specivied pivot */
+		matrix.set(axisAngle);
+		matrix.m03 = pivot.x;
+		matrix.m13 = pivot.y;
+		matrix.m23 = pivot.z;
+		
+		matrix.m03 = pivot.x - matrix.m00 * pivot.x - matrix.m01 * pivot.y - matrix.m02 * pivot.z;
+		matrix.m13 = pivot.y - matrix.m10 * pivot.x - matrix.m11 * pivot.y - matrix.m12 * pivot.z;
+		matrix.m23 = pivot.z - matrix.m20 * pivot.x - matrix.m21 * pivot.y - matrix.m22 * pivot.z;
 		transformVertices();
 	}
 
@@ -121,10 +119,20 @@ public class Selection extends AbstractTransformable {
 		}
 	}
 
-	public void sync() {
-		// TODO Auto-generated method stub
-		
+	public void scale(Scale3d scale) {
+		matrix.setIdentity();
+		scale.getScaleMatrix(matrix);
+	}
+
+	public void translate(Vector3d vector) {
+		matrix.set(vector);
 	}
 	
+	public void getBaseTransform(TransformUtil transformUtil, int space) {
+		selectedSdsModelAttr.getValue().getLocal2WorldTransform(transformUtil, space);
+	}
 	
+	public void getPivot(Point3d pivot) {
+		getCenter(pivot, null);
+	}
 }

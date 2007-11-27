@@ -437,6 +437,13 @@ public class Main {
 		actions.toolSM.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				StateMachine<JPatchTool> sm = (StateMachine<JPatchTool>) source;
+				if (sm.getValue() instanceof RotateTool) {
+					if (actions.sdsModeSM.getValue() == Actions.SdsMode.OBJECT_MODE) {
+						((RotateTool) sm.getValue()).setTransformable((XFormNode) selectionManager.getSelectedObjectAttribute().getValue());
+					} else {
+						((RotateTool) sm.getValue()).setTransformable(selection);
+					}
+				}
 				sm.getValue().registerListeners(viewports);
 			}
 		});
