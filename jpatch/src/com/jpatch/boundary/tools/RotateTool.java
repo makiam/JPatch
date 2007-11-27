@@ -691,19 +691,29 @@ public class RotateTool implements VisibleTool {
 					editList.add(AttributeEdit.changeAttribute(Main.getInstance().getActions().toolSM, LastModifierTool.getInstance().get(), false));
 					LastModifierTool.getInstance().set(RotateTool.this);
 				}
+				Matrix4d old1Matrix = new Matrix4d();
 				Matrix4d oldMatrix = new Matrix4d();
 				Matrix4d newMatrix = new Matrix4d();
+				Matrix4d new1Matrix = new Matrix4d();
 				transformUtil.getMatrix(LOCAL, WORLD, oldMatrix);
+				transformUtil.getMatrix(WORLD, LOCAL, old1Matrix);
 				transformable.end(editList);
 				transformable.getBaseTransform(transformUtil, LOCAL);
 				transformUtil.getMatrix(WORLD, LOCAL, newMatrix);
+				transformUtil.getMatrix(LOCAL, WORLD, new1Matrix);
 				Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
+				
+				new1Matrix.mul(newMatrix, oldMatrix);
+//				System.out.println("old=" + oldMatrix);
+				System.out.println("new*old=" + new1Matrix);
 				
 				Matrix4d m = new Matrix4d();
 				m.setIdentity();
 				rotation.getRotationMatrix(m);
-				m.mul(newMatrix);
-				m.mul(oldMatrix);
+//				m.mul(newMatrix);
+//				m.mul(oldMatrix);
+				m.mul(new1Matrix);
+
 				Matrix3d mm = new Matrix3d();
 				m.getRotationScale(mm);
 				rotation.setRotation(mm);
@@ -804,8 +814,8 @@ public class RotateTool implements VisibleTool {
 			
 			Matrix4d matrix = new Matrix4d();
 			
-			transformUtil.getMatrix(LOCAL, WORLD, matrix);
-			System.out.println(matrix);
+//			transformUtil.getMatrix(LOCAL, WORLD, matrix);
+//			System.out.println(matrix);
 			
 //			/* compute rotation matrix */
 ////			Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getTransform().getMatrix(matrix);
