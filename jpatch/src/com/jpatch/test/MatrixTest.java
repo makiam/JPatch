@@ -34,32 +34,26 @@ public class MatrixTest {
 //		rot.rotateMatrix(concat);
 //		System.out.println("rot(translateX10) = " + concat);
 		
-		Matrix4d a = new Matrix4d();
-		Matrix4d b = new Matrix4d();
-		Matrix4d ab = new Matrix4d();
+		Matrix4d r = new Matrix4d();
+		Matrix4d o = new Matrix4d();
+		Matrix4d n = new Matrix4d();
+		Matrix4d n1 = new Matrix4d();
+		Matrix4d r2 = new Matrix4d();
+		Matrix4d tmp = new Matrix4d();
 		
-		randomize(a);
-		randomize(b);
+		randomize(r);
+		randomize(o);
+		randomize(n);
+		n1.invert(n);
 		
-		ab.mul(a, b);
+		r2.mul(r, o);
+		r2.mul(n1);
 		
-		System.out.println("A=" + a);
-		System.out.println("B=" + b);
-		System.out.println("AxB=" + ab);
+		tmp.mul(r, o);
+		System.out.println("rot x old = " + tmp);
+		tmp.mul(r2, n);
+		System.out.println("rot2 x new" + tmp);
 		
-		Matrix4d a1 = new Matrix4d();
-		a1.invert(a);
-		Matrix4d b1 = new Matrix4d();
-		b1.invert(b);
-		Matrix4d ab1 = new Matrix4d();
-		ab1.invert(ab);
-		
-		a.mul(ab, b1);
-//		b.mul(a1);
-//		a.invert();
-		System.out.println("A=" + a);
-//		b.invert();
-//		System.out.println("B1=" + b);
 		
 		/*
 		 * AB = A x B
