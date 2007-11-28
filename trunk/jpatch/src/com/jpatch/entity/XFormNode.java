@@ -7,6 +7,7 @@ import java.util.List;
 import javax.vecmath.*;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.control.AttributeEdit;
 import com.jpatch.afw.control.JPatchUndoableEdit;
 import com.jpatch.afw.vecmath.*;
 
@@ -423,35 +424,29 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	}
 	
 	private class TransformableHelper {
+		private Rotation3d rStart = new Rotation3d();
 		private Matrix3d startRot = new Matrix3d();
 		private Matrix3d newRot = new Matrix3d();
 		private Matrix4d localTransform = new Matrix4d();
 		private boolean active = false;
 		
 		public void begin() {
+			rStart.set(rotation);
 			rotation.getRotationMatrix(startRot);
 			getLocal2WorldTransform(localTransform);
 			active = true;
 		}
 		
 		public void rotate(Point3d pivot, AxisAngle4d axisAngle) {
-			System.out.println("rotate");
 			newRot.set(axisAngle);
 			newRot.mul(startRot, newRot);
-//			newRot.mul(startRot);
 			rotation.setRotation(newRot);
 			rotationAttr.setTuple(rotation);
-			
-//			tmp.m03 = tmp.m00 * pivot.x + tmp.m01 * pivot.y + tmp.m02 * pivot.z;
-//			tmp.m13 = tmp.m10 * pivot.x + tmp.m11 * pivot.y + tmp.m12 * pivot.z;
-//			tmp.m23 = tmp.m20 * pivot.x + tmp.m21 * pivot.y + tmp.m22 * pivot.z;
-			
-			
-//			transformUtil.setSpace2World(LOCAL, START, matrix);
 		}
 		
 		public void end(List<JPatchUndoableEdit> editList) {
 			active = false;
+			editList.add(AttributeEdit.changeAttribute(rotationAttr, rStart, false));
 		}
 		
 		public void getBaseTransform(TransformUtil transformUtil, int space) {
