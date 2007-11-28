@@ -675,6 +675,8 @@ public class RotateTool implements VisibleTool {
 		public void mouseReleased(MouseEvent e) {
 			if (mouseMotionListener != null) {
 				viewport.getComponent().removeMouseMotionListener(mouseMotionListener);
+				ViewportVars vv = new ViewportVars(viewport);
+				
 				mouseMotionListener = null;
 //				Matrix3d m = new Matrix3d();
 //				rotation.getRotationMatrix(m);
@@ -695,27 +697,28 @@ public class RotateTool implements VisibleTool {
 				Matrix4d oldMatrix = new Matrix4d();
 				Matrix4d newMatrix = new Matrix4d();
 				Matrix4d new1Matrix = new Matrix4d();
-				transformUtil.getMatrix(LOCAL, WORLD, oldMatrix);
-				transformUtil.getMatrix(WORLD, LOCAL, old1Matrix);
+				transformUtil.getMatrix(LOCAL, START_ROTATION, oldMatrix);
 				transformable.end(editList);
 				transformable.getBaseTransform(transformUtil, LOCAL);
-				transformUtil.getMatrix(WORLD, LOCAL, newMatrix);
-				transformUtil.getMatrix(LOCAL, WORLD, new1Matrix);
+				transformUtil.getMatrix(START_ROTATION, LOCAL, newMatrix);
+				
+				
 				Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
 				
-				new1Matrix.mul(newMatrix, oldMatrix);
+//				new1Matrix.mul(newMatrix, oldMatrix);
 //				System.out.println("old=" + oldMatrix);
-				System.out.println("new*old=" + new1Matrix);
+//				System.out.println("new*old=" + new1Matrix);
 				
-				Matrix4d m = new Matrix4d();
-				m.setIdentity();
-				rotation.getRotationMatrix(m);
-//				m.mul(newMatrix);
-//				m.mul(oldMatrix);
-				m.mul(new1Matrix);
+				Matrix4d rot = new Matrix4d();
+				rot.setIdentity();
+				rotation.getRotationMatrix(rot);
+//				m.mul(new1Matrix);
 
+				rot.mul(oldMatrix);
+				rot.mul(newMatrix);
+				
 				Matrix3d mm = new Matrix3d();
-				m.getRotationScale(mm);
+				rot.getRotationScale(mm);
 				rotation.setRotation(mm);
 				startRotation.set(rotation);
 				Main.getInstance().repaintViewports();
