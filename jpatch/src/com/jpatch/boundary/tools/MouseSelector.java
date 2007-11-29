@@ -47,6 +47,7 @@ public class MouseSelector {
 //		transform.mul2(matrix);
 		
 //		Matrix4d matrix = viewport.getViewDef().getMatrix(new Matrix4d());
+		boolean useProjection = !viewport.getViewDef().getShowControlMeshAttribute().getBoolean();
 		Point3d p = new Point3d();
 //		System.out.println("getVertexAt(" + x + ", " + y + ")");
 		viewDef.configureTransformUtil(transformUtil);
@@ -54,7 +55,11 @@ public class MouseSelector {
 		for (Face face : sdsModel.getSds().faceList) {
 			for (HalfEdge edge : face.getEdges()) {
 				TopLevelVertex vertex = edge.getFirstVertex();
-				vertex.getPos(p);
+				if (useProjection) {
+					vertex.vertexPoint.limit.get(p);
+				} else {
+					vertex.getPos(p);
+				}
 				transformUtil.projectToScreen(transformUtil.LOCAL, p, p);
 				double dx = x - p.x;
 				double dy = y - p.y;
@@ -91,12 +96,16 @@ public class MouseSelector {
 			y1 = tmp;
 		}
 		
-		System.out.println("x:" + x0 + " " + x1 + " y:" + y0 + " " + y1);
 		Point3d p = new Point3d();
+		boolean useProjection = !viewport.getViewDef().getShowControlMeshAttribute().getBoolean();
 		for (Face face : sdsModel.getSds().faceList) {
 			for (HalfEdge edge : face.getEdges()) {
 				TopLevelVertex vertex = edge.getFirstVertex();
-				vertex.getPos(p);
+				if (useProjection) {
+					vertex.vertexPoint.limit.get(p);
+				} else {
+					vertex.getPos(p);
+				}
 				transformUtil.projectToScreen(transformUtil.LOCAL, p, p);
 				if (p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1) {
 					selectedVertices.add(vertex);

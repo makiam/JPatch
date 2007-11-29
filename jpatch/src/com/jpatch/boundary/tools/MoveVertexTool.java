@@ -29,6 +29,7 @@ import javax.vecmath.Matrix4d;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
+import javax.vecmath.Vector3d;
 
 import jpatch.boundary.settings.Settings;
 
@@ -240,10 +241,15 @@ public class MoveVertexTool implements VisibleTool {
 	private static class MoveVertexMouseMotionListener extends MouseMotionAdapter {
 		private final Viewport viewport;
 		private final TopLevelVertex vertex;
+		private final Point3d pStart = new Point3d();
+		private final Point3d limitStart = new Point3d();
+		private final Point3d k = new Point3d();
 		private final Point3d p = new Point3d();
+		private final Vector3d v = new Vector3d();
 		private final SdsModel sdsModel;
 		private final TransformUtil transformUtil = new TransformUtil();
 		double z;
+		boolean useLimit;
 //		Point3d pos = new Point3d();
 //		Point3d limit = new Point3d();
 		
@@ -252,11 +258,24 @@ public class MoveVertexTool implements VisibleTool {
 			this.vertex = vertex;
 			this.sdsModel = sdsModel;
 			
+			useLimit = !viewport.getViewDef().getShowControlMeshAttribute().getBoolean();
+			
 			viewport.getViewDef().configureTransformUtil(transformUtil);
 			sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
 //			transformUtil.setTransform(TransformUtil.LOCAL, sdsModel.getTransform());
 			
-			vertex.getPos(p);
+			vertex.vertexPoint.limit.get(limitStart);
+			vertex.getPos(pStart);
+			if (useLimit) {
+				p.set(limitStart);
+				k.set(pStart);
+				k.scale(vertex.getLimitFactor());
+				k.sub(limitStart, k);
+			} else {
+				p.set(pStart);
+			}
+			
+			
 //			System.out.print("local=" + p + " screen=");
 			transformUtil.projectToScreen(transformUtil.LOCAL, p, p);
 //			System.out.println(p);
@@ -265,6 +284,8 @@ public class MoveVertexTool implements VisibleTool {
 //			System.out.println("local=" + p2);
 //			System.out.println(transformUtil);
 			z = p.z;
+			
+			
 		}
 		
 		@Override
@@ -275,6 +296,13 @@ public class MoveVertexTool implements VisibleTool {
 //			System.out.println("Pscreen =" + p);
 //			System.out.print("screen=" + p + " local=");
 			transformUtil.projectFromScreen(transformUtil.LOCAL, p, p);
+			
+			
+			if (useLimit) {
+				p.sub(k);
+				p.scale(1.0 / vertex.getLimitFactor());
+			} 
+				
 //			System.out.println(p);
 //			System.out.println("Pworld  =" + p);
 //			p.sub(limit);

@@ -27,6 +27,7 @@ public class TopLevelVertex extends BaseVertex {
 	int valence = -1;
 
 	HalfEdge creaseEdge0, creaseEdge1;
+	double limitFactor;
 	
 //	final Iterable<Face> faceIterable = new Iterable<Face>() {
 //		public Iterator<Face> iterator() {
@@ -88,6 +89,7 @@ public class TopLevelVertex extends BaseVertex {
 				if (!overridePosition.getBoolean()) {
 					if (TopLevelVertex.this.corner > 0) {
 						position.setTuple(TopLevelVertex.this.position);
+						limitFactor = 1.0;
 					} else if (TopLevelVertex.this.crease > 0) {
 						Tuple3Attr p0 = TopLevelVertex.this.position;
 						Tuple3Attr p1 = TopLevelVertex.this.creaseEdge0.pair.vertex.position;
@@ -97,6 +99,7 @@ public class TopLevelVertex extends BaseVertex {
 								p0.getY() * CREASE0 + (p1.getY() + p2.getY()) * CREASE1,
 								p0.getZ() * CREASE0 + (p1.getZ() + p2.getZ()) * CREASE1
 						);
+						limitFactor = CREASE_LIMIT0;
 					}
 					if (TopLevelVertex.this.corner < 1 && TopLevelVertex.this.crease < 1) {
 						final double k = 1.0 / (valence * valence);
@@ -122,6 +125,7 @@ public class TopLevelVertex extends BaseVertex {
 								smoothY * t1 + position.getY() * t,
 								smoothZ * t1 + position.getZ() * t
 						);
+						limitFactor = (VERTEX_POINT_LIMIT[valence] * t1 + t);
 					}
 				}
 				if (!overrideSharpness.getBoolean()) {
@@ -235,6 +239,10 @@ public class TopLevelVertex extends BaseVertex {
 	
 	public int getValence() {
 		return valence;
+	}
+	
+	public double getLimitFactor() {
+		return limitFactor;
 	}
 	
 	public LinearCombination<TopLevelVertex> getVertexPointLc() {
