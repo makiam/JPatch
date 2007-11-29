@@ -19,6 +19,7 @@ import java.util.*;
 
 import javax.media.opengl.*;
 import static javax.media.opengl.GL.*;
+
 import javax.vecmath.*;
 
 
@@ -685,8 +686,8 @@ public class ViewportGl extends Viewport {
 		}
 		Point3d p = new Point3d();
 		transformUtil.projectToScreen(LOCAL, p, p);
-		if (node instanceof TransformNode) {
-			drawString(((TransformNode) node).getNameAttribute().getValue(), (int) p.x, (int) p.y);
+		if (node instanceof XFormNode) {
+			drawString(((XFormNode) node).getNameAttribute().getValue(), (int) p.x, (int) p.y);
 		}
 		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
 			drawSceneGraphNames(child);
@@ -1005,6 +1006,36 @@ public class ViewportGl extends Viewport {
 			}
 			gl.glEnd();
 		}
+		
+		Point3f p0 = new Point3f();
+		Point3f p1 = new Point3f();
+		if (!getViewDef().getShowControlMeshAttribute().getBoolean() && selection.getVertexCount() > 1) {
+			for (int pass = 0; pass < 4; pass++) {
+				if (pass < 2) {
+					gl.glColor4f(1, 1, 0, 0.15f);
+					gl.glDisable(GL_DEPTH_TEST);
+				} else {
+					gl.glColor4f(1, 1, 0, 0.5f);
+					gl.glEnable(GL_DEPTH_TEST);
+				}
+				if (pass == 0 || pass == 2) {
+					gl.glBegin(GL_LINES);
+				} else {
+					gl.glBegin(GL_POINTS);
+				}
+				for (AbstractVertex av : selection.getSelectedVerticesAttribute().getElements()) {
+					TopLevelVertex v = (TopLevelVertex) av;
+					p0.set(v.projectedPos);
+					gl.glVertex3f(p0.x, p0.y, p0.z);
+					if (pass == 0 || pass == 2) {
+						p1.set(v.vertexPoint.projectedLimit);
+						gl.glVertex3f(p1.x, p1.y, p1.z);
+					}
+				}
+				gl.glEnd();
+			}
+		}
+		
 		gl.glPointSize(3);
 	}
 	

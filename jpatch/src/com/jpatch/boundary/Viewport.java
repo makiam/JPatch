@@ -1,6 +1,7 @@
 package com.jpatch.boundary;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.ui.AttributeManager;
 import com.jpatch.entity.Perspective;
 import com.jpatch.settings.*;
 import com.sun.opengl.impl.GLWorkerThread;
@@ -76,6 +77,19 @@ public abstract class Viewport implements NamedObject {
 //				viewTypeAttr.getValue().setViewport(Viewport.this);
 //			}
 //		});
+		showLimitSurfaceAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
+			private boolean showProj;
+			public void attributeHasChanged(Attribute source) {
+				if (!showLimitSurfaceAttr.getBoolean()) {
+					showProj = showProjectedMeshAttr.getBoolean();
+					showProjectedMeshAttr.setBoolean(false);
+					AttributeManager.getInstance().lock(showProjectedMeshAttr);
+				} else {
+					AttributeManager.getInstance().unlock(showProjectedMeshAttr);
+					showProjectedMeshAttr.setBoolean(showProj);
+				}
+			}
+		});
 		
 	}
 

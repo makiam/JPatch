@@ -448,6 +448,7 @@ public class Main {
 			}
 		});
 		
+		
 //		selection.getSelectedSdsModelAttribute().addAttributePostChangeListener(new AttributePostChangeListener() {
 //
 //			public void attributeHasChanged(Attribute source) {
@@ -670,6 +671,17 @@ public class Main {
 		selectionManager = new SelectionManager(tree, treeManager);
 		selectionManager.getSelectedObjectAttribute().addAttributePostChangeListener(inspector.getSelectionChangeListener());
 		actions.toolSM.addAttributePostChangeListener(inspector.getToolChangeListener());
+		
+		selectionManager.getSelectedObjectAttribute().addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				if (actions.toolSM.getValue() instanceof RotateTool) {
+					if (actions.sdsModeSM.getValue() == Actions.SdsMode.OBJECT_MODE) {
+						((RotateTool) actions.toolSM.getValue()).setTransformable((XFormNode) selectionManager.getSelectedObjectAttribute().getValue());
+						repaintViewports();
+					}
+				}
+			}
+		});
 		
 		AttributeManager.getInstance().addUserInputListener(new UserInputListener() {
 			public void userInput(Object source, Attribute attr) {
