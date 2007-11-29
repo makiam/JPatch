@@ -40,7 +40,7 @@ import jpatch.boundary.action.EditAnimObjectAction;
 
 import static javax.media.opengl.GL.*;
 
-public class RotateTool implements VisibleTool {
+public class RotateTool implements ModifierTool, VisibleTool {
 	public static final GenericAttr<String> EDIT_NAME = new GenericAttr<String>("rotate");
 	private static final double SCREEN_ROTATE_FACTOR = 1.2;
 	private static final int SEGMENTS = 128;
@@ -79,8 +79,8 @@ public class RotateTool implements VisibleTool {
 	private TransformUtil transformUtil = new TransformUtil("startLocal", "startRotation", "rotation");
 //	private static final int AXIS_ROTATION = 3;
 //	private static final int START_LOCAL = 3;
-	private static final int START_ROTATION = 4;
-	private static final int ROTATION = 5;
+	private static final int START_ROTATION = 3;
+	private static final int ROTATION = 4;
 	
 	private Transformable transformable;
 	

@@ -24,8 +24,9 @@ import com.jpatch.afw.vecmath.*;
 import com.jpatch.boundary.*;
 
 import com.jpatch.entity.GlMaterial;
+import com.jpatch.entity.Transformable;
 
-public class TranslateTool implements VisibleTool {
+public class TranslateTool implements ModifierTool, VisibleTool {
 	public static final GenericAttr<String> EDIT_NAME = new GenericAttr<String>("translate");
 	private static float ARROW_WIDTH = 0.05f;
 	private static float ARROW_LENGTH = 0.1f;
@@ -127,8 +128,12 @@ public class TranslateTool implements VisibleTool {
 			}
 	);
 	
-	private TransformUtil transformUtil = new TransformUtil("axis_rotation");
+	private TransformUtil transformUtil = new TransformUtil("translation", "axis_rotation");
+	
 	private static final int AXIS_ROTATION = 3;
+	private static final int TRANSLATION = 4;
+	
+	private Transformable transformable;
 	
 	private double radius;
 	
@@ -180,10 +185,16 @@ public class TranslateTool implements VisibleTool {
 		mouseListeners = null;
 	}
 	
+	public void setTransformable(Transformable transformable) {
+		this.transformable = transformable;
+		transformable.getPivot(pivot);
+	}
+	
 	private void configureFor(Viewport viewport) {
 //		viewport.getViewDef().computeMatrix();
 		viewport.getViewDef().configureTransformUtil(transformUtil);
-		Main.getInstance().getSelection().configureTransformUtil(transformUtil);
+		transformable.getBaseTransform(transformUtil, LOCAL);
+//		Main.getInstance().getSelection().configureTransformUtil(transformUtil);
 		
 		/* set the transformUtil's local->world matrix's scale to 1.0 */
 		transformUtil.setScale(LOCAL, WORLD, 1.0);
@@ -417,9 +428,10 @@ public class TranslateTool implements VisibleTool {
 			axisRotation.getRotationMatrix(new Matrix3d()).transform(vector2);
 //			System.out.println(vector);
 //			transformUtil.transform(AXIS_ROTATION, vector, vector);
-			transformMatrix.setTranslation(vector2);
-			Selection selection = Main.getInstance().getSelection();
-			selection.transform(transformMatrix);
+//			transformMatrix.setTranslation(vector2);
+//			Selection selection = Main.getInstance().getSelection();
+//			selection.transform(transformMatrix);
+			transformable.translate(vector2);
 			Main.getInstance().syncRepaintViewport(viewport);
 		}
 	}
