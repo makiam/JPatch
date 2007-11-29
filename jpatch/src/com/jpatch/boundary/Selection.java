@@ -122,10 +122,12 @@ public class Selection implements Transformable {
 	public void scale(Scale3d scale) {
 		matrix.setIdentity();
 		scale.getScaleMatrix(matrix);
+		transformVertices();
 	}
 
 	public void translate(Vector3d vector) {
 		matrix.set(vector);
+		transformVertices();
 	}
 	
 	public void getBaseTransform(TransformUtil transformUtil, int space) {

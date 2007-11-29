@@ -193,8 +193,7 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	}
 
 	public void translate(Vector3d vector) {
-		// TODO Auto-generated method stub
-		
+		transformable.translate(vector);
 	}
 	
 	public void getPivot(Point3d pivot) {
@@ -425,12 +424,14 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	
 	private class TransformableHelper {
 		private Rotation3d rStart = new Rotation3d();
+		private Vector3d startTranslation = new Vector3d();
 		private Matrix3d startRot = new Matrix3d();
 		private Matrix3d newRot = new Matrix3d();
 		private Matrix4d localTransform = new Matrix4d();
 		private boolean active = false;
 		
 		public void begin() {
+			startTranslation.set(translation);
 			rStart.set(rotation);
 			rotation.getRotationMatrix(startRot);
 			getLocal2WorldTransform(localTransform);
@@ -442,6 +443,11 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 			newRot.mul(startRot, newRot);
 			rotation.setRotation(newRot);
 			rotationAttr.setTuple(rotation);
+		}
+		
+		public void translate(Vector3d vector) {
+			translation.add(startTranslation, vector);
+			translationAttr.setTuple(translation);
 		}
 		
 		public void end(List<JPatchUndoableEdit> editList) {

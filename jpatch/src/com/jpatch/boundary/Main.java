@@ -42,6 +42,7 @@ import com.jpatch.boundary.actions.Actions;
 import com.jpatch.boundary.actions.Actions.ViewportMode;
 import com.jpatch.boundary.tools.JPatchTool;
 import com.jpatch.boundary.tools.LastModifierTool;
+import com.jpatch.boundary.tools.ModifierTool;
 import com.jpatch.boundary.tools.RotateTool;
 import com.jpatch.boundary.tools.VisibleTool;
 import com.jpatch.entity.Camera;
@@ -437,11 +438,11 @@ public class Main {
 		actions.toolSM.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				StateMachine<JPatchTool> sm = (StateMachine<JPatchTool>) source;
-				if (sm.getValue() instanceof RotateTool) {
+				if (sm.getValue() instanceof ModifierTool) {
 					if (actions.sdsModeSM.getValue() == Actions.SdsMode.OBJECT_MODE) {
-						((RotateTool) sm.getValue()).setTransformable((XFormNode) selectionManager.getSelectedObjectAttribute().getValue());
+						((ModifierTool) sm.getValue()).setTransformable((XFormNode) selectionManager.getSelectedObjectAttribute().getValue());
 					} else {
-						((RotateTool) sm.getValue()).setTransformable(selection);
+						((ModifierTool) sm.getValue()).setTransformable(selection);
 					}
 				}
 				sm.getValue().registerListeners(viewports);
@@ -674,9 +675,9 @@ public class Main {
 		
 		selectionManager.getSelectedObjectAttribute().addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
-				if (actions.toolSM.getValue() instanceof RotateTool) {
+				if (actions.toolSM.getValue() instanceof ModifierTool) {
 					if (actions.sdsModeSM.getValue() == Actions.SdsMode.OBJECT_MODE) {
-						((RotateTool) actions.toolSM.getValue()).setTransformable((XFormNode) selectionManager.getSelectedObjectAttribute().getValue());
+						((ModifierTool) actions.toolSM.getValue()).setTransformable((XFormNode) selectionManager.getSelectedObjectAttribute().getValue());
 						repaintViewports();
 					}
 				}
