@@ -136,6 +136,8 @@ public class MoveVertexTool implements VisibleTool {
 		gl.glVertex3f(p010.x, p010.y, p010.z); gl.glVertex3f(p110.x, p110.y, p110.z);
 		gl.glVertex3f(p011.x, p011.y, p011.z); gl.glVertex3f(p111.x, p111.y, p111.z);
 		gl.glEnd();
+		
+		
 		gl.glDisable(GL_BLEND);
 		gl.glDisable(GL_LINE_SMOOTH);
 	}

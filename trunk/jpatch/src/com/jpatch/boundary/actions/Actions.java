@@ -99,6 +99,10 @@ public class Actions {
 		scaleTool.getEnabled().setBoolean(false);
 		save.getEnabled().setBoolean(false);
 		
+		snapToGrid.getEnabled().setBoolean(false);
+		edgeMode.getEnabled().setBoolean(false);
+		faceMode.getEnabled().setBoolean(false);
+		
 		/*
 		 * configure undo and redo actions
 		 */
