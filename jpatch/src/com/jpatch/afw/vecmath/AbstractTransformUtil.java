@@ -104,7 +104,9 @@ public abstract class AbstractTransformUtil {
 	public void setSpace2World(int fromSpace, int toSpace, Matrix4d matrix) {
 		validateMatrix(toSpace, WORLD);
 		setSpace2WorldImpl(fromSpace, matrices[toSpace][WORLD]);
-		matrices[fromSpace][WORLD].mul(matrix);
+		if (matrix != null) {
+			matrices[fromSpace][WORLD].mul(matrix);
+		}
 	}
 	
 	/**
