@@ -95,7 +95,8 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 	private final Point3d pivot = new Point3d();
 	private final Point3d cameraPivot = new Point3d();
 	
-	private final Vector3d vector = new Vector3d(2, 1, 0);
+	private final Vector3d startVector = new Vector3d();
+	private final Vector3d vector = new Vector3d();
 	private final Rotation3d axisRotation = new Rotation3d();
 	private final StateMachine<Integer> modeAttr = new StateMachine<Integer>(new Integer[] { 3, 6 }, 3);
 	private final static Shape arrow = new Shape(
@@ -128,10 +129,13 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 			}
 	);
 	
-	private TransformUtil transformUtil = new TransformUtil("translation", "axis_rotation");
+	private TransformUtil transformUtil = new TransformUtil("base", "axisRotation", "start");
+	private static final int BASE = 3;
+	private static final int AXIS_R = 4;
+	private static final int START = 5;
 	
-	private static final int AXIS_ROTATION = 3;
-	private static final int TRANSLATION = 4;
+//	private static final int AXIS_ROTATION = 3;
+//	private static final int TRANSLATION = 4;
 	
 	private Transformable transformable;
 	
@@ -188,18 +192,22 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 	public void setTransformable(Transformable transformable) {
 		this.transformable = transformable;
 		transformable.getPivot(pivot);
+		vector.set(0, 0, 0);
+		startVector.set(0, 0, 0);
+		axisRotationAttr.setTuple(0, 0, 0);
+		
 	}
 	
 	private void configureFor(Viewport viewport) {
 //		viewport.getViewDef().computeMatrix();
 		viewport.getViewDef().configureTransformUtil(transformUtil);
-		transformable.getBaseTransform(transformUtil, LOCAL);
+		transformable.getBaseTransform(transformUtil, BASE);
 //		Main.getInstance().getSelection().configureTransformUtil(transformUtil);
 		
 		/* set the transformUtil's local->world matrix's scale to 1.0 */
-		transformUtil.setScale(LOCAL, WORLD, 1.0);
+		transformUtil.setScale(BASE, WORLD, 1.0);
 		
-		transformUtil.transform(LOCAL, pivot, CAMERA, cameraPivot);
+		transformUtil.transform(BASE, pivot, CAMERA, cameraPivot);
 		/*
 		 * set the radius so that the tool will occupy about 1/3rd of the screen
 		 */
@@ -209,7 +217,10 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 		
 		/* compute rotation matrix */
 		axisRotation.getRotationMatrix(matrix);
-		matrix.mul(radius);
+//		matrix.mul(radius);
+		
+		Vector3d v = new Vector3d(startVector);
+		matrix.transform(v);
 		
 		/* add pivot translation */
 		matrix.m03 = pivot.x;
@@ -218,7 +229,25 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 		matrix.m33 = 1;
 		
 		/* set local2world to rotate-tool matrix */ 
-		transformUtil.setSpace2World(AXIS_ROTATION, LOCAL, matrix);
+		transformUtil.setSpace2World(AXIS_R, BASE, matrix);
+		
+//		v.set(vector);
+//		matrix.transform(v);
+//		
+//		/* add pivot translation */
+//		matrix.m03 = pivot.x + v.x;
+//		matrix.m13 = pivot.y + v.y;
+//		matrix.m23 = pivot.z + v.z;
+//		matrix.m33 = 1;
+		
+		matrix.set(startVector);
+//		System.out.println(matrix);
+		transformUtil.setSpace2World(START, AXIS_R, matrix);
+		
+		v.add(startVector, vector);
+		matrix.set(v);
+		transformUtil.setSpace2World(LOCAL, AXIS_R, matrix);
+		
 	}
 	
 	public void draw(Viewport viewport) {
@@ -229,7 +258,7 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 		for (int i = 0; i < matrices.length; i++) {
 			axisPoints[i] = new Point3f(1, 0, 0);
 			matrices[i].transform(axisPoints[i]);
-			transformUtil.transform(AXIS_ROTATION, axisPoints[i], CAMERA,axisPoints[i]);
+			transformUtil.transform(AXIS_R, axisPoints[i], CAMERA, axisPoints[i]);
 			order[i] = i;
 		};
 		
@@ -255,28 +284,26 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 //		gl.glClear(GL_DEPTH_BUFFER_BIT);
 		
 		Point3f p = new Point3f();
-		Matrix4d modelView = transformUtil.getMatrix(AXIS_ROTATION, CAMERA, new Matrix4d());
+		Matrix4d modelView = transformUtil.getMatrix(START, CAMERA, new Matrix4d());
+		modelView.m00 *= radius; modelView.m01 *= radius; modelView.m02 *= radius;
+		modelView.m10 *= radius; modelView.m11 *= radius; modelView.m12 *= radius;
+		modelView.m20 *= radius; modelView.m21 *= radius; modelView.m22 *= radius;
 		
 		Matrix4d m = new Matrix4d();
 		/* draw x/y/z lines */
 		
+//		System.out.println("mv0=" + modelView);
 		int start = mouseMotionListener == null ? 1 : 0;
 		for (int ghost = start; ghost < 2; ghost++) {
 			if (ghost == 1) {
-				Vector3d v = new Vector3d(vector);
-				axisRotation.getRotationMatrix(new Matrix3d()).transform(v);
-				axisRotation.getRotationMatrix(m);
-				m.mul(radius);
 				
-				/* add pivot translation */
-				m.m03 = pivot.x + v.x;
-				m.m13 = pivot.y + v.y;
-				m.m23 = pivot.z + v.z;
-				
-				m.m33 = 1;
 			
-				transformUtil.setSpace2World(AXIS_ROTATION, LOCAL, m);
-				transformUtil.getMatrix(AXIS_ROTATION, CAMERA, modelView);
+//				transformUtil.setSpace2World(AXIS_ROTATION, LOCAL, m);
+				transformUtil.getMatrix(LOCAL, CAMERA, modelView);
+				modelView.m00 *= radius; modelView.m01 *= radius; modelView.m02 *= radius;
+				modelView.m10 *= radius; modelView.m11 *= radius; modelView.m12 *= radius;
+				modelView.m20 *= radius; modelView.m21 *= radius; modelView.m22 *= radius;
+//				System.out.println("mv1=" + modelView);
 //				transformUtil.getModelViewMatrix(modelView);
 			}
 			
@@ -407,31 +434,33 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 			pScreen.x = e.getX();
 			pScreen.y = e.getY();
 			if (constraint < 0) {
-				transformUtil.projectFromScreen(AXIS_ROTATION, pScreen, pLocal);
-				vector.set(pLocal);
+				transformUtil.projectFromScreen(AXIS_R, pScreen, pLocal);
+				vector.sub(pLocal, startVector);
 			} else {
 				Point3d p0s = new Point3d();
-				transformUtil.projectToScreen(AXIS_ROTATION, p0s, p0s);
-				Point3d p1 = new Point3d(1 - ARROW_LENGTH * 0.75, 0, 0);
+				transformUtil.projectToScreen(LOCAL, p0s, p0s);
+				Point3d p1 = new Point3d((1 - ARROW_LENGTH * 0.75) * radius, 0, 0);
 				matrices[constraint].transform(p1);
 				Point3d p1s = new Point3d();
-				transformUtil.projectToScreen(AXIS_ROTATION, p1, p1s);
+				transformUtil.projectToScreen(LOCAL, p1, p1s);
 				double t = Utils3d.closestPointOnLine(p0s.x, p0s.y, p1s.x, p1s.y, pScreen.x, pScreen.y);
 //				System.out.println(p0s.x + "," + p0s.y + "-" + p1s.x + "," + p1s.y + " " + t);
 				pScreen.interpolate(p0s, p1s, t);
-				transformUtil.projectFromScreen(AXIS_ROTATION, pScreen, pLocal);
+				transformUtil.projectFromScreen(AXIS_R, pScreen, pLocal);
 				pLocal.sub(p1);
-				vector.set(pLocal);
+				vector.sub(pLocal, startVector);
 			}
-			vector.scale(radius);
-			Vector3d vector2 = new Vector3d(vector);
-			axisRotation.getRotationMatrix(new Matrix3d()).transform(vector2);
-//			System.out.println(vector);
+//			vector.scale(radius);
+//			Vector3d vector2 = new Vector3d(vector);
+//			axisRotation.getRotationMatrix(new Matrix3d()).transform(vector2);
+//			System.out.println("s=" + startVector + " v=" + vector);
 //			transformUtil.transform(AXIS_ROTATION, vector, vector);
 //			transformMatrix.setTranslation(vector2);
 //			Selection selection = Main.getInstance().getSelection();
 //			selection.transform(transformMatrix);
-			transformable.translate(vector2);
+			Vector3d v = new Vector3d();
+			transformUtil.transform(AXIS_R, vector, BASE, v);
+			transformable.translate(v);
 			Main.getInstance().syncRepaintViewport(viewport);
 		}
 	}
@@ -444,13 +473,14 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 		}
 		@Override
 		public void mousePressed(MouseEvent e) {
+			
 			configureFor(viewport);
 			
 			double minDistSq = 100;
 			Point3d p = new Point3d(0, 0, 0);
 			Point hitPoint = new Point();
 			double hitZ = 0;
-			transformUtil.projectToScreen(AXIS_ROTATION, p, p);
+			transformUtil.projectToScreen(LOCAL, p, p);
 			int hit = -2;
 			if (distSq(e.getX(), e.getY(), p) < minDistSq) {
 				hit = -1;
@@ -458,9 +488,9 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 				hitZ = p.z;
 			} else {
 				for (int i = 0; i < matrices.length; i++) {
-					p.set(1 - ARROW_LENGTH * 0.75, 0, 0);
+					p.set((1 - ARROW_LENGTH * 0.75) * radius, 0, 0);
 					matrices[i].transform(p);
-					transformUtil.projectToScreen(AXIS_ROTATION, p, p);
+					transformUtil.projectToScreen(LOCAL, p, p);
 					double distSq = distSq(e.getX(), e.getY(), p);
 					if (distSq < minDistSq) {
 						minDistSq = distSq;
@@ -494,14 +524,18 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 					editList.add(AttributeEdit.changeAttribute(Main.getInstance().getActions().toolSM, LastModifierTool.getInstance().get(), false));
 					LastModifierTool.getInstance().set(TranslateTool.this);
 				}
-				Matrix4d matrix = new Matrix4d();
-				axisRotation.getRotationMatrix(matrix);
-				matrix.transform(vector);
-				pivot.add(vector);
-				vector.set(0, 0, 0);
+//				Matrix4d matrix = new Matrix4d();
+//				axisRotation.getRotationMatrix(matrix);
+//				matrix.transform(vector);
+//				pivot.add(vector);
+//				vector.set(0, 0, 0);
 //				pivotAttr.setTuple(pivot);
 //				vectorAttr.setTuple(vector);
 				
+				startVector.add(vector);
+				vector.set(0, 0, 0);
+				
+//				System.out.println("start vector is now " + startVector);
 				editList.add(AttributeEdit.changeAttribute(pivotAttr, pivot, true));
 				editList.add(AttributeEdit.changeAttribute(vectorAttr, vector, true));
 				
