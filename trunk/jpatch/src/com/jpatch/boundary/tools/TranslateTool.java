@@ -192,8 +192,12 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 	public void setTransformable(Transformable transformable) {
 		this.transformable = transformable;
 		transformable.getPivot(pivot);
+		Point3d p = new Point3d();
+		transformable.getPivot(p);
+		transformUtil.transform(BASE, p, AXIS_R, p);
+		startVector.set(p);
+//		startVector.add(vector);
 		vector.set(0, 0, 0);
-		startVector.set(0, 0, 0);
 		axisRotationAttr.setTuple(0, 0, 0);
 		
 	}
@@ -506,8 +510,7 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 				Main.getInstance().getRobot().mouseMove(hitPoint.x, hitPoint.y);
 				mouseMotionListener = new HitMouseMotionListener(viewport, hit, hitZ);
 				viewport.getComponent().addMouseMotionListener(mouseMotionListener);
-				Selection selection = Main.getInstance().getSelection();
-				selection.begin();
+				transformable.begin();
 			}
 		}
 		
@@ -516,8 +519,7 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 			if (mouseMotionListener != null) {
 				viewport.getComponent().removeMouseMotionListener(mouseMotionListener);
 				mouseMotionListener = null;
-				Selection selection = Main.getInstance().getSelection();
-				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(selection.getVertexCount() + 3);
+				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
 				
 				
 				if (LastModifierTool.getInstance().get() != TranslateTool.this) {
@@ -532,14 +534,22 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 //				pivotAttr.setTuple(pivot);
 //				vectorAttr.setTuple(vector);
 				
-				startVector.add(vector);
+				transformable.end(editList);
+				
+				Point3d p = new Point3d();
+				transformable.getPivot(p);
+				transformUtil.transform(BASE, p, AXIS_R, p);
+				startVector.set(p);
+//				startVector.add(vector);
 				vector.set(0, 0, 0);
+				
+				
 				
 //				System.out.println("start vector is now " + startVector);
 				editList.add(AttributeEdit.changeAttribute(pivotAttr, pivot, true));
 				editList.add(AttributeEdit.changeAttribute(vectorAttr, vector, true));
 				
-				selection.end(editList);
+				
 				
 				
 				

@@ -70,6 +70,9 @@ public class ChangeViewTool implements JPatchTool {
 		public void mouseReleased(MouseEvent e) {
 			viewport.getComponent().removeMouseMotionListener(mml);
 			mml = null;
+			if (viewport.getViewDef() instanceof PerspectiveViewDef) {
+				Main.getInstance().syncViewports(viewport);
+			}
 		}
 	}
 	
@@ -161,7 +164,7 @@ public class ChangeViewTool implements JPatchTool {
 					double ay = Math.toDegrees(ay0 - ay1);
 //					System.out.println("screen: " + x0 + "/" + y0 + " sphere: " + Math.toDegrees(ax0) + "/" + Math.toDegrees(ay0));
 					prespectiveViewDef.getRotationAttribute().setTuple(
-							prespectiveViewDef.getRotationAttribute().getX() + ax,
+							prespectiveViewDef.getRotationAttribute().getX() - ax,
 							prespectiveViewDef.getRotationAttribute().getY() + ay,
 							prespectiveViewDef.getRotationAttribute().getZ()
 					);
@@ -179,7 +182,7 @@ public class ChangeViewTool implements JPatchTool {
 					break;
 				}
 			}
-			Main.getInstance().repaintViewport(viewport);
+			Main.getInstance().syncRepaintViewport(viewport);
 		}
 	}
 }

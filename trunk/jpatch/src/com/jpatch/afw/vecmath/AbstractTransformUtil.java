@@ -294,11 +294,25 @@ public abstract class AbstractTransformUtil {
 	 */
 	public void flipZAxis(int space) {
 		Matrix4d m = matrices[space][WORLD];
+//		Matrix3d r = new Matrix3d();
+//		m.getRotationScale(r);
+//		Matrix3d mm = new Matrix3d();
+//		mm.rotY(Math.PI);
+//		r.mul(r, mm);
+//		m.setRotationScale(r);
+		
+//		m.m00 = -m.m00;
+//		m.m01 = -m.m01;
+//		m.m02 = -m.m02;
+//		m.m20 = -m.m20;
+//		m.m21 = -m.m21;
+//		m.m22 = -m.m22;
+		
 		m.m00 = -m.m00;
-		m.m01 = -m.m01;
-		m.m02 = -m.m02;
+		m.m10 = -m.m10;
 		m.m20 = -m.m20;
-		m.m21 = -m.m21;
+		m.m02 = -m.m02;
+		m.m12 = -m.m12;
 		m.m22 = -m.m22;
 	}
 	
