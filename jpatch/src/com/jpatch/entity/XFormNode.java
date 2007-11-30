@@ -446,7 +446,14 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 		}
 		
 		public void translate(Vector3d vector) {
-			translation.add(startTranslation, vector);
+			
+			Matrix3d m = rotation.getRotationMatrix(new Matrix3d());
+//			m.invert();
+			Vector3d v = new Vector3d(vector);
+			m.transform(v);
+			
+			translation.add(startTranslation, v);
+			
 			translationAttr.setTuple(translation);
 		}
 		
@@ -461,6 +468,7 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 			} else {
 				getLocal2WorldTransform(transformUtil, space);
 			}
+//			System.out.println(active + " " + transformUtil.getMatrix(space, TransformUtil.WORLD, new Matrix4d()));
 		}
 		
 	}

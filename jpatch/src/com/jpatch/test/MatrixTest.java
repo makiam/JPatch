@@ -6,6 +6,14 @@ import javax.vecmath.*;
 
 public class MatrixTest {
 	public static void main(String[] args) {
+		Matrix3d m = new Matrix3d();
+		m.rotY(Math.PI);
+		
+		Matrix3d mm = new Matrix3d(1, 1, 1, 1, 1, 1, 1, 1, 1);
+		
+		m.mul(mm);
+		System.out.println(m);
+		System.exit(0);
 		new MatrixTest();
 	}
 	
