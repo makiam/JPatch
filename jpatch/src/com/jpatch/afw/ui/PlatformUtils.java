@@ -99,6 +99,9 @@ public class PlatformUtils {
 			UIManager.getLookAndFeelDefaults().put("ComboBox.background", Color.WHITE);
 			UIManager.getLookAndFeelDefaults().put("Tree.background", grayBackground);
 			UIManager.getLookAndFeelDefaults().put("Tree.textBackground", grayBackground);
+		} else {
+			UIManager.getDefaults().put("SplitPaneUI", "com.jpatch.afw.ui.laf.SplitPaneUI");
+		}
 //			System.out.println(UIManager.getLookAndFeelDefaults().get("SliderUI"));
 //			UIManager.getLookAndFeelDefaults().put("Slider.paintThumbArrowShape", Boolean.TRUE);
 			
@@ -141,7 +144,7 @@ public class PlatformUtils {
 //					g.drawRect(x, y, width - 1, height - 1);
 //				}
 //			});
-			
-		}
+//			
+//		}
 	}
 }

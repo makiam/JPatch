@@ -61,6 +61,8 @@ public class JPatchFormContainer {
 		expandedButton.setFont(LABEL_FONT);
 		titleBar.setOpaque(false);
 		component.add(titleBar);
+		component.setOpaque(true);
+		component.setBackground(Color.WHITE);
 		component.setBorder(new Border() {
 			private final Insets insets = new Insets(0, 4, 0, 4);
 			public Insets getBorderInsets(Component c) {

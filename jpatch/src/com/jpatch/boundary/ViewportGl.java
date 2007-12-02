@@ -1592,7 +1592,7 @@ public class ViewportGl extends Viewport {
 		gl.glEnable(GL_DEPTH_TEST);
 	}
 	
-	private void rasterMode() {
+	public void rasterMode() {
 		int w = drawable.getWidth();
 		int h = drawable.getHeight();
 		gl.glViewport(0, 0, w - 1, h - 1);

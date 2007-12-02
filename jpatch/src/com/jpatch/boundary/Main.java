@@ -616,9 +616,9 @@ public class Main {
 //		hSplit.setBackground(BACKGROUND);
 		
 		JComponent sideBar = new JPanel(new BorderLayout());
-		JComponent leftStrut = new JComponent() {
+		JComponent leftStrut = new JPanel() {
 			@Override
-			public void paintComponent(Graphics g) {
+			public void paint(Graphics g) {
 				Background.fillComponent(this, g);
 			}
 		};
@@ -627,7 +627,7 @@ public class Main {
 		sideBar.add(vSplit, BorderLayout.CENTER);
 		
 		JComponent screenArea = new JPanel(new BorderLayout());
-		JComponent rightStrut = new JComponent() {
+		JComponent rightStrut = new JPanel() {
 			@Override
 			public void paintComponent(Graphics g) {
 				Background.fillComponent(this, g);

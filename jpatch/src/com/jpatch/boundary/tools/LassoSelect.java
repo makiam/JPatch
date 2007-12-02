@@ -3,7 +3,10 @@ package com.jpatch.boundary.tools;
 import java.awt.*;
 import java.awt.event.*;
 
-import jpatch.boundary.*;
+import javax.media.opengl.GL;
+import javax.media.opengl.GLAutoDrawable;
+
+import com.jpatch.boundary.*;
 import jpatch.boundary.settings.*;
 
 public class LassoSelect {
@@ -21,15 +24,17 @@ public class LassoSelect {
 		private final MouseMotionListener mouseMotionListener = new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				Graphics2D g = (Graphics2D) e.getComponent().getGraphics();
+				GL gl = ((GLAutoDrawable) e.getComponent()).getGL();
+				Graphics2D g = (Graphics2D) e.getComponent().getGraphics().create();
 				int mx = e.getX();
 				int my = e.getY();
-				drawRectangle(g, rectangle);
+				drawRectangle(g, rectangle, gl);
 				rectangle.x = mx > x ? x : mx;
 				rectangle.y = my > y ? y : my;
 				rectangle.width = Math.abs(mx - x);
 				rectangle.height = Math.abs(my - y);
-				drawRectangle(g, rectangle);
+				drawRectangle(g, rectangle,gl );
+				g.dispose();
 			}
 		};
 		
@@ -44,20 +49,30 @@ public class LassoSelect {
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			if (e.getButton() == button) {
+				GL gl = ((GLAutoDrawable) e.getComponent()).getGL();
 				viewport.getComponent().removeMouseMotionListener(mouseMotionListener);
 				viewport.getComponent().removeMouseListener(this);
 				Graphics2D g = (Graphics2D) e.getComponent().getGraphics();
-				drawRectangle(g, rectangle);
+				drawRectangle(g, rectangle, gl);
 			}
 		}
 		
-		private void drawRectangle(Graphics2D g, Rectangle r) {
+		private void drawRectangle(Graphics2D g, Rectangle r, GL gl) {
 			g.setXORMode(XOR_MODE);
 			g.setStroke(DASHES);
 			g.drawLine(r.x, r.y, r.x + r.width, r.y);
 			g.drawLine(r.x + r.width, r.y + 1, r.x + r.width, r.y + r.height);
 			g.drawLine(r.x + 1, r.y + r.height, r.x + r.width, r.y + r.height);
 			g.drawLine(r.x, r.y + 2, r.x, r.y + r.height);
+//			((ViewportGl) viewport).rasterMode();
+//			gl.glColor3f(1, 1, 0);
+//			gl.glBegin(GL.GL_LINE_LOOP);
+//			gl.glVertex2f(r.x, r.y);
+//			gl.glVertex2f(r.x + r.width, r.y);
+//			gl.glVertex2f(r.x + r.width, r.y + r.height);
+//			gl.glVertex2f(r.x, r.y + r.height);
+//			gl.glEnd();
+//			gl.glFlush();
 		}
 	}
 }

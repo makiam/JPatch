@@ -23,6 +23,8 @@ public class AttributeEditorPanel {
 	private static class EditorPanel extends JPanel implements Scrollable {
 		private EditorPanel(JComponent child) {
 			super(new BorderLayout());
+			setBackground(Color.WHITE);
+			setOpaque(true);
 			add(child, BorderLayout.NORTH);
 		}
 			
