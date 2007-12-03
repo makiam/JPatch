@@ -1,44 +1,20 @@
 package com.jpatch.boundary.tools;
 
-import java.awt.Dimension;
-import java.awt.event.*;
-import java.awt.geom.Line2D;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import com.jpatch.afw.attributes.GenericAttr;
-import com.jpatch.afw.attributes.StateMachine;
-import com.jpatch.afw.attributes.Tuple3Attr;
-import com.jpatch.afw.control.AttributeEdit;
-import com.jpatch.afw.control.JPatchUndoableEdit;
-import com.jpatch.afw.vecmath.Rotation3d;
-import com.jpatch.afw.vecmath.Sphere;
-import com.jpatch.afw.vecmath.TransformUtil;
+import static com.jpatch.afw.vecmath.AbstractTransformUtil.*;
 import static com.jpatch.afw.vecmath.TransformUtil.*;
-import com.jpatch.afw.vecmath.Utils3d;
-import com.jpatch.boundary.Main;
-import com.jpatch.boundary.OrthoViewDef;
-import com.jpatch.boundary.PerspectiveViewDef;
-import com.jpatch.boundary.Selection;
-import com.jpatch.boundary.ViewDef;
-import com.jpatch.boundary.ViewDirection;
-import com.jpatch.boundary.Viewport;
-import com.jpatch.boundary.ViewportGl;
-import com.jpatch.boundary.actions.Actions;
-import com.jpatch.entity.BasicMaterial;
-import com.jpatch.entity.GlMaterial;
-import com.jpatch.entity.Transformable;
-import com.jpatch.settings.ColorSettings;
-import com.jpatch.settings.Settings;
-
-import javax.media.opengl.GL;
-import javax.vecmath.*;
-
-import jpatch.boundary.action.EditAnimObjectAction;
-
-
 import static javax.media.opengl.GL.*;
+import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.control.*;
+import com.jpatch.afw.vecmath.*;
+import com.jpatch.boundary.*;
+import com.jpatch.entity.*;
+import com.jpatch.settings.*;
+
+import java.awt.event.*;
+import java.util.*;
+
+import javax.media.opengl.*;
+import javax.vecmath.*;
 
 public class RotateTool implements ModifierTool, VisibleTool {
 	public static final GenericAttr<String> EDIT_NAME = new GenericAttr<String>("rotate");
@@ -592,6 +568,9 @@ public class RotateTool implements ModifierTool, VisibleTool {
 		}
 		@Override
 		public void mousePressed(MouseEvent e) {
+			if (e.getButton() != MouseEvent.BUTTON1) {
+				return;	
+			}
 			
 			ViewportVars vv = new ViewportVars(viewport);
 			

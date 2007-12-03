@@ -40,11 +40,7 @@ import com.jpatch.afw.ui.UserInputListener;
 import com.jpatch.afw.vecmath.Transform;
 import com.jpatch.boundary.actions.Actions;
 import com.jpatch.boundary.actions.Actions.ViewportMode;
-import com.jpatch.boundary.tools.JPatchTool;
-import com.jpatch.boundary.tools.LastModifierTool;
-import com.jpatch.boundary.tools.ModifierTool;
-import com.jpatch.boundary.tools.RotateTool;
-import com.jpatch.boundary.tools.VisibleTool;
+import com.jpatch.boundary.tools.*;
 import com.jpatch.entity.Camera;
 import com.jpatch.entity.SceneGraphNode;
 import com.jpatch.entity.SdsModel;
@@ -461,6 +457,9 @@ public class Main {
 //			
 //		});
 //		actions.toolSM.getValue().registerListeners(viewports);
+		
+		ChangeViewTool mmbTool = ChangeViewTool.createMmbTool();
+		mmbTool.registerListeners(viewports);
 		
 		JPatchToolBar toolBar = new JPatchToolBar();
 		JPanel panel = new JPanel(new BorderLayout());
