@@ -137,7 +137,7 @@ public class ChangeViewTool implements JPatchTool {
 			
 			Mode mode = ChangeViewTool.this.mode;
 			if (mode == Mode.MMB) {
-				if (e.isShiftDown()) {
+				if (e.isControlDown()) {
 					mode = Mode.ROTATE;
 				} else {
 					mode = Mode.MOVE;
@@ -218,7 +218,7 @@ public class ChangeViewTool implements JPatchTool {
 					break;
 				}
 			}
-			Main.getInstance().syncRepaintViewport(viewport);
+			Main.getInstance().repaintViewport(viewport);
 		}
 
 		public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {
@@ -226,9 +226,8 @@ public class ChangeViewTool implements JPatchTool {
 			double factor = 1.0 - wheelClicks / 10.0;
 			if (factor < 0.2) factor = 0.2;
 			if (factor > 5) factor = 5;
-			System.out.println(wheelClicks);
 			zoom(factor);
-			Main.getInstance().syncRepaintViewport(viewport);
+			Main.getInstance().repaintViewport(viewport);
 		}
 	}
 }
