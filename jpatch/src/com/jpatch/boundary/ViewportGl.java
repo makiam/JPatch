@@ -687,7 +687,9 @@ public class ViewportGl extends Viewport {
 		Point3d p = new Point3d();
 		transformUtil.projectToScreen(LOCAL, p, p);
 		if (node instanceof XFormNode) {
-			drawString(((XFormNode) node).getNameAttribute().getValue(), (int) p.x, (int) p.y);
+			if (!transformUtil.isPerspective() || p.z > nearClip) {
+				drawString(((XFormNode) node).getNameAttribute().getValue(), (int) p.x, (int) p.y);
+			}
 		}
 		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
 			drawSceneGraphNames(child);

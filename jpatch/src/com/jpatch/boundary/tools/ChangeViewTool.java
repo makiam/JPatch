@@ -11,10 +11,10 @@ import javax.vecmath.*;
 //import jpatch.entity.*;
 
 public class ChangeViewTool implements JPatchTool {
-	private static enum Mode { MOVE, ZOOM, ROTATE }
+	private static enum Mode { MOVE, ZOOM, ROTATE, MMB }
 
 	private MouseListener[] mouseListeners;
-	private Mode mode;
+	private final Mode mode;
 	
 	public static ChangeViewTool createMoveViewTool() {
 		return new ChangeViewTool(Mode.MOVE);
@@ -28,6 +28,10 @@ public class ChangeViewTool implements JPatchTool {
 		return new ChangeViewTool(Mode.ROTATE);
 	}
 	
+	public static ChangeViewTool createMmbTool() {
+		return new ChangeViewTool(Mode.MMB);
+	}
+	
 	private ChangeViewTool(Mode mode) {
 		this.mode = mode;
 	}
@@ -37,6 +41,10 @@ public class ChangeViewTool implements JPatchTool {
 		for (int i = 0; i < viewports.length; i++) {
 			mouseListeners[i] = new ChangeViewMouseListener(viewports[i]);
 			viewports[i].getComponent().addMouseListener(mouseListeners[i]);
+			if (mode == Mode.MMB) {
+				MouseWheelListener wheelListener = new ChangeViewMouseMotionListener(viewports[i], 0, 0);
+				viewports[i].getComponent().addMouseWheelListener(wheelListener);
+			}
 		}
 	}
 
@@ -62,6 +70,15 @@ public class ChangeViewTool implements JPatchTool {
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
+			if (mode == Mode.MMB) {
+				if (e.getButton() != MouseEvent.BUTTON2) {
+					return;
+				}
+			} else {
+				if (e.getButton() != MouseEvent.BUTTON1) {
+					return;
+				}
+			}
 			mml = new ChangeViewMouseMotionListener(viewport, e.getX(), e.getY());
 			viewport.getComponent().addMouseMotionListener(mml);
 		}
@@ -76,7 +93,7 @@ public class ChangeViewTool implements JPatchTool {
 		}
 	}
 	
-	private class ChangeViewMouseMotionListener extends MouseMotionAdapter {
+	private class ChangeViewMouseMotionListener extends MouseMotionAdapter implements MouseWheelListener {
 		
 		private Viewport viewport;
 		private int x, y;
@@ -98,6 +115,16 @@ public class ChangeViewTool implements JPatchTool {
 //			}
 		}
 		
+		private void zoom(double factor) {
+			if (viewport.getViewDef() instanceof OrthoViewDef) {
+				OrthoViewDef orthoViewDef = (OrthoViewDef) viewport.getViewDef();
+				orthoViewDef.getScaleAttribute().setDouble(orthoViewDef.getScaleAttribute().getDouble() * factor);
+			} else {
+				PerspectiveViewDef prespectiveViewDef = (PerspectiveViewDef) viewport.getViewDef();
+				prespectiveViewDef.getFocalLengthAttribute().setDouble(prespectiveViewDef.getFocalLengthAttribute().getDouble() * factor);
+			}
+		}
+		
 		@Override
 		public void mouseDragged(MouseEvent e) {
 			int dx = e.getX() - x;
@@ -107,6 +134,15 @@ public class ChangeViewTool implements JPatchTool {
 			
 //			viewport.setBirdsEyeView();
 			ViewDef viewDef = viewport.getViewDef();
+			
+			Mode mode = ChangeViewTool.this.mode;
+			if (mode == Mode.MMB) {
+				if (e.isShiftDown()) {
+					mode = Mode.ROTATE;
+				} else {
+					mode = Mode.MOVE;
+				}
+			} 
 			if (viewDef instanceof OrthoViewDef) {
 				OrthoViewDef orthoViewDef = (OrthoViewDef) viewDef;
 				double w = viewport.getComponent().getWidth() / 20 * orthoViewDef.getScaleAttribute().getDouble();
@@ -125,7 +161,7 @@ public class ChangeViewTool implements JPatchTool {
 					break;
 				case ZOOM:
 					double factor = Math.min(Math.max(1 + (dx - dy) / 200.0, 0.2), 5);
-					orthoViewDef.getScaleAttribute().setDouble(orthoViewDef.getScaleAttribute().getDouble() * factor);
+					zoom(factor);
 					break;
 				}
 			} else if (viewDef instanceof PerspectiveViewDef) {
@@ -173,15 +209,25 @@ public class ChangeViewTool implements JPatchTool {
 					prespectiveViewDef.getRotationAttribute().setTuple(
 							prespectiveViewDef.getRotationAttribute().getX(),
 							prespectiveViewDef.getRotationAttribute().getY(),
-							prespectiveViewDef.getRotationAttribute().getZ() - dx / 10.0
+							prespectiveViewDef.getRotationAttribute().getZ() + dx / 10.0
 					);
 					break;
 				case ZOOM:
 					double factor = Math.min(Math.max(1 + (dx - dy) / 200.0, 0.2), 5);
-					prespectiveViewDef.getFocalLengthAttribute().setDouble(prespectiveViewDef.getFocalLengthAttribute().getDouble() * factor);
+					zoom(factor);
 					break;
 				}
 			}
+			Main.getInstance().syncRepaintViewport(viewport);
+		}
+
+		public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {
+			int wheelClicks = mouseWheelEvent.getWheelRotation();
+			double factor = 1.0 - wheelClicks / 10.0;
+			if (factor < 0.2) factor = 0.2;
+			if (factor > 5) factor = 5;
+			System.out.println(wheelClicks);
+			zoom(factor);
 			Main.getInstance().syncRepaintViewport(viewport);
 		}
 	}
