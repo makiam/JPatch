@@ -41,11 +41,7 @@ import com.jpatch.afw.vecmath.Transform;
 import com.jpatch.boundary.actions.Actions;
 import com.jpatch.boundary.actions.Actions.ViewportMode;
 import com.jpatch.boundary.tools.*;
-import com.jpatch.entity.Camera;
-import com.jpatch.entity.SceneGraphNode;
-import com.jpatch.entity.SdsModel;
-import com.jpatch.entity.TransformNode;
-import com.jpatch.entity.XFormNode;
+import com.jpatch.entity.*;
 import com.jpatch.entity.sds.JptLoader;
 import com.jpatch.entity.sds.Sds;
 import com.jpatch.settings.Settings;
@@ -537,8 +533,8 @@ public class Main {
 		
 		sceneGraphRoot.getNameAttribute().setValue("Origin");
 		
-		final XFormNode node1 = new XFormNode();
-		tmpNode = new XFormNode();
+		final XFormNode node1 = new Bone();
+		tmpNode = new Bone();
 //		final TransformNode node3 = new TransformNode();
 //		final TransformNode node4 = new TransformNode();
 		node1.getNameAttribute().setValue("node1");

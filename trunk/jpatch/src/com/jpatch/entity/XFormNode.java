@@ -73,11 +73,14 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	/** world transform matrix */
 	protected final Matrix4d local2WorldMatrix = new Matrix4d();
 	
-	/** lazy evaluation flag */
-	private boolean localInvalid = false;
+	/** downstream transform matrix (inherited by descendants) */
+	protected final Matrix4d downstream2WorldMatrix = new Matrix4d();
 	
 	/** lazy evaluation flag */
-	private boolean worldInvalid = false;
+	protected boolean localInvalid = false;
+	
+	/** lazy evaluation flag */
+	protected boolean worldInvalid = false;
 	
 	private final  AttributePostChangeListener invalidationListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
@@ -258,7 +261,7 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	 * flag has not been set yet (this method assumes that, if worldInvalid
 	 * is set on a node, it is also set on all its descendants).
 	 */
-	private void invalidate() {
+	protected void invalidate() {
 		localInvalid = true;
 		invalidateBranch(false);
 	}
@@ -273,7 +276,7 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	 * scene-graph's topology has been changed.
 	 * @param force 
 	 */
-	private void invalidateBranch(boolean force) {
+	protected void invalidateBranch(boolean force) {
 		if (force || !worldInvalid) {
 			worldInvalid = true;
 			for (SceneGraphNode child : getChildrenAttribute().getElements()) {
@@ -300,20 +303,21 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	 * Note that, if the to-world matrices of the parent node are invalide, this method
 	 * is called (recursively) on the parent node.
 	 */
-	private void computeWorldMatrices() {
+	protected void computeWorldMatrices() {
 		if (localInvalid || worldInvalid) {
 			computeLocalMatrices();
 			
-			/* multiply matrices with parent's local2world-transform */
+			/* multiply matrices with parent's downstream2world-transform */
 			SceneGraphNode parent = getParentAttribute().getValue();
 			if (parent != null && parent instanceof XFormNode) {
 				XFormNode parentXForm = ((XFormNode) parent);
 				parentXForm.computeWorldMatrices();
-				axisRotation2WolrdMatrix.mul(parentXForm.local2WorldMatrix, axisRotationMatrix);
-				local2WorldMatrix.mul(parentXForm.local2WorldMatrix, localMatrix);
+				axisRotation2WolrdMatrix.mul(parentXForm.downstream2WorldMatrix, axisRotationMatrix);
+				local2WorldMatrix.mul(parentXForm.downstream2WorldMatrix, localMatrix);
 			} else {
 				local2WorldMatrix.set(localMatrix);
 			}
+			downstream2WorldMatrix.set(local2WorldMatrix);
 			worldInvalid = false;
 		}
 	}

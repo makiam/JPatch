@@ -1,0 +1,26 @@
+<attributeEditor name="Bone" class="com.jpatch.entity.Bone">
+	<field name="Name" attribute="Name" />
+	<field name="Translation" attribute="Translation" />
+	<field name="Rotation" attribute="Rotation" />
+	<field name="Scale" attribute="Scale" />
+	<field name="Length" attribute="Length" />
+	<group name="Advanced">
+		<field name="Extent" attribute="Extent" />
+		<field name="Transform order" attribute="TransformOrder" />
+		<field name="Rotation order" attribute="RotationOrder" />
+		<field name="Axis rotation order" attribute="AxisRotationOrder" />
+		<field name="Axis rotation" attribute="AxisRotation" />
+		<field name="Visibility" attribute="Visibility" />
+	</group>
+	<group name="Limits">
+		<group name="Translation">
+			<limits attribute="Translation" />
+		</group>
+		<group name="Rotation">
+			<limits attribute="Rotation" />
+		</group>
+		<group name="Scale">
+			<limits attribute="Scale" />
+		</group>
+	</group>
+</attributeEditor>
