@@ -706,11 +706,13 @@ public class ViewportGl extends Viewport {
 			gl.glPolygonMode(GL_FRONT, GL_FILL);
 			gl.glColor3f(0, 0, 0);
 			gl.glDisable(GL_COLOR_MATERIAL);
+			color.scale(0.8f);
 			BONE_MATERIAL.setKd(color);
 			color.scale(0.25f);
 			BONE_MATERIAL.setKa(color);
 			BONE_MATERIAL.applyMaterial(gl, GL_FRONT);
 			BONE.draw(gl, modelView);
+			gl.glEnable(GL_DEPTH_TEST);
 		}
 		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
 			drawSceneGraphElement(child);

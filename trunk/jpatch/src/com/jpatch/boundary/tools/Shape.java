@@ -101,7 +101,7 @@ public class Shape {
 			b.sub(vertices[triangles[p2]], vertices[triangles[p0]]);
 			normals[i] = new Vector3f();
 			normals[i].cross(a, b);
-			normals[i].normalize();
+//			normals[i].normalize();
 		}
 	}
 }
