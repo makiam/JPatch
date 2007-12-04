@@ -744,7 +744,7 @@ public class RotateTool implements ModifierTool, VisibleTool {
 					rotation.setRotation(m2);
 
 					transformUtil.transform(START_ROTATION, axis, LOCAL, axis);
-					transformable.rotate(pivot, new AxisAngle4d(axis, angle));
+					transformable.rotate(pivot, axis, angle);
 //				}
 //				selection.getSelectedSdsModelAttribute().getValue().getSds().computeLevel2Vertices();
 				

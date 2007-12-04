@@ -44,6 +44,21 @@ public class Tuple3Attr extends AbstractAttribute {
 		bindTuple(tuple);
 	}
 	
+	public Tuple3Attr(Tuple3f tuple) {
+		this(tuple.x, tuple.y, tuple.z);
+		bindTuple(tuple);
+	}
+	
+	public Tuple3Attr(Tuple3f tuple, double x, double y, double z) {
+		this(x, y, z);
+		bindTuple(tuple);
+	}
+	
+	public Tuple3Attr(Tuple3f tuple, DoubleAttr x, DoubleAttr y, DoubleAttr z) {
+		this(x, y, z);
+		bindTuple(tuple);
+	}
+	
 	public DoubleAttr getXAttr() {
 		return xAttr;
 	}
@@ -113,14 +128,31 @@ public class Tuple3Attr extends AbstractAttribute {
 		return "(" + xAttr.getDouble() + ", " + yAttr.getDouble() + ", " + zAttr.getDouble() + ")";
 	}
 	
-	public void bindTuple(Tuple3d tuple) {
-		addAttributePostChangeListener(new BindTupleListener(tuple));
+	public void bindTuple(Tuple3f tuple) {
+		addAttributePostChangeListener(new BindTuple3fListener(tuple));
 	}
 	
-	private static class BindTupleListener implements AttributePostChangeListener {
+	public void bindTuple(Tuple3d tuple) {
+		addAttributePostChangeListener(new BindTuple3dListener(tuple));
+	}
+	
+	private static class BindTuple3dListener implements AttributePostChangeListener {
 		private final Tuple3d tuple;
 		
-		private BindTupleListener(Tuple3d tuple) {
+		private BindTuple3dListener(Tuple3d tuple) {
+			this.tuple = tuple;
+		}
+		
+		public void attributeHasChanged(Attribute source) {
+			Tuple3Attr tuple3Attr = (Tuple3Attr) source;
+			tuple3Attr.getTuple(tuple);
+		}
+	}
+	
+	private static class BindTuple3fListener implements AttributePostChangeListener {
+		private final Tuple3f tuple;
+		
+		private BindTuple3fListener(Tuple3f tuple) {
 			this.tuple = tuple;
 		}
 		

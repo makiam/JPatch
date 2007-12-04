@@ -96,8 +96,9 @@ public class Selection implements Transformable {
 		}
 	}
 
-	public void rotate(Point3d pivot, AxisAngle4d axisAngle) {
+	public void rotate(Point3d pivot, Vector3d axis, double angle) {
 		/* set matrix to the rotation matrix specified by axisAngle around specivied pivot */
+		AxisAngle4d axisAngle = new AxisAngle4d(axis, angle);
 		matrix.set(axisAngle);
 		matrix.m03 = pivot.x;
 		matrix.m13 = pivot.y;

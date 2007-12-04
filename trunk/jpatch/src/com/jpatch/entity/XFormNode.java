@@ -181,8 +181,8 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 		transformable.end(editList);
 	}
 
-	public void rotate(Point3d pivot, AxisAngle4d axisAngle) {
-		transformable.rotate(pivot, axisAngle);
+	public void rotate(Point3d pivot, Vector3d axis, double angle) {
+		transformable.rotate(pivot, axis, angle);
 	}
 
 	public void scale(Scale3d scale) {
@@ -442,7 +442,9 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 			active = true;
 		}
 		
-		public void rotate(Point3d pivot, AxisAngle4d axisAngle) {
+		public void rotate(Point3d pivot, Vector3d axis, double angle) {
+			axisRotationMatrix.transform(axis);
+			AxisAngle4d axisAngle = new AxisAngle4d(axis, angle);
 			newRot.set(axisAngle);
 			newRot.mul(startRot, newRot);
 			rotation.setRotation(newRot);

@@ -11,7 +11,7 @@ public interface Transformable {
 	/* begin manipulation */
 	public void begin();
 	/* rotate */
-	public void rotate(Point3d pivot, AxisAngle4d axisAngle);
+	public void rotate(Point3d pivot, Vector3d axis, double angle);
 	/* translate */
 	public void translate(Vector3d vector);
 	/* scale */

@@ -354,6 +354,22 @@ public class ViewportGl extends Viewport {
 	    }
 	  }
 	
+	private final static float BONE_LENGTH = 1.0f;
+	private final static float BONE_WIDTH = 0.1f;
+	private final static GlMaterial BONE_MATERIAL = new GlMaterial(new Color3f(), 0.25f, 0.0f, 10);
+	
+	private final static Shape BONE = new Shape(
+			new Point3f[] {
+					new Point3f(0, 0, 0),
+					new Point3f(BONE_WIDTH, 0, BONE_WIDTH),
+					new Point3f(0, BONE_WIDTH, BONE_WIDTH),
+					new Point3f(-BONE_WIDTH, 0, BONE_WIDTH),
+					new Point3f(0,-BONE_WIDTH, BONE_WIDTH),
+					new Point3f(0, 0, BONE_LENGTH),
+			},
+			new int[] { 0, 2, 1, 0, 3, 2, 0, 4, 3, 0, 1, 4, 5, 1, 2, 5, 2, 3, 5, 3, 4, 5, 4, 1 }
+	);
+	
 	/** Offset to the GL Display-Lists holding the character bitmaps. */
 	private int fontOffset;
 	
@@ -671,6 +687,30 @@ public class ViewportGl extends Viewport {
 		drawOrigin(modelView);
 		if (node instanceof SdsModel) {
 			drawSds3(((SdsModel) node).getSds());
+		}
+		if (node instanceof Bone) {
+			Bone bone = (Bone) node;
+			float length = (float) bone.getLengthAttribute().getDouble();
+			modelView.m00 *= length;
+			modelView.m01 *= length;
+			modelView.m02 *= length;
+			modelView.m10 *= length;
+			modelView.m11 *= length;
+			modelView.m12 *= length;
+			modelView.m20 *= length;
+			modelView.m21 *= length;
+			modelView.m22 *= length;
+			Color3f color = bone.getColor(new Color3f()); // TODO reuse color object
+			gl.glEnable(GL_LIGHTING);
+			gl.glShadeModel(GL_SMOOTH);
+			gl.glPolygonMode(GL_FRONT, GL_FILL);
+			gl.glColor3f(0, 0, 0);
+			gl.glDisable(GL_COLOR_MATERIAL);
+			BONE_MATERIAL.setKd(color);
+			color.scale(0.25f);
+			BONE_MATERIAL.setKa(color);
+			BONE_MATERIAL.applyMaterial(gl, GL_FRONT);
+			BONE.draw(gl, modelView);
 		}
 		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
 			drawSceneGraphElement(child);
