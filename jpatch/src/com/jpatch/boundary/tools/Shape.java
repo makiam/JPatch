@@ -42,7 +42,40 @@ public class Shape {
 		gl.glEnd();
 	}
 	
+	public void draw(GL gl, Matrix4f matrix) {
+		Point3f p = new Point3f();
+		Vector3f v = new Vector3f();
+		gl.glBegin(GL_TRIANGLES);
+		for (int i = 0; i < normals.length; i++) {
+			v.set(normals[i]);
+			matrix.transform(v);
+			v.normalize();
+			gl.glNormal3f(v.x, v.y, v.z);
+			for (int t = i * 3; t < i * 3 + 3; t++) {
+				p.set(vertices[triangles[t]]);
+				matrix.transform(p);
+				gl.glVertex3f(p.x, p.y, p.z);
+			}
+		}
+		gl.glEnd();
+	}
+	
 	public void drawOutline(GL gl, Matrix4d matrix) {
+		Point3f p = new Point3f();
+		gl.glLineWidth(1.5f);
+		gl.glDisable(GL_LINE_SMOOTH);
+		for (int i = 0; i < normals.length; i++) {
+			gl.glBegin(GL_LINE_LOOP);
+			for (int t = i * 3; t < i * 3 + 3; t++) {
+				p.set(vertices[triangles[t]]);
+				matrix.transform(p);
+				gl.glVertex3f(p.x, p.y, p.z);
+			}
+			gl.glEnd();
+		}
+	}
+	
+	public void drawOutline(GL gl, Matrix4f matrix) {
 		Point3f p = new Point3f();
 		gl.glLineWidth(1.5f);
 		gl.glDisable(GL_LINE_SMOOTH);
