@@ -68,7 +68,7 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	protected final Matrix4d localMatrix = new Matrix4d();
 
 	/** world axisRotation transform matrix */
-	protected final Matrix4d axisRotation2WolrdMatrix = new Matrix4d();
+	protected final Matrix4d axisRotation2WorldMatrix = new Matrix4d();
 	
 	/** world transform matrix */
 	protected final Matrix4d local2WorldMatrix = new Matrix4d();
@@ -77,10 +77,10 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	protected final Matrix4d downstream2WorldMatrix = new Matrix4d();
 	
 	/** lazy evaluation flag */
-	protected boolean localInvalid = false;
+	protected boolean localInvalid = true;
 	
 	/** lazy evaluation flag */
-	protected boolean worldInvalid = false;
+	protected boolean worldInvalid = true;
 	
 	private final  AttributePostChangeListener invalidationListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
@@ -220,13 +220,13 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	 */
 	public Matrix4d getAxisRotation2WorldTransform(Matrix4d matrix) {
 		computeWorldMatrices();
-		matrix.set(axisRotation2WolrdMatrix);
+		matrix.set(axisRotation2WorldMatrix);
 		return matrix;
 	}
 	
 	public void getAxisRotation2WorldTransform(TransformUtil transformUtil, int space) {
 		computeWorldMatrices();
-		transformUtil.setSpace2World(space, axisRotation2WolrdMatrix);
+		transformUtil.setSpace2World(space, axisRotation2WorldMatrix);
 	}
 	
 	/**
@@ -312,9 +312,10 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 			if (parent != null && parent instanceof XFormNode) {
 				XFormNode parentXForm = ((XFormNode) parent);
 				parentXForm.computeWorldMatrices();
-				axisRotation2WolrdMatrix.mul(parentXForm.downstream2WorldMatrix, axisRotationMatrix);
+				axisRotation2WorldMatrix.mul(parentXForm.downstream2WorldMatrix, axisRotationMatrix);
 				local2WorldMatrix.mul(parentXForm.downstream2WorldMatrix, localMatrix);
 			} else {
+				axisRotation2WorldMatrix.set(axisRotationMatrix);
 				local2WorldMatrix.set(localMatrix);
 			}
 			downstream2WorldMatrix.set(local2WorldMatrix);

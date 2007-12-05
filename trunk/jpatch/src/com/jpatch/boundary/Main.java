@@ -533,14 +533,33 @@ public class Main {
 		
 		sceneGraphRoot.getNameAttribute().setValue("Origin");
 		
-		final XFormNode node1 = new Bone();
-		tmpNode = new Bone();
+		final Bone upperArm = new Bone();
+		final Bone lowerArm = new Bone();
+		final Bone hand = new Bone();
+		final XFormNode elbowTarget = new XFormNode();
+		final XFormNode handTarget = new XFormNode();
+		
 //		final TransformNode node3 = new TransformNode();
 //		final TransformNode node4 = new TransformNode();
-		node1.getNameAttribute().setValue("node1");
-		node1.getParentAttribute().setValue(sceneGraphRoot);
-		tmpNode.getParentAttribute().setValue(node1);
-		tmpNode.getNameAttribute().setValue("node2");
+		upperArm.getNameAttribute().setValue("upperArm");
+		upperArm.getParentAttribute().setValue(sceneGraphRoot);
+		upperArm.getLengthAttribute().setDouble(10);
+		lowerArm.getNameAttribute().setValue("lowerArm");
+		lowerArm.getParentAttribute().setValue(upperArm);
+		lowerArm.getLengthAttribute().setDouble(8);
+		hand.getNameAttribute().setValue("hand");
+		hand.getParentAttribute().setValue(lowerArm);
+		hand.getLengthAttribute().setDouble(2);
+		
+		elbowTarget.getNameAttribute().setValue("elbowTarget");
+		elbowTarget.getParentAttribute().setValue(sceneGraphRoot);
+		elbowTarget.getTranslationAttribute().setTuple(-10, 0, 0);
+		handTarget.getNameAttribute().setValue("handTarget");
+		handTarget.getParentAttribute().setValue(sceneGraphRoot);
+		handTarget.getTranslationAttribute().setTuple(-5, 0, 10);
+		
+		new IkConstraint(upperArm, lowerArm, hand, elbowTarget, handTarget);
+		
 		try {
 //			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt")));
 //			final SdsModel model1 = new SdsModel(new Sds(new FileInputStream("/home/sascha/off/cube2.off")));
