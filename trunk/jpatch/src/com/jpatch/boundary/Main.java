@@ -541,24 +541,25 @@ public class Main {
 		
 //		final TransformNode node3 = new TransformNode();
 //		final TransformNode node4 = new TransformNode();
-		upperArm.getNameAttribute().setValue("upperArm");
-		upperArm.getParentAttribute().setValue(sceneGraphRoot);
-		upperArm.getLengthAttribute().setDouble(10);
-		lowerArm.getNameAttribute().setValue("lowerArm");
-		lowerArm.getParentAttribute().setValue(upperArm);
-		lowerArm.getLengthAttribute().setDouble(8);
-		hand.getNameAttribute().setValue("hand");
-		hand.getParentAttribute().setValue(lowerArm);
-		hand.getLengthAttribute().setDouble(2);
 		
-		elbowTarget.getNameAttribute().setValue("elbowTarget");
-		elbowTarget.getParentAttribute().setValue(sceneGraphRoot);
-		elbowTarget.getTranslationAttribute().setTuple(-10, 0, 0);
-		handTarget.getNameAttribute().setValue("handTarget");
-		handTarget.getParentAttribute().setValue(sceneGraphRoot);
-		handTarget.getTranslationAttribute().setTuple(-5, 0, 10);
+//		upperArm.getNameAttribute().setValue("upperArm");
+//		upperArm.getParentAttribute().setValue(sceneGraphRoot);
+//		upperArm.getLengthAttribute().setDouble(10);
+//		lowerArm.getNameAttribute().setValue("lowerArm");
+//		lowerArm.getParentAttribute().setValue(upperArm);
+//		lowerArm.getLengthAttribute().setDouble(8);
+//		hand.getNameAttribute().setValue("hand");
+//		hand.getParentAttribute().setValue(lowerArm);
+//		hand.getLengthAttribute().setDouble(2);
+//		
+//		elbowTarget.getNameAttribute().setValue("elbowTarget");
+//		elbowTarget.getParentAttribute().setValue(sceneGraphRoot);
+//		elbowTarget.getTranslationAttribute().setTuple(-10, 0, 0);
+//		handTarget.getNameAttribute().setValue("handTarget");
+//		handTarget.getParentAttribute().setValue(sceneGraphRoot);
+//		handTarget.getTranslationAttribute().setTuple(-5, 0, 10);
 		
-		new IkConstraint(upperArm, lowerArm, hand, elbowTarget, handTarget);
+//		new IkConstraint(upperArm, lowerArm, hand, elbowTarget, handTarget);
 		
 		try {
 //			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt")));
@@ -573,7 +574,7 @@ public class Main {
 //			model3.getParentAttribute().setValue(model2);
 			SdsModel model = new SdsModel(new Sds());
 			model.getNameAttribute().setValue("SDS model");
-			model.getParentAttribute().setValue(tmpNode);
+			model.getParentAttribute().setValue(sceneGraphRoot);
 			selection.getSelectedSdsModelAttribute().setValue(model);
 			
 		} catch (Exception e) {
@@ -809,7 +810,7 @@ public class Main {
 		SdsModel model = new SdsModel(sds);
 		treeManager.createTreeNodeFor(model);
 		model.getNameAttribute().setValue("model");
-		model.getParentAttribute().setValue(tmpNode);
+		model.getParentAttribute().setValue(sceneGraphRoot);
 		
 		SdsModel oldModel = selection.getSelectedSdsModelAttribute().getValue();
 		selection.getSelectedSdsModelAttribute().setValue(model);

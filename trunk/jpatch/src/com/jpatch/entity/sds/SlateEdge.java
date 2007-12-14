@@ -58,6 +58,14 @@ public class SlateEdge {
 		}
 	}
 	
+	public Level2Vertex getVertex() {
+		return vertex;
+	}
+	
+	public Level2Vertex getNeighbor() {
+		return pair.vertex;
+	}
+	
 	@Override
 	public String toString() {
 		return hashCode() + ":" + pair.hashCode();

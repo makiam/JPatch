@@ -1,15 +1,13 @@
 package com.jpatch.boundary.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 
 import javax.swing.JFileChooser;
 
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
-import com.jpatch.boundary.Main;
+import com.jpatch.boundary.*;
 import com.jpatch.boundary.tools.*;
 import com.jpatch.entity.sds.*;
 
@@ -84,7 +82,16 @@ public class Actions {
 	
 	public final JPatchAction save = new JPatchAction(undoManager, "SAVE_FILE") {
 		public void actionPerformed(ActionEvent e) {
-			System.out.println("save");
+			JFileChooser fileChooser = new JFileChooser();
+			if (fileChooser.showOpenDialog(Main.getInstance().getFrame()) == JFileChooser.APPROVE_OPTION) {
+				try {
+					Sds sds = Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getSds();
+					PrintStream out = new PrintStream(new FileOutputStream(fileChooser.getSelectedFile()));
+					new RibExporter().export(sds, out);
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				} 
+			}
 		}
 	};
 	
@@ -97,7 +104,7 @@ public class Actions {
 		extrudeTool.getEnabled().setBoolean(false);
 		latheTool.getEnabled().setBoolean(false);
 		scaleTool.getEnabled().setBoolean(false);
-		save.getEnabled().setBoolean(false);
+//		save.getEnabled().setBoolean(false);
 		
 		snapToGrid.getEnabled().setBoolean(false);
 		edgeMode.getEnabled().setBoolean(false);
