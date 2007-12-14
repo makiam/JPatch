@@ -242,7 +242,9 @@ public class JptLoader {
 			sds.makeSlates();
 			sds.rethinkSlates();
 			
-			if (true) {
+			System.out.println(sds.vertexList.size() + " top level, " + sds.level2Vertices.length + " level 2 vertices");
+			
+			if (false) {
 				return sds;
 			}
 			
