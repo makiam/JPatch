@@ -12,9 +12,13 @@ import com.jpatch.entity.TransformNode;
 
 public class JPatchInspector {
 	public AttributeEditorPanel panel = new AttributeEditorPanel();
-	private static final Color VIEW_COLOR = new Color(0x99aabb);
-	private static final Color TOOL_COLOR = new Color(0xbbaa99);
-	private static final Color SELECTION_COLOR = new Color(0x88aa88);
+//	private static final Color VIEW_COLOR = new Color(0x99aabb);
+//	private static final Color TOOL_COLOR = new Color(0xbbaa99);
+//	private static final Color SELECTION_COLOR = new Color(0x88aa88);
+	
+	private static final Color VIEW_COLOR = new Color(0xbbccee);
+	private static final Color TOOL_COLOR = new Color(0xeeccbb);
+	private static final Color SELECTION_COLOR = new Color(0xaaccaa);
 	
 	private final BooleanAttr viewExpandedAttr = new BooleanAttr();
 	private final BooleanAttr toolExpandedAttr = new BooleanAttr();

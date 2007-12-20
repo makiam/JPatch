@@ -33,7 +33,6 @@ public class JPatchForm {
 			}
 			public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) { }
 		});
-		component.setBackground(Color.WHITE);
 		component.setOpaque(false);
 	}
 	
@@ -44,7 +43,7 @@ public class JPatchForm {
 	
 	public void addRow(JLabel label, JComponent... components) {
 		JComponent row = new JPanel(new RowLayout());
-		row.setBackground(Color.WHITE);
+		row.setOpaque(false);
 		row.add(label);
 		for (JComponent c : components) {
 			row.add(c);

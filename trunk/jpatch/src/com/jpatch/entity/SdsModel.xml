@@ -9,6 +9,7 @@
 			<field name="Rotation order" attribute="RotationOrder" />
 			<field name="Axis rotation order" attribute="AxisRotationOrder" />
 			<field name="Axis rotation" attribute="AxisRotation" />
+			<boolean display="switch" false="invsible" true="visible" />
 			<field name="Visibility" attribute="Visibility" />
 		</group>
 		<group name="Limits" expansion="embeddedTransform.limits">

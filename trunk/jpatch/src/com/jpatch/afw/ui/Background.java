@@ -17,7 +17,7 @@ public class Background {
 		}
 		double rootWidth = root.getWidth();
 		double rootHeight = root.getHeight();
-		double size = Math.sqrt(rootWidth * rootWidth + rootHeight * rootHeight);
+		double size = Math.sqrt(rootWidth * rootWidth + rootHeight * rootHeight) * 1.5;
 		Point2D.Double hub = new Point2D.Double(rootWidth / 2.0, -rootWidth / 4.0);
 		Point2D.Double spoke0 = new Point2D.Double();
 		Point2D.Double spoke = new Point2D.Double();
