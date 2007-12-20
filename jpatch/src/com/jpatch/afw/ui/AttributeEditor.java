@@ -27,6 +27,8 @@ public class AttributeEditor {
 	private final Stack<JPatchFormContainer> containerStack = new Stack<JPatchFormContainer>();
 	private JPatchForm form = new JPatchForm();
 	private final List<ComponentBinding> bindings = new ArrayList<ComponentBinding>();
+	private String falseString = null;
+	private String trueString = null;
 	
 	public AttributeEditor(Class entityClass, String name, BooleanAttr expansionControl, Object entity, Color borderColor) {
 		this.entityClass = entityClass;
@@ -53,6 +55,11 @@ public class AttributeEditor {
 	
 	public JPatchFormContainer getRootContainer() {
 		return containerStack.firstElement();
+	}
+	
+	public void setBooleanValues(String falseString, String trueString) {
+		this.falseString = falseString;
+		this.trueString = trueString;
 	}
 	
 	public void startContainer(String name, BooleanAttr expansionControl) {
@@ -83,9 +90,15 @@ public class AttributeEditor {
 			form.addRow(new JLabel(label), x, y);
 			addBinding(new ComponentBinding(getAttributeMethod(attributeName), x, y));
 		} else if (attribute instanceof BooleanAttr) {
-			JCheckBox checkBox = new JCheckBox();
-			form.addRow(new JLabel(label), checkBox);
-			addBinding(new ComponentBinding(getAttributeMethod(attributeName), checkBox));
+			if (falseString == null || trueString == null) {
+				JCheckBox checkBox = new JCheckBox();
+				form.addRow(new JLabel(label), checkBox);
+				addBinding(new ComponentBinding(getAttributeMethod(attributeName), checkBox));
+			} else {
+				Switcher switcher = new Switcher(falseString, trueString);
+				form.addRow(new JLabel(label), switcher);
+				addBinding(new ComponentBinding(getAttributeMethod(attributeName), switcher.asAbstractButton()));
+			}
 		} else if (attribute instanceof StateMachine) {
 			JComboBox comboBox = new JComboBox();
 			form.addRow(new JLabel(label), comboBox);
@@ -185,7 +198,7 @@ public class AttributeEditor {
 			AttributeManager.getInstance().bindTextFieldToAttribute(entity, (JTextField) binding.components[0], ((Tuple2Attr) attribute).getXAttr());
 			AttributeManager.getInstance().bindTextFieldToAttribute(entity, (JTextField) binding.components[1], ((Tuple2Attr) attribute).getYAttr());
 		} else if (attribute instanceof BooleanAttr) {
-			AttributeManager.getInstance().bindCheckBoxToAttribute(entity, (JCheckBox) binding.components[0], (BooleanAttr) attribute);
+			AttributeManager.getInstance().bindButtonToAttribute(entity, (AbstractButton) binding.components[0], (BooleanAttr) attribute);
 		} else if (attribute instanceof StateMachine) {
 			AttributeManager.getInstance().bindComboBoxToAttribute(entity, (JComboBox) binding.components[0], (StateMachine) attribute);
 		} else if (attribute instanceof ScalarAttribute){

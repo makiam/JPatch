@@ -29,14 +29,7 @@ import com.jpatch.afw.control.Configuration;
 import com.jpatch.afw.control.JPatchUndoListener;
 import com.jpatch.afw.control.JPatchUndoManager;
 import com.jpatch.afw.icons.IconSet;
-import com.jpatch.afw.ui.AttributeManager;
-import com.jpatch.afw.ui.Background;
-import com.jpatch.afw.ui.ButtonUtils;
-import com.jpatch.afw.ui.JPatchActionButton;
-import com.jpatch.afw.ui.JPatchStateButton;
-import com.jpatch.afw.ui.JPatchToggleButton;
-import com.jpatch.afw.ui.JPatchToolBar;
-import com.jpatch.afw.ui.UserInputListener;
+import com.jpatch.afw.ui.*;
 import com.jpatch.afw.vecmath.Transform;
 import com.jpatch.boundary.actions.Actions;
 import com.jpatch.boundary.actions.Actions.ViewportMode;
@@ -527,7 +520,12 @@ public class Main {
 		
 		
 		
-		final JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		final JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT) {
+
+		};
+		vSplit.setBorder(null);
+		
+		vSplit.setBackground(Color.RED);
 		activeViewport.addAttributePostChangeListener(inspector.getViewportChangeListener());
 		inspector.getComponent().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		
@@ -605,14 +603,33 @@ public class Main {
 		
 		treeManager.createTreeNodeFor(sceneGraphRoot);
 		JTree tree = new JTree(treeModel);
+		tree.setCellRenderer(new JPatchTreeCellRenderer());
 		tree.setRootVisible(false);
 		tree.setShowsRootHandles(true);
 		
-		JScrollPane scrollPane = new JScrollPane(inspector.getComponent(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.setBorder(BorderFactory.createLineBorder(new Color(0xcccccc), 1));
+		JScrollPane scrollPane = new JScrollPane(null, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER) {
+			
+		};
+		
+		
+		JViewport viewport = new JViewport() {
+			public void paintComponent(Graphics g) {
+				Background.fillComponent(this, g);
+				
+			}
+		};
+		viewport.setView(inspector.getComponent());
+		viewport.setBorder(null);
+//		inspector.getComponent().setOpaque(false);
+		scrollPane.setViewport(viewport);
+		
+		scrollPane.setBorder(null);
+//		scrollPane.setBorder(BorderFactory.createLineBorder(new Color(0xcccccc), 1));
 		scrollPane.getViewport().setBorder(null);
 		scrollPane.setViewportBorder(null);
 		scrollPane.getVerticalScrollBar().setBorder(null);
+		
+//		scrollPane.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 		vSplit.setBorder(null);
 		vSplit.setContinuousLayout(true);
 //		vSplit.setBackground(BACKGROUND);
@@ -620,10 +637,53 @@ public class Main {
 		vSplit.setDividerSize(9);
 //		vSplit.add(new JScrollPane(tree));
 		
-		JScrollPane scrollPane2 = new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane2.setBorder(BorderFactory.createLineBorder(new Color(0xcccccc), 1));
+		final JScrollPane scrollPane2 = new JScrollPane(null, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		tree.setOpaque(false);
+		
+		viewport = new JViewport() {
+//			public void paintComponent(Graphics g) {
+//				Background.fillComponent(this, g);
+//				((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//				((Graphics2D) g).setPaint(new GradientPaint(0, 0, new Color(0xeeeeee), getWidth(), 0, new Color(0xe8e8e8)));
+//				g.fillRoundRect(2, 0, getWidth() - 4, getHeight(), 9, 9);
+//				g.setColor(new Color(0x777777));
+//				g.drawRoundRect(2, 0, getWidth() - 5, getHeight() - 1, 8, 8);
+//			}
+		};
+		
+		viewport.setView(tree);
+		viewport.setOpaque(false);
+		scrollPane2.setViewport(viewport);
+		scrollPane2.setBorder(null);
 		scrollPane2.getViewport().setBorder(null);
-		scrollPane2.setViewportBorder(null);
+		
+		scrollPane2.setViewportBorder(new Border() {
+
+			public Insets getBorderInsets(Component c) {
+				return new Insets(2, 4, 2, 4);
+			}
+
+			public boolean isBorderOpaque() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+				Background.fillComponent((Container) c, g);
+				((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//				((Graphics2D) g).setPaint(new GradientPaint(0, 0, new Color(0xeeeeec), c.getWidth(), 0, new Color(0xc8c8c8)));
+				g.setColor(new Color(0xe0e0e0));
+				int scrollBarWidth = scrollPane2.getVerticalScrollBar().getSize().width;
+				g.fillRoundRect(2, 0, c.getWidth() - scrollBarWidth - 4, c.getHeight(), 9, 9);
+				((Graphics2D) g).setPaint(new GradientPaint(0, 0, new Color(0x44ffffff, true), 0, 32,  new Color(0x00ffffff, true)));
+				g.fillRoundRect(2, 0, c.getWidth() - scrollBarWidth - 4, 32, 9, 9);
+				g.setColor(new Color(0x777777));
+				g.drawRoundRect(2, 0, c.getWidth() - scrollBarWidth - 5, c.getHeight() - 1, 8, 8);
+				
+				
+			}
+			
+		});
 		scrollPane2.getVerticalScrollBar().setBorder(null);
 		
 		vSplit.add(scrollPane2);
@@ -637,8 +697,8 @@ public class Main {
 				Background.fillComponent(this, g);
 			}
 		};
-		leftStrut.setPreferredSize(new Dimension(2, 2));
-		sideBar.add(leftStrut, BorderLayout.WEST);
+//		leftStrut.setPreferredSize(new Dimension(2, 2));
+//		sideBar.add(leftStrut, BorderLayout.WEST);
 		sideBar.add(vSplit, BorderLayout.CENTER);
 		
 		JComponent screenArea = new JPanel(new BorderLayout());

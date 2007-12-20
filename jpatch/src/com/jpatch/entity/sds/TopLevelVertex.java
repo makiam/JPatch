@@ -145,6 +145,7 @@ public class TopLevelVertex extends BaseVertex {
 				}
 				if (TopLevelVertex.this.corner > 0) {
 					TopLevelVertex.this.position.getTuple(limit);
+					computeNormal();
 				} else if (TopLevelVertex.this.crease > 0) {
 					Tuple3Attr p1 = TopLevelVertex.this.creaseEdge0.edgePoint.position;
 					Tuple3Attr p2 = TopLevelVertex.this.creaseEdge1.edgePoint.position;
@@ -153,6 +154,7 @@ public class TopLevelVertex extends BaseVertex {
 							position.getY() * CREASE_LIMIT0 + (p1.getY() + p2.getY()) * CREASE_LIMIT1,
 							position.getZ() * CREASE_LIMIT0 + (p1.getZ() + p2.getZ()) * CREASE_LIMIT1
 					);
+					computeNormal();
 				} else {
 					double fx = 0, fy = 0, fz = 0;
 					double ex = 0, ey = 0, ez = 0;
@@ -179,6 +181,7 @@ public class TopLevelVertex extends BaseVertex {
 					float bx = 0;
 					float by = 0;
 					float bz = 0;
+					
 					for (int i = 0; i < edges.length; i++) {
 						int j = (i + 1) % edges.length;
 						Tuple3Attr p0f = edges[i].face.facePoint.position;
@@ -206,6 +209,25 @@ public class TopLevelVertex extends BaseVertex {
 					normal.normalize();
 				}	
 				limitValid = true;
+			}
+			
+			private void computeNormal() {
+				normal.set(0, 0, 0);
+				
+				for (int i = 0; i < faces.length; i++) {
+					Face face = faces[i];
+//					System.out.println(i + " " + face);
+					if (face == null) {
+						continue;
+					}
+//					System.out.println(face + " " + face.facePoint.normal);
+					face.facePoint.computeDerivedPosition();
+					face.facePoint.computeLimit();
+					normal.add(face.facePoint.normal);
+				}
+				
+				normal.normalize();
+				
 			}
 		};
 		
@@ -424,6 +446,9 @@ public class TopLevelVertex extends BaseVertex {
 			throw new IllegalStateException();
 		}
 		edges = tmp;
+		for (int i = 0; i < edges.length; i++) {
+			faces[i] = edges[i].face;
+		}
 		valence = n;
 	}
 	

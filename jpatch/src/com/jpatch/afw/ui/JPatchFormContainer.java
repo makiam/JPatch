@@ -16,9 +16,9 @@ public class JPatchFormContainer {
 	private static final Font LABEL_FONT = new Font("sans-serif", Font.BOLD, 12);
 	private static final Icon EXPANDED_ICON = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/EXPANDED.png"));
 	private static final Icon COLLAPSED_ICON = new ImageIcon(ClassLoader.getSystemResource("com/jpatch/afw/icons/COLLAPSED.png"));
-	private static final Insets EXPANDED_INSETS = new Insets(0, 4, 4, 4);
-	private static final Insets COLLAPSED_INSETS = new Insets(0, 4, 2, 4);
-	private final JComponent component = Box.createVerticalBox();
+	private static final Insets EXPANDED_INSETS = new Insets(0, 3, 3, 3);
+	private static final Insets COLLAPSED_INSETS = new Insets(0, 3, 3, 3);
+	private final JComponent component = new JPanel();
 	private final JComponent titleBar = new JPanel(new BorderLayout());
 	private final Box formBox = Box.createVerticalBox();
 	private final Box containerBox = Box.createVerticalBox();
@@ -56,15 +56,14 @@ public class JPatchFormContainer {
 	};
 	
 	public JPatchFormContainer(String title, BooleanAttr expansionControl) {
-		
+		component.setLayout(new BoxLayout(component, BoxLayout.Y_AXIS));
 		titleBar.add(expandedButton, BorderLayout.WEST);
 		expandedButton.setFont(LABEL_FONT);
 		titleBar.setOpaque(false);
 		component.add(titleBar);
-		component.setOpaque(true);
-		component.setBackground(Color.WHITE);
+		component.setOpaque(false);
+//		component.setBackground(new Color(0xcccccc));
 		component.setBorder(new Border() {
-			private final Insets insets = new Insets(0, 4, 0, 4);
 			public Insets getBorderInsets(Component c) {
 				return expandedAttr.getBoolean() ? EXPANDED_INSETS : COLLAPSED_INSETS;
 			}
@@ -74,18 +73,48 @@ public class JPatchFormContainer {
 			}
 
 			public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+				Color background = Color.white;
+				int t = 127;
+//				t = 100;
+				Color brightColor = new Color(
+						(borderColor.getRed() * t + background.getRed() * (255 - t)) / 255,
+						(borderColor.getGreen() * t + background.getGreen() * (255 - t)) / 255,
+						(borderColor.getBlue() * t + background.getBlue() * (255 - t)) / 255
+				);
+				int gray = (borderColor.getRed() * 0 + borderColor.getGreen() * 255 + borderColor.getBlue() * 0) * 5 / 6 / 255;
+				Color grayColor = new Color(gray + borderColor.getRed() / 6, gray + borderColor.getGreen() / 6, gray + borderColor.getBlue() / 6);
+//				grayColor = new Color(0xcccccc);
+//				brightColor = Color.YELLOW;
+				
+				
 				int h = titleBar.getHeight();
 				Graphics2D g2 = (Graphics2D) g;
+//				g2.setColor(new Color(0xeeeeee));
+//				g2.fillRoundRect(x + 1, y + h - 1, width - 3, height - h - 3, 6, 6);
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				g2.setColor(borderColor);
-				g2.fillRoundRect(x, y + 0, width, h, 8, 8);
-				g2.drawRoundRect(x, y + 0, width - 1, h - 1, 8, 8);
-				if (expandedAttr.getBoolean()) {
-					g2.drawRoundRect(x, y + h - 2, width - 1, height - h - 1, 8, 8);
-					g2.drawRoundRect(x + 1, y + h - 1, width - 3, height - h - 3, 6, 6);
-					g2.fillRect(x, 11, 2, 8);
-					g2.fillRect(x + width - 2, 11, 2, 8);
-				}
+//				g2.setPaint(new GradientPaint(0, h, borderColor, width, 0, brightColor));
+				
+//				int level = getLevel();
+//				int round = 14 - level * 2;
+				
+				int round = 10;
+				
+				g2.setPaint(new GradientPaint(0, h, brightColor, width, 0, grayColor));
+				g2.fillRoundRect(x + 1, y + 1, width - 2, height - 3, round - 2, round - 2);
+				int hh = Math.min(h * 2, height);
+				g2.setPaint(new GradientPaint(0, 0, new Color(0x66ffffff, true), 0, hh, new Color(0x00ffffff, true)));
+				g2.fillRoundRect(x, y, width, hh, round, round);
+				g2.setColor(borderColor.darker());
+				g2.drawRoundRect(x, y, width - 1, height - 2, round, round);
+//				g2.setColor(borderColor);
+//				g2.fillRoundRect(x, y + 0, width, h, 8, 8);
+//				g2.drawRoundRect(x, y + 0, width - 1, h - 1, 8, 8);
+//				if (expandedAttr.getBoolean()) {
+//					g2.drawRoundRect(x, y + h - 2, width - 1, height - h - 1, 8, 8);
+//					g2.drawRoundRect(x + 1, y + h - 1, width - 3, height - h - 3, 6, 6);
+//					g2.fillRect(x, 11, 2, 8);
+//					g2.fillRect(x + width - 2, 11, 2, 8);
+//				}
 			}
 			
 		});
@@ -129,8 +158,9 @@ public class JPatchFormContainer {
 	public void add(JPatchFormContainer formContainer) {
 		containerBox.add(formContainer.getComponent());
 		formContainer.parentContainer = this;
-		Color background = UIManager.getColor("Panel.background");
-		int t = 255 - 100;
+//		Color background = UIManager.getColor("Panel.background");
+		Color background = Color.white;
+		int t = 255 - 127;
 		formContainer.borderColor = new Color(
 				(borderColor.getRed() * t + background.getRed() * (255 - t)) / 255,
 				(borderColor.getGreen() * t + background.getGreen() * (255 - t)) / 255,

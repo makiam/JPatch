@@ -258,35 +258,35 @@ public class AttributeManager {
 	}
 	
 	/**
-	 * Binds the specified JCheckBox to the specified Attribute.
-	 * @param checkBox
+	 * Binds the specified AbstractButton to the specified Attribute.
+	 * @param button
 	 * @param booleanAttr
-	 * @return the specified JCheckBox
+	 * @return the specified AbstractButton
 	 * @throws NullPointerException if any of the specified parameters is null
-	 * @throws IllegalStateException if the specified JCheckBox is already bound (to <i>any</i> Attribute)
+	 * @throws IllegalStateException if the specified AbstractButton is already bound (to <i>any</i> Attribute)
 	 */
-	public JCheckBox bindCheckBoxToAttribute(final Object entity, final JCheckBox checkBox, final BooleanAttr booleanAttr) {
+	public AbstractButton bindButtonToAttribute(final Object entity, final AbstractButton button, final BooleanAttr booleanAttr) {
 //		checkBox.setSelected(booleanAttr.getBoolean());
 		
 		/* create an AttributePostChangeListener to listen for attribute changes und update the checkbox */
 		AttributePostChangeListener attrListener = new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
-				checkBox.setSelected(booleanAttr.getBoolean());
+				button.setSelected(booleanAttr.getBoolean());
 			}
 		};
 		
 		/* bind attribute and attrListener to component */
-		bind(checkBox, new AttributeBinding(booleanAttr, attrListener));						// throws IllegalStateException if already bound
+		bind(button, new AttributeBinding(booleanAttr, attrListener));						// throws IllegalStateException if already bound
 		
 		/* create and add an ActionListener */
-		addListener(checkBox, new ActionListener() {					// throws IllegalStateException if already bound
+		addListener(button, new ActionListener() {					// throws IllegalStateException if already bound
 			public void actionPerformed(ActionEvent e) {
-				booleanAttr.setBoolean(checkBox.isSelected());
+				booleanAttr.setBoolean(button.isSelected());
 				fireActionPerformed(entity, booleanAttr);
 			}
 		});
 		
-		return checkBox;
+		return button;
 	}
 	
 	public JTextField bindTextFieldToAttribute(Object entity, final JTextField textField, ScalarAttribute attribute) {
@@ -645,7 +645,10 @@ public class AttributeManager {
 		listeners.add(listener);
 		
 		if (listener instanceof ActionListener) {
-			if (component instanceof AbstractButton) {
+			if (component instanceof Switcher) {
+				((Switcher) component).asAbstractButton().addActionListener((ActionListener) listener);
+				return;
+			} else if (component instanceof AbstractButton) {
 				((AbstractButton) component).addActionListener((ActionListener) listener);
 				return;
 			} else if (component instanceof JTextField) {

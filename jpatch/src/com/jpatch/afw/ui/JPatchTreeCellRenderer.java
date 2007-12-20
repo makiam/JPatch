@@ -46,27 +46,40 @@ public class JPatchTreeCellRenderer extends DefaultTreeCellRenderer {
 		iconMap.put(Model.class, new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_16x16/model.png")));
 	}
 	
+	public JPatchTreeCellRenderer() {
+		setOpaque(false);
+	}
+	
 	@Override
 	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 		/* initialze label by calling superclass method */
 		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 		
-		JPatchTreeNode node = (JPatchTreeNode) value;		// node needs to be a JPatchTreeNode
-		Object userObject = node.getUserObject();
-		setText(node.getName());							// set the label text
-		if (userObject != null) {
-			if (userObject instanceof Project && ((Project) userObject).isOpen()) {
-				setIcon(projectOpenIcon);
-			} else {
-				Class objectClass = userObject.getClass();
-				Icon icon = null;
-				while (icon == null) {
-					icon = iconMap.get(objectClass);
-					objectClass = objectClass.getSuperclass();
-				}
-				setIcon(icon);
-			}
-		}
+//		JPatchTreeNode node = (JPatchTreeNode) value;		// node needs to be a JPatchTreeNode
+//		Object userObject = node.getUserObject();
+//		setText(node.getName());							// set the label text
+//		if (userObject != null) {
+//			if (userObject instanceof Project && ((Project) userObject).isOpen()) {
+//				setIcon(projectOpenIcon);
+//			} else {
+//				Class objectClass = userObject.getClass();
+//				Icon icon = null;
+//				while (icon == null) {
+//					icon = iconMap.get(objectClass);
+//					objectClass = objectClass.getSuperclass();
+//				}
+//				setIcon(icon);
+//			}
+//		}
 		return this;
 	}
+	
+	public Color getBackgroundNonSelectionColor() {
+		return(null);
+	}
+
+	public Color getBackground() {
+		return(null);
+	}
+		 
 }

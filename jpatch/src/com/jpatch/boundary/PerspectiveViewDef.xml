@@ -5,6 +5,7 @@
 	<field name="Rotation" attribute="Rotation" />
 	<field name="Focal Length" attribute="FocalLength" />
 	<group name="Rendering" expansion="view.rendering">
+	    <boolean display="switch" false="hide" true="show" />
 		<field name="Control mesh" attribute="ShowControlMesh" />
 		<field name="Limit surface" attribute="ShowLimitSurface" />
 		<field name="Projected mesh" attribute="ShowProjectedMesh" />

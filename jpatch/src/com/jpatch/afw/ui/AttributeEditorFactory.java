@@ -80,8 +80,14 @@ public class AttributeEditorFactory {
 				if (!attributes.getValue("class").equals(objectClass.getName())) {
 					throw new SAXException("wrong class: " + attributes.getValue("class") + ", excpected " + objectClass.getSimpleName());
 				}
-			}
-			if (localName.equals("group")) {
+			} else if (localName.equals("boolean")) {
+				String display = attributes.getValue("display");
+				if (display.equals("checkbox")) {
+					editor.setBooleanValues(null, null);
+				} else if (display.equals("switch")) {
+					editor.setBooleanValues(attributes.getValue("false"), attributes.getValue("true"));
+				}
+			} else if (localName.equals("group")) {
 				String expansion = attributes.getValue("expansion");
 				BooleanAttr expansionControl = null;
 				if (expansion != null) {

@@ -16,7 +16,7 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.plaf.metal.MetalSplitPaneUI;
 
-public class SplitPaneUI extends MetalSplitPaneUI {
+public class SplitPaneUI extends BasicSplitPaneUI {
 	private static final int oneTouchSize = 8;
     /**
       * Creates a new SplitPaneUI instance

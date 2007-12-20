@@ -15,9 +15,7 @@ import javax.media.opengl.GL;
 import javax.swing.SwingUtilities;
 import javax.vecmath.*;
 
-import com.jpatch.afw.attributes.GenericAttr;
-import com.jpatch.afw.attributes.StateMachine;
-import com.jpatch.afw.attributes.Tuple3Attr;
+import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.AttributeEdit;
 import com.jpatch.afw.control.JPatchUndoableEdit;
 import com.jpatch.afw.vecmath.*;
@@ -92,6 +90,8 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 	private final Tuple3Attr pivotAttr = new Tuple3Attr();
 	private final Tuple3Attr axisRotationAttr = new Tuple3Attr();
 	private final Tuple3Attr vectorAttr = new Tuple3Attr();
+	private final BooleanAttr normalAttr = new BooleanAttr(false);
+	
 	private final Point3d pivot = new Point3d();
 	private final Point3d cameraPivot = new Point3d();
 	
