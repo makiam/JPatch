@@ -2,6 +2,7 @@ package com.jpatch.boundary.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.*;
+import java.util.*;
 
 import javax.swing.JFileChooser;
 
@@ -23,7 +24,7 @@ public class Actions {
 			new MoveVertexTool(),
 			new RotateTool(),
 			new TranslateTool(),
-			null
+			new NormalTool(),
 	};
 	
 	public final JPatchUndoManager undoManager = new JPatchUndoManager();
@@ -80,6 +81,25 @@ public class Actions {
 		}
 	};
 	
+	public final JPatchAction extrudeTest = new JPatchAction(undoManager, "EXTRUDE_TOOL") {
+		public void actionPerformed(ActionEvent e) {
+			System.out.println("extrude");
+			Sds sds = Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getSds();
+			Set<AbstractVertex> selectedVertices = new HashSet<AbstractVertex>(Main.getInstance().getSelection().getSelectedVerticesAttribute().getElements());
+			Collection<Face> facesToExtrude = new HashSet<Face>();
+			faceLoop:
+			for (Face face : sds.faceList) {
+				for (HalfEdge edge : face.getEdges()) {
+					if (!selectedVertices.contains(edge.getFirstVertex())) {
+						continue faceLoop;
+					}
+					facesToExtrude.add(face);
+				}
+			}
+			Operations.extrude(sds, facesToExtrude);
+		}
+	};
+	
 	public final JPatchAction save = new JPatchAction(undoManager, "SAVE_FILE") {
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser fileChooser = new JFileChooser();
@@ -103,7 +123,7 @@ public class Actions {
 		
 		extrudeTool.getEnabled().setBoolean(false);
 		latheTool.getEnabled().setBoolean(false);
-		scaleTool.getEnabled().setBoolean(false);
+//		scaleTool.getEnabled().setBoolean(false);
 //		save.getEnabled().setBoolean(false);
 		
 		snapToGrid.getEnabled().setBoolean(false);

@@ -42,12 +42,14 @@ public abstract class AbstractVertex {
 		position.getReferenceTuple3().getTuple(p);
 	}
 	
-	public void getPos(Tuple3d p) {
+	public Tuple3d getPos(Tuple3d p) {
 		position.getTuple(p);
+		return p;
 	}
 	
-	public void getPos(Tuple3f p) {
+	public Tuple3f getPos(Tuple3f p) {
 		position.getTuple(p);
+		return p;
 	}
 	
 	public void getProjectedPos(Tuple3f p) {

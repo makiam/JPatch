@@ -153,7 +153,7 @@ public class MoveVertexTool implements VisibleTool {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON1) {
-				MouseSelector.Hit hit = MouseSelector.getVertexAt(viewport, e.getX(), e.getY());
+				MouseSelector.Hit hit = MouseSelector.getVertexAt(viewport, e.getX(), e.getY(), false);
 //				HalfEdge edge = MouseSelector.getEdgeAt(viewport, e.getX(), e.getY(), Main.getInstance().getActiveSds());
 				if (hit.object != null) {
 					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, (SdsModel) hit.node, (TopLevelVertex) hit.object);

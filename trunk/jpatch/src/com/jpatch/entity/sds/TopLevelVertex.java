@@ -432,11 +432,13 @@ public class TopLevelVertex extends BaseVertex {
 		int j = 0;
 		for (int i = 0; i < n; i++) {
 			HalfEdge start = getStartEdge(edges[i]);
+			System.out.println("validate " + this + " checking " + edges[i]);
 			HalfEdge e = null, next = start;
 			do {
 				e = next;
 				next = e.prev == null ? null : e.prev.pair;
 				if (!addedEdges.contains(e)) {
+					System.out.println("validate " + this + " adding " + e);
 					addedEdges.add(e);
 					tmp[j++] = e;
 				}
@@ -466,6 +468,19 @@ public class TopLevelVertex extends BaseVertex {
 		final Face[] tmpFace = new Face[faces.length + 1];
 		System.arraycopy(faces, 0, tmpFace, 0, faces.length);
 		tmpFace[faces.length] = edge.face;
+		faces = tmpFace;
+	}
+	
+	void removeEdge(HalfEdge edge) {
+		int index = getEdgeIndex(edge);
+		final HalfEdge[] tmp = new HalfEdge[edges.length - 1];
+		System.arraycopy(edges, 0, tmp, 0, index);
+		System.arraycopy(edges, index + 1, tmp, index, tmp.length - index);
+		edges = tmp;
+		
+		final Face[] tmpFace = new Face[faces.length - 1];
+		System.arraycopy(faces, 0, tmpFace, 0, index);
+		System.arraycopy(faces, index + 1, tmpFace, index, tmpFace.length - index);
 		faces = tmpFace;
 	}
 	

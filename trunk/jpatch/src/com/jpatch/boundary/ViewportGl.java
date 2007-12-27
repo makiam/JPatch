@@ -1279,24 +1279,24 @@ public class ViewportGl extends Viewport {
 			}
 			gl.glEnd();
 			
-			Vector3f n = new Vector3f();
-			gl.glColor3f(1, 1, 0);
-			gl.glBegin(GL_LINES);
-			for (Face face : sds.faceList) {
-				for (HalfEdge edge : face.getEdges()) {
-					if (edge.isPrimary()) {
-						TopLevelVertex vertex = edge.getFirstVertex();
-						Point3f p = vertex.vertexPoint.projectedLimit;
-						gl.glVertex3f(p.x, p.y, p.z);
-						n.set(vertex.vertexPoint.projectedNormal);
-						n.normalize();
-						n.scale(20);
-						p.add(n);
-						gl.glVertex3f(p.x, p.y, p.z);
-					}
-				}
-			}
-			gl.glEnd();
+//			Vector3f n = new Vector3f();
+//			gl.glColor3f(1, 1, 0);
+//			gl.glBegin(GL_LINES);
+//			for (Face face : sds.faceList) {
+//				for (HalfEdge edge : face.getEdges()) {
+//					if (edge.isPrimary()) {
+//						TopLevelVertex vertex = edge.getFirstVertex();
+//						Point3f p = vertex.vertexPoint.projectedLimit;
+//						gl.glVertex3f(p.x, p.y, p.z);
+//						n.set(vertex.vertexPoint.projectedNormal);
+//						n.normalize();
+//						n.scale(20);
+//						p.add(n);
+//						gl.glVertex3f(p.x, p.y, p.z);
+//					}
+//				}
+//			}
+//			gl.glEnd();
 			
 			
 		} else if (showProjectedMeshAttr.getBoolean()) {

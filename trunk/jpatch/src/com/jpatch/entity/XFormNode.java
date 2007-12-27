@@ -186,8 +186,8 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	}
 
 	public void scale(Scale3d scale) {
-		// TODO Auto-generated method stub
-		
+		System.out.println("scale=" + scale);
+		transformable.scale(scale);
 	}
 
 	public void sync() {
@@ -463,6 +463,23 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 			
 			translationAttr.setTuple(translation);
 		}
+		
+		public void scale(Scale3d scale) {
+			System.out.println("scale= " + scale);
+//			Matrix3d m = scale.getScaleMatrix(new Matrix3d());
+//			scale.scale(XFormNode.this.scale);
+			XFormNode.this.scale.set(scale);
+			System.out.println("this.scale=" + XFormNode.this.scale);
+			scaleAttr.setTuple(XFormNode.this.scale);
+//			m.invert();
+//			Vector3d v = new Vector3d(vector);
+//			m.transform(v);
+//			
+//			translation.add(startTranslation, v);
+//			
+//			translationAttr.setTuple(translation);
+		}
+
 		
 		public void end(List<JPatchUndoableEdit> editList) {
 			active = false;
