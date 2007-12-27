@@ -17,37 +17,37 @@ public class MouseSelector {
 	static final private double MIN_DIST_SQ = 64;
 	static final TransformUtil transformUtil = new TransformUtil();
 	
-	public static Hit getVertexAt(Viewport viewport, int x, int y) {	
-		return getVertexAt(viewport, x, y, Main.getInstance().getSceneGraphRoot(), new Hit());
+	public static Hit getVertexAt(Viewport viewport, int x, int y, boolean noProjection) {	
+		return getVertexAt(viewport, x, y, Main.getInstance().getSceneGraphRoot(), new Hit(), noProjection);
 	}
 	
-	public static Hit getVertexAt(Viewport viewport, int x, int y, SceneGraphNode node) {
-		return getVertexAt(viewport, x, y, node, new Hit());
+	public static Hit getVertexAt(Viewport viewport, int x, int y, SceneGraphNode node, boolean noProjection) {
+		return getVertexAt(viewport, x, y, node, new Hit(), noProjection);
 	}
 	
-	public static Hit getVertexAt(Viewport viewport, int x, int y, Hit hit) {
-		return getVertexAt(viewport, x, y, Main.getInstance().getSceneGraphRoot(), hit);
+	public static Hit getVertexAt(Viewport viewport, int x, int y, Hit hit, boolean noProjection) {
+		return getVertexAt(viewport, x, y, Main.getInstance().getSceneGraphRoot(), hit, noProjection);
 	}
 	
-	public static Hit getVertexAt(Viewport viewport, int x, int y, SceneGraphNode node, Hit hit) {
+	public static Hit getVertexAt(Viewport viewport, int x, int y, SceneGraphNode node, Hit hit, boolean noProjection) {
 		if (node instanceof SdsModel) {
 			SdsModel sdsModel = (SdsModel) node;
-			getVertexAt(viewport, x, y, sdsModel, hit);
+			getVertexAt(viewport, x, y, sdsModel, hit, noProjection);
 		}
 		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
-			getVertexAt(viewport, x, y, child, hit);
+			getVertexAt(viewport, x, y, child, hit, noProjection);
 		}
 		return hit;
 	}
 	
-	public static void getVertexAt(Viewport viewport, int x, int y, SdsModel sdsModel, Hit hit) {
+	public static void getVertexAt(Viewport viewport, int x, int y, SdsModel sdsModel, Hit hit, boolean noProjection) {
 		ViewDef viewDef = viewport.getViewDef();
 //		Matrix4d matrix = new Matrix4d(viewDef.getMatrix(new Matrix4d()));
 //		Transform transform = sdsModel.getTransform();
 //		transform.mul2(matrix);
 		
 //		Matrix4d matrix = viewport.getViewDef().getMatrix(new Matrix4d());
-		boolean useProjection = !viewport.getViewDef().getShowControlMeshAttribute().getBoolean();
+		boolean useProjection = !viewport.getViewDef().getShowControlMeshAttribute().getBoolean() && !noProjection;
 		Point3d p = new Point3d();
 //		System.out.println("getVertexAt(" + x + ", " + y + ")");
 		viewDef.configureTransformUtil(transformUtil);

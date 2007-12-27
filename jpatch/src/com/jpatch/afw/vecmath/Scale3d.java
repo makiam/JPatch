@@ -7,7 +7,7 @@ import javax.vecmath.*;
  * each axis.
  */
 @SuppressWarnings("serial")
-public class Scale3d extends Tuple3d {
+public class Scale3d extends Vector3d {
 	
 	/**
 	 * Creates a new Scale3d object with an identity transformation (scale factors 1, 1, 1)
@@ -117,6 +117,12 @@ public class Scale3d extends Tuple3d {
 		m.m22 *= z;
 		m.m23 *= z;
 		return m;
+	}
+	
+	public void scale(Tuple3d tuple) {
+		tuple.x *= this.x;
+		tuple.y *= this.y;
+		tuple.z *= this.z;
 	}
 }
 
