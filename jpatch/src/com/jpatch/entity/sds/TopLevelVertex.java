@@ -23,7 +23,7 @@ public class TopLevelVertex extends BaseVertex {
 	
 	HalfEdge[] edges = new HalfEdge[0];
 	Face[] faces = new Face[0];
-	public final Level2Vertex vertexPoint;
+	private final Level2Vertex vertexPoint;
 	int valence = -1;
 
 	HalfEdge creaseEdge0, creaseEdge1;
@@ -82,18 +82,15 @@ public class TopLevelVertex extends BaseVertex {
 		vertexPoint = new Level2Vertex() {
 			
 			@Override
-			public void computeDerivedPosition() {
-				if (positionValid) {
-					return;
-				}
+			void computeDerivedPosition() {
 				if (!overridePosition.getBoolean()) {
 					if (TopLevelVertex.this.corner > 0) {
 						position.setTuple(TopLevelVertex.this.position);
 						limitFactor = 1.0;
 					} else if (TopLevelVertex.this.crease > 0) {
 						Tuple3Attr p0 = TopLevelVertex.this.position;
-						Tuple3Attr p1 = TopLevelVertex.this.creaseEdge0.pair.vertex.position;
-						Tuple3Attr p2 = TopLevelVertex.this.creaseEdge1.pair.vertex.position;
+						Tuple3Attr p1 = TopLevelVertex.this.creaseEdge0.getPair().getVertex().position;
+						Tuple3Attr p2 = TopLevelVertex.this.creaseEdge1.getPair().getVertex().position;
 						position.setTuple(
 								p0.getX() * CREASE0 + (p1.getX() + p2.getX()) * CREASE1,
 								p0.getY() * CREASE0 + (p1.getY() + p2.getY()) * CREASE1,
@@ -106,11 +103,12 @@ public class TopLevelVertex extends BaseVertex {
 						double w = (valence - 2.0) / valence;
 						double x = 0, y = 0, z = 0;
 						for (HalfEdge edge : edges) {
-							Tuple3Attr p = edge.face.facePoint.position;
+							edge.getFace().getFacePoint().validatePosition();
+							Tuple3Attr p = edge.getFace().getFacePoint().position;
 							x += p.getX();
 							y += p.getY();
 							z += p.getZ();
-							p = edge.pair.vertex.position;
+							p = edge.getPairVertex().position;
 							x += p.getX();
 							y += p.getY();
 							z += p.getZ();
@@ -133,22 +131,20 @@ public class TopLevelVertex extends BaseVertex {
 				}
 				crease = Math.max(0, TopLevelVertex.this.crease - 1);
 				corner = Math.max(0, TopLevelVertex.this.corner - 1);
-				creaseEdge0 = TopLevelVertex.this.creaseEdge0 == null ? null : TopLevelVertex.this.creaseEdge0.slateEdge0;
-				creaseEdge1 = TopLevelVertex.this.creaseEdge1 == null ? null : TopLevelVertex.this.creaseEdge1.slateEdge0;			
-				positionValid = true;
+				creaseEdge0 = TopLevelVertex.this.creaseEdge0 == null ? null : TopLevelVertex.this.creaseEdge0.getSlateEdge0();
+				creaseEdge1 = TopLevelVertex.this.creaseEdge1 == null ? null : TopLevelVertex.this.creaseEdge1.getSlateEdge0();			
 			}
 			
 			@Override
-			public void computeLimit() {
-				if (limitValid) {
-					return;
-				}
+			void computeLimit() {
 				if (TopLevelVertex.this.corner > 0) {
 					TopLevelVertex.this.position.getTuple(limit);
 					computeNormal();
 				} else if (TopLevelVertex.this.crease > 0) {
-					Tuple3Attr p1 = TopLevelVertex.this.creaseEdge0.edgePoint.position;
-					Tuple3Attr p2 = TopLevelVertex.this.creaseEdge1.edgePoint.position;
+					TopLevelVertex.this.creaseEdge0.getEdgePoint().validatePosition();
+					TopLevelVertex.this.creaseEdge1.getEdgePoint().validatePosition();
+					Tuple3Attr p1 = TopLevelVertex.this.creaseEdge0.getEdgePoint().position;
+					Tuple3Attr p2 = TopLevelVertex.this.creaseEdge1.getEdgePoint().position;
 					limit.set(
 							position.getX() * CREASE_LIMIT0 + (p1.getX() + p2.getX()) * CREASE_LIMIT1,
 							position.getY() * CREASE_LIMIT0 + (p1.getY() + p2.getY()) * CREASE_LIMIT1,
@@ -159,11 +155,13 @@ public class TopLevelVertex extends BaseVertex {
 					double fx = 0, fy = 0, fz = 0;
 					double ex = 0, ey = 0, ez = 0;
 					for (HalfEdge edge : edges) {
-						Tuple3Attr p = edge.face.facePoint.position;
+						edge.getFace().getFacePoint().validatePosition();
+						Tuple3Attr p = edge.getFace().getFacePoint().position;
 						fx += p.getX();
 						fy += p.getY();
 						fz += p.getZ();
-						p = edge.edgePoint.position;
+						edge.getEdgePoint().validatePosition();
+						p = edge.getEdgePoint().position;
 						ex += p.getX();
 						ey += p.getY();
 						ez += p.getZ();
@@ -184,10 +182,10 @@ public class TopLevelVertex extends BaseVertex {
 					
 					for (int i = 0; i < edges.length; i++) {
 						int j = (i + 1) % edges.length;
-						Tuple3Attr p0f = edges[i].face.facePoint.position;
-						Tuple3Attr p0e = edges[i].edgePoint.position;
-						Tuple3Attr p1f = edges[j].face.facePoint.position;
-						Tuple3Attr p1e = edges[j].edgePoint.position;
+						Tuple3Attr p0f = edges[i].getFace().getFacePoint().position;
+						Tuple3Attr p0e = edges[i].getEdgePoint().position;
+						Tuple3Attr p1f = edges[j].getFace().getFacePoint().position;
+						Tuple3Attr p1e = edges[j].getEdgePoint().position;
 						float ew = TANGENT_EDGE_WEIGHT[valence][i];
 						float fw = TANGENT_FACE_WEIGHT[valence][i];
 						ax += p1f.getX() * fw;
@@ -208,7 +206,6 @@ public class TopLevelVertex extends BaseVertex {
 					normal.cross(uTangent, vTangent);
 					normal.normalize();
 				}	
-				limitValid = true;
 			}
 			
 			private void computeNormal() {
@@ -221,9 +218,8 @@ public class TopLevelVertex extends BaseVertex {
 						continue;
 					}
 //					System.out.println(face + " " + face.facePoint.normal);
-					face.facePoint.computeDerivedPosition();
-					face.facePoint.computeLimit();
-					normal.add(face.facePoint.normal);
+					face.getFacePoint().validateLimit();
+					normal.add(face.getFacePoint().normal);
 				}
 				
 				normal.normalize();
@@ -267,18 +263,22 @@ public class TopLevelVertex extends BaseVertex {
 		return limitFactor;
 	}
 	
+	public Level2Vertex getVertexPoint() {
+		return vertexPoint;
+	}
+	
 	public LinearCombination<TopLevelVertex> getVertexPointLc() {
 		LinearCombination<TopLevelVertex> lc = new LinearCombination<TopLevelVertex>();
 		if (corner > 0) {
 			lc.add(this, 1.0);
 		} else if (crease > 0) {
 			lc.add(this, CREASE0);
-			lc.add(creaseEdge0.pair.vertex, CREASE1);
-			lc.add(creaseEdge1.pair.vertex, CREASE1);
+			lc.add(creaseEdge0.getPairVertex(), CREASE1);
+			lc.add(creaseEdge1.getPairVertex(), CREASE1);
 		} else {
 			double n = edges.length;
 			for (HalfEdge edge : edges) {
-				lc.addScaled(edge.face.getFacePointLc(), 1.0 / n);
+				lc.addScaled(edge.getFace().getFacePointLc(), 1.0 / n);
 				lc.addScaled(edge.getMidPointLc(), 2.0 / n);
 			}
 			lc.add(this, (n - 3));
@@ -298,7 +298,7 @@ public class TopLevelVertex extends BaseVertex {
 		} else {
 			lc.addScaled(getVertexPointLc(), VERTEX_POINT_LIMIT[valence]);
 			for (HalfEdge edge : edges) {
-				lc.addScaled(edge.face.getFacePointLc(), VERTEX_FACE_LIMIT[valence]);
+				lc.addScaled(edge.getFace().getFacePointLc(), VERTEX_FACE_LIMIT[valence]);
 				lc.addScaled(edge.getEdgePointLc(), VERTEX_EDGE_LIMIT[valence]);
 			}
 		}
@@ -311,12 +311,12 @@ public class TopLevelVertex extends BaseVertex {
 			for (int i = 0; i < edges.length; i++) {
 				switch(direction) {
 				case 0:					// u direction
-					lc.addScaled(edges[i].face.getFacePointLc(), TANGENT_FACE_WEIGHT[valence][i]);
+					lc.addScaled(edges[i].getFace().getFacePointLc(), TANGENT_FACE_WEIGHT[valence][i]);
 					lc.addScaled(edges[i].getEdgePointLc(), TANGENT_FACE_WEIGHT[valence][i]);
 					lc.scale(1 / edges.length / 10);
 					break;
 				case 1:					// v direction
-					lc.addScaled(edges[(i + 1) % edges.length].face.getFacePointLc(), TANGENT_FACE_WEIGHT[valence][i]);
+					lc.addScaled(edges[(i + 1) % edges.length].getFace().getFacePointLc(), TANGENT_FACE_WEIGHT[valence][i]);
 					lc.addScaled(edges[(i + 1) % edges.length].getEdgePointLc(), TANGENT_FACE_WEIGHT[valence][i]);
 					lc.scale(1 / edges.length / 10);
 					break;
@@ -332,9 +332,9 @@ public class TopLevelVertex extends BaseVertex {
 				return i;
 			}
 		}
-		System.out.println("vertex=" + this + " edge=" + edge + " edge-pair=" + edge.pair);
+		System.out.println("vertex=" + this + " edge=" + edge + " edge-pair=" + edge.getPair());
 		for (HalfEdge ed : getAdjacentEdges()) {
-			System.out.println("\tedge=" + ed + " vertex=" + ed.vertex);
+			System.out.println("\tedge=" + ed + " vertex=" + ed.getVertex());
 		}
 		throw new IllegalArgumentException(edge.toString());
 	}
@@ -393,33 +393,31 @@ public class TopLevelVertex extends BaseVertex {
 		HalfEdge e, prev = edge;
 		do {
 			e = prev;
-			prev = e.pair.next;
+			prev = e.getPair().getNext();
 		} while (prev != null && prev != edge);
 		return e;
 	}
 	
 	public void invalidateLevel2Verices() {
-		vertexPoint.positionValid = false;
-		vertexPoint.limitValid = false;
+		vertexPoint.invalidate();
 		for (HalfEdge edge : edges) {
-			edge.edgePoint.positionValid = false;
-			Face face = edge.face;
+			edge.getEdgePoint().invalidate();
+			Face face = edge.getFace();
 			if (face != null) {
-				face.facePoint.positionValid = false;
-				HalfEdge e = edge.next;
-				e.edgePoint.positionValid = false;
-				for (int i = 0, n = face.sides - 2; i < n; i++) {
-					e.vertex.vertexPoint.positionValid = false;
-					e.vertex.vertexPoint.limitValid = false;
-					TopLevelVertex v = e.vertex;
+				face.getFacePoint().invalidate();
+				HalfEdge e = edge.getNext();
+				e.getEdgePoint().invalidate();
+				for (int i = 0, n = face.getSides() - 2; i < n; i++) {
+					TopLevelVertex v = e.getVertex();
+					v.getVertexPoint().invalidate();
 					for (HalfEdge e2 : v.edges) {
-						e2.edgePoint.limitValid = false;
-						Face f = e2.face;
+						e2.getEdgePoint().invalidate();
+						Face f = e2.getFace();
 						if (f != null) {
-							f.facePoint.limitValid = false;
+							f.getFacePoint().invalidate();
 						}
 					}
-					e = e.next;
+					e = e.getNext();
 				}
 			}
 		}
@@ -436,7 +434,7 @@ public class TopLevelVertex extends BaseVertex {
 			HalfEdge e = null, next = start;
 			do {
 				e = next;
-				next = e.prev == null ? null : e.prev.pair;
+				next = e.getPrev() == null ? null : e.getPrev().getPair();
 				if (!addedEdges.contains(e)) {
 					System.out.println("validate " + this + " adding " + e);
 					addedEdges.add(e);
@@ -449,7 +447,7 @@ public class TopLevelVertex extends BaseVertex {
 		}
 		edges = tmp;
 		for (int i = 0; i < edges.length; i++) {
-			faces[i] = edges[i].face;
+			faces[i] = edges[i].getFace();
 		}
 		valence = n;
 	}
@@ -467,7 +465,7 @@ public class TopLevelVertex extends BaseVertex {
 		
 		final Face[] tmpFace = new Face[faces.length + 1];
 		System.arraycopy(faces, 0, tmpFace, 0, faces.length);
-		tmpFace[faces.length] = edge.face;
+		tmpFace[faces.length] = edge.getFace();
 		faces = tmpFace;
 	}
 	

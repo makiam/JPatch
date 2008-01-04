@@ -244,7 +244,7 @@ public class JptLoader {
 			
 			System.out.println(sds.vertexList.size() + " top level, " + sds.level2Vertices.length + " level 2 vertices");
 			
-			if (false) {
+			if (true) {
 				return sds;
 			}
 			
@@ -300,7 +300,7 @@ public class JptLoader {
 				for (int i = 0; i < size; i++) {
 //					System.out.print(sds.vertexList.get(i).pos);
 //					System.out.print(" => ");
-					Level2Vertex l2v = sds.vertexList.get(i).vertexPoint;
+					Level2Vertex l2v = sds.vertexList.get(i).getVertexPoint();
 					LinearCombination<TopLevelVertex> lc = sds.vertexList.get(i).getLimitLc();
 					double x = 0, y = 0, z = 0;
 					for (int j = 0; j < lc.size(); j++) {

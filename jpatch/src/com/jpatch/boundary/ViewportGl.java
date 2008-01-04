@@ -1024,6 +1024,7 @@ public class ViewportGl extends Viewport {
 	private void drawSelection(Selection selection) {
 		gl.glPointSize(4);
 		gl.glDisable(GL_LIGHTING);
+		Point3f p = new Point3f();
 		for (int pass = 0; pass < 2; pass++) {
 			if (pass == 0) {
 				gl.glDisable(GL_DEPTH_TEST);
@@ -1037,13 +1038,13 @@ public class ViewportGl extends Viewport {
 			gl.glBegin(GL_POINTS);
 			if (viewDef.getShowControlMeshAttribute().getBoolean()) {
 				for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
-					Point3f p = vertex.projectedPos;
+					vertex.getProjectedPos(p);
 					gl.glVertex3f(p.x, p.y, p.z);
 				}
 			} else if (viewDef.getShowProjectedMeshAttribute().getBoolean()) {
 				for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
 					if (vertex instanceof TopLevelVertex) {
-						Point3f p = ((TopLevelVertex) vertex).vertexPoint.projectedLimit;
+						((TopLevelVertex) vertex).getVertexPoint().getProjectedLimit(p);
 						gl.glVertex3f(p.x, p.y, p.z);
 					}
 				}
@@ -1069,10 +1070,10 @@ public class ViewportGl extends Viewport {
 				}
 				for (AbstractVertex av : selection.getSelectedVerticesAttribute().getElements()) {
 					TopLevelVertex v = (TopLevelVertex) av;
-					p0.set(v.projectedPos);
+					v.getProjectedPos(p0);
 					gl.glVertex3f(p0.x, p0.y, p0.z);
 					if (pass == 0 || pass == 2) {
-						p1.set(v.vertexPoint.projectedLimit);
+						v.getVertexPoint().getProjectedLimit(p1);
 						gl.glVertex3f(p1.x, p1.y, p1.z);
 					}
 				}
@@ -1128,6 +1129,9 @@ public class ViewportGl extends Viewport {
 		
 		GlMaterial currentMaterial = null;
 		gl.glColor3f(0.0f, 0.0f, 0.0f);
+		
+		Point3f p = new Point3f();
+		Vector3f n = new Vector3f();
 		if (showLimitSurfaceAttr.getBoolean()) {
 			
 //			System.out.println("simple model = " + simpleModel);
@@ -1145,22 +1149,22 @@ public class ViewportGl extends Viewport {
 				}
 				if (simple) {
 					gl.glBegin(GL_TRIANGLE_FAN);
-					Point3f p = face.facePoint.projectedLimit;
-					Vector3f n = face.facePoint.projectedNormal;
+					face.getFacePoint().getProjectedLimit(p);
+					face.getFacePoint().getProjectedNormal(n);
 					gl.glNormal3f(n.x, n.y, n.z);
 					gl.glVertex3f(p.x, p.y, p.z);
 					for (HalfEdge edge : face.getEdges()) {
-						p = edge.getFirstVertex().vertexPoint.projectedLimit;
-						n = edge.getFirstVertex().vertexPoint.projectedNormal;
+						edge.getVertex().getVertexPoint().getProjectedLimit(p);
+						edge.getVertex().getVertexPoint().getProjectedNormal(n);
 						gl.glNormal3f(n.x, n.y, n.z);
 						gl.glVertex3f(p.x, p.y, p.z);
-						p = edge.edgePoint.projectedLimit;
-						n = edge.edgePoint.projectedNormal;
+						edge.getEdgePoint().getProjectedLimit(p);
+						edge.getEdgePoint().getProjectedNormal(n);
 						gl.glNormal3f(n.x, n.y, n.z);
 						gl.glVertex3f(p.x, p.y, p.z);
 					}
-					p = face.getEdges()[0].getFirstVertex().vertexPoint.projectedLimit;
-					n = face.getEdges()[0].getFirstVertex().vertexPoint.projectedNormal;
+					face.getEdges()[0].getVertex().getVertexPoint().getProjectedLimit(p);
+					face.getEdges()[0].getVertex().getVertexPoint().getProjectedNormal(n);
 					gl.glNormal3f(n.x, n.y, n.z);
 					gl.glVertex3f(p.x, p.y, p.z);
 					gl.glEnd();
@@ -1168,9 +1172,9 @@ public class ViewportGl extends Viewport {
 						gl.glColor3f(1, 1, 1);
 						gl.glBegin(GL_LINE_LOOP);
 						for (HalfEdge edge : face.getEdges()) {
-							p = edge.getFirstVertex().vertexPoint.projectedLimit;
+							edge.getVertex().getVertexPoint().getProjectedLimit(p);
 							gl.glVertex3f(p.x, p.y, p.z);
-							p = edge.edgePoint.projectedLimit;
+							edge.getEdgePoint().getProjectedLimit(p);
 							gl.glVertex3f(p.x, p.y, p.z);
 						}
 						gl.glEnd();
@@ -1200,17 +1204,17 @@ public class ViewportGl extends Viewport {
 						currentMaterial = faceMaterial;
 					}
 					gl.glBegin(GL_TRIANGLE_FAN);
-					Point3f p = face.facePoint.projectedPos;
-					Vector3f n = face.facePoint.projectedNormal;
+					face.getFacePoint().getProjectedPos(p);
+					face.getFacePoint().getProjectedNormal(n);
 					gl.glNormal3f(n.x, n.y, n.z);
 					gl.glVertex3f(p.x, p.y, p.z);
 					for (HalfEdge edge : face.getEdges()) {
-						p = edge.getFirstVertex().projectedPos;
+						edge.getVertex().getProjectedPos(p);
 //						n = edge.getFirstVertex().vertexPoint.projectedNormal;
 //						gl.glNormal3f(n.x, n.y, n.z);
 						gl.glVertex3f(p.x, p.y, p.z);
 					}
-					p = face.getEdges()[0].getFirstVertex().projectedPos;
+					face.getEdges()[0].getVertex().getProjectedPos(p);
 //					n = face.edge.getFirstVertex().vertexPoint.projectedNormal;
 //					gl.glNormal3f(n.x, n.y, n.z);
 					gl.glVertex3f(p.x, p.y, p.z);
@@ -1237,14 +1241,10 @@ public class ViewportGl extends Viewport {
 						} else {
 							gl.glColor3f(1, 1, 1);
 						}
-						Point3f p0 = edge.getFirstVertex().projectedPos;
-						Point3f p1 = edge.getSecondVertex().projectedPos;
-//						edge.getFirstVertex().referencePosition.get(p0);
-//						edge.getSecondVertex().referencePosition.get(p1);
-//						modelView.transform(p0);
-//						modelView.transform(p1);
-						gl.glVertex3f(p0.x, p0.y, p0.z);
-						gl.glVertex3f(p1.x, p1.y, p1.z);
+						edge.getVertex().getProjectedPos(p);
+						gl.glVertex3f(p.x, p.y, p.z);
+						edge.getPairVertex().getProjectedPos(p);
+						gl.glVertex3f(p.x, p.y, p.z);
 					}
 				}
 			}
@@ -1258,8 +1258,8 @@ public class ViewportGl extends Viewport {
 			for (Face face : sds.faceList) {
 				for (HalfEdge edge : face.getEdges()) {
 					if (edge.isPrimary()) {
-						AbstractVertex vertex = edge.getFirstVertex();
-						Point3f p = vertex.projectedPos;
+						AbstractVertex vertex = edge.getVertex();
+						vertex.getProjectedPos(p);
 						gl.glVertex3f(p.x, p.y, p.z);
 //						vertex = edge.getSecondVertex();
 //						p = vertex.projectedPos;
@@ -1306,8 +1306,8 @@ public class ViewportGl extends Viewport {
 			for (Face face : sds.faceList) {
 				for (HalfEdge edge : face.getEdges()) {
 					if (edge.isPrimary()) {
-						TopLevelVertex vertex = edge.getFirstVertex();
-						Point3f p = vertex.vertexPoint.projectedLimit;
+						TopLevelVertex vertex = edge.getVertex();
+						vertex.getVertexPoint().getProjectedLimit(p);
 						gl.glVertex3f(p.x, p.y, p.z);
 					}
 				}
@@ -1388,7 +1388,7 @@ public class ViewportGl extends Viewport {
 	}
 	
 	private void drawSlate(Slate2 slate) {
-		
+		if (false) return;
 		/*
 		 * turning lighting on/off (using glEnable(GL_LIGHTING) and glDisable(GL_LIGHTING)
 		 * a lot during rendering proved to be very slow. This code therefore uses

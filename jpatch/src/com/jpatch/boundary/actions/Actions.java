@@ -90,11 +90,11 @@ public class Actions {
 			faceLoop:
 			for (Face face : sds.faceList) {
 				for (HalfEdge edge : face.getEdges()) {
-					if (!selectedVertices.contains(edge.getFirstVertex())) {
+					if (!selectedVertices.contains(edge.getVertex())) {
 						continue faceLoop;
 					}
-					facesToExtrude.add(face);
 				}
+				facesToExtrude.add(face);
 			}
 			Operations.extrude(sds, facesToExtrude);
 		}

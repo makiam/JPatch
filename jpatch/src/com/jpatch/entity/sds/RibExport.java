@@ -9,7 +9,7 @@ public class RibExport {
 		Set<TopLevelVertex> vertexSet = new HashSet<TopLevelVertex>();
 		for (Face face : sds.faceList) {
 			for (HalfEdge edge : face.getEdges()) {
-				vertexSet.add(edge.getFirstVertex());
+				vertexSet.add(edge.getVertex());
 			}
 		}
 		List<TopLevelVertex> vertexList = new ArrayList<TopLevelVertex>(vertexSet);
@@ -38,7 +38,7 @@ public class RibExport {
 				} else {
 					writer.print(" ");
 				}
-				writer.print(vertexIndexMap.get(edge.getFirstVertex()));
+				writer.print(vertexIndexMap.get(edge.getVertex()));
 			}
 		}
 		writer.print("]\n");

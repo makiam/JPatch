@@ -54,9 +54,9 @@ public class MouseSelector {
 		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
 		for (Face face : sdsModel.getSds().faceList) {
 			for (HalfEdge edge : face.getEdges()) {
-				TopLevelVertex vertex = edge.getFirstVertex();
+				TopLevelVertex vertex = edge.getVertex();
 				if (useProjection) {
-					vertex.vertexPoint.limit.get(p);
+					vertex.getVertexPoint().getLimit(p);
 				} else {
 					vertex.getPos(p);
 				}
@@ -100,9 +100,9 @@ public class MouseSelector {
 		boolean useProjection = !viewport.getViewDef().getShowControlMeshAttribute().getBoolean();
 		for (Face face : sdsModel.getSds().faceList) {
 			for (HalfEdge edge : face.getEdges()) {
-				TopLevelVertex vertex = edge.getFirstVertex();
+				TopLevelVertex vertex = edge.getVertex();
 				if (useProjection) {
-					vertex.vertexPoint.limit.get(p);
+					vertex.getVertexPoint().getLimit(p);
 				} else {
 					vertex.getPos(p);
 				}
@@ -129,8 +129,8 @@ public class MouseSelector {
 		for (Face face : sdsModel.getSds().faceList) {
 			for (HalfEdge edge : face.getEdges()) {
 				if (edge.isPrimary()) {
-					edge.getFirstVertex().getPos(p0);
-					edge.getSecondVertex().getPos(p1);
+					edge.getVertex().getPos(p0);
+					edge.getPairVertex().getPos(p1);
 					transformUtil.projectToScreen(transformUtil.LOCAL, p0, p0);
 					transformUtil.projectToScreen(transformUtil.LOCAL, p1, p1);
 					line.setLine(p0.x, p0.y, p1.x, p1.y);

@@ -16,7 +16,7 @@ public class Operations {
 		for (Face face : faces) {
 			System.out.println("extruding " + face);
 			for (HalfEdge edge : face.getEdges()) {
-				if (!faces.contains(edge.getLeftFace())) {
+				if (!faces.contains(edge.getPairFace())) {
 					edgesToExtrude.add(edge);
 				}
 			}
@@ -41,12 +41,12 @@ public class Operations {
 			 */
 			
 			/* get faces A and B */
-			Face faceA = edge.getLeftFace();
-			Face faceB = edge.getRightFace();
+			Face faceA = edge.getPairFace();
+			Face faceB = edge.getFace();
 			
 			/* get vertices 0 and 1 */
-			TopLevelVertex v0 = edge.getFirstVertex();
-			TopLevelVertex v1 = edge.getSecondVertex();
+			TopLevelVertex v0 = edge.getVertex();
+			TopLevelVertex v1 = edge.getPairVertex();
 			
 			/* create extruded vertices 0' and 1' */
 			TopLevelVertex v01 = new TopLevelVertex(v0);
@@ -105,6 +105,17 @@ public class Operations {
 	
 	public static void extrude(Sds sds, Collection<Face> extrudedFaces) {
 		sds.dump();
+		
+		for (Face face : extrudedFaces) {
+			sds.removeFace(face);
+		}
+		sds.validateVertices();
+		sds.makeSlates();
+		sds.rethinkSlates();
+		
+		sds.dump();
+		if (true) return;
+		
 		/*
 		 * STEP 1 - split faces:
 		 * for all non-extruded faces (at the boundary):

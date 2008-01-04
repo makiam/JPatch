@@ -266,7 +266,7 @@ public class MoveVertexTool implements VisibleTool {
 			sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
 //			transformUtil.setTransform(TransformUtil.LOCAL, sdsModel.getTransform());
 			
-			vertex.vertexPoint.limit.get(limitStart);
+			vertex.getVertexPoint().getLimit(limitStart);
 			vertex.getPos(pStart);
 			if (useLimit) {
 				p.set(limitStart);
