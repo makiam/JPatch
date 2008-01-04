@@ -1,6 +1,7 @@
 package com.jpatch.entity.sds;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.ui.*;
 
 import javax.vecmath.*;
 
@@ -9,9 +10,9 @@ import trashcan.TransformedPoint3;
 
 public abstract class AbstractVertex {
 	final TransformedPoint3 position = new TransformedPoint3(0, 0, 0);
-	final DoubleAttr sharpness = new HardBoundedDoubleAttr(0, 10, 0);
+	final DoubleAttr sharpness = AttributeManager.getInstance().createBoundedDoubleAttr(new DoubleAttr(0), new DoubleAttr(10));
 	
-	public final Point3f projectedPos = new Point3f();
+	final Point3f projectedPos = new Point3f();
 	
 	public TransformedPoint3 getPosition() {
 		return position;

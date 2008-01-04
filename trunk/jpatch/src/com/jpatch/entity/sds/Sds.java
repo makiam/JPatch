@@ -226,17 +226,17 @@ public class Sds {
 		}
 		for (Face face : faceList) {
 			face.initFans();
-			list.add(face.facePoint);
+			list.add(face.getFacePoint());
 		}
 		for (Face face : faceList) {
 			for (HalfEdge edge : face.getEdges()) {
 				if (edge.isPrimary()) {
-					list.add(edge.edgePoint);
+					list.add(edge.getEdgePoint());
 				}
 			}
 		}
 		for (TopLevelVertex vertex : vertexList) {
-			list.add(vertex.vertexPoint);
+			list.add(vertex.getVertexPoint());
 //			System.out.println(list.size());
 		}
 		level2Vertices = list.toArray(new Level2Vertex[list.size()]);
@@ -265,7 +265,7 @@ public class Sds {
 		}
 		computeLevel2Vertices();
 		for (Face face : faceList) {
-			for (Slate2 slate : face.slates) {
+			for (Slate2 slate : face.getSlates()) {
 				slate.initCreases();
 			}
 		}
@@ -275,15 +275,15 @@ public class Sds {
 	}
 	
 	public void computeLevel2Vertices() {
-//		System.out.println("cumputeLevel2Vertices...");
-		for (Level2Vertex v : level2Vertices) {
-			v.computeDerivedPosition();
-		}
-		for (Level2Vertex v : level2Vertices) {
-			v.computeLimit();
-		}
+		System.out.println("cumputeLevel2Vertices...");
+//		for (Level2Vertex v : level2Vertices) {
+//			v.computeDerivedPosition();
+//		}
+//		for (Level2Vertex v : level2Vertices) {
+//			v.computeLimit();
+//		}
 		for (Face face : faceList) {
-			for (Slate2 slate : face.slates) {
+			for (Slate2 slate : face.getSlates()) {
 				slate.computeNormalCone();
 			}
 		}
@@ -357,14 +357,14 @@ public class Sds {
 		System.out.println("Faces:");
 		for (Face face : faceList) {
 			System.out.print(face + ": ");
-			for (HalfEdge edge : face.edges) {
+			for (HalfEdge edge : face.getEdges()) {
 				System.out.print(edge + " ");
 			}
 			System.out.println();
 		}
 		List<HalfEdge> edgeList = new ArrayList<HalfEdge>();
 		for (Face face : faceList) {
-			for (HalfEdge edge : face.edges) {
+			for (HalfEdge edge : face.getEdges()) {
 				edgeList.add(edge);
 			}
 		}
@@ -375,7 +375,7 @@ public class Sds {
 		});
 		System.out.println("Edges:");
 		for (HalfEdge e : edgeList) {
-			System.out.println(e + ": v1=" + e.vertex + " v2=" + e.pair.vertex + " f=" + e.face + " n=" + e.next + " p=" + e.prev);
+			System.out.println(e + ": v1=" + e.getVertex() + " v2=" + e.getPairVertex() + " f=" + e.getFace() + " n=" + e.getNext() + " p=" + e.getPrev());
 		}
 		
 		System.out.println("Vertices:");
@@ -393,11 +393,11 @@ public class Sds {
 		System.out.println(vertexList.size() + " " + vertexSet.size());
 		for (Face face : faceList) {
 			for (HalfEdge edge : face.getEdges()) {
-				if (!vertexSet.contains(edge.vertex)) {
-					System.out.println(edge.vertex);
+				if (!vertexSet.contains(edge.getVertex())) {
+					System.out.println(edge.getVertex());
 				}
-				if (!vertexSet.contains(edge.pair.vertex)) {
-					System.out.println(edge.pair.vertex);
+				if (!vertexSet.contains(edge.getPairVertex())) {
+					System.out.println(edge.getPairVertex());
 				}
 			}
 		}		
@@ -411,17 +411,15 @@ public class Sds {
 	}
 	
 	void addFace(int[] vertices) {
-		HalfEdge start = createEdge(vertexList.get(vertices[0]), vertexList.get(vertices[1]));
+		HalfEdge start = getHalfEdge(vertexList.get(vertices[0]), vertexList.get(vertices[1]));
 		HalfEdge prev = start;
 		HalfEdge edge = null;
 		for (int i = 1; i < vertices.length; i++) {
-			edge = createEdge(vertexList.get(vertices[i]), vertexList.get(vertices[(i + 1) % vertices.length]));
-			prev.next = edge;
-			edge.prev = prev;
+			edge = getHalfEdge(vertexList.get(vertices[i]), vertexList.get(vertices[(i + 1) % vertices.length]));
+			edge.appendTo(prev);
 			prev = edge;
 		}
-		edge.next = start;
-		start.prev = edge;
+		start.appendTo(edge);
 		Face face = new Face(vertices.length, start);
 		faceList.add(face);
 	}
@@ -480,23 +478,46 @@ public class Sds {
 				vertexList.add(v1);
 				vertices[i] = v0;
 				vertices[(i + 1) % vertices.length] = v1;
-				nonManifoldEdge.sharpness.setDouble(10.0);
+				nonManifoldEdge.getSharpness().setDouble(10.0);
 			}
 		}
-		HalfEdge start = createEdge(vertices[0], vertices[1]);
+		HalfEdge start = getHalfEdge(vertices[0], vertices[1]);
 		HalfEdge prev = start;
 		HalfEdge edge = null;
 		for (int i = 1; i < vertices.length; i++) {
-			edge = createEdge(vertices[i], vertices[(i + 1) % vertices.length]);
-			prev.next = edge;
-			edge.prev = prev;
+			edge = getHalfEdge(vertices[i], vertices[(i + 1) % vertices.length]);
+			edge.appendTo(prev);
 			prev = edge;
 		}
-		edge.next = start;
-		start.prev = edge;
+		start.appendTo(edge);
 		Face face = new Face(vertices.length, start);
 		faceList.add(face);
 		return face;
+	}
+	
+	public void removeFace(Face face) {
+		System.out.println("removeing face " + face);
+		/* remove face from facelist (or throw Exception if it isn't in facelist) */
+		int index = faceList.indexOf(face);
+		if (index == -1) {
+			throw new IllegalArgumentException("Face " + face + " is not in SDS");
+		}
+		faceList.remove(index);
+		
+		/* remove face from edges */
+		for (HalfEdge halfEdge : face.getEdges()) {
+			halfEdge.setFace(null);
+			halfEdge.getEdgePoint().invalidate();
+			halfEdge.getVertex().getVertexPoint().invalidate();
+			halfEdge.getPairVertex().getVertexPoint().invalidate();
+			
+			/* check if the pair edge is in use, and remove it if not */
+			if (halfEdge.getPairFace() != null) {
+				halfEdge.getPairFace().getFacePoint().invalidate();
+			} else {
+				removeEdge(halfEdge);
+			}
+		}
 	}
 	
 //	private Face createFace(TopLevelVertex[] vertices) {
@@ -518,29 +539,76 @@ public class Sds {
 	private HalfEdge checkEdge(TopLevelVertex vertex0, TopLevelVertex vertex1) {
 		EdgeKey key = new EdgeKey(vertex1, vertex0);
 		HalfEdge neighbor = edgeMap.get(key);
-		if (neighbor != null && (neighbor.pair.face != null || poisonedEdges.contains(neighbor) || poisonedEdges.contains(neighbor.pair))) {
+		if (neighbor != null && (neighbor.getPairFace() != null || poisonedEdges.contains(neighbor) || poisonedEdges.contains(neighbor.getPair()))) {
 			return neighbor.getPrimary();
 		} else {
 			return null;
 		}
 	}
 	
-	private HalfEdge createEdge(TopLevelVertex vertex0, TopLevelVertex vertex1) {
-		EdgeKey key = new EdgeKey(vertex1, vertex0);
-		HalfEdge neighbor = edgeMap.get(key);
-		HalfEdge edge;
-		if (neighbor == null) {
+	/**
+	 * Checks if the halfEdge vertex0->vertex1 already exists. If it exists and it's face is null,
+	 * it is returned, if the face is not null, an IllegalStateException is thrown (non-manifold surface,
+	 * each HalfEdge can only belong to one face). If it doesn't exist, a new edge is created, added to the SDS
+	 * and returned
+	 * @param vertex0
+	 * @param vertex1
+	 * @return
+	 */
+	private HalfEdge getHalfEdge(TopLevelVertex vertex0, TopLevelVertex vertex1) {
+		/* check if the HalfEdge (v0->v1) already exists */
+		HalfEdge edge = edgeMap.get(new EdgeKey(vertex0, vertex1));
+		if (edge == null) {
+			/* if no edge is found, create a new one and store it in the maps */
 			edge = new HalfEdge(vertex0, vertex1);
-			edgeMap.put(new EdgeKey(vertex0, vertex1), edge);
-			vertex0.addEdge(edge);
-			vertex1.addEdge(edge.pair);
+			addHalfEdge(edge);
 		} else {
-			edge = neighbor.pair;
-			if (edge.face != null) {
-				throw new IllegalArgumentException("Surface is non-manifold.");
+			if (edge.getFace() != null) {
+				throw new IllegalStateException("Surface is non-manifold");
 			}
 		}
 		return edge;
+	}
+	
+	/**
+	 * Adds specified halfEdge and its pair to edgeMap.
+	 * Adds specified halfEdge and its pair to their vertices
+	 * @param halfEdge
+	 */
+	private void addHalfEdge(HalfEdge halfEdge) {
+		TopLevelVertex v0 = halfEdge.getVertex();
+		TopLevelVertex v1 = halfEdge.getPairVertex();
+		EdgeKey key = new EdgeKey(v0, v1);
+		EdgeKey pairKey = new EdgeKey(v1, v0);
+		if (edgeMap.containsKey(key) || edgeMap.containsKey(pairKey)) {
+			throw new IllegalStateException("HalfEdge " + halfEdge + " already in SDS");
+		}
+		edgeMap.put(key, halfEdge);
+		edgeMap.put(pairKey, halfEdge.getPair());
+		v0.addEdge(halfEdge);
+		v1.addEdge(halfEdge.getPair());
+	}
+	
+	/**
+	 * Removes specified halfEdge and its pair from edgeMap.
+	 * Removes specified halfEdge and its pair from their vertices
+	 * @param halfEdge
+	 */
+	private void removeEdge(HalfEdge halfEdge) {
+		if (halfEdge.getFace() != null || halfEdge.getPairFace() != null) {
+			throw new IllegalStateException("Edge " + halfEdge + " still has faces");
+		}
+		TopLevelVertex v0 = halfEdge.getVertex();
+		TopLevelVertex v1 = halfEdge.getPairVertex();
+		EdgeKey key = new EdgeKey(v0, v1);
+		EdgeKey pairKey = new EdgeKey(v1, v0);
+		if (!edgeMap.containsKey(key) || !edgeMap.containsKey(pairKey)) {
+			throw new IllegalStateException("HalfEdge " + halfEdge + " not in SDS");
+		}
+		edgeMap.remove(key);
+		edgeMap.remove(pairKey);
+		v0.removeEdge(halfEdge);
+		v1.removeEdge(halfEdge.getPair());
 	}
 	
 	private static final class EdgeKey {

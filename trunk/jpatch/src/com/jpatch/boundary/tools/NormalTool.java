@@ -127,7 +127,8 @@ public class NormalTool implements JPatchTool {
 			this.viewport = viewport;
 			
 			vertex.getPos(p0);
-			p1.add(p0, vertex.vertexPoint.normal);
+			vertex.getVertexPoint().getNormal(p1);
+			p1.add(p0);
 			
 			viewport.getViewDef().configureTransformUtil(transformUtil);
 			sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
@@ -198,7 +199,7 @@ public class NormalTool implements JPatchTool {
 		
 		VertexNormal(TopLevelVertex v) {
 			v.getPos(pStart);
-			pNormal.set(v.vertexPoint.normal);
+			v.getVertexPoint().getNormal(pNormal);
 		}
 		
 		void setFactor(TopLevelVertex v, double f) {

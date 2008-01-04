@@ -19,15 +19,15 @@ import javax.vecmath.*;
 public class Face {
 	static int count;
 	final int num = count++;
-	public final int sides;
+	private final int sides;
 	private final double recSides;
-	final Slate2[] slates;
+	private final Slate2[] slates;
 	
-	final SlateEdge[] slateEdges;
+	private final SlateEdge[] slateEdges;
 	private Material material = new BasicMaterial(new Color3f(1.0f, 1.0f, 1.0f));
 	
-	public final Level2Vertex facePoint;
-	public final HalfEdge[] edges;
+	private final Level2Vertex facePoint;
+	private final HalfEdge[] edges;
 //	final Iterable<HalfEdge> edgeIterable = new Iterable<HalfEdge>() {
 //		public Iterator<HalfEdge> iterator() {
 //			return new Iterator<HalfEdge>() {
@@ -57,7 +57,7 @@ public class Face {
 		HalfEdge edge = start;
 		for (int i = 0; i < sides; i++) {
 			edges[i] = edge;
-			edge = edge.next;
+			edge = edge.getNext();
 		}
 		
 		recSides = 1.0 / sides;
@@ -66,34 +66,29 @@ public class Face {
 		
 		facePoint = new Level2Vertex() {
 			@Override
-			public void computeDerivedPosition() {
-				if (positionValid) {
-					return;
-				}
+			void computeDerivedPosition() {
 				double x = 0, y = 0, z = 0;
 				for (HalfEdge edge : getEdges()) {
-					Tuple3Attr t = edge.vertex.position;
+					Tuple3Attr t = edge.getVertex().position;
 					x += t.getX();
 					y += t.getY();
 					z += t.getZ();
 				}
 				position.setTuple(x * recSides, y * recSides, z * recSides);
-				positionValid = true;
 			}
 			
 			@Override
-			public void computeLimit() {
-				if (limitValid) {
-					return;
-				}
+			void computeLimit() {
 				double fx = 0, fy = 0, fz = 0;
 				double ex = 0, ey = 0, ez = 0;
 				for (HalfEdge edge : edges) {
-					Tuple3Attr t = edge.vertex.vertexPoint.position;
+					edge.getVertex().getVertexPoint().validatePosition();
+					Tuple3Attr t = edge.getVertex().getVertexPoint().position;
 					fx += t.getX();
 					fy += t.getY();
 					fz += t.getZ();
-					t = edge.edgePoint.position;
+					edge.getEdgePoint().validatePosition();
+					t = edge.getEdgePoint().position;
 					ex += t.getX();
 					ey += t.getY();
 					ez += t.getZ();
@@ -112,11 +107,11 @@ public class Face {
 				float bz = 0;
 				int i = 0;
 				for (HalfEdge edge : edges) {
-					HalfEdge nextEdge = edge.next;
-					Tuple3Attr t0f = edge.face.facePoint.position;
-					Tuple3Attr t0e = edge.edgePoint.position;
-					Tuple3Attr t1f = nextEdge.face.facePoint.position;
-					Tuple3Attr t1e = nextEdge.edgePoint.position;
+					HalfEdge nextEdge = edge.getNext();
+					Tuple3Attr t0f = edge.getFace().getFacePoint().position;
+					Tuple3Attr t0e = edge.getEdgePoint().position;
+					Tuple3Attr t1f = nextEdge.getFace().getFacePoint().position;
+					Tuple3Attr t1e = nextEdge.getEdgePoint().position;
 					float ew = TANGENT_EDGE_WEIGHT[Face.this.sides][i];
 					float fw = TANGENT_FACE_WEIGHT[Face.this.sides][i];
 					ax += t1f.getX() * fw;
@@ -137,7 +132,6 @@ public class Face {
 				vTangent.set(ax, ay, az);
 				normal.cross(uTangent, vTangent);
 				normal.normalize();
-				limitValid = true;
 			}
 		};
 		
@@ -148,11 +142,15 @@ public class Face {
 			slates[i] = new Slate2();
 		}
 		for (int i = 0; i < sides; i++) {
-			e.face = this;
-			slateEdges[i] = new SlateEdge(slates[(i + 1) % sides], slates[i], facePoint, e.edgePoint, this);
-			e = e.next;
+			e.setFace(this);
+			slateEdges[i] = new SlateEdge(slates[(i + 1) % sides], slates[i], facePoint, e.getEdgePoint(), this);
+			e = e.getNext();
 		}
 		
+	}
+	
+	public int getSides() {
+		return sides;
 	}
 	
 	public Material getMaterial() {
@@ -167,7 +165,7 @@ public class Face {
 		LinearCombination<TopLevelVertex> lc = new LinearCombination<TopLevelVertex>();
 		double weight = 1.0 / sides;
 		for (HalfEdge edge : getEdges()) {
-			lc.add(edge.vertex, weight);
+			lc.add(edge.getVertex(), weight);
 		}
 		return lc;
 	}
@@ -175,10 +173,10 @@ public class Face {
 	void prepareSlates() {
 		HalfEdge e = edges[0];
 		for (int n = 0; n < sides; n++) {
-			Face f = e.face;
-			e.slateEdge0.slate = f.slates[f.getEdgeIndex(e)];
-			e.slateEdge1.slate = f.slates[f.getEdgeIndex(e.next)];
-			e = e.next;
+			Face f = e.getFace();
+			e.getSlateEdge0().slate = f.slates[f.getEdgeIndex(e)];
+			e.getSlateEdge1().slate = f.slates[f.getEdgeIndex(e.getNext())];
+			e = e.getNext();
 		}
 	}
 	
@@ -189,16 +187,16 @@ public class Face {
 			SlateEdge[][] corners = new SlateEdge[4][];
 			
 			/* create SlateEdges for corner 0 (outer corner) */
-			final int valence = edge.vertex.valence;
+			final int valence = edge.getVertex().valence;
 			
 //			System.out.println("face=" + this + " side=" + n + " valence=" + valence);
 			corners[0] = new SlateEdge[valence];
 			
-			HalfEdge e = edge.vertex.edges[0];
-			int offset = valence - edge.vertex.getEdgeIndex(edge);
+			HalfEdge e = edge.getVertex().edges[0];
+			int offset = valence - edge.getVertex().getEdgeIndex(edge);
 			
 			for (int i = 0; i < valence; i++) {
-				corners[0][(i + offset) % valence] = edge.vertex.edges[i].slateEdge0;
+				corners[0][(i + offset) % valence] = edge.getVertex().edges[i].getSlateEdge0();
 //				if (e.prev != null) {
 //					e = e.prev.pair;
 //				}
@@ -220,9 +218,9 @@ public class Face {
 			/* create SlateEdges for corner 1 (upper right) */
 			corners[1] = new SlateEdge[4];
 			corners[1][0] = slateEdges[n].pair;
-			corners[1][1] = edge.slateEdge0.pair;
-			corners[1][2] = edge.pair.face == null ? null : edge.pair.face.slateEdges[edge.pair.face.getEdgeIndex(edge.pair)].pair;
-			corners[1][3] = edge.slateEdge1;
+			corners[1][1] = edge.getSlateEdge0().pair;
+			corners[1][2] = edge.getPairFace() == null ? null : edge.getPairFace().slateEdges[edge.getPairFace().getEdgeIndex(edge.getPair())].pair;
+			corners[1][3] = edge.getSlateEdge1();
 			
 			/* create SlateEdges for corner 2 (inner corner) */
 			corners[2] = new SlateEdge[sides];
@@ -232,14 +230,14 @@ public class Face {
 			
 			/* create SlateEdges for corner 3 (lower left) */
 			corners[3] = new SlateEdge[4];
-			corners[3][0] = edge.prev.slateEdge1;
+			corners[3][0] = edge.getPrev().getSlateEdge1();
 			corners[3][1] = slateEdges[(sides - 1 + n) % sides].pair;
-			corners[3][2] = edge.prev.slateEdge0.pair;
-			corners[3][3] = edge.prev.pair.face == null ? null : edge.prev.pair.face.slateEdges[edge.prev.pair.face.getEdgeIndex(edge.prev.pair)].pair;
+			corners[3][2] = edge.getPrev().getSlateEdge0().pair;
+			corners[3][3] = edge.getPrev().getPairFace() == null ? null : edge.getPrev().getPairFace().slateEdges[edge.getPrev().getPairFace().getEdgeIndex(edge.getPrev().getPair())].pair;
 			
 			slates[n].setCorners(corners);
 			
-			edge = edge.next;
+			edge = edge.getNext();
 		}
 		
 	}
@@ -480,6 +478,10 @@ public class Face {
 //		int dy = ymax - ymin;
 //		return (dx > dy) ? dx : dy; 
 //	}
+	
+	public Level2Vertex getFacePoint() {
+		return facePoint;
+	}
 	
 	public Slate2[] getSlates() {
 		return slates;

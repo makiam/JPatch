@@ -150,9 +150,9 @@ public class TransformUtil extends AbstractTransformUtil {
 	 * @return radius of the sphere such that the sphere will occupy about 1/4th of the viewport area
 	 */
 	public double computeNiceRadius(double zDistance, int viewportWidth, int viewportHeight) {
-		System.out.println("computeNiceRadius(" + zDistance + ", " + viewportWidth + ", " + viewportHeight + ")");
+//		System.out.println("computeNiceRadius(" + zDistance + ", " + viewportWidth + ", " + viewportHeight + ")");
 		if (!isPerspective()) {
-			System.out.println("niceRadius = " + Math.min(viewportWidth, viewportHeight) / getCameraScale() * 0.2);
+//			System.out.println("niceRadius = " + Math.min(viewportWidth, viewportHeight) / getCameraScale() * 0.2);
 			return Math.min(viewportWidth, viewportHeight) / getCameraScale() * 0.2;
 		} else {
 			return zDistance / getRelativeFocalLength() * 0.2;

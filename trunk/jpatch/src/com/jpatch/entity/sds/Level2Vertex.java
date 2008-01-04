@@ -8,17 +8,17 @@ import com.jpatch.settings.*;
 public abstract class Level2Vertex extends BaseVertex {
 	private static RealtimeRendererSettings RENDERER_SETTINGS = Settings.getInstance().realtimeRenderer;
 	
-	public final BooleanAttr overridePosition = new BooleanAttr(false);
-	public final BooleanAttr overrideSharpness = new BooleanAttr(false);
-	public final Point3d limit = new Point3d();
-	public final Vector3d uTangent = new Vector3d();
-	public final Vector3d vTangent = new Vector3d();
-	public final Vector3d normal = new Vector3d();
+	final BooleanAttr overridePosition = new BooleanAttr(false);
+	final BooleanAttr overrideSharpness = new BooleanAttr(false);
+	final Point3d limit = new Point3d();
+	final Vector3d uTangent = new Vector3d();
+	final Vector3d vTangent = new Vector3d();
+	final Vector3d normal = new Vector3d();
 	
-	public final Point3f projectedLimit = new Point3f();
-	public final Vector3f projectedUTangent = new Vector3f();
-	public final Vector3f projectedVTangent = new Vector3f();
-	public final Vector3f projectedNormal = new Vector3f();
+	final Point3f projectedLimit = new Point3f();
+	final Vector3f projectedUTangent = new Vector3f();
+	final Vector3f projectedVTangent = new Vector3f();
+	final Vector3f projectedNormal = new Vector3f();
 	
 //	private final Point3f[] positionStencil;
 //	private final float[] positionWeights;
@@ -30,11 +30,11 @@ public abstract class Level2Vertex extends BaseVertex {
 //	private final float[] vTangentWeights;
 	
 	SlateEdge creaseEdge0, creaseEdge1;
-	boolean positionValid = false;
-	boolean limitValid = false;
+	private boolean positionValid = false;
+	private boolean limitValid = false;
 	
-	public abstract void computeDerivedPosition();
-	public abstract void computeLimit();
+	abstract void computeDerivedPosition();
+	abstract void computeLimit();
 	
 //	public Level2Vertex(
 //			LinearCombination<TopLevelVertex> positionLc,
@@ -95,7 +95,27 @@ public abstract class Level2Vertex extends BaseVertex {
 //	}
 	
 	@Override
+	public Tuple3d getPos(Tuple3d p) {
+		validatePosition();
+		position.getTuple(p);
+		return p;
+	}
+	
+	public Tuple3d getLimit(Tuple3d p) {
+		validateLimit();
+		p.set(limit);
+		return p;
+	}
+	
+	public Tuple3d getNormal(Tuple3d n) {
+		validateLimit();
+		n.set(limit);
+		return n;
+	}
+	
+	@Override
 	public void project(Matrix4f matrix) {
+		validateLimit();
 		super.project(matrix);
 		projectedLimit.set(limit);
 		matrix.transform(projectedLimit);
@@ -104,5 +124,37 @@ public abstract class Level2Vertex extends BaseVertex {
 		if (RENDERER_SETTINGS.softwareNormalize) {
 			projectedNormal.normalize();
 		}
+	}
+	
+	public void getProjectedLimit(Tuple3f limit) {
+		validateLimit();
+		limit.set(projectedLimit);
+	}
+	
+	public void getProjectedNormal(Tuple3f normal) {
+		validateLimit();
+		normal.set(projectedNormal);
+	}
+	
+	public void invalidate() {
+		positionValid = false;
+		limitValid = false;
+	}
+	
+	public void validatePosition() {
+		if (positionValid) {
+			return;
+		}
+		computeDerivedPosition();
+		positionValid = true;
+	}
+	
+	public void validateLimit() {
+		if (limitValid) {
+			return;
+		}
+		validatePosition();
+		computeLimit();
+		limitValid = true;
 	}
 }

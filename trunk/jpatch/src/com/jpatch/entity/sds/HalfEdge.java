@@ -14,29 +14,26 @@ import com.jpatch.afw.attributes.*;
  *
  */
 public class HalfEdge {
-	static int count;
-	final int num = count++;
+	private static int count;
+	public final int num = count++;
 	
-	final TopLevelVertex vertex;
-	final HalfEdge pair;
-	Face face;
-	HalfEdge prev;
-	HalfEdge next;
-	public final Level2Vertex edgePoint;
-	final SlateEdge slateEdge0;
-	final SlateEdge slateEdge1;
-	public final HardBoundedDoubleAttr sharpness;
-	final boolean primary;
+	private final TopLevelVertex vertex;
+	private final HalfEdge pair;
+	private Face face;
+	private HalfEdge prev;
+	private HalfEdge next;
+	private final Level2Vertex edgePoint;
+	private final SlateEdge slateEdge0;
+	private final SlateEdge slateEdge1;
+	private final DoubleAttr sharpness;
+	private final boolean primary;
 
 	public HalfEdge(TopLevelVertex firstVertex, TopLevelVertex secondVertex) {
 		sharpness = new HardBoundedDoubleAttr(0, 10, 0);
 		vertex = firstVertex;
 		edgePoint = new Level2Vertex() {
 			@Override
-			public void computeDerivedPosition() {
-				if (positionValid) {
-					return;
-				}
+			void computeDerivedPosition() {
 				Tuple3Attr p0 = HalfEdge.this.vertex.position;
 				Tuple3Attr p1 = HalfEdge.this.pair.vertex.position;
 				double edgeSharpness = creaseSharpness();
@@ -48,8 +45,10 @@ public class HalfEdge {
 							(p0.getZ() + p1.getZ()) * 0.5
 					);
 				} else {
-					Tuple3Attr p2 = HalfEdge.this.face.facePoint.position;
-					Tuple3Attr p3 = HalfEdge.this.pair.face.facePoint.position;
+					getFace().getFacePoint().validatePosition();
+					Tuple3Attr p2 = getFace().getFacePoint().position;
+					getPairFace().getFacePoint().validatePosition();
+					Tuple3Attr p3 = getPairFace().getFacePoint().position;
 					position.setTuple(
 							(p0.getX() + p1.getX() + p2.getX() + p3.getX()) * 0.25,
 							(p0.getY() + p1.getY() + p2.getY() + p3.getY()) * 0.25,
@@ -57,32 +56,61 @@ public class HalfEdge {
 					);
 				}
 				crease = Math.max(0, edgeSharpness - 1);
-				positionValid = true;
 			}
 			
 			@Override
-			public void computeLimit() {
-				if (limitValid) {
-					return;
-				}
+			void computeLimit() {
 				double edgeSharpness = HalfEdge.this.creaseSharpness();
 				if (edgeSharpness > 0) {
-					Tuple3Attr p1 = vertex.vertexPoint.position;
-					Tuple3Attr p2 = pair.vertex.vertexPoint.position;
+					vertex.getVertexPoint().validatePosition();
+					pair.vertex.getVertexPoint().validatePosition();
+					Tuple3Attr p1 = vertex.getVertexPoint().position;
+					Tuple3Attr p2 = pair.vertex.getVertexPoint().position;
 					limit.set(
 							position.getX() * CREASE_LIMIT0 + (p1.getX() + p2.getX()) * CREASE_LIMIT1,
 							position.getY() * CREASE_LIMIT0 + (p1.getY() + p2.getY()) * CREASE_LIMIT1,
 							position.getZ() * CREASE_LIMIT0 + (p1.getZ() + p2.getZ()) * CREASE_LIMIT1
 					);
+					
+					p1 = vertex.position;
+					p2 = pair.vertex.position;
+					if (face != null) {
+						face.getFacePoint().validatePosition();
+						Tuple3Attr pf = face.getFacePoint().position;
+						uTangent.set(p2.getX() - p1.getX(), p2.getY() - p1.getY(), p2.getZ() - p1.getZ());
+						vTangent.set(
+								pf.getX() - (p1.getX() + p2.getX()) * 0.5,
+								pf.getY() - (p1.getY() + p2.getY()) * 0.5,
+								pf.getZ() - (p1.getZ() + p2.getZ()) * 0.5);
+					} else {
+						pair.face.getFacePoint().validatePosition();
+						Tuple3Attr pf = pair.face.getFacePoint().position;
+						uTangent.set(p1.getX() - p2.getX(), p1.getY() - p2.getY(), p1.getZ() - p2.getZ());
+						vTangent.set(
+								pf.getX() - (p1.getX() + p2.getX()) * 0.5,
+								pf.getY() - (p1.getY() + p2.getY()) * 0.5,
+								pf.getZ() - (p1.getZ() + p2.getZ()) * 0.5);
+					}
+					normal.cross(uTangent, vTangent);
+					normal.normalize();
 				} else {
+					pair.prev.edgePoint.validatePosition();
+					next.edgePoint.validatePosition();
+					prev.edgePoint.validatePosition();
+					pair.next.edgePoint.validatePosition();
+					pair.vertex.getVertexPoint().validatePosition();
+					face.getFacePoint().validatePosition();
+					vertex.getVertexPoint().validatePosition();
+					pair.face.getFacePoint().validatePosition();
+					
 					Tuple3Attr pf0 = pair.prev.edgePoint.position;
 					Tuple3Attr pf1 = next.edgePoint.position;
 					Tuple3Attr pf2 = prev.edgePoint.position;
 					Tuple3Attr pf3 = pair.next.edgePoint.position;
-					Tuple3Attr pe0 = pair.vertex.vertexPoint.position;
-					Tuple3Attr pe1 = face.facePoint.position;
-					Tuple3Attr pe2 = vertex.vertexPoint.position;
-					Tuple3Attr pe3 = pair.face.facePoint.position;
+					Tuple3Attr pe0 = pair.vertex.getVertexPoint().position;
+					Tuple3Attr pe1 = face.getFacePoint().position;
+					Tuple3Attr pe2 = vertex.getVertexPoint().position;
+					Tuple3Attr pe3 = pair.face.getFacePoint().position;
 					limit.set(
 							position.getX() * LIMIT0 + ((pf0.getX() + pf2.getX()) + (pf1.getX() + pf3.getX())) * LIMIT2 + ((pe0.getX() + pe2.getX()) + (pe1.getX() + pe3.getX())) * LIMIT1,
 							position.getY() * LIMIT0 + ((pf0.getY() + pf2.getY()) + (pf1.getY() + pf3.getY())) * LIMIT2 + ((pe0.getY() + pe2.getY()) + (pe1.getY() + pe3.getY())) * LIMIT1,
@@ -104,7 +132,6 @@ public class HalfEdge {
 					normal.cross(uTangent, vTangent);
 					normal.normalize();
 				}
-				limitValid = true;
 			}
 		};
 		pair = new HalfEdge(secondVertex, firstVertex, this, sharpness, edgePoint);
@@ -115,13 +142,13 @@ public class HalfEdge {
 		primary = true;
 	}
 	
-	private HalfEdge(TopLevelVertex firstVertex, TopLevelVertex secondVertex, HalfEdge neighbor, HardBoundedDoubleAttr sharpness, Level2Vertex edgePoint) {
+	private HalfEdge(TopLevelVertex firstVertex, TopLevelVertex secondVertex, HalfEdge neighbor, DoubleAttr sharpness, Level2Vertex edgePoint) {
 		this.vertex = firstVertex;
 		this.pair = neighbor;
 		this.sharpness = sharpness;
 		this.edgePoint = edgePoint;
-		slateEdge0 = new SlateEdge(firstVertex.vertexPoint, edgePoint, this, pair);
-		slateEdge1 = new SlateEdge(edgePoint, secondVertex.vertexPoint, this, pair);
+		slateEdge0 = new SlateEdge(firstVertex.getVertexPoint(), edgePoint, this, pair);
+		slateEdge1 = new SlateEdge(edgePoint, secondVertex.getVertexPoint(), this, pair);
 		primary = false;
 	}
 	
@@ -146,19 +173,28 @@ public class HalfEdge {
 		return lc;
 	}
 	
-	final public TopLevelVertex getFirstVertex() {
+	final public HalfEdge getPair() {
+		return pair;
+	}
+	
+	final public TopLevelVertex getVertex() {
 		return vertex;
 	}
 	
-	final public TopLevelVertex getSecondVertex() {
+	final public TopLevelVertex getPairVertex() {
 		return pair.vertex;
 	}
 	
-	final public Face getRightFace() {
+	final public void setFace(Face face) {
+		this.face = face;
+		edgePoint.invalidate();
+	}
+	
+	final public Face getFace() {
 		return face;
 	}
 	
-	final public Face getLeftFace() {
+	final public Face getPairFace() {
 		return pair.face;
 	}
 	
@@ -186,6 +222,30 @@ public class HalfEdge {
 		}
 	}
 	
+	public HalfEdge getNext() {
+		return next;
+	}
+	
+	public HalfEdge getPrev() {
+		return prev;
+	}
+	
+	public Level2Vertex getEdgePoint() {
+		return edgePoint;
+	}
+	
+	public SlateEdge getSlateEdge0() {
+		return slateEdge0;
+	}
+	
+	public SlateEdge getSlateEdge1() {
+		return slateEdge1;
+	}
+	
+	public void appendTo(HalfEdge halfEdge) {
+		this.prev = halfEdge;
+		halfEdge.next = this;
+	}
 //	@Override
 //	final public int hashCode() {
 //		return (System.identityHashCode(vertex) << 1) ^ System.identityHashCode(pair.vertex);
