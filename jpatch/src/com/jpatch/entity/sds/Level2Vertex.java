@@ -96,26 +96,26 @@ public abstract class Level2Vertex extends BaseVertex {
 	
 	@Override
 	public Tuple3d getPos(Tuple3d p) {
-		validatePosition();
+//		validatePosition();
 		position.getTuple(p);
 		return p;
 	}
 	
 	public Tuple3d getLimit(Tuple3d p) {
-		validateLimit();
+//		validateLimit();
 		p.set(limit);
 		return p;
 	}
 	
 	public Tuple3d getNormal(Tuple3d n) {
-		validateLimit();
+//		validateLimit();
 		n.set(limit);
 		return n;
 	}
 	
 	@Override
 	public void project(Matrix4f matrix) {
-		validateLimit();
+//		validateLimit();
 		super.project(matrix);
 		projectedLimit.set(limit);
 		matrix.transform(projectedLimit);
@@ -127,12 +127,12 @@ public abstract class Level2Vertex extends BaseVertex {
 	}
 	
 	public void getProjectedLimit(Tuple3f limit) {
-		validateLimit();
+//		validateLimit();
 		limit.set(projectedLimit);
 	}
 	
 	public void getProjectedNormal(Tuple3f normal) {
-		validateLimit();
+//		validateLimit();
 		normal.set(projectedNormal);
 	}
 	

@@ -62,7 +62,7 @@ public class SlateEdge {
 		return vertex;
 	}
 	
-	public Level2Vertex getNeighbor() {
+	public Level2Vertex getPairVertex() {
 		return pair.vertex;
 	}
 	
