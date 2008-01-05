@@ -275,13 +275,13 @@ public class Sds {
 	}
 	
 	public void computeLevel2Vertices() {
-		System.out.println("cumputeLevel2Vertices...");
+//		System.out.println("cumputeLevel2Vertices...");
 //		for (Level2Vertex v : level2Vertices) {
 //			v.computeDerivedPosition();
 //		}
-//		for (Level2Vertex v : level2Vertices) {
-//			v.computeLimit();
-//		}
+		for (Level2Vertex v : level2Vertices) {
+			v.validateLimit();
+		}
 		for (Face face : faceList) {
 			for (Slate2 slate : face.getSlates()) {
 				slate.computeNormalCone();

@@ -24,10 +24,10 @@ public class AmbientOcclusion {
 						int n = 0;
 						for (int i = 0; i < corner.length; i++) {
 							if (corner[i] != null) {
-								if (corner[i].getNeighbor() == null) {
+								if (corner[i].getPairVertex() == null) {
 									throw new RuntimeException("i=" + i);
 								}
-								radius += v.limit.distance(corner[i].getNeighbor().limit);
+								radius += v.limit.distance(corner[i].getPairVertex().limit);
 								n++;
 							}
 						}
