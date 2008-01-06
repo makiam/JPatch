@@ -198,6 +198,35 @@ public abstract class AbstractTransformUtil {
 	}
 	
 	/**
+	 * Sets the specified matrix to the transformation matrix for transforming
+	 * from fromSpace to toSpace
+	 * @param fromSpace
+	 * @param toSpace
+	 * @param matrix
+	 * @return
+	 */
+	public double[] getMatrix(int fromSpace, int toSpace, double[] matrix) {
+		validateMatrix(fromSpace, toSpace);
+		matrix[0] = matrices[fromSpace][toSpace].m00;
+		matrix[1] = matrices[fromSpace][toSpace].m10;
+		matrix[2] = matrices[fromSpace][toSpace].m20;
+		matrix[3] = matrices[fromSpace][toSpace].m30;
+		matrix[4] = matrices[fromSpace][toSpace].m01;
+		matrix[5] = matrices[fromSpace][toSpace].m11;
+		matrix[6] = matrices[fromSpace][toSpace].m21;
+		matrix[7] = matrices[fromSpace][toSpace].m31;
+		matrix[8] = matrices[fromSpace][toSpace].m02;
+		matrix[9] = matrices[fromSpace][toSpace].m12;
+		matrix[10] = matrices[fromSpace][toSpace].m22;
+		matrix[11] = matrices[fromSpace][toSpace].m23;
+		matrix[12] = matrices[fromSpace][toSpace].m03;
+		matrix[13] = matrices[fromSpace][toSpace].m13;
+		matrix[14] = matrices[fromSpace][toSpace].m23;
+		matrix[15] = matrices[fromSpace][toSpace].m33;
+		return matrix;
+	}
+	
+	/**
 	 * Sets the specified matrix to the rotatisetSpace2Worldon/scale component of the matrix
 	 * for transforming from fromSpace to toSpace
 	 * @param fromSpace

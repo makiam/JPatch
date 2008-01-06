@@ -43,13 +43,13 @@ public class SdsWeights {
 			VERTEX_FACE[valence] = 0.25 / (valence * valence);
 			VERTEX_POINT[valence] = (valence - 1.75) / valence;
 			
-			LIMIT_EDGE_WEIGHTS[valence] = 4.0 / (valence * (valence + 5));
-			LIMIT_CORNER_WEIGHTS[valence] = 1.0 / (valence * (valence + 5));
-			LIMIT_CENTER_WEIGHTS[valence] = (float) valence / (valence + 5);
+			LIMIT_EDGE_WEIGHTS[valence] = 4.0 / (valence * (valence + 5.0));
+			LIMIT_CORNER_WEIGHTS[valence] = 1.0 / (valence * (valence + 5.0));
+			LIMIT_CENTER_WEIGHTS[valence] = valence / (valence + 5.0);
 			
 			TANGENT_CORNER_WEIGHTS[valence] = new double[valence];
 			TANGENT_EDGE_WEIGHTS[valence] = new double[valence];
-			double An = (1 + cos(2 * PI / valence) + cos(PI / valence) * sqrt(2 * (9 + cos(2 * PI / valence))));
+			double An = 1 + cos(2 * PI / valence) + cos(PI / valence) * sqrt(2 * (9 + cos(2 * PI / valence)));
 			for (int j = 0; j < valence; j++) {
 				TANGENT_EDGE_WEIGHTS[valence][j] = An * cos(2 * PI  * j / valence);
 				TANGENT_CORNER_WEIGHTS[valence][j] = cos(2 * PI * j / valence) + cos(2 * PI * (j + 1) / valence);

@@ -10,6 +10,26 @@ public abstract class DerivedVertex extends Vertex {
 	private boolean positionValid;
 	private boolean limitValid;
 	
+	public void getLimit(Tuple3f tuple) {
+		validateLimit();
+		tuple.set(limit);
+	}
+	
+	public void getLimit(Tuple3d tuple) {
+		validateLimit();
+		tuple.set(limit);
+	}
+	
+	public void getNormal(Tuple3f tuple) {
+		validateLimit();
+		tuple.set(normal);
+	}
+	
+	public void getNormal(Tuple3d tuple) {
+		validateLimit();
+		tuple.set(normal);
+	}
+	
 	/**
 	 * Computes the position of this DerivedVertex
 	 */
