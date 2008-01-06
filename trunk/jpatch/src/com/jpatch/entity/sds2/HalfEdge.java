@@ -47,6 +47,10 @@ public class HalfEdge {
 		return face;
 	}
 
+	public Face getPairFace() {
+		return pair.face;
+	}
+	
 	public void setFace(Face face) {
 		assert (this.face == null && face != null) || (this.face != null && face == null) : this + ".face=" + this.face + ", face=" + face + ", exactly one must be null";
 		this.face = face;
@@ -60,69 +64,77 @@ public class HalfEdge {
 	}
 	
 	public DerivedVertex getEdgePoint() {
+		if (edgePoint == null) {
+			edgePoint = new DerivedVertex() {
+
+				@Override
+				protected void computePosition() {
+					Point3d e0 = vertex.position;
+					Point3d e1 = pair.vertex.position;
+					face.getFacePoint().validatePosition();
+					Point3d f0 = face.getFacePoint().position;
+					pair.face.getFacePoint().validatePosition();
+					Point3d f1 = pair.face.getFacePoint().position;
+					position.set(
+							(e0.x + e1.x + f0.x + f1.x) * 0.25,
+							(e0.y + e1.y + f0.y + f1.y) * 0.25,
+							(e0.z + e1.z + f0.z + f1.z) * 0.25
+					);
+				}
+				
+				@Override
+				protected void computeLimit() {
+					validatePosition();
+					next.edgePoint.validatePosition();
+					prev.edgePoint.validatePosition();
+					pair.next.edgePoint.validatePosition();
+					pair.prev.edgePoint.validatePosition();
+					vertex.getVertexPoint().validatePosition();
+					pair.vertex.getVertexPoint().validatePosition();
+					
+					Point3d c0 = pair.next.edgePoint.position;
+					Point3d c1 = pair.prev.edgePoint.position;
+					Point3d c2 = prev.edgePoint.position;
+					Point3d c3 = next.edgePoint.position;
+					
+					Point3d e0 = pair.face.getFacePoint().position;
+					Point3d e1 = pair.vertex.getVertexPoint().position;
+					Point3d e2 = face.getFacePoint().position;
+					Point3d e3 = vertex.getVertexPoint().position;
+					
+					limit.set(
+							position.x * LIMIT0 + ((e0.x + e2.x) + (e1.x + e3.x)) * LIMIT1 + ((c0.x + c2.x) + (c1.x + c3.x)) * LIMIT2,
+							position.y * LIMIT0 + ((e0.y + e2.y) + (e1.y + e3.y)) * LIMIT1 + ((c0.y + c2.y) + (c1.y + c3.y)) * LIMIT2,
+							position.z * LIMIT0 + ((e0.z + e2.z) + (e1.z + e3.z)) * LIMIT1 + ((c0.z + c2.z) + (c1.z + c3.z)) * LIMIT2
+					);
+					
+					vTangent.set(
+							(e1.x - e3.x) * 4 + (c1.x - c0.x) + (c2.x - c3.x),
+							(e1.y - e3.y) * 4 + (c1.y - c0.y) + (c2.y - c3.y),
+							(e1.z - e3.z) * 4 + (c1.z - c0.z) + (c2.z - c3.z)
+					);
+					
+					uTangent.set(
+							(e0.x - e2.x) * 4 + (c0.x - c3.x) + (c1.x - c2.x),
+							(e0.y - e2.y) * 4 + (c0.y - c3.y) + (c1.y - c2.y),
+							(e0.z - e2.z) * 4 + (c0.z - c3.z) + (c1.z - c2.z)
+					);
+					
+					normal.cross(uTangent, vTangent);
+//					normal.set(0,0,0);
+				}
+
+				public String toString() {
+					return "v" + num + "(" + HalfEdge.this + ")";
+				}
+				
+			};
+			pair.edgePoint = edgePoint;
+		}
 		return edgePoint;
 	}
 	
-	public void createNextLevel() {
-		edgePoint = new DerivedVertex() {
-
-			@Override
-			protected void computePosition() {
-				Point3d e0 = vertex.position;
-				Point3d e1 = pair.vertex.position;
-				face.getFacePoint().validatePosition();
-				Point3d f0 = face.getFacePoint().position;
-				pair.face.getFacePoint().validatePosition();
-				Point3d f1 = pair.face.getFacePoint().position;
-				position.set(
-						(e0.x + e1.x + f0.x + f1.x) * 0.25,
-						(e0.y + e1.y + f0.y + f1.y) * 0.25,
-						(e0.z + e1.z + f0.z + f1.z) * 0.25
-				);
-			}
-			
-			@Override
-			protected void computeLimit() {
-				validatePosition();
-				next.edgePoint.validatePosition();
-				prev.edgePoint.validatePosition();
-				pair.next.edgePoint.validatePosition();
-				pair.prev.edgePoint.validatePosition();
-				vertex.getVertexPoint().validatePosition();
-				pair.vertex.getVertexPoint().validatePosition();
-				
-				Point3d c0 = pair.next.edgePoint.position;
-				Point3d c1 = pair.prev.edgePoint.position;
-				Point3d c2 = prev.edgePoint.position;
-				Point3d c3 = next.edgePoint.position;
-				
-				Point3d e0 = pair.face.getFacePoint().position;
-				Point3d e1 = pair.vertex.getVertexPoint().position;
-				Point3d e2 = face.getFacePoint().position;
-				Point3d e3 = vertex.getVertexPoint().position;
-				
-				limit.set(
-						position.x * LIMIT0 + ((e0.x + e2.x) + (e1.x + e3.x)) * LIMIT1 + ((c0.x + c2.x) + (c1.x + c3.x)) * LIMIT2,
-						position.y * LIMIT0 + ((e0.y + e2.y) + (e1.y + e3.y)) * LIMIT1 + ((c0.y + c2.y) + (c1.y + c3.y)) * LIMIT2,
-						position.z * LIMIT0 + ((e0.z + e2.z) + (e1.z + e3.z)) * LIMIT1 + ((c0.z + c2.z) + (c1.z + c3.z)) * LIMIT2
-				);
-				
-				vTangent.set(
-						(e1.x - e3.x) * 4 + (c1.x - c0.x) + (c2.x - c3.x),
-						(e1.y - e3.y) * 4 + (c1.y - c0.y) + (c2.y - c3.y),
-						(e1.z - e3.z) * 4 + (c1.z - c0.z) + (c2.z - c3.z)
-				);
-				
-				uTangent.set(
-						(e0.x - e2.x) * 4 + (c0.x - c3.x) + (c1.x - c2.x),
-						(e0.y - e2.y) * 4 + (c0.y - c3.y) + (c1.y - c2.y),
-						(e0.z - e2.z) * 4 + (c0.z - c3.z) + (c1.z - c2.z)
-				);
-				
-				normal.cross(uTangent, vTangent);
-			}
-
-		};
-		pair.edgePoint = edgePoint;
+	public String toString() {
+		return "e" + vertex.num + "-" + pair.vertex.num;
 	}
 }

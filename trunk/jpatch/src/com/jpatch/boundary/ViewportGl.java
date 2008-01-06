@@ -583,6 +583,14 @@ public class ViewportGl extends Viewport {
 //		rasterMode();
 //		drawGrid();
 		spatialMode();
+//		gl.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		gl.glColor3f(0, 0, 0);
+		gl.glShadeModel(GL_SMOOTH);
+		gl.glDisable(GL_COLOR_MATERIAL);
+		gl.glEnable(GL_LIGHTING);
+		gl.glEnable(GL_NORMALIZE);
+		setMaterial(GL_FRONT, new GlMaterial(new Color3f(1, 0, 0), 0.2f, 0.0f, 10.0f).getArray());
+		drawSds2(Main.getInstance().sds2, 2);
 //		if (true) return;
 		
 //		gl.glEnable(GL_BLEND);
@@ -1082,6 +1090,74 @@ public class ViewportGl extends Viewport {
 		}
 		
 		gl.glPointSize(3);
+	}
+	
+	private void drawSds2(com.jpatch.entity.sds2.Sds sds, int level) {
+		transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
+		
+		double[] matrix = transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, new double[16]);
+		gl.glMatrixMode(GL_MODELVIEW);
+		gl.glLoadMatrixd(matrix, 0);
+		Point3f p = new Point3f();
+		Vector3f n = new Vector3f();
+		for (com.jpatch.entity.sds2.Face face : sds.getFaces(level - 1)) {
+			gl.glBegin(GL_TRIANGLE_FAN);
+			face.getFacePoint().getLimit(p);
+			face.getFacePoint().getNormal(n);
+//			n.normalize();
+			gl.glNormal3f(n.x, n.y, n.z);
+			gl.glVertex3f(p.x, p.y, p.z);
+			for (com.jpatch.entity.sds2.HalfEdge edge : face.getEdges()) {
+				edge.getVertex().getVertexPoint().getLimit(p);
+				edge.getVertex().getVertexPoint().getNormal(n);
+//				n.normalize();
+				gl.glNormal3f(n.x, n.y, n.z);
+				gl.glVertex3f(p.x, p.y, p.z);
+				edge.getEdgePoint().getLimit(p);
+				edge.getEdgePoint().getNormal(n);
+//				n.normalize();
+				gl.glNormal3f(n.x, n.y, n.z);
+				gl.glVertex3f(p.x, p.y, p.z);
+			}
+			face.getEdges()[0].getVertex().getVertexPoint().getLimit(p);
+			face.getEdges()[0].getVertex().getVertexPoint().getNormal(n);
+//			n.normalize();
+			gl.glNormal3f(n.x, n.y, n.z);
+			gl.glVertex3f(p.x, p.y, p.z);
+			gl.glEnd();
+		}
+		
+		
+//		for (com.jpatch.entity.sds2.Face face : sds.getFaces(level)) {
+//			gl.glBegin(GL_POLYGON);
+//			for (com.jpatch.entity.sds2.HalfEdge edge : face.getEdges()) {
+//				edge.getVertex().getPosition(p);
+//				modelView.transform(p);
+//				gl.glVertex3f(p.x, p.y, p.z);
+//			}
+//			gl.glEnd();
+//		}
+			
+//		gl.glDisable(GL_DEPTH_TEST);
+//		gl.glDisable(GL_LIGHTING);
+//		gl.glColor3f(1, 1, 1);
+//		gl.glBegin(GL_LINES);
+//		for (com.jpatch.entity.sds2.Face face : sds.getFaces(level - 1)) {
+//			for (com.jpatch.entity.sds2.HalfEdge edge : face.getEdges()) {
+//				edge.getFace().getFacePoint().getLimit(p);
+//				edge.getFace().getFacePoint().getNormal(n);
+//				n.normalize();
+//				n.scale(0.1f);
+//				n.add(p);
+//				gl.glVertex3f(p.x, p.y, p.z);
+//				gl.glVertex3f(n.x, n.y, n.z);
+//			}
+//		}
+//		gl.glEnd();
+//		gl.glEnable(GL_LIGHTING);
+//		gl.glEnable(GL_DEPTH_TEST);
+		gl.glLoadIdentity();
+		
 	}
 	
 	private void drawSds3(Sds sds) {

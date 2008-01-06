@@ -37,6 +37,7 @@ import com.jpatch.boundary.tools.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds.JptLoader;
 import com.jpatch.entity.sds.Sds;
+import com.jpatch.entity.sds2.*;
 import com.jpatch.settings.Settings;
 import com.jpatch.ui.ViewportSwitcher;
 import com.sun.org.apache.xpath.internal.operations.Mod;
@@ -74,7 +75,7 @@ public class Main {
 	private static Color VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.text.get();
 	private static Color ACTIVE_VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.selection.get();
 	
-	
+	public com.jpatch.entity.sds2.Sds sds2; 
 	final DefaultTreeModel treeModel = new DefaultTreeModel(new DefaultMutableTreeNode("TREE ROOT"));
 	final TreeManager treeManager = new TreeManager(treeModel);
 	
@@ -237,6 +238,19 @@ public class Main {
 	@SuppressWarnings("serial")
 	private Main() {
 		
+		try {
+			sds2 = ImportOff.importOff(ClassLoader.getSystemResourceAsStream("off/boxcube.off"));
+			sds2.createNextLevel(0);
+			sds2.createNextLevel(1);
+			sds2.createNextLevel(2);
+			sds2.createNextLevel(3);
+			sds2.createNextLevel(4);
+//			sds2.dumpFaces(0);
+//			sds2.dumpFaces(1);
+//			System.exit(0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 //		System.out.println("opengl is single threaded: " + Threading.isSingleThreaded());
 //		Threading.disableSingleThreading();
