@@ -2,8 +2,6 @@ package com.jpatch.entity.sds2;
 
 import static com.jpatch.entity.sds2.SdsWeights.*;
 
-import java.util.*;
-
 import javax.vecmath.*;
 
 public class Vertex {
@@ -13,9 +11,10 @@ public class Vertex {
 	protected final Point3d position = new Point3d();
 	
 	private HalfEdge[] edges = new HalfEdge[0];
+	private HalfEdge preferredStart;
 	
 	private DerivedVertex vertexPoint;
-	private int boundaryType;
+	private int boundaryType;				// -1 = irregular, 0 = regular, 1 = boundary
 	
 	public Vertex() {
 		;
@@ -96,7 +95,6 @@ public class Vertex {
 					double ex = 0, ey = 0, ez = 0;
 					double ux = 0, uy = 0, uz = 0;
 					double vx = 0, vy = 0, vz = 0;
-//					HalfEdge edge = edges[0];
 					for (int i = 0; i < valence; i++) {
 						HalfEdge edge = edges[i];
 						DerivedVertex cp = edge.getPairFace().getFacePoint();
@@ -118,7 +116,6 @@ public class Vertex {
 						vx += cp.position.x * tangentCornerWeights[j] + ep.position.x * tangentEdgeWeights[j];
 						vy += cp.position.y * tangentCornerWeights[j] + ep.position.y * tangentEdgeWeights[j];
 						vz += cp.position.z * tangentCornerWeights[j] + ep.position.z * tangentEdgeWeights[j];	
-						edge = edge.getPrev().getPair();
 					}
 					limit.set(
 							cx * limitCornerWeight + ex * limitEdgeWeight + position.x * limitCenterWeight,
@@ -128,7 +125,6 @@ public class Vertex {
 					uTangent.set(ux, uy, uz);
 					vTangent.set(vx, vy, vz);
 					normal.cross(uTangent, vTangent);
-//					normal.set(0,0,0);
 				}
 				
 				public String toString() {
@@ -147,15 +143,23 @@ public class Vertex {
 		;
 	}
 	
-	public void addEdge(HalfEdge edge) {
+	/**
+	 * Adds the specified HalfEdge to this vertex
+	 * asserts that edge.getVertex() == this vertex
+	 */
+	void addEdge(HalfEdge edge) {
 		assert edge.getVertex() == this : "edge.vertex=" + edge.getVertex() + ", must be this vertex (" + this + ")";
 		HalfEdge[] tmp = new HalfEdge[edges.length + 1];
 		System.arraycopy(edges, 0, tmp, 0, edges.length);
 		tmp[edges.length] = edge;
-		organizeEdges(tmp);
+		edges = tmp;
 	}
 	
-	public void removeEdge(HalfEdge edge) {
+	/**
+	 * Removes the specified HalfEdge from this vertex
+	 * @throws ArrayIndexOutOfBoundsException if the specified HalfEdge is not adjacent to this Vertex
+	 */
+	void removeEdge(HalfEdge edge) {
 		int i = 0;
 		while (edges[i] != edge) {	// throws ArrayIndexOutOfBoundsException if edge is not part of edges
 			i++;
@@ -163,32 +167,84 @@ public class Vertex {
 		final HalfEdge[] tmp = new HalfEdge[edges.length - 1];
 		System.arraycopy(edges, 0, tmp, 0, i);
 		System.arraycopy(edges, i + 1, tmp, i, tmp.length - i);
-		organizeEdges(tmp);
+		edges = tmp;
 	}
 	
-	private void organizeEdges(HalfEdge[] newEdges) {
-		edges = new HalfEdge[newEdges.length];
-		HalfEdge e = newEdges[0];
-		while(e.getPair().getNext() != null && e.getPair().getNext() != newEdges[0]) {
+	/**
+	 * This method must be called whenever a face adjacent to this vertex was created or destroyed.
+	 * It will sort the edge-array, depending on the type of this vertex:
+	 * <ul>
+	 * <li>Regular: edge[n + 1].getPrev().getPair() == edge[n]. If possible, old start-edge is used.</li>
+	 * <li>Boundary: edge[n + 1].getPrev().getPair() == edge[n] for all but the last edge
+	 * <li>Irregular: No particular order
+	 * </ul>
+	 * TODO: preferredStart method will not work properly with undo/redo
+	 */
+	void organizeEdges() {
+		HalfEdge[] tmp = edges.clone();
+		HalfEdge e = tmp[0];
+		while(e.getPair().getNext() != null && e.getPair().getNext() != tmp[0]) {
 			e = e.getPair().getNext();
 		}
-		if (e.getNext() != null) {
+		
+		if (e.getPrev() != null) {
 			boundaryType = 0;	// regular vertex
+			// check if edges contains preferredStart and, if yes, use it as start-edge. Else set preferredStart to current start-edge
+			for (int i = 0; i < tmp.length; i++) {
+				if (tmp[i] == preferredStart) {
+					e = preferredStart;
+					break;
+				}
+			}
+			preferredStart = e;
+		} else {
+			boundaryType = 1;	// regular boundary vertex (corner)
 		}
+		
 		for (int i = 0; i < edges.length; i++) {
 			if (e.getPrev() == null) {
-				System.arraycopy(newEdges, 0, edges, 0, edges.length);
+				System.arraycopy(tmp, 0, edges, 0, edges.length);
 				boundaryType = -1; // irregular boundary vertex, crease edges are edges[0] and edges[edges.length - 1]
 				return;
 			}
 			edges[i] = e;
 			e = e.getPrev().getPair();
 		}
-		boundaryType = 1;	// regular boundary vertex (corner)
 	}
 	
 	@Override
 	public String toString() {
 		return "v" + num;
+	}
+	
+	public static void main(String[] args) {
+		Vertex v = new Vertex();
+		final int n = 10;
+		HalfEdge[] edges = new HalfEdge[n];
+		for (int i = 0; i < n; i++) {
+			edges[i] = new HalfEdge(v, new Vertex());
+		}
+		int[] k = new int[] { 3,6,5,4,7,9,8,2,10,1};
+		for (int i = 0; i < k.length; i++) {
+			int j = k[i] - 1;
+			edges[j].appendTo(edges[(j + 1) % n].getPair());
+			v.addEdge(edges[j]);
+			for (HalfEdge e : v.edges) {
+				System.out.print(e + " ");
+			}
+			System.out.println();
+		}
+		
+		for (int i = 0; i < n; i++) {
+			System.out.print(edges[i] + "\t " + edges[i].getPrev() + "\t " + edges[i].getNext() + "\t ");
+			System.out.println(edges[i].getPair() + "\t " + edges[i].getPair().getPrev() + "\t " + edges[i].getPair().getNext());
+		}
+		
+		HalfEdge e = v.edges[0];
+		do {
+			System.out.print(e + " ");
+			e = e.getPrev().getPair();
+		} while (e != v.edges[0]);
+		
 	}
 }

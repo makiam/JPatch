@@ -239,7 +239,7 @@ public class Main {
 	private Main() {
 		
 		try {
-			sds2 = ImportOff.importOff(ClassLoader.getSystemResourceAsStream("off/boxcube.off"));
+			sds2 = ImportOff.importOff(ClassLoader.getSystemResourceAsStream("off/cube2.off"));
 			sds2.createNextLevel(0);
 			sds2.createNextLevel(1);
 			sds2.createNextLevel(2);
