@@ -1,8 +1,6 @@
 package com.jpatch.entity.sds2;
 
-import static com.jpatch.entity.sds.SdsWeights.*;
 import static com.jpatch.entity.sds2.SdsWeights.*;
-import com.jpatch.afw.attributes.*;
 
 import javax.vecmath.*;
 
@@ -28,6 +26,7 @@ public class Face {
 			if (prev == sides) {
 				prev = 0;
 			}
+			this.edges[i].getVertex().organizeEdges();
 		}
 	}
 	

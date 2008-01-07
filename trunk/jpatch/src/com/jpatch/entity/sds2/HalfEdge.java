@@ -59,6 +59,7 @@ public class HalfEdge {
 	public void appendTo(HalfEdge prevEdge) {
 		assert prev == null : this + ".prev is " + prev + ", must be null";
 		assert prevEdge.next == null : prevEdge + ".next is " + prevEdge.next + ", must be null";
+		assert vertex == prevEdge.pair.vertex : "prevEdge.pair.vertex is " + prevEdge.pair.vertex + ", this.vertex = " + vertex + ", must be equal";
 		prevEdge.next = this;
 		this.prev = prevEdge;
 	}

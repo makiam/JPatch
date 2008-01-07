@@ -590,7 +590,7 @@ public class ViewportGl extends Viewport {
 		gl.glEnable(GL_LIGHTING);
 		gl.glEnable(GL_NORMALIZE);
 		setMaterial(GL_FRONT, new GlMaterial(new Color3f(1, 0, 0), 0.2f, 0.0f, 10.0f).getArray());
-		drawSds2(Main.getInstance().sds2, 2);
+		drawSds2(Main.getInstance().sds2, 4);
 //		if (true) return;
 		
 //		gl.glEnable(GL_BLEND);

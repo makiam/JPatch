@@ -13,10 +13,6 @@ public class Sds {
 	}
 	
 	public void addFace(int level, Vertex... vertices) {
-//		System.out.print("Adding face at level " + level + " vertices: ");
-//		for (Vertex v : vertices) {
-//			System.out.print(v + " ");
-//		}
 		HalfEdge[] edges = new HalfEdge[vertices.length];
 		for (int i = 0; i < vertices.length; i++) {
 			int j = i + 1;
@@ -27,7 +23,6 @@ public class Sds {
 		}
 		Face face = new Face(edges);
 		levelFaceSets[level].add(face);
-//		System.out.println("    face=" + face);
 	}
 	
 	public Collection<Face> getFaces(int level) {
@@ -65,9 +60,7 @@ public class Sds {
 			edge = new HalfEdge(vertex0, vertex1);
 			addHalfEdge(edge);
 		} else {
-			if (edge.getFace() != null) {
-				throw new IllegalStateException("Surface is non-manifold, edge=" + edge + " face=" + edge.getFace());
-			}
+			assert edge.getFace() == null : "Surface is non-manifold, edge=" + edge + " face=" + edge.getFace();
 		}
 		return edge;
 	}
