@@ -12,7 +12,7 @@ public class Sds {
 		}
 	}
 	
-	public void addFace(int level, Vertex... vertices) {
+	public Face addFace(int level, Vertex... vertices) {
 		HalfEdge[] edges = new HalfEdge[vertices.length];
 		for (int i = 0; i < vertices.length; i++) {
 			int j = i + 1;
@@ -23,6 +23,7 @@ public class Sds {
 		}
 		Face face = new Face(edges);
 		levelFaceSets[level].add(face);
+		return face;
 	}
 	
 	public Collection<Face> getFaces(int level) {
