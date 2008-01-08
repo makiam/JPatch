@@ -80,6 +80,7 @@ public class JptLoader {
 					Face face = sds.addFace(0, vertices);
 //					if (face != null) {
 						face.setMaterial(materials.get(materialIndex));
+						System.out.println(materials.get(materialIndex));
 //					}
 //					sds.addCandidateFace(vertexList.toArray(new TopLevelVertex[vertexList.size()]));
 					chars = null;
@@ -216,12 +217,16 @@ public class JptLoader {
 					end.getVertex().getPosition(p1);
 					evaluateBezier(p0, outTangent, inTangent, p1, cp.hookPos, p2);
 					cp.getVertex().setPosition(p2);
+//					start.getVertex().getPosition(p0);
+//					end.getVertex().getPosition(p1);
+					p2.interpolate(p0, p1, cp.hookPos);
+					cp.vertex.setPosition(p2);
 //					cp.vertex.pos.interpolate(start.getVertex().pos, end.getVertex().pos, cp.hookPos);
 				}
 			}
 //			sds.addCandidateFaces();
 //			sds.replaceFaces();
-//			sds.sortFaces();
+			sds.sortFaces();
 //			sds.validateVertices();
 //			Map<Point3d, Vector3d> compensationMap = new HashMap<Point3d, Vector3d>();
 //			for (TopLevelVertex vertex : sds.vertexList) {

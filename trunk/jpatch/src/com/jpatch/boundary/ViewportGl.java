@@ -590,7 +590,7 @@ public class ViewportGl extends Viewport {
 		gl.glEnable(GL_LIGHTING);
 		gl.glEnable(GL_NORMALIZE);
 		setMaterial(GL_FRONT, new GlMaterial(new Color3f(1, 0, 0), 0.2f, 0.0f, 10.0f).getArray());
-		drawSds2(Main.getInstance().sds2, 2);
+		drawSds2(Main.getInstance().sds2, 1);
 //		if (true) return;
 		
 //		gl.glEnable(GL_BLEND);
@@ -1094,13 +1094,18 @@ public class ViewportGl extends Viewport {
 	
 	private void drawSds2(com.jpatch.entity.sds2.Sds sds, int level) {
 		transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
-		
+		GlMaterial currentMaterial = null;
 		double[] matrix = transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, new double[16]);
 		gl.glMatrixMode(GL_MODELVIEW);
 		gl.glLoadMatrixd(matrix, 0);
 		Point3f p = new Point3f();
 		Vector3f n = new Vector3f();
 		for (com.jpatch.entity.sds2.Face face : sds.getFaces(level - 1)) {
+			GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
+			if (currentMaterial != faceMaterial) {
+				setMaterial(GL_FRONT, faceMaterial.getArray());
+				currentMaterial = faceMaterial;
+			}
 			gl.glBegin(GL_TRIANGLE_FAN);
 			face.getFacePoint().getLimit(p);
 			face.getFacePoint().getNormal(n);

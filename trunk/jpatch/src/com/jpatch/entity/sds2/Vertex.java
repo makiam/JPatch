@@ -31,12 +31,12 @@ public class Vertex {
 	
 	public void getPosition(Tuple3d position) {
 		validatePosition();
-		position.set(position);
+		position.set(this.position);
 	}
 	
 	public void getPosition(Tuple3f position) {
 		validatePosition();
-		position.set(position);
+		position.set(this.position);
 	}
 	
 	public void setPosition(Tuple3d position) {
@@ -92,8 +92,10 @@ public class Vertex {
 						break;
 					case BOUNDARY:
 						Point3d p0 = Vertex.this.position;
+						Vertex.this.edges[0].getPair().getVertex().validatePosition();
 						Point3d p1 = Vertex.this.edges[0].getPair().getVertex().position;
-						Point3d p2 = Vertex.this.edges[edges.length].getPair().getVertex().position;
+						Vertex.this.edges[edges.length - 1].getPair().getVertex().validatePosition();
+						Point3d p2 = Vertex.this.edges[edges.length - 1].getPair().getVertex().position;
 						position.set(
 								p0.x * CREASE0 + (p1.x + p2.x) * CREASE1,
 								p0.y * CREASE0 + (p1.y + p2.y) * CREASE1,
@@ -101,6 +103,7 @@ public class Vertex {
 						);
 						break;
 					case IRREGULAR:
+						System.out.println("IRREGULAR");
 						position.set(Vertex.this.position);
 						break;
 					default:
@@ -251,7 +254,7 @@ public class Vertex {
 			e = e.getPair().getNext();
 		}
 		
-		if (e.getPrev() != null) {
+		if (e.getPair().getNext() != null) {
 			boundaryType = REGULAR;	// regular vertex
 			// check if edges contains preferredStart and, if yes, use it as start-edge. Else set preferredStart to current start-edge
 			for (int i = 0; i < tmp.length; i++) {
@@ -265,14 +268,18 @@ public class Vertex {
 			boundaryType = BOUNDARY;	// regular boundary vertex (corner)
 		}
 		
+		
+		
 		for (int i = 0; i < edges.length; i++) {
-			if (e.getPrev() == null) {
+			if (i < edges.length - 1 && e.getPrev() == null) {
 				System.arraycopy(tmp, 0, edges, 0, edges.length);
 				boundaryType = IRREGULAR; // irregular boundary vertex, crease edges are edges[0] and edges[edges.length - 1]
 				return;
 			}
 			edges[i] = e;
-			e = e.getPrev().getPair();
+			if (i < edges.length - 1) {
+				e = e.getPrev().getPair();
+			}
 		}
 	}
 	
