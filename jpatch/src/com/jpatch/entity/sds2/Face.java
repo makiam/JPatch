@@ -38,10 +38,12 @@ public class Face {
 	}
 	
 	public Material getMaterial() {
+		if (material == null) throw new RuntimeException();
 		return material;
 	}
 	
 	public void setMaterial(Material material) {
+		if (material == null) throw new RuntimeException();
 		this.material = material;
 	}
 	

@@ -3,12 +3,22 @@ package com.jpatch.entity.sds2;
 import java.util.*;
 
 public class Sds {
+	private final static Comparator<Face> faceMaterialComparator = new Comparator<Face>() {
+		public int compare(Face f1, Face f2) {
+			int m1 = System.identityHashCode(f1.getMaterial());
+			int m2 = System.identityHashCode(f2.getMaterial());
+			return (m1 < m2) ? -1 : (m1 > m2) ? 1 : 0;
+		}		
+	};
+	
 	private Set<Face>[] levelFaceSets = new Set[SdsConstants.MAX_LEVEL + 1];
+	private List<Face>[] levelFaceLists = new List[SdsConstants.MAX_LEVEL + 1];
 	private Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
 	
 	public Sds() {
 		for (int i = 0; i < levelFaceSets.length; i++) {
 			levelFaceSets[i] = new HashSet<Face>();
+			levelFaceLists[i] = new ArrayList<Face>();
 		}
 	}
 	
@@ -26,8 +36,17 @@ public class Sds {
 		return face;
 	}
 	
+	public void sortFaces() {
+		for (int i = 0; i < levelFaceSets.length; i++) {
+			levelFaceLists[i].clear();
+			levelFaceLists[i].addAll(levelFaceSets[i]);
+			Collections.sort(levelFaceLists[i], faceMaterialComparator);
+			System.out.println("sorted level " + i + " " + levelFaceLists[i].size());
+		}
+	}
+	
 	public Collection<Face> getFaces(int level) {
-		return levelFaceSets[level];
+		return levelFaceLists[level];
 	}
 	
 	public void dumpFaces(int level) {
@@ -39,7 +58,8 @@ public class Sds {
 	public void createNextLevel(int currentLevel) {
 		for (Face face : levelFaceSets[currentLevel]) {
 			for (HalfEdge edge : face.getEdges()) {
-				addFace(currentLevel + 1, face.getFacePoint(), edge.getPrev().getEdgePoint(), edge.getVertex().getVertexPoint(), edge.getEdgePoint());
+				Face newFace = addFace(currentLevel + 1, face.getFacePoint(), edge.getPrev().getEdgePoint(), edge.getVertex().getVertexPoint(), edge.getEdgePoint());
+				newFace.setMaterial(face.getMaterial());
 			}
 		}
 	}

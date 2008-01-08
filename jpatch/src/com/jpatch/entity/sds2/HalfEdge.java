@@ -148,7 +148,8 @@ public class HalfEdge {
 						
 						normal.cross(uTangent, vTangent);
 					break;
-					case BOUNDARY:			
+					case BOUNDARY:
+						validatePosition();
 						vertex.getVertexPoint().validatePosition();
 						pair.vertex.getVertexPoint().validatePosition();
 						Point3d p1 = vertex.getVertexPoint().position;

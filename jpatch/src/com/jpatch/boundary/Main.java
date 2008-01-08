@@ -240,10 +240,14 @@ public class Main {
 		
 		try {
 //			sds2 = ImportOff.importOff(ClassLoader.getSystemResourceAsStream("off/teapot.off"));
-			sds2 = new com.jpatch.entity.sds2.JptLoader().importModel(new FileInputStream("/home/sascha/sphere.jpt"));
+			sds2 = new com.jpatch.entity.sds2.JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt"));
+			System.out.println(sds2.getFaces(0).size() + " faces at level 0");
 			sds2.createNextLevel(0);
-			sds2.createNextLevel(1);
-			sds2.createNextLevel(2);
+			System.out.println(sds2.getFaces(1).size() + " faces at level 1");
+//			sds2.createNextLevel(1);
+//			System.out.println(sds2.getFaces(2).size() + " faces at level 2");
+			sds2.sortFaces();
+//			sds2.createNextLevel(2);
 //			sds2.createNextLevel(3);
 //			sds2.createNextLevel(4);
 //			sds2.dumpFaces(0);
