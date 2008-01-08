@@ -1,14 +1,15 @@
 package com.jpatch.entity.sds2;
 
 import static com.jpatch.entity.sds2.SdsWeights.*;
+import com.jpatch.entity.*;
 
 import javax.vecmath.*;
 
 public class Face {
 	private final HalfEdge[] edges;
 	private final double oneOverSides;
-	
 	private DerivedVertex facePoint;
+	private Material material;
 	
 	public Face(HalfEdge... edges) {
 		int sides = edges.length;
@@ -26,12 +27,22 @@ public class Face {
 			if (prev == sides) {
 				prev = 0;
 			}
+		}
+		for (int i = 0; i < sides; i++) {
 			this.edges[i].getVertex().organizeEdges();
 		}
 	}
 	
 	public HalfEdge[] getEdges() {
 		return edges;
+	}
+	
+	public Material getMaterial() {
+		return material;
+	}
+	
+	public void setMaterial(Material material) {
+		this.material = material;
 	}
 	
 	public DerivedVertex getFacePoint() {
