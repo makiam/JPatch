@@ -60,7 +60,7 @@ public class Sds {
 			HalfEdge[] edges = face.getEdges();
 //			Face[] children = face.getChildren();
 			for (int i = 0; i < edges.length; i++) {
-				Face newFace = addFace(currentLevel + 1, face.getFacePoint(), edges[i].getPrev().getEdgePoint(), edges[i].getVertex().getVertexPoint(), edges[i].getEdgePoint());
+				Face newFace = addFace(currentLevel + 1, face.createFacePoint(), edges[i].getPrev().createEdgePoint(), edges[i].getVertex().createVertexPoint(), edges[i].createEdgePoint());
 				newFace.setMaterial(face.getMaterial());
 //				children[i] = newFace;
 			}

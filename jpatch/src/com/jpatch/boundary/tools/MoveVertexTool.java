@@ -8,7 +8,7 @@ import com.jpatch.afw.vecmath.TransformUtil;
 import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.*;
 import com.jpatch.entity.SdsModel;
-import com.jpatch.entity.sds.*;
+import com.jpatch.entity.sds2.*;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -156,7 +156,7 @@ public class MoveVertexTool implements VisibleTool {
 				MouseSelector.Hit hit = MouseSelector.getVertexAt(viewport, e.getX(), e.getY(), false);
 //				HalfEdge edge = MouseSelector.getEdgeAt(viewport, e.getX(), e.getY(), Main.getInstance().getActiveSds());
 				if (hit.object != null) {
-					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, (SdsModel) hit.node, (TopLevelVertex) hit.object);
+					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, (SdsModel) hit.node, (Vertex) hit.object);
 					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 //					Main.getInstance().setSelectedObject(vertex);
 //				} else if (edge != null) {
@@ -242,7 +242,7 @@ public class MoveVertexTool implements VisibleTool {
 	
 	private static class MoveVertexMouseMotionListener extends MouseMotionAdapter {
 		private final Viewport viewport;
-		private final TopLevelVertex vertex;
+		private final Vertex vertex;
 		private final Point3d pStart = new Point3d();
 		private final Point3d limitStart = new Point3d();
 		private final Point3d k = new Point3d();
@@ -255,7 +255,7 @@ public class MoveVertexTool implements VisibleTool {
 //		Point3d pos = new Point3d();
 //		Point3d limit = new Point3d();
 		
-		MoveVertexMouseMotionListener(Viewport viewport, SdsModel sdsModel, TopLevelVertex vertex) {
+		MoveVertexMouseMotionListener(Viewport viewport, SdsModel sdsModel, Vertex vertex) {
 			this.viewport = viewport;
 			this.vertex = vertex;
 			this.sdsModel = sdsModel;
@@ -267,11 +267,11 @@ public class MoveVertexTool implements VisibleTool {
 //			transformUtil.setTransform(TransformUtil.LOCAL, sdsModel.getTransform());
 			
 			vertex.getVertexPoint().getLimit(limitStart);
-			vertex.getPos(pStart);
+			vertex.getPosition(pStart);
 			if (useLimit) {
 				p.set(limitStart);
 				k.set(pStart);
-				k.scale(vertex.getLimitFactor());
+//				k.scale(vertex.getLimitFactor());
 				k.sub(limitStart, k);
 			} else {
 				p.set(pStart);
@@ -302,7 +302,7 @@ public class MoveVertexTool implements VisibleTool {
 			
 			if (useLimit) {
 				p.sub(k);
-				p.scale(1.0 / vertex.getLimitFactor());
+//				p.scale(1.0 / vertex.getLimitFactor());
 			} 
 				
 //			System.out.println(p);
@@ -311,7 +311,7 @@ public class MoveVertexTool implements VisibleTool {
 //			double n = vertex.valence();
 //			p.scale((n + 5) / n);
 //			p.add(pos);
-			vertex.getPosition().setTuple(p);
+			vertex.setPosition(p);
 //			sdsModel.getSds().computeLevel2Vertices();
 			Main.getInstance().syncRepaintViewport(viewport);
 		}

@@ -2,6 +2,8 @@ package com.jpatch.boundary.tools;
 
 import javax.vecmath.*;
 
+import trashcan.*;
+
 import com.jpatch.boundary.*;
 import com.jpatch.boundary.actions.*;
 import com.jpatch.entity.*;

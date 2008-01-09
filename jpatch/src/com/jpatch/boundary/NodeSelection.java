@@ -8,9 +8,10 @@ import javax.vecmath.AxisAngle4d;
 import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3d;
 
+import trashcan.*;
+
 import com.jpatch.afw.control.JPatchUndoableEdit;
 import com.jpatch.afw.vecmath.TransformUtil;
-import com.jpatch.entity.TransformNode;
 import com.jpatch.entity.Transformable;
 
 public class NodeSelection implements Transformable {

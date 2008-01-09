@@ -4,11 +4,12 @@ import java.awt.Color;
 
 import javax.swing.JComponent;
 
+import trashcan.*;
+
 import com.jpatch.afw.Utils;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.ui.*;
 import com.jpatch.boundary.tools.JPatchTool;
-import com.jpatch.entity.TransformNode;
 
 public class JPatchInspector {
 	public AttributeEditorPanel panel = new AttributeEditorPanel();

@@ -15,13 +15,13 @@ import com.jpatch.boundary.*;
 import com.jpatch.boundary.tools.MoveVertexTool.*;
 import com.jpatch.boundary.tools.TranslateTool.*;
 import com.jpatch.entity.*;
-import com.jpatch.entity.sds.*;
+import com.jpatch.entity.sds2.*;
 
 public class NormalTool implements JPatchTool {
 	MouseListener[] mouseListeners;
 	TransformUtil transformUtil = new TransformUtil();
-	Map<TopLevelVertex, VertexNormal> vertexPos = new HashMap<TopLevelVertex, VertexNormal>();
-	TopLevelVertex vertex;
+	Map<Vertex, VertexNormal> vertexPos = new HashMap<Vertex, VertexNormal>();
+	Vertex vertex;
 	
 	public void registerListeners(Viewport[] viewports) {
 		if (mouseListeners != null) {
@@ -83,15 +83,12 @@ public class NormalTool implements JPatchTool {
 				Selection selection = Main.getInstance().getSelection();
 				MouseSelector.Hit hit = MouseSelector.getVertexAt(viewport, e.getX(), e.getY(), true);
 				if (selection.getSelectedVerticesAttribute().contains(hit.object)) {
-					vertex = (TopLevelVertex) hit.object;
+					vertex = (Vertex) hit.object;
 					vertexPos.clear();
-					for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
-						if (vertex instanceof TopLevelVertex) {
-							TopLevelVertex tlv = (TopLevelVertex) vertex;
-							vertexPos.put(tlv, new VertexNormal(tlv));
-						}
+					for (Vertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
+						vertexPos.put(vertex, new VertexNormal(vertex));
 					}
-					mouseMotionListener = new MoveNormalMouseMotionListener(viewport, (SdsModel) hit.node, (TopLevelVertex) hit.object);
+					mouseMotionListener = new MoveNormalMouseMotionListener(viewport, (SdsModel) hit.node, vertex);
 					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 				} 
 			}
@@ -123,12 +120,17 @@ public class NormalTool implements JPatchTool {
 //		Point3d pos = new Point3d();
 //		Point3d limit = new Point3d();
 		
-		MoveNormalMouseMotionListener(Viewport viewport, SdsModel sdsModel, TopLevelVertex vertex) {
+		MoveNormalMouseMotionListener(Viewport viewport, SdsModel sdsModel, Vertex vertex) {
 			this.viewport = viewport;
 			
-			vertex.getPos(p0);
-			vertex.getVertexPoint().getNormal(p1);
-			p1.add(p0);
+			VertexNormal vertexNormal = vertexPos.get(vertex);
+			
+//			vertex.getPosition(p0);
+//			vertex.getVertexPoint().getNormal(p1);
+//			p1.add(p0);
+			
+			p0.set(vertexNormal.pStart);
+			p1.add(vertexNormal.pStart, vertexNormal.pNormal);
 			
 			viewport.getViewDef().configureTransformUtil(transformUtil);
 			sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
@@ -175,7 +177,7 @@ public class NormalTool implements JPatchTool {
 				factor = (p.z - p0.z) / delta;
 				break;
 			}
-			for (TopLevelVertex v : vertexPos.keySet()) {
+			for (Vertex v : vertexPos.keySet()) {
 				vertexPos.get(v).setFactor(v, factor);
 			}
 			
@@ -195,15 +197,16 @@ public class NormalTool implements JPatchTool {
 	
 	private static class VertexNormal {
 		Point3d pStart = new Point3d();
-		Point3d pNormal = new Point3d();
+		Vector3d pNormal = new Vector3d();
 		
-		VertexNormal(TopLevelVertex v) {
-			v.getPos(pStart);
+		VertexNormal(Vertex v) {
+			v.getPosition(pStart);
 			v.getVertexPoint().getNormal(pNormal);
+			pNormal.normalize();
 		}
 		
-		void setFactor(TopLevelVertex v, double f) {
-			v.getPosition().setTuple(pStart.x + pNormal.x * f, pStart.y + pNormal.y * f, pStart.z + pNormal.z * f);
+		void setFactor(Vertex v, double f) {
+			v.setPosition(pStart.x + pNormal.x * f, pStart.y + pNormal.y * f, pStart.z + pNormal.z * f);
 		}
 	}
 

@@ -35,8 +35,6 @@ import com.jpatch.boundary.actions.Actions;
 import com.jpatch.boundary.actions.Actions.ViewportMode;
 import com.jpatch.boundary.tools.*;
 import com.jpatch.entity.*;
-import com.jpatch.entity.sds.JptLoader;
-import com.jpatch.entity.sds.Sds;
 import com.jpatch.entity.sds2.*;
 import com.jpatch.settings.Settings;
 import com.jpatch.ui.ViewportSwitcher;
@@ -75,7 +73,6 @@ public class Main {
 	private static Color VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.text.get();
 	private static Color ACTIVE_VIEWPORT_BORDER_COLOR = Settings.getInstance().colors.selection.get();
 	
-	public com.jpatch.entity.sds2.Sds sds2; 
 	final DefaultTreeModel treeModel = new DefaultTreeModel(new DefaultMutableTreeNode("TREE ROOT"));
 	final TreeManager treeManager = new TreeManager(treeModel);
 	
@@ -238,23 +235,7 @@ public class Main {
 	@SuppressWarnings("serial")
 	private Main() {
 		
-		try {
-			sds2 = ImportOff.importOff(ClassLoader.getSystemResourceAsStream("off/cube2.off"));
-//			sds2 = new com.jpatch.entity.sds2.JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt"));
-			sds2.createNextLevel(0);
-			sds2.createNextLevel(1);
-//			sds2.createNextLevel(2);
-//			sds2.createNextLevel(3);
-			sds2.sortFaces();
-//			sds2.createNextLevel(2);
-//			sds2.createNextLevel(3);
-//			sds2.createNextLevel(4);
-//			sds2.dumpFaces(0);
-//			sds2.dumpFaces(1);
-//			System.exit(0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		
 		
 //		System.out.println("opengl is single threaded: " + Threading.isSingleThreaded());
 //		Threading.disableSingleThreading();
@@ -888,6 +869,9 @@ public class Main {
 	}
 	
 	public void setModel(Sds sds) {
+		sds.createNextLevel(0);
+		sds.createNextLevel(1);
+		sds.sortFaces();
 		SdsModel model = new SdsModel(sds);
 		treeManager.createTreeNodeFor(model);
 		model.getNameAttribute().setValue("model");

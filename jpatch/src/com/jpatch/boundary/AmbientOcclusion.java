@@ -4,48 +4,50 @@ import java.util.*;
 
 import javax.vecmath.*;
 
-import com.jpatch.entity.sds.*;
+import com.jpatch.entity.sds2.*;
 
 public class AmbientOcclusion {
-	private Map<Level2Vertex, Disk> diskMap;
 	
-	public void computeAo(Sds sds) {
+	private Map<Vertex, Disk> diskMap;
+	
+	public void computeAo(Sds sds, int level) {
 		long time = System.currentTimeMillis();
-		diskMap = new HashMap<Level2Vertex, Disk>();
-		for (Face face : sds.faceList) {
-			for (Slate2 slate : face.getSlates()) {
-				for (SlateEdge[] corner : slate.getCorners()) {
-					Level2Vertex v = corner[0].getVertex();
-					if (v == null) {
-						throw new RuntimeException();
+		diskMap = new HashMap<Vertex, Disk>();
+		Point3d p0 = new Point3d();
+		Point3d p1 = new Point3d();
+		Vector3d vn = new Vector3d();
+		
+		for (Face face : sds.getFaces(level)) {
+			for (HalfEdge edge : face.getEdges()) {
+				Vertex v = edge.getVertex();
+				if (!diskMap.containsKey(v)) {				
+					double radius = 0;
+					int n = 0;
+					v.getLimit(p0);
+					for (HalfEdge vertexEdge : v.getEdges()) {
+						vertexEdge.getPairVertex().getLimit(p1);
+						radius += p0.distance(p1);
+						n++;
 					}
-					if (diskMap.get(v) == null) {				
-						double radius = 0;
-						int n = 0;
-						for (int i = 0; i < corner.length; i++) {
-							if (corner[i] != null) {
-								if (corner[i].getPairVertex() == null) {
-									throw new RuntimeException("i=" + i);
-								}
-								radius += v.limit.distance(corner[i].getPairVertex().limit);
-								n++;
-							}
-						}
-						radius /= n;
-						Disk disk = new Disk(v.limit, v.normal, radius);
-						diskMap.put(v, disk);
-					}
+					radius /= n;
+					v.getNormal(vn);
+					Disk disk = new Disk(p0, vn, radius);
+					diskMap.put(v, disk);
 				}
 			}
 		}
-		Disk[] disks = new Disk[sds.level2Vertices.length];
-		for (int i = 0; i < sds.level2Vertices.length; i++) {
-			disks[i] = diskMap.get(sds.level2Vertices[i]);
+		Disk[] disks = new Disk[diskMap.size()];
+		System.out.println(disks.length + " disks");
+		{
+			int i = 0;
+			for (Vertex v : diskMap.keySet()) {
+				disks[i++] = diskMap.get(v);
+			}
 		}
 		
 		Vector3d v = new Vector3d();
 		for (int i = 0; i < disks.length; i++) {
-			System.out.println(i * 100 / disks.length + "%");
+			System.out.println(i * 100.0 / disks.length + "%");
 			Disk disk1 = disks[i];
 			for (int j = i + 1; j < disks.length; j++) {
 				Disk disk2 = disks[j];
@@ -85,7 +87,7 @@ public class AmbientOcclusion {
 		System.out.println((System.currentTimeMillis() - time) + "ms");
 	}
 	
-	public double getOcclusion(Level2Vertex vertex) {
+	public double getOcclusion(Vertex vertex) {
 		return diskMap.get(vertex).occlusion;
 //		return vertex.normal.z;
 	}

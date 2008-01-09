@@ -1,44 +1,50 @@
 package com.jpatch.boundary;
 
-import com.jpatch.entity.sds.*;
+import com.jpatch.entity.sds2.*;
 import java.io.*;
 import java.util.*;
 
-public class RibExporter {
+import javax.vecmath.*;
 
+public class RibExporter {
+	private static final int LEVEL = 1;
+	
 	public void export(Sds sds, PrintStream out) {
 		AmbientOcclusion ao = new AmbientOcclusion();
-		ao.computeAo(sds);
+		ao.computeAo(sds, LEVEL);
 		out.print("SubdivisionMesh \"catmull-clark\" [");
 		
-		/* count slates */
-		int numSlates = 0;
-		for (Face face : sds.faceList) {
-			numSlates += face.sides;
-		}
+//		/* count slates */
+//		int numSlates = 0;
+//		for (Face face : sds.faceList) {
+//			numSlates += face.sides;
+//		}
 		
 		/* enumerate (level 2) vertices */
-		Map<Level2Vertex, Integer> vertexNumbers = new HashMap<Level2Vertex, Integer>();
+		Map<Vertex, Integer> vertexNumbers = new LinkedHashMap<Vertex, Integer>();
 		int n = 0;
-		for (Level2Vertex v : sds.level2Vertices) {
-			vertexNumbers.put(v, n++);
+		for (Face face : sds.getFaces(LEVEL)) {
+			for (HalfEdge edge : face.getEdges()) {
+				Vertex v = edge.getVertex();
+				if (!vertexNumbers.containsKey(v)) {
+					vertexNumbers.put(v, n++);
+				}
+			}	
 		}
 		
 		/* print sides per face array */
-		for (int i = 0; i < numSlates; i++) {
+		for (int i = 0, s = sds.getFaces(LEVEL).size(); i < s; i++) {
 			out.print("4 ");
 		}
 		out.println("]");
 		
 		/* print face vertex numbers */
 		out.print("[");
-		for (Face face : sds.faceList) {
-			for (Slate2 slate : face.getSlates()) {
-				SlateEdge[][] edges = slate.getCorners();
-				for (int i = 0; i < 4; i++) {
-					out.print(vertexNumbers.get(edges[i][0].getVertex()));
-					out.print(' ');
-				}
+		for (Face face : sds.getFaces(LEVEL)) {
+			for (HalfEdge edge : face.getEdges()) {
+				Vertex v = edge.getVertex();
+				out.print(vertexNumbers.get(v));
+				out.print(' ');
 			}
 		}
 		out.println("]");
@@ -48,19 +54,21 @@ public class RibExporter {
 		
 		/* print vertex positions */
 		out.print("\"P\" [");
-		for (Level2Vertex v : sds.level2Vertices) {
-			out.print(v.getPosition().getX());
+		Point3d p = new Point3d();
+		for (Vertex v : vertexNumbers.keySet()) {
+			v.getPosition(p);
+			out.print(p.x);
 			out.print(' ');
-			out.print(v.getPosition().getY());
+			out.print(p.y);
 			out.print(' ');
-			out.print(v.getPosition().getZ());
+			out.print(p.z);
 			out.print(' ');
 		}
 		out.println("]");
 		
 		/* print vertex occlusion */
 		out.print("\"vertex float Occlusion\" [");
-		for (Level2Vertex v : sds.level2Vertices) {
+		for (Vertex v : vertexNumbers.keySet()) {
 			out.print(ao.getOcclusion(v));
 			out.print(' ');
 		}

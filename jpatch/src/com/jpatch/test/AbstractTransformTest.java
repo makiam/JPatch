@@ -1,5 +1,6 @@
 package com.jpatch.test;
 
+import trashcan.*;
 import com.jpatch.entity.*;
 
 public class AbstractTransformTest {
