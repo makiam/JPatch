@@ -2,6 +2,7 @@ package com.jpatch.entity.sds2;
 
 
 import static com.jpatch.entity.sds2.SdsWeights.*;
+import com.jpatch.afw.attributes.*;
 
 import javax.vecmath.*;
 
@@ -21,12 +22,18 @@ public class Vertex {
 	private DerivedVertex vertexPoint;
 	private int boundaryType;
 	
+	protected final Tuple3Attr positionAttr = new Tuple3Attr(position);
+	
 	public Vertex() {
 		;
 	}
 	
 	public Vertex(double x, double y, double z) {
 		position.set(x, y, z);
+	}
+	
+	public Tuple3Attr getPositionAttribute() {
+		return positionAttr;
 	}
 	
 	public void getPosition(Tuple3d position) {
@@ -40,7 +47,7 @@ public class Vertex {
 	}
 	
 	public void setPosition(Tuple3d position) {
-		this.position.set(position);
+		positionAttr.setTuple(position);
 	}
 	
 	public void getLimit(Tuple3f limit) {

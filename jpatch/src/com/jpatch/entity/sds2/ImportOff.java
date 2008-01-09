@@ -1,11 +1,17 @@
 package com.jpatch.entity.sds2;
 
+import com.jpatch.entity.*;
+
 import java.io.*;
 import java.util.*;
+
+import javax.vecmath.*;
 
 public class ImportOff {
 	public static Sds importOff(InputStream in) throws IOException {
 		Sds sds = new Sds();
+		Material material = new BasicMaterial(new Color3f(0, 0, 1));
+		
 		List<Vertex> vertexList = new ArrayList<Vertex>();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		String[] tokens;
@@ -34,7 +40,8 @@ public class ImportOff {
 			for (int j = 0; j < vertices.length; j++) {
 				vertices[j] = vertexList.get(Integer.parseInt(tokens[j + 1]));
 			}
-			sds.addFace(0, vertices);
+			Face face = sds.addFace(0, vertices);
+			face.setMaterial(material);
 		}
 		return sds;
 	}

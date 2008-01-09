@@ -9,6 +9,9 @@ import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.tools.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds.*;
+import com.jpatch.entity.sds2.SdsConstants;
+import com.sun.opengl.util.*;
+//import com.sun.opengl.util.*;
 
 import java.awt.Component;
 import java.awt.event.MouseWheelEvent;
@@ -376,6 +379,8 @@ public class ViewportGl extends Viewport {
 	private int maxLights, maxTextureSize;
 	
 	GLEventListener glEventListener;
+	
+	private final FloatBuffer buffer = BufferUtil.newFloatBuffer(SdsConstants.MAX_VALENCE * 12 + 12);
 	
 	public ViewportGl(int id, ViewDirection direction, CollectionAttr<ViewDirection> orthoDirections, JPatchInspector inspector) {
 		super(id, direction, orthoDirections, inspector);
@@ -1098,38 +1103,26 @@ public class ViewportGl extends Viewport {
 		double[] matrix = transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, new double[16]);
 		gl.glMatrixMode(GL_MODELVIEW);
 		gl.glLoadMatrixd(matrix, 0);
+		gl.glColor3f(0, 0, 0);
+		gl.glEnable(GL_COLOR_MATERIAL);
+		gl.glColorMaterial(GL_FRONT, GL_EMISSION);
 		Point3f p = new Point3f();
 		Vector3f n = new Vector3f();
+		gl.glInterleavedArrays(GL_N3F_V3F, 0, buffer);
+		final boolean showProjectedMesh = viewDef.getShowProjectedMeshAttribute().getBoolean();
 		for (com.jpatch.entity.sds2.Face face : sds.getFaces(level - 1)) {
 			GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
 			if (currentMaterial != faceMaterial) {
 				setMaterial(GL_FRONT, faceMaterial.getArray());
 				currentMaterial = faceMaterial;
 			}
-			gl.glBegin(GL_TRIANGLE_FAN);
-			face.getFacePoint().getLimit(p);
-			face.getFacePoint().getNormal(n);
-//			n.normalize();
-			gl.glNormal3f(n.x, n.y, n.z);
-			gl.glVertex3f(p.x, p.y, p.z);
-			for (com.jpatch.entity.sds2.HalfEdge edge : face.getEdges()) {
-				edge.getVertex().getVertexPoint().getLimit(p);
-				edge.getVertex().getVertexPoint().getNormal(n);
-//				n.normalize();
-				gl.glNormal3f(n.x, n.y, n.z);
-				gl.glVertex3f(p.x, p.y, p.z);
-				edge.getEdgePoint().getLimit(p);
-				edge.getEdgePoint().getNormal(n);
-//				n.normalize();
-				gl.glNormal3f(n.x, n.y, n.z);
-				gl.glVertex3f(p.x, p.y, p.z);
+			face.fillArray(buffer);
+			gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() * 2 + 2);
+			if (showProjectedMesh) {
+				gl.glColor3f(0.5f, 0.5f, 0.25f);
+				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides() * 2);
+				gl.glColor3f(0, 0, 0);
 			}
-			face.getEdges()[0].getVertex().getVertexPoint().getLimit(p);
-			face.getEdges()[0].getVertex().getVertexPoint().getNormal(n);
-//			n.normalize();
-			gl.glNormal3f(n.x, n.y, n.z);
-			gl.glVertex3f(p.x, p.y, p.z);
-			gl.glEnd();
 		}
 		
 		
