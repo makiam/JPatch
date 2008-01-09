@@ -697,7 +697,7 @@ public class ViewportGl extends Viewport {
 		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
 		drawOrigin(modelView);
 		if (node instanceof SdsModel) {
-			drawSds2(((SdsModel) node).getSds(), 1);
+			drawSds2(((SdsModel) node).getSds(), 3);
 		}
 		if (node instanceof Bone) {
 			Bone bone = (Bone) node;

@@ -120,6 +120,7 @@ public class Face {
 	}
 	
 	public DerivedVertex createFacePoint() {
+		assert facePoint == null;
 		facePoint = new DerivedVertex() {
 			@Override
 			protected void computePosition() {
