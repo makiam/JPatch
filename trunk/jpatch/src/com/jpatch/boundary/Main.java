@@ -239,13 +239,12 @@ public class Main {
 	private Main() {
 		
 		try {
-//			sds2 = ImportOff.importOff(ClassLoader.getSystemResourceAsStream("off/teapot.off"));
-			sds2 = new com.jpatch.entity.sds2.JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt"));
-			System.out.println(sds2.getFaces(0).size() + " faces at level 0");
+			sds2 = ImportOff.importOff(ClassLoader.getSystemResourceAsStream("off/cube2.off"));
+//			sds2 = new com.jpatch.entity.sds2.JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt"));
 			sds2.createNextLevel(0);
-			System.out.println(sds2.getFaces(1).size() + " faces at level 1");
-//			sds2.createNextLevel(1);
-//			System.out.println(sds2.getFaces(2).size() + " faces at level 2");
+			sds2.createNextLevel(1);
+//			sds2.createNextLevel(2);
+//			sds2.createNextLevel(3);
 			sds2.sortFaces();
 //			sds2.createNextLevel(2);
 //			sds2.createNextLevel(3);

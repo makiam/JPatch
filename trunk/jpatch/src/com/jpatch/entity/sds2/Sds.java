@@ -57,9 +57,12 @@ public class Sds {
 	
 	public void createNextLevel(int currentLevel) {
 		for (Face face : levelFaceSets[currentLevel]) {
-			for (HalfEdge edge : face.getEdges()) {
-				Face newFace = addFace(currentLevel + 1, face.getFacePoint(), edge.getPrev().getEdgePoint(), edge.getVertex().getVertexPoint(), edge.getEdgePoint());
+			HalfEdge[] edges = face.getEdges();
+//			Face[] children = face.getChildren();
+			for (int i = 0; i < edges.length; i++) {
+				Face newFace = addFace(currentLevel + 1, face.getFacePoint(), edges[i].getPrev().getEdgePoint(), edges[i].getVertex().getVertexPoint(), edges[i].getEdgePoint());
 				newFace.setMaterial(face.getMaterial());
+//				children[i] = newFace;
 			}
 		}
 	}

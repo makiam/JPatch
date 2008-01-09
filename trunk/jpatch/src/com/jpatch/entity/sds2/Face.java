@@ -1,6 +1,9 @@
 package com.jpatch.entity.sds2;
 
 import static com.jpatch.entity.sds2.SdsWeights.*;
+
+import java.nio.*;
+
 import com.jpatch.entity.*;
 
 import javax.vecmath.*;
@@ -10,6 +13,7 @@ public class Face {
 	private final double oneOverSides;
 	private DerivedVertex facePoint;
 	private Material material;
+//	private final Face[] children;
 	
 	public Face(HalfEdge... edges) {
 		int sides = edges.length;
@@ -18,6 +22,7 @@ public class Face {
 		oneOverSides = 1.0 / sides;
 		
 		this.edges = edges.clone();
+//		children = new Face[sides];
 		
 		// append adges and set their face to this
 		int prev = sides - 1;
@@ -33,6 +38,10 @@ public class Face {
 		}
 	}
 	
+	public int getSides() {
+		return edges.length;
+	}
+	
 	public HalfEdge[] getEdges() {
 		return edges;
 	}
@@ -45,6 +54,55 @@ public class Face {
 	public void setMaterial(Material material) {
 		if (material == null) throw new RuntimeException();
 		this.material = material;
+	}
+	
+//	public Face[] getChildren() {
+//		return children;
+//	}
+	
+	public void fillArray(FloatBuffer buffer) {
+		facePoint.validateLimit();
+		buffer.clear();
+		buffer.put((float) facePoint.normal.x);
+		buffer.put((float) facePoint.normal.y);
+		buffer.put((float) facePoint.normal.z);
+		buffer.put((float) facePoint.limit.x);
+		buffer.put((float) facePoint.limit.y);
+		buffer.put((float) facePoint.limit.z);
+		
+		for (com.jpatch.entity.sds2.HalfEdge edge : edges) {
+			DerivedVertex v = edge.getVertex().getVertexPoint();
+			v.validateLimit();
+			buffer.put((float) v.normal.x);
+			buffer.put((float) v.normal.y);
+			buffer.put((float) v.normal.z);
+			buffer.put((float) v.limit.x);
+			buffer.put((float) v.limit.y);
+			buffer.put((float) v.limit.z);
+			
+			v = edge.getEdgePoint();
+			v.validateLimit();
+			buffer.put((float) v.normal.x);
+			buffer.put((float) v.normal.y);
+			buffer.put((float) v.normal.z);
+			buffer.put((float) v.limit.x);
+			buffer.put((float) v.limit.y);
+			buffer.put((float) v.limit.z);
+		}
+		DerivedVertex v = edges[0].getVertex().getVertexPoint();
+		buffer.put((float) v.normal.x);
+		buffer.put((float) v.normal.y);
+		buffer.put((float) v.normal.z);
+		buffer.put((float) v.limit.x);
+		buffer.put((float) v.limit.y);
+		buffer.put((float) v.limit.z);
+		buffer.rewind();
+//		buffer.put(buffer.get(6));
+//		buffer.put(buffer.get(7));
+//		buffer.put(buffer.get(8));
+//		buffer.put(buffer.get(9));
+//		buffer.put(buffer.get(10));
+//		buffer.put(buffer.get(11));
 	}
 	
 	public DerivedVertex getFacePoint() {
