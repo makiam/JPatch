@@ -48,164 +48,176 @@ public class Vertex {
 	
 	public void setPosition(Tuple3d position) {
 		positionAttr.setTuple(position);
+		invalidate();
+	}
+	
+	public void setPosition(double x, double y, double z) {
+		positionAttr.setTuple(x, y, z);
+		invalidate();
 	}
 	
 	public void getLimit(Tuple3f limit) {
-		;
+		throw new UnsupportedOperationException();
 	}
 	
 	public void getLimit(Tuple3d limit) {
-		;
+		throw new UnsupportedOperationException();
 	}
 	
 	public void getNormal(Tuple3f normal) {
-		;
+		throw new UnsupportedOperationException();
 	}
 	
 	public void getNormal(Tuple3d normal) {
-		;
+		throw new UnsupportedOperationException();
+	}
+	
+	public DerivedVertex createVertexPoint() {
+		vertexPoint = new DerivedVertex() {
+			@Override
+			protected void computePosition() {
+				switch (boundaryType) {
+				case REGULAR:
+					final int valence = edges.length;
+					final double rimWeight = VERTEX_LIMIT_RIM_WEIGHTS[valence];
+					final double centerWeight = VERTEX_LIMIT_CENTER_WEIGHTS[valence];
+					double x = 0, y = 0, z = 0;
+					HalfEdge edge = edges[0];
+					for (int i = 0; i < valence; i++) {
+						Vertex fp = edge.getFace().getFacePoint();
+						fp.validatePosition();
+						x += fp.position.x;
+						y += fp.position.y;
+						z += fp.position.z;
+						Vertex ep = edge.getPairVertex();
+						ep.validatePosition();
+						x += ep.position.x;
+						y += ep.position.y;
+						z += ep.position.z;
+						edge = edge.getPrev().getPair();
+					}
+					position.set(
+							x * rimWeight + Vertex.this.position.x * centerWeight,
+							y * rimWeight + Vertex.this.position.y * centerWeight,
+							z * rimWeight + Vertex.this.position.z * centerWeight
+					);
+					break;
+				case BOUNDARY:
+					Point3d p0 = Vertex.this.position;
+					Vertex.this.edges[0].getPair().getVertex().validatePosition();
+					Point3d p1 = Vertex.this.edges[0].getPair().getVertex().position;
+					Vertex.this.edges[edges.length - 1].getPair().getVertex().validatePosition();
+					Point3d p2 = Vertex.this.edges[edges.length - 1].getPair().getVertex().position;
+					position.set(
+							p0.x * CREASE0 + (p1.x + p2.x) * CREASE1,
+							p0.y * CREASE0 + (p1.y + p2.y) * CREASE1,
+							p0.z * CREASE0 + (p1.z + p2.z) * CREASE1
+					);
+					break;
+				case IRREGULAR:
+					System.out.println("IRREGULAR");
+					position.set(Vertex.this.position);
+					break;
+				default:
+					assert false;	// should never get here
+				}		
+			}
+			
+			@Override
+			protected void computeLimit() {
+				switch (boundaryType) {
+				case REGULAR:
+					validatePosition();
+					final int valence = edges.length;
+					final double limitCornerWeight = LIMIT_CORNER_WEIGHTS[valence];
+					final double limitEdgeWeight = LIMIT_EDGE_WEIGHTS[valence];
+					final double limitCenterWeight = LIMIT_CENTER_WEIGHTS[valence];
+					
+					final double[] tangentCornerWeights = TANGENT_CORNER_WEIGHTS[valence];
+					final double[] tangentEdgeWeights = TANGENT_EDGE_WEIGHTS[valence];
+					
+					double cx = 0, cy = 0, cz = 0;
+					double ex = 0, ey = 0, ez = 0;
+					double ux = 0, uy = 0, uz = 0;
+					double vx = 0, vy = 0, vz = 0;
+					for (int i = 0; i < valence; i++) {
+						HalfEdge edge = edges[i];
+						DerivedVertex cp = edge.getPairFace().getFacePoint();
+						cp.validatePosition();
+						cx += cp.position.x;
+						cy += cp.position.y;
+						cz += cp.position.z;
+						DerivedVertex ep = edge.getEdgePoint();
+						ep.validatePosition();
+						ex += ep.position.x;
+						ey += ep.position.y;
+						ez += ep.position.z;
+						
+						ux += cp.position.x * tangentCornerWeights[i] + ep.position.x * tangentEdgeWeights[i];
+						uy += cp.position.y * tangentCornerWeights[i] + ep.position.y * tangentEdgeWeights[i];
+						uz += cp.position.z * tangentCornerWeights[i] + ep.position.z * tangentEdgeWeights[i];
+						
+						int j = (i > 0) ? i - 1 : valence - 1;	
+						vx += cp.position.x * tangentCornerWeights[j] + ep.position.x * tangentEdgeWeights[j];
+						vy += cp.position.y * tangentCornerWeights[j] + ep.position.y * tangentEdgeWeights[j];
+						vz += cp.position.z * tangentCornerWeights[j] + ep.position.z * tangentEdgeWeights[j];	
+					}
+					limit.set(
+							cx * limitCornerWeight + ex * limitEdgeWeight + position.x * limitCenterWeight,
+							cy * limitCornerWeight + ey * limitEdgeWeight + position.y * limitCenterWeight,
+							cz * limitCornerWeight + ez * limitEdgeWeight + position.z * limitCenterWeight
+					);
+					uTangent.set(ux, uy, uz);
+					vTangent.set(vx, vy, vz);
+					normal.cross(uTangent, vTangent);
+					break;
+				case BOUNDARY:
+					Vertex.this.edges[0].getEdgePoint().validatePosition();
+					Vertex.this.edges[Vertex.this.edges.length - 1].getEdgePoint().validatePosition();
+					Point3d p1 = Vertex.this.edges[0].getEdgePoint().position;
+					Point3d p2 = Vertex.this.edges[Vertex.this.edges.length - 1].getEdgePoint().position;
+					limit.set(
+							position.x * CREASE_LIMIT0 + (p1.x + p2.x) * CREASE_LIMIT1,
+							position.y * CREASE_LIMIT0 + (p1.y + p2.y) * CREASE_LIMIT1,
+							position.z * CREASE_LIMIT0 + (p1.z + p2.z) * CREASE_LIMIT1
+					);
+					computeNormal();
+					break;
+				case IRREGULAR:
+					limit.set(Vertex.this.position);
+					computeNormal();
+					break;
+				default:
+					assert false;	// should never get here
+				}				
+			}
+			
+			/**
+			 * Estimate normal by taking the sum of all adjacent face normals
+			 */
+			private final void computeNormal() {
+				normal.set(0, 0, 0);				
+				for (int i = 0; i < edges.length; i++) {
+					Face face = edges[i].getFace();
+					if (face != null) {
+						face.getFacePoint().validateLimit();
+						normal.add(face.getFacePoint().normal);
+					}
+				}
+			}
+			
+			public String toString() {
+				return "v" + num + "(" + Vertex.this + ")";
+			}
+		};
+		return vertexPoint;
+	}
+	
+	public HalfEdge[] getEdges() {
+		return edges;
 	}
 	
 	public DerivedVertex getVertexPoint() {
-		if (vertexPoint == null) {
-			vertexPoint = new DerivedVertex() {
-				@Override
-				protected void computePosition() {
-					switch (boundaryType) {
-					case REGULAR:
-						final int valence = edges.length;
-						final double rimWeight = VERTEX_LIMIT_RIM_WEIGHTS[valence];
-						final double centerWeight = VERTEX_LIMIT_CENTER_WEIGHTS[valence];
-						double x = 0, y = 0, z = 0;
-						HalfEdge edge = edges[0];
-						for (int i = 0; i < valence; i++) {
-							Vertex fp = edge.getFace().getFacePoint();
-							fp.validatePosition();
-							x += fp.position.x;
-							y += fp.position.y;
-							z += fp.position.z;
-							Vertex ep = edge.getPairVertex();
-							ep.validatePosition();
-							x += ep.position.x;
-							y += ep.position.y;
-							z += ep.position.z;
-							edge = edge.getPrev().getPair();
-						}
-						position.set(
-								x * rimWeight + Vertex.this.position.x * centerWeight,
-								y * rimWeight + Vertex.this.position.y * centerWeight,
-								z * rimWeight + Vertex.this.position.z * centerWeight
-						);
-						break;
-					case BOUNDARY:
-						Point3d p0 = Vertex.this.position;
-						Vertex.this.edges[0].getPair().getVertex().validatePosition();
-						Point3d p1 = Vertex.this.edges[0].getPair().getVertex().position;
-						Vertex.this.edges[edges.length - 1].getPair().getVertex().validatePosition();
-						Point3d p2 = Vertex.this.edges[edges.length - 1].getPair().getVertex().position;
-						position.set(
-								p0.x * CREASE0 + (p1.x + p2.x) * CREASE1,
-								p0.y * CREASE0 + (p1.y + p2.y) * CREASE1,
-								p0.z * CREASE0 + (p1.z + p2.z) * CREASE1
-						);
-						break;
-					case IRREGULAR:
-						System.out.println("IRREGULAR");
-						position.set(Vertex.this.position);
-						break;
-					default:
-						assert false;	// should never get here
-					}		
-				}
-				
-				@Override
-				protected void computeLimit() {
-					switch (boundaryType) {
-					case REGULAR:
-						validatePosition();
-						final int valence = edges.length;
-						final double limitCornerWeight = LIMIT_CORNER_WEIGHTS[valence];
-						final double limitEdgeWeight = LIMIT_EDGE_WEIGHTS[valence];
-						final double limitCenterWeight = LIMIT_CENTER_WEIGHTS[valence];
-						
-						final double[] tangentCornerWeights = TANGENT_CORNER_WEIGHTS[valence];
-						final double[] tangentEdgeWeights = TANGENT_EDGE_WEIGHTS[valence];
-						
-						double cx = 0, cy = 0, cz = 0;
-						double ex = 0, ey = 0, ez = 0;
-						double ux = 0, uy = 0, uz = 0;
-						double vx = 0, vy = 0, vz = 0;
-						for (int i = 0; i < valence; i++) {
-							HalfEdge edge = edges[i];
-							DerivedVertex cp = edge.getPairFace().getFacePoint();
-							cp.validatePosition();
-							cx += cp.position.x;
-							cy += cp.position.y;
-							cz += cp.position.z;
-							DerivedVertex ep = edge.getEdgePoint();
-							ep.validatePosition();
-							ex += ep.position.x;
-							ey += ep.position.y;
-							ez += ep.position.z;
-							
-							ux += cp.position.x * tangentCornerWeights[i] + ep.position.x * tangentEdgeWeights[i];
-							uy += cp.position.y * tangentCornerWeights[i] + ep.position.y * tangentEdgeWeights[i];
-							uz += cp.position.z * tangentCornerWeights[i] + ep.position.z * tangentEdgeWeights[i];
-							
-							int j = (i > 0) ? i - 1 : valence - 1;	
-							vx += cp.position.x * tangentCornerWeights[j] + ep.position.x * tangentEdgeWeights[j];
-							vy += cp.position.y * tangentCornerWeights[j] + ep.position.y * tangentEdgeWeights[j];
-							vz += cp.position.z * tangentCornerWeights[j] + ep.position.z * tangentEdgeWeights[j];	
-						}
-						limit.set(
-								cx * limitCornerWeight + ex * limitEdgeWeight + position.x * limitCenterWeight,
-								cy * limitCornerWeight + ey * limitEdgeWeight + position.y * limitCenterWeight,
-								cz * limitCornerWeight + ez * limitEdgeWeight + position.z * limitCenterWeight
-						);
-						uTangent.set(ux, uy, uz);
-						vTangent.set(vx, vy, vz);
-						normal.cross(uTangent, vTangent);
-						break;
-					case BOUNDARY:
-						Vertex.this.edges[0].getEdgePoint().validatePosition();
-						Vertex.this.edges[Vertex.this.edges.length - 1].getEdgePoint().validatePosition();
-						Point3d p1 = Vertex.this.edges[0].getEdgePoint().position;
-						Point3d p2 = Vertex.this.edges[Vertex.this.edges.length - 1].getEdgePoint().position;
-						limit.set(
-								position.x * CREASE_LIMIT0 + (p1.x + p2.x) * CREASE_LIMIT1,
-								position.y * CREASE_LIMIT0 + (p1.y + p2.y) * CREASE_LIMIT1,
-								position.z * CREASE_LIMIT0 + (p1.z + p2.z) * CREASE_LIMIT1
-						);
-						computeNormal();
-						break;
-					case IRREGULAR:
-						limit.set(Vertex.this.position);
-						computeNormal();
-						break;
-					default:
-						assert false;	// should never get here
-					}				
-				}
-				
-				/**
-				 * Estimate normal by taking the sum of all adjacent face normals
-				 */
-				private final void computeNormal() {
-					normal.set(0, 0, 0);				
-					for (int i = 0; i < edges.length; i++) {
-						Face face = edges[i].getFace();
-						if (face != null) {
-							face.getFacePoint().validateLimit();
-							normal.add(face.getFacePoint().normal);
-						}
-					}
-				}
-				
-				public String toString() {
-					return "v" + num + "(" + Vertex.this + ")";
-				}
-			};
-		}
 		return vertexPoint;
 	}
 	
@@ -215,6 +227,14 @@ public class Vertex {
 	
 	public void validateLimit() {
 		;
+	}
+	
+	public void invalidate() {
+		for (HalfEdge edge : edges) {
+			if (edge.getFace() != null) {
+				edge.getFace().invalidate();
+			}
+		}
 	}
 	
 	/**

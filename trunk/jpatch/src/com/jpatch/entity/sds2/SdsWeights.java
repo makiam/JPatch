@@ -51,8 +51,8 @@ public class SdsWeights {
 			TANGENT_EDGE_WEIGHTS[valence] = new double[valence];
 			double An = 1 + cos(2 * PI / valence) + cos(PI / valence) * sqrt(2 * (9 + cos(2 * PI / valence)));
 			for (int j = 0; j < valence; j++) {
-				TANGENT_EDGE_WEIGHTS[valence][j] = An * cos(2 * PI  * j / valence);
-				TANGENT_CORNER_WEIGHTS[valence][j] = cos(2 * PI * j / valence) + cos(2 * PI * (j + 1) / valence);
+				TANGENT_CORNER_WEIGHTS[valence][j] = An * cos(2 * PI  * j / valence);
+				TANGENT_EDGE_WEIGHTS[valence][j] = cos(2 * PI * j / valence) + cos(2 * PI * (j + 1) / valence);
 			}
 			
 			VERTEX_LIMIT_RIM_WEIGHTS[valence] = 1.0 / (valence * valence);

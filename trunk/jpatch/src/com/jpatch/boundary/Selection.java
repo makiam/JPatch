@@ -9,11 +9,11 @@ import com.jpatch.afw.control.AttributeEdit;
 import com.jpatch.afw.control.JPatchUndoableEdit;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.entity.*;
-import com.jpatch.entity.sds.*;
+import com.jpatch.entity.sds2.*;
 
 public class Selection implements Transformable {
 	private final GenericAttr<SdsModel> selectedSdsModelAttr = new GenericAttr<SdsModel>();
-	private final CollectionAttr<AbstractVertex> selectedVerticesAttr = new CollectionAttr<AbstractVertex>(LinkedHashSet.class);
+	private final CollectionAttr<Vertex> selectedVerticesAttr = new CollectionAttr<Vertex>(LinkedHashSet.class);
 	private Point3d[] startPositions;
 	private Matrix4d matrix = new Matrix4d();
 	
@@ -21,7 +21,7 @@ public class Selection implements Transformable {
 		return selectedSdsModelAttr;
 	}
 	
-	public CollectionAttr<AbstractVertex> getSelectedVerticesAttribute() {
+	public CollectionAttr<Vertex> getSelectedVerticesAttribute() {
 		return selectedVerticesAttr;
 	}
 	
@@ -29,8 +29,8 @@ public class Selection implements Transformable {
 		p0.set(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 		p1.set(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
 		Point3d p = new Point3d();
-		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
-			vertex.getPos(p);
+		for (Vertex vertex : selectedVerticesAttr.getElements()) {
+			vertex.getPosition(p);
 			if (matrix != null) {
 				matrix.transform(p);
 			}
@@ -65,9 +65,9 @@ public class Selection implements Transformable {
 		}
 		Miniball mb = new Miniball();
 		ArrayList<Point3d> points = new ArrayList<Point3d>();
-		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
+		for (Vertex vertex : selectedVerticesAttr.getElements()) {
 			Point3d p = new Point3d();
-			vertex.getPos(p);
+			vertex.getPosition(p);
 			if (matrix != null) {
 				matrix.transform(p);
 			}
@@ -81,17 +81,17 @@ public class Selection implements Transformable {
 		int count = selectedVerticesAttr.getElements().size();
 		startPositions = new Point3d[count];
 		int i = 0;
-		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
+		for (Vertex vertex : selectedVerticesAttr.getElements()) {
 			startPositions[i] = new Point3d();
-			vertex.getPos(startPositions[i]);
+			vertex.getPosition(startPositions[i]);
 			i++;
 		}
 	}
 
 	public void end(List<JPatchUndoableEdit> editList) {
 		int i = 0;
-		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
-			editList.add(AttributeEdit.changeAttribute(vertex.getReferencePosition(), startPositions[i], false));
+		for (Vertex vertex : selectedVerticesAttr.getElements()) {
+			editList.add(AttributeEdit.changeAttribute(vertex.getPositionAttribute(), startPositions[i], false));
 			i++;
 		}
 	}
@@ -113,10 +113,10 @@ public class Selection implements Transformable {
 	private void transformVertices() {
 		Point3d p = new Point3d();
 		int i = 0;
-		for (AbstractVertex vertex : selectedVerticesAttr.getElements()) {
+		for (Vertex vertex : selectedVerticesAttr.getElements()) {
 			p.set(startPositions[i++]);
 			matrix.transform(p);
-			vertex.getPosition().setTuple(p);
+			vertex.setPosition(p);
 		}
 	}
 

@@ -10,7 +10,7 @@ import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
 import com.jpatch.boundary.*;
 import com.jpatch.boundary.tools.*;
-import com.jpatch.entity.sds.*;
+import com.jpatch.entity.sds2.*;
 
 public class Actions {
 //	public static enum Tool { MOVE_VIEW, ZOOM_VIEW, ROTATE_VIEW, DEFAULT_TOOL, MOVE_TOOL, SCALE_TOOL, ROTATE_TOOL, EXTRUDE_TOOL, LATHE_TOOL }
@@ -83,20 +83,20 @@ public class Actions {
 	
 	public final JPatchAction extrudeTest = new JPatchAction(undoManager, "EXTRUDE_TOOL") {
 		public void actionPerformed(ActionEvent e) {
-			System.out.println("extrude");
-			Sds sds = Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getSds();
-			Set<AbstractVertex> selectedVertices = new HashSet<AbstractVertex>(Main.getInstance().getSelection().getSelectedVerticesAttribute().getElements());
-			Collection<Face> facesToExtrude = new HashSet<Face>();
-			faceLoop:
-			for (Face face : sds.faceList) {
-				for (HalfEdge edge : face.getEdges()) {
-					if (!selectedVertices.contains(edge.getVertex())) {
-						continue faceLoop;
-					}
-				}
-				facesToExtrude.add(face);
-			}
-			Operations.extrude(sds, facesToExtrude);
+//			System.out.println("extrude");
+//			Sds sds = Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getSds();
+//			Set<AbstractVertex> selectedVertices = new HashSet<AbstractVertex>(Main.getInstance().getSelection().getSelectedVerticesAttribute().getElements());
+//			Collection<Face> facesToExtrude = new HashSet<Face>();
+//			faceLoop:
+//			for (Face face : sds.faceList) {
+//				for (HalfEdge edge : face.getEdges()) {
+//					if (!selectedVertices.contains(edge.getVertex())) {
+//						continue faceLoop;
+//					}
+//				}
+//				facesToExtrude.add(face);
+//			}
+//			Operations.extrude(sds, facesToExtrude);
 		}
 	};
 	

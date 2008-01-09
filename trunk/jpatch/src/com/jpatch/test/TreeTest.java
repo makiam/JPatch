@@ -6,11 +6,12 @@ import java.awt.event.ActionListener;
 import java.util.TimerTask;
 
 import com.jpatch.boundary.TreeManager;
-import com.jpatch.entity.TransformNode;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+
+import trashcan.*;
 public class TreeTest {
 
 	/**

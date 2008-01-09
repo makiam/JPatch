@@ -1,7 +1,6 @@
 package com.jpatch.entity;
 
-import com.jpatch.afw.attributes.GenericAttr;
-import com.jpatch.entity.sds.Sds;
+import com.jpatch.entity.sds2.Sds;
 
 public class SdsModel extends XFormNode {
 	private final Sds sds;

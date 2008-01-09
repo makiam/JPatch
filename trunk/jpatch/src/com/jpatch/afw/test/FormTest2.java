@@ -11,7 +11,6 @@ import com.jpatch.afw.ui.PlatformUtils;
 import com.jpatch.afw.vecmath.Rotation3d;
 import com.jpatch.boundary.JPatchInspector;
 import com.jpatch.boundary.ViewportGl;
-import com.jpatch.entity.TransformNode;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -20,6 +19,8 @@ import java.util.Locale;
 
 import javax.swing.*;
 import javax.swing.plaf.metal.MetalSliderUI;
+
+import trashcan.*;
 
 public class FormTest2 {
 	public static void main(String[] args) {

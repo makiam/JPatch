@@ -1,10 +1,10 @@
-package com.jpatch.entity;
+package trashcan;
 
 import javax.vecmath.*;
 
-import trashcan.SoftBoundedDoubleAttr;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.afw.attributes.*;
+import com.jpatch.entity.*;
 
 public class TransformNode extends SceneGraphNode {
 	

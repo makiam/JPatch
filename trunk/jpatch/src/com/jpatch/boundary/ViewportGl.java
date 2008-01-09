@@ -8,8 +8,7 @@ import com.jpatch.afw.vecmath.Utils3d;
 import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.tools.*;
 import com.jpatch.entity.*;
-import com.jpatch.entity.sds.*;
-import com.jpatch.entity.sds2.SdsConstants;
+import com.jpatch.entity.sds2.*;
 import com.sun.opengl.util.*;
 //import com.sun.opengl.util.*;
 
@@ -41,7 +40,7 @@ public class ViewportGl extends Viewport {
 	private final Vector3f v = new Vector3f();
 	
 //	private final FragmentTesselator kernel = new FragmentTesselator();
-	private static final Dicer dicer = new Dicer();
+//	private static final Dicer dicer = new Dicer();
 	private int subdivLevel = 4;
 	
 	private long time;
@@ -594,8 +593,7 @@ public class ViewportGl extends Viewport {
 		gl.glDisable(GL_COLOR_MATERIAL);
 		gl.glEnable(GL_LIGHTING);
 		gl.glEnable(GL_NORMALIZE);
-		setMaterial(GL_FRONT, new GlMaterial(new Color3f(1, 0, 0), 0.2f, 0.0f, 10.0f).getArray());
-		drawSds2(Main.getInstance().sds2, 1);
+		
 //		if (true) return;
 		
 //		gl.glEnable(GL_BLEND);
@@ -651,7 +649,7 @@ public class ViewportGl extends Viewport {
 		SceneGraphNode sceneGraphRoot = Main.getInstance().getSceneGraphRoot();
 		drawSceneGraphElement(sceneGraphRoot);
 		Selection selection = Main.getInstance().getSelection();
-		drawSelection(selection);
+//		drawSelection(selection);
 		
 		JPatchTool tool = Main.getInstance().getActiveTool();
 //		System.out.println("tool = " + tool);
@@ -699,7 +697,7 @@ public class ViewportGl extends Viewport {
 		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
 		drawOrigin(modelView);
 		if (node instanceof SdsModel) {
-			drawSds3(((SdsModel) node).getSds());
+			drawSds2(((SdsModel) node).getSds(), 1);
 		}
 		if (node instanceof Bone) {
 			Bone bone = (Bone) node;
@@ -1050,7 +1048,7 @@ public class ViewportGl extends Viewport {
 			}
 			gl.glBegin(GL_POINTS);
 			if (viewDef.getShowControlMeshAttribute().getBoolean()) {
-				for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
+				for (Vertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
 					vertex.getProjectedPos(p);
 					gl.glVertex3f(p.x, p.y, p.z);
 				}

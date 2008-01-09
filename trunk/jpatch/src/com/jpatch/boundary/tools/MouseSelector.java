@@ -11,7 +11,7 @@ import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.*;
 import com.jpatch.entity.SceneGraphNode;
 import com.jpatch.entity.SdsModel;
-import com.jpatch.entity.sds.*;
+import com.jpatch.entity.sds2.*;
 
 public class MouseSelector {
 	static final private double MIN_DIST_SQ = 64;
@@ -52,13 +52,13 @@ public class MouseSelector {
 //		System.out.println("getVertexAt(" + x + ", " + y + ")");
 		viewDef.configureTransformUtil(transformUtil);
 		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
-		for (Face face : sdsModel.getSds().faceList) {
+		for (Face face : sdsModel.getSds().getFaces(0)) {
 			for (HalfEdge edge : face.getEdges()) {
-				TopLevelVertex vertex = edge.getVertex();
+				Vertex vertex = edge.getVertex();
 				if (useProjection) {
 					vertex.getVertexPoint().getLimit(p);
 				} else {
-					vertex.getPos(p);
+					vertex.getPosition(p);
 				}
 				transformUtil.projectToScreen(transformUtil.LOCAL, p, p);
 				double dx = x - p.x;
@@ -74,7 +74,7 @@ public class MouseSelector {
 	}
 	
 	public static void getVertices(Viewport viewport, int x0, int y0, int x1, int y1, SdsModel sdsModel, Selection selection) {
-		CollectionAttr<AbstractVertex> selectedVertices = selection.getSelectedVerticesAttribute();
+		CollectionAttr<Vertex> selectedVertices = selection.getSelectedVerticesAttribute();
 		selectedVertices.clear();
 		
 		ViewDef viewDef = viewport.getViewDef();
@@ -98,13 +98,13 @@ public class MouseSelector {
 		
 		Point3d p = new Point3d();
 		boolean useProjection = !viewport.getViewDef().getShowControlMeshAttribute().getBoolean();
-		for (Face face : sdsModel.getSds().faceList) {
+		for (Face face : sdsModel.getSds().getFaces(0)) {
 			for (HalfEdge edge : face.getEdges()) {
-				TopLevelVertex vertex = edge.getVertex();
+				Vertex vertex = edge.getVertex();
 				if (useProjection) {
 					vertex.getVertexPoint().getLimit(p);
 				} else {
-					vertex.getPos(p);
+					vertex.getPosition(p);
 				}
 				transformUtil.projectToScreen(transformUtil.LOCAL, p, p);
 				if (p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1) {
@@ -126,11 +126,11 @@ public class MouseSelector {
 		HalfEdge hit = null;
 		double min = MIN_DIST_SQ;
 		Line2D.Double line = new Line2D.Double();
-		for (Face face : sdsModel.getSds().faceList) {
+		for (Face face : sdsModel.getSds().getFaces(0)) {
 			for (HalfEdge edge : face.getEdges()) {
-				if (edge.isPrimary()) {
-					edge.getVertex().getPos(p0);
-					edge.getPairVertex().getPos(p1);
+//				if (edge.isPrimary()) {
+					edge.getVertex().getPosition(p0);
+					edge.getPairVertex().getPosition(p1);
 					transformUtil.projectToScreen(transformUtil.LOCAL, p0, p0);
 					transformUtil.projectToScreen(transformUtil.LOCAL, p1, p1);
 					line.setLine(p0.x, p0.y, p1.x, p1.y);
@@ -141,7 +141,7 @@ public class MouseSelector {
 					}
 				}
 			}
-		}
+//		}
 		return hit;
 	}
 	

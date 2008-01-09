@@ -52,6 +52,13 @@ public abstract class DerivedVertex extends Vertex {
 		limitValid = true;
 	}
 	
+	@Override
+	public void invalidate() {
+		super.invalidate();
+		positionValid = false;
+		limitValid = false;
+	}
+	
 	protected abstract void computePosition();
 	protected abstract void computeLimit();
 }
