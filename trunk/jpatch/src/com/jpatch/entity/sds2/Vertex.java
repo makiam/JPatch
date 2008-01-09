@@ -24,6 +24,8 @@ public class Vertex {
 	
 	protected final Tuple3Attr positionAttr = new Tuple3Attr(position);
 	
+	private boolean invalid = false;
+	
 	public Vertex() {
 		;
 	}
@@ -73,6 +75,7 @@ public class Vertex {
 	}
 	
 	public DerivedVertex createVertexPoint() {
+		assert vertexPoint == null;
 		vertexPoint = new DerivedVertex() {
 			@Override
 			protected void computePosition() {
@@ -222,18 +225,21 @@ public class Vertex {
 	}
 	
 	public void validatePosition() {
-		;
+		invalid = false;
 	}
 	
 	public void validateLimit() {
-		;
+		invalid = false;
 	}
 	
 	public void invalidate() {
-		for (HalfEdge edge : edges) {
-			if (edge.getFace() != null) {
-				edge.getFace().invalidate();
+		if (!invalid) {
+			for (HalfEdge edge : edges) {
+				if (edge.getFace() != null) {
+					edge.getFace().invalidate();
+				}
 			}
+			invalid = true;
 		}
 	}
 	

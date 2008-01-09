@@ -34,6 +34,7 @@ public abstract class DerivedVertex extends Vertex {
 	 * Computes the position of this DerivedVertex
 	 */
 	public final void validatePosition() {
+		super.validatePosition();
 		if (positionValid) {
 			return;
 		}
@@ -45,6 +46,7 @@ public abstract class DerivedVertex extends Vertex {
 	 * Computes the limit, tangents and normal of this DerivedVertex
 	 */
 	public final void validateLimit() {
+		super.validateLimit();
 		if (limitValid) {
 			return;
 		}

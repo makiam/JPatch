@@ -75,6 +75,7 @@ public class HalfEdge {
 	}
 	
 	public DerivedVertex createEdgePoint() {
+		assert edgePoint == null;
 		edgePoint = new DerivedVertex() {
 
 			@Override
