@@ -60,7 +60,7 @@ public class Face {
 //		return children;
 //	}
 	
-	public void fillArray(FloatBuffer buffer) {
+	public void fillArrayLimit(FloatBuffer buffer) {
 		facePoint.validateLimit();
 		buffer.clear();
 		buffer.put((float) facePoint.normal.x);
@@ -97,12 +97,38 @@ public class Face {
 		buffer.put((float) v.limit.y);
 		buffer.put((float) v.limit.z);
 		buffer.rewind();
-//		buffer.put(buffer.get(6));
-//		buffer.put(buffer.get(7));
-//		buffer.put(buffer.get(8));
-//		buffer.put(buffer.get(9));
-//		buffer.put(buffer.get(10));
-//		buffer.put(buffer.get(11));
+	}
+	
+	public void fillArrayPosition(FloatBuffer buffer) {
+		facePoint.validatePosition();
+		buffer.clear();
+		buffer.put((float) facePoint.normal.x);
+		buffer.put((float) facePoint.normal.y);
+		buffer.put((float) facePoint.normal.z);
+		buffer.put((float) facePoint.position.x);
+		buffer.put((float) facePoint.position.y);
+		buffer.put((float) facePoint.position.z);
+		
+		for (com.jpatch.entity.sds2.HalfEdge edge : edges) {
+			Vertex v = edge.getVertex();
+			DerivedVertex lv = v.getVertexPoint();
+			v.validatePosition();
+			buffer.put((float) lv.normal.x);
+			buffer.put((float) lv.normal.y);
+			buffer.put((float) lv.normal.z);
+			buffer.put((float) v.position.x);
+			buffer.put((float) v.position.y);
+			buffer.put((float) v.position.z);
+		}
+		Vertex v = edges[0].getVertex();
+		DerivedVertex lv = v.getVertexPoint();
+		buffer.put((float) lv.normal.x);
+		buffer.put((float) lv.normal.y);
+		buffer.put((float) lv.normal.z);
+		buffer.put((float) v.position.x);
+		buffer.put((float) v.position.y);
+		buffer.put((float) v.position.z);
+		buffer.rewind();
 	}
 	
 	public void invalidate() {

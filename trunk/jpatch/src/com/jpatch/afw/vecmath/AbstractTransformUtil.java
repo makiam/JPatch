@@ -218,11 +218,29 @@ public abstract class AbstractTransformUtil {
 		matrix[8] = matrices[fromSpace][toSpace].m02;
 		matrix[9] = matrices[fromSpace][toSpace].m12;
 		matrix[10] = matrices[fromSpace][toSpace].m22;
-		matrix[11] = matrices[fromSpace][toSpace].m23;
+		matrix[11] = matrices[fromSpace][toSpace].m32;
 		matrix[12] = matrices[fromSpace][toSpace].m03;
 		matrix[13] = matrices[fromSpace][toSpace].m13;
 		matrix[14] = matrices[fromSpace][toSpace].m23;
 		matrix[15] = matrices[fromSpace][toSpace].m33;
+//		System.out.println(matrices[fromSpace][toSpace]);
+		
+//		matrix[0] = matrices[fromSpace][toSpace].m00;
+//		matrix[1] = matrices[fromSpace][toSpace].m01;
+//		matrix[2] = matrices[fromSpace][toSpace].m02;
+//		matrix[3] = matrices[fromSpace][toSpace].m03;
+//		matrix[4] = matrices[fromSpace][toSpace].m10;
+//		matrix[5] = matrices[fromSpace][toSpace].m11;
+//		matrix[6] = matrices[fromSpace][toSpace].m12;
+//		matrix[7] = matrices[fromSpace][toSpace].m13;
+//		matrix[8] = matrices[fromSpace][toSpace].m20;
+//		matrix[9] = matrices[fromSpace][toSpace].m21;
+//		matrix[10] = matrices[fromSpace][toSpace].m22;
+//		matrix[11] = matrices[fromSpace][toSpace].m22;
+//		matrix[12] = matrices[fromSpace][toSpace].m30;
+//		matrix[13] = matrices[fromSpace][toSpace].m31;
+//		matrix[14] = matrices[fromSpace][toSpace].m32;
+//		matrix[15] = matrices[fromSpace][toSpace].m33;
 		return matrix;
 	}
 	

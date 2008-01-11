@@ -10,11 +10,7 @@ import com.jpatch.boundary.*;
 import com.jpatch.entity.SdsModel;
 import com.jpatch.entity.sds2.*;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -25,6 +21,7 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLCanvas;
+import javax.swing.*;
 import javax.vecmath.Matrix4d;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3d;
@@ -70,9 +67,15 @@ public class MoveVertexTool implements VisibleTool {
 		if (selection == null) {
 			return;
 		}
+		
+		selection.getSelectedSdsModelAttribute().getValue().getLocal2WorldTransform(transformUtil, LOCAL);
+		double[] modelView = transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, new double[16]);
+		gl.glMatrixMode(GL_MODELVIEW);
+		gl.glLoadMatrixd(modelView, 0);
+		
 		selection.getSelectedSdsModelAttribute().getValue().getLocal2WorldTransform(transformUtil, LOCAL);
 //		transformUtil.setTransform(LOCAL, selection.getSelectedSdsModelAttribute().getValue().getTransform());
-		Matrix4f modelView = transformUtil.getMatrix(LOCAL, CAMERA, new Matrix4f());
+//		Matrix4f modelView = transformUtil.getMatrix(LOCAL, CAMERA, new Matrix4f());
 		Point3d p0 = new Point3d();
 		Point3d p1 = new Point3d();
 		selection.getBounds(p0, p1, null);
@@ -92,14 +95,14 @@ public class MoveVertexTool implements VisibleTool {
 		Point3f p100 = new Point3f(p111.x, p000.y, p000.z);
 		Point3f p101 = new Point3f(p111.x, p000.y, p111.z);
 		Point3f p110 = new Point3f(p111.x, p111.y, p000.z);
-		modelView.transform(p000);
-		modelView.transform(p001);
-		modelView.transform(p010);
-		modelView.transform(p011);
-		modelView.transform(p100);
-		modelView.transform(p101);
-		modelView.transform(p110);
-		modelView.transform(p111);
+//		modelView.transform(p000);
+//		modelView.transform(p001);
+//		modelView.transform(p010);
+//		modelView.transform(p011);
+//		modelView.transform(p100);
+//		modelView.transform(p101);
+//		modelView.transform(p110);
+//		modelView.transform(p111);
 		gl.glEnable(GL_BLEND);
 		gl.glEnable(GL_LINE_SMOOTH);
 		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -153,10 +156,14 @@ public class MoveVertexTool implements VisibleTool {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON1) {
-				MouseSelector.Hit hit = MouseSelector.getVertexAt(viewport, e.getX(), e.getY(), false);
+				Point point = new Point(e.getX(), e.getY());
+				MouseSelector.Hit hit = MouseSelector.getVertexAt(viewport, point, false);
 //				HalfEdge edge = MouseSelector.getEdgeAt(viewport, e.getX(), e.getY(), Main.getInstance().getActiveSds());
 				if (hit.object != null) {
-					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, (SdsModel) hit.node, (Vertex) hit.object);
+					Point hitPoint = new Point(point);
+					SwingUtilities.convertPointToScreen(hitPoint, viewport.getComponent());
+					Main.getInstance().getRobot().mouseMove(hitPoint.x, hitPoint.y);
+					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, point, (SdsModel) hit.node, (Vertex) hit.object);
 					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 //					Main.getInstance().setSelectedObject(vertex);
 //				} else if (edge != null) {
@@ -243,6 +250,7 @@ public class MoveVertexTool implements VisibleTool {
 	private static class MoveVertexMouseMotionListener extends MouseMotionAdapter {
 		private final Viewport viewport;
 		private final Vertex vertex;
+		private Point point;
 		private final Point3d pStart = new Point3d();
 		private final Point3d limitStart = new Point3d();
 		private final Point3d k = new Point3d();
@@ -255,7 +263,8 @@ public class MoveVertexTool implements VisibleTool {
 //		Point3d pos = new Point3d();
 //		Point3d limit = new Point3d();
 		
-		MoveVertexMouseMotionListener(Viewport viewport, SdsModel sdsModel, Vertex vertex) {
+		MoveVertexMouseMotionListener(Viewport viewport, Point point, SdsModel sdsModel, Vertex vertex) {
+			this.point = new Point(point);
 			this.viewport = viewport;
 			this.vertex = vertex;
 			this.sdsModel = sdsModel;
@@ -271,7 +280,7 @@ public class MoveVertexTool implements VisibleTool {
 			if (useLimit) {
 				p.set(limitStart);
 				k.set(pStart);
-//				k.scale(vertex.getLimitFactor());
+				k.scale(vertex.getLimitFactor());
 				k.sub(limitStart, k);
 			} else {
 				p.set(pStart);
@@ -292,6 +301,11 @@ public class MoveVertexTool implements VisibleTool {
 		
 		@Override
 		public void mouseDragged(MouseEvent e) {
+			if (point != null && point.x == e.getX() && point.y == e.getY()) {
+				point = null;
+				return;
+			}
+			System.out.println(point + " " + e.getX() + "," + e.getY());
 			p.x = e.getX();
 			p.y = e.getY();
 			p.z = z;
@@ -302,7 +316,7 @@ public class MoveVertexTool implements VisibleTool {
 			
 			if (useLimit) {
 				p.sub(k);
-//				p.scale(1.0 / vertex.getLimitFactor());
+				p.scale(1.0 / vertex.getLimitFactor());
 			} 
 				
 //			System.out.println(p);
