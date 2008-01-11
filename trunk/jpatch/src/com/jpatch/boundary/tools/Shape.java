@@ -42,7 +42,7 @@ public class Shape {
 		gl.glEnd();
 	}
 	
-	public void draw(GL gl, Matrix4f matrix) {
+	public void draw(GL gl, Matrix4d matrix) {
 		Point3f p = new Point3f();
 		Vector3f v = new Vector3f();
 		gl.glBegin(GL_TRIANGLES);
