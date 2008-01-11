@@ -1,5 +1,6 @@
 package com.jpatch.boundary.tools;
 
+import java.awt.*;
 import java.awt.geom.Line2D;
 
 import javax.vecmath.*;
@@ -17,31 +18,32 @@ public class MouseSelector {
 	static final private double MIN_DIST_SQ = 64;
 	static final TransformUtil transformUtil = new TransformUtil();
 	
-	public static Hit getVertexAt(Viewport viewport, int x, int y, boolean noProjection) {	
-		return getVertexAt(viewport, x, y, Main.getInstance().getSceneGraphRoot(), new Hit(), noProjection);
+	public static Hit getVertexAt(Viewport viewport, Point point, boolean noProjection) {	
+		return getVertexAt(viewport, point, Main.getInstance().getSceneGraphRoot(), new Hit(), noProjection);
 	}
 	
-	public static Hit getVertexAt(Viewport viewport, int x, int y, SceneGraphNode node, boolean noProjection) {
-		return getVertexAt(viewport, x, y, node, new Hit(), noProjection);
+	public static Hit getVertexAt(Viewport viewport, Point point, SceneGraphNode node, boolean noProjection) {
+		return getVertexAt(viewport, point, node, new Hit(), noProjection);
 	}
 	
-	public static Hit getVertexAt(Viewport viewport, int x, int y, Hit hit, boolean noProjection) {
-		return getVertexAt(viewport, x, y, Main.getInstance().getSceneGraphRoot(), hit, noProjection);
+	public static Hit getVertexAt(Viewport viewport, Point point, Hit hit, boolean noProjection) {
+		return getVertexAt(viewport, point, Main.getInstance().getSceneGraphRoot(), hit, noProjection);
 	}
 	
-	public static Hit getVertexAt(Viewport viewport, int x, int y, SceneGraphNode node, Hit hit, boolean noProjection) {
+	public static Hit getVertexAt(Viewport viewport, Point point, SceneGraphNode node, Hit hit, boolean noProjection) {
 		if (node instanceof SdsModel) {
 			SdsModel sdsModel = (SdsModel) node;
-			getVertexAt(viewport, x, y, sdsModel, hit, noProjection);
+			getVertexAt(viewport, point, sdsModel, hit, noProjection);
 		}
 		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
-			getVertexAt(viewport, x, y, child, hit, noProjection);
+			getVertexAt(viewport, point, child, hit, noProjection);
 		}
 		return hit;
 	}
 	
-	public static void getVertexAt(Viewport viewport, int x, int y, SdsModel sdsModel, Hit hit, boolean noProjection) {
+	public static void getVertexAt(Viewport viewport, Point point, SdsModel sdsModel, Hit hit, boolean noProjection) {
 		ViewDef viewDef = viewport.getViewDef();
+		Point hitPoint = new Point();
 //		Matrix4d matrix = new Matrix4d(viewDef.getMatrix(new Matrix4d()));
 //		Transform transform = sdsModel.getTransform();
 //		transform.mul2(matrix);
@@ -61,16 +63,18 @@ public class MouseSelector {
 					vertex.getPosition(p);
 				}
 				transformUtil.projectToScreen(transformUtil.LOCAL, p, p);
-				double dx = x - p.x;
-				double dy = y - p.y;
+				double dx = point.x - p.x;
+				double dy = point.y - p.y;
 				double distanceSq = dx * dx + dy * dy;
 				if (distanceSq < hit.distanceSq) {
 					hit.node = sdsModel;
 					hit.distanceSq = distanceSq;
 					hit.object = vertex;
+					hitPoint.setLocation(p.x, p.y);
 				}
 			}
 		}
+		point.setLocation(hitPoint);
 	}
 	
 	public static void getVertices(Viewport viewport, int x0, int y0, int x1, int y1, SdsModel sdsModel, Selection selection) {

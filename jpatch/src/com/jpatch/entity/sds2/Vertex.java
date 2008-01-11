@@ -1,6 +1,7 @@
 package com.jpatch.entity.sds2;
 
 
+import static com.jpatch.entity.sds.SdsWeights.*;
 import static com.jpatch.entity.sds2.SdsWeights.*;
 import com.jpatch.afw.attributes.*;
 
@@ -214,6 +215,19 @@ public class Vertex {
 			}
 		};
 		return vertexPoint;
+	}
+	
+	public double getLimitFactor() {
+		switch (boundaryType) {
+		case REGULAR:
+			return LIMIT_CENTER_WEIGHTS[edges.length];
+		case BOUNDARY:
+			return CREASE_LIMIT0;
+		case IRREGULAR:
+			return 1.0;
+		}
+		assert false;	// should never get here
+		return 0;
 	}
 	
 	public HalfEdge[] getEdges() {

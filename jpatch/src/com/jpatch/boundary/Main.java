@@ -870,8 +870,8 @@ public class Main {
 	
 	public void setModel(Sds sds) {
 		sds.createNextLevel(0);
-		sds.createNextLevel(1);
-		sds.createNextLevel(2);
+//		sds.createNextLevel(1);
+//		sds.createNextLevel(2);
 		sds.sortFaces();
 		SdsModel model = new SdsModel(sds);
 		treeManager.createTreeNodeFor(model);

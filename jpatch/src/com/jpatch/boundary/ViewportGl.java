@@ -50,7 +50,9 @@ public class ViewportGl extends Viewport {
 	private boolean canUseProgram;
 	private int num;
 	
-	private Matrix4f modelView = new Matrix4f();
+	private double[] modelView = new double[16];
+	
+//	private Matrix4f modelView = new Matrix4f();
 	private TransformUtil transformUtil = new TransformUtil();
 //	private final TransformUtil transformUtil = new TransformUtil();
 	
@@ -649,7 +651,7 @@ public class ViewportGl extends Viewport {
 		SceneGraphNode sceneGraphRoot = Main.getInstance().getSceneGraphRoot();
 		drawSceneGraphElement(sceneGraphRoot);
 		Selection selection = Main.getInstance().getSelection();
-//		drawSelection(selection);
+		drawSelection(selection);
 		
 		JPatchTool tool = Main.getInstance().getActiveTool();
 //		System.out.println("tool = " + tool);
@@ -677,6 +679,14 @@ public class ViewportGl extends Viewport {
 			transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
 		}
 		
+//		for (int i = 0; i < 4; i++) {
+//			for (int j = 0; j < 4; j++) {
+//				System.out.print(modelView[i + j * 4] + " \t");
+//			}
+//			System.out.println();
+//		}
+//		System.out.println();
+		
 //		if (transform != null) {
 //			transformUtil.setTransform(LOCAL, transform);
 ////			transform.mul2(matrix);
@@ -694,23 +704,28 @@ public class ViewportGl extends Viewport {
 //			transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
 //		}
 //		modelView.set(matrix);
+		
 		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
-		drawOrigin(modelView);
+		gl.glMatrixMode(GL_MODELVIEW);
+		gl.glLoadIdentity();
+		gl.glLoadMatrixd(modelView, 0);
+		
+		drawOrigin();
 		if (node instanceof SdsModel) {
-			drawSds2(((SdsModel) node).getSds(), 3);
+			drawSds2(((SdsModel) node).getSds(), 1);
 		}
 		if (node instanceof Bone) {
 			Bone bone = (Bone) node;
-			float length = (float) bone.getLengthAttribute().getDouble();
-			modelView.m00 *= length;
-			modelView.m01 *= length;
-			modelView.m02 *= length;
-			modelView.m10 *= length;
-			modelView.m11 *= length;
-			modelView.m12 *= length;
-			modelView.m20 *= length;
-			modelView.m21 *= length;
-			modelView.m22 *= length;
+			double length = bone.getLengthAttribute().getDouble();
+			modelView[0] *= length;
+			modelView[1] *= length;
+			modelView[2] *= length;
+			modelView[4] *= length;
+			modelView[5] *= length;
+			modelView[6] *= length;
+			modelView[8] *= length;
+			modelView[9] *= length;
+			modelView[10] *= length;
 			Color3f color = bone.getColor(new Color3f()); // TODO reuse color object
 			gl.glEnable(GL_LIGHTING);
 			gl.glShadeModel(GL_SMOOTH);
@@ -722,7 +737,7 @@ public class ViewportGl extends Viewport {
 			color.scale(0.25f);
 			BONE_MATERIAL.setKa(color);
 			BONE_MATERIAL.applyMaterial(gl, GL_FRONT);
-			BONE.draw(gl, modelView);
+			BONE.draw(gl);
 			gl.glEnable(GL_DEPTH_TEST);
 		}
 		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
@@ -972,17 +987,12 @@ public class ViewportGl extends Viewport {
 //		gl.glDisable(GL_BLEND);
 //	}
 
-	protected void drawOrigin(Matrix4f matrix) {
-		float radius = (float) transformUtil.computeNiceRadius(-matrix.m23, component.getWidth(), component.getHeight()) / 2;
+	protected void drawOrigin() {
+		float radius = (float) transformUtil.computeNiceRadius(-modelView[11], component.getWidth(), component.getHeight()) / 2;
 		Point3f p0 = new Point3f(0, 0, 0);
 		Point3f px = new Point3f(radius, 0, 0);
 		Point3f py = new Point3f(0, radius, 0);
 		Point3f pz = new Point3f(0, 0, radius);
-		
-		matrix.transform(p0);
-		matrix.transform(px);
-		matrix.transform(py);
-		matrix.transform(pz);
 	
 		
 //		System.out.println("p0 = " + p0);
@@ -1032,7 +1042,13 @@ public class ViewportGl extends Viewport {
 		gl.glEnable(GL_LIGHTING);
 	}
 	
-	private void drawSelection(Selection selection) {
+	private void drawSelection(Selection selection) {	
+		selection.getSelectedSdsModelAttribute().getValue().getLocal2WorldTransform(transformUtil, LOCAL);
+		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
+		gl.glMatrixMode(GL_MODELVIEW);
+		gl.glLoadIdentity();
+		gl.glLoadMatrixd(modelView, 0);
+		
 		gl.glPointSize(4);
 		gl.glDisable(GL_LIGHTING);
 		Point3f p = new Point3f();
@@ -1049,15 +1065,13 @@ public class ViewportGl extends Viewport {
 			gl.glBegin(GL_POINTS);
 			if (viewDef.getShowControlMeshAttribute().getBoolean()) {
 				for (Vertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
-					vertex.getProjectedPos(p);
+					vertex.getPosition(p);
 					gl.glVertex3f(p.x, p.y, p.z);
 				}
 			} else if (viewDef.getShowProjectedMeshAttribute().getBoolean()) {
-				for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
-					if (vertex instanceof TopLevelVertex) {
-						((TopLevelVertex) vertex).getVertexPoint().getProjectedLimit(p);
-						gl.glVertex3f(p.x, p.y, p.z);
-					}
+				for (Vertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
+					vertex.getVertexPoint().getLimit(p);
+					gl.glVertex3f(p.x, p.y, p.z);
 				}
 			}
 			gl.glEnd();
@@ -1079,12 +1093,11 @@ public class ViewportGl extends Viewport {
 				} else {
 					gl.glBegin(GL_POINTS);
 				}
-				for (AbstractVertex av : selection.getSelectedVerticesAttribute().getElements()) {
-					TopLevelVertex v = (TopLevelVertex) av;
-					v.getProjectedPos(p0);
+				for (Vertex v : selection.getSelectedVerticesAttribute().getElements()) {
+					v.getPosition(p0);
 					gl.glVertex3f(p0.x, p0.y, p0.z);
 					if (pass == 0 || pass == 2) {
-						v.getVertexPoint().getProjectedLimit(p1);
+						v.getVertexPoint().getLimit(p1);
 						gl.glVertex3f(p1.x, p1.y, p1.z);
 					}
 				}
@@ -1096,34 +1109,42 @@ public class ViewportGl extends Viewport {
 	}
 	
 	private void drawSds2(com.jpatch.entity.sds2.Sds sds, int level) {
-		transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
+//		transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
 		GlMaterial currentMaterial = null;
-		double[] matrix = transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, new double[16]);
-		gl.glMatrixMode(GL_MODELVIEW);
-		gl.glLoadMatrixd(matrix, 0);
+		
 		gl.glColor3f(0, 0, 0);
 		gl.glEnable(GL_COLOR_MATERIAL);
 		gl.glColorMaterial(GL_FRONT, GL_EMISSION);
-		Point3f p = new Point3f();
-		Vector3f n = new Vector3f();
 		gl.glInterleavedArrays(GL_N3F_V3F, 0, buffer);
-		final boolean showProjectedMesh = viewDef.getShowProjectedMeshAttribute().getBoolean();
-		for (com.jpatch.entity.sds2.Face face : sds.getFaces(level - 1)) {
-			GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
-			if (currentMaterial != faceMaterial) {
-				setMaterial(GL_FRONT, faceMaterial.getArray());
-				currentMaterial = faceMaterial;
-			}
-			face.fillArray(buffer);
-			gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() * 2 + 2);
-			if (showProjectedMesh) {
-				gl.glColor3f(0.5f, 0.5f, 0.25f);
-				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides() * 2);
-				gl.glColor3f(0, 0, 0);
+		if (viewDef.getShowLimitSurfaceAttribute().getBoolean()) {
+			final boolean showProjectedMesh = viewDef.getShowProjectedMeshAttribute().getBoolean();
+			for (com.jpatch.entity.sds2.Face face : sds.getFaces(level - 1)) {
+				GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
+				if (currentMaterial != faceMaterial) {
+					setMaterial(GL_FRONT, faceMaterial.getArray());
+					currentMaterial = faceMaterial;
+				}
+				face.fillArrayLimit(buffer);
+				gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() * 2 + 2);
+				if (showProjectedMesh) {
+					gl.glColor3f(0.5f, 0.5f, 0.5f);
+					gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides() * 2);
+					gl.glColor3f(0, 0, 0);
+				}
 			}
 		}
 		
-		
+		if (viewDef.getShowControlMeshAttribute().getBoolean()) {
+			gl.glDisable(GL_COLOR_MATERIAL);
+			gl.glDisable(GL_LIGHTING);
+			for (com.jpatch.entity.sds2.Face face : sds.getFaces(0)) {
+				face.fillArrayPosition(buffer);
+				gl.glColor3f(1, 1, 1);
+				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides());
+				gl.glColor3f(1, 0, 0);
+				gl.glDrawArrays(GL_POINTS, 1, face.getSides());
+			}
+		}
 //		for (com.jpatch.entity.sds2.Face face : sds.getFaces(level)) {
 //			gl.glBegin(GL_POLYGON);
 //			for (com.jpatch.entity.sds2.HalfEdge edge : face.getEdges()) {
@@ -1152,7 +1173,7 @@ public class ViewportGl extends Viewport {
 //		gl.glEnd();
 //		gl.glEnable(GL_LIGHTING);
 //		gl.glEnable(GL_DEPTH_TEST);
-		gl.glLoadIdentity();
+//		gl.glLoadIdentity();
 		
 	}
 	
