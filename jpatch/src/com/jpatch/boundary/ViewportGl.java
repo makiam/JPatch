@@ -655,6 +655,8 @@ public class ViewportGl extends Viewport {
 		
 		JPatchTool tool = Main.getInstance().getActiveTool();
 //		System.out.println("tool = " + tool);
+		gl.glMatrixMode(GL_MODELVIEW);
+		gl.glLoadIdentity();
 		if (tool != null) {
 			tool.draw(this);
 		}
