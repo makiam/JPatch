@@ -714,7 +714,7 @@ public class ViewportGl extends Viewport {
 		
 		drawOrigin();
 		if (node instanceof SdsModel) {
-			drawSds2(((SdsModel) node).getSds(), 1);
+			drawSds2(((SdsModel) node).getSds(), 2);
 		}
 		if (node instanceof Bone) {
 			Bone bone = (Bone) node;
@@ -1066,12 +1066,12 @@ public class ViewportGl extends Viewport {
 			}
 			gl.glBegin(GL_POINTS);
 			if (viewDef.getShowControlMeshAttribute().getBoolean()) {
-				for (BaseVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
+				for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
 					vertex.getPosition(p);
 					gl.glVertex3f(p.x, p.y, p.z);
 				}
 			} else if (viewDef.getShowProjectedMeshAttribute().getBoolean()) {
-				for (BaseVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
+				for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
 					vertex.getVertexPoint().getLimit(p);
 					gl.glVertex3f(p.x, p.y, p.z);
 				}
@@ -1095,7 +1095,7 @@ public class ViewportGl extends Viewport {
 				} else {
 					gl.glBegin(GL_POINTS);
 				}
-				for (BaseVertex v : selection.getSelectedVerticesAttribute().getElements()) {
+				for (AbstractVertex v : selection.getSelectedVerticesAttribute().getElements()) {
 					v.getPosition(p0);
 					gl.glVertex3f(p0.x, p0.y, p0.z);
 					if (pass == 0 || pass == 2) {

@@ -56,7 +56,7 @@ public class MouseSelector {
 		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
 		for (Face face : sdsModel.getSds().getFaces(0)) {
 			for (HalfEdge edge : face.getEdges()) {
-				BaseVertex vertex = edge.getVertex();
+				AbstractVertex vertex = edge.getVertex();
 				if (useProjection) {
 					vertex.getVertexPoint().getLimit(p);
 				} else {
@@ -78,7 +78,7 @@ public class MouseSelector {
 	}
 	
 	public static void getVertices(Viewport viewport, int x0, int y0, int x1, int y1, SdsModel sdsModel, Selection selection) {
-		CollectionAttr<BaseVertex> selectedVertices = selection.getSelectedVerticesAttribute();
+		CollectionAttr<AbstractVertex> selectedVertices = selection.getSelectedVerticesAttribute();
 		selectedVertices.clear();
 		
 		ViewDef viewDef = viewport.getViewDef();
@@ -104,7 +104,7 @@ public class MouseSelector {
 		boolean useProjection = !viewport.getViewDef().getShowControlMeshAttribute().getBoolean();
 		for (Face face : sdsModel.getSds().getFaces(0)) {
 			for (HalfEdge edge : face.getEdges()) {
-				BaseVertex vertex = edge.getVertex();
+				AbstractVertex vertex = edge.getVertex();
 				if (useProjection) {
 					vertex.getVertexPoint().getLimit(p);
 				} else {
