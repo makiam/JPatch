@@ -15,7 +15,7 @@ public class AbstractVertex {
 	
 	protected final Point3d position = new Point3d();
 	
-	protected HalfEdge[] edges = new HalfEdge[0];
+	protected HalfEdge[] vertexEdges = new HalfEdge[0];
 	protected HalfEdge preferredStart;
 	
 	protected DerivedVertex vertexPoint;
@@ -42,11 +42,15 @@ public class AbstractVertex {
 	
 	public void setPosition(Tuple3d position) {
 		positionAttr.setTuple(position);
+		invalid = true;
+		alteredInvalid = true;
 		invalidate();
 	}
 	
 	public void setPosition(double x, double y, double z) {
 		positionAttr.setTuple(x, y, z);
+		invalid = true;
+		alteredInvalid = true;
 		invalidate();
 	}
 	
@@ -71,18 +75,16 @@ public class AbstractVertex {
 		vertexPoint = new DerivedVertex() {
 			@Override
 			protected void computePosition() {
+				AbstractVertex.this.validatePosition();
 				switch (boundaryType) {
 				case REGULAR:
-					final int valence = edges.length;
+					final int valence = vertexEdges.length;
 					final double rimWeight = VERTEX_LIMIT_RIM_WEIGHTS[valence];
 					final double centerWeight = VERTEX_LIMIT_CENTER_WEIGHTS[valence];
 					double x = 0, y = 0, z = 0;
-					HalfEdge edge = edges[0];
+					HalfEdge edge = AbstractVertex.this.vertexEdges[0];
 					for (int i = 0; i < valence; i++) {
 						DerivedVertex fp = edge.getFace().getFacePoint();
-						if (fp == null) {
-							fp = null;
-						}
 						fp.validatePosition();
 						x += fp.position.x;
 						y += fp.position.y;
@@ -102,10 +104,10 @@ public class AbstractVertex {
 					break;
 				case BOUNDARY:
 					Point3d p0 = AbstractVertex.this.position;
-					AbstractVertex.this.edges[0].getPair().getVertex().validatePosition();
-					Point3d p1 = AbstractVertex.this.edges[0].getPair().getVertex().position;
-					AbstractVertex.this.edges[edges.length - 1].getPair().getVertex().validatePosition();
-					Point3d p2 = AbstractVertex.this.edges[edges.length - 1].getPair().getVertex().position;
+					AbstractVertex.this.vertexEdges[0].getPair().getVertex().validatePosition();
+					Point3d p1 = AbstractVertex.this.vertexEdges[0].getPair().getVertex().position;
+					AbstractVertex.this.vertexEdges[vertexEdges.length - 1].getPair().getVertex().validatePosition();
+					Point3d p2 = AbstractVertex.this.vertexEdges[vertexEdges.length - 1].getPair().getVertex().position;
 					position.set(
 							p0.x * CREASE0 + (p1.x + p2.x) * CREASE1,
 							p0.y * CREASE0 + (p1.y + p2.y) * CREASE1,
@@ -122,10 +124,10 @@ public class AbstractVertex {
 			
 			@Override
 			protected void computeLimit() {
+				validatePosition();
 				switch (boundaryType) {
 				case REGULAR:
-					validatePosition();
-					final int valence = edges.length;
+					final int valence = vertexEdges.length;
 					final double limitCornerWeight = LIMIT_CORNER_WEIGHTS[valence];
 					final double limitEdgeWeight = LIMIT_EDGE_WEIGHTS[valence];
 					final double limitCenterWeight = LIMIT_CENTER_WEIGHTS[valence];
@@ -138,7 +140,7 @@ public class AbstractVertex {
 					double ux = 0, uy = 0, uz = 0;
 					double vx = 0, vy = 0, vz = 0;
 					for (int i = 0; i < valence; i++) {
-						HalfEdge edge = edges[i];
+						HalfEdge edge = AbstractVertex.this.vertexEdges[i];
 						DerivedVertex cp = edge.getPairFace().getFacePoint();
 						cp.validatePosition();
 						cx += cp.position.x;
@@ -169,10 +171,10 @@ public class AbstractVertex {
 					computeMatrix();
 					break;
 				case BOUNDARY:
-					AbstractVertex.this.edges[0].getEdgePoint().validatePosition();
-					AbstractVertex.this.edges[AbstractVertex.this.edges.length - 1].getEdgePoint().validatePosition();
-					Point3d p1 = AbstractVertex.this.edges[0].getEdgePoint().position;
-					Point3d p2 = AbstractVertex.this.edges[AbstractVertex.this.edges.length - 1].getEdgePoint().position;
+					AbstractVertex.this.vertexEdges[0].getEdgePoint().validatePosition();
+					AbstractVertex.this.vertexEdges[AbstractVertex.this.vertexEdges.length - 1].getEdgePoint().validatePosition();
+					Point3d p1 = AbstractVertex.this.vertexEdges[0].getEdgePoint().position;
+					Point3d p2 = AbstractVertex.this.vertexEdges[AbstractVertex.this.vertexEdges.length - 1].getEdgePoint().position;
 					limit.set(
 							position.x * CREASE_LIMIT0 + (p1.x + p2.x) * CREASE_LIMIT1,
 							position.y * CREASE_LIMIT0 + (p1.y + p2.y) * CREASE_LIMIT1,
@@ -194,8 +196,8 @@ public class AbstractVertex {
 			 */
 			private final void computeNormal() {
 				normal.set(0, 0, 0);				
-				for (int i = 0; i < edges.length; i++) {
-					Face face = edges[i].getFace();
+				for (int i = 0; i < AbstractVertex.this.vertexEdges.length; i++) {
+					Face face = AbstractVertex.this.vertexEdges[i].getFace();
 					if (face != null) {
 						face.getFacePoint().validateLimit();
 						normal.add(face.getFacePoint().normal);
@@ -209,8 +211,8 @@ public class AbstractVertex {
 			 */
 			private final void computeAlteredNormal() {
 				alteredNormal.set(0, 0, 0);				
-				for (int i = 0; i < edges.length; i++) {
-					Face face = edges[i].getFace();
+				for (int i = 0; i < AbstractVertex.this.vertexEdges.length; i++) {
+					Face face = AbstractVertex.this.vertexEdges[i].getFace();
 					if (face != null) {
 						face.getFacePoint().validateAlteredLimit();
 						alteredNormal.add(face.getFacePoint().alteredNormal);
@@ -225,10 +227,11 @@ public class AbstractVertex {
 
 			@Override
 			protected void computeAlteredLimit() {
+//				System.out.println(this + " computeAlteredLimit()");
+				validateAlteredPosition();
 				switch (boundaryType) {
 				case REGULAR:
-					validateAlteredPosition();
-					final int valence = edges.length;
+					final int valence = vertexEdges.length;
 					final double limitCornerWeight = LIMIT_CORNER_WEIGHTS[valence];
 					final double limitEdgeWeight = LIMIT_EDGE_WEIGHTS[valence];
 					final double limitCenterWeight = LIMIT_CENTER_WEIGHTS[valence];
@@ -241,7 +244,7 @@ public class AbstractVertex {
 					double ux = 0, uy = 0, uz = 0;
 					double vx = 0, vy = 0, vz = 0;
 					for (int i = 0; i < valence; i++) {
-						HalfEdge edge = edges[i];
+						HalfEdge edge = AbstractVertex.this.vertexEdges[i];
 						DerivedVertex cp = edge.getPairFace().getFacePoint();
 						cp.validateAlteredPosition();
 						cx += cp.alteredPosition.x;
@@ -273,10 +276,10 @@ public class AbstractVertex {
 					alteredNormal.normalize();
 					break;
 				case BOUNDARY:
-					AbstractVertex.this.edges[0].getEdgePoint().validateAlteredPosition();
-					AbstractVertex.this.edges[AbstractVertex.this.edges.length - 1].getEdgePoint().validateAlteredPosition();
-					Point3d p1 = AbstractVertex.this.edges[0].getEdgePoint().alteredPosition;
-					Point3d p2 = AbstractVertex.this.edges[AbstractVertex.this.edges.length - 1].getEdgePoint().alteredPosition;
+					AbstractVertex.this.vertexEdges[0].getEdgePoint().validateAlteredPosition();
+					AbstractVertex.this.vertexEdges[AbstractVertex.this.vertexEdges.length - 1].getEdgePoint().validateAlteredPosition();
+					Point3d p1 = AbstractVertex.this.vertexEdges[0].getEdgePoint().alteredPosition;
+					Point3d p2 = AbstractVertex.this.vertexEdges[AbstractVertex.this.vertexEdges.length - 1].getEdgePoint().alteredPosition;
 					alteredLimit.set(
 							alteredPosition.x * CREASE_LIMIT0 + (p1.x + p2.x) * CREASE_LIMIT1,
 							alteredPosition.y * CREASE_LIMIT0 + (p1.y + p2.y) * CREASE_LIMIT1,
@@ -290,7 +293,8 @@ public class AbstractVertex {
 					break;
 				default:
 					assert false;	// should never get here
-				}				
+				}
+//				System.out.println("    alteredLimit = " + alteredLimit);
 			}
 		};
 		return vertexPoint;
@@ -299,7 +303,7 @@ public class AbstractVertex {
 	public double getLimitFactor() {
 		switch (boundaryType) {
 		case REGULAR:
-			return LIMIT_CENTER_WEIGHTS[edges.length];
+			return LIMIT_CENTER_WEIGHTS[vertexEdges.length];
 		case BOUNDARY:
 			return CREASE_LIMIT0;
 		case IRREGULAR:
@@ -310,7 +314,7 @@ public class AbstractVertex {
 	}
 	
 	public HalfEdge[] getEdges() {
-		return edges;
+		return vertexEdges;
 	}
 	
 	public DerivedVertex getVertexPoint() {
@@ -327,7 +331,7 @@ public class AbstractVertex {
 	
 	public void invalidate() {
 		if (!invalid) {
-			for (HalfEdge edge : edges) {
+			for (HalfEdge edge : vertexEdges) {
 				if (edge.getFace() != null) {
 					edge.getFace().invalidate();
 				}
@@ -339,7 +343,7 @@ public class AbstractVertex {
 	
 	public void invalidateAltered() {
 		if (!alteredInvalid) {
-			for (HalfEdge edge : edges) {
+			for (HalfEdge edge : vertexEdges) {
 				if (edge.getFace() != null) {
 					edge.getFace().invalidateAltered();
 				}
@@ -354,10 +358,10 @@ public class AbstractVertex {
 	 */
 	void addEdge(HalfEdge edge) {
 		assert edge.getVertex() == this : "edge.vertex=" + edge.getVertex() + ", must be this vertex (" + this + ")";
-		HalfEdge[] tmp = new HalfEdge[edges.length + 1];
-		System.arraycopy(edges, 0, tmp, 0, edges.length);
-		tmp[edges.length] = edge;
-		edges = tmp;
+		HalfEdge[] tmp = new HalfEdge[vertexEdges.length + 1];
+		System.arraycopy(vertexEdges, 0, tmp, 0, vertexEdges.length);
+		tmp[vertexEdges.length] = edge;
+		vertexEdges = tmp;
 	}
 	
 	/**
@@ -366,13 +370,13 @@ public class AbstractVertex {
 	 */
 	void removeEdge(HalfEdge edge) {
 		int i = 0;
-		while (edges[i] != edge) {	// throws ArrayIndexOutOfBoundsException if edge is not part of edges
+		while (vertexEdges[i] != edge) {	// throws ArrayIndexOutOfBoundsException if edge is not part of edges
 			i++;
 		}
-		final HalfEdge[] tmp = new HalfEdge[edges.length - 1];
-		System.arraycopy(edges, 0, tmp, 0, i);
-		System.arraycopy(edges, i + 1, tmp, i, tmp.length - i);
-		edges = tmp;
+		final HalfEdge[] tmp = new HalfEdge[vertexEdges.length - 1];
+		System.arraycopy(vertexEdges, 0, tmp, 0, i);
+		System.arraycopy(vertexEdges, i + 1, tmp, i, tmp.length - i);
+		vertexEdges = tmp;
 	}
 	
 	/**
@@ -386,7 +390,7 @@ public class AbstractVertex {
 	 * TODO: preferredStart method will not work properly with undo/redo
 	 */
 	void organizeEdges() {
-		HalfEdge[] tmp = edges.clone();
+		HalfEdge[] tmp = vertexEdges.clone();
 		HalfEdge e = tmp[0];
 		while(e.getPair().getNext() != null && e.getPair().getNext() != tmp[0]) {
 			e = e.getPair().getNext();
@@ -408,14 +412,14 @@ public class AbstractVertex {
 		
 		
 		
-		for (int i = 0; i < edges.length; i++) {
-			if (i < edges.length - 1 && e.getPrev() == null) {
-				System.arraycopy(tmp, 0, edges, 0, edges.length);
+		for (int i = 0; i < vertexEdges.length; i++) {
+			if (i < vertexEdges.length - 1 && e.getPrev() == null) {
+				System.arraycopy(tmp, 0, vertexEdges, 0, vertexEdges.length);
 				boundaryType = IRREGULAR; // irregular boundary vertex, crease edges are edges[0] and edges[edges.length - 1]
 				return;
 			}
-			edges[i] = e;
-			if (i < edges.length - 1) {
+			vertexEdges[i] = e;
+			if (i < vertexEdges.length - 1) {
 				e = e.getPrev().getPair();
 			}
 		}
@@ -438,7 +442,7 @@ public class AbstractVertex {
 			int j = k[i] - 1;
 			edges[j].appendTo(edges[(j + 1) % n].getPair());
 			v.addEdge(edges[j]);
-			for (HalfEdge e : v.edges) {
+			for (HalfEdge e : v.vertexEdges) {
 				System.out.print(e + " ");
 			}
 			System.out.println();
@@ -449,11 +453,11 @@ public class AbstractVertex {
 			System.out.println(edges[i].getPair() + "\t " + edges[i].getPair().getPrev() + "\t " + edges[i].getPair().getNext());
 		}
 		
-		HalfEdge e = v.edges[0];
+		HalfEdge e = v.vertexEdges[0];
 		do {
 			System.out.print(e + " ");
 			e = e.getPrev().getPair();
-		} while (e != v.edges[0]);
+		} while (e != v.vertexEdges[0]);
 		
 	}
 }

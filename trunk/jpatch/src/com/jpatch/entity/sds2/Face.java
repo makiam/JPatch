@@ -9,7 +9,7 @@ import com.jpatch.entity.*;
 import javax.vecmath.*;
 
 public class Face {
-	private final HalfEdge[] edges;
+	private final HalfEdge[] faceEdges;
 	private final double oneOverSides;
 	private DerivedVertex facePoint;
 	private Material material;
@@ -21,29 +21,29 @@ public class Face {
 		
 		oneOverSides = 1.0 / sides;
 		
-		this.edges = edges.clone();
+		this.faceEdges = edges.clone();
 //		children = new Face[sides];
 		
 		// append adges and set their face to this
 		int prev = sides - 1;
 		for (int i = 0; i < sides; i++) {
-			this.edges[i].setFace(this);
-			this.edges[i].appendTo(this.edges[prev++]);
+			this.faceEdges[i].setFace(this);
+			this.faceEdges[i].appendTo(this.faceEdges[prev++]);
 			if (prev == sides) {
 				prev = 0;
 			}
 		}
 		for (int i = 0; i < sides; i++) {
-			this.edges[i].getVertex().organizeEdges();
+			this.faceEdges[i].getVertex().organizeEdges();
 		}
 	}
 	
 	public int getSides() {
-		return edges.length;
+		return faceEdges.length;
 	}
 	
 	public HalfEdge[] getEdges() {
-		return edges;
+		return faceEdges;
 	}
 	
 	public Material getMaterial() {
@@ -70,7 +70,7 @@ public class Face {
 		buffer.put((float) facePoint.alteredLimit.y);
 		buffer.put((float) facePoint.alteredLimit.z);
 		
-		for (com.jpatch.entity.sds2.HalfEdge edge : edges) {
+		for (com.jpatch.entity.sds2.HalfEdge edge : faceEdges) {
 			DerivedVertex v = edge.getVertex().getVertexPoint();
 			v.validateAlteredLimit();
 			buffer.put((float) v.alteredNormal.x);
@@ -89,7 +89,7 @@ public class Face {
 			buffer.put((float) v.alteredLimit.y);
 			buffer.put((float) v.alteredLimit.z);
 		}
-		DerivedVertex v = edges[0].getVertex().getVertexPoint();
+		DerivedVertex v = faceEdges[0].getVertex().getVertexPoint();
 		buffer.put((float) v.alteredNormal.x);
 		buffer.put((float) v.alteredNormal.y);
 		buffer.put((float) v.alteredNormal.z);
@@ -97,6 +97,10 @@ public class Face {
 		buffer.put((float) v.alteredLimit.y);
 		buffer.put((float) v.alteredLimit.z);
 		buffer.rewind();
+		
+//		while (buffer.remaining() > 0) {
+//			System.out.println(buffer.get() + ", " + buffer.get() + ", " + buffer.get());
+//		}
 	}
 	
 	public void fillArrayPosition(FloatBuffer buffer) {
@@ -109,7 +113,7 @@ public class Face {
 		buffer.put((float) facePoint.position.y);
 		buffer.put((float) facePoint.position.z);
 		
-		for (com.jpatch.entity.sds2.HalfEdge edge : edges) {
+		for (com.jpatch.entity.sds2.HalfEdge edge : faceEdges) {
 			AbstractVertex v = edge.getVertex();
 			DerivedVertex lv = v.getVertexPoint();
 			v.validatePosition();
@@ -120,7 +124,7 @@ public class Face {
 			buffer.put((float) v.position.y);
 			buffer.put((float) v.position.z);
 		}
-		AbstractVertex v = edges[0].getVertex();
+		AbstractVertex v = faceEdges[0].getVertex();
 		DerivedVertex lv = v.getVertexPoint();
 		buffer.put((float) lv.normal.x);
 		buffer.put((float) lv.normal.y);
@@ -135,7 +139,7 @@ public class Face {
 		if (facePoint != null) {
 			facePoint.invalidate();
 		}
-		for (HalfEdge edge : edges) {
+		for (HalfEdge edge : faceEdges) {
 			if (edge.getVertex().getVertexPoint() != null) {
 				edge.getVertex().getVertexPoint().invalidate();
 			}
@@ -150,7 +154,7 @@ public class Face {
 		if (facePoint != null) {
 			facePoint.invalidateAltered();
 		}
-		for (HalfEdge edge : edges) {
+		for (HalfEdge edge : faceEdges) {
 			if (edge.getVertex().getVertexPoint() != null) {
 				edge.getVertex().getVertexPoint().invalidateAltered();
 			}
@@ -166,7 +170,8 @@ public class Face {
 			@Override
 			protected void computePosition() {
 				double x = 0, y = 0, z = 0;
-				for (HalfEdge edge : edges) {
+				for (HalfEdge edge : faceEdges) {
+//					System.out.println(edge.getVertex());
 					edge.getVertex().validatePosition();
 					Point3d p = edge.getVertex().position;
 					x += p.x;
@@ -183,7 +188,7 @@ public class Face {
 			protected void computeLimit() {
 				validatePosition();
 				
-				final int sides = edges.length;
+				final int sides = faceEdges.length;
 				
 				final double limitCornerWeight = LIMIT_CORNER_WEIGHTS[sides];
 				final double limitEdgeWeight = LIMIT_EDGE_WEIGHTS[sides];
@@ -197,7 +202,7 @@ public class Face {
 				double ux = 0, uy = 0, uz = 0;
 				double vx = 0, vy = 0, vz = 0;
 				for (int i = 0; i < sides; i++) {
-					HalfEdge edge = edges[i];
+					HalfEdge edge = faceEdges[i];
 					DerivedVertex cp = edge.getVertex().getVertexPoint();
 					cp.validatePosition();
 					cx += cp.position.x;
@@ -231,14 +236,15 @@ public class Face {
 			
 			@Override
 			protected void computeAlteredLimit() {
-				if (true) {
-					alteredLimit.set(limit);
-					alteredNormal.set(normal);
-					return;
-				}
+//				System.out.println(this + " computeAlteredLimit()");
+//				if (false) {
+//					alteredLimit.set(limit);
+//					alteredNormal.set(normal);
+//					return;
+//				}
 				validateAlteredPosition();
 				
-				final int sides = edges.length;
+				final int sides = faceEdges.length;
 				
 				final double limitCornerWeight = LIMIT_CORNER_WEIGHTS[sides];
 				final double limitEdgeWeight = LIMIT_EDGE_WEIGHTS[sides];
@@ -252,7 +258,7 @@ public class Face {
 				double ux = 0, uy = 0, uz = 0;
 				double vx = 0, vy = 0, vz = 0;
 				for (int i = 0; i < sides; i++) {
-					HalfEdge edge = edges[i];
+					HalfEdge edge = faceEdges[i];
 					DerivedVertex cp = edge.getVertex().getVertexPoint();
 					cp.validateAlteredPosition();
 					cx += cp.alteredPosition.x;
@@ -283,6 +289,8 @@ public class Face {
 				alteredNormal.cross(uTangent, vTangent);
 				alteredNormal.normalize();
 //				normal.set(0,0,0);
+				
+//				System.out.println("    alteredLimit = " + alteredLimit);
 			}
 			
 			public String toString() {
@@ -298,9 +306,9 @@ public class Face {
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder("f{");
-		for (int i = 0; i < edges.length; i++) {
-			sb.append(edges[i].getVertex());
-			if (i < edges.length - 1) {
+		for (int i = 0; i < faceEdges.length; i++) {
+			sb.append(faceEdges[i].getVertex());
+			if (i < faceEdges.length - 1) {
 				sb.append('-');
 			}
 		}

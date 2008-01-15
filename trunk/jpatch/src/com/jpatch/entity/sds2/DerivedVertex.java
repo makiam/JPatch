@@ -49,12 +49,12 @@ public abstract class DerivedVertex extends AbstractVertex {
 	
 	public void setPosition(Tuple3d position) {
 		positionAttr.setTuple(position);
-		invalidateAltered();
+		invalidate();
 	}
 	
 	public void setPosition(double x, double y, double z) {
 		positionAttr.setTuple(x, y, z);
-		invalidateAltered();
+		invalidate();
 	}
 	/**
 	 * Computes the position of this DerivedVertex
@@ -62,7 +62,7 @@ public abstract class DerivedVertex extends AbstractVertex {
 	public final void validatePosition() {
 		super.validatePosition();
 		if (positionValid) {
-			return;
+//			return;
 		}
 		computePosition();
 		positionValid = true;
@@ -73,7 +73,7 @@ public abstract class DerivedVertex extends AbstractVertex {
 	 */
 	public final void validateAlteredPosition() {
 		if (alteredPositionValid) {
-			return;
+//			return;
 		}
 		computeAlteredPosition();
 		alteredPositionValid = true;
@@ -85,7 +85,7 @@ public abstract class DerivedVertex extends AbstractVertex {
 	public final void validateLimit() {
 		super.validateLimit();
 		if (limitValid) {
-			return;
+//			return;
 		}
 		computeLimit();
 		alteredLimitValid = true;
@@ -96,17 +96,25 @@ public abstract class DerivedVertex extends AbstractVertex {
 	 */
 	public final void validateAlteredLimit() {
 		if (alteredLimitValid) {
-			return;
+//			return;
 		}
 		computeAlteredLimit();
 		alteredLimitValid = true;
 	}
 	
 	@Override
-	public void invalidate() {
+	public final void invalidate() {
 		super.invalidate();
 		positionValid = false;
 		limitValid = false;
+	}
+	
+	@Override
+	public final void invalidateAltered() {
+		super.invalidateAltered();
+		alteredPositionValid = false;
+		alteredLimitValid = false;
+		System.out.println(this + " invalidateAltered()");
 	}
 	
 	protected void computeMatrix() {
@@ -122,9 +130,14 @@ public abstract class DerivedVertex extends AbstractVertex {
 	protected abstract void computePosition();
 	protected abstract void computeLimit();
 	protected void computeAlteredPosition() {
+//		System.out.println("computeAlteredPosition()");
 		validateLimit();
+//		System.out.println("    position = " + position);
 		positionAttr.getTuple(alteredPosition);
 		matrix.transform(alteredPosition);
+		alteredPosition.add(position);
+//		System.out.println("    alteredPosition = " + alteredPosition);
 	}
+	
 	protected abstract void computeAlteredLimit();
 }

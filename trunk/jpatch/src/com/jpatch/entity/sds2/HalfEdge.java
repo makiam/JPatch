@@ -187,6 +187,7 @@ public class HalfEdge {
 
 			@Override
 			protected void computeAlteredLimit() {
+//				System.out.println(this + " computeAlteredLimit()");
 				switch (boundaryType) {
 				case REGULAR:
 					validateAlteredPosition();
@@ -207,7 +208,7 @@ public class HalfEdge {
 					Point3d e2 = face.getFacePoint().alteredPosition;
 					Point3d e3 = vertex.getVertexPoint().alteredPosition;
 					
-					limit.set(
+					alteredLimit.set(
 							alteredPosition.x * LIMIT0 + ((e0.x + e2.x) + (e1.x + e3.x)) * LIMIT1 + ((c0.x + c2.x) + (c1.x + c3.x)) * LIMIT2,
 							alteredPosition.y * LIMIT0 + ((e0.y + e2.y) + (e1.y + e3.y)) * LIMIT1 + ((c0.y + c2.y) + (c1.y + c3.y)) * LIMIT2,
 							alteredPosition.z * LIMIT0 + ((e0.z + e2.z) + (e1.z + e3.z)) * LIMIT1 + ((c0.z + c2.z) + (c1.z + c3.z)) * LIMIT2
@@ -265,6 +266,7 @@ public class HalfEdge {
 				default:
 					assert false;	// should never get here
 				}
+//				System.out.println("    alteredLimit = " + alteredLimit);
 			}
 			
 			public String toString() {
