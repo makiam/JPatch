@@ -48,7 +48,7 @@ public class JptLoader {
 					patch = false;
 				} else if (localName.equals("points")) {
 					String[] cpIndexes = chars.toString().split("[,\\ ]");
-					List<Vertex> vertexList = new ArrayList<Vertex>();
+					List<BaseVertex> vertexList = new ArrayList<BaseVertex>();
 					for (int i = 0; i < cpIndexes.length; i += 2) {
 						Cp cp = cpList.get(Integer.parseInt(cpIndexes[i]));
 						Cp cpNext = cpList.get(Integer.parseInt(cpIndexes[i + 1]));
@@ -76,7 +76,7 @@ public class JptLoader {
 					}
 //					System.out.println(vertexList);
 					Collections.reverse(vertexList);
-					Vertex[] vertices = vertexList.toArray(new Vertex[vertexList.size()]);
+					BaseVertex[] vertices = vertexList.toArray(new BaseVertex[vertexList.size()]);
 					Face face = sds.addFace(0, vertices);
 //					if (face != null) {
 						face.setMaterial(materials.get(materialIndex));
@@ -274,14 +274,14 @@ public class JptLoader {
 	
 	private class Cp {
 		final int index = cpIndex++, attach;
-		final Vertex vertex;
+		final BaseVertex vertex;
 		final double hookPos;
 		final Point3d inTangent = new Point3d();
 		final Point3d outTangent = new Point3d();
 		Cp prev, next;
 		
 		Cp(double x, double y, double z) {
-			vertex = new Vertex(x, y, z);
+			vertex = new BaseVertex(x, y, z);
 			attach = -1;
 			hookPos = -1;
 //			sds.vertexList.add(vertex);
@@ -294,7 +294,7 @@ public class JptLoader {
 		}
 		
 		Cp(double hookPos) {
-			vertex = new Vertex();
+			vertex = new BaseVertex();
 			this.hookPos = hookPos;
 			attach = -1;
 //			sds.vertexList.add(vertex);
@@ -304,7 +304,7 @@ public class JptLoader {
 			return (attach == -1) ? this : cpList.get(attach).getHead();
 		}
 		
-		Vertex getVertex() {
+		BaseVertex getVertex() {
 			return getHead().vertex;
 		}
 		

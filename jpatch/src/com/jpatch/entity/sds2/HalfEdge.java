@@ -9,7 +9,7 @@ public class HalfEdge {
 	public static final int REGULAR = 0;
 	public static final int BOUNDARY = 1;
 	
-	private final Vertex vertex;
+	private final AbstractVertex vertex;
 	private final HalfEdge pair;
 	private HalfEdge next;
 	private HalfEdge prev;
@@ -18,21 +18,21 @@ public class HalfEdge {
 	
 	private DerivedVertex edgePoint;
 	
-	public HalfEdge(Vertex v0, Vertex v1) {
+	public HalfEdge(AbstractVertex v0, AbstractVertex v1) {
 		this.vertex = v0;
 		this.pair = new HalfEdge(v1, this);
 	}
 	
-	private HalfEdge(Vertex v, HalfEdge pair) {
+	private HalfEdge(AbstractVertex v, HalfEdge pair) {
 		this.vertex = v;
 		this.pair = pair;
 	}
 	
-	public Vertex getVertex() {
+	public AbstractVertex getVertex() {
 		return vertex;
 	}
 	
-	public Vertex getPairVertex() {
+	public AbstractVertex getPairVertex() {
 		return pair.vertex;
 	}
 	
@@ -145,8 +145,7 @@ public class HalfEdge {
 							(e0.y - e2.y) * 4 + (c0.y - c3.y) + (c1.y - c2.y),
 							(e0.z - e2.z) * 4 + (c0.z - c3.z) + (c1.z - c2.z)
 					);
-					
-					normal.cross(uTangent, vTangent);
+					computeMatrix();
 				break;
 				case BOUNDARY:
 					validatePosition();
@@ -160,8 +159,8 @@ public class HalfEdge {
 							position.z * CREASE_LIMIT0 + (p1.z + p2.z) * CREASE_LIMIT1
 					);
 					
-					p1 = vertex.position;
-					p2 = pair.vertex.position;
+//					p1 = vertex.position;
+//					p2 = pair.vertex.position;
 					if (face != null) {
 						face.getFacePoint().validatePosition();
 						Point3d pf = face.getFacePoint().position;
@@ -179,13 +178,95 @@ public class HalfEdge {
 								pf.y - (p1.y + p2.y) * 0.5,
 								pf.z - (p1.z + p2.z) * 0.5);
 					}
-					normal.cross(uTangent, vTangent);
+					computeMatrix();
 					break;
 				default:
 					assert false;	// should never get here
 				}
 			}
 
+			@Override
+			protected void computeAlteredLimit() {
+				switch (boundaryType) {
+				case REGULAR:
+					validateAlteredPosition();
+					next.edgePoint.validateAlteredPosition();
+					prev.edgePoint.validateAlteredPosition();
+					pair.next.edgePoint.validateAlteredPosition();
+					pair.prev.edgePoint.validateAlteredPosition();
+					vertex.getVertexPoint().validateAlteredPosition();
+					pair.vertex.getVertexPoint().validateAlteredPosition();
+					
+					Point3d c0 = pair.next.edgePoint.alteredPosition;
+					Point3d c1 = pair.prev.edgePoint.alteredPosition;
+					Point3d c2 = prev.edgePoint.alteredPosition;
+					Point3d c3 = next.edgePoint.alteredPosition;
+					
+					Point3d e0 = pair.face.getFacePoint().alteredPosition;
+					Point3d e1 = pair.vertex.getVertexPoint().alteredPosition;
+					Point3d e2 = face.getFacePoint().alteredPosition;
+					Point3d e3 = vertex.getVertexPoint().alteredPosition;
+					
+					limit.set(
+							alteredPosition.x * LIMIT0 + ((e0.x + e2.x) + (e1.x + e3.x)) * LIMIT1 + ((c0.x + c2.x) + (c1.x + c3.x)) * LIMIT2,
+							alteredPosition.y * LIMIT0 + ((e0.y + e2.y) + (e1.y + e3.y)) * LIMIT1 + ((c0.y + c2.y) + (c1.y + c3.y)) * LIMIT2,
+							alteredPosition.z * LIMIT0 + ((e0.z + e2.z) + (e1.z + e3.z)) * LIMIT1 + ((c0.z + c2.z) + (c1.z + c3.z)) * LIMIT2
+					);
+					
+					vTangent.set(
+							(e1.x - e3.x) * 4 + (c1.x - c0.x) + (c2.x - c3.x),
+							(e1.y - e3.y) * 4 + (c1.y - c0.y) + (c2.y - c3.y),
+							(e1.z - e3.z) * 4 + (c1.z - c0.z) + (c2.z - c3.z)
+					);
+					
+					uTangent.set(
+							(e0.x - e2.x) * 4 + (c0.x - c3.x) + (c1.x - c2.x),
+							(e0.y - e2.y) * 4 + (c0.y - c3.y) + (c1.y - c2.y),
+							(e0.z - e2.z) * 4 + (c0.z - c3.z) + (c1.z - c2.z)
+					);
+					
+					alteredNormal.cross(uTangent, vTangent);
+					alteredNormal.normalize();
+				break;
+				case BOUNDARY:
+					validateAlteredPosition();
+					vertex.getVertexPoint().validateAlteredPosition();
+					pair.vertex.getVertexPoint().validateAlteredPosition();
+					Point3d p1 = vertex.getVertexPoint().alteredPosition;
+					Point3d p2 = pair.vertex.getVertexPoint().alteredPosition;
+					alteredLimit.set(
+							alteredPosition.x * CREASE_LIMIT0 + (p1.x + p2.x) * CREASE_LIMIT1,
+							alteredPosition.y * CREASE_LIMIT0 + (p1.y + p2.y) * CREASE_LIMIT1,
+							alteredPosition.z * CREASE_LIMIT0 + (p1.z + p2.z) * CREASE_LIMIT1
+					);
+					
+//					p1 = vertex.position;
+//					p2 = pair.vertex.position;
+					if (face != null) {
+						face.getFacePoint().validateAlteredPosition();
+						Point3d pf = face.getFacePoint().alteredPosition;
+						uTangent.set(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
+						vTangent.set(
+								pf.x - (p1.x + p2.x) * 0.5,
+								pf.y - (p1.y + p2.y) * 0.5,
+								pf.z - (p1.z + p2.z) * 0.5);
+					} else {
+						pair.face.getFacePoint().validateAlteredPosition();
+						Point3d pf = pair.face.getFacePoint().alteredPosition;
+						uTangent.set(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
+						vTangent.set(
+								pf.x - (p1.x + p2.x) * 0.5,
+								pf.y - (p1.y + p2.y) * 0.5,
+								pf.z - (p1.z + p2.z) * 0.5);
+					}
+					alteredNormal.cross(uTangent, vTangent);
+					alteredNormal.normalize();
+					break;
+				default:
+					assert false;	// should never get here
+				}
+			}
+			
 			public String toString() {
 				return "v" + num + "(" + HalfEdge.this + ")";
 			}
