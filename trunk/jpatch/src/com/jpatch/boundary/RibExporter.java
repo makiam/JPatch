@@ -21,11 +21,11 @@ public class RibExporter {
 //		}
 		
 		/* enumerate (level 2) vertices */
-		Map<Vertex, Integer> vertexNumbers = new LinkedHashMap<Vertex, Integer>();
+		Map<BaseVertex, Integer> vertexNumbers = new LinkedHashMap<BaseVertex, Integer>();
 		int n = 0;
 		for (Face face : sds.getFaces(LEVEL)) {
 			for (HalfEdge edge : face.getEdges()) {
-				Vertex v = edge.getVertex();
+				BaseVertex v = edge.getVertex();
 				if (!vertexNumbers.containsKey(v)) {
 					vertexNumbers.put(v, n++);
 				}
@@ -42,7 +42,7 @@ public class RibExporter {
 		out.print("[");
 		for (Face face : sds.getFaces(LEVEL)) {
 			for (HalfEdge edge : face.getEdges()) {
-				Vertex v = edge.getVertex();
+				BaseVertex v = edge.getVertex();
 				out.print(vertexNumbers.get(v));
 				out.print(' ');
 			}
@@ -55,7 +55,7 @@ public class RibExporter {
 		/* print vertex positions */
 		out.print("\"P\" [");
 		Point3d p = new Point3d();
-		for (Vertex v : vertexNumbers.keySet()) {
+		for (BaseVertex v : vertexNumbers.keySet()) {
 			v.getPosition(p);
 			out.print(p.x);
 			out.print(' ');
@@ -68,7 +68,7 @@ public class RibExporter {
 		
 		/* print vertex occlusion */
 		out.print("\"vertex float Occlusion\" [");
-		for (Vertex v : vertexNumbers.keySet()) {
+		for (BaseVertex v : vertexNumbers.keySet()) {
 			out.print(ao.getOcclusion(v));
 			out.print(' ');
 		}

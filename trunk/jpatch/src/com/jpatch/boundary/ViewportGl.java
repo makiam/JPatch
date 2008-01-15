@@ -1066,12 +1066,12 @@ public class ViewportGl extends Viewport {
 			}
 			gl.glBegin(GL_POINTS);
 			if (viewDef.getShowControlMeshAttribute().getBoolean()) {
-				for (Vertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
+				for (BaseVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
 					vertex.getPosition(p);
 					gl.glVertex3f(p.x, p.y, p.z);
 				}
 			} else if (viewDef.getShowProjectedMeshAttribute().getBoolean()) {
-				for (Vertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
+				for (BaseVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
 					vertex.getVertexPoint().getLimit(p);
 					gl.glVertex3f(p.x, p.y, p.z);
 				}
@@ -1095,7 +1095,7 @@ public class ViewportGl extends Viewport {
 				} else {
 					gl.glBegin(GL_POINTS);
 				}
-				for (Vertex v : selection.getSelectedVerticesAttribute().getElements()) {
+				for (BaseVertex v : selection.getSelectedVerticesAttribute().getElements()) {
 					v.getPosition(p0);
 					gl.glVertex3f(p0.x, p0.y, p0.z);
 					if (pass == 0 || pass == 2) {

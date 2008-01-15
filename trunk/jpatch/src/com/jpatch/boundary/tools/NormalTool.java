@@ -20,8 +20,8 @@ import com.jpatch.entity.sds2.*;
 public class NormalTool implements JPatchTool {
 	MouseListener[] mouseListeners;
 	TransformUtil transformUtil = new TransformUtil();
-	Map<Vertex, VertexNormal> vertexPos = new HashMap<Vertex, VertexNormal>();
-	Vertex vertex;
+	Map<BaseVertex, VertexNormal> vertexPos = new HashMap<BaseVertex, VertexNormal>();
+	BaseVertex vertex;
 	
 	public void registerListeners(Viewport[] viewports) {
 		if (mouseListeners != null) {
@@ -83,9 +83,9 @@ public class NormalTool implements JPatchTool {
 				Selection selection = Main.getInstance().getSelection();
 				MouseSelector.Hit hit = MouseSelector.getVertexAt(viewport, e.getX(), e.getY(), true);
 				if (selection.getSelectedVerticesAttribute().contains(hit.object)) {
-					vertex = (Vertex) hit.object;
+					vertex = (BaseVertex) hit.object;
 					vertexPos.clear();
-					for (Vertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
+					for (BaseVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
 						vertexPos.put(vertex, new VertexNormal(vertex));
 					}
 					mouseMotionListener = new MoveNormalMouseMotionListener(viewport, (SdsModel) hit.node, vertex);
@@ -120,7 +120,7 @@ public class NormalTool implements JPatchTool {
 //		Point3d pos = new Point3d();
 //		Point3d limit = new Point3d();
 		
-		MoveNormalMouseMotionListener(Viewport viewport, SdsModel sdsModel, Vertex vertex) {
+		MoveNormalMouseMotionListener(Viewport viewport, SdsModel sdsModel, BaseVertex vertex) {
 			this.viewport = viewport;
 			
 			VertexNormal vertexNormal = vertexPos.get(vertex);
@@ -177,7 +177,7 @@ public class NormalTool implements JPatchTool {
 				factor = (p.z - p0.z) / delta;
 				break;
 			}
-			for (Vertex v : vertexPos.keySet()) {
+			for (BaseVertex v : vertexPos.keySet()) {
 				vertexPos.get(v).setFactor(v, factor);
 			}
 			
@@ -199,13 +199,13 @@ public class NormalTool implements JPatchTool {
 		Point3d pStart = new Point3d();
 		Vector3d pNormal = new Vector3d();
 		
-		VertexNormal(Vertex v) {
+		VertexNormal(BaseVertex v) {
 			v.getPosition(pStart);
 			v.getVertexPoint().getNormal(pNormal);
 			pNormal.normalize();
 		}
 		
-		void setFactor(Vertex v, double f) {
+		void setFactor(BaseVertex v, double f) {
 			v.setPosition(pStart.x + pNormal.x * f, pStart.y + pNormal.y * f, pStart.z + pNormal.z * f);
 		}
 	}

@@ -22,7 +22,7 @@ public class Sds {
 		}
 	}
 	
-	public Face addFace(int level, Vertex... vertices) {
+	public Face addFace(int level, AbstractVertex... vertices) {
 		HalfEdge[] edges = new HalfEdge[vertices.length];
 		for (int i = 0; i < vertices.length; i++) {
 			int j = i + 1;
@@ -60,10 +60,10 @@ public class Sds {
 			HalfEdge[] edges = face.getEdges();
 //			Face[] children = face.getChildren();
 			for (int i = 0; i < edges.length; i++) {
-				Vertex v0 = face.getFacePoint() == null ? face.createFacePoint() : face.getFacePoint();
-				Vertex v1 = edges[i].getPrev().getEdgePoint() == null ? edges[i].getPrev().createEdgePoint() : edges[i].getPrev().getEdgePoint();
-				Vertex v2 = edges[i].getVertex().getVertexPoint() == null ? edges[i].getVertex().createVertexPoint() : edges[i].getVertex().getVertexPoint();
-				Vertex v3 = edges[i].getEdgePoint() == null ? edges[i].createEdgePoint() : edges[i].getEdgePoint();
+				AbstractVertex v0 = face.getFacePoint() == null ? face.createFacePoint() : face.getFacePoint();
+				AbstractVertex v1 = edges[i].getPrev().getEdgePoint() == null ? edges[i].getPrev().createEdgePoint() : edges[i].getPrev().getEdgePoint();
+				AbstractVertex v2 = edges[i].getVertex().getVertexPoint() == null ? edges[i].getVertex().createVertexPoint() : edges[i].getVertex().getVertexPoint();
+				AbstractVertex v3 = edges[i].getEdgePoint() == null ? edges[i].createEdgePoint() : edges[i].getEdgePoint();
 				Face newFace = addFace(currentLevel + 1, v0, v1, v2, v3);
 				newFace.setMaterial(face.getMaterial());
 //				children[i] = newFace;
@@ -80,7 +80,7 @@ public class Sds {
 	 * @param vertex1
 	 * @return
 	 */
-	private HalfEdge getHalfEdge(Vertex vertex0, Vertex vertex1) {
+	private HalfEdge getHalfEdge(AbstractVertex vertex0, AbstractVertex vertex1) {
 		/* check if the HalfEdge (v0->v1) already exists */
 		HalfEdge edge = edgeMap.get(new EdgeKey(vertex0, vertex1));
 		if (edge == null) {
@@ -99,8 +99,8 @@ public class Sds {
 	 * @param halfEdge
 	 */
 	private void addHalfEdge(HalfEdge halfEdge) {
-		Vertex v0 = halfEdge.getVertex();
-		Vertex v1 = halfEdge.getPairVertex();
+		AbstractVertex v0 = halfEdge.getVertex();
+		AbstractVertex v1 = halfEdge.getPairVertex();
 		EdgeKey key = new EdgeKey(v0, v1);
 		EdgeKey pairKey = new EdgeKey(v1, v0);
 		if (edgeMap.containsKey(key) || edgeMap.containsKey(pairKey)) {
@@ -121,8 +121,8 @@ public class Sds {
 		if (halfEdge.getFace() != null || halfEdge.getPairFace() != null) {
 			throw new IllegalStateException("Edge " + halfEdge + " still has faces");
 		}
-		Vertex v0 = halfEdge.getVertex();
-		Vertex v1 = halfEdge.getPairVertex();
+		AbstractVertex v0 = halfEdge.getVertex();
+		AbstractVertex v1 = halfEdge.getPairVertex();
 		EdgeKey key = new EdgeKey(v0, v1);
 		EdgeKey pairKey = new EdgeKey(v1, v0);
 		if (!edgeMap.containsKey(key) || !edgeMap.containsKey(pairKey)) {
@@ -135,11 +135,11 @@ public class Sds {
 	}
 	
 	private static final class EdgeKey {
-		private final Vertex v0;
-		private final Vertex v1;
+		private final AbstractVertex v0;
+		private final AbstractVertex v1;
 		private final int hashCode;
 		
-		private EdgeKey(Vertex v0, Vertex v1) {
+		private EdgeKey(AbstractVertex v0, AbstractVertex v1) {
 			this.v0 = v0;
 			this.v1 = v1;
 			hashCode = (System.identityHashCode(v0) << 1) ^ System.identityHashCode(v1);

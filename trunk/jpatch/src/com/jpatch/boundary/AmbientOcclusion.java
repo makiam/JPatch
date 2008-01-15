@@ -8,18 +8,18 @@ import com.jpatch.entity.sds2.*;
 
 public class AmbientOcclusion {
 	
-	private Map<Vertex, Disk> diskMap;
+	private Map<BaseVertex, Disk> diskMap;
 	
 	public void computeAo(Sds sds, int level) {
 		long time = System.currentTimeMillis();
-		diskMap = new HashMap<Vertex, Disk>();
+		diskMap = new HashMap<BaseVertex, Disk>();
 		Point3d p0 = new Point3d();
 		Point3d p1 = new Point3d();
 		Vector3d vn = new Vector3d();
 		
 		for (Face face : sds.getFaces(level)) {
 			for (HalfEdge edge : face.getEdges()) {
-				Vertex v = edge.getVertex();
+				BaseVertex v = edge.getVertex();
 				if (!diskMap.containsKey(v)) {				
 					double radius = 0;
 					int n = 0;
@@ -40,7 +40,7 @@ public class AmbientOcclusion {
 		System.out.println(disks.length + " disks");
 		{
 			int i = 0;
-			for (Vertex v : diskMap.keySet()) {
+			for (BaseVertex v : diskMap.keySet()) {
 				disks[i++] = diskMap.get(v);
 			}
 		}
@@ -87,7 +87,7 @@ public class AmbientOcclusion {
 		System.out.println((System.currentTimeMillis() - time) + "ms");
 	}
 	
-	public double getOcclusion(Vertex vertex) {
+	public double getOcclusion(BaseVertex vertex) {
 		return diskMap.get(vertex).occlusion;
 //		return vertex.normal.z;
 	}

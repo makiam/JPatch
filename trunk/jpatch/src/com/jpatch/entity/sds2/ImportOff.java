@@ -12,7 +12,7 @@ public class ImportOff {
 		Sds sds = new Sds();
 		Material material = new BasicMaterial(new Color3f(0, 0, 1));
 		
-		List<Vertex> vertexList = new ArrayList<Vertex>();
+		List<BaseVertex> vertexList = new ArrayList<BaseVertex>();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		String[] tokens;
 		String line;
@@ -26,7 +26,7 @@ public class ImportOff {
 		for (int i = 0; i < numVertices; i++) {
 			line = reader.readLine();
 			tokens = line.trim().split("\\s+");
-			Vertex vertex = new Vertex(Double.parseDouble(tokens[0]), Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
+			BaseVertex vertex = new BaseVertex(Double.parseDouble(tokens[0]), Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
 			vertexList.add(vertex);
 		}
 		
@@ -36,7 +36,7 @@ public class ImportOff {
 				continue;
 			}
 			tokens = line.trim().split("\\s+");
-			Vertex[] vertices = new Vertex[Integer.parseInt(tokens[0])];
+			BaseVertex[] vertices = new BaseVertex[Integer.parseInt(tokens[0])];
 			for (int j = 0; j < vertices.length; j++) {
 				vertices[j] = vertexList.get(Integer.parseInt(tokens[j + 1]));
 			}

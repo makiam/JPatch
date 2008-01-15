@@ -163,7 +163,7 @@ public class MoveVertexTool implements VisibleTool {
 					Point hitPoint = new Point(point);
 					SwingUtilities.convertPointToScreen(hitPoint, viewport.getComponent());
 					Main.getInstance().getRobot().mouseMove(hitPoint.x, hitPoint.y);
-					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, point, (SdsModel) hit.node, (Vertex) hit.object);
+					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, point, (SdsModel) hit.node, (BaseVertex) hit.object);
 					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 //					Main.getInstance().setSelectedObject(vertex);
 //				} else if (edge != null) {
@@ -249,7 +249,7 @@ public class MoveVertexTool implements VisibleTool {
 	
 	private static class MoveVertexMouseMotionListener extends MouseMotionAdapter {
 		private final Viewport viewport;
-		private final Vertex vertex;
+		private final BaseVertex vertex;
 		private Point point;
 		private final Point3d pStart = new Point3d();
 		private final Point3d limitStart = new Point3d();
@@ -263,7 +263,7 @@ public class MoveVertexTool implements VisibleTool {
 //		Point3d pos = new Point3d();
 //		Point3d limit = new Point3d();
 		
-		MoveVertexMouseMotionListener(Viewport viewport, Point point, SdsModel sdsModel, Vertex vertex) {
+		MoveVertexMouseMotionListener(Viewport viewport, Point point, SdsModel sdsModel, BaseVertex vertex) {
 			this.point = new Point(point);
 			this.viewport = viewport;
 			this.vertex = vertex;

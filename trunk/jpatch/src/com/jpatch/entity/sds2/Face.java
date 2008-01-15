@@ -61,41 +61,41 @@ public class Face {
 //	}
 	
 	public void fillArrayLimit(FloatBuffer buffer) {
-		facePoint.validateLimit();
+		facePoint.validateAlteredLimit();
 		buffer.clear();
-		buffer.put((float) facePoint.normal.x);
-		buffer.put((float) facePoint.normal.y);
-		buffer.put((float) facePoint.normal.z);
-		buffer.put((float) facePoint.limit.x);
-		buffer.put((float) facePoint.limit.y);
-		buffer.put((float) facePoint.limit.z);
+		buffer.put((float) facePoint.alteredNormal.x);
+		buffer.put((float) facePoint.alteredNormal.y);
+		buffer.put((float) facePoint.alteredNormal.z);
+		buffer.put((float) facePoint.alteredLimit.x);
+		buffer.put((float) facePoint.alteredLimit.y);
+		buffer.put((float) facePoint.alteredLimit.z);
 		
 		for (com.jpatch.entity.sds2.HalfEdge edge : edges) {
 			DerivedVertex v = edge.getVertex().getVertexPoint();
-			v.validateLimit();
-			buffer.put((float) v.normal.x);
-			buffer.put((float) v.normal.y);
-			buffer.put((float) v.normal.z);
-			buffer.put((float) v.limit.x);
-			buffer.put((float) v.limit.y);
-			buffer.put((float) v.limit.z);
+			v.validateAlteredLimit();
+			buffer.put((float) v.alteredNormal.x);
+			buffer.put((float) v.alteredNormal.y);
+			buffer.put((float) v.alteredNormal.z);
+			buffer.put((float) v.alteredLimit.x);
+			buffer.put((float) v.alteredLimit.y);
+			buffer.put((float) v.alteredLimit.z);
 			
 			v = edge.getEdgePoint();
-			v.validateLimit();
-			buffer.put((float) v.normal.x);
-			buffer.put((float) v.normal.y);
-			buffer.put((float) v.normal.z);
-			buffer.put((float) v.limit.x);
-			buffer.put((float) v.limit.y);
-			buffer.put((float) v.limit.z);
+			v.validateAlteredLimit();
+			buffer.put((float) v.alteredNormal.x);
+			buffer.put((float) v.alteredNormal.y);
+			buffer.put((float) v.alteredNormal.z);
+			buffer.put((float) v.alteredLimit.x);
+			buffer.put((float) v.alteredLimit.y);
+			buffer.put((float) v.alteredLimit.z);
 		}
 		DerivedVertex v = edges[0].getVertex().getVertexPoint();
-		buffer.put((float) v.normal.x);
-		buffer.put((float) v.normal.y);
-		buffer.put((float) v.normal.z);
-		buffer.put((float) v.limit.x);
-		buffer.put((float) v.limit.y);
-		buffer.put((float) v.limit.z);
+		buffer.put((float) v.alteredNormal.x);
+		buffer.put((float) v.alteredNormal.y);
+		buffer.put((float) v.alteredNormal.z);
+		buffer.put((float) v.alteredLimit.x);
+		buffer.put((float) v.alteredLimit.y);
+		buffer.put((float) v.alteredLimit.z);
 		buffer.rewind();
 	}
 	
@@ -110,7 +110,7 @@ public class Face {
 		buffer.put((float) facePoint.position.z);
 		
 		for (com.jpatch.entity.sds2.HalfEdge edge : edges) {
-			Vertex v = edge.getVertex();
+			AbstractVertex v = edge.getVertex();
 			DerivedVertex lv = v.getVertexPoint();
 			v.validatePosition();
 			buffer.put((float) lv.normal.x);
@@ -120,7 +120,7 @@ public class Face {
 			buffer.put((float) v.position.y);
 			buffer.put((float) v.position.z);
 		}
-		Vertex v = edges[0].getVertex();
+		AbstractVertex v = edges[0].getVertex();
 		DerivedVertex lv = v.getVertexPoint();
 		buffer.put((float) lv.normal.x);
 		buffer.put((float) lv.normal.y);
@@ -141,6 +141,21 @@ public class Face {
 			}
 			if (edge.getEdgePoint() != null) {
 				edge.getEdgePoint().invalidate();
+			}
+		}
+		invalidateAltered();
+	}
+	
+	public void invalidateAltered() {
+		if (facePoint != null) {
+			facePoint.invalidateAltered();
+		}
+		for (HalfEdge edge : edges) {
+			if (edge.getVertex().getVertexPoint() != null) {
+				edge.getVertex().getVertexPoint().invalidateAltered();
+			}
+			if (edge.getEdgePoint() != null) {
+				edge.getEdgePoint().invalidateAltered();
 			}
 		}
 	}
@@ -183,12 +198,12 @@ public class Face {
 				double vx = 0, vy = 0, vz = 0;
 				for (int i = 0; i < sides; i++) {
 					HalfEdge edge = edges[i];
-					Vertex cp = edge.getVertex().getVertexPoint();
+					DerivedVertex cp = edge.getVertex().getVertexPoint();
 					cp.validatePosition();
 					cx += cp.position.x;
 					cy += cp.position.y;
 					cz += cp.position.z;
-					Vertex ep = edge.getEdgePoint();
+					DerivedVertex ep = edge.getEdgePoint();
 					ep.validatePosition();
 					ex += ep.position.x;
 					ey += ep.position.y;
@@ -210,7 +225,63 @@ public class Face {
 				);
 				uTangent.set(ux, uy, uz);
 				vTangent.set(vx, vy, vz);
-				normal.cross(uTangent, vTangent);
+				computeMatrix();
+//				normal.set(0,0,0);
+			}
+			
+			@Override
+			protected void computeAlteredLimit() {
+				if (true) {
+					alteredLimit.set(limit);
+					alteredNormal.set(normal);
+					return;
+				}
+				validateAlteredPosition();
+				
+				final int sides = edges.length;
+				
+				final double limitCornerWeight = LIMIT_CORNER_WEIGHTS[sides];
+				final double limitEdgeWeight = LIMIT_EDGE_WEIGHTS[sides];
+				final double limitCenterWeight = LIMIT_CENTER_WEIGHTS[sides];
+				
+				final double[] tangentCornerWeights = TANGENT_CORNER_WEIGHTS[sides];
+				final double[] tangentEdgeWeights = TANGENT_EDGE_WEIGHTS[sides];
+				
+				double cx = 0, cy = 0, cz = 0;
+				double ex = 0, ey = 0, ez = 0;
+				double ux = 0, uy = 0, uz = 0;
+				double vx = 0, vy = 0, vz = 0;
+				for (int i = 0; i < sides; i++) {
+					HalfEdge edge = edges[i];
+					DerivedVertex cp = edge.getVertex().getVertexPoint();
+					cp.validateAlteredPosition();
+					cx += cp.alteredPosition.x;
+					cy += cp.alteredPosition.y;
+					cz += cp.alteredPosition.z;
+					DerivedVertex ep = edge.getEdgePoint();
+					ep.validateAlteredPosition();
+					ex += ep.alteredPosition.x;
+					ey += ep.alteredPosition.y;
+					ez += ep.alteredPosition.z;
+					
+					ux += cp.alteredPosition.x * tangentCornerWeights[i] + ep.alteredPosition.x * tangentEdgeWeights[i];
+					uy += cp.alteredPosition.y * tangentCornerWeights[i] + ep.alteredPosition.y * tangentEdgeWeights[i];
+					uz += cp.alteredPosition.z * tangentCornerWeights[i] + ep.alteredPosition.z * tangentEdgeWeights[i];
+					
+					int j = (i > 0) ? i - 1 : sides - 1;		
+					vx += cp.alteredPosition.x * tangentCornerWeights[j] + ep.alteredPosition.x * tangentEdgeWeights[j];
+					vy += cp.alteredPosition.y * tangentCornerWeights[j] + ep.alteredPosition.y * tangentEdgeWeights[j];
+					vz += cp.alteredPosition.z * tangentCornerWeights[j] + ep.alteredPosition.z * tangentEdgeWeights[j];				
+				}
+				alteredLimit.set(
+						cx * limitCornerWeight + ex * limitEdgeWeight + alteredPosition.x * limitCenterWeight,
+						cy * limitCornerWeight + ey * limitEdgeWeight + alteredPosition.y * limitCenterWeight,
+						cz * limitCornerWeight + ez * limitEdgeWeight + alteredPosition.z * limitCenterWeight
+				);
+				uTangent.set(ux, uy, uz);
+				vTangent.set(vx, vy, vz);
+				alteredNormal.cross(uTangent, vTangent);
+				alteredNormal.normalize();
 //				normal.set(0,0,0);
 			}
 			
