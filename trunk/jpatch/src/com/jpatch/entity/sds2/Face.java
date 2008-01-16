@@ -172,8 +172,8 @@ public class Face {
 				double x = 0, y = 0, z = 0;
 				for (HalfEdge edge : faceEdges) {
 //					System.out.println(edge.getVertex());
-					edge.getVertex().validatePosition();
-					Point3d p = edge.getVertex().position;
+					edge.getVertex().validateAlteredPosition();
+					Point3d p = edge.getVertex().alteredPosition;
 					x += p.x;
 					y += p.y;
 					z += p.z;

@@ -80,8 +80,10 @@ public class HalfEdge {
 
 			@Override
 			protected void computePosition() {
-				Point3d e0 = vertex.position;
-				Point3d e1 = pair.vertex.position;
+				vertex.validateAlteredPosition();
+				pair.vertex.validateAlteredPosition();
+				Point3d e0 = vertex.alteredPosition;
+				Point3d e1 = pair.vertex.alteredPosition;
 				switch (boundaryType) {
 				case REGULAR:
 					face.getFacePoint().validatePosition();
@@ -266,6 +268,9 @@ public class HalfEdge {
 				default:
 					assert false;	// should never get here
 				}
+//				System.out.println(this + ".alteredLimit = " + alteredLimit);
+//				alteredLimit.set(limit);
+//				alteredNormal.set(normal);
 //				System.out.println("    alteredLimit = " + alteredLimit);
 			}
 			
