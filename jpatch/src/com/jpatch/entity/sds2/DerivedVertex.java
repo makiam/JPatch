@@ -3,7 +3,6 @@ package com.jpatch.entity.sds2;
 import javax.vecmath.*;
 
 public abstract class DerivedVertex extends AbstractVertex {
-	protected final Point3d alteredPosition = new Point3d();
 	protected final Point3d alteredLimit = new Point3d();
 	protected final Vector3d alteredNormal = new Vector3d();
 	protected final Point3d limit = new Point3d();
@@ -16,6 +15,10 @@ public abstract class DerivedVertex extends AbstractVertex {
 	private boolean limitValid;
 	private boolean alteredPositionValid;
 	private boolean alteredLimitValid;
+	
+	public DerivedVertex() {
+		super(new Point3d());
+	}
 	
 	public void getLimit(Tuple3f tuple) {
 		validateLimit();
@@ -62,7 +65,7 @@ public abstract class DerivedVertex extends AbstractVertex {
 	public final void validatePosition() {
 		super.validatePosition();
 		if (positionValid) {
-//			return;
+			return;
 		}
 		computePosition();
 		positionValid = true;
@@ -73,7 +76,7 @@ public abstract class DerivedVertex extends AbstractVertex {
 	 */
 	public final void validateAlteredPosition() {
 		if (alteredPositionValid) {
-//			return;
+			return;
 		}
 		computeAlteredPosition();
 		alteredPositionValid = true;
@@ -85,19 +88,21 @@ public abstract class DerivedVertex extends AbstractVertex {
 	public final void validateLimit() {
 		super.validateLimit();
 		if (limitValid) {
-//			return;
+			return;
 		}
 		computeLimit();
-		alteredLimitValid = true;
+		limitValid = true;
 	}
 	
 	/**
 	 * Computes the limit, tangents and normal of this DerivedVertex
 	 */
 	public final void validateAlteredLimit() {
+//		System.out.println(this + ".validateAlteredLimit(), alteredLimitValid = " + alteredLimitValid);
 		if (alteredLimitValid) {
-//			return;
+			return;
 		}
+//		System.out.println("   calling computeAlteredLimit()");
 		computeAlteredLimit();
 		alteredLimitValid = true;
 	}
@@ -111,10 +116,12 @@ public abstract class DerivedVertex extends AbstractVertex {
 	
 	@Override
 	public final void invalidateAltered() {
+//		System.out.println("DerivedVertex.invalidateAltered() called on object " + this);
 		super.invalidateAltered();
 		alteredPositionValid = false;
 		alteredLimitValid = false;
-		System.out.println(this + " invalidateAltered()");
+//		System.out.println("    " + this + ".alteredLimitValid = " + alteredLimitValid);
+//		System.out.println(this + " invalidateAltered()");
 	}
 	
 	protected void computeMatrix() {
