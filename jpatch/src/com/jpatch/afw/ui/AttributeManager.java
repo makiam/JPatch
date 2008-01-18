@@ -292,6 +292,8 @@ public class AttributeManager {
 	public JTextField bindTextFieldToAttribute(Object entity, final JTextField textField, ScalarAttribute attribute) {
 		if (attribute instanceof DoubleAttr) {
 			return bindTextFieldToAttribute(entity, textField, (DoubleAttr) attribute);
+		} else if (attribute instanceof IntAttr) {
+			return bindTextFieldToAttribute(entity, textField, (IntAttr) attribute);
 		} else if (attribute instanceof GenericAttr) {
 			return bindTextFieldToAttribute(entity, textField, (GenericAttr<String>) attribute);
 		} else {
@@ -446,6 +448,61 @@ public class AttributeManager {
 		
 		/* bind attribute and attrListener to component */
 		bind(textField, new AttributeBinding(doubleAttr, listener));						// throws IllegalStateException if already bound
+		
+		
+		/* add a FocusListener to verify and update the attribute value on focus loss */
+		addListener(textField, listener);
+		
+		/* add the TRANSFER_FOCUS_ACTIONLISTENER (which simply transfers the focus when the user presses enter over the TextField */
+		addListener(textField, TRANSFER_FOCUS_ACTIONLISTENER);
+		
+		return textField;
+	}
+	
+	
+	private JTextField bindTextFieldToAttribute(final Object entity, final JTextField textField, final IntAttr intAttr) {
+		textField.setColumns(COLUMNS);
+		textField.setHorizontalAlignment(SwingConstants.RIGHT);
+//		textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
+		
+		
+		
+		class SuperListener extends FocusAdapter implements FocusListener, AttributePostChangeListener {
+			private boolean suppressAction = false;
+
+			public void focusLost(FocusEvent e) {
+				if (!suppressAction) {
+					suppressAction = true;
+					try {
+						double value = Double.parseDouble(textField.getText());
+						if (value != intAttr.getInt()) {
+							intAttr.setInt(Integer.parseInt(textField.getText()));
+							textField.setBackground(textField.isEnabled() ? UIManager.getColor("TextField.background") : UIManager.getColor("TextField.inactiveBackground"));
+							textField.setText(DOUBLE_FORMAT.format(intAttr.getInt()));
+							fireActionPerformed(entity, intAttr);
+						}
+					} catch (NumberFormatException exception) {
+						textField.setBackground(Color.YELLOW);
+						textField.requestFocus();
+					} finally {
+						suppressAction = false;
+					}
+				}
+			}
+			
+			public void attributeHasChanged(Attribute source) {
+				if (!suppressAction) {
+					suppressAction = true;
+					textField.setText(DOUBLE_FORMAT.format(intAttr.getInt()));
+					suppressAction = false;
+				}
+			}
+		}
+		
+		SuperListener listener = new SuperListener();
+		
+		/* bind attribute and attrListener to component */
+		bind(textField, new AttributeBinding(intAttr, listener));						// throws IllegalStateException if already bound
 		
 		
 		/* add a FocusListener to verify and update the attribute value on focus loss */

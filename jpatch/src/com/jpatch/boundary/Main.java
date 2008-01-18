@@ -76,6 +76,7 @@ public class Main {
 	final DefaultTreeModel treeModel = new DefaultTreeModel(new DefaultMutableTreeNode("TREE ROOT"));
 	final TreeManager treeManager = new TreeManager(treeModel);
 	
+	
 	private Robot robot;
 	private JFrame frame;
 	private JLabel statusLabel = new JLabel("status");
@@ -99,6 +100,8 @@ public class Main {
 	private JPatchTool visibleTool = null;
 	
 	private final SelectionManager selectionManager;
+	
+	
 	
 	private SceneGraphNode sceneGraphRoot = new SceneGraphNode() {
 //		@Override
@@ -871,7 +874,9 @@ public class Main {
 	public void setModel(Sds sds) {
 		sds.createNextLevel(0);
 		sds.createNextLevel(1);
-//		sds.createNextLevel(2);
+		sds.createNextLevel(2);
+		sds.createNextLevel(3);
+
 		sds.sortFaces();
 		SdsModel model = new SdsModel(sds);
 		treeManager.createTreeNodeFor(model);
@@ -986,6 +991,8 @@ public class Main {
 //	public void setSelection(Selection selection) {
 //		this.selection = selection;
 //	}
+
+	
 	
 	
 }

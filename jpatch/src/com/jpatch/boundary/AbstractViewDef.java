@@ -1,7 +1,6 @@
 package com.jpatch.boundary;
 
-import com.jpatch.afw.attributes.BooleanAttr;
-import com.jpatch.afw.attributes.StateMachine;
+import com.jpatch.afw.attributes.*;
 
 public abstract class AbstractViewDef implements ViewDef {
 	protected final Viewport viewport;
@@ -38,4 +37,7 @@ public abstract class AbstractViewDef implements ViewDef {
 		return viewport.getViewDirectionAttribute();
 	}
 
+	public IntAttr getEditLevelAttribute() {
+		return Globals.getInstance().getEditLevelAttribute();
+	}
 }

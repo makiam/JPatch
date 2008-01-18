@@ -24,8 +24,8 @@ public class AbstractVertex {
 	
 	protected final Tuple3Attr positionAttr = new Tuple3Attr();
 	
-	protected boolean invalid = true;
-	protected boolean alteredInvalid = true;
+	private boolean invalid = true;
+//	protected boolean alteredInvalid = true;
 	
 	public AbstractVertex() {
 		alteredPosition = position;
@@ -51,15 +51,15 @@ public class AbstractVertex {
 	
 	public void setPosition(Tuple3d position) {
 		positionAttr.setTuple(position);
-		invalid = true;
-		alteredInvalid = true;
+//		invalid = true;
+//		alteredInvalid = true;
 		invalidate();
 	}
 	
 	public void setPosition(double x, double y, double z) {
 		positionAttr.setTuple(x, y, z);
-		invalid = true;
-		alteredInvalid = true;
+//		invalid = true;
+//		alteredInvalid = true;
 		invalidate();
 	}
 	
@@ -128,7 +128,8 @@ public class AbstractVertex {
 					break;
 				default:
 					assert false;	// should never get here
-				}		
+				}
+//				System.out.println(this + " position=" + position);
 			}
 			
 			@Override
@@ -171,9 +172,9 @@ public class AbstractVertex {
 						vz += cp.position.z * tangentCornerWeights[j] + ep.position.z * tangentEdgeWeights[j];	
 					}
 					limit.set(
-							cx * limitCornerWeight + ex * limitEdgeWeight + alteredPosition.x * limitCenterWeight,
-							cy * limitCornerWeight + ey * limitEdgeWeight + alteredPosition.y * limitCenterWeight,
-							cz * limitCornerWeight + ez * limitEdgeWeight + alteredPosition.z * limitCenterWeight
+							cx * limitCornerWeight + ex * limitEdgeWeight + position.x * limitCenterWeight,
+							cy * limitCornerWeight + ey * limitEdgeWeight + position.y * limitCenterWeight,
+							cz * limitCornerWeight + ez * limitEdgeWeight + position.z * limitCenterWeight
 					);
 					uTangent.set(ux, uy, uz);
 					vTangent.set(vx, vy, vz);
@@ -197,7 +198,8 @@ public class AbstractVertex {
 					break;
 				default:
 					assert false;	// should never get here
-				}				
+				}
+//				System.out.println(this + " limit=" + limit);
 			}
 			
 			/**
@@ -275,9 +277,9 @@ public class AbstractVertex {
 						vz += cp.alteredPosition.z * tangentCornerWeights[j] + ep.alteredPosition.z * tangentEdgeWeights[j];	
 					}
 					alteredLimit.set(
-							cx * limitCornerWeight + ex * limitEdgeWeight + alteredLimit.x * limitCenterWeight,
-							cy * limitCornerWeight + ey * limitEdgeWeight + alteredLimit.y * limitCenterWeight,
-							cz * limitCornerWeight + ez * limitEdgeWeight + alteredLimit.z * limitCenterWeight
+							cx * limitCornerWeight + ex * limitEdgeWeight + alteredPosition.x * limitCenterWeight,
+							cy * limitCornerWeight + ey * limitEdgeWeight + alteredPosition.y * limitCenterWeight,
+							cz * limitCornerWeight + ez * limitEdgeWeight + alteredPosition.z * limitCenterWeight
 					);
 					uTangent.set(ux, uy, uz);
 					vTangent.set(vx, vy, vz);
@@ -339,32 +341,36 @@ public class AbstractVertex {
 	}
 	
 	public void validateAlteredPosition() {
-		validatePosition();
+		invalid = false;
+	}
+	
+	public void validateAlteredLimit() {
+		invalid = false;
 	}
 	
 	public void invalidate() {
-		if (true || invalid) {
+		if (!invalid) {
 			for (HalfEdge edge : vertexEdges) {
 				if (edge.getFace() != null) {
 					edge.getFace().invalidate();
 				}
 			}
-			invalid = false;
+			invalid = true;
 		}
-		invalidateAltered();
+//		invalidateAltered();
 	}
 	
-	public void invalidateAltered() {
-//		System.out.println("AbstractVertex.invalidateAltered() called on object " + this);
-		if (true || alteredInvalid) {
-			for (HalfEdge edge : vertexEdges) {
-				if (edge.getFace() != null) {
-					edge.getFace().invalidateAltered();
-				}
-			}
-			alteredInvalid = false;
-		}
-	}
+//	public void invalidateAltered() {
+////		System.out.println("AbstractVertex.invalidateAltered() called on object " + this);
+//		if (!alteredInvalid) {
+//			for (HalfEdge edge : vertexEdges) {
+//				if (edge.getFace() != null) {
+//					edge.getFace().invalidateAltered();
+//				}
+//			}
+//			alteredInvalid = true;
+//		}
+//	}
 	
 	/**
 	 * Adds the specified HalfEdge to this vertex

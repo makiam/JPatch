@@ -163,7 +163,7 @@ public class MoveVertexTool implements VisibleTool {
 					Point hitPoint = new Point(point);
 					SwingUtilities.convertPointToScreen(hitPoint, viewport.getComponent());
 					Main.getInstance().getRobot().mouseMove(hitPoint.x, hitPoint.y);
-					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, point, (SdsModel) hit.node, (BaseVertex) hit.object);
+					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, point, (SdsModel) hit.node, (AbstractVertex) hit.object);
 					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 //					Main.getInstance().setSelectedObject(vertex);
 //				} else if (edge != null) {
@@ -249,7 +249,7 @@ public class MoveVertexTool implements VisibleTool {
 	
 	private static class MoveVertexMouseMotionListener extends MouseMotionAdapter {
 		private final Viewport viewport;
-		private final BaseVertex vertex;
+		private final AbstractVertex vertex;
 		private Point point;
 		private final Point3d pStart = new Point3d();
 		private final Point3d limitStart = new Point3d();
@@ -263,7 +263,7 @@ public class MoveVertexTool implements VisibleTool {
 //		Point3d pos = new Point3d();
 //		Point3d limit = new Point3d();
 		
-		MoveVertexMouseMotionListener(Viewport viewport, Point point, SdsModel sdsModel, BaseVertex vertex) {
+		MoveVertexMouseMotionListener(Viewport viewport, Point point, SdsModel sdsModel, AbstractVertex vertex) {
 			this.point = new Point(point);
 			this.viewport = viewport;
 			this.vertex = vertex;
@@ -305,13 +305,13 @@ public class MoveVertexTool implements VisibleTool {
 				point = null;
 				return;
 			}
-			System.out.println(point + " " + e.getX() + "," + e.getY());
+//			System.out.println(point + " " + e.getX() + "," + e.getY());
 			p.x = e.getX();
 			p.y = e.getY();
 			p.z = z;
 //			System.out.println("Pscreen =" + p);
 //			System.out.print("screen=" + p + " local=");
-			transformUtil.projectFromScreen(transformUtil.LOCAL, p, p);
+			transformUtil.projectFromScreen(TransformUtil.LOCAL, p, p);
 			
 			
 			if (useLimit) {
