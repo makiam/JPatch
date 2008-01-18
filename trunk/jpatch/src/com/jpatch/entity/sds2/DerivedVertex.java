@@ -1,23 +1,37 @@
 package com.jpatch.entity.sds2;
 
+import com.jpatch.afw.attributes.*;
+
 import javax.vecmath.*;
 
 public abstract class DerivedVertex extends AbstractVertex {
+	private final Point3d hierarchyPos = new Point3d();
+	protected final Point3d limit = new Point3d();
+	protected final Vector3d normal = new Vector3d();
 	protected final Point3d alteredLimit = new Point3d();
 	protected final Vector3d alteredNormal = new Vector3d();
-	protected final Point3d limit = new Point3d();
 	protected final Matrix3d matrix = new Matrix3d();
 	protected final Matrix3d invMatrix = new Matrix3d();
 	protected final Vector3d uTangent = new Vector3d();
 	protected final Vector3d vTangent = new Vector3d();
-	protected final Vector3d normal = new Vector3d();
 	private boolean positionValid;
 	private boolean limitValid;
 	private boolean alteredPositionValid;
 	private boolean alteredLimitValid;
 	
 	public DerivedVertex() {
+//		super();
 		super(new Point3d());
+		positionAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+//				validatePosition();
+				positionAttr.getTuple(hierarchyPos);
+				
+				hierarchyPos.sub(position);
+				invMatrix.transform(hierarchyPos);
+//				hierarchyPos.set(0, 0, 0);
+			}
+		});
 	}
 	
 	public void getLimit(Tuple3f tuple) {
@@ -56,7 +70,7 @@ public abstract class DerivedVertex extends AbstractVertex {
 	}
 	
 	public void setPosition(double x, double y, double z) {
-		positionAttr.setTuple(x, y, z);
+		positionAttr.setTuple(position);
 		invalidate();
 	}
 	/**
@@ -71,12 +85,13 @@ public abstract class DerivedVertex extends AbstractVertex {
 		positionValid = true;
 	}
 	
-	/**
-	 * Computes the position of this DerivedVertex
-	 */
+//	/**
+//	 * Computes the position of this DerivedVertex
+//	 */
 	public final void validateAlteredPosition() {
+		super.validateAlteredPosition();
 		if (alteredPositionValid) {
-//			return;
+			return;
 		}
 		computeAlteredPosition();
 		alteredPositionValid = true;
@@ -98,13 +113,17 @@ public abstract class DerivedVertex extends AbstractVertex {
 	 * Computes the limit, tangents and normal of this DerivedVertex
 	 */
 	public final void validateAlteredLimit() {
+//		if (true) throw new UnsupportedOperationException();
+//		invalid = false;
 //		System.out.println(this + ".validateAlteredLimit(), alteredLimitValid = " + alteredLimitValid);
+		super.validateAlteredLimit();
 		if (alteredLimitValid) {
 			return;
 		}
 //		System.out.println("   calling computeAlteredLimit()");
 		computeAlteredLimit();
 		alteredLimitValid = true;
+		
 	}
 	
 	@Override
@@ -112,17 +131,19 @@ public abstract class DerivedVertex extends AbstractVertex {
 		super.invalidate();
 		positionValid = false;
 		limitValid = false;
-	}
-	
-	@Override
-	public final void invalidateAltered() {
-//		System.out.println("DerivedVertex.invalidateAltered() called on object " + this);
-		super.invalidateAltered();
 		alteredPositionValid = false;
 		alteredLimitValid = false;
-//		System.out.println("    " + this + ".alteredLimitValid = " + alteredLimitValid);
-//		System.out.println(this + " invalidateAltered()");
 	}
+	
+//	@Override
+//	public final void invalidateAltered() {
+////		System.out.println("DerivedVertex.invalidateAltered() called on object " + this);
+//		super.invalidateAltered();
+//		alteredPositionValid = false;
+//		alteredLimitValid = false;
+////		System.out.println("    " + this + ".alteredLimitValid = " + alteredLimitValid);
+////		System.out.println(this + " invalidateAltered()");
+//	}
 	
 	protected void computeMatrix() {
 		normal.cross(uTangent, vTangent);
@@ -136,14 +157,12 @@ public abstract class DerivedVertex extends AbstractVertex {
 	
 	protected abstract void computePosition();
 	protected abstract void computeLimit();
+
 	protected void computeAlteredPosition() {
-//		System.out.println("computeAlteredPosition()");
 		validateLimit();
-//		System.out.println("    position = " + position);
-		positionAttr.getTuple(alteredPosition);
+		alteredPosition.set(hierarchyPos);
 		matrix.transform(alteredPosition);
 		alteredPosition.add(position);
-//		System.out.println("    alteredPosition = " + alteredPosition);
 	}
 	
 	protected abstract void computeAlteredLimit();

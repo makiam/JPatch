@@ -714,7 +714,7 @@ public class ViewportGl extends Viewport {
 		
 		drawOrigin();
 		if (node instanceof SdsModel) {
-			drawSds2(((SdsModel) node).getSds(), 2);
+			drawSds2(((SdsModel) node).getSds(), 4);
 		}
 		if (node instanceof Bone) {
 			Bone bone = (Bone) node;
@@ -1139,7 +1139,7 @@ public class ViewportGl extends Viewport {
 		if (viewDef.getShowControlMeshAttribute().getBoolean()) {
 			gl.glDisable(GL_COLOR_MATERIAL);
 			gl.glDisable(GL_LIGHTING);
-			for (com.jpatch.entity.sds2.Face face : sds.getFaces(0)) {
+			for (com.jpatch.entity.sds2.Face face : sds.getFaces(Globals.getInstance().getEditLevelAttribute().getInt())) {
 				face.fillArrayPosition(buffer);
 				gl.glColor3f(1, 1, 1);
 				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides());

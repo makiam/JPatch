@@ -1,8 +1,6 @@
 package com.jpatch.boundary;
 
-import com.jpatch.afw.attributes.DoubleAttr;
-import com.jpatch.afw.attributes.Tuple2Attr;
-import com.jpatch.afw.attributes.Tuple3Attr;
+import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.vecmath.TransformUtil;
 import com.jpatch.entity.Perspective;
 
@@ -64,4 +62,6 @@ public class PerspectiveViewDef extends AbstractViewDef {
 		transformUtil.setViewportDimension(viewport.getComponent().getWidth(), viewport.getComponent().getHeight());
 		transformUtil.setCameraScale(1);
 	}
+	
+	
 }

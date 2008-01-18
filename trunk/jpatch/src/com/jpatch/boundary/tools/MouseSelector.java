@@ -54,7 +54,7 @@ public class MouseSelector {
 //		System.out.println("getVertexAt(" + x + ", " + y + ")");
 		viewDef.configureTransformUtil(transformUtil);
 		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
-		for (Face face : sdsModel.getSds().getFaces(0)) {
+		for (Face face : sdsModel.getSds().getFaces(Globals.getInstance().getEditLevelAttribute().getInt())) {
 			for (HalfEdge edge : face.getEdges()) {
 				AbstractVertex vertex = edge.getVertex();
 				if (useProjection) {
@@ -102,7 +102,7 @@ public class MouseSelector {
 		
 		Point3d p = new Point3d();
 		boolean useProjection = !viewport.getViewDef().getShowControlMeshAttribute().getBoolean();
-		for (Face face : sdsModel.getSds().getFaces(0)) {
+		for (Face face : sdsModel.getSds().getFaces(Globals.getInstance().getEditLevelAttribute().getInt())) {
 			for (HalfEdge edge : face.getEdges()) {
 				AbstractVertex vertex = edge.getVertex();
 				if (useProjection) {

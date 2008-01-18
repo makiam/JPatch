@@ -11,4 +11,5 @@ public interface ViewDef {
 	public StateMachine<ViewDirection> getViewDirectionAttribute();
 	public Viewport getViewport();
 	public void configureTransformUtil(TransformUtil transformUtil);
+	public IntAttr getEditLevelAttribute();
 }
