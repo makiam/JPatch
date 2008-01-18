@@ -339,7 +339,7 @@ public class AbstractVertex {
 	}
 	
 	public void validateAlteredPosition() {
-		
+		validatePosition();
 	}
 	
 	public void invalidate() {
