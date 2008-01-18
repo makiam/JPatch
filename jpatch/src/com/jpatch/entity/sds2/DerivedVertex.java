@@ -76,7 +76,7 @@ public abstract class DerivedVertex extends AbstractVertex {
 	 */
 	public final void validateAlteredPosition() {
 		if (alteredPositionValid) {
-			return;
+//			return;
 		}
 		computeAlteredPosition();
 		alteredPositionValid = true;

@@ -61,46 +61,76 @@ public class Face {
 //	}
 	
 	public void fillArrayLimit(FloatBuffer buffer) {
-		facePoint.validateAlteredLimit();
+//		facePoint.validateAlteredLimit();
+//		buffer.clear();
+//		buffer.put((float) facePoint.alteredNormal.x);
+//		buffer.put((float) facePoint.alteredNormal.y);
+//		buffer.put((float) facePoint.alteredNormal.z);
+//		buffer.put((float) facePoint.alteredLimit.x);
+//		buffer.put((float) facePoint.alteredLimit.y);
+//		buffer.put((float) facePoint.alteredLimit.z);	
+//		for (com.jpatch.entity.sds2.HalfEdge edge : faceEdges) {
+//			DerivedVertex v = edge.getVertex().getVertexPoint();
+//			v.validateAlteredLimit();
+//			buffer.put((float) v.alteredNormal.x);
+//			buffer.put((float) v.alteredNormal.y);
+//			buffer.put((float) v.alteredNormal.z);
+//			buffer.put((float) v.alteredLimit.x);
+//			buffer.put((float) v.alteredLimit.y);
+//			buffer.put((float) v.alteredLimit.z);
+//			
+//			v = edge.getEdgePoint();
+//			v.validateAlteredLimit();
+//			buffer.put((float) v.alteredNormal.x);
+//			buffer.put((float) v.alteredNormal.y);
+//			buffer.put((float) v.alteredNormal.z);
+//			buffer.put((float) v.alteredLimit.x);
+//			buffer.put((float) v.alteredLimit.y);
+//			buffer.put((float) v.alteredLimit.z);
+//		}
+//		DerivedVertex v = faceEdges[0].getVertex().getVertexPoint();
+//		buffer.put((float) v.alteredNormal.x);
+//		buffer.put((float) v.alteredNormal.y);
+//		buffer.put((float) v.alteredNormal.z);
+//		buffer.put((float) v.alteredLimit.x);
+//		buffer.put((float) v.alteredLimit.y);
+//		buffer.put((float) v.alteredLimit.z);
+//		buffer.rewind();
+		facePoint.validateLimit();
 		buffer.clear();
-		buffer.put((float) facePoint.alteredNormal.x);
-		buffer.put((float) facePoint.alteredNormal.y);
-		buffer.put((float) facePoint.alteredNormal.z);
+		buffer.put((float) facePoint.normal.x);
+		buffer.put((float) facePoint.normal.y);
+		buffer.put((float) facePoint.normal.z);
 		buffer.put((float) facePoint.alteredLimit.x);
 		buffer.put((float) facePoint.alteredLimit.y);
-		buffer.put((float) facePoint.alteredLimit.z);
-		
+		buffer.put((float) facePoint.alteredLimit.z);	
 		for (com.jpatch.entity.sds2.HalfEdge edge : faceEdges) {
 			DerivedVertex v = edge.getVertex().getVertexPoint();
 			v.validateAlteredLimit();
-			buffer.put((float) v.alteredNormal.x);
-			buffer.put((float) v.alteredNormal.y);
-			buffer.put((float) v.alteredNormal.z);
-			buffer.put((float) v.alteredLimit.x);
-			buffer.put((float) v.alteredLimit.y);
-			buffer.put((float) v.alteredLimit.z);
+			buffer.put((float) v.normal.x);
+			buffer.put((float) v.normal.y);
+			buffer.put((float) v.normal.z);
+			buffer.put((float) v.limit.x);
+			buffer.put((float) v.limit.y);
+			buffer.put((float) v.limit.z);
 			
 			v = edge.getEdgePoint();
 			v.validateAlteredLimit();
-			buffer.put((float) v.alteredNormal.x);
-			buffer.put((float) v.alteredNormal.y);
-			buffer.put((float) v.alteredNormal.z);
-			buffer.put((float) v.alteredLimit.x);
-			buffer.put((float) v.alteredLimit.y);
-			buffer.put((float) v.alteredLimit.z);
+			buffer.put((float) v.normal.x);
+			buffer.put((float) v.normal.y);
+			buffer.put((float) v.normal.z);
+			buffer.put((float) v.limit.x);
+			buffer.put((float) v.limit.y);
+			buffer.put((float) v.limit.z);
 		}
 		DerivedVertex v = faceEdges[0].getVertex().getVertexPoint();
-		buffer.put((float) v.alteredNormal.x);
-		buffer.put((float) v.alteredNormal.y);
-		buffer.put((float) v.alteredNormal.z);
-		buffer.put((float) v.alteredLimit.x);
-		buffer.put((float) v.alteredLimit.y);
-		buffer.put((float) v.alteredLimit.z);
+		buffer.put((float) v.normal.x);
+		buffer.put((float) v.normal.y);
+		buffer.put((float) v.normal.z);
+		buffer.put((float) v.limit.x);
+		buffer.put((float) v.limit.y);
+		buffer.put((float) v.limit.z);
 		buffer.rewind();
-		
-//		while (buffer.remaining() > 0) {
-//			System.out.println(buffer.get() + ", " + buffer.get() + ", " + buffer.get());
-//		}
 	}
 	
 	public void fillArrayPosition(FloatBuffer buffer) {
