@@ -407,6 +407,12 @@ public class AbstractVertex {
 	 * @throws ArrayIndexOutOfBoundsException if the specified HalfEdge is not adjacent to this Vertex
 	 */
 	void removeEdge(HalfEdge edge) {
+		System.out.println("removing edge " + edge + " from vertex " + this);
+		System.out.print("    edges are:");
+		for (HalfEdge e : vertexEdges) {
+			System.out.print(" " + e);
+		}
+		System.out.println();
 		int i = 0;
 		while (vertexEdges[i] != edge) {	// throws ArrayIndexOutOfBoundsException if edge is not part of edges
 			i++;
@@ -415,6 +421,11 @@ public class AbstractVertex {
 		System.arraycopy(vertexEdges, 0, tmp, 0, i);
 		System.arraycopy(vertexEdges, i + 1, tmp, i, tmp.length - i);
 		vertexEdges = tmp;
+		System.out.print("    edges are:");
+		for (HalfEdge e : vertexEdges) {
+			System.out.print(" " + e);
+		}
+		System.out.println();
 	}
 	
 	/**
