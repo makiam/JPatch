@@ -261,6 +261,8 @@ public class Face {
 				);
 				uTangent.set(ux, uy, uz);
 				vTangent.set(vx, vy, vz);
+				normal.cross(uTangent, vTangent);
+				normal.normalize();
 				computeMatrix();
 				
 //				normal.set(0,0,0);
