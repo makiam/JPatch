@@ -714,7 +714,7 @@ public class ViewportGl extends Viewport {
 		
 		drawOrigin();
 		if (node instanceof SdsModel) {
-			drawSds2(((SdsModel) node).getSds(), 4);
+			drawSds2(((SdsModel) node).getSds(), 1);
 		}
 		if (node instanceof Bone) {
 			Bone bone = (Bone) node;

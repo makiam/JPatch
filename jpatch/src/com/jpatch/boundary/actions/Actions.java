@@ -83,20 +83,22 @@ public class Actions {
 	
 	public final JPatchAction extrudeTest = new JPatchAction(undoManager, "EXTRUDE_TOOL") {
 		public void actionPerformed(ActionEvent e) {
-//			System.out.println("extrude");
-//			Sds sds = Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getSds();
-//			Set<AbstractVertex> selectedVertices = new HashSet<AbstractVertex>(Main.getInstance().getSelection().getSelectedVerticesAttribute().getElements());
-//			Collection<Face> facesToExtrude = new HashSet<Face>();
-//			faceLoop:
-//			for (Face face : sds.faceList) {
-//				for (HalfEdge edge : face.getEdges()) {
-//					if (!selectedVertices.contains(edge.getVertex())) {
-//						continue faceLoop;
-//					}
-//				}
-//				facesToExtrude.add(face);
-//			}
-//			Operations.extrude(sds, facesToExtrude);
+			System.out.println("extrude");
+			Sds sds = Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getSds();
+			Set<AbstractVertex> selectedVertices = new HashSet<AbstractVertex>(Main.getInstance().getSelection().getSelectedVerticesAttribute().getElements());
+			Collection<Face> facesToExtrude = new HashSet<Face>();
+			faceLoop:
+			for (Face face : sds.getFaces(0)) {
+				for (HalfEdge edge : face.getEdges()) {
+					if (!selectedVertices.contains(edge.getVertex())) {
+						continue faceLoop;
+					}
+				}
+				facesToExtrude.add(face);
+			}
+			for (Face face : facesToExtrude) {
+				sds.removeFace(0, face);
+			}
 		}
 	};
 	

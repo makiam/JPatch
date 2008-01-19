@@ -36,6 +36,34 @@ public class Sds {
 		return face;
 	}
 	
+	public void removeFace(int level, Face face) {
+		System.out.println("removing face " + face);
+		assert levelFaceSets[level].contains(face) : "unknown face";
+		for (HalfEdge edge : face.getEdges()) {
+			assert edge.getFace() == face : "edge " + edge + " doesn't belong to face " + face;
+			edge.setFace(null);
+			if (edge.getPairFace() == null) {
+				System.out.println("removing edge " + edge);
+				removeEdge(edge);
+			}
+		}
+		DerivedVertex facePoint = face.getFacePoint();
+		if (facePoint != null) {
+			for (HalfEdge subEdge : facePoint.getEdges()) {
+				Face subFace = subEdge.getFace();
+				if (subFace != null) {
+					removeFace(level + 1, subFace);
+				}
+			}
+		}
+		levelFaceSets[level].remove(face);
+		levelFaceLists[level].remove(face);
+		
+		for (HalfEdge edge : face.getEdges()) {
+			edge.getVertex().organizeEdges();
+		}
+	}
+	
 	public void sortFaces() {
 		for (int i = 0; i < levelFaceSets.length; i++) {
 			levelFaceLists[i].clear();
