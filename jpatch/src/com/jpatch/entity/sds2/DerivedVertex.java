@@ -146,8 +146,6 @@ public abstract class DerivedVertex extends AbstractVertex {
 //	}
 	
 	protected void computeMatrix() {
-		normal.cross(uTangent, vTangent);
-		normal.normalize();
 		double nLength = 0.5 * (uTangent.length() + vTangent.length());
 		matrix.m00 = uTangent.x; matrix.m01 = vTangent.x; matrix.m02 = normal.x * nLength;
 		matrix.m10 = uTangent.y; matrix.m11 = vTangent.y; matrix.m12 = normal.y * nLength;

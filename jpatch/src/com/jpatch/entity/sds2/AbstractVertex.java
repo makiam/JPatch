@@ -99,10 +99,10 @@ public class AbstractVertex {
 						y += fp.position.y;
 						z += fp.position.z;
 						AbstractVertex ep = edge.getPairVertex();
-						ep.validatePosition();
-						x += ep.position.x;
-						y += ep.position.y;
-						z += ep.position.z;
+						ep.validateAlteredPosition();
+						x += ep.alteredPosition.x;
+						y += ep.alteredPosition.y;
+						z += ep.alteredPosition.z;
 						edge = edge.getPrev().getPair();
 					}
 					position.set(
@@ -178,6 +178,8 @@ public class AbstractVertex {
 					);
 					uTangent.set(ux, uy, uz);
 					vTangent.set(vx, vy, vz);
+					normal.cross(uTangent, vTangent);
+					normal.normalize();
 					computeMatrix();
 					break;
 				case BOUNDARY:
@@ -214,7 +216,23 @@ public class AbstractVertex {
 						normal.add(face.getFacePoint().normal);
 					}
 				}
+				AbstractVertex vu = AbstractVertex.this.vertexEdges[0].getPairVertex();
+				AbstractVertex vv = AbstractVertex.this.vertexEdges[1].getPairVertex();
+				AbstractVertex.this.validatePosition();
+				vu.validatePosition();
+				vv.validatePosition();
+				uTangent.sub(vv.position, AbstractVertex.this.position);
+				double vlength = uTangent.length();
+				vTangent.sub(vu.position, AbstractVertex.this.position);
+				double ulength = vTangent.length();
+				uTangent.cross(uTangent, normal);
+				vTangent.cross(uTangent, normal);
+				uTangent.normalize();
+				vTangent.normalize();
 				normal.normalize();
+				uTangent.scale(ulength);
+				vTangent.scale(vlength);
+				computeMatrix();
 			}
 			
 			/**

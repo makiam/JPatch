@@ -119,6 +119,8 @@ public class HalfEdge {
 					pair.prev.edgePoint.validatePosition();
 					vertex.getVertexPoint().validatePosition();
 					pair.vertex.getVertexPoint().validatePosition();
+					pair.face.getFacePoint().validatePosition();
+					face.getFacePoint().validatePosition();
 					
 					Point3d c0 = pair.next.edgePoint.position;
 					Point3d c1 = pair.prev.edgePoint.position;
@@ -147,6 +149,8 @@ public class HalfEdge {
 							(e0.y - e2.y) * 4 + (c0.y - c3.y) + (c1.y - c2.y),
 							(e0.z - e2.z) * 4 + (c0.z - c3.z) + (c1.z - c2.z)
 					);
+					normal.cross(uTangent, vTangent);
+					normal.normalize();
 					computeMatrix();
 				break;
 				case BOUNDARY:
@@ -180,6 +184,8 @@ public class HalfEdge {
 								pf.y - (p1.y + p2.y) * 0.5,
 								pf.z - (p1.z + p2.z) * 0.5);
 					}
+					normal.cross(uTangent, vTangent);
+					normal.normalize();
 					computeMatrix();
 					break;
 				default:
@@ -199,6 +205,8 @@ public class HalfEdge {
 					pair.prev.edgePoint.validateAlteredPosition();
 					vertex.getVertexPoint().validateAlteredPosition();
 					pair.vertex.getVertexPoint().validateAlteredPosition();
+					pair.face.getFacePoint().validateAlteredPosition();
+					face.getFacePoint().validateAlteredPosition();
 					
 					Point3d c0 = pair.next.edgePoint.alteredPosition;
 					Point3d c1 = pair.prev.edgePoint.alteredPosition;
