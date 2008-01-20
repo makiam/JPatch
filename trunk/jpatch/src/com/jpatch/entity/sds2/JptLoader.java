@@ -77,12 +77,14 @@ public class JptLoader {
 //					System.out.println(vertexList);
 					Collections.reverse(vertexList);
 					BaseVertex[] vertices = vertexList.toArray(new BaseVertex[vertexList.size()]);
-					Face face = sds.addFace(0, vertices);
+					if (materialIndex != -1) {
+						Face face = sds.addFace(0, vertices);
 //					if (face != null) {
 						face.setMaterial(materials.get(materialIndex));
 //						System.out.println(materials.get(materialIndex));
 //					}
 //					sds.addCandidateFace(vertexList.toArray(new TopLevelVertex[vertexList.size()]));
+					}
 					chars = null;
 				}
 			}

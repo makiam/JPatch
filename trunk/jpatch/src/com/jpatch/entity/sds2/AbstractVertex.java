@@ -85,7 +85,7 @@ public class AbstractVertex {
 			@Override
 			protected void computePosition() {
 				AbstractVertex.this.validateAlteredPosition();
-				switch (boundaryType) {
+				switch (AbstractVertex.this.boundaryType) {
 				case REGULAR:
 					final int valence = vertexEdges.length;
 					final double rimWeight = VERTEX_LIMIT_RIM_WEIGHTS[valence];
@@ -115,8 +115,8 @@ public class AbstractVertex {
 					Point3d p0 = AbstractVertex.this.alteredPosition;
 					AbstractVertex.this.vertexEdges[0].getPair().getVertex().validateAlteredPosition();
 					Point3d p1 = AbstractVertex.this.vertexEdges[0].getPair().getVertex().alteredPosition;
-					AbstractVertex.this.vertexEdges[vertexEdges.length - 1].getPair().getVertex().validateAlteredPosition();
-					Point3d p2 = AbstractVertex.this.vertexEdges[vertexEdges.length - 1].getPair().getVertex().alteredPosition;
+					AbstractVertex.this.vertexEdges[AbstractVertex.this.vertexEdges.length - 1].getPair().getVertex().validateAlteredPosition();
+					Point3d p2 = AbstractVertex.this.vertexEdges[AbstractVertex.this.vertexEdges.length - 1].getPair().getVertex().alteredPosition;
 					position.set(
 							p0.x * CREASE0 + (p1.x + p2.x) * CREASE1,
 							p0.y * CREASE0 + (p1.y + p2.y) * CREASE1,
@@ -135,7 +135,7 @@ public class AbstractVertex {
 			@Override
 			protected void computeLimit() {
 				validatePosition();
-				switch (boundaryType) {
+				switch (AbstractVertex.this.boundaryType) {
 				case REGULAR:
 					final int valence = vertexEdges.length;
 					final double limitCornerWeight = LIMIT_CORNER_WEIGHTS[valence];
@@ -258,7 +258,7 @@ public class AbstractVertex {
 			protected void computeAlteredLimit() {
 //				System.out.println(this + " computeAlteredLimit()");
 				validateAlteredPosition();
-				switch (boundaryType) {
+				switch (AbstractVertex.this.boundaryType) {
 				case REGULAR:
 					final int valence = vertexEdges.length;
 					final double limitCornerWeight = LIMIT_CORNER_WEIGHTS[valence];
@@ -407,12 +407,11 @@ public class AbstractVertex {
 	 * @throws ArrayIndexOutOfBoundsException if the specified HalfEdge is not adjacent to this Vertex
 	 */
 	void removeEdge(HalfEdge edge) {
-		System.out.println("removing edge " + edge + " from vertex " + this);
-		System.out.print("    edges are:");
-		for (HalfEdge e : vertexEdges) {
-			System.out.print(" " + e);
-		}
-		System.out.println();
+		boolean debug = false;
+		if (debug) System.out.println("removing edge " + edge + " from vertex " + this);
+		if (debug) System.out.print("    edges are:");
+		if (debug) for (HalfEdge e : vertexEdges) System.out.print(" " + e);
+		if (debug) System.out.println();
 		int i = 0;
 		while (vertexEdges[i] != edge) {	// throws ArrayIndexOutOfBoundsException if edge is not part of edges
 			i++;
@@ -421,11 +420,9 @@ public class AbstractVertex {
 		System.arraycopy(vertexEdges, 0, tmp, 0, i);
 		System.arraycopy(vertexEdges, i + 1, tmp, i, tmp.length - i);
 		vertexEdges = tmp;
-		System.out.print("    edges are:");
-		for (HalfEdge e : vertexEdges) {
-			System.out.print(" " + e);
-		}
-		System.out.println();
+		if (debug) System.out.print("    edges are:");
+		if (debug) for (HalfEdge e : vertexEdges) System.out.print(" " + e);
+		if (debug) System.out.println();
 	}
 	
 	/**
@@ -439,6 +436,16 @@ public class AbstractVertex {
 	 * TODO: preferredStart method will not work properly with undo/redo
 	 */
 	void organizeEdges() {
+		boolean debug = false;
+		if (debug) System.out.println(this + " organizeEdges() called...");
+		
+		if (debug) System.out.print("    edges are:");
+		if (debug) for (HalfEdge e : vertexEdges) System.out.print(" " + e);
+		if (debug) System.out.println();
+		
+		if (vertexEdges.length == 0) {
+			return;
+		}
 		HalfEdge[] tmp = vertexEdges.clone();
 		HalfEdge e = tmp[0];
 		while(e.getPair().getNext() != null && e.getPair().getNext() != tmp[0]) {
@@ -465,13 +472,21 @@ public class AbstractVertex {
 			if (i < vertexEdges.length - 1 && e.getPrev() == null) {
 				System.arraycopy(tmp, 0, vertexEdges, 0, vertexEdges.length);
 				boundaryType = IRREGULAR; // irregular boundary vertex, crease edges are edges[0] and edges[edges.length - 1]
-				return;
+				break;
 			}
 			vertexEdges[i] = e;
 			if (i < vertexEdges.length - 1) {
 				e = e.getPrev().getPair();
 			}
 		}
+		
+		if (debug) System.out.print("    edges are:");
+		if (debug) for (HalfEdge ed : vertexEdges) System.out.print(" " + ed);
+		if (debug) System.out.println();
+		if (debug) System.out.println("    boundaryType = " + boundaryType);
+		
+		invalidate();
+		
 	}
 	
 	@Override

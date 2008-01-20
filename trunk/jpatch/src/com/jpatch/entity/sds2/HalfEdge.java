@@ -64,6 +64,12 @@ public class HalfEdge {
 		} else {
 			boundaryType = pair.boundaryType = BOUNDARY;
 		}
+		if (face == null) {
+			assert next != null;
+			assert prev != null;
+			next = null;
+			prev = null;
+		}
 	}
 	
 	public void appendTo(HalfEdge prevEdge) {
