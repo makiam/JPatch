@@ -15,7 +15,7 @@ public class Face {
 	private Material material;
 //	private final Face[] children;
 	
-	public Face(HalfEdge... edges) {
+	public Face(Material material, HalfEdge... edges) {
 		int sides = edges.length;
 		assert sides >= 3 : "edges.length=" + edges.length + ", must be >= 3";
 		
@@ -36,6 +36,7 @@ public class Face {
 		for (int i = 0; i < sides; i++) {
 			this.faceEdges[i].getVertex().organizeEdges();
 		}
+		this.material = material;
 	}
 	
 	public int getSides() {

@@ -1,8 +1,12 @@
 package com.jpatch.entity.sds2;
 
+import com.jpatch.entity.*;
+
 import java.util.*;
 
 public class Sds {
+	private int maxLevel = 3;
+	
 	private final static Comparator<Face> faceMaterialComparator = new Comparator<Face>() {
 		public int compare(Face f1, Face f2) {
 			int m1 = System.identityHashCode(f1.getMaterial());
@@ -13,6 +17,8 @@ public class Sds {
 	
 	private Set<Face>[] levelFaceSets = new Set[SdsConstants.MAX_LEVEL + 1];
 	private List<Face>[] levelFaceLists = new List[SdsConstants.MAX_LEVEL + 1];
+	private boolean facesSorted;
+	
 	private Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
 	
 	public Sds() {
@@ -22,7 +28,7 @@ public class Sds {
 		}
 	}
 	
-	public Face addFace(int level, AbstractVertex... vertices) {
+	public Face addFace(int level, Material material, AbstractVertex... vertices) {
 		HalfEdge[] edges = new HalfEdge[vertices.length];
 		for (int i = 0; i < vertices.length; i++) {
 			int j = i + 1;
@@ -31,9 +37,30 @@ public class Sds {
 			}
 			edges[i] = getHalfEdge(vertices[i], vertices[j]);
 		}
-		Face face = new Face(edges);
+		Face face = new Face(material, edges);
 		levelFaceSets[level].add(face);
+		int nextLevel = level + 1;
+		if (nextLevel < maxLevel) {
+			for (int i = 0; i < edges.length; i++) {
+				AbstractVertex v0 = face.getFacePoint() == null ? face.createFacePoint() : face.getFacePoint();
+				AbstractVertex v1 = edges[i].getPrev().getEdgePoint() == null ? edges[i].getPrev().createEdgePoint() : edges[i].getPrev().getEdgePoint();
+				AbstractVertex v2 = edges[i].getVertex().getVertexPoint() == null ? edges[i].getVertex().createVertexPoint() : edges[i].getVertex().getVertexPoint();
+				AbstractVertex v3 = edges[i].getEdgePoint() == null ? edges[i].createEdgePoint() : edges[i].getEdgePoint();
+				addFace(nextLevel, material, v0, v1, v2, v3);
+			}
+		}
+		facesSorted = false;
 		return face;
+	}
+	
+	public void setFaceMaterial(Face face, Material material) {
+		face.setMaterial(material);
+		DerivedVertex facePoint = face.getFacePoint();
+		if (facePoint != null) {
+			for (HalfEdge edge : facePoint.getEdges()) {
+				setFaceMaterial(edge.getFace(), material);
+			}
+		}
 	}
 	
 	public void removeFace(int level, Face face) {
@@ -69,18 +96,23 @@ public class Sds {
 				}
 			}
 		}
+		facesSorted = false;
 	}
 	
-	public void sortFaces() {
+	private void sortFaces() {
+		if (facesSorted) {
+			return;
+		}
 		for (int i = 0; i < levelFaceSets.length; i++) {
 			levelFaceLists[i].clear();
 			levelFaceLists[i].addAll(levelFaceSets[i]);
 			Collections.sort(levelFaceLists[i], faceMaterialComparator);
-			System.out.println("sorted level " + i + " " + levelFaceLists[i].size());
 		}
+		facesSorted = true;
 	}
 	
 	public Collection<Face> getFaces(int level) {
+		sortFaces();
 		return levelFaceLists[level];
 	}
 	
@@ -90,21 +122,21 @@ public class Sds {
 		}
 	}
 	
-	public void createNextLevel(int currentLevel) {
-		for (Face face : levelFaceSets[currentLevel]) {
-			HalfEdge[] edges = face.getEdges();
-//			Face[] children = face.getChildren();
-			for (int i = 0; i < edges.length; i++) {
-				AbstractVertex v0 = face.getFacePoint() == null ? face.createFacePoint() : face.getFacePoint();
-				AbstractVertex v1 = edges[i].getPrev().getEdgePoint() == null ? edges[i].getPrev().createEdgePoint() : edges[i].getPrev().getEdgePoint();
-				AbstractVertex v2 = edges[i].getVertex().getVertexPoint() == null ? edges[i].getVertex().createVertexPoint() : edges[i].getVertex().getVertexPoint();
-				AbstractVertex v3 = edges[i].getEdgePoint() == null ? edges[i].createEdgePoint() : edges[i].getEdgePoint();
-				Face newFace = addFace(currentLevel + 1, v0, v1, v2, v3);
-				newFace.setMaterial(face.getMaterial());
-//				children[i] = newFace;
-			}
-		}
-	}
+//	public void createNextLevel(int currentLevel) {
+//		for (Face face : levelFaceSets[currentLevel]) {
+//			HalfEdge[] edges = face.getEdges();
+////			Face[] children = face.getChildren();
+//			for (int i = 0; i < edges.length; i++) {
+//				AbstractVertex v0 = face.getFacePoint() == null ? face.createFacePoint() : face.getFacePoint();
+//				AbstractVertex v1 = edges[i].getPrev().getEdgePoint() == null ? edges[i].getPrev().createEdgePoint() : edges[i].getPrev().getEdgePoint();
+//				AbstractVertex v2 = edges[i].getVertex().getVertexPoint() == null ? edges[i].getVertex().createVertexPoint() : edges[i].getVertex().getVertexPoint();
+//				AbstractVertex v3 = edges[i].getEdgePoint() == null ? edges[i].createEdgePoint() : edges[i].getEdgePoint();
+//				Face newFace = addFace(currentLevel + 1, v0, v1, v2, v3);
+//				newFace.setMaterial(face.getMaterial());
+////				children[i] = newFace;
+//			}
+//		}
+//	}
 	
 	/**
 	 * Checks if the halfEdge vertex0->vertex1 already exists. If it exists and it's face is null,

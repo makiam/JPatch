@@ -78,9 +78,10 @@ public class JptLoader {
 					Collections.reverse(vertexList);
 					BaseVertex[] vertices = vertexList.toArray(new BaseVertex[vertexList.size()]);
 					if (materialIndex != -1) {
-						Face face = sds.addFace(0, vertices);
+						Face face = sds.addFace(0, materials.get(materialIndex), vertices);
 //					if (face != null) {
-						face.setMaterial(materials.get(materialIndex));
+//						sds.setFaceMaterial(face, materials.get(materialIndex));
+//						face.setMaterial(materials.get(materialIndex));
 //						System.out.println(materials.get(materialIndex));
 //					}
 //					sds.addCandidateFace(vertexList.toArray(new TopLevelVertex[vertexList.size()]));
@@ -228,7 +229,7 @@ public class JptLoader {
 			}
 //			sds.addCandidateFaces();
 //			sds.replaceFaces();
-			sds.sortFaces();
+//			sds.sortFaces();
 //			sds.validateVertices();
 //			Map<Point3d, Vector3d> compensationMap = new HashMap<Point3d, Vector3d>();
 //			for (TopLevelVertex vertex : sds.vertexList) {

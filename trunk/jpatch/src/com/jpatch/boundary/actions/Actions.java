@@ -96,11 +96,12 @@ public class Actions {
 				}
 				facesToExtrude.add(face);
 			}
-			for (Face face : facesToExtrude) {
-//				sds.dumpFaces(0);
-				sds.removeFace(0, face);
-//				sds.dumpFaces(0);
-			}
+//			for (Face face : facesToExtrude) {
+////				sds.dumpFaces(0);
+//				sds.removeFace(0, face);
+////				sds.dumpFaces(0);
+//			}
+			Operations.extrude(sds, facesToExtrude);
 			Main.getInstance().repaintViewports();
 		}
 	};
