@@ -714,7 +714,7 @@ public class ViewportGl extends Viewport {
 		
 		drawOrigin();
 		if (node instanceof SdsModel) {
-			drawSds2(((SdsModel) node).getSds(), 3);
+			drawSds2(((SdsModel) node).getSds(), 2);
 		}
 		if (node instanceof Bone) {
 			Bone bone = (Bone) node;
@@ -1120,7 +1120,9 @@ public class ViewportGl extends Viewport {
 		gl.glInterleavedArrays(GL_N3F_V3F, 0, buffer);
 		if (viewDef.getShowLimitSurfaceAttribute().getBoolean()) {
 			final boolean showProjectedMesh = viewDef.getShowProjectedMeshAttribute().getBoolean();
+			int n = 0;
 			for (com.jpatch.entity.sds2.Face face : sds.getFaces(level - 1)) {
+//				System.out.println("drawing face " + n++ + ": " + face);
 				GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
 				if (currentMaterial != faceMaterial) {
 					setMaterial(GL_FRONT, faceMaterial.getArray());
@@ -1134,6 +1136,7 @@ public class ViewportGl extends Viewport {
 					gl.glColor3f(0, 0, 0);
 				}
 			}
+//			System.out.println();
 		}
 		
 		if (viewDef.getShowControlMeshAttribute().getBoolean()) {
