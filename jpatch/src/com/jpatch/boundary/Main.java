@@ -486,6 +486,7 @@ public class Main {
 		JPatchStateButton latheTool = new JPatchStateButton(actions.latheTool);
 		
 		JPatchActionButton extrudeTestButton = new JPatchActionButton(actions.extrudeTest);
+		JPatchActionButton dumpButton = new JPatchActionButton(actions.dump);
 		
 		buttonUtils.configureButtons(IconSet.Style.UNDECORATED, openButton, saveButton);
 		buttonUtils.configureButtons(IconSet.Style.DARK, undoButton, redoButton);
@@ -523,6 +524,7 @@ public class Main {
 		toolBar.add(latheTool);
 		toolBar.add(Box.createHorizontalStrut(4));
 		toolBar.add(extrudeTestButton);
+		toolBar.add(dumpButton);
 		
 		
 		final JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT) {

@@ -3,16 +3,19 @@ package com.jpatch.entity.sds2;
 import static com.jpatch.entity.sds2.SdsWeights.*;
 
 import java.nio.*;
+import java.util.*;
 
 import com.jpatch.entity.*;
 
 import javax.vecmath.*;
 
 public class Face {
+	private static int count = 0;
 	private final HalfEdge[] faceEdges;
 	private final double oneOverSides;
 	private DerivedVertex facePoint;
 	private Material material;
+	private int num = count++;
 //	private final Face[] children;
 	
 	public Face(Material material, HalfEdge... edges) {
@@ -298,7 +301,7 @@ public class Face {
 	}
 	
 	public String toString() {
-		StringBuilder sb = new StringBuilder("f{");
+		StringBuilder sb = new StringBuilder("f" + num + "{");
 		for (int i = 0; i < faceEdges.length; i++) {
 			sb.append(faceEdges[i].getVertex());
 			if (i < faceEdges.length - 1) {
@@ -308,4 +311,15 @@ public class Face {
 		sb.append("}");
 		return sb.toString();
 	}
+	
+//	public int hashCode() {
+//		return Arrays.hashCode(faceEdges);
+//	}
+//	
+//	public boolean equals(Object o) {
+//		if (!(o instanceof Face)) {
+//			return false;
+//		}
+//		return Arrays.equals(faceEdges, ((Face) o).faceEdges);
+//	}
 }

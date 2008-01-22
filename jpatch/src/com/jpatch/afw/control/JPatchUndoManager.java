@@ -109,6 +109,7 @@ public class JPatchUndoManager {
 	private void addEdit(NamedEditList namedEditList) {
 		if (position == MAX_DEPTH) {
 			undoStack.remove(0);
+			position--;
 		} else {
 			for (int i = position, n = undoStack.size(); i < n; i++) {
 				undoStack.remove(position);
