@@ -304,4 +304,16 @@ public class HalfEdge {
 	public String toString() {
 		return "e" + vertex.num + "-" + pair.vertex.num;
 	}
+	
+//	public int hashCode() {
+//		return vertex.hashCode() ^ pair.vertex.hashCode();
+//	}
+//	
+//	public boolean equals(Object o) {
+//		if (!(o instanceof HalfEdge)) {
+//			return false;
+//		}
+//		HalfEdge e = (HalfEdge) o;
+//		return vertex.equals(e.vertex) && pair.vertex.equals(e.pair.vertex);
+//	}
 }

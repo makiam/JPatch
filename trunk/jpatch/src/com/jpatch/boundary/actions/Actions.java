@@ -51,6 +51,8 @@ public class Actions {
 	
 	public final ToggleAction snapToGrid = new ToggleAction(snapToGridToggle, undoManager, "SNAP_TO_GRID");
 	
+	public final GenericAttr<String> extrudeString = new GenericAttr<String>("extrude");
+	
 	public final JPatchAction undo = new JPatchAction(undoManager, "UNDO") {
 		public void actionPerformed(ActionEvent e) {
 			if (undoManager.canUndo()) {
@@ -81,6 +83,13 @@ public class Actions {
 		}
 	};
 	
+	public final JPatchAction dump = new JPatchAction(undoManager, "DUMP") {
+		public void actionPerformed(ActionEvent e) {
+			Sds sds = Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getSds();
+			sds.dumpFaces(0);
+		}
+	};
+	
 	public final JPatchAction extrudeTest = new JPatchAction(undoManager, "EXTRUDE_TOOL") {
 		public void actionPerformed(ActionEvent e) {
 			System.out.println("extrude");
@@ -101,7 +110,9 @@ public class Actions {
 //				sds.removeFace(0, face);
 ////				sds.dumpFaces(0);
 //			}
-			Operations.extrude(sds, facesToExtrude);
+			List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
+			Operations.extrude(sds, facesToExtrude, editList);
+			undoManager.addEdit(extrudeString, editList);
 			Main.getInstance().repaintViewports();
 		}
 	};

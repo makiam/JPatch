@@ -1,10 +1,13 @@
 package com.jpatch.entity.sds2;//////**********************************
 
+import com.jpatch.afw.control.*;
+import com.jpatch.entity.*;
+
 import java.util.*;
 import javax.vecmath.*;
 
 public class Operations {
-	public static void extrude(Sds sds, Collection<Face> faces) {
+	public static void extrude(Sds sds, Collection<Face> faces, List<JPatchUndoableEdit> editList) {
 		
 		Map<BaseVertex, BaseVertex> boundaryVertices = new HashMap<BaseVertex, BaseVertex>();
 		Set<BaseVertex> innerVertices = new HashSet<BaseVertex>();
@@ -19,14 +22,16 @@ public class Operations {
 				}
 			}
 		}
+		
 		for (Face face : faces) {
+			face.getFacePoint().getNormal(normal);
 			for (HalfEdge edge : face.getEdges()) {
 				BaseVertex vertex = (BaseVertex) edge.getVertex();
 				if (boundaryVertices.containsKey(vertex)) {
 					continue;
 				}
 				vertex.getPosition(position);
-				vertex.getVertexPoint().getNormal(normal);
+//				vertex.getVertexPoint().getNormal(normal);
 				position.add(normal);
 				boolean isBoundaryVertex = false;
 				for(HalfEdge vertexEdge : vertex.getEdges()) {
@@ -42,7 +47,7 @@ public class Operations {
 				}	
 				if (!isBoundaryVertex && !innerVertices.contains(vertex)) {
 					innerVertices.add(vertex);
-					vertex.setPosition(position);
+					addEdit(editList, AttributeEdit.changeAttribute(vertex.positionAttr, position, true));
 				}
 			}
 		}
@@ -56,20 +61,83 @@ public class Operations {
 				AbstractVertex newVertex = boundaryVertices.get(vertex);
 				vertices[i] = newVertex == null ? vertex : newVertex;
 			}
-			sds.removeFace(0, boundaryFace);
-			sds.addFace(0, boundaryFace.getMaterial(), vertices);
+			addEdit(editList, new RemoveFaceEdit(sds, boundaryFace));
+			addEdit(editList, new AddFaceEdit(sds, boundaryFace.getMaterial(), vertices));
 			for (HalfEdge edge : edges) {
 				if (boundaryEdges.contains(edge)) {
 					edgeVertices[0] = edge.getVertex();
 					edgeVertices[1] = edge.getPairVertex();
 					edgeVertices[2]  = boundaryVertices.get(edge.getPairVertex());
 					edgeVertices[3]  = boundaryVertices.get(edge.getVertex());
-					Face face = sds.addFace(0, boundaryFace.getMaterial(), edgeVertices);
-					System.out.println("added " + face);
+					addEdit(editList, new AddFaceEdit(sds, boundaryFace.getMaterial(), edgeVertices));
 				}
 			}
 		}
+	}
+	
+	private static void addEdit(List<JPatchUndoableEdit> editList, JPatchUndoableEdit edit) {
+		if (editList != null) {
+			editList.add(edit);
+		}
+	}
+	
+	private static abstract class AbstractAddRemoveFaceEdit extends AbstractUndoableEdit {
+		Sds sds;
+		Face face;
+		Material material;
+		AbstractVertex[] vertices;
 		
+		void addFace() {
+			face = sds.addFace(0, material, vertices);
+			System.out.println("added face " + face);
+		}
 		
+		void removeFace() {
+			System.out.println("removing face " + face);
+			sds.removeFace(0, face);
+		}
+	}
+	
+	private static class RemoveFaceEdit extends AbstractAddRemoveFaceEdit {
+		
+		RemoveFaceEdit(Sds sds, Face face) {
+			this.sds = sds;
+			this.face = face;
+			material = face.getMaterial();
+			vertices = new AbstractVertex[face.getSides()];
+			for (int i = 0, n = face.getSides(); i < n; i++) {
+				vertices[i] = face.getEdges()[i].getVertex();
+			}
+			redo();
+		}
+		
+		public void undo() {
+			super.undo();
+			addFace();
+		}
+		
+		public void redo() {
+			super.redo();
+			removeFace();
+		}
+	}
+	
+	private static class AddFaceEdit extends AbstractAddRemoveFaceEdit {
+		AddFaceEdit(Sds sds, Material material, AbstractVertex... vertices) {
+			this.sds = sds;
+			this.material = material;
+			this.vertices = vertices.clone();
+			redo();
+		}
+		
+		public void undo() {
+			super.undo();
+			removeFace();
+		}
+		
+		public void redo() {
+			super.redo();
+			addFace();
+		}
 	}
 }
