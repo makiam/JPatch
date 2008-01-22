@@ -2,6 +2,7 @@ package com.jpatch.boundary.tools;
 
 import static com.jpatch.afw.vecmath.TransformUtil.*;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
@@ -20,8 +21,8 @@ import com.jpatch.entity.sds2.*;
 public class NormalTool implements JPatchTool {
 	MouseListener[] mouseListeners;
 	TransformUtil transformUtil = new TransformUtil();
-	Map<BaseVertex, VertexNormal> vertexPos = new HashMap<BaseVertex, VertexNormal>();
-	BaseVertex vertex;
+	Map<AbstractVertex, VertexNormal> vertexPos = new HashMap<AbstractVertex, VertexNormal>();
+	AbstractVertex vertex;
 	
 	public void registerListeners(Viewport[] viewports) {
 		if (mouseListeners != null) {
@@ -81,11 +82,12 @@ public class NormalTool implements JPatchTool {
 		public void mousePressed(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				Selection selection = Main.getInstance().getSelection();
-				MouseSelector.Hit hit = MouseSelector.getVertexAt(viewport, e.getX(), e.getY(), true);
+				Point point = new Point(e.getX(), e.getY());
+				MouseSelector.Hit hit = MouseSelector.getVertexAt(viewport, point, false);
 				if (selection.getSelectedVerticesAttribute().contains(hit.object)) {
 					vertex = (BaseVertex) hit.object;
 					vertexPos.clear();
-					for (BaseVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
+					for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
 						vertexPos.put(vertex, new VertexNormal(vertex));
 					}
 					mouseMotionListener = new MoveNormalMouseMotionListener(viewport, (SdsModel) hit.node, vertex);
@@ -120,7 +122,7 @@ public class NormalTool implements JPatchTool {
 //		Point3d pos = new Point3d();
 //		Point3d limit = new Point3d();
 		
-		MoveNormalMouseMotionListener(Viewport viewport, SdsModel sdsModel, BaseVertex vertex) {
+		MoveNormalMouseMotionListener(Viewport viewport, SdsModel sdsModel, AbstractVertex vertex) {
 			this.viewport = viewport;
 			
 			VertexNormal vertexNormal = vertexPos.get(vertex);
@@ -177,7 +179,7 @@ public class NormalTool implements JPatchTool {
 				factor = (p.z - p0.z) / delta;
 				break;
 			}
-			for (BaseVertex v : vertexPos.keySet()) {
+			for (AbstractVertex v : vertexPos.keySet()) {
 				vertexPos.get(v).setFactor(v, factor);
 			}
 			
@@ -199,13 +201,13 @@ public class NormalTool implements JPatchTool {
 		Point3d pStart = new Point3d();
 		Vector3d pNormal = new Vector3d();
 		
-		VertexNormal(BaseVertex v) {
+		VertexNormal(AbstractVertex v) {
 			v.getPosition(pStart);
 			v.getVertexPoint().getNormal(pNormal);
 			pNormal.normalize();
 		}
 		
-		void setFactor(BaseVertex v, double f) {
+		void setFactor(AbstractVertex v, double f) {
 			v.setPosition(pStart.x + pNormal.x * f, pStart.y + pNormal.y * f, pStart.z + pNormal.z * f);
 		}
 	}

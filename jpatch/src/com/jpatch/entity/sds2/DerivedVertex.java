@@ -8,7 +8,6 @@ public abstract class DerivedVertex extends AbstractVertex {
 	private final Point3d hierarchyPos = new Point3d();
 	protected final Point3d limit = new Point3d();
 	protected final Vector3d normal = new Vector3d();
-	protected final Point3d alteredLimit = new Point3d();
 	protected final Vector3d alteredNormal = new Vector3d();
 	protected final Matrix3d matrix = new Matrix3d();
 	protected final Matrix3d invMatrix = new Matrix3d();
@@ -22,6 +21,7 @@ public abstract class DerivedVertex extends AbstractVertex {
 	public DerivedVertex() {
 //		super();
 		super(new Point3d());
+		alteredLimit = new Point3d();
 		positionAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 //				validatePosition();
@@ -35,23 +35,23 @@ public abstract class DerivedVertex extends AbstractVertex {
 	}
 	
 	public void getLimit(Tuple3f tuple) {
-		validateLimit();
-		tuple.set(limit);
+		validateAlteredLimit();
+		tuple.set(alteredLimit);
 	}
 	
 	public void getLimit(Tuple3d tuple) {
-		validateLimit();
-		tuple.set(limit);
+		validateAlteredLimit();
+		tuple.set(alteredLimit);
 	}
 	
 	public void getNormal(Tuple3f tuple) {
-		validateLimit();
-		tuple.set(normal);
+		validateAlteredLimit();
+		tuple.set(alteredNormal);
 	}
 	
 	public void getNormal(Tuple3d tuple) {
-		validateLimit();
-		tuple.set(normal);
+		validateAlteredLimit();
+		tuple.set(alteredNormal);
 	}
 	
 	public void getPosition(Tuple3d position) {

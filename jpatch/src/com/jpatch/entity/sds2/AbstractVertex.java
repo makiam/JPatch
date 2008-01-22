@@ -15,6 +15,7 @@ public class AbstractVertex {
 	
 	protected final Point3d position = new Point3d();
 	protected final Point3d alteredPosition;
+	protected Point3d alteredLimit;
 	
 	protected HalfEdge[] vertexEdges = new HalfEdge[0];
 	protected HalfEdge preferredStart;
@@ -326,6 +327,9 @@ public class AbstractVertex {
 //				System.out.println("    alteredLimit = " + alteredLimit);
 			}
 		};
+		if (alteredLimit == null) {
+			alteredLimit = vertexPoint.alteredLimit;
+		}
 		return vertexPoint;
 	}
 	
