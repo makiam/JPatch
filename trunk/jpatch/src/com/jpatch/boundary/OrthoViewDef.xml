@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <attributeEditor name="View" class="com.jpatch.boundary.OrthoViewDef">
-	<field name="Level" attribute="EditLevel" />
+	<field name="Render-level" attribute="RenderLevel" />
+	<field name="Edit-level" attribute="EditLevel" />
 	<field name="View" attribute="ViewDirection" />
 	<field name="Translation" attribute="Translation" />
 	<field name="Rotation" attribute="Rotation" />

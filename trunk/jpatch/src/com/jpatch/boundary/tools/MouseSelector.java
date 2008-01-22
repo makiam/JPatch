@@ -58,7 +58,7 @@ public class MouseSelector {
 			for (HalfEdge edge : face.getEdges()) {
 				AbstractVertex vertex = edge.getVertex();
 				if (useProjection) {
-					vertex.getVertexPoint().getLimit(p);
+					vertex.getLimit(p);
 				} else {
 					vertex.getPosition(p);
 				}
@@ -106,11 +106,11 @@ public class MouseSelector {
 			for (HalfEdge edge : face.getEdges()) {
 				AbstractVertex vertex = edge.getVertex();
 				if (useProjection) {
-					vertex.getVertexPoint().getLimit(p);
+					vertex.getLimit(p);
 				} else {
 					vertex.getPosition(p);
 				}
-				transformUtil.projectToScreen(transformUtil.LOCAL, p, p);
+				transformUtil.projectToScreen(TransformUtil.LOCAL, p, p);
 				if (p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1) {
 					selectedVertices.add(vertex);
 				}

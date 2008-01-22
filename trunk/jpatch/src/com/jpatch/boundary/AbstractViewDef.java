@@ -40,4 +40,8 @@ public abstract class AbstractViewDef implements ViewDef {
 	public IntAttr getEditLevelAttribute() {
 		return Globals.getInstance().getEditLevelAttribute();
 	}
+	
+	public IntAttr getRenderLevelAttribute() {
+		return Globals.getInstance().getRenderLevelAttribute();
+	}
 }

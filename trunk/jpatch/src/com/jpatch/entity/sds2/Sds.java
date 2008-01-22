@@ -42,7 +42,7 @@ public class Sds {
 		int nextLevel = level + 1;
 		if (nextLevel < maxLevel) {
 			for (int i = 0; i < edges.length; i++) {
-				AbstractVertex v0 = face.getFacePoint() == null ? face.createFacePoint() : face.getFacePoint();
+				AbstractVertex v0 = face.getFacePoint();
 				AbstractVertex v1 = edges[i].getPrev().getEdgePoint() == null ? edges[i].getPrev().createEdgePoint() : edges[i].getPrev().getEdgePoint();
 				AbstractVertex v2 = edges[i].getVertex().getVertexPoint() == null ? edges[i].getVertex().createVertexPoint() : edges[i].getVertex().getVertexPoint();
 				AbstractVertex v3 = edges[i].getEdgePoint() == null ? edges[i].createEdgePoint() : edges[i].getEdgePoint();
@@ -56,10 +56,8 @@ public class Sds {
 	public void setFaceMaterial(Face face, Material material) {
 		face.setMaterial(material);
 		DerivedVertex facePoint = face.getFacePoint();
-		if (facePoint != null) {
-			for (HalfEdge edge : facePoint.getEdges()) {
-				setFaceMaterial(edge.getFace(), material);
-			}
+		for (HalfEdge edge : facePoint.getEdges()) {
+			setFaceMaterial(edge.getFace(), material);
 		}
 	}
 	

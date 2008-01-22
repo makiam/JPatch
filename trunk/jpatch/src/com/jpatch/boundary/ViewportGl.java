@@ -714,7 +714,7 @@ public class ViewportGl extends Viewport {
 		
 		drawOrigin();
 		if (node instanceof SdsModel) {
-			drawSds2(((SdsModel) node).getSds(), 2);
+			drawSds2(((SdsModel) node).getSds(), Globals.getInstance().getRenderLevelAttribute().getInt());
 		}
 		if (node instanceof Bone) {
 			Bone bone = (Bone) node;
@@ -1045,6 +1045,7 @@ public class ViewportGl extends Viewport {
 	}
 	
 	private void drawSelection(Selection selection) {	
+//		if (true) return;
 		selection.getSelectedSdsModelAttribute().getValue().getLocal2WorldTransform(transformUtil, LOCAL);
 		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
 		gl.glMatrixMode(GL_MODELVIEW);
@@ -1112,15 +1113,15 @@ public class ViewportGl extends Viewport {
 	
 	private void drawSds2(com.jpatch.entity.sds2.Sds sds, int level) {
 //		transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
-		GlMaterial currentMaterial = null;
 		
-		gl.glColor3f(0, 0, 0);
-		gl.glEnable(GL_COLOR_MATERIAL);
-		gl.glColorMaterial(GL_FRONT, GL_EMISSION);
-		gl.glInterleavedArrays(GL_N3F_V3F, 0, buffer);
+		
+		
 		if (viewDef.getShowLimitSurfaceAttribute().getBoolean()) {
-			final boolean showProjectedMesh = viewDef.getShowProjectedMeshAttribute().getBoolean();
-			int n = 0;
+			GlMaterial currentMaterial = null;
+			gl.glColor3f(0, 0, 0);
+			gl.glEnable(GL_COLOR_MATERIAL);
+			gl.glColorMaterial(GL_FRONT, GL_EMISSION);
+			gl.glInterleavedArrays(GL_N3F_V3F, 0, buffer);
 			for (com.jpatch.entity.sds2.Face face : sds.getFaces(level - 1)) {
 //				System.out.println("drawing face " + n++ + ": " + face);
 				GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
@@ -1128,26 +1129,42 @@ public class ViewportGl extends Viewport {
 					setMaterial(GL_FRONT, faceMaterial.getArray());
 					currentMaterial = faceMaterial;
 				}
-				face.fillArrayLimit(buffer);
+				face.getLimitSurface(buffer);
 				gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() * 2 + 2);
-				if (showProjectedMesh) {
-					gl.glColor3f(0.5f, 0.5f, 0.5f);
-					gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides() * 2);
-					gl.glColor3f(0, 0, 0);
-				}
 			}
 //			System.out.println();
+		}
+		
+		if (viewDef.getShowProjectedMeshAttribute().getBoolean()) {
+			gl.glDisable(GL_COLOR_MATERIAL);
+			gl.glDisable(GL_LIGHTING);
+			gl.glInterleavedArrays(GL_V3F, 0, buffer);
+			gl.glColor3f(1, 0, 0);
+			for (com.jpatch.entity.sds2.Face face : sds.getFaces(Globals.getInstance().getEditLevelAttribute().getInt())) {
+				face.getLimitMesh(buffer);
+				gl.glDrawArrays(GL_POINTS, 0, face.getSides());
+			}
+			gl.glDisable(GL_DEPTH_TEST);
+			gl.glEnable(GL_BLEND);
+			gl.glColor4f(1, 0, 0, 0.25f);
+			for (com.jpatch.entity.sds2.Face face : sds.getFaces(Globals.getInstance().getEditLevelAttribute().getInt())) {
+				face.getLimitMesh(buffer);
+				gl.glDrawArrays(GL_POINTS, 0, face.getSides());
+			}
+			gl.glEnable(GL_DEPTH_TEST);
+			gl.glDisable(GL_BLEND);
 		}
 		
 		if (viewDef.getShowControlMeshAttribute().getBoolean()) {
 			gl.glDisable(GL_COLOR_MATERIAL);
 			gl.glDisable(GL_LIGHTING);
+			gl.glInterleavedArrays(GL_V3F, 0, buffer);
 			for (com.jpatch.entity.sds2.Face face : sds.getFaces(Globals.getInstance().getEditLevelAttribute().getInt())) {
-				face.fillArrayPosition(buffer);
+				face.getPositionMesh(buffer);
 				gl.glColor3f(1, 1, 1);
-				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides());
+				gl.glDrawArrays(GL_LINE_LOOP, 0, face.getSides());
 				gl.glColor3f(1, 0, 0);
-				gl.glDrawArrays(GL_POINTS, 1, face.getSides());
+				gl.glDrawArrays(GL_POINTS, 0, face.getSides());
 			}
 		}
 //		for (com.jpatch.entity.sds2.Face face : sds.getFaces(level)) {
