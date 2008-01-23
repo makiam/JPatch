@@ -9,6 +9,8 @@ import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.*;
 import com.jpatch.entity.SdsModel;
 import com.jpatch.entity.sds2.*;
+import com.sun.opengl.util.*;
+import com.sun.opengl.util.texture.*;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -16,11 +18,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
+import java.nio.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GLCanvas;
+import javax.media.opengl.*;
 import javax.swing.*;
 import javax.vecmath.Matrix4d;
 import javax.vecmath.Matrix4f;
@@ -208,12 +210,44 @@ public class MoveVertexTool implements VisibleTool {
 		private final Viewport viewport;
 		private final SdsModel sdsModel;
 		private int x, y;
+		private ByteBuffer buffer;
+		private int cw, ch;
 		
 		private LassoSelectMouseMotionListener(Viewport viewport, SdsModel sdsModel, int x, int y) {
 			this.viewport = viewport;
 			this.sdsModel = sdsModel;
 			this.x = x;
 			this.y = y;
+			
+			
+			ViewportGl viewportGl = (ViewportGl) viewport;
+			GLAutoDrawable glDrawable = (GLAutoDrawable) viewportGl.getComponent();
+			GLContext glContext = glDrawable.getContext();
+			glContext.makeCurrent();
+			GL gl = viewportGl.getGl();
+			gl.glReadBuffer(GL_FRONT);
+			cw = glDrawable.getWidth();
+			ch = glDrawable.getHeight();
+			System.out.println("canvas size = " + cw + "x" + ch);
+			buffer = BufferUtil.newByteBuffer(cw * ch * 3);
+//			buffer = ByteBuffer.allocate(ch * cw * 3);
+//			System.out.println(buffer.isDirect());
+			gl.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1);
+			gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 1);
+//			long t = System.currentTimeMillis();
+			viewportGl.rasterMode();
+			gl.glReadPixels(0, 1, cw, ch, GL_BGR, GL_UNSIGNED_BYTE, buffer);
+//			System.out.println(System.currentTimeMillis() - t);
+			glContext.release();
+			
+			buffer.rewind();
+//			for (int i = 0; i < buffer.capacity(); i++) {
+//				System.out.print(buffer.get(i) + " ");
+//				if (i % (3 * cw) == 0) {
+//					System.out.println();
+//				}
+//			}
+//			System.out.println();
 		}
 		
 		@Override
@@ -221,21 +255,68 @@ public class MoveVertexTool implements VisibleTool {
 			Graphics2D g = (Graphics2D) e.getComponent().getGraphics();
 			int mx = e.getX();
 			int my = e.getY();
-			drawRectangle(g, rectangle);
+			drawRectangle(g, rectangle, e.getComponent());
 			rectangle.x = mx > x ? x : mx;
 			rectangle.y = my > y ? y : my;
 			rectangle.width = Math.abs(mx - x);
 			rectangle.height = Math.abs(my - y);
-			drawRectangle(g, rectangle);
+			drawRectangle(g, rectangle, e.getComponent());
 		}
 		
-		private void drawRectangle(Graphics2D g, Rectangle r) {
-			g.setXORMode(XOR_MODE);
-			g.setStroke(DASHES);
-			g.drawLine(r.x, r.y, r.x + r.width, r.y);
-			g.drawLine(r.x + r.width, r.y + 1, r.x + r.width, r.y + r.height);
-			g.drawLine(r.x + 1, r.y + r.height, r.x + r.width, r.y + r.height);
-			g.drawLine(r.x, r.y + 2, r.x, r.y + r.height);
+		private void drawRectangle(Graphics2D g, Rectangle r, Component c) {
+			GLCanvas glCanvas = (GLCanvas) c;
+			glCanvas.getContext().makeCurrent();
+			GL gl = glCanvas.getGL();
+//			gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			gl.glDrawBuffer(GL.GL_BACK);
+			((ViewportGl) viewport).rasterMode();
+			gl.glDisable(GL_DEPTH_TEST);
+//			gl.glReadPixels(0, 0, c.getWidth(), c.getHeight(), GL_BGR, GL_UNSIGNED_BYTE, buffer);
+			gl.glRasterPos2i(0, ch - 2);
+			
+//			for (int i = 0; i < buffer.capacity(); i++) {
+//				System.out.print(buffer.get(i) + " ");
+//				if (i % (3 * cw) == 0) {
+//					System.out.println();
+//				}
+//			}
+//			System.out.println();
+				
+//			System.out.println("drawing " + cw + "x" + ch + " pixels, size = " + buffer.capacity());
+			gl.glDrawPixels(cw, ch, GL_BGR, GL_UNSIGNED_BYTE, buffer);
+//			gl.glLogicOp(GL_XOR);
+//			gl.glEnable(GL.GL_COLOR_LOGIC_OP);
+			gl.glEnable(GL_BLEND);
+			gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			gl.glColor4f(1, 1, 0, 1.0f);
+			gl.glBegin(GL.GL_LINE_LOOP);
+			gl.glVertex2f(r.x, r.y);
+			gl.glVertex2f(r.x, r.y + r.height);
+			gl.glVertex2f(r.x + r.width, r.y + r.height);
+			gl.glVertex2f(r.x + r.width, r.y);
+			gl.glEnd();
+			gl.glColor4f(1, 1, 0, 0.1f);
+			gl.glBegin(GL.GL_QUADS);
+			gl.glVertex2f(r.x, r.y);
+			gl.glVertex2f(r.x, r.y + r.height);
+			gl.glVertex2f(r.x + r.width, r.y + r.height);
+			gl.glVertex2f(r.x + r.width, r.y);
+			gl.glEnd();
+			gl.glDisable(GL_BLEND);
+			gl.glEnable(GL_DEPTH_TEST);
+			gl.glFlush();
+			glCanvas.swapBuffers();
+			
+//			gl.glDisable(GL.GL_COLOR_LOGIC_OP);
+			
+//			gl.glDrawBuffer(GL.GL_BACK);
+			glCanvas.getContext().release();
+//			g.setXORMode(XOR_MODE);
+//			g.setStroke(DASHES);
+//			g.drawLine(r.x, r.y, r.x + r.width, r.y);
+//			g.drawLine(r.x + r.width, r.y + 1, r.x + r.width, r.y + r.height);
+//			g.drawLine(r.x + 1, r.y + r.height, r.x + r.width, r.y + r.height);
+//			g.drawLine(r.x, r.y + 2, r.x, r.y + r.height);
 		}
 		
 		private void getSelectedVertices(Selection selection) {

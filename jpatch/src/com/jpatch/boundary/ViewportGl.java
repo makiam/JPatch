@@ -473,6 +473,7 @@ public class ViewportGl extends Viewport {
 //				gl.glFinish();	// wait for previous gl functions to finish
 				Color3f background = active ? COLORS.activeBackground : COLORS.background;
 				gl.glClearColor(background.x, background.y, background.z, 0);	// set background color
+//				gl.glClearColor(1, 0.5f, 0, 0);
 //				gl.glClearDepth(farClip);									// set initial depth-buffer value
 				gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// clear color and depth buffers
 //				gl.glFlush();
