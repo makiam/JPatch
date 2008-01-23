@@ -5,7 +5,7 @@ import com.jpatch.entity.*;
 import java.util.*;
 
 public class Sds {
-	private int maxLevel = 1;
+	private int maxLevel = 2;
 	
 	private final static Comparator<Face> faceMaterialComparator = new Comparator<Face>() {
 		public int compare(Face f1, Face f2) {

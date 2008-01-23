@@ -390,6 +390,7 @@ public class ViewportGl extends Viewport {
 	    GLCapabilitiesChooser chooser = new MultisampleChooser();
 
 	    caps.setSampleBuffers(antialiasAttr.getBoolean());
+	   
 	    caps.setNumSamples(4);
 	    drawable = new GLCanvas(caps, chooser, null, null);
 	    
