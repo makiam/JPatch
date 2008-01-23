@@ -236,7 +236,10 @@ public class MoveVertexTool implements VisibleTool {
 			gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 1);
 //			long t = System.currentTimeMillis();
 			viewportGl.rasterMode();
-			gl.glReadPixels(0, 1, cw, ch, GL_BGR, GL_UNSIGNED_BYTE, buffer);
+//			gl.glReadPixels(0, 1, cw, ch, GL_BGR, GL_UNSIGNED_BYTE, buffer);
+			gl.glReadBuffer(GL_FRONT);
+			gl.glDrawBuffer(GL_BACK);
+			gl.glCopyPixels(0, 0, cw, ch, GL_COLOR);
 //			System.out.println(System.currentTimeMillis() - t);
 			glContext.release();
 			
@@ -283,7 +286,11 @@ public class MoveVertexTool implements VisibleTool {
 //			System.out.println();
 				
 //			System.out.println("drawing " + cw + "x" + ch + " pixels, size = " + buffer.capacity());
-			gl.glDrawPixels(cw, ch, GL_BGR, GL_UNSIGNED_BYTE, buffer);
+//			gl.glDrawPixels(cw, ch, GL_BGR, GL_UNSIGNED_BYTE, buffer);
+			gl.glReadBuffer(GL_BACK);
+			gl.glDrawBuffer(GL_FRONT);
+			gl.glCopyPixels(0, 1, cw, ch - 1, GL_COLOR);
+			
 //			gl.glLogicOp(GL_XOR);
 //			gl.glEnable(GL.GL_COLOR_LOGIC_OP);
 			gl.glEnable(GL_BLEND);
@@ -295,21 +302,21 @@ public class MoveVertexTool implements VisibleTool {
 			gl.glVertex2f(r.x + r.width, r.y + r.height);
 			gl.glVertex2f(r.x + r.width, r.y);
 			gl.glEnd();
-			gl.glColor4f(1, 1, 0, 0.1f);
-			gl.glBegin(GL.GL_QUADS);
-			gl.glVertex2f(r.x, r.y);
-			gl.glVertex2f(r.x, r.y + r.height);
-			gl.glVertex2f(r.x + r.width, r.y + r.height);
-			gl.glVertex2f(r.x + r.width, r.y);
-			gl.glEnd();
+//			gl.glColor4f(1, 1, 0, 0.1f);
+//			gl.glBegin(GL.GL_QUADS);
+//			gl.glVertex2f(r.x, r.y);
+//			gl.glVertex2f(r.x, r.y + r.height);
+//			gl.glVertex2f(r.x + r.width, r.y + r.height);
+//			gl.glVertex2f(r.x + r.width, r.y);
+//			gl.glEnd();
 			gl.glDisable(GL_BLEND);
 			gl.glEnable(GL_DEPTH_TEST);
 			gl.glFlush();
-			glCanvas.swapBuffers();
+//			glCanvas.swapBuffers();
 			
 //			gl.glDisable(GL.GL_COLOR_LOGIC_OP);
 			
-//			gl.glDrawBuffer(GL.GL_BACK);
+			gl.glDrawBuffer(GL.GL_BACK);
 			glCanvas.getContext().release();
 //			g.setXORMode(XOR_MODE);
 //			g.setStroke(DASHES);
