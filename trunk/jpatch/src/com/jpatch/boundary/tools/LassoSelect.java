@@ -58,21 +58,23 @@ public class LassoSelect {
 		}
 		
 		private void drawRectangle(Graphics2D g, Rectangle r, GL gl) {
-			g.setXORMode(XOR_MODE);
-			g.setStroke(DASHES);
-			g.drawLine(r.x, r.y, r.x + r.width, r.y);
-			g.drawLine(r.x + r.width, r.y + 1, r.x + r.width, r.y + r.height);
-			g.drawLine(r.x + 1, r.y + r.height, r.x + r.width, r.y + r.height);
-			g.drawLine(r.x, r.y + 2, r.x, r.y + r.height);
-//			((ViewportGl) viewport).rasterMode();
-//			gl.glColor3f(1, 1, 0);
-//			gl.glBegin(GL.GL_LINE_LOOP);
-//			gl.glVertex2f(r.x, r.y);
-//			gl.glVertex2f(r.x + r.width, r.y);
-//			gl.glVertex2f(r.x + r.width, r.y + r.height);
-//			gl.glVertex2f(r.x, r.y + r.height);
-//			gl.glEnd();
-//			gl.glFlush();
+			System.out.println("draw rectangle " + r);
+//			g.setXORMode(XOR_MODE);
+//			g.setStroke(DASHES);
+//			g.drawLine(r.x, r.y, r.x + r.width, r.y);
+//			g.drawLine(r.x + r.width, r.y + 1, r.x + r.width, r.y + r.height);
+//			g.drawLine(r.x + 1, r.y + r.height, r.x + r.width, r.y + r.height);
+//			g.drawLine(r.x, r.y + 2, r.x, r.y + r.height);
+			gl.glDrawBuffer(GL.GL_FRONT);
+			((ViewportGl) viewport).rasterMode();
+			gl.glColor3f(1, 1, 0);
+			gl.glBegin(GL.GL_LINE_LOOP);
+			gl.glVertex2f(r.x, r.y);
+			gl.glVertex2f(r.x + r.width, r.y);
+			gl.glVertex2f(r.x + r.width, r.y + r.height);
+			gl.glVertex2f(r.x, r.y + r.height);
+			gl.glEnd();
+			gl.glFlush();
 		}
 	}
 }
