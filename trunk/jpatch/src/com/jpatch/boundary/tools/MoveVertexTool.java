@@ -19,7 +19,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.nio.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 
 import javax.media.opengl.*;
@@ -196,6 +196,7 @@ public class MoveVertexTool implements VisibleTool {
 						}
 						Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
 						
+						lassoListener.free();
 						Main.getInstance().repaintViewports();
 					} else {
 						Main.getInstance().syncViewports(viewport);
@@ -210,8 +211,10 @@ public class MoveVertexTool implements VisibleTool {
 		private final Viewport viewport;
 		private final SdsModel sdsModel;
 		private int x, y;
-		private ByteBuffer buffer;
+//		private ByteBuffer buffer;
 		private int cw, ch;
+		private int texture;
+		private GLContext glContext;
 		
 		private LassoSelectMouseMotionListener(Viewport viewport, SdsModel sdsModel, int x, int y) {
 			this.viewport = viewport;
@@ -222,28 +225,56 @@ public class MoveVertexTool implements VisibleTool {
 			
 			ViewportGl viewportGl = (ViewportGl) viewport;
 			GLAutoDrawable glDrawable = (GLAutoDrawable) viewportGl.getComponent();
-			GLContext glContext = glDrawable.getContext();
+			glContext = glDrawable.getContext();
 			glContext.makeCurrent();
-			GL gl = viewportGl.getGl();
-			gl.glReadBuffer(GL_FRONT);
+			GL gl = glContext.getGL();
+			System.out.println(gl);
+			int[] tex = new int[1];
+			gl.glGenTextures(1, tex, 0);
+			texture = tex[0];
+			
 			cw = glDrawable.getWidth();
 			ch = glDrawable.getHeight();
-			System.out.println("canvas size = " + cw + "x" + ch);
-			buffer = BufferUtil.newByteBuffer(cw * ch * 3);
-//			buffer = ByteBuffer.allocate(ch * cw * 3);
-//			System.out.println(buffer.isDirect());
+			 
 			gl.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1);
 			gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 1);
-//			long t = System.currentTimeMillis();
-			viewportGl.rasterMode();
-//			gl.glReadPixels(0, 1, cw, ch, GL_BGR, GL_UNSIGNED_BYTE, buffer);
+			
+			gl.glBindTexture(GL_TEXTURE_2D, texture);
+			
+//			ByteBuffer data = BufferUtil.newByteBuffer(cw * ch * 3); 
+//	        data.limit(data.capacity());
+//	        data.rewind();
+//	        Random rnd = new Random();
+//	        while(data.remaining() > 0) {
+//	        	data.put((byte) rnd.nextInt());
+//	        }
+//	        data.rewind();
+	        
+	        // Build Texture Using Information In data
+//	        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 4, cw, ch, 0, GL.GL_BGR, GL.GL_UNSIGNED_BYTE, data);    
+	        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+	        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+	        
 			gl.glReadBuffer(GL_FRONT);
-			gl.glDrawBuffer(GL_BACK);
-			gl.glCopyPixels(0, 0, cw, ch, GL_COLOR);
+			
+			System.out.println("canvas size = " + cw + "x" + ch);
+			
+			
+			gl.glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, cw, ch, 0);
+//			buffer = BufferUtil.newByteBuffer(cw * ch * 3);
+//			buffer = ByteBuffer.allocate(ch * cw * 3);
+//			System.out.println(buffer.isDirect());
+			
+//			long t = System.currentTimeMillis();
+//			viewportGl.rasterMode();
+//			gl.glReadPixels(0, 1, cw, ch, GL_BGR, GL_UNSIGNED_BYTE, buffer);
+//			gl.glReadBuffer(GL_FRONT);
+//			gl.glDrawBuffer(GL_RIGHT);
+//			gl.glCopyPixels(0, 0, cw, ch, GL_COLOR);
 //			System.out.println(System.currentTimeMillis() - t);
 			glContext.release();
 			
-			buffer.rewind();
+//			buffer.rewind();
 //			for (int i = 0; i < buffer.capacity(); i++) {
 //				System.out.print(buffer.get(i) + " ");
 //				if (i % (3 * cw) == 0) {
@@ -275,7 +306,7 @@ public class MoveVertexTool implements VisibleTool {
 			((ViewportGl) viewport).rasterMode();
 			gl.glDisable(GL_DEPTH_TEST);
 //			gl.glReadPixels(0, 0, c.getWidth(), c.getHeight(), GL_BGR, GL_UNSIGNED_BYTE, buffer);
-			gl.glRasterPos2i(0, ch - 2);
+//			gl.glRasterPos2i(0, ch - 2);
 			
 //			for (int i = 0; i < buffer.capacity(); i++) {
 //				System.out.print(buffer.get(i) + " ");
@@ -287,10 +318,27 @@ public class MoveVertexTool implements VisibleTool {
 				
 //			System.out.println("drawing " + cw + "x" + ch + " pixels, size = " + buffer.capacity());
 //			gl.glDrawPixels(cw, ch, GL_BGR, GL_UNSIGNED_BYTE, buffer);
-			gl.glReadBuffer(GL_BACK);
-			gl.glDrawBuffer(GL_FRONT);
-			gl.glCopyPixels(0, 1, cw, ch - 1, GL_COLOR);
+//			gl.glReadBuffer(GL_AUX0);
+//			gl.glDrawBuffer(GL_BACK);
+//			gl.glCopyPixels(0, 1, cw, ch - 1, GL_COLOR);
+			gl.glColor3f(1, 1, 1);
+			gl.glBindTexture(GL_TEXTURE_2D, texture);
+			gl.glEnable(GL_TEXTURE_2D);
+			gl.glBegin(GL_QUADS);
+			gl.glTexCoord2f(0, 1);
+			gl.glVertex2i(0, -1);
+			gl.glTexCoord2f(0, 0);
+			gl.glVertex2i(0, ch - 1);
+			gl.glTexCoord2f(1, 0);
+			gl.glVertex2i(cw, ch - 1);
+			gl.glTexCoord2f(1, 1);
+			gl.glVertex2i(cw, -1);
+//			
 			
+//			
+//			gl.glVertex2i(0, ch);
+			gl.glEnd();
+			gl.glDisable(GL_TEXTURE_2D);
 //			gl.glLogicOp(GL_XOR);
 //			gl.glEnable(GL.GL_COLOR_LOGIC_OP);
 			gl.glEnable(GL_BLEND);
@@ -302,21 +350,21 @@ public class MoveVertexTool implements VisibleTool {
 			gl.glVertex2f(r.x + r.width, r.y + r.height);
 			gl.glVertex2f(r.x + r.width, r.y);
 			gl.glEnd();
-//			gl.glColor4f(1, 1, 0, 0.1f);
-//			gl.glBegin(GL.GL_QUADS);
-//			gl.glVertex2f(r.x, r.y);
-//			gl.glVertex2f(r.x, r.y + r.height);
-//			gl.glVertex2f(r.x + r.width, r.y + r.height);
-//			gl.glVertex2f(r.x + r.width, r.y);
-//			gl.glEnd();
+			gl.glColor4f(1, 1, 0, 0.1f);
+			gl.glBegin(GL.GL_QUADS);
+			gl.glVertex2f(r.x, r.y);
+			gl.glVertex2f(r.x, r.y + r.height);
+			gl.glVertex2f(r.x + r.width, r.y + r.height);
+			gl.glVertex2f(r.x + r.width, r.y);
+			gl.glEnd();
 			gl.glDisable(GL_BLEND);
 			gl.glEnable(GL_DEPTH_TEST);
 			gl.glFlush();
-//			glCanvas.swapBuffers();
+			glCanvas.swapBuffers();
 			
 //			gl.glDisable(GL.GL_COLOR_LOGIC_OP);
 			
-			gl.glDrawBuffer(GL.GL_BACK);
+//			gl.glDrawBuffer(GL.GL_BACK);
 			glCanvas.getContext().release();
 //			g.setXORMode(XOR_MODE);
 //			g.setStroke(DASHES);
@@ -332,6 +380,12 @@ public class MoveVertexTool implements VisibleTool {
 			int x1 = rectangle.x + rectangle.width;
 			int y1 = rectangle.y + rectangle.height;
 			MouseSelector.getVertices(viewport, x0, y0, x1, y1, sdsModel, selection);
+		}
+		
+		private void free() {
+			glContext.makeCurrent();
+			glContext.getGL().glDeleteTextures(1, new int[texture], 0);
+			glContext.release();
 		}
 	}
 	
