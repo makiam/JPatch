@@ -481,7 +481,7 @@ public class ViewportGl extends Viewport {
 //				long t = System.currentTimeMillis();
 //				gl.glFlush();
 //				gl.glFinish();	// wait for previous gl functions to finish
-				Color3f background = active ? COLORS.activeBackground : COLORS.background;
+				Color3f background = true ? COLORS.activeBackground : COLORS.background;
 				gl.glClearColor(background.x, background.y, background.z, 0);	// set background color
 //				gl.glClearColor(1, 0.5f, 0, 0);
 //				gl.glClearDepth(farClip);									// set initial depth-buffer value
@@ -1917,6 +1917,36 @@ public class ViewportGl extends Viewport {
 //		System.out.println("bottom = " + screenShotTxCoords[2]);
 //		System.out.println("right = " + screenShotTxCoords[3]);
 	}
+	
+//	public void redrawBackground() {
+//		GLContext glContext = ((GLAutoDrawable) component).getContext();
+//		if (glContext.makeCurrent() == GLContext.CONTEXT_CURRENT) {
+//			GL gl = glContext.getGL();
+//			gl.glDrawBuffer(GL_FRONT);
+//			gl.glDisable(GL_LIGHTING);
+//			gl.glDepthMask(false);
+//			gl.glDisable(GL_DEPTH_TEST);
+////			gl.glEnable(GL_BLEND);
+////			gl.glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
+//			rasterMode();
+//			float h = component.getHeight();
+//			float w = component.getWidth();
+//			float z = +0.9f;
+//			Color3f background = active ? COLORS.activeBackground : COLORS.background;
+//			gl.glColor3f(background.x, background.y, background.z);	// set background color
+//			gl.glBegin(GL_QUADS);
+//			System.out.println("redraw background " + active);
+//			gl.glVertex3f(0, 0, z);
+//			gl.glVertex3f(0, h, z);
+//			gl.glVertex3f(w, h, z);
+//			gl.glVertex3f(w, 0, z);
+//			gl.glEnd();
+//			gl.glDepthMask(true);
+//			gl.glDrawBuffer(GL_BACK);
+//			gl.glFlush();
+//			glContext.release();
+//		}
+//	}
 	
 	public void disposeScreenShotTexture() {
 		GL gl = drawable.getGL();

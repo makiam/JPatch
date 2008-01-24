@@ -10,6 +10,12 @@ public class Background {
 //	private static final Color SPOKE_COLOR = Color.BLACK;
 	
 	public static void fillComponent(Container c, Graphics g) {
+		fillComponent(c, g, false);
+	}
+	
+	public static void fillComponent(Container c, Graphics g, boolean dark) {
+		final Color hubColor = dark ? HUB_COLOR.darker().darker() : HUB_COLOR;
+		final Color spokeColor = dark ? SPOKE_COLOR.darker().darker() : SPOKE_COLOR;
 		Graphics2D g2 = (Graphics2D) g;
 		Component root = c;
 		while (root.getParent() != null) {
@@ -27,8 +33,9 @@ public class Background {
 			hub.x -= p.x;
 			hub.y -= p.y;
 		}
-		for (int y = 0; y < c.getHeight(); y += step) {
-			for (int x = 0; x < c.getWidth(); x += step) {
+		Rectangle r = g.getClipBounds();
+		for (int y = r.y; y < r.y + r.height; y += step) {
+			for (int x = r.x; x < r.x + r.width; x += step) {
 				double dx = (x + step / 2.0) - hub.x;
 				double dy = (y + step / 2.0) - hub.y;
 				double l =  size / Math.sqrt(dx * dx + dy * dy);
@@ -36,7 +43,7 @@ public class Background {
 				spoke.y = hub.y + dy * l * 0.5;
 				spoke0.x = hub.x + dx * l * 0.0;
 				spoke0.y = hub.y + dy * l * 0.0;
-				g2.setPaint(new GradientPaint(spoke0, HUB_COLOR, spoke, SPOKE_COLOR));
+				g2.setPaint(new GradientPaint(spoke0, hubColor, spoke, spokeColor));
 				g.fillRect(x, y, step, step);
 			}
 		}
