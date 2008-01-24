@@ -101,6 +101,7 @@ public class AttributeEditor {
 			}
 		} else if (attribute instanceof StateMachine) {
 			JComboBox comboBox = new JComboBox();
+			comboBox.setOpaque(false);
 			form.addRow(new JLabel(label), comboBox);
 			addBinding(new ComponentBinding(getAttributeMethod(attributeName), comboBox));
 		} else {

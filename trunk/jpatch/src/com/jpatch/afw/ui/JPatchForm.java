@@ -10,6 +10,7 @@ public class JPatchForm {
 	private static final Insets INSETS = new Insets(1, 1, 1, 1);
 	private static final Dimension LABEL_SIZE = new Dimension(100, 20);
 	private static final Dimension SLIDER_SIZE = new Dimension(20, 20);
+	private static final int MAX_HEIGHT = 22;
 	private final JComponent component = new JPanel(new ColumnLayout());
 //		@Override
 //		public void doLayout() {
@@ -46,6 +47,9 @@ public class JPatchForm {
 		row.setOpaque(false);
 		row.add(label);
 		for (JComponent c : components) {
+			if (c instanceof JTextField) {
+				c.setPreferredSize(new Dimension(20, 18));
+			}
 			row.add(c);
 		}
 		component.add(row);
@@ -214,6 +218,8 @@ public class JPatchForm {
 					maxHeight = height;
 				}
 			}
+//			maxHeight = 20;
+			maxHeight = Math.min(MAX_HEIGHT, maxHeight);
 //			System.out.println("maxHeight = " + maxHeight);
 			int start = LABEL_SIZE.width, width = parent.getSize().width - start;
 			setComponentBounds(parent.getComponent(0), 0, 0, start, maxHeight, false, false);
@@ -254,6 +260,7 @@ public class JPatchForm {
 				if (size.height > height)
 					height = size.height;
 			}
+			height = Math.min(MAX_HEIGHT, height);
 			layoutSize.height = height;
 			layoutSize.width = Short.MAX_VALUE;
 //			layoutSize.width = 300;//JPatchForm.this.container.getRootContainer().getComponent().getRootPane().getWidth();
