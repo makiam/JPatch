@@ -25,6 +25,8 @@ public class Actions {
 			new RotateTool(),
 			new TranslateTool(),
 			new NormalTool(),
+			null,
+			null,
 	};
 	
 	public final JPatchUndoManager undoManager = new JPatchUndoManager();
@@ -37,12 +39,14 @@ public class Actions {
 	public final SwitchStateAction zoomView = new SwitchStateAction(toolSM, tools[1], undoManager, "ZOOM_VIEW");
 	public final SwitchStateAction rotateView = new SwitchStateAction(toolSM, tools[2], undoManager, "ROTATE_VIEW");
 	
-	public final SwitchStateAction defaultTool = new SwitchStateAction(toolSM, tools[3], undoManager, "DEFAULT_TOOL");
+	public final SwitchStateAction selectTool = new SwitchStateAction(toolSM, tools[3], undoManager, "SELECT_TOOL");
 	public final SwitchStateAction moveTool = new SwitchStateAction(toolSM, tools[5], undoManager, "MOVE_TOOL");
 	public final SwitchStateAction scaleTool = new SwitchStateAction(toolSM, tools[6], undoManager, "SCALE_TOOL");
 	public final SwitchStateAction rotateTool = new SwitchStateAction(toolSM, tools[4], undoManager, "ROTATE_TOOL");
 	public final SwitchStateAction extrudeTool = new SwitchStateAction(toolSM, tools[6], undoManager, "EXTRUDE_TOOL");
 	public final SwitchStateAction latheTool = new SwitchStateAction(toolSM, tools[6], undoManager, "LATHE_TOOL");
+	public final SwitchStateAction tweakTool = new SwitchStateAction(toolSM, tools[7], undoManager, "TWEAK_TOOL");
+	public final SwitchStateAction insetTool = new SwitchStateAction(toolSM, tools[8], undoManager, "INSET_TOOL");
 	
 	public final SwitchStateAction vertexMode = new SwitchStateAction(sdsModeSM, SdsMode.VERTEX_MODE, undoManager, "VERTEX_MODE");
 	public final SwitchStateAction edgeMode = new SwitchStateAction(sdsModeSM, SdsMode.EDGE_MODE, undoManager, "EDGE_MODE");

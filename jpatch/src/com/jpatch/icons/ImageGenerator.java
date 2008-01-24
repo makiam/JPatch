@@ -40,13 +40,15 @@ public class ImageGenerator {
 		"ROTATE_VIEW",
 		"UNDO",
 		"REDO",
-		"DEFAULT_TOOL",
+		"TWEAK_TOOL",
 		"MOVE_TOOL",
 		"SCALE_TOOL",
 		"ROTATE_TOOL",
 		"EXTRUDE_TOOL",
 		"LATHE_TOOL",
-		"SNAP_TO_GRID"
+		"SNAP_TO_GRID",
+		"SELECT_TOOL",
+		"INSET_TOOL"
 	};
 	
 	public static void main(String[] args) throws Exception {
@@ -413,7 +415,34 @@ public class ImageGenerator {
 			g.setColor(new Color(0x70000000, true));
 			g.drawRect(5, 5, 5, 5);
 			break;
-		case 17: // hide
+		case 17: // select
+			g.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 1, new float[] { 13f / 4, 13f / 4 }, 13f / 8));
+			g.setColor(new Color(0x80000000, true));
+			g.drawRect(1, 1, 13, 13);
+			break;
+		case 18: // inset
+			
+			g.setColor(new Color(0x30000000, true));
+			g.fillRect(4, 4, 8, 8);
+			
+			g.setColor(new Color(0x60000000, true));
+			
+			g.drawLine(1, 1, 3, 3);
+			g.drawLine(14, 14, 12, 12);
+			g.drawLine(1, 14, 3, 12);
+			g.drawLine(14, 1, 12, 3);
+			g.drawLine(2, 4, 4, 4);
+			g.drawLine(4, 4, 4, 2);
+			g.drawLine(11, 4, 13, 4);
+			g.drawLine(11, 4, 11, 2);
+			g.drawLine(2, 11, 4, 11);
+			g.drawLine(4, 11, 4, 13);
+			g.drawLine(11, 11, 13, 11);
+			g.drawLine(11, 11, 11, 13);
+			
+			g.setColor(new Color(0x90000000, true));
+			g.drawRect(0, 0, 15, 15);
+			g.drawRect(4, 4, 7, 7);
 			break;
 		}
 	}

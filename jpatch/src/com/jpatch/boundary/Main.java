@@ -477,12 +477,14 @@ public class Main {
 		
 		JPatchToggleButton snapToGrid = new JPatchToggleButton(actions.snapToGrid);
 		
-		JPatchStateButton defaultTool = new JPatchStateButton(actions.defaultTool);
+		JPatchStateButton tweakTool = new JPatchStateButton(actions.tweakTool);
+		JPatchStateButton selectTool = new JPatchStateButton(actions.selectTool);
 		JPatchStateButton moveTool = new JPatchStateButton(actions.moveTool);
 		JPatchStateButton scaleTool = new JPatchStateButton(actions.scaleTool);
 		JPatchStateButton rotateTool = new JPatchStateButton(actions.rotateTool);
 		
 		JPatchStateButton extrudeTool = new JPatchStateButton(actions.extrudeTool);
+		JPatchStateButton insetTool = new JPatchStateButton(actions.insetTool);
 		JPatchStateButton latheTool = new JPatchStateButton(actions.latheTool);
 		
 		JPatchActionButton extrudeTestButton = new JPatchActionButton(actions.extrudeTest);
@@ -493,8 +495,8 @@ public class Main {
 		buttonUtils.configureButtons(IconSet.Style.GLOSSY, moveView, zoomView, rotateView);
 		buttonUtils.configureButtons(IconSet.Style.FROSTED, vertexMode, edgeMode, faceMode, objectMode);
 		buttonUtils.configureButtons(IconSet.Style.BRUSHED, snapToGrid);
-		buttonUtils.configureButtons(IconSet.Style.BRUSHED, defaultTool, moveTool, scaleTool, rotateTool);
-		buttonUtils.configureButtons(IconSet.Style.BRUSHED, extrudeTool, latheTool);
+		buttonUtils.configureButtons(IconSet.Style.BRUSHED, tweakTool, selectTool, moveTool, scaleTool, rotateTool);
+		buttonUtils.configureButtons(IconSet.Style.BRUSHED, extrudeTool, insetTool, latheTool);
 		
 		toolBar.add(openButton);
 		toolBar.add(saveButton);
@@ -515,12 +517,14 @@ public class Main {
 		toolBar.add(Box.createHorizontalStrut(16));
 		toolBar.add(snapToGrid);
 		toolBar.add(Box.createHorizontalStrut(4));
-		toolBar.add(defaultTool);
+		toolBar.add(tweakTool);
+		toolBar.add(selectTool);
 		toolBar.add(moveTool);
 		toolBar.add(scaleTool);
 		toolBar.add(rotateTool);
 		toolBar.add(Box.createHorizontalStrut(4));
 		toolBar.add(extrudeTool);
+		toolBar.add(insetTool);
 		toolBar.add(latheTool);
 		toolBar.add(Box.createHorizontalStrut(4));
 		toolBar.add(extrudeTestButton);
