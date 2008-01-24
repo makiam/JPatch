@@ -58,7 +58,7 @@ public class Test {
 		
 		JPatchToggleButton snapToGrid = new JPatchToggleButton(actions.snapToGrid);
 		
-		JPatchStateButton defaultTool = new JPatchStateButton(actions.defaultTool);
+		JPatchStateButton defaultTool = new JPatchStateButton(actions.selectTool);
 		JPatchStateButton moveTool = new JPatchStateButton(actions.moveTool);
 		JPatchStateButton scaleTool = new JPatchStateButton(actions.scaleTool);
 		JPatchStateButton rotateTool = new JPatchStateButton(actions.rotateTool);

@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.*;
 import java.nio.*;
 import java.util.*;
 import java.util.List;
@@ -227,21 +228,34 @@ public class MoveVertexTool implements VisibleTool {
 			GLAutoDrawable glDrawable = (GLAutoDrawable) viewportGl.getComponent();
 			glContext = glDrawable.getContext();
 			glContext.makeCurrent();
-			GL gl = glContext.getGL();
-			System.out.println(gl);
-			int[] tex = new int[1];
-			gl.glGenTextures(1, tex, 0);
-			texture = tex[0];
+			//GL gl = glContext.getGL();
+			viewportGl.createScreenShotTexture();
 			
-			cw = glDrawable.getWidth();
-			ch = glDrawable.getHeight();
-			 
-			gl.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1);
-			gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 1);
 			
-			gl.glBindTexture(GL_TEXTURE_2D, texture);
+//			cw = glDrawable.getWidth() / 2;
+//			ch = glDrawable.getHeight() / 2;
+//			
+//			cw = 1024;
+//			ch = 1024;
 			
-//			ByteBuffer data = BufferUtil.newByteBuffer(cw * ch * 3); 
+//			gl.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1);
+//			gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 1);
+			
+//			BufferedImage image = new BufferedImage(cw, ch, BufferedImage.TYPE_3BYTE_BGR);
+//			Graphics g = image.createGraphics();
+//			g.setColor(Color.WHITE);
+//			g.fillRect(10, 10, cw - 20, ch - 20);
+//			texture = TextureIO.newTexture(image, false);
+			
+//			texture.enable();
+//			texture.bind();
+//			int[] tex = new int[1];
+//			gl.glGenTextures(0, tex, 0);
+//			texture = tex[0];
+//			gl.glEnable(GL_TEXTURE_2D);
+//			gl.glBindTexture(GL.GL_TEXTURE_2D, texture);
+			
+//			ByteBuffer data = BufferUtil.newByteBuffer(cw * ch * 4); 
 //	        data.limit(data.capacity());
 //	        data.rewind();
 //	        Random rnd = new Random();
@@ -251,16 +265,16 @@ public class MoveVertexTool implements VisibleTool {
 //	        data.rewind();
 	        
 	        // Build Texture Using Information In data
-//	        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 4, cw, ch, 0, GL.GL_BGR, GL.GL_UNSIGNED_BYTE, data);    
-	        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-	        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+//	        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, cw, ch, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, data);    
+//	        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+//	        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
 	        
-			gl.glReadBuffer(GL_FRONT);
+//			gl.glReadBuffer(GL_FRONT);
+//			
+//			System.out.println("canvas size = " + cw + "x" + ch);
 			
-			System.out.println("canvas size = " + cw + "x" + ch);
-			
-			
-			gl.glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, cw, ch, 0);
+//			gl.glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, cw, ch);
+//			gl.glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, cw, ch, 0);
 //			buffer = BufferUtil.newByteBuffer(cw * ch * 3);
 //			buffer = ByteBuffer.allocate(ch * cw * 3);
 //			System.out.println(buffer.isDirect());
@@ -272,8 +286,9 @@ public class MoveVertexTool implements VisibleTool {
 //			gl.glDrawBuffer(GL_RIGHT);
 //			gl.glCopyPixels(0, 0, cw, ch, GL_COLOR);
 //			System.out.println(System.currentTimeMillis() - t);
+//			texture.disable();
 			glContext.release();
-			
+			drawRectangle(new Rectangle(0, 0, 0, 0), viewport.getComponent());
 //			buffer.rewind();
 //			for (int i = 0; i < buffer.capacity(); i++) {
 //				System.out.print(buffer.get(i) + " ");
@@ -286,25 +301,26 @@ public class MoveVertexTool implements VisibleTool {
 		
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			Graphics2D g = (Graphics2D) e.getComponent().getGraphics();
 			int mx = e.getX();
 			int my = e.getY();
-			drawRectangle(g, rectangle, e.getComponent());
+			drawRectangle(rectangle, e.getComponent());
 			rectangle.x = mx > x ? x : mx;
 			rectangle.y = my > y ? y : my;
 			rectangle.width = Math.abs(mx - x);
 			rectangle.height = Math.abs(my - y);
-			drawRectangle(g, rectangle, e.getComponent());
+			drawRectangle(rectangle, e.getComponent());
 		}
 		
-		private void drawRectangle(Graphics2D g, Rectangle r, Component c) {
+		private void drawRectangle(Rectangle r, Component c) {
+//			if (true) return;
 			GLCanvas glCanvas = (GLCanvas) c;
 			glCanvas.getContext().makeCurrent();
 			GL gl = glCanvas.getGL();
 //			gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			gl.glDrawBuffer(GL.GL_BACK);
+//			gl.glDrawBuffer(GL.GL_BACK);
 			((ViewportGl) viewport).rasterMode();
 			gl.glDisable(GL_DEPTH_TEST);
+//			gl.glEnable(GL_COLOR_MATRIX);
 //			gl.glReadPixels(0, 0, c.getWidth(), c.getHeight(), GL_BGR, GL_UNSIGNED_BYTE, buffer);
 //			gl.glRasterPos2i(0, ch - 2);
 			
@@ -321,43 +337,69 @@ public class MoveVertexTool implements VisibleTool {
 //			gl.glReadBuffer(GL_AUX0);
 //			gl.glDrawBuffer(GL_BACK);
 //			gl.glCopyPixels(0, 1, cw, ch - 1, GL_COLOR);
-			gl.glColor3f(1, 1, 1);
-			gl.glBindTexture(GL_TEXTURE_2D, texture);
-			gl.glEnable(GL_TEXTURE_2D);
-			gl.glBegin(GL_QUADS);
-			gl.glTexCoord2f(0, 1);
-			gl.glVertex2i(0, -1);
-			gl.glTexCoord2f(0, 0);
-			gl.glVertex2i(0, ch - 1);
-			gl.glTexCoord2f(1, 0);
-			gl.glVertex2i(cw, ch - 1);
-			gl.glTexCoord2f(1, 1);
-			gl.glVertex2i(cw, -1);
-//			
+			
+			gl.glDisable(GL_BLEND);
+			gl.glDepthMask(false);
+//			TextureCoords txCoords = texture.getImageTexCoords();
+			
+			
+//				int ch = this.ch / 10;
+//				int cw = this.cw / 10;
+				
+				
+//				gl.glEnable(GL_TEXTURE_2D);
+//				gl.glBindTexture(GL_TEXTURE_2D, texture);
+//				gl.glColor3f(1, 0, 1);
+//				gl.glBegin(GL_QUADS);
+//				gl.glTexCoord2f(0, 1);
+//				gl.glVertex2i(0, -1);
+//				gl.glTexCoord2f(0, 0);
+//				gl.glVertex2i(0, ch - 1);
+//				gl.glTexCoord2f(1, 0);
+//				gl.glVertex2i(cw, ch - 1);
+//				gl.glTexCoord2f(1, 1);
+//				gl.glVertex2i(cw, -1);
+//				gl.glEnd();
+//				gl.glDisable(GL_TEXTURE_2D);
+//				gl.glMatrixMode(GL_COLOR);
+//				gl.glLoadMatrixf(new float[] {
+//						0.33f, 0.33f, 0.33f, 0,
+//						0.33f, 0.33f, 0.33f, 0,
+//						0.33f, 0.33f, 0.33f, 0,
+//						0, 0, 0, 1
+//				}, 0);
+				((ViewportGl) viewport).drawScreenShot(0, 0, c.getWidth(), c.getHeight(), 0.667f);
+				
 			
 //			
+			
+			((ViewportGl) viewport).drawScreenShot(r.x, r.y, r.x + r.width, r.y + r.height, 1.0f);
+//			
 //			gl.glVertex2i(0, ch);
-			gl.glEnd();
-			gl.glDisable(GL_TEXTURE_2D);
+			
 //			gl.glLogicOp(GL_XOR);
 //			gl.glEnable(GL.GL_COLOR_LOGIC_OP);
-			gl.glEnable(GL_BLEND);
+//			gl.glEnable(GL_BLEND);
 			gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			
 			gl.glColor4f(1, 1, 0, 1.0f);
+			
 			gl.glBegin(GL.GL_LINE_LOOP);
 			gl.glVertex2f(r.x, r.y);
 			gl.glVertex2f(r.x, r.y + r.height);
 			gl.glVertex2f(r.x + r.width, r.y + r.height);
 			gl.glVertex2f(r.x + r.width, r.y);
 			gl.glEnd();
-			gl.glColor4f(1, 1, 0, 0.1f);
-			gl.glBegin(GL.GL_QUADS);
-			gl.glVertex2f(r.x, r.y);
-			gl.glVertex2f(r.x, r.y + r.height);
-			gl.glVertex2f(r.x + r.width, r.y + r.height);
-			gl.glVertex2f(r.x + r.width, r.y);
-			gl.glEnd();
-			gl.glDisable(GL_BLEND);
+			
+//			gl.glColor4f(1, 1, 0, 0.1f);
+//			gl.glBegin(GL.GL_QUADS);
+//			gl.glVertex2f(r.x, r.y);
+//			gl.glVertex2f(r.x, r.y + r.height);
+//			gl.glVertex2f(r.x + r.width, r.y + r.height);
+//			gl.glVertex2f(r.x + r.width, r.y);
+//			gl.glEnd();
+//			gl.glDisable(GL_BLEND);
+			gl.glDepthMask(true);
 			gl.glEnable(GL_DEPTH_TEST);
 			gl.glFlush();
 			glCanvas.swapBuffers();
@@ -365,6 +407,10 @@ public class MoveVertexTool implements VisibleTool {
 //			gl.glDisable(GL.GL_COLOR_LOGIC_OP);
 			
 //			gl.glDrawBuffer(GL.GL_BACK);
+			
+//			gl.glMatrixMode(GL_COLOR);
+//			gl.glLoadIdentity();
+			
 			glCanvas.getContext().release();
 //			g.setXORMode(XOR_MODE);
 //			g.setStroke(DASHES);
@@ -384,7 +430,10 @@ public class MoveVertexTool implements VisibleTool {
 		
 		private void free() {
 			glContext.makeCurrent();
-			glContext.getGL().glDeleteTextures(1, new int[texture], 0);
+//			texture.dispose();
+			((ViewportGl) viewport).disposeScreenShotTexture();
+			
+//			glContext.getGL().glDeleteTextures(1, new int[] { texture }, 0);
 			glContext.release();
 		}
 	}
