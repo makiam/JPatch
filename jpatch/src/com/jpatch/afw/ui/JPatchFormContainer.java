@@ -60,6 +60,7 @@ public class JPatchFormContainer {
 		titleBar.add(expandedButton, BorderLayout.WEST);
 		expandedButton.setFont(LABEL_FONT);
 		titleBar.setOpaque(false);
+		titleBar.setPreferredSize(new Dimension(20, 18));
 		component.add(titleBar);
 		component.setOpaque(false);
 //		component.setBackground(new Color(0xcccccc));
