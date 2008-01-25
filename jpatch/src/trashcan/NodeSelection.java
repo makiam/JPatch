@@ -1,4 +1,4 @@
-package com.jpatch.boundary;
+package trashcan;
 
 import static com.jpatch.afw.vecmath.TransformUtil.LOCAL;
 

@@ -71,12 +71,12 @@ public class MoveVertexTool implements VisibleTool {
 			return;
 		}
 		
-		selection.getSelectedSdsModelAttribute().getValue().getLocal2WorldTransform(transformUtil, LOCAL);
+		selection.getNode().getLocal2WorldTransform(transformUtil, LOCAL);
 		double[] modelView = transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, new double[16]);
 		gl.glMatrixMode(GL_MODELVIEW);
 		gl.glLoadMatrixd(modelView, 0);
 		
-		selection.getSelectedSdsModelAttribute().getValue().getLocal2WorldTransform(transformUtil, LOCAL);
+		selection.getNode().getLocal2WorldTransform(transformUtil, LOCAL);
 //		transformUtil.setTransform(LOCAL, selection.getSelectedSdsModelAttribute().getValue().getTransform());
 //		Matrix4f modelView = transformUtil.getMatrix(LOCAL, CAMERA, new Matrix4f());
 		Point3d p0 = new Point3d();
@@ -174,7 +174,7 @@ public class MoveVertexTool implements VisibleTool {
 //				} else {
 //					Main.getInstance().setSelectedObject(null);
 				} else {
-					SdsModel sdsModel = Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue();
+					SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
 					mouseMotionListener = new LassoSelectMouseMotionListener(viewport, sdsModel, e.getX(), e.getY());
 					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
 				}
