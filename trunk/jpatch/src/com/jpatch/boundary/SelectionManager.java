@@ -9,34 +9,34 @@ import com.jpatch.afw.Utils;
 import com.jpatch.afw.attributes.Attribute;
 import com.jpatch.afw.attributes.AttributePostChangeListener;
 import com.jpatch.afw.attributes.GenericAttr;
-import com.jpatch.entity.SceneGraphNode;
+import com.jpatch.entity.*;
 
 public class SelectionManager {
 	/**
 	 * Attribute to hold the selected object
 	 */
-	private final GenericAttr<Object> selectedObjectAttr = new GenericAttr<Object>();
+//	private final GenericAttr<Object> selectedObjectAttr = new GenericAttr<Object>();
 	
 	/**
 	 * Flag to prevent update loops
 	 */
 	private boolean ignoreChange;
 	
-	public SelectionManager(final JTree tree, final TreeManager treeManager) {
+	public SelectionManager(final JTree tree, final TreeManager treeManager, final Selection selection) {
 		/*
 		 * listen for changes of the selected object to update the tree-selection
 		 * accordingly
 		 */
-		selectedObjectAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
+		selection.getNodeAttribute().addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				if (!ignoreChange) {
 					ignoreChange = true;
-					Object selectedObject = selectedObjectAttr.getValue();
-					SceneGraphNode sceneGraphNode = null;
-					if (selectedObject instanceof SceneGraphNode) {
-						sceneGraphNode = (SceneGraphNode) selectedObject;
-					}
-					TreeNode treeNode = treeManager.getTreeNodeFor(sceneGraphNode);
+//					Object selectedObject = selectedObjectAttr.getValue();
+//					SceneGraphNode sceneGraphNode = null;
+//					if (selectedObject instanceof SceneGraphNode) {
+//						sceneGraphNode = (SceneGraphNode) selectedObject;
+//					}
+					TreeNode treeNode = treeManager.getTreeNodeFor(selection.getNode());
 					if (treeNode != null) {
 						tree.setSelectionPath(Utils.createTreePath(treeNode));
 					} else {
@@ -59,9 +59,10 @@ public class SelectionManager {
 					if (e.getNewLeadSelectionPath() != null) {
 						selectedTreeNode = e.getNewLeadSelectionPath().getLastPathComponent();
 					}
-					if (selectedTreeNode instanceof SceneGraphTreeNode) {
-						Object selection = ((SceneGraphTreeNode) selectedTreeNode).getSceneGraphNode();
-						selectedObjectAttr.setValue(selection);
+					if (selectedTreeNode instanceof XFormNode) {
+						selection.setNode((XFormNode) selectedTreeNode); 
+//						Object selection = ((SceneGraphTreeNode) selectedTreeNode).getSceneGraphNode();
+//						selectedObjectAttr.setValue(selection);
 					}
 					ignoreChange = false;
 				}
@@ -69,11 +70,11 @@ public class SelectionManager {
 		});
 	}
 	
-	/**
-	 * Returns the Attribute that holds the selected object
-	 * @return the Attribute that holds the selected object
-	 */
-	public GenericAttr<Object> getSelectedObjectAttribute() {
-		return selectedObjectAttr;
-	}
+//	/**
+//	 * Returns the Attribute that holds the selected object
+//	 * @return the Attribute that holds the selected object
+//	 */
+//	public GenericAttr<Object> getSelectedObjectAttribute() {
+//		return selectedObjectAttr;
+//	}
 }

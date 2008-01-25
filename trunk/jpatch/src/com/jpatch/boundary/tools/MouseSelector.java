@@ -78,7 +78,7 @@ public class MouseSelector {
 	}
 	
 	public static void getVertices(Viewport viewport, int x0, int y0, int x1, int y1, SdsModel sdsModel, Selection selection) {
-		CollectionAttr<AbstractVertex> selectedVertices = selection.getSelectedVerticesAttribute();
+		CollectionAttr<AbstractVertex> selectedVertices = selection.getVertices();
 		selectedVertices.clear();
 		
 		ViewDef viewDef = viewport.getViewDef();

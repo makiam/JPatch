@@ -89,7 +89,7 @@ public class Actions {
 	
 	public final JPatchAction dump = new JPatchAction(undoManager, "DUMP") {
 		public void actionPerformed(ActionEvent e) {
-			Sds sds = Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getSds();
+			Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
 			sds.dumpFaces(0);
 		}
 	};
@@ -97,8 +97,8 @@ public class Actions {
 	public final JPatchAction extrudeTest = new JPatchAction(undoManager, "EXTRUDE_TOOL") {
 		public void actionPerformed(ActionEvent e) {
 			System.out.println("extrude");
-			Sds sds = Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getSds();
-			Set<AbstractVertex> selectedVertices = new HashSet<AbstractVertex>(Main.getInstance().getSelection().getSelectedVerticesAttribute().getElements());
+			Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
+			Set<AbstractVertex> selectedVertices = new HashSet<AbstractVertex>(Main.getInstance().getSelection().getVertices());
 			Collection<Face> facesToExtrude = new HashSet<Face>();
 			faceLoop:
 			for (Face face : sds.getFaces(0)) {
@@ -126,7 +126,7 @@ public class Actions {
 			JFileChooser fileChooser = new JFileChooser();
 			if (fileChooser.showOpenDialog(Main.getInstance().getFrame()) == JFileChooser.APPROVE_OPTION) {
 				try {
-					Sds sds = Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue().getSds();
+					Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
 					PrintStream out = new PrintStream(new FileOutputStream(fileChooser.getSelectedFile()));
 					new RibExporter().export(sds, out);
 				} catch (IOException ex) {

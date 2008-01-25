@@ -1067,7 +1067,7 @@ public class ViewportGl extends Viewport {
 	private void drawSelection(Selection selection) {
 		GL gl = drawable.getGL();
 //		if (true) return;
-		selection.getSelectedSdsModelAttribute().getValue().getLocal2WorldTransform(transformUtil, LOCAL);
+		selection.getNode().getLocal2WorldTransform(transformUtil, LOCAL);
 		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
 		gl.glMatrixMode(GL_MODELVIEW);
 		gl.glLoadIdentity();
@@ -1088,12 +1088,12 @@ public class ViewportGl extends Viewport {
 			}
 			gl.glBegin(GL_POINTS);
 			if (viewDef.getShowControlMeshAttribute().getBoolean()) {
-				for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
+				for (AbstractVertex vertex : selection.getVertices()) {
 					vertex.getPosition(p);
 					gl.glVertex3f(p.x, p.y, p.z);
 				}
 			} else if (viewDef.getShowProjectedMeshAttribute().getBoolean()) {
-				for (AbstractVertex vertex : selection.getSelectedVerticesAttribute().getElements()) {
+				for (AbstractVertex vertex : selection.getVertices()) {
 					vertex.getVertexPoint().getLimit(p);
 					gl.glVertex3f(p.x, p.y, p.z);
 				}
@@ -1103,7 +1103,7 @@ public class ViewportGl extends Viewport {
 		
 		Point3f p0 = new Point3f();
 		Point3f p1 = new Point3f();
-		if (!getViewDef().getShowControlMeshAttribute().getBoolean() && selection.getVertexCount() > 1) {
+		if (!getViewDef().getShowControlMeshAttribute().getBoolean() && selection.getVertices().size() > 1) {
 			for (int pass = 0; pass < 4; pass++) {
 				if (pass < 2) {
 					gl.glColor4f(1, 1, 0, 0.15f);
@@ -1117,7 +1117,7 @@ public class ViewportGl extends Viewport {
 				} else {
 					gl.glBegin(GL_POINTS);
 				}
-				for (AbstractVertex v : selection.getSelectedVerticesAttribute().getElements()) {
+				for (AbstractVertex v : selection.getVertices()) {
 					v.getPosition(p0);
 					gl.glVertex3f(p0.x, p0.y, p0.z);
 					if (pass == 0 || pass == 2) {

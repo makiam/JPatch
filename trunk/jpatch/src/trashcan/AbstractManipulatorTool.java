@@ -1,4 +1,4 @@
-package com.jpatch.boundary.tools;
+package trashcan;
 
 import javax.vecmath.*;
 
@@ -6,11 +6,13 @@ import trashcan.*;
 
 import com.jpatch.boundary.*;
 import com.jpatch.boundary.actions.*;
+import com.jpatch.boundary.tools.*;
 import com.jpatch.entity.*;
 
 public abstract class AbstractManipulatorTool implements JPatchTool {
 
 	protected TransformNode getSelectedNode() {
+		return Main.getInstance().getSelection().getNode();
 		if (isObjectMode()) {
 			return (TransformNode) Main.getInstance().getSelectionManager().getSelectedObjectAttribute().getValue();
 		} else {

@@ -434,9 +434,9 @@ public class Main {
 				StateMachine<JPatchTool> sm = (StateMachine<JPatchTool>) source;
 				if (sm.getValue() instanceof ModifierTool) {
 					if (actions.sdsModeSM.getValue() == Actions.SdsMode.OBJECT_MODE) {
-						((ModifierTool) sm.getValue()).setTransformable((XFormNode) selectionManager.getSelectedObjectAttribute().getValue());
+						((ModifierTool) sm.getValue()).setTransformable(selection.getNode());
 					} else {
-						((ModifierTool) sm.getValue()).setTransformable(selection);
+						((ModifierTool) sm.getValue()).setTransformable(selection.getTransformable());
 					}
 				}
 				sm.getValue().registerListeners(viewports);
@@ -591,7 +591,7 @@ public class Main {
 			SdsModel model = new SdsModel(new Sds());
 			model.getNameAttribute().setValue("SDS model");
 			model.getParentAttribute().setValue(sceneGraphRoot);
-			selection.getSelectedSdsModelAttribute().setValue(model);
+			selection.setNode(model);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -762,15 +762,15 @@ public class Main {
 //		viewports[0].setActive(true);
 //		activeViewport.setValue(viewports[0]);
 		
-		selectionManager = new SelectionManager(tree, treeManager);
-		selectionManager.getSelectedObjectAttribute().addAttributePostChangeListener(inspector.getSelectionChangeListener());
+		selectionManager = new SelectionManager(tree, treeManager, selection);
+		selection.getNodeAttribute().addAttributePostChangeListener(inspector.getSelectionChangeListener());
 		actions.toolSM.addAttributePostChangeListener(inspector.getToolChangeListener());
 		
-		selectionManager.getSelectedObjectAttribute().addAttributePostChangeListener(new AttributePostChangeListener() {
+		selection.getNodeAttribute().addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				if (actions.toolSM.getValue() instanceof ModifierTool) {
 					if (actions.sdsModeSM.getValue() == Actions.SdsMode.OBJECT_MODE) {
-						((ModifierTool) actions.toolSM.getValue()).setTransformable((XFormNode) selectionManager.getSelectedObjectAttribute().getValue());
+						((ModifierTool) actions.toolSM.getValue()).setTransformable(selection.getNode());
 						repaintViewports();
 					}
 				}
@@ -896,8 +896,8 @@ public class Main {
 		model.getNameAttribute().setValue("model");
 		model.getParentAttribute().setValue(sceneGraphRoot);
 		
-		SdsModel oldModel = selection.getSelectedSdsModelAttribute().getValue();
-		selection.getSelectedSdsModelAttribute().setValue(model);
+		SdsModel oldModel = selection.getSdsModel();
+		selection.setNode(model);
 		
 		treeManager.removeNode(oldModel);
 	}
