@@ -36,8 +36,8 @@ public abstract class Viewport implements NamedObject {
 	double zPos;
 	double fw;
 	static final int maxSubdiv = 10;
-	static final float nearClip = 1;
-	static final float farClip = 1 << 15;
+	public static final float nearClip = 1;
+	public static final float farClip = 1 << 15;
 	static final RealtimeRendererSettings RENDERER_SETTINGS = Settings.getInstance().realtimeRenderer;
 	boolean active = false;
 	
