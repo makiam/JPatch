@@ -25,7 +25,7 @@ public class Actions {
 			new RotateTool(),
 			new TranslateTool(),
 			new NormalTool(),
-			null,
+			new TweakTool(),
 			null,
 	};
 	

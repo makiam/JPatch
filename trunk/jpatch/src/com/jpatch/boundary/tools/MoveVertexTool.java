@@ -230,7 +230,7 @@ public class MoveVertexTool implements VisibleTool {
 			glContext = glDrawable.getContext();
 			glContext.makeCurrent();
 			//GL gl = glContext.getGL();
-			viewportGl.createScreenShotTexture();
+			viewportGl.validateScreenShotTexture();
 			
 			
 //			cw = glDrawable.getWidth() / 2;
