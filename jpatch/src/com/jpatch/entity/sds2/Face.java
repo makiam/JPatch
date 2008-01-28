@@ -62,6 +62,11 @@ public class Face {
 		this.material = material;
 	}
 	
+	public void getMidpoint(Tuple3d midPoint) {
+		facePoint.validatePosition();
+		midPoint.set(facePoint.position);
+	}
+	
 //	public Face[] getChildren() {
 //		return children;
 //	}
