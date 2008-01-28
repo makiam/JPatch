@@ -158,9 +158,10 @@ public class MoveVertexTool implements VisibleTool {
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
+			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				Point point = new Point(e.getX(), e.getY());
-				MouseSelector.Hit hit = MouseSelector.getVertexAt(viewport, point, false);
+				MouseSelector.HitObject hitObject = MouseSelector.getObjectAt(viewport, mouseX, mouseY, maxDistSq, sdsModel, level, type);
 //				HalfEdge edge = MouseSelector.getEdgeAt(viewport, e.getX(), e.getY(), Main.getInstance().getActiveSds());
 				if (hit.object != null) {
 					Point hitPoint = new Point(point);

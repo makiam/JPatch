@@ -1,157 +1,123 @@
 package com.jpatch.boundary.tools;
 
-import java.awt.*;
-import java.awt.geom.Line2D;
-
 import javax.vecmath.*;
 
-import com.jpatch.afw.attributes.CollectionAttr;
-import com.jpatch.afw.vecmath.Transform;
-import com.jpatch.afw.vecmath.TransformUtil;
+import com.jpatch.afw.vecmath.*;
 import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.*;
-import com.jpatch.entity.SceneGraphNode;
-import com.jpatch.entity.SdsModel;
+import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
 public class MouseSelector {
 	static final private double MIN_DIST_SQ = 64;
 	static final TransformUtil transformUtil = new TransformUtil();
 	
-	public static Hit getVertexAt(Viewport viewport, Point point, boolean noProjection) {	
-		return getVertexAt(viewport, point, Main.getInstance().getSceneGraphRoot(), new Hit(), noProjection);
-	}
-	
-	public static Hit getVertexAt(Viewport viewport, Point point, SceneGraphNode node, boolean noProjection) {
-		return getVertexAt(viewport, point, node, new Hit(), noProjection);
-	}
-	
-	public static Hit getVertexAt(Viewport viewport, Point point, Hit hit, boolean noProjection) {
-		return getVertexAt(viewport, point, Main.getInstance().getSceneGraphRoot(), hit, noProjection);
-	}
-	
-	public static Hit getVertexAt(Viewport viewport, Point point, SceneGraphNode node, Hit hit, boolean noProjection) {
-		if (node instanceof SdsModel) {
-			SdsModel sdsModel = (SdsModel) node;
-			getVertexAt(viewport, point, sdsModel, hit, noProjection);
-		}
-		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
-			getVertexAt(viewport, point, child, hit, noProjection);
-		}
-		return hit;
-	}
-	
-	public static void getVertexAt(Viewport viewport, Point point, SdsModel sdsModel, Hit hit, boolean noProjection) {
-		ViewDef viewDef = viewport.getViewDef();
-		Point hitPoint = new Point();
-//		Matrix4d matrix = new Matrix4d(viewDef.getMatrix(new Matrix4d()));
-//		Transform transform = sdsModel.getTransform();
-//		transform.mul2(matrix);
-		
-//		Matrix4d matrix = viewport.getViewDef().getMatrix(new Matrix4d());
-		boolean useProjection = !viewport.getViewDef().getShowControlMeshAttribute().getBoolean() && !noProjection;
-		Point3d p = new Point3d();
-//		System.out.println("getVertexAt(" + x + ", " + y + ")");
-		viewDef.configureTransformUtil(transformUtil);
+	public static HitObject getObjectAt(Viewport viewport, int mouseX, int mouseY, double maxDistSq, SdsModel sdsModel, int level, int type) {
+		HitObject hitObject = null;
+		viewport.getViewDef().configureTransformUtil(transformUtil);
 		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
-		for (Face face : sdsModel.getSds().getFaces(Globals.getInstance().getEditLevelAttribute().getInt())) {
-			for (HalfEdge edge : face.getEdges()) {
-				AbstractVertex vertex = edge.getVertex();
-				if (useProjection) {
-					vertex.getLimit(p);
-				} else {
-					vertex.getPosition(p);
-				}
-				transformUtil.projectToScreen(transformUtil.LOCAL, p, p);
-				double dx = point.x - p.x;
-				double dy = point.y - p.y;
-				double distanceSq = dx * dx + dy * dy;
-				if (distanceSq < hit.distanceSq) {
-					hit.node = sdsModel;
-					hit.distanceSq = distanceSq;
-					hit.object = vertex;
-					hitPoint.setLocation(p.x, p.y);
-				}
-			}
-		}
-		point.setLocation(hitPoint);
-	}
-	
-	public static void getVertices(Viewport viewport, int x0, int y0, int x1, int y1, SdsModel sdsModel, Selection selection) {
-		CollectionAttr<AbstractVertex> selectedVertices = selection.getVertices();
-		selectedVertices.clear();
-		
-		ViewDef viewDef = viewport.getViewDef();
-		
-		viewDef.configureTransformUtil(transformUtil);
-		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
-		
-		/* ensure that x0 is the left side and x1 is the right side (x0 < x1) */
-		if (x1 < x0) {
-			int tmp = x0;
-			x0 = x1;
-			x1 = tmp;
-		}
-		
-		/* ensure that y0 is the lower side and y1 is the upper side (y0 < y1) */
-		if (y1 < y0) {
-			int tmp = y0;
-			y0 = y1;
-			y1 = tmp;
-		}
-		
-		Point3d p = new Point3d();
-		boolean useProjection = !viewport.getViewDef().getShowControlMeshAttribute().getBoolean();
-		for (Face face : sdsModel.getSds().getFaces(Globals.getInstance().getEditLevelAttribute().getInt())) {
-			for (HalfEdge edge : face.getEdges()) {
-				AbstractVertex vertex = edge.getVertex();
-				if (useProjection) {
-					vertex.getLimit(p);
-				} else {
-					vertex.getPosition(p);
-				}
-				transformUtil.projectToScreen(TransformUtil.LOCAL, p, p);
-				if (p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1) {
-					selectedVertices.add(vertex);
-				}
-			}
-		}		
-	}
-	
-	public static HalfEdge getEdgeAt(Viewport viewport, int x, int y, SdsModel sdsModel) {
-		ViewDef viewDef = viewport.getViewDef();
-		
-		viewDef.configureTransformUtil(transformUtil);
-		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
-		
-//		Matrix4d matrix = viewport.getViewDef().getMatrix(new Matrix4d());
 		Point3d p0 = new Point3d();
 		Point3d p1 = new Point3d();
-		HalfEdge hit = null;
-		double min = MIN_DIST_SQ;
-		Line2D.Double line = new Line2D.Double();
-		for (Face face : sdsModel.getSds().getFaces(0)) {
-			for (HalfEdge edge : face.getEdges()) {
-//				if (edge.isPrimary()) {
-					edge.getVertex().getPosition(p0);
-					edge.getPairVertex().getPosition(p1);
-					transformUtil.projectToScreen(transformUtil.LOCAL, p0, p0);
-					transformUtil.projectToScreen(transformUtil.LOCAL, p1, p1);
-					line.setLine(p0.x, p0.y, p1.x, p1.y);
-					double distanceSq = line.ptSegDistSq(x, y);
-					if (distanceSq < min) {
-						min = distanceSq;
-						hit = edge;
+		for (Face face : sdsModel.getSds().getFaces(level)) {
+			if ((type & Type.FACE) != 0) {
+				face.getMidpoint(p0);
+				double distSq = distSq(mouseX, mouseY, p0);
+				if ((hitObject != null && distSq < hitObject.distanceSq) || distSq < maxDistSq) {
+					hitObject = new HitFace(sdsModel, distSq, (int) p0.x, (int) p0.y, face);
+				}
+			}
+			if (((type & Type.EDGE) | (type & Type.VERTEX) | (type & Type.LIMIT)) != 0) {
+				for (HalfEdge edge : face.getEdges()) {
+					AbstractVertex vertex = edge.getVertex();
+					if ((type & Type.VERTEX) != 0) {
+						vertex.getPosition(p0);
+						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+						double distSq = distSq(mouseX, mouseY, p0);
+						if ((hitObject != null && distSq < hitObject.distanceSq) || distSq < maxDistSq) {
+							hitObject = new HitVertex(sdsModel, distSq, (int) p0.x, (int) p0.y, vertex);
+						}
+					}
+					if ((type & Type.LIMIT) != 0) {
+						vertex.getLimit(p0);
+						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+						double distSq = distSq(mouseX, mouseY, p0);
+						if ((hitObject != null && distSq < hitObject.distanceSq) || distSq < maxDistSq) {
+							hitObject = new HitVertex(sdsModel, distSq, (int) p0.x, (int) p0.y, vertex);
+						}
+					}
+					if ((type & Type.EDGE) != 0) {
+						vertex.getPosition(p0);
+						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+						edge.getPairVertex().getPosition(p1);
+						transformUtil.projectToScreen(TransformUtil.LOCAL, p1, p1);
+						if ((type & Type.VERTEX) == 0) {
+							double t = Utils3d.closestPointOnLine(p0.x, p0.y, p1.x, p1.y, mouseX, mouseY);
+							t = Math.max(0, Math.min(t, 1));
+							p1.interpolate(p0, p1, t);
+						} else {
+							p1.interpolate(p0, p1, 0.5);
+						}
+						double distSq = distSq(mouseX, mouseY, p1);
+						if ((hitObject != null && distSq < hitObject.distanceSq) || distSq < maxDistSq) {
+							hitObject = new HitEdge(sdsModel, distSq, (int) p1.x, (int) p1.y, edge);
+						}
 					}
 				}
 			}
-//		}
-		return hit;
+		}
+		return hitObject;
 	}
 	
-	public static class Hit {
-		public SceneGraphNode node = null;
-		public Object object = null;
-		public double distanceSq = MIN_DIST_SQ;
+	private static double distSq(int mouseX, int mouseY, Point3d p) {
+		double dx = p.x - mouseX;
+		double dy = p.y - mouseY;
+		return dx * dx + dy * dy;
+	}
+	
+	public abstract static class HitObject {
+		public final SceneGraphNode node;
+		public final double distanceSq;
+		public final int screenX;
+		public final int screenY;
+		private HitObject(SceneGraphNode node, double distanceSq, int screenX, int screenY) {
+			this.node = node;
+			this.distanceSq = distanceSq;
+			this.screenX = screenX;
+			this.screenY = screenY;
+		}
+	}
+	
+	public static class HitVertex extends HitObject {
+		public final AbstractVertex vertex;
+		private HitVertex(SceneGraphNode node, double distanceSq, int screenX, int screenY, AbstractVertex vertex) {
+			super(node, distanceSq, screenX, screenY);
+			this.vertex = vertex;
+		}
+	}
+	
+	public static class HitEdge extends HitObject {
+		public final HalfEdge halfEdge;
+		private HitEdge(SceneGraphNode node, double distanceSq, int screenX, int screenY, HalfEdge halfEdge) {
+			super(node, distanceSq, screenX, screenY);
+			this.halfEdge = halfEdge;
+		}
+	}
+	
+	public static class HitFace extends HitObject {
+		public final Face face;
+		private HitFace(SceneGraphNode node, double distanceSq, int screenX, int screenY, Face face) {
+			super(node, distanceSq, screenX, screenY);
+			this.face = face;
+		}
+	}
+	
+	public static final class Type {
+		public static final int VERTEX = 1;
+		public static final int LIMIT = 2;
+		public static final int EDGE = 4;
+		public static final int FACE = 8;
+		private Type() {
+			assert false;	// not instanciable
+		}
 	}
 }
