@@ -1,14 +1,18 @@
 package com.jpatch.boundary;
 
+import java.util.*;
+
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeNode;
+import javax.swing.undo.*;
 
 import com.jpatch.afw.Utils;
 import com.jpatch.afw.attributes.Attribute;
 import com.jpatch.afw.attributes.AttributePostChangeListener;
 import com.jpatch.afw.attributes.GenericAttr;
+import com.jpatch.afw.control.*;
 import com.jpatch.entity.*;
 
 public class SelectionManager {
@@ -21,6 +25,8 @@ public class SelectionManager {
 	 * Flag to prevent update loops
 	 */
 	private boolean ignoreChange;
+	
+	private static final GenericAttr<String> EDIT_NAME = new GenericAttr<String>("change selected node");
 	
 	public SelectionManager(final JTree tree, final TreeManager treeManager, final Selection selection) {
 		/*
@@ -60,7 +66,9 @@ public class SelectionManager {
 						selectedTreeNode = e.getNewLeadSelectionPath().getLastPathComponent();
 					}
 					if (selectedTreeNode instanceof XFormNode) {
-						selection.setNode((XFormNode) selectedTreeNode); 
+						List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(1);
+						selection.setNode((XFormNode) selectedTreeNode, editList);
+						Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
 //						Object selection = ((SceneGraphTreeNode) selectedTreeNode).getSceneGraphNode();
 //						selectedObjectAttr.setValue(selection);
 					}

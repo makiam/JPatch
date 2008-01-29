@@ -5,8 +5,7 @@ import java.util.*;
 import javax.vecmath.*;
 
 import com.jpatch.afw.attributes.*;
-import com.jpatch.afw.control.AttributeEdit;
-import com.jpatch.afw.control.JPatchUndoableEdit;
+import com.jpatch.afw.control.*;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
@@ -25,12 +24,14 @@ public class Selection {
 	private boolean verticesValid;
 	private boolean edgesValid;
 	private boolean facesValid;
-
+	private boolean nodeChanging;
+	
 	private final Transformable transformable = new Transformable() {
 		private Point3d[] startPositions;
 		private Matrix4d matrix = new Matrix4d();
 		
 		public void begin() {
+			validateVertices();
 			int count =vertices.size();
 			startPositions = new Point3d[count];
 			int i = 0;
@@ -96,8 +97,7 @@ public class Selection {
 	public Selection() {
 		nodeAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
-				switchType(Type.NODE);
-				invalidate();
+				assert nodeChanging;
 			}
 		});
 	}
@@ -114,8 +114,11 @@ public class Selection {
 		return nodeAttr.getValue();
 	}
 	
-	public void setNode(XFormNode node) {
+	public void setNode(XFormNode node, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		nodeChanging = true;
 		nodeAttr.setValue(node);
+		nodeChanging = false;
 	}
 	
 	public SdsModel getSdsModel() {
@@ -147,87 +150,119 @@ public class Selection {
 		return transformable;
 	}
 	
-	public void clear() {
+	public void clear(List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
 		invalidate();
 		vertices.clear();
 		edges.clear();
 		faces.clear();
 	}
 	
-	public void addVertex(AbstractVertex vertex) {
-		switchType(Type.VERTICES);
+	public void addVertex(AbstractVertex vertex, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		switchType(Type.VERTICES, null);
 		vertices.add(vertex);
 		invalidate();
 	}
 	
-	public void removeVertex(AbstractVertex vertex) {
-		switchType(Type.VERTICES);
+	public void removeVertex(AbstractVertex vertex, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		switchType(Type.VERTICES, null);
 		vertices.remove(vertex);
 		invalidate();
 	}
 	
-	public void addVertices(Collection<AbstractVertex> vertices) {
-		switchType(Type.VERTICES);
+	public void addVertices(Collection<AbstractVertex> vertices, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		switchType(Type.VERTICES, null);
 		this.vertices.addAll(vertices);
 		invalidate();
 	}
 	
-	public void removeVertices(Collection<AbstractVertex> vertices) {
-		switchType(Type.VERTICES);
+	public void removeVertices(Collection<AbstractVertex> vertices, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		switchType(Type.VERTICES, null);
 		this.vertices.removeAll(vertices);
 		invalidate();
 	}
 	
-	public void addEdge(HalfEdge edge) {
-		switchType(Type.EDGES);
+	public void setVertex(AbstractVertex vertex, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		clear(null);
+		addVertex(vertex, null);
+	}
+	
+	public void addEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		switchType(Type.EDGES, null);
 		edges.add(edge);
 		invalidate();
 	}
 	
-	public void removeEdge(HalfEdge edge) {
-		switchType(Type.EDGES);
+	public void removeEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		switchType(Type.EDGES, null);
 		edges.remove(edge);
 		invalidate();
 	}
 	
-	public void addEdges(Collection<HalfEdge> edges) {
-		switchType(Type.EDGES);
+	public void addEdges(Collection<HalfEdge> edges, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		switchType(Type.EDGES, null);
 		this.edges.addAll(edges);
 		invalidate();
 	}
 	
-	public void removeEdges(Collection<HalfEdge> edges) {
-		switchType(Type.EDGES);
+	public void removeEdges(Collection<HalfEdge> edges, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		switchType(Type.EDGES, null);
 		this.edges.removeAll(edges);
 		invalidate();
 	}
 	
-	public void addFace(Face face) {
-		switchType(Type.FACES);
+	public void setEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		clear(null);
+		addEdge(edge, null);
+	}
+	
+	public void addFace(Face face, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		switchType(Type.FACES, null);
 		faces.add(face);
 		invalidate();
 	}
 	
-	public void removeFace(Face face) {
-		switchType(Type.FACES);
+	public void removeFace(Face face, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		switchType(Type.FACES, null);
 		faces.remove(face);
 		invalidate();
 	}
 	
-	public void addFaces(Collection<Face> faces) {
-		switchType(Type.FACES);
+	public void addFaces(Collection<Face> faces, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		switchType(Type.FACES, null);
 		this.faces.addAll(faces);
 		invalidate();
 	}
 	
-	public void removeFaces(Collection<Face> faces) {
-		switchType(Type.FACES);
+	public void removeFaces(Collection<Face> faces, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		switchType(Type.FACES, null);
 		this.faces.removeAll(faces);
 		invalidate();
 	}
 	
-	public void switchType(Type type) {
+	public void setFace(Face face, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		clear(null);
+		addFace(face, null);
+	}
+	
+	public void switchType(Type type, List<JPatchUndoableEdit> editList) {
 		if (type != this.type) {
+			addChangeSelectionEdit(editList);
 			switch(type) {
 			case NODE:
 				invalidate();
@@ -436,5 +471,79 @@ public class Selection {
 		}
 		mb.build(points);
 		center.set(mb.center());
+	}
+	
+	public static class State {
+		private Object selectedEntities;
+		private Type type;
+		
+		private State(Selection selection) {
+			type = selection.type;
+			switch(type) {
+			case NODE:
+				selectedEntities = selection.nodeAttr.getValue();
+				break;
+			case EDGES:
+				selection.validateEdges();
+				selectedEntities = selection.edges.toArray();
+				break;
+			case FACES:
+				selection.validateFaces();
+				selectedEntities = selection.faces.toArray();
+				break;
+			case VERTICES:
+				selection.validateVertices();
+				selectedEntities = selection.vertices.toArray();
+				break;
+			default:
+				assert false; // should never get here	
+			}
+		}
+		
+		private void copyTo(Selection selection) {
+			selection.type = type;
+			switch(type) {
+			case NODE:
+				selection.nodeAttr.setValue((XFormNode) selectedEntities);
+				break;
+			case EDGES:
+				selection.edges.clear();
+				selection.edges.addAll(Arrays.asList((HalfEdge[]) selectedEntities));
+				selection.invalidate();
+				break;
+			case FACES:
+				selection.faces.clear();
+				selection.faces.addAll(Arrays.asList((Face[]) selectedEntities));
+				selection.invalidate();
+				break;
+			case VERTICES:
+				selection.vertices.clear();
+				selection.vertices.addAll(Arrays.asList((AbstractVertex[]) selectedEntities));
+				selection.invalidate();
+				break;
+			default:
+				assert false; // should never get here	
+			}
+		}
+	}
+	
+	private void addChangeSelectionEdit(List<JPatchUndoableEdit> editList) {
+		if (editList != null) {
+			editList.add(new ChangeSelectionEdit());
+		}
+	}
+	
+	private class ChangeSelectionEdit extends AbstractUndoableEdit {
+		private State state;
+		
+		private ChangeSelectionEdit() {
+			state = new State(Selection.this);
+		}
+		
+		private void swap() {
+			State tmpState = new State(Selection.this);
+			state.copyTo(Selection.this);
+			state = tmpState;
+		}
 	}
 }
