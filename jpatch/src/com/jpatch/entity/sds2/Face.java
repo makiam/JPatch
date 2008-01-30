@@ -12,10 +12,16 @@ import javax.vecmath.*;
 public class Face {
 	private static int count = 0;
 	private final HalfEdge[] faceEdges;
+	private Face[] subFaces;
 	private final double oneOverSides;
 	private DerivedVertex facePoint;
 	private Material material;
 	private int num = count++;
+	private Point3d midpointPosition = new Point3d();
+	private Vector3d midpointNormal = new Vector3d();
+	private boolean midpointPositionValid;
+	private boolean midpointNormalValid;
+	
 //	private final Face[] children;
 	
 	public Face(Material material, HalfEdge... edges) {
@@ -25,6 +31,7 @@ public class Face {
 		oneOverSides = 1.0 / sides;
 		
 		this.faceEdges = edges.clone();
+		
 //		children = new Face[sides];
 		
 		// append adges and set their face to this
@@ -40,8 +47,10 @@ public class Face {
 			this.faceEdges[i].getVertex().organizeEdges();
 		}
 		this.material = material;
-		
-		createFacePoint();
+		for (int i = 0; i < edges.length; i++) {
+			edges[i].faceEdgeIndex = i;
+		}
+//		createFacePoint();
 	}
 	
 	public int getSides() {
@@ -62,14 +71,36 @@ public class Face {
 		this.material = material;
 	}
 	
-	public void getMidpoint(Tuple3d midPoint) {
-		facePoint.validatePosition();
-		midPoint.set(facePoint.position);
+	public void getMidpointPosition(Tuple3d midPoint) {
+		validateMidpointPosition();
+		midPoint.set(midpointPosition);
 	}
 	
+	public void getMidpointNormal(Tuple3d midPoint) {
+		validateMidpointNormal();
+		midPoint.set(midpointNormal);
+	}
+	
+	public void setSubFace(int side, Face face) {
+		subFaces[side] = face;
+	}
 //	public Face[] getChildren() {
 //		return children;
 //	}
+	
+	public void getSubEdges(int side, HalfEdge[] subEdges) {
+		assert subEdges.length == 2;
+//		if (subFaces == null) {
+//			return false;
+//		}
+		int nextSide = side + 1;
+		if (nextSide == faceEdges.length) {
+			nextSide = 0;
+		}
+		subEdges[0] = subFaces[side].faceEdges[2];
+		subEdges[1] = subFaces[nextSide].faceEdges[1];
+//		return true;
+	}
 	
 	public void getLimitSurface(FloatBuffer buffer) {
 		facePoint.validateAlteredLimit();
@@ -121,6 +152,26 @@ public class Face {
 		buffer.rewind();
 	}
 	
+	public void getPositionSurface(FloatBuffer buffer) {
+		buffer.clear();	
+		validateMidpointPosition();
+		buffer.put((float) midpointPosition.x);
+		buffer.put((float) midpointPosition.y);
+		buffer.put((float) midpointPosition.z);
+		for (com.jpatch.entity.sds2.HalfEdge edge : faceEdges) {
+			AbstractVertex v = edge.getVertex();
+			v.validateAlteredPosition();
+			buffer.put((float) v.alteredPosition.x);
+			buffer.put((float) v.alteredPosition.y);
+			buffer.put((float) v.alteredPosition.z);
+		}
+		AbstractVertex v = faceEdges[0].getVertex();
+		buffer.put((float) v.alteredPosition.x);
+		buffer.put((float) v.alteredPosition.y);
+		buffer.put((float) v.alteredPosition.z);
+		buffer.rewind();
+	}
+	
 	public void getLimitMesh(FloatBuffer buffer) {
 		buffer.clear();	
 		for (com.jpatch.entity.sds2.HalfEdge edge : faceEdges) {
@@ -145,7 +196,52 @@ public class Face {
 				edge.getEdgePoint().invalidate();
 			}
 		}
+		midpointPositionValid = false;
+		midpointNormalValid = false;
 //		invalidateAltered();
+	}
+	
+	private void validateMidpointPosition() {
+		if (midpointPositionValid) {
+			return;
+		}
+		double x = 0, y = 0, z = 0;
+		for (HalfEdge edge : faceEdges) {
+//			System.out.println(edge.getVertex());
+			edge.getVertex().validateAlteredPosition();
+			Point3d p = edge.getVertex().alteredPosition;
+			x += p.x;
+			y += p.y;
+			z += p.z;
+		}
+		x *= oneOverSides;
+		y *= oneOverSides;
+		z *= oneOverSides;
+		midpointPosition.set(x, y, z);
+		midpointPositionValid = true;
+	}
+	
+	private void validateMidpointNormal() {
+		if (midpointNormalValid) {
+			return;
+		}
+		double x = 0, y = 0, z = 0;
+		for (HalfEdge edge : faceEdges) {
+			Point3d u = edge.getVertex().alteredPosition;
+			double ux = u.x - midpointPosition.x;
+			double uy = u.y - midpointPosition.y;
+			double uz = u.z - midpointPosition.z;
+			Point3d v = edge.getPairVertex().alteredPosition;
+			double vx = v.x - midpointPosition.x;
+			double vy = v.y - midpointPosition.y;
+			double vz = v.z - midpointPosition.z;
+			x += uy * vz - uz * vy;		// cross product
+			y += uz * vx - ux * vz;
+			z += ux * vy - uy * vx;
+		}
+		midpointNormal.set(x, y, z);
+		midpointNormal.normalize();
+		midpointNormalValid = true;
 	}
 	
 //	public void invalidateAltered() {
@@ -162,24 +258,14 @@ public class Face {
 //		}
 //	}
 	
-	private DerivedVertex createFacePoint() {
+	public DerivedVertex createFacePoint() {
 		assert facePoint == null;
+		subFaces = new Face[faceEdges.length];
 		facePoint = new DerivedVertex() {
 			@Override
 			protected void computePosition() {
-				double x = 0, y = 0, z = 0;
-				for (HalfEdge edge : faceEdges) {
-//					System.out.println(edge.getVertex());
-					edge.getVertex().validateAlteredPosition();
-					Point3d p = edge.getVertex().alteredPosition;
-					x += p.x;
-					y += p.y;
-					z += p.z;
-				}
-				x *= oneOverSides;
-				y *= oneOverSides;
-				z *= oneOverSides;
-				position.set(x, y, z);
+				validateMidpointPosition();
+				position.set(midpointPosition);
 			}
 			
 			@Override

@@ -1023,7 +1023,6 @@ public class ViewportGl extends Viewport {
 
 	protected void drawOrigin() {
 		GL gl = drawable.getGL();
-		System.out.println("draw origin");
 		float radius = (float) transformUtil.computeNiceRadius(-modelView[11], component.getWidth(), component.getHeight()) / 2;
 		Point3f p0 = new Point3f(0, 0, 0);
 		Point3f px = new Point3f(radius, 0, 0);
@@ -1172,35 +1171,64 @@ public class ViewportGl extends Viewport {
 		}
 		
 		if (viewDef.getShowProjectedMeshAttribute().getBoolean()) {
-			gl.glDisable(GL_COLOR_MATERIAL);
-			gl.glDisable(GL_LIGHTING);
-			gl.glInterleavedArrays(GL_V3F, 0, buffer);
-			gl.glColor3f(1, 0, 0);
-			for (com.jpatch.entity.sds2.Face face : sds.getFaces(Globals.getInstance().getEditLevelAttribute().getInt())) {
-				face.getLimitMesh(buffer);
-				gl.glDrawArrays(GL_POINTS, 0, face.getSides());
+//			gl.glDisable(GL_COLOR_MATERIAL);
+//			gl.glDisable(GL_LIGHTING);
+//			gl.glInterleavedArrays(GL_V3F, 0, buffer);
+//			gl.glColor3f(1, 0, 0);
+//			for (com.jpatch.entity.sds2.Face face : sds.getFaces(Globals.getInstance().getEditLevelAttribute().getInt())) {
+//				face.getLimitMesh(buffer);
+//				gl.glDrawArrays(GL_POINTS, 0, face.getSides());
+//			}
+//			gl.glDisable(GL_DEPTH_TEST);
+//			gl.glEnable(GL_BLEND);
+//			gl.glColor4f(1, 0, 0, 0.25f);
+//			for (com.jpatch.entity.sds2.Face face : sds.getFaces(Globals.getInstance().getEditLevelAttribute().getInt())) {
+//				face.getLimitMesh(buffer);
+//				gl.glDrawArrays(GL_POINTS, 0, face.getSides());
+//			}
+//			gl.glEnable(GL_DEPTH_TEST);
+//			gl.glDisable(GL_BLEND);
+			gl.glColor3f(1, 1, 1);
+			gl.glBegin(GL_LINES);
+			int editLevel = Globals.getInstance().getEditLevelAttribute().getInt();
+			int renderLevel = Globals.getInstance().getRenderLevelAttribute().getInt();
+			int levelsToGo = renderLevel - editLevel;
+			Point3d p = new Point3d();
+			HalfEdge[] subEdges = new HalfEdge[2];
+			for (com.jpatch.entity.sds2.Face face : sds.getFaces(editLevel)) {
+				for (HalfEdge edge : face.getEdges()) {
+					if (edge.isPrimary() || edge.getPairFace() == null) {
+						drawEdgeLimit(gl, p, levelsToGo, edge, subEdges);
+					}
+				}
 			}
-			gl.glDisable(GL_DEPTH_TEST);
-			gl.glEnable(GL_BLEND);
-			gl.glColor4f(1, 0, 0, 0.25f);
-			for (com.jpatch.entity.sds2.Face face : sds.getFaces(Globals.getInstance().getEditLevelAttribute().getInt())) {
-				face.getLimitMesh(buffer);
-				gl.glDrawArrays(GL_POINTS, 0, face.getSides());
-			}
-			gl.glEnable(GL_DEPTH_TEST);
-			gl.glDisable(GL_BLEND);
+			gl.glEnd();
 		}
 		
 		if (viewDef.getShowControlMeshAttribute().getBoolean()) {
-			gl.glDisable(GL_COLOR_MATERIAL);
-			gl.glDisable(GL_LIGHTING);
+			gl.glColor3f(0, 0, 0);
+			gl.glEnable(GL_COLOR_MATERIAL);
+			gl.glColorMaterial(GL_FRONT, GL_EMISSION);
+			gl.glEnable(GL_LIGHTING);
 			gl.glInterleavedArrays(GL_V3F, 0, buffer);
+			boolean solid = !viewDef.getShowLimitSurfaceAttribute().getBoolean();
+			GlMaterial currentMaterial = null;
+			Vector3d normal = new Vector3d();
 			for (com.jpatch.entity.sds2.Face face : sds.getFaces(Globals.getInstance().getEditLevelAttribute().getInt())) {
-				face.getPositionMesh(buffer);
+				face.getPositionSurface(buffer);
+				if (solid) {
+					GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
+					if (currentMaterial != faceMaterial) {
+						setMaterial(GL_FRONT, faceMaterial.getArray());
+						currentMaterial = faceMaterial;
+					}
+					face.getMidpointNormal(normal);
+					gl.glNormal3d(normal.x, normal.y, normal.z);
+					gl.glColor3f(0, 0, 0);
+					gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() + 2);
+				}
 				gl.glColor3f(1, 1, 1);
-				gl.glDrawArrays(GL_LINE_LOOP, 0, face.getSides());
-				gl.glColor3f(1, 0, 0);
-				gl.glDrawArrays(GL_POINTS, 0, face.getSides());
+				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides());
 			}
 		}
 //		for (com.jpatch.entity.sds2.Face face : sds.getFaces(level)) {
@@ -1233,6 +1261,24 @@ public class ViewportGl extends Viewport {
 //		gl.glEnable(GL_DEPTH_TEST);
 //		gl.glLoadIdentity();
 		
+	}
+	
+	private void drawEdgeLimit(GL gl, Point3d p, int levelsToGo, HalfEdge edge, HalfEdge[] subEdges) {
+		if (levelsToGo > 0) {
+			Face face = edge.getFace();
+			face.getSubEdges(edge.getFaceEdgeIndex(), subEdges);
+			HalfEdge edge0 = subEdges[0];
+			HalfEdge edge1 = subEdges[1];
+			drawEdgeLimit(gl, p, levelsToGo - 1, edge0, subEdges);
+			drawEdgeLimit(gl, p, levelsToGo - 1, edge1, subEdges);
+		} else {
+			edge.getVertex().validateAlteredLimit();
+			edge.getVertex().getLimit(p);
+			gl.glVertex3d(p.x, p.y, p.z);
+			edge.getPairVertex().validateAlteredLimit();
+			edge.getPairVertex().getLimit(p);
+			gl.glVertex3d(p.x, p.y, p.z);
+		}
 	}
 	
 	private void drawSds3(Sds sds) {
@@ -1854,6 +1900,7 @@ public class ViewportGl extends Viewport {
 	}
 	
 	public float getDepthAt(int x, int y) {
+		validateScreenShotTexture();
 		int h = component.getHeight();
 		int w = component.getWidth();
 		if (x < 0 || x >= w || y < 0 || y >= h) {
@@ -1864,7 +1911,9 @@ public class ViewportGl extends Viewport {
 		index = (h - y - 1) * w + x;
 //		System.out.println("x=" + x + " y=" + y + " w=" + w + " h=" + h + " i=" + index + " capacity=" + depthBuffer.capacity());
 		buffer.rewind();
-		return farClip - 2 * Viewport.farClip * depthBuffer.get(index) - 1;
+		float depth = farClip - 2 * Viewport.farClip * depthBuffer.get(index) - 1;
+//		System.out.println("x= " + x + " y=" + y + " depth=" + depth);
+		return depth;
 	}
 	
 	public void drawScreenShot(int x0, int y0, int x1, int y1, float alpha) {

@@ -11,21 +11,25 @@ public class HalfEdge {
 	
 	private final AbstractVertex vertex;
 	private final HalfEdge pair;
+	private final boolean primary;
+	
 	private HalfEdge next;
 	private HalfEdge prev;
 	private Face face;
+	int faceEdgeIndex;
 	private int boundaryType;
-	
 	private DerivedVertex edgePoint;
 	
 	public HalfEdge(AbstractVertex v0, AbstractVertex v1) {
 		this.vertex = v0;
 		this.pair = new HalfEdge(v1, this);
+		this.primary = true;
 	}
 	
 	private HalfEdge(AbstractVertex v, HalfEdge pair) {
 		this.vertex = v;
 		this.pair = pair;
+		this.primary = false;
 	}
 	
 	public AbstractVertex getVertex() {
@@ -72,12 +76,30 @@ public class HalfEdge {
 		}
 	}
 	
+	public int getFaceEdgeIndex() {
+		return faceEdgeIndex;
+	}
+	
+//	private void computeFaceEdgeIndex() {
+//		HalfEdge[] faceEdges = face.getEdges();
+//		for (int i = 0; i < faceEdges.length; i++) {
+//			if (faceEdges[i] == this) {
+//				faceEdgeIndex = i;
+//			}
+//		}
+//		assert false; // should never get here
+//	}
+	
 	public void appendTo(HalfEdge prevEdge) {
 		assert prev == null : this + ".prev is " + prev + ", must be null";
 		assert prevEdge.next == null : prevEdge + ".next is " + prevEdge.next + ", must be null";
 		assert vertex == prevEdge.pair.vertex : "prevEdge.pair.vertex is " + prevEdge.pair.vertex + ", this.vertex = " + vertex + ", must be equal";
 		prevEdge.next = this;
 		this.prev = prevEdge;
+	}
+	
+	public boolean isPrimary() {
+		return primary;
 	}
 	
 	public DerivedVertex createEdgePoint() {
