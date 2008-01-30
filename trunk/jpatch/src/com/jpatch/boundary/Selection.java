@@ -13,7 +13,7 @@ import com.jpatch.entity.sds2.*;
 public class Selection {
 	public static enum Type { VERTICES, EDGES, FACES, NODE }
 	
-	private Type type;
+	private Type type = Type.NODE;
 	private final GenericAttr<XFormNode> nodeAttr = new GenericAttr<XFormNode>();
 	private final Set<AbstractVertex> vertices = new HashSet<AbstractVertex>();
 	private final Collection<AbstractVertex> unmodifyableVertices = Collections.unmodifiableCollection(vertices);
@@ -24,7 +24,7 @@ public class Selection {
 	private boolean verticesValid;
 	private boolean edgesValid;
 	private boolean facesValid;
-	private boolean nodeChanging;
+//	private boolean nodeChanging;
 	
 	private final Transformable transformable = new Transformable() {
 		private Point3d[] startPositions;
@@ -95,11 +95,11 @@ public class Selection {
 	};
 	
 	public Selection() {
-		nodeAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute source) {
-				assert nodeChanging;
-			}
-		});
+//		nodeAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
+//			public void attributeHasChanged(Attribute source) {
+//				assert nodeChanging;
+//			}
+//		});
 	}
 	
 	public Type getType() {
@@ -116,9 +116,10 @@ public class Selection {
 	
 	public void setNode(XFormNode node, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		nodeChanging = true;
+//		nodeChanging = true;
 		nodeAttr.setValue(node);
-		nodeChanging = false;
+		switchType(Type.NODE, null);
+//		nodeChanging = false;
 	}
 	
 	public SdsModel getSdsModel() {
@@ -360,8 +361,9 @@ public class Selection {
 					edges.add(edge);
 				}
 			}
+			break;
 		default:
-			assert false; // should never get here	
+			assert false : "type was " + type; // should never get here	
 		}	
 		edgesValid = true;
 	}
@@ -538,12 +540,25 @@ public class Selection {
 		
 		private ChangeSelectionEdit() {
 			state = new State(Selection.this);
+			apply(false);
 		}
 		
 		private void swap() {
 			State tmpState = new State(Selection.this);
 			state.copyTo(Selection.this);
 			state = tmpState;
+		}
+		
+		@Override
+		public void undo() {
+			super.undo();
+			swap();
+		}
+		
+		@Override
+		public void redo() {
+			super.redo();
+			swap();
 		}
 	}
 }

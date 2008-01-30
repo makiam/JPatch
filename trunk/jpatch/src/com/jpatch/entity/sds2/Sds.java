@@ -5,7 +5,7 @@ import com.jpatch.entity.*;
 import java.util.*;
 
 public class Sds {
-	private int maxLevel = 1;
+	private int maxLevel = 4;
 	
 	private final static Comparator<Face> faceMaterialComparator = new Comparator<Face>() {
 		public int compare(Face f1, Face f2) {
@@ -42,11 +42,12 @@ public class Sds {
 		int nextLevel = level + 1;
 		if (nextLevel <= maxLevel) {
 			for (int i = 0; i < edges.length; i++) {
-				AbstractVertex v0 = face.getFacePoint();
+				AbstractVertex v0 = face.getFacePoint() == null ? face.createFacePoint() : face.getFacePoint();
 				AbstractVertex v1 = edges[i].getPrev().getEdgePoint() == null ? edges[i].getPrev().createEdgePoint() : edges[i].getPrev().getEdgePoint();
 				AbstractVertex v2 = edges[i].getVertex().getVertexPoint() == null ? edges[i].getVertex().createVertexPoint() : edges[i].getVertex().getVertexPoint();
 				AbstractVertex v3 = edges[i].getEdgePoint() == null ? edges[i].createEdgePoint() : edges[i].getEdgePoint();
-				addFace(nextLevel, material, v0, v1, v2, v3);
+				Face subFace = addFace(nextLevel, material, v0, v1, v2, v3);
+				face.setSubFace(i, subFace);
 			}
 		}
 		facesSorted = false;

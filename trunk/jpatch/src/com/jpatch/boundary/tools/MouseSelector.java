@@ -37,7 +37,7 @@ public class MouseSelector {
 		for (Face face : sdsModel.getSds().getFaces(level)) {
 //			System.out.println("getObjectAt face=" + face + " mx=" + mouseX + " my=" + mouseY);
 			if ((type & Type.FACE) != 0) {
-				face.getMidpoint(p0);
+				face.getMidpointPosition(p0);
 				transformUtil.projectToScreen(LOCAL, p0, p0);
 				if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
 					double distSq = distSq(mouseX, mouseY, p0);
@@ -64,9 +64,11 @@ public class MouseSelector {
 					if ((type & Type.LIMIT) != 0) {
 						vertex.getLimit(p0);
 						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
-						double distSq = distSq(mouseX, mouseY, p0);
-						if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-							hitObject = new HitVertex(sdsModel, distSq, (int) p0.x, (int) p0.y, vertex);
+						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
+							double distSq = distSq(mouseX, mouseY, p0);
+							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
+								hitObject = new HitVertex(sdsModel, distSq, (int) p0.x, (int) p0.y, vertex);
+							}
 						}
 					}
 					if ((type & Type.EDGE) != 0) {
@@ -91,7 +93,7 @@ public class MouseSelector {
 							}
 	//						System.out.println(" distance = " + Math.sqrt(distSq));
 							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-								hitObject = new HitEdge(sdsModel, distSq, (int) p1.x, (int) p1.y, edge);
+								hitObject = new HitEdge(sdsModel, distSq, (int) pem.x, (int) pem.y, edge);
 							}
 						}
 					}

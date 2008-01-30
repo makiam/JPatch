@@ -591,7 +591,7 @@ public class Main {
 			SdsModel model = new SdsModel(new Sds());
 			model.getNameAttribute().setValue("SDS model");
 			model.getParentAttribute().setValue(sceneGraphRoot);
-			selection.setNode(model);
+			selection.setNode(model, null);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -897,7 +897,7 @@ public class Main {
 		model.getParentAttribute().setValue(sceneGraphRoot);
 		
 		SdsModel oldModel = selection.getSdsModel();
-		selection.setNode(model);
+		selection.setNode(model, null);
 		
 		treeManager.removeNode(oldModel);
 	}
