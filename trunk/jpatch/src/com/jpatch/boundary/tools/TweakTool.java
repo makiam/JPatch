@@ -66,8 +66,8 @@ public class TweakTool implements VisibleTool {
 		gl.glLoadMatrixd(modelView, 0);
 		gl.glEnable(GL_BLEND);
 		gl.glDisable(GL_DEPTH_TEST);
-		gl.glPointSize(6.0f);
-		gl.glLineWidth(4.0f);
+		
+		
 		gl.glColor4f(1, 1, 0, 1.0f);
 		Point3d p = new Point3d();
 		if (hitObject instanceof HitVertex) {
@@ -77,12 +77,21 @@ public class TweakTool implements VisibleTool {
 			} else {
 				hitVertex.vertex.getLimit(p);
 			}
+			gl.glPointSize(6.0f);
 			gl.glBegin(GL_POINTS);
 			gl.glVertex3d(p.x, p.y, p.z);
 			gl.glEnd();
 		} else if (hitObject instanceof HitEdge) {
 			HitEdge hitEgde = (HitEdge) hitObject;
+			gl.glLineWidth(3.0f);
 			gl.glBegin(GL_LINES);
+			hitEgde.halfEdge.getVertex().getPosition(p);
+			gl.glVertex3d(p.x, p.y, p.z);
+			hitEgde.halfEdge.getPairVertex().getPosition(p);
+			gl.glVertex3d(p.x, p.y, p.z);
+			gl.glEnd();
+			gl.glPointSize(4.0f);
+			gl.glBegin(GL_POINTS);
 			hitEgde.halfEdge.getVertex().getPosition(p);
 			gl.glVertex3d(p.x, p.y, p.z);
 			hitEgde.halfEdge.getPairVertex().getPosition(p);
@@ -112,6 +121,11 @@ public class TweakTool implements VisibleTool {
 				gl.glVertex3d(p.x, p.y, p.z);
 				gl.glEnd();
 			}
+			gl.glPointSize(4.0f);
+			hitFace.face.getMidpointPosition(p);
+			gl.glBegin(GL_POINTS);
+			gl.glVertex3d(p.x, p.y, p.z);
+			gl.glEnd();
 		}
 		gl.glPointSize(3.0f);
 		gl.glLineWidth(1.0f);

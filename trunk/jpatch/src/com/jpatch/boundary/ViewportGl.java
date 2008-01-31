@@ -1078,72 +1078,121 @@ public class ViewportGl extends Viewport {
 		gl.glEnable(GL_LIGHTING);
 	}
 	
-	private void drawSelection(Selection selection) {
+//	private void drawSelection(Selection selection) {
+//		GL gl = drawable.getGL();
+////		if (true) return;
+//		selection.getNode().getLocal2WorldTransform(transformUtil, LOCAL);
+//		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
+//		gl.glMatrixMode(GL_MODELVIEW);
+//		gl.glLoadIdentity();
+//		gl.glLoadMatrixd(modelView, 0);
+//		
+//		gl.glPointSize(4);
+//		gl.glDisable(GL_LIGHTING);
+//		Point3f p = new Point3f();
+//		for (int pass = 0; pass < 2; pass++) {
+//			if (pass == 0) {
+//				gl.glDisable(GL_DEPTH_TEST);
+//				gl.glEnable(GL_BLEND);
+//				gl.glColor4f(1, 1, 0, 0.4f);
+//			} else {
+//				gl.glEnable(GL_DEPTH_TEST);
+//				gl.glDisable(GL_BLEND);
+//				gl.glColor3f(1, 1, 0);
+//			}
+//			gl.glBegin(GL_POINTS);
+//			if (viewDef.getShowControlMeshAttribute().getBoolean()) {
+//				for (AbstractVertex vertex : selection.getVertices()) {
+//					vertex.getPosition(p);
+//					gl.glVertex3f(p.x, p.y, p.z);
+//				}
+//			} else if (viewDef.getShowProjectedMeshAttribute().getBoolean()) {
+//				for (AbstractVertex vertex : selection.getVertices()) {
+//					vertex.getVertexPoint().getLimit(p);
+//					gl.glVertex3f(p.x, p.y, p.z);
+//				}
+//			}
+//			gl.glEnd();
+//		}
+//		
+//		Point3f p0 = new Point3f();
+//		Point3f p1 = new Point3f();
+//		if (!getViewDef().getShowControlMeshAttribute().getBoolean() && selection.getVertices().size() > 1) {
+//			for (int pass = 0; pass < 4; pass++) {
+//				if (pass < 2) {
+//					gl.glColor4f(1, 1, 0, 0.15f);
+//					gl.glDisable(GL_DEPTH_TEST);
+//				} else {
+//					gl.glColor4f(1, 1, 0, 0.5f);
+//					gl.glEnable(GL_DEPTH_TEST);
+//				}
+//				if (pass == 0 || pass == 2) {
+//					gl.glBegin(GL_LINES);
+//				} else {
+//					gl.glBegin(GL_POINTS);
+//				}
+//				for (AbstractVertex v : selection.getVertices()) {
+//					v.getPosition(p0);
+//					gl.glVertex3f(p0.x, p0.y, p0.z);
+//					if (pass == 0 || pass == 2) {
+//						v.getVertexPoint().getLimit(p1);
+//						gl.glVertex3f(p1.x, p1.y, p1.z);
+//					}
+//				}
+//				gl.glEnd();
+//			}
+//		}
+//		
+//		gl.glPointSize(3);
+//	}
+	
+	public void drawSelection(Selection selection) {
 		GL gl = drawable.getGL();
-//		if (true) return;
-		selection.getNode().getLocal2WorldTransform(transformUtil, LOCAL);
-		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
-		gl.glMatrixMode(GL_MODELVIEW);
-		gl.glLoadIdentity();
-		gl.glLoadMatrixd(modelView, 0);
-		
-		gl.glPointSize(4);
-		gl.glDisable(GL_LIGHTING);
+//		selection.getNode().getLocal2WorldTransform(transformUtil, LOCAL);
+//		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
+//		gl.glMatrixMode(GL_MODELVIEW);
+//		gl.glLoadIdentity();
+//		gl.glLoadMatrixd(modelView, 0);
 		Point3f p = new Point3f();
-		for (int pass = 0; pass < 2; pass++) {
-			if (pass == 0) {
-				gl.glDisable(GL_DEPTH_TEST);
-				gl.glEnable(GL_BLEND);
-				gl.glColor4f(1, 1, 0, 0.4f);
-			} else {
-				gl.glEnable(GL_DEPTH_TEST);
-				gl.glDisable(GL_BLEND);
-				gl.glColor3f(1, 1, 0);
-			}
+		Vector3d n = new Vector3d();
+		switch (selection.getType()) {
+		case VERTICES:
+			gl.glPointSize(6);
+			gl.glColor3f(1, 1, 0);
 			gl.glBegin(GL_POINTS);
-			if (viewDef.getShowControlMeshAttribute().getBoolean()) {
-				for (AbstractVertex vertex : selection.getVertices()) {
-					vertex.getPosition(p);
-					gl.glVertex3f(p.x, p.y, p.z);
-				}
-			} else if (viewDef.getShowProjectedMeshAttribute().getBoolean()) {
-				for (AbstractVertex vertex : selection.getVertices()) {
-					vertex.getVertexPoint().getLimit(p);
-					gl.glVertex3f(p.x, p.y, p.z);
-				}
+			for (AbstractVertex vertex : selection.getVertices()) {
+				vertex.getPosition(p);
+				gl.glVertex3f(p.x, p.y, p.z);
 			}
 			gl.glEnd();
-		}
-		
-		Point3f p0 = new Point3f();
-		Point3f p1 = new Point3f();
-		if (!getViewDef().getShowControlMeshAttribute().getBoolean() && selection.getVertices().size() > 1) {
-			for (int pass = 0; pass < 4; pass++) {
-				if (pass < 2) {
-					gl.glColor4f(1, 1, 0, 0.15f);
-					gl.glDisable(GL_DEPTH_TEST);
-				} else {
-					gl.glColor4f(1, 1, 0, 0.5f);
-					gl.glEnable(GL_DEPTH_TEST);
-				}
-				if (pass == 0 || pass == 2) {
-					gl.glBegin(GL_LINES);
-				} else {
-					gl.glBegin(GL_POINTS);
-				}
-				for (AbstractVertex v : selection.getVertices()) {
-					v.getPosition(p0);
-					gl.glVertex3f(p0.x, p0.y, p0.z);
-					if (pass == 0 || pass == 2) {
-						v.getVertexPoint().getLimit(p1);
-						gl.glVertex3f(p1.x, p1.y, p1.z);
-					}
-				}
-				gl.glEnd();
+			break;
+		case EDGES:
+			gl.glLineWidth(4);
+			gl.glColor3f(1, 1, 0);
+			gl.glBegin(GL_LINES);
+			for (HalfEdge edge : selection.getEdges()) {
+				edge.getVertex().getPosition(p);
+				gl.glVertex3f(p.x, p.y, p.z);
+				edge.getPairVertex().getPosition(p);
+				gl.glVertex3f(p.x, p.y, p.z);
 			}
+			gl.glEnd();
+			break;
+		case FACES:
+			gl.glLineWidth(2);
+			gl.glEnable(GL_BLEND);
+			for (Face face : selection.getFaces()) {
+				face.getPositionSurface(buffer);
+				face.getMidpointNormal(n);
+				gl.glNormal3d(n.x, n.y, n.z);
+				gl.glColor4f(1, 1, 0, 0.5f);
+				gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() + 2);
+				gl.glColor3f(1, 1, 0);
+				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides());
+			}
+			gl.glDisable(GL_BLEND);
+			break;
 		}
-		
-		gl.glPointSize(3);
 	}
 	
 	private void drawSds2(com.jpatch.entity.sds2.Sds sds, int level) {
@@ -1198,7 +1247,7 @@ public class ViewportGl extends Viewport {
 			for (com.jpatch.entity.sds2.Face face : sds.getFaces(editLevel)) {
 				for (HalfEdge edge : face.getEdges()) {
 					if (edge.isPrimary() || edge.getPairFace() == null) {
-						drawEdgeLimit(gl, p, levelsToGo, edge, subEdges);
+						drawEdgeLimit(p, levelsToGo, edge, subEdges);
 					}
 				}
 			}
@@ -1263,14 +1312,15 @@ public class ViewportGl extends Viewport {
 		
 	}
 	
-	private void drawEdgeLimit(GL gl, Point3d p, int levelsToGo, HalfEdge edge, HalfEdge[] subEdges) {
+	private void drawEdgeLimit(Point3d p, int levelsToGo, HalfEdge edge, HalfEdge[] subEdges) {
+		GL gl = drawable.getGL();
 		if (levelsToGo > 0) {
 			Face face = edge.getFace();
 			face.getSubEdges(edge.getFaceEdgeIndex(), subEdges);
 			HalfEdge edge0 = subEdges[0];
 			HalfEdge edge1 = subEdges[1];
-			drawEdgeLimit(gl, p, levelsToGo - 1, edge0, subEdges);
-			drawEdgeLimit(gl, p, levelsToGo - 1, edge1, subEdges);
+			drawEdgeLimit(p, levelsToGo - 1, edge0, subEdges);
+			drawEdgeLimit(p, levelsToGo - 1, edge1, subEdges);
 		} else {
 			edge.getVertex().validateAlteredLimit();
 			edge.getVertex().getLimit(p);
@@ -1280,6 +1330,7 @@ public class ViewportGl extends Viewport {
 			gl.glVertex3d(p.x, p.y, p.z);
 		}
 	}
+	
 	
 	private void drawSds3(Sds sds) {
 		useProgram = false;
