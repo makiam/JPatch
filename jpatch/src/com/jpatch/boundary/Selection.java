@@ -196,28 +196,32 @@ public class Selection {
 	public void addEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
 		switchType(Type.EDGES, null);
-		edges.add(edge);
+		edges.add(edge.getPrimary());
 		invalidate();
 	}
 	
 	public void removeEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
 		switchType(Type.EDGES, null);
-		edges.remove(edge);
+		edges.remove(edge.getPrimary());
 		invalidate();
 	}
 	
 	public void addEdges(Collection<HalfEdge> edges, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
 		switchType(Type.EDGES, null);
-		this.edges.addAll(edges);
+		for (HalfEdge edge : edges) {
+			this.edges.add(edge.getPrimary());
+		}
 		invalidate();
 	}
 	
 	public void removeEdges(Collection<HalfEdge> edges, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
 		switchType(Type.EDGES, null);
-		this.edges.removeAll(edges);
+		for (HalfEdge edge : edges) {
+			this.edges.remove(edge.getPrimary());
+		}
 		invalidate();
 	}
 	
@@ -341,7 +345,7 @@ public class Selection {
 				Sds sds = sdsModel.getSds();
 				for (Face face : sds.getFaces(0)) {
 					for (HalfEdge edge : face.getEdges()) {
-						edges.add(edge);
+						edges.add(edge.getPrimary());
 					}
 				}
 			}
@@ -350,7 +354,7 @@ public class Selection {
 			for (AbstractVertex vertex : vertices) {
 				for (HalfEdge edge : vertex.getEdges()) {
 					if (vertices.contains(edge.getPairVertex())) {
-						edges.add(edge);
+						edges.add(edge.getPrimary());
 					}
 				}
 			}
@@ -358,7 +362,7 @@ public class Selection {
 		case FACES:
 			for (Face face : faces) {
 				for (HalfEdge edge : face.getEdges()) {
-					edges.add(edge);
+					edges.add(edge.getPrimary());
 				}
 			}
 			break;

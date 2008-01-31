@@ -102,6 +102,10 @@ public class HalfEdge {
 		return primary;
 	}
 	
+	public HalfEdge getPrimary() {
+		return primary ? this : pair;
+	}
+	
 	public DerivedVertex createEdgePoint() {
 		assert edgePoint == null;
 		edgePoint = new DerivedVertex() {
