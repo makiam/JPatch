@@ -679,9 +679,13 @@ public class ViewportGl extends Viewport {
 		
 //		drawOrigin(viewDef.getTransformUtil().getMatrix(WORLD, CAMERA, new Matrix4f()));
 		
+		gl.glLineWidth(1);
 		SceneGraphNode sceneGraphRoot = Main.getInstance().getSceneGraphRoot();
 		drawSceneGraphElement(sceneGraphRoot);
 		Selection selection = Main.getInstance().getSelection();
+		
+		gl.glDisable(GL_LIGHTING);
+		gl.glDisable(GL_COLOR_MATERIAL);
 		drawSelection(selection);
 		
 		JPatchTool tool = Main.getInstance().getActiveTool();
@@ -1153,8 +1157,11 @@ public class ViewportGl extends Viewport {
 //		gl.glMatrixMode(GL_MODELVIEW);
 //		gl.glLoadIdentity();
 //		gl.glLoadMatrixd(modelView, 0);
+		
+		
 		Point3f p = new Point3f();
 		Vector3d n = new Vector3d();
+		gl.glDepthMask(false);
 		switch (selection.getType()) {
 		case VERTICES:
 			gl.glPointSize(6);
@@ -1193,6 +1200,9 @@ public class ViewportGl extends Viewport {
 			gl.glDisable(GL_BLEND);
 			break;
 		}
+		gl.glDepthMask(true);
+	
+//		gl.glPopMatrix();
 	}
 	
 	private void drawSds2(com.jpatch.entity.sds2.Sds sds, int level) {

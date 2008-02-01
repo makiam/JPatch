@@ -43,7 +43,7 @@ public class MouseSelector {
 					double distSq = distSq(mouseX, mouseY, p0);
 	//				System.out.println("face midpoint = " + p0 + " distSq = " + distSq);
 					if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-						hitObject = new HitFace(sdsModel, distSq, (int) p0.x, (int) p0.y, face);
+						hitObject = new HitFace(sdsModel, distSq, p0, face);
 					}
 				}
 			}
@@ -57,7 +57,7 @@ public class MouseSelector {
 						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
 							double distSq = distSq(mouseX, mouseY, p0);
 							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-								hitObject = new HitVertex(sdsModel, distSq, (int) p0.x, (int) p0.y, vertex);
+								hitObject = new HitVertex(sdsModel, distSq, p0, vertex);
 							}
 						}
 					}
@@ -67,7 +67,7 @@ public class MouseSelector {
 						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
 							double distSq = distSq(mouseX, mouseY, p0);
 							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-								hitObject = new HitVertex(sdsModel, distSq, (int) p0.x, (int) p0.y, vertex);
+								hitObject = new HitVertex(sdsModel, distSq, p0, vertex);
 							}
 						}
 					}
@@ -93,7 +93,7 @@ public class MouseSelector {
 							}
 	//						System.out.println(" distance = " + Math.sqrt(distSq));
 							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-								hitObject = new HitEdge(sdsModel, distSq, (int) pem.x, (int) pem.y, edge);
+								hitObject = new HitEdge(sdsModel, distSq, pem, edge.getPrimary());
 							}
 						}
 					}
@@ -115,37 +115,71 @@ public class MouseSelector {
 	public abstract static class HitObject {
 		public final XFormNode node;
 		public final double distanceSq;
-		public final int screenX;
-		public final int screenY;
-		private HitObject(XFormNode node, double distanceSq, int screenX, int screenY) {
+		public final Point3d screenPosition;
+		private HitObject(XFormNode node, double distanceSq, Point3d screenPosition) {
 			this.node = node;
 			this.distanceSq = distanceSq;
-			this.screenX = screenX;
-			this.screenY = screenY;
+			this.screenPosition = new Point3d(screenPosition);
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (!(o instanceof HitObject)) {
+				return false;
+			}
+			HitObject other = (HitObject) o;
+			return node == other.node;
 		}
 	}
 	
 	public static class HitVertex extends HitObject {
 		public final AbstractVertex vertex;
-		private HitVertex(XFormNode node, double distanceSq, int screenX, int screenY, AbstractVertex vertex) {
-			super(node, distanceSq, screenX, screenY);
+		private HitVertex(XFormNode node, double distanceSq, Point3d screenPosition, AbstractVertex vertex) {
+			super(node, distanceSq, screenPosition);
 			this.vertex = vertex;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (!(o instanceof HitVertex)) {
+				return false;
+			}
+			HitVertex other = (HitVertex) o;
+			return super.equals(o) && vertex == other.vertex;
 		}
 	}
 	
 	public static class HitEdge extends HitObject {
 		public final HalfEdge halfEdge;
-		private HitEdge(XFormNode node, double distanceSq, int screenX, int screenY, HalfEdge halfEdge) {
-			super(node, distanceSq, screenX, screenY);
+		private HitEdge(XFormNode node, double distanceSq, Point3d screenPosition, HalfEdge halfEdge) {
+			super(node, distanceSq, screenPosition);
 			this.halfEdge = halfEdge;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (!(o instanceof HitEdge)) {
+				return false;
+			}
+			HitEdge other = (HitEdge) o;
+			return super.equals(o) && halfEdge == other.halfEdge;
 		}
 	}
 	
 	public static class HitFace extends HitObject {
 		public final Face face;
-		private HitFace(XFormNode node, double distanceSq, int screenX, int screenY, Face face) {
-			super(node, distanceSq, screenX, screenY);
+		private HitFace(XFormNode node, double distanceSq, Point3d screenPosition, Face face) {
+			super(node, distanceSq, screenPosition);
 			this.face = face;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (!(o instanceof HitFace)) {
+				return false;
+			}
+			HitFace other = (HitFace) o;
+			return super.equals(o) && face == other.face;
 		}
 	}
 	

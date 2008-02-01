@@ -100,19 +100,19 @@ public class TransformUtil extends AbstractTransformUtil {
 		} 
 	}
 	
-	/**
-	 * Sets the coordinates of toVector to the coordinates of fromVector, projected from screen
-	 * to camera space and (iff space != camera space) transformed to the specified space
-	 * @param space
-	 * @param fromPoint
-	 * @param toPoint
-	 */
-	public void projectFromScreen(int space, Vector3d fromVector, Vector3d toVector) {
-		unproject(fromVector, toVector);
-		if (space != CAMERA) {
-			transform(CAMERA, toVector, space, toVector);
-		} 
-	}
+//	/**
+//	 * Sets the coordinates of toVector to the coordinates of fromVector, projected from screen
+//	 * to camera space and (iff space != camera space) transformed to the specified space
+//	 * @param space
+//	 * @param fromPoint
+//	 * @param toPoint
+//	 */
+//	public void projectFromScreen(int space, Vector3d fromVector, Vector3d toVector) {
+////		unproject(fromVector, toVector);
+//		if (space != CAMERA) {
+//			transform(CAMERA, toVector, space, toVector);
+//		} 
+//	}
 	
 	/**
 	 * Sets the world-to-space transformation matrix to the matrix of the specified transform object
