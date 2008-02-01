@@ -189,6 +189,7 @@ public class Selection {
 	
 	public void setVertex(AbstractVertex vertex, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
+		switchType(Type.VERTICES, null);
 		clear(null);
 		addVertex(vertex, null);
 	}
@@ -227,6 +228,7 @@ public class Selection {
 	
 	public void setEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
+		switchType(Type.EDGES, null);
 		clear(null);
 		addEdge(edge, null);
 	}
@@ -261,6 +263,7 @@ public class Selection {
 	
 	public void setFace(Face face, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
+		switchType(Type.FACES, null);
 		clear(null);
 		addFace(face, null);
 	}
@@ -564,5 +567,23 @@ public class Selection {
 			super.redo();
 			swap();
 		}
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Selection@").append(System.identityHashCode(this)).append(": ");
+		sb.append(nodeAttr.getValue()).append(" ");
+		switch (type) {
+		case VERTICES:
+			sb.append(vertices);
+			break;
+		case EDGES:
+			sb.append(edges);
+			break;
+		case FACES:
+			sb.append(faces);
+			break;
+		}
+		return sb.toString();
 	}
 }
