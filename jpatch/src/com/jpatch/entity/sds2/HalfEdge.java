@@ -1,7 +1,11 @@
 package com.jpatch.entity.sds2;
 
 import static com.jpatch.entity.sds2.SdsWeights.*;
+
+import java.util.*;
+
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.control.*;
 
 import javax.vecmath.*;
 
@@ -104,6 +108,10 @@ public class HalfEdge {
 	
 	public HalfEdge getPrimary() {
 		return primary ? this : pair;
+	}
+	
+	public void disposeEdgePoint() {
+		edgePoint = null;
 	}
 	
 	public DerivedVertex createEdgePoint() {
@@ -329,6 +337,30 @@ public class HalfEdge {
 	
 	public String toString() {
 		return "e" + vertex.num + "-" + pair.vertex.num;
+	}
+	
+	public void saveState(List<JPatchUndoableEdit> editList) {
+		editList.add(new AbstractSwapEdit() {
+			private HalfEdge next = HalfEdge.this.next;
+			private HalfEdge prev = HalfEdge.this.next;
+			private Face face = HalfEdge.this.face;
+			private int faceEdgeIndex = HalfEdge.this.faceEdgeIndex;
+			private int boundaryType = HalfEdge.this.boundaryType;
+			
+			@Override
+			protected void swap() {
+				HalfEdge tmpEdge;
+				Face tmpFace;
+				int tmpInt;
+				
+				/* swap state */
+				tmpEdge = HalfEdge.this.next; HalfEdge.this.next = next; next = tmpEdge;
+				tmpEdge = HalfEdge.this.prev; HalfEdge.this.prev = prev; prev = tmpEdge;
+				tmpFace = HalfEdge.this.face; HalfEdge.this.face = face; face = tmpFace;
+				tmpInt = HalfEdge.this.faceEdgeIndex; HalfEdge.this.faceEdgeIndex = faceEdgeIndex; faceEdgeIndex = tmpInt;
+				tmpInt = HalfEdge.this.boundaryType; HalfEdge.this.boundaryType = boundaryType; boundaryType = tmpInt;
+			}
+		});
 	}
 	
 //	public int hashCode() {

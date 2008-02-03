@@ -1,7 +1,11 @@
 package com.jpatch.entity.sds2;
 
 import static com.jpatch.entity.sds2.SdsWeights.*;
+
+import java.util.*;
+
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.control.*;
 
 import javax.vecmath.*;
 
@@ -78,6 +82,11 @@ public class AbstractVertex {
 	
 	public void getNormal(Tuple3d normal) {
 		throw new UnsupportedOperationException();
+	}
+	
+	
+	public void disposeVertexPoint() {
+		vertexPoint = null;
 	}
 	
 	public DerivedVertex createVertexPoint() {
@@ -427,6 +436,26 @@ public class AbstractVertex {
 		if (debug) System.out.print("    edges are:");
 		if (debug) for (HalfEdge e : vertexEdges) System.out.print(" " + e);
 		if (debug) System.out.println();
+	}
+	
+	void saveEdges(List<JPatchUndoableEdit> editList) {
+		JPatchUndoableEdit edit = new AbstractSwapEdit() {
+			private HalfEdge[] edges = vertexEdges.clone();
+			private int boundaryType = AbstractVertex.this.boundaryType;
+			
+			@Override
+			protected void swap() {
+				HalfEdge[] tmpEdges = vertexEdges.clone();
+				vertexEdges = edges;
+				edges = tmpEdges;
+				int tmpBoundaryType = AbstractVertex.this.boundaryType;
+				AbstractVertex.this.boundaryType = boundaryType;
+				boundaryType = tmpBoundaryType;
+			}
+		};
+		if (editList != null) {
+			editList.add(edit);
+		}
 	}
 	
 	/**

@@ -7,6 +7,10 @@ public abstract class DoubleLimit extends AttributePreChangeAdapter {
 		this.limit = limit;
 	}
 	
+	public DoubleLimit(double limit) {
+		this.limit = new DoubleAttr(limit);
+	}
+	
 	public DoubleAttr getAttr() {
 		return limit;
 	}

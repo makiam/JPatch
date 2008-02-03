@@ -61,15 +61,18 @@ public class Operations {
 				AbstractVertex newVertex = boundaryVertices.get(vertex);
 				vertices[i] = newVertex == null ? vertex : newVertex;
 			}
-			addEdit(editList, new RemoveFaceEdit(sds, boundaryFace));
-			addEdit(editList, new AddFaceEdit(sds, boundaryFace.getMaterial(), vertices));
+			sds.removeFace(editList, 0, boundaryFace);
+//			addEdit(editList, new RemoveFaceEdit(sds, boundaryFace));
+			sds.addFace(editList, 0, boundaryFace.getMaterial(), vertices);
+//			addEdit(editList, new AddFaceEdit(sds, boundaryFace.getMaterial(), vertices));
 			for (HalfEdge edge : edges) {
 				if (boundaryEdges.contains(edge)) {
 					edgeVertices[0] = edge.getVertex();
 					edgeVertices[1] = edge.getPairVertex();
 					edgeVertices[2]  = boundaryVertices.get(edge.getPairVertex());
 					edgeVertices[3]  = boundaryVertices.get(edge.getVertex());
-					addEdit(editList, new AddFaceEdit(sds, boundaryFace.getMaterial(), edgeVertices));
+//					addEdit(editList, new AddFaceEdit(sds, boundaryFace.getMaterial(), edgeVertices));
+					sds.addFace(editList, 0, boundaryFace.getMaterial(), edgeVertices);
 				}
 			}
 		}
@@ -81,63 +84,63 @@ public class Operations {
 		}
 	}
 	
-	private static abstract class AbstractAddRemoveFaceEdit extends AbstractUndoableEdit {
-		Sds sds;
-		Face face;
-		Material material;
-		AbstractVertex[] vertices;
-		
-		void addFace() {
-			face = sds.addFace(0, material, vertices);
-			System.out.println("added face " + face);
-		}
-		
-		void removeFace() {
-			System.out.println("removing face " + face);
-			sds.removeFace(0, face);
-		}
-	}
-	
-	private static class RemoveFaceEdit extends AbstractAddRemoveFaceEdit {
-		
-		RemoveFaceEdit(Sds sds, Face face) {
-			this.sds = sds;
-			this.face = face;
-			material = face.getMaterial();
-			vertices = new AbstractVertex[face.getSides()];
-			for (int i = 0, n = face.getSides(); i < n; i++) {
-				vertices[i] = face.getEdges()[i].getVertex();
-			}
-			redo();
-		}
-		
-		public void undo() {
-			super.undo();
-			addFace();
-		}
-		
-		public void redo() {
-			super.redo();
-			removeFace();
-		}
-	}
-	
-	private static class AddFaceEdit extends AbstractAddRemoveFaceEdit {
-		AddFaceEdit(Sds sds, Material material, AbstractVertex... vertices) {
-			this.sds = sds;
-			this.material = material;
-			this.vertices = vertices.clone();
-			redo();
-		}
-		
-		public void undo() {
-			super.undo();
-			removeFace();
-		}
-		
-		public void redo() {
-			super.redo();
-			addFace();
-		}
-	}
+//	private static abstract class AbstractAddRemoveFaceEdit extends AbstractUndoableEdit {
+//		Sds sds;
+//		Face face;
+//		Material material;
+//		AbstractVertex[] vertices;
+//		
+//		void addFace() {
+//			face = sds.addFace(0, material, vertices);
+//			System.out.println("added face " + face);
+//		}
+//		
+//		void removeFace() {
+//			System.out.println("removing face " + face);
+//			sds.removeFace(0, face);
+//		}
+//	}
+//	
+//	private static class RemoveFaceEdit extends AbstractAddRemoveFaceEdit {
+//		
+//		RemoveFaceEdit(Sds sds, Face face) {
+//			this.sds = sds;
+//			this.face = face;
+//			material = face.getMaterial();
+//			vertices = new AbstractVertex[face.getSides()];
+//			for (int i = 0, n = face.getSides(); i < n; i++) {
+//				vertices[i] = face.getEdges()[i].getVertex();
+//			}
+//			redo();
+//		}
+//		
+//		public void undo() {
+//			super.undo();
+//			addFace();
+//		}
+//		
+//		public void redo() {
+//			super.redo();
+//			removeFace();
+//		}
+//	}
+//	
+//	private static class AddFaceEdit extends AbstractAddRemoveFaceEdit {
+//		AddFaceEdit(Sds sds, Material material, AbstractVertex... vertices) {
+//			this.sds = sds;
+//			this.material = material;
+//			this.vertices = vertices.clone();
+//			redo();
+//		}
+//		
+//		public void undo() {
+//			super.undo();
+//			removeFace();
+//		}
+//		
+//		public void redo() {
+//			super.redo();
+//			addFace();
+//		}
+//	}
 }

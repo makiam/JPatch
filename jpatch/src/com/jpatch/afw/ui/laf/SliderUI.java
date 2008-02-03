@@ -63,4 +63,6 @@ public class SliderUI extends MetalSliderUI {
 		g2.setPaint(new GradientPaint(0, trackRect.y + c - 2, new Color(0x70000000, true), 0, trackRect.y + c + 2, new Color(0x08000000, true)));
 		g2.fillRoundRect(trackRect.x, trackRect.y + c - 2, trackRect.width, 4, 4, 4);
 	}
+	
+	
 }

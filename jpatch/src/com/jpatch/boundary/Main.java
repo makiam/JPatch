@@ -58,6 +58,7 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.undo.*;
 
 import jpatch.boundary.tools.Tools;
 
@@ -534,7 +535,7 @@ public class Main {
 		toolBar.add(insetTool);
 		toolBar.add(latheTool);
 		toolBar.add(Box.createHorizontalStrut(4));
-//		toolBar.add(extrudeTestButton);
+		toolBar.add(extrudeTestButton);
 //		toolBar.add(dumpButton);
 		
 		
@@ -588,7 +589,7 @@ public class Main {
 //			model2.getParentAttribute().setValue(model1);
 //			model3.getNameAttribute().setValue("model 3");
 //			model3.getParentAttribute().setValue(model2);
-			SdsModel model = new SdsModel(new Sds());
+			SdsModel model = new SdsModel(new Sds(actions.undoManager));
 			model.getNameAttribute().setValue("SDS model");
 			model.getParentAttribute().setValue(sceneGraphRoot);
 			selection.setNode(model, null);

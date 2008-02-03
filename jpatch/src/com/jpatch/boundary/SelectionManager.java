@@ -26,8 +26,6 @@ public class SelectionManager {
 	 */
 	private boolean ignoreChange;
 	
-	private static final GenericAttr<String> EDIT_NAME = new GenericAttr<String>("change selected node");
-	
 	public SelectionManager(final JTree tree, final TreeManager treeManager, final Selection selection) {
 		/*
 		 * listen for changes of the selected object to update the tree-selection
@@ -68,7 +66,7 @@ public class SelectionManager {
 					if (selectedTreeNode instanceof XFormNode) {
 						List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(1);
 						selection.setNode((XFormNode) selectedTreeNode, editList);
-						Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
+						Main.getInstance().getUndoManager().addEdit("Change selected node", editList);
 //						Object selection = ((SceneGraphTreeNode) selectedTreeNode).getSceneGraphNode();
 //						selectedObjectAttr.setValue(selection);
 					}
