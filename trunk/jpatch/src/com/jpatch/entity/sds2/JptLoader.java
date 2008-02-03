@@ -1,5 +1,6 @@
 package com.jpatch.entity.sds2;
 
+import com.jpatch.boundary.*;
 import com.jpatch.entity.*;
 
 import java.io.*;
@@ -78,7 +79,7 @@ public class JptLoader {
 					Collections.reverse(vertexList);
 					BaseVertex[] vertices = vertexList.toArray(new BaseVertex[vertexList.size()]);
 					if (materialIndex != -1) {
-						Face face = sds.addFace(0, materials.get(materialIndex), vertices);
+						Face face = sds.addFace(null, 0, materials.get(materialIndex), vertices);
 //					if (face != null) {
 //						sds.setFaceMaterial(face, materials.get(materialIndex));
 //						face.setMaterial(materials.get(materialIndex));
@@ -194,7 +195,7 @@ public class JptLoader {
 		try {
 			xmlReader = XMLReaderFactory.createXMLReader();
 			xmlReader.setContentHandler(handler);
-			sds = new Sds();
+			sds = new Sds(Main.getInstance().getUndoManager());
 			cpList.clear();
 			childHookIndex.clear();
 			cpIndex = 0;
@@ -249,7 +250,7 @@ public class JptLoader {
 //			sds.rethinkSlates();
 			
 //			System.out.println(sds.vertexList.size() + " top level, " + sds.level2Vertices.length + " level 2 vertices");
-			
+			sds.dumpFaces(0);
 			return sds;
 			
 			

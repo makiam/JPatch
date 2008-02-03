@@ -1,5 +1,10 @@
 <attributeEditor name="SdsModel" class="com.jpatch.entity.SdsModel">
 	<field name="Name" attribute="Name" />
+	<group name="Subdivision">
+		<field name="Max. level" attribute="MaxLevel" />
+		<slider name="Display level" attribute="RenderLevel" />
+		<slider name="Edit level" attribute="EditLevel" />
+	</group>
 	<group name="Transform" expansion="embeddedTransform">
 		<field name="Translation" attribute="Translation" />
 		<field name="Rotation" attribute="Rotation" />

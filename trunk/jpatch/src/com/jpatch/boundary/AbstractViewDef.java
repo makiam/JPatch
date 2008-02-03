@@ -36,12 +36,4 @@ public abstract class AbstractViewDef implements ViewDef {
 	public StateMachine<ViewDirection> getViewDirectionAttribute() {
 		return viewport.getViewDirectionAttribute();
 	}
-
-	public IntAttr getEditLevelAttribute() {
-		return Globals.getInstance().getEditLevelAttribute();
-	}
-	
-	public IntAttr getRenderLevelAttribute() {
-		return Globals.getInstance().getRenderLevelAttribute();
-	}
 }

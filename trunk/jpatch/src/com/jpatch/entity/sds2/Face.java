@@ -12,7 +12,7 @@ import javax.vecmath.*;
 public class Face {
 	private static int count = 0;
 	private final HalfEdge[] faceEdges;
-	private Face[] subFaces;
+//	private Face[] subFaces;
 	private final double oneOverSides;
 	private DerivedVertex facePoint;
 	private Material material;
@@ -81,25 +81,25 @@ public class Face {
 		midPoint.set(midpointNormal);
 	}
 	
-	public void setSubFace(int side, Face face) {
-		subFaces[side] = face;
-	}
-//	public Face[] getChildren() {
-//		return children;
+//	public void setSubFace(int side, Face face) {
+//		subFaces[side] = face;
 //	}
 	
 	public void getSubEdges(int side, HalfEdge[] subEdges) {
 		assert subEdges.length == 2;
-//		if (subFaces == null) {
-//			return false;
-//		}
+
 		int nextSide = side + 1;
 		if (nextSide == faceEdges.length) {
 			nextSide = 0;
 		}
-		subEdges[0] = subFaces[side].faceEdges[2];
-		subEdges[1] = subFaces[nextSide].faceEdges[1];
-//		return true;
+		
+		int prevSide = side - 1;
+		if (prevSide < 0) {
+			prevSide = faceEdges.length - 1;
+		}
+		
+		subEdges[0] = facePoint.getEdges()[prevSide].getFace().faceEdges[2];
+		subEdges[1] = facePoint.getEdges()[side].getFace().faceEdges[1];
 	}
 	
 	public void getLimitSurface(FloatBuffer buffer) {
@@ -258,9 +258,13 @@ public class Face {
 //		}
 //	}
 	
+	public void disposeFacePoint() {
+		facePoint = null;
+	}
+	
 	public DerivedVertex createFacePoint() {
 		assert facePoint == null;
-		subFaces = new Face[faceEdges.length];
+//		subFaces = new Face[faceEdges.length];
 		facePoint = new DerivedVertex() {
 			@Override
 			protected void computePosition() {

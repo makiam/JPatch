@@ -54,15 +54,15 @@ public class JPatchUndoManager {
 		}
 	}
 	
-	public void addEdit(GenericAttr<String> name, List<JPatchUndoableEdit> editList) {
+	public void addEdit(String name, List<JPatchUndoableEdit> editList) {
 		addEdit(new NamedEditList(name, editList.toArray(new JPatchUndoableEdit[editList.size()])));
 	}
 	
-	public void addEdit(GenericAttr<String> name, JPatchUndoableEdit[] edits) {
+	public void addEdit(String name, JPatchUndoableEdit[] edits) {
 		addEdit(new NamedEditList(name, edits));
 	}
 	
-	public void addEdit(GenericAttr<String> name, JPatchUndoableEdit edit) {
+	public void addEdit(String name, JPatchUndoableEdit edit) {
 		addEdit(new NamedEditList(name, edit));
 	}
 	
@@ -76,7 +76,7 @@ public class JPatchUndoManager {
 	
 	public String getUndoName() {
 		if (canUndo()) {
-			return undoStack.get(position - 1).name.getValue();
+			return undoStack.get(position - 1).name;
 		} else {
 			return ResourceManager.getInstance().getString("CANT_UNDO");
 		}
@@ -84,7 +84,7 @@ public class JPatchUndoManager {
 	
 	public String getRedoName() {
 		if (canRedo()) {
-			return undoStack.get(position).name.getValue();
+			return undoStack.get(position).name;
 		} else {
 			return ResourceManager.getInstance().getString("CANT_REDO");
 		}
@@ -120,22 +120,22 @@ public class JPatchUndoManager {
 	}
 	
 	private static class NamedEditList {
-		private final GenericAttr<String> name;
+		private final String name;
 		private final JPatchUndoableEdit[] edits;
 		
-		private NamedEditList(GenericAttr<String> name, JPatchUndoableEdit[] edits) {
+		private NamedEditList(String name, JPatchUndoableEdit[] edits) {
 			this.name = name;
 			this.edits = edits;
 		}
 		
-		private NamedEditList(GenericAttr<String> name, JPatchUndoableEdit edit) {
+		private NamedEditList(String name, JPatchUndoableEdit edit) {
 			this.name = name;
 			edits = new JPatchUndoableEdit[] { edit };
 		}
 		
 		private void undo() {
 			if (LOG) {
-				System.out.println("undo " + name.getValue());
+				System.out.println("undo " + name);
 			}
 			for (int i = edits.length - 1; i >= 0; i--) {
 				edits[i].undo();
@@ -144,7 +144,7 @@ public class JPatchUndoManager {
 		
 		private void redo() {
 			if (LOG) {
-				System.out.println("redo " + name.getValue());
+				System.out.println("redo " + name);
 			}
 			for (int i = 0; i < edits.length; i++) {
 				edits[i].redo();

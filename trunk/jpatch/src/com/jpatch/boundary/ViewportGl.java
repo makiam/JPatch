@@ -26,6 +26,7 @@ import static javax.media.opengl.GL.*;
 import javax.vecmath.*;
 
 
+
 public class ViewportGl extends Viewport {
 	private static Matrix4d IDENTITY = Utils3d.createIdentityMatrix4d();
 	private int repaintCount = 0;
@@ -749,7 +750,7 @@ public class ViewportGl extends Viewport {
 		
 		drawOrigin();
 		if (node instanceof SdsModel) {
-			drawSds2(((SdsModel) node).getSds(), Globals.getInstance().getRenderLevelAttribute().getInt());
+			drawSds2(((SdsModel) node).getSds(), ((SdsModel) node).getSds().getRenderLevelAttribute().getInt());
 		}
 		if (node instanceof Bone) {
 			Bone bone = (Bone) node;
@@ -1249,8 +1250,8 @@ public class ViewportGl extends Viewport {
 //			gl.glDisable(GL_BLEND);
 			gl.glColor3f(1, 1, 1);
 			gl.glBegin(GL_LINES);
-			int editLevel = Globals.getInstance().getEditLevelAttribute().getInt();
-			int renderLevel = Globals.getInstance().getRenderLevelAttribute().getInt();
+			int editLevel = sds.getEditLevelAttribute().getInt();
+			int renderLevel = sds.getRenderLevelAttribute().getInt();
 			int levelsToGo = renderLevel - editLevel;
 			Point3d p = new Point3d();
 			HalfEdge[] subEdges = new HalfEdge[2];
@@ -1273,7 +1274,7 @@ public class ViewportGl extends Viewport {
 			boolean solid = !viewDef.getShowLimitSurfaceAttribute().getBoolean();
 			GlMaterial currentMaterial = null;
 			Vector3d normal = new Vector3d();
-			for (com.jpatch.entity.sds2.Face face : sds.getFaces(Globals.getInstance().getEditLevelAttribute().getInt())) {
+			for (com.jpatch.entity.sds2.Face face : sds.getFaces(sds.getEditLevelAttribute().getInt())) {
 				face.getPositionSurface(buffer);
 				if (solid) {
 					GlMaterial faceMaterial = face.getMaterial().getGlMaterial();

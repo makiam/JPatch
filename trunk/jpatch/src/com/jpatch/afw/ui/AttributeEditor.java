@@ -205,12 +205,15 @@ public class AttributeEditor {
 		} else if (attribute instanceof ScalarAttribute){
 			AttributeManager.getInstance().bindTextFieldToAttribute(entity, (JTextField) binding.components[0], (ScalarAttribute) attribute);
 			if (binding.components.length == 2) {
-				AttributeManager.getInstance().bindSliderToAttribute(entity, (JSlider) binding.components[1], (DoubleAttr) attribute, IdentityMapping.getInstance());
+//				AttributeManager.getInstance().bindSliderToAttribute(entity, (JSlider) binding.components[1], (DoubleAttr) attribute, IdentityMapping.getInstance());
+				AttributeManager.getInstance().bindSliderToAttribute(entity, (JSlider) binding.components[1], (IntAttr) attribute);
 			}
 		} else {
 			throw new IllegalStateException();
 		}
 	}
+	
+	
 	
 	private class ComponentBinding {
 		final Method[] getObjectMethod;

@@ -16,23 +16,9 @@ import com.jpatch.afw.attributes.*;
  * @author sascha
  * @see jpatch.entity.ScalarAttribute
  */
-public abstract class AttributeEdit extends AbstractUndoableEdit {
+public abstract class AttributeEdit extends AbstractSwapEdit {
 	
 	private AttributeEdit() { } 	// private default constructor makes sure this class can not be instantiated.
-	
-	@Override
-	public final void undo() {
-		super.undo();
-		swap();
-	}
-	
-	@Override
-	public final void redo() {
-		super.redo();
-		swap();
-	}
-	
-	protected abstract void swap();
 	
 	/* * * * * * * * * * * * *
 	 * static factory methods

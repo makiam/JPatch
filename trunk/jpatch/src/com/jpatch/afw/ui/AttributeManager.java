@@ -50,12 +50,22 @@ public class AttributeManager {
 	/**
 	 * Maps DoubleAttr to their upper limits
 	 */
-	private final Map<DoubleAttr, DoubleMaximum> upperLimits = new HashMap<DoubleAttr, DoubleMaximum>();
+	private final Map<DoubleAttr, DoubleMaximum> upperLimitsDouble = new HashMap<DoubleAttr, DoubleMaximum>();
 	
 	/**
 	 * Maps DoubleAttr to their lower limits
 	 */
-	private final Map<DoubleAttr, DoubleMinimum> lowerLimits = new HashMap<DoubleAttr, DoubleMinimum>();
+	private final Map<DoubleAttr, DoubleMinimum> lowerLimitsDouble = new HashMap<DoubleAttr, DoubleMinimum>();
+	
+	/**
+	 * Maps IntAttr to their upper limits
+	 */
+	private final Map<IntAttr, IntMaximum> upperLimitsInt = new HashMap<IntAttr, IntMaximum>();
+	
+	/**
+	 * Maps IntAttr to their lower limits
+	 */
+	private final Map<IntAttr, IntMinimum> lowerLimitsInt = new HashMap<IntAttr, IntMinimum>();
 	
 	/**
 	 * Stores the managed listeners for managed JComponents
@@ -139,8 +149,8 @@ public class AttributeManager {
 	 * @throws IllegalArgumentException if the specified attribute already has an upper limit set
 	 */
 	public DoubleMaximum setUpperLimit(final DoubleAttr attr, final DoubleMaximum limit) {
-		if (upperLimits.containsKey(attr)) {
-			throw new IllegalStateException(attr + " has already set an upper limit: " + upperLimits.get(attr));
+		if (upperLimitsDouble.containsKey(attr)) {
+			throw new IllegalStateException(attr + " has already set an upper limit: " + upperLimitsDouble.get(attr));
 		}
 		attr.addAttributePreChangeListener(limit);
 		limit.getAttr().addAttributePostChangeListener(new AttributePostChangeListener() {
@@ -148,7 +158,28 @@ public class AttributeManager {
 				attr.setDouble(limit.attributeWillChange(attr, attr.getDouble()));
 			}
 		});
-		upperLimits.put(attr, limit);
+		upperLimitsDouble.put(attr, limit);
+		return limit;
+	}
+	
+	/**
+	 * Sets the upper limit for the specified attribute
+	 * @param attr the attribute to be bounded
+	 * @param limit the upper limit for the specified attribute
+	 * @return the upper limit for the specified attribute
+	 * @throws IllegalArgumentException if the specified attribute already has an upper limit set
+	 */
+	public IntMaximum setUpperLimit(final IntAttr attr, final IntMaximum limit) {
+		if (upperLimitsInt.containsKey(attr)) {
+			throw new IllegalStateException(attr + " has already set an upper limit: " + upperLimitsInt.get(attr));
+		}
+		attr.addAttributePreChangeListener(limit);
+		limit.getAttr().addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				attr.setInt(limit.attributeWillChange(attr, attr.getInt()));
+			}
+		});
+		upperLimitsInt.put(attr, limit);
 		return limit;
 	}
 	
@@ -157,10 +188,22 @@ public class AttributeManager {
 	 * @param attr the attribute whose upper limit should be cleared
 	 */
 	public void clearUpperLimit(DoubleAttr attr) {
-		DoubleLimit limit = upperLimits.get(attr);
+		DoubleLimit limit = upperLimitsDouble.get(attr);
 		if (limit != null) {
 			attr.removeAttributePreChangeListener(limit);
-			upperLimits.remove(attr);
+			upperLimitsDouble.remove(attr);
+		}
+	}
+	
+	/**
+	 * Clears the upper limit for the specified attribute
+	 * @param attr the attribute whose upper limit should be cleared
+	 */
+	public void clearUpperLimit(IntAttr attr) {
+		IntLimit limit = upperLimitsInt.get(attr);
+		if (limit != null) {
+			attr.removeAttributePreChangeListener(limit);
+			upperLimitsInt.remove(attr);
 		}
 	}
 	
@@ -170,7 +213,17 @@ public class AttributeManager {
 	 * @return the upper limit of the specified attribute, or null if no upper limit is set
 	 */
 	public DoubleAttr getUpperLimit(DoubleAttr attr) {
-		DoubleMaximum limit = upperLimits.get(attr);
+		DoubleMaximum limit = upperLimitsDouble.get(attr);
+		return limit == null ? null : limit.getAttr();
+	}
+	
+	/**
+	 * Returns the upper limit of the specified attribute
+	 * @param attr the attribute whose upper limit should be returned
+	 * @return the upper limit of the specified attribute, or null if no upper limit is set
+	 */
+	public IntAttr getUpperLimit(IntAttr attr) {
+		IntMaximum limit = upperLimitsInt.get(attr);
 		return limit == null ? null : limit.getAttr();
 	}
 	
@@ -182,8 +235,8 @@ public class AttributeManager {
 	 * @throws IllegalArgumentException if the specified attribute already has an lower limit set
 	 */
 	public DoubleMinimum setLowerLimit(final DoubleAttr attr, final DoubleMinimum limit) {
-		if (lowerLimits.containsKey(attr)) {
-			throw new IllegalStateException(attr + " has already set a lower limit: " + lowerLimits.get(attr));
+		if (lowerLimitsDouble.containsKey(attr)) {
+			throw new IllegalStateException(attr + " has already set a lower limit: " + lowerLimitsDouble.get(attr));
 		}
 		attr.addAttributePreChangeListener(limit);
 		limit.getAttr().addAttributePostChangeListener(new AttributePostChangeListener() {
@@ -191,7 +244,28 @@ public class AttributeManager {
 				attr.setDouble(limit.attributeWillChange(attr, attr.getDouble()));
 			}
 		});
-		lowerLimits.put(attr, limit);
+		lowerLimitsDouble.put(attr, limit);
+		return limit;
+	}
+	
+	/**
+	 * Sets the lower limit for the specified attribute
+	 * @param attr the attribute to be bounded
+	 * @param limit the lower limit for the specified attribute
+	 * @return the lower limit for the specified attribute
+	 * @throws IllegalArgumentException if the specified attribute already has an lower limit set
+	 */
+	public IntMinimum setLowerLimit(final IntAttr attr, final IntMinimum limit) {
+		if (lowerLimitsInt.containsKey(attr)) {
+			throw new IllegalStateException(attr + " has already set a lower limit: " + lowerLimitsInt.get(attr));
+		}
+		attr.addAttributePreChangeListener(limit);
+		limit.getAttr().addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				attr.setInt(limit.attributeWillChange(attr, attr.getInt()));
+			}
+		});
+		lowerLimitsInt.put(attr, limit);
 		return limit;
 	}
 	
@@ -200,11 +274,23 @@ public class AttributeManager {
 	 * @param attr the attribute whose lower limit should be cleared
 	 */
 	public void clearLowerLimit(DoubleAttr attr) {
-		DoubleLimit limit = lowerLimits.get(attr);
+		DoubleLimit limit = lowerLimitsDouble.get(attr);
 		if (limit != null) {
 			attr.removeAttributePreChangeListener(limit);
 		}
-		lowerLimits.remove(attr);
+		lowerLimitsDouble.remove(attr);
+	}
+	
+	/**
+	 * Clears the lower limit for the specified attribute
+	 * @param attr the attribute whose lower limit should be cleared
+	 */
+	public void clearLowerLimit(IntAttr attr) {
+		IntLimit limit = lowerLimitsInt.get(attr);
+		if (limit != null) {
+			attr.removeAttributePreChangeListener(limit);
+		}
+		lowerLimitsInt.remove(attr);
 	}
 	
 	/**
@@ -213,7 +299,17 @@ public class AttributeManager {
 	 * @return the lower limit of the specified attribute, or null if no lower limit is set
 	 */
 	public DoubleAttr getLowerLimit(DoubleAttr attr) {
-		DoubleMinimum limit = lowerLimits.get(attr);
+		DoubleMinimum limit = lowerLimitsDouble.get(attr);
+		return limit == null ? null : limit.getAttr();
+	}
+	
+	/**
+	 * Returns the lower limit of the specified attribute
+	 * @param attr the attribute whose lower limit should be returned
+	 * @return the lower limit of the specified attribute, or null if no lower limit is set
+	 */
+	public IntAttr getLowerLimit(IntAttr attr) {
+		IntMinimum limit = lowerLimitsInt.get(attr);
 		return limit == null ? null : limit.getAttr();
 	}
 	
@@ -227,6 +323,47 @@ public class AttributeManager {
 		DoubleAttr attr = new DoubleAttr();
 		setLowerLimit(attr, new DoubleMinimum(min));
 		setUpperLimit(attr, new DoubleMaximum(max));
+		return attr;
+	}
+	
+	/**
+	 * Creates a new bounded DoubleAttr that is limited by the specified min and max attributes
+	 * @param min the minimum value
+	 * @param max the maximum value
+	 * @return a new bounded DoubleAttr that is limited by the specified min and max attributes
+	 */
+	public DoubleAttr createBoundedDoubleAttr(double min, double max) {
+		DoubleAttr attr = new DoubleAttr();
+		setLowerLimit(attr, new DoubleMinimum(min));
+		setUpperLimit(attr, new DoubleMaximum(max));
+		return attr;
+	}
+	
+	/**
+	 * Creates a new bounded IntAttr that is limited by the specified min and max attributes
+	 * @param value the attribute value
+	 * @param min the attribute representing the minimum value
+	 * @param max the attribute representing the maximum value
+	 * @return a new bounded IntAttr that is limited by the specified min and max attributes
+	 */
+	public IntAttr createBoundedIntAttr(int value, IntAttr min, IntAttr max) {
+		IntAttr attr = new IntAttr(value);
+		setLowerLimit(attr, new IntMinimum(min));
+		setUpperLimit(attr, new IntMaximum(max));
+		return attr;
+	}
+	
+	/**
+	 * Creates a new bounded IntAttr that is limited by the specified min and max attributes
+	 * @param value the attribute value
+	 * @param min the minimum value
+	 * @param max the maximum value
+	 * @return a new bounded IntAttr that is limited by the specified min and max attributes
+	 */
+	public IntAttr createBoundedIntAttr(int value, int min, int max) {
+		IntAttr attr = new IntAttr(value);
+		setLowerLimit(attr, new IntMinimum(min));
+		setUpperLimit(attr, new IntMaximum(max));
 		return attr;
 	}
 	
@@ -299,6 +436,54 @@ public class AttributeManager {
 		} else {
 			throw new IllegalArgumentException("can't bind " + attribute + " to " + textField);
 		}
+	}
+	
+	public void bindSliderToAttribute(final Object entity, final JSlider slider, final IntAttr intAttr) {
+		final IntAttr minimum = getLowerLimit(intAttr);
+		final IntAttr maximum = getUpperLimit(intAttr);
+		slider.setSnapToTicks(true);
+		slider.setMinorTickSpacing(1);
+		slider.setOpaque(false);
+		slider.setValue(intAttr.getInt());
+		if (minimum == null || maximum == null) {
+			throw new IllegalArgumentException(intAttr + " is not bounded!");
+		}
+		AttributeBinding minBinding = new AttributeBinding(minimum, new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				System.out.println("slider value = " + slider.getValue());
+				System.out.println("setting minimum to " + minimum.getInt());
+				slider.setMinimum(minimum.getInt());
+				System.out.println("slider value = " + slider.getValue());
+			}	
+		});
+		AttributeBinding maxBinding = new AttributeBinding(maximum, new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				System.out.println("slider value = " + slider.getValue());
+				System.out.println("setting maximum to " + maximum.getInt());
+				slider.setMaximum(maximum.getInt());
+				System.out.println("slider value = " + slider.getValue());
+			}	
+		});
+		class SuperListener implements ChangeListener, AttributePostChangeListener {
+			private boolean suppressAction = false;
+			
+			public void stateChanged(ChangeEvent e) {
+				if (!suppressAction) {
+					intAttr.setInt(slider.getValue());
+					fireActionPerformed(entity, intAttr);
+				}
+			}
+
+			public void attributeHasChanged(Attribute source) {
+				suppressAction = true;
+				slider.setValue(intAttr.getInt());
+				suppressAction = false;
+			}
+		}
+		SuperListener listener = new SuperListener();
+		AttributeBinding sliderBinding = new AttributeBinding(intAttr, listener);
+		bind(slider, minBinding, maxBinding, sliderBinding);
+		addListener(slider, listener);
 	}
 	
 	public JComboBox bindComboBoxToAttribute(final Object entity, final JComboBox comboBox, final StateMachine stateMachine) {
@@ -514,91 +699,91 @@ public class AttributeManager {
 		return textField;
 	}
 	
-	/**
-	 * Binds the specified JSlider to the specified (bounded!) Attribute.
-	 * @param slider
-	 * @param attr
-	 * @param mapping
-	 * @return the specified JSlider
-	 * @throws NullPointerException if any of the specified parameters is null
-	 * @throws IllegalArgumentEexception if the specified attribute is not bounded
-	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
-	 */
-	public JSlider bindSliderToAttribute(Object entity, JSlider slider, DoubleAttr attr, Mapping mapping) {
-		DoubleAttr min = getLowerLimit(attr);
-		DoubleAttr max = getUpperLimit(attr);
-		if (min == null || max == null) {
-			throw new IllegalArgumentException(attr + " is not bounded");
-		}
-		return bindSliderToAttribute(entity, slider, attr, min, max, mapping);
-	}
+//	/**
+//	 * Binds the specified JSlider to the specified (bounded!) Attribute.
+//	 * @param slider
+//	 * @param attr
+//	 * @param mapping
+//	 * @return the specified JSlider
+//	 * @throws NullPointerException if any of the specified parameters is null
+//	 * @throws IllegalArgumentEexception if the specified attribute is not bounded
+//	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
+//	 */
+//	public JSlider bindSliderToAttribute(Object entity, JSlider slider, DoubleAttr attr, Mapping mapping) {
+//		DoubleAttr min = getLowerLimit(attr);
+//		DoubleAttr max = getUpperLimit(attr);
+//		if (min == null || max == null) {
+//			throw new IllegalArgumentException(attr + " is not bounded");
+//		}
+//		return bindSliderToAttribute(entity, slider, attr, min, max, mapping);
+//	}
+//	
+//	/**
+//	 * Binds the specified JSlider to the specified Attribute. Constant minimum and maximum slider
+//	 * values must be provided.
+//	 * @param slider
+//	 * @param attr
+//	 * @param min
+//	 * @param max
+//	 * @param mapping
+//	 * @return the specified JSlider
+//	 * @throws NullPointerException if any of the specified parameters is null
+//	 * @throws IllegalArgumentEexception if the specified attribute is not bounded
+//	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
+//	 */
+//	public JSlider bindSliderToAttribute(Object entity, JSlider slider, DoubleAttr attr, double min, double max, Mapping mapping) {
+//		return bindSliderToAttribute(entity, slider, attr, new DoubleAttr(min), new DoubleAttr(max), mapping);
+//	}
 	
-	/**
-	 * Binds the specified JSlider to the specified Attribute. Constant minimum and maximum slider
-	 * values must be provided.
-	 * @param slider
-	 * @param attr
-	 * @param min
-	 * @param max
-	 * @param mapping
-	 * @return the specified JSlider
-	 * @throws NullPointerException if any of the specified parameters is null
-	 * @throws IllegalArgumentEexception if the specified attribute is not bounded
-	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
-	 */
-	public JSlider bindSliderToAttribute(Object entity, JSlider slider, DoubleAttr attr, double min, double max, Mapping mapping) {
-		return bindSliderToAttribute(entity, slider, attr, new DoubleAttr(min), new DoubleAttr(max), mapping);
-	}
-	
-	/**
-	 * Binds the specified JSlider to the specified Attribute.
-	 * @param slider
-	 * @param attr
-	 * @param min
-	 * @param max
-	 * @param mapping
-	 * @return the specified JSlider
-	 * @throws NullPointerException if any of the specified parameters is null
-	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
-	 */
-	private JSlider bindSliderToAttribute(final Object entity, final JSlider slider, final DoubleAttr attr, final DoubleAttr min, final DoubleAttr max, final Mapping mapping) {
-		slider.setMinimum(0);
-		slider.setMaximum(1000);
-		
-		class SuperListener implements ChangeListener, AttributePostChangeListener {
-			private boolean suppressAction = false;
-
-			public void stateChanged(ChangeEvent e) {
-				if (!suppressAction) {
-					suppressAction = true;
-					getSliderValue(slider, attr, min, max, mapping);
-					fireActionPerformed(entity, attr);
-					suppressAction = false;
-				}
-			}
-			
-			public void attributeHasChanged(Attribute source) {
-				if (!suppressAction) {
-					suppressAction = true;
-					setSliderPosition(slider, attr, min, max, mapping);
-					suppressAction = false;
-				}
-			}
-		}
-		
-		SuperListener listener = new SuperListener();
-		
-//		setSliderPosition(slider, attr, min, max, mapping);
-		
-		
-		/* bind attribute and attrListener to component */
-		bind(slider, new AttributeBinding(attr, listener), new AttributeBinding(min, listener), new AttributeBinding(max, listener));				// throws IllegalStateException if already bound
-		
-		/* add a ChangeListener to track the slider value */
-		addListener(slider, listener);
-		
-		return slider;
-	}
+//	/**
+//	 * Binds the specified JSlider to the specified Attribute.
+//	 * @param slider
+//	 * @param attr
+//	 * @param min
+//	 * @param max
+//	 * @param mapping
+//	 * @return the specified JSlider
+//	 * @throws NullPointerException if any of the specified parameters is null
+//	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
+//	 */
+//	private JSlider bindSliderToAttribute(final Object entity, final JSlider slider, final DoubleAttr attr, final DoubleAttr min, final DoubleAttr max, final Mapping mapping) {
+//		slider.setMinimum(0);
+//		slider.setMaximum(1000);
+//		
+//		class SuperListener implements ChangeListener, AttributePostChangeListener {
+//			private boolean suppressAction = false;
+//
+//			public void stateChanged(ChangeEvent e) {
+//				if (!suppressAction) {
+//					suppressAction = true;
+//					getSliderValue(slider, attr, min, max, mapping);
+//					fireActionPerformed(entity, attr);
+//					suppressAction = false;
+//				}
+//			}
+//			
+//			public void attributeHasChanged(Attribute source) {
+//				if (!suppressAction) {
+//					suppressAction = true;
+//					setSliderPosition(slider, attr, min, max, mapping);
+//					suppressAction = false;
+//				}
+//			}
+//		}
+//		
+//		SuperListener listener = new SuperListener();
+//		
+////		setSliderPosition(slider, attr, min, max, mapping);
+//		
+//		
+//		/* bind attribute and attrListener to component */
+//		bind(slider, new AttributeBinding(attr, listener), new AttributeBinding(min, listener), new AttributeBinding(max, listener));				// throws IllegalStateException if already bound
+//		
+//		/* add a ChangeListener to track the slider value */
+//		addListener(slider, listener);
+//		
+//		return slider;
+//	}
 	
 	/**
 	 * Binds a textfied, a set and a clear button to an attribute that allow to specify an upper or lower
