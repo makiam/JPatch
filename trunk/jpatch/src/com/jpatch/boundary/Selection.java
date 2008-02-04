@@ -486,8 +486,9 @@ public class Selection {
 		private Object selectedEntities;
 		private Type type;
 		
-		private State(Selection selection) {
+		public State(Selection selection) {
 			type = selection.type;
+			System.out.println("type=" + type);
 			switch(type) {
 			case NODE:
 				selectedEntities = selection.nodeAttr.getValue();
@@ -502,15 +503,16 @@ public class Selection {
 				break;
 			case VERTICES:
 				selection.validateVertices();
-				selectedEntities = selection.vertices.toArray();
+				selectedEntities = selection.vertices.toArray(new AbstractVertex[selection.vertices.size()]);
 				break;
 			default:
 				assert false; // should never get here	
 			}
 		}
 		
-		private void copyTo(Selection selection) {
+		public void copyTo(Selection selection) {
 			selection.type = type;
+			
 			switch(type) {
 			case NODE:
 				selection.nodeAttr.setValue((XFormNode) selectedEntities);

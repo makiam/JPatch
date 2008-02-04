@@ -8,7 +8,8 @@ import javax.vecmath.*;
 
 public class Operations {
 	public static void extrude(Sds sds, Collection<Face> faces, List<JPatchUndoableEdit> editList) {
-		
+		System.out.println("extrude " + faces.size() + " faces:");
+		System.out.println(faces);
 		Map<BaseVertex, BaseVertex> boundaryVertices = new HashMap<BaseVertex, BaseVertex>();
 		Set<BaseVertex> innerVertices = new HashSet<BaseVertex>();
 		Set<HalfEdge> boundaryEdges = new HashSet<HalfEdge>();
@@ -23,16 +24,19 @@ public class Operations {
 			}
 		}
 		
+		System.out.println("boundary edges:");
+		System.out.println(boundaryEdges);
+		
 		for (Face face : faces) {
 			face.getFacePoint().getNormal(normal);
 			for (HalfEdge edge : face.getEdges()) {
 				BaseVertex vertex = (BaseVertex) edge.getVertex();
-				if (boundaryVertices.containsKey(vertex)) {
-					continue;
+				if (!boundaryVertices.containsKey(vertex)) {
+					vertex.getPosition(position);
+//					vertex.getVertexPoint().getNormal(normal);
+					position.add(normal);
 				}
-				vertex.getPosition(position);
-//				vertex.getVertexPoint().getNormal(normal);
-				position.add(normal);
+				
 				boolean isBoundaryVertex = false;
 				for(HalfEdge vertexEdge : vertex.getEdges()) {
 					Face vertexFace = vertexEdge.getFace();
@@ -51,6 +55,9 @@ public class Operations {
 				}
 			}
 		}
+		
+		System.out.println("boundary faces:");
+		System.out.println(boundaryFaces);
 		
 		AbstractVertex[] edgeVertices = new AbstractVertex[4];
 		for (Face boundaryFace : boundaryFaces) {

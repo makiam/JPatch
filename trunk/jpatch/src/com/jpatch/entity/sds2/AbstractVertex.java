@@ -439,25 +439,31 @@ public class AbstractVertex {
 	}
 	
 	void saveEdges(List<JPatchUndoableEdit> editList) {
-		JPatchUndoableEdit edit = new AbstractSwapEdit() {
-			private HalfEdge[] edges = vertexEdges.clone();
-			private int boundaryType = AbstractVertex.this.boundaryType;
-			
-			@Override
-			protected void swap() {
-				HalfEdge[] tmpEdges = vertexEdges.clone();
-				vertexEdges = edges;
-				edges = tmpEdges;
-				int tmpBoundaryType = AbstractVertex.this.boundaryType;
-				AbstractVertex.this.boundaryType = boundaryType;
-				boundaryType = tmpBoundaryType;
-			}
-		};
+		JPatchUndoableEdit edit = new SaveEdgesEdit();
 		if (editList != null) {
 			editList.add(edit);
 		}
 	}
 	
+	private class SaveEdgesEdit extends AbstractSwapEdit {
+		private HalfEdge[] edges = vertexEdges.clone();
+		private int boundaryType = AbstractVertex.this.boundaryType;
+		
+		private SaveEdgesEdit() {
+			apply(true);
+		}
+		
+		@Override
+		protected void swap() {
+			HalfEdge[] tmpEdges = vertexEdges.clone();
+			vertexEdges = edges;
+			edges = tmpEdges;
+			int tmpBoundaryType = AbstractVertex.this.boundaryType;
+			AbstractVertex.this.boundaryType = boundaryType;
+			boundaryType = tmpBoundaryType;
+			invalidate();
+		}
+	}
 	/**
 	 * This method must be called whenever a face adjacent to this vertex was created or destroyed.
 	 * It will sort the edge-array, depending on the type of this vertex:

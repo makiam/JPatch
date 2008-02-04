@@ -554,7 +554,7 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 				
 				
 				
-				Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
+				Main.getInstance().getUndoManager().addEdit("translate", editList);
 				Main.getInstance().repaintViewports();	// need to repaint all viewports to make the ghost disappear,
 														// therefore no syncRepaintViewports()
 			}

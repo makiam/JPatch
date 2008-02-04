@@ -18,6 +18,26 @@ public class MouseSelector {
 	static final TransformUtil transformUtil = new TransformUtil();
 	static final FloatBuffer buffer = BufferUtil.newFloatBuffer(1);
 	
+	
+	public static Selection.State getVertices(Viewport viewport, int x0, int y0, int x1, int y1, SdsModel sdsModel, int level) {
+		Selection selection = new Selection();
+		selection.switchType(Selection.Type.VERTICES, null);
+		viewport.getViewDef().configureTransformUtil(transformUtil);
+		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
+		Point3d p = new Point3d();
+		for (Face face : sdsModel.getSds().getFaces(level)) {
+			for (HalfEdge edge : face.getEdges()) {
+				AbstractVertex vertex = edge.getVertex();
+				vertex.getPosition(p);
+				transformUtil.projectToScreen(LOCAL, p, p);
+				if (x0 <= p.x && p.x <= x1 && y0 <= p.y && p.y <= y1) {
+					selection.addVertex(vertex, null);
+				}
+			}
+		}
+		return new Selection.State(selection);
+	}
+
 	public static HitObject getObjectAt(Viewport viewport, int mouseX, int mouseY, double maxDistSq, SdsModel sdsModel, int level, int type) {
 		HitObject hitObject = null;
 		viewport.getViewDef().configureTransformUtil(transformUtil);
@@ -193,4 +213,6 @@ public class MouseSelector {
 			assert false;	// not instanciable
 		}
 	}
+
+	
 }

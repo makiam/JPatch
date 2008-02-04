@@ -96,6 +96,7 @@ public class Sds {
 			edges[i] = getHalfEdge(editList, vertices[i], vertices[j]);
 		}
 		Face face = new Face(material, edges);
+		if (level == 0) System.out.println("adding face " + face);
 		AddFaceEdit addFaceEdit = new AddFaceEdit(level, face);
 		if (editList != null) {
 			editList.add(addFaceEdit);
@@ -153,7 +154,7 @@ public class Sds {
 	}
 	
 	public void removeFace(List<JPatchUndoableEdit> editList, int level, Face face) {
-//		System.out.println("removing face " + face);
+		if (level == 0) System.out.println("removing face " + face);
 		assert levelFaceSets[level].contains(face) : "unknown face";
 		
 		RemoveFaceEdit removeFaceEdit = new RemoveFaceEdit(level, face);
@@ -357,7 +358,6 @@ public class Sds {
 	private class RemoveFaceEdit extends FaceEdit {
 		private RemoveFaceEdit(int level, Face face) {
 			super(level, face);
-			redo();
 		}
 		
 		public void undo() {
