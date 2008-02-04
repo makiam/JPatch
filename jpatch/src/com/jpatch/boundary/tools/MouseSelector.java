@@ -17,6 +17,7 @@ public class MouseSelector {
 	static final private double MIN_DIST_SQ = 64;
 	static final TransformUtil transformUtil = new TransformUtil();
 	static final FloatBuffer buffer = BufferUtil.newFloatBuffer(1);
+	
 	public static HitObject getObjectAt(Viewport viewport, int mouseX, int mouseY, double maxDistSq, SdsModel sdsModel, int level, int type) {
 		HitObject hitObject = null;
 		viewport.getViewDef().configureTransformUtil(transformUtil);
