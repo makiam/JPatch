@@ -2,9 +2,7 @@ package com.jpatch.afw.control;
 
 public abstract class AbstractSwapEdit extends AbstractUndoableEdit {
 
-	protected AbstractSwapEdit() {
-		apply(false);
-	}
+	protected AbstractSwapEdit() { }
 	
 	@Override
 	public void redo() {

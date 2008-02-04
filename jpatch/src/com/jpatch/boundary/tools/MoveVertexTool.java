@@ -160,25 +160,25 @@ public class MoveVertexTool implements VisibleTool {
 		public void mousePressed(MouseEvent e) {
 			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
 			if (e.getButton() == MouseEvent.BUTTON1) {
-				Point point = new Point(e.getX(), e.getY());
-				MouseSelector.HitObject hitObject = MouseSelector.getObjectAt(viewport, mouseX, mouseY, maxDistSq, sdsModel, level, type);
-//				HalfEdge edge = MouseSelector.getEdgeAt(viewport, e.getX(), e.getY(), Main.getInstance().getActiveSds());
-				if (hit.object != null) {
-					Point hitPoint = new Point(point);
-					SwingUtilities.convertPointToScreen(hitPoint, viewport.getComponent());
-					Main.getInstance().getRobot().mouseMove(hitPoint.x, hitPoint.y);
-					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, point, (SdsModel) hit.node, (AbstractVertex) hit.object);
-					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
-//					Main.getInstance().setSelectedObject(vertex);
-//				} else if (edge != null) {
-//					Main.getInstance().setSelectedObject(edge);
+//				Point point = new Point(e.getX(), e.getY());
+//				MouseSelector.HitObject hitObject = MouseSelector.getObjectAt(viewport, mouseX, mouseY, maxDistSq, sdsModel, level, type);
+////				HalfEdge edge = MouseSelector.getEdgeAt(viewport, e.getX(), e.getY(), Main.getInstance().getActiveSds());
+//				if (hit.object != null) {
+//					Point hitPoint = new Point(point);
+//					SwingUtilities.convertPointToScreen(hitPoint, viewport.getComponent());
+//					Main.getInstance().getRobot().mouseMove(hitPoint.x, hitPoint.y);
+//					mouseMotionListener = new MoveVertexMouseMotionListener(viewport, point, (SdsModel) hit.node, (AbstractVertex) hit.object);
+//					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
+////					Main.getInstance().setSelectedObject(vertex);
+////				} else if (edge != null) {
+////					Main.getInstance().setSelectedObject(edge);
+////				} else {
+////					Main.getInstance().setSelectedObject(null);
 //				} else {
-//					Main.getInstance().setSelectedObject(null);
-				} else {
-					SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
+//					SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
 					mouseMotionListener = new LassoSelectMouseMotionListener(viewport, sdsModel, e.getX(), e.getY());
 					viewport.getComponent().addMouseMotionListener(mouseMotionListener);
-				}
+//				}
 			}
 		}
 		
@@ -196,7 +196,7 @@ public class MoveVertexTool implements VisibleTool {
 							editList.add(AttributeEdit.changeAttribute(Main.getInstance().getActions().toolSM, LastModifierTool.getInstance().get(), false));
 							LastModifierTool.getInstance().set(MoveVertexTool.this);
 						}
-						Main.getInstance().getUndoManager().addEdit(EDIT_NAME, editList);
+						Main.getInstance().getUndoManager().addEdit("change selection", editList);
 						
 						lassoListener.free();
 						Main.getInstance().repaintViewports();
@@ -426,7 +426,9 @@ public class MoveVertexTool implements VisibleTool {
 			int y0 = rectangle.y;
 			int x1 = rectangle.x + rectangle.width;
 			int y1 = rectangle.y + rectangle.height;
-			MouseSelector.getVertices(viewport, x0, y0, x1, y1, sdsModel, selection);
+			
+			Selection.State state = MouseSelector.getVertices(viewport, x0, y0, x1, y1, sdsModel, sdsModel.getEditLevelAttribute().getInt());
+			state.copyTo(selection);
 		}
 		
 		private void free() {

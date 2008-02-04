@@ -340,29 +340,34 @@ public class HalfEdge {
 	}
 	
 	public void saveState(List<JPatchUndoableEdit> editList) {
-		editList.add(new AbstractSwapEdit() {
-			private HalfEdge next = HalfEdge.this.next;
-			private HalfEdge prev = HalfEdge.this.next;
-			private Face face = HalfEdge.this.face;
-			private int faceEdgeIndex = HalfEdge.this.faceEdgeIndex;
-			private int boundaryType = HalfEdge.this.boundaryType;
-			
-			@Override
-			protected void swap() {
-				HalfEdge tmpEdge;
-				Face tmpFace;
-				int tmpInt;
-				
-				/* swap state */
-				tmpEdge = HalfEdge.this.next; HalfEdge.this.next = next; next = tmpEdge;
-				tmpEdge = HalfEdge.this.prev; HalfEdge.this.prev = prev; prev = tmpEdge;
-				tmpFace = HalfEdge.this.face; HalfEdge.this.face = face; face = tmpFace;
-				tmpInt = HalfEdge.this.faceEdgeIndex; HalfEdge.this.faceEdgeIndex = faceEdgeIndex; faceEdgeIndex = tmpInt;
-				tmpInt = HalfEdge.this.boundaryType; HalfEdge.this.boundaryType = boundaryType; boundaryType = tmpInt;
-			}
-		});
+		editList.add(new SaveStateEdit());
 	}
 	
+	private class SaveStateEdit extends AbstractSwapEdit {
+		private HalfEdge next = HalfEdge.this.next;
+		private HalfEdge prev = HalfEdge.this.next;
+		private Face face = HalfEdge.this.face;
+		private int faceEdgeIndex = HalfEdge.this.faceEdgeIndex;
+		private int boundaryType = HalfEdge.this.boundaryType;
+		
+		private SaveStateEdit() {
+			apply(true);
+		}
+		
+		@Override
+		protected void swap() {
+			HalfEdge tmpEdge;
+			Face tmpFace;
+			int tmpInt;
+			
+			/* swap state */
+			tmpEdge = HalfEdge.this.next; HalfEdge.this.next = next; next = tmpEdge;
+			tmpEdge = HalfEdge.this.prev; HalfEdge.this.prev = prev; prev = tmpEdge;
+			tmpFace = HalfEdge.this.face; HalfEdge.this.face = face; face = tmpFace;
+			tmpInt = HalfEdge.this.faceEdgeIndex; HalfEdge.this.faceEdgeIndex = faceEdgeIndex; faceEdgeIndex = tmpInt;
+			tmpInt = HalfEdge.this.boundaryType; HalfEdge.this.boundaryType = boundaryType; boundaryType = tmpInt;
+		}
+	}
 //	public int hashCode() {
 //		return vertex.hashCode() ^ pair.vertex.hashCode();
 //	}

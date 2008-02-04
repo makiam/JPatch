@@ -96,22 +96,23 @@ public class Actions {
 		public void actionPerformed(ActionEvent e) {
 			System.out.println("extrude");
 			Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
-			Set<AbstractVertex> selectedVertices = new HashSet<AbstractVertex>(Main.getInstance().getSelection().getVertices());
-			Collection<Face> facesToExtrude = new HashSet<Face>();
-			faceLoop:
-			for (Face face : sds.getFaces(0)) {
-				for (HalfEdge edge : face.getEdges()) {
-					if (!selectedVertices.contains(edge.getVertex())) {
-						continue faceLoop;
-					}
-				}
-				facesToExtrude.add(face);
-			}
-//			for (Face face : facesToExtrude) {
-////				sds.dumpFaces(0);
-//				sds.removeFace(0, face);
-////				sds.dumpFaces(0);
+//			Set<AbstractVertex> selectedVertices = new HashSet<AbstractVertex>(Main.getInstance().getSelection().getVertices());
+//			Collection<Face> facesToExtrude = new HashSet<Face>();
+//			faceLoop:
+//			for (Face face : sds.getFaces(0)) {
+//				for (HalfEdge edge : face.getEdges()) {
+//					if (!selectedVertices.contains(edge.getVertex())) {
+//						continue faceLoop;
+//					}
+//				}
+//				facesToExtrude.add(face);
 //			}
+////			for (Face face : facesToExtrude) {
+//////				sds.dumpFaces(0);
+////				sds.removeFace(0, face);
+//////				sds.dumpFaces(0);
+////			}
+			Collection<Face> facesToExtrude = Main.getInstance().getSelection().getFaces();
 			List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
 			Operations.extrude(sds, facesToExtrude, editList);
 			undoManager.addEdit("Extrude", editList);
