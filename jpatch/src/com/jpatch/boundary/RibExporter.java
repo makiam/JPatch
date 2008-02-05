@@ -1,5 +1,6 @@
 package com.jpatch.boundary;
 
+import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 import java.io.*;
 import java.util.*;
@@ -9,9 +10,16 @@ import javax.vecmath.*;
 public class RibExporter {
 	private static final int LEVEL = 1;
 	
-	public void export(Sds sds, PrintStream out) {
-		AmbientOcclusion ao = new AmbientOcclusion();
-		ao.computeAo(sds, LEVEL);
+	public void export(SdsModel sdsModel, PrintStream out) {
+		Sds sds = sdsModel.getSds();
+		
+//		AmbientOcclusion ao = new AmbientOcclusion();
+//		ao.computeAo(sds, LEVEL);
+		
+		AmbientOcclusion2 ao = new AmbientOcclusion2();
+		ao.compute(sdsModel);
+		ao.toRib(out);
+		
 		out.print("SubdivisionMesh \"catmull-clark\" [");
 		
 //		/* count slates */
@@ -21,11 +29,11 @@ public class RibExporter {
 //		}
 		
 		/* enumerate (level 2) vertices */
-		Map<BaseVertex, Integer> vertexNumbers = new LinkedHashMap<BaseVertex, Integer>();
+		Map<AbstractVertex, Integer> vertexNumbers = new LinkedHashMap<AbstractVertex, Integer>();
 		int n = 0;
 		for (Face face : sds.getFaces(LEVEL)) {
 			for (HalfEdge edge : face.getEdges()) {
-				BaseVertex v = edge.getVertex();
+				AbstractVertex v = edge.getVertex();
 				if (!vertexNumbers.containsKey(v)) {
 					vertexNumbers.put(v, n++);
 				}
@@ -42,7 +50,7 @@ public class RibExporter {
 		out.print("[");
 		for (Face face : sds.getFaces(LEVEL)) {
 			for (HalfEdge edge : face.getEdges()) {
-				BaseVertex v = edge.getVertex();
+				AbstractVertex v = edge.getVertex();
 				out.print(vertexNumbers.get(v));
 				out.print(' ');
 			}
@@ -55,7 +63,7 @@ public class RibExporter {
 		/* print vertex positions */
 		out.print("\"P\" [");
 		Point3d p = new Point3d();
-		for (BaseVertex v : vertexNumbers.keySet()) {
+		for (AbstractVertex v : vertexNumbers.keySet()) {
 			v.getPosition(p);
 			out.print(p.x);
 			out.print(' ');
@@ -66,12 +74,12 @@ public class RibExporter {
 		}
 		out.println("]");
 		
-		/* print vertex occlusion */
-		out.print("\"vertex float Occlusion\" [");
-		for (BaseVertex v : vertexNumbers.keySet()) {
-			out.print(ao.getOcclusion(v));
-			out.print(' ');
-		}
-		out.println("]");
+//		/* print vertex occlusion */
+//		out.print("\"vertex float Occlusion\" [");
+//		for (AbstractVertex v : vertexNumbers.keySet()) {
+//			out.print(ao.getOcclusion(v));
+//			out.print(' ');
+//		}
+//		out.println("]");
 	}
 }
