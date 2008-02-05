@@ -536,7 +536,7 @@ public class Main {
 		toolBar.add(latheTool);
 		toolBar.add(Box.createHorizontalStrut(4));
 		toolBar.add(extrudeTestButton);
-//		toolBar.add(dumpButton);
+		toolBar.add(dumpButton);
 		
 		
 		final JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT) {

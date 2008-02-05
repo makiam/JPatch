@@ -89,6 +89,7 @@ public class Actions {
 		public void actionPerformed(ActionEvent e) {
 			Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
 			sds.dumpFaces(0);
+			new AmbientOcclusion2().compute(Main.getInstance().getSelection().getSdsModel());
 		}
 	};
 	
@@ -127,7 +128,7 @@ public class Actions {
 				try {
 					Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
 					PrintStream out = new PrintStream(new FileOutputStream(fileChooser.getSelectedFile()));
-					new RibExporter().export(sds, out);
+					new RibExporter().export(Main.getInstance().getSelection().getSdsModel(), out);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				} 
