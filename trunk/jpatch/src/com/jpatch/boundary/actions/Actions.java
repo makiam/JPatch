@@ -129,6 +129,9 @@ public class Actions {
 					Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
 					PrintStream out = new PrintStream(new FileOutputStream(fileChooser.getSelectedFile()));
 					new RibExporter().export(Main.getInstance().getSelection().getSdsModel(), out);
+//					AmbientOcclusion2 ao = new AmbientOcclusion2();
+//					ao.compute(Main.getInstance().getSelection().getSdsModel());
+//					ao.dumpDiscs(out);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				} 
