@@ -13,52 +13,77 @@ import static com.jpatch.afw.vecmath.TransformUtil.*;
 
 public class AmbientOcclusion2 {
 	private TransformUtil transformUtil = new TransformUtil();
-	private Collection<Disc> discs = new ArrayList<Disc>();
+	private Collection<Disk> disks = new ArrayList<Disk>();
 	
 	public void compute(SceneGraphNode rootNode) {
-		discs.clear();
+		disks.clear();
 		computeDiscs(rootNode);
-		for (Disc disc : discs) {
-			System.out.println(disc);
-		}
-		System.out.println(discs.size());
 	}
 	
 	public void toRib(PrintStream out) {
-		String n = Integer.toString(discs.size());
+		String n = Integer.toString(disks.size());
 		out.println("Declare \"numberOfDiscs\" \"uniform float\"");
 		out.println("Declare \"positions\" \"uniform point[" + n + "]\"");
 		out.println("Declare \"normals\" \"uniform normal[" + n + "]\"");
 		out.println("Declare \"areas\" \"uniform float[" + n + "]\"");
 		out.print("Surface \"ao\" \"numberOfDiscs\" ");
-		out.print(discs.size());
+		out.print(disks.size());
 		out.print(" \"positions\" [");
-		for (Disc disc : discs) {
+		for (Disk disk : disks) {
 			out.print(' ');
-			out.print(disc.position.x);
+			out.print(disk.position.x);
 			out.print(' ');
-			out.print(disc.position.y);
+			out.print(disk.position.y);
 			out.print(' ');
-			out.print(disc.position.z);
+			out.print(disk.position.z);
 			out.print(' ');
 		}
 		out.print("] \"normals\" [");
-		for (Disc disc : discs) {
+		for (Disk disk : disks) {
 			out.print(' ');
-			out.print(disc.normal.x);
+			out.print(disk.normal.x);
 			out.print(' ');
-			out.print(disc.normal.y);
+			out.print(disk.normal.y);
 			out.print(' ');
-			out.print(disc.normal.z);
+			out.print(disk.normal.z);
 			out.print(' ');
 		}
 		out.print("] \"areas\" [ ");
-		for (Disc disc : discs) {
-			out.print(disc.area / Math.PI);
+		for (Disk disk : disks) {
+			out.print(disk.area);
 			out.print(' ');
 		}
 		out.print("]");
 		out.println();
+	}
+	
+	public void dumpDiscs(PrintStream out) {
+		Matrix3d m = new Matrix3d();
+		for (Disk disk : disks) {
+			Utils3d.reorientTransform(disk.normal, m);
+			//out.println("TransformBegin");
+			out.print("    Transform [ ");
+			out.print(m.m00); out.print(' ');
+			out.print(m.m10); out.print(' ');
+			out.print(m.m20); out.print(' ');
+			out.print("0 ");
+			out.print(m.m01); out.print(' ');
+			out.print(m.m11); out.print(' ');
+			out.print(m.m21); out.print(' ');
+			out.print("0 ");
+			out.print(m.m02); out.print(' ');
+			out.print(m.m12); out.print(' ');
+			out.print(m.m22); out.print(' ');
+			out.print("0 ");
+			out.print(disk.position.x); out.print(' ');
+			out.print(disk.position.y); out.print(' ');
+			out.print(disk.position.z); out.print(' ');
+			out.println("1 ]");
+			out.print("    Disk 0 ");
+			out.print(Math.sqrt(disk.area / Math.PI));
+			out.println(" 360");
+			//out.println("TransformEnd");
+		}
 	}
 	
 	private void computeDiscs(SceneGraphNode node) {
@@ -101,15 +126,15 @@ public class AmbientOcclusion2 {
 				double p = (a + b + c) / 2;
 				area += Math.sqrt(p * (p - a) * (p - b) * (p - c));
 			}
-			discs.add(new Disc(center, normal, area));
+			disks.add(new Disk(center, normal, area));
 		}
 	}
 	
-	private static class Disc {
+	private static class Disk {
 		private final Point3d position;
 		private final Vector3d normal;
 		private final double area;
-		private Disc(Point3d position, Vector3d normal, double area) {
+		private Disk(Point3d position, Vector3d normal, double area) {
 			this.position = new Point3d(position);
 			this.normal = new Vector3d(normal);
 			normal.normalize();

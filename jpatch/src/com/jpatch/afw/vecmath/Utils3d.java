@@ -164,6 +164,26 @@ public class Utils3d {
 	}
 	
 	/**
+	 * Sets the specified transform matrix to a rotation matrix that reorients
+	 * the coordinate system such that the z-axis points towards the specified
+	 * zVector
+	 * @param zVector
+	 * @param transform
+	 */
+	public static void reorientTransform(Vector3d zVector, Matrix3d transform) {
+		Vector3d vx = new Vector3d();
+		Vector3d vy = new Vector3d();
+		Vector3d vz = new Vector3d();
+		vz.normalize(zVector);
+		perpendicularVector(vz, vx);
+		vy.cross(vx, vz);
+		vy.normalize();
+		transform.m00 = vx.x; transform.m01 = vy.x; transform.m02 = vz.x;
+		transform.m10 = vx.y; transform.m11 = vy.y; transform.m12 = vz.y;
+		transform.m20 = vx.z; transform.m21 = vy.z; transform.m22 = vz.z;
+	}
+	
+	/**
 	 * Returns factor t such that a(1-t)+bt is the point on line ab (specified by ax, ay, bx and by) closest to p (specified by px and py).
 	 * Note that only for 0 &lt; t &lt; 1 the computed point is on the line segment ab.
 	 * @param ax x coordinate of point a (start of line segment)
