@@ -14,10 +14,12 @@ import static com.jpatch.afw.vecmath.TransformUtil.*;
 public class AmbientOcclusion2 {
 	private TransformUtil transformUtil = new TransformUtil();
 	private Collection<Disk> disks = new ArrayList<Disk>();
+	private Collection<Sphere> spheres = new ArrayList<Sphere>();
 	
 	public void compute(SceneGraphNode rootNode) {
 		disks.clear();
-		computeDiscs(rootNode);
+		spheres.clear();
+		computeSpheres(rootNode);
 	}
 	
 	public void toRib(PrintStream out) {
@@ -57,7 +59,38 @@ public class AmbientOcclusion2 {
 		out.println();
 	}
 	
-	public void dumpDiscs(PrintStream out) {
+	public void toRibSpheres(PrintStream out) {
+		String n = Integer.toString(spheres.size());
+		out.println("Declare \"numberOfDiscs\" \"uniform float\"");
+		out.println("Declare \"positions\" \"uniform point[" + n + "]\"");
+		out.println("Declare \"normals\" \"uniform normal[" + n + "]\"");
+		out.println("Declare \"areas\" \"uniform float[" + n + "]\"");
+		out.print("Surface \"ao\" \"numberOfDiscs\" ");
+		out.print(spheres.size());
+		out.print(" \"positions\" [");
+		for (Sphere sphere : spheres) {
+			out.print(' ');
+			out.print(sphere.position.x);
+			out.print(' ');
+			out.print(sphere.position.y);
+			out.print(' ');
+			out.print(sphere.position.z);
+			out.print(' ');
+		}
+		out.print("] \"normals\" [");
+		for (Sphere sphere : spheres) {
+			out.print(" 0 0 0 ");
+		}
+		out.print("] \"areas\" [ ");
+		for (Sphere sphere : spheres) {
+			out.print(sphere.radius);
+			out.print(' ');
+		}
+		out.print("]");
+		out.println();
+	}
+	
+	public void dumpDisks(PrintStream out) {
 		Matrix3d m = new Matrix3d();
 		for (Disk disk : disks) {
 			Utils3d.reorientTransform(disk.normal, m);
@@ -86,16 +119,31 @@ public class AmbientOcclusion2 {
 		}
 	}
 	
-	private void computeDiscs(SceneGraphNode node) {
-		if (node instanceof SdsModel) {
-			addDiscs((SdsModel) node);
-		}
-		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
-			computeDiscs(child);
+	public void dumpSpheres(PrintStream out) {
+		for (Sphere sphere : spheres) {
+			out.print("Transform [ 1 0 0 0 0 1 0 0 0 0 1 0 ");
+			out.print(sphere.position.x); out.print(' ');
+			out.print(sphere.position.y); out.print(' ');
+			out.print(sphere.position.z); out.print(' ');
+			out.println("1 ]");
+			out.print("Sphere ");
+			out.print(sphere.radius); out.print(' ');
+			out.print(-sphere.radius); out.print(' ');
+			out.print(sphere.radius);
+			out.println(" 360");
 		}
 	}
 	
-	private void addDiscs(SdsModel sdsModel) {
+	private void computeDisks(SceneGraphNode node) {
+		if (node instanceof SdsModel) {
+			addDisks((SdsModel) node);
+		}
+		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
+			computeDisks(child);
+		}
+	}
+	
+	private void addDisks(SdsModel sdsModel) {
 		final int level = 0;
 		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
 		Point3d center = new Point3d();
@@ -127,6 +175,47 @@ public class AmbientOcclusion2 {
 				area += Math.sqrt(p * (p - a) * (p - b) * (p - c));
 			}
 			disks.add(new Disk(center, normal, area));
+			
+		}
+	}
+	
+	private void computeSpheres(SceneGraphNode node) {
+		if (node instanceof SdsModel) {
+			addSpheres((SdsModel) node);
+		}
+		for (SceneGraphNode child : node.getChildrenAttribute().getElements()) {
+			computeSpheres(child);
+		}
+	}
+	
+	private void addSpheres(SdsModel sdsModel) {
+		final int level = 0;
+		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
+		Point3d center = new Point3d();
+		Point3d p0 = new Point3d();
+//		Point3d p1 = new Point3d();
+		Vector3d normal = new Vector3d();
+		for (Face face : sdsModel.getSds().getFaces(level)) {
+			face.getFacePoint().getLimit(center);
+			face.getFacePoint().getNormal(normal);
+			transformUtil.transform(LOCAL, center, WORLD, center);
+			transformUtil.transform(LOCAL, normal, WORLD, normal);
+			normal.normalize();
+			HalfEdge[] edges = face.getEdges();
+			double distance = 0;
+			for (int i = 0; i < edges.length; i++) {
+				int j = i + 1;
+				if (j == edges.length) {
+					j = 0;
+				}
+				edges[i].getEdgePoint().getLimit(p0);
+				transformUtil.transform(LOCAL, p0, WORLD, p0);
+				
+				distance = Math.max(distance, center.distance(p0));
+			}
+			spheres.add(new Sphere(center, normal, distance));
+//			disks.add(new Disk(center, normal, area));
+			
 		}
 	}
 	
@@ -135,14 +224,36 @@ public class AmbientOcclusion2 {
 		private final Vector3d normal;
 		private final double area;
 		private Disk(Point3d position, Vector3d normal, double area) {
-			this.position = new Point3d(position);
 			this.normal = new Vector3d(normal);
 			normal.normalize();
 			this.area = area;
+			double radius = Math.sqrt(area / Math.PI);
+			this.position = new Point3d(
+				position.x - normal.x * radius,
+				position.y - normal.y * radius,
+				position.z - normal.z * radius
+			);
 		}
 		
 		public String toString() {
 			return position + " " + normal + " " + area;
+		}
+	}
+	
+	private static class Sphere {
+		private final Point3d position;
+		private final double radius;
+		private Sphere(Point3d position, Vector3d normal, double radius) {
+			this.radius = radius;
+			this.position = new Point3d(
+				position.x - normal.x * radius,
+				position.y - normal.y * radius,
+				position.z - normal.z * radius
+			);
+		}
+		
+		public String toString() {
+			return position + " " + radius;
 		}
 	}
 }
