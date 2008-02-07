@@ -131,7 +131,7 @@ public class Actions {
 					new RibExporter().export(Main.getInstance().getSelection().getSdsModel(), out);
 //					AmbientOcclusion2 ao = new AmbientOcclusion2();
 //					ao.compute(Main.getInstance().getSelection().getSdsModel());
-//					ao.dumpDiscs(out);
+//					ao.dumpSpheres(out);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				} 

@@ -16,9 +16,9 @@ public class RibExporter {
 //		AmbientOcclusion ao = new AmbientOcclusion();
 //		ao.computeAo(sds, LEVEL);
 		
-		AmbientOcclusion2 ao = new AmbientOcclusion2();
-		ao.compute(sdsModel);
-		ao.toRib(out);
+//		AmbientOcclusion2 ao = new AmbientOcclusion2();
+//		ao.compute(sdsModel);
+//		ao.toRibSpheres(out);
 		
 		out.print("SubdivisionMesh \"catmull-clark\" [");
 		
