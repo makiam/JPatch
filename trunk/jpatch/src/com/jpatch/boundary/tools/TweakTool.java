@@ -55,6 +55,7 @@ public class TweakTool implements VisibleTool {
 
 	public void unregisterListeners(Viewport[] viewports) {
 		for (int i = 0; i < viewports.length; i++) {
+			viewports[i].getComponent().removeMouseListener(mouseListeners[i]);
 			viewports[i].getComponent().removeMouseMotionListener(mouseMotionListeners[i]);
 		}
 	}

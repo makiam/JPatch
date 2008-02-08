@@ -113,9 +113,9 @@ public class Actions {
 ////				sds.removeFace(0, face);
 //////				sds.dumpFaces(0);
 ////			}
-			Collection<Face> facesToExtrude = Main.getInstance().getSelection().getFaces();
+//			Collection<Face> facesToExtrude = Main.getInstance().getSelection().getFaces();
 			List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
-			Operations.extrude(sds, facesToExtrude, editList);
+			Operations.extrude(sds, Main.getInstance().getSelection(), editList);
 			undoManager.addEdit("Extrude", editList);
 			Main.getInstance().repaintViewports();
 		}
