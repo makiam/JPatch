@@ -24,6 +24,16 @@ public class BaseVertex extends AbstractVertex {
 	}
 	
 	@Override
+	public void getNormal(Tuple3f normal) {
+		vertexPoint.getNormal(normal);
+	}
+	
+	@Override
+	public void getNormal(Tuple3d normal) {
+		vertexPoint.getNormal(normal);
+	}
+	
+	@Override
 	public void validateAlteredLimit() {
 		vertexPoint.validateAlteredLimit();
 	}
