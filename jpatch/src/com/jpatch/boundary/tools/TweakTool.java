@@ -24,7 +24,6 @@ public class TweakTool implements VisibleTool {
 	private TransformUtil transformUtil = new TransformUtil();
 	private MouseMotionListener[] mouseMotionListeners;
 	private MouseListener[] mouseListeners;
-	private double[] modelView = new double[16];
 	
 	private static int STANDARD_SELECTION_TYPE = MouseSelector.Type.EDGE | MouseSelector.Type.FACE | MouseSelector.Type.VERTEX;
 	private static int LIMIT_SELECTION_TYPE = MouseSelector.Type.LIMIT;
@@ -71,13 +70,12 @@ public class TweakTool implements VisibleTool {
 		viewport.spatialMode();
 		viewport.getViewDef().configureTransformUtil(transformUtil);
 		hitObject.node.getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
-		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
-		gl.glMatrixMode(GL_MODELVIEW);
-		gl.glLoadMatrixd(modelView, 0);
-		gl.glEnable(GL_BLEND);
+		viewport.setModelViewMatrix(transformUtil);
+		
+//		gl.glEnable(GL_BLEND);
 //		gl.glDisable(GL_DEPTH_TEST);
 		
-		viewport.drawSelection(hitSelection);
+		viewport.drawSelection(hitSelection, new Color3f(1, 1, 0));
 //		gl.glColor4f(1, 1, 0, 1.0f);
 //		Point3d p = new Point3d();
 //		if (hitObject instanceof HitVertex) {
@@ -137,10 +135,10 @@ public class TweakTool implements VisibleTool {
 //			gl.glVertex3d(p.x, p.y, p.z);
 //			gl.glEnd();
 //		}
-		gl.glPointSize(3.0f);
-		gl.glLineWidth(1.0f);
-		gl.glDisable(GL_BLEND);
-		gl.glEnable(GL_DEPTH_TEST);
+//		gl.glPointSize(3.0f);
+//		gl.glLineWidth(1.0f);
+//		gl.glDisable(GL_BLEND);
+//		gl.glEnable(GL_DEPTH_TEST);
 		glDrawable.swapBuffers();
 		glDrawable.getContext().release();
 	}

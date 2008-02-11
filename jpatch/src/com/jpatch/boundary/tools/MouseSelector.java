@@ -1,6 +1,9 @@
 package com.jpatch.boundary.tools;
 
+import java.awt.*;
+import java.awt.geom.*;
 import java.nio.*;
+import java.util.*;
 
 import javax.media.opengl.*;
 import static javax.media.opengl.GL.*;
@@ -19,25 +22,44 @@ public class MouseSelector {
 	static final FloatBuffer buffer = BufferUtil.newFloatBuffer(1);
 	
 	
-	public static Selection.State getVertices(Viewport viewport, int x0, int y0, int x1, int y1, SdsModel sdsModel, int level) {
-		Selection selection = new Selection();
-		selection.switchType(Selection.Type.VERTICES, null);
+//	public static Selection.State getVertices(Viewport viewport, int x0, int y0, int x1, int y1, SdsModel sdsModel, int level) {
+//		Selection selection = new Selection();
+//		selection.switchType(Selection.Type.VERTICES, null);
+//		viewport.getViewDef().configureTransformUtil(transformUtil);
+//		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
+//		Point3d p = new Point3d();
+//		for (Face face : sdsModel.getSds().getFaces(level)) {
+//			for (HalfEdge edge : face.getEdges()) {
+//				AbstractVertex vertex = edge.getVertex();
+//				vertex.getPosition(p);
+//				transformUtil.projectToScreen(LOCAL, p, p);
+//				if (x0 <= p.x && p.x <= x1 && y0 <= p.y && p.y <= y1) {
+//					selection.addVertex(vertex, null);
+//				}
+//			}
+//		}
+//		return new Selection.State(selection);
+//	}
+	
+	public static void getVerticesUnderLasso(ViewportGl viewport, Polygon lasso, SdsModel sdsModel, int level, boolean visibleOnly, Collection<AbstractVertex> vertices) {
+		vertices.clear();
 		viewport.getViewDef().configureTransformUtil(transformUtil);
 		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
 		Point3d p = new Point3d();
 		for (Face face : sdsModel.getSds().getFaces(level)) {
-			for (HalfEdge edge : face.getEdges()) {
-				AbstractVertex vertex = edge.getVertex();
+			for (HalfEdge halfEdge : face.getEdges()) {
+				AbstractVertex vertex = halfEdge.getVertex();
 				vertex.getPosition(p);
 				transformUtil.projectToScreen(LOCAL, p, p);
-				if (x0 <= p.x && p.x <= x1 && y0 <= p.y && p.y <= y1) {
-					selection.addVertex(vertex, null);
+				if (lasso.contains(p.x, p.y)) {
+					if(!visibleOnly || viewport.getDepthAt((int) p.x, (int) p.y) < p.z) {
+						vertices.add(vertex);
+					}
 				}
 			}
 		}
-		return new Selection.State(selection);
 	}
-
+	
 	public static HitObject getObjectAt(Viewport viewport, int mouseX, int mouseY, double maxDistSq, SdsModel sdsModel, int level, int type) {
 		HitObject hitObject = null;
 		viewport.getViewDef().configureTransformUtil(transformUtil);
@@ -151,7 +173,10 @@ public class MouseSelector {
 			HitObject other = (HitObject) o;
 			return node == other.node;
 		}
+		
+		public abstract void getVertices(Collection<AbstractVertex> vertices);
 	}
+	
 	
 	public static class HitVertex extends HitObject {
 		public final AbstractVertex vertex;
@@ -167,6 +192,11 @@ public class MouseSelector {
 			}
 			HitVertex other = (HitVertex) o;
 			return super.equals(o) && vertex == other.vertex;
+		}
+		
+		@Override
+		public void getVertices(Collection<AbstractVertex> vertices) {
+			vertices.add(vertex);
 		}
 	}
 	
@@ -185,6 +215,12 @@ public class MouseSelector {
 			HitEdge other = (HitEdge) o;
 			return super.equals(o) && halfEdge == other.halfEdge;
 		}
+		
+		@Override
+		public void getVertices(Collection<AbstractVertex> vertices) {
+			vertices.add(halfEdge.getVertex());
+			vertices.add(halfEdge.getPairVertex());
+		}
 	}
 	
 	public static class HitFace extends HitObject {
@@ -201,6 +237,13 @@ public class MouseSelector {
 			}
 			HitFace other = (HitFace) o;
 			return super.equals(o) && face == other.face;
+		}
+		
+		@Override
+		public void getVertices(Collection<AbstractVertex> vertices) {
+			for (HalfEdge edge : face.getEdges()) {
+				vertices.add(edge.getVertex());
+			}
 		}
 	}
 	

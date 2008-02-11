@@ -21,7 +21,7 @@ public class Actions {
 			ChangeViewTool.createMoveViewTool(),
 			ChangeViewTool.createZoomViewTool(),
 			ChangeViewTool.createRotateViewTool(),
-			new MoveVertexTool(),
+			new SelectTool(),
 			new RotateTool(),
 			new TranslateTool(),
 			new NormalTool(),
@@ -151,8 +151,8 @@ public class Actions {
 //		save.getEnabled().setBoolean(false);
 		
 		snapToGrid.getEnabled().setBoolean(false);
-		edgeMode.getEnabled().setBoolean(false);
-		faceMode.getEnabled().setBoolean(false);
+//		edgeMode.getEnabled().setBoolean(false);
+//		faceMode.getEnabled().setBoolean(false);
 		
 		/*
 		 * configure undo and redo actions

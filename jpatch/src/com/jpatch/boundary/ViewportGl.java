@@ -687,7 +687,7 @@ public class ViewportGl extends Viewport {
 		
 		gl.glDisable(GL_LIGHTING);
 		gl.glDisable(GL_COLOR_MATERIAL);
-		drawSelection(selection);
+		drawSelection(selection, new Color3f(1, 1, 0));
 		
 		JPatchTool tool = Main.getInstance().getActiveTool();
 //		System.out.println("tool = " + tool);
@@ -782,6 +782,18 @@ public class ViewportGl extends Viewport {
 			drawSceneGraphElement(child);
 		}
 		
+	}
+	
+	public void setModelViewMatrix(XFormNode node) {
+		node.getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+		setModelViewMatrix(transformUtil);
+	}
+	
+	public void setModelViewMatrix(TransformUtil transformUtil) {
+		GL gl = drawable.getGL();
+		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
+		gl.glMatrixMode(GL_MODELVIEW);
+		gl.glLoadMatrixd(modelView, 0);
 	}
 	
 	private void drawSceneGraphNames(SceneGraphNode node) {
@@ -1151,7 +1163,7 @@ public class ViewportGl extends Viewport {
 //		gl.glPointSize(3);
 //	}
 	
-	public void drawSelection(Selection selection) {
+	public void drawSelection(Selection selection, Color3f highlighColor) {
 		GL gl = drawable.getGL();
 //		selection.getNode().getLocal2WorldTransform(transformUtil, LOCAL);
 //		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
@@ -1166,7 +1178,7 @@ public class ViewportGl extends Viewport {
 		switch (selection.getType()) {
 		case VERTICES:
 			gl.glPointSize(6);
-			gl.glColor3f(1, 1, 0);
+			gl.glColor3f(highlighColor.x, highlighColor.y, highlighColor.z);
 			gl.glBegin(GL_POINTS);
 			for (AbstractVertex vertex : selection.getVertices()) {
 				vertex.getPosition(p);
@@ -1175,8 +1187,8 @@ public class ViewportGl extends Viewport {
 			gl.glEnd();
 			break;
 		case EDGES:
-			gl.glLineWidth(4);
-			gl.glColor3f(1, 1, 0);
+			gl.glLineWidth(3);
+			gl.glColor3f(highlighColor.x, highlighColor.y, highlighColor.z);
 			gl.glBegin(GL_LINES);
 			for (HalfEdge edge : selection.getEdges()) {
 				edge.getVertex().getPosition(p);
@@ -1189,13 +1201,14 @@ public class ViewportGl extends Viewport {
 		case FACES:
 			gl.glLineWidth(2);
 			gl.glEnable(GL_BLEND);
+			gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			for (Face face : selection.getFaces()) {
 				face.getPositionSurface(buffer);
 				face.getMidpointNormal(n);
 				gl.glNormal3d(n.x, n.y, n.z);
-				gl.glColor4f(1, 1, 0, 0.5f);
+				gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, 0.5f);
 				gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() + 2);
-				gl.glColor3f(1, 1, 0);
+				gl.glColor3f(highlighColor.x, highlighColor.y, highlighColor.z);
 				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides());
 			}
 			gl.glDisable(GL_BLEND);
