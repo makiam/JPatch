@@ -118,7 +118,7 @@ public class Selection {
 		addChangeSelectionEdit(editList);
 //		nodeChanging = true;
 		nodeAttr.setValue(node);
-		switchType(Type.NODE, null);
+		setType(Type.NODE, null);
 //		nodeChanging = false;
 	}
 	
@@ -161,56 +161,56 @@ public class Selection {
 	
 	public void addVertex(AbstractVertex vertex, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.VERTICES, null);
+		setType(Type.VERTICES, null);
 		vertices.add(vertex);
 		invalidate();
 	}
 	
 	public void removeVertex(AbstractVertex vertex, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.VERTICES, null);
+		setType(Type.VERTICES, null);
 		vertices.remove(vertex);
 		invalidate();
 	}
 	
 	public void addVertices(Collection<AbstractVertex> vertices, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.VERTICES, null);
+		setType(Type.VERTICES, null);
 		this.vertices.addAll(vertices);
 		invalidate();
 	}
 	
 	public void removeVertices(Collection<AbstractVertex> vertices, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.VERTICES, null);
+		setType(Type.VERTICES, null);
 		this.vertices.removeAll(vertices);
 		invalidate();
 	}
 	
 	public void setVertex(AbstractVertex vertex, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.VERTICES, null);
+		setType(Type.VERTICES, null);
 		clear(null);
 		addVertex(vertex, null);
 	}
 	
 	public void addEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.EDGES, null);
+		setType(Type.EDGES, null);
 		edges.add(edge.getPrimary());
 		invalidate();
 	}
 	
 	public void removeEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.EDGES, null);
+		setType(Type.EDGES, null);
 		edges.remove(edge.getPrimary());
 		invalidate();
 	}
 	
 	public void addEdges(Collection<HalfEdge> edges, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.EDGES, null);
+		setType(Type.EDGES, null);
 		for (HalfEdge edge : edges) {
 			this.edges.add(edge.getPrimary());
 		}
@@ -219,7 +219,7 @@ public class Selection {
 	
 	public void removeEdges(Collection<HalfEdge> edges, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.EDGES, null);
+		setType(Type.EDGES, null);
 		for (HalfEdge edge : edges) {
 			this.edges.remove(edge.getPrimary());
 		}
@@ -228,47 +228,47 @@ public class Selection {
 	
 	public void setEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.EDGES, null);
+		setType(Type.EDGES, null);
 		clear(null);
 		addEdge(edge, null);
 	}
 	
 	public void addFace(Face face, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.FACES, null);
+		setType(Type.FACES, null);
 		faces.add(face);
 		invalidate();
 	}
 	
 	public void removeFace(Face face, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.FACES, null);
+		setType(Type.FACES, null);
 		faces.remove(face);
 		invalidate();
 	}
 	
 	public void addFaces(Collection<Face> faces, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.FACES, null);
+		setType(Type.FACES, null);
 		this.faces.addAll(faces);
 		invalidate();
 	}
 	
 	public void removeFaces(Collection<Face> faces, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.FACES, null);
+		setType(Type.FACES, null);
 		this.faces.removeAll(faces);
 		invalidate();
 	}
 	
 	public void setFace(Face face, List<JPatchUndoableEdit> editList) {
 		addChangeSelectionEdit(editList);
-		switchType(Type.FACES, null);
+		setType(Type.FACES, null);
 		clear(null);
 		addFace(face, null);
 	}
 	
-	public void switchType(Type type, List<JPatchUndoableEdit> editList) {
+	public void setType(Type type, List<JPatchUndoableEdit> editList) {
 		if (type != this.type) {
 			addChangeSelectionEdit(editList);
 			switch(type) {

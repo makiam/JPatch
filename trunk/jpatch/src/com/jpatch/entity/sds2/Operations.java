@@ -104,7 +104,7 @@ public class Operations {
 			newSelection.add(boundaryVertices.get(boundaryVertex));
 		}
 		selection.addVertices(newSelection, editList);
-		selection.switchType(selectionType, editList);
+		selection.setType(selectionType, editList);
 		
 		/* change selection */
 		
