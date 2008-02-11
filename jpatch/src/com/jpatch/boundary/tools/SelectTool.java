@@ -167,8 +167,8 @@ public class SelectTool implements VisibleTool {
 				switch(typeAttr.getValue()) {
 				case LASSO:
 					lassoPolygon.npoints = 0;
-					lassoPolygon.xpoints = new int[0];
-					lassoPolygon.ypoints = new int[0];
+//					lassoPolygon.xpoints = new int[0];
+//					lassoPolygon.ypoints = new int[0];
 					lassoPolygon.invalidate();
 					break;
 				case RECTANGLE:
