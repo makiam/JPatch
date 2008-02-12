@@ -37,6 +37,7 @@ public class SelectTool implements VisibleTool {
 		}
 	}
 	
+	
 	private final StateMachine<Type> typeAttr = new StateMachine<Type>(Type.class, Type.RECTANGLE);
 	private final StateMachine<Mode> modeAttr = new StateMachine<Mode>(Mode.class, Mode.SMART);
 //	private final StateMachine<Type> modeAttr = new StateMachine<Type>(Type.class, Type.RECTANGLE);
@@ -48,7 +49,7 @@ public class SelectTool implements VisibleTool {
 	private final Collection<AbstractVertex> vertices = new ArrayList<AbstractVertex>();
 	private boolean active;
 	private boolean visibleOnly;
-	
+	private TextureUpdater textureUpdater;
 	public void draw(Viewport viewport) {
 		// TODO Auto-generated method stub
 
@@ -64,14 +65,9 @@ public class SelectTool implements VisibleTool {
 			viewports[i].getComponent().addMouseListener(mouseListeners[i]);
 			mouseMotionListeners[i] = new SelectMouseMotionListener((ViewportGl) viewports[i]);
 			viewports[i].getComponent().addMouseMotionListener(mouseMotionListeners[i]);
-			ViewportGl viewportGl = (ViewportGl) viewports[i];
-			GLAutoDrawable glDrawable = (GLAutoDrawable) viewportGl.getComponent();
-			glDrawable.getContext().makeCurrent();
-			if (glDrawable.getContext() == GLContext.getCurrent()) {
-				viewportGl.validateScreenShotTexture();
-				glDrawable.getContext().release();
-			}
 		}
+		textureUpdater = new TextureUpdater(viewports);
+		textureUpdater.start();
 	}
 
 	public void unregisterListeners(Viewport[] viewports) {
@@ -79,6 +75,7 @@ public class SelectTool implements VisibleTool {
 			viewports[i].getComponent().removeMouseListener(mouseListeners[i]);
 			viewports[i].getComponent().removeMouseMotionListener(mouseMotionListeners[i]);
 		}
+		textureUpdater.stop();
 	}
 
 	public GenericAttr<Mode> getModeAttribute() {
@@ -277,5 +274,5 @@ public class SelectTool implements VisibleTool {
 //				}
 //			}
 //		}	
-	};
+	}
 }

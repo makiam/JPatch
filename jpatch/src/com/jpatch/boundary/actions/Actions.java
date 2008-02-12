@@ -30,7 +30,7 @@ public class Actions {
 	};
 	
 	public final JPatchUndoManager undoManager = new JPatchUndoManager();
-	public final StateMachine<JPatchTool> toolSM = new StateMachine<JPatchTool>(tools, tools[3]);
+	public final StateMachine<JPatchTool> toolSM = new StateMachine<JPatchTool>(tools, tools[0]);
 	public final StateMachine<SdsMode> sdsModeSM = new StateMachine<SdsMode>(SdsMode.class, SdsMode.VERTEX_MODE);
 	public final StateMachine<ViewportMode> viewportModeSM = new StateMachine<ViewportMode>(ViewportMode.class, ViewportMode.VIEWPORT_1);
 	public final Toggle snapToGridToggle = new Toggle();

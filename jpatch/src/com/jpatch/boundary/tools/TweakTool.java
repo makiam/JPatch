@@ -34,6 +34,8 @@ public class TweakTool implements VisibleTool {
 	private Point hitPoint;
 	private Point3d localStart = new Point3d();
 	
+	private TextureUpdater textureUpdater;
+	
 	public void draw(Viewport viewport) {
 		// TODO Auto-generated method stub
 
@@ -50,6 +52,8 @@ public class TweakTool implements VisibleTool {
 			mouseMotionListeners[i] = new TweakMouseMotionListener((ViewportGl) viewports[i]);
 			viewports[i].getComponent().addMouseMotionListener(mouseMotionListeners[i]);
 		}
+		textureUpdater = new TextureUpdater(viewports);
+		textureUpdater.start();
 	}
 
 	public void unregisterListeners(Viewport[] viewports) {
@@ -57,6 +61,7 @@ public class TweakTool implements VisibleTool {
 			viewports[i].getComponent().removeMouseListener(mouseListeners[i]);
 			viewports[i].getComponent().removeMouseMotionListener(mouseMotionListeners[i]);
 		}
+		textureUpdater.stop();
 	}
 
 	private void highlightHitObject(ViewportGl viewport) {

@@ -61,6 +61,7 @@ public class ViewportGl extends Viewport {
 //	private final TransformUtil transformUtil = new TransformUtil();
 	
 	private boolean screenshotTextureValid;
+	private long lastRedrawTime;
 	private int screenshotTexture;
 	private float[] screenShotTxCoords = new float[4];
 	private FloatBuffer depthBuffer;
@@ -703,6 +704,11 @@ public class ViewportGl extends Viewport {
 		drawInfo();
 //		gl.glFlush(); // ensure that everything gets drawn
 //		gl.glFinish();
+		lastRedrawTime = System.currentTimeMillis();
+	}
+	
+	public long getContentAge() {
+		return System.currentTimeMillis() - lastRedrawTime;
 	}
 	
 	private void drawSceneGraphElement(SceneGraphNode node) {
@@ -1303,6 +1309,17 @@ public class ViewportGl extends Viewport {
 				gl.glColor3f(1, 1, 1);
 				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides());
 			}
+			
+			gl.glColor3f(0.5f, 0.5f, 1.0f);
+			gl.glBegin(GL_LINES);
+			Point3f p = new Point3f();
+			for (HalfEdge strayEdge : sds.getStrayEdges()) {
+				strayEdge.getVertex().getPosition(p);
+				gl.glVertex3f(p.x, p.y, p.z);
+				strayEdge.getPairVertex().getPosition(p);
+				gl.glVertex3f(p.x, p.y, p.z);
+			}
+			gl.glEnd();
 		}
 //		for (com.jpatch.entity.sds2.Face face : sds.getFaces(level)) {
 //			gl.glBegin(GL_POLYGON);
@@ -1972,6 +1989,7 @@ public class ViewportGl extends Viewport {
 //		return Viewport.farClip - 2 * Viewport.farClip * buffer.get(0) - 1;
 		
 		screenshotTextureValid = true;
+//		System.out.println("texture Updated");
 	}
 	
 	public float getDepthAt(int x, int y) {

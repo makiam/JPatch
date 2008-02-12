@@ -310,10 +310,8 @@ public class Selection {
 			SdsModel sdsModel = getSdsModel();
 			if (sdsModel != null) {
 				Sds sds = sdsModel.getSds();
-				for (Face face : sds.getFaces(0)) {
-					for (HalfEdge edge : face.getEdges()) {
-						vertices.add(edge.getVertex());
-					}
+				for (AbstractVertex vertex : sds.getVertices(0)) {
+					vertices.add(vertex);
 				}
 			}
 			break;
@@ -346,10 +344,8 @@ public class Selection {
 			SdsModel sdsModel = getSdsModel();
 			if (sdsModel != null) {
 				Sds sds = sdsModel.getSds();
-				for (Face face : sds.getFaces(0)) {
-					for (HalfEdge edge : face.getEdges()) {
-						edges.add(edge.getPrimary());
-					}
+				for (HalfEdge edge : sds.getEdges(0)) {
+					edges.add(edge.getPrimary());
 				}
 			}
 			break;
