@@ -17,7 +17,7 @@ import javax.media.opengl.*;
 import javax.vecmath.*;
 
 public class RotateTool implements ModifierTool, VisibleTool {
-	public static final GenericAttr<String> EDIT_NAME = new GenericAttr<String>("rotate");
+	public static final String EDIT_NAME = "rotate";
 	private static final double SCREEN_ROTATE_FACTOR = 1.2;
 	private static final int SEGMENTS = 128;
 	private static final int CIRCLE_SEGMENTS = 4096;
@@ -411,12 +411,13 @@ public class RotateTool implements ModifierTool, VisibleTool {
 		double cameraRadius = vv.radius * transformUtil.getCameraScale();
 		
 		Point3d rayOrigin = new Point3d();
+		Point3d rayDestination = new Point3d();
 		Vector3d rayDirection = new Vector3d();
 		if (transformUtil.isPerspective()) {
 			rayOrigin.set(0, 0, 0);
-			rayDirection.set(mouseX, mouseY, 1);
-			transformUtil.projectFromScreen(CAMERA, rayDirection, rayDirection);
-			rayDirection.z = -1; // TODO: WHY?
+			rayDestination.set(mouseX, mouseY, 1);
+			transformUtil.projectFromScreen(CAMERA, rayDestination, rayDestination);
+			rayDirection.set(rayDestination.x, rayDestination.y, -rayDestination.z);	// TODO: why -z ?!?
 		} else {
 			rayOrigin.set(mouseX, mouseY, 0);
 			transformUtil.projectFromScreen(CAMERA, rayOrigin, rayOrigin);

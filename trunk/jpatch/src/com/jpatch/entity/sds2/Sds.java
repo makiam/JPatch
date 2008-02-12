@@ -23,6 +23,9 @@ public class Sds {
 	
 	private Set<Face>[] levelFaceSets = new Set[SdsConstants.MAX_LEVEL + 1];
 	private List<Face>[] levelFaceLists = new List[SdsConstants.MAX_LEVEL + 1];
+	private Set<HalfEdge> strayEdges = new HashSet<HalfEdge>();
+	private Set<AbstractVertex> strayVertices = new HashSet<AbstractVertex>();
+	
 	private boolean facesSorted;
 	
 	private Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
@@ -69,6 +72,12 @@ public class Sds {
 			}
 		});
 		
+		
+		AbstractVertex v0 = new BaseVertex(0, 0, 0);
+		AbstractVertex v1 = new BaseVertex(5, 5, 0);
+		AbstractVertex v2 = new BaseVertex(10, 0, 0);
+		addSegment(null, v0, v1);
+		addSegment(null, v1, v2);
 	}
 	
 	public IntAttr getMaxLevelAttribute() {
@@ -81,6 +90,17 @@ public class Sds {
 	
 	public IntAttr getEditLevelAttribute() {
 		return editLevelAttr;
+	}
+	
+	public void addSegment(List<JPatchUndoableEdit> editList, AbstractVertex vertex0, AbstractVertex vertex1) {
+		assert (!edgeMap.containsKey(new EdgeKey(vertex0, vertex1)));
+		HalfEdge edge = new HalfEdge(vertex0, vertex1);
+		JPatchUndoableEdit addEdgeEdit = new AddEdgeEdit(edge);
+		JPatchUndoableEdit addStrayEdgeEdit = new AddStrayEdgeEdit(edge);
+		if (editList != null) {
+			editList.add(addEdgeEdit);
+			editList.add(addStrayEdgeEdit);
+		}
 	}
 	
 	public Face addFace(List<JPatchUndoableEdit> editList, int level, Material material, AbstractVertex... vertices) {
@@ -207,9 +227,96 @@ public class Sds {
 		facesSorted = true;
 	}
 	
-	public Collection<Face> getFaces(int level) {
+	public List<Face> getFaces(int level) {
 		sortFaces();
 		return levelFaceLists[level];
+	}
+	
+	public Iterable<AbstractVertex> getVertices(final int level) {
+		return new Iterable<AbstractVertex>() {
+			public Iterator<AbstractVertex> iterator() {
+				return new Iterator<AbstractVertex>() {
+					Iterator<Face> faces = levelFaceLists[level].iterator();
+					HalfEdge[] faceEdges;
+					int edgeIndex;
+					Iterator<AbstractVertex> vertices = strayVertices.iterator();
+					
+					public boolean hasNext() {
+						if (faceEdges != null && edgeIndex < faceEdges.length) {
+							return true;
+						}
+						if (faces.hasNext()) {
+							faceEdges = faces.next().getEdges();
+							edgeIndex = 0;
+							return hasNext();
+						}
+						return vertices.hasNext();
+					}
+
+					public AbstractVertex next() {
+						if (faceEdges != null && edgeIndex < faceEdges.length) {
+							return faceEdges[edgeIndex++].getVertex();
+						}
+						if (faces.hasNext()) {
+							faceEdges = faces.next().getEdges();
+							edgeIndex = 0;
+							return next();
+						}
+						return vertices.next();
+					}
+
+					public void remove() {
+						throw new UnsupportedOperationException();
+					}
+				};
+			}
+		};
+	}
+	
+	public Iterable<HalfEdge> getStrayEdges() {
+		return strayEdges;
+	}
+	
+	public Iterable<HalfEdge> getEdges(final int level) {
+		return new Iterable<HalfEdge>() {
+			public Iterator<HalfEdge> iterator() {
+				return new Iterator<HalfEdge>() {
+					Iterator<Face> faces = levelFaceLists[level].iterator();
+					HalfEdge[] faceEdges;
+					int edgeIndex;
+					Iterator<HalfEdge> edges = strayEdges.iterator();
+					
+					public boolean hasNext() {
+						if (faceEdges != null && edgeIndex < faceEdges.length) {
+							return true;
+						}
+						if (faces.hasNext()) {
+							faceEdges = faces.next().getEdges();
+							edgeIndex = 0;
+							return hasNext();
+						}
+						return edges.hasNext();
+					}
+
+
+					public HalfEdge next() {
+						if (faceEdges != null && edgeIndex < faceEdges.length) {
+							return faceEdges[edgeIndex++];
+						}
+						if (faces.hasNext()) {
+							faceEdges = faces.next().getEdges();
+							edgeIndex = 0;
+							return next();
+						}
+						return edges.next();
+					}
+
+					public void remove() {
+						throw new UnsupportedOperationException();
+					}
+				};
+			}
+		};
 	}
 	
 	public void dumpFaces(int level) {
@@ -241,6 +348,12 @@ public class Sds {
 			assert edge.getFace() == null : "Surface is non-manifold, edge=" + edge + " face=" + edge.getFace();
 			if (editList != null) {
 				edge.saveState(editList);
+			}
+			if (strayEdges.contains(edge)) {
+				JPatchUndoableEdit removeStrayEdgeEdit = new RemoveStrayEdgeEdit(edge);
+				if (editList != null) {
+					editList.add(removeStrayEdgeEdit);
+				}
 			}
 		}
 		return edge;
@@ -303,6 +416,58 @@ public class Sds {
 	
 	private class RemoveEdgeEdit extends EdgeEdit {
 		private RemoveEdgeEdit(HalfEdge halfEdge) {
+			super(halfEdge);
+		}
+		
+		public void undo() {
+			super.undo();
+			add();
+		}
+		
+		public void redo() {
+			super.redo();
+			remove();
+		}
+	}
+	
+	private abstract class StrayEdgeEdit extends AbstractUndoableEdit {
+		HalfEdge halfEdge;
+		StrayEdgeEdit(HalfEdge halfEdge) {
+			this.halfEdge = halfEdge;
+			apply(true);
+		}
+		
+		void add() {
+			strayEdges.add(halfEdge);
+			strayVertices.add(halfEdge.getVertex());
+			strayVertices.add(halfEdge.getPairVertex());
+		}
+		
+		void remove() {
+			strayEdges.remove(halfEdge);
+			strayVertices.remove(halfEdge.getVertex());
+			strayVertices.remove(halfEdge.getPairVertex());
+		}
+	}
+	
+	private class AddStrayEdgeEdit extends StrayEdgeEdit {
+		private AddStrayEdgeEdit(HalfEdge halfEdge) {
+			super(halfEdge);
+		}
+		
+		public void undo() {
+			super.undo();
+			remove();
+		}
+		
+		public void redo() {
+			super.redo();
+			add();
+		}
+	}
+	
+	private class RemoveStrayEdgeEdit extends StrayEdgeEdit {
+		private RemoveStrayEdgeEdit(HalfEdge halfEdge) {
 			super(halfEdge);
 		}
 		
