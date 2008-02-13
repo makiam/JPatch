@@ -24,7 +24,7 @@ public class Sds {
 	private Set<Face>[] levelFaceSets = new Set[SdsConstants.MAX_LEVEL + 1];
 	private List<Face>[] levelFaceLists = new List[SdsConstants.MAX_LEVEL + 1];
 	private Set<HalfEdge> strayEdges = new HashSet<HalfEdge>();
-	private Set<AbstractVertex> strayVertices = new HashSet<AbstractVertex>();
+	private Set<BaseVertex> strayVertices = new HashSet<BaseVertex>();
 	
 	private boolean facesSorted;
 	
@@ -71,13 +71,6 @@ public class Sds {
 				return Math.min(renderLevelAttr.getInt(), value);
 			}
 		});
-		
-		
-		AbstractVertex v0 = new BaseVertex(0, 0, 0);
-		AbstractVertex v1 = new BaseVertex(5, 5, 0);
-		AbstractVertex v2 = new BaseVertex(10, 0, 0);
-		addSegment(null, v0, v1);
-		addSegment(null, v1, v2);
 	}
 	
 	public IntAttr getMaxLevelAttribute() {
@@ -239,7 +232,7 @@ public class Sds {
 					Iterator<Face> faces = levelFaceLists[level].iterator();
 					HalfEdge[] faceEdges;
 					int edgeIndex;
-					Iterator<AbstractVertex> vertices = strayVertices.iterator();
+					Iterator<BaseVertex> vertices = strayVertices.iterator();
 					
 					public boolean hasNext() {
 						if (faceEdges != null && edgeIndex < faceEdges.length) {
@@ -271,6 +264,10 @@ public class Sds {
 				};
 			}
 		};
+	}
+	
+	public Collection<BaseVertex> getStrayVertices() {
+		return strayVertices;
 	}
 	
 	public Iterable<HalfEdge> getStrayEdges() {
@@ -439,12 +436,14 @@ public class Sds {
 		
 		void add() {
 			strayEdges.add(halfEdge);
-			strayVertices.add(halfEdge.getVertex());
-			strayVertices.add(halfEdge.getPairVertex());
+			strayEdges.add(halfEdge.getPair());
+			strayVertices.add((BaseVertex) halfEdge.getVertex());
+			strayVertices.add((BaseVertex) halfEdge.getPairVertex());
 		}
 		
 		void remove() {
 			strayEdges.remove(halfEdge);
+			strayEdges.remove(halfEdge.getPair());
 			strayVertices.remove(halfEdge.getVertex());
 			strayVertices.remove(halfEdge.getPairVertex());
 		}
@@ -557,5 +556,66 @@ public class Sds {
 			EdgeKey ek = (EdgeKey) o;
 			return v0 == ek.v0 && v1 == ek.v1;
 		}
+	}
+	
+	public HalfEdge getNextStrayEdge(HalfEdge strayEdge) {
+		assert strayEdges.contains(strayEdge) : "edge " + strayEdge + " not in " + strayEdges;
+		HalfEdge[] vertexEdges = strayEdge.getPairVertex().getEdges();
+		if (vertexEdges.length == 2) {
+			assert (vertexEdges[0] == strayEdge.getPair() || vertexEdges[1] == strayEdge.getPair());
+			return (vertexEdges[0] == strayEdge.getPair()) ? vertexEdges[1] : vertexEdges[0];
+		} else {
+			assert vertexEdges.length == 1;
+			return null;
+		}
+	}
+	
+	public HalfEdge getPrevStrayEdge(HalfEdge strayEdge) {
+		assert strayEdges.contains(strayEdge);
+		HalfEdge[] vertexEdges = strayEdge.getVertex().getEdges();
+		if (vertexEdges.length == 2) {
+			assert (vertexEdges[0] == strayEdge || vertexEdges[1] == strayEdge);
+			return (vertexEdges[0] == strayEdge) ? vertexEdges[1].getPair() : vertexEdges[0].getPair();
+		} else {
+			assert vertexEdges.length == 1;
+			return null;
+		}
+	}
+	
+	public BaseVertex[] getLoop(BaseVertex strayVertex) {
+		assert strayVertices.contains(strayVertex);
+		assert strayVertex.getEdges().length == 1;
+		HalfEdge edge = strayVertex.getEdges()[0];
+		List<BaseVertex> vertices = new ArrayList<BaseVertex>();
+		vertices.add((BaseVertex) edge.getVertex());
+		while (edge != null) {
+			vertices.add((BaseVertex) edge.getPairVertex());
+			edge = getNextStrayEdge(edge);
+		}
+		return vertices.toArray(new BaseVertex[vertices.size()]);
+	}
+	
+	public boolean isConnected(BaseVertex a, BaseVertex b) {
+		assert strayVertices.contains(a);
+		assert strayVertices.contains(b);
+		assert a.getEdges().length == 1;
+		assert b.getEdges().length == 1;
+		HalfEdge strayEdge = a.getEdges()[0];
+		while (strayEdge != null && strayEdge.getPairVertex() != b) {
+			assert strayEdge.getPairVertex() != a;
+			strayEdge = getNextStrayEdge(strayEdge);
+		}
+		if (strayEdge == null) {
+			return false;
+		} else {
+			assert strayEdge.getPairVertex() == b;
+			return true;
+		}
+	}
+	
+	public boolean isStartOfChain(BaseVertex strayVertex) {
+		assert strayVertices.contains(strayVertex);
+		assert strayVertex.getEdges().length == 1 || strayVertex.getEdges().length == 2;
+		return strayVertex.getEdges().length == 1;
 	}
 }

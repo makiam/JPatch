@@ -48,7 +48,8 @@ public class ImageGenerator {
 		"LATHE_TOOL",
 		"SNAP_TO_GRID",
 		"SELECT_TOOL",
-		"INSET_TOOL"
+		"INSET_TOOL",
+		"ADD_EDGE_TOOL"
 	};
 	
 	public static void main(String[] args) throws Exception {
@@ -443,6 +444,17 @@ public class ImageGenerator {
 			g.setColor(new Color(0x90000000, true));
 			g.drawRect(0, 0, 15, 15);
 			g.drawRect(4, 4, 7, 7);
+			break;
+		case 19: // add edge
+			g.setColor(new Color(0x60000000, true));
+			g.drawLine(1, 1, 3, 7);
+			g.drawLine(3, 8, 1, 14);
+			g.drawLine(14, 1, 12, 7);
+			g.drawLine(12, 8, 14, 14);
+//			g.setStroke(new BasicStroke(1.5f));
+			g.setColor(new Color(0xc0000000, true));
+			g.drawLine(3, 7, 12, 7);
+			g.drawLine(3, 8, 12, 8);
 			break;
 		}
 	}

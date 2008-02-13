@@ -22,6 +22,17 @@ public class Operations {
 //		Vector3d normal = new Vector3d();
 		
 		Collection<Face> selectedFaces = selection.getFaces();
+		
+		boolean singleFace = false;
+		if (selectedFaces.size() == 1) {
+			singleFace = true;
+			for (HalfEdge edge : selectedFaces.iterator().next().getEdges()) {
+				if (edge.getPairFace() != null) {
+					singleFace = false;
+					break;
+				}
+			}
+		}
 		/* 
 		 * all faces that have a neighbor that isn't selected (including faces at mesh boundaries)
 		 * are added to the boundaryFaces set. The edges on these boundaries are added to the
@@ -83,7 +94,20 @@ public class Operations {
 				//if this vertex hasn't been extruded, use the old vertex instead
 				newVertices[i] = newVertex == null ? vertex : newVertex;
 			}
-			sds.removeFace(editList, 0, boundaryFace);
+			
+			if (singleFace) {
+				/* reverse the face */
+				AbstractVertex[] vertices = new AbstractVertex[boundaryFace.getSides()];
+				HalfEdge[] faceEdges = boundaryFace.getEdges();
+				for (int i = 0; i < vertices.length; i++) {
+					vertices[i] = faceEdges[vertices.length - i - 1].getVertex();
+				}
+				Material material = boundaryFace.getMaterial();
+				sds.removeFace(editList, 0, boundaryFace);
+				sds.addFace(editList, 0, material, vertices);
+			} else {
+				sds.removeFace(editList, 0, boundaryFace);
+			}
 			sds.addFace(editList, 0, boundaryFace.getMaterial(), newVertices);
 		}
 		

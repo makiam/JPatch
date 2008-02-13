@@ -59,6 +59,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.*;
+import javax.vecmath.*;
 
 import jpatch.boundary.tools.Tools;
 
@@ -102,6 +103,7 @@ public class Main {
 	
 	private final SelectionManager selectionManager;
 	
+	private Material defaultMaterial = new BasicMaterial(new Color3f(1, 1, 1));
 	
 	
 	private SceneGraphNode sceneGraphRoot = new SceneGraphNode() {
@@ -494,6 +496,7 @@ public class Main {
 		JPatchStateButton extrudeTool = new JPatchStateButton(actions.extrudeTool);
 		JPatchStateButton insetTool = new JPatchStateButton(actions.insetTool);
 		JPatchStateButton latheTool = new JPatchStateButton(actions.latheTool);
+		JPatchStateButton addEdgeTool = new JPatchStateButton(actions.addEdgeTool);
 		
 		JPatchActionButton extrudeTestButton = new JPatchActionButton(actions.extrudeTest);
 		JPatchActionButton dumpButton = new JPatchActionButton(actions.dump);
@@ -504,7 +507,7 @@ public class Main {
 		buttonUtils.configureButtons(IconSet.Style.FROSTED, vertexMode, edgeMode, faceMode, objectMode);
 		buttonUtils.configureButtons(IconSet.Style.BRUSHED, snapToGrid);
 		buttonUtils.configureButtons(IconSet.Style.BRUSHED, tweakTool, selectTool, moveTool, scaleTool, rotateTool);
-		buttonUtils.configureButtons(IconSet.Style.BRUSHED, extrudeTool, insetTool, latheTool);
+		buttonUtils.configureButtons(IconSet.Style.BRUSHED, addEdgeTool, extrudeTool, insetTool, latheTool);
 		
 		toolBar.add(openButton);
 		toolBar.add(saveButton);
@@ -531,8 +534,9 @@ public class Main {
 		toolBar.add(scaleTool);
 		toolBar.add(rotateTool);
 		toolBar.add(Box.createHorizontalStrut(4));
+		toolBar.add(addEdgeTool);
 		toolBar.add(extrudeTool);
-		toolBar.add(insetTool);
+//		toolBar.add(insetTool);
 		toolBar.add(latheTool);
 		toolBar.add(Box.createHorizontalStrut(4));
 		toolBar.add(extrudeTestButton);
@@ -1009,6 +1013,10 @@ public class Main {
 	
 	public SelectionManager getSelectionManager() {
 		return selectionManager;
+	}
+	
+	public Material getDefaultMaterial() {
+		return defaultMaterial;
 	}
 //	public void setSelection(Selection selection) {
 //		this.selection = selection;

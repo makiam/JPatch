@@ -27,6 +27,7 @@ public class Actions {
 			new NormalTool(),
 			new TweakTool(),
 			null,
+			new AddEdgeTool()
 	};
 	
 	public final JPatchUndoManager undoManager = new JPatchUndoManager();
@@ -47,6 +48,7 @@ public class Actions {
 	public final SwitchStateAction latheTool = new SwitchStateAction(toolSM, tools[6], undoManager, "LATHE_TOOL");
 	public final SwitchStateAction tweakTool = new SwitchStateAction(toolSM, tools[7], undoManager, "TWEAK_TOOL");
 	public final SwitchStateAction insetTool = new SwitchStateAction(toolSM, tools[8], undoManager, "INSET_TOOL");
+	public final SwitchStateAction addEdgeTool = new SwitchStateAction(toolSM, tools[9], undoManager, "ADD_EDGE_TOOL");
 	
 	public final SwitchStateAction vertexMode = new SwitchStateAction(sdsModeSM, SdsMode.VERTEX_MODE, undoManager, "VERTEX_MODE");
 	public final SwitchStateAction edgeMode = new SwitchStateAction(sdsModeSM, SdsMode.EDGE_MODE, undoManager, "EDGE_MODE");
