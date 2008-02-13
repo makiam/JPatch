@@ -1289,6 +1289,7 @@ public class ViewportGl extends Viewport {
 			gl.glEnable(GL_COLOR_MATERIAL);
 			gl.glColorMaterial(GL_FRONT, GL_EMISSION);
 			gl.glEnable(GL_LIGHTING);
+			gl.glPointSize(3);
 			gl.glInterleavedArrays(GL_V3F, 0, buffer);
 			boolean solid = !viewDef.getShowLimitSurfaceAttribute().getBoolean();
 			GlMaterial currentMaterial = null;
@@ -1308,8 +1309,12 @@ public class ViewportGl extends Viewport {
 				}
 				gl.glColor3f(1, 1, 1);
 				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides());
+				gl.glDrawArrays(GL_POINTS, 1, face.getSides());
 			}
 			
+			gl.glColor3f(0, 0, 0);
+			gl.glDisable(GL_COLOR_MATERIAL);
+			gl.glDisable(GL_LIGHTING);
 			gl.glColor3f(0.5f, 0.5f, 1.0f);
 			gl.glBegin(GL_LINES);
 			Point3f p = new Point3f();
@@ -1317,6 +1322,12 @@ public class ViewportGl extends Viewport {
 				strayEdge.getVertex().getPosition(p);
 				gl.glVertex3f(p.x, p.y, p.z);
 				strayEdge.getPairVertex().getPosition(p);
+				gl.glVertex3f(p.x, p.y, p.z);
+			}
+			gl.glEnd();
+			gl.glBegin(GL_POINTS);
+			for (BaseVertex strayVertex : sds.getStrayVertices()) {
+				strayVertex.getPosition(p);
 				gl.glVertex3f(p.x, p.y, p.z);
 			}
 			gl.glEnd();
