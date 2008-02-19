@@ -396,15 +396,15 @@ public class ViewportGl extends Viewport {
 	public ViewportGl(int id, ViewDirection direction, CollectionAttr<ViewDirection> orthoDirections, JPatchInspector inspector) {
 		super(id, direction, orthoDirections, inspector);
 		
-		GLCapabilities caps = new GLCapabilities();
-	    GLCapabilitiesChooser chooser = new MultisampleChooser();
-
-	    caps.setSampleBuffers(antialiasAttr.getBoolean());
-	   
-	    caps.setNumSamples(4);
-	    drawable = new GLCanvas(caps, chooser, null, null);
+//		GLCapabilities caps = new GLCapabilities();
+//	    GLCapabilitiesChooser chooser = new MultisampleChooser();
+//
+//	    caps.setSampleBuffers(antialiasAttr.getBoolean());
+//	   
+//	    caps.setNumSamples(4);
+//	    drawable = new GLCanvas(caps, chooser, null, null);
 	    
-	    
+	    drawable = new GLCanvas();
 //		drawable = LIGHTWEIGHT ? new GLJPanel(caps) : new GLCanvas(caps);
 		component = (Component) drawable;
 		component.setBackground(COLORS.background.get());
