@@ -61,7 +61,7 @@ class TextureUpdater {
 		if (started) {
 			throw new IllegalStateException("Thread can only be started once");
 		}
-		thread.start();
+//		thread.start();
 		started = true;
 	}
 	

@@ -362,7 +362,7 @@ public class RotateTool implements ModifierTool, VisibleTool {
 		gl.glDisable(GL_LINE_SMOOTH);
 		gl.glEnable(GL_LIGHTING);
 		gl.glEnable(GL_DEPTH_TEST);
-		gl.glEnable(GL_CULL_FACE);
+//		gl.glEnable(GL_CULL_FACE);
 	}
 	
 	public void registerListeners(Viewport[] viewports) {

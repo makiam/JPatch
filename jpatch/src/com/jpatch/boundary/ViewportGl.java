@@ -36,6 +36,7 @@ public class ViewportGl extends Viewport {
 	private static final ColorSettings COLORS = Settings.getInstance().colors;
 	private static final RealtimeRendererSettings RENDERER = Settings.getInstance().realtimeRenderer;
 	
+	private static final BasicMaterial BACK_MATERIAL = new BasicMaterial(new Color4f(), new Color4f(), new Color4f(), new Color4f(1, 0, 0, 1), 0);
 	final GLAutoDrawable drawable;
 //	private GL gl;
 	private final Point3f p = new Point3f();
@@ -433,7 +434,9 @@ public class ViewportGl extends Viewport {
 				gl.glGetIntegerv(GL_MAX_TEXTURE_SIZE, I, 0);
 				maxTextureSize = I[0];
 				
-				setLighting(RealtimeLighting.createThreepointLight());			
+				setLighting(RealtimeLighting.createThreepointLight());	
+				gl.glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, 1);
+				gl.glLightModelf(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 //				setLighting(RealtimeLighting.createHeadLight());
 				
 //				gl.glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
@@ -443,8 +446,8 @@ public class ViewportGl extends Viewport {
 				gl.glPolygonOffset(1.0f, 1.0f);
 				gl.glDisable(GL_DEPTH_TEST);
 				gl.glDisable(GL_NORMALIZE);
-				gl.glEnable(GL_CULL_FACE);
-				gl.glCullFace(GL_BACK);
+				gl.glDisable(GL_CULL_FACE);
+//				gl.glCullFace(GL_NONE);
 //				gl.glFrontFace(GL_CW);	// left handed
 				canUseProgram = gl.isFunctionAvailable("glUseProgram");
 				canUseProgram = false;
@@ -483,6 +486,9 @@ public class ViewportGl extends Viewport {
 				depthBuffer = BufferUtil.newFloatBuffer(component.getWidth() * component.getHeight());
 				System.out.println("component dimension = " + component.getWidth() + "x" + component.getHeight());
 				System.out.println("depth buffer capacity = " + depthBuffer.capacity());
+				
+				BACK_MATERIAL.getGlMaterial().applyMaterial(gl, GL_BACK);
+				
 			}
 
 			public void display(GLAutoDrawable drawable) {
@@ -577,6 +583,7 @@ public class ViewportGl extends Viewport {
 		gl.glMaterialfv(side, GL_EMISSION, array, GlMaterial.EMISSION);
 		gl.glMaterialfv(side, GL_SHININESS, array, GlMaterial.SHININESS);
 		gl.glEnable(GL_COLOR_MATERIAL);
+		BACK_MATERIAL.getGlMaterial().applyMaterial(gl, GL_BACK);
 	}
 	
 //	private void drawTriangleMesh(TriangleMesh t) {
@@ -1957,6 +1964,7 @@ public class ViewportGl extends Viewport {
 		gl.glLoadIdentity();
 //		gl.glScalef(1, 1, -1); // switch to left handed coordinate system
 		gl.glEnable(GL_DEPTH_TEST);
+		gl.glShadeModel(GL_SMOOTH);
 	}
 	
 	public void rasterMode() {
@@ -2000,6 +2008,7 @@ public class ViewportGl extends Viewport {
 //		return Viewport.farClip - 2 * Viewport.farClip * buffer.get(0) - 1;
 		
 		screenshotTextureValid = true;
+		spatialMode();
 //		System.out.println("texture Updated");
 	}
 	

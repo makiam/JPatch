@@ -21,6 +21,8 @@ public class AddEdgeTool implements VisibleTool {
 	private BaseVertex startVertex;
 	private BaseVertex endVertex;
 	
+	private boolean drag;
+	
 	public void draw(Viewport viewport) {
 		
 	}
@@ -135,6 +137,9 @@ public class AddEdgeTool implements VisibleTool {
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
+			if (e.getButton() != MouseEvent.BUTTON1) {
+				return;
+			}
 			if (startVertex == null) {
 				startVertex = new BaseVertex();
 				TransformUtil transformUtil = new TransformUtil();
@@ -146,12 +151,16 @@ public class AddEdgeTool implements VisibleTool {
 			}
 			highlight(viewport);
 			floatingVertex = new BaseVertex();
+			drag = true;
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
+			if (e.getButton() != MouseEvent.BUTTON1) {
+				return;
+			}
 			
+			Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
 			boolean addFace = false;
 			if (sds.getStrayVertices().contains(startVertex) && endVertex != null && endVertex != floatingVertex) {
 				System.out.println("is start of chain: " + sds.isStartOfChain(endVertex));
@@ -166,7 +175,7 @@ public class AddEdgeTool implements VisibleTool {
 				}
 			}
 			
-			if (!addFace) {
+			if (!addFace && endVertex != null) {
 				sds.addSegment(null, startVertex, endVertex);
 			}
 			
@@ -174,6 +183,8 @@ public class AddEdgeTool implements VisibleTool {
 			endVertex = null;
 			Main.getInstance().repaintViewports();
 			highlight(viewport);
+			
+			drag = false;
 		}
 		
 	}
@@ -186,7 +197,10 @@ public class AddEdgeTool implements VisibleTool {
 		}
 		
 		public void mouseDragged(MouseEvent e) {
-		
+			if (!drag) {
+				return;
+			}
+			
 			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
 			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, MouseSelector.Type.VERTEX);
 			if (hitVertex != null) {

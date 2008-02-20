@@ -10,10 +10,11 @@ import static javax.media.opengl.GL.*;
 import javax.media.opengl.*;
 import javax.vecmath.*;
 
+import trashcan.MoveVertexTool.*;
+
 import com.jpatch.afw.control.*;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.boundary.*;
-import com.jpatch.boundary.tools.MoveVertexTool.*;
 import com.jpatch.boundary.tools.TranslateTool.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;

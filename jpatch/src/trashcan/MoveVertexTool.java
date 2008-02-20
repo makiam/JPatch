@@ -1,4 +1,4 @@
-package com.jpatch.boundary.tools;
+package trashcan;
 
 import static javax.media.opengl.GL.*;
 import com.jpatch.afw.attributes.GenericAttr;
@@ -7,6 +7,7 @@ import com.jpatch.afw.control.JPatchUndoableEdit;
 import com.jpatch.afw.vecmath.TransformUtil;
 import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.*;
+import com.jpatch.boundary.tools.*;
 import com.jpatch.entity.SdsModel;
 import com.jpatch.entity.sds2.*;
 import com.sun.opengl.util.*;

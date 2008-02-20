@@ -415,7 +415,7 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 		gl.glDisable(GL_POLYGON_SMOOTH);
 		gl.glEnable(GL_LIGHTING);
 		gl.glEnable(GL_DEPTH_TEST);
-		gl.glEnable(GL_CULL_FACE);
+//		gl.glEnable(GL_CULL_FACE);
 		
 	}
 
