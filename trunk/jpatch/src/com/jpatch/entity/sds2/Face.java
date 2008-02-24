@@ -2,6 +2,7 @@ package com.jpatch.entity.sds2;
 
 import static com.jpatch.entity.sds2.SdsWeights.*;
 
+import java.lang.reflect.*;
 import java.nio.*;
 import java.util.*;
 
