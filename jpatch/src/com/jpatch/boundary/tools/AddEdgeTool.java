@@ -1,6 +1,8 @@
 package com.jpatch.boundary.tools;
 
+import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 import javax.media.opengl.*;
 import static javax.media.opengl.GL.*;
@@ -21,7 +23,11 @@ public class AddEdgeTool implements VisibleTool {
 	private BaseVertex startVertex;
 	private BaseVertex endVertex;
 	
+	private BaseVertex[] strayFace;
+	
 	private boolean drag;
+	
+	int mouseX, mouseY;
 	
 	public void draw(Viewport viewport) {
 		
@@ -60,11 +66,12 @@ public class AddEdgeTool implements VisibleTool {
 		viewport.setModelViewMatrix(Main.getInstance().getSelection().getNode());
 		
 		gl.glDepthMask(false);
+		gl.glLineWidth(1);
 		
 		Point3f p = new Point3f();
 		gl.glPointSize(6);
 		gl.glColor3f(0.5f, 0.5f, 1.0f);
-		if (startVertex != null) {
+		if (startVertex != null && (endVertex != null || strayFace == null)) {
 			gl.glBegin(GL_POINTS);
 			startVertex.getPosition(p);
 			gl.glVertex3f(p.x, p.y, p.z);
@@ -98,26 +105,21 @@ public class AddEdgeTool implements VisibleTool {
 					gl.glEnable(GL_BLEND);
 					gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 					gl.glColor4f(0.5f, 0.5f, 1.0f, 0.5f);
-					gl.glBegin(GL_TRIANGLE_FAN);
-					double mx = 0, my = 0, mz = 0;
-					for (BaseVertex vertex : vertices) {
-						vertex.getPosition(p);
-						mx += p.x; my += p.y; mz += p.z;
-					}
-					mx /= vertices.length;
-					my /= vertices.length;
-					mz /= vertices.length;
-					gl.glVertex3f((float) mx, (float) my, (float) mz);
-					for (BaseVertex vertex : vertices) {
-						vertex.getPosition(p);
-						gl.glVertex3f(p.x, p.y, p.z);
-					}
-					vertices[0].getPosition(p);
-					gl.glVertex3f(p.x, p.y, p.z);
-					gl.glEnd();
+					drawStrayFace(gl, vertices, p);
 					gl.glDisable(GL_BLEND);
 				}
 			}
+		}
+		
+		if (strayFace != null) {
+			gl.glEnable(GL_BLEND);
+			gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			gl.glColor4f(0.5f, 0.5f, 1.0f, 0.5f);
+			drawStrayFace(gl, strayFace, p);
+			gl.glDisable(GL_BLEND);
+			viewport.rasterMode();
+			viewport.drawString("click to add face", mouseX, mouseY);
+			viewport.spatialMode();
 		}
 //		System.out.println(hitVertex);
 		
@@ -126,6 +128,35 @@ public class AddEdgeTool implements VisibleTool {
 		gl.glFlush();
 		glDrawable.swapBuffers();
 		glDrawable.getContext().release();
+	}
+	
+	private void drawStrayFace(GL gl, BaseVertex[] vertices, Point3f p) {
+		gl.glBegin(GL_TRIANGLE_FAN);
+		double mx = 0, my = 0, mz = 0;
+		for (BaseVertex vertex : vertices) {
+			vertex.getPosition(p);
+			mx += p.x; my += p.y; mz += p.z;
+		}
+		mx /= vertices.length;
+		my /= vertices.length;
+		mz /= vertices.length;
+		gl.glVertex3f((float) mx, (float) my, (float) mz);
+		for (BaseVertex vertex : vertices) {
+			vertex.getPosition(p);
+			gl.glVertex3f(p.x, p.y, p.z);
+		}
+		vertices[0].getPosition(p);
+		gl.glVertex3f(p.x, p.y, p.z);
+		gl.glEnd();
+		gl.glLineWidth(2);
+		gl.glDisable(GL_BLEND);
+		gl.glBegin(GL_LINE_LOOP);
+		for (BaseVertex vertex : vertices) {
+			vertex.getPosition(p);
+			gl.glVertex3f(p.x, p.y, p.z);
+		}
+		gl.glEnd();
+		gl.glLineWidth(1);
 	}
 	
 	private class AddEdgeMouseListener extends MouseAdapter {
@@ -140,6 +171,7 @@ public class AddEdgeTool implements VisibleTool {
 			if (e.getButton() != MouseEvent.BUTTON1) {
 				return;
 			}
+			
 			if (startVertex == null) {
 				startVertex = new BaseVertex();
 				TransformUtil transformUtil = new TransformUtil();
@@ -152,6 +184,7 @@ public class AddEdgeTool implements VisibleTool {
 			highlight(viewport);
 			floatingVertex = new BaseVertex();
 			drag = true;
+			
 		}
 
 		@Override
@@ -160,27 +193,47 @@ public class AddEdgeTool implements VisibleTool {
 				return;
 			}
 			
-			Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
-			boolean addFace = false;
-			if (sds.getStrayVertices().contains(startVertex) && endVertex != null && endVertex != floatingVertex) {
-				System.out.println("is start of chain: " + sds.isStartOfChain(endVertex));
-				if (sds.isStartOfChain(endVertex)) {
-					System.out.println("is connected: " + sds.isConnected(startVertex, endVertex));
-					if (sds.isConnected(startVertex, endVertex)) {
-						System.out.println("adding face");
-						sds.addFace(null, 0, Main.getInstance().getDefaultMaterial(), sds.getLoop(startVertex));
-						addFace = true;
-//						BaseVertex[] vertices = sds.getLoop(startVertex);
+			if (strayFace != null) {
+				Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
+				sds.removeStrayFace(null, strayFace);
+				Face face = sds.addFace(null, 0, Main.getInstance().getDefaultMaterial(), strayFace);
+				Vector3d normal = new Vector3d();
+				face.getMidpointNormal(normal);
+				TransformUtil transformUtil = new TransformUtil();
+				viewport.getViewDef().configureTransformUtil(transformUtil);
+				Main.getInstance().getSelection().getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+				transformUtil.transform(TransformUtil.LOCAL, normal, TransformUtil.CAMERA, normal);
+				if (normal.z < 0) {
+					Collection<Face> faces = new ArrayList<Face>(1);
+					faces.add(face);
+					sds.flipFaces(null, faces);
+				}
+				
+			} else {
+			
+				Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
+				boolean addFace = false;
+				if (sds.getStrayVertices().contains(startVertex) && endVertex != null && endVertex != floatingVertex) {
+					System.out.println("is start of chain: " + sds.isStartOfChain(endVertex));
+					if (sds.isStartOfChain(endVertex)) {
+						System.out.println("is connected: " + sds.isConnected(startVertex, endVertex));
+						if (sds.isConnected(startVertex, endVertex)) {
+	//						System.out.println("adding face");
+							sds.addStrayFace(null, sds.getLoop(startVertex));
+	//						sds.addFace(null, 0, Main.getInstance().getDefaultMaterial(), sds.getLoop(startVertex));
+	//						addFace = true;
+	//						BaseVertex[] vertices = sds.getLoop(startVertex);
+						}
 					}
 				}
+				
+				if (!addFace && endVertex != null) {
+					sds.addSegment(null, startVertex, endVertex);
+				}
 			}
-			
-			if (!addFace && endVertex != null) {
-				sds.addSegment(null, startVertex, endVertex);
-			}
-			
 			startVertex = endVertex;
 			endVertex = null;
+			strayFace = null;
 			Main.getInstance().repaintViewports();
 			highlight(viewport);
 			
@@ -200,6 +253,7 @@ public class AddEdgeTool implements VisibleTool {
 			if (!drag) {
 				return;
 			}
+			strayFace = null;
 			
 			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
 			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, MouseSelector.Type.VERTEX);
@@ -219,12 +273,49 @@ public class AddEdgeTool implements VisibleTool {
 		}
 
 		public void mouseMoved(MouseEvent e) {
+			mouseX = e.getX();
+			mouseY = e.getY();
 			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
 			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, MouseSelector.Type.VERTEX);
 			if (hitVertex != null) {
 				startVertex = (BaseVertex) hitVertex.vertex;
 			} else {
 				startVertex = null;
+			}
+			
+			TransformUtil transformUtil = new TransformUtil();
+			viewport.getViewDef().configureTransformUtil(transformUtil);
+			Main.getInstance().getSelection().getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+			Point3d p = new Point3d();
+			Polygon polygon = new Polygon();
+			polygon.xpoints = new int[256];
+			polygon.ypoints = new int[256];
+			polygon.npoints = 0;
+			double minDistSq = Double.MAX_VALUE;
+			strayFace = null;
+			for (BaseVertex[] vertices : sdsModel.getSds().getStrayFaces()) {
+				double midX = 0, midY = 0;
+				for (int i = 0; i < vertices.length; i++) {
+					vertices[i].getPosition(p);
+					transformUtil.projectToScreen(TransformUtil.LOCAL, p, p);
+					midX += p.x;
+					midY += p.y;
+					polygon.xpoints[i] = (int) Math.round(p.x);
+					polygon.ypoints[i] = (int) Math.round(p.y);
+				}
+				polygon.npoints = vertices.length;
+				polygon.invalidate();
+				if (polygon.contains(e.getX(), e.getY())) {
+					midX /= vertices.length;
+					midY /= vertices.length;
+					double dx = midX - e.getX();
+					double dy = midY - e.getY();
+					double distSq = dx * dx + dy * dy;
+					if (distSq < minDistSq) {
+						minDistSq = distSq;
+						strayFace = vertices;
+					}
+				}
 			}
 			highlight(viewport);
 		}

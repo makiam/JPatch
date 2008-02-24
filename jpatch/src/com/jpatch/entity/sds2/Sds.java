@@ -25,6 +25,7 @@ public class Sds {
 	private List<Face>[] levelFaceLists = new List[SdsConstants.MAX_LEVEL + 1];
 	private Set<HalfEdge> strayEdges = new HashSet<HalfEdge>();
 	private Set<BaseVertex> strayVertices = new HashSet<BaseVertex>();
+	private Set<BaseVertex[]> strayFaces = new HashSet<BaseVertex[]>();
 	
 	private boolean facesSorted;
 	
@@ -96,6 +97,20 @@ public class Sds {
 		}
 	}
 	
+	public void addStrayFace(List<JPatchUndoableEdit> editList, BaseVertex[] vertices) {
+		AddStrayFaceEdit edit = new AddStrayFaceEdit(vertices);
+		if (editList != null) {
+			editList.add(edit);
+		}
+	}
+	
+	public void removeStrayFace(List<JPatchUndoableEdit> editList, BaseVertex[] vertices) {
+		RemoveStrayFaceEdit edit = new RemoveStrayFaceEdit(vertices);
+		if (editList != null) {
+			editList.add(edit);
+		}
+	}
+	
 	public Face addFace(List<JPatchUndoableEdit> editList, int level, Material material, AbstractVertex... vertices) {
 		HalfEdge[] edges = new HalfEdge[vertices.length];
 		for (AbstractVertex vertex : vertices) {
@@ -146,6 +161,28 @@ public class Sds {
 		}
 	}
 	
+	public void flipFaces(List<JPatchUndoableEdit> editList, Collection<Face> faces) {
+		Material[] materials = new Material[faces.size()];
+		BaseVertex[][] faceVertices = new BaseVertex[faces.size()][];
+		
+		{
+			int i = 0;
+			for (Face face : faces) {
+				assert levelFaceSets[0].contains(face) : "unknown face: " + face;
+				materials[i] = face.getMaterial();
+				faceVertices[i] = new BaseVertex[face.getSides()];
+				HalfEdge[] faceEdges = face.getEdges();
+				for (int j = 0; j < faceEdges.length; j++) {
+					faceVertices[i][j] = (BaseVertex) faceEdges[faceEdges.length - 1 - j].getVertex();
+				}
+				removeFace(editList, 0, face);
+			}
+		}
+		for (int i = 0; i < faceVertices.length; i++) {
+			addFace(editList, 0, materials[i], faceVertices[i]);
+		}
+	}
+	
 	private void subdivideFace(List<JPatchUndoableEdit> editList, int level, Face face) {
 		int nextLevel = level + 1;
 		HalfEdge[] edges = face.getEdges();
@@ -177,8 +214,10 @@ public class Sds {
 		
 		for (HalfEdge edge : face.getEdges()) {
 			assert edge.getFace() == face : "edge " + edge + " doesn't belong to face " + face;
-			edge.saveState(editList);
-			edge.getVertex().saveEdges(editList);
+			if (editList != null) {
+				edge.saveState(editList);
+				edge.getVertex().saveEdges(editList);
+			}
 			edge.setFace(null);
 		}
 		
@@ -272,6 +311,10 @@ public class Sds {
 	
 	public Iterable<HalfEdge> getStrayEdges() {
 		return strayEdges;
+	}
+	
+	public Collection<BaseVertex[]> getStrayFaces() {
+		return strayFaces;
 	}
 	
 	public Iterable<HalfEdge> getEdges(final int level) {
@@ -468,6 +511,54 @@ public class Sds {
 	private class RemoveStrayEdgeEdit extends StrayEdgeEdit {
 		private RemoveStrayEdgeEdit(HalfEdge halfEdge) {
 			super(halfEdge);
+		}
+		
+		public void undo() {
+			super.undo();
+			add();
+		}
+		
+		public void redo() {
+			super.redo();
+			remove();
+		}
+	}
+	
+	private abstract class StrayFaceEdit extends AbstractUndoableEdit {
+		BaseVertex[] vertices;
+		StrayFaceEdit(BaseVertex[] vertices) {
+			this.vertices = vertices;
+			apply(true);
+		}
+		
+		void add() {
+			strayFaces.add(vertices);
+		}
+		
+		void remove() {
+			strayFaces.remove(vertices);
+		}
+	}
+	
+	private class AddStrayFaceEdit extends StrayFaceEdit {
+		private AddStrayFaceEdit(BaseVertex[] vertices) {
+			super(vertices);
+		}
+		
+		public void undo() {
+			super.undo();
+			remove();
+		}
+		
+		public void redo() {
+			super.redo();
+			add();
+		}
+	}
+	
+	private class RemoveStrayFaceEdit extends StrayFaceEdit {
+		private RemoveStrayFaceEdit(BaseVertex[] vertices) {
+			super(vertices);
 		}
 		
 		public void undo() {
