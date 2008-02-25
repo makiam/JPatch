@@ -18,20 +18,12 @@ public class Operations {
 		Vector3d axis = new Vector3d();
 		axis.sub(endAxis, startAxis);
 		AxisAngle4d axisAngle = new AxisAngle4d(axis, 0);
-		Matrix4d translate0 = new Matrix4d();
-		Matrix4d translate1 = new Matrix4d();
-		Matrix4d rotate = new Matrix4d();
-		Matrix4d lathe = new Matrix4d();
-		translate0.setIdentity();
-		translate0.setTranslation(new Vector3d(-startAxis.x, -startAxis.y, -startAxis.z));
-		translate1.setIdentity();
-		translate1.setTranslation(new Vector3d(startAxis.x, startAxis.y, startAxis.z));
-		
+		Matrix4d matrix = new Matrix4d();
 		
 		for (int segment = 0; segment < segments; segment++) {
 			int count = angle == 360 ? segments : segments - 1;
 			axisAngle.angle = Math.toRadians(angle / count * segment);
-			rotate.set(axisAngle);
+			matrix.set(axisAngle);
 			
 //			lathe.set(translate0);
 //			lathe.mul(rotate);
@@ -40,9 +32,9 @@ public class Operations {
 			for (int i = 0; i < vertices.length; i++) {
 				Point3d p = lathedPoints[segment][i];
 				vertices[i].getPosition(p);
-				p.add(startAxis);
-				rotate.transform(p);
 				p.sub(startAxis);
+				matrix.transform(p);
+				p.add(startAxis);
 			}
 		}
 	}
