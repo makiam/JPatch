@@ -24,7 +24,7 @@ public class Actions {
 			new SelectTool(),
 			new RotateTool(),
 			new TranslateTool(),
-			new NormalTool(),
+			new LatheTool(),
 			new TweakTool(),
 			null,
 			new AddEdgeTool()
@@ -42,9 +42,9 @@ public class Actions {
 	
 	public final SwitchStateAction selectTool = new SwitchStateAction(toolSM, tools[3], undoManager, "SELECT_TOOL");
 	public final SwitchStateAction moveTool = new SwitchStateAction(toolSM, tools[5], undoManager, "MOVE_TOOL");
-	public final SwitchStateAction scaleTool = new SwitchStateAction(toolSM, tools[6], undoManager, "SCALE_TOOL");
+	public final SwitchStateAction scaleTool = new SwitchStateAction(toolSM, tools[8], undoManager, "SCALE_TOOL");
 	public final SwitchStateAction rotateTool = new SwitchStateAction(toolSM, tools[4], undoManager, "ROTATE_TOOL");
-	public final SwitchStateAction extrudeTool = new SwitchStateAction(toolSM, tools[6], undoManager, "EXTRUDE_TOOL");
+	public final SwitchStateAction extrudeTool = new SwitchStateAction(toolSM, tools[8], undoManager, "EXTRUDE_TOOL");
 	public final SwitchStateAction latheTool = new SwitchStateAction(toolSM, tools[6], undoManager, "LATHE_TOOL");
 	public final SwitchStateAction tweakTool = new SwitchStateAction(toolSM, tools[7], undoManager, "TWEAK_TOOL");
 	public final SwitchStateAction insetTool = new SwitchStateAction(toolSM, tools[8], undoManager, "INSET_TOOL");
@@ -148,7 +148,7 @@ public class Actions {
 		toolSM.setDefaultState(tools[3]);
 		
 		extrudeTool.getEnabled().setBoolean(false);
-		latheTool.getEnabled().setBoolean(false);
+//		latheTool.getEnabled().setBoolean(false);
 //		scaleTool.getEnabled().setBoolean(false);
 //		save.getEnabled().setBoolean(false);
 		

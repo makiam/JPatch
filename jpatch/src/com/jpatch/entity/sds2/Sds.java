@@ -8,6 +8,20 @@ import com.jpatch.entity.*;
 import java.util.*;
 
 public class Sds {
+	public static final class Type {
+		public static final int VERTEX = 1 << 0;
+		public static final int LIMIT = 1 << 1;
+		public static final int EDGE = 1 << 2;
+		public static final int FACE = 1 << 3;
+		public static final int STRAY_VERTEX = 1 << 4;
+		public static final int STRAY_EDGE = 1 << 5;
+		
+		private Type() {
+			assert false;	// not instanciable
+		}
+	}
+	
+	
 	private int currentMaxLevel = 1;
 	private IntAttr maxLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(currentMaxLevel, 1, 4);
 	private IntAttr renderLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(currentMaxLevel, 1, 4);
@@ -264,7 +278,7 @@ public class Sds {
 		return levelFaceLists[level];
 	}
 	
-	public Iterable<AbstractVertex> getVertices(final int level) {
+	public Iterable<? extends AbstractVertex> getVertices(final int level, final boolean includeStrayVertices) {
 		return new Iterable<AbstractVertex>() {
 			public Iterator<AbstractVertex> iterator() {
 				return new Iterator<AbstractVertex>() {
@@ -282,7 +296,10 @@ public class Sds {
 							edgeIndex = 0;
 							return hasNext();
 						}
-						return vertices.hasNext();
+						if (includeStrayVertices) {
+							return vertices.hasNext();
+						}
+						return false;
 					}
 
 					public AbstractVertex next() {
@@ -294,7 +311,10 @@ public class Sds {
 							edgeIndex = 0;
 							return next();
 						}
-						return vertices.next();
+						if (includeStrayVertices) {
+							return vertices.next();
+						}
+						throw new NoSuchElementException();
 					}
 
 					public void remove() {
@@ -317,7 +337,7 @@ public class Sds {
 		return strayFaces;
 	}
 	
-	public Iterable<HalfEdge> getEdges(final int level) {
+	public Iterable<HalfEdge> getEdges(final int level, final boolean includeStrayEdges) {
 		return new Iterable<HalfEdge>() {
 			public Iterator<HalfEdge> iterator() {
 				return new Iterator<HalfEdge>() {
@@ -335,7 +355,10 @@ public class Sds {
 							edgeIndex = 0;
 							return hasNext();
 						}
-						return edges.hasNext();
+						if (includeStrayEdges) {
+							return edges.hasNext();
+						}
+						return false;
 					}
 
 
@@ -348,7 +371,10 @@ public class Sds {
 							edgeIndex = 0;
 							return next();
 						}
-						return edges.next();
+						if (includeStrayEdges) {
+							return edges.next();
+						}
+						throw new NoSuchElementException();
 					}
 
 					public void remove() {
@@ -673,14 +699,30 @@ public class Sds {
 		}
 	}
 	
-	public BaseVertex[] getLoop(BaseVertex strayVertex) {
+	public HalfEdge getStart(HalfEdge strayEdge) {
+		HalfEdge startEdge = strayEdge;
+		HalfEdge prevEdge = getPrevStrayEdge(strayEdge);
+		while (prevEdge != null && prevEdge != strayEdge) {
+			HalfEdge tmp = startEdge;
+			startEdge = prevEdge;
+			prevEdge = getPrevStrayEdge(tmp);
+		}
+		return startEdge;
+	}
+	
+	public BaseVertex[] getChain(BaseVertex strayVertex) {
 		assert strayVertices.contains(strayVertex);
-		assert strayVertex.getEdges().length == 1;
+//		assert strayVertex.getEdges().length == 1;
 		HalfEdge edge = strayVertex.getEdges()[0];
 		List<BaseVertex> vertices = new ArrayList<BaseVertex>();
-		vertices.add((BaseVertex) edge.getVertex());
+		BaseVertex startVertex = (BaseVertex) edge.getVertex();
+		vertices.add(startVertex);
 		while (edge != null) {
-			vertices.add((BaseVertex) edge.getPairVertex());
+			BaseVertex v = (BaseVertex) edge.getPairVertex();
+			vertices.add(v);
+			if (v == startVertex) {
+				break;
+			}
 			edge = getNextStrayEdge(edge);
 		}
 		return vertices.toArray(new BaseVertex[vertices.size()]);

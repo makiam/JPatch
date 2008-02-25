@@ -27,7 +27,7 @@ public class AddEdgeTool implements VisibleTool {
 	
 	private boolean drag;
 	
-	int mouseX, mouseY;
+	private int mouseX, mouseY;
 	
 	public void draw(Viewport viewport) {
 		
@@ -101,22 +101,26 @@ public class AddEdgeTool implements VisibleTool {
 //				System.out.println("is connected: " + sds.isConnected(startVertex, endVertex));
 				if (sds.isConnected(startVertex, endVertex)) {
 //					sds.addFace(null, 0, Main.getInstance().getDefaultMaterial(), sds.getLoop(startVertex));
-					BaseVertex[] vertices = sds.getLoop(startVertex);
-					gl.glEnable(GL_BLEND);
-					gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-					gl.glColor4f(0.5f, 0.5f, 1.0f, 0.5f);
-					drawStrayFace(gl, vertices, p);
-					gl.glDisable(GL_BLEND);
+					BaseVertex[] vertices = sds.getChain(startVertex);
+					gl.glLineWidth(2);
+					gl.glBegin(GL_LINE_LOOP);
+					for (BaseVertex vertex : vertices) {
+						vertex.getPosition(p);
+						gl.glVertex3f(p.x, p.y, p.z);
+					}
+					gl.glEnd();
+					gl.glLineWidth(1);
 				}
 			}
 		}
 		
 		if (strayFace != null) {
-			gl.glEnable(GL_BLEND);
-			gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//			gl.glEnable(GL_BLEND);
+//			gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			gl.glColor4f(0.5f, 0.5f, 1.0f, 0.5f);
 			drawStrayFace(gl, strayFace, p);
 			gl.glDisable(GL_BLEND);
+			
 			viewport.rasterMode();
 			viewport.drawString("click to add face", mouseX, mouseY);
 			viewport.spatialMode();
@@ -131,6 +135,9 @@ public class AddEdgeTool implements VisibleTool {
 	}
 	
 	private void drawStrayFace(GL gl, BaseVertex[] vertices, Point3f p) {
+		gl.glEnable(GL_BLEND);
+		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		gl.glColor4f(0.5f, 0.5f, 1.0f, 0.5f);
 		gl.glBegin(GL_TRIANGLE_FAN);
 		double mx = 0, my = 0, mz = 0;
 		for (BaseVertex vertex : vertices) {
@@ -156,7 +163,7 @@ public class AddEdgeTool implements VisibleTool {
 			gl.glVertex3f(p.x, p.y, p.z);
 		}
 		gl.glEnd();
-		gl.glLineWidth(1);
+		gl.glDisable(GL_BLEND);
 	}
 	
 	private class AddEdgeMouseListener extends MouseAdapter {
@@ -219,7 +226,7 @@ public class AddEdgeTool implements VisibleTool {
 						System.out.println("is connected: " + sds.isConnected(startVertex, endVertex));
 						if (sds.isConnected(startVertex, endVertex)) {
 	//						System.out.println("adding face");
-							sds.addStrayFace(null, sds.getLoop(startVertex));
+							sds.addStrayFace(null, sds.getChain(startVertex));
 	//						sds.addFace(null, 0, Main.getInstance().getDefaultMaterial(), sds.getLoop(startVertex));
 	//						addFace = true;
 	//						BaseVertex[] vertices = sds.getLoop(startVertex);
@@ -256,7 +263,7 @@ public class AddEdgeTool implements VisibleTool {
 			strayFace = null;
 			
 			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
-			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, MouseSelector.Type.VERTEX);
+			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, Sds.Type.VERTEX | Sds.Type.STRAY_VERTEX);
 			if (hitVertex != null) {
 				endVertex = (BaseVertex) hitVertex.vertex;
 			} else {
@@ -276,7 +283,7 @@ public class AddEdgeTool implements VisibleTool {
 			mouseX = e.getX();
 			mouseY = e.getY();
 			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
-			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, MouseSelector.Type.VERTEX);
+			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, Sds.Type.VERTEX | Sds.Type.STRAY_VERTEX);
 			if (hitVertex != null) {
 				startVertex = (BaseVertex) hitVertex.vertex;
 			} else {
