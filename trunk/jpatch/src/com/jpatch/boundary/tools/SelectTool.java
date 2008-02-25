@@ -221,13 +221,13 @@ public class SelectTool implements VisibleTool {
 			final int type;
 			switch(Main.getInstance().getActions().sdsModeSM.getValue()) {
 			case EDGE_MODE:
-				type = MouseSelector.Type.EDGE;
+				type = Sds.Type.EDGE;
 				break;
 			case VERTEX_MODE:
-				type = MouseSelector.Type.VERTEX;
+				type = Sds.Type.VERTEX;
 				break;
 			case FACE_MODE:
-				type = MouseSelector.Type.FACE;
+				type = Sds.Type.FACE;
 				break;
 			default:
 				throw new RuntimeException(); // should never get here	

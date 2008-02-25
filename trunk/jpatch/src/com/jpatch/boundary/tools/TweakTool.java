@@ -25,8 +25,8 @@ public class TweakTool implements VisibleTool {
 	private MouseMotionListener[] mouseMotionListeners;
 	private MouseListener[] mouseListeners;
 	
-	private static int STANDARD_SELECTION_TYPE = MouseSelector.Type.EDGE | MouseSelector.Type.FACE | MouseSelector.Type.VERTEX;
-	private static int LIMIT_SELECTION_TYPE = MouseSelector.Type.LIMIT;
+	private static int STANDARD_SELECTION_TYPE = Sds.Type.EDGE | Sds.Type.FACE | Sds.Type.VERTEX | Sds.Type.STRAY_VERTEX | Sds.Type.STRAY_EDGE;
+	private static int LIMIT_SELECTION_TYPE = Sds.Type.LIMIT;
 	
 	private HitObject hitObject;
 	private Selection hitSelection = new Selection();

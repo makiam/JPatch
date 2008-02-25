@@ -1339,29 +1339,29 @@ public class ViewportGl extends Viewport {
 			}
 			gl.glEnd();
 			
-			gl.glEnable(GL_BLEND);
-			gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			gl.glColor4f(0.5f, 0.5f, 1.0f, 0.25f);
-			for (BaseVertex[] vertices : sds.getStrayFaces()) {
-				gl.glBegin(GL_TRIANGLE_FAN);
-				double mx = 0, my = 0, mz = 0;
-				for (BaseVertex vertex : vertices) {
-					vertex.getPosition(p);
-					mx += p.x; my += p.y; mz += p.z;
-				}
-				mx /= vertices.length;
-				my /= vertices.length;
-				mz /= vertices.length;
-				gl.glVertex3f((float) mx, (float) my, (float) mz);
-				for (BaseVertex vertex : vertices) {
-					vertex.getPosition(p);
-					gl.glVertex3f(p.x, p.y, p.z);
-				}
-				vertices[0].getPosition(p);
-				gl.glVertex3f(p.x, p.y, p.z);
-				gl.glEnd();
-			}
-			gl.glDisable(GL_BLEND);
+//			gl.glEnable(GL_BLEND);
+//			gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//			gl.glColor4f(0.5f, 0.5f, 1.0f, 0.25f);
+//			for (BaseVertex[] vertices : sds.getStrayFaces()) {
+//				gl.glBegin(GL_TRIANGLE_FAN);
+//				double mx = 0, my = 0, mz = 0;
+//				for (BaseVertex vertex : vertices) {
+//					vertex.getPosition(p);
+//					mx += p.x; my += p.y; mz += p.z;
+//				}
+//				mx /= vertices.length;
+//				my /= vertices.length;
+//				mz /= vertices.length;
+//				gl.glVertex3f((float) mx, (float) my, (float) mz);
+//				for (BaseVertex vertex : vertices) {
+//					vertex.getPosition(p);
+//					gl.glVertex3f(p.x, p.y, p.z);
+//				}
+//				vertices[0].getPosition(p);
+//				gl.glVertex3f(p.x, p.y, p.z);
+//				gl.glEnd();
+//			}
+//			gl.glDisable(GL_BLEND);
 		}
 //		for (com.jpatch.entity.sds2.Face face : sds.getFaces(level)) {
 //			gl.glBegin(GL_POLYGON);

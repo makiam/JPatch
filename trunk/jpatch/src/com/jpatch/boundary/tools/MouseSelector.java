@@ -14,7 +14,9 @@ import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
+import static com.jpatch.entity.sds2.Sds.*;
 import com.sun.opengl.util.*;
+
 
 public class MouseSelector {
 	static final private double MIN_DIST_SQ = 64;
@@ -46,7 +48,7 @@ public class MouseSelector {
 		viewport.getViewDef().configureTransformUtil(transformUtil);
 		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
 		Point3d p = new Point3d();
-		for (AbstractVertex vertex : sdsModel.getSds().getVertices(level)) {
+		for (AbstractVertex vertex : sdsModel.getSds().getVertices(level, true)) {
 			vertex.getPosition(p);
 			transformUtil.projectToScreen(LOCAL, p, p);
 			if (lasso.contains(p.x, p.y)) {
@@ -88,8 +90,14 @@ public class MouseSelector {
 			}
 		}
 		
-		if ((type & Type.EDGE) != 0) {
-			for (HalfEdge edge : sds.getEdges(level)) {
+		if ((type & (Type.EDGE | Type.STRAY_EDGE)) != 0) {
+			Iterable<HalfEdge> edges;
+			if ((type & Type.EDGE) == 0) {
+				edges = sds.getStrayEdges();
+			} else {
+				edges = sds.getEdges(level, (type & Type.STRAY_EDGE) != 0);
+			}
+			for (HalfEdge edge : edges) {
 				edge.getVertex().getPosition(p0);
 				transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
 				edge.getPairVertex().getPosition(p1);
@@ -114,8 +122,14 @@ public class MouseSelector {
 				}
 			}
 		}
-		if (((type & Type.VERTEX) != 0) || ((type & Type.LIMIT) != 0)) {
-			for (AbstractVertex vertex : sds.getVertices(level)) {
+		if ((type & (Type.VERTEX | Type.STRAY_VERTEX | Type.LIMIT)) != 0) {
+			Iterable<? extends AbstractVertex> vertices;
+			if ((type & (Type.VERTEX | Type.LIMIT)) == 0) {
+				vertices = sds.getStrayVertices();
+			} else {
+				vertices = sds.getVertices(level, (type & Type.STRAY_VERTEX) != 0);
+			}
+			for (AbstractVertex vertex : vertices) {
 				if ((type & Type.VERTEX) != 0) {
 					vertex.getPosition(p0);
 						
@@ -243,15 +257,7 @@ public class MouseSelector {
 		}
 	}
 	
-	public static final class Type {
-		public static final int VERTEX = 1;
-		public static final int LIMIT = 2;
-		public static final int EDGE = 4;
-		public static final int FACE = 8;
-		private Type() {
-			assert false;	// not instanciable
-		}
-	}
+	
 
 	
 }

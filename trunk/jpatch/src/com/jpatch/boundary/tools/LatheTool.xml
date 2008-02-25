@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<attributeEditor name="View" class="com.jpatch.boundary.tools.LatheTool">
+	<field name="Axis start" attribute="AxisStart" />
+	<field name="Axis end" attribute="AxisEnd" />
+	<field name="Epsilon" attribute="Epsilon" />
+	<field name="Angle" attribute="Angle" />
+	<field name="Segments" attribute="Segments" />
+</attributeEditor>

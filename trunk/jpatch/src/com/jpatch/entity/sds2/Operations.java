@@ -8,6 +8,45 @@ import java.util.*;
 import javax.vecmath.*;
 
 public class Operations {
+	
+	public static void lathe(Sds sds, BaseVertex[] vertices, Point3d startAxis, Point3d endAxis, double epsilon, int segments, double angle, List<JPatchUndoableEdit> editList) {
+		
+		
+	}
+	
+	public static void getLathedVertices(Sds sds, BaseVertex[] vertices, Point3d startAxis, Point3d endAxis, double epsilon, int segments, double angle, Point3d[][] lathedPoints) {
+		Vector3d axis = new Vector3d();
+		axis.sub(endAxis, startAxis);
+		AxisAngle4d axisAngle = new AxisAngle4d(axis, 0);
+		Matrix4d translate0 = new Matrix4d();
+		Matrix4d translate1 = new Matrix4d();
+		Matrix4d rotate = new Matrix4d();
+		Matrix4d lathe = new Matrix4d();
+		translate0.setIdentity();
+		translate0.setTranslation(new Vector3d(-startAxis.x, -startAxis.y, -startAxis.z));
+		translate1.setIdentity();
+		translate1.setTranslation(new Vector3d(startAxis.x, startAxis.y, startAxis.z));
+		
+		
+		for (int segment = 0; segment < segments; segment++) {
+			int count = angle == 360 ? segments : segments - 1;
+			axisAngle.angle = Math.toRadians(angle / count * segment);
+			rotate.set(axisAngle);
+			
+//			lathe.set(translate0);
+//			lathe.mul(rotate);
+//			lathe.mul(translate1);
+			
+			for (int i = 0; i < vertices.length; i++) {
+				Point3d p = lathedPoints[segment][i];
+				vertices[i].getPosition(p);
+				p.add(startAxis);
+				rotate.transform(p);
+				p.sub(startAxis);
+			}
+		}
+	}
+	
 	public static void extrude(Sds sds, Selection selection, List<JPatchUndoableEdit> editList) {
 //		System.out.println("extrude " + faces.size() + " faces:");
 //		System.out.println(faces);
@@ -132,65 +171,6 @@ public class Operations {
 		
 		/* change selection */
 		
-//		System.out.println("boundary edges:");
-//		System.out.println(boundaryEdges);
-//		
-//		for (Face face : faces) {
-//			face.getFacePoint().getNormal(normal);
-//			for (HalfEdge edge : face.getEdges()) {
-//				BaseVertex vertex = (BaseVertex) edge.getVertex();
-//				if (!boundaryVertices.containsKey(vertex)) {
-//					vertex.getPosition(position);
-////					vertex.getVertexPoint().getNormal(normal);
-//					position.add(normal);
-//				}
-//				
-//				boolean isBoundaryVertex = false;
-//				for(HalfEdge vertexEdge : vertex.getEdges()) {
-//					Face vertexFace = vertexEdge.getFace();
-//					if (!faces.contains(vertexFace)) {
-//						BaseVertex newVertex = new BaseVertex();
-//						newVertex.setPosition(position);
-//						boundaryVertices.put(vertex, newVertex);
-//						boundaryFaces.add(face);
-//						isBoundaryVertex = true;
-//						break;
-//					}		
-//				}	
-//				if (!isBoundaryVertex && !innerVertices.contains(vertex)) {
-//					innerVertices.add(vertex);
-//					addEdit(editList, AttributeEdit.changeAttribute(vertex.positionAttr, position, true));
-//				}
-//			}
-//		}
-//		
-//		System.out.println("boundary faces:");
-//		System.out.println(boundaryFaces);
-//		
-//		AbstractVertex[] edgeVertices = new AbstractVertex[4];
-//		for (Face boundaryFace : boundaryFaces) {
-//			HalfEdge[] edges = boundaryFace.getEdges().clone();
-//			AbstractVertex[] vertices = new AbstractVertex[boundaryFace.getSides()];
-//			for (int i = 0; i < edges.length; i++) {
-//				AbstractVertex vertex = edges[i].getVertex();
-//				AbstractVertex newVertex = boundaryVertices.get(vertex);
-//				vertices[i] = newVertex == null ? vertex : newVertex;
-//			}
-//			sds.removeFace(editList, 0, boundaryFace);
-////			addEdit(editList, new RemoveFaceEdit(sds, boundaryFace));
-//			sds.addFace(editList, 0, boundaryFace.getMaterial(), vertices);
-////			addEdit(editList, new AddFaceEdit(sds, boundaryFace.getMaterial(), vertices));
-//			for (HalfEdge edge : edges) {
-//				if (boundaryEdges.contains(edge)) {
-//					edgeVertices[0] = edge.getVertex();
-//					edgeVertices[1] = edge.getPairVertex();
-//					edgeVertices[2]  = boundaryVertices.get(edge.getPairVertex());
-//					edgeVertices[3]  = boundaryVertices.get(edge.getVertex());
-////					addEdit(editList, new AddFaceEdit(sds, boundaryFace.getMaterial(), edgeVertices));
-//					sds.addFace(editList, 0, boundaryFace.getMaterial(), edgeVertices);
-//				}
-//			}
-//		}
 	}
 	
 	private static void addEdit(List<JPatchUndoableEdit> editList, JPatchUndoableEdit edit) {
@@ -198,79 +178,5 @@ public class Operations {
 			editList.add(edit);
 		}
 	}
-	
-//	private static abstract class AbstractAddRemoveFaceEdit extends AbstractUndoableEdit {
-//		Sds sds;
-//		Face face;
-//		Material material;
-//		AbstractVertex[] vertices;
-//		
-//		void addFace() {
-//			face = sds.addFace(0, material, vertices);
-//			System.out.println("added face " + face);
-//		}
-//		
-//		void removeFace() {
-//			System.out.println("removing face " + face);
-//			sds.removeFace(0, face);
-//		}
-//	}
-//	
-//	private static class RemoveFaceEdit extends AbstractAddRemoveFaceEdit {
-//		
-//		RemoveFaceEdit(Sds sds, Face face) {
-//			this.sds = sds;
-//			this.face = face;
-//			material = face.getMaterial();
-//			vertices = new AbstractVertex[face.getSides()];
-//			for (int i = 0, n = face.getSides(); i < n; i++) {
-//				vertices[i] = face.getEdges()[i].getVertex();
-//			}
-//			redo();
-//		}
-//		
-//		public void undo() {
-//			super.undo();
-//			addFace();
-//		}
-//		
-//		public void redo() {
-//			super.redo();
-//			removeFace();
-//		}
-//	}
-//	
-//	private static class AddFaceEdit extends AbstractAddRemoveFaceEdit {
-//		AddFaceEdit(Sds sds, Material material, AbstractVertex... vertices) {
-//			this.sds = sds;
-//			this.material = material;
-//			this.vertices = vertices.clone();
-//			redo();
-//		}
-//		
-//		public void undo() {
-//			super.undo();
-//			removeFace();
-//		}
-//		
-//		public void redo() {
-//			super.redo();
-//			addFace();
-//		}
-//	}
-	
-//	static abstract class ExtrudeStrategy {
-//		abstract void extrude(BaseVertex originalVertex, BaseVertex extrudedVertex, List<JPatchUndoableEdit> editList);
-//	}
-//	
-//	static abstract class ExtrudeAlongNormalStrategy extends ExtrudeStrategy {
-//		private final Point3d position = new Point3d();
-//		private final Vector3d normal = new Vector3d();
-//		
-//		void extrude(BaseVertex originalVertex, BaseVertex extrudedVertex, List<JPatchUndoableEdit> editList) {
-//			originalVertex.getPosition(position);
-//			originalVertex.getNormal(normal);
-//			addEdit(editList, AttributeEdit.changeAttribute(extrudedVertex.positionAttr, position, true));
-//		}
-//	}
+
 }

@@ -310,7 +310,7 @@ public class Selection {
 			SdsModel sdsModel = getSdsModel();
 			if (sdsModel != null) {
 				Sds sds = sdsModel.getSds();
-				for (AbstractVertex vertex : sds.getVertices(0)) {
+				for (AbstractVertex vertex : sds.getVertices(0, true)) {
 					vertices.add(vertex);
 				}
 			}
@@ -344,7 +344,7 @@ public class Selection {
 			SdsModel sdsModel = getSdsModel();
 			if (sdsModel != null) {
 				Sds sds = sdsModel.getSds();
-				for (HalfEdge edge : sds.getEdges(0)) {
+				for (HalfEdge edge : sds.getEdges(0, true)) {
 					edges.add(edge.getPrimary());
 				}
 			}
