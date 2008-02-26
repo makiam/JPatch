@@ -118,6 +118,13 @@ public class Sds {
 		}
 	}
 	
+	public void removeStrayEdge(List<JPatchUndoableEdit> editList, HalfEdge strayEdge) {
+		RemoveStrayEdgeEdit edit = new RemoveStrayEdgeEdit(strayEdge);
+		if (editList != null) {
+			editList.add(edit);
+		}
+	}
+	
 	public void removeStrayFace(List<JPatchUndoableEdit> editList, BaseVertex[] vertices) {
 		RemoveStrayFaceEdit edit = new RemoveStrayFaceEdit(vertices);
 		if (editList != null) {
