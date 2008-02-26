@@ -1,6 +1,6 @@
 package com.jpatch.afw.ui;
 
-import com.jpatch.afw.attributes.BooleanAttr;
+import com.jpatch.afw.attributes.*;
 
 import java.awt.Color;
 import java.io.*;
@@ -103,6 +103,12 @@ public class AttributeEditorFactory {
 			} else if (localName.equals("limits")) {
 				editor.addLimits(attributes.getValue("attribute"));
 			} else if (localName.equals("slider")) {
+				String mapping = attributes.getValue("mapping");
+				if (mapping != null && mapping.equals("exponential")) {
+					editor.setMapping(ExponentialMapping.getInstance());
+				} else {
+					editor.setMapping(IdentityMapping.getInstance());
+				}
 				editor.addSlider(attributes.getValue("name"), attributes.getValue("attribute"));
 			}
 		}

@@ -1,6 +1,7 @@
 package com.jpatch.entity.sds2;//////**********************************
 
 import com.jpatch.afw.control.*;
+import com.jpatch.afw.vecmath.*;
 import com.jpatch.boundary.*;
 import com.jpatch.entity.*;
 
@@ -9,25 +10,59 @@ import javax.vecmath.*;
 
 public class Operations {
 	
-	public static void lathe(Sds sds, BaseVertex[] vertices, Point3d startAxis, Point3d endAxis, double epsilon, int segments, double angle, List<JPatchUndoableEdit> editList) {
-		
-		
+	public static void lathe(Sds sds, Point3d[][] lathedPoints, List<JPatchUndoableEdit> editList) {
+		Map<Point3d, BaseVertex> vertexMap = new HashMap<Point3d, BaseVertex>();
+		for (Point3d[] segment : lathedPoints) {
+			for (Point3d point : segment) {
+				if (!vertexMap.containsKey(point)) {
+					vertexMap.put(point, new BaseVertex(point.x, point.y, point.z));
+				}
+			}
+		}
+		for (Point3d[] segment : lathedPoints) {
+			for (Point3d point : segment) {
+				System.out.println(point + " => " + vertexMap.get(point));
+			}
+		}
+		int points = lathedPoints[0].length;
+		Material material = Main.getInstance().getDefaultMaterial();
+		for (int segment = 0; segment < lathedPoints.length - 1; segment++) {
+			for (int i = 0; i < points - 1; i++) {
+				BaseVertex v0 = vertexMap.get(lathedPoints[segment][i]);
+				BaseVertex v1 = vertexMap.get(lathedPoints[segment][i + 1]);
+				BaseVertex v2 = vertexMap.get(lathedPoints[segment + 1][i + 1]);
+				BaseVertex v3 = vertexMap.get(lathedPoints[segment + 1][i]);
+				if (v0 == v3) {
+					sds.addFace(editList, 0, material, v0, v1, v2);
+				} else if (v1 == v2) {
+					sds.addFace(editList, 0, material, v0, v1, v3);
+				} else {
+					sds.addFace(editList, 0, material, v0, v1, v2, v3);
+				}
+			}
+		}
 	}
 	
-	public static void getLathedVertices(Sds sds, BaseVertex[] vertices, Point3d startAxis, Point3d endAxis, double epsilon, int segments, double angle, Point3d[][] lathedPoints) {
+	public static void getLathedVertices(Sds sds, BaseVertex[] vertices, Point3d startAxis, Point3d endAxis, double epsilon, double angle, Point3d[][] lathedPoints) {
 		Vector3d axis = new Vector3d();
 		axis.sub(endAxis, startAxis);
 		AxisAngle4d axisAngle = new AxisAngle4d(axis, 0);
 		Matrix4d matrix = new Matrix4d();
 		
-		for (int segment = 0; segment < segments; segment++) {
-			int count = angle == 360 ? segments : segments - 1;
-			axisAngle.angle = Math.toRadians(angle / count * segment);
+		Point3d pc = new Point3d();
+		double epsilonSquared = epsilon * epsilon;
+		for (int segment = 0; segment < lathedPoints.length; segment++) {
+			if (segment == 0 || (angle == 360 && segment == lathedPoints.length - 1)) {
+				axisAngle.angle = 0;
+			} else {
+				axisAngle.angle = Math.toRadians(angle / (lathedPoints.length - 1) * segment);
+			}
 			matrix.set(axisAngle);
 			
 //			lathe.set(translate0);
 //			lathe.mul(rotate);
 //			lathe.mul(translate1);
+			
 			
 			for (int i = 0; i < vertices.length; i++) {
 				Point3d p = lathedPoints[segment][i];
@@ -35,6 +70,19 @@ public class Operations {
 				p.sub(startAxis);
 				matrix.transform(p);
 				p.add(startAxis);
+				
+				/* check epsilon for first and last points */
+				if ((i == 0 || i == vertices.length - 1) && vertices[i].getEdges().length == 1) {
+					vertices[i].getPosition(pc);
+					/* set pc to the point on the axis closest to p */
+					double t = Utils3d.closestPointOnLine(startAxis, endAxis, pc);
+					pc.interpolate(startAxis, endAxis, t);
+					
+					/* if closer than epsilon, project p to axis */
+					if (p.distanceSquared(pc) <= epsilonSquared) {
+						p.set(pc);
+					}
+				}
 			}
 		}
 	}

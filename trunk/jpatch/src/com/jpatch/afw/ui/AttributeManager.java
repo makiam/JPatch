@@ -26,6 +26,7 @@ public class AttributeManager {
 	 * DecimalFormat used to print doubles in TextFields
 	 */
 	private static final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.ENGLISH));
+	private static final DecimalFormat SCI_FORMAT = new DecimalFormat("0.0E0", new DecimalFormatSymbols(Locale.ENGLISH));
 	
 	/**
 	 * Columns (width of the TextFields)
@@ -90,6 +91,11 @@ public class AttributeManager {
 		return INSTANCE;
 	}
 	
+	static {
+		DOUBLE_FORMAT.setMaximumFractionDigits(5);
+		DOUBLE_FORMAT.setMinimumFractionDigits(1);
+//		DOUBLE_FORMAT.set
+	}
 	/**
 	 * Private constructor (singleton pattern)
 	 */
@@ -332,8 +338,8 @@ public class AttributeManager {
 	 * @param max the maximum value
 	 * @return a new bounded DoubleAttr that is limited by the specified min and max attributes
 	 */
-	public DoubleAttr createBoundedDoubleAttr(double min, double max) {
-		DoubleAttr attr = new DoubleAttr();
+	public DoubleAttr createBoundedDoubleAttr(double value, double min, double max) {
+		DoubleAttr attr = new DoubleAttr(value);
 		setLowerLimit(attr, new DoubleMinimum(min));
 		setUpperLimit(attr, new DoubleMaximum(max));
 		return attr;
@@ -597,7 +603,7 @@ public class AttributeManager {
 		
 		
 		
-		class SuperListener extends FocusAdapter implements FocusListener, AttributePostChangeListener {
+		class SuperListener implements FocusListener, ComponentListener, AttributePostChangeListener {
 			private boolean suppressAction = false;
 
 			public void focusLost(FocusEvent e) {
@@ -608,7 +614,7 @@ public class AttributeManager {
 						if (value != doubleAttr.getDouble()) {
 							doubleAttr.setDouble(Double.parseDouble(textField.getText()));
 							textField.setBackground(textField.isEnabled() ? UIManager.getColor("TextField.background") : UIManager.getColor("TextField.inactiveBackground"));
-							textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
+							textField.setText(formatDouble(textField, doubleAttr.getDouble()));
 							fireActionPerformed(entity, doubleAttr);
 						}
 					} catch (NumberFormatException exception) {
@@ -623,9 +629,35 @@ public class AttributeManager {
 			public void attributeHasChanged(Attribute source) {
 				if (!suppressAction) {
 					suppressAction = true;
-					textField.setText(DOUBLE_FORMAT.format(doubleAttr.getDouble()));
+					textField.setText(formatDouble(textField, doubleAttr.getDouble()));
 					suppressAction = false;
 				}
+			}
+
+			public void focusGained(FocusEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void componentHidden(ComponentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void componentMoved(ComponentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void componentResized(ComponentEvent e) {
+				suppressAction = true;
+				textField.setText(formatDouble(textField, doubleAttr.getDouble()));
+				suppressAction = false;
+			}
+
+			public void componentShown(ComponentEvent e) {
+				// TODO Auto-generated method stub
+				
 			}
 		}
 		
@@ -640,6 +672,7 @@ public class AttributeManager {
 		
 		/* add the TRANSFER_FOCUS_ACTIONLISTENER (which simply transfers the focus when the user presses enter over the TextField */
 		addListener(textField, TRANSFER_FOCUS_ACTIONLISTENER);
+		
 		
 		return textField;
 	}
@@ -663,7 +696,7 @@ public class AttributeManager {
 						if (value != intAttr.getInt()) {
 							intAttr.setInt(Integer.parseInt(textField.getText()));
 							textField.setBackground(textField.isEnabled() ? UIManager.getColor("TextField.background") : UIManager.getColor("TextField.inactiveBackground"));
-							textField.setText(DOUBLE_FORMAT.format(intAttr.getInt()));
+							textField.setText(INT_FORMAT.format(intAttr.getInt()));
 							fireActionPerformed(entity, intAttr);
 						}
 					} catch (NumberFormatException exception) {
@@ -678,7 +711,7 @@ public class AttributeManager {
 			public void attributeHasChanged(Attribute source) {
 				if (!suppressAction) {
 					suppressAction = true;
-					textField.setText(DOUBLE_FORMAT.format(intAttr.getInt()));
+					textField.setText(INT_FORMAT.format(intAttr.getInt()));
 					suppressAction = false;
 				}
 			}
@@ -699,91 +732,91 @@ public class AttributeManager {
 		return textField;
 	}
 	
-//	/**
-//	 * Binds the specified JSlider to the specified (bounded!) Attribute.
-//	 * @param slider
-//	 * @param attr
-//	 * @param mapping
-//	 * @return the specified JSlider
-//	 * @throws NullPointerException if any of the specified parameters is null
-//	 * @throws IllegalArgumentEexception if the specified attribute is not bounded
-//	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
-//	 */
-//	public JSlider bindSliderToAttribute(Object entity, JSlider slider, DoubleAttr attr, Mapping mapping) {
-//		DoubleAttr min = getLowerLimit(attr);
-//		DoubleAttr max = getUpperLimit(attr);
-//		if (min == null || max == null) {
-//			throw new IllegalArgumentException(attr + " is not bounded");
-//		}
-//		return bindSliderToAttribute(entity, slider, attr, min, max, mapping);
-//	}
-//	
-//	/**
-//	 * Binds the specified JSlider to the specified Attribute. Constant minimum and maximum slider
-//	 * values must be provided.
-//	 * @param slider
-//	 * @param attr
-//	 * @param min
-//	 * @param max
-//	 * @param mapping
-//	 * @return the specified JSlider
-//	 * @throws NullPointerException if any of the specified parameters is null
-//	 * @throws IllegalArgumentEexception if the specified attribute is not bounded
-//	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
-//	 */
-//	public JSlider bindSliderToAttribute(Object entity, JSlider slider, DoubleAttr attr, double min, double max, Mapping mapping) {
-//		return bindSliderToAttribute(entity, slider, attr, new DoubleAttr(min), new DoubleAttr(max), mapping);
-//	}
+	/**
+	 * Binds the specified JSlider to the specified (bounded!) Attribute.
+	 * @param slider
+	 * @param attr
+	 * @param mapping
+	 * @return the specified JSlider
+	 * @throws NullPointerException if any of the specified parameters is null
+	 * @throws IllegalArgumentEexception if the specified attribute is not bounded
+	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
+	 */
+	public JSlider bindSliderToAttribute(Object entity, JSlider slider, DoubleAttr attr, Mapping mapping) {
+		DoubleAttr min = getLowerLimit(attr);
+		DoubleAttr max = getUpperLimit(attr);
+		if (min == null || max == null) {
+			throw new IllegalArgumentException(attr + " is not bounded");
+		}
+		return bindSliderToAttribute(entity, slider, attr, min, max, mapping);
+	}
 	
-//	/**
-//	 * Binds the specified JSlider to the specified Attribute.
-//	 * @param slider
-//	 * @param attr
-//	 * @param min
-//	 * @param max
-//	 * @param mapping
-//	 * @return the specified JSlider
-//	 * @throws NullPointerException if any of the specified parameters is null
-//	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
-//	 */
-//	private JSlider bindSliderToAttribute(final Object entity, final JSlider slider, final DoubleAttr attr, final DoubleAttr min, final DoubleAttr max, final Mapping mapping) {
-//		slider.setMinimum(0);
-//		slider.setMaximum(1000);
-//		
-//		class SuperListener implements ChangeListener, AttributePostChangeListener {
-//			private boolean suppressAction = false;
-//
-//			public void stateChanged(ChangeEvent e) {
-//				if (!suppressAction) {
-//					suppressAction = true;
-//					getSliderValue(slider, attr, min, max, mapping);
-//					fireActionPerformed(entity, attr);
-//					suppressAction = false;
-//				}
-//			}
-//			
-//			public void attributeHasChanged(Attribute source) {
-//				if (!suppressAction) {
-//					suppressAction = true;
-//					setSliderPosition(slider, attr, min, max, mapping);
-//					suppressAction = false;
-//				}
-//			}
-//		}
-//		
-//		SuperListener listener = new SuperListener();
-//		
-////		setSliderPosition(slider, attr, min, max, mapping);
-//		
-//		
-//		/* bind attribute and attrListener to component */
-//		bind(slider, new AttributeBinding(attr, listener), new AttributeBinding(min, listener), new AttributeBinding(max, listener));				// throws IllegalStateException if already bound
-//		
-//		/* add a ChangeListener to track the slider value */
-//		addListener(slider, listener);
-//		
-//		return slider;
-//	}
+	/**
+	 * Binds the specified JSlider to the specified Attribute. Constant minimum and maximum slider
+	 * values must be provided.
+	 * @param slider
+	 * @param attr
+	 * @param min
+	 * @param max
+	 * @param mapping
+	 * @return the specified JSlider
+	 * @throws NullPointerException if any of the specified parameters is null
+	 * @throws IllegalArgumentEexception if the specified attribute is not bounded
+	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
+	 */
+	public JSlider bindSliderToAttribute(Object entity, JSlider slider, DoubleAttr attr, double min, double max, Mapping mapping) {
+		return bindSliderToAttribute(entity, slider, attr, new DoubleAttr(min), new DoubleAttr(max), mapping);
+	}
+	
+	/**
+	 * Binds the specified JSlider to the specified Attribute.
+	 * @param slider
+	 * @param attr
+	 * @param min
+	 * @param max
+	 * @param mapping
+	 * @return the specified JSlider
+	 * @throws NullPointerException if any of the specified parameters is null
+	 * @throws IllegalStateException if the specified JTextField is already bound (to <i>any</i> Attribute)
+	 */
+	private JSlider bindSliderToAttribute(final Object entity, final JSlider slider, final DoubleAttr attr, final DoubleAttr min, final DoubleAttr max, final Mapping mapping) {
+		slider.setMinimum(0);
+		slider.setMaximum(1000);
+		slider.setOpaque(false);
+		class SuperListener implements ChangeListener, AttributePostChangeListener {
+			private boolean suppressAction = false;
+
+			public void stateChanged(ChangeEvent e) {
+				if (!suppressAction) {
+					suppressAction = true;
+					getSliderValue(slider, attr, min, max, mapping);
+					fireActionPerformed(entity, attr);
+					suppressAction = false;
+				}
+			}
+			
+			public void attributeHasChanged(Attribute source) {
+				if (!suppressAction) {
+					suppressAction = true;
+					setSliderPosition(slider, attr, min, max, mapping);
+					suppressAction = false;
+				}
+			}
+		}
+		
+		SuperListener listener = new SuperListener();
+		
+//		setSliderPosition(slider, attr, min, max, mapping);
+		
+		
+		/* bind attribute and attrListener to component */
+		bind(slider, new AttributeBinding(attr, listener), new AttributeBinding(min, listener), new AttributeBinding(max, listener));				// throws IllegalStateException if already bound
+		
+		/* add a ChangeListener to track the slider value */
+		addListener(slider, listener);
+		
+		return slider;
+	}
 	
 	/**
 	 * Binds a textfied, a set and a clear button to an attribute that allow to specify an upper or lower
@@ -873,9 +906,11 @@ public class AttributeManager {
 	 */
 	private void addListener(JComponent component, Object listener) {
 //		if (component instanceof AbstractButton && listener instanceof ActionListener) {
-//			System.out.println("adding " + listener + " to " + component.getClass().getName() + "@" + System.identityHashCode(component));
+			
 ////			Thread.dumpStack();
 //		}
+		System.out.println("adding " + listener + " to " + component.getClass().getName() + "@" + System.identityHashCode(component));
+		
 		Collection<Object> listeners = componentListeners.get(component);
 		if (listeners == null) {
 			listeners = new HashSet<Object>(4);
@@ -886,33 +921,41 @@ public class AttributeManager {
 		}
 		listeners.add(listener);
 		
+		boolean ok = false;
 		if (listener instanceof ActionListener) {
 			if (component instanceof Switcher) {
 				((Switcher) component).asAbstractButton().addActionListener((ActionListener) listener);
-				return;
+				ok = true;
 			} else if (component instanceof AbstractButton) {
 				((AbstractButton) component).addActionListener((ActionListener) listener);
-				return;
+				ok = true;
 			} else if (component instanceof JTextField) {
 				((JTextField) component).addActionListener((ActionListener) listener);
-				return;
+				ok = true;
 			} else if (component instanceof JComboBox) {
 				((JComboBox) component).addActionListener((ActionListener) listener);
-				return;
+				ok = true;
 			}
-		} else if (listener instanceof ChangeListener) {
+		}
+		if (listener instanceof ChangeListener) {
 			if (component instanceof JSlider) {
 				((JSlider) component).addChangeListener((ChangeListener) listener);
-				return;
+				ok = true;
 			}
-		} else if (listener instanceof FocusListener) {
-			component.addFocusListener((FocusListener) listener);
-			return;
-		} else if (listener instanceof HierarchyListener) {
-			component.addHierarchyListener((HierarchyListener) listener);
-			return;
 		}
-		throw new IllegalArgumentException("Can't add " + listener + " to " + component);
+		if (listener instanceof FocusListener) {
+			component.addFocusListener((FocusListener) listener);
+			ok = true;
+		}
+		if (listener instanceof HierarchyListener) {
+			component.addHierarchyListener((HierarchyListener) listener);
+			ok = true;
+		}
+		if (listener instanceof ComponentListener) {
+			component.addComponentListener((ComponentListener) listener);
+			ok = true;
+		}
+		assert ok : "Can't add " + listener + " to " + component;
 	}
 	
 	/**
@@ -926,33 +969,39 @@ public class AttributeManager {
 		if (listeners == null) {
 			return;
 		}
+		boolean ok = false;
 		for (Object listener : listeners) {
 //			if (component instanceof AbstractButton && listener instanceof ActionListener) System.out.println("removing " + listener + " from " + component.getClass().getName() + "@" + System.identityHashCode(component));
 			if (listener instanceof ActionListener) {
 				if (component instanceof AbstractButton) {
 					((AbstractButton) component).removeActionListener((ActionListener) listener);
-					continue;
+					ok = true;
 				} else if (component instanceof JTextField) {
 					((JTextField) component).removeActionListener((ActionListener) listener);
-					continue;
+					ok = true;
 				} else if (component instanceof JComboBox) {
 					((JComboBox) component).removeActionListener((ActionListener) listener);
-					continue;
+					ok = true;
 				}
 			} else if (listener instanceof ChangeListener) {
 				if (component instanceof JSlider) {
 					((JSlider) component).removeChangeListener((ChangeListener) listener);
-					continue;
+					ok = true;
 				}
 			} else if (listener instanceof FocusListener) {
 				component.removeFocusListener((FocusListener) listener);
-				continue;
+				ok = true;
 			} else if (listener instanceof HierarchyListener) {
 				component.removeHierarchyListener((HierarchyListener) listener);
-				continue;
+				ok = true;
+			} else if (listener instanceof ComponentListener) {
+				component.removeComponentListener((ComponentListener) listener);
+				ok = true;
 			}
-			throw new IllegalArgumentException("Can't remove " + listener + " from " + component);
+			assert ok : "Can't remove " + listener + " from " + component;
 		}
+		System.out.println("removed listeners from " + component);
+		System.out.println("remaining listeners " + component.getListeners(EventListener.class).length);
 		componentListeners.remove(component);
 	}
 	
@@ -1075,5 +1124,73 @@ public class AttributeManager {
 		void unbind() {
 			attribute.removeAttributePostChangeListener(listener);
 		}
+	}
+	
+	private static final String formatDouble(JTextField textField, double d) {
+		int digits = Math.min(8, textField.getWidth() / textField.getFontMetrics(textField.getFont()).getWidths()['0'] - 1);
+		
+		int intDigits = getIntegerDigits(d);
+		if (intDigits > digits) {
+			int expDigits = (Math.abs(d) >= 1E10) ? 5 : 4;
+			SCI_FORMAT.setMinimumFractionDigits(digits - expDigits);
+			SCI_FORMAT.setMaximumFractionDigits(digits - expDigits);
+			return SCI_FORMAT.format(d);
+		}
+		int fractionDigits = getFractionDigits(d);
+		if (fractionDigits > digits) {
+			int expDigits;
+			if (Math.abs(d) >= 1e100) expDigits = 6;
+			else if (Math.abs(d) >= 1e10) expDigits = 5;
+			else if (Math.abs(d) <= 1e-10) expDigits = 6;
+			else if (Math.abs(d) <= 1) expDigits = 5;
+			else expDigits = 4;
+			SCI_FORMAT.setMinimumFractionDigits(digits - expDigits);
+			SCI_FORMAT.setMaximumFractionDigits(digits - expDigits);
+			return SCI_FORMAT.format(d);
+		}
+		setFractionDigits(Math.min(Math.max(3, fractionDigits), digits - intDigits));
+//		if (ad >= 10000) return SCI_FORMAT.format(d);
+//		if (ad >= 1000) setFractionDigits(0);
+//		else if (ad >= 100) setFractionDigits(1);
+//		else if (ad >= 10) setFractionDigits(2);
+//		else setFractionDigits(3);
+		return DOUBLE_FORMAT.format(d);
+	}
+	
+	private static int getIntegerDigits(double d) {
+		double ad = Math.abs(d);
+		int sign = (d < 0) ? 1 : 0;
+		sign = 1;
+		if (ad >= 1000000000) return 10 + sign;
+		else if (ad >= 100000000) return 9 + sign;
+		else if (ad >= 10000000) return 8 + sign;
+		else if (ad >= 1000000) return 7 + sign;
+		else if (ad >= 100000) return 6 + sign;
+		else if (ad >= 10000) return 5 + sign;
+		else if (ad >= 1000) return 4 + sign;
+		else if (ad >= 100) return 3 + sign;
+		else if (ad >= 10) return 2 + sign;
+		else return 1 + sign;
+	}
+	
+	private static int getFractionDigits(double d) {
+		double ad = Math.abs(d);
+		int sign = (d < 0) ? 1 : 0;
+		sign = 1;
+		if (ad == 0) return 1 + sign;
+		else if (ad < 0.000000001) return 10 + sign;
+		else if (ad < 0.00000001) return 9 + sign;
+		else if (ad < 0.0000001) return 8 + sign;
+		else if (ad < 0.000001) return 7 + sign;
+		else if (ad < 0.00001) return 6 + sign;
+		else if (ad < 0.0001) return 5 + sign;
+		else if (ad < 0.001) return 4 + sign;
+		else if (ad < 0.01) return 3 + sign;
+		else if (ad < 0.1) return 2 + sign;
+		else return 1 + sign;
+	}
+	private static void setFractionDigits(int digits) {
+		DOUBLE_FORMAT.setMinimumFractionDigits(digits);
+		DOUBLE_FORMAT.setMaximumFractionDigits(digits);
 	}
 }

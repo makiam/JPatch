@@ -195,13 +195,44 @@ public class Utils3d {
 	 * @return factor t such that a(1-t)+bt is the point on line ab closest to p
 	 */
 	public static double closestPointOnLine(double ax, double ay, double bx, double by, double px, double py) {
-		double vx = bx - ax;
-		double vy = by - ay;
-		double wx = px - ax;
-		double wy = py - ay;
+		final double vx = bx - ax;
+		final double vy = by - ay;
+		final double wx = px - ax;
+		final double wy = py - ay;
 		
-		double c1 = wx * vx + wy * vy; // dot product w dot v
-		double c2 = vx * vx + vy * vy; // dot product v dot v
+		final double c1 = wx * vx + wy * vy; // dot product w dot v
+		final double c2 = vx * vx + vy * vy; // dot product v dot v
 		return c1 / c2;
+	}
+	
+	/**
+	 * Returns factor t such that a(1-t)+bt is the point on line ab (specified by ax, ay, az and bx, by, bz) closest to point p (px, py, pz).
+	 * Note that only for 0 &lt; t &lt; 1 the computed point is on the line segment ab.
+	 * @param ax x coordinate of point a (start of line segment)
+	 * @param ay y coordinate of point a (start of line segment)
+	 * @param az z coordinate of point a (start of line segment)
+	 * @param bx x coordinate of point b (end of line segment)
+	 * @param by y coordinate of point b (end of line segment)
+	 * @param bz z coordinate of point a (end of line segment)
+	 * @param px x coordinate of point p
+	 * @param py y coordinate of point p
+	 * @param pz z coordinate of point p
+	 * @return factor t such that a(1-t)+bt is the point on line ab closest to p
+	 */
+	public static double closestPointOnLine(double ax, double ay, double az, double bx, double by, double bz, double px, double py, double pz) {
+		final double vx = bx - ax;
+		final double vy = by - ay;
+		final double vz = bz - az;
+		final double wx = px - ax;
+		final double wy = py - ay;
+		final double wz = pz - az;
+		
+		final double c1 = wx * vx + wy * vy + wz * vz; // dot product w dot v
+		final double c2 = vx * vx + vy * vy + vz * vz; // dot product v dot v
+		return c1 / c2;
+	}
+	
+	public static double closestPointOnLine(Point3d a, Point3d b, Point3d p) {
+		return closestPointOnLine(a.x, a.y, a.z, b.x, b.y, b.z, p.x, p.y, p.z);
 	}
 }

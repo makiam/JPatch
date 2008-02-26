@@ -29,6 +29,7 @@ public class AttributeEditor {
 	private final List<ComponentBinding> bindings = new ArrayList<ComponentBinding>();
 	private String falseString = null;
 	private String trueString = null;
+	private Mapping mapping = IdentityMapping.getInstance();
 	
 	public AttributeEditor(Class entityClass, String name, BooleanAttr expansionControl, Object entity, Color borderColor) {
 		this.entityClass = entityClass;
@@ -205,20 +206,28 @@ public class AttributeEditor {
 		} else if (attribute instanceof ScalarAttribute){
 			AttributeManager.getInstance().bindTextFieldToAttribute(entity, (JTextField) binding.components[0], (ScalarAttribute) attribute);
 			if (binding.components.length == 2) {
-//				AttributeManager.getInstance().bindSliderToAttribute(entity, (JSlider) binding.components[1], (DoubleAttr) attribute, IdentityMapping.getInstance());
-				AttributeManager.getInstance().bindSliderToAttribute(entity, (JSlider) binding.components[1], (IntAttr) attribute);
+				if (attribute instanceof IntAttr) {
+					AttributeManager.getInstance().bindSliderToAttribute(entity, (JSlider) binding.components[1], (IntAttr) attribute);
+				} else if (attribute instanceof DoubleAttr) {
+					AttributeManager.getInstance().bindSliderToAttribute(entity, (JSlider) binding.components[1], (DoubleAttr) attribute, binding.mapping);
+				} else {
+					throw new IllegalStateException();
+				}
 			}
 		} else {
 			throw new IllegalStateException();
 		}
 	}
 	
-	
+	public void setMapping(Mapping mapping) {
+		this.mapping = mapping;
+	}
 	
 	private class ComponentBinding {
 		final Method[] getObjectMethod;
 		final Method getAttributeMethod;
 		final JComponent[] components;
+		final Mapping mapping = AttributeEditor.this.mapping;
 		ComponentBinding(Method getAttributeMethod, JComponent... components) {
 			this.getObjectMethod = objectStack.toArray(new Method[objectStack.size()]);
 			this.getAttributeMethod = getAttributeMethod;

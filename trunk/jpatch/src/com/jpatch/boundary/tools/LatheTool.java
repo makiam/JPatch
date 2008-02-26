@@ -10,6 +10,7 @@ import static javax.media.opengl.GL.*;
 import javax.vecmath.*;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.ui.*;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.boundary.*;
 import com.jpatch.boundary.tools.MouseSelector.*;
@@ -33,9 +34,9 @@ public class LatheTool implements VisibleTool {
 	
 	private final Tuple3Attr axisStartAttr = new Tuple3Attr(axisStart);
 	private final Tuple3Attr axisEndAttr = new Tuple3Attr(axisEnd);
-	private final DoubleAttr epsilonAttr = new DoubleAttr(0.01);
-	private final IntAttr segmentsAttr = new IntAttr(8);
-	private final DoubleAttr angleAttr = new DoubleAttr(360);
+	private final DoubleAttr epsilonAttr = AttributeManager.getInstance().createBoundedDoubleAttr(0.1, 0.001, 100);
+	private final IntAttr segmentsAttr = AttributeManager.getInstance().createBoundedIntAttr(8, 3, 32);
+	private final DoubleAttr angleAttr = AttributeManager.getInstance().createBoundedDoubleAttr(360, 0.0, 360);
 	
 	private HalfEdge lastStartEdge;
 	private HalfEdge startEdge;
@@ -101,14 +102,18 @@ public class LatheTool implements VisibleTool {
 		}
 	}
 	
+	private int getSegmentCount() {
+		return segmentsAttr.getInt() + 1;
+	}
+	
 	private void computeLathedVertices() {
 		boolean reuse = true;
-		if (lathedPoints.length != segmentsAttr.getInt()) {
-			lathedPoints = new Point3d[segmentsAttr.getInt()][chain.length];
+		if (lathedPoints.length != getSegmentCount()) {
+			lathedPoints = new Point3d[getSegmentCount()][chain.length];
 			reuse = false;
 		}
 		if (lathedPoints[0].length != chain.length) {
-			lathedPoints = new Point3d[segmentsAttr.getInt()][chain.length];
+			lathedPoints = new Point3d[getSegmentCount()][chain.length];
 			reuse = false;
 		}
 		if (!reuse) {
@@ -118,14 +123,13 @@ public class LatheTool implements VisibleTool {
 				}
 			}
 		}
-		if (lastStartEdge != startEdge || !reuse || !latheValid) {
+		if (true || lastStartEdge != startEdge || !reuse || !latheValid) {
 			Operations.getLathedVertices(
 					Main.getInstance().getSelection().getSdsModel().getSds(),
 					chain,
 					axisStart,
 					axisEnd,
 					epsilonAttr.getDouble(),
-					segmentsAttr.getInt(),
 					angleAttr.getDouble(),
 					lathedPoints
 				);
@@ -161,7 +165,7 @@ public class LatheTool implements VisibleTool {
 			
 			computeLathedVertices();
 			
-			int segments = segmentsAttr.getInt();
+			int segments = getSegmentCount();
 			int points = chain.length;
 			
 			gl.glEnable(GL_BLEND);
@@ -190,14 +194,25 @@ public class LatheTool implements VisibleTool {
 			Vector3d v = new Vector3d();
 			Vector3d normal = new Vector3d();
 			gl.glBegin(GL_QUADS);
-			for (int segment = 0; segment < segments; segment++) {
+			for (int segment = 0; segment < segments - 1; segment++) {
+//				if (angleAttr.getDouble() != 360 && segment == segments - 1) {
+//					break;
+//				}
 				for (int i = 0; i < points - 1; i++) {
 					Point3d p0 = lathedPoints[segment][i];
-					Point3d p1 = lathedPoints[(segment + 1) % segments][i];
-					Point3d p2 = lathedPoints[(segment + 1) % segments][i + 1];
+					Point3d p1 = lathedPoints[segment + 1][i];
+					Point3d p2 = lathedPoints[segment + 1][i + 1];
 					Point3d p3 = lathedPoints[segment][i + 1];
-					u.sub(p1, p0);
-					v.sub(p3, p0);
+					if (!p0.equals(p1)) {
+						u.sub(p1, p0);
+					} else {
+						u.sub(p2, p0);
+					}
+					if (!p0.equals(p3)) {
+						v.sub(p3, p0);
+					} else {
+						v.sub(p2, p0);
+					}
 					normal.cross(u, v);
 					normal.normalize();
 					gl.glNormal3d(normal.x, normal.y, normal.z);	
@@ -236,15 +251,19 @@ public class LatheTool implements VisibleTool {
 			if (e.getButton() != MouseEvent.BUTTON1) {
 				return;
 			}
-			
-		}
-
-		@Override
-		public void mouseReleased(MouseEvent e) {
-			if (e.getButton() != MouseEvent.BUTTON1) {
-				return;
+			computeLathedVertices();
+			Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
+			Operations.lathe(sds, lathedPoints, null);
+			HalfEdge strayEdge = startEdge;
+			while (strayEdge != null) {
+				HalfEdge nextEdge = sds.getNextStrayEdge(strayEdge);
+				sds.removeStrayEdge(null, strayEdge);
+				strayEdge = nextEdge;
 			}
-			
+			Main.getInstance().repaintViewports();
+			startEdge = null;
+			chain = null;
+			latheValid = false;
 		}
 	}
 	
