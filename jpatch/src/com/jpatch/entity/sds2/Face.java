@@ -18,10 +18,14 @@ public class Face {
 	private DerivedVertex facePoint;
 	private Material material;
 	private int num = count++;
-	private Point3d midpointPosition = new Point3d();
-	private Vector3d midpointNormal = new Vector3d();
+	Point3d midpointPosition = new Point3d();
+	Point3d displacedMidpointPosition = new Point3d();
+	Vector3d midpointNormal = new Vector3d();
+	Vector3d displacedMidpointNormal = new Vector3d();
 	private boolean midpointPositionValid;
 	private boolean midpointNormalValid;
+	private boolean displacedMidpointPositionValid;
+	private boolean displacedMidpointNormalValid;
 	
 //	private final Face[] children;
 	
@@ -202,27 +206,47 @@ public class Face {
 //		invalidateAltered();
 	}
 	
-	private void validateMidpointPosition() {
-		if (midpointPositionValid) {
-			return;
+	void validateMidpointPosition() {
+		if (!midpointPositionValid) {
+			/* set midpointPosition to average of this face's corner vertices */
+			double x = 0, y = 0, z = 0;
+			for (HalfEdge edge : faceEdges) {
+				AbstractVertex vertex = edge.getVertex();
+				vertex.validatePosition();
+				Point3d p = vertex.position;
+				x += p.x;
+				y += p.y;
+				z += p.z;
+			}
+			x *= oneOverSides;
+			y *= oneOverSides;
+			z *= oneOverSides;
+			midpointPosition.set(x, y, z);
+			midpointPositionValid = true;
 		}
-		double x = 0, y = 0, z = 0;
-		for (HalfEdge edge : faceEdges) {
-//			System.out.println(edge.getVertex());
-			edge.getVertex().validateAlteredPosition();
-			Point3d p = edge.getVertex().alteredPosition;
-			x += p.x;
-			y += p.y;
-			z += p.z;
-		}
-		x *= oneOverSides;
-		y *= oneOverSides;
-		z *= oneOverSides;
-		midpointPosition.set(x, y, z);
-		midpointPositionValid = true;
 	}
 	
-	private void validateMidpointNormal() {
+	void validateDisplacedMidpointPosition() {
+		if (!displacedMidpointPositionValid) {
+			/* set midpointPosition to average of this face's corner vertices */
+			double x = 0, y = 0, z = 0;
+			for (HalfEdge edge : faceEdges) {
+				AbstractVertex vertex = edge.getVertex();
+				vertex.validateDisplacedPosition();
+				Point3d p = vertex.displacedPosition;
+				x += p.x;
+				y += p.y;
+				z += p.z;
+			}
+			x *= oneOverSides;
+			y *= oneOverSides;
+			z *= oneOverSides;
+			displacedMidpointPosition.set(x, y, z);
+			displacedMidpointPositionValid = true;
+		}
+	}
+	
+	void validateMidpointNormal() {
 		if (midpointNormalValid) {
 			return;
 		}
