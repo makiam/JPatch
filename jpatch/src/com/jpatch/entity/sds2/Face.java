@@ -1,10 +1,6 @@
 package com.jpatch.entity.sds2;
 
-import static com.jpatch.entity.sds2.SdsWeights.*;
-
-import java.lang.reflect.*;
 import java.nio.*;
-import java.util.*;
 
 import com.jpatch.entity.*;
 
@@ -292,7 +288,8 @@ public class Face {
 		assert facePoint == null;
 		facePoint = new DerivedVertex() {
 			@Override
-			protected void validatePosition() {
+			void validatePosition() {
+				System.out.println(this + ".validatePosition() " + positionValid);
 				if (!positionValid) {
 					validateDisplacedMidpointPosition();
 					position.set(displacedMidpointPosition);
