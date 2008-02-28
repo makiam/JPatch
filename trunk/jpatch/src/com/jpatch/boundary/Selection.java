@@ -70,7 +70,8 @@ public class Selection {
 			for (AbstractVertex vertex : vertices) {
 				p.set(startPositions[i++]);
 				matrix.transform(p);
-				vertex.setPosition(p);
+				vertex.getPositionAttribute().setTuple(p);
+//				vertex.setPosition(p);
 			}
 		}
 

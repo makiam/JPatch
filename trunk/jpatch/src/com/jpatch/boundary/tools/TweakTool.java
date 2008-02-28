@@ -180,8 +180,7 @@ public class TweakTool implements VisibleTool {
 				Main.getInstance().repaintViewports();
 				drag = false;
 			}
-		}
-		
+		}		
 	}
 	
 	private void updateSelection(Selection selection, HitObject hitObject) {
