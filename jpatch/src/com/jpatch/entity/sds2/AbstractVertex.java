@@ -1,57 +1,13 @@
 package com.jpatch.entity.sds2;
 
-
-import static java.lang.Math.*;
+import static com.jpatch.entity.sds2.SdsWeights.*;
 import java.util.*;
+
+import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
 import javax.vecmath.*;
 
-public class AbstractVertex {
-	private static final int MAX_VALENCE = 64;
-	private static final double[][] TANGENT_FACE_WEIGHTS = new double[MAX_VALENCE + 1][];			// [valence][index]
-	private static final double[][] TANGENT_PAIR_WEIGHTS = new double[MAX_VALENCE + 1][];
-	private static final double[][] IRREGULAR_TANGENT_WEIGHTS = new double[MAX_VALENCE + 1][];
-	private static final double[][] BOUNDARY_TANGENT_WEIGHTS = new double[MAX_VALENCE + 1][];
-	private static final double CREASE0 = 3.0f / 4.0f;
-	private static final double CREASE1 = 1.0f / 8.0f;
-	private static final double CREASE_LIMIT0 = 2.0f / 3.0f;
-	private static final double CREASE_LIMIT1 = 1.0f / 6.0f;
-	private static final double[] VERTEX_LIMIT_RIM_WEIGHTS = new double[MAX_VALENCE + 1];
-	private static final double[] VERTEX_LIMIT_CENTER_WEIGHTS = new double[MAX_VALENCE + 1];
-	
-	static {
-		for (int valence = 3; valence <= MAX_VALENCE; valence++) {
-			TANGENT_FACE_WEIGHTS[valence] = new double[valence];
-			TANGENT_PAIR_WEIGHTS[valence] = new double[valence];
-			double An = 1 + cos(2 * PI / valence) + cos(PI / valence) * sqrt(2 * (9 + cos(2 * PI / valence)));
-			for (int j = 0; j < valence; j++) {
-				TANGENT_PAIR_WEIGHTS[valence][j] = (cos(2 * PI * j / valence) + cos(2 * PI * (j + 1) / valence)) / 4.0;
-			}
-			for (int j = 0; j < valence; j++) {
-				int prev = j - 1;
-				if (prev < 0) {
-					prev = valence - 1;
-				}
-				int next = j + 1;
-				if (next >= valence) {
-					next = 0;
-				}
-				TANGENT_FACE_WEIGHTS[valence][j] = An * cos(2 * PI  * j / valence)
-					+ TANGENT_PAIR_WEIGHTS[valence][prev]
-					+ TANGENT_PAIR_WEIGHTS[valence][next];
-			}
-			
-			IRREGULAR_TANGENT_WEIGHTS[valence] = new double[valence];
-			BOUNDARY_TANGENT_WEIGHTS[valence] = new double[valence];
-			for (int i = 0; i < valence; i++) {
-				IRREGULAR_TANGENT_WEIGHTS[valence][i] = cos(2 * PI * i / valence);
-				BOUNDARY_TANGENT_WEIGHTS[valence][i] = sin(PI * i / valence);
-			}
-			
-			VERTEX_LIMIT_RIM_WEIGHTS[valence] = 1.0 / (valence * valence);
-			VERTEX_LIMIT_CENTER_WEIGHTS[valence] = (valence - 2.0) / valence;
-		}
-	}
+public abstract class AbstractVertex {
 	
 	public static final int IRREGULAR = -1;
 	public static final int REGULAR = 0;
@@ -60,6 +16,9 @@ public class AbstractVertex {
 	private static int count;
 	public final int num = count++;
 	
+	final Tuple3Attr positionAttr = new Tuple3Attr();
+	
+	final Point3d referencePosition = new Point3d();
 	final Point3d position = new Point3d();
 	final Point3d displacedPosition = new Point3d();
 	final Point3d limit = new Point3d();
@@ -70,13 +29,14 @@ public class AbstractVertex {
 	final Vector3d displacedVTangent = new Vector3d();
 	final Vector3d normal = new Vector3d();
 	final Vector3d displacedNormal = new Vector3d();
-	final Matrix4d displacementMatrix = new Matrix4d();
-	final Matrix4d invDisplacementMatrix = new Matrix4d();
+	final Matrix3d displacementMatrix = new Matrix3d();
+	final Matrix3d invDisplacementMatrix = new Matrix3d();
+	final Vector3d displacementVector = new Vector3d();
 	
 	HalfEdge[] vertexEdges = new HalfEdge[0];
 	HalfEdge preferredStart;
 	
-	private AbstractVertex vertexPoint;
+	private DerivedVertex vertexPoint;
 	private int boundaryType;
 	
 	private boolean isDisplaced;
@@ -88,64 +48,94 @@ public class AbstractVertex {
 	boolean displacementMatrixValid;
 	boolean invDisplacementMatrixValid;
 	
-	public void getPosition(Tuple3d position) {
+	AbstractVertex() {
+		positionAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				setPosition(positionAttr.getX(), positionAttr.getY(), positionAttr.getZ());
+			}
+		});
+	}
+	
+	public final Tuple3Attr getPositionAttribute() {
+		return positionAttr;
+	}
+	
+	public final void getPosition(Tuple3d position) {
 		validateDisplacedPosition();
 		position.set(this.displacedPosition);
 	}
 	
-	public void getPosition(Tuple3f position) {
+	public final void getPosition(Tuple3f position) {
 		validateDisplacedPosition();
 		position.set(this.displacedPosition);
 	}
 	
-	public void setPosition(Tuple3d position) {
-		this.position.set(position);
-		invalidate();
+	public final void setPosition(Point3d p) {
+		positionAttr.setTuple(p);
 	}
 	
-	public void setPosition(double x, double y, double z) {
-		position.set(x, y, z);
-		invalidate();
+	abstract void setPosition(double x, double y, double z);
+	
+	final void setDisplacedPosition(Point3d displacedPosition) {
+		setDisplacedPosition(displacedPosition.x, displacedPosition.y, displacedPosition.z);
 	}
 	
-	public void getLimit(Tuple3f limit) {
+	final void setDisplacedPosition(double x, double y, double z) {
+		System.out.println(this + " setDisplacedPosition(" + x + ", " + y + ", " + z + ") has been called");
+		if (x == 0 && y == 0 && z == 0) {
+			isDisplaced = false;
+			invalidateDisplacement();
+		} else {
+			validatePosition();
+			displacementVector.set(x - position.x, y - position.y, z - position.z);
+			validateInvDisplacementMatrix();
+			invDisplacementMatrix.transform(displacementVector);
+			displacedPositionValid = false;
+			invalidateDisplacement();
+			isDisplaced = true;
+		}
+	}
+	
+	public final void getLimit(Tuple3f limit) {
 		validateDisplacedLimit();
 		limit.set(this.displacedLimit);
 	}
 	
-	public void getLimit(Tuple3d limit) {
+	public final void getLimit(Tuple3d limit) {
 		validateDisplacedLimit();
 		limit.set(this.displacedLimit);
 	}
 	
-	public void getNormal(Tuple3f normal) {
+	public final void getNormal(Tuple3f normal) {
 		validateDisplacedLimit();
 		normal.set(this.displacedNormal);
 	}
 	
-	public void getNormal(Tuple3d normal) {
+	public final void getNormal(Tuple3d normal) {
 		validateDisplacedLimit();
 		normal.set(this.displacedNormal);
 	}
 	
-	public void disposeVertexPoint() {
+	public final void disposeVertexPoint() {
 		vertexPoint = null;
 	}
 	
-	public AbstractVertex createVertexPoint() {
+	public final DerivedVertex createVertexPoint() {
 		assert vertexPoint == null;
-		vertexPoint = new AbstractVertex() {
+		vertexPoint = new DerivedVertex() {
+			
 			@Override
-			protected void validatePosition() {
+			void validatePosition() {
 				if (!positionValid) {
-					AbstractVertex.this.validateDisplacedPosition();
-					switch (AbstractVertex.this.boundaryType) {
+					AbstractVertex parentVertex = AbstractVertex.this;
+					parentVertex.validateDisplacedPosition();
+					switch (parentVertex.boundaryType) {
 					case REGULAR:
 						final int valence = vertexEdges.length;
 						final double rimWeight = VERTEX_LIMIT_RIM_WEIGHTS[valence];
 						final double centerWeight = VERTEX_LIMIT_CENTER_WEIGHTS[valence];
 						double x = 0, y = 0, z = 0;
-						for (HalfEdge edge : AbstractVertex.this.vertexEdges) {
+						for (HalfEdge edge : parentVertex.vertexEdges) {
 							Face face = edge.getFace();
 							face.validateDisplacedMidpointPosition();
 							Point3d fp = face.displacedMidpointPosition;
@@ -160,15 +150,15 @@ public class AbstractVertex {
 							z += ep.z;
 						}
 						position.set(
-								x * rimWeight + AbstractVertex.this.displacedPosition.x * centerWeight,
-								y * rimWeight + AbstractVertex.this.displacedPosition.y * centerWeight,
-								z * rimWeight + AbstractVertex.this.displacedPosition.z * centerWeight
+								x * rimWeight + parentVertex.displacedPosition.x * centerWeight,
+								y * rimWeight + parentVertex.displacedPosition.y * centerWeight,
+								z * rimWeight + parentVertex.displacedPosition.z * centerWeight
 						);
 						break;
 					case BOUNDARY:
-						AbstractVertex v0 = AbstractVertex.this;
-						AbstractVertex v1 = AbstractVertex.this.vertexEdges[0].getPairVertex();
-						AbstractVertex v2 = AbstractVertex.this.vertexEdges[AbstractVertex.this.vertexEdges.length - 1].getPairVertex();
+						AbstractVertex v0 = parentVertex;
+						AbstractVertex v1 = parentVertex.vertexEdges[0].getPairVertex();
+						AbstractVertex v2 = parentVertex.vertexEdges[parentVertex.vertexEdges.length - 1].getPairVertex();
 						Point3d p0 = v0.displacedPosition;
 						v1.validateDisplacedPosition();
 						Point3d p1 = v1.displacedPosition;
@@ -182,7 +172,7 @@ public class AbstractVertex {
 						);
 						break;
 					case IRREGULAR:
-						position.set(AbstractVertex.this.displacedPosition);
+						position.set(parentVertex.displacedPosition);
 						break;
 					default:
 						assert false;	// should never get here
@@ -191,14 +181,16 @@ public class AbstractVertex {
 				}
 			}
 			
+			@Override
 			public String toString() {
-				return "v" + num + "(" + AbstractVertex.this + ")";
+				AbstractVertex parentVertex = AbstractVertex.this;
+				return "v" + num + "(" + parentVertex + ")";
 			}
 		};
 		return vertexPoint;
 	}
 	
-	public double getLimitFactor() {
+	public final double getLimitFactor() {
 		switch (boundaryType) {
 		case REGULAR:
 			return vertexEdges.length / (double) (vertexEdges.length + 5);
@@ -211,26 +203,27 @@ public class AbstractVertex {
 		return 0;
 	}
 	
-	public HalfEdge[] getEdges() {
+	public final HalfEdge[] getEdges() {
 		return vertexEdges;
 	}
 	
-	public AbstractVertex getVertexPoint() {
+	public final DerivedVertex getVertexPoint() {
 		return vertexPoint;
 	}
 	
 	void validatePosition() {
 		if (!positionValid) {
-			// TODO
+			position.set(referencePosition);
 			positionValid = true;
 		}
 	}
 	
-	void validateDisplacedPosition() {
+	final void validateDisplacedPosition() {
 		if (!displacedPositionValid) {
 			if (isDisplaced) {
+				displacedPosition.add(displacementVector);
 				validateDisplacementMatrix();	// this also validates position
-				displacementMatrix.transform(position, displacedPosition);
+				displacementMatrix.transform(displacedPosition);
 			} else {
 				validatePosition();
 				displacedPosition.set(position);
@@ -239,7 +232,7 @@ public class AbstractVertex {
 		}
 	}
 	
-	void validateLimit() {
+	final void validateLimit() {
 		if (!limitValid) {
 			validatePosition();
 			final int valence = vertexEdges.length;
@@ -261,7 +254,7 @@ public class AbstractVertex {
 			
 					Face face = edge.getPairFace();
 					face.validateMidpointPosition();
-					Point3d faceMidpoint = edge.getPairFace().midpointPosition;
+					Point3d faceMidpoint = face.midpointPosition;
 					fx += faceMidpoint.x;
 					fy += faceMidpoint.y;
 					fz += faceMidpoint.z;
@@ -352,7 +345,7 @@ public class AbstractVertex {
 		}
 	}
 	
-	void validateDisplacedLimit() {
+	final void validateDisplacedLimit() {
 		if (!displacedLimitValid) {
 			if (isDisplaced) {
 				validateDisplacedPosition();
@@ -473,7 +466,7 @@ public class AbstractVertex {
 		displacedLimitValid = true;
 	}
 	
-	void validateDisplacementMatrix() {
+	final void validateDisplacementMatrix() {
 		if (!displacementMatrixValid && isDisplaced) {
 			validateLimit();
 			double nLength = 0.5 * (uTangent.length() + vTangent.length());
@@ -484,7 +477,7 @@ public class AbstractVertex {
 		}
 	}
 	
-	void validateInvDisplacementMatrix() {
+	final void validateInvDisplacementMatrix() {
 		if (!invDisplacementMatrixValid && isDisplaced) {
 			validateDisplacementMatrix();
 			invDisplacementMatrix.invert(displacementMatrix);
@@ -492,7 +485,7 @@ public class AbstractVertex {
 		}
 	}
 	
-	public void invalidate() {
+	public final void invalidate() {
 		if (positionValid) {
 			for (HalfEdge edge : vertexEdges) {
 				if (edge.getFace() != null) {
@@ -500,19 +493,33 @@ public class AbstractVertex {
 				}
 			}
 			positionValid = false;
-			displacedPositionValid = false;
-			limitValid = false;
-			displacedLimitValid = false;
-			displacementMatrixValid = false;
-			invDisplacementMatrixValid = false;
 		}
+		limitValid = false;
+		displacedPositionValid = false;
+		displacedLimitValid = false;
+		displacementMatrixValid = false;
+		invDisplacementMatrixValid = false;
+	}
+	
+	public final void invalidateDisplacement() {
+		if (displacedPositionValid) {
+			for (HalfEdge edge : vertexEdges) {
+				if (edge.getFace() != null) {
+					edge.getFace().invalidate();
+				}
+			}
+			displacedPositionValid = false;
+		}
+		displacedLimitValid = false;
+		displacementMatrixValid = false;
+		invDisplacementMatrixValid = false;
 	}
 	
 	/**
 	 * Adds the specified HalfEdge to this vertex
 	 * asserts that edge.getVertex() == this vertex
 	 */
-	void addEdge(HalfEdge edge) {
+	final void addEdge(HalfEdge edge) {
 		assert edge.getVertex() == this : "edge.vertex=" + edge.getVertex() + ", must be this vertex (" + this + ")";
 		HalfEdge[] tmp = new HalfEdge[vertexEdges.length + 1];
 		System.arraycopy(vertexEdges, 0, tmp, 0, vertexEdges.length);
@@ -524,7 +531,7 @@ public class AbstractVertex {
 	 * Removes the specified HalfEdge from this vertex
 	 * @throws ArrayIndexOutOfBoundsException if the specified HalfEdge is not adjacent to this Vertex
 	 */
-	void removeEdge(HalfEdge edge) {
+	final void removeEdge(HalfEdge edge) {
 		boolean debug = false;
 		if (debug) System.out.println("removing edge " + edge + " from vertex " + this);
 		if (debug) System.out.print("    edges are:");
@@ -543,14 +550,14 @@ public class AbstractVertex {
 		if (debug) System.out.println();
 	}
 	
-	void saveEdges(List<JPatchUndoableEdit> editList) {
+	final void saveEdges(List<JPatchUndoableEdit> editList) {
 		JPatchUndoableEdit edit = new SaveEdgesEdit();
 		if (editList != null) {
 			editList.add(edit);
 		}
 	}
 	
-	private class SaveEdgesEdit extends AbstractSwapEdit {
+	private final class SaveEdgesEdit extends AbstractSwapEdit {
 		private HalfEdge[] edges = vertexEdges.clone();
 		private int boundaryType = AbstractVertex.this.boundaryType;
 		
@@ -579,7 +586,7 @@ public class AbstractVertex {
 	 * </ul>
 	 * TODO: preferredStart method will not work properly with undo/redo
 	 */
-	void organizeEdges() {
+	final void organizeEdges() {
 		boolean debug = false;
 		if (debug) System.out.println(this + " organizeEdges() called...");
 		
@@ -638,34 +645,34 @@ public class AbstractVertex {
 		return "v" + num;
 	}
 	
-	public static void main(String[] args) {
-		BaseVertex v = new BaseVertex();
-		final int n = 10;
-		HalfEdge[] edges = new HalfEdge[n];
-		for (int i = 0; i < n; i++) {
-			edges[i] = new HalfEdge(v, new BaseVertex());
-		}
-		int[] k = new int[] { 3,6,5,4,7,9,8,2,10,1};
-		for (int i = 0; i < k.length; i++) {
-			int j = k[i] - 1;
-			edges[j].appendTo(edges[(j + 1) % n].getPair());
-			v.addEdge(edges[j]);
-			for (HalfEdge e : v.vertexEdges) {
-				System.out.print(e + " ");
-			}
-			System.out.println();
-		}
-		
-		for (int i = 0; i < n; i++) {
-			System.out.print(edges[i] + "\t " + edges[i].getPrev() + "\t " + edges[i].getNext() + "\t ");
-			System.out.println(edges[i].getPair() + "\t " + edges[i].getPair().getPrev() + "\t " + edges[i].getPair().getNext());
-		}
-		
-		HalfEdge e = v.vertexEdges[0];
-		do {
-			System.out.print(e + " ");
-			e = e.getPrev().getPair();
-		} while (e != v.vertexEdges[0]);
-		
-	}
+//	public static void main(String[] args) {
+//		BaseVertex v = new BaseVertex();
+//		final int n = 10;
+//		HalfEdge[] edges = new HalfEdge[n];
+//		for (int i = 0; i < n; i++) {
+//			edges[i] = new HalfEdge(v, new BaseVertex());
+//		}
+//		int[] k = new int[] { 3,6,5,4,7,9,8,2,10,1};
+//		for (int i = 0; i < k.length; i++) {
+//			int j = k[i] - 1;
+//			edges[j].appendTo(edges[(j + 1) % n].getPair());
+//			v.addEdge(edges[j]);
+//			for (HalfEdge e : v.vertexEdges) {
+//				System.out.print(e + " ");
+//			}
+//			System.out.println();
+//		}
+//		
+//		for (int i = 0; i < n; i++) {
+//			System.out.print(edges[i] + "\t " + edges[i].getPrev() + "\t " + edges[i].getNext() + "\t ");
+//			System.out.println(edges[i].getPair() + "\t " + edges[i].getPair().getPrev() + "\t " + edges[i].getPair().getNext());
+//		}
+//		
+//		HalfEdge e = v.vertexEdges[0];
+//		do {
+//			System.out.print(e + " ");
+//			e = e.getPrev().getPair();
+//		} while (e != v.vertexEdges[0]);
+//		
+//	}
 }
