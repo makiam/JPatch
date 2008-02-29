@@ -240,8 +240,8 @@ public class JptLoader {
 				try {
 					vertex.getPosition(p);
 					vertex.getLimit(l);
-					p.scale(2.414);
-					l.scale(1.414);
+					p.scale(2);
+					l.scale(1);
 					p.sub(l);
 					compensationMap.put(vertex, new Point3d(p));
 				} catch (Exception e) {
