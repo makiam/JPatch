@@ -91,9 +91,9 @@ public class RealtimeLighting {
 	 */
 	public static RealtimeLighting createThreepointLight() {
 		RealtimeLighting rtl = new RealtimeLighting(3);
-		rtl.add(rtl.new DirectionalLight(new Color3f (0.80f, 0.80f, 0.80f), true, true, new Vector3f( -1,  1,  1)));	// key
-		rtl.add(rtl.new DirectionalLight(new Color3f (0.40f, 0.40f, 0.40f), true, true, new Vector3f(  1,  0,  1)));	// fill
-		rtl.add(rtl.new DirectionalLight(new Color3f (1.20f, 1.20f, 1.20f), true, true, new Vector3f(  0,  1, -1)));	// back
+		rtl.add(rtl.new DirectionalLight(new Color3f (0.66f, 0.66f, 0.66f), true, true, new Vector3f( -1,  1,  1)));	// key
+		rtl.add(rtl.new DirectionalLight(new Color3f (0.33f, 0.33f, 0.33f), false, false, new Vector3f(  1,  0,  1)));	// fill
+		rtl.add(rtl.new DirectionalLight(new Color3f (1.00f, 1.00f, 1.00f), true, true, new Vector3f(  0,  1, -1)));	// back
 		return rtl;
 	}
 	

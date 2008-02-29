@@ -190,6 +190,7 @@ public class Face {
 			facePoint.invalidate();
 		}
 		for (HalfEdge edge : faceEdges) {
+			edge.getVertex().displacedLimitValid = false;
 			if (edge.getVertex().getVertexPoint() != null) {
 				edge.getVertex().getVertexPoint().invalidate();
 			}
@@ -289,7 +290,6 @@ public class Face {
 		facePoint = new DerivedVertex() {
 			@Override
 			void validatePosition() {
-				System.out.println(this + ".validatePosition() " + positionValid);
 				if (!positionValid) {
 					validateDisplacedMidpointPosition();
 					position.set(displacedMidpointPosition);

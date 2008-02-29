@@ -909,7 +909,7 @@ public class AttributeManager {
 			
 ////			Thread.dumpStack();
 //		}
-		System.out.println("adding " + listener + " to " + component.getClass().getName() + "@" + System.identityHashCode(component));
+//		System.out.println("adding " + listener + " to " + component.getClass().getName() + "@" + System.identityHashCode(component));
 		
 		Collection<Object> listeners = componentListeners.get(component);
 		if (listeners == null) {
@@ -1000,8 +1000,8 @@ public class AttributeManager {
 			}
 			assert ok : "Can't remove " + listener + " from " + component;
 		}
-		System.out.println("removed listeners from " + component);
-		System.out.println("remaining listeners " + component.getListeners(EventListener.class).length);
+//		System.out.println("removed listeners from " + component);
+//		System.out.println("remaining listeners " + component.getListeners(EventListener.class).length);
 		componentListeners.remove(component);
 	}
 	
