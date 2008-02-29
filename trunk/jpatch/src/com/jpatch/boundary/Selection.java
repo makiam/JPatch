@@ -28,16 +28,20 @@ public class Selection {
 	
 	private final Transformable transformable = new Transformable() {
 		private Point3d[] startPositions;
+		private Point3d[] startTuples;
 		private Matrix4d matrix = new Matrix4d();
 		
 		public void begin() {
 			validateVertices();
 			int count =vertices.size();
 			startPositions = new Point3d[count];
+			startTuples = new Point3d[count];
 			int i = 0;
 			for (AbstractVertex vertex : vertices) {
 				startPositions[i] = new Point3d();
 				vertex.getPosition(startPositions[i]);
+				startTuples[i] = new Point3d();
+				vertex.getPositionAttribute().getTuple(startTuples[i]);
 				i++;
 			}
 		}
@@ -45,7 +49,7 @@ public class Selection {
 		public void end(List<JPatchUndoableEdit> editList) {
 			int i = 0;
 			for (AbstractVertex vertex : vertices) {
-				editList.add(AttributeEdit.changeAttribute(vertex.getPositionAttribute(), startPositions[i], false));
+				editList.add(AttributeEdit.changeAttribute(vertex.getPositionAttribute(), startTuples[i], false));
 				i++;
 			}
 		}
@@ -70,7 +74,7 @@ public class Selection {
 			for (AbstractVertex vertex : vertices) {
 				p.set(startPositions[i++]);
 				matrix.transform(p);
-				vertex.getPositionAttribute().setTuple(p);
+				vertex.setPosition(p);
 //				vertex.setPosition(p);
 			}
 		}

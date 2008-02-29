@@ -8,10 +8,10 @@ import com.jpatch.afw.control.*;
 import javax.vecmath.*;
 
 public abstract class AbstractVertex {
-	
-	public static final int IRREGULAR = -1;
-	public static final int REGULAR = 0;
-	public static final int BOUNDARY = 1;
+	private static enum BoundaryType { REGULAR, BOUNDARY, IRREGULAR }
+//	public static final int IRREGULAR = -1;
+//	public static final int REGULAR = 0;
+//	public static final int BOUNDARY = 1;
 	
 	private static int count;
 	public final int num = count++;
@@ -23,28 +23,25 @@ public abstract class AbstractVertex {
 	final Point3d displacedPosition = new Point3d();
 	final Point3d limit = new Point3d();
 	final Point3d displacedLimit = new Point3d();
-//	final Vector3d uTangent = new Vector3d();
-//	final Vector3d displacedUTangent = new Vector3d();
-//	final Vector3d vTangent = new Vector3d();
-//	final Vector3d displacedVTangent = new Vector3d();
 	final Vector3d normal = new Vector3d();
 	final Vector3d displacedNormal = new Vector3d();
 	final Matrix3d displacementMatrix = new Matrix3d();
 	final Matrix3d invDisplacementMatrix = new Matrix3d();
 	final Vector3d displacementVector = new Vector3d();
+	final Vector3d transformedDisplacementVector = new Vector3d();
 	
 	HalfEdge[] vertexEdges = new HalfEdge[0];
 	HalfEdge preferredStart;
 	
 	private DerivedVertex vertexPoint;
-	private int boundaryType;
+	private BoundaryType boundaryType;
 	
 	private boolean isDisplaced;
 	
 	boolean positionValid;
 	private boolean displacedPositionValid;
 	private boolean limitValid;
-	private boolean displacedLimitValid;
+	boolean displacedLimitValid;
 	private boolean invDisplacementMatrixValid;
 	
 	AbstractVertex() {
@@ -69,28 +66,23 @@ public abstract class AbstractVertex {
 		position.set(this.displacedPosition);
 	}
 	
-	public final void setPosition(Point3d p) {
+	public void setPosition(Point3d p) {
 		positionAttr.setTuple(p);
 	}
 	
 	abstract void setPosition(double x, double y, double z);
 	
-	final void setDisplacedPosition(Point3d displacedPosition) {
-		setDisplacedPosition(displacedPosition.x, displacedPosition.y, displacedPosition.z);
-	}
-	
-	final void setDisplacedPosition(double x, double y, double z) {
-		System.out.println(this + " setDisplacedPosition(" + x + ", " + y + ", " + z + ") has been called");
+	final void setDisplacement(double x, double y, double z) {
 		if (x == 0 && y == 0 && z == 0) {
+			positionValid = true;
+			invalidate();
 			isDisplaced = false;
-			invalidateDisplacement();
 		} else {
-			validatePosition();
-			displacementVector.set(x - position.x, y - position.y, z - position.z);
 			validateInvDisplacementMatrix();
+			displacementVector.set(x, y, z);
 			invDisplacementMatrix.transform(displacementVector);
-			displacedPositionValid = false;
-			invalidateDisplacement();
+			positionValid = true;
+			invalidate();
 			isDisplaced = true;
 		}
 	}
@@ -214,17 +206,15 @@ public abstract class AbstractVertex {
 		if (!positionValid) {
 			position.set(referencePosition);
 			positionValid = true;
-			System.out.println(this + " position validated: " + position);
 		}
 	}
 	
 	final void validateDisplacedPosition() {
-//		System.out.println(this + ".validateDisplacedPosition() " + displacedPositionValid + " " + isDisplaced);
 		if (!displacedPositionValid) {
 			if (isDisplaced) {
 				validateLimit();	// this also validates position
-				displacedPosition.add(position, displacementVector);
-				displacementMatrix.transform(displacedPosition);
+				displacementMatrix.transform(displacementVector, transformedDisplacementVector);
+				displacedPosition.add(position, transformedDisplacementVector);	
 			} else {
 				validatePosition();
 				displacedPosition.set(position);
@@ -234,8 +224,7 @@ public abstract class AbstractVertex {
 	}
 	
 	final void validateLimit() {
-		if (toString().contains("f")) System.out.println(this + ".validateLimit() " + limitValid);
-		if (true || !limitValid) {
+		if (!limitValid) {
 			validatePosition();
 			final int valence = vertexEdges.length;
 			double ux = 0, uy = 0, uz = 0;	// u tangent
@@ -246,8 +235,10 @@ public abstract class AbstractVertex {
 				final double limitFaceWeight = 3.0 * limitPairWeight;
 				final double limitCenterWeight = (valence + 1.0) / (valence + 5);
 				
-				final double[] tangentPairWeight = TANGENT_PAIR_WEIGHTS[valence];
-				final double[] tangentFaceWeight = TANGENT_FACE_WEIGHTS[valence];
+				final double[] uTangentPairWeight = U_TANGENT_PAIR_WEIGHTS[valence];
+				final double[] uTangentFaceWeight = U_TANGENT_FACE_WEIGHTS[valence];
+				final double[] vTangentPairWeight = V_TANGENT_PAIR_WEIGHTS[valence];
+				final double[] vTangentFaceWeight = V_TANGENT_FACE_WEIGHTS[valence];
 				
 				double fx = 0, fy = 0, fz = 0;
 				double px = 0, py = 0, pz = 0;
@@ -268,22 +259,19 @@ public abstract class AbstractVertex {
 					py += edgePairPoint.y;
 					pz += edgePairPoint.z;
 					
-					ux += faceMidpoint.x * tangentFaceWeight[i] + edgePairPoint.x * tangentPairWeight[i];
-					uy += faceMidpoint.y * tangentFaceWeight[i] + edgePairPoint.y * tangentPairWeight[i];
-					uz += faceMidpoint.z * tangentFaceWeight[i] + edgePairPoint.z * tangentPairWeight[i];
+					ux += faceMidpoint.x * uTangentFaceWeight[i] + edgePairPoint.x * uTangentPairWeight[i];
+					uy += faceMidpoint.y * uTangentFaceWeight[i] + edgePairPoint.y * uTangentPairWeight[i];
+					uz += faceMidpoint.z * uTangentFaceWeight[i] + edgePairPoint.z * uTangentPairWeight[i];
 					
-					int j = (i > 0) ? i - 1 : valence - 1;	
-					vx += faceMidpoint.x * tangentFaceWeight[j] + edgePairPoint.x * tangentPairWeight[j];
-					vy += faceMidpoint.y * tangentFaceWeight[j] + edgePairPoint.y * tangentPairWeight[j];
-					vz += faceMidpoint.z * tangentFaceWeight[j] + edgePairPoint.z * tangentPairWeight[j];	
+					vx += faceMidpoint.x * vTangentFaceWeight[i] + edgePairPoint.x * vTangentPairWeight[i];
+					vy += faceMidpoint.y * vTangentFaceWeight[i] + edgePairPoint.y * vTangentPairWeight[i];
+					vz += faceMidpoint.z * vTangentFaceWeight[i] + edgePairPoint.z * vTangentPairWeight[i];	
 				}
 				limit.set(
 						fx * limitFaceWeight + px * limitPairWeight + position.x * limitCenterWeight,
 						fy * limitFaceWeight + py * limitPairWeight + position.y * limitCenterWeight,
 						fz * limitFaceWeight + pz * limitPairWeight + position.z * limitCenterWeight
-				);
-//				uTangent.set(ux, uy, uz);
-//				vTangent.set(vx, vy, vz);			
+				);		
 				break;
 			case BOUNDARY:
 				AbstractVertex vertex0 = vertexEdges[0].getPairVertex();
@@ -297,23 +285,24 @@ public abstract class AbstractVertex {
 						position.y * CREASE_LIMIT0 + (p0.y + p1.y) * CREASE_LIMIT1,
 						position.z * CREASE_LIMIT0 + (p0.z + p1.z) * CREASE_LIMIT1
 				);
-				ux = p1.x - p0.x;
-				uy = p1.y - p0.y;
-				uz = p1.z - p0.z;
-//				uTangent.set(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z);
+				ux = p0.x - p1.x;
+				uy = p0.y - p1.y;
+				uz = p0.z - p1.z;
 				vx = 0; vy = 0; vz = 0;
-				for (int i = 1; i < vertexEdges.length - 2; i++) {
-					AbstractVertex v = vertexEdges[i].getPairVertex();
-					v.validatePosition();
-					vx += v.position.x * BOUNDARY_TANGENT_WEIGHTS[valence][i];
-					vy += v.position.y * BOUNDARY_TANGENT_WEIGHTS[valence][i];
-					vz += v.position.z * BOUNDARY_TANGENT_WEIGHTS[valence][i];
+				double summaryWeight = 0;
+				for (int i = 0; i < vertexEdges.length - 1; i++) {
+					Face face = vertexEdges[i].getFace();
+					face.validateMidpointPosition();
+//					v.validateDisplacedPosition();
+					vx += face.midpointPosition.x * 1;//BOUNDARY_TANGENT_WEIGHTS[valence + 1][i + 1];
+					vy += face.midpointPosition.y * 1;//BOUNDARY_TANGENT_WEIGHTS[valence + 1][i + 1];
+					vz += face.midpointPosition.z * 1;//BOUNDARY_TANGENT_WEIGHTS[valence + 1][i + 1];
+					summaryWeight += 1;//BOUNDARY_TANGENT_WEIGHTS[valence + 1][i + 1];
 				}
 				double f = 1.0 / (vertexEdges.length - 2);
 				vx = vx * f - position.x;
 				vy = vy * f - position.y;
 				vz = vz * f - position.z;
-//				vTangent.set(vx - position.x, vy - position.y, vz - position.z);
 				break;
 			case IRREGULAR:
 				limit.set(position);
@@ -333,8 +322,6 @@ public abstract class AbstractVertex {
 					ux += edgePairPoint.x * uWeight; uy += edgePairPoint.y * uWeight; uz += edgePairPoint.z * uWeight;
 					vx += edgePairPoint.x * vWeight; vy += edgePairPoint.y * vWeight; vz += edgePairPoint.z * vWeight;
 				}
-//				uTangent.set(ux, uy, uz);
-//				vTangent.set(vx, vy, vz);
 				break;
 			default:
 				assert false;	// should never get here
@@ -357,125 +344,112 @@ public abstract class AbstractVertex {
 	
 	final void validateDisplacedLimit() {
 		if (!displacedLimitValid) {
-			if (isDisplaced) {
-				validateDisplacedPosition();
-				final int valence = vertexEdges.length;
-				double ux = 0, uy = 0, uz = 0;	// u tangent
-				double vx = 0, vy = 0, vz = 0;	// v tangent
-				switch (boundaryType) {
-				case REGULAR:
-					final double limitPairWeight = 1.0 / (valence * (valence + 5));
-					final double limitFaceWeight = 3.0 * limitPairWeight;
-					final double limitCenterWeight = (valence + 1.0) / (valence + 5);
-					
-					final double[] tangentPairWeight = TANGENT_PAIR_WEIGHTS[valence];
-					final double[] tangentFaceWeight = TANGENT_FACE_WEIGHTS[valence];
-					
-					double fx = 0, fy = 0, fz = 0;
-					double px = 0, py = 0, pz = 0;
-					for (int i = 0; i < valence; i++) {
-						HalfEdge edge = vertexEdges[i];
+			validateDisplacedPosition();
+			final int valence = vertexEdges.length;
+			double ux = 0, uy = 0, uz = 0;	// u tangent
+			double vx = 0, vy = 0, vz = 0;	// v tangent
+			switch (boundaryType) {
+			case REGULAR:
+				final double limitPairWeight = 1.0 / (valence * (valence + 5));
+				final double limitFaceWeight = 3.0 * limitPairWeight;
+				final double limitCenterWeight = (valence + 1.0) / (valence + 5);
 				
-						Face face = edge.getPairFace();
-						face.validateDisplacedMidpointPosition();
-						Point3d faceMidpoint = edge.getPairFace().displacedMidpointPosition;
-						fx += faceMidpoint.x;
-						fy += faceMidpoint.y;
-						fz += faceMidpoint.z;
-						
-						AbstractVertex pair = edge.getPairVertex();
-						pair.validateDisplacedPosition();
-						Point3d edgePairPoint = edge.getPairVertex().displacedPosition;
-						px += edgePairPoint.x;
-						py += edgePairPoint.y;
-						pz += edgePairPoint.z;
-						
-						ux += faceMidpoint.x * tangentFaceWeight[i] + edgePairPoint.x * tangentPairWeight[i];
-						uy += faceMidpoint.y * tangentFaceWeight[i] + edgePairPoint.y * tangentPairWeight[i];
-						uz += faceMidpoint.z * tangentFaceWeight[i] + edgePairPoint.z * tangentPairWeight[i];
-						
-						int j = (i > 0) ? i - 1 : valence - 1;	
-						vx += faceMidpoint.x * tangentFaceWeight[j] + edgePairPoint.x * tangentPairWeight[j];
-						vy += faceMidpoint.y * tangentFaceWeight[j] + edgePairPoint.y * tangentPairWeight[j];
-						vz += faceMidpoint.z * tangentFaceWeight[j] + edgePairPoint.z * tangentPairWeight[j];	
-					}
-					limit.set(
-							fx * limitFaceWeight + px * limitPairWeight + displacedPosition.x * limitCenterWeight,
-							fy * limitFaceWeight + py * limitPairWeight + displacedPosition.y * limitCenterWeight,
-							fz * limitFaceWeight + pz * limitPairWeight + displacedPosition.z * limitCenterWeight
-					);
-//					displacedUTangent.set(ux, uy, uz);
-//					displacedVTangent.set(vx, vy, vz);		
-					break;
-				case BOUNDARY:
-					AbstractVertex vertex0 = vertexEdges[0].getPairVertex();
-					AbstractVertex vertex1 = vertexEdges[vertexEdges.length - 1].getPairVertex();
-					vertex0.validateDisplacedPosition();
-					vertex1.validateDisplacedPosition();
-					Point3d p0 = vertex0.displacedPosition;
-					Point3d p1 = vertex1.displacedPosition;
-					limit.set(
-							displacedPosition.x * CREASE_LIMIT0 + (p0.x + p1.x) * CREASE_LIMIT1,
-							displacedPosition.y * CREASE_LIMIT0 + (p0.y + p1.y) * CREASE_LIMIT1,
-							displacedPosition.z * CREASE_LIMIT0 + (p0.z + p1.z) * CREASE_LIMIT1
-					);
-					ux = p1.x - p0.x;
-					uy = p1.y - p0.y;
-					uz = p1.z - p0.z;
-//					displacedUTangent.set(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z);
-					vx = 0; vy = 0; vz = 0;
-					double summaryWeight = 0;
-					for (int i = 1; i < vertexEdges.length - 2; i++) {
-						AbstractVertex v = vertexEdges[i].getPairVertex();
-						v.validateDisplacedPosition();
-						vx += v.displacedPosition.x * BOUNDARY_TANGENT_WEIGHTS[valence][i];
-						vy += v.displacedPosition.y * BOUNDARY_TANGENT_WEIGHTS[valence][i];
-						vz += v.displacedPosition.z * BOUNDARY_TANGENT_WEIGHTS[valence][i];
-						summaryWeight += BOUNDARY_TANGENT_WEIGHTS[valence][i];
-					}
-					double f = 1.0 / summaryWeight;
-					vx = vx * f - displacedPosition.x;
-					vy = vy * f - displacedPosition.y;
-					vz = vz * f - displacedPosition.z;
-//					displacedVTangent.set(vx - displacedPosition.x, vy - displacedPosition.y, vz - displacedPosition.z);
-					break;
-				case IRREGULAR:
-					displacedLimit.set(displacedPosition);
-					for (int i = 0; i < valence; i++) {
-						int next = i + 1;
-						if (next == valence) {
-							next = 0;
-						}
-						double uWeight = IRREGULAR_TANGENT_WEIGHTS[valence][i];
-						double vWeight = IRREGULAR_TANGENT_WEIGHTS[valence][next];
-						
-						HalfEdge edge = vertexEdges[i];
-						AbstractVertex pair = edge.getPairVertex();
-						pair.validateDisplacedPosition();
-						Point3d edgePairPoint = edge.getPairVertex().displacedPosition;
-						
-						ux += edgePairPoint.x * uWeight; uy += edgePairPoint.y * uWeight; uz += edgePairPoint.z * uWeight;
-						vx += edgePairPoint.x * vWeight; vy += edgePairPoint.y * vWeight; vz += edgePairPoint.z * vWeight;
-					}
-//					displacedUTangent.set(ux, uy, uz);
-//					displacedVTangent.set(vx, vy, vz);
-					break;
-				default:
-					assert false;	// should never get here
+				final double[] uTangentPairWeight = U_TANGENT_PAIR_WEIGHTS[valence];
+				final double[] uTangentFaceWeight = U_TANGENT_FACE_WEIGHTS[valence];
+				final double[] vTangentPairWeight = V_TANGENT_PAIR_WEIGHTS[valence];
+				final double[] vTangentFaceWeight = V_TANGENT_FACE_WEIGHTS[valence];
+				
+				double fx = 0, fy = 0, fz = 0;
+				double px = 0, py = 0, pz = 0;
+				for (int i = 0; i < valence; i++) {
+					HalfEdge edge = vertexEdges[i];
+			
+					Face face = edge.getPairFace();
+					face.validateDisplacedMidpointPosition();
+					Point3d faceMidpoint = edge.getPairFace().displacedMidpointPosition;
+					fx += faceMidpoint.x;
+					fy += faceMidpoint.y;
+					fz += faceMidpoint.z;
+					
+					AbstractVertex pair = edge.getPairVertex();
+					pair.validateDisplacedPosition();
+					Point3d edgePairPoint = edge.getPairVertex().displacedPosition;
+					px += edgePairPoint.x;
+					py += edgePairPoint.y;
+					pz += edgePairPoint.z;
+					
+					ux += faceMidpoint.x * uTangentFaceWeight[i] + edgePairPoint.x * uTangentPairWeight[i];
+					uy += faceMidpoint.y * uTangentFaceWeight[i] + edgePairPoint.y * uTangentPairWeight[i];
+					uz += faceMidpoint.z * uTangentFaceWeight[i] + edgePairPoint.z * uTangentPairWeight[i];
+					
+					vx += faceMidpoint.x * vTangentFaceWeight[i] + edgePairPoint.x * vTangentPairWeight[i];
+					vy += faceMidpoint.y * vTangentFaceWeight[i] + edgePairPoint.y * vTangentPairWeight[i];
+					vz += faceMidpoint.z * vTangentFaceWeight[i] + edgePairPoint.z * vTangentPairWeight[i];	
 				}
-				
-				/* normal = u cross v */
-				displacedNormal.set(uy*vz - uz*vy, uz*vx - ux*vz, ux*vy - uy*vx);
-				displacedNormal.normalize();
+				displacedLimit.set(
+						fx * limitFaceWeight + px * limitPairWeight + displacedPosition.x * limitCenterWeight,
+						fy * limitFaceWeight + py * limitPairWeight + displacedPosition.y * limitCenterWeight,
+						fz * limitFaceWeight + pz * limitPairWeight + displacedPosition.z * limitCenterWeight
+				);		
+				break;
+			case BOUNDARY:
+				AbstractVertex vertex0 = vertexEdges[0].getPairVertex();
+				AbstractVertex vertex1 = vertexEdges[vertexEdges.length - 1].getPairVertex();
+				vertex0.validateDisplacedPosition();
+				vertex1.validateDisplacedPosition();
+				Point3d p0 = vertex0.displacedPosition;
+				Point3d p1 = vertex1.displacedPosition;
+				displacedLimit.set(
+						displacedPosition.x * CREASE_LIMIT0 + (p0.x + p1.x) * CREASE_LIMIT1,
+						displacedPosition.y * CREASE_LIMIT0 + (p0.y + p1.y) * CREASE_LIMIT1,
+						displacedPosition.z * CREASE_LIMIT0 + (p0.z + p1.z) * CREASE_LIMIT1
+				);
+				ux = p0.x - p1.x;
+				uy = p0.y - p1.y;
+				uz = p0.z - p1.z;
+				vx = 0; vy = 0; vz = 0;
+				double summaryWeight = 0;
+				for (int i = 0; i < vertexEdges.length - 1; i++) {
+					Face face = vertexEdges[i].getFace();
+					face.validateDisplacedMidpointPosition();
+//					v.validateDisplacedPosition();
+					vx += face.displacedMidpointPosition.x * BOUNDARY_TANGENT_WEIGHTS[valence + 1][i + 1];
+					vy += face.displacedMidpointPosition.y * BOUNDARY_TANGENT_WEIGHTS[valence + 1][i + 1];
+					vz += face.displacedMidpointPosition.z * BOUNDARY_TANGENT_WEIGHTS[valence + 1][i + 1];
+					summaryWeight += BOUNDARY_TANGENT_WEIGHTS[valence + 1][i + 1];
+				}
+				double f = 1.0 / summaryWeight;
+				vx = vx * f - displacedPosition.x;
+				vy = vy * f - displacedPosition.y;
+				vz = vz * f - displacedPosition.z;
+				break;
+			case IRREGULAR:
+				displacedLimit.set(displacedPosition);
+				for (int i = 0; i < valence; i++) {
+					int next = i + 1;
+					if (next == valence) {
+						next = 0;
+					}
+					double uWeight = IRREGULAR_TANGENT_WEIGHTS[valence][i];
+					double vWeight = IRREGULAR_TANGENT_WEIGHTS[valence][next];
+					
+					HalfEdge edge = vertexEdges[i];
+					AbstractVertex pair = edge.getPairVertex();
+					pair.validateDisplacedPosition();
+					Point3d edgePairPoint = edge.getPairVertex().displacedPosition;
+					
+					ux += edgePairPoint.x * uWeight; uy += edgePairPoint.y * uWeight; uz += edgePairPoint.z * uWeight;
+					vx += edgePairPoint.x * vWeight; vy += edgePairPoint.y * vWeight; vz += edgePairPoint.z * vWeight;
+				}
+				break;
+			default:
+				assert false;	// should never get here
 			}
-		} else {
-			validateLimit();
-			displacedLimit.set(limit);
-//			displacedUTangent.set(uTangent);
-//			displacedVTangent.set(vTangent);
-			displacedNormal.set(normal);
-		}
-		displacedLimitValid = true;
+			
+			displacedNormal.set(uy*vz - uz*vy, uz*vx - ux*vz, ux*vy - uy*vx);
+			displacedNormal.normalize();
+			displacedLimitValid = true;
+		}	
 	}
 	
 	final void validateInvDisplacementMatrix() {
@@ -487,31 +461,18 @@ public abstract class AbstractVertex {
 	}
 	
 	public final void invalidate() {
-		System.out.println(this + ".invalidate()");
 		if (positionValid) {
+			positionValid = false;
 			for (HalfEdge edge : vertexEdges) {
 				if (edge.getFace() != null) {
 					edge.getFace().invalidate();
 				}
 			}
-			positionValid = false;
 		}
 		limitValid = false;
 		displacedPositionValid = false;
 		displacedLimitValid = false;
 		invDisplacementMatrixValid = false;
-	}
-	
-	public final void invalidateDisplacement() {
-		if (displacedPositionValid) {
-			for (HalfEdge edge : vertexEdges) {
-				if (edge.getFace() != null) {
-					edge.getFace().invalidate();
-				}
-			}
-			displacedPositionValid = false;
-		}
-		displacedLimitValid = false;
 	}
 	
 	/**
@@ -558,7 +519,7 @@ public abstract class AbstractVertex {
 	
 	private final class SaveEdgesEdit extends AbstractSwapEdit {
 		private HalfEdge[] edges = vertexEdges.clone();
-		private int boundaryType = AbstractVertex.this.boundaryType;
+		private BoundaryType boundaryType = AbstractVertex.this.boundaryType;
 		
 		private SaveEdgesEdit() {
 			apply(true);
@@ -569,9 +530,10 @@ public abstract class AbstractVertex {
 			HalfEdge[] tmpEdges = vertexEdges.clone();
 			vertexEdges = edges;
 			edges = tmpEdges;
-			int tmpBoundaryType = AbstractVertex.this.boundaryType;
+			BoundaryType tmpBoundaryType = AbstractVertex.this.boundaryType;
 			AbstractVertex.this.boundaryType = boundaryType;
 			boundaryType = tmpBoundaryType;
+			positionValid = true;
 			invalidate();
 		}
 	}
@@ -603,7 +565,7 @@ public abstract class AbstractVertex {
 		}
 		
 		if (e.getPair().getNext() != null) {
-			boundaryType = REGULAR;	// regular vertex
+			boundaryType = BoundaryType.REGULAR;	// regular vertex
 			// check if edges contains preferredStart and, if yes, use it as start-edge. Else set preferredStart to current start-edge
 			for (int i = 0; i < tmp.length; i++) {
 				if (tmp[i] == preferredStart) {
@@ -613,7 +575,7 @@ public abstract class AbstractVertex {
 			}
 			preferredStart = e;
 		} else {
-			boundaryType = BOUNDARY;	// regular boundary vertex (corner)
+			boundaryType = BoundaryType.BOUNDARY;	// regular boundary vertex (corner)
 		}
 		
 		
@@ -621,7 +583,7 @@ public abstract class AbstractVertex {
 		for (int i = 0; i < vertexEdges.length; i++) {
 			if (i < vertexEdges.length - 1 && e.getPrev() == null) {
 				System.arraycopy(tmp, 0, vertexEdges, 0, vertexEdges.length);
-				boundaryType = IRREGULAR; // irregular boundary vertex, crease edges are edges[0] and edges[edges.length - 1]
+				boundaryType = BoundaryType.IRREGULAR; // irregular boundary vertex, crease edges are edges[0] and edges[edges.length - 1]
 				break;
 			}
 			vertexEdges[i] = e;
@@ -635,6 +597,7 @@ public abstract class AbstractVertex {
 		if (debug) System.out.println();
 		if (debug) System.out.println("    boundaryType = " + boundaryType);
 		
+		positionValid = true;
 		invalidate();
 		
 	}
@@ -643,35 +606,4 @@ public abstract class AbstractVertex {
 	public String toString() {
 		return "v" + num;
 	}
-	
-//	public static void main(String[] args) {
-//		BaseVertex v = new BaseVertex();
-//		final int n = 10;
-//		HalfEdge[] edges = new HalfEdge[n];
-//		for (int i = 0; i < n; i++) {
-//			edges[i] = new HalfEdge(v, new BaseVertex());
-//		}
-//		int[] k = new int[] { 3,6,5,4,7,9,8,2,10,1};
-//		for (int i = 0; i < k.length; i++) {
-//			int j = k[i] - 1;
-//			edges[j].appendTo(edges[(j + 1) % n].getPair());
-//			v.addEdge(edges[j]);
-//			for (HalfEdge e : v.vertexEdges) {
-//				System.out.print(e + " ");
-//			}
-//			System.out.println();
-//		}
-//		
-//		for (int i = 0; i < n; i++) {
-//			System.out.print(edges[i] + "\t " + edges[i].getPrev() + "\t " + edges[i].getNext() + "\t ");
-//			System.out.println(edges[i].getPair() + "\t " + edges[i].getPair().getPrev() + "\t " + edges[i].getPair().getNext());
-//		}
-//		
-//		HalfEdge e = v.vertexEdges[0];
-//		do {
-//			System.out.print(e + " ");
-//			e = e.getPrev().getPair();
-//		} while (e != v.vertexEdges[0]);
-//		
-//	}
 }

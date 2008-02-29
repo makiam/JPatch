@@ -3,8 +3,8 @@ package com.jpatch.entity;
 import javax.vecmath.*;
 
 public class BasicMaterial implements Material {
-	public static final float DEFAULT_AMBIENT = 0.1f;
-	public static final float DEFAULT_DIFFUSE = 0.75f;
+	public static final float DEFAULT_AMBIENT = 0.2f;
+	public static final float DEFAULT_DIFFUSE = 0.8f;
 	public static final float DEFAULT_SPECULAR = 1.0f;
 	public static final float DEFAULT_EMISSION = 0.0f;
 	public static final float DEFAULT_SHININESS = 100f;

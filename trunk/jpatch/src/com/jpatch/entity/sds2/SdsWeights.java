@@ -1,15 +1,13 @@
 package com.jpatch.entity.sds2;
 
 import static java.lang.Math.*;
-import static java.lang.Math.PI;
-import static java.lang.Math.cos;
-import static java.lang.Math.sqrt;
-import static com.jpatch.entity.sds2.SdsConstants.MAX_VALENCE;
 
 public class SdsWeights {
 	static final int MAX_VALENCE = 64;
-	static final double[][] TANGENT_FACE_WEIGHTS = new double[MAX_VALENCE + 1][];			// [valence][index]
-	static final double[][] TANGENT_PAIR_WEIGHTS = new double[MAX_VALENCE + 1][];
+	static final double[][] U_TANGENT_FACE_WEIGHTS = new double[MAX_VALENCE + 1][];			// [valence][index]
+	static final double[][] U_TANGENT_PAIR_WEIGHTS = new double[MAX_VALENCE + 1][];
+	static final double[][] V_TANGENT_FACE_WEIGHTS = new double[MAX_VALENCE + 1][];			// [valence][index]
+	static final double[][] V_TANGENT_PAIR_WEIGHTS = new double[MAX_VALENCE + 1][];
 	static final double[][] IRREGULAR_TANGENT_WEIGHTS = new double[MAX_VALENCE + 1][];
 	static final double[][] BOUNDARY_TANGENT_WEIGHTS = new double[MAX_VALENCE + 1][];
 	static final double CREASE0 = 3.0f / 4.0f;
@@ -21,11 +19,14 @@ public class SdsWeights {
 	
 	static {
 		for (int valence = 3; valence <= MAX_VALENCE; valence++) {
-			TANGENT_FACE_WEIGHTS[valence] = new double[valence];
-			TANGENT_PAIR_WEIGHTS[valence] = new double[valence];
+			U_TANGENT_FACE_WEIGHTS[valence] = new double[valence];
+			U_TANGENT_PAIR_WEIGHTS[valence] = new double[valence];
+			V_TANGENT_FACE_WEIGHTS[valence] = new double[valence];
+			V_TANGENT_PAIR_WEIGHTS[valence] = new double[valence];
 			double An = 1 + cos(2 * PI / valence) + cos(PI / valence) * sqrt(2 * (9 + cos(2 * PI / valence)));
 			for (int j = 0; j < valence; j++) {
-				TANGENT_PAIR_WEIGHTS[valence][j] = (cos(2 * PI * j / valence) + cos(2 * PI * (j + 1) / valence)) / 4.0;
+				U_TANGENT_PAIR_WEIGHTS[valence][j] = (cos(2 * PI * j / valence) + cos(2 * PI * (j + 1) / valence)) / 4.0;
+				V_TANGENT_PAIR_WEIGHTS[valence][j] = (sin(2 * PI * j / valence) + sin(2 * PI * (j + 1) / valence)) / 4.0;
 			}
 			for (int j = 0; j < valence; j++) {
 				int prev = j - 1;
@@ -36,9 +37,12 @@ public class SdsWeights {
 				if (next >= valence) {
 					next = 0;
 				}
-				TANGENT_FACE_WEIGHTS[valence][j] = An * cos(2 * PI  * j / valence)
-					+ TANGENT_PAIR_WEIGHTS[valence][prev]
-					+ TANGENT_PAIR_WEIGHTS[valence][next];
+				U_TANGENT_FACE_WEIGHTS[valence][j] = An * cos(2 * PI  * j / valence)
+					+ U_TANGENT_PAIR_WEIGHTS[valence][prev]
+					+ U_TANGENT_PAIR_WEIGHTS[valence][next];
+				V_TANGENT_FACE_WEIGHTS[valence][j] = An * sin(2 * PI  * j / valence)
+					+ V_TANGENT_PAIR_WEIGHTS[valence][prev]
+					+ V_TANGENT_PAIR_WEIGHTS[valence][next];
 			}
 			
 			IRREGULAR_TANGENT_WEIGHTS[valence] = new double[valence];
