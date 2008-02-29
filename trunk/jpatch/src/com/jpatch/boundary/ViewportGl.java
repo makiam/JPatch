@@ -1250,8 +1250,12 @@ public class ViewportGl extends Viewport {
 					setMaterial(GL_FRONT, faceMaterial.getArray());
 					currentMaterial = faceMaterial;
 				}
-				face.getLimitSurface(buffer);
-				gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() * 2 + 2);
+				try {
+					face.getLimitSurface(buffer);
+					gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() * 2 + 2);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 //			System.out.println();
 		}
@@ -1405,10 +1409,8 @@ public class ViewportGl extends Viewport {
 			drawEdgeLimit(p, levelsToGo - 1, edge0, subEdges);
 			drawEdgeLimit(p, levelsToGo - 1, edge1, subEdges);
 		} else {
-			edge.getVertex().validateAlteredLimit();
 			edge.getVertex().getLimit(p);
 			gl.glVertex3d(p.x, p.y, p.z);
-			edge.getPairVertex().validateAlteredLimit();
 			edge.getPairVertex().getLimit(p);
 			gl.glVertex3d(p.x, p.y, p.z);
 		}

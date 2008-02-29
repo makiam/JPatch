@@ -232,25 +232,30 @@ public class JptLoader {
 //			sds.replaceFaces();
 //			sds.sortFaces();
 //			sds.validateVertices();
-//			Map<Point3d, Vector3d> compensationMap = new HashMap<Point3d, Vector3d>();
-//			for (TopLevelVertex vertex : sds.vertexList) {
-//				Vector3d v = new Vector3d();
-//				for (HalfEdge edge : vertex.edges) {
-//					v.add(edge.getSecondVertex().pos);
-//				}
-//				v.scale(-1.0 / vertex.edges.length);
-//				v.add(vertex.pos);
-//				v.scale(0.75);
-//				compensationMap.put(vertex.pos, v);
-//			}
-//			for (Point3d p : compensationMap.keySet()) {
-//				p.add(compensationMap.get(p));
-//			}
+			Map<AbstractVertex, Point3d> compensationMap = new HashMap<AbstractVertex, Point3d>();
+			Point3d p = new Point3d();
+			Point3d l = new Point3d();
+			
+			for (AbstractVertex vertex : sds.getVertices(0, false)) {
+				try {
+					vertex.getPosition(p);
+					vertex.getLimit(l);
+					p.scale(2.414);
+					l.scale(1.414);
+					p.sub(l);
+					compensationMap.put(vertex, new Point3d(p));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			for (AbstractVertex vertex : compensationMap.keySet()) {
+				vertex.setPosition(compensationMap.get(vertex));
+			}
 //			sds.makeSlates();
 //			sds.rethinkSlates();
 			
 //			System.out.println(sds.vertexList.size() + " top level, " + sds.level2Vertices.length + " level 2 vertices");
-			sds.dumpFaces(0);
+//			sds.dumpFaces(0);
 			return sds;
 			
 			

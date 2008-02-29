@@ -145,7 +145,7 @@ public class Sds {
 			edges[i] = getHalfEdge(editList, vertices[i], vertices[j]);
 		}
 		Face face = new Face(material, edges);
-		if (level == 0) System.out.println("adding face " + face);
+//		if (level == 0) System.out.println("adding face " + face);
 		AddFaceEdit addFaceEdit = new AddFaceEdit(level, face);
 		if (editList != null) {
 			editList.add(addFaceEdit);
@@ -286,6 +286,7 @@ public class Sds {
 	}
 	
 	public Iterable<? extends AbstractVertex> getVertices(final int level, final boolean includeStrayVertices) {
+		sortFaces();
 		return new Iterable<AbstractVertex>() {
 			public Iterator<AbstractVertex> iterator() {
 				return new Iterator<AbstractVertex>() {
