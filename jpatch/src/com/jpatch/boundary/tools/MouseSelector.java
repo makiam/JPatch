@@ -59,7 +59,8 @@ public class MouseSelector {
 		}
 	}
 	
-	public static HitObject getObjectAt(Viewport viewport, int mouseX, int mouseY, double maxDistSq, SdsModel sdsModel, int level, int type) {
+	public static HitObject getObjectAt(Viewport viewport, int mouseX, int mouseY, double initMaxDistSq, SdsModel sdsModel, int level, int type) {
+		double maxDistSq = initMaxDistSq;
 		HitObject hitObject = null;
 		viewport.getViewDef().configureTransformUtil(transformUtil);
 		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
@@ -110,14 +111,11 @@ public class MouseSelector {
 				pem.interpolate(p0, p1, 0.5);
 		
 				if(viewportGl.getDepthAt((int) pec.x, (int) pec.y) < pec.z) {
-					double distSq;
-					if ((type & Type.VERTEX) == 0) {
-						distSq = distSq(mouseX, mouseY, pec);
-					} else {
-						distSq = distSq(mouseX, mouseY, pem);
-					}
-					if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-						hitObject = new HitEdge(sdsModel, distSq, pem, edge.getPrimary());
+					double cDistSq = distSq(mouseX, mouseY, pec);
+					double mDistSq = distSq(mouseX, mouseY, pem);
+					
+					if ((hitObject != null && mDistSq < hitObject.distanceSq) || (hitObject == null && cDistSq < maxDistSq)) {
+						hitObject = new HitEdge(sdsModel, mDistSq, pem, edge.getPrimary());
 					}
 				}
 			}
@@ -130,7 +128,7 @@ public class MouseSelector {
 				vertices = sds.getVertices(level, (type & Type.STRAY_VERTEX) != 0);
 			}
 			for (AbstractVertex vertex : vertices) {
-				if ((type & Type.VERTEX) != 0) {
+				if ((type & (Type.VERTEX | Type.STRAY_VERTEX)) != 0) {
 					vertex.getPosition(p0);
 						
 					transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);

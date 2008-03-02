@@ -65,7 +65,6 @@ public class TweakTool implements VisibleTool {
 	}
 
 	private void highlightHitObject(ViewportGl viewport) {
-//		System.out.println("hitObject = " + hitObject + " distance = " + Math.sqrt(hitObject.distanceSq));
 		
 		GLAutoDrawable glDrawable = (GLAutoDrawable) viewport.getComponent();
 		glDrawable.getContext().makeCurrent();
@@ -76,74 +75,9 @@ public class TweakTool implements VisibleTool {
 		viewport.getViewDef().configureTransformUtil(transformUtil);
 		hitObject.node.getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
 		viewport.setModelViewMatrix(transformUtil);
-		
-//		gl.glEnable(GL_BLEND);
-//		gl.glDisable(GL_DEPTH_TEST);
-		
+			
 		viewport.drawSelection(hitSelection, new Color3f(1, 1, 0));
-//		gl.glColor4f(1, 1, 0, 1.0f);
-//		Point3d p = new Point3d();
-//		if (hitObject instanceof HitVertex) {
-//			HitVertex hitVertex = (HitVertex) hitObject;
-//			if (viewport.getViewDef().getShowControlMeshAttribute().getBoolean()) {
-//				hitVertex.vertex.getPosition(p);
-//			} else {
-//				hitVertex.vertex.getLimit(p);
-//			}
-//			gl.glPointSize(6.0f);
-//			gl.glBegin(GL_POINTS);
-//			gl.glVertex3d(p.x, p.y, p.z);
-//			gl.glEnd();
-//		} else if (hitObject instanceof HitEdge) {
-//			HitEdge hitEgde = (HitEdge) hitObject;
-//			gl.glLineWidth(3.0f);
-//			gl.glBegin(GL_LINES);
-//			hitEgde.halfEdge.getVertex().getPosition(p);
-//			gl.glVertex3d(p.x, p.y, p.z);
-//			hitEgde.halfEdge.getPairVertex().getPosition(p);
-//			gl.glVertex3d(p.x, p.y, p.z);
-//			gl.glEnd();
-//			gl.glPointSize(4.0f);
-//			gl.glBegin(GL_POINTS);
-//			hitEgde.halfEdge.getVertex().getPosition(p);
-//			gl.glVertex3d(p.x, p.y, p.z);
-//			hitEgde.halfEdge.getPairVertex().getPosition(p);
-//			gl.glVertex3d(p.x, p.y, p.z);
-//			gl.glEnd();
-//		} else if (hitObject instanceof HitFace) {
-//			HitFace hitFace = (HitFace) hitObject;
-//			gl.glColor4f(1, 1, 0, 1.0f);
-//			for (int pass = 0; pass < 2; pass++) {
-//				switch (pass) {
-//				case 0:
-//					gl.glColor4f(1, 1, 0, 0.5f);
-//					gl.glBegin(GL_TRIANGLE_FAN);
-//					hitFace.face.getMidpointPosition(p);
-//					gl.glVertex3d(p.x, p.y, p.z);
-//					break;
-//				case 1:
-//					gl.glLineWidth(2.0f);
-//					gl.glColor4f(1, 1, 0, 1.0f);
-//					gl.glBegin(GL_LINE_LOOP);
-//				}
-//				for (HalfEdge edge : hitFace.face.getEdges()) {
-//					edge.getVertex().getPosition(p);
-//					gl.glVertex3d(p.x, p.y, p.z);
-//				}
-//				hitFace.face.getEdges()[0].getVertex().getPosition(p);
-//				gl.glVertex3d(p.x, p.y, p.z);
-//				gl.glEnd();
-//			}
-//			gl.glPointSize(4.0f);
-//			hitFace.face.getMidpointPosition(p);
-//			gl.glBegin(GL_POINTS);
-//			gl.glVertex3d(p.x, p.y, p.z);
-//			gl.glEnd();
-//		}
-//		gl.glPointSize(3.0f);
-//		gl.glLineWidth(1.0f);
-//		gl.glDisable(GL_BLEND);
-//		gl.glEnable(GL_DEPTH_TEST);
+
 		glDrawable.swapBuffers();
 		glDrawable.getContext().release();
 	}
