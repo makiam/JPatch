@@ -73,13 +73,13 @@ public class Face {
 	}
 	
 	public void getMidpointPosition(Tuple3d midPoint) {
-		validateMidpointPosition();
-		midPoint.set(midpointPosition);
+		validateDisplacedMidpointPosition();
+		midPoint.set(displacedMidpointPosition);
 	}
 	
 	public void getMidpointNormal(Tuple3d midPoint) {
-		validateMidpointNormal();
-		midPoint.set(midpointNormal);
+		validateDisplacedMidpointNormal();
+		midPoint.set(displacedMidpointNormal);
 	}
 	
 //	public void setSubFace(int side, Face face) {
@@ -250,11 +250,11 @@ public class Face {
 		}
 		double x = 0, y = 0, z = 0;
 		for (HalfEdge edge : faceEdges) {
-			Point3d u = edge.getVertex().displacedPosition;
+			Point3d u = edge.getVertex().position;
 			double ux = u.x - midpointPosition.x;
 			double uy = u.y - midpointPosition.y;
 			double uz = u.z - midpointPosition.z;
-			Point3d v = edge.getPairVertex().displacedPosition;
+			Point3d v = edge.getPairVertex().position;
 			double vx = v.x - midpointPosition.x;
 			double vy = v.y - midpointPosition.y;
 			double vz = v.z - midpointPosition.z;
@@ -265,6 +265,29 @@ public class Face {
 		midpointNormal.set(x, y, z);
 		midpointNormal.normalize();
 		midpointNormalValid = true;
+	}
+	
+	void validateDisplacedMidpointNormal() {
+		if (displacedMidpointNormalValid) {
+			return;
+		}
+		double x = 0, y = 0, z = 0;
+		for (HalfEdge edge : faceEdges) {
+			Point3d u = edge.getVertex().displacedPosition;
+			double ux = u.x - displacedMidpointPosition.x;
+			double uy = u.y - displacedMidpointPosition.y;
+			double uz = u.z - displacedMidpointPosition.z;
+			Point3d v = edge.getPairVertex().displacedPosition;
+			double vx = v.x - displacedMidpointPosition.x;
+			double vy = v.y - displacedMidpointPosition.y;
+			double vz = v.z - displacedMidpointPosition.z;
+			x += uy * vz - uz * vy;		// cross product
+			y += uz * vx - ux * vz;
+			z += ux * vy - uy * vx;
+		}
+		displacedMidpointNormal.set(x, y, z);
+		displacedMidpointNormal.normalize();
+		displacedMidpointNormalValid = true;
 	}
 	
 //	public void invalidateAltered() {

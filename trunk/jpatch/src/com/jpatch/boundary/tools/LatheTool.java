@@ -5,11 +5,14 @@ import java.awt.event.*;
 import java.util.*;
 
 import javax.media.opengl.*;
+
 import static javax.media.opengl.GL.*;
 
+import javax.swing.*;
 import javax.vecmath.*;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.control.*;
 import com.jpatch.afw.ui.*;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.boundary.*;
@@ -45,6 +48,16 @@ public class LatheTool implements VisibleTool {
 	
 	private int mouseX, mouseY;
 	private boolean latheValid;
+	
+	private HitObject hitObject;
+	private Selection hitSelection = new Selection();
+	private boolean drag;
+	private boolean wasDragged;
+	
+	private Point hitPoint;
+	private Point3d localStart = new Point3d();
+	
+	private TransformUtil transformUtil = new TransformUtil();
 	
 	private final AttributePostChangeListener latheInvalidationListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
@@ -139,7 +152,6 @@ public class LatheTool implements VisibleTool {
 	}
 	
 	private void highlight(ViewportGl viewport) {
-//		System.out.println("hitObject = " + hitObject + " distance = " + Math.sqrt(hitObject.distanceSq));
 		
 		GLAutoDrawable glDrawable = (GLAutoDrawable) viewport.getComponent();
 		glDrawable.getContext().makeCurrent();
@@ -147,96 +159,117 @@ public class LatheTool implements VisibleTool {
 		viewport.validateScreenShotTexture();
 		viewport.drawScreenShot(0, 0, glDrawable.getWidth(), glDrawable.getHeight(), 1.0f);
 		viewport.spatialMode();
-		viewport.setModelViewMatrix(Main.getInstance().getSelection().getNode());
-		gl.glDepthMask(false);
 		
-		gl.glDisable(GL_LIGHTING);
-		gl.glColor3f(0.5f, 0.5f, 1.0f);
-		gl.glLineWidth(2);
-		if (chain != null) {
+		if (hitObject != null) {
 			
-			Point3d p = new Point3d();
-			gl.glBegin(GL_LINE_STRIP);
-			for (BaseVertex vertex : chain) {
-				vertex.getPosition(p);
-				gl.glVertex3d(p.x, p.y, p.z);
-			}
-			gl.glEnd();
+			viewport.setModelViewMatrix(Main.getInstance().getSelection().getNode());
+			gl.glDisable(GL_DEPTH_TEST);
+			gl.glDepthMask(false);
 			
-			computeLathedVertices();
-			
-			int segments = getSegmentCount();
-			int points = chain.length;
-			
-			gl.glEnable(GL_BLEND);
-			gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			gl.glColor4f(0.5f, 0.5f, 1.0f, 0.25f);
-			gl.glLineWidth(1);
-			for (int i = 0; i < segments; i++) {
-				gl.glBegin(GL_LINE_STRIP);
-				for(int j = 0; j < points; j++) {
-					gl.glVertex3d(lathedPoints[i][j].x, lathedPoints[i][j].y, lathedPoints[i][j].z);
-				}
-				gl.glEnd();
-			}
-			for (int i = 0; i < points; i++) {
-				gl.glBegin(GL_LINE_STRIP);
-				for(int j = 0; j < segments; j++) {
-					gl.glVertex3d(lathedPoints[j][i].x, lathedPoints[j][i].y, lathedPoints[j][i].z);
-				}
-				gl.glEnd();
-			}
-			
-			gl.glEnable(GL_LIGHTING);
-			
-			latheMaterial.applyMaterial(gl, GL_FRONT_AND_BACK);
-			Vector3d u = new Vector3d();
-			Vector3d v = new Vector3d();
-			Vector3d normal = new Vector3d();
-			gl.glBegin(GL_QUADS);
-			for (int segment = 0; segment < segments - 1; segment++) {
-//				if (angleAttr.getDouble() != 360 && segment == segments - 1) {
-//					break;
-//				}
-				for (int i = 0; i < points - 1; i++) {
-					Point3d p0 = lathedPoints[segment][i];
-					Point3d p1 = lathedPoints[segment + 1][i];
-					Point3d p2 = lathedPoints[segment + 1][i + 1];
-					Point3d p3 = lathedPoints[segment][i + 1];
-					if (!p0.equals(p1)) {
-						u.sub(p1, p0);
-					} else {
-						u.sub(p2, p0);
-					}
-					if (!p0.equals(p3)) {
-						v.sub(p3, p0);
-					} else {
-						v.sub(p2, p0);
-					}
-					normal.cross(u, v);
-					normal.normalize();
-					gl.glNormal3d(normal.x, normal.y, normal.z);	
-					gl.glVertex3d(p0.x, p0.y, p0.z);
-					gl.glVertex3d(p1.x, p1.y, p1.z);
-					gl.glVertex3d(p2.x, p2.y, p2.z);
-					gl.glVertex3d(p3.x, p3.y, p3.z);
-				}
-			}
-			gl.glEnd();
-			gl.glDisable(GL_BLEND);
+			viewport.getViewDef().configureTransformUtil(transformUtil);
+			hitObject.node.getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+			viewport.setModelViewMatrix(transformUtil);
+				
+			viewport.drawSelection(hitSelection, new Color3f(0.5f, 0.5f, 1.0f));
+	
 			gl.glDisable(GL_LIGHTING);
-			viewport.rasterMode();
-			viewport.drawString("click to lathe", mouseX, mouseY);
-			viewport.spatialMode();
+			gl.glColor3f(0.5f, 0.5f, 1.0f);
+			gl.glLineWidth(1);
+			if (chain != null) {
+				
+				Point3d p = new Point3d();
+				gl.glBegin(GL_LINE_STRIP);
+				for (BaseVertex vertex : chain) {
+					vertex.getPosition(p);
+					gl.glVertex3d(p.x, p.y, p.z);
+				}
+				gl.glEnd();
+				
+				computeLathedVertices();
+				
+				int segments = getSegmentCount();
+				int points = chain.length;
+				
+				gl.glEnable(GL_BLEND);
+				gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				gl.glColor4f(0.5f, 0.5f, 1.0f, 0.25f);
+				gl.glLineWidth(1);
+				for (int i = 0; i < segments; i++) {
+					gl.glBegin(GL_LINE_STRIP);
+					for(int j = 0; j < points; j++) {
+						gl.glVertex3d(lathedPoints[i][j].x, lathedPoints[i][j].y, lathedPoints[i][j].z);
+					}
+					gl.glEnd();
+				}
+				for (int i = 0; i < points; i++) {
+					gl.glBegin(GL_LINE_STRIP);
+					for(int j = 0; j < segments; j++) {
+						gl.glVertex3d(lathedPoints[j][i].x, lathedPoints[j][i].y, lathedPoints[j][i].z);
+					}
+					gl.glEnd();
+				}
+				
+				gl.glEnable(GL_LIGHTING);
+				
+				latheMaterial.applyMaterial(gl, GL_FRONT_AND_BACK);
+				Vector3d u = new Vector3d();
+				Vector3d v = new Vector3d();
+				Vector3d normal = new Vector3d();
+				gl.glBegin(GL_QUADS);
+				for (int segment = 0; segment < segments - 1; segment++) {
+	//				if (angleAttr.getDouble() != 360 && segment == segments - 1) {
+	//					break;
+	//				}
+					for (int i = 0; i < points - 1; i++) {
+						Point3d p0 = lathedPoints[segment][i];
+						Point3d p1 = lathedPoints[segment + 1][i];
+						Point3d p2 = lathedPoints[segment + 1][i + 1];
+						Point3d p3 = lathedPoints[segment][i + 1];
+						if (!p0.equals(p1)) {
+							u.sub(p1, p0);
+						} else {
+							u.sub(p2, p0);
+						}
+						if (!p0.equals(p3)) {
+							v.sub(p3, p0);
+						} else {
+							v.sub(p2, p0);
+						}
+						normal.cross(u, v);
+						normal.normalize();
+						gl.glNormal3d(normal.x, normal.y, normal.z);	
+						gl.glVertex3d(p0.x, p0.y, p0.z);
+						gl.glVertex3d(p1.x, p1.y, p1.z);
+						gl.glVertex3d(p2.x, p2.y, p2.z);
+						gl.glVertex3d(p3.x, p3.y, p3.z);
+					}
+				}
+				gl.glEnd();
+				gl.glDisable(GL_BLEND);
+				gl.glDisable(GL_LIGHTING);
+				if (!drag) {
+					viewport.rasterMode();
+					viewport.drawString("click to lathe", mouseX, mouseY);
+					viewport.spatialMode();
+				}
+			}
+			gl.glLineWidth(1);
+			
+			
+			gl.glEnable(GL_DEPTH_TEST);
+			gl.glDepthMask(true);
 		}
-		gl.glLineWidth(1);
-		
-		
-		
-		gl.glDepthMask(true);
 		gl.glFlush();
 		glDrawable.swapBuffers();
 		glDrawable.getContext().release();
+	}
+	
+	private void updateSelection(Selection selection, HitObject hitObject) {
+		if (hitObject instanceof MouseSelector.HitVertex) {
+			selection.setVertex(((HitVertex) hitObject).vertex, null);
+		} else if (hitObject instanceof MouseSelector.HitEdge) {
+			selection.setEdge(((HitEdge) hitObject).halfEdge, null);
+		} 
 	}
 	
 	private class LatheMouseListener extends MouseAdapter {
@@ -248,30 +281,83 @@ public class LatheTool implements VisibleTool {
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
-			if (e.getButton() != MouseEvent.BUTTON1) {
+			if (hitObject == null) {
 				return;
 			}
-			computeLathedVertices();
-			Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
-			Operations.lathe(sds, lathedPoints, null);
-			HalfEdge strayEdge = startEdge;
-			while (strayEdge != null) {
-				HalfEdge nextEdge = sds.getNextStrayEdge(strayEdge);
-				sds.removeStrayEdge(null, strayEdge);
-				strayEdge = nextEdge;
+			if (e.getButton() == MouseEvent.BUTTON1) {
+				snapPointer(viewport);
+				Selection selection = Main.getInstance().getSelection();
+				updateSelection(selection, hitObject);
+				selection.getTransformable().begin();
+				drag = true;
+				wasDragged = false;
+				localStart.set(hitObject.screenPosition);
+				transformUtil.projectFromScreen(TransformUtil.LOCAL, localStart, localStart);
 			}
-			Main.getInstance().repaintViewports();
-			startEdge = null;
-			chain = null;
-			latheValid = false;
 		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			if (wasDragged && e.getButton() == MouseEvent.BUTTON1) {
+				Selection selection = Main.getInstance().getSelection();
+				selection.getTransformable().end(new ArrayList<JPatchUndoableEdit>());
+				Main.getInstance().getSelection().clear(null);
+				Main.getInstance().repaintViewports();
+				drag = false;
+			} else {
+				computeLathedVertices();
+				Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
+				Operations.lathe(sds, lathedPoints, null);
+				HalfEdge strayEdge = startEdge;
+				while (strayEdge != null) {
+					HalfEdge nextEdge = sds.getNextStrayEdge(strayEdge);
+					sds.removeStrayEdge(null, strayEdge);
+					strayEdge = nextEdge;
+					if (strayEdge == startEdge) {
+						break;
+					}
+				}
+				Main.getInstance().repaintViewports();
+				startEdge = null;
+				chain = null;
+				latheValid = false;
+			}
+		}		
+		
+//		@Override
+//		public void mouseClicked(MouseEvent e) {
+//			if (e.getButton() != MouseEvent.BUTTON1) {
+//				return;
+//			}
+//			
+//		}
 	}
 	
 	private class LatheMouseMotionListener extends MouseMotionAdapter {
 		private final ViewportGl viewport;
+		Point3d mouse = new Point3d();
+		Vector3d vector = new Vector3d();
 		
 		LatheMouseMotionListener(ViewportGl viewport) {
 			this.viewport = viewport;
+		}
+		
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			if (drag) {
+				if (hitPoint != null && hitPoint.x == e.getX() && hitPoint.y == e.getY()) {
+					hitPoint = null;
+					return;
+				}
+				mouse.set(e.getX(), e.getY(), hitObject.screenPosition.z);
+				transformUtil.projectFromScreen(TransformUtil.LOCAL, mouse, mouse);
+				vector.sub(mouse, localStart);
+				Selection selection = Main.getInstance().getSelection();
+				selection.getTransformable().translate(vector);
+//				Main.getInstance().syncRepaintViewport(viewport);
+				highlight(viewport);
+				wasDragged = true;
+			}
 		}
 		
 		@Override
@@ -279,15 +365,46 @@ public class LatheTool implements VisibleTool {
 			mouseX = e.getX();
 			mouseY = e.getY();
 			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
-			HitEdge hitEdge = (HitEdge) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, Sds.Type.STRAY_EDGE);
-			if (hitEdge == null) {
-				chain = null;
-			} else {
-				Sds sds = sdsModel.getSds();
-				startEdge = sds.getStart(hitEdge.halfEdge);
-				chain = sds.getChain((BaseVertex) startEdge.getVertex());
+//			HitEdge hitEdge = (HitEdge) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, Sds.Type.STRAY_EDGE);
+//			if (hitEdge == null) {
+//				chain = null;
+//			} else {
+//				Sds sds = sdsModel.getSds();
+//				startEdge = sds.getStart(hitEdge.halfEdge);
+//				chain = sds.getChain((BaseVertex) startEdge.getVertex());
+//			}
+//			highlight(viewport);
+			
+			Sds sds = sdsModel.getSds();
+			
+			if (sdsModel != null) {
+				int level = sdsModel.getEditLevelAttribute().getInt();
+				int selectionType = Sds.Type.STRAY_VERTEX | Sds.Type.STRAY_EDGE;
+				hitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, level, selectionType);
+				if (hitObject != null) {
+					
+						HalfEdge hitEdge = null;
+						if (hitObject instanceof HitVertex) {
+							hitEdge = ((HitVertex) hitObject).vertex.getEdges()[0];
+						} else {
+							hitEdge = ((HitEdge) hitObject).halfEdge;
+						}
+						updateSelection(hitSelection, hitObject);
+						startEdge = sds.getStart(hitEdge);
+						chain = sds.getChain((BaseVertex) startEdge.getVertex());
+					
+				} else {
+					chain = null;
+				}
 			}
 			highlight(viewport);
 		}
+	}
+	
+	private void snapPointer(Viewport viewport) {
+		Point point = new Point((int) Math.round(hitObject.screenPosition.x), (int) Math.round(hitObject.screenPosition.y));
+		hitPoint = new Point(point);
+		SwingUtilities.convertPointToScreen(point, viewport.getComponent());
+		Main.getInstance().getRobot().mouseMove(point.x, point.y);
 	}
 }
