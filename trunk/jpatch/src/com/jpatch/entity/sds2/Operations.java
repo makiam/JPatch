@@ -10,7 +10,7 @@ import javax.vecmath.*;
 
 public class Operations {
 	
-	public static void lathe(Sds sds, Point3d[][] lathedPoints, List<JPatchUndoableEdit> editList) {
+	public static void lathe(Sds sds, Point3d[][] lathedPoints, BaseVertex[][] lathedVertices, Material material, List<JPatchUndoableEdit> editList) {
 		Map<Point3d, BaseVertex> vertexMap = new HashMap<Point3d, BaseVertex>();
 		for (Point3d[] segment : lathedPoints) {
 			for (Point3d point : segment) {
@@ -19,19 +19,22 @@ public class Operations {
 				}
 			}
 		}
-		for (Point3d[] segment : lathedPoints) {
-			for (Point3d point : segment) {
-				System.out.println(point + " => " + vertexMap.get(point));
-			}
-		}
+//		for (Point3d[] segment : lathedPoints) {
+//			for (Point3d point : segment) {
+//				System.out.println(point + " => " + vertexMap.get(point));
+//			}
+//		}
 		int points = lathedPoints[0].length;
-		Material material = Main.getInstance().getDefaultMaterial();
 		for (int segment = 0; segment < lathedPoints.length - 1; segment++) {
 			for (int i = 0; i < points - 1; i++) {
 				BaseVertex v0 = vertexMap.get(lathedPoints[segment][i]);
 				BaseVertex v1 = vertexMap.get(lathedPoints[segment][i + 1]);
 				BaseVertex v2 = vertexMap.get(lathedPoints[segment + 1][i + 1]);
 				BaseVertex v3 = vertexMap.get(lathedPoints[segment + 1][i]);
+				lathedVertices[segment][i] = v0;
+				lathedVertices[segment][i + 1] = v1;
+				lathedVertices[segment + 1][i + 1] = v2;
+				lathedVertices[segment + 1][i] = v3;
 				if (v0 == v3) {
 					sds.addFace(editList, 0, material, v0, v1, v2);
 				} else if (v1 == v2) {

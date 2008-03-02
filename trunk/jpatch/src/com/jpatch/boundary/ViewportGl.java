@@ -1232,7 +1232,7 @@ public class ViewportGl extends Viewport {
 //		gl.glPopMatrix();
 	}
 	
-	private void drawSds2(com.jpatch.entity.sds2.Sds sds, int level) {
+	public void drawSds2(com.jpatch.entity.sds2.Sds sds, int level) {
 //		transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
 		
 		GL gl = drawable.getGL();
