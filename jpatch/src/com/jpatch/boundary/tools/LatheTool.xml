@@ -5,4 +5,6 @@
 	<slider name="Epsilon" attribute="Epsilon" mapping="exponential"/>
 	<slider name="Angle" attribute="Angle" />
 	<slider name="Segments" attribute="Segments" />
+	<boolean display="switch" false="mesh" true="limit" />
+	<field name="Preview" attribute="PreviewLimit" />
 </attributeEditor>

@@ -21,9 +21,9 @@ import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
 public class LatheTool implements VisibleTool {
-	private static final GlMaterial latheMaterial = new GlMaterial(
+	private static final BasicMaterial latheMaterial = new BasicMaterial(
 		new Color4f(0, 0, 0, 0),
-		new Color4f(0.5f, 0.5f, 1.0f, 0.25f),
+		new Color4f(0.5f, 0.5f, 1.0f, 0.33f),
 		new Color4f(0, 0, 0, 0),
 		new Color4f(0, 0, 0, 0),
 		10
@@ -40,6 +40,7 @@ public class LatheTool implements VisibleTool {
 	private final DoubleAttr epsilonAttr = AttributeManager.getInstance().createBoundedDoubleAttr(0.1, 0.001, 100);
 	private final IntAttr segmentsAttr = AttributeManager.getInstance().createBoundedIntAttr(8, 3, 32);
 	private final DoubleAttr angleAttr = AttributeManager.getInstance().createBoundedDoubleAttr(360, 0.0, 360);
+	private final BooleanAttr previewLimitAttr = new BooleanAttr(true);
 	
 	private HalfEdge lastStartEdge;
 	private HalfEdge startEdge;
@@ -58,6 +59,13 @@ public class LatheTool implements VisibleTool {
 	private Point3d localStart = new Point3d();
 	
 	private TransformUtil transformUtil = new TransformUtil();
+	
+	private Sds lathedSds;
+	private BaseVertex[][] lathedVertices = new BaseVertex[0][0];
+	private boolean snapFirstPoint;
+	private boolean snapLastPoint;
+	private boolean lastSnapFirstPoint;
+	private boolean lastSnapLastPoint;
 	
 	private final AttributePostChangeListener latheInvalidationListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
@@ -93,6 +101,10 @@ public class LatheTool implements VisibleTool {
 		return angleAttr;
 	}
 	
+	public BooleanAttr getPreviewLimitAttribute() {
+		return previewLimitAttr;
+	}
+	
 	public void draw(Viewport viewport) {
 		
 	}
@@ -123,10 +135,12 @@ public class LatheTool implements VisibleTool {
 		boolean reuse = true;
 		if (lathedPoints.length != getSegmentCount()) {
 			lathedPoints = new Point3d[getSegmentCount()][chain.length];
+			lathedVertices = new BaseVertex[getSegmentCount()][chain.length];
 			reuse = false;
 		}
 		if (lathedPoints[0].length != chain.length) {
 			lathedPoints = new Point3d[getSegmentCount()][chain.length];
+			lathedVertices = new BaseVertex[getSegmentCount()][chain.length];
 			reuse = false;
 		}
 		if (!reuse) {
@@ -135,20 +149,39 @@ public class LatheTool implements VisibleTool {
 					p[i] = new Point3d();
 				}
 			}
+			for (BaseVertex[] v : lathedVertices) {
+				for (int i = 0; i < v.length; i++) {
+					v[i] = new BaseVertex();
+				}
+			}
 		}
-		if (true || lastStartEdge != startEdge || !reuse || !latheValid) {
-			Operations.getLathedVertices(
-					Main.getInstance().getSelection().getSdsModel().getSds(),
-					chain,
-					axisStart,
-					axisEnd,
-					epsilonAttr.getDouble(),
-					angleAttr.getDouble(),
-					lathedPoints
-				);
-			lastStartEdge = startEdge;
-			latheValid = true;
+		
+		Operations.getLathedVertices(
+				Main.getInstance().getSelection().getSdsModel().getSds(),
+				chain,
+				axisStart,
+				axisEnd,
+				epsilonAttr.getDouble(),
+				angleAttr.getDouble(),
+				lathedPoints
+			);
+		
+		
+		if (lastStartEdge != startEdge || lastSnapFirstPoint != snapFirstPoint || lastSnapLastPoint != snapLastPoint) {
+			lathedSds = new Sds(null);
+			Operations.lathe(lathedSds, lathedPoints, lathedVertices, latheMaterial, null);
+		} else {
+			for (int i = 0; i < lathedPoints.length; i++) {
+				for (int j = 0; j < lathedPoints[i].length; j++) {
+					lathedVertices[i][j].setPosition(lathedPoints[i][j]);
+				}
+			}
 		}
+		
+		lastStartEdge = startEdge;
+		latheValid = true;
+		
+		
 	}
 	
 	private void highlight(ViewportGl viewport) {
@@ -192,64 +225,81 @@ public class LatheTool implements VisibleTool {
 				
 				gl.glEnable(GL_BLEND);
 				gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				gl.glColor4f(0.5f, 0.5f, 1.0f, 0.25f);
-				gl.glLineWidth(1);
-				for (int i = 0; i < segments; i++) {
-					gl.glBegin(GL_LINE_STRIP);
-					for(int j = 0; j < points; j++) {
-						gl.glVertex3d(lathedPoints[i][j].x, lathedPoints[i][j].y, lathedPoints[i][j].z);
-					}
-					gl.glEnd();
-				}
-				for (int i = 0; i < points; i++) {
-					gl.glBegin(GL_LINE_STRIP);
-					for(int j = 0; j < segments; j++) {
-						gl.glVertex3d(lathedPoints[j][i].x, lathedPoints[j][i].y, lathedPoints[j][i].z);
-					}
-					gl.glEnd();
-				}
 				
+				if (!previewLimitAttr.getBoolean()) {
+					gl.glColor4f(0.5f, 0.5f, 1.0f, 0.25f);
+					gl.glLineWidth(1);
+					for (int i = 0; i < segments; i++) {
+						gl.glBegin(GL_LINE_STRIP);
+						for(int j = 0; j < points; j++) {
+							gl.glVertex3d(lathedPoints[i][j].x, lathedPoints[i][j].y, lathedPoints[i][j].z);
+						}
+						gl.glEnd();
+					}
+					for (int i = 0; i < points; i++) {
+						gl.glBegin(GL_LINE_STRIP);
+						for(int j = 0; j < segments; j++) {
+							gl.glVertex3d(lathedPoints[j][i].x, lathedPoints[j][i].y, lathedPoints[j][i].z);
+						}
+						gl.glEnd();
+					}
+				}
 				gl.glEnable(GL_LIGHTING);
 				
-				latheMaterial.applyMaterial(gl, GL_FRONT_AND_BACK);
-				Vector3d u = new Vector3d();
-				Vector3d v = new Vector3d();
-				Vector3d normal = new Vector3d();
-				gl.glBegin(GL_QUADS);
-				for (int segment = 0; segment < segments - 1; segment++) {
-	//				if (angleAttr.getDouble() != 360 && segment == segments - 1) {
-	//					break;
-	//				}
-					for (int i = 0; i < points - 1; i++) {
-						Point3d p0 = lathedPoints[segment][i];
-						Point3d p1 = lathedPoints[segment + 1][i];
-						Point3d p2 = lathedPoints[segment + 1][i + 1];
-						Point3d p3 = lathedPoints[segment][i + 1];
-						if (!p0.equals(p1)) {
-							u.sub(p1, p0);
-						} else {
-							u.sub(p2, p0);
+				latheMaterial.getGlMaterial().applyMaterial(gl, GL_FRONT_AND_BACK);
+				
+				if (!previewLimitAttr.getBoolean()) {
+					Vector3d u = new Vector3d();
+					Vector3d v = new Vector3d();
+					Vector3d normal = new Vector3d();
+					gl.glBegin(GL_QUADS);
+					for (int segment = 0; segment < segments - 1; segment++) {
+		//				if (angleAttr.getDouble() != 360 && segment == segments - 1) {
+		//					break;
+		//				}
+						for (int i = 0; i < points - 1; i++) {
+							Point3d p0 = lathedPoints[segment][i];
+							Point3d p1 = lathedPoints[segment + 1][i];
+							Point3d p2 = lathedPoints[segment + 1][i + 1];
+							Point3d p3 = lathedPoints[segment][i + 1];
+							if (!p0.equals(p1)) {
+								u.sub(p1, p0);
+							} else {
+								u.sub(p2, p0);
+							}
+							if (!p0.equals(p3)) {
+								v.sub(p3, p0);
+							} else {
+								v.sub(p2, p0);
+							}
+							normal.cross(u, v);
+							normal.normalize();
+							gl.glNormal3d(normal.x, normal.y, normal.z);	
+							gl.glVertex3d(p0.x, p0.y, p0.z);
+							gl.glVertex3d(p1.x, p1.y, p1.z);
+							gl.glVertex3d(p2.x, p2.y, p2.z);
+							gl.glVertex3d(p3.x, p3.y, p3.z);
 						}
-						if (!p0.equals(p3)) {
-							v.sub(p3, p0);
-						} else {
-							v.sub(p2, p0);
-						}
-						normal.cross(u, v);
-						normal.normalize();
-						gl.glNormal3d(normal.x, normal.y, normal.z);	
-						gl.glVertex3d(p0.x, p0.y, p0.z);
-						gl.glVertex3d(p1.x, p1.y, p1.z);
-						gl.glVertex3d(p2.x, p2.y, p2.z);
-						gl.glVertex3d(p3.x, p3.y, p3.z);
 					}
+					gl.glEnd();
+				} else {
+					ViewDef viewDef = viewport.getViewDef();
+					boolean showMesh = viewDef.getShowControlMeshAttribute().getBoolean();
+					boolean showLimit = viewDef.getShowLimitSurfaceAttribute().getBoolean();
+					boolean showProjectedMesh = viewDef.getShowProjectedMeshAttribute().getBoolean();
+					viewDef.getShowControlMeshAttribute().setBoolean(false);
+					viewDef.getShowLimitSurfaceAttribute().setBoolean(true);
+					viewDef.getShowProjectedMeshAttribute().setBoolean(true);
+					viewport.drawSds2(lathedSds, 1);
+					viewDef.getShowControlMeshAttribute().setBoolean(showMesh);
+					viewDef.getShowLimitSurfaceAttribute().setBoolean(showLimit);
+					viewDef.getShowProjectedMeshAttribute().setBoolean(showProjectedMesh);
 				}
-				gl.glEnd();
 				gl.glDisable(GL_BLEND);
 				gl.glDisable(GL_LIGHTING);
 				if (!drag) {
 					viewport.rasterMode();
-					viewport.drawString("click to lathe", mouseX, mouseY);
+					viewport.drawString("doubleclick to lathe", mouseX, mouseY);
 					viewport.spatialMode();
 				}
 			}
@@ -298,29 +348,31 @@ public class LatheTool implements VisibleTool {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			if (wasDragged && e.getButton() == MouseEvent.BUTTON1) {
-				Selection selection = Main.getInstance().getSelection();
-				selection.getTransformable().end(new ArrayList<JPatchUndoableEdit>());
-				Main.getInstance().getSelection().clear(null);
-				Main.getInstance().repaintViewports();
-				drag = false;
-			} else {
-				computeLathedVertices();
-				Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
-				Operations.lathe(sds, lathedPoints, null);
-				HalfEdge strayEdge = startEdge;
-				while (strayEdge != null) {
-					HalfEdge nextEdge = sds.getNextStrayEdge(strayEdge);
-					sds.removeStrayEdge(null, strayEdge);
-					strayEdge = nextEdge;
-					if (strayEdge == startEdge) {
-						break;
+			if (e.getButton() == MouseEvent.BUTTON1 && chain != null) {
+				if (wasDragged) {
+					Selection selection = Main.getInstance().getSelection();
+					selection.getTransformable().end(new ArrayList<JPatchUndoableEdit>());
+					Main.getInstance().getSelection().clear(null);
+					Main.getInstance().repaintViewports();
+					drag = false;
+				} else if (e.getClickCount() == 2){
+					computeLathedVertices();
+					Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
+					Operations.lathe(sds, lathedPoints, lathedVertices, Main.getInstance().getDefaultMaterial(), null);
+					HalfEdge strayEdge = startEdge;
+					while (strayEdge != null) {
+						HalfEdge nextEdge = sds.getNextStrayEdge(strayEdge);
+						sds.removeStrayEdge(null, strayEdge);
+						strayEdge = nextEdge;
+						if (strayEdge == startEdge) {
+							break;
+						}
 					}
+					Main.getInstance().repaintViewports();
+					startEdge = null;
+					chain = null;
+					latheValid = false;
 				}
-				Main.getInstance().repaintViewports();
-				startEdge = null;
-				chain = null;
-				latheValid = false;
 			}
 		}		
 		
@@ -385,7 +437,8 @@ public class LatheTool implements VisibleTool {
 					
 						HalfEdge hitEdge = null;
 						if (hitObject instanceof HitVertex) {
-							hitEdge = ((HitVertex) hitObject).vertex.getEdges()[0];
+							AbstractVertex v = ((HitVertex) hitObject).vertex;
+							hitEdge = v.getEdges()[v.getEdges().length - 1];
 						} else {
 							hitEdge = ((HitEdge) hitObject).halfEdge;
 						}

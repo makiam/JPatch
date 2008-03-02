@@ -57,7 +57,9 @@ public class Sds {
 				// add or remove faces on new (old) levels
 				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
 				setMaxLevel(editList);
-				undoManager.addEdit("Change subdivision level", editList);
+				if (undoManager != null) {
+					undoManager.addEdit("Change subdivision level", editList);
+				}
 			}
 		});
 		
