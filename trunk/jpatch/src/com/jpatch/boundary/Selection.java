@@ -489,18 +489,18 @@ public class Selection {
 		
 		public State(Selection selection) {
 			type = selection.type;
-			System.out.println("type=" + type);
+//			System.out.println("type=" + type);
 			switch(type) {
 			case NODE:
 				selectedEntities = selection.nodeAttr.getValue();
 				break;
 			case EDGES:
 				selection.validateEdges();
-				selectedEntities = selection.edges.toArray();
+				selectedEntities = selection.edges.toArray(new HalfEdge[selection.edges.size()]);
 				break;
 			case FACES:
 				selection.validateFaces();
-				selectedEntities = selection.faces.toArray();
+				selectedEntities = selection.faces.toArray(new Face[selection.faces.size()]);
 				break;
 			case VERTICES:
 				selection.validateVertices();

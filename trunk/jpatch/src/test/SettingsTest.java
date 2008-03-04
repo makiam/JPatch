@@ -1,5 +1,6 @@
 package test;
 
+import java.awt.*;
 import java.util.Enumeration;
 
 import javax.swing.UIDefaults;
@@ -18,10 +19,15 @@ public class SettingsTest {
 //		System.out.println(uiDefaults);
 		Enumeration e = uiDefaults.keys();
 		while (e.hasMoreElements()) {
-			String key = (String) e.nextElement();
-			if (key.endsWith(".border")) {
+			Object key = e.nextElement();
+//			if (key.endsWith(".border")) {
+			if (key instanceof String && ((String) key).toLowerCase().contains("double")) {
 				System.out.println(key + " => " + uiDefaults.get(key));
 			}
+		}
+		
+		for (Object key : System.getProperties().keySet()) {
+			System.out.println(key + " => " + System.getProperty(key.toString()));
 		}
 	}
 }

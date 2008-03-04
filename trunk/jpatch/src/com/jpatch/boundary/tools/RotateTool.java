@@ -135,7 +135,7 @@ public class RotateTool implements ModifierTool, VisibleTool {
 			gl.glEnd();
 		}
 		gl.glColorMask(true, true, true, true);			// enable rendering into the color buffer
-		gl.glDepthFunc(GL_LEQUAL);						// normal depth test operation
+		gl.glDepthFunc(GL_LESS);						// normal depth test operation
 		
 		/*
 		 * draw RGB circles

@@ -173,6 +173,7 @@ public class HalfEdge {
 		private HalfEdge next = HalfEdge.this.next;
 		private HalfEdge prev = HalfEdge.this.next;
 		private Face face = HalfEdge.this.face;
+//		private Face pairFace = HalfEdge.this.pair.face;
 		private int faceEdgeIndex = HalfEdge.this.faceEdgeIndex;
 		private int boundaryType = HalfEdge.this.boundaryType;
 		
@@ -190,6 +191,7 @@ public class HalfEdge {
 			tmpEdge = HalfEdge.this.next; HalfEdge.this.next = next; next = tmpEdge;
 			tmpEdge = HalfEdge.this.prev; HalfEdge.this.prev = prev; prev = tmpEdge;
 			tmpFace = HalfEdge.this.face; HalfEdge.this.face = face; face = tmpFace;
+//			tmpFace = HalfEdge.this.pair.face; HalfEdge.this.pair.face = pairFace; pairFace = tmpFace;
 			tmpInt = HalfEdge.this.faceEdgeIndex; HalfEdge.this.faceEdgeIndex = faceEdgeIndex; faceEdgeIndex = tmpInt;
 			tmpInt = HalfEdge.this.boundaryType; HalfEdge.this.boundaryType = boundaryType; boundaryType = tmpInt;
 		}

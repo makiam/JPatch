@@ -421,6 +421,10 @@ public abstract class AbstractVertex {
 					HalfEdge edge = vertexEdges[i];
 			
 					Face face = edge.getPairFace();
+//					if (face == null) {
+//						System.err.println("no pair face!!!");
+//						break; // FIXME
+//					}
 					face.validateDisplacedMidpointPosition();
 					Point3d faceMidpoint = face.displacedMidpointPosition;
 					
@@ -541,11 +545,15 @@ public abstract class AbstractVertex {
 		private BoundaryType boundaryType = AbstractVertex.this.boundaryType;
 		
 		private SaveEdgesEdit() {
-			apply(true);
+			apply(false);
+//			System.out.print("    SaveEdgesEdit created: " + AbstractVertex.this + " edges are:");
+//			dumpEdges();
+//			System.out.println();
 		}
 		
 		@Override
 		protected void swap() {
+//			System.out.print("      " + AbstractVertex.this + " was "); dumpEdges();
 			HalfEdge[] tmpEdges = vertexEdges.clone();
 			vertexEdges = edges;
 			edges = tmpEdges;
@@ -554,6 +562,11 @@ public abstract class AbstractVertex {
 			boundaryType = tmpBoundaryType;
 			positionValid = true;
 			invalidate();
+//			System.out.print(" is now "); dumpEdges();System.out.println();
+		}
+		
+		private void dumpEdges() {
+			for (HalfEdge e : vertexEdges) System.out.print(e + " ");
 		}
 	}
 	/**

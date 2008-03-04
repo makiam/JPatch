@@ -409,7 +409,7 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 		
 		/* cleanup gl */
 		gl.glLineWidth(1);
-		gl.glDepthFunc(GL_LEQUAL);
+		gl.glDepthFunc(GL_LESS);
 		gl.glDisable(GL_BLEND);
 		gl.glDisable(GL_LINE_SMOOTH);
 		gl.glDisable(GL_POLYGON_SMOOTH);
