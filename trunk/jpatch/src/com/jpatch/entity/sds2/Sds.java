@@ -138,11 +138,11 @@ public class Sds {
 		AbstractVertex[] vertices = invertices.clone();
 		HalfEdge[] edges = new HalfEdge[vertices.length];
 
-		System.out.print("add face called: ");
-		for (AbstractVertex vertex : vertices) {
-			System.out.print(vertex + " ");
-		}
-		System.out.println();
+//		System.out.print("add face called: ");
+//		for (AbstractVertex vertex : vertices) {
+//			System.out.print(vertex + " ");
+//		}
+//		System.out.println();
 		
 		for (int i = 0; i < vertices.length; i++) {
 			int j = i + 1;
@@ -238,7 +238,7 @@ public class Sds {
 	}
 	
 	public void removeFace(List<JPatchUndoableEdit> editList, int level, Face face) {
-		if (level == 0) System.out.println("removing face " + face);
+//		if (level == 0) System.out.println("removing face " + face);
 		assert levelFaceSets[level].contains(face) : "unknown face";
 		
 		RemoveFaceEdit removeFaceEdit = new RemoveFaceEdit(level, face);
@@ -454,7 +454,7 @@ public class Sds {
 		/* check if the HalfEdge (v0->v1) already exists */
 		HalfEdge edge = edgeMap.get(new EdgeKey(vertex0, vertex1));
 		if (edge == null) {
-			System.out.println("create new edge " + vertex0 + "-" + vertex1);
+//			System.out.println("create new edge " + vertex0 + "-" + vertex1);
 			/* if no edge is found, create a new one and store it in the maps */
 			edge = new HalfEdge(vertex0, vertex1);
 			JPatchUndoableEdit addEdgeEdit = new AddEdgeEdit(edge);
@@ -462,7 +462,7 @@ public class Sds {
 				editList.add(addEdgeEdit);
 			}
 		} else {
-			System.out.println("found edge " + edge);
+//			System.out.println("found edge " + edge);
 			assert edge.getFace() == null : "Surface is non-manifold, edge=" + edge + " face=" + edge.getFace();
 			if (editList != null) {
 				edge.saveState(editList);
