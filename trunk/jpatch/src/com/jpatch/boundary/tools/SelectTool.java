@@ -232,7 +232,7 @@ public class SelectTool implements VisibleTool {
 			default:
 				throw new RuntimeException(); // should never get here	
 			}
-			HitObject hitObject = MouseSelector.getObjectAt(viewport, mx, my, Double.MAX_VALUE, sdsModel, level, type);
+			HitObject hitObject = MouseSelector.getObjectAt(viewport, mx, my, Double.MAX_VALUE, sdsModel, level, type, null);
 			hitObject.getVertices(vertices);
 			break;
 		}

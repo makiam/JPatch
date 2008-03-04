@@ -474,7 +474,7 @@ public class LatheTool implements VisibleTool {
 			if (sdsModel != null) {
 				int level = sdsModel.getEditLevelAttribute().getInt();
 				int selectionType = Sds.Type.STRAY_VERTEX | Sds.Type.STRAY_EDGE;
-				hitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, level, selectionType);
+				hitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, level, selectionType, null);
 				if (hitObject != null) {
 					
 						HalfEdge hitEdge = null;

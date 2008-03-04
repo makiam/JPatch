@@ -95,6 +95,23 @@ public class Actions {
 		}
 	};
 	
+	public final JPatchAction flip = new JPatchAction(undoManager, "FLIP_FACES") {
+		public void actionPerformed(ActionEvent e) {
+			Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
+			Selection selection = Main.getInstance().getSelection();
+			if (selection != null) {
+				Collection<Face> faces = selection.getFaces();
+				if (faces.size() > 0) {
+					List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
+					sds.flipFaces(editList, faces);
+					selection.clear(editList);
+					undoManager.addEdit("Extrude", editList);
+					Main.getInstance().repaintViewports();
+				}
+			}
+		}
+	};
+	
 	public final JPatchAction extrudeTest = new JPatchAction(undoManager, "EXTRUDE_TOOL") {
 		public void actionPerformed(ActionEvent e) {
 			System.out.println("extrude");
@@ -119,6 +136,7 @@ public class Actions {
 			List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
 			Operations.extrude(sds, Main.getInstance().getSelection(), editList);
 			undoManager.addEdit("Extrude", editList);
+			toolSM.setValue(tools[5]);
 			Main.getInstance().repaintViewports();
 		}
 	};

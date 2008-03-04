@@ -137,7 +137,12 @@ public class Sds {
 	public Face addFace(List<JPatchUndoableEdit> editList, int level, Material material, AbstractVertex... invertices) {
 		AbstractVertex[] vertices = invertices.clone();
 		HalfEdge[] edges = new HalfEdge[vertices.length];
-//		System.out.println("add face called");
+
+		System.out.print("add face called: ");
+		for (AbstractVertex vertex : vertices) {
+			System.out.print(vertex + " ");
+		}
+		System.out.println();
 		
 		for (int i = 0; i < vertices.length; i++) {
 			int j = i + 1;
@@ -204,6 +209,7 @@ public class Sds {
 					faceVertices[i][j] = (BaseVertex) faceEdges[faceEdges.length - 1 - j].getVertex();
 				}
 				removeFace(editList, 0, face);
+				i++;
 			}
 		}
 		for (int i = 0; i < faceVertices.length; i++) {
@@ -409,7 +415,7 @@ public class Sds {
 			System.out.println();
 		}
 		for (int l = level; l <= 1; l++) {
-			for (AbstractVertex vertex : getVertices(l, false)) {
+			for (AbstractVertex vertex : getVertices(l, true)) {
 				System.out.print(vertex + " ");
 				for (HalfEdge edge : vertex.getEdges()) {
 					System.out.print(edge + " ");
@@ -417,14 +423,14 @@ public class Sds {
 				System.out.println();
 			}
 		}
-//		for (HalfEdge edge : getEdges(0, false)) {
-//			System.out.print(edge + " ");
-//			System.out.print("next=" + edge.getNext() + " ");
-//			System.out.print("prev=" + edge.getPrev() + " ");
-//			System.out.print("face=" + edge.getFace() + " ");
-//			System.out.print("pairFace=" + edge.getPairFace() + " ");
-//			System.out.println();
-//		}
+		for (HalfEdge edge : getEdges(0, true)) {
+			System.out.print(edge + " ");
+			System.out.print("next=" + edge.getNext() + " ");
+			System.out.print("prev=" + edge.getPrev() + " ");
+			System.out.print("face=" + edge.getFace() + " ");
+			System.out.print("pairFace=" + edge.getPairFace() + " ");
+			System.out.println();
+		}
 //		
 //		for (int i = 0; i < levelFaceSets.length; i++) {
 //			for (AbstractVertex v : getVertices(i, false)) {
@@ -444,9 +450,11 @@ public class Sds {
 	 * @return
 	 */
 	private HalfEdge getHalfEdge(List<JPatchUndoableEdit> editList, AbstractVertex vertex0, AbstractVertex vertex1) {
+		assert vertex0 != vertex1 : "Vertices are identical: " + vertex0;
 		/* check if the HalfEdge (v0->v1) already exists */
 		HalfEdge edge = edgeMap.get(new EdgeKey(vertex0, vertex1));
 		if (edge == null) {
+			System.out.println("create new edge " + vertex0 + "-" + vertex1);
 			/* if no edge is found, create a new one and store it in the maps */
 			edge = new HalfEdge(vertex0, vertex1);
 			JPatchUndoableEdit addEdgeEdit = new AddEdgeEdit(edge);
@@ -454,6 +462,7 @@ public class Sds {
 				editList.add(addEdgeEdit);
 			}
 		} else {
+			System.out.println("found edge " + edge);
 			assert edge.getFace() == null : "Surface is non-manifold, edge=" + edge + " face=" + edge.getFace();
 			if (editList != null) {
 				edge.saveState(editList);
@@ -556,8 +565,12 @@ public class Sds {
 		void remove() {
 			strayEdges.remove(halfEdge);
 			strayEdges.remove(halfEdge.getPair());
-			strayVertices.remove(halfEdge.getVertex());
-			strayVertices.remove(halfEdge.getPairVertex());
+			if (halfEdge.getVertex().getEdges().length == 1) {
+				strayVertices.remove(halfEdge.getVertex());
+			}
+			if (halfEdge.getPairVertex().getEdges().length == 1) {
+				strayVertices.remove(halfEdge.getPairVertex());
+			}
 		}
 	}
 	
@@ -762,10 +775,10 @@ public class Sds {
 		vertices.add(startVertex);
 		while (edge != null) {
 			BaseVertex v = (BaseVertex) edge.getPairVertex();
-			vertices.add(v);
 			if (v == startVertex) {
 				break;
 			}
+			vertices.add(v);
 			edge = getNextStrayEdge(edge);
 		}
 		return vertices.toArray(new BaseVertex[vertices.size()]);

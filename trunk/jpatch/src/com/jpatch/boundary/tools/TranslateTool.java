@@ -87,13 +87,16 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 	
 	private final Matrix4d transformMatrix = new Matrix4d();
 	
-	private final Tuple3Attr pivotAttr = new Tuple3Attr();
+	private final Point3d pivot = new Point3d();
+	private final Point3d cameraPivot = new Point3d();
+	
+	private final Tuple3Attr pivotAttr = new Tuple3Attr(pivot);
 	private final Tuple3Attr axisRotationAttr = new Tuple3Attr();
 	private final Tuple3Attr vectorAttr = new Tuple3Attr();
 	private final BooleanAttr normalAttr = new BooleanAttr(false);
 	
-	private final Point3d pivot = new Point3d();
-	private final Point3d cameraPivot = new Point3d();
+//	private final Point3d pivot = new Point3d();
+//	private final Point3d cameraPivot = new Point3d();
 	
 	private final Vector3d startVector = new Vector3d();
 	private final Vector3d vector = new Vector3d();
@@ -170,6 +173,7 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 	public void registerListeners(Viewport[] viewports) {
 		Selection selection = Main.getInstance().getSelection();
 		selection.getCenter(pivot, null);
+//		System.out.println("pivot=" + pivot);
 		pivotAttr.setTuple(pivot);
 		if (mouseListeners != null) {
 			throw new IllegalStateException("already registered");
@@ -212,6 +216,7 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 		transformUtil.setScale(BASE, WORLD, 1.0);
 		
 		transformUtil.transform(BASE, pivot, CAMERA, cameraPivot);
+//		System.out.println("pivot=" + pivot + " cam_pivot=" + cameraPivot);
 		/*
 		 * set the radius so that the tool will occupy about 1/3rd of the screen
 		 */
@@ -227,10 +232,11 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 		matrix.transform(v);
 		
 		/* add pivot translation */
-		matrix.m03 = pivot.x;
-		matrix.m13 = pivot.y;
-		matrix.m23 = pivot.z;
-		matrix.m33 = 1;
+//		matrix.m03 = pivot.x;
+//		matrix.m13 = pivot.y;
+//		matrix.m23 = pivot.z;
+//		matrix.m33 = 1;
+		matrix.setIdentity();
 		
 		/* set local2world to rotate-tool matrix */ 
 		transformUtil.setSpace2World(AXIS_R, BASE, matrix);
