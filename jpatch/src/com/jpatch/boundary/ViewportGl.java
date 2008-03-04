@@ -1985,7 +1985,7 @@ public class ViewportGl extends Viewport {
 		} else {
 			gl.glOrtho(-w, w, -h, h, -farClip, farClip);
 		}
-		gl.glDepthFunc(GL_LEQUAL);
+		gl.glDepthFunc(GL_LESS);
 		gl.glMatrixMode(GL_MODELVIEW);
 		gl.glLoadIdentity();
 //		gl.glScalef(1, 1, -1); // switch to left handed coordinate system

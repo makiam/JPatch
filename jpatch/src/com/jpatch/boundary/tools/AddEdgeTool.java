@@ -3,11 +3,13 @@ package com.jpatch.boundary.tools;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 import javax.media.opengl.*;
 import static javax.media.opengl.GL.*;
 import javax.vecmath.*;
 
+import com.jpatch.afw.control.*;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.boundary.*;
 import com.jpatch.boundary.tools.MouseSelector.*;
@@ -122,7 +124,7 @@ public class AddEdgeTool implements VisibleTool {
 			gl.glDisable(GL_BLEND);
 			
 			viewport.rasterMode();
-			viewport.drawString("click to add face", mouseX, mouseY);
+			viewport.drawString("doubleclick to add face", mouseX, mouseY);
 			viewport.spatialMode();
 		}
 //		System.out.println(hitVertex);
@@ -201,19 +203,26 @@ public class AddEdgeTool implements VisibleTool {
 			}
 			
 			if (strayFace != null) {
-				Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
-				sds.removeStrayFace(null, strayFace);
-				Face face = sds.addFace(null, 0, Main.getInstance().getDefaultMaterial(), strayFace);
-				Vector3d normal = new Vector3d();
-				face.getMidpointNormal(normal);
-				TransformUtil transformUtil = new TransformUtil();
-				viewport.getViewDef().configureTransformUtil(transformUtil);
-				Main.getInstance().getSelection().getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
-				transformUtil.transform(TransformUtil.LOCAL, normal, TransformUtil.CAMERA, normal);
-				if (normal.z < 0) {
-					Collection<Face> faces = new ArrayList<Face>(1);
-					faces.add(face);
-					sds.flipFaces(null, faces);
+				if (e.getClickCount() == 2) {
+			
+					Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
+					List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
+					sds.removeStrayFace(editList, strayFace);
+					Face face = sds.addFace(editList, 0, Main.getInstance().getDefaultMaterial(), strayFace);
+					Vector3d normal = new Vector3d();
+					face.getMidpointNormal(normal);
+					TransformUtil transformUtil = new TransformUtil();
+					viewport.getViewDef().configureTransformUtil(transformUtil);
+					Main.getInstance().getSelection().getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+					transformUtil.transform(TransformUtil.LOCAL, normal, TransformUtil.CAMERA, normal);
+					if (normal.z < 0) {
+						Collection<Face> faces = new ArrayList<Face>(1);
+						faces.add(face);
+						sds.flipFaces(editList, faces);
+					}
+					Main.getInstance().getUndoManager().addEdit("create face", editList);
+				} else {
+					return;
 				}
 				
 			} else {
@@ -226,7 +235,9 @@ public class AddEdgeTool implements VisibleTool {
 						System.out.println("is connected: " + sds.isConnected(startVertex, endVertex));
 						if (sds.isConnected(startVertex, endVertex)) {
 	//						System.out.println("adding face");
-							sds.addStrayFace(null, sds.getChain(startVertex));
+							List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
+							sds.addStrayFace(editList, sds.getChain(startVertex));
+							Main.getInstance().getUndoManager().addEdit("create stray face", editList);
 	//						sds.addFace(null, 0, Main.getInstance().getDefaultMaterial(), sds.getLoop(startVertex));
 	//						addFace = true;
 	//						BaseVertex[] vertices = sds.getLoop(startVertex);

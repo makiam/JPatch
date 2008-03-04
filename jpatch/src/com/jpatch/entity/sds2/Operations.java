@@ -46,7 +46,7 @@ public class Operations {
 		}
 	}
 	
-	public static void getLathedVertices(Sds sds, BaseVertex[] vertices, Point3d startAxis, Point3d endAxis, double epsilon, double angle, Point3d[][] lathedPoints) {
+	public static void getLathedVertices(Sds sds, BaseVertex[] vertices, Point3d startAxis, Point3d endAxis, double epsilon, double angle, Point3d[][] lathedPoints, boolean[] snap) {
 		Vector3d axis = new Vector3d();
 		axis.sub(endAxis, startAxis);
 		AxisAngle4d axisAngle = new AxisAngle4d(axis, 0);
@@ -76,6 +76,7 @@ public class Operations {
 				
 				/* check epsilon for first and last points */
 				if ((i == 0 || i == vertices.length - 1) && vertices[i].getEdges().length == 1) {
+					int idx = (i == 0) ? 0 : 1;
 					vertices[i].getPosition(pc);
 					/* set pc to the point on the axis closest to p */
 					double t = Utils3d.closestPointOnLine(startAxis, endAxis, pc);
@@ -84,6 +85,9 @@ public class Operations {
 					/* if closer than epsilon, project p to axis */
 					if (p.distanceSquared(pc) <= epsilonSquared) {
 						p.set(pc);
+						snap[idx] = true;
+					} else {
+						snap[idx] = false;
 					}
 				}
 			}

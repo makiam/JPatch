@@ -134,11 +134,11 @@ public class Sds {
 		}
 	}
 	
-	public Face addFace(List<JPatchUndoableEdit> editList, int level, Material material, AbstractVertex... vertices) {
+	public Face addFace(List<JPatchUndoableEdit> editList, int level, Material material, AbstractVertex... invertices) {
+		AbstractVertex[] vertices = invertices.clone();
 		HalfEdge[] edges = new HalfEdge[vertices.length];
-		for (AbstractVertex vertex : vertices) {
-			vertex.saveEdges(editList);
-		}
+//		System.out.println("add face called");
+		
 		for (int i = 0; i < vertices.length; i++) {
 			int j = i + 1;
 			if (j == vertices.length) {
@@ -146,8 +146,13 @@ public class Sds {
 			}
 			edges[i] = getHalfEdge(editList, vertices[i], vertices[j]);
 		}
+		for (AbstractVertex vertex : vertices) {
+//			System.out.println("  saving edges for " + vertex);
+			vertex.saveEdges(editList);
+		}
+		
 		Face face = new Face(material, edges);
-//		if (level == 0) System.out.println("adding face " + face);
+//		if (level == 0) System.out.println(this + " adding face " + face);
 		AddFaceEdit addFaceEdit = new AddFaceEdit(level, face);
 		if (editList != null) {
 			editList.add(addFaceEdit);
@@ -397,8 +402,36 @@ public class Sds {
 	
 	public void dumpFaces(int level) {
 		for (Face face : levelFaceSets[level]) {
-			System.out.println(face);
+			System.out.print(face + " ");
+			for (HalfEdge edge : face.getEdges()) {
+				System.out.print(edge + " ");
+			}
+			System.out.println();
 		}
+		for (int l = level; l <= 1; l++) {
+			for (AbstractVertex vertex : getVertices(l, false)) {
+				System.out.print(vertex + " ");
+				for (HalfEdge edge : vertex.getEdges()) {
+					System.out.print(edge + " ");
+				}
+				System.out.println();
+			}
+		}
+//		for (HalfEdge edge : getEdges(0, false)) {
+//			System.out.print(edge + " ");
+//			System.out.print("next=" + edge.getNext() + " ");
+//			System.out.print("prev=" + edge.getPrev() + " ");
+//			System.out.print("face=" + edge.getFace() + " ");
+//			System.out.print("pairFace=" + edge.getPairFace() + " ");
+//			System.out.println();
+//		}
+//		
+//		for (int i = 0; i < levelFaceSets.length; i++) {
+//			for (AbstractVertex v : getVertices(i, false)) {
+//				v.organizeEdges();
+//				v.invalidate();
+//			}
+//		}
 	}
 	
 	/**

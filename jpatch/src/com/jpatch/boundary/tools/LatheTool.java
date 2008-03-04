@@ -3,6 +3,7 @@ package com.jpatch.boundary.tools;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 import javax.media.opengl.*;
 
@@ -62,10 +63,10 @@ public class LatheTool implements VisibleTool {
 	
 	private Sds lathedSds;
 	private BaseVertex[][] lathedVertices = new BaseVertex[0][0];
-	private boolean snapFirstPoint;
-	private boolean snapLastPoint;
-	private boolean lastSnapFirstPoint;
-	private boolean lastSnapLastPoint;
+	private boolean[] snap = new boolean[2];
+	private boolean[] lastSnap = new boolean[2];
+	private long clickTime;
+	private long doubleClickTime = 500;	// ms
 	
 	private final AttributePostChangeListener latheInvalidationListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
@@ -156,6 +157,8 @@ public class LatheTool implements VisibleTool {
 			}
 		}
 		
+		lastSnap[0] = snap[0];
+		lastSnap[1] = snap[1];
 		Operations.getLathedVertices(
 				Main.getInstance().getSelection().getSdsModel().getSds(),
 				chain,
@@ -163,11 +166,12 @@ public class LatheTool implements VisibleTool {
 				axisEnd,
 				epsilonAttr.getDouble(),
 				angleAttr.getDouble(),
-				lathedPoints
+				lathedPoints,
+				snap
 			);
 		
 		
-		if (lastStartEdge != startEdge || lastSnapFirstPoint != snapFirstPoint || lastSnapLastPoint != snapLastPoint) {
+		if (lastStartEdge != startEdge || lastSnap[0] != snap[0] || lastSnap[1] != snap[1]) {
 			lathedSds = new Sds(null);
 			Operations.lathe(lathedSds, lathedPoints, lathedVertices, latheMaterial, null);
 		} else {
@@ -206,6 +210,23 @@ public class LatheTool implements VisibleTool {
 			viewport.drawSelection(hitSelection, new Color3f(0.5f, 0.5f, 1.0f));
 	
 			gl.glDisable(GL_LIGHTING);
+			gl.glLineWidth(1);
+			gl.glEnable(GL_LINE_STIPPLE);
+			gl.glLineStipple(2, (short) 0xfe10);
+			gl.glColor3f(1, 1, 0);
+			gl.glBegin(GL_LINES);
+			int axisScale = 10;
+			gl.glVertex3d(
+				axisScale * axisEnd.x - (axisScale - 1) * axisStart.x,
+				axisScale * axisEnd.y - (axisScale - 1) * axisStart.y,
+				axisScale * axisEnd.z - (axisScale - 1) * axisStart.z
+			);
+			gl.glVertex3d(
+				axisScale * axisStart.x - (axisScale - 1) * axisEnd.x,
+				axisScale * axisStart.y - (axisScale - 1) * axisEnd.y,
+				axisScale * axisStart.z - (axisScale - 1) * axisEnd.z
+			);gl.glEnd();
+			gl.glDisable(GL_LINE_STIPPLE);
 			gl.glColor3f(0.5f, 0.5f, 1.0f);
 			gl.glLineWidth(1);
 			if (chain != null) {
@@ -335,14 +356,43 @@ public class LatheTool implements VisibleTool {
 				return;
 			}
 			if (e.getButton() == MouseEvent.BUTTON1) {
-				snapPointer(viewport);
-				Selection selection = Main.getInstance().getSelection();
-				updateSelection(selection, hitObject);
-				selection.getTransformable().begin();
-				drag = true;
-				wasDragged = false;
-				localStart.set(hitObject.screenPosition);
-				transformUtil.projectFromScreen(TransformUtil.LOCAL, localStart, localStart);
+				long t = System.currentTimeMillis();
+				boolean doubleClick = (t - clickTime < doubleClickTime);
+				clickTime = t;
+				if (!wasDragged && doubleClick) {
+					lathedPoints = new Point3d[0][0];
+					lathedVertices = new BaseVertex[0][0];
+					computeLathedVertices();
+					Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
+					List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
+					Main.getInstance().getSelection().clear(editList);
+					Operations.lathe(sds, lathedPoints, lathedVertices, Main.getInstance().getDefaultMaterial(), editList);
+					
+					HalfEdge strayEdge = startEdge;
+					while (strayEdge != null) {
+						HalfEdge nextEdge = sds.getNextStrayEdge(strayEdge);
+						sds.removeStrayEdge(editList, strayEdge);
+						strayEdge = nextEdge;
+						if (strayEdge == startEdge) {
+							break;
+						}
+					}
+					Main.getInstance().getUndoManager().addEdit("lathe", editList);
+					Main.getInstance().repaintViewports();
+					startEdge = null;
+					chain = null;
+					latheValid = false;
+					drag = false;
+				} else {
+					snapPointer(viewport);
+					Selection selection = Main.getInstance().getSelection();
+					updateSelection(selection, hitObject);
+					selection.getTransformable().begin();
+					drag = true;
+					wasDragged = false;
+					localStart.set(hitObject.screenPosition);
+					transformUtil.projectFromScreen(TransformUtil.LOCAL, localStart, localStart);
+				}
 			}
 		}
 
@@ -350,28 +400,13 @@ public class LatheTool implements VisibleTool {
 		public void mouseReleased(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON1 && chain != null) {
 				if (wasDragged) {
+					List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
 					Selection selection = Main.getInstance().getSelection();
-					selection.getTransformable().end(new ArrayList<JPatchUndoableEdit>());
-					Main.getInstance().getSelection().clear(null);
+					selection.getTransformable().end(editList);
+					Main.getInstance().getSelection().clear(editList);
+					Main.getInstance().getUndoManager().addEdit("move vertices", editList);
 					Main.getInstance().repaintViewports();
 					drag = false;
-				} else if (e.getClickCount() == 2){
-					computeLathedVertices();
-					Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
-					Operations.lathe(sds, lathedPoints, lathedVertices, Main.getInstance().getDefaultMaterial(), null);
-					HalfEdge strayEdge = startEdge;
-					while (strayEdge != null) {
-						HalfEdge nextEdge = sds.getNextStrayEdge(strayEdge);
-						sds.removeStrayEdge(null, strayEdge);
-						strayEdge = nextEdge;
-						if (strayEdge == startEdge) {
-							break;
-						}
-					}
-					Main.getInstance().repaintViewports();
-					startEdge = null;
-					chain = null;
-					latheValid = false;
 				}
 			}
 		}		
@@ -397,8 +432,14 @@ public class LatheTool implements VisibleTool {
 		@Override
 		public void mouseDragged(MouseEvent e) {
 			if (drag) {
+				System.out.println("m: " + mouseX + "," + mouseY + " e:" + e.getX() + "," + e.getY());
 				if (hitPoint != null && hitPoint.x == e.getX() && hitPoint.y == e.getY()) {
 					hitPoint = null;
+					System.out.println("# " + wasDragged);
+					return;
+				}
+				if (e.getX() == mouseX && e.getY() == mouseY) {
+					System.out.println("* " + wasDragged);
 					return;
 				}
 				mouse.set(e.getX(), e.getY(), hitObject.screenPosition.z);
@@ -407,6 +448,7 @@ public class LatheTool implements VisibleTool {
 				Selection selection = Main.getInstance().getSelection();
 				selection.getTransformable().translate(vector);
 //				Main.getInstance().syncRepaintViewport(viewport);
+				computeLathedVertices();
 				highlight(viewport);
 				wasDragged = true;
 			}
@@ -456,6 +498,8 @@ public class LatheTool implements VisibleTool {
 	
 	private void snapPointer(Viewport viewport) {
 		Point point = new Point((int) Math.round(hitObject.screenPosition.x), (int) Math.round(hitObject.screenPosition.y));
+		mouseX = point.x;
+		mouseY = point.y;
 		hitPoint = new Point(point);
 		SwingUtilities.convertPointToScreen(point, viewport.getComponent());
 		Main.getInstance().getRobot().mouseMove(point.x, point.y);
