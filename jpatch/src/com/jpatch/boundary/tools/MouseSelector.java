@@ -23,6 +23,11 @@ public class MouseSelector {
 	static final TransformUtil transformUtil = new TransformUtil();
 	static final FloatBuffer buffer = BufferUtil.newFloatBuffer(1);
 	
+	static final ObjectFilter ACCEPT_ANYTHING = new ObjectFilter() {
+		public boolean accept(Object o) {
+			return true;
+		}
+	};
 	
 //	public static Selection.State getVertices(Viewport viewport, int x0, int y0, int x1, int y1, SdsModel sdsModel, int level) {
 //		Selection selection = new Selection();
@@ -59,7 +64,10 @@ public class MouseSelector {
 		}
 	}
 	
-	public static HitObject getObjectAt(Viewport viewport, int mouseX, int mouseY, double initMaxDistSq, SdsModel sdsModel, int level, int type) {
+	public static HitObject getObjectAt(Viewport viewport, int mouseX, int mouseY, double initMaxDistSq, SdsModel sdsModel, int level, int type, ObjectFilter objectFilter) {
+		if (objectFilter == null) {
+			objectFilter = ACCEPT_ANYTHING;
+		}
 		double maxDistSq = initMaxDistSq;
 		HitObject hitObject = null;
 		viewport.getViewDef().configureTransformUtil(transformUtil);
@@ -80,12 +88,14 @@ public class MouseSelector {
 		
 		if ((type & Type.FACE) != 0) {
 			for (Face face :sds.getFaces(level)) {
-				face.getMidpointPosition(p0);
-				transformUtil.projectToScreen(LOCAL, p0, p0);
-				if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
-					double distSq = distSq(mouseX, mouseY, p0);
-					if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-						hitObject = new HitFace(sdsModel, distSq, p0, face);
+				if (objectFilter.accept(face)) {
+					face.getMidpointPosition(p0);
+					transformUtil.projectToScreen(LOCAL, p0, p0);
+					if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
+						double distSq = distSq(mouseX, mouseY, p0);
+						if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
+							hitObject = new HitFace(sdsModel, distSq, p0, face);
+						}
 					}
 				}
 			}
@@ -99,23 +109,25 @@ public class MouseSelector {
 				edges = sds.getEdges(level, (type & Type.STRAY_EDGE) != 0);
 			}
 			for (HalfEdge edge : edges) {
-				edge.getVertex().getPosition(p0);
-				transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
-				edge.getPairVertex().getPosition(p1);
-				transformUtil.projectToScreen(TransformUtil.LOCAL, p1, p1);
+				if (objectFilter.accept(edge)) {
+					edge.getVertex().getPosition(p0);
+					transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+					edge.getPairVertex().getPosition(p1);
+					transformUtil.projectToScreen(TransformUtil.LOCAL, p1, p1);
+				
+					double t = Utils3d.closestPointOnLine(p0.x, p0.y, p1.x, p1.y, mouseX, mouseY);
+					t = Math.max(0, Math.min(t, 1));
+					pec.interpolate(p0, p1, t);
+					t = Math.max(0.1, Math.min(t, 0.9));
+					pem.interpolate(p0, p1, 0.5);
 			
-				double t = Utils3d.closestPointOnLine(p0.x, p0.y, p1.x, p1.y, mouseX, mouseY);
-				t = Math.max(0, Math.min(t, 1));
-				pec.interpolate(p0, p1, t);
-				t = Math.max(0.1, Math.min(t, 0.9));
-				pem.interpolate(p0, p1, 0.5);
-		
-				if(viewportGl.getDepthAt((int) pec.x, (int) pec.y) < pec.z) {
-					double cDistSq = distSq(mouseX, mouseY, pec);
-					double mDistSq = distSq(mouseX, mouseY, pem);
-					
-					if ((hitObject != null && mDistSq < hitObject.distanceSq) || (hitObject == null && cDistSq < maxDistSq)) {
-						hitObject = new HitEdge(sdsModel, mDistSq, pem, edge.getPrimary());
+					if(viewportGl.getDepthAt((int) pec.x, (int) pec.y) < pec.z) {
+						double cDistSq = distSq(mouseX, mouseY, pec);
+						double mDistSq = distSq(mouseX, mouseY, pem);
+						
+						if ((hitObject != null && mDistSq < hitObject.distanceSq) || (hitObject == null && cDistSq < maxDistSq)) {
+							hitObject = new HitEdge(sdsModel, mDistSq, pem, edge.getPrimary());
+						}
 					}
 				}
 			}
@@ -128,27 +140,29 @@ public class MouseSelector {
 				vertices = sds.getVertices(level, (type & Type.STRAY_VERTEX) != 0);
 			}
 			for (AbstractVertex vertex : vertices) {
-				if ((type & (Type.VERTEX | Type.STRAY_VERTEX)) != 0) {
-					vertex.getPosition(p0);
-						
-					transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
-					if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
-						double distSq = distSq(mouseX, mouseY, p0);
-						if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-							hitObject = new HitVertex(sdsModel, distSq, p0, vertex);
+				if (objectFilter.accept(vertex)) {
+					if ((type & (Type.VERTEX | Type.STRAY_VERTEX)) != 0) {
+						vertex.getPosition(p0);
+							
+						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
+							double distSq = distSq(mouseX, mouseY, p0);
+							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
+								hitObject = new HitVertex(sdsModel, distSq, p0, vertex);
+							}
 						}
 					}
+					if ((type & Type.LIMIT) != 0) {
+						vertex.getLimit(p0);
+						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
+							double distSq = distSq(mouseX, mouseY, p0);
+							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
+								hitObject = new HitVertex(sdsModel, distSq, p0, vertex);
+							}
+						}
+					}	
 				}
-				if ((type & Type.LIMIT) != 0) {
-					vertex.getLimit(p0);
-					transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
-					if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
-						double distSq = distSq(mouseX, mouseY, p0);
-						if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-							hitObject = new HitVertex(sdsModel, distSq, p0, vertex);
-						}
-					}
-				}			
 			}
 		}
 		glDrawable.getContext().release();

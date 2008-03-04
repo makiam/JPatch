@@ -156,7 +156,7 @@ public class TweakTool implements VisibleTool {
 			if (sdsModel != null) {
 				int level = sdsModel.getEditLevelAttribute().getInt();
 				int selectionType = viewport.getViewDef().getShowControlMeshAttribute().getBoolean() ? STANDARD_SELECTION_TYPE : LIMIT_SELECTION_TYPE;
-				HitObject newHitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), Double.MAX_VALUE, sdsModel, level, selectionType);
+				HitObject newHitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), Double.MAX_VALUE, sdsModel, level, selectionType, null);
 				if (newHitObject != null && !newHitObject.equals(hitObject)) {
 					hitObject = newHitObject;
 					updateSelection(hitSelection, hitObject);

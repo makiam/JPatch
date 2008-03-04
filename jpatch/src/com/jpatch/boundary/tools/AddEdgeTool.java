@@ -17,6 +17,16 @@ import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
 public class AddEdgeTool implements VisibleTool {
+	private static ObjectFilter ENDVERTEX_FILTER = new ObjectFilter() {
+		public boolean accept(Object o) {
+			try {
+				return ((AbstractVertex) o).getEdges().length == 1;
+			} catch (ClassCastException e) {
+				return false;
+			}
+		}
+	};
+	
 	private MouseMotionListener[] mouseMotionListeners;
 	private MouseListener[] mouseListeners;
 	private TextureUpdater textureUpdater;
@@ -96,11 +106,12 @@ public class AddEdgeTool implements VisibleTool {
 		
 		
 		Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
-//		System.out.println("startVertex=" + startVertex + " endVertex=" + endVertex);
+		
 		if (sds.getStrayVertices().contains(startVertex) && endVertex != null && endVertex != floatingVertex) {
-//			System.out.println("is start of chain: " + sds.isStartOfChain(endVertex));
+			System.out.println("startVertex=" + startVertex + " endVertex=" + endVertex);
+			System.out.println("is start of chain: " + sds.isStartOfChain(endVertex));
 			if (sds.isStartOfChain(endVertex)) {
-//				System.out.println("is connected: " + sds.isConnected(startVertex, endVertex));
+				System.out.println("is connected: " + sds.isConnected(startVertex, endVertex));
 				if (sds.isConnected(startVertex, endVertex)) {
 //					sds.addFace(null, 0, Main.getInstance().getDefaultMaterial(), sds.getLoop(startVertex));
 					BaseVertex[] vertices = sds.getChain(startVertex);
@@ -209,6 +220,7 @@ public class AddEdgeTool implements VisibleTool {
 					List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
 					sds.removeStrayFace(editList, strayFace);
 					Face face = sds.addFace(editList, 0, Main.getInstance().getDefaultMaterial(), strayFace);
+					sds.dumpFaces(0);
 					Vector3d normal = new Vector3d();
 					face.getMidpointNormal(normal);
 					TransformUtil transformUtil = new TransformUtil();
@@ -228,6 +240,9 @@ public class AddEdgeTool implements VisibleTool {
 			} else {
 			
 				Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
+				
+				
+				
 				boolean addFace = false;
 				if (sds.getStrayVertices().contains(startVertex) && endVertex != null && endVertex != floatingVertex) {
 					System.out.println("is start of chain: " + sds.isStartOfChain(endVertex));
@@ -235,19 +250,28 @@ public class AddEdgeTool implements VisibleTool {
 						System.out.println("is connected: " + sds.isConnected(startVertex, endVertex));
 						if (sds.isConnected(startVertex, endVertex)) {
 	//						System.out.println("adding face");
-							List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
-							sds.addStrayFace(editList, sds.getChain(startVertex));
-							Main.getInstance().getUndoManager().addEdit("create stray face", editList);
+							
 	//						sds.addFace(null, 0, Main.getInstance().getDefaultMaterial(), sds.getLoop(startVertex));
-	//						addFace = true;
+							addFace = true;
 	//						BaseVertex[] vertices = sds.getLoop(startVertex);
 						}
 					}
 				}
 				
-				if (!addFace && endVertex != null) {
-					sds.addSegment(null, startVertex, endVertex);
+				List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
+				if (endVertex != null) {
+					sds.addSegment(editList, startVertex, endVertex);
 				}
+				
+				if (addFace) {
+					sds.addStrayFace(editList, sds.getChain(startVertex));
+				}
+				
+				if (editList.size() > 0) {
+					Main.getInstance().getUndoManager().addEdit("add edge", editList);
+				}
+//				sds.dumpFaces(0);
+				
 			}
 			startVertex = endVertex;
 			endVertex = null;
@@ -274,7 +298,7 @@ public class AddEdgeTool implements VisibleTool {
 			strayFace = null;
 			
 			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
-			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, Sds.Type.VERTEX | Sds.Type.STRAY_VERTEX);
+			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, Sds.Type.VERTEX | Sds.Type.STRAY_VERTEX, ENDVERTEX_FILTER);
 			if (hitVertex != null) {
 				endVertex = (BaseVertex) hitVertex.vertex;
 			} else {
@@ -294,7 +318,7 @@ public class AddEdgeTool implements VisibleTool {
 			mouseX = e.getX();
 			mouseY = e.getY();
 			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
-			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, Sds.Type.VERTEX | Sds.Type.STRAY_VERTEX);
+			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, Sds.Type.VERTEX | Sds.Type.STRAY_VERTEX, ENDVERTEX_FILTER);
 			if (hitVertex != null) {
 				startVertex = (BaseVertex) hitVertex.vertex;
 			} else {
