@@ -380,6 +380,7 @@ public class LatheTool implements VisibleTool {
 					Main.getInstance().getUndoManager().addEdit("lathe", editList);
 					Main.getInstance().repaintViewports();
 					startEdge = null;
+					lastStartEdge = null;
 					chain = null;
 					latheValid = false;
 					drag = false;
