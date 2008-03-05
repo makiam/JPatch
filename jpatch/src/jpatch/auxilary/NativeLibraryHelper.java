@@ -87,7 +87,7 @@ public class NativeLibraryHelper {
 //	}
 	
 	private static String getNativeLibsDir(Os os, Arch arch) {
-		String osDir = null, archDir = null, prefix = null, suffix = null;
+		String osDir = null, archDir = null;
 		switch(os) {
 		case WINDOWS:
 			osDir = "windows/";
@@ -195,8 +195,10 @@ public class NativeLibraryHelper {
 			return Arch.X86;
 		} else if (osArch.equals("ppc") || osArch.equals("PowerPC")) {
 			return Arch.PPC;
-		} if (osArch.equals("sparc")) {
+		} else if (osArch.equals("sparc")) {
 			return Arch.SPARC;
+		} else if (osArch.equals("amd64")) {
+			return Arch.AMD64;
 		} else {
 			return Arch.UNKNOWN_OTHER;
 		}
