@@ -167,7 +167,7 @@ public class Actions {
 		
 		extrudeTool.getEnabled().setBoolean(false);
 //		latheTool.getEnabled().setBoolean(false);
-//		scaleTool.getEnabled().setBoolean(false);
+		scaleTool.getEnabled().setBoolean(false);
 //		save.getEnabled().setBoolean(false);
 		
 		snapToGrid.getEnabled().setBoolean(false);
