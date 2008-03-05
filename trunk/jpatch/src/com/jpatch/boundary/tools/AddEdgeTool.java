@@ -264,7 +264,10 @@ public class AddEdgeTool implements VisibleTool {
 				}
 				
 				if (addFace) {
-					sds.addStrayFace(editList, sds.getChain(startVertex));
+					BaseVertex[] chain = sds.getChain(startVertex);
+					BaseVertex[] loop = new BaseVertex[chain.length - 1];
+					System.arraycopy(chain, 0, loop, 0, loop.length);
+					sds.addStrayFace(editList, loop);
 				}
 				
 				if (editList.size() > 0) {

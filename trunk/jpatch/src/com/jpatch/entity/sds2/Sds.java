@@ -775,10 +775,10 @@ public class Sds {
 		vertices.add(startVertex);
 		while (edge != null) {
 			BaseVertex v = (BaseVertex) edge.getPairVertex();
+			vertices.add(v);
 			if (v == startVertex) {
 				break;
 			}
-			vertices.add(v);
 			edge = getNextStrayEdge(edge);
 		}
 		return vertices.toArray(new BaseVertex[vertices.size()]);
