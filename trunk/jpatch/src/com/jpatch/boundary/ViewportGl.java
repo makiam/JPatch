@@ -435,8 +435,8 @@ public class ViewportGl extends Viewport {
 				maxTextureSize = I[0];
 				
 				setLighting(RealtimeLighting.createThreepointLight());	
-//				gl.glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, 1);
-//				gl.glLightModelf(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
+				gl.glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, 1);
+				gl.glLightModelf(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 //				setLighting(RealtimeLighting.createHeadLight());
 				
 //				gl.glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
