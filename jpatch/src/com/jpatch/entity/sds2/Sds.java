@@ -113,6 +113,18 @@ public class Sds {
 		}
 	}
 	
+	public void removeSegment(List<JPatchUndoableEdit> editList, HalfEdge strayEdge) {
+		assert (strayEdges.contains(strayEdge));
+		assert (strayVertices.contains(strayEdge.getVertex()));
+		assert (strayVertices.contains(strayEdge.getPairVertex()));
+		JPatchUndoableEdit removeStrayEdgeEdge = new RemoveStrayEdgeEdit(strayEdge);
+		JPatchUndoableEdit removeEdgeEdit = new RemoveEdgeEdit(strayEdge);
+		if (editList != null) {
+			editList.add(removeStrayEdgeEdge);
+			editList.add(removeEdgeEdit);
+		}
+	}
+	
 	public void addStrayFace(List<JPatchUndoableEdit> editList, BaseVertex[] vertices) {
 		AddStrayFaceEdit edit = new AddStrayFaceEdit(vertices);
 		if (editList != null) {
@@ -431,6 +443,30 @@ public class Sds {
 			System.out.print("pairFace=" + edge.getPairFace() + " ");
 			System.out.println();
 		}
+		
+		System.out.print("stray edges: ");
+		for (HalfEdge edge : getStrayEdges()) {
+			System.out.print(edge + " ");
+		}
+		System.out.println();
+		
+		System.out.print("stray vertices: ");
+		for (AbstractVertex vertex : getStrayVertices()) {
+			System.out.print(vertex + " ");
+		}
+		System.out.println();
+		
+		System.out.print("stray faces: ");
+		for (AbstractVertex[] face : getStrayFaces()) {
+			System.out.print("{ ");
+			for (AbstractVertex vertex : face) {
+				System.out.print(vertex + " ");
+			}
+			System.out.print("} ");
+		}
+		System.out.println();
+		
+		
 //		
 //		for (int i = 0; i < levelFaceSets.length; i++) {
 //			for (AbstractVertex v : getVertices(i, false)) {
@@ -756,6 +792,7 @@ public class Sds {
 	}
 	
 	public HalfEdge getStart(HalfEdge strayEdge) {
+		assert strayEdges.contains(strayEdge);
 		HalfEdge startEdge = strayEdge;
 		HalfEdge prevEdge = getPrevStrayEdge(strayEdge);
 		while (prevEdge != null && prevEdge != strayEdge) {

@@ -500,6 +500,7 @@ public class Main {
 		
 		JPatchActionButton extrudeTestButton = new JPatchActionButton(actions.extrudeTest);
 		JPatchActionButton flipButton = new JPatchActionButton(actions.flip);
+		JPatchActionButton dumpButton = new JPatchActionButton(actions.dump);
 		
 		buttonUtils.configureButtons(IconSet.Style.UNDECORATED, openButton, saveButton);
 		buttonUtils.configureButtons(IconSet.Style.DARK, undoButton, redoButton);
@@ -541,6 +542,7 @@ public class Main {
 		toolBar.add(Box.createHorizontalStrut(4));
 		toolBar.add(extrudeTestButton);
 		toolBar.add(flipButton);
+		toolBar.add(dumpButton);
 		
 		
 		final JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT) {

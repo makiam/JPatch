@@ -371,7 +371,7 @@ public class LatheTool implements VisibleTool {
 					HalfEdge strayEdge = startEdge;
 					while (strayEdge != null) {
 						HalfEdge nextEdge = sds.getNextStrayEdge(strayEdge);
-						sds.removeStrayEdge(editList, strayEdge);
+						sds.removeSegment(editList, strayEdge);
 						strayEdge = nextEdge;
 						if (strayEdge == startEdge) {
 							break;
