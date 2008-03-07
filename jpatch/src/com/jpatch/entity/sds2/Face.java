@@ -3,12 +3,14 @@ package com.jpatch.entity.sds2;
 import java.nio.*;
 
 import com.jpatch.entity.*;
+import com.sun.opengl.util.*;
 
 import javax.vecmath.*;
 
 public class Face {
 	private static int count = 0;
 	private final HalfEdge[] faceEdges;
+	
 //	private Face[] subFaces;
 	private final double oneOverSides;
 	private DerivedVertex facePoint;
@@ -22,8 +24,11 @@ public class Face {
 	private boolean midpointNormalValid;
 	private boolean displacedMidpointPositionValid;
 	private boolean displacedMidpointNormalValid;
+	private boolean limitSurfaceValid;
+	private boolean controlSurfaceValid;
 	
-//	private final Face[] children;
+	private final FloatBuffer limitSurfaceBuffer;
+	private final FloatBuffer controlSurfaceBuffer;
 	
 	public Face(Material material, HalfEdge... edges) {
 		int sides = edges.length;
@@ -33,7 +38,8 @@ public class Face {
 		
 		this.faceEdges = edges.clone();
 		
-//		children = new Face[sides];
+		limitSurfaceBuffer = BufferUtil.newFloatBuffer(sides * 2 * 12);
+		controlSurfaceBuffer = BufferUtil.newFloatBuffer((sides + 2) * 2 * 12);
 		
 		// append adges and set their face to this
 		int prev = sides - 1;
@@ -51,7 +57,6 @@ public class Face {
 		for (int i = 0; i < edges.length; i++) {
 			edges[i].faceEdgeIndex = i;
 		}
-//		createFacePoint();
 	}
 	
 	public int getSides() {
@@ -82,9 +87,10 @@ public class Face {
 		midPoint.set(displacedMidpointNormal);
 	}
 	
-//	public void setSubFace(int side, Face face) {
-//		subFaces[side] = face;
-//	}
+	public void getMidpointNormal(Tuple3f midPoint) {
+		validateDisplacedMidpointNormal();
+		midPoint.set(displacedMidpointNormal);
+	}
 	
 	public void getSubEdges(int side, HalfEdge[] subEdges) {
 		assert subEdges.length == 2;
@@ -103,86 +109,59 @@ public class Face {
 		subEdges[1] = facePoint.getEdges()[side].getFace().faceEdges[1];
 	}
 	
-	public void getLimitSurface(FloatBuffer buffer) {
-		facePoint.validateDisplacedLimit();
-		buffer.clear();
-		buffer.put((float) facePoint.displacedNormal.x);
-		buffer.put((float) facePoint.displacedNormal.y);
-		buffer.put((float) facePoint.displacedNormal.z);
-		buffer.put((float) facePoint.displacedLimit.x);
-		buffer.put((float) facePoint.displacedLimit.y);
-		buffer.put((float) facePoint.displacedLimit.z);	
-		for (com.jpatch.entity.sds2.HalfEdge edge : faceEdges) {
-			DerivedVertex v = edge.getVertex().getVertexPoint();
-			v.validateDisplacedLimit();
-			buffer.put((float) v.displacedNormal.x);
-			buffer.put((float) v.displacedNormal.y);
-			buffer.put((float) v.displacedNormal.z);
-			buffer.put((float) v.displacedLimit.x);
-			buffer.put((float) v.displacedLimit.y);
-			buffer.put((float) v.displacedLimit.z);
+	public FloatBuffer getLimitSurface() {
+		if (!limitSurfaceValid) {
+			for (HalfEdge edge : faceEdges) {
+				AbstractVertex v = edge.getVertex();
+				v.validateDisplacedLimit();
+				limitSurfaceBuffer.put((float) v.displacedNormal.x);
+				limitSurfaceBuffer.put((float) v.displacedNormal.y);
+				limitSurfaceBuffer.put((float) v.displacedNormal.z);
+				limitSurfaceBuffer.put((float) v.displacedLimit.x);
+				limitSurfaceBuffer.put((float) v.displacedLimit.y);
+				limitSurfaceBuffer.put((float) v.displacedLimit.z);
+			}
+			limitSurfaceValid = true;
+		}
+		limitSurfaceBuffer.rewind();
+		return limitSurfaceBuffer;
+	}
+	
+	public FloatBuffer getControlSurface() {
+		if (!controlSurfaceValid) {
+			controlSurfaceBuffer.rewind();
+			validateDisplacedMidpointNormal();
+			final float nx = (float) displacedMidpointNormal.x;
+			final float ny = (float) displacedMidpointNormal.y;
+			final float nz = (float) displacedMidpointNormal.z;
+			validateDisplacedMidpointPosition();	// this also validates the displacedPosition of all of the face's vertices
+			controlSurfaceBuffer.put(nx);
+			controlSurfaceBuffer.put(ny);
+			controlSurfaceBuffer.put(nz);
+			controlSurfaceBuffer.put((float) displacedMidpointPosition.x);
+			controlSurfaceBuffer.put((float) displacedMidpointPosition.y);
+			controlSurfaceBuffer.put((float) displacedMidpointPosition.z);
+			for (HalfEdge edge : faceEdges) {
+				AbstractVertex v = edge.getVertex();
+				controlSurfaceBuffer.put(nx);
+				controlSurfaceBuffer.put(ny);
+				controlSurfaceBuffer.put(nz);
+				controlSurfaceBuffer.put((float) v.displacedPosition.x);
+				controlSurfaceBuffer.put((float) v.displacedPosition.y);
+				controlSurfaceBuffer.put((float) v.displacedPosition.z);
+			}
+			AbstractVertex v = faceEdges[0].getVertex();
+			controlSurfaceBuffer.put(nx);
+			controlSurfaceBuffer.put(ny);
+			controlSurfaceBuffer.put(nz);
+			controlSurfaceBuffer.put((float) v.displacedPosition.x);
+			controlSurfaceBuffer.put((float) v.displacedPosition.y);
+			controlSurfaceBuffer.put((float) v.displacedPosition.z);
 			
-			v = edge.getEdgePoint();
-			v.validateDisplacedLimit();
-			buffer.put((float) v.displacedNormal.x);
-			buffer.put((float) v.displacedNormal.y);
-			buffer.put((float) v.displacedNormal.z);
-			buffer.put((float) v.displacedLimit.x);
-			buffer.put((float) v.displacedLimit.y);
-			buffer.put((float) v.displacedLimit.z);
+			controlSurfaceValid = true;
 		}
-		DerivedVertex v = faceEdges[0].getVertex().getVertexPoint();
-		buffer.put((float) v.displacedNormal.x);
-		buffer.put((float) v.displacedNormal.y);
-		buffer.put((float) v.displacedNormal.z);
-		buffer.put((float) v.displacedLimit.x);
-		buffer.put((float) v.displacedLimit.y);
-		buffer.put((float) v.displacedLimit.z);
-		buffer.rewind();
-	}
-	
-	public void getPositionMesh(FloatBuffer buffer) {
-		buffer.clear();	
-		for (com.jpatch.entity.sds2.HalfEdge edge : faceEdges) {
-			AbstractVertex v = edge.getVertex();
-			v.validateDisplacedPosition();
-			buffer.put((float) v.displacedPosition.x);
-			buffer.put((float) v.displacedPosition.y);
-			buffer.put((float) v.displacedPosition.z);
-		}
-		buffer.rewind();
-	}
-	
-	public void getPositionSurface(FloatBuffer buffer) {
-		buffer.clear();	
-		validateMidpointPosition();
-		buffer.put((float) midpointPosition.x);
-		buffer.put((float) midpointPosition.y);
-		buffer.put((float) midpointPosition.z);
-		for (com.jpatch.entity.sds2.HalfEdge edge : faceEdges) {
-			AbstractVertex v = edge.getVertex();
-			v.validateDisplacedPosition();
-			buffer.put((float) v.displacedPosition.x);
-			buffer.put((float) v.displacedPosition.y);
-			buffer.put((float) v.displacedPosition.z);
-		}
-		AbstractVertex v = faceEdges[0].getVertex();
-		buffer.put((float) v.displacedPosition.x);
-		buffer.put((float) v.displacedPosition.y);
-		buffer.put((float) v.displacedPosition.z);
-		buffer.rewind();
-	}
-	
-	public void getLimitMesh(FloatBuffer buffer) {
-		buffer.clear();	
-		for (com.jpatch.entity.sds2.HalfEdge edge : faceEdges) {
-			AbstractVertex v = edge.getVertex();
-			v.validateDisplacedLimit();
-			buffer.put((float) v.displacedLimit.x);
-			buffer.put((float) v.displacedLimit.y);
-			buffer.put((float) v.displacedLimit.z);
-		}
-		buffer.rewind();
+		controlSurfaceBuffer.rewind();
+		return controlSurfaceBuffer;
 	}
 	
 	public void invalidate() {
@@ -197,11 +176,16 @@ public class Face {
 			if (edge.getEdgePoint() != null) {
 				edge.getEdgePoint().invalidate();
 			}
+			if (edge.getPairFace() != null) {
+				edge.getPairFace().limitSurfaceValid = false;
+			}
 		}
 		midpointPositionValid = false;
 		displacedMidpointPositionValid = false;
 		midpointNormalValid = false;
 		displacedMidpointNormalValid = false;
+		limitSurfaceValid = false;
+		controlSurfaceValid = false;
 	}
 	
 	void validateMidpointPosition() {
@@ -289,20 +273,6 @@ public class Face {
 		displacedMidpointNormal.normalize();
 		displacedMidpointNormalValid = true;
 	}
-	
-//	public void invalidateAltered() {
-//		if (facePoint != null) {
-//			facePoint.invalidateAltered();
-//		}
-//		for (HalfEdge edge : faceEdges) {
-//			if (edge.getVertex().getVertexPoint() != null) {
-//				edge.getVertex().getVertexPoint().invalidateAltered();
-//			}
-//			if (edge.getEdgePoint() != null) {
-//				edge.getEdgePoint().invalidateAltered();
-//			}
-//		}
-//	}
 	
 	public void disposeFacePoint() {
 		facePoint = null;

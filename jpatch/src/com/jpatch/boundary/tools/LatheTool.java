@@ -27,8 +27,16 @@ public class LatheTool implements VisibleTool {
 		new Color4f(0.5f, 0.5f, 1.0f, 0.33f),
 		new Color4f(0, 0, 0, 0),
 		new Color4f(0, 0, 0, 0),
-		10
+		0
 	);
+	private static final BasicMaterial lineMaterial = new BasicMaterial(
+		new Color4f(0.25f, 0.25f, 0.5f, 0.33f),
+		new Color4f(0.5f, 0.5f, 1.0f, 0.33f),
+		new Color4f(0, 0, 0, 0),
+		new Color4f(0, 0, 0, 0),
+		0
+	);
+	private static final Color4f lineColor = new Color4f(0.5f, 0.5f, 1.0f, 0.33f);
 	
 	private MouseMotionListener[] mouseMotionListeners;
 	private MouseListener[] mouseListeners;
@@ -201,6 +209,7 @@ public class LatheTool implements VisibleTool {
 			
 			viewport.setModelViewMatrix(Main.getInstance().getSelection().getNode());
 			gl.glDisable(GL_DEPTH_TEST);
+			gl.glEnable(GL_CULL_FACE);
 			gl.glDepthMask(false);
 			
 			viewport.getViewDef().configureTransformUtil(transformUtil);
@@ -267,54 +276,12 @@ public class LatheTool implements VisibleTool {
 				}
 				gl.glEnable(GL_LIGHTING);
 				
-				latheMaterial.getGlMaterial().applyMaterial(gl, GL_FRONT_AND_BACK);
+				latheMaterial.getGlMaterial().applyMaterial(gl, GL_FRONT);
 				
-				if (!previewLimitAttr.getBoolean()) {
-					Vector3d u = new Vector3d();
-					Vector3d v = new Vector3d();
-					Vector3d normal = new Vector3d();
-					gl.glBegin(GL_QUADS);
-					for (int segment = 0; segment < segments - 1; segment++) {
-		//				if (angleAttr.getDouble() != 360 && segment == segments - 1) {
-		//					break;
-		//				}
-						for (int i = 0; i < points - 1; i++) {
-							Point3d p0 = lathedPoints[segment][i];
-							Point3d p1 = lathedPoints[segment + 1][i];
-							Point3d p2 = lathedPoints[segment + 1][i + 1];
-							Point3d p3 = lathedPoints[segment][i + 1];
-							if (!p0.equals(p1)) {
-								u.sub(p1, p0);
-							} else {
-								u.sub(p2, p0);
-							}
-							if (!p0.equals(p3)) {
-								v.sub(p3, p0);
-							} else {
-								v.sub(p2, p0);
-							}
-							normal.cross(u, v);
-							normal.normalize();
-							gl.glNormal3d(normal.x, normal.y, normal.z);	
-							gl.glVertex3d(p0.x, p0.y, p0.z);
-							gl.glVertex3d(p1.x, p1.y, p1.z);
-							gl.glVertex3d(p2.x, p2.y, p2.z);
-							gl.glVertex3d(p3.x, p3.y, p3.z);
-						}
-					}
-					gl.glEnd();
+				if (previewLimitAttr.getBoolean()) {
+					viewport.drawSds2(lathedSds, false, true, true, 1, 0, lineColor, lineMaterial.getGlMaterial());
 				} else {
-					ViewDef viewDef = viewport.getViewDef();
-					boolean showMesh = viewDef.getShowControlMeshAttribute().getBoolean();
-					boolean showLimit = viewDef.getShowLimitSurfaceAttribute().getBoolean();
-					boolean showProjectedMesh = viewDef.getShowProjectedMeshAttribute().getBoolean();
-					viewDef.getShowControlMeshAttribute().setBoolean(false);
-					viewDef.getShowLimitSurfaceAttribute().setBoolean(true);
-					viewDef.getShowProjectedMeshAttribute().setBoolean(true);
-					viewport.drawSds2(lathedSds, 1);
-					viewDef.getShowControlMeshAttribute().setBoolean(showMesh);
-					viewDef.getShowLimitSurfaceAttribute().setBoolean(showLimit);
-					viewDef.getShowProjectedMeshAttribute().setBoolean(showProjectedMesh);
+					viewport.drawSds2(lathedSds, true, false, false, 0, 0, lineColor, lineMaterial.getGlMaterial());
 				}
 				gl.glDisable(GL_BLEND);
 				gl.glDisable(GL_LIGHTING);
@@ -326,7 +293,7 @@ public class LatheTool implements VisibleTool {
 			}
 			gl.glLineWidth(1);
 			
-			
+			gl.glDisable(GL_CULL_FACE);
 			gl.glEnable(GL_DEPTH_TEST);
 			gl.glDepthMask(true);
 		}
