@@ -1,6 +1,7 @@
 package com.jpatch.entity.sds2;
 
 import java.nio.*;
+import java.util.*;
 
 import com.jpatch.entity.*;
 import com.sun.opengl.util.*;
@@ -57,6 +58,24 @@ public class Face {
 		for (int i = 0; i < edges.length; i++) {
 			edges[i].faceEdgeIndex = i;
 		}
+	}
+	
+	public void flip(Set<HalfEdge> edgesToFlip, Set<AbstractVertex> verticesToFlip) {
+		HalfEdge[] tmp = faceEdges.clone();
+		
+		for (int i = 0; i < faceEdges.length; i++) {
+			faceEdges[i] = tmp[faceEdges.length - i - 1].getPair();
+			edgesToFlip.add(faceEdges[i]);
+			verticesToFlip.add(faceEdges[i].getVertex());
+		}
+		
+		if (facePoint != null) {
+			for (HalfEdge edge : facePoint.getEdges()) {
+				edge.getFace().flip(edgesToFlip, verticesToFlip);
+			}
+		}
+		
+		invalidate();
 	}
 	
 	public int getSides() {
@@ -176,15 +195,17 @@ public class Face {
 			if (edge.getEdgePoint() != null) {
 				edge.getEdgePoint().invalidate();
 			}
-			if (edge.getPairFace() != null) {
-				edge.getPairFace().limitSurfaceValid = false;
+			for (HalfEdge e : edge.getVertex().getEdges()) {
+				if (e.getFace() != null) {
+					e.getFace().limitSurfaceValid = false;
+				}
 			}
 		}
 		midpointPositionValid = false;
 		displacedMidpointPositionValid = false;
 		midpointNormalValid = false;
 		displacedMidpointNormalValid = false;
-		limitSurfaceValid = false;
+//		limitSurfaceValid = false;
 		controlSurfaceValid = false;
 	}
 	

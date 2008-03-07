@@ -169,6 +169,12 @@ public class HalfEdge {
 		editList.add(new SaveStateEdit());
 	}
 	
+	void flip() {
+		Face tmp = face;
+		face = pair.face;
+		pair.face = tmp;
+	}
+	
 	private class SaveStateEdit extends AbstractSwapEdit {
 		private HalfEdge next = HalfEdge.this.next;
 		private HalfEdge prev = HalfEdge.this.next;

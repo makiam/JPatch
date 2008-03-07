@@ -421,10 +421,10 @@ public abstract class AbstractVertex {
 					HalfEdge edge = vertexEdges[i];
 			
 					Face face = edge.getPairFace();
-//					if (face == null) {
-//						System.err.println("no pair face!!!");
-//						break; // FIXME
-//					}
+					if (face == null) {
+						System.err.println(this + ": no pair face!!!");
+						break; // FIXME
+					}
 					face.validateDisplacedMidpointPosition();
 					Point3d faceMidpoint = face.displacedMidpointPosition;
 					
@@ -632,6 +632,13 @@ public abstract class AbstractVertex {
 		positionValid = true;
 		invalidate();
 		
+	}
+	
+	void flip() {
+		HalfEdge[] tmp = vertexEdges.clone();
+		for (int i = 0; i < vertexEdges.length; i++) {
+			vertexEdges[i] = tmp[vertexEdges.length - i - 1];
+		}
 	}
 	
 	@Override
