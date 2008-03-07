@@ -479,11 +479,11 @@ public class ViewportGl extends Viewport {
 					gl.glAttachShader(program, vertexShader);
 					gl.glAttachShader(program, fragmentShader);
 					gl.glLinkProgram(program);
-//					gl.glUseProgram(program);
+					gl.glUseProgram(program);
 					printProgramInfo(gl, program);
 //					gl.glUseProgram(0);
 				}
-				canUseProgram = false;
+//				canUseProgram = false;
 				
 				int[] tex = new int[1];
 				gl.glGenTextures(0, tex, 0);
@@ -1229,9 +1229,7 @@ public class ViewportGl extends Viewport {
 			gl.glEnable(GL_BLEND);
 			gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			for (Face face : selection.getFaces()) {
-				gl.glInterleavedArrays(GL_V3F, 0, face.getControlSurface());
-				face.getMidpointNormal(n);
-				gl.glNormal3d(n.x, n.y, n.z);
+				gl.glInterleavedArrays(GL_N3F_V3F, 0, face.getControlSurface());
 				gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, 0.5f);
 				gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() + 2);
 				gl.glColor3f(highlighColor.x, highlighColor.y, highlighColor.z);

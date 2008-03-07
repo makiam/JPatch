@@ -91,7 +91,6 @@ public class Actions {
 		public void actionPerformed(ActionEvent e) {
 			Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
 			sds.dumpFaces(0);
-			new AmbientOcclusion2().compute(Main.getInstance().getSelection().getSdsModel());
 		}
 	};
 	

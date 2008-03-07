@@ -207,25 +207,9 @@ public class Sds {
 	}
 	
 	public void flipFaces(List<JPatchUndoableEdit> editList, Collection<Face> faces) {
-		Material[] materials = new Material[faces.size()];
-		BaseVertex[][] faceVertices = new BaseVertex[faces.size()][];
-		
-		{
-			int i = 0;
-			for (Face face : faces) {
-				assert levelFaceSets[0].contains(face) : "unknown face: " + face;
-				materials[i] = face.getMaterial();
-				faceVertices[i] = new BaseVertex[face.getSides()];
-				HalfEdge[] faceEdges = face.getEdges();
-				for (int j = 0; j < faceEdges.length; j++) {
-					faceVertices[i][j] = (BaseVertex) faceEdges[faceEdges.length - 1 - j].getVertex();
-				}
-				removeFace(editList, 0, face);
-				i++;
-			}
-		}
-		for (int i = 0; i < faceVertices.length; i++) {
-			addFace(editList, 0, materials[i], faceVertices[i]);
+		FlipFacesEdit edit = new FlipFacesEdit(faces);
+		if (editList != null) {
+			editList.add(edit);
 		}
 	}
 	
@@ -511,6 +495,32 @@ public class Sds {
 			}
 		}
 		return edge;
+	}
+	
+	private static class FlipFacesEdit extends AbstractSwapEdit {
+		final Face[] faces;
+		
+		FlipFacesEdit(Collection<Face> faces) {
+			this.faces = faces.toArray(new Face[faces.size()]);
+			swap();
+			applied = true;
+		}
+		
+		@Override
+		protected void swap() {
+			Set<HalfEdge> edgesToFlip = new HashSet<HalfEdge>();
+			Set<AbstractVertex> verticesToFlip = new HashSet<AbstractVertex>();
+			for (Face face : faces) {
+				face.flip(edgesToFlip, verticesToFlip);
+			}
+			for (HalfEdge edge : edgesToFlip) {
+				edge.flip();
+			}
+			for (AbstractVertex vertex : verticesToFlip) {
+				vertex.flip();
+			}
+		}
+		
 	}
 	
 	private abstract class EdgeEdit extends AbstractUndoableEdit {
