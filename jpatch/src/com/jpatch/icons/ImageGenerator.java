@@ -49,7 +49,8 @@ public class ImageGenerator {
 		"SNAP_TO_GRID",
 		"SELECT_TOOL",
 		"INSET_TOOL",
-		"ADD_EDGE_TOOL"
+		"ADD_EDGE_TOOL",
+		"FLIP_TOOL",
 	};
 	
 	public static void main(String[] args) throws Exception {
@@ -455,6 +456,19 @@ public class ImageGenerator {
 			g.setColor(new Color(0xc0000000, true));
 			g.drawLine(3, 7, 12, 7);
 			g.drawLine(3, 8, 12, 8);
+			break;
+		case 20: // flip
+			g.setComposite(AlphaComposite.SrcOver);
+			g.setColor(new Color(0x40000000, true));
+			g.fillRect(3, 3, 11, 11);
+			g.setColor(new Color(0x80000000, true));
+			g.drawRect(2, 2, 12, 12);
+			Polygon arrow = new Polygon(
+				new int[] { 3, 6, 6, 11, 11, 14, 14, 11, 11, 6, 6, 3 },
+				new int[] { 8, 5, 7, 7,  5,  8,  9, 12,  10, 10, 12, 9},
+				12
+			);
+			g.fill(arrow);
 			break;
 		}
 	}
