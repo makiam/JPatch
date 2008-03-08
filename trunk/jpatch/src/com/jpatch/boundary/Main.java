@@ -497,6 +497,7 @@ public class Main {
 		JPatchStateButton insetTool = new JPatchStateButton(actions.insetTool);
 		JPatchStateButton latheTool = new JPatchStateButton(actions.latheTool);
 		JPatchStateButton addEdgeTool = new JPatchStateButton(actions.addEdgeTool);
+		JPatchStateButton flipTool = new JPatchStateButton(actions.flipTool);
 		
 		JPatchActionButton extrudeTestButton = new JPatchActionButton(actions.extrudeTest);
 		JPatchActionButton flipButton = new JPatchActionButton(actions.flip);
@@ -507,7 +508,7 @@ public class Main {
 		buttonUtils.configureButtons(IconSet.Style.GLOSSY, moveView, zoomView, rotateView);
 		buttonUtils.configureButtons(IconSet.Style.FROSTED, vertexMode, edgeMode, faceMode, objectMode);
 		buttonUtils.configureButtons(IconSet.Style.BRUSHED, snapToGrid);
-		buttonUtils.configureButtons(IconSet.Style.BRUSHED, tweakTool, selectTool, moveTool, scaleTool, rotateTool);
+		buttonUtils.configureButtons(IconSet.Style.BRUSHED, tweakTool, selectTool, moveTool, scaleTool, rotateTool, flipTool);
 		buttonUtils.configureButtons(IconSet.Style.BRUSHED, addEdgeTool, extrudeTool, insetTool, latheTool);
 		
 		toolBar.add(openButton);
@@ -534,6 +535,7 @@ public class Main {
 		toolBar.add(moveTool);
 		toolBar.add(scaleTool);
 		toolBar.add(rotateTool);
+		toolBar.add(flipTool);
 		toolBar.add(Box.createHorizontalStrut(4));
 		toolBar.add(addEdgeTool);
 		toolBar.add(extrudeTool);
