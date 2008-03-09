@@ -26,7 +26,7 @@ public class Actions {
 			new TranslateTool(),
 			new LatheTool(),
 			new TweakTool(),
-			null,
+			new ExtrudeTool(),
 			new AddEdgeTool(),
 			new FlipTool()
 	};
@@ -166,7 +166,7 @@ public class Actions {
 		 */
 		toolSM.setDefaultState(tools[3]);
 		
-		extrudeTool.getEnabled().setBoolean(false);
+//		extrudeTool.getEnabled().setBoolean(false);
 //		latheTool.getEnabled().setBoolean(false);
 		scaleTool.getEnabled().setBoolean(false);
 //		save.getEnabled().setBoolean(false);

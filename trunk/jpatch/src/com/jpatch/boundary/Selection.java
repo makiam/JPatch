@@ -107,6 +107,10 @@ public class Selection {
 //		});
 	}
 	
+	public void set(Selection selection) {
+		new State(selection).copyTo(this);
+	}
+	
 	public Type getType() {
 		return type;
 	}

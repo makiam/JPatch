@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<attributeEditor name="Select Tool" class="com.jpatch.boundary.tools.ExtrudeTool">
+	<boolean display="switch" false="split" true="connect" />
+	<field name="Faces" attribute="KeepConnected" />
+	<boolean display="switch" false="free" true="normal" />
+	<field name="Constraint" attribute="ConstrainToNormal" />
+</attributeEditor>
