@@ -1,4 +1,4 @@
-package com.jpatch.entity.sds;
+package trashcan.sds;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -14,8 +14,8 @@ import jpatch.boundary.settings.RealtimeRendererSettings;
 import jpatch.boundary.settings.Settings;
 
 import static java.lang.Math.*;
-import static com.jpatch.entity.sds.SdsConstants.*;
-import static com.jpatch.entity.sds.SdsWeights.*;
+import static trashcan.sds.SdsConstants.*;
+import static trashcan.sds.SdsWeights.*;
 
 public class Dicer {
 	private static RealtimeRendererSettings RENDERER_SETTINGS = Settings.getInstance().realtimeRenderer;

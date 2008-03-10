@@ -1,4 +1,4 @@
-package com.jpatch.entity.sds;
+package trashcan.sds;
 
 public abstract class BaseVertex extends AbstractVertex {
 	double corner, crease;

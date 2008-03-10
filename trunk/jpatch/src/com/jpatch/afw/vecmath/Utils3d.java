@@ -108,19 +108,43 @@ public class Utils3d {
 		v.sub(rayOrigin);
 		double a = v.dot(normal);
 		double b = rayDir.dot(normal);
-//		System.out.println("b=" + b);
 		if (Math.abs(b) < 0.01) {
 			return false;
 		}
 		double distance = a / b;
-//		System.out.println("distance=" + distance);
-//		if (distance < 0.1) {
-//			return false;
-//		}
 		intersectionPoint.set(rayDir);
 		intersectionPoint.scale(distance);
 		intersectionPoint.add(rayOrigin);
 		return true;
+	}
+	
+	public static final double rayTriangleIntersection(Point3d rayOrigin, Vector3d rayDirection, Point3d v0, Point3d v1, Point3d v2) {
+		final double EPSILON = 0.000001;
+		Vector3d edge1 = new Vector3d();
+		Vector3d edge2 = new Vector3d();
+		Vector3d vP = new Vector3d();
+		Vector3d vQ = new Vector3d();
+		Vector3d vT = new Vector3d();
+		edge1.sub(v1, v0);
+		edge2.sub(v2, v0);
+		vP.cross(rayDirection, edge2);
+		double det = edge1.dot(vP);
+		if (det > -EPSILON && det < EPSILON) {
+			return Double.MAX_VALUE;
+		}
+		double invDet = 1.0 / det;
+		vT.sub(rayOrigin, v0);
+		double u = vT.dot(vP) * invDet;
+		if (u < 0.0 || u > 1.0) {
+			return Double.MAX_VALUE;
+		}
+		vQ.cross(vT, edge1);
+		double v = rayDirection.dot(vQ) * invDet;
+		if (v < 0.0 || (u + v) > 1.0) {
+			return Double.MAX_VALUE;
+		}
+		double t = edge2.dot(vQ) * invDet;
+		return t;
 	}
 	
 	/**
@@ -234,5 +258,21 @@ public class Utils3d {
 	
 	public static double closestPointOnLine(Point3d a, Point3d b, Point3d p) {
 		return closestPointOnLine(a.x, a.y, a.z, b.x, b.y, b.z, p.x, p.y, p.z);
+	}
+	
+	public static void main(String[] args) {
+		Point3d v0 = new Point3d(0, 0, 100);
+		Point3d v1 = new Point3d(100, 0, 200);
+		Point3d v2 = new Point3d(0, 100, 300);
+		Point3d origin = new Point3d(1, 0, 0);
+		Vector3d direction = new Vector3d(1, 1, 50);
+//		direction.normalize();
+		double t = rayTriangleIntersection(origin, direction, v0, v1, v2);
+		Point3d p = new Point3d(
+			origin.x + t * direction.x,
+			origin.y + t * direction.y,
+			origin.z + t * direction.z
+		);
+		System.out.println(p);
 	}
 }

@@ -1,4 +1,4 @@
-package com.jpatch.entity.sds;
+package trashcan.sds;
 
 public class MathTest {
 	Vertex[] top;

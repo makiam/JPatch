@@ -1,9 +1,9 @@
-package com.jpatch.entity.sds;
+package trashcan.sds;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sqrt;
-import static com.jpatch.entity.sds.SdsConstants.MAX_VALENCE;
+import static trashcan.sds.SdsConstants.*;
 
 public class SdsWeights {
 	static final float FACE0 = 1.0f / 4.0f;

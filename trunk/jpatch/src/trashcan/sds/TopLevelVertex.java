@@ -1,4 +1,4 @@
-package com.jpatch.entity.sds;
+package trashcan.sds;
 
 import java.util.*;
 
@@ -6,7 +6,7 @@ import javax.vecmath.*;
 
 import com.jpatch.afw.attributes.*;
 
-import static com.jpatch.entity.sds.SdsWeights.*;
+import static trashcan.sds.SdsWeights.*;
 
 /**
  * 
