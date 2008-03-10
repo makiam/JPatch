@@ -75,9 +75,9 @@ public class TweakTool implements VisibleTool {
 		viewport.getViewDef().configureTransformUtil(transformUtil);
 		hitObject.node.getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
 		viewport.setModelViewMatrix(transformUtil);
-			
+		gl.glDisable(GL_DEPTH_TEST);
 		viewport.drawSelection(hitSelection, new Color3f(1, 1, 0));
-
+		gl.glEnable(GL_DEPTH_TEST);
 		glDrawable.swapBuffers();
 		glDrawable.getContext().release();
 	}

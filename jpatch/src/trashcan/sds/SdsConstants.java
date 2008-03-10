@@ -1,4 +1,4 @@
-package com.jpatch.entity.sds;
+package trashcan.sds;
 
 public class SdsConstants {
 	static final int MAX_SUBDIV = 5;

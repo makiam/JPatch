@@ -1,6 +1,6 @@
-package com.jpatch.entity.sds;
+package trashcan.sds;
 
-import static com.jpatch.entity.sds.SdsWeights.*;
+import static trashcan.sds.SdsWeights.*;
 
 import java.util.Iterator;
 

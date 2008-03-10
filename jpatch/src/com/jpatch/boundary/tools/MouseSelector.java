@@ -86,17 +86,81 @@ public class MouseSelector {
 //		System.out.println(mouseX + "," + mouseY + " depth = " + viewportGl.getDepthAt(mouseX, mouseY));
 		Sds sds = sdsModel.getSds();
 		
+		
+		
+		
 		if ((type & Type.FACE) != 0) {
+			
+			Point3d rayOrigin = new Point3d();
+			Point3d rayDestination = new Point3d();
+			Vector3d rayDirection = new Vector3d();
+			if (transformUtil.isPerspective()) {
+				rayOrigin.set(0, 0, 0);
+				rayDestination.set(mouseX, mouseY, 1);
+				transformUtil.projectFromScreen(CAMERA, rayDestination, rayDestination);
+				rayDirection.set(rayDestination.x, rayDestination.y, -rayDestination.z);	// TODO: why -z ?!?
+			} else {
+				rayOrigin.set(mouseX, mouseY, 0);
+				transformUtil.projectFromScreen(CAMERA, rayOrigin, rayOrigin);
+				rayDirection.set(0, 0, -1);
+			}
+			
 			for (Face face :sds.getFaces(level)) {
 				if (objectFilter.accept(face)) {
-					face.getMidpointPosition(p0);
-					transformUtil.projectToScreen(LOCAL, p0, p0);
-					if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
-						double distSq = distSq(mouseX, mouseY, p0);
-						if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-							hitObject = new HitFace(sdsModel, distSq, p0, face);
+//					face.getMidpointPosition(p0);
+//					transformUtil.projectToScreen(LOCAL, p0, p0);
+//					if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
+//						double distSq = distSq(mouseX, mouseY, p0);
+//						if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
+//							hitObject = new HitFace(sdsModel, distSq, p0, face);
+//						}
+//					}
+					double z = getDistSqToFace(rayOrigin, rayDirection, face);
+					if (z < Double.MAX_VALUE) {
+						face.getMidpointPosition(p0);
+						transformUtil.projectToScreen(LOCAL, p0, p0);
+						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < z) {
+							double distSq = distSq(mouseX, mouseY, p0);
+							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
+								hitObject = new HitFace(sdsModel, distSq, p0, face);
+							}
 						}
 					}
+				}
+			}
+		}
+		
+		
+		if ((type & (Type.VERTEX | Type.STRAY_VERTEX | Type.LIMIT)) != 0) {
+			Iterable<? extends AbstractVertex> vertices;
+			if ((type & (Type.VERTEX | Type.LIMIT)) == 0) {
+				vertices = sds.getStrayVertices();
+			} else {
+				vertices = sds.getVertices(level, (type & Type.STRAY_VERTEX) != 0);
+			}
+			for (AbstractVertex vertex : vertices) {
+				if (objectFilter.accept(vertex)) {
+					if ((type & (Type.VERTEX | Type.STRAY_VERTEX)) != 0) {
+						vertex.getPosition(p0);
+							
+						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
+							double distSq = distSq(mouseX, mouseY, p0) * 9;
+							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
+								hitObject = new HitVertex(sdsModel, distSq, p0, vertex);
+							}
+						}
+					}
+					if ((type & Type.LIMIT) != 0) {
+						vertex.getLimit(p0);
+						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
+							double distSq = distSq(mouseX, mouseY, p0) * 9;
+							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
+								hitObject = new HitVertex(sdsModel, distSq, p0, vertex);
+							}
+						}
+					}	
 				}
 			}
 		}
@@ -122,8 +186,8 @@ public class MouseSelector {
 					pem.interpolate(p0, p1, 0.5);
 			
 					if(viewportGl.getDepthAt((int) pec.x, (int) pec.y) < pec.z) {
-						double cDistSq = distSq(mouseX, mouseY, pec);
-						double mDistSq = distSq(mouseX, mouseY, pem);
+						double cDistSq = distSq(mouseX, mouseY, pec) * 9;
+						double mDistSq = distSq(mouseX, mouseY, pem) * 9;
 						
 						if ((hitObject != null && mDistSq < hitObject.distanceSq) || (hitObject == null && cDistSq < maxDistSq)) {
 							hitObject = new HitEdge(sdsModel, mDistSq, pem, edge.getPrimary());
@@ -132,44 +196,29 @@ public class MouseSelector {
 				}
 			}
 		}
-		if ((type & (Type.VERTEX | Type.STRAY_VERTEX | Type.LIMIT)) != 0) {
-			Iterable<? extends AbstractVertex> vertices;
-			if ((type & (Type.VERTEX | Type.LIMIT)) == 0) {
-				vertices = sds.getStrayVertices();
-			} else {
-				vertices = sds.getVertices(level, (type & Type.STRAY_VERTEX) != 0);
-			}
-			for (AbstractVertex vertex : vertices) {
-				if (objectFilter.accept(vertex)) {
-					if ((type & (Type.VERTEX | Type.STRAY_VERTEX)) != 0) {
-						vertex.getPosition(p0);
-							
-						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
-						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
-							double distSq = distSq(mouseX, mouseY, p0);
-							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-								hitObject = new HitVertex(sdsModel, distSq, p0, vertex);
-							}
-						}
-					}
-					if ((type & Type.LIMIT) != 0) {
-						vertex.getLimit(p0);
-						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
-						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
-							double distSq = distSq(mouseX, mouseY, p0);
-							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-								hitObject = new HitVertex(sdsModel, distSq, p0, vertex);
-							}
-						}
-					}	
-				}
-			}
-		}
 		glDrawable.getContext().release();
 		return hitObject;
 	}
 	
-	
+	private static Point3d faceMidpoint = new Point3d();
+	private static Point3d faceP0 = new Point3d();
+	private static Point3d faceP1 = new Point3d();
+	private static double getDistSqToFace(Point3d rayOrigin, Vector3d rayDirection, Face face) {
+		face.getMidpointPosition(faceMidpoint);
+		transformUtil.transform(LOCAL, faceMidpoint, CAMERA, faceMidpoint);
+		for (HalfEdge faceEdge : face.getEdges()) {
+			faceEdge.getVertex().getPosition(faceP0);
+			transformUtil.transform(LOCAL, faceP0, CAMERA, faceP0);
+			faceEdge.getPairVertex().getPosition(faceP1);
+			transformUtil.transform(LOCAL, faceP1, CAMERA, faceP1);
+			double t = Utils3d.rayTriangleIntersection(rayOrigin, rayDirection, faceMidpoint, faceP0, faceP1);
+			if (t < Double.MAX_VALUE) {
+				double z = rayOrigin.z + rayDirection.z * t;
+				return z;
+			}
+		}
+		return Double.MAX_VALUE;
+	}
 	
 	private static double distSq(int mouseX, int mouseY, Point3d p) {
 		double dx = p.x - mouseX;

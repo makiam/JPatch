@@ -1,8 +1,8 @@
-package com.jpatch.entity.sds;
+package trashcan.sds;
 
 import javax.vecmath.*;
 
-import static com.jpatch.entity.sds.Dicer.*;
+import static trashcan.sds.Dicer.*;
 
 public class Slate2 {
 	private static final Point3f NULL_POINT = new Point3f();
