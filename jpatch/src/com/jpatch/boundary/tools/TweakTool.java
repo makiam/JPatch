@@ -36,6 +36,10 @@ public class TweakTool implements VisibleTool {
 	
 	private TextureUpdater textureUpdater;
 	
+	private static enum Mode { MOVE, SELECT_RECTANGLE, SELECT_LASSO, SELECT_PROXIMITY }
+	
+	private Mode mode;
+	
 	public void draw(Viewport viewport) {
 		// TODO Auto-generated method stub
 
@@ -156,11 +160,13 @@ public class TweakTool implements VisibleTool {
 			if (sdsModel != null) {
 				int level = sdsModel.getEditLevelAttribute().getInt();
 				int selectionType = viewport.getViewDef().getShowControlMeshAttribute().getBoolean() ? STANDARD_SELECTION_TYPE : LIMIT_SELECTION_TYPE;
-				HitObject newHitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), Double.MAX_VALUE, sdsModel, level, selectionType, null);
+				HitObject newHitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 32 * 32, sdsModel, level, selectionType, null);
 				if (newHitObject != null && !newHitObject.equals(hitObject)) {
 					hitObject = newHitObject;
 					updateSelection(hitSelection, hitObject);
 					highlightHitObject(viewport);
+				} else {
+					hitObject = newHitObject;
 				}
 			}
 		}	

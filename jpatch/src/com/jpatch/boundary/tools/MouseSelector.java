@@ -1,6 +1,7 @@
 package com.jpatch.boundary.tools;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.*;
 import java.nio.*;
 import java.util.*;
@@ -64,12 +65,11 @@ public class MouseSelector {
 		}
 	}
 	
-	public static HitObject getObjectAt(Viewport viewport, int mouseX, int mouseY, double initMaxDistSq, SdsModel sdsModel, int level, int type, ObjectFilter objectFilter) {
+	public static HitObject getObjectAt(Viewport viewport, int mouseX, int mouseY, final double initMaxDistSq, SdsModel sdsModel, int level, int type, ObjectFilter objectFilter) {
 		if (objectFilter == null) {
 			objectFilter = ACCEPT_ANYTHING;
 		}
-		double maxDistSq = initMaxDistSq;
-		HitObject hitObject = null;
+		HitObject hitObject = new HitNull(initMaxDistSq);
 		viewport.getViewDef().configureTransformUtil(transformUtil);
 		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
 		Point3d p0 = new Point3d();
@@ -107,22 +107,15 @@ public class MouseSelector {
 			
 			for (Face face :sds.getFaces(level)) {
 				if (objectFilter.accept(face)) {
-//					face.getMidpointPosition(p0);
-//					transformUtil.projectToScreen(LOCAL, p0, p0);
-//					if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
-//						double distSq = distSq(mouseX, mouseY, p0);
-//						if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-//							hitObject = new HitFace(sdsModel, distSq, p0, face);
-//						}
-//					}
 					double z = getDistSqToFace(rayOrigin, rayDirection, face);
 					if (z < Double.MAX_VALUE) {
 						face.getMidpointPosition(p0);
 						transformUtil.projectToScreen(LOCAL, p0, p0);
 						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < z) {
 							double distSq = distSq(mouseX, mouseY, p0);
-							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-								hitObject = new HitFace(sdsModel, distSq, p0, face);
+							HitObject hitFace = new HitFace(sdsModel, distSq, new Point3d(mouseX, mouseY, 0), face);
+							if (hitFace.isCloserThan(hitObject)) {
+								hitObject = hitFace;
 							}
 						}
 					}
@@ -145,9 +138,10 @@ public class MouseSelector {
 							
 						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
 						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
-							double distSq = distSq(mouseX, mouseY, p0) * 9;
-							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-								hitObject = new HitVertex(sdsModel, distSq, p0, vertex);
+							double distSq = distSq(mouseX, mouseY, p0);
+							HitObject hitVertex = new HitVertex(sdsModel, distSq, p0, vertex);
+							if (hitVertex.isCloserThan(hitObject)) {
+								hitObject = hitVertex;
 							}
 						}
 					}
@@ -155,9 +149,10 @@ public class MouseSelector {
 						vertex.getLimit(p0);
 						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
 						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
-							double distSq = distSq(mouseX, mouseY, p0) * 9;
-							if ((hitObject != null && distSq < hitObject.distanceSq) || (hitObject == null && distSq < maxDistSq)) {
-								hitObject = new HitVertex(sdsModel, distSq, p0, vertex);
+							double distSq = distSq(mouseX, mouseY, p0);
+							HitObject hitVertex = new HitVertex(sdsModel, distSq, p0, vertex);
+							if (hitVertex.isCloserThan(hitObject)) {
+								hitObject = hitVertex;
 							}
 						}
 					}	
@@ -173,7 +168,7 @@ public class MouseSelector {
 				edges = sds.getEdges(level, (type & Type.STRAY_EDGE) != 0);
 			}
 			for (HalfEdge edge : edges) {
-				if (objectFilter.accept(edge)) {
+				if (edge.isPrimary() && objectFilter.accept(edge)) {
 					edge.getVertex().getPosition(p0);
 					transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
 					edge.getPairVertex().getPosition(p1);
@@ -182,22 +177,21 @@ public class MouseSelector {
 					double t = Utils3d.closestPointOnLine(p0.x, p0.y, p1.x, p1.y, mouseX, mouseY);
 					t = Math.max(0, Math.min(t, 1));
 					pec.interpolate(p0, p1, t);
-					t = Math.max(0.1, Math.min(t, 0.9));
 					pem.interpolate(p0, p1, 0.5);
 			
 					if(viewportGl.getDepthAt((int) pec.x, (int) pec.y) < pec.z) {
-						double cDistSq = distSq(mouseX, mouseY, pec) * 9;
-						double mDistSq = distSq(mouseX, mouseY, pem) * 9;
-						
-						if ((hitObject != null && mDistSq < hitObject.distanceSq) || (hitObject == null && cDistSq < maxDistSq)) {
-							hitObject = new HitEdge(sdsModel, mDistSq, pem, edge.getPrimary());
+						double cDistSq = distSq(mouseX, mouseY, pec);
+						double mDistSq = distSq(mouseX, mouseY, pem);
+						HitObject hitEdge = new HitEdge(sdsModel, mDistSq, cDistSq, pec, edge.getPrimary());
+						if (hitEdge.isCloserThan(hitObject)) {
+							hitObject = hitEdge;
 						}
 					}
 				}
 			}
 		}
 		glDrawable.getContext().release();
-		return hitObject;
+		return hitObject instanceof HitNull ? null : hitObject;
 	}
 	
 	private static Point3d faceMidpoint = new Point3d();
@@ -228,12 +222,15 @@ public class MouseSelector {
 	
 	public abstract static class HitObject {
 		public final XFormNode node;
-		public final double distanceSq;
+		public final double centerDistSq;
+		public final double edgeDistSq;
 		public final Point3d screenPosition;
-		private HitObject(XFormNode node, double distanceSq, Point3d screenPosition) {
+		private HitObject(XFormNode node, double centerDistSq, double edgeDistSq, Point3d screenPosition) {
+			assert edgeDistSq <= centerDistSq;
 			this.node = node;
-			this.distanceSq = distanceSq;
-			this.screenPosition = new Point3d(screenPosition);
+			this.centerDistSq = centerDistSq;
+			this.edgeDistSq = edgeDistSq;
+			this.screenPosition = screenPosition == null ? null : new Point3d(screenPosition);
 		}
 		
 		@Override
@@ -246,13 +243,36 @@ public class MouseSelector {
 		}
 		
 		public abstract void getVertices(Collection<AbstractVertex> vertices);
+		
+		public abstract boolean isCloserThan(HitObject o);
 	}
 	
+	public static class HitNull extends HitObject {
+
+		private HitNull(double distanceSq) {
+			super(null, distanceSq, distanceSq, null);
+		}
+		
+		@Override
+		public void getVertices(Collection<AbstractVertex> vertices) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isCloserThan(HitObject o) {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			throw new UnsupportedOperationException();
+		}
+	}
 	
 	public static class HitVertex extends HitObject {
 		public final AbstractVertex vertex;
 		private HitVertex(XFormNode node, double distanceSq, Point3d screenPosition, AbstractVertex vertex) {
-			super(node, distanceSq, screenPosition);
+			super(node, distanceSq, distanceSq, screenPosition);
 			this.vertex = vertex;
 		}
 		
@@ -269,12 +289,27 @@ public class MouseSelector {
 		public void getVertices(Collection<AbstractVertex> vertices) {
 			vertices.add(vertex);
 		}
+
+		@Override
+		public boolean isCloserThan(HitObject o) {
+			if (o instanceof HitVertex) {
+				return edgeDistSq < o.edgeDistSq;
+			} else if (o instanceof HitEdge) {
+				return edgeDistSq < o.centerDistSq;
+			} else if (o instanceof HitFace) {
+				return edgeDistSq < o.centerDistSq;
+			} else if (o instanceof HitNull) {
+				return edgeDistSq < o.edgeDistSq;
+			} else {
+				throw new AssertionError();
+			}
+		}
 	}
 	
 	public static class HitEdge extends HitObject {
 		public final HalfEdge halfEdge;
-		private HitEdge(XFormNode node, double distanceSq, Point3d screenPosition, HalfEdge halfEdge) {
-			super(node, distanceSq, screenPosition);
+		private HitEdge(XFormNode node, double centerDistSq, double edgeDistSq, Point3d screenPosition, HalfEdge halfEdge) {
+			super(node, centerDistSq, edgeDistSq, screenPosition);
 			this.halfEdge = halfEdge;
 		}
 		
@@ -292,12 +327,27 @@ public class MouseSelector {
 			vertices.add(halfEdge.getVertex());
 			vertices.add(halfEdge.getPairVertex());
 		}
+		
+		@Override
+		public boolean isCloserThan(HitObject o) {
+			if (o instanceof HitVertex) {
+				return centerDistSq < o.edgeDistSq;
+			} else if (o instanceof HitEdge) {
+				return edgeDistSq < o.edgeDistSq;
+			} else if (o instanceof HitFace) {
+				return edgeDistSq < o.centerDistSq;
+			} else if (o instanceof HitNull) {
+				return edgeDistSq < o.edgeDistSq;
+			} else {
+				throw new AssertionError();
+			}
+		}
 	}
 	
 	public static class HitFace extends HitObject {
 		public final Face face;
 		private HitFace(XFormNode node, double distanceSq, Point3d screenPosition, Face face) {
-			super(node, distanceSq, screenPosition);
+			super(node, distanceSq, 0, screenPosition);
 			this.face = face;
 		}
 		
@@ -316,9 +366,26 @@ public class MouseSelector {
 				vertices.add(edge.getVertex());
 			}
 		}
+		
+		@Override
+		public boolean isCloserThan(HitObject o) {
+			if (o instanceof HitVertex) {
+				return centerDistSq < o.edgeDistSq;
+			} else if (o instanceof HitEdge) {
+				return centerDistSq < o.edgeDistSq;
+			} else if (o instanceof HitFace) {
+				return centerDistSq < o.centerDistSq;
+			} else if (o instanceof HitNull) {
+				return edgeDistSq < o.edgeDistSq;
+			} else {
+				throw new AssertionError();
+			}
+		}
 	}
 	
-	
+	public static boolean isSelectionTrigger(MouseEvent event) {
+		return event.isShiftDown();
+	}
 
 	
 }
