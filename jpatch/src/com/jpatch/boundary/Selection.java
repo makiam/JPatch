@@ -127,7 +127,7 @@ public class Selection {
 		addChangeSelectionEdit(editList);
 //		nodeChanging = true;
 		nodeAttr.setValue(node);
-		setType(Type.NODE, null);
+//		setType(Type.NODE, null);
 //		nodeChanging = false;
 	}
 	

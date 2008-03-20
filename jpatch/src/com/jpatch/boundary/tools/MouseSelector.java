@@ -49,6 +49,35 @@ public class MouseSelector {
 //		return new Selection.State(selection);
 //	}
 	
+	public static Selection.Type getBestSelectionType(Sds sds, int level, Set<AbstractVertex> vertices) {
+		if (vertices.size() == 0) {
+			return Selection.Type.VERTICES;
+		}
+		
+		for (Face face : sds.getFaces(level)) {
+			boolean faceContained = true;
+			for (HalfEdge faceEdge : face.getEdges()) {
+				if (!vertices.contains(faceEdge.getVertex())) {
+					faceContained = false;
+					break;
+				}
+			}
+			if (faceContained) {
+				return Selection.Type.FACES;
+			}
+		}
+		for (HalfEdge edge : sds.getEdges(level, true)) {
+			AbstractVertex v0 = edge.getVertex();
+			AbstractVertex v1 = edge.getPairVertex();
+			if (vertices.contains(v0) && vertices.contains(v1)) {
+				return Selection.Type.EDGES;
+			}
+		}
+		
+		
+		return Selection.Type.VERTICES;
+	}
+	
 	public static void getVerticesUnderLasso(ViewportGl viewport, Polygon lasso, SdsModel sdsModel, int level, boolean visibleOnly, Collection<AbstractVertex> vertices) {
 		vertices.clear();
 		viewport.getViewDef().configureTransformUtil(transformUtil);
