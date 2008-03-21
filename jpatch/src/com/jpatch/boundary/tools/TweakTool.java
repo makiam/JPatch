@@ -117,6 +117,14 @@ public class TweakTool implements VisibleTool {
 				if (hitObject != null) {
 					if (e.isShiftDown()) {
 						mode = Mode.SELECT_PROXIMITY;
+						if (hitObject instanceof HitVertex) {
+							selectionType = Selection.Type.VERTICES;
+						} else if (hitObject instanceof HitEdge) {
+							selectionType = Selection.Type.EDGES;
+						} else if (hitObject instanceof HitFace) {
+							selectionType = Selection.Type.FACES;
+						}
+						vertices.clear();
 					} else {
 						mode = Mode.MOVE;
 						snapPointer(viewport);
@@ -159,52 +167,42 @@ public class TweakTool implements VisibleTool {
 		}		
 	}
 	
-	private void promoteSelectionType(Selection.Type newType) {
-//		switch (selectionType) {
-//		case VERTICES:
-//			selectionType = newType;
-//			break;
-//		case EDGES:
-//			if (newType == Selection.Type.FACES) {
-//				selectionType = newType;
-//			}
-//			break;
-//		}
-		selectionType = newType;
-	}
 	private void updateSelection(ViewportGl viewport, int mx, int my, SdsModel sdsModel, int level) {
 		switch(mode) {
 		case SELECT_LASSO:
 			lassoPolygon.addPoint(mx, my);
 			lassoPolygon.invalidate();
 			MouseSelector.getVerticesUnderLasso(viewport, lassoPolygon, sdsModel, level, false, vertices);
-			promoteSelectionType(MouseSelector.getBestSelectionType(sdsModel.getSds(), level, vertices));
+			selectionType = MouseSelector.getBestSelectionType(sdsModel.getSds(), level, vertices);
 			break;
 		case SELECT_RECTANGLE:
 			lassoPolygon.xpoints[1] = lassoPolygon.xpoints[2] = mx;
 			lassoPolygon.ypoints[3] = lassoPolygon.ypoints[2] = my;
 			lassoPolygon.invalidate();
 			MouseSelector.getVerticesUnderLasso(viewport, lassoPolygon, sdsModel, level, false, vertices);
-			promoteSelectionType(MouseSelector.getBestSelectionType(sdsModel.getSds(), level, vertices));
+			selectionType = MouseSelector.getBestSelectionType(sdsModel.getSds(), level, vertices);
 			break;
 		case SELECT_PROXIMITY:
 			final int type;
-			System.out.println(Main.getInstance().getActions().sdsModeSM.getValue());
-			switch(Main.getInstance().getActions().sdsModeSM.getValue()) {
-			case EDGE_MODE:
+			switch(selectionType) {
+			case EDGES:
 				type = Sds.Type.EDGE;
 				break;
-			case VERTEX_MODE:
+			case VERTICES:
 				type = Sds.Type.VERTEX;
 				break;
-			case FACE_MODE:
+			case FACES:
 				type = Sds.Type.FACE;
 				break;
 			default:
 				throw new RuntimeException(); // should never get here	
 			}
 			HitObject hitObject = MouseSelector.getObjectAt(viewport, mx, my, Double.MAX_VALUE, sdsModel, level, type, null);
-			hitObject.getVertices(vertices);
+//			vertices.clear();
+			if (hitObject != null) {
+				hitObject.getVertices(vertices);
+			}
+			System.out.println("selectionType=" + selectionType + " hitobject=" + hitObject + " vertices=" + vertices);
 			break;
 		}
 		hitSelection.setNode(Main.getInstance().getSelection().getNode(), null);

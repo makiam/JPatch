@@ -7,9 +7,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="JPatch/src/nativelibs/linux/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.hyades.test.tools.core_4.2.3.v200701141614/java.runner.jar"/>
-	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.junit_3.8.1/junit.jar"/>
-	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.hyades.test.tools.core_4.2.3.v200701141614/common.runner.jar"/>
 	<classpathentry kind="lib" path="lib/mtj.jar"/>
 	<classpathentry kind="lib" path="lib/gluegen-rt.jar">
 		<attributes>
