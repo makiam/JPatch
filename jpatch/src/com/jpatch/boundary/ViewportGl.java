@@ -621,11 +621,11 @@ public class ViewportGl extends Viewport {
 		GL gl = drawable.getGL();
 
 		
-		if (antialiasAttr.getBoolean()) {
-			gl.glEnable(GL_MULTISAMPLE);
-		} else {
-			gl.glDisable(GL_MULTISAMPLE);
-		}
+//		if (antialiasAttr.getBoolean()) {
+//			gl.glEnable(GL_MULTISAMPLE);
+//		} else {
+//			gl.glDisable(GL_MULTISAMPLE);
+//		}
 		viewDef.configureTransformUtil(transformUtil);
 		time = System.nanoTime();
 //		System.out.println("ViewportGL.draw() at " + System.currentTimeMillis());
@@ -1430,6 +1430,10 @@ public class ViewportGl extends Viewport {
 	}
 	
 	public void validateScreenShotTexture() {
+		validateScreenShotTexture(true);
+	}
+		
+	public void validateScreenShotTexture(boolean front) {
 		if (screenshotTextureValid) {
 			return;
 		}
@@ -1443,7 +1447,7 @@ public class ViewportGl extends Viewport {
 		int txWidth = textureSize(component.getWidth());
 		int txHeight = textureSize(component.getHeight());
 		
-		gl.glReadBuffer(GL_FRONT);
+		gl.glReadBuffer(front ? GL_FRONT : GL_BACK);
 		gl.glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, txWidth, txHeight, 0);
 		
 		screenShotTxCoords[0] = 0.0f;	// top
@@ -1455,6 +1459,7 @@ public class ViewportGl extends Viewport {
 //		return Viewport.farClip - 2 * Viewport.farClip * buffer.get(0) - 1;
 		
 		screenshotTextureValid = true;
+		gl.glDisable(GL_TEXTURE_2D);
 		spatialMode();
 //		System.out.println("texture Updated");
 	}

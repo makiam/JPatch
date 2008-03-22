@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<attributeEditor name="Tweak Tool" class="com.jpatch.boundary.tools.TweakTool">
+  <boolean display="switch" false="Rect" true="Lasso" />
+  <field name="Selection mode" attribute="SelectLasso" />
+</attributeEditor>
