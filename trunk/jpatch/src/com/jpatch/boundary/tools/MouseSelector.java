@@ -271,6 +271,8 @@ public class MouseSelector {
 			return node == other.node;
 		}
 		
+		public abstract Selection.Type getType();
+		
 		public abstract void getVertices(Collection<AbstractVertex> vertices);
 		
 		public abstract boolean isCloserThan(HitObject o);
@@ -294,6 +296,11 @@ public class MouseSelector {
 		
 		@Override
 		public boolean equals(Object o) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public com.jpatch.boundary.Selection.Type getType() {
 			throw new UnsupportedOperationException();
 		}
 	}
@@ -333,6 +340,11 @@ public class MouseSelector {
 				throw new AssertionError();
 			}
 		}
+		
+		@Override
+		public com.jpatch.boundary.Selection.Type getType() {
+			return Selection.Type.VERTICES;
+		}
 	}
 	
 	public static class HitEdge extends HitObject {
@@ -370,6 +382,11 @@ public class MouseSelector {
 			} else {
 				throw new AssertionError();
 			}
+		}
+		
+		@Override
+		public com.jpatch.boundary.Selection.Type getType() {
+			return Selection.Type.EDGES;
 		}
 	}
 	
@@ -409,6 +426,11 @@ public class MouseSelector {
 			} else {
 				throw new AssertionError();
 			}
+		}
+		
+		@Override
+		public com.jpatch.boundary.Selection.Type getType() {
+			return Selection.Type.FACES;
 		}
 	}
 	
