@@ -480,10 +480,10 @@ public class Main {
 		JPatchStateButton zoomView = new JPatchStateButton(actions.zoomView);
 		JPatchStateButton rotateView = new JPatchStateButton(actions.rotateView);
 		
-		JPatchStateButton vertexMode = new JPatchStateButton(actions.vertexMode);
-		JPatchStateButton edgeMode = new JPatchStateButton(actions.edgeMode);
-		JPatchStateButton faceMode = new JPatchStateButton(actions.faceMode);
-		JPatchStateButton objectMode = new JPatchStateButton(actions.objectMode);
+//		JPatchStateButton vertexMode = new JPatchStateButton(actions.vertexMode);
+//		JPatchStateButton edgeMode = new JPatchStateButton(actions.edgeMode);
+//		JPatchStateButton faceMode = new JPatchStateButton(actions.faceMode);
+//		JPatchStateButton objectMode = new JPatchStateButton(actions.objectMode);
 		
 		JPatchToggleButton snapToGrid = new JPatchToggleButton(actions.snapToGrid);
 		
@@ -506,9 +506,9 @@ public class Main {
 		buttonUtils.configureButtons(IconSet.Style.UNDECORATED, openButton, saveButton);
 		buttonUtils.configureButtons(IconSet.Style.DARK, undoButton, redoButton);
 		buttonUtils.configureButtons(IconSet.Style.GLOSSY, moveView, zoomView, rotateView);
-		buttonUtils.configureButtons(IconSet.Style.FROSTED, vertexMode, edgeMode, faceMode, objectMode);
-		buttonUtils.configureButtons(IconSet.Style.BRUSHED, snapToGrid);
-		buttonUtils.configureButtons(IconSet.Style.BRUSHED, tweakTool, selectTool, moveTool, scaleTool, rotateTool, flipTool);
+//		buttonUtils.configureButtons(IconSet.Style.FROSTED, vertexMode, edgeMode, faceMode, objectMode);
+		buttonUtils.configureButtons(IconSet.Style.FROSTED, snapToGrid);
+		buttonUtils.configureButtons(IconSet.Style.FROSTED, tweakTool, selectTool, moveTool, scaleTool, rotateTool, flipTool);
 		buttonUtils.configureButtons(IconSet.Style.BRUSHED, addEdgeTool, extrudeTool, insetTool, latheTool);
 		
 		toolBar.add(openButton);
@@ -523,11 +523,11 @@ public class Main {
 		toolBar.add(zoomView);
 		toolBar.add(rotateView);
 		toolBar.add(Box.createHorizontalStrut(16));
-		toolBar.add(vertexMode);
-		toolBar.add(edgeMode);
-		toolBar.add(faceMode);
-		toolBar.add(objectMode);
-		toolBar.add(Box.createHorizontalStrut(16));
+//		toolBar.add(vertexMode);
+//		toolBar.add(edgeMode);
+//		toolBar.add(faceMode);
+//		toolBar.add(objectMode);
+//		toolBar.add(Box.createHorizontalStrut(16));
 		toolBar.add(snapToGrid);
 		toolBar.add(Box.createHorizontalStrut(4));
 		toolBar.add(tweakTool);
