@@ -65,6 +65,7 @@ public class ViewportGl extends Viewport {
 //	private final TransformUtil transformUtil = new TransformUtil();
 	
 	private boolean screenshotTextureValid;
+	private boolean depthBufferValid;
 	private long lastRedrawTime;
 	private int screenshotTexture;
 	private float[] screenShotTxCoords = new float[4];
@@ -618,6 +619,7 @@ public class ViewportGl extends Viewport {
 	@Override
 	public void draw() {
 		screenshotTextureValid = false;
+		depthBufferValid = false;
 		GL gl = drawable.getGL();
 
 		
@@ -1455,7 +1457,7 @@ public class ViewportGl extends Viewport {
 		screenShotTxCoords[2] = (float) component.getHeight() / txHeight;										// bottom
 		screenShotTxCoords[3] = (float) component.getWidth() / txWidth;				// right
 		
-		gl.glReadPixels(0, 0, component.getWidth(), component.getHeight(), GL_DEPTH_COMPONENT, GL_FLOAT, depthBuffer);
+//		gl.glReadPixels(0, 0, component.getWidth(), component.getHeight(), GL_DEPTH_COMPONENT, GL_FLOAT, depthBuffer);
 //		return Viewport.farClip - 2 * Viewport.farClip * buffer.get(0) - 1;
 		
 		screenshotTextureValid = true;
@@ -1464,8 +1466,22 @@ public class ViewportGl extends Viewport {
 //		System.out.println("texture Updated");
 	}
 	
+	public void validateDepthBuffer() {
+		validateDepthBuffer(true);
+	}
+		
+	public void validateDepthBuffer(boolean front) {
+		if (depthBufferValid) {
+			return;
+		}
+		GL gl = drawable.getGL();
+		gl.glReadBuffer(front ? GL_FRONT : GL_BACK);
+		gl.glReadPixels(0, 0, component.getWidth(), component.getHeight(), GL_DEPTH_COMPONENT, GL_FLOAT, depthBuffer);
+		depthBufferValid = true;
+	}
+	
 	public float getDepthAt(int x, int y) {
-		validateScreenShotTexture();
+		validateDepthBuffer();
 		int h = component.getHeight();
 		int w = component.getWidth();
 		if (x < 0 || x >= w || y < 0 || y >= h) {
