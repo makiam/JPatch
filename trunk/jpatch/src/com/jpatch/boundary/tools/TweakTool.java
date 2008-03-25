@@ -5,9 +5,11 @@ import static javax.media.opengl.GL.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 import javax.media.opengl.*;
 import javax.swing.*;
+import javax.swing.undo.*;
 import javax.vecmath.*;
 
 import com.jpatch.afw.attributes.*;
@@ -31,15 +33,14 @@ public class TweakTool implements VisibleTool {
 	
 	private HitObject hitObject;
 	private Selection hitSelection = new Selection();
-	private Selection tweakSelection = new Selection();
 	private Point hitPoint;
 	private Point3d localStart = new Point3d();
 	
 	private final Polygon lassoPolygon = new Polygon();
 	private final Set<AbstractVertex> vertices = new HashSet<AbstractVertex>();
-	private static enum Mode { IDLE, MOVE, SELECT_RECTANGLE, SELECT_LASSO, SELECT_PROXIMITY }
+	private static enum Mode { IDLE, HOVER, MOVE, SELECT, LASSO }
 	
-	private Mode mode = Mode.IDLE;
+	private Mode mode = Mode.HOVER;
 	private Selection.Type selectionType;
 	
 	private final BooleanAttr selectLassoAttr = new BooleanAttr();
@@ -76,7 +77,7 @@ public class TweakTool implements VisibleTool {
 //		textureUpdater.stop();
 	}
 
-	private void highlightHitObject(ViewportGl viewport, boolean redraw) {
+	private void highlightHitObject(ViewportGl viewport, boolean redraw, boolean validateTexture) {
 		
 		GLAutoDrawable glDrawable = (GLAutoDrawable) viewport.getComponent();
 		glDrawable.getContext().makeCurrent();
@@ -84,12 +85,15 @@ public class TweakTool implements VisibleTool {
 		if (redraw) {
 			gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			viewport.draw();
-			viewport.validateScreenShotTexture(false);
+			if (validateTexture) {
+				viewport.validateScreenShotTexture(false);
+				viewport.validateDepthBuffer(false);
+			}
 		} else {
 			viewport.validateScreenShotTexture();
 			viewport.drawScreenShot(0, 0, glDrawable.getWidth(), glDrawable.getHeight(), 1.0f);
 		}
-		if (mode == Mode.SELECT_LASSO || mode == Mode.SELECT_RECTANGLE) {
+		if (mode == Mode.LASSO) {
 			gl.glColor3f(1, 1, 0);
 			gl.glLineWidth(1);
 			gl.glBegin(GL_LINE_LOOP);
@@ -103,14 +107,16 @@ public class TweakTool implements VisibleTool {
 		
 		viewport.spatialMode();
 		viewport.getViewDef().configureTransformUtil(transformUtil);
-		if (tweakSelection.getNode() != null) {
-			tweakSelection.getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+		Selection selection = Main.getInstance().getSelection();
+		if (selection.getNode() != null) {
+			selection.getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
 			viewport.setModelViewMatrix(transformUtil);
 			gl.glDisable(GL_DEPTH_TEST);
-			viewport.drawSelection(tweakSelection, new Color3f(1, 1, 0));
-			if (mode != Mode.MOVE) {
+			viewport.drawSelection(selection, new Color3f(1, 1, 0));
+//			if (mode == Mode.HOVER && hitObject != null) {
+//				setSelection(hitSelection, hitObject);
 				viewport.drawSelection(hitSelection, new Color3f(1, 1, 0));
-			}
+//			}
 			gl.glEnable(GL_DEPTH_TEST);
 		}
 		glDrawable.swapBuffers();
@@ -130,53 +136,98 @@ public class TweakTool implements VisibleTool {
 //				return;
 //			}
 			if (e.getButton() == MouseEvent.BUTTON1) {
-				if (hitObject != null) {
-					if (e.isShiftDown()) {
-						mode = Mode.SELECT_PROXIMITY;
-						if (hitObject instanceof HitVertex) {
-							selectionType = Selection.Type.VERTICES;
-						} else if (hitObject instanceof HitEdge) {
-							selectionType = Selection.Type.EDGES;
-						} else if (hitObject instanceof HitFace) {
-							selectionType = Selection.Type.FACES;
-						}
-						vertices.clear();
-					} else {
+				final Selection selection = Main.getInstance().getSelection();
+				final SdsModel sdsModel = selection.getSdsModel();
+				final int level = sdsModel.getEditLevelAttribute().getInt();
+				
+				if (MouseSelector.isSelectionTrigger(e)) {
+					mode = Mode.SELECT;
+				}
+				switch (mode) {
+				case IDLE:
+					List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(1);
+					selection.clear(editList);
+					Main.getInstance().getUndoManager().addEdit("clear selection", editList);
+					highlightHitObject(viewport, false, false);
+					break;
+				case HOVER:
+					hitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 32 * 32, sdsModel, level, STANDARD_SELECTION_TYPE, null);
+					if (hitObject != null) {
+						setSelection(hitSelection, hitObject);
+						snapPointer(viewport, hitObject);
 						mode = Mode.MOVE;
-						snapPointer(viewport);
-//						setSelection(tweakSelection, hitObject);
-						
-						Collection<AbstractVertex> hitVertices = new HashSet<AbstractVertex>();
-						hitObject.getVertices(hitVertices);
-						if (hitVertices.size() > 0 && tweakSelection.getVertices().containsAll(hitVertices)) {
-//							hitSelection.clear(null);
-//							new Selection.State(tweakSelection).copyTo(hitSelection);
-						} else {
-							setSelection(tweakSelection, hitObject);
-						}
-						
-						tweakSelection.getTransformable().begin();
+						hitSelection.getTransformable().begin();
 						localStart.set(hitObject.screenPosition);
 						transformUtil.projectFromScreen(TransformUtil.LOCAL, localStart, localStart);
-					}
-				} else {
-					if (selectLassoAttr.getBoolean()) {
-						mode = Mode.SELECT_LASSO;
-						lassoPolygon.npoints = 0;
-						lassoPolygon.invalidate();
-						selectionType = Selection.Type.VERTICES;
+						highlightHitObject(viewport, false, false);
 					} else {
-						mode = Mode.SELECT_RECTANGLE;
-						final int mx = e.getX();
-						final int my = e.getY();
-						lassoPolygon.npoints = 4;
-						lassoPolygon.xpoints = new int[] { mx, mx, mx, mx };
-						lassoPolygon.ypoints = new int[] { my, my, my, my };
-						lassoPolygon.invalidate();
-						selectionType = Selection.Type.VERTICES;
+						mode = Mode.LASSO;
+						if (selectLassoAttr.getBoolean()) {
+							lassoPolygon.npoints = 0;
+							lassoPolygon.invalidate();
+							selectionType = Selection.Type.VERTICES;
+						} else {
+							final int mx = e.getX();
+							final int my = e.getY();
+							lassoPolygon.npoints = 4;
+							lassoPolygon.xpoints = new int[] { mx, mx, mx, mx };
+							lassoPolygon.ypoints = new int[] { my, my, my, my };
+							lassoPolygon.invalidate();
+							selectionType = Selection.Type.VERTICES;
+						}
 					}
+					break;
 				}
-				highlightHitObject(viewport, false);
+				
+				
+				
+//				if (hitObject != null) {
+//					if (e.isShiftDown()) {
+//						mode = Mode.SELECT;
+//						if (hitObject instanceof HitVertex) {
+//							selectionType = Selection.Type.VERTICES;
+//						} else if (hitObject instanceof HitEdge) {
+//							selectionType = Selection.Type.EDGES;
+//						} else if (hitObject instanceof HitFace) {
+//							selectionType = Selection.Type.FACES;
+//						}
+//						vertices.clear();
+//					} else {
+//						mode = Mode.MOVE;
+//						snapPointer(viewport);
+////						setSelection(tweakSelection, hitObject);
+//						
+//						Collection<AbstractVertex> hitVertices = new HashSet<AbstractVertex>();
+//						hitObject.getVertices(hitVertices);
+//						if (hitVertices.size() > 0 && tweakSelection.getVertices().containsAll(hitVertices)) {
+////							hitSelection.clear(null);
+////							new Selection.State(tweakSelection).copyTo(hitSelection);
+//						} else {
+//							setSelection(tweakSelection, hitObject);
+//						}
+//						
+//						tweakSelection.getTransformable().begin();
+//						localStart.set(hitObject.screenPosition);
+//						transformUtil.projectFromScreen(TransformUtil.LOCAL, localStart, localStart);
+//					}
+//				} else {
+//					if (selectLassoAttr.getBoolean()) {
+//						mode = Mode.SELECT_LASSO;
+//						lassoPolygon.npoints = 0;
+//						lassoPolygon.invalidate();
+//						selectionType = Selection.Type.VERTICES;
+//					} else {
+//						mode = Mode.SELECT_RECTANGLE;
+//						final int mx = e.getX();
+//						final int my = e.getY();
+//						lassoPolygon.npoints = 4;
+//						lassoPolygon.xpoints = new int[] { mx, mx, mx, mx };
+//						lassoPolygon.ypoints = new int[] { my, my, my, my };
+//						lassoPolygon.invalidate();
+//						selectionType = Selection.Type.VERTICES;
+//					}
+//				}
+//				highlightHitObject(viewport, false);
 			}
 		}
 
@@ -184,66 +235,74 @@ public class TweakTool implements VisibleTool {
 		public void mouseReleased(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				if (mode == Mode.MOVE) {
-					tweakSelection.getTransformable().end(new ArrayList<JPatchUndoableEdit>());
-					Main.getInstance().repaintViewports();
+					List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(1);
+					hitSelection.getTransformable().end(editList);
+					Main.getInstance().getUndoManager().addEdit("move", editList);
+					highlightHitObject(viewport, true, true);
+//					Main.getInstance().repaintViewports();
 				}
-				mode = Mode.IDLE;
+				mode = Mode.HOVER;
 			}
 		}		
 	}
 	
-	private void updateSelection(ViewportGl viewport, int mx, int my, SdsModel sdsModel, int level) {
-		switch(mode) {
-		case SELECT_LASSO:
-			lassoPolygon.addPoint(mx, my);
-			lassoPolygon.invalidate();
-			MouseSelector.getVerticesUnderLasso(viewport, lassoPolygon, sdsModel, level, false, vertices);
-			selectionType = MouseSelector.getBestSelectionType(sdsModel.getSds(), level, vertices);
-			break;
-		case SELECT_RECTANGLE:
-			lassoPolygon.xpoints[1] = lassoPolygon.xpoints[2] = mx;
-			lassoPolygon.ypoints[3] = lassoPolygon.ypoints[2] = my;
-			lassoPolygon.invalidate();
-			MouseSelector.getVerticesUnderLasso(viewport, lassoPolygon, sdsModel, level, false, vertices);
-			selectionType = MouseSelector.getBestSelectionType(sdsModel.getSds(), level, vertices);
-			break;
-		case SELECT_PROXIMITY:
-			final int type;
-			switch(selectionType) {
-			case EDGES:
-				type = Sds.Type.EDGE;
-				break;
-			case VERTICES:
-				type = Sds.Type.VERTEX;
-				break;
-			case FACES:
-				type = Sds.Type.FACE;
-				break;
-			default:
-				throw new RuntimeException(); // should never get here	
-			}
-			HitObject hitObject = MouseSelector.getObjectAt(viewport, mx, my, Double.MAX_VALUE, sdsModel, level, type, null);
-//			vertices.clear();
-			if (hitObject != null) {
-				hitObject.getVertices(vertices);
-			}
-			System.out.println("selectionType=" + selectionType + " hitobject=" + hitObject + " vertices=" + vertices);
-			break;
-		}
-		tweakSelection.setNode(Main.getInstance().getSelection().getNode(), null);
-		tweakSelection.clear(null);
-		tweakSelection.addVertices(vertices, null);
-		tweakSelection.setType(selectionType, null);
-		highlightHitObject(viewport, false);
-	}
+//	private void updateSelection(ViewportGl viewport, int mx, int my, SdsModel sdsModel, int level) {
+//		switch(mode) {
+//		case SELECT_LASSO:
+//			lassoPolygon.addPoint(mx, my);
+//			lassoPolygon.invalidate();
+//			MouseSelector.getVerticesUnderLasso(viewport, lassoPolygon, sdsModel, level, false, vertices);
+//			selectionType = MouseSelector.getBestSelectionType(sdsModel.getSds(), level, vertices);
+//			break;
+//		case SELECT_RECTANGLE:
+//			lassoPolygon.xpoints[1] = lassoPolygon.xpoints[2] = mx;
+//			lassoPolygon.ypoints[3] = lassoPolygon.ypoints[2] = my;
+//			lassoPolygon.invalidate();
+//			MouseSelector.getVerticesUnderLasso(viewport, lassoPolygon, sdsModel, level, false, vertices);
+//			selectionType = MouseSelector.getBestSelectionType(sdsModel.getSds(), level, vertices);
+//			break;
+//		case SELECT_PROXIMITY:
+//			final int type;
+//			switch(selectionType) {
+//			case EDGES:
+//				type = Sds.Type.EDGE;
+//				break;
+//			case VERTICES:
+//				type = Sds.Type.VERTEX;
+//				break;
+//			case FACES:
+//				type = Sds.Type.FACE;
+//				break;
+//			default:
+//				throw new RuntimeException(); // should never get here	
+//			}
+//			HitObject hitObject = MouseSelector.getObjectAt(viewport, mx, my, Double.MAX_VALUE, sdsModel, level, type, null);
+////			vertices.clear();
+//			if (hitObject != null) {
+//				hitObject.getVertices(vertices);
+//			}
+//			System.out.println("selectionType=" + selectionType + " hitobject=" + hitObject + " vertices=" + vertices);
+//			break;
+//		}
+//		tweakSelection.setNode(Main.getInstance().getSelection().getNode(), null);
+//		tweakSelection.clear(null);
+//		tweakSelection.addVertices(vertices, null);
+//		tweakSelection.setType(selectionType, null);
+//		highlightHitObject(viewport, false);
+//	}
 	
 	private void setSelection(Selection selection, HitObject hitObject) {
-		if (hitObject instanceof MouseSelector.HitVertex) {
-			selection.setVertex(((HitVertex) hitObject).vertex, null);
-		} else if (hitObject instanceof MouseSelector.HitEdge) {
-			selection.setEdge(((HitEdge) hitObject).halfEdge, null);
-		} else if (hitObject instanceof MouseSelector.HitFace) {
-			selection.setFace(((HitFace) hitObject).face, null);
+		if (hitObject == null) {
+			selection.clear(null);
+		} else {
+			selection.setNode(hitObject.node, null);
+			if (hitObject instanceof MouseSelector.HitVertex) {
+				selection.setVertex(((HitVertex) hitObject).vertex, null);
+			} else if (hitObject instanceof MouseSelector.HitEdge) {
+				selection.setEdge(((HitEdge) hitObject).halfEdge, null);
+			} else if (hitObject instanceof MouseSelector.HitFace) {
+				selection.setFace(((HitFace) hitObject).face, null);
+			}
 		}
 	}
 	
@@ -266,49 +325,62 @@ public class TweakTool implements VisibleTool {
 				mouse.set(e.getX(), e.getY(), hitObject.screenPosition.z);
 				transformUtil.projectFromScreen(TransformUtil.LOCAL, mouse, mouse);
 				vector.sub(mouse, localStart);
-				tweakSelection.getTransformable().translate(vector);
+				hitSelection.getTransformable().translate(vector);
 //				Main.getInstance().syncRepaintViewport(viewport);
-				highlightHitObject(viewport, true);
+				highlightHitObject(viewport, true, false);
 				break;
-			case SELECT_LASSO:		// fallthrough intended
-			case SELECT_RECTANGLE:	// fallthrough intended
-			case SELECT_PROXIMITY:
-				final SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
-				final int level = sdsModel.getEditLevelAttribute().getInt();
-				
-				int mx = e.getX();
-				int my = e.getY();
-				
-				updateSelection(viewport, mx, my, sdsModel, level);
-				break;
+//			case SELECT_LASSO:		// fallthrough intended
+//			case SELECT_RECTANGLE:	// fallthrough intended
+//			case SELECT_PROXIMITY:
+//				final SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
+//				final int level = sdsModel.getEditLevelAttribute().getInt();
+//				
+//				int mx = e.getX();
+//				int my = e.getY();
+//				
+//				updateSelection(viewport, mx, my, sdsModel, level);
+//				break;
 			}
 		}
 
 		public void mouseMoved(MouseEvent e) {
-			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
-			if (sdsModel != null) {
-				int level = sdsModel.getEditLevelAttribute().getInt();
-				int selectionType = viewport.getViewDef().getShowControlMeshAttribute().getBoolean() ? STANDARD_SELECTION_TYPE : LIMIT_SELECTION_TYPE;
-				HitObject newHitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 32 * 32, sdsModel, level, selectionType, null);
-				if (newHitObject != null && !newHitObject.equals(hitObject)) {
+//			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
+//			if (sdsModel != null) {
+//				int level = sdsModel.getEditLevelAttribute().getInt();
+//				int selectionType = viewport.getViewDef().getShowControlMeshAttribute().getBoolean() ? STANDARD_SELECTION_TYPE : LIMIT_SELECTION_TYPE;
+//				HitObject newHitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 32 * 32, sdsModel, level, selectionType, null);
+//				if (newHitObject != null && !newHitObject.equals(hitObject)) {
+//					hitObject = newHitObject;
+//					Collection<AbstractVertex> hitVertices = new HashSet<AbstractVertex>();
+//					hitObject.getVertices(hitVertices);
+//					if (hitVertices.size() > 0 && tweakSelection.getVertices().containsAll(hitVertices)) {
+//						hitSelection.clear(null);
+//						new Selection.State(tweakSelection).copyTo(hitSelection);
+//					} else {
+//						setSelection(hitSelection, hitObject);
+//					}
+//					highlightHitObject(viewport, false);
+//				} else {
+//					hitObject = newHitObject;
+//				}
+//			}
+			final Selection selection = Main.getInstance().getSelection();
+			final SdsModel sdsModel = selection.getSdsModel();
+			final int level = sdsModel.getEditLevelAttribute().getInt();
+			
+			switch (mode) {
+			case HOVER:
+				HitObject newHitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 32 * 32, sdsModel, level, STANDARD_SELECTION_TYPE, null);
+				if (newHitObject == null ? hitObject != null : !newHitObject.equals(hitObject)) {
 					hitObject = newHitObject;
-					Collection<AbstractVertex> hitVertices = new HashSet<AbstractVertex>();
-					hitObject.getVertices(hitVertices);
-					if (hitVertices.size() > 0 && tweakSelection.getVertices().containsAll(hitVertices)) {
-						hitSelection.clear(null);
-						new Selection.State(tweakSelection).copyTo(hitSelection);
-					} else {
-						setSelection(hitSelection, hitObject);
-					}
-					highlightHitObject(viewport, false);
-				} else {
-					hitObject = newHitObject;
+					setSelection(hitSelection, hitObject);
+					highlightHitObject(viewport, false, false);
 				}
 			}
 		}	
 	};
 	
-	private void snapPointer(Viewport viewport) {
+	private void snapPointer(Viewport viewport, HitObject hitObject) {
 		Point point = new Point((int) Math.round(hitObject.screenPosition.x), (int) Math.round(hitObject.screenPosition.y));
 		hitPoint = new Point(point);
 		SwingUtilities.convertPointToScreen(point, viewport.getComponent());
