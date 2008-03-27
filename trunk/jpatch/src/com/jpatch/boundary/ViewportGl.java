@@ -697,10 +697,10 @@ public class ViewportGl extends Viewport {
 		gl.glLineWidth(1);
 		SceneGraphNode sceneGraphRoot = Main.getInstance().getSceneGraphRoot();
 		drawSceneGraphElement(sceneGraphRoot);
-		Selection selection = Main.getInstance().getSelection();
+//		Selection selection = Main.getInstance().getSelection();
 		
-		gl.glDisable(GL_LIGHTING);
-		drawSelection(selection, new Color3f(1, 1, 0));
+//		gl.glDisable(GL_LIGHTING);
+//		drawSelection(selection, new Color3f(1, 1, 0));
 		
 		JPatchTool tool = Main.getInstance().getActiveTool();
 //		System.out.println("tool = " + tool);
