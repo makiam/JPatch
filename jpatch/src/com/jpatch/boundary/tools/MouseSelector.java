@@ -94,6 +94,84 @@ public class MouseSelector {
 		}
 	}
 	
+	public static boolean isHit(Viewport viewport, int mouseX, int mouseY, final double maxDistSq, Selection selection, Point3d hitPoint) {
+		viewport.getViewDef().configureTransformUtil(transformUtil);
+		selection.getNode().getLocal2WorldTransform(transformUtil, LOCAL);
+		Point3d p0 = new Point3d();
+		Point3d p1 = new Point3d();
+		switch (selection.getType()) {
+		case VERTICES:
+			for (AbstractVertex vertex : selection.getVertices()) {
+				vertex.getPosition(p0);
+				transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+				if (isCloser(mouseX, mouseY, p0.x, p0.y, maxDistSq)) {
+					hitPoint.set(p0);
+					return true;
+				}
+			}
+			break;
+		case EDGES:
+			for (HalfEdge edge : selection.getEdges()) {
+				edge.getVertex().getPosition(p0);
+				transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+				edge.getPairVertex().getPosition(p1);
+				transformUtil.projectToScreen(TransformUtil.LOCAL, p1, p1);
+				
+				double t = Utils3d.closestPointOnLine(p0.x, p0.y, p1.x, p1.y, mouseX, mouseY);
+				t = Math.max(0, Math.min(t, 1));
+				p0.interpolate(p0, p1, t);
+				
+				if (isCloser(mouseX, mouseY, p0.x, p0.y, maxDistSq)) {
+					hitPoint.set(p0);
+					return true;
+				}
+			}
+			break;
+		case FACES:
+			for (Face face : selection.getFaces()) {
+				HalfEdge[] egdes = face.getEdges();
+				int n = face.getSides();
+				Polygon polygon = new Polygon(new int[n], new int[n], n);
+				for (int i = 0; i < n; i++) {
+					egdes[i].getVertex().getPosition(p0);
+					transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+					polygon.xpoints[i] = (int) Math.round(p0.x);
+					polygon.ypoints[i] = (int) Math.round(p0.y);
+				}
+				if (polygon.contains(mouseX, mouseY)) {
+					Point3d rayOrigin = new Point3d();
+					Vector3d rayDirection = new Vector3d();
+					setupCameraRay(rayOrigin, rayDirection, mouseX, mouseY);
+					hitPoint.set(mouseX, mouseY, getFaceHitZ(rayOrigin, rayDirection, face));
+					return true;
+				}
+			}
+			break;
+		default:
+			throw new RuntimeException(); // should never get here
+		}
+		return false;
+	}
+	
+	private static boolean isCloser(double x0, double y0, double x1, double y1, double maxDistSq) {
+		double dx = x0 - x1;
+		double dy = y0 - y1;
+		return (dx * dx + dy * dy) <= maxDistSq;
+	}
+	
+	private static void setupCameraRay(Point3d rayOrigin, Vector3d rayDirection, int mouseX, int mouseY) {
+		if (transformUtil.isPerspective()) {
+			rayOrigin.set(mouseX, mouseY, 1);
+			transformUtil.projectFromScreen(CAMERA, rayOrigin, rayOrigin);
+			rayDirection.set(rayOrigin.x, rayOrigin.y, -rayOrigin.z);	// TODO: why -z ?!?
+			rayOrigin.set(0, 0, 0);
+		} else {
+			rayOrigin.set(mouseX, mouseY, 0);
+			transformUtil.projectFromScreen(CAMERA, rayOrigin, rayOrigin);
+			rayDirection.set(0, 0, -1);
+		}
+	}
+	
 	public static HitObject getObjectAt(Viewport viewport, int mouseX, int mouseY, final double initMaxDistSq, SdsModel sdsModel, int level, int type, ObjectFilter objectFilter) {
 		if (objectFilter == null) {
 			objectFilter = ACCEPT_ANYTHING;
@@ -121,22 +199,12 @@ public class MouseSelector {
 		if ((type & Type.FACE) != 0) {
 			
 			Point3d rayOrigin = new Point3d();
-			Point3d rayDestination = new Point3d();
 			Vector3d rayDirection = new Vector3d();
-			if (transformUtil.isPerspective()) {
-				rayOrigin.set(0, 0, 0);
-				rayDestination.set(mouseX, mouseY, 1);
-				transformUtil.projectFromScreen(CAMERA, rayDestination, rayDestination);
-				rayDirection.set(rayDestination.x, rayDestination.y, -rayDestination.z);	// TODO: why -z ?!?
-			} else {
-				rayOrigin.set(mouseX, mouseY, 0);
-				transformUtil.projectFromScreen(CAMERA, rayOrigin, rayOrigin);
-				rayDirection.set(0, 0, -1);
-			}
+			setupCameraRay(rayOrigin, rayDirection, mouseX, mouseY);
 			
 			for (Face face :sds.getFaces(level)) {
 				if (objectFilter.accept(face)) {
-					double z = getDistSqToFace(rayOrigin, rayDirection, face);
+					double z = getFaceHitZ(rayOrigin, rayDirection, face);
 					if (z < Double.MAX_VALUE) {
 						face.getMidpointPosition(p0);
 						transformUtil.projectToScreen(LOCAL, p0, p0);
@@ -226,7 +294,8 @@ public class MouseSelector {
 	private static Point3d faceMidpoint = new Point3d();
 	private static Point3d faceP0 = new Point3d();
 	private static Point3d faceP1 = new Point3d();
-	private static double getDistSqToFace(Point3d rayOrigin, Vector3d rayDirection, Face face) {
+	
+	private static double getFaceHitZ(Point3d rayOrigin, Vector3d rayDirection, Face face) {
 		face.getMidpointPosition(faceMidpoint);
 		transformUtil.transform(LOCAL, faceMidpoint, CAMERA, faceMidpoint);
 		for (HalfEdge faceEdge : face.getEdges()) {
@@ -431,6 +500,11 @@ public class MouseSelector {
 		@Override
 		public com.jpatch.boundary.Selection.Type getType() {
 			return Selection.Type.FACES;
+		}
+		
+		@Override
+		public String toString() {
+			return "Hitface:" + face;
 		}
 	}
 	
