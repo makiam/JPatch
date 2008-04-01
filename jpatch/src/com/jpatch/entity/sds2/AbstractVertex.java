@@ -44,7 +44,7 @@ public abstract class AbstractVertex {
 	AbstractVertex() {
 		positionAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
-				setPosition(positionAttr.getX(), positionAttr.getY(), positionAttr.getZ());
+				setPos(positionAttr.getX(), positionAttr.getY(), positionAttr.getZ());
 			}
 		});
 	}
@@ -67,7 +67,11 @@ public abstract class AbstractVertex {
 		positionAttr.setTuple(p);
 	}
 	
-	abstract void setPosition(double x, double y, double z);
+	public void setPosition(double x, double y, double z) {
+		positionAttr.setTuple(x, y, z);
+	}
+	
+	abstract void setPos(double x, double y, double z);
 	
 	final void setDisplacement(double x, double y, double z) {
 		if (x == 0 && y == 0 && z == 0) {

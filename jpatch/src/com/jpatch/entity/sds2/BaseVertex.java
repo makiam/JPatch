@@ -11,7 +11,7 @@ public class BaseVertex extends AbstractVertex {
 	}
 	
 	@Override
-	void setPosition(double x, double y, double z) {
+	void setPos(double x, double y, double z) {
 		this.referencePosition.set(x, y, z);
 		positionValid = true;
 		invalidate();
