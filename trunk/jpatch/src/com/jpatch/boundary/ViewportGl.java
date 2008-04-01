@@ -1191,7 +1191,7 @@ public class ViewportGl extends Viewport {
 //		gl.glPointSize(3);
 //	}
 	
-	public void drawSelection(Selection selection, Color3f highlighColor) {
+	public void drawSelection(Selection selection, Color4f highlighColor) {
 		GL gl = drawable.getGL();
 //		selection.getNode().getLocal2WorldTransform(transformUtil, LOCAL);
 //		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
@@ -1201,12 +1201,13 @@ public class ViewportGl extends Viewport {
 		
 		
 		Point3f p = new Point3f();
-		Vector3d n = new Vector3d();
 		gl.glDepthMask(false);
+		gl.glEnable(GL_BLEND);
+		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		switch (selection.getType()) {
 		case VERTICES:
 			gl.glPointSize(6);
-			gl.glColor3f(highlighColor.x, highlighColor.y, highlighColor.z);
+			gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, highlighColor.w);
 			gl.glBegin(GL_POINTS);
 			for (AbstractVertex vertex : selection.getVertices()) {
 				vertex.getPosition(p);
@@ -1216,7 +1217,7 @@ public class ViewportGl extends Viewport {
 			break;
 		case EDGES:
 			gl.glLineWidth(3);
-			gl.glColor3f(highlighColor.x, highlighColor.y, highlighColor.z);
+			gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, highlighColor.w);
 			gl.glBegin(GL_LINES);
 			for (HalfEdge edge : selection.getEdges()) {
 				edge.getVertex().getPosition(p);
@@ -1228,18 +1229,16 @@ public class ViewportGl extends Viewport {
 			break;
 		case FACES:
 			gl.glLineWidth(2);
-			gl.glEnable(GL_BLEND);
-			gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			for (Face face : selection.getFaces()) {
 				gl.glInterleavedArrays(GL_N3F_V3F, 0, face.getControlSurface());
-				gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, 0.5f);
+				gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, highlighColor.w * 0.5f);
 				gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() + 2);
-				gl.glColor3f(highlighColor.x, highlighColor.y, highlighColor.z);
+				gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, highlighColor.w);
 				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides());
 			}
-			gl.glDisable(GL_BLEND);
 			break;
 		}
+		gl.glDisable(GL_BLEND);
 		gl.glDepthMask(true);
 	
 //		gl.glPopMatrix();

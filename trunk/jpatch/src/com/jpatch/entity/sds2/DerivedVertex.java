@@ -13,7 +13,7 @@ public abstract class DerivedVertex extends AbstractVertex {
 	}
 	
 	@Override
-	public void setPosition(double x, double y, double z) {
+	public void setPos(double x, double y, double z) {
 		setDisplacement(x, y, z);
 	}
 }

@@ -22,6 +22,8 @@ import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
 public class TweakTool implements VisibleTool {
+	private enum ToolMode { FREE, NORMAL }
+	
 	private static final int MAX_DISTANCE_SQ = 32 * 32;
 	
 	private TransformUtil transformUtil = new TransformUtil();
@@ -48,6 +50,7 @@ public class TweakTool implements VisibleTool {
 	private Selection.Type selectionType;
 	
 	private final BooleanAttr selectLassoAttr = new BooleanAttr();
+	private final StateMachine<ToolMode> toolModeAttr = new StateMachine<ToolMode>(ToolMode.class, ToolMode.FREE);
 	
 	public void draw(Viewport viewport) {
 		// TODO Auto-generated method stub
@@ -56,6 +59,10 @@ public class TweakTool implements VisibleTool {
 
 	public BooleanAttr getSelectLassoAttribute() {
 		return selectLassoAttr;
+	}
+	
+	public StateMachine<ToolMode> getToolModeAttribute() {
+		return toolModeAttr;
 	}
 	
 	public void registerListeners(Viewport[] viewports) {
@@ -81,7 +88,7 @@ public class TweakTool implements VisibleTool {
 //		textureUpdater.stop();
 	}
 
-	private void highlightHitObject(ViewportGl viewport, boolean redraw, boolean validateTexture) {
+	private void highlightHitObject(ViewportGl viewport, boolean redraw, boolean validateTexture, boolean strong) {
 		
 		GLAutoDrawable glDrawable = (GLAutoDrawable) viewport.getComponent();
 		glDrawable.getContext().makeCurrent();
@@ -112,23 +119,23 @@ public class TweakTool implements VisibleTool {
 		viewport.spatialMode();
 		viewport.getViewDef().configureTransformUtil(transformUtil);
 		
-		selection.getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+		hitSelection.getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
 		viewport.setModelViewMatrix(transformUtil);
 		gl.glDisable(GL_DEPTH_TEST);
 		
 		
-		Selection selection = Main.getInstance().getSelection();
-		if (selection.getNode() != null) {
-			selection.getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+//		Selection selection = Main.getInstance().getSelection();
+//		if (hitSelection.getNode() != null) {
+//			hitSelection.getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
 			viewport.setModelViewMatrix(transformUtil);
 			gl.glDisable(GL_DEPTH_TEST);
 //			viewport.drawSelection(selection, new Color3f(1, 1, 0));
 //			if (mode == Mode.HOVER && hitObject != null) {
 //				setSelection(hitSelection, hitObject);
-				viewport.drawSelection(hitSelection, new Color3f(1, 1, 0));
+				viewport.drawSelection(hitSelection, new Color4f(1, 1, 0, strong ? 1.0f : 0.5f));
 //			}
 			gl.glEnable(GL_DEPTH_TEST);
-		}
+//		}
 		glDrawable.swapBuffers();
 		glDrawable.getContext().release();
 	}
@@ -154,7 +161,7 @@ public class TweakTool implements VisibleTool {
 		hitSelection.getTransformable().begin();
 		localStart.set(screenPosition);
 		transformUtil.projectFromScreen(TransformUtil.LOCAL, localStart, localStart);
-		highlightHitObject(viewport, false, false);
+		highlightHitObject(viewport, false, false, true);
 	}
 	
 	private class TweakMouseListener extends MouseAdapter {
@@ -170,8 +177,7 @@ public class TweakTool implements VisibleTool {
 //				return;
 //			}
 			if (e.getButton() == MouseEvent.BUTTON1) {
-				final Selection selection = Main.getInstance().getSelection();
-				final SdsModel sdsModel = selection.getSdsModel();
+				final SdsModel sdsModel = hitSelection.getSdsModel();
 				final int level = sdsModel.getEditLevelAttribute().getInt();
 				
 				
@@ -203,9 +209,9 @@ public class TweakTool implements VisibleTool {
 //						}
 //					}
 					if (mode == Mode.IDLE) {
-						selection.clear(null);
+						hitSelection.clear(null);
 						setLassoMode(e.getX(), e.getY());
-						highlightHitObject(viewport, false, false);
+						highlightHitObject(viewport, false, false, true);
 					}
 					
 //					List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>(1);
@@ -292,12 +298,12 @@ public class TweakTool implements VisibleTool {
 //					mode = Mode.HOVER;
 //					break;
 //				case LASSO:
-					if (hitSelection.getVertices().size() > 1) {
+					if (hitSelection.getSize() > 1) {
 						mode = Mode.IDLE;
 					} else {
 						mode = Mode.HOVER;
 					}
-					highlightHitObject(viewport, false, false);
+					highlightHitObject(viewport, true, true, true);
 //					break;
 //				default:
 //					assert false : mode;
@@ -337,7 +343,7 @@ public class TweakTool implements VisibleTool {
 		hitSelection.setNode(sdsModel, null);
 		hitSelection.addVertices(vertices, null);
 		hitSelection.setType(selectionType, null);
-		highlightHitObject(viewport, false, false);
+		highlightHitObject(viewport, false, false, true);
 	}
 	
 	private int getSelectionFilter(Selection.Type type) {
@@ -390,7 +396,7 @@ public class TweakTool implements VisibleTool {
 				vector.sub(mouse, localStart);
 				hitSelection.getTransformable().translate(vector);
 //				Main.getInstance().syncRepaintViewport(viewport);
-				highlightHitObject(viewport, true, false);
+				highlightHitObject(viewport, true, false, true);
 				break;
 //			case SELECT_LASSO:		// fallthrough intended
 //			case SELECT_RECTANGLE:	// fallthrough intended
@@ -438,8 +444,13 @@ public class TweakTool implements VisibleTool {
 				if (newHitObject == null ? hitObject != null : !newHitObject.equals(hitObject)) {
 					hitObject = newHitObject;
 					setSelection(hitSelection, hitObject);
-					highlightHitObject(viewport, false, false);
+					highlightHitObject(viewport, false, false, true);
 				}
+				break;
+			case IDLE:
+				boolean strong = MouseSelector.isHit(viewport, e.getX(), e.getY(), 32 * 32, hitSelection, new Point3d());
+				highlightHitObject(viewport, false, false, strong);
+				break;
 			}
 		}	
 	};

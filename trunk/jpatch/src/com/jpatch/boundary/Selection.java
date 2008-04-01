@@ -437,6 +437,21 @@ public class Selection {
 		facesValid = true;
 	}
 	
+	public int getSize() {
+		switch (type) {
+		case EDGES:
+			return getEdges().size();
+		case FACES:
+			return getFaces().size();
+		case VERTICES:
+			return getVertices().size();
+		case NODE:
+			return 1;
+		default:
+			throw new RuntimeException(); // should never get here
+		}
+	}
+	
 	public void getBounds(Tuple3d p0, Tuple3d p1, Matrix4d matrix) {
 		p0.set(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 		p1.set(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
