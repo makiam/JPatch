@@ -1,5 +1,6 @@
 package com.jpatch.boundary.tools;
 
+import static com.jpatch.afw.vecmath.TransformUtil.*;
 import static javax.media.opengl.GL.*;
 
 import java.awt.*;
@@ -18,6 +19,7 @@ import com.jpatch.afw.control.*;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.boundary.*;
 import com.jpatch.boundary.tools.MouseSelector.*;
+import com.jpatch.boundary.tools.NormalTool.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
@@ -51,6 +53,8 @@ public class TweakTool implements VisibleTool {
 	
 	private final BooleanAttr selectLassoAttr = new BooleanAttr();
 	private final StateMachine<ToolMode> toolModeAttr = new StateMachine<ToolMode>(ToolMode.class, ToolMode.FREE);
+	
+	private Normal normal;
 	
 	public void draw(Viewport viewport) {
 		// TODO Auto-generated method stub
@@ -155,13 +159,16 @@ public class TweakTool implements VisibleTool {
 		}
 	}
 	
-	private void setMoveMode(ViewportGl viewport, Point3d screenPosition) {
-		snapPointer(viewport, screenPosition);
+	private void setMoveMode(ViewportGl viewport, HitObject hitObject) {
+		snapPointer(viewport, hitObject.screenPosition);
 		mode = Mode.MOVE;
 		hitSelection.getTransformable().begin();
-		localStart.set(screenPosition);
+		localStart.set(hitObject.screenPosition);
 		transformUtil.projectFromScreen(TransformUtil.LOCAL, localStart, localStart);
 		highlightHitObject(viewport, false, false, true);
+		if (toolModeAttr.getValue() == ToolMode.NORMAL) {
+			normal = new Normal(viewport, hitSelection, hitObject, transformUtil);
+		}
 	}
 	
 	private class TweakMouseListener extends MouseAdapter {
@@ -184,9 +191,9 @@ public class TweakTool implements VisibleTool {
 				switch (mode) {
 				case IDLE:
 					System.out.println("selectionType = " + hitSelection.getType());
-					Point3d screenPos = new Point3d();
-					if (MouseSelector.isHit(viewport, e.getX(), e.getY(), 32 * 32, hitSelection, screenPos)) {
-						setMoveMode(viewport, screenPos);
+					HitObject hitObject = MouseSelector.isHit(viewport, e.getX(), e.getY(), 32 * 32, hitSelection);
+					if (hitObject != null) {
+						setMoveMode(viewport, hitObject);
 					}
 					
 //					int selectionFilter = getSelectionFilter(hitSelection.getType());
@@ -226,7 +233,7 @@ public class TweakTool implements VisibleTool {
 							mode = Mode.SELECT;
 						} else {
 							setSelection(hitSelection, hitObject);
-							setMoveMode(viewport, hitObject.screenPosition);
+							setMoveMode(viewport, hitObject);
 						}
 					} else {
 						setLassoMode(e.getX(), e.getY());
@@ -391,11 +398,15 @@ public class TweakTool implements VisibleTool {
 					hitPoint = null;
 					return;
 				}
-				mouse.set(e.getX(), e.getY(), localStart.z);
-				transformUtil.projectFromScreen(TransformUtil.LOCAL, mouse, mouse);
-				vector.sub(mouse, localStart);
-				hitSelection.getTransformable().translate(vector);
-//				Main.getInstance().syncRepaintViewport(viewport);
+				if (toolModeAttr.getValue() == ToolMode.NORMAL) {
+					normal.mouseDragged(viewport, e.getX(), e.getY());
+				} else {
+					mouse.set(e.getX(), e.getY(), localStart.z);
+					transformUtil.projectFromScreen(TransformUtil.LOCAL, mouse, mouse);
+					vector.sub(mouse, localStart);
+					hitSelection.getTransformable().translate(vector);
+	//				Main.getInstance().syncRepaintViewport(viewport);
+				}
 				highlightHitObject(viewport, true, false, true);
 				break;
 //			case SELECT_LASSO:		// fallthrough intended
@@ -448,7 +459,7 @@ public class TweakTool implements VisibleTool {
 				}
 				break;
 			case IDLE:
-				boolean strong = MouseSelector.isHit(viewport, e.getX(), e.getY(), 32 * 32, hitSelection, new Point3d());
+				boolean strong = MouseSelector.isHit(viewport, e.getX(), e.getY(), 32 * 32, hitSelection) != null;
 				highlightHitObject(viewport, false, false, strong);
 				break;
 			}
@@ -460,5 +471,108 @@ public class TweakTool implements VisibleTool {
 		hitPoint = new Point(point);
 		SwingUtilities.convertPointToScreen(point, viewport.getComponent());
 		Main.getInstance().getRobot().mouseMove(point.x, point.y);
+	}
+	
+	private class Normal {
+		private final Point3d p0 = new Point3d();
+		private final Point3d p1 = new Point3d();
+		private final Point3d p0s = new Point3d();
+		private final Point3d p1s = new Point3d();
+		private final Point3d p = new Point3d();
+		private final double delta;
+		private final int axis;
+		private final Map<AbstractVertex, VertexNormal> vertexPos = new HashMap<AbstractVertex, VertexNormal>();
+		
+		Normal(Viewport viewport, Selection selection, HitObject hitObject, TransformUtil transformUtil) {
+			if (hitObject instanceof HitVertex) {
+				AbstractVertex vertex = ((HitVertex) hitObject).vertex;
+				vertex.getPosition(p0);
+				vertex.getNormal(p1);
+				p1.add(p0);
+			} else if (hitObject instanceof HitEdge) {
+				HalfEdge edge = ((HitEdge) hitObject).halfEdge;
+				edge.getVertex().getPosition(p0);
+				edge.getPairVertex().getPosition(p1);
+				p0.interpolate(p0, p1, ((HitEdge) hitObject).position);
+				
+				Vector3d n0 = new Vector3d();
+				Vector3d n1 = new Vector3d();
+				edge.getVertex().getNormal(n0);
+				edge.getPairVertex().getNormal(n1);
+				n0.interpolate(n0, n1, ((HitEdge) hitObject).position);
+				n0.normalize();
+				p1.add(p0, n0);
+			} else if (hitObject instanceof HitFace) {
+				((HitFace) hitObject).face.getMidpointPosition(p0);
+				((HitFace) hitObject).face.getMidpointNormal(p1);
+				p1.add(p0);
+			}
+			
+			transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0s);
+			transformUtil.projectToScreen(TransformUtil.LOCAL, p1, p1s);
+			
+			double dx = Math.abs(p0.x - p1.x);
+			double dy = Math.abs(p0.y - p1.y);
+			double dz = Math.abs(p0.z - p1.z);
+			
+			if (dx > dy) {
+				if (dx > dz) {
+					axis = 0; // x
+					delta = p1.x - p0.x;
+				} else {
+					axis = 2; // z
+					delta = p1.z - p0.z;
+				}
+			} else {
+				if (dy > dz) {
+					axis = 1; // y
+					delta = p1.y - p0.y;
+				} else {
+					axis = 2; // z
+					delta = p1.z - p0.z;
+				}
+			}
+			
+			for (AbstractVertex vertex : selection.getVertices()) {
+				vertexPos.put(vertex, new VertexNormal(vertex));
+			}
+			
+			snapPointer(viewport, p0s);
+		}
+		
+		public void mouseDragged(Viewport viewport, int mx, int my) {
+			p.interpolate(p0s, p1s, Utils3d.closestPointOnLine(p0s.x, p0s.y, p1s.x, p1s.y, mx, my));
+			transformUtil.projectFromScreen(LOCAL, p, p);
+			double factor = 0;
+			switch (axis) {
+			case 0:	// x
+				factor = (p.x - p0.x) / delta;
+				break;
+			case 1:	// y
+				factor = (p.y - p0.y) / delta;
+				break;
+			case 2:	// z
+				factor = (p.z - p0.z) / delta;
+				break;
+			}
+			for (AbstractVertex v : vertexPos.keySet()) {
+				vertexPos.get(v).setFactor(v, factor);
+			}
+		}
+	}
+	
+	private static class VertexNormal {
+		Point3d pStart = new Point3d();
+		Vector3d pNormal = new Vector3d();
+		
+		VertexNormal(AbstractVertex v) {
+			v.getPosition(pStart);
+			v.getVertexPoint().getNormal(pNormal);
+			pNormal.normalize();
+		}
+		
+		void setFactor(AbstractVertex v, double f) {
+			v.setPosition(pStart.x + pNormal.x * f, pStart.y + pNormal.y * f, pStart.z + pNormal.z * f);
+		}
 	}
 }

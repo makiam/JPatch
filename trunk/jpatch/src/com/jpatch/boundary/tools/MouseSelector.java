@@ -94,7 +94,7 @@ public class MouseSelector {
 		}
 	}
 	
-	public static boolean isHit(Viewport viewport, int mouseX, int mouseY, final double maxDistSq, Selection selection, Point3d hitPoint) {
+	public static HitObject isHit(Viewport viewport, int mouseX, int mouseY, final double maxDistSq, Selection selection) {
 		viewport.getViewDef().configureTransformUtil(transformUtil);
 		selection.getNode().getLocal2WorldTransform(transformUtil, LOCAL);
 		Point3d p0 = new Point3d();
@@ -104,9 +104,9 @@ public class MouseSelector {
 			for (AbstractVertex vertex : selection.getVertices()) {
 				vertex.getPosition(p0);
 				transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
-				if (isCloser(mouseX, mouseY, p0.x, p0.y, maxDistSq)) {
-					hitPoint.set(p0);
-					return true;
+				double distSq = distSq(mouseX, mouseY, p0.x, p0.y);
+				if (distSq < maxDistSq) {
+					return new HitVertex(selection.getNode(), distSq, p0, vertex);
 				}
 			}
 			break;
@@ -120,10 +120,9 @@ public class MouseSelector {
 				double t = Utils3d.closestPointOnLine(p0.x, p0.y, p1.x, p1.y, mouseX, mouseY);
 				t = Math.max(0, Math.min(t, 1));
 				p0.interpolate(p0, p1, t);
-				
-				if (isCloser(mouseX, mouseY, p0.x, p0.y, maxDistSq)) {
-					hitPoint.set(p0);
-					return true;
+				double distSq = distSq(mouseX, mouseY, p0.x, p0.y);
+				if (distSq < maxDistSq) {
+					return new HitEdge(selection.getNode(), distSq, distSq, t, p0, edge);
 				}
 			}
 			break;
@@ -142,21 +141,21 @@ public class MouseSelector {
 					Point3d rayOrigin = new Point3d();
 					Vector3d rayDirection = new Vector3d();
 					setupCameraRay(rayOrigin, rayDirection, mouseX, mouseY);
-					hitPoint.set(mouseX, mouseY, getFaceHitZ(rayOrigin, rayDirection, face));
-					return true;
+					p0.set(mouseX, mouseY, getFaceHitZ(rayOrigin, rayDirection, face));
+					return new HitFace(selection.getNode(), 0, p0, face);
 				}
 			}
 			break;
 		default:
 			throw new RuntimeException(); // should never get here
 		}
-		return false;
+		return null;
 	}
 	
-	private static boolean isCloser(double x0, double y0, double x1, double y1, double maxDistSq) {
+	private static double distSq(double x0, double y0, double x1, double y1) {
 		double dx = x0 - x1;
 		double dy = y0 - y1;
-		return (dx * dx + dy * dy) <= maxDistSq;
+		return (dx * dx + dy * dy);
 	}
 	
 	private static void setupCameraRay(Point3d rayOrigin, Vector3d rayDirection, int mouseX, int mouseY) {
@@ -279,7 +278,7 @@ public class MouseSelector {
 					if(viewportGl.getDepthAt((int) pec.x, (int) pec.y) < pec.z) {
 						double cDistSq = distSq(mouseX, mouseY, pec);
 						double mDistSq = distSq(mouseX, mouseY, pem);
-						HitObject hitEdge = new HitEdge(sdsModel, mDistSq, cDistSq, pec, edge.getPrimary());
+						HitObject hitEdge = new HitEdge(sdsModel, mDistSq, cDistSq, t, pec, edge.getPrimary());
 						if (hitEdge.isCloserThan(hitObject)) {
 							hitObject = hitEdge;
 						}
@@ -418,9 +417,12 @@ public class MouseSelector {
 	
 	public static class HitEdge extends HitObject {
 		public final HalfEdge halfEdge;
-		private HitEdge(XFormNode node, double centerDistSq, double edgeDistSq, Point3d screenPosition, HalfEdge halfEdge) {
+		public final Double position;
+		
+		private HitEdge(XFormNode node, double centerDistSq, double edgeDistSq, double position, Point3d screenPosition, HalfEdge halfEdge) {
 			super(node, centerDistSq, edgeDistSq, screenPosition);
 			this.halfEdge = halfEdge;
+			this.position = position;
 		}
 		
 		@Override
