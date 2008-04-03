@@ -327,7 +327,7 @@ public class MouseSelector {
 			this.node = node;
 			this.centerDistSq = centerDistSq;
 			this.edgeDistSq = edgeDistSq;
-			this.screenPosition = screenPosition == null ? null : new Point3d(screenPosition);
+			this.screenPosition = screenPosition == null ? null : new Point3d(screenPosition.x, screenPosition.y, 0);
 		}
 		
 		@Override
