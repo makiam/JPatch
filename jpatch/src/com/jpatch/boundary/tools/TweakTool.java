@@ -160,6 +160,7 @@ public class TweakTool implements VisibleTool {
 	}
 	
 	private void setMoveMode(ViewportGl viewport, HitObject hitObject) {
+		System.out.println(hitObject.screenPosition);
 		snapPointer(viewport, hitObject.screenPosition);
 		mode = Mode.MOVE;
 		hitSelection.getTransformable().begin();
