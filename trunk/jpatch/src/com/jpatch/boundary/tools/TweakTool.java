@@ -490,6 +490,10 @@ public class TweakTool implements VisibleTool {
 				vertex.getPosition(p0);
 				vertex.getNormal(p1);
 				p1.add(p0);
+				
+				for (AbstractVertex v : selection.getVertices()) {
+					vertexPos.put(v, new VertexNormal(v));
+				}
 			} else if (hitObject instanceof HitEdge) {
 				HalfEdge edge = ((HitEdge) hitObject).halfEdge;
 				edge.getVertex().getPosition(p0);
@@ -503,10 +507,49 @@ public class TweakTool implements VisibleTool {
 				n0.interpolate(n0, n1, ((HitEdge) hitObject).position);
 				n0.normalize();
 				p1.add(p0, n0);
+				
+				AbstractVertex[] edgeVertices = new AbstractVertex[2];
+				for (HalfEdge e : selection.getEdges()) {
+					e.getVertices(edgeVertices);
+					e.getVertex().getNormal(n0);
+					e.getPairVertex().getNormal(n1);
+					for (AbstractVertex v : edgeVertices) {
+						VertexNormal vn = vertexPos.get(v);
+						if (vn == null) {
+							vn = new VertexNormal(v, new Vector3d());
+							vertexPos.put(v, vn);
+						}
+						vn.pNormal.add(n0);
+						vn.pNormal.add(n1);
+					}
+				}
+				
+				for (AbstractVertex v : vertexPos.keySet()) {
+					vertexPos.get(v).pNormal.normalize();
+				}
+				
 			} else if (hitObject instanceof HitFace) {
 				((HitFace) hitObject).face.getMidpointPosition(p0);
 				((HitFace) hitObject).face.getMidpointNormal(p1);
 				p1.add(p0);
+				
+				Vector3d n0 = new Vector3d();
+				for (Face f : selection.getFaces()) {
+					f.getMidpointNormal(n0);
+					for (HalfEdge e : f.getEdges()) {
+						AbstractVertex v = e.getVertex();
+						VertexNormal vn = vertexPos.get(v);
+						if (vn == null) {
+							vn = new VertexNormal(v, new Vector3d());
+							vertexPos.put(v, vn);
+						}
+						vn.pNormal.add(n0);
+					}
+				}
+				
+				for (AbstractVertex v : vertexPos.keySet()) {
+					vertexPos.get(v).pNormal.normalize();
+				}
 			}
 			
 			transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0s);
@@ -532,10 +575,6 @@ public class TweakTool implements VisibleTool {
 					axis = 2; // z
 					delta = p1.z - p0.z;
 				}
-			}
-			
-			for (AbstractVertex vertex : selection.getVertices()) {
-				vertexPos.put(vertex, new VertexNormal(vertex));
 			}
 			
 			snapPointer(viewport, p0s);
@@ -570,6 +609,11 @@ public class TweakTool implements VisibleTool {
 			v.getPosition(pStart);
 			v.getVertexPoint().getNormal(pNormal);
 			pNormal.normalize();
+		}
+		
+		VertexNormal(AbstractVertex v, Vector3d normal) {
+			v.getPosition(pStart);
+			pNormal.set(normal);
 		}
 		
 		void setFactor(AbstractVertex v, double f) {
