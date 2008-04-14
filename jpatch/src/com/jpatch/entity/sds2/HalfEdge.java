@@ -64,6 +64,13 @@ public class HalfEdge {
 		return pair.face;
 	}
 	
+	public AbstractVertex[] getVertices(AbstractVertex[] vertices) {
+		assert vertices.length == 2;
+		vertices[0] = vertex;
+		vertices[1] = pair.vertex;
+		return vertices;
+	}
+	
 	public void setFace(Face face) {
 		assert (this.face == null && face != null) || (this.face != null && face == null) : this + ".face=" + this.face + ", face=" + face + ", exactly one must be null";
 		this.face = face;
