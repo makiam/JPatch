@@ -216,7 +216,7 @@ public class LatheTool implements VisibleTool {
 			hitObject.node.getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
 			viewport.setModelViewMatrix(transformUtil);
 				
-			viewport.drawSelection(hitSelection, new Color3f(0.5f, 0.5f, 1.0f));
+			viewport.drawSelection(hitSelection, new Color4f(0.5f, 0.5f, 1.0f, 0.5f));
 	
 			gl.glDisable(GL_LIGHTING);
 			gl.glLineWidth(1);
