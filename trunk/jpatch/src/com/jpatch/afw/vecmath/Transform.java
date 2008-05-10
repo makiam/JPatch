@@ -40,7 +40,7 @@ public abstract class Transform {
 	
 	/**
 	 * Transforms the specified point using this transformation matrix
-	 * @param normal the point to be transformed
+	 * @param referenceNormal the point to be transformed
 	 * @return the specified point (after the transformation)
 	 */
 	public Point3d transform(Point3d point) {
@@ -51,7 +51,7 @@ public abstract class Transform {
 	
 	/**
 	 * Transforms the specified point using the inverse of this transformation matrix
-	 * @param normal the point to be transformed
+	 * @param referenceNormal the point to be transformed
 	 * @return the specified point (after the transformation)
 	 */
 	public Point3d invTransform(Point3d point) {

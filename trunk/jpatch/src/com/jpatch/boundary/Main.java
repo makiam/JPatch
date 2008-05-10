@@ -893,20 +893,19 @@ public class Main {
 		return actions.undoManager;
 	}
 	
-	public void setModel(Sds sds) {
+	public void setModel(SdsModel sdsModel) {
 //		sds.createNextLevel(0);
 //		sds.createNextLevel(1);
 //		sds.createNextLevel(2);
 //		sds.createNextLevel(3);
 
 //		sds.sortFaces();
-		SdsModel model = new SdsModel(sds);
-		treeManager.createTreeNodeFor(model);
-		model.getNameAttribute().setValue("model");
-		model.getParentAttribute().setValue(sceneGraphRoot);
+		treeManager.createTreeNodeFor(sdsModel);
+		sdsModel.getNameAttribute().setValue("model");
+		sdsModel.getParentAttribute().setValue(sceneGraphRoot);
 		
 		SdsModel oldModel = selection.getSdsModel();
-		selection.setNode(model, null);
+		selection.setNode(sdsModel, null);
 		
 		treeManager.removeNode(oldModel);
 	}

@@ -14,6 +14,7 @@ public class JptLoader {
 	private Map<Integer, Cp> cpList = new HashMap<Integer, Cp>();
 	private Map<Integer, Cp> childHookIndex = new HashMap<Integer, Cp>();
 	private int cpIndex;
+	private SdsModel sdsModel;
 	private Sds sds;
 	private List<Material> materials = new ArrayList<Material>();
 	private Map<String, Integer> materialNameMap = new HashMap<String, Integer>();
@@ -190,12 +191,13 @@ public class JptLoader {
 		materials.add(new BasicMaterial(new Color3f(1.0f, 1.0f, 1.0f)));
 	}
 	
-	public Sds importModel(InputStream inputStream) throws IOException {
+	public SdsModel importModel(InputStream inputStream) throws IOException {
 		XMLReader xmlReader;
 		try {
 			xmlReader = XMLReaderFactory.createXMLReader();
 			xmlReader.setContentHandler(handler);
 			sds = new Sds(Main.getInstance().getUndoManager());
+			sdsModel = new SdsModel(sds);
 			cpList.clear();
 			childHookIndex.clear();
 			cpIndex = 0;
@@ -256,7 +258,7 @@ public class JptLoader {
 			
 //			System.out.println(sds.vertexList.size() + " top level, " + sds.level2Vertices.length + " level 2 vertices");
 //			sds.dumpFaces(0);
-			return sds;
+			return sdsModel;
 			
 			
 			
@@ -290,7 +292,7 @@ public class JptLoader {
 		Cp prev, next;
 		
 		Cp(double x, double y, double z) {
-			vertex = new BaseVertex(x, y, z);
+			vertex = new BaseVertex(sdsModel, x, y, z);
 			attach = -1;
 			hookPos = -1;
 //			sds.vertexList.add(vertex);
@@ -303,7 +305,7 @@ public class JptLoader {
 		}
 		
 		Cp(double hookPos) {
-			vertex = new BaseVertex();
+			vertex = new BaseVertex(sdsModel);
 			this.hookPos = hookPos;
 			attach = -1;
 //			sds.vertexList.add(vertex);

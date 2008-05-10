@@ -10,6 +10,7 @@ import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
 import com.jpatch.boundary.*;
 import com.jpatch.boundary.tools.*;
+import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
 public class Actions {
@@ -79,8 +80,8 @@ public class Actions {
 			JFileChooser fileChooser = new JFileChooser();
 			if (fileChooser.showOpenDialog(Main.getInstance().getFrame()) == JFileChooser.APPROVE_OPTION) {
 				try {
-					Sds sds = new JptLoader().importModel(new FileInputStream(fileChooser.getSelectedFile()));
-					Main.getInstance().setModel(sds);
+					SdsModel sdsModel = new JptLoader().importModel(new FileInputStream(fileChooser.getSelectedFile()));
+					Main.getInstance().setModel(sdsModel);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				} 
@@ -116,7 +117,7 @@ public class Actions {
 	public final JPatchAction extrudeTest = new JPatchAction(undoManager, "EXTRUDE_TOOL") {
 		public void actionPerformed(ActionEvent e) {
 			System.out.println("extrude");
-			Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
+			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
 //			Set<AbstractVertex> selectedVertices = new HashSet<AbstractVertex>(Main.getInstance().getSelection().getVertices());
 //			Collection<Face> facesToExtrude = new HashSet<Face>();
 //			faceLoop:
@@ -135,7 +136,7 @@ public class Actions {
 ////			}
 //			Collection<Face> facesToExtrude = Main.getInstance().getSelection().getFaces();
 			List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
-			Operations.extrude(sds, Main.getInstance().getSelection(), editList);
+			Operations.extrude(sdsModel, Main.getInstance().getSelection(), editList);
 			undoManager.addEdit("Extrude", editList);
 			toolSM.setValue(tools[5]);
 			Main.getInstance().repaintViewports();

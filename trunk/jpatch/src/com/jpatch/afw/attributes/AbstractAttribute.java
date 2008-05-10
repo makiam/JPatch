@@ -45,9 +45,11 @@ public class AbstractAttribute implements Attribute {
  	     * notify the new listener about the current value
  	     * TODO: is this really a good idea?
  	     */
- 	    fireEvents = false;
- 	    l.attributeHasChanged(this);
- 	    fireEvents = true;
+ 	    if (fireEvents) {
+ 	    	fireEvents = false;
+ 	    	l.attributeHasChanged(this);
+ 	    	fireEvents = true;
+ 	    }
     }
     
     /**

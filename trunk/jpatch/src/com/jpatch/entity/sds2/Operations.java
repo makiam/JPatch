@@ -10,12 +10,13 @@ import javax.vecmath.*;
 
 public class Operations {
 	
-	public static void lathe(Sds sds, Point3d[][] lathedPoints, BaseVertex[][] lathedVertices, Material material, List<JPatchUndoableEdit> editList) {
+	public static void lathe(SdsModel sdsModel, Point3d[][] lathedPoints, BaseVertex[][] lathedVertices, Material material, List<JPatchUndoableEdit> editList) {
+		Sds sds = sdsModel.getSds();
 		Map<Point3d, BaseVertex> vertexMap = new HashMap<Point3d, BaseVertex>();
 		for (Point3d[] segment : lathedPoints) {
 			for (Point3d point : segment) {
 				if (!vertexMap.containsKey(point)) {
-					vertexMap.put(point, new BaseVertex(point.x, point.y, point.z));
+					vertexMap.put(point, new BaseVertex(sdsModel, point.x, point.y, point.z));
 				}
 			}
 		}
@@ -94,9 +95,11 @@ public class Operations {
 		}
 	}
 	
-	public static void extrude(Sds sds, Selection selection, List<JPatchUndoableEdit> editList) {
+	public static void extrude(SdsModel sdsModel, Selection selection, List<JPatchUndoableEdit> editList) {
 //		System.out.println("extrude " + faces.size() + " faces:");
 //		System.out.println(faces);
+		
+		Sds sds = sdsModel.getSds();
 		
 		Map<BaseVertex, BaseVertex> boundaryVertices = new HashMap<BaseVertex, BaseVertex>();
 		Set<BaseVertex> innerVertices = new HashSet<BaseVertex>();
@@ -164,7 +167,7 @@ public class Operations {
 					edgeVertex.getPosition(position);
 //					edgeVertex.getVertexPoint().getNormal(normal);
 //					position.add(normal);
-					BaseVertex extrudedVertex = new BaseVertex();
+					BaseVertex extrudedVertex = new BaseVertex(sdsModel);
 					extrudedVertex.setPosition(position);
 					boundaryVertices.put((BaseVertex) edgeVertex, extrudedVertex);
 				}

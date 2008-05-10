@@ -100,13 +100,13 @@ public class TransformNode extends AbstractTransform {
 		
 		position.addAttributeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(ScalarAttribute attribute) {
-				positionChanged(position, translation);
+				positionChanged(worldPosition, translation);
 				computeBranch();
 			}
 		});
 		translation.addAttributeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(ScalarAttribute attribute) {
-				translationChanged(translation, position);
+				translationChanged(translation, worldPosition);
 				computeBranch();
 			}
 		});

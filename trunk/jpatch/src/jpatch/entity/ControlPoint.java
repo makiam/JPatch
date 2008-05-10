@@ -51,25 +51,25 @@ public class ControlPoint extends AbstractJPatchXObject {
 		position.addAttributeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(ScalarAttribute attribute) {
 //				System.out.println(ControlPoint.this + " position changed");
-				position.get(pos);
+				worldPosition.get(pos);
 				refPos.set(pos);
 				if (inverseInvalid) {
 					computeInverseTransform();
 				}
 				invTransform.transform(refPos);
-				referencePosition.setValueAdjusting(true);
-				referencePosition.set(refPos);
-				referencePosition.setValueAdjusting(false);
+				worldPosition.setValueAdjusting(true);
+				worldPosition.set(refPos);
+				worldPosition.setValueAdjusting(false);
 			}
 		});
 		referencePosition.addAttributeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(ScalarAttribute attribute) {
-				referencePosition.get(refPos);
+				worldPosition.get(refPos);
 				pos.set(refPos);
 				transform.transform(pos);
-				position.setValueAdjusting(true);
-				position.set(pos);
-				position.setValueAdjusting(false);
+				worldPosition.setValueAdjusting(true);
+				worldPosition.set(pos);
+				worldPosition.setValueAdjusting(false);
 			}
 		});
 	}

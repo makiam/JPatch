@@ -2,7 +2,7 @@ package com.jpatch.entity;
 
 import static com.jpatch.afw.vecmath.TransformUtil.LOCAL;
 
-import java.util.List;
+import java.util.*;
 
 import javax.vecmath.*;
 
@@ -81,6 +81,8 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	
 	/** lazy evaluation flag */
 	protected boolean worldInvalid = true;
+	
+	private final List<XFormListener> xformListeners = new ArrayList<XFormListener>(0);
 	
 	private final  AttributePostChangeListener invalidationListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
@@ -212,6 +214,15 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 	 * public methods
 	 */
 	
+	
+	public void addXFormListener(XFormListener listener) {
+		xformListeners.add(listener);
+	}
+	
+	public void removeXFormListener(XFormListener listener) {
+		xformListeners.remove(listener);
+	}
+	
 	/**
 	 * Sets the specified matrix to the axisRotation->world transformation matrix
 	 * of this node.
@@ -239,6 +250,10 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 		computeWorldMatrices();
 		matrix.set(local2WorldMatrix);
 		return matrix;
+	}
+	
+	public boolean isInvalid() {
+		return worldInvalid;
 	}
 	
 	public void getLocal2WorldTransform(TransformUtil transformUtil, int space) {
@@ -284,6 +299,9 @@ public class XFormNode extends SceneGraphNode implements Transformable {
 				if (force || !childNode.worldInvalid) {
 					childNode.invalidateBranch(force);
 				}
+			}
+			for (XFormListener listerer : xformListeners) {
+				listerer.invalidateTransformation();
 			}
 		}
 	}
