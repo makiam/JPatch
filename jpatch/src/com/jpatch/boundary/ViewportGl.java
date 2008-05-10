@@ -730,11 +730,11 @@ public class ViewportGl extends Viewport {
 //		Matrix4d matrix = new Matrix4d(viewDef.getMatrix(new Matrix4d()));
 //		Transform transform = node.getTransform();
 		
-		if (node instanceof XFormNode) {
-			((XFormNode) node).getLocal2WorldTransform(transformUtil, LOCAL);
-		} else {
-			transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
-		}
+//		if (node instanceof XFormNode) {
+//			((XFormNode) node).getLocal2WorldTransform(transformUtil, LOCAL);
+//		} else {
+//			transformUtil.setSpace2World(TransformUtil.LOCAL, IDENTITY);
+//		}
 		
 //		for (int i = 0; i < 4; i++) {
 //			for (int j = 0; j < 4; j++) {
@@ -762,11 +762,11 @@ public class ViewportGl extends Viewport {
 //		}
 //		modelView.set(matrix);
 		
-		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
+		transformUtil.getMatrix(TransformUtil.WORLD, TransformUtil.CAMERA, modelView);
 		gl.glMatrixMode(GL_MODELVIEW);
 		gl.glLoadMatrixd(modelView, 0);
 		
-		drawOrigin();
+//		drawOrigin();
 		if (node instanceof SdsModel) {
 			Sds sds = ((SdsModel) node).getSds();
 			drawSds2(
@@ -819,7 +819,7 @@ public class ViewportGl extends Viewport {
 	
 	public void setModelViewMatrix(TransformUtil transformUtil) {
 		GL gl = drawable.getGL();
-		transformUtil.getMatrix(TransformUtil.LOCAL, TransformUtil.CAMERA, modelView);
+		transformUtil.getMatrix(TransformUtil.WORLD, TransformUtil.CAMERA, modelView);
 		gl.glMatrixMode(GL_MODELVIEW);
 		gl.glLoadMatrixd(modelView, 0);
 	}

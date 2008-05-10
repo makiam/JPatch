@@ -215,8 +215,8 @@ public class Face {
 			double x = 0, y = 0, z = 0;
 			for (HalfEdge edge : faceEdges) {
 				AbstractVertex vertex = edge.getVertex();
-				vertex.validatePosition();
-				Point3d p = vertex.position;
+				vertex.validateWorldPosition();
+				Point3d p = vertex.worldPosition;
 				x += p.x;
 				y += p.y;
 				z += p.z;
@@ -255,11 +255,11 @@ public class Face {
 		}
 		double x = 0, y = 0, z = 0;
 		for (HalfEdge edge : faceEdges) {
-			Point3d u = edge.getVertex().position;
+			Point3d u = edge.getVertex().worldPosition;
 			double ux = u.x - midpointPosition.x;
 			double uy = u.y - midpointPosition.y;
 			double uz = u.z - midpointPosition.z;
-			Point3d v = edge.getPairVertex().position;
+			Point3d v = edge.getPairVertex().worldPosition;
 			double vx = v.x - midpointPosition.x;
 			double vy = v.y - midpointPosition.y;
 			double vz = v.z - midpointPosition.z;
@@ -303,11 +303,11 @@ public class Face {
 		assert facePoint == null;
 		facePoint = new DerivedVertex() {
 			@Override
-			void validatePosition() {
-				if (!positionValid) {
+			void validateWorldPosition() {
+				if (!worldPositionValid) {
 					validateDisplacedMidpointPosition();
-					position.set(displacedMidpointPosition);
-					positionValid = true;
+					worldPosition.set(displacedMidpointPosition);
+					worldPositionValid = true;
 				}
 			}
 			

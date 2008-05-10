@@ -126,25 +126,25 @@ public class HalfEdge {
 		edgePoint = new DerivedVertex() {
 
 			@Override
-			protected void validatePosition() {
+			protected void validateWorldPosition() {
 				vertex.validateDisplacedPosition();
 				pair.vertex.validateDisplacedPosition();
 				Point3d e0 = vertex.displacedPosition;
 				Point3d e1 = pair.vertex.displacedPosition;
 				switch (boundaryType) {
 				case REGULAR:
-					face.getFacePoint().validatePosition();
-					Point3d f0 = face.getFacePoint().position;
-					pair.face.getFacePoint().validatePosition();
-					Point3d f1 = pair.face.getFacePoint().position;
-					position.set(
+					face.getFacePoint().validateWorldPosition();
+					Point3d f0 = face.getFacePoint().worldPosition;
+					pair.face.getFacePoint().validateWorldPosition();
+					Point3d f1 = pair.face.getFacePoint().worldPosition;
+					worldPosition.set(
 							(e0.x + e1.x + f0.x + f1.x) * 0.25,
 							(e0.y + e1.y + f0.y + f1.y) * 0.25,
 							(e0.z + e1.z + f0.z + f1.z) * 0.25
 					);
 					break;
 				case BOUNDARY:
-					position.set(
+					worldPosition.set(
 							(e0.x + e1.x) * 0.5,
 							(e0.y + e1.y) * 0.5,
 							(e0.z + e1.z) * 0.5
