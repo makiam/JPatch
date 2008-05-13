@@ -13,6 +13,8 @@ import javax.swing.*;
 import javax.swing.undo.*;
 import javax.vecmath.*;
 
+import trashcan.*;
+
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
 
@@ -23,7 +25,7 @@ import com.jpatch.boundary.tools.NormalTool.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
-public class TweakTool implements VisibleTool {
+public class TweakTool implements VisibleTool, ViewportOverlay {
 	private enum ToolMode { FREE, NORMAL }
 	
 	private static final int MAX_DISTANCE_SQ = 32 * 32;
@@ -75,10 +77,11 @@ public class TweakTool implements VisibleTool {
 		mouseListeners = new MouseListener[viewports.length];
 		mouseMotionListeners = new MouseMotionListener[viewports.length];
 		for (int i = 0; i < viewports.length; i++) {
-			mouseListeners[i] = new TweakMouseListener((ViewportGl) viewports[i]);
+			mouseListeners[i] = new TweakMouseListener(viewports[i]);
 			viewports[i].getComponent().addMouseListener(mouseListeners[i]);
-			mouseMotionListeners[i] = new TweakMouseMotionListener((ViewportGl) viewports[i]);
+			mouseMotionListeners[i] = new TweakMouseMotionListener(viewports[i]);
 			viewports[i].getComponent().addMouseMotionListener(mouseMotionListeners[i]);
+			viewports[i].addOverlay(this);
 		}
 //		textureUpdater = new TextureUpdater(viewports);
 //		textureUpdater.start();
@@ -88,60 +91,61 @@ public class TweakTool implements VisibleTool {
 		for (int i = 0; i < viewports.length; i++) {
 			viewports[i].getComponent().removeMouseListener(mouseListeners[i]);
 			viewports[i].getComponent().removeMouseMotionListener(mouseMotionListeners[i]);
+			viewports[i].removeOverlay(this);
 		}
 //		textureUpdater.stop();
 	}
 
-	private void highlightHitObject(ViewportGl viewport, boolean redraw, boolean validateTexture, boolean strong) {
-		
-		GLAutoDrawable glDrawable = (GLAutoDrawable) viewport.getComponent();
-		glDrawable.getContext().makeCurrent();
-		GL gl = glDrawable.getGL();
-		if (redraw) {
-			gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			viewport.draw();
-			if (validateTexture) {
-				viewport.validateScreenShotTexture(false);
-				viewport.validateDepthBuffer(false);
-			}
-		} else {
-			viewport.validateScreenShotTexture();
-			viewport.drawScreenShot(0, 0, glDrawable.getWidth(), glDrawable.getHeight(), 1.0f);
-		}
-		if (mode == Mode.LASSO) {
-			gl.glColor3f(1, 1, 0);
-			gl.glLineWidth(1);
-			gl.glBegin(GL_LINE_LOOP);
-			for (int i = 0; i < lassoPolygon.npoints; i++) {
-				gl.glVertex2i(lassoPolygon.xpoints[i], lassoPolygon.ypoints[i]);
-			}
-			gl.glEnd();
-		}
-		
-		viewport.spatialMode();
-		
-		viewport.spatialMode();
-		viewport.getViewDef().configureTransformUtil(transformUtil);
-		
-		hitSelection.getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
-		viewport.setModelViewMatrix(transformUtil);
-		gl.glDisable(GL_DEPTH_TEST);
-		
-		
-//		Selection selection = Main.getInstance().getSelection();
-//		if (hitSelection.getNode() != null) {
-//			hitSelection.getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
-			viewport.setModelViewMatrix(transformUtil);
-			gl.glDisable(GL_DEPTH_TEST);
-//			viewport.drawSelection(selection, new Color3f(1, 1, 0));
-//			if (mode == Mode.HOVER && hitObject != null) {
-//				setSelection(hitSelection, hitObject);
-				viewport.drawSelection(hitSelection, new Color4f(1, 1, 0, strong ? 1.0f : 0.5f));
+	private void highlightHitObject(Viewport viewport, boolean redraw, boolean validateTexture, boolean strong) {
+		viewport.redrawOverlays();
+//		GLAutoDrawable glDrawable = (GLAutoDrawable) viewport.getComponent();
+//		glDrawable.getContext().makeCurrent();
+//		GL gl = glDrawable.getGL();
+//		if (redraw) {
+//			gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//			viewport.draw();
+//			if (validateTexture) {
+//				viewport.validateScreenShotTexture(false);
+//				viewport.validateDepthBuffer(false);
 //			}
-			gl.glEnable(GL_DEPTH_TEST);
+//		} else {
+//			viewport.validateScreenShotTexture();
+//			viewport.drawScreenShot(0, 0, glDrawable.getWidth(), glDrawable.getHeight(), 1.0f);
 //		}
-		glDrawable.swapBuffers();
-		glDrawable.getContext().release();
+//		if (mode == Mode.LASSO) {
+//			gl.glColor3f(1, 1, 0);
+//			gl.glLineWidth(1);
+//			gl.glBegin(GL_LINE_LOOP);
+//			for (int i = 0; i < lassoPolygon.npoints; i++) {
+//				gl.glVertex2i(lassoPolygon.xpoints[i], lassoPolygon.ypoints[i]);
+//			}
+//			gl.glEnd();
+//		}
+//		
+//		viewport.spatialMode();
+//		
+//		viewport.spatialMode();
+//		viewport.getViewDef().configureTransformUtil(transformUtil);
+//		
+//		hitSelection.getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+//		viewport.setModelViewMatrix(transformUtil);
+//		gl.glDisable(GL_DEPTH_TEST);
+//		
+//		
+////		Selection selection = Main.getInstance().getSelection();
+////		if (hitSelection.getNode() != null) {
+////			hitSelection.getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+//			viewport.setModelViewMatrix(transformUtil);
+//			gl.glDisable(GL_DEPTH_TEST);
+////			viewport.drawSelection(selection, new Color3f(1, 1, 0));
+////			if (mode == Mode.HOVER && hitObject != null) {
+////				setSelection(hitSelection, hitObject);
+//				viewport.drawSelection(hitSelection, new Color4f(1, 1, 0, strong ? 1.0f : 0.5f));
+////			}
+//			gl.glEnable(GL_DEPTH_TEST);
+////		}
+//		glDrawable.swapBuffers();
+//		glDrawable.getContext().release();
 	}
 	
 	private void setLassoMode(final int mx, final int my) {
@@ -159,7 +163,7 @@ public class TweakTool implements VisibleTool {
 		}
 	}
 	
-	private void setMoveMode(ViewportGl viewport, HitObject hitObject) {
+	private void setMoveMode(Viewport viewport, HitObject hitObject) {
 		System.out.println(hitObject.screenPosition);
 		snapPointer(viewport, hitObject.screenPosition);
 		mode = Mode.MOVE;
@@ -173,9 +177,9 @@ public class TweakTool implements VisibleTool {
 	}
 	
 	private class TweakMouseListener extends MouseAdapter {
-		final ViewportGl viewport;
+		final Viewport viewport;
 		
-		private TweakMouseListener(ViewportGl viewport) {
+		private TweakMouseListener(Viewport viewport) {
 			this.viewport = viewport;
 		}
 		
@@ -320,7 +324,7 @@ public class TweakTool implements VisibleTool {
 		}		
 	}
 	
-	private void updateSelection(ViewportGl viewport, int mx, int my, SdsModel sdsModel, int level) {
+	private void updateSelection(Viewport viewport, int mx, int my, SdsModel sdsModel, int level) {
 		switch(mode) {
 		case LASSO:
 			if (selectLassoAttr.getBoolean()) {
@@ -384,11 +388,11 @@ public class TweakTool implements VisibleTool {
 	}
 	
 	private class TweakMouseMotionListener implements MouseMotionListener {
-		final ViewportGl viewport;
+		final Viewport viewport;
 		Point3d mouse = new Point3d();
 		Vector3d vector = new Vector3d();
 		
-		private TweakMouseMotionListener(ViewportGl viewport) {
+		private TweakMouseMotionListener(Viewport viewport) {
 			this.viewport = viewport;
 		}
 		
@@ -618,6 +622,22 @@ public class TweakTool implements VisibleTool {
 		
 		void setFactor(AbstractVertex v, double f) {
 			v.setPosition(pStart.x + pNormal.x * f, pStart.y + pNormal.y * f, pStart.z + pNormal.z * f);
+		}
+	}
+
+	public void drawOverlay(Viewport viewport) {
+		GL gl = viewport.getGL();
+		Viewport.drawSelection(gl, hitSelection, new Color4f(1, 1, 0, 0.5f));
+		if (mode == Mode.LASSO) {
+			viewport.rasterMode(gl);
+			gl.glColor3f(1, 1, 0);
+			gl.glLineWidth(1);
+			gl.glBegin(GL_LINE_LOOP);
+			for (int i = 0; i < lassoPolygon.npoints; i++) {
+				gl.glVertex2i(lassoPolygon.xpoints[i], lassoPolygon.ypoints[i]);
+			}
+			gl.glEnd();
+			viewport.spatialMode(gl);
 		}
 	}
 }

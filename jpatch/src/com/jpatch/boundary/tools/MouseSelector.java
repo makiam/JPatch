@@ -10,6 +10,8 @@ import javax.media.opengl.*;
 import static javax.media.opengl.GL.*;
 import javax.vecmath.*;
 
+import trashcan.*;
+
 import com.jpatch.afw.vecmath.*;
 import static com.jpatch.afw.vecmath.TransformUtil.*;
 import com.jpatch.boundary.*;
@@ -78,7 +80,7 @@ public class MouseSelector {
 		return Selection.Type.VERTICES;
 	}
 	
-	public static void getVerticesUnderLasso(ViewportGl viewport, Polygon lasso, SdsModel sdsModel, int level, boolean visibleOnly, Collection<AbstractVertex> vertices) {
+	public static void getVerticesUnderLasso(Viewport viewport, Polygon lasso, SdsModel sdsModel, int level, boolean visibleOnly, Collection<AbstractVertex> vertices) {
 		vertices.clear();
 		viewport.getViewDef().configureTransformUtil(transformUtil);
 		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
@@ -183,11 +185,10 @@ public class MouseSelector {
 		Point3d pem = new Point3d();
 		Point3d pec = new Point3d();
 		
-		ViewportGl viewportGl = (ViewportGl) viewport;
-		GLAutoDrawable glDrawable = (GLAutoDrawable) viewportGl.getComponent();
-		glDrawable.getContext().makeCurrent();
-		GL gl = glDrawable.getGL();
-		gl.glReadBuffer(GL_FRONT);
+//		GLAutoDrawable glDrawable = (GLAutoDrawable) viewport.getComponent();
+//		glDrawable.getContext().makeCurrent();
+//		GL gl = glDrawable.getGL();
+//		gl.glReadBuffer(GL_FRONT);
 		
 //		System.out.println(mouseX + "," + mouseY + " depth = " + viewportGl.getDepthAt(mouseX, mouseY));
 		Sds sds = sdsModel.getSds();
@@ -207,7 +208,7 @@ public class MouseSelector {
 					if (z < Double.MAX_VALUE) {
 						face.getMidpointPosition(p0);
 						transformUtil.projectToScreen(LOCAL, p0, p0);
-						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < z) {
+						if(viewport.getDepthAt((int) p0.x, (int) p0.y) < z) {
 							double distSq = distSq(mouseX, mouseY, p0);
 							HitObject hitFace = new HitFace(sdsModel, distSq, new Point3d(mouseX, mouseY, 0), face);
 							if (hitFace.isCloserThan(hitObject)) {
@@ -233,7 +234,7 @@ public class MouseSelector {
 						vertex.getPosition(p0);
 							
 						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
-						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
+						if(viewport.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
 							double distSq = distSq(mouseX, mouseY, p0);
 							HitObject hitVertex = new HitVertex(sdsModel, distSq, p0, vertex);
 							if (hitVertex.isCloserThan(hitObject)) {
@@ -244,7 +245,7 @@ public class MouseSelector {
 					if ((type & Type.LIMIT) != 0) {
 						vertex.getLimit(p0);
 						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
-						if(viewportGl.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
+						if(viewport.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
 							double distSq = distSq(mouseX, mouseY, p0);
 							HitObject hitVertex = new HitVertex(sdsModel, distSq, p0, vertex);
 							if (hitVertex.isCloserThan(hitObject)) {
@@ -275,7 +276,7 @@ public class MouseSelector {
 					pec.interpolate(p0, p1, t);
 					pem.interpolate(p0, p1, 0.5);
 			
-					if(viewportGl.getDepthAt((int) pec.x, (int) pec.y) < pec.z) {
+					if(viewport.getDepthAt((int) pec.x, (int) pec.y) < pec.z) {
 						double cDistSq = distSq(mouseX, mouseY, pec);
 						double mDistSq = distSq(mouseX, mouseY, pem);
 						HitObject hitEdge = new HitEdge(sdsModel, mDistSq, cDistSq, t, pec, edge.getPrimary());
@@ -286,7 +287,7 @@ public class MouseSelector {
 				}
 			}
 		}
-		glDrawable.getContext().release();
+//		glDrawable.getContext().release();
 		return hitObject instanceof HitNull ? null : hitObject;
 	}
 	

@@ -10,6 +10,8 @@ import javax.media.opengl.*;
 import javax.swing.*;
 import javax.vecmath.*;
 
+import trashcan.*;
+
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
 

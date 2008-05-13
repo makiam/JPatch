@@ -11,6 +11,8 @@ import javax.media.opengl.*;
 import javax.swing.*;
 import javax.vecmath.*;
 
+import trashcan.*;
+
 import com.jpatch.afw.control.*;
 
 import com.jpatch.afw.vecmath.*;

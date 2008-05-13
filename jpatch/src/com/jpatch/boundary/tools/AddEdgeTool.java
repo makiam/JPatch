@@ -9,6 +9,8 @@ import javax.media.opengl.*;
 import static javax.media.opengl.GL.*;
 import javax.vecmath.*;
 
+import trashcan.*;
+
 import com.jpatch.afw.control.*;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.boundary.*;

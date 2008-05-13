@@ -15,6 +15,8 @@ import javax.media.opengl.GL;
 import javax.swing.SwingUtilities;
 import javax.vecmath.*;
 
+import trashcan.*;
+
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.AttributeEdit;
 import com.jpatch.afw.control.JPatchUndoableEdit;

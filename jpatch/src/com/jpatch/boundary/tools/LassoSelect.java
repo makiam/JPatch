@@ -8,6 +8,7 @@ import javax.media.opengl.GLAutoDrawable;
 
 import com.jpatch.boundary.*;
 import jpatch.boundary.settings.*;
+import trashcan.*;
 
 public class LassoSelect {
 	private static final Color XOR_MODE = new Color(Settings.getInstance().colors.background.get().getRGB() ^ Settings.getInstance().colors.selection.get().getRGB());

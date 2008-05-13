@@ -25,10 +25,6 @@ public abstract class AbstractViewDef implements ViewDef {
 		return viewport.getShowProjectedMeshAttribute();
 	}
 
-	public BooleanAttr getAntialiasAttribute() {
-		return viewport.getAntialiasAttribute();
-	}
-	
 	public BooleanAttr getShowNodeNamesAttribute() {
 		return viewport.getShowNodeNamesAttribute();
 	}
