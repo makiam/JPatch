@@ -109,6 +109,13 @@ public class GlMaterial {
 		array[AMBIENT + 3] = 1.0f;
 	}
 	
+	public void setKa(float r, float g, float b, float a) {
+		array[AMBIENT] = r;
+		array[AMBIENT + 1] = g;
+		array[AMBIENT + 2] = b;
+		array[AMBIENT + 3] = a;
+	}
+	
 	public void setKd(Color4f kd) {
 		array[DIFFUSE] = kd.x;
 		array[DIFFUSE + 1] = kd.y;
@@ -121,6 +128,13 @@ public class GlMaterial {
 		array[DIFFUSE + 1] = kd.y;
 		array[DIFFUSE + 2] = kd.z;
 		array[DIFFUSE + 3] = 1.0f;
+	}
+	
+	public void setKd(float r, float g, float b, float a) {
+		array[DIFFUSE] = r;
+		array[DIFFUSE + 1] = g;
+		array[DIFFUSE + 2] = b;
+		array[DIFFUSE + 3] = a;
 	}
 	
 	public void setKs(Color4f ks) {
@@ -137,6 +151,13 @@ public class GlMaterial {
 		array[SPECULAR + 3] = 1.0f;
 	}
 	
+	public void setKs(float r, float g, float b, float a) {
+		array[SPECULAR] = r;
+		array[SPECULAR + 1] = g;
+		array[SPECULAR + 2] = b;
+		array[SPECULAR + 3] = a;
+	}
+	
 	public void setKe(Color4f ke) {
 		array[EMISSION] = ke.x;
 		array[EMISSION + 1] = ke.y;
@@ -151,17 +172,24 @@ public class GlMaterial {
 		array[EMISSION + 3] = 1.0f;
 	}
 	
+	public void setKe(float r, float g, float b, float a) {
+		array[EMISSION] = r;
+		array[EMISSION + 1] = g;
+		array[EMISSION + 2] = b;
+		array[EMISSION + 3] = a;
+	}
+	
 	public void setShininess(float shininess) {
 		array[SHININESS] = shininess;
 	}
 	
-	public void applyMaterial(GL gl, int side) {
-//		gl.glDisable(GL_COLOR_MATERIAL);
-		gl.glMaterialfv(side, GL_AMBIENT, array, GlMaterial.AMBIENT);
-		gl.glMaterialfv(side, GL_DIFFUSE, array, GlMaterial.DIFFUSE);
-		gl.glMaterialfv(side, GL_SPECULAR, array, GlMaterial.SPECULAR);
-		gl.glMaterialfv(side, GL_EMISSION, array, GlMaterial.EMISSION);
-		gl.glMaterialfv(side, GL_SHININESS, array, GlMaterial.SHININESS);
-//		gl.glEnable(GL_COLOR_MATERIAL);
-	}
+//	public void applyMaterial(GL gl, int side) {
+////		gl.glDisable(GL_COLOR_MATERIAL);
+//		gl.glMaterialfv(side, GL_AMBIENT, array, GlMaterial.AMBIENT);
+//		gl.glMaterialfv(side, GL_DIFFUSE, array, GlMaterial.DIFFUSE);
+//		gl.glMaterialfv(side, GL_SPECULAR, array, GlMaterial.SPECULAR);
+//		gl.glMaterialfv(side, GL_EMISSION, array, GlMaterial.EMISSION);
+//		gl.glMaterialfv(side, GL_SHININESS, array, GlMaterial.SHININESS);
+////		gl.glEnable(GL_COLOR_MATERIAL);
+//	}
 }

@@ -16,6 +16,8 @@ import java.util.*;
 import javax.media.opengl.*;
 import javax.vecmath.*;
 
+import trashcan.*;
+
 public class RotateTool implements ModifierTool, VisibleTool {
 	public static final String EDIT_NAME = "rotate";
 	private static final double SCREEN_ROTATE_FACTOR = 1.2;

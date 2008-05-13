@@ -1,4 +1,4 @@
-package com.jpatch.boundary;
+package trashcan;
 
 import com.jpatch.settings.*;
 import com.jpatch.afw.attributes.CollectionAttr;
@@ -6,6 +6,8 @@ import com.jpatch.afw.vecmath.Transform;
 import com.jpatch.afw.vecmath.TransformUtil;
 import com.jpatch.afw.vecmath.Utils3d;
 import static com.jpatch.afw.vecmath.TransformUtil.*;
+import com.jpatch.boundary.*;
+import com.jpatch.boundary.RealtimeLighting.*;
 import com.jpatch.boundary.tools.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
@@ -494,6 +496,9 @@ public class ViewportGl extends Viewport {
 				System.out.println("component dimension = " + component.getWidth() + "x" + component.getHeight());
 				System.out.println("depth buffer capacity = " + depthBuffer.capacity());
 				
+//				gl.glGetIntegerv(GL_AUX_BUFFERS, tex, 0);
+//				System.out.println("AUX-Buffers: " + tex[0]);
+				
 				BACK_MATERIAL.getGlMaterial().applyMaterial(gl, GL_BACK);
 				
 			}
@@ -622,6 +627,7 @@ public class ViewportGl extends Viewport {
 		depthBufferValid = false;
 		GL gl = drawable.getGL();
 
+//		gl.glDrawBuffer(GL_AUX0);
 		
 //		if (antialiasAttr.getBoolean()) {
 //			gl.glEnable(GL_MULTISAMPLE);
@@ -717,6 +723,14 @@ public class ViewportGl extends Viewport {
 //		gl.glFlush(); // ensure that everything gets drawn
 //		gl.glFinish();
 		lastRedrawTime = System.currentTimeMillis();
+//		gl.glReadBuffer(GL_AUX0);
+//		gl.glDrawBuffer(GL_BACK);
+//		rasterMode();
+//		int w = component.getWidth();
+//		int h = component.getHeight();
+//		gl.glRasterPos2i(0, h);
+//		gl.glCopyPixels(0, 0, w, h, GL_COLOR);
+//		validateScreenShotTexture();
 	}
 	
 	public long getContentAge() {
@@ -792,16 +806,18 @@ public class ViewportGl extends Viewport {
 			modelView[8] *= length;
 			modelView[9] *= length;
 			modelView[10] *= length;
-			Color3f color = bone.getColor(new Color3f()); // TODO reuse color object
+//			Color3f color = bone.getColor(new Color3f()); // TODO reuse color object
 			gl.glEnable(GL_LIGHTING);
 			gl.glShadeModel(GL_SMOOTH);
 			gl.glPolygonMode(GL_FRONT, GL_FILL);
 			gl.glColor3f(0, 0, 0);
 //			gl.glDisable(GL_COLOR_MATERIAL);
-			color.scale(0.8f);
-			BONE_MATERIAL.setKd(color);
-			color.scale(0.25f);
-			BONE_MATERIAL.setKa(color);
+//			color.scale(0.8f);
+//			BONE_MATERIAL.setKd(color);
+//			color.scale(0.25f);
+//			BONE_MATERIAL.setKa(color);
+			bone.applyColor(BONE_MATERIAL);
+			setMaterial(side, array)
 			BONE_MATERIAL.applyMaterial(gl, GL_FRONT);
 			BONE.draw(gl);
 			gl.glEnable(GL_DEPTH_TEST);

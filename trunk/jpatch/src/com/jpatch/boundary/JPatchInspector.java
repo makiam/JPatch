@@ -90,7 +90,7 @@ public class JPatchInspector {
 	public void setViewport(Viewport viewport) {
 		panel.remove(0);
 //		System.out.println("viewport=" + viewport);
-		panel.add(AttributeEditorFactory.getInstance().getEditorFor(viewport.viewDef, viewExpandedAttr, VIEW_COLOR), 0);
+		panel.add(AttributeEditorFactory.getInstance().getEditorFor(viewport.getViewDef(), viewExpandedAttr, VIEW_COLOR), 0);
 //		if (panel.getComponent().getRootPane() != null) {
 //			System.out.println("validate " + panel.getComponent().getRootPane());
 		JComponent component = panel.getComponent();

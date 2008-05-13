@@ -62,6 +62,7 @@ import javax.swing.undo.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.tools.Tools;
+import trashcan.*;
 
 
 /**
@@ -332,7 +333,7 @@ public class Main {
 		ObjectRegistry<Viewport> viewportRegistry = new ObjectRegistry<Viewport>();
 		
 		for (int i = 0; i < NUMBER_OF_VIEWPORTS; i++) {
-			viewports[i] = new ViewportGl(i + 1, OrthoViewDirection.DIRECTIONS[i * 2], viewDirectionsAttr, inspector);
+			viewports[i] = new Viewport(i + 1, OrthoViewDirection.DIRECTIONS[i * 2], viewDirectionsAttr, inspector);
 			screen.add(viewports[i].getComponent());
 			final int viewportNumber = i;
 			viewports[i].getComponent().addMouseListener(new MouseAdapter() {
@@ -351,7 +352,7 @@ public class Main {
 			public void attributeHasChanged(Attribute source) {
 				Viewport active = ((StateMachine<Viewport>) source).getValue();
 				for (Viewport vp : ((StateMachine<Viewport>) source).getStates()) {
-					vp.setActive(vp == active);
+//					vp.setActive(vp == active);
 				}
 				screen.repaint();
 //				repaintViewports();
@@ -760,6 +761,7 @@ public class Main {
 //		frame.add(uiFactory.getComponent("edit toolbar"), BorderLayout.EAST);
 //		frame.setJMenuBar((JMenuBar) uiFactory.getComponent("menubar"));
 		
+		actions.toolSM.suppressChangeNotification(true);
 		actions.toolSM.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				repaintViewports();
@@ -767,6 +769,7 @@ public class Main {
 				//       with undo/redo!
 			}
 		});
+		actions.toolSM.suppressChangeNotification(false);
 		
 //		viewports[0].setActive(true);
 //		activeViewport.setValue(viewports[0]);
@@ -929,7 +932,8 @@ public class Main {
 		if (component.isVisible()) {
 //			viewport.getViewDef().computeMatrix();
 //			viewport.getComponent().repaint();
-			((GLAutoDrawable) component).display();
+			viewport.redrawViewport();
+//			((GLAutoDrawable) component).display();
 		}
 	}
 	

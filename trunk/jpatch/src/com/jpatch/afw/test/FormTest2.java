@@ -10,7 +10,6 @@ import com.jpatch.afw.ui.AttributeManager;
 import com.jpatch.afw.ui.PlatformUtils;
 import com.jpatch.afw.vecmath.Rotation3d;
 import com.jpatch.boundary.JPatchInspector;
-import com.jpatch.boundary.ViewportGl;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;

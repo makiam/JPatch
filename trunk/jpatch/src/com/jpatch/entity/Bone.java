@@ -59,4 +59,9 @@ public class Bone extends XFormNode {
 		colorAttr.getTuple(color);
 		return color;
 	}
+	
+	public void applyColor(GlMaterial glMaterial) {
+		glMaterial.setKd((float) colorAttr.getX() * 0.80f, (float) colorAttr.getY() * 0.80f, (float) colorAttr.getZ() * 0.80f, 1.0f);
+		glMaterial.setKa((float) colorAttr.getX() * 0.25f, (float) colorAttr.getY() * 0.25f, (float) colorAttr.getZ() * 0.25f, 1.0f);
+	}
 }

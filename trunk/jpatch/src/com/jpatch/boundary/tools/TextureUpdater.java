@@ -6,6 +6,8 @@ import java.awt.*;
 
 import javax.media.opengl.*;
 
+import trashcan.*;
+
 /**
  * This Thread, once started, keeps the screenshotTextures of the viewports up to date.
  * It checks every INTERVAL if the content of the viewport is older than 2 * INTERVAL.
