@@ -22,7 +22,7 @@ import com.jpatch.boundary.tools.MouseSelector.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
-public class SelectTool implements VisibleTool {
+public class SelectTool implements JPatchTool {
 	public static enum Type {
 		RECTANGLE, LASSO, PROXIMITY;
 		@Override
@@ -51,7 +51,6 @@ public class SelectTool implements VisibleTool {
 	private final Collection<AbstractVertex> vertices = new ArrayList<AbstractVertex>();
 	private boolean active;
 	private boolean visibleOnly;
-	private TextureUpdater textureUpdater;
 	public void draw(Viewport viewport) {
 		// TODO Auto-generated method stub
 
@@ -68,8 +67,6 @@ public class SelectTool implements VisibleTool {
 			mouseMotionListeners[i] = new SelectMouseMotionListener((ViewportGl) viewports[i]);
 			viewports[i].getComponent().addMouseMotionListener(mouseMotionListeners[i]);
 		}
-		textureUpdater = new TextureUpdater(viewports);
-		textureUpdater.start();
 	}
 
 	public void unregisterListeners(Viewport[] viewports) {
@@ -77,7 +74,6 @@ public class SelectTool implements VisibleTool {
 			viewports[i].getComponent().removeMouseListener(mouseListeners[i]);
 			viewports[i].getComponent().removeMouseMotionListener(mouseMotionListeners[i]);
 		}
-		textureUpdater.stop();
 	}
 
 	public GenericAttr<Mode> getModeAttribute() {
@@ -109,7 +105,7 @@ public class SelectTool implements VisibleTool {
 		viewport.setModelViewMatrix(selection.getNode());
 		
 		gl.glEnable(GL_BLEND);
-		viewport.drawSelection(selection, new Color3f(1, 1, 0));
+//		viewport.drawSelection(selection, new Color3f(1, 1, 0));
 		gl.glDisable(GL_BLEND);
 		gl.glFlush();
 		glDrawable.swapBuffers();

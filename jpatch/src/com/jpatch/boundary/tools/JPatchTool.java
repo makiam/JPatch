@@ -7,5 +7,5 @@ public interface JPatchTool {
 //	void setTransformable(Transformable transformable);
 	void registerListeners(Viewport[] viewports);
 	void unregisterListeners(Viewport[] viewports);
-	void draw(Viewport viewport);
+//	void draw(Viewport viewport);
 }

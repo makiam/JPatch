@@ -23,7 +23,7 @@ import com.jpatch.boundary.tools.MouseSelector.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
-public class LatheTool implements VisibleTool {
+public class LatheTool implements JPatchTool {
 	private static final BasicMaterial latheMaterial = new BasicMaterial(
 		new Color4f(0, 0, 0, 0),
 		new Color4f(0.5f, 0.5f, 1.0f, 0.33f),

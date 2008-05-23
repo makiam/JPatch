@@ -25,11 +25,11 @@ public class Actions {
 			new SelectTool(),
 			new RotateTool(),
 			new TranslateTool(),
-			new LatheTool(),
+			null, // new LatheTool(),
 			new TweakTool(),
-			new ExtrudeTool(),
-			new AddEdgeTool(),
-			new FlipTool()
+			null, // new ExtrudeTool(),
+			null, // new AddEdgeTool(),
+			null, // new FlipTool()
 	};
 	
 	public final JPatchUndoManager undoManager = new JPatchUndoManager();
