@@ -26,7 +26,7 @@ import com.jpatch.boundary.*;
 import com.jpatch.entity.GlMaterial;
 import com.jpatch.entity.Transformable;
 
-public class TranslateTool implements ModifierTool, VisibleTool {
+public class TranslateTool implements ModifierTool, JPatchTool {
 	public static final GenericAttr<String> EDIT_NAME = new GenericAttr<String>("translate");
 	private static float ARROW_WIDTH = 0.05f;
 	private static float ARROW_LENGTH = 0.1f;
@@ -284,7 +284,7 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 		
 		
 		/* initialize GL for rendering */
-		GL gl = ((ViewportGl) viewport).getGl();
+		GL gl = viewport.getGL();
 		gl.glEnable(GL_BLEND);
 		gl.glEnable(GL_LINE_SMOOTH);
 		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -365,7 +365,7 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 								arrow.drawOutline(gl, m);
 								gl.glEnable(GL_LIGHTING);
 								int mat = (ghost == 0) ? 3 : axis / 2;
-								MATERIALS[mat].applyMaterial(gl, GL_FRONT);
+								Viewport.setMaterial(gl, GL_FRONT, MATERIALS[mat]);
 								arrow.draw(gl, m);
 								gl.glDisable(GL_LIGHTING);
 							} else {
@@ -382,7 +382,7 @@ public class TranslateTool implements ModifierTool, VisibleTool {
 						cube.drawOutline(gl, modelView);
 						gl.glEnable(GL_LIGHTING);
 						int mat = (ghost == 0) ? 3 : 4;
-						MATERIALS[mat].applyMaterial(gl, GL_FRONT);
+						Viewport.setMaterial(gl, GL_FRONT, MATERIALS[mat]);
 						cube.draw(gl, modelView);
 						gl.glDisable(GL_LIGHTING);
 					} else {

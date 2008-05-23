@@ -100,7 +100,7 @@ public class Main {
 	private CollectionAttr<ViewDirection> viewDirectionsAttr = new CollectionAttr<ViewDirection>(TreeSet.class, OrthoViewDirection.DIRECTIONS);
 	
 	private Selection selection = new Selection();
-	private JPatchTool visibleTool = null;
+//	private JPatchTool visibleTool = null;
 	
 	private final SelectionManager selectionManager;
 	
@@ -379,9 +379,9 @@ public class Main {
 			@Override
 			public JPatchTool attributeWillChange(ScalarAttribute source, JPatchTool value) {
 				JPatchTool currentTool = actions.toolSM.getValue();
-				if (currentTool instanceof VisibleTool) {
-					visibleTool = currentTool;
-				}
+//				if (currentTool instanceof VisibleTool) {
+//					visibleTool = currentTool;
+//				}
 				return value;
 			}
 		});
@@ -885,11 +885,11 @@ public class Main {
 	public JPatchTool getActiveTool() {
 //		return actions.toolSM.getValue();
 		JPatchTool currentTool = actions.toolSM.getValue();
-		if (currentTool instanceof VisibleTool) {
+//		if (currentTool instanceof VisibleTool) {
 			return currentTool;
-		} else {
-			return visibleTool;
-		}
+//		} else {
+//			return visibleTool;
+//		}
 	}
 	
 	public JPatchUndoManager getUndoManager() {

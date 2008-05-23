@@ -25,12 +25,12 @@ import com.jpatch.boundary.tools.NormalTool.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
-public class TweakTool implements VisibleTool, ViewportOverlay {
+public class TweakTool implements JPatchTool, ViewportOverlay {
 	private enum ToolMode { FREE, NORMAL }
 	
 	private static final int MAX_DISTANCE_SQ = 32 * 32;
 	
-	private TransformUtil transformUtil = new TransformUtil();
+//	private TransformUtil transformUtil = new TransformUtil();
 	private MouseMotionListener[] mouseMotionListeners;
 	private MouseListener[] mouseListeners;
 	
@@ -57,12 +57,9 @@ public class TweakTool implements VisibleTool, ViewportOverlay {
 	private final StateMachine<ToolMode> toolModeAttr = new StateMachine<ToolMode>(ToolMode.class, ToolMode.FREE);
 	
 	private Normal normal;
+
+	private boolean strong;
 	
-	public void draw(Viewport viewport) {
-		// TODO Auto-generated method stub
-
-	}
-
 	public BooleanAttr getSelectLassoAttribute() {
 		return selectLassoAttr;
 	}
@@ -83,8 +80,6 @@ public class TweakTool implements VisibleTool, ViewportOverlay {
 			viewports[i].getComponent().addMouseMotionListener(mouseMotionListeners[i]);
 			viewports[i].addOverlay(this);
 		}
-//		textureUpdater = new TextureUpdater(viewports);
-//		textureUpdater.start();
 	}
 
 	public void unregisterListeners(Viewport[] viewports) {
@@ -93,10 +88,10 @@ public class TweakTool implements VisibleTool, ViewportOverlay {
 			viewports[i].getComponent().removeMouseMotionListener(mouseMotionListeners[i]);
 			viewports[i].removeOverlay(this);
 		}
-//		textureUpdater.stop();
 	}
 
 	private void highlightHitObject(Viewport viewport, boolean redraw, boolean validateTexture, boolean strong) {
+		this.strong = strong;
 		viewport.redrawOverlays();
 //		GLAutoDrawable glDrawable = (GLAutoDrawable) viewport.getComponent();
 //		glDrawable.getContext().makeCurrent();
@@ -169,10 +164,10 @@ public class TweakTool implements VisibleTool, ViewportOverlay {
 		mode = Mode.MOVE;
 		hitSelection.getTransformable().begin();
 		localStart.set(hitObject.screenPosition);
-		transformUtil.projectFromScreen(TransformUtil.LOCAL, localStart, localStart);
+		viewport.projectFromScreen(localStart, localStart);
 		highlightHitObject(viewport, false, false, true);
 		if (toolModeAttr.getValue() == ToolMode.NORMAL) {
-			normal = new Normal(viewport, hitSelection, hitObject, transformUtil);
+			normal = new Normal(viewport, hitSelection, hitObject);
 		}
 	}
 	
@@ -315,7 +310,7 @@ public class TweakTool implements VisibleTool, ViewportOverlay {
 					} else {
 						mode = Mode.HOVER;
 					}
-					highlightHitObject(viewport, true, true, true);
+					highlightHitObject(viewport, true, true, false);
 //					break;
 //				default:
 //					assert false : mode;
@@ -355,7 +350,7 @@ public class TweakTool implements VisibleTool, ViewportOverlay {
 		hitSelection.setNode(sdsModel, null);
 		hitSelection.addVertices(vertices, null);
 		hitSelection.setType(selectionType, null);
-		highlightHitObject(viewport, false, false, true);
+		highlightHitObject(viewport, false, false, false);
 	}
 	
 	private int getSelectionFilter(Selection.Type type) {
@@ -407,12 +402,13 @@ public class TweakTool implements VisibleTool, ViewportOverlay {
 					normal.mouseDragged(viewport, e.getX(), e.getY());
 				} else {
 					mouse.set(e.getX(), e.getY(), localStart.z);
-					transformUtil.projectFromScreen(TransformUtil.LOCAL, mouse, mouse);
+					viewport.projectFromScreen(mouse, mouse);
 					vector.sub(mouse, localStart);
 					hitSelection.getTransformable().translate(vector);
 	//				Main.getInstance().syncRepaintViewport(viewport);
 				}
-				highlightHitObject(viewport, true, false, true);
+				Main.getInstance().repaintViewport(viewport);
+//				highlightHitObject(viewport, true, false, true);
 				break;
 //			case SELECT_LASSO:		// fallthrough intended
 //			case SELECT_RECTANGLE:	// fallthrough intended
@@ -460,7 +456,7 @@ public class TweakTool implements VisibleTool, ViewportOverlay {
 				if (newHitObject == null ? hitObject != null : !newHitObject.equals(hitObject)) {
 					hitObject = newHitObject;
 					setSelection(hitSelection, hitObject);
-					highlightHitObject(viewport, false, false, true);
+					highlightHitObject(viewport, false, false, false);
 				}
 				break;
 			case IDLE:
@@ -488,7 +484,7 @@ public class TweakTool implements VisibleTool, ViewportOverlay {
 		private final int axis;
 		private final Map<AbstractVertex, VertexNormal> vertexPos = new HashMap<AbstractVertex, VertexNormal>();
 		
-		Normal(Viewport viewport, Selection selection, HitObject hitObject, TransformUtil transformUtil) {
+		Normal(Viewport viewport, Selection selection, HitObject hitObject) {
 			if (hitObject instanceof HitVertex) {
 				AbstractVertex vertex = ((HitVertex) hitObject).vertex;
 				vertex.getPosition(p0);
@@ -556,8 +552,8 @@ public class TweakTool implements VisibleTool, ViewportOverlay {
 				}
 			}
 			
-			transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0s);
-			transformUtil.projectToScreen(TransformUtil.LOCAL, p1, p1s);
+			viewport.projectToScreen(p0, p0s);
+			viewport.projectToScreen(p1, p1s);
 			
 			double dx = Math.abs(p0.x - p1.x);
 			double dy = Math.abs(p0.y - p1.y);
@@ -586,7 +582,7 @@ public class TweakTool implements VisibleTool, ViewportOverlay {
 		
 		public void mouseDragged(Viewport viewport, int mx, int my) {
 			p.interpolate(p0s, p1s, Utils3d.closestPointOnLine(p0s.x, p0s.y, p1s.x, p1s.y, mx, my));
-			transformUtil.projectFromScreen(LOCAL, p, p);
+			viewport.projectFromScreen(p, p);
 			double factor = 0;
 			switch (axis) {
 			case 0:	// x
@@ -627,7 +623,8 @@ public class TweakTool implements VisibleTool, ViewportOverlay {
 
 	public void drawOverlay(Viewport viewport) {
 		GL gl = viewport.getGL();
-		Viewport.drawSelection(gl, hitSelection, new Color4f(1, 1, 0, 0.5f));
+		viewport.resetModelviewMatrix(gl);
+		Viewport.drawSelection(gl, hitSelection, new Color4f(1, 1, 0, strong ? 0.8f : 0.6f));
 		if (mode == Mode.LASSO) {
 			viewport.rasterMode(gl);
 			gl.glColor3f(1, 1, 0);

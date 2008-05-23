@@ -60,7 +60,7 @@ public class Viewport implements NamedObject {
 	
 	private ViewDef viewDef;
 	private final Collection<ViewportOverlay> overlays = new ArrayList<ViewportOverlay>();
-	private OverlayStrategy overlayStrategy = new AuxBufferOverlayStrategy();
+	private OverlayStrategy overlayStrategy = new TextureOverlayStrategy();
 	
 	private FloatBuffer depthBuffer;
 	private boolean depthBufferValid;
@@ -211,6 +211,14 @@ public class Viewport implements NamedObject {
 
 	public void setViewDef(ViewDef viewDef) {
 		this.viewDef = viewDef;
+	}
+	
+	public void projectToScreen(Point3d fromPoint, Point3d toPoint) {
+		transformUtil.projectToScreen(TransformUtil.WORLD, fromPoint, toPoint);
+	}
+	
+	public void projectFromScreen(Point3d fromPoint, Point3d toPoint) {
+		transformUtil.projectFromScreen(TransformUtil.WORLD, fromPoint, toPoint);
 	}
 	
 	public float getDepthAt(int x, int y) {
@@ -621,10 +629,8 @@ public class Viewport implements NamedObject {
 		gl.glClearColor(background.x, background.y, background.z, 1);
 		component.setBackground(background.get());
 		gl.glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);	// clear color and depth buffers
-		viewDef.configureTransformUtil(transformUtil);
-		transformUtil.getMatrix(TransformUtil.WORLD, TransformUtil.CAMERA, modelView);
-		gl.glMatrixMode(GL_MODELVIEW);
-		gl.glLoadMatrixd(modelView, 0);
+		
+		resetModelviewMatrix(gl);
 		
 		gl.glShadeModel(GL_SMOOTH);
 		gl.glEnable(GL_NORMALIZE);
@@ -638,6 +644,14 @@ public class Viewport implements NamedObject {
 			drawSceneGraphNames(gl, sceneGraphRoot);
 		}
 		drawInfo(gl);
+		depthBufferValid = false;
+	}
+	
+	public void resetModelviewMatrix(GL gl) {
+		viewDef.configureTransformUtil(transformUtil);
+		transformUtil.getMatrix(TransformUtil.WORLD, TransformUtil.CAMERA, modelView);
+		gl.glMatrixMode(GL_MODELVIEW);
+		gl.glLoadMatrixd(modelView, 0);
 	}
 	
 	private void drawSceneGraphNames(GL gl, SceneGraphNode node) {
