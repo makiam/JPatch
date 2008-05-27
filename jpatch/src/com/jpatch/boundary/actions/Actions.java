@@ -25,10 +25,10 @@ public class Actions {
 			new SelectTool(),
 			new RotateTool(),
 			new TranslateTool(),
-			null, // new LatheTool(),
+		    new LatheTool(),
 			new TweakTool(),
 			null, // new ExtrudeTool(),
-			null, // new AddEdgeTool(),
+			new AddEdgeTool(),
 			null, // new FlipTool()
 	};
 	

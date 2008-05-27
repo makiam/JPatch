@@ -624,6 +624,7 @@ public class TweakTool implements JPatchTool, ViewportOverlay {
 	public void drawOverlay(Viewport viewport) {
 		GL gl = viewport.getGL();
 		viewport.resetModelviewMatrix(gl);
+		gl.glDisable(GL_DEPTH_TEST);
 		Viewport.drawSelection(gl, hitSelection, new Color4f(1, 1, 0, strong ? 0.8f : 0.6f));
 		if (mode == Mode.LASSO) {
 			viewport.rasterMode(gl);
@@ -636,5 +637,6 @@ public class TweakTool implements JPatchTool, ViewportOverlay {
 			gl.glEnd();
 			viewport.spatialMode(gl);
 		}
+		gl.glEnable(GL_DEPTH_TEST);
 	}
 }

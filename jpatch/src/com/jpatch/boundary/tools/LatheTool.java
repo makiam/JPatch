@@ -23,7 +23,7 @@ import com.jpatch.boundary.tools.MouseSelector.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
-public class LatheTool implements JPatchTool {
+public class LatheTool implements JPatchTool, ViewportOverlay {
 	private static final BasicMaterial latheMaterial = new BasicMaterial(
 		new Color4f(0, 0, 0, 0),
 		new Color4f(0.5f, 0.5f, 1.0f, 0.33f),
@@ -69,9 +69,9 @@ public class LatheTool implements JPatchTool {
 	private Point hitPoint;
 	private Point3d localStart = new Point3d();
 	
-	private TransformUtil transformUtil = new TransformUtil();
+//	private TransformUtil transformUtil = new TransformUtil();
 	
-	private Sds lathedSds;
+	private SdsModel lathedSds;
 	private BaseVertex[][] lathedVertices = new BaseVertex[0][0];
 	private boolean[] snap = new boolean[2];
 	private boolean[] lastSnap = new boolean[2];
@@ -124,10 +124,11 @@ public class LatheTool implements JPatchTool {
 		mouseListeners = new MouseListener[viewports.length];
 		mouseMotionListeners = new MouseMotionListener[viewports.length];
 		for (int i = 0; i < viewports.length; i++) {
-			mouseListeners[i] = new LatheMouseListener((ViewportGl) viewports[i]);
+			mouseListeners[i] = new LatheMouseListener(viewports[i]);
 			viewports[i].getComponent().addMouseListener(mouseListeners[i]);
-			mouseMotionListeners[i] = new LatheMouseMotionListener((ViewportGl) viewports[i]);
+			mouseMotionListeners[i] = new LatheMouseMotionListener(viewports[i]);
 			viewports[i].getComponent().addMouseMotionListener(mouseMotionListeners[i]);
+			viewports[i].addOverlay(this);
 		}
 	}
 
@@ -135,6 +136,7 @@ public class LatheTool implements JPatchTool {
 		for (int i = 0; i < viewports.length; i++) {
 			viewports[i].getComponent().removeMouseListener(mouseListeners[i]);
 			viewports[i].getComponent().removeMouseMotionListener(mouseMotionListeners[i]);
+			viewports[i].removeOverlay(this);
 		}
 	}
 	
@@ -162,7 +164,7 @@ public class LatheTool implements JPatchTool {
 			}
 			for (BaseVertex[] v : lathedVertices) {
 				for (int i = 0; i < v.length; i++) {
-					v[i] = new BaseVertex();
+					v[i] = new BaseVertex(Main.getInstance().getActiveModel());
 				}
 			}
 		}
@@ -182,7 +184,7 @@ public class LatheTool implements JPatchTool {
 		
 		
 		if (lastStartEdge != startEdge || lastSnap[0] != snap[0] || lastSnap[1] != snap[1]) {
-			lathedSds = new Sds(null);
+			lathedSds = new SdsModel(new Sds(null));
 			Operations.lathe(lathedSds, lathedPoints, lathedVertices, latheMaterial, null);
 		} else {
 			for (int i = 0; i < lathedPoints.length; i++) {
@@ -198,27 +200,23 @@ public class LatheTool implements JPatchTool {
 		
 	}
 	
-	private void highlight(ViewportGl viewport) {
+	public void drawOverlay(Viewport viewport) {
 		
-		GLAutoDrawable glDrawable = (GLAutoDrawable) viewport.getComponent();
-		glDrawable.getContext().makeCurrent();
-		GL gl = glDrawable.getGL();
-		viewport.validateScreenShotTexture();
-		viewport.drawScreenShot(0, 0, glDrawable.getWidth(), glDrawable.getHeight(), 1.0f);
-		viewport.spatialMode();
+		GL gl = viewport.getGL();
+		viewport.spatialMode(gl);
 		
 		if (hitObject != null) {
 			
-			viewport.setModelViewMatrix(Main.getInstance().getSelection().getNode());
+			viewport.resetModelviewMatrix(gl);
 			gl.glDisable(GL_DEPTH_TEST);
 			gl.glEnable(GL_CULL_FACE);
 			gl.glDepthMask(false);
 			
-			viewport.getViewDef().configureTransformUtil(transformUtil);
-			hitObject.node.getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
-			viewport.setModelViewMatrix(transformUtil);
+//			viewport.getViewDef().configureTransformUtil(transformUtil);
+//			hitObject.node.getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+//			viewport.setModelViewMatrix(transformUtil);
 				
-			viewport.drawSelection(hitSelection, new Color4f(0.5f, 0.5f, 1.0f, 0.5f));
+			viewport.drawSelection(gl, hitSelection, new Color4f(0.5f, 0.5f, 1.0f, 0.5f));
 	
 			gl.glDisable(GL_LIGHTING);
 			gl.glLineWidth(1);
@@ -278,19 +276,19 @@ public class LatheTool implements JPatchTool {
 				}
 				gl.glEnable(GL_LIGHTING);
 				
-				latheMaterial.getGlMaterial().applyMaterial(gl, GL_FRONT);
+				viewport.setMaterial(gl, GL_FRONT, latheMaterial.getGlMaterial());
 				
 				if (previewLimitAttr.getBoolean()) {
-					viewport.drawSds2(lathedSds, false, true, true, 1, 0, lineColor, lineMaterial.getGlMaterial());
+					viewport.drawSds(gl, lathedSds.getSds(), false, true, true, 1, 0, lineColor, lineMaterial.getGlMaterial());
 				} else {
-					viewport.drawSds2(lathedSds, true, false, false, 0, 0, lineColor, lineMaterial.getGlMaterial());
+					viewport.drawSds(gl, lathedSds.getSds(), true, false, false, 0, 0, lineColor, lineMaterial.getGlMaterial());
 				}
 				gl.glDisable(GL_BLEND);
 				gl.glDisable(GL_LIGHTING);
 				if (!drag) {
-					viewport.rasterMode();
-					viewport.drawString("doubleclick to lathe", mouseX, mouseY);
-					viewport.spatialMode();
+					viewport.rasterMode(gl);
+					viewport.drawString(gl, "doubleclick to lathe", mouseX, mouseY);
+					viewport.spatialMode(gl);
 				}
 			}
 			gl.glLineWidth(1);
@@ -299,9 +297,6 @@ public class LatheTool implements JPatchTool {
 			gl.glEnable(GL_DEPTH_TEST);
 			gl.glDepthMask(true);
 		}
-		gl.glFlush();
-		glDrawable.swapBuffers();
-		glDrawable.getContext().release();
 	}
 	
 	private void updateSelection(Selection selection, HitObject hitObject) {
@@ -313,9 +308,9 @@ public class LatheTool implements JPatchTool {
 	}
 	
 	private class LatheMouseListener extends MouseAdapter {
-		private final ViewportGl viewport;
+		private final Viewport viewport;
 		
-		LatheMouseListener(ViewportGl viewport) {
+		LatheMouseListener(Viewport viewport) {
 			this.viewport = viewport;
 		}
 		
@@ -332,15 +327,15 @@ public class LatheTool implements JPatchTool {
 					lathedPoints = new Point3d[0][0];
 					lathedVertices = new BaseVertex[0][0];
 					computeLathedVertices();
-					Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
+					SdsModel sdsModel = Main.getInstance().getActiveModel();
 					List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
 					Main.getInstance().getSelection().clear(editList);
-					Operations.lathe(sds, lathedPoints, lathedVertices, Main.getInstance().getDefaultMaterial(), editList);
+					Operations.lathe(sdsModel, lathedPoints, lathedVertices, Main.getInstance().getDefaultMaterial(), editList);
 					
 					HalfEdge strayEdge = startEdge;
 					while (strayEdge != null) {
-						HalfEdge nextEdge = sds.getNextStrayEdge(strayEdge);
-						sds.removeSegment(editList, strayEdge);
+						HalfEdge nextEdge = sdsModel.getSds().getNextStrayEdge(strayEdge);
+						sdsModel.getSds().removeSegment(editList, strayEdge);
 						strayEdge = nextEdge;
 						if (strayEdge == startEdge) {
 							break;
@@ -361,7 +356,7 @@ public class LatheTool implements JPatchTool {
 					drag = true;
 					wasDragged = false;
 					localStart.set(hitObject.screenPosition);
-					transformUtil.projectFromScreen(TransformUtil.LOCAL, localStart, localStart);
+					viewport.projectFromScreen(localStart, localStart);
 				}
 			}
 		}
@@ -391,11 +386,11 @@ public class LatheTool implements JPatchTool {
 	}
 	
 	private class LatheMouseMotionListener extends MouseMotionAdapter {
-		private final ViewportGl viewport;
+		private final Viewport viewport;
 		Point3d mouse = new Point3d();
 		Vector3d vector = new Vector3d();
 		
-		LatheMouseMotionListener(ViewportGl viewport) {
+		LatheMouseMotionListener(Viewport viewport) {
 			this.viewport = viewport;
 		}
 		
@@ -413,13 +408,13 @@ public class LatheTool implements JPatchTool {
 					return;
 				}
 				mouse.set(e.getX(), e.getY(), hitObject.screenPosition.z);
-				transformUtil.projectFromScreen(TransformUtil.LOCAL, mouse, mouse);
+				viewport.projectFromScreen(mouse, mouse);
 				vector.sub(mouse, localStart);
 				Selection selection = Main.getInstance().getSelection();
 				selection.getTransformable().translate(vector);
 //				Main.getInstance().syncRepaintViewport(viewport);
 				computeLathedVertices();
-				highlight(viewport);
+				viewport.redrawOverlays();
 				wasDragged = true;
 			}
 		}
@@ -462,7 +457,7 @@ public class LatheTool implements JPatchTool {
 					chain = null;
 				}
 			}
-			highlight(viewport);
+			viewport.redrawOverlays();
 		}
 	}
 	
