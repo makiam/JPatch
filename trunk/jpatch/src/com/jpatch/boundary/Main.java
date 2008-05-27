@@ -84,7 +84,7 @@ public class Main {
 	private JFrame frame;
 	private JLabel statusLabel = new JLabel("status");
 	
-	private Sds activeSds;
+	private SdsModel activeModel;
 
 	private JComponent screen = new Screen();
 	
@@ -602,6 +602,7 @@ public class Main {
 			model.getNameAttribute().setValue("SDS model");
 			model.getParentAttribute().setValue(sceneGraphRoot);
 			selection.setNode(model, null);
+			activeModel = model;
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -870,8 +871,8 @@ public class Main {
 		return frame;
 	}
 	
-	public Sds getActiveSds() {
-		return activeSds;
+	public SdsModel getActiveModel() {
+		return activeModel;
 	}
 	
 	public SceneGraphNode getSceneGraphRoot() {
@@ -911,6 +912,7 @@ public class Main {
 		selection.setNode(sdsModel, null);
 		
 		treeManager.removeNode(oldModel);
+		activeModel = sdsModel;
 	}
 	
 //	public void computeSceneGraph() {

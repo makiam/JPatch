@@ -18,7 +18,7 @@ import com.jpatch.boundary.tools.MouseSelector.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
-public class AddEdgeTool implements VisibleTool {
+public class AddEdgeTool implements JPatchTool, ViewportOverlay {
 	private static ObjectFilter ENDVERTEX_FILTER = new ObjectFilter() {
 		public boolean accept(Object o) {
 			try {
@@ -31,7 +31,6 @@ public class AddEdgeTool implements VisibleTool {
 	
 	private MouseMotionListener[] mouseMotionListeners;
 	private MouseListener[] mouseListeners;
-	private TextureUpdater textureUpdater;
 	
 	private BaseVertex floatingVertex;
 	private BaseVertex startVertex;
@@ -51,33 +50,28 @@ public class AddEdgeTool implements VisibleTool {
 		mouseListeners = new MouseListener[viewports.length];
 		mouseMotionListeners = new MouseMotionListener[viewports.length];
 		for (int i = 0; i < viewports.length; i++) {
-			mouseListeners[i] = new AddEdgeMouseListener((ViewportGl) viewports[i]);
+			mouseListeners[i] = new AddEdgeMouseListener(viewports[i]);
 			viewports[i].getComponent().addMouseListener(mouseListeners[i]);
-			mouseMotionListeners[i] = new AddEdgeMouseMotionListener((ViewportGl) viewports[i]);
+			mouseMotionListeners[i] = new AddEdgeMouseMotionListener(viewports[i]);
 			viewports[i].getComponent().addMouseMotionListener(mouseMotionListeners[i]);
+			viewports[i].addOverlay(this);
 		}
-		textureUpdater = new TextureUpdater(viewports);
-		textureUpdater.start();
 	}
 
 	public void unregisterListeners(Viewport[] viewports) {
 		for (int i = 0; i < viewports.length; i++) {
 			viewports[i].getComponent().removeMouseListener(mouseListeners[i]);
 			viewports[i].getComponent().removeMouseMotionListener(mouseMotionListeners[i]);
+			viewports[i].removeOverlay(this);
 		}
-		textureUpdater.stop();
 	}
 	
-	private void highlight(ViewportGl viewport) {
+	public void drawOverlay(Viewport viewport) {
 //		System.out.println("hitObject = " + hitObject + " distance = " + Math.sqrt(hitObject.distanceSq));
 		
-		GLAutoDrawable glDrawable = (GLAutoDrawable) viewport.getComponent();
-		glDrawable.getContext().makeCurrent();
-		GL gl = glDrawable.getGL();
-		viewport.validateScreenShotTexture();
-		viewport.drawScreenShot(0, 0, glDrawable.getWidth(), glDrawable.getHeight(), 1.0f);
-		viewport.spatialMode();
-		viewport.setModelViewMatrix(Main.getInstance().getSelection().getNode());
+		GL gl = viewport.getGL();
+		viewport.spatialMode(gl);
+		viewport.resetModelviewMatrix(gl);
 		
 		gl.glDepthMask(false);
 		gl.glLineWidth(1);
@@ -136,17 +130,13 @@ public class AddEdgeTool implements VisibleTool {
 			drawStrayFace(gl, strayFace, p);
 			gl.glDisable(GL_BLEND);
 			
-			viewport.rasterMode();
-			viewport.drawString("doubleclick to add face", mouseX, mouseY);
-			viewport.spatialMode();
+			viewport.rasterMode(gl);
+			viewport.drawString(gl, "doubleclick to add face", mouseX, mouseY);
+			viewport.spatialMode(gl);
 		}
 //		System.out.println(hitVertex);
 		
 		gl.glDepthMask(true);
-		
-		gl.glFlush();
-		glDrawable.swapBuffers();
-		glDrawable.getContext().release();
 	}
 	
 	private void drawStrayFace(GL gl, BaseVertex[] vertices, Point3f p) {
@@ -182,9 +172,9 @@ public class AddEdgeTool implements VisibleTool {
 	}
 	
 	private class AddEdgeMouseListener extends MouseAdapter {
-		private final ViewportGl viewport;
+		private final Viewport viewport;
 		
-		AddEdgeMouseListener(ViewportGl viewport) {
+		AddEdgeMouseListener(Viewport viewport) {
 			this.viewport = viewport;
 		}
 		
@@ -195,7 +185,7 @@ public class AddEdgeTool implements VisibleTool {
 			}
 			
 			if (startVertex == null) {
-				startVertex = new BaseVertex();
+				startVertex = new BaseVertex(Main.getInstance().getActiveModel());
 				TransformUtil transformUtil = new TransformUtil();
 				viewport.getViewDef().configureTransformUtil(transformUtil);
 				Main.getInstance().getSelection().getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
@@ -203,8 +193,8 @@ public class AddEdgeTool implements VisibleTool {
 				transformUtil.projectFromScreen(TransformUtil.LOCAL, p, p);
 				startVertex.setPosition(p);
 			}
-			highlight(viewport);
-			floatingVertex = new BaseVertex();
+			viewport.redrawOverlays();
+			floatingVertex = new BaseVertex(Main.getInstance().getActiveModel());
 			drag = true;
 			
 		}
@@ -282,7 +272,7 @@ public class AddEdgeTool implements VisibleTool {
 			endVertex = null;
 			strayFace = null;
 			Main.getInstance().repaintViewports();
-			highlight(viewport);
+//			viewport.redrawOverlays();
 			
 			drag = false;
 		}
@@ -290,9 +280,9 @@ public class AddEdgeTool implements VisibleTool {
 	}
 
 	private class AddEdgeMouseMotionListener implements MouseMotionListener {
-		private final ViewportGl viewport;
+		private final Viewport viewport;
 		
-		AddEdgeMouseMotionListener(ViewportGl viewport) {
+		AddEdgeMouseMotionListener(Viewport viewport) {
 			this.viewport = viewport;
 		}
 		
@@ -316,7 +306,7 @@ public class AddEdgeTool implements VisibleTool {
 				endVertex.setPosition(p);
 			}
 			
-			highlight(viewport);
+			viewport.redrawOverlays();
 		}
 
 		public void mouseMoved(MouseEvent e) {
@@ -364,7 +354,7 @@ public class AddEdgeTool implements VisibleTool {
 					}
 				}
 			}
-			highlight(viewport);
+			viewport.redrawOverlays();
 		}
 		
 	}
