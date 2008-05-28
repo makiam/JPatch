@@ -347,6 +347,8 @@ public class Pnt {
             matrix[i+1] = new Pnt(coords);
         }
         
+        System.out.println("***" + toString(matrix));
+        System.out.println("***" + this);
         /* Compute and analyze the vector of areas/volumes/contents */
         Pnt vector = cross(matrix);
         double content = vector.coordinates[0];
