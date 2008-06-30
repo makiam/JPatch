@@ -127,7 +127,7 @@ public class Simplex {
 			matrix.setElement(row, dim + 1, vertices[row].dot(vertices[row]));
 		}
 		for (int column = 0; column < dim; column++) {
-			matrix.setElement(vertices.length, column, vertices[vertices.length].getElement(column));
+			matrix.setElement(vertices.length, column, vertices[vertices.length - 1].getElement(column));
 		}
 		matrix.setElement(vertices.length, dim, 1);
 		matrix.setElement(vertices.length, dim + 1, point.dot(point));
@@ -139,6 +139,31 @@ public class Simplex {
 		return result;
 	}
 	
+	/**
+     * True iff simplices are neighbors.
+     * Two simplices are neighbors if they are the same dimension and they share
+     * a facet.
+     * @param simplex the other Simplex
+     * @return true iff this Simplex is a neighbor of simplex
+     */
+    public boolean isNeighbor (Simplex simplex) {
+    	if (vertices.length != simplex.vertices.length) {
+    		throw new IllegalArgumentException("Dimension mismatch");
+    	}
+    	int n = vertices.length;
+    	int c = 0;
+        for (int i = 0; i < n; i++) {
+        	for (int j = 0; j < n; j++) {
+        		if (vertices[i] == vertices[j]) {
+        			c++;
+        			continue;
+        		}
+        	}
+        }
+        return (c == n - 1);
+    }
+    
+    
 	public double content () {
 		int dim = vertices.length;
 		Matrix matrix = new Matrix(dim, dim);
