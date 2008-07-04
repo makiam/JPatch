@@ -18,28 +18,34 @@ public class Delaunay {
 		return neighbors.containsKey(simplex);
 	}
 	
+	public Collection<Simplex> getSimplices() {
+		return neighbors.keySet();
+	}
+	
 	public Simplex locate(Vector point) {
-		Simplex simplex = prevSimplex;
-		if (!contains(simplex)) {
-			simplex = null;
-		}
-		
-		Set<Simplex> visitedSimplices = new HashSet<Simplex>();
-		while (simplex != null) {
-			if (visitedSimplices.contains(simplex)) {
-				throw new RuntimeException(); // should not happen
-			}
-			visitedSimplices.add(simplex);
-			Vector corner = simplex.isOutside(point);
-			if (corner == null) {
-				return simplex;
-			}
-			simplex = neighborOpposite(corner, simplex);
-		}
-		
-		System.out.println("Cecking all simplices");
+		System.out.println("locating " + point);
+//		Simplex simplex = prevSimplex;
+//		if (!contains(simplex)) {
+//			simplex = null;
+//		}
+//		
+//		Set<Simplex> visitedSimplices = new HashSet<Simplex>();
+//		while (simplex != null) {
+//			if (visitedSimplices.contains(simplex)) {
+//				throw new RuntimeException(); // should not happen
+//			}
+//			visitedSimplices.add(simplex);
+//			Vector corner = simplex.isOutside(point);
+//			if (corner == null) {
+//				return simplex;
+//			}
+//			simplex = neighborOpposite(corner, simplex);
+//		}
+//		
+//		System.out.println("Cecking all simplices");
 		for (Simplex s : neighbors.keySet()) {
 			if (s.isOutside(point) == null) {
+				System.out.println(point + " is in " + s);
 				return s;
 			}
 		}
