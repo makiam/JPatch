@@ -64,10 +64,10 @@ public class Test {
 //		dt.delaunayPlace(new Pnt(0, 1, 1));
 //		dt.delaunayPlace(new Pnt(1, 0, 1));
 //		dt.delaunayPlace(new Pnt(1, 1, 1));
-		for (int i = 0; i < 10; i++) {
-			dt.delaunayPlace(new Pnt(Math.random(), Math.random()));
+		Random rnd = new Random(1);
+		for (int i = 0; i < 50; i++) {
+			dt.delaunayPlace(new Pnt(rnd.nextDouble(), rnd.nextDouble()));
 		}
-		dt.delaunayPlace(new Pnt(0.00, 0.5));
 		for (Simplex<Pnt> s : dt) {
 			for (Pnt p : s) {
 				Color c = new Color((float) Math.random(), (float) Math.random(), (float) Math.random());
@@ -98,19 +98,23 @@ public class Test {
 						}
 						n++;
 					}
-					double[] weights = getWeights(point, splx);
-					int i = 0;
-					double r = 0, g = 0, b = 0;
-					for (Pnt p : hit) {
-						Color c = colors.get(p);
-						r += weights[i] * c.getRed();
-						g += weights[i] * c.getGreen();
-						b += weights[i] * c.getBlue();
-						i++;
+					try {
+						double[] weights = getWeights(point, splx);
+						int i = 0;
+						double r = 0, g = 0, b = 0;
+						for (Pnt p : hit) {
+							Color c = colors.get(p);
+							r += weights[i] * c.getRed();
+							g += weights[i] * c.getGreen();
+							b += weights[i] * c.getBlue();
+							i++;
+						}
+	//					System.out.println(r + "," + g + "," + b);
+						g2.setColor(new Color((int) r, (int) g, (int) b));
+						g2.fillRect(x, y, 2, 2);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-//					System.out.println(r + "," + g + "," + b);
-					g2.setColor(new Color((int) r, (int) g, (int) b));
-					g2.fillRect(x, y, 2, 2);
 				}
 			}
 			System.out.println(y);
@@ -135,12 +139,11 @@ public class Test {
 			public void paintComponent(Graphics g) {
 				Graphics2D g2 = (Graphics2D) g.create();
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				g2.setStroke(new BasicStroke(0));
 				g2.setColor(Color.WHITE);
 				g2.drawImage(img, 60, 60, null);
-//				if (true) return;
+				if (true) return;
 				g2.setTransform(at);
-				g2.setStroke(new BasicStroke(0));
+				g2.setStroke(new BasicStroke(1.0f / 600));
 				Pnt[] pts = new Pnt[3];
 				Line2D.Double line = new Line2D.Double();
 				for (Simplex<Pnt> s : dt) {

@@ -84,7 +84,7 @@ public class DelaunayTriangulation extends Triangulation<Pnt> {
             triangle = this.neighborOpposite(corner, triangle);
         }
         // No luck; try brute force
-        System.out.println("Warning: Checking all triangles for " + point);
+ //       System.out.println("Warning: Checking all triangles for " + point);
         for (Simplex<Pnt> tri: this) {
             if (point.isOutside(tri.toArray(new Pnt[0])) == null) return tri;
         }
