@@ -53,6 +53,14 @@ public class DelaunayTriangulation extends Triangulation<Pnt> {
         mostRecent = triangle;
     }
     
+    public DelaunayTriangulation (Simplex<Pnt> triangle1, Simplex<Pnt> triangle2) {
+        super(triangle1);
+        mostRecent = triangle1;
+        neighbors.put(triangle2, new HashSet<Simplex<Pnt>>());
+        neighbors.get(triangle1).add(triangle2);
+        neighbors.get(triangle2).add(triangle1);
+    }
+    
     /**
      * Locate the triangle with point (a Pnt) inside (or on) it.
      * @param point the Pnt to locate
