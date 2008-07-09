@@ -28,4 +28,8 @@ public class MorphTarget {
 		this.position = position.clone();
 		this.value = value.clone();
 	}
+	
+	public void setValue(double ... value) {
+		System.arraycopy(value, 0, this.value, 0, value.length);
+	}
 }

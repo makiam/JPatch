@@ -10,11 +10,18 @@ import javax.swing.*;
 public class InterpolationTest {
 	
 	public static void main(String[] args) {
-		final Morph morph = new Morph(2, new double[] { 0, 0, 0 });
-		morph.removeMorphTarget(morph.getMorphTargets()[0]);
-		morph.addMorphTarget(new MorphTarget(new double[] { 0.0, 0.0 }, new double[] { 0.0, 0.0, 0.0 }));
-		morph.addMorphTarget(new MorphTarget(new double[] { 0.5, 0.0 }, new double[] { 0.5, 0.5, 0.5 }));
-		morph.addMorphTarget(new MorphTarget(new double[] { 1.0, 0.0 }, new double[] { 1.0, 1.0, 1.0 }));
+		final Morph morph = new Morph(2, 3);
+		morph.addMorphTarget(new double[] { 0.0, 0.0 }).setValue(1.0, 1.0, 1.0);
+		morph.addMorphTarget(new double[] { 1.0, 0.0 }).setValue(1.0, 1.0, 1.0);
+		morph.addMorphTarget(new double[] { 0.33, 0.0 }).setValue(0.0, 0.0, 0.0);
+		morph.addMorphTarget(new double[] { 0.66, 0.0 });
+		morph.computePreWeights();
+		
+//		morph.addMorphTarget(new MorphTarget(new double[] { 0.33, 0.0 }, new double[] { 0.0, 0.0, 0.0 }));
+//		morph.addMorphTarget(new MorphTarget(new double[] { 0.66, 0.0 }, new double[] { 0.5, 0.5, 0.5 }));
+//		morph.addMorphTarget(new MorphTarget(new double[] { 1.0, 0.0 }, new double[] { 1.0, 1.0, 1.0 }));
+//		morph.addMorphTarget(new MorphTarget(new double[] { 0.5, 1.0 }, new double[] { 0.5, 0.5, 0.5 }));
+//		morph.addMorphTarget(new MorphTarget(new double[] { 1.0, 1.0 }, new double[] { 1.0, 1.0, 1.0 }));
 //		morph.addMorphTarget(new MorphTarget(new double[] { 0.8, 0.0 }, new double[] { 0, 0, 0 }));
 //		morph.addMorphTarget(new MorphTarget(new double[] { 1, 1, 0 }, new double[] { 0, 0, 0 }));
 //		morph.addMorphTarget(new MorphTarget(new double[] { 0, 1, 0 }, new double[] { 1, 1, 1 }));
@@ -33,7 +40,7 @@ public class InterpolationTest {
 			for (int x = 0; x < width; x++) {
 				position[0] = x * xStep;
 				position[1] = y * yStep;
-				morph.interpolate(position, result);
+				morph.interpolate(position, true, result);
 				int r = Math.max(0, Math.min(255, (int) (result[0] * 255)));
 				int g = Math.max(0, Math.min(255, (int) (result[1] * 255)));
 				int b = Math.max(0, Math.min(255, (int) (result[2] * 255)));
@@ -43,8 +50,8 @@ public class InterpolationTest {
 		}
 		for (int x = 0; x < width; x++) {
 			position[0] = x * xStep;
-			position[1] = 0.5;
-			morph.interpolate(position, result);
+			position[1] = 0.0;
+			morph.interpolate(position, true, result);
 			img.setRGB(x, height - 1 - ((int) (result[0] * (height - 1))), 0xff0000);
 		}
 		
