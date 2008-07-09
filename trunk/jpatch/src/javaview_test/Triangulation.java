@@ -38,7 +38,7 @@ import java.util.Set;
  */
 public class Triangulation<V> implements Iterable<Simplex<V>> {
     
-    private HashMap<Simplex<V>,HashSet<Simplex<V>>> neighbors;  // Maps Simplex to neighbors
+    HashMap<Simplex<V>,HashSet<Simplex<V>>> neighbors;  // Maps Simplex to neighbors
     
     /**
      * Constructor.
