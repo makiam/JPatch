@@ -295,17 +295,15 @@ public class Utils3d {
 	}
 	
 	private static final int dim(double[] m) {
-		switch (m.length) {
-		case 1*1: return 1;
-		case 2*2: return 2;
-		case 3*3: return 3;
-		case 4*4: return 4;
-		case 5*5: return 5;
-		case 6*6: return 6;
-		case 7*7: return 7;
-		case 8*8: return 8;
-		default: throw new MismatchedSizeException();
+		int i = 0;
+		int d = m.length;
+		while(i * i < d) {
+			i++;
 		}
+		if (i * i == d) {
+			return i;
+		}
+		throw new MismatchedSizeException();
 	}
 	
 	/**
@@ -355,7 +353,7 @@ public class Utils3d {
 	//	      _Numerical_Recipes_in_C_, Cambridge University Press, 
 	//	      1988, pp 44-45.
 	//
-	static void luBacksubstitution(int dim, double[] matrix1,
+	public static void luBacksubstitution(int dim, double[] matrix1,
 			int[] row_perm,
 			double[] matrix2) {
 
@@ -406,6 +404,66 @@ public class Utils3d {
 		}
 	}
     
+	public static void luBacksubstitution2(int dim, double[] matrix1,
+			int[] row_perm,
+			double[] x) {
+
+		int i, ii, ip, j, k;
+		int rp;
+		int cv, rv, ri;
+		double tt;
+
+		// rp = row_perm;
+		rp = 0;
+
+		// For each column vector of matrix2 ... 
+//		for (k = 0; k < dim; k++) {
+			// cv = &(matrix2[0][k]);
+			cv = 0;
+			ii = -1;
+
+			// Forward substitution 
+			for (i = 0; i < dim; i++) {
+				double sum;
+
+				ip = row_perm[rp+i];
+				sum = x[ip];
+				x[ip] = x[i];
+				if (ii >= 0) {
+					// rv = &(matrix1[i][0]);
+					rv = i*dim;
+					for (j = ii; j <= i-1; j++) {
+						sum -= matrix1[rv+j] * x[j];
+					}
+				}
+				else if (sum != 0.0) {
+					ii = i;
+				}
+				x[i] = sum;
+			}
+
+			// Backsubstitution 
+			for (i = 0; i < dim; i++) {
+				ri = (dim-1-i);
+				rv = dim*(ri);
+				tt = 0.0;
+				for(j=1;j<=i;j++) {
+					tt += matrix1[rv+dim-j] * x[dim-j]; 	  
+				}
+				x[ri]= (x[ri] - tt) / matrix1[rv+ri];
+			}
+//		}
+	}
+	
+	public static void solve(double[] matrix, double[] b) {
+		int dim = dim(matrix);
+		int[] row_perm = new int[dim];
+		int[] even_row_xchg = new int[1];
+		if (!luDecomposition(dim, matrix, row_perm, even_row_xchg)) {
+			throw new SingularMatrixException(); 
+		}
+		luBacksubstitution2(dim, matrix, row_perm, b);
+	}
 	/**
 	 * Given a nxn array "matrix0", this function replaces it with the 
 	 * LU decomposition of a row-wise permutation of itself.  The input 
@@ -423,7 +481,7 @@ public class Utils3d {
 	//	      _Numerical_Recipes_in_C_, Cambridge University Press, 
 	//	      1988, pp 40-45.
 	//
-	private static final boolean luDecomposition(int dim, double[] matrix0,	int[] row_perm, int[] even_row_xchg) {
+	public static final boolean luDecomposition(int dim, double[] matrix0,	int[] row_perm, int[] even_row_xchg) {
 
 		double row_scale[] = new double[dim];
 
