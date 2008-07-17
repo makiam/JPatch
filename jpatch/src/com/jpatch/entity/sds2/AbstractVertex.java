@@ -17,6 +17,7 @@ public abstract class AbstractVertex {
 	public final int num = count++;
 	
 	final Tuple3Attr positionAttr = new Tuple3Attr();
+	final DoubleAttr cornerSharpnessAttr = new DoubleAttr();
 	
 	final Point3d worldPosition = new Point3d();		// position in world space
 	final Point3d worldLimit = new Point3d();			// limit in world space
@@ -56,6 +57,15 @@ public abstract class AbstractVertex {
 			}
 		});
 		positionAttr.suppressChangeNotification(false);
+		
+		cornerSharpnessAttr.suppressChangeNotification(true);
+		cornerSharpnessAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
+				invalidate();
+			}
+		});
+		cornerSharpnessAttr.suppressChangeNotification(false);
 	}
 	
 	public final Tuple3Attr getPositionAttribute() {
@@ -84,17 +94,21 @@ public abstract class AbstractVertex {
 	
 	final void setDisplacement(double x, double y, double z) {
 		if (x == 0 && y == 0 && z == 0) {
-			worldPositionValid = true;
+			worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
 			invalidate();
 			isDisplaced = false;
 		} else {
 			validateInvDisplacementMatrix();
 			displacementVector.set(x, y, z);
 			invDisplacementMatrix.transform(displacementVector);
-			worldPositionValid = true;
+			worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
 			invalidate();
 			isDisplaced = true;
 		}
+	}
+	
+	double getCornerSharpness() {
+		return cornerSharpnessAttr.getDouble();
 	}
 	
 	public final void getLimit(Tuple3f limit) {
@@ -125,58 +139,70 @@ public abstract class AbstractVertex {
 		assert vertexPoint == null;
 		vertexPoint = new DerivedVertex() {
 			
+			@Override double getCornerSharpness() {
+				AbstractVertex parentVertex = AbstractVertex.this;
+				return Math.max(0, parentVertex.getCornerSharpness() - 1 + cornerSharpnessAttr.getDouble());
+			}
+			
 			@Override
 			void validateWorldPosition() {
 				if (!worldPositionValid) {
 					AbstractVertex parentVertex = AbstractVertex.this;
 					parentVertex.validateDisplacedPosition();
-					switch (parentVertex.boundaryType) {
-					case REGULAR:
-						final int valence = vertexEdges.length;
-						final double rimWeight = VERTEX_LIMIT_RIM_WEIGHTS[valence];
-						final double centerWeight = VERTEX_LIMIT_CENTER_WEIGHTS[valence];
-						double x = 0, y = 0, z = 0;
-						for (HalfEdge edge : parentVertex.vertexEdges) {
-							Face face = edge.getFace();
-							face.validateDisplacedMidpointPosition();
-							Point3d fp = face.displacedMidpointPosition;
-							x += fp.x;
-							y += fp.y;
-							z += fp.z;
-							AbstractVertex pair = edge.getPairVertex();
-							pair.validateDisplacedPosition();
-							Point3d ep = pair.displacedPosition;
-							x += ep.x;
-							y += ep.y;
-							z += ep.z;
-						}
-						worldPosition.set(
-								x * rimWeight + parentVertex.displacedPosition.x * centerWeight,
-								y * rimWeight + parentVertex.displacedPosition.y * centerWeight,
-								z * rimWeight + parentVertex.displacedPosition.z * centerWeight
-						);
-						break;
-					case BOUNDARY:
-						AbstractVertex v0 = parentVertex;
-						AbstractVertex v1 = parentVertex.vertexEdges[0].getPairVertex();
-						AbstractVertex v2 = parentVertex.vertexEdges[parentVertex.vertexEdges.length - 1].getPairVertex();
-						Point3d p0 = v0.displacedPosition;
-						v1.validateDisplacedPosition();
-						Point3d p1 = v1.displacedPosition;
-						v2.validateDisplacedPosition();
-						Point3d p2 = v2.displacedPosition;
-						
-						worldPosition.set(
-								p0.x * CREASE0 + (p1.x + p2.x) * CREASE1,
-								p0.y * CREASE0 + (p1.y + p2.y) * CREASE1,
-								p0.z * CREASE0 + (p1.z + p2.z) * CREASE1
-						);
-						break;
-					case IRREGULAR:
+					double cornerSharpness = getCornerSharpness();
+					if (cornerSharpness > 1 || parentVertex.boundaryType == BoundaryType.IRREGULAR) {
 						worldPosition.set(parentVertex.displacedPosition);
-						break;
-					default:
-						assert false;	// should never get here
+						System.out.println("corner");
+					} else {
+						switch (parentVertex.boundaryType) {
+						case REGULAR:
+							final int valence = vertexEdges.length;
+							final double rimWeight = VERTEX_LIMIT_RIM_WEIGHTS[valence];
+							final double centerWeight = VERTEX_LIMIT_CENTER_WEIGHTS[valence];
+							double x = 0, y = 0, z = 0;
+							for (HalfEdge edge : parentVertex.vertexEdges) {
+								Face face = edge.getFace();
+								face.validateDisplacedMidpointPosition();
+								Point3d fp = face.displacedMidpointPosition;
+								x += fp.x;
+								y += fp.y;
+								z += fp.z;
+								AbstractVertex pair = edge.getPairVertex();
+								pair.validateDisplacedPosition();
+								Point3d ep = pair.displacedPosition;
+								x += ep.x;
+								y += ep.y;
+								z += ep.z;
+							}
+							worldPosition.set(
+									x * rimWeight + parentVertex.displacedPosition.x * centerWeight,
+									y * rimWeight + parentVertex.displacedPosition.y * centerWeight,
+									z * rimWeight + parentVertex.displacedPosition.z * centerWeight
+							);
+							break;
+						case BOUNDARY:
+							AbstractVertex v0 = parentVertex;
+							AbstractVertex v1 = parentVertex.vertexEdges[0].getPairVertex();
+							AbstractVertex v2 = parentVertex.vertexEdges[parentVertex.vertexEdges.length - 1].getPairVertex();
+							Point3d p0 = v0.displacedPosition;
+							v1.validateDisplacedPosition();
+							Point3d p1 = v1.displacedPosition;
+							v2.validateDisplacedPosition();
+							Point3d p2 = v2.displacedPosition;
+							
+							worldPosition.set(
+									p0.x * CREASE0 + (p1.x + p2.x) * CREASE1,
+									p0.y * CREASE0 + (p1.y + p2.y) * CREASE1,
+									p0.z * CREASE0 + (p1.z + p2.z) * CREASE1
+							);
+							break;
+						default:
+							assert false;	// should never get here
+						}
+					}
+					if (cornerSharpness > 0) {
+						worldPosition.interpolate(parentVertex.displacedPosition, cornerSharpness);
+						System.out.println("corner");
 					}
 					worldPositionValid = true;
 				}
@@ -349,6 +375,12 @@ public abstract class AbstractVertex {
 				assert false;	// should never get here
 			}
 			
+			double cornerSharpness = Math.max(0, getCornerSharpness() - 1);
+			if (false && cornerSharpness > 0) {
+				double alpha = 1 - Math.pow(getLimitFactor(), cornerSharpness);
+				worldLimit.interpolate(worldPosition, alpha);
+			}
+			
 			/* normal = u cross v */
 			worldNormal.set(uy*vz - uz*vy, uz*vx - ux*vz, ux*vy - uy*vx);
 			worldNormal.normalize();
@@ -480,6 +512,16 @@ public abstract class AbstractVertex {
 				break;
 			default:
 				assert false;	// should never get here
+			}
+			
+			double cornerSharpness = Math.max(0, getCornerSharpness() - 1);
+			if (false && cornerSharpness > 0) {
+				double factor = 1 - VERTEX_LIMIT_CENTER_WEIGHTS[valence];
+//				double factor = 1 - getLimitFactor();
+				double alpha = 1 - Math.pow(factor, cornerSharpness);
+				alpha = 0.1;
+				System.out.println("alpha = " + alpha);
+				displacedLimit.interpolate(displacedPosition, alpha);
 			}
 			
 			displacedNormal.set(uy*vz - uz*vy, uz*vx - ux*vz, ux*vy - uy*vx);

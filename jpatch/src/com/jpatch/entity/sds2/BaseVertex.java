@@ -2,6 +2,7 @@ package com.jpatch.entity.sds2;
 
 import javax.vecmath.*;
 
+import com.jpatch.afw.attributes.*;
 import com.jpatch.entity.*;
 
 public class BaseVertex extends AbstractVertex implements XFormListener {
@@ -26,6 +27,8 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 		invTransformMatrix.invert(transformMatrix);
 		invTransformMatrixValid = true;
 		positionAttr.setTuple(x, y, z);
+		
+		cornerSharpnessAttr.setDouble(0);
 	}
 	
 	@Override

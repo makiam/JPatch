@@ -21,15 +21,63 @@
  */
 package com.jpatch.entity;
 
+import java.util.*;
+
+import com.jpatch.afw.attributes.*;
+
 public class MorphTarget {
-	final double[] position;
-	final double[] value;
-	public MorphTarget(double[] position, double[] value) {
-		this.position = position.clone();
-		this.value = value.clone();
+	private final List<DoubleAttr> attributeList = new ArrayList<DoubleAttr>();
+	private final List<DoubleAttr> attributeListView = Collections.unmodifiableList(attributeList);
+	
+	public List<DoubleAttr> getAttributes() {
+		return attributeListView;
 	}
 	
-	public void setValue(double ... value) {
-		System.arraycopy(value, 0, this.value, 0, value.length);
+	public void addAttribute(DoubleAttr attr) {
+		attributeList.add(attr);
+	}
+	
+	public void addAttribute(Tuple2Attr attr) {
+		attributeList.add(attr.getXAttr());
+		attributeList.add(attr.getYAttr());
+	}
+	
+	public void addAttribute(Tuple3Attr attr) {
+		attributeList.add(attr.getXAttr());
+		attributeList.add(attr.getYAttr());
+		attributeList.add(attr.getZAttr());
+	}
+	
+	public void removeAttribute(DoubleAttr attr) {
+		attributeList.remove(attr);
+	}
+	
+	public void removeAttribute(Tuple2Attr attr) {
+		attributeList.remove(attr.getXAttr());
+		attributeList.remove(attr.getYAttr());
+	}
+	
+	public void removeAttribute(Tuple3Attr attr) {
+		attributeList.remove(attr.getXAttr());
+		attributeList.remove(attr.getYAttr());
+		attributeList.remove(attr.getZAttr());
+	}
+	
+	public int getSize() {
+		return attributeList.size();
+	}
+	
+	public void readValues(double[] values, int start) {
+		int index = start;
+		for (DoubleAttr attr : attributeList) {
+			values[index++] = attr.getDouble();
+		}
+	}
+	
+	public void writeValues(double[] values, int start) {
+		int index = start;
+		for (DoubleAttr attr : attributeList) {
+			attr.setDouble(values[index++]);
+		}
 	}
 }
