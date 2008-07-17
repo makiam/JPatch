@@ -455,14 +455,79 @@ public class Utils3d {
 //		}
 	}
 	
-	public static void solve(double[] matrix, double[] b) {
+	
+	/**
+     * Solves a set of linear equations.  The input parameters "matrix1",
+     * and "row_perm" come from luDecompostion and do not change
+     * here.  The parameter "matrix2" is a set of column vectors assembled
+     * into a nxn matrix of floating-point values.  The procedure takes each
+     * column of "matrix2" in turn and treats it as the right-hand side of the
+     * matrix equation Ax = LUx = b.  The solution vector replaces the
+     * original column of the matrix.
+     *
+     * If "matrix2" is the identity matrix, the procedure replaces its contents
+     * with the inverse of the matrix from which "matrix1" was originally
+     * derived.
+     */
+    //
+    // Reference: Press, Flannery, Teukolsky, Vetterling, 
+    //	      _Numerical_Recipes_in_C_, Cambridge University Press, 
+    //	      1988, pp 44-45.
+    //
+	static void luBacksubstitution3(int dim, double[] matrix, int[] row_perm, double[] b, double[] x) {
+		final int size = x.length / dim;
+		System.arraycopy(b, 0, x, 0, b.length);
+		
+		// rp = row_perm;
+		int rp = 0;
+
+		// For each column vector of matrix x ... 
+		for (int k = 0; k < size; k++) {
+			// cv = &(matrix2[0][k]);
+			int cv = k;
+			int ii = -1;
+
+			// Forward substitution 
+			for (int i = 0; i < dim; i++) {
+				double sum;
+
+				int ip = row_perm[rp+i];
+				sum = x[cv+size*ip];
+				x[cv+size*ip] = x[cv+size*i];
+				if (ii >= 0) {
+					// rv = &(matrix1[i][0]);
+					int rv = i*dim;
+					for (int j = ii; j <= i-1; j++) {
+						sum -= matrix[rv+j] * x[cv+size*j];
+					}
+				}
+				else if (sum != 0.0) {
+					ii = i;
+				}
+				x[cv+size*i] = sum;
+			}
+
+			// Backsubstitution 
+			for (int i = 0; i < dim; i++) {
+				int ri = (dim-1-i);
+				int rv = dim*(ri);
+				double tt = 0.0;
+				for(int j=1;j<=i;j++) {
+					tt += matrix[rv+dim-j] * x[cv+size*(dim-j)]; 	  
+				}
+				x[cv+size*ri]= (x[cv+size*ri] - tt) / matrix[rv+ri];
+			}
+		}
+	}
+	
+	public static void solve(double[] matrix, double[] b, double[] x) {
 		int dim = dim(matrix);
 		int[] row_perm = new int[dim];
 		int[] even_row_xchg = new int[1];
 		if (!luDecomposition(dim, matrix, row_perm, even_row_xchg)) {
 			throw new SingularMatrixException(); 
 		}
-		luBacksubstitution2(dim, matrix, row_perm, b);
+		luBacksubstitution3(dim, matrix, row_perm, b, x);
 	}
 	/**
 	 * Given a nxn array "matrix0", this function replaces it with the 
