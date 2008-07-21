@@ -6,7 +6,7 @@ public class SdsMath {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		int n = 4;
+		int n = 5;
 		int depth = 100;
 		LinearCombination<String>[][] edge = new LinearCombination[depth][n];
 		LinearCombination<String>[][] face = new LinearCombination[depth][n];
@@ -32,17 +32,23 @@ public class SdsMath {
 				edge[level][i].addScaled(edge[level - 1][i], 0.25);
 				edge[level][i].addScaled(vertex[level - 1], 0.25);
 				edge[level][i].addScaled(face[level - 1][i], 0.25);
-				edge[level][i].addScaled(face[level - 1][(i + n - 1) % n], 0.25);
-			}
-			for (int i = 0; i < n; i++) {
-				face[level][i] = new LinearCombination<String>();
-				face[level][i].addScaled(face[level - 1][i], 0.25);
-				face[level][i].addScaled(vertex[level - 1], 0.25);
-				face[level][i].addScaled(edge[level][i], 0.25);
-				face[level][i].addScaled(edge[level][(i + 1) % n], 0.25);
+				edge[level][i].addScaled(face[level - 1][(i + 1) % n], 0.25);
 				
 				vertex[level].addScaled(edge[level - 1][i], wpf);
-				vertex[level].addScaled(face[level][i], wpf);
+				vertex[level].addScaled(face[level - 1][i], wpf);
+				
+				
+				
+			}
+			for (int i = 0; i < n; i++) {
+				
+				face[level][i] = new LinearCombination<String>();
+				face[level][i].addScaled(face[level - 1][i], 0.25);
+				face[level][i].addScaled(vertex[level], 0.25);
+				face[level][i].addScaled(edge[level][i], 0.25);
+				face[level][i].addScaled(edge[level][(i + n - 1) % n], 0.25);
+				
+				
 				
 			}
 			System.out.println("v(" + level + ") = " + vertex[level]);
