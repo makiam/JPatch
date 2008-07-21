@@ -23,9 +23,9 @@ public class Sds {
 	
 	
 	private int currentMaxLevel = 1;
-	private IntAttr maxLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(currentMaxLevel, 0, 4);
-	private IntAttr renderLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(currentMaxLevel, 0, 4);
-	private IntAttr editLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(0, 0, 4);
+	private IntAttr maxLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(currentMaxLevel, 0, SdsConstants.MAX_LEVEL);
+	private IntAttr renderLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(currentMaxLevel, 0, SdsConstants.MAX_LEVEL);
+	private IntAttr editLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(0, 0, SdsConstants.MAX_LEVEL);
 	
 	private final static Comparator<Face> faceMaterialComparator = new Comparator<Face>() {
 		public int compare(Face f1, Face f2) {

@@ -608,6 +608,16 @@ public class Viewport implements NamedObject {
 			gl.glVertex3f(p.x, p.y, p.z);
 		}
 		gl.glEnd();
+		
+		
+		/* draw vertex limit */
+		gl.glPointSize(5.0f);
+		gl.glBegin(GL_POINTS);
+		for (AbstractVertex vertex : sds.getVertices(level, false)) {
+			vertex.getLimit(p);
+			gl.glVertex3f(p.x, p.y, p.z);
+		}
+		gl.glEnd();
 	}
 	
 	private void validateDepthBuffer() {

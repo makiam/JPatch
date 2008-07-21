@@ -159,6 +159,8 @@ public abstract class AbstractVertex {
 							final int valence = vertexEdges.length;
 							final double rimWeight = VERTEX_LIMIT_RIM_WEIGHTS[valence];
 							final double centerWeight = VERTEX_LIMIT_CENTER_WEIGHTS[valence];
+//							final double rimWeight = 1.0/ valence;
+//							final double centerWeight = (2 * valence - 3) / valence;
 							double x = 0, y = 0, z = 0;
 							for (HalfEdge edge : parentVertex.vertexEdges) {
 								Face face = edge.getFace();
@@ -261,6 +263,7 @@ public abstract class AbstractVertex {
 	}
 	
 	final void validateWorldLimit() {
+		if (true) throw new UnsupportedOperationException();
 		if (!worldLimitValid) {
 			validateWorldPosition();
 			final int valence = vertexEdges.length;
@@ -268,9 +271,9 @@ public abstract class AbstractVertex {
 			double vx = 0, vy = 0, vz = 0;	// v tangent
 			switch (boundaryType) {
 			case REGULAR:
-				final double limitPairWeight = 1.0 / (valence * (valence + 5));
+				final double limitPairWeight = 1.0 / (valence * (valence + 5.0));
 				final double limitFaceWeight = 3.0 * limitPairWeight;
-				final double limitCenterWeight = (valence + 1.0) / (valence + 5);
+				final double limitCenterWeight = (valence + 1.0) / (valence + 5.0);
 				
 				final double[] uTangentPairWeight = U_TANGENT_PAIR_WEIGHTS[valence];
 				final double[] uTangentFaceWeight = U_TANGENT_FACE_WEIGHTS[valence];
@@ -405,9 +408,16 @@ public abstract class AbstractVertex {
 			
 			switch (boundaryType) {
 			case REGULAR:
-				final double limitPairWeight = 1.0 / (valence * (valence + 5));
-				final double limitFaceWeight = 3.0 * limitPairWeight;
-				final double limitCenterWeight = (valence + 1.0) / (valence + 5);
+//				final double limitPairWeight = 1.0 / (valence * (valence + 5.0));
+//				final double limitFaceWeight = 3.0 * limitPairWeight;
+//				final double limitCenterWeight = (valence + 1.0) / (valence + 5.0);
+				
+				final double div = 1.0 / (5 + valence);
+				final double limitCenterWeight = valence * div + 1 * div;
+				final double limitPairWeight = 1 * div / valence;
+				final double limitFaceWeight = 3 * div / valence;
+				
+				
 				final double[] uTangentPairWeight = U_TANGENT_PAIR_WEIGHTS[valence];
 				final double[] uTangentFaceWeight = U_TANGENT_FACE_WEIGHTS[valence];
 				final double[] vTangentPairWeight = V_TANGENT_PAIR_WEIGHTS[valence];
@@ -430,6 +440,13 @@ public abstract class AbstractVertex {
 					px += edgePairPoint.x;
 					py += edgePairPoint.y;
 					pz += edgePairPoint.z;
+					
+//					AbstractVertex ep = edge.getEdgePoint();
+//					ep.validateDisplacedPosition();
+//					Point3d edgePairPoint = ep.displacedPosition;
+//					px += edgePairPoint.x;
+//					py += edgePairPoint.y;
+//					pz += edgePairPoint.z;
 					
 					ux += faceMidpoint.x * uTangentFaceWeight[i] + edgePairPoint.x * uTangentPairWeight[i];
 					uy += faceMidpoint.y * uTangentFaceWeight[i] + edgePairPoint.y * uTangentPairWeight[i];
