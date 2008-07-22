@@ -11,7 +11,7 @@ import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
 public class Selection {
-	public static enum Type { VERTICES, EDGES, FACES, NODE }
+	public static enum Type { LIMIT, VERTICES, EDGES, FACES, NODE }
 	
 	private Type type = Type.NODE;
 	private final GenericAttr<XFormNode> nodeAttr = new GenericAttr<XFormNode>();
@@ -153,6 +153,14 @@ public class Selection {
 		return unmodifyableFaces;
 	}
 	
+	public AbstractVertex getLimit() {
+		if (type != Type.LIMIT) {
+			throw new IllegalStateException();
+		}
+		validateVertices();
+		return vertices.iterator().next();
+	}
+	
 	public Transformable getTransformable() {
 		if (type == Type.NODE) {
 			return nodeAttr.getValue();
@@ -193,6 +201,14 @@ public class Selection {
 		addChangeSelectionEdit(editList);
 		setType(Type.VERTICES, null);
 		this.vertices.removeAll(vertices);
+		invalidate();
+	}
+	
+	public void setLimit(AbstractVertex vertex, List<JPatchUndoableEdit> editList) {
+		addChangeSelectionEdit(editList);
+		setType(Type.LIMIT, null);
+		clear(null);
+		vertices.add(vertex);
 		invalidate();
 	}
 	
@@ -284,6 +300,7 @@ public class Selection {
 			case NODE:
 				invalidate();
 				break;
+			case LIMIT:		//fallthrouh intentional
 			case VERTICES:
 				invalidate();
 				validateVertices();
@@ -310,7 +327,7 @@ public class Selection {
 	}
 	
 	private void validateVertices() {
-		if (verticesValid || type == Type.VERTICES) {
+		if (verticesValid || type == Type.VERTICES || type == Type.LIMIT) {
 			return;
 		}
 		vertices.clear();
@@ -444,6 +461,8 @@ public class Selection {
 		case FACES:
 			return getFaces().size();
 		case VERTICES:
+			return getVertices().size();
+		case LIMIT:
 			return getVertices().size();
 		case NODE:
 			return 1;

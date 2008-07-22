@@ -393,8 +393,17 @@ public class Viewport implements NamedObject {
 	
 	public static void drawSelection(GL gl, Selection selection, Color4f highlighColor) {
 		final Point3f p = new Point3f();
-		
 		switch (selection.getType()) {
+		case LIMIT:
+			gl.glPointSize(6);
+			gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, highlighColor.w);
+			gl.glBegin(GL_POINTS);
+			for (AbstractVertex vertex : selection.getVertices()) {
+				vertex.getLimit(p);
+				gl.glVertex3f(p.x, p.y, p.z);
+			}
+			gl.glEnd();
+			break;
 		case VERTICES:
 			gl.glPointSize(6);
 			gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, highlighColor.w);

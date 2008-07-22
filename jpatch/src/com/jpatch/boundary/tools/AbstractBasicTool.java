@@ -1,71 +1,53 @@
 package com.jpatch.boundary.tools;
 
-import static com.jpatch.afw.vecmath.TransformUtil.*;
 import static javax.media.opengl.GL.*;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.util.List;
 
 import javax.media.opengl.*;
 import javax.swing.*;
-import javax.swing.undo.*;
 import javax.vecmath.*;
 
-import trashcan.*;
-
 import com.jpatch.afw.attributes.*;
-import com.jpatch.afw.control.*;
 
-import com.jpatch.afw.vecmath.*;
 import com.jpatch.boundary.*;
 import com.jpatch.boundary.tools.MouseSelector.*;
-import com.jpatch.boundary.tools.NormalTool.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
-public class TweakTool implements JPatchTool, ViewportOverlay {
-	private enum ToolMode { FREE, NORMAL }
+public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 	
-	private static final int MAX_DISTANCE_SQ = 32 * 32;
 	
-//	private TransformUtil transformUtil = new TransformUtil();
 	private MouseMotionListener[] mouseMotionListeners;
 	private MouseListener[] mouseListeners;
 	
 	private static int STANDARD_SELECTION_TYPE = Sds.Type.EDGE | Sds.Type.FACE | Sds.Type.VERTEX | Sds.Type.STRAY_VERTEX | Sds.Type.STRAY_EDGE;
 	private static int LIMIT_SELECTION_TYPE = Sds.Type.LIMIT;
 	
-	private HitObject hitObject;
-	private Selection hitSelection = new Selection();
-	private Point hitPoint;
+	protected HitObject hitObject;
+	protected Selection hitSelection = new Selection();
+	protected Point hitPoint;
 	
-	private Point3d localStart = new Point3d();
+	protected Point3d localStart = new Point3d();
 	
 	private final Polygon lassoPolygon = new Polygon();
 	private final Set<AbstractVertex> vertices = new HashSet<AbstractVertex>();
-	private static enum Mode { IDLE, HOVER, MOVE, SELECT, LASSO }
+	protected static enum Mode { IDLE, HOVER, SELECT, LASSO, ACTION }
 	private static enum Select { ADD, REMOVE }
 	
-	private Mode mode = Mode.HOVER;
+	protected Mode mode = Mode.HOVER;
 	private Select select = Select.ADD;
 	
 	private Selection.Type selectionType;
 	
 	private final BooleanAttr selectLassoAttr = new BooleanAttr();
-	private final StateMachine<ToolMode> toolModeAttr = new StateMachine<ToolMode>(ToolMode.class, ToolMode.FREE);
 	
-	private Normal normal;
-
 	private boolean strong;
 	
 	public BooleanAttr getSelectLassoAttribute() {
 		return selectLassoAttr;
-	}
-	
-	public StateMachine<ToolMode> getToolModeAttribute() {
-		return toolModeAttr;
 	}
 	
 	public void registerListeners(Viewport[] viewports) {
@@ -74,9 +56,9 @@ public class TweakTool implements JPatchTool, ViewportOverlay {
 		mouseListeners = new MouseListener[viewports.length];
 		mouseMotionListeners = new MouseMotionListener[viewports.length];
 		for (int i = 0; i < viewports.length; i++) {
-			mouseListeners[i] = new TweakMouseListener(viewports[i]);
+			mouseListeners[i] = new SelectMouseListener(viewports[i]);
 			viewports[i].getComponent().addMouseListener(mouseListeners[i]);
-			mouseMotionListeners[i] = new TweakMouseMotionListener(viewports[i]);
+			mouseMotionListeners[i] = new SelectMouseMotionListener(viewports[i]);
 			viewports[i].getComponent().addMouseMotionListener(mouseMotionListeners[i]);
 			viewports[i].addOverlay(this);
 		}
@@ -93,54 +75,6 @@ public class TweakTool implements JPatchTool, ViewportOverlay {
 	private void highlightHitObject(Viewport viewport, boolean redraw, boolean validateTexture, boolean strong) {
 		this.strong = strong;
 		viewport.redrawOverlays();
-//		GLAutoDrawable glDrawable = (GLAutoDrawable) viewport.getComponent();
-//		glDrawable.getContext().makeCurrent();
-//		GL gl = glDrawable.getGL();
-//		if (redraw) {
-//			gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//			viewport.draw();
-//			if (validateTexture) {
-//				viewport.validateScreenShotTexture(false);
-//				viewport.validateDepthBuffer(false);
-//			}
-//		} else {
-//			viewport.validateScreenShotTexture();
-//			viewport.drawScreenShot(0, 0, glDrawable.getWidth(), glDrawable.getHeight(), 1.0f);
-//		}
-//		if (mode == Mode.LASSO) {
-//			gl.glColor3f(1, 1, 0);
-//			gl.glLineWidth(1);
-//			gl.glBegin(GL_LINE_LOOP);
-//			for (int i = 0; i < lassoPolygon.npoints; i++) {
-//				gl.glVertex2i(lassoPolygon.xpoints[i], lassoPolygon.ypoints[i]);
-//			}
-//			gl.glEnd();
-//		}
-//		
-//		viewport.spatialMode();
-//		
-//		viewport.spatialMode();
-//		viewport.getViewDef().configureTransformUtil(transformUtil);
-//		
-//		hitSelection.getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
-//		viewport.setModelViewMatrix(transformUtil);
-//		gl.glDisable(GL_DEPTH_TEST);
-//		
-//		
-////		Selection selection = Main.getInstance().getSelection();
-////		if (hitSelection.getNode() != null) {
-////			hitSelection.getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
-//			viewport.setModelViewMatrix(transformUtil);
-//			gl.glDisable(GL_DEPTH_TEST);
-////			viewport.drawSelection(selection, new Color3f(1, 1, 0));
-////			if (mode == Mode.HOVER && hitObject != null) {
-////				setSelection(hitSelection, hitObject);
-//				viewport.drawSelection(hitSelection, new Color4f(1, 1, 0, strong ? 1.0f : 0.5f));
-////			}
-//			gl.glEnable(GL_DEPTH_TEST);
-////		}
-//		glDrawable.swapBuffers();
-//		glDrawable.getContext().release();
 	}
 	
 	private void setLassoMode(final int mx, final int my) {
@@ -158,23 +92,19 @@ public class TweakTool implements JPatchTool, ViewportOverlay {
 		}
 	}
 	
-	private void setMoveMode(Viewport viewport, HitObject hitObject) {
-		System.out.println(hitObject.screenPosition);
+	protected void setActionMode(Viewport viewport, HitObject hitObject) {
 		snapPointer(viewport, hitObject.screenPosition);
-		mode = Mode.MOVE;
+		mode = Mode.ACTION;
 		hitSelection.getTransformable().begin();
 		localStart.set(hitObject.screenPosition);
 		viewport.projectFromScreen(localStart, localStart);
 		highlightHitObject(viewport, false, false, true);
-		if (toolModeAttr.getValue() == ToolMode.NORMAL) {
-			normal = new Normal(viewport, hitSelection, hitObject);
-		}
 	}
 	
-	private class TweakMouseListener extends MouseAdapter {
+	private class SelectMouseListener extends MouseAdapter {
 		final Viewport viewport;
 		
-		private TweakMouseListener(Viewport viewport) {
+		private SelectMouseListener(Viewport viewport) {
 			this.viewport = viewport;
 		}
 		
@@ -190,10 +120,9 @@ public class TweakTool implements JPatchTool, ViewportOverlay {
 				
 				switch (mode) {
 				case IDLE:
-					System.out.println("selectionType = " + hitSelection.getType());
 					HitObject hitObject = MouseSelector.isHit(viewport, e.getX(), e.getY(), 32 * 32, hitSelection);
 					if (hitObject != null) {
-						setMoveMode(viewport, hitObject);
+						setActionMode(viewport, hitObject);
 					}
 					
 //					int selectionFilter = getSelectionFilter(hitSelection.getType());
@@ -227,15 +156,16 @@ public class TweakTool implements JPatchTool, ViewportOverlay {
 //					highlightHitObject(viewport, false, false);
 					break;
 				case HOVER:
-					hitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 32 * 32, sdsModel, level, STANDARD_SELECTION_TYPE, null);
+					int selectionType = getSelectionType(viewport);
+					hitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 32 * 32, sdsModel, level, selectionType, null);
 					if (hitObject != null) {
 						if (MouseSelector.isSelectionTrigger(e)) {
 							mode = Mode.SELECT;
 						} else {
 							setSelection(hitSelection, hitObject);
-							setMoveMode(viewport, hitObject);
+							setActionMode(viewport, hitObject);
 						}
-					} else {
+					} else if (selectionType == STANDARD_SELECTION_TYPE) {
 						setLassoMode(e.getX(), e.getY());
 					}
 					break;
@@ -342,7 +272,6 @@ public class TweakTool implements JPatchTool, ViewportOverlay {
 			if (hitObject != null) {
 				hitObject.getVertices(vertices);
 			}
-			System.out.println("selectionType=" + selectionType + " hitobject=" + hitObject + " vertices=" + vertices);
 			break;
 		}
 		Selection selection = Main.getInstance().getSelection();
@@ -370,9 +299,10 @@ public class TweakTool implements JPatchTool, ViewportOverlay {
 		if (hitObject == null) {
 			selection.clear(null);
 		} else {
-			System.out.println("hitobject = " + hitObject + " node = " + hitObject.node);
 			selection.setNode(hitObject.node, null);
-			if (hitObject instanceof MouseSelector.HitVertex) {
+			if (hitObject instanceof MouseSelector.HitLimit) {
+				selection.setLimit(((HitVertex) hitObject).vertex, null);
+			} else if (hitObject instanceof MouseSelector.HitVertex) {
 				selection.setVertex(((HitVertex) hitObject).vertex, null);
 			} else if (hitObject instanceof MouseSelector.HitEdge) {
 				selection.setEdge(((HitEdge) hitObject).halfEdge, null);
@@ -382,37 +312,17 @@ public class TweakTool implements JPatchTool, ViewportOverlay {
 		}
 	}
 	
-	private class TweakMouseMotionListener implements MouseMotionListener {
+	private class SelectMouseMotionListener implements MouseMotionListener {
 		final Viewport viewport;
 		Point3d mouse = new Point3d();
 		Vector3d vector = new Vector3d();
 		
-		private TweakMouseMotionListener(Viewport viewport) {
+		private SelectMouseMotionListener(Viewport viewport) {
 			this.viewport = viewport;
 		}
 		
 		public void mouseDragged(MouseEvent e) {
 			switch (mode) {
-			case MOVE:
-				if (hitPoint != null && hitPoint.x == e.getX() && hitPoint.y == e.getY()) {
-					hitPoint = null;
-					return;
-				}
-				if (toolModeAttr.getValue() == ToolMode.NORMAL) {
-					normal.mouseDragged(viewport, e.getX(), e.getY());
-				} else {
-					mouse.set(e.getX(), e.getY(), localStart.z);
-					viewport.projectFromScreen(mouse, mouse);
-					vector.sub(mouse, localStart);
-					hitSelection.getTransformable().translate(vector);
-	//				Main.getInstance().syncRepaintViewport(viewport);
-				}
-				Main.getInstance().repaintViewport(viewport);
-//				highlightHitObject(viewport, true, false, true);
-				break;
-//			case SELECT_LASSO:		// fallthrough intended
-//			case SELECT_RECTANGLE:	// fallthrough intended
-//			case SELECT_PROXIMITY:
 			case LASSO:
 				final SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
 				final int level = sdsModel.getEditLevelAttribute().getInt();
@@ -426,33 +336,14 @@ public class TweakTool implements JPatchTool, ViewportOverlay {
 		}
 
 		public void mouseMoved(MouseEvent e) {
-//			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
-//			if (sdsModel != null) {
-//				int level = sdsModel.getEditLevelAttribute().getInt();
-//				int selectionType = viewport.getViewDef().getShowControlMeshAttribute().getBoolean() ? STANDARD_SELECTION_TYPE : LIMIT_SELECTION_TYPE;
-//				HitObject newHitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 32 * 32, sdsModel, level, selectionType, null);
-//				if (newHitObject != null && !newHitObject.equals(hitObject)) {
-//					hitObject = newHitObject;
-//					Collection<AbstractVertex> hitVertices = new HashSet<AbstractVertex>();
-//					hitObject.getVertices(hitVertices);
-//					if (hitVertices.size() > 0 && tweakSelection.getVertices().containsAll(hitVertices)) {
-//						hitSelection.clear(null);
-//						new Selection.State(tweakSelection).copyTo(hitSelection);
-//					} else {
-//						setSelection(hitSelection, hitObject);
-//					}
-//					highlightHitObject(viewport, false);
-//				} else {
-//					hitObject = newHitObject;
-//				}
-//			}
 			final Selection selection = Main.getInstance().getSelection();
 			final SdsModel sdsModel = selection.getSdsModel();
 			final int level = sdsModel.getEditLevelAttribute().getInt();
 			
 			switch (mode) {
 			case HOVER:
-				HitObject newHitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 32 * 32, sdsModel, level, STANDARD_SELECTION_TYPE, null);
+				int selectionType = getSelectionType(viewport);
+				HitObject newHitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 32 * 32, sdsModel, level, selectionType, null);
 				if (newHitObject == null ? hitObject != null : !newHitObject.equals(hitObject)) {
 					hitObject = newHitObject;
 					setSelection(hitSelection, hitObject);
@@ -467,158 +358,24 @@ public class TweakTool implements JPatchTool, ViewportOverlay {
 		}	
 	};
 	
-	private void snapPointer(Viewport viewport, Point3d screenPosition) {
+	private int getSelectionType(Viewport viewport) {
+		final ViewDef viewDef = viewport.getViewDef();
+		final boolean showMesh = viewDef.getShowControlMeshAttribute().getBoolean();
+		final boolean showLimit = viewDef.getShowLimitSurfaceAttribute().getBoolean();
+		final boolean showProjection = viewDef.getShowProjectedMeshAttribute().getBoolean();
+		if (showProjection && showLimit && !showMesh) {
+			return LIMIT_SELECTION_TYPE;
+		} else if (showMesh) {
+			return STANDARD_SELECTION_TYPE;
+		}
+		return 0;
+	}
+	
+	protected void snapPointer(Viewport viewport, Point3d screenPosition) {
 		Point point = new Point((int) Math.round(screenPosition.x), (int) Math.round(screenPosition.y));
 		hitPoint = new Point(point);
 		SwingUtilities.convertPointToScreen(point, viewport.getComponent());
 		Main.getInstance().getRobot().mouseMove(point.x, point.y);
-	}
-	
-	private class Normal {
-		private final Point3d p0 = new Point3d();
-		private final Point3d p1 = new Point3d();
-		private final Point3d p0s = new Point3d();
-		private final Point3d p1s = new Point3d();
-		private final Point3d p = new Point3d();
-		private final double delta;
-		private final int axis;
-		private final Map<AbstractVertex, VertexNormal> vertexPos = new HashMap<AbstractVertex, VertexNormal>();
-		
-		Normal(Viewport viewport, Selection selection, HitObject hitObject) {
-			if (hitObject instanceof HitVertex) {
-				AbstractVertex vertex = ((HitVertex) hitObject).vertex;
-				vertex.getPosition(p0);
-				vertex.getNormal(p1);
-				p1.add(p0);
-				
-				for (AbstractVertex v : selection.getVertices()) {
-					vertexPos.put(v, new VertexNormal(v));
-				}
-			} else if (hitObject instanceof HitEdge) {
-				HalfEdge edge = ((HitEdge) hitObject).halfEdge;
-				edge.getVertex().getPosition(p0);
-				edge.getPairVertex().getPosition(p1);
-				p0.interpolate(p0, p1, ((HitEdge) hitObject).position);
-				
-				Vector3d n0 = new Vector3d();
-				Vector3d n1 = new Vector3d();
-				edge.getVertex().getNormal(n0);
-				edge.getPairVertex().getNormal(n1);
-				n0.interpolate(n0, n1, ((HitEdge) hitObject).position);
-				n0.normalize();
-				p1.add(p0, n0);
-				
-				AbstractVertex[] edgeVertices = new AbstractVertex[2];
-				for (HalfEdge e : selection.getEdges()) {
-					e.getVertices(edgeVertices);
-					e.getVertex().getNormal(n0);
-					e.getPairVertex().getNormal(n1);
-					for (AbstractVertex v : edgeVertices) {
-						VertexNormal vn = vertexPos.get(v);
-						if (vn == null) {
-							vn = new VertexNormal(v, new Vector3d());
-							vertexPos.put(v, vn);
-						}
-						vn.pNormal.add(n0);
-						vn.pNormal.add(n1);
-					}
-				}
-				
-				for (AbstractVertex v : vertexPos.keySet()) {
-					vertexPos.get(v).pNormal.normalize();
-				}
-				
-			} else if (hitObject instanceof HitFace) {
-				((HitFace) hitObject).face.getMidpointPosition(p0);
-				((HitFace) hitObject).face.getMidpointNormal(p1);
-				p1.add(p0);
-				
-				Vector3d n0 = new Vector3d();
-				for (Face f : selection.getFaces()) {
-					f.getMidpointNormal(n0);
-					for (HalfEdge e : f.getEdges()) {
-						AbstractVertex v = e.getVertex();
-						VertexNormal vn = vertexPos.get(v);
-						if (vn == null) {
-							vn = new VertexNormal(v, new Vector3d());
-							vertexPos.put(v, vn);
-						}
-						vn.pNormal.add(n0);
-					}
-				}
-				
-				for (AbstractVertex v : vertexPos.keySet()) {
-					vertexPos.get(v).pNormal.normalize();
-				}
-			}
-			
-			viewport.projectToScreen(p0, p0s);
-			viewport.projectToScreen(p1, p1s);
-			
-			double dx = Math.abs(p0.x - p1.x);
-			double dy = Math.abs(p0.y - p1.y);
-			double dz = Math.abs(p0.z - p1.z);
-			
-			if (dx > dy) {
-				if (dx > dz) {
-					axis = 0; // x
-					delta = p1.x - p0.x;
-				} else {
-					axis = 2; // z
-					delta = p1.z - p0.z;
-				}
-			} else {
-				if (dy > dz) {
-					axis = 1; // y
-					delta = p1.y - p0.y;
-				} else {
-					axis = 2; // z
-					delta = p1.z - p0.z;
-				}
-			}
-			
-			snapPointer(viewport, p0s);
-		}
-		
-		public void mouseDragged(Viewport viewport, int mx, int my) {
-			p.interpolate(p0s, p1s, Utils3d.closestPointOnLine(p0s.x, p0s.y, p1s.x, p1s.y, mx, my));
-			viewport.projectFromScreen(p, p);
-			double factor = 0;
-			switch (axis) {
-			case 0:	// x
-				factor = (p.x - p0.x) / delta;
-				break;
-			case 1:	// y
-				factor = (p.y - p0.y) / delta;
-				break;
-			case 2:	// z
-				factor = (p.z - p0.z) / delta;
-				break;
-			}
-			for (AbstractVertex v : vertexPos.keySet()) {
-				vertexPos.get(v).setFactor(v, factor);
-			}
-		}
-	}
-	
-	private static class VertexNormal {
-		Point3d pStart = new Point3d();
-		Vector3d pNormal = new Vector3d();
-		
-		VertexNormal(AbstractVertex v) {
-			v.getPosition(pStart);
-			v.getVertexPoint().getNormal(pNormal);
-			pNormal.normalize();
-		}
-		
-		VertexNormal(AbstractVertex v, Vector3d normal) {
-			v.getPosition(pStart);
-			pNormal.set(normal);
-		}
-		
-		void setFactor(AbstractVertex v, double f) {
-			v.setPosition(pStart.x + pNormal.x * f, pStart.y + pNormal.y * f, pStart.z + pNormal.z * f);
-		}
 	}
 
 	public void drawOverlay(Viewport viewport) {

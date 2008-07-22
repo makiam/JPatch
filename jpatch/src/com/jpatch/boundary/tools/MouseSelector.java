@@ -247,7 +247,7 @@ public class MouseSelector {
 						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
 						if(viewport.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
 							double distSq = distSq(mouseX, mouseY, p0);
-							HitObject hitVertex = new HitVertex(sdsModel, distSq, p0, vertex);
+							HitObject hitVertex = new HitLimit(sdsModel, distSq, p0, vertex);
 							if (hitVertex.isCloserThan(hitObject)) {
 								hitObject = hitVertex;
 							}
@@ -413,6 +413,12 @@ public class MouseSelector {
 		@Override
 		public com.jpatch.boundary.Selection.Type getType() {
 			return Selection.Type.VERTICES;
+		}
+	}
+	
+	public static class HitLimit extends HitVertex {
+		private HitLimit(XFormNode node, double distanceSq, Point3d screenPosition, AbstractVertex vertex) {
+			super(node, distanceSq, screenPosition,vertex);
 		}
 	}
 	
