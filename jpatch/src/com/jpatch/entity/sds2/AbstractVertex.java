@@ -111,6 +111,10 @@ public abstract class AbstractVertex {
 		return cornerSharpnessAttr.getDouble();
 	}
 	
+	public final DoubleAttr getCornerSharpnessAttribute() {
+		return cornerSharpnessAttr;
+	}
+	
 	public final void getLimit(Tuple3f limit) {
 		validateDisplacedLimit();
 		limit.set(displacedLimit);

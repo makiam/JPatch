@@ -30,6 +30,7 @@ public class Actions {
 			null, // new ExtrudeTool(),
 			new AddEdgeTool(),
 			null, // new FlipTool()
+			new CornerTool()
 	};
 	
 	public final JPatchUndoManager undoManager = new JPatchUndoManager();
@@ -52,6 +53,7 @@ public class Actions {
 	public final SwitchStateAction insetTool = new SwitchStateAction(toolSM, tools[8], undoManager, "INSET_TOOL");
 	public final SwitchStateAction addEdgeTool = new SwitchStateAction(toolSM, tools[9], undoManager, "ADD_EDGE_TOOL");
 	public final SwitchStateAction flipTool = new SwitchStateAction(toolSM, tools[10], undoManager, "FLIP_TOOL");
+	public final SwitchStateAction cornerTool = new SwitchStateAction(toolSM, tools[11], undoManager, "FLIP_TOOL");
 	
 	public final SwitchStateAction vertexMode = new SwitchStateAction(sdsModeSM, SdsMode.VERTEX_MODE, undoManager, "VERTEX_MODE");
 	public final SwitchStateAction edgeMode = new SwitchStateAction(sdsModeSM, SdsMode.EDGE_MODE, undoManager, "EDGE_MODE");
