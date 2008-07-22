@@ -222,7 +222,7 @@ public abstract class AbstractVertex {
 	public final double getLimitFactor() {
 		switch (boundaryType) {
 		case REGULAR:
-			return vertexEdges.length / (double) (vertexEdges.length + 5);
+			return (vertexEdges.length) / (double) (vertexEdges.length + 5);
 		case BOUNDARY:
 			return CREASE_LIMIT0;
 		case IRREGULAR:

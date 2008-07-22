@@ -2,5 +2,5 @@
 <attributeEditor name="Tweak Tool" class="com.jpatch.boundary.tools.TweakTool">
   <boolean display="switch" false="Rect" true="Lasso" />
   <field name="Selection mode" attribute="SelectLasso" />
-  <field name="Tool mode" attribute="ToolMode" />
+  <field name="Dragging mode" attribute="ToolMode" />
 </attributeEditor>
