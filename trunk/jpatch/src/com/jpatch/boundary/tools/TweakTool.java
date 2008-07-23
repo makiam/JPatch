@@ -64,8 +64,8 @@ public class TweakTool extends AbstractBasicTool {
 	
 	
 	@Override
-	protected void setActionMode(Viewport viewport, HitObject hitObject) {
-		super.setActionMode(viewport, hitObject);
+	protected void setActionMode(Viewport viewport, HitObject hitObject, MouseEvent e) {
+		super.setActionMode(viewport, hitObject, e);
 		if (toolModeAttr.getValue() == ToolMode.NORMAL) {
 			normal = new Normal(viewport, hitSelection, hitObject);
 		}
