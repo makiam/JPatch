@@ -110,7 +110,7 @@ public abstract class AbstractVertex {
 		}
 	}
 	
-	double getCornerSharpness() {
+	public double getCornerSharpness() {
 		return sharpnessValue;
 	}
 	
@@ -147,7 +147,7 @@ public abstract class AbstractVertex {
 		vertexPoint = new DerivedVertex() {
 			
 			@Override
-			double getCornerSharpness() {
+			public double getCornerSharpness() {
 				AbstractVertex parentVertex = AbstractVertex.this;
 				return Math.max(0, parentVertex.getCornerSharpness() - 1) + sharpnessValue;
 			}
@@ -534,12 +534,9 @@ public abstract class AbstractVertex {
 			
 			double cornerSharpness = getCornerSharpness();
 			if (cornerSharpness > 0) {
-				System.out.println("cornerSharpness = " + cornerSharpness);
 				if (cornerSharpness < 10) {
-					System.out.println("limitfactor="+ getLimitFactor());
-					double factor = getLimitFactor();
-					double alpha = Math.pow(1 - Math.pow(factor, cornerSharpness), cornerSharpness);
-//					alpha = 0.1;
+					/* FIXME: This is an ad-hoc approximation with no background and needs to be replaced by a correct solution */
+					double alpha = Math.min(Math.pow(0.12 * cornerSharpness, 0.5), 1);
 					displacedLimit.interpolate(displacedPosition, alpha);
 				} else {
 					displacedLimit.set(displacedPosition);
