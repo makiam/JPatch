@@ -5,9 +5,8 @@ import java.util.*;
 
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
-import com.jpatch.entity.*;
+import com.jpatch.afw.ui.*;
 
-import javax.crypto.spec.*;
 import javax.vecmath.*;
 
 public abstract class AbstractVertex {
@@ -17,7 +16,7 @@ public abstract class AbstractVertex {
 	public final int num = count++;
 	
 	final Tuple3Attr positionAttr = new Tuple3Attr();
-	final DoubleAttr cornerSharpnessAttr = new DoubleAttr();
+	final DoubleAttr cornerSharpnessAttr = AttributeManager.getInstance().createBoundedDoubleAttr(0, 0, 100);
 	
 	final Point3d worldPosition = new Point3d();		// position in world space
 	final Point3d worldLimit = new Point3d();			// limit in world space
@@ -48,6 +47,7 @@ public abstract class AbstractVertex {
 	boolean displacedLimitValid;
 	
 	private boolean invDisplacementMatrixValid;
+	double sharpnessValue;
 	
 	AbstractVertex() {
 		positionAttr.suppressChangeNotification(true);
@@ -61,8 +61,11 @@ public abstract class AbstractVertex {
 		cornerSharpnessAttr.suppressChangeNotification(true);
 		cornerSharpnessAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
+//				sharpnessValue = Math.tan(cornerSharpnessAttr.getDouble() * 0.005 * Math.PI);
+				sharpnessValue = Math.exp(cornerSharpnessAttr.getDouble() * 0.024) - 1;
 				worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
 				invalidate();
+				System.out.println("sharpness=" + cornerSharpnessAttr.getDouble() + " " + sharpnessValue);
 			}
 		});
 		cornerSharpnessAttr.suppressChangeNotification(false);
@@ -108,7 +111,7 @@ public abstract class AbstractVertex {
 	}
 	
 	double getCornerSharpness() {
-		return cornerSharpnessAttr.getDouble();
+		return sharpnessValue;
 	}
 	
 	public final DoubleAttr getCornerSharpnessAttribute() {
@@ -143,9 +146,10 @@ public abstract class AbstractVertex {
 		assert vertexPoint == null;
 		vertexPoint = new DerivedVertex() {
 			
-			@Override double getCornerSharpness() {
+			@Override
+			double getCornerSharpness() {
 				AbstractVertex parentVertex = AbstractVertex.this;
-				return Math.max(0, parentVertex.getCornerSharpness() - 1 + cornerSharpnessAttr.getDouble());
+				return Math.max(0, parentVertex.getCornerSharpness() - 1) + sharpnessValue;
 			}
 			
 			@Override
@@ -153,10 +157,9 @@ public abstract class AbstractVertex {
 				if (!worldPositionValid) {
 					AbstractVertex parentVertex = AbstractVertex.this;
 					parentVertex.validateDisplacedPosition();
-					double cornerSharpness = getCornerSharpness();
+					double cornerSharpness = parentVertex.getCornerSharpness();
 					if (cornerSharpness > 1 || parentVertex.boundaryType == BoundaryType.IRREGULAR) {
 						worldPosition.set(parentVertex.displacedPosition);
-						System.out.println("corner");
 					} else {
 						switch (parentVertex.boundaryType) {
 						case REGULAR:
@@ -529,14 +532,18 @@ public abstract class AbstractVertex {
 				assert false;	// should never get here
 			}
 			
-			double cornerSharpness = Math.max(0, getCornerSharpness() - 1);
-			if (false && cornerSharpness > 0) {
-				double factor = 1 - VERTEX_LIMIT_CENTER_WEIGHTS[valence];
-//				double factor = 1 - getLimitFactor();
-				double alpha = 1 - Math.pow(factor, cornerSharpness);
-				alpha = 0.1;
-				System.out.println("alpha = " + alpha);
-				displacedLimit.interpolate(displacedPosition, alpha);
+			double cornerSharpness = getCornerSharpness();
+			if (cornerSharpness > 0) {
+				System.out.println("cornerSharpness = " + cornerSharpness);
+				if (cornerSharpness < 10) {
+					System.out.println("limitfactor="+ getLimitFactor());
+					double factor = getLimitFactor();
+					double alpha = Math.pow(1 - Math.pow(factor, cornerSharpness), cornerSharpness);
+//					alpha = 0.1;
+					displacedLimit.interpolate(displacedPosition, alpha);
+				} else {
+					displacedLimit.set(displacedPosition);
+				}
 			}
 			
 			displacedNormal.set(uy*vz - uz*vy, uz*vx - ux*vz, ux*vy - uy*vx);

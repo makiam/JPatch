@@ -23,8 +23,8 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 	private MouseMotionListener[] mouseMotionListeners;
 	private MouseListener[] mouseListeners;
 	
-	private static int STANDARD_SELECTION_TYPE = Sds.Type.EDGE | Sds.Type.FACE | Sds.Type.VERTEX | Sds.Type.STRAY_VERTEX | Sds.Type.STRAY_EDGE;
-	private static int LIMIT_SELECTION_TYPE = Sds.Type.LIMIT;
+	protected int STANDARD_SELECTION_TYPE = Sds.Type.EDGE | Sds.Type.FACE | Sds.Type.VERTEX | Sds.Type.STRAY_VERTEX | Sds.Type.STRAY_EDGE;
+	protected int LIMIT_SELECTION_TYPE = Sds.Type.LIMIT;
 	
 	protected HitObject hitObject;
 	protected Selection hitSelection = new Selection();
@@ -92,7 +92,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 		}
 	}
 	
-	protected void setActionMode(Viewport viewport, HitObject hitObject) {
+	protected void setActionMode(Viewport viewport, HitObject hitObject, MouseEvent event) {
 		snapPointer(viewport, hitObject.screenPosition);
 		mode = Mode.ACTION;
 		hitSelection.getTransformable().begin();
@@ -122,7 +122,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 				case IDLE:
 					HitObject hitObject = MouseSelector.isHit(viewport, e.getX(), e.getY(), 32 * 32, hitSelection);
 					if (hitObject != null) {
-						setActionMode(viewport, hitObject);
+						setActionMode(viewport, hitObject, e);
 					}
 					
 //					int selectionFilter = getSelectionFilter(hitSelection.getType());
@@ -163,7 +163,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 							mode = Mode.SELECT;
 						} else {
 							setSelection(hitSelection, hitObject);
-							setActionMode(viewport, hitObject);
+							setActionMode(viewport, hitObject, e);
 						}
 					} else if (selectionType == STANDARD_SELECTION_TYPE) {
 						setLassoMode(e.getX(), e.getY());
