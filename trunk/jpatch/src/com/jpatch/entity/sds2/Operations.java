@@ -95,11 +95,11 @@ public class Operations {
 		}
 	}
 	
-	public static void extrude(SdsModel sdsModel, Selection selection, List<JPatchUndoableEdit> editList) {
+	public static void extrude(Selection selection, List<JPatchUndoableEdit> editList) {
 //		System.out.println("extrude " + faces.size() + " faces:");
 //		System.out.println(faces);
 		
-		Sds sds = sdsModel.getSds();
+		Sds sds = selection.getSdsModel().getSds();
 		
 		Map<BaseVertex, BaseVertex> boundaryVertices = new HashMap<BaseVertex, BaseVertex>();
 		Set<BaseVertex> innerVertices = new HashSet<BaseVertex>();
@@ -167,7 +167,7 @@ public class Operations {
 					edgeVertex.getPosition(position);
 //					edgeVertex.getVertexPoint().getNormal(normal);
 //					position.add(normal);
-					BaseVertex extrudedVertex = new BaseVertex(sdsModel);
+					BaseVertex extrudedVertex = new BaseVertex(selection.getSdsModel());
 					extrudedVertex.setPosition(position);
 					boundaryVertices.put((BaseVertex) edgeVertex, extrudedVertex);
 				}

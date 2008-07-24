@@ -12,6 +12,7 @@ import javax.vecmath.*;
 public class HalfEdge {
 	public static final int REGULAR = 0;
 	public static final int BOUNDARY = 1;
+	public static final int STRAY = 2;
 	
 	private final AbstractVertex vertex;
 	private final HalfEdge pair;
@@ -21,7 +22,7 @@ public class HalfEdge {
 	private HalfEdge prev;
 	private Face face;
 	int faceEdgeIndex;
-	private int boundaryType;
+	private int boundaryType = STRAY;
 	private DerivedVertex edgePoint;
 	
 	public HalfEdge(AbstractVertex v0, AbstractVertex v1) {
@@ -76,6 +77,8 @@ public class HalfEdge {
 		this.face = face;
 		if (face != null && pair.face != null) {
 			boundaryType = pair.boundaryType = REGULAR;
+		} else if (face == null && pair.face == null) {
+			boundaryType = pair.boundaryType = STRAY;
 		} else {
 			boundaryType = pair.boundaryType = BOUNDARY;
 		}
@@ -89,6 +92,14 @@ public class HalfEdge {
 	
 	public int getFaceEdgeIndex() {
 		return faceEdgeIndex;
+	}
+	
+	public boolean isBoundary() {
+		return boundaryType == BOUNDARY;
+	}
+	
+	public boolean isStray() {
+		return boundaryType == STRAY;
 	}
 	
 //	private void computeFaceEdgeIndex() {

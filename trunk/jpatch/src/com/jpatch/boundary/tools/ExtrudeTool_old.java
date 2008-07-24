@@ -22,7 +22,7 @@ import com.jpatch.boundary.tools.MouseSelector.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
-public class ExtrudeTool implements VisibleTool {
+public class ExtrudeTool_old implements VisibleTool {
 	
 	private TransformUtil transformUtil = new TransformUtil();
 	private MouseMotionListener[] mouseMotionListeners;

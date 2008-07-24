@@ -15,6 +15,7 @@ public class Sds {
 		public static final int FACE = 1 << 3;
 		public static final int STRAY_VERTEX = 1 << 4;
 		public static final int STRAY_EDGE = 1 << 5;
+		public static final int BOUNDARY_EDGE = 1 << 6;
 		
 		private Type() {
 			assert false;	// not instanciable
