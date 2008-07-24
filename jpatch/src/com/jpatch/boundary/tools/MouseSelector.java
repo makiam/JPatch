@@ -257,31 +257,34 @@ public class MouseSelector {
 			}
 		}
 		
-		if ((type & (Type.EDGE | Type.STRAY_EDGE)) != 0) {
+		if ((type & (Type.EDGE | Type.STRAY_EDGE | Type.BOUNDARY_EDGE)) != 0) {
 			Iterable<HalfEdge> edges;
-			if ((type & Type.EDGE) == 0) {
+			if ((type & (Type.EDGE | Type.BOUNDARY_EDGE)) == 0) {
 				edges = sds.getStrayEdges();
 			} else {
 				edges = sds.getEdges(level, (type & Type.STRAY_EDGE) != 0);
 			}
+			boolean boundaryOnly = ((type & Type.EDGE) == 0);
 			for (HalfEdge edge : edges) {
 				if (edge.isPrimary() && objectFilter.accept(edge)) {
-					edge.getVertex().getPosition(p0);
-					transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
-					edge.getPairVertex().getPosition(p1);
-					transformUtil.projectToScreen(TransformUtil.LOCAL, p1, p1);
+					if (!boundaryOnly || edge.isBoundary()) {
+						edge.getVertex().getPosition(p0);
+						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+						edge.getPairVertex().getPosition(p1);
+						transformUtil.projectToScreen(TransformUtil.LOCAL, p1, p1);
+					
+						double t = Utils3d.closestPointOnLine(p0.x, p0.y, p1.x, p1.y, mouseX, mouseY);
+						t = Math.max(0, Math.min(t, 1));
+						pec.interpolate(p0, p1, t);
+						pem.interpolate(p0, p1, 0.5);
 				
-					double t = Utils3d.closestPointOnLine(p0.x, p0.y, p1.x, p1.y, mouseX, mouseY);
-					t = Math.max(0, Math.min(t, 1));
-					pec.interpolate(p0, p1, t);
-					pem.interpolate(p0, p1, 0.5);
-			
-					if(viewport.getDepthAt((int) pec.x, (int) pec.y) < pec.z) {
-						double cDistSq = distSq(mouseX, mouseY, pec);
-						double mDistSq = distSq(mouseX, mouseY, pem);
-						HitObject hitEdge = new HitEdge(sdsModel, mDistSq, cDistSq, t, pec, edge.getPrimary());
-						if (hitEdge.isCloserThan(hitObject)) {
-							hitObject = hitEdge;
+						if(viewport.getDepthAt((int) pec.x, (int) pec.y) < pec.z) {
+							double cDistSq = distSq(mouseX, mouseY, pec);
+							double mDistSq = distSq(mouseX, mouseY, pem);
+							HitObject hitEdge = new HitEdge(sdsModel, mDistSq, cDistSq, t, pec, edge.getPrimary());
+							if (hitEdge.isCloserThan(hitObject)) {
+								hitObject = hitEdge;
+							}
 						}
 					}
 				}

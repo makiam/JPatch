@@ -27,7 +27,7 @@ public class Actions {
 			new TranslateTool(),
 		    new LatheTool(),
 			new TweakTool(),
-			null, // new ExtrudeTool(),
+			new ExtrudeTool(),
 			new AddEdgeTool(),
 			null, // new FlipTool()
 			new CornerTool()
@@ -138,7 +138,7 @@ public class Actions {
 ////			}
 //			Collection<Face> facesToExtrude = Main.getInstance().getSelection().getFaces();
 			List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
-			Operations.extrude(sdsModel, Main.getInstance().getSelection(), editList);
+			Operations.extrude(Main.getInstance().getSelection(), editList);
 			undoManager.addEdit("Extrude", editList);
 			toolSM.setValue(tools[5]);
 			Main.getInstance().repaintViewports();

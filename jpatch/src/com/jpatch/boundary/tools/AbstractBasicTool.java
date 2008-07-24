@@ -249,7 +249,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 		}		
 	}
 	
-	private void updateSelection(Viewport viewport, int mx, int my, SdsModel sdsModel, int level) {
+	private void updateSelection(Viewport viewport, int mx, int my, SdsModel sdsModel, int level, int selectionFilter) {
 		switch(mode) {
 		case LASSO:
 			if (selectLassoAttr.getBoolean()) {
@@ -274,11 +274,44 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 			}
 			break;
 		}
-		Selection selection = Main.getInstance().getSelection();
+		
+		/* if we don't want faces, select just the edges */
+		if (selectionType == Selection.Type.FACES && ((selectionFilter & Sds.Type.FACE) == 0)) {
+			selectionType = Selection.Type.EDGES;
+		}
+		/* if we don't want edges, select just the vertices */
+		if (selectionType == Selection.Type.EDGES && ((selectionFilter & (Sds.Type.EDGE | Sds.Type.STRAY_EDGE | Sds.Type.BOUNDARY_EDGE)) == 0)) {
+			selectionType = Selection.Type.VERTICES;
+		}
+		
+		/* configure hotSelection */
 		hitSelection.clear(null);
 		hitSelection.setNode(sdsModel, null);
 		hitSelection.addVertices(vertices, null);
 		hitSelection.setType(selectionType, null);
+		
+		/* filter selection */
+		switch (selectionType) {
+		case EDGES:
+			
+			final boolean acceptRegular = ((selectionFilter & Sds.Type.EDGE) != 0);
+			final boolean acceptBoundary = ((selectionFilter & Sds.Type.BOUNDARY_EDGE) != 0);
+			final boolean acceptStray = ((selectionFilter & Sds.Type.STRAY_EDGE) != 0);
+			Set<HalfEdge> edgesToRemove = new HashSet<HalfEdge>();
+			for (HalfEdge edge : hitSelection.getEdges()) {
+				if (edge.isStray() && !acceptStray) {
+					edgesToRemove.add(edge);
+				}
+				if (!acceptRegular && (!edge.isBoundary() || !acceptBoundary)) {
+					edgesToRemove.add(edge);
+				}
+			}
+			hitSelection.removeEdges(edgesToRemove, null);
+			
+			break;
+		case VERTICES:
+			break;
+		}
 		highlightHitObject(viewport, false, false, false);
 	}
 	
@@ -330,7 +363,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 				int mx = e.getX();
 				int my = e.getY();
 				
-				updateSelection(viewport, mx, my, sdsModel, level);
+				updateSelection(viewport, mx, my, sdsModel, level, STANDARD_SELECTION_TYPE);
 				break;
 			}
 		}

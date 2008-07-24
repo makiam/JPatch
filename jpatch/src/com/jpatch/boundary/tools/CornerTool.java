@@ -65,7 +65,9 @@ public class CornerTool extends AbstractBasicTool {
 		GL gl = viewport.getGL();
 		viewport.resetModelviewMatrix(gl);
 		gl.glDisable(GL_DEPTH_TEST);
+		gl.glEnable(GL_LINE_SMOOTH);
 		drawCorners(gl);
+		gl.glDisable(GL_LINE_SMOOTH);
 		gl.glEnable(GL_DEPTH_TEST);
 	}
 	
@@ -78,22 +80,25 @@ public class CornerTool extends AbstractBasicTool {
 			return;
 		}
 		final int level = sdsModel.getEditLevelAttribute().getInt();
-		gl.glColor4f(1, 0, 0, 0.25f);
-		gl.glLineWidth(3.0f);
-		gl.glBegin(GL_LINES);
+		
 		for (AbstractVertex vertex : sdsModel.getSds().getVertices(level, false)) {
-			if (vertex.getCornerSharpness() > 0) {
+			final float sharpness = (float) vertex.getCornerSharpness();
+			if (sharpness > 0) {
 				vertex.getPosition(p0);
+				gl.glColor4f(1, 0, 0, 0.2f + sharpness * 0.03f);
+				gl.glLineWidth(2.0f + sharpness * 0.2f);
+				gl.glBegin(GL_LINES);
 				for (HalfEdge edge : vertex.getEdges()) {
 					AbstractVertex pair = edge.getPairVertex();
 					pair.getPosition(p1);
-					p1.interpolate(p0, 0.75f);
+					p1.interpolate(p0, 0.85f - sharpness * 0.01f);
 					gl.glVertex3f(p0.x, p0.y, p0.z);
 					gl.glVertex3f(p1.x, p1.y, p1.z);
 				}
+				gl.glEnd();
 			}
 		}
-		gl.glEnd();
+		
 	}
 	
 	private class CornerMouseMotionListener extends MouseMotionAdapter {
