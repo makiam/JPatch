@@ -95,10 +95,7 @@ public class Operations {
 		}
 	}
 	
-	public static void extrude(Selection selection, List<JPatchUndoableEdit> editList) {
-//		System.out.println("extrude " + faces.size() + " faces:");
-//		System.out.println(faces);
-		
+	public static Map<BaseVertex, BaseVertex> extrude(Selection selection, List<JPatchUndoableEdit> editList) {
 		Sds sds = selection.getSdsModel().getSds();
 		
 		Map<BaseVertex, BaseVertex> boundaryVertices = new HashMap<BaseVertex, BaseVertex>();
@@ -106,9 +103,6 @@ public class Operations {
 		Map<HalfEdge, Material> boundaryEdges = new HashMap<HalfEdge, Material>();
 		Set<Face> boundaryFaces = new HashSet<Face>();
 		Set<Face> innerFaces = new HashSet<Face>();
-		
-//		Point3d position = new Point3d();
-//		Vector3d normal = new Vector3d();
 		
 		Collection<Face> selectedFaces = selection.getFaces();
 		
@@ -221,6 +215,8 @@ public class Operations {
 		
 		/* change selection */
 		
+		/* return old-to-new vertex mapping */
+		return boundaryVertices;
 	}
 	
 	private static void addEdit(List<JPatchUndoableEdit> editList, JPatchUndoableEdit edit) {
