@@ -265,9 +265,10 @@ public class MouseSelector {
 				edges = sds.getEdges(level, (type & Type.STRAY_EDGE) != 0);
 			}
 			boolean boundaryOnly = ((type & Type.EDGE) == 0);
+			boolean stray = ((type & Type.STRAY_EDGE) == 0);
 			for (HalfEdge edge : edges) {
 				if (edge.isPrimary() && objectFilter.accept(edge)) {
-					if (!boundaryOnly || edge.isBoundary()) {
+					if (!boundaryOnly || edge.isBoundary() || (stray || edge.isStray())) {
 						edge.getVertex().getPosition(p0);
 						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
 						edge.getPairVertex().getPosition(p1);
