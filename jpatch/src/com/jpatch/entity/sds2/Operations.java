@@ -96,6 +96,67 @@ public class Operations {
 	}
 	
 	public static Map<BaseVertex, BaseVertex> extrude(Selection selection, List<JPatchUndoableEdit> editList) {
+		/* check if faces are to be extruded */
+		Collection<Face> selectedFaces = selection.getFaces();
+		if (selectedFaces.size() > 0) {
+			return extrudeFaces(selection, selectedFaces, editList);
+		} 
+		
+		/* if not, check if edges are to be extruded */
+		Collection<HalfEdge> selectedEdges = selection.getEdges();
+		if (selectedEdges.size() > 0) {
+			return extrudeEdges(selection, selectedEdges, editList);
+		}
+		
+		/* if not, do nothing and return empty map */
+		return new HashMap<BaseVertex, BaseVertex>();
+	}
+	
+	private static Map<BaseVertex, BaseVertex> extrudeEdges(Selection selection, Collection<HalfEdge> selectedEdges, List<JPatchUndoableEdit> editList) {
+		Sds sds = selection.getSdsModel().getSds();
+		Map<BaseVertex, BaseVertex> boundaryVertices = new HashMap<BaseVertex, BaseVertex>();
+		Point3d position = new Point3d();
+		BaseVertex[] edgeVertices = new BaseVertex[2];
+		BaseVertex[] faceVertices = new BaseVertex[4];
+		Material material = Main.getInstance().getDefaultMaterial();
+		for (HalfEdge edge : selectedEdges) {
+			if (edge.getFace() != null) {
+				material = edge.getFace().getMaterial();
+				edge = edge.getPair();
+			}
+			if (!edge.isBoundary() && !edge.isStray()) {
+				throw new IllegalArgumentException("can't extrude non-boundary-edge " + edge);
+			}
+			for (AbstractVertex vertex : edge.getVertices(edgeVertices)) {
+				if (!boundaryVertices.containsKey(vertex)) {
+					vertex.getPosition(position);
+					BaseVertex extrudedVertex = new BaseVertex(selection.getSdsModel());
+					extrudedVertex.setPosition(position);
+					boundaryVertices.put((BaseVertex) vertex, extrudedVertex);
+				}
+			}
+			faceVertices[0] = edgeVertices[0];
+			faceVertices[1] = edgeVertices[1];
+			faceVertices[2] = boundaryVertices.get(edgeVertices[1]);
+			faceVertices[3] = boundaryVertices.get(edgeVertices[0]);
+			System.out.println(Arrays.toString(faceVertices));
+			sds.addFace(editList, 0, material, faceVertices);
+		}
+		
+		/* change selection */
+		Selection.Type selectionType = selection.getType();
+		selection.clear(editList);
+		Collection<AbstractVertex> newSelection = new HashSet<AbstractVertex>();
+		for (BaseVertex boundaryVertex : boundaryVertices.keySet()) {
+			newSelection.add(boundaryVertices.get(boundaryVertex));
+		}
+		selection.addVertices(newSelection, editList);
+		selection.setType(selectionType, editList);
+		
+		return boundaryVertices;
+	}
+	
+	private static Map<BaseVertex, BaseVertex> extrudeFaces(Selection selection, Collection<Face> selectedFaces, List<JPatchUndoableEdit> editList) {
 		Sds sds = selection.getSdsModel().getSds();
 		
 		Map<BaseVertex, BaseVertex> boundaryVertices = new HashMap<BaseVertex, BaseVertex>();
@@ -103,8 +164,6 @@ public class Operations {
 		Map<HalfEdge, Material> boundaryEdges = new HashMap<HalfEdge, Material>();
 		Set<Face> boundaryFaces = new HashSet<Face>();
 		Set<Face> innerFaces = new HashSet<Face>();
-		
-		Collection<Face> selectedFaces = selection.getFaces();
 		
 		boolean singleFace = false;
 		if (selectedFaces.size() == 1) {
@@ -152,10 +211,10 @@ public class Operations {
 		
 		/* create new extruded vertices for all boundary edges */
 		BaseVertex[] edgeVertices = new BaseVertex[2];
+		
 		Point3d position = new Point3d();
 		for (HalfEdge boundaryEdge : boundaryEdges.keySet()) {
-			edgeVertices[0] = (BaseVertex) boundaryEdge.getVertex();
-			edgeVertices[1] = (BaseVertex) boundaryEdge.getPairVertex();
+			boundaryEdge.getVertices(edgeVertices);
 			for (AbstractVertex edgeVertex : edgeVertices) {
 				if (!boundaryVertices.containsKey(edgeVertex)) {
 					edgeVertex.getPosition(position);
@@ -204,6 +263,7 @@ public class Operations {
 			sds.addFace(editList, 0, boundaryEdges.get(boundaryEdge), newVertices);
 		}
 		
+		/* change selection */
 		Selection.Type selectionType = selection.getType();
 		selection.clear(editList);
 		Collection<AbstractVertex> newSelection = new HashSet<AbstractVertex>(innerVertices);
@@ -212,8 +272,6 @@ public class Operations {
 		}
 		selection.addVertices(newSelection, editList);
 		selection.setType(selectionType, editList);
-		
-		/* change selection */
 		
 		/* return old-to-new vertex mapping */
 		return boundaryVertices;

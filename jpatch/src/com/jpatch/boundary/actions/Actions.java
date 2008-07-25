@@ -173,6 +173,9 @@ public class Actions {
 //		latheTool.getEnabled().setBoolean(false);
 		scaleTool.getEnabled().setBoolean(false);
 //		save.getEnabled().setBoolean(false);
+		rotateTool.getEnabled().setBoolean(false);
+		moveTool.getEnabled().setBoolean(false);
+		selectTool.getEnabled().setBoolean(false);
 		
 		snapToGrid.getEnabled().setBoolean(false);
 //		edgeMode.getEnabled().setBoolean(false);
