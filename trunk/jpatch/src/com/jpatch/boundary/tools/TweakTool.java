@@ -121,7 +121,7 @@ public class TweakTool extends AbstractBasicTool {
 		private final Point3d p = new Point3d();
 		private final double delta;
 		private final int axis;
-		private final Map<AbstractVertex, VertexNormal> vertexPos = new HashMap<AbstractVertex, VertexNormal>();
+		private final Map<AbstractVertex, ConstraintVertexTranslation> vertexPos = new HashMap<AbstractVertex, ConstraintVertexTranslation>();
 		private AbstractVertex limit;
 		
 		Normal(Viewport viewport, Selection selection, HitObject hitObject) {
@@ -136,8 +136,11 @@ public class TweakTool extends AbstractBasicTool {
 				vertex.getNormal(p1);
 				p1.add(p0);
 				
+				Vector3d normal = new Vector3d();
 				for (AbstractVertex v : selection.getVertices()) {
-					vertexPos.put(v, new VertexNormal(v));
+					v.getNormal(normal);
+					normal.normalize();
+					vertexPos.put(v, new ConstraintVertexTranslation(v, normal));
 				}
 			} else if (hitObject instanceof HitEdge) {
 				HalfEdge edge = ((HitEdge) hitObject).halfEdge;
@@ -159,18 +162,18 @@ public class TweakTool extends AbstractBasicTool {
 					e.getVertex().getNormal(n0);
 					e.getPairVertex().getNormal(n1);
 					for (AbstractVertex v : edgeVertices) {
-						VertexNormal vn = vertexPos.get(v);
+						ConstraintVertexTranslation vn = vertexPos.get(v);
 						if (vn == null) {
-							vn = new VertexNormal(v, new Vector3d());
+							vn = new ConstraintVertexTranslation(v, new Vector3d());
 							vertexPos.put(v, vn);
 						}
-						vn.pNormal.add(n0);
-						vn.pNormal.add(n1);
+						vn.getVector().add(n0);
+						vn.getVector().add(n1);
 					}
 				}
 				
 				for (AbstractVertex v : vertexPos.keySet()) {
-					vertexPos.get(v).pNormal.normalize();
+					vertexPos.get(v).getVector().normalize();
 				}
 				
 			} else if (hitObject instanceof HitFace) {
@@ -183,17 +186,17 @@ public class TweakTool extends AbstractBasicTool {
 					f.getMidpointNormal(n0);
 					for (HalfEdge e : f.getEdges()) {
 						AbstractVertex v = e.getVertex();
-						VertexNormal vn = vertexPos.get(v);
+						ConstraintVertexTranslation vn = vertexPos.get(v);
 						if (vn == null) {
-							vn = new VertexNormal(v, new Vector3d());
+							vn = new ConstraintVertexTranslation(v, new Vector3d());
 							vertexPos.put(v, vn);
 						}
-						vn.pNormal.add(n0);
+						vn.getVector().add(n0);
 					}
 				}
 				
 				for (AbstractVertex v : vertexPos.keySet()) {
-					vertexPos.get(v).pNormal.normalize();
+					vertexPos.get(v).getVector().normalize();
 				}
 			}
 			
@@ -244,28 +247,8 @@ public class TweakTool extends AbstractBasicTool {
 				factor /= limit.getLimitFactor();
 			}
 			for (AbstractVertex v : vertexPos.keySet()) {
-				vertexPos.get(v).setFactor(v, factor);
+				vertexPos.get(v).moveTo(factor);
 			}
-		}
-	}
-	
-	private static class VertexNormal {
-		Point3d pStart = new Point3d();
-		Vector3d pNormal = new Vector3d();
-		
-		VertexNormal(AbstractVertex v) {
-			v.getPosition(pStart);
-			v.getVertexPoint().getNormal(pNormal);
-			pNormal.normalize();
-		}
-		
-		VertexNormal(AbstractVertex v, Vector3d normal) {
-			v.getPosition(pStart);
-			pNormal.set(normal);
-		}
-		
-		void setFactor(AbstractVertex v, double f) {
-			v.setPosition(pStart.x + pNormal.x * f, pStart.y + pNormal.y * f, pStart.z + pNormal.z * f);
 		}
 	}
 }

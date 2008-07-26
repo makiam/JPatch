@@ -244,6 +244,16 @@ public class Viewport implements NamedObject {
 		gl.glMaterialfv(side, GL_SHININESS, array, GlMaterial.SHININESS);
 	}
 	
+	static float[] zero = new float[4];
+	public static void setDiffuseMaterial(GL gl, int side, GlMaterial glMaterial) {
+		float[] array = glMaterial.getArray();
+		gl.glMaterialfv(side, GL_AMBIENT, array, GlMaterial.AMBIENT);
+		gl.glMaterialfv(side, GL_DIFFUSE, array, GlMaterial.DIFFUSE);
+		gl.glMaterialfv(side, GL_SPECULAR, zero, 0);
+		gl.glMaterialfv(side, GL_EMISSION, array, GlMaterial.EMISSION);
+		gl.glMaterialfv(side, GL_SHININESS, array, GlMaterial.SHININESS);
+	}
+	
 	public static int getIntVar(GL gl, int var) {
 		int[] tmp = new int[1];
 		gl.glGetIntegerv(var, tmp, 0);
@@ -560,7 +570,7 @@ public class Viewport implements NamedObject {
 				for (Face face : sds.getFaces(editLevel)) {
 					GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
 					if (currentMaterial != faceMaterial) {
-						setMaterial(gl, GL_FRONT, faceMaterial);
+						setDiffuseMaterial(gl, GL_FRONT, faceMaterial);
 						currentMaterial = faceMaterial;
 					}
 //					face.getMidpointNormal(p);
