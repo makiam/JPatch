@@ -253,21 +253,30 @@ public class Face {
 		if (midpointNormalValid) {
 			return;
 		}
-		double x = 0, y = 0, z = 0;
-		for (HalfEdge edge : faceEdges) {
-			Point3d u = edge.getVertex().worldPosition;
-			double ux = u.x - midpointPosition.x;
-			double uy = u.y - midpointPosition.y;
-			double uz = u.z - midpointPosition.z;
-			Point3d v = edge.getPairVertex().worldPosition;
-			double vx = v.x - midpointPosition.x;
-			double vy = v.y - midpointPosition.y;
-			double vz = v.z - midpointPosition.z;
-			x += uy * vz - uz * vy;		// cross product
-			y += uz * vx - ux * vz;
-			z += ux * vy - uy * vx;
+		validateMidpointPosition();
+		double dx, dy, dz;
+		double ux = 0, uy = 0, uz = 0;
+		double vx = 0, vy = 0, vz = 0;
+		final double[] cosinusTable = SdsConstants.COSINUS[faceEdges.length];
+		for (int i = 0; i < faceEdges.length; i++) {
+			final Point3d p = faceEdges[i].getVertex().worldPosition;
+			dx = p.x - midpointPosition.x;
+			dy = p.y - midpointPosition.y;
+			dz = p.z - midpointPosition.z;
+			final double uScale = cosinusTable[i + 1];
+			final double vScale = cosinusTable[i];
+			ux += dx * uScale;
+			uy += dy * uScale;
+			uz += dz * uScale;
+			vx += dx * vScale;
+			vy += dy * vScale;
+			vz += dz * vScale;
 		}
-		midpointNormal.set(x, y, z);
+		midpointNormal.set(
+				uy * vz - uz * vy,		// cross product
+				uz * vx - ux * vz,
+				ux * vy - uy * vx
+		);
 		midpointNormal.normalize();
 		midpointNormalValid = true;
 	}
@@ -276,21 +285,30 @@ public class Face {
 		if (displacedMidpointNormalValid) {
 			return;
 		}
-		double x = 0, y = 0, z = 0;
-		for (HalfEdge edge : faceEdges) {
-			Point3d u = edge.getVertex().displacedPosition;
-			double ux = u.x - displacedMidpointPosition.x;
-			double uy = u.y - displacedMidpointPosition.y;
-			double uz = u.z - displacedMidpointPosition.z;
-			Point3d v = edge.getPairVertex().displacedPosition;
-			double vx = v.x - displacedMidpointPosition.x;
-			double vy = v.y - displacedMidpointPosition.y;
-			double vz = v.z - displacedMidpointPosition.z;
-			x += uy * vz - uz * vy;		// cross product
-			y += uz * vx - ux * vz;
-			z += ux * vy - uy * vx;
+		validateDisplacedMidpointPosition();
+		double dx, dy, dz;
+		double ux = 0, uy = 0, uz = 0;
+		double vx = 0, vy = 0, vz = 0;
+		final double[] cosinusTable = SdsConstants.COSINUS[faceEdges.length];
+		for (int i = 0; i < faceEdges.length; i++) {
+			final Point3d p = faceEdges[i].getVertex().displacedPosition;
+			dx = p.x - displacedMidpointPosition.x;
+			dy = p.y - displacedMidpointPosition.y;
+			dz = p.z - displacedMidpointPosition.z;
+			final double uScale = cosinusTable[i + 1];
+			final double vScale = cosinusTable[i];
+			ux += dx * uScale;
+			uy += dy * uScale;
+			uz += dz * uScale;
+			vx += dx * vScale;
+			vy += dy * vScale;
+			vz += dz * vScale;
 		}
-		displacedMidpointNormal.set(x, y, z);
+		displacedMidpointNormal.set(
+				uy * vz - uz * vy,		// cross product
+				uz * vx - ux * vz,
+				ux * vy - uy * vx
+		);
 		displacedMidpointNormal.normalize();
 		displacedMidpointNormalValid = true;
 	}
