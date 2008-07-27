@@ -240,7 +240,7 @@ public class ExtrudeTool extends AbstractBasicTool {
 				System.out.println("Extruding...");
 				System.out.println("Selection was " + hitSelection);
 				Map<BaseVertex, BaseVertex> newVertices = Operations.extrude(hitSelection, null);
-				System.out.println("Selection now is " + hitSelection);
+				System.out.println("Selection is now " + hitSelection);
 				Set<AbstractVertex> oldVertices = new HashSet<AbstractVertex>(vertexPos.keySet());
 				for (AbstractVertex oldVertex : oldVertices) {
 					VertexNormal vertexNormal = vertexPos.get(oldVertex);
@@ -271,6 +271,7 @@ public class ExtrudeTool extends AbstractBasicTool {
 				break;
 			}
 			for (AbstractVertex v : vertexPos.keySet()) {
+				System.out.println(v + " => " + vertexPos.get(v));
 				vertexPos.get(v).setFactor(v, factor);
 			}
 		}
