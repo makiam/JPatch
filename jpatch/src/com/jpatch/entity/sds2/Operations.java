@@ -201,6 +201,7 @@ public class Operations {
 		for (Face innerFace : innerFaces) {
 			for (HalfEdge edge : innerFace.getEdges()) {
 				BaseVertex innerVertex = (BaseVertex) edge.getVertex();
+				assert innerVertex != null;
 				innerVertices.add(innerVertex);
 //				innerVertex.getPosition(position);
 //				innerVertex.getVertexPoint().getNormal(normal);
@@ -216,6 +217,7 @@ public class Operations {
 		for (HalfEdge boundaryEdge : boundaryEdges.keySet()) {
 			boundaryEdge.getVertices(edgeVertices);
 			for (AbstractVertex edgeVertex : edgeVertices) {
+				assert edgeVertex != null;
 				if (!boundaryVertices.containsKey(edgeVertex)) {
 					edgeVertex.getPosition(position);
 //					edgeVertex.getVertexPoint().getNormal(normal);
@@ -274,6 +276,9 @@ public class Operations {
 		selection.setType(selectionType, editList);
 		
 		/* return old-to-new vertex mapping */
+		for (BaseVertex v : innerVertices) {
+			boundaryVertices.put(v, v);
+		}
 		return boundaryVertices;
 	}
 	
