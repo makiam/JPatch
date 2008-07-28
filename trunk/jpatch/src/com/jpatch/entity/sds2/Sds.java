@@ -155,11 +155,11 @@ public class Sds {
 		AbstractVertex[] vertices = invertices.clone();
 		HalfEdge[] edges = new HalfEdge[vertices.length];
 
-//		System.out.print("add face called: ");
-//		for (AbstractVertex vertex : vertices) {
-//			System.out.print(vertex + " ");
-//		}
-//		System.out.println();
+		System.out.print("add face called: ");
+		for (AbstractVertex vertex : vertices) {
+			System.out.print(vertex + " ");
+		}
+		System.out.println();
 		
 		for (int i = 0; i < vertices.length; i++) {
 			int j = i + 1;
@@ -606,9 +606,11 @@ public class Sds {
 		void remove() {
 			strayEdges.remove(halfEdge);
 			strayEdges.remove(halfEdge.getPair());
+//			halfEdge.getVertex().removeEdge(halfEdge);
 			if (halfEdge.getVertex().getEdges().length == 1) {
 				strayVertices.remove(halfEdge.getVertex());
 			}
+//			halfEdge.getPairVertex().removeEdge(halfEdge.getPair());
 			if (halfEdge.getPairVertex().getEdges().length == 1) {
 				strayVertices.remove(halfEdge.getPairVertex());
 			}

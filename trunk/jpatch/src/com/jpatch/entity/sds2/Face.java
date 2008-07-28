@@ -32,6 +32,7 @@ public class Face {
 	private final FloatBuffer controlSurfaceBuffer;
 	
 	public Face(Material material, HalfEdge... edges) {
+		System.out.println("Face constructor called for edges " + Arrays.toString(edges));
 		int sides = edges.length;
 		assert sides >= 3 : "edges.length=" + edges.length + ", must be >= 3";
 		
