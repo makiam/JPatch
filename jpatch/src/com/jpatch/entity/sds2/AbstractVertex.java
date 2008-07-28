@@ -705,7 +705,7 @@ public abstract class AbstractVertex {
 		
 		worldPositionValid = true;
 		invalidate();
-		
+		System.out.println(this + " boundaryType = " + boundaryType);
 	}
 	
 	void flip() {
@@ -717,6 +717,6 @@ public abstract class AbstractVertex {
 	
 	@Override
 	public String toString() {
-		return "v" + num;
+		return "v" + num + "(" + Arrays.toString(vertexEdges) + ")";
 	}
 }
