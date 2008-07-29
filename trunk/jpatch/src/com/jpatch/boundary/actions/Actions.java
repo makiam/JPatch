@@ -39,6 +39,10 @@ public class Actions {
 	public final StateMachine<ViewportMode> viewportModeSM = new StateMachine<ViewportMode>(ViewportMode.class, ViewportMode.VIEWPORT_1);
 	public final Toggle snapToGridToggle = new Toggle();
 	
+	public final Toggle selectVerticesToggle = new Toggle();
+	public final Toggle selectEdgesToggle = new Toggle();
+	public final Toggle selectFacesToggle = new Toggle();
+	
 	public final SwitchStateAction moveView = new SwitchStateAction(toolSM, tools[0], undoManager, "MOVE_VIEW");
 	public final SwitchStateAction zoomView = new SwitchStateAction(toolSM, tools[1], undoManager, "ZOOM_VIEW");
 	public final SwitchStateAction rotateView = new SwitchStateAction(toolSM, tools[2], undoManager, "ROTATE_VIEW");
@@ -61,6 +65,10 @@ public class Actions {
 	public final SwitchStateAction objectMode = new SwitchStateAction(sdsModeSM, SdsMode.OBJECT_MODE, undoManager, "OBJECT_MODE");
 	
 	public final ToggleAction snapToGrid = new ToggleAction(snapToGridToggle, undoManager, "SNAP_TO_GRID");
+	
+	public final ToggleAction selectVertices = new ToggleAction(selectVerticesToggle, undoManager, "VERTEX_MODE");
+	public final ToggleAction selectEdges = new ToggleAction(selectEdgesToggle, undoManager, "EDGE_MODE");
+	public final ToggleAction selectFaces = new ToggleAction(selectFacesToggle, undoManager, "FACE_MODE");
 	
 	public final JPatchAction undo = new JPatchAction(undoManager, "UNDO") {
 		public void actionPerformed(ActionEvent e) {

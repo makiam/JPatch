@@ -197,7 +197,6 @@ public class MouseSelector {
 		
 		
 		if ((type & Type.FACE) != 0) {
-			
 			Point3d rayOrigin = new Point3d();
 			Vector3d rayDirection = new Vector3d();
 			setupCameraRay(rayOrigin, rayDirection, mouseX, mouseY);

@@ -138,7 +138,7 @@ public class Selection {
 		return null;
 	}
 	
-	public Collection<AbstractVertex> getVertices() {
+	public Collection<? extends AbstractVertex> getVertices() {
 		validateVertices();
 		return unmodifyableVertices;
 	}

@@ -506,11 +506,17 @@ public class Sds {
 		@Override
 		protected void swap() {
 			Set<HalfEdge> edgesToFlip = new HashSet<HalfEdge>();
+			Set<HalfEdge> uniqueEdges = new HashSet<HalfEdge>();
 			Set<AbstractVertex> verticesToFlip = new HashSet<AbstractVertex>();
 			for (Face face : faces) {
 				face.flip(edgesToFlip, verticesToFlip);
 			}
 			for (HalfEdge edge : edgesToFlip) {
+				if (!uniqueEdges.contains(edge.getPair())) {
+					uniqueEdges.add(edge);
+				}
+			}
+			for (HalfEdge edge : uniqueEdges) {
 				edge.flip();
 			}
 			for (AbstractVertex vertex : verticesToFlip) {
@@ -607,12 +613,17 @@ public class Sds {
 			strayEdges.remove(halfEdge);
 			strayEdges.remove(halfEdge.getPair());
 //			halfEdge.getVertex().removeEdge(halfEdge);
-			if (halfEdge.getVertex().getEdges().length == 1) {
-				strayVertices.remove(halfEdge.getVertex());
-			}
-//			halfEdge.getPairVertex().removeEdge(halfEdge.getPair());
-			if (halfEdge.getPairVertex().getEdges().length == 1) {
-				strayVertices.remove(halfEdge.getPairVertex());
+			for (AbstractVertex v : halfEdge.getVertices(new AbstractVertex[2])) {
+				boolean removeStrayVertex = true;
+				for (HalfEdge e : v.getEdges()) {
+					if (!e.isStray()) {
+						removeStrayVertex = false;
+						continue;
+					}
+				}
+				if (removeStrayVertex) {
+					strayVertices.remove(v);
+				}
 			}
 		}
 	}

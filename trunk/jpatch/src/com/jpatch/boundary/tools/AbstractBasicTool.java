@@ -27,6 +27,16 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 	protected int LIMIT_SELECTION_TYPE = Sds.Type.LIMIT;
 	
 	protected HitObject hitObject;
+	protected HalfEdge hitEdge;
+	final ObjectFilter hitEdgeFilter = new ObjectFilter() {
+		public boolean accept(Object o) {
+			if (o != hitEdge && o instanceof HalfEdge) {
+				return ((HalfEdge) o).isBoundary();
+			}
+			return false;
+		}
+	};
+	
 	protected Selection hitSelection = new Selection();
 	protected Point hitPoint;
 	
@@ -93,6 +103,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 	}
 	
 	protected void setActionMode(Viewport viewport, HitObject hitObject, MouseEvent event) {
+		viewport.freezeDepthBuffer(true);
 		snapPointer(viewport, hitObject.screenPosition);
 		mode = Mode.ACTION;
 		hitSelection.getTransformable().begin();
@@ -115,6 +126,9 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 //			}
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				final SdsModel sdsModel = hitSelection.getSdsModel();
+				if (sdsModel == null) {
+					return;
+				}
 				final int level = sdsModel.getEditLevelAttribute().getInt();
 				
 				
@@ -122,6 +136,9 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 				case IDLE:
 					HitObject hitObject = MouseSelector.isHit(viewport, e.getX(), e.getY(), 32 * 32, hitSelection);
 					if (hitObject != null) {
+						if (hitObject instanceof HitEdge) {
+							hitEdge = ((HitEdge) hitObject).halfEdge;
+						}
 						setActionMode(viewport, hitObject, e);
 					}
 					
@@ -162,6 +179,9 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 						if (MouseSelector.isSelectionTrigger(e)) {
 							mode = Mode.SELECT;
 						} else {
+							if (hitObject instanceof HitEdge) {
+								hitEdge = ((HitEdge) hitObject).halfEdge;
+							}
 							setSelection(hitSelection, hitObject);
 							setActionMode(viewport, hitObject, e);
 						}
@@ -240,6 +260,8 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 					} else {
 						mode = Mode.HOVER;
 					}
+					hitEdge = null;
+					viewport.freezeDepthBuffer(false);
 					highlightHitObject(viewport, true, true, false);
 //					break;
 //				default:

@@ -6,6 +6,7 @@ import com.jpatch.boundary.*;
 import com.jpatch.entity.*;
 
 import java.util.*;
+
 import javax.vecmath.*;
 
 public class Operations {
@@ -160,7 +161,7 @@ public class Operations {
 		Sds sds = selection.getSdsModel().getSds();
 		
 		Map<BaseVertex, BaseVertex> boundaryVertices = new HashMap<BaseVertex, BaseVertex>();
-		Set<BaseVertex> innerVertices = new HashSet<BaseVertex>();
+		Set<BaseVertex> innerVertices = new HashSet<BaseVertex>((Collection<BaseVertex>) selection.getVertices());
 		Map<HalfEdge, Material> boundaryEdges = new HashMap<HalfEdge, Material>();
 		Set<Face> boundaryFaces = new HashSet<Face>();
 		Set<Face> innerFaces = new HashSet<Face>();
@@ -175,6 +176,7 @@ public class Operations {
 				}
 			}
 		}
+		
 		/* 
 		 * all faces that have a neighbor that isn't selected (including faces at mesh boundaries)
 		 * are added to the boundaryFaces set. The edges on these boundaries are added to the
@@ -185,7 +187,8 @@ public class Operations {
 				if (!selectedFaces.contains(edge.getPairFace())) {
 					boundaryEdges.put(edge, face.getMaterial());
 					boundaryFaces.add(face);
-					System.out.println("edge=" + edge + " face=" + face);
+					innerVertices.remove(edge.getVertex());
+					innerVertices.remove(edge.getPairVertex());
 				}
 			}
 		}
@@ -195,20 +198,20 @@ public class Operations {
 		innerFaces.addAll(selectedFaces);
 		innerFaces.removeAll(boundaryFaces);
 		
-		/*
-		 * move vertices on inner faces
-		 */
-		for (Face innerFace : innerFaces) {
-			for (HalfEdge edge : innerFace.getEdges()) {
-				BaseVertex innerVertex = (BaseVertex) edge.getVertex();
-				assert innerVertex != null;
-				innerVertices.add(innerVertex);
-//				innerVertex.getPosition(position);
-//				innerVertex.getVertexPoint().getNormal(normal);
-//				position.add(normal);
-//				addEdit(editList, AttributeEdit.changeAttribute(innerVertex.positionAttr, position, true));
-			}
-		}
+//		/*
+//		 * move vertices on inner faces
+//		 */
+//		for (Face innerFace : innerFaces) {
+//			for (HalfEdge edge : innerFace.getEdges()) {
+//				BaseVertex innerVertex = (BaseVertex) edge.getVertex();
+//				assert innerVertex != null;
+//				innerVertices.add(innerVertex);
+////				innerVertex.getPosition(position);
+////				innerVertex.getVertexPoint().getNormal(normal);
+////				position.add(normal);
+////				addEdit(editList, AttributeEdit.changeAttribute(innerVertex.positionAttr, position, true));
+//			}
+//		}
 		
 		/* create new extruded vertices for all boundary edges */
 		BaseVertex[] edgeVertices = new BaseVertex[2];
@@ -287,5 +290,147 @@ public class Operations {
 			editList.add(edit);
 		}
 	}
-
+	
+	public static boolean canWeldEdges(HalfEdge source, Collection<HalfEdge> selectedEdges, HalfEdge target) {
+		if (!source.isBoundary() || !target.isBoundary()) {
+			return false;
+		}
+		source = source.faceEdge();
+		target = target.faceEdge();
+		
+		final List<HalfEdge> sourceEdges = HalfEdge.continguousEdges(source, selectedEdges);
+		final List<HalfEdge> targetEdges = HalfEdge.continguousEdges(target, null);
+		final boolean sourceLooped = HalfEdge.isLooped(sourceEdges);
+		final boolean targetLooped = HalfEdge.isLooped(targetEdges);
+		final int sourceIndex = sourceEdges.indexOf(source);
+		final int targetIndex = targetEdges.indexOf(target);
+		System.out.println("WELD EDGES");
+		System.out.println("source=" + source + " -> " + sourceEdges);
+		System.out.println("target=" + target + " -> " + targetEdges);
+		System.out.println("Source: size=" + sourceEdges.size() + " index=" + sourceIndex + " looped=" + sourceLooped);
+		System.out.println("Target: size=" + targetEdges.size() + " index=" + targetIndex + " looped=" + targetLooped);
+		return false;
+	}
+	
+	
+	
+//	private static final class DoubleLinkedListElement<T> implements Iterable<T> {
+//		private final T element;
+//		private DoubleLinkedListElement<T> prev;
+//		private DoubleLinkedListElement<T> next;
+//		
+//		private DoubleLinkedListElement(T element) {
+//			this.element = element;
+//		}
+//		
+//		void prepend(DoubleLinkedListElement<T> doubleLinkedListElement) {
+//			if (prev != null) {
+//				assert prev.next == this;
+//				prev.next = doubleLinkedListElement;
+//			}
+//			doubleLinkedListElement.prev = prev;
+//			doubleLinkedListElement.next = this;
+//			prev = doubleLinkedListElement;
+//		}
+//		
+//		void append(DoubleLinkedListElement<T> doubleLinkedListElement) {
+//			if (next != null) {
+//				assert next.prev == this;
+//				next.prev = doubleLinkedListElement;
+//			}
+//			doubleLinkedListElement.prev = this;
+//			doubleLinkedListElement.next = next;
+//			next = doubleLinkedListElement;
+//		}
+//		
+//		DoubleLinkedListElement<T> getFirstListElement() {
+//			return (prev == null) ? this : prev.getFirstListElement();
+//		}
+//		
+//		DoubleLinkedListElement<T> getLastListElement() {
+//			return (next == null) ? this : next.getFirstListElement();
+//		}
+//
+//		public Iterator<T> iterator() {
+//			if (prev != null) {
+//				throw new IllegalStateException(DoubleLinkedListElement.this + " is not the first element in the list");
+//			}
+//			return new Iterator<T>() {
+//				private DoubleLinkedListElement<T> dlle = DoubleLinkedListElement.this;
+//				public boolean hasNext() {
+//					return dlle != null;
+//				}
+//
+//				public T next() {
+//					T tmp = dlle.element;
+//					dlle = dlle.next;
+//					return tmp;
+//				}
+//
+//				public void remove() {
+//					throw new UnsupportedOperationException();
+//				}
+//			};
+//		}
+//	}
+	
+	
+//	private static final class EdgeNeighbors {
+//		final HalfEdge edge;
+//		final EdgeNeighbors neighbors[] = new EdgeNeighbors[2];
+//		
+//		EdgeNeighbors(HalfEdge edge) {
+//			this.edge = edge;
+//		}
+//		
+//		EdgeNeighbors walk(int direction) {
+//			if (neighbors[direction] == null) {
+//				return this;
+//			}
+//			EdgeNeighbors neighbor = neighbors[direction];
+//			if (neighbor.neighbors[0] == this) {
+//				direction = 1;
+//			} else if (neighbor.neighbors[1] == this) {
+//				direction = 0;
+//			} else {
+//				throw new RuntimeException();
+//			}
+//			return neighbor.walk(direction);
+//		}
+//		
+//		public Iterator<HalfEdge> iterator() {
+//			final int direction;
+//			if (neighbors[0] == null) {
+//				direction = 1;
+//			} else if (neighbors[1] == null) {
+//				direction = 0;
+//			} else {
+//				throw new IllegalStateException(EdgeNeighbors.this + " is not an endpoint");
+//			}
+//			return new Iterator<HalfEdge>() {
+//				int dir = direction;
+//				private EdgeNeighbors current = EdgeNeighbors.this;
+//				public boolean hasNext() {
+//					return current != null;
+//				}
+//
+//				public HalfEdge next() {
+//					HalfEdge tmp = current.edge;
+//					EdgeNeighbors next = current.neighbors[dir];
+//					if (next.neighbors[0] == EdgeNeighbors.this) {
+//						dir = 1;
+//					} else if (next.neighbors[1] == EdgeNeighbors.this) {
+//						dir = 0;
+//					} else {
+//						throw new RuntimeException();
+//					}
+//					return tmp;
+//				}
+//
+//				public void remove() {
+//					throw new UnsupportedOperationException();
+//				}
+//			};
+//		}
+//	}
 }
