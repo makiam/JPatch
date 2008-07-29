@@ -188,9 +188,15 @@ public class HalfEdge {
 	}
 	
 	void flip() {
-		Face tmp = face;
+		Face tmpFace = face;
 		face = pair.face;
-		pair.face = tmp;
+		pair.face = tmpFace;
+		HalfEdge tmpNext = next;
+		HalfEdge tmpPrev = prev;
+		next = (pair.prev == null) ? null : pair.prev.pair;
+		prev = (pair.next == null) ? null : pair.next.pair;
+		pair.next = (tmpPrev == null) ? null : tmpPrev.pair;
+		pair.prev = (tmpNext == null) ? null : tmpNext.pair;
 	}
 	
 	private class SaveStateEdit extends AbstractSwapEdit {
@@ -220,6 +226,61 @@ public class HalfEdge {
 			tmpInt = HalfEdge.this.boundaryType; HalfEdge.this.boundaryType = boundaryType; boundaryType = tmpInt;
 		}
 	}
+	
+	private HalfEdge getPrevBoundaryEdge() {
+		assert boundaryType == BOUNDARY;
+		for (HalfEdge e : vertex.getEdges()) {
+			if (e.boundaryType == BOUNDARY) {
+				return e.pair;
+			}
+		}
+		return null;
+	}
+	
+	private HalfEdge getNextBoundaryEdge() {
+		assert boundaryType == BOUNDARY;
+		for (HalfEdge e : pair.vertex.getEdges()) {
+			if (e.boundaryType == BOUNDARY) {
+				return e;
+			}
+		}
+		return null;
+	}
+	
+	public HalfEdge faceEdge() {
+		assert isBoundary();
+		return (getFace() != null) ? this : pair;
+	}
+	
+	public static List<HalfEdge> continguousEdges(HalfEdge edge, Collection<HalfEdge> edges) {
+		assert edge.getFace() != null && edge.getPairFace() == null;
+		final HalfEdge start = edge;
+		
+		edge = getStartBoundaryEdge(edge, start, edges);
+		
+		List<HalfEdge> edgeList = new ArrayList<HalfEdge>(edges == null ? 10 : edges.size());
+		do {
+			edgeList.add(edge);
+			edge = edge.getNextBoundaryEdge();
+		} while (edge != null && edge != start);
+		return edgeList;
+	}
+	
+	public static boolean isLooped(List<HalfEdge> continguousEdges) {
+		HalfEdge first = continguousEdges.get(0);
+		HalfEdge last = continguousEdges.get(continguousEdges.size() - 1);
+		if (first.getPrevBoundaryEdge() == last) {
+			assert last.getNextBoundaryEdge() == first;
+			return true;
+		}
+		return false;
+	}
+	
+	private static HalfEdge getStartBoundaryEdge(HalfEdge edge, HalfEdge start, Collection<HalfEdge> edges) {
+		HalfEdge prev = edge.getPrevBoundaryEdge();
+		return (prev == null || edge == start || (edges == null || !edges.contains(prev))) ? edge : getStartBoundaryEdge(prev, start, edges);
+	}
+	
 //	public int hashCode() {
 //		return vertex.hashCode() ^ pair.vertex.hashCode();
 //	}

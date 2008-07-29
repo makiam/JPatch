@@ -104,6 +104,20 @@ public class TweakTool extends AbstractBasicTool {
 					hitSelection.getTransformable().translate(vector);
 	//				Main.getInstance().syncRepaintViewport(viewport);
 				}
+				if (hitEdge != null) {
+					HitEdge otherEdge = (HitEdge) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 100, hitSelection.getSdsModel(), 0, Sds.Type.BOUNDARY_EDGE, hitEdgeFilter);
+					if (otherEdge != null) {
+						HalfEdge source = hitEdge;
+						HalfEdge target = otherEdge.halfEdge;
+						Collection<HalfEdge> selectedEdges = hitSelection.getEdges();
+						System.out.println("selectedEdges=" + selectedEdges);
+						Operations.canWeldEdges(source, selectedEdges, target);
+					}
+				}
+				
+				
+				
+				
 				Main.getInstance().repaintViewport(viewport);
 
 				break;

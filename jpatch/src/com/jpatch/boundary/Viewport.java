@@ -64,6 +64,7 @@ public class Viewport implements NamedObject {
 	
 	private FloatBuffer depthBuffer;
 	private boolean depthBufferValid;
+	private boolean depthBufferFrozen;
 	
 	private double[] modelView = new double[16];
 	private TransformUtil transformUtil = new TransformUtil();
@@ -640,7 +641,7 @@ public class Viewport implements NamedObject {
 	}
 	
 	private void validateDepthBuffer() {
-		if (depthBufferValid) {
+		if (depthBufferValid || depthBufferFrozen) {
 			return;
 		}
 		drawable.getContext().makeCurrent();
@@ -649,6 +650,10 @@ public class Viewport implements NamedObject {
 		gl.glReadPixels(0, 0, drawable.getWidth(), drawable.getHeight(), GL_DEPTH_COMPONENT, GL_FLOAT, depthBuffer);
 		depthBufferValid = true;
 		drawable.getContext().release();
+	}
+	
+	public void freezeDepthBuffer(boolean freeze) {
+		depthBufferFrozen = freeze;
 	}
 	
 	private void draw(GL gl) {

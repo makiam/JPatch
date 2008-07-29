@@ -104,7 +104,7 @@ public class Main {
 	
 	private final SelectionManager selectionManager;
 	
-	private Material defaultMaterial = new BasicMaterial(new Color3f(1, 1, 1));
+	private Material defaultMaterial = new BasicMaterial(new Color3f(0.666666667f, 0.666666667f, 0.666666667f));
 	
 	
 	private SceneGraphNode sceneGraphRoot = new SceneGraphNode() {
@@ -488,6 +488,10 @@ public class Main {
 		
 		JPatchToggleButton snapToGrid = new JPatchToggleButton(actions.snapToGrid);
 		
+		JPatchToggleButton selectVertices = new JPatchToggleButton(actions.selectVertices);
+		JPatchToggleButton selectEdges = new JPatchToggleButton(actions.selectEdges);
+		JPatchToggleButton selectFaces = new JPatchToggleButton(actions.selectFaces);
+		
 		JPatchStateButton tweakTool = new JPatchStateButton(actions.tweakTool);
 		JPatchStateButton selectTool = new JPatchStateButton(actions.selectTool);
 		JPatchStateButton moveTool = new JPatchStateButton(actions.moveTool);
@@ -508,10 +512,10 @@ public class Main {
 		buttonUtils.configureButtons(IconSet.Style.UNDECORATED, openButton, saveButton);
 		buttonUtils.configureButtons(IconSet.Style.DARK, undoButton, redoButton);
 		buttonUtils.configureButtons(IconSet.Style.GLOSSY, moveView, zoomView, rotateView);
-//		buttonUtils.configureButtons(IconSet.Style.FROSTED, vertexMode, edgeMode, faceMode, objectMode);
+		buttonUtils.configureButtons(IconSet.Style.FROSTED, selectVertices, selectEdges, selectFaces);
 		buttonUtils.configureButtons(IconSet.Style.FROSTED, snapToGrid);
-		buttonUtils.configureButtons(IconSet.Style.FROSTED, tweakTool, selectTool, moveTool, scaleTool, rotateTool, flipTool);
-		buttonUtils.configureButtons(IconSet.Style.BRUSHED, addEdgeTool, extrudeTool, insetTool, latheTool, cornerTool);
+		buttonUtils.configureButtons(IconSet.Style.FROSTED, tweakTool, selectTool, moveTool, scaleTool, rotateTool, flipTool, cornerTool);
+		buttonUtils.configureButtons(IconSet.Style.BRUSHED, addEdgeTool, extrudeTool, insetTool, latheTool);
 		
 		toolBar.add(openButton);
 		toolBar.add(saveButton);
@@ -525,11 +529,10 @@ public class Main {
 		toolBar.add(zoomView);
 		toolBar.add(rotateView);
 		toolBar.add(Box.createHorizontalStrut(16));
-//		toolBar.add(vertexMode);
-//		toolBar.add(edgeMode);
-//		toolBar.add(faceMode);
-//		toolBar.add(objectMode);
-//		toolBar.add(Box.createHorizontalStrut(16));
+		toolBar.add(selectVertices);
+		toolBar.add(selectEdges);
+		toolBar.add(selectFaces);
+		toolBar.add(Box.createHorizontalStrut(16));
 		toolBar.add(snapToGrid);
 		toolBar.add(Box.createHorizontalStrut(4));
 		toolBar.add(tweakTool);
