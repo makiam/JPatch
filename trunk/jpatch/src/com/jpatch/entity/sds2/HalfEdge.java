@@ -230,7 +230,7 @@ public class HalfEdge {
 	private HalfEdge getPrevBoundaryEdge() {
 		assert boundaryType == BOUNDARY;
 		for (HalfEdge e : vertex.getEdges()) {
-			if (e.boundaryType == BOUNDARY) {
+			if (e != this && e.boundaryType == BOUNDARY) {
 				return e.pair;
 			}
 		}
@@ -254,31 +254,33 @@ public class HalfEdge {
 	
 	public static List<HalfEdge> continguousEdges(HalfEdge edge, Collection<HalfEdge> edges) {
 		assert edge.getFace() != null && edge.getPairFace() == null;
-		final HalfEdge start = edge;
-		
-		edge = getStartBoundaryEdge(edge, start, edges);
-		
+		final HalfEdge start = getStartBoundaryEdge(edge, edge, edges);
+		edge = start;
+		System.out.println("start is " + edge);
 		List<HalfEdge> edgeList = new ArrayList<HalfEdge>(edges == null ? 10 : edges.size());
 		do {
+			System.out.print("adding " + edge + ", ");
 			edgeList.add(edge);
 			edge = edge.getNextBoundaryEdge();
-		} while (edge != null && edge != start);
+			System.out.println("next would be " + edge);
+		} while (edge != null && edge != start && (edges == null || edges.contains(edge)));
 		return edgeList;
 	}
 	
-	public static boolean isLooped(List<HalfEdge> continguousEdges) {
-		HalfEdge first = continguousEdges.get(0);
-		HalfEdge last = continguousEdges.get(continguousEdges.size() - 1);
-		if (first.getPrevBoundaryEdge() == last) {
-			assert last.getNextBoundaryEdge() == first;
-			return true;
-		}
-		return false;
-	}
+//	public static boolean isLooped(List<HalfEdge> continguousEdges) {
+//		HalfEdge first = continguousEdges.get(0);
+//		HalfEdge last = continguousEdges.get(continguousEdges.size() - 1);
+//		if (first.getPrevBoundaryEdge() == last) {
+//			assert last.getNextBoundaryEdge() == first;
+//			return true;
+//		}
+//		return false;
+//	}
 	
 	private static HalfEdge getStartBoundaryEdge(HalfEdge edge, HalfEdge start, Collection<HalfEdge> edges) {
 		HalfEdge prev = edge.getPrevBoundaryEdge();
-		return (prev == null || edge == start || (edges == null || !edges.contains(prev))) ? edge : getStartBoundaryEdge(prev, start, edges);
+		System.out.println("edge=" + edge + " prev=" + prev + " start=" + start + " edges=" + edges);
+		return (prev == null || prev == start || (edges != null && !edges.contains(prev))) ? edge : getStartBoundaryEdge(prev, start, edges);
 	}
 	
 //	public int hashCode() {

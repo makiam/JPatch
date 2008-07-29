@@ -300,15 +300,27 @@ public class Operations {
 		
 		final List<HalfEdge> sourceEdges = HalfEdge.continguousEdges(source, selectedEdges);
 		final List<HalfEdge> targetEdges = HalfEdge.continguousEdges(target, null);
-		final boolean sourceLooped = HalfEdge.isLooped(sourceEdges);
-		final boolean targetLooped = HalfEdge.isLooped(targetEdges);
+//		final boolean sourceLooped = HalfEdge.isLooped(sourceEdges);
+//		final boolean targetLooped = HalfEdge.isLooped(targetEdges);
 		final int sourceIndex = sourceEdges.indexOf(source);
 		final int targetIndex = targetEdges.indexOf(target);
 		System.out.println("WELD EDGES");
 		System.out.println("source=" + source + " -> " + sourceEdges);
 		System.out.println("target=" + target + " -> " + targetEdges);
-		System.out.println("Source: size=" + sourceEdges.size() + " index=" + sourceIndex + " looped=" + sourceLooped);
-		System.out.println("Target: size=" + targetEdges.size() + " index=" + targetIndex + " looped=" + targetLooped);
+		System.out.println("Source: size=" + sourceEdges.size() + " index=" + sourceIndex);
+		System.out.println("Target: size=" + targetEdges.size() + " index=" + targetIndex);
+		Point3d p = new Point3d();
+		if (targetEdges.size() > sourceEdges.size()) {
+			int targetStart = targetEdges.size() + sourceIndex - 1;
+			for (int i = 0; i < sourceEdges.size(); i++) {
+				HalfEdge sourceEdge = sourceEdges.get(i);
+				HalfEdge targetEdge = targetEdges.get((targetStart + targetEdges.size() - i) % targetEdges.size());
+				targetEdge.getPairVertex().getPosition(p);
+				sourceEdge.getVertex().setPosition(p);
+				targetEdge.getVertex().getPosition(p);
+				sourceEdge.getPairVertex().setPosition(p);
+			}
+		}
 		return false;
 	}
 	

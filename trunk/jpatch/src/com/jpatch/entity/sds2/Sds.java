@@ -151,7 +151,11 @@ public class Sds {
 		}
 	}
 	
-	public Face addFace(List<JPatchUndoableEdit> editList, int level, Material material, AbstractVertex... invertices) {
+	public Face addFace(List<JPatchUndoableEdit> editList, int level, Material material, AbstractVertex... vertices) {
+		return addFace(editList, level, null, -1, material, vertices);
+	}
+	
+	private Face addFace(List<JPatchUndoableEdit> editList, int level, Face parent, int edgeIndex, Material material, AbstractVertex... invertices) {
 		AbstractVertex[] vertices = invertices.clone();
 		HalfEdge[] edges = new HalfEdge[vertices.length];
 
@@ -173,7 +177,12 @@ public class Sds {
 			vertex.saveEdges(editList);
 		}
 		
-		Face face = new Face(material, edges);
+		Face face;
+		if (parent == null) {
+			face = new Face(material, edges);
+		} else {
+			face = new Face(material, edges, parent, edgeIndex);
+		}
 //		if (level == 0) System.out.println(this + " adding face " + face);
 		AddFaceEdit addFaceEdit = new AddFaceEdit(level, face);
 		if (editList != null) {
@@ -226,7 +235,7 @@ public class Sds {
 			AbstractVertex v1 = edges[i].getPrev().getEdgePoint() == null ? edges[i].getPrev().createEdgePoint() : edges[i].getPrev().getEdgePoint();
 			AbstractVertex v2 = edges[i].getVertex().getVertexPoint() == null ? edges[i].getVertex().createVertexPoint() : edges[i].getVertex().getVertexPoint();
 			AbstractVertex v3 = edges[i].getEdgePoint() == null ? edges[i].createEdgePoint() : edges[i].getEdgePoint();
-			addFace(editList, nextLevel, face.getMaterial(), v0, v1, v2, v3);
+			addFace(editList, nextLevel, face, i, face.getMaterial(), v0, v1, v2, v3);
 		}
 	}
 	

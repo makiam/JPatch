@@ -715,8 +715,17 @@ public abstract class AbstractVertex {
 		}
 	}
 	
+	private Id getId() {
+		for (HalfEdge edge : vertexEdges) {
+			if (edge.getFace() != null) {
+				return new Id(edge.getFace().id, (byte) edge.getFaceEdgeIndex());
+			}
+		}
+		return null;
+	}
+	
 	@Override
 	public String toString() {
-		return "v" + num + "(" + Arrays.toString(vertexEdges) + ")";
+		return "v" + num + "(" + getId() + ")";
 	}
 }

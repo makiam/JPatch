@@ -16,7 +16,7 @@ public class Face {
 	private final double oneOverSides;
 	private DerivedVertex facePoint;
 	private Material material;
-	private int num = count++;
+	final Id id;
 	Point3d midpointPosition = new Point3d();
 	Point3d displacedMidpointPosition = new Point3d();
 	Vector3d midpointNormal = new Vector3d();
@@ -32,13 +32,23 @@ public class Face {
 	private final FloatBuffer controlSurfaceBuffer;
 	
 	public Face(Material material, HalfEdge... edges) {
-		System.out.println("Face constructor called for edges " + Arrays.toString(edges));
+		this(material, edges, new Id());
+	}
+	
+	public Face(Material material, HalfEdge[] edges, Face parent, int edgeIndex) {
+		this(material, edges, new Id(parent.id, (byte) edgeIndex));
+	}
+	
+	public Face(Material material, HalfEdge[] edges, Id id) {
+//		System.out.println("Face constructor called for edges " + Arrays.toString(edges));
 		int sides = edges.length;
 		assert sides >= 3 : "edges.length=" + edges.length + ", must be >= 3";
 		
 		oneOverSides = 1.0 / sides;
 		
 		this.faceEdges = edges.clone();
+		this.id = id;
+		
 		
 		limitSurfaceBuffer = BufferUtil.newFloatBuffer(sides * 2 * 12);
 		controlSurfaceBuffer = BufferUtil.newFloatBuffer((sides + 2) * 2 * 12);
@@ -59,6 +69,8 @@ public class Face {
 		for (int i = 0; i < edges.length; i++) {
 			edges[i].faceEdgeIndex = i;
 		}
+		
+//		System.out.println("new face is " + this);
 	}
 	
 	public void flip(Set<HalfEdge> edgesToFlip, Set<AbstractVertex> verticesToFlip) {
@@ -342,7 +354,7 @@ public class Face {
 	}
 	
 	public String toString() {
-		StringBuilder sb = new StringBuilder("f" + num + "{");
+		StringBuilder sb = new StringBuilder("f" + id + "{");
 		for (int i = 0; i < faceEdges.length; i++) {
 			sb.append(faceEdges[i].getVertex());
 			if (i < faceEdges.length - 1) {
