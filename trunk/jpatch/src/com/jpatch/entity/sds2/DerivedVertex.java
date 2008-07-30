@@ -5,6 +5,8 @@ import com.jpatch.afw.*;
 import java.io.*;
 import java.util.*;
 
+import javax.vecmath.*;
+
 public abstract class DerivedVertex extends AbstractVertex {
 	
 	@Override
@@ -12,7 +14,8 @@ public abstract class DerivedVertex extends AbstractVertex {
 		validateInvDisplacementMatrix();
 		displacementVector.set(x - worldPosition.x, y - worldPosition.y, z - worldPosition.z);
 //		invDisplacementMatrix.transform(displacementVector);
-		positionAttr.setTuple(displacementVector);
+//		positionAttr.setTuple(displacementVector);
+		setPos(displacementVector.x, displacementVector.y, displacementVector.z);
 	}
 	
 	@Override
@@ -20,27 +23,28 @@ public abstract class DerivedVertex extends AbstractVertex {
 		setDisplacement(x, y, z);
 	}
 	
+	@Override
+	public void getPos(Tuple3d pos) {
+		//TODO: implement
+	}
 	
 	public void writeXml(XmlWriter xmlWriter) throws IOException {
-		if (isDisplaced || cornerSharpnessAttr.getDouble() != 0) {
+//		if (isDisplaced || cornerSharpnessAttr.getDouble() != 0) {
+		if (isDisplaced) {
 			xmlWriter.startElement("hierarchyvertex");
 			xmlWriter.startElement("hierarchy");
 			xmlWriter.intArray(generateId());
 			xmlWriter.endElement();
 			if (isDisplaced) {
 				xmlWriter.startElement("displacement");
-				xmlWriter.characters(Double.toString(positionAttr.getX()));
-				xmlWriter.characters(" ");
-				xmlWriter.characters(Double.toString(positionAttr.getY()));
-				xmlWriter.characters(" ");
-				xmlWriter.characters(Double.toString(positionAttr.getZ()));
+				xmlWriter.writeTuple(displacementVector);
 				xmlWriter.endElement();
 			}
-			if (cornerSharpnessAttr.getDouble() > 0) {
-				xmlWriter.startElement("cornersharpness");
-				xmlWriter.characters(Double.toString(cornerSharpnessAttr.getDouble()));
-				xmlWriter.endElement();
-			}
+//			if (cornerSharpnessAttr.getDouble() > 0) {
+//				xmlWriter.startElement("cornersharpness");
+//				xmlWriter.characters(Double.toString(cornerSharpnessAttr.getDouble()));
+//				xmlWriter.endElement();
+//			}
 			xmlWriter.endElement();
 		}
 	}

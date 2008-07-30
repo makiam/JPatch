@@ -19,7 +19,7 @@
  * along with JPatch; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package jpatch.boundary;
+package com.jpatch.boundary;
 
 import java.awt.*;
 import java.util.Timer;
@@ -38,7 +38,7 @@ import javax.swing.border.*;
 @SuppressWarnings("serial")
 public class MemoryMonitor {
 	private static final int DELAY = 1000;
-	private static final Insets INSETS = new Insets(0, 1, 0, 1);
+	private static final Insets INSETS = new Insets(0, 4, 0, 4);
 	private static final Border BORDER = new Border() {
 		public Insets getBorderInsets(Component c) {
 			return INSETS;
@@ -47,7 +47,20 @@ public class MemoryMonitor {
 			return true;
 		}
 		public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-			;
+			
+			g.setColor(new Color(0x88000000, true));
+			g.drawRect(x + 1, y + 1, width, height);
+			g.setColor(new Color(0x44000000, true));
+			g.drawRect(x + 2, y + 2, width, height);
+			g.setColor(new Color(0x22000000, true));
+			g.drawRect(x + 3, y + 3, width, height);
+			g.setColor(new Color(0x11000000, true));
+			g.drawRect(x + 4, y + 4, width, height);
+			g.setColor(new Color(0x666666));
+			g.drawRect(x, y, width - 1, height - 1);
+			
+//			g.fillRect(x, y, width, height);
+//			g.draw3DRect(x, y, width, height, false);
 		}
 	};
 	private JLabel maxLabel = new JLabel();
@@ -55,19 +68,20 @@ public class MemoryMonitor {
 	private JLabel useLabel = new JLabel();
 
 	private MemoryMonitor() {
-		Color bg = maxLabel.getBackground();
-		Color label = new Color(bg.getRed() - 24, bg.getGreen() - 24, bg.getBlue() - 24);
-		maxLabel.setBorder(null);
-//		maxLabel.setBackground(label);
-		maxLabel.setOpaque(false);
+//		Color bg = Color.white;
+//		Color label = new Color(bg.getRed() - 24, bg.getGreen() - 24, bg.getBlue() - 24);
+		Color label = new Color(0xe0e8e4);
+		maxLabel.setBorder(BORDER);
+		maxLabel.setBackground(label);
+		maxLabel.setOpaque(true);
 		maxLabel.setToolTipText("Maximum memory the VM may use in MB");
-		totalLabel.setBorder(null);
-//		totalLabel.setBackground(label);
-		totalLabel.setOpaque(false);
+		totalLabel.setBorder(BORDER);
+		totalLabel.setBackground(label);
+		totalLabel.setOpaque(true);
 		totalLabel.setToolTipText("Total memory reserved for the VM in MB");
-		useLabel.setBorder(null);
-//		useLabel.setBackground(label);
-		useLabel.setOpaque(false);
+		useLabel.setBorder(BORDER);
+		useLabel.setBackground(label);
+		useLabel.setOpaque(true);
 		useLabel.setToolTipText("Memory used by the VM in MB");
 	}
 	
@@ -79,8 +93,7 @@ public class MemoryMonitor {
 		box.add(memMon.totalLabel);
 		box.add(Box.createHorizontalStrut(2));
 		box.add(memMon.useLabel);
-		box.add(Box.createHorizontalStrut(20));
-		box.setOpaque(false);
+		box.add(Box.createHorizontalStrut(2));
 		Timer timer = new Timer();
 		TimerTask task = new TimerTask() {
 			@Override

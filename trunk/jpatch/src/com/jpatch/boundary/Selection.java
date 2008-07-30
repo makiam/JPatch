@@ -41,7 +41,7 @@ public class Selection {
 				startPositions[i] = new Point3d();
 				vertex.getPosition(startPositions[i]);
 				startTuples[i] = new Point3d();
-				vertex.getPositionAttribute().getTuple(startTuples[i]);
+				vertex.getPos(startTuples[i]);
 				i++;
 			}
 		}
@@ -49,7 +49,8 @@ public class Selection {
 		public void end(List<JPatchUndoableEdit> editList) {
 			int i = 0;
 			for (AbstractVertex vertex : vertices) {
-				editList.add(AttributeEdit.changeAttribute(vertex.getPositionAttribute(), startTuples[i], false));
+//				editList.add(AttributeEdit.changeAttribute(vertex.getPositionAttribute(), startTuples[i], false));
+				editList.add(vertex.new ChangePositionEdit(startTuples[i], false));
 				i++;
 			}
 		}

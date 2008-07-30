@@ -72,7 +72,7 @@ public class Face {
 			edges[i].faceEdgeIndex = i;
 		}
 		
-		System.out.println("new face is " + this);
+//		System.out.println("new face is " + this);
 	}
 	
 	public void flip(Set<HalfEdge> edgesToFlip, Set<AbstractVertex> verticesToFlip) {

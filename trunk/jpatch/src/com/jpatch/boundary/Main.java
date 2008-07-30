@@ -393,7 +393,7 @@ public class Main {
 		};
 		statusBar.add(statusLabel);
 		statusBar.add(Box.createHorizontalGlue());
-//		statusBar.add(MemoryMonitor.createMemoryMonitor(), BorderLayout.EAST);
+		statusBar.add(MemoryMonitor.createMemoryMonitor(), BorderLayout.EAST);
 		statusBar.add(Box.createHorizontalStrut(16));
 		statusBar.setOpaque(true);
 		statusBar.setBackground(new Color(0xb0b0b0));
