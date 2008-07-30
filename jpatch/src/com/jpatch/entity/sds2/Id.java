@@ -24,9 +24,7 @@ package com.jpatch.entity.sds2;
 import java.util.*;
 
 public class Id {
-	private static int count = 0;
-	private final int topLevelId;
-	private final byte[] subdivId;
+	private final int[] id;
 	
 	Id() {
 		topLevelId = count++;

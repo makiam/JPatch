@@ -1,7 +1,10 @@
 package com.jpatch.entity.sds2;
 
+import java.io.*;
+
 import javax.vecmath.*;
 
+import com.jpatch.afw.*;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.entity.*;
 
@@ -12,6 +15,8 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 	private boolean transformMatrixValid;
 	private boolean invTransformMatrixValid;
 	private final Point3d localPosition = new Point3d();
+	private static int count;
+	final int num = count++;
 	
 	public BaseVertex(XFormNode node) {
 		this(node, 0, 0, 0);
@@ -68,5 +73,30 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 	public void invalidateTransformation() {
 		transformMatrixValid = false;
 		invalidate();
+	}
+	
+	public void writeXml(XmlWriter xmlWriter) throws IOException {
+		xmlWriter.startElement("vertex");
+		xmlWriter.startElement("id");
+		xmlWriter.characters(Integer.toString(num));
+		xmlWriter.endElement();
+		xmlWriter.startElement("position");
+		xmlWriter.characters(Double.toString(positionAttr.getX()));
+		xmlWriter.characters(" ");
+		xmlWriter.characters(Double.toString(positionAttr.getY()));
+		xmlWriter.characters(" ");
+		xmlWriter.characters(Double.toString(positionAttr.getZ()));
+		xmlWriter.endElement();
+		if (cornerSharpnessAttr.getDouble() > 0) {
+			xmlWriter.startElement("cornersharpness");
+			xmlWriter.characters(Double.toString(cornerSharpnessAttr.getDouble()));
+			xmlWriter.endElement();
+		}
+		xmlWriter.endElement();
+	}
+
+	@Override
+	public String toString() {
+		return "v" + num;
 	}
 }
