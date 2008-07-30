@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Stack;
 
+import javax.vecmath.*;
+
 public class XmlWriter {
 	private static final String indent = "  ";
 	private static final String newLine = "\n";
@@ -111,6 +113,21 @@ public class XmlWriter {
 			writer.write(Integer.toString(array[i]));
 		}
 		isNewLine = false;
+	}
+	
+	public void writeTuple(Tuple3d tuple) throws IOException {
+		if (!inDocument) {
+			throw new IllegalStateException();
+		}
+		if (inElement) {
+			writer.write('>');
+			inElement = false;
+		}
+		writer.write(Double.toString(tuple.x));
+		writer.write(' ');
+		writer.write(Double.toString(tuple.y));
+		writer.write(' ');
+		writer.write(Double.toString(tuple.z));
 	}
 	
 	public void attribute(String name, byte b) throws IOException {

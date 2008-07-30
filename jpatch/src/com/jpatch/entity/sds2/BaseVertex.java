@@ -31,18 +31,24 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 		xformNode.getLocal2WorldTransform(transformMatrix);
 		invTransformMatrix.invert(transformMatrix);
 		invTransformMatrixValid = true;
-		positionAttr.setTuple(x, y, z);
-		
-		cornerSharpnessAttr.setDouble(0);
+		setPos(x, y, z);
+//		positionAttr.setTuple(x, y, z);
+//		
+//		cornerSharpnessAttr.setDouble(0);
 	}
 	
 	@Override
-	void setPos(double x, double y, double z) {
+	public void setPos(double x, double y, double z) {
 		validateInvTransformMatrix();
 		worldPosition.set(x, y, z);
 		invTransformMatrix.transform(worldPosition, localPosition);
 		worldPositionValid = true;
 		invalidate();
+	}
+	
+	@Override
+	public void getPos(Tuple3d pos) {
+		pos.set(worldPosition);
 	}
 	
 	void validateWorldPosition() {
@@ -81,17 +87,13 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 		xmlWriter.characters(Integer.toString(num));
 		xmlWriter.endElement();
 		xmlWriter.startElement("position");
-		xmlWriter.characters(Double.toString(positionAttr.getX()));
-		xmlWriter.characters(" ");
-		xmlWriter.characters(Double.toString(positionAttr.getY()));
-		xmlWriter.characters(" ");
-		xmlWriter.characters(Double.toString(positionAttr.getZ()));
+		xmlWriter.writeTuple(localPosition);
 		xmlWriter.endElement();
-		if (cornerSharpnessAttr.getDouble() > 0) {
-			xmlWriter.startElement("cornersharpness");
-			xmlWriter.characters(Double.toString(cornerSharpnessAttr.getDouble()));
-			xmlWriter.endElement();
-		}
+//		if (cornerSharpnessAttr.getDouble() > 0) {
+//			xmlWriter.startElement("cornersharpness");
+//			xmlWriter.characters(Double.toString(cornerSharpnessAttr.getDouble()));
+//			xmlWriter.endElement();
+//		}
 		xmlWriter.endElement();
 	}
 

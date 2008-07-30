@@ -17,8 +17,8 @@ public abstract class AbstractVertex {
 	
 	
 	
-	final Tuple3Attr positionAttr = new Tuple3Attr();
-	final DoubleAttr cornerSharpnessAttr = AttributeManager.getInstance().createBoundedDoubleAttr(0, 0, 100);
+//	final Tuple3Attr positionAttr = new Tuple3Attr();
+//	final DoubleAttr cornerSharpnessAttr = AttributeManager.getInstance().createBoundedDoubleAttr(0, 0, 100);
 	
 	final Point3d worldPosition = new Point3d();		// position in world space
 	final Point3d worldLimit = new Point3d();			// limit in world space
@@ -52,30 +52,30 @@ public abstract class AbstractVertex {
 	double sharpnessValue;
 	
 	AbstractVertex() {
-		positionAttr.suppressChangeNotification(true);
-		positionAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute source) {
-				setPos(positionAttr.getX(), positionAttr.getY(), positionAttr.getZ());
-			}
-		});
-		positionAttr.suppressChangeNotification(false);
-		
-		cornerSharpnessAttr.suppressChangeNotification(true);
-		cornerSharpnessAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute source) {
-//				sharpnessValue = Math.tan(cornerSharpnessAttr.getDouble() * 0.005 * Math.PI);
-				sharpnessValue = Math.exp(cornerSharpnessAttr.getDouble() * 0.024) - 1;
-				worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
-				invalidate();
-				System.out.println("sharpness=" + cornerSharpnessAttr.getDouble() + " " + sharpnessValue);
-			}
-		});
-		cornerSharpnessAttr.suppressChangeNotification(false);
+//		positionAttr.suppressChangeNotification(true);
+//		positionAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
+//			public void attributeHasChanged(Attribute source) {
+//				setPos(positionAttr.getX(), positionAttr.getY(), positionAttr.getZ());
+//			}
+//		});
+//		positionAttr.suppressChangeNotification(false);
+//		
+//		cornerSharpnessAttr.suppressChangeNotification(true);
+//		cornerSharpnessAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
+//			public void attributeHasChanged(Attribute source) {
+////				sharpnessValue = Math.tan(cornerSharpnessAttr.getDouble() * 0.005 * Math.PI);
+//				sharpnessValue = Math.exp(cornerSharpnessAttr.getDouble() * 0.024) - 1;
+//				worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
+//				invalidate();
+//				System.out.println("sharpness=" + cornerSharpnessAttr.getDouble() + " " + sharpnessValue);
+//			}
+//		});
+//		cornerSharpnessAttr.suppressChangeNotification(false);
 	}
 	
-	public final Tuple3Attr getPositionAttribute() {
-		return positionAttr;
-	}
+//	public final Tuple3Attr getPositionAttribute() {
+//		return positionAttr;
+//	}
 	
 	public final void getPosition(Tuple3d position) {
 		validateDisplacedPosition();
@@ -92,10 +92,13 @@ public abstract class AbstractVertex {
 	}
 	
 	public void setPosition(double x, double y, double z) {
-		positionAttr.setTuple(x, y, z);
+//		positionAttr.setTuple(x, y, z);
+		setPos(x, y, z);
 	}
 	
-	abstract void setPos(double x, double y, double z);
+	public abstract void setPos(double x, double y, double z);
+	
+	public abstract void getPos(Tuple3d pos);
 	
 	final void setDisplacement(double x, double y, double z) {
 		if (x == 0 && y == 0 && z == 0) {
@@ -116,9 +119,9 @@ public abstract class AbstractVertex {
 		return sharpnessValue;
 	}
 	
-	public final DoubleAttr getCornerSharpnessAttribute() {
-		return cornerSharpnessAttr;
-	}
+//	public final DoubleAttr getCornerSharpnessAttribute() {
+//		return cornerSharpnessAttr;
+//	}
 	
 	public final void getLimit(Tuple3f limit) {
 		validateDisplacedLimit();
@@ -701,7 +704,7 @@ public abstract class AbstractVertex {
 		
 		worldPositionValid = true;
 		invalidate();
-		System.out.println(this + " boundaryType = " + boundaryType);
+//		System.out.println(this + " boundaryType = " + boundaryType);
 	}
 	
 	void flip() {
@@ -725,4 +728,21 @@ public abstract class AbstractVertex {
 	public abstract String toString();
 	
 	public abstract void writeXml(XmlWriter xmlWriter) throws IOException;
+	
+	public class ChangePositionEdit extends AbstractSwapEdit {
+		private final Tuple3d pos = new Point3d();
+		public ChangePositionEdit(Tuple3d pos, boolean changeNow) {
+			this.pos.set(pos);
+			apply(changeNow);
+		}
+		
+		@Override
+		protected void swap() {
+			double x = pos.x;
+			double y = pos.y;
+			double z = pos.z;
+			getPos(pos);
+			setPos(x, y, z);
+		}
+	}
 }
