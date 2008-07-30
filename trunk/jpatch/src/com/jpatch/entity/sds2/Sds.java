@@ -1,5 +1,6 @@
 package com.jpatch.entity.sds2;
 
+import com.jpatch.afw.*;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
 import com.jpatch.afw.ui.*;
@@ -36,6 +37,7 @@ public class Sds {
 		}		
 	};
 	
+	private final Map<Integer, Face> faceIdMap = new HashMap<Integer, Face>();
 	private final Set<Face>[] faceSets = new Set[SdsConstants.MAX_LEVEL + 1];
 	private final List<Face>[] faceLists = new List[SdsConstants.MAX_LEVEL + 1];
 	private final Set<HalfEdge> strayEdges = new HashSet<HalfEdge>();
@@ -303,49 +305,75 @@ public class Sds {
 		facesSorted = true;
 	}
 	
+	public DerivedVertex locateVertex(int[] hierarchyId) {
+//		System.out.println("hierarchyId = " + Arrays.toString(hierarchyId));
+		Face face = faceIdMap.get(hierarchyId[hierarchyId.length - 1]);
+		if (face == null) {
+			throw new IllegalArgumentException("level-0 face with id " + hierarchyId[0] + " does not exist");
+		}
+//		System.out.println("base face found: " + face);
+		HalfEdge[] subEdges = new HalfEdge[2];
+		for (int i = hierarchyId.length - 2; i > 0; i--) {
+			face.getSubEdges(hierarchyId[i], subEdges);
+			face = subEdges[0].getFace();
+//			System.out.println("descending to " + face);
+		}
+		return (DerivedVertex) face.getEdges()[hierarchyId[0]].getVertex();
+	}
+	
 	public List<Face> getFaces(int level) {
 		sortFaces();
 		return faceLists[level];
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Iterable<? extends AbstractVertex> getVertices(final int level, final boolean includeStrayVertices) {
-		sortFaces();
+		if (includeStrayVertices) {
+			return new CombinedIterable(getFaceVertices(level), strayVertices);
+		}
+		return getFaceVertices(level);
+	}
+	
+	public Iterable<? extends AbstractVertex> getFaceVertices(final int level) {
 		return new Iterable<AbstractVertex>() {
 			public Iterator<AbstractVertex> iterator() {
+				if (faceLists[level].size() == 0) {
+					return new ArrayList<AbstractVertex>(0).iterator();
+				}
 				return new Iterator<AbstractVertex>() {
 					Iterator<Face> faces = faceLists[level].iterator();
-					HalfEdge[] faceEdges;
+					Face face = faces.next();
+					HalfEdge[] faceEdges = face.getEdges();
 					int edgeIndex;
-					Iterator<BaseVertex> vertices = strayVertices.iterator();
+					AbstractVertex nextVertex = getNextVertex();
+					
+					private final AbstractVertex getNextVertex() {
+						if (edgeIndex == faceEdges.length) {
+							if (faces.hasNext()) {
+								face = faces.next();
+								faceEdges = face.getEdges();
+								edgeIndex = 0;
+							} else {
+								return null;
+							}
+						}
+						HalfEdge edge = faceEdges[edgeIndex++];
+						AbstractVertex vertex = edge.getVertex();
+						if (vertex.getPrimaryFace() != face) {
+							return getNextVertex();
+						}
+						return vertex;
+					}
+					
 					
 					public boolean hasNext() {
-						if (faceEdges != null && edgeIndex < faceEdges.length) {
-							return true;
-						}
-						if (faces.hasNext()) {
-							faceEdges = faces.next().getEdges();
-							edgeIndex = 0;
-							return hasNext();
-						}
-						if (includeStrayVertices) {
-							return vertices.hasNext();
-						}
-						return false;
+						return nextVertex != null;
 					}
 
 					public AbstractVertex next() {
-						if (faceEdges != null && edgeIndex < faceEdges.length) {
-							return faceEdges[edgeIndex++].getVertex();
-						}
-						if (faces.hasNext()) {
-							faceEdges = faces.next().getEdges();
-							edgeIndex = 0;
-							return next();
-						}
-						if (includeStrayVertices) {
-							return vertices.next();
-						}
-						throw new NoSuchElementException();
+						AbstractVertex tmp = nextVertex;
+						nextVertex = getNextVertex();
+						return tmp;
 					}
 
 					public void remove() {
@@ -355,6 +383,54 @@ public class Sds {
 			}
 		};
 	}
+	
+//	public Iterable<? extends AbstractVertex> getVerticesOld(final int level, final boolean includeStrayVertices) {
+//		sortFaces();
+//		return new Iterable<AbstractVertex>() {
+//			public Iterator<AbstractVertex> iterator() {
+//				return new Iterator<AbstractVertex>() {
+//					Iterator<Face> faces = faceLists[level].iterator();
+//					HalfEdge[] faceEdges;
+//					int edgeIndex;
+//					Iterator<BaseVertex> vertices = strayVertices.iterator();
+//					
+//					public boolean hasNext() {
+//						if (faceEdges != null && edgeIndex < faceEdges.length) {
+//							return true;
+//						}
+//						if (faces.hasNext()) {
+//							faceEdges = faces.next().getEdges();
+//							edgeIndex = 0;
+//							return hasNext();
+//						}
+//						if (includeStrayVertices) {
+//							return vertices.hasNext();
+//						}
+//						return false;
+//					}
+//
+//					public AbstractVertex next() {
+//						if (faceEdges != null && edgeIndex < faceEdges.length) {
+//							return faceEdges[edgeIndex++].getVertex();
+//						}
+//						if (faces.hasNext()) {
+//							faceEdges = faces.next().getEdges();
+//							edgeIndex = 0;
+//							return next();
+//						}
+//						if (includeStrayVertices) {
+//							return vertices.next();
+//						}
+//						throw new NoSuchElementException();
+//					}
+//
+//					public void remove() {
+//						throw new UnsupportedOperationException();
+//					}
+//				};
+//			}
+//		};
+//	}
 	
 	public Collection<BaseVertex> getStrayVertices() {
 		return strayVertices;
@@ -729,12 +805,18 @@ public class Sds {
 		void add() {
 			assert !faceSets[level].contains(face) : "Face " + face + " has already been added to " + Sds.this + " at level " + level;
 			faceSets[level].add(face);
+			if (level == 0) {
+				faceIdMap.put(face.id, face);
+			}
 			facesSorted = false;
 		}
 		
 		void remove() {
 			assert faceSets[level].contains(face) : "Face " + face + " is unknown to " + Sds.this + " at level " + level;
 			faceSets[level].remove(face);
+			if (level == 0) {
+				faceIdMap.remove(face.id);
+			}
 			facesSorted = false;
 		}
 	}

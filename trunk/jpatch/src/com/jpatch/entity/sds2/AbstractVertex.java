@@ -1,8 +1,11 @@
 package com.jpatch.entity.sds2;
 
 import static com.jpatch.entity.sds2.SdsWeights.*;
+
+import java.io.*;
 import java.util.*;
 
+import com.jpatch.afw.*;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
 import com.jpatch.afw.ui.*;
@@ -12,8 +15,7 @@ import javax.vecmath.*;
 public abstract class AbstractVertex {
 	private static enum BoundaryType { REGULAR, BOUNDARY, IRREGULAR }
 	
-	private static int count;
-	public final int num = count++;
+	
 	
 	final Tuple3Attr positionAttr = new Tuple3Attr();
 	final DoubleAttr cornerSharpnessAttr = AttributeManager.getInstance().createBoundedDoubleAttr(0, 0, 100);
@@ -38,7 +40,7 @@ public abstract class AbstractVertex {
 	private DerivedVertex vertexPoint;
 	private BoundaryType boundaryType;
 	
-	private boolean isDisplaced;
+	boolean isDisplaced;
 	
 	boolean worldPositionValid;
 	private boolean displacedPositionValid;
@@ -215,12 +217,6 @@ public abstract class AbstractVertex {
 					}
 					worldPositionValid = true;
 				}
-			}
-			
-			@Override
-			public String toString() {
-				AbstractVertex parentVertex = AbstractVertex.this;
-				return "v" + num + "(" + parentVertex + ")";
 			}
 		};
 		return vertexPoint;
@@ -715,17 +711,18 @@ public abstract class AbstractVertex {
 		}
 	}
 	
-	private Id getId() {
+	public Face getPrimaryFace() {
 		for (HalfEdge edge : vertexEdges) {
-			if (edge.getFace() != null) {
-				return new Id(edge.getFace().id, (byte) edge.getFaceEdgeIndex());
+			Face face = edge.getFace();
+			if (face != null) {
+				return face;
 			}
 		}
 		return null;
 	}
 	
 	@Override
-	public String toString() {
-		return "v" + num + "(" + getId() + ")";
-	}
+	public abstract String toString();
+	
+	public abstract void writeXml(XmlWriter xmlWriter) throws IOException;
 }

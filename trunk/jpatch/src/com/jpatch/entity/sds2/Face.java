@@ -9,14 +9,15 @@ import com.sun.opengl.util.*;
 import javax.vecmath.*;
 
 public class Face {
-	private static int count = 0;
+	private static int count;
 	private final HalfEdge[] faceEdges;
 	
 //	private Face[] subFaces;
 	private final double oneOverSides;
 	private DerivedVertex facePoint;
 	private Material material;
-	final Id id;
+	final Face parentFace;
+	final int id;
 	Point3d midpointPosition = new Point3d();
 	Point3d displacedMidpointPosition = new Point3d();
 	Vector3d midpointNormal = new Vector3d();
@@ -32,14 +33,15 @@ public class Face {
 	private final FloatBuffer controlSurfaceBuffer;
 	
 	public Face(Material material, HalfEdge... edges) {
-		this(material, edges, new Id());
+		this(material, count++, edges);
 	}
 	
-	public Face(Material material, HalfEdge[] edges, Face parent, int edgeIndex) {
-		this(material, edges, new Id(parent.id, (byte) edgeIndex));
+	public Face(Material material, int faceId, HalfEdge... edges) {
+		this(material, edges, null, faceId);
 	}
 	
-	public Face(Material material, HalfEdge[] edges, Id id) {
+	public Face(Material material, HalfEdge[] edges, Face parentFace, int edgeIndex) {
+		
 //		System.out.println("Face constructor called for edges " + Arrays.toString(edges));
 		int sides = edges.length;
 		assert sides >= 3 : "edges.length=" + edges.length + ", must be >= 3";
@@ -47,8 +49,8 @@ public class Face {
 		oneOverSides = 1.0 / sides;
 		
 		this.faceEdges = edges.clone();
-		this.id = id;
-		
+		this.parentFace = parentFace;
+		this.id = edgeIndex;
 		
 		limitSurfaceBuffer = BufferUtil.newFloatBuffer(sides * 2 * 12);
 		controlSurfaceBuffer = BufferUtil.newFloatBuffer((sides + 2) * 2 * 12);
@@ -70,7 +72,7 @@ public class Face {
 			edges[i].faceEdgeIndex = i;
 		}
 		
-//		System.out.println("new face is " + this);
+		System.out.println("new face is " + this);
 	}
 	
 	public void flip(Set<HalfEdge> edgesToFlip, Set<AbstractVertex> verticesToFlip) {
@@ -341,10 +343,6 @@ public class Face {
 					worldPositionValid = true;
 				}
 			}
-			
-			public String toString() {
-				return "v" + num + "(" + Face.this + ")";
-			}
 		};
 		return facePoint;
 	}
@@ -354,7 +352,7 @@ public class Face {
 	}
 	
 	public String toString() {
-		StringBuilder sb = new StringBuilder("f" + id + "{");
+		StringBuilder sb = new StringBuilder("f" + Arrays.toString(generateId()) + "{");
 		for (int i = 0; i < faceEdges.length; i++) {
 			sb.append(faceEdges[i].getVertex());
 			if (i < faceEdges.length - 1) {
@@ -363,6 +361,22 @@ public class Face {
 		}
 		sb.append("}");
 		return sb.toString();
+	}
+	
+	int addId(int[] id, int index) {
+		id[index++] = this.id;
+		if (parentFace != null) {
+			return parentFace.addId(id, index);
+		}
+		return index;
+	}
+	
+	public int[] generateId() {
+		int[] tmp = new int[SdsConstants.MAX_LEVEL + 1];
+		int level = addId(tmp, 0);
+		int[] id = new int[level];
+		System.arraycopy(tmp, 0, id, 0, level);
+		return id;
 	}
 	
 //	public int hashCode() {

@@ -165,11 +165,6 @@ public class HalfEdge {
 					assert false;	// should never get here
 				}			
 			}
-			
-			public String toString() {
-				return "v" + num + "(" + HalfEdge.this + ")";
-			}
-			
 		};
 		pair.edgePoint = edgePoint;
 		return edgePoint;
@@ -180,7 +175,7 @@ public class HalfEdge {
 	}
 	
 	public String toString() {
-		return "e" + vertex.num + "-" + pair.vertex.num;
+		return "e" + vertex + "-" + pair.vertex;
 	}
 	
 	public void saveState(List<JPatchUndoableEdit> editList) {

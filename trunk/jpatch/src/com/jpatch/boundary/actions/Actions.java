@@ -6,6 +6,7 @@ import java.util.*;
 
 import javax.swing.JFileChooser;
 
+import com.jpatch.afw.*;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
 import com.jpatch.boundary.*;
@@ -104,6 +105,30 @@ public class Actions {
 		public void actionPerformed(ActionEvent e) {
 			Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
 			sds.dumpFaces(0);
+			try {
+				Writer writer = new OutputStreamWriter(System.out);
+				XmlWriter xmlWriter = new XmlWriter(writer);
+				xmlWriter.startDocument();
+				xmlWriter.startElement("subdivisionsurface");
+				xmlWriter.attribute("scheme", "catmull-clark");
+				for (int level = 0; level <= sds.getMaxLevelAttribute().getInt(); level++) {
+					for (AbstractVertex v : sds.getVertices(level, false)) {
+						v.writeXml(xmlWriter);
+					}
+				}
+				xmlWriter.endElement();
+				xmlWriter.endDocument();
+				writer.flush();
+			} catch(IOException ex) {
+				ex.printStackTrace();
+			}
+			for (AbstractVertex v : sds.getVertices(2, false)) {
+				int[] hierarchyId = ((DerivedVertex) v).generateId();
+				System.out.println("* searching for " + Arrays.toString(hierarchyId));
+				DerivedVertex d = sds.locateVertex(hierarchyId);
+				System.out.println("*  found " + Arrays.toString(d.generateId()));
+				System.out.println(d == v);
+			}
 		}
 	};
 	
