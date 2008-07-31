@@ -29,12 +29,14 @@ public class HalfEdge {
 		this.vertex = v0;
 		this.pair = new HalfEdge(v1, this);
 		this.primary = true;
+		v0.addEdge(this);
 	}
 	
 	private HalfEdge(AbstractVertex v, HalfEdge pair) {
 		this.vertex = v;
 		this.pair = pair;
 		this.primary = false;
+		v.addEdge(this);
 	}
 	
 	public AbstractVertex getVertex() {

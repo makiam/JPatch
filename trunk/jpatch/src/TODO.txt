@@ -1,0 +1,3 @@
+2008 Jul 31:
+	* check stray-edges/stray-vertices (don't work with extrude tool)
+	* work on undo/redo for adding/removing faces and stray-edges

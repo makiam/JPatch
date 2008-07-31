@@ -27,6 +27,17 @@ public abstract class DerivedVertex extends AbstractVertex {
 		invalidate();
 	}
 	
+	public void discardHierarchyModification() {
+		assert hierarchicalVertexModification != null;
+		sds.discardHierarchicalVertexModification(hierarchicalVertexModification);
+		hierarchicalVertexModification = null;
+	}
+	
+	public void setHierarchyModification(HierarchicalVertexModification hierarchyVertexMod) {
+		assert Arrays.equals(generateId(), hierarchyVertexMod.hierarchyPath);
+		this.hierarchicalVertexModification = hierarchyVertexMod;
+	}
+	
 //	@Override
 //	public void setPos(double x, double y, double z) {
 //		setDisplacement(x, y, z);
@@ -38,9 +49,11 @@ public abstract class DerivedVertex extends AbstractVertex {
 //	}
 	void validateDisplacedPosition() {
 		if (!displacedPositionValid) {
+//			System.out.println(this + ".validateDisplacedPosition() called, displacedPositionValid=" + displacedPositionValid);
+//			System.out.println("hierarchicalVertexModification=" + hierarchicalVertexModification);
 			if (hierarchicalVertexModification != null && hierarchicalVertexModification.isDisplaced()) {
 				validateWorldLimit();	// this also validates position
-				displacementMatrix.transform(morphDisplacementVector, transformedDisplacementVector);
+				displacementMatrix.transform(hierarchicalVertexModification.displacementVector, transformedDisplacementVector);
 				displacedPosition.add(worldPosition, transformedDisplacementVector);	
 			} else {
 				validateWorldPosition();
