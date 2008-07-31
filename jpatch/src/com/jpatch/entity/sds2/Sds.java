@@ -44,6 +44,7 @@ public class Sds {
 	private final Set<BaseVertex> strayVertices = new HashSet<BaseVertex>();
 	private final Set<BaseVertex[]> strayFaces = new HashSet<BaseVertex[]>();
 	private final Map<EdgeKey, HalfEdge>[] edgeMaps = new Map[SdsConstants.MAX_LEVEL + 1];
+	private final Map<int[], HierarchicalVertexModification>[] hierarchyMaps = new Map[SdsConstants.MAX_LEVEL + 1];
 	
 	private boolean facesSorted;
 	
@@ -55,6 +56,7 @@ public class Sds {
 			faceSets[i] = new HashSet<Face>();
 			faceLists[i] = new ArrayList<Face>();
 			edgeMaps[i] = new HashMap<EdgeKey, HalfEdge>();
+			hierarchyMaps[i] = new HashMap<int[], HierarchicalVertexModification>();
 		}
 		
 		/* add or remove faces on new (old) levels when maxLevel changes */
@@ -130,6 +132,20 @@ public class Sds {
 			editList.add(removeStrayEdgeEdge);
 			editList.add(removeEdgeEdit);
 		}
+	}
+	
+	public HierarchicalVertexModification createHierarchyModification(int[] path) {
+		int level = path.length - 2;
+		assert(!hierarchyMaps[level].containsKey(path)) : "path " + Arrays.toString(path) + " already modified";
+		HierarchicalVertexModification hierarchicalVertexModification = new HierarchicalVertexModification();
+		hierarchyMaps[level].put(path, hierarchicalVertexModification);
+		return hierarchicalVertexModification;
+	}
+	
+	public void discardHierarchicalVertexModification(int[] path) {
+		int level = path.length - 2;
+		assert hierarchyMaps[level].containsKey(path) : "path " + Arrays.toString(path) + " not modified";
+		hierarchyMaps[level].remove(path);
 	}
 	
 	public void addStrayFace(List<JPatchUndoableEdit> editList, BaseVertex[] vertices) {

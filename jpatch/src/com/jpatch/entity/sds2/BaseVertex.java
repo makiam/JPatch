@@ -18,27 +18,25 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 	private static int count;
 	final int num = count++;
 	
-	public BaseVertex(XFormNode node) {
-		this(node, 0, 0, 0);
+	public BaseVertex(SdsModel sdsModel) {
+		this(sdsModel, 0, 0, 0);
 	}
 	
-	public BaseVertex(XFormNode node, double x, double y, double z) {
-		if (node == null) {
-			throw new NullPointerException();
-		}
-		this.xformNode = node;
+	public BaseVertex(SdsModel sdsModel, double x, double y, double z) {
+		super(sdsModel.getSds());
+		this.xformNode = sdsModel;
 		xformNode.addXFormListener(this);
 		xformNode.getLocal2WorldTransform(transformMatrix);
 		invTransformMatrix.invert(transformMatrix);
 		invTransformMatrixValid = true;
-		setPos(x, y, z);
+		setPosition(x, y, z);
 //		positionAttr.setTuple(x, y, z);
 //		
 //		cornerSharpnessAttr.setDouble(0);
 	}
 	
 	@Override
-	public void setPos(double x, double y, double z) {
+	public void setPosition(double x, double y, double z) {
 		validateInvTransformMatrix();
 		worldPosition.set(x, y, z);
 		invTransformMatrix.transform(worldPosition, localPosition);
@@ -46,10 +44,10 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 		invalidate();
 	}
 	
-	@Override
-	public void getPos(Tuple3d pos) {
-		pos.set(worldPosition);
-	}
+//	@Override
+//	public void getPos(Tuple3d pos) {
+//		pos.set(worldPosition);
+//	}
 	
 	void validateWorldPosition() {
 		if (!transformMatrixValid) {

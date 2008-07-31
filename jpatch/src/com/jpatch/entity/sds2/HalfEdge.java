@@ -134,7 +134,8 @@ public class HalfEdge {
 	
 	public DerivedVertex createEdgePoint() {
 		assert edgePoint == null;
-		edgePoint = new DerivedVertex() {
+		Sds sds = vertex.sds;
+		edgePoint = new DerivedVertex(sds) {
 
 			@Override
 			protected void validateWorldPosition() {

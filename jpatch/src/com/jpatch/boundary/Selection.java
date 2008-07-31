@@ -41,7 +41,7 @@ public class Selection {
 				startPositions[i] = new Point3d();
 				vertex.getPosition(startPositions[i]);
 				startTuples[i] = new Point3d();
-				vertex.getPos(startTuples[i]);
+				vertex.getPosition(startTuples[i]);
 				i++;
 			}
 		}

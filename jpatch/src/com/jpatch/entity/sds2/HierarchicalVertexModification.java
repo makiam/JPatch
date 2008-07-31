@@ -4,38 +4,28 @@ import com.jpatch.afw.*;
 
 import java.io.*;
 
-public class HierarchicalVertexModification {
-	private double dx, dy, dz;
-	private double cornerSharpness;
+import javax.vecmath.*;
+
+public final class HierarchicalVertexModification {
+	Vector3d displacementVector = new Vector3d();
+	double cornerSharpness;
 	
-	public HierarchicalVertexModification(double dx, double dy, double dz, double cornerSharpness) {
-		this.dx = dx;
-		this.dy = dy;
-		this.dz = dz;
-		this.cornerSharpness = cornerSharpness;
-	}
-	
-	public void applyTo(DerivedVertex vertex) {
-		vertex.setDisplacement(dx, dy, dz);
-		vertex.getCornerSharpnessAttribute().setDouble(cornerSharpness);
+	boolean isDisplaced() {
+		return displacementVector.x != 0 && displacementVector.y != 0 && displacementVector.z != 0;
 	}
 	
 	public void writeXml(XmlWriter xmlWriter, int[] hierarchyId) throws IOException {
-		xmlWriter.startElement("hierarchyvertex");
-		xmlWriter.startElement("hierarchy");
+		xmlWriter.startElement("hierarchyVertex");
+		xmlWriter.startElement("hierarchyPath");
 		xmlWriter.intArray(hierarchyId);
 		xmlWriter.endElement();
-		if (dx != 0 || dy != 0 || dz != 0) {
+		if (isDisplaced()) {
 			xmlWriter.startElement("displacement");
-			xmlWriter.characters(Double.toString(dx));
-			xmlWriter.characters(" ");
-			xmlWriter.characters(Double.toString(dy));
-			xmlWriter.characters(" ");
-			xmlWriter.characters(Double.toString(dz));
+			xmlWriter.writeTuple(displacementVector);
 			xmlWriter.endElement();
 		}
 		if (cornerSharpness > 0) {
-			xmlWriter.startElement("cornersharpness");
+			xmlWriter.startElement("cornerSharpness");
 			xmlWriter.characters(Double.toString(cornerSharpness));
 			xmlWriter.endElement();
 		}
