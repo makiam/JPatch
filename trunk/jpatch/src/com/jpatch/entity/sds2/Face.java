@@ -41,7 +41,6 @@ public class Face {
 	}
 	
 	public Face(Material material, HalfEdge[] edges, Face parentFace, int edgeIndex) {
-		
 //		System.out.println("Face constructor called for edges " + Arrays.toString(edges));
 		int sides = edges.length;
 		assert sides >= 3 : "edges.length=" + edges.length + ", must be >= 3";
@@ -334,7 +333,9 @@ public class Face {
 	
 	public DerivedVertex createFacePoint() {
 		assert facePoint == null;
-		facePoint = new DerivedVertex() {
+		Sds sds = faceEdges[0].getVertex().sds;
+		
+		facePoint = new DerivedVertex(sds) {
 			@Override
 			void validateWorldPosition() {
 				if (!worldPositionValid) {

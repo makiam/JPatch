@@ -56,6 +56,12 @@ public class JPatchFormContainer {
 	};
 	
 	public JPatchFormContainer(String title, BooleanAttr expansionControl) {
+		this.title = title;
+		if (expansionControl != null) {
+			expandedAttr = expansionControl;
+		} else {
+			expandedAttr = new BooleanAttr();
+		}
 		component.setLayout(new BoxLayout(component, BoxLayout.Y_AXIS));
 		titleBar.add(expandedButton, BorderLayout.WEST);
 		expandedButton.setFont(LABEL_FONT);
@@ -120,12 +126,7 @@ public class JPatchFormContainer {
 			
 		});
 		
-		this.title = title;
-		if (expansionControl != null) {
-			expandedAttr = expansionControl;
-		} else {
-			expandedAttr = new BooleanAttr();
-		}
+		
 		expandedAttr.addAttributePostChangeListener(expansionListener);
 		expandedButton.setSelected(expandedAttr.getBoolean());
 		expandedButton.addActionListener(new ActionListener() {

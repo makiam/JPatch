@@ -8,47 +8,48 @@ import java.util.*;
 import javax.vecmath.*;
 
 public abstract class DerivedVertex extends AbstractVertex {
+	private HierarchicalVertexModification hierarchicalVertexModification;
+	
+	DerivedVertex(Sds sds) {
+		super(sds);
+	}
 	
 	@Override
 	public void setPosition(double x, double y, double z) {
 		validateInvDisplacementMatrix();
-		displacementVector.set(x - worldPosition.x, y - worldPosition.y, z - worldPosition.z);
-//		invDisplacementMatrix.transform(displacementVector);
-//		positionAttr.setTuple(displacementVector);
-		setPos(displacementVector.x, displacementVector.y, displacementVector.z);
+		if (hierarchicalVertexModification == null) {
+			hierarchicalVertexModification = sds.createHierarchyModification(generateId());
+		}
+		validateInvDisplacementMatrix();
+		hierarchicalVertexModification.displacementVector.set(x - worldPosition.x, y - worldPosition.y, z - worldPosition.z);
+		invDisplacementMatrix.transform(hierarchicalVertexModification.displacementVector);
+		worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
+		invalidate();
 	}
 	
-	@Override
-	public void setPos(double x, double y, double z) {
-		setDisplacement(x, y, z);
-	}
-	
-	@Override
-	public void getPos(Tuple3d pos) {
-		//TODO: implement
-	}
-	
-	public void writeXml(XmlWriter xmlWriter) throws IOException {
-//		if (isDisplaced || cornerSharpnessAttr.getDouble() != 0) {
-		if (isDisplaced) {
-			xmlWriter.startElement("hierarchyvertex");
-			xmlWriter.startElement("hierarchy");
-			xmlWriter.intArray(generateId());
-			xmlWriter.endElement();
-			if (isDisplaced) {
-				xmlWriter.startElement("displacement");
-				xmlWriter.writeTuple(displacementVector);
-				xmlWriter.endElement();
+//	@Override
+//	public void setPos(double x, double y, double z) {
+//		setDisplacement(x, y, z);
+//	}
+//	
+//	@Override
+//	public void getPos(Tuple3d pos) {
+//		//TODO: implement
+//	}
+	void validateDisplacedPosition() {
+		if (!displacedPositionValid) {
+			if (hierarchicalVertexModification != null && hierarchicalVertexModification.isDisplaced()) {
+				validateWorldLimit();	// this also validates position
+				displacementMatrix.transform(morphDisplacementVector, transformedDisplacementVector);
+				displacedPosition.add(worldPosition, transformedDisplacementVector);	
+			} else {
+				validateWorldPosition();
+				displacedPosition.set(worldPosition);
 			}
-//			if (cornerSharpnessAttr.getDouble() > 0) {
-//				xmlWriter.startElement("cornersharpness");
-//				xmlWriter.characters(Double.toString(cornerSharpnessAttr.getDouble()));
-//				xmlWriter.endElement();
-//			}
-			xmlWriter.endElement();
+			displacedPositionValid = true;
 		}
 	}
-	
+
 	public int[] generateId() {
 		for (HalfEdge edge : vertexEdges) {
 			if (edge.getFace() != null) {

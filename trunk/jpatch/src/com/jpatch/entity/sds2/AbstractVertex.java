@@ -31,7 +31,7 @@ public abstract class AbstractVertex {
 	final Matrix3d displacementMatrix = new Matrix3d();
 	final Matrix3d invDisplacementMatrix = new Matrix3d();
 	
-	final Vector3d displacementVector = new Vector3d();
+	final Vector3d morphDisplacementVector = new Vector3d();
 	final Vector3d transformedDisplacementVector = new Vector3d();
 	
 	HalfEdge[] vertexEdges = new HalfEdge[0];
@@ -40,10 +40,8 @@ public abstract class AbstractVertex {
 	private DerivedVertex vertexPoint;
 	private BoundaryType boundaryType;
 	
-	boolean isDisplaced;
-	
 	boolean worldPositionValid;
-	private boolean displacedPositionValid;
+	boolean displacedPositionValid;
 	
 	private boolean worldLimitValid;
 	boolean displacedLimitValid;
@@ -51,7 +49,12 @@ public abstract class AbstractVertex {
 	private boolean invDisplacementMatrixValid;
 	double sharpnessValue;
 	
-	AbstractVertex() {
+	final Sds sds;
+	
+	AbstractVertex(Sds sds) {
+		this.sds = sds;
+	}
+	
 //		positionAttr.suppressChangeNotification(true);
 //		positionAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
 //			public void attributeHasChanged(Attribute source) {
@@ -71,7 +74,7 @@ public abstract class AbstractVertex {
 //			}
 //		});
 //		cornerSharpnessAttr.suppressChangeNotification(false);
-	}
+//	}
 	
 //	public final Tuple3Attr getPositionAttribute() {
 //		return positionAttr;
@@ -91,29 +94,13 @@ public abstract class AbstractVertex {
 		setPosition(p.x, p.y, p.z);
 	}
 	
-	public void setPosition(double x, double y, double z) {
-//		positionAttr.setTuple(x, y, z);
-		setPos(x, y, z);
-	}
+	public abstract void setPosition(double x, double y, double z);
 	
-	public abstract void setPos(double x, double y, double z);
+//	public abstract void setPos(double x, double y, double z);
+//	
+//	public abstract void getPos(Tuple3d pos);
 	
-	public abstract void getPos(Tuple3d pos);
 	
-	final void setDisplacement(double x, double y, double z) {
-		if (x == 0 && y == 0 && z == 0) {
-			worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
-			invalidate();
-			isDisplaced = false;
-		} else {
-			validateInvDisplacementMatrix();
-			displacementVector.set(x, y, z);
-			invDisplacementMatrix.transform(displacementVector);
-			worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
-			invalidate();
-			isDisplaced = true;
-		}
-	}
 	
 	public double getCornerSharpness() {
 		return sharpnessValue;
@@ -149,7 +136,7 @@ public abstract class AbstractVertex {
 	
 	public final DerivedVertex createVertexPoint() {
 		assert vertexPoint == null;
-		vertexPoint = new DerivedVertex() {
+		vertexPoint = new DerivedVertex(sds) {
 			
 			@Override
 			public double getCornerSharpness() {
@@ -254,18 +241,10 @@ public abstract class AbstractVertex {
 //		}
 //	}
 	
-	final void validateDisplacedPosition() {
-		if (!displacedPositionValid) {
-			if (isDisplaced) {
-				validateWorldLimit();	// this also validates position
-				displacementMatrix.transform(displacementVector, transformedDisplacementVector);
-				displacedPosition.add(worldPosition, transformedDisplacementVector);	
-			} else {
-				validateWorldPosition();
-				displacedPosition.set(worldPosition);
-			}
-			displacedPositionValid = true;
-		}
+	void validateDisplacedPosition() {
+		validateWorldPosition();
+		displacedPosition.set(worldPosition);
+		displacedPositionValid = true;
 	}
 	
 	final void validateWorldLimit() {
@@ -727,8 +706,6 @@ public abstract class AbstractVertex {
 	@Override
 	public abstract String toString();
 	
-	public abstract void writeXml(XmlWriter xmlWriter) throws IOException;
-	
 	public class ChangePositionEdit extends AbstractSwapEdit {
 		private final Tuple3d pos = new Point3d();
 		public ChangePositionEdit(Tuple3d pos, boolean changeNow) {
@@ -741,8 +718,8 @@ public abstract class AbstractVertex {
 			double x = pos.x;
 			double y = pos.y;
 			double z = pos.z;
-			getPos(pos);
-			setPos(x, y, z);
+//			getPos(pos);
+//			setPos(x, y, z);
 		}
 	}
 }

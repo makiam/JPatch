@@ -90,6 +90,7 @@ public class PlatformUtils {
 		if (platform != Platform.MAC_OS_X) {
 			try {
 				UIManager.setLookAndFeel("com.jpatch.afw.ui.laf.JPatchLookAndFeel");
+//				UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 //				UIManager.setLookAndFeel("jpatch.boundary.laf.SmoothLookAndFeel");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
