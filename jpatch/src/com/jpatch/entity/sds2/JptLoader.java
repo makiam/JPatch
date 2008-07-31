@@ -80,7 +80,7 @@ public class JptLoader {
 					Collections.reverse(vertexList);
 					BaseVertex[] vertices = vertexList.toArray(new BaseVertex[vertexList.size()]);
 					if (materialIndex != -1) {
-						Face face = sds.addFace(null, 0, materials.get(materialIndex), vertices);
+						sds.addFace(null, materials.get(materialIndex), vertices);
 //					if (face != null) {
 //						sds.setFaceMaterial(face, materials.get(materialIndex));
 //						face.setMaterial(materials.get(materialIndex));

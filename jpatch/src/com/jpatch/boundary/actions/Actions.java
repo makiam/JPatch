@@ -173,7 +173,7 @@ public class Actions {
 			List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
 			Operations.extrude(Main.getInstance().getSelection(), editList);
 			undoManager.addEdit("Extrude", editList);
-			toolSM.setValue(tools[5]);
+			toolSM.setValue(tools[7]);
 			Main.getInstance().repaintViewports();
 		}
 	};
@@ -200,7 +200,7 @@ public class Actions {
 		/*
 		 * configure tool statemachine
 		 */
-		toolSM.setDefaultState(tools[3]);
+		toolSM.setDefaultState(tools[7]);
 		
 //		extrudeTool.getEnabled().setBoolean(false);
 //		latheTool.getEnabled().setBoolean(false);

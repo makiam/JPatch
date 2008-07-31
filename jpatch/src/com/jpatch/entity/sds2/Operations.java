@@ -38,11 +38,11 @@ public class Operations {
 				lathedVertices[segment + 1][i + 1] = v2;
 				lathedVertices[segment + 1][i] = v3;
 				if (v0 == v3) {
-					sds.addFace(editList, 0, material, v0, v1, v2);
+					sds.addFace(editList, material, v0, v1, v2);
 				} else if (v1 == v2) {
-					sds.addFace(editList, 0, material, v0, v1, v3);
+					sds.addFace(editList, material, v0, v1, v3);
 				} else {
-					sds.addFace(editList, 0, material, v0, v1, v2, v3);
+					sds.addFace(editList, material, v0, v1, v2, v3);
 				}
 			}
 		}
@@ -141,7 +141,7 @@ public class Operations {
 			faceVertices[2] = boundaryVertices.get(edgeVertices[1]);
 			faceVertices[3] = boundaryVertices.get(edgeVertices[0]);
 			System.out.println(Arrays.toString(faceVertices));
-			sds.addFace(editList, 0, material, faceVertices);
+			sds.addFace(editList, material, faceVertices);
 		}
 		
 		/* change selection */
@@ -250,12 +250,12 @@ public class Operations {
 					vertices[i] = faceEdges[vertices.length - i - 1].getVertex();
 				}
 				Material material = boundaryFace.getMaterial();
-				sds.removeFace(editList, 0, boundaryFace);
-				sds.addFace(editList, 0, material, vertices);
+				sds.removeFace(editList, boundaryFace);
+				sds.addFace(editList, material, vertices);
 			} else {
-				sds.removeFace(editList, 0, boundaryFace);
+				sds.removeFace(editList, boundaryFace);
 			}
-			sds.addFace(editList, 0, boundaryFace.getMaterial(), newVertices);
+			sds.addFace(editList, boundaryFace.getMaterial(), newVertices);
 		}
 		
 		/* create extrude-faces */
@@ -265,7 +265,7 @@ public class Operations {
 			newVertices[1] = boundaryEdge.getPairVertex();
 			newVertices[2]  = boundaryVertices.get(boundaryEdge.getPairVertex());
 			newVertices[3]  = boundaryVertices.get(boundaryEdge.getVertex());
-			sds.addFace(editList, 0, boundaryEdges.get(boundaryEdge), newVertices);
+			sds.addFace(editList, boundaryEdges.get(boundaryEdge), newVertices);
 		}
 		
 		/* change selection */
