@@ -45,8 +45,8 @@ public class Sds {
 	private final Set<HalfEdge> strayEdges = new HashSet<HalfEdge>();
 	private final Set<BaseVertex> strayVertices = new HashSet<BaseVertex>();
 	private final Set<BaseVertex[]> strayFaces = new HashSet<BaseVertex[]>();
-	private final Map<EdgeKey, HalfEdge>[] edgeMaps = new Map[SdsConstants.MAX_LEVEL + 1];
-	private final Set<HierarchicalVertexModification>[] hierarchy = new Set[SdsConstants.MAX_LEVEL + 1];
+	private final Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
+	private final Set<Displacement>[] hierarchy = new Set[SdsConstants.MAX_LEVEL + 1];
 	
 	private boolean facesSorted;
 	
@@ -57,8 +57,7 @@ public class Sds {
 		for (int i = 0; i < faceSets.length; i++) {
 			faceSets[i] = new HashSet<Face>();
 			faceLists[i] = new ArrayList<Face>();
-			edgeMaps[i] = new HashMap<EdgeKey, HalfEdge>();
-			hierarchy[i] = new HashSet<HierarchicalVertexModification>();
+			hierarchy[i] = new HashSet<Displacement>();
 		}
 		
 		/* add or remove faces on new (old) levels when maxLevel changes */
@@ -110,7 +109,7 @@ public class Sds {
 	
 	public void addSegment(List<JPatchUndoableEdit> editList, AbstractVertex vertex0, AbstractVertex vertex1) {
 		edgeKey.set(vertex0, vertex1);
-		assert (!edgeMaps[0].containsKey(edgeKey));
+		assert (!edgeMap.containsKey(edgeKey));
 		HalfEdge edge = new HalfEdge(vertex0, vertex1);
 //		JPatchUndoableEdit addEdgeEdit = new AddEdgeEdit(edge, 0);
 		JPatchUndoableEdit addStrayEdgeEdit = new AddStrayEdgeEdit(edge);
@@ -132,14 +131,14 @@ public class Sds {
 		}
 	}
 	
-	public HierarchicalVertexModification createHierarchyModification(int[] path) {
+	public Displacement createHierarchyModification(int[] path) {
 		int level = path.length - 2;
-		HierarchicalVertexModification hierarchicalVertexModification = new HierarchicalVertexModification(path);
+		Displacement hierarchicalVertexModification = new Displacement(path);
 		hierarchy[level].add(hierarchicalVertexModification);
 		return hierarchicalVertexModification;
 	}
 	
-	public void discardHierarchicalVertexModification(HierarchicalVertexModification hierarchicalVertexModification) {
+	public void discardHierarchicalVertexModification(Displacement hierarchicalVertexModification) {
 		int level = hierarchicalVertexModification.hierarchyPath.length - 2;
 		assert hierarchy[level].contains(hierarchicalVertexModification);
 		hierarchy[level].remove(hierarchicalVertexModification);
@@ -166,31 +165,25 @@ public class Sds {
 		}
 	}
 	
-	private Face createFace(int level, Face parent, int edgeIndex, Material material, AbstractVertex... invertices) {
+	private Face createFace(int level, Face parent, int edgeIndex, Material material, HalfEdge... edges) {
 		assert level > 0;
-		AbstractVertex[] vertices = invertices.clone();
-		HalfEdge[] edges = new HalfEdge[vertices.length];
-
+		assert parent != null;
 //		System.out.print("add face called: ");
 //		for (AbstractVertex vertex : vertices) {
 //			System.out.print(vertex + " ");
 //		}
 //		System.out.println();
 		
-		for (int i = 0; i < vertices.length; i++) {
-			int j = i + 1;
-			if (j == vertices.length) {
-				j = 0;
-			}
-			edges[i] = getHalfEdge(vertices[i], vertices[j], level);
-		}
+//		for (int i = 0; i < vertices.length; i++) {
+//			int j = i + 1;
+//			if (j == vertices.length) {
+//				j = 0;
+//			}
+//			edges[i] = getHalfEdge(vertices[i], vertices[j]);
+//		}
 		
-		Face face;
-		if (parent == null) {
-			face = new Face(material, edges);
-		} else {
-			face = new Face(material, edges, parent, edgeIndex);
-		}
+		Face face = new Face(material, edges, parent, edgeIndex);
+		
 //		if (level == 0) System.out.println(this + " adding face " + face);
 		
 		assert !faceSets[level].contains(face) : "Face " + face + " has already been added to " + Sds.this + " at level " + level;
@@ -286,12 +279,33 @@ public class Sds {
 	
 	private void subdivideFace(int level, Face face) {
 		HalfEdge[] edges = face.getEdges();
-		AbstractVertex v0 = face.createFacePoint();
+		HalfEdge[] hubEdges = new HalfEdge[face.getSides()];
+		HalfEdge[] newEdges = new HalfEdge[4];
+		
+		AbstractVertex facePoint = face.createFacePoint();
 		for (int i = 0; i < edges.length; i++) {
-			AbstractVertex v1 = edges[i].getPrev().getEdgePoint() == null ? edges[i].getPrev().createEdgePoint() : edges[i].getPrev().getEdgePoint();
-			AbstractVertex v2 = edges[i].getVertex().getVertexPoint() == null ? edges[i].getVertex().createVertexPoint() : edges[i].getVertex().getVertexPoint();
-			AbstractVertex v3 = edges[i].getEdgePoint() == null ? edges[i].createEdgePoint() : edges[i].getEdgePoint();
-			createFace(level + 1, face, i, face.getMaterial(), v0, v1, v2, v3);
+			if (edges[i].getVertex().getVertexPoint() == null) {
+				edges[i].getVertex().createVertexPoint();
+			}
+		}
+		for (int i = 0; i < edges.length; i++) {
+			DerivedVertex edgePoint = edges[i].getEdgePoint();
+			if (edgePoint == null) {
+				edgePoint = edges[i].createEdgePoint();
+			}
+			hubEdges[i] = new HalfEdge(facePoint, edgePoint);
+		}
+		for (int i = 0; i < edges.length; i++) {
+			int j = (i == edges.length - 1) ? 0 : i + 1;
+			newEdges[0] = hubEdges[i];
+			newEdges[1] = edges[i].getPair().getSubEdge().getPair();
+			newEdges[2] = edges[j].getSubEdge();
+			newEdges[3] = hubEdges[j].getPair();
+			createFace(level + 1, face, i, face.getMaterial(), newEdges);
+//			AbstractVertex v1 = edges[i].getPrev().getEdgePoint();
+//			AbstractVertex v2 = edges[i].getVertex().getVertexPoint();
+//			AbstractVertex v3 = edges[i].getEdgePoint();
+//			createFace(level + 1, face, i, face.getMaterial(), v0, v1, v2, v3);
 		}
 	}
 	
@@ -326,7 +340,7 @@ public class Sds {
 			if (j == vertices.length) {
 				j = 0;
 			}
-			edges[i] = getHalfEdge(vertices[i], vertices[j], 0);
+			edges[i] = getHalfEdge(vertices[i], vertices[j]);
 		}
 		
 		Face face = new Face(material, edges);
@@ -342,8 +356,8 @@ public class Sds {
 	private void discardFace(int level, Face face) {
 		for (HalfEdge edge: face.getEdges()) {
 			assert edge.getFace() == face;
-			if (edge.getPairFace() == null) {
-				discardEdge(level, edge);
+			if (level == 0 && edge.getPairFace() == null) {
+				discardEdge(edge);
 			} else {
 				edge.setFace(null);
 			}
@@ -362,17 +376,14 @@ public class Sds {
 		}
 	}
 	
-	private void discardEdge(int level, HalfEdge edge) {
-		AbstractVertex v0 = edge.getVertex();
-		AbstractVertex v1 = edge.getPairVertex();
+	private void discardEdge(HalfEdge edge) {
 		edgeKey.set(edge.getVertex(), edge.getPairVertex());
-		assert edgeMaps[level].containsKey(edgeKey);
-		edgeMaps[level].remove(edgeKey);
+		assert edgeMap.containsKey(edgeKey);
+		edgeMap.remove(edgeKey);
 		edgeKey.swap();
-		assert edgeMaps[level].containsKey(edgeKey);
-		edgeMaps[level].remove(edgeKey);
-		v0.removeEdge(edge);
-		v1.removeEdge(edge.getPair());
+		assert edgeMap.containsKey(edgeKey);
+		edgeMap.remove(edgeKey);
+		edge.dispose();
 	}
 	
 //	public void removeFace(List<JPatchUndoableEdit> editList, int level, Face face) {
@@ -714,20 +725,20 @@ public class Sds {
 	 * @param vertex1
 	 * @return
 	 */
-	private HalfEdge getHalfEdge(AbstractVertex vertex0, AbstractVertex vertex1, int level) {
+	private HalfEdge getHalfEdge(AbstractVertex vertex0, AbstractVertex vertex1) {
 		assert vertex0 != vertex1 : "Vertices are identical: " + vertex0;
 		/* check if the HalfEdge (v0->v1) already exists */
 		edgeKey.set(vertex0, vertex1);
-		HalfEdge edge = edgeMaps[level].get(edgeKey);
+		HalfEdge edge = edgeMap.get(edgeKey);
 		if (edge == null) {
 //			System.out.println("create new edge " + vertex0 + "-" + vertex1);
 			/* if no edge is found, create a new one and store it in the maps */
 			edge = new HalfEdge(vertex0, vertex1);
 			
-			assert !edgeMaps[level].containsKey(edgeKey) : "HalfEdge " + edge + " already in SDS";
-			edgeMaps[level].put(edgeKey.clone(), edge);
+			assert !edgeMap.containsKey(edgeKey) : "HalfEdge " + edge + " already in SDS";
+			edgeMap.put(edgeKey.clone(), edge);
 			edgeKey.swap();
-			edgeMaps[level].put(edgeKey.clone(), edge.getPair());
+			edgeMap.put(edgeKey.clone(), edge.getPair());
 		}
 		return edge;
 	}

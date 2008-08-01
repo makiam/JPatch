@@ -7,13 +7,26 @@ import java.util.*;
 
 import javax.vecmath.*;
 
-public final class HierarchicalVertexModification {
-	Vector3d displacementVector = new Vector3d();
+public final class Displacement {
 	double cornerSharpness;
 	final int[] hierarchyPath;
 	final int hashCode;
 	
-	public HierarchicalVertexModification(int[] hierarchyPath) {
+	final Point3d displacedPosition = new Point3d();
+	final Point3d displacedLimit = new Point3d();
+	final Vector3d displacedNormal = new Vector3d();
+	
+	final Matrix3d displacementMatrix = new Matrix3d();
+	final Matrix3d invDisplacementMatrix = new Matrix3d();
+	
+	final Vector3d displacementVector = new Vector3d();
+	final Vector3d transformedDisplacementVector = new Vector3d();
+	
+	boolean displacedPositionValid;
+	boolean displacedLimitValid;
+	boolean invDisplacementMatrixValid;
+	
+	public Displacement(int[] hierarchyPath) {
 		this.hierarchyPath = hierarchyPath.clone();
 		hashCode = Arrays.hashCode(hierarchyPath);
 	}
@@ -42,8 +55,8 @@ public final class HierarchicalVertexModification {
 	
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof HierarchicalVertexModification) {
-			return Arrays.equals(hierarchyPath, ((HierarchicalVertexModification) o).hierarchyPath);
+		if (o instanceof Displacement) {
+			return Arrays.equals(hierarchyPath, ((Displacement) o).hierarchyPath);
 		}
 		return false;
 	}

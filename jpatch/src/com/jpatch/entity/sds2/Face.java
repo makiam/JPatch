@@ -147,12 +147,12 @@ public class Face {
 			for (HalfEdge edge : faceEdges) {
 				AbstractVertex v = edge.getVertex();
 				v.validateDisplacedLimit();
-				limitSurfaceBuffer.put((float) v.displacedNormal.x);
-				limitSurfaceBuffer.put((float) v.displacedNormal.y);
-				limitSurfaceBuffer.put((float) v.displacedNormal.z);
-				limitSurfaceBuffer.put((float) v.displacedLimit.x);
-				limitSurfaceBuffer.put((float) v.displacedLimit.y);
-				limitSurfaceBuffer.put((float) v.displacedLimit.z);
+				limitSurfaceBuffer.put((float) v.getNormal().x);
+				limitSurfaceBuffer.put((float) v.getNormal().y);
+				limitSurfaceBuffer.put((float) v.getNormal().z);
+				limitSurfaceBuffer.put((float) v.getLimit().x);
+				limitSurfaceBuffer.put((float) v.getLimit().y);
+				limitSurfaceBuffer.put((float) v.getLimit().z);
 			}
 			limitSurfaceValid = true;
 		}
@@ -179,17 +179,17 @@ public class Face {
 				controlSurfaceBuffer.put(nx);
 				controlSurfaceBuffer.put(ny);
 				controlSurfaceBuffer.put(nz);
-				controlSurfaceBuffer.put((float) v.displacedPosition.x);
-				controlSurfaceBuffer.put((float) v.displacedPosition.y);
-				controlSurfaceBuffer.put((float) v.displacedPosition.z);
+				controlSurfaceBuffer.put((float) v.getPos().x);
+				controlSurfaceBuffer.put((float) v.getPos().y);
+				controlSurfaceBuffer.put((float) v.getPos().z);
 			}
 			AbstractVertex v = faceEdges[0].getVertex();
 			controlSurfaceBuffer.put(nx);
 			controlSurfaceBuffer.put(ny);
 			controlSurfaceBuffer.put(nz);
-			controlSurfaceBuffer.put((float) v.displacedPosition.x);
-			controlSurfaceBuffer.put((float) v.displacedPosition.y);
-			controlSurfaceBuffer.put((float) v.displacedPosition.z);
+			controlSurfaceBuffer.put((float) v.getPos().x);
+			controlSurfaceBuffer.put((float) v.getPos().y);
+			controlSurfaceBuffer.put((float) v.getPos().z);
 			
 			controlSurfaceValid = true;
 		}
@@ -202,7 +202,9 @@ public class Face {
 			facePoint.invalidate();
 		}
 		for (HalfEdge edge : faceEdges) {
-			edge.getVertex().displacedLimitValid = false;
+			if (edge.getVertex().displacement != null) {
+				edge.getVertex().displacement.displacedLimitValid = false;
+			}
 			if (edge.getVertex().getVertexPoint() != null) {
 				edge.getVertex().getVertexPoint().invalidate();
 			}
@@ -250,7 +252,7 @@ public class Face {
 			for (HalfEdge edge : faceEdges) {
 				AbstractVertex vertex = edge.getVertex();
 				vertex.validateDisplacedPosition();
-				Point3d p = vertex.displacedPosition;
+				Point3d p = vertex.getPos();
 				x += p.x;
 				y += p.y;
 				z += p.z;
@@ -305,7 +307,7 @@ public class Face {
 		double vx = 0, vy = 0, vz = 0;
 		final double[] cosinusTable = SdsConstants.COSINUS[faceEdges.length];
 		for (int i = 0; i < faceEdges.length; i++) {
-			final Point3d p = faceEdges[i].getVertex().displacedPosition;
+			final Point3d p = faceEdges[i].getVertex().getPos();
 			dx = p.x - displacedMidpointPosition.x;
 			dy = p.y - displacedMidpointPosition.y;
 			dz = p.z - displacedMidpointPosition.z;

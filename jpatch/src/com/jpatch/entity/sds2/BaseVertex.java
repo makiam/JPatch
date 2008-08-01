@@ -40,7 +40,7 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 		validateInvTransformMatrix();
 		worldPosition.set(x, y, z);
 		invTransformMatrix.transform(worldPosition, localPosition);
-		worldPositionValid = true;
+		worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
 		invalidate();
 	}
 	
