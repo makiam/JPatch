@@ -602,10 +602,9 @@ public class Viewport implements NamedObject {
 			setMaterial(gl, GL_FRONT, meshMaterial);
 			gl.glBegin(GL_LINES);
 			int levelsToGo = level - editLevel;
-			HalfEdge[] subEdges = new HalfEdge[2];
 			for (HalfEdge edge : sds.getEdges(editLevel, false)) {
 				if (edge.isPrimary() || edge.getPairFace() == null) {
-					drawEdgeLimit(gl, p, levelsToGo, edge, subEdges);
+					drawEdgeLimit(gl, p, levelsToGo, edge);
 				}
 			}
 			gl.glEnd();
@@ -727,14 +726,16 @@ public class Viewport implements NamedObject {
 		drawable.getContext().release();
 	}
 	
-	private static void drawEdgeLimit(GL gl, Tuple3f p, int levelsToGo, HalfEdge edge, HalfEdge[] subEdges) {
+	private static void drawEdgeLimit(GL gl, Tuple3f p, int levelsToGo, HalfEdge edge) {
 		if (levelsToGo > 0) {
-			Face face = edge.getFace();
-			face.getSubEdges(edge.getFaceEdgeIndex(), subEdges);
-			HalfEdge edge0 = subEdges[0];
-			HalfEdge edge1 = subEdges[1];
-			drawEdgeLimit(gl, p, levelsToGo - 1, edge0, subEdges);
-			drawEdgeLimit(gl, p, levelsToGo - 1, edge1, subEdges);
+//			Face face = edge.getFace();
+//			face.getSubEdges(edge.getFaceEdgeIndex(), subEdges);
+//			HalfEdge edge0 = subEdges[0];
+//			HalfEdge edge1 = subEdges[1];
+//			drawEdgeLimit(gl, p, levelsToGo - 1, edge0, subEdges);
+//			drawEdgeLimit(gl, p, levelsToGo - 1, edge1, subEdges);
+			drawEdgeLimit(gl, p, levelsToGo - 1, edge.getSubEdge());
+			drawEdgeLimit(gl, p, levelsToGo - 1, edge.getPair().getSubEdge());
 		} else {
 			edge.getVertex().getNormal(p);
 			gl.glNormal3d(p.x, p.y, p.z);

@@ -20,6 +20,7 @@ public class HalfEdge {
 	
 	private HalfEdge next;
 	private HalfEdge prev;
+	private HalfEdge subEdge;
 	private Face face;
 	int faceEdgeIndex;
 	private int boundaryType = STRAY;
@@ -37,6 +38,11 @@ public class HalfEdge {
 		this.pair = pair;
 		this.primary = false;
 		v.addEdge(this);
+	}
+	
+	public void dispose() {
+		vertex.removeEdge(this);
+		pair.dispose();
 	}
 	
 	public AbstractVertex getVertex() {
@@ -132,10 +138,15 @@ public class HalfEdge {
 	
 	public void disposeEdgePoint() {
 		edgePoint = null;
+		subEdge = null;
+		pair.subEdge = null;
 	}
 	
 	public DerivedVertex createEdgePoint() {
 		assert edgePoint == null;
+		assert subEdge == null;
+		assert pair.subEdge == null;
+		
 		Sds sds = vertex.sds;
 		edgePoint = new DerivedVertex(sds) {
 
@@ -143,8 +154,8 @@ public class HalfEdge {
 			protected void validateWorldPosition() {
 				vertex.validateDisplacedPosition();
 				pair.vertex.validateDisplacedPosition();
-				Point3d e0 = vertex.displacedPosition;
-				Point3d e1 = pair.vertex.displacedPosition;
+				Point3d e0 = vertex.getPos();
+				Point3d e1 = pair.vertex.getPos();
 				switch (boundaryType) {
 				case REGULAR:
 					face.getFacePoint().validateWorldPosition();
@@ -170,11 +181,18 @@ public class HalfEdge {
 			}
 		};
 		pair.edgePoint = edgePoint;
+		
+		subEdge = new HalfEdge(vertex.getVertexPoint(), edgePoint);
+		pair.subEdge = new HalfEdge(pair.vertex.getVertexPoint(), edgePoint);
 		return edgePoint;
 	}
 	
 	public DerivedVertex getEdgePoint() {
 		return edgePoint;
+	}
+	
+	public HalfEdge getSubEdge() {
+		return subEdge;
 	}
 	
 	public String toString() {

@@ -8,7 +8,6 @@ import java.util.*;
 import javax.vecmath.*;
 
 public abstract class DerivedVertex extends AbstractVertex {
-	private HierarchicalVertexModification hierarchicalVertexModification;
 	
 	DerivedVertex(Sds sds) {
 		super(sds);
@@ -17,25 +16,26 @@ public abstract class DerivedVertex extends AbstractVertex {
 	@Override
 	public void setPosition(double x, double y, double z) {
 		validateInvDisplacementMatrix();
-		if (hierarchicalVertexModification == null) {
-			hierarchicalVertexModification = sds.createHierarchyModification(generateId());
+		if (displacement == null) {
+			setDisplacement(sds.createHierarchyModification(generateId()));
 		}
 		validateInvDisplacementMatrix();
-		hierarchicalVertexModification.displacementVector.set(x - worldPosition.x, y - worldPosition.y, z - worldPosition.z);
-		invDisplacementMatrix.transform(hierarchicalVertexModification.displacementVector);
+		displacement.displacementVector.set(x - worldPosition.x, y - worldPosition.y, z - worldPosition.z);
+		displacement.invDisplacementMatrix.transform(displacement.displacementVector);
 		worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
 		invalidate();
 	}
 	
-	public void discardHierarchyModification() {
-		assert hierarchicalVertexModification != null;
-		sds.discardHierarchicalVertexModification(hierarchicalVertexModification);
-		hierarchicalVertexModification = null;
+	public void discardDisplacement() {
+		assert displacement != null;
+		sds.discardHierarchicalVertexModification(displacement);
+		displacement = null;
 	}
 	
-	public void setHierarchyModification(HierarchicalVertexModification hierarchyVertexMod) {
-		assert Arrays.equals(generateId(), hierarchyVertexMod.hierarchyPath);
-		this.hierarchicalVertexModification = hierarchyVertexMod;
+	public void setDisplacement(Displacement displacement) {
+		assert Arrays.equals(generateId(), displacement.hierarchyPath);
+		this.displacement = displacement;
+		worldLimitValid = false;
 	}
 	
 //	@Override
@@ -48,18 +48,20 @@ public abstract class DerivedVertex extends AbstractVertex {
 //		//TODO: implement
 //	}
 	void validateDisplacedPosition() {
-		if (!displacedPositionValid) {
+		if (displacement != null && !displacement.displacedPositionValid) {
 //			System.out.println(this + ".validateDisplacedPosition() called, displacedPositionValid=" + displacedPositionValid);
 //			System.out.println("hierarchicalVertexModification=" + hierarchicalVertexModification);
-			if (hierarchicalVertexModification != null && hierarchicalVertexModification.isDisplaced()) {
+			if (displacement.isDisplaced()) {
 				validateWorldLimit();	// this also validates position
-				displacementMatrix.transform(hierarchicalVertexModification.displacementVector, transformedDisplacementVector);
-				displacedPosition.add(worldPosition, transformedDisplacementVector);	
+				displacement.displacementMatrix.transform(displacement.displacementVector, displacement.transformedDisplacementVector);
+				displacement.displacedPosition.add(worldPosition, displacement.transformedDisplacementVector);	
 			} else {
 				validateWorldPosition();
-				displacedPosition.set(worldPosition);
+				displacement.displacedPosition.set(worldPosition);
 			}
-			displacedPositionValid = true;
+			displacement.displacedPositionValid = true;
+		} else {
+			validateWorldPosition();
 		}
 	}
 

@@ -2,13 +2,9 @@ package com.jpatch.entity.sds2;
 
 import static com.jpatch.entity.sds2.SdsWeights.*;
 
-import java.io.*;
 import java.util.*;
 
-import com.jpatch.afw.*;
-import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
-import com.jpatch.afw.ui.*;
 
 import javax.vecmath.*;
 
@@ -24,15 +20,16 @@ public abstract class AbstractVertex {
 	final Point3d worldLimit = new Point3d();			// limit in world space
 	final Vector3d worldNormal = new Vector3d();		// normal in world space
 	
-	final Point3d displacedPosition = new Point3d();
-	final Point3d displacedLimit = new Point3d();
-	final Vector3d displacedNormal = new Vector3d();
+	Displacement displacement;
+//	final Point3d displacedPosition = new Point3d();
+//	final Point3d displacedLimit = new Point3d();
+//	final Vector3d displacedNormal = new Vector3d();
+//	
+//	final Matrix3d displacementMatrix = new Matrix3d();
+//	final Matrix3d invDisplacementMatrix = new Matrix3d();
 	
-	final Matrix3d displacementMatrix = new Matrix3d();
-	final Matrix3d invDisplacementMatrix = new Matrix3d();
-	
-	final Vector3d morphDisplacementVector = new Vector3d();
-	final Vector3d transformedDisplacementVector = new Vector3d();
+//	final Vector3d morphDisplacementVector = new Vector3d();
+//	final Vector3d transformedDisplacementVector = new Vector3d();
 	
 	HalfEdge[] vertexEdges = new HalfEdge[0];
 	HalfEdge preferredStart;
@@ -41,12 +38,12 @@ public abstract class AbstractVertex {
 	private BoundaryType boundaryType;
 	
 	boolean worldPositionValid;
-	boolean displacedPositionValid;
+//	boolean displacedPositionValid;
 	
-	private boolean worldLimitValid;
-	boolean displacedLimitValid;
+	boolean worldLimitValid;
+//	boolean displacedLimitValid;
 	
-	private boolean invDisplacementMatrixValid;
+//	private boolean invDisplacementMatrixValid;
 	double sharpnessValue;
 	
 	final Sds sds;
@@ -82,12 +79,12 @@ public abstract class AbstractVertex {
 	
 	public final void getPosition(Tuple3d position) {
 		validateDisplacedPosition();
-		position.set(displacedPosition);
+		position.set(displacement == null ? worldPosition : displacement.displacedPosition);
 	}
 	
 	public final void getPosition(Tuple3f position) {
 		validateDisplacedPosition();
-		position.set(displacedPosition);
+		position.set(displacement == null ? worldPosition : displacement.displacedPosition);
 	}
 	
 	public final void setPosition(Point3d p) {
@@ -112,26 +109,38 @@ public abstract class AbstractVertex {
 	
 	public final void getLimit(Tuple3f limit) {
 		validateDisplacedLimit();
-		limit.set(displacedLimit);
+		limit.set(displacement == null ? worldLimit : displacement.displacedLimit);
 	}
 	
 	public final void getLimit(Tuple3d limit) {
 		validateDisplacedLimit();
-		limit.set(displacedLimit);
+		limit.set(displacement == null ? worldLimit : displacement.displacedLimit);
 	}
 	
 	public final void getNormal(Tuple3f normal) {
 		validateDisplacedLimit();
-		normal.set(displacedNormal);
+		normal.set(displacement == null ? worldNormal : displacement.displacedNormal);
 	}
 	
 	public final void getNormal(Tuple3d normal) {
 		validateDisplacedLimit();
-		normal.set(displacedNormal);
+		normal.set(displacement == null ? worldNormal : displacement.displacedNormal);
 	}
 	
 	public final void disposeVertexPoint() {
 		vertexPoint = null;
+	}
+	
+	final Point3d getPos() {
+		return displacement == null ? worldPosition : displacement.displacedPosition;
+	}
+	
+	final Point3d getLimit() {
+		return displacement == null ? worldLimit : displacement.displacedLimit;
+	}
+	
+	final Vector3d getNormal() {
+		return displacement == null ? worldNormal : displacement.displacedNormal;
 	}
 	
 	public final DerivedVertex createVertexPoint() {
@@ -151,7 +160,7 @@ public abstract class AbstractVertex {
 					parentVertex.validateDisplacedPosition();
 					double cornerSharpness = parentVertex.getCornerSharpness();
 					if (cornerSharpness > 1 || parentVertex.boundaryType == BoundaryType.IRREGULAR) {
-						worldPosition.set(parentVertex.displacedPosition);
+						worldPosition.set(parentVertex.getPos());
 					} else {
 						switch (parentVertex.boundaryType) {
 						case REGULAR:
@@ -170,26 +179,26 @@ public abstract class AbstractVertex {
 								z += fp.z;
 								AbstractVertex pair = edge.getPairVertex();
 								pair.validateDisplacedPosition();
-								Point3d ep = pair.displacedPosition;
+								Point3d ep = pair.getPos();
 								x += ep.x;
 								y += ep.y;
 								z += ep.z;
 							}
 							worldPosition.set(
-									x * rimWeight + parentVertex.displacedPosition.x * centerWeight,
-									y * rimWeight + parentVertex.displacedPosition.y * centerWeight,
-									z * rimWeight + parentVertex.displacedPosition.z * centerWeight
+									x * rimWeight + parentVertex.getPos().x * centerWeight,
+									y * rimWeight + parentVertex.getPos().y * centerWeight,
+									z * rimWeight + parentVertex.getPos().z * centerWeight
 							);
 							break;
 						case BOUNDARY:
 							AbstractVertex v0 = parentVertex;
 							AbstractVertex v1 = parentVertex.vertexEdges[0].getPairVertex();
 							AbstractVertex v2 = parentVertex.vertexEdges[parentVertex.vertexEdges.length - 1].getPairVertex();
-							Point3d p0 = v0.displacedPosition;
+							Point3d p0 = v0.getPos();
 							v1.validateDisplacedPosition();
-							Point3d p1 = v1.displacedPosition;
+							Point3d p1 = v1.getPos();
 							v2.validateDisplacedPosition();
-							Point3d p2 = v2.displacedPosition;
+							Point3d p2 = v2.getPos();
 							
 							worldPosition.set(
 									p0.x * CREASE0 + (p1.x + p2.x) * CREASE1,
@@ -202,7 +211,7 @@ public abstract class AbstractVertex {
 						}
 					}
 					if (cornerSharpness > 0) {
-						worldPosition.interpolate(parentVertex.displacedPosition, cornerSharpness);
+						worldPosition.interpolate(parentVertex.getPos(), cornerSharpness);
 						System.out.println("corner");
 					}
 					worldPositionValid = true;
@@ -243,8 +252,8 @@ public abstract class AbstractVertex {
 	
 	void validateDisplacedPosition() {
 		validateWorldPosition();
-		displacedPosition.set(worldPosition);
-		displacedPositionValid = true;
+//		displacedPosition.set(worldPosition);
+//		displacedPositionValid = true;
 	}
 	
 	final void validateWorldLimit() {
@@ -377,16 +386,18 @@ public abstract class AbstractVertex {
 			double uLength = Math.sqrt(ux * ux + uy * uy + uz * uz);
 			double vLength = Math.sqrt(vx * vx + vy * vy + vz * vz);
 			double nLength = 0.5 * (uLength + vLength);
-			displacementMatrix.m00 = ux; displacementMatrix.m01 = vx; displacementMatrix.m02 = worldNormal.x * nLength;
-			displacementMatrix.m10 = uy; displacementMatrix.m11 = vy; displacementMatrix.m12 = worldNormal.y * nLength;
-			displacementMatrix.m20 = uz; displacementMatrix.m21 = vz; displacementMatrix.m22 = worldNormal.z * nLength;
-			
+			if (displacement != null) {
+				Matrix3d displacementMatrix = displacement.displacementMatrix;
+				displacementMatrix.m00 = ux; displacementMatrix.m01 = vx; displacementMatrix.m02 = worldNormal.x * nLength;
+				displacementMatrix.m10 = uy; displacementMatrix.m11 = vy; displacementMatrix.m12 = worldNormal.y * nLength;
+				displacementMatrix.m20 = uz; displacementMatrix.m21 = vz; displacementMatrix.m22 = worldNormal.z * nLength;
+			}
 			worldLimitValid = true;
 		}
 	}
 	
 	final void validateDisplacedLimit() {
-		if (!displacedLimitValid) {
+		if (displacement != null && !displacement.displacedLimitValid) {
 			validateDisplacedPosition();
 			final int valence = vertexEdges.length;
 			double ux = 0, uy = 0, uz = 0;	// u tangent
@@ -422,7 +433,7 @@ public abstract class AbstractVertex {
 					
 					AbstractVertex pair = edge.getPairVertex();
 					pair.validateDisplacedPosition();
-					Point3d edgePairPoint = edge.getPairVertex().displacedPosition;
+					Point3d edgePairPoint = edge.getPairVertex().getPos();
 					px += edgePairPoint.x;
 					py += edgePairPoint.y;
 					pz += edgePairPoint.z;
@@ -435,10 +446,10 @@ public abstract class AbstractVertex {
 					vy += faceMidpoint.y * vTangentFaceWeight[i] + edgePairPoint.y * vTangentPairWeight[i];
 					vz += faceMidpoint.z * vTangentFaceWeight[i] + edgePairPoint.z * vTangentPairWeight[i];	
 				}
-				displacedLimit.set(
-						fx * limitFaceWeight + px * limitPairWeight + displacedPosition.x * limitCenterWeight,
-						fy * limitFaceWeight + py * limitPairWeight + displacedPosition.y * limitCenterWeight,
-						fz * limitFaceWeight + pz * limitPairWeight + displacedPosition.z * limitCenterWeight
+				displacement.displacedLimit.set(
+						fx * limitFaceWeight + px * limitPairWeight + displacement.displacedPosition.x * limitCenterWeight,
+						fy * limitFaceWeight + py * limitPairWeight + displacement.displacedPosition.y * limitCenterWeight,
+						fz * limitFaceWeight + pz * limitPairWeight + displacement.displacedPosition.z * limitCenterWeight
 				);		
 				break;
 			case BOUNDARY:
@@ -446,12 +457,12 @@ public abstract class AbstractVertex {
 				AbstractVertex vertex1 = vertexEdges[vertexEdges.length - 1].getPairVertex();
 				vertex0.validateDisplacedPosition();
 				vertex1.validateDisplacedPosition();
-				Point3d p0 = vertex0.displacedPosition;
-				Point3d p1 = vertex1.displacedPosition;
-				displacedLimit.set(
-						displacedPosition.x * CREASE_LIMIT0 + (p0.x + p1.x) * CREASE_LIMIT1,
-						displacedPosition.y * CREASE_LIMIT0 + (p0.y + p1.y) * CREASE_LIMIT1,
-						displacedPosition.z * CREASE_LIMIT0 + (p0.z + p1.z) * CREASE_LIMIT1
+				Point3d p0 = vertex0.getPos();
+				Point3d p1 = vertex1.getPos();
+				displacement.displacedLimit.set(
+						displacement.displacedPosition.x * CREASE_LIMIT0 + (p0.x + p1.x) * CREASE_LIMIT1,
+						displacement.displacedPosition.y * CREASE_LIMIT0 + (p0.y + p1.y) * CREASE_LIMIT1,
+						displacement.displacedPosition.z * CREASE_LIMIT0 + (p0.z + p1.z) * CREASE_LIMIT1
 				);
 				ux = p0.x - p1.x;
 				uy = p0.y - p1.y;
@@ -471,7 +482,7 @@ public abstract class AbstractVertex {
 					
 					AbstractVertex pair = edge.getPairVertex();
 					pair.validateDisplacedPosition();
-					Point3d edgePairPoint = edge.getPairVertex().displacedPosition;
+					Point3d edgePairPoint = edge.getPairVertex().getPos();
 					
 					vx += faceMidpoint.x;
 					vy += faceMidpoint.y;
@@ -483,12 +494,12 @@ public abstract class AbstractVertex {
 					}
 				}
 				double f = 1.0 / (valence * 2 - 3);
-				vx = vx * f - displacedLimit.x;
-				vy = vy * f - displacedLimit.y;
-				vz = vz * f - displacedLimit.z;
+				vx = vx * f - displacement.displacedLimit.x;
+				vy = vy * f - displacement.displacedLimit.y;
+				vz = vz * f - displacement.displacedLimit.z;
 				break;
 			case IRREGULAR:
-				displacedLimit.set(displacedPosition);
+				displacement.displacedLimit.set(getPos());
 				for (int i = 0; i < valence; i++) {
 					int next = i + 1;
 					if (next == valence) {
@@ -500,7 +511,7 @@ public abstract class AbstractVertex {
 					HalfEdge edge = vertexEdges[i];
 					AbstractVertex pair = edge.getPairVertex();
 					pair.validateDisplacedPosition();
-					Point3d edgePairPoint = edge.getPairVertex().displacedPosition;
+					Point3d edgePairPoint = edge.getPairVertex().getPos();
 					
 					ux += edgePairPoint.x * uWeight; uy += edgePairPoint.y * uWeight; uz += edgePairPoint.z * uWeight;
 					vx += edgePairPoint.x * vWeight; vy += edgePairPoint.y * vWeight; vz += edgePairPoint.z * vWeight;
@@ -515,23 +526,25 @@ public abstract class AbstractVertex {
 				if (cornerSharpness < 10) {
 					/* FIXME: This is an ad-hoc approximation with no background and needs to be replaced by a correct solution */
 					double alpha = Math.min(Math.pow(0.12 * cornerSharpness, 0.5), 1);
-					displacedLimit.interpolate(displacedPosition, alpha);
+					displacement.displacedLimit.interpolate(displacement.displacedPosition, alpha);
 				} else {
-					displacedLimit.set(displacedPosition);
+					displacement.displacedLimit.set(displacement.displacedPosition);
 				}
 			}
 			
-			displacedNormal.set(uy*vz - uz*vy, uz*vx - ux*vz, ux*vy - uy*vx);
-			displacedNormal.normalize();
-			displacedLimitValid = true;
-		}	
+			displacement.displacedNormal.set(uy*vz - uz*vy, uz*vx - ux*vz, ux*vy - uy*vx);
+			displacement.displacedNormal.normalize();
+			displacement.displacedLimitValid = true;
+		} else {
+			validateWorldLimit();
+		}
 	}
 	
 	final void validateInvDisplacementMatrix() {
-		if (!invDisplacementMatrixValid) {
+		if (displacement != null && !displacement.invDisplacementMatrixValid) {
 			validateWorldLimit();
-			invDisplacementMatrix.invert(displacementMatrix);
-			invDisplacementMatrixValid = true;
+			displacement.invDisplacementMatrix.invert(displacement.displacementMatrix);
+			displacement.invDisplacementMatrixValid = true;
 		}
 	}
 	
@@ -545,9 +558,11 @@ public abstract class AbstractVertex {
 			}
 		}
 		worldLimitValid = false;
-		displacedPositionValid = false;
-		displacedLimitValid = false;
-		invDisplacementMatrixValid = false;
+		if (displacement != null) {
+			displacement.displacedPositionValid = false;
+			displacement.displacedLimitValid = false;
+			displacement.invDisplacementMatrixValid = false;
+		}
 	}
 	
 	/**
