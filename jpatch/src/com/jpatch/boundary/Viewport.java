@@ -73,6 +73,8 @@ public class Viewport implements NamedObject {
 	private long time;
 	private int repaintCount;
 	
+	private static final FloatBuffer limitSurfaceBuffer = BufferUtil.newFloatBuffer(SdsConstants.MAX_VALENCE * 2 * 3);
+	
 	public Viewport(int id, ViewDirection direction, CollectionAttr<ViewDirection> orthoDirections, final JPatchInspector inspector) {
 		drawable = new GLCanvas();
 		drawable.addGLEventListener(new GLEventListener() {
@@ -438,14 +440,14 @@ public class Viewport implements NamedObject {
 			gl.glEnd();
 			break;
 		case FACES:
-			gl.glLineWidth(2);
-			for (Face face : selection.getFaces()) {
-				gl.glInterleavedArrays(GL_N3F_V3F, 0, face.getControlSurface());
-				gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, highlighColor.w * 0.5f);
-				gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() + 2);
-				gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, highlighColor.w);
-				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides());
-			}
+//			gl.glLineWidth(2);
+//			for (Face face : selection.getFaces()) {
+//				gl.glInterleavedArrays(GL_N3F_V3F, 0, face.getControlSurface());
+//				gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, highlighColor.w * 0.5f);
+//				gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() + 2);
+//				gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, highlighColor.w);
+//				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides());
+//			}
 			break;
 		}
 	}
@@ -557,6 +559,8 @@ public class Viewport implements NamedObject {
 					setMaterial(gl, GL_FRONT, faceMaterial);
 					currentMaterial = faceMaterial;
 				}
+//				face.getLimitSurface(limitSurfaceBuffer);
+//				gl.glInterleavedArrays(GL_N3F_V3F, 0, limitSurfaceBuffer);
 				gl.glInterleavedArrays(GL_N3F_V3F, 0, face.getLimitSurface());
 				gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides());
 			}
@@ -727,6 +731,7 @@ public class Viewport implements NamedObject {
 	}
 	
 	private static void drawEdgeLimit(GL gl, Tuple3f p, int levelsToGo, HalfEdge edge) {
+		System.out.println("drawEdgeLimit");
 		if (levelsToGo > 0) {
 //			Face face = edge.getFace();
 //			face.getSubEdges(edge.getFaceEdgeIndex(), subEdges);
