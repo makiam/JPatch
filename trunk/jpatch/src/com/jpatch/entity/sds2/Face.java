@@ -51,8 +51,17 @@ public class Face {
 		this.parentFace = parentFace;
 		this.id = edgeIndex;
 		
-		limitSurfaceBuffer = BufferUtil.newFloatBuffer(sides * 2 * 12);
-		controlSurfaceBuffer = BufferUtil.newFloatBuffer((sides + 2) * 2 * 12);
+//		limitSurfaceBuffer = BufferUtil.newFloatBuffer(sides * 2 * 3);
+		limitSurfaceBuffer = FloatBuffer.allocate(sides * 2 * 3);
+//		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(sides * 2 * 3 * 4);
+//		byteBuffer.order(ByteOrder.nativeOrder());
+//		limitSurfaceBuffer = byteBuffer.asFloatBuffer();
+		
+//		limitSurface = new float[sides * 2 * 3];
+//		limitSurfaceBuffer = FloatBuffer.wrap(limitSurface);
+//		System.out.println(limitSurfaceBuffer.isDirect());
+//		controlSurfaceBuffer = BufferUtil.newFloatBuffer((sides + 2) * 2 * 3);
+		controlSurfaceBuffer = FloatBuffer.allocate((sides + 2) * 2 * 3);
 		
 		// append adges and set their face to this
 		int prev = sides - 1;
@@ -159,6 +168,22 @@ public class Face {
 		limitSurfaceBuffer.rewind();
 		return limitSurfaceBuffer;
 	}
+	
+	public void getLimitSurface(FloatBuffer limitSurfaceBuffer) {
+		limitSurfaceBuffer.rewind();
+		for (HalfEdge edge : faceEdges) {
+			AbstractVertex v = edge.getVertex();
+			v.validateDisplacedLimit();
+			limitSurfaceBuffer.put((float) v.getNormal().x);
+			limitSurfaceBuffer.put((float) v.getNormal().y);
+			limitSurfaceBuffer.put((float) v.getNormal().z);
+			limitSurfaceBuffer.put((float) v.getLimit().x);
+			limitSurfaceBuffer.put((float) v.getLimit().y);
+			limitSurfaceBuffer.put((float) v.getLimit().z);
+		}
+		limitSurfaceBuffer.rewind();
+	}
+	
 	
 	public FloatBuffer getControlSurface() {
 		if (!controlSurfaceValid) {
