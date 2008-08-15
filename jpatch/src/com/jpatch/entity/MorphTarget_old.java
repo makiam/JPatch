@@ -25,7 +25,7 @@ import java.util.*;
 
 import com.jpatch.afw.attributes.*;
 
-public class MorphTarget {
+public class MorphTarget_old {
 	private final List<DoubleAttr> attributeList = new ArrayList<DoubleAttr>();
 	private final List<DoubleAttr> attributeListView = Collections.unmodifiableList(attributeList);
 	

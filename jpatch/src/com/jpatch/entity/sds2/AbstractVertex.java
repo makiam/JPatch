@@ -5,6 +5,7 @@ import static com.jpatch.entity.sds2.SdsWeights.*;
 import java.util.*;
 
 import com.jpatch.afw.control.*;
+import com.jpatch.entity.*;
 
 import javax.vecmath.*;
 

@@ -48,6 +48,9 @@ public class Sds {
 	private final Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
 	private final Set<Displacement>[] hierarchy = new Set[SdsConstants.MAX_LEVEL + 1];
 	
+	private MorphTarget activeMorphTarget;
+	private MorphTarget activeNdeLayer = new NdeLayer("default layer");
+	
 	private boolean facesSorted;
 	
 	/** used as key to find entries in edgeMaps without creating a new key object every time */
@@ -105,6 +108,19 @@ public class Sds {
 	
 	public IntAttr getEditLevelAttribute() {
 		return editLevelAttr;
+	}
+	
+	
+	public MorphTarget getActiveMorphTarget() {
+		return activeMorphTarget;
+	}
+	
+	public MorphTarget getActiveNdeLayer() {
+		return activeNdeLayer;
+	}
+	
+	public void setActiveNdeLayer(NdeLayer ndeLayer) {
+		this.activeNdeLayer = ndeLayer;
 	}
 	
 	public void addSegment(List<JPatchUndoableEdit> editList, AbstractVertex vertex0, AbstractVertex vertex1) {

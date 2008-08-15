@@ -106,6 +106,7 @@ public class Main {
 	
 	private Material defaultMaterial = new BasicMaterial(new Color3f(0.666666667f, 0.666666667f, 0.666666667f));
 	
+	private final NdeLayerComponent ndeComponent = new NdeLayerComponent();
 	
 	private SceneGraphNode sceneGraphRoot = new SceneGraphNode() {
 //		@Override
@@ -685,7 +686,9 @@ public class Main {
 //			}
 		};
 		
-		viewport.setView(tree);
+//		viewport.setView(tree);
+		viewport.setView(ndeComponent.getComponent());
+		
 		viewport.setOpaque(false);
 		scrollPane2.setViewport(viewport);
 		scrollPane2.setBorder(null);
@@ -918,6 +921,7 @@ public class Main {
 		
 		treeManager.removeNode(oldModel);
 		activeModel = sdsModel;
+		ndeComponent.setSds(sdsModel.getSds());
 	}
 	
 //	public void computeSceneGraph() {
