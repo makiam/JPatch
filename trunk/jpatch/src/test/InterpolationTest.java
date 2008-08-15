@@ -10,7 +10,7 @@ import javax.swing.*;
 public class InterpolationTest {
 	
 	public static void main(String[] args) {
-		final Morph morph = new Morph(2, 3);
+		final Morph_old morph = new Morph_old(2, 3);
 		morph.addMorphTarget(new double[] { 0.0, 0.0 }).setValue(1.0, 1.0, 1.0);
 		morph.addMorphTarget(new double[] { 1.0, 0.0 }).setValue(1.0, 1.0, 1.0);
 		morph.addMorphTarget(new double[] { 0.33, 0.0 }).setValue(0.0, 0.0, 0.0);

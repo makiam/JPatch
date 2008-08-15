@@ -2,19 +2,19 @@ package com.jpatch.entity;
 
 import java.util.*;
 
-public class Morph {
+public class Morph_old {
 	private double[] weights;
-	private MorphTarget[] morphTargets = new MorphTarget[0];
+	private MorphTarget_old[] morphTargets = new MorphTarget_old[0];
 	private double[][] preWeights;
 	private double[] fairWeights;
 	private int valueSize;
 	
-	public Morph(int dimensions, int valueSize) {
+	public Morph_old(int dimensions, int valueSize) {
 //		morphTargets = new MorphTarget[] { new MorphTarget(new double[dimensions], value) };
 		this.valueSize = valueSize;
 	}
 	
-	public MorphTarget[] getMorphTargets() {
+	public MorphTarget_old[] getMorphTargets() {
 		return morphTargets.clone();
 	}
 	
@@ -28,7 +28,7 @@ public class Morph {
 		}
 	}
 	
-	public MorphTarget addMorphTarget(double[] position) {
+	public MorphTarget_old addMorphTarget(double[] position) {
 //		if (morphTarget == null) {
 //    		throw new NullPointerException();
 //    	}
@@ -38,11 +38,11 @@ public class Morph {
 //    		}
 //		}
 		computePreWeights();
-		MorphTarget morphTarget = new MorphTarget(position, new double[valueSize]);
+		MorphTarget_old morphTarget = new MorphTarget_old(position, new double[valueSize]);
     	interpolate(position, true, morphTarget.value);
     	System.out.println(Arrays.toString(morphTarget.value));
     	int i = morphTargets.length;
-    	MorphTarget[] tmp = new MorphTarget[i + 1];
+    	MorphTarget_old[] tmp = new MorphTarget_old[i + 1];
     	System.arraycopy(morphTargets, 0, tmp, 0, i);
  	    tmp[i] = morphTarget;
  	    morphTargets = tmp;
@@ -51,13 +51,13 @@ public class Morph {
  	    return morphTarget;
 	}
 	
-	public void removeMorphTarget(MorphTarget morphTarget) {
+	public void removeMorphTarget(MorphTarget_old morphTarget) {
     	int i = 0;
     	while (i < morphTargets.length && morphTargets[i] != morphTarget) {
     		i++;
     	}
     	if (i < morphTargets.length) {
-    		MorphTarget[] tmp = new MorphTarget[morphTargets.length - 1];
+    		MorphTarget_old[] tmp = new MorphTarget_old[morphTargets.length - 1];
     	    // Copy the list up to i
     	    System.arraycopy(morphTargets, 0, tmp, 0, i);
     	    // Copy from one past the index, up to
