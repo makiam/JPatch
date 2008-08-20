@@ -921,7 +921,7 @@ public class Main {
 		
 		treeManager.removeNode(oldModel);
 		activeModel = sdsModel;
-		ndeComponent.setSds(sdsModel.getSds());
+//		ndeComponent.bindTo(sdsModel);
 	}
 	
 //	public void computeSceneGraph() {

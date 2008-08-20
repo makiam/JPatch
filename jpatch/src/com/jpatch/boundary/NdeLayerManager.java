@@ -1,6 +1,7 @@
 package com.jpatch.boundary;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
@@ -47,6 +48,25 @@ public class NdeLayerManager {
 		JCheckBox checkBox0 = new JCheckBox();
 		checkBox0.setToolTipText("test");
 		
+		table.addMouseMotionListener(new MouseMotionAdapter() {
+			private final Point p = new Point();
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				p.setLocation(e.getX(), e.getY());
+				int row = table.rowAtPoint(p);
+				int col = table.columnAtPoint(p);
+				switch (col) {
+				case 0:
+					table.setToolTipText("select active layer");
+					break;
+				case 1:
+					table.setToolTipText("activate/deactivate layer");
+					break;
+				default:
+					table.setToolTipText(null);	
+				}
+			}
+		});
 //		table.getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
 //			private JRadioButton radioButton = new JRadioButton();
 //			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -132,6 +152,23 @@ public class NdeLayerManager {
 		return table;
 	}
 	
+	private void apply() {
+		Set<Object> objects = new HashSet<Object>();
+		for (NdeLayer layer : layers) {
+			layer.reset();
+			objects.addAll(layer.getObjects());
+		}
+		for (NdeLayer layer : layers) {
+			layer.apply();
+		}
+		for (Object object : objects) {
+			if (object instanceof BaseVertex) {
+				((BaseVertex) object).validateLocalPosition();
+			}
+		}
+		Main.getInstance().repaintViewports();
+	}
+	
 	class NdeTableModel extends AbstractTableModel {
 
 		public int getColumnCount() {
@@ -168,6 +205,7 @@ public class NdeLayerManager {
 			case 1:
 				layers.get(rowIndex).getEnabledAttribute().setBoolean((Boolean) value);
 				fireTableCellUpdated(rowIndex, 0);
+				apply();
 				break;
 			case 2:
 				layers.get(rowIndex).getNameAttribute().setValue((String) value);

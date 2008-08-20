@@ -12,6 +12,7 @@ import javax.swing.plaf.metal.MetalSliderUI;
 
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.icons.IconSet;
+import com.jpatch.boundary.*;
 import com.sun.java.swing.plaf.motif.MotifSliderUI;
 
 public class AttributeEditor {
@@ -27,6 +28,7 @@ public class AttributeEditor {
 	private final Stack<JPatchFormContainer> containerStack = new Stack<JPatchFormContainer>();
 	private JPatchForm form = new JPatchForm();
 	private final List<ComponentBinding> bindings = new ArrayList<ComponentBinding>();
+	private final List<SpecialBinding> specialBindings = new ArrayList<SpecialBinding>();
 	private String falseString = null;
 	private String trueString = null;
 	private Mapping mapping = IdentityMapping.getInstance();
@@ -159,11 +161,19 @@ public class AttributeEditor {
 		bind(binding);
 	}
 	
+	public void addSpecialBinding(SpecialBinding specialBinding) {
+		specialBindings.add(specialBinding);
+		containerStack.peek().add(specialBinding.getComponent());
+	}
+	
 	public void setEntity(Object entity) {
 		this.entity = entity;
 		getRootContainer().getComponent().setVisible(false);	// otherwise Swing would repaint each component individually
 		for (ComponentBinding binding : bindings) {
 			bind(binding);
+		}
+		for (SpecialBinding specialBinding : specialBindings) {
+			specialBinding.bindTo(entity);
 		}
 		getRootContainer().getComponent().setVisible(true);
 	}

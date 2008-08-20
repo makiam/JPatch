@@ -29,4 +29,7 @@
 			</group>
 		</group>
 	</group>
+	<group name="NDE Layers">
+		<special componentClass="com.jpatch.boundary.NdeLayerComponent" />
+	</group>
 </attributeEditor>
