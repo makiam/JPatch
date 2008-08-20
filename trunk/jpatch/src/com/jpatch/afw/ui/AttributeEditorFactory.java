@@ -1,6 +1,7 @@
 package com.jpatch.afw.ui;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.boundary.*;
 
 import java.awt.Color;
 import java.io.*;
@@ -76,7 +77,16 @@ public class AttributeEditorFactory {
 		
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-			if (localName.equals("attributeEditor")) {
+			if (localName.equals("special")) {
+				String className = attributes.getValue("componentClass");
+				try {
+					SpecialBinding specialBinding = (SpecialBinding) Class.forName(className).newInstance();
+					editor.addSpecialBinding(specialBinding);
+				} catch (Exception e) {
+					throw new SAXException(e);
+				}
+				
+			} else if (localName.equals("attributeEditor")) {
 				if (!attributes.getValue("class").equals(objectClass.getName())) {
 					throw new SAXException("wrong class: " + attributes.getValue("class") + ", excpected " + objectClass.getSimpleName());
 				}

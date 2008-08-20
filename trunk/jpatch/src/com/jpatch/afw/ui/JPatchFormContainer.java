@@ -157,6 +157,16 @@ public class JPatchFormContainer {
 		form.setFormContainer(this);	
 	}
 	
+	public void add(JComponent customComponent) {
+		System.out.println("add " + customComponent);
+		formBox.add(customComponent);	
+	}
+	
+	public void remove(JComponent customComponent) {
+		System.out.println("remove " + customComponent);
+		formBox.remove(customComponent);	
+	}
+	
 	public void add(JPatchFormContainer formContainer) {
 		containerBox.add(formContainer.getComponent());
 		formContainer.parentContainer = this;

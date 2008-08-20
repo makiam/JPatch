@@ -58,7 +58,7 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 		morphTarget.addVector(xPositionAccumulator, dx);
 		morphTarget.addVector(yPositionAccumulator, dy);
 		morphTarget.addVector(zPositionAccumulator, dz);
-		
+		morphTarget.addObject(this);
 		worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
 		invalidate();
 	}
