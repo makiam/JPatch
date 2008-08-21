@@ -1,6 +1,6 @@
 package com.jpatch.entity;
 
-public class Accumulator implements Comparable<Accumulator>{
+public class Accumulator_old implements Comparable<Accumulator_old>{
 	private double value;
 	
 	void reset() {
@@ -11,7 +11,7 @@ public class Accumulator implements Comparable<Accumulator>{
 		this.value += vector;
 	}
 
-	public final int compareTo(Accumulator other) {
+	public final int compareTo(Accumulator_old other) {
 		final int hThis = System.identityHashCode(this);
 		final int hOther = System.identityHashCode(other);
 		return hThis < hOther ? -1 : hThis > hOther ? 1 : 0;

@@ -7,24 +7,25 @@ public class MorphTarget {
 	private final Set<Object> objectsRO = Collections.unmodifiableSet(objects);
 	private Accumulator[] accumulators = new Accumulator[0];
 	private double[] vectors = new double[0];
+	private int[] indices = new int[] { 0 };
 	
-	public void setVector(Accumulator accumulator, double vector) {
-		int index = Arrays.binarySearch(accumulators, accumulator);
-		if (index < 0) {
-			if (vector == 0) {
-				return;	// no need to add new accumulator if vector is 0
-			}
-			/* add new accumulator */
-			index = -index - 1;
-			addAccumulator(accumulator, index);
-			vectors[index] = vector;
-		} else {
-			vectors[index] = vector;
-			if (vectors[index] == 0) {
-				removeAccumulator(index);
-			}
-		}
-	}
+//	public void setVector(Accumulator_old accumulator, double vector) {
+//		int index = Arrays.binarySearch(accumulators, accumulator);
+//		if (index < 0) {
+//			if (vector == 0) {
+//				return;	// no need to add new accumulator if vector is 0
+//			}
+//			/* add new accumulator */
+//			index = -index - 1;
+//			addAccumulator(accumulator, index);
+//			vectors[index] = vector;
+//		} else {
+//			vectors[index] = vector;
+//			if (vectors[index] == 0) {
+//				removeAccumulator(index);
+//			}
+//		}
+//	}
 	
 	public void addObject(Object object) {
 		objects.add(object);
@@ -34,33 +35,50 @@ public class MorphTarget {
 		return objectsRO;
 	}
 	
-	public void addVector(Accumulator accumulator, double vector) {
-		int index = Arrays.binarySearch(accumulators, accumulator);
-		if (index < 0) {
-			if (vector == 0) {
-				return;	// no need to add new accumulator if vector is 0
-			}
+	public void addAccumulator(Accumulator accumulator) {
+		if (accumulator.isZero()) {
+			return;	// no need to add zero accumulator
+		}
+		int position = Arrays.binarySearch(accumulators, accumulator);
+		if (position < 0) {
 			/* add new accumulator */
-			index = -index - 1;
-			addAccumulator(accumulator, index);
-			vectors[index] = vector;
+			position = -position - 1;
+			addAccumulator(accumulator, position);
 		} else {
-			vectors[index] += vector;
-			if (vectors[index] == 0) {
-				removeAccumulator(index);
+			accumulator.readout(vectors, indices[position]);
+			if (isZero(position)) {
+				removeAccumulator(position);
 			}
 		}
 	}
 	
-	private void addAccumulator(Accumulator accumulator, int index) {
-		int insertPosition = -Arrays.binarySearch(accumulators, accumulator) -1;
-		accumulators = arrayInsert(accumulators, insertPosition, accumulator);
-		vectors = arrayInsert(vectors, insertPosition, 0.0);
+	private void addAccumulator(Accumulator accumulator, int position) {
+		accumulators = arrayInsert(accumulators, position, accumulator);
+		final int offset = accumulator.getDimensions();
+		final int index = indices[position];
+		vectors = arrayInsert(vectors, index, offset);
+		accumulator.readout(vectors, index);
+		insertIndex(position, offset);
+	}
+	
+	private void removeAccumulator(int position) {
+		vectors = arrayRemove(vectors, indices[position], accumulators[position].getDimensions());
+		accumulators = arrayRemove(accumulators, position);
+		removeIndex(position);
+	}
+	
+	private boolean isZero(int position) {
+		for (int i = indices[position], n = indices[position + 1]; i < n; i++) {
+			if (vectors[i] != 0.0) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	void apply() {
 		for (int i = 0; i < accumulators.length; i++) {
-			accumulators[i].add(vectors[i]);
+			accumulators[i].accumulate(vectors, indices[i]);
 		}
 	}
 	
@@ -70,33 +88,62 @@ public class MorphTarget {
 		}
 	}
 	
-	void apply(final double weight) {
-		for (int i = 0; i < accumulators.length; i++) {
-			accumulators[i].add(vectors[i] * weight);
+//	void apply(final double weight) {
+//		for (int i = 0; i < accumulators.length; i++) {
+//			accumulators[i].add(vectors[i] * weight);
+//		}
+//	}
+	
+	private void insertIndex(final int position, final int offset) {
+		final int[] tmp = new int[indices.length + 1];
+		System.arraycopy(indices, 0, tmp, 0, position + 1);
+		for (int i = position; i < indices.length; i++) {
+			tmp[i + 1] = indices[i] + offset;
 		}
+		indices = tmp;
 	}
 	
+	private void removeIndex(final int position) {
+		final int[] tmp = new int[indices.length - 1];
+		System.arraycopy(indices, 0, tmp, 0, position);
+		final int offset = indices[position] - indices[position + 1];
+		for (int i = position; i < tmp.length; i++) {
+			tmp[i] = indices[i + 1] + offset;
+		}
+		indices = tmp;
+	}
 	
 //	private void removeAccumulator(Accumulator accumulator) {
 //		final int index = Arrays.binarySearch(accumulators, accumulator);
 //		removeAccumulator(index);
 //	}
 	
-	private void removeAccumulator(int index) {
-		accumulators = arrayRemove(accumulators, index);
-		vectors = arrayRemove(vectors, index);
+	
+	
+	private static final double[] arrayInsert(double[] array, int position, int length) {
+		final double[] tmp = new double[array.length + length];
+		System.arraycopy(array, 0, tmp, 0, position);
+		System.arraycopy(array, position, tmp, position + length, array.length - position);
+		return tmp;
 	}
 	
-	private static final double[] arrayInsert(double[] array, int position, double value) {
-		final double[] tmp = new double[array.length + 1];
+	private static final double[] arrayRemove(double[] array, int position, int length) {
+		final double[] tmp = new double[array.length - length];
+		System.arraycopy(array, 0, tmp, 0, position);
+	    System.arraycopy(array, position + length, tmp, position, tmp.length - position);
+	   return tmp;
+	}
+	
+	private static final int[] arrayInsert(int[] array, int position, int value) {
+		final int[] tmp = new int[array.length + 1];
 		System.arraycopy(array, 0, tmp, 0, position);
 		tmp[position] = value;
 		System.arraycopy(array, position, tmp, position + 1, array.length - position);
 		return tmp;
 	}
 	
-	private static final double[] arrayRemove(double[] array, int position) {
-		final double[] tmp = new double[array.length - 1];
+	private static final int[] arrayRemove(int[] array, int position) {
+		final int[] tmp = new int[array.length - 1];
 		System.arraycopy(array, 0, tmp, 0, position);
 	    System.arraycopy(array, position + 1, tmp, position, tmp.length - position);
 	   return tmp;
@@ -119,27 +166,56 @@ public class MorphTarget {
 	
 	private void dump() {
 		for (int i = 0; i < accumulators.length; i++) {
-			System.out.println(accumulators[i] + "\t" + vectors[i]);
+			System.out.print(i + "\t" + accumulators[i] + "\t");
+			for (int j = indices[i]; j < indices[i + 1]; j++) {
+				System.out.print(vectors[j] + " ");
+			}
+			System.out.println();
 		}
 	}
 	
-//	public static void main(String[] args) {
-//		MorphTarget mt = new MorphTarget();
-//		Accumulator a = new Accumulator();
-//		Accumulator b = new Accumulator();
-//		Accumulator c = new Accumulator();
+	public static void main(String[] args) {
+		MorphTarget mt = new MorphTarget();
 //		
-//		System.out.println("a = " + a);
-//		System.out.println("b = " + b);
-//		System.out.println("c = " + c);
-//		mt.addAccumulator(a);
-//		mt.addAccumulator(b);
-//		mt.addAccumulator(c);
+//		mt.indices = new int[] { 0, 3, 6, 7, 9, 12 };
+//		System.out.println(Arrays.toString(mt.indices));
+//		mt.insertIndex(6, 2);
+//		System.out.println(Arrays.toString(mt.indices));
+//		mt.removeIndex(6);
+//		System.out.println(Arrays.toString(mt.indices));
 //		
-//		mt.setVector(c, 5);
-//		mt.dump();
-//		System.out.println();
-//		mt.removeAccumulator(c);
-//		mt.dump();
-//	}
+//		System.exit(0);
+		
+		Accumulator[] accs = new Accumulator[] {
+			new ScalarAccumulator(),
+			new ScalarAccumulator(),
+			new Tuple3Accumulator(),
+			new Tuple3Accumulator(),
+			new ScalarAccumulator(),
+			new Tuple3Accumulator(),
+		};
+		((ScalarAccumulator) accs[0]).setValue(1);
+		((ScalarAccumulator) accs[1]).setValue(2);
+		((Tuple3Accumulator) accs[2]).setValue(3, 4, 5);
+		((Tuple3Accumulator) accs[3]).setValue(6, 7, 8);
+		((ScalarAccumulator) accs[4]).setValue(9);
+		((Tuple3Accumulator) accs[5]).setValue(10, 11, 12);
+		
+		Random rnd = new Random();
+		
+		for (int k = 0; k < 2; k++) {
+			for (int i = 0; i < accs.length; i++) {
+				mt.addAccumulator(accs[i]);
+				mt.dump();
+				System.out.println();
+			}
+		}
+		
+		((Tuple3Accumulator) accs[5]).setValue(-20, -22, -24);
+		mt.addAccumulator(accs[5]);
+		mt.dump();
+		
+		mt.removeAccumulator(4);
+		mt.dump();
+	}
 }
