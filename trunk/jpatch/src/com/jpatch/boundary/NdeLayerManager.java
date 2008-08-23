@@ -12,17 +12,20 @@ import javax.swing.table.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
-public class NdeLayerManager {
+public class NdeLayerManager extends Morph<NdeLayer> {
 	private final Sds sds;
-	private final List<NdeLayer> layers = new ArrayList<NdeLayer>();
 	private final NdeTableModel tableModel = new NdeTableModel();
 	private final JTable table = new JTable(tableModel);
 	private int selectedLayerIndex = 0;
 	
 	public NdeLayerManager(Sds sds) {
+		super(NdeLayer.class);
 		this.sds = sds;
-		addLayer((NdeLayer) sds.getActiveNdeLayer());
-		addLayer(new NdeLayer("test layer"));
+		
+		NdeLayer defaultLayer = createMorphTarget();
+		defaultLayer.getNameAttribute().setValue("Default Layer");
+		sds.setActiveMorphTarget(defaultLayer);
+		
 //		table.getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
 //			private JCheckBox checkBox = new JCheckBox();
 //			public Component getTableCellRendererComponent(JTable table,
@@ -143,32 +146,20 @@ public class NdeLayerManager {
 //		});
 	}
 	
-	public void addLayer(NdeLayer layer) {
-		layers.add(layer);
-		
-	}
 	
 	public JComponent getComponent() {
 		return table;
 	}
 	
-	private void apply() {
-		Set<Object> objects = new HashSet<Object>();
-		for (NdeLayer layer : layers) {
-			layer.reset();
-			objects.addAll(layer.getObjects());
-		}
-		for (NdeLayer layer : layers) {
-			layer.apply();
-		}
-		for (Object object : objects) {
-			if (object instanceof BaseVertex) {
-				((BaseVertex) object).validateLocalPosition();
-			}
-		}
-		Main.getInstance().repaintViewports();
-	}
 	
+	@Override
+	public NdeLayer createMorphTarget() {
+		NdeLayer ndeLayer = super.createMorphTarget();
+		tableModel.fireTableRowsInserted(morphTargets.size() - 1, morphTargets.size() - 1);
+		return ndeLayer;
+	}
+
+
 	class NdeTableModel extends AbstractTableModel {
 
 		public int getColumnCount() {
@@ -176,7 +167,7 @@ public class NdeLayerManager {
 		}
 
 		public int getRowCount() {
-			return layers.size();
+			return morphTargets.size();
 		}
 
 		public Object getValueAt(int rowIndex, int columnIndex) {
@@ -184,9 +175,9 @@ public class NdeLayerManager {
 			case 0:
 				return rowIndex == selectedLayerIndex;
 			case 1:
-				return layers.get(rowIndex).getEnabledAttribute().getBoolean();
+				return morphTargets.get(rowIndex).getEnabledAttribute().getBoolean();
 			case 2:
-				return layers.get(rowIndex).getNameAttribute().getValue();
+				return morphTargets.get(rowIndex).getNameAttribute().getValue();
 			default:
 				throw new RuntimeException();
 			}
@@ -200,15 +191,16 @@ public class NdeLayerManager {
 				selectedLayerIndex = rowIndex;
 				fireTableCellUpdated(tmp, 0);
 				fireTableCellUpdated(selectedLayerIndex, 0);
-				sds.setActiveNdeLayer(layers.get(rowIndex));
+				sds.setActiveMorphTarget(morphTargets.get(rowIndex));
 				break;
 			case 1:
-				layers.get(rowIndex).getEnabledAttribute().setBoolean((Boolean) value);
+				morphTargets.get(rowIndex).getEnabledAttribute().setBoolean((Boolean) value);
 				fireTableCellUpdated(rowIndex, 0);
 				apply();
+				Main.getInstance().repaintViewports();
 				break;
 			case 2:
-				layers.get(rowIndex).getNameAttribute().setValue((String) value);
+				morphTargets.get(rowIndex).getNameAttribute().setValue((String) value);
 				break;
 			default:
 				throw new RuntimeException();
@@ -231,7 +223,7 @@ public class NdeLayerManager {
 
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			NdeLayer layer = layers.get(rowIndex);
+			NdeLayer layer = morphTargets.get(rowIndex);
 			switch (columnIndex) {
 			case 0:
 				return layer.getEnabledAttribute().getBoolean();
@@ -247,15 +239,15 @@ public class NdeLayerManager {
 		
 	}
 	
-	public static void main(String[] args) {
-		JFrame frame = new JFrame("NDE Layer List test");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		NdeLayerManager manager = new NdeLayerManager(null);
-		manager.addLayer(new NdeLayer("layer 1"));
-		manager.addLayer(new NdeLayer("layer 2"));
-		manager.addLayer(new NdeLayer("layer 3"));
-		frame.add(manager.table);
-		frame.pack();
-		frame.setVisible(true);
-	}
+//	public static void main(String[] args) {
+//		JFrame frame = new JFrame("NDE Layer List test");
+//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		NdeLayerManager manager = new NdeLayerManager(null);
+//		manager.addLayer(new NdeLayer("layer 1"));
+//		manager.addLayer(new NdeLayer("layer 2"));
+//		manager.addLayer(new NdeLayer("layer 3"));
+//		frame.add(manager.table);
+//		frame.pack();
+//		frame.setVisible(true);
+//	}
 }

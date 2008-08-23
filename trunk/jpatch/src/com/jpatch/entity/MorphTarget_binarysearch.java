@@ -2,7 +2,7 @@ package com.jpatch.entity;
 
 import java.util.*;
 
-public class MorphTarget {
+public class MorphTarget_binarysearch {
 	private final Set<Object> objects = new HashSet<Object>();
 	private final Set<Object> objectsRO = Collections.unmodifiableSet(objects);
 	private Accumulator[] accumulators = new Accumulator[0];
@@ -175,7 +175,7 @@ public class MorphTarget {
 	}
 	
 	public static void main(String[] args) {
-		MorphTarget mt = new MorphTarget();
+		MorphTarget_binarysearch mt = new MorphTarget_binarysearch();
 //		
 //		mt.indices = new int[] { 0, 3, 6, 7, 9, 12 };
 //		System.out.println(Arrays.toString(mt.indices));

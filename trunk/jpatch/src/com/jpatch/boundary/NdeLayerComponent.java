@@ -21,7 +21,7 @@ public class NdeLayerComponent implements SpecialBinding {
 		tablePanel.setBorder(BorderFactory.createEtchedBorder());
 		newButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				ndeLayerManager.addLayer(new NdeLayer("new layer"));
+				ndeLayerManager.createMorphTarget();
 				panel.revalidate();
 				panel.repaint();
 			}
@@ -39,7 +39,7 @@ public class NdeLayerComponent implements SpecialBinding {
 	public void bindTo(Object binding) {
 		sdsModel = (SdsModel) binding;
 		tablePanel.removeAll();
-		ndeLayerManager = new NdeLayerManager(sdsModel.getSds());
+		ndeLayerManager = sdsModel.getSds().getNdeLayerManager();
 		tablePanel.add(ndeLayerManager.getComponent(), BorderLayout.CENTER);
 		
 		
