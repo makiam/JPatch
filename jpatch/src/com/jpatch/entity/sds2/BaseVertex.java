@@ -52,10 +52,9 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 		dy = localPosition.y - dy;
 		dz = localPosition.z - dz;
 		
-		final MorphTarget morphTarget = sds.getActiveNdeLayer();
-		positionAccumulator.setValue(dx, dy, dz);
-		morphTarget.addAccumulator(positionAccumulator);
-		morphTarget.addObject(this);
+		final MorphTarget morphTarget = sds.getActiveMorphTarget();
+		positionAccumulator.setTuple(dx, dy, dz);
+		morphTarget.addAccumulator(positionAccumulator, this);
 		worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
 		invalidate();
 	}
@@ -66,7 +65,7 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 //	}
 	
 	public void validateLocalPosition() {
-		positionAccumulator.getValue(localPosition);
+		positionAccumulator.getTuple(localPosition);
 		invalidate();
 	}
 

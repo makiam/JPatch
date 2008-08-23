@@ -4,6 +4,7 @@ import com.jpatch.afw.*;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
 import com.jpatch.afw.ui.*;
+import com.jpatch.boundary.*;
 import com.jpatch.entity.*;
 
 import java.util.*;
@@ -48,8 +49,8 @@ public class Sds {
 	private final Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
 	private final Set<Displacement>[] hierarchy = new Set[SdsConstants.MAX_LEVEL + 1];
 	
+	private final NdeLayerManager ndeLayerManager = new NdeLayerManager(this);
 	private MorphTarget activeMorphTarget;
-	private MorphTarget activeNdeLayer = new NdeLayer("default layer");
 	
 	private boolean facesSorted;
 	
@@ -110,17 +111,17 @@ public class Sds {
 		return editLevelAttr;
 	}
 	
+	public NdeLayerManager getNdeLayerManager() {
+		return ndeLayerManager;
+	}
 	
 	public MorphTarget getActiveMorphTarget() {
 		return activeMorphTarget;
 	}
 	
-	public MorphTarget getActiveNdeLayer() {
-		return activeNdeLayer;
-	}
 	
-	public void setActiveNdeLayer(NdeLayer ndeLayer) {
-		this.activeNdeLayer = ndeLayer;
+	public void setActiveMorphTarget(MorphTarget morphTarget) {
+		this.activeMorphTarget = morphTarget;
 	}
 	
 	public void addSegment(List<JPatchUndoableEdit> editList, AbstractVertex vertex0, AbstractVertex vertex1) {

@@ -21,6 +21,8 @@ public abstract class AbstractVertex {
 	final Point3d worldLimit = new Point3d();			// limit in world space
 	final Vector3d worldNormal = new Vector3d();		// normal in world space
 	
+	final Tuple3Accumulator displacementAccumulator = new Tuple3Accumulator();
+	
 	Displacement displacement;
 //	final Point3d displacedPosition = new Point3d();
 //	final Point3d displacedLimit = new Point3d();
@@ -90,6 +92,10 @@ public abstract class AbstractVertex {
 	
 	public final void setPosition(Point3d p) {
 		setPosition(p.x, p.y, p.z);
+	}
+	
+	public Displacement getDisplacement() {
+		return displacement;
 	}
 	
 	public abstract void setPosition(double x, double y, double z);
@@ -255,6 +261,11 @@ public abstract class AbstractVertex {
 		validateWorldPosition();
 //		displacedPosition.set(worldPosition);
 //		displacedPositionValid = true;
+	}
+	
+	public void invalidateDisplacedPosition() {
+		displacement.displacedPositionValid = false;
+		displacement.displacedLimitValid = false;
 	}
 	
 	final void validateWorldLimit() {

@@ -4,10 +4,10 @@ import com.jpatch.afw.attributes.*;
 
 public class NdeLayer extends MorphTarget {
 	private BooleanAttr enabledAttr = new BooleanAttr(true);
-	private GenericAttr<String> nameAttr = new GenericAttr<String>();
+	private GenericAttr<String> nameAttr = new GenericAttr<String>("New NDE Layer");
 	
-	public NdeLayer(String name) {
-		nameAttr.setValue(name);
+	public NdeLayer(Morph morph) {
+		super(morph);
 	}
 	
 	public BooleanAttr getEnabledAttribute() {

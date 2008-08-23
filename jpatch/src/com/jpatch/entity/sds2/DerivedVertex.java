@@ -1,6 +1,7 @@
 package com.jpatch.entity.sds2;
 
 import com.jpatch.afw.*;
+import com.jpatch.entity.*;
 
 import java.io.*;
 import java.util.*;
@@ -15,13 +16,16 @@ public abstract class DerivedVertex extends AbstractVertex {
 	
 	@Override
 	public void setPosition(double x, double y, double z) {
-		validateInvDisplacementMatrix();
 		if (displacement == null) {
 			setDisplacement(sds.createHierarchyModification(generateId()));
 		}
 		validateInvDisplacementMatrix();
-		displacement.displacementVector.set(x - worldPosition.x, y - worldPosition.y, z - worldPosition.z);
-		displacement.invDisplacementMatrix.transform(displacement.displacementVector);
+		displacement.transformedDisplacementVector.set(x - worldPosition.x, y - worldPosition.y, z - worldPosition.z);
+		displacement.invDisplacementMatrix.transform(displacement.transformedDisplacementVector, displacement.displacementVector);
+		
+		final MorphTarget morphTarget = sds.getActiveMorphTarget();
+		displacementAccumulator.setTuple(displacement.displacementVector);
+		morphTarget.addAccumulator(displacementAccumulator, this);
 		worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
 		invalidate();
 	}
@@ -49,6 +53,7 @@ public abstract class DerivedVertex extends AbstractVertex {
 //	}
 	void validateDisplacedPosition() {
 		if (displacement != null && !displacement.displacedPositionValid) {
+			displacementAccumulator.getTuple(displacement.displacementVector);
 //			System.out.println(this + ".validateDisplacedPosition() called, displacedPositionValid=" + displacedPositionValid);
 //			System.out.println("hierarchicalVertexModification=" + hierarchicalVertexModification);
 			if (displacement.isDisplaced()) {
