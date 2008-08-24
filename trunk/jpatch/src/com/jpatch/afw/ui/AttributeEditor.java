@@ -167,6 +167,7 @@ public class AttributeEditor {
 	}
 	
 	public void setEntity(Object entity) {
+		System.out.println("*** setEntity called, entity=" + entity);
 		this.entity = entity;
 		getRootContainer().getComponent().setVisible(false);	// otherwise Swing would repaint each component individually
 		for (ComponentBinding binding : bindings) {

@@ -1,15 +1,26 @@
 package com.jpatch.entity;
 
+import java.util.*;
+
 import javax.vecmath.*;
 
-public class Tuple3Accumulator extends AbstractAccumulator {
-	private double x, y, z;
+@SuppressWarnings("serial")
+public class Tuple3Accumulator extends Tuple3d implements Accumulator {
+	private final Tuple3d tuple;
+	
+	public Tuple3Accumulator(Tuple3d tuple) {
+		this.tuple = tuple;
+	}
 	
 	public void accumulate(Accumulator acc) {
-		Tuple3Accumulator t3a = (Tuple3Accumulator) acc;
-		x += t3a.x;
-		y += t3a.y;
-		z += t3a.z;
+		System.out.println(this + " accumulate");
+		add((Tuple3Accumulator) acc);
+		tuple.set(this);
+	}
+	
+	public void set(Accumulator acc) {
+		System.out.println(this + " set " + acc + ", tuple=" + System.identityHashCode(tuple));
+		tuple.add(this, (Tuple3Accumulator) acc);
 	}
 	
 	public void reset() {
@@ -21,7 +32,7 @@ public class Tuple3Accumulator extends AbstractAccumulator {
 	}
 	
 	public Tuple3Accumulator getValue() {
-		Tuple3Accumulator a = new Tuple3Accumulator();
+		Tuple3Accumulator a = new Tuple3Accumulator(null);
 		a.x = x;
 		a.y = y;
 		a.z = z;
@@ -41,5 +52,36 @@ public class Tuple3Accumulator extends AbstractAccumulator {
 	public Tuple3d getTuple(Tuple3d tuple) {
 		tuple.set(x, y, z);
 		return tuple;
+	}
+	
+	@Override
+	public int hashCode() {
+		return System.identityHashCode(this);
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		assert o instanceof Accumulator;
+		return o == this;
+	}
+	
+	private static String toString(Tuple3d tuple) {
+		StringBuilder sb = new StringBuilder();
+		Formatter formatter = new Formatter(sb);
+		sb.append("[");
+		if (tuple != null) {
+			formatter.format("%3.3f", tuple.x);
+			sb.append(",");
+			formatter.format("%3.3f", tuple.y);
+			sb.append(",");
+			formatter.format("%3.3f", tuple.z);
+			sb.append(",");
+		}
+		sb.append("]");
+		return sb.toString();
+	}
+	
+	public String toString() {
+		return "Tuple3Accumulator@" + System.identityHashCode(this) + toString(this) + toString(tuple);
 	}
 }

@@ -4,6 +4,7 @@ import com.jpatch.afw.control.Configuration;
 import com.jpatch.afw.ui.PlatformUtils;
 import com.jpatch.boundary.Main;
 
+import java.awt.*;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
@@ -20,6 +21,11 @@ public class Launcher {
 		
 		while (!new NativeLibraryHelper().checkLibraries(null));
 		
-		Main.getInstance();
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				Main.getInstance();
+			}
+		});
+		
 	}
 }

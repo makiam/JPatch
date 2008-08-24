@@ -37,6 +37,8 @@ public class NdeLayerComponent implements SpecialBinding {
 	}
 	
 	public void bindTo(Object binding) {
+		Thread.dumpStack();
+			
 		sdsModel = (SdsModel) binding;
 		tablePanel.removeAll();
 		ndeLayerManager = sdsModel.getSds().getNdeLayerManager();
