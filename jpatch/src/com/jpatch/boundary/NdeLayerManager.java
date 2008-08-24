@@ -13,14 +13,12 @@ import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
 public class NdeLayerManager extends Morph<NdeLayer> {
-	private final Sds sds;
 	private final NdeTableModel tableModel = new NdeTableModel();
 	private final JTable table = new JTable(tableModel);
 	private int selectedLayerIndex = 0;
 	
 	public NdeLayerManager(Sds sds) {
-		super(NdeLayer.class);
-		this.sds = sds;
+		super(NdeLayer.class, sds);
 		
 		NdeLayer defaultLayer = createMorphTarget();
 		defaultLayer.getNameAttribute().setValue("Default Layer");
@@ -192,6 +190,8 @@ public class NdeLayerManager extends Morph<NdeLayer> {
 				fireTableCellUpdated(tmp, 0);
 				fireTableCellUpdated(selectedLayerIndex, 0);
 				sds.setActiveMorphTarget(morphTargets.get(rowIndex));
+				apply();
+				Main.getInstance().repaintViewports();
 				break;
 			case 1:
 				morphTargets.get(rowIndex).getEnabledAttribute().setBoolean((Boolean) value);

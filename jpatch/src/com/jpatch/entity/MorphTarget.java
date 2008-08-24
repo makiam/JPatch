@@ -12,9 +12,11 @@ public class MorphTarget {
 		this.morph = morph;
 	}
 	
-	public final void addAccumulator(Accumulator accumulator, Object object) {
+	public final Accumulator getAccumulatorValueFor(Accumulator accumulator, Object object) {
+		System.out.println("gettint accumulator for " + object);
 		final Integer position = index.get(accumulator);
 		if (position == null) {
+			System.out.println("adding accumulator for " + object);
 			final int n = accumulators.length;
 			final Accumulator[] tmpAccumulators = new Accumulator[n + 1];
 			System.arraycopy(accumulators, 0, tmpAccumulators, 0, n);
@@ -22,12 +24,14 @@ public class MorphTarget {
 			accumulators = tmpAccumulators;
 			final Accumulator[] tmpValues = new Accumulator[n + 1];
 			System.arraycopy(values, 0, tmpValues, 0, n);
-			tmpValues[n] = accumulator.getValue();
+			final Accumulator value = accumulator.getValue();
+			tmpValues[n] = value;
 			values = tmpValues;
 			index.put(accumulator, n);
 			morph.addAccumulator(accumulator, object);
+			return value;
 		} else {
-			values[position].accumulate(accumulator);
+			return values[position];
 		}
 	}
 	
@@ -49,6 +53,12 @@ public class MorphTarget {
 	void apply() {
 		for (int i = 0; i < accumulators.length; i++) {
 			accumulators[i].accumulate(values[i]);
+		}
+	}
+	
+	void set() {
+		for (int i = 0; i < accumulators.length; i++) {
+			accumulators[i].set(values[i]);
 		}
 	}
 }

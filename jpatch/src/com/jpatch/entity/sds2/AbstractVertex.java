@@ -21,7 +21,7 @@ public abstract class AbstractVertex {
 	final Point3d worldLimit = new Point3d();			// limit in world space
 	final Vector3d worldNormal = new Vector3d();		// normal in world space
 	
-	final Tuple3Accumulator displacementAccumulator = new Tuple3Accumulator();
+//	final Tuple3Accumulator displacementAccumulator = new Tuple3Accumulator();
 	
 	Displacement displacement;
 //	final Point3d displacedPosition = new Point3d();

@@ -58,9 +58,10 @@ public class JPatchInspector {
 	private AttributePostChangeListener selectionChangeListener = new AttributePostChangeListener() {
 		public void attributeHasChanged(Attribute source) {
 			panel.remove(2);
-			System.out.println("selection=" + ((GenericAttr<Object>) source).getValue());
+			System.out.println("***selection=" + ((GenericAttr<Object>) source).getValue());
 			Object selectedObject = ((GenericAttr<Object>) source).getValue();
 			if (selectedObject != null) {
+				System.out.println("***");
 				AttributeEditor ae = AttributeEditorFactory.getInstance().getEditorFor(((GenericAttr<Object>) source).getValue(), selectionExpandedAttr, SELECTION_COLOR);
 				if (ae != null) {
 					panel.add(ae, 2);

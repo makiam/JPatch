@@ -1,6 +1,7 @@
 package com.jpatch.entity.sds2;
 
 import com.jpatch.afw.*;
+import com.jpatch.entity.*;
 
 import java.io.*;
 import java.util.*;
@@ -21,6 +22,8 @@ public final class Displacement {
 	
 	final Vector3d displacementVector = new Vector3d();
 	final Vector3d transformedDisplacementVector = new Vector3d();
+	
+	final Tuple3Accumulator displacementAccumulator = new Tuple3Accumulator(displacementVector);
 	
 	boolean displacedPositionValid;
 	boolean displacedLimitValid;

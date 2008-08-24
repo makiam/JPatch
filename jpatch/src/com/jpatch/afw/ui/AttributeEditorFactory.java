@@ -2,6 +2,7 @@ package com.jpatch.afw.ui;
 
 import com.jpatch.afw.attributes.*;
 import com.jpatch.boundary.*;
+import com.jpatch.entity.*;
 
 import java.awt.Color;
 import java.io.*;
@@ -55,13 +56,14 @@ public class AttributeEditorFactory {
 				xmlReader.parse(url.toString());
 				editor = handler.getEditor();
 				editors.put(object.getClass(), editor);
-				return editor;
+//				return editor;
 			} catch (SAXException e) {
 				throw new RuntimeException(e);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
+		System.out.println("*** now calling editor.setEntity(" + object + ")");
 		editor.setEntity(object);
 		return editor;
 	}

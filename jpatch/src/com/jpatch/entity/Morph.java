@@ -5,6 +5,7 @@ import com.jpatch.entity.sds2.*;
 import java.util.*;
 
 public class Morph<T extends MorphTarget> {
+	protected final Sds sds;
 	private final Map<Accumulator, Integer> index = new HashMap<Accumulator, Integer>();
 	protected Accumulator[] accumulators = new Accumulator[0];
 	protected Object[] objects = new Object[0];
@@ -13,7 +14,8 @@ public class Morph<T extends MorphTarget> {
 	protected final List<T> morphTargets = new ArrayList<T>();
 	private final Class<? extends T> morphTargetClass;
 	
-	public Morph(Class<T> morphTargetClass) {
+	public Morph(Class<T> morphTargetClass, Sds sds) {
+		this.sds = sds;
 		this.morphTargetClass = morphTargetClass;
 	}
 	
@@ -90,20 +92,23 @@ public class Morph<T extends MorphTarget> {
 		}
 		
 		/* apply targets */
+		MorphTarget activeMorptarget = sds.getActiveMorphTarget();
 		for (T morphTarget : morphTargets) {
 			if (morphTarget instanceof NdeLayer) {
-				if (((NdeLayer) morphTarget).getEnabledAttribute().getBoolean()) {
+				if (morphTarget == activeMorptarget) {
+					continue;
+				} else if (((NdeLayer) morphTarget).getEnabledAttribute().getBoolean()) {
 					morphTarget.apply();
 				}
 			}
 		}
 		
+		activeMorptarget.set();
+		
 		/* validate objects */
 		for (Object object : objects) {
-			if (object instanceof BaseVertex) {
-				((BaseVertex) object).validateLocalPosition();
-			} else if (object instanceof DerivedVertex) {
-				((DerivedVertex) object).invalidateDisplacedPosition();
+			if (object instanceof AbstractVertex) {
+				((AbstractVertex) object).invalidate();
 			}
 		}
 	}

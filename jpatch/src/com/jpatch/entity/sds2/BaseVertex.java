@@ -18,7 +18,7 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 	private static int count;
 	final int num = count++;
 	
-	private final Tuple3Accumulator positionAccumulator = new Tuple3Accumulator();
+	private final Tuple3Accumulator positionAccumulator = new Tuple3Accumulator(localPosition);
 	
 	public BaseVertex(SdsModel sdsModel) {
 		this(sdsModel, 0, 0, 0);
@@ -32,29 +32,16 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 		invTransformMatrix.invert(transformMatrix);
 		invTransformMatrixValid = true;
 		setPosition(x, y, z);
-//		positionAttr.setTuple(x, y, z);
-//		
-//		cornerSharpnessAttr.setDouble(0);
 	}
 	
 	@Override
 	public void setPosition(double x, double y, double z) {
 		validateInvTransformMatrix();
 		worldPosition.set(x, y, z);
-		
-		double dx = localPosition.x;
-		double dy = localPosition.y;
-		double dz = localPosition.z;
-		
 		invTransformMatrix.transform(worldPosition, localPosition);
-		
-		dx = localPosition.x - dx;
-		dy = localPosition.y - dy;
-		dz = localPosition.z - dz;
-		
 		final MorphTarget morphTarget = sds.getActiveMorphTarget();
-		positionAccumulator.setTuple(dx, dy, dz);
-		morphTarget.addAccumulator(positionAccumulator, this);
+		Tuple3Accumulator accumulatorValue = (Tuple3Accumulator) morphTarget.getAccumulatorValueFor(positionAccumulator, this);
+		accumulatorValue.sub(localPosition, positionAccumulator);
 		worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
 		invalidate();
 	}
@@ -64,10 +51,10 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 //		pos.set(worldPosition);
 //	}
 	
-	public void validateLocalPosition() {
-		positionAccumulator.getTuple(localPosition);
-		invalidate();
-	}
+//	public void validateLocalPosition(Accumulator accumulator) {
+//		localPosition.add(positionAccumulator, (Tuple3Accumulator) accumulator);
+//		invalidate();
+//	}
 
 	void validateWorldPosition() {
 		if (!transformMatrixValid) {

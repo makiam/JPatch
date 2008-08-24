@@ -24,8 +24,8 @@ public abstract class DerivedVertex extends AbstractVertex {
 		displacement.invDisplacementMatrix.transform(displacement.transformedDisplacementVector, displacement.displacementVector);
 		
 		final MorphTarget morphTarget = sds.getActiveMorphTarget();
-		displacementAccumulator.setTuple(displacement.displacementVector);
-		morphTarget.addAccumulator(displacementAccumulator, this);
+		Tuple3Accumulator accumulatorValue = (Tuple3Accumulator) morphTarget.getAccumulatorValueFor(displacement.displacementAccumulator, this);
+		accumulatorValue.sub(displacement.displacementVector, displacement.displacementAccumulator);
 		worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
 		invalidate();
 	}
@@ -53,7 +53,7 @@ public abstract class DerivedVertex extends AbstractVertex {
 //	}
 	void validateDisplacedPosition() {
 		if (displacement != null && !displacement.displacedPositionValid) {
-			displacementAccumulator.getTuple(displacement.displacementVector);
+//			displacementAccumulator.getTuple(displacement.displacementVector);
 //			System.out.println(this + ".validateDisplacedPosition() called, displacedPositionValid=" + displacedPositionValid);
 //			System.out.println("hierarchicalVertexModification=" + hierarchicalVertexModification);
 			if (displacement.isDisplaced()) {

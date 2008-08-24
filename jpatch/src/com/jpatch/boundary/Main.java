@@ -593,26 +593,22 @@ public class Main {
 		
 //		new IkConstraint(upperArm, lowerArm, hand, elbowTarget, handTarget);
 		
-		try {
-//			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt")));
-//			final SdsModel model1 = new SdsModel(new Sds(new FileInputStream("/home/sascha/off/cube2.off")));
-//			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/barrel.jpt")));
-//			model1.getNameAttribute().setValue("model 1");
-//			model1.getParentAttribute().setValue(sceneGraphRoot);
-//			selection.getSelectedSdsModelAttribute().setValue(model1);
-//			model2.getNameAttribute().setValue("model 2");
-//			model2.getParentAttribute().setValue(model1);
-//			model3.getNameAttribute().setValue("model 3");
-//			model3.getParentAttribute().setValue(model2);
-			SdsModel model = new SdsModel(new Sds(actions.undoManager));
-			model.getNameAttribute().setValue("SDS model");
-			model.getParentAttribute().setValue(sceneGraphRoot);
-			selection.setNode(model, null);
-			activeModel = model;
+//		try {
+////			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/cartoonRabbit.jpt")));
+////			final SdsModel model1 = new SdsModel(new Sds(new FileInputStream("/home/sascha/off/cube2.off")));
+////			final SdsModel model1 = new SdsModel(new JptLoader().importModel(new FileInputStream("/home/sascha/barrel.jpt")));
+////			model1.getNameAttribute().setValue("model 1");
+////			model1.getParentAttribute().setValue(sceneGraphRoot);
+////			selection.getSelectedSdsModelAttribute().setValue(model1);
+////			model2.getNameAttribute().setValue("model 2");
+////			model2.getParentAttribute().setValue(model1);
+////			model3.getNameAttribute().setValue("model 3");
+////			model3.getParentAttribute().setValue(model2);
 			
-		} catch (Exception e) {
-			e.printStackTrace();
-		} 
+			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} 
 		
 		
 		final Camera camera1 = new Camera();
@@ -637,6 +633,9 @@ public class Main {
 		System.out.println(viewDirectionsAttr.getElements());
 		
 		treeManager.createTreeNodeFor(sceneGraphRoot);
+		
+		
+		
 		JTree tree = new JTree(treeModel);
 		tree.setCellRenderer(new JPatchTreeCellRenderer());
 		tree.setRootVisible(false);
@@ -817,6 +816,12 @@ public class Main {
 			}
 		});
 		
+		SdsModel model = new SdsModel(new Sds(actions.undoManager));
+//		model.getNameAttribute().setValue("SDS model");
+//		model.getParentAttribute().setValue(sceneGraphRoot);
+//		selection.setNode(null, null);
+		setModel(model);
+		
 		frame.setVisible(true);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -906,6 +911,7 @@ public class Main {
 	}
 	
 	public void setModel(SdsModel sdsModel) {
+		System.out.println("*** Set model called, sdsModel = " + sdsModel + ", sds = " + sdsModel.getSds());
 //		sds.createNextLevel(0);
 //		sds.createNextLevel(1);
 //		sds.createNextLevel(2);
@@ -919,7 +925,9 @@ public class Main {
 		SdsModel oldModel = selection.getSdsModel();
 		selection.setNode(sdsModel, null);
 		
-		treeManager.removeNode(oldModel);
+		if (oldModel != null) {
+			treeManager.removeNode(oldModel);
+		}
 		activeModel = sdsModel;
 //		ndeComponent.bindTo(sdsModel);
 	}
