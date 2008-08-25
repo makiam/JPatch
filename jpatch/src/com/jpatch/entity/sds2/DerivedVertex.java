@@ -22,7 +22,7 @@ public abstract class DerivedVertex extends AbstractVertex {
 		validateInvDisplacementMatrix();
 		displacement.transformedDisplacementVector.set(x - worldPosition.x, y - worldPosition.y, z - worldPosition.z);
 		displacement.invDisplacementMatrix.transform(displacement.transformedDisplacementVector, displacement.displacementVector);
-		
+		System.out.println("local displacement=" + displacement.displacementVector);
 		final MorphTarget morphTarget = sds.getActiveMorphTarget();
 		Tuple3Accumulator accumulatorValue = (Tuple3Accumulator) morphTarget.getAccumulatorValueFor(displacement.displacementAccumulator, this);
 		accumulatorValue.sub(displacement.displacementVector, displacement.displacementAccumulator);
@@ -40,34 +40,6 @@ public abstract class DerivedVertex extends AbstractVertex {
 		assert Arrays.equals(generateId(), displacement.hierarchyPath);
 		this.displacement = displacement;
 		worldLimitValid = false;
-	}
-	
-//	@Override
-//	public void setPos(double x, double y, double z) {
-//		setDisplacement(x, y, z);
-//	}
-//	
-//	@Override
-//	public void getPos(Tuple3d pos) {
-//		//TODO: implement
-//	}
-	void validateDisplacedPosition() {
-		if (displacement != null && !displacement.displacedPositionValid) {
-//			displacementAccumulator.getTuple(displacement.displacementVector);
-//			System.out.println(this + ".validateDisplacedPosition() called, displacedPositionValid=" + displacedPositionValid);
-//			System.out.println("hierarchicalVertexModification=" + hierarchicalVertexModification);
-			if (displacement.isDisplaced()) {
-				validateWorldLimit();	// this also validates position
-				displacement.displacementMatrix.transform(displacement.displacementVector, displacement.transformedDisplacementVector);
-				displacement.displacedPosition.add(worldPosition, displacement.transformedDisplacementVector);	
-			} else {
-				validateWorldPosition();
-				displacement.displacedPosition.set(worldPosition);
-			}
-			displacement.displacedPositionValid = true;
-		} else {
-			validateWorldPosition();
-		}
 	}
 
 	public int[] generateId() {

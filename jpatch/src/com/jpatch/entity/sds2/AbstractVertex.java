@@ -257,16 +257,26 @@ public abstract class AbstractVertex {
 //		}
 //	}
 	
-	void validateDisplacedPosition() {
-		validateWorldPosition();
-//		displacedPosition.set(worldPosition);
-//		displacedPositionValid = true;
+	final void validateDisplacedPosition() {
+		if (displacement != null && !displacement.displacedPositionValid) {
+			if (displacement.isDisplaced()) {
+				validateWorldLimit();	// this also validates position
+				displacement.displacementMatrix.transform(displacement.displacementVector, displacement.transformedDisplacementVector);
+				displacement.displacedPosition.add(worldPosition, displacement.transformedDisplacementVector);	
+			} else {
+				validateWorldPosition();
+				displacement.displacedPosition.set(worldPosition);
+			}
+			displacement.displacedPositionValid = true;
+		} else {
+			validateWorldPosition();
+		}
 	}
 	
-	public void invalidateDisplacedPosition() {
-		displacement.displacedPositionValid = false;
-		displacement.displacedLimitValid = false;
-	}
+//	public void invalidateDisplacedPosition() {
+//		displacement.displacedPositionValid = false;
+//		displacement.displacedLimitValid = false;
+//	}
 	
 	final void validateWorldLimit() {
 		if (!worldLimitValid) {
@@ -560,7 +570,12 @@ public abstract class AbstractVertex {
 		}
 	}
 	
-	public final void invalidate() {
+	public void invalidateAll() {
+		worldPositionValid = true; // will be invalidated by invalidate() method
+		invalidate();
+	}
+	
+	final void invalidate() {
 		if (worldPositionValid) {
 			worldPositionValid = false;
 			for (HalfEdge edge : vertexEdges) {
@@ -571,6 +586,7 @@ public abstract class AbstractVertex {
 		}
 		worldLimitValid = false;
 		if (displacement != null) {
+			System.out.println(this + " invalidate displacement");
 			displacement.displacedPositionValid = false;
 			displacement.displacedLimitValid = false;
 			displacement.invDisplacementMatrixValid = false;

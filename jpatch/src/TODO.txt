@@ -1,3 +1,7 @@
 2008 Jul 31:
 	* check stray-edges/stray-vertices (don't work with extrude tool)
 	* work on undo/redo for adding/removing faces and stray-edges
+2008 Aug 25:
+	* morphs: use displacement in basevertices too if morph is not NDE
+	* morphs: use reference count to discard unused displacement objects
+	

@@ -20,6 +20,7 @@ public class Morph<T extends MorphTarget> {
 	}
 	
 	public final void addAccumulator(Accumulator accumulator, Object object) {
+		System.out.println(this + " addAccumulator(" + accumulator + ", " + object);
 		final Integer position = index.get(accumulator);
 		if (position == null) {
 			final int n = accumulators.length;
@@ -108,7 +109,7 @@ public class Morph<T extends MorphTarget> {
 		/* validate objects */
 		for (Object object : objects) {
 			if (object instanceof AbstractVertex) {
-				((AbstractVertex) object).invalidate();
+				((AbstractVertex) object).invalidateAll();
 			}
 		}
 	}
