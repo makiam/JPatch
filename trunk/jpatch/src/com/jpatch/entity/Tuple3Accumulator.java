@@ -13,18 +13,20 @@ public class Tuple3Accumulator extends Tuple3d implements Accumulator {
 	}
 	
 	public void accumulate(Accumulator acc) {
-		System.out.println(this + " accumulate");
 		add((Tuple3Accumulator) acc);
 		tuple.set(this);
+		System.out.println(this + " accumulate, tuple=" + tuple);
 	}
 	
 	public void set(Accumulator acc) {
-		System.out.println(this + " set " + acc + ", tuple=" + System.identityHashCode(tuple));
 		tuple.add(this, (Tuple3Accumulator) acc);
+		System.out.println(this + " set " + acc + ", tuple=" + tuple);
 	}
 	
 	public void reset() {
 		x = y = z = 0;
+		tuple.set(0, 0, 0);
+		System.out.println(this + " reset");
 	}
 
 	public boolean isZero() {
