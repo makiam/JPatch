@@ -49,8 +49,10 @@ public class Sds {
 	private final Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
 	private final Set<Displacement>[] hierarchy = new Set[SdsConstants.MAX_LEVEL + 1];
 	
-	private final NdeLayerManager ndeLayerManager = new NdeLayerManager(this);
-	private MorphTarget activeMorphTarget;
+	
+//	private MorphTarget activeMorphTarget;
+	private final MorphController morphController = new MorphController(this);
+	private final NdeLayerManager ndeLayerManager = new NdeLayerManager(morphController);
 	
 	private boolean facesSorted;
 	
@@ -58,6 +60,7 @@ public class Sds {
 	private final EdgeKey edgeKey = new EdgeKey();
 	
 	public Sds(final JPatchUndoManager undoManager) {
+		
 		for (int i = 0; i < faceSets.length; i++) {
 			faceSets[i] = new HashSet<Face>();
 			faceLists[i] = new ArrayList<Face>();
@@ -114,15 +117,19 @@ public class Sds {
 	public NdeLayerManager getNdeLayerManager() {
 		return ndeLayerManager;
 	}
-	
+//	
 	public MorphTarget getActiveMorphTarget() {
-		return activeMorphTarget;
+		return morphController.getActiveMorphTarget();
 	}
 	
-	
-	public void setActiveMorphTarget(MorphTarget morphTarget) {
-		this.activeMorphTarget = morphTarget;
+	public MorphController getMorphController() {
+		return morphController;
 	}
+//	
+//	
+//	public void setActiveMorphTarget(MorphTarget morphTarget) {
+//		this.activeMorphTarget = morphTarget;
+//	}
 	
 	public void addSegment(List<JPatchUndoableEdit> editList, AbstractVertex vertex0, AbstractVertex vertex1) {
 		edgeKey.set(vertex0, vertex1);

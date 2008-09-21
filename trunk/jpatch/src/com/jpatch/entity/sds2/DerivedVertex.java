@@ -25,7 +25,7 @@ public abstract class DerivedVertex extends AbstractVertex {
 		System.out.println("local displacement=" + displacement.displacementVector);
 		final MorphTarget morphTarget = sds.getActiveMorphTarget();
 		Tuple3Accumulator accumulatorValue = (Tuple3Accumulator) morphTarget.getAccumulatorValueFor(displacement.displacementAccumulator, this);
-		accumulatorValue.sub(displacement.displacementVector, displacement.displacementAccumulator);
+		accumulatorValue.asTuple().sub(displacement.displacementVector, displacement.displacementAccumulator.asTuple());
 		worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
 		invalidate();
 	}

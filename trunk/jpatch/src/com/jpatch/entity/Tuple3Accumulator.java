@@ -5,7 +5,8 @@ import java.util.*;
 import javax.vecmath.*;
 
 @SuppressWarnings("serial")
-public class Tuple3Accumulator extends Tuple3d implements Accumulator {
+public class Tuple3Accumulator implements Accumulator {
+	private final Tuple3d t = new Point3d();
 	private final Tuple3d tuple;
 	
 	public Tuple3Accumulator(Tuple3d tuple) {
@@ -13,38 +14,38 @@ public class Tuple3Accumulator extends Tuple3d implements Accumulator {
 	}
 	
 	public void accumulate(Accumulator acc) {
-		add((Tuple3Accumulator) acc);
-		tuple.set(this);
+		t.add(((Tuple3Accumulator) acc).t);
+		tuple.set(t);
 		System.out.println(this + " accumulate, tuple=" + tuple);
 	}
 	
 	public void set(Accumulator acc) {
-		tuple.add(this, (Tuple3Accumulator) acc);
+		tuple.add(t, ((Tuple3Accumulator) acc).t);
 		System.out.println(this + " set " + acc + ", tuple=" + tuple);
 	}
 	
 	public void reset() {
-		x = y = z = 0;
+		t.set(0, 0, 0);
 		tuple.set(0, 0, 0);
 		System.out.println(this + " reset");
 	}
 
 	public boolean isZero() {
-		return x == 0 && y == 0 && z == 0;
+		return t.x == 0 && t.y == 0 && t.z == 0;
 	}
 	
 	public Tuple3Accumulator getValue() {
 		Tuple3Accumulator a = new Tuple3Accumulator(null);
-		a.x = x;
-		a.y = y;
-		a.z = z;
+		a.t.set(t);
 		return a;
 	}
 	
+	public Tuple3d asTuple() {
+		return t;
+	}
+	
 	public void setTuple(double x, double y, double z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		t.set(x, y, z);
 	}
 	
 	public void setTuple(Tuple3d tuple) {
@@ -52,7 +53,7 @@ public class Tuple3Accumulator extends Tuple3d implements Accumulator {
 	}
 	
 	public Tuple3d getTuple(Tuple3d tuple) {
-		tuple.set(x, y, z);
+		tuple.set(t);
 		return tuple;
 	}
 	
@@ -63,7 +64,6 @@ public class Tuple3Accumulator extends Tuple3d implements Accumulator {
 	
 	@Override
 	public boolean equals(Object o) {
-		assert o instanceof Accumulator;
 		return o == this;
 	}
 	
@@ -84,6 +84,6 @@ public class Tuple3Accumulator extends Tuple3d implements Accumulator {
 	}
 	
 	public String toString() {
-		return "Tuple3Accumulator@" + System.identityHashCode(this) + toString(this) + toString(tuple);
+		return "Tuple3Accumulator@" + System.identityHashCode(this) + toString(this.t) + toString(tuple);
 	}
 }

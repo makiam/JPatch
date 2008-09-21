@@ -8,6 +8,7 @@ import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.table.*;
 
 import com.jpatch.afw.attributes.*;
 
@@ -430,6 +431,27 @@ public class AttributeManager {
 		});
 		
 		return button;
+	}
+	
+	public JLabel bindLabelToAttribute(Object entity, final JLabel label, final GenericAttr<String> attribute) {
+		AttributeBinding binding = new AttributeBinding(attribute, new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				label.setText(attribute.getValue());
+			}	
+		});
+		bind(label, binding);
+		return label;
+	}
+	
+	public JTable bindTableToAttribute(Object entity, final JTable table, final Attribute attribute) {
+		AttributeBinding binding = new AttributeBinding(attribute, new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				System.out.println("*");
+				((AbstractTableModel) table.getModel()).fireTableDataChanged();
+			}	
+		});
+		bind(table, binding);
+		return table;
 	}
 	
 	public JTextField bindTextFieldToAttribute(Object entity, final JTextField textField, ScalarAttribute attribute) {

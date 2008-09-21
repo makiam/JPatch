@@ -3,12 +3,12 @@ package com.jpatch.entity;
 import java.util.*;
 
 public class MorphTarget {
-	private final Morph morph;
+	private final Morph<? extends MorphTarget> morph;
 	private final Map<Accumulator, Integer> index = new HashMap<Accumulator, Integer>();
 	private Accumulator[] accumulators = new Accumulator[0];
 	private Accumulator[] values = new Accumulator[0];
 	
-	public MorphTarget(Morph morph) {
+	public MorphTarget(Morph<? extends MorphTarget> morph) {
 		this.morph = morph;
 	}
 	
@@ -60,5 +60,9 @@ public class MorphTarget {
 		for (int i = 0; i < accumulators.length; i++) {
 			accumulators[i].set(values[i]);
 		}
+	}
+	
+	Accumulator[] getValues() {
+		return values;
 	}
 }

@@ -8,7 +8,7 @@ import com.jpatch.entity.sds2.*;
 
 import javax.swing.*;
 
-public class NdeLayerComponent implements SpecialBinding {
+public class NdeLayerComponent implements SpecialBinding.CustomComponent {
 	private final JPanel panel = new JPanel(new BorderLayout());
 	private final JPanel tablePanel = new JPanel(new BorderLayout());
 	private final JComponent buttonBox = Box.createHorizontalBox();
@@ -37,8 +37,6 @@ public class NdeLayerComponent implements SpecialBinding {
 	}
 	
 	public void bindTo(Object binding) {
-		Thread.dumpStack();
-			
 		sdsModel = (SdsModel) binding;
 		tablePanel.removeAll();
 		ndeLayerManager = sdsModel.getSds().getNdeLayerManager();

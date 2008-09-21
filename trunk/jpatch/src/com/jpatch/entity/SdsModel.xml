@@ -32,4 +32,5 @@
 	<group name="NDE Layers">
 		<special componentClass="com.jpatch.boundary.NdeLayerComponent" />
 	</group>
+	<special componentClass="com.jpatch.boundary.MorphComponent" />
 </attributeEditor>
