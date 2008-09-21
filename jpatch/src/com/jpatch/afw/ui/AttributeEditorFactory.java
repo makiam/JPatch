@@ -85,6 +85,7 @@ public class AttributeEditorFactory {
 					SpecialBinding specialBinding = (SpecialBinding) Class.forName(className).newInstance();
 					editor.addSpecialBinding(specialBinding);
 				} catch (Exception e) {
+					e.printStackTrace();
 					throw new SAXException(e);
 				}
 				

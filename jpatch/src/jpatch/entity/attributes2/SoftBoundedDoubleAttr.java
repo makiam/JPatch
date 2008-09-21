@@ -17,7 +17,7 @@ public class SoftBoundedDoubleAttr extends DoubleAttr implements BoundedDoubleVa
 	}
 	
 	public SoftBoundedDoubleAttr(double min, double max, double value) {
-		this(min, max, value, new LinearMapping());
+		this(min, max, value, LinearMapping.getInstance());
 	}
 	
 	public SoftBoundedDoubleAttr(double min, double max, double value, Mapping mapping) {

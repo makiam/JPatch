@@ -17,12 +17,13 @@ public class NdeLayerManager extends Morph<NdeLayer> {
 	private final JTable table = new JTable(tableModel);
 	private int selectedLayerIndex = 0;
 	
-	public NdeLayerManager(Sds sds) {
-		super(NdeLayer.class, sds);
+	public NdeLayerManager(MorphController morphController) {
+		super(NdeLayer.class, morphController);
+		morphController.setNdeLayerManager(this);
 		
 		NdeLayer defaultLayer = createMorphTarget();
 		defaultLayer.getNameAttribute().setValue("Default Layer");
-		sds.setActiveMorphTarget(defaultLayer);
+		morphController.setActiveMorphTarget(defaultLayer);
 		
 //		table.getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
 //			private JCheckBox checkBox = new JCheckBox();
@@ -46,8 +47,6 @@ public class NdeLayerManager extends Morph<NdeLayer> {
 		table.getColumnModel().getColumn(0).setMaxWidth(22);
 		table.getColumnModel().getColumn(1).setMaxWidth(22);
 		
-		JCheckBox checkBox0 = new JCheckBox();
-		checkBox0.setToolTipText("test");
 		
 		table.addMouseMotionListener(new MouseMotionAdapter() {
 			private final Point p = new Point();
@@ -189,14 +188,14 @@ public class NdeLayerManager extends Morph<NdeLayer> {
 				selectedLayerIndex = rowIndex;
 				fireTableCellUpdated(tmp, 0);
 				fireTableCellUpdated(selectedLayerIndex, 0);
-				sds.setActiveMorphTarget(morphTargets.get(rowIndex));
-				apply();
+				morphController.setActiveMorphTarget(morphTargets.get(rowIndex));
+				morphController.apply();
 				Main.getInstance().repaintViewports();
 				break;
 			case 1:
 				morphTargets.get(rowIndex).getEnabledAttribute().setBoolean((Boolean) value);
 				fireTableCellUpdated(rowIndex, 0);
-				apply();
+				morphController.apply();
 				Main.getInstance().repaintViewports();
 				break;
 			case 2:

@@ -42,6 +42,10 @@ public class JPatchForm {
 		return component;
 	}
 	
+	public void removeAll() {
+		component.removeAll();
+	}
+	
 	public void addRow(JLabel label, JComponent... components) {
 		JComponent row = new JPanel(new RowLayout());
 		row.setOpaque(false);

@@ -163,7 +163,16 @@ public class AttributeEditor {
 	
 	public void addSpecialBinding(SpecialBinding specialBinding) {
 		specialBindings.add(specialBinding);
-		containerStack.peek().add(specialBinding.getComponent());
+		if (specialBinding instanceof SpecialBinding.CustomComponent) {
+			containerStack.peek().add(((SpecialBinding.CustomComponent)specialBinding).getComponent());
+		} else if (specialBinding instanceof SpecialBinding.FormContainer) {
+			JPatchFormContainer formContainer = ((SpecialBinding.FormContainer) specialBinding).getFormContainer();
+			if (!containerStack.isEmpty()) {
+				containerStack.peek().add(formContainer);
+			}
+		} else {
+			throw new AssertionError("should never get here");
+		}
 	}
 	
 	public void setEntity(Object entity) {
