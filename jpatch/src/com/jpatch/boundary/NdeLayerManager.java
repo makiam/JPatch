@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
+import com.jpatch.afw.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
@@ -67,82 +68,9 @@ public class NdeLayerManager extends Morph<NdeLayer> {
 				}
 			}
 		});
-//		table.getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
-//			private JRadioButton radioButton = new JRadioButton();
-//			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//				radioButton.setSelected((Boolean) value);
-//				NdeLayer layer = layers.get(row);
-//				radioButton.setEnabled(layer.getEnabledAttribute().getBoolean());
-//				radioButton.setOpaque(false);
-//				return radioButton;
-//			}
-//			
-//		});
 		
-//		final JRadioButton radioButton = new JRadioButton();
-//		
-//		checkBox0.setUI(new javax.swing.plaf.basic.BasicRadioButtonUI());
-//		table.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(checkBox0));
-		
-		table.setSelectionModel(new DefaultListSelectionModel() {
-
-			@Override
-			public int getAnchorSelectionIndex() {
-				return -1;
-			}
-
-			@Override
-			public int getLeadSelectionIndex() {
-				return -1;
-			}
-
-			@Override
-			public int getMaxSelectionIndex() {
-				return -1;
-			}
-
-			@Override
-			public int getMinSelectionIndex() {
-				return -1;
-			}
-
-			@Override
-			public boolean isSelectedIndex(int index) {
-				return false;
-			}
-
-			@Override
-			public boolean isSelectionEmpty() {
-				return true;
-			}
-			
-		});
-//		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//
-//			public void valueChanged(ListSelectionEvent e) {
-//				if (!e.getValueIsAdjusting()) {
-//					ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-//					System.out.println(lsm.getLeadSelectionIndex());
-//					NdeLayer selectedLayer = layers.get(table.getSelectedRow());
-//					System.out.println(selectedLayer.getNameAttribute().getValue());
-//				}
-//			}
-//			
-//		});
-//		table.getColumnModel().getColumn(0).getCellEditor().addCellEditorListener(new CellEditorListener() {
-
-//			public void editingCanceled(ChangeEvent arg0) {
-//				// TODO Auto-generated method stub
-//				
-//			}
-//
-//			public void editingStopped(ChangeEvent arg0) {
-//				System.out.println(arg0.getSource());
-//			}
-//			
-//		});
+		table.setSelectionModel(Utils.NULL_SELECTION_MODEL);
 	}
-	
 	
 	public JComponent getComponent() {
 		return table;

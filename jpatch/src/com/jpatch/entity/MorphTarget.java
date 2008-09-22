@@ -1,5 +1,7 @@
 package com.jpatch.entity;
 
+import com.jpatch.afw.attributes.*;
+
 import java.util.*;
 
 public class MorphTarget {
@@ -7,9 +9,14 @@ public class MorphTarget {
 	private final Map<Accumulator, Integer> index = new HashMap<Accumulator, Integer>();
 	private Accumulator[] accumulators = new Accumulator[0];
 	private Accumulator[] values = new Accumulator[0];
+	private GenericAttr<String> nameAttr = new GenericAttr<String>("New NDE Layer");
 	
 	public MorphTarget(Morph<? extends MorphTarget> morph) {
 		this.morph = morph;
+	}
+	
+	public GenericAttr<String> getNameAttribute() {
+		return nameAttr;
 	}
 	
 	public final Accumulator getAccumulatorValueFor(Accumulator accumulator, Object object) {

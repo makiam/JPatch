@@ -2,7 +2,7 @@ package com.jpatch.afw;
 
 import java.util.*;
 
-import javax.swing.JComponent;
+import javax.swing.*;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.vecmath.Matrix4d;
@@ -123,4 +123,38 @@ public class Utils {
 			return recurseValidateRoot((JComponent) component.getParent());
 		}
 	}
+	
+	public static final ListSelectionModel NULL_SELECTION_MODEL = new DefaultListSelectionModel() {
+
+		@Override
+		public int getAnchorSelectionIndex() {
+			return -1;
+		}
+
+		@Override
+		public int getLeadSelectionIndex() {
+			return -1;
+		}
+
+		@Override
+		public int getMaxSelectionIndex() {
+			return -1;
+		}
+
+		@Override
+		public int getMinSelectionIndex() {
+			return -1;
+		}
+
+		@Override
+		public boolean isSelectedIndex(int index) {
+			return false;
+		}
+
+		@Override
+		public boolean isSelectionEmpty() {
+			return true;
+		}
+		
+	};
 }

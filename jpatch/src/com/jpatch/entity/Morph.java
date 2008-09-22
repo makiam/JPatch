@@ -12,6 +12,7 @@ public abstract class Morph<T extends MorphTarget> {
 //	private int[] references = new int[0];
 	
 	protected final List<T> morphTargets = new ArrayList<T>();
+	private final List<T> morphTargetsView = Collections.unmodifiableList(morphTargets);
 	private final Class<? extends T> morphTargetClass;
 	
 	protected Morph(Class<T> morphTargetClass, MorphController morphController) {
@@ -84,6 +85,10 @@ public abstract class Morph<T extends MorphTarget> {
 		}
 		morphTargets.add(morphTarget);
 		return morphTarget;
+	}
+	
+	public List<T> getMorphTargets() {
+		return morphTargetsView;
 	}
 	
 	public void removeMorphTarget(MorphTarget morphTarget) {
