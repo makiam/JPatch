@@ -446,7 +446,6 @@ public class AttributeManager {
 	public JTable bindTableToAttribute(Object entity, final JTable table, final Attribute attribute) {
 		AttributeBinding binding = new AttributeBinding(attribute, new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
-				System.out.println("*");
 				((AbstractTableModel) table.getModel()).fireTableDataChanged();
 			}	
 		});

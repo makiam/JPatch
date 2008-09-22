@@ -78,6 +78,15 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 				valuesValid = false;
 			}
 		});
+		for (int i = 0; i <= degreesOfFreedom; i++) {
+			MorphTarget target = createMorphTarget();
+			if (i == 0) {
+				target.getNameAttribute().setValue("idle target");
+			} else {
+				target.getNameAttribute().setValue("DOF#" + (i - 1) + " maximum target");
+				centers[i][i - 1] = 1;
+			}
+		}
 	}
 	
 	public GenericAttr<String> getNameAttribute() {
@@ -312,6 +321,7 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 	}
 	
 	private void evaluate() {
+		if (true) return; // TODO
 		check();
 		if (!weightsValid) {
 			computeWeights();

@@ -20,6 +20,8 @@ public class JPatchFormContainer {
 	private static final Insets COLLAPSED_INSETS = new Insets(0, 3, 3, 3);
 	private final JComponent component = new JPanel();
 	private final JComponent titleBar = new JPanel(new BorderLayout());
+	private final JPanel actionButtonPanel;
+	private final JButton actionButton;
 	private final Box formBox = Box.createVerticalBox();
 	private final Box containerBox = Box.createVerticalBox();
 	private JPatchFormContainer parentContainer;
@@ -48,6 +50,9 @@ public class JPatchFormContainer {
 					}
 				}
 				expandedButton.setSelected(expandedAttr.getBoolean());
+				if (actionButton != null) {
+					actionButtonPanel.setVisible(expandedAttr.getBoolean());
+				}
 				System.out.println(title + " component=" + System.identityHashCode(component) + " parent=" + System.identityHashCode(component.getParent()) + " validateRoot=" + System.identityHashCode(Utils.getValidateRoot(component)));
 				component.revalidate();
 				ignore = false;
@@ -56,14 +61,33 @@ public class JPatchFormContainer {
 	};
 	
 	public JPatchFormContainer(String title, BooleanAttr expansionControl) {
+		this(title, expansionControl, new JButton("test"));
+	}
+			
+	public JPatchFormContainer(String title, BooleanAttr expansionControl, JButton actionButton) {
 		this.title = title;
 		if (expansionControl != null) {
 			expandedAttr = expansionControl;
 		} else {
 			expandedAttr = new BooleanAttr();
 		}
+		this.actionButton = actionButton;
 		component.setLayout(new BoxLayout(component, BoxLayout.Y_AXIS));
 		titleBar.add(expandedButton, BorderLayout.WEST);
+		if (actionButton != null) {
+			actionButtonPanel = new JPanel(new BorderLayout());
+			actionButtonPanel.setBorder(BorderFactory.createEmptyBorder(2, 1, 1, 2));
+			System.out.println("panel border = " + actionButtonPanel.getBorder());
+			System.out.println("button border = " + actionButton.getBorder());
+			Dimension dim = actionButton.getPreferredSize();
+			dim.height = 20;
+			actionButton.setPreferredSize(dim);
+			actionButtonPanel.add(actionButton, BorderLayout.CENTER);
+			actionButtonPanel.setOpaque(false);
+			titleBar.add(actionButtonPanel, BorderLayout.EAST);
+		} else {
+			actionButtonPanel = null;
+		}
 		expandedButton.setFont(LABEL_FONT);
 		titleBar.setOpaque(false);
 		titleBar.setPreferredSize(new Dimension(20, 18));
@@ -125,7 +149,6 @@ public class JPatchFormContainer {
 			}
 			
 		});
-		
 		
 		expandedAttr.addAttributePostChangeListener(expansionListener);
 		expandedButton.setSelected(expandedAttr.getBoolean());

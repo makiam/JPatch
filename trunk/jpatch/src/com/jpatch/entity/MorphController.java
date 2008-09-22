@@ -1,5 +1,6 @@
 package com.jpatch.entity;
 
+import com.jpatch.afw.attributes.*;
 import com.jpatch.boundary.*;
 import com.jpatch.entity.sds2.*;
 
@@ -13,7 +14,7 @@ public class MorphController {
 	private int[] references = new int[0];
 	private NdeLayerManager ndeLayerManager;
 	private List<MorphInterpolator> morphs = new ArrayList<MorphInterpolator>();
-	private MorphTarget activeMorphTarget;
+	private GenericAttr<MorphTarget> activeMorphTargetAttr = new GenericAttr<MorphTarget>();
 	
 	public MorphController(Sds sds) {
 		this.sds = sds;
@@ -103,9 +104,11 @@ public class MorphController {
 			accumulator.reset();
 		}
 		
+		final MorphTarget activeMorphTarget = activeMorphTargetAttr.getValue();
+		
 		ndeLayerManager.apply(activeMorphTarget);
 		for (Morph<? extends MorphTarget> morph : morphs) {
-			morph.apply(activeMorphTarget);
+			morph.apply(activeMorphTargetAttr.getValue());
 		}
 		
 		activeMorphTarget.set();
@@ -123,11 +126,14 @@ public class MorphController {
 	}
 	
 	public MorphTarget getActiveMorphTarget() {
-		return activeMorphTarget;
+		return activeMorphTargetAttr.getValue();
 	}
 	
-	
 	public void setActiveMorphTarget(MorphTarget morphTarget) {
-		this.activeMorphTarget = morphTarget;
+		this.activeMorphTargetAttr.setValue(morphTarget);
+	}
+	
+	public GenericAttr<MorphTarget> getActiveMorphTargetAttribute() {
+		return activeMorphTargetAttr;
 	}
 }
