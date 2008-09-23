@@ -15,17 +15,18 @@ import javax.swing.table.*;
 
 
 
+
 public class MorphComponent implements SpecialBinding.FormContainer {
 	private static final Border TABLE_BORDER = BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2), BorderFactory.createEtchedBorder());
 	private final JPanel morphsPanel = new JPanel(new BorderLayout());
 	private final JPanel morphsTablePanel = new JPanel(new BorderLayout());
 	private final JComponent buttonBox = Box.createHorizontalBox();
-	private final JButton newButton = new JButton("New");
-	private JPatchFormContainer rootFormContainer = new JPatchFormContainer("Morphs", new BooleanAttr());
+	private final JButton newButton = new JButton("new");
+	private JPatchFormContainer rootFormContainer = new JPatchFormContainer("Morphs", new BooleanAttr(), newButton);
 	private JPatchFormContainer advancedFormContainer = new JPatchFormContainer("Advanced", new BooleanAttr());
 	private JPatchFormContainer dofFormContainer = new JPatchFormContainer("Degrees of freedom", new BooleanAttr());
 	private JPatchFormContainer sliderFormContainer = new JPatchFormContainer("Sliders", new BooleanAttr());
-	private JPatchFormContainer targetsFormContainer = new JPatchFormContainer("Targets", new BooleanAttr());
+	private JPatchFormContainer targetsFormContainer = new JPatchFormContainer("Targets", new BooleanAttr(), new JButton("new"));
 	private JPatchFormContainer targetPositionFormContainer = new JPatchFormContainer("Target position", new BooleanAttr());
 	private JPatchForm advancedForm = new JPatchForm();
 	private JPatchForm sliderForm = new JPatchForm();
@@ -35,32 +36,154 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 	private JSlider[] sliders = new JSlider[0];
 	
 	private MorphInterpolator currentMorph;
+	private MorphTarget currentTarget;
+	private DoubleArrayAttr targetPositionAttr;
 	
 	private MorphController morphController;
 	private SdsModel sdsModel;
 	private MorphListModel morphListModel = new MorphListModel();
 	private JList morphList = new JList(morphListModel);
 	
-	private DofTableModel dofTableModel = new DofTableModel();
-	private JTable dofTable = new JTable(dofTableModel);
+	@SuppressWarnings("serial")
+	private final AbstractTableModel dofTableModel = new JPatchTableModel(
+			new String[] { "DOF", "min", "current", "max" },
+			new Class[] { String.class, Double.class, Double.class, Double.class },
+			new boolean[] { true, true, true, true }
+	) {
+		public int getRowCount() {
+			return currentMorph == null ? 0 : currentMorph.getDegreesOfFreedom();
+		}
+
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			switch (columnIndex) {
+			case 0: // DOF name
+				return currentMorph.getDofNamesAttribute().getValue(rowIndex);
+			case 1: // lower limit
+				return currentMorph.getLowerLimitsAttribute().getDouble(rowIndex);
+			case 2: // value
+				return currentMorph.getPositionAttribute().getDouble(rowIndex);
+			case 3: // upper limit
+				return currentMorph.getUpperLimitsAttribute().getDouble(rowIndex);
+			default:
+				throw new AssertionError("should never get here");	
+			}
+		}
+		
+		@Override
+		public void setValueAt(Object value, int rowIndex, int columnIndex) {
+			switch (columnIndex) {
+			case 0: // DOF name
+				currentMorph.getDofNamesAttribute().setValue(rowIndex, (String) value);
+				break;
+			case 1: // lower limit
+				currentMorph.getLowerLimitsAttribute().setDouble(rowIndex, (Double) value);
+				break;
+			case 2: // value
+				currentMorph.getPositionAttribute().setDouble(rowIndex, (Double) value);
+				break;
+			case 3: // upper limit
+				currentMorph.getUpperLimitsAttribute().setDouble(rowIndex, (Double) value);
+				break;
+			default:
+				throw new AssertionError("should never get here");	
+			}
+		}
 	
-	private TargetsTableModel targetsTableModel = new TargetsTableModel();
-	private JTable targetsTable = new JTable(targetsTableModel);
+	};
+	private final JTable dofTable = new JTable(dofTableModel);
+	
+	@SuppressWarnings("serial")
+	private final AbstractTableModel targetsTableModel = new JPatchTableModel(
+			new String[] { "A", "target" },
+			new Class[] { Boolean.class, String.class },
+			new boolean[] { true, true }
+	) {
+		public int getRowCount() {
+			return currentMorph == null ? 0 : currentMorph.getMorphTargets().size();
+		}
+		
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			switch (columnIndex) {
+			case 0:
+				return currentMorph.getMorphTargets().get(rowIndex) == morphController.getActiveMorphTarget();
+			case 1:
+				return currentMorph.getMorphTargets().get(rowIndex).getNameAttribute().getValue();
+			default:
+				throw new AssertionError("should never get here");
+			}
+		}
+		
+		public void setValueAt(Object value, int rowIndex, int columnIndex) {
+			switch (columnIndex) {
+			case 0: // active
+				morphController.setActiveMorphTarget(currentMorph.getMorphTargets().get(rowIndex));
+				morphController.apply();
+				Main.getInstance().repaintViewports();
+				break;
+			case 1: // target name
+				currentMorph.getMorphTargets().get(rowIndex).getNameAttribute().setValue((String) value);
+				break;
+			default:
+				throw new AssertionError("should never get here");	
+			}
+		}
+		
+		@Override
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+			return rowIndex == 0 ? false : super.isCellEditable(rowIndex, columnIndex);
+		}
+	};
+	private final JTable targetsTable = new JTable(targetsTableModel);
+	
+	@SuppressWarnings("serial")
+	private final AbstractTableModel targetPositionTableModel = new JPatchTableModel(
+			new String[] { "DOF", "position" },
+			new Class[] { String.class, Double.class },
+			new boolean[] { false, true }
+	) {
+
+		public int getRowCount() {
+			return currentTarget == null ? 0 : currentMorph.getDegreesOfFreedom();
+		}
+
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			switch (columnIndex) {
+			case 0:
+				return currentMorph.getDofNamesAttribute().getValue(rowIndex);
+			case 1:
+				return targetPositionAttr.getAttr(rowIndex).getDouble();
+			default:
+				throw new AssertionError("should never get here");
+			}
+		}
+		
+		@Override
+		public void setValueAt(Object value, int rowIndex, int columnIndex) {
+			switch (columnIndex) {
+			case 1: // target name
+				targetPositionAttr.getAttr(rowIndex).setDouble((Double) value);
+				break;
+			default:
+				throw new AssertionError("should never get here");	
+			}
+		}
+	};
+	private final JTable targetPositionTable = new JTable(targetPositionTableModel);
 	
 	public MorphComponent() {
 		morphsPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		morphsTablePanel.setBorder(TABLE_BORDER);
 		newButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				morphController.addMorph(new MorphInterpolator(3, morphController, "new morph"));
+				morphController.addMorph(new MorphInterpolator(2, morphController, "new morph"));
 				morphListModel.fireIntervalAdded(morphListModel, morphController.getNumberOfMorphs(), morphController.getNumberOfMorphs() + 1);
 				morphList.setSelectedIndex(morphController.getNumberOfMorphs() - 1);
 			}
 		});
 		
-		buttonBox.add(newButton);
-		buttonBox.setOpaque(false);
-		morphsPanel.add(buttonBox, BorderLayout.NORTH);
+//		buttonBox.add(newButton);
+//		buttonBox.setOpaque(false);
+//		morphsPanel.add(buttonBox, BorderLayout.NORTH);
 		morphsPanel.add(morphsTablePanel, BorderLayout.CENTER);
 		rootFormContainer.add(morphsPanel);
 		rootFormContainer.add(advancedFormContainer);
@@ -99,7 +222,27 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 		targetsTablePanel.add(targetsTable);
 		targetsFormContainer.add(targetsTablePanel);
 		
+		targetsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent arg0) {
+				int row = targetsTable.getSelectedRow();
+				if (row != -1) {
+					setCurrentTarget(currentMorph.getMorphTargets().get(targetsTable.getSelectedRow()));
+				} else {
+					setCurrentTarget(null);
+				}
+			}		
+		});
+		
 		targetsFormContainer.add(targetPositionFormContainer);
+		
+		/* Target position table */
+		targetPositionTable.setSelectionModel(Utils.NULL_SELECTION_MODEL);
+		JPanel targetPositionPanel = new JPanel(new BorderLayout());
+		targetPositionPanel.setBorder(TABLE_BORDER);
+		targetPositionPanel.add(targetPositionTable.getTableHeader(), BorderLayout.NORTH);
+		targetPositionPanel.add(targetPositionTable);
+		targetPositionFormContainer.add(targetPositionPanel);
+		
 		
 //		dofTable.setDefaultRenderer(GenericAttr.class, new DefaultTableCellRenderer() {
 //
@@ -151,6 +294,13 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 		targetsTableModel.fireTableDataChanged();
 	}
 	
+	private void setCurrentTarget(MorphTarget target) {
+		currentTarget = target;
+		if (currentTarget != null) {
+			targetPositionAttr = currentMorph.createCenterPositionAttribute(currentTarget);
+		}
+		targetPositionTableModel.fireTableDataChanged();
+	}
 	
 	
 	public void bindTo(Object binding) {
@@ -164,7 +314,7 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 	private class MorphListModel extends AbstractListModel {
 
 		public Object getElementAt(int index) {
-			return morphController.getMorph(index).getNameAttribute();
+			return morphController.getMorph(index).getNameAttribute().getValue();
 		}
 
 		public int getSize() {
@@ -177,152 +327,5 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 			super.fireIntervalAdded(source, index0, index1);
 		}
 		
-	}
-	
-	private class TargetsTableModel extends AbstractTableModel {
-		public int getColumnCount() {
-			return 2;
-		}
-
-		public int getRowCount() {
-			return currentMorph == null ? 0 : currentMorph.getMorphTargets().size();
-		}
-
-		@Override
-		public String getColumnName(int column) {
-			switch (column) {
-			case 0: // DOF name
-				return "A";
-			case 1: // lower limit
-				return "Target";
-			default:
-				throw new AssertionError("should never get here");
-			}
-		}
-		
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				return currentMorph.getMorphTargets().get(rowIndex) == morphController.getActiveMorphTarget();
-			case 1:
-				return currentMorph.getMorphTargets().get(rowIndex).getNameAttribute().getValue();
-			default:
-				throw new AssertionError("should never get here");
-			}
-		}
-		
-		@Override
-		public void setValueAt(Object value, int rowIndex, int columnIndex) {
-			switch (columnIndex) {
-			case 0: // active
-				morphController.setActiveMorphTarget(currentMorph.getMorphTargets().get(rowIndex));
-				morphController.apply();
-				Main.getInstance().repaintViewports();
-				break;
-			case 1: // target name
-				currentMorph.getMorphTargets().get(rowIndex).getNameAttribute().setValue((String) value);
-				break;
-			default:
-				throw new AssertionError("should never get here");	
-			}
-		}
-		
-		@Override
-		public Class<?> getColumnClass(int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				return Boolean.class;
-			case 1:
-				return String.class;
-			default:
-				throw new AssertionError("should never get here");
-			}
-		}
-
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return true;
-		}
-	}
-	
-	private class DofTableModel extends AbstractTableModel {
-
-		public int getColumnCount() {
-			return 4;
-		}
-
-		public int getRowCount() {
-			return currentMorph == null ? 0 : currentMorph.getDegreesOfFreedom();
-		}
-
-		@Override
-		public String getColumnName(int column) {
-			switch (column) {
-			case 0: // DOF name
-				return "DOF";
-			case 1: // lower limit
-				return "min";
-			case 2: // value
-				return "current";
-			case 3: // upper limit
-				return "max";
-			default:
-				throw new AssertionError("should never get here");
-			}
-		}
-
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			switch (columnIndex) {
-			case 0: // DOF name
-				return currentMorph.getDofNamesAttribute().getValue(rowIndex);
-			case 1: // lower limit
-				return currentMorph.getLowerLimitsAttribute().getDouble(rowIndex);
-			case 2: // value
-				return currentMorph.getPositionAttribute().getDouble(rowIndex);
-			case 3: // upper limit
-				return currentMorph.getUpperLimitsAttribute().getDouble(rowIndex);
-			default:
-				throw new AssertionError("should never get here");	
-			}
-		}
-		
-		@Override
-		public void setValueAt(Object value, int rowIndex, int columnIndex) {
-			switch (columnIndex) {
-			case 0: // DOF name
-				currentMorph.getDofNamesAttribute().setValue(rowIndex, (String) value);
-				break;
-			case 1: // lower limit
-				currentMorph.getLowerLimitsAttribute().setDouble(rowIndex, (Double) value);
-				break;
-			case 2: // value
-				currentMorph.getPositionAttribute().setDouble(rowIndex, (Double) value);
-				break;
-			case 3: // upper limit
-				currentMorph.getUpperLimitsAttribute().setDouble(rowIndex, (Double) value);
-				break;
-			default:
-				throw new AssertionError("should never get here");	
-			}
-		}
-		
-		@Override
-		public Class<?> getColumnClass(int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				return String.class;
-			case 1:
-			case 2:	//fallthrough intentional
-			case 3: //fallthrough intentional
-				return Double.class;
-			default:
-				throw new AssertionError("should never get here");
-			}
-		}
-
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return true;
-		}
 	}
 }

@@ -286,6 +286,24 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 		}
 	}
 	
+	public DoubleArrayAttr createCenterPositionAttribute(MorphTarget target) {
+		final int centerIndex = morphTargetIndex.get(target);
+		DoubleArrayAttr arrayAttr = new DoubleArrayAttr(degreesOfFreedom);
+		for (int i = 0; i < degreesOfFreedom; i++) {
+			final int dofIndex = i;
+			DoubleAttr doubleAttr = arrayAttr.getAttr(dofIndex);
+			doubleAttr.setDouble(centers[centerIndex][dofIndex]);
+			doubleAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
+				public void attributeHasChanged(Attribute source) {
+					centers[centerIndex][dofIndex] = ((DoubleAttr) source).getDouble();
+					weightsValid = false;
+				}		
+			});
+		}
+		System.out.println("created new ArrayAttr for index " + centerIndex + ": " + arrayAttr);
+		return arrayAttr;
+	}
+	
 	private void computeWeights() {
 		int dim = centers.length + 1 + degreesOfFreedom;
 		
