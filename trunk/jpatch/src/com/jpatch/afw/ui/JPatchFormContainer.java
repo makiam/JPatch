@@ -61,7 +61,7 @@ public class JPatchFormContainer {
 	};
 	
 	public JPatchFormContainer(String title, BooleanAttr expansionControl) {
-		this(title, expansionControl, new JButton("test"));
+		this(title, expansionControl, null);
 	}
 			
 	public JPatchFormContainer(String title, BooleanAttr expansionControl, JButton actionButton) {
