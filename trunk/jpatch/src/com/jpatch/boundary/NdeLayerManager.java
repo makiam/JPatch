@@ -10,11 +10,77 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 
 import com.jpatch.afw.*;
+import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.ui.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
 public class NdeLayerManager extends Morph<NdeLayer> {
-	private final NdeTableModel tableModel = new NdeTableModel();
+	@SuppressWarnings("serial")
+	private final AbstractTableModel tableModel = new JPatchTableModel(
+				new String[] { "A", "E", "Layer Name" },
+				new Class[] { Boolean.class, Boolean.class, String.class },
+				new boolean[] { true, true, true }
+		){
+	
+		public int getRowCount() {
+			return morphTargets.size();
+		}
+
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			switch (columnIndex) {
+			case 0:
+				return morphTargets.get(rowIndex) == morphController.getActiveMorphTarget();
+			case 1:
+				return morphTargets.get(rowIndex).getEnabledAttribute().getBoolean();
+			case 2:
+				return morphTargets.get(rowIndex).getNameAttribute().getValue();
+			default:
+				throw new RuntimeException();
+			}
+		}
+
+		@Override
+		public void setValueAt(Object value, int rowIndex, int columnIndex) {
+			switch (columnIndex) {
+			case 0:
+				int tmp = selectedLayerIndex;
+				selectedLayerIndex = rowIndex;
+				fireTableCellUpdated(tmp, 0);
+				fireTableCellUpdated(selectedLayerIndex, 0);
+				morphController.setActiveMorphTarget(morphTargets.get(rowIndex));
+				morphController.apply();
+				Main.getInstance().repaintViewports();
+				break;
+			case 1:
+				morphTargets.get(rowIndex).getEnabledAttribute().setBoolean((Boolean) value);
+				fireTableCellUpdated(rowIndex, 0);
+				morphController.apply();
+				Main.getInstance().repaintViewports();
+				break;
+			case 2:
+				morphTargets.get(rowIndex).getNameAttribute().setValue((String) value);
+				break;
+			default:
+				throw new RuntimeException();
+			}
+		}
+		
+		@Override
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+			NdeLayer layer = morphTargets.get(rowIndex);
+			switch (columnIndex) {
+			case 0:
+				return layer.getEnabledAttribute().getBoolean();
+			case 1:
+				return rowIndex != selectedLayerIndex;
+			case 2:
+				return true;
+			default:
+				throw new RuntimeException();
+			}
+		}
+	};
 	private final JTable table = new JTable(tableModel);
 	private int selectedLayerIndex = 0;
 	
@@ -24,6 +90,11 @@ public class NdeLayerManager extends Morph<NdeLayer> {
 		
 		NdeLayer defaultLayer = createMorphTarget();
 		defaultLayer.getNameAttribute().setValue("Default Layer");
+		morphController.getActiveMorphTargetAttribute().addAttributePostChangeListener(new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				tableModel.fireTableDataChanged();
+			}	
+		});
 		morphController.setActiveMorphTarget(defaultLayer);
 		
 //		table.getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
@@ -72,7 +143,7 @@ public class NdeLayerManager extends Morph<NdeLayer> {
 		table.setSelectionModel(Utils.NULL_SELECTION_MODEL);
 	}
 	
-	public JComponent getComponent() {
+	public JTable getTable() {
 		return table;
 	}
 	
@@ -85,86 +156,7 @@ public class NdeLayerManager extends Morph<NdeLayer> {
 	}
 
 
-	class NdeTableModel extends AbstractTableModel {
-
-		public int getColumnCount() {
-			return 3;
-		}
-
-		public int getRowCount() {
-			return morphTargets.size();
-		}
-
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				return rowIndex == selectedLayerIndex;
-			case 1:
-				return morphTargets.get(rowIndex).getEnabledAttribute().getBoolean();
-			case 2:
-				return morphTargets.get(rowIndex).getNameAttribute().getValue();
-			default:
-				throw new RuntimeException();
-			}
-		}
-
-		@Override
-		public void setValueAt(Object value, int rowIndex, int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				int tmp = selectedLayerIndex;
-				selectedLayerIndex = rowIndex;
-				fireTableCellUpdated(tmp, 0);
-				fireTableCellUpdated(selectedLayerIndex, 0);
-				morphController.setActiveMorphTarget(morphTargets.get(rowIndex));
-				morphController.apply();
-				Main.getInstance().repaintViewports();
-				break;
-			case 1:
-				morphTargets.get(rowIndex).getEnabledAttribute().setBoolean((Boolean) value);
-				fireTableCellUpdated(rowIndex, 0);
-				morphController.apply();
-				Main.getInstance().repaintViewports();
-				break;
-			case 2:
-				morphTargets.get(rowIndex).getNameAttribute().setValue((String) value);
-				break;
-			default:
-				throw new RuntimeException();
-			}
-		}
-
-		@Override
-		public Class<?> getColumnClass(int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				return Boolean.class;
-			case 1:
-				return Boolean.class;
-			case 2:
-				return String.class;
-			default:
-				throw new RuntimeException();
-			}
-		}
-
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			NdeLayer layer = morphTargets.get(rowIndex);
-			switch (columnIndex) {
-			case 0:
-				return layer.getEnabledAttribute().getBoolean();
-			case 1:
-				return rowIndex != selectedLayerIndex;
-			case 2:
-				return true;
-			default:
-				throw new RuntimeException();
-			}
-		}
-		
-		
-	}
+	
 	
 //	public static void main(String[] args) {
 //		JFrame frame = new JFrame("NDE Layer List test");

@@ -166,6 +166,10 @@ public class JPatchFormContainer {
 		expandedButton.setText(title);
 	}
 	
+	public void setTitle(String title) {
+		expandedButton.setText(title);
+	}
+	
 	public JComponent getComponent() {
 		return component;
 	}

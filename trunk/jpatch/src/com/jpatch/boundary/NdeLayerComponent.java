@@ -3,16 +3,18 @@ package com.jpatch.boundary;
 import java.awt.*;
 import java.awt.event.*;
 
+import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.ui.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 
 import javax.swing.*;
 
-public class NdeLayerComponent implements SpecialBinding.CustomComponent {
+public class NdeLayerComponent implements SpecialBinding.FormContainer {
 	private final JPanel panel = new JPanel(new BorderLayout());
 	private final JPanel tablePanel = new JPanel(new BorderLayout());
-	private final JComponent buttonBox = Box.createHorizontalBox();
 	private final JButton newButton = new JButton("New");
+	private final JPatchFormContainer formContainer = new JPatchFormContainer("NDE Layers", new BooleanAttr(), newButton);
 	private NdeLayerManager ndeLayerManager;
 	private SdsModel sdsModel;
 	
@@ -26,23 +28,24 @@ public class NdeLayerComponent implements SpecialBinding.CustomComponent {
 				panel.repaint();
 			}
 		});
-		buttonBox.add(newButton);
-		buttonBox.setOpaque(false);
-		panel.add(buttonBox, BorderLayout.NORTH);
 		panel.add(tablePanel, BorderLayout.CENTER);
+		formContainer.add(panel);
 	}
 	
-	public JComponent getComponent() {
-		return panel;
+	public JPatchFormContainer getFormContainer() {
+		return formContainer;
 	}
 	
 	public void bindTo(Object binding) {
 		sdsModel = (SdsModel) binding;
 		tablePanel.removeAll();
 		ndeLayerManager = sdsModel.getSds().getNdeLayerManager();
-		tablePanel.add(ndeLayerManager.getComponent(), BorderLayout.CENTER);
+		tablePanel.add(ndeLayerManager.getTable().getTableHeader(), BorderLayout.NORTH);
+		tablePanel.add(ndeLayerManager.getTable(), BorderLayout.CENTER);
 		
 		
 		
 	}
+
+	
 }

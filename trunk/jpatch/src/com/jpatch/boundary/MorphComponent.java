@@ -17,6 +17,8 @@ import javax.swing.table.*;
 
 
 public class MorphComponent implements SpecialBinding.FormContainer {
+	
+	
 	private static final Border TABLE_BORDER = BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2), BorderFactory.createEtchedBorder());
 	private final JPanel morphsPanel = new JPanel(new BorderLayout());
 	private final JPanel morphsTablePanel = new JPanel(new BorderLayout());
@@ -43,6 +45,12 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 	private SdsModel sdsModel;
 	private MorphListModel morphListModel = new MorphListModel();
 	private JList morphList = new JList(morphListModel);
+	
+	private final AttributePostChangeListener activeTargetListener = new AttributePostChangeListener() {
+		public void attributeHasChanged(Attribute source) {
+			targetsTableModel.fireTableDataChanged();
+		}	
+	};
 	
 	@SuppressWarnings("serial")
 	private final AbstractTableModel dofTableModel = new JPatchTableModel(
@@ -284,6 +292,14 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 				attributeManager.bindSliderToAttribute(currentMorph, sliders[i], doubleAttr, IdentityMapping.getInstance());
 				attributeManager.bindLabelToAttribute(currentMorph, sliderLables[i], currentMorph.getDofNamesAttribute().getAttr(i));
 				sliderForm.addRow(sliderLables[i], sliders[i]);
+				sliders[i].addChangeListener(new ChangeListener() {
+
+					public void stateChanged(ChangeEvent arg0) {
+						morphController.apply();
+						Main.getInstance().repaintViewports();
+					}
+					
+				});
 			}
 		} else {
 			
@@ -309,6 +325,8 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 		morphsTablePanel.removeAll();
 		morphController = sdsModel.getSds().getMorphController();
 		morphsTablePanel.add(morphList, BorderLayout.CENTER);
+		morphController.getActiveMorphTargetAttribute().removeAttributePostChangeListener(activeTargetListener);
+		morphController.getActiveMorphTargetAttribute().addAttributePostChangeListener(activeTargetListener);
 	}
 
 	private class MorphListModel extends AbstractListModel {
