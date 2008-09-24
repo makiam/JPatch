@@ -40,6 +40,6 @@ public class AbstractTransformTest {
 	}
 	void dump(AbstractTransformNode node) {
 		String nodename = (node == node1) ? "node1" : (node == node2) ? "node2" : "?";
-		System.out.println(nodename + " parent=" + node.getParentAttribute().getValue() + " children=" + node.getChildrenAttribute().getElements());
+		System.out.println(nodename + " parent=" + node.getParentAttribute().createValue() + " children=" + node.getChildrenAttribute().getElements());
 	}
 }

@@ -34,7 +34,7 @@ public class Tuple3Accumulator implements Accumulator {
 		return t.x == 0 && t.y == 0 && t.z == 0;
 	}
 	
-	public Tuple3Accumulator getValue() {
+	public Tuple3Accumulator createValue() {
 		Tuple3Accumulator a = new Tuple3Accumulator(null);
 		a.t.set(t);
 		return a;
