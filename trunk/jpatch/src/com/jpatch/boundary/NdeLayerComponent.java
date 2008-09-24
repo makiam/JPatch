@@ -18,7 +18,7 @@ public class NdeLayerComponent implements SpecialBinding.FormContainer {
 	private NdeLayerManager ndeLayerManager;
 	private SdsModel sdsModel;
 	
-	public NdeLayerComponent() {
+	public NdeLayerComponent() { 
 		panel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		tablePanel.setBorder(BorderFactory.createEtchedBorder());
 		newButton.addActionListener(new ActionListener() {
