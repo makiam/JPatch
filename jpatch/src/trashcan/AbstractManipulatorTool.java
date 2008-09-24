@@ -14,9 +14,9 @@ public abstract class AbstractManipulatorTool implements JPatchTool {
 	protected TransformNode getSelectedNode() {
 		return Main.getInstance().getSelection().getNode();
 		if (isObjectMode()) {
-			return (TransformNode) Main.getInstance().getSelectionManager().getSelectedObjectAttribute().getValue();
+			return (TransformNode) Main.getInstance().getSelectionManager().getSelectedObjectAttribute().createValue();
 		} else {
-			return Main.getInstance().getSelection().getSelectedSdsModelAttribute().getValue();
+			return Main.getInstance().getSelection().getSelectedSdsModelAttribute().createValue();
 		}
 	}
 	

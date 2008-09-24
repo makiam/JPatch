@@ -5,5 +5,5 @@ public interface Accumulator {
 	boolean isZero();
 	void accumulate(Accumulator acc);
 	void set(Accumulator acc);
-	Accumulator getValue();
+	Accumulator createValue();
 }

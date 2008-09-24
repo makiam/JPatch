@@ -142,8 +142,8 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 
 
 	@Override
-	public void addAccumulator(Accumulator accumulator, Object object) {
-		super.addAccumulator(accumulator, object);
+	public void addAccumulator(Accumulator accumulator, Object object, Accumulator value) {
+		super.addAccumulator(accumulator, object, value);
 		
 		final Integer position = index.get(accumulator);
 		if (position == null) {
@@ -156,12 +156,13 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 			
 			final Accumulator[] tmpAccumulatorValues = new Accumulator[n + 1];
 			System.arraycopy(accumulatorValues, 0, tmpAccumulatorValues, 0, n);
-			tmpAccumulatorValues[n] = accumulator.getValue();
+			tmpAccumulatorValues[n] = value;
 			accumulatorValues = tmpAccumulatorValues;
 			
 			if (accumulator instanceof Tuple3Accumulator) {
-				valueIndex.put(accumulator, dimensions);
+				valueIndex.put(value, dimensions);
 				addDimensions(3);
+	//			System.out.println("*** adding valueIndex for value " + accumulatorValue + ", morphTarget=" + morphTarget);
 			} else {
 				throw new IllegalArgumentException();
 			}
@@ -266,17 +267,18 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 		for (int centerIndex = 0; centerIndex < centers.length; centerIndex++) {
 			MorphTarget morphTarget = morphTargets.get(centerIndex);
 			final double[] values = this.values[centerIndex];
-			int index = 0;
 			
 			System.out.println("morphTarget:" + morphTarget);
 			/* check if accumulator values have changed and, if yes, change the value and clear the weightsValid flag */
 			for (Accumulator accumulator : morphTarget.getValues()) {
 				if (accumulator instanceof Tuple3Accumulator) {
 					System.out.println(accumulator);
+					System.out.println("*** getting valueIndex for " + accumulator);
+					int index = valueIndex.get(accumulator);
 					Tuple3d tuple = ((Tuple3Accumulator) accumulator).asTuple();
-					weightsValid &= checkValue(values, index++, tuple.x);
-					weightsValid &= checkValue(values, index++, tuple.y);
-					weightsValid &= checkValue(values, index++, tuple.z);
+					weightsValid &= checkValue(values, index, tuple.x);
+					weightsValid &= checkValue(values, index + 1, tuple.y);
+					weightsValid &= checkValue(values, index + 2, tuple.z);
 				} else {
 					throw new RuntimeException();
 				}
@@ -412,6 +414,9 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 	@Override
 	public void apply(MorphTarget activeMorphTarget) {
 		System.out.println("apply");
+		if (morphTargetIndex.containsKey(activeMorphTarget)) {
+			return;
+		}
 		if (!valuesValid || !weightsValid) {
 			evaluate();
 		}

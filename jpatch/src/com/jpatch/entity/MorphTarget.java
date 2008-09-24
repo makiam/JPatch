@@ -20,7 +20,6 @@ public class MorphTarget {
 	}
 	
 	public final Accumulator getAccumulatorValueFor(Accumulator accumulator, Object object) {
-		System.out.println("gettint accumulator for " + object);
 		final Integer position = index.get(accumulator);
 		if (position == null) {
 			System.out.println("adding accumulator for " + object);
@@ -31,11 +30,11 @@ public class MorphTarget {
 			accumulators = tmpAccumulators;
 			final Accumulator[] tmpValues = new Accumulator[n + 1];
 			System.arraycopy(values, 0, tmpValues, 0, n);
-			final Accumulator value = accumulator.getValue();
+			final Accumulator value = accumulator.createValue();
 			tmpValues[n] = value;
 			values = tmpValues;
 			index.put(accumulator, n);
-			morph.addAccumulator(accumulator, object);
+			morph.addAccumulator(accumulator, object, value);
 			return value;
 		} else {
 			return values[position];
@@ -71,5 +70,10 @@ public class MorphTarget {
 	
 	Accumulator[] getValues() {
 		return values;
+	}
+	
+	@Override
+	public String toString() {
+		return "MorphTarget@" + System.identityHashCode(this) + "(" + nameAttr.getValue() + ") " + Arrays.toString(accumulators);
 	}
 }

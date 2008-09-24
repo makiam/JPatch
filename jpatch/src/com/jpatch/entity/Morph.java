@@ -20,7 +20,7 @@ public abstract class Morph<T extends MorphTarget> {
 		this.morphTargetClass = morphTargetClass;
 	}
 	
-	public void addAccumulator(Accumulator accumulator, Object object) {
+	public void addAccumulator(Accumulator accumulator, Object object, Accumulator value) {
 //		System.out.println(this + " addAccumulator(" + accumulator + ", " + object);
 //		final Integer position = index.get(accumulator);
 //		if (position == null) {
