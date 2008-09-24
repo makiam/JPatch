@@ -13,6 +13,8 @@ import com.sun.org.apache.xalan.internal.xsltc.util.*;
 
 
 public class MorphInterpolator extends Morph<MorphTarget> {
+	private static final String[] DIMENSION_NAMES = new String[] { "x", "y", "z", "w", "u", "v" };
+	
 	/** degrees of freedom (center dimensions)*/
 	private final int degreesOfFreedom;
 	
@@ -61,6 +63,7 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 			public void attributeHasChanged(Attribute source) {
 				positionAttr.getDoubles(position);
 				valuesValid = false;
+				System.out.println(this + " position=" + Arrays.toString(position));
 			}
 		});
 		minimumsAttr = new DoubleArrayAttr(degreesOfFreedom);
@@ -71,7 +74,7 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 			maximumsAttr.setDouble(i, 1.0);
 			AttributeManager.getInstance().setLowerLimit(positionAttr.getAttr(i), new DoubleMinimum(minimumsAttr.getAttr(i)));
 			AttributeManager.getInstance().setUpperLimit(positionAttr.getAttr(i), new DoubleMaximum(maximumsAttr.getAttr(i)));
-			dofNamesAttr.setValue(i, Integer.toString(i));
+			dofNamesAttr.setValue(i, DIMENSION_NAMES[i]);
 		}
 		kAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
@@ -259,13 +262,17 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 	}
 	
 	private void check() {
+		System.out.println("check");
 		for (int centerIndex = 0; centerIndex < centers.length; centerIndex++) {
 			MorphTarget morphTarget = morphTargets.get(centerIndex);
 			final double[] values = this.values[centerIndex];
 			int index = 0;
+			
+			System.out.println("morphTarget:" + morphTarget);
 			/* check if accumulator values have changed and, if yes, change the value and clear the weightsValid flag */
 			for (Accumulator accumulator : morphTarget.getValues()) {
 				if (accumulator instanceof Tuple3Accumulator) {
+					System.out.println(accumulator);
 					Tuple3d tuple = ((Tuple3Accumulator) accumulator).asTuple();
 					weightsValid &= checkValue(values, index++, tuple.x);
 					weightsValid &= checkValue(values, index++, tuple.y);
@@ -274,6 +281,7 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 					throw new RuntimeException();
 				}
 			}
+			System.out.println("values=" + Arrays.toString(values));
 		}
 	}
 	
@@ -305,6 +313,12 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 	}
 	
 	private void computeWeights() {
+		System.out.println("*compute weights*");
+		if (dimensions == 0) {
+			weightsValid = true;
+			return;
+		}
+		
 		int dim = centers.length + 1 + degreesOfFreedom;
 		
 		double[] y = new double[values.length * dimensions];
@@ -313,6 +327,10 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 				y[i * dimensions + j] = values[i][j];
 			}
 		}
+		
+		System.out.println("values:" + Arrays.deepToString(values));
+		System.out.println("y:" + Arrays.toString(y));
+		System.out.println("centers:" + Arrays.deepToString(centers));
 		
 		/* fill matrix */
 		double[] matrix = new double[dim * dim];
@@ -327,19 +345,31 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 				matrix[(centers.length + 1 + j) * dim + i] = centers[i][j];
 			}
 		}
+		System.out.println("matrix:");
+		Utils3d.printMatrix(matrix);
 		
 		double[] b = new double[dim * dimensions];
 		weights = new double[dim * dimensions];
-		System.arraycopy(y, 0, b, 0, values.length);
+		
+		System.out.println("y.length=" + y.length);
+		System.out.println("b.length=" + b.length);
+		System.out.println("values.length=" + values.length);
+		
+		System.arraycopy(y, 0, b, 0, y.length);
+		
+		System.out.println("b:" + Arrays.toString(b));
 		
 		/* solve the system */
 		MatrixUtils.solve(matrix, b, weights);
 		
 		weightsValid = true;
+		
+		System.out.println("weights:" + Arrays.toString(weights));
 	}
 	
 	private void evaluate() {
-		if (true) return; // TODO
+//		if (true) return; // TODO
+		System.out.println("evaluate");
 		check();
 		if (!weightsValid) {
 			computeWeights();
@@ -373,6 +403,7 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 			} else {
 				throw new RuntimeException();
 			}
+			System.out.println(accumulator);
 		}
 		
 		valuesValid = true;
@@ -380,6 +411,7 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 	
 	@Override
 	public void apply(MorphTarget activeMorphTarget) {
+		System.out.println("apply");
 		if (!valuesValid || !weightsValid) {
 			evaluate();
 		}

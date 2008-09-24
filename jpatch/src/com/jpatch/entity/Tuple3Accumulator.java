@@ -16,18 +16,18 @@ public class Tuple3Accumulator implements Accumulator {
 	public void accumulate(Accumulator acc) {
 		t.add(((Tuple3Accumulator) acc).t);
 		tuple.set(t);
-		System.out.println(this + " accumulate, tuple=" + tuple);
+//		System.out.println(this + " accumulate, tuple=" + tuple);
 	}
 	
 	public void set(Accumulator acc) {
 		tuple.add(t, ((Tuple3Accumulator) acc).t);
-		System.out.println(this + " set " + acc + ", tuple=" + tuple);
+//		System.out.println(this + " set " + acc + ", tuple=" + tuple);
 	}
 	
 	public void reset() {
 		t.set(0, 0, 0);
 		tuple.set(0, 0, 0);
-		System.out.println(this + " reset");
+//		System.out.println(this + " reset");
 	}
 
 	public boolean isZero() {

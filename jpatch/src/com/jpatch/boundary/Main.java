@@ -685,8 +685,8 @@ public class Main {
 //			}
 		};
 		
-//		viewport.setView(tree);
-		viewport.setView(ndeComponent.getComponent());
+		viewport.setView(tree);
+//		viewport.setView(ndeComponent.getComponent());
 		
 		viewport.setOpaque(false);
 		scrollPane2.setViewport(viewport);
