@@ -155,8 +155,15 @@ public class NdeLayerManager extends Morph<NdeLayer> {
 		return ndeLayer;
 	}
 
-
-	
+	@Override
+	public void apply(MorphTarget activeMorptarget) {
+		/* apply targets */
+		for (NdeLayer morphTarget : morphTargets) {
+			if (morphTarget.getEnabledAttribute().getBoolean()) {
+				morphTarget.apply(morphTarget == activeMorptarget);
+			}
+		}
+	}
 	
 //	public static void main(String[] args) {
 //		JFrame frame = new JFrame("NDE Layer List test");

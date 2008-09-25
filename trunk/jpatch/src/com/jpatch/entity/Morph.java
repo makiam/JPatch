@@ -4,6 +4,8 @@ import com.jpatch.entity.sds2.*;
 
 import java.util.*;
 
+import javax.vecmath.*;
+
 public abstract class Morph<T extends MorphTarget> {
 //	protected final Sds sds;
 	protected final MorphController morphController;
@@ -20,7 +22,7 @@ public abstract class Morph<T extends MorphTarget> {
 		this.morphTargetClass = morphTargetClass;
 	}
 	
-	public void addAccumulator(Accumulator accumulator, Object object, Accumulator value) {
+	public void addAccumulator(Tuple3Accumulator accumulator, Object object, Tuple3d value) {
 //		System.out.println(this + " addAccumulator(" + accumulator + ", " + object);
 //		final Integer position = index.get(accumulator);
 //		if (position == null) {
@@ -49,7 +51,7 @@ public abstract class Morph<T extends MorphTarget> {
 //		index.put(accumulator, n);
 //	}
 	
-	public void removeAccumulator(Accumulator accumulator) {
+	public void removeAccumulator(Tuple3Accumulator accumulator) {
 //		final int pos = index.get(accumulator);
 //		references[pos]--;
 //		if (references[pos] == 0) {
@@ -95,16 +97,6 @@ public abstract class Morph<T extends MorphTarget> {
 		morphTargets.remove(morphTarget);
 	}
 	
-	public void apply(MorphTarget activeMorptarget) {
-		/* apply targets */
-		for (T morphTarget : morphTargets) {
-			if (morphTarget instanceof NdeLayer) {
-				if (morphTarget == activeMorptarget) {
-					continue;
-				} else if (((NdeLayer) morphTarget).getEnabledAttribute().getBoolean()) {
-					morphTarget.apply();
-				}
-			}
-		}
-	}
+	public abstract void apply(MorphTarget activeMorptarget);
+	
 }

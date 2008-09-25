@@ -16,10 +16,10 @@ public class NdeLayer extends MorphTarget {
 	
 	
 	
-	@Override
-	public void apply() {
-		if (enabledAttr.getBoolean()) {
-			super.apply();
-		}
-	}
+//	@Override
+//	public void apply() {
+//		if (enabledAttr.getBoolean()) {
+//			super.apply();
+//		}
+//	}
 }

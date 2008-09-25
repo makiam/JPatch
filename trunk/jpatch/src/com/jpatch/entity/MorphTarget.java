@@ -4,11 +4,13 @@ import com.jpatch.afw.attributes.*;
 
 import java.util.*;
 
+import javax.vecmath.*;
+
 public class MorphTarget {
 	private final Morph<? extends MorphTarget> morph;
-	private final Map<Accumulator, Integer> index = new HashMap<Accumulator, Integer>();
-	private Accumulator[] accumulators = new Accumulator[0];
-	private Accumulator[] values = new Accumulator[0];
+	private final Map<Tuple3Accumulator, Integer> accumulatorIndex = new HashMap<Tuple3Accumulator, Integer>();
+	private Tuple3Accumulator[] accumulators = new Tuple3Accumulator[0];
+	private Tuple3d[] values = new Tuple3d[0];
 	private GenericAttr<String> nameAttr = new GenericAttr<String>("New NDE Layer");
 	
 	public MorphTarget(Morph<? extends MorphTarget> morph) {
@@ -19,61 +21,69 @@ public class MorphTarget {
 		return nameAttr;
 	}
 	
-	public final Accumulator getAccumulatorValueFor(Accumulator accumulator, Object object) {
-		final Integer position = index.get(accumulator);
+	public final Tuple3d getValueFor(final Tuple3Accumulator accumulator, final Object object) {
+		final Integer position = accumulatorIndex.get(accumulator);
 		if (position == null) {
 			System.out.println("adding accumulator for " + object);
+			
 			final int n = accumulators.length;
-			final Accumulator[] tmpAccumulators = new Accumulator[n + 1];
-			System.arraycopy(accumulators, 0, tmpAccumulators, 0, n);
-			tmpAccumulators[n] = accumulator;
-			accumulators = tmpAccumulators;
-			final Accumulator[] tmpValues = new Accumulator[n + 1];
+			
+			final Tuple3Accumulator[] tpmAccumulators = new Tuple3Accumulator[n + 1];
+			System.arraycopy(accumulators, 0, tpmAccumulators, 0, n);
+			tpmAccumulators[n] = accumulator;
+			accumulators = tpmAccumulators;
+			
+			final Tuple3d[] tmpValues = new Tuple3d[n + 1];
 			System.arraycopy(values, 0, tmpValues, 0, n);
-			final Accumulator value = accumulator.createValue();
+			final Tuple3d value = new Point3d();
 			tmpValues[n] = value;
 			values = tmpValues;
-			index.put(accumulator, n);
+			
+			accumulatorIndex.put(accumulator, n);
 			morph.addAccumulator(accumulator, object, value);
+			
 			return value;
 		} else {
 			return values[position];
 		}
 	}
 	
-	private final void removeAccumulator(Accumulator accumulator) {
-		final int pos = index.get(accumulator);
+	private final void removeTarget(Tuple3Accumulator accumulator) {
+		final int pos = accumulatorIndex.get(accumulator);
 		final int n = accumulators.length;
-		final Accumulator[] tmpAccumulators = new Accumulator[n - 1];
-		System.arraycopy(accumulators, 0, tmpAccumulators, 0, pos);
-	    System.arraycopy(accumulators, pos + 1, tmpAccumulators, pos, n - pos - 1);
-	    accumulators = tmpAccumulators;
-	    final Accumulator[] tmpValues = new Accumulator[n - 1];
+		
+		final Tuple3Accumulator[] tpmAccumulators = new Tuple3Accumulator[n - 1];
+		System.arraycopy(accumulators, 0, tpmAccumulators, 0, pos);
+	    System.arraycopy(accumulators, pos + 1, tpmAccumulators, pos, n - pos - 1);
+	    accumulators = tpmAccumulators;
+	    
+	    final Tuple3d[] tmpValues = new Tuple3d[n - 1];
 		System.arraycopy(values, 0, tmpValues, 0, pos);
-	    System.arraycopy(accumulators, pos + 1, tmpValues, pos, n - pos - 1);
+	    System.arraycopy(values, pos + 1, tmpValues, pos, n - pos - 1);
 	    values = tmpValues;
-	    index.remove(accumulator);
+	    
+	    accumulatorIndex.remove(accumulator);
 	    morph.removeAccumulator(accumulator);
 	}
 	
-	void apply() {
-		for (int i = 0; i < accumulators.length; i++) {
-			accumulators[i].accumulate(values[i]);
+	public void apply(boolean isActive) {
+		if (isActive) {
+			for (int i = 0; i < accumulators.length; i++) {
+				accumulators[i].accumulateActive(values[i]);
+			}
+		} else {
+			for (int i = 0; i < accumulators.length; i++) {
+				accumulators[i].accumulatePassive(values[i]);
+			}
 		}
 	}
 	
-	void set() {
-		for (int i = 0; i < accumulators.length; i++) {
-			accumulators[i].set(values[i]);
-		}
-	}
-	
-	Accumulator[] getValues() {
+	Tuple3d[] getValues() {
 		return values;
 	}
 	
-	@Override
-	public String toString() {
-		return "MorphTarget@" + System.identityHashCode(this) + "(" + nameAttr.getValue() + ") " + Arrays.toString(accumulators);
-	}
+//	@Override
+//	public String toString() {
+//		return "MorphTarget@" + System.identityHashCode(this) + "(" + nameAttr.getValue() + ") " + Arrays.toString(targets);
+//	}
 }
