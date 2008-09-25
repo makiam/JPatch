@@ -41,7 +41,7 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 	/** weights */
 	private double[] weights;
 	
-	private final Map<Tuple3d, Integer> valueIndex = new HashMap<Tuple3d, Integer>();
+	private final Map<Tuple3d, Integer> valueIndex = new IdentityHashMap<Tuple3d, Integer>();
 	
 	private final Map<MorphTarget, Integer> morphTargetIndex = new HashMap<MorphTarget, Integer>();
 	
@@ -156,13 +156,14 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 			
 			final Tuple3d[] tmpAccumulatorValues = new Tuple3d[n + 1];
 			System.arraycopy(accumulatorValues, 0, tmpAccumulatorValues, 0, n);
-			tmpAccumulatorValues[n] = value;
+			Tuple3d newValue = new Point3d();
+			tmpAccumulatorValues[n] = newValue;
 			accumulatorValues = tmpAccumulatorValues;
 			
 //			if (accumulator instanceof Tuple3Accumulator) {
 				valueIndex.put(value, dimensions);
 				addDimensions(3);
-	//			System.out.println("*** adding valueIndex for value " + accumulatorValue + ", morphTarget=" + morphTarget);
+				System.out.println("*** adding valueIndex for value " + System.identityHashCode(value));
 //			} else {
 //				throw new IllegalArgumentException();
 //			}
@@ -273,7 +274,7 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 			for (Tuple3d value : morphTarget.getValues()) {
 //				if (accumulator instanceof Tuple3Accumulator) {
 //					System.out.println(accumulator);
-//					System.out.println("*** getting valueIndex for " + accumulator);
+					System.out.println("*** getting valueIndex for " + System.identityHashCode(value));
 					int index = valueIndex.get(value);
 //					Tuple3d tuple = ((Tuple3Accumulator) accumulator).asTuple();
 					weightsValid &= checkValue(values, index, value.x);
@@ -416,6 +417,7 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 		System.out.println("apply");
 		if (morphTargetIndex.containsKey(activeMorphTarget)) {
 			activeMorphTarget.apply(true);
+			return;
 		}
 		if (!valuesValid || !weightsValid) {
 			evaluate();

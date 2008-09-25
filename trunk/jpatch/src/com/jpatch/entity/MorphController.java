@@ -108,9 +108,9 @@ public class MorphController {
 		
 		ndeLayerManager.apply(activeMorphTarget);
 		
-//		for (Morph<? extends MorphTarget> morph : morphs) {
-//			morph.applyPassive(activeMorphTarget);
-//		}
+		for (Morph<? extends MorphTarget> morph : morphs) {
+			morph.apply(activeMorphTarget);
+		}
 		
 //		activeMorphTarget.apply(true);
 		
