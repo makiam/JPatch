@@ -40,8 +40,8 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 		worldPosition.set(x, y, z);
 		invTransformMatrix.transform(worldPosition, localPosition);
 		final MorphTarget morphTarget = sds.getActiveMorphTarget();
-		Tuple3Accumulator accumulatorValue = (Tuple3Accumulator) morphTarget.getAccumulatorValueFor(positionAccumulator, this);
-		accumulatorValue.asTuple().sub(localPosition, positionAccumulator.asTuple());
+		Tuple3d value = morphTarget.getValueFor(positionAccumulator, this);
+		positionAccumulator.applyTo(value);
 		worldPositionValid = true; // will be set to false by invalidate() - if true, invalidate would exit early.
 		invalidate();
 	}

@@ -8,8 +8,8 @@ import java.util.*;
 
 public class MorphController {
 	protected final Sds sds;
-	private final Map<Accumulator, Integer> index = new HashMap<Accumulator, Integer>();
-	protected Accumulator[] accumulators = new Accumulator[0];
+	private final Map<Tuple3Accumulator, Integer> index = new HashMap<Tuple3Accumulator, Integer>();
+	protected Tuple3Accumulator[] accumulators = new Tuple3Accumulator[0];
 	protected Object[] objects = new Object[0];
 	private int[] references = new int[0];
 	private NdeLayerManager ndeLayerManager;
@@ -24,7 +24,7 @@ public class MorphController {
 		return morphs.size();
 	}
 	
-	public final void addAccumulator(Accumulator accumulator, Object object) {
+	public final void addAccumulator(Tuple3Accumulator accumulator, Object object) {
 		System.out.println(this + " addAccumulator(" + accumulator + ", " + object);
 		final Integer position = index.get(accumulator);
 		if (position == null) {
@@ -34,10 +34,10 @@ public class MorphController {
 		}
 	}
 	
-	protected void addNewAccumulator(Accumulator accumulator, Object object) {
+	protected void addNewAccumulator(Tuple3Accumulator accumulator, Object object) {
 		final int n = accumulators.length;
 		
-		final Accumulator[] tmpAccumulators = new Accumulator[n + 1];
+		final Tuple3Accumulator[] tmpAccumulators = new Tuple3Accumulator[n + 1];
 		System.arraycopy(accumulators, 0, tmpAccumulators, 0, n);
 		tmpAccumulators[n] = accumulator;
 		accumulators = tmpAccumulators;
@@ -55,7 +55,7 @@ public class MorphController {
 		index.put(accumulator, n);
 	}
 	
-	public final void removeAccumulator(Accumulator accumulator) {
+	public final void removeAccumulator(Tuple3Accumulator accumulator) {
 		final int pos = index.get(accumulator);
 		references[pos]--;
 		if (references[pos] == 0) {
@@ -63,10 +63,10 @@ public class MorphController {
 		}
 	}
 	
-	protected void removeAccumulator(Accumulator accumulator, final int pos) {
+	protected void removeAccumulator(Tuple3Accumulator accumulator, final int pos) {
 		final int n = accumulators.length;
 		
-		final Accumulator[] tmpAccumulators = new Accumulator[n - 1];
+		final Tuple3Accumulator[] tmpAccumulators = new Tuple3Accumulator[n - 1];
 		System.arraycopy(accumulators, 0, tmpAccumulators, 0, pos);
 	    System.arraycopy(accumulators, pos + 1, tmpAccumulators, pos, n - pos - 1);
 	    accumulators = tmpAccumulators;
@@ -100,18 +100,19 @@ public class MorphController {
 	
 	public void apply() {
 		/* reset all accumulators */
-		for (Accumulator accumulator : accumulators) {
+		for (Tuple3Accumulator accumulator : accumulators) {
 			accumulator.reset();
 		}
 		
 		final MorphTarget activeMorphTarget = activeMorphTargetAttr.getValue();
 		
 		ndeLayerManager.apply(activeMorphTarget);
-		for (Morph<? extends MorphTarget> morph : morphs) {
-			morph.apply(activeMorphTargetAttr.getValue());
-		}
 		
-		activeMorphTarget.set();
+//		for (Morph<? extends MorphTarget> morph : morphs) {
+//			morph.applyPassive(activeMorphTarget);
+//		}
+		
+//		activeMorphTarget.apply(true);
 		
 		/* validate objects */
 		for (Object object : objects) {
