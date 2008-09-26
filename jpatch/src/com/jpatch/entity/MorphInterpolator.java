@@ -78,6 +78,7 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 		}
 		kAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
+				weightsValid = false;
 				valuesValid = false;
 			}
 		});
@@ -208,10 +209,10 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 		tmpC[n] = coordinates.clone();
 		centers = tmpC;
 		
-		final double[][] tmpY = new double[n + 1][];
-		System.arraycopy(values, 0, tmpY, 0, n);
-		tmpY[n] = coordinates.clone();
-		values = tmpY;
+		final double[][] tmpV = new double[n + 1][];
+		System.arraycopy(values, 0, tmpV, 0, n);
+		tmpV[n] = new double[dimensions];
+		values = tmpV;
 		
 		weightsValid = false;
 		
