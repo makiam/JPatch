@@ -23,12 +23,13 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 	private final JPanel morphsPanel = new JPanel(new BorderLayout());
 	private final JPanel morphsTablePanel = new JPanel(new BorderLayout());
 	private final JComponent buttonBox = Box.createHorizontalBox();
-	private final JButton newButton = new JButton("new");
-	private JPatchFormContainer rootFormContainer = new JPatchFormContainer("Morphs", new BooleanAttr(), newButton);
+	private final JButton newMorphButton = new JButton("new");
+	private final JButton newTargetButton = new JButton("new");
+	private JPatchFormContainer rootFormContainer = new JPatchFormContainer("Morphs", new BooleanAttr(), newMorphButton);
 	private JPatchFormContainer advancedFormContainer = new JPatchFormContainer("Advanced", new BooleanAttr());
 	private JPatchFormContainer dofFormContainer = new JPatchFormContainer("Degrees of freedom", new BooleanAttr());
 	private JPatchFormContainer sliderFormContainer = new JPatchFormContainer("Sliders", new BooleanAttr());
-	private JPatchFormContainer targetsFormContainer = new JPatchFormContainer("Targets", new BooleanAttr(), new JButton("new"));
+	private JPatchFormContainer targetsFormContainer = new JPatchFormContainer("Targets", new BooleanAttr(), newTargetButton);
 	private JPatchFormContainer targetPositionFormContainer = new JPatchFormContainer("Target position", new BooleanAttr());
 	private JPatchForm advancedForm = new JPatchForm();
 	private JPatchForm sliderForm = new JPatchForm();
@@ -181,14 +182,19 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 	public MorphComponent() {
 		morphsPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		morphsTablePanel.setBorder(TABLE_BORDER);
-		newButton.addActionListener(new ActionListener() {
+		newMorphButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				morphController.addMorph(new MorphInterpolator(2, morphController, "new morph"));
 				morphListModel.fireIntervalAdded(morphListModel, morphController.getNumberOfMorphs(), morphController.getNumberOfMorphs() + 1);
 				morphList.setSelectedIndex(morphController.getNumberOfMorphs() - 1);
 			}
 		});
-		
+		newTargetButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				currentMorph.createMorphTarget();
+				targetsTableModel.fireTableDataChanged();
+			}
+		});
 //		buttonBox.add(newButton);
 //		buttonBox.setOpaque(false);
 //		morphsPanel.add(buttonBox, BorderLayout.NORTH);
@@ -198,6 +204,8 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 		rootFormContainer.add(dofFormContainer);
 		rootFormContainer.add(sliderFormContainer);
 		rootFormContainer.add(targetsFormContainer);
+		
+		newTargetButton.setEnabled(false);
 		
 		morphList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		morphList.addListSelectionListener(new ListSelectionListener() {
@@ -306,6 +314,8 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 			sliders = new JSlider[0];
 			sliderLables = new JLabel[0];
 		}
+		newTargetButton.setEnabled(currentMorph != null);
+		
 		dofTableModel.fireTableDataChanged();
 		targetsTableModel.fireTableDataChanged();
 	}
