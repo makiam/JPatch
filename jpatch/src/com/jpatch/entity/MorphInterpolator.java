@@ -82,12 +82,15 @@ public class MorphInterpolator extends Morph<MorphTarget> {
 				valuesValid = false;
 			}
 		});
+//		MorphTarget target = createMorphTarget();
+//		target.getNameAttribute().setValue("idle target");
+		
 		for (int i = 0; i <= degreesOfFreedom; i++) {
 			MorphTarget target = createMorphTarget();
 			if (i == 0) {
 				target.getNameAttribute().setValue("idle target");
 			} else {
-				target.getNameAttribute().setValue("DOF#" + (i - 1) + " maximum target");
+				target.getNameAttribute().setValue(DIMENSION_NAMES[i - 1] + " = 1");
 				centers[i][i - 1] = 1;
 			}
 		}
