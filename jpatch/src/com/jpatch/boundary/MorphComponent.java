@@ -13,6 +13,8 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
+import jpatch.boundary.ui.*;
+
 
 
 
@@ -30,7 +32,7 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 	private JPatchFormContainer dofFormContainer = new JPatchFormContainer("Degrees of freedom", new BooleanAttr());
 	private JPatchFormContainer sliderFormContainer = new JPatchFormContainer("Sliders", new BooleanAttr());
 	private JPatchFormContainer targetsFormContainer = new JPatchFormContainer("Targets", new BooleanAttr(), newTargetButton);
-	private JPatchFormContainer targetPositionFormContainer = new JPatchFormContainer("Target position", new BooleanAttr());
+//	private JPatchFormContainer targetPositionFormContainer = new JPatchFormContainer("Target position", new BooleanAttr());
 	private JPatchForm advancedForm = new JPatchForm();
 	private JPatchForm sliderForm = new JPatchForm();
 	private JTextField kValueTextField = new JTextField();
@@ -102,13 +104,38 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 	private final JTable dofTable = new JTable(dofTableModel);
 	
 	@SuppressWarnings("serial")
-	private final AbstractTableModel targetsTableModel = new JPatchTableModel(
-			new String[] { "A", "target" },
-			new Class[] { Boolean.class, String.class },
-			new boolean[] { true, true }
-	) {
+	private final AbstractTableModel targetsTableModel = new AbstractTableModel() {
+
+		public int getColumnCount() {
+			return currentMorph == null ? 0 : currentMorph.getDegreesOfFreedom() + 2;
+		}
+
 		public int getRowCount() {
 			return currentMorph == null ? 0 : currentMorph.getMorphTargets().size();
+		}
+		
+		@Override
+		public Class<?> getColumnClass(int columnIndex) {
+			switch (columnIndex) {
+			case 0:
+				return Boolean.class;
+			case 1:
+				return String.class;
+			default:
+				return Double.class;
+			}
+		}
+
+		@Override
+		public String getColumnName(int column) {
+			switch (column) {
+			case 0:
+				return "A";
+			case 1:
+				return "Name";
+			default:
+				return currentMorph.getDofNamesAttribute().getValue(column - 2);
+			}
 		}
 		
 		public Object getValueAt(int rowIndex, int columnIndex) {
@@ -118,7 +145,7 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 			case 1:
 				return currentMorph.getMorphTargets().get(rowIndex).getNameAttribute().getValue();
 			default:
-				throw new AssertionError("should never get here");
+				return currentMorph.getCenterPosition(rowIndex, columnIndex - 2);
 			}
 		}
 		
@@ -133,60 +160,94 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 				currentMorph.getMorphTargets().get(rowIndex).getNameAttribute().setValue((String) value);
 				break;
 			default:
-				throw new AssertionError("should never get here");	
+				currentMorph.setCenterPosition(rowIndex, columnIndex - 2, (Double) value);
 			}
 		}
 		
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return rowIndex == 0 ? false : super.isCellEditable(rowIndex, columnIndex);
+			return rowIndex == 0 && columnIndex == 0 ? false : true;
 		}
 	};
 	private final JTable targetsTable = new JTable(targetsTableModel);
 	
-	@SuppressWarnings("serial")
-	private final AbstractTableModel targetPositionTableModel = new JPatchTableModel(
-			new String[] { "DOF", "position" },
-			new Class[] { String.class, Double.class },
-			new boolean[] { false, true }
-	) {
-
-		public int getRowCount() {
-			return currentTarget == null ? 0 : currentMorph.getDegreesOfFreedom();
-		}
-
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				return currentMorph.getDofNamesAttribute().getValue(rowIndex);
-			case 1:
-				return targetPositionAttr.getAttr(rowIndex).getDouble();
-			default:
-				throw new AssertionError("should never get here");
-			}
-		}
-		
-		@Override
-		public void setValueAt(Object value, int rowIndex, int columnIndex) {
-			switch (columnIndex) {
-			case 1: // target name
-				targetPositionAttr.getAttr(rowIndex).setDouble((Double) value);
-				break;
-			default:
-				throw new AssertionError("should never get here");	
-			}
-		}
-	};
-	private final JTable targetPositionTable = new JTable(targetPositionTableModel);
+//	@SuppressWarnings("serial")
+//	private final AbstractTableModel targetPositionTableModel = new JPatchTableModel(
+//			new String[] { "DOF", "position" },
+//			new Class[] { String.class, Double.class },
+//			new boolean[] { false, true }
+//	) {
+//
+//		public int getRowCount() {
+//			return currentTarget == null ? 0 : currentMorph.getDegreesOfFreedom();
+//		}
+//
+//		public Object getValueAt(int rowIndex, int columnIndex) {
+//			switch (columnIndex) {
+//			case 0:
+//				return currentMorph.getDofNamesAttribute().getValue(rowIndex);
+//			case 1:
+//				return targetPositionAttr.getAttr(rowIndex).getDouble();
+//			default:
+//				throw new AssertionError("should never get here");
+//			}
+//		}
+//		
+//		@Override
+//		public void setValueAt(Object value, int rowIndex, int columnIndex) {
+//			switch (columnIndex) {
+//			case 1: // target name
+//				targetPositionAttr.getAttr(rowIndex).setDouble((Double) value);
+//				break;
+//			default:
+//				throw new AssertionError("should never get here");	
+//			}
+//		}
+//	};
+//	private final JTable targetPositionTable = new JTable(targetPositionTableModel);
 	
 	public MorphComponent() {
 		morphsPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		morphsTablePanel.setBorder(TABLE_BORDER);
 		newMorphButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				morphController.addMorph(new MorphInterpolator(2, morphController, "new morph"));
-				morphListModel.fireIntervalAdded(morphListModel, morphController.getNumberOfMorphs(), morphController.getNumberOfMorphs() + 1);
-				morphList.setSelectedIndex(morphController.getNumberOfMorphs() - 1);
+				JPanel newMorphDialog = new JPanel();
+				newMorphDialog.setLayout(new GridBagLayout());
+				GridBagConstraints gbc = new GridBagConstraints();
+				JTextField nameTextField = new JTextField("new morph", 15);
+				gbc.fill = GridBagConstraints.HORIZONTAL;
+				gbc.insets = new Insets(2, 2, 2, 2);
+				gbc.gridx = 0;
+				gbc.gridy = 0;
+				newMorphDialog.add(new JLabel("Name:"), gbc);
+				gbc.gridx = 1;
+				gbc.gridy = 0;
+				newMorphDialog.add(nameTextField, gbc);
+				JComboBox dimensionsComboBox = new JComboBox(new Integer[] { 1, 2, 3, 4, 5, 6 } );
+				gbc.gridx = 0;
+				gbc.gridy = 1;
+				newMorphDialog.add(new JLabel("Dimensions:"), gbc);
+				gbc.gridx = 1;
+				gbc.gridy = 1;
+				newMorphDialog.add(dimensionsComboBox, gbc);
+				Dimension d = dimensionsComboBox.getPreferredSize();
+				nameTextField.setPreferredSize(d);
+				
+				int option = JPatchDialog.showDialog(
+						Main.getInstance().getFrame(),
+						"Create new morph",
+						JPatchDialog.QUESTION,
+						"Enter parameters for new morph:",
+						newMorphDialog,
+						new String[] { "Create morph", null, "Cancel" },
+						0,
+						"200");
+				
+				if (option == 0) {
+					morphController.addMorph(new MorphInterpolator((Integer) dimensionsComboBox.getSelectedItem(), morphController, nameTextField.getText()));
+					morphListModel.fireIntervalAdded(morphListModel, morphController.getNumberOfMorphs(), morphController.getNumberOfMorphs() + 1);
+					morphList.setSelectedIndex(morphController.getNumberOfMorphs() - 1);
+				}
 			}
 		});
 		newTargetButton.addActionListener(new ActionListener() {
@@ -230,34 +291,35 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 		dofFormContainer.add(dofTablePanel);
 		
 		/* Targets table */
-		targetsTable.getColumnModel().getColumn(0).setMaxWidth(20);
+//		targetsTable.getColumnModel().getColumn(0).setMaxWidth(20);
 		targetsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//		JScrollPane scrollPane = new JScrollPane(targetsTable, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		JPanel targetsTablePanel = new JPanel(new BorderLayout());
 		targetsTablePanel.setBorder(TABLE_BORDER);
 		targetsTablePanel.add(targetsTable.getTableHeader(), BorderLayout.NORTH);
 		targetsTablePanel.add(targetsTable);
 		targetsFormContainer.add(targetsTablePanel);
 		
-		targetsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent arg0) {
-				int row = targetsTable.getSelectedRow();
-				if (row != -1) {
-					setCurrentTarget(currentMorph.getMorphTargets().get(targetsTable.getSelectedRow()));
-				} else {
-					setCurrentTarget(null);
-				}
-			}		
-		});
+//		targetsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+//			public void valueChanged(ListSelectionEvent arg0) {
+//				int row = targetsTable.getSelectedRow();
+//				if (row != -1) {
+//					setCurrentTarget(currentMorph.getMorphTargets().get(targetsTable.getSelectedRow()));
+//				} else {
+//					setCurrentTarget(null);
+//				}
+//			}		
+//		});
 		
-		targetsFormContainer.add(targetPositionFormContainer);
+//		targetsFormContainer.add(targetPositionFormContainer);
 		
-		/* Target position table */
-		targetPositionTable.setSelectionModel(Utils.NULL_SELECTION_MODEL);
-		JPanel targetPositionPanel = new JPanel(new BorderLayout());
-		targetPositionPanel.setBorder(TABLE_BORDER);
-		targetPositionPanel.add(targetPositionTable.getTableHeader(), BorderLayout.NORTH);
-		targetPositionPanel.add(targetPositionTable);
-		targetPositionFormContainer.add(targetPositionPanel);
+//		/* Target position table */
+//		targetPositionTable.setSelectionModel(Utils.NULL_SELECTION_MODEL);
+//		JPanel targetPositionPanel = new JPanel(new BorderLayout());
+//		targetPositionPanel.setBorder(TABLE_BORDER);
+//		targetPositionPanel.add(targetPositionTable.getTableHeader(), BorderLayout.NORTH);
+//		targetPositionPanel.add(targetPositionTable);
+//		targetPositionFormContainer.add(targetPositionPanel);
 		
 		
 //		dofTable.setDefaultRenderer(GenericAttr.class, new DefaultTableCellRenderer() {
@@ -287,6 +349,8 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 			attributeManager.unbind(sliderLables[i]);
 		}
 		
+		targetsTableModel.fireTableStructureChanged();
+		
 		sliderForm.removeAll();
 		if (currentMorph != null) {
 			attributeManager.bindTextFieldToAttribute(currentMorph, kValueTextField, currentMorph.getKAttribute());
@@ -309,6 +373,8 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 					
 				});
 			}
+			targetsTable.getColumnModel().getColumn(0).setMaxWidth(20);
+			targetsTable.getColumnModel().getColumn(1).setPreferredWidth(100);
 		} else {
 			
 			sliders = new JSlider[0];
@@ -317,16 +383,19 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 		newTargetButton.setEnabled(currentMorph != null);
 		
 		dofTableModel.fireTableDataChanged();
-		targetsTableModel.fireTableDataChanged();
+		
+		
+		
+//		
 	}
 	
-	private void setCurrentTarget(MorphTarget target) {
-		currentTarget = target;
-		if (currentTarget != null) {
-			targetPositionAttr = currentMorph.createCenterPositionAttribute(currentTarget);
-		}
-		targetPositionTableModel.fireTableDataChanged();
-	}
+//	private void setCurrentTarget(MorphTarget target) {
+//		currentTarget = target;
+//		if (currentTarget != null) {
+//			targetPositionAttr = currentMorph.createCenterPositionAttribute(currentTarget);
+//		}
+//		targetPositionTableModel.fireTableDataChanged();
+//	}
 	
 	
 	public void bindTo(Object binding) {
