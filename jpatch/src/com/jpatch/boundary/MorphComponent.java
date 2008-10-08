@@ -6,6 +6,7 @@ import java.awt.event.*;
 import com.jpatch.afw.*;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.ui.*;
+import com.jpatch.boundary.headupdisplay.*;
 import com.jpatch.entity.*;
 
 import javax.swing.*;
@@ -384,8 +385,10 @@ public class MorphComponent implements SpecialBinding.FormContainer {
 		
 		dofTableModel.fireTableDataChanged();
 		
-		
-		
+		if (morph != null) {
+			Main.getInstance().slider.link(Slider.Axis.X_AXIS, morph.getPositionAttribute().getAttr(0));
+			Main.getInstance().slider.link(Slider.Axis.Y_AXIS, morph.getPositionAttribute().getAttr(1));
+		}
 //		
 	}
 	
