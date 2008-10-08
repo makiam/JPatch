@@ -33,6 +33,7 @@ import com.jpatch.afw.ui.*;
 import com.jpatch.afw.vecmath.Transform;
 import com.jpatch.boundary.actions.Actions;
 import com.jpatch.boundary.actions.Actions.ViewportMode;
+import com.jpatch.boundary.headupdisplay.*;
 import com.jpatch.boundary.tools.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
@@ -62,6 +63,7 @@ import javax.swing.undo.*;
 import javax.vecmath.*;
 
 import jpatch.boundary.tools.Tools;
+import sun.net.www.http.*;
 import trashcan.*;
 
 
@@ -114,6 +116,9 @@ public class Main {
 //			return null;
 //		}
 	};
+	
+	public HUD hud = new HUD();	//FIXME make private
+	public Slider slider = new Slider(hud); //FIXME make private
 	
 	private LayoutManager2 screenLayout = new LayoutManager2() {
 		private Dimension dim = new Dimension();
@@ -345,6 +350,11 @@ public class Main {
 			viewports[i].getNameAttribute().setValue("Viewport");
 			viewportRegistry.addObject(viewports[i]);
 		}
+		
+		hud.bindToViewport(viewports[0]);
+		hud.addWidget(slider);
+		slider.getBounds().setBounds(10, 10, 100, 100);
+		
 		
 		activeViewport = new StateMachine<Viewport>(viewports, viewports[0]);
 		screen.setLayout(screenLayout);
@@ -846,6 +856,10 @@ public class Main {
 			}
 			
 		});
+		
+//		hud.addWidget(slider);
+//		slider.getBounds().setBounds(10, 10, 100, 100);
+//		hud.bindToViewport(viewports[0]);
 //		new BshConsole();
 	}
 	
