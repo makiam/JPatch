@@ -63,23 +63,24 @@ public class Face {
 //		controlSurfaceBuffer = BufferUtil.newFloatBuffer((sides + 2) * 2 * 3);
 		controlSurfaceBuffer = FloatBuffer.allocate((sides + 2) * 2 * 3);
 		
-		// append adges and set their face to this
+		// append edges and set their face to this
 		int prev = sides - 1;
 		for (int i = 0; i < sides; i++) {
 			this.faceEdges[i].setFace(this);
-			this.faceEdges[i].appendTo(this.faceEdges[prev++]);
+//			this.faceEdges[i].appendTo(this.faceEdges[prev++]);
 			if (prev == sides) {
 				prev = 0;
 			}
 		}
-		for (int i = 0; i < sides; i++) {
-			this.faceEdges[i].getVertex().organizeEdges();
-		}
+		
 		this.material = material;
 		for (int i = 0; i < edges.length; i++) {
 			edges[i].faceEdgeIndex = i;
 		}
 		
+		for (int i = 0; i < sides; i++) {
+			this.faceEdges[i].getVertex().organizeEdges();
+		}
 //		System.out.println("new face is " + this);
 	}
 	

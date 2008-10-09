@@ -18,8 +18,8 @@ public class HalfEdge {
 	private final HalfEdge pair;
 	private final boolean primary;
 	
-	private HalfEdge next;
-	private HalfEdge prev;
+//	private HalfEdge next;
+//	private HalfEdge prev;
 	private HalfEdge subEdge;
 	private Face face;
 	int faceEdgeIndex;
@@ -58,11 +58,27 @@ public class HalfEdge {
 	}
 	
 	public HalfEdge getNext() {
-		return next;
+		if (face != null) {
+			int i = faceEdgeIndex + 1;
+			if (i >= face.getSides()) {
+				i = 0;
+			}
+			return face.getEdges()[i];
+		} else {
+			return null;
+		}
 	}
 	
 	public HalfEdge getPrev() {
-		return prev;
+		if (face != null) {
+			int i = faceEdgeIndex - 1;
+			if (i < 0) {
+				i = face.getSides() - 1;
+			}
+			return face.getEdges()[i];
+		} else {
+			return null;
+		}
 	}
 	
 	public Face getFace() {
@@ -90,15 +106,16 @@ public class HalfEdge {
 		} else {
 			boundaryType = pair.boundaryType = BOUNDARY;
 		}
-		if (face == null) {
-			assert next != null;
-			assert prev != null;
-			next = null;
-			prev = null;
-		}
+//		if (face == null) {
+//			assert next != null;
+//			assert prev != null;
+//			next = null;
+//			prev = null;
+//		}
 	}
 	
 	public int getFaceEdgeIndex() {
+		assert face.getEdges()[faceEdgeIndex] == this;
 		return faceEdgeIndex;
 	}
 	
@@ -120,13 +137,13 @@ public class HalfEdge {
 //		assert false; // should never get here
 //	}
 	
-	public void appendTo(HalfEdge prevEdge) {
-		assert prev == null : this + ".prev is " + prev + ", must be null";
-		assert prevEdge.next == null : prevEdge + ".next is " + prevEdge.next + ", must be null";
-		assert vertex == prevEdge.pair.vertex : "prevEdge.pair.vertex is " + prevEdge.pair.vertex + ", this.vertex = " + vertex + ", must be equal";
-		prevEdge.next = this;
-		this.prev = prevEdge;
-	}
+//	public void appendTo(HalfEdge prevEdge) {
+//		assert prev == null : this + ".prev is " + prev + ", must be null";
+//		assert prevEdge.next == null : prevEdge + ".next is " + prevEdge.next + ", must be null";
+//		assert vertex == prevEdge.pair.vertex : "prevEdge.pair.vertex is " + prevEdge.pair.vertex + ", this.vertex = " + vertex + ", must be equal";
+//		prevEdge.next = this;
+//		this.prev = prevEdge;
+//	}
 	
 	public boolean isPrimary() {
 		return primary;
@@ -207,17 +224,17 @@ public class HalfEdge {
 		Face tmpFace = face;
 		face = pair.face;
 		pair.face = tmpFace;
-		HalfEdge tmpNext = next;
-		HalfEdge tmpPrev = prev;
-		next = (pair.prev == null) ? null : pair.prev.pair;
-		prev = (pair.next == null) ? null : pair.next.pair;
-		pair.next = (tmpPrev == null) ? null : tmpPrev.pair;
-		pair.prev = (tmpNext == null) ? null : tmpNext.pair;
+//		HalfEdge tmpNext = next;
+//		HalfEdge tmpPrev = prev;
+//		next = (pair.prev == null) ? null : pair.prev.pair;
+//		prev = (pair.next == null) ? null : pair.next.pair;
+//		pair.next = (tmpPrev == null) ? null : tmpPrev.pair;
+//		pair.prev = (tmpNext == null) ? null : tmpNext.pair;
 	}
 	
 	private class SaveStateEdit extends AbstractSwapEdit {
-		private HalfEdge next = HalfEdge.this.next;
-		private HalfEdge prev = HalfEdge.this.next;
+//		private HalfEdge next = HalfEdge.this.next;
+//		private HalfEdge prev = HalfEdge.this.next;
 		private Face face = HalfEdge.this.face;
 //		private Face pairFace = HalfEdge.this.pair.face;
 		private int faceEdgeIndex = HalfEdge.this.faceEdgeIndex;
@@ -234,8 +251,8 @@ public class HalfEdge {
 			int tmpInt;
 			
 			/* swap state */
-			tmpEdge = HalfEdge.this.next; HalfEdge.this.next = next; next = tmpEdge;
-			tmpEdge = HalfEdge.this.prev; HalfEdge.this.prev = prev; prev = tmpEdge;
+//			tmpEdge = HalfEdge.this.next; HalfEdge.this.next = next; next = tmpEdge;
+//			tmpEdge = HalfEdge.this.prev; HalfEdge.this.prev = prev; prev = tmpEdge;
 			tmpFace = HalfEdge.this.face; HalfEdge.this.face = face; face = tmpFace;
 //			tmpFace = HalfEdge.this.pair.face; HalfEdge.this.pair.face = pairFace; pairFace = tmpFace;
 			tmpInt = HalfEdge.this.faceEdgeIndex; HalfEdge.this.faceEdgeIndex = faceEdgeIndex; faceEdgeIndex = tmpInt;

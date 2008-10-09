@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.media.opengl.*;
 import static javax.media.opengl.GL.*;
+
+import javax.swing.*;
 import javax.vecmath.*;
 
 import trashcan.*;
@@ -139,6 +141,12 @@ public class AddEdgeTool implements JPatchTool, ViewportOverlay {
 		gl.glDepthMask(true);
 	}
 	
+	private void snapPointer(Viewport viewport, Point3d screenPosition) {
+		Point point = new Point((int) Math.round(screenPosition.x), (int) Math.round(screenPosition.y));
+		SwingUtilities.convertPointToScreen(point, viewport.getComponent());
+		Main.getInstance().getRobot().mouseMove(point.x, point.y);
+	}
+	
 	private void drawStrayFace(GL gl, BaseVertex[] vertices, Point3f p) {
 		gl.glEnable(GL_BLEND);
 		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -188,10 +196,17 @@ public class AddEdgeTool implements JPatchTool, ViewportOverlay {
 				startVertex = new BaseVertex(Main.getInstance().getActiveModel());
 				TransformUtil transformUtil = new TransformUtil();
 				viewport.getViewDef().configureTransformUtil(transformUtil);
-				Main.getInstance().getSelection().getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+//				Main.getInstance().getSelection().getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
 				Point3d p = new Point3d(e.getX(), e.getY(), 0);
-				transformUtil.projectFromScreen(TransformUtil.LOCAL, p, p);
+				transformUtil.projectFromScreen(TransformUtil.WORLD, p, p);
 				startVertex.setPosition(p);
+			} else {
+				Point3d p = new Point3d();
+				startVertex.getPosition(p);
+				TransformUtil transformUtil = new TransformUtil();
+				viewport.getViewDef().configureTransformUtil(transformUtil);
+				transformUtil.projectToScreen(TransformUtil.WORLD, p, p);
+				snapPointer(viewport, p);
 			}
 			viewport.redrawOverlays();
 			floatingVertex = new BaseVertex(Main.getInstance().getActiveModel());
@@ -210,15 +225,18 @@ public class AddEdgeTool implements JPatchTool, ViewportOverlay {
 			
 					Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
 					List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
+					System.out.println("Dumping faces *BEFORE*");
+					sds.dumpFaces(0);
 					sds.removeStrayFace(editList, strayFace);
 					Face face = sds.addFace(editList, Main.getInstance().getDefaultMaterial(), strayFace);
+					System.out.println("Dumping faces *AFTER*");
 					sds.dumpFaces(0);
 					Vector3d normal = new Vector3d();
 					face.getMidpointNormal(normal);
 					TransformUtil transformUtil = new TransformUtil();
 					viewport.getViewDef().configureTransformUtil(transformUtil);
-					Main.getInstance().getSelection().getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
-					transformUtil.transform(TransformUtil.LOCAL, normal, TransformUtil.CAMERA, normal);
+//					Main.getInstance().getSelection().getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+					transformUtil.transform(TransformUtil.WORLD, normal, TransformUtil.CAMERA, normal);
 					if (normal.z < 0) {
 						Collection<Face> faces = new ArrayList<Face>(1);
 						faces.add(face);
@@ -300,9 +318,9 @@ public class AddEdgeTool implements JPatchTool, ViewportOverlay {
 				endVertex = floatingVertex;
 				TransformUtil transformUtil = new TransformUtil();
 				viewport.getViewDef().configureTransformUtil(transformUtil);
-				Main.getInstance().getSelection().getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+//				Main.getInstance().getSelection().getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
 				Point3d p = new Point3d(e.getX(), e.getY(), 0);
-				transformUtil.projectFromScreen(TransformUtil.LOCAL, p, p);
+				transformUtil.projectFromScreen(TransformUtil.WORLD, p, p);
 				endVertex.setPosition(p);
 			}
 			
@@ -322,7 +340,7 @@ public class AddEdgeTool implements JPatchTool, ViewportOverlay {
 			
 			TransformUtil transformUtil = new TransformUtil();
 			viewport.getViewDef().configureTransformUtil(transformUtil);
-			Main.getInstance().getSelection().getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
+//			Main.getInstance().getSelection().getNode().getLocal2WorldTransform(transformUtil, TransformUtil.LOCAL);
 			Point3d p = new Point3d();
 			Polygon polygon = new Polygon();
 			polygon.xpoints = new int[256];
@@ -334,7 +352,7 @@ public class AddEdgeTool implements JPatchTool, ViewportOverlay {
 				double midX = 0, midY = 0;
 				for (int i = 0; i < vertices.length; i++) {
 					vertices[i].getPosition(p);
-					transformUtil.projectToScreen(TransformUtil.LOCAL, p, p);
+					transformUtil.projectToScreen(TransformUtil.WORLD, p, p);
 					midX += p.x;
 					midY += p.y;
 					polygon.xpoints[i] = (int) Math.round(p.x);

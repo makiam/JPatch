@@ -625,6 +625,7 @@ public class Viewport implements NamedObject {
 			gl.glVertex3f(p.x, p.y, p.z);
 		}
 		gl.glEnd();
+		gl.glPointSize(3);
 		gl.glBegin(GL_POINTS);
 		for (BaseVertex strayVertex : sds.getStrayVertices()) {
 			strayVertex.getPosition(p);

@@ -44,13 +44,13 @@ public class Borders {
 				
 			
 				for (int i = 0; i < 3; i++) {
-					if (j > 0) {
+					if (j > 1) {
 						g2.setPaint(new GradientPaint(0, 0, new Color(0x777777 + 0x333333 * j), 0, 20, new Color(0x888888 + 0x333333 * j)));
 					} else {
 						g2.setPaint(new GradientPaint(0, 0, new Color(0x77333333, true), 0, 20, new Color(0x77333333, true)));
 					}
 					g2.fill(new Ellipse2D.Double(30 + i * 16, 3, 15, 15));
-					if (j > 0) {
+					if (j > 1) {
 						g2.setPaint(new GradientPaint(0, 0, new Color(0x888888 + 0x333333 * j), 0, 10, new Color(0x333333 + 0x000000 * j)));
 						g2.fill(new Ellipse2D.Double(31.2 + i * 16, 4.2, 12.6, 12.6));
 					}

@@ -87,7 +87,7 @@ public class MouseSelector {
 		Point3d p = new Point3d();
 		for (AbstractVertex vertex : sdsModel.getSds().getVertices(level, true)) {
 			vertex.getPosition(p);
-			transformUtil.projectToScreen(LOCAL, p, p);
+			transformUtil.projectToScreen(WORLD, p, p);
 			if (lasso.contains(p.x, p.y)) {
 				if(!visibleOnly || viewport.getDepthAt((int) p.x, (int) p.y) < p.z) {
 					vertices.add(vertex);
@@ -105,7 +105,7 @@ public class MouseSelector {
 		case VERTICES:
 			for (AbstractVertex vertex : selection.getVertices()) {
 				vertex.getPosition(p0);
-				transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+				transformUtil.projectToScreen(WORLD, p0, p0);
 				double distSq = distSq(mouseX, mouseY, p0.x, p0.y);
 				if (distSq < maxDistSq) {
 					return new HitVertex(selection.getNode(), distSq, p0, vertex);
@@ -115,9 +115,9 @@ public class MouseSelector {
 		case EDGES:
 			for (HalfEdge edge : selection.getEdges()) {
 				edge.getVertex().getPosition(p0);
-				transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+				transformUtil.projectToScreen(WORLD, p0, p0);
 				edge.getPairVertex().getPosition(p1);
-				transformUtil.projectToScreen(TransformUtil.LOCAL, p1, p1);
+				transformUtil.projectToScreen(WORLD, p1, p1);
 				
 				double t = Utils3d.closestPointOnLine(p0.x, p0.y, p1.x, p1.y, mouseX, mouseY);
 				t = Math.max(0, Math.min(t, 1));
@@ -135,7 +135,7 @@ public class MouseSelector {
 				Polygon polygon = new Polygon(new int[n], new int[n], n);
 				for (int i = 0; i < n; i++) {
 					egdes[i].getVertex().getPosition(p0);
-					transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+					transformUtil.projectToScreen(WORLD, p0, p0);
 					polygon.xpoints[i] = (int) Math.round(p0.x);
 					polygon.ypoints[i] = (int) Math.round(p0.y);
 				}
@@ -206,7 +206,7 @@ public class MouseSelector {
 					double z = getFaceHitZ(rayOrigin, rayDirection, face);
 					if (z < Double.MAX_VALUE) {
 						face.getMidpointPosition(p0);
-						transformUtil.projectToScreen(LOCAL, p0, p0);
+						transformUtil.projectToScreen(WORLD, p0, p0);
 						if(viewport.getDepthAt((int) p0.x, (int) p0.y) < z) {
 							double distSq = distSq(mouseX, mouseY, p0);
 							HitObject hitFace = new HitFace(sdsModel, distSq, new Point3d(mouseX, mouseY, 0), face);
@@ -232,7 +232,7 @@ public class MouseSelector {
 					if ((type & (Type.VERTEX | Type.STRAY_VERTEX)) != 0) {
 						vertex.getPosition(p0);
 							
-						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+						transformUtil.projectToScreen(WORLD, p0, p0);
 						if(viewport.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
 							double distSq = distSq(mouseX, mouseY, p0);
 							HitObject hitVertex = new HitVertex(sdsModel, distSq, p0, vertex);
@@ -243,7 +243,7 @@ public class MouseSelector {
 					}
 					if ((type & Type.LIMIT) != 0) {
 						vertex.getLimit(p0);
-						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+						transformUtil.projectToScreen(WORLD, p0, p0);
 						if(viewport.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
 							double distSq = distSq(mouseX, mouseY, p0);
 							HitObject hitVertex = new HitLimit(sdsModel, distSq, p0, vertex);
@@ -269,9 +269,9 @@ public class MouseSelector {
 				if (edge.isPrimary() && objectFilter.accept(edge)) {
 					if (!boundaryOnly || edge.isBoundary() || (stray || edge.isStray())) {
 						edge.getVertex().getPosition(p0);
-						transformUtil.projectToScreen(TransformUtil.LOCAL, p0, p0);
+						transformUtil.projectToScreen(WORLD, p0, p0);
 						edge.getPairVertex().getPosition(p1);
-						transformUtil.projectToScreen(TransformUtil.LOCAL, p1, p1);
+						transformUtil.projectToScreen(WORLD, p1, p1);
 					
 						double t = Utils3d.closestPointOnLine(p0.x, p0.y, p1.x, p1.y, mouseX, mouseY);
 						t = Math.max(0, Math.min(t, 1));
@@ -300,12 +300,12 @@ public class MouseSelector {
 	
 	private static double getFaceHitZ(Point3d rayOrigin, Vector3d rayDirection, Face face) {
 		face.getMidpointPosition(faceMidpoint);
-		transformUtil.transform(LOCAL, faceMidpoint, CAMERA, faceMidpoint);
+		transformUtil.transform(WORLD, faceMidpoint, CAMERA, faceMidpoint);
 		for (HalfEdge faceEdge : face.getEdges()) {
 			faceEdge.getVertex().getPosition(faceP0);
-			transformUtil.transform(LOCAL, faceP0, CAMERA, faceP0);
+			transformUtil.transform(WORLD, faceP0, CAMERA, faceP0);
 			faceEdge.getPairVertex().getPosition(faceP1);
-			transformUtil.transform(LOCAL, faceP1, CAMERA, faceP1);
+			transformUtil.transform(WORLD, faceP1, CAMERA, faceP1);
 			double t = Utils3d.rayTriangleIntersection(rayOrigin, rayDirection, faceMidpoint, faceP0, faceP1);
 			if (t < Double.MAX_VALUE) {
 				double z = rayOrigin.z + rayDirection.z * t;
