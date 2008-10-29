@@ -227,7 +227,12 @@ public class AddEdgeTool implements JPatchTool, ViewportOverlay {
 					List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
 					System.out.println("Dumping faces *BEFORE*");
 					sds.dumpFaces(0);
+					System.out.println("---");
 					sds.removeStrayFace(editList, strayFace);
+					for (BaseVertex vertex : strayFace) {
+						sds.removeStrayEdge(editList, vertex.getEdges()[0]);
+//						sds.removeStrayEdge(editList, vertex.getEdges()[1]);
+					}
 					Face face = sds.addFace(editList, Main.getInstance().getDefaultMaterial(), strayFace);
 					System.out.println("Dumping faces *AFTER*");
 					sds.dumpFaces(0);

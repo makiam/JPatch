@@ -357,6 +357,7 @@ public class Sds {
 	}
 	
 	private Face createFace(Material material, AbstractVertex... vertices) {
+		System.out.println("createFace(" + material + ", " + Arrays.toString(vertices) + ") called");
 		HalfEdge[] edges = new HalfEdge[vertices.length];
 		
 		for (int i = 0; i < vertices.length; i++) {
@@ -369,6 +370,7 @@ public class Sds {
 		
 		Face face = new Face(material, edges);
 		faceSets[0].add(face);
+		facesSorted = false;
 		faceIdMap.put(face.id, face);
 		
 		if (0 < maxLevelAttr.getInt()) {
@@ -491,15 +493,35 @@ public class Sds {
 	public Iterable<? extends AbstractVertex> getVertices(final int level, final boolean includeStrayVertices) {
 		if (includeStrayVertices) {
 			return new CombinedIterable(getFaceVertices(level), strayVertices);
+		} else {
+			return getFaceVertices(level);
 		}
-		return getFaceVertices(level);
+	}
+	
+	
+	public Iterable<HalfEdge> getEdges(final int level, final boolean includeStrayEdges) {
+		if (includeStrayEdges) {
+			return new CombinedIterable<HalfEdge>(getFaceEdges(level), strayEdges);
+		} else {
+			return getFaceEdges(level);
+		}
 	}
 	
 	public Iterable<? extends AbstractVertex> getFaceVertices(final int level) {
 		return new Iterable<AbstractVertex>() {
 			public Iterator<AbstractVertex> iterator() {
 				if (faceLists[level].size() == 0) {
-					return new ArrayList<AbstractVertex>(0).iterator();
+					return new Iterator<AbstractVertex>() {
+						public boolean hasNext() {
+							return false;
+						}
+						public AbstractVertex next() {
+							throw new NoSuchElementException();
+						}
+						public void remove() {
+							throw new UnsupportedOperationException();
+						}		
+					};
 				}
 				return new Iterator<AbstractVertex>() {
 					Iterator<Face> faces = faceLists[level].iterator();
@@ -605,14 +627,13 @@ public class Sds {
 		return strayFaces;
 	}
 	
-	public Iterable<HalfEdge> getEdges(final int level, final boolean includeStrayEdges) {
+	private Iterable<HalfEdge> getFaceEdges(final int level) {
 		return new Iterable<HalfEdge>() {
 			public Iterator<HalfEdge> iterator() {
 				return new Iterator<HalfEdge>() {
 					Iterator<Face> faces = faceLists[level].iterator();
 					HalfEdge[] faceEdges;
 					int edgeIndex;
-					Iterator<HalfEdge> edges = strayEdges.iterator();
 					
 					public boolean hasNext() {
 						if (faceEdges != null && edgeIndex < faceEdges.length) {
@@ -621,10 +642,7 @@ public class Sds {
 						if (faces.hasNext()) {
 							faceEdges = faces.next().getEdges();
 							edgeIndex = 0;
-							return hasNext();
-						}
-						if (includeStrayEdges) {
-							return edges.hasNext();
+							return true;
 						}
 						return false;
 					}
@@ -636,11 +654,8 @@ public class Sds {
 						}
 						if (faces.hasNext()) {
 							faceEdges = faces.next().getEdges();
-							edgeIndex = 0;
-							return next();
-						}
-						if (includeStrayEdges) {
-							return edges.next();
+							edgeIndex = 1;
+							return faceEdges[0];
 						}
 						throw new NoSuchElementException();
 					}
@@ -654,6 +669,7 @@ public class Sds {
 	}
 	
 	public void dumpFaces(int level) {
+		System.out.println("FACES");
 		for (Face face : faceSets[level]) {
 			System.out.print(face + " ");
 			for (HalfEdge edge : face.getEdges()) {
@@ -661,7 +677,8 @@ public class Sds {
 			}
 			System.out.println();
 		}
-		for (int l = level; l <= 1; l++) {
+		System.out.println("VERTICES");
+		for (int l = level; l <= 0; l++) {
 			for (AbstractVertex vertex : getVertices(l, true)) {
 				System.out.print(vertex + " ");
 				for (HalfEdge edge : vertex.getEdges()) {
@@ -670,6 +687,7 @@ public class Sds {
 				System.out.println();
 			}
 		}
+		System.out.println("EDGES");
 		for (HalfEdge edge : getEdges(0, true)) {
 			System.out.print(edge + " ");
 			System.out.print("next=" + edge.getNext() + " ");
@@ -880,24 +898,40 @@ public class Sds {
 			strayEdges.add(halfEdge.getPair());
 			strayVertices.add((BaseVertex) halfEdge.getVertex());
 			strayVertices.add((BaseVertex) halfEdge.getPairVertex());
+			edgeKey.set(halfEdge.getVertex(), halfEdge.getPairVertex());
+			edgeMap.put(edgeKey.clone(), halfEdge);
 		}
 		
 		void remove() {
 			strayEdges.remove(halfEdge);
 			strayEdges.remove(halfEdge.getPair());
+			edgeKey.set(halfEdge.getVertex(), halfEdge.getPairVertex());
+			edgeMap.remove(edgeKey);
+			edgeKey.swap();
+			edgeMap.remove(edgeKey);
 //			halfEdge.getVertex().removeEdge(halfEdge);
-			for (AbstractVertex v : halfEdge.getVertices(new AbstractVertex[2])) {
-				boolean removeStrayVertex = true;
-				for (HalfEdge e : v.getEdges()) {
-					if (!e.isStray()) {
-						removeStrayVertex = false;
-						continue;
-					}
-				}
-				if (removeStrayVertex) {
-					strayVertices.remove(v);
-				}
+			halfEdge.getVertex().removeEdge(halfEdge);
+			halfEdge.getPairVertex().removeEdge(halfEdge.getPair());
+			if (halfEdge.getVertex().getEdges().length == 0) {
+				strayVertices.remove(halfEdge.getVertex());
 			}
+			if (halfEdge.getPairVertex().getEdges().length == 0) {
+				strayVertices.remove(halfEdge.getPairVertex());
+			}
+//			for (AbstractVertex v : halfEdge.getVertices(new AbstractVertex[2])) {
+//				
+//				
+//				boolean removeStrayVertex = true;
+//				for (HalfEdge e : v.getEdges()) {
+//					if (!e.isStray()) {
+//						removeStrayVertex = false;
+//						continue;
+//					}
+//				}
+//				if (removeStrayVertex) {
+//					strayVertices.remove(v);
+//				}
+//			}
 		}
 	}
 	
@@ -1072,6 +1106,9 @@ public class Sds {
 		
 		@Override
 		public boolean equals(Object o) {
+			if (!(o instanceof EdgeKey)) {
+				return false;
+			}
 			EdgeKey ek = (EdgeKey) o;
 			return v0 == ek.v0 && v1 == ek.v1;
 		}
