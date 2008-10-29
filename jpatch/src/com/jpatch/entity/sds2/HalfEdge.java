@@ -213,7 +213,7 @@ public class HalfEdge {
 	}
 	
 	public String toString() {
-		return "e" + vertex + "-" + pair.vertex;
+		return "e" + vertex + "-" + pair.vertex + "(" + (face == null ? "null" : (face.id + ":" + faceEdgeIndex)) + ")";
 	}
 	
 	public void saveState(List<JPatchUndoableEdit> editList) {

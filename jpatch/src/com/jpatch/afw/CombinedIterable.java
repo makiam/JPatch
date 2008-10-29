@@ -17,4 +17,16 @@ public class CombinedIterable<T> implements Iterable<T> {
 		}
 		return new CombinedIterator<T>(iterators);
 	}
+	
+	public static void main(String[] args) {
+		List<String> a = new ArrayList<String>();
+		List<String> b = new ArrayList<String>();
+//		a.add("a");
+//		a.add("b");
+		b.add("c");
+		b.add("d");
+		for (String s : new CombinedIterable<String>(a, b)) {
+			System.out.print(s);
+		}
+	}
 }
