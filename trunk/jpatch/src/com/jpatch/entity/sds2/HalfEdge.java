@@ -146,7 +146,7 @@ public class HalfEdge {
 //	}
 	
 	public boolean isPrimary() {
-		return primary;
+		return primary || pair.face == null;
 	}
 	
 	public HalfEdge getPrimary() {
@@ -213,7 +213,7 @@ public class HalfEdge {
 	}
 	
 	public String toString() {
-		return "e" + vertex + "-" + pair.vertex + "(" + (face == null ? "null" : (face.id + ":" + faceEdgeIndex)) + ")";
+		return "e" + vertex + "-" + pair.vertex + "(" + (face == null ? "null" : (face.id + ":" + faceEdgeIndex)) + "){" + boundaryType + "}[" + isPrimary() + "]";
 	}
 	
 	public void saveState(List<JPatchUndoableEdit> editList) {

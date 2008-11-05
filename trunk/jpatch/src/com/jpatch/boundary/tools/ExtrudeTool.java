@@ -57,7 +57,7 @@ public class ExtrudeTool extends AbstractBasicTool {
 		for (int i = 0; i < viewports.length; i++) {
 			mouseMotionListeners[i] = new ExtrudeMouseMotionListener(viewports[i]);
 			viewports[i].getComponent().addMouseMotionListener(mouseMotionListeners[i]);
-			viewports[i].addOverlay(this);
+//			viewports[i].addOverlay(this);
 		}
 	}
 
@@ -66,7 +66,7 @@ public class ExtrudeTool extends AbstractBasicTool {
 		super.unregisterListeners(viewports);
 		for (int i = 0; i < viewports.length; i++) {
 			viewports[i].getComponent().removeMouseMotionListener(mouseMotionListeners[i]);
-			viewports[i].removeOverlay(this);
+//			viewports[i].removeOverlay(this);
 		}
 	}
 	
