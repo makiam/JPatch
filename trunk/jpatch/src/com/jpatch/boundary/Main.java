@@ -351,9 +351,9 @@ public class Main {
 			viewportRegistry.addObject(viewports[i]);
 		}
 		
-//		hud.bindToViewport(viewports[0]);
-//		hud.addWidget(slider);
-//		slider.getBounds().setBounds(10, 10, 100, 100);
+		hud.bindToViewport(viewports[0]);
+		hud.addWidget(slider);
+		slider.getBounds().setBounds(10, 10, 100, 100);
 		
 		
 		activeViewport = new StateMachine<Viewport>(viewports, viewports[0]);
