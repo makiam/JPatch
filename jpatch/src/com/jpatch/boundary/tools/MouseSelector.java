@@ -191,6 +191,7 @@ public class MouseSelector {
 //		gl.glReadBuffer(GL_FRONT);
 		
 //		System.out.println(mouseX + "," + mouseY + " depth = " + viewportGl.getDepthAt(mouseX, mouseY));
+		System.out.println("MouseSelector type=" + type);
 		Sds sds = sdsModel.getSds();
 		
 		
@@ -265,7 +266,10 @@ public class MouseSelector {
 			}
 			boolean boundaryOnly = ((type & Type.EDGE) == 0);
 			boolean stray = ((type & Type.STRAY_EDGE) == 0);
+			
+			
 			for (HalfEdge edge : edges) {
+				System.out.println("edge: " + edge);
 				if (edge.isPrimary() && objectFilter.accept(edge)) {
 					if (!boundaryOnly || edge.isBoundary() || (stray || edge.isStray())) {
 						edge.getVertex().getPosition(p0);
