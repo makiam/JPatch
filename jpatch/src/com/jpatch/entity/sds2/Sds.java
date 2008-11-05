@@ -46,9 +46,9 @@ public class Sds {
 	private final Set<HalfEdge> strayEdges = new HashSet<HalfEdge>();
 	private final Set<BaseVertex> strayVertices = new HashSet<BaseVertex>();
 	private final Set<BaseVertex[]> strayFaces = new HashSet<BaseVertex[]>();
-	private final Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
+//	private final Map<EdgeKey, HalfEdge> edgeMap = new HashMap<EdgeKey, HalfEdge>();
 	private final Set<Displacement>[] hierarchy = new Set[SdsConstants.MAX_LEVEL + 1];
-	
+	private final EdgeSet edgeSet = new EdgeSet();
 	
 //	private MorphTarget activeMorphTarget;
 	private final MorphController morphController = new MorphController(this);
@@ -56,8 +56,102 @@ public class Sds {
 	
 	private boolean facesSorted;
 	
-	/** used as key to find entries in edgeMaps without creating a new key object every time */
-	private final EdgeKey edgeKey = new EdgeKey();
+	public static class EdgeSet {
+		final static double growFactor = 0.75;
+		final static double shrinkFactor = 0.25;
+		int size = 4;
+		int mask = 0xf;
+		int count = 0;
+		int max = 12;
+		int min = 12;
+		private HalfEdge[][] buckets = new HalfEdge[16][];
+		
+		private int hash(final AbstractVertex v0, final AbstractVertex v1) {
+//			System.out.println("hash=" + ((v0.hashCode() ^ v1.hashCode()) & mask));
+			return (v0.hashCode() ^ v1.hashCode()) & mask;
+		}
+		
+		public HalfEdge getHalfEdge(final AbstractVertex v0, final AbstractVertex v1) {
+			final int index = hash(v0, v1);
+			HalfEdge[] bucket = buckets[index];
+			if (bucket != null) {
+				for (HalfEdge halfEdge : bucket) {
+					if (halfEdge.getVertex() == v0 && halfEdge.getPairVertex() == v1) {
+						return halfEdge;
+					}
+				}
+			}
+			HalfEdge halfEdge = new HalfEdge(v0, v1);
+			add(index, halfEdge);
+			return halfEdge;
+		}
+		
+		public void removeHalfEdge(final HalfEdge halfEdge) {
+			remove(hash(halfEdge.getVertex(), halfEdge.getPairVertex()), halfEdge);
+		}
+		
+		private void add(final int bucketIndex, final HalfEdge halfEdge) {
+			if (buckets[bucketIndex] == null) {
+				buckets[bucketIndex] = new HalfEdge[] { halfEdge, halfEdge.getPair() };
+			} else {
+				HalfEdge[] tmp = buckets[bucketIndex];
+				buckets[bucketIndex] = new HalfEdge[tmp.length + 2];
+				System.arraycopy(tmp, 0, buckets[bucketIndex], 0, tmp.length);
+				buckets[bucketIndex][tmp.length] = halfEdge;
+				buckets[bucketIndex][tmp.length + 1] = halfEdge.getPair();
+			}
+			count++;
+			if (count > max) {
+				size++;
+				rehash();
+			}
+		}
+		
+		private void remove(final int bucketIndex, final HalfEdge halfEdge) {
+			HalfEdge[] tmp = buckets[bucketIndex];
+			if (tmp.length == 2) {
+				buckets[bucketIndex] = null;
+			} else {
+				buckets[bucketIndex] = new HalfEdge[tmp.length - 2];
+				int i = 0;
+		    	while (i < tmp.length && (tmp[i] != halfEdge || tmp[i] != halfEdge.getPair())) {
+		    		i += 2;
+		    	}
+		    	System.arraycopy(tmp, 0, buckets[bucketIndex], 0, i);
+		    	if (i < buckets[bucketIndex].length) {
+	    	    	System.arraycopy(tmp, i + 2, buckets[bucketIndex], i, buckets[bucketIndex].length - i);
+		    	}
+			}
+			count--;
+			if (count < min) {
+				size--;
+				rehash();
+			}
+		}
+		
+		private void rehash() {
+			int dim = 1 << size;
+			max = (int) (dim * growFactor);
+			min = Math.max(12, (int) (dim * shrinkFactor));
+			int mask = dim - 1;
+			System.out.println("count=" + count + ", rehashing to " + dim + " (size=" + size + " max=" + max + " min=" + min + " mask=" + mask + ")");
+			HalfEdge[][] tmp = buckets;
+			buckets = new HalfEdge[dim][];
+			count = 0;
+			for (HalfEdge[] bucket : tmp) {
+				if (bucket != null) {
+					for (int i = 0; i < bucket.length; i += 2) {
+						HalfEdge halfEdge = bucket[i];
+						final int index = hash(halfEdge.getVertex(), halfEdge.getPairVertex());
+						add(index, halfEdge);
+					}
+				}
+			}
+		}
+	}
+	
+//	/** used as key to find entries in edgeMaps without creating a new key object every time */
+//	private final EdgeKey edgeKey = new EdgeKey();
 	
 	public Sds(final JPatchUndoManager undoManager) {
 		
@@ -132,8 +226,8 @@ public class Sds {
 //	}
 	
 	public void addSegment(List<JPatchUndoableEdit> editList, AbstractVertex vertex0, AbstractVertex vertex1) {
-		edgeKey.set(vertex0, vertex1);
-		assert (!edgeMap.containsKey(edgeKey));
+//		edgeKey.set(vertex0, vertex1);
+//		assert (!edgeMap.containsKey(edgeKey));
 		HalfEdge edge = new HalfEdge(vertex0, vertex1);
 //		JPatchUndoableEdit addEdgeEdit = new AddEdgeEdit(edge, 0);
 		JPatchUndoableEdit addStrayEdgeEdit = new AddStrayEdgeEdit(edge);
@@ -403,12 +497,13 @@ public class Sds {
 	}
 	
 	private void discardEdge(HalfEdge edge) {
-		edgeKey.set(edge.getVertex(), edge.getPairVertex());
-		assert edgeMap.containsKey(edgeKey);
-		edgeMap.remove(edgeKey);
-		edgeKey.swap();
-		assert edgeMap.containsKey(edgeKey);
-		edgeMap.remove(edgeKey);
+//		edgeKey.set(edge.getVertex(), edge.getPairVertex());
+//		assert edgeMap.containsKey(edgeKey);
+//		edgeMap.remove(edgeKey);
+//		edgeKey.swap();
+//		assert edgeMap.containsKey(edgeKey);
+//		edgeMap.remove(edgeKey);
+		edgeSet.removeHalfEdge(edge);
 		edge.dispose();
 	}
 	
@@ -770,19 +865,20 @@ public class Sds {
 	private HalfEdge getHalfEdge(AbstractVertex vertex0, AbstractVertex vertex1) {
 		assert vertex0 != vertex1 : "Vertices are identical: " + vertex0;
 		/* check if the HalfEdge (v0->v1) already exists */
-		edgeKey.set(vertex0, vertex1);
-		HalfEdge edge = edgeMap.get(edgeKey);
-		if (edge == null) {
-//			System.out.println("create new edge " + vertex0 + "-" + vertex1);
-			/* if no edge is found, create a new one and store it in the maps */
-			edge = new HalfEdge(vertex0, vertex1);
-			
-			assert !edgeMap.containsKey(edgeKey) : "HalfEdge " + edge + " already in SDS";
-			edgeMap.put(edgeKey.clone(), edge);
-			edgeKey.swap();
-			edgeMap.put(edgeKey.clone(), edge.getPair());
-		}
-		return edge;
+//		edgeKey.set(vertex0, vertex1);
+//		HalfEdge edge = edgeMap.get(edgeKey);
+//		if (edge == null) {
+////			System.out.println("create new edge " + vertex0 + "-" + vertex1);
+//			/* if no edge is found, create a new one and store it in the maps */
+//			edge = new HalfEdge(vertex0, vertex1);
+//			
+//			assert !edgeMap.containsKey(edgeKey) : "HalfEdge " + edge + " already in SDS";
+//			edgeMap.put(edgeKey.clone(), edge);
+//			edgeKey.swap();
+//			edgeMap.put(edgeKey.clone(), edge.getPair());
+//		}
+//		return edge;
+		return edgeSet.getHalfEdge(vertex0, vertex1);
 	}
 	
 	private static class FlipFacesEdit extends AbstractSwapEdit {
@@ -898,17 +994,17 @@ public class Sds {
 			strayEdges.add(halfEdge.getPair());
 			strayVertices.add((BaseVertex) halfEdge.getVertex());
 			strayVertices.add((BaseVertex) halfEdge.getPairVertex());
-			edgeKey.set(halfEdge.getVertex(), halfEdge.getPairVertex());
-			edgeMap.put(edgeKey.clone(), halfEdge);
+//			edgeKey.set(halfEdge.getVertex(), halfEdge.getPairVertex());
+//			edgeMap.put(edgeKey.clone(), halfEdge);
 		}
 		
 		void remove() {
 			strayEdges.remove(halfEdge);
 			strayEdges.remove(halfEdge.getPair());
-			edgeKey.set(halfEdge.getVertex(), halfEdge.getPairVertex());
-			edgeMap.remove(edgeKey);
-			edgeKey.swap();
-			edgeMap.remove(edgeKey);
+//			edgeKey.set(halfEdge.getVertex(), halfEdge.getPairVertex());
+//			edgeMap.remove(edgeKey);
+//			edgeKey.swap();
+//			edgeMap.remove(edgeKey);
 //			halfEdge.getVertex().removeEdge(halfEdge);
 			halfEdge.getVertex().removeEdge(halfEdge);
 			halfEdge.getPairVertex().removeEdge(halfEdge.getPair());
@@ -1071,48 +1167,48 @@ public class Sds {
 		}
 	}
 	
-	private static final class EdgeKey implements Cloneable {
-		private AbstractVertex v0;
-		private AbstractVertex v1;
-		private int hashCode;
-		
-		private EdgeKey() {
-			;
-		}
-		
-		private void set(AbstractVertex v0, AbstractVertex v1) {
-			this.v0 = v0;
-			this.v1 = v1;
-			hashCode = (System.identityHashCode(v0) << 1) ^ System.identityHashCode(v1);
-		}
-		
-		public void swap() {
-			set(v1, v0);
-		}
-		
-		@Override
-		public EdgeKey clone() {
-			try {
-				return (EdgeKey) super.clone();
-			} catch (CloneNotSupportedException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		
-		@Override
-		public int hashCode() {
-			return hashCode;
-		}
-		
-		@Override
-		public boolean equals(Object o) {
-			if (!(o instanceof EdgeKey)) {
-				return false;
-			}
-			EdgeKey ek = (EdgeKey) o;
-			return v0 == ek.v0 && v1 == ek.v1;
-		}
-	}
+//	private static final class EdgeKey implements Cloneable {
+//		private AbstractVertex v0;
+//		private AbstractVertex v1;
+//		private int hashCode;
+//		
+//		private EdgeKey() {
+//			;
+//		}
+//		
+//		private void set(AbstractVertex v0, AbstractVertex v1) {
+//			this.v0 = v0;
+//			this.v1 = v1;
+//			hashCode = (System.identityHashCode(v0) << 1) ^ System.identityHashCode(v1);
+//		}
+//		
+//		public void swap() {
+//			set(v1, v0);
+//		}
+//		
+//		@Override
+//		public EdgeKey clone() {
+//			try {
+//				return (EdgeKey) super.clone();
+//			} catch (CloneNotSupportedException e) {
+//				throw new RuntimeException(e);
+//			}
+//		}
+//		
+//		@Override
+//		public int hashCode() {
+//			return hashCode;
+//		}
+//		
+//		@Override
+//		public boolean equals(Object o) {
+//			if (!(o instanceof EdgeKey)) {
+//				return false;
+//			}
+//			EdgeKey ek = (EdgeKey) o;
+//			return v0 == ek.v0 && v1 == ek.v1;
+//		}
+//	}
 	
 	public HalfEdge getNextStrayEdge(HalfEdge strayEdge) {
 		assert strayEdges.contains(strayEdge) : "edge " + strayEdge + " not in " + strayEdges;

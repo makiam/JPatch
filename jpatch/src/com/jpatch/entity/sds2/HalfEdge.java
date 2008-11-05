@@ -316,15 +316,15 @@ public class HalfEdge {
 		return (prev == null || prev == start || (edges != null && !edges.contains(prev))) ? edge : getStartBoundaryEdge(prev, start, edges);
 	}
 	
-//	public int hashCode() {
-//		return vertex.hashCode() ^ pair.vertex.hashCode();
-//	}
-//	
-//	public boolean equals(Object o) {
-//		if (!(o instanceof HalfEdge)) {
-//			return false;
-//		}
-//		HalfEdge e = (HalfEdge) o;
-//		return vertex.equals(e.vertex) && pair.vertex.equals(e.pair.vertex);
-//	}
+	public int hashCode() {
+		return vertex.hashCode() + 37 * pair.vertex.hashCode();
+	}
+	
+	public boolean equals(Object o) {
+		if (!(o instanceof HalfEdge)) {
+			return false;
+		}
+		HalfEdge e = (HalfEdge) o;
+		return vertex == e.vertex && pair.vertex == e.pair.vertex;
+	}
 }
