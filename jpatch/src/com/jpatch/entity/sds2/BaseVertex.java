@@ -104,6 +104,6 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 
 	@Override
 	public String toString() {
-		return "v" + num;
+		return "v" + num + "{" + boundaryType() + "}";
 	}
 }

@@ -675,7 +675,7 @@ public abstract class AbstractVertex {
 	 * TODO: preferredStart method will not work properly with undo/redo
 	 */
 	final void organizeEdges() {
-		boolean debug = false;
+		boolean debug = true;
 		if (debug) System.out.println(this + " organizeEdges() called...");
 		
 		if (debug) System.out.print("    edges are:");
@@ -746,9 +746,6 @@ public abstract class AbstractVertex {
 		return null;
 	}
 	
-	@Override
-	public abstract String toString();
-	
 	public class ChangePositionEdit extends AbstractSwapEdit {
 		private final Tuple3d pos = new Point3d();
 		public ChangePositionEdit(Tuple3d pos, boolean changeNow) {
@@ -764,5 +761,9 @@ public abstract class AbstractVertex {
 //			getPos(pos);
 //			setPos(x, y, z);
 		}
+	}
+	
+	BoundaryType boundaryType() {
+		return boundaryType;
 	}
 }
