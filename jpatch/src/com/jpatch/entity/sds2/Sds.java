@@ -9,6 +9,9 @@ import com.jpatch.entity.*;
 
 import java.util.*;
 
+import org.junit.*;
+import static org.junit.Assert.*;
+
 public class Sds {
 	public static final class Type {
 		public static final int VERTEX = 1 << 0;
