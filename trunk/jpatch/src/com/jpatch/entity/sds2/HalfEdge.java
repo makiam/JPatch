@@ -10,9 +10,7 @@ import com.jpatch.afw.control.*;
 import javax.vecmath.*;
 
 public class HalfEdge {
-	public static final int REGULAR = 0;
-	public static final int BOUNDARY = 1;
-	public static final int STRAY = 2;
+	private static enum BoundaryType { REGULAR, BOUNDARY, STRAY }
 	
 	private final AbstractVertex vertex;
 	private final HalfEdge pair;
@@ -23,7 +21,7 @@ public class HalfEdge {
 	private HalfEdge subEdge;
 	private Face face;
 	int faceEdgeIndex;
-	private int boundaryType = STRAY;
+	private BoundaryType boundaryType = BoundaryType.STRAY;
 	private DerivedVertex edgePoint;
 	
 	public HalfEdge(AbstractVertex v0, AbstractVertex v1) {
@@ -100,11 +98,11 @@ public class HalfEdge {
 		assert (this.face == null && face != null) || (this.face != null && face == null) : this + ".face=" + this.face + ", face=" + face + ", exactly one must be null";
 		this.face = face;
 		if (face != null && pair.face != null) {
-			boundaryType = pair.boundaryType = REGULAR;
+			boundaryType = pair.boundaryType = BoundaryType.REGULAR;
 		} else if (face == null && pair.face == null) {
-			boundaryType = pair.boundaryType = STRAY;
+			boundaryType = pair.boundaryType = BoundaryType.STRAY;
 		} else {
-			boundaryType = pair.boundaryType = BOUNDARY;
+			boundaryType = pair.boundaryType = BoundaryType.BOUNDARY;
 		}
 //		if (face == null) {
 //			assert next != null;
@@ -115,16 +113,16 @@ public class HalfEdge {
 	}
 	
 	public int getFaceEdgeIndex() {
-		assert face.getEdges()[faceEdgeIndex] == this;
+		assert face.getEdges()[faceEdgeIndex] == this : "index=" + faceEdgeIndex + " faceEdges=" + Arrays.toString(face.getEdges());
 		return faceEdgeIndex;
 	}
 	
 	public boolean isBoundary() {
-		return boundaryType == BOUNDARY;
+		return boundaryType == BoundaryType.BOUNDARY;
 	}
 	
 	public boolean isStray() {
-		return boundaryType == STRAY;
+		return boundaryType == BoundaryType.STRAY;
 	}
 	
 //	private void computeFaceEdgeIndex() {
@@ -213,7 +211,7 @@ public class HalfEdge {
 	}
 	
 	public String toString() {
-		return "e" + vertex + "-" + pair.vertex + "(" + (face == null ? "null" : (face.id + ":" + faceEdgeIndex)) + "){" + boundaryType + "}[" + isPrimary() + "]";
+		return "e" + vertex + "-" + pair.vertex;// + "(" + (face == null ? "null" : (face.id + ":" + faceEdgeIndex)) + "){" + boundaryType + "}[" + isPrimary() + "]";
 	}
 	
 	public void saveState(List<JPatchUndoableEdit> editList) {
@@ -238,7 +236,7 @@ public class HalfEdge {
 		private Face face = HalfEdge.this.face;
 //		private Face pairFace = HalfEdge.this.pair.face;
 		private int faceEdgeIndex = HalfEdge.this.faceEdgeIndex;
-		private int boundaryType = HalfEdge.this.boundaryType;
+		private BoundaryType boundaryType = HalfEdge.this.boundaryType;
 		
 		private SaveStateEdit() {
 			apply(true);
@@ -249,6 +247,7 @@ public class HalfEdge {
 			HalfEdge tmpEdge;
 			Face tmpFace;
 			int tmpInt;
+			BoundaryType tmpBoundaryType;
 			
 			/* swap state */
 //			tmpEdge = HalfEdge.this.next; HalfEdge.this.next = next; next = tmpEdge;
@@ -256,14 +255,14 @@ public class HalfEdge {
 			tmpFace = HalfEdge.this.face; HalfEdge.this.face = face; face = tmpFace;
 //			tmpFace = HalfEdge.this.pair.face; HalfEdge.this.pair.face = pairFace; pairFace = tmpFace;
 			tmpInt = HalfEdge.this.faceEdgeIndex; HalfEdge.this.faceEdgeIndex = faceEdgeIndex; faceEdgeIndex = tmpInt;
-			tmpInt = HalfEdge.this.boundaryType; HalfEdge.this.boundaryType = boundaryType; boundaryType = tmpInt;
+			tmpBoundaryType = HalfEdge.this.boundaryType; HalfEdge.this.boundaryType = boundaryType; boundaryType = tmpBoundaryType;
 		}
 	}
 	
 	private HalfEdge getPrevBoundaryEdge() {
-		assert boundaryType == BOUNDARY;
+		assert boundaryType == BoundaryType.BOUNDARY;
 		for (HalfEdge e : vertex.getEdges()) {
-			if (e != this && e.boundaryType == BOUNDARY) {
+			if (e != this && e.boundaryType == BoundaryType.BOUNDARY) {
 				return e.pair;
 			}
 		}
@@ -271,9 +270,9 @@ public class HalfEdge {
 	}
 	
 	private HalfEdge getNextBoundaryEdge() {
-		assert boundaryType == BOUNDARY;
+		assert boundaryType == BoundaryType.BOUNDARY;
 		for (HalfEdge e : pair.vertex.getEdges()) {
-			if (e.boundaryType == BOUNDARY) {
+			if (e.boundaryType == BoundaryType.BOUNDARY) {
 				return e;
 			}
 		}

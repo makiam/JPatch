@@ -403,6 +403,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 					hitObject = newHitObject;
 					setSelection(hitSelection, hitObject);
 					highlightHitObject(viewport, false, false, false);
+					System.out.println(hitObject);
 				}
 				break;
 			case IDLE:

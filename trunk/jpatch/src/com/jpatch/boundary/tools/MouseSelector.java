@@ -191,7 +191,7 @@ public class MouseSelector {
 //		gl.glReadBuffer(GL_FRONT);
 		
 //		System.out.println(mouseX + "," + mouseY + " depth = " + viewportGl.getDepthAt(mouseX, mouseY));
-		System.out.println("MouseSelector type=" + type);
+//		System.out.println("MouseSelector type=" + type);
 		Sds sds = sdsModel.getSds();
 		
 		
@@ -269,7 +269,7 @@ public class MouseSelector {
 			
 			
 			for (HalfEdge edge : edges) {
-				System.out.println("edge: " + edge);
+//				System.out.println("edge: " + edge);
 				if (edge.isPrimary() && objectFilter.accept(edge)) {
 					if (!boundaryOnly || edge.isBoundary() || (stray || edge.isStray())) {
 						edge.getVertex().getPosition(p0);
@@ -379,6 +379,11 @@ public class MouseSelector {
 		public com.jpatch.boundary.Selection.Type getType() {
 			throw new UnsupportedOperationException();
 		}
+		
+		@Override
+		public String toString() {
+			return "NULL";
+		}
 	}
 	
 	public static class HitVertex extends HitObject {
@@ -421,11 +426,21 @@ public class MouseSelector {
 		public com.jpatch.boundary.Selection.Type getType() {
 			return Selection.Type.VERTICES;
 		}
+		
+		@Override
+		public String toString() {
+			return "vertex " + vertex.toString();
+		}
 	}
 	
 	public static class HitLimit extends HitVertex {
 		private HitLimit(XFormNode node, double distanceSq, Point3d screenPosition, AbstractVertex vertex) {
 			super(node, distanceSq, screenPosition,vertex);
+		}
+		
+		@Override
+		public String toString() {
+			return "limit " + vertex.toString();
 		}
 	}
 	
@@ -472,6 +487,11 @@ public class MouseSelector {
 		@Override
 		public com.jpatch.boundary.Selection.Type getType() {
 			return Selection.Type.EDGES;
+		}
+		
+		@Override
+		public String toString() {
+			return "edge " + halfEdge.toString();
 		}
 	}
 	
@@ -520,7 +540,7 @@ public class MouseSelector {
 		
 		@Override
 		public String toString() {
-			return "Hitface:" + face;
+			return "face" + face;
 		}
 	}
 	
