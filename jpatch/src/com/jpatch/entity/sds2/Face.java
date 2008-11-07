@@ -373,6 +373,8 @@ public class Face {
 				}
 			}
 		};
+		
+		facePoint.vertexId = new VertexId.FacePointId(faceEdges[0].getVertex().vertexId, faceEdges[1].getVertex().vertexId);
 		return facePoint;
 	}
 	

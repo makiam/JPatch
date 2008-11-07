@@ -3,6 +3,6 @@ package com.jpatch.afw.testing;
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TestClass {
+public @interface TestSuit {
 	
 }

@@ -25,6 +25,7 @@ public class HalfEdge {
 	private DerivedVertex edgePoint;
 	
 	public HalfEdge(AbstractVertex v0, AbstractVertex v1) {
+		assert v0 != v1;
 		this.vertex = v0;
 		this.pair = new HalfEdge(v1, this);
 		this.primary = true;
@@ -199,6 +200,8 @@ public class HalfEdge {
 		
 		subEdge = new HalfEdge(vertex.getVertexPoint(), edgePoint);
 		pair.subEdge = new HalfEdge(pair.vertex.getVertexPoint(), edgePoint);
+		
+		edgePoint.vertexId = new VertexId.EdgePointId(vertex.vertexId, pair.vertex.vertexId);
 		return edgePoint;
 	}
 	

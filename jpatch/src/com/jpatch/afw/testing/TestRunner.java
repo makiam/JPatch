@@ -34,8 +34,19 @@ public class TestRunner {
 	 * @throws InstantiationException 
 	 */
 	public static void main(String[] args) {
+//		PrintStream out = System.out;
+//		System.setOut(new PrintStream(new OutputStream() {
+//
+//			@Override
+//			public void write(int b) throws IOException {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//			
+//		}));
 		TestRunner testRunner = new TestRunner();
 		testRunner.testPackage(new File(BIN, BASE.replace('.', File.separatorChar)));
+//		System.setOut(out);
 		testRunner.reportTotals();
 	}
 
@@ -45,7 +56,7 @@ public class TestRunner {
 				boolean classCounted = false;
 				Class<?> mainClass = ClassLoader.getSystemClassLoader().loadClass(classNameFor(classFile));
 				for (Class<?> subClass : mainClass.getDeclaredClasses()) {
-					TestClass testClass = subClass.getAnnotation(TestClass.class);
+					TestSuit testClass = subClass.getAnnotation(TestSuit.class);
 					if (testClass != null) {
 						if ((subClass.getModifiers() & Modifier.STATIC) != 0) {
 							try {
@@ -56,7 +67,7 @@ public class TestRunner {
 								}
 								testSuits++;
 								for (Method testMethod : subClass.getMethods()) {
-									Test test = testMethod.getAnnotation(Test.class);
+									TestCase test = testMethod.getAnnotation(TestCase.class);
 									if (test != null) {
 										try {
 											TestResult testResult = (TestResult) testMethod.invoke(testObject, VOID);
@@ -91,8 +102,8 @@ public class TestRunner {
 	
 	private void reportTotals() {
 		System.out.println("---");
-		System.out.println(classes + " classes, " + testSuits + " testSuits, " + (successes + warnings + errors) + " tests");
-		System.out.println(successes + " success, " + warnings + " warnings, " + errors + " errors");
+		System.out.print(classes + " classes, " + testSuits + " testSuits, " + (successes + warnings + errors) + " tests: ");
+		System.out.println(successes + " success, " + warnings + " WARNINGS, " + errors + " ERRORS");
 	}
 	
 	private String classNameFor(File classFile) {
