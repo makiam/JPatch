@@ -26,6 +26,7 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 	
 	public BaseVertex(SdsModel sdsModel, double x, double y, double z) {
 		super(sdsModel.getSds());
+		vertexId = new VertexId.BaseVertexId(this);
 		this.xformNode = sdsModel;
 		xformNode.addXFormListener(this);
 		xformNode.getLocal2WorldTransform(transformMatrix);
@@ -102,8 +103,8 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 		xmlWriter.endElement();
 	}
 
-	@Override
-	public String toString() {
-		return "v" + num + "{" + boundaryType() + "}";
-	}
+//	@Override
+//	public String toString() {
+//		return "v" + num + "{" + boundaryType() + "}";
+//	}
 }

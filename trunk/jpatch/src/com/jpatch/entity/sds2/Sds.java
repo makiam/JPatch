@@ -3,6 +3,7 @@ package com.jpatch.entity.sds2;
 import com.jpatch.afw.*;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
+import com.jpatch.afw.testing.*;
 import com.jpatch.afw.ui.*;
 import com.jpatch.boundary.*;
 import com.jpatch.entity.*;
@@ -184,7 +185,6 @@ public class Sds {
 		 * Modify number of buckets and reshash
 		 */
 		private void rehash() {
-			System.out.println("rehashing, new capacity=" + capacity);
 			HalfEdge[][] tmp = buckets;
 			/* new number of buckets */
 			buckets = new HalfEdge[capacity][];
@@ -199,7 +199,6 @@ public class Sds {
 					}
 				}
 			}
-			dump();
 		}
 		
 		/**
@@ -217,11 +216,8 @@ public class Sds {
 			mask = capacity - 1;
 		}
 		
+		@SuppressWarnings("unused")
 		private void dump() {
-			dump(buckets);
-		}
-		
-		private void dump(HalfEdge[][] buckets) {
 			for (int i = 0; i < buckets.length; i++) {
 				System.out.print("Bucket " + i + ":\t");
 				if (buckets[i] != null) {
@@ -895,6 +891,35 @@ public class Sds {
 			}
 			System.out.print("} ");
 		}
+		System.out.println();
+		
+		System.out.println("running compare-test");
+		int p = 0;
+		List<VertexId> idList = new ArrayList<VertexId>();
+		for (AbstractVertex a : getVertices(currentMaxLevel, false)) {
+			System.out.print(".");
+			if (p++ == 100) {
+				System.out.println();
+				p = 0;
+			}
+			idList.add(a.vertexId);
+			for (AbstractVertex b : getVertices(currentMaxLevel, false)) {
+				if (a.vertexId.compareTo(b.vertexId) == 0 && a != b) {
+					System.out.println("error");
+				}
+			}
+		}
+		
+		System.out.println("sorting...");
+		Collections.sort(idList);
+		VertexId last = idList.get(idList.size() - 1);
+		for (VertexId id : idList) {
+			System.out.println(id + " " + id.compareTo(last));
+			last = id;
+			if (id.getVertex().vertexId != id) {
+				System.out.println("****ERROR****");
+			}
+		}
 //		System.out.println();
 //		System.out.println("edgeset:");
 //		edgeSet.dump();
@@ -1334,4 +1359,124 @@ public class Sds {
 		assert strayVertex.getEdges().length == 1 || strayVertex.getEdges().length == 2;
 		return strayVertex.getEdges().length == 1;
 	}
+	
+	@TestSuit
+	public static class Tests {
+		private EdgeSet edgeSet = new EdgeSet();
+		private AbstractVertex[] vertices = new AbstractVertex[100];
+		private HalfEdge[][] edges = new HalfEdge[100][100];
+		
+		public Tests() {
+			final SdsModel sdsModel = new SdsModel(new Sds(null));
+			
+			/* create vertices */
+			for (int i = 0; i < vertices.length; i++) {
+				vertices[i] = new BaseVertex(sdsModel);
+			}
+		}
+		
+		private int vertexNumber(AbstractVertex vertex) {
+			for (int i = 0; i < vertices.length; i++) {
+				if (vertices[i] == vertex) {
+					return i;
+				}
+			}
+			return -1;
+		}
+		
+		@TestCase
+		public TestResult test() {
+			/* create edges */
+			for (int k = 0; k < 2; k++) { // running 2 times to ensure that existing edges will be found and not created twice
+				for (int i = 0; i < vertices.length; i++) {
+					for (int j = 0; j < vertices.length; j++) {
+						try {
+							edges[i][j] = edgeSet.getHalfEdge(vertices[i], vertices[j]);
+							if (i == j) {
+								return TestResult.error("edge with v0=v1 cereated without assertion-error");
+							}
+						} catch (AssertionError e) {
+							if (i != j) {
+								return TestResult.error(e.getMessage());
+							}
+						}
+					}
+				}
+			}
+			
+			/* count created edges in hashTable, check number */
+			int count = 0;
+			for (HalfEdge[] bucket : edgeSet.buckets) {
+				if (bucket != null) {
+					count += bucket.length;
+				}
+			}
+			int expect = vertices.length * (vertices.length - 1) / 2;
+			if (count != expect) {
+				return TestResult.error("should have " + expect + " edges in hashTable, found " + count);
+			}
+			
+			/* test that edges a-b actually have pair-edges b-a */
+			for (int i = 0; i < vertices.length; i++) {
+				for (int j = 0; j < vertices.length; j++) {
+					if (i == j) {
+						if (edges[i][j] != null) {
+							return TestResult.error(edges[i][j] + " should be null");
+						}
+						continue;
+					}
+					if (edges[i][j].getPair() != edges[j][i]) {
+						return TestResult.error(edges[i][j] + " pair is " + edges[i][j].getPair() + ", should be " + edges[j][i]);
+					}
+				}
+			}
+			
+			/* remove all edges between vertices > 10 */
+			for (int i = 0; i < vertices.length; i++) {
+				for (int j = 0; j < i; j++) {
+					if (i >= 10 || j >= 10) {
+						edgeSet.removeHalfEdge(edges[i][j]);
+					}
+				}
+			}
+			
+			/* check that the remaining edges are still there, but the rest has been removed */
+			count = 0;
+			final boolean[][] edgePresent = new boolean[vertices.length][vertices.length];
+			for (HalfEdge[] bucket : edgeSet.buckets) {
+				if (bucket != null) {
+					for (HalfEdge edge : bucket) {
+						count++;
+						final int i = vertexNumber(edge.getVertex());
+						final int j = vertexNumber(edge.getPairVertex());
+						if (edgePresent[i][j]) {
+							return TestResult.error(edge + " found twice");
+						} else {
+							edgePresent[i][j] = true;
+						}
+						if (edgePresent[j][i]) {
+							return TestResult.error(edge.getPair() + " found twice");
+						} else {
+							edgePresent[j][i] = true;
+						}
+					}
+				}
+			}
+			
+			if (count != 45) {
+				return TestResult.error("should have 45 edges in hashTable, found " + count);
+			}
+			
+			for (int i = 0; i < vertices.length; i++) {
+				for (int j = 0; j < vertices.length; j++) {
+					boolean expecting = (i < 10 && j < 10 && i != j);
+					if (edgePresent[i][j] != expecting) {
+						return TestResult.error("edgePresent[" + i + "][" + j + "] should be " + expecting);
+					}
+				}
+			}
+			return TestResult.success();
+		}
+	}
+	
 }

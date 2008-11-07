@@ -122,13 +122,13 @@ public class Actions {
 			} catch(IOException ex) {
 				ex.printStackTrace();
 			}
-			for (AbstractVertex v : sds.getVertices(2, false)) {
-				int[] hierarchyId = ((DerivedVertex) v).generateId();
-				System.out.println("* searching for " + Arrays.toString(hierarchyId));
-				DerivedVertex d = sds.locateVertex(hierarchyId);
-				System.out.println("*  found " + Arrays.toString(d.generateId()));
-				System.out.println(d == v);
-			}
+//			for (AbstractVertex v : sds.getVertices(2, false)) {
+//				int[] hierarchyId = ((DerivedVertex) v).generateId();
+//				System.out.println("* searching for " + Arrays.toString(hierarchyId));
+//				DerivedVertex d = sds.locateVertex(hierarchyId);
+//				System.out.println("*  found " + Arrays.toString(d.generateId()));
+//				System.out.println(d == v);
+//			}
 		}
 	};
 	

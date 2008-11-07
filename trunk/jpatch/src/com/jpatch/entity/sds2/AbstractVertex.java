@@ -5,6 +5,7 @@ import static com.jpatch.entity.sds2.SdsWeights.*;
 import java.util.*;
 
 import com.jpatch.afw.control.*;
+import com.jpatch.afw.testing.*;
 import com.jpatch.entity.*;
 
 import javax.vecmath.*;
@@ -50,6 +51,8 @@ public abstract class AbstractVertex {
 	double sharpnessValue;
 	
 	final Sds sds;
+	
+	VertexId vertexId;
 	
 	AbstractVertex(Sds sds) {
 		this.sds = sds;
@@ -225,6 +228,7 @@ public abstract class AbstractVertex {
 				}
 			}
 		};
+		vertexPoint.vertexId = new VertexId.VertexPointId(vertexId);
 		return vertexPoint;
 	}
 	
@@ -675,7 +679,7 @@ public abstract class AbstractVertex {
 	 * TODO: preferredStart method will not work properly with undo/redo
 	 */
 	final void organizeEdges() {
-		boolean debug = true;
+		boolean debug = false;
 		if (debug) System.out.println(this + " organizeEdges() called...");
 		
 		if (debug) System.out.print("    edges are:");
@@ -765,5 +769,106 @@ public abstract class AbstractVertex {
 	
 	BoundaryType boundaryType() {
 		return boundaryType;
+	}
+	
+	@Override
+	public String toString() {
+		return vertexId.toString();
+	}
+	
+	@TestSuit
+	public static class Tests {
+		private static final Material MATERIAL = new BasicMaterial(new Color3f(1, 1, 1));
+		private final Sds sds = new Sds(null);
+		private final SdsModel sdsModel = new SdsModel(sds);
+		private final AbstractVertex[] v = new AbstractVertex[13];
+//		private final AbstractVertex[] v1 = new AbstractVertex[13];
+		
+		public Tests() {
+			for (int i = 0; i < v.length; i++) {
+				v[i] = new BaseVertex(sdsModel);
+			}
+		}
+		
+		@TestCase
+		public TestResult test() {
+			
+			
+			makeFace(0, 1, 2);
+			if (!checkBoundary(0, 1, 2)) {
+				return TestResult.error("Bad edges: " + Arrays.toString(v[0].getEdges()));
+			}
+			makeFace(2, 3, 0);
+			if (!checkBoundary(0, 1, 3)) {
+				return TestResult.error("Bad edges: " + Arrays.toString(v[0].getEdges()));
+			}
+			makeFace(1, 0, 12);
+			if (!checkBoundary(0, 12, 3)) {
+				return TestResult.error("Bad edges: " + Arrays.toString(v[0].getEdges()));
+			}
+			makeFace(0, 10, 11);
+			if (v[0].boundaryType != BoundaryType.IRREGULAR) {
+				return TestResult.error("Bad boundary-Type: " + v[0].boundaryType);
+			}
+			makeFace(9, 10, 0);
+			if (v[0].boundaryType != BoundaryType.IRREGULAR) {
+				return TestResult.error("Bad boundary-Type: " + v[0].boundaryType);
+			}
+			makeFace(12, 0, 11);
+			if (!checkBoundary(0, 9, 3)) {
+				return TestResult.error("Bad edges: " + Arrays.toString(v[0].getEdges()));
+			}
+			makeFace(6, 0, 5);
+			if (v[0].boundaryType != BoundaryType.IRREGULAR) {
+				return TestResult.error("Bad boundary-Type: " + v[0].boundaryType);
+			}
+			makeFace(4, 5, 0);
+			if (v[0].boundaryType != BoundaryType.IRREGULAR) {
+				return TestResult.error("Bad boundary-Type: " + v[0].boundaryType);
+			}
+			makeFace(0, 3, 4);
+			if (!checkBoundary(0, 9, 6)) {
+				return TestResult.error("Bad edges: " + Arrays.toString(v[0].getEdges()));
+			}
+			makeFace(6, 7, 0);
+			if (!checkBoundary(0, 9, 7)) {
+				return TestResult.error("Bad edges: " + Arrays.toString(v[0].getEdges()));
+			}
+			makeFace(8, 9, 0);
+			if (!checkBoundary(0, 8, 7)) {
+				return TestResult.error("Bad edges: " + Arrays.toString(v[0].getEdges()));
+			}
+			makeFace(7, 8, 0);
+			if (v[0].boundaryType != BoundaryType.REGULAR) {
+				return TestResult.error("Bad boundary-Type: " + v[0].boundaryType);
+			}
+			
+			return TestResult.success();
+		}
+		
+		private boolean checkBoundary(int vertex, int first, int last) {
+			HalfEdge[] edges = v[vertex].getEdges();
+			HalfEdge[] subEdges = v[vertex].vertexPoint.getEdges();
+			boolean boundaryOk = v[vertex].boundaryType == BoundaryType.BOUNDARY && v[vertex].vertexPoint.boundaryType() == BoundaryType.BOUNDARY;
+			boolean edgesOk = edges[0].getPairVertex() == v[first] && edges[edges.length - 1].getPairVertex() == v[last];
+			boolean subEdgesOk = subEdges[0].getPairVertex() == v[first].getEdges()[0].getEdgePoint() && subEdges[subEdges.length - 1].getPairVertex() == v[last].getEdges()[0].getEdgePoint();
+			return boundaryOk && edgesOk;// && subEdgesOk;
+		}
+		
+		private void makeFace(int ... indices) {
+			AbstractVertex[] av = new AbstractVertex[indices.length];
+			for (int i = 0; i < indices.length; i++) {
+				av[i] = v[indices[i]];
+			}
+			sds.addFace(null, MATERIAL, av);
+//			for (int i = 0; i < indices.length; i++) {
+//				int index = indices[i];
+//				if (index == 0) {
+//					v1[index] = v[index].vertexPoint;
+//				} else {
+//					v1[index] = v[index].getEdges()[0].getEdgePoint();
+//				}
+//			}
+		}
 	}
 }
