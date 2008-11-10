@@ -16,7 +16,7 @@ public class Face {
 	private final double oneOverSides;
 	private DerivedVertex facePoint;
 	private Material material;
-	final Face parentFace;
+//	final Face parentFace;
 	final int id;
 	Point3d midpointPosition = new Point3d();
 	Point3d displacedMidpointPosition = new Point3d();
@@ -32,15 +32,25 @@ public class Face {
 	private final FloatBuffer limitSurfaceBuffer;
 	private final FloatBuffer controlSurfaceBuffer;
 	
+	private boolean subdivided;
+	
+	public boolean isSubdivided() {
+		return subdivided;
+	}
+
+	public void setSubdivided(boolean subdivided) {
+		this.subdivided = subdivided;
+	}
+
 	public Face(Material material, HalfEdge... edges) {
 		this(material, count++, edges);
 	}
 	
 	public Face(Material material, int faceId, HalfEdge... edges) {
-		this(material, edges, null, faceId);
+		this(material, edges, faceId);
 	}
 	
-	public Face(Material material, HalfEdge[] edges, Face parentFace, int edgeIndex) {
+	public Face(Material material, HalfEdge[] edges, int edgeIndex) {
 //		System.out.println("Face constructor called for edges " + Arrays.toString(edges));
 		int sides = edges.length;
 		assert sides >= 3 : "edges.length=" + edges.length + ", must be >= 3";
@@ -48,7 +58,7 @@ public class Face {
 		oneOverSides = 1.0 / sides;
 		
 		this.faceEdges = edges.clone();
-		this.parentFace = parentFace;
+//		this.parentFace = parentFace;
 		this.id = edgeIndex;
 		
 //		limitSurfaceBuffer = BufferUtil.newFloatBuffer(sides * 2 * 3);
@@ -382,33 +392,37 @@ public class Face {
 		return facePoint;
 	}
 	
-	public String toString() {
-		StringBuilder sb = new StringBuilder("f" + Arrays.toString(generateId()) + "{");
-		for (int i = 0; i < faceEdges.length; i++) {
-			sb.append(faceEdges[i].getVertex());
-			if (i < faceEdges.length - 1) {
-				sb.append('-');
-			}
-		}
-		sb.append("}");
-		return sb.toString();
+	public final DerivedVertex getOrCreateFacePoint() {
+		return facePoint != null ? facePoint : createFacePoint();
 	}
 	
-	int addId(int[] id, int index) {
-		id[index++] = this.id;
-		if (parentFace != null) {
-			return parentFace.addId(id, index);
-		}
-		return index;
-	}
+//	public String toString() {
+//		StringBuilder sb = new StringBuilder("f" + Arrays.toString(generateId()) + "{");
+//		for (int i = 0; i < faceEdges.length; i++) {
+//			sb.append(faceEdges[i].getVertex());
+//			if (i < faceEdges.length - 1) {
+//				sb.append('-');
+//			}
+//		}
+//		sb.append("}");
+//		return sb.toString();
+//	}
 	
-	public int[] generateId() {
-		int[] tmp = new int[SdsConstants.MAX_LEVEL + 1];
-		int level = addId(tmp, 0);
-		int[] id = new int[level];
-		System.arraycopy(tmp, 0, id, 0, level);
-		return id;
-	}
+//	int addId(int[] id, int index) {
+//		id[index++] = this.id;
+//		if (parentFace != null) {
+//			return parentFace.addId(id, index);
+//		}
+//		return index;
+//	}
+//	
+//	public int[] generateId() {
+//		int[] tmp = new int[SdsConstants.MAX_LEVEL + 1];
+//		int level = addId(tmp, 0);
+//		int[] id = new int[level];
+//		System.arraycopy(tmp, 0, id, 0, level);
+//		return id;
+//	}
 	
 //	public int hashCode() {
 //		return Arrays.hashCode(faceEdges);

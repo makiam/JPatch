@@ -362,9 +362,9 @@ public class Sds {
 		}
 	}
 	
-	private Face createFace(int level, Face parent, int edgeIndex, Material material, HalfEdge... edges) {
+	private Face createSubFace(int level, int edgeIndex, Material material, HalfEdge... edges) {
 		assert level > 0;
-		assert parent != null;
+//		assert parent != null;
 //		System.out.print("add face called: ");
 //		for (AbstractVertex vertex : vertices) {
 //			System.out.print(vertex + " ");
@@ -379,7 +379,7 @@ public class Sds {
 //			edges[i] = getHalfEdge(vertices[i], vertices[j]);
 //		}
 		
-		Face face = new Face(material, edges, parent, edgeIndex);
+		Face face = new Face(material, edges, edgeIndex);
 		
 //		if (level == 0) System.out.println(this + " adding face " + face);
 		
@@ -388,7 +388,7 @@ public class Sds {
 		
 		
 		if (level < maxLevelAttr.getInt()) {
-			subdivideFace(level, face);
+			subdivideFace(level, face, false);
 		}
 		return face;
 	}
@@ -454,7 +454,7 @@ public class Sds {
 //			int n = faceSets[currentMaxLevel].size();
 //			int i = 0, p = 0;
 			for (Face face : faceSets[currentMaxLevel]) {
-				subdivideFace(currentMaxLevel, face);
+				subdivideFace(currentMaxLevel, face, false);
 //				int np = (i++) * 100 / n;
 //				if (np > p) {
 //					p = np;
@@ -474,7 +474,11 @@ public class Sds {
 		}
 	}
 	
-	private void subdivideFace(int level, Face face) {
+	private void subdivideFace(int level, Face face, boolean subdivSurroundings) {
+		if (face.isSubdivided()) {
+			return;
+		}
+		
 		HalfEdge[] edges = face.getEdges();
 		HalfEdge[] hubEdges = new HalfEdge[face.getSides()];
 		HalfEdge[] newEdges = new HalfEdge[4];
@@ -498,11 +502,23 @@ public class Sds {
 			newEdges[1] = edges[i].getPair().getSubEdge().getPair();
 			newEdges[2] = edges[j].getSubEdge();
 			newEdges[3] = hubEdges[j].getPair();
-			createFace(level + 1, face, i, face.getMaterial(), newEdges);
+			createSubFace(level + 1, i, face.getMaterial(), newEdges);
 //			AbstractVertex v1 = edges[i].getPrev().getEdgePoint();
 //			AbstractVertex v2 = edges[i].getVertex().getVertexPoint();
 //			AbstractVertex v3 = edges[i].getEdgePoint();
 //			createFace(level + 1, face, i, face.getMaterial(), v0, v1, v2, v3);
+		}
+		
+		/* subdivide surrounding faces */
+		if (subdivSurroundings) {
+			for (HalfEdge edge : face.getEdges()) {
+				for (HalfEdge corner : edge.getVertex().getEdges()) {
+					Face f = corner.getFace();
+					if (f != null && f != face) {
+						subdivideFace(level, f, false);
+					}
+				}
+			}
 		}
 	}
 	
@@ -547,7 +563,7 @@ public class Sds {
 		faceIdMap.put(face.id, face);
 		
 		if (0 < maxLevelAttr.getInt()) {
-			subdivideFace(0, face);
+			subdivideFace(0, face, false);
 		}
 		return face;
 	}
