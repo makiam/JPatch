@@ -254,6 +254,10 @@ public abstract class AbstractVertex {
 		return vertexPoint;
 	}
 	
+	public final DerivedVertex getOrCreateVertexPoint() {
+		return vertexPoint != null ? vertexPoint : createVertexPoint();
+	}
+	
 	abstract void validateWorldPosition();
 //		if (!worldPositionValid) {
 //			worldPosition.set(worldPosition);

@@ -209,6 +209,10 @@ public class HalfEdge {
 		return edgePoint;
 	}
 	
+	public final DerivedVertex getOrCreateEdgePoint() {
+		return edgePoint != null ? edgePoint : createEdgePoint();
+	}
+	
 	public HalfEdge getSubEdge() {
 		return subEdge;
 	}
