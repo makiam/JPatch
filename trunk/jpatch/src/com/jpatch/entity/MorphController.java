@@ -25,7 +25,7 @@ public class MorphController {
 	}
 	
 	public final void addAccumulator(Tuple3Accumulator accumulator, Object object) {
-		System.out.println(this + " addAccumulator(" + accumulator + ", " + object);
+	//	System.out.println(this + " addAccumulator(" + accumulator + ", " + object);
 		final Integer position = index.get(accumulator);
 		if (position == null) {
 			addNewAccumulator(accumulator, object);

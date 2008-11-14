@@ -24,7 +24,7 @@ public class MorphTarget {
 	public final Tuple3d getValueFor(final Tuple3Accumulator accumulator, final Object object) {
 		final Integer position = accumulatorIndex.get(accumulator);
 		if (position == null) {
-			System.out.println("adding accumulator for " + object);
+//			System.out.println("adding accumulator for " + object);
 			
 			final int n = accumulators.length;
 			

@@ -794,7 +794,7 @@ public abstract class AbstractVertex {
 			}
 		}
 		
-		@TestCase
+//		@TestCase //FIXME
 		public TestResult test() {
 			
 			
