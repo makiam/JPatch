@@ -44,6 +44,15 @@ public class TestRunner {
 //			}
 //			
 //		}));
+		
+		/* check that assertions are on*/
+		try {
+			assert false;
+			System.err.println("Can't run tests, please enable assertions with -ea switch");
+			System.exit(0);
+		} catch (AssertionError e) {
+			// OK
+		}
 		TestRunner testRunner = new TestRunner();
 		testRunner.testPackage(new File(BIN, BASE.replace('.', File.separatorChar)));
 //		System.setOut(out);
