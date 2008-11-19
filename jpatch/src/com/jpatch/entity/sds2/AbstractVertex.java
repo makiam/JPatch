@@ -11,7 +11,7 @@ import com.jpatch.entity.*;
 import javax.vecmath.*;
 
 public abstract class AbstractVertex {
-	private static enum BoundaryType { REGULAR, BOUNDARY, IRREGULAR }
+	static enum BoundaryType { REGULAR, BOUNDARY, IRREGULAR }
 	
 	
 	

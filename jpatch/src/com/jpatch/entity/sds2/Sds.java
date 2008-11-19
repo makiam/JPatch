@@ -251,10 +251,8 @@ public class Sds {
 		private int max;
 		private int min;
 		private Face[][] buckets;
-		private final List<Face> faceList = new ArrayList<Face>(MIN);
-		private final List<Face> unmodifiableFaceList = Collections.unmodifiableList(faceList);
-		private final List<Face> removedFaces = new ArrayList<Face>();
-		private boolean listSorted = false;
+		/** additionally store each face in per-material sets */
+		private final Map<Material, Set<Face>> perMaterialFaceSets = new HashMap<Material, Set<Face>>();
 		
 		FaceSet() {
 			setSize(8);	//initial capacity = 256
@@ -346,28 +344,41 @@ public class Sds {
 		}
 		
 		/**
-		 * Returns a list view, sorted by material
+		 * Iterates over all faces, sorted by material, for all faces where face.getMaterial() != null
+		 * A null material indicates a face that's not meant to be rendered (i.e. faces only needed to
+		 * compute the position of neighbor-vertices at higher subdiv levels)
 		 */
-		List<Face> asList() {
-			/* check if faces need to be removed from the list */
-			if (!removedFaces.isEmpty()) {
-				faceList.removeAll(removedFaces);
-				removedFaces.clear();
-			}
-			/* sort list if necessary */
-			if (!listSorted) {
-				Collections.sort(faceList, faceMaterialComparator);
-				listSorted = true;
-			}
-			return unmodifiableFaceList;
-		}
-		
 		public Iterator<Face> iterator() {
-			return asList().iterator();
+			@SuppressWarnings("unchecked")
+			Iterator<Face>[] iterators = (Iterator<Face>[]) new Iterator[perMaterialFaceSets.size()];
+			int i = 0;
+			for (Map.Entry<Material, Set<Face>> entry : perMaterialFaceSets.entrySet()) {
+				iterators[i++] = entry.getValue().iterator();
+			}
+			return new CombinedIterator<Face>(iterators);
 		}
 		
 		public int size() {
 			return count;
+		}
+		
+		void setMaterial(final Face face, final Material newMaterial) {
+			final Material oldMaterial = face.getMaterial();
+			if (oldMaterial == newMaterial) {
+				return;
+			}
+			if (oldMaterial != null) {
+				perMaterialFaceSets.get(oldMaterial).remove(face);
+			}
+			if (newMaterial != null) {
+				Set<Face> faceSet = perMaterialFaceSets.get(newMaterial);
+				if (faceSet == null) {
+					faceSet = new HashSet<Face>();
+					perMaterialFaceSets.put(newMaterial, faceSet);
+				}
+				faceSet.add(face);
+			}
+			face.setMaterial(newMaterial);
 		}
 		
 		/**
@@ -390,8 +401,16 @@ public class Sds {
 				setSize(size + 1);
 				rehash();
 			}
-			faceList.add(face);
-			listSorted = false;
+			
+			final Material faceMaterial = face.getMaterial();
+			if (faceMaterial != null) {
+				Set<Face> faceSet = perMaterialFaceSets.get(faceMaterial);
+				if (faceSet == null) {
+					faceSet = new HashSet<Face>();
+					perMaterialFaceSets.put(faceMaterial, faceSet);
+				}
+				faceSet.add(face);
+			}
 		}
 		
 		/**
@@ -423,8 +442,11 @@ public class Sds {
 				setSize(size - 1);
 				rehash();
 			}
-			removedFaces.add(face); // faces are removed lazily
 			
+			final Material faceMaterial = face.getMaterial();
+			if (faceMaterial != null) {
+				perMaterialFaceSets.get(faceMaterial).remove(face);
+			}
 			discardFace(face, true);
 		}
 		
@@ -757,16 +779,21 @@ public class Sds {
 		}
 	}
 	
-	private void subdivideFace(int level, Face face, boolean subdivSurroundings) {
+	private void subdivideFace(final int level, final Face face, final boolean subdivSurroundings) {
+		final Material material = face.getMaterial();
+		
 		if (face.isSubdivided()) {
+			for (HalfEdge edge : face.getFacePoint().getEdges()) {
+				faceSets[level + 1].setMaterial(edge.getFace(), material);
+			}
 			return;
 		}
 		
-		HalfEdge[] edges = face.getEdges();
-		HalfEdge[] hubEdges = new HalfEdge[face.getSides()];
-		HalfEdge[] newEdges = new HalfEdge[4];
+		final HalfEdge[] edges = face.getEdges();
+		final HalfEdge[] hubEdges = new HalfEdge[face.getSides()];
+		final HalfEdge[] newEdges = new HalfEdge[4];
 		
-		AbstractVertex facePoint = face.createFacePoint();
+		final AbstractVertex facePoint = face.createFacePoint();
 		for (int i = 0; i < edges.length; i++) {
 			if (edges[i].getVertex().getVertexPoint() == null) {
 				edges[i].getVertex().createVertexPoint();
@@ -786,7 +813,10 @@ public class Sds {
 			newEdges[2] = edges[j].getSubEdge();
 			newEdges[3] = hubEdges[j].getPair();
 
-			faceSets[level + 1].getFace(newEdges);
+			final Face subFace = faceSets[level + 1].getFace(newEdges);
+			if (subdivSurroundings) {
+				faceSets[level + 1].setMaterial(subFace, material);
+			}
 //			createFace(level + 1, face, i, face.getMaterial(), newEdges);
 
 //			AbstractVertex v1 = edges[i].getPrev().getEdgePoint();
@@ -942,8 +972,8 @@ public class Sds {
 //		return (DerivedVertex) face.getEdges()[hierarchyId[0]].getVertex();
 //	}
 	
-	public List<Face> getFaces(int level) {
-		return faceSets[level].asList();
+	public Iterable<Face> getFaces(int level) {
+		return faceSets[level];
 	}
 	
 	@SuppressWarnings("unchecked")
