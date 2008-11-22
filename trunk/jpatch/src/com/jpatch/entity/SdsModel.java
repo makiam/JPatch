@@ -16,13 +16,13 @@ public class SdsModel extends XFormNode {
 		return sds;
 	}
 	
-	public IntAttr getMaxLevelAttribute() {
-		return sds.getMaxLevelAttribute();
+	public IntAttr getMinLevelAttribute() {
+		return sds.getMinLevelAttribute();
 	}
 	
-	public IntAttr getRenderLevelAttribute() {
-		return sds.getRenderLevelAttribute();
-	}
+//	public IntAttr getRenderLevelAttribute() {
+//		return sds.getRenderLevelAttribute();
+//	}
 	
 	public IntAttr getEditLevelAttribute() {
 		return sds.getEditLevelAttribute();

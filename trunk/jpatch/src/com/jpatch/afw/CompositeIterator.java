@@ -2,14 +2,14 @@ package com.jpatch.afw;
 
 import java.util.*;
 
-public class CombinedIterator<T> implements Iterator<T> {
+public class CompositeIterator<T> implements Iterator<T> {
 	private final Iterator<T>[] iterators;
 	private int index = 0;
 	private T nextElement;
 	
-	public CombinedIterator(Iterator<T>... iterators) {
+	public CompositeIterator(Iterator<T>... iterators) {
 		this.iterators = iterators.clone();
-		nextElement = getNextElement();
+		nextElement = (iterators.length > 0) ? getNextElement() : null;
 	}
 	
 	public boolean hasNext() {

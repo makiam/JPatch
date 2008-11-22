@@ -8,14 +8,17 @@ import com.jpatch.boundary.tools.Shape;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 import com.jpatch.settings.*;
+import com.sun.corba.se.spi.legacy.connection.*;
 import com.sun.opengl.util.*;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.nio.*;
 import java.util.*;
 
 import javax.media.opengl.*;
+import javax.swing.*;
 import javax.vecmath.*;
 
 import static com.jpatch.afw.vecmath.TransformUtil.*;
@@ -157,6 +160,49 @@ public class Viewport implements NamedObject {
 				} else {
 					AttributeManager.getInstance().unlock(showProjectedMeshAttr);
 					showProjectedMeshAttr.setBoolean(showProj);
+				}
+			}
+		});
+		
+		
+		
+		final JPopupMenu popup = new JPopupMenu();
+		JMenuItem subdivideMenuItem = new JMenuItem("subdivide");
+		popup.add(subdivideMenuItem);
+		
+		subdivideMenuItem.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				Selection selection = Main.getInstance().getSelection();
+				int level = selection.getSdsModel().getEditLevelAttribute().getInt();
+				if (selection.getType() == Selection.Type.FACES) {
+					for (Face face : selection.getFaces()) {
+						selection.getSdsModel().getSds().subdivideFace(level, face, true);
+					}
+				}
+				System.out.println(Main.getInstance().getSelection());
+				
+			}
+			
+		});
+		component.addMouseListener(new MouseAdapter() {
+
+			public void mouseClicked(MouseEvent e) {
+				popup(e);
+			}
+
+			public void mousePressed(MouseEvent e) {
+				popup(e);
+			}
+
+			public void mouseReleased(MouseEvent e) {
+				popup(e);
+			}
+			
+			private void popup(MouseEvent e) {
+				System.out.println(e);
+				if (e.isPopupTrigger()) {
+					popup.show((Component) component, e.getX(), e.getY());
 				}
 			}
 		});
@@ -440,14 +486,14 @@ public class Viewport implements NamedObject {
 			gl.glEnd();
 			break;
 		case FACES:
-//			gl.glLineWidth(2);
-//			for (Face face : selection.getFaces()) {
-//				gl.glInterleavedArrays(GL_N3F_V3F, 0, face.getControlSurface());
-//				gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, highlighColor.w * 0.5f);
-//				gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() + 2);
-//				gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, highlighColor.w);
-//				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides());
-//			}
+			gl.glLineWidth(2);
+			for (Face face : selection.getFaces()) {
+				gl.glInterleavedArrays(GL_N3F_V3F, 0, face.getControlSurface());
+				gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, highlighColor.w * 0.5f);
+				gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides() + 2);
+				gl.glColor4f(highlighColor.x, highlighColor.y, highlighColor.z, highlighColor.w);
+				gl.glDrawArrays(GL_LINE_LOOP, 1, face.getSides());
+			}
 			break;
 		}
 	}
@@ -461,7 +507,7 @@ public class Viewport implements NamedObject {
 				showControlMeshAttr.getBoolean(),
 				showLimitSurfaceAttr.getBoolean(),
 				showProjectedMeshAttr.getBoolean(),
-				sds.getRenderLevelAttribute().getInt(),
+//				sds.getMinLevelAttribute().getInt(),
 				sds.getEditLevelAttribute().getInt(),
 				LINE_COLOR,
 				LINE_MATERIAL.getGlMaterial()
@@ -546,23 +592,28 @@ public class Viewport implements NamedObject {
 	    gl.glDisable(GL_BLEND);
 	}
 	
-	public static void drawSds(GL gl, Sds sds, boolean showControlMesh, boolean showLimit, boolean showProjectedMesh, int level, int editLevel, Color4f lineColor, GlMaterial meshMaterial) {		
+	public static void drawSds(GL gl, Sds sds, boolean showControlMesh, boolean showLimit, boolean showProjectedMesh, int editLevel, Color4f lineColor, GlMaterial meshMaterial) {		
 		final Tuple3f p = new Point3f();
 		
-		/* draw limit surface */
-		if (showLimit) {
-			gl.glEnable(GL_LIGHTING);
-			GlMaterial currentMaterial = null;
-			for (Face face : sds.getFaces(level)) {
-				GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
-				if (currentMaterial != faceMaterial) {
-					setMaterial(gl, GL_FRONT, faceMaterial);
-					currentMaterial = faceMaterial;
+		for (int level = 0; level < SdsConstants.MAX_LEVEL; level++) {
+			/* draw limit surface */
+			if (showLimit) {
+				gl.glEnable(GL_LIGHTING);
+				GlMaterial currentMaterial = null;
+				for (Face face : sds.getFaces(level)) {
+					if (face.isSubdivided() || face.getMaterial() == null) {
+						continue;
+					}
+					GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
+					if (currentMaterial != faceMaterial) {
+						setMaterial(gl, GL_FRONT, faceMaterial);
+						currentMaterial = faceMaterial;
+					}
+	//				face.getLimitSurface(limitSurfaceBuffer);
+	//				gl.glInterleavedArrays(GL_N3F_V3F, 0, limitSurfaceBuffer);
+					gl.glInterleavedArrays(GL_N3F_V3F, 0, face.getLimitSurface());
+					gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides());
 				}
-//				face.getLimitSurface(limitSurfaceBuffer);
-//				gl.glInterleavedArrays(GL_N3F_V3F, 0, limitSurfaceBuffer);
-				gl.glInterleavedArrays(GL_N3F_V3F, 0, face.getLimitSurface());
-				gl.glDrawArrays(GL_TRIANGLE_FAN, 0, face.getSides());
 			}
 		}
 		
@@ -599,20 +650,21 @@ public class Viewport implements NamedObject {
 			gl.glEnd();
 			
 		}
+			
+//		/* draw projected mesh */
+//		if (showProjectedMesh) {
+//			gl.glEnable(GL_LIGHTING);
+//			setMaterial(gl, GL_FRONT, meshMaterial);
+//			gl.glBegin(GL_LINES);
+//			int levelsToGo = level - editLevel;
+//			for (HalfEdge edge : sds.getEdges(editLevel, false)) {
+//				if (edge.isPrimary() || edge.getPairFace() == null) {
+//					drawEdgeLimit(gl, p, levelsToGo, edge);
+//				}
+//			}
+//			gl.glEnd();
+//		}
 		
-		/* draw projected mesh */
-		if (showProjectedMesh) {
-			gl.glEnable(GL_LIGHTING);
-			setMaterial(gl, GL_FRONT, meshMaterial);
-			gl.glBegin(GL_LINES);
-			int levelsToGo = level - editLevel;
-			for (HalfEdge edge : sds.getEdges(editLevel, false)) {
-				if (edge.isPrimary() || edge.getPairFace() == null) {
-					drawEdgeLimit(gl, p, levelsToGo, edge);
-				}
-			}
-			gl.glEnd();
-		}
 		
 		/* draw stray edges/vertices */
 		gl.glDisable(GL_LIGHTING);

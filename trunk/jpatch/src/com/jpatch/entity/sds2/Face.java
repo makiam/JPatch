@@ -30,17 +30,6 @@ public class Face {
 	
 	private final FloatBuffer limitSurfaceBuffer;
 	private final FloatBuffer controlSurfaceBuffer;
-	
-
-	private boolean subdivided;
-	
-	public boolean isSubdivided() {
-		return subdivided;
-	}
-
-	public void setSubdivided(boolean subdivided) {
-		this.subdivided = subdivided;
-	}
 
 	public Face(Material material, HalfEdge[] edges) {
 
@@ -113,15 +102,19 @@ public class Face {
 	}
 	
 	public Material getMaterial() {
-		if (material == null) throw new RuntimeException();
+//		if (material == null) throw new RuntimeException();
 		return material;
 	}
 	
 	void setMaterial(Material material) {
-		if (material == null) throw new RuntimeException();
+//		if (material == null) throw new RuntimeException();
 		this.material = material;
 	}
 	
+	public boolean isSubdivided() {
+		return facePoint != null;
+	}
+
 	public void getMidpointPosition(Tuple3d midPoint) {
 		validateDisplacedMidpointPosition();
 		midPoint.set(displacedMidpointPosition);

@@ -1,8 +1,8 @@
 <attributeEditor name="SdsModel" class="com.jpatch.entity.SdsModel">
 	<field name="Name" attribute="Name" />
 	<group name="Subdivision">
-		<field name="Max. level" attribute="MaxLevel" />
-		<slider name="Display level" attribute="RenderLevel" />
+		<field name="Max. level" attribute="MinLevel" />
+<!--	<slider name="Display level" attribute="RenderLevel" /> -->
 		<slider name="Edit level" attribute="EditLevel" />
 	</group>
 	<group name="Transform" expansion="embeddedTransform">

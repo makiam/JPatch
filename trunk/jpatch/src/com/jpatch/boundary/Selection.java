@@ -408,7 +408,9 @@ public class Selection {
 			SdsModel sdsModel = getSdsModel();
 			if (sdsModel != null) {
 				Sds sds = sdsModel.getSds();
-				faces.addAll(sds.getFaces(0));
+				for (Face face : sds.getFaces(0)) {
+					faces.add(face);
+				}
 			}
 			break;
 		case VERTICES:

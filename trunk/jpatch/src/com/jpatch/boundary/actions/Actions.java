@@ -111,7 +111,7 @@ public class Actions {
 				xmlWriter.startDocument();
 				xmlWriter.startElement("subdivisionsurface");
 				xmlWriter.attribute("scheme", "catmull-clark");
-				for (int level = 0; level <= sds.getMaxLevelAttribute().getInt(); level++) {
+				for (int level = 0; level <= sds.getMinLevelAttribute().getInt(); level++) {
 					for (AbstractVertex v : sds.getVertices(level, false)) {
 //						v.writeXml(xmlWriter);
 					}
