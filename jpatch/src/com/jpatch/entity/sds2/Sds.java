@@ -355,7 +355,7 @@ public class Sds {
 			for (Map.Entry<Material, Set<Face>> entry : perMaterialFaceSets.entrySet()) {
 				iterators[i++] = entry.getValue().iterator();
 			}
-			return new CombinedIterator<Face>(iterators);
+			return new CompositeIterator<Face>(iterators);
 		}
 		
 		public int size() {
@@ -512,7 +512,7 @@ public class Sds {
 		minLevelAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
 			public void attributeHasChanged(Attribute source) {
 				// add or remove faces on new (old) levels
-				setMaxLevel();
+				setMinLevel();
 			}
 		});
 		
@@ -659,41 +659,41 @@ public class Sds {
 //		if (level < minLevelAttr.getInt()) {
 //			subdivideFace(level, face);
 
-	private Face createSubFace(int level, int edgeIndex, Material material, HalfEdge... edges) {
-		assert level > 0;
-//		assert parent != null;
-//		System.out.print("add face called: ");
-//		for (AbstractVertex vertex : vertices) {
-//			System.out.print(vertex + " ");
-
+//	private Face createSubFace(int level, int edgeIndex, Material material, HalfEdge... edges) {
+//		assert level > 0;
+////		assert parent != null;
+////		System.out.print("add face called: ");
+////		for (AbstractVertex vertex : vertices) {
+////			System.out.print(vertex + " ");
+//
+////		}
+//
+////		return face;
+////	}
+//
+////		System.out.println();
+//		
+////		for (int i = 0; i < vertices.length; i++) {
+////			int j = i + 1;
+////			if (j == vertices.length) {
+////				j = 0;
+////			}
+////			edges[i] = getHalfEdge(vertices[i], vertices[j]);
+////		}
+//		
+//		Face face = new Face(material, edges, edgeIndex);
+//		
+////		if (level == 0) System.out.println(this + " adding face " + face);
+//		
+//		assert !faceSets[level].contains(face) : "Face " + face + " has already been added to " + Sds.this + " at level " + level;
+//		faceSets[level].add(face);
+//		
+//		
+//		if (level < maxLevelAttr.getInt()) {
+//			subdivideFace(level, face, false);
 //		}
-
 //		return face;
 //	}
-
-//		System.out.println();
-		
-//		for (int i = 0; i < vertices.length; i++) {
-//			int j = i + 1;
-//			if (j == vertices.length) {
-//				j = 0;
-//			}
-//			edges[i] = getHalfEdge(vertices[i], vertices[j]);
-//		}
-		
-		Face face = new Face(material, edges, edgeIndex);
-		
-//		if (level == 0) System.out.println(this + " adding face " + face);
-		
-		assert !faceSets[level].contains(face) : "Face " + face + " has already been added to " + Sds.this + " at level " + level;
-		faceSets[level].add(face);
-		
-		
-		if (level < maxLevelAttr.getInt()) {
-			subdivideFace(level, face, false);
-		}
-		return face;
-	}
 
 	
 //	public Face addFace(List<JPatchUndoableEdit> editList, Material material, AbstractVertex... invertices) {
@@ -733,7 +733,7 @@ public class Sds {
 //		return face;
 //	}
 	
-	public void setMaxLevel() {
+	public void setMinLevel() {
 		System.gc();
 		int newLevel = minLevelAttr.getInt();
 		System.out.println("currentMinLevel = " + currentMinLevel + ", newLevel = " + newLevel);
@@ -759,7 +759,7 @@ public class Sds {
 //			int i = 0, p = 0;
 
 			for (Face face : faceSets[currentMinLevel]) {
-				subdivideFace(currentMinLevel, face);
+				subdivideFace(currentMinLevel, face, false);
 
 //				int np = (i++) * 100 / n;
 //				if (np > p) {
@@ -779,8 +779,10 @@ public class Sds {
 		}
 	}
 	
-	private void subdivideFace(final int level, final Face face, final boolean subdivSurroundings) {
-		final Material material = face.getMaterial();
+	public void subdivideFace(final int level, final Face face, final boolean subdivSurroundings) {
+		System.out.println("subdivideFace(" + level + ", " + face + ", " + subdivSurroundings + ") called");
+		
+		final Material material = subdivSurroundings ? face.getMaterial() : null;
 		
 		if (face.isSubdivided()) {
 			for (HalfEdge edge : face.getFacePoint().getEdges()) {
@@ -877,7 +879,8 @@ public class Sds {
 			edges[i] = getHalfEdge(vertices[i], vertices[j]);
 		}
 		
-		Face face = new Face(material, edges);
+		
+		Face face = faceSets[0].getFace(edges);
 		
 		if (0 < minLevelAttr.getInt()) {
 			subdivideFace(0, face, false);
@@ -979,7 +982,7 @@ public class Sds {
 	@SuppressWarnings("unchecked")
 	public Iterable<? extends AbstractVertex> getVertices(final int level, final boolean includeStrayVertices) {
 		if (includeStrayVertices) {
-			return new CombinedIterable(getFaceVertices(level), strayVertices);
+			return new CompositIterable(getFaceVertices(level), strayVertices);
 		} else {
 			return getFaceVertices(level);
 		}
@@ -988,7 +991,7 @@ public class Sds {
 	@SuppressWarnings("unchecked")
 	public Iterable<HalfEdge> getEdges(final int level, final boolean includeStrayEdges) {
 		if (includeStrayEdges) {
-			return new CombinedIterable<HalfEdge>(getFaceEdges(level), strayEdges);
+			return new CompositIterable<HalfEdge>(getFaceEdges(level), strayEdges);
 		} else {
 			return getFaceEdges(level);
 		}
@@ -1545,7 +1548,7 @@ public class Sds {
 		Face face;
 		
 		void add() {
-			assert !faceSets[0].contains(face) : "Face " + face + " has already been added to " + Sds.this;
+//			assert !faceSets[0].contains(face) : "Face " + face + " has already been added to " + Sds.this;
 			face = createFace(material, vertices);
 		}
 		

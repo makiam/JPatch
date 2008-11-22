@@ -335,6 +335,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 			break;
 		}
 		highlightHitObject(viewport, false, false, false);
+		Main.getInstance().getSelection().set(hitSelection);
 	}
 	
 	private int getSelectionFilter(Selection.Type type) {

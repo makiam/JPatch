@@ -9,11 +9,7 @@ import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.util.Set;
 
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
 import javax.swing.border.Border;
 
 public class PlatformUtils {
@@ -86,6 +82,9 @@ public class PlatformUtils {
 		System.setProperty("swing.boldMetal", "false");
 		System.setProperty("swing.aatext", "true");
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
+		
+		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 		
 		if (platform != Platform.MAC_OS_X) {
 			try {
