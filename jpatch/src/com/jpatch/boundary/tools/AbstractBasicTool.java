@@ -366,6 +366,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 				selection.setFace(((HitFace) hitObject).face, null);
 			}
 		}
+		Main.getInstance().getSelection().set(selection);
 	}
 	
 	private class SelectMouseMotionListener implements MouseMotionListener {

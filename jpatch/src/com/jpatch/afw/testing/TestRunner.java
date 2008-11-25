@@ -126,15 +126,16 @@ public class TestRunner {
 	}
 	
 	private void report(Class<?> testClass, Method testMethod, TestResult result) {
+		System.out.println(testClass.getName() + "." + testMethod + ": " + result);
 		if (result.isSuccess()) {
 			successes++;
 			return;
 		} else if (result.isWarning()) {
 			warnings++;
-			System.out.print("WARNING " + warnings + ":\t ");
+//			System.out.print("WARNING " + warnings + ":\t ");
 		} else if (result.isError()) {
 			errors++;
-			System.out.print("ERROR " + errors + ":\t ");
+//			System.out.print("ERROR " + errors + ":\t ");
 		}
 		System.out.print(testClass.getName() + "." + testMethod.getName() + "() ");
 		System.out.println(result);
