@@ -115,6 +115,18 @@ public class Face {
 		return facePoint != null;
 	}
 
+	public boolean isDrawable() {
+		if (material == null) {
+			return false;
+		}
+		if (facePoint != null) {
+			if (facePoint.getEdges()[0].getFace().getMaterial() != null) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public void getMidpointPosition(Tuple3d midPoint) {
 		validateDisplacedMidpointPosition();
 		midPoint.set(displacedMidpointPosition);

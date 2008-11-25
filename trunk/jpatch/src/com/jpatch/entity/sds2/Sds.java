@@ -31,7 +31,7 @@ public class Sds {
 	}
 	
 	
-	private int currentMinLevel = 1;
+	private int currentMinLevel = 0;
 	private IntAttr minLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(currentMinLevel, 0, SdsConstants.MAX_LEVEL);
 //	private IntAttr renderLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(currentMaxLevel, 0, SdsConstants.MAX_LEVEL);
 	private IntAttr editLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(0, 0, SdsConstants.MAX_LEVEL);
@@ -784,55 +784,55 @@ public class Sds {
 		
 		final Material material = subdivSurroundings ? face.getMaterial() : null;
 		
-		if (face.isSubdivided()) {
+		if (!face.isSubdivided()) {
+			final HalfEdge[] edges = face.getEdges();
+			final HalfEdge[] hubEdges = new HalfEdge[face.getSides()];
+			final HalfEdge[] newEdges = new HalfEdge[4];
+			
+			final AbstractVertex facePoint = face.createFacePoint();
+			for (int i = 0; i < edges.length; i++) {
+				if (edges[i].getVertex().getVertexPoint() == null) {
+					edges[i].getVertex().createVertexPoint();
+				}
+			}
+			for (int i = 0; i < edges.length; i++) {
+				DerivedVertex edgePoint = edges[i].getEdgePoint();
+				if (edgePoint == null) {
+					edgePoint = edges[i].createEdgePoint();
+				}
+				hubEdges[i] = new HalfEdge(facePoint, edgePoint);
+			}
+			for (int i = 0; i < edges.length; i++) {
+				int j = (i == edges.length - 1) ? 0 : i + 1;
+				newEdges[0] = hubEdges[i];
+				newEdges[1] = edges[i].getPair().getSubEdge().getPair();
+				newEdges[2] = edges[j].getSubEdge();
+				newEdges[3] = hubEdges[j].getPair();
+
+				final Face subFace = faceSets[level + 1].getFace(newEdges);
+				faceSets[level + 1].setMaterial(subFace, subdivSurroundings ? material : null);
+				
+//				createFace(level + 1, face, i, face.getMaterial(), newEdges);
+
+//				AbstractVertex v1 = edges[i].getPrev().getEdgePoint();
+//				AbstractVertex v2 = edges[i].getVertex().getVertexPoint();
+//				AbstractVertex v3 = edges[i].getEdgePoint();
+//				createFace(level + 1, face, i, face.getMaterial(), v0, v1, v2, v3);
+			}
+		} else {
 			for (HalfEdge edge : face.getFacePoint().getEdges()) {
 				faceSets[level + 1].setMaterial(edge.getFace(), material);
 			}
-			return;
 		}
 		
-		final HalfEdge[] edges = face.getEdges();
-		final HalfEdge[] hubEdges = new HalfEdge[face.getSides()];
-		final HalfEdge[] newEdges = new HalfEdge[4];
 		
-		final AbstractVertex facePoint = face.createFacePoint();
-		for (int i = 0; i < edges.length; i++) {
-			if (edges[i].getVertex().getVertexPoint() == null) {
-				edges[i].getVertex().createVertexPoint();
-			}
-		}
-		for (int i = 0; i < edges.length; i++) {
-			DerivedVertex edgePoint = edges[i].getEdgePoint();
-			if (edgePoint == null) {
-				edgePoint = edges[i].createEdgePoint();
-			}
-			hubEdges[i] = new HalfEdge(facePoint, edgePoint);
-		}
-		for (int i = 0; i < edges.length; i++) {
-			int j = (i == edges.length - 1) ? 0 : i + 1;
-			newEdges[0] = hubEdges[i];
-			newEdges[1] = edges[i].getPair().getSubEdge().getPair();
-			newEdges[2] = edges[j].getSubEdge();
-			newEdges[3] = hubEdges[j].getPair();
-
-			final Face subFace = faceSets[level + 1].getFace(newEdges);
-			if (subdivSurroundings) {
-				faceSets[level + 1].setMaterial(subFace, material);
-			}
-//			createFace(level + 1, face, i, face.getMaterial(), newEdges);
-
-//			AbstractVertex v1 = edges[i].getPrev().getEdgePoint();
-//			AbstractVertex v2 = edges[i].getVertex().getVertexPoint();
-//			AbstractVertex v3 = edges[i].getEdgePoint();
-//			createFace(level + 1, face, i, face.getMaterial(), v0, v1, v2, v3);
-		}
 		
 		/* subdivide surrounding faces */
 		if (subdivSurroundings) {
 			for (HalfEdge edge : face.getEdges()) {
 				for (HalfEdge corner : edge.getVertex().getEdges()) {
 					Face f = corner.getFace();
-					if (f != null && f != face) {
+					if (f != null && f != face && ! f.isSubdivided()) {
 						subdivideFace(level, f, false);
 					}
 				}
@@ -1677,14 +1677,14 @@ public class Sds {
 	}
 	
 	@TestSuit
-	public static class Tests {
+	public static class SetTests {
 		private EdgeSet edgeSet = new EdgeSet();
 		private AbstractVertex[] vertices = new AbstractVertex[100];
 		private HalfEdge[][] edges = new HalfEdge[100][100];
 		private final Sds sds = new Sds(null);
 		private final SdsModel sdsModel = new SdsModel(sds);
 		
-		public Tests() {
+		public SetTests() {
 			/* create vertices */
 			for (int i = 0; i < vertices.length; i++) {
 				vertices[i] = new BaseVertex(sdsModel);
@@ -1846,17 +1846,175 @@ public class Sds {
 			}
 			
 			/* remove two faces */
-			List<Face> faceList = faceSet.asList();
+			List<Face> faceList = new ArrayList<Face>();
+			for (Face face : faceSet) {
+				faceList.add(face);
+			}
 			faceSet.removeFace(faceList.get(0));
 			faceSet.removeFace(faceList.get(2));
 			faceSet.removeFace(faceList.get(3));
 			/* should have 1 faces in set */
-			if (faceSet.asList().size() != 1) {
-				return TestResult.error("faces in set: " + faceSet.asList().size() + ", should be 2");
+			if (faceSet.size() != 1) {
+				return TestResult.error("faces in set: " + faceSet.size() + ", should be 2");
 			}
 			
 			return TestResult.success();
 		}
 	}
 	
+	@TestSuit
+	public static class SubdivTests {
+		private final AbstractVertex[] v;
+		private final Sds sds = new Sds(null);
+		private final SdsModel sdsModel = new SdsModel(sds);
+		private final Face[] faces;
+		
+		public SubdivTests() {
+			/* create a cube */
+			v = new BaseVertex[] {
+				new BaseVertex(sdsModel, -1, -1, -1),
+				new BaseVertex(sdsModel, -1, -1, +1),
+				new BaseVertex(sdsModel, +1, -1, +1),
+				new BaseVertex(sdsModel, +1, -1, -1),
+				new BaseVertex(sdsModel, -1, +1, -1),
+				new BaseVertex(sdsModel, -1, +1, +1),
+				new BaseVertex(sdsModel, +1, +1, +1),
+				new BaseVertex(sdsModel, +1, +1, -1),
+			};
+			faces = new Face[] {
+				sds.addFace(null, sds.newFaceMaterial, v[0], v[1], v[2], v[3]),
+				sds.addFace(null, sds.newFaceMaterial, v[1], v[0], v[4], v[5]),
+				sds.addFace(null, sds.newFaceMaterial, v[2], v[1], v[5], v[6]),
+				sds.addFace(null, sds.newFaceMaterial, v[3], v[2], v[6], v[7]),
+				sds.addFace(null, sds.newFaceMaterial, v[0], v[3], v[7], v[4]),
+				sds.addFace(null, sds.newFaceMaterial, v[7], v[6], v[5], v[4])
+			};
+		}
+		
+		
+		@TestCase
+		public TestResult subdivTest() {
+			/* should have 6 faces at level 0 and none at level 1*/
+			if (sds.faceSets[0].size() != 6) {
+				return TestResult.error("expected 6 faces at level 0, found " + sds.faceSets[0].size());
+			}
+			if (sds.faceSets[1].size() != 0) {
+				return TestResult.error("expected 0 faces at level 1, found " + sds.faceSets[1].size());
+			}
+			
+			/* subdivide face 0 */
+			sds.subdivideFace(0, faces[0], true);
+			
+			/* should have 6 faces at level 20 and none at level 1*/
+			if (sds.faceSets[0].size() != 6) {
+				return TestResult.error("expected 6 faces at level 0, found " + sds.faceSets[0].size());
+			}
+			if (sds.faceSets[1].size() != 20) {
+				return TestResult.error("expected 20 faces at level 1, found " + sds.faceSets[1].size());
+			}
+			
+			/* check sub-faces of face 0 */
+			for (HalfEdge edge : faces[0].getFacePoint().getEdges()) {
+				Face subFace = edge.getFace();
+				if (subFace.getMaterial() == null) {
+					return TestResult.error("face 0 subface " + subFace + " material == null");
+				}
+			}
+			
+			/* check sub-faces of face 1..4 */
+			for (int i = 1; i <= 4; i++) {
+				for (HalfEdge edge : faces[i].getFacePoint().getEdges()) {
+					Face subFace = edge.getFace();
+					if (subFace.getMaterial() != null) {
+						return TestResult.error("face " + i + " subface " + subFace + " material != null");
+					}
+				}
+			}
+			
+			/* check sub-faces of face 5 */
+			if (faces[5].isSubdivided()) {
+				return TestResult.error("face 5 is subdivided!");
+			}
+			
+			/* check that we only receive 4 faces (with materials) from level 1 */
+			int count = 0;
+			for (Face f : sds.getFaces(1)) {
+				count++;
+			}
+			if (count != 4) {
+				return TestResult.error("expected 4 material-faces on level 1, got " + count);
+			}
+			
+			/* compute positions of level-1 vertices */
+			Point3d p = new Point3d();
+			try {
+				for (Face f : sds.getFaces(1)) {
+					for (HalfEdge e : f.getEdges()) {
+						e.getVertex().getPosition(p);
+						e.getVertex().getLimit(p);
+					}
+					f.getControlSurface();
+					f.getLimitSurface();
+				}
+			} catch (Exception e) {
+				return TestResult.error(e.getMessage());
+			}
+			
+			/* subdivide face 1 */
+			sds.subdivideFace(0, faces[1], true);
+			
+			/* should have 6 faces at level 24 and none at level 1*/
+			if (sds.faceSets[0].size() != 6) {
+				return TestResult.error("expected 6 faces at level 0, found " + sds.faceSets[0].size());
+			}
+			if (sds.faceSets[1].size() != 24) {
+				return TestResult.error("expected 24 faces at level 1, found " + sds.faceSets[1].size());
+			}
+			
+			/* check sub-faces of face 0..1 */
+			for (int i = 0; i <= 1; i++) {
+				for (HalfEdge edge : faces[i].getFacePoint().getEdges()) {
+					Face subFace = edge.getFace();
+					if (subFace.getMaterial() == null) {
+						return TestResult.error("face " + i + " subface " + subFace + " material == null");
+					}
+				}
+			}
+			
+			/* check sub-faces of face 2..5 */
+			for (int i = 2; i <= 5; i++) {
+				for (HalfEdge edge : faces[i].getFacePoint().getEdges()) {
+					Face subFace = edge.getFace();
+					if (subFace.getMaterial() != null) {
+						return TestResult.error("face " + i + " subface " + subFace + " material != null");
+					}
+				}
+			}
+			
+			/* check that we only receive 8 faces (with materials) from level 1 */
+			count = 0;
+			for (Face f : sds.getFaces(1)) {
+				count++;
+			}
+			if (count != 8) {
+				return TestResult.error("expected 8 material-faces on level 1, got " + count);
+			}
+			
+			/* compute positions of level-1 vertices */
+			try {
+				for (Face f : sds.getFaces(1)) {
+					for (HalfEdge e : f.getEdges()) {
+						e.getVertex().getPosition(p);
+						e.getVertex().getLimit(p);
+					}
+					f.getControlSurface();
+					f.getLimitSurface();
+				}
+			} catch (Exception e) {
+				return TestResult.error(e.getMessage());
+			}
+			
+			return TestResult.success();
+		}
+	}
 }

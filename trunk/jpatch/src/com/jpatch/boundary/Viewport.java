@@ -595,13 +595,13 @@ public class Viewport implements NamedObject {
 	public static void drawSds(GL gl, Sds sds, boolean showControlMesh, boolean showLimit, boolean showProjectedMesh, int editLevel, Color4f lineColor, GlMaterial meshMaterial) {		
 		final Tuple3f p = new Point3f();
 		
-		for (int level = 0; level < SdsConstants.MAX_LEVEL; level++) {
+		for (int level = 0; level <= SdsConstants.MAX_LEVEL; level++) {
 			/* draw limit surface */
 			if (showLimit) {
 				gl.glEnable(GL_LIGHTING);
 				GlMaterial currentMaterial = null;
 				for (Face face : sds.getFaces(level)) {
-					if (face.isSubdivided() || face.getMaterial() == null) {
+					if (!face.isDrawable()) {
 						continue;
 					}
 					GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
