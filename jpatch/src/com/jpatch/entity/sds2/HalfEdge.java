@@ -145,7 +145,7 @@ public class HalfEdge {
 //	}
 	
 	public boolean isPrimary() {
-		return primary || pair.face == null;
+		return primary;
 	}
 	
 	public HalfEdge getPrimary() {

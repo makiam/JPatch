@@ -44,12 +44,13 @@ public class Sds {
 		}		
 	};
 	
-	private final Map<Integer, Face> faceIdMap = new HashMap<Integer, Face>();
-	@SuppressWarnings("unchecked")
+	
 	private final FaceSet[] faceSets = new FaceSet[SdsConstants.MAX_LEVEL + 1];
-	private final Set<HalfEdge> strayEdges = new HashSet<HalfEdge>();
-	private final Set<BaseVertex> strayVertices = new HashSet<BaseVertex>();
-	private final Set<BaseVertex[]> strayFaces = new HashSet<BaseVertex[]>();
+	@SuppressWarnings("unchecked")
+	private final Iterable<HalfEdge>[] faceEdges = (Iterable<HalfEdge>[]) new Iterable[SdsConstants.MAX_LEVEL + 1];
+	
+//	private final Set<HalfEdge> strayEdges = new HashSet<HalfEdge>();
+//	private final Set<BaseVertex[]> strayFaces = new HashSet<BaseVertex[]>();
 	@SuppressWarnings("unchecked")
 	private final Set<Displacement>[] hierarchy = new Set[SdsConstants.MAX_LEVEL + 1];
 	private final EdgeSet edgeSet = new EdgeSet();
@@ -65,7 +66,7 @@ public class Sds {
 	 * It is used to find existing edges for given vertex-pairs.
 	 * @author sascha
 	 */
-	public static class EdgeSet {
+	public static class EdgeSet implements Iterable<HalfEdge> {
 		final static double growFactor = 0.75;
 		final static double shrinkFactor = 0.25;
 		final static int MIN = 256;
@@ -75,6 +76,7 @@ public class Sds {
 		int count;
 		int max;
 		int min;
+		int version = 0;
 		private HalfEdge[][] buckets;
 		
 		private EdgeSet() {
@@ -127,6 +129,56 @@ public class Sds {
 			remove(hash(halfEdge.getVertex(), halfEdge.getPairVertex()), halfEdge);
 		}
 		
+		public Iterator<HalfEdge> iterator() {
+			return new Iterator<HalfEdge>() {
+				private final int snapshot = version;
+				private int bucketIndex = 0;
+				private HalfEdge[] bucket = null;
+				private int index = 0;
+				private HalfEdge next = getNext();
+				
+				public boolean hasNext() {
+					if (snapshot != version) {
+						throw new ConcurrentModificationException();
+					}
+					return next != null;
+				}
+
+				public HalfEdge next() {
+					if (snapshot != version) {
+						throw new ConcurrentModificationException();
+					}
+					if (next == null) {
+						throw new NoSuchElementException();
+					}
+					HalfEdge tmp = next;
+					next = getNext();
+					return tmp;
+				}
+
+				public void remove() {
+					throw new UnsupportedOperationException();
+				}
+				
+				private HalfEdge getNext() {
+					while(bucket == null) {
+						bucketIndex++;
+						if (bucketIndex == buckets.length) {
+							return null;
+						}
+						bucket = buckets[bucketIndex];
+						index = 0;
+					}
+					if (index < bucket.length) {
+						return bucket[index++].getPrimary();
+					} else {
+						bucket = null;
+						return getNext();
+					}
+				}
+			};
+		}
+		
 		/**
 		 * Adds a halfEdge to a bucket
 		 */
@@ -147,6 +199,7 @@ public class Sds {
 				setSize(size + 1);
 				rehash();
 			}
+			version++;
 		}
 		
 		/**
@@ -179,7 +232,7 @@ public class Sds {
 				setSize(size - 1);
 				rehash();
 			}
-			
+			version++;
 //			halfEdge.dispose();//FIXME
 		}
 		
@@ -505,6 +558,7 @@ public class Sds {
 		
 		for (int i = 0; i < faceSets.length; i++) {
 			faceSets[i] = new FaceSet();
+			faceEdges[i] = createFaceEdgesIterable(i);
 			hierarchy[i] = new HashSet<Displacement>();
 		}
 		
@@ -586,8 +640,6 @@ public class Sds {
 	
 	public void removeSegment(List<JPatchUndoableEdit> editList, HalfEdge strayEdge) {
 		assert (strayEdges.contains(strayEdge));
-		assert (strayVertices.contains(strayEdge.getVertex()));
-		assert (strayVertices.contains(strayEdge.getPairVertex()));
 		JPatchUndoableEdit removeStrayEdgeEdge = new RemoveStrayEdgeEdit(strayEdge);
 //		JPatchUndoableEdit removeEdgeEdit = new RemoveEdgeEdit(strayEdge, 0);
 		if (editList != null) {
@@ -989,12 +1041,8 @@ public class Sds {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Iterable<HalfEdge> getEdges(final int level, final boolean includeStrayEdges) {
-		if (includeStrayEdges) {
-			return new CompositIterable<HalfEdge>(getFaceEdges(level), strayEdges);
-		} else {
-			return getFaceEdges(level);
-		}
+	public Iterable<HalfEdge> getEdges(final int level) {
+		return (level == 0) ? edgeSet : faceEdges[level];
 	}
 	
 	public Iterable<? extends AbstractVertex> getFaceVertices(final int level) {
@@ -1044,6 +1092,9 @@ public class Sds {
 					}
 
 					public AbstractVertex next() {
+						if (nextVertex == null) {
+							throw new NoSuchElementException();
+						}
 						AbstractVertex tmp = nextVertex;
 						nextVertex = getNextVertex();
 						return tmp;
@@ -1105,53 +1156,137 @@ public class Sds {
 //		};
 //	}
 	
-	public Collection<BaseVertex> getStrayVertices() {
-		return strayVertices;
-	}
-	
-	public Iterable<HalfEdge> getStrayEdges() {
-		return strayEdges;
-	}
-	
-	public Collection<BaseVertex[]> getStrayFaces() {
-		return strayFaces;
-	}
-	
-	private Iterable<HalfEdge> getFaceEdges(final int level) {
-		return new Iterable<HalfEdge>() {
-			public Iterator<HalfEdge> iterator() {
-				return new Iterator<HalfEdge>() {
-					Iterator<Face> faces = faceSets[level].iterator();
-					HalfEdge[] faceEdges;
-					int edgeIndex;
+	public Iterable<BaseVertex> getStrayVertices() {
+		return new Iterable<BaseVertex>() {
+
+			public Iterator<BaseVertex> iterator() {
+				return new Iterator<BaseVertex>() {
+					private Iterator<HalfEdge> strayEdgeIterator = strayEdges.iterator();
+					private HalfEdge strayEdge;
+					private boolean first = false;
+					private AbstractVertex vertex = getNext();
 					
 					public boolean hasNext() {
-						if (faceEdges != null && edgeIndex < faceEdges.length) {
-							return true;
-						}
-						if (faces.hasNext()) {
-							faceEdges = faces.next().getEdges();
-							edgeIndex = 0;
-							return true;
-						}
-						return false;
+						return vertex != null;
 					}
 
-
-					public HalfEdge next() {
-						if (faceEdges != null && edgeIndex < faceEdges.length) {
-							return faceEdges[edgeIndex++];
-						}
-						if (faces.hasNext()) {
-							faceEdges = faces.next().getEdges();
-							edgeIndex = 1;
-							return faceEdges[0];
-						}
-						throw new NoSuchElementException();
+					public BaseVertex next() {
+						AbstractVertex tmp = vertex;
+						vertex = getNext();
+						return (BaseVertex) tmp;
 					}
 
 					public void remove() {
 						throw new UnsupportedOperationException();
+					}
+					
+					private AbstractVertex getNext() {
+						if (!first) {
+							if (strayEdgeIterator.hasNext()) {
+								strayEdge = strayEdgeIterator.next();
+								if (isStartOfChain(strayEdge.getVertex())) {
+									first = true;
+									return strayEdge.getVertex();
+								}
+							} else {
+								return null;
+							}
+						}
+						first = false;
+						return strayEdge.getPairVertex();
+					}
+				};
+			}
+			
+		};
+	}
+	
+	private Iterable<HalfEdge> strayEdges = new Iterable<HalfEdge>() {
+		public Iterator<HalfEdge> iterator() {
+			return new Iterator<HalfEdge>() {
+				Iterator<HalfEdge> edges = edgeSet.iterator();
+				HalfEdge edge = getNext();
+				
+				public boolean hasNext() {
+					return edge != null;
+				}
+
+				public HalfEdge next() {
+					if (edge == null) {
+						throw new NoSuchElementException();
+					}
+					HalfEdge tmp = edge;
+					edge = getNext();
+					return tmp;
+				}
+
+				public void remove() {
+					throw new UnsupportedOperationException();
+				}
+				
+				private HalfEdge getNext() {
+					if (edges.hasNext()) {
+						edge = edges.next();
+						if (edge.isStray()) {
+							return edge;
+						}
+						return getNext();
+					}
+					return null;
+				}
+			};
+		}	
+	};
+	
+	
+	private Iterable<HalfEdge> createFaceEdgesIterable(final int level) {
+		return new Iterable<HalfEdge>() {
+			public Iterator<HalfEdge> iterator() {
+				return new Iterator<HalfEdge>() {
+					Iterator<Face> faces = faceSets[level].iterator();
+					HalfEdge[] faceEdges = new HalfEdge[0];
+					int edgeIndex;
+					HalfEdge next = getNext();
+					
+					public boolean hasNext() {
+						return next != null;
+					}
+
+
+					public HalfEdge next() {
+						if (next == null) {
+							throw new NoSuchElementException();
+						}
+						HalfEdge tmp = next;
+						next = getNext();
+						return tmp;
+					}
+
+					public void remove() {
+						throw new UnsupportedOperationException();
+					}
+					
+					private HalfEdge getNext() {
+						if (edgeIndex < faceEdges.length) {
+							next = faceEdges[edgeIndex++];
+							if (next.isPrimary()) {
+								return next;
+							} else {
+								if (next.getPairFace() == null || !next.getPairFace().isDrawable()) {
+									return next.getPair();
+								} else {
+									return getNext();
+								}
+							}
+						} else {
+							if (faces.hasNext()) {
+								faceEdges = faces.next().getEdges();
+								edgeIndex = 0;
+								return getNext();
+							} else {
+								return null;
+							}
+						}
 					}
 				};
 			}
@@ -1670,8 +1805,7 @@ public class Sds {
 		}
 	}
 	
-	public boolean isStartOfChain(BaseVertex strayVertex) {
-		assert strayVertices.contains(strayVertex);
+	public boolean isStartOfChain(AbstractVertex strayVertex) {
 		assert strayVertex.getEdges().length == 1 || strayVertex.getEdges().length == 2;
 		return strayVertex.getEdges().length == 1;
 	}
