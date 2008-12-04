@@ -68,7 +68,7 @@ public class MouseSelector {
 				return Selection.Type.FACES;
 			}
 		}
-		for (HalfEdge edge : sds.getEdges(level, true)) {
+		for (HalfEdge edge : sds.getEdges(level)) {
 			AbstractVertex v0 = edge.getVertex();
 			AbstractVertex v1 = edge.getPairVertex();
 			if (vertices.contains(v0) && vertices.contains(v1)) {
@@ -85,7 +85,7 @@ public class MouseSelector {
 		viewport.getViewDef().configureTransformUtil(transformUtil);
 		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
 		Point3d p = new Point3d();
-		for (AbstractVertex vertex : sdsModel.getSds().getVertices(level, true)) {
+		for (AbstractVertex vertex : sdsModel.getSds().getVertices(level)) {
 			vertex.getPosition(p);
 			transformUtil.projectToScreen(WORLD, p, p);
 			if (lasso.contains(p.x, p.y)) {
@@ -224,9 +224,9 @@ public class MouseSelector {
 		if ((type & (Type.VERTEX | Type.STRAY_VERTEX | Type.LIMIT)) != 0) {
 			Iterable<? extends AbstractVertex> vertices;
 			if ((type & (Type.VERTEX | Type.LIMIT)) == 0) {
-				vertices = sds.getStrayVertices();
+				vertices = sds.getVertices(level);//sds.getStrayVertices();
 			} else {
-				vertices = sds.getVertices(level, (type & Type.STRAY_VERTEX) != 0);
+				vertices = sds.getVertices(level);//, (type & Type.STRAY_VERTEX) != 0);
 			}
 			for (AbstractVertex vertex : vertices) {
 				if (objectFilter.accept(vertex)) {
@@ -260,9 +260,9 @@ public class MouseSelector {
 		if ((type & (Type.EDGE | Type.STRAY_EDGE | Type.BOUNDARY_EDGE)) != 0) {
 			Iterable<HalfEdge> edges;
 			if ((type & (Type.EDGE | Type.BOUNDARY_EDGE)) == 0) {
-				edges = sds.getStrayEdges();
+				edges = sds.getEdges(level);//sds.getStrayEdges();
 			} else {
-				edges = sds.getEdges(level, (type & Type.STRAY_EDGE) != 0);
+				edges = sds.getEdges(level);//, (type & Type.STRAY_EDGE) != 0);
 			}
 			boolean boundaryOnly = ((type & Type.EDGE) == 0);
 			boolean stray = ((type & Type.STRAY_EDGE) == 0);

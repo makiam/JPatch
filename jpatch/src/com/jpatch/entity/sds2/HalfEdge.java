@@ -24,7 +24,16 @@ public class HalfEdge {
 	private BoundaryType boundaryType = BoundaryType.STRAY;
 	private DerivedVertex edgePoint;
 	
-	public HalfEdge(AbstractVertex v0, AbstractVertex v1) {
+	public static HalfEdge getOrCreate(AbstractVertex v0, AbstractVertex v1) {
+		for (HalfEdge edge : v0.getEdges()) {
+			if (edge.getPairVertex() == v1) {
+				return edge;
+			}
+		}
+		return new HalfEdge(v0, v1);
+	}
+	
+	private HalfEdge(AbstractVertex v0, AbstractVertex v1) {
 		assert v0 != v1;
 		this.vertex = v0;
 		this.pair = new HalfEdge(v1, this);
@@ -39,10 +48,10 @@ public class HalfEdge {
 		v.addEdge(this);
 	}
 	
-	public void dispose() {
-		vertex.removeEdge(this);
-		pair.dispose();
-	}
+//	public void dispose() {
+//		vertex.removeEdge(this);
+//		pair.vertex.removeEdge(pair);
+//	}
 	
 	public AbstractVertex getVertex() {
 		return vertex;
