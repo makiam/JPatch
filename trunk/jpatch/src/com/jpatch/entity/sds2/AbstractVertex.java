@@ -864,7 +864,7 @@ public abstract class AbstractVertex {
 			for (int i = 0; i < indices.length; i++) {
 				av[i] = v[indices[i]];
 			}
-			sds.addFace(null, MATERIAL, av);
+			sds.getOrCreateFace(av);
 //			for (int i = 0; i < indices.length; i++) {
 //				int index = indices[i];
 //				if (index == 0) {

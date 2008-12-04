@@ -80,7 +80,9 @@ public class JptLoader {
 					Collections.reverse(vertexList);
 					BaseVertex[] vertices = vertexList.toArray(new BaseVertex[vertexList.size()]);
 					if (materialIndex != -1) {
-						sds.addFace(null, materials.get(materialIndex), vertices);
+//						sds.addFace(null, materials.get(materialIndex), vertices);
+						final Face face = sds.getOrCreateFace(vertices);
+						
 //					if (face != null) {
 //						sds.setFaceMaterial(face, materials.get(materialIndex));
 //						face.setMaterial(materials.get(materialIndex));
@@ -238,7 +240,7 @@ public class JptLoader {
 			Point3d p = new Point3d();
 			Point3d l = new Point3d();
 			
-			for (AbstractVertex vertex : sds.getVertices(0, false)) {
+			for (AbstractVertex vertex : sds.getVertices(0)) {
 				try {
 					vertex.getPosition(p);
 					vertex.getLimit(l);
