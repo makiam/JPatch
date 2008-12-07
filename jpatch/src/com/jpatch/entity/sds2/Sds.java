@@ -50,14 +50,15 @@ public class Sds {
 	private final Iterable<HalfEdge>[] faceEdges = (Iterable<HalfEdge>[]) new Iterable[SdsConstants.MAX_LEVEL + 1];
 	private final Iterable<? extends AbstractVertex>[] faceVertices = (Iterable<? extends AbstractVertex>[]) new Iterable[SdsConstants.MAX_LEVEL + 1];
 	
-//	private final Set<HalfEdge> strayEdges = new HashSet<HalfEdge>();
-
+	private final Set<HalfEdge> strayEdges = new HashSet<HalfEdge>();
+	private final Iterable<BaseVertex> strayVertices = createStrayVertexIterable();
+	
 	private final Set<BaseVertex[]> strayFaces = new HashSet<BaseVertex[]>();
 	@SuppressWarnings("unchecked")
 	private final Set<Displacement>[] hierarchy = new Set[SdsConstants.MAX_LEVEL + 1];
-//	private final EdgeSet edgeSet = new EdgeSet();
+
+
 	
-//	private MorphTarget activeMorphTarget;
 	private final MorphController morphController = new MorphController(this);
 	private final NdeLayerManager ndeLayerManager = new NdeLayerManager(morphController);
 	
@@ -662,46 +663,48 @@ public class Sds {
 //		};
 //	}
 	
-//	private Iterable<BaseVertex> strayVertices = new Iterable<BaseVertex>() {
-//		public Iterator<BaseVertex> iterator() {
-//			return new Iterator<BaseVertex>() {
-//				private Iterator<HalfEdge> strayEdgeIterator = strayEdges.iterator();
-//				private HalfEdge strayEdge;
-//				private boolean first = false;
-//				private AbstractVertex vertex = getNext();
-//				
-//				public boolean hasNext() {
-//					return vertex != null;
-//				}
-//
-//				public BaseVertex next() {
-//					AbstractVertex tmp = vertex;
-//					vertex = getNext();
-//					return (BaseVertex) tmp;
-//				}
-//
-//				public void remove() {
-//					throw new UnsupportedOperationException();
-//				}
-//				
-//				private AbstractVertex getNext() {
-//					if (!first) {
-//						if (strayEdgeIterator.hasNext()) {
-//							strayEdge = strayEdgeIterator.next();
-//							if (isStartOfChain(strayEdge.getVertex())) {
-//								first = true;
-//								return strayEdge.getVertex();
-//							}
-//						} else {
-//							return null;
-//						}
-//					}
-//					first = false;
-//					return strayEdge.getPairVertex();
-//				}
-//			};
-//		}
-//	};
+	private Iterable<BaseVertex> createStrayVertexIterable() {
+		return new Iterable<BaseVertex>() {
+			public Iterator<BaseVertex> iterator() {
+				return new Iterator<BaseVertex>() {
+					private Iterator<HalfEdge> strayEdgeIterator = strayEdges.iterator();
+					private HalfEdge strayEdge;
+					private boolean first = false;
+					private AbstractVertex vertex = getNext();
+					
+					public boolean hasNext() {
+						return vertex != null;
+					}
+	
+					public BaseVertex next() {
+						AbstractVertex tmp = vertex;
+						vertex = getNext();
+						return (BaseVertex) tmp;
+					}
+	
+					public void remove() {
+						throw new UnsupportedOperationException();
+					}
+					
+					private AbstractVertex getNext() {
+						if (!first) {
+							if (strayEdgeIterator.hasNext()) {
+								strayEdge = strayEdgeIterator.next();
+								if (isStartOfChain(strayEdge.getVertex())) {
+									first = true;
+									return strayEdge.getVertex();
+								}
+							} else {
+								return null;
+							}
+						}
+						first = false;
+						return strayEdge.getPairVertex();
+					}
+				};
+			}
+		};
+	}
 //	
 //	
 //	private Iterable<HalfEdge> strayEdges = new Iterable<HalfEdge>() {
@@ -1982,7 +1985,7 @@ public class Sds {
 					faceVertices[valence][j] = vertices[vertexIndex++];
 				}
 				for (int j = 0; j < valence; j++) {
-					faceEdges[valence][j] = sds.getHalfEdge(faceVertices[valence][j], faceVertices[valence][(j + 1) % valence]); 
+					faceEdges[valence][j] = HalfEdge.getOrCreate(faceVertices[valence][j], faceVertices[valence][(j + 1) % valence]); 
 				}
 				faces[valence] = faceSet.getFace(faceEdges[valence]);
 			}

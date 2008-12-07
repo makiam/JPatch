@@ -1,3 +1,4 @@
+package com.jpatch.afw.ui;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
