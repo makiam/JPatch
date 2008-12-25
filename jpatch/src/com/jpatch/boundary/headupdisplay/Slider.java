@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.media.opengl.*;
+
+import jpatch.boundary.mouse.*;
 import static javax.media.opengl.GL.*;
 
 import com.jpatch.afw.attributes.*;
@@ -47,7 +49,7 @@ public class Slider {
 		return bounds;
 	}
 	
-	private final MouseAdapter mouseAdapter = new MouseAdapter() {
+	private final JPatchMouseAdapter mouseAdapter = new JPatchMouseAdapter() {
 		private boolean dragging = false;
 		
 		@Override
@@ -158,7 +160,7 @@ public class Slider {
 		yAttr.setDouble((yValue - yMin.getDouble()) / (yMax.getDouble() - yMin.getDouble()));
 	}
 	
-	protected MouseAdapter getMouseAdapter() {
+	protected JPatchMouseAdapter getMouseAdapter() {
 		return mouseAdapter;
 	}
 	

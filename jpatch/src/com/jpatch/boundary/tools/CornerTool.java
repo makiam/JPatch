@@ -23,7 +23,7 @@ public class CornerTool extends AbstractBasicTool {
 	private double[] cornerSharpnesValues;
 	
 	public CornerTool() {
-		STANDARD_SELECTION_TYPE = Sds.Type.VERTEX | Sds.Type.STRAY_VERTEX;
+		STANDARD_SELECTION_TYPE = EnumSet.of(Sds.Type.VERTEX, Sds.Type.STRAY_VERTEX);
 	}
 	
 	@Override
@@ -81,7 +81,7 @@ public class CornerTool extends AbstractBasicTool {
 		}
 		final int level = sdsModel.getEditLevelAttribute().getInt();
 		
-		for (AbstractVertex vertex : sdsModel.getSds().getVertices(level, false)) {
+		for (AbstractVertex vertex : sdsModel.getSds().getVertices(level)) {
 			final float sharpness = (float) vertex.getCornerSharpness();
 			if (sharpness > 0) {
 				vertex.getPosition(p0);

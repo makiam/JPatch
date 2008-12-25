@@ -39,7 +39,7 @@ public class ExtrudeTool extends AbstractBasicTool {
 	private boolean extrudeDone;
 	
 	public ExtrudeTool() {
-		STANDARD_SELECTION_TYPE = Sds.Type.FACE | Sds.Type.BOUNDARY_EDGE | Sds.Type.STRAY_EDGE;
+		STANDARD_SELECTION_TYPE = EnumSet.of(Sds.Type.FACE, Sds.Type.BOUNDARY_EDGE, Sds.Type.STRAY_EDGE);
 	}
 	
 	public StateMachine<ToolMode> getToolModeAttribute() {

@@ -173,7 +173,7 @@ public class MouseSelector {
 		}
 	}
 	
-	public static HitObject getObjectAt(Viewport viewport, int mouseX, int mouseY, final double initMaxDistSq, SdsModel sdsModel, int level, int type, ObjectFilter objectFilter) {
+	public static HitObject getObjectAt(Viewport viewport, int mouseX, int mouseY, final double initMaxDistSq, SdsModel sdsModel, int level, EnumSet<Sds.Type> type, ObjectFilter objectFilter) {
 		if (objectFilter == null) {
 			objectFilter = ACCEPT_ANYTHING;
 		}
@@ -197,7 +197,7 @@ public class MouseSelector {
 		
 		
 		
-		if ((type & Type.FACE) != 0) {
+		if (type.contains(Type.FACE)) {
 			Point3d rayOrigin = new Point3d();
 			Vector3d rayDirection = new Vector3d();
 			setupCameraRay(rayOrigin, rayDirection, mouseX, mouseY);
@@ -221,16 +221,16 @@ public class MouseSelector {
 		}
 		
 		
-		if ((type & (Type.VERTEX | Type.STRAY_VERTEX | Type.LIMIT)) != 0) {
+		if (type.contains(Type.VERTEX) | type.contains(Type.STRAY_VERTEX) | type.contains(Type.LIMIT)) {
 			Iterable<? extends AbstractVertex> vertices;
-			if ((type & (Type.VERTEX | Type.LIMIT)) == 0) {
-				vertices = sds.getVertices(level);//sds.getStrayVertices();
+			if (!type.contains(Type.VERTEX) && !type.contains(Type.LIMIT)) {
+				vertices = sds.getStrayVertices();
 			} else {
 				vertices = sds.getVertices(level);//, (type & Type.STRAY_VERTEX) != 0);
 			}
 			for (AbstractVertex vertex : vertices) {
 				if (objectFilter.accept(vertex)) {
-					if ((type & (Type.VERTEX | Type.STRAY_VERTEX)) != 0) {
+					if (type.contains(Type.VERTEX) | type.contains(Type.STRAY_VERTEX)) {
 						vertex.getPosition(p0);
 							
 						transformUtil.projectToScreen(WORLD, p0, p0);
@@ -242,7 +242,7 @@ public class MouseSelector {
 							}
 						}
 					}
-					if ((type & Type.LIMIT) != 0) {
+					if (type.contains(Type.LIMIT)) {
 						vertex.getLimit(p0);
 						transformUtil.projectToScreen(WORLD, p0, p0);
 						if(viewport.getDepthAt((int) p0.x, (int) p0.y) < p0.z) {
@@ -257,15 +257,15 @@ public class MouseSelector {
 			}
 		}
 		
-		if ((type & (Type.EDGE | Type.STRAY_EDGE | Type.BOUNDARY_EDGE)) != 0) {
+		if (type.contains(Type.EDGE) | type.contains(Type.STRAY_EDGE) | type.contains(Type.BOUNDARY_EDGE)) {
 			Iterable<HalfEdge> edges;
-			if ((type & (Type.EDGE | Type.BOUNDARY_EDGE)) == 0) {
-				edges = sds.getEdges(level);//sds.getStrayEdges();
+			if (!type.contains(Type.EDGE) && !type.contains(Type.BOUNDARY_EDGE)) {
+				edges = sds.getStrayEdges();
 			} else {
-				edges = sds.getEdges(level);//, (type & Type.STRAY_EDGE) != 0);
+				edges = sds.getAllEdges();
 			}
-			boolean boundaryOnly = ((type & Type.EDGE) == 0);
-			boolean stray = ((type & Type.STRAY_EDGE) == 0);
+			final boolean boundaryOnly = !type.contains(Type.EDGE);
+			final boolean stray = type.contains(Type.STRAY_EDGE);
 			
 			
 			for (HalfEdge edge : edges) {

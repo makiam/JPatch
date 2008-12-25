@@ -15,6 +15,7 @@ public class GlTest {
 	public static final int OSX_PPC = 3;
 	public static final int SOLARIS_SPARC = 4;
 	public static final int SOLARIS_X86 = 5;
+	public static final int OSX_X86 = 6;
 	
 	public static final String[] OS_ARCH = new String[] {
 		"OTHER",
@@ -22,7 +23,8 @@ public class GlTest {
 		"Linux/x86",
 		"OS X/Power PC",
 		"Solaris/Sparc",
-		"Solaris/x86"
+		"Solaris/x86",
+		"OS X/x86",
 	};
 	
 	public static Logger logger;
@@ -169,6 +171,8 @@ public class GlTest {
 		else if (name.equals("Mac OS X")) {
 			if (arch.equals("ppc") || arch.equals("PowerPC")) {
 				return OSX_PPC;
+			} else {
+				return OSX_X86;
 			}
 		}
 		else if (name.equals("Solaris")) {
@@ -197,6 +201,11 @@ public class GlTest {
 			case OSX_PPC: {
 				copyFromURL(ClassLoader.getSystemResource("lib/jogl/native/osx_ppc/libjogl.jnilib"), dir);
 				copyFromURL(ClassLoader.getSystemResource("lib/jogl/native/osx_ppc/libjogl_cg.jnilib"), dir);
+			}
+			break;
+			case OSX_X86: {
+				copyFromURL(ClassLoader.getSystemResource("src/nativelibs/osx/x86/libjogl.jnilib"), dir);
+				copyFromURL(ClassLoader.getSystemResource("src/nativelibs/osx/x86/libjogl_cg.jnilib"), dir);
 			}
 			break;
 			case SOLARIS_SPARC: {

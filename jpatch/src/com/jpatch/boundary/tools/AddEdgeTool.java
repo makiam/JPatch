@@ -31,6 +31,7 @@ public class AddEdgeTool implements JPatchTool, ViewportOverlay {
 		}
 	};
 	
+	private static EnumSet<Sds.Type> VERTEX_STRAY_VERTEX = EnumSet.of(Sds.Type.VERTEX, Sds.Type.STRAY_VERTEX);
 	private MouseMotionListener[] mouseMotionListeners;
 	private MouseListener[] mouseListeners;
 	
@@ -233,7 +234,7 @@ public class AddEdgeTool implements JPatchTool, ViewportOverlay {
 						sds.removeStrayEdge(editList, vertex.getEdges()[0]);
 //						sds.removeStrayEdge(editList, vertex.getEdges()[1]);
 					}
-					Face face = sds.addFace(editList, Main.getInstance().getDefaultMaterial(), strayFace);
+					Face face = sds.getOrCreateFace(strayFace);
 					System.out.println("Dumping faces *AFTER*");
 					sds.dumpFaces(0);
 					Vector3d normal = new Vector3d();
@@ -316,7 +317,7 @@ public class AddEdgeTool implements JPatchTool, ViewportOverlay {
 			strayFace = null;
 			
 			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
-			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, Sds.Type.VERTEX | Sds.Type.STRAY_VERTEX, ENDVERTEX_FILTER);
+			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, VERTEX_STRAY_VERTEX, ENDVERTEX_FILTER);
 			if (hitVertex != null) {
 				endVertex = (BaseVertex) hitVertex.vertex;
 			} else {
@@ -336,7 +337,7 @@ public class AddEdgeTool implements JPatchTool, ViewportOverlay {
 			mouseX = e.getX();
 			mouseY = e.getY();
 			SdsModel sdsModel = Main.getInstance().getSelection().getSdsModel();
-			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, Sds.Type.VERTEX | Sds.Type.STRAY_VERTEX, ENDVERTEX_FILTER);
+			HitVertex hitVertex = (HitVertex) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 64, sdsModel, 0, VERTEX_STRAY_VERTEX, ENDVERTEX_FILTER);
 			if (hitVertex != null) {
 				startVertex = (BaseVertex) hitVertex.vertex;
 			} else {

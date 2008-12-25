@@ -666,24 +666,24 @@ public class Viewport implements NamedObject {
 //		}
 		
 		
-//		/* draw stray edges/vertices */
-//		gl.glDisable(GL_LIGHTING);
-//		gl.glColor3f(0.5f, 0.5f, 1.0f);
-//		gl.glBegin(GL_LINES);
-//		for (HalfEdge strayEdge : sds.getStrayEdges()) {
-//			strayEdge.getVertex().getPosition(p);
-//			gl.glVertex3f(p.x, p.y, p.z);
-//			strayEdge.getPairVertex().getPosition(p);
-//			gl.glVertex3f(p.x, p.y, p.z);
-//		}
-//		gl.glEnd();
-//		gl.glPointSize(3);
-//		gl.glBegin(GL_POINTS);
-//		for (BaseVertex strayVertex : sds.getStrayVertices()) {
-//			strayVertex.getPosition(p);
-//			gl.glVertex3f(p.x, p.y, p.z);
-//		}
-//		gl.glEnd();
+		/* draw stray edges/vertices */
+		gl.glDisable(GL_LIGHTING);
+		gl.glColor3f(0.5f, 0.5f, 1.0f);
+		gl.glBegin(GL_LINES);
+		for (HalfEdge strayEdge : sds.getStrayEdges()) {
+			strayEdge.getVertex().getPosition(p);
+			gl.glVertex3f(p.x, p.y, p.z);
+			strayEdge.getPairVertex().getPosition(p);
+			gl.glVertex3f(p.x, p.y, p.z);
+		}
+		gl.glEnd();
+		gl.glPointSize(3);
+		gl.glBegin(GL_POINTS);
+		for (BaseVertex strayVertex : sds.getStrayVertices()) {
+			strayVertex.getPosition(p);
+			gl.glVertex3f(p.x, p.y, p.z);
+		}
+		gl.glEnd();
 		
 		
 //		/* draw vertex limit */
