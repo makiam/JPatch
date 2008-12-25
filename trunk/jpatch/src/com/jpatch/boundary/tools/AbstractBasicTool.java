@@ -23,8 +23,9 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 	private MouseMotionListener[] mouseMotionListeners;
 	private MouseListener[] mouseListeners;
 	
-	protected int STANDARD_SELECTION_TYPE = Sds.Type.EDGE | Sds.Type.FACE | Sds.Type.VERTEX | Sds.Type.STRAY_VERTEX | Sds.Type.STRAY_EDGE;
-	protected int LIMIT_SELECTION_TYPE = Sds.Type.LIMIT;
+	protected EnumSet<Sds.Type> STANDARD_SELECTION_TYPE = EnumSet.of(Sds.Type.EDGE, Sds.Type.FACE, Sds.Type.VERTEX, Sds.Type.STRAY_VERTEX, Sds.Type.STRAY_EDGE);
+	protected EnumSet<Sds.Type> LIMIT_SELECTION_TYPE = EnumSet.of(Sds.Type.LIMIT);
+	protected final EnumSet<Sds.Type> NULL_SELECTION_TYPE = EnumSet.noneOf(Sds.Type.class);
 	
 	protected HitObject hitObject;
 	protected HalfEdge hitEdge;
@@ -173,7 +174,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 //					highlightHitObject(viewport, false, false);
 					break;
 				case HOVER:
-					int selectionType = getSelectionType(viewport);
+					EnumSet<Sds.Type> selectionType = getSelectionType(viewport);
 					hitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 32 * 32, sdsModel, level, selectionType, null);
 					if (hitObject != null) {
 						if (MouseSelector.isSelectionTrigger(e)) {
@@ -271,7 +272,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 		}		
 	}
 	
-	private void updateSelection(Viewport viewport, int mx, int my, SdsModel sdsModel, int level, int selectionFilter) {
+	private void updateSelection(Viewport viewport, int mx, int my, SdsModel sdsModel, int level, EnumSet<Sds.Type> selectionFilter) {
 		switch(mode) {
 		case LASSO:
 			if (selectLassoAttr.getBoolean()) {
@@ -288,7 +289,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 			}
 			break;
 		case SELECT:
-			final int type = getSelectionFilter(selectionType);
+			final EnumSet<Sds.Type> type = getSelectionFilter(selectionType);
 			HitObject hitObject = MouseSelector.getObjectAt(viewport, mx, my, Double.MAX_VALUE, sdsModel, level, type, null);
 //			vertices.clear();
 			if (hitObject != null) {
@@ -298,11 +299,11 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 		}
 		
 		/* if we don't want faces, select just the edges */
-		if (selectionType == Selection.Type.FACES && ((selectionFilter & Sds.Type.FACE) == 0)) {
+		if (selectionType == Selection.Type.FACES && selectionFilter.contains(Sds.Type.FACE)) {
 			selectionType = Selection.Type.EDGES;
 		}
 		/* if we don't want edges, select just the vertices */
-		if (selectionType == Selection.Type.EDGES && ((selectionFilter & (Sds.Type.EDGE | Sds.Type.STRAY_EDGE | Sds.Type.BOUNDARY_EDGE)) == 0)) {
+		if (selectionType == Selection.Type.EDGES && (selectionFilter.contains(Sds.Type.EDGE) | selectionFilter.contains(Sds.Type.STRAY_EDGE) | selectionFilter.contains(Sds.Type.BOUNDARY_EDGE))) {
 			selectionType = Selection.Type.VERTICES;
 		}
 		
@@ -316,9 +317,9 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 		switch (selectionType) {
 		case EDGES:
 			
-			final boolean acceptRegular = ((selectionFilter & Sds.Type.EDGE) != 0);
-			final boolean acceptBoundary = ((selectionFilter & Sds.Type.BOUNDARY_EDGE) != 0);
-			final boolean acceptStray = ((selectionFilter & Sds.Type.STRAY_EDGE) != 0);
+			final boolean acceptRegular = selectionFilter.contains(Sds.Type.EDGE);
+			final boolean acceptBoundary = selectionFilter.contains(Sds.Type.BOUNDARY_EDGE);
+			final boolean acceptStray = selectionFilter.contains(Sds.Type.STRAY_EDGE);
 			Set<HalfEdge> edgesToRemove = new HashSet<HalfEdge>();
 			for (HalfEdge edge : hitSelection.getEdges()) {
 				if (edge.isStray() && !acceptStray) {
@@ -338,14 +339,14 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 		Main.getInstance().getSelection().set(hitSelection);
 	}
 	
-	private int getSelectionFilter(Selection.Type type) {
+	private EnumSet<Sds.Type> getSelectionFilter(Selection.Type type) {
 		switch(type) {
 		case EDGES:
-			return Sds.Type.EDGE;
+			return EnumSet.of(Sds.Type.EDGE);
 		case VERTICES:
-			return Sds.Type.VERTEX;
+			return EnumSet.of(Sds.Type.VERTEX);
 		case FACES:
-			return Sds.Type.FACE;
+			return EnumSet.of(Sds.Type.FACE);
 		default:
 			throw new IllegalArgumentException(type.toString());
 		}
@@ -399,7 +400,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 			
 			switch (mode) {
 			case HOVER:
-				int selectionType = getSelectionType(viewport);
+				EnumSet<Sds.Type> selectionType = getSelectionType(viewport);
 				HitObject newHitObject = MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 32 * 32, sdsModel, level, selectionType, null);
 				if (newHitObject == null ? hitObject != null : !newHitObject.equals(hitObject)) {
 					hitObject = newHitObject;
@@ -416,7 +417,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 		}	
 	};
 	
-	private int getSelectionType(Viewport viewport) {
+	private EnumSet<Sds.Type> getSelectionType(Viewport viewport) {
 		final ViewDef viewDef = viewport.getViewDef();
 		final boolean showMesh = viewDef.getShowControlMeshAttribute().getBoolean();
 		final boolean showLimit = viewDef.getShowLimitSurfaceAttribute().getBoolean();
@@ -426,7 +427,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 		} else if (showMesh) {
 			return STANDARD_SELECTION_TYPE;
 		}
-		return 0;
+		return NULL_SELECTION_TYPE;
 	}
 	
 	protected void snapPointer(Viewport viewport, Point3d screenPosition) {

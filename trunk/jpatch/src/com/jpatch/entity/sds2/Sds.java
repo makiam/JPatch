@@ -16,19 +16,21 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class Sds {
-	public static final class Type {
-		public static final int VERTEX = 1 << 0;
-		public static final int LIMIT = 1 << 1;
-		public static final int EDGE = 1 << 2;
-		public static final int FACE = 1 << 3;
-		public static final int STRAY_VERTEX = 1 << 4;
-		public static final int STRAY_EDGE = 1 << 5;
-		public static final int BOUNDARY_EDGE = 1 << 6;
-		
-		private Type() {
-			assert false;	// not instanciable
-		}
-	}
+	public static enum Type { VERTEX, LIMIT, EDGE, FACE, STRAY_VERTEX, STRAY_EDGE, BOUNDARY_EDGE };
+	
+//	public static final class Type {
+//		public static final int VERTEX = 1 << 0;
+//		public static final int LIMIT = 1 << 1;
+//		public static final int EDGE = 1 << 2;
+//		public static final int FACE = 1 << 3;
+//		public static final int STRAY_VERTEX = 1 << 4;
+//		public static final int STRAY_EDGE = 1 << 5;
+//		public static final int BOUNDARY_EDGE = 1 << 6;
+//		
+//		private Type() {
+//			assert false;	// not instanciable
+//		}
+//	}
 	
 	
 	private int currentMinLevel = 0;
@@ -51,7 +53,7 @@ public class Sds {
 	private final Iterable<? extends AbstractVertex>[] faceVertices = (Iterable<? extends AbstractVertex>[]) new Iterable[SdsConstants.MAX_LEVEL + 1];
 	
 	private final Set<HalfEdge> strayEdges = new HashSet<HalfEdge>();
-	private final Iterable<BaseVertex> strayVertices = createStrayVertexIterable();
+	private final Collection<BaseVertex> strayVertices = createStrayVertexCollection();
 	
 	private final Set<BaseVertex[]> strayFaces = new HashSet<BaseVertex[]>();
 	@SuppressWarnings("unchecked")
@@ -133,33 +135,45 @@ public class Sds {
 	public MorphController getMorphController() {
 		return morphController;
 	}
+	
+	public Iterable<BaseVertex[]> getStrayFaces() {
+		return strayFaces;
+	}
+	
+	public Collection<BaseVertex> getStrayVertices() {
+		return strayVertices;
+	}
 //	
 //	
 //	public void setActiveMorphTarget(MorphTarget morphTarget) {
 //		this.activeMorphTarget = morphTarget;
 //	}
 	
-//	public void addSegment(List<JPatchUndoableEdit> editList, AbstractVertex vertex0, AbstractVertex vertex1) {
-////		edgeKey.set(vertex0, vertex1);
-////		assert (!edgeMap.containsKey(edgeKey));
-////		HalfEdge edge = new HalfEdge(vertex0, vertex1);
-////		JPatchUndoableEdit addEdgeEdit = new AddEdgeEdit(edge, 0);
-//		JPatchUndoableEdit addStrayEdgeEdit = new AddStrayEdgeEdit(vertex0, vertex1);
-//		if (editList != null) {
-////			editList.add(addEdgeEdit);
-//			editList.add(addStrayEdgeEdit);
-//		}
-//	}
-//	
-//	public void removeSegment(List<JPatchUndoableEdit> editList, HalfEdge strayEdge) {
-//		assert (strayEdges.contains(strayEdge));
-//		JPatchUndoableEdit removeStrayEdgeEdge = new RemoveStrayEdgeEdit(strayEdge);
-////		JPatchUndoableEdit removeEdgeEdit = new RemoveEdgeEdit(strayEdge, 0);
-//		if (editList != null) {
-//			editList.add(removeStrayEdgeEdge);
-////			editList.add(removeEdgeEdit);
-//		}
-//	}
+	public void addSegment(List<JPatchUndoableEdit> editList, AbstractVertex vertex0, AbstractVertex vertex1) {
+//		edgeKey.set(vertex0, vertex1);
+//		assert (!edgeMap.containsKey(edgeKey));
+//		HalfEdge edge = new HalfEdge(vertex0, vertex1);
+//		JPatchUndoableEdit addEdgeEdit = new AddEdgeEdit(edge, 0);
+		JPatchUndoableEdit addStrayEdgeEdit = new AddStrayEdgeEdit(vertex0, vertex1);
+		if (editList != null) {
+//			editList.add(addEdgeEdit);
+			editList.add(addStrayEdgeEdit);
+		}
+	}
+	
+	public void removeSegment(List<JPatchUndoableEdit> editList, HalfEdge strayEdge) {
+		assert (strayEdges.contains(strayEdge));
+		JPatchUndoableEdit removeStrayEdgeEdge = new RemoveStrayEdgeEdit(strayEdge);
+//		JPatchUndoableEdit removeEdgeEdit = new RemoveEdgeEdit(strayEdge, 0);
+		if (editList != null) {
+			editList.add(removeStrayEdgeEdge);
+//			editList.add(removeEdgeEdit);
+		}
+	}
+	
+	public Iterable<HalfEdge> getStrayEdges() {
+		return strayEdges;
+	}
 	
 	public Displacement createHierarchyModification(int[] path) {
 		int level = path.length - 2;
@@ -552,6 +566,10 @@ public class Sds {
 		return faceEdges[level];
 	}
 	
+	public Iterable<HalfEdge> getAllEdges() {
+		return new CompositIterable<HalfEdge>(faceEdges[0], strayEdges);
+	}
+	
 	private Iterable<? extends AbstractVertex> createFaceVerticesIterable(final int level) {
 		return new Iterable<AbstractVertex>() {
 			public Iterator<AbstractVertex> iterator() {
@@ -663,8 +681,8 @@ public class Sds {
 //		};
 //	}
 	
-	private Iterable<BaseVertex> createStrayVertexIterable() {
-		return new Iterable<BaseVertex>() {
+	private Collection<BaseVertex> createStrayVertexCollection() {
+		return new AbstractCollection<BaseVertex>() {
 			public Iterator<BaseVertex> iterator() {
 				return new Iterator<BaseVertex>() {
 					private Iterator<HalfEdge> strayEdgeIterator = strayEdges.iterator();
@@ -702,6 +720,15 @@ public class Sds {
 						return strayEdge.getPairVertex();
 					}
 				};
+			}
+
+			@Override
+			public int size() {
+				int i = 0;
+				for (Iterator it = iterator(); it.hasNext(); ) {
+					i++;
+				}
+				return i;
 			}
 		};
 	}
@@ -1059,17 +1086,17 @@ public class Sds {
 		}
 		
 		void add() {
-			final HalfEdge halfEdge = edgeSet.getHalfEdge(v0, v1);
+			final HalfEdge halfEdge = HalfEdge.getOrCreate(v0, v1);
 			strayEdges.add(halfEdge);
 			strayEdges.add(halfEdge.getPair());
-			strayVertices.add((BaseVertex) halfEdge.getVertex());
-			strayVertices.add((BaseVertex) halfEdge.getPairVertex());
+//			strayVertices.add((BaseVertex) halfEdge.getVertex());
+//			strayVertices.add((BaseVertex) halfEdge.getPairVertex());
 //			edgeKey.set(halfEdge.getVertex(), halfEdge.getPairVertex());
 //			edgeMap.put(edgeKey.clone(), halfEdge);
 		}
 		
 		void remove() {
-			final HalfEdge halfEdge = edgeSet.getHalfEdge(v0, v1);
+			final HalfEdge halfEdge = HalfEdge.getOrCreate(v0, v1);
 			strayEdges.remove(halfEdge);
 			strayEdges.remove(halfEdge.getPair());
 //			edgeKey.set(halfEdge.getVertex(), halfEdge.getPairVertex());
@@ -1079,13 +1106,13 @@ public class Sds {
 //			halfEdge.getVertex().removeEdge(halfEdge);
 			halfEdge.getVertex().removeEdge(halfEdge);
 			halfEdge.getPairVertex().removeEdge(halfEdge.getPair());
-			if (halfEdge.getVertex().getEdges().length == 0) {
-				strayVertices.remove(halfEdge.getVertex());
-			}
-			if (halfEdge.getPairVertex().getEdges().length == 0) {
-				strayVertices.remove(halfEdge.getPairVertex());
-			}
-			edgeSet.removeHalfEdge(halfEdge);
+//			if (halfEdge.getVertex().getEdges().length == 0) {
+//				strayVertices.remove(halfEdge.getVertex());
+//			}
+//			if (halfEdge.getPairVertex().getEdges().length == 0) {
+//				strayVertices.remove(halfEdge.getPairVertex());
+//			}
+//			edgeSet.removeHalfEdge(halfEdge);
 //			for (AbstractVertex v : halfEdge.getVertices(new AbstractVertex[2])) {
 //				
 //				

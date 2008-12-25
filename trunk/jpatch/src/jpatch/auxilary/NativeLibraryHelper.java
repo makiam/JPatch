@@ -191,7 +191,8 @@ public class NativeLibraryHelper {
 	
 	private static Arch detectArch() {
 		String osArch = System.getProperties().getProperty("os.arch");
-		if (osArch.equals("x86") || osArch.equals("i386") || osArch.equals("i586") || osArch.equals("i686")) {
+		System.out.println(osArch);
+		if (osArch.startsWith("x86") || osArch.equals("i386") || osArch.equals("i586") || osArch.equals("i686")) {
 			return Arch.X86;
 		} else if (osArch.equals("ppc") || osArch.equals("PowerPC")) {
 			return Arch.PPC;
@@ -208,6 +209,7 @@ public class NativeLibraryHelper {
 		String algorithm = "SHA-1";
 		Os os = detectOs();
 		Arch arch = detectArch();
+		System.out.println(os + " " + arch);
 		
 		String dir = getNativeLibsDir(os, arch);
 		String[] libs = getLibraryNames(os);
