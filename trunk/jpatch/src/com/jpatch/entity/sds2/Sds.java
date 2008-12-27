@@ -359,7 +359,7 @@ public class Sds {
 	}
 	
 	public void subdivideFace(final int level, final Face face, final boolean subdivSurroundings) {
-//		System.out.println("subdivideFace(" + level + ", " + face + ", " + subdivSurroundings + ") called");
+		System.out.println("subdivideFace(" + level + ", " + face + ", " + subdivSurroundings + ") called");
 		
 		final Material material = subdivSurroundings ? face.getMaterial() : null;
 		
@@ -367,25 +367,23 @@ public class Sds {
 			final HalfEdge[] edges = face.getEdges();
 			final HalfEdge[] hubEdges = new HalfEdge[face.getSides()];
 			final HalfEdge[] newEdges = new HalfEdge[4];
+			final DerivedVertex[] edgePoints = new DerivedVertex[face.getSides()];
+			final DerivedVertex[] vertexPoints = new DerivedVertex[face.getSides()];
 			
-			final AbstractVertex facePoint = face.createFacePoint();
+			final AbstractVertex facePoint = face.getOrCreateFacePoint();
 			for (int i = 0; i < edges.length; i++) {
-				if (edges[i].getVertex().getVertexPoint() == null) {
-					edges[i].getVertex().createVertexPoint();
-				}
+				vertexPoints[i] = edges[i].getVertex().getOrCreateVertexPoint();
+				edgePoints[i] = edges[i].getOrCreateEdgePoint();
+				hubEdges[i] = HalfEdge.getOrCreate(facePoint, edgePoints[i]);
 			}
-			for (int i = 0; i < edges.length; i++) {
-				DerivedVertex edgePoint = edges[i].getEdgePoint();
-				if (edgePoint == null) {
-					edgePoint = edges[i].createEdgePoint();
-				}
-				hubEdges[i] = HalfEdge.getOrCreate(facePoint, edgePoint);
-			}
+			
 			for (int i = 0; i < edges.length; i++) {
 				int j = (i == edges.length - 1) ? 0 : i + 1;
 				newEdges[0] = hubEdges[i];
-				newEdges[1] = edges[i].getPair().getSubEdge().getPair();
-				newEdges[2] = edges[j].getSubEdge();
+//				newEdges[1] = edges[i].getPair().getSubEdge().getPair();
+				newEdges[1] = HalfEdge.getOrCreate(edgePoints[i], vertexPoints[j]);
+//				newEdges[2] = edges[j].getSubEdge();
+				newEdges[2] = HalfEdge.getOrCreate(vertexPoints[j], edgePoints[j]);
 				newEdges[3] = hubEdges[j].getPair();
 
 				final Face subFace = faceSets[level + 1].getFace(newEdges);
@@ -397,9 +395,11 @@ public class Sds {
 //				AbstractVertex v2 = edges[i].getVertex().getVertexPoint();
 //				AbstractVertex v3 = edges[i].getEdgePoint();
 //				createFace(level + 1, face, i, face.getMaterial(), v0, v1, v2, v3);
+				face.setSubdivided(true);
 			}
 		} else {
 			for (HalfEdge edge : face.getFacePoint().getEdges()) {
+				assert edge.getFace() != null : edge + ".face == null";
 				faceSets[level + 1].setMaterial(edge.getFace(), material);
 			}
 		}
@@ -559,6 +559,9 @@ public class Sds {
 		return faceVertices[level];
 	}
 	
+	public Iterable<? extends AbstractVertex> getAllVertices() {
+		return new CompositIterable(faceVertices[0], strayVertices);
+	}
 	
 	
 	@SuppressWarnings("unchecked")
@@ -1086,9 +1089,9 @@ public class Sds {
 		}
 		
 		void add() {
-			final HalfEdge halfEdge = HalfEdge.getOrCreate(v0, v1);
+			final HalfEdge halfEdge = HalfEdge.getOrCreate(v0, v1).getPrimary();
 			strayEdges.add(halfEdge);
-			strayEdges.add(halfEdge.getPair());
+//			strayEdges.add(halfEdge.getPair());
 //			strayVertices.add((BaseVertex) halfEdge.getVertex());
 //			strayVertices.add((BaseVertex) halfEdge.getPairVertex());
 //			edgeKey.set(halfEdge.getVertex(), halfEdge.getPairVertex());
@@ -1098,7 +1101,7 @@ public class Sds {
 		void remove() {
 			final HalfEdge halfEdge = HalfEdge.getOrCreate(v0, v1);
 			strayEdges.remove(halfEdge);
-			strayEdges.remove(halfEdge.getPair());
+//			strayEdges.remove(halfEdge.getPair());
 //			edgeKey.set(halfEdge.getVertex(), halfEdge.getPairVertex());
 //			edgeMap.remove(edgeKey);
 //			edgeKey.swap();
@@ -1222,7 +1225,7 @@ public class Sds {
 		
 		void add() {
 //			assert !faceSets[0].contains(face) : "Face " + face + " has already been added to " + Sds.this;
-			face = sds.createFace(material, vertices);
+			face = sds.getOrCreateFace(vertices);
 		}
 		
 		void remove() {

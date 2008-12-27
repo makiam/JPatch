@@ -299,11 +299,11 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 		}
 		
 		/* if we don't want faces, select just the edges */
-		if (selectionType == Selection.Type.FACES && selectionFilter.contains(Sds.Type.FACE)) {
+		if (selectionType == Selection.Type.FACES && !selectionFilter.contains(Sds.Type.FACE)) {
 			selectionType = Selection.Type.EDGES;
 		}
 		/* if we don't want edges, select just the vertices */
-		if (selectionType == Selection.Type.EDGES && (selectionFilter.contains(Sds.Type.EDGE) | selectionFilter.contains(Sds.Type.STRAY_EDGE) | selectionFilter.contains(Sds.Type.BOUNDARY_EDGE))) {
+		if (selectionType == Selection.Type.EDGES && !selectionFilter.contains(Sds.Type.EDGE) && !selectionFilter.contains(Sds.Type.STRAY_EDGE) && !selectionFilter.contains(Sds.Type.BOUNDARY_EDGE)) {
 			selectionType = Selection.Type.VERTICES;
 		}
 		

@@ -105,7 +105,7 @@ public class TweakTool extends AbstractBasicTool {
 	//				Main.getInstance().syncRepaintViewport(viewport);
 				}
 				if (hitEdge != null) {
-					HitEdge otherEdge = (HitEdge) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 100, hitSelection.getSdsModel(), 0, Sds.Type.BOUNDARY_EDGE, hitEdgeFilter);
+					HitEdge otherEdge = (HitEdge) MouseSelector.getObjectAt(viewport, e.getX(), e.getY(), 100, hitSelection.getSdsModel(), 0, EnumSet.of(Sds.Type.BOUNDARY_EDGE), hitEdgeFilter);
 					if (otherEdge != null) {
 						HalfEdge source = hitEdge;
 						HalfEdge target = otherEdge.halfEdge;

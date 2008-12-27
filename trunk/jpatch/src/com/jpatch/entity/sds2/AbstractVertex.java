@@ -10,7 +10,7 @@ import com.jpatch.entity.*;
 
 import javax.vecmath.*;
 
-public abstract class AbstractVertex {
+public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 	static enum BoundaryType { REGULAR, BOUNDARY, IRREGULAR }
 	
 	
@@ -36,16 +36,16 @@ public abstract class AbstractVertex {
 //	final Vector3d transformedDisplacementVector = new Vector3d();
 	
 	HalfEdge[] vertexEdges = new HalfEdge[0];
-	HalfEdge preferredStart;
 	
 	private DerivedVertex vertexPoint;
-	private BoundaryType boundaryType;
+	BoundaryType boundaryType;
 	
 	boolean worldPositionValid;
 //	boolean displacedPositionValid;
 	
 	boolean worldLimitValid;
 //	boolean displacedLimitValid;
+	
 	
 //	private boolean invDisplacementMatrixValid;
 	double sharpnessValue;
@@ -156,7 +156,7 @@ public abstract class AbstractVertex {
 	public final DerivedVertex createVertexPoint() {
 		assert vertexPoint == null;
 		vertexPoint = new DerivedVertex(sds) {
-			
+		
 			@Override
 			public double getCornerSharpness() {
 				AbstractVertex parentVertex = AbstractVertex.this;
@@ -227,9 +227,34 @@ public abstract class AbstractVertex {
 					worldPositionValid = true;
 				}
 			}
+			
+//			@Override
+//			void organizeEdges() {
+//				AbstractVertex.this.organizeEdges();
+//				final HalfEdge[] parentEdges = AbstractVertex.this.vertexEdges;
+//				if (vertexEdges.length == parentEdges.length) {
+//					for (int i = 0; i < parentEdges.length; i++) {
+//						vertexEdges[i] = HalfEdge.getOrCreate(this, parentEdges[i].getOrCreateEdgePoint());
+//					}
+//					boundaryType = AbstractVertex.this.boundaryType;
+//				} else {
+//					boundaryType = BoundaryType.IRREGULAR;
+//				}
+//			}
 		};
 		vertexPoint.vertexId = new VertexId.VertexPointId(vertexId);
+		createVertexPointEdges();
 		return vertexPoint;
+	}
+	
+	void createVertexPointEdges() {
+		if (vertexPoint.vertexEdges == null || vertexPoint.vertexEdges.length != vertexEdges.length) {
+			vertexPoint.vertexEdges = new HalfEdge[vertexEdges.length];
+		}
+		for (int i = 0; i < vertexEdges.length; i++) {
+			vertexPoint.vertexEdges[i] = HalfEdge.getOrCreate(vertexPoint, vertexEdges[i].getOrCreateEdgePoint());
+		}
+		vertexPoint.boundaryType = boundaryType;
 	}
 	
 	public final double getLimitFactor() {
@@ -583,6 +608,10 @@ public abstract class AbstractVertex {
 		invalidate();
 	}
 	
+//	public void invalidateEdgeOrder() {
+//		edgeOrderValid = false;
+//	}
+	
 	final void invalidate() {
 		if (worldPositionValid) {
 			worldPositionValid = false;
@@ -601,40 +630,7 @@ public abstract class AbstractVertex {
 		}
 	}
 	
-	/**
-	 * Adds the specified HalfEdge to this vertex
-	 * asserts that edge.getVertex() == this vertex
-	 */
-	final void addEdge(HalfEdge edge) {
-		assert edge.getVertex() == this : "edge.vertex=" + edge.getVertex() + ", must be this vertex (" + this + ")";
-		HalfEdge[] tmp = new HalfEdge[vertexEdges.length + 1];
-		System.arraycopy(vertexEdges, 0, tmp, 0, vertexEdges.length);
-		tmp[vertexEdges.length] = edge;
-		vertexEdges = tmp;
-	}
 	
-	/**
-	 * Removes the specified HalfEdge from this vertex
-	 * @throws ArrayIndexOutOfBoundsException if the specified HalfEdge is not adjacent to this Vertex
-	 */
-	final void removeEdge(HalfEdge edge) {
-		boolean debug = false;
-		if (debug) System.out.println("removing edge " + edge + " from vertex " + this);
-		if (debug) System.out.print("    edges are:");
-		if (debug) for (HalfEdge e : vertexEdges) System.out.print(" " + e);
-		if (debug) System.out.println();
-		int i = 0;
-		while (vertexEdges[i] != edge) {	// throws ArrayIndexOutOfBoundsException if edge is not part of edges
-			i++;
-		}
-		final HalfEdge[] tmp = new HalfEdge[vertexEdges.length - 1];
-		System.arraycopy(vertexEdges, 0, tmp, 0, i);
-		System.arraycopy(vertexEdges, i + 1, tmp, i, tmp.length - i);
-		vertexEdges = tmp;
-		if (debug) System.out.print("    edges are:");
-		if (debug) for (HalfEdge e : vertexEdges) System.out.print(" " + e);
-		if (debug) System.out.println();
-	}
 	
 	final void saveEdges(List<JPatchUndoableEdit> editList) {
 		JPatchUndoableEdit edit = new SaveEdgesEdit();
@@ -672,70 +668,7 @@ public abstract class AbstractVertex {
 			for (HalfEdge e : vertexEdges) System.out.print(e + " ");
 		}
 	}
-	/**
-	 * This method must be called whenever a face adjacent to this vertex was created or destroyed.
-	 * It will sort the edge-array, depending on the type of this vertex:
-	 * <ul>
-	 * <li>Regular: edge[n + 1].getPrev().getPair() == edge[n]. If possible, old start-edge is used.</li>
-	 * <li>Boundary: edge[n + 1].getPrev().getPair() == edge[n] for all but the last edge
-	 * <li>Irregular: No particular order
-	 * </ul>
-	 * TODO: preferredStart method will not work properly with undo/redo
-	 */
-	final void organizeEdges() {
-		boolean debug = false;
-		if (debug) System.out.println(this + " organizeEdges() called...");
-		
-		if (debug) System.out.print("    edges are:");
-		if (debug) for (HalfEdge e : vertexEdges) System.out.print(" " + e);
-		if (debug) System.out.println();
-		
-		if (vertexEdges.length == 0) {
-			return;
-		}
-		HalfEdge[] tmp = vertexEdges.clone();
-		HalfEdge e = tmp[0];
-		while(e.getPair().getNext() != null && e.getPair().getNext() != tmp[0]) {
-			e = e.getPair().getNext();
-		}
-		
-		if (e.getPair().getNext() != null) {
-			boundaryType = BoundaryType.REGULAR;	// regular vertex
-			// check if edges contains preferredStart and, if yes, use it as start-edge. Else set preferredStart to current start-edge
-			for (int i = 0; i < tmp.length; i++) {
-				if (tmp[i] == preferredStart) {
-					e = preferredStart;
-					break;
-				}
-			}
-			preferredStart = e;
-		} else {
-			boundaryType = BoundaryType.BOUNDARY;	// regular boundary vertex (corner)
-		}
-		
-		
-		
-		for (int i = 0; i < vertexEdges.length; i++) {
-			if (i < vertexEdges.length - 1 && e.getPrev() == null) {
-				System.arraycopy(tmp, 0, vertexEdges, 0, vertexEdges.length);
-				boundaryType = BoundaryType.IRREGULAR; // irregular boundary vertex, crease edges are edges[0] and edges[edges.length - 1]
-				break;
-			}
-			vertexEdges[i] = e;
-			if (i < vertexEdges.length - 1) {
-				e = e.getPrev().getPair();
-			}
-		}
-		
-		if (debug) System.out.print("    edges are:");
-		if (debug) for (HalfEdge ed : vertexEdges) System.out.print(" " + ed);
-		if (debug) System.out.println();
-		if (debug) System.out.println("    boundaryType = " + boundaryType);
-		
-		worldPositionValid = true;
-		invalidate();
-//		System.out.println(this + " boundaryType = " + boundaryType);
-	}
+	
 	
 	void flip() {
 		HalfEdge[] tmp = vertexEdges.clone();
@@ -779,6 +712,12 @@ public abstract class AbstractVertex {
 	public String toString() {
 		return vertexId.toString();
 	}
+	
+	public int compareTo(AbstractVertex other) {
+		return vertexId.compareTo(other.vertexId);
+	}
+
+	
 	
 	@TestSuit
 	public static class Tests {

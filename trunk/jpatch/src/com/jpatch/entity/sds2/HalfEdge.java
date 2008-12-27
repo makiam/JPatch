@@ -4,12 +4,13 @@ import static com.jpatch.entity.sds2.SdsWeights.*;
 
 import java.util.*;
 
+import com.jpatch.afw.*;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
 
 import javax.vecmath.*;
 
-public class HalfEdge {
+public class HalfEdge implements Comparable<HalfEdge>{
 	private static enum BoundaryType { REGULAR, BOUNDARY, STRAY }
 	
 	private final AbstractVertex vertex;
@@ -18,18 +19,25 @@ public class HalfEdge {
 	
 //	private HalfEdge next;
 //	private HalfEdge prev;
-	private HalfEdge subEdge;
+//	private HalfEdge subEdge;
 	private Face face;
 	int faceEdgeIndex;
 	private BoundaryType boundaryType = BoundaryType.STRAY;
 	private DerivedVertex edgePoint;
 	
 	public static HalfEdge getOrCreate(AbstractVertex v0, AbstractVertex v1) {
+		System.out.println("**getOrCreateEdge(" + v0 + ", " + v1 + ")");
 		for (HalfEdge edge : v0.getEdges()) {
-			if (edge.getPairVertex() == v1) {
+			if (edge != null && edge.pair.vertex == v1) {
 				return edge;
 			}
 		}
+		for (HalfEdge edge : v1.getEdges()) {
+			if (edge != null && edge.pair.vertex == v0) {
+				return edge.pair;
+			}
+		}
+		System.out.println("***new");
 		return new HalfEdge(v0, v1);
 	}
 	
@@ -38,14 +46,17 @@ public class HalfEdge {
 		this.vertex = v0;
 		this.pair = new HalfEdge(v1, this);
 		this.primary = true;
-		v0.addEdge(this);
+		if (v0 instanceof BaseVertex || v1 instanceof BaseVertex) {
+			assert v0 instanceof BaseVertex && v1 instanceof BaseVertex;
+			((BaseVertex) v0).addEdge(this);
+			((BaseVertex) v1).addEdge(pair);
+		}
 	}
 	
 	private HalfEdge(AbstractVertex v, HalfEdge pair) {
 		this.vertex = v;
 		this.pair = pair;
 		this.primary = false;
-		v.addEdge(this);
 	}
 	
 //	public void dispose() {
@@ -105,6 +116,7 @@ public class HalfEdge {
 	}
 	
 	public void setFace(Face face) {
+		System.out.println(this + ".setFace(" + face + ")");
 		assert (this.face == null && face != null) || (this.face != null && face == null) : this + ".face=" + this.face + ", face=" + face + ", exactly one must be null";
 		this.face = face;
 		if (face != null && pair.face != null) {
@@ -113,6 +125,12 @@ public class HalfEdge {
 			boundaryType = pair.boundaryType = BoundaryType.STRAY;
 		} else {
 			boundaryType = pair.boundaryType = BoundaryType.BOUNDARY;
+		}
+		if (edgePoint != null) {
+			createEdgePointEdges();
+		}
+		if (vertex.getVertexPoint() != null) {
+			vertex.createVertexPointEdges();
 		}
 //		if (face == null) {
 //			assert next != null;
@@ -163,55 +181,100 @@ public class HalfEdge {
 	
 	public void disposeEdgePoint() {
 		edgePoint = null;
-		subEdge = null;
-		pair.subEdge = null;
+//		subEdge = null;
+//		pair.subEdge = null;
 	}
 	
 	public DerivedVertex createEdgePoint() {
 		assert edgePoint == null;
-		assert subEdge == null;
-		assert pair.subEdge == null;
+//		assert subEdge == null;
+//		assert pair.subEdge == null;
 		
 		Sds sds = vertex.sds;
 		edgePoint = new DerivedVertex(sds) {
 
 			@Override
 			protected void validateWorldPosition() {
-				vertex.validateDisplacedPosition();
-				pair.vertex.validateDisplacedPosition();
-				Point3d e0 = vertex.getPos();
-				Point3d e1 = pair.vertex.getPos();
-				switch (boundaryType) {
-				case REGULAR:
-					face.getFacePoint().validateWorldPosition();
-					Point3d f0 = face.getFacePoint().worldPosition;
-					pair.face.getFacePoint().validateWorldPosition();
-					Point3d f1 = pair.face.getFacePoint().worldPosition;
-					worldPosition.set(
-							(e0.x + e1.x + f0.x + f1.x) * 0.25,
-							(e0.y + e1.y + f0.y + f1.y) * 0.25,
-							(e0.z + e1.z + f0.z + f1.z) * 0.25
-					);
-					break;
-				case BOUNDARY:
-					worldPosition.set(
-							(e0.x + e1.x) * 0.5,
-							(e0.y + e1.y) * 0.5,
-							(e0.z + e1.z) * 0.5
-					);
-					break;
-				default:
-					assert false;	// should never get here
-				}			
+				if (!worldPositionValid) {
+					vertex.validateDisplacedPosition();
+					pair.vertex.validateDisplacedPosition();
+					Point3d e0 = vertex.getPos();
+					Point3d e1 = pair.vertex.getPos();
+					switch (boundaryType) {
+					case REGULAR:
+						face.getFacePoint().validateWorldPosition();
+						Point3d f0 = face.getFacePoint().worldPosition;
+						pair.face.getFacePoint().validateWorldPosition();
+						Point3d f1 = pair.face.getFacePoint().worldPosition;
+						worldPosition.set(
+								(e0.x + e1.x + f0.x + f1.x) * 0.25,
+								(e0.y + e1.y + f0.y + f1.y) * 0.25,
+								(e0.z + e1.z + f0.z + f1.z) * 0.25
+						);
+						break;
+					case BOUNDARY:
+						worldPosition.set(
+								(e0.x + e1.x) * 0.5,
+								(e0.y + e1.y) * 0.5,
+								(e0.z + e1.z) * 0.5
+						);
+						break;
+					default:
+						assert false;	// should never get here
+					}
+					worldPositionValid = true;
+				}
 			}
 		};
 		pair.edgePoint = edgePoint;
 		
-		subEdge = new HalfEdge(vertex.getVertexPoint(), edgePoint);
-		pair.subEdge = new HalfEdge(pair.vertex.getVertexPoint(), edgePoint);
+//		subEdge = new HalfEdge(vertex.getVertexPoint(), edgePoint);
+//		pair.subEdge = new HalfEdge(pair.vertex.getVertexPoint(), edgePoint);
 		
 		edgePoint.vertexId = new VertexId.EdgePointId(vertex.vertexId, pair.vertex.vertexId);
+		createEdgePointEdges();
 		return edgePoint;
+	}
+	
+	private void createEdgePointEdges() {
+		if (face != null) {
+			if (pair.face != null) {
+				/* REGULAR */
+				edgePoint.boundaryType = AbstractVertex.BoundaryType.REGULAR;
+				edgePoint.vertexEdges = new HalfEdge[] {
+					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint()),
+					HalfEdge.getOrCreate(edgePoint, face.getOrCreateFacePoint()),
+					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint()),
+					HalfEdge.getOrCreate(edgePoint, pair.face.getOrCreateFacePoint())
+				};
+				Utils.cycleToFront(edgePoint.vertexEdges);
+			} else {
+				/* BOUNDARY (right side) */
+				edgePoint.boundaryType = AbstractVertex.BoundaryType.BOUNDARY;
+				edgePoint.vertexEdges = new HalfEdge[] {
+					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint()),
+					HalfEdge.getOrCreate(edgePoint, face.getOrCreateFacePoint()),
+					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint())
+				};
+			}
+		} else {
+			if (pair.face != null) {
+				/* BOUNDARY (left side) */
+				edgePoint.boundaryType = AbstractVertex.BoundaryType.BOUNDARY;
+				edgePoint.vertexEdges = new HalfEdge[] {
+					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint()),
+					HalfEdge.getOrCreate(edgePoint, pair.face.getOrCreateFacePoint()),
+					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint())
+				};
+			} else {
+				/* STRAY EDGE */
+				edgePoint.vertexEdges = new HalfEdge[] {
+					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint()),
+					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint())
+				};
+				Utils.cycleToFront(edgePoint.vertexEdges);
+			}
+		}
 	}
 	
 	public DerivedVertex getEdgePoint() {
@@ -222,9 +285,9 @@ public class HalfEdge {
 		return edgePoint != null ? edgePoint : createEdgePoint();
 	}
 	
-	public HalfEdge getSubEdge() {
-		return subEdge;
-	}
+//	public HalfEdge getSubEdge() {
+//		return subEdge;
+//	}
 	
 	public String toString() {
 		return "e" + vertex + "-" + pair.vertex;// + "(" + (face == null ? "null" : (face.id + ":" + faceEdgeIndex)) + "){" + boundaryType + "}[" + isPrimary() + "]";
@@ -341,5 +404,9 @@ public class HalfEdge {
 		}
 		HalfEdge e = (HalfEdge) o;
 		return vertex == e.vertex && pair.vertex == e.pair.vertex;
+	}
+
+	public int compareTo(HalfEdge other) {
+		return pair.vertex.vertexId.compareTo(other.pair.vertex.vertexId);
 	}
 }

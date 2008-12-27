@@ -4,6 +4,7 @@ import java.nio.*;
 import java.util.*;
 
 import com.jpatch.entity.*;
+import com.jpatch.entity.sds2.AbstractVertex.*;
 import com.sun.opengl.util.*;
 
 import javax.vecmath.*;
@@ -31,6 +32,8 @@ public class Face {
 	private final FloatBuffer limitSurfaceBuffer;
 	private final FloatBuffer controlSurfaceBuffer;
 
+	private boolean subdivided;
+	
 	public Face(Material material, HalfEdge[] edges) {
 
 //		System.out.println("Face constructor called for edges " + Arrays.toString(edges));
@@ -54,14 +57,9 @@ public class Face {
 //		controlSurfaceBuffer = BufferUtil.newFloatBuffer((sides + 2) * 2 * 3);
 		controlSurfaceBuffer = FloatBuffer.allocate((sides + 2) * 2 * 3);
 		
-		// append edges and set their face to this
-		int prev = sides - 1;
-		for (int i = 0; i < sides; i++) {
-			this.faceEdges[i].setFace(this);
-//			this.faceEdges[i].appendTo(this.faceEdges[prev++]);
-			if (prev == sides) {
-				prev = 0;
-			}
+		// set edge faces to this
+		for (HalfEdge edge : faceEdges) {
+			edge.setFace(this);
 		}
 		
 		this.material = material;
@@ -69,9 +67,13 @@ public class Face {
 			edges[i].faceEdgeIndex = i;
 		}
 		
-		for (int i = 0; i < sides; i++) {
-			this.faceEdges[i].getVertex().organizeEdges();
+		if (this.faceEdges[0].getVertex() instanceof BaseVertex) {
+			// level 0 face
+			for (int i = 0; i < sides; i++) {
+				((BaseVertex) this.faceEdges[i].getVertex()).organizeEdges();
+			}
 		}
+		
 //		System.out.println("new face is " + this);
 	}
 	
@@ -112,15 +114,19 @@ public class Face {
 	}
 	
 	public boolean isSubdivided() {
-		return facePoint != null;
+		return subdivided;
 	}
 
+	public void setSubdivided(boolean subdivided) {
+		this.subdivided = subdivided;
+	}
+	
 	public boolean isDrawable() {
 		if (material == null) {
 			return false;
 		}
 		if (facePoint != null) {
-			if (facePoint.getEdges()[0].getFace().getMaterial() != null) {
+			if (subdivided && facePoint.getEdges()[0].getFace().getMaterial() != null) {
 				return false;
 			}
 		}
@@ -382,6 +388,13 @@ public class Face {
 		};
 		
 		facePoint.vertexId = new VertexId.FacePointId(faceEdges[0].getVertex().vertexId, faceEdges[1].getVertex().vertexId);
+		
+		/* create facePoint edges */
+		facePoint.vertexEdges = new HalfEdge[faceEdges.length];
+		for (int i = 0; i < faceEdges.length; i++) {
+			facePoint.vertexEdges[i] = HalfEdge.getOrCreate(facePoint, faceEdges[i].getOrCreateEdgePoint());
+		}
+		facePoint.boundaryType = BoundaryType.REGULAR;
 		return facePoint;
 	}
 	
