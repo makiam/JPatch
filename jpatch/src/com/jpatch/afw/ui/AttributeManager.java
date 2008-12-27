@@ -465,6 +465,46 @@ public class AttributeManager {
 		}
 	}
 	
+	public void bindComboBoxToAttribute(final Object entity, final JComboBox comboBox, final IntAttr intAttr) {
+		final CollectionAttr<Integer> possibleValues = new CollectionAttr<Integer>(LinkedHashSet.class);
+		final IntAttr minimum = getLowerLimit(intAttr);
+		final IntAttr maximum = getUpperLimit(intAttr);
+		final AttributePostChangeListener rangeChangeLisener = new AttributePostChangeListener() {
+			public void attributeHasChanged(Attribute source) {
+				HashSet<Integer> newRange = new LinkedHashSet<Integer>();
+				for (int i = minimum.getInt(); i <= maximum.getInt(); i++) {
+					newRange.add(i);
+				}
+				possibleValues.setTo(newRange);
+			}
+		};
+		AttributeBinding minBinding = new AttributeBinding(minimum, rangeChangeLisener);
+		AttributeBinding maxBinding = new AttributeBinding(maximum, rangeChangeLisener);
+		rangeChangeLisener.attributeHasChanged(null);
+		final StateMachine<Integer> stateMachine = new StateMachine<Integer>(possibleValues, intAttr.getInt());
+
+		AttributePostChangeListener stateListener = new AttributePostChangeListener() {
+			private boolean suppressAction = false;
+			
+			public void attributeHasChanged(Attribute source) {
+				if (!suppressAction) {
+					suppressAction = true;
+					if (source == stateMachine) {
+						intAttr.setInt(stateMachine.getValue());
+					} else if (source == intAttr) {
+						stateMachine.setValue(intAttr.getInt());
+					}
+					suppressAction = false;
+				}
+			}
+		};
+		
+		AttributeBinding stateBinding = new AttributeBinding(stateMachine, stateListener);
+		AttributeBinding intBinding = new AttributeBinding(intAttr, stateListener);
+		
+		bindComboBoxToAttribute(entity, comboBox, stateMachine, minBinding, maxBinding, stateBinding, intBinding);
+	}
+	
 	public void bindSliderToAttribute(final Object entity, final JSlider slider, final IntAttr intAttr) {
 		final IntAttr minimum = getLowerLimit(intAttr);
 		final IntAttr maximum = getUpperLimit(intAttr);
@@ -513,7 +553,7 @@ public class AttributeManager {
 		addListener(slider, listener);
 	}
 	
-	public JComboBox bindComboBoxToAttribute(final Object entity, final JComboBox comboBox, final StateMachine stateMachine) {
+	public JComboBox bindComboBoxToAttribute(final Object entity, final JComboBox comboBox, final StateMachine stateMachine, final AttributeBinding... additionalBindings) {
 		class SuperListener implements ActionListener, AttributePostChangeListener {
 			private boolean suppressAction = false;
 			
@@ -546,7 +586,11 @@ public class AttributeManager {
 		
 		SuperListener listener = new SuperListener();
 		
-		bind(comboBox, new AttributeBinding(stateMachine, listener), new AttributeBinding(stateMachine.getStatesAttribute(), listener));
+		AttributeBinding[] bindings = new AttributeBinding[2 + additionalBindings.length];
+		bindings[0] = new AttributeBinding(stateMachine, listener);
+		bindings[1] = new AttributeBinding(stateMachine.getStatesAttribute(), listener);
+		System.arraycopy(additionalBindings, 0, bindings, 2, additionalBindings.length);
+		bind(comboBox, bindings);
 		
 		/* stimulate stateSetListener to update state-list in comboBox */
 //		stateSetListener.attributeHasChanged(stateMachine.getStateSet());

@@ -680,7 +680,7 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 	public Face getPrimaryFace() {
 		for (HalfEdge edge : vertexEdges) {
 			Face face = edge.getFace();
-			if (face != null) {
+			if (face != null && face.getMaterial() != null) {
 				return face;
 			}
 		}

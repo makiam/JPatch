@@ -177,7 +177,7 @@ public class Viewport implements NamedObject {
 				int level = selection.getSdsModel().getEditLevelAttribute().getInt();
 				if (selection.getType() == Selection.Type.FACES) {
 					for (Face face : selection.getFaces()) {
-						selection.getSdsModel().getSds().subdivideFace(level, face, true);
+						selection.getSdsModel().getSds().subdivideFace(level, face, Face.SubdivStatus.USER_SUBDIVIDED);
 					}
 				}
 				System.out.println(Main.getInstance().getSelection());

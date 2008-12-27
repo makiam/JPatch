@@ -54,6 +54,7 @@ public class JPatchForm {
 			if (c instanceof JTextField) {
 				c.setPreferredSize(new Dimension(20, 18));
 			}
+			c.setToolTipText(label.getToolTipText());
 			row.add(c);
 		}
 		component.add(row);

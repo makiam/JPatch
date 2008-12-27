@@ -9,6 +9,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import javax.swing.*;
+
 import jpatch.boundary.AbstractAttributeEditor.Item;
 import jpatch.boundary.AbstractAttributeEditor.Type;
 import org.xml.sax.*;
@@ -112,7 +114,9 @@ public class AttributeEditorFactory {
 				}
 				editor.startContainer(attributes.getValue("name"), expansionControl);
 			} else if (localName.equals("field")) {
-				editor.addField(attributes.getValue("name"), attributes.getValue("attribute"));
+				JLabel label = new JLabel(attributes.getValue("name"));
+				label.setToolTipText(attributes.getValue("tooltip"));
+				editor.addField(label, attributes.getValue("attribute"));
 			} else if (localName.equals("limits")) {
 				editor.addLimits(attributes.getValue("attribute"));
 			} else if (localName.equals("slider")) {
@@ -122,7 +126,13 @@ public class AttributeEditorFactory {
 				} else {
 					editor.setMapping(IdentityMapping.getInstance());
 				}
-				editor.addSlider(attributes.getValue("name"), attributes.getValue("attribute"));
+				JLabel label = new JLabel(attributes.getValue("name"));
+				label.setToolTipText(attributes.getValue("tooltip"));
+				editor.addSlider(label, attributes.getValue("attribute"));
+			} else if (localName.equals("combo")) {
+				JLabel label = new JLabel(attributes.getValue("name"));
+				label.setToolTipText(attributes.getValue("tooltip"));
+				editor.addCombo(label, attributes.getValue("attribute"));
 			}
 		}
 		

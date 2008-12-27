@@ -216,33 +216,33 @@ public class StateMachine<T> extends GenericAttr<T> {
 	}
 
 
-	/**
-	 * Removes <i>state</i> from the list of possible states.
-	 * If the state to be removed is the current state, this StateMachine will try to switch to another state. It first tries to switch
-	 * to the default state if the revertToDefault flag is set. If the revertToDefault flag is not set or it can't switch to the default
-	 * state, it tries to switch to any other state, starting with the first state
-	 * in the list of possible states. If it can't switch to any other state, an IllegalStateException is thrown.
-	 * @param state the state to remove
-	 * @throws IllegalStateException if the state to be removed is the current state and this StateMachine is unable to switch to any other state
-	 */
-	public final void removeState(T state) {
-		if (state == value) {
-			if (!revertToDefault()) {
-				for (T s : statesAttr.getElements()) {
-					if (s == state) {
-						continue;
-					}
-					if (setValue(s) == s) {
-						break;
-					}
-				}
-			}
-			if (state == value) {
-				throw new IllegalStateException("can't remove state " + state + " - unable to switch state");
-			}
-		}
-		statesAttr.remove(state);
-	}
+//	/**
+//	 * Removes <i>state</i> from the list of possible states.
+//	 * If the state to be removed is the current state, this StateMachine will try to switch to another state. It first tries to switch
+//	 * to the default state if the revertToDefault flag is set. If the revertToDefault flag is not set or it can't switch to the default
+//	 * state, it tries to switch to any other state, starting with the first state
+//	 * in the list of possible states. If it can't switch to any other state, an IllegalStateException is thrown.
+//	 * @param state the state to remove
+//	 * @throws IllegalStateException if the state to be removed is the current state and this StateMachine is unable to switch to any other state
+//	 */
+//	public final void removeState(T state) {
+//		if (state == value) {
+//			if (!revertToDefault()) {
+//				for (T s : statesAttr.getElements()) {
+//					if (s == state) {
+//						continue;
+//					}
+//					if (setValue(s) == s) {
+//						break;
+//					}
+//				}
+//			}
+//			if (state == value) {
+//				throw new IllegalStateException("can't remove state " + state + " - unable to switch state");
+//			}
+//		}
+//		statesAttr.remove(state);
+//	}
 
 	/**
 	 * If the revertToDefault flag is set, this method will try to switch the state to the default state and returns the result

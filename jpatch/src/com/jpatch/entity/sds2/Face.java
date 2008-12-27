@@ -10,10 +10,9 @@ import com.sun.opengl.util.*;
 import javax.vecmath.*;
 
 public class Face {
-	private static int count;
+	public static enum SubdivStatus { NOT_SUBDIVIDED, BOUNDARY, AUTO_SUBDIVIDED, USER_SUBDIVIDED }
 	private final HalfEdge[] faceEdges;
 	
-//	private Face[] subFaces;
 	private final double oneOverSides;
 	private DerivedVertex facePoint;
 	private Material material;
@@ -32,7 +31,7 @@ public class Face {
 	private final FloatBuffer limitSurfaceBuffer;
 	private final FloatBuffer controlSurfaceBuffer;
 
-	private boolean subdivided;
+	private SubdivStatus subdivStatus = SubdivStatus.NOT_SUBDIVIDED;
 	
 	public Face(Material material, HalfEdge[] edges) {
 
@@ -57,14 +56,9 @@ public class Face {
 //		controlSurfaceBuffer = BufferUtil.newFloatBuffer((sides + 2) * 2 * 3);
 		controlSurfaceBuffer = FloatBuffer.allocate((sides + 2) * 2 * 3);
 		
-		// set edge faces to this
-		for (HalfEdge edge : faceEdges) {
-			edge.setFace(this);
-		}
-		
 		this.material = material;
 		for (int i = 0; i < edges.length; i++) {
-			edges[i].faceEdgeIndex = i;
+			edges[i].setFace(this, i);
 		}
 		
 		if (this.faceEdges[0].getVertex() instanceof BaseVertex) {
@@ -113,24 +107,27 @@ public class Face {
 		this.material = material;
 	}
 	
-	public boolean isSubdivided() {
-		return subdivided;
+	public SubdivStatus getSubdivStatus() {
+		return subdivStatus;
 	}
 
-	public void setSubdivided(boolean subdivided) {
-		this.subdivided = subdivided;
+	void setSubdivStatus(SubdivStatus subdivStatus) {
+//		assert subdivStatus == SubdivStatus.NOT_SUBDIVIDED || facePoint != null;
+		this.subdivStatus = subdivStatus;
 	}
 	
 	public boolean isDrawable() {
-		if (material == null) {
-			return false;
-		}
-		if (facePoint != null) {
-			if (subdivided && facePoint.getEdges()[0].getFace().getMaterial() != null) {
-				return false;
-			}
-		}
-		return true;
+//		if (material == null) {
+//			return false;
+//		}
+//		if (facePoint != null) {
+//			if (subdivided && facePoint.getEdges()[0].getFace().getMaterial() != null) {
+//				return false;
+//			}
+//		}
+//		return true;
+//		if (true) return false;
+		return material != null && (subdivStatus == SubdivStatus.NOT_SUBDIVIDED || subdivStatus == SubdivStatus.BOUNDARY);
 	}
 	
 	public void getMidpointPosition(Tuple3d midPoint) {

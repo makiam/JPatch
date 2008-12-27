@@ -1,9 +1,9 @@
 <attributeEditor name="SdsModel" class="com.jpatch.entity.SdsModel">
 	<field name="Name" attribute="Name" />
 	<group name="Subdivision">
-		<field name="Max. level" attribute="MinLevel" />
+		<combo name="Auto level" attribute="MinLevel" tooltip="The minimum subdivision level each face is automatically subdivided to"/>
 <!--	<slider name="Display level" attribute="RenderLevel" /> -->
-		<slider name="Edit level" attribute="EditLevel" />
+		<combo name="Edit level" attribute="EditLevel" />
 	</group>
 	<group name="Transform" expansion="embeddedTransform">
 		<field name="Translation" attribute="Translation" />
