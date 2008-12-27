@@ -1,5 +1,7 @@
 package com.jpatch.afw;
 
+import com.jpatch.entity.sds2.*;
+
 import java.util.*;
 
 import javax.swing.*;
@@ -124,6 +126,39 @@ public class Utils {
 		}
 	}
 	
+	public static void cyclicShift(Object[] array, int amount) {
+		amount %= array.length;
+		if (amount < 0) {
+			amount += array.length;
+		}
+		Object[] tmp = array.clone();
+		System.arraycopy(tmp, 0, array, amount, array.length - amount);
+		System.arraycopy(tmp, array.length - amount, array, 0, amount);
+	}
+	
+	public static void cycleToFront(Comparable[] array) {
+		/* find smallest index */
+		loop:
+		for (int i = 0; i < array.length; i++) {
+			for (int j = i + 1; j < array.length; j++) {
+				if (array[i].compareTo(array[j]) == 0) {
+					throw new IllegalArgumentException("array contains equal elements");
+				}
+//				System.out.println(array[i] + " vs. " + array[j] + ": " + array[i].compareTo(array[j]));
+				if (array[i].compareTo(array[j]) > 0) {
+					continue loop;
+				}
+			}
+//			System.out.println(i + ": " + array[i]);
+			// i is smallest index
+			if (i != 0) {
+				cyclicShift(array, -i);
+//				System.out.println(Arrays.toString(array));
+			}
+			return;
+		}
+	}
+	
 	public static final ListSelectionModel NULL_SELECTION_MODEL = new DefaultListSelectionModel() {
 
 		@Override
@@ -157,4 +192,22 @@ public class Utils {
 		}
 		
 	};
+	
+	public static void main(String[] args) {
+		char[] chars = "obcdefghijklmnapqrstuvwxyz".toCharArray();
+		Character[] array = new Character[chars.length];
+		for (int i = 0; i < chars.length; i++) {
+			array[i] = chars[i];
+		}
+		System.out.println(Arrays.toString(array));
+		for (int i = -50; i <= 50; i++) {
+			cyclicShift(array, i);
+			System.out.println(Arrays.toString(array));
+			cycleToFront(array);
+			System.out.println(Arrays.toString(array));
+		}
+		cycleToFront(array);
+		
+		System.out.println(Arrays.toString(array));
+	}
 }

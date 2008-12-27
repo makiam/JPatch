@@ -42,7 +42,7 @@ public abstract class VertexId implements Comparable<VertexId>{
 		
 		@Override
 		AbstractVertex getVertex() {
-			return parentVertexId.getVertex().getVertexPoint();
+			return parentVertexId.getVertex().getOrCreateVertexPoint();
 		}
 		
 		public int compareTo(VertexId other) {

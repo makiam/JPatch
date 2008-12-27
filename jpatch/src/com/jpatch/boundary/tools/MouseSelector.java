@@ -177,6 +177,12 @@ public class MouseSelector {
 		if (objectFilter == null) {
 			objectFilter = ACCEPT_ANYTHING;
 		}
+		if (level > 0) {
+			System.out.println("level=" + level + ", type=" + type);
+			type = EnumSet.copyOf(type);
+			type.retainAll(EnumSet.of(Sds.Type.VERTEX, Sds.Type.BOUNDARY_EDGE, Sds.Type.EDGE, Sds.Type.FACE, Sds.Type.LIMIT ));
+			System.out.println("type=" + type);
+		}
 		HitObject hitObject = new HitNull(initMaxDistSq);
 		viewport.getViewDef().configureTransformUtil(transformUtil);
 		sdsModel.getLocal2WorldTransform(transformUtil, LOCAL);
@@ -221,12 +227,14 @@ public class MouseSelector {
 		}
 		
 		
-		if (type.contains(Type.VERTEX) | type.contains(Type.STRAY_VERTEX) | type.contains(Type.LIMIT)) {
+		if (type.contains(Type.VERTEX) || type.contains(Type.STRAY_VERTEX) || type.contains(Type.LIMIT)) {
 			Iterable<? extends AbstractVertex> vertices;
 			if (!type.contains(Type.VERTEX) && !type.contains(Type.LIMIT)) {
 				vertices = sds.getStrayVertices();
+			} else if (type.contains(Type.STRAY_VERTEX)){
+				vertices = sds.getAllVertices();//, (type & Type.STRAY_VERTEX) != 0);
 			} else {
-				vertices = sds.getVertices(level);//, (type & Type.STRAY_VERTEX) != 0);
+				vertices = sds.getVertices(level);
 			}
 			for (AbstractVertex vertex : vertices) {
 				if (objectFilter.accept(vertex)) {
@@ -261,8 +269,10 @@ public class MouseSelector {
 			Iterable<HalfEdge> edges;
 			if (!type.contains(Type.EDGE) && !type.contains(Type.BOUNDARY_EDGE)) {
 				edges = sds.getStrayEdges();
-			} else {
+			} else if (type.contains(Type.STRAY_EDGE)){
 				edges = sds.getAllEdges();
+			} else {
+				edges = sds.getEdges(level);
 			}
 			final boolean boundaryOnly = !type.contains(Type.EDGE);
 			final boolean stray = type.contains(Type.STRAY_EDGE);
