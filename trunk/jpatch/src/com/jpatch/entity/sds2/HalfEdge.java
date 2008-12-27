@@ -25,8 +25,17 @@ public class HalfEdge implements Comparable<HalfEdge>{
 	private BoundaryType boundaryType = BoundaryType.STRAY;
 	private DerivedVertex edgePoint;
 	
+	/**
+	 * Returns a HalfEdge connecting the specified vertices. If such an edge has already been created and added to at 
+	 * least one of the specified vertices, it is returned. Otherwise a new edge is created and returned.
+	 * If the specified vertices are BaseVertices (subdiv-level 0), the edge is added to the vertices. DerivedVerticed
+	 * (subdivLevel > 0) are left untouched, as they have to keep track of their attached edges on their own.
+	 * @param v0 the first vertex
+	 * @param v1 the second vertex
+	 * @return the HalfEdge connecting the specified vertices
+	 */
 	public static HalfEdge getOrCreate(AbstractVertex v0, AbstractVertex v1) {
-		System.out.println("**getOrCreateEdge(" + v0 + ", " + v1 + ")");
+		/* search both vertices for the edge in question */
 		for (HalfEdge edge : v0.getEdges()) {
 			if (edge != null && edge.pair.vertex == v1) {
 				return edge;
@@ -37,15 +46,19 @@ public class HalfEdge implements Comparable<HalfEdge>{
 				return edge.pair;
 			}
 		}
-		System.out.println("***new");
+		/* edge not found, create a new one */
 		return new HalfEdge(v0, v1);
 	}
 	
+	/**
+	 * Constructor for creating the primary HalfEdge
+	 */
 	private HalfEdge(AbstractVertex v0, AbstractVertex v1) {
 		assert v0 != v1;
 		this.vertex = v0;
 		this.pair = new HalfEdge(v1, this);
 		this.primary = true;
+		/* when connecting BaseVertices, add the new edge using BaseVertex.addEdge() */
 		if (v0 instanceof BaseVertex || v1 instanceof BaseVertex) {
 			assert v0 instanceof BaseVertex && v1 instanceof BaseVertex;
 			((BaseVertex) v0).addEdge(this);
@@ -53,6 +66,9 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		}
 	}
 	
+	/**
+	 * Constructor for creating the secondary HalfEdge (always called from primary HalfEdge constructor)
+	 */
 	private HalfEdge(AbstractVertex v, HalfEdge pair) {
 		this.vertex = v;
 		this.pair = pair;
@@ -115,10 +131,11 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		return vertices;
 	}
 	
-	public void setFace(Face face) {
+	public void setFace(Face face, int faceEdgeIndex) {
 		System.out.println(this + ".setFace(" + face + ")");
 		assert (this.face == null && face != null) || (this.face != null && face == null) : this + ".face=" + this.face + ", face=" + face + ", exactly one must be null";
 		this.face = face;
+		this.faceEdgeIndex = faceEdgeIndex;
 		if (face != null && pair.face != null) {
 			boundaryType = pair.boundaryType = BoundaryType.REGULAR;
 		} else if (face == null && pair.face == null) {
@@ -132,12 +149,6 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		if (vertex.getVertexPoint() != null) {
 			vertex.createVertexPointEdges();
 		}
-//		if (face == null) {
-//			assert next != null;
-//			assert prev != null;
-//			next = null;
-//			prev = null;
-//		}
 	}
 	
 	public int getFaceEdgeIndex() {

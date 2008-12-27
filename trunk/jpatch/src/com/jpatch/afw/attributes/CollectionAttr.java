@@ -64,8 +64,18 @@ public class CollectionAttr<T> extends AbstractAttribute {
 	 * Clears all elements of this CollectionAttr
 	 */
 	public void clear() {
-		collection.clear();
-		fireAttributeHasChanged();
+		if (collection.size() > 0) {
+			collection.clear();
+			fireAttributeHasChanged();
+		}
+	}
+	
+	public void setTo(Collection<T> elements) {
+		if (!collection.equals(elements)) {
+			collection.clear();
+			collection.addAll(elements);
+			fireAttributeHasChanged();
+		}
 	}
 	
 	/**
@@ -73,8 +83,9 @@ public class CollectionAttr<T> extends AbstractAttribute {
 	 * @param element element to be added to this CollectionAttr
 	 */
 	public void add(T element) {
-		collection.add(element);
-		fireAttributeHasChanged();
+		if (collection.add(element)) {
+			fireAttributeHasChanged();
+		}
 	}
 	
 	/**
@@ -82,8 +93,9 @@ public class CollectionAttr<T> extends AbstractAttribute {
 	 * @param elements collection containing the elements to be added to this CollectionAttr
 	 */
 	public void addAll(Collection<T> elements) {
-		collection.addAll(elements);
-		fireAttributeHasChanged();
+		if (collection.addAll(elements)) {
+			fireAttributeHasChanged();
+		}
 	}
 	
 	/**
@@ -91,8 +103,9 @@ public class CollectionAttr<T> extends AbstractAttribute {
 	 * @param element element to be added to this CollectionAttr
 	 */
 	public void remove(T element) {
-		collection.remove(element);
-		fireAttributeHasChanged();
+		if (collection.remove(element)) {
+			fireAttributeHasChanged();
+		}
 	}
 	
 	/**
@@ -100,8 +113,9 @@ public class CollectionAttr<T> extends AbstractAttribute {
 	 * @param elements collection containing the elements to be removed to this CollectionAttr
 	 */
 	public void removeAll(Collection<T> elements) {
-		collection.removeAll(elements);
-		fireAttributeHasChanged();
+		if (collection.removeAll(elements)) {
+			fireAttributeHasChanged();
+		}
 	}
 	
 	/**
@@ -109,8 +123,9 @@ public class CollectionAttr<T> extends AbstractAttribute {
 	 * @param elements collection containing the elements to be retained in this CollectionAttr
 	 */
 	public void retainAll(Collection<T> elements) {
-		collection.retainAll(elements);
-		fireAttributeHasChanged();
+		if (collection.retainAll(elements)) {
+			fireAttributeHasChanged();
+		}
 	}
 	
 	/**

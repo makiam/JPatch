@@ -65,6 +65,7 @@ public class AttributeEditor {
 		this.trueString = trueString;
 	}
 	
+	
 	public void startContainer(String name, BooleanAttr expansionControl) {
 		JPatchFormContainer formContainer = new JPatchFormContainer(name, expansionControl);
 		form = new JPatchForm();
@@ -79,47 +80,54 @@ public class AttributeEditor {
 		containerStack.pop();
 	}
 	
-	public void addField(String label, String attributeName) {
+	public void addField(JLabel label, String attributeName) {
 		Attribute attribute = getAttribute(attributeName);
 		if (attribute instanceof Tuple3Attr) {
 			JTextField x = new JTextField();
 			JTextField y = new JTextField();
 			JTextField z = new JTextField();
-			form.addRow(new JLabel(label), x, y, z);
+			form.addRow(label, x, y, z);
 			addBinding(new ComponentBinding(getAttributeMethod(attributeName), x, y, z));
 		} else if (attribute instanceof Tuple2Attr) {
 			JTextField x = new JTextField();
 			JTextField y = new JTextField();
-			form.addRow(new JLabel(label), x, y);
+			form.addRow(label, x, y);
 			addBinding(new ComponentBinding(getAttributeMethod(attributeName), x, y));
 		} else if (attribute instanceof BooleanAttr) {
 			if (falseString == null || trueString == null) {
 				JCheckBox checkBox = new JCheckBox();
-				form.addRow(new JLabel(label), checkBox);
+				form.addRow(label, checkBox);
 				addBinding(new ComponentBinding(getAttributeMethod(attributeName), checkBox));
 			} else {
 				Switcher switcher = new Switcher(falseString, trueString);
-				form.addRow(new JLabel(label), switcher);
+				form.addRow(label, switcher);
 				addBinding(new ComponentBinding(getAttributeMethod(attributeName), switcher.asAbstractButton()));
 			}
 		} else if (attribute instanceof StateMachine) {
 			JComboBox comboBox = new JComboBox();
 			comboBox.setOpaque(false);
-			form.addRow(new JLabel(label), comboBox);
+			form.addRow(label, comboBox);
 			addBinding(new ComponentBinding(getAttributeMethod(attributeName), comboBox));
 		} else {
 			JTextField textField = new JTextField();
-			form.addRow(new JLabel(label), textField);
+			form.addRow(label, textField);
 			addBinding(new ComponentBinding(getAttributeMethod(attributeName), textField));
 		}
 	}
 	
-	public void addSlider(String label, String attributeName) {
-		JTextField textField = new JTextField();
-		JSlider slider = new JSlider();
-//		slider.setUI(new SliderUI());
-		form.addRow(new JLabel(label), textField, slider);
-		addBinding(new ComponentBinding(getAttributeMethod(attributeName), textField, slider));
+	public void addSlider(JLabel label, String attributeName) {
+		
+			JTextField textField = new JTextField();
+			JSlider slider = new JSlider();
+			form.addRow(label, textField, slider);
+			addBinding(new ComponentBinding(getAttributeMethod(attributeName), textField, slider));
+		
+	}
+	
+	public void addCombo(JLabel label, String attributeName) {
+			JComboBox comboBox = new JComboBox();
+			form.addRow(label, comboBox);
+			addBinding(new ComponentBinding(getAttributeMethod(attributeName), comboBox));
 	}
 	
 	public void addLimits(String attributeName) {
@@ -150,7 +158,7 @@ public class AttributeEditor {
 		}
 		form.addRow(new JLabel("MAXIMUM"), textFields[0], textFields[2], textFields[4]);
 		form.addRow(new JLabel("SET/CLR"), boxes[0], boxes[2], boxes[4]);
-		addField("Current", attributeName);
+		addField(new JLabel("Current"), attributeName);
 		form.addRow(new JLabel("SET/CLR"), boxes[1], boxes[3], boxes[5]);
 		form.addRow(new JLabel("MINIMUM"), textFields[1], textFields[3], textFields[5]);
 		addBinding(new ComponentBinding(getAttributeMethod(attributeName), components));
@@ -222,16 +230,20 @@ public class AttributeEditor {
 		} else if (attribute instanceof BooleanAttr) {
 			AttributeManager.getInstance().bindButtonToAttribute(entity, (AbstractButton) binding.components[0], (BooleanAttr) attribute);
 		} else if (attribute instanceof StateMachine) {
-			AttributeManager.getInstance().bindComboBoxToAttribute(entity, (JComboBox) binding.components[0], (StateMachine) attribute);
+			AttributeManager.getInstance().bindComboBoxToAttribute(entity, (JComboBox) binding.components[0], (StateMachine<?>) attribute);
 		} else if (attribute instanceof ScalarAttribute){
-			AttributeManager.getInstance().bindTextFieldToAttribute(entity, (JTextField) binding.components[0], (ScalarAttribute) attribute);
-			if (binding.components.length == 2) {
-				if (attribute instanceof IntAttr) {
-					AttributeManager.getInstance().bindSliderToAttribute(entity, (JSlider) binding.components[1], (IntAttr) attribute);
-				} else if (attribute instanceof DoubleAttr) {
-					AttributeManager.getInstance().bindSliderToAttribute(entity, (JSlider) binding.components[1], (DoubleAttr) attribute, binding.mapping);
-				} else {
-					throw new IllegalStateException();
+			if (binding.components[0] instanceof JComboBox) {
+				AttributeManager.getInstance().bindComboBoxToAttribute(entity, (JComboBox) binding.components[0], (IntAttr) attribute);
+			} else {
+				AttributeManager.getInstance().bindTextFieldToAttribute(entity, (JTextField) binding.components[0], (ScalarAttribute) attribute);
+				if (binding.components.length == 2) {
+					if (attribute instanceof IntAttr) {
+						AttributeManager.getInstance().bindSliderToAttribute(entity, (JSlider) binding.components[1], (IntAttr) attribute);
+					} else if (attribute instanceof DoubleAttr) {
+						AttributeManager.getInstance().bindSliderToAttribute(entity, (JSlider) binding.components[1], (DoubleAttr) attribute, binding.mapping);
+					} else {
+						throw new IllegalStateException();
+					}
 				}
 			}
 		} else {

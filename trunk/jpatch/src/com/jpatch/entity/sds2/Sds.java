@@ -34,7 +34,7 @@ public class Sds {
 	
 	
 	private int currentMinLevel = 0;
-	private IntAttr minLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(currentMinLevel, 0, SdsConstants.MAX_LEVEL);
+	private IntAttr minLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(currentMinLevel, 2, SdsConstants.MAX_LEVEL);
 //	private IntAttr renderLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(currentMaxLevel, 0, SdsConstants.MAX_LEVEL);
 	private IntAttr editLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(0, 0, SdsConstants.MAX_LEVEL);
 	
@@ -338,7 +338,7 @@ public class Sds {
 //			int i = 0, p = 0;
 
 			for (Face face : faceSets[currentMinLevel]) {
-				subdivideFace(currentMinLevel, face, false);
+				subdivideFace(currentMinLevel, face, Face.SubdivStatus.AUTO_SUBDIVIDED);
 
 //				int np = (i++) * 100 / n;
 //				if (np > p) {
@@ -358,12 +358,19 @@ public class Sds {
 		}
 	}
 	
-	public void subdivideFace(final int level, final Face face, final boolean subdivSurroundings) {
-		System.out.println("subdivideFace(" + level + ", " + face + ", " + subdivSurroundings + ") called");
+	public void subdivideFace(final int level, final Face face, final Face.SubdivStatus subdivStatus) {
+		System.out.println("subdivideFace(" + level + ", " + face + ", " + subdivStatus + ") called");
 		
-		final Material material = subdivSurroundings ? face.getMaterial() : null;
+		assert subdivStatus != Face.SubdivStatus.NOT_SUBDIVIDED;
 		
-		if (!face.isSubdivided()) {
+		if (face.getSubdivStatus() == subdivStatus) {
+			return;
+		}
+		
+		final Material material = face.getMaterial();
+		
+		if (face.getSubdivStatus() == Face.SubdivStatus.NOT_SUBDIVIDED) {
+			
 			final HalfEdge[] edges = face.getEdges();
 			final HalfEdge[] hubEdges = new HalfEdge[face.getSides()];
 			final HalfEdge[] newEdges = new HalfEdge[4];
@@ -387,7 +394,7 @@ public class Sds {
 				newEdges[3] = hubEdges[j].getPair();
 
 				final Face subFace = faceSets[level + 1].getFace(newEdges);
-				faceSets[level + 1].setMaterial(subFace, subdivSurroundings ? material : null);
+				
 				
 //				createFace(level + 1, face, i, face.getMaterial(), newEdges);
 
@@ -395,24 +402,39 @@ public class Sds {
 //				AbstractVertex v2 = edges[i].getVertex().getVertexPoint();
 //				AbstractVertex v3 = edges[i].getEdgePoint();
 //				createFace(level + 1, face, i, face.getMaterial(), v0, v1, v2, v3);
-				face.setSubdivided(true);
+				if (subdivStatus == Face.SubdivStatus.BOUNDARY) {
+					faceSets[level + 1].setMaterial(subFace, null);
+				} else {
+					faceSets[level + 1].setMaterial(subFace, material);
+					if (level + 1 < minLevelAttr.getInt()) {
+						subdivideFace(level + 1, subFace, subdivStatus);
+					}
+				}
 			}
+			face.setSubdivStatus(subdivStatus);
 		} else {
-			for (HalfEdge edge : face.getFacePoint().getEdges()) {
-				assert edge.getFace() != null : edge + ".face == null";
-				faceSets[level + 1].setMaterial(edge.getFace(), material);
+			/* promote subdivSatus if higher */
+			if (face.getSubdivStatus().compareTo(subdivStatus) < 0) {
+				face.setSubdivStatus(subdivStatus);
+//				if (subdivStatus != Face.SubdivStatus.BOUNDARY) {
+					for (HalfEdge edge : face.getFacePoint().getEdges()) {
+						final Face subFace = edge.getFace();
+						if (subFace.getMaterial() == null) {
+							faceSets[level + 1].setMaterial(subFace, material);
+						}
+					}
+//				}
 			}
 		}
 		
 		
-		
 		/* subdivide surrounding faces */
-		if (subdivSurroundings) {
+		if (subdivStatus != Face.SubdivStatus.BOUNDARY) {
 			for (HalfEdge edge : face.getEdges()) {
 				for (HalfEdge corner : edge.getVertex().getEdges()) {
 					Face f = corner.getFace();
-					if (f != null && f != face && ! f.isSubdivided()) {
-						subdivideFace(level, f, false);
+					if (f != null && f != face) {
+						subdivideFace(level, f, Face.SubdivStatus.BOUNDARY);
 					}
 				}
 			}
@@ -458,7 +480,7 @@ public class Sds {
 		Face face = faceSets[0].getFace(edges);
 		
 		if (0 < minLevelAttr.getInt()) {
-			subdivideFace(0, face, false);
+			subdivideFace(0, face, Face.SubdivStatus.AUTO_SUBDIVIDED);
 		}
 		return face;
 	}
@@ -1107,8 +1129,8 @@ public class Sds {
 //			edgeKey.swap();
 //			edgeMap.remove(edgeKey);
 //			halfEdge.getVertex().removeEdge(halfEdge);
-			halfEdge.getVertex().removeEdge(halfEdge);
-			halfEdge.getPairVertex().removeEdge(halfEdge.getPair());
+			((BaseVertex) halfEdge.getVertex()).removeEdge(halfEdge);
+			((BaseVertex) halfEdge.getPairVertex()).removeEdge(halfEdge.getPair());
 //			if (halfEdge.getVertex().getEdges().length == 0) {
 //				strayVertices.remove(halfEdge.getVertex());
 //			}
@@ -1279,7 +1301,7 @@ public class Sds {
 	
 	
 	public HalfEdge getNextStrayEdge(HalfEdge strayEdge) {
-		assert strayEdges.contains(strayEdge) : "edge " + strayEdge + " not in " + strayEdges;
+		assert strayEdges.contains(strayEdge.getPrimary()) : "edge " + strayEdge + " not in " + strayEdges;
 		HalfEdge[] vertexEdges = strayEdge.getPairVertex().getEdges();
 		if (vertexEdges.length == 2) {
 			assert (vertexEdges[0] == strayEdge.getPair() || vertexEdges[1] == strayEdge.getPair());
@@ -1291,7 +1313,7 @@ public class Sds {
 	}
 	
 	public HalfEdge getPrevStrayEdge(HalfEdge strayEdge) {
-		assert strayEdges.contains(strayEdge);
+		assert strayEdges.contains(strayEdge.getPrimary());
 		HalfEdge[] vertexEdges = strayEdge.getVertex().getEdges();
 		if (vertexEdges.length == 2) {
 			assert (vertexEdges[0] == strayEdge || vertexEdges[1] == strayEdge);
@@ -1303,7 +1325,7 @@ public class Sds {
 	}
 	
 	public HalfEdge getStart(HalfEdge strayEdge) {
-		assert strayEdges.contains(strayEdge);
+		assert strayEdges.contains(strayEdge.getPrimary());
 		HalfEdge startEdge = strayEdge;
 		HalfEdge prevEdge = getPrevStrayEdge(strayEdge);
 		while (prevEdge != null && prevEdge != strayEdge) {
