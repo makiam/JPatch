@@ -131,6 +131,10 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		return vertices;
 	}
 	
+	public void clearFace() {
+		setFace(null, -1);
+	}
+	
 	public void setFace(Face face, int faceEdgeIndex) {
 		System.out.println(this + ".setFace(" + face + ")");
 		assert (this.face == null && face != null) || (this.face != null && face == null) : this + ".face=" + this.face + ", face=" + face + ", exactly one must be null";
