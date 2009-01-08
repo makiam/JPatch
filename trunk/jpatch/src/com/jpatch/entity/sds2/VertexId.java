@@ -1,29 +1,37 @@
 package com.jpatch.entity.sds2;
 
 public abstract class VertexId implements Comparable<VertexId>{
-	abstract AbstractVertex getVertex();
+	AbstractVertex vertex;
+	
+	abstract void createVertex();
+	
+	
+	final AbstractVertex getOrCreateVertex() {
+		if (vertex == null) {
+			createVertex();
+		}
+		return vertex;
+	}
 	
 	static class BaseVertexId extends VertexId {
-		
-		private final BaseVertex baseVertex;
-		
 		BaseVertexId(BaseVertex vertex) {
-			this.baseVertex = vertex;
+			this.vertex = vertex;
 		}
 		
 		@Override
 		public String toString() {
-			return Integer.toString(baseVertex.num);
+			return Integer.toString(((BaseVertex) vertex).num);
 		}
 		
 		@Override
-		BaseVertex getVertex() {
-			return baseVertex;
+		void createVertex() {
+			throw new UnsupportedOperationException();
 		}
 		
 		public int compareTo(VertexId other) {
-			BaseVertexId o = (BaseVertexId) other;
-			return baseVertex.num < o.baseVertex.num ? -1 : baseVertex.num > o.baseVertex.num ? 1 : 0;
+			int n = ((BaseVertex) vertex).num;
+			int on = ((BaseVertex) other.vertex).num;
+			return n < on ? -1 : n > on ? 1 : 0;
 		}
 	}
 	
@@ -41,8 +49,8 @@ public abstract class VertexId implements Comparable<VertexId>{
 		}
 		
 		@Override
-		AbstractVertex getVertex() {
-			return parentVertexId.getVertex().getOrCreateVertexPoint();
+		void createVertex() {
+			vertex = parentVertexId.getOrCreateVertex().getOrCreateVertexPoint();
 		}
 		
 		public int compareTo(VertexId other) {
@@ -75,11 +83,11 @@ public abstract class VertexId implements Comparable<VertexId>{
 		}
 		
 		@Override
-		AbstractVertex getVertex() {
-			final AbstractVertex v0 = parentVertexId0.getVertex();
-			final AbstractVertex v1 = parentVertexId1.getVertex();
+		void createVertex() {
+			final AbstractVertex v0 = parentVertexId0.getOrCreateVertex();
+			final AbstractVertex v1 = parentVertexId1.getOrCreateVertex();
 			final HalfEdge edge = HalfEdge.getOrCreate(v0, v1);
-			return edge.getEdgePoint();
+			vertex = edge.getEdgePoint();
 		}
 		
 		public int compareTo(VertexId other) {
@@ -122,14 +130,14 @@ public abstract class VertexId implements Comparable<VertexId>{
 		}
 		
 		@Override
-		AbstractVertex getVertex() {
+		void createVertex() {
 			final AbstractVertex[] vertices = new AbstractVertex[parentVertexIds.length];
 			for (int i = 0; i < parentVertexIds.length; i++) {
-				vertices[i] = parentVertexIds[i].getVertex();
+				vertices[i] = parentVertexIds[i].getOrCreateVertex();
 			}
 			final Sds sds = vertices[0].sds;
 			final Face face = sds.getOrCreateFace(vertices);
-			return face.getOrCreateFacePoint();
+			vertex = face.getOrCreateFacePoint();
 		}
 		
 		public int compareTo(VertexId other) {
