@@ -71,7 +71,7 @@ public class Face {
 //		System.out.println("new face is " + this);
 	}
 	
-	public void flip(Set<HalfEdge> edgesToFlip, Set<AbstractVertex> verticesToFlip) {
+	void flip(Set<HalfEdge> edgesToFlip, Set<AbstractVertex> verticesToFlip) {
 		HalfEdge[] tmp = faceEdges.clone();
 		
 		for (int i = 0; i < faceEdges.length; i++) {

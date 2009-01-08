@@ -143,6 +143,11 @@ public class Sds {
 	public Collection<BaseVertex> getStrayVertices() {
 		return strayVertices;
 	}
+	
+	public Material getCurrentMaterial() {
+		return newFaceMaterial;
+	}
+	
 	//	
 	//	
 	//	public void setActiveMorphTarget(MorphTarget morphTarget) {
@@ -461,7 +466,7 @@ public class Sds {
 	/**
 	 * Creates a face (and, if necessary, its edges)
 	 */
-	public Face getOrCreateFace(AbstractVertex... vertices) {
+	Face getOrCreateFace(AbstractVertex... vertices) {
 		System.out.println("createFace(" + Arrays.toString(vertices) + ") called");
 		HalfEdge[] edges = new HalfEdge[vertices.length];
 
@@ -729,6 +734,7 @@ public class Sds {
 								strayEdge = strayEdgeIterator.next();
 								if (isStartOfChain(strayEdge.getVertex())) {
 									first = true;
+									assert strayEdge.getVertex().getEdges().length == 1;
 									return strayEdge.getVertex();
 								}
 							} else {
@@ -736,6 +742,7 @@ public class Sds {
 							}
 						}
 						first = false;
+						assert strayEdge.getVertex().getEdges().length == 1 || strayEdge.getVertex().getEdges().length == 2;
 						return strayEdge.getPairVertex();
 					}
 				};
@@ -1013,7 +1020,7 @@ public class Sds {
 
 			void remove() {
 				assert sds.faceSets[0].contains(face) : "Face " + face + " is unknown to " + sds;
-				sds.discardFace(face, true);
+				sds.faceSets[0].removeFace(face);
 			}
 
 			private static class Add extends FaceEdit {
@@ -1108,7 +1115,7 @@ public class Sds {
 			}
 
 			void remove() {
-				final HalfEdge halfEdge = HalfEdge.getOrCreate(v0, v1);
+				final HalfEdge halfEdge = HalfEdge.getOrCreate(v0, v1).getPrimary();
 				sds.strayEdges.remove(halfEdge);
 				((BaseVertex) halfEdge.getVertex()).removeEdge(halfEdge);
 				((BaseVertex) halfEdge.getPairVertex()).removeEdge(halfEdge.getPair());
@@ -1273,7 +1280,6 @@ public class Sds {
 	}
 
 	public boolean isStartOfChain(AbstractVertex strayVertex) {
-		assert strayVertex.getEdges().length == 1 || strayVertex.getEdges().length == 2;
 		return strayVertex.getEdges().length == 1;
 	}
 
