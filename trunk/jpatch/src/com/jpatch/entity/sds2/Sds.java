@@ -1071,8 +1071,7 @@ public class Sds {
 
 			FlipFacesEdit(Collection<Face> faces) {
 				this.faces = faces.toArray(new Face[faces.size()]);
-				swap();
-				applied = true;
+				apply(true);
 			}
 
 			@Override
