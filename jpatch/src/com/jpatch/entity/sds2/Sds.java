@@ -3,6 +3,7 @@ package com.jpatch.entity.sds2;
 import com.jpatch.afw.*;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
+import com.jpatch.afw.control.AbstractAddRemoveEdit.*;
 import com.jpatch.afw.testing.*;
 import com.jpatch.afw.ui.*;
 import com.jpatch.boundary.*;
@@ -12,8 +13,7 @@ import java.util.*;
 
 import javax.vecmath.*;
 
-import org.junit.*;
-import static org.junit.Assert.*;
+import static com.jpatch.afw.control.AbstractAddRemoveEdit.Mode.*;
 
 public class Sds {
 	public static enum Type { VERTEX, LIMIT, EDGE, FACE, STRAY_VERTEX, STRAY_EDGE, BOUNDARY_EDGE };
@@ -159,7 +159,7 @@ public class Sds {
 		//		assert (!edgeMap.containsKey(edgeKey));
 		//		HalfEdge edge = new HalfEdge(vertex0, vertex1);
 		//		JPatchUndoableEdit addEdgeEdit = new AddEdgeEdit(edge, 0);
-		JPatchUndoableEdit addStrayEdgeEdit = new Edits.StrayEdgeEdit.Add(this, vertex0, vertex1);
+		JPatchUndoableEdit addStrayEdgeEdit = new StrayEdgeEdit(vertex0, vertex1, ADD);
 		if (editList != null) {
 			//			editList.add(addEdgeEdit);
 			editList.add(addStrayEdgeEdit);
@@ -168,7 +168,7 @@ public class Sds {
 
 	public void removeSegment(List<JPatchUndoableEdit> editList, HalfEdge strayEdge) {
 		//assert (strayEdges.contains(strayEdge));
-		JPatchUndoableEdit removeStrayEdgeEdge = new Edits.StrayEdgeEdit.Remove(this, strayEdge);
+		JPatchUndoableEdit removeStrayEdgeEdge = new StrayEdgeEdit(strayEdge, REMOVE);
 		//		JPatchUndoableEdit removeEdgeEdit = new RemoveEdgeEdit(strayEdge, 0);
 		if (editList != null) {
 			editList.add(removeStrayEdgeEdge);
@@ -194,14 +194,14 @@ public class Sds {
 	}
 
 	public void addStrayFace(List<JPatchUndoableEdit> editList, BaseVertex[] vertices) {
-		JPatchUndoableEdit edit = new Edits.StrayFaceEdit.Add(this, vertices);
+		JPatchUndoableEdit edit = new StrayFaceEdit(vertices, ADD);
 		if (editList != null) {
 			editList.add(edit);
 		}
 	}
 
 	public void removeStrayFace(List<JPatchUndoableEdit> editList, BaseVertex[] vertices) {
-		JPatchUndoableEdit edit = new Edits.StrayFaceEdit.Remove(this, vertices);
+		JPatchUndoableEdit edit = new StrayFaceEdit(vertices, REMOVE);
 		if (editList != null) {
 			editList.add(edit);
 		}
@@ -350,13 +350,13 @@ public class Sds {
 	}
 
 	public void flipFaces(List<JPatchUndoableEdit> editList, Collection<Face> faces) {
-		JPatchUndoableEdit edit = new Edits.FlipFacesEdit(faces);
+		JPatchUndoableEdit edit = new FlipFacesEdit(faces);
 		if (editList != null) {
 			editList.add(edit);
 		}
 	}
 
-	public void subdivideFace(final int level, final Face face, final Face.SubdivStatus subdivStatus) {
+	public void subdivideFace(final int level, final Face face, final Face.SubdivStatus subdivStatus, List<JPatchUndoableEdit> editList) {
 		System.out.println("subdivideFace(" + level + ", " + face + ", " + subdivStatus + ") called");
 
 		assert subdivStatus != Face.SubdivStatus.NOT_SUBDIVIDED;
@@ -375,10 +375,10 @@ public class Sds {
 			final DerivedVertex[] edgePoints = new DerivedVertex[face.getSides()];
 			final DerivedVertex[] vertexPoints = new DerivedVertex[face.getSides()];
 
-			final AbstractVertex facePoint = face.getOrCreateFacePoint();
+			final AbstractVertex facePoint = face.getOrCreateFacePoint(editList);
 			for (int i = 0; i < edges.length; i++) {
-				vertexPoints[i] = edges[i].getVertex().getOrCreateVertexPoint();
-				edgePoints[i] = edges[i].getOrCreateEdgePoint();
+				vertexPoints[i] = edges[i].getVertex().getOrCreateVertexPoint(editList);
+				edgePoints[i] = edges[i].getOrCreateEdgePoint(editList);
 				hubEdges[i] = HalfEdge.getOrCreate(facePoint, edgePoints[i]);
 			}
 
@@ -405,7 +405,7 @@ public class Sds {
 				} else {
 					faceSets[level + 1].setMaterial(subFace, material);
 					if (level + 1 < minLevelAttr.getInt()) {
-						subdivideFace(level + 1, subFace, subdivStatus);
+						subdivideFace(level + 1, subFace, subdivStatus, editList);
 					}
 				}
 			}
@@ -432,7 +432,7 @@ public class Sds {
 				for (HalfEdge corner : edge.getVertex().getEdges()) {
 					Face f = corner.getFace();
 					if (f != null && f != face) {
-						subdivideFace(level, f, Face.SubdivStatus.BOUNDARY);
+						subdivideFace(level, f, Face.SubdivStatus.BOUNDARY, editList);
 					}
 				}
 			}
@@ -1001,7 +1001,7 @@ public class Sds {
 	//		return edgeSet.getHalfEdge(vertex0, vertex1);
 	//	}
 
-	private static abstract class Edits {
+//	private static abstract class Edits {
 
 		private static abstract class FaceEdit extends AbstractUndoableEdit {
 			final Sds sds;
@@ -1032,12 +1032,10 @@ public class Sds {
 				}
 
 				public void undo() {
-					super.undo();
 					remove();
 				}
 
 				public void redo() {
-					super.redo();
 					add();
 				}
 			}
@@ -1055,12 +1053,10 @@ public class Sds {
 				}
 
 				public void undo() {
-					super.undo();
 					add();
 				}
 
 				public void redo() {
-					super.redo();
 					remove();
 				}
 			}
@@ -1097,115 +1093,53 @@ public class Sds {
 
 		}
 
-		private static abstract class StrayEdgeEdit extends AbstractUndoableEdit {
-			final Sds sds;
-			final AbstractVertex v0;
-			final AbstractVertex v1;
-			StrayEdgeEdit(Sds sds, AbstractVertex v0, AbstractVertex v1) {
-				this.sds = sds;
-				this.v0 = v0;
-				this.v1 = v1;
+		private class StrayEdgeEdit extends AbstractAddRemoveEdit {
+			private final HalfEdge primaryEdge;
+			
+			StrayEdgeEdit(AbstractVertex v0, AbstractVertex v1, Mode mode) {
+				this(HalfEdge.getOrCreate(v0, v1), mode);
+			}
+			
+			StrayEdgeEdit(HalfEdge halfEdge, Mode mode) {
+				super(mode);
+				primaryEdge = halfEdge.getPrimary();
+				assert primaryEdge.getFace() == null && primaryEdge.getPairFace() == null;
 				apply(true);
 			}
 
-			void add() {
-				final HalfEdge halfEdge = HalfEdge.getOrCreate(v0, v1).getPrimary();
-				sds.strayEdges.add(halfEdge);
+			public void add() {
+				strayEdges.add(primaryEdge);
+				((BaseVertex) primaryEdge.getVertex()).addEdge(primaryEdge);
+				((BaseVertex) primaryEdge.getPairVertex()).addEdge(primaryEdge.getPair());
 			}
 
-			void remove() {
-				final HalfEdge halfEdge = HalfEdge.getOrCreate(v0, v1).getPrimary();
-				sds.strayEdges.remove(halfEdge);
-				((BaseVertex) halfEdge.getVertex()).removeEdge(halfEdge);
-				((BaseVertex) halfEdge.getPairVertex()).removeEdge(halfEdge.getPair());
-			}
-
-
-			private static class Add extends StrayEdgeEdit {
-				private Add(Sds sds, AbstractVertex v0, AbstractVertex v1) {
-					super(sds, v0, v1);
-				}
-
-				public void undo() {
-					super.undo();
-					remove();
-				}
-
-				public void redo() {
-					super.redo();
-					add();
-				}
-			}
-
-			private static class Remove extends StrayEdgeEdit {
-				private Remove(Sds sds, HalfEdge halfEdge) {
-					super(sds, halfEdge.getVertex(), halfEdge.getPairVertex());
-				}
-
-				public void undo() {
-					super.undo();
-					add();
-				}
-
-				public void redo() {
-					super.redo();
-					remove();
-				}
+			public void remove() {
+				strayEdges.remove(primaryEdge);
+				((BaseVertex) primaryEdge.getVertex()).removeEdge(primaryEdge);
+				((BaseVertex) primaryEdge.getPairVertex()).removeEdge(primaryEdge.getPair());
 			}
 		}
-
-		private static abstract class StrayFaceEdit extends AbstractUndoableEdit {
-			final Sds sds;
-			BaseVertex[] vertices;
-			StrayFaceEdit(Sds sds, BaseVertex[] vertices) {
-				this.sds = sds;
+		
+		private class StrayFaceEdit extends AbstractAddRemoveEdit {
+			private final BaseVertex[] vertices;
+			
+			StrayFaceEdit(BaseVertex[] vertices, Mode mode) {
+				super(mode);
 				this.vertices = vertices.clone();
 				apply(true);
 			}
 
-			void add() {
-				sds.strayFaces.add(vertices);
+			public void add() {
+				strayFaces.add(vertices);
 			}
 
-			void remove() {
-				sds.strayFaces.remove(vertices);
-			}
-
-			private static class Add extends StrayFaceEdit {
-				private Add(Sds sds, BaseVertex[] vertices) {
-					super(sds, vertices);
-				}
-
-				public void undo() {
-					super.undo();
-					remove();
-				}
-
-				public void redo() {
-					super.redo();
-					add();
-				}
-			}
-
-			private static class Remove extends StrayFaceEdit {
-				private Remove(Sds sds, BaseVertex[] vertices) {
-					super(sds, vertices);
-				}
-
-				public void undo() {
-					super.undo();
-					add();
-				}
-
-				public void redo() {
-					super.redo();
-					remove();
-				}
+			public void remove() {
+				strayFaces.remove(vertices);
 			}
 		}
-
-	}
-
+		
+	
+	
 	public HalfEdge getNextStrayEdge(HalfEdge strayEdge) {
 		assert strayEdges.contains(strayEdge.getPrimary()) : "edge " + strayEdge + " not in " + strayEdges;
 		HalfEdge[] vertexEdges = strayEdge.getPairVertex().getEdges();
@@ -1801,6 +1735,24 @@ public class Sds {
 				}
 			}
 		}
+		
+		private class FaceSetAddRemove extends AbstractAddRemoveEdit {
+			private final Face face;
+
+			private FaceSetAddRemove(Face face, Mode mode) {
+				super(mode);
+				this.face = face;
+			}
+			
+			public void add() {
+				FaceSet.this.add(hash(face.getEdges()), face);
+			}
+			
+			public void remove() {
+				FaceSet.this.remove(hash(face.getEdges()), face);
+			}
+			
+		}
 	}
 
 
@@ -2147,5 +2099,5 @@ public class Sds {
 
 			return TestResult.success();
 		}
-	}
+//	}
 }

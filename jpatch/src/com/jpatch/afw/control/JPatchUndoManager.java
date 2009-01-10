@@ -138,7 +138,7 @@ public class JPatchUndoManager {
 				System.out.println("undo " + name);
 			}
 			for (int i = edits.length - 1; i >= 0; i--) {
-				edits[i].undo();
+				edits[i].performUndo();
 			}
 		}
 		
@@ -147,7 +147,7 @@ public class JPatchUndoManager {
 				System.out.println("redo " + name);
 			}
 			for (int i = 0; i < edits.length; i++) {
-				edits[i].redo();
+				edits[i].performRedo();
 			}
 		}
 	}

@@ -601,14 +601,14 @@ public class Selection {
 		}
 		
 		@Override
-		public void undo() {
-			super.undo();
+		public void performUndo() {
+			super.performUndo();
 			swap();
 		}
 		
 		@Override
-		public void redo() {
-			super.redo();
+		public void performRedo() {
+			super.performRedo();
 			swap();
 		}
 	}

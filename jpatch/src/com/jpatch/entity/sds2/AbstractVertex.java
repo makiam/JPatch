@@ -157,7 +157,7 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 		return displacement == null ? worldNormal : displacement.displacedNormal;
 	}
 	
-	public final DerivedVertex createVertexPoint(List<JPatchUndoableEdit> editList) {
+	private DerivedVertex createVertexPoint() {
 		assert vertexPoint == null;
 		vertexPoint = new DerivedVertex(sds) {
 		
@@ -247,14 +247,32 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 //			}
 		};
 		vertexPoint.vertexId = new VertexId.VertexPointId(vertexId);
-		
-		if (editList != null) {
-			editList.add(new VertexPointEdit(null, false));
-		}
-		createVertexPointEdges(editList);
-		
 		return vertexPoint;
 	}
+	
+	public final class CreateVertexPointEdit extends AbstractSwapEdit {
+		private DerivedVertex vertexPoint;
+		
+		CreateVertexPointEdit() { 
+			createVertexPoint();
+			apply(false);
+		}
+		
+		@Override
+		protected void swap() {
+			DerivedVertex tmp = AbstractVertex.this.vertexPoint;
+			AbstractVertex.this.vertexPoint = vertexPoint;
+			vertexPoint = tmp;
+		}
+	}
+	
+//		if (editList != null) {
+//			editList.add(new VertexPointEdit(null, false));
+//		}
+//		createVertexPointEdges(editList);
+//		
+//		return vertexPoint;
+//	}
 	
 	void createVertexPointEdges(List<JPatchUndoableEdit> editList) {
 		if (vertexPoint.vertexEdges == null || vertexPoint.vertexEdges.length != vertexEdges.length) {
@@ -289,7 +307,16 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 	}
 	
 	public final DerivedVertex getOrCreateVertexPoint(List<JPatchUndoableEdit> editList) {
-		return vertexPoint != null ? vertexPoint : createVertexPoint(editList);
+		if (vertexPoint != null) {
+			return vertexPoint;
+		} else {
+			if (editList != null) {
+				editList.add(new CreateVertexPointEdit());
+			} else {
+				createVertexPoint();
+			}
+		}
+		return vertexPoint;
 	}
 	
 	abstract void validateWorldPosition();
@@ -837,6 +864,21 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 			DerivedVertex tmp = AbstractVertex.this.vertexPoint;
 			AbstractVertex.this.vertexPoint = vertexPoint;
 			vertexPoint = tmp;
+		}
+	}
+	
+	private class VertexEdgesEdit extends AbstractSwapEdit {
+		private HalfEdge[] vertexEdges;
+		
+		VertexEdgesEdit(HalfEdge[] vertexEdges, boolean apply) {
+			this.vertexEdges = vertexEdges;
+		}
+		
+		@Override
+		protected void swap() {
+			HalfEdge[] tmp = AbstractVertex.this.vertexEdges;
+			AbstractVertex.this.vertexEdges = vertexEdges;
+			vertexEdges = tmp;
 		}
 	}
 }
