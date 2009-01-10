@@ -137,8 +137,12 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 		normal.set(displacement == null ? worldNormal : displacement.displacedNormal);
 	}
 	
-	public final void disposeVertexPoint() {
-		vertexPoint = null;
+	public final void disposeVertexPoint(List<JPatchUndoableEdit> editList) {
+		assert vertexPoint != null;
+		JPatchUndoableEdit edit = new VertexPointEdit(null, true);
+		if (editList != null) {
+			editList.add(edit);
+		}
 	}
 	
 	final Point3d getPos() {
@@ -153,7 +157,7 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 		return displacement == null ? worldNormal : displacement.displacedNormal;
 	}
 	
-	public final DerivedVertex createVertexPoint() {
+	public final DerivedVertex createVertexPoint(List<JPatchUndoableEdit> editList) {
 		assert vertexPoint == null;
 		vertexPoint = new DerivedVertex(sds) {
 		
@@ -243,16 +247,21 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 //			}
 		};
 		vertexPoint.vertexId = new VertexId.VertexPointId(vertexId);
-		createVertexPointEdges();
+		
+		if (editList != null) {
+			editList.add(new VertexPointEdit(null, false));
+		}
+		createVertexPointEdges(editList);
+		
 		return vertexPoint;
 	}
 	
-	void createVertexPointEdges() {
+	void createVertexPointEdges(List<JPatchUndoableEdit> editList) {
 		if (vertexPoint.vertexEdges == null || vertexPoint.vertexEdges.length != vertexEdges.length) {
 			vertexPoint.vertexEdges = new HalfEdge[vertexEdges.length];
 		}
 		for (int i = 0; i < vertexEdges.length; i++) {
-			vertexPoint.vertexEdges[i] = HalfEdge.getOrCreate(vertexPoint, vertexEdges[i].getOrCreateEdgePoint());
+			vertexPoint.vertexEdges[i] = HalfEdge.getOrCreate(vertexPoint, vertexEdges[i].getOrCreateEdgePoint(editList));
 		}
 		vertexPoint.boundaryType = boundaryType;
 	}
@@ -279,8 +288,8 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 		return vertexPoint;
 	}
 	
-	public final DerivedVertex getOrCreateVertexPoint() {
-		return vertexPoint != null ? vertexPoint : createVertexPoint();
+	public final DerivedVertex getOrCreateVertexPoint(List<JPatchUndoableEdit> editList) {
+		return vertexPoint != null ? vertexPoint : createVertexPoint(editList);
 	}
 	
 	abstract void validateWorldPosition();
@@ -812,6 +821,22 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 //					v1[index] = v[index].getEdges()[0].getEdgePoint();
 //				}
 //			}
+		}
+	}
+	
+	private class VertexPointEdit extends AbstractSwapEdit {
+		private DerivedVertex vertexPoint;
+
+		VertexPointEdit(DerivedVertex vertexPoint, boolean apply) {
+			this.vertexPoint = vertexPoint;
+			apply(apply);
+		}
+		
+		@Override
+		protected void swap() {
+			DerivedVertex tmp = AbstractVertex.this.vertexPoint;
+			AbstractVertex.this.vertexPoint = vertexPoint;
+			vertexPoint = tmp;
 		}
 	}
 }

@@ -3,6 +3,7 @@ package com.jpatch.entity.sds2;
 import java.nio.*;
 import java.util.*;
 
+import com.jpatch.afw.control.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.AbstractVertex.*;
 import com.sun.opengl.util.*;
@@ -365,11 +366,14 @@ public class Face {
 		displacedMidpointNormalValid = true;
 	}
 	
-	public void disposeFacePoint() {
-		facePoint = null;
+	public void disposeFacePoint(List<JPatchUndoableEdit> editList) {
+		JPatchUndoableEdit edit = new FacePointEdit(null, true);
+		if (editList != null) {
+			editList.add(edit);
+		}
 	}
 	
-	public DerivedVertex createFacePoint() {
+	public DerivedVertex createFacePoint(List<JPatchUndoableEdit> editList) {
 		assert facePoint == null;
 		Sds sds = faceEdges[0].getVertex().sds;
 		
@@ -389,9 +393,13 @@ public class Face {
 		/* create facePoint edges */
 		facePoint.vertexEdges = new HalfEdge[faceEdges.length];
 		for (int i = 0; i < faceEdges.length; i++) {
-			facePoint.vertexEdges[i] = HalfEdge.getOrCreate(facePoint, faceEdges[i].getOrCreateEdgePoint());
+			facePoint.vertexEdges[i] = HalfEdge.getOrCreate(facePoint, faceEdges[i].getOrCreateEdgePoint(editList));
 		}
 		facePoint.boundaryType = BoundaryType.REGULAR;
+		
+		if (editList != null) {
+			editList.add(new FacePointEdit(null, false));
+		}
 		return facePoint;
 	}
 	
@@ -400,8 +408,8 @@ public class Face {
 	}
 	
 
-	public final DerivedVertex getOrCreateFacePoint() {
-		return facePoint != null ? facePoint : createFacePoint();
+	public final DerivedVertex getOrCreateFacePoint(List<JPatchUndoableEdit> editList) {
+		return facePoint != null ? facePoint : createFacePoint(editList);
 	}
 
 //	int addId(int[] id, int index) {
@@ -459,4 +467,20 @@ public class Face {
 //		}
 //		return Arrays.equals(faceEdges, ((Face) o).faceEdges);
 //	}
+	
+	private class FacePointEdit extends AbstractSwapEdit {
+		private DerivedVertex facePoint;
+
+		FacePointEdit(DerivedVertex facePoint, boolean apply) {
+			this.facePoint = facePoint;
+			apply(apply);
+		}
+		
+		@Override
+		protected void swap() {
+			DerivedVertex tmp = Face.this.facePoint;
+			Face.this.facePoint = facePoint;
+			facePoint = tmp;
+		}
+	}
 }

@@ -2,7 +2,7 @@ package com.jpatch.afw.control;
 
 
 public abstract class AbstractUndoableEdit implements JPatchUndoableEdit {
-	protected boolean applied;
+	private boolean applied;
 	
 	protected final void apply(boolean apply) {
 		if (apply) {
