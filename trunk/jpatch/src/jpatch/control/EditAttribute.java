@@ -23,14 +23,14 @@ public abstract class AttributeEdit extends AbstractUndoableEdit {
 	private AttributeEdit() { } 	// private default constructor makes sure this class can not be instantiated.
 	
 	@Override
-	public final void undo() {
-		super.undo();
+	public final void performUndo() {
+		super.performUndo();
 		swap();
 	}
 	
 	@Override
-	public final void redo() {
-		super.redo();
+	public final void performRedo() {
+		super.performRedo();
 		swap();
 	}
 	

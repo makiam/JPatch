@@ -200,7 +200,7 @@ public class AddBoneMouseAdapter extends JPatchMouseAdapter {
 //			edit.addEdit(new AtomicChangeTool(Tools.defaultTool));
 			MainFrame.getInstance().getUndoManager().addEdit(edit);
 			if (bone.getLength() == 0) {
-				MainFrame.getInstance().getUndoManager().undo();
+				MainFrame.getInstance().getUndoManager().performUndo();
 				MainFrame.getInstance().setSelection(null);
 			}
 			
