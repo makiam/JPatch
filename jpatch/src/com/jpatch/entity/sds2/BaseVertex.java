@@ -7,6 +7,7 @@ import javax.vecmath.*;
 
 import com.jpatch.afw.*;
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.control.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.AbstractVertex.*;
 
@@ -64,19 +65,24 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 	 * Adds the specified HalfEdge to this vertex
 	 * asserts that edge.getVertex() == this vertex
 	 */
-	final void addEdge(HalfEdge edge) {
+	final void addEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
 		assert edge.getVertex() == this : "edge.vertex=" + edge.getVertex() + ", must be this vertex (" + this + ")";
 		HalfEdge[] tmp = new HalfEdge[vertexEdges.length + 1];
 		System.arraycopy(vertexEdges, 0, tmp, 0, vertexEdges.length);
 		tmp[vertexEdges.length] = edge;
+		
+		if (editList != null) {
+			editList.add(new VertexEdgesEdit());
+		}
 		vertexEdges = tmp;
+		updateVertexPointEdges(editList);
 	}
 	
 	/**
 	 * Removes the specified HalfEdge from this vertex
 	 * @throws ArrayIndexOutOfBoundsException if the specified HalfEdge is not adjacent to this Vertex
 	 */
-	final void removeEdge(HalfEdge edge) {
+	final void removeEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
 		boolean debug = false;
 		if (debug) System.out.println("removing edge " + edge + " from vertex " + this);
 		if (debug) System.out.print("    edges are:");
@@ -89,7 +95,12 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 		final HalfEdge[] tmp = new HalfEdge[vertexEdges.length - 1];
 		System.arraycopy(vertexEdges, 0, tmp, 0, i);
 		System.arraycopy(vertexEdges, i + 1, tmp, i, tmp.length - i);
+		
+		if (editList != null) {
+			editList.add(new VertexEdgesEdit());
+		}
 		vertexEdges = tmp;
+		
 		if (debug) System.out.print("    edges are:");
 		if (debug) for (HalfEdge e : vertexEdges) System.out.print(" " + e);
 		if (debug) System.out.println();

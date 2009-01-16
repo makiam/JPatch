@@ -34,7 +34,7 @@ public class HalfEdge implements Comparable<HalfEdge>{
 	 * @param v1 the second vertex
 	 * @return the HalfEdge connecting the specified vertices
 	 */
-	public static HalfEdge getOrCreate(AbstractVertex v0, AbstractVertex v1) {
+	public static HalfEdge getOrCreate(AbstractVertex v0, AbstractVertex v1, List<JPatchUndoableEdit> editList) {
 		/* search both vertices for the edge in question */
 		for (HalfEdge edge : v0.getEdges()) {
 			if (edge != null && edge.pair.vertex == v1) {
@@ -46,8 +46,18 @@ public class HalfEdge implements Comparable<HalfEdge>{
 				return edge.pair;
 			}
 		}
+		
 		/* edge not found, create a new one */
-		return new HalfEdge(v0, v1);
+		HalfEdge halfEdge = new HalfEdge(v0, v1);
+		
+		/* when connecting BaseVertices, add the new edge using BaseVertex.addEdge() */
+		if (v0 instanceof BaseVertex || v1 instanceof BaseVertex) {
+			assert v0 instanceof BaseVertex && v1 instanceof BaseVertex;
+			((BaseVertex) v0).addEdge(halfEdge, editList);
+			((BaseVertex) v1).addEdge(halfEdge.pair, editList);
+		}
+		
+		return halfEdge;
 	}
 	
 	/**
@@ -58,12 +68,6 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		this.vertex = v0;
 		this.pair = new HalfEdge(v1, this);
 		this.primary = true;
-		/* when connecting BaseVertices, add the new edge using BaseVertex.addEdge() */
-		if (v0 instanceof BaseVertex || v1 instanceof BaseVertex) {
-			assert v0 instanceof BaseVertex && v1 instanceof BaseVertex;
-			((BaseVertex) v0).addEdge(this);
-			((BaseVertex) v1).addEdge(pair);
-		}
 	}
 	
 	/**
@@ -131,27 +135,21 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		return vertices;
 	}
 	
-	public void clearFace() {
-		setFace(null, -1);
+	public void clearFace(List<JPatchUndoableEdit> editList) {
+		setFace(null, -1, editList);
 	}
 	
-	public void setFace(Face face, int faceEdgeIndex) {
+	public void setFace(Face face, int faceEdgeIndex, List<JPatchUndoableEdit> editList) {
 		System.out.println(this + ".setFace(" + face + ")");
 		assert (this.face == null && face != null) || (this.face != null && face == null) : this + ".face=" + this.face + ", face=" + face + ", exactly one must be null";
-		this.face = face;
-		this.faceEdgeIndex = faceEdgeIndex;
-		if (face != null && pair.face != null) {
-			boundaryType = pair.boundaryType = BoundaryType.REGULAR;
-		} else if (face == null && pair.face == null) {
-			boundaryType = pair.boundaryType = BoundaryType.STRAY;
-		} else {
-			boundaryType = pair.boundaryType = BoundaryType.BOUNDARY;
+		
+		FaceEdit edit = new FaceEdit(face, faceEdgeIndex);
+		if (editList != null) {
+			editList.add(edit);
 		}
+		
 		if (edgePoint != null) {
-			createEdgePointEdges(null); //TODO: requires EditList ?!?
-		}
-		if (vertex.getVertexPoint() != null) {
-			vertex.createVertexPointEdges(null); //TODO: requires EditList ?!?
+			createEdgePointEdges(editList);
 		}
 	}
 	
@@ -195,7 +193,7 @@ public class HalfEdge implements Comparable<HalfEdge>{
 	}
 	
 	public void disposeEdgePoint(List<JPatchUndoableEdit> editList) {
-		JPatchUndoableEdit edit = new EdgePointEdit(null, true);
+		EdgePointEdit edit = new EdgePointEdit(null);
 		if (editList != null) {
 			editList.add(edit);
 		}
@@ -205,8 +203,8 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		assert edgePoint == null;
 		
 		Sds sds = vertex.sds;
-		edgePoint = new DerivedVertex(sds) {
-
+		
+		DerivedVertex newEdgePoint = new DerivedVertex(sds) {
 			@Override
 			protected void validateWorldPosition() {
 				if (!worldPositionValid) {
@@ -240,10 +238,9 @@ public class HalfEdge implements Comparable<HalfEdge>{
 				}
 			}
 		};
-		pair.edgePoint = edgePoint;
-		
+		EdgePointEdit edit = new EdgePointEdit(newEdgePoint);
 		if (editList != null) {
-			editList.add(new EdgePointEdit(null, false));
+			editList.add(edit);
 		}
 		
 		edgePoint.vertexId = new VertexId.EdgePointId(vertex.vertexId, pair.vertex.vertexId);
@@ -253,24 +250,28 @@ public class HalfEdge implements Comparable<HalfEdge>{
 	}
 	
 	private void createEdgePointEdges(List<JPatchUndoableEdit> editList) {
+		if (editList != null) {
+			editList.add(edgePoint.new VertexEdgesEdit());
+			editList.add(edgePoint.new BoundaryTypeEdit());
+		}
 		if (face != null) {
 			if (pair.face != null) {
 				/* REGULAR */
 				edgePoint.boundaryType = AbstractVertex.BoundaryType.REGULAR;
 				edgePoint.vertexEdges = new HalfEdge[] {
-					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint(editList)),
-					HalfEdge.getOrCreate(edgePoint, face.getOrCreateFacePoint(editList)),
-					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint(editList)),
-					HalfEdge.getOrCreate(edgePoint, pair.face.getOrCreateFacePoint(editList))
+					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint(editList), editList),
+					HalfEdge.getOrCreate(edgePoint, face.getOrCreateFacePoint(editList), editList),
+					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint(editList), editList),
+					HalfEdge.getOrCreate(edgePoint, pair.face.getOrCreateFacePoint(editList), editList)
 				};
 				Utils.cycleToFront(edgePoint.vertexEdges);
 			} else {
 				/* BOUNDARY (right side) */
 				edgePoint.boundaryType = AbstractVertex.BoundaryType.BOUNDARY;
 				edgePoint.vertexEdges = new HalfEdge[] {
-					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint(editList)),
-					HalfEdge.getOrCreate(edgePoint, face.getOrCreateFacePoint(editList)),
-					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint(editList))
+					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint(editList), editList),
+					HalfEdge.getOrCreate(edgePoint, face.getOrCreateFacePoint(editList), editList),
+					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint(editList), editList)
 				};
 			}
 		} else {
@@ -278,15 +279,15 @@ public class HalfEdge implements Comparable<HalfEdge>{
 				/* BOUNDARY (left side) */
 				edgePoint.boundaryType = AbstractVertex.BoundaryType.BOUNDARY;
 				edgePoint.vertexEdges = new HalfEdge[] {
-					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint(editList)),
-					HalfEdge.getOrCreate(edgePoint, pair.face.getOrCreateFacePoint(editList)),
-					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint(editList))
+					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint(editList), editList),
+					HalfEdge.getOrCreate(edgePoint, pair.face.getOrCreateFacePoint(editList), editList),
+					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint(editList), editList)
 				};
 			} else {
 				/* STRAY EDGE */
 				edgePoint.vertexEdges = new HalfEdge[] {
-					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint(editList)),
-					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint(editList))
+					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint(editList), editList),
+					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint(editList), editList)
 				};
 				Utils.cycleToFront(edgePoint.vertexEdges);
 			}
@@ -309,9 +310,9 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		return "e" + vertex + "-" + pair.vertex;// + "(" + (face == null ? "null" : (face.id + ":" + faceEdgeIndex)) + "){" + boundaryType + "}[" + isPrimary() + "]";
 	}
 	
-	public void saveState(List<JPatchUndoableEdit> editList) {
-		editList.add(new SaveStateEdit());
-	}
+//	public void saveState(List<JPatchUndoableEdit> editList) {
+//		editList.add(new SaveStateEdit());
+//	}
 	
 	void flip() {
 		Face tmpFace = face;
@@ -325,34 +326,34 @@ public class HalfEdge implements Comparable<HalfEdge>{
 //		pair.prev = (tmpNext == null) ? null : tmpNext.pair;
 	}
 	
-	private class SaveStateEdit extends AbstractSwapEdit {
-//		private HalfEdge next = HalfEdge.this.next;
-//		private HalfEdge prev = HalfEdge.this.next;
-		private Face face = HalfEdge.this.face;
-//		private Face pairFace = HalfEdge.this.pair.face;
-		private int faceEdgeIndex = HalfEdge.this.faceEdgeIndex;
-		private BoundaryType boundaryType = HalfEdge.this.boundaryType;
-		
-		private SaveStateEdit() {
-			apply(true);
-		}
-		
-		@Override
-		protected void swap() {
-			HalfEdge tmpEdge;
-			Face tmpFace;
-			int tmpInt;
-			BoundaryType tmpBoundaryType;
-			
-			/* swap state */
-//			tmpEdge = HalfEdge.this.next; HalfEdge.this.next = next; next = tmpEdge;
-//			tmpEdge = HalfEdge.this.prev; HalfEdge.this.prev = prev; prev = tmpEdge;
-			tmpFace = HalfEdge.this.face; HalfEdge.this.face = face; face = tmpFace;
-//			tmpFace = HalfEdge.this.pair.face; HalfEdge.this.pair.face = pairFace; pairFace = tmpFace;
-			tmpInt = HalfEdge.this.faceEdgeIndex; HalfEdge.this.faceEdgeIndex = faceEdgeIndex; faceEdgeIndex = tmpInt;
-			tmpBoundaryType = HalfEdge.this.boundaryType; HalfEdge.this.boundaryType = boundaryType; boundaryType = tmpBoundaryType;
-		}
-	}
+//	private class SaveStateEdit extends AbstractSwapEdit {
+////		private HalfEdge next = HalfEdge.this.next;
+////		private HalfEdge prev = HalfEdge.this.next;
+//		private Face face = HalfEdge.this.face;
+////		private Face pairFace = HalfEdge.this.pair.face;
+//		private int faceEdgeIndex = HalfEdge.this.faceEdgeIndex;
+//		private BoundaryType boundaryType = HalfEdge.this.boundaryType;
+//		
+//		private SaveStateEdit() {
+//			apply(true);
+//		}
+//		
+//		@Override
+//		protected void swap() {
+//			HalfEdge tmpEdge;
+//			Face tmpFace;
+//			int tmpInt;
+//			BoundaryType tmpBoundaryType;
+//			
+//			/* swap state */
+////			tmpEdge = HalfEdge.this.next; HalfEdge.this.next = next; next = tmpEdge;
+////			tmpEdge = HalfEdge.this.prev; HalfEdge.this.prev = prev; prev = tmpEdge;
+//			tmpFace = HalfEdge.this.face; HalfEdge.this.face = face; face = tmpFace;
+////			tmpFace = HalfEdge.this.pair.face; HalfEdge.this.pair.face = pairFace; pairFace = tmpFace;
+//			tmpInt = HalfEdge.this.faceEdgeIndex; HalfEdge.this.faceEdgeIndex = faceEdgeIndex; faceEdgeIndex = tmpInt;
+//			tmpBoundaryType = HalfEdge.this.boundaryType; HalfEdge.this.boundaryType = boundaryType; boundaryType = tmpBoundaryType;
+//		}
+//	}
 	
 	private HalfEdge getPrevBoundaryEdge() {
 		assert boundaryType == BoundaryType.BOUNDARY;
@@ -426,20 +427,78 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		return pair.vertex.vertexId.compareTo(other.pair.vertex.vertexId);
 	}
 	
+	/**
+	 * Modifies edgePoint
+	 * Usage: Instanciate the edit with the new edgePoint value, it will immediately set the HalfEdge's edgePont to the new value.
+	 * @author sascha
+	 */
 	private class EdgePointEdit extends AbstractSwapEdit {
-		private DerivedVertex edgePoint;
+		private DerivedVertex xEdgePoint;
 
-		EdgePointEdit(DerivedVertex edgePoint, boolean apply) {
-			this.edgePoint = edgePoint;
-			apply(apply);
+		EdgePointEdit(DerivedVertex edgePoint) {
+			xEdgePoint = edgePoint;
+			apply(true);
 		}
 		
 		@Override
 		protected void swap() {
-			DerivedVertex tmp = HalfEdge.this.edgePoint;
-			HalfEdge.this.edgePoint = edgePoint;
-			HalfEdge.this.pair.edgePoint = edgePoint;
-			edgePoint = tmp;
+			DerivedVertex tmp = edgePoint;
+			edgePoint = pair.edgePoint = xEdgePoint;
+			xEdgePoint = tmp;
+		}
+	}
+	
+	/**
+	 * Modifies face
+	 * Usage: Instanciate the edit with the new face value, it will immediately set the HalfEdge's face to the new value
+	 * @author sascha
+	 */
+	private class FaceEdit extends AbstractSwapEdit {
+		private Face xFace;
+		private int xFaceEdgeIndex;
+		
+		FaceEdit(Face face, int faceEdgeIndex) {
+			xFace = face;
+			xFaceEdgeIndex = faceEdgeIndex;
+			apply(true);
+		}
+		
+		@Override
+		protected void swap() {
+			final Face tmpFace = face;
+			face = xFace;
+			xFace = tmpFace;
+			
+			final int tmpFaceEdgeIndex = faceEdgeIndex;
+			faceEdgeIndex = xFaceEdgeIndex;
+			xFaceEdgeIndex = tmpFaceEdgeIndex;
+			
+			/* update boundary-type */
+			if (face != null) {
+				/* invalidate vertices */
+				for (HalfEdge edge : face.getEdges()) {
+					edge.getVertex().invalidateAll();
+				}
+				if (pair.face != null) {
+					/* invalidate vertices */
+					for (HalfEdge edge : pair.face.getEdges()) {
+						edge.getVertex().invalidateAll();
+					}
+					boundaryType = pair.boundaryType = BoundaryType.REGULAR;
+				} else {
+					boundaryType = pair.boundaryType = BoundaryType.BOUNDARY;
+				}
+			} else {
+				if (pair.face != null) {
+					/* invalidate vertices */
+					for (HalfEdge edge : pair.face.getEdges()) {
+						edge.getVertex().invalidateAll();
+					}
+					boundaryType = pair.boundaryType = BoundaryType.BOUNDARY;
+				} else {
+					boundaryType = pair.boundaryType = BoundaryType.STRAY;
+				}
+			}
 		}
 	}
 }

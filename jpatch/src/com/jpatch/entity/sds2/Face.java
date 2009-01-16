@@ -34,7 +34,27 @@ public class Face {
 
 	private SubdivStatus subdivStatus = SubdivStatus.NOT_SUBDIVIDED;
 	
-	public Face(Material material, HalfEdge[] edges) {
+	private static int count = 0;
+	private final int num = count++;
+	
+	public static Face create(Material material, HalfEdge[] edges, List<JPatchUndoableEdit> editList) {
+		Face face = new Face(material, edges);
+		
+		for (int i = 0; i < edges.length; i++) {
+			edges[i].setFace(face, i, editList);
+		}
+		
+		if (face.faceEdges[0].getVertex() instanceof BaseVertex) {
+			// level 0 face
+			for (int i = 0; i < edges.length; i++) {
+				((BaseVertex) face.faceEdges[i].getVertex()).organizeEdges();
+			}
+		}
+		
+		return face;
+	}
+	
+	private Face(Material material, HalfEdge[] edges) {
 
 //		System.out.println("Face constructor called for edges " + Arrays.toString(edges));
 		int sides = edges.length;
@@ -58,16 +78,7 @@ public class Face {
 		controlSurfaceBuffer = FloatBuffer.allocate((sides + 2) * 2 * 3);
 		
 		this.material = material;
-		for (int i = 0; i < edges.length; i++) {
-			edges[i].setFace(this, i);
-		}
 		
-		if (this.faceEdges[0].getVertex() instanceof BaseVertex) {
-			// level 0 face
-			for (int i = 0; i < sides; i++) {
-				((BaseVertex) this.faceEdges[i].getVertex()).organizeEdges();
-			}
-		}
 		
 //		System.out.println("new face is " + this);
 	}
@@ -367,14 +378,18 @@ public class Face {
 	}
 	
 	public void disposeFacePoint(List<JPatchUndoableEdit> editList) {
-		JPatchUndoableEdit edit = new FacePointEdit(null, true);
 		if (editList != null) {
-			editList.add(edit);
+			editList.add(new FacePointEdit());
 		}
+		facePoint = null;
 	}
 	
 	public DerivedVertex createFacePoint(List<JPatchUndoableEdit> editList) {
 		assert facePoint == null;
+		if (editList != null) {
+			editList.add(new FacePointEdit());
+		}
+		
 		Sds sds = faceEdges[0].getVertex().sds;
 		
 		facePoint = new DerivedVertex(sds) {
@@ -393,13 +408,10 @@ public class Face {
 		/* create facePoint edges */
 		facePoint.vertexEdges = new HalfEdge[faceEdges.length];
 		for (int i = 0; i < faceEdges.length; i++) {
-			facePoint.vertexEdges[i] = HalfEdge.getOrCreate(facePoint, faceEdges[i].getOrCreateEdgePoint(editList));
+			facePoint.vertexEdges[i] = HalfEdge.getOrCreate(facePoint, faceEdges[i].getOrCreateEdgePoint(editList), editList);
 		}
 		facePoint.boundaryType = BoundaryType.REGULAR;
 		
-		if (editList != null) {
-			editList.add(new FacePointEdit(null, false));
-		}
 		return facePoint;
 	}
 	
@@ -468,12 +480,22 @@ public class Face {
 //		return Arrays.equals(faceEdges, ((Face) o).faceEdges);
 //	}
 	
+	@Override
+	public String toString() {
+		return "f" + num;
+	}
+	
+	/**
+	 * Stores facePoint state
+	 * Usage: Instanciate the edit, <i>then</i> set the facePoint of this Face to its new value.
+	 * @author sascha
+	 */
 	private class FacePointEdit extends AbstractSwapEdit {
 		private DerivedVertex facePoint;
 
-		FacePointEdit(DerivedVertex facePoint, boolean apply) {
-			this.facePoint = facePoint;
-			apply(apply);
+		FacePointEdit() {
+			facePoint = Face.this.facePoint;
+			apply(false);
 		}
 		
 		@Override

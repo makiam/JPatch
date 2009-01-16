@@ -106,6 +106,11 @@ public class Operations {
 		/* if not, check if edges are to be extruded */
 		Collection<HalfEdge> selectedEdges = selection.getEdges();
 		if (selectedEdges.size() > 0) {
+			if (selectedEdges.iterator().next().isStray()) {
+				for (HalfEdge strayEdge : selectedEdges) {
+					selection.getSdsModel().getSds().removeSegment(editList, strayEdge);
+				}
+			}
 			return extrudeEdges(selection, selectedEdges, editList);
 		}
 		
