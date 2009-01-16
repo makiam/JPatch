@@ -104,7 +104,16 @@ public class Actions {
 	public final JPatchAction dump = new JPatchAction(undoManager, "DUMP") {
 		public void actionPerformed(ActionEvent e) {
 			Sds sds = Main.getInstance().getSelection().getSdsModel().getSds();
-			sds.dumpFaces(0);
+			try {
+				BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+				System.out.print("dump from level:");
+				int min = Integer.parseInt(input.readLine());
+				System.out.print("dump to level:");
+				int max = Integer.parseInt(input.readLine());
+				sds.dumpFaces(min, max);
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
 			try {
 				Writer writer = new OutputStreamWriter(System.out);
 				XmlWriter xmlWriter = new XmlWriter(writer);

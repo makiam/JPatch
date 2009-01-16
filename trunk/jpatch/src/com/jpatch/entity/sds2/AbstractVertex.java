@@ -11,7 +11,7 @@ import com.jpatch.entity.*;
 import javax.vecmath.*;
 
 public abstract class AbstractVertex implements Comparable<AbstractVertex> {
-	static enum BoundaryType { REGULAR, BOUNDARY, IRREGULAR }
+	static enum BoundaryType { REGULAR, BOUNDARY, IRREGULAR, ILLEGAL }
 	
 	
 	
@@ -38,7 +38,7 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 	HalfEdge[] vertexEdges = new HalfEdge[0];
 	
 	private DerivedVertex vertexPoint;
-	BoundaryType boundaryType;
+	BoundaryType boundaryType = BoundaryType.ILLEGAL;
 	
 	boolean worldPositionValid;
 //	boolean displacedPositionValid;
@@ -139,10 +139,10 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 	
 	public final void disposeVertexPoint(List<JPatchUndoableEdit> editList) {
 		assert vertexPoint != null;
-		JPatchUndoableEdit edit = new VertexPointEdit(null, true);
 		if (editList != null) {
-			editList.add(edit);
+			editList.add(new VertexPointEdit());
 		}
+		vertexPoint = null;
 	}
 	
 	final Point3d getPos() {
@@ -157,7 +157,7 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 		return displacement == null ? worldNormal : displacement.displacedNormal;
 	}
 	
-	private DerivedVertex createVertexPoint() {
+	private void createVertexPoint() {
 		assert vertexPoint == null;
 		vertexPoint = new DerivedVertex(sds) {
 		
@@ -176,6 +176,7 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 					if (cornerSharpness > 1 || parentVertex.boundaryType == BoundaryType.IRREGULAR) {
 						worldPosition.set(parentVertex.getPos());
 					} else {
+						System.out.println("derived=" + this + " parent=" + parentVertex + " parentBT=" + parentVertex.boundaryType);
 						switch (parentVertex.boundaryType) {
 						case REGULAR:
 							final int valence = vertexEdges.length;
@@ -206,6 +207,7 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 							break;
 						case BOUNDARY:
 							AbstractVertex v0 = parentVertex;
+							System.out.println("vertexEdges=" + Arrays.toString(parentVertex.vertexEdges));
 							AbstractVertex v1 = parentVertex.vertexEdges[0].getPairVertex();
 							AbstractVertex v2 = parentVertex.vertexEdges[parentVertex.vertexEdges.length - 1].getPairVertex();
 							Point3d p0 = v0.getPos();
@@ -247,24 +249,9 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 //			}
 		};
 		vertexPoint.vertexId = new VertexId.VertexPointId(vertexId);
-		return vertexPoint;
+		vertexPoint.boundaryType = boundaryType;
 	}
 	
-	public final class CreateVertexPointEdit extends AbstractSwapEdit {
-		private DerivedVertex vertexPoint;
-		
-		CreateVertexPointEdit() { 
-			createVertexPoint();
-			apply(false);
-		}
-		
-		@Override
-		protected void swap() {
-			DerivedVertex tmp = AbstractVertex.this.vertexPoint;
-			AbstractVertex.this.vertexPoint = vertexPoint;
-			vertexPoint = tmp;
-		}
-	}
 	
 //		if (editList != null) {
 //			editList.add(new VertexPointEdit(null, false));
@@ -274,14 +261,17 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 //		return vertexPoint;
 //	}
 	
-	void createVertexPointEdges(List<JPatchUndoableEdit> editList) {
-		if (vertexPoint.vertexEdges == null || vertexPoint.vertexEdges.length != vertexEdges.length) {
+	void updateVertexPointEdges(List<JPatchUndoableEdit> editList) {
+		if (vertexPoint != null) {
+			if (editList != null) {
+				editList.add(vertexPoint.new VertexEdgesEdit());
+			}
 			vertexPoint.vertexEdges = new HalfEdge[vertexEdges.length];
+			for (int i = 0; i < vertexEdges.length; i++) {
+				vertexPoint.vertexEdges[i] = HalfEdge.getOrCreate(vertexPoint, vertexEdges[i].getOrCreateEdgePoint(editList), editList);
+			}
+			vertexPoint.updateVertexPointEdges(editList);
 		}
-		for (int i = 0; i < vertexEdges.length; i++) {
-			vertexPoint.vertexEdges[i] = HalfEdge.getOrCreate(vertexPoint, vertexEdges[i].getOrCreateEdgePoint(editList));
-		}
-		vertexPoint.boundaryType = boundaryType;
 	}
 	
 	public final double getLimitFactor() {
@@ -302,6 +292,19 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 		return vertexEdges;
 	}
 	
+	/**
+	 * @param v
+	 * @return the edge containing this vertex with the specified vertex v, or null if no such edge exists
+	 */
+	public final HalfEdge getEdge(AbstractVertex v) {
+		for (HalfEdge edge : vertexEdges) {
+			if (edge.getPairVertex() == v) {
+				return edge;
+			}
+		}
+		return null;
+	}
+	
 	public final DerivedVertex getVertexPoint() {
 		return vertexPoint;
 	}
@@ -311,12 +314,12 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 			return vertexPoint;
 		} else {
 			if (editList != null) {
-				editList.add(new CreateVertexPointEdit());
-			} else {
-				createVertexPoint();
+				editList.add(new VertexPointEdit());
 			}
+			createVertexPoint();
+			updateVertexPointEdges(editList);
+			return vertexPoint;
 		}
-		return vertexPoint;
 	}
 	
 	abstract void validateWorldPosition();
@@ -851,12 +854,17 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 		}
 	}
 	
+	/**
+	 * Stores vertexPoint state
+	 * Usage: Instanciate the edit, <i>then</i> set the vertexPoint of this AbstractVertex to its new value.
+	 * @author sascha
+	 */
 	private class VertexPointEdit extends AbstractSwapEdit {
 		private DerivedVertex vertexPoint;
 
-		VertexPointEdit(DerivedVertex vertexPoint, boolean apply) {
-			this.vertexPoint = vertexPoint;
-			apply(apply);
+		VertexPointEdit() {
+			vertexPoint = AbstractVertex.this.vertexPoint;
+			apply(false);
 		}
 		
 		@Override
@@ -867,11 +875,17 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 		}
 	}
 	
-	private class VertexEdgesEdit extends AbstractSwapEdit {
+	/**
+	 * Stores vertexEdges state
+	 * Usage: Instanciate the edit, <i>then</i> set the vertexEdges of this AbstractVertex to its new value (a new array!).
+	 * @author sascha
+	 */
+	class VertexEdgesEdit extends AbstractSwapEdit {
 		private HalfEdge[] vertexEdges;
 		
-		VertexEdgesEdit(HalfEdge[] vertexEdges, boolean apply) {
-			this.vertexEdges = vertexEdges;
+		VertexEdgesEdit() {
+			vertexEdges = AbstractVertex.this.vertexEdges;
+			apply(false);
 		}
 		
 		@Override
@@ -879,6 +893,26 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 			HalfEdge[] tmp = AbstractVertex.this.vertexEdges;
 			AbstractVertex.this.vertexEdges = vertexEdges;
 			vertexEdges = tmp;
+		}
+	}
+	
+	/**
+	 * Stores boundaryType state
+	 * Usage: Instanciate the edit, <i>then</i> set the boundaryType of this AbstractVertex to its new value.
+	 * @author sascha
+	 */
+	class BoundaryTypeEdit extends AbstractSwapEdit {
+		private BoundaryType boundaryType;
+		
+		BoundaryTypeEdit() {
+			boundaryType = AbstractVertex.this.boundaryType;
+		}
+		
+		@Override
+		protected void swap() {
+			BoundaryType tmp = AbstractVertex.this.boundaryType;
+			AbstractVertex.this.boundaryType = boundaryType;
+			boundaryType = tmp;
 		}
 	}
 }
