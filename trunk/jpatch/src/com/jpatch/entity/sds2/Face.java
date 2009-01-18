@@ -37,6 +37,8 @@ public class Face {
 	private static int count = 0;
 	private final int num = count++;
 	
+	private int rim;
+	
 	public static Face create(Material material, HalfEdge[] edges, List<JPatchUndoableEdit> editList) {
 		Face face = new Face(material, edges);
 		
@@ -56,7 +58,7 @@ public class Face {
 	
 	private Face(Material material, HalfEdge[] edges) {
 
-//		System.out.println("Face constructor called for edges " + Arrays.toString(edges));
+		System.out.println("Face constructor called for edges " + Arrays.toString(edges));
 		int sides = edges.length;
 		assert sides >= 3 : "edges.length=" + edges.length + ", must be >= 3";
 		
@@ -101,6 +103,19 @@ public class Face {
 		invalidate();
 	}
 	
+	public void increaseRimValue() {
+		rim++;
+	}
+	
+	public void decreaseRimValue() {
+		assert rim > 0;
+		rim--;
+	}
+	
+	public int getRimValue() {
+		return rim;
+	}
+	
 	public int getSides() {
 		return faceEdges.length;
 	}
@@ -119,10 +134,14 @@ public class Face {
 		this.material = material;
 	}
 	
-	public SubdivStatus getSubdivStatus() {
-		return subdivStatus;
-	}
+//	public SubdivStatus getSubdivStatus() {
+//		return subdivStatus;
+//	}
 
+	public boolean isSubdivided() {
+		return facePoint != null && facePoint.getEdges() != null;
+	}
+	
 	void setSubdivStatus(SubdivStatus subdivStatus) {
 //		assert subdivStatus == SubdivStatus.NOT_SUBDIVIDED || facePoint != null;
 		this.subdivStatus = subdivStatus;
@@ -139,7 +158,10 @@ public class Face {
 //		}
 //		return true;
 //		if (true) return false;
-		return material != null && (subdivStatus == SubdivStatus.NOT_SUBDIVIDED || subdivStatus == SubdivStatus.BOUNDARY);
+	
+//		return material != null && (subdivStatus == SubdivStatus.NOT_SUBDIVIDED || subdivStatus == SubdivStatus.BOUNDARY);
+		
+		return material != null && !isSubdivided();
 	}
 	
 	public void getMidpointPosition(Tuple3d midPoint) {
@@ -259,9 +281,11 @@ public class Face {
 			if (edge.getEdgePoint() != null) {
 				edge.getEdgePoint().invalidate();
 			}
-			for (HalfEdge e : edge.getVertex().getEdges()) {
-				if (e.getFace() != null) {
-					e.getFace().limitSurfaceValid = false;
+			if (edge.getVertex().getEdges() != null) {
+				for (HalfEdge e : edge.getVertex().getEdges()) {
+					if (e.getFace() != null) {
+						e.getFace().limitSurfaceValid = false;
+					}
 				}
 			}
 		}
@@ -401,16 +425,18 @@ public class Face {
 					worldPositionValid = true;
 				}
 			}
+			
+			@Override
+			void computeEdges() {
+				/* create facePoint edges */
+				vertexEdges = new HalfEdge[faceEdges.length];
+				for (int i = 0; i < faceEdges.length; i++) {
+					facePoint.vertexEdges[i] = HalfEdge.getOrCreate(facePoint, faceEdges[i].getEdgePoint());
+				}
+			}
 		};
-		
-		facePoint.vertexId = new VertexId.FacePointId(faceEdges[0].getVertex().vertexId, faceEdges[1].getVertex().vertexId);
-		
-		/* create facePoint edges */
-		facePoint.vertexEdges = new HalfEdge[faceEdges.length];
-		for (int i = 0; i < faceEdges.length; i++) {
-			facePoint.vertexEdges[i] = HalfEdge.getOrCreate(facePoint, faceEdges[i].getOrCreateEdgePoint(editList), editList);
-		}
 		facePoint.boundaryType = BoundaryType.REGULAR;
+		facePoint.vertexId = new VertexId.FacePointId(faceEdges[0].getVertex().vertexId, faceEdges[1].getVertex().vertexId);
 		
 		return facePoint;
 	}

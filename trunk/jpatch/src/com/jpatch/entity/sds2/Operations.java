@@ -239,20 +239,20 @@ public class Operations {
 		
 		/* delete and recreate boundary faces */
 		for (Face boundaryFace : boundaryFaces) {
-			AbstractVertex[] newVertices = new AbstractVertex[boundaryFace.getSides()];
+			BaseVertex[] newVertices = new BaseVertex[boundaryFace.getSides()];
 			for (int i = 0; i < boundaryFace.getSides(); i++) {
-				AbstractVertex vertex = boundaryFace.getEdges()[i].getVertex();
-				AbstractVertex newVertex = boundaryVertices.get(vertex);
+				BaseVertex vertex = (BaseVertex) boundaryFace.getEdges()[i].getVertex();
+				BaseVertex newVertex = boundaryVertices.get(vertex);
 				//if this vertex hasn't been extruded, use the old vertex instead
 				newVertices[i] = newVertex == null ? vertex : newVertex;
 			}
 			
 			if (singleFace) {
 				/* reverse the face */
-				AbstractVertex[] vertices = new AbstractVertex[boundaryFace.getSides()];
+				BaseVertex[] vertices = new BaseVertex[boundaryFace.getSides()];
 				HalfEdge[] faceEdges = boundaryFace.getEdges();
 				for (int i = 0; i < vertices.length; i++) {
-					vertices[i] = faceEdges[vertices.length - i - 1].getVertex();
+					vertices[i] = (BaseVertex) faceEdges[vertices.length - i - 1].getVertex();
 				}
 				Material material = boundaryFace.getMaterial();
 				sds.removeFace(editList, boundaryFace);
@@ -264,10 +264,10 @@ public class Operations {
 		}
 		
 		/* create extrude-faces */
-		AbstractVertex[] newVertices = new AbstractVertex[4];
+		BaseVertex[] newVertices = new BaseVertex[4];
 		for (HalfEdge boundaryEdge : boundaryEdges.keySet()) {
-			newVertices[0] = boundaryEdge.getVertex();
-			newVertices[1] = boundaryEdge.getPairVertex();
+			newVertices[0] = (BaseVertex) boundaryEdge.getVertex();
+			newVertices[1] = (BaseVertex) boundaryEdge.getPairVertex();
 			newVertices[2]  = boundaryVertices.get(boundaryEdge.getPairVertex());
 			newVertices[3]  = boundaryVertices.get(boundaryEdge.getVertex());
 			sds.addFace(editList, boundaryEdges.get(boundaryEdge), newVertices);

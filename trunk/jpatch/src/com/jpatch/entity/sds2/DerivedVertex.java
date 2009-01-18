@@ -56,6 +56,8 @@ public abstract class DerivedVertex extends AbstractVertex {
 		return null;
 	}
 	
+	abstract void computeEdges();
+	
 //	public String toString() {
 //		return "hv" + Arrays.toString(generateId());
 //	}

@@ -26,37 +26,60 @@ public class HalfEdge implements Comparable<HalfEdge>{
 	private DerivedVertex edgePoint;
 	
 	/**
-	 * Returns a HalfEdge connecting the specified vertices. If such an edge has already been created and added to at 
-	 * least one of the specified vertices, it is returned. Otherwise a new edge is created and returned.
-	 * If the specified vertices are BaseVertices (subdiv-level 0), the edge is added to the vertices. DerivedVerticed
-	 * (subdivLevel > 0) are left untouched, as they have to keep track of their attached edges on their own.
+	 * Returns a HalfEdge connecting the specified vertices if such an edge has already been created and added to v0, null otherwise.
 	 * @param v0 the first vertex
 	 * @param v1 the second vertex
 	 * @return the HalfEdge connecting the specified vertices
 	 */
-	public static HalfEdge getOrCreate(AbstractVertex v0, AbstractVertex v1, List<JPatchUndoableEdit> editList) {
-		/* search both vertices for the edge in question */
-		for (HalfEdge edge : v0.getEdges()) {
-			if (edge != null && edge.pair.vertex == v1) {
-				return edge;
+	private static HalfEdge locateEdge(AbstractVertex v0, AbstractVertex v1) {
+		assert v0 != null && v1 != null;
+		if (v0.getEdges() != null) {
+			for (HalfEdge edge : v0.getEdges()) {
+				if (edge != null && edge.pair.vertex == v1) {
+					return edge;
+				}
 			}
 		}
-		for (HalfEdge edge : v1.getEdges()) {
-			if (edge != null && edge.pair.vertex == v0) {
-				return edge.pair;
+		if (v1.getEdges() != null) {
+			for (HalfEdge edge : v1.getEdges()) {
+				if (edge != null && edge.pair.vertex == v0) {
+					return edge.pair;
+				}
 			}
 		}
-		
-		/* edge not found, create a new one */
-		HalfEdge halfEdge = new HalfEdge(v0, v1);
-		
-		/* when connecting BaseVertices, add the new edge using BaseVertex.addEdge() */
-		if (v0 instanceof BaseVertex || v1 instanceof BaseVertex) {
-			assert v0 instanceof BaseVertex && v1 instanceof BaseVertex;
-			((BaseVertex) v0).addEdge(halfEdge, editList);
-			((BaseVertex) v1).addEdge(halfEdge.pair, editList);
+		return null;
+	}
+	
+	/**
+	 * Returns a HalfEdge connecting the specified vertices if such an edge has already been created and added to v0.
+	 * Otherwise a new edge is created and returned.
+	 * If it's a new edge, it also gets added to the BaseVertices.
+	 * @param v0 the first vertex
+	 * @param v1 the second vertex
+	 * @return the HalfEdge connecting the specified vertices
+	 */
+	public static HalfEdge getOrCreate(BaseVertex v0, BaseVertex v1, List<JPatchUndoableEdit> editList) {
+		HalfEdge halfEdge = locateEdge(v0, v1);
+		if (halfEdge == null) {
+			halfEdge = new HalfEdge(v0, v1);
+			v0.addEdge(halfEdge, editList);
+			v1.addEdge(halfEdge.pair, editList);
 		}
-		
+		return halfEdge;
+	}
+	
+	/**
+	 * Returns a HalfEdge connecting the specified vertices if such an edge has already been created and added to v0.
+	 * Otherwise a new edge is created and returned.
+	 * @param v0 the first vertex
+	 * @param v1 the second vertex
+	 * @return the HalfEdge connecting the specified vertices
+	 */
+	public static HalfEdge getOrCreate(DerivedVertex v0, DerivedVertex v1) {
+		HalfEdge halfEdge = locateEdge(v0, v1);
+		if (halfEdge == null) {
+			halfEdge = new HalfEdge(v0, v1);
+		}
 		return halfEdge;
 	}
 	
@@ -149,7 +172,11 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		}
 		
 		if (edgePoint != null) {
-			createEdgePointEdges(editList);
+			if (editList != null) {
+				editList.add(edgePoint.new VertexEdgesEdit());
+				editList.add(edgePoint.new BoundaryTypeEdit());
+			}
+			edgePoint.computeEdges();
 		}
 	}
 	
@@ -237,62 +264,57 @@ public class HalfEdge implements Comparable<HalfEdge>{
 					worldPositionValid = true;
 				}
 			}
+			
+			void computeEdges() {
+				if (face != null) {
+					if (pair.face != null) {
+						/* REGULAR */
+						boundaryType = BoundaryType.REGULAR;
+						vertexEdges = new HalfEdge[] {
+							HalfEdge.getOrCreate(this, pair.vertex.getVertexPoint()),
+							HalfEdge.getOrCreate(this, face.getFacePoint()),
+							HalfEdge.getOrCreate(this, vertex.getVertexPoint()),
+							HalfEdge.getOrCreate(this, pair.face.getFacePoint())
+						};
+//						Utils.cycleToFront(vertexEdges);
+					} else {
+						/* BOUNDARY (right side) */
+						boundaryType = BoundaryType.BOUNDARY;
+						vertexEdges = new HalfEdge[] {
+							HalfEdge.getOrCreate(this, pair.vertex.getVertexPoint()),
+							HalfEdge.getOrCreate(this, face.getFacePoint()),
+							HalfEdge.getOrCreate(this, vertex.getVertexPoint())
+						};
+					}
+				} else {
+					if (pair.face != null) {
+						/* BOUNDARY (left side) */
+						boundaryType = BoundaryType.BOUNDARY;
+						vertexEdges = new HalfEdge[] {
+							HalfEdge.getOrCreate(this, vertex.getVertexPoint()),
+							HalfEdge.getOrCreate(this, pair.face.getFacePoint()),
+							HalfEdge.getOrCreate(this, pair.vertex.getVertexPoint())
+						};
+					} else {
+						/* STRAY EDGE */
+						vertexEdges = new HalfEdge[] {
+							HalfEdge.getOrCreate(this, pair.vertex.getVertexPoint()),
+							HalfEdge.getOrCreate(this, vertex.getVertexPoint())
+						};
+//						Utils.cycleToFront(vertexEdges);
+					}
+				}
+			}
 		};
 		EdgePointEdit edit = new EdgePointEdit(newEdgePoint);
 		if (editList != null) {
 			editList.add(edit);
 		}
-		
 		edgePoint.vertexId = new VertexId.EdgePointId(vertex.vertexId, pair.vertex.vertexId);
-		createEdgePointEdges(editList);
-		
 		return edgePoint;
 	}
 	
-	private void createEdgePointEdges(List<JPatchUndoableEdit> editList) {
-		if (editList != null) {
-			editList.add(edgePoint.new VertexEdgesEdit());
-			editList.add(edgePoint.new BoundaryTypeEdit());
-		}
-		if (face != null) {
-			if (pair.face != null) {
-				/* REGULAR */
-				edgePoint.boundaryType = AbstractVertex.BoundaryType.REGULAR;
-				edgePoint.vertexEdges = new HalfEdge[] {
-					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint(editList), editList),
-					HalfEdge.getOrCreate(edgePoint, face.getOrCreateFacePoint(editList), editList),
-					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint(editList), editList),
-					HalfEdge.getOrCreate(edgePoint, pair.face.getOrCreateFacePoint(editList), editList)
-				};
-				Utils.cycleToFront(edgePoint.vertexEdges);
-			} else {
-				/* BOUNDARY (right side) */
-				edgePoint.boundaryType = AbstractVertex.BoundaryType.BOUNDARY;
-				edgePoint.vertexEdges = new HalfEdge[] {
-					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint(editList), editList),
-					HalfEdge.getOrCreate(edgePoint, face.getOrCreateFacePoint(editList), editList),
-					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint(editList), editList)
-				};
-			}
-		} else {
-			if (pair.face != null) {
-				/* BOUNDARY (left side) */
-				edgePoint.boundaryType = AbstractVertex.BoundaryType.BOUNDARY;
-				edgePoint.vertexEdges = new HalfEdge[] {
-					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint(editList), editList),
-					HalfEdge.getOrCreate(edgePoint, pair.face.getOrCreateFacePoint(editList), editList),
-					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint(editList), editList)
-				};
-			} else {
-				/* STRAY EDGE */
-				edgePoint.vertexEdges = new HalfEdge[] {
-					HalfEdge.getOrCreate(edgePoint, pair.vertex.getOrCreateVertexPoint(editList), editList),
-					HalfEdge.getOrCreate(edgePoint, vertex.getOrCreateVertexPoint(editList), editList)
-				};
-				Utils.cycleToFront(edgePoint.vertexEdges);
-			}
-		}
-	}
+	
 	
 	public DerivedVertex getEdgePoint() {
 		return edgePoint;
