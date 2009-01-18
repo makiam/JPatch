@@ -10,7 +10,7 @@ import com.jpatch.entity.*;
 
 import javax.vecmath.*;
 
-public abstract class AbstractVertex implements Comparable<AbstractVertex> {
+public abstract class AbstractVertex {
 	static enum BoundaryType { REGULAR, BOUNDARY, IRREGULAR, ILLEGAL }
 	
 	
@@ -35,9 +35,9 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 //	final Vector3d morphDisplacementVector = new Vector3d();
 //	final Vector3d transformedDisplacementVector = new Vector3d();
 	
-	HalfEdge[] vertexEdges = new HalfEdge[0];
+	HalfEdge[] vertexEdges;
 	
-	private DerivedVertex vertexPoint;
+	DerivedVertex vertexPoint;
 	BoundaryType boundaryType = BoundaryType.ILLEGAL;
 	
 	boolean worldPositionValid;
@@ -234,22 +234,21 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 				}
 			}
 			
-//			@Override
-//			void organizeEdges() {
-//				AbstractVertex.this.organizeEdges();
-//				final HalfEdge[] parentEdges = AbstractVertex.this.vertexEdges;
-//				if (vertexEdges.length == parentEdges.length) {
-//					for (int i = 0; i < parentEdges.length; i++) {
-//						vertexEdges[i] = HalfEdge.getOrCreate(this, parentEdges[i].getOrCreateEdgePoint());
-//					}
-//					boundaryType = AbstractVertex.this.boundaryType;
-//				} else {
-//					boundaryType = BoundaryType.IRREGULAR;
-//				}
-//			}
+			void computeEdges() {
+				System.out.print(this + ".computeEdges() called, ");
+				final AbstractVertex parentVertex = AbstractVertex.this;
+				vertexEdges = new HalfEdge[parentVertex.vertexEdges.length];
+				for (int i = 0; i < vertexEdges.length; i++) {
+					vertexEdges[i] = HalfEdge.getOrCreate(this, parentVertex.vertexEdges[i].getEdgePoint());
+				}
+				System.out.println(" edges are: " + Arrays.toString(vertexEdges));
+				boundaryType = parentVertex.boundaryType;
+				if (vertexPoint != null && vertexPoint.vertexEdges != null) {
+					vertexPoint.computeEdges();
+				}
+			}
 		};
 		vertexPoint.vertexId = new VertexId.VertexPointId(vertexId);
-		vertexPoint.boundaryType = boundaryType;
 	}
 	
 	
@@ -261,18 +260,7 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 //		return vertexPoint;
 //	}
 	
-	void updateVertexPointEdges(List<JPatchUndoableEdit> editList) {
-		if (vertexPoint != null) {
-			if (editList != null) {
-				editList.add(vertexPoint.new VertexEdgesEdit());
-			}
-			vertexPoint.vertexEdges = new HalfEdge[vertexEdges.length];
-			for (int i = 0; i < vertexEdges.length; i++) {
-				vertexPoint.vertexEdges[i] = HalfEdge.getOrCreate(vertexPoint, vertexEdges[i].getOrCreateEdgePoint(editList), editList);
-			}
-			vertexPoint.updateVertexPointEdges(editList);
-		}
-	}
+	
 	
 	public final double getLimitFactor() {
 		switch (boundaryType) {
@@ -294,7 +282,7 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 	
 	/**
 	 * @param v
-	 * @return the edge containing this vertex with the specified vertex v, or null if no such edge exists
+	 * @return the edge connecting this vertex with the specified vertex v, or null if no such edge exists
 	 */
 	public final HalfEdge getEdge(AbstractVertex v) {
 		for (HalfEdge edge : vertexEdges) {
@@ -303,6 +291,20 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * @param edge
+	 * @return the index of the specified edge.
+	 * @throws NoSuchElementException if the edge does not exist
+	 */
+	public final int getEdgeIndex(HalfEdge edge) {
+		for (int i = 0; i < vertexEdges.length; i++) {
+			if (vertexEdges[i] == edge) {
+				return i;
+			}
+		}
+		throw new NoSuchElementException();
 	}
 	
 	public final DerivedVertex getVertexPoint() {
@@ -317,7 +319,6 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 				editList.add(new VertexPointEdit());
 			}
 			createVertexPoint();
-			updateVertexPointEdges(editList);
 			return vertexPoint;
 		}
 	}
@@ -423,6 +424,7 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 					HalfEdge edge = vertexEdges[i];
 			
 					Face face = edge.getPairFace();
+					System.out.println("vertex=" + this + " edge=" + edge + " pairFace=" + face);
 					face.validateMidpointPosition();
 					Point3d faceMidpoint = face.midpointPosition;
 					
@@ -654,9 +656,11 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 	final void invalidate() {
 		if (worldPositionValid) {
 			worldPositionValid = false;
-			for (HalfEdge edge : vertexEdges) {
-				if (edge.getFace() != null) {
-					edge.getFace().invalidate();
+			if (vertexEdges != null) {
+				for (HalfEdge edge : vertexEdges) {
+					if (edge.getFace() != null) {
+						edge.getFace().invalidate();
+					}
 				}
 			}
 		}
@@ -751,12 +755,6 @@ public abstract class AbstractVertex implements Comparable<AbstractVertex> {
 	public String toString() {
 		return vertexId.toString();
 	}
-	
-	public int compareTo(AbstractVertex other) {
-		return vertexId.compareTo(other.vertexId);
-	}
-
-	
 	
 	@TestSuit
 	public static class Tests {

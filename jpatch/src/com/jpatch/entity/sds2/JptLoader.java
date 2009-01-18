@@ -81,7 +81,8 @@ public class JptLoader {
 					BaseVertex[] vertices = vertexList.toArray(new BaseVertex[vertexList.size()]);
 					if (materialIndex != -1) {
 //						sds.addFace(null, materials.get(materialIndex), vertices);
-						final Face face = sds.getOrCreateFace(null, vertices);
+						final Face face = sds.addFace(null, materials.get(materialIndex), vertices);
+						
 						
 //					if (face != null) {
 //						sds.setFaceMaterial(face, materials.get(materialIndex));

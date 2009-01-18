@@ -159,6 +159,26 @@ public class Utils {
 		}
 	}
 	
+	public static final <T> Collection<T> asCollection(final Iterable<T> iterable) {
+		return new AbstractCollection<T>() {
+
+			@Override
+			public Iterator<T> iterator() {
+				return iterable.iterator();
+			}
+
+			@Override
+			public int size() {
+				int i = 0;
+				for (Iterator<T> it = iterator(); it.hasNext(); ) {
+					it.next();
+					i++;
+				}
+				return i;
+			}
+		};
+	}
+	
 	public static final ListSelectionModel NULL_SELECTION_MODEL = new DefaultListSelectionModel() {
 
 		@Override

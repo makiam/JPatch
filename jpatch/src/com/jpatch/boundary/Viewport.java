@@ -604,6 +604,7 @@ public class Viewport implements NamedObject {
 					if (!face.isDrawable()) {
 						continue;
 					}
+					System.out.println("drawing face " + face);
 					GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
 					if (currentMaterial != faceMaterial) {
 						setMaterial(gl, GL_FRONT, faceMaterial);

@@ -75,7 +75,6 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 			editList.add(new VertexEdgesEdit());
 		}
 		vertexEdges = tmp;
-		updateVertexPointEdges(editList);
 	}
 	
 	/**
@@ -159,6 +158,9 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 		if (debug) System.out.println();
 		if (debug) System.out.println("    boundaryType = " + boundaryType);
 		
+		if (vertexPoint != null && vertexPoint.vertexEdges != null) {
+			vertexPoint.computeEdges();
+		}
 		worldPositionValid = true;
 		invalidate();
 	}
