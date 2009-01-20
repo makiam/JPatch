@@ -61,49 +61,7 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 //		invalidate();
 //	}
 
-	/**
-	 * Adds the specified HalfEdge to this vertex
-	 * asserts that edge.getVertex() == this vertex
-	 */
-	final void addEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
-		assert edge.getVertex() == this : "edge.vertex=" + edge.getVertex() + ", must be this vertex (" + this + ")";
-		HalfEdge[] tmp = new HalfEdge[vertexEdges.length + 1];
-		System.arraycopy(vertexEdges, 0, tmp, 0, vertexEdges.length);
-		tmp[vertexEdges.length] = edge;
-		
-		if (editList != null) {
-			editList.add(new VertexEdgesEdit());
-		}
-		vertexEdges = tmp;
-	}
 	
-	/**
-	 * Removes the specified HalfEdge from this vertex
-	 * @throws ArrayIndexOutOfBoundsException if the specified HalfEdge is not adjacent to this Vertex
-	 */
-	final void removeEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
-		boolean debug = false;
-		if (debug) System.out.println("removing edge " + edge + " from vertex " + this);
-		if (debug) System.out.print("    edges are:");
-		if (debug) for (HalfEdge e : vertexEdges) System.out.print(" " + e);
-		if (debug) System.out.println();
-		int i = 0;
-		while (vertexEdges[i] != edge) {	// throws ArrayIndexOutOfBoundsException if edge is not part of edges
-			i++;
-		}
-		final HalfEdge[] tmp = new HalfEdge[vertexEdges.length - 1];
-		System.arraycopy(vertexEdges, 0, tmp, 0, i);
-		System.arraycopy(vertexEdges, i + 1, tmp, i, tmp.length - i);
-		
-		if (editList != null) {
-			editList.add(new VertexEdgesEdit());
-		}
-		vertexEdges = tmp;
-		
-		if (debug) System.out.print("    edges are:");
-		if (debug) for (HalfEdge e : vertexEdges) System.out.print(" " + e);
-		if (debug) System.out.println();
-	}
 	
 	/**
 	 * This method must be called whenever a face adjacent to this vertex was created or destroyed.
@@ -115,21 +73,22 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 	 * </ul>
 	 */
 	void organizeEdges() {
-		boolean debug = false;
+		boolean debug = true;
 		if (debug) System.out.println(this + " organizeEdges() called...");
 		
-		if (debug) System.out.print("    edges are:");
-		if (debug) for (HalfEdge e : vertexEdges) System.out.print(" " + e);
-		if (debug) System.out.println();
+		if (debug) System.out.println("    edges are: " + Arrays.toString(vertexEdges));
 		
 		if (vertexEdges.length == 0) {
 			return;
 		}
 		final HalfEdge[] tmp = vertexEdges.clone();
 		HalfEdge e = tmp[0];
+		System.out.println("e=" + e + ", pairNext=" + e.getPair().getNext() + ", entering loop");
 		while(e.getPair().getNext() != null && e.getPair().getNext() != tmp[0]) {
 			e = e.getPair().getNext();
+			System.out.println("e=" + e + ", pairNext=" + e.getPair().getNext());
 		}
+		System.out.println("loop done");
 		
 		if (e.getPair().getNext() != null) {
 			boundaryType = BoundaryType.REGULAR;	// regular vertex
@@ -142,6 +101,11 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 		
 		
 		for (int i = 0; i < vertexEdges.length; i++) {
+			if (e.getPrev() != null) {
+				System.out.println("e=" + e + ", prevPair=" + e.getPrev().getPair());
+			} else {
+				System.out.println("e=" + e + ", prev=null");
+			}
 			if (i < vertexEdges.length - 1 && e.getPrev() == null) {
 				System.arraycopy(tmp, 0, vertexEdges, 0, vertexEdges.length);
 				boundaryType = BoundaryType.IRREGULAR; // irregular boundary vertex, crease edges are edges[0] and edges[edges.length - 1]
@@ -159,7 +123,7 @@ public class BaseVertex extends AbstractVertex implements XFormListener {
 		if (debug) System.out.println("    boundaryType = " + boundaryType);
 		
 		if (vertexPoint != null && vertexPoint.vertexEdges != null) {
-			vertexPoint.computeEdges();
+		// TODO ??	vertexPoint.organizeEdges();
 		}
 		worldPositionValid = true;
 		invalidate();

@@ -407,6 +407,14 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 					setSelection(hitSelection, hitObject);
 					highlightHitObject(viewport, false, false, false);
 					System.out.println(hitObject);
+					
+					if (hitObject instanceof HitVertex) {
+						Main.getInstance().getExplorer().goTo(((HitVertex) hitObject).vertex);
+					} else if (hitObject instanceof HitEdge) {
+						Main.getInstance().getExplorer().goTo(((HitEdge) hitObject).halfEdge);
+					} else if (hitObject instanceof HitFace) {
+						Main.getInstance().getExplorer().goTo(((HitFace) hitObject).face);
+					}
 				}
 				break;
 			case IDLE:
