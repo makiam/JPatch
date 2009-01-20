@@ -120,6 +120,8 @@ public class Main {
 	public HUD hud = new HUD();	//FIXME make private
 	public Slider slider = new Slider(hud); //FIXME make private
 	
+	private Explorer explorer = new Explorer();
+	
 	private LayoutManager2 screenLayout = new LayoutManager2() {
 		private Dimension dim = new Dimension();
 		
@@ -857,6 +859,11 @@ public class Main {
 			
 		});
 		
+		JFrame frame = new JFrame("JPatch Object Explorer");
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.add(explorer.getComponent());
+		frame.setSize(300, 400);
+		frame.setVisible(true);
 //		hud.addWidget(slider);
 //		slider.getBounds().setBounds(10, 10, 100, 100);
 //		hud.bindToViewport(viewports[0]);
@@ -881,6 +888,10 @@ public class Main {
 //			}
 //		}
 //	}
+	
+	public Explorer getExplorer() {
+		return explorer;
+	}
 	
 	public static Main getInstance() {
 		return INSTANCE;

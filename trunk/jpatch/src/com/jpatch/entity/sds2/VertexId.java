@@ -1,56 +1,38 @@
 package com.jpatch.entity.sds2;
 
 public abstract class VertexId implements Comparable<VertexId>{
-	AbstractVertex vertex;
-	
-	abstract void createVertex();
-	
-	
-	final AbstractVertex getOrCreateVertex() {
-		if (vertex == null) {
-			createVertex();
-		}
-		return vertex;
-	}
 	
 	static class BaseVertexId extends VertexId {
+		public final BaseVertex vertex;
+		
 		BaseVertexId(BaseVertex vertex) {
 			this.vertex = vertex;
 		}
 		
 		@Override
 		public String toString() {
-			return Integer.toString(((BaseVertex) vertex).num);
-		}
-		
-		@Override
-		void createVertex() {
-			throw new UnsupportedOperationException();
+			return "v" + Integer.toString(((BaseVertex) vertex).num);
 		}
 		
 		public int compareTo(VertexId other) {
 			int n = ((BaseVertex) vertex).num;
-			int on = ((BaseVertex) other.vertex).num;
+			int on = ((BaseVertex) ((BaseVertexId) other).vertex).num;
 			return n < on ? -1 : n > on ? 1 : 0;
 		}
 	}
 	
 	static class VertexPointId extends VertexId {
+		public final AbstractVertex parentVertex;
+		public final VertexId parentVertexId;
 		
-		private final VertexId parentVertexId;
-		
-		VertexPointId(VertexId parentVertexId) {
-			this.parentVertexId = parentVertexId;
+		VertexPointId(AbstractVertex parentVertex) {
+			this.parentVertex = parentVertex;
+			this.parentVertexId = parentVertex.vertexId;
 		}
 		
 		@Override
 		public String toString() {
 			return "v(" + parentVertexId + ")";
-		}
-		
-		@Override
-		void createVertex() {
-			vertex = parentVertexId.getOrCreateVertex().getOrCreateVertexPoint();
 		}
 		
 		public int compareTo(VertexId other) {
@@ -63,18 +45,22 @@ public abstract class VertexId implements Comparable<VertexId>{
 	}
 	
 	static class EdgePointId extends VertexId {
+		public final HalfEdge halfEdge;
+		public final VertexId parentVertexId0;
+		public final VertexId parentVertexId1;
 		
-		private final VertexId parentVertexId0;
-		private final VertexId parentVertexId1;
-		
-		EdgePointId(VertexId parentVertexId0, VertexId parentVertexId1) {
-			if (parentVertexId0.compareTo(parentVertexId1) < 0) {
-				this.parentVertexId0 = parentVertexId0;
-				this.parentVertexId1 = parentVertexId1;
+		EdgePointId(HalfEdge halfEdge) {
+			final VertexId id0 = halfEdge.getVertex().vertexId;
+			final VertexId id1 = halfEdge.getPairVertex().vertexId;
+			if (id0.compareTo(id1) < 0) {
+				this.parentVertexId0 = id0;
+				this.parentVertexId1 = id1;
+				this.halfEdge = halfEdge;
 			} else {
-				this.parentVertexId0 = parentVertexId1;
-				this.parentVertexId1 = parentVertexId0;
-			}
+				this.parentVertexId0 = id1;
+				this.parentVertexId1 = id0;
+				this.halfEdge = halfEdge.getPair();
+			}	
 		}
 		
 		@Override
@@ -82,13 +68,6 @@ public abstract class VertexId implements Comparable<VertexId>{
 			return "e(" + parentVertexId0 + "," + parentVertexId1 + ")";
 		}
 		
-		@Override
-		void createVertex() {
-			final AbstractVertex v0 = parentVertexId0.getOrCreateVertex();
-			final AbstractVertex v1 = parentVertexId1.getOrCreateVertex();
-			final HalfEdge edge = HalfEdge.getOrCreate(v0, v1);
-			vertex = edge.getEdgePoint();
-		}
 		
 		public int compareTo(VertexId other) {
 			if (other instanceof EdgePointId) {
@@ -108,36 +87,30 @@ public abstract class VertexId implements Comparable<VertexId>{
 	}
 	
 	static class FacePointId extends VertexId {
+		public final Face face;
+		public final VertexId[] parentVertexIds;
 		
-		private final VertexId[] parentVertexIds;
-		
-		FacePointId(VertexId ... parentVertexIds) {
-			this.parentVertexIds = parentVertexIds.clone();
+		FacePointId(Face face) {
+			this.face = face;
+			this.parentVertexIds = new VertexId[face.getSides()];
+			for (int i = 0; i < face.getSides(); i++) {
+				parentVertexIds[i] = face.getEdges()[i].getVertex().vertexId;
+			}
 		}
 		
 		@Override
 		public String toString() {
-			final StringBuilder sb = new StringBuilder();
-			sb.append("f(");
-			for (int i = 0 ; i < parentVertexIds.length; i++) {
-				sb.append(parentVertexIds[i]);
-				if (i < parentVertexIds.length - 1) {
-					sb.append(',');
-				}
-			}
-			sb.append(')');
-			return sb.toString();
-		}
-		
-		@Override
-		void createVertex() {
-			final AbstractVertex[] vertices = new AbstractVertex[parentVertexIds.length];
-			for (int i = 0; i < parentVertexIds.length; i++) {
-				vertices[i] = parentVertexIds[i].getOrCreateVertex();
-			}
-			final Sds sds = vertices[0].sds;
-			final Face face = sds.getOrCreateFace(vertices);
-			vertex = face.getOrCreateFacePoint();
+			return "f(" + face.toString() + ")";
+//			final StringBuilder sb = new StringBuilder();
+//			sb.append("f(");
+//			for (int i = 0 ; i < parentVertexIds.length; i++) {
+//				sb.append(parentVertexIds[i]);
+//				if (i < parentVertexIds.length - 1) {
+//					sb.append(',');
+//				}
+//			}
+//			sb.append(')');
+//			return sb.toString();
 		}
 		
 		public int compareTo(VertexId other) {

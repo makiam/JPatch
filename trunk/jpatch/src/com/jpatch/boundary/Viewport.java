@@ -1,6 +1,7 @@
 package com.jpatch.boundary;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.control.*;
 import com.jpatch.afw.ui.AttributeManager;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.boundary.tools.*;
@@ -16,6 +17,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.nio.*;
 import java.util.*;
+import java.util.List;
 
 import javax.media.opengl.*;
 import javax.swing.*;
@@ -176,9 +178,11 @@ public class Viewport implements NamedObject {
 				Selection selection = Main.getInstance().getSelection();
 				int level = selection.getSdsModel().getEditLevelAttribute().getInt();
 				if (selection.getType() == Selection.Type.FACES) {
+					List<JPatchUndoableEdit> editList = new LinkedList<JPatchUndoableEdit>();		
 					for (Face face : selection.getFaces()) {
-						selection.getSdsModel().getSds().subdivideFace(level, face, Face.SubdivStatus.USER_SUBDIVIDED, null);
+						selection.getSdsModel().getSds().increaseSubdivisionLevel(level, face, Face.SubdivStatus.USER_SUBDIVIDED, editList);
 					}
+					Main.getInstance().getUndoManager().addEdit("subdivide", editList);
 				}
 				System.out.println(Main.getInstance().getSelection());
 				

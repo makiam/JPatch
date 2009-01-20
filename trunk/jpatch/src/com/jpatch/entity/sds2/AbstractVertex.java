@@ -11,7 +11,7 @@ import com.jpatch.entity.*;
 import javax.vecmath.*;
 
 public abstract class AbstractVertex {
-	static enum BoundaryType { REGULAR, BOUNDARY, IRREGULAR, ILLEGAL }
+	static enum BoundaryType { REGULAR, BOUNDARY, IRREGULAR, ILLEGAL, HELPER }
 	
 	
 	
@@ -35,7 +35,7 @@ public abstract class AbstractVertex {
 //	final Vector3d morphDisplacementVector = new Vector3d();
 //	final Vector3d transformedDisplacementVector = new Vector3d();
 	
-	HalfEdge[] vertexEdges;
+	HalfEdge[] vertexEdges = new HalfEdge[0];
 	
 	DerivedVertex vertexPoint;
 	BoundaryType boundaryType = BoundaryType.ILLEGAL;
@@ -113,26 +113,33 @@ public abstract class AbstractVertex {
 		return sharpnessValue;
 	}
 	
+	public boolean isHelper() {
+		return boundaryType == BoundaryType.HELPER;
+	}
 //	public final DoubleAttr getCornerSharpnessAttribute() {
 //		return cornerSharpnessAttr;
 //	}
 	
 	public final void getLimit(Tuple3f limit) {
+		assert !isHelper();
 		validateDisplacedLimit();
 		limit.set(displacement == null ? worldLimit : displacement.displacedLimit);
 	}
 	
 	public final void getLimit(Tuple3d limit) {
+		assert !isHelper();
 		validateDisplacedLimit();
 		limit.set(displacement == null ? worldLimit : displacement.displacedLimit);
 	}
 	
 	public final void getNormal(Tuple3f normal) {
+		assert !isHelper();
 		validateDisplacedLimit();
 		normal.set(displacement == null ? worldNormal : displacement.displacedNormal);
 	}
 	
 	public final void getNormal(Tuple3d normal) {
+		assert !isHelper();
 		validateDisplacedLimit();
 		normal.set(displacement == null ? worldNormal : displacement.displacedNormal);
 	}
@@ -150,14 +157,17 @@ public abstract class AbstractVertex {
 	}
 	
 	final Point3d getLimit() {
+		assert !isHelper();
 		return displacement == null ? worldLimit : displacement.displacedLimit;
 	}
 	
 	final Vector3d getNormal() {
+		assert !isHelper();
 		return displacement == null ? worldNormal : displacement.displacedNormal;
 	}
 	
 	private void createVertexPoint() {
+		assert !isHelper() : this;
 		assert vertexPoint == null;
 		vertexPoint = new DerivedVertex(sds) {
 		
@@ -234,21 +244,22 @@ public abstract class AbstractVertex {
 				}
 			}
 			
-			void computeEdges() {
+			@Override
+			void organizeEdges() {
 				System.out.print(this + ".computeEdges() called, ");
 				final AbstractVertex parentVertex = AbstractVertex.this;
 				vertexEdges = new HalfEdge[parentVertex.vertexEdges.length];
 				for (int i = 0; i < vertexEdges.length; i++) {
-					vertexEdges[i] = HalfEdge.getOrCreate(this, parentVertex.vertexEdges[i].getEdgePoint());
+					vertexEdges[i] = HalfEdge.get(this, parentVertex.vertexEdges[i].getEdgePoint());
 				}
 				System.out.println(" edges are: " + Arrays.toString(vertexEdges));
 				boundaryType = parentVertex.boundaryType;
 				if (vertexPoint != null && vertexPoint.vertexEdges != null) {
-					vertexPoint.computeEdges();
+					vertexPoint.organizeEdges();
 				}
 			}
 		};
-		vertexPoint.vertexId = new VertexId.VertexPointId(vertexId);
+		vertexPoint.vertexId = new VertexId.VertexPointId(this);
 	}
 	
 	
@@ -331,6 +342,7 @@ public abstract class AbstractVertex {
 //	}
 	
 	final void validateDisplacedPosition() {
+//		assert !isHelper();
 		if (displacement != null && !displacement.displacedPositionValid) {
 			if (displacement.isDisplaced()) {
 				validateWorldLimit();	// this also validates position
@@ -352,6 +364,7 @@ public abstract class AbstractVertex {
 //	}
 	
 	final void validateWorldLimit() {
+		assert !isHelper();
 		if (!worldLimitValid) {
 			validateWorldPosition();
 			final int valence = vertexEdges.length;
@@ -466,7 +479,7 @@ public abstract class AbstractVertex {
 				}
 				break;
 			default:
-				assert false;	// should never get here
+				throw new AssertionError(this + " should never get here");
 			}
 			
 			double cornerSharpness = Math.max(0, getCornerSharpness() - 1);
@@ -493,6 +506,7 @@ public abstract class AbstractVertex {
 	}
 	
 	final void validateDisplacedLimit() {
+		assert !isHelper();
 		if (displacement != null && !displacement.displacedLimitValid) {
 			validateDisplacedPosition();
 			final int valence = vertexEdges.length;
@@ -674,43 +688,91 @@ public abstract class AbstractVertex {
 	}
 	
 	
+	abstract void organizeEdges();
 	
-	final void saveEdges(List<JPatchUndoableEdit> editList) {
-		JPatchUndoableEdit edit = new SaveEdgesEdit();
+	/**
+	 * Adds the specified HalfEdge to this vertex
+	 * asserts that edge.getVertex() == this vertex
+	 */
+	final void addEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
+		assert edge.getVertex() == this : "edge.vertex=" + edge.getVertex() + ", must be this vertex (" + this + ")";
+		HalfEdge[] tmp = new HalfEdge[vertexEdges.length + 1];
+		System.arraycopy(vertexEdges, 0, tmp, 0, vertexEdges.length);
+		tmp[vertexEdges.length] = edge;
+		
 		if (editList != null) {
-			editList.add(edit);
+			editList.add(new VertexEdgesEdit());
 		}
+		vertexEdges = tmp;
+		boundaryType = BoundaryType.HELPER;
 	}
 	
-	private final class SaveEdgesEdit extends AbstractSwapEdit {
-		private HalfEdge[] edges = vertexEdges.clone();
-		private BoundaryType boundaryType = AbstractVertex.this.boundaryType;
-		
-		private SaveEdgesEdit() {
-			apply(false);
-//			System.out.print("    SaveEdgesEdit created: " + AbstractVertex.this + " edges are:");
-//			dumpEdges();
-//			System.out.println();
+	/**
+	 * Removes the specified HalfEdge from this vertex
+	 * @throws ArrayIndexOutOfBoundsException if the specified HalfEdge is not adjacent to this Vertex
+	 */
+	final void removeEdge(HalfEdge edge, List<JPatchUndoableEdit> editList) {
+		boolean debug = false;
+		if (debug) System.out.println("removing edge " + edge + " from vertex " + this);
+		if (debug) System.out.print("    edges are:");
+		if (debug) for (HalfEdge e : vertexEdges) System.out.print(" " + e);
+		if (debug) System.out.println();
+		int i = 0;
+		while (vertexEdges[i] != edge) {	// throws ArrayIndexOutOfBoundsException if edge is not part of edges
+			i++;
 		}
+		final HalfEdge[] tmp = new HalfEdge[vertexEdges.length - 1];
+		System.arraycopy(vertexEdges, 0, tmp, 0, i);
+		System.arraycopy(vertexEdges, i + 1, tmp, i, tmp.length - i);
 		
-		@Override
-		protected void swap() {
-//			System.out.print("      " + AbstractVertex.this + " was "); dumpEdges();
-			HalfEdge[] tmpEdges = vertexEdges.clone();
-			vertexEdges = edges;
-			edges = tmpEdges;
-			BoundaryType tmpBoundaryType = AbstractVertex.this.boundaryType;
-			AbstractVertex.this.boundaryType = boundaryType;
-			boundaryType = tmpBoundaryType;
-			worldPositionValid = true;
-			invalidate();
-//			System.out.print(" is now "); dumpEdges();System.out.println();
+		if (editList != null) {
+			editList.add(new VertexEdgesEdit());
 		}
+		vertexEdges = tmp;
 		
-		private void dumpEdges() {
-			for (HalfEdge e : vertexEdges) System.out.print(e + " ");
-		}
+		if (debug) System.out.print("    edges are:");
+		if (debug) for (HalfEdge e : vertexEdges) System.out.print(" " + e);
+		if (debug) System.out.println();
+		
+		boundaryType = BoundaryType.HELPER;
 	}
+	
+//	final void saveEdges(List<JPatchUndoableEdit> editList) {
+//		JPatchUndoableEdit edit = new SaveEdgesEdit();
+//		if (editList != null) {
+//			editList.add(edit);
+//		}
+//	}
+	
+//	private final class SaveEdgesEdit extends AbstractSwapEdit {
+//		private HalfEdge[] edges = vertexEdges.clone();
+//		private BoundaryType boundaryType = AbstractVertex.this.boundaryType;
+//		
+//		private SaveEdgesEdit() {
+//			apply(false);
+////			System.out.print("    SaveEdgesEdit created: " + AbstractVertex.this + " edges are:");
+////			dumpEdges();
+////			System.out.println();
+//		}
+//		
+//		@Override
+//		protected void swap() {
+////			System.out.print("      " + AbstractVertex.this + " was "); dumpEdges();
+//			HalfEdge[] tmpEdges = vertexEdges.clone();
+//			vertexEdges = edges;
+//			edges = tmpEdges;
+//			BoundaryType tmpBoundaryType = AbstractVertex.this.boundaryType;
+//			AbstractVertex.this.boundaryType = boundaryType;
+//			boundaryType = tmpBoundaryType;
+//			worldPositionValid = true;
+//			invalidate();
+////			System.out.print(" is now "); dumpEdges();System.out.println();
+//		}
+//		
+//		private void dumpEdges() {
+//			for (HalfEdge e : vertexEdges) System.out.print(e + " ");
+//		}
+//	}
 	
 	
 	void flip() {
@@ -720,15 +782,15 @@ public abstract class AbstractVertex {
 		}
 	}
 	
-	public Face getPrimaryFace() {
-		for (HalfEdge edge : vertexEdges) {
-			Face face = edge.getFace();
-			if (face != null && face.getMaterial() != null) {
-				return face;
-			}
-		}
-		return null;
-	}
+//	public Face getPrimaryFace() {
+//		for (HalfEdge edge : vertexEdges) {
+//			Face face = edge.getFace();
+//			if (face != null && face.getMaterial() != null) {
+//				return face;
+//			}
+//		}
+//		return null;
+//	}
 	
 	public class ChangePositionEdit extends AbstractSwapEdit {
 		private final Tuple3d pos = new Point3d();

@@ -11,7 +11,7 @@ import com.sun.opengl.util.*;
 import javax.vecmath.*;
 
 public class Face {
-	public static enum SubdivStatus { NOT_SUBDIVIDED, BOUNDARY, AUTO_SUBDIVIDED, USER_SUBDIVIDED }
+	public static enum SubdivStatus { NOT_SUBDIVIDED, HELPER, AUTO_SUBDIVIDED, USER_SUBDIVIDED }
 	private final HalfEdge[] faceEdges;
 	
 	private final double oneOverSides;
@@ -36,8 +36,6 @@ public class Face {
 	
 	private static int count = 0;
 	private final int num = count++;
-	
-	private int rim;
 	
 	public static Face create(Material material, HalfEdge[] edges, List<JPatchUndoableEdit> editList) {
 		Face face = new Face(material, edges);
@@ -103,19 +101,6 @@ public class Face {
 		invalidate();
 	}
 	
-	public void increaseRimValue() {
-		rim++;
-	}
-	
-	public void decreaseRimValue() {
-		assert rim > 0;
-		rim--;
-	}
-	
-	public int getRimValue() {
-		return rim;
-	}
-	
 	public int getSides() {
 		return faceEdges.length;
 	}
@@ -134,16 +119,15 @@ public class Face {
 		this.material = material;
 	}
 	
-//	public SubdivStatus getSubdivStatus() {
-//		return subdivStatus;
-//	}
-
-	public boolean isSubdivided() {
-		return facePoint != null && facePoint.getEdges() != null;
+	public SubdivStatus getSubdivStatus() {
+		return subdivStatus;
 	}
 	
-	void setSubdivStatus(SubdivStatus subdivStatus) {
-//		assert subdivStatus == SubdivStatus.NOT_SUBDIVIDED || facePoint != null;
+	void setSubdivStatus(SubdivStatus subdivStatus, List<JPatchUndoableEdit> editList) {
+		assert subdivStatus == SubdivStatus.NOT_SUBDIVIDED || facePoint != null;
+		if (editList != null) {
+			editList.add(new SubdivStatusEdit());
+		}
 		this.subdivStatus = subdivStatus;
 	}
 	
@@ -159,9 +143,19 @@ public class Face {
 //		return true;
 //		if (true) return false;
 	
-//		return material != null && (subdivStatus == SubdivStatus.NOT_SUBDIVIDED || subdivStatus == SubdivStatus.BOUNDARY);
-		
-		return material != null && !isSubdivided();
+		return material != null && (subdivStatus == SubdivStatus.NOT_SUBDIVIDED || subdivStatus == SubdivStatus.HELPER);
+	}
+	
+	public void dispose(List<JPatchUndoableEdit> editList) {
+		for (HalfEdge edge : faceEdges) {
+			edge.clearFace(editList);
+		}
+		if (facePoint != null) {
+			for (HalfEdge edge : facePoint.getEdges()) {
+				edge.getFace().dispose(editList);
+			}
+		}
+		disposeFacePoint(editList);
 	}
 	
 	public void getMidpointPosition(Tuple3d midPoint) {
@@ -427,16 +421,17 @@ public class Face {
 			}
 			
 			@Override
-			void computeEdges() {
+			void organizeEdges() {
 				/* create facePoint edges */
 				vertexEdges = new HalfEdge[faceEdges.length];
 				for (int i = 0; i < faceEdges.length; i++) {
-					facePoint.vertexEdges[i] = HalfEdge.getOrCreate(facePoint, faceEdges[i].getEdgePoint());
+					facePoint.vertexEdges[i] = HalfEdge.get(facePoint, faceEdges[i].getEdgePoint());
 				}
+				facePoint.boundaryType = BoundaryType.REGULAR;
 			}
 		};
-		facePoint.boundaryType = BoundaryType.REGULAR;
-		facePoint.vertexId = new VertexId.FacePointId(faceEdges[0].getVertex().vertexId, faceEdges[1].getVertex().vertexId);
+		
+		facePoint.vertexId = new VertexId.FacePointId(this);
 		
 		return facePoint;
 	}
@@ -511,6 +506,10 @@ public class Face {
 		return "f" + num;
 	}
 	
+	public boolean isHelper() {
+		return material == null;
+	}
+	
 	/**
 	 * Stores facePoint state
 	 * Usage: Instanciate the edit, <i>then</i> set the facePoint of this Face to its new value.
@@ -529,6 +528,27 @@ public class Face {
 			DerivedVertex tmp = Face.this.facePoint;
 			Face.this.facePoint = facePoint;
 			facePoint = tmp;
+		}
+	}
+	
+	/**
+	 * Stores facePoint state
+	 * Usage: Instanciate the edit, <i>then</i> set the facePoint of this Face to its new value.
+	 * @author sascha
+	 */
+	public class SubdivStatusEdit extends AbstractSwapEdit {
+		private SubdivStatus subdivStatus;
+		
+		SubdivStatusEdit() {
+			subdivStatus = Face.this.subdivStatus;
+			apply(false);
+		}
+		
+		@Override
+		protected void swap() {
+			SubdivStatus tmp = Face.this.subdivStatus;
+			Face.this.subdivStatus = subdivStatus;
+			subdivStatus = tmp;
 		}
 	}
 }

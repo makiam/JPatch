@@ -7,6 +7,7 @@ import java.util.*;
 import com.jpatch.afw.*;
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
+import com.jpatch.entity.sds2.AbstractVertex.*;
 
 import javax.vecmath.*;
 
@@ -21,7 +22,7 @@ public class HalfEdge implements Comparable<HalfEdge>{
 //	private HalfEdge prev;
 //	private HalfEdge subEdge;
 	private Face face;
-	int faceEdgeIndex;
+	int faceEdgeIndex = -1;
 	private BoundaryType boundaryType = BoundaryType.STRAY;
 	private DerivedVertex edgePoint;
 	
@@ -31,7 +32,7 @@ public class HalfEdge implements Comparable<HalfEdge>{
 	 * @param v1 the second vertex
 	 * @return the HalfEdge connecting the specified vertices
 	 */
-	private static HalfEdge locateEdge(AbstractVertex v0, AbstractVertex v1) {
+	public static HalfEdge get(AbstractVertex v0, AbstractVertex v1) {
 		assert v0 != null && v1 != null;
 		if (v0.getEdges() != null) {
 			for (HalfEdge edge : v0.getEdges()) {
@@ -58,27 +59,12 @@ public class HalfEdge implements Comparable<HalfEdge>{
 	 * @param v1 the second vertex
 	 * @return the HalfEdge connecting the specified vertices
 	 */
-	public static HalfEdge getOrCreate(BaseVertex v0, BaseVertex v1, List<JPatchUndoableEdit> editList) {
-		HalfEdge halfEdge = locateEdge(v0, v1);
+	public static HalfEdge getOrCreate(AbstractVertex v0, AbstractVertex v1, List<JPatchUndoableEdit> editList) {
+		HalfEdge halfEdge = get(v0, v1);
 		if (halfEdge == null) {
 			halfEdge = new HalfEdge(v0, v1);
 			v0.addEdge(halfEdge, editList);
 			v1.addEdge(halfEdge.pair, editList);
-		}
-		return halfEdge;
-	}
-	
-	/**
-	 * Returns a HalfEdge connecting the specified vertices if such an edge has already been created and added to v0.
-	 * Otherwise a new edge is created and returned.
-	 * @param v0 the first vertex
-	 * @param v1 the second vertex
-	 * @return the HalfEdge connecting the specified vertices
-	 */
-	public static HalfEdge getOrCreate(DerivedVertex v0, DerivedVertex v1) {
-		HalfEdge halfEdge = locateEdge(v0, v1);
-		if (halfEdge == null) {
-			halfEdge = new HalfEdge(v0, v1);
 		}
 		return halfEdge;
 	}
@@ -102,11 +88,6 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		this.primary = false;
 	}
 	
-//	public void dispose() {
-//		vertex.removeEdge(this);
-//		pair.vertex.removeEdge(pair);
-//	}
-	
 	public AbstractVertex getVertex() {
 		return vertex;
 	}
@@ -115,12 +96,24 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		return pair.vertex;
 	}
 	
+	public AbstractVertex[] getVertices(AbstractVertex[] vertices) {
+		assert vertices.length == 2;
+		vertices[0] = vertex;
+		vertices[1] = pair.vertex;
+		return vertices;
+	}
+	
 	public HalfEdge getPair() {
 		return pair;
 	}
 	
+	public BoundaryType getBoundaryType() {
+		return boundaryType;
+	}
+	
 	public HalfEdge getNext() {
 		if (face != null) {
+			assert face.getEdges()[faceEdgeIndex] == this : "index=" + faceEdgeIndex + " faceEdges=" + Arrays.toString(face.getEdges());
 			int i = faceEdgeIndex + 1;
 			if (i >= face.getSides()) {
 				i = 0;
@@ -133,6 +126,7 @@ public class HalfEdge implements Comparable<HalfEdge>{
 	
 	public HalfEdge getPrev() {
 		if (face != null) {
+			assert face.getEdges()[faceEdgeIndex] == this : "index=" + faceEdgeIndex + " faceEdges=" + Arrays.toString(face.getEdges());
 			int i = faceEdgeIndex - 1;
 			if (i < 0) {
 				i = face.getSides() - 1;
@@ -151,20 +145,41 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		return pair.face;
 	}
 	
-	public AbstractVertex[] getVertices(AbstractVertex[] vertices) {
-		assert vertices.length == 2;
-		vertices[0] = vertex;
-		vertices[1] = pair.vertex;
-		return vertices;
-	}
-	
+	/**
+	 * Clears this halfEdge's face. If the pair's face also is null, it will also
+	 * dispose this edge (and thus dispose the edgePoint, if it exists, and removes
+	 * both halfEdges from their vertices).
+	 * @param editList
+	 */
 	public void clearFace(List<JPatchUndoableEdit> editList) {
-		setFace(null, -1, editList);
+		assert face != null : this + ": can't clear face, face already is null";
+		changeFace(null, -1, editList);
+		if (pair.face == null) {
+			dispose(editList);
+		}
 	}
 	
 	public void setFace(Face face, int faceEdgeIndex, List<JPatchUndoableEdit> editList) {
-		System.out.println(this + ".setFace(" + face + ")");
-		assert (this.face == null && face != null) || (this.face != null && face == null) : this + ".face=" + this.face + ", face=" + face + ", exactly one must be null";
+		assert face != null : this + ": can't set face to " + face + ", face was already set to " + this.face;
+		assert face.getEdges()[faceEdgeIndex] == this : "index=" + faceEdgeIndex + " faceEdges=" + Arrays.toString(face.getEdges());
+		changeFace(face, faceEdgeIndex, editList);
+	}
+	
+	/**
+	 * Disposes this edge. Disposes the edgePoint if it exists and removes
+	 * both halfEdges from their vertices.
+	 * @param editList
+	 */
+	private void dispose(List<JPatchUndoableEdit> editList) {
+		if (edgePoint != null) {
+			removeEdgePoint(editList);
+		}
+		vertex.removeEdge(this, editList);
+		pair.vertex.removeEdge(pair, editList);
+	}
+	
+	private void changeFace(Face face, int faceEdgeIndex, List<JPatchUndoableEdit> editList) {
+		System.out.println(this + ".changeFace(" + face + ", " + faceEdgeIndex + ")");
 		
 		FaceEdit edit = new FaceEdit(face, faceEdgeIndex);
 		if (editList != null) {
@@ -176,12 +191,12 @@ public class HalfEdge implements Comparable<HalfEdge>{
 				editList.add(edgePoint.new VertexEdgesEdit());
 				editList.add(edgePoint.new BoundaryTypeEdit());
 			}
-			edgePoint.computeEdges();
+	// TODO ???		edgePoint.organizeEdges();
 		}
 	}
 	
 	public int getFaceEdgeIndex() {
-		assert face.getEdges()[faceEdgeIndex] == this : "index=" + faceEdgeIndex + " faceEdges=" + Arrays.toString(face.getEdges());
+		assert face == null || face.getEdges()[faceEdgeIndex] == this : "index=" + faceEdgeIndex + " faceEdges=" + Arrays.toString(face.getEdges());
 		return faceEdgeIndex;
 	}
 	
@@ -219,7 +234,11 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		return primary ? this : pair;
 	}
 	
-	public void disposeEdgePoint(List<JPatchUndoableEdit> editList) {
+	/**
+	 * removes the edge-point from this edge;
+	 * @param editList
+	 */
+	private void removeEdgePoint(List<JPatchUndoableEdit> editList) {
 		EdgePointEdit edit = new EdgePointEdit(null);
 		if (editList != null) {
 			editList.add(edit);
@@ -239,8 +258,8 @@ public class HalfEdge implements Comparable<HalfEdge>{
 					pair.vertex.validateDisplacedPosition();
 					Point3d e0 = vertex.getPos();
 					Point3d e1 = pair.vertex.getPos();
-					switch (boundaryType) {
-					case REGULAR:
+					if (face != null && pair.face != null) {
+						boundaryType = BoundaryType.REGULAR;
 						face.getFacePoint().validateWorldPosition();
 						Point3d f0 = face.getFacePoint().worldPosition;
 						pair.face.getFacePoint().validateWorldPosition();
@@ -250,40 +269,38 @@ public class HalfEdge implements Comparable<HalfEdge>{
 								(e0.y + e1.y + f0.y + f1.y) * 0.25,
 								(e0.z + e1.z + f0.z + f1.z) * 0.25
 						);
-						break;
-					case BOUNDARY:
+					} else {
+						boundaryType = BoundaryType.BOUNDARY;
 						worldPosition.set(
 								(e0.x + e1.x) * 0.5,
 								(e0.y + e1.y) * 0.5,
 								(e0.z + e1.z) * 0.5
 						);
-						break;
-					default:
-						assert false;	// should never get here
 					}
 					worldPositionValid = true;
 				}
 			}
 			
-			void computeEdges() {
+			@Override
+			void organizeEdges() {
 				if (face != null) {
 					if (pair.face != null) {
 						/* REGULAR */
 						boundaryType = BoundaryType.REGULAR;
 						vertexEdges = new HalfEdge[] {
-							HalfEdge.getOrCreate(this, pair.vertex.getVertexPoint()),
-							HalfEdge.getOrCreate(this, face.getFacePoint()),
-							HalfEdge.getOrCreate(this, vertex.getVertexPoint()),
-							HalfEdge.getOrCreate(this, pair.face.getFacePoint())
+							HalfEdge.get(this, pair.vertex.getVertexPoint()),
+							HalfEdge.get(this, face.getFacePoint()),
+							HalfEdge.get(this, vertex.getVertexPoint()),
+							HalfEdge.get(this, pair.face.getFacePoint())
 						};
 //						Utils.cycleToFront(vertexEdges);
 					} else {
 						/* BOUNDARY (right side) */
 						boundaryType = BoundaryType.BOUNDARY;
 						vertexEdges = new HalfEdge[] {
-							HalfEdge.getOrCreate(this, pair.vertex.getVertexPoint()),
-							HalfEdge.getOrCreate(this, face.getFacePoint()),
-							HalfEdge.getOrCreate(this, vertex.getVertexPoint())
+							HalfEdge.get(this, pair.vertex.getVertexPoint()),
+							HalfEdge.get(this, face.getFacePoint()),
+							HalfEdge.get(this, vertex.getVertexPoint())
 						};
 					}
 				} else {
@@ -291,17 +308,12 @@ public class HalfEdge implements Comparable<HalfEdge>{
 						/* BOUNDARY (left side) */
 						boundaryType = BoundaryType.BOUNDARY;
 						vertexEdges = new HalfEdge[] {
-							HalfEdge.getOrCreate(this, vertex.getVertexPoint()),
-							HalfEdge.getOrCreate(this, pair.face.getFacePoint()),
-							HalfEdge.getOrCreate(this, pair.vertex.getVertexPoint())
+							HalfEdge.get(this, vertex.getVertexPoint()),
+							HalfEdge.get(this, pair.face.getFacePoint()),
+							HalfEdge.get(this, pair.vertex.getVertexPoint())
 						};
 					} else {
-						/* STRAY EDGE */
-						vertexEdges = new HalfEdge[] {
-							HalfEdge.getOrCreate(this, pair.vertex.getVertexPoint()),
-							HalfEdge.getOrCreate(this, vertex.getVertexPoint())
-						};
-//						Utils.cycleToFront(vertexEdges);
+						throw new AssertionError("should never get here");
 					}
 				}
 			}
@@ -310,11 +322,19 @@ public class HalfEdge implements Comparable<HalfEdge>{
 		if (editList != null) {
 			editList.add(edit);
 		}
-		edgePoint.vertexId = new VertexId.EdgePointId(vertex.vertexId, pair.vertex.vertexId);
+		edgePoint.vertexId = new VertexId.EdgePointId(this);
 		return edgePoint;
 	}
 	
-	
+//	private void setEdgePointBoundaryType() {
+//		if (face == null) {
+//			if (pair.face == null) {
+//				edgePoint.boundaryType = AbstractVertex.BoundaryType.STRAY;
+//			} else {
+//				edgePoint.boundaryType = BoundaryType.STRAY;
+//			}
+//		}
+//	}
 	
 	public DerivedVertex getEdgePoint() {
 		return edgePoint;
@@ -337,9 +357,17 @@ public class HalfEdge implements Comparable<HalfEdge>{
 //	}
 	
 	void flip() {
+		
+		int tmpFaceEdgeIndex = faceEdgeIndex;
+		faceEdgeIndex = pair.face != null ? pair.face.getSides() - 1 - pair.faceEdgeIndex : -1;
+		pair.faceEdgeIndex = face != null ? face.getSides() - 1 - tmpFaceEdgeIndex : -1;
+		
 		Face tmpFace = face;
 		face = pair.face;
 		pair.face = tmpFace;
+		
+		
+		
 //		HalfEdge tmpNext = next;
 //		HalfEdge tmpPrev = prev;
 //		next = (pair.prev == null) ? null : pair.prev.pair;
