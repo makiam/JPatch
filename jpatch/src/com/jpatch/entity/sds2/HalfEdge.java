@@ -247,6 +247,9 @@ public class HalfEdge implements Comparable<HalfEdge>{
 	
 	public DerivedVertex createEdgePoint(List<JPatchUndoableEdit> editList) {
 		assert edgePoint == null;
+		if (!isPrimary()) {
+			return pair.createEdgePoint(editList);
+		}
 		
 		Sds sds = vertex.sds;
 		
@@ -283,37 +286,50 @@ public class HalfEdge implements Comparable<HalfEdge>{
 			
 			@Override
 			void organizeEdges() {
-				if (face != null) {
-					if (pair.face != null) {
-						/* REGULAR */
-						boundaryType = BoundaryType.REGULAR;
-						vertexEdges = new HalfEdge[] {
-							HalfEdge.get(this, pair.vertex.getVertexPoint()),
-							HalfEdge.get(this, face.getFacePoint()),
-							HalfEdge.get(this, vertex.getVertexPoint()),
-							HalfEdge.get(this, pair.face.getFacePoint())
-						};
-//						Utils.cycleToFront(vertexEdges);
+//				boundaryType = BoundaryType.HELPER;
+				final DerivedVertex vertexPoint = vertex.getVertexPoint();
+				final DerivedVertex pairVertexPoint = pair.vertex.getVertexPoint();
+				if (vertexPoint != null && pairVertexPoint != null) {
+					if (face != null) {
+						final DerivedVertex facePoint = face.getFacePoint();
+						if (facePoint != null) {
+							if (pair.face != null) {
+								/* REGULAR */
+								final DerivedVertex pairFacePoint = pair.face.getFacePoint();
+								if (pairFacePoint != null) {
+//									boundaryType = BoundaryType.REGULAR;
+									if (vertexEdges.length == 4) {
+										vertexEdges[0] = HalfEdge.get(this, pairVertexPoint);
+										vertexEdges[1] = HalfEdge.get(this, facePoint);
+										vertexEdges[2] = HalfEdge.get(this, vertexPoint);
+										vertexEdges[3] = HalfEdge.get(this, pairFacePoint);
+									}
+								}
+							} else {
+								/* BOUNDARY (right side) */
+//								boundaryType = BoundaryType.BOUNDARY;
+								if (vertexEdges.length == 3) {
+									vertexEdges[0] = HalfEdge.get(this, pairVertexPoint);
+									vertexEdges[1] = HalfEdge.get(this, facePoint);
+									vertexEdges[2] = HalfEdge.get(this, vertexPoint);
+								}
+							}
+						}
 					} else {
-						/* BOUNDARY (right side) */
-						boundaryType = BoundaryType.BOUNDARY;
-						vertexEdges = new HalfEdge[] {
-							HalfEdge.get(this, pair.vertex.getVertexPoint()),
-							HalfEdge.get(this, face.getFacePoint()),
-							HalfEdge.get(this, vertex.getVertexPoint())
-						};
-					}
-				} else {
-					if (pair.face != null) {
-						/* BOUNDARY (left side) */
-						boundaryType = BoundaryType.BOUNDARY;
-						vertexEdges = new HalfEdge[] {
-							HalfEdge.get(this, vertex.getVertexPoint()),
-							HalfEdge.get(this, pair.face.getFacePoint()),
-							HalfEdge.get(this, pair.vertex.getVertexPoint())
-						};
-					} else {
-						throw new AssertionError("should never get here");
+						if (pair.face != null) {
+							final DerivedVertex pairFacePoint = pair.face.getFacePoint();
+							if (pairFacePoint != null) {
+								/* BOUNDARY (left side) */
+//								boundaryType = BoundaryType.BOUNDARY;
+								if (vertexEdges.length == 3) {
+									vertexEdges[0] = HalfEdge.get(this, vertexPoint);
+									vertexEdges[1] = HalfEdge.get(this, pairFacePoint);
+									vertexEdges[2] = HalfEdge.get(this, pairVertexPoint);
+								}
+							}
+						} else {
+							throw new AssertionError("should never get here");
+						}
 					}
 				}
 			}

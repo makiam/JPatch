@@ -11,9 +11,7 @@ import com.jpatch.entity.*;
 import javax.vecmath.*;
 
 public abstract class AbstractVertex {
-	static enum BoundaryType { REGULAR, BOUNDARY, IRREGULAR, ILLEGAL, HELPER }
-	
-	
+	static enum BoundaryType { REGULAR, BOUNDARY, IRREGULAR, ILLEGAL }
 	
 //	final Tuple3Attr positionAttr = new Tuple3Attr();
 //	final DoubleAttr cornerSharpnessAttr = AttributeManager.getInstance().createBoundedDoubleAttr(0, 0, 100);
@@ -114,7 +112,7 @@ public abstract class AbstractVertex {
 	}
 	
 	public boolean isHelper() {
-		return boundaryType == BoundaryType.HELPER;
+		return false; // FIXME
 	}
 //	public final DoubleAttr getCornerSharpnessAttribute() {
 //		return cornerSharpnessAttr;
@@ -246,16 +244,15 @@ public abstract class AbstractVertex {
 			
 			@Override
 			void organizeEdges() {
-				System.out.print(this + ".computeEdges() called, ");
 				final AbstractVertex parentVertex = AbstractVertex.this;
-				vertexEdges = new HalfEdge[parentVertex.vertexEdges.length];
+				boundaryType = parentVertex.boundaryType;
+				for (int i = 0; i < vertexEdges.length; i++) {
+					if (parentVertex.vertexEdges[i].getEdgePoint() == null) {
+						return;
+					}
+				}
 				for (int i = 0; i < vertexEdges.length; i++) {
 					vertexEdges[i] = HalfEdge.get(this, parentVertex.vertexEdges[i].getEdgePoint());
-				}
-				System.out.println(" edges are: " + Arrays.toString(vertexEdges));
-				boundaryType = parentVertex.boundaryType;
-				if (vertexPoint != null && vertexPoint.vertexEdges != null) {
-					vertexPoint.organizeEdges();
 				}
 			}
 		};
@@ -479,7 +476,7 @@ public abstract class AbstractVertex {
 				}
 				break;
 			default:
-				throw new AssertionError(this + " should never get here");
+				throw new AssertionError(this + " should never get here, BT=" + boundaryType);
 			}
 			
 			double cornerSharpness = Math.max(0, getCornerSharpness() - 1);
@@ -704,7 +701,7 @@ public abstract class AbstractVertex {
 			editList.add(new VertexEdgesEdit());
 		}
 		vertexEdges = tmp;
-		boundaryType = BoundaryType.HELPER;
+//		boundaryType = BoundaryType.HELPER;
 	}
 	
 	/**
@@ -734,7 +731,7 @@ public abstract class AbstractVertex {
 		if (debug) for (HalfEdge e : vertexEdges) System.out.print(" " + e);
 		if (debug) System.out.println();
 		
-		boundaryType = BoundaryType.HELPER;
+//		boundaryType = BoundaryType.HELPER;
 	}
 	
 //	final void saveEdges(List<JPatchUndoableEdit> editList) {
