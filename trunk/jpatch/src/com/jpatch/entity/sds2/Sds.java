@@ -35,7 +35,7 @@ public class Sds {
 
 
 	private int currentMinLevel = 0;
-	private IntAttr minLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(currentMinLevel, 1, SdsConstants.MAX_LEVEL);
+	private IntAttr minLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(currentMinLevel, 0, SdsConstants.MAX_LEVEL);
 	//	private IntAttr renderLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(currentMaxLevel, 0, SdsConstants.MAX_LEVEL);
 	private IntAttr editLevelAttr = AttributeManager.getInstance().createBoundedIntAttr(0, 0, SdsConstants.MAX_LEVEL);
 
@@ -72,7 +72,7 @@ public class Sds {
 	public Sds(final JPatchUndoManager undoManager) {
 
 		for (int i = 0; i < faceSets.length; i++) {
-			faceSets[i] = new FaceSet();
+			faceSets[i] = new FaceSet(i);
 			faceEdges[i] = createFaceEdgesIterable(i);
 			faceVertices[i] = createFaceVerticesIterable(i);
 			hierarchy[i] = new HashSet<Displacement>();
@@ -367,9 +367,17 @@ public class Sds {
 
 		assert newSubdivStatus != Face.SubdivStatus.NOT_SUBDIVIDED;
 		assert newSubdivStatus != Face.SubdivStatus.USER_SUBDIVIDED || editList != null;
-		assert newSubdivStatus == Face.SubdivStatus.AUTO_SUBDIVIDED || editList == null;
+		assert newSubdivStatus != Face.SubdivStatus.AUTO_SUBDIVIDED || editList == null;
 		
 		final SubdivStatus currentSubdivStatus = face.getSubdivStatus();
+		
+		if (newSubdivStatus == SubdivStatus.HELPER) {
+			face.increaseDependentFaceCount();
+		}
+		
+		if (newSubdivStatus == currentSubdivStatus) {
+			return;
+		}
 		
 		/* return if new subdiv-status is not "higher" */
 		if (newSubdivStatus.compareTo(currentSubdivStatus) >= 0) {
@@ -1461,8 +1469,10 @@ public class Sds {
 		private Face[][] buckets;
 		/** additionally store each face in per-material sets */
 		private final Map<Material, Set<Face>> perMaterialFaceSets = new HashMap<Material, Set<Face>>();
+		private final int level;
 
-		FaceSet() {
+		FaceSet(int level) {
+			this.level = level;
 			setSize(8);	//initial capacity = 256
 			buckets = new Face[capacity][];
 		}
@@ -1528,6 +1538,32 @@ public class Sds {
 			add(index, face);
 			if (editList != null) {
 				editList.add(new FaceSetAddRemove(face, ADD));
+			}
+			
+			/* check if surrounding faces are subdivided, if yes, make this a helper and set dependentFaces */
+			int subdividedNeighbors = 0;
+			for (HalfEdge faceEdge : face.getEdges()) {
+				final Face pairFace = faceEdge.getPairFace();
+				if (pairFace != null) {
+					final SubdivStatus pairSubdivStatus = pairFace.getSubdivStatus();
+					if (pairSubdivStatus == SubdivStatus.AUTO_SUBDIVIDED || pairSubdivStatus == SubdivStatus.USER_SUBDIVIDED) {
+						subdividedNeighbors--;
+					}
+				}
+				for (HalfEdge vertexEdge : faceEdge.getVertex().getEdges()) {
+					final Face neighborFace = vertexEdge.getFace();
+					if (neighborFace != face && neighborFace != null) {
+						final SubdivStatus neighborSubdivStatus = neighborFace.getSubdivStatus();
+						if (neighborSubdivStatus == SubdivStatus.AUTO_SUBDIVIDED || neighborSubdivStatus == SubdivStatus.USER_SUBDIVIDED) {
+							subdividedNeighbors++;
+						}
+					}
+				}
+				assert subdividedNeighbors >= 0;
+				if (subdividedNeighbors > 0) {
+					increaseSubdivisionLevel(level, face, SubdivStatus.HELPER, editList);
+					face.setDependentFaceCount(subdividedNeighbors);
+				}
 			}
 			return face;
 		}

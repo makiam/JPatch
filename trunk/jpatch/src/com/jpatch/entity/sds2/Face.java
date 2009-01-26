@@ -33,6 +33,8 @@ public class Face {
 	private final FloatBuffer controlSurfaceBuffer;
 
 	private SubdivStatus subdivStatus = SubdivStatus.NOT_SUBDIVIDED;
+	/* number of neighbor-faces that need this face as a helper */
+	private int dependentFaces;
 	
 	private static int count = 0;
 	private final int num = count++;
@@ -43,13 +45,12 @@ public class Face {
 		for (int i = 0; i < edges.length; i++) {
 			edges[i].setFace(face, i, editList);
 		}
-		
-		if (face.faceEdges[0].getVertex() instanceof BaseVertex) {
-			// level 0 face
-			for (int i = 0; i < edges.length; i++) {
-				((BaseVertex) face.faceEdges[i].getVertex()).organizeEdges();
-			}
+
+		for (int i = 0; i < edges.length; i++) {
+			(face.faceEdges[i].getVertex()).organizeEdges();
 		}
+
+		face.invalidate();
 		
 		return face;
 	}
@@ -121,6 +122,20 @@ public class Face {
 	
 	public SubdivStatus getSubdivStatus() {
 		return subdivStatus;
+	}
+	
+	public void increaseDependentFaceCount() {
+		dependentFaces++;
+	}
+	
+	public void setDependentFaceCount(int count) {
+		assert count > 0;
+		dependentFaces = count;
+	}
+	
+	public int decreaseDependentFaceCount() {
+		assert dependentFaces > 0;
+		return dependentFaces--;
 	}
 	
 	void setSubdivStatus(SubdivStatus subdivStatus, List<JPatchUndoableEdit> editList) {
@@ -263,7 +278,7 @@ public class Face {
 	
 	public void invalidate() {
 		if (facePoint != null) {
-			facePoint.invalidate();
+			facePoint.invalidateAll();
 		}
 		for (HalfEdge edge : faceEdges) {
 			if (edge.getVertex().displacement != null) {
@@ -422,17 +437,25 @@ public class Face {
 			
 			@Override
 			void organizeEdges() {
-				/* create facePoint edges */
-				vertexEdges = new HalfEdge[faceEdges.length];
-				for (int i = 0; i < faceEdges.length; i++) {
-					facePoint.vertexEdges[i] = HalfEdge.get(facePoint, faceEdges[i].getEdgePoint());
+				if (vertexEdges.length != faceEdges.length) {
+					return;
 				}
-				facePoint.boundaryType = BoundaryType.REGULAR;
+				for (int i = 0; i < faceEdges.length; i++) {
+					if (faceEdges[i].getEdgePoint() == null) {
+						return;
+					}
+				}
+				/* create facePoint edges */
+				for (int i = 0; i < faceEdges.length; i++) {
+					vertexEdges[i] = HalfEdge.get(this, faceEdges[i].getEdgePoint());
+				}
 			}
 		};
 		
+		facePoint.boundaryType = BoundaryType.REGULAR;
 		facePoint.vertexId = new VertexId.FacePointId(this);
 		
+		System.out.println("*** facepoint " + facePoint + " created, BT = " + facePoint.boundaryType);
 		return facePoint;
 	}
 	
