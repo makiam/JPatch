@@ -603,15 +603,15 @@ public class Viewport implements NamedObject {
 			/* draw limit surface */
 			if (showLimit) {
 				gl.glEnable(GL_LIGHTING);
-				GlMaterial currentMaterial = null;
-				for (Face face : sds.getFaces(level)) {
+				Material currentMaterial = null;
+				for (Face face = sds.getFaces(level); face != null; face = face.getNext()) {
 					if (!face.isDrawable()) {
 						continue;
 					}
 					System.out.println("drawing face " + face);
-					GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
+					final Material faceMaterial = face.getMaterial();
 					if (currentMaterial != faceMaterial) {
-						setMaterial(gl, GL_FRONT, faceMaterial);
+						setMaterial(gl, GL_FRONT, faceMaterial.getGlMaterial());
 						currentMaterial = faceMaterial;
 					}
 	//				face.getLimitSurface(limitSurfaceBuffer);
@@ -628,7 +628,7 @@ public class Viewport implements NamedObject {
 				// render solid control surface
 				gl.glEnable(GL_LIGHTING);
 				GlMaterial currentMaterial = null;
-				for (Face face : sds.getFaces(editLevel)) {
+				for (Face face = sds.getFaces(editLevel); face != null; face = face.getNext()) {
 					GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
 					if (currentMaterial != faceMaterial) {
 						setDiffuseMaterial(gl, GL_FRONT, faceMaterial);

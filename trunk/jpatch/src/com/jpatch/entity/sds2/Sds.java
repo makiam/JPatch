@@ -48,7 +48,9 @@ public class Sds {
 	};
 
 
-	private final FaceSet[] faceSets = new FaceSet[SdsConstants.MAX_LEVEL + 1];
+	private final FaceManager faceManager = new FaceManager();
+	
+	private final Map<Material, Face>[] faceMaterialMaps = new Map[SdsConstants.MAX_LEVEL + 1];
 	@SuppressWarnings("unchecked")
 	private final Iterable<HalfEdge>[] faceEdges = (Iterable<HalfEdge>[]) new Iterable[SdsConstants.MAX_LEVEL + 1];
 	private final Iterable<? extends AbstractVertex>[] faceVertices = (Iterable<? extends AbstractVertex>[]) new Iterable[SdsConstants.MAX_LEVEL + 1];
@@ -71,8 +73,8 @@ public class Sds {
 
 	public Sds(final JPatchUndoManager undoManager) {
 
-		for (int i = 0; i < faceSets.length; i++) {
-			faceSets[i] = new FaceSet(i);
+		for (int i = 0; i < faceMaterialMaps.length; i++) {
+			faceMaterialMaps[i] = new HashMap<Material, Face>();
 			faceEdges[i] = createFaceEdgesIterable(i);
 			faceVertices[i] = createFaceVerticesIterable(i);
 			hierarchy[i] = new HashSet<Displacement>();
@@ -341,7 +343,7 @@ public class Sds {
 			//			int n = faceSets[currentMaxLevel].size();
 			//			int i = 0, p = 0;
 
-			for (Face face : faceSets[currentMinLevel]) {
+//			for (Face face : faceSets[currentMinLevel]) {
 //				subdivideFace(currentMinLevel, face, Face.SubdivStatus.AUTO_SUBDIVIDED);
 
 				//				int np = (i++) * 100 / n;
@@ -349,7 +351,7 @@ public class Sds {
 				//					p = np;
 				//					System.out.println(i + " (" + p + "%) " + Runtime.getRuntime().maxMemory() + "," + Runtime.getRuntime().totalMemory() + "," + Runtime.getRuntime().freeMemory());
 				//				}
-			}
+//			}
 		}
 		currentMinLevel = newLevel;
 		System.gc();
@@ -507,10 +509,50 @@ public class Sds {
 		}
 		edges[last] = HalfEdge.getOrCreate(vertices[last], vertices[0], editList);
 
-		Face face = faceSets[0].createFace(editList, edges);
+		Face face = createFace(0, editList, edges);
 		return face;
 	}
 
+	/**
+	 * Creates a Face with the specified edges and adds it to the hashTable.
+	 * @param face the Face to remove
+	 */
+	private Face createFace(int level, List<JPatchUndoableEdit> editList, final HalfEdge... edges) {
+		
+		Face face = Face.create(null, edges, editList);
+		
+		if (editList != null) {
+//FIXME			editList.add(new FaceSetAddRemove(face, ADD));
+		}
+		
+		/* check if surrounding faces are subdivided, if yes, make this a helper and set dependentFaces */
+		int subdividedNeighbors = 0;
+		for (HalfEdge faceEdge : face.getEdges()) {
+			final Face pairFace = faceEdge.getPairFace();
+			if (pairFace != null) {
+				final SubdivStatus pairSubdivStatus = pairFace.getSubdivStatus();
+				if (pairSubdivStatus == SubdivStatus.AUTO_SUBDIVIDED || pairSubdivStatus == SubdivStatus.USER_SUBDIVIDED) {
+					subdividedNeighbors--;
+				}
+			}
+			for (HalfEdge vertexEdge : faceEdge.getVertex().getEdges()) {
+				final Face neighborFace = vertexEdge.getFace();
+				if (neighborFace != face && neighborFace != null) {
+					final SubdivStatus neighborSubdivStatus = neighborFace.getSubdivStatus();
+					if (neighborSubdivStatus == SubdivStatus.AUTO_SUBDIVIDED || neighborSubdivStatus == SubdivStatus.USER_SUBDIVIDED) {
+						subdividedNeighbors++;
+					}
+				}
+			}
+			assert subdividedNeighbors >= 0;
+			if (subdividedNeighbors > 0) {
+				increaseSubdivisionLevel(level, face, SubdivStatus.HELPER, editList);
+				face.setDependentFaceCount(subdividedNeighbors);
+			}
+		}
+		return face;
+	}
+	
 	/**
 	 * Discards a face. Sets face-fields of all edges to null and removes
 	 * orphaned edges. Also calls discardFace on all sub-faces of the
@@ -598,8 +640,12 @@ public class Sds {
 	//		return (DerivedVertex) face.getEdges()[hierarchyId[0]].getVertex();
 	//	}
 
-	public Iterable<Face> getFaces(int level) {
-		return faceSets[level];
+	/**
+	 * idiom for looping over faces:
+	 * for (Face face = sds.getFaces(level); face != null; face = face.getNext()) { .. }
+	 */
+	public Face getFaces(int level) {
+		return faceManager.levelStartFaces[level];
 	}
 
 	@SuppressWarnings("unchecked")
@@ -816,7 +862,121 @@ public class Sds {
 	//		}	
 	//	};
 
+	private Iterator<Face> creatFaceIterator(final Face startFace) {
+		return new Iterator<Face>() {
+			private Face next = startFace;
+			
+			public boolean hasNext() {
+				return next != null;
+			}
 
+			public Face next() {
+				Face tmp = next;
+				next = tmp.nextFace;
+				return tmp;
+			}
+
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
+	}
+	
+	private static class FaceManager {
+		private final Face[] levelStartFaces = new Face[SdsConstants.MAX_LEVEL + 1];
+		private final Map<Material, Face>[] levelMaterialStartFaces = new Map[SdsConstants.MAX_LEVEL + 1];
+//		private final Iterable<Face>[] levelFaces = new Iterable[SdsConstants.MAX_LEVEL + 1];
+		
+		FaceManager() {
+			for (int i = 0; i <= SdsConstants.MAX_LEVEL; i++) {
+				levelMaterialStartFaces[i] = new HashMap<Material, Face>();
+//				levelFaces[i] = createLevelIterable(i);
+			}
+		}
+		
+		void addFace(int level, Face face) {
+			final Material material = face.material;
+			final Face materialStartFace = levelMaterialStartFaces[level].get(material);
+			if (materialStartFace != null) {
+				face.insertAfter(materialStartFace);
+			} else {
+				/* first face with this material */
+				final Face levelStartFace = levelStartFaces[level];
+				if (levelStartFace != null) {
+					face.insertBefore(levelStartFace);
+				}
+				levelStartFaces[level] = face;
+				levelMaterialStartFaces[level].put(material, face);
+			}
+		}
+		
+		void removeFace(int level, Face face) {
+			final Material material = face.material;
+			if (face == levelStartFaces[level]) {
+				levelStartFaces[level] = face.nextFace;
+			}
+			if (face.prevFace == null || face.prevFace.getMaterial() != material) {
+				levelMaterialStartFaces[level].put(material, face.nextFace);
+			}
+			face.remove();
+		}
+		
+//		public Iterable<Material> getMaterials(int level) {
+//			return levelMaterialStartFaces[level].keySet();
+//		}
+	
+//		Iterable<Face> createLevelIterable(final int level) {
+//			return new Iterable<Face>() {
+//				public Iterator<Face> iterator() { 
+//					return new Iterator<Face>() {
+//						private Face face = levelStartFaces[level];
+//						
+//						public boolean hasNext() {
+//							return face != null;
+//						}
+//		
+//						public Face next() {
+//							final Face tmp = face;
+//							face = face.nextFace;
+//							return tmp;
+//						}
+//		
+//						public void remove() {
+//							throw new UnsupportedOperationException();
+//						}
+//					};
+//				}
+//			};
+//		}
+		
+//		Iterable<Face> createLevelMaterialIterable(final int level, final Material material) {
+//			return new Iterable<Face>() {
+//				public Iterator<Face> iterator() { 
+//					return new Iterator<Face>() {
+//						private Face face = levelMaterialStartFaces[level].get(material);
+//						
+//						public boolean hasNext() {
+//							return face != null;
+//						}
+//		
+//						public Face next() {
+//							final Face tmp = face;
+//							face = face.nextFace;
+//							if (face != null && face.material != material) {
+//								face = null;
+//							}
+//							return tmp;
+//						}
+//		
+//						public void remove() {
+//							throw new UnsupportedOperationException();
+//						}
+//					};
+//				}
+//			};
+//		}
+	}
+	
 	private Iterable<HalfEdge> createFaceEdgesIterable(final int level) {
 		return new Iterable<HalfEdge>() {
 			public Iterator<HalfEdge> iterator() {
@@ -1451,329 +1611,329 @@ public class Sds {
 	//	}
 
 
-	/**
-	 * A special purpose hashtable that associates vertex-arrays with faces.
-	 * It is used to find existing faces for given vertex-arrays.
-	 * @author sascha
-	 */
-	private final class FaceSet implements Iterable<Face> {
-		private final static double growFactor = 0.75;
-		private final static double shrinkFactor = 0.25;
-		private final static int MIN = 256;
-		private int size;
-		private int capacity;
-		private int mask;
-		private int count;
-		private int max;
-		private int min;
-		private Face[][] buckets;
-		/** additionally store each face in per-material sets */
-		private final Map<Material, Set<Face>> perMaterialFaceSets = new HashMap<Material, Set<Face>>();
-		private final int level;
-
-		FaceSet(int level) {
-			this.level = level;
-			setSize(8);	//initial capacity = 256
-			buckets = new Face[capacity][];
-		}
-
-		/**
-		 * compute hashcode for edge array
-		 * Hashcode for e0,e1,e2... is identical to hashcode of e2,e1,...e0 etc.
-		 */
-		private int hash(HalfEdge... edges) {
-			int hash = 0;
-			for (HalfEdge edge : edges) {
-				hash ^= edge.getVertex().hashCode();
-			}
-			return hash & mask;
-		}
-
-		/**
-		 * Returns the Face that spans the vertices of the specified edges.
-		 * It that Face already exists, it is returned, otherwise null is returned.
-		 * @param vertices the vertices
-		 * @return the Face connecting the vertices of the specified edges
-		 */
-		private Face findFace(final int index, final HalfEdge... edges) {
-
-			//			System.out.println("getFace(" + Arrays.toString(vertices) + " called");
-			//			System.out.println("bucketIndex = " + index);
-			Face[] bucket = buckets[index];
-			/* check if the bucket is non-empty */
-			if (bucket != null) {
-				/* scan bucket sequentially for the face*/
-				faceLoop:
-					for (Face face : bucket) {
-						HalfEdge[] faceEdges = face.getEdges();
-						for (int start = 0; start < faceEdges.length; start++) {
-							if (faceEdges[start].getVertex() == edges[0].getVertex()) {
-								//							System.out.println("  start=" + start);
-								for (int i = 1; i < faceEdges.length; i++) {
-									int j = start + i;
-									if (j >= faceEdges.length) {
-										j -= faceEdges.length;
-									}
-									//								System.out.println("vertices[" + i + "]=" + vertices[i] + " faceEdge[" + j + "].getVertex()=" + faceEdges[j].getVertex());
-									if (edges[i].getVertex() != faceEdges[j].getVertex()) {
-										continue faceLoop;
-									}
-								}
-								return face;
-							}
-						}
-					}
-			}
-			return null;
-		}
-
-		/**
-		 * Creates a Face with the specified edges and adds it to the hashTable.
-		 * @param face the Face to remove
-		 */
-		Face createFace(List<JPatchUndoableEdit> editList, final HalfEdge... edges) {
-			final int index = hash(edges);
-			assert findFace(index, edges) == null;
-			Face face = Face.create(null, edges, editList);
-			add(index, face);
-			if (editList != null) {
-				editList.add(new FaceSetAddRemove(face, ADD));
-			}
-			
-			/* check if surrounding faces are subdivided, if yes, make this a helper and set dependentFaces */
-			int subdividedNeighbors = 0;
-			for (HalfEdge faceEdge : face.getEdges()) {
-				final Face pairFace = faceEdge.getPairFace();
-				if (pairFace != null) {
-					final SubdivStatus pairSubdivStatus = pairFace.getSubdivStatus();
-					if (pairSubdivStatus == SubdivStatus.AUTO_SUBDIVIDED || pairSubdivStatus == SubdivStatus.USER_SUBDIVIDED) {
-						subdividedNeighbors--;
-					}
-				}
-				for (HalfEdge vertexEdge : faceEdge.getVertex().getEdges()) {
-					final Face neighborFace = vertexEdge.getFace();
-					if (neighborFace != face && neighborFace != null) {
-						final SubdivStatus neighborSubdivStatus = neighborFace.getSubdivStatus();
-						if (neighborSubdivStatus == SubdivStatus.AUTO_SUBDIVIDED || neighborSubdivStatus == SubdivStatus.USER_SUBDIVIDED) {
-							subdividedNeighbors++;
-						}
-					}
-				}
-				assert subdividedNeighbors >= 0;
-				if (subdividedNeighbors > 0) {
-					increaseSubdivisionLevel(level, face, SubdivStatus.HELPER, editList);
-					face.setDependentFaceCount(subdividedNeighbors);
-				}
-			}
-			return face;
-		}
-		
-		
-		boolean contains(final HalfEdge... edges) {
-			return findFace(hash(edges), edges) != null;
-		}
-
-		boolean contains(final Face face) {
-			final HalfEdge[] edges = face.getEdges();
-			Face f = findFace(hash(edges), edges);
-			if (f == null) {
-				return false;
-			}
-			assert f == face;
-			return true;
-		}
-
-		/**
-		 * Removes the specified Face from the hashTable.
-		 * @param face the Face to remove
-		 */
-		void removeFace(List<JPatchUndoableEdit> editList, final Face face) {
-			remove(hash(face.getEdges()), face);
-			if (editList != null) {
-				editList.add(new FaceSetAddRemove(face, REMOVE));
-			}
-		}
-
-		/**
-		 * Iterates over all faces, sorted by material, for all faces where face.getMaterial() != null
-		 * A null material indicates a face that's not meant to be rendered (i.e. faces only needed to
-		 * compute the position of neighbor-vertices at higher subdiv levels)
-		 */
-		public Iterator<Face> iterator() {
-			@SuppressWarnings("unchecked")
-			Iterator<Face>[] iterators = (Iterator<Face>[]) new Iterator[perMaterialFaceSets.size()];
-			int i = 0;
-			for (Map.Entry<Material, Set<Face>> entry : perMaterialFaceSets.entrySet()) {
-				iterators[i++] = entry.getValue().iterator();
-			}
-			return new CompositeIterator<Face>(iterators);
-		}
-
-		public int size() {
-			return count;
-		}
-
-		void setMaterial(final Face face, final Material newMaterial) {
-			final Material oldMaterial = face.getMaterial();
-			if (oldMaterial == newMaterial) {
-				return;
-			}
-			if (oldMaterial != null) {
-				perMaterialFaceSets.get(oldMaterial).remove(face);
-			}
-			if (newMaterial != null) {
-				Set<Face> faceSet = perMaterialFaceSets.get(newMaterial);
-				if (faceSet == null) {
-					faceSet = new HashSet<Face>();
-					perMaterialFaceSets.put(newMaterial, faceSet);
-				}
-				faceSet.add(face);
-			}
-			face.setMaterial(newMaterial);
-		}
-
-		/**
-		 * Adds a face to a bucket
-		 */
-		private void add(final int bucketIndex, final Face face) {
-			if (buckets[bucketIndex] == null) {
-				/* empty bucket, create new one */
-				buckets[bucketIndex] = new Face[] { face };
-			} else {
-				/* non empty bucket, grow by one element and copy all elements */
-				Face[] tmp = buckets[bucketIndex];
-				buckets[bucketIndex] = new Face[tmp.length + 1];
-				System.arraycopy(tmp, 0, buckets[bucketIndex], 0, tmp.length);
-				buckets[bucketIndex][tmp.length] = face;
-			}
-			/* increase count, rehash if necessary */
-			count++;
-			if (count > max) {
-				setSize(size + 1);
-				rehash();
-			}
-
-			final Material faceMaterial = face.getMaterial();
-			if (faceMaterial != null) {
-				Set<Face> faceSet = perMaterialFaceSets.get(faceMaterial);
-				if (faceSet == null) {
-					faceSet = new HashSet<Face>();
-					perMaterialFaceSets.put(faceMaterial, faceSet);
-				}
-				faceSet.add(face);
-			}
-		}
-
-		/**
-		 * Removes a face from a bucket
-		 */
-		private void remove(final int bucketIndex, final Face face) {
-			Face[] tmp = buckets[bucketIndex];
-			if (tmp.length == 1) {
-				/* length was 1, bucket is empty now */
-				buckets[bucketIndex] = null;
-			} else {
-				/* shrink bucket by 1*/
-				buckets[bucketIndex] = new Face[tmp.length - 1];
-				/* scan for element to discard */
-				int i = 0;
-				while (i < tmp.length && tmp[i] != face) {
-					i++;
-				}
-				assert(i < tmp.length) : "element not found in hash bucket";
-				/* copy the other elements */
-				System.arraycopy(tmp, 0, buckets[bucketIndex], 0, i);
-				if (i < buckets[bucketIndex].length) {
-					System.arraycopy(tmp, i + 1, buckets[bucketIndex], i, buckets[bucketIndex].length - i);
-				}
-			}
-			/* decrease count, rehash if necessary */
-			count--;
-			if (count < min) {
-				setSize(size - 1);
-				rehash();
-			}
-
-			final Material faceMaterial = face.getMaterial();
-			if (faceMaterial != null) {
-				perMaterialFaceSets.get(faceMaterial).remove(face);
-			}
-		}
-
-		/**
-		 * Modify number of buckets and reshash
-		 */
-		private void rehash() {
-			Face[][] tmp = buckets;
-			/* new number of buckets */
-			buckets = new Face[capacity][];
-			count = 0; // reset count!
-			/* add all old elements to new buckets */
-			for (Face[] bucket : tmp) {
-				if (bucket != null) {
-					for (int i = 0; i < bucket.length; i ++) {
-						Face face = bucket[i];
-						final int index = hash(face.getEdges());
-						add(index, face);
-					}
-				}
-			}
-		}
-
-		/**
-		 * compute capacity, bitmask and min/max load values for a specified size
-		 * @param size capacity = 2^size
-		 */
-		private void setSize(int size) {
-			this.size = size;
-			capacity = 1 << size;
-			max = (int) (capacity * growFactor);
-			min = (int) (capacity * shrinkFactor);
-			if (min < MIN) {
-				min = 0;
-			}
-			mask = capacity - 1;
-		}
-
-		@SuppressWarnings("unused")
-		private void dump() {
-			for (int i = 0; i < buckets.length; i++) {
-				System.out.print("Bucket " + i + ":\t");
-				if (buckets[i] != null) {
-					for (Face face : buckets[i]) {
-						System.out.print(" " + face);
-					}
-					System.out.println();
-				} else {
-					System.out.println(" *empty*");
-				}
-			}
-		}
-		
-		/**
-		 * Usage: Instanciating this edit has no immediate effect on the set. Create the edit at any time,
-		 * but add (or remove) the face to (from) the set manually (either before or after instanciating this edit).
-		 * @author sascha
-		 */
-		private class FaceSetAddRemove extends AbstractAddRemoveEdit {
-			private final Face face;
-
-			private FaceSetAddRemove(Face face, Mode mode) {
-				super(mode);
-				this.face = face;
-				apply(false);
-			}
-			
-			public void add() {
-				FaceSet.this.add(hash(face.getEdges()), face);
-			}
-			
-			public void remove() {
-				FaceSet.this.remove(hash(face.getEdges()), face);
-			}
-			
-		}
-	}
+//	/**
+//	 * A special purpose hashtable that associates vertex-arrays with faces.
+//	 * It is used to find existing faces for given vertex-arrays.
+//	 * @author sascha
+//	 */
+//	private final class FaceSet implements Iterable<Face> {
+//		private final static double growFactor = 0.75;
+//		private final static double shrinkFactor = 0.25;
+//		private final static int MIN = 256;
+//		private int size;
+//		private int capacity;
+//		private int mask;
+//		private int count;
+//		private int max;
+//		private int min;
+//		private Face[][] buckets;
+//		/** additionally store each face in per-material sets */
+//		private final Map<Material, Set<Face>> perMaterialFaceSets = new HashMap<Material, Set<Face>>();
+//		private final int level;
+//
+//		FaceSet(int level) {
+//			this.level = level;
+//			setSize(8);	//initial capacity = 256
+//			buckets = new Face[capacity][];
+//		}
+//
+//		/**
+//		 * compute hashcode for edge array
+//		 * Hashcode for e0,e1,e2... is identical to hashcode of e2,e1,...e0 etc.
+//		 */
+//		private int hash(HalfEdge... edges) {
+//			int hash = 0;
+//			for (HalfEdge edge : edges) {
+//				hash ^= edge.getVertex().hashCode();
+//			}
+//			return hash & mask;
+//		}
+//
+//		/**
+//		 * Returns the Face that spans the vertices of the specified edges.
+//		 * It that Face already exists, it is returned, otherwise null is returned.
+//		 * @param vertices the vertices
+//		 * @return the Face connecting the vertices of the specified edges
+//		 */
+//		private Face findFace(final int index, final HalfEdge... edges) {
+//
+//			//			System.out.println("getFace(" + Arrays.toString(vertices) + " called");
+//			//			System.out.println("bucketIndex = " + index);
+//			Face[] bucket = buckets[index];
+//			/* check if the bucket is non-empty */
+//			if (bucket != null) {
+//				/* scan bucket sequentially for the face*/
+//				faceLoop:
+//					for (Face face : bucket) {
+//						HalfEdge[] faceEdges = face.getEdges();
+//						for (int start = 0; start < faceEdges.length; start++) {
+//							if (faceEdges[start].getVertex() == edges[0].getVertex()) {
+//								//							System.out.println("  start=" + start);
+//								for (int i = 1; i < faceEdges.length; i++) {
+//									int j = start + i;
+//									if (j >= faceEdges.length) {
+//										j -= faceEdges.length;
+//									}
+//									//								System.out.println("vertices[" + i + "]=" + vertices[i] + " faceEdge[" + j + "].getVertex()=" + faceEdges[j].getVertex());
+//									if (edges[i].getVertex() != faceEdges[j].getVertex()) {
+//										continue faceLoop;
+//									}
+//								}
+//								return face;
+//							}
+//						}
+//					}
+//			}
+//			return null;
+//		}
+//
+//		/**
+//		 * Creates a Face with the specified edges and adds it to the hashTable.
+//		 * @param face the Face to remove
+//		 */
+//		Face createFace(List<JPatchUndoableEdit> editList, final HalfEdge... edges) {
+//			final int index = hash(edges);
+//			assert findFace(index, edges) == null;
+//			Face face = Face.create(null, edges, editList);
+//			add(index, face);
+//			if (editList != null) {
+//				editList.add(new FaceSetAddRemove(face, ADD));
+//			}
+//			
+//			/* check if surrounding faces are subdivided, if yes, make this a helper and set dependentFaces */
+//			int subdividedNeighbors = 0;
+//			for (HalfEdge faceEdge : face.getEdges()) {
+//				final Face pairFace = faceEdge.getPairFace();
+//				if (pairFace != null) {
+//					final SubdivStatus pairSubdivStatus = pairFace.getSubdivStatus();
+//					if (pairSubdivStatus == SubdivStatus.AUTO_SUBDIVIDED || pairSubdivStatus == SubdivStatus.USER_SUBDIVIDED) {
+//						subdividedNeighbors--;
+//					}
+//				}
+//				for (HalfEdge vertexEdge : faceEdge.getVertex().getEdges()) {
+//					final Face neighborFace = vertexEdge.getFace();
+//					if (neighborFace != face && neighborFace != null) {
+//						final SubdivStatus neighborSubdivStatus = neighborFace.getSubdivStatus();
+//						if (neighborSubdivStatus == SubdivStatus.AUTO_SUBDIVIDED || neighborSubdivStatus == SubdivStatus.USER_SUBDIVIDED) {
+//							subdividedNeighbors++;
+//						}
+//					}
+//				}
+//				assert subdividedNeighbors >= 0;
+//				if (subdividedNeighbors > 0) {
+//					increaseSubdivisionLevel(level, face, SubdivStatus.HELPER, editList);
+//					face.setDependentFaceCount(subdividedNeighbors);
+//				}
+//			}
+//			return face;
+//		}
+//		
+//		
+//		boolean contains(final HalfEdge... edges) {
+//			return findFace(hash(edges), edges) != null;
+//		}
+//
+//		boolean contains(final Face face) {
+//			final HalfEdge[] edges = face.getEdges();
+//			Face f = findFace(hash(edges), edges);
+//			if (f == null) {
+//				return false;
+//			}
+//			assert f == face;
+//			return true;
+//		}
+//
+//		/**
+//		 * Removes the specified Face from the hashTable.
+//		 * @param face the Face to remove
+//		 */
+//		void removeFace(List<JPatchUndoableEdit> editList, final Face face) {
+//			remove(hash(face.getEdges()), face);
+//			if (editList != null) {
+//				editList.add(new FaceSetAddRemove(face, REMOVE));
+//			}
+//		}
+//
+//		/**
+//		 * Iterates over all faces, sorted by material, for all faces where face.getMaterial() != null
+//		 * A null material indicates a face that's not meant to be rendered (i.e. faces only needed to
+//		 * compute the position of neighbor-vertices at higher subdiv levels)
+//		 */
+//		public Iterator<Face> iterator() {
+//			@SuppressWarnings("unchecked")
+//			Iterator<Face>[] iterators = (Iterator<Face>[]) new Iterator[perMaterialFaceSets.size()];
+//			int i = 0;
+//			for (Map.Entry<Material, Set<Face>> entry : perMaterialFaceSets.entrySet()) {
+//				iterators[i++] = entry.getValue().iterator();
+//			}
+//			return new CompositeIterator<Face>(iterators);
+//		}
+//
+//		public int size() {
+//			return count;
+//		}
+//
+//		void setMaterial(final Face face, final Material newMaterial) {
+//			final Material oldMaterial = face.getMaterial();
+//			if (oldMaterial == newMaterial) {
+//				return;
+//			}
+//			if (oldMaterial != null) {
+//				perMaterialFaceSets.get(oldMaterial).remove(face);
+//			}
+//			if (newMaterial != null) {
+//				Set<Face> faceSet = perMaterialFaceSets.get(newMaterial);
+//				if (faceSet == null) {
+//					faceSet = new HashSet<Face>();
+//					perMaterialFaceSets.put(newMaterial, faceSet);
+//				}
+//				faceSet.add(face);
+//			}
+//			face.setMaterial(newMaterial);
+//		}
+//
+//		/**
+//		 * Adds a face to a bucket
+//		 */
+//		private void add(final int bucketIndex, final Face face) {
+//			if (buckets[bucketIndex] == null) {
+//				/* empty bucket, create new one */
+//				buckets[bucketIndex] = new Face[] { face };
+//			} else {
+//				/* non empty bucket, grow by one element and copy all elements */
+//				Face[] tmp = buckets[bucketIndex];
+//				buckets[bucketIndex] = new Face[tmp.length + 1];
+//				System.arraycopy(tmp, 0, buckets[bucketIndex], 0, tmp.length);
+//				buckets[bucketIndex][tmp.length] = face;
+//			}
+//			/* increase count, rehash if necessary */
+//			count++;
+//			if (count > max) {
+//				setSize(size + 1);
+//				rehash();
+//			}
+//
+//			final Material faceMaterial = face.getMaterial();
+//			if (faceMaterial != null) {
+//				Set<Face> faceSet = perMaterialFaceSets.get(faceMaterial);
+//				if (faceSet == null) {
+//					faceSet = new HashSet<Face>();
+//					perMaterialFaceSets.put(faceMaterial, faceSet);
+//				}
+//				faceSet.add(face);
+//			}
+//		}
+//
+//		/**
+//		 * Removes a face from a bucket
+//		 */
+//		private void remove(final int bucketIndex, final Face face) {
+//			Face[] tmp = buckets[bucketIndex];
+//			if (tmp.length == 1) {
+//				/* length was 1, bucket is empty now */
+//				buckets[bucketIndex] = null;
+//			} else {
+//				/* shrink bucket by 1*/
+//				buckets[bucketIndex] = new Face[tmp.length - 1];
+//				/* scan for element to discard */
+//				int i = 0;
+//				while (i < tmp.length && tmp[i] != face) {
+//					i++;
+//				}
+//				assert(i < tmp.length) : "element not found in hash bucket";
+//				/* copy the other elements */
+//				System.arraycopy(tmp, 0, buckets[bucketIndex], 0, i);
+//				if (i < buckets[bucketIndex].length) {
+//					System.arraycopy(tmp, i + 1, buckets[bucketIndex], i, buckets[bucketIndex].length - i);
+//				}
+//			}
+//			/* decrease count, rehash if necessary */
+//			count--;
+//			if (count < min) {
+//				setSize(size - 1);
+//				rehash();
+//			}
+//
+//			final Material faceMaterial = face.getMaterial();
+//			if (faceMaterial != null) {
+//				perMaterialFaceSets.get(faceMaterial).remove(face);
+//			}
+//		}
+//
+//		/**
+//		 * Modify number of buckets and reshash
+//		 */
+//		private void rehash() {
+//			Face[][] tmp = buckets;
+//			/* new number of buckets */
+//			buckets = new Face[capacity][];
+//			count = 0; // reset count!
+//			/* add all old elements to new buckets */
+//			for (Face[] bucket : tmp) {
+//				if (bucket != null) {
+//					for (int i = 0; i < bucket.length; i ++) {
+//						Face face = bucket[i];
+//						final int index = hash(face.getEdges());
+//						add(index, face);
+//					}
+//				}
+//			}
+//		}
+//
+//		/**
+//		 * compute capacity, bitmask and min/max load values for a specified size
+//		 * @param size capacity = 2^size
+//		 */
+//		private void setSize(int size) {
+//			this.size = size;
+//			capacity = 1 << size;
+//			max = (int) (capacity * growFactor);
+//			min = (int) (capacity * shrinkFactor);
+//			if (min < MIN) {
+//				min = 0;
+//			}
+//			mask = capacity - 1;
+//		}
+//
+//		@SuppressWarnings("unused")
+//		private void dump() {
+//			for (int i = 0; i < buckets.length; i++) {
+//				System.out.print("Bucket " + i + ":\t");
+//				if (buckets[i] != null) {
+//					for (Face face : buckets[i]) {
+//						System.out.print(" " + face);
+//					}
+//					System.out.println();
+//				} else {
+//					System.out.println(" *empty*");
+//				}
+//			}
+//		}
+//		
+//		/**
+//		 * Usage: Instanciating this edit has no immediate effect on the set. Create the edit at any time,
+//		 * but add (or remove) the face to (from) the set manually (either before or after instanciating this edit).
+//		 * @author sascha
+//		 */
+//		private class FaceSetAddRemove extends AbstractAddRemoveEdit {
+//			private final Face face;
+//
+//			private FaceSetAddRemove(Face face, Mode mode) {
+//				super(mode);
+//				this.face = face;
+//				apply(false);
+//			}
+//			
+//			public void add() {
+//				FaceSet.this.add(hash(face.getEdges()), face);
+//			}
+//			
+//			public void remove() {
+//				FaceSet.this.remove(hash(face.getEdges()), face);
+//			}
+//			
+//		}
+//	}
 
 
 

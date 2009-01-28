@@ -16,7 +16,7 @@ public class Face {
 	
 	private final double oneOverSides;
 	private DerivedVertex facePoint;
-	private Material material;
+	Material material;
 
 	Point3d midpointPosition = new Point3d();
 	Point3d displacedMidpointPosition = new Point3d();
@@ -38,6 +38,9 @@ public class Face {
 	
 	private static int count = 0;
 	private final int num = count++;
+	
+	Face nextFace;
+	Face prevFace;
 	
 	public static Face create(Material material, HalfEdge[] edges, List<JPatchUndoableEdit> editList) {
 		Face face = new Face(material, edges);
@@ -82,6 +85,39 @@ public class Face {
 		
 		
 //		System.out.println("new face is " + this);
+	}
+	
+	void insertBefore(Face face) {
+		prevFace = face.prevFace;
+		nextFace = face;
+		face.prevFace = this;
+		if (prevFace != null) {
+			prevFace.nextFace = this;
+		}
+	}
+	
+	void insertAfter(Face face) {
+		prevFace = face;
+		nextFace = face.nextFace;
+		face.nextFace = this;
+		if (nextFace != null) {
+			nextFace.prevFace = this;
+		}
+	}
+	
+	void remove() {
+		if (prevFace != null) {
+			prevFace.nextFace = nextFace;
+		}
+		if (nextFace != null) {
+			nextFace.prevFace = prevFace;
+		}
+		nextFace = null;
+		prevFace = null;
+	}
+	
+	public Face getNext() {
+		return nextFace;
 	}
 	
 	void flip(Set<HalfEdge> edgesToFlip, Set<AbstractVertex> verticesToFlip) {
