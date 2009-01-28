@@ -408,7 +408,7 @@ public class Selection {
 			SdsModel sdsModel = getSdsModel();
 			if (sdsModel != null) {
 				Sds sds = sdsModel.getSds();
-				for (Face face : sds.getFaces(0)) {
+				for (Face face = sds.getFaces(0); face != null; face = face.next()) {
 					faces.add(face);
 				}
 			}

@@ -116,7 +116,7 @@ public class Face {
 		prevFace = null;
 	}
 	
-	public Face getNext() {
+	public Face next() {
 		return nextFace;
 	}
 	
