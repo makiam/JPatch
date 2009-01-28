@@ -604,7 +604,7 @@ public class Viewport implements NamedObject {
 			if (showLimit) {
 				gl.glEnable(GL_LIGHTING);
 				Material currentMaterial = null;
-				for (Face face = sds.getFaces(level); face != null; face = face.getNext()) {
+				for (Face face = sds.getFaces(level); face != null; face = face.next()) {
 					if (!face.isDrawable()) {
 						continue;
 					}
@@ -628,7 +628,7 @@ public class Viewport implements NamedObject {
 				// render solid control surface
 				gl.glEnable(GL_LIGHTING);
 				GlMaterial currentMaterial = null;
-				for (Face face = sds.getFaces(editLevel); face != null; face = face.getNext()) {
+				for (Face face = sds.getFaces(editLevel); face != null; face = face.next()) {
 					GlMaterial faceMaterial = face.getMaterial().getGlMaterial();
 					if (currentMaterial != faceMaterial) {
 						setDiffuseMaterial(gl, GL_FRONT, faceMaterial);

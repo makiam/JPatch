@@ -392,7 +392,7 @@ public class Sds {
 				assert facePoint != null;
 				for (HalfEdge edge : facePoint.getEdges()) {
 					final Face subface = edge.getFace();
-					faceSets[level + 1].removeFace(editList, subface);
+					faceManager.removeFace(level + 1, subface, editList);
 					subface.dispose(editList);		
 				}
 			}
@@ -429,7 +429,8 @@ public class Sds {
 					subfaceEdges[2] = HalfEdge.getOrCreate(vertexPoints[next], edgePoints[next], editList);
 					subfaceEdges[3] = HalfEdge.getOrCreate(edgePoints[next], facePoint, editList);
 					
-					Face subFace = faceSets[level + 1].createFace(editList, subfaceEdges);
+					Face subFace = createFace(level + 1, editList, subfaceEdges);
+//					Face subFace = faceSets[level + 1].createFace(editList, subfaceEdges);
 				}
 			}
 			
@@ -437,7 +438,7 @@ public class Sds {
 				/* set subface materials */
 				for (HalfEdge edge : face.getFacePoint().getEdges()) {
 					final Face subface = edge.getFace();
-					faceSets[level + 1].setMaterial(subface, material);	
+					faceManager.changeMaterial(level + 1, subface, material);
 				}
 				
 				/* subdivide all surrounding faces */
@@ -472,17 +473,9 @@ public class Sds {
 		}
 	}
 
-	//	public void setFaceMaterial(Face face, Material material) {
-	//		face.setMaterial(material);
-	//		DerivedVertex facePoint = face.getFacePoint();
-	//		for (HalfEdge edge : facePoint.getEdges()) {
-	//			setFaceMaterial(edge.getFace(), material);
-	//		}
-	//	}
-
 	public Face addFace(List<JPatchUndoableEdit> editList, Material material, BaseVertex... vertices) {
 		Face face = createFace(editList, vertices);
-		faceSets[0].setMaterial(face, material);
+		faceManager.changeMaterial(0, face, material);
 		if (minLevelAttr.getInt() > 0) {
 			increaseSubdivisionLevel(0, face, Face.SubdivStatus.AUTO_SUBDIVIDED, null);
 		}
@@ -490,8 +483,7 @@ public class Sds {
 	}
 
 	public void removeFace(List<JPatchUndoableEdit> editList, Face face) {
-		assert faceSets[0].contains(face);
-		faceSets[0].removeFace(editList, face);
+		faceManager.removeFace(0, face, editList);
 		discardFace(face, editList);
 	}
 
@@ -522,7 +514,7 @@ public class Sds {
 		Face face = Face.create(null, edges, editList);
 		
 		if (editList != null) {
-//FIXME			editList.add(new FaceSetAddRemove(face, ADD));
+			editList.add(faceManager.new FaceManagerAddRemove(level, face, ADD));
 		}
 		
 		/* check if surrounding faces are subdivided, if yes, make this a helper and set dependentFaces */
@@ -670,7 +662,7 @@ public class Sds {
 	private Iterable<? extends AbstractVertex> createFaceVerticesIterable(final int level) {
 		return new Iterable<AbstractVertex>() {
 			public Iterator<AbstractVertex> iterator() {
-				if (faceSets[level].size() == 0) {
+				if (faceManager.levelStartFaces[level] == null) {
 					return new Iterator<AbstractVertex>() {
 						public boolean hasNext() {
 							return false;
@@ -684,16 +676,15 @@ public class Sds {
 					};
 				}
 				return new Iterator<AbstractVertex>() {
-					Iterator<Face> faces = faceSets[level].iterator();
-					Face face = faces.next();
+					Face face = faceManager.levelStartFaces[level];
 					HalfEdge[] faceEdges = face.getEdges();
 					int edgeIndex;
 					AbstractVertex nextVertex = getNextVertex();
 
 					private final AbstractVertex getNextVertex() {
 						if (edgeIndex == faceEdges.length) {
-							if (faces.hasNext()) {
-								face = faces.next();
+							face = face.next();
+							if (face != null) {
 								faceEdges = face.getEdges();
 								edgeIndex = 0;
 							} else {
@@ -885,16 +876,29 @@ public class Sds {
 	private static class FaceManager {
 		private final Face[] levelStartFaces = new Face[SdsConstants.MAX_LEVEL + 1];
 		private final Map<Material, Face>[] levelMaterialStartFaces = new Map[SdsConstants.MAX_LEVEL + 1];
-//		private final Iterable<Face>[] levelFaces = new Iterable[SdsConstants.MAX_LEVEL + 1];
 		
 		FaceManager() {
 			for (int i = 0; i <= SdsConstants.MAX_LEVEL; i++) {
 				levelMaterialStartFaces[i] = new HashMap<Material, Face>();
-//				levelFaces[i] = createLevelIterable(i);
 			}
 		}
 		
-		void addFace(int level, Face face) {
+		public void addFace(int level, Face face, List<JPatchUndoableEdit> editList) {
+			if (editList != null) {
+				editList.add(new FaceManagerAddRemove(level, face, Mode.ADD));
+			}
+			addFace(level, face);
+		}
+		
+		public void removeFace(int level, Face face, List<JPatchUndoableEdit> editList) {
+			if (editList != null) {
+				editList.add(new FaceManagerAddRemove(level, face, Mode.REMOVE));
+			}
+			removeFace(level, face);
+		}
+		
+		private void addFace(int level, Face face) {
+			System.out.println("FaceManager.addFace(" + level + ", " + face + ") called");
 			final Material material = face.material;
 			final Face materialStartFace = levelMaterialStartFaces[level].get(material);
 			if (materialStartFace != null) {
@@ -910,7 +914,7 @@ public class Sds {
 			}
 		}
 		
-		void removeFace(int level, Face face) {
+		private void removeFace(int level, Face face) {
 			final Material material = face.material;
 			if (face == levelStartFaces[level]) {
 				levelStartFaces[level] = face.nextFace;
@@ -921,9 +925,38 @@ public class Sds {
 			face.remove();
 		}
 		
-//		public Iterable<Material> getMaterials(int level) {
-//			return levelMaterialStartFaces[level].keySet();
-//		}
+		private void changeMaterial(int level, Face face, Material newMaterial) {
+			removeFace(level, face);
+			face.setMaterial(newMaterial);
+			addFace(level, face);
+		}
+		
+		/**
+		 * Usage: Instanciating this edit has no immediate effect on the set. Create the edit at any time,
+		 * but add (or remove) the face to (from) the set manually (either before or after instanciating this edit).
+		 * @author sascha
+		 */
+		private class FaceManagerAddRemove extends AbstractAddRemoveEdit {
+			private final int level;
+			private final Face face;
+
+			private FaceManagerAddRemove(int level, Face face, Mode mode) {
+				super(mode);
+				this.level = level;
+				this.face = face;
+				apply(false);
+			}
+			
+			public void add() {
+				addFace(level, face);
+			}
+			
+			public void remove() {
+				removeFace(level, face);
+			}		
+		}
+		
+
 	
 //		Iterable<Face> createLevelIterable(final int level) {
 //			return new Iterable<Face>() {
@@ -980,9 +1013,23 @@ public class Sds {
 	private Iterable<HalfEdge> createFaceEdgesIterable(final int level) {
 		return new Iterable<HalfEdge>() {
 			public Iterator<HalfEdge> iterator() {
+				if (faceManager.levelStartFaces[level] == null) {
+					return new Iterator<HalfEdge>() {
+						public boolean hasNext() {
+							return false;
+						}
+						public HalfEdge next() {
+							throw new NoSuchElementException();
+						}
+						public void remove() {
+							throw new UnsupportedOperationException();
+						}		
+					};
+				}
+				
 				return new Iterator<HalfEdge>() {
-					Iterator<Face> faces = faceSets[level].iterator();
-					HalfEdge[] faceEdges = new HalfEdge[0];
+					Face face = faceManager.levelStartFaces[level];
+					HalfEdge[] faceEdges = face.getEdges();
 					int edgeIndex;
 					HalfEdge next = getNext();
 
@@ -1017,8 +1064,9 @@ public class Sds {
 								}
 							}
 						} else {
-							if (faces.hasNext()) {
-								faceEdges = faces.next().getEdges();
+							face = face.next();
+							if (face != null) {
+								faceEdges = face.getEdges();
 								edgeIndex = 0;
 								return getNext();
 							} else {
@@ -1049,7 +1097,10 @@ public class Sds {
 		
 		for (int level = minLevel; level <= maxLevel; level++) {
 			System.out.println("\nLEVEL " + level + " FACES:");
-			Set<Face> faces = new HashSet<Face>(Utils.asCollection(faceSets[level]));
+			Set<Face> faces = new HashSet<Face>();
+			for (Face face = faceManager.levelStartFaces[level]; face != null; face = face.next()) {
+				faces.add(face);
+			}
 			for (Face face : faces) {
 				System.out.print(face + " ");
 				for (HalfEdge edge : face.getEdges()) {

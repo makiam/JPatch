@@ -56,7 +56,7 @@ public class MouseSelector {
 			return Selection.Type.VERTICES;
 		}
 		
-		for (Face face : sds.getFaces(level)) {
+		for (Face face = sds.getFaces(level); face != null; face = face.next()) {
 			boolean faceContained = true;
 			for (HalfEdge faceEdge : face.getEdges()) {
 				if (!vertices.contains(faceEdge.getVertex())) {
@@ -208,7 +208,7 @@ public class MouseSelector {
 			Vector3d rayDirection = new Vector3d();
 			setupCameraRay(rayOrigin, rayDirection, mouseX, mouseY);
 			
-			for (Face face :sds.getFaces(level)) {
+			for (Face face = sds.getFaces(level); face != null; face = face.next()) {
 				if (objectFilter.accept(face)) {
 					double z = getFaceHitZ(rayOrigin, rayDirection, face);
 					if (z < Double.MAX_VALUE) {
