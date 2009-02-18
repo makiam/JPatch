@@ -1,6 +1,7 @@
 package com.jpatch.boundary.tools;
 
 import com.jpatch.afw.attributes.*;
+import com.jpatch.afw.control.*;
 import com.jpatch.afw.vecmath.*;
 import com.jpatch.boundary.*;
 import com.jpatch.boundary.tools.MouseSelector.*;
@@ -107,7 +108,9 @@ public class ExtrudeTool extends AbstractBasicTool {
 					normal.mouseDragged(viewport, e.getX(), e.getY());
 				} else {
 					if (!extrudeDone) {
-						Operations.extrude(hitSelection, null);
+						List<JPatchUndoableEdit> editList = new ArrayList<JPatchUndoableEdit>();
+						Operations.extrude(hitSelection, editList);
+						Main.getInstance().getUndoManager().addEdit("extrude", editList);
 						hitSelection.getTransformable().begin();
 						extrudeDone = true;
 					}

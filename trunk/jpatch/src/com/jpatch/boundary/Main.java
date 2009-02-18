@@ -25,9 +25,7 @@ package com.jpatch.boundary;
 
 
 import com.jpatch.afw.attributes.*;
-import com.jpatch.afw.control.Configuration;
-import com.jpatch.afw.control.JPatchUndoListener;
-import com.jpatch.afw.control.JPatchUndoManager;
+import com.jpatch.afw.control.*;
 import com.jpatch.afw.icons.IconSet;
 import com.jpatch.afw.ui.*;
 import com.jpatch.afw.vecmath.Transform;
@@ -864,6 +862,13 @@ public class Main {
 		frame.add(explorer.getComponent());
 		frame.setSize(300, 400);
 		frame.setVisible(true);
+		
+		JFrame undoFrame = new JFrame("JPatch Undo Explorer");
+		undoFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		undoFrame.add(new UndoExplorer(getUndoManager()).getComponent());
+		undoFrame.setSize(800, 400);
+		undoFrame.setVisible(true);
+		
 //		hud.addWidget(slider);
 //		slider.getBounds().setBounds(10, 10, 100, 100);
 //		hud.bindToViewport(viewports[0]);

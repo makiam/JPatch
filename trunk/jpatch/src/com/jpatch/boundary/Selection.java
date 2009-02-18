@@ -586,7 +586,7 @@ public class Selection {
 		}
 	}
 	
-	private class ChangeSelectionEdit extends AbstractUndoableEdit {
+	private class ChangeSelectionEdit extends AbstractSwapEdit {
 		private State state;
 		
 		private ChangeSelectionEdit() {
@@ -594,22 +594,10 @@ public class Selection {
 			apply(false);
 		}
 		
-		private void swap() {
+		protected void swap() {
 			State tmpState = new State(Selection.this);
 			state.copyTo(Selection.this);
 			state = tmpState;
-		}
-		
-		@Override
-		public void performUndo() {
-			super.performUndo();
-			swap();
-		}
-		
-		@Override
-		public void performRedo() {
-			super.performRedo();
-			swap();
 		}
 	}
 	

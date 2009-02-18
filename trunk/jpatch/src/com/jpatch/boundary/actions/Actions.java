@@ -240,6 +240,8 @@ public class Actions {
 			}
 
 			public void undoPerformed(JPatchUndoManager undoManager) {
+				System.out.println("*** dumping model after undo ***");
+				Main.getInstance().getActiveModel().getSds().dumpFaces(0, 0);
 				undo.getEnabled().setBoolean(undoManager.canUndo());
 				redo.getEnabled().setBoolean(undoManager.canRedo());
 			}

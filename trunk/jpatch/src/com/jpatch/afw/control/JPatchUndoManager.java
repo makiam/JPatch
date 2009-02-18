@@ -5,6 +5,8 @@ import com.jpatch.afw.attributes.GenericAttr;
 
 import java.util.*;
 
+import javax.swing.*;
+
 import jpatch.boundary.settings.Settings;
 
 public class JPatchUndoManager {
@@ -150,5 +152,53 @@ public class JPatchUndoManager {
 				edits[i].performRedo();
 			}
 		}
+		
+		/*
+		 * FOR DEBUGGING ONLY - used by UndoExplorer
+		 */
+		@SuppressWarnings("serial")
+		private ListModel asListModel() {
+			return new AbstractListModel() {
+			
+				public Object getElementAt(int index) {
+					return edits[index];
+				}
+		
+				public int getSize() {
+					return edits.length;
+				}
+			};
+		}
+	}
+	
+	/*
+	 * FOR DEBUGGING ONLY - used by UndoExplorer
+	 */
+	@SuppressWarnings("serial")
+	ListModel asListModel() {
+		return new AbstractListModel() {
+		
+			public Object getElementAt(int index) {
+				return undoStack.get(index).name;
+			}
+	
+			public int getSize() {
+				return undoStack.size();
+			}
+		};
+	}
+	
+	/*
+	 * FOR DEBUGGING ONLY - used by UndoExplorer
+	 */
+	ListModel getListModelForEdit(int index) {
+		return undoStack.get(index).asListModel();
+	}
+	
+	/*
+	 * FOR DEBUGGING ONLY - used by UndoExplorer
+	 */
+	int getPosition() {
+		return position - 1;
 	}
 }
