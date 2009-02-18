@@ -2,11 +2,13 @@ package com.jpatch.afw;
 
 import com.jpatch.entity.sds2.*;
 
+import java.lang.reflect.*;
 import java.util.*;
 
 import javax.swing.*;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
+import javax.swing.event.*;
+import javax.swing.table.*;
+import javax.swing.tree.*;
 import javax.vecmath.Matrix4d;
 
 public class Utils {
@@ -212,6 +214,59 @@ public class Utils {
 		}
 		
 	};
+	
+	@SuppressWarnings("serial")
+	public static TableModel reflectionTableModel(final Object object) {
+		final List<Field> fieldList = new ArrayList<Field>();
+		for (Class cls = object.getClass(); cls != null; cls = cls.getSuperclass()) {
+			for (Field field : cls.getDeclaredFields()) {
+				if (!Modifier.isStatic(field.getModifiers()) && ! field.isSynthetic()) {
+					field.setAccessible(true);
+					fieldList.add(field);
+				}
+			}
+		}
+		
+		System.out.println("object " + object + " has " + fieldList.size() + " fields");
+		return new AbstractTableModel() {
+
+			public int getColumnCount() {
+				return 2;
+			}
+
+			public int getRowCount() {
+				return fieldList.size();
+			}
+
+			public Object getValueAt(int rowIndex, int columnIndex) {
+				System.out.println("getValueAt(row " + rowIndex + ", column " + columnIndex + ") [" + fieldList.size() + " rows]");
+				Object content;
+				try {
+					content = fieldList.get(rowIndex).get(object);
+					Field field = fieldList.get(rowIndex);
+					switch (columnIndex) {
+					case 0:
+						return Modifier.toString(field.getModifiers()) + " " + field.getType().getName() + " " + field.getName();
+					case 1:				
+						if (content instanceof Object[]) return Arrays.toString((Object[]) content);
+						else if (content instanceof byte[]) return Arrays.toString((byte[]) content);
+						else if (content instanceof short[]) return Arrays.toString((short[]) content);
+						else if (content instanceof char[]) return Arrays.toString((char[]) content);
+						else if (content instanceof int[]) return Arrays.toString((int[]) content);
+						else if (content instanceof long[]) return Arrays.toString((long[]) content);
+						else if (content instanceof boolean[]) return Arrays.toString((boolean[]) content);
+						else if (content instanceof float[]) return Arrays.toString((float[]) content);
+						else if (content instanceof double[]) return Arrays.toString((double[]) content);
+						else return content;				
+					default:
+						throw new AssertionError("should never get here");	
+					}
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		};
+	}
 	
 	public static void main(String[] args) {
 		char[] chars = "obcdefghijklmnapqrstuvwxyz".toCharArray();
