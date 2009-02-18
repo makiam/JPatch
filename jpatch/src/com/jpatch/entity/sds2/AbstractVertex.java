@@ -963,6 +963,7 @@ public abstract class AbstractVertex {
 		
 		BoundaryTypeEdit() {
 			boundaryType = AbstractVertex.this.boundaryType;
+			apply(false);
 		}
 		
 		@Override
