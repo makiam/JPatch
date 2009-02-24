@@ -1,6 +1,10 @@
 package com.jpatch.afw;
 
+import com.jpatch.*;
+import com.jpatch.boundary.Main;
+
 import java.awt.*;
+import java.awt.event.*;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.List;
@@ -8,6 +12,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
+
 
 public final class ReflectionTable {
 	private static final TableCellRenderer CELL_RENDERER = new DefaultTableCellRenderer() {
@@ -17,9 +22,10 @@ public final class ReflectionTable {
 			if (value == null) {
 				setText("null");
 			}
-			setBackground(column == 4 ? Color.WHITE : Color.LIGHT_GRAY);
-			ReflectionTableModel model = (ReflectionTableModel) table.getModel();
-			setForeground(column < 4 || value == null || model.fields[row].getType().isPrimitive() ? Color.BLACK : Color.BLUE);
+			boolean selectable = (((ObjectTableModel) table.getModel()).isSelectable(column));
+			setBackground(selectable ? Color.WHITE : Color.LIGHT_GRAY);
+//			ReflectionTableModel model = (ReflectionTableModel) table.getModel();
+//			setForeground(column < 4 || value == null || model.fields[row].getType().isPrimitive() ? Color.BLACK : Color.BLUE);
 			return this;
 		}
 	};
@@ -33,31 +39,53 @@ public final class ReflectionTable {
 	}
 	
 	public static void setupTable(final JTable table, Class type, Object object) {
-		table.setModel(new ReflectionTableModel(type, object));
+		setTableModel(table, type, object);
 		table.setDefaultRenderer(Object.class, CELL_RENDERER);
-		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-				System.out.println(e);
-				if (!e.getValueIsAdjusting() && e.getFirstIndex() >= 0) {
-					ReflectionTableModel model = (ReflectionTableModel) table.getModel();
-					try {
-						Object o = model.fields[e.getFirstIndex()].get(model.object);
-						table.setModel(new ReflectionTableModel(o.getClass(), o));
-					} catch (IllegalAccessException e1) {
-						throw new RuntimeException(e1);
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Point point = e.getPoint();
+				int row = table.rowAtPoint(point);
+				int column = table.columnAtPoint(point);
+				if (((ObjectTableModel) table.getModel()).isSelectable(column)) {
+					Object o = table.getModel().getValueAt(row, column);
+					if (o != null) {
+						setTableModel(table, o.getClass(), o);
 					}
 				}
 			}
 		});
-		table.getColumnModel().getColumn(0).setPreferredWidth(100);
-		table.getColumnModel().getColumn(1).setPreferredWidth(100);
-		table.getColumnModel().getColumn(2).setPreferredWidth(100);
-		table.getColumnModel().getColumn(3).setPreferredWidth(100);
-		table.getColumnModel().getColumn(4).setPreferredWidth(400);
-		table.setPreferredSize(new Dimension(800, 400));
+//		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+//			public void valueChanged(ListSelectionEvent e) {
+//				System.out.println(e);
+//				if (!e.getValueIsAdjusting() && e.getFirstIndex() >= 0) {
+//					e.
+//					Object o = ((ObjectTableModel) table.getModel()).getObject(e.getFirstIndex());
+//					if (o != null) {
+//						setTableModel(table, o.getClass(), o);
+//					}
+//				}
+//			}
+//		});
 	}
 	
-	private static class ReflectionTableModel extends AbstractTableModel {
+	private static void setTableModel(final JTable table, Class type, Object object) {
+		if (type.isArray()) {
+			table.setModel(new ArrayTableModel(object));
+		} else if (object instanceof Collection) {
+			table.setModel(new ArrayTableModel(((Collection) object).toArray()));
+		} else if (object instanceof Map) {
+			table.setModel(new MapTableModel((Map) object));
+		} else {
+			table.setModel(new ReflectionTableModel(type, object));
+		}
+	}
+	
+	private static abstract class ObjectTableModel extends AbstractTableModel {
+		public abstract boolean isSelectable(int columnIndex);
+	}
+	
+	private static class ReflectionTableModel extends ObjectTableModel {
 		private final Class type;
 		private Object object;
 		
@@ -96,7 +124,7 @@ public final class ReflectionTable {
 		}
 		
 		public int getColumnCount() {
-			return 5;
+			return 2;
 		}
 	
 		public int getRowCount() {
@@ -106,15 +134,15 @@ public final class ReflectionTable {
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			Field field = fields[rowIndex];
 			switch (columnIndex) {
+//			case 0:
+//				return field.getDeclaringClass().getSimpleName();
+//			case 1:
+//				return Modifier.toString(field.getModifiers());
+//			case 2:
+//				return field.getType().getSimpleName();
 			case 0:
-				return field.getDeclaringClass().getSimpleName();
-			case 1:
-				return Modifier.toString(field.getModifiers());
-			case 2:
-				return field.getType().getSimpleName();
-			case 3:
 				return field.getName();
-			case 4:
+			case 1:
 				try {
 					Object value = field.get(object);
 					if (value == null) return null;
@@ -139,19 +167,108 @@ public final class ReflectionTable {
 		@Override
 		public String getColumnName(int columnIndex) {
 			switch (columnIndex) {
+//			case 0:
+//				return "declaring class";
+//			case 1:
+//				return "modifiers";
+//			case 2:
+//				return "type";
 			case 0:
-				return "declaring class";
-			case 1:
-				return "modifiers";
-			case 2:
-				return "type";
-			case 3:
 				return "name";
-			case 4:
+			case 1:
 				return "value";
 			default:
 				throw new AssertionError();
 			}
+		}
+
+		@Override
+		public boolean isSelectable(int columnIndex) {
+			return columnIndex == 1;
+		}
+	}
+	
+	private static class ArrayTableModel extends ObjectTableModel {
+		private final Object array;
+		
+		public ArrayTableModel(Object array) {
+			this.array = array;
+		}
+		
+		public int getColumnCount() {
+			return 1;
+		}
+	
+		public int getRowCount() {
+			return Array.getLength(array);
+		}
+	
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			switch (columnIndex) {
+			case 0:
+				return Array.get(array, rowIndex);
+			default:
+				throw new AssertionError();
+			}
+		}
+
+		@Override
+		public String getColumnName(int columnIndex) {
+			switch (columnIndex) {
+			case 0:
+				return "value";
+			default:
+				throw new AssertionError();
+			}
+		}
+
+		@Override
+		public boolean isSelectable(int columnIndex) {
+			return true;
+		}
+	}
+	
+	private static class MapTableModel extends ObjectTableModel {
+		private final Map.Entry<?, ?>[] entries;
+		
+		public MapTableModel(Map<?, ?> map) {
+			entries = (Map.Entry<?, ?>[]) new ArrayList<Map.Entry>(map.entrySet()).toArray(new Map.Entry[map.size()]);
+		}
+		
+		public int getColumnCount() {
+			return 2;
+		}
+	
+		public int getRowCount() {
+			return entries.length;
+		}
+	
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			switch (columnIndex) {
+			case 0:
+				return entries[rowIndex].getKey();
+			case 1:
+				return entries[rowIndex].getValue();
+			default:
+				throw new AssertionError();
+			}
+		}
+
+		@Override
+		public String getColumnName(int columnIndex) {
+			switch (columnIndex) {
+			case 0:
+				return "key";
+			case 1:
+				return "value";
+			default:
+				throw new AssertionError();
+			}
+		}
+
+		@Override
+		public boolean isSelectable(int columnIndex) {
+			return true;
 		}
 	}
 	
@@ -160,11 +277,24 @@ public final class ReflectionTable {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JTable table = new JTable();
 		
-		HashMap map = new HashMap();
+		Map map = new HashMap();
 		map.put("a", 1);
 		map.put("b", 2);
 		map.put("c", 3);
-		setupTable(table, table);
+		
+		List list = new ArrayList();
+		list.add("test");
+		list.add(27);
+		list.add(null);
+		list.add(new Object());
+		
+		try {
+			Launcher.main(null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		
+		setupTable(table, Main.getInstance());
 		frame.add(new JScrollPane(table));
 		frame.setSize(800, 600);
 		frame.setVisible(true);

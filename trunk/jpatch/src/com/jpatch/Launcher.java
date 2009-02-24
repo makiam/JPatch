@@ -6,13 +6,14 @@ import com.jpatch.boundary.Main;
 
 import java.awt.*;
 import java.io.IOException;
+import java.lang.reflect.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 
 import jpatch.auxilary.NativeLibraryHelper;
 
 public class Launcher {
-	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
+	public static void main(String[] args) throws NoSuchAlgorithmException, IOException, InterruptedException, InvocationTargetException {
 		Configuration.getInstance().put("locale", Locale.ENGLISH);
 		Configuration.getInstance().put("stringResource", "com/jpatch/resources/Strings");
 		Configuration.getInstance().put("iconDir", "com/jpatch/icons/");
@@ -21,7 +22,7 @@ public class Launcher {
 		
 		while (!new NativeLibraryHelper().checkLibraries(null));
 		
-		EventQueue.invokeLater(new Runnable() {
+		EventQueue.invokeAndWait(new Runnable() {
 			public void run() {
 				Main.getInstance();
 			}
