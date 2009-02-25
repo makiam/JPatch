@@ -1,6 +1,7 @@
 package com.jpatch.afw;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.*;
 import java.util.*;
 import java.util.List;
@@ -9,6 +10,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import jpatch.boundary.action.*;
+import sun.security.action.*;
 
 public class Stripe {
 	public static enum Orientation { HORIZONTAL, VERTICAL }
@@ -21,9 +23,25 @@ public class Stripe {
 	private final JButton backButton = new JButton("<");
 	private final JButton forwardButton = new JButton(">");
 	
+	private volatile Scroller scroller;
+	
 	public Stripe(Orientation orientation, int visibleItemCount) {
 		this.orientation = orientation;
 		setVisibleItemCount(visibleItemCount);
+		backButton.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				scroll(position - 1);
+			}
+			
+		});
+		forwardButton.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				scroll(position + 1);
+			}
+			
+		});
 	}
 	
 	public void setVisibleItemCount(int visibleItemCount) {
@@ -54,13 +72,13 @@ public class Stripe {
 		layoutListView();
 	}
 	
-	private void scroll(int newPosition) {
+	private void scroll(final int newPosition) {
 		int delta = newPosition - position;
 		int size = visibleItemCount + Math.min(visibleItemCount, Math.abs(delta));
-		System.out.println("size=" + size);
+		//System.out.println("position=" + position + " newPosition=" + newPosition + "size=" + size);
 		int[] indices = new int[size];
 		int start = Math.min(position, newPosition);
-		if (size <= visibleItemCount * 2) {
+		if (size < visibleItemCount * 2) {
 			for (int i = 0; i < size; i++) {
 				indices[i] = start + i;
 			}
@@ -71,27 +89,127 @@ public class Stripe {
 				indices[i + visibleItemCount] = end + i;
 			}
 		}
-		System.out.println(Arrays.toString(indices));
-		int iwidth = listView.getWidth() / visibleItemCount;
-		int width = iwidth * size;;
-		int height = listView.getHeight();
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = image.createGraphics();
-		g.setColor(Color.BLUE);
-		g.fillRect(0, 0, width, height);
-		for (int i = 0; i < size; i++) {
-			Component component = components.get(indices[i]);
-			component.setBounds(0, 0, iwidth, height);
-			component.paint(g);
-			System.out.println(component.isVisible());
-			g.translate(iwidth, 0);
+		int startIndex = -1;
+		int endIndex = -1;
+		for (int i = 0; i < indices.length; i++) {
+			if (indices[i] == position) {
+				startIndex = i;
+			}
+			if (indices[i] == newPosition) {
+				endIndex = i;
+			}
+		}
+		//System.out.println(Arrays.toString(indices));
+		int pixelSize = -1;
+		BufferedImage image = null;
+		if (orientation == Orientation.HORIZONTAL) {
+			pixelSize = listView.getWidth() / visibleItemCount;
+			int width = pixelSize * size;
+			int height = listView.getHeight();
+			image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			Graphics2D g = image.createGraphics();
+			g.setColor(component.getBackground());
+			g.fillRect(0, 0, width, height);
+			for (int i = 0; i < size; i++) {
+				if (indices[i] < components.size()) {
+					Component component = components.get(indices[i]);
+					component.setBounds(0, 0, pixelSize, height);
+					component.doLayout();
+					component.paint(g);
+					g.translate(pixelSize, 0);
+				} else {
+					break;
+				}
+			}
+		} else {
+			pixelSize = listView.getHeight() / visibleItemCount;
+			int width = listView.getWidth();
+			int height = pixelSize * size;
+			image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			Graphics2D g = image.createGraphics();
+			g.setColor(component.getBackground());
+			g.fillRect(0, 0, width, height);
+			for (int i = 0; i < size; i++) {
+				if (indices[i] < components.size()) {
+					Component component = components.get(indices[i]);
+					component.setBounds(0, 0, width, pixelSize);
+					component.doLayout();
+					component.paint(g);
+					g.translate(0, pixelSize);
+				} else {
+					break;
+				}
+			}
+		}
+		component.remove(listView);
+		
+		position = newPosition;
+		
+		final ImagePainter imagePainter = new ImagePainter(image);
+		component.add(imagePainter, BorderLayout.CENTER);
+		final int startPixel = startIndex * pixelSize;
+		final int endPixel = endIndex * pixelSize;
+		
+//		for (int i = 0; i < 100; i++) {
+//			int x = startX + (endX - startX) * i / 100;
+//			imagePainter.setXOffset(x);
+//			try {
+//				Thread.sleep(10);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+		component.doLayout();
+		component.repaint();
+		new Thread(new Scroller(imagePainter, startPixel, endPixel)).start();
+	}
+	
+	private class Scroller implements Runnable {
+		final ImagePainter imagePainter;
+		final int startPixel;
+		final int endPixel;
+		
+		final int duration = 150; //ms
+		
+		int count = 0;
+		
+		volatile boolean stop;
+		
+		Scroller(ImagePainter imagePainter, int startPixel, int endPixel) {
+			this.imagePainter = imagePainter;
+			this.startPixel = startPixel;
+			this.endPixel = endPixel;
 		}
 		
-		JFrame frame = new JFrame("test");
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.add(new JLabel(new ImageIcon(image)));
-		frame.pack();
-		frame.setVisible(true);
+		public void run() {
+			if (scroller != null) {
+				scroller.stop = true;
+			}
+			scroller = this;
+			int tt;
+			long t = System.currentTimeMillis();
+			long t0 = t;
+			while (!stop && (tt = (int) (System.currentTimeMillis() - t)) < duration) {
+				int dt = (int) (System.currentTimeMillis() - t0);
+				t0 = System.currentTimeMillis();
+				double s = (double) tt / duration;
+				double ss = 0.5 - 0.5 * Math.cos(s * Math.PI);
+				int pixel = startPixel + (int) ((endPixel - startPixel) * ss);
+				imagePainter.setOffset(pixel);
+				component.paintImmediately(component.getBounds());
+				count++;
+				try {
+					Thread.sleep(Math.max(0, 1000/61 - dt));
+				} catch (InterruptedException e) {
+					break;
+				}
+			}
+			component.remove(imagePainter);
+			component.add(listView, BorderLayout.CENTER);
+			layoutListView();
+			component.paintImmediately(component.getBounds());
+		}
 	}
 	
 	private void layoutListView() {
@@ -109,18 +227,17 @@ public class Stripe {
 	}
 	
 	public static void main(String[] args) {
-		final Stripe stripe = new Stripe(Stripe.Orientation.HORIZONTAL, 3);
+		final Stripe stripe = new Stripe(Stripe.Orientation.VERTICAL, 3);
 		final JFrame frame = new JFrame("stripe");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(800, 300);
 		frame.add(stripe.component);
 		frame.setVisible(true);
 		
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 10; i++) {
 			final JPanel panel = new JPanel();
 			final JLabel label = new JLabel(Integer.toString(i)) {
 				public void paint(Graphics g) {
-					System.out.println(this + ".paint(" + g + ")");
 					super.paint(g);
 				}
 			};
@@ -131,15 +248,37 @@ public class Stripe {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					stripe.addComponent(label);
-					stripe.scroll(0);
 				}
 			});
 		//	frame.repaint();
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+		}
+		
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				stripe.scroll(0);
+			}
+		});
+	}
+	
+	private class ImagePainter extends JComponent {
+		private final Image image;
+		private int offset;
+		
+		private ImagePainter(Image image) {
+			this.image = image;
+		}
+		
+		private synchronized void setOffset(int offset) {
+			this.offset = offset;
+		}
+		
+		public void paint(Graphics g) {
+			g.drawImage(image, orientation == Orientation.HORIZONTAL ? -offset : 0, orientation == Orientation.VERTICAL ? -offset : 0, null);
 		}
 	}
 }
