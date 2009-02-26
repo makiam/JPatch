@@ -30,16 +30,8 @@ public final class ReflectionTable {
 		}
 	};
 	
-	public static void setupTable(JTable table, Class type) {
-		setupTable(table, type, null);
-	}
-	
-	public static void setupTable(JTable table, Object object) {
-		setupTable(table, object.getClass(), object);
-	}
-	
-	public static void setupTable(final JTable table, Class type, Object object) {
-		setTableModel(table, type, object);
+	public static void setupTable(final JTable table, Object object, final BrowserListener browserListener) {
+		setTableModel(table, object.getClass(), object);
 		table.setDefaultRenderer(Object.class, CELL_RENDERER);
 		table.addMouseListener(new MouseAdapter() {
 			@Override
@@ -49,9 +41,7 @@ public final class ReflectionTable {
 				int column = table.columnAtPoint(point);
 				if (((ObjectTableModel) table.getModel()).isSelectable(column)) {
 					Object o = table.getModel().getValueAt(row, column);
-					if (o != null) {
-						setTableModel(table, o.getClass(), o);
-					}
+					browserListener.goTo(o);
 				}
 			}
 		});
@@ -272,6 +262,10 @@ public final class ReflectionTable {
 		}
 	}
 	
+	private static interface BrowserListener {
+		public void goTo(Object object);
+	}
+	
 	public static void main(String[] agrs) {
 		JFrame frame = new JFrame("Reflection Table");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -294,7 +288,7 @@ public final class ReflectionTable {
 			e.printStackTrace();
 		} 
 		
-		setupTable(table, Main.getInstance());
+		setupTable(table, Main.getInstance(), null);
 		frame.add(new JScrollPane(table));
 		frame.setSize(800, 600);
 		frame.setVisible(true);
