@@ -170,7 +170,7 @@ public class Stripe {
 		final int startPixel;
 		final int endPixel;
 		
-		final int duration = 150; //ms
+		final int duration = 250; //ms
 		
 		int count = 0;
 		
@@ -227,7 +227,7 @@ public class Stripe {
 	}
 	
 	public static void main(String[] args) {
-		final Stripe stripe = new Stripe(Stripe.Orientation.VERTICAL, 3);
+		final Stripe stripe = new Stripe(Stripe.Orientation.HORIZONTAL, 4);
 		final JFrame frame = new JFrame("stripe");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(800, 300);
