@@ -1,8 +1,8 @@
 #Fat Jar Configuration File
-#Sat Nov 03 12:14:07 CET 2007
+#Wed Mar 05 16:02:31 CET 2008
 onejar.expand=
 autojar.enable=false
-excludes=<po|JPatch>~objects/;<po|JPatch>~patterns/;<po|JPatch>~org/;<po|JPatch>~inyo/
+excludes=<po|JPatch>~objects/;<po|JPatch>~patterns/;<po|JPatch>~org/;<po|JPatch>~inyo/;<jar|java.runner.jar>;<jar|junit.jar>;<jar|common.runner.jar>;<jar|mtj.jar>
 manifest.removesigners=true
 manifest.mergeall=false
 manifest.file=<createnew>

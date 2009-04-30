@@ -72,6 +72,10 @@ public class Stripe {
 		layoutListView();
 	}
 	
+	private void setupButtons() {
+		backButton.setEnabled(position > 0);
+	}
+	
 	private void scroll(final int newPosition) {
 		int delta = newPosition - position;
 		int size = visibleItemCount + Math.min(visibleItemCount, Math.abs(delta));
@@ -144,6 +148,7 @@ public class Stripe {
 		component.remove(listView);
 		
 		position = newPosition;
+		setupButtons();
 		
 		final ImagePainter imagePainter = new ImagePainter(image);
 		component.add(imagePainter, BorderLayout.CENTER);
@@ -227,27 +232,35 @@ public class Stripe {
 	}
 	
 	public static void main(String[] args) {
-		final Stripe stripe = new Stripe(Stripe.Orientation.HORIZONTAL, 4);
+		final Stripe hStripe = new Stripe(Stripe.Orientation.HORIZONTAL, 4);
 		final JFrame frame = new JFrame("stripe");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(800, 300);
-		frame.add(stripe.component);
+		frame.add(hStripe.component);
 		frame.setVisible(true);
 		
 		for (int i = 0; i < 10; i++) {
-			final JPanel panel = new JPanel();
-			final JLabel label = new JLabel(Integer.toString(i)) {
-				public void paint(Graphics g) {
-					super.paint(g);
-				}
-			};
-			panel.add(new JButton("x"));
-			panel.add(label);
-			label.setBorder(new EtchedBorder());
-			label.setOpaque(true);
+			final Stripe vStripe = new Stripe(Stripe.Orientation.VERTICAL, 1);
+			for (int j = 0; j < 5; j++) {
+				final JPanel panel = new JPanel();
+				final JLabel label = new JLabel(Integer.toString(j)) {
+					public void paint(Graphics g) {
+						super.paint(g);
+					}
+				};
+				panel.add(new JButton("x"));
+				panel.add(label);
+				label.setBorder(new EtchedBorder());
+				label.setOpaque(true);
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						vStripe.addComponent(label);
+					}
+				});
+			}
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
-					stripe.addComponent(label);
+					hStripe.addComponent(vStripe.component);
 				}
 			});
 		//	frame.repaint();
@@ -260,7 +273,7 @@ public class Stripe {
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				stripe.scroll(0);
+				hStripe.scroll(0);
 			}
 		});
 	}
