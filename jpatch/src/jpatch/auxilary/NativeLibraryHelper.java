@@ -10,8 +10,6 @@ import javax.swing.JFrame;
 
 import jpatch.boundary.ui.JPatchDialog;
 
-import sun.security.action.GetLongAction;
-
 public class NativeLibraryHelper {
 	public static String NATIVE_LIBS_DIR = "nativelibs/";
 	
@@ -30,61 +28,6 @@ public class NativeLibraryHelper {
 		PPC,
 		SPARC
 	}
-	
-	private static String[] nativeLibs = new String[0];
-	private static String dir;
-	
-//	public static final Os detectedOs = detectOs();
-//	public static final Arch detectedArch = detectArch();
-	
-//	public static void detectPlatform() {
-//		String osDir = null, archDir = null, prefix = null, suffix = null;
-//		switch(detectedOs) {
-//		case WINDOWS:
-//			osDir = "windows/";
-//			prefix = "";
-//			suffix = ".dll";
-//			break;
-//		case LINUX:
-//			osDir = "linux/";
-//			prefix = "lib";
-//			suffix = ".so";
-//			break;
-//		case MAC_OS_X:
-//			osDir = "osx/";
-//			prefix = "lib";
-//			suffix = ".jnilib";
-//			break;
-//		}
-//		switch (detectedArch) {
-//		case X86:
-//			archDir = "x86/";
-//			break;
-//		case AMD64:
-//			archDir = "amd64/";
-//			break;
-//		case PPC:
-//			archDir = "ppc/";
-//			break;
-//		}
-//		
-//		/* windows hack */
-//		if (detectedOs == Os.WINDOWS) {
-//			archDir = "x86/";
-//		}
-//		
-//		if (osDir != null && archDir != null && suffix != null) {
-//			dir = NATIVE_LIBS_DIR + osDir + archDir;
-//			List<String> libList = new ArrayList<String>();
-//			libList.add(prefix + "jogl" + suffix);
-//			libList.add(prefix + "jogl_awt" + suffix);
-//			libList.add(prefix + "jogl_cg" + suffix);
-//			if (detectedOs == Os.LINUX) {
-//				libList.add(prefix + "jogl_drihack" + suffix);
-//			}
-//			nativeLibs = libList.toArray(new String[libList.size()]);
-//		}
-//	}
 	
 	private static String getNativeLibsDir(Os os, Arch arch) {
 		String osDir = null, archDir = null;
@@ -123,18 +66,6 @@ public class NativeLibraryHelper {
 		return null;
 	}
 	
-	
-//	String javaLibraryPath = properties.getProperty("java.library.path");
-//	String[] folders = javaLibraryPath.split(properties.getProperty("path.separator"));
-//	String lib = System.mapLibraryName("jogl");
-//	for (int i = 0; i < folders.length; i++) {
-//		File file = new File(folders[i], lib);
-//		if (file.exists()) {
-//			loaded = true;
-//			logger.log("found in " + folders[i] + "\n");
-//		}
-//	}
-	
 	private static String[] getLibraryNames(Os os) {
 		List<String> libList = new ArrayList<String>();
 		libList.add(System.mapLibraryName("jogl"));
@@ -157,23 +88,6 @@ public class NativeLibraryHelper {
 		return digest.digest();
 	}
 	
-	private static void extractLib(String dir, String prefix, String name, String suffix) throws IOException {
-		InputStream i = ClassLoader.getSystemResourceAsStream(dir + prefix + name + suffix);
-		if (i == null) {
-			throw new FileNotFoundException();
-		}
-		InputStream in = new BufferedInputStream(i);
-		File tmp = new File(System.getProperties().getProperty("java.io.tmpdir"), prefix + name + suffix);
-		OutputStream out = new BufferedOutputStream(new FileOutputStream(tmp));
-		int data;
-		while ((data = in.read()) != -1) {
-			out.write(data);
-		}
-		in.close();
-		out.close();
-		tmp.deleteOnExit();
-	}
-	
 	private static Os detectOs() {
 		String osName = System.getProperties().getProperty("os.name");
 		if (osName.startsWith("Windows")) {
@@ -191,7 +105,6 @@ public class NativeLibraryHelper {
 	
 	private static Arch detectArch() {
 		String osArch = System.getProperties().getProperty("os.arch");
-		System.out.println(osArch);
 		if (osArch.startsWith("x86") || osArch.equals("i386") || osArch.equals("i586") || osArch.equals("i686")) {
 			return Arch.X86;
 		} else if (osArch.equals("ppc") || osArch.equals("PowerPC")) {
@@ -209,7 +122,7 @@ public class NativeLibraryHelper {
 		String algorithm = "SHA-1";
 		Os os = detectOs();
 		Arch arch = detectArch();
-		System.out.println(os + " " + arch);
+		System.out.println("Platform identified as " + os + " " + arch);
 		
 		String dir = getNativeLibsDir(os, arch);
 		String[] libs = getLibraryNames(os);
@@ -250,7 +163,7 @@ public class NativeLibraryHelper {
 					"<code>-Djava.library.path=<i>&lt;path&gt;</i></code> commandline switch.";
 			JComboBox folderCombo = new JComboBox(folders);
 			int selection = JPatchDialog.showDialog(owner, "JOGL native libraries installation", JPatchDialog.WARNING, message, folderCombo, new String[] { "Install", null, "Quit" }, 1, "400");
-			if (selection == 1) {
+			if (selection != 0) {
 				/* Quit */
 				System.exit(0);
 			}
@@ -278,7 +191,7 @@ public class NativeLibraryHelper {
 				String lib = libs[i];
 				File libFile = new File(folder, lib);
 				if (libFile.exists()) {
-					if (!compareDigest(digests[i], digest(new FileInputStream(libFile), algorithm))) {
+					if (!Arrays.equals(digests[i], digest(new FileInputStream(libFile), algorithm))) {
 						reinstall.add(i);
 					}
 				} else {
@@ -336,7 +249,7 @@ public class NativeLibraryHelper {
 					buttonText = "Re-Install";
 				}
 				int selection = JPatchDialog.showDialog(owner, "JOGL native libraries installation", JPatchDialog.WARNING, message, null, new String[] { buttonText, null, "Quit" }, 1, "400");
-				if (selection == 1) {
+				if (selection != 0) {
 					/* Quit */
 					System.exit(0);
 				}
@@ -359,34 +272,6 @@ public class NativeLibraryHelper {
 		}
 	}
 	
-	public static void main(String[] args) throws Exception {
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(800, 600);
-		frame.setVisible(true);
-		
-		while (!new NativeLibraryHelper().checkLibraries(frame));
-		System.out.println("OK");
-		System.exit(0);
-	}
-	
-	private static boolean compareDigest(byte[] digest1, byte[] digest2) {
-//		System.out.println("comparing : ");
-//		System.out.println(digestToString(digest1));
-//		System.out.println(digestToString(digest2));
-//		System.out.println();
-		
-		if (digest1.length != digest2.length) {
-			return false;
-		}
-		for (int i = 0; i < digest1.length; i++) {
-			if (digest1[i] != digest2[i]) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
 	private void install(InputStream source, File destination) throws IOException {
 		OutputStream out = new FileOutputStream(destination);
 		byte[] buffer = new byte[4096];
@@ -399,18 +284,23 @@ public class NativeLibraryHelper {
 	}
 	
 	private static String digestToString(byte[] digest) {
-//		StringBuilder sb = new StringBuilder("{");
-//		for (int i = 0; i < digest.length - 1; i++) {
-//			sb.append(digest[i]);
-//			sb.append(", ");
-//		}
-//		sb.append(digest[digest.length - 1]);
-//		sb.append("}");
-//		return sb.toString();
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < digest.length - 1; i++) {
 			sb.append(Integer.toHexString(digest[i] & 0xff));
 		}
 		return sb.toString();
 	}
+	
+	/** for testing */
+	public static void main(String[] args) throws Exception {
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(800, 600);
+		frame.setVisible(true);
+		
+		while (!new NativeLibraryHelper().checkLibraries(frame));
+		System.out.println("OK");
+		System.exit(0);
+	}
+	
 }

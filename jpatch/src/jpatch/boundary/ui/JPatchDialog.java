@@ -22,25 +22,17 @@
 package jpatch.boundary.ui;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.WindowAdapter;
+import java.awt.event.*;
 
 import javax.swing.*;
-import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.border.Border;
-import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.PlainDocument;
-import javax.swing.text.StyledEditorKit;
+import javax.swing.text.*;
 
-import test.IconComponent;
 
 /**
  * @author sascha
  *
  */
+@SuppressWarnings("serial")
 public class JPatchDialog extends JDialog {
 	public final static Icon ERROR = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_64x64/dialog-error.png"));
 	public final static Icon INFORMATION = new ImageIcon(ClassLoader.getSystemResource("jpatch/images/icons_64x64/dialog-information.png"));
@@ -55,7 +47,7 @@ public class JPatchDialog extends JDialog {
 		setLayout(new BorderLayout());
 		Box buttonBox = Box.createHorizontalBox();
 		if (icon != null) {
-			IconComponent iconComponent = new IconComponent(icon);
+			JLabel iconComponent = new JLabel(icon);
 			iconComponent.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 0));
 			add(iconComponent, BorderLayout.WEST);
 		}
@@ -70,19 +62,10 @@ public class JPatchDialog extends JDialog {
 		text.setOpaque(false);
 		textBox.add(text);
 		if (component != null) {
-//			Box box = Box.createVerticalBox();
-//			box.add(component);
-//			box.setBorder(BorderFactory.createEmptyBorder(0, 16, 16, 16));
 			JPanel panel = new JPanel();
 			panel.setLayout(new BorderLayout());
 			panel.add(component, BorderLayout.CENTER);
-			Border b1 = BorderFactory.createEmptyBorder(8, 8, 8, 8);
-			Border b2 = BorderFactory.createEtchedBorder();
-			Border b3 = BorderFactory.createEmptyBorder(0, 16, 16, 16);
-//			panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createCompoundBorder(b3, b2), b1));
-			panel.setBorder(b3);
-			
-//			panel.s
+			panel.setBorder(BorderFactory.createEmptyBorder(0, 16, 16, 16));
 			textBox.add(panel);
 		}
 		textBox.add(buttonBox);
@@ -121,11 +104,20 @@ public class JPatchDialog extends JDialog {
 		setVisible(true);
 	}
 
+	/**
+	 * Displays a dialog window
+	 * @param owner	the frame owning this dialog
+	 * @param title	a title string
+	 * @param icon the icon to display
+	 * @param message a message to display
+	 * @param component a component to display
+	 * @param options an array of (string) options to show - may contain nulls, which will put separators between the options
+	 * @param focus which option should have the focus (nulls are not counted)
+	 * @param width the width of the message-box (in html syntax, e.g. 100px)
+	 * @return the index of the selected option (nulls are not counted), or -1 if the window was closed
+	 */
 	public static int showDialog(Frame owner, String title, Icon icon, String message, Component component, String[] options, int focus, String width) {
-		
 		JPatchDialog dialog = new JPatchDialog(owner, title, true, icon, message, component, options, focus, width);
 		return dialog.selectedOption;
 	}
-	
-	
 }
