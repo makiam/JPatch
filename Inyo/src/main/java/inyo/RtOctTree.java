@@ -31,6 +31,7 @@
 package inyo;
 
 import java.util.ArrayList;
+import java.util.List;
 
 class RtOctTree extends RtBoundingBox {
 	    
@@ -46,12 +47,12 @@ class RtOctTree extends RtBoundingBox {
 	 * @param firstTriangle
 	 * @param lastTriangle
 	 */
-	public RtOctTree( int maxDepth, int maxItems, ArrayList triangleList ) {
+	public RtOctTree( int maxDepth, int maxItems, List<RtTriangle> triangleList ) {
                 		  
         // scan through children in the list and build the bounding box
 		for (int i = 0; i < triangleList.size(); i++ ) {        
             // get the next triangle
-            RtTriangle triangle = (RtTriangle)triangleList.get(i);            
+            RtTriangle triangle = triangleList.get(i);            
             
             // add to the octtree's bounding box
 			this.add( triangle );
@@ -76,8 +77,8 @@ class RtOctTree extends RtBoundingBox {
 	 * @param depth
 	 * @param childList
 	 */
-    public RtOctTree( int maxDepth, int maxItems, ArrayList triangleList, int depth, double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-        ArrayList newList = new ArrayList();
+    public RtOctTree( int maxDepth, int maxItems, List<RtTriangle> triangleList, int depth, double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+        List<RtTriangle> newList = new ArrayList<>();
         
         // create bounding box
         this.add( minX, minY, minZ );
@@ -86,12 +87,12 @@ class RtOctTree extends RtBoundingBox {
         // scan through triangles in the list
         for (int i = 0; i < triangleList.size(); i++ ) {
             // get the next triangle
-        	RtTriangle triangle = (RtTriangle)triangleList.get(i);            
+        	RtTriangle triangle = triangleList.get(i);            
             			
             // in bounding box?
             if (this.intersects( triangle )) {
                 // add to the list
-                newList.add( (Object)triangle );
+                newList.add(triangle );
             }
         }
 
@@ -112,7 +113,7 @@ class RtOctTree extends RtBoundingBox {
      * @param depth
      * @param childList
      */
-    final void buildOctants( int maxDepth, int maxItems, ArrayList triangleList, int depth, double minX, double minY, double minZ, double maxX, double maxY, double maxZ ) {
+    final void buildOctants( int maxDepth, int maxItems, List<RtTriangle> triangleList, int depth, double minX, double minY, double minZ, double maxX, double maxY, double maxZ ) {
 
         // no children?
         if (triangleList.size() == 0) {
@@ -130,7 +131,7 @@ class RtOctTree extends RtBoundingBox {
             // copy the elements into the array
             for (int i = 0; i < triangleList.size(); i++ ) {
                 // get the next triangle and place in the array
-            	child[i] = (RtTriangle)triangleList.get(i);            	
+            	child[i] = triangleList.get(i);
 			}
 			
 		} else {

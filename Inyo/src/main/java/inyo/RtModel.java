@@ -1,9 +1,8 @@
 
 package inyo;
 
-import inyo.RtOctTree;
-import inyo.RtTriangle;
 import java.util.ArrayList;
+import java.util.List;
 
 /*
  * Created on Feb 24, 2005
@@ -19,11 +18,11 @@ import java.util.ArrayList;
 public class RtModel {
 	
 	RtOctTree octree;
-	ArrayList triangleList = new ArrayList();	
+	List<RtTriangle> triangleList = new ArrayList<>();
 	
 	public void addTriangle(RtTriangle triangle) {
 		// add to the list
-		this.triangleList.add( (Object)triangle );
+		this.triangleList.add(triangle);
 		
 		// add to material's samples?
 		if (triangle.material.specular == 0) {
