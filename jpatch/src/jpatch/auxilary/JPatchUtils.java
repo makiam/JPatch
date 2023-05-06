@@ -1,9 +1,6 @@
 package jpatch.auxilary;
 
 import java.io.File;
-
-import javax.swing.*;
-
 import jpatch.boundary.*;
 import jpatch.boundary.ui.JPatchDialog;
 

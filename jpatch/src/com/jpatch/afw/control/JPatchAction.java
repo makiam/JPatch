@@ -3,12 +3,9 @@ package com.jpatch.afw.control;
 
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.ui.KeyboardShortcutManager;
-
 import java.awt.event.ActionListener;
-
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
-import javax.swing.undo.UndoManager;
 
 public abstract class JPatchAction implements ActionListener {
 	protected final String name;
@@ -37,11 +34,9 @@ public abstract class JPatchAction implements ActionListener {
 				return value;
 			}
 		});
-		keyboardShortcut.addAttributePostChangeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute source) {
-				KeyboardShortcutManager.getInstance().manageAction(JPatchAction.this);
-			}
-		});
+		keyboardShortcut.addAttributePostChangeListener((Attribute source) -> {
+                    KeyboardShortcutManager.getInstance().manageAction(JPatchAction.this);
+                });
 		ResourceManager.getInstance().configureAction(this);
 	}
 

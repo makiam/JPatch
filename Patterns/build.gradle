@@ -1,0 +1,10 @@
+plugins {
+    id 'jpatch.java-conventions'
+}
+
+description = 'Patterns'
+
+dependencies {
+
+    compileOnly group: 'org.beanshell', name: 'bsh', version: '3.0.0-SNAPSHOT'
+}

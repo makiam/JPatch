@@ -3,13 +3,10 @@ package ui;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.AffineTransform;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 public class JPatchToolBar extends JToolBar {
 	private static final int NORMAL = 0;
@@ -64,6 +61,7 @@ public class JPatchToolBar extends JToolBar {
 		}
 	}
 
+        @Override
 	public void paintComponent(Graphics g) {
 		Rectangle bounds = getBounds();
 		Graphics2D g2 = (Graphics2D) g;

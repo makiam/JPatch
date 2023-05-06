@@ -1,18 +1,13 @@
 package trashcan;
 
+import com.jpatch.afw.control.JPatchUndoableEdit;
+import com.jpatch.afw.vecmath.TransformUtil;
 import static com.jpatch.afw.vecmath.TransformUtil.LOCAL;
-
+import com.jpatch.entity.Transformable;
 import java.util.List;
-
 import javax.vecmath.AxisAngle4d;
 import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3d;
-
-import trashcan.*;
-
-import com.jpatch.afw.control.JPatchUndoableEdit;
-import com.jpatch.afw.vecmath.TransformUtil;
-import com.jpatch.entity.Transformable;
 
 public class NodeSelection implements Transformable {
 	public static final int START = 3;
@@ -46,11 +41,13 @@ public class NodeSelection implements Transformable {
 		transformUtil.setSpace2World(LOCAL, START, matrix);
 	}
 	
+        @Override
 	public void begin() {
 		transformUtil.setTransform(START, transformNode.getTransform());
 		transformUtil.setTransform(LOCAL, transformNode.getTransform());
 	}
 
+        @Override
 	public void end(List<JPatchUndoableEdit> editList) {
 		// TODO Auto-generated method stub
 

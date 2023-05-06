@@ -3,7 +3,6 @@ package com.jpatch.afw.resources;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 
-import javax.swing.KeyStroke;
 
 public class CreateKeynamesTemplate {
 

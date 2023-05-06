@@ -24,7 +24,6 @@ package jpatch.boundary.ui;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -52,15 +51,13 @@ public class ExpandableForm extends JComponent {
 	}
 	public ExpandableForm(boolean keepExpanded) {
 		alwaysExpanded = keepExpanded;
-		button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				expanded = button.isSelected();
-				doLayout();
-				repaint();
-				button.setPressedIcon(button.isSelected() ? collapseIcon : expandIcon);
-				button.setToolTipText(button.isSelected() ? "collapse" : "expand");
-			}
-		});
+		button.addActionListener((ActionEvent e) -> {
+                    expanded = button.isSelected();
+                    doLayout();
+                    repaint();
+                    button.setPressedIcon(button.isSelected() ? collapseIcon : expandIcon);
+                    button.setToolTipText(button.isSelected() ? "collapse" : "expand");
+                });
 		button.setIcon(expandIcon);
 		button.setSelectedIcon(collapseIcon);
 		button.setRolloverIcon(expandRolloverIcon);
@@ -72,22 +69,28 @@ public class ExpandableForm extends JComponent {
 		add(button);
 		
 		setLayout(new LayoutManager2() {
+                        @Override
 			public void addLayoutComponent(String name, Component comp) { }
 
+                        @Override
 			public void removeLayoutComponent(Component comp) { }
 
+                        @Override
 			public Dimension preferredLayoutSize(Container parent) {
 				return computeSize(parent);
 			}
 
+                        @Override
 			public Dimension minimumLayoutSize(Container parent) {
 				return computeSize(parent);
 			}
 
+                        @Override
 			public Dimension maximumLayoutSize(Container parent) {
 				return computeSize(parent);
 			}
 			
+                        @Override
 			public void layoutContainer(Container parent) {
 				
 				int width = layoutSize.width;
@@ -147,6 +150,7 @@ public class ExpandableForm extends JComponent {
 		});
 		
 		setBorder(new Border() {
+                        @Override
 			public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
 //				Graphics2D g2 = (Graphics2D) g.create();
 				Color topColor = new Color(0xa7a7af);

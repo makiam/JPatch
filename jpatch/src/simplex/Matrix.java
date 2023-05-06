@@ -1,7 +1,5 @@
 package simplex;
 
-import javax.vecmath.*;
-
 public class Matrix {
 	private final double[][] elements;
 	private final int rows;

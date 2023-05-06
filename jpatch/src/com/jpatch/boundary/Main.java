@@ -28,41 +28,24 @@ import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.*;
 import com.jpatch.afw.icons.IconSet;
 import com.jpatch.afw.ui.*;
-import com.jpatch.afw.vecmath.Transform;
 import com.jpatch.boundary.actions.Actions;
-import com.jpatch.boundary.actions.Actions.ViewportMode;
 import com.jpatch.boundary.headupdisplay.*;
 import com.jpatch.boundary.tools.*;
 import com.jpatch.entity.*;
 import com.jpatch.entity.sds2.*;
 import com.jpatch.settings.Settings;
 import com.jpatch.ui.ViewportSwitcher;
-import com.sun.org.apache.xpath.internal.operations.Mod;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.*;
 import java.util.*;
 
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCanvas;
-import javax.media.opengl.Threading;
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.undo.*;
 import javax.vecmath.*;
 
-import jpatch.boundary.tools.Tools;
-import sun.net.www.http.*;
-import trashcan.*;
 
 
 /**

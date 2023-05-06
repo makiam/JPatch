@@ -2,23 +2,20 @@ package sds;
 
 import java.io.*;
 import java.util.*;
-
+import javax.vecmath.*;
+import jpatch.entity.*;
 import no.uib.cipr.matrix.*;
 import no.uib.cipr.matrix.sparse.*;
-
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
-import javax.vecmath.*;
-
-import jpatch.entity.*;
 
 public class JptLoader {
-	private Map<Integer, Cp> cpList = new HashMap<Integer, Cp>();
-	private Map<Integer, Cp> childHookIndex = new HashMap<Integer, Cp>();
+	private Map<Integer, Cp> cpList = new HashMap<>();
+	private Map<Integer, Cp> childHookIndex = new HashMap<>();
 	private int cpIndex;
 	private Sds sds;
-	private List<Material> materials = new ArrayList<Material>();
-	private Map<String, Integer> materialNameMap = new HashMap<String, Integer>();
+	private List<Material> materials = new ArrayList<>();
+	private Map<String, Integer> materialNameMap = new HashMap<>();
 	
 	public ContentHandler handler = new DefaultHandler() {
 		StringBuilder chars;
@@ -51,10 +48,10 @@ public class JptLoader {
 					patch = false;
 				} else if (localName.equals("points")) {
 					String[] cpIndexes = chars.toString().split("[,\\ ]");
-					List<TopLevelVertex> vertexList = new ArrayList<TopLevelVertex>();
+					List<TopLevelVertex> vertexList = new ArrayList<>();
 					for (int i = 0; i < cpIndexes.length; i += 2) {
-						Cp cp = cpList.get(Integer.parseInt(cpIndexes[i]));
-						Cp cpNext = cpList.get(Integer.parseInt(cpIndexes[i + 1]));
+						Cp cp = cpList.get(Integer.valueOf(cpIndexes[i]));
+						Cp cpNext = cpList.get(Integer.valueOf(cpIndexes[i + 1]));
 						Cp childHook0 = childHookIndex.get(cp.index);
 						Cp childHook1 = childHookIndex.get(cpNext.index);
 						vertexList.add(cp.getVertex());
@@ -244,7 +241,7 @@ public class JptLoader {
 				return sds;
 			}
 			
-			Map<TopLevelVertex, Integer> vertexIndexMap = new HashMap<TopLevelVertex, Integer>();
+			Map<TopLevelVertex, Integer> vertexIndexMap = new HashMap<>();
 			for (int i = 0; i < sds.vertexList.size(); i++) {
 				vertexIndexMap.put(sds.vertexList.get(i), i);
 			}

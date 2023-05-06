@@ -3,14 +3,9 @@ package jpatch.boundary.ui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import javax.swing.*;
-
 import jpatch.boundary.newaction.JPatchAction;
 
 public class JPatchButton extends JButton implements KeyBindingHelper.CallBack {

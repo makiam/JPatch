@@ -1,21 +1,15 @@
 package com.jpatch.afw.icons;
 
 import com.jpatch.afw.ui.ImageUtils;
-
 import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.image.*;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.plaf.basic.BasicButtonUI;
-import javax.swing.plaf.metal.MetalButtonUI;
 
 public class IconSet implements Serializable {
 	private static final long serialVersionUID = -5773242156358795217L;

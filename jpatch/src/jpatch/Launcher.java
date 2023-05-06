@@ -1,23 +1,13 @@
 package jpatch;
 
-import java.lang.reflect.*;
 import java.awt.*;
-import java.io.*;
-import java.security.NoSuchAlgorithmException;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.prefs.Preferences;
-
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.plaf.*;
-
 import jpatch.auxilary.NativeLibraryHelper;
 import jpatch.boundary.*;
-import jpatch.boundary.laf.*;
+import jpatch.boundary.SplashScreen;
 import jpatch.boundary.settings.*;
 import jpatch.boundary.ui.JPatchDialog;
-import jpatch.entity.*;
 
 public final class Launcher {
 	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
@@ -107,13 +97,14 @@ public final class Launcher {
 //		}
 	}
 	
+        @SuppressWarnings("ResultOfObjectAllocationIgnored")
 	private static void launchAnimator() {
 		new MainFrame();
 		if (SplashScreen.instance != null)
 			SplashScreen.instance.setText("Setting up new animation");
 		MainFrame.getInstance().newAnimation();
 	}
-	
+	@SuppressWarnings("ResultOfObjectAllocationIgnored")
 	private static void launchModeler() {
 		new MainFrame();
 		if (SplashScreen.instance != null)

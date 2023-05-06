@@ -21,20 +21,14 @@
  */
 package test;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
-import java.util.*;
 
 import javax.swing.*;
-import javax.swing.border.*;
-
 import jpatch.boundary.ui.ExpandableForm;
 import jpatch.boundary.ui.ExpandableFormContainer;
 
 public class LayoutTest {
 
+        @SuppressWarnings("ResultOfObjectAllocationIgnored")
 	public static void main(String[] args) {
 		new LayoutTest();
 	}
@@ -51,7 +45,7 @@ public class LayoutTest {
 		
 		
 		for (Row[] panel : panels) {
-			JPanel container = new ExpandableForm();
+			JComponent container = new ExpandableForm();
 			for (Row row : panel) {
 				container.add(row.label);
 				container.add(row.field);

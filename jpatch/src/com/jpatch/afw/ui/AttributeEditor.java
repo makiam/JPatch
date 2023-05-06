@@ -1,19 +1,13 @@
 package com.jpatch.afw.ui;
 
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.List;
-
-import javax.swing.*;
-import javax.swing.plaf.basic.BasicSliderUI;
-import javax.swing.plaf.metal.MetalSliderUI;
-
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.icons.IconSet;
 import com.jpatch.boundary.*;
-import com.sun.java.swing.plaf.motif.MotifSliderUI;
+import java.awt.*;
+import java.lang.reflect.*;
+import java.util.*;
+import java.util.List;
+import javax.swing.*;
 
 public class AttributeEditor {
 	

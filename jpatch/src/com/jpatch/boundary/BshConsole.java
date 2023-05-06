@@ -1,15 +1,12 @@
 package com.jpatch.boundary;
 
+import bsh.*;
+import bsh.util.JConsole;
 import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
-
 import javax.swing.*;
-
-import bsh.*;
-import bsh.util.JConsole;
 
 public class BshConsole implements Runnable {
 	
@@ -35,20 +32,17 @@ public class BshConsole implements Runnable {
 		
 //		
 		new Thread(this).start();
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				
-				JFrame f = new JFrame();
-				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				f.add(console);
-				f.setSize(800, 600);
-				f.setVisible(true);
-				
-			}
-		});
+		EventQueue.invokeLater(() -> {
+                    JFrame f = new JFrame();
+                    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    f.add(console);
+                    f.setSize(800, 600);
+                    f.setVisible(true);
+                });
 		
 	}
 	
+        @Override
 	public void run() {
 		interpreter.setOut(console.getOut());
 		interpreter.setErr(console.getErr());
@@ -63,16 +57,14 @@ public class BshConsole implements Runnable {
 				}
 				final String l = line;
 				System.out.println(l);
-				EventQueue.invokeAndWait(new Runnable() {
-					public void run() {
-						try {
-							interpreter.eval(l);
-						} catch (EvalError e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				});
+				EventQueue.invokeAndWait(() -> {
+                                    try {
+                                        interpreter.eval(l);
+                                    } catch (EvalError e) {
+                                        // TODO Auto-generated catch block
+                                        e.printStackTrace();
+                                    }
+                                });
 //				interpreter.getOut().print("\n>");
 			}
 		} catch (IOException e) {

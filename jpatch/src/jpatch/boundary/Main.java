@@ -21,26 +21,20 @@
  */
 package jpatch.boundary;
 
-import sds.*;
-
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.*;
-
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
-
-import jpatch.entity.*;
-
-import jpatch.boundary.action.OldActions;
 import jpatch.boundary.newaction.Actions;
 import jpatch.boundary.newtools.*;
 import jpatch.boundary.settings.*;
 import jpatch.boundary.tree.JPatchTree;
 import jpatch.boundary.tree.JPatchTreeNode;
+import jpatch.entity.*;
+import sds.*;
 
 
 /**

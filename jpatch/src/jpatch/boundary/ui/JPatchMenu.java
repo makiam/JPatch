@@ -23,7 +23,6 @@ package jpatch.boundary.ui;
 
 import java.awt.*;
 import java.beans.*;
-
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -74,6 +73,7 @@ public class JPatchMenu extends JMenu implements PropertyChangeListener {
 	/* (non-Javadoc)
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
+        @Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		rethinkMenuEnabled();
 	}

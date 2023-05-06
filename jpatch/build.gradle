@@ -1,0 +1,33 @@
+plugins {
+    id 'jpatch.java-conventions'
+}
+
+description = 'JPatch modeller'
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs = ['src']   
+        }
+    }
+    test {
+        java {
+            srcDirs = ['test']
+        }
+    }
+
+}
+
+
+dependencies {
+    implementation group: 'org.beanshell', name: 'bsh', version: '3.0.0-SNAPSHOT'
+    implementation group: 'javax.vecmath', name: 'vecmath', version: '1.5.2'
+    implementation project(":LAF")
+    implementation project(":Inyo")
+}
+
+
+

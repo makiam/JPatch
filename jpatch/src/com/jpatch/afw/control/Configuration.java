@@ -6,7 +6,7 @@ import java.util.Map;
 public class Configuration {
 	private static Configuration INSTANCE;
 	
-	private Map<String, Object> map = new HashMap<String, Object>();
+	private final Map<String, Object> map = new HashMap<>();
 	
 	public static Configuration getInstance() {
 		if (INSTANCE == null) {

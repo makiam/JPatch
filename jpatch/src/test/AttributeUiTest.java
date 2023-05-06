@@ -1,20 +1,9 @@
 package test;
 
-import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.text.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-
 import jpatch.boundary.AbstractAttributeEditor;
 import jpatch.boundary.AttributeEditorFactory;
-import jpatch.boundary.AttributeUiHelper;
-import jpatch.boundary.BoneAttributeEditor;
-import jpatch.boundary.TransformNodeAttributeEditor;
 import jpatch.entity.*;
 
 public class AttributeUiTest {

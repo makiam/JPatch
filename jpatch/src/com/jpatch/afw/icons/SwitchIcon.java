@@ -1,15 +1,11 @@
 package com.jpatch.afw.icons;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
 import java.io.*;
-
 import javax.imageio.*;
-import javax.swing.*;
-
-import org.apache.batik.ext.awt.*;
+import org.apache.batik.ext.awt.LinearGradientPaint;
 
 
 public class SwitchIcon {

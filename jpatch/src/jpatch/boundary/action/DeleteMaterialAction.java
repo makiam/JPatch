@@ -2,11 +2,10 @@ package jpatch.boundary.action;
 
 import java.awt.event.*;
 import java.util.Iterator;
-
 import javax.swing.*;
-import jpatch.entity.*;
 import jpatch.boundary.*;
 import jpatch.control.edit.*;
+import jpatch.entity.*;
 
 public final class DeleteMaterialAction extends AbstractAction {
 	
@@ -22,11 +21,12 @@ public final class DeleteMaterialAction extends AbstractAction {
 		//putValue(Action.SHORT_DESCRIPTION,"Add Controlpoint [A]");
 		//MainFrame.getInstance().getKeyEventDispatcher().setKeyActionListener(this,KeyEvent.VK_A);
 	}
+        @Override
 	public void actionPerformed(ActionEvent actionEvent) {
 		//MainFrame.getInstance().getJPatchScreen().removeAllMouseListeners();
 		//MainFrame.getInstance().getJPatchScreen().addMouseListeners(new AddControlPointMouseAdapter());
 		//MainFrame.getInstance().clearDialog();
-		OLDMaterial defaultMaterial = (OLDMaterial) MainFrame.getInstance().getModel().getMaterialList().get(0);
+		OLDMaterial defaultMaterial = MainFrame.getInstance().getModel().getMaterialList().get(0);
 		if (material != defaultMaterial) {
 			JPatchActionEdit edit = new JPatchActionEdit("delete material");
 			for (Iterator it = MainFrame.getInstance().getModel().getPatchSet().iterator(); it.hasNext(); ) {

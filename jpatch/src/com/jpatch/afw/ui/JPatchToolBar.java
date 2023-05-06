@@ -3,13 +3,11 @@ package com.jpatch.afw.ui;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
+@SuppressWarnings("serial")
 public class JPatchToolBar extends JToolBar {
 	private Color textColor = new Color(0xffffffff, true);
 	private Font textFont = new Font("sans-serif", Font.BOLD, 13);
@@ -65,6 +63,7 @@ public class JPatchToolBar extends JToolBar {
 		}
 	}
 
+        @Override
 	public void paintComponent(Graphics g) {
 		Background.fillComponent(this, g);
 		if (false) {

@@ -1,16 +1,5 @@
 package com.jpatch.afw.demo;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.Locale;
-
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JSeparator;
-import javax.swing.KeyStroke;
-import javax.swing.UIManager;
-
 import com.jpatch.afw.attributes.StateMachine;
 import com.jpatch.afw.attributes.Toggle;
 import com.jpatch.afw.control.*;
@@ -18,6 +7,11 @@ import com.jpatch.afw.ui.JPatchCheckBoxMenuItem;
 import com.jpatch.afw.ui.JPatchMenu;
 import com.jpatch.afw.ui.JPatchMenuItem;
 import com.jpatch.afw.ui.JPatchRadioButtonMenuItem;
+import java.awt.event.ActionEvent;
+import java.util.Locale;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JSeparator;
 
 public class Demo {
 

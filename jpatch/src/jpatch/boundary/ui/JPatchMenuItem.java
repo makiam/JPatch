@@ -1,12 +1,8 @@
 package jpatch.boundary.ui;
 
-import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
-
 import javax.swing.*;
-
-import jpatch.boundary.action.*;
 import jpatch.boundary.newaction.JPatchAction;
 
 public class JPatchMenuItem extends JMenuItem {

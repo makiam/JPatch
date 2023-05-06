@@ -1,0 +1,16 @@
+plugins {
+    id 'jpatch.java-conventions'
+}
+
+description = 'Inyo Renderer'
+
+
+
+
+dependencies {
+    compileOnly group: 'javax.vecmath', name: 'vecmath', version: '1.5.2'
+    compileOnly project(":Patterns")
+}
+
+
+

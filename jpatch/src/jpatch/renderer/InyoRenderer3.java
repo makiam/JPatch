@@ -1,26 +1,24 @@
 package jpatch.renderer;
 
+import inyo.*;
 import java.awt.Image;
 import java.util.*;
 import javax.vecmath.*;
-import jpatch.entity.*;
-import jpatch.boundary.*;
 import jpatch.boundary.settings.InyoSettings;
 import jpatch.boundary.settings.Settings;
-
-import inyo.*;
+import jpatch.entity.*;
 
 public class InyoRenderer3 implements Renderer {
 	
 	private Image image;
-	private List models;
-	private List lights;
+	private List<AnimModel> models;
+	private List<AnimLight> lights;
 	private OLDCamera camera;
 	private PatchTesselator3 patchTesselator = new PatchTesselator3();
 	private JPatchInyoInterface inyo;
 	private volatile boolean abort = false;
 	
-	public InyoRenderer3(List models, OLDCamera camera, List lights) {
+	public InyoRenderer3(List<AnimModel> models, OLDCamera camera, List<AnimLight> lights) {
 		this.models = models;
 		this.camera = camera;
 		this.lights = lights;
@@ -62,7 +60,7 @@ public class InyoRenderer3 implements Renderer {
 		/*
 		 * lightsources
 		 */
-		for (Iterator it = lights.iterator(); it.hasNext(); ) {
+		for (Iterator<AnimLight> it = lights.iterator(); it.hasNext(); ) {
 			if (abort)
 				return null;
 			AnimLight light = (AnimLight) it.next();
@@ -76,8 +74,8 @@ public class InyoRenderer3 implements Renderer {
 		}
 		
 		
-		for (Iterator it = models.iterator(); it.hasNext(); ) {
-			AnimModel animModel = (AnimModel) it.next();
+		for (Iterator<AnimModel> it = models.iterator(); it.hasNext(); ) {
+			AnimModel animModel = it.next();
 			OLDModel model = animModel.getModel();
 			int subdiv = Settings.getInstance().export.inyo.subdivisionLevel + animModel.getSubdivisionOffset();
 			if (subdiv < 2) subdiv = 2;
@@ -86,10 +84,10 @@ public class InyoRenderer3 implements Renderer {
 	
 			
 			
-			for (Iterator iterator = model.getMaterialList().iterator(); iterator.hasNext();) {
+			for (Iterator<OLDMaterial> iterator = model.getMaterialList().iterator(); iterator.hasNext();) {
 				if (abort)
 					return null;
-				OLDMaterial material = (OLDMaterial)iterator.next();
+				OLDMaterial material = iterator.next();
 				PatchTesselator3.Vertex[] vtx = patchTesselator.getPerMaterialVertexArray(material);
 				int[][] triangles = patchTesselator.getPerMaterialTriangleArray();
 				if (triangles.length > 0) {
@@ -133,12 +131,14 @@ public class InyoRenderer3 implements Renderer {
 		
 		System.out.println("INYO START");
 		Thread renderer = new Thread() {
+                        @Override
 			public void run() {
 				inyo.startRendering(new InyoJPatchInterface() {
 					/**
 					 * Tell JPatch about the rendering progress
 					 * @param progress 0.0 means rendering just started, 0.5 means half way done, 1.0 means rendering finished.
 					 */
+                                        @Override
 					public void progress(double progress) {
 						System.out.println("progress: " + progress);
 						// TODO: looks like Inyo doesn't talk to us :/
@@ -148,6 +148,7 @@ public class InyoRenderer3 implements Renderer {
 					 * Pass the rendered image back to JPatch
 					 * @param image the final image
 					 */
+                                        @Override
 					public void renderingDone(java.awt.Image image) {
 						InyoRenderer3.this.image = image;
 					}
@@ -168,6 +169,7 @@ public class InyoRenderer3 implements Renderer {
 		return image;
 	}
 	
+        @Override
 	public synchronized void abort() {
 		abort = true;
 		inyo.stopRendering();

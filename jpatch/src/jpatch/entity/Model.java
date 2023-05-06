@@ -1,9 +1,7 @@
 package jpatch.entity;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.*;
-
 import jpatch.auxilary.XmlWriter;
 
 public class Model extends AbstractNamedObject {
