@@ -27,6 +27,7 @@ dependencies {
     implementation group: 'javax.vecmath', name: 'vecmath', version: '1.5.2'
     implementation project(":LAF")
     implementation project(":Inyo")
+    implementation project(":batik")
 }
 
 
