@@ -9,10 +9,12 @@ public class IdentityMapping implements Mapping {
 		return INSTANCE;
 	}
 	
+        @Override
 	public double getMappedValue(double value) {
 		return value;
 	}
 
+        @Override
 	public double getValue(double mappedValue) {
 		return mappedValue;
 	}

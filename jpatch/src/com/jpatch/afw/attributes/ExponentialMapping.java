@@ -9,10 +9,12 @@ public class ExponentialMapping implements Mapping {
 		return INSTANCE;
 	}
 	
+    @Override
 	public double getMappedValue(double value) {
 		return Math.exp(value);
 	}
 
+    @Override
 	public double getValue(double mappedValue) {
 		return Math.log(mappedValue);
 	}

@@ -1,15 +1,12 @@
 package com.jpatch.entity;
 
-import static com.jpatch.afw.vecmath.TransformUtil.LOCAL;
-
-import java.util.*;
-
-import javax.vecmath.*;
 
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.AttributeEdit;
 import com.jpatch.afw.control.JPatchUndoableEdit;
 import com.jpatch.afw.vecmath.*;
+import java.util.*;
+import javax.vecmath.*;
 
 public class XFormNode extends SceneGraphNode implements Transformable {
 	/** enumeration of transform operations */

@@ -1,19 +1,13 @@
 package test;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
-import java.awt.event.*;
 import java.io.IOException;
-
 import javax.swing.*;
 import javax.swing.tree.*;
-
 import jpatch.entity.*;
 
 public class NewTreeTest {

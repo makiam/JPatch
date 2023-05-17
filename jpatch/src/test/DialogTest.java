@@ -24,17 +24,8 @@ package test;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-
 import javax.swing.*;
-import javax.swing.border.EtchedBorder;
-
-
-import jpatch.boundary.AbstractAttributeEditor;
-import jpatch.boundary.settings.Settings;
-import jpatch.boundary.ui.ExpandableForm;
 import jpatch.boundary.ui.JPatchDialog;
-import jpatch.entity.Attribute;
 
 /**
  * @author sascha
@@ -54,6 +45,7 @@ public class DialogTest {
 		final WorkspaceChooser wsc = new WorkspaceChooser();
 		button.addActionListener(new ActionListener() {
 
+                        @Override
 			public void actionPerformed(ActionEvent e) {
 				int i = JPatchDialog.showDialog(frame, "abc.txt", JPatchDialog.WARNING, "<b>Do you want to save changes to this file before closing it?</b><p>If you don't save, your changes will be lost.", null, new String[] { "Don't Save", null, "Cancel", "Save" }, 2, "320");
 				System.out.println(i);

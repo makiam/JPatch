@@ -1,8 +1,8 @@
 package simplex;
 
 import java.util.*;
+import simplex.Vector;
 
-import javaview_test.*;
 
 public class Simplex {
 	private static final double EPSILON = 1.0e-6;

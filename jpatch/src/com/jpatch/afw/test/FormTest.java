@@ -1,24 +1,13 @@
 package com.jpatch.afw.test;
 
-import java.awt.*;
-import java.util.*;
-
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.control.Configuration;
 import com.jpatch.afw.icons.IconSet;
-import com.jpatch.afw.icons.IconSet.*;
 import com.jpatch.afw.ui.*;
 import com.jpatch.afw.vecmath.Rotation3d;
-
-import javax.sound.sampled.spi.FormatConversionProvider;
+import java.awt.*;
+import java.util.*;
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.plaf.ColorUIResource;
-
-import jpatch.entity.attributes2.LinearMapping;
-
-import trashcan.HardBoundedDoubleAttr;
-import trashcan.SoftBoundedDoubleAttr;
 
 public class FormTest {
 	public static void main(String[] args) {
@@ -37,11 +26,9 @@ public class FormTest {
 		DoubleAttr max = new DoubleAttr(100);
 		DoubleAttr doubleAttr = AttributeManager.getInstance().createBoundedDoubleAttr(min, max);
 		
-		doubleAttr.addAttributePostChangeListener(new AttributePostChangeListener() {
-			public void attributeHasChanged(Attribute source) {
-				System.out.println(((DoubleAttr) source).getDouble());
-			}
-		});
+		doubleAttr.addAttributePostChangeListener((Attribute source) -> {
+                    System.out.println(((DoubleAttr) source).getDouble());
+                });
 		AttributeManager.getInstance().bindTextFieldToAttribute(textField, doubleAttr);
 		AttributeManager.getInstance().bindSliderToAttribute(slider, doubleAttr, IdentityMapping.getInstance());
 		

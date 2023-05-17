@@ -1,10 +1,8 @@
 package test;
 
 import com.jpatch.afw.vecmath.*;
-
 import java.util.*;
 
-import javax.vecmath.*;
 
 public class GMatrixTest {
 

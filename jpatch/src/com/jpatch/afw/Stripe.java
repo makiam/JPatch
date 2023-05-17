@@ -5,18 +5,15 @@ import java.awt.event.*;
 import java.awt.image.*;
 import java.util.*;
 import java.util.List;
-
 import javax.swing.*;
 import javax.swing.border.*;
 
-import jpatch.boundary.action.*;
-import sun.security.action.*;
 
 public class Stripe {
 	public static enum Orientation { HORIZONTAL, VERTICAL }
 	private final Orientation orientation;
 	private int visibleItemCount;
-	private final List<Component> components = new ArrayList<Component>();
+	private final List<Component> components = new ArrayList<>();
 	private final JComponent listView = new JPanel();
 	private final JComponent component = new JPanel(new BorderLayout());
 	private int position;
@@ -28,20 +25,12 @@ public class Stripe {
 	public Stripe(Orientation orientation, int visibleItemCount) {
 		this.orientation = orientation;
 		setVisibleItemCount(visibleItemCount);
-		backButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent arg0) {
-				scroll(position - 1);
-			}
-			
-		});
-		forwardButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent arg0) {
-				scroll(position + 1);
-			}
-			
-		});
+		backButton.addActionListener((ActionEvent arg0) -> {
+                    scroll(position - 1);
+                });
+		forwardButton.addActionListener((ActionEvent arg0) -> {
+                    scroll(position + 1);
+                });
 	}
 	
 	public void setVisibleItemCount(int visibleItemCount) {

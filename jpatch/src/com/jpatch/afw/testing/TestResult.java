@@ -1,7 +1,5 @@
 package com.jpatch.afw.testing;
 
-import java.util.*;
-
 public final class TestResult {
 	public static enum Type { SUCCESS, WARNING, ERROR }
 	private final Type type;

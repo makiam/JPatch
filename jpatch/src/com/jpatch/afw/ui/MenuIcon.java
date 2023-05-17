@@ -3,12 +3,10 @@ package com.jpatch.afw.ui;
 import com.jpatch.afw.control.JPatchAction;
 import com.jpatch.afw.control.SwitchStateAction;
 import com.jpatch.afw.control.ToggleAction;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
-
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -56,6 +54,7 @@ class MenuIcon implements Icon {
 		menuAccelerator.setFont(font);
 	}
 	
+        @Override
 	public int getIconHeight() {
 		return HEIGHT;
 	}
@@ -75,6 +74,7 @@ class MenuIcon implements Icon {
 		return flags;
 	}
 
+        @Override
 	public int getIconWidth() {
 		if (menuItem.getParent() instanceof JMenuBar) {
 			return menuText.getPreferredSize().width;
@@ -114,6 +114,7 @@ class MenuIcon implements Icon {
 		return width;
 	}
 	
+        @Override
 	public void paintIcon(Component comp, Graphics g, int x, int y) {
 		System.out.println("paint:" + menuText.getText());
 		menuText.setBounds(0, 0, menuText.getPreferredSize().width, HEIGHT);
