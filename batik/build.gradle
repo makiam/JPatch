@@ -1,0 +1,14 @@
+plugins {
+    id 'jpatch.java-conventions'
+}
+
+description = 'Batik'
+
+
+
+
+dependencies {
+}
+
+
+
