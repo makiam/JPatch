@@ -11,10 +11,12 @@ public class IntAttr extends AbstractAttribute implements IntValue {
 		setInt(value);
 	}
 	
+        @Override
 	public int getInt() {
 		return value;
 	}
 
+        @Override
 	public void setInt(int value) {
 		if (value != this.value) {
 			this.value = value;

@@ -38,11 +38,13 @@ public class Demo {
 		};
 		
 		JPatchAction openAction = new JPatchAction(null, "OPEN") {
+                        @Override
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("open");
 			}
 		};
 		JPatchAction saveAction = new JPatchAction(null, "SAVE") {
+                        @Override
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("save");
 			}

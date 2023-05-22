@@ -11,6 +11,7 @@ public abstract class AbstractAttribute implements Attribute{
      * @see #fireAttributeChanged
      * @see #removeAttributeListener
      */
+        @Override
     public void addAttributeListener(AttributeListener l) {
     	if (l == null) {
     		throw new NullPointerException();
@@ -34,6 +35,7 @@ public abstract class AbstractAttribute implements Attribute{
      * @see #fireAttributeChanged
      * @see #addAttributeListener
      */
+        @Override
     public void removeAttributeListener(AttributeListener l) {
     	int i = 0;
     	while (i < attributeListeners.length && attributeListeners[i] != l) {

@@ -10,17 +10,17 @@ import javax.swing.KeyStroke;
 public abstract class JPatchAction implements ActionListener {
 	protected final String name;
 	protected final JPatchUndoManager undoManager;
-	protected GenericAttr<String> displayName = new GenericAttr<String>("");
-	protected GenericAttr<String> buttonText = new GenericAttr<String>("");
-	protected GenericAttr<String> menuText = new GenericAttr<String>("");
+	protected GenericAttr<String> displayName = new GenericAttr<>("");
+	protected GenericAttr<String> buttonText = new GenericAttr<>("");
+	protected GenericAttr<String> menuText = new GenericAttr<>("");
 	protected BooleanAttr useMenuIcon = new BooleanAttr(false);
-	protected GenericAttr<Icon> icon = new GenericAttr<Icon>();
-	protected GenericAttr<Icon> selectedIcon = new GenericAttr<Icon>();
-	protected GenericAttr<Icon> disabledIcon = new GenericAttr<Icon>();
-	protected GenericAttr<Icon> disabledSelectedIcon = new GenericAttr<Icon>();
-	protected GenericAttr<Icon> rolloverIcon = new GenericAttr<Icon>();
-	protected GenericAttr<Icon> rolloverSelectedIcon = new GenericAttr<Icon>();
-	protected GenericAttr<KeyStroke> keyboardShortcut = new GenericAttr<KeyStroke>();
+	protected GenericAttr<Icon> icon = new GenericAttr<>();
+	protected GenericAttr<Icon> selectedIcon = new GenericAttr<>();
+	protected GenericAttr<Icon> disabledIcon = new GenericAttr<>();
+	protected GenericAttr<Icon> disabledSelectedIcon = new GenericAttr<>();
+	protected GenericAttr<Icon> rolloverIcon = new GenericAttr<>();
+	protected GenericAttr<Icon> rolloverSelectedIcon = new GenericAttr<>();
+	protected GenericAttr<KeyStroke> keyboardShortcut = new GenericAttr<>();
 	protected BooleanAttr enabled = new BooleanAttr(true);
 
 	
