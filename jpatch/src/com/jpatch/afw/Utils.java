@@ -1,12 +1,9 @@
 package com.jpatch.afw;
 
-import com.jpatch.entity.sds2.*;
 
 import java.lang.reflect.*;
 import java.util.*;
-
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.tree.*;
 import javax.vecmath.Matrix4d;
@@ -217,8 +214,8 @@ public class Utils {
 	
 	@SuppressWarnings("serial")
 	public static TableModel reflectionTableModel(final Object object) {
-		final List<Field> fieldList = new ArrayList<Field>();
-		for (Class cls = object.getClass(); cls != null; cls = cls.getSuperclass()) {
+		final List<Field> fieldList = new ArrayList<>();
+		for (Class<?> cls = object.getClass(); cls != null; cls = cls.getSuperclass()) {
 			for (Field field : cls.getDeclaredFields()) {
 				if (!Modifier.isStatic(field.getModifiers()) && ! field.isSynthetic()) {
 					field.setAccessible(true);
@@ -230,14 +227,17 @@ public class Utils {
 		System.out.println("object " + object + " has " + fieldList.size() + " fields");
 		return new AbstractTableModel() {
 
+                        @Override
 			public int getColumnCount() {
 				return 2;
 			}
 
+                        @Override
 			public int getRowCount() {
 				return fieldList.size();
 			}
 
+                        @Override
 			public Object getValueAt(int rowIndex, int columnIndex) {
 				System.out.println("getValueAt(row " + rowIndex + ", column " + columnIndex + ") [" + fieldList.size() + " rows]");
 				Object content;

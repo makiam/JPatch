@@ -176,6 +176,7 @@ public class Stripe {
 			this.endPixel = endPixel;
 		}
 		
+                @Override
 		public void run() {
 			if (scroller != null) {
 				scroller.stop = true;
@@ -233,6 +234,7 @@ public class Stripe {
 			for (int j = 0; j < 5; j++) {
 				final JPanel panel = new JPanel();
 				final JLabel label = new JLabel(Integer.toString(j)) {
+                                        @Override
 					public void paint(Graphics g) {
 						super.paint(g);
 					}
@@ -241,17 +243,13 @@ public class Stripe {
 				panel.add(label);
 				label.setBorder(new EtchedBorder());
 				label.setOpaque(true);
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						vStripe.addComponent(label);
-					}
-				});
+				EventQueue.invokeLater(() -> {
+                                    vStripe.addComponent(label);
+                                });
 			}
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					hStripe.addComponent(vStripe.component);
-				}
-			});
+			EventQueue.invokeLater(() -> {
+                            hStripe.addComponent(vStripe.component);
+                        });
 		//	frame.repaint();
 			try {
 				Thread.sleep(100);
@@ -260,11 +258,9 @@ public class Stripe {
 			}
 		}
 		
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				hStripe.scroll(0);
-			}
-		});
+		EventQueue.invokeLater(() -> {
+                    hStripe.scroll(0);
+                });
 	}
 	
 	private class ImagePainter extends JComponent {
@@ -279,6 +275,7 @@ public class Stripe {
 			this.offset = offset;
 		}
 		
+                @Override
 		public void paint(Graphics g) {
 			g.drawImage(image, orientation == Orientation.HORIZONTAL ? -offset : 0, orientation == Orientation.VERTICAL ? -offset : 0, null);
 		}

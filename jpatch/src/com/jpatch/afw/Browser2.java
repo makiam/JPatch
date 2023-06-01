@@ -5,7 +5,6 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
-import javax.swing.event.*;
 
 public class Browser2<T> {
 	private final List<Node> nodeList = new ArrayList<Node>();

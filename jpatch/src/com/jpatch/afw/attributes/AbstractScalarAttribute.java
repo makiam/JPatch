@@ -25,6 +25,7 @@ public abstract class AbstractScalarAttribute<T> extends AbstractAttribute imple
      * @throws NullPointerException if the specified argument is null
      * @throws IllegalArgumentException if the specified AttributePreChangeListener has already been added to this AbstractAttribute
      */
+        @Override
     public void addAttributePreChangeListener(AttributePreChangeListener l) {
     	if (l == null) {
     		throw new NullPointerException();
@@ -53,6 +54,7 @@ public abstract class AbstractScalarAttribute<T> extends AbstractAttribute imple
      * @param l the AttributePreChangeListener to remove
      * @see #addAttributePreChangeListener
      */
+        @Override
     public void removeAttributePreChangeListener(AttributePreChangeListener l) {
     	if (attributePreChangeListeners == null) {
     		return; 								// listener list is empty, ignore silently and return

@@ -1,12 +1,8 @@
 package com.jpatch.afw.icons;
 
-import com.jpatch.afw.attributes.ScalarAttribute;
-import com.jpatch.afw.attributes.AttributePreChangeAdapter;
-import com.jpatch.afw.attributes.AttributePostChangeListener;
-import com.jpatch.afw.attributes.StateMachine;
+import com.jpatch.afw.icons.IconSet.Style;
+import com.jpatch.afw.icons.IconSet.Type;
 import com.jpatch.afw.ui.*;
-import com.jpatch.ui.ViewportSwitcher;
-
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -14,18 +10,11 @@ import java.awt.geom.*;
 import java.awt.image.*;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.URL;
-
 import javax.swing.*;
-
 import org.apache.batik.ext.awt.LinearGradientPaint;
-import ui.JPatchToolBar;
-import static com.jpatch.afw.icons.IconSet.*;
 
 public class ImageGenerator {
 	private BufferedImage image, stencil;
@@ -276,15 +265,14 @@ public class ImageGenerator {
 		
 		
 		File file = new File("src/com/jpatch/afw/icons/buttonBorders.iconset");
-		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
-		oos.writeObject(iconSet);
-		oos.close();
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+                oos.writeObject(iconSet);
+            }
 		
-//		System.exit(0);
-		
-		ObjectInputStream ois = new ObjectInputStream(new FileInputStream("src/com/jpatch/afw/icons/buttonBorders.iconset"));
-		iconSet = (IconSet) ois.readObject();
-		ois.close();
+            try (//		System.exit(0);
+                    ObjectInputStream ois = new ObjectInputStream(new FileInputStream("src/com/jpatch/afw/icons/buttonBorders.iconset"))) {
+                iconSet = (IconSet) ois.readObject();
+            }
 		
 		frame.setLayout(new BorderLayout());
 		

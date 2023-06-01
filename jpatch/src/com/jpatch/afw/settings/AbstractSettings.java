@@ -23,28 +23,17 @@ package com.jpatch.afw.settings;
 
 
 import com.jpatch.afw.control.Configuration;
-
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.lang.reflect.*;
-import java.lang.annotation.*;
 import java.util.*;
 import java.util.List;
 import java.util.prefs.*;
-
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.event.*;
-import javax.swing.plaf.basic.BasicCheckBoxUI;
 import javax.swing.table.*;
 import javax.swing.tree.*;
-import javax.vecmath.*;
 
-import jpatch.entity.OLDModel;
 
 /**
  * This class provides publically accessible settings (preferences)

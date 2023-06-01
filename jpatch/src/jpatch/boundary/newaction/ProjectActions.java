@@ -1,9 +1,7 @@
 package jpatch.boundary.newaction;
 
 import java.awt.event.ActionEvent;
-
 import javax.swing.*;
-
 import jpatch.boundary.*;
 import jpatch.entity.*;
 
@@ -33,6 +31,7 @@ public class ProjectActions {
 			this.type = type;
 		}
 		
+                @Override
 		public void actionPerformed(ActionEvent e) {
 			JPatchObject object = (Project) Main.getInstance().getSelectedTreeUserObject();
 			if (object == null || !(object instanceof Project)) {

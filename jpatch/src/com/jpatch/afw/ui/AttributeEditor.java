@@ -18,11 +18,11 @@ public class AttributeEditor {
 	private final Class entityClass;
 	private Object entity;
 	private Object currentObject;
-	private final Stack<Method> objectStack = new Stack<Method>();
-	private final Stack<JPatchFormContainer> containerStack = new Stack<JPatchFormContainer>();
+	private final Stack<Method> objectStack = new Stack<>();
+	private final Stack<JPatchFormContainer> containerStack = new Stack<>();
 	private JPatchForm form = new JPatchForm();
-	private final List<ComponentBinding> bindings = new ArrayList<ComponentBinding>();
-	private final List<SpecialBinding> specialBindings = new ArrayList<SpecialBinding>();
+	private final List<ComponentBinding> bindings = new ArrayList<>();
+	private final List<SpecialBinding> specialBindings = new ArrayList<>();
 	private String falseString = null;
 	private String trueString = null;
 	private Mapping mapping = IdentityMapping.getInstance();

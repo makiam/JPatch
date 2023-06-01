@@ -56,6 +56,7 @@ public class LatheEditorDialog extends JDialog implements ActionListener, Change
 	/** the Lathe CurvePanel */
 	private class CurvePanel extends JPanel {
 		private static final long serialVersionUID = 6691264073850143334L;
+                @Override
 		public void paintComponent(Graphics g1) {
 			super.paintComponent(g1);
 			Graphics2D g = (Graphics2D)g1;

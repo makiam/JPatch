@@ -2,15 +2,12 @@ package com.jpatch.afw;
 
 import com.jpatch.*;
 import com.jpatch.boundary.Main;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.List;
-
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.table.*;
 
 
@@ -84,20 +81,16 @@ public final class ReflectionTable {
 		public ReflectionTableModel(Class type, Object object) {
 			this.type = type;
 			
-			final List<Field> allFields = new ArrayList<Field>();
+			final List<Field> allFields = new ArrayList<>();
 			for (Class c = type; c != null; c = c.getSuperclass()) {
-				List<Field> fieldList = new ArrayList<Field>();
+				List<Field> fieldList = new ArrayList<>();
 				for (Field field : c.getDeclaredFields()) {
 					if (!Modifier.isStatic(field.getModifiers()) && ! field.isSynthetic()) {
 						field.setAccessible(true);
 						fieldList.add(field);
 					}
 				}
-				Collections.sort(fieldList, new Comparator<Field>() {
-					public int compare(Field o1, Field o2) {
-						return o2.getName().compareTo(o1.getName());
-					}
-				});
+				Collections.sort(fieldList, (Field o1, Field o2) -> o2.getName().compareTo(o1.getName()));
 				allFields.addAll(fieldList);
 			}
 			Collections.reverse(allFields);
@@ -113,14 +106,17 @@ public final class ReflectionTable {
 			this.object = object;
 		}
 		
+                @Override
 		public int getColumnCount() {
 			return 2;
 		}
 	
+                @Override
 		public int getRowCount() {
 			return fields.length;
 		}
 	
+                @Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			Field field = fields[rowIndex];
 			switch (columnIndex) {
@@ -185,14 +181,17 @@ public final class ReflectionTable {
 			this.array = array;
 		}
 		
+                @Override
 		public int getColumnCount() {
 			return 1;
 		}
 	
+                @Override
 		public int getRowCount() {
 			return Array.getLength(array);
 		}
 	
+                @Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			switch (columnIndex) {
 			case 0:
@@ -225,14 +224,17 @@ public final class ReflectionTable {
 			entries = (Map.Entry<?, ?>[]) new ArrayList<Map.Entry>(map.entrySet()).toArray(new Map.Entry[map.size()]);
 		}
 		
+                @Override
 		public int getColumnCount() {
 			return 2;
 		}
 	
+                @Override
 		public int getRowCount() {
 			return entries.length;
 		}
 	
+                @Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			switch (columnIndex) {
 			case 0:

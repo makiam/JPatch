@@ -4,10 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
-
 import javax.swing.SwingUtilities;
-import javax.vecmath.Point3d;
-
 import jpatch.boundary.*;
 import jpatch.control.*;
 import jpatch.control.edit2.JPatchUndoableEdit;
@@ -16,6 +13,7 @@ import jpatch.entity.*;
 public class AddCurveTool implements JPatchTool {
 	private MouseListener[] mouseListeners;
 	
+        @Override
 	public void registerListeners(Viewport[] viewports) {
 		mouseListeners = new MouseListener[viewports.length];
 		for (int i = 0; i < viewports.length; i++) {
@@ -24,6 +22,7 @@ public class AddCurveTool implements JPatchTool {
 		}
 	}
 
+        @Override
 	public void unregisterListeners(Viewport[] viewports) {
 		for (int i = 0; i < viewports.length; i++) {
 			viewports[i].getComponent().removeMouseListener(mouseListeners[i]);
@@ -31,6 +30,7 @@ public class AddCurveTool implements JPatchTool {
 		mouseListeners = null;
 	}
 
+        @Override
 	public void draw(Viewport viewport) {
 		// TODO Auto-generated method stub
 		
@@ -52,7 +52,7 @@ public class AddCurveTool implements JPatchTool {
 			case MouseEvent.BUTTON1:
 				assert mml == null;
 				assert kl == null;
-				editList = new ArrayList<JPatchUndoableEdit>();
+				editList = new ArrayList<>();
 				ControlPoint weldTo = viewport.getControlPointAt(e.getX(), e.getY(), Main.getInstance().getActiveModel(), null);
 				if (weldTo != null) {
 					Point3d p3 = new Point3d();

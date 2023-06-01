@@ -1,7 +1,6 @@
 package jpatch.boundary.newaction;
 
 import java.awt.event.*;
-
 import jpatch.boundary.*;
 import jpatch.boundary.newtools.*;
 
@@ -36,6 +35,7 @@ public final class ChangeToolActions {
 			this.tool = tool;
 		}
 		
+                @Override
 		public void actionPerformed(ActionEvent e) {
 			Main.getInstance().setTool(tool);
 		}

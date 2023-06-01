@@ -1,20 +1,8 @@
 package jpatch.boundary;
 
 import java.awt.*;
-import java.awt.event.AWTEventListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.awt.image.IndexColorModel;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
 import java.util.*;
-import java.util.Timer;
-//import java.beans.*;
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.text.JTextComponent;
 import javax.swing.tree.*;
 import javax.vecmath.*;
 
@@ -26,11 +14,8 @@ import jpatch.boundary.timeline.TimelineEditor;
 import jpatch.boundary.tools.*;
 //	import jpatch.boundary.mouse.*;		//remove
 import jpatch.control.*;
-import jpatch.control.edit.*;
-import jpatch.boundary.laf.*;
 import jpatch.boundary.mouse.TreeMouseAdapter;
 import jpatch.boundary.action.*;
-import sun.security.provider.certpath.IndexedCollectionCertStore;
 
 public final class MainFrame extends JFrame {
 	/**

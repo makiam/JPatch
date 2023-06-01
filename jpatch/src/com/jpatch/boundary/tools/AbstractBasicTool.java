@@ -1,21 +1,19 @@
 package com.jpatch.boundary.tools;
 
-import static javax.media.opengl.GL.*;
 
+import com.jpatch.afw.attributes.*;
+import com.jpatch.boundary.*;
+import com.jpatch.boundary.tools.MouseSelector.*;
+import com.jpatch.boundary.tools.MouseSelector.HitEdge;
+import com.jpatch.boundary.tools.MouseSelector.HitFace;
+import com.jpatch.boundary.tools.MouseSelector.HitObject;
+import com.jpatch.boundary.tools.MouseSelector.HitVertex;
+import com.jpatch.entity.*;
+import com.jpatch.entity.sds2.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-
-import javax.media.opengl.*;
 import javax.swing.*;
-import javax.vecmath.*;
-
-import com.jpatch.afw.attributes.*;
-
-import com.jpatch.boundary.*;
-import com.jpatch.boundary.tools.MouseSelector.*;
-import com.jpatch.entity.*;
-import com.jpatch.entity.sds2.*;
 
 public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 	
@@ -30,6 +28,7 @@ public abstract class AbstractBasicTool implements JPatchTool, ViewportOverlay {
 	protected HitObject hitObject;
 	protected HalfEdge hitEdge;
 	final ObjectFilter hitEdgeFilter = new ObjectFilter() {
+                @Override
 		public boolean accept(Object o) {
 			if (o != hitEdge && o instanceof HalfEdge) {
 				return ((HalfEdge) o).isBoundary();

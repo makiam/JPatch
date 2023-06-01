@@ -22,21 +22,15 @@
 package jpatch.entity;
 
 import java.io.*;
-
-import jpatch.boundary.WorkspaceManager;
-import jpatch.entity.*;
 import java.lang.reflect.*;
+import jpatch.boundary.WorkspaceManager;
 
 /**
  * @author sascha
  *
  */
 public class Project extends AbstractNamedObject {
-	private static final FileFilter XML_FILEFILTER = new FileFilter() {
-		public boolean accept(File pathname) {
-			return pathname.getName().endsWith(".xml");
-		}
-	};
+	private static final FileFilter XML_FILEFILTER = (File pathname) -> pathname.getName().endsWith(".xml");
 	
 	private File projectDir;
 	private File modelDir;
@@ -86,6 +80,7 @@ public class Project extends AbstractNamedObject {
 		}
 	}
 
+        @Override
 	public String getName() {
 		return name.get();
 	}

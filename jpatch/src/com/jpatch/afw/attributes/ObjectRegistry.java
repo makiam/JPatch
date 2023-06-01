@@ -1,6 +1,5 @@
 package com.jpatch.afw.attributes;
 
-import com.jpatch.afw.attributes.*;
 
 import java.util.*;
 import java.util.regex.*;
@@ -48,6 +47,7 @@ public final class ObjectRegistry<T extends NamedObject> {
 	 * This Listener is added to all managed objects (upon calling the add(T, String) method).
 	 */
 	private final AttributePostChangeListener postChangeListener = new AttributePostChangeListener() {
+                @Override
 		public void attributeHasChanged(Attribute source) {
 			GenericAttr<String> nameAttr = (GenericAttr<String>) source;
 			T object = attributeMap.get(source);

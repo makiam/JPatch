@@ -2,18 +2,14 @@ package jpatch.boundary.mouse;
 
 
 import java.awt.*;
-import java.awt.geom.*;
 import java.awt.event.*;
-import javax.vecmath.*;
-
-import jpatch.entity.*;
+import java.awt.geom.*;
 import jpatch.boundary.*;
 import jpatch.boundary.action.OldActions;
 import jpatch.boundary.settings.Settings;
-import jpatch.boundary.tools.*;
-import jpatch.boundary.ui.JPatchLockingToggleButton;
 import jpatch.boundary.ui.LockingButtonGroup;
 import jpatch.control.edit.*;
+import jpatch.entity.*;
 
 
 public class AddBoneMouseAdapter extends JPatchMouseAdapter {

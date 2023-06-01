@@ -1,7 +1,5 @@
 package com.jpatch.entity;
 
-import static javax.media.opengl.GL.*;
-import javax.media.opengl.GL;
 import javax.vecmath.*;
 
 public class GlMaterial {

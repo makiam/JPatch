@@ -23,7 +23,6 @@ package jpatch.boundary.ui;
 
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 import javax.swing.text.*;
 
@@ -75,24 +74,22 @@ public class JPatchDialog extends JDialog {
 		Component focusComponent = null;
 		int o = 0;
 		for (String option : options) {
-			if (option != null) {
-				JButton button = new JButton(option);
-				buttonBox.add(Box.createHorizontalStrut(8));
-				buttonBox.add(button);
-				buttonBox.add(Box.createHorizontalStrut(8));
-				if (o == focus)
-					focusComponent = button;
-				final int opt = o;
-				button.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						selectedOption = opt;
-						dispose();
-					}
-				});
-				o++;
-			} else {
-				buttonBox.add(Box.createHorizontalGlue());
-			}
+			if (option == null) {
+                            buttonBox.add(Box.createHorizontalGlue());
+                        } else {
+                            JButton button = new JButton(option);
+                            buttonBox.add(Box.createHorizontalStrut(8));
+                            buttonBox.add(button);
+                            buttonBox.add(Box.createHorizontalStrut(8));
+                            if (o == focus)
+                                focusComponent = button;
+                            final int opt = o;
+                            button.addActionListener((ActionEvent e) -> {
+                                selectedOption = opt;
+                                dispose();
+                            });
+                            o++;
+                        }
 		}
 		buttonBox.setBorder(BorderFactory.createEmptyBorder(0, 8, 16, 8));
 		pack();

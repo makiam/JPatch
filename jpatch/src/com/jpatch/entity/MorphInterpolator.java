@@ -1,15 +1,10 @@
 package com.jpatch.entity;
 
-import java.util.*;
-
-import javax.vecmath.*;
-
 import com.jpatch.afw.attributes.*;
 import com.jpatch.afw.ui.*;
 import com.jpatch.afw.vecmath.*;
-import com.jpatch.entity.*;
-import com.jpatch.entity.sds2.*;
-import com.sun.org.apache.xalan.internal.xsltc.util.*;
+import java.util.*;
+import javax.vecmath.*;
 
 
 public class MorphInterpolator extends Morph<MorphTarget> {

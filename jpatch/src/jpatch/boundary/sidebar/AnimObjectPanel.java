@@ -2,14 +2,10 @@ package jpatch.boundary.sidebar;
 
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
-
 import javax.vecmath.*;
-
 import jpatch.boundary.*;
 import jpatch.boundary.action.*;
 import jpatch.control.edit.*;
@@ -41,6 +37,7 @@ public class AnimObjectPanel extends SidePanel implements ChangeListener {
 			JButton buttonColor = new JButton("Set color...");
 			add(buttonColor);
 			buttonColor.addActionListener(new ActionListener() {
+                                @Override
 				public void actionPerformed(ActionEvent e) {
 					AnimLight light = (AnimLight) AnimObjectPanel.this.animObject;
 					Color color = JColorChooser.showDialog(MainFrame.getInstance(), light.getName() + " color", light.getColor().get());
@@ -59,6 +56,7 @@ public class AnimObjectPanel extends SidePanel implements ChangeListener {
 		JButton buttonPovRay = new JButton("Pov-Ray...");
 		add(buttonPovRay);
 		buttonPovRay.addActionListener(new ActionListener() {
+                        @Override
 			public void actionPerformed(ActionEvent e) {
 				JTextArea textArea = new JTextArea(AnimObjectPanel.this.animObject.getRenderString("povray", ""), 15, 60);
 				textArea.setFont(FONT);
@@ -70,6 +68,7 @@ public class AnimObjectPanel extends SidePanel implements ChangeListener {
 		JButton buttonRenderman = new JButton("RenderMAN...");
 		add(buttonRenderman);
 		buttonRenderman.addActionListener(new ActionListener() {
+                        @Override
 			public void actionPerformed(ActionEvent e) {
 				JTextArea textArea = new JTextArea(AnimObjectPanel.this.animObject.getRenderString("renderman", ""), 15, 60);
 				textArea.setFont(FONT);

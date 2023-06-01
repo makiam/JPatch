@@ -1,7 +1,5 @@
 package jpatch.auxilary;
 
-import javax.vecmath.*;
-
 public class AliasWavefrontMat {
 	public Color3f Ka = new Color3f(0.25f, 0.25f, 0.50f);
 	public Color3f Kd = new Color3f(0.25f, 0.25f, 0.50f);
@@ -17,6 +15,7 @@ public class AliasWavefrontMat {
 		this.Ns = Ns;
 	}
 	
+        @Override
 	public String toString() {
 		return (
 			"Ka " + Ka.x + " " + Ka.y + " " + Ka.z + "\n"

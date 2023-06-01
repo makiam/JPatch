@@ -1,16 +1,11 @@
 package jpatch.boundary.newaction;
 
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-
 import jpatch.boundary.*;
 import jpatch.boundary.ui.JPatchDialog;
 import sds.JptLoader;
@@ -19,6 +14,7 @@ import sds.Sds;
 public class LoadModelActions {
 	public static Action createLoadModelAction() {
 		return new JPatchAction() {
+                        @Override
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fileChooser = new JFileChooser();
 				fileChooser.setFileFilter(new FileFilter() {
