@@ -1,0 +1,3 @@
+rootProject.name = 'JPatch'
+
+include ':InyoRender', ':SmoothLookAndFeel'
